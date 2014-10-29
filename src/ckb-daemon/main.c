@@ -15,7 +15,7 @@
 #define N_KEYS 144
 typedef struct {
     const char* name;
-    char code;
+    unsigned char code;
 } key;
 key keymap[] = {
     { "esc", 0 },

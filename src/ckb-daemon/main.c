@@ -472,9 +472,17 @@ int openusb(libusb_device* device){
             }
             // Claim the USB interfaces. 2 is needed for key interrupts, 3 for the LED display.
             libusb_set_auto_detach_kernel_driver(kb->handle, 1);
-            if(libusb_claim_interface(kb->handle, 2) || libusb_claim_interface(kb->handle, 3)){
-                printf("Failed to claim interfaces\n");
-                libusb_release_interface(kb->handle, 3);
+            if(libusb_claim_interface(kb->handle, 2)){
+                printf("Failed to claim interface 2\n");
+                libusb_close(kb->handle);
+                kb->dev = 0;
+                kb->handle = 0;
+                return -1;
+            }
+            if(libusb_claim_interface(kb->handle, 3)){
+                printf("Failed to claim interface 3\n");
+                libusb_release_interface(kb->handle, 2);
+                libusb_close(kb->handle);
                 kb->dev = 0;
                 kb->handle = 0;
                 return -1;
@@ -483,6 +491,7 @@ int openusb(libusb_device* device){
             if(libusb_get_string_descriptor_ascii(kb->handle, descriptor.iProduct, (unsigned char*)kb->name, NAME_LEN) <= 0
                     || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->serial, SERIAL_LEN) <= 0){
                 printf("Failed to get device info\n");
+                libusb_release_interface(kb->handle, 2);
                 libusb_release_interface(kb->handle, 3);
                 libusb_close(kb->handle);
                 kb->dev = 0;
@@ -492,6 +501,7 @@ int openusb(libusb_device* device){
             printf("Connecting %s (S/N: %s)\n", kb->name, kb->serial);
             // Make /dev path
             if(makedevpath(index)){
+                libusb_release_interface(kb->handle, 2);
                 libusb_release_interface(kb->handle, 3);
                 libusb_close(kb->handle);
                 kb->dev = 0;
@@ -831,8 +841,6 @@ int main(void){
     printf("ckb Corsair Keyboard RGB driver v0.1\n");
 
     // Start libusb
-    libusb_init(0);
-    libusb_device** devices = 0;
     if(libusb_init(0)){
         printf("Failed to initialize libusb\n");
         return -1;
@@ -845,6 +853,7 @@ int main(void){
     if(!makedevpath(0))
         printf("Root controller ready at %s0\n", devpath);
     // Enumerate connected devices
+    libusb_device** devices = 0;
     if(libusb_get_device_list(0, &devices) > 0){
         for(libusb_device** dev = devices; *dev != 0; dev++)
             openusb(*dev);

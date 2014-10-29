@@ -15,7 +15,7 @@
 #define N_KEYS 144
 typedef struct {
     const char* name;
-    int code;
+    char code;
 } key;
 key keymap[] = {
     { "esc", 0 },
@@ -53,7 +53,7 @@ key keymap[] = {
     { "t", 62 },
     { "y", 74 },
     { "u", 86 },
-    { "i", 98},
+    { "i", 98 },
     { "o",  110 },
     { "p", 122 },
     { "lbracket", 134 },
@@ -101,7 +101,7 @@ key keymap[] = {
     { "del", 43 },
     { "end", 55 },
     { "pgdown", 67 },
-    { "up", 103},
+    { "up", 103 },
     { "left", 115 },
     { "down", 127 },
     { "right", 139 },
@@ -162,11 +162,13 @@ key keymap[] = {
 #define NAME_LEN 33
 #define SERIAL_LEN   33
 #define RGB_SIZE (N_KEYS * sizeof(short))
-#define QUEUE_LEN 6
+#define QUEUE_LEN 12
 #define MSG_SIZE 64
 typedef struct {
     short* rgb;
     char* queue[QUEUE_LEN];
+    struct libusb_transfer* keyint;
+    char intinput[MSG_SIZE];
     int ledfifo;
     int queuelength;
     struct libusb_device_descriptor descriptor;
@@ -392,6 +394,27 @@ int makedevpath(int index){
     return 0;
 }
 
+void intcallback(struct libusb_transfer* transfer){
+    usbdevice* kb = transfer->user_data;
+    // TODO: Actually do something with this data
+    printf("Got interrupt on %s\n", kb->serial);
+    // If the transfer didn't finish successfully, free it
+    if(transfer->status != LIBUSB_TRANSFER_COMPLETED){
+        libusb_free_transfer(transfer);
+        if(kb->keyint == transfer)
+            kb->keyint = 0;
+        return;
+    }
+    // Else, re-submit the transfer
+    libusb_submit_transfer(transfer);
+}
+
+void setint(usbdevice* kb){
+    kb->keyint = libusb_alloc_transfer(0);
+    libusb_fill_interrupt_transfer(kb->keyint, kb->handle, 0x83, kb->intinput, MSG_SIZE, intcallback, kb, 0);
+    libusb_submit_transfer(kb->keyint);
+}
+
 #define V_CORSAIR   0x1b1c
 #define P_K70       0x1b13
 #define P_K95       0x1b11
@@ -435,8 +458,8 @@ int openusb(libusb_device* device){
         }
     }
     // Find a free USB slot
-    for(int i = 1; i < DEV_MAX; i++){
-        usbdevice* kb = keyboard + i;
+    for(int index = 1; index < DEV_MAX; index++){
+        usbdevice* kb = keyboard + index;
         if(!kb->handle){
             // Open device
             memcpy(&kb->descriptor, &descriptor, sizeof(descriptor));
@@ -447,14 +470,16 @@ int openusb(libusb_device* device){
                 kb->dev = 0;
                 return -1;
             }
+            // Claim the USB interfaces. 2 is needed for key interrupts, 3 for the LED display.
             libusb_set_auto_detach_kernel_driver(kb->handle, 1);
-            if(libusb_claim_interface(kb->handle, 3)){
-                printf("Failed to claim interface\n");
+            if(libusb_claim_interface(kb->handle, 2) || libusb_claim_interface(kb->handle, 3)){
+                printf("Failed to claim interfaces\n");
                 libusb_release_interface(kb->handle, 3);
                 kb->dev = 0;
                 kb->handle = 0;
                 return -1;
             }
+            // Get device description and serial
             if(libusb_get_string_descriptor_ascii(kb->handle, descriptor.iProduct, (unsigned char*)kb->name, NAME_LEN) <= 0
                     || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->serial, SERIAL_LEN) <= 0){
                 printf("Failed to get device info\n");
@@ -466,24 +491,97 @@ int openusb(libusb_device* device){
             }
             printf("Connecting %s (S/N: %s)\n", kb->name, kb->serial);
             // Make /dev path
-            if(makedevpath(i)){
+            if(makedevpath(index)){
                 libusb_release_interface(kb->handle, 3);
                 libusb_close(kb->handle);
                 kb->dev = 0;
                 kb->handle = 0;
                 return -1;
             }
-            printf("Device ready at %s%d\n", devpath, i);
+            printf("Device ready at %s%d\n", devpath, index);
 
             // Create the USB queue
             for(int q = 0; q < QUEUE_LEN; q++)
                 kb->queue[q] = malloc(MSG_SIZE);
 
-            // The default behavior is to highlight the M-buttons (K95) as well as Win Lock with an inverted color when active.
-            // Additionally, pressing an M-button will switch to a different memory state. This message will remove both behaviors,
-            // at the cost of the buttons causing the keyboard to freeze instead of switch mode. Need more research here...
-            char datapkt[64] = { 0x07, 0x04, 0x02, 0 };
-            usbqueue(kb, datapkt, 1);
+            // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode. This packet disables their
+            // hardware-based functions.
+            char datapkt[7][64] = { { 0x07, 0x04, 0x02, 0} };
+
+            // Set interrupt mode on the keys. 0x80 generates a normal HID interrupt, 0x40 generates a custom interrupt. 0xc0 generates both.
+            // NOTE: I observed the windows driver setting a key to 0x49. Seems there are other bits in use here. I'm also a bit uncertain
+            // about the order of keys here; I got the 0x40 entries by looking at the Windows packet. It seems the K95 keys are all at the end,
+            // but the rest of them don't correspond to the LED indices in any apparent manner. Might just be totally different mapping.
+
+            // For now, set the extra keys to use the special interrupt and everything else to use regular. This is the board's default
+            // behavior anyway. Special interrupts will be activated for other keys later, for animation/rebinding purposes.
+
+            // TODO: It would probably be a good idea to reset everything to 0x80 when quitting the driver so that the keys won't lock up if
+            // you press them afterward.
+
+            for(int i = 1; i < 5; i++){
+                datapkt[i][0] = 0x07;
+                datapkt[i][1] = 0x40;
+                datapkt[i][2] = 0x1e;
+            }
+            datapkt[5][0] = 0x07;
+            datapkt[5][1] = 0x40;
+            datapkt[5][2] = 0x0d;
+            datapkt[6][0] = 0x07;
+            datapkt[6][1] = 0x05;
+            datapkt[6][2] = 0x02;
+            datapkt[6][4] = 0x03;
+            for(int i = 0; i < 30; i++){
+                datapkt[1][i * 2 + 4] = i;
+                datapkt[1][i * 2 + 5] = 0x80;
+            }
+            for(int i = 0; i < 30; i++){
+                // Skip 0x31
+                int val = i + 0x1e;
+                if(val > 0x30)
+                    val++;
+                datapkt[2][i * 2 + 4] = val;
+                datapkt[2][i * 2 + 5] = 0x80;
+            }
+            for(int i = 0; i < 30; i++){
+                // Skip 3f, 41, 42, 46, 51, 53, 55
+                int val = i + 0x3d;
+                if(val > 0x3e)
+                    val++;
+                if(val > 0x40)
+                    val += 2;
+                if(val > 0x45)
+                    val++;
+                if(val > 0x50)
+                    val++;
+                if(val > 0x52)
+                    val++;
+                if(val > 0x54)
+                    val++;
+                datapkt[3][i * 2 + 4] = val;
+                datapkt[3][i * 2 + 5] = (val == 0x47 || val == 0x60) ? 0x40 : 0x80;
+            }
+            for(int i = 0; i < 30; i++){
+                // Skip 6f
+                int val = i + 0x62;
+                if(val > 0x6e)
+                    val++;
+                datapkt[4][i * 2 + 4] = val;
+                datapkt[4][i * 2 + 5] = (val > 0x77) ? 0x40 : 0x80;
+            }
+            for(int i = 0; i < 13; i++){
+                // Skip 82, 83
+                int val = i + 0x81;
+                if(val > 0x81)
+                    val += 2;
+                datapkt[5][i * 2 + 4] = val;
+                datapkt[5][i * 2 + 5] = 0x40;
+            }
+            // Send out the messages.
+            usbqueue(kb, datapkt[0], 7);
+
+            // Setup the interrupt handler. These have to be processed asychronously so as not to lock up the animation
+            setint(kb);
 
             // Restore profile (if any)
             usbstore* store = findstore(kb->serial);
@@ -526,6 +624,7 @@ int closeusb(int index){
         store->rgb = kb->rgb;
         store->rgbon = kb->rgbon;
         // Close USB device
+        libusb_release_interface(kb->handle, 2);
         libusb_release_interface(kb->handle, 3);
         libusb_close(kb->handle);
         kb->handle = 0;
@@ -738,7 +837,7 @@ int main(void){
         printf("Failed to initialize libusb\n");
         return -1;
     }
-    libusb_set_debug(0, LIBUSB_LOG_LEVEL_INFO);
+    libusb_set_debug(0, LIBUSB_LOG_LEVEL_NONE);
     // Make root keyboard
     umask(0);
     memset(keyboard, 0, sizeof(keyboard));

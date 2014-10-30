@@ -25,7 +25,14 @@ void quit(){
     libusb_exit(0);
 }
 
+void sighandler2(int type){
+    printf("\nIgnoring signal %d (already shutting down)\n", type);
+}
+
 void sighandler(int type){
+    signal(SIGTERM, sighandler2);
+    signal(SIGINT, sighandler2);
+    signal(SIGQUIT, sighandler2);
     printf("\nCaught signal %d\n", type);
     quit();
     exit(0);

@@ -30,4 +30,7 @@ void updateconnected();
 // Create a dev path for the keyboard at index. Returns 0 on success.
 int makedevpath(int index);
 
+// Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
+int readlines(int fd, char*** lines);
+
 #endif

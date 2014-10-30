@@ -26,7 +26,7 @@ void quit(){
 }
 
 void sighandler(int type){
-    printf("Caught signal %d\n", type);
+    printf("\nCaught signal %d\n", type);
     quit();
     exit(0);
 }

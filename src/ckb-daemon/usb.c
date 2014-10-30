@@ -111,6 +111,7 @@ int openusb(libusb_device* device){
         }
     }
     // Find a free USB slot
+    int devreset = 0;
     for(int index = 1; index < DEV_MAX; index++){
         usbdevice* kb = keyboard + index;
         if(!kb->handle){
@@ -125,15 +126,23 @@ int openusb(libusb_device* device){
             }
             // Claim the USB interfaces. 2 is needed for key interrupts, 3 for the LED display.
             libusb_set_auto_detach_kernel_driver(kb->handle, 1);
+            if(libusb_claim_interface(kb->handle, 0))
+                printf("Warning: Failed to claim interface 0\n");
+            if(libusb_claim_interface(kb->handle, 1))
+                printf("Warning: Failed to claim interface 1\n");
             if(libusb_claim_interface(kb->handle, 2)){
-                printf("Failed to claim interface 2\n");
+                printf("Error: Failed to claim interface 2\n");
+                libusb_release_interface(kb->handle, 0);
+                libusb_release_interface(kb->handle, 1);
                 libusb_close(kb->handle);
                 kb->dev = 0;
                 kb->handle = 0;
                 return -1;
             }
             if(libusb_claim_interface(kb->handle, 3)){
-                printf("Failed to claim interface 3\n");
+                printf("Error: Failed to claim interface 3\n");
+                libusb_release_interface(kb->handle, 0);
+                libusb_release_interface(kb->handle, 1);
                 libusb_release_interface(kb->handle, 2);
                 libusb_close(kb->handle);
                 kb->dev = 0;
@@ -143,17 +152,34 @@ int openusb(libusb_device* device){
             // Get device description and serial
             if(libusb_get_string_descriptor_ascii(kb->handle, descriptor.iProduct, (unsigned char*)kb->name, NAME_LEN) <= 0
                     || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->serial, SERIAL_LEN) <= 0){
-                printf("Failed to get device info\n");
-                libusb_release_interface(kb->handle, 2);
-                libusb_release_interface(kb->handle, 3);
-                libusb_close(kb->handle);
-                kb->dev = 0;
-                kb->handle = 0;
-                return -1;
+                printf("%s: Failed to get device info%s\n", devreset ? "Error" : "Warning", devreset ? "" : ", trying reset...");
+                int reset = libusb_reset_device(kb->handle);
+                if(reset){
+                    libusb_release_interface(kb->handle, 0);
+                    libusb_release_interface(kb->handle, 1);
+                    libusb_release_interface(kb->handle, 2);
+                    libusb_release_interface(kb->handle, 3);
+                    libusb_close(kb->handle);
+                    kb->dev = 0;
+                    kb->handle = 0;
+                    if(reset != LIBUSB_ERROR_NOT_FOUND)
+                        return -1;
+                    index--;
+                    devreset = 1;
+                    continue;
+                }
+                if(libusb_get_string_descriptor_ascii(kb->handle, descriptor.iProduct, (unsigned char*)kb->name, NAME_LEN) <= 0
+                        || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->serial, SERIAL_LEN) <= 0){
+                    printf("Error: Reset failed\n");
+                    return -1;
+                }
+                printf("Reset success\n");
             }
             printf("Connecting %s (S/N: %s)\n", kb->name, kb->serial);
             // Make /dev path
             if(makedevpath(index)){
+                libusb_release_interface(kb->handle, 0);
+                libusb_release_interface(kb->handle, 1);
                 libusb_release_interface(kb->handle, 2);
                 libusb_release_interface(kb->handle, 3);
                 libusb_close(kb->handle);
@@ -262,6 +288,8 @@ int openusb(libusb_device* device){
             }
             updateconnected();
 
+            libusb_release_interface(kb->handle, 0);
+            libusb_release_interface(kb->handle, 1);
             return 0;
         }
     }

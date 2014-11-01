@@ -4,12 +4,13 @@
 // Number of keys
 #define N_KEYS 144
 
-// Map from key name to LED code
+// Map from key name to LED code and USB scan code
 typedef struct {
     const char* name;
-    unsigned char code;
+    short led;
+    short scan;
 } key;
-extern key keymap[];
-extern const int N_KEYMAP;
+// List of keys, ordered according to where they appear in the keyboard input
+extern key keymap[N_KEYS];
 
 #endif

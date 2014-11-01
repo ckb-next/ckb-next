@@ -5,6 +5,7 @@
 #include <sys/signal.h>
 
 int usbhotplug(struct libusb_context* ctx, struct libusb_device* device, libusb_hotplug_event event, void* user_data){
+    printf("Got hotplug event\n");
     if(event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED){
         // Device connected: parse device
         return openusb(device);
@@ -19,8 +20,20 @@ int usbhotplug(struct libusb_context* ctx, struct libusb_device* device, libusb_
 }
 
 void quit(){
-    for(int i = 1; i < DEV_MAX; i++)
-        closeusb(i);
+    for(int i = 1; i < DEV_MAX; i++){
+        // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
+        if(keyboard[i].handle){
+            setinput(keyboard + i, IN_HID);
+            // Stop the uinput device now to ensure no keys get stuck
+            uinputclose(i);
+            // Flush the USB queue and close the device
+            while(keyboard[i].queuelength > 0){
+                usleep(3333);
+                usbdequeue(keyboard + i);
+            }
+            closeusb(i);
+        }
+    }
     closeusb(0);
     libusb_exit(0);
 }
@@ -40,6 +53,9 @@ void sighandler(int type){
 
 int main(void){
     printf("ckb Corsair Keyboard RGB driver v0.1\n");
+
+    // Load the uinput module (if it's not loaded already)
+    system("modprobe uinput");
 
     // Start libusb
     if(libusb_init(0)){

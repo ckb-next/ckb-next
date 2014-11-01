@@ -151,9 +151,9 @@ void readled(usbdevice* kb, char* line){
                         colors[keycode] = rgb;
                     } else {
                         // Find this key in the keymap
-                        for(unsigned i = 0; i < N_KEYMAP; i++){
-                            if(!strcmp(keyname, keymap[i].name)){
-                                colors[keymap[i].code] = rgb;
+                        for(unsigned i = 0; i < N_KEYS; i++){
+                            if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
+                                colors[keymap[i].led] = rgb;
                                 break;
                             }
                         }

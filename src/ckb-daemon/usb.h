@@ -28,7 +28,9 @@ typedef struct {
     char* queue[QUEUE_LEN];
     struct libusb_transfer* keyint;
     char intinput[MSG_SIZE];
+    char previntinput[N_KEYS / 8];
     int ledfifo;
+    int uinput;
     int queuelength;
     struct libusb_device_descriptor descriptor;
     libusb_device* dev;
@@ -55,6 +57,15 @@ int usbcmp(libusb_device* dev1, libusb_device* dev2);
 int openusb(libusb_device* device);
 // Close a USB device and remove device entry. Returns 0 on success
 int closeusb(int index);
+
+// Opens uinput device
+int uinputopen(int index, const struct libusb_device_descriptor* descriptor);
+// Closes uinput device
+void uinputclose(int index);
+// Set input mode on a device
+#define IN_CORSAIR  0x40
+#define IN_HID      0x80
+void setinput(usbdevice* kb, int input);
 
 // Add a message to a USB device to be sent to the device. Returns 0 on success.
 int usbqueue(usbdevice* kb, char* messages, int count);

@@ -12,7 +12,7 @@ The user-runnable utility is currently very limited. It only supports one keyboa
 Building
 --------
 
-Only tested on Linux so far. It may work on OSX or Windows with some modification. `libusb-1.0` and `gcc` are required. Check with your package manager to make sure you have the correct libraries/headers installed. After that you can build ckb by running `make` in the directory you downloaded it to. The binaries will be placed in the `bin` directory assuming they compile successfully.
+ckb only supports Linux. OSX support is planned (tentatively). `libusb-1.0` and `gcc` are required. Check with your package manager to make sure you have the correct libraries/headers installed. After that you can build ckb by running `make` in the directory you downloaded it to. The binaries will be placed in `bin` assuming they compile successfully.
 
 Usage
 -----
@@ -38,11 +38,7 @@ The `serial` parameter, representing a keyboard's serial number, is required whe
 - `on` turns lighting on, restoring previously-applied colors (if any). It does not take a parameter.
 - `rgb` turns lighting on and also changes key colors. The parameter may be a single hex color; for instance, `rgb ff0000` will turn the whole keyboard red. Alternatively, you may specify key/color combinations, in a format like `key1:color1,key2:color2,key3:color3` and so on. For instance, `rgb esc:00ff00` will turn Esc green without affecting other keys. See `src/ckb_daemon/keyboard.c` for a list of key names. Multiple keys may be set to the same color by writing `key1,key2:color` instead of `key1:color,key2:color`. The special name `all` may be used to change all keys; for instance, `rgb all:ffffff,w,a,s,d:0000ff,enter:ff0000` will set the WASD keys to blue, the enter key to red, and all other keys to white.
 
-Caveats
--------
+Caveat emptor
+-------------
 
-The caps lock and scroll lock LEDs don't work on my computer (Arch Linux). Num Lock is fine, and the actual function of the keys is unimpaired. I don't know if this is a universal problem or not. I noticed that if I run a Windows VM in VMware, the lights work correctly when I move the mouse into the VM screen...even if the keyboard is connected to Linux and not Windows. This may actually be a problem in the kernel or Xorg. I'm still in the process of researching it.
-
-I have on one or two occasions had the keyboard animation freeze, at which point the LED controller refused to talk to my computer until I unplugged it and plugged it back in. In my early testing, I found that sending LED messages to the keyboard too quickly caused this to happen. The ~3ms per packet / 60FPS delay I've chosen seems stable 99% of the time, but it may be that a lower rate is desireable or that I need to handle some other kind of message to stop the freeze from occurring.
-
-Sometimes if you restart the daemon without unplugging and replugging the keyboard, it will fail to get interrupt events and the G-keys will freeze the board again. It's probably something libusb-related that I've forgotten to do.
+The firmware on these boards is extremely buggy and your keyboard may not work immediately or at all. I'm still trying to sort this out, but it may not be fixable.

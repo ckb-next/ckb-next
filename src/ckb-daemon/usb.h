@@ -29,8 +29,10 @@ typedef struct {
     struct libusb_transfer* keyint;
     char intinput[MSG_SIZE];
     char previntinput[N_KEYS / 8];
+    char ileds;
     int ledfifo;
     int uinput;
+    int event;
     int queuelength;
     struct libusb_device_descriptor descriptor;
     libusb_device* dev;

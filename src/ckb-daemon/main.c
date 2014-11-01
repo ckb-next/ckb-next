@@ -3,6 +3,7 @@
 #include "led.h"
 #include <time.h>
 #include <sys/signal.h>
+#include <linux/uinput.h>
 
 int usbhotplug(struct libusb_context* ctx, struct libusb_device* device, libusb_hotplug_event event, void* user_data){
     printf("Got hotplug event\n");
@@ -56,11 +57,11 @@ int main(void){
 
     // Load the uinput module (if it's not loaded already)
     if(system("modprobe uinput") != 0)
-        printf("Failed to load module uinput\n");
+        printf("Warning: Failed to load module uinput\n");
 
     // Start libusb
     if(libusb_init(0)){
-        printf("Failed to initialize libusb\n");
+        printf("Fatal: Failed to initialize libusb\n");
         return -1;
     }
     libusb_set_debug(0, LIBUSB_LOG_LEVEL_NONE);
@@ -71,17 +72,18 @@ int main(void){
     if(!makedevpath(0))
         printf("Root controller ready at %s0\n", devpath);
     // Enumerate connected devices
+    printf("Scanning devices\n");
     libusb_device** devices = 0;
     if(libusb_get_device_list(0, &devices) > 0){
         for(libusb_device** dev = devices; *dev != 0; dev++)
             openusb(*dev);
         libusb_free_device_list(devices, 1);
     } else
-        printf("Failed to scan USB devices\n");
+        printf("Warning: Failed to scan USB devices\n");
     // Set hotplug callback
     libusb_hotplug_callback_handle hphandle;
     if(libusb_hotplug_register_callback(0, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT, 0, V_CORSAIR, LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY, usbhotplug, 0, &hphandle) != LIBUSB_SUCCESS)
-        printf("Failed to activate hot plug callback\n");
+        printf("Warning: Failed to activate hot plug callback\n");
 
     // Set up signal handlers for quitting the service.
     signal(SIGTERM, sighandler);
@@ -107,9 +109,22 @@ int main(void){
         }
         // Run the USB queue. Messages must be queued because sending multiple messages at the same time can cause the interface to freeze
         for(int i = 1; i < DEV_MAX; i++){
-            if(keyboard[i].handle)
+            if(keyboard[i].handle){
                 usbdequeue(keyboard + i);
+                // Read the indicator LEDs for this device and update them if necessary.
+                // The lights are polled on an interval rather than being tied to keypresses because they may not fire immediately and
+                // they may be changed by an external source.
+                char leds[LED_CNT / 8] = { 0 };
+                if(ioctl(keyboard[i].event, EVIOCGLED(sizeof(leds)), &leds)){
+                    char ileds = leds[0];
+                    if(ileds != keyboard[i].ileds){
+                        keyboard[i].ileds = ileds;
+                        libusb_control_transfer(keyboard[i].handle, 0x21, 0x09, 0x0200, 0, &ileds, 1, 0);
+                    }
+                }
+            }
         }
+        // Try to get the state for the indicator lights (num lock, caps lock, scroll lock)
         // Sleep for 3ms. This delay seems to be enough to prevent the device from stopping and achieves a throughput of 60FPS.
         usleep(3333);
     }

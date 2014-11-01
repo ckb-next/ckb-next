@@ -84,19 +84,22 @@ void intcallback(struct libusb_transfer* transfer){
                     event.type = EV_KEY;
                     event.code = map->scan;
                     event.value = !!new;
-                    write(kb->uinput, &event, sizeof(event));
+                    if(write(kb->uinput, &event, sizeof(event)) <= 0)
+                        printf("Write error: %s\n", strerror(errno));
                     // The volume wheel doesn't generate keyups, so create them automatically
                     if(map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN){
                         kb->intinput[byte] &= ~mask;
                         event.type = EV_KEY;
                         event.code = map->scan;
                         event.value = 0;
-                        write(kb->uinput, &event, sizeof(event));
+                        if(write(kb->uinput, &event, sizeof(event)) <= 0)
+                            printf("Write error: %s\n", strerror(errno));
                     }
                     event.type = EV_SYN;
                     event.code = SYN_REPORT;
                     event.value = 0;
-                    write(kb->uinput, &event, sizeof(event));
+                    if(write(kb->uinput, &event, sizeof(event)) <= 0)
+                        printf("Write error: %s\n", strerror(errno));
                 }
             }
         }
@@ -136,8 +139,9 @@ int uinputopen(int index, const struct libusb_device_descriptor* descriptor){
     indev.id.bustype = BUS_USB;
     indev.id.vendor = descriptor->idVendor;
     indev.id.product = descriptor->idProduct;
-    indev.id.version = 1;
-    write(fd, &indev, sizeof(indev));
+    indev.id.version = 4;
+    if(write(fd, &indev, sizeof(indev)) <= 0)
+        printf("Write error: %s\n", strerror(errno));
     if(ioctl(fd, UI_DEV_CREATE)){
         printf("Failed to create uinput device: %s\n", strerror(errno));
         close(fd);
@@ -157,11 +161,13 @@ void uinputclose(int index){
     event.type = EV_KEY;
     for(int key = 0; key < 256; key++){
         event.code = key;
-        write(kb->uinput, &event, sizeof(event));
+        if(write(kb->uinput, &event, sizeof(event)) <= 0)
+            printf("Write error: %s\n", strerror(errno));
     }
     event.type = EV_SYN;
     event.code = SYN_REPORT;
-    write(kb->uinput, &event, sizeof(event));
+    if(write(kb->uinput, &event, sizeof(event)) <= 0)
+        printf("Write error: %s\n", strerror(errno));
     // Close the device
     ioctl(kb->uinput, UI_DEV_DESTROY);
     close(kb->uinput);

@@ -55,7 +55,8 @@ int main(void){
     printf("ckb Corsair Keyboard RGB driver v0.1\n");
 
     // Load the uinput module (if it's not loaded already)
-    system("modprobe uinput");
+    if(system("modprobe uinput") != 0)
+        printf("Failed to load module uinput\n");
 
     // Start libusb
     if(libusb_init(0)){

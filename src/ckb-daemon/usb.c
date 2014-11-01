@@ -53,7 +53,7 @@ int usbdequeue(usbdevice* kb){
     return count;
 }
 
-void intcallback(struct libusb_transfer* transfer){
+void icorcallback(struct libusb_transfer* transfer){
     usbdevice* kb = transfer->user_data;
     // If the transfer didn't finish successfully, free it
     if(transfer->status != LIBUSB_TRANSFER_COMPLETED){
@@ -110,10 +110,25 @@ void intcallback(struct libusb_transfer* transfer){
     libusb_submit_transfer(transfer);
 }
 
+void ihidcallback(struct libusb_transfer* transfer){
+    // If the transfer didn't finish successfully, free it
+    if(transfer->status != LIBUSB_TRANSFER_COMPLETED){
+        free(transfer->buffer);
+        libusb_free_transfer(transfer);
+        return;
+    }
+    // All useful inputs come from the corsair interface, so don't bother processing this
+    // Re-submit the transfer
+    libusb_submit_transfer(transfer);
+}
+
 void setint(usbdevice* kb){
     kb->keyint = libusb_alloc_transfer(0);
-    libusb_fill_interrupt_transfer(kb->keyint, kb->handle, 0x83, kb->intinput, MSG_SIZE, intcallback, kb, 0);
+    libusb_fill_interrupt_transfer(kb->keyint, kb->handle, 0x83, kb->intinput, MSG_SIZE, icorcallback, kb, 0);
     libusb_submit_transfer(kb->keyint);
+    struct libusb_transfer* transfer = libusb_alloc_transfer(0);
+    libusb_fill_interrupt_transfer(transfer, kb->handle, 0x82, malloc(MSG_SIZE), MSG_SIZE, ihidcallback, kb, 0);
+    libusb_submit_transfer(transfer);
 }
 
 int uinputopen(int index, const struct libusb_device_descriptor* descriptor){

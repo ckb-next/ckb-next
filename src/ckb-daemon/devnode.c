@@ -1,4 +1,4 @@
-#include "io.h"
+#include "devnode.h"
 #include "usb.h"
 
 const char *const devpath = "/dev/input/ckb";

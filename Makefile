@@ -1,4 +1,4 @@
-DAEMON_SRC := src/ckb-daemon/main.c src/ckb-daemon/usb.c src/ckb-daemon/input.c src/ckb-daemon/led.c src/ckb-daemon/keyboard.c src/ckb-daemon/io.c
+DAEMON_SRC := src/ckb-daemon/main.c src/ckb-daemon/usb.c src/ckb-daemon/input.c src/ckb-daemon/led.c src/ckb-daemon/keyboard.c src/ckb-daemon/devnode.c
 CKB_SRC := src/ckb/main.c
 
 build:

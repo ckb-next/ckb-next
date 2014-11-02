@@ -1,14 +1,7 @@
 #ifndef USB_H
 #define USB_H
 
-#ifndef _DEFAULT_SOURCE
-#define _DEFAULT_SOURCE
-#endif
-#include <features.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <libusb-1.0/libusb.h>
+#include "includes.h"
 #include "keyboard.h"
 
 // Vendor/product codes
@@ -60,16 +53,10 @@ int openusb(libusb_device* device);
 // Close a USB device and remove device entry. Returns 0 on success
 int closeusb(int index);
 
-// Opens uinput device
-int uinputopen(int index, const struct libusb_device_descriptor* descriptor);
-// Closes uinput device
-void uinputclose(int index);
 // Set input mode on a device
 #define IN_CORSAIR  0x40
 #define IN_HID      0x80
 void setinput(usbdevice* kb, int input);
-// Read LEDs from the event device and update them (if needed).
-void updateindicators(usbdevice* kb, int force);
 
 // Add a message to a USB device to be sent to the device. Returns 0 on success.
 int usbqueue(usbdevice* kb, char* messages, int count);

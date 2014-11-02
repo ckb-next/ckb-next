@@ -1,18 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
-#ifndef _DEFAULT_SOURCE
-#define _DEFAULT_SOURCE
-#endif
-#include <features.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/errno.h>
+#include "includes.h"
 
 // rm -rf
 int rm_recursive(const char* path);

@@ -1,9 +1,7 @@
 #include "usb.h"
 #include "io.h"
 #include "led.h"
-#include <time.h>
-#include <sys/signal.h>
-#include <linux/uinput.h>
+#include "input.h"
 
 int usbhotplug(struct libusb_context* ctx, struct libusb_device* device, libusb_hotplug_event event, void* user_data){
     printf("Got hotplug event\n");

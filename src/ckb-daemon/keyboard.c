@@ -1,5 +1,4 @@
 #include "keyboard.h"
-#include <linux/uinput.h>
 
 key keymap[N_KEYS] = {
     { "esc",        0x00, KEY_ESC },

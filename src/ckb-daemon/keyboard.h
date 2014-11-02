@@ -1,6 +1,8 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
+#include "includes.h"
+
 // Number of keys
 #define N_KEYS 144
 

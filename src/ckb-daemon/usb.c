@@ -313,6 +313,27 @@ void setinput(usbdevice* kb, int input){
     usbqueue(kb, datapkt[0], 6);
 }
 
+void updateindicators(usbdevice* kb, int force){
+    // Read the indicator LEDs for this device and update them if necessary.
+    if(!kb->handle)
+        return;
+    if(kb->event <= 0){
+        if(force){
+            kb->ileds = 0;
+            libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0200, 0, &kb->ileds, 1, 0);
+        }
+        return;
+    }
+    char leds[LED_CNT / 8] = { 0 };
+    if(ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds)){
+        char ileds = leds[0];
+        if(ileds != kb->ileds || force){
+            kb->ileds = ileds;
+            libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0200, 0, &ileds, 1, 0);
+        }
+    }
+}
+
 int usbcmp(libusb_device* dev1, libusb_device* dev2){
     uint8_t num1[7], num2[7];
     int len1, len2;
@@ -470,6 +491,7 @@ int openusb(libusb_device* device){
             }
             if(kb->event <= 0)
                 printf("No event device found. Indicator lights will be disabled\n");
+            updateindicators(kb, 1);
 
             // Make /dev path
             if(makedevpath(index)){

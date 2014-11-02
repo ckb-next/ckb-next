@@ -111,17 +111,9 @@ int main(void){
         for(int i = 1; i < DEV_MAX; i++){
             if(keyboard[i].handle){
                 usbdequeue(keyboard + i);
-                // Read the indicator LEDs for this device and update them if necessary.
-                // The lights are polled on an interval rather than being tied to keypresses because they may not fire immediately and
-                // they may be changed by an external source.
-                char leds[LED_CNT / 8] = { 0 };
-                if(ioctl(keyboard[i].event, EVIOCGLED(sizeof(leds)), &leds)){
-                    char ileds = leds[0];
-                    if(ileds != keyboard[i].ileds){
-                        keyboard[i].ileds = ileds;
-                        libusb_control_transfer(keyboard[i].handle, 0x21, 0x09, 0x0200, 0, &ileds, 1, 0);
-                    }
-                }
+                // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
+                // immediately and may be changed externally by the OS.
+                updateindicators(keyboard + i, 0);
             }
         }
         // Sleep for 3ms. This delay seems to be enough to prevent the device from stopping and achieves a throughput of 60FPS.

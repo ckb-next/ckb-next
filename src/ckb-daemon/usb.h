@@ -68,6 +68,8 @@ void uinputclose(int index);
 #define IN_CORSAIR  0x40
 #define IN_HID      0x80
 void setinput(usbdevice* kb, int input);
+// Read LEDs from the event device and update them (if needed).
+void updateindicators(usbdevice* kb, int force);
 
 // Add a message to a USB device to be sent to the device. Returns 0 on success.
 int usbqueue(usbdevice* kb, char* messages, int count);

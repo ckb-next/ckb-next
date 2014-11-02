@@ -348,6 +348,16 @@ int usbcmp(libusb_device* dev1, libusb_device* dev2){
     return 0;
 }
 
+void closehandle(usbdevice* kb){
+    libusb_release_interface(kb->handle, 0);
+    libusb_release_interface(kb->handle, 1);
+    libusb_release_interface(kb->handle, 2);
+    libusb_release_interface(kb->handle, 3);
+    libusb_close(kb->handle);
+    kb->handle = 0;
+    kb->dev = 0;
+}
+
 int openusb(libusb_device* device){
     // Get info and check the manufacturer/product ID
     struct libusb_device_descriptor descriptor;
@@ -395,31 +405,19 @@ int openusb(libusb_device* device){
             // 1 is for HID inputs
             if(libusb_claim_interface(kb->handle, 1)){
                 printf("Error: Failed to claim interface 1\n");
-                libusb_release_interface(kb->handle, 0);
-                libusb_close(kb->handle);
-                kb->dev = 0;
-                kb->handle = 0;
+                closehandle(kb);
                 return -1;
             }
             // 2 is for Corsair inputs
             if(libusb_claim_interface(kb->handle, 2)){
                 printf("Error: Failed to claim interface 2\n");
-                libusb_release_interface(kb->handle, 0);
-                libusb_release_interface(kb->handle, 1);
-                libusb_close(kb->handle);
-                kb->dev = 0;
-                kb->handle = 0;
+                closehandle(kb);
                 return -1;
             }
             // 3 is for the LED and board controller
             if(libusb_claim_interface(kb->handle, 3)){
                 printf("Error: Failed to claim interface 3\n");
-                libusb_release_interface(kb->handle, 0);
-                libusb_release_interface(kb->handle, 1);
-                libusb_release_interface(kb->handle, 2);
-                libusb_close(kb->handle);
-                kb->dev = 0;
-                kb->handle = 0;
+                closehandle(kb);
                 return -1;
             }
             // Reset the device. It acts weird if you don't.
@@ -427,13 +425,7 @@ int openusb(libusb_device* device){
                 printf("Resetting device\n");
                 int reset = libusb_reset_device(kb->handle);
                 if(reset){
-                    libusb_release_interface(kb->handle, 0);
-                    libusb_release_interface(kb->handle, 1);
-                    libusb_release_interface(kb->handle, 2);
-                    libusb_release_interface(kb->handle, 3);
-                    libusb_close(kb->handle);
-                    kb->dev = 0;
-                    kb->handle = 0;
+                    closehandle(kb);
                     if(reset != LIBUSB_ERROR_NOT_FOUND){
                         printf("Error: Reset failed\n");
                         return -1;
@@ -451,13 +443,7 @@ int openusb(libusb_device* device){
                 if(devreset < 2){
                     int reset = libusb_reset_device(kb->handle);
                     if(reset){
-                        libusb_release_interface(kb->handle, 0);
-                        libusb_release_interface(kb->handle, 1);
-                        libusb_release_interface(kb->handle, 2);
-                        libusb_release_interface(kb->handle, 3);
-                        libusb_close(kb->handle);
-                        kb->dev = 0;
-                        kb->handle = 0;
+                        closehandle(kb);
                         if(reset != LIBUSB_ERROR_NOT_FOUND){
                             printf("Error: Reset failed\n");
                             return -1;
@@ -479,13 +465,7 @@ int openusb(libusb_device* device){
 
             // Set up a uinput device for key events
             if((kb->uinput = uinputopen(index, &descriptor)) <= 0){
-                libusb_release_interface(kb->handle, 0);
-                libusb_release_interface(kb->handle, 1);
-                libusb_release_interface(kb->handle, 2);
-                libusb_release_interface(kb->handle, 3);
-                libusb_close(kb->handle);
-                kb->dev = 0;
-                kb->handle = 0;
+                closehandle(kb);
                 kb->uinput = 0;
                 return -1;
             }
@@ -495,13 +475,8 @@ int openusb(libusb_device* device){
 
             // Make /dev path
             if(makedevpath(index)){
-                libusb_release_interface(kb->handle, 0);
-                libusb_release_interface(kb->handle, 1);
-                libusb_release_interface(kb->handle, 2);
-                libusb_release_interface(kb->handle, 3);
-                libusb_close(kb->handle);
-                kb->dev = 0;
-                kb->handle = 0;
+                uinputclose(index);
+                closehandle(kb);
                 return -1;
             }
 
@@ -562,13 +537,7 @@ int closeusb(int index){
         store->rgb = kb->rgb;
         store->rgbon = kb->rgbon;
         // Close USB device
-        libusb_release_interface(kb->handle, 0);
-        libusb_release_interface(kb->handle, 1);
-        libusb_release_interface(kb->handle, 2);
-        libusb_release_interface(kb->handle, 3);
-        libusb_close(kb->handle);
-        kb->handle = 0;
-        kb->dev = 0;
+        closehandle(kb);
         updateconnected();
     }
     // Delete the control path

@@ -5,7 +5,7 @@
 #include <linux/uinput.h>
 
 #ifndef UINPUT_VERSION
-#define UINPUT_VERSION 0
+#define UINPUT_VERSION 2
 #endif
 
 usbdevice keyboard[DEV_MAX];
@@ -145,7 +145,7 @@ int uinputopen(int index, const struct libusb_device_descriptor* descriptor){
             return fd;
         }
     }
-    printf("Setting up uinput device %d\n", index);
+    printf("Setting up uinput device ckb%d\n", index);
     // Set up as a keyboard device and enable all keys as well as all LEDs
     ioctl(fd, UI_SET_EVBIT, EV_KEY);
     ioctl(fd, UI_SET_EVBIT, EV_LED);
@@ -161,7 +161,7 @@ int uinputopen(int index, const struct libusb_device_descriptor* descriptor){
     indev.id.bustype = BUS_USB;
     indev.id.vendor = descriptor->idVendor;
     indev.id.product = descriptor->idProduct;
-    indev.id.version = 4;
+    indev.id.version = (UINPUT_VERSION > 4 ? 4 : UINPUT_VERSION);
     if(write(fd, &indev, sizeof(indev)) <= 0)
         printf("Write error: %s\n", strerror(errno));
     if(ioctl(fd, UI_DEV_CREATE)){
@@ -170,41 +170,71 @@ int uinputopen(int index, const struct libusb_device_descriptor* descriptor){
         return -1;
     }
     // Get event device. Needed to listen to indicator LEDs (caps lock, etc)
-#if UINPUT_VERSION >= 4
     char uiname[256], uipath[FILENAME_MAX];
-    if(ioctl(fd, UI_GET_SYSNAME(256), uiname) < 0){
-        printf("Warning: Couldn't get uinput path: %s\n", strerror(errno));
-        return fd;
-    }
-    snprintf(uipath, FILENAME_MAX, "/sys/devices/virtual/input/%s", uiname);
-    // Look in the uinput directory for a file named event*
-    DIR* dir = opendir(uipath);
-    if(!dir){
-        printf("Warning: Couldn't open uinput path: %s\n", strerror(errno));
-        return fd;
-    }
-    int eid = -1;
-    struct dirent* file;
-    while((file = readdir(dir))){
-        if(sscanf(file->d_name, "event%d", &eid) == 1)
-            break;
-    }
-    closedir(dir);
-    if(eid < 0){
-        printf("Warning: Couldn't find event at uinput path\n");
-        return fd;
-    }
-    // Open the corresponding device in /dev/input
-    snprintf(uipath, FILENAME_MAX, "/dev/input/event%d", eid);
-    int fd2 = open(uipath, O_RDONLY | O_NONBLOCK);
-    if(fd2 <= 0){
-        printf("Warning: Couldn't open event device: %s\n", strerror(errno));
-        return fd;
-    }
-    keyboard[index].event = fd2;
-#else
-    printf("Your version of uinput doesn't support UI_GET_SYSNAME. Num/Caps/Scroll Lock indicators won't work\n");
+    const char* uidevbase = "/sys/devices/virtual/input";
+#if UINPUT_VERSION >= 4
+    if(ioctl(fd, UI_GET_SYSNAME(256), uiname) >= 0)
+        snprintf(uipath, FILENAME_MAX, "%s/%s", uidevbase, uiname);
+    else {
+        printf("Warning: Couldn't get uinput path (trying workaround): %s\n", strerror(errno));
 #endif
+        // If the system's version of uinput doesn't support getting the device name, or if it failed, scan the directory for this device
+        DIR* uidir = opendir(uidevbase);
+        if(!uidir){
+            printf("Warning: Couldn't open virtual device path: %s\n", strerror(errno));
+            return fd;
+        }
+        struct dirent* uifile;
+        while((uifile = readdir(uidir))){
+            int uilength;
+            snprintf(uipath, FILENAME_MAX, "%s/%s%n/name", uidevbase, uifile->d_name, &uilength);
+            int namefd = open(uipath, O_RDONLY);
+            if(namefd > 0){
+                char name[10] = { 0 }, trimmedname[10] = { 0 };
+                ssize_t len = read(namefd, name, 9);
+                sscanf(name, "%9s", trimmedname);
+                if(len >= 0 && !strcmp(trimmedname, indev.name)){
+                    uipath[uilength] = 0;
+                    strcpy(uiname, uifile->d_name);
+                    break;
+                }
+                close(namefd);
+            }
+            uipath[0] = 0;
+        }
+        closedir(uidir);
+#if UINPUT_VERSION >= 4
+    }
+#endif
+    if(strlen(uipath) > 0){
+        printf("%s/%s set up\n", uidevbase, uiname);
+        // Look in the uinput directory for a file named event*
+        DIR* dir = opendir(uipath);
+        if(!dir){
+            printf("Warning: Couldn't open uinput path: %s\n", strerror(errno));
+            return fd;
+        }
+        int eid = -1;
+        struct dirent* file;
+        while((file = readdir(dir))){
+            if(sscanf(file->d_name, "event%d", &eid) == 1)
+                break;
+        }
+        closedir(dir);
+        if(eid < 0){
+            printf("Warning: Couldn't find event at uinput path\n");
+            return fd;
+        }
+        // Open the corresponding device in /dev/input
+        snprintf(uipath, FILENAME_MAX, "/dev/input/event%d", eid);
+        int fd2 = open(uipath, O_RDONLY | O_NONBLOCK);
+        if(fd2 <= 0){
+            printf("Warning: Couldn't open event device: %s\n", strerror(errno));
+            return fd;
+        }
+        keyboard[index].event = fd2;
+        printf("Opened /dev/input/event%d\n", eid);
+    }
     return fd;
 }
 
@@ -438,6 +468,8 @@ int openusb(libusb_device* device){
                 kb->uinput = 0;
                 return -1;
             }
+            if(kb->event <= 0)
+                printf("No event device found. Indicator lights will be disabled\n");
 
             // Make /dev path
             if(makedevpath(index)){

@@ -124,7 +124,6 @@ int main(void){
                 }
             }
         }
-        // Try to get the state for the indicator lights (num lock, caps lock, scroll lock)
         // Sleep for 3ms. This delay seems to be enough to prevent the device from stopping and achieves a throughput of 60FPS.
         usleep(3333);
     }

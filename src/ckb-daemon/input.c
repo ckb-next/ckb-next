@@ -136,15 +136,17 @@ void uinputupdate(usbdevice* kb){
         if(oldb == newb)
             continue;
         for(int bit = 0; bit < 8; bit++){
-            key* map = keymap + byte * 8 + bit;
+            int keyindex = byte * 8 + bit;
+            key* map = keymap + keyindex;
+            int scancode = kb->bind.base[keyindex];
             char mask = 1 << bit;
             char old = oldb & mask, new = newb & mask;
             // If the key state changed, send it to the uinput device
-            if(old != new && map->scan != 0){
+            if(old != new && scancode != 0){
                 struct input_event event;
                 memset(&event, 0, sizeof(event));
                 event.type = EV_KEY;
-                event.code = map->scan;
+                event.code = scancode;
                 event.value = !!new;
                 if(write(kb->uinput, &event, sizeof(event)) <= 0)
                     printf("Write error: %s\n", strerror(errno));
@@ -152,7 +154,7 @@ void uinputupdate(usbdevice* kb){
                 if(map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN){
                     kb->intinput[byte] &= ~mask;
                     event.type = EV_KEY;
-                    event.code = map->scan;
+                    event.code = scancode;
                     event.value = 0;
                     if(write(kb->uinput, &event, sizeof(event)) <= 0)
                         printf("Write error: %s\n", strerror(errno));
@@ -187,4 +189,40 @@ void updateindicators(usbdevice* kb, int force){
             libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0200, 0, &ileds, 1, 0);
         }
     }
+}
+
+void initbind(keybind* bind){
+    for(int i = 0; i < N_KEYS; i++)
+        bind->base[i] = keymap[i].scan;
+    bind->macros = malloc(32 * sizeof(key));
+    bind->macrocap = 32;
+}
+
+void closebind(keybind* bind){
+    free(bind->macros);
+    memset(bind, 0, sizeof(*bind));
+}
+
+void cmd_bind(usbdevice* kb, int keyindex, const char* to){
+    // Find the key to bind to
+    int tocode = 0;
+    if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1){
+        kb->bind.base[keyindex] = tocode;
+        return;
+    }
+    // If not numeric, look it up
+    for(int i = 0; i < N_KEYS; i++){
+        if(keymap[i].name && !strcmp(to, keymap[i].name)){
+            kb->bind.base[keyindex] = keymap[i].scan;
+            return;
+        }
+    }
+}
+
+void cmd_unbind(usbdevice* kb, int keyindex, const char* to){
+    kb->bind.base[keyindex] = 0;
+}
+
+void cmd_reset(usbdevice* kb, int keyindex, const char* to){
+    kb->bind.base[keyindex] = keymap[keyindex].scan;
 }

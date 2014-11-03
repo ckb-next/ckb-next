@@ -1,5 +1,7 @@
 #include "devnode.h"
 #include "usb.h"
+#include "input.h"
+#include "led.h"
 
 const char *const devpath = "/dev/input/ckb";
 
@@ -57,12 +59,12 @@ int makedevpath(int index){
         printf("Unable to create %s: %s\n", path, strerror(errno));
         return -1;
     }
-    // Create FIFO for the LEDs
-    char ledpath[sizeof(path) + 4];
-    snprintf(ledpath, sizeof(ledpath), "%s/led", path);
-    if(mkfifo(ledpath, S_READWRITE) != 0 || (kb->ledfifo = open(ledpath, O_RDONLY | O_NONBLOCK)) <= 0){
+    // Create command FIFO
+    char fifopath[sizeof(path) + 4];
+    snprintf(fifopath, sizeof(fifopath), "%s/cmd", path);
+    if(mkfifo(fifopath, S_READWRITE) != 0 || (kb->fifo = open(fifopath, O_RDONLY | O_NONBLOCK)) <= 0){
         rm_recursive(path);
-        printf("Unable to create %s: %s\n", ledpath, strerror(errno));
+        printf("Unable to create %s: %s\n", fifopath, strerror(errno));
         return -1;
     }
     if(kb->model == -1){
@@ -142,4 +144,101 @@ int readlines(int fd, char*** lines){
     free(buffer);
     *lines = linebuffer;
     return nlines;
+}
+
+void readcmd(usbdevice* kb, const char* line){
+    char word[strlen(line) + 1];
+    int wordlen;
+    // See if the first word is a serial number. If so, switch devices and skip to the next word.
+    if(sscanf(line, "%s%n", word, &wordlen) == 1 && strlen(word) == SERIAL_LEN - 1){
+        usbdevice* found = findusb(word);
+        if(found)
+            kb = found;
+        line += wordlen;
+        sscanf(line, "%s%n", word, &wordlen);
+    }
+    if(!kb->handle)
+        return;
+    cmd mode = NONE;
+    cmdhandler handler = 0;
+    int rgbchange = 0;
+    // Read words from the input
+    do {
+        line += wordlen;
+        // Check for a command word
+        if(!strcmp(word, "bind")){
+            mode = BIND;
+            handler = cmd_bind;
+            continue;
+        } else if(!strcmp(word, "unbind")){
+            mode = UNBIND;
+            handler = cmd_unbind;
+            continue;
+        } else if(!strcmp(word, "reset")){
+            mode = RESET;
+            handler = cmd_reset;
+            continue;
+        }/* else if(!strcmp(word, "macro")){
+            mode = MACRO;
+            handler = cmd_macro;
+            continue;
+        }*/ else if(!strcmp(word, "rgb")){
+            mode = RGB;
+            handler = cmd_ledrgb;
+            rgbchange = 1;
+            continue;
+        }
+        if(mode == NONE)
+            continue;
+        else if(mode == RGB){
+            // RGB command has a special response for "on", "off", and a hex constant
+            int r, g, b;
+            if(!strcmp(word, "on")){
+                cmd_ledon(kb);
+                continue;
+            } else if(!strcmp(word, "off")){
+                cmd_ledoff(kb);
+                continue;
+            } else if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
+                for(int i = 0; i < N_KEYS; i++)
+                    cmd_ledrgb(kb, i, word);
+                continue;
+            }
+        }
+        // Split the parameter at the colon
+        int left = -1;
+        sscanf(word, "%*[^:]%n", &left);
+        if(left <= 0)
+            continue;
+        const char* right = word + left;
+        if(right[0] == ':')
+            right++;
+        // Scan the left side for key names and run the request command
+        int position = 0, field = 0;
+        char keyname[11];
+        while(position < left && sscanf(word + position, "%10[^:,]%n", keyname, &field) == 1){
+            int keycode;
+            if(!strcmp(keyname, "all")){
+                // Set all keys
+                for(int i = 0; i < N_KEYS; i++)
+                    handler(kb, i, right);
+            } else if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
+                      || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
+                // Set a key numerically
+                handler(kb, keycode, right);
+            } else {
+                // Find this key in the keymap
+                for(unsigned i = 0; i < N_KEYS; i++){
+                    if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
+                        handler(kb, i, right);
+                        break;
+                    }
+                }
+            }
+            if(word[position += field] == ',')
+                position++;
+        }
+    } while(sscanf(line, "%s%n", word, &wordlen) == 1);
+    if(rgbchange)
+        updateleds(kb, kb->rgbon ? kb->rgb : 0);
 }

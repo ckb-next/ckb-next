@@ -8,7 +8,12 @@
 void initrgb(short** rgb, int* rgbon);
 // Update a device's LEDs with RGB data.
 void updateleds(usbdevice* kb, short* rgb);
-// Read and process input from an LED FIFO.
-void readled(usbdevice* kb, char* line);
+
+// Turns LEDs off
+void cmd_ledoff(usbdevice* kb);
+// Turns LEDs on
+void cmd_ledon(usbdevice* kb);
+// Updates an LED color
+void cmd_ledrgb(usbdevice* kb, int keyindex, const char* code);
 
 #endif

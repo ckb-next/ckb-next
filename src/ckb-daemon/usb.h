@@ -9,21 +9,30 @@
 #define P_K70       0x1b13
 #define P_K95       0x1b11
 
+// Stucture for tracking key bindings
+typedef struct {
+    int base[N_KEYS];
+    key* macros;
+    int macrocount;
+    int macrocap;
+} keybind;
+#define MACRO_MAX   1024
+
 // Structure for tracking keyboard devices
-#define DEV_MAX     10
-#define NAME_LEN 33
-#define SERIAL_LEN   33
-#define RGB_SIZE (N_KEYS * sizeof(short))
-#define QUEUE_LEN 12
-#define MSG_SIZE 64
+#define NAME_LEN    33
+#define SERIAL_LEN  33
+#define RGB_SIZE    (N_KEYS * sizeof(short))
+#define QUEUE_LEN   12
+#define MSG_SIZE    64
 typedef struct {
     short* rgb;
     char* queue[QUEUE_LEN];
     struct libusb_transfer* keyint;
     char intinput[MSG_SIZE];
     char previntinput[N_KEYS / 8];
+    keybind bind;
     char ileds;
-    int ledfifo;
+    int fifo;
     int uinput;
     int event;
     int queuelength;
@@ -35,6 +44,7 @@ typedef struct {
     char name[NAME_LEN];
     char serial[SERIAL_LEN];
 } usbdevice;
+#define DEV_MAX     10
 extern usbdevice keyboard[DEV_MAX];
 
 // Structure to store RGB settings for a keyboard not currently connected
@@ -63,6 +73,8 @@ int usbqueue(usbdevice* kb, char* messages, int count);
 // Output a message from the USB queue to the device, if any. Returns number of bytes written.
 int usbdequeue(usbdevice* kb);
 
+// Find a connected USB device. Returns 0 if not found
+usbdevice* findusb(const char* serial);
 // Find a USB device from storage. Returns 0 if not found
 usbstore* findstore(const char* serial);
 // Add a USB device to storage. Returns an existing device if found or a new one if not.

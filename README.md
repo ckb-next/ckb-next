@@ -21,22 +21,59 @@ Run `ckb-daemon` as root. It will log some status messages to the terminal and y
 
 `/dev/input/ckb0` contains the following files:
 - `connected`: A list of all connected keyboards, one per line. Each line contains a device path followed by the device's serial number and its description.
-- `led`: LED controller. More information below.
+- `cmd`: Keyboard controller. More information below.
 
 Other `ckb*` devices contain the following:
 - `model`: Device description/model.
 - `serial`: Device serial number. `model` and `serial` will match the info found in `ckb0/connected`
-- `led`: LED controller.
+- `cmd`: Keyboard controller.
 
-The LED controllers may be written by any user and accept input in the form of text commands. Write one command per line in the following format:
-`[serial] command [parameter]`
+Commands
+--------
 
-In a terminal shell, you can do this with `echo foo > /dev/input/ckb0/led`. Programmatically, you can open and write them as regular files. Be sure to call `fflush()` or an equivalent function so that your output is actually written.
+The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They may be written by any user. Commands should be given in the following format:
+`[serial] command1 [paramter1] [command2] [parameter2] [command3] [parameter3] ...`
 
-The `serial` parameter, representing a keyboard's serial number, is required when issuing commands to `ckb0`. If a keyboard with that number isn't connected, the settings will take effect when it is plugged in. When writing to `ckb1` and above, the setting is optional; by default, it will use the serial number at that path. `command` may be one of the following:
-- `off` turns all lighting off. It does not take a parameter.
-- `on` turns lighting on, restoring previously-applied colors (if any). It does not take a parameter.
-- `rgb` turns lighting on and also changes key colors. The parameter may be a single hex color; for instance, `rgb ff0000` will turn the whole keyboard red. Alternatively, you may specify key/color combinations, in a format like `key1:color1,key2:color2,key3:color3` and so on. For instance, `rgb esc:00ff00` will turn Esc green without affecting other keys. See `src/ckb_daemon/keyboard.c` for a list of key names. Multiple keys may be set to the same color by writing `key1,key2:color` instead of `key1:color,key2:color`. The special name `all` may be used to change all keys; for instance, `rgb all:ffffff,w,a,s,d:0000ff,enter:ff0000` will set the WASD keys to blue, the enter key to red, and all other keys to white.
+In a terminal shell, you can do this with e.g. `echo foo > /dev/input/ckb1/cmd`. Programmatically, you can open and write them as regular files. When programming, you must append a newline character and flush the output before your command(s) will actually be read.
+
+The `serial` parameter, representing a keyboard's serial number, is required when issuing commands to `ckb0`. It is unnecessary if writing to `ckb1` or any other path with an actual keyboard. If a keyboard with the given serial number isn't connected, the settings will be applied to that keyboard when it is plugged in.
+
+LED commands
+------------
+
+The backlighting is controlled by the `rgb` commands. Any of the following combinations may be used:
+- `rgb off` turns lighting off. No further color changes will take effect until you issue `rgb on`.
+- `rgb on` turns lighting on.
+- `rgb <RRGGBB>` sets the entire keyboard to the color specified by the hex constant RRGGBB.
+- `rgb <key>:<RRGGBB>` sets the specified key to the specified hex color. See `src/ckb-daemon/keyboard.c` for a list of key names.
+
+**Examples:**
+- `rgb ffffff` makes the whole keyboard white.
+- `rgb 000000` makes the whole keyboard black. This is NOT equivalent to `rgb off` as the keys are still considered "on" but are simply not lit.
+- `rgb esc:ff0000` sets the Esc key red but leaves the rest of the keyboard unchanged.
+Multiple keys may be changed to one color when separated with commas, for instance:
+- `rgb w,a,s,d:0000ff` sets the WASD keys to blue.
+Additionally, multiple commands may be combined into one, for instance:
+- `rgb ffffff esc:ff0000 w,a,s,d:0000ff` sets the Esc key red, the WASD keys blue, and the rest of the keyboard white (note the lack of a key name before `ffffff`, implying the whole keyboard is to be set).
+
+Binding commands
+----------------
+
+Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 operation that translates one keypress to a different keypress, regardless of circumstance; simple, but inflexible.
+- `bind <key1>:<key2>` remaps key1 to key2. Again, see `src/ckb-daemon/keyboard.c` for a list of key names.
+- `unbind <key>` unbinds a key, causing it to lose all function.
+- `rebind <key>` resets a key, returning it to its default binding.
+
+**Examples:**
+- `bind g1:esc` makes G1 become an alternate Esc key (the actual Esc key is not changed).
+- `bind caps:tab tab:caps` switches the functions of the Tab and Caps Lock keys.
+- `unbind lwin rwin` disables both Windows keys, even without using the keyboard's Windows Lock function.
+- `rebind all` resets the whole keyboard to its default bindings.
+
+Binding
+-------
+
+The binding controllers at `dev/input/ckb*/bind` are also text based. Like their LED counterparts, they accept text commands (optionally preceded by a
 
 Caveat emptor
 -------------

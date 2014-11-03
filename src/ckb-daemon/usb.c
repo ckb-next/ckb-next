@@ -7,6 +7,14 @@ usbdevice keyboard[DEV_MAX];
 usbstore* store = 0;
 int storecount = 0;
 
+usbdevice* findusb(const char* serial){
+    for(int i = 0; i < DEV_MAX; i++){
+        if(keyboard[i].fifo && !strcmp(serial, keyboard[i].serial))
+            return keyboard + i;
+    }
+    return 0;
+}
+
 usbstore* findstore(const char* serial){
     for(int i = 0; i < storecount; i++){
         usbstore* res = store + i;
@@ -318,6 +326,9 @@ int openusb(libusb_device* device){
                 initrgb(&kb->rgb, &kb->rgbon);
                 updateleds(kb, kb->rgb);
             }
+
+            initbind(&kb->bind);
+
             updateconnected();
 
             printf("Device ready at %s%d\n", devpath, index);
@@ -332,10 +343,10 @@ int openusb(libusb_device* device){
 int closeusb(int index){
     // Close file handles
     usbdevice* kb = keyboard + index;
-    if(!kb->ledfifo)
+    if(!kb->fifo)
         return 0;
-    close(kb->ledfifo);
-    kb->ledfifo = 0;
+    close(kb->fifo);
+    kb->fifo = 0;
     if(kb->handle){
         printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->serial);
         uinputclose(index);
@@ -346,6 +357,8 @@ int closeusb(int index){
         usbstore* store = addstore(kb->serial);
         store->rgb = kb->rgb;
         store->rgbon = kb->rgbon;
+        // Free binding data
+        closebind(&kb->bind);
         // Close USB device
         closehandle(kb);
         updateconnected();

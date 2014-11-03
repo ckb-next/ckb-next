@@ -2,6 +2,7 @@
 #define IO_H
 
 #include "includes.h"
+#include "usb.h"
 
 // rm -rf
 int rm_recursive(const char* path);
@@ -21,5 +22,19 @@ int makedevpath(int index);
 
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
 int readlines(int fd, char*** lines);
+
+// Command operations
+typedef enum {
+    NONE,
+    BIND,
+    UNBIND,
+    RESET,
+    MACRO,
+    RGB,
+} cmd;
+typedef void (*cmdhandler)(usbdevice*, int, const char*);
+
+// Reads input from the command FIFO
+void readcmd(usbdevice* kb, const char* line);
 
 #endif

@@ -82,6 +82,7 @@ int main(void){
     libusb_hotplug_callback_handle hphandle;
     if(libusb_hotplug_register_callback(0, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT, 0, V_CORSAIR, LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY, usbhotplug, 0, &hphandle) != LIBUSB_SUCCESS)
         printf("Warning: Failed to activate hot plug callback\n");
+    printf("Device scan finished\n");
 
     // Set up signal handlers for quitting the service.
     signal(SIGTERM, sighandler);
@@ -94,12 +95,12 @@ int main(void){
         libusb_handle_events_timeout_completed(0, &tv, 0);
         // Process FIFOs
         for(int i = 0; i < DEV_MAX; i++){
-            if(keyboard[i].ledfifo){
+            if(keyboard[i].fifo){
                 char** lines;
-                int nlines = readlines(keyboard[i].ledfifo, &lines);
+                int nlines = readlines(keyboard[i].fifo, &lines);
                 for(int j = 0; j < nlines; j++){
                     if(strlen(lines[j]) > 1)
-                        readled(keyboard + i, lines[j]);
+                        readcmd(keyboard + i, lines[j]);
                     free(lines[j]);
                 }
                 free(lines);

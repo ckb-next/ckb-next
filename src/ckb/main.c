@@ -56,12 +56,12 @@ void mainloop_random(float fr, float fg, float fb, float br, float bg, float bb)
         }
     }
     // Update and output the keys
-    fprintf(output, "rgb ");
+    fprintf(output, "rgb on ");
     for(int i = 0; i < N_KEYS; i++){
         r[i] += rspeed[i];
         g[i] += gspeed[i];
         b[i] += bspeed[i];
-        fprintf(output, "#%d:%02x%02x%02x,", i, (int)(r[i]), (int)(g[i]), (int)(b[i]));
+        fprintf(output, " #%d:%02x%02x%02x", i, (int)(r[i]), (int)(g[i]), (int)(b[i]));
     }
     fputc('\n', output);
     fflush(output);
@@ -71,7 +71,7 @@ void mainloop_random(float fr, float fg, float fb, float br, float bg, float bb)
 void mainloop_wave(float fr, float fg, float fb, float br, float bg, float bb){
     float size = WIDTH + 36.f;
     static float wavepos = -36.f;
-    fprintf(output, "rgb ");
+    fprintf(output, "rgb on ");
     for(int i = 0; i < N_POSITIONS; i++){
         float r = br;
         float g = bg;
@@ -82,7 +82,7 @@ void mainloop_wave(float fr, float fg, float fb, float br, float bg, float bb){
             g = g * distance / 36.f + fg * (1.f - distance / 36.f);
             b = b * distance / 36.f + fb * (1.f - distance / 36.f);
         }
-        fprintf(output, "%s:%02x%02x%02x", positions[i].name, (int)r, (int)g, (int)b);
+        fprintf(output, " %s:%02x%02x%02x", positions[i].name, (int)r, (int)g, (int)b);
     }
     fputc('\n', output);
     fflush(output);
@@ -95,7 +95,7 @@ void mainloop_ripple(float fr, float fg, float fb, float br, float bg, float bb)
     float size = sqrt(WIDTH*WIDTH/2. + HEIGHT*HEIGHT/2.);
     float cx = WIDTH / 2.f, cy = HEIGHT / 2.f;
     static float ringpos = -36.f;
-    fprintf(output, "rgb ");
+    fprintf(output, "rgb on");
     for(int i = 0; i < N_POSITIONS; i++){
         float r = br;
         float g = bg;
@@ -106,7 +106,7 @@ void mainloop_ripple(float fr, float fg, float fb, float br, float bg, float bb)
             g = g * distance / 36.f + fg * (1.f - distance / 36.f);
             b = b * distance / 36.f + fb * (1.f - distance / 36.f);
         }
-        fprintf(output, "%s:%02x%02x%02x", positions[i].name, (int)r, (int)g, (int)b);
+        fprintf(output, " %s:%02x%02x%02x", positions[i].name, (int)r, (int)g, (int)b);
     }
     fputc('\n', output);
     fflush(output);
@@ -120,7 +120,7 @@ void mainloop_gradient(float fr, float fg, float fb, float br, float bg, float b
     int r = fr * grad + br * (1.f - grad);
     int g = fg * grad + bg * (1.f - grad);
     int b = fb * grad + bb * (1.f - grad);
-    fprintf(output, "rgb %02x%02x%02x\n", r, g, b);
+    fprintf(output, "rgb on %02x%02x%02x\n", r, g, b);
     fflush(output);
     if(grad == 0.f)
         exit(0);
@@ -130,7 +130,7 @@ void mainloop_gradient(float fr, float fg, float fb, float br, float bg, float b
 }
 
 void mainloop_solid(float fr, float fg, float fb, float br, float bg, float bb){
-    fprintf(output, "rgb %02x%02x%02x\n", (int)fr, (int)fg, (int)fb);
+    fprintf(output, "rgb on %02x%02x%02x\n", (int)fr, (int)fg, (int)fb);
     fflush(output);
     exit(0);
 }
@@ -179,7 +179,11 @@ int main(int argc, char** argv){
         exit(0);
     }
 
-    output = fopen("/dev/input/ckb1/led", "w");
+    output = fopen("/dev/input/ckb1/cmd", "w");
+    if(!output){
+        printf("Unable to open input device\n");
+        exit(-1);
+    }
     int foreground = 0xffffff, background = 0xffffff;
     if(argc >= 3)
         foreground = background = readcolor(argv[2]);

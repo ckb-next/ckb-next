@@ -56,8 +56,8 @@ Multiple keys may be changed to one color when separated with commas, for instan
 Additionally, multiple commands may be combined into one, for instance:
 - `rgb ffffff esc:ff0000 w,a,s,d:0000ff` sets the Esc key red, the WASD keys blue, and the rest of the keyboard white (note the lack of a key name before `ffffff`, implying the whole keyboard is to be set).
 
-Binding commands
-----------------
+Binding keys
+------------
 
 Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 operation that translates one keypress to a different keypress, regardless of circumstance; simple, but inflexible.
 - `bind <key1>:<key2>` remaps key1 to key2. Again, see `src/ckb-daemon/keyboard.c` for a list of key names.
@@ -70,17 +70,17 @@ Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 oper
 - `unbind lwin rwin` disables both Windows keys, even without using the keyboard's Windows Lock function.
 - `rebind all` resets the whole keyboard to its default bindings.
 
-Macros
-------
+Key macros
+----------
 
 Macros are a more advanced form of key binding, controlled with the `macro` command.
-- `macro <keys>:<command>` binds a key combination to a command, where the command is a series of key presses. Keys should be separated with the + symbol; for instance, `lctrl+a` binds a macro to (left) Ctrl+A. Keys in the command should be preceded with `+` to trigger a key down event or `-` to trigger a key up.
+- `macro <keys>:<command>` binds a key combination to a command, where the command is a series of key presses. To combine keys, separate them with `+`; for instance, `lctrl+a` binds a macro to (left) Ctrl+A. In the command field, enter `+<key>` to trigger a key down or `-<key>` to trigger a key up. To simulate a key press, use `+<key>,-<key>`.
 - `macro <keys>:clear` clears commands associated with a key combination. Only one macro may be assigned per combination; assigning a second one will overwrite the first.
 - `macro clear` clears all macros.
 
 **Examples:**
 - `macro g1:+lctrl,+a,-a,-lctrl` triggers a Ctrl+A when G1 is pressed.
-- `macro g2+g3:+lalt,+f4,-f4,-lalts` triggers an Alt+F4 when both G1 and G2 are pressed.
+- `macro g2+g3:+lalt,+f4,-f4,-lalt` triggers an Alt+F4 when both G1 and G2 are pressed.
 
 Assigning a macro to a key will cause its binding to be ignored; for instance, `macro a:+b,-b` will cause A to generate a B character regardless of its binding. However, `macro lctrl+a:+b,-b` will cause A to generate a B only when Ctrl is also held down. Macros currently do not have any repeating options and will be triggered only once, when the key is pressed down. This feature will be added soon.
 

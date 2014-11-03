@@ -25,7 +25,9 @@ void cmd_bind(usbdevice* kb, int keyindex, const char* to);
 void cmd_unbind(usbdevice* kb, int keyindex, const char* ignored);
 // Resets a key binding
 void cmd_rebind(usbdevice* kb, int keyindex, const char* ignored);
-// Creates a macro
+// Creates or updates a macro
 void cmd_macro(usbdevice* kb, const char* keys, const char* assignment);
+// Clears all macros
+void cmd_macroclear(usbdevice* kb);
 
 #endif

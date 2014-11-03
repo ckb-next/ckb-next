@@ -283,6 +283,7 @@ void cmd_macro(usbdevice* kb, const char* keys, const char* assignment){
     keymacro macro;
     memset(&macro, 0, sizeof(macro));
     // Scan the left side for key names, separated by +
+    int empty = 1;
     int left = strlen(keys), right = strlen(assignment);
     int position = 0, field = 0;
     char keyname[12];
@@ -292,11 +293,13 @@ void cmd_macro(usbdevice* kb, const char* keys, const char* assignment){
                   || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
             // Set a key numerically
             macro.combo[keycode / 8] |= 1 << (keycode % 8);
+            empty = 0;
         } else {
             // Find this key in the keymap
             for(unsigned i = 0; i < N_KEYS; i++){
                 if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
                     macro.combo[i / 8] |= 1 << (i % 8);
+                    empty = 0;
                     break;
                 }
             }
@@ -304,6 +307,8 @@ void cmd_macro(usbdevice* kb, const char* keys, const char* assignment){
         if(keys[position += field] == '+')
             position++;
     }
+    if(empty)
+        return;
     // Count the number of actions (comma separated)
     int count = 0;
     for(const char* c = assignment; *c != 0; c++){
@@ -317,6 +322,8 @@ void cmd_macro(usbdevice* kb, const char* keys, const char* assignment){
     position = 0;
     field = 0;
     while(position < right && sscanf(assignment + position, "%11[^,]%n", keyname, &field) == 1){
+        if(!strcmp(keyname, "clear"))
+            break;
         int down = (keyname[0] == '+');
         if(down || keyname[0] == '-'){
             int keycode;
@@ -342,8 +349,34 @@ void cmd_macro(usbdevice* kb, const char* keys, const char* assignment){
             position++;
     }
 
-    // Add the macro to the device settings
+    // See if there's already a macro with this trigger
+    keymacro* macros = bind->macros;
+    for(int i = 0; i < bind->macrocount; i++){
+        if(!memcmp(macros[i].combo, macro.combo, N_KEYS / 8)){
+            free(macros[i].actions);
+            // If the new macro has no actions, erase the existing one
+            if(!macro.actioncount){
+                for(int j = i + 1; j < bind->macrocount; j++)
+                    memcpy(macros + j - 1, macros + j, sizeof(keymacro));
+                bind->macrocount--;
+            } else
+                // If there are actions, replace the existing with the new
+                memcpy(macros + i, &macro, sizeof(keymacro));
+            return;
+        }
+    }
+
+    // Add the macro to the device settings if not empty
+    if(macro.actioncount < 1)
+        return;
     memcpy(bind->macros + (bind->macrocount++), &macro, sizeof(keymacro));
     if(bind->macrocount >= bind->macrocap)
         bind->macros = realloc(bind->macros, (bind->macrocap += 16) * sizeof(keymacro));
+}
+
+void cmd_macroclear(usbdevice* kb){
+    keybind* bind = &kb->bind;
+    for(int i = 0; i < bind->macrocount; i++)
+        free(bind->macros[i].actions);
+    bind->macrocount = 0;
 }

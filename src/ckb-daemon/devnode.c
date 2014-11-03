@@ -204,6 +204,10 @@ void readcmd(usbdevice* kb, const char* line){
                     cmd_ledrgb(kb, i, word);
                 continue;
             }
+        } else if(mode == MACRO && !strcmp(word, "clear")){
+            // Macro has a special clear command
+            cmd_macroclear(kb);
+            continue;
         }
         // Split the parameter at the colon
         int left = -1;

@@ -11,8 +11,18 @@
 
 // Stucture for tracking key bindings
 typedef struct {
+    short scan;
+    char down;
+} macroaction;
+typedef struct {
+    macroaction* actions;
+    int actioncount;
+    char combo[N_KEYS / 8];
+    char triggered;
+} keymacro;
+typedef struct {
     int base[N_KEYS];
-    key* macros;
+    keymacro* macros;
     int macrocount;
     int macrocap;
 } keybind;

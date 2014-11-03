@@ -51,12 +51,12 @@ int makedevpath(int index){
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
     if(rm_recursive(path) != 0 && errno != ENOENT){
-        printf("Unable to delete %s: %s\n", path, strerror(errno));
+        printf("Error: Unable to delete %s: %s\n", path, strerror(errno));
         return -1;
     }
     if(mkdir(path, S_READDIR) != 0){
         rm_recursive(path);
-        printf("Unable to create %s: %s\n", path, strerror(errno));
+        printf("Error: Unable to create %s: %s\n", path, strerror(errno));
         return -1;
     }
     // Create command FIFO
@@ -64,7 +64,7 @@ int makedevpath(int index){
     snprintf(fifopath, sizeof(fifopath), "%s/cmd", path);
     if(mkfifo(fifopath, S_READWRITE) != 0 || (kb->fifo = open(fifopath, O_RDONLY | O_NONBLOCK)) <= 0){
         rm_recursive(path);
-        printf("Unable to create %s: %s\n", fifopath, strerror(errno));
+        printf("Error: Unable to create %s: %s\n", fifopath, strerror(errno));
         return -1;
     }
     if(kb->model == -1){
@@ -174,15 +174,15 @@ void readcmd(usbdevice* kb, const char* line){
             mode = UNBIND;
             handler = cmd_unbind;
             continue;
-        } else if(!strcmp(word, "reset")){
-            mode = RESET;
-            handler = cmd_reset;
+        } else if(!strcmp(word, "rebind")){
+            mode = REBIND;
+            handler = cmd_rebind;
             continue;
-        }/* else if(!strcmp(word, "macro")){
+        } else if(!strcmp(word, "macro")){
             mode = MACRO;
-            handler = cmd_macro;
+            handler = 0;
             continue;
-        }*/ else if(!strcmp(word, "rgb")){
+        } else if(!strcmp(word, "rgb")){
             mode = RGB;
             handler = cmd_ledrgb;
             rgbchange = 1;
@@ -213,6 +213,12 @@ void readcmd(usbdevice* kb, const char* line){
         const char* right = word + left;
         if(right[0] == ':')
             right++;
+        // Macros have a separate left-side handler
+        if(mode == MACRO){
+            word[left] = 0;
+            cmd_macro(kb, word, right);
+            continue;
+        }
         // Scan the left side for key names and run the request command
         int position = 0, field = 0;
         char keyname[11];

@@ -28,7 +28,7 @@ typedef enum {
     NONE,
     BIND,
     UNBIND,
-    RESET,
+    REBIND,
     MACRO,
     RGB,
 } cmd;

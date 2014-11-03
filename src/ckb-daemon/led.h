@@ -5,15 +5,15 @@
 #include "usb.h"
 
 // Initialize RGB data.
-void initrgb(short** rgb, int* rgbon);
+void initrgb(keylight* light);
 // Update a device's LEDs with RGB data.
-void updateleds(usbdevice* kb, short* rgb);
+void updateleds(usbdevice* kb);
 
 // Turns LEDs off
-void cmd_ledoff(usbdevice* kb);
+void cmd_ledoff(usbprofile* profile);
 // Turns LEDs on
-void cmd_ledon(usbdevice* kb);
+void cmd_ledon(usbprofile* profile);
 // Updates an LED color
-void cmd_ledrgb(usbdevice* kb, int keyindex, const char* code);
+void cmd_ledrgb(usbprofile* profile, int keyindex, const char* code);
 
 #endif

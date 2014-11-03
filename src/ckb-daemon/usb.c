@@ -4,35 +4,37 @@
 #include "input.h"
 
 usbdevice keyboard[DEV_MAX];
-usbstore* store = 0;
+usbsetting* store = 0;
 int storecount = 0;
 
 usbdevice* findusb(const char* serial){
     for(int i = 0; i < DEV_MAX; i++){
-        if(keyboard[i].fifo && !strcmp(serial, keyboard[i].serial))
+        if(keyboard[i].fifo && !strcmp(serial, keyboard[i].setting.serial))
             return keyboard + i;
     }
     return 0;
 }
 
-usbstore* findstore(const char* serial){
+usbsetting* findstore(const char* serial){
     for(int i = 0; i < storecount; i++){
-        usbstore* res = store + i;
+        usbsetting* res = store + i;
         if(!strcmp(res->serial, serial))
             return res;
     }
     return 0;
 }
 
-usbstore* addstore(const char* serial){
+usbsetting* addstore(const char* serial){
     // Try to find the device before adding it
-    usbstore* res = findstore(serial);
+    usbsetting* res = findstore(serial);
     if(res)
         return res;
     // Add device to the list
-    store = realloc(store, ++storecount * sizeof(usbstore));
+    store = realloc(store, ++storecount * sizeof(usbsetting));
     res = store + storecount - 1;
-    memset(res, 0, sizeof(usbstore));
+    // Initialize profile
+    initrgb(&res->profile.light);
+    initbind(&res->profile.bind);
     strcpy(res->serial, serial);
     return res;
 }
@@ -255,7 +257,7 @@ int openusb(libusb_device* device){
             }
             // Get device description and serial
             if(libusb_get_string_descriptor_ascii(kb->handle, descriptor.iProduct, (unsigned char*)kb->name, NAME_LEN) <= 0
-                    || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->serial, SERIAL_LEN) <= 0){
+                    || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->setting.serial, SERIAL_LEN) <= 0){
                 // If it fails, try to reset the device again
                 printf("%s: Failed to get device info%s\n", devreset >= 2 ? "Error" : "Warning", devreset >= 2 ? "" : ", trying another reset...");
                 if(devreset < 2){
@@ -271,7 +273,7 @@ int openusb(libusb_device* device){
                         continue;
                     }
                     if(libusb_get_string_descriptor_ascii(kb->handle, descriptor.iProduct, (unsigned char*)kb->name, NAME_LEN) <= 0
-                            || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->serial, SERIAL_LEN) <= 0){
+                            || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->setting.serial, SERIAL_LEN) <= 0){
                         printf("Error: Reset failed\n");
                         return -1;
                     }
@@ -279,7 +281,7 @@ int openusb(libusb_device* device){
                 } else
                     return -1;\
             }
-            printf("Connecting %s (S/N: %s)\n", kb->name, kb->serial);
+            printf("Connecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
 
             // Set up a uinput device for key events
             if((kb->uinput = uinputopen(index, &descriptor)) <= 0){
@@ -313,21 +315,16 @@ int openusb(libusb_device* device){
             setint(kb);
 
             // Restore profile (if any)
-            usbstore* store = findstore(kb->serial);
+            usbsetting* store = findstore(kb->setting.serial);
             if(store){
-                kb->rgb = store->rgb;
-                if((kb->rgbon = store->rgbon))
-                    updateleds(kb, kb->rgb);
-                else
-                    updateleds(kb, 0);
+                memcpy(&kb->setting.profile, &store->profile, sizeof(store->profile));
             } else {
                 // If no profile, set all LEDs to white
                 // TODO: Load factory calibration instead
-                initrgb(&kb->rgb, &kb->rgbon);
-                updateleds(kb, kb->rgb);
+                initrgb(&kb->setting.profile.light);
+                initbind(&kb->setting.profile.bind);
             }
-
-            initbind(&kb->bind);
+            updateleds(kb);
 
             updateconnected();
 
@@ -348,17 +345,14 @@ int closeusb(int index){
     close(kb->fifo);
     kb->fifo = 0;
     if(kb->handle){
-        printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->serial);
+        printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
         uinputclose(index);
         // Delete USB queue
         for(int i = 0; i < QUEUE_LEN; i++)
             free(kb->queue[i]);
-        // Move the RGB data into the device store
-        usbstore* store = addstore(kb->serial);
-        store->rgb = kb->rgb;
-        store->rgbon = kb->rgbon;
-        // Free binding data
-        closebind(&kb->bind);
+        // Move the profile data into the device store
+        usbsetting* store = addstore(kb->setting.serial);
+        memcpy(&store->profile, &kb->setting.profile, sizeof(kb->setting.profile));
         // Close USB device
         closehandle(kb);
         updateconnected();

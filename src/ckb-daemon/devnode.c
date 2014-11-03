@@ -36,7 +36,7 @@ void updateconnected(){
     for(int i = 1; i < DEV_MAX; i++){
         if(keyboard[i].handle){
             written = 1;
-            fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].serial, keyboard[i].name);
+            fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].setting.serial, keyboard[i].name);
         }
     }
     if(!written)
@@ -86,7 +86,7 @@ int makedevpath(int index){
         }
         FILE* sfile = fopen(spath, "w");
         if(sfile){
-            fputs(kb->serial, sfile);
+            fputs(kb->setting.serial, sfile);
             fputc('\n', sfile);
             fclose(sfile);
             chmod(spath, S_READ);
@@ -150,15 +150,23 @@ void readcmd(usbdevice* kb, const char* line){
     char word[strlen(line) + 1];
     int wordlen;
     // See if the first word is a serial number. If so, switch devices and skip to the next word.
+    usbsetting* set = (kb->handle ? &kb->setting : 0);
     if(sscanf(line, "%s%n", word, &wordlen) == 1 && strlen(word) == SERIAL_LEN - 1){
         usbdevice* found = findusb(word);
-        if(found)
+        if(found){
             kb = found;
+            set = &kb->setting;
+        } else {
+            // If the device isn't plugged in, find (or add) it to storage
+            kb = 0;
+            set = addstore(word);
+        }
         line += wordlen;
         sscanf(line, "%s%n", word, &wordlen);
     }
-    if(!kb->handle)
+    if(!set)
         return;
+    usbprofile* profile = &set->profile;
     cmd mode = NONE;
     cmdhandler handler = 0;
     int rgbchange = 0;
@@ -194,19 +202,19 @@ void readcmd(usbdevice* kb, const char* line){
             // RGB command has a special response for "on", "off", and a hex constant
             int r, g, b;
             if(!strcmp(word, "on")){
-                cmd_ledon(kb);
+                cmd_ledon(profile);
                 continue;
             } else if(!strcmp(word, "off")){
-                cmd_ledoff(kb);
+                cmd_ledoff(profile);
                 continue;
             } else if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
                 for(int i = 0; i < N_KEYS; i++)
-                    cmd_ledrgb(kb, i, word);
+                    cmd_ledrgb(profile, i, word);
                 continue;
             }
         } else if(mode == MACRO && !strcmp(word, "clear")){
             // Macro has a special clear command
-            cmd_macroclear(kb);
+            cmd_macroclear(profile);
             continue;
         }
         // Split the parameter at the colon
@@ -220,7 +228,7 @@ void readcmd(usbdevice* kb, const char* line){
         // Macros have a separate left-side handler
         if(mode == MACRO){
             word[left] = 0;
-            cmd_macro(kb, word, right);
+            cmd_macro(profile, word, right);
             continue;
         }
         // Scan the left side for key names and run the request command
@@ -231,16 +239,16 @@ void readcmd(usbdevice* kb, const char* line){
             if(!strcmp(keyname, "all")){
                 // Set all keys
                 for(int i = 0; i < N_KEYS; i++)
-                    handler(kb, i, right);
+                    handler(profile, i, right);
             } else if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
                       || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
                 // Set a key numerically
-                handler(kb, keycode, right);
+                handler(profile, keycode, right);
             } else {
                 // Find this key in the keymap
                 for(unsigned i = 0; i < N_KEYS; i++){
                     if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
-                        handler(kb, i, right);
+                        handler(profile, i, right);
                         break;
                     }
                 }
@@ -249,6 +257,6 @@ void readcmd(usbdevice* kb, const char* line){
                 position++;
         }
     } while(sscanf(line, "%s%n", word, &wordlen) == 1);
-    if(rgbchange)
-        updateleds(kb, kb->rgbon ? kb->rgb : 0);
+    if(kb && rgbchange)
+        updateleds(kb);
 }

@@ -140,7 +140,7 @@ int macromask(const char* key1, const char* key2){
 }
 
 void uinputupdate(usbdevice* kb){
-    keybind* bind = &kb->bind;
+    keybind* bind = &kb->setting.profile.bind;
     // Don't do anything if the state hasn't changed
     if(!memcmp(kb->previntinput, kb->intinput, N_KEYS / 8))
         return;
@@ -242,6 +242,7 @@ void initbind(keybind* bind){
         bind->base[i] = keymap[i].scan;
     bind->macros = malloc(32 * sizeof(keymacro));
     bind->macrocap = 32;
+    bind->macrocount = 0;
 }
 
 void closebind(keybind* bind){
@@ -251,32 +252,32 @@ void closebind(keybind* bind){
     memset(bind, 0, sizeof(*bind));
 }
 
-void cmd_bind(usbdevice* kb, int keyindex, const char* to){
+void cmd_bind(usbprofile* profile, int keyindex, const char* to){
     // Find the key to bind to
     int tocode = 0;
     if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1){
-        kb->bind.base[keyindex] = tocode;
+        profile->bind.base[keyindex] = tocode;
         return;
     }
     // If not numeric, look it up
     for(int i = 0; i < N_KEYS; i++){
         if(keymap[i].name && !strcmp(to, keymap[i].name)){
-            kb->bind.base[keyindex] = keymap[i].scan;
+            profile->bind.base[keyindex] = keymap[i].scan;
             return;
         }
     }
 }
 
-void cmd_unbind(usbdevice* kb, int keyindex, const char* to){
-    kb->bind.base[keyindex] = 0;
+void cmd_unbind(usbprofile* profile, int keyindex, const char* to){
+    profile->bind.base[keyindex] = 0;
 }
 
-void cmd_rebind(usbdevice* kb, int keyindex, const char* to){
-    kb->bind.base[keyindex] = keymap[keyindex].scan;
+void cmd_rebind(usbprofile* profile, int keyindex, const char* to){
+    profile->bind.base[keyindex] = keymap[keyindex].scan;
 }
 
-void cmd_macro(usbdevice* kb, const char* keys, const char* assignment){
-    keybind* bind = &kb->bind;
+void cmd_macro(usbprofile* profile, const char* keys, const char* assignment){
+    keybind* bind = &profile->bind;
     if(bind->macrocount >= MACRO_MAX)
         return;
     // Create a key macro
@@ -374,8 +375,8 @@ void cmd_macro(usbdevice* kb, const char* keys, const char* assignment){
         bind->macros = realloc(bind->macros, (bind->macrocap += 16) * sizeof(keymacro));
 }
 
-void cmd_macroclear(usbdevice* kb){
-    keybind* bind = &kb->bind;
+void cmd_macroclear(usbprofile* profile){
+    keybind* bind = &profile->bind;
     for(int i = 0; i < bind->macrocount; i++)
         free(bind->macros[i].actions);
     bind->macrocount = 0;

@@ -32,7 +32,7 @@ typedef enum {
     MACRO,
     RGB,
 } cmd;
-typedef void (*cmdhandler)(usbdevice*, int, const char*);
+typedef void (*cmdhandler)(usbprofile*, int, const char*);
 
 // Reads input from the command FIFO
 void readcmd(usbdevice* kb, const char* line);

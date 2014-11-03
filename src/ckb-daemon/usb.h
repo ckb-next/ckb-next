@@ -9,62 +9,87 @@
 #define P_K70       0x1b13
 #define P_K95       0x1b11
 
-// Stucture for tracking key bindings
+// Key binding structures
+
+// Action triggered when activating a macro
 typedef struct {
     short scan;
+    // down = 0 for keyup, down = 1 for keydown
     char down;
 } macroaction;
+
+// Key macro
 typedef struct {
     macroaction* actions;
     int actioncount;
     char combo[N_KEYS / 8];
     char triggered;
 } keymacro;
+
+// Key bindings for a device/profile
 typedef struct {
+    // Base bindings
     int base[N_KEYS];
+    // Macros
     keymacro* macros;
     int macrocount;
     int macrocap;
 } keybind;
 #define MACRO_MAX   1024
 
+// End key bind structures
+
+// Lighting structure for a device/profile
+#define RGB_SIZE    (N_KEYS * sizeof(short))
+typedef struct {
+    short* rgb;
+    char enabled;
+} keylight;
+
+// Profile structure
+typedef struct {
+    keylight light;
+    keybind bind;
+} usbprofile;
+
+// Structure to store settings for a USB device, whether or not it's plugged in
+#define SERIAL_LEN  33
+typedef struct {
+    usbprofile profile;
+    char serial[SERIAL_LEN];
+} usbsetting;
+
 // Structure for tracking keyboard devices
 #define NAME_LEN    33
-#define SERIAL_LEN  33
-#define RGB_SIZE    (N_KEYS * sizeof(short))
 #define QUEUE_LEN   12
 #define MSG_SIZE    64
 typedef struct {
-    short* rgb;
-    char* queue[QUEUE_LEN];
-    struct libusb_transfer* keyint;
-    char intinput[MSG_SIZE];
-    char previntinput[N_KEYS / 8];
-    keybind bind;
-    char ileds;
-    int fifo;
-    int uinput;
-    int event;
-    int queuelength;
+    // USB device info
     struct libusb_device_descriptor descriptor;
     libusb_device* dev;
     libusb_device_handle* handle;
-    int rgbon;
     int model;
+    // Interrupt transfers
+    struct libusb_transfer* keyint;
+    char intinput[MSG_SIZE];
+    char previntinput[N_KEYS / 8];
+    // Indicator LED state
+    char ileds;
+    // Command FIFO
+    int fifo;
+    // uinput/event devices
+    int uinput;
+    int event;
+    // USB output queue
+    char* queue[QUEUE_LEN];
+    int queuelength;
+    // Keyboard settings
+    usbsetting setting;
+    // Device name
     char name[NAME_LEN];
-    char serial[SERIAL_LEN];
 } usbdevice;
 #define DEV_MAX     10
 extern usbdevice keyboard[DEV_MAX];
-
-// Structure to store RGB settings for a keyboard not currently connected
-typedef struct {
-    short* rgb;
-    int rgbon;
-    char serial[SERIAL_LEN];
-} usbstore;
-extern usbstore* store;
-extern int storecount;
 
 // USB device compare. Returns 0 if devices are the same
 int usbcmp(libusb_device* dev1, libusb_device* dev2);
@@ -86,8 +111,8 @@ int usbdequeue(usbdevice* kb);
 // Find a connected USB device. Returns 0 if not found
 usbdevice* findusb(const char* serial);
 // Find a USB device from storage. Returns 0 if not found
-usbstore* findstore(const char* serial);
+usbsetting* findstore(const char* serial);
 // Add a USB device to storage. Returns an existing device if found or a new one if not.
-usbstore* addstore(const char* serial);
+usbsetting* addstore(const char* serial);
 
 #endif

@@ -151,70 +151,95 @@ void readcmd(usbdevice* kb, const char* line){
     int wordlen;
     // See if the first word is a serial number. If so, switch devices and skip to the next word.
     usbsetting* set = (kb->handle ? &kb->setting : 0);
-    if(sscanf(line, "%s%n", word, &wordlen) == 1 && strlen(word) == SERIAL_LEN - 1){
-        usbdevice* found = findusb(word);
-        if(found){
-            kb = found;
-            set = &kb->setting;
-        } else {
-            // If the device isn't plugged in, find (or add) it to storage
-            kb = 0;
-            set = addstore(word);
-        }
-        line += wordlen;
-        sscanf(line, "%s%n", word, &wordlen);
-    }
-    if(!set)
-        return;
-    usbprofile* profile = &set->profile;
-    cmd mode = NONE;
+    usbprofile* profile = (set ? &set->profile : 0);
+    usbmode* mode = (profile ? profile->currentmode : 0);
+    cmd command = NONE;
     cmdhandler handler = 0;
     int rgbchange = 0;
     // Read words from the input
     do {
         line += wordlen;
         // Check for a command word
-        if(!strcmp(word, "bind")){
-            mode = BIND;
+        if(!strcmp(word, "device")){
+            command = DEVICE;
+            handler = 0;
+            continue;
+        } else if(!strcmp(word, "mode")){
+            command = MODE;
+            handler = 0;
+            continue;
+        } else if(!strcmp(word, "switch")){
+            command = NONE;
+            handler = 0;
+            if(profile)
+                profile->currentmode = mode;
+            rgbchange = 1;
+            continue;
+        } else if(!strcmp(word, "bind")){
+            command = BIND;
             handler = cmd_bind;
             continue;
         } else if(!strcmp(word, "unbind")){
-            mode = UNBIND;
+            command = UNBIND;
             handler = cmd_unbind;
             continue;
         } else if(!strcmp(word, "rebind")){
-            mode = REBIND;
+            command = REBIND;
             handler = cmd_rebind;
             continue;
         } else if(!strcmp(word, "macro")){
-            mode = MACRO;
+            command = MACRO;
             handler = 0;
             continue;
         } else if(!strcmp(word, "rgb")){
-            mode = RGB;
+            command = RGB;
             handler = cmd_ledrgb;
             rgbchange = 1;
             continue;
         }
-        if(mode == NONE)
+        if(command == NONE)
             continue;
-        else if(mode == RGB){
+        else if(command == DEVICE){
+            if(strlen(word) == SERIAL_LEN - 1){
+                usbdevice* found = findusb(word);
+                if(found){
+                    kb = found;
+                    set = &kb->setting;
+                } else {
+                    // If the device isn't plugged in, find (or add) it to storage
+                    kb = 0;
+                    set = addstore(word);
+                }
+                profile = (set ? &set->profile : 0);
+                mode = (profile ? profile->currentmode : 0);
+            }
+            continue;
+        }
+        // Only the DEVICE command is valid without an existing mode
+        if(!mode)
+            continue;
+        if(command == MODE){
+            int newmode;
+            if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode < MODE_MAX)
+                mode = getmode(newmode - 1, profile);
+            continue;
+        } else if(command == RGB){
             // RGB command has a special response for "on", "off", and a hex constant
             int r, g, b;
             if(!strcmp(word, "on")){
-                cmd_ledon(profile);
+                cmd_ledon(mode);
                 continue;
             } else if(!strcmp(word, "off")){
-                cmd_ledoff(profile);
+                cmd_ledoff(mode);
                 continue;
             } else if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
                 for(int i = 0; i < N_KEYS; i++)
-                    cmd_ledrgb(profile, i, word);
+                    cmd_ledrgb(mode, i, word);
                 continue;
             }
-        } else if(mode == MACRO && !strcmp(word, "clear")){
+        } else if(command == MACRO && !strcmp(word, "clear")){
             // Macro has a special clear command
-            cmd_macroclear(profile);
+            cmd_macroclear(mode);
             continue;
         }
         // Split the parameter at the colon
@@ -226,9 +251,9 @@ void readcmd(usbdevice* kb, const char* line){
         if(right[0] == ':')
             right++;
         // Macros have a separate left-side handler
-        if(mode == MACRO){
+        if(command == MACRO){
             word[left] = 0;
-            cmd_macro(profile, word, right);
+            cmd_macro(mode, word, right);
             continue;
         }
         // Scan the left side for key names and run the request command
@@ -239,16 +264,16 @@ void readcmd(usbdevice* kb, const char* line){
             if(!strcmp(keyname, "all")){
                 // Set all keys
                 for(int i = 0; i < N_KEYS; i++)
-                    handler(profile, i, right);
+                    handler(mode, i, right);
             } else if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
                       || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
                 // Set a key numerically
-                handler(profile, keycode, right);
+                handler(mode, keycode, right);
             } else {
                 // Find this key in the keymap
                 for(unsigned i = 0; i < N_KEYS; i++){
                     if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
-                        handler(profile, i, right);
+                        handler(mode, i, right);
                         break;
                     }
                 }
@@ -257,6 +282,6 @@ void readcmd(usbdevice* kb, const char* line){
                 position++;
         }
     } while(sscanf(line, "%s%n", word, &wordlen) == 1);
-    if(kb && rgbchange)
+    if(mode && rgbchange)
         updateleds(kb);
 }

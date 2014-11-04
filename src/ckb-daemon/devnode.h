@@ -26,13 +26,17 @@ int readlines(int fd, char*** lines);
 // Command operations
 typedef enum {
     NONE,
+    DEVICE,
+    MODE,
+
     BIND,
     UNBIND,
     REBIND,
     MACRO,
+
     RGB,
 } cmd;
-typedef void (*cmdhandler)(usbprofile*, int, const char*);
+typedef void (*cmdhandler)(usbmode*, int, const char*);
 
 // Reads input from the command FIFO
 void readcmd(usbdevice* kb, const char* line);

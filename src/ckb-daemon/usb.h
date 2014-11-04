@@ -40,17 +40,29 @@ typedef struct {
 // End key bind structures
 
 // Lighting structure for a device/profile
-#define RGB_SIZE    (N_KEYS * sizeof(short))
 typedef struct {
-    short* rgb;
+    short rgb[N_KEYS];
     char enabled;
 } keylight;
 
-// Profile structure
+// Mode structure
+#define MD_NAME_LEN 16
 typedef struct {
     keylight light;
     keybind bind;
+    short name[MD_NAME_LEN];
+} usbmode;
+
+// Profile structure
+#define PR_NAME_LEN 16
+typedef struct {
+    usbmode* mode;
+    int modecount;
+    int modecap;
+    usbmode* currentmode;
+    short name[PR_NAME_LEN];
 } usbprofile;
+#define MODE_MAX    16
 
 // Structure to store settings for a USB device, whether or not it's plugged in
 #define SERIAL_LEN  33
@@ -114,5 +126,8 @@ usbdevice* findusb(const char* serial);
 usbsetting* findstore(const char* serial);
 // Add a USB device to storage. Returns an existing device if found or a new one if not.
 usbsetting* addstore(const char* serial);
+
+// Get a mode from a profile. The mode will be created if it didn't already exist.
+usbmode* getmode(int id, usbprofile* profile);
 
 #endif

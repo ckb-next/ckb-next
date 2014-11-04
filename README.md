@@ -32,11 +32,15 @@ Commands
 --------
 
 The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They may be written by any user. Commands should be given in the following format:
-`[serial] command1 [paramter1] [command2] [parameter2] [command3] [parameter3] ...`
+`[device <serial>] [mode <n>] command1 [paramter1] [command2] [parameter2] [command3] [parameter3] ...`
 
 In a terminal shell, you can do this with e.g. `echo foo > /dev/input/ckb1/cmd`. Programmatically, you can open and write them as regular files. When programming, you must append a newline character and flush the output before your command(s) will actually be read.
 
-The `serial` parameter, representing a keyboard's serial number, is required when issuing commands to `ckb0`. It is unnecessary if writing to `ckb1` or any other path with an actual keyboard. If a keyboard with the given serial number isn't connected, the settings will be applied to that keyboard when it is plugged in.
+The `device` command, followed by the keyboard's serial number, is required when issuing commands to `ckb0`. It is unnecessary if writing to `ckb1` or any other path with an actual keyboard. If a keyboard with the given serial number isn't connected, the settings will be applied to that keyboard when it is plugged in.
+
+`mode` is an optional command specifying which mode to change the settings for (by default, the currently-selected mode is used). Modes 1 through 3 may be stored on the hardware, but additional modes may be added as well. Note that the hardware can only store RGB settings, not key bindings.
+
+The `switch` command may be used to switch the keyboard to a different mode. For instance, to switch the keyboard to mode 2, use `mode 2 switch`.
 
 LED commands
 ------------

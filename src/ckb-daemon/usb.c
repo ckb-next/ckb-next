@@ -32,11 +32,28 @@ usbsetting* addstore(const char* serial){
     // Add device to the list
     store = realloc(store, ++storecount * sizeof(usbsetting));
     res = store + storecount - 1;
-    // Initialize profile
-    initrgb(&res->profile.light);
-    initbind(&res->profile.bind);
+    // Initialize device
+    memset(&res->profile, 0, sizeof(res->profile));
     strcpy(res->serial, serial);
     return res;
+}
+
+usbmode* getmode(int id, usbprofile* profile){
+    if(id < profile->modecount)
+        return profile->mode + id;
+    int cap = id / 4 * 4 + 4;
+    if(cap > profile->modecap){
+        profile->mode = realloc(profile->mode, cap * sizeof(usbmode));
+        profile->modecap = cap;
+    }
+    // Initialize any newly-created modes
+    for(int i = profile->modecount; i <= id; i++){
+        initrgb(&profile->mode[i].light);
+        initbind(&profile->mode[i].bind);
+        memset(profile->mode[i].name, 0, sizeof(profile->mode[i].name));
+    }
+    profile->modecount = id + 1;
+    return profile->mode + id;
 }
 
 int usbqueue(usbdevice* kb, char* messages, int count){
@@ -52,7 +69,7 @@ int usbqueue(usbdevice* kb, char* messages, int count){
 int usbdequeue(usbdevice* kb){
     if(kb->queuelength == 0 || !kb->handle)
         return 0;
-    int count = libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0300, 0x03, kb->queue[0], MSG_SIZE, 0);
+    int count = libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0300, 0x03, kb->queue[0], MSG_SIZE, 500);
     // Rotate queue
     char* first = kb->queue[0];
     for(int i = 1; i < QUEUE_LEN; i++)
@@ -320,9 +337,8 @@ int openusb(libusb_device* device){
                 memcpy(&kb->setting.profile, &store->profile, sizeof(store->profile));
             } else {
                 // If no profile, set all LEDs to white
-                // TODO: Load factory calibration instead
-                initrgb(&kb->setting.profile.light);
-                initbind(&kb->setting.profile.bind);
+                // TODO: Load hardware profile instead
+                kb->setting.profile.currentmode = getmode(0, &kb->setting.profile);
             }
             updateleds(kb);
 
@@ -353,7 +369,8 @@ int closeusb(int index){
         // Move the profile data into the device store
         usbsetting* store = addstore(kb->setting.serial);
         memcpy(&store->profile, &kb->setting.profile, sizeof(kb->setting.profile));
-        // Close USB device
+        // Reset and close USB device
+        libusb_reset_device(kb->handle);
         closehandle(kb);
         updateconnected();
     }

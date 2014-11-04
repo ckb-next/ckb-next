@@ -28,7 +28,8 @@ void quit(){
             // Flush the USB queue and close the device
             while(keyboard[i].queuelength > 0){
                 usleep(3333);
-                usbdequeue(keyboard + i);
+                if(usbdequeue(keyboard + i) <= 0)
+                    break;
             }
             closeusb(i);
         }

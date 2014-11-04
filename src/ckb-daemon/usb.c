@@ -56,6 +56,20 @@ usbmode* getmode(int id, usbprofile* profile){
     return profile->mode + id;
 }
 
+void erasemode(usbmode *mode){
+    closebind(&mode->bind);
+    initrgb(&mode->light);
+    initbind(&mode->bind);
+}
+
+void eraseprofile(usbprofile* profile){
+    // Clear all mode data
+    for(int i = 0; i < profile->modecount; i++)
+        closebind(&profile->mode[i].bind);
+    free(profile->mode);
+    memset(profile, 0, sizeof(*profile));
+}
+
 int usbqueue(usbdevice* kb, char* messages, int count){
     // Don't add messages unless the queue has enough room for all of them
     if(kb->queuelength + count > QUEUE_LEN)

@@ -175,6 +175,22 @@ void readcmd(usbdevice* kb, const char* line){
                 profile->currentmode = mode;
             rgbchange = 1;
             continue;
+        } else if(!strcmp(word, "erase")){
+            command = NONE;
+            handler = 0;
+            if(mode)
+                erasemode(mode);
+            rgbchange = 1;
+            continue;
+        } else if(!strcmp(word, "eraseprofile")){
+            command = NONE;
+            handler = 0;
+            if(profile){
+                eraseprofile(profile);
+                mode = profile->currentmode = getmode(0, profile);
+            }
+            rgbchange = 1;
+            continue;
         } else if(!strcmp(word, "bind")){
             command = BIND;
             handler = cmd_bind;

@@ -129,5 +129,9 @@ usbsetting* addstore(const char* serial);
 
 // Get a mode from a profile. The mode will be created if it didn't already exist.
 usbmode* getmode(int id, usbprofile* profile);
+// Resets a mode to its default settings
+void erasemode(usbmode* mode);
+// Erases a profile, deleting all of its modes.
+void eraseprofile(usbprofile* profile);
 
 #endif

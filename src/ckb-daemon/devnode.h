@@ -28,6 +28,8 @@ typedef enum {
     NONE,
     DEVICE,
     MODE,
+    NAME,
+    PROFILENAME,
 
     BIND,
     UNBIND,

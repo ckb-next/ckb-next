@@ -7,8 +7,10 @@
 
 #include <features.h>
 
+#include <ctype.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <iconv.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

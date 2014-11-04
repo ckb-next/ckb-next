@@ -50,7 +50,7 @@ typedef struct {
 typedef struct {
     keylight light;
     keybind bind;
-    short name[MD_NAME_LEN];
+    unsigned short name[MD_NAME_LEN];
 } usbmode;
 
 // Profile structure
@@ -60,7 +60,7 @@ typedef struct {
     int modecount;
     int modecap;
     usbmode* currentmode;
-    short name[PR_NAME_LEN];
+    unsigned short name[PR_NAME_LEN];
 } usbprofile;
 #define MODE_MAX    16
 
@@ -129,6 +129,10 @@ usbsetting* addstore(const char* serial);
 
 // Get a mode from a profile. The mode will be created if it didn't already exist.
 usbmode* getmode(int id, usbprofile* profile);
+// Sets a mode's name
+void setmodename(usbmode* mode, const char* name);
+// Sets a profile's name
+void setprofilename(usbprofile* profile, const char* name);
 // Resets a mode to its default settings
 void erasemode(usbmode* mode);
 // Erases a profile, deleting all of its modes.

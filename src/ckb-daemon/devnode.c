@@ -157,7 +157,7 @@ void readcmd(usbdevice* kb, const char* line){
     cmdhandler handler = 0;
     int rgbchange = 0;
     // Read words from the input
-    do {
+    while(sscanf(line, "%s%n", word, &wordlen) == 1){
         line += wordlen;
         // Check for a command word
         if(!strcmp(word, "device")){
@@ -190,6 +190,14 @@ void readcmd(usbdevice* kb, const char* line){
                 mode = profile->currentmode = getmode(0, profile);
             }
             rgbchange = 1;
+            continue;
+        } else if(!strcmp(word, "name")){
+            command = NAME;
+            handler = 0;
+            continue;
+        } else if(!strcmp(word, "profilename")){
+            command = PROFILENAME;
+            handler = 0;
             continue;
         } else if(!strcmp(word, "bind")){
             command = BIND;
@@ -238,6 +246,14 @@ void readcmd(usbdevice* kb, const char* line){
             int newmode;
             if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode < MODE_MAX)
                 mode = getmode(newmode - 1, profile);
+            continue;
+        } else if(command == NAME){
+            // Name just parses a whole word
+            setmodename(mode, word);
+            continue;
+        } else if(command == PROFILENAME){
+            // Same for profile name
+            setprofilename(profile, word);
             continue;
         } else if(command == RGB){
             // RGB command has a special response for "on", "off", and a hex constant
@@ -297,7 +313,7 @@ void readcmd(usbdevice* kb, const char* line){
             if(word[position += field] == ',')
                 position++;
         }
-    } while(sscanf(line, "%s%n", word, &wordlen) == 1);
+    }
     if(mode && rgbchange)
         updateleds(kb);
 }

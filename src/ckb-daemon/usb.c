@@ -56,6 +56,57 @@ usbmode* getmode(int id, usbprofile* profile){
     return profile->mode + id;
 }
 
+iconv_t utf8to16 = 0;
+
+void urldecode2(char *dst, const char *src){
+    char a, b;
+    while (*src) {
+        if ((*src == '%') &&
+                ((a = src[1]) && (b = src[2])) &&
+                (isxdigit(a) && isxdigit(b))) {
+            if (a >= 'a')
+                a -= 'a'-'A';
+            if (a >= 'A')
+                a -= ('A' - 10);
+            else
+                a -= '0';
+            if (b >= 'a')
+                b -= 'a'-'A';
+            if (b >= 'A')
+                b -= ('A' - 10);
+            else
+                b -= '0';
+            *dst++ = 16*a+b;
+            src+=3;
+        } else {
+            *dst++ = *src++;
+        }
+    }
+    *dst++ = '\0';
+}
+
+void setmodename(usbmode* mode, const char* name){
+    if(!utf8to16)
+        utf8to16 = iconv_open("UTF-16LE", "UTF-8");
+    memset(mode->name, 0, sizeof(mode->name));
+    char decoded[strlen(name) + 1];
+    urldecode2(decoded, name);
+    size_t srclen = strlen(decoded), dstlen = MD_NAME_LEN * 2 - 2;
+    char* in = decoded, *out = (char*)mode->name;
+    iconv(utf8to16, &in, &srclen, &out, &dstlen);
+}
+
+void setprofilename(usbprofile* profile, const char* name){
+    if(!utf8to16)
+        utf8to16 = iconv_open("UTF-16LE", "UTF-8");
+    memset(profile->name, 0, sizeof(profile->name));
+    char decoded[strlen(name) + 1];
+    urldecode2(decoded, name);
+    size_t srclen = strlen(decoded), dstlen = PR_NAME_LEN * 2 - 2;
+    char* in = decoded, *out = (char*)profile->name;
+    iconv(utf8to16, &in, &srclen, &out, &dstlen);
+}
+
 void erasemode(usbmode *mode){
     closebind(&mode->bind);
     initrgb(&mode->light);

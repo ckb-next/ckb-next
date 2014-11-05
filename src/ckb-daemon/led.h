@@ -8,6 +8,10 @@
 void initrgb(keylight* light);
 // Update a device's LEDs with RGB data.
 void updateleds(usbdevice* kb);
+// Saves RGB data for a device profile.
+void saveleds(usbdevice* kb, int mode);
+// Loads RGB data for a device profile.
+void loadleds(usbdevice* kb, int mode);
 
 // Turns LEDs off
 void cmd_ledoff(usbmode* mode);

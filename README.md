@@ -3,9 +3,7 @@ ckb: Corsair K70/K95 Driver for Linux
 
 ckb is divided into two parts: a daemon program which must be run as root and communicates with the USB device, and a utility program, which provides several animations and may be run as any user.
 
-The daemon provides devices at `/dev/input/ckb*`, where * is the device number, starting at 1. Up to 9 keyboards may be connected at once (note: not tested...) and controlled independently. Hot-plugging is supported; if you unplug a keyboard while the daemon is running and then plug it back in, the keyboard's previous settings will be restored. The daemon additionally provides `/dev/input/ckb0`, which can be used to control keyboards when they are not plugged in. Settings are only remembered as long as the daemon is running; if you restart the daemon, all settings will be forgotten.
-
-The G-keys on the K95 cannot currently be remapped, but using this driver WILL fix the bug where pressing a G-key will cause the entire keyboard to freeze. It is also not currently possible to use the Brightness or Win Lock keys, or the K95's memory keys, with this driver. Support for those is coming soon.
+The daemon provides devices at `/dev/input/ckb*`, where * is the device number, starting at 1. Up to 9 keyboards may be connected at once (note: not tested...) and controlled independently. Hot-plugging is supported; if you unplug a keyboard while the daemon is running and then plug it back in, the keyboard's previous settings will be restored. If a keyboard is plugged in which has not yet been assigned any settings, its saved settings will be loaded from the hardware. The daemon additionally provides `/dev/input/ckb0`, which can be used to control keyboards when they are not plugged in. Settings are only remembered as long as the daemon is running; if you restart the daemon, all settings will be forgotten.
 
 The user-runnable utility is currently very limited. It only supports one keyboard and has a limited selection of animations with little configuration. The plan is to replace it with a more robust Qt-based utility, creating something like Corsair's proprietary Windows controller.
 
@@ -38,9 +36,17 @@ In a terminal shell, you can do this with e.g. `echo foo > /dev/input/ckb1/cmd`.
 
 The `device` command, followed by the keyboard's serial number, is required when issuing commands to `ckb0`. It is unnecessary if writing to `ckb1` or any other path with an actual keyboard. If a keyboard with the given serial number isn't connected, the settings will be applied to that keyboard when it is plugged in.
 
-`mode` is an optional command specifying which mode to change the settings for (by default, the currently-selected mode is used). Modes 1 through 3 may be stored on the hardware, but additional modes may be added as well. Note that the hardware can only store RGB settings, not key bindings.
+Profiles and modes
+------------------
 
-The `switch` command may be used to switch the keyboard to a different mode. For instance, to switch the keyboard to mode 2, use `mode 2 switch`.
+Keyboard settings are grouped into modes, where each mode has its own independent binding and lighting setup. By default, all commands will update the currently selected mode. The `mode <n>` command may be used to change the settings for a different mode. Up to 64 modes are available. Each keyboard has one profile, which may be given a name. Modes 1 through 3 may be saved to the device hardware (only mode 1 for K70s). Only the RGB settings can be saved, not the bindings or any other info. Commands are as follows:
+- `profilename <name>` sets the profile's name. The name must be written without spaces; to add a space, use `%20`.
+- `name <name>` sets the current mode's name. Use `mode <n> name <name>` to set a different mode's name.
+- `mode <n> switch` switches the keyboard to mode N.
+- `hwload` loads the RGB profile from the hardware. The profile's bindings are not affected.
+- `hwsave` saves the RGB profile to the hardware.
+- `erase` erases the current mode, resetting its lighting and bindings. Use `mode <n> erase` to erase a different mode.
+- `eraseprofile` resets the entire profile, erasing its name and all of its modes.
 
 LED commands
 ------------
@@ -88,7 +94,9 @@ Macros are a more advanced form of key binding, controlled with the `macro` comm
 
 Assigning a macro to a key will cause its binding to be ignored; for instance, `macro a:+b,-b` will cause A to generate a B character regardless of its binding. However, `macro lctrl+a:+b,-b` will cause A to generate a B only when Ctrl is also held down. Macros currently do not have any repeating options and will be triggered only once, when the key is pressed down. This feature will be added soon.
 
-Caveat emptor
--------------
+Known issues
+------------
 
-The firmware on these boards is extremely buggy and your keyboard may not work immediately or at all. I'm still trying to sort this out, but it may not be fixable.
+- When loading settings from the hardware, all three modes end up with the same RGB configuration. This is a hardware bug and it affects CUE as well.
+- It's not possible for the daemon to determine which hardware mode was in use, so the keyboard always starts on mode 1. Again, this is a hardware issue (although thanks to the above problem, it doesn't really matter anyway).
+- Sometimes the keyboard doesn't work properly without unplugging and replugging it, especially after closing and restarting the daemon.

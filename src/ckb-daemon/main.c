@@ -26,7 +26,7 @@ void quit(){
             // Stop the uinput device now to ensure no keys get stuck
             uinputclose(i);
             // Flush the USB queue and close the device
-            while(keyboard[i].queuelength > 0){
+            while(keyboard[i].queuecount > 0){
                 usleep(3333);
                 if(usbdequeue(keyboard + i) <= 0)
                     break;

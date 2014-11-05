@@ -41,9 +41,17 @@ typedef struct {
 
 // Lighting structure for a device/profile
 typedef struct {
-    short rgb[N_KEYS];
+    char r[N_KEYS / 2];
+    char g[N_KEYS / 2];
+    char b[N_KEYS / 2];
     char enabled;
 } keylight;
+
+// ID structure
+typedef struct {
+    char guid[16];
+    char modified[2];
+} usbid;
 
 // Mode structure
 #define MD_NAME_LEN 16
@@ -51,6 +59,7 @@ typedef struct {
     keylight light;
     keybind bind;
     unsigned short name[MD_NAME_LEN];
+    usbid id;
 } usbmode;
 
 // Profile structure
@@ -61,6 +70,7 @@ typedef struct {
     int modecap;
     usbmode* currentmode;
     unsigned short name[PR_NAME_LEN];
+    usbid id;
 } usbprofile;
 #define MODE_MAX    16
 
@@ -73,7 +83,7 @@ typedef struct {
 
 // Structure for tracking keyboard devices
 #define NAME_LEN    33
-#define QUEUE_LEN   12
+#define QUEUE_LEN   40
 #define MSG_SIZE    64
 typedef struct {
     // USB device info
@@ -94,7 +104,7 @@ typedef struct {
     int event;
     // USB output queue
     char* queue[QUEUE_LEN];
-    int queuelength;
+    int queuecount;
     // Keyboard settings
     usbsetting setting;
     // Device name
@@ -129,6 +139,7 @@ usbsetting* addstore(const char* serial);
 
 // Get a mode from a profile. The mode will be created if it didn't already exist.
 usbmode* getmode(int id, usbprofile* profile);
+
 // Sets a mode's name
 void setmodename(usbmode* mode, const char* name);
 // Sets a profile's name
@@ -137,5 +148,15 @@ void setprofilename(usbprofile* profile, const char* name);
 void erasemode(usbmode* mode);
 // Erases a profile, deleting all of its modes.
 void eraseprofile(usbprofile* profile);
+
+// Generates a new ID
+void genid(usbid* id);
+// Updates an ID's modification
+void updatemod(usbid* id);
+
+// Loads the profile name from hardware
+void hwloadprofile(usbdevice* kb);
+// Saves the profile name to hardware
+void hwsaveprofile(usbdevice* kb);
 
 #endif

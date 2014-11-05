@@ -175,6 +175,17 @@ void readcmd(usbdevice* kb, const char* line){
                 profile->currentmode = mode;
             rgbchange = 1;
             continue;
+        } else if(!strcmp(word, "hwload")){
+            command = NONE;
+            handler = 0;
+            if(profile)
+                hwloadprofile(kb);
+            rgbchange = 1;
+        } else if(!strcmp(word, "hwsave")){
+            command = NONE;
+            handler = 0;
+            if(profile)
+                hwsaveprofile(kb);
         } else if(!strcmp(word, "erase")){
             command = NONE;
             handler = 0;
@@ -194,10 +205,14 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(!strcmp(word, "name")){
             command = NAME;
             handler = 0;
+            if(mode)
+                updatemod(&mode->id);
             continue;
         } else if(!strcmp(word, "profilename")){
             command = PROFILENAME;
             handler = 0;
+            if(profile)
+                updatemod(&profile->id);
             continue;
         } else if(!strcmp(word, "bind")){
             command = BIND;
@@ -219,6 +234,8 @@ void readcmd(usbdevice* kb, const char* line){
             command = RGB;
             handler = cmd_ledrgb;
             rgbchange = 1;
+            if(mode)
+                updatemod(&mode->id);
             continue;
         }
         if(command == NONE)

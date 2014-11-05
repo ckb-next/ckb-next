@@ -35,6 +35,7 @@ usbsetting* addstore(const char* serial){
     // Initialize device
     memset(&res->profile, 0, sizeof(res->profile));
     strcpy(res->serial, serial);
+    genid(&res->profile.id);
     return res;
 }
 
@@ -51,6 +52,7 @@ usbmode* getmode(int id, usbprofile* profile){
         initrgb(&profile->mode[i].light);
         initbind(&profile->mode[i].bind);
         memset(profile->mode[i].name, 0, sizeof(profile->mode[i].name));
+        genid(&profile->mode[i].id);
     }
     profile->modecount = id + 1;
     return profile->mode + id;
@@ -109,8 +111,10 @@ void setprofilename(usbprofile* profile, const char* name){
 
 void erasemode(usbmode *mode){
     closebind(&mode->bind);
+    memset(mode, 0, sizeof(*mode));
     initrgb(&mode->light);
     initbind(&mode->bind);
+    genid(&mode->id);
 }
 
 void eraseprofile(usbprofile* profile){
@@ -119,20 +123,134 @@ void eraseprofile(usbprofile* profile){
         closebind(&profile->mode[i].bind);
     free(profile->mode);
     memset(profile, 0, sizeof(*profile));
+    genid(&profile->id);
+}
+
+void genid(usbid* id){
+    static int seeded = 0;
+    if(!seeded){
+        srand(time(NULL));
+        seeded = 1;
+    }
+    // Generate a random ID
+    int numbers[4] = { rand(), rand(), rand(), rand() };
+    memcpy(id->guid, numbers, sizeof(id->guid));
+    memset(id->modified, 0, sizeof(id->modified));
+}
+
+void updatemod(usbid* id){
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    short new = (short)tv.tv_usec, old;
+    memcpy(&old, id->modified, 2);
+    if(new == old)
+        new++;
+    memcpy(id->modified, &new, 2);
+}
+
+void hwloadmode(usbdevice* kb, int mode){
+    // Ask for mode's name
+    usbmode* kbmode = kb->setting.profile.mode + mode;
+    char data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
+    usbqueue(kb, data_pkt, 1);
+    usleep(3333);
+    usbdequeue(kb);
+    // Wait for the response
+    libusb_control_transfer(kb->handle, 0xa1, 1, 0x0300, 0x03, data_pkt, MSG_SIZE, 500);
+    if(data_pkt[0] == 0x0e && data_pkt[1] == 0x01)
+        memcpy(kbmode->name, data_pkt + 4, MD_NAME_LEN * 2);
+    // Load the RGB setting
+    loadleds(kb, mode);
+}
+
+void hwloadprofile(usbdevice* kb){
+    if(!kb || !kb->handle)
+        return;
+    // Empty the board's USB queue
+    while(kb->queuecount > 0){
+        usleep(3333);
+        usbdequeue(kb);
+    }
+    // Ask for profile ID
+    usbprofile* profile = &kb->setting.profile;
+    char data_pkt[2][MSG_SIZE] = {
+        { 0x0e, 0x15, 0x01, 0 },
+        { 0x0e, 0x16, 0x01, 0 }
+    };
+    char in_pkt[MSG_SIZE];
+    usbqueue(kb, data_pkt[0], 1);
+    usleep(3333);
+    usbdequeue(kb);
+    // Wait for the response
+    libusb_control_transfer(kb->handle, 0xa1, 1, 0x0300, 0x03, in_pkt, MSG_SIZE, 500);
+    memcpy(&profile->id, in_pkt + 4, sizeof(usbid));
+    // Ask for mode IDs
+    int modes = (kb->model == 95 ? 3 : 1);
+    for(int i = 0; i < modes; i++){
+        data_pkt[0][3] = i + 1;
+        usbqueue(kb, data_pkt[0], 1);
+        usleep(3333);
+        usbdequeue(kb);
+        // Wait for the response
+        libusb_control_transfer(kb->handle, 0xa1, 1, 0x0300, 0x03, in_pkt, MSG_SIZE, 500);
+        memcpy(&profile->mode[i].id, in_pkt + 4, sizeof(usbid));
+    }
+    // Ask for profile name
+    usbqueue(kb, data_pkt[1], 1);
+    usleep(3333);
+    usbdequeue(kb);
+    // Wait for the response
+    libusb_control_transfer(kb->handle, 0xa1, 1, 0x0300, 0x03, in_pkt, MSG_SIZE, 500);
+    memcpy(kb->setting.profile.name, in_pkt + 4, PR_NAME_LEN * 2);
+    // Load modes
+    for(int i = 0; i < modes; i++)
+        hwloadmode(kb, i);
+}
+
+void hwsaveprofile(usbdevice* kb){
+    if(!kb || !kb->handle)
+        return;
+    // Save the profile name
+    usbprofile* profile = &kb->setting.profile;
+    char data_pkt[2][MSG_SIZE] = {
+        {0x07, 0x16, 0x01, 0 },
+        {0x07, 0x15, 0x01, 0, 1, 2, 3, 4, 5 },
+    };
+    memcpy(data_pkt[0] + 4, profile->name, PR_NAME_LEN * 2);
+    usbqueue(kb, data_pkt[0], 1);
+    // Save the mode names
+    int modes = (kb->model == 95 ? 3 : 1);
+    for(int i = 0; i < modes; i++){
+        data_pkt[0][3] = i + 1;
+        memcpy(data_pkt[0] + 4, profile->mode[i].name, MD_NAME_LEN * 2);
+        usbqueue(kb, data_pkt[0], 1);
+    }
+    // Save the profile ID
+    memcpy(data_pkt[1] + 4, &profile->id, sizeof(usbid));
+    usbqueue(kb, data_pkt[1], 1);
+    // Save the mode IDs
+    for(int i = 0; i < modes; i++){
+        data_pkt[1][3] = i + 1;
+        memcpy(data_pkt[1] + 4, &profile->mode[i].id, sizeof(usbid));
+        usbqueue(kb, data_pkt[1], 1);
+    }
+    // Save the RGB data
+    for(int i = 0; i < modes; i++)
+        saveleds(kb, i);
 }
 
 int usbqueue(usbdevice* kb, char* messages, int count){
     // Don't add messages unless the queue has enough room for all of them
-    if(kb->queuelength + count > QUEUE_LEN)
+    if(kb->queuecount + count > QUEUE_LEN)
         return -1;
     for(int i = 0; i < count; i++)
-        memcpy(kb->queue[kb->queuelength + i], messages + MSG_SIZE * i, MSG_SIZE);
-    kb->queuelength += count;
+        memcpy(kb->queue[kb->queuecount + i], messages + MSG_SIZE * i, MSG_SIZE);
+    kb->queuecount += count;
     return 0;
 }
 
 int usbdequeue(usbdevice* kb){
-    if(kb->queuelength == 0 || !kb->handle)
+    if(kb->queuecount == 0 || !kb->handle)
         return 0;
     int count = libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0300, 0x03, kb->queue[0], MSG_SIZE, 500);
     // Rotate queue
@@ -140,7 +258,7 @@ int usbdequeue(usbdevice* kb){
     for(int i = 1; i < QUEUE_LEN; i++)
         kb->queue[i - 1] = kb->queue[i];
     kb->queue[QUEUE_LEN - 1] = first;
-    kb->queuelength--;
+    kb->queuecount--;
     return count;
 }
 
@@ -361,7 +479,7 @@ int openusb(libusb_device* device){
                     }
                     printf("Reset success\n");
                 } else
-                    return -1;\
+                    return -1;
             }
             printf("Connecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
 
@@ -401,9 +519,11 @@ int openusb(libusb_device* device){
             if(store){
                 memcpy(&kb->setting.profile, &store->profile, sizeof(store->profile));
             } else {
-                // If no profile, set all LEDs to white
-                // TODO: Load hardware profile instead
+                // If there is no profile, load it from the device
                 kb->setting.profile.currentmode = getmode(0, &kb->setting.profile);
+                getmode(1, &kb->setting.profile);
+                getmode(2, &kb->setting.profile);
+                hwloadprofile(kb);
             }
             updateleds(kb);
 

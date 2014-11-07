@@ -98,17 +98,29 @@ int makedevpath(int index){
 }
 
 #define MAX_LINES 512
-int readlines(int fd, char*** lines){
-    int buffersize = 4095;
-    char* buffer = malloc(buffersize + 1);
-    ssize_t length = read(fd, buffer, buffersize);
+#define MAX_BUFFER (16 * 1024 - 1)
+int readlines(int fd, const char*** lines){
+    // Allocate static buffers to store data
+    static int buffersize = 4095;
+    static int leftover = 0, leftoverlen = 0;
+    static char* buffer = 0;
+    static const char** linebuffer = 0;
+    if(!buffer){
+        buffer = malloc(buffersize + 1);
+        linebuffer = malloc(MAX_LINES * sizeof(const char**));
+    }
+    // Move any data left over from a previous read to the start of the buffer
+    if(leftover)
+        memcpy(buffer, buffer + leftover, leftoverlen);
+    ssize_t length = read(fd, buffer + leftoverlen, buffersize - leftoverlen);
+    length = (length < 0 ? 0 : length) + leftoverlen;
+    leftover = leftoverlen = 0;
     if(length <= 0){
-        free(buffer);
         *lines = 0;
         return 0;
     }
-    // Continue buffering until all available input is read
-    while(length == buffersize){
+    // Continue buffering until all available input is read or there's no room left
+    while(length == buffersize || buffersize >= MAX_BUFFER){
         int oldsize = buffersize;
         buffersize += 4096;
         buffer = realloc(buffer, buffersize + 1);
@@ -119,29 +131,23 @@ int readlines(int fd, char*** lines){
     }
     buffer[length] = 0;
     // Break the input into lines
-    char** linebuffer = malloc(MAX_LINES * sizeof(char*));
     char* line = buffer;
     int nlines = 0;
     while(1){
-        char* nextline = strchr(line, '\n');
+        char* nextline = memchr(line, '\n', buffer + length - line);
         if(!nextline || nlines == MAX_LINES - 1){
-            int linesize = length - (line - buffer) + 1;
-            char* output = malloc(linesize);
-            memcpy(output, line, linesize);
-            linebuffer[nlines++] = output;
+            // Process any left over bytes next time
+            leftover = line - buffer;
+            leftoverlen = length - leftover;
             break;
         }
-        // Include the \n in the output
-        nextline++;
-        int linesize = nextline - line;
-        char* output = malloc(linesize + 1);
-        memcpy(output, line, linesize);
-        output[linesize] = 0;
-        linebuffer[nlines++] = output;
-        line = nextline;
+        // Replace the \n with \0 and insert the line into the line buffer
+        *nextline = 0;
+        linebuffer[nlines++] = line;
+        line = ++nextline;
+        if(line == buffer + length)
+            break;
     }
-    // Clean up
-    free(buffer);
     *lines = linebuffer;
     return nlines;
 }

@@ -21,7 +21,7 @@ void updateconnected();
 int makedevpath(int index);
 
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
-int readlines(int fd, char*** lines);
+int readlines(int fd, const char*** lines);
 
 // Command operations
 typedef enum {

@@ -101,14 +101,12 @@ int main(void){
             // Process FIFOs
             for(int i = 0; i < DEV_MAX; i++){
                 if(keyboard[i].fifo){
-                    char** lines;
+                    const char** lines;
                     int nlines = readlines(keyboard[i].fifo, &lines);
                     for(int j = 0; j < nlines; j++){
                         if(lines[j][0] != 0 && lines[j][1] != 0)
                             readcmd(keyboard + i, lines[j]);
-                        free(lines[j]);
                     }
-                    free(lines);
                 }
             }
         }
@@ -124,7 +122,7 @@ int main(void){
         }
         // Sleep for 3ms. This delay seems to be enough to prevent the device from stopping and achieves a throughput of 60FPS.
         usleep(3333);
-        frame = (frame + 1) % 3;
+        frame = (frame + 1) % 5;
     }
     quit();
     return 0;

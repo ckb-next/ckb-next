@@ -51,8 +51,22 @@ void sighandler(int type){
     exit(0);
 }
 
-int main(void){
+int main(int argc, char** argv){
     printf("ckb Corsair Keyboard RGB driver v0.1\n");
+
+    // Read parameters
+    int fps = 60;
+    for(int i = 1; i < argc; i++){
+        char* argument = argv[i];
+        if(sscanf(argument, "--fps=%d", &fps) == 1){
+            if(fps > 60 || fps <= 0){
+                // There's no point running higher than 60FPS.
+                // The LED controller is locked to 60Hz so it will only cause tearing and/or device freezes.
+                printf("Warning: Requested %d FPS but capping at 60\n", fps);
+                fps = 60;
+            }
+        }
+    }
 
     // Load the uinput module (if it's not loaded already)
     if(system("modprobe uinput") != 0)
@@ -90,7 +104,6 @@ int main(void){
     signal(SIGINT, sighandler);
     signal(SIGQUIT, sighandler);
 
-
     int frame = 0;
     while(1){
         // No need to run most of these functions on every single frame
@@ -120,8 +133,8 @@ int main(void){
                     updateindicators(keyboard + i, 0);
             }
         }
-        // Sleep for 3ms. This delay seems to be enough to prevent the device from stopping and achieves a throughput of 60FPS.
-        usleep(3333);
+        // Sleep for long enough to achieve the desired frame rate (5 packets per frame).
+        usleep(1000000 / fps / 5);
         frame = (frame + 1) % 5;
     }
     quit();

@@ -90,21 +90,26 @@ int main(void){
     signal(SIGINT, sighandler);
     signal(SIGQUIT, sighandler);
 
+
+    int frame = 0;
     while(1){
-        // Run hotplug callback
-        struct timeval tv = { 0 };
-        libusb_handle_events_timeout_completed(0, &tv, 0);
-        // Process FIFOs
-        for(int i = 0; i < DEV_MAX; i++){
-            if(keyboard[i].fifo){
-                char** lines;
-                int nlines = readlines(keyboard[i].fifo, &lines);
-                for(int j = 0; j < nlines; j++){
-                    if(strlen(lines[j]) > 1)
-                        readcmd(keyboard + i, lines[j]);
-                    free(lines[j]);
+        // No need to run most of these functions on every single frame
+        if(!frame){
+            // Run hotplug callback
+            struct timeval tv = { 0 };
+            libusb_handle_events_timeout_completed(0, &tv, 0);
+            // Process FIFOs
+            for(int i = 0; i < DEV_MAX; i++){
+                if(keyboard[i].fifo){
+                    char** lines;
+                    int nlines = readlines(keyboard[i].fifo, &lines);
+                    for(int j = 0; j < nlines; j++){
+                        if(lines[j][0] != 0 && lines[j][1] != 0)
+                            readcmd(keyboard + i, lines[j]);
+                        free(lines[j]);
+                    }
+                    free(lines);
                 }
-                free(lines);
             }
         }
         // Run the USB queue. Messages must be queued because sending multiple messages at the same time can cause the interface to freeze
@@ -113,11 +118,13 @@ int main(void){
                 usbdequeue(keyboard + i);
                 // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
                 // immediately and may be changed externally by the OS.
-                updateindicators(keyboard + i, 0);
+                if(!frame)
+                    updateindicators(keyboard + i, 0);
             }
         }
         // Sleep for 3ms. This delay seems to be enough to prevent the device from stopping and achieves a throughput of 60FPS.
         usleep(3333);
+        frame = (frame + 1) % 3;
     }
     quit();
     return 0;

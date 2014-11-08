@@ -1,5 +1,5 @@
-ckb: Corsair K70/K95 Driver for Linux
-=====================================
+ckb: Corsair K70/K95 Driver for Linux and OSX
+=============================================
 
 ckb is divided into two parts: a daemon program which must be run as root and communicates with the USB device, and a utility program, which provides several animations and may be run as any user.
 
@@ -19,10 +19,10 @@ If you don't already have developer tools installed, you need to download Xcode 
 
 Download libusb from here: http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.19/libusb-1.0.19.tar.bz2/download
 
-Unzip it and open the directory you extracted it to in a terminal. Run `./configure && make && sudo make install`. Now you can build ckb by switching to the directory you downloaded it to and running `make`. The binaries will be placed in `bin` assuming they compile successfully.
+Unzip it and open the directory you extracted it to in a terminal. Run `./configure && make && sudo make install`. Now you can build ckb by switching to the dckb directory and running `make`. The binaries will be placed in `bin` assuming they compile successfully.
 
 **Mac notes:**
-- The keyboard devices are located at `/tmp/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input/ckb` in this document, replace it with `/tmp/input/ckb`.
+- The keyboard devices are located at `/tmp/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input/ckb` in this document, replace it with `/tmp/ckb`.
 - Only the RGB controller works right now; key rebinding and macros are not currently possible.
 
 Usage

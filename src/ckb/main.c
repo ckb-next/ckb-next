@@ -1,5 +1,7 @@
 #define _DEFAULT_SOURCE
+#ifdef __linux
 #include <features.h>
+#endif
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
@@ -179,7 +181,11 @@ int main(int argc, char** argv){
         exit(0);
     }
 
+#ifdef __linux
     output = fopen("/dev/input/ckb1/cmd", "w");
+#else
+    output = fopen("/tmp/ckb1/cmd", "w");
+#endif
     if(!output){
         printf("Unable to open input device\n");
         exit(-1);

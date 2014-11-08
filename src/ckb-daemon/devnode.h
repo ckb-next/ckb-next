@@ -7,7 +7,7 @@
 // rm -rf
 int rm_recursive(const char* path);
 
-// Device path base ("/dev/input/ckb")
+// Device path base ("/dev/input/ckb" or "/tmp/ckb")
 const char *const devpath;
 
 // Simple file permissions

@@ -2,6 +2,7 @@
 #define KEYBOARD_H
 
 #include "includes.h"
+#include "keyboard_mac.h"
 
 // Number of keys
 #define N_KEYS 144

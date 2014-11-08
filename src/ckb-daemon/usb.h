@@ -22,7 +22,7 @@ typedef struct {
 typedef struct {
     macroaction* actions;
     int actioncount;
-    char combo[N_KEYS / 8];
+    unsigned char combo[N_KEYS / 8];
     char triggered;
 } keymacro;
 
@@ -93,17 +93,23 @@ typedef struct {
     int model;
     // Interrupt transfers
     struct libusb_transfer* keyint;
-    char intinput[MSG_SIZE];
-    char previntinput[N_KEYS / 8];
+    unsigned char intinput[MSG_SIZE];
+    unsigned char previntinput[N_KEYS / 8];
     // Indicator LED state
-    char ileds;
+    unsigned char ileds;
     // Command FIFO
     int fifo;
     // uinput/event devices
+#ifdef OS_LINUX
     int uinput;
     int event;
+#endif
+#ifdef OS_MAC
+    CGEventSourceRef event;
+    CGEventFlags eflags;
+#endif
     // USB output queue
-    char* queue[QUEUE_LEN];
+    unsigned char* queue[QUEUE_LEN];
     int queuecount;
     // Keyboard settings
     usbsetting setting;
@@ -126,7 +132,7 @@ int closeusb(int index);
 void setinput(usbdevice* kb, int input);
 
 // Add a message to a USB device to be sent to the device. Returns 0 on success.
-int usbqueue(usbdevice* kb, char* messages, int count);
+int usbqueue(usbdevice* kb, unsigned char* messages, int count);
 // Output a message from the USB queue to the device, if any. Returns number of bytes written.
 int usbdequeue(usbdevice* kb);
 
@@ -138,7 +144,7 @@ usbsetting* findstore(const char* serial);
 usbsetting* addstore(const char* serial);
 
 // Get a mode from a profile. The mode will be created if it didn't already exist.
-usbmode* getmode(int id, usbprofile* profile);
+usbmode* getusbmode(int id, usbprofile* profile);
 
 // Sets a mode's name
 void setmodename(usbmode* mode, const char* name);

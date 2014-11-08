@@ -7,10 +7,23 @@ The daemon provides devices at `/dev/input/ckb*`, where * is the device number, 
 
 The user-runnable utility is currently very limited. It only supports one keyboard and has a limited selection of animations with little configuration. The plan is to replace it with a more robust Qt-based utility, creating something like Corsair's proprietary Windows controller.
 
-Building
---------
+Building for Linux
+------------------
 
-ckb only supports Linux. OSX support is planned (tentatively). `libusb-1.0` and `gcc` are required. Check with your package manager to make sure you have the correct libraries/headers installed. After that you can build ckb by running `make` in the directory you downloaded it to. The binaries will be placed in `bin` assuming they compile successfully.
+`libusb-1.0`, `gcc`, and `glibc` are required. Check with your package manager to make sure you have the correct libraries/headers installed. You also need a kernel with uinput support (all distros should ship with this by default; don't worry about it unless you're running a custom kernel). You can build ckb by running `make` in the directory you downloaded it to. The binaries will be placed in `bin` assuming they compile successfully.
+
+Building for OSX
+----------------
+
+If you don't already have developer tools installed, you need to download Xcode from the App Store. Run it once to make sure all of its tools are installed.
+
+Download libusb from here: http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.19/libusb-1.0.19.tar.bz2/download
+
+Unzip it and open the directory you extracted it to in a terminal. Run `./configure && make && sudo make install`. Now you can build ckb by switching to the directory you downloaded it to and running `make`. The binaries will be placed in `bin` assuming they compile successfully.
+
+**Mac notes:**
+- The keyboard devices are located at `/tmp/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input/ckb` in this document, replace it with `/tmp/input/ckb`.
+- Only the RGB controller works right now; key rebinding and macros are not currently possible.
 
 Usage
 -----

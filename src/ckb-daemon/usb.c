@@ -39,7 +39,7 @@ usbsetting* addstore(const char* serial){
     return res;
 }
 
-usbmode* getmode(int id, usbprofile* profile){
+usbmode* getusbmode(int id, usbprofile* profile){
     if(id < profile->modecount)
         return profile->mode + id;
     int cap = id / 4 * 4 + 4;
@@ -151,7 +151,7 @@ void updatemod(usbid* id){
 void hwloadmode(usbdevice* kb, int mode){
     // Ask for mode's name
     usbmode* kbmode = kb->setting.profile.mode + mode;
-    char data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
+    unsigned char data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
     usbqueue(kb, data_pkt, 1);
     usleep(3333);
     usbdequeue(kb);
@@ -173,11 +173,11 @@ void hwloadprofile(usbdevice* kb){
     }
     // Ask for profile ID
     usbprofile* profile = &kb->setting.profile;
-    char data_pkt[2][MSG_SIZE] = {
+    unsigned char data_pkt[2][MSG_SIZE] = {
         { 0x0e, 0x15, 0x01, 0 },
         { 0x0e, 0x16, 0x01, 0 }
     };
-    char in_pkt[MSG_SIZE];
+    unsigned char in_pkt[MSG_SIZE];
     usbqueue(kb, data_pkt[0], 1);
     usleep(3333);
     usbdequeue(kb);
@@ -212,7 +212,7 @@ void hwsaveprofile(usbdevice* kb){
         return;
     // Save the profile name
     usbprofile* profile = &kb->setting.profile;
-    char data_pkt[2][MSG_SIZE] = {
+    unsigned char data_pkt[2][MSG_SIZE] = {
         {0x07, 0x16, 0x01, 0 },
         {0x07, 0x15, 0x01, 0, 1, 2, 3, 4, 5 },
     };
@@ -239,7 +239,7 @@ void hwsaveprofile(usbdevice* kb){
         saveleds(kb, i);
 }
 
-int usbqueue(usbdevice* kb, char* messages, int count){
+int usbqueue(usbdevice* kb, unsigned char* messages, int count){
     // Don't add messages unless the queue has enough room for all of them
     if(kb->queuecount + count > QUEUE_LEN)
         return -1;
@@ -254,7 +254,7 @@ int usbdequeue(usbdevice* kb){
         return 0;
     int count = libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0300, 0x03, kb->queue[0], MSG_SIZE, 500);
     // Rotate queue
-    char* first = kb->queue[0];
+    unsigned char* first = kb->queue[0];
     for(int i = 1; i < QUEUE_LEN; i++)
         kb->queue[i - 1] = kb->queue[i];
     kb->queue[QUEUE_LEN - 1] = first;
@@ -277,8 +277,7 @@ void icorcallback(struct libusb_transfer* transfer){
         libusb_submit_transfer(transfer);
         return;
     }
-    if(kb->uinput)
-        uinputupdate(kb);
+    inputupdate(kb);
 
     // Re-submit the transfer
     libusb_submit_transfer(transfer);
@@ -310,7 +309,7 @@ void setinput(usbdevice* kb, int input){
     // NOTE: I observed the windows driver setting a key to 0x49; it seems there are other bits used in this message. I doubt that
     // they're useful, though. Additionally, the windows driver omits some of the key indices, but there seems to be no harm in
     // including all of them.
-    char datapkt[6][MSG_SIZE] = { };
+    unsigned char datapkt[6][MSG_SIZE] = { };
     for(int i = 0; i < 4; i++){
         datapkt[i][0] = 0x07;
         datapkt[i][1] = 0x40;
@@ -324,7 +323,7 @@ void setinput(usbdevice* kb, int input){
     datapkt[5][2] = 0x02;
     datapkt[5][4] = 0x03;
     // The special corsair keys don't have any HID scancode, so don't allow them to generate HID interrupts no matter what
-#define IMASK(key) ~(!keymap[key].scan << 7)
+#define IMASK(key) ~((keymap[key].scan == -1) << 7)
     for(int i = 0; i < 30; i++){
         int key = i;
         datapkt[0][i * 2 + 4] = key;
@@ -417,6 +416,7 @@ int openusb(libusb_device* device){
                 kb->dev = 0;
                 return -1;
             }
+#ifdef OS_LINUX
             // Claim the USB interfaces.
             libusb_set_auto_detach_kernel_driver(kb->handle, 1);
             // 0 is useless (but claim it anyway for completeness)
@@ -455,11 +455,12 @@ int openusb(libusb_device* device){
                     continue;
                 }
             }
+#endif
             // Get device description and serial
             if(libusb_get_string_descriptor_ascii(kb->handle, descriptor.iProduct, (unsigned char*)kb->name, NAME_LEN) <= 0
                     || libusb_get_string_descriptor_ascii(kb->handle, descriptor.iSerialNumber, (unsigned char*)kb->setting.serial, SERIAL_LEN) <= 0){
                 // If it fails, try to reset the device again
-                printf("%s: Failed to get device info%s\n", devreset >= 2 ? "Error" : "Warning", devreset >= 2 ? "" : ", trying another reset...");
+                printf("%s: Failed to get device info%s\n", devreset >= 2 ? "Error" : "Warning", devreset >= 2 ? "" : ", trying to reset...");
                 if(devreset < 2){
                     int reset = libusb_reset_device(kb->handle);
                     if(reset){
@@ -482,20 +483,21 @@ int openusb(libusb_device* device){
                     return -1;
             }
             printf("Connecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
+#ifdef OS_MAC
+            // OSX has some problems sending packets to the device immediately
+            sleep(1);
+#endif
 
-            // Set up a uinput device for key events
-            if((kb->uinput = uinputopen(index, &descriptor)) <= 0){
+            // Set up an input device for key events
+            if(!inputopen(index, &descriptor)){
                 closehandle(kb);
-                kb->uinput = 0;
                 return -1;
             }
-            if(kb->event <= 0)
-                printf("No event device found. Indicator lights will be disabled\n");
             updateindicators(kb, 1);
 
             // Make /dev path
             if(makedevpath(index)){
-                uinputclose(index);
+                inputclose(index);
                 closehandle(kb);
                 return -1;
             }
@@ -506,10 +508,14 @@ int openusb(libusb_device* device){
 
             // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode. This packet disables their
             // hardware-based functions.
-            char datapkt[64] = { 0x07, 0x04, 0x02 };
+            unsigned char datapkt[64] = { 0x07, 0x04, 0x02 };
             usbqueue(kb, datapkt, 1);
             // Set all keys to use the Corsair input. HID input is unused.
+#ifdef OS_LINUX
             setinput(kb, IN_CORSAIR);
+#else
+            setinput(kb, IN_HID);
+#endif
 
             // Setup the interrupt handler. These have to be processed asychronously so as not to lock up the animation
             setint(kb);
@@ -520,9 +526,9 @@ int openusb(libusb_device* device){
                 memcpy(&kb->setting.profile, &store->profile, sizeof(store->profile));
             } else {
                 // If there is no profile, load it from the device
-                kb->setting.profile.currentmode = getmode(0, &kb->setting.profile);
-                getmode(1, &kb->setting.profile);
-                getmode(2, &kb->setting.profile);
+                kb->setting.profile.currentmode = getusbmode(0, &kb->setting.profile);
+                getusbmode(1, &kb->setting.profile);
+                getusbmode(2, &kb->setting.profile);
                 hwloadprofile(kb);
             }
             updateleds(kb);
@@ -547,7 +553,7 @@ int closeusb(int index){
     kb->fifo = 0;
     if(kb->handle){
         printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
-        uinputclose(index);
+        inputclose(index);
         // Delete USB queue
         for(int i = 0; i < QUEUE_LEN; i++)
             free(kb->queue[i]);

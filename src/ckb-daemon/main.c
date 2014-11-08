@@ -24,7 +24,7 @@ void quit(){
         if(keyboard[i].handle){
             setinput(keyboard + i, IN_HID);
             // Stop the uinput device now to ensure no keys get stuck
-            uinputclose(i);
+            inputclose(i);
             // Flush the USB queue and close the device
             while(keyboard[i].queuecount > 0){
                 usleep(3333);
@@ -68,9 +68,11 @@ int main(int argc, char** argv){
         }
     }
 
+#ifdef OS_LINUX
     // Load the uinput module (if it's not loaded already)
     if(system("modprobe uinput") != 0)
         printf("Warning: Failed to load module uinput\n");
+#endif
 
     // Start libusb
     if(libusb_init(0)){

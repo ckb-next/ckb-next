@@ -3,7 +3,12 @@
 #include "input.h"
 #include "led.h"
 
+// OSX doesn't like putting FIFOs in /dev for some reason
+#ifndef OS_MAC
 const char *const devpath = "/dev/input/ckb";
+#else
+const char *const devpath = "/tmp/ckb";
+#endif
 
 int rm_recursive(const char* path){
     DIR* dir = opendir(path);
@@ -204,7 +209,7 @@ void readcmd(usbdevice* kb, const char* line){
             handler = 0;
             if(profile){
                 eraseprofile(profile);
-                mode = profile->currentmode = getmode(0, profile);
+                mode = profile->currentmode = getusbmode(0, profile);
             }
             rgbchange = 1;
             continue;
@@ -268,7 +273,7 @@ void readcmd(usbdevice* kb, const char* line){
         if(command == MODE){
             int newmode;
             if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode < MODE_MAX)
-                mode = getmode(newmode - 1, profile);
+                mode = getusbmode(newmode - 1, profile);
             continue;
         } else if(command == NAME){
             // Name just parses a whole word

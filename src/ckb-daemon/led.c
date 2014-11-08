@@ -8,7 +8,7 @@ void initrgb(keylight* light){
     memset(light->b, 0, sizeof(light->b));
 }
 
-void makergb(const keylight* light, char data_pkt[5][MSG_SIZE]){
+void makergb(const keylight* light, unsigned char data_pkt[5][MSG_SIZE]){
     if(light->enabled){
         const char* r = light->r, *g = light->g, *b = light->b;
         memcpy(data_pkt[0] + 4, r, 60);
@@ -29,7 +29,7 @@ void updateleds(usbdevice* kb){
     if(!kb)
         return;
 
-    char data_pkt[5][MSG_SIZE] = {
+    unsigned char data_pkt[5][MSG_SIZE] = {
         { 0x7f, 0x01, 0x3c, 0 },
         { 0x7f, 0x02, 0x3c, 0 },
         { 0x7f, 0x03, 0x3c, 0 },
@@ -42,7 +42,7 @@ void updateleds(usbdevice* kb){
 }
 
 void saveleds(usbdevice* kb, int mode){
-    char data_pkt[5][MSG_SIZE] = {
+    unsigned char data_pkt[5][MSG_SIZE] = {
         { 0x7f, 0x01, 0x3c, 0 },
         { 0x7f, 0x02, 0x3c, 0 },
         { 0x7f, 0x03, 0x3c, 0 },
@@ -55,7 +55,7 @@ void saveleds(usbdevice* kb, int mode){
 }
 
 void loadleds(usbdevice* kb, int mode){
-    char data_pkt[5][MSG_SIZE] = {
+    unsigned char data_pkt[5][MSG_SIZE] = {
         { 0x0e, 0x14, 0x02, 0x01, 0x01, mode + 1, 0 },
         { 0xff, 0x01, 0x3c, 0 },
         { 0xff, 0x02, 0x3c, 0 },

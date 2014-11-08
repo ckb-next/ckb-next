@@ -12,5 +12,5 @@ endif
 build:
 	rm -rf bin
 	mkdir bin
-	gcc $(DAEMON_SRC) -o bin/ckb-daemon -I/usr/local/include -L/usr/local/lib -lusb-1.0 -std=c99 -O2
-	gcc $(CKB_SRC) -o bin/ckb -lm -std=c99 -O2
+	gcc $(DAEMON_SRC) -o bin/ckb-daemon -I/usr/local/include -L/usr/local/lib -lusb-1.0 -std=c99 -O2 -DKEYMAP_DEFAULT
+	gcc $(CKB_SRC) -o bin/ckb -lm -std=c99 -O2 -DKEYMAP_DEFAULT

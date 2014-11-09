@@ -19,10 +19,13 @@ void inputupdate(usbdevice* kb){
     if(!kb->event)
         return;
 #endif
+    pthread_mutex_lock(&kb->mutex);
     keybind* bind = &kb->setting.profile.currentmode->bind;
     // Don't do anything if the state hasn't changed
-    if(!memcmp(kb->previntinput, kb->intinput, N_KEYS / 8))
+    if(!memcmp(kb->previntinput, kb->intinput, N_KEYS / 8)){
+        pthread_mutex_unlock(&kb->mutex);
         return;
+    }
     // Look for macros matching the current state
     int macrotrigger = 0;
     for(int i = 0; i < bind->macrocount; i++){
@@ -43,6 +46,7 @@ void inputupdate(usbdevice* kb){
     // Don't do anything else if a macro was already triggered
     if(macrotrigger){
         memcpy(kb->previntinput, kb->intinput, N_KEYS / 8);
+        pthread_mutex_unlock(&kb->mutex);
         return;
     }
     for(int byte = 0; byte < N_KEYS / 8; byte++){
@@ -56,7 +60,7 @@ void inputupdate(usbdevice* kb){
             char mask = 1 << bit;
             char old = oldb & mask, new = newb & mask;
             // If the key state changed, send it to the uinput device
-            if(old != new && scancode != 0){
+            if(old != new && scancode >= 0){
                 os_keypress(kb, scancode, !!new);
                 // The volume wheel doesn't generate keyups, so create them automatically
                 if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN)){
@@ -68,14 +72,7 @@ void inputupdate(usbdevice* kb){
         }
     }
     memcpy(kb->previntinput, kb->intinput, N_KEYS / 8);
-}
-
-void updateindicators(usbdevice* kb, int force){
-    // Read the indicator LEDs for this device and update them if necessary.
-    if(!kb->handle)
-        return;
-    if(os_readind(kb) || force)
-        libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0200, 0, &kb->ileds, 1, 500);
+    pthread_mutex_unlock(&kb->mutex);
 }
 
 void initbind(keybind* bind){

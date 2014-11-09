@@ -1,7 +1,7 @@
 #ifndef KEYBOARD_MAC_H
 #define KEYBOARD_MAC_H
 
-#include "includes.h"
+#include "os.h"
 #ifdef OS_MAC
 
 // Emulate Linux key constants for OSX

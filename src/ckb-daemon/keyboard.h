@@ -1,7 +1,6 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include "includes.h"
 #include "keyboard_mac.h"
 
 // Number of keys
@@ -13,6 +12,7 @@ typedef struct {
     short led;
     short scan;
 } key;
+
 // List of keys, ordered according to where they appear in the keyboard input
 extern key keymap[N_KEYS];
 

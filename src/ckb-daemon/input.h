@@ -5,7 +5,7 @@
 #include "usb.h"
 
 // Opens uinput device
-int inputopen(int index, const struct libusb_device_descriptor* descriptor);
+int inputopen(int index);
 // Closes uinput device
 void inputclose(int index);
 
@@ -19,8 +19,6 @@ void updateindicators(usbdevice* kb, int force);
 void os_keypress(usbdevice* kb, int scancode, int down);
 // Generate a SYN event
 void os_kpsync(usbdevice* kb);
-// Read the indicator LED state. Returns 1 if it changed
-int os_readind(usbdevice* kb);
 
 // Initializes key bindings for a device
 void initbind(keybind* bind);

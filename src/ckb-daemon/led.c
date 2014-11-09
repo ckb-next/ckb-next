@@ -70,7 +70,7 @@ void loadleds(usbdevice* kb, int mode){
         usleep(3333);
         usbdequeue(kb);
         // Wait for the response
-        libusb_control_transfer(kb->handle, 0xa1, 1, 0x0300, 0x03, data_pkt[i], MSG_SIZE, 500);
+        usbinput(kb, data_pkt[i]);
     }
     // Copy the data back to the mode
     keylight* light = &kb->setting.profile.mode[mode].light;

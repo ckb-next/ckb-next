@@ -1,5 +1,6 @@
 #include "usb.h"
 #include "input.h"
+#include "device.h"
 
 #ifdef OS_LINUX
 
@@ -97,15 +98,15 @@ int uinputopen(struct uinput_user_dev* indev, int* event){
     return fd;
 }
 
-int inputopen(int index, const struct libusb_device_descriptor* descriptor){
+int inputopen(int index){
     // Create the new input device
     printf("Setting up uinput device ckb%d\n", index);
     struct uinput_user_dev indev;
     memset(&indev, 0, sizeof(indev));
     snprintf(indev.name, UINPUT_MAX_NAME_SIZE, "ckb%d", index);
     indev.id.bustype = BUS_USB;
-    indev.id.vendor = descriptor->idVendor;
-    indev.id.product = descriptor->idProduct;
+    indev.id.vendor = keyboard[index].descriptor.idVendor;
+    indev.id.product = keyboard[index].descriptor.idProduct;
     indev.id.version = (UINPUT_VERSION > 4 ? 4 : UINPUT_VERSION);
     int event;
     int fd = uinputopen(&indev, &event);
@@ -167,16 +168,15 @@ void os_kpsync(usbdevice* kb){
         printf("Write error: %s\n", strerror(errno));
 }
 
-int os_readind(usbdevice* kb){
-    char ileds = 0;
+void updateindicators(usbdevice* kb, int force){
+    // Read the indicator LEDs for this device and update them if necessary.
+    if(!kb->handle)
+        return;
     char leds[LED_CNT / 8] = { 0 };
-    if(kb->event && ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds))
-        ileds = leds[0];
-    if(ileds != kb->ileds){
-        kb->ileds = ileds;
-        return 1;
+    if(force || (ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds) && leds[0] != kb->ileds)){
+        kb->ileds = leds[0];
+        libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0200, 0, &kb->ileds, 1, 500);
     }
-    return 0;
 }
 
 #endif

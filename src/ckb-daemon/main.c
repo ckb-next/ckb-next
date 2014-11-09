@@ -1,27 +1,18 @@
 #include "usb.h"
+#include "device.h"
 #include "devnode.h"
 #include "led.h"
 #include "input.h"
 
-int usbhotplug(struct libusb_context* ctx, struct libusb_device* device, libusb_hotplug_event event, void* user_data){
-    printf("Got hotplug event\n");
-    if(event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED){
-        // Device connected: parse device
-        return openusb(device);
-    } else if(event == LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT){
-        // Device disconnected: look for it in the device list
-        for(int i = 1; i < DEV_MAX; i++){
-            if(!usbcmp(keyboard[i].dev, device))
-                return closeusb(i);
-        }
-    }
-    return 0;
-}
+static int kblocked = 0;
 
 void quit(){
+    if(!kblocked)
+        pthread_mutex_lock(&kblistmutex);
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
-        if(keyboard[i].handle){
+        if(keyboard[i].fifo && keyboard[i].handle){
+            pthread_mutex_lock(&keyboard[i].mutex);
             setinput(keyboard + i, IN_HID);
             // Stop the uinput device now to ensure no keys get stuck
             inputclose(i);
@@ -32,10 +23,13 @@ void quit(){
                     break;
             }
             closeusb(i);
+            pthread_mutex_unlock(&keyboard[i].mutex);
         }
     }
+    if(!kblocked)
+        pthread_mutex_unlock(&kblistmutex);
     closeusb(0);
-    libusb_exit(0);
+    usbdeinit();
 }
 
 void sighandler2(int type){
@@ -68,40 +62,26 @@ int main(int argc, char** argv){
         }
     }
 
-#ifdef OS_LINUX
-    // Load the uinput module (if it's not loaded already)
-    if(system("modprobe uinput") != 0)
-        printf("Warning: Failed to load module uinput\n");
-#endif
-
-    // Start libusb
-    if(libusb_init(0)){
-        printf("Fatal: Failed to initialize libusb\n");
-        return -1;
-    }
-    libusb_set_debug(0, LIBUSB_LOG_LEVEL_NONE);
     // Make root keyboard
     umask(0);
     memset(keyboard, 0, sizeof(keyboard));
     keyboard[0].model = -1;
     if(!makedevpath(0))
         printf("Root controller ready at %s0\n", devpath);
-    // Enumerate connected devices
-    printf("Scanning devices\n");
-    libusb_device** devices = 0;
-    if(libusb_get_device_list(0, &devices) > 0){
-        for(libusb_device** dev = devices; *dev != 0; dev++)
-            openusb(*dev);
-        libusb_free_device_list(devices, 1);
-    } else
-        printf("Warning: Failed to scan USB devices\n");
-    // Set hotplug callback
-    libusb_hotplug_callback_handle hphandle;
-    if(libusb_hotplug_register_callback(0, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT, 0, V_CORSAIR, LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY, usbhotplug, 0, &hphandle) != LIBUSB_SUCCESS)
-        printf("Warning: Failed to activate hot plug callback\n");
-    printf("Device scan finished\n");
+
+    // Don't let any spawned threads handle signals
+    sigset_t signals, oldsignals;
+    sigfillset(&signals);
+    pthread_sigmask(SIG_SETMASK, &signals, &oldsignals);
+
+    // Start the USB system
+    if(usbinit()){
+        quit();
+        return -1;
+    }
 
     // Set up signal handlers for quitting the service.
+    pthread_sigmask(SIG_SETMASK, &oldsignals, 0);
     signal(SIGTERM, sighandler);
     signal(SIGINT, sighandler);
     signal(SIGQUIT, sighandler);
@@ -110,10 +90,10 @@ int main(int argc, char** argv){
     while(1){
         // No need to run most of these functions on every single frame
         if(!frame){
-            // Run hotplug callback
-            struct timeval tv = { 0 };
-            libusb_handle_events_timeout_completed(0, &tv, 0);
+            usbmainloop();
             // Process FIFOs
+            kblocked = 1;
+            pthread_mutex_lock(&kblistmutex);
             for(int i = 0; i < DEV_MAX; i++){
                 if(keyboard[i].fifo){
                     const char** lines;
@@ -124,17 +104,24 @@ int main(int argc, char** argv){
                     }
                 }
             }
+        } else {
+            kblocked = 1;
+            pthread_mutex_lock(&kblistmutex);
         }
         // Run the USB queue. Messages must be queued because sending multiple messages at the same time can cause the interface to freeze
         for(int i = 1; i < DEV_MAX; i++){
-            if(keyboard[i].handle){
+            if(keyboard[i].fifo && keyboard[i].handle){
+                pthread_mutex_lock(&keyboard[i].mutex);
                 usbdequeue(keyboard + i);
                 // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
                 // immediately and may be changed externally by the OS.
                 if(!frame)
                     updateindicators(keyboard + i, 0);
+                pthread_mutex_unlock(&keyboard[i].mutex);
             }
         }
+        pthread_mutex_unlock(&kblistmutex);
+        kblocked = 0;
         // Sleep for long enough to achieve the desired frame rate (5 packets per frame).
         usleep(1000000 / fps / 5);
         frame = (frame + 1) % 5;

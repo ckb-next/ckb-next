@@ -15,20 +15,17 @@ Building for Linux
 Building for OSX
 ----------------
 
-If you don't already have developer tools installed, you need to download Xcode from the App Store. Run it once to make sure all of its tools are installed.
-
-Download libusb from here: http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.19/libusb-1.0.19.tar.bz2/download
-
-Unzip it and open the directory you extracted it to in a terminal. Run `./configure && make && sudo make install`. Now you can build ckb by switching to the dckb directory and running `make`. The binaries will be placed in `bin` assuming they compile successfully.
+You can build ckb by running `make` from Terminal in the directory you downloaded it to. You should be prompted to install developer tools if you don't have them already (you can also get them by downloading Xcode from the App Store). The binaries will be placed in `bin` assuming they compile successfully.
 
 **Mac notes:**
 - The keyboard devices are located at `/tmp/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input/ckb` in this document, replace it with `/tmp/ckb`.
-- Only the RGB controller works right now; key rebinding and macros are not currently possible.
+- Num Lock is permanently on (since OSX always treats it as enabled). There will be an option soon to disable the indicator LED if you don't like it.
+- If you've rebound your modifier keys in System Preferences, those changes won't work anymore. You have to switch them using ckb's `bind` command. For instance, to switch Cmd and Ctrl, run: `echo bind lctrl:lwin lwin:lctrl rctrl:rwin rwin:rctrl > /tmp/ckb1/cmd`
 
 Usage
 -----
 
-Run `ckb-daemon` as root. It will log some status messages to the terminal and you should now be able to access `/dev/input/ckb*`. The easiest way to see it in action is to run `ckb` (as any user) and specify an effect and foreground/background colors. `ckb` accepts colors in hexadecimal format (`RRGGBB`) or recognizes the names `white`, `black`, `red`, `yellow`, `green`, `cyan`, `blue`, and `magenta`.
+After building, run `sudo bin/ckb-daemon` to start the daemon. It will log some status messages to the terminal and you should now be able to access `/dev/input/ckb*`. The easiest way to see it in action is to open a new terminal in the same directory and run `bin/ckb [animation] [foreground] [background]` (or `bin/ckb` by itself to see a list of animations). `ckb` accepts colors in hexadecimal format (`RRGGBB`) or recognizes the names `white`, `black`, `red`, `yellow`, `green`, `cyan`, `blue`, and `magenta`.
 
 `/dev/input/ckb0` contains the following files:
 - `connected`: A list of all connected keyboards, one per line. Each line contains a device path followed by the device's serial number and its description.

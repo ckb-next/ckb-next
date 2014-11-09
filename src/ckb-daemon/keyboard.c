@@ -13,7 +13,7 @@ key keymap[N_KEYS] = {
     { "f9",         0x6c, KEY_F9 },
     { "f10",        0x78, KEY_F10 },
     { "f11",        0x84, KEY_F11 },
-    { "grave",      0x01, KEY_GRAVE },
+    { "grave",      0x01, KEY_GRAVE_UK },
     { "1",          0x0d, KEY_1 },
     { "2",          0x19, KEY_2 },
     { "3",          0x25, KEY_3 },

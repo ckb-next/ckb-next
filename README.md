@@ -109,4 +109,4 @@ Known issues
 
 - When loading settings from the hardware, all three modes end up with the same RGB configuration. This is a hardware bug and it affects CUE as well.
 - It's not possible for the daemon to determine which hardware mode was in use, so the keyboard always starts on mode 1. Again, this is a hardware issue (although thanks to the above problem, it doesn't really matter anyway).
-- Occasionally the daemon can't communicate with the keyboard and the device needs to be unplugged and plugged back in. This seems to be a firmware/OS issue and probably isn't fixable by ckb.
+- The Linux driver doesn't work 100% consistently and can be very slow to start up or shut down. This seems to be a driver/firmware conflict at an OS level, so it probably can't be fixed in ckb.

@@ -10,7 +10,7 @@
 
 int usbdequeue(usbdevice* kb){
     if(kb->queuecount == 0 || !kb->handle)
-        return 0;
+        return -1;
     IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, kb->queue[0], MSG_SIZE);
     // Rotate queue
     unsigned char* first = kb->queue[0];
@@ -37,6 +37,12 @@ void closehandle(usbdevice* kb){
             kb->handles[i] = 0;
         }
     }
+}
+
+int resetusb(usbdevice* kb){
+    // I don't think it's actually possible to do this.
+    // Just return success without doing anything...
+    return 0;
 }
 
 void usbremove(void* context, IOReturn result, void* sender){
@@ -262,10 +268,6 @@ int usbinit(){
         return -1;
     }
     return 0;
-}
-
-void usbmainloop(){
-    // Nothing to do
 }
 
 void usbdeinit(){

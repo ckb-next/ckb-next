@@ -27,6 +27,8 @@
 #define UINPUT_VERSION 2
 #endif
 
+#define INPUT_TEST unusedinput[8]
+
 #endif  // OS_LINUX
 
 #ifdef OS_MAC

@@ -110,7 +110,6 @@ int main(int argc, char** argv){
     while(1){
         // No need to run most of these functions on every single frame
         if(!frame){
-            usbmainloop();
             // Process FIFOs
             pthread_mutex_lock(&kblistmutex);
             for(int i = 0; i < DEV_MAX; i++){
@@ -128,11 +127,19 @@ int main(int argc, char** argv){
         // Run the USB queue. Messages must be queued because sending multiple messages at the same time can cause the interface to freeze
         for(int i = 1; i < DEV_MAX; i++){
             if(IS_ACTIVE(keyboard + i)){
-                usbdequeue(keyboard + i);
-                // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
-                // immediately and may be changed externally by the OS.
-                if(!frame)
-                    updateindicators(keyboard + i, 0);
+                if(usbdequeue(keyboard + i) == 0){
+                    printf("Device ckb%d not responding, trying to reset...\n", i);
+                    if(resetusb(keyboard + i))
+                        closeusb(i);
+                    else {
+                        updateindicators(keyboard + i, 1);
+                    }
+                } else {
+                    // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
+                    // immediately and may be changed externally by the OS.
+                    if(!frame)
+                        updateindicators(keyboard + i, 0);
+                }
             }
         }
         pthread_mutex_unlock(&kblistmutex);

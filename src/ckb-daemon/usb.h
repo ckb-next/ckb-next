@@ -14,8 +14,6 @@
 
 // Start the USB system. Returns 0 on success
 int usbinit();
-// USB main loop callback
-void usbmainloop();
 // Stop the USB system.
 void usbdeinit();
 
@@ -25,6 +23,9 @@ int setupusb(int index);
 // Close a USB device and remove device entry. Returns 0 on success
 // Threading: Lock the device mutex BEFORE calling this. It will be released.
 int closeusb(int index);
+// Reset a USB device. Returns 0 on success, -1 if device should be removed
+// Threading: Lock the device mutex before calling
+int resetusb(usbdevice* kb);
 // Close handles on a USB device
 // Threading: Lock device before use, unlock after finish
 void closehandle(usbdevice* kb);
@@ -33,6 +34,7 @@ void closehandle(usbdevice* kb);
 // Threading: Lock device before use, unlock after finish
 int usbqueue(usbdevice* kb, unsigned char* messages, int count);
 // Output a message from the USB queue to the device, if any. Returns number of bytes written.
+// If the message was not sent successfully it will not be removed from the queue.
 // Threading: Lock device before use, unlock after finish
 int usbdequeue(usbdevice* kb);
 // Gets input from a USB device.

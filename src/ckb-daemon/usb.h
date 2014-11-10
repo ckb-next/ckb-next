@@ -5,9 +5,12 @@
 #include "keyboard.h"
 
 // Vendor/product codes
-#define V_CORSAIR   0x1b1c
-#define P_K70       0x1b13
-#define P_K95       0x1b11
+#define V_CORSAIR       0x1b1c
+#define P_K70           0x1b13
+#define P_K95           0x1b11
+#define V_CORSAIR_STR   "1b1c"
+#define P_K70_STR       "1b13"
+#define P_K95_STR       "1b11"
 
 // Start the USB system. Returns 0 on success
 int usbinit();
@@ -17,17 +20,23 @@ void usbmainloop();
 void usbdeinit();
 
 // Set up a USB device after all its handles are open. Returns 0 on success
+// Threading: Creates device mutex. Locks it until finished.
 int setupusb(int index);
 // Close a USB device and remove device entry. Returns 0 on success
+// Threading: Lock the device mutex BEFORE calling this. It will be released.
 int closeusb(int index);
 // Close handles on a USB device
+// Threading: Lock device before use, unlock after finish
 void closehandle(usbdevice* kb);
 
 // Add a message to a USB device to be sent to the device. Returns 0 on success.
+// Threading: Lock device before use, unlock after finish
 int usbqueue(usbdevice* kb, unsigned char* messages, int count);
 // Output a message from the USB queue to the device, if any. Returns number of bytes written.
+// Threading: Lock device before use, unlock after finish
 int usbdequeue(usbdevice* kb);
 // Gets input from a USB device.
+// Threading: Lock device before use, unlock after finish
 int usbinput(usbdevice* kb, unsigned char* message);
 
 #endif

@@ -9,7 +9,7 @@
 #define INCOMPLETE (IOHIDDeviceRef)-1l
 
 int usbdequeue(usbdevice* kb){
-    if(kb->queuecount == 0 || !kb->handle || kb->handle == INCOMPLETE)
+    if(kb->queuecount == 0 || !kb->handle)
         return 0;
     IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, kb->queue[0], MSG_SIZE);
     // Rotate queue
@@ -22,7 +22,7 @@ int usbdequeue(usbdevice* kb){
 }
 
 int usbinput(usbdevice* kb, unsigned char* message){
-    if(!kb->handle || kb->handle == INCOMPLETE)
+    if(!IS_ACTIVE(kb))
         return 0;
     CFIndex length = MSG_SIZE;
     IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
@@ -43,8 +43,10 @@ void usbremove(void* context, IOReturn result, void* sender){
     pthread_mutex_lock(&kblistmutex);
     usbdevice* kb = context;
     for(int i = 0; i < DEV_MAX; i++){
-        if(keyboard + i == kb)
+        if(keyboard + i == kb){
+            pthread_mutex_lock(&keyboard[i].mutex);
             closeusb(i);
+        }
     }
     pthread_mutex_unlock(&kblistmutex);
 }
@@ -63,6 +65,12 @@ void openusb(int index){
     // Handle 3 is the control handle
     kb->lastkeypress = -1;
     kb->handle = kb->handles[3];
+
+    // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode. This packet disables their
+    // hardware-based functions.
+    unsigned char datapkt[MSG_SIZE] = { 0x07, 0x04, 0x02 };
+    // TODO: Handle control errors here
+    IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, datapkt, MSG_SIZE);
 
     // Set up the device
     if(setupusb(index)){
@@ -132,6 +140,7 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     }
     if(index == -1){
         printf("Error: No free devices\n");
+        pthread_mutex_unlock(&kblistmutex);
         return;
     }
     usbdevice* kb = keyboard + index;
@@ -244,12 +253,12 @@ void* threadrun(void* context){
 int usbinit(){
     // Create the device manager
     if(!(usbmanager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone))){
-        printf("Failed to create device manager\n");
+        printf("Fatal: Failed to create device manager\n");
         return -1;
     }
     // Start the device thread
     if(pthread_create(&usbthread, 0, threadrun, 0)){
-        printf("Failed to start worker thread\n");
+        printf("Fatal: Failed to start USB thread\n");
         return -1;
     }
     return 0;

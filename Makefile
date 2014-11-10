@@ -3,7 +3,7 @@ CKB_SRC := src/ckb/main.c
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-	DAEMON_SRC += src/ckb-daemon/usb_linux.c src/ckb-daemon/input_linux.c -lusb-1.0 -lpthread
+	DAEMON_SRC += src/ckb-daemon/usb_linux.c src/ckb-daemon/input_linux.c -ludev -lpthread
 endif
 ifeq ($(UNAME_S),Darwin)
 	DAEMON_SRC += src/ckb-daemon/usb_mac.c src/ckb-daemon/input_mac.c src/ckb-daemon/extra_mac.m -framework IOKit -framework CoreFoundation -framework CoreGraphics -framework AppKit -liconv

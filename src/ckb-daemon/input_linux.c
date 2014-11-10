@@ -105,8 +105,8 @@ int inputopen(int index){
     memset(&indev, 0, sizeof(indev));
     snprintf(indev.name, UINPUT_MAX_NAME_SIZE, "ckb%d", index);
     indev.id.bustype = BUS_USB;
-    indev.id.vendor = keyboard[index].descriptor.idVendor;
-    indev.id.product = keyboard[index].descriptor.idProduct;
+    indev.id.vendor = V_CORSAIR;
+    indev.id.product = (keyboard[index].model == 95 ? P_K95 : P_K70);
     indev.id.version = (UINPUT_VERSION > 4 ? 4 : UINPUT_VERSION);
     int event;
     int fd = uinputopen(&indev, &event);
@@ -170,12 +170,13 @@ void os_kpsync(usbdevice* kb){
 
 void updateindicators(usbdevice* kb, int force){
     // Read the indicator LEDs for this device and update them if necessary.
-    if(!kb->handle)
+    if(!IS_ACTIVE(kb))
         return;
     char leds[LED_CNT / 8] = { 0 };
     if(force || (ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds) && leds[0] != kb->ileds)){
         kb->ileds = leds[0];
-        libusb_control_transfer(kb->handle, 0x21, 0x09, 0x0200, 0, &kb->ileds, 1, 500);
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
+        ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     }
 }
 

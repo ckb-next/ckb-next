@@ -35,10 +35,6 @@ int setupusb(int index){
     for(int q = 0; q < QUEUE_LEN; q++)
         kb->queue[q] = malloc(MSG_SIZE);
 
-    // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode. This packet disables their
-    // hardware-based functions.
-    unsigned char datapkt[64] = { 0x07, 0x04, 0x02 };
-    usbqueue(kb, datapkt, 1);
     // Set all keys to use the Corsair input. HID input is unused.
     setinput(kb, IN_CORSAIR);
 
@@ -78,7 +74,6 @@ int closeusb(int index){
         closehandle(kb);
         updateconnected();
     }
-    pthread_mutex_destroy(&kb->mutex);
     // Delete the control path
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
@@ -86,6 +81,9 @@ int closeusb(int index){
         printf("Unable to delete %s: %s\n", path, strerror(errno));
     else
         printf("Removed device path %s\n", path);
+
+    pthread_mutex_unlock(&kb->mutex);
+    pthread_mutex_destroy(&kb->mutex);
     memset(kb, 0, sizeof(*kb));
     return 0;
 }

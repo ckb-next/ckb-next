@@ -10,7 +10,7 @@ The user-runnable utility is currently very limited. It only supports one keyboa
 Building for Linux
 ------------------
 
-`libusb-1.0`, `gcc`, and `glibc` are required. Check with your package manager to make sure you have the correct libraries/headers installed. You also need a kernel with uinput support (all distros should ship with this by default; don't worry about it unless you're running a custom kernel). You can build ckb by running `make` in the directory you downloaded it to. The binaries will be placed in `bin` assuming they compile successfully.
+`libudev`, `gcc`, and `glibc` are required. Check with your package manager to make sure you have the correct libraries/headers installed (Note: on Ubuntu you need `libudev-dev`). You also need a kernel with uinput support (all distros should ship with this by default; don't worry about it unless you're running a custom kernel). You can build ckb by running `make` in the directory you downloaded it to. The binaries will be placed in `bin` assuming they compile successfully.
 
 Building for OSX
 ----------------
@@ -109,4 +109,4 @@ Known issues
 
 - When loading settings from the hardware, all three modes end up with the same RGB configuration. This is a hardware bug and it affects CUE as well.
 - It's not possible for the daemon to determine which hardware mode was in use, so the keyboard always starts on mode 1. Again, this is a hardware issue (although thanks to the above problem, it doesn't really matter anyway).
-- Sometimes the keyboard doesn't work properly without unplugging and replugging it, especially after closing and restarting the daemon.
+- Occasionally the daemon can't communicate with the keyboard and the device needs to be unplugged and plugged back in. This seems to be a firmware/OS issue and probably isn't fixable by ckb.

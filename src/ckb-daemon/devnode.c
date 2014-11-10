@@ -40,7 +40,7 @@ void updateconnected(){
     }
     int written = 0;
     for(int i = 1; i < DEV_MAX; i++){
-        if(keyboard[i].handle){
+        if(IS_ACTIVE(keyboard + i)){
             written = 1;
             fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].setting.serial, keyboard[i].name);
         }
@@ -162,7 +162,7 @@ void readcmd(usbdevice* kb, const char* line){
     char word[strlen(line) + 1];
     int wordlen;
     // See if the first word is a serial number. If so, switch devices and skip to the next word.
-    usbsetting* set = (kb->handle ? &kb->setting : 0);
+    usbsetting* set = (IS_ACTIVE(kb) ? &kb->setting : 0);
     usbprofile* profile = (set ? &set->profile : 0);
     usbmode* mode = (profile ? profile->currentmode : 0);
     cmd command = NONE;

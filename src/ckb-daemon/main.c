@@ -4,18 +4,22 @@
 #include "led.h"
 #include "input.h"
 
-static int kblocked = 0;
+// Not supported on OSX...
+#ifdef OS_MAC
+#define pthread_mutex_timedlock(mutex, timespec) pthread_mutex_trylock(mutex)
+#endif
 
 void quit(){
-    if(!kblocked)
-        pthread_mutex_lock(&kblistmutex);
+    // Wait at most 1s for mutex locks. Better to crash than to freeze shutting down.
+    struct timespec timeout = { 1, 0 };
+    pthread_mutex_timedlock(&kblistmutex, &timeout);
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
-        if(keyboard[i].fifo && keyboard[i].handle){
-            pthread_mutex_lock(&keyboard[i].mutex);
-            setinput(keyboard + i, IN_HID);
+        if(IS_ACTIVE(keyboard + i)){
+            pthread_mutex_timedlock(&keyboard[i].mutex, &timeout);
             // Stop the uinput device now to ensure no keys get stuck
             inputclose(i);
+            setinput(keyboard + i, IN_HID);
             // Flush the USB queue and close the device
             while(keyboard[i].queuecount > 0){
                 usleep(3333);
@@ -23,11 +27,9 @@ void quit(){
                     break;
             }
             closeusb(i);
-            pthread_mutex_unlock(&keyboard[i].mutex);
         }
     }
-    if(!kblocked)
-        pthread_mutex_unlock(&kblistmutex);
+    pthread_mutex_unlock(&kblistmutex);
     closeusb(0);
     usbdeinit();
 }
@@ -43,6 +45,26 @@ void sighandler(int type){
     printf("\nCaught signal %d\n", type);
     quit();
     exit(0);
+}
+
+pthread_t sigthread;
+
+void* sigmain(void* context){
+    // Allow signals in this thread
+    sigset_t signals;
+    sigfillset(&signals);
+    sigdelset(&signals, SIGTERM);
+    sigdelset(&signals, SIGINT);
+    sigdelset(&signals, SIGQUIT);
+    // Set up signal handlers for quitting the service.
+    pthread_sigmask(SIG_SETMASK, &signals, 0);
+    signal(SIGTERM, sighandler);
+    signal(SIGINT, sighandler);
+    signal(SIGQUIT, sighandler);
+    while(1){
+        sleep(-1);
+    }
+    return 0;
 }
 
 int main(int argc, char** argv){
@@ -65,14 +87,15 @@ int main(int argc, char** argv){
     // Make root keyboard
     umask(0);
     memset(keyboard, 0, sizeof(keyboard));
+    pthread_mutex_init(&keyboard[0].mutex, 0);
     keyboard[0].model = -1;
     if(!makedevpath(0))
         printf("Root controller ready at %s0\n", devpath);
 
     // Don't let any spawned threads handle signals
-    sigset_t signals, oldsignals;
+    sigset_t signals;
     sigfillset(&signals);
-    pthread_sigmask(SIG_SETMASK, &signals, &oldsignals);
+    pthread_sigmask(SIG_SETMASK, &signals, 0);
 
     // Start the USB system
     if(usbinit()){
@@ -80,11 +103,8 @@ int main(int argc, char** argv){
         return -1;
     }
 
-    // Set up signal handlers for quitting the service.
-    pthread_sigmask(SIG_SETMASK, &oldsignals, 0);
-    signal(SIGTERM, sighandler);
-    signal(SIGINT, sighandler);
-    signal(SIGQUIT, sighandler);
+    // Start the signal handling thread
+    pthread_create(&sigthread, 0, sigmain, 0);
 
     int frame = 0;
     while(1){
@@ -92,7 +112,6 @@ int main(int argc, char** argv){
         if(!frame){
             usbmainloop();
             // Process FIFOs
-            kblocked = 1;
             pthread_mutex_lock(&kblistmutex);
             for(int i = 0; i < DEV_MAX; i++){
                 if(keyboard[i].fifo){
@@ -104,24 +123,19 @@ int main(int argc, char** argv){
                     }
                 }
             }
-        } else {
-            kblocked = 1;
+        } else
             pthread_mutex_lock(&kblistmutex);
-        }
         // Run the USB queue. Messages must be queued because sending multiple messages at the same time can cause the interface to freeze
         for(int i = 1; i < DEV_MAX; i++){
-            if(keyboard[i].fifo && keyboard[i].handle){
-                pthread_mutex_lock(&keyboard[i].mutex);
+            if(IS_ACTIVE(keyboard + i)){
                 usbdequeue(keyboard + i);
                 // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
                 // immediately and may be changed externally by the OS.
                 if(!frame)
                     updateindicators(keyboard + i, 0);
-                pthread_mutex_unlock(&keyboard[i].mutex);
             }
         }
         pthread_mutex_unlock(&kblistmutex);
-        kblocked = 0;
         // Sleep for long enough to achieve the desired frame rate (5 packets per frame).
         usleep(1000000 / fps / 5);
         frame = (frame + 1) % 5;

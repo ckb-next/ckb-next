@@ -19,16 +19,13 @@
 #endif
 
 #include <features.h>
-#include <libusb-1.0/libusb.h>
+#include <libudev.h>
 #include <linux/uinput.h>
+#include <linux/usbdevice_fs.h>
 
 #ifndef UINPUT_VERSION
 #define UINPUT_VERSION 2
 #endif
-
-// Mutexes kill libusb. Disable them for now...
-#define pthread_mutex_lock(mutex)
-#define pthread_mutex_unlock(mutex)
 
 #endif  // OS_LINUX
 

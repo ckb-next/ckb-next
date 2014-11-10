@@ -83,12 +83,13 @@ typedef struct {
 typedef struct {
     // I/O devices
 #ifdef OS_LINUX
-    struct libusb_device_descriptor descriptor;
-    libusb_device* dev;
-    libusb_device_handle* handle;
-    struct libusb_transfer* keyint;
+    struct udev_device* udev;
+    struct usbdevfs_urb urb[3];
+    char unusedinput[32];
+    int handle;
     int uinput;
     int event;
+    pthread_t usbthread;
 #endif
 #ifdef OS_MAC
     IOHIDDeviceRef handle;
@@ -98,6 +99,7 @@ typedef struct {
     long keypresstime;
     short lastkeypress;
 #endif
+    // A mutex used for USB controls. Needs to be locked before reading or writing the handle
     pthread_mutex_t mutex;
     // Keyboard type (70 or 95 for keyboards, -1 for root)
     int model;

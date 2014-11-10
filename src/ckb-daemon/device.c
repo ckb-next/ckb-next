@@ -165,7 +165,7 @@ void hwloadmode(usbdevice* kb, int mode){
 }
 
 void hwloadprofile(usbdevice* kb){
-    if(!kb || !kb->handle)
+    if(!IS_ACTIVE(kb))
         return;
     // Empty the board's USB queue
     while(kb->queuecount > 0){
@@ -209,7 +209,7 @@ void hwloadprofile(usbdevice* kb){
 }
 
 void hwsaveprofile(usbdevice* kb){
-    if(!kb || !kb->handle)
+    if(!IS_ACTIVE(kb))
         return;
     // Save the profile name
     usbprofile* profile = &kb->setting.profile;

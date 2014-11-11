@@ -25,7 +25,7 @@ void makergb(const keylight* light, uchar data_pkt[5][MSG_SIZE]){
     }
 }
 
-void updateleds(usbdevice* kb){
+void updatergb(usbdevice* kb){
     if(!kb)
         return;
 
@@ -41,7 +41,7 @@ void updateleds(usbdevice* kb){
     usbqueue(kb, data_pkt[0], 5);
 }
 
-void saveleds(usbdevice* kb, int mode){
+void savergb(usbdevice* kb, int mode){
     uchar data_pkt[5][MSG_SIZE] = {
         { 0x7f, 0x01, 0x3c, 0 },
         { 0x7f, 0x02, 0x3c, 0 },
@@ -54,7 +54,7 @@ void saveleds(usbdevice* kb, int mode){
     usbqueue(kb, data_pkt[0], 5);
 }
 
-void loadleds(usbdevice* kb, int mode){
+void loadrgb(usbdevice* kb, int mode){
     uchar data_pkt[5][MSG_SIZE] = {
         { 0x0e, 0x14, 0x02, 0x01, 0x01, mode + 1, 0 },
         { 0xff, 0x01, 0x3c, 0 },
@@ -85,15 +85,15 @@ void loadleds(usbdevice* kb, int mode){
 
 #define MAX_WORDS 3
 
-void cmd_ledoff(usbmode* mode){
+void cmd_rgboff(usbmode* mode){
     mode->light.enabled = 0;
 }
 
-void cmd_ledon(usbmode* mode){
+void cmd_rgbon(usbmode* mode){
     mode->light.enabled = 1;
 }
 
-void cmd_ledrgb(usbmode* mode, int keyindex, const char* code){
+void cmd_rgb(usbmode* mode, int keyindex, const char* code){
     unsigned int r, g, b;
     if(sscanf(code, "%2x%2x%2x", &r, &g, &b) == 3){
         if(r > 255)

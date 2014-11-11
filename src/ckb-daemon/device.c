@@ -161,7 +161,7 @@ void hwloadmode(usbdevice* kb, int mode){
     if(data_pkt[0] == 0x0e && data_pkt[1] == 0x01)
         memcpy(kbmode->name, data_pkt + 4, MD_NAME_LEN * 2);
     // Load the RGB setting
-    loadleds(kb, mode);
+    loadrgb(kb, mode);
 }
 
 void hwloadprofile(usbdevice* kb){
@@ -237,7 +237,7 @@ void hwsaveprofile(usbdevice* kb){
     }
     // Save the RGB data
     for(int i = 0; i < modes; i++)
-        saveleds(kb, i);
+        savergb(kb, i);
 }
 
 void setinput(usbdevice* kb, int input){

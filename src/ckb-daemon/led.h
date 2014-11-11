@@ -7,18 +7,18 @@
 // Initialize RGB data.
 void initrgb(keylight* light);
 // Update a device's LEDs with RGB data.
-void updateleds(usbdevice* kb);
+void updatergb(usbdevice* kb);
 // Saves RGB data for a device profile.
-void saveleds(usbdevice* kb, int mode);
+void savergb(usbdevice* kb, int mode);
 // Loads RGB data for a device profile.
-void loadleds(usbdevice* kb, int mode);
+void loadrgb(usbdevice* kb, int mode);
 
 // Turns LEDs off
-void cmd_ledoff(usbmode* mode);
+void cmd_rgboff(usbmode* mode);
 // Turns LEDs on
-void cmd_ledon(usbmode* mode);
+void cmd_rgbon(usbmode* mode);
 // Updates an LED color
-void cmd_ledrgb(usbmode* mode, int keyindex, const char* code);
+void cmd_rgb(usbmode* mode, int keyindex, const char* code);
 
 // Turns an indicator off permanently
 void cmd_ioff(usbmode* mode, int zero, const char* led);

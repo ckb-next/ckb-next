@@ -10,6 +10,10 @@
 #define OS_MAC
 #endif
 
+#if !defined(OS_LINUX) && !defined(OS_MAC)
+#error Your OS is not supported. Edit os.h if you want to compile anyway.
+#endif
+
 // OS-specific includes
 
 #ifdef OS_LINUX

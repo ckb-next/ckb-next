@@ -244,7 +244,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         } else if(!strcmp(word, "rgb")){
             command = RGB;
-            handler = cmd_ledrgb;
+            handler = cmd_rgb;
             rgbchange = 1;
             if(mode)
                 updatemod(&mode->id);
@@ -300,14 +300,14 @@ void readcmd(usbdevice* kb, const char* line){
             // RGB command has a special response for "on", "off", and a hex constant
             int r, g, b;
             if(!strcmp(word, "on")){
-                cmd_ledon(mode);
+                cmd_rgbon(mode);
                 continue;
             } else if(!strcmp(word, "off")){
-                cmd_ledoff(mode);
+                cmd_rgboff(mode);
                 continue;
             } else if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
                 for(int i = 0; i < N_KEYS; i++)
-                    cmd_ledrgb(mode, i, word);
+                    cmd_rgb(mode, i, word);
                 continue;
             }
         } else if(command == MACRO && !strcmp(word, "clear")){
@@ -356,5 +356,5 @@ void readcmd(usbdevice* kb, const char* line){
         }
     }
     if(mode && rgbchange)
-        updateleds(kb);
+        updatergb(kb);
 }

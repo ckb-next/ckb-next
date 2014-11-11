@@ -49,7 +49,7 @@ int setupusb(int index){
         getusbmode(2, &kb->setting.profile);
         hwloadprofile(kb);
     }
-    updateleds(kb);
+    updatergb(kb);
     pthread_mutex_unlock(&kb->mutex);
     return 0;
 }

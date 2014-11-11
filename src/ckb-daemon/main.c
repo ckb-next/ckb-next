@@ -131,9 +131,8 @@ int main(int argc, char** argv){
                     printf("Device ckb%d not responding, trying to reset...\n", i);
                     if(resetusb(keyboard + i))
                         closeusb(i);
-                    else {
+                    else
                         updateindicators(keyboard + i, 1);
-                    }
                 } else {
                     // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
                     // immediately and may be changed externally by the OS.

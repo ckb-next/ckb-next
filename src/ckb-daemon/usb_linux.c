@@ -212,7 +212,7 @@ int openusb(struct udev_device* dev, int model){
             }
             if(!received){
                 printf("Didn't get input, trying to reset again...\n");
-                if(resetusb(kb)){
+                if(resetusb(kb) || ioctl(kb->handle, USBDEVFS_CONTROL, &transfer) != MSG_SIZE){
                     printf("Reset failed (%s). Disconnecting.\n", strerror(errno));
                     closehandle(kb);
                     connectstatus |= 2;

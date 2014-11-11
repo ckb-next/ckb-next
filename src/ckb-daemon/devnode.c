@@ -216,7 +216,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         } else if(!strcmp(word, "name")){
             command = NAME;
-            handler = 0;
+            handler = cmd_setmodename;
             if(mode)
                 updatemod(&mode->id);
             continue;
@@ -249,6 +249,18 @@ void readcmd(usbdevice* kb, const char* line){
             if(mode)
                 updatemod(&mode->id);
             continue;
+        } else if(!strcmp(word, "ioff")){
+            command = IOFF;
+            handler = cmd_ioff;
+            continue;
+        } else if(!strcmp(word, "ion")){
+            command = ION;
+            handler = cmd_ion;
+            continue;
+        } else if(!strcmp(word, "iauto")){
+            command = IAUTO;
+            handler = cmd_iauto;
+            continue;
         }
         if(command == NONE)
             continue;
@@ -276,12 +288,12 @@ void readcmd(usbdevice* kb, const char* line){
             if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode < MODE_MAX)
                 mode = getusbmode(newmode - 1, profile);
             continue;
-        } else if(command == NAME){
-            // Name just parses a whole word
-            setmodename(mode, word);
+        } else if(command == NAME || command == IOFF || command == ION || command == IAUTO){
+            // All of the above just parse the whole word
+            handler(mode, 0, word);
             continue;
         } else if(command == PROFILENAME){
-            // Same for profile name
+            // Profile name is the same, but takes a different parameter
             setprofilename(profile, word);
             continue;
         } else if(command == RGB){

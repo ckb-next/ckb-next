@@ -19,7 +19,6 @@ You can build ckb by running `make` from Terminal in the directory you downloade
 
 **Mac notes:**
 - The keyboard devices are located at `/tmp/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input/ckb` in this document, replace it with `/tmp/ckb`.
-- Num Lock is permanently on (since OSX always treats it as enabled). There will be an option soon to disable the indicator LED if you don't like it.
 - If you've rebound your modifier keys in System Preferences, those changes won't work anymore. You have to switch them using ckb's `bind` command. For instance, to switch Cmd and Ctrl, run: `echo bind lctrl:lwin lwin:lctrl rctrl:rwin rwin:rctrl > /tmp/ckb1/cmd`
 
 Usage
@@ -75,6 +74,14 @@ Multiple keys may be changed to one color when separated with commas, for instan
 - `rgb w,a,s,d:0000ff` sets the WASD keys to blue.
 Additionally, multiple commands may be combined into one, for instance:
 - `rgb ffffff esc:ff0000 w,a,s,d:0000ff` sets the Esc key red, the WASD keys blue, and the rest of the keyboard white (note the lack of a key name before `ffffff`, implying the whole keyboard is to be set).
+
+Indicators
+----------
+
+The indicator LEDs (Num Lock, Caps Lock, Scroll Lock) are controlled with the `i` commands.
+- `ioff <led>` turns an indicator off permanently. Valid LED names are `num`, `caps`, and `scroll`.
+- `ion <led>` turns an indicator on permanently.
+- `iauto <led>` turns an indicator off or on automatically (default behavior).
 
 Binding keys
 ------------

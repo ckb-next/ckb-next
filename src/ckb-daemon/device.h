@@ -30,7 +30,7 @@ usbsetting* addstore(const char* serial);
 usbmode* getusbmode(int id, usbprofile* profile);
 
 // Sets a mode's name
-void setmodename(usbmode* mode, const char* name);
+void cmd_setmodename(usbmode* mode, int zero, const char* name);
 // Sets a profile's name
 void setprofilename(usbprofile* profile, const char* name);
 // Resets a mode to its default settings

@@ -20,4 +20,11 @@ void cmd_ledon(usbmode* mode);
 // Updates an LED color
 void cmd_ledrgb(usbmode* mode, int keyindex, const char* code);
 
+// Turns an indicator off permanently
+void cmd_ioff(usbmode* mode, int zero, const char* led);
+// Turns an indicator on permanently
+void cmd_ion(usbmode* mode, int zero, const char* led);
+// Sets an indicator to automatic mode
+void cmd_iauto(usbmode* mode, int zero, const char* led);
+
 #endif

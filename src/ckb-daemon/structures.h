@@ -17,7 +17,7 @@ typedef struct {
 typedef struct {
     macroaction* actions;
     int actioncount;
-    unsigned char combo[N_KEYS / 8];
+    uchar combo[N_KEYS / 8];
     char triggered;
 } keymacro;
 
@@ -53,6 +53,9 @@ typedef struct {
 typedef struct {
     keylight light;
     keybind bind;
+    // Indicators permanently off/on
+    uchar ioff, ion;
+    // Name and UUID
     unsigned short name[MD_NAME_LEN];
     usbid id;
 } usbmode;
@@ -60,10 +63,13 @@ typedef struct {
 // Profile structure
 #define PR_NAME_LEN 16
 typedef struct {
+    // Modes
     usbmode* mode;
     int modecount;
     int modecap;
+    // Currently-selected mode
     usbmode* currentmode;
+    // Name and UUID
     unsigned short name[PR_NAME_LEN];
     usbid id;
 } usbprofile;
@@ -104,14 +110,14 @@ typedef struct {
     // Keyboard type (70 or 95 for keyboards, -1 for root)
     int model;
     // Interrupt transfers (keypresses)
-    unsigned char intinput[MSG_SIZE];
-    unsigned char previntinput[N_KEYS / 8];
+    uchar intinput[MSG_SIZE];
+    uchar previntinput[N_KEYS / 8];
     // Indicator LED state
-    unsigned char ileds;
+    uchar ileds;
     // Command FIFO
     int fifo;
     // USB output queue
-    unsigned char* queue[QUEUE_LEN];
+    uchar* queue[QUEUE_LEN];
     int queuecount;
     // Keyboard settings
     usbsetting setting;

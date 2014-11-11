@@ -20,6 +20,8 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
+typedef unsigned char uchar;
+
 #include "structures.h"
 
 #endif

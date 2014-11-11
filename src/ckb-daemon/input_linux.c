@@ -173,8 +173,13 @@ void updateindicators(usbdevice* kb, int force){
     if(!IS_ACTIVE(kb))
         return;
     char leds[LED_CNT / 8] = { 0 };
-    if(force || (ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds) && leds[0] != kb->ileds)){
-        kb->ileds = leds[0];
+    ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds);
+    char ileds = leds[0];
+    usbmode* mode = kb->setting.profile.currentmode;
+    if(mode)
+        ileds = (ileds & ~mode->ioff) | mode->ion;
+    if(force || ileds != kb->ileds){
+        kb->ileds = ileds;
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
         ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     }

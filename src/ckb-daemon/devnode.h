@@ -37,6 +37,9 @@ typedef enum {
     MACRO,
 
     RGB,
+    IOFF,
+    ION,
+    IAUTO
 } cmd;
 typedef void (*cmdhandler)(usbmode*, int, const char*);
 

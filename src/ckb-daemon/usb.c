@@ -4,7 +4,7 @@
 #include "device.h"
 #include "led.h"
 
-int usbqueue(usbdevice* kb, unsigned char* messages, int count){
+int usbqueue(usbdevice* kb, uchar* messages, int count){
     // Don't add messages unless the queue has enough room for all of them
     if(kb->queuecount + count > QUEUE_LEN)
         return -1;

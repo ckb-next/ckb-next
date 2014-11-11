@@ -93,6 +93,9 @@ void updateindicators(usbdevice* kb, int force){
     // we use the last-assigned value rather than fetching it from the system
     if(kb->eflags & kCGEventFlagMaskAlphaShift)
         ileds |= 2;
+    usbmode* mode = kb->setting.profile.currentmode;
+    if(mode)
+        ileds = (ileds & ~mode->ioff) | mode->ion;
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;
         // Set the LEDs

@@ -50,9 +50,9 @@ usbmode* getusbmode(int id, usbprofile* profile){
     }
     // Initialize any newly-created modes
     for(int i = profile->modecount; i <= id; i++){
+        memset(profile->mode + i, 0, sizeof(profile->mode[i]));
         initrgb(&profile->mode[i].light);
         initbind(&profile->mode[i].bind);
-        memset(profile->mode[i].name, 0, sizeof(profile->mode[i].name));
         genid(&profile->mode[i].id);
     }
     profile->modecount = id + 1;
@@ -88,7 +88,7 @@ void urldecode2(char *dst, const char *src){
     *dst++ = '\0';
 }
 
-void setmodename(usbmode* mode, const char* name){
+void cmd_setmodename(usbmode* mode, int zero, const char* name){
     if(!utf8to16)
         utf8to16 = iconv_open("UTF-16LE", "UTF-8");
     memset(mode->name, 0, sizeof(mode->name));
@@ -152,7 +152,7 @@ void updatemod(usbid* id){
 void hwloadmode(usbdevice* kb, int mode){
     // Ask for mode's name
     usbmode* kbmode = kb->setting.profile.mode + mode;
-    unsigned char data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
+    uchar data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
     usbqueue(kb, data_pkt, 1);
     usleep(3333);
     usbdequeue(kb);
@@ -174,11 +174,11 @@ void hwloadprofile(usbdevice* kb){
     }
     // Ask for profile ID
     usbprofile* profile = &kb->setting.profile;
-    unsigned char data_pkt[2][MSG_SIZE] = {
+    uchar data_pkt[2][MSG_SIZE] = {
         { 0x0e, 0x15, 0x01, 0 },
         { 0x0e, 0x16, 0x01, 0 }
     };
-    unsigned char in_pkt[MSG_SIZE];
+    uchar in_pkt[MSG_SIZE];
     usbqueue(kb, data_pkt[0], 1);
     usleep(3333);
     usbdequeue(kb);
@@ -213,7 +213,7 @@ void hwsaveprofile(usbdevice* kb){
         return;
     // Save the profile name
     usbprofile* profile = &kb->setting.profile;
-    unsigned char data_pkt[2][MSG_SIZE] = {
+    uchar data_pkt[2][MSG_SIZE] = {
         {0x07, 0x16, 0x01, 0 },
         {0x07, 0x15, 0x01, 0, 1, 2, 3, 4, 5 },
     };
@@ -245,7 +245,7 @@ void setinput(usbdevice* kb, int input){
     // NOTE: I observed the windows driver setting a key to 0x49; it seems there are other bits used in this message. I doubt that
     // they're useful, though. Additionally, the windows driver omits some of the key indices, but there seems to be no harm in
     // including all of them.
-    unsigned char datapkt[6][MSG_SIZE] = { };
+    uchar datapkt[6][MSG_SIZE] = { };
     for(int i = 0; i < 4; i++){
         datapkt[i][0] = 0x07;
         datapkt[i][1] = 0x40;

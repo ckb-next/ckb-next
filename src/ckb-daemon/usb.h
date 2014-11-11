@@ -32,13 +32,13 @@ void closehandle(usbdevice* kb);
 
 // Add a message to a USB device to be sent to the device. Returns 0 on success.
 // Threading: Lock device before use, unlock after finish
-int usbqueue(usbdevice* kb, unsigned char* messages, int count);
+int usbqueue(usbdevice* kb, uchar* messages, int count);
 // Output a message from the USB queue to the device, if any. Returns number of bytes written.
 // If the message was not sent successfully it will not be removed from the queue.
 // Threading: Lock device before use, unlock after finish
 int usbdequeue(usbdevice* kb);
 // Gets input from a USB device.
 // Threading: Lock device before use, unlock after finish
-int usbinput(usbdevice* kb, unsigned char* message);
+int usbinput(usbdevice* kb, uchar* message);
 
 #endif

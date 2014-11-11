@@ -13,7 +13,7 @@ int usbdequeue(usbdevice* kb){
         return -1;
     IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, kb->queue[0], MSG_SIZE);
     // Rotate queue
-    unsigned char* first = kb->queue[0];
+    uchar* first = kb->queue[0];
     for(int i = 1; i < QUEUE_LEN; i++)
         kb->queue[i - 1] = kb->queue[i];
     kb->queue[QUEUE_LEN - 1] = first;
@@ -21,7 +21,7 @@ int usbdequeue(usbdevice* kb){
     return MSG_SIZE;
 }
 
-int usbinput(usbdevice* kb, unsigned char* message){
+int usbinput(usbdevice* kb, uchar* message){
     if(!IS_ACTIVE(kb))
         return 0;
     CFIndex length = MSG_SIZE;
@@ -74,7 +74,7 @@ void openusb(int index){
 
     // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode. This packet disables their
     // hardware-based functions.
-    unsigned char datapkt[MSG_SIZE] = { 0x07, 0x04, 0x02 };
+    uchar datapkt[MSG_SIZE] = { 0x07, 0x04, 0x02 };
     // TODO: Handle control errors here
     IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, datapkt, MSG_SIZE);
 

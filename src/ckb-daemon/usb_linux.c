@@ -17,7 +17,7 @@ int usbdequeue(usbdevice* kb){
     if(res <= 0)
         return 0;
     // Rotate queue
-    unsigned char* first = kb->queue[0];
+    uchar* first = kb->queue[0];
     for(int i = 1; i < QUEUE_LEN; i++)
         kb->queue[i - 1] = kb->queue[i];
     kb->queue[QUEUE_LEN - 1] = first;
@@ -25,7 +25,7 @@ int usbdequeue(usbdevice* kb){
     return res;
 }
 
-int usbinput(usbdevice* kb, unsigned char* message){
+int usbinput(usbdevice* kb, uchar* message){
     if(!IS_ACTIVE(kb))
         return 0;
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 50, message };
@@ -176,7 +176,7 @@ int openusb(struct udev_device* dev, int model){
 
             // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode. This packet disables their
             // hardware-based functions.
-            unsigned char datapkt[MSG_SIZE] = { 0x07, 0x04, 0x02 };
+            uchar datapkt[MSG_SIZE] = { 0x07, 0x04, 0x02 };
             struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 500, datapkt };
             // This packet doesn't always succeed, so reset the device if that happens
             if(ioctl(kb->handle, USBDEVFS_CONTROL, &transfer) != MSG_SIZE){

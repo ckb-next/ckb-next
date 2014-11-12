@@ -8,6 +8,9 @@
 // Setting may be null if kb is not null, in which case kb->setting will be used. They must not both be null.
 void nprintf(usbdevice* kb, usbsetting* setting, usbmode* mode, const char* format, ...);
 
+// Notifies of a device connection or disconnection.
+void notifyconnect(int index, int connecting);
+
 // Enables or disables notification for a key
 void cmd_notify(usbmode* mode, int keycode, const char* toggle);
 

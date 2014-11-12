@@ -3,6 +3,7 @@
 #include "devnode.h"
 #include "device.h"
 #include "led.h"
+#include "notify.h"
 
 int usbqueue(usbdevice* kb, uchar* messages, int count){
     // Don't add messages unless the queue has enough room for all of them
@@ -75,6 +76,7 @@ int closeusb(int index){
         // Close USB device
         closehandle(kb);
         updateconnected();
+        notifyconnect(index, 0);
     }
     // Delete the control path
     rmdevpath(index);

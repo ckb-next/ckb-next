@@ -131,6 +131,10 @@ Notification commands are as follows:
 
 **Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `a up` `a down`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
 
+Additionally, the following notifications will be generated at `ckb0/notify` regardless of circumstance:
+- `<serial> added at <path>` whenever a device is connected.
+- `<serial> removed from <path` whenever a device is disconnected. These messages are only generated at `ckb0/notify`, not at the node for the actual device.
+
 Known issues
 ------------
 

@@ -1,5 +1,6 @@
 #include "notify.h"
 #include "device.h"
+#include "devnode.h"
 
 void nprintf(usbdevice* kb, usbsetting* setting, usbmode* mode, const char* format, ...){
     if(!kb && !setting)
@@ -25,6 +26,13 @@ void nprintf(usbdevice* kb, usbsetting* setting, usbmode* mode, const char* form
             dprintf(fifo, "mode %d ", INDEX_OF(mode, setting->profile.mode) + 1);
         vdprintf(fifo, format, va_args);
         write(fifo, &line, 1);
+    }
+}
+
+void notifyconnect(int index, int connecting){
+    if(keyboard[0].outfifo){
+        usbdevice* kb = keyboard + index;
+        dprintf(keyboard[0].outfifo, "%s %s %s%d\n", kb->setting.serial, connecting ? "added at" : "removed from", devpath, index);
     }
 }
 

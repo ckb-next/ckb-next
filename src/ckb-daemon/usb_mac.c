@@ -3,6 +3,7 @@
 #include "devnode.h"
 #include "led.h"
 #include "input.h"
+#include "notify.h"
 
 #ifdef OS_MAC
 
@@ -90,6 +91,9 @@ void openusb(int index){
     // Register for close notification
     IOHIDDeviceRegisterRemovalCallback(kb->handle, usbremove, kb);
 
+    // Update connected
+    updateconnected();
+    notifyconnect(index, 1);
     printf("Device ready at %s%d\n", devpath, index);
 }
 

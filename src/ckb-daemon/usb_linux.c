@@ -3,6 +3,7 @@
 #include "devnode.h"
 #include "led.h"
 #include "input.h"
+#include "notify.h"
 
 #ifdef OS_LINUX
 
@@ -221,6 +222,7 @@ int openusb(struct udev_device* dev, int model){
             }
 
             updateconnected();
+            notifyconnect(index, 1);
             printf("Device ready at %s%d\n", devpath, index);
             connectstatus |= 1;
             return 0;

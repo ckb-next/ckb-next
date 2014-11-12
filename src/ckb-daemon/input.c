@@ -1,4 +1,3 @@
-#include "usb.h"
 #include "input.h"
 #include "notify.h"
 

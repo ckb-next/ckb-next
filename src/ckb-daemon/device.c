@@ -1,7 +1,6 @@
 #include "device.h"
-#include "usb.h"
-#include "led.h"
 #include "input.h"
+#include "led.h"
 
 usbdevice keyboard[DEV_MAX];
 pthread_mutex_t kblistmutex = PTHREAD_MUTEX_INITIALIZER;

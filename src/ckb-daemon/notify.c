@@ -1,6 +1,6 @@
-#include "notify.h"
 #include "device.h"
 #include "devnode.h"
+#include "notify.h"
 
 void nprintf(usbdevice* kb, usbsetting* setting, usbmode* mode, const char* format, ...){
     if(!kb && !setting)

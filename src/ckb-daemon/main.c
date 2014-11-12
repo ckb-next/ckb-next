@@ -1,7 +1,5 @@
-#include "usb.h"
 #include "device.h"
 #include "devnode.h"
-#include "led.h"
 #include "input.h"
 
 // Not supported on OSX...

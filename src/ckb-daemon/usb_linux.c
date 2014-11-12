@@ -1,9 +1,8 @@
-#include "usb.h"
 #include "device.h"
 #include "devnode.h"
-#include "led.h"
 #include "input.h"
 #include "notify.h"
+#include "usb.h"
 
 #ifdef OS_LINUX
 

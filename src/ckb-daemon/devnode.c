@@ -1,6 +1,5 @@
-#include "devnode.h"
 #include "device.h"
-#include "usb.h"
+#include "devnode.h"
 #include "input.h"
 #include "led.h"
 #include "notify.h"

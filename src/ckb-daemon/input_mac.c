@@ -1,6 +1,5 @@
-#include "usb.h"
-#include "input.h"
 #include "device.h"
+#include "input.h"
 
 #ifdef OS_MAC
 

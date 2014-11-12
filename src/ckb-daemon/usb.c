@@ -1,9 +1,9 @@
-#include "usb.h"
-#include "input.h"
-#include "devnode.h"
 #include "device.h"
+#include "devnode.h"
+#include "input.h"
 #include "led.h"
 #include "notify.h"
+#include "usb.h"
 
 int usbqueue(usbdevice* kb, uchar* messages, int count){
     // Don't add messages unless the queue has enough room for all of them

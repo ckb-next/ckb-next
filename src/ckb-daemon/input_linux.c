@@ -1,6 +1,5 @@
-#include "usb.h"
-#include "input.h"
 #include "device.h"
+#include "input.h"
 
 #ifdef OS_LINUX
 
@@ -36,7 +35,6 @@ int uinputopen(struct uinput_user_dev* indev, int* event){
     if(ioctl(fd, UI_GET_SYSNAME(256), uiname) >= 0)
         snprintf(uipath, FILENAME_MAX, "%s/%s", uidevbase, uiname);
     else {
-        printf("Warning: Couldn't get uinput path (trying workaround): %s\n", strerror(errno));
 #endif
         // If the system's version of uinput doesn't support getting the device name, or if it failed, scan the directory for this device
         DIR* uidir = opendir(uidevbase);
@@ -67,7 +65,6 @@ int uinputopen(struct uinput_user_dev* indev, int* event){
     }
 #endif
     if(strlen(uipath) > 0){
-        printf("%s/%s set up\n", uidevbase, uiname);
         // Look in the uinput directory for a file named event*
         DIR* dir = opendir(uipath);
         if(!dir){
@@ -93,14 +90,12 @@ int uinputopen(struct uinput_user_dev* indev, int* event){
             return fd;
         }
         *event = fd2;
-        printf("Opened /dev/input/event%d\n", eid);
     }
     return fd;
 }
 
 int inputopen(int index){
     // Create the new input device
-    printf("Setting up uinput device ckb%d\n", index);
     struct uinput_user_dev indev;
     memset(&indev, 0, sizeof(indev));
     snprintf(indev.name, UINPUT_MAX_NAME_SIZE, "ckb%d", index);
@@ -127,7 +122,6 @@ void inputclose(int index){
     usbdevice* kb = keyboard + index;
     if(kb->uinput <= 0)
         return;
-    printf("Closing uinput device %d\n", index);
     close(kb->event);
     kb->event = 0;
     // Set all keys released

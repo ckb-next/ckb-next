@@ -116,7 +116,7 @@ Assigning a macro to a key will cause its binding to be ignored; for instance, `
 Notifications
 -------------
 
-The keyboard can be configured to generate user-readable notifications on keypress events. These are controlled with the `notify` command. In order to see them, read from `/dev/input/ckb*/notify`. In a terminal, you can do this like `cat /dev/input/ckb1/notify`. Programmatically, you can open it for reading like a regular file. Note that notifications are not queued: if you do not have the file open when a notification arrives, you will not receive it.
+The keyboard can be configured to generate user-readable notifications on keypress events. These are controlled with the `notify` command. In order to see them, read from `/dev/input/ckb*/notify`. In a terminal, you can do this like `cat /dev/input/ckb1/notify`. Programmatically, you can open it for reading like a regular file. Note that the file can only reliably be read by one application: if you try to open it in two different programs, they may both fail to get data. Data will be buffered as long as no programs are reading, so you will receive all unread notifications as soon as you open the file.
 
 Notifications are printed in the format of one notification per line. If you are reading from `/dev/input/ckb0` you will see notifications for all keyboards, with the keyboard's serial number printed at the beginning of each line. Reading from `/dev/input/ckb1` or above will show you only notifications for that keyboard, with no serial number.
 

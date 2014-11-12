@@ -113,9 +113,9 @@ int main(int argc, char** argv){
             // Process FIFOs
             pthread_mutex_lock(&kblistmutex);
             for(int i = 0; i < DEV_MAX; i++){
-                if(keyboard[i].fifo){
+                if(keyboard[i].infifo){
                     const char** lines;
-                    int nlines = readlines(keyboard[i].fifo, &lines);
+                    int nlines = readlines(keyboard[i].infifo, &lines);
                     for(int j = 0; j < nlines; j++){
                         if(lines[j][0] != 0 && lines[j][1] != 0)
                             readcmd(keyboard + i, lines[j]);

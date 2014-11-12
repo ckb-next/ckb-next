@@ -3,6 +3,7 @@
 #include "usb.h"
 #include "input.h"
 #include "led.h"
+#include "notify.h"
 
 // OSX doesn't like putting FIFOs in /dev for some reason
 #ifndef OS_MAC
@@ -61,23 +62,35 @@ int makedevpath(int index){
         return -1;
     }
     if(mkdir(path, S_READDIR) != 0){
-        rm_recursive(path);
         printf("Error: Unable to create %s: %s\n", path, strerror(errno));
+        rm_recursive(path);
         return -1;
     }
     // Create command FIFO
-    char fifopath[sizeof(path) + 4];
-    snprintf(fifopath, sizeof(fifopath), "%s/cmd", path);
-    if(mkfifo(fifopath, S_READWRITE) != 0 || (kb->fifo = open(fifopath, O_RDONLY | O_NONBLOCK)) <= 0){
+    char inpath[sizeof(path) + 4];
+    snprintf(inpath, sizeof(inpath), "%s/cmd", path);
+    if(mkfifo(inpath, S_READWRITE) != 0 || (kb->infifo = open(inpath, O_RDONLY | O_NONBLOCK)) <= 0){
+        printf("Error: Unable to create %s: %s\n", inpath, strerror(errno));
         rm_recursive(path);
-        printf("Error: Unable to create %s: %s\n", fifopath, strerror(errno));
+        kb->infifo = 0;
+        return -1;
+    }
+    // Create notification FIFO
+    char outpath[sizeof(path) + 7];
+    snprintf(outpath, sizeof(outpath), "%s/notify", path);
+    if(mkfifo(outpath, S_READWRITE) != 0 || (kb->outfifo = open(outpath, O_RDWR | O_NONBLOCK)) <= 0){
+        printf("Error: Unable to create %s: %s\n", outpath, strerror(errno));
+        close(kb->infifo);
+        kb->infifo = 0;
+        kb->outfifo = 0;
+        rm_recursive(path);
         return -1;
     }
     if(kb->model == -1){
         // Root keyboard: write a list of devices
         updateconnected();
     } else {
-        // Write the model and serial to files (doesn't apply to root keyboard)
+        // Write the model and serial to files
         char mpath[sizeof(path) + 6], spath[sizeof(path) + 7];
         snprintf(mpath, sizeof(mpath), "%s/model", path);
         snprintf(spath, sizeof(spath), "%s/serial", path);
@@ -100,6 +113,22 @@ int makedevpath(int index){
             printf("Warning: Unable to create %s: %s\n", spath, strerror(errno));
         }
     }
+    return 0;
+}
+
+int rmdevpath(int index){
+    usbdevice* kb = keyboard + index;
+    close(kb->infifo);
+    kb->infifo = 0;
+    close(kb->outfifo);
+    kb->outfifo = 0;
+    char path[strlen(devpath) + 2];
+    snprintf(path, sizeof(path), "%s%d", devpath, index);
+    if(rm_recursive(path) != 0 && errno != ENOENT){
+        printf("Unable to delete %s: %s\n", path, strerror(errno));
+        return -1;
+    }
+    printf("Removed device path %s\n", path);
     return 0;
 }
 
@@ -261,6 +290,9 @@ void readcmd(usbdevice* kb, const char* line){
             command = IAUTO;
             handler = cmd_iauto;
             continue;
+        } else if(!strcmp(word, "notify")){
+            command = NOTIFY;
+            handler = cmd_notify;
         }
         if(command == NONE)
             continue;

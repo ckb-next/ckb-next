@@ -29,11 +29,13 @@ After building, run `sudo bin/ckb-daemon` to start the daemon. It will log some 
 `/dev/input/ckb0` contains the following files:
 - `connected`: A list of all connected keyboards, one per line. Each line contains a device path followed by the device's serial number and its description.
 - `cmd`: Keyboard controller. More information below.
+- `notify`: Keyboard notifications. See Notification section.
 
 Other `ckb*` devices contain the following:
 - `model`: Device description/model.
 - `serial`: Device serial number. `model` and `serial` will match the info found in `ckb0/connected`
 - `cmd`: Keyboard controller.
+- `notify`: Keyboard notifications.
 
 Commands
 --------
@@ -110,6 +112,24 @@ Macros are a more advanced form of key binding, controlled with the `macro` comm
 - `macro g2+g3:+lalt,+f4,-f4,-lalt` triggers an Alt+F4 when both G1 and G2 are pressed.
 
 Assigning a macro to a key will cause its binding to be ignored; for instance, `macro a:+b,-b` will cause A to generate a B character regardless of its binding. However, `macro lctrl+a:+b,-b` will cause A to generate a B only when Ctrl is also held down. Macros currently do not have any repeating options and will be triggered only once, when the key is pressed down. This feature will be added soon.
+
+Notifications
+-------------
+
+The keyboard can be configured to generate user-readable notifications on keypress events. These are controlled with the `notify` command. In order to see them, read from `/dev/input/ckb*/notify`. In a terminal, you can do this like `cat /dev/input/ckb1/notify`. Programmatically, you can open it for reading like a regular file. Note that notifications are not queued: if you do not have the file open when a notification arrives, you will not receive it.
+
+Notifications are printed in the format of one notification per line. If you are reading from `/dev/input/ckb0` you will see notifications for all keyboards, with the keyboard's serial number printed at the beginning of each line. Reading from `/dev/input/ckb1` or above will show you only notifications for that keyboard, with no serial number.
+
+Notification commands are as follows:
+- `notify <key>:on` or simply `notify <key>` enables notifications for a key. Each key will generate two notifications: `<key> down` when the key is pressed, and `<key> up` when it is released.
+- `notify <key>off` turns notifications off for a key.
+
+**Examples:**
+- `notify w,a,s,d` sends notifications whenever W, A, S, or D is pressed.
+- `notify g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17,g18,mr,m1,m2,m3,light,lock` prints a notification whenever a non-standard key is pressed.
+- `notify all:off` turns all key notifications off.
+
+**Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `a up` `a down`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
 
 Known issues
 ------------

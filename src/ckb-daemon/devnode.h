@@ -19,6 +19,8 @@ const char *const devpath;
 void updateconnected();
 // Create a dev path for the keyboard at index. Returns 0 on success.
 int makedevpath(int index);
+// Remove the dev path for the keyboard at index. Returns 0 on success.
+int rmdevpath(int index);
 
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
 int readlines(int fd, const char*** lines);
@@ -39,7 +41,9 @@ typedef enum {
     RGB,
     IOFF,
     ION,
-    IAUTO
+    IAUTO,
+
+    NOTIFY
 } cmd;
 typedef void (*cmdhandler)(usbmode*, int, const char*);
 

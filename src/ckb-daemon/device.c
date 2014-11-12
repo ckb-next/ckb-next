@@ -10,7 +10,7 @@ int storecount = 0;
 
 usbdevice* findusb(const char* serial){
     for(int i = 0; i < DEV_MAX; i++){
-        if(keyboard[i].fifo && !strcmp(serial, keyboard[i].setting.serial))
+        if(keyboard[i].infifo && !strcmp(serial, keyboard[i].setting.serial))
             return keyboard + i;
     }
     return 0;

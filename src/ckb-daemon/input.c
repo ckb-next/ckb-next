@@ -1,5 +1,6 @@
 #include "usb.h"
 #include "input.h"
+#include "notify.h"
 
 int macromask(const uchar* key1, const uchar* key2){
     // Scan a macro against key input. Return 0 if any of them don't match
@@ -20,7 +21,8 @@ void inputupdate(usbdevice* kb){
         return;
 #endif
     pthread_mutex_lock(&kb->mutex);
-    keybind* bind = &kb->setting.profile.currentmode->bind;
+    usbmode* mode = kb->setting.profile.currentmode;
+    keybind* bind = &mode->bind;
     // Don't do anything if the state hasn't changed
     if(!memcmp(kb->previntinput, kb->intinput, N_KEYS / 8)){
         pthread_mutex_unlock(&kb->mutex);
@@ -43,12 +45,6 @@ void inputupdate(usbdevice* kb){
             macro->triggered = 0;
         }
     }
-    // Don't do anything else if a macro was already triggered
-    if(macrotrigger){
-        memcpy(kb->previntinput, kb->intinput, N_KEYS / 8);
-        pthread_mutex_unlock(&kb->mutex);
-        return;
-    }
     for(int byte = 0; byte < N_KEYS / 8; byte++){
         char oldb = kb->previntinput[byte], newb = kb->intinput[byte];
         if(oldb == newb)
@@ -60,14 +56,27 @@ void inputupdate(usbdevice* kb){
             char mask = 1 << bit;
             char old = oldb & mask, new = newb & mask;
             // If the key state changed, send it to the uinput device
-            if(old != new && scancode >= 0){
-                os_keypress(kb, scancode, !!new);
-                // The volume wheel doesn't generate keyups, so create them automatically
-                if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN)){
-                    os_keypress(kb, scancode, 0);
-                    kb->intinput[byte] &= ~mask;
+            if(old != new){
+                // Don't echo a key press if a macro was triggered or if there's no scancode associated
+                if(!macrotrigger && scancode >= 0){
+                    os_keypress(kb, scancode, !!new);
+                    // The volume wheel doesn't generate keyups, so create them automatically
+                    if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN)){
+                        os_keypress(kb, scancode, 0);
+                        kb->intinput[byte] &= ~mask;
+                    }
+                    os_kpsync(kb);
                 }
-                os_kpsync(kb);
+                // Print a notification if desired
+                int notify = mode->notify[byte] & mask;
+                if(notify){
+                    if(map->name){
+                        nprintf(kb, 0, 0, "%s %s", map->name, new ? "down" : "up");
+                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN))
+                            nprintf(kb, 0, 0, "%s up", map->name);
+                    } else
+                        nprintf(kb, 0, 0, "#%d %s", keyindex, new ? "down" : "up");
+                }
             }
         }
     }
@@ -131,7 +140,7 @@ void cmd_macro(usbmode* mode, const char* keys, const char* assignment){
         if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
                   || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
             // Set a key numerically
-            macro.combo[keycode / 8] |= 1 << (keycode % 8);
+            SET_KEYBIT(macro.combo, keycode);
             empty = 0;
         } else {
             // Find this key in the keymap

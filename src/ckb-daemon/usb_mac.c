@@ -202,7 +202,7 @@ void* krthread(void* context){
         if(interval <= 0)
             interval = 1;
         for(int i = 1; i < DEV_MAX; i++){
-            if(keyboard[i].handle && keyboard[i].fifo){
+            if(IS_ACTIVE(keyboard + i)){
                 pthread_mutex_lock(&keyboard[i].mutex);
                 if(keyboard[i].lastkeypress != -1){
                     keyboard[i].keypresstime++;

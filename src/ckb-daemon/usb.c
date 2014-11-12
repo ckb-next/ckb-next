@@ -6,7 +6,7 @@
 
 int usbqueue(usbdevice* kb, uchar* messages, int count){
     // Don't add messages unless the queue has enough room for all of them
-    if(kb->queuecount + count > QUEUE_LEN)
+    if(!kb->handle || kb->queuecount + count > QUEUE_LEN)
         return -1;
     for(int i = 0; i < count; i++)
         memcpy(kb->queue[kb->queuecount + i], messages + MSG_SIZE * i, MSG_SIZE);
@@ -18,18 +18,22 @@ int setupusb(int index){
     usbdevice* kb = keyboard + index;
     pthread_mutex_init(&kb->mutex, 0);
     pthread_mutex_lock(&kb->mutex);
-    // Set up an input device for key events
-    if(!inputopen(index)){
-        pthread_mutex_unlock(&kb->mutex);
-        return -1;
-    }
-    updateindicators(kb, 1);
 
     // Make /dev path
     if(makedevpath(index)){
         pthread_mutex_unlock(&kb->mutex);
+        pthread_mutex_destroy(&kb->mutex);
         return -1;
     }
+
+    // Set up an input device for key events
+    if(!inputopen(index)){
+        rmdevpath(index);
+        pthread_mutex_unlock(&kb->mutex);
+        pthread_mutex_destroy(&kb->mutex);
+        return -1;
+    }
+    updateindicators(kb, 1);
 
     // Create the USB queue
     for(int q = 0; q < QUEUE_LEN; q++)
@@ -57,10 +61,8 @@ int setupusb(int index){
 int closeusb(int index){
     // Close file handles
     usbdevice* kb = keyboard + index;
-    if(!kb->fifo)
+    if(!kb->infifo)
         return 0;
-    close(kb->fifo);
-    kb->fifo = 0;
     if(kb->handle){
         printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
         inputclose(index);
@@ -75,12 +77,7 @@ int closeusb(int index){
         updateconnected();
     }
     // Delete the control path
-    char path[strlen(devpath) + 2];
-    snprintf(path, sizeof(path), "%s%d", devpath, index);
-    if(rm_recursive(path) != 0 && errno != ENOENT)
-        printf("Unable to delete %s: %s\n", path, strerror(errno));
-    else
-        printf("Removed device path %s\n", path);
+    rmdevpath(index);
 
     pthread_mutex_unlock(&kb->mutex);
     pthread_mutex_destroy(&kb->mutex);

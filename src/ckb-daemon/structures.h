@@ -32,6 +32,11 @@ typedef struct {
 } keybind;
 #define MACRO_MAX   1024
 
+// Used to manipulate key bitfields
+// The do-while business is a hack to make statements like "if(a) SET_KEYBIT(...); else CLEAR_KEYBIT(...);" work
+#define SET_KEYBIT(array, index) do { (array)[(index) / 8] |= 1 << ((index) % 8); } while(0)
+#define CLEAR_KEYBIT(array, index) do { (array)[(index) / 8] &= ~(1 << ((index) % 8)); } while(0)
+
 // End key bind structures
 
 // Lighting structure for a device/profile
@@ -53,6 +58,8 @@ typedef struct {
 typedef struct {
     keylight light;
     keybind bind;
+    // Key notification settings
+    uchar notify[N_KEYS / 8];
     // Indicators permanently off/on
     uchar ioff, ion;
     // Name and UUID
@@ -107,6 +114,10 @@ typedef struct {
 #endif
     // A mutex used for USB controls. Needs to be locked before reading or writing the handle
     pthread_mutex_t mutex;
+    // Command FIFO
+    int infifo;
+    // Notification FIFO
+    int outfifo;
     // Keyboard type (70 or 95 for keyboards, -1 for root)
     int model;
     // Interrupt transfers (keypresses)
@@ -114,8 +125,6 @@ typedef struct {
     uchar previntinput[N_KEYS / 8];
     // Indicator LED state
     uchar ileds;
-    // Command FIFO
-    int fifo;
     // USB output queue
     uchar* queue[QUEUE_LEN];
     int queuecount;

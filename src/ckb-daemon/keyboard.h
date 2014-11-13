@@ -20,6 +20,16 @@ typedef struct {
 } key;
 
 // List of keys, ordered according to where they appear in the keyboard input
-extern key keymap[N_KEYS];
+extern const key keymap_us[N_KEYS];
+extern const key keymap_uk[N_KEYS];
+
+// System-selected key map
+extern const key* keymap_system;
+
+// Get a keyboard layout from a string name. Returns null if the name is not supported.
+// Supported:
+//  "us" => US layout
+//  "uk" => UK layout
+const key* getkeymap(const char* name);
 
 #endif

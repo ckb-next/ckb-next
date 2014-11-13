@@ -45,7 +45,14 @@ The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They 
 
 In a terminal shell, you can do this with e.g. `echo foo > /dev/input/ckb1/cmd`. Programmatically, you can open and write them as regular files. When programming, you must append a newline character and flush the output before your command(s) will actually be read.
 
-The `device` command, followed by the keyboard's serial number, is required when issuing commands to `ckb0`. It is unnecessary if writing to `ckb1` or any other path with an actual keyboard. If a keyboard with the given serial number isn't connected, the settings will be applied to that keyboard when it is plugged in.
+The `device` command, followed by the keyboard's serial number, specifies which keyboard to control. It is only required when issuing commands to `ckb0` or when controlling a keyboard that is not plugged in. In all other cases, the device is inferred from the control path. Additionally, the following commands may be issued to `ckb0` without any device: `layout`, `notifyon`, and `notifyoff`. See below for documentation.
+
+Keyboard layout
+---------------
+
+ckb currently supports both US and UK keyboard layouts. By default, the keyboard layout will be detected from the system locale. You can override this by specifying `--layout=<country>` at the command-line. For instance, `ckb-daemon --layout=uk` makes the UK layout default regardless of locale. You can also change it after starting the daemon by issuing `layout <country>` to `/dev/input/ckb0/cmd` (without including any device ID). It can be overwritten on a per-keyboard basis by issuing the `layout` command to `ckb*/cmd`. Sending the command to `ckb0` does not change the layout of any already-connected keyboards, it only changes the default.
+
+Note that changing a keyboard's layout will reset all bindings and remove all macros associated with the keyboard. This is because not all keys are supported by all layouts (for instance, the UK has a separate hash key which is not present on the US layout). You can re-add the bindings manually after resetting the layout.
 
 Profiles and modes
 ------------------
@@ -66,7 +73,7 @@ The backlighting is controlled by the `rgb` commands. Any of the following combi
 - `rgb off` turns lighting off. No further color changes will take effect until you issue `rgb on`.
 - `rgb on` turns lighting on.
 - `rgb <RRGGBB>` sets the entire keyboard to the color specified by the hex constant RRGGBB.
-- `rgb <key>:<RRGGBB>` sets the specified key to the specified hex color. See `src/ckb-daemon/keyboard.c` for a list of key names.
+- `rgb <key>:<RRGGBB>` sets the specified key to the specified hex color. See `src/ckb-daemon/keyboard_*.c` for a list of key names in each layout.
 
 **Examples:**
 - `rgb ffffff` makes the whole keyboard white.
@@ -89,7 +96,7 @@ Binding keys
 ------------
 
 Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 operation that translates one keypress to a different keypress, regardless of circumstance; simple, but inflexible.
-- `bind <key1>:<key2>` remaps key1 to key2. Again, see `src/ckb-daemon/keyboard.c` for a list of key names.
+- `bind <key1>:<key2>` remaps key1 to key2. Again, see `src/ckb-daemon/keyboard_*.c` for a list of key names.
 - `unbind <key>` unbinds a key, causing it to lose all function.
 - `rebind <key>` resets a key, returning it to its default binding.
 

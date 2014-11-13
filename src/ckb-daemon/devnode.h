@@ -38,6 +38,7 @@ typedef enum {
     NAME,
     PROFILENAME,
 
+    LAYOUT,
     BIND,
     UNBIND,
     REBIND,
@@ -52,7 +53,7 @@ typedef enum {
     NOTIFYON,
     NOTIFYOFF,
 } cmd;
-typedef void (*cmdhandler)(usbmode*, int, const char*);
+typedef void (*cmdhandler)(usbmode*, const key*, int, const char*);
 
 // Reads input from the command FIFO
 void readcmd(usbdevice* kb, const char* line);

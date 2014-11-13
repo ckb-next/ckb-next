@@ -1,4 +1,4 @@
-DAEMON_SRC := src/ckb-daemon/main.c src/ckb-daemon/usb.c src/ckb-daemon/device.c src/ckb-daemon/input.c src/ckb-daemon/led.c src/ckb-daemon/keyboard.c src/ckb-daemon/devnode.c src/ckb-daemon/notify.c
+DAEMON_SRC := src/ckb-daemon/main.c src/ckb-daemon/usb.c src/ckb-daemon/device.c src/ckb-daemon/input.c src/ckb-daemon/led.c src/ckb-daemon/keyboard.c src/ckb-daemon/keyboard_us.c src/ckb-daemon/keyboard_uk.c src/ckb-daemon/devnode.c src/ckb-daemon/notify.c
 CKB_SRC := src/ckb/main.c
 
 UNAME_S := $(shell uname -s)
@@ -12,5 +12,5 @@ endif
 build:
 	rm -rf bin
 	mkdir bin
-	gcc $(DAEMON_SRC) -o bin/ckb-daemon -std=c99 -O2 -DKEYMAP_DEFAULT
+	gcc $(DAEMON_SRC) -o bin/ckb-daemon -std=c99 -O2
 	gcc $(CKB_SRC) -o bin/ckb -lm -std=c99 -O2 -DKEYMAP_DEFAULT

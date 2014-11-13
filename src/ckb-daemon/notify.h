@@ -12,6 +12,6 @@ void nprintf(usbdevice* kb, usbsetting* setting, usbmode* mode, const char* form
 void notifyconnect(usbdevice* kb, int connecting);
 
 // Enables or disables notification for a key
-void cmd_notify(usbmode* mode, int keycode, const char* toggle);
+void cmd_notify(usbmode* mode, const key* keymap, int keyindex, const char* toggle);
 
 #endif

@@ -21,18 +21,18 @@ void os_keypress(usbdevice* kb, int scancode, int down);
 void os_kpsync(usbdevice* kb);
 
 // Initializes key bindings for a device
-void initbind(keybind* bind);
+void initbind(keybind* bind, const key* keymap);
 // Frees key binding data for a device
 void closebind(keybind* bind);
 
 // Binds a key
-void cmd_bind(usbmode* mode, int keyindex, const char* to);
+void cmd_bind(usbmode* mode, const key* keymap, int keyindex, const char* to);
 // Unbinds a key
-void cmd_unbind(usbmode* mode, int keyindex, const char* ignored);
+void cmd_unbind(usbmode* mode, const key* keymap, int keyindex, const char* ignored);
 // Resets a key binding
-void cmd_rebind(usbmode* mode, int keyindex, const char* ignored);
+void cmd_rebind(usbmode* mode, const key* keymap, int keyindex, const char* ignored);
 // Creates or updates a macro
-void cmd_macro(usbmode* mode, const char* keys, const char* assignment);
+void cmd_macro(usbmode* mode, const key* keymap, const char* keys, const char* assignment);
 // Clears all macros
 void cmd_macroclear(usbmode* mode);
 

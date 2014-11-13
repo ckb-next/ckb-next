@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <iconv.h>
+#include <locale.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>

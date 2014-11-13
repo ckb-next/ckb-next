@@ -14,13 +14,13 @@ void inputupdate(usbdevice* kb){
 #ifdef OS_LINUX
     if(!kb->uinput)
         return;
-#endif
-#ifdef OS_MAC
+#else
     if(!kb->event)
         return;
 #endif
     pthread_mutex_lock(&kb->mutex);
     usbmode* mode = kb->setting.profile.currentmode;
+    const key* keymap = kb->setting.keymap;
     keybind* bind = &mode->bind;
     // Don't do anything if the state hasn't changed
     if(!memcmp(kb->previntinput, kb->intinput, N_KEYS / 8)){
@@ -50,7 +50,7 @@ void inputupdate(usbdevice* kb){
             continue;
         for(int bit = 0; bit < 8; bit++){
             int keyindex = byte * 8 + bit;
-            key* map = keymap + keyindex;
+            const key* map = keymap + keyindex;
             int scancode = bind->base[keyindex];
             char mask = 1 << bit;
             char old = oldb & mask, new = newb & mask;
@@ -83,7 +83,7 @@ void inputupdate(usbdevice* kb){
     pthread_mutex_unlock(&kb->mutex);
 }
 
-void initbind(keybind* bind){
+void initbind(keybind* bind, const key* keymap){
     for(int i = 0; i < N_KEYS; i++)
         bind->base[i] = keymap[i].scan;
     bind->macros = malloc(32 * sizeof(keymacro));
@@ -98,7 +98,7 @@ void closebind(keybind* bind){
     memset(bind, 0, sizeof(*bind));
 }
 
-void cmd_bind(usbmode* mode, int keyindex, const char* to){
+void cmd_bind(usbmode* mode, const key* keymap, int keyindex, const char* to){
     // Find the key to bind to
     int tocode = 0;
     if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1){
@@ -114,15 +114,15 @@ void cmd_bind(usbmode* mode, int keyindex, const char* to){
     }
 }
 
-void cmd_unbind(usbmode* mode, int keyindex, const char* to){
+void cmd_unbind(usbmode* mode, const key* keymap, int keyindex, const char* to){
     mode->bind.base[keyindex] = 0;
 }
 
-void cmd_rebind(usbmode* mode, int keyindex, const char* to){
+void cmd_rebind(usbmode* mode, const key* keymap, int keyindex, const char* to){
     mode->bind.base[keyindex] = keymap[keyindex].scan;
 }
 
-void cmd_macro(usbmode* mode, const char* keys, const char* assignment){
+void cmd_macro(usbmode* mode, const key* keymap, const char* keys, const char* assignment){
     keybind* bind = &mode->bind;
     if(bind->macrocount >= MACRO_MAX)
         return;

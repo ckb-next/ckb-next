@@ -93,7 +93,7 @@ void cmd_rgbon(usbmode* mode){
     mode->light.enabled = 1;
 }
 
-void cmd_rgb(usbmode* mode, int keyindex, const char* code){
+void cmd_rgb(usbmode* mode, const key* keymap, int keyindex, const char* code){
     unsigned int r, g, b;
     if(sscanf(code, "%2x%2x%2x", &r, &g, &b) == 3){
         if(r > 255)
@@ -128,7 +128,7 @@ static int iselect(const char* led){
     return 0;
 }
 
-void cmd_ioff(usbmode* mode, int zero, const char* led){
+void cmd_ioff(usbmode* mode, const key* keymap, int zero, const char* led){
     int bit = iselect(led);
     if(!bit)
         return;
@@ -138,7 +138,7 @@ void cmd_ioff(usbmode* mode, int zero, const char* led){
     mode->ion &= ~bit;
 }
 
-void cmd_ion(usbmode* mode, int zero, const char* led){
+void cmd_ion(usbmode* mode, const key* keymap, int zero, const char* led){
     int bit = iselect(led);
     if(!bit)
         return;
@@ -148,7 +148,7 @@ void cmd_ion(usbmode* mode, int zero, const char* led){
     mode->ion |= bit;
 }
 
-void cmd_iauto(usbmode* mode, int zero, const char* led){
+void cmd_iauto(usbmode* mode, const key* keymap, int zero, const char* led){
     int bit = iselect(led);
     if(!bit)
         return;

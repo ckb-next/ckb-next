@@ -40,9 +40,9 @@ void notifyconnect(usbdevice* kb, int connecting){
     }
 }
 
-void cmd_notify(usbmode* mode, int keycode, const char* toggle){
+void cmd_notify(usbmode* mode, const key* keymap, int keyindex, const char* toggle){
     if(!strcmp(toggle, "on") || *toggle == 0)
-        SET_KEYBIT(mode->notify, keycode);
+        SET_KEYBIT(mode->notify, keyindex);
     else if(!strcmp(toggle, "off"))
-        CLEAR_KEYBIT(mode->notify, keycode);
+        CLEAR_KEYBIT(mode->notify, keyindex);
 }

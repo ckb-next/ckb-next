@@ -85,7 +85,11 @@ typedef struct {
 // Structure to store settings for a USB device, whether or not it's plugged in
 #define SERIAL_LEN  33
 typedef struct {
+    // Keyboard profile
     usbprofile profile;
+    // Key map (locale)
+    const key* keymap;
+    // Device serial number
     char serial[SERIAL_LEN];
 } usbsetting;
 

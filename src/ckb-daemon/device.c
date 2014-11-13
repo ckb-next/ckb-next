@@ -39,7 +39,7 @@ usbsetting* addstore(const char* serial){
     return res;
 }
 
-usbmode* getusbmode(int id, usbprofile* profile){
+usbmode* getusbmode(int id, usbprofile* profile, const key* keymap){
     if(id < profile->modecount)
         return profile->mode + id;
     int cap = id / 4 * 4 + 4;
@@ -51,7 +51,7 @@ usbmode* getusbmode(int id, usbprofile* profile){
     for(int i = profile->modecount; i <= id; i++){
         memset(profile->mode + i, 0, sizeof(profile->mode[i]));
         initrgb(&profile->mode[i].light);
-        initbind(&profile->mode[i].bind);
+        initbind(&profile->mode[i].bind, keymap);
         genid(&profile->mode[i].id);
     }
     profile->modecount = id + 1;
@@ -87,7 +87,7 @@ void urldecode2(char *dst, const char *src){
     *dst++ = '\0';
 }
 
-void cmd_setmodename(usbmode* mode, int zero, const char* name){
+void cmd_setmodename(usbmode* mode, const key* keymap, int zero, const char* name){
     if(!utf8to16)
         utf8to16 = iconv_open("UTF-16LE", "UTF-8");
     memset(mode->name, 0, sizeof(mode->name));
@@ -109,11 +109,11 @@ void setprofilename(usbprofile* profile, const char* name){
     iconv(utf8to16, &in, &srclen, &out, &dstlen);
 }
 
-void erasemode(usbmode *mode){
+void erasemode(usbmode *mode, const key* keymap){
     closebind(&mode->bind);
     memset(mode, 0, sizeof(*mode));
     initrgb(&mode->light);
-    initbind(&mode->bind);
+    initbind(&mode->bind, keymap);
     genid(&mode->id);
 }
 
@@ -257,8 +257,9 @@ void setinput(usbdevice* kb, int input){
     datapkt[5][1] = 0x05;
     datapkt[5][2] = 0x02;
     datapkt[5][4] = 0x03;
-    // The special corsair keys don't have any HID scancode, so don't allow them to generate HID interrupts no matter what
-#define IMASK(key) ~((keymap[key].scan == -1) << 7)
+    // The special corsair keys don't have any HID scancode, so don't allow them to generate HID interrupts no matter what.
+    // (these should have the same key index regardless of layout)
+#define IMASK(key) ~((keymap_system[key].scan == -2) << 7)
     for(int i = 0; i < 30; i++){
         int key = i;
         datapkt[0][i * 2 + 4] = key;

@@ -209,8 +209,9 @@ int readlines(int fd, const char*** lines){
 void readcmd(usbdevice* kb, const char* line){
     char word[strlen(line) + 1];
     int wordlen;
-    // See if the first word is a serial number. If so, switch devices and skip to the next word.
+    // Read settings from the device
     usbsetting* set = (IS_ACTIVE(kb) ? &kb->setting : 0);
+    const key* keymap = (set ? set->keymap : keymap_system);
     usbprofile* profile = (set ? &set->profile : 0);
     usbmode* mode = (profile ? profile->currentmode : 0);
     cmd command = NONE;
@@ -250,7 +251,7 @@ void readcmd(usbdevice* kb, const char* line){
             command = NONE;
             handler = 0;
             if(mode)
-                erasemode(mode);
+                erasemode(mode, keymap);
             rgbchange = 1;
             continue;
         } else if(!strcmp(word, "eraseprofile")){
@@ -258,7 +259,7 @@ void readcmd(usbdevice* kb, const char* line){
             handler = 0;
             if(profile){
                 eraseprofile(profile);
-                mode = profile->currentmode = getusbmode(0, profile);
+                mode = profile->currentmode = getusbmode(0, profile, keymap);
             }
             rgbchange = 1;
             continue;
@@ -273,6 +274,10 @@ void readcmd(usbdevice* kb, const char* line){
             handler = 0;
             if(profile)
                 updatemod(&profile->id);
+            continue;
+        } else if(!strcmp(word, "layout")){
+            command = LAYOUT;
+            handler = 0;
             continue;
         } else if(!strcmp(word, "bind")){
             command = BIND;
@@ -335,8 +340,28 @@ void readcmd(usbdevice* kb, const char* line){
                     kb = 0;
                     set = addstore(word);
                 }
+                keymap = (set ? set->keymap : keymap_system);
                 profile = (set ? &set->profile : 0);
                 mode = (profile ? profile->currentmode : 0);
+            }
+            continue;
+        } else if(command == LAYOUT){
+            const key* newkeymap = getkeymap(word);
+            if(!newkeymap)
+                continue;
+            if(profile){
+                // If applied to a device, reset all key bindings to the new key map
+                keymap = set->keymap = newkeymap;
+                for(int i = 0; i < profile->modecount; i++){
+                    usbmode* mode = profile->mode + i;
+                    closebind(&mode->bind);
+                    memset(&mode->bind, 0, sizeof(mode->bind));
+                    initbind(&mode->bind, keymap);
+                }
+            } else {
+                // If applied to the root controller, update the system keymap but not any devices
+                keymap_system = newkeymap;
+                printf("Setting default layout: %s\n", word);
             }
             continue;
         } else if(command == NOTIFYON){
@@ -350,17 +375,17 @@ void readcmd(usbdevice* kb, const char* line){
                 rmnotifynode(kb, notify);
             continue;
         }
-        // Only the DEVICE or NOTIFYON/OFF commands are valid without an existing mode
+        // Only the DEVICE, LAYOUT, and NOTIFYON/OFF commands are valid without an existing mode
         if(!mode)
             continue;
         if(command == MODE){
             int newmode;
             if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode < MODE_MAX)
-                mode = getusbmode(newmode - 1, profile);
+                mode = getusbmode(newmode - 1, profile, keymap);
             continue;
         } else if(command == NAME || command == IOFF || command == ION || command == IAUTO){
             // All of the above just parse the whole word
-            handler(mode, 0, word);
+            handler(mode, keymap, 0, word);
             continue;
         } else if(command == PROFILENAME){
             // Profile name is the same, but takes a different parameter
@@ -377,7 +402,7 @@ void readcmd(usbdevice* kb, const char* line){
                 continue;
             } else if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
                 for(int i = 0; i < N_KEYS; i++)
-                    cmd_rgb(mode, i, word);
+                    cmd_rgb(mode, keymap, i, word);
                 continue;
             }
         } else if(command == MACRO && !strcmp(word, "clear")){
@@ -396,7 +421,7 @@ void readcmd(usbdevice* kb, const char* line){
         // Macros have a separate left-side handler
         if(command == MACRO){
             word[left] = 0;
-            cmd_macro(mode, word, right);
+            cmd_macro(mode, keymap, word, right);
             continue;
         }
         // Scan the left side for key names and run the request command
@@ -407,16 +432,16 @@ void readcmd(usbdevice* kb, const char* line){
             if(!strcmp(keyname, "all")){
                 // Set all keys
                 for(int i = 0; i < N_KEYS; i++)
-                    handler(mode, i, right);
+                    handler(mode, keymap, i, right);
             } else if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
                       || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
                 // Set a key numerically
-                handler(mode, keycode, right);
+                handler(mode, keymap, keycode, right);
             } else {
                 // Find this key in the keymap
                 for(unsigned i = 0; i < N_KEYS; i++){
                     if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
-                        handler(mode, i, right);
+                        handler(mode, keymap, i, right);
                         break;
                     }
                 }

@@ -45,12 +45,13 @@ int setupusb(usbdevice* kb){
     // Restore profile (if any)
     usbsetting* store = findstore(kb->setting.serial);
     if(store){
-        memcpy(&kb->setting.profile, &store->profile, sizeof(store->profile));
+        memcpy(&kb->setting, store, sizeof(*store));
     } else {
         // If there is no profile, load it from the device
-        kb->setting.profile.currentmode = getusbmode(0, &kb->setting.profile);
-        getusbmode(1, &kb->setting.profile);
-        getusbmode(2, &kb->setting.profile);
+        kb->setting.keymap = keymap_system;
+        kb->setting.profile.currentmode = getusbmode(0, &kb->setting.profile, keymap_system);
+        getusbmode(1, &kb->setting.profile, keymap_system);
+        getusbmode(2, &kb->setting.profile, keymap_system);
         hwloadprofile(kb);
     }
     updatergb(kb);

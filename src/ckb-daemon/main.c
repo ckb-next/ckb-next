@@ -73,6 +73,7 @@ int main(int argc, char** argv){
     int fps = 60;
     for(int i = 1; i < argc; i++){
         char* argument = argv[i];
+        char layout[10];
         if(sscanf(argument, "--fps=%d", &fps) == 1){
             if(fps > 60 || fps <= 0){
                 // There's no point running higher than 60FPS.
@@ -80,6 +81,26 @@ int main(int argc, char** argv){
                 printf("Warning: Requested %d FPS but capping at 60\n", fps);
                 fps = 60;
             }
+        } else if(sscanf(argument, "--layout=%9s", layout) == 1){
+            // Set keyboard layout from command-line parameter
+            keymap_system = getkeymap(layout);
+            printf("Setting default layout: %s\n", layout);
+        }
+    }
+
+    // If the keymap wasn't set via command-line, get it from the system locale
+    if(!keymap_system){
+        setlocale(LC_ALL, "");
+        const char* locale = setlocale(LC_CTYPE, 0);
+        // Check for UK layout
+        if(strstr(locale, "en_GB") || strstr(locale, "en-GB")
+                || strstr(locale, "en_gb") || strstr(locale, "en-gb")){
+            keymap_system = keymap_uk;
+            printf("Setting default layout: uk\n");
+        } else {
+            // Default to US
+            keymap_system = keymap_us;
+            printf("Setting default layout: us\n");
         }
     }
 

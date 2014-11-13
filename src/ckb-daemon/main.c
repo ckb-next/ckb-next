@@ -1,6 +1,7 @@
 #include "device.h"
 #include "devnode.h"
 #include "input.h"
+#include "led.h"
 
 // Not supported on OSX...
 #ifdef OS_MAC
@@ -70,19 +71,15 @@ int main(int argc, char** argv){
     printf("ckb Corsair Keyboard RGB driver v0.1\n");
 
     // Read parameters
-    int fps = 60;
     for(int i = 1; i < argc; i++){
         char* argument = argv[i];
         char layout[10];
-        if(sscanf(argument, "--fps=%d", &fps) == 1){
-            if(fps > 60 || fps <= 0){
-                // There's no point running higher than 60FPS.
-                // The LED controller is locked to 60Hz so it will only cause tearing and/or device freezes.
-                printf("Warning: Requested %d FPS but capping at 60\n", fps);
-                fps = 60;
-            }
+        unsigned newfps;
+        if(sscanf(argument, "--fps=%u", &newfps) == 1){
+            // Set FPS
+            setfps(newfps);
         } else if(sscanf(argument, "--layout=%9s", layout) == 1){
-            // Set keyboard layout from command-line parameter
+            // Set keyboard layout
             keymap_system = getkeymap(layout);
             printf("Setting default layout: %s\n", layout);
         }

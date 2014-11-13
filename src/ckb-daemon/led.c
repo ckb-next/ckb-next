@@ -157,3 +157,17 @@ void cmd_iauto(usbmode* mode, const key* keymap, int zero, const char* led){
     mode->ioff &= ~bit;
     mode->ion &= ~bit;
 }
+
+volatile unsigned fps = 60;
+
+void setfps(unsigned newfps){
+    if(newfps > 60 || newfps == 0){
+        // There's no point running higher than 60FPS.
+        // The LED controller is locked to 60Hz so it will only cause tearing and/or device freezes.
+        printf("Warning: Requested %d FPS but setting to 60\n", newfps);
+        fps = 60;
+    } else {
+        fps = newfps;
+        printf("Setting FPS to %u\n", fps);
+    }
+}

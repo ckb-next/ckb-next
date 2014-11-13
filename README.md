@@ -84,6 +84,8 @@ Multiple keys may be changed to one color when separated with commas, for instan
 Additionally, multiple commands may be combined into one, for instance:
 - `rgb ffffff esc:ff0000 w,a,s,d:0000ff` sets the Esc key red, the WASD keys blue, and the rest of the keyboard white (note the lack of a key name before `ffffff`, implying the whole keyboard is to be set).
 
+By default, the controller runs at 60FPS, meaning that attempts to animate the LEDs faster than that will be ignored. The keyboard's internal LED controller runs at 60Hz, so this should be a sensible maximum. If you wish to set it lower, you can start `ckb-daemon` with the `--fps=<rate>` option. You can also issue `fps <rate>` to `/dev/input/ckb0/cmd` after starting the daemon. Note that the FPS is global and cannot be set on a per-keyboard basis.
+
 Indicators
 ----------
 

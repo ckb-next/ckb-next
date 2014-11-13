@@ -295,6 +295,11 @@ void readcmd(usbdevice* kb, const char* line){
             command = MACRO;
             handler = 0;
             continue;
+        } else if(!strcmp(word, "fps")){
+            command = FPS;
+            handler = 0;
+            rgbchange = 1;
+            continue;
         } else if(!strcmp(word, "rgb")){
             command = RGB;
             handler = cmd_rgb;
@@ -364,6 +369,10 @@ void readcmd(usbdevice* kb, const char* line){
                 printf("Setting default layout: %s\n", word);
             }
             continue;
+        } else if(command == FPS){
+            unsigned newfps;
+            if(kb && sscanf(word, "%u", &newfps) == 1)
+                setfps(newfps);
         } else if(command == NOTIFYON){
             int notify;
             if(kb && sscanf(word, "%u", &notify) == 1)
@@ -375,7 +384,7 @@ void readcmd(usbdevice* kb, const char* line){
                 rmnotifynode(kb, notify);
             continue;
         }
-        // Only the DEVICE, LAYOUT, and NOTIFYON/OFF commands are valid without an existing mode
+        // Only the DEVICE, LAYOUT, FPS, and NOTIFYON/OFF commands are valid without an existing mode
         if(!mode)
             continue;
         if(command == MODE){

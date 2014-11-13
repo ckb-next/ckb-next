@@ -44,6 +44,7 @@ typedef enum {
     REBIND,
     MACRO,
 
+    FPS,
     RGB,
     IOFF,
     ION,

@@ -22,6 +22,11 @@ int makedevpath(int index);
 // Remove the dev path for the keyboard at index. Returns 0 on success.
 int rmdevpath(int index);
 
+// Creates a notification node for the specified keyboard.
+int mknotifynode(usbdevice* kb, int notify);
+// Removes a notification node for the specified keyboard.
+int rmnotifynode(usbdevice* kb, int notify);
+
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
 int readlines(int fd, const char*** lines);
 
@@ -43,7 +48,9 @@ typedef enum {
     ION,
     IAUTO,
 
-    NOTIFY
+    NOTIFY,
+    NOTIFYON,
+    NOTIFYOFF,
 } cmd;
 typedef void (*cmdhandler)(usbmode*, int, const char*);
 

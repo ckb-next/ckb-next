@@ -8,31 +8,35 @@ void nprintf(usbdevice* kb, usbsetting* setting, usbmode* mode, const char* form
     if(!setting)
         setting = &kb->setting;
     va_list va_args;
-    va_start(va_args, format);
     char line = '\n';
     int fifo;
-    // Write the string to the keyboard's FIFO (if any)
-    if(kb && (fifo = kb->outfifo)){
-        if(mode)
-            dprintf(fifo, "mode %d ", INDEX_OF(mode, setting->profile.mode) + 1);
-        vdprintf(fifo, format, va_args);
-        write(fifo, &line, 1);
-    }
-    // Write it to the root FIFO and include the serial number
-    va_start(va_args, format);
-    if((fifo = keyboard[0].outfifo)){
-        dprintf(fifo, "%s ", setting->serial);
-        if(mode)
-            dprintf(fifo, "mode %d ", INDEX_OF(mode, setting->profile.mode) + 1);
-        vdprintf(fifo, format, va_args);
-        write(fifo, &line, 1);
+    // Write the string to the keyboard's FIFOs (if any)
+    for(int i = 0; i < OUTFIFO_MAX; i++){
+        va_start(va_args, format);
+        if(kb && (fifo = kb->outfifo[i])){
+            if(mode)
+                dprintf(fifo, "mode %d ", INDEX_OF(mode, setting->profile.mode) + 1);
+            vdprintf(fifo, format, va_args);
+            write(fifo, &line, 1);
+        }
+        // Write it to the root FIFOs and include the serial number
+        va_start(va_args, format);
+        if((fifo = keyboard[0].outfifo[i])){
+            dprintf(fifo, "%s ", setting->serial);
+            if(mode)
+                dprintf(fifo, "mode %d ", INDEX_OF(mode, setting->profile.mode) + 1);
+            vdprintf(fifo, format, va_args);
+            write(fifo, &line, 1);
+        }
     }
 }
 
 void notifyconnect(int index, int connecting){
-    if(keyboard[0].outfifo){
-        usbdevice* kb = keyboard + index;
-        dprintf(keyboard[0].outfifo, "%s %s %s%d\n", kb->setting.serial, connecting ? "added at" : "removed from", devpath, index);
+    for(int i = 0; i < OUTFIFO_MAX; i++){
+        if(keyboard[0].outfifo[i]){
+            usbdevice* kb = keyboard + index;
+            dprintf(keyboard[0].outfifo[i], "%s %s %s%d\n", kb->setting.serial, connecting ? "added at" : "removed from", devpath, index);
+        }
     }
 }
 

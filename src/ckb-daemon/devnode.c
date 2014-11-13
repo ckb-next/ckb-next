@@ -75,16 +75,7 @@ int makedevpath(int index){
         return -1;
     }
     // Create notification FIFO
-    char outpath[sizeof(path) + 7];
-    snprintf(outpath, sizeof(outpath), "%s/notify", path);
-    if(mkfifo(outpath, S_READWRITE) != 0 || (kb->outfifo = open(outpath, O_RDWR | O_NONBLOCK)) <= 0){
-        printf("Error: Unable to create %s: %s\n", outpath, strerror(errno));
-        close(kb->infifo);
-        kb->infifo = 0;
-        kb->outfifo = 0;
-        rm_recursive(path);
-        return -1;
-    }
+    mknotifynode(kb, 0);
     if(kb->model == -1){
         // Root keyboard: write a list of devices
         updateconnected();
@@ -119,8 +110,8 @@ int rmdevpath(int index){
     usbdevice* kb = keyboard + index;
     close(kb->infifo);
     kb->infifo = 0;
-    close(kb->outfifo);
-    kb->outfifo = 0;
+    for(int i = 0; i < OUTFIFO_MAX; i++)
+        rmnotifynode(kb, i);
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
     if(rm_recursive(path) != 0 && errno != ENOENT){
@@ -129,6 +120,35 @@ int rmdevpath(int index){
     }
     printf("Removed device path %s\n", path);
     return 0;
+}
+
+
+int mknotifynode(usbdevice* kb, int notify){
+    if(notify < 0 || notify >= OUTFIFO_MAX)
+        return -1;
+    // Create the notification node
+    int index = INDEX_OF(kb, keyboard);
+    char outpath[strlen(devpath) + 10];
+    snprintf(outpath, sizeof(outpath), "%s%d/notify%d", devpath, index, notify);
+    if(mkfifo(outpath, S_READWRITE) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK)) <= 0){
+        printf("Warning: Unable to create %s: %s\n", outpath, strerror(errno));
+        kb->outfifo[notify] = 0;
+        return -1;
+    }
+    return 0;
+}
+
+int rmnotifynode(usbdevice* kb, int notify){
+    if(notify < 0 || notify >= OUTFIFO_MAX)
+        return -1;
+    int index = INDEX_OF(kb, keyboard);
+    char outpath[strlen(devpath) + 10];
+    snprintf(outpath, sizeof(outpath), "%s%d/notify%d", devpath, index, notify);
+    // Close FIFO
+    close(kb->outfifo[notify]);
+    kb->outfifo[notify] = 0;
+    // Delete node
+    return remove(outpath);
 }
 
 #define MAX_LINES 512
@@ -292,6 +312,15 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(!strcmp(word, "notify")){
             command = NOTIFY;
             handler = cmd_notify;
+            continue;
+        } else if(!strcmp(word, "notifyon")){
+            command = NOTIFYON;
+            handler = 0;
+            continue;
+        } else if(!strcmp(word, "notifyoff")){
+            command = NOTIFYOFF;
+            handler = 0;
+            continue;
         }
         if(command == NONE)
             continue;
@@ -310,8 +339,18 @@ void readcmd(usbdevice* kb, const char* line){
                 mode = (profile ? profile->currentmode : 0);
             }
             continue;
+        } else if(command == NOTIFYON){
+            int notify;
+            if(kb && sscanf(word, "%u", &notify) == 1)
+                mknotifynode(kb, notify);
+            continue;
+        } else if(command == NOTIFYOFF){
+            int notify;
+            if(kb && sscanf(word, "%u", &notify) == 1 && notify != 0)
+                rmnotifynode(kb, notify);
+            continue;
         }
-        // Only the DEVICE command is valid without an existing mode
+        // Only the DEVICE or NOTIFYON/OFF commands are valid without an existing mode
         if(!mode)
             continue;
         if(command == MODE){

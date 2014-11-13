@@ -93,6 +93,7 @@ typedef struct {
 #define NAME_LEN    33
 #define QUEUE_LEN   40
 #define MSG_SIZE    64
+#define OUTFIFO_MAX 10
 typedef struct {
     // I/O devices
 #ifdef OS_LINUX
@@ -117,7 +118,7 @@ typedef struct {
     // Command FIFO
     int infifo;
     // Notification FIFO
-    int outfifo;
+    int outfifo[OUTFIFO_MAX];
     // Keyboard type (70 or 95 for keyboards, -1 for root)
     int model;
     // Interrupt transfers (keypresses)

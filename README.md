@@ -116,24 +116,26 @@ Assigning a macro to a key will cause its binding to be ignored; for instance, `
 Notifications
 -------------
 
-The keyboard can be configured to generate user-readable notifications on keypress events. These are controlled with the `notify` command. In order to see them, read from `/dev/input/ckb*/notify`. In a terminal, you can do this like `cat /dev/input/ckb1/notify`. Programmatically, you can open it for reading like a regular file. Note that the file can only reliably be read by one application: if you try to open it in two different programs, they may both fail to get data. Data will be buffered as long as no programs are reading, so you will receive all unread notifications as soon as you open the file.
+The keyboard can be configured to generate user-readable notifications on keypress events. These are controlled with the `notify` commands. In order to see events, read from `/dev/input/ckb*/notify0`. In a terminal, you can do this like `cat /dev/input/ckb1/notify0`. Programmatically, you can open it for reading like a regular file.
 
-Notifications are printed in the format of one notification per line. If you are reading from `/dev/input/ckb0` you will see notifications for all keyboards, with the keyboard's serial number printed at the beginning of each line. Reading from `/dev/input/ckb1` or above will show you only notifications for that keyboard, with no serial number.
+Note that the file can only reliably be read by one application: if you try to open it in two different programs, they may both fail to get data. Data will be buffered as long as no programs are reading, so you will receive all unread notifications as soon as you open the file. If you'd like to read notifications from two separate applications, send the command `notifyon <n>` to the keyboard you wish to receive notifications from, where N is a number between 1 and 9. If `/dev/input/ckb*/notify<n>` does not already exist, it will be created, and you can read notifications from there without disrupting any other program currently reading them. To close a notification node, send `notifyoff <n>`.
+
+Notifications are printed in the format of one notification per line. If you are reading from `ckb0/notify*` you will see notifications for all keyboards, with the keyboard's serial number printed at the beginning of each line. Reading from `ckb1` or above will show you only notifications for that keyboard, with no serial number.
 
 Notification commands are as follows:
 - `notify <key>:on` or simply `notify <key>` enables notifications for a key. Each key will generate two notifications: `<key> down` when the key is pressed, and `<key> up` when it is released.
-- `notify <key>off` turns notifications off for a key.
+- `notify <key>:off` turns notifications off for a key.
 
 **Examples:**
 - `notify w,a,s,d` sends notifications whenever W, A, S, or D is pressed.
 - `notify g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17,g18,mr,m1,m2,m3,light,lock` prints a notification whenever a non-standard key is pressed.
 - `notify all:off` turns all key notifications off.
 
-**Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `a up` `a down`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
+**Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `a down` `a up`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
 
-Additionally, the following notifications will be generated at `ckb0/notify` regardless of circumstance:
+Additionally, the following notifications will be generated at `ckb0/notify*` regardless of circumstance:
 - `<serial> added at <path>` whenever a device is connected.
-- `<serial> removed from <path` whenever a device is disconnected. These messages are only generated at `ckb0/notify`, not at the node for the actual device.
+- `<serial> removed from <path>` whenever a device is disconnected. These messages are only generated at `ckb0/notify*`, not at the node for the actual device.
 
 Known issues
 ------------

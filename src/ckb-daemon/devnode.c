@@ -151,18 +151,14 @@ int rmnotifynode(usbdevice* kb, int notify){
     return remove(outpath);
 }
 
-#define MAX_LINES 512
-#define MAX_BUFFER (16 * 1024 - 1)
-int readlines(int fd, const char*** lines){
+#define MAX_BUFFER (64 * 1024 - 1)
+unsigned readlines(int fd, const char** input){
     // Allocate static buffers to store data
     static int buffersize = 4095;
     static int leftover = 0, leftoverlen = 0;
     static char* buffer = 0;
-    static const char** linebuffer = 0;
-    if(!buffer){
+    if(!buffer)
         buffer = malloc(buffersize + 1);
-        linebuffer = malloc(MAX_LINES * sizeof(const char**));
-    }
     // Move any data left over from a previous read to the start of the buffer
     if(leftover)
         memcpy(buffer, buffer + leftover, leftoverlen);
@@ -170,7 +166,7 @@ int readlines(int fd, const char*** lines){
     length = (length < 0 ? 0 : length) + leftoverlen;
     leftover = leftoverlen = 0;
     if(length <= 0){
-        *lines = 0;
+        *input = 0;
         return 0;
     }
     // Continue buffering until all available input is read or there's no room left
@@ -184,26 +180,32 @@ int readlines(int fd, const char*** lines){
         length += length2;
     }
     buffer[length] = 0;
-    // Break the input into lines
-    char* line = buffer;
-    int nlines = 0;
-    while(1){
-        char* nextline = memchr(line, '\n', buffer + length - line);
-        if(!nextline || nlines == MAX_LINES - 1){
-            // Process any left over bytes next time
-            leftover = line - buffer;
-            leftoverlen = length - leftover;
-            break;
+    // Input should be issued one line at a time and should end with a newline.
+    // Find the last newline in the input
+    char* lastline = memrchr(buffer, '\n', length);
+    if(lastline == buffer + length - 1){
+        // If it's the last characcter, return the whole string
+        *input = buffer;
+        return length - leftoverlen;
+    } else if(lastline){
+        // Otherwise, chop off the input at the end and process it next time
+        *lastline = 0;
+        leftover = lastline + 1 - buffer;
+        leftoverlen = length - leftover;
+        *input = buffer;
+        return leftover - 1;
+    } else {
+        // If it wasn't found at all, process the whole buffer next time
+        *input = 0;
+        if(length != MAX_BUFFER){
+            // Unless the buffer is completely full, in which case discard it
+            printf("Warning: Too much input (64KB). Dropping.\n");
+            return 0;
         }
-        // Replace the \n with \0 and insert the line into the line buffer
-        *nextline = 0;
-        linebuffer[nlines++] = line;
-        line = ++nextline;
-        if(line == buffer + length)
-            break;
+        leftover = 0;
+        leftoverlen = length;
+        return 0;
     }
-    *lines = linebuffer;
-    return nlines;
 }
 
 void readcmd(usbdevice* kb, const char* line){

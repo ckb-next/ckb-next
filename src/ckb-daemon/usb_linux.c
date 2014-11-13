@@ -217,7 +217,9 @@ int openusb(struct udev_device* dev, int model){
                     closehandle(kb);
                     connectstatus |= 2;
                     return -1;
-                }
+                } else
+                    printf("Reset success\n");
+
             }
 
             updateconnected();

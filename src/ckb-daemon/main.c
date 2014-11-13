@@ -131,12 +131,9 @@ int main(int argc, char** argv){
             pthread_mutex_lock(&kblistmutex);
             for(int i = 0; i < DEV_MAX; i++){
                 if(keyboard[i].infifo){
-                    const char** lines;
-                    int nlines = readlines(keyboard[i].infifo, &lines);
-                    for(int j = 0; j < nlines; j++){
-                        if(lines[j][0] != 0 && lines[j][1] != 0)
-                            readcmd(keyboard + i, lines[j]);
-                    }
+                    const char* line;
+                    if(readlines(keyboard[i].infifo, &line))
+                        readcmd(keyboard + i, line);
                 }
             }
         } else

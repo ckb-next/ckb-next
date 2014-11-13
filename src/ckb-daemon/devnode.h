@@ -28,7 +28,7 @@ int mknotifynode(usbdevice* kb, int notify);
 int rmnotifynode(usbdevice* kb, int notify);
 
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
-int readlines(int fd, const char*** lines);
+unsigned readlines(int fd, const char** input);
 
 // Command operations
 typedef enum {

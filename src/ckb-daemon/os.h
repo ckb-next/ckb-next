@@ -22,6 +22,10 @@
 #define _DEFAULT_SOURCE
 #endif
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <features.h>
 #include <libudev.h>
 #include <linux/uinput.h>
@@ -39,6 +43,8 @@
 
 #include <Carbon/Carbon.h>
 #include <IOKit/hid/IOHIDLib.h>
+
+void *memrchr(const void *s, int c, size_t n);
 
 #endif  // OS_MAC
 

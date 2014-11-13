@@ -18,9 +18,9 @@ const char *const devpath;
 // Update the list of connected devices.
 void updateconnected();
 // Create a dev path for the keyboard at index. Returns 0 on success.
-int makedevpath(int index);
+int makedevpath(usbdevice* kb);
 // Remove the dev path for the keyboard at index. Returns 0 on success.
-int rmdevpath(int index);
+int rmdevpath(usbdevice* kb);
 
 // Creates a notification node for the specified keyboard.
 int mknotifynode(usbdevice* kb, int notify);

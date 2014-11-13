@@ -51,7 +51,7 @@ void usbremove(void* context, IOReturn result, void* sender){
     for(int i = 0; i < DEV_MAX; i++){
         if(keyboard + i == kb){
             pthread_mutex_lock(&keyboard[i].mutex);
-            closeusb(i);
+            closeusb(keyboard + i);
         }
     }
     pthread_mutex_unlock(&kblistmutex);
@@ -63,8 +63,7 @@ void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportTyp
         inputupdate(kb);
 }
 
-void openusb(int index){
-    usbdevice* kb = keyboard + index;
+void openusb(usbdevice* kb){
     // The driver sometimes isn't completely ready yet, so give it a short delay
     sleep(1);
 
@@ -79,7 +78,7 @@ void openusb(int index){
     IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, datapkt, MSG_SIZE);
 
     // Set up the device
-    if(setupusb(index)){
+    if(setupusb(kb)){
         closehandle(kb);
         return;
     }
@@ -92,7 +91,8 @@ void openusb(int index){
 
     // Update connected
     updateconnected();
-    notifyconnect(index, 1);
+    notifyconnect(kb, 1);
+    int index = INDEX_OF(kb, keyboard);
     printf("Device ready at %s%d\n", devpath, index);
 }
 
@@ -174,7 +174,7 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
 
     // If all handles have been set up, finish initializing the keyboard
     if(kb->handles[0] && kb->handles[1] && kb->handles[2] && kb->handles[3])
-        openusb(index);
+        openusb(kb);
     pthread_mutex_unlock(&kblistmutex);
 }
 

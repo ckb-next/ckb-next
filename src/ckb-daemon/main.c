@@ -4,7 +4,7 @@
 
 // Not supported on OSX...
 #ifdef OS_MAC
-#define pthread_mutex_timedlock(mutex, timespec) pthread_mutex_trylock(mutex)
+#define pthread_mutex_timedlock(mutex, timespec) pthread_mutex_lock(mutex)
 #endif
 
 void quit(){
@@ -16,7 +16,7 @@ void quit(){
         if(IS_ACTIVE(keyboard + i)){
             pthread_mutex_timedlock(&keyboard[i].mutex, &timeout);
             // Stop the uinput device now to ensure no keys get stuck
-            inputclose(i);
+            inputclose(keyboard + i);
             setinput(keyboard + i, IN_HID);
             // Flush the USB queue and close the device
             while(keyboard[i].queuecount > 0){
@@ -24,11 +24,12 @@ void quit(){
                 if(usbdequeue(keyboard + i) <= 0)
                     break;
             }
-            closeusb(i);
+            closeusb(keyboard + i);
         }
     }
     pthread_mutex_unlock(&kblistmutex);
-    closeusb(0);
+    pthread_mutex_timedlock(&keyboard[0].mutex, &timeout);
+    closeusb(keyboard);
     usbdeinit();
 }
 
@@ -87,7 +88,7 @@ int main(int argc, char** argv){
     memset(keyboard, 0, sizeof(keyboard));
     pthread_mutex_init(&keyboard[0].mutex, 0);
     keyboard[0].model = -1;
-    if(!makedevpath(0))
+    if(!makedevpath(keyboard))
         printf("Root controller ready at %s0\n", devpath);
 
     // Don't let any spawned threads handle signals
@@ -125,10 +126,11 @@ int main(int argc, char** argv){
         // Run the USB queue. Messages must be queued because sending multiple messages at the same time can cause the interface to freeze
         for(int i = 1; i < DEV_MAX; i++){
             if(IS_ACTIVE(keyboard + i)){
+                pthread_mutex_lock(&keyboard[i].mutex);
                 if(usbdequeue(keyboard + i) == 0){
                     printf("Device ckb%d not responding, trying to reset...\n", i);
                     if(resetusb(keyboard + i))
-                        closeusb(i);
+                        closeusb(keyboard + i);
                     else
                         updateindicators(keyboard + i, 1);
                 } else {
@@ -137,6 +139,7 @@ int main(int argc, char** argv){
                     if(!frame)
                         updateindicators(keyboard + i, 0);
                 }
+                pthread_mutex_unlock(&keyboard[i].mutex);
             }
         }
         pthread_mutex_unlock(&kblistmutex);

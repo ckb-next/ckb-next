@@ -51,8 +51,8 @@ void updateconnected(){
     chmod(cpath, S_READ);
 }
 
-int makedevpath(int index){
-    usbdevice* kb = keyboard + index;
+int makedevpath(usbdevice* kb){
+    int index = INDEX_OF(kb, keyboard);
     // Create the control path
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
@@ -106,8 +106,8 @@ int makedevpath(int index){
     return 0;
 }
 
-int rmdevpath(int index){
-    usbdevice* kb = keyboard + index;
+int rmdevpath(usbdevice* kb){
+    int index = INDEX_OF(kb, keyboard);
     close(kb->infifo);
     kb->infifo = 0;
     for(int i = 0; i < OUTFIFO_MAX; i++)

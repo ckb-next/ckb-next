@@ -15,21 +15,20 @@ int usbqueue(usbdevice* kb, uchar* messages, int count){
     return 0;
 }
 
-int setupusb(int index){
-    usbdevice* kb = keyboard + index;
+int setupusb(usbdevice* kb){
     pthread_mutex_init(&kb->mutex, 0);
     pthread_mutex_lock(&kb->mutex);
 
     // Make /dev path
-    if(makedevpath(index)){
+    if(makedevpath(kb)){
         pthread_mutex_unlock(&kb->mutex);
         pthread_mutex_destroy(&kb->mutex);
         return -1;
     }
 
     // Set up an input device for key events
-    if(!inputopen(index)){
-        rmdevpath(index);
+    if(!inputopen(kb)){
+        rmdevpath(kb);
         pthread_mutex_unlock(&kb->mutex);
         pthread_mutex_destroy(&kb->mutex);
         return -1;
@@ -59,14 +58,13 @@ int setupusb(int index){
     return 0;
 }
 
-int closeusb(int index){
+int closeusb(usbdevice* kb){
     // Close file handles
-    usbdevice* kb = keyboard + index;
     if(!kb->infifo)
         return 0;
     if(kb->handle){
         printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
-        inputclose(index);
+        inputclose(kb);
         // Delete USB queue
         for(int i = 0; i < QUEUE_LEN; i++)
             free(kb->queue[i]);
@@ -76,10 +74,10 @@ int closeusb(int index){
         // Close USB device
         closehandle(kb);
         updateconnected();
-        notifyconnect(index, 0);
+        notifyconnect(kb, 0);
     }
     // Delete the control path
-    rmdevpath(index);
+    rmdevpath(kb);
 
     pthread_mutex_unlock(&kb->mutex);
     pthread_mutex_destroy(&kb->mutex);

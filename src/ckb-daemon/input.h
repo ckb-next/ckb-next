@@ -5,9 +5,9 @@
 #include "usb.h"
 
 // Opens uinput device
-int inputopen(int index);
+int inputopen(usbdevice* kb);
 // Closes uinput device
-void inputclose(int index);
+void inputclose(usbdevice* kb);
 
 // Updates keypresses on uinput device
 void inputupdate(usbdevice* kb);

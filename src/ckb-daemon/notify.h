@@ -9,7 +9,7 @@
 void nprintf(usbdevice* kb, usbsetting* setting, usbmode* mode, const char* format, ...);
 
 // Notifies of a device connection or disconnection.
-void notifyconnect(int index, int connecting);
+void notifyconnect(usbdevice* kb, int connecting);
 
 // Enables or disables notification for a key
 void cmd_notify(usbmode* mode, int keycode, const char* toggle);

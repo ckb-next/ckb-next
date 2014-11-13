@@ -190,7 +190,7 @@ int openusb(struct udev_device* dev, int model){
             }
 
             // Set up the device
-            if(setupusb(index)){
+            if(setupusb(kb)){
                 closehandle(kb);
                 connectstatus |= 2;
                 return -1;
@@ -221,7 +221,8 @@ int openusb(struct udev_device* dev, int model){
             }
 
             updateconnected();
-            notifyconnect(index, 1);
+            notifyconnect(kb, 1);
+            int index = INDEX_OF(kb, keyboard);
             printf("Device ready at %s%d\n", devpath, index);
             connectstatus |= 1;
             return 0;
@@ -318,7 +319,7 @@ void* udevmain(void* context){
                     for(int i = 1; i < DEV_MAX; i++){
                         if(keyboard[i].udev && !strcmp(path, udev_device_get_syspath(keyboard[i].udev))){
                             pthread_mutex_lock(&keyboard[i].mutex);
-                            closeusb(i);
+                            closeusb(keyboard + i);
                             break;
                         }
                     }

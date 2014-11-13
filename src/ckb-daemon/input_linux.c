@@ -94,8 +94,9 @@ int uinputopen(struct uinput_user_dev* indev, int* event){
     return fd;
 }
 
-int inputopen(int index){
+int inputopen(usbdevice* kb){
     // Create the new input device
+    int index = INDEX_OF(kb, keyboard);
     struct uinput_user_dev indev;
     memset(&indev, 0, sizeof(indev));
     snprintf(indev.name, UINPUT_MAX_NAME_SIZE, "ckb%d", index);
@@ -118,8 +119,7 @@ int inputopen(int index){
     return 1;
 }
 
-void inputclose(int index){
-    usbdevice* kb = keyboard + index;
+void inputclose(usbdevice* kb){
     if(kb->uinput <= 0)
         return;
     close(kb->event);

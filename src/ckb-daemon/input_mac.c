@@ -3,20 +3,20 @@
 
 #ifdef OS_MAC
 
-int inputopen(int index){
+int inputopen(usbdevice* kb){
     CGEventSourceRef event = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
     if(!event){
-        keyboard[index].event = 0;
+        kb->event = 0;
         return 0;
     }
-    keyboard[index].event = event;
+    kb->event = event;
     return 1;
 }
 
-void inputclose(int index){
-    if(keyboard[index].event){
-        CFRelease(keyboard[index].event);
-        keyboard[index].event = 0;
+void inputclose(usbdevice* kb){
+    if(kb->event){
+        CFRelease(kb->event);
+        kb->event = 0;
     }
 }
 

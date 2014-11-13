@@ -31,10 +31,10 @@ void nprintf(usbdevice* kb, usbsetting* setting, usbmode* mode, const char* form
     }
 }
 
-void notifyconnect(int index, int connecting){
+void notifyconnect(usbdevice* kb, int connecting){
+    int index = INDEX_OF(kb, keyboard);
     for(int i = 0; i < OUTFIFO_MAX; i++){
         if(keyboard[0].outfifo[i]){
-            usbdevice* kb = keyboard + index;
             dprintf(keyboard[0].outfifo[i], "%s %s %s%d\n", kb->setting.serial, connecting ? "added at" : "removed from", devpath, index);
         }
     }

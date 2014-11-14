@@ -151,9 +151,9 @@ Additionally, the following notifications will be generated at `ckb0/notify*` re
 Getting parameters
 ------------------
 
-Parameters can be retrieved using the `get` command. The data will be sent out in the form of a notification. Generally, the syntax to get the data associated with a particular command is `get :<command>` (note the colon), and the associated data will be returned in the form of `<command> <data>`. The following data may be gotten:
-- `get :hello` simply prints `hello` to the notification nodes. This may be useful to determine whether or not the daemon is responding. It can only be issued to `ckb0` with no keyboard and will be ignored in any other circumstance.
-- `get :fps` gets the current frame rate. Returns `fps <rate>`. Like `:hello`, this will be ignored if it is issued to any actual keyboard.
+Parameters can be retrieved using the `get` command. The data will be sent out as a notification. Generally, the syntax to get the data associated with a command is `get :<command>` (note the colon), and the associated data will be returned in the form of `<command> <data>`. The following data may be gotten:
+- `get :hello` simply prints `hello` to the notification nodes. This may be useful to determine whether or not the daemon is responding. It can only be issued to `ckb0` with no `device` command; in any other circumstance, it will be ignored.
+- `get :fps` gets the current frame rate. Returns `fps <rate>`. Like `:hello`, this will be ignored if it is issued to an actual keyboard.
 - `get :layout` gets the current keyboard layout. Returns `layout <country>`. This may be issued to `ckb0` to get the default layout or to any keyboard to get the keyboard's layout.
 
 Known issues

@@ -202,11 +202,6 @@ int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
 int hwloadprofile(usbdevice* kb, int apply){
     if(!IS_ACTIVE(kb))
         return 0;
-    // Free the existing profile (if any)
-    if(kb->profile.hw){
-        free(kb->profile.hw);
-        kb->profile.hw = 0;
-    }
     // Empty the board's USB queue
     while(kb->queuecount > 0){
         usleep(3000);
@@ -256,10 +251,13 @@ int hwloadprofile(usbdevice* kb, int apply){
             return -1;
         }
     }
-    kb->profile.hw = hw;
     // Make the profile active (if requested)
     if(apply)
         hwtonative(&kb->profile, hw, modes);
+    // Free the existing profile (if any)
+    if(kb->profile.hw)
+        free(kb->profile.hw);
+    kb->profile.hw = hw;
     return 0;
 }
 
@@ -267,6 +265,8 @@ void hwsaveprofile(usbdevice* kb){
     if(!IS_ACTIVE(kb))
         return;
     hwprofile* hw = kb->profile.hw;
+    if(!hw)
+        hw = kb->profile.hw = calloc(1, sizeof(hwprofile));
     int modes = (kb->model == 95 ? HWMODE_K95 : HWMODE_K70);
     nativetohw(&kb->profile, hw, modes);
     // Save the profile and mode names

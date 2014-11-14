@@ -64,6 +64,12 @@ int loadrgb(usbdevice* kb, keylight* light, int mode){
         { 0xff, 0x03, 0x3c, 0 },
         { 0xff, 0x04, 0x24, 0 },
     };
+    uchar in_pkt[4][MSG_SIZE] = {
+        { 0xff, 0x01, 0x3c, 0 },
+        { 0xff, 0x02, 0x3c, 0 },
+        { 0xff, 0x03, 0x3c, 0 },
+        { 0xff, 0x04, 0x24, 0 },
+    };
     usbqueue(kb, data_pkt[0], 1);
     usleep(3000);
     if(!usbdequeue(kb))
@@ -73,18 +79,18 @@ int loadrgb(usbdevice* kb, keylight* light, int mode){
         usleep(3000);
         if(!usbdequeue(kb))
             return -1;
-        // Wait for the response
-        if(!usbinput(kb, data_pkt[i]))
+        // Wait for the response. Make sure the first four bytes match
+        if(!usbinput(kb, in_pkt[i - 1]) || memcmp(in_pkt[i - 1], data_pkt[i], 4))
             return -1;
     }
     // Copy the data back to the mode
     char* r = light->r, *g = light->g, *b = light->b;
-    memcpy(r, data_pkt[1] + 4, 60);
-    memcpy(r + 60, data_pkt[2] + 4, 12);
-    memcpy(g, data_pkt[2] + 16, 48);
-    memcpy(g + 48, data_pkt[3] + 4, 24);
-    memcpy(b, data_pkt[3] + 28, 36);
-    memcpy(b + 36, data_pkt[4] + 4, 36);
+    memcpy(r, in_pkt[0] + 4, 60);
+    memcpy(r + 60, in_pkt[1] + 4, 12);
+    memcpy(g, in_pkt[1] + 16, 48);
+    memcpy(g + 48, in_pkt[2] + 4, 24);
+    memcpy(b, in_pkt[2] + 28, 36);
+    memcpy(b + 36, in_pkt[3] + 4, 36);
     light->enabled = 1;
     return 0;
 }

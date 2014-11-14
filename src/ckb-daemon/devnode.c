@@ -211,18 +211,31 @@ unsigned readlines(int fd, const char** input){
 }
 
 void readcmd(usbdevice* kb, const char* line){
-    char word[strlen(line) + 1];
+    usbdevice* kb0 = kb;
+    char* word = malloc(strlen(line) + 1);
     int wordlen;
-    // Read settings from the device
-    usbprofile* profile = (IS_ACTIVE(kb) ? &kb->profile : 0);
-    const key* keymap = (profile ? profile->keymap : keymap_system);
-    usbmode* mode = (profile ? profile->currentmode : 0);
-    cmd command = NONE;
-    cmdhandler handler = 0;
+    const char* newline = 0;
+    usbprofile* profile;
+    const key* keymap;
+    usbmode* mode;
+    cmd command;
+    cmdhandler handler;
     int rgbchange = 0;
     // Read words from the input
     while(sscanf(line, "%s%n", word, &wordlen) == 1){
         line += wordlen;
+        // If we passed a newline, reset the context
+        if(line > newline){
+            kb = kb0;
+            profile = (IS_ACTIVE(kb) ? &kb->profile : 0);
+            keymap = (profile ? profile->keymap : keymap_system);
+            mode = (profile ? profile->currentmode : 0);
+            command = NONE;
+            handler = 0;
+            newline = strchr(line, '\n');
+            if(!newline)
+                newline = line + strlen(line);
+        }
         // Check for a command word
         if(!strcmp(word, "device")){
             command = DEVICE;
@@ -334,6 +347,10 @@ void readcmd(usbdevice* kb, const char* line){
             command = NOTIFYOFF;
             handler = 0;
             continue;
+        } else if(!strcmp(word, "get")){
+            command = GET;
+            handler = 0;
+            continue;
         }
         if(command == NONE)
             continue;
@@ -365,10 +382,12 @@ void readcmd(usbdevice* kb, const char* line){
                     memset(&mode->bind, 0, sizeof(mode->bind));
                     initbind(&mode->bind, keymap);
                 }
+                nprintf(kb, 0, 0, "layout %s\n", word);
             } else {
                 // If applied to the root controller, update the system keymap but not any devices
                 keymap_system = newkeymap;
                 printf("Setting default layout: %s\n", word);
+                nrprintf("layout %s\n", word);
             }
             continue;
         } else if(command == FPS){
@@ -385,8 +404,11 @@ void readcmd(usbdevice* kb, const char* line){
             if(kb && sscanf(word, "%u", &notify) == 1 && notify != 0)
                 rmnotifynode(kb, notify);
             continue;
+        } else if(command == GET){
+            getinfo(kb, mode, word);
+            continue;
         }
-        // Only the DEVICE, LAYOUT, FPS, and NOTIFYON/OFF commands are valid without an existing mode
+        // Only the DEVICE, LAYOUT, FPS, GET, and NOTIFYON/OFF commands are valid without an existing mode
         if(!mode)
             continue;
         if(command == MODE){
@@ -463,4 +485,5 @@ void readcmd(usbdevice* kb, const char* line){
     }
     if(mode && rgbchange)
         updatergb(kb);
+    free(word);
 }

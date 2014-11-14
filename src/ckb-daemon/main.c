@@ -2,6 +2,7 @@
 #include "devnode.h"
 #include "input.h"
 #include "led.h"
+#include "notify.h"
 
 // Not supported on OSX...
 #ifdef OS_MAC
@@ -84,6 +85,10 @@ int main(int argc, char** argv){
             printf("Setting default layout: %s\n", layout);
         }
     }
+
+    // Set FPS if not done already
+    if(!fps)
+        setfps(60);
 
     // If the keymap wasn't set via command-line, get it from the system locale
     if(!keymap_system){

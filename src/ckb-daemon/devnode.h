@@ -53,6 +53,7 @@ typedef enum {
     NOTIFY,
     NOTIFYON,
     NOTIFYOFF,
+    GET
 } cmd;
 typedef void (*cmdhandler)(usbmode*, const key*, int, const char*);
 

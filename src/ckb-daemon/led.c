@@ -1,5 +1,6 @@
 #include "led.h"
 #include "device.h"
+#include "notify.h"
 
 void initrgb(keylight* light){
     // Allocate colors. Default to all white.
@@ -163,7 +164,7 @@ void cmd_iauto(usbmode* mode, const key* keymap, int zero, const char* led){
     mode->ion &= ~bit;
 }
 
-volatile unsigned fps = 60;
+volatile unsigned fps = 0;
 
 void setfps(unsigned newfps){
     if(newfps > 60 || newfps == 0){
@@ -175,4 +176,5 @@ void setfps(unsigned newfps){
         fps = newfps;
         printf("Setting FPS to %u\n", fps);
     }
+    nrprintf("fps %d\n", fps);
 }

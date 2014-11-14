@@ -7,7 +7,7 @@
 #ifdef OS_LINUX
 
 // Number used to track whether or not a device connects successfully
-int connectstatus = 0;
+volatile int connectstatus = 0;
 
 int usbdequeue(usbdevice* kb){
     if(kb->queuecount == 0 || !kb->handle)
@@ -182,6 +182,7 @@ int openusb(struct udev_device* dev, int model){
                     pthread_mutex_unlock(&kb->mutex);
                     pthread_mutex_destroy(&kb->mutex);
                     pthread_mutex_destroy(&kb->keymutex);
+                    sleep(1);
                     return -1;
                 } else
                     printf("Reset success\n");
@@ -210,6 +211,7 @@ int openusb(struct udev_device* dev, int model){
                     pthread_mutex_unlock(&kb->mutex);
                     pthread_mutex_destroy(&kb->mutex);
                     pthread_mutex_destroy(&kb->keymutex);
+                    sleep(1);
                     return -1;
                 } else
                     printf("Reset success\n");
@@ -265,9 +267,12 @@ void udevenum(){
 void* udevmain(void* context){
     // Enumerate all currently connected devices
     udevenum();
-    if(connectstatus & 2)
+    while(connectstatus & 2){
         // If a device failed to connect, enumerate again to make sure we reconnect it (if possible)
+        printf("Trying again...\n");
+        connectstatus = 0;
         udevenum();
+    }
 
     // Done scanning. Enter a loop to poll for device updates
     struct udev_monitor* monitor = udev_monitor_new_from_netlink(udev, "udev");
@@ -306,8 +311,12 @@ void* udevmain(void* context){
                     usleep(100000);
                     connectstatus = 0;
                     udevenum();
-                    if(connectstatus & 2)
+                    while(connectstatus & 2){
+                        // If a device failed to connect, enumerate again to make sure we reconnect it (if possible)
+                        printf("Trying again...\n");
+                        connectstatus = 0;
                         udevenum();
+                    }
                 } else if(!strcmp(action, "remove")){
                     // Device removed. Look for it in our list of keyboards
                     pthread_mutex_lock(&kblistmutex);

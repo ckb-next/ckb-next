@@ -29,13 +29,13 @@ After building, run `sudo bin/ckb-daemon` to start the daemon. It will log some 
 `/dev/input/ckb0` contains the following files:
 - `connected`: A list of all connected keyboards, one per line. Each line contains a device path followed by the device's serial number and its description.
 - `cmd`: Keyboard controller. More information below.
-- `notify`: Keyboard notifications. See Notification section.
+- `notify0`: Keyboard notifications. See Notification section.
 
 Other `ckb*` devices contain the following:
 - `model`: Device description/model.
 - `serial`: Device serial number. `model` and `serial` will match the info found in `ckb0/connected`
 - `cmd`: Keyboard controller.
-- `notify`: Keyboard notifications.
+- `notify0`: Keyboard notifications.
 
 Commands
 --------
@@ -129,22 +129,32 @@ The keyboard can be configured to generate user-readable notifications on keypre
 
 Note that the file can only reliably be read by one application: if you try to open it in two different programs, they may both fail to get data. Data will be buffered as long as no programs are reading, so you will receive all unread notifications as soon as you open the file. If you'd like to read notifications from two separate applications, send the command `notifyon <n>` to the keyboard you wish to receive notifications from, where N is a number between 1 and 9. If `/dev/input/ckb*/notify<n>` does not already exist, it will be created, and you can read notifications from there without disrupting any other program currently reading them. To close a notification node, send `notifyoff <n>`.
 
-Notifications are printed in the format of one notification per line. If you are reading from `ckb0/notify*` you will see notifications for all keyboards, with the keyboard's serial number printed at the beginning of each line. Reading from `ckb1` or above will show you only notifications for that keyboard, with no serial number.
+Notifications are printed in the format of one notification per line. If you are reading from `ckb0/notify*` you will see notifications for all keyboards, with `device <serial>` printed at the beginning of each line. Reading from `ckb1` or above will show you only notifications for that keyboard, with no serial number.
 
 Notification commands are as follows:
-- `notify <key>:on` or simply `notify <key>` enables notifications for a key. Each key will generate two notifications: `<key> down` when the key is pressed, and `<key> up` when it is released.
+- `notify <key>:on` or simply `notify <key>` enables notifications for a key. Each key will generate two notifications: `key +<key>` when the key is pressed, and `key -<key>` when it is released.
 - `notify <key>:off` turns notifications off for a key.
 
 **Examples:**
-- `notify w,a,s,d` sends notifications whenever W, A, S, or D is pressed.
-- `notify g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17,g18,mr,m1,m2,m3,light,lock` prints a notification whenever a non-standard key is pressed.
+- `notify w a s d` sends notifications whenever W, A, S, or D is pressed.
+- `notify g1 g2 g3 g4 g5 g6 g7 g8 g9 g10 g11 g12 g13 g14 g15 g16 g17 g18 mr m1 m2 m3 light lock` prints a notification whenever a non-standard key is pressed.
 - `notify all:off` turns all key notifications off.
 
-**Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `a down` `a up`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
+**Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `key +a` `key -a`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
 
 Additionally, the following notifications will be generated at `ckb0/notify*` regardless of circumstance:
-- `<serial> added at <path>` whenever a device is connected.
-- `<serial> removed from <path>` whenever a device is disconnected. These messages are only generated at `ckb0/notify*`, not at the node for the actual device.
+- `device <serial> added at <path>` whenever a device is connected.
+- `device <serial> removed from <path>` whenever a device is disconnected. These messages are only generated at `ckb0/notify*`, not at the node for the actual device.
+- `fps <rate>` when the FPS is changed.
+- `layout <country>` when the default layout is changed.
+
+Getting parameters
+------------------
+
+Parameters can be retrieved using the `get` command. The data will be sent out in the form of a notification. Generally, the syntax to get the data associated with a particular command is `get :<command>` (note the colon), and the associated data will be returned in the form of `<command> <data>`. The following data may be gotten:
+- `get :hello` simply prints `hello` to the notification nodes. This may be useful to determine whether or not the daemon is responding. It can only be issued to `ckb0` with no keyboard and will be ignored in any other circumstance.
+- `get :fps` gets the current frame rate. Returns `fps <rate>`. Like `:hello`, this will be ignored if it is issued to any actual keyboard.
+- `get :layout` gets the current keyboard layout. Returns `layout <country>`. This may be issued to `ckb0` to get the default layout or to any keyboard to get the keyboard's layout.
 
 Known issues
 ------------

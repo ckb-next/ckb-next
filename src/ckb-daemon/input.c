@@ -10,6 +10,14 @@ int macromask(const uchar* key1, const uchar* key2){
     return 1;
 }
 
+#ifdef OS_LINUX
+// Is a key a modifier?
+#define IS_MOD(s) ((s) == KEY_CAPSLOCK || (s) == KEY_NUMLOCK || (s) == KEY_SCROLLLOCK || (s) == KEY_LEFTSHIFT || (s) == KEY_RIGHTSHIFT || (s) == KEY_LEFTCTRL || (s) == KEY_RIGHTCTRL || (s) == KEY_LEFTMETA || (s) == KEY_RIGHTMETA || (s) == KEY_LEFTALT || (s) == KEY_RIGHTALT)
+#else
+// Scroll Lock and Num Lock aren't modifiers on OSX
+#define IS_MOD(s) ((s) == KEY_CAPSLOCK || (s) == KEY_LEFTSHIFT || (s) == KEY_RIGHTSHIFT || (s) == KEY_LEFTCTRL || (s) == KEY_RIGHTCTRL || (s) == KEY_LEFTMETA || (s) == KEY_RIGHTMETA || (s) == KEY_LEFTALT || (s) == KEY_RIGHTALT)
+#endif
+
 void inputupdate(usbdevice* kb){
 #ifdef OS_LINUX
     if(!kb->uinput)
@@ -18,13 +26,13 @@ void inputupdate(usbdevice* kb){
     if(!kb->event)
         return;
 #endif
-    pthread_mutex_lock(&kb->mutex);
+    pthread_mutex_lock(&kb->keymutex);
     usbmode* mode = kb->profile.currentmode;
     const key* keymap = kb->profile.keymap;
     keybind* bind = &mode->bind;
     // Don't do anything if the state hasn't changed
     if(!memcmp(kb->previntinput, kb->intinput, N_KEYS / 8)){
-        pthread_mutex_unlock(&kb->mutex);
+        pthread_mutex_unlock(&kb->keymutex);
         return;
     }
     // Look for macros matching the current state
@@ -38,12 +46,17 @@ void inputupdate(usbdevice* kb){
                 // Send events for each keypress in the macro
                 for(int a = 0; a < macro->actioncount; a++)
                     os_keypress(kb, macro->actions[a].scan, macro->actions[a].down);
-                os_kpsync(kb);
             }
         } else {
             macro->triggered = 0;
         }
     }
+    // Make a list of keycodes to send. Rearrange them so that modifier keydowns always come first
+    // and modifier keyups always come last. This ensures that shortcut keys will register properly
+    // even if both keydown events happen at once.
+    // N_KEYS + 2 is used because the volume wheel generates keydowns and keyups at the same time
+    int events[N_KEYS + 2];
+    int modcount = 0, keycount = 0, rmodcount = 0;
     for(int byte = 0; byte < N_KEYS / 8; byte++){
         char oldb = kb->previntinput[byte], newb = kb->intinput[byte];
         if(oldb == newb)
@@ -58,13 +71,31 @@ void inputupdate(usbdevice* kb){
             if(old != new){
                 // Don't echo a key press if a macro was triggered or if there's no scancode associated
                 if(!macrotrigger && scancode >= 0){
-                    os_keypress(kb, scancode, !!new);
-                    // The volume wheel doesn't generate keyups, so create them automatically
-                    if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN)){
-                        os_keypress(kb, scancode, 0);
-                        kb->intinput[byte] &= ~mask;
+                    if(IS_MOD(scancode)){
+                        if(new){
+                            // Modifier down: Add to the end of modifier keys
+                            for(int i = keycount + rmodcount; i > 0; i--)
+                                events[modcount + i] = events[modcount + i - 1];
+                            // Add 1 to the scancode because A is zero on OSX
+                            // Positive code = keydown, negative code = keyup
+                            events[modcount++] = scancode + 1;
+                        } else {
+                            // Modifier up: Add to the end of everything
+                            events[modcount + keycount + rmodcount++] = -(scancode + 1);
+                        }
+                    } else {
+                        // Regular keypress: add to the end of regular keys
+                        for(int i = rmodcount; i > 0; i--)
+                            events[modcount + keycount + i] = events[modcount + keycount + i - 1];
+                        events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
+                        // The volume wheel doesn't generate keyups, so create them automatically
+                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN)){
+                            for(int i = rmodcount; i > 0; i--)
+                                events[modcount + keycount + i] = events[modcount + keycount + i - 1];
+                            events[modcount + keycount++] = -(scancode + 1);
+                            kb->intinput[byte] &= ~mask;
+                        }
                     }
-                    os_kpsync(kb);
                 }
                 // Print a notification if desired
                 int notify = mode->notify[byte] & mask;
@@ -79,8 +110,15 @@ void inputupdate(usbdevice* kb){
             }
         }
     }
+    // Process all queued keypresses
+    int totalkeys = modcount + keycount + rmodcount;
+    for(int i = 0; i < totalkeys; i++){
+        int scancode = events[i];
+        os_keypress(kb, (scancode < 0 ? -scancode : scancode) - 1, scancode > 0);
+    }
+    os_kpsync(kb);
     memcpy(kb->previntinput, kb->intinput, N_KEYS / 8);
-    pthread_mutex_unlock(&kb->mutex);
+    pthread_mutex_unlock(&kb->keymutex);
 }
 
 void initbind(keybind* bind, const key* keymap){

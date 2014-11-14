@@ -220,7 +220,7 @@ int hwloadprofile(usbdevice* kb, int apply){
         { 0x0e, 0x16, 0x01, 0 }
     };
     uchar in_pkt[MSG_SIZE];
-    int modes = (kb->model == 95 ? 3 : 1);
+    int modes = (kb->model == 95 ? HWMODE_K95 : HWMODE_K70);
     for(int i = 0; i <= modes; i++){
         data_pkt[0][3] = i;
         usbqueue(kb, data_pkt[0], 1);
@@ -267,13 +267,13 @@ void hwsaveprofile(usbdevice* kb){
     if(!IS_ACTIVE(kb))
         return;
     hwprofile* hw = kb->profile.hw;
-    int modes = (kb->model == 95 ? 3 : 1);
+    int modes = (kb->model == 95 ? HWMODE_K95 : HWMODE_K70);
     nativetohw(&kb->profile, hw, modes);
     // Save the profile and mode names
     uchar data_pkt[2][MSG_SIZE] = {
         {0x07, 0x16, 0x01, 0 },
         {0x07, 0x15, 0x01, 0 },
-    };;
+    };
     // Save the mode names
     for(int i = 0; i <= modes; i++){
         data_pkt[0][3] = i;

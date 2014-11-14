@@ -43,13 +43,13 @@ void* intreap(void* context){
             break;
         }
         if(urb){
-            // Otherwise, re-submit the URB
-            ioctl(fd, USBDEVFS_SUBMITURB, urb);
-            // And process input (if any)
+            // Process input (if any)
             if(urb->actual_length == MSG_SIZE)
                 inputupdate(kb);
             // Mark the keyboard as having received input
             kb->INPUT_TEST = 1;
+            // And re-submit the URB
+            ioctl(fd, USBDEVFS_SUBMITURB, urb);
         }
     }
     return 0;
@@ -181,6 +181,7 @@ int openusb(struct udev_device* dev, int model){
                     connectstatus |= 2;
                     pthread_mutex_unlock(&kb->mutex);
                     pthread_mutex_destroy(&kb->mutex);
+                    pthread_mutex_destroy(&kb->keymutex);
                     return -1;
                 } else
                     printf("Reset success\n");
@@ -208,6 +209,7 @@ int openusb(struct udev_device* dev, int model){
                     connectstatus |= 2;
                     pthread_mutex_unlock(&kb->mutex);
                     pthread_mutex_destroy(&kb->mutex);
+                    pthread_mutex_destroy(&kb->keymutex);
                     return -1;
                 } else
                     printf("Reset success\n");

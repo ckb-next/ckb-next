@@ -85,6 +85,7 @@ void openusb(usbdevice* kb){
         closehandle(kb);
         pthread_mutex_unlock(&kb->mutex);
         pthread_mutex_destroy(&kb->mutex);
+        pthread_mutex_destroy(&kb->keymutex);
         return;
     } else if(setup){
         // If the setup had a communication error, wait a bit and try again.
@@ -218,13 +219,13 @@ void* krthread(void* context){
             interval = 1;
         for(int i = 1; i < DEV_MAX; i++){
             if(IS_ACTIVE(keyboard + i)){
-                pthread_mutex_lock(&keyboard[i].mutex);
+                pthread_mutex_lock(&keyboard[i].keymutex);
                 if(keyboard[i].lastkeypress != -1){
                     keyboard[i].keypresstime++;
                     if(keyboard[i].keypresstime >= delay && (keyboard[i].keypresstime - delay) % interval == 0)
                         keyretrigger(keyboard + i, keyboard[i].lastkeypress);
                 }
-                pthread_mutex_unlock(&keyboard[i].mutex);
+                pthread_mutex_unlock(&keyboard[i].keymutex);
             }
         }
     }

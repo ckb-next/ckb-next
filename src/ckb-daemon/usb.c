@@ -20,12 +20,14 @@ int usbqueue(usbdevice* kb, uchar* messages, int count){
 
 int setupusb(usbdevice* kb){
     pthread_mutex_init(&kb->mutex, 0);
+    pthread_mutex_init(&kb->keymutex, 0);
     pthread_mutex_lock(&kb->mutex);
 
     // Make /dev path
     if(makedevpath(kb)){
         pthread_mutex_unlock(&kb->mutex);
         pthread_mutex_destroy(&kb->mutex);
+        pthread_mutex_destroy(&kb->keymutex);
         return -1;
     }
 
@@ -34,6 +36,7 @@ int setupusb(usbdevice* kb){
         rmdevpath(kb);
         pthread_mutex_unlock(&kb->mutex);
         pthread_mutex_destroy(&kb->mutex);
+        pthread_mutex_destroy(&kb->keymutex);
         return -1;
     }
     updateindicators(kb, 1);
@@ -96,6 +99,7 @@ int closeusb(usbdevice* kb){
     // Close file handles
     if(!kb->infifo)
         return 0;
+    pthread_mutex_lock(&kb->keymutex);
     if(kb->handle){
         printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
         inputclose(kb);
@@ -113,6 +117,8 @@ int closeusb(usbdevice* kb){
     // Delete the control path
     rmdevpath(kb);
 
+    pthread_mutex_unlock(&kb->keymutex);
+    pthread_mutex_destroy(&kb->keymutex);
     pthread_mutex_unlock(&kb->mutex);
     pthread_mutex_destroy(&kb->mutex);
     memset(kb, 0, sizeof(*kb));

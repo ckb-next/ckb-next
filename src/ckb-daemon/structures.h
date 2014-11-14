@@ -130,6 +130,8 @@ typedef struct {
 #endif
     // A mutex used for USB controls. Needs to be locked before reading or writing the handle
     pthread_mutex_t mutex;
+    // Similar, but used only for key input.
+    pthread_mutex_t keymutex;
     // Command FIFO
     int infifo;
     // Notification FIFO

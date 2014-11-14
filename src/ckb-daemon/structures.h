@@ -39,7 +39,7 @@ typedef struct {
 
 // End key bind structures
 
-// Lighting structure for a device/profile
+// Lighting structure for a mode
 typedef struct {
     char r[N_KEYS / 2];
     char g[N_KEYS / 2];
@@ -53,8 +53,24 @@ typedef struct {
     char modified[2];
 } usbid;
 
-// Mode structure
+#define PR_NAME_LEN 16
 #define MD_NAME_LEN 16
+
+#define HWMODE_K70 1
+#define HWMODE_K95 3
+#define HWMODE_MAX 3
+
+// Hardware profile structure
+typedef struct {
+    // RGB settings
+    keylight light[HWMODE_MAX];
+    // Mode/profile IDs
+    usbid id[HWMODE_MAX + 1];
+    // Mode/profile names
+    ushort name[HWMODE_MAX + 1][MD_NAME_LEN];
+} hwprofile;
+
+// Native mode structure
 typedef struct {
     keylight light;
     keybind bind;
@@ -63,12 +79,12 @@ typedef struct {
     // Indicators permanently off/on
     uchar ioff, ion;
     // Name and UUID
-    unsigned short name[MD_NAME_LEN];
+    ushort name[MD_NAME_LEN];
     usbid id;
 } usbmode;
 
-// Profile structure
-#define PR_NAME_LEN 16
+// Native profile structure
+#define SERIAL_LEN  33
 typedef struct {
     // Modes
     usbmode* mode;
@@ -76,22 +92,17 @@ typedef struct {
     int modecap;
     // Currently-selected mode
     usbmode* currentmode;
-    // Name and UUID
-    unsigned short name[PR_NAME_LEN];
-    usbid id;
-} usbprofile;
-#define MODE_MAX    16
-
-// Structure to store settings for a USB device, whether or not it's plugged in
-#define SERIAL_LEN  33
-typedef struct {
-    // Keyboard profile
-    usbprofile profile;
     // Key map (locale)
     const key* keymap;
     // Device serial number
     char serial[SERIAL_LEN];
-} usbsetting;
+    // Hardware modes. Null if not read yet
+    hwprofile* hw;
+    // Name and UUID
+    ushort name[PR_NAME_LEN];
+    usbid id;
+} usbprofile;
+#define MODE_MAX    16
 
 // Structure for tracking keyboard devices
 #define NAME_LEN    33
@@ -134,7 +145,7 @@ typedef struct {
     uchar* queue[QUEUE_LEN];
     int queuecount;
     // Keyboard settings
-    usbsetting setting;
+    usbprofile profile;
     // Device name
     char name[NAME_LEN];
 } usbdevice;

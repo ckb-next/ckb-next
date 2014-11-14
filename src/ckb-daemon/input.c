@@ -19,8 +19,8 @@ void inputupdate(usbdevice* kb){
         return;
 #endif
     pthread_mutex_lock(&kb->mutex);
-    usbmode* mode = kb->setting.profile.currentmode;
-    const key* keymap = kb->setting.keymap;
+    usbmode* mode = kb->profile.currentmode;
+    const key* keymap = kb->profile.keymap;
     keybind* bind = &mode->bind;
     // Don't do anything if the state hasn't changed
     if(!memcmp(kb->previntinput, kb->intinput, N_KEYS / 8)){

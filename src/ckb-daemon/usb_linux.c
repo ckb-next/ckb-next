@@ -27,7 +27,7 @@ int usbdequeue(usbdevice* kb){
 
 int usbinput(usbdevice* kb, uchar* message){
     if(!IS_ACTIVE(kb))
-        return 0;
+        return -1;
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 50, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     return res < 0 ? 0 : res;
@@ -123,7 +123,7 @@ int usbclaim(usbdevice* kb){
     return 0;
 }
 
-int resetusb(usbdevice* kb){
+int os_resetusb(usbdevice* kb){
     int res = usbunclaim(kb);
     if(res)
         return res;
@@ -154,17 +154,8 @@ int openusb(struct udev_device* dev, int model){
 
             // Copy device description and serial
             strncpy(kb->name, udev_device_get_sysattr_value(dev, "product"), NAME_LEN);
-            strncpy(kb->setting.serial, udev_device_get_sysattr_value(dev, "serial"), SERIAL_LEN);
-            printf("Connecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
-
-            // A USB reset is almost always required in order for it to work correctly
-            printf("Resetting device\n");
-            if(ioctl(kb->handle, USBDEVFS_RESET, 0)){
-                printf("Reset failed (%s). Disconnecting.\n", strerror(errno));
-                closehandle(kb);
-                connectstatus |= 2;
-                return -1;
-            }
+            strncpy(kb->profile.serial, udev_device_get_sysattr_value(dev, "serial"), SERIAL_LEN);
+            printf("Connecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
 
             // Claim the USB interfaces
             if(usbclaim(kb)){
@@ -174,26 +165,25 @@ int openusb(struct udev_device* dev, int model){
                 return -1;
             }
 
-            // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode. This packet disables their
-            // hardware-based functions.
-            uchar datapkt[MSG_SIZE] = { 0x07, 0x04, 0x02 };
-            struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 500, datapkt };
-            // This packet doesn't always succeed, so reset the device if that happens
-            if(ioctl(kb->handle, USBDEVFS_CONTROL, &transfer) != MSG_SIZE){
-                printf("Couldn't talk to device (%s), trying to reset again...\n", strerror(errno));
-                if(resetusb(kb) || ioctl(kb->handle, USBDEVFS_CONTROL, &transfer) != MSG_SIZE){
-                    printf("Reset failed (%s). Disconnecting.\n", strerror(errno));
-                    closehandle(kb);
-                    connectstatus |= 2;
-                    return -1;
-                }
-            }
-
-            // Set up the device
-            if(setupusb(kb)){
+            // Set up the device.
+            int setup = setupusb(kb);
+            if(setup == -1){
+                // -1 indicates a software failure. Give up.
+                printf("Failed to set up device.\n");
                 closehandle(kb);
                 connectstatus |= 2;
-                return -1;
+            } else if(setup){
+                // Any other failure is hardware based. Reset and try again.
+                printf("Failed to set up device, trying to reset...\n");
+                if(resetusb(kb)){
+                    printf("Reset failed. Disconnecting.\n");
+                    closehandle(kb);
+                    connectstatus |= 2;
+                    pthread_mutex_unlock(&kb->mutex);
+                    pthread_mutex_destroy(&kb->mutex);
+                    return -1;
+                } else
+                    printf("Reset success\n");
             }
 
             // Set up the interrupt transfers.
@@ -211,15 +201,16 @@ int openusb(struct udev_device* dev, int model){
                 }
             }
             if(!received){
-                printf("Didn't get input, trying to reset again...\n");
-                if(resetusb(kb) || ioctl(kb->handle, USBDEVFS_CONTROL, &transfer) != MSG_SIZE){
-                    printf("Reset failed (%s). Disconnecting.\n", strerror(errno));
+                printf("Didn't get input, trying to reset...\n");
+                if(resetusb(kb)){
+                    printf("Reset failed. Disconnecting.\n");
                     closehandle(kb);
                     connectstatus |= 2;
+                    pthread_mutex_unlock(&kb->mutex);
+                    pthread_mutex_destroy(&kb->mutex);
                     return -1;
                 } else
                     printf("Reset success\n");
-
             }
 
             updateconnected();
@@ -227,6 +218,7 @@ int openusb(struct udev_device* dev, int model){
             int index = INDEX_OF(kb, keyboard);
             printf("Device ready at %s%d\n", devpath, index);
             connectstatus |= 1;
+            pthread_mutex_unlock(&kb->mutex);
             return 0;
         }
     }

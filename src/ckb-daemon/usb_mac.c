@@ -11,22 +11,24 @@
 int usbdequeue(usbdevice* kb){
     if(kb->queuecount == 0 || !kb->handle)
         return -1;
-    IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, kb->queue[0], MSG_SIZE);
+    IOReturn res = IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, kb->queue[0], MSG_SIZE);
     // Rotate queue
     uchar* first = kb->queue[0];
     for(int i = 1; i < QUEUE_LEN; i++)
         kb->queue[i - 1] = kb->queue[i];
     kb->queue[QUEUE_LEN - 1] = first;
     kb->queuecount--;
+    if(res != kIOReturnSuccess)
+        return 0;
     return MSG_SIZE;
 }
 
 int usbinput(usbdevice* kb, uchar* message){
     if(!IS_ACTIVE(kb))
-        return 0;
+        return -1;
     CFIndex length = MSG_SIZE;
-    IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
-    return length;
+    IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
+    return res != kIOReturnSuccess ? 0 : length;
 }
 
 void closehandle(usbdevice* kb){
@@ -39,7 +41,7 @@ void closehandle(usbdevice* kb){
     }
 }
 
-int resetusb(usbdevice* kb){
+int os_resetusb(usbdevice* kb){
     // I don't think it's actually possible to do this.
     // Just return success without doing anything...
     return 0;
@@ -78,9 +80,16 @@ void openusb(usbdevice* kb){
     IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, datapkt, MSG_SIZE);
 
     // Set up the device
-    if(setupusb(kb)){
+    int setup = setupusb(kb);
+    if(setup == -1){
         closehandle(kb);
+        pthread_mutex_unlock(&kb->mutex);
+        pthread_mutex_destroy(&kb->mutex);
         return;
+    } else if(setup){
+        // If the setup had a communication error, wait a bit and try again.
+        sleep(1);
+        resetusb(kb);
     }
 
     // Start handling HID reports for the Corsair input
@@ -94,6 +103,7 @@ void openusb(usbdevice* kb){
     notifyconnect(kb, 1);
     int index = INDEX_OF(kb, keyboard);
     printf("Device ready at %s%d\n", devpath, index);
+    pthread_mutex_unlock(&kb->mutex);
 }
 
 long usbgetvalue(IOHIDDeviceRef device, CFStringRef key){
@@ -125,7 +135,7 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     // Look for any partially-set up boards matching this serial number
     int index = -1;
     for(int i = 1; i < DEV_MAX; i++){
-        if(!strcmp(keyboard[i].setting.serial, serial) && keyboard[i].handle == INCOMPLETE){
+        if(!strcmp(keyboard[i].profile.serial, serial) && keyboard[i].handle == INCOMPLETE){
             index = i;
             break;
         }
@@ -138,11 +148,11 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
                 index = i;
                 keyboard[i].handle = INCOMPLETE;
                 keyboard[i].model = model;
-                strcpy(keyboard[i].setting.serial, serial);
+                strcpy(keyboard[i].profile.serial, serial);
                 CFTypeRef cfname = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductKey));
                 if(cfname && CFGetTypeID(cfname) == CFStringGetTypeID())
                     CFStringGetCString(cfname, keyboard[i].name, SERIAL_LEN, kCFStringEncodingASCII);
-                printf("Connecting %s (S/N: %s)\n", keyboard[i].name, keyboard[i].setting.serial);
+                printf("Connecting %s (S/N: %s)\n", keyboard[i].name, keyboard[i].profile.serial);
                 break;
             }
         }
@@ -171,6 +181,8 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     // Handle 3 is for controlling the device
     else if(input == 0 && output == 0 && feature == 64)
         kb->handles[3] = device;
+    else
+        printf("Warning: Got unknown handle\n");
 
     // If all handles have been set up, finish initializing the keyboard
     if(kb->handles[0] && kb->handles[1] && kb->handles[2] && kb->handles[3])

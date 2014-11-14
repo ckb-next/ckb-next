@@ -22,9 +22,9 @@ void setinput(usbdevice* kb, int input);
 // Find a connected USB device. Returns 0 if not found
 usbdevice* findusb(const char* serial);
 // Find a USB device from storage. Returns 0 if not found
-usbsetting* findstore(const char* serial);
+usbprofile* findstore(const char* serial);
 // Add a USB device to storage. Returns an existing device if found or a new one if not.
-usbsetting* addstore(const char* serial);
+usbprofile* addstore(const char* serial, int autosetup);
 
 // Get a mode from a profile. The mode will be created if it didn't already exist.
 usbmode* getusbmode(int id, usbprofile* profile, const key* keymap);
@@ -43,8 +43,8 @@ void genid(usbid* id);
 // Updates an ID's modification
 void updatemod(usbid* id);
 
-// Loads the profile name from hardware
-void hwloadprofile(usbdevice* kb);
+// Loads the profile name from hardware. apply = 1 to apply/activate hardware profile, 1 to simply store it.
+int hwloadprofile(usbdevice* kb, int apply);
 // Saves the profile name to hardware
 void hwsaveprofile(usbdevice* kb);
 

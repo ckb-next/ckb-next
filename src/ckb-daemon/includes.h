@@ -21,8 +21,9 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
-// Unsigned char definition
+// Unsigned char/short definition
 typedef unsigned char uchar;
+typedef unsigned short ushort;
 // Gets the index of an object within an array
 #define INDEX_OF(entry, array) (int)(((unsigned long)(entry) - (unsigned long)(array)) / sizeof(*entry))
 

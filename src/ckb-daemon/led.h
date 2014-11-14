@@ -10,8 +10,8 @@ void initrgb(keylight* light);
 void updatergb(usbdevice* kb);
 // Saves RGB data for a device profile.
 void savergb(usbdevice* kb, int mode);
-// Loads RGB data for a device profile.
-void loadrgb(usbdevice* kb, int mode);
+// Loads RGB data for a device profile. Returns 0 on success.
+int loadrgb(usbdevice* kb, keylight* light, int mode);
 
 // Turns LEDs off
 void cmd_rgboff(usbmode* mode);

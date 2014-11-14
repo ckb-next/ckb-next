@@ -28,10 +28,10 @@ void quit(){
             closeusb(keyboard + i);
         }
     }
-    pthread_mutex_unlock(&kblistmutex);
     pthread_mutex_timedlock(&keyboard[0].mutex, &timeout);
     closeusb(keyboard);
     usbdeinit();
+    pthread_mutex_unlock(&kblistmutex);
 }
 
 void sighandler2(int type){
@@ -124,7 +124,9 @@ int main(int argc, char** argv){
     pthread_create(&sigthread, 0, sigmain, 0);
 
     int frame = 0;
+    struct timespec time, nexttime;
     while(1){
+        clock_gettime(CLOCK_MONOTONIC, &time);
         // No need to run most of these functions on every single frame
         if(!frame){
             // Process FIFOs
@@ -144,10 +146,13 @@ int main(int argc, char** argv){
                 pthread_mutex_lock(&keyboard[i].mutex);
                 if(usbdequeue(keyboard + i) == 0){
                     printf("Device ckb%d not responding, trying to reset...\n", i);
-                    if(resetusb(keyboard + i))
+                    if(resetusb(keyboard + i)){
+                        printf("Reset failed\n");
                         closeusb(keyboard + i);
-                    else
+                    } else {
+                        printf("Reset success\n");
                         updateindicators(keyboard + i, 1);
+                    }
                 } else {
                     // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
                     // immediately and may be changed externally by the OS.
@@ -159,7 +164,19 @@ int main(int argc, char** argv){
         }
         pthread_mutex_unlock(&kblistmutex);
         // Sleep for long enough to achieve the desired frame rate (5 packets per frame).
-        usleep(1000000 / fps / 5);
+        long newnsec = time.tv_nsec + 1000000000 / fps / 5;
+        nexttime.tv_sec = time.tv_sec + newnsec / 1000000000;
+        nexttime.tv_nsec = newnsec % 1000000000;
+        // Don't ever sleep for less than 1.5ms. It can lock the keyboard.
+        clock_gettime(CLOCK_MONOTONIC, &time);
+        newnsec = time.tv_nsec + 1500000;
+        time.tv_sec += newnsec / 1000000000;
+        time.tv_nsec = newnsec % 1000000000;
+        // Sleep for whichever time period is greater. Restart the sleep if it gets interrupted.
+        if(nexttime.tv_sec > time.tv_sec || (nexttime.tv_sec == time.tv_sec && nexttime.tv_nsec > time.tv_nsec))
+            while(clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nexttime, 0) == EINTR);
+        else
+            while(clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, 0) == EINTR);
         frame = (frame + 1) % 5;
     }
     quit();

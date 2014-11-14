@@ -18,7 +18,7 @@ int usbinit();
 void usbdeinit();
 
 // Set up a USB device after all its handles are open. Returns 0 on success
-// Threading: Creates device mutex. Locks it until finished.
+// Threading: Creates device mutex and locks it. Unlocks mutex ONLY if return is -1 (software error). Unlock manually otherwise.
 int setupusb(usbdevice* kb);
 // Close a USB device and remove device entry. Returns 0 on success
 // Threading: Lock the device mutex BEFORE calling this. It will be released.

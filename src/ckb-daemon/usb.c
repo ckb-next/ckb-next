@@ -5,6 +5,9 @@
 #include "notify.h"
 #include "usb.h"
 
+// OS-specific USB reset
+extern int os_resetusb(usbdevice* kb);
+
 int usbqueue(usbdevice* kb, uchar* messages, int count){
     // Don't add messages unless the queue has enough room for all of them
     if(!kb->handle || kb->queuecount + count > QUEUE_LEN)
@@ -39,24 +42,54 @@ int setupusb(usbdevice* kb){
     for(int q = 0; q < QUEUE_LEN; q++)
         kb->queue[q] = malloc(MSG_SIZE);
 
+    // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
+    // This packet disables their hardware-based functions.
+    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02 };
+    usbqueue(kb, msg, 1);
+
     // Set all keys to use the Corsair input. HID input is unused.
     setinput(kb, IN_CORSAIR);
 
     // Restore profile (if any)
-    usbsetting* store = findstore(kb->setting.serial);
+    usbprofile* store = findstore(kb->profile.serial);
     if(store){
-        memcpy(&kb->setting, store, sizeof(*store));
+        memcpy(&kb->profile, store, sizeof(*store));
+        if(hwloadprofile(kb, 0))
+            return -2;
     } else {
         // If there is no profile, load it from the device
-        kb->setting.keymap = keymap_system;
-        kb->setting.profile.currentmode = getusbmode(0, &kb->setting.profile, keymap_system);
-        getusbmode(1, &kb->setting.profile, keymap_system);
-        getusbmode(2, &kb->setting.profile, keymap_system);
-        hwloadprofile(kb);
+        kb->profile.keymap = keymap_system;
+        kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
+        getusbmode(1, &kb->profile, keymap_system);
+        getusbmode(2, &kb->profile, keymap_system);
+        if(hwloadprofile(kb, 1))
+            return -2;
     }
     updatergb(kb);
-    pthread_mutex_unlock(&kb->mutex);
     return 0;
+}
+
+int resetusb(usbdevice* kb){
+    // Perform a USB reset
+    int res = os_resetusb(kb);
+    if(res)
+        return res;
+    // Empty the queue. Re-send the software key message as well as the input mode.
+    kb->queuecount = 0;
+    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02 };
+    usbqueue(kb, msg, 1);
+    setinput(kb, IN_CORSAIR);
+    updatergb(kb);
+    // If the hardware profile hasn't been loaded yet, load it here
+    res = 0;
+    if(!kb->profile.hw){
+        if(findstore(kb->profile.serial))
+            res = hwloadprofile(kb, 0);
+        else
+            res = hwloadprofile(kb, 1);
+    }
+    updatergb(kb);
+    return res;
 }
 
 int closeusb(usbdevice* kb){
@@ -64,14 +97,14 @@ int closeusb(usbdevice* kb){
     if(!kb->infifo)
         return 0;
     if(kb->handle){
-        printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->setting.serial);
+        printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
         inputclose(kb);
         // Delete USB queue
         for(int i = 0; i < QUEUE_LEN; i++)
             free(kb->queue[i]);
         // Move the profile data into the device store
-        usbsetting* store = addstore(kb->setting.serial);
-        memcpy(&store->profile, &kb->setting.profile, sizeof(kb->setting.profile));
+        usbprofile* store = addstore(kb->profile.serial, 0);
+        memcpy(store, &kb->profile, sizeof(kb->profile));
         // Close USB device
         closehandle(kb);
         updateconnected();

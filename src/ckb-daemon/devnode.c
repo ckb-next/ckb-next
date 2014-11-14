@@ -42,7 +42,7 @@ void updateconnected(){
     for(int i = 1; i < DEV_MAX; i++){
         if(IS_ACTIVE(keyboard + i)){
             written = 1;
-            fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].setting.serial, keyboard[i].name);
+            fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].profile.serial, keyboard[i].name);
         }
     }
     if(!written)
@@ -95,7 +95,7 @@ int makedevpath(usbdevice* kb){
         }
         FILE* sfile = fopen(spath, "w");
         if(sfile){
-            fputs(kb->setting.serial, sfile);
+            fputs(kb->profile.serial, sfile);
             fputc('\n', sfile);
             fclose(sfile);
             chmod(spath, S_READ);
@@ -151,7 +151,7 @@ int rmnotifynode(usbdevice* kb, int notify){
     return remove(outpath);
 }
 
-#define MAX_BUFFER (64 * 1024 - 1)
+#define MAX_BUFFER (128 * 1024 - 1)
 unsigned readlines(int fd, const char** input){
     // Allocate static buffers to store data
     static int buffersize = 4095;
@@ -170,7 +170,9 @@ unsigned readlines(int fd, const char** input){
         return 0;
     }
     // Continue buffering until all available input is read or there's no room left
-    while(length == buffersize || buffersize >= MAX_BUFFER){
+    while(length == buffersize){
+        if(buffersize == MAX_BUFFER)
+            break;
         int oldsize = buffersize;
         buffersize += 4096;
         buffer = realloc(buffer, buffersize + 1);
@@ -197,9 +199,9 @@ unsigned readlines(int fd, const char** input){
     } else {
         // If it wasn't found at all, process the whole buffer next time
         *input = 0;
-        if(length != MAX_BUFFER){
+        if(length == MAX_BUFFER){
             // Unless the buffer is completely full, in which case discard it
-            printf("Warning: Too much input (64KB). Dropping.\n");
+            printf("Warning: Too much input (128KB). Dropping.\n");
             return 0;
         }
         leftover = 0;
@@ -212,9 +214,8 @@ void readcmd(usbdevice* kb, const char* line){
     char word[strlen(line) + 1];
     int wordlen;
     // Read settings from the device
-    usbsetting* set = (IS_ACTIVE(kb) ? &kb->setting : 0);
-    const key* keymap = (set ? set->keymap : keymap_system);
-    usbprofile* profile = (set ? &set->profile : 0);
+    usbprofile* profile = (IS_ACTIVE(kb) ? &kb->profile : 0);
+    const key* keymap = (profile ? profile->keymap : keymap_system);
     usbmode* mode = (profile ? profile->currentmode : 0);
     cmd command = NONE;
     cmdhandler handler = 0;
@@ -242,7 +243,7 @@ void readcmd(usbdevice* kb, const char* line){
             command = NONE;
             handler = 0;
             if(profile)
-                hwloadprofile(kb);
+                hwloadprofile(kb, 1);
             rgbchange = 1;
         } else if(!strcmp(word, "hwsave")){
             command = NONE;
@@ -261,7 +262,7 @@ void readcmd(usbdevice* kb, const char* line){
             handler = 0;
             if(profile){
                 eraseprofile(profile);
-                mode = profile->currentmode = getusbmode(0, profile, keymap);
+                mode = profile->currentmode;
             }
             rgbchange = 1;
             continue;
@@ -341,14 +342,13 @@ void readcmd(usbdevice* kb, const char* line){
                 usbdevice* found = findusb(word);
                 if(found){
                     kb = found;
-                    set = &kb->setting;
+                    profile = &kb->profile;
                 } else {
                     // If the device isn't plugged in, find (or add) it to storage
                     kb = 0;
-                    set = addstore(word);
+                    profile = addstore(word, 1);
                 }
-                keymap = (set ? set->keymap : keymap_system);
-                profile = (set ? &set->profile : 0);
+                keymap = (profile ? profile->keymap : keymap_system);
                 mode = (profile ? profile->currentmode : 0);
             }
             continue;
@@ -358,7 +358,7 @@ void readcmd(usbdevice* kb, const char* line){
                 continue;
             if(profile){
                 // If applied to a device, reset all key bindings to the new key map
-                keymap = set->keymap = newkeymap;
+                keymap = profile->keymap = newkeymap;
                 for(int i = 0; i < profile->modecount; i++){
                     usbmode* mode = profile->mode + i;
                     closebind(&mode->bind);

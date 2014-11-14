@@ -45,7 +45,7 @@ The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They 
 
 In a terminal shell, you can do this with e.g. `echo foo > /dev/input/ckb1/cmd`. Programmatically, you can open and write them as regular files. When programming, you must append a newline character and flush the output before your command(s) will actually be read.
 
-The `device` command, followed by the keyboard's serial number, specifies which keyboard to control. It is only required when issuing commands to `ckb0` or when controlling a keyboard that is not plugged in. In all other cases, the device is inferred from the control path. Additionally, the following commands may be issued to `ckb0` without any device: `layout`, `notifyon`, and `notifyoff`. See below for documentation.
+The `device` command, followed by the keyboard's serial number, specifies which keyboard to control. It is only required when issuing commands to `ckb0` or when controlling a keyboard that is not plugged in. In all other cases, the device is inferred from the control path. Additionally, the following commands may be issued to `ckb0` without any device: `layout`, `fps`, `notifyon`, and `notifyoff`. See below for documentation.
 
 Keyboard layout
 ---------------

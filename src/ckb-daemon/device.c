@@ -4,38 +4,40 @@
 
 usbdevice keyboard[DEV_MAX];
 pthread_mutex_t kblistmutex = PTHREAD_MUTEX_INITIALIZER;
-usbsetting* store = 0;
+usbprofile* store = 0;
 int storecount = 0;
 
 usbdevice* findusb(const char* serial){
     for(int i = 0; i < DEV_MAX; i++){
-        if(keyboard[i].infifo && !strcmp(serial, keyboard[i].setting.serial))
+        if(keyboard[i].infifo && !strcmp(serial, keyboard[i].profile.serial))
             return keyboard + i;
     }
     return 0;
 }
 
-usbsetting* findstore(const char* serial){
+usbprofile* findstore(const char* serial){
     for(int i = 0; i < storecount; i++){
-        usbsetting* res = store + i;
+        usbprofile* res = store + i;
         if(!strcmp(res->serial, serial))
             return res;
     }
     return 0;
 }
 
-usbsetting* addstore(const char* serial){
+usbprofile* addstore(const char* serial, int autosetup){
     // Try to find the device before adding it
-    usbsetting* res = findstore(serial);
+    usbprofile* res = findstore(serial);
     if(res)
         return res;
     // Add device to the list
-    store = realloc(store, ++storecount * sizeof(usbsetting));
+    store = realloc(store, ++storecount * sizeof(usbprofile));
     res = store + storecount - 1;
     // Initialize device
-    memset(&res->profile, 0, sizeof(res->profile));
+    memset(res, 0, sizeof(*res));
+    if(autosetup)
+        eraseprofile(res);
     strcpy(res->serial, serial);
-    genid(&res->profile.id);
+    genid(&res->id);
     return res;
 }
 
@@ -124,6 +126,10 @@ void eraseprofile(usbprofile* profile){
     free(profile->mode);
     memset(profile, 0, sizeof(*profile));
     genid(&profile->id);
+    // There need to be at least three profiles or some functions might crash
+    profile->currentmode = getusbmode(0, profile, profile->keymap);
+    getusbmode(1, profile, profile->keymap);
+    getusbmode(2, profile, profile->keymap);
 }
 
 void genid(usbid* id){
@@ -148,90 +154,136 @@ void updatemod(usbid* id){
     memcpy(id->modified, &new, 2);
 }
 
-void hwloadmode(usbdevice* kb, int mode){
-    // Ask for mode's name
-    usbmode* kbmode = kb->setting.profile.mode + mode;
-    uchar data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
-    usbqueue(kb, data_pkt, 1);
-    usleep(3333);
-    usbdequeue(kb);
-    // Wait for the response
-    usbinput(kb, data_pkt);
-    if(data_pkt[0] == 0x0e && data_pkt[1] == 0x01)
-        memcpy(kbmode->name, data_pkt + 4, MD_NAME_LEN * 2);
-    // Load the RGB setting
-    loadrgb(kb, mode);
+// Converts a hardware profile to a native profile
+void hwtonative(usbprofile* profile, hwprofile* hw, int modes){
+    // Copy the profile and mode names
+    memcpy(profile->name, hw->name[0], PR_NAME_LEN * 2);
+    for(int i = 0; i < modes; i++)
+        memcpy(profile->mode[i].name, hw->name[i + 1], MD_NAME_LEN * 2);
+    // Copy the profile and mode IDs
+    memcpy(&profile->id, hw->id, sizeof(*hw->id));
+    for(int i = 0; i < modes; i++)
+        memcpy(&profile->mode[i].id, hw->id + i + 1, sizeof(*hw->id));
+    // Copy the key lighting
+    for(int i = 0; i < modes; i++)
+        memcpy(&profile->mode[i].light, hw->light + i, sizeof(*hw->light));
 }
 
-void hwloadprofile(usbdevice* kb){
+// Converts a native profile to a hardware profile
+void nativetohw(usbprofile* profile, hwprofile* hw, int modes){
+    // Copy the profile and mode names
+    memcpy(hw->name[0], profile->name, PR_NAME_LEN * 2);
+    for(int i = 0; i < modes; i++)
+        memcpy(hw->name[i + 1], profile->mode[i].name, MD_NAME_LEN * 2);
+    // Copy the profile and mode IDs
+    memcpy(hw->id, &profile->id, sizeof(*hw->id));
+    for(int i = 0; i < modes; i++)
+        memcpy(hw->id + i + 1, &profile->mode[i].id, sizeof(*hw->id));
+    // Copy the key lighting
+    for(int i = 0; i < modes; i++)
+        memcpy(hw->light + i, &profile->mode[i].light, sizeof(*hw->light));
+}
+
+int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
+    // Ask for mode's name
+    uchar data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
+    usbqueue(kb, data_pkt, 1);
+    usleep(3000);
+    if(!usbdequeue(kb))
+        return -1;
+    // Wait for the response
+    if(!usbinput(kb, data_pkt))
+        return -1;
+    memcpy(hw->name + mode + 1, data_pkt + 4, MD_NAME_LEN * 2);
+    // Load the RGB setting
+    return loadrgb(kb, hw->light + mode, mode);
+}
+
+int hwloadprofile(usbdevice* kb, int apply){
     if(!IS_ACTIVE(kb))
-        return;
+        return 0;
+    // Free the existing profile (if any)
+    if(kb->profile.hw){
+        free(kb->profile.hw);
+        kb->profile.hw = 0;
+    }
     // Empty the board's USB queue
     while(kb->queuecount > 0){
-        usleep(3333);
-        usbdequeue(kb);
+        usleep(3000);
+        if(!usbdequeue(kb))
+            return -1;
     }
-    // Ask for profile ID
-    usbprofile* profile = &kb->setting.profile;
+    hwprofile* hw = calloc(1, sizeof(hwprofile));
+    // Ask for profile and mode IDs
     uchar data_pkt[2][MSG_SIZE] = {
         { 0x0e, 0x15, 0x01, 0 },
         { 0x0e, 0x16, 0x01, 0 }
     };
     uchar in_pkt[MSG_SIZE];
-    usbqueue(kb, data_pkt[0], 1);
-    usleep(3333);
-    usbdequeue(kb);
-    // Wait for the response
-    usbinput(kb, in_pkt);
-    memcpy(&profile->id, in_pkt + 4, sizeof(usbid));
-    // Ask for mode IDs
     int modes = (kb->model == 95 ? 3 : 1);
-    for(int i = 0; i < modes; i++){
-        data_pkt[0][3] = i + 1;
+    for(int i = 0; i <= modes; i++){
+        data_pkt[0][3] = i;
         usbqueue(kb, data_pkt[0], 1);
-        usleep(3333);
-        usbdequeue(kb);
+        usleep(3000);
+        if(!usbdequeue(kb)){
+            free(hw);
+            return -1;
+        }
         // Wait for the response
-        usbinput(kb, in_pkt);
-        memcpy(&profile->mode[i].id, in_pkt + 4, sizeof(usbid));
+        if(!usbinput(kb, in_pkt)){
+            free(hw);
+            return -1;
+        }
+        memcpy(hw->id + i, in_pkt + 4, sizeof(usbid));
     }
     // Ask for profile name
     usbqueue(kb, data_pkt[1], 1);
-    usleep(3333);
-    usbdequeue(kb);
+    usleep(3000);
+    if(!usbdequeue(kb)){
+        free(hw);
+        return -1;
+    }
     // Wait for the response
-    usbinput(kb, in_pkt);
-    memcpy(kb->setting.profile.name, in_pkt + 4, PR_NAME_LEN * 2);
+    if(!usbinput(kb, in_pkt)){
+        free(hw);
+        return -1;
+    }
+    memcpy(hw->name[0], in_pkt + 4, PR_NAME_LEN * 2);
     // Load modes
-    for(int i = 0; i < modes; i++)
-        hwloadmode(kb, i);
+    for(int i = 0; i < modes; i++){
+        if(hwloadmode(kb, hw, i)){
+            free(hw);
+            return -1;
+        }
+    }
+    kb->profile.hw = hw;
+    // Make the profile active (if requested)
+    if(apply)
+        hwtonative(&kb->profile, hw, modes);
+    return 0;
 }
 
 void hwsaveprofile(usbdevice* kb){
     if(!IS_ACTIVE(kb))
         return;
-    // Save the profile name
-    usbprofile* profile = &kb->setting.profile;
+    hwprofile* hw = kb->profile.hw;
+    int modes = (kb->model == 95 ? 3 : 1);
+    nativetohw(&kb->profile, hw, modes);
+    // Save the profile and mode names
     uchar data_pkt[2][MSG_SIZE] = {
         {0x07, 0x16, 0x01, 0 },
-        {0x07, 0x15, 0x01, 0, 1, 2, 3, 4, 5 },
-    };
-    memcpy(data_pkt[0] + 4, profile->name, PR_NAME_LEN * 2);
-    usbqueue(kb, data_pkt[0], 1);
+        {0x07, 0x15, 0x01, 0 },
+    };;
     // Save the mode names
-    int modes = (kb->model == 95 ? 3 : 1);
-    for(int i = 0; i < modes; i++){
-        data_pkt[0][3] = i + 1;
-        memcpy(data_pkt[0] + 4, profile->mode[i].name, MD_NAME_LEN * 2);
+    for(int i = 0; i <= modes; i++){
+        data_pkt[0][3] = i;
+        memcpy(data_pkt[0] + 4, hw->name[i], MD_NAME_LEN * 2);
         usbqueue(kb, data_pkt[0], 1);
     }
-    // Save the profile ID
-    memcpy(data_pkt[1] + 4, &profile->id, sizeof(usbid));
-    usbqueue(kb, data_pkt[1], 1);
-    // Save the mode IDs
-    for(int i = 0; i < modes; i++){
-        data_pkt[1][3] = i + 1;
-        memcpy(data_pkt[1] + 4, &profile->mode[i].id, sizeof(usbid));
+    // Save the IDs
+    for(int i = 0; i <= modes; i++){
+        data_pkt[1][3] = i;
+        memcpy(data_pkt[1] + 4, hw->id + i, sizeof(usbid));
         usbqueue(kb, data_pkt[1], 1);
     }
     // Save the RGB data

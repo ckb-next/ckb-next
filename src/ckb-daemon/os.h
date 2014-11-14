@@ -44,7 +44,15 @@
 #include <Carbon/Carbon.h>
 #include <IOKit/hid/IOHIDLib.h>
 
+// Various POSIX functions that aren't present on OSX
+
 void *memrchr(const void *s, int c, size_t n);
+
+#define CLOCK_MONOTONIC 1
+#define TIMER_ABSTIME   1
+typedef int clockid_t;
+int clock_gettime(clockid_t clk_id, struct timespec *tp);
+int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp, struct timespec *rmtp);
 
 #endif  // OS_MAC
 

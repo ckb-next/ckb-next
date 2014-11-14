@@ -1,4 +1,5 @@
 #include "led.h"
+#include "device.h"
 
 void initrgb(keylight* light){
     // Allocate colors. Default to all white.
@@ -26,7 +27,7 @@ void makergb(const keylight* light, uchar data_pkt[5][MSG_SIZE]){
 }
 
 void updatergb(usbdevice* kb){
-    if(!kb)
+    if(!IS_ACTIVE(kb))
         return;
 
     uchar data_pkt[5][MSG_SIZE] = {
@@ -37,7 +38,7 @@ void updatergb(usbdevice* kb){
         { 0x07, 0x27, 0x00, 0x00, 0xD8 }
     };
 
-    makergb(&kb->setting.profile.currentmode->light, data_pkt);
+    makergb(&kb->profile.currentmode->light, data_pkt);
     usbqueue(kb, data_pkt[0], 5);
 }
 
@@ -50,11 +51,11 @@ void savergb(usbdevice* kb, int mode){
         { 0x07, 0x14, 0x02, 0x00, 0x01, mode + 1 }
     };
 
-    makergb(&kb->setting.profile.mode[mode].light, data_pkt);
+    makergb(&kb->profile.mode[mode].light, data_pkt);
     usbqueue(kb, data_pkt[0], 5);
 }
 
-void loadrgb(usbdevice* kb, int mode){
+int loadrgb(usbdevice* kb, keylight* light, int mode){
     uchar data_pkt[5][MSG_SIZE] = {
         { 0x0e, 0x14, 0x02, 0x01, 0x01, mode + 1, 0 },
         { 0xff, 0x01, 0x3c, 0 },
@@ -63,17 +64,19 @@ void loadrgb(usbdevice* kb, int mode){
         { 0xff, 0x04, 0x24, 0 },
     };
     usbqueue(kb, data_pkt[0], 1);
-    usleep(3333);
-    usbdequeue(kb);
+    usleep(3000);
+    if(!usbdequeue(kb))
+        return -1;
     for(int i = 1; i < 5; i++){
         usbqueue(kb, data_pkt[i], 1);
-        usleep(3333);
-        usbdequeue(kb);
+        usleep(3000);
+        if(!usbdequeue(kb))
+            return -1;
         // Wait for the response
-        usbinput(kb, data_pkt[i]);
+        if(!usbinput(kb, data_pkt[i]))
+            return -1;
     }
     // Copy the data back to the mode
-    keylight* light = &kb->setting.profile.mode[mode].light;
     char* r = light->r, *g = light->g, *b = light->b;
     memcpy(r, data_pkt[1] + 4, 60);
     memcpy(r + 60, data_pkt[2] + 4, 12);
@@ -81,6 +84,8 @@ void loadrgb(usbdevice* kb, int mode){
     memcpy(g + 48, data_pkt[3] + 4, 24);
     memcpy(b, data_pkt[3] + 28, 36);
     memcpy(b + 36, data_pkt[4] + 4, 36);
+    light->enabled = 1;
+    return 0;
 }
 
 #define MAX_WORDS 3

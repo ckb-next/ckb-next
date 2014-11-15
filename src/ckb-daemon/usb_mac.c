@@ -73,12 +73,6 @@ void openusb(usbdevice* kb){
     kb->lastkeypress = -1;
     kb->handle = kb->handles[3];
 
-    // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode. This packet disables their
-    // hardware-based functions.
-    uchar datapkt[MSG_SIZE] = { 0x07, 0x04, 0x02 };
-    // TODO: Handle control errors here
-    IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, datapkt, MSG_SIZE);
-
     // Set up the device
     int setup = setupusb(kb);
     if(setup == -1){

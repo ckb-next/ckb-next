@@ -148,7 +148,9 @@ int openusb(struct udev_device* dev, int model){
             if(kb->handle <= 0){
                 printf("Error: Failed to open USB device: %s\n", strerror(errno));
                 closehandle(kb);
-                connectstatus |= 2;
+                // Don't try again if it failed with ENOENT or EINVAL
+                if(errno != ENOENT && errno != EINVAL)
+                    connectstatus |= 2;
                 return -1;
             }
 
@@ -267,7 +269,8 @@ void udevenum(){
 void* udevmain(void* context){
     // Enumerate all currently connected devices
     udevenum();
-    while(connectstatus & 2){
+    int tries = 0;
+    while((connectstatus & 2) && ++tries < 5){
         // If a device failed to connect, enumerate again to make sure we reconnect it (if possible)
         printf("Trying again...\n");
         connectstatus = 0;
@@ -311,7 +314,8 @@ void* udevmain(void* context){
                     usleep(100000);
                     connectstatus = 0;
                     udevenum();
-                    while(connectstatus & 2){
+                    tries = 0;
+                    while((connectstatus & 2) && ++tries < 5){
                         // If a device failed to connect, enumerate again to make sure we reconnect it (if possible)
                         printf("Trying again...\n");
                         connectstatus = 0;

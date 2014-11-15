@@ -75,7 +75,7 @@ int main(int argc, char** argv){
     for(int i = 1; i < argc; i++){
         char* argument = argv[i];
         char layout[10];
-        unsigned newfps;
+        unsigned newfps, newgid;
         if(sscanf(argument, "--fps=%u", &newfps) == 1){
             // Set FPS
             setfps(newfps);
@@ -83,6 +83,10 @@ int main(int argc, char** argv){
             // Set keyboard layout
             keymap_system = getkeymap(layout);
             printf("Setting default layout: %s\n", layout);
+        } else if(sscanf(argument, "--gid=%u", &newgid) == 1){
+            // Set dev node GID
+            gid = newgid;
+            printf("Setting /dev node gid: %u\n", newgid);
         }
     }
 

@@ -11,6 +11,8 @@ const char *const devpath = "/dev/input/ckb";
 const char *const devpath = "/tmp/ckb";
 #endif
 
+long uid = -1, gid = -1;
+
 int rm_recursive(const char* path){
     DIR* dir = opendir(path);
     if(!dir)
@@ -48,7 +50,9 @@ void updateconnected(){
     if(!written)
         fputc('\n', cfile);
     fclose(cfile);
-    chmod(cpath, S_READ);
+    chmod(cpath, gid >= 0 ? S_CUSTOM_R : S_READ);
+    if(gid >= 0)
+        chown(cpath, 0, gid);
 }
 
 int makedevpath(usbdevice* kb){
@@ -65,15 +69,19 @@ int makedevpath(usbdevice* kb){
         rm_recursive(path);
         return -1;
     }
+    if(gid >= 0)
+        chown(path, 0, gid);
     // Create command FIFO
     char inpath[sizeof(path) + 4];
     snprintf(inpath, sizeof(inpath), "%s/cmd", path);
-    if(mkfifo(inpath, S_READWRITE) != 0 || (kb->infifo = open(inpath, O_RDONLY | O_NONBLOCK)) <= 0){
+    if(mkfifo(inpath, gid >= 0 ? S_CUSTOM : S_READWRITE) != 0 || (kb->infifo = open(inpath, O_RDONLY | O_NONBLOCK)) <= 0){
         printf("Error: Unable to create %s: %s\n", inpath, strerror(errno));
         rm_recursive(path);
         kb->infifo = 0;
         return -1;
     }
+    if(gid >= 0)
+        fchown(kb->infifo, 0, gid);
     // Create notification FIFO
     mknotifynode(kb, 0);
     if(kb->model == -1){
@@ -89,18 +97,24 @@ int makedevpath(usbdevice* kb){
             fputs(kb->name, mfile);
             fputc('\n', mfile);
             fclose(mfile);
-            chmod(mpath, S_READ);
+            chmod(mpath, gid >= 0 ? S_CUSTOM_R : S_READ);
+            if(gid >= 0)
+                chown(mpath, 0, gid);
         } else {
             printf("Warning: Unable to create %s: %s\n", mpath, strerror(errno));
+            remove(mpath);
         }
         FILE* sfile = fopen(spath, "w");
         if(sfile){
             fputs(kb->profile.serial, sfile);
             fputc('\n', sfile);
             fclose(sfile);
-            chmod(spath, S_READ);
+            chmod(spath, gid >= 0 ? S_CUSTOM_R : S_READ);
+            if(gid >= 0)
+                chown(spath, 0, gid);
         } else {
             printf("Warning: Unable to create %s: %s\n", spath, strerror(errno));
+            remove(spath);
         }
     }
     return 0;
@@ -130,11 +144,14 @@ int mknotifynode(usbdevice* kb, int notify){
     int index = INDEX_OF(kb, keyboard);
     char outpath[strlen(devpath) + 10];
     snprintf(outpath, sizeof(outpath), "%s%d/notify%d", devpath, index, notify);
-    if(mkfifo(outpath, S_READWRITE) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK)) <= 0){
+    if(mkfifo(outpath, gid >= 0 ? S_CUSTOM_R : S_READ) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK)) <= 0){
         printf("Warning: Unable to create %s: %s\n", outpath, strerror(errno));
         kb->outfifo[notify] = 0;
+        remove(outpath);
         return -1;
     }
+    if(gid >= 0)
+        fchown(kb->outfifo[notify], 0, gid);
     return 0;
 }
 

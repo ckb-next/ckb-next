@@ -155,6 +155,9 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :hello` simply prints `hello` to the notification nodes. This may be useful to determine whether or not the daemon is responding. It can only be issued to `ckb0` with no `device` command; in any other circumstance, it will be ignored.
 - `get :fps` gets the current frame rate. Returns `fps <rate>`. Like `:hello`, this will be ignored if it is issued to an actual keyboard.
 - `get :layout` gets the current keyboard layout. Returns `layout <country>`. This may be issued to `ckb0` to get the default layout or to any keyboard to get the keyboard's layout.
+- `get :mode` returns the current mode in the form of a `switch` command. (Note: Do not use this in a line containing a `mode` command or it will return the mode that you selected, rather than the keyboard's current mode).
+- `get :rgb` returns an `rgb` command equivalent to the current RGB state of the current mode. To see the RGB settings for another mode, use `mode <n> get :rgb`. Keep in mind that the keyboard hardware has a very limited color precision, so a command like `rgb 123456 get :rgb` may not output `rgb 123456`. The only guarantee is that it will output the RGB color as seen by the keyboard.
+- `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile (**Note:** This may not be accurate after loading from the hardware. See Caveats section). The output is the same except that it says `hwrgb` instead of `rgb`.
 
 Security
 --------

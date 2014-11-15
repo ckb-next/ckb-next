@@ -95,7 +95,91 @@ int loadrgb(usbdevice* kb, keylight* light, int mode){
     return 0;
 }
 
-#define MAX_WORDS 3
+// Generates data for an RGB command to match the given RGB data. Returns a string like "ff0000" or "w:ff0000 a:00ff00 ..."
+// The result must be freed later.
+char* printrgb(keylight* light, const key* keymap){
+    int length = 0;
+    // Unpack LED data back to 8bpc format.
+    uchar r[N_KEYS], g[N_KEYS], b[N_KEYS];
+    char* mr = light->r;
+    char* mg = light->g;
+    char* mb = light->b;
+    for(int i = 0; i < N_KEYS; i++){
+        // Translate the RGB index to a key index using the key map
+        int k = keymap[i].led;
+        if(k < 0)
+            continue;
+        if(k & 1){
+            r[i] = (7 - ((mr[k / 2] & 0xF0) >> 4)) << 5;
+            g[i] = (7 - ((mg[k / 2] & 0xF0) >> 4)) << 5;
+            b[i] = (7 - ((mb[k / 2] & 0xF0) >> 4)) << 5;
+        } else {
+            r[i] = (7 - (mr[k / 2] & 0x0F)) << 5;
+            g[i] = (7 - (mg[k / 2] & 0x0F)) << 5;
+            b[i] = (7 - (mb[k / 2] & 0x0F)) << 5;
+        }
+
+        // Convert 0xe0 to 0xff (white color)
+        if(r[i] == 0xe0)
+            r[i] = 0xff;
+        if(g[i] == 0xe0)
+            g[i] = 0xff;
+        if(b[i] == 0xe0)
+            b[i] = 0xff;
+    }
+    // Make a buffer to track key names and to filter out duplicates
+    char names[N_KEYS][11];
+    for(int i = 0; i < N_KEYS; i++){
+        const char* name = keymap[i].name;
+        if(!name || keymap[i].led < 0)
+            names[i][0] = 0;
+        else
+            strncpy(names[i], name, 11);
+    }
+    // Check to make sure these aren't all the same color
+    int same = 1;
+    for(int i = 1; i < N_KEYS; i++){
+        if(!names[i][0])
+            continue;
+        if(r[i] != r[0] || g[i] != g[0] || b[i] != b[0]){
+            same = 0;
+            break;
+        }
+    }
+    // If they are, just output that color
+    if(same){
+        char* buffer = malloc(7);
+        snprintf(buffer, 7, "%02x%02x%02x", r[0], g[0], b[0]);
+        return buffer;
+    }
+    const int BUFFER_LEN = 4096;
+    char* buffer = malloc(BUFFER_LEN);
+    for(int i = 0; i < N_KEYS; i++){
+        if(!names[i][0])
+            continue;
+        // Print the key name
+        int newlen = 0;
+        snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%s%n" : " %s%n", names[i], &newlen);
+        length += newlen;
+        // Look ahead to see if any other keys have this color. If so, print them here as well.
+        uchar kr = r[i], kg = g[i], kb = b[i];
+        for(int j = i + 1; j < N_KEYS; j++){
+            if(!names[j][0])
+                continue;
+            if(r[j] != kr || g[j] != kg || b[j] != kb)
+                continue;
+            snprintf(buffer + length, BUFFER_LEN - length, ",%s%n", names[j], &newlen);
+            length += newlen;
+            // Erase the key's name so it won't get printed later
+            names[j][0] = 0;
+        }
+        // Print the color
+        snprintf(buffer + length, BUFFER_LEN - length, ":%02x%02x%02x%n", kr, kg, kb, &newlen);
+        length += newlen;
+    }
+
+    return buffer;
+}
 
 void cmd_rgboff(usbmode* mode){
     mode->light.enabled = 0;

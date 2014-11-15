@@ -73,4 +73,38 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
     } else if(!kb || !mode)
         // Only FPS and layout can be printed without an active mode
         return;
+
+    usbprofile* profile = &kb->profile;
+    if(!strcmp(setting, ":mode")){
+        // Get the current mode number
+        nprintf(kb, 0, mode, "switch\n");
+        return;
+    } else if(!strcmp(setting, ":rgb")){
+        // Get the current RGB settings
+        char* rgb = printrgb(&mode->light, profile->keymap);
+        nprintf(kb, 0, mode, "rgb %s\n", rgb);
+        free(rgb);
+        return;
+    } else if(!strcmp(setting, ":hwrgb")){
+        // Get the current hardware RGB settings
+        unsigned index = INDEX_OF(mode, profile->mode);
+        // Make sure the mode number is valid
+        switch(kb->model){
+        case 95:
+            if(index >= HWMODE_K95)
+                return;
+            break;
+        case 70:
+            if(index >= HWMODE_K70)
+                return;
+            break;
+        default:
+            return;
+        }
+        // Get the mode from the hardware store
+        char* rgb = printrgb(profile->hw->light + index, profile->keymap);
+        nprintf(kb, 0, mode, "hwrgb %s\n", rgb);
+        free(rgb);
+        return;
+    }
 }

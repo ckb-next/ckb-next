@@ -40,7 +40,7 @@ void KbWidget::frameUpdate(){
     static int frame = 0;
     int bg = ui->bgButton->color.rgba() & 0xFFFFFF;
     int fg = ui->fgButton->color.rgba() & 0xFFFFFF;
-    int rate = ui->framerateBox->currentIndex() + 3;
+    int rate = ui->framerateBox->currentIndex() + 1;
     keypos* positions = (ui->layoutBox->currentIndex() == 1) ? positions_uk : positions_us;
     int N_POSITIONS = (positions == positions_uk) ? N_POSITIONS_UK : N_POSITIONS_US;
     if(!(frame++ % rate)){
@@ -152,5 +152,13 @@ void KbWidget::on_lightCheckbox_clicked(bool checked){
         cmd.write("rgb on\n");
     else
         cmd.write("rgb off\n");
+    cmd.flush();
+}
+
+void KbWidget::on_layoutBox_currentIndexChanged(int index){
+    if(index == 1)
+        cmd.write("layout uk\n");
+    else
+        cmd.write("layout us\n");
     cmd.flush();
 }

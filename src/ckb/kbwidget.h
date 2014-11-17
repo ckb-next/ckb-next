@@ -32,6 +32,8 @@ public slots:
 private slots:
     void on_lightCheckbox_clicked(bool checked);
 
+    void on_layoutBox_currentIndexChanged(int index);
+
 private:
     Ui::KbWidget *ui;
 };

@@ -100,7 +100,7 @@ void inputupdate(usbdevice* kb){
                 // Print a notification if desired
                 int notify = mode->notify[byte] & mask;
                 if(notify){
-                    if(map->name && map->led >= 0){
+                    if(map->name && map->led){
                         nprintf(kb, 0, 0, "key %c%s\n", new ? '+' : '-', map->name);
                         if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN))
                             nprintf(kb, 0, 0, "%s up", map->name);

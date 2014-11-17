@@ -147,10 +147,10 @@ int openusb(struct udev_device* dev, int model){
             kb->model = model;
             if(kb->handle <= 0){
                 printf("Error: Failed to open USB device: %s\n", strerror(errno));
-                closehandle(kb);
                 // Don't try again if it failed with ENOENT or EINVAL
-                if(errno != ENOENT && errno != EINVAL)
+                if(errno != ENOENT && errno != ENODEV && errno != EINVAL)
                     connectstatus |= 2;
+                closehandle(kb);
                 return -1;
             }
 

@@ -234,15 +234,15 @@ void readcmd(usbdevice* kb, const char* line){
     const char* newline = 0;
     usbprofile* profile;
     const key* keymap;
-    usbmode* mode;
-    cmd command;
-    cmdhandler handler;
-    int rgbchange = 0;
+    usbmode* mode = 0;
+    cmd command = NONE;
+    cmdhandler handler = 0;
     // Read words from the input
     while(sscanf(line, "%s%n", word, &wordlen) == 1){
         line += wordlen;
         // If we passed a newline, reset the context
         if(line > newline){
+            usbdevice* prevkb = kb;
             kb = kb0;
             profile = (IS_ACTIVE(kb) ? &kb->profile : 0);
             keymap = (profile ? profile->keymap : keymap_system);
@@ -252,6 +252,9 @@ void readcmd(usbdevice* kb, const char* line){
             newline = strchr(line, '\n');
             if(!newline)
                 newline = line + strlen(line);
+            // Send the RGB command to the last device if its colors changed
+            if(kb != prevkb)
+                updatergb(prevkb, 0);
         }
         // Check for a command word
         if(!strcmp(word, "device")){
@@ -267,14 +270,12 @@ void readcmd(usbdevice* kb, const char* line){
             handler = 0;
             if(profile)
                 profile->currentmode = mode;
-            rgbchange = 1;
             continue;
         } else if(!strcmp(word, "hwload")){
             command = NONE;
             handler = 0;
             if(profile)
                 hwloadprofile(kb, 1);
-            rgbchange = 1;
         } else if(!strcmp(word, "hwsave")){
             command = NONE;
             handler = 0;
@@ -285,7 +286,6 @@ void readcmd(usbdevice* kb, const char* line){
             handler = 0;
             if(mode)
                 erasemode(mode, keymap);
-            rgbchange = 1;
             continue;
         } else if(!strcmp(word, "eraseprofile")){
             command = NONE;
@@ -294,7 +294,6 @@ void readcmd(usbdevice* kb, const char* line){
                 eraseprofile(profile);
                 mode = profile->currentmode;
             }
-            rgbchange = 1;
             continue;
         } else if(!strcmp(word, "name")){
             command = NAME;
@@ -331,12 +330,10 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(!strcmp(word, "fps")){
             command = FPS;
             handler = 0;
-            rgbchange = 1;
             continue;
         } else if(!strcmp(word, "rgb")){
             command = RGB;
             handler = cmd_rgb;
-            rgbchange = 1;
             if(mode)
                 updatemod(&mode->id);
             continue;
@@ -374,6 +371,7 @@ void readcmd(usbdevice* kb, const char* line){
         else if(command == DEVICE){
             if(strlen(word) == SERIAL_LEN - 1){
                 usbdevice* found = findusb(word);
+                usbdevice* prevkb = kb;
                 if(found){
                     kb = found;
                     profile = &kb->profile;
@@ -384,6 +382,9 @@ void readcmd(usbdevice* kb, const char* line){
                 }
                 keymap = (profile ? profile->keymap : keymap_system);
                 mode = (profile ? profile->currentmode : 0);
+                // Send the RGB command to the last device if its colors changed
+                if(kb != prevkb)
+                    updatergb(prevkb, 0);
             }
             continue;
         } else if(command == LAYOUT){
@@ -500,7 +501,6 @@ void readcmd(usbdevice* kb, const char* line){
                 position++;
         }
     }
-    if(mode && rgbchange)
-        updatergb(kb);
+    updatergb(kb, 0);
     free(word);
 }

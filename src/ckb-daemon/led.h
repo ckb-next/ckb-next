@@ -7,7 +7,7 @@
 // Initialize RGB data.
 void initrgb(keylight* light);
 // Update a device's LEDs with RGB data.
-void updatergb(usbdevice* kb);
+void updatergb(usbdevice* kb, int force);
 // Saves RGB data for a device profile.
 void savergb(usbdevice* kb, int mode);
 // Loads RGB data for a device profile. Returns 0 on success.

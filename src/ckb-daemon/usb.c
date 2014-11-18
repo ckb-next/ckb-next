@@ -39,6 +39,7 @@ int setupusb(usbdevice* kb){
         pthread_mutex_destroy(&kb->keymutex);
         return -1;
     }
+
     updateindicators(kb, 1);
 
     // Create the USB queue
@@ -47,7 +48,7 @@ int setupusb(usbdevice* kb){
 
     // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
     // This packet disables their hardware-based functions.
-    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02 };
+    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02, 0 };
     usbqueue(kb, msg, 1);
 
     // Set all keys to use the Corsair input. HID input is unused.
@@ -68,7 +69,7 @@ int setupusb(usbdevice* kb){
         if(hwloadprofile(kb, 1))
             return -2;
     }
-    updatergb(kb);
+    updatergb(kb, 1);
     return 0;
 }
 
@@ -79,10 +80,9 @@ int resetusb(usbdevice* kb){
         return res;
     // Empty the queue. Re-send the software key message as well as the input mode.
     kb->queuecount = 0;
-    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02 };
+    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02, 0 };
     usbqueue(kb, msg, 1);
     setinput(kb, IN_CORSAIR);
-    updatergb(kb);
     // If the hardware profile hasn't been loaded yet, load it here
     res = 0;
     if(!kb->profile.hw){
@@ -91,7 +91,7 @@ int resetusb(usbdevice* kb){
         else
             res = hwloadprofile(kb, 1);
     }
-    updatergb(kb);
+    updatergb(kb, 1);
     return res;
 }
 

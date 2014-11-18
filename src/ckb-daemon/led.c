@@ -27,9 +27,15 @@ void makergb(const keylight* light, uchar data_pkt[5][MSG_SIZE]){
     }
 }
 
-void updatergb(usbdevice* kb){
+void updatergb(usbdevice* kb, int force){
     if(!IS_ACTIVE(kb))
         return;
+    // Don't do anything if the lighting hasn't changed
+    keylight* lastlight = &kb->lastlight;
+    keylight* newlight = &kb->profile.currentmode->light;
+    if(!force && !memcmp(lastlight, newlight, sizeof(*lastlight)))
+        return;
+    memcpy(lastlight, newlight, sizeof(*lastlight));
 
     uchar data_pkt[5][MSG_SIZE] = {
         { 0x7f, 0x01, 0x3c, 0 },
@@ -39,7 +45,7 @@ void updatergb(usbdevice* kb){
         { 0x07, 0x27, 0x00, 0x00, 0xD8 }
     };
 
-    makergb(&kb->profile.currentmode->light, data_pkt);
+    makergb(newlight, data_pkt);
     usbqueue(kb, data_pkt[0], 5);
 }
 

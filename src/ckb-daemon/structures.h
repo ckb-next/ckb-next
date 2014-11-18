@@ -141,6 +141,8 @@ typedef struct {
     // Interrupt transfers (keypresses)
     uchar intinput[MSG_SIZE];
     uchar previntinput[N_KEYS / 8];
+    // Last RGB data sent to the device
+    keylight lastlight;
     // Indicator LED state
     uchar ileds;
     // USB output queue

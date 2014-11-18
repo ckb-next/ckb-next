@@ -6,3 +6,4 @@ tmp-*/
 Makefile
 moc_*
 ui_*
+qrc_*

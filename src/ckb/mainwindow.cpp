@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::scanKeyboards(){
     QString rootdev = devpath.arg(0);
     QFile connected(rootdev + "/connected");
-    if(!connected.open(QFile::ReadOnly)){
+    if(!connected.open(QIODevice::ReadOnly)){
         // No root controller
         if(ui->tabWidget->currentWidget() != noKbWidget){
             while(ui->tabWidget->count() > 0)
@@ -58,7 +58,7 @@ void MainWindow::scanKeyboards(){
     // Check if any currently-connected keyboards have been removed
     QList<KbWidget*> kbWidgets2 = kbWidgets;
     foreach(KbWidget* w, kbWidgets2){
-        if(!w->cmd.isOpen()){
+        if(w->cmdpath == ""){
             w->deleteLater();
             ui->tabWidget->removeTab(kbWidgets.indexOf(w));
             kbWidgets.removeAll(w);
@@ -82,7 +82,7 @@ void MainWindow::scanKeyboards(){
             continue;
         // Add the keyboard
         widget = new KbWidget(this, dev);
-        if(!widget->cmd.isOpen()){
+        if(widget->cmdpath == ""){
             delete widget;
             continue;
         }
@@ -103,6 +103,7 @@ void MainWindow::scanKeyboards(){
             w->deleteLater();
         kbWidgets.clear();
     } else if(ui->tabWidget->widget(0) == noKbWidget){
+        // Keyboards found
         // Remove "no keyboard detected" if it's there
         ui->tabWidget->removeTab(0);
     }

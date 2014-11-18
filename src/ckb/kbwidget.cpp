@@ -1,6 +1,7 @@
 #include "kbwidget.h"
 #include "ui_kbwidget.h"
 #include <cmath>
+#include <fcntl.h>
 
 // Keyboard LED positions, measured roughly in 16th inches. Most keys are 3/4" apart.
 struct keypos {
@@ -34,28 +35,30 @@ keypos positions_uk[] = {
 #define N_POSITIONS_UK (sizeof(positions_uk)/sizeof(keypos))
 
 void KbWidget::frameUpdate(){
-    if(!cmd.isOpen())
-        return;
-    static int prevBG = -1;
+    readInput();
+    static int prevBG = -1, prevAnim = -1;
     static int frame = 0;
-    int bg = ui->bgButton->color.rgba() & 0xFFFFFF;
-    int fg = ui->fgButton->color.rgba() & 0xFFFFFF;
+    int bg = bgColor.rgba() & 0xFFFFFF;
+    int fg = fgColor.rgba() & 0xFFFFFF;
     int rate = ui->framerateBox->currentIndex() + 1;
     keypos* positions = (ui->layoutBox->currentIndex() == 1) ? positions_uk : positions_us;
     int N_POSITIONS = (positions == positions_uk) ? N_POSITIONS_UK : N_POSITIONS_US;
     if(!(frame++ % rate)){
-        switch(ui->animBox->currentIndex()){
+        QFile cmd;
+        getCmd(cmd);
+        int anim = ui->animBox->currentIndex();
+        switch(anim){
         case 0:
             // No animation
-            if(bg != prevBG){
+            if(bg != prevBG || prevAnim != anim)
                 cmd.write(QString().sprintf("rgb %06x\n", bg).toLatin1());
-                cmd.flush();
-            }
             break;
         case 1: {
             // Wave
             float size = WIDTH + 36.f;
             static float wavepos = -36.f;
+            if(prevAnim != anim)
+                wavepos = -36.f;
             cmd.write("rgb");
             for(int i = 0; i < N_POSITIONS; i++){
                 float r = (bg >> 16) & 0xFF;
@@ -70,7 +73,6 @@ void KbWidget::frameUpdate(){
                 cmd.write(QString().sprintf(" %s:%02x%02x%02x", positions[i].name, (int)r, (int)g, (int)b).toLatin1());
             }
             cmd.write("\n");
-            cmd.flush();
             wavepos += (size + 36.f) / 2.f / 60.f * rate;
             if(wavepos >= size)
                 wavepos = -36.f;
@@ -81,6 +83,8 @@ void KbWidget::frameUpdate(){
             float size = sqrt(WIDTH*WIDTH/2. + HEIGHT*HEIGHT/2.);
             float cx = WIDTH / 2.f, cy = HEIGHT / 2.f;
             static float ringpos = -36.f;
+            if(prevAnim != anim)
+                ringpos = -36.f;
             cmd.write("rgb");
             for(int i = 0; i < N_POSITIONS; i++){
                 float r = (bg >> 16) & 0xFF;
@@ -95,70 +99,132 @@ void KbWidget::frameUpdate(){
                 cmd.write(QString().sprintf(" %s:%02x%02x%02x", positions[i].name, (int)r, (int)g, (int)b).toLatin1());
             }
             cmd.write("\n");
-            cmd.flush();
             ringpos += (size + 36.f) / 60.f * rate;
             if(ringpos >= size)
                 ringpos = -36.f;
             break;
         }
         }
+        prevAnim = anim;
         prevBG = bg;
+        cmd.close();
+    }
+}
+
+void KbWidget::readInput(){
+    QFile notify;
+    int fd = open(notifypath.toLatin1().constData(), O_RDONLY | O_NONBLOCK);
+    if(notify.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle)){
+        QString line;
+        while((line = notify.readLine()) != ""){
+            QStringList components = line.trimmed().split(" ");
+            if(components[0] == "layout"){
+                if(components[1] == "uk")
+                    ui->layoutBox->setCurrentIndex(1);
+                else if(components[1] == "us")
+                    ui->layoutBox->setCurrentIndex(0);
+            } else if(components[0] == "mode"){
+                if(components[2] == "rgb"){
+                    bool ok;
+                    int rgb = components[3].toInt(&ok, 16);
+                    rgb |= 0xFF000000;
+                    if(ok){
+                        bgColor = QColor((QRgb)rgb);
+                        ui->bgButton->color = bgColor;
+                        ui->bgButton->updateImage();
+                    }
+                }
+            }
+        }
+        notify.close();
     }
 }
 
 KbWidget::KbWidget(QWidget *parent, const QString &path) :
-    QWidget(parent), devpath(path), cmd(path + "/cmd"),
+    QWidget(parent), devpath(path), cmdpath(path + "/cmd"), notifyNumber(0),
     ui(new Ui::KbWidget)
 {
     ui->setupUi(this);
 
     QFile mpath(path + "/model"), spath(path + "/serial");
-    if(mpath.open(QFile::ReadOnly)){
+    if(mpath.open(QIODevice::ReadOnly)){
         model = mpath.read(100);
-        model = model.trimmed();
+        model = model.remove("Corsair").remove("Gaming Keyboard").remove("Keyboard").trimmed();
         mpath.close();
     }
-    if(spath.open(QFile::ReadOnly)){
+    if(spath.open(QIODevice::ReadOnly)){
         serial = spath.read(100);
         serial = serial.trimmed();
         spath.close();
         ui->serialLabel->setText(serial);
     }
-    cmd.open(QFile::ReadWrite);
-    cmd.write("rgb on\n");
-    cmd.flush();
+    // Find an available notification node
+    for(int i = 1; i < 10; i++){
+        QString notify = QString(path + "/notify%1").arg(i);
+        if(!QFile::exists(notify)){
+            notifyNumber = i;
+            notifypath = notify;
+            break;
+        }
+    }
+    QFile cmd;
+    getCmd(cmd);
+    if(notifyNumber > 0)
+        cmd.write(QString("notifyon %1 ").arg(notifyNumber).toLatin1());
+    cmd.write("rgb on ");
+    cmd.write("get :rgb ");
+    cmd.write("get :layout\n");
+    cmd.close();
 
-    ui->bgButton->color = QColor(255, 0, 0);
+    ui->bgButton->color = bgColor = QColor(255, 0, 0);
     ui->bgButton->updateImage();
+    fgColor = QColor(255, 255, 255);
     connect(ui->bgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeBG(QColor)));
     connect(ui->fgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeFG(QColor)));
 }
 
 KbWidget::~KbWidget(){
-    cmd.close();
+    if(notifyNumber > 0){
+        QFile cmd;
+        getCmd(cmd);
+        int bg = ui->bgButton->color.rgba() & 0xFFFFFF;
+        cmd.write(QString().sprintf("rgb %06x ", bg).toLatin1());
+        cmd.write(QString("notifyoff %1\n").arg(notifyNumber).toLatin1());
+        cmd.close();
+    }
     delete ui;
 }
 
+void KbWidget::getCmd(QFile& file){
+    file.setFileName(cmdpath);
+    if(!file.open(QIODevice::WriteOnly))
+        cmdpath = notifypath = devpath = "";
+}
+
 void KbWidget::changeFG(QColor newColor){
-    fg = newColor;
+    fgColor = newColor;
 }
 
 void KbWidget::changeBG(QColor newColor){
-    bg = newColor;
+    bgColor = newColor;
 }
 
 void KbWidget::on_lightCheckbox_clicked(bool checked){
+    QFile cmd;
+    getCmd(cmd);
     if(checked)
         cmd.write("rgb on\n");
     else
         cmd.write("rgb off\n");
-    cmd.flush();
+    cmd.close();
 }
 
 void KbWidget::on_layoutBox_currentIndexChanged(int index){
+    QFile cmd;
+    getCmd(cmd);
     if(index == 1)
         cmd.write("layout uk\n");
     else
         cmd.write("layout us\n");
-    cmd.flush();
+    cmd.close();
 }

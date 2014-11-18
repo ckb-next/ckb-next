@@ -16,13 +16,13 @@ public:
     explicit KbWidget(QWidget *parent, const QString& path);
     ~KbWidget();
 
-    QString devpath;
+    QString devpath, cmdpath, notifypath;
     QString serial;
     QString model;
 
-    QFile cmd;
+    int notifyNumber;
 
-    QColor fg, bg;
+    QColor fgColor, bgColor;
 
 public slots:
     void frameUpdate();
@@ -36,6 +36,9 @@ private slots:
 
 private:
     Ui::KbWidget *ui;
+
+    void getCmd(QFile& file);
+    void readInput();
 };
 
 #endif // KBWIDGET_H

@@ -203,18 +203,32 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Enable lighting:</string>
+      <string>Brightness:</string>
      </property>
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QCheckBox" name="lightCheckbox">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
+    <widget class="QComboBox" name="brightnessBox">
+     <item>
+      <property name="text">
+       <string>100%</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>67%</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>33%</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </item>
     </widget>
    </item>
   </layout>

@@ -37,12 +37,16 @@ keypos positions_uk[] = {
 void KbWidget::frameUpdate(){
     readInput();
     static int prevBG = -1, prevAnim = -1;
+    static float prevLight = 0.f;
     static int frame = 0;
     int bg = bgColor.rgba() & 0xFFFFFF;
     int fg = fgColor.rgba() & 0xFFFFFF;
     int rate = ui->framerateBox->currentIndex() + 1;
     keypos* positions = (ui->layoutBox->currentIndex() == 1) ? positions_uk : positions_us;
     int N_POSITIONS = (positions == positions_uk) ? N_POSITIONS_UK : N_POSITIONS_US;
+    if(ui->brightnessBox->currentIndex() == 3)
+        return;
+    float light = (3 - ui->brightnessBox->currentIndex()) / 3.f;
     if(!(frame++ % rate)){
         QFile cmd;
         getCmd(cmd);
@@ -50,8 +54,15 @@ void KbWidget::frameUpdate(){
         switch(anim){
         case 0:
             // No animation
-            if(bg != prevBG || prevAnim != anim)
-                cmd.write(QString().sprintf("rgb %06x\n", bg).toLatin1());
+            if(bg != prevBG || prevAnim != anim || light != prevLight){
+                float r = (bg >> 16) & 0xFF;
+                float g = (bg >> 8) & 0xFF;
+                float b = bg & 0xFF;
+                r *= light;
+                g *= light;
+                b *= light;
+                cmd.write(QString().sprintf("rgb on %02x%02x%02x\n", (int)r, (int)g, (int)b).toLatin1());
+            }
             break;
         case 1: {
             // Wave
@@ -59,7 +70,7 @@ void KbWidget::frameUpdate(){
             static float wavepos = -36.f;
             if(prevAnim != anim)
                 wavepos = -36.f;
-            cmd.write("rgb");
+            cmd.write("rgb on");
             for(int i = 0; i < N_POSITIONS; i++){
                 float r = (bg >> 16) & 0xFF;
                 float g = (bg >> 8) & 0xFF;
@@ -70,6 +81,9 @@ void KbWidget::frameUpdate(){
                     g = g * distance / 36.f + ((fg >> 8) & 0xFF) * (1.f - distance / 36.f);
                     b = b * distance / 36.f + (fg & 0xFF) * (1.f - distance / 36.f);
                 }
+                r *= light;
+                g *= light;
+                b *= light;
                 cmd.write(QString().sprintf(" %s:%02x%02x%02x", positions[i].name, (int)r, (int)g, (int)b).toLatin1());
             }
             cmd.write("\n");
@@ -85,7 +99,7 @@ void KbWidget::frameUpdate(){
             static float ringpos = -36.f;
             if(prevAnim != anim)
                 ringpos = -36.f;
-            cmd.write("rgb");
+            cmd.write("rgb on");
             for(int i = 0; i < N_POSITIONS; i++){
                 float r = (bg >> 16) & 0xFF;
                 float g = (bg >> 8) & 0xFF;
@@ -96,6 +110,9 @@ void KbWidget::frameUpdate(){
                     g = g * distance / 36.f + ((fg >> 8) & 0xFF) * (1.f - distance / 36.f);
                     b = b * distance / 36.f + (fg & 0xFF) * (1.f - distance / 36.f);
                 }
+                r *= light;
+                g *= light;
+                b *= light;
                 cmd.write(QString().sprintf(" %s:%02x%02x%02x", positions[i].name, (int)r, (int)g, (int)b).toLatin1());
             }
             cmd.write("\n");
@@ -107,6 +124,7 @@ void KbWidget::frameUpdate(){
         }
         prevAnim = anim;
         prevBG = bg;
+        prevLight = light;
         cmd.close();
     }
 }
@@ -123,8 +141,23 @@ void KbWidget::readInput(){
                     ui->layoutBox->setCurrentIndex(1);
                 else if(components[1] == "us")
                     ui->layoutBox->setCurrentIndex(0);
+            } else if(components[0] == "key"){
+                if(components[1] == "+light"){
+                    int index = ui->brightnessBox->currentIndex() - 1;
+                    if(index < 0)
+                        index = ui->brightnessBox->count() - 1;
+                    ui->brightnessBox->setCurrentIndex(index);
+                }
             } else if(components[0] == "mode"){
                 if(components[2] == "rgb"){
+                    if(components[3] == "on"){
+                        if(ui->brightnessBox->currentIndex() == 3)
+                            ui->brightnessBox->setCurrentIndex(0);
+                        continue;
+                    } else if(components[3] == "off"){
+                        ui->brightnessBox->setCurrentIndex(3);
+                        continue;
+                    }
                     bool ok;
                     int rgb = components[3].toInt(&ok, 16);
                     rgb |= 0xFF000000;
@@ -171,7 +204,8 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
     getCmd(cmd);
     if(notifyNumber > 0)
         cmd.write(QString("notifyon %1 ").arg(notifyNumber).toLatin1());
-    cmd.write("rgb on ");
+    cmd.write("notify light ");
+    cmd.write("get :rgbon ");
     cmd.write("get :rgb ");
     cmd.write("get :layout\n");
     cmd.close();
@@ -196,8 +230,8 @@ KbWidget::~KbWidget(){
 }
 
 void KbWidget::getCmd(QFile& file){
-    file.setFileName(cmdpath);
-    if(!file.open(QIODevice::WriteOnly))
+    int fd = open(cmdpath.toLatin1().constData(), O_WRONLY | O_NONBLOCK);
+    if(!file.open(fd, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle))
         cmdpath = notifypath = devpath = "";
 }
 
@@ -209,16 +243,6 @@ void KbWidget::changeBG(QColor newColor){
     bgColor = newColor;
 }
 
-void KbWidget::on_lightCheckbox_clicked(bool checked){
-    QFile cmd;
-    getCmd(cmd);
-    if(checked)
-        cmd.write("rgb on\n");
-    else
-        cmd.write("rgb off\n");
-    cmd.close();
-}
-
 void KbWidget::on_layoutBox_currentIndexChanged(int index){
     QFile cmd;
     getCmd(cmd);
@@ -227,4 +251,13 @@ void KbWidget::on_layoutBox_currentIndexChanged(int index){
     else
         cmd.write("layout us\n");
     cmd.close();
+}
+
+void KbWidget::on_brightnessBox_currentIndexChanged(int index){
+    if(index == 3){
+        QFile cmd;
+        getCmd(cmd);
+        cmd.write("rgb off\n");
+        cmd.close();
+    }
 }

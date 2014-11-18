@@ -85,6 +85,12 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         nprintf(kb, 0, mode, "rgb %s\n", rgb);
         free(rgb);
         return;
+    } else if(!strcmp(setting, ":rgbon")){
+        if(mode->light.enabled)
+            nprintf(kb, 0, mode, "rgb on\n");
+        else
+            nprintf(kb, 0, mode, "rgb off\n");
+        return;
     } else if(!strcmp(setting, ":hwrgb")){
         // Get the current hardware RGB settings
         unsigned index = INDEX_OF(mode, profile->mode);

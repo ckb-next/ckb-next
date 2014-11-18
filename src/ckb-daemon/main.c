@@ -69,7 +69,7 @@ void* sigmain(void* context){
 }
 
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.1\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.2\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){
@@ -82,7 +82,8 @@ int main(int argc, char** argv){
         } else if(sscanf(argument, "--layout=%9s", layout) == 1){
             // Set keyboard layout
             keymap_system = getkeymap(layout);
-            printf("Setting default layout: %s\n", layout);
+            if(keymap_system)
+                printf("Setting default layout: %s\n", layout);
         } else if(sscanf(argument, "--gid=%u", &newgid) == 1){
             // Set dev node GID
             gid = newgid;

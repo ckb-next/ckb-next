@@ -33,7 +33,7 @@ void updatergb(usbdevice* kb, int force){
     // Don't do anything if the lighting hasn't changed
     keylight* lastlight = &kb->lastlight;
     keylight* newlight = &kb->profile.currentmode->light;
-    if(!force && !memcmp(lastlight, newlight, sizeof(*lastlight)))
+    if(!force && ((!lastlight->enabled && !newlight->enabled) || !memcmp(lastlight, newlight, sizeof(*lastlight))))
         return;
     memcpy(lastlight, newlight, sizeof(*lastlight));
 

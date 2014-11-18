@@ -30,9 +30,8 @@ public slots:
     void changeBG(QColor newColor);
 
 private slots:
-    void on_lightCheckbox_clicked(bool checked);
-
     void on_layoutBox_currentIndexChanged(int index);
+    void on_brightnessBox_currentIndexChanged(int index);
 
 private:
     Ui::KbWidget *ui;

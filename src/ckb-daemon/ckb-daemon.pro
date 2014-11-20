@@ -42,7 +42,8 @@ SOURCES += \
 	notify.c \
 	usb_linux.c \
 	usb_mac.c \
-	usb.c
+	usb.c \
+    firmware.c
 
 HEADERS += \
 	device.h \
@@ -55,7 +56,8 @@ HEADERS += \
 	notify.h \
 	os.h \
 	structures.h \
-	usb.h
+	usb.h \
+    firmware.h
 
 OBJECTIVE_SOURCES += \
 	extra_mac.m

@@ -37,6 +37,8 @@ void setprofilename(usbprofile* profile, const char* name);
 void erasemode(usbmode* mode, const key* keymap);
 // Erases a profile, deleting all of its modes.
 void eraseprofile(usbprofile* profile);
+// Frees a profile's memory
+void freeprofile(usbprofile* profile);
 
 // Generates a new ID
 void genid(usbid* id);

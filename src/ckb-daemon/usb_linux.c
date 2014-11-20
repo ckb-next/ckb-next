@@ -37,7 +37,7 @@ void* intreap(void* context){
     usbdevice* kb = context;
     int fd = kb->handle;
     while(1){
-        struct usbdevfs_urb* urb;
+        struct usbdevfs_urb* urb = 0;
         if(ioctl(fd, USBDEVFS_REAPURB, &urb) && errno == ENODEV){
             // Stop the thread if the handle closes
             break;
@@ -50,6 +50,7 @@ void* intreap(void* context){
             kb->INPUT_TEST = 1;
             // And re-submit the URB
             ioctl(fd, USBDEVFS_SUBMITURB, urb);
+            urb = 0;
         }
     }
     return 0;
@@ -150,7 +151,9 @@ int openusb(struct udev_device* dev, int model){
                 // Don't try again if it failed with ENOENT or EINVAL
                 if(errno != ENOENT && errno != ENODEV && errno != EINVAL)
                     connectstatus |= 2;
-                closehandle(kb);
+                udev_device_unref(kb->udev);
+                kb->handle = 0;
+                kb->udev = 0;
                 return -1;
             }
 

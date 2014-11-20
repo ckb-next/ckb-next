@@ -1,5 +1,6 @@
 #include "device.h"
 #include "devnode.h"
+#include "firmware.h"
 #include "input.h"
 #include "led.h"
 #include "notify.h"
@@ -11,7 +12,7 @@ const char *const devpath = "/dev/input/ckb";
 const char *const devpath = "/tmp/ckb";
 #endif
 
-long uid = -1, gid = -1;
+long gid = -1;
 
 int rm_recursive(const char* path){
     DIR* dir = opendir(path);
@@ -136,10 +137,11 @@ int rmdevpath(usbdevice* kb){
     return 0;
 }
 
-
 int mknotifynode(usbdevice* kb, int notify){
     if(notify < 0 || notify >= OUTFIFO_MAX)
         return -1;
+    if(kb->outfifo[notify])
+        return 0;
     // Create the notification node
     int index = INDEX_OF(kb, keyboard);
     char outpath[strlen(devpath) + 10];
@@ -156,7 +158,7 @@ int mknotifynode(usbdevice* kb, int notify){
 }
 
 int rmnotifynode(usbdevice* kb, int notify){
-    if(notify < 0 || notify >= OUTFIFO_MAX)
+    if(notify < 0 || notify >= OUTFIFO_MAX || !kb->outfifo[notify])
         return -1;
     int index = INDEX_OF(kb, keyboard);
     char outpath[strlen(devpath) + 10];
@@ -166,6 +168,24 @@ int rmnotifynode(usbdevice* kb, int notify){
     kb->outfifo[notify] = 0;
     // Delete node
     return remove(outpath);
+}
+
+void writefwnode(usbdevice* kb){
+    int index = INDEX_OF(kb, keyboard);
+    char fwpath[strlen(devpath) + 12];
+    snprintf(fwpath, sizeof(fwpath), "%s%d/fwversion", devpath, index);
+    FILE* fwfile = fopen(fwpath, "w");
+    if(fwfile){
+        fprintf(fwfile, "%04x", kb->fwversion);
+        fputc('\n', fwfile);
+        fclose(fwfile);
+        chmod(fwpath, gid >= 0 ? S_CUSTOM_R : S_READ);
+        if(gid >= 0)
+         chown(fwpath, 0, gid);
+    } else {
+        printf("Warning: Unable to create %s: %s\n", fwpath, strerror(errno));
+        remove(fwpath);
+    }
 }
 
 #define MAX_BUFFER (128 * 1024 - 1)
@@ -365,6 +385,10 @@ void readcmd(usbdevice* kb, const char* line){
             command = GET;
             handler = 0;
             continue;
+        } else if(!strcmp(word, "fwupdate")){
+            command = FWUPDATE;
+            handler = 0;
+            continue;
         }
         if(command == NONE)
             continue;
@@ -459,6 +483,10 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(command == MACRO && !strcmp(word, "clear")){
             // Macro has a special clear command
             cmd_macroclear(mode);
+            continue;
+        } else if(command == FWUPDATE){
+            // FW update also parses a whole word
+            cmd_fwupdate(kb, word);
             continue;
         }
         // Split the parameter at the colon

@@ -132,6 +132,14 @@ void eraseprofile(usbprofile* profile){
     getusbmode(2, profile, profile->keymap);
 }
 
+void freeprofile(usbprofile* profile){
+    // Clear all mode data
+    for(int i = 0; i < profile->modecount; i++)
+        closebind(&profile->mode[i].bind);
+    free(profile->mode);
+    memset(profile, 0, sizeof(*profile));
+}
+
 void genid(usbid* id){
     static int seeded = 0;
     if(!seeded){

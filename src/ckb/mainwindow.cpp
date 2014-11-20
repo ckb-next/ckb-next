@@ -129,7 +129,7 @@ void MainWindow::timerTick(){
 }
 
 void MainWindow::about(){
-    QMessageBox::information(this, "About ckb", "ckb v0.0.2\nhttps://github.com/ccMSC/ckb\n\nLicensed under GPL v2");
+    QMessageBox::information(this, "About ckb", "ckb v0.0.3\nhttps://github.com/ccMSC/ckb\n\nLicensed under GPL v2");
 }
 
 MainWindow::~MainWindow(){

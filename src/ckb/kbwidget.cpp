@@ -179,7 +179,7 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
 {
     ui->setupUi(this);
 
-    QFile mpath(path + "/model"), spath(path + "/serial");
+    QFile mpath(path + "/model"), spath(path + "/serial"), fpath(path + "/fwversion");
     if(mpath.open(QIODevice::ReadOnly)){
         model = mpath.read(100);
         model = model.remove("Corsair").remove("Gaming Keyboard").remove("Keyboard").trimmed();
@@ -190,6 +190,12 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
         serial = serial.trimmed();
         spath.close();
         ui->serialLabel->setText(serial);
+    }
+    if(fpath.open(QIODevice::ReadOnly)){
+        firmware = fpath.read(100);
+        firmware = firmware.trimmed();
+        fpath.close();
+        ui->fwLabel->setText(firmware);
     }
     // Find an available notification node
     for(int i = 1; i < 10; i++){

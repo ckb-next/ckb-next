@@ -136,8 +136,6 @@ typedef struct {
     int infifo;
     // Notification FIFO
     int outfifo[OUTFIFO_MAX];
-    // Keyboard type (70 or 95 for keyboards, -1 for root)
-    int model;
     // Interrupt transfers (keypresses)
     uchar intinput[MSG_SIZE];
     uchar previntinput[N_KEYS / 8];
@@ -150,6 +148,10 @@ typedef struct {
     int queuecount;
     // Keyboard settings
     usbprofile profile;
+    // Firmware version
+    short fwversion;
+    // Keyboard type (70 or 95 for keyboards, -1 for root)
+    char model;
     // Device name
     char name[NAME_LEN];
 } usbdevice;

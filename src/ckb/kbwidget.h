@@ -19,6 +19,7 @@ public:
     QString devpath, cmdpath, notifypath;
     QString serial;
     QString model;
+    QString firmware;
 
     int notifyNumber;
 

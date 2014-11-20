@@ -29,6 +29,9 @@ int mknotifynode(usbdevice* kb, int notify);
 // Removes a notification node for the specified keyboard.
 int rmnotifynode(usbdevice* kb, int notify);
 
+// Writes a keyboard's firmware version to its device node.
+void writefwnode(usbdevice* kb);
+
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
 unsigned readlines(int fd, const char** input);
 
@@ -55,7 +58,9 @@ typedef enum {
     NOTIFY,
     NOTIFYON,
     NOTIFYOFF,
-    GET
+    GET,
+
+    FWUPDATE
 } cmd;
 typedef void (*cmdhandler)(usbmode*, const key*, int, const char*);
 

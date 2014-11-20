@@ -19,7 +19,17 @@ void quit(){
             pthread_mutex_timedlock(&keyboard[i].mutex, &timeout);
             // Stop the uinput device now to ensure no keys get stuck
             inputclose(keyboard + i);
+            // Empty the USB queue first
+            while(keyboard[i].queuecount > 0){
+                usleep(3333);
+                if(usbdequeue(keyboard + i) <= 0)
+                    break;
+            }
             setinput(keyboard + i, IN_HID);
+            // Set the M-keys back into hardware mode and restore the RGB profile. It has to be sent twice for some reason.
+            uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x01, 0 };
+            usbqueue(keyboard + i, msg, 1);
+            usbqueue(keyboard + i, msg, 1);
             // Flush the USB queue and close the device
             while(keyboard[i].queuecount > 0){
                 usleep(3333);
@@ -69,7 +79,7 @@ void* sigmain(void* context){
 }
 
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.0.2\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.3\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){

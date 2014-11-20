@@ -10,6 +10,7 @@ After running the daemon, it will log some status messages to the terminal and y
 Other `ckb*` devices contain the following:
 - `model`: Device description/model.
 - `serial`: Device serial number. `model` and `serial` will match the info found in `ckb0/connected`
+- `fwversion`: Device firmware version.
 - `cmd`: Keyboard controller.
 - `notify0`: Keyboard notifications.
 
@@ -135,6 +136,16 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :rgb` returns an `rgb` command equivalent to the current RGB state of the current mode. To see the RGB settings for another mode, use `mode <n> get :rgb`. Keep in mind that the keyboard hardware has a very limited color precision, so a command like `rgb 123456 get :rgb` may not output `rgb 123456`. The only guarantee is that it will output the RGB color as seen by the keyboard.
 - `get :rgbon` returns either `rgb off` or `rgb on` depending on whether or not lighting was enabled.
 - `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile (**Note:** This may not be accurate after loading from the hardware. See Caveats section). The output is the same except that it says `hwrgb` instead of `rgb`.
+
+Firmware updates
+----------------
+
+**WARNING:** Improper use of `fwupdate` may brick your device; use this command at your own risk. I accept no responsibility for broken keyboards.
+
+The latest K70 RGB firmware may be downloaded from here: http://www3.corsair.com/software/HID/K70RGB.zip
+The latest K95 RGB firmware may be downloaded from here: http://www3.corsair.com/software/HID/K95RGB.zip
+
+To update your keyboard's firmware, first extract the contents of the zip file and then issue the command `fwupdate /path/to/fw/file.bin` to the keyboard you wish to update. The path name must not include spaces. If it succeeded, you should see `fwupdate <path> ok` logged to the keyboard's notification node and then the device will disconnect and reconnect. If you see `fwupdate <path> invalid` it means that the firmware file was not valid for the device; more info may be available in the daemon's `stdout`. If you see `fwupdate <path> fail` it means that the file was valid but the update failed. When the device reconnects you should see the new firmware version in its `fwversion` node; if you see `0000` instead it means that the keyboard did not update successfully and will need another `fwupdate` command in order to function again.
 
 Security
 --------

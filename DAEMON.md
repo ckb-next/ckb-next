@@ -1,6 +1,8 @@
 The daemon provides devices at `/dev/input/ckb*`, where * is the device number, starting at 1. Up to 9 keyboards may be connected at once (note: not tested...) and controlled independently. Hot-plugging is supported; if you unplug a keyboard while the daemon is running and then plug it back in, the keyboard's previous settings will be restored. If a keyboard is plugged in which has not yet been assigned any settings, its saved settings will be loaded from the hardware. The daemon additionally provides `/dev/input/ckb0`, which can be used to control keyboards when they are not plugged in. Settings are only remembered as long as the daemon is running; if you restart the daemon, all settings will be forgotten.
 
-After running the daemon, it will log some status messages to the terminal and you should now be able to access `/dev/input/ckb*`. The easiest way to see it in action is to open a new terminal in the same directory and run `bin/ckb [animation] [foreground] [background]` (or `bin/ckb` by itself to see a list of animations). `ckb` accepts colors in hexadecimal format (`RRGGBB`) or recognizes the names `white`, `black`, `red`, `yellow`, `green`, `cyan`, `blue`, and `magenta`.
+After running the daemon, it will log some status messages to the terminal and you should now be able to access `/dev/input/ckb*`.
+
+**Mac note:** The devices on OSX are located at `/tmp/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input` in this document, replace it with `/tmp`.
 
 `/dev/input/ckb0` contains the following files:
 - `connected`: A list of all connected keyboards, one per line. Each line contains a device path followed by the device's serial number and its description.
@@ -20,14 +22,14 @@ Commands
 The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They may be written by any user. Commands should be given in the following format:
 `[device <serial>] [mode <n>] command1 [paramter1] [command2] [parameter2] [command3] [parameter3] ...`
 
-In a terminal shell, you can do this with e.g. `echo foo > /dev/input/ckb1/cmd`. Programmatically, you can open and write them as regular files. When programming, you must append a newline character and flush the output before your command(s) will actually be read.
+In a terminal shell, you can do this like `echo mycommand > /dev/input/ckb1/cmd`. Programmatically, you can open and write them as regular files. When programming, you must append a newline character and flush the output before your command(s) will actually be read.
 
 The `device` command, followed by the keyboard's serial number, specifies which keyboard to control. It is only required when issuing commands to `ckb0` or when controlling a keyboard that is not plugged in. In all other cases, the device is inferred from the control path. Additionally, the following commands may be issued to `ckb0` without any device: `layout`, `fps`, `notifyon`, and `notifyoff`. See below for documentation.
 
 Keyboard layout
 ---------------
 
-ckb currently supports both US and UK keyboard layouts. By default, the keyboard layout will be detected from the system locale. You can override this by specifying `--layout=<country>` at the command-line. For instance, `ckb-daemon --layout=uk` makes the UK layout default regardless of locale. You can also change it after starting the daemon by issuing `layout <country>` to `/dev/input/ckb0/cmd` (without including any device ID). It can be overwritten on a per-keyboard basis by issuing the `layout` command to `ckb*/cmd`. Sending the command to `ckb0` does not change the layout of any already-connected keyboards, it only changes the default.
+ckb currently supports both US and UK keyboard layouts. By default, the keyboard layout will be detected from the system locale. You can override this by specifying `--layout=<country>` at the command-line. For instance, `ckb-daemon --layout=uk` makes the UK layout default regardless of locale. You can also change it after starting the daemon by issuing `layout <country>` to `/dev/input/ckb0/cmd` (without including any device ID). It can be overwritten on a per-keyboard basis by issuing the `layout` command to `ckb*/cmd`. Sending the command to `ckb0` does not change the layout of any already-connected keyboards, only the default layout.
 
 Note that changing a keyboard's layout will reset all bindings and remove all macros associated with the keyboard. This is because not all keys are supported by all layouts (for instance, the UK has a separate hash key which is not present on the US layout). You can re-add the bindings manually after resetting the layout.
 
@@ -61,7 +63,7 @@ Multiple keys may be changed to one color when separated with commas, for instan
 Additionally, multiple commands may be combined into one, for instance:
 - `rgb ffffff esc:ff0000 w,a,s,d:0000ff` sets the Esc key red, the WASD keys blue, and the rest of the keyboard white (note the lack of a key name before `ffffff`, implying the whole keyboard is to be set).
 
-By default, the controller runs at 60FPS, meaning that attempts to animate the LEDs faster than that will be ignored. The keyboard's internal LED controller runs at 60Hz, so this should be a sensible maximum. If you wish to set it lower, you can start `ckb-daemon` with the `--fps=<rate>` option. You can also issue `fps <rate>` to `/dev/input/ckb0/cmd` after starting the daemon. Note that the FPS is global and cannot be set on a per-keyboard basis.
+By default, the controller runs at 60FPS, meaning that attempts to animate the LEDs faster than that will be ignored. The keyboard's internal LED controller runs at 60Hz, so this should be a sensible maximum. If you wish to set it lower, start `ckb-daemon` with the `--fps=<rate>` option. You may also issue `fps <rate>` to `/dev/input/ckb0/cmd` after starting the daemon. Note that the FPS is global and cannot be set on a per-keyboard basis.
 
 Indicators
 ----------
@@ -74,7 +76,7 @@ The indicator LEDs (Num Lock, Caps Lock, Scroll Lock) are controlled with the `i
 Binding keys
 ------------
 
-Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 operation that translates one keypress to a different keypress, regardless of circumstance; simple, but inflexible.
+Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 operation that translates one keypress to a different keypress regardless of circumstance.
 - `bind <key1>:<key2>` remaps key1 to key2. Again, see `src/ckb-daemon/keyboard_*.c` for a list of key names.
 - `unbind <key>` unbinds a key, causing it to lose all function.
 - `rebind <key>` resets a key, returning it to its default binding.
@@ -95,7 +97,7 @@ Macros are a more advanced form of key binding, controlled with the `macro` comm
 
 **Examples:**
 - `macro g1:+lctrl,+a,-a,-lctrl` triggers a Ctrl+A when G1 is pressed.
-- `macro g2+g3:+lalt,+f4,-f4,-lalt` triggers an Alt+F4 when both G1 and G2 are pressed.
+- `macro g2+g3:+lalt,+f4,-f4,-lalt` triggers an Alt+F4 when G2 and G3 are pressed simultaneously.
 
 Assigning a macro to a key will cause its binding to be ignored; for instance, `macro a:+b,-b` will cause A to generate a B character regardless of its binding. However, `macro lctrl+a:+b,-b` will cause A to generate a B only when Ctrl is also held down. Macros currently do not have any repeating options and will be triggered only once, when the key is pressed down. This feature will be added soon.
 
@@ -135,7 +137,7 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :mode` returns the current mode in the form of a `switch` command. (Note: Do not use this in a line containing a `mode` command or it will return the mode that you selected, rather than the keyboard's current mode).
 - `get :rgb` returns an `rgb` command equivalent to the current RGB state of the current mode. To see the RGB settings for another mode, use `mode <n> get :rgb`. Keep in mind that the keyboard hardware has a very limited color precision, so a command like `rgb 123456 get :rgb` may not output `rgb 123456`. The only guarantee is that it will output the RGB color as seen by the keyboard.
 - `get :rgbon` returns either `rgb off` or `rgb on` depending on whether or not lighting was enabled.
-- `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile (**Note:** This may not be accurate after loading from the hardware. See Caveats section). The output is the same except that it says `hwrgb` instead of `rgb`.
+- `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile. The output is the same except that it says `hwrgb` instead of `rgb`.
 
 Firmware updates
 ----------------
@@ -143,11 +145,12 @@ Firmware updates
 **WARNING:** Improper use of `fwupdate` may brick your device; use this command at your own risk. I accept no responsibility for broken keyboards.
 
 The latest K70 RGB firmware may be downloaded from here: http://www3.corsair.com/software/HID/K70RGB.zip
+
 The latest K95 RGB firmware may be downloaded from here: http://www3.corsair.com/software/HID/K95RGB.zip
 
-To update your keyboard's firmware, first extract the contents of the zip file and then issue the command `fwupdate /path/to/fw/file.bin` to the keyboard you wish to update. The path name must not include spaces. If it succeeded, you should see `fwupdate <path> ok` logged to the keyboard's notification node and then the device will disconnect and reconnect. If you see `fwupdate <path> invalid` it means that the firmware file was not valid for the device; more info may be available in the daemon's `stdout`. If you see `fwupdate <path> fail` it means that the file was valid but the update failed. When the device reconnects you should see the new firmware version in its `fwversion` node; if you see `0000` instead it means that the keyboard did not update successfully and will need another `fwupdate` command in order to function again.
+To update your keyboard's firmware, first extract the contents of the zip file and then issue the command `fwupdate /path/to/fw/file.bin` to the keyboard you wish to update. The path name must be absolute and must not include spaces. If it succeeded, you should see `fwupdate <path> ok` logged to the keyboard's notification node and then the device will disconnect and reconnect. If you see `fwupdate <path> invalid` it means that the firmware file was not valid for the device; more info may be available in the daemon's `stdout`. If you see `fwupdate <path> fail` it means that the file was valid but the update failed. When the device reconnects you should see the new firmware version in its `fwversion` node; if you see `0000` instead it means that the keyboard did not update successfully and will need another `fwupdate` command in order to function again.
 
 Security
 --------
 
-By default, all of the `ckb*` nodes may be accessed by any user. For most single-user systems this should not present any security issues, since only one person will have access to the computer anyway. However, if you'd like to restrict the users that can write to the `cmd` nodes or read from the `notify` nodes, you can specify the `--gid=<group>` option at start up. For instance, on most systems you could run `ckb-daemon --gid=1000` make them accessible only by the system's primary user. `ckb-daemon` must still be run as root, regardless of which `gid` you specify. The `gid` option may only be set at startup and cannot be changed while the daemon is running.
+By default, all of the `ckb*` nodes may be accessed by any user. For most single-user systems this should not present any security issues, since only one person will have access to the computer anyway. However, if you'd like to restrict the users that can write to the `cmd` nodes or read from the `notify` nodes, you can specify the `--gid=<group>` option at start up. For instance, on most systems you could run `ckb-daemon --gid=1000` to make them accessible only by the system's primary user. `ckb-daemon` must still be run as root, regardless of which `gid` you specify. The `gid` option may be set only at startup and cannot be changed while the daemon is running.

@@ -305,14 +305,12 @@ void setinput(usbdevice* kb, int input){
     // they're useful, though. Additionally, the windows driver omits some of the key indices, but there seems to be no harm in
     // including all of them.
     uchar datapkt[6][MSG_SIZE] = { };
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 5; i++){
         datapkt[i][0] = 0x07;
         datapkt[i][1] = 0x40;
-        datapkt[i][2] = 0x1e;
+        datapkt[i][2] = 30;
     }
-    datapkt[4][0] = 0x07;
-    datapkt[4][1] = 0x40;
-    datapkt[4][2] = 0x0d;
+    datapkt[4][2] = 24;
     datapkt[5][0] = 0x07;
     datapkt[5][1] = 0x05;
     datapkt[5][2] = 0x02;

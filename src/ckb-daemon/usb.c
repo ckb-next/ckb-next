@@ -57,17 +57,32 @@ int setupusb(usbdevice* kb){
         updateindicators(kb, 1);
 
         // Get the firmware version from the device
-        int fwfail = !!getfwversion(kb);
+        int fail = !!getfwversion(kb);
 
         // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
         // This packet disables their hardware-based functions.
         uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02, 0 };
         usbqueue(kb, msg, 1);
 
+        // Wait a little bit and then send this message.
+        // The keyboard doesn't always respond immediately.
+        sleep(1);
+        if(!usbdequeue(kb))
+            fail = 1;
+
         // Set all keys to use the Corsair input. HID input is unused.
         setinput(kb, IN_CORSAIR);
 
+        // Again, wait a little bit and then run this.
+        sleep(1);
+        while(kb->queuecount > 0){
+            if(!usbdequeue(kb))
+                fail = 1;
+            usleep(3000);
+        }
+
         // Restore profile (if any)
+        sleep(1);
         usbprofile* store = findstore(kb->profile.serial);
         if(store){
             memcpy(&kb->profile, store, sizeof(*store));
@@ -82,7 +97,7 @@ int setupusb(usbdevice* kb){
             if(hwloadprofile(kb, 1))
                 return -2;
         }
-        if(fwfail)
+        if(fail)
             return -2;
         updatergb(kb, 1);
     }

@@ -13,14 +13,14 @@
 int getfwversion(usbdevice* kb){
     // Empty the board's USB queue
     while(kb->queuecount > 0){
-        usleep(3000);
+        DELAY_SHORT;
         if(!usbdequeue(kb))
             return -1;
     }
     // Ask board for firmware info
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x01, 0 };
     usbqueue(kb, data_pkt, 1);
-    usleep(3000);
+    DELAY_LONG;
     if(!usbdequeue(kb))
         return -1;
     // Wait for the response
@@ -75,7 +75,7 @@ int fwupdate(usbdevice* kb, const char* path){
     printf("Loading firmware version %04x from %s\n", version, path);
     // Empty the board's USB queue
     while(kb->queuecount > 0){
-        usleep(3000);
+        DELAY_SHORT;
         if(!usbdequeue(kb)){
             printf("Error: Firmware update failed\n");
             return FW_USBFAIL;
@@ -128,7 +128,7 @@ int fwupdate(usbdevice* kb, const char* path){
         }
         if(index == 1){
             usbqueue(kb, data_pkt[0], 1);
-            usleep(3000);
+            DELAY_MEDIUM;
             if(!usbdequeue(kb)){
                 printf("Error: Firmware update failed\n");
                 return FW_USBFAIL;
@@ -144,7 +144,7 @@ int fwupdate(usbdevice* kb, const char* path){
         }
         // Run the queue
         while(kb->queuecount > 0){
-            usleep(3000);
+            DELAY_MEDIUM;
             if(!usbdequeue(kb)){
                 printf("Error: Firmware update failed\n");
                 return FW_USBFAIL;
@@ -156,9 +156,9 @@ int fwupdate(usbdevice* kb, const char* path){
         { 0x07, 0x0d, 0xf0, 0x00, 0x00, 0x00, index },
         { 0x07, 0x02, 0xf0, 0 }
     };
-    usbqueue(kb, data_pkt2, 2);
+    usbqueue(kb, data_pkt2[0], 2);
     while(kb->queuecount > 0){
-        usleep(3000);
+        DELAY_MEDIUM;
         if(!usbdequeue(kb)){
             printf("Error: Firmware update failed\n");
             return FW_USBFAIL;

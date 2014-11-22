@@ -124,7 +124,7 @@ void inputupdate(usbdevice* kb){
 void initbind(keybind* bind, const key* keymap){
     for(int i = 0; i < N_KEYS; i++)
         bind->base[i] = keymap[i].scan;
-    bind->macros = malloc(32 * sizeof(keymacro));
+    bind->macros = calloc(32, sizeof(keymacro));
     bind->macrocap = 32;
     bind->macrocount = 0;
 }
@@ -195,13 +195,13 @@ void cmd_macro(usbmode* mode, const key* keymap, const char* keys, const char* a
     if(empty)
         return;
     // Count the number of actions (comma separated)
-    int count = 0;
+    int count = 1;
     for(const char* c = assignment; *c != 0; c++){
         if(*c == ',')
             count++;
     }
     // Allocate a buffer for them
-    macro.actions = malloc(sizeof(macroaction) * count);
+    macro.actions = calloc(count, sizeof(macroaction));
     macro.actioncount = 0;
     // Scan the actions
     position = 0;

@@ -4,6 +4,7 @@
 #include "input.h"
 #include "led.h"
 #include "notify.h"
+#include "profile.h"
 #include "usb.h"
 
 // OS-specific USB reset
@@ -78,25 +79,33 @@ int setupusb(usbdevice* kb){
         while(kb->queuecount > 0){
             if(!usbdequeue(kb))
                 fail = 1;
-            usleep(3000);
+            DELAY_MEDIUM;
         }
 
         // Restore profile (if any)
         sleep(1);
         usbprofile* store = findstore(kb->profile.serial);
         if(store){
-            memcpy(&kb->profile, store, sizeof(*store));
+            memcpy(&kb->profile, store, sizeof(usbprofile));
+            if(kb->model == 95){
+                // On the K95, make sure at least 3 porfiles are available
+                getusbmode(1, &kb->profile, keymap_system);
+                getusbmode(2, &kb->profile, keymap_system);
+            }
             if(hwloadprofile(kb, 0))
                 return -2;
         } else {
             // If there is no profile, load it from the device
             kb->profile.keymap = keymap_system;
             kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
-            getusbmode(1, &kb->profile, keymap_system);
-            getusbmode(2, &kb->profile, keymap_system);
+            if(kb->model == 95){
+                getusbmode(1, &kb->profile, keymap_system);
+                getusbmode(2, &kb->profile, keymap_system);
+            }
             if(hwloadprofile(kb, 1))
                 return -2;
         }
+        DELAY_LONG;
         if(fail)
             return -2;
         updatergb(kb, 1);
@@ -144,7 +153,7 @@ int closeusb(usbdevice* kb){
             freeprofile(&kb->profile);
         else {
             usbprofile* store = addstore(kb->profile.serial, 0);
-            memcpy(store, &kb->profile, sizeof(kb->profile));
+            memcpy(store, &kb->profile, sizeof(usbprofile));
         }
         // Close USB device
         closehandle(kb);
@@ -158,6 +167,6 @@ int closeusb(usbdevice* kb){
     pthread_mutex_destroy(&kb->keymutex);
     pthread_mutex_unlock(&kb->mutex);
     pthread_mutex_destroy(&kb->mutex);
-    memset(kb, 0, sizeof(*kb));
+    memset(kb, 0, sizeof(usbdevice));
     return 0;
 }

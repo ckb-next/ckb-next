@@ -4,6 +4,7 @@
 #include "input.h"
 #include "led.h"
 #include "notify.h"
+#include "profile.h"
 
 // OSX doesn't like putting FIFOs in /dev for some reason
 #ifndef OS_MAC
@@ -311,7 +312,7 @@ void readcmd(usbdevice* kb, const char* line){
             command = NONE;
             handler = 0;
             if(profile){
-                eraseprofile(profile);
+                eraseprofile(profile, kb->model == 95 ? 3 : 1);
                 mode = profile->currentmode;
             }
             continue;

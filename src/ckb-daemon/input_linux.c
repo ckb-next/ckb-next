@@ -29,7 +29,7 @@ int uinputopen(struct uinput_user_dev* indev, int* event){
         return -1;
     }
     // Get event device. Needed to listen to indicator LEDs (caps lock, etc)
-    char uiname[256], uipath[FILENAME_MAX];
+    char uiname[256] = { 0 }, uipath[FILENAME_MAX] = { 0 };
     const char* uidevbase = "/sys/devices/virtual/input";
 #if UINPUT_VERSION >= 4
     if(ioctl(fd, UI_GET_SYSNAME(256), uiname) >= 0)

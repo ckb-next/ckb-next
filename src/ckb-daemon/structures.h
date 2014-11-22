@@ -114,7 +114,7 @@ typedef struct {
 #ifdef OS_LINUX
     struct udev_device* udev;
     struct usbdevfs_urb urb[3];
-    char unusedinput[32];
+    char unusedinput[36];
     int handle;
     int uinput;
     int event;

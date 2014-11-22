@@ -35,7 +35,8 @@
 #define UINPUT_VERSION 2
 #endif
 
-#define INPUT_TEST unusedinput[8]
+#define INPUT_READY unusedinput[34]
+#define INPUT_TEST  unusedinput[35]
 
 #endif  // OS_LINUX
 

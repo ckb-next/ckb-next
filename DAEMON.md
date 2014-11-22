@@ -134,21 +134,25 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :hello` simply prints `hello` to the notification nodes. This may be useful to determine whether or not the daemon is responding. It can only be issued to `ckb0` with no `device` command; in any other circumstance, it will be ignored.
 - `get :fps` gets the current frame rate. Returns `fps <rate>`. Like `:hello`, this will be ignored if it is issued to an actual keyboard.
 - `get :layout` gets the current keyboard layout. Returns `layout <country>`. This may be issued to `ckb0` to get the default layout or to any keyboard to get the keyboard's layout.
-- `get :mode` returns the current mode in the form of a `switch` command. (Note: Do not use this in a line containing a `mode` command or it will return the mode that you selected, rather than the keyboard's current mode).
-- `get :rgb` returns an `rgb` command equivalent to the current RGB state of the current mode. To see the RGB settings for another mode, use `mode <n> get :rgb`. Keep in mind that the keyboard hardware has a very limited color precision, so a command like `rgb 123456 get :rgb` may not output `rgb 123456`. The only guarantee is that it will output the RGB color as seen by the keyboard.
-- `get :rgbon` returns either `rgb off` or `rgb on` depending on whether or not lighting was enabled.
+- `get :mode` returns the current mode in the form of a `switch` command. (Note: Do not use this in a line containing a `mode` command or it will return the mode that you selected, rather than the keyboard's current mode.)
+- `get :name` returns the current mode's name in the form of `mode <n> name <name>`. To see the name of another mode, use `mode <n> get :name`. The name is URL-encoded, so spaces are written as %20. The name may be truncated, so `name <some long string> get :name` may return something shorter than what was entered.
+- `get :profilename` returns the profile's name, in the form of `profilename <name>`. As above, it is URL-encoded and may be truncated.
+- `get :rgb` returns an `rgb` command equivalent to the RGB state of the current mode. Note that the keyboard has a limited color precision, so `rgb 123456 get :rgb` will not output `rgb 123456`. The only guarantee is that the `rgb` output will produce the same colors seen on the keyboard.
 - `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile. The output is the same except that it says `hwrgb` instead of `rgb`.
+- `get :rgbon` returns either `rgb off` or `rgb on` depending on whether or not lighting was enabled. There is no `:hwrgbon` because the hardware lights are always on.
 
 Firmware updates
 ----------------
 
-**WARNING:** Improper use of `fwupdate` may brick your device; use this command at your own risk. I accept no responsibility for broken keyboards.
+**WARNING:** Improper use of `fwupdate` may brick your device; use this command *at your own risk*. I accept no responsibility for broken keyboards.
 
 The latest K70 RGB firmware may be downloaded from here: http://www3.corsair.com/software/HID/K70RGB.zip
 
 The latest K95 RGB firmware may be downloaded from here: http://www3.corsair.com/software/HID/K95RGB.zip
 
-To update your keyboard's firmware, first extract the contents of the zip file and then issue the command `fwupdate /path/to/fw/file.bin` to the keyboard you wish to update. The path name must be absolute and must not include spaces. If it succeeded, you should see `fwupdate <path> ok` logged to the keyboard's notification node and then the device will disconnect and reconnect. If you see `fwupdate <path> invalid` it means that the firmware file was not valid for the device; more info may be available in the daemon's `stdout`. If you see `fwupdate <path> fail` it means that the file was valid but the update failed. When the device reconnects you should see the new firmware version in its `fwversion` node; if you see `0000` instead it means that the keyboard did not update successfully and will need another `fwupdate` command in order to function again.
+To update your keyboard's firmware, first extract the contents of the zip file and then issue the command `fwupdate /path/to/fw/file.bin` to the keyboard you wish to update. The path name must be absolute and must not include spaces. If it succeeded, you should see `fwupdate <path> ok` logged to the keyboard's notification node and then the device will disconnect and reconnect. If you see `fwupdate <path> invalid` it means that the firmware file was not valid for the device; more info may be available in the daemon's `stdout`. If you see `fwupdate <path> fail` it means that the file was valid but the update failed at a hardware level. The keyboard may disconnect/reconnect anyway or it may remain in operation.
+
+When the device reconnects you should see the new firmware version in its `fwversion` node; if you see `0000` instead it means that the keyboard did not update successfully and will need another `fwupdate` command in order to function again. If the update fails repeatedly, try connecting the keyboard to a Windows PC and using the official firmware update in CUE.
 
 Security
 --------

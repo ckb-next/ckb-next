@@ -2,6 +2,7 @@
 #include "devnode.h"
 #include "led.h"
 #include "notify.h"
+#include "profile.h"
 
 void nprintf(usbdevice* kb, usbprofile* profile, usbmode* mode, const char* format, ...){
     if(!kb && !profile)
@@ -31,7 +32,6 @@ void nprintf(usbdevice* kb, usbprofile* profile, usbmode* mode, const char* form
 
 void nrprintf(const char* format, ...){
     va_list va_args;
-    char line = '\n';
     int fifo;
     for(int i = 0; i < OUTFIFO_MAX; i++){
         va_start(va_args, format);
@@ -112,5 +112,13 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         nprintf(kb, 0, mode, "hwrgb %s\n", rgb);
         free(rgb);
         return;
+    } else if(!strcmp(setting, ":profilename")){
+        char* name = getprofilename(profile);
+        nprintf(kb, 0, 0, "profilename %s\n", name[0] ? name : "Unnamed");
+        free(name);
+    } else if(!strcmp(setting, ":name")){
+        char* name = getmodename(mode);
+        nprintf(kb, 0, mode, "name %s\n", name[0] ? name : "Unnamed");
+        free(name);
     }
 }

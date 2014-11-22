@@ -16,8 +16,7 @@ TEMPLATE = app
 
 QMAKE_MAC_SDK = macosx10.10
 
-QMAKE_CFLAGS += -std=c99
-CONFIG += warn_off
+QMAKE_CFLAGS += -std=c99 -Wno-unused-parameter -Werror=implicit
 
 macx {
 	LIBS += -framework IOKit -framework CoreFoundation -framework CoreGraphics -framework AppKit -liconv
@@ -43,7 +42,8 @@ SOURCES += \
 	usb_linux.c \
 	usb_mac.c \
 	usb.c \
-    firmware.c
+	firmware.c \
+	profile.c
 
 HEADERS += \
 	device.h \
@@ -57,7 +57,8 @@ HEADERS += \
 	os.h \
 	structures.h \
 	usb.h \
-    firmware.h
+	firmware.h \
+	profile.h
 
 OBJECTIVE_SOURCES += \
 	extra_mac.m

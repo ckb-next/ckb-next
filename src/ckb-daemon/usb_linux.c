@@ -44,7 +44,7 @@ void* intreap(void* context){
         }
         if(urb){
             // Process input (if any)
-            if(urb->actual_length == MSG_SIZE)
+            if(kb->INPUT_READY && urb->actual_length == MSG_SIZE)
                 inputupdate(kb);
             // Mark the keyboard as having received input
             kb->INPUT_TEST = 1;
@@ -99,8 +99,7 @@ int usbunclaim(usbdevice* kb){
     // Reconnecting any of the others causes trouble
     struct usbdevfs_ioctl ctl = { 1, USBDEVFS_CONNECT, 0 };
     ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
-    // Device needs to be reset or it might freeze up
-    return ioctl(kb->handle, USBDEVFS_RESET, 0);
+    return 0;
 }
 
 void closehandle(usbdevice* kb){
@@ -170,6 +169,11 @@ int openusb(struct udev_device* dev, int model){
                 return -1;
             }
 
+            // Set up the interrupt transfers.
+            kb->INPUT_TEST = 0;
+            kb->INPUT_READY = 0;
+            setint(kb);
+
             // Set up the device.
             int setup = setupusb(kb);
             if(setup == -1){
@@ -193,12 +197,9 @@ int openusb(struct udev_device* dev, int model){
                     printf("Reset success\n");
             }
 
-            // Set up the interrupt transfers.
-            kb->INPUT_TEST = 0;
-            setint(kb);
-
             // We should receive an interrupt transfer shortly after setting them up. If it doesn't happen, the device
             // isn't working correctly and needs to be reset
+            kb->INPUT_READY = 1;
             int received = 0;
             for(int wait = 0; wait < 10; wait++){
                 usleep(50000);
@@ -314,7 +315,7 @@ void* udevmain(void* context){
                     } else
                         udev_device_unref(dev);
                     // Wait a little bit and then re-enumerate devices. Sometimes the keyboard doesn't get picked up right away.
-                    usleep(100000);
+                    DELAY_LONG;
                     connectstatus = 0;
                     udevenum();
                     tries = 0;

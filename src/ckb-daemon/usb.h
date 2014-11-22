@@ -12,6 +12,11 @@
 #define P_K70_STR       "1b13"
 #define P_K95_STR       "1b11"
 
+// USB delays for when the keyboards get picky about timing
+#define DELAY_SHORT     usleep(3000)
+#define DELAY_MEDIUM    usleep(10000)
+#define DELAY_LONG      usleep(100000)
+
 // Start the USB system. Returns 0 on success
 int usbinit();
 // Stop the USB system.

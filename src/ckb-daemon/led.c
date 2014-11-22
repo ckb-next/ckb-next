@@ -10,8 +10,8 @@ void initrgb(keylight* light){
     memset(light->b, 0, sizeof(light->b));
 }
 
-void makergb(const keylight* light, uchar data_pkt[5][MSG_SIZE]){
-    if(light->enabled){
+void makergb(const keylight* light, uchar data_pkt[5][MSG_SIZE], int forceon){
+    if(forceon || light->enabled){
         const char* r = light->r, *g = light->g, *b = light->b;
         memcpy(data_pkt[0] + 4, r, 60);
         memcpy(data_pkt[1] + 4, r + 60, 12);
@@ -33,9 +33,9 @@ void updatergb(usbdevice* kb, int force){
     // Don't do anything if the lighting hasn't changed
     keylight* lastlight = &kb->lastlight;
     keylight* newlight = &kb->profile.currentmode->light;
-    if(!force && ((!lastlight->enabled && !newlight->enabled) || !memcmp(lastlight, newlight, sizeof(*lastlight))))
+    if(!force && ((!lastlight->enabled && !newlight->enabled) || !memcmp(lastlight, newlight, sizeof(keylight))))
         return;
-    memcpy(lastlight, newlight, sizeof(*lastlight));
+    memcpy(lastlight, newlight, sizeof(keylight));
 
     uchar data_pkt[5][MSG_SIZE] = {
         { 0x7f, 0x01, 60, 0 },
@@ -45,7 +45,7 @@ void updatergb(usbdevice* kb, int force){
         { 0x07, 0x27, 0x00, 0x00, 0xD8 }
     };
 
-    makergb(newlight, data_pkt);
+    makergb(newlight, data_pkt, 0);
     usbqueue(kb, data_pkt[0], 5);
 }
 
@@ -58,7 +58,7 @@ void savergb(usbdevice* kb, int mode){
         { 0x07, 0x14, 0x02, 0x00, 0x01, mode + 1 }
     };
 
-    makergb(&kb->profile.mode[mode].light, data_pkt);
+    makergb(&kb->profile.mode[mode].light, data_pkt, 1);
     usbqueue(kb, data_pkt[0], 5);
 }
 
@@ -77,12 +77,12 @@ int loadrgb(usbdevice* kb, keylight* light, int mode){
         { 0xff, 0x04, 36, 0 },
     };
     usbqueue(kb, data_pkt[0], 1);
-    usleep(3000);
+    DELAY_LONG;
     if(!usbdequeue(kb))
         return -1;
     for(int i = 1; i < 5; i++){
         usbqueue(kb, data_pkt[i], 1);
-        usleep(3000);
+        DELAY_MEDIUM;
         if(!usbdequeue(kb))
             return -1;
         // Wait for the response. Make sure the first four bytes match
@@ -194,6 +194,9 @@ void cmd_rgbon(usbmode* mode){
 }
 
 void cmd_rgb(usbmode* mode, const key* keymap, int keyindex, const char* code){
+    int index = keymap[keyindex].led;
+    if(index < 0)
+        return;
     unsigned int r, g, b;
     if(sscanf(code, "%2x%2x%2x", &r, &g, &b) == 3){
         if(r > 255)
@@ -202,7 +205,6 @@ void cmd_rgb(usbmode* mode, const key* keymap, int keyindex, const char* code){
             g = 255;
         if(b > 255)
             b = 255;
-        int index = keymap[keyindex].led;
         char* mr = mode->light.r;
         char* mg = mode->light.g;
         char* mb = mode->light.b;

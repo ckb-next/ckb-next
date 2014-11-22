@@ -19,14 +19,20 @@ DESTDIR = $$PWD/../../bin
 SOURCES += main.cpp\
 		mainwindow.cpp \
 	kbwidget.cpp \
-	colorbutton.cpp
+	colorbutton.cpp \
+    settingswidget.cpp \
+    kblightwidget.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
-	colorbutton.h
+	colorbutton.h \
+    settingswidget.h \
+    kblightwidget.h
 
 FORMS    += mainwindow.ui \
-	kbwidget.ui
+	kbwidget.ui \
+    settingswidget.ui \
+    kblightwidget.ui
 
 RESOURCES += \
 	image.qrc

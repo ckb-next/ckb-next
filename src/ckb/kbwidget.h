@@ -1,8 +1,10 @@
 #ifndef KBWIDGET_H
 #define KBWIDGET_H
 
-#include <QWidget>
 #include <QFile>
+#include <QListWidgetItem>
+#include <QWidget>
+#include "kblightwidget.h"
 
 namespace Ui {
 class KbWidget;
@@ -21,21 +23,32 @@ public:
     QString model;
     QString firmware;
 
-    int notifyNumber;
+    QString lastProfileName;
+    QStringList lastModeNames;
 
-    QColor fgColor, bgColor;
+    bool disconnect;
+
+    int notifyNumber;
+    int currentMode;
 
 public slots:
     void frameUpdate();
-    void changeFG(QColor newColor);
-    void changeBG(QColor newColor);
 
 private slots:
     void on_layoutBox_currentIndexChanged(int index);
-    void on_brightnessBox_currentIndexChanged(int index);
+
+    void on_modeList_currentRowChanged(int currentRow);
+
+    void on_profileText_editingFinished();
+
+    void on_modeList_itemChanged(QListWidgetItem *item);
+
+    void on_pushButton_clicked();
 
 private:
     Ui::KbWidget *ui;
+
+    void addMode();
 
     void getCmd(QFile& file);
     void readInput();

@@ -1,11 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QSystemTrayIcon>
 #include <QCloseEvent>
+#include <QMainWindow>
+#include <QMenu>
+#include <QSystemTrayIcon>
 #include <QTimer>
 #include "kbwidget.h"
+#include "settingswidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,10 +21,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    QTimer* eventTimer;
-
     void scanKeyboards();
-    QWidget* noKbWidget;
+    SettingsWidget* settingsWidget;
     QList<KbWidget*> kbWidgets;
 
     QAction* restoreAction;
@@ -35,7 +35,6 @@ public:
 
 public slots:
     void timerTick();
-    void about();
 
 private:
     Ui::MainWindow *ui;

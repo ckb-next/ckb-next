@@ -1,16 +1,19 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "ui_settingswidget.h"
 #include <QSharedMemory>
 #include <QMessageBox>
 
 extern QSharedMemory appShare;
 
-static const QString noKbMsg = "No keyboard detected";
+static const QString configLabel = "Settings";
 #ifndef __APPLE__
-static const QString devpath = "/dev/input/ckb%1";
+QString devpath = "/dev/input/ckb%1";
 #else
-static const QString devpath = "/tmp/ckb%1";
+QString devpath = "/tmp/ckb%1";
 #endif
+
+QTimer* eventTimer = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -27,16 +30,15 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 
-    ui->tabWidget->addTab(noKbWidget = new QWidget(this), noKbMsg);
+    ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
 
     connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
-    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
     connect(closeAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(show()));
 
     eventTimer = new QTimer(this);
     connect(eventTimer, SIGNAL(timeout()), this, SLOT(timerTick()));
-    eventTimer->start(16);
+    eventTimer->start(1000 / 60);
 
     scanKeyboards();
 }
@@ -45,27 +47,18 @@ void MainWindow::scanKeyboards(){
     QString rootdev = devpath.arg(0);
     QFile connected(rootdev + "/connected");
     if(!connected.open(QIODevice::ReadOnly)){
-        // No root controller
-        if(ui->tabWidget->currentWidget() != noKbWidget){
-            while(ui->tabWidget->count() > 0)
-                ui->tabWidget->removeTab(0);
-            ui->tabWidget->addTab(noKbWidget, noKbMsg);
-        }
+        // No root controller - remove all keyboards
+        while(ui->tabWidget->count() > 1)
+            ui->tabWidget->removeTab(0);
         foreach(KbWidget* w, kbWidgets)
             w->deleteLater();
         kbWidgets.clear();
     }
-    // Check if any currently-connected keyboards have been removed
-    QList<KbWidget*> kbWidgets2 = kbWidgets;
-    foreach(KbWidget* w, kbWidgets2){
-        if(w->cmdpath == ""){
-            w->deleteLater();
-            ui->tabWidget->removeTab(kbWidgets.indexOf(w));
-            kbWidgets.removeAll(w);
-        }
-    }
+
+    // Scan connected devices
+    foreach(KbWidget* w, kbWidgets)
+        w->disconnect = true;
     QString line;
-    int count = kbWidgets.count();
     while((line = connected.readLine()) != ""){
         QString dev = line.split(" ")[0];
         if(dev == "")
@@ -75,6 +68,7 @@ void MainWindow::scanKeyboards(){
         foreach(KbWidget* w, kbWidgets){
             if(w->devpath == dev){
                 widget = w;
+                widget->disconnect = 0;
                 break;
             }
         }
@@ -86,31 +80,34 @@ void MainWindow::scanKeyboards(){
             delete widget;
             continue;
         }
-        count++;
         kbWidgets.append(widget);
-        ui->tabWidget->addTab(widget, widget->model);
+        ui->tabWidget->insertTab(ui->tabWidget->count() - 1, widget, widget->model);
         connect(eventTimer, SIGNAL(timeout()), widget, SLOT(frameUpdate()));
     }
     connected.close();
-    if(count == 0){
-        // No keyboards found
-        if(ui->tabWidget->currentWidget() != noKbWidget){
-            while(ui->tabWidget->count() > 0)
-                ui->tabWidget->removeTab(0);
-            ui->tabWidget->addTab(noKbWidget, noKbMsg);
-        }
-        foreach(KbWidget* w, kbWidgets)
+
+    // Remove any devices not found in the connected list
+    QList<KbWidget*> kbWidgets2 = kbWidgets;
+    foreach(KbWidget* w, kbWidgets2){
+        if(w->disconnect){
+            int i = kbWidgets.indexOf(w);
+            ui->tabWidget->removeTab(i);
+            kbWidgets.removeAt(i);
             w->deleteLater();
-        kbWidgets.clear();
-    } else if(ui->tabWidget->widget(0) == noKbWidget){
-        // Keyboards found
-        // Remove "no keyboard detected" if it's there
-        ui->tabWidget->removeTab(0);
+        }
     }
+
+    int count = kbWidgets.count();
+    if(count == 0)
+        settingsWidget->ui->devicesLabel->setText("No devices connected");
+    else if(count == 1)
+        settingsWidget->ui->devicesLabel->setText("1 device connected");
+    else
+        settingsWidget->ui->devicesLabel->setText(QString("%1 devices connected").arg(count));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
-    QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, use the Exit option from the menu.");
+    QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb\" on the Settings screen.");
     hide();
     event->ignore();
 }
@@ -119,17 +116,17 @@ void MainWindow::timerTick(){
     // Check if another instance requested this in the foreground
     if(appShare.lock()){
         void* data = appShare.data();
-        if((QString)QByteArray((const char*)data) == "Open")
+        if((QString)QByteArray((const char*)data) == "Open"){
             show();
+            raise();
+            activateWindow();
+        }
         // Remove the request
         *(char*)data = 0;
         appShare.unlock();
     }
+    // Scan for connected/disconnected keyboards
     scanKeyboards();
-}
-
-void MainWindow::about(){
-    QMessageBox::information(this, "About ckb", "ckb v0.0.3\nhttps://github.com/ccMSC/ckb\n\nLicensed under GPL v2");
 }
 
 MainWindow::~MainWindow(){

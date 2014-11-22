@@ -13,263 +13,247 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
-   <item row="5" column="1">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item row="0" column="2" rowspan="2">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
+     <widget class="QWidget" name="lightTab">
+      <attribute name="title">
+       <string>Lighting</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0" colspan="3">
+        <widget class="QStackedWidget" name="lightWidgets"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="devTab">
+      <attribute name="title">
+       <string>Device</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="1" column="2">
+        <widget class="QLabel" name="fwLabel">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Firmware version:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="2">
+        <widget class="QComboBox" name="layoutBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <item>
+          <property name="text">
+           <string>United States</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>United Kingdom</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Layout:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>1</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Serial number:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="serialLabel">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>30</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="3">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>30</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="3">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>30</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QListWidget" name="modeList">
+     <property name="minimumSize">
       <size>
-       <width>20</width>
+       <width>180</width>
        <height>0</height>
       </size>
      </property>
-    </spacer>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Serial number:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
+     <property name="maximumSize">
       <size>
-       <width>20</width>
-       <height>40</height>
+       <width>180</width>
+       <height>16777215</height>
       </size>
      </property>
-    </spacer>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Animation color:</string>
-     </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Animation:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_8">
-     <property name="text">
-      <string>Layout:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="QComboBox" name="framerateBox">
-     <item>
-      <property name="text">
-       <string>60</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>30</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>15</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Base color:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="2">
-    <widget class="ColorButton" name="bgButton">
-     <property name="text">
-      <string> #000000</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>FPS:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Brightness:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2" colspan="2">
-    <widget class="QLabel" name="serialLabel">
-     <property name="text">
-      <string>N/A</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="2">
-    <widget class="ColorButton" name="fgButton">
-     <property name="text">
-      <string> #FFFFFF</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>30</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="5" column="3">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>     Try adjusting this if you experience animation issues.</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="4">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="7" column="2">
-    <widget class="QComboBox" name="animBox">
-     <item>
-      <property name="text">
-       <string>None</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Wave</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Ripple</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QComboBox" name="layoutBox">
+   <item row="0" column="0" colspan="2">
+    <widget class="QLineEdit" name="profileText">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <item>
-      <property name="text">
-       <string>United States</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>United Kingdom</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QComboBox" name="brightnessBox">
-     <item>
-      <property name="text">
-       <string>100%</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>67%</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>33%</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Off</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <spacer name="verticalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
+     <property name="minimumSize">
       <size>
-       <width>0</width>
-       <height>30</height>
+       <width>180</width>
+       <height>0</height>
       </size>
      </property>
-    </spacer>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_9">
-     <property name="text">
-      <string>Firmware version:</string>
+     <property name="maximumSize">
+      <size>
+       <width>180</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="placeholderText">
+      <string>Profile Name</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QLabel" name="fwLabel">
+   <item row="2" column="0" colspan="2">
+    <widget class="QPushButton" name="pushButton">
      <property name="text">
-      <string>N/A</string>
+      <string>Save to hardware</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ColorButton</class>
-   <extends>QPushButton</extends>
-   <header location="global">colorbutton.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -106,6 +106,7 @@ void KbWidget::readInput(){
                         continue;
                     }
                     // If it's a color command, scan the input
+                    QColor lightColor = QColor();
                     for(int i = 3; i < components.count(); i++){
                         QString comp = components[i];
                         if(comp.indexOf(":") < 0){
@@ -123,10 +124,21 @@ void KbWidget::readInput(){
                                 QColor color = QColor::fromRgb((QRgb)rgb);
                                 // Parse keys
                                 QStringList keys = set[0].split(",");
-                                foreach(QString key, keys)
+                                foreach(QString key, keys){
                                     light->rgbWidget->set(key, color);
+                                    if(key == "light")
+                                        // Extrapolate the Light key to the M-keys and Lock key, since those will be set to black on exit
+                                        lightColor = color;
+                                }
                             }
                         }
+                    }
+                    if(lightColor.isValid()){
+                        light->rgbWidget->set("mr", lightColor);
+                        light->rgbWidget->set("m1", lightColor);
+                        light->rgbWidget->set("m2", lightColor);
+                        light->rgbWidget->set("m3", lightColor);
+                        light->rgbWidget->set("lock", lightColor);
                     }
                 }
             }

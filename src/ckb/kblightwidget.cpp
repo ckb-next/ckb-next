@@ -4,7 +4,7 @@
 
 extern int framerate;
 
-void KbLightWidget::animSolid(QFile& cmd, float light){
+void KbLightWidget::animSolid(QFile& cmd, float light, QStringList inactive, float inactiveLevel){
     cmd.write(" rgb on");
     const KeyMap& map = rgbWidget->map();
     uint count = map.count();
@@ -17,11 +17,19 @@ void KbLightWidget::animSolid(QFile& cmd, float light){
         g *= light;
         b *= light;
         const KeyPos& pos = *map.key(i);
+        foreach(QString name, inactive){
+            if(!strcmp(pos.name, name.toLatin1().constData())){
+                r *= inactiveLevel;
+                g *= inactiveLevel;
+                b *= inactiveLevel;
+                break;
+            }
+        }
         cmd.write(QString().sprintf(" %s:%02x%02x%02x", pos.name, (int)r, (int)g, (int)b).toLatin1());
     }
 }
 
-void KbLightWidget::animWave(QFile& cmd, float light){
+void KbLightWidget::animWave(QFile& cmd, float light, QStringList inactive, float inactiveLevel){
     const KeyMap& map = rgbWidget->map();
     int fg = fgColor.rgb() & 0xFFFFFF;
     float size = map.width() + 36.f;
@@ -45,6 +53,14 @@ void KbLightWidget::animWave(QFile& cmd, float light){
         r *= light;
         g *= light;
         b *= light;
+        foreach(QString name, inactive){
+            if(!strcmp(pos.name, name.toLatin1().constData())){
+                r *= inactiveLevel;
+                g *= inactiveLevel;
+                b *= inactiveLevel;
+                break;
+            }
+        }
         cmd.write(QString().sprintf(" %s:%02x%02x%02x", pos.name, (int)r, (int)g, (int)b).toLatin1());
     }
     wavepos += (size + 36.f) / 2.f / (float)framerate;
@@ -52,7 +68,7 @@ void KbLightWidget::animWave(QFile& cmd, float light){
         wavepos = -36.f;
 }
 
-void KbLightWidget::animRipple(QFile& cmd, float light){
+void KbLightWidget::animRipple(QFile& cmd, float light, QStringList inactive, float inactiveLevel){
     const KeyMap& map = rgbWidget->map();
     int fg = fgColor.rgb() & 0xFFFFFF;
     float size = sqrt(((double)map.width())*map.width()/2. + ((double)map.height())*map.height()/2.);
@@ -77,6 +93,14 @@ void KbLightWidget::animRipple(QFile& cmd, float light){
         r *= light;
         g *= light;
         b *= light;
+        foreach(QString name, inactive){
+            if(!strcmp(pos.name, name.toLatin1().constData())){
+                r *= inactiveLevel;
+                g *= inactiveLevel;
+                b *= inactiveLevel;
+                break;
+            }
+        }
         cmd.write(QString().sprintf(" %s:%02x%02x%02x", pos.name, (int)r, (int)g, (int)b).toLatin1());
     }
     ringpos += (size + 36.f) / (float)framerate;
@@ -95,22 +119,30 @@ void KbLightWidget::frameUpdate(QFile& cmd, int modenumber){
         return;
     }
     float light = (3 - ui->brightnessBox->currentIndex()) / 3.f;
+    QStringList inactiveList = QStringList();
+    float inactiveLight = 1.f;
+    if(ui->inactiveCheck->isChecked()){
+        inactiveList << "mr" << "m1" << "m2" << "m3" << "lock";
+        inactiveList.removeAll(QString("m%1").arg(modenumber));
+        inactiveLight = (2 - ui->inactiveLevelBox->currentIndex()) / 4.f;
+    }
+
     int anim = ui->animBox->currentIndex();
     switch(anim){
     case 0:
         // No animation
         if(forceLight){
-            animSolid(cmd, light);
+            animSolid(cmd, light, inactiveList, inactiveLight);
         }
         break;
     case 1: {
         // Wave
-        animWave(cmd, light);
+        animWave(cmd, light, inactiveList, inactiveLight);
         break;
     }
     case 2: {
         // Ripple
-        animRipple(cmd, light);
+        animRipple(cmd, light, inactiveList, inactiveLight);
         break;
     }
     }
@@ -126,7 +158,7 @@ void KbLightWidget::close(QFile &cmd, int modenumber){
     }
     // Set just the background color, ignoring any animation
     cmd.write(QString().sprintf("mode %d", modenumber).toLatin1());
-    animSolid(cmd, 1.f);
+    animSolid(cmd, 1.f, QStringList() << "mr" << "m1" << "m2" << "m3" << "lock", 0.f);
     cmd.write("\n");
 }
 
@@ -182,4 +214,12 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
 
 KbLightWidget::~KbLightWidget(){
     delete ui;
+}
+
+void KbLightWidget::on_inactiveCheck_stateChanged(int arg1){
+    forceLight = true;
+}
+
+void KbLightWidget::on_inactiveLevelBox_currentIndexChanged(int index){
+    forceLight = true;
 }

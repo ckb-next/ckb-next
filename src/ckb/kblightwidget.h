@@ -37,10 +37,14 @@ private slots:
 
     void on_animBox_currentIndexChanged(int index);
 
+    void on_inactiveCheck_stateChanged(int arg1);
+
+    void on_inactiveLevelBox_currentIndexChanged(int index);
+
 private:
-    void animSolid(QFile& cmd, float light);
-    void animWave(QFile& cmd, float light);
-    void animRipple(QFile& cmd, float light);
+    void animSolid(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
+    void animWave(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
+    void animRipple(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
 
     Ui::KbLightWidget *ui;
     friend class KbWidget;

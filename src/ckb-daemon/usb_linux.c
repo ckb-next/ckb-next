@@ -208,7 +208,7 @@ int openusb(struct udev_device* dev, int model){
                     break;
                 }
             }
-            if(!received){
+            if(!received && kb->fwversion > 0){
                 printf("Didn't get input, trying to reset...\n");
                 if(resetusb(kb)){
                     printf("Reset failed. Disconnecting.\n");

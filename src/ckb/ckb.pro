@@ -12,6 +12,7 @@ TARGET = ckb
 TEMPLATE = app
 
 QMAKE_MAC_SDK = macosx10.10
+ICON = ckb-logo.icns
 
 OBJECTS_DIR = $$PWD/../../tmp-ckb
 DESTDIR = $$PWD/../../bin
@@ -20,23 +21,23 @@ SOURCES += main.cpp\
 		mainwindow.cpp \
 	kbwidget.cpp \
 	colorbutton.cpp \
-    settingswidget.cpp \
-    kblightwidget.cpp \
-    keymap.cpp \
-    rgbwidget.cpp
+	settingswidget.cpp \
+	kblightwidget.cpp \
+	keymap.cpp \
+	rgbwidget.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
 	colorbutton.h \
-    settingswidget.h \
-    kblightwidget.h \
-    keymap.h \
-    rgbwidget.h
+	settingswidget.h \
+	kblightwidget.h \
+	keymap.h \
+	rgbwidget.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \
-    settingswidget.ui \
-    kblightwidget.ui
+	settingswidget.ui \
+	kblightwidget.ui
 
 RESOURCES += \
 	image.qrc

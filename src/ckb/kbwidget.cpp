@@ -24,7 +24,7 @@ void KbWidget::frameUpdate(){
     KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(currentMode);
     if(prevMode != currentMode)
         light->forceLight = true;
-    light->frameUpdate(cmd, currentMode + 1, ui->layoutBox->currentIndex());
+    light->frameUpdate(cmd, currentMode + 1);
     cmd.close();
     prevMode = currentMode;
 }
@@ -43,6 +43,13 @@ void KbWidget::readInput(){
                     ui->layoutBox->setCurrentIndex(1);
                 else if(components[1] == "us")
                     ui->layoutBox->setCurrentIndex(0);
+
+                // Set all light setups to the new layout
+                int modecount = (model.indexOf("K95") >= 0) ? 3 : 1;
+                for(int mode = 0; mode < modecount; mode++){
+                    KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);
+                    light->rgbWidget->map(getKeyMap());
+                }
             } else if(components[0] == "key"){
                 // Key event
                 if(components[1] == "+light"){
@@ -65,6 +72,7 @@ void KbWidget::readInput(){
                     ui->lightWidgets->setCurrentIndex(2);
                 }
             } else if(components[0] == "profilename"){
+                // Profile name - update list
                 QString name = QUrl::fromPercentEncoding(components[1].toUtf8());
                 lastProfileName = name;
                 ui->profileText->setText(name);
@@ -80,12 +88,15 @@ void KbWidget::readInput(){
                         ui->lightWidgets->setCurrentIndex(mode);
                     }
                 } else if(components[2] == "name"){
+                    // Mode name - update list
                     QString name = QUrl::fromPercentEncoding(components[3].toUtf8());
                     lastModeNames[mode] = name;
                     ui->modeList->item(mode)->setText(name);
                 } else if(components[2] == "rgb"){
                     // RGB - set mode lighting
                     KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);
+                    light->forceLight = true;
+                    // If it's an on or off command, just set the brightness
                     if(components[3] == "on"){
                         if(light->ui->brightnessBox->currentIndex() == 3)
                             light->ui->brightnessBox->setCurrentIndex(0);
@@ -94,13 +105,28 @@ void KbWidget::readInput(){
                         light->ui->brightnessBox->setCurrentIndex(3);
                         continue;
                     }
-                    bool ok;
-                    int rgb = components[3].toInt(&ok, 16);
-                    rgb |= 0xFF000000;
-                    if(ok){
-                        light->bgColor = QColor((QRgb)rgb);
-                        light->ui->bgButton->color = light->bgColor;
-                        light->ui->bgButton->updateImage();
+                    // If it's a color command, scan the input
+                    for(int i = 3; i < components.count(); i++){
+                        QString comp = components[i];
+                        if(comp.indexOf(":") < 0){
+                            // Single hex constant?
+                            bool ok;
+                            int rgb = comp.toInt(&ok, 16);
+                            if(ok)
+                                light->rgbWidget->set(QColor::fromRgb((QRgb)rgb));
+                        } else {
+                            // List of keys. Parse color first
+                            QStringList set = comp.split(":");
+                            bool ok;
+                            int rgb = set[1].toInt(&ok, 16);
+                            if(ok){
+                                QColor color = QColor::fromRgb((QRgb)rgb);
+                                // Parse keys
+                                QStringList keys = set[0].split(",");
+                                foreach(QString key, keys)
+                                    light->rgbWidget->set(key, color);
+                            }
+                        }
                     }
                 }
             }
@@ -188,6 +214,10 @@ void KbWidget::addMode(){
     ui->lightWidgets->addWidget(new KbLightWidget(this));
 }
 
+KeyMap KbWidget::getKeyMap(){
+    return KeyMap::standard(model.indexOf("K95") >= 0 ? KeyMap::K95 : KeyMap::K70, (KeyMap::Layout)ui->layoutBox->currentIndex());
+}
+
 void KbWidget::getCmd(QFile& file){
     int fd = open(cmdpath.toLatin1().constData(), O_WRONLY | O_NONBLOCK);
     if(!file.open(fd, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle))
@@ -198,12 +228,16 @@ void KbWidget::on_layoutBox_currentIndexChanged(int index){
     QFile cmd;
     getCmd(cmd);
     if(index == 1)
-        cmd.write("layout uk\n");
+        cmd.write("layout uk");
     else
-        cmd.write("layout us\n");
+        cmd.write("layout us");
+    // Ask for all the RGB settings again
+    // No need to switch the modes' layouts here, we'll see a notification for that shortly
+    int modecount = (model.indexOf("K95") >= 0) ? 3 : 1;
+    for(int mode = 0; mode < modecount; mode++)
+        cmd.write(QString(" mode %1 get :rgbon :rgb").arg(mode + 1).toLatin1());
+    cmd.write("\n");
     cmd.close();
-    KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(currentMode);
-    light->forceLight = true;
 }
 
 void KbWidget::on_modeList_currentRowChanged(int currentRow){

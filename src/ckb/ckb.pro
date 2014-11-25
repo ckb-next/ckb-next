@@ -21,13 +21,17 @@ SOURCES += main.cpp\
 	kbwidget.cpp \
 	colorbutton.cpp \
     settingswidget.cpp \
-    kblightwidget.cpp
+    kblightwidget.cpp \
+    keymap.cpp \
+    rgbwidget.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
 	colorbutton.h \
     settingswidget.h \
-    kblightwidget.h
+    kblightwidget.h \
+    keymap.h \
+    rgbwidget.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \

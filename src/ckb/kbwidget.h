@@ -49,6 +49,7 @@ private:
     Ui::KbWidget *ui;
 
     void addMode();
+    KeyMap getKeyMap();
 
     void getCmd(QFile& file);
     void readInput();

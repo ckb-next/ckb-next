@@ -13,7 +13,7 @@ You can build the project by running `qmake && make` in the directory you downlo
 Building for OSX
 ----------------
 
-Install Qt5 from here: http://www.qt.io/download-open-source/ (you'll also be propmted to install Xcode from the app store if you don't have it already)
+Install Qt5 from here: http://www.qt.io/download-open-source/ (you'll also be prompted to install Xcode from the app store if you don't have it already)
 
 Open ckb.pro in Qt Creator. You should be prompted to configure the project (the default settings should work). Open `Build` from the menu bar and select `Run qmake`. Now press Cmd+B to build the project. The binaries should be placed in a newly-created `bin` directory assuming they compile successfully. Exit Qt Creator.
 
@@ -35,7 +35,6 @@ The user interface is currently very limited and only supports a handful of opti
 - Reactive lighting for keypresses
 - Key rebinding
 - Key macros
-- Loading and saving hardware profiles
 
 Closing ckb will actually minimize it to the system tray. Use the Exit option from the tray icon or program settings to exit the application.
 

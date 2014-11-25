@@ -3,13 +3,18 @@
 #include <QPainter>
 
 ColorButton::ColorButton(QWidget *parent) :
-    QPushButton(parent), color(QColor(255, 255, 255))
+    QPushButton(parent), color(QColor())
 {
     connect(this, SIGNAL(clicked()), this, SLOT(pickColor()));
     updateImage();
 }
 
 void ColorButton::updateImage(){
+    if(!color.isValid()){
+        setIcon(QIcon());
+        setText("Pick color...");
+        return;
+    }
     const int w = 12, h = 12;
     QImage image(w, h, QImage::Format_RGB888);
     QPainter painter(&image);

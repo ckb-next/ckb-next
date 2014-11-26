@@ -31,7 +31,7 @@ void quit(){
                 if(usbdequeue(keyboard + i) <= 0)
                     break;
             }
-            sleep(1);
+            DELAY_LONG;
             // Set the M-keys back into hardware mode and restore the RGB profile. It has to be sent twice for some reason.
             uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x01, 0 };
             usbqueue(keyboard + i, msg, 1);

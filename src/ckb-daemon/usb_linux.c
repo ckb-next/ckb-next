@@ -221,7 +221,7 @@ int openusb(struct udev_device* dev, int model){
                     pthread_mutex_unlock(&kb->mutex);
                     pthread_mutex_destroy(&kb->mutex);
                     pthread_mutex_destroy(&kb->keymutex);
-                    sleep(1);
+                    DELAY_LONG;
                     return -1;
                 } else
                     printf("Reset success\n");
@@ -247,7 +247,7 @@ int openusb(struct udev_device* dev, int model){
                     pthread_mutex_unlock(&kb->mutex);
                     pthread_mutex_destroy(&kb->mutex);
                     pthread_mutex_destroy(&kb->keymutex);
-                    sleep(1);
+                    DELAY_LONG;
                     return -1;
                 } else
                     printf("Reset success\n");

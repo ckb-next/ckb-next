@@ -67,7 +67,7 @@ int setupusb(usbdevice* kb){
 
         // Wait a little bit and then send this message.
         // The keyboard doesn't always respond immediately.
-        sleep(1);
+        DELAY_LONG;
         if(!usbdequeue(kb))
             fail = 1;
 
@@ -75,7 +75,7 @@ int setupusb(usbdevice* kb){
         setinput(kb, IN_CORSAIR);
 
         // Again, wait a little bit and then run this.
-        sleep(1);
+        DELAY_LONG;
         while(kb->queuecount > 0){
             if(!usbdequeue(kb))
                 fail = 1;
@@ -83,7 +83,7 @@ int setupusb(usbdevice* kb){
         }
 
         // Restore profile (if any)
-        sleep(1);
+        DELAY_LONG;
         usbprofile* store = findstore(kb->profile.serial);
         if(store){
             memcpy(&kb->profile, store, sizeof(usbprofile));

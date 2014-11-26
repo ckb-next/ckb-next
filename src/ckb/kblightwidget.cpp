@@ -108,7 +108,7 @@ void KbLightWidget::animRipple(QFile& cmd, float light, QStringList inactive, fl
         ringpos = -36.f;
 }
 
-void KbLightWidget::frameUpdate(QFile& cmd, int modenumber){
+void KbLightWidget::frameUpdate(QFile& cmd, int modenumber, bool dimMute){
     cmd.write(QString().sprintf("mode %d switch", modenumber).toLatin1());
     if(forceLight)
         cmd.write(" notify mr m1 m2 m3 light lock");
@@ -123,6 +123,8 @@ void KbLightWidget::frameUpdate(QFile& cmd, int modenumber){
     float inactiveLight = 1.f;
     if(ui->inactiveCheck->isChecked()){
         inactiveList << "mr" << "m1" << "m2" << "m3" << "lock";
+        if(dimMute)
+            inactiveList << "mute";
         inactiveList.removeAll(QString("m%1").arg(modenumber));
         inactiveLight = (2 - ui->inactiveLevelBox->currentIndex()) / 4.f;
     }
@@ -131,9 +133,7 @@ void KbLightWidget::frameUpdate(QFile& cmd, int modenumber){
     switch(anim){
     case 0:
         // No animation
-        if(forceLight){
-            animSolid(cmd, light, inactiveList, inactiveLight);
-        }
+        animSolid(cmd, light, inactiveList, inactiveLight);
         break;
     case 1: {
         // Wave

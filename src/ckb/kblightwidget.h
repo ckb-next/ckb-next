@@ -24,7 +24,7 @@ public:
 
     RgbWidget* rgbWidget;
 
-    void frameUpdate(QFile& cmd, int modenumber);
+    void frameUpdate(QFile& cmd, int modenumber, bool dimMute);
     void close(QFile& cmd, int modenumber);
 
 private slots:

@@ -4,12 +4,17 @@
 #include <QUrl>
 #include "kbwidget.h"
 #include "kblightwidget.h"
+#include "media.h"
 #include "ui_kbwidget.h"
 #include "ui_kblightwidget.h"
 
 void KbWidget::frameUpdate(){
     // Read from the notification node
     readInput();
+    // Get system mute state
+    muteState mute = getMuteState();
+    if(mute == UNKNOWN)
+        mute = UNMUTED;
 
     QFile cmd;
     getCmd(cmd);
@@ -24,7 +29,7 @@ void KbWidget::frameUpdate(){
     KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(currentMode);
     if(prevMode != currentMode)
         light->forceLight = true;
-    light->frameUpdate(cmd, currentMode + 1);
+    light->frameUpdate(cmd, currentMode + 1, mute != MUTED);
     cmd.close();
     prevMode = currentMode;
 }

@@ -13,6 +13,9 @@ TEMPLATE = app
 
 QMAKE_MAC_SDK = macosx10.10
 ICON = ckb-logo.icns
+macx {
+	LIBS += -framework AudioToolbox.framework
+}
 
 OBJECTS_DIR = $$PWD/../../tmp-ckb
 DESTDIR = $$PWD/../../bin
@@ -24,7 +27,8 @@ SOURCES += main.cpp\
 	settingswidget.cpp \
 	kblightwidget.cpp \
 	keymap.cpp \
-	rgbwidget.cpp
+	rgbwidget.cpp \
+    media_linux.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
@@ -33,7 +37,7 @@ HEADERS  += mainwindow.h \
 	kblightwidget.h \
 	keymap.h \
 	rgbwidget.h \
-    media.h
+	media.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \

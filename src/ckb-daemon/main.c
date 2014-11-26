@@ -21,26 +21,26 @@ void quit(){
             inputclose(keyboard + i);
             // Empty the USB queue first
             while(keyboard[i].queuecount > 0){
-                usleep(3333);
+                DELAY_SHORT;
                 if(usbdequeue(keyboard + i) <= 0)
                     break;
             }
+            DELAY_MEDIUM;
             setinput(keyboard + i, IN_HID);
             while(keyboard[i].queuecount > 0){
-                usleep(3333);
+                DELAY_SHORT;
                 if(usbdequeue(keyboard + i) <= 0)
                     break;
             }
-            DELAY_LONG;
             // Set the M-keys back into hardware mode and restore the RGB profile. It has to be sent twice for some reason.
             uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x01, 0 };
             usbqueue(keyboard + i, msg, 1);
             usbqueue(keyboard + i, msg, 1);
             // Flush the USB queue and close the device
             while(keyboard[i].queuecount > 0){
+                DELAY_MEDIUM;
                 if(usbdequeue(keyboard + i) <= 0)
                     break;
-                usleep(3333);
             }
             closeusb(keyboard + i);
         }

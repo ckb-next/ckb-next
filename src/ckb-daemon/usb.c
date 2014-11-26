@@ -74,12 +74,12 @@ int setupusb(usbdevice* kb){
         // Set all keys to use the Corsair input. HID input is unused.
         setinput(kb, IN_CORSAIR);
 
-        // Again, wait a little bit and then run this.
-        DELAY_LONG;
         while(kb->queuecount > 0){
-            if(!usbdequeue(kb))
+            DELAY_SHORT;
+            if(!usbdequeue(kb)){
                 fail = 1;
-            DELAY_MEDIUM;
+                break;
+            }
         }
 
         // Restore profile (if any)
@@ -105,7 +105,7 @@ int setupusb(usbdevice* kb){
             if(hwloadprofile(kb, 1))
                 return -2;
         }
-        DELAY_LONG;
+        DELAY_SHORT;
         if(fail)
             return -2;
         updatergb(kb, 1);

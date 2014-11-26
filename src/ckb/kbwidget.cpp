@@ -54,6 +54,7 @@ void KbWidget::readInput(QFile& cmd){
                     KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);
                     light->rgbWidget->map(getKeyMap());
 #ifndef __APPLE__
+                    if(light->winLock)
                         light->setWinLock(cmd, mode + 1, true);
 #endif
                 }

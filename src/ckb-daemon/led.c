@@ -77,15 +77,16 @@ int loadrgb(usbdevice* kb, keylight* light, int mode){
         { 0xff, 0x04, 36, 0 },
     };
     usbqueue(kb, data_pkt[0], 1);
-    DELAY_LONG;
+    DELAY_SHORT;
     if(!usbdequeue(kb))
         return -1;
     for(int i = 1; i < 5; i++){
         usbqueue(kb, data_pkt[i], 1);
-        DELAY_MEDIUM;
+        DELAY_SHORT;
         if(!usbdequeue(kb))
             return -1;
         // Wait for the response. Make sure the first four bytes match
+        DELAY_SHORT;
         if(!usbinput(kb, in_pkt[i - 1]) || memcmp(in_pkt[i - 1], data_pkt[i], 4))
             return -1;
     }

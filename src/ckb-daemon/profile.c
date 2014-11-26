@@ -228,10 +228,11 @@ int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
     // Ask for mode's name
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
     usbqueue(kb, data_pkt, 1);
-    DELAY_LONG;
+    DELAY_SHORT;
     if(!usbdequeue(kb))
         return -1;
     // Wait for the response
+    DELAY_MEDIUM;
     if(!usbinput(kb, data_pkt))
         return -1;
     memcpy(hw->name[mode + 1], data_pkt + 4, MD_NAME_LEN * 2);
@@ -259,12 +260,13 @@ int hwloadprofile(usbdevice* kb, int apply){
     for(int i = 0; i <= modes; i++){
         data_pkt[0][3] = i;
         usbqueue(kb, data_pkt[0], 1);
-        DELAY_LONG;
+        DELAY_SHORT;
         if(!usbdequeue(kb)){
             free(hw);
             return -1;
         }
         // Wait for the response
+        DELAY_MEDIUM;
         if(!usbinput(kb, in_pkt)){
             free(hw);
             return -1;
@@ -273,12 +275,13 @@ int hwloadprofile(usbdevice* kb, int apply){
     }
     // Ask for profile name
     usbqueue(kb, data_pkt[1], 1);
-    DELAY_LONG;
+    DELAY_SHORT;
     if(!usbdequeue(kb)){
         free(hw);
         return -1;
     }
     // Wait for the response
+    DELAY_SHORT;
     if(!usbinput(kb, in_pkt)){
         free(hw);
         return -1;

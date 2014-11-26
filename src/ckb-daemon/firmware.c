@@ -20,10 +20,10 @@ int getfwversion(usbdevice* kb){
     // Ask board for firmware info
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x01, 0 };
     usbqueue(kb, data_pkt, 1);
-    DELAY_LONG;
     if(!usbdequeue(kb))
         return -1;
     // Wait for the response
+    DELAY_MEDIUM;
     uchar in_pkt[MSG_SIZE];
     if(!usbinput(kb, in_pkt) || in_pkt[0] != 0x0e || in_pkt[1] != 0x01)
         return -1;

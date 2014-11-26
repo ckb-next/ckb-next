@@ -39,7 +39,7 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 50, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     if(res <= 0){
-        printf("Error: usbdequeue (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
+        printf("Error: usbinput (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
         return 0;
     }
     if(res != MSG_SIZE)
@@ -133,7 +133,11 @@ int usbclaim(usbdevice* kb){
     // 3 is for the LED and board controller
     for(int i = 0; i < 4; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        if((ioctl(kb->handle, USBDEVFS_IOCTL, &ctl) && errno != ENODATA) || ioctl(kb->handle, USBDEVFS_CLAIMINTERFACE, &i))
+        if((ioctl(kb->handle, USBDEVFS_IOCTL, &ctl) && errno != ENODATA))
+            return -1;
+    }
+    for(int i = 0; i < 4; i++){
+        if(ioctl(kb->handle, USBDEVFS_CLAIMINTERFACE, &i))
             return -1;
     }
     return 0;

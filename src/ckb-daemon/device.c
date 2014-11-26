@@ -44,9 +44,6 @@ usbprofile* addstore(const char* serial, int autosetup){
 
 void setinput(usbdevice* kb, int input){
     // Set input mode on the keys. 0x80 generates a normal HID interrupt, 0x40 generates a proprietary interrupt. 0xc0 generates both.
-    // NOTE: I observed the windows driver setting a key to 0x49; it seems there are other bits used in this message. I doubt that
-    // they're useful, though. Additionally, the windows driver omits some of the key indices, but there seems to be no harm in
-    // including all of them.
     uchar datapkt[6][MSG_SIZE] = { };
     for(int i = 0; i < 5; i++){
         datapkt[i][0] = 0x07;
@@ -84,7 +81,8 @@ void setinput(usbdevice* kb, int input){
     for(int i = 0; i < 24; i++){
         int key = i + 120;
         datapkt[4][i * 2 + 4] = key;
-        datapkt[4][i * 2 + 5] = input & IMASK(key);
+        // Set the MR button to toggle the MR ring (0x9)
+        datapkt[4][i * 2 + 5] = (input & IMASK(key)) | (!strcmp(keymap_system[key].name, "mr") ? 0x9 : 0);
     }
 #undef IMASK
     usbqueue(kb, datapkt[0], 6);

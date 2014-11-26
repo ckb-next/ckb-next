@@ -115,9 +115,11 @@ int setupusb(usbdevice* kb){
 
 int _resetusb(usbdevice* kb, const char* file, int line){
     // Perform a USB reset
+    DELAY_LONG;
     int res = os_resetusb(kb, file, line);
     if(res)
         return res;
+    DELAY_LONG;
     // Empty the queue. Re-send the firmware message as well as the input messages.
     kb->queuecount = 0;
     if(getfwversion(kb))

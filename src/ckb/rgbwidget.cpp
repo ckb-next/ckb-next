@@ -5,8 +5,9 @@
 static const int KEY_SIZE = 12;
 
 RgbWidget::RgbWidget(QWidget *parent) :
-    QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1)
+    QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1), mouseDownMode(NONE)
 {
+    setMouseTracking(true);
 }
 
 void RgbWidget::map(const KeyMap& newMap){
@@ -117,6 +118,7 @@ void RgbWidget::paintEvent(QPaintEvent*){
 }
 
 void RgbWidget::mousePressEvent(QMouseEvent* event){
+    event->accept();
     mouseDownMode = (event->modifiers() & Qt::AltModifier) ? SUBTRACT : (event->modifiers() & Qt::ControlModifier) ? ADD : SET;
     // If shift is held down and the previous mousedown didn't have any movement, select all keys between the two clicks
     if(event->modifiers() & Qt::ShiftModifier && mouseCurrentX >= 0 && mouseCurrentY >= 0){
@@ -134,11 +136,11 @@ void RgbWidget::mousePressEvent(QMouseEvent* event){
     // See if the event hit any keys
     float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
     float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
-    float mx = mouseCurrentX / xScale, my = mouseCurrentY / yScale;
+    float mx = mouseCurrentX / xScale - 6.f, my = mouseCurrentY / yScale - 6.f;
     uint count = keyMap.count();
     for(uint i = 0; i < count; i++){
         const KeyPos& key = *keyMap.key(i);
-        if(fabs(key.x - mx + 6.f) <= 5.f && fabs(key.y - my + 6.f) <= 5.f){
+        if(fabs(key.x - mx) <= key.width / 2.f - 2.f && fabs(key.y - my) <= key.height / 2.f - 2.f){
             newSelection.setBit(i);
             update();
             break;
@@ -147,78 +149,98 @@ void RgbWidget::mousePressEvent(QMouseEvent* event){
 }
 
 void RgbWidget::mouseMoveEvent(QMouseEvent* event){
-    if(mouseDownMode == NONE)
-        return;
-    // Find selection rectangle
-    mouseCurrentX = event->x();
-    mouseCurrentY = event->y();
+    event->accept();
+    if(mouseDownMode != NONE){
+        // Find selection rectangle
+        mouseCurrentX = event->x();
+        mouseCurrentY = event->y();
+        float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
+        float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
+        float mx1, mx2, my1, my2;
+        if(mouseCurrentX >= mouseDownX){
+            mx1 = mouseDownX / xScale - 5.f;
+            mx2 = mouseCurrentX / xScale + 5.f;
+        } else {
+            mx1 = mouseCurrentX / xScale - 5.f;
+            mx2 = mouseDownX / xScale + 5.f;
+        }
+        if(mouseCurrentY >= mouseDownY){
+            my1 = mouseDownY / yScale - 5.f;
+            my2 = mouseCurrentY / yScale + 5.f;
+        } else {
+            my1 = mouseCurrentY / yScale - 5.f;
+            my2 = mouseDownY / yScale + 5.f;
+        }
+        // Clear new selection
+        newSelection.fill(false);
+        // See if the event hit any keys
+        uint count = keyMap.count();
+        for(uint i = 0; i < count; i++){
+            const KeyPos& key = *keyMap.key(i);
+            if(key.x + 6.f >= mx1 && key.x + 6.f <= mx2
+                    && key.y + 6.f >= my1 && key.y + 6.f <= my2){
+                newSelection.setBit(i);
+            }
+        }
+        update();
+    }
+    // Update tooltip with the moused-over key (if any)
     float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
     float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
-    float mx1, mx2, my1, my2;
-    if(mouseCurrentX >= mouseDownX){
-        mx1 = mouseDownX / xScale - 5.f;
-        mx2 = mouseCurrentX / xScale + 5.f;
-    } else {
-        mx1 = mouseCurrentX / xScale - 5.f;
-        mx2 = mouseDownX / xScale + 5.f;
-    }
-    if(mouseCurrentY >= mouseDownY){
-        my1 = mouseDownY / yScale - 5.f;
-        my2 = mouseCurrentY / yScale + 5.f;
-    } else {
-        my1 = mouseCurrentY / yScale - 5.f;
-        my2 = mouseDownY / yScale + 5.f;
-    }
-    // Clear new selection
-    newSelection.fill(false);
-    // See if the event hit any keys
+    float mx = event->x() / xScale - 6.f, my = event->y() / yScale - 6.f;
     uint count = keyMap.count();
     for(uint i = 0; i < count; i++){
         const KeyPos& key = *keyMap.key(i);
-        if(key.x + 6.f >= mx1 && key.x + 6.f <= mx2
-                && key.y + 6.f >= my1 && key.y + 6.f <= my2){
-            newSelection.setBit(i);
+        if(fabs(key.x - mx) <= key.width / 2.f - 2.f && fabs(key.y - my) <= key.height / 2.f - 2.f){
+            setToolTip(key.name);
+            return;
         }
     }
-    update();
+    setToolTip("");
 }
 
 void RgbWidget::mouseReleaseEvent(QMouseEvent* event){
-    // Apply the new selection
-    switch(mouseDownMode){
-    case SET:
-        selection = newSelection;
-        break;
-    case ADD:
-        selection |= newSelection;
-        break;
-    case SUBTRACT:
-        selection &= ~newSelection;
-        break;
-    default:;
-    }
-    // Clear mousedown state.
-    newSelection.fill(false);
-    mouseDownMode = NONE;
-    // Leave mouseCurrentX and mouseCurrentY alone if the mouse didn't move.
-    // Used for shift+click above
-    if(event->x() != mouseDownX || event->y() != mouseDownY)
-        mouseCurrentX = mouseCurrentY = 0;
-    update();
-    // Determine the color of the selected keys (invalid color if there are any conflicts)
-    QColor color = QColor();
-    uint count = keyMap.count();
-    for(uint i = 0; i < count; i++){
-        if(selection.testBit(i)){
-            if(!color.isValid()){
-                color = keyMap.color(i);
-                continue;
-            }
-            if(keyMap.color(i) != color){
-                color = QColor();
-                break;
+    event->accept();
+    if(mouseDownMode != NONE){
+        // Apply the new selection
+        switch(mouseDownMode){
+        case SET:
+            selection = newSelection;
+            break;
+        case ADD:
+            selection |= newSelection;
+            break;
+        case SUBTRACT:
+            selection &= ~newSelection;
+            break;
+        default:;
+        }
+        // Clear mousedown state.
+        newSelection.fill(false);
+        mouseDownMode = NONE;
+        // Determine the color of the selected keys (invalid color if there are any conflicts)
+        QColor color = QColor();
+        uint count = keyMap.count();
+        for(uint i = 0; i < count; i++){
+            if(selection.testBit(i)){
+                if(!color.isValid()){
+                    color = keyMap.color(i);
+                    continue;
+                }
+                if(keyMap.color(i) != color){
+                    color = QColor();
+                    break;
+                }
             }
         }
+        emit selectionChanged(color, selection.count(true));
     }
-    emit selectionChanged(color, selection.count(true));
+    // Set tooltip according to which key the mouse is over
+}
+
+void RgbWidget::clearSelection(){
+    selection.fill(false);
+    newSelection.fill(false);
+    mouseDownMode = NONE;
+    emit selectionChanged(QColor(), 0);
 }

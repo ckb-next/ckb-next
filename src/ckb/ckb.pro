@@ -32,7 +32,8 @@ HEADERS  += mainwindow.h \
 	settingswidget.h \
 	kblightwidget.h \
 	keymap.h \
-	rgbwidget.h
+	rgbwidget.h \
+    media.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \
@@ -41,3 +42,6 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
 	image.qrc
+
+OBJECTIVE_SOURCES += \
+	media_mac.m

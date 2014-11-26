@@ -45,8 +45,7 @@ void KbWidget::readInput(){
                     ui->layoutBox->setCurrentIndex(0);
 
                 // Set all light setups to the new layout
-                int modecount = (model.indexOf("K95") >= 0) ? 3 : 1;
-                for(int mode = 0; mode < modecount; mode++){
+                for(int mode = 0; mode < modeCount; mode++){
                     KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);
                     light->rgbWidget->map(getKeyMap());
                 }
@@ -174,8 +173,8 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
     }
 
     // Create modes
-    int modecount = (model.indexOf("K95") >= 0) ? 3 : 1;
-    for(int i = 0; i < modecount; i++)
+    modeCount = (model.indexOf("K95") >= 0) ? 3 : 1;
+    for(int i = 0; i < modeCount; i++)
         addMode();
     ui->modeList->setCurrentRow(0);
     ui->lightWidgets->setCurrentIndex(0);
@@ -198,7 +197,7 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
         // If there were none, take notify0
         notifypath = path + "/notify0";
     cmd.write("get :profilename :layout :mode\n");
-    for(int i = 0; i < modecount; i++)
+    for(int i = 0; i < modeCount; i++)
         cmd.write(QString("mode %1 get :name :rgbon :rgb\n").arg(i + 1).toLatin1());
     cmd.close();
     usleep(100000);
@@ -209,8 +208,7 @@ KbWidget::~KbWidget(){
         QFile cmd;
         getCmd(cmd);
         // Close all modes
-        int modecount = ui->modeList->count() ;
-        for(int i = 0; i < modecount; i++)
+        for(int i = 0; i < modeCount; i++)
             ((KbLightWidget*)ui->lightWidgets->widget(i))->close(cmd, i + 1);
         cmd.write(QString("notifyoff %1\n").arg(notifyNumber).toLatin1());
         cmd.close();
@@ -239,14 +237,18 @@ void KbWidget::getCmd(QFile& file){
 void KbWidget::on_layoutBox_currentIndexChanged(int index){
     QFile cmd;
     getCmd(cmd);
+    // Close modes so that the RGB settings will be translated to the new layout correctly
+    for(int mode = 0; mode < modeCount; mode++){
+        KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);
+        light->close(cmd, mode + 1);
+    }
     if(index == 1)
         cmd.write("layout uk");
     else
         cmd.write("layout us");
     // Ask for all the RGB settings again
     // No need to switch the modes' layouts here, we'll see a notification for that shortly
-    int modecount = (model.indexOf("K95") >= 0) ? 3 : 1;
-    for(int mode = 0; mode < modecount; mode++)
+    for(int mode = 0; mode < modeCount; mode++)
         cmd.write(QString(" mode %1 get :rgbon :rgb").arg(mode + 1).toLatin1());
     cmd.write("\n");
     cmd.close();
@@ -254,6 +256,8 @@ void KbWidget::on_layoutBox_currentIndexChanged(int index){
 
 void KbWidget::on_modeList_currentRowChanged(int currentRow){
     currentMode = currentRow;
+    KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(currentMode);
+    light->rgbWidget->clearSelection();
     ui->lightWidgets->setCurrentIndex(currentRow);
 }
 
@@ -279,9 +283,8 @@ void KbWidget::on_profileText_editingFinished(){
 void KbWidget::on_modeList_itemChanged(QListWidgetItem *item){
     // Mode name changed?
     int index = 0;
-    int modecount = (model.indexOf("K95") >= 0) ? 3 : 1;
     // Find the mode's index
-    for(; index < modecount; index++){
+    for(; index < modeCount; index++){
         if(ui->modeList->item(index) == item)
             break;
     }
@@ -306,11 +309,15 @@ void KbWidget::on_pushButton_clicked(){
     QFile cmd;
     getCmd(cmd);
     // Close every mode so that only the base colors are written, not the animations
-    int modecount = (model.indexOf("K95") >= 0) ? 3 : 1;
-    for(int mode = 0; mode < modecount; mode++){
+    for(int mode = 0; mode < modeCount; mode++){
         KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);
         light->close(cmd, mode + 1);
     }
     cmd.write("hwsave\n");
     cmd.close();
+}
+
+void KbWidget::on_tabWidget_currentChanged(int index){
+    KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(currentMode);
+    light->rgbWidget->clearSelection();
 }

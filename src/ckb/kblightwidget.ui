@@ -10,6 +10,9 @@
     <height>483</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -133,7 +136,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Off</string>
+           <string>0%</string>
           </property>
          </item>
         </widget>
@@ -151,6 +154,9 @@
            <width>100</width>
            <height>100</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
         </widget>
        </item>

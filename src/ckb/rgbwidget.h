@@ -20,6 +20,8 @@ public:
     void set(const QColor& color);
     void setSelected(const QColor& color);
 
+    void clearSelection();
+
 signals:
     void selectionChanged(QColor selectedColor, int selectedCount);
 

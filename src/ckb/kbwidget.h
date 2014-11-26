@@ -29,6 +29,7 @@ public:
     bool disconnect;
 
     int notifyNumber;
+    int modeCount;
     int currentMode;
 
 public slots:
@@ -44,6 +45,8 @@ private slots:
     void on_modeList_itemChanged(QListWidgetItem *item);
 
     void on_pushButton_clicked();
+
+    void on_tabWidget_currentChanged(int index);
 
 private:
     Ui::KbWidget *ui;

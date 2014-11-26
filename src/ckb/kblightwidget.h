@@ -27,18 +27,14 @@ public:
     void frameUpdate(QFile& cmd, int modenumber);
     void close(QFile& cmd, int modenumber);
 
-public slots:
+private slots:
     void newSelection(QColor selectedColor, int selectedCount);
     void changeBG(QColor newColor);
     void changeFG(QColor newColor);
 
-private slots:
     void on_brightnessBox_currentIndexChanged(int index);
-
     void on_animBox_currentIndexChanged(int index);
-
     void on_inactiveCheck_stateChanged(int arg1);
-
     void on_inactiveLevelBox_currentIndexChanged(int index);
 
 private:

@@ -9,15 +9,15 @@
 #include "ui_kblightwidget.h"
 
 void KbWidget::frameUpdate(){
+    QFile cmd;
+    getCmd(cmd);
+
     // Read from the notification node
-    readInput();
+    readInput(cmd);
     // Get system mute state
     muteState mute = getMuteState();
     if(mute == UNKNOWN)
         mute = UNMUTED;
-
-    QFile cmd;
-    getCmd(cmd);
     // If the mode changed, close the old one first
     static int prevMode = -1;
     if(prevMode >= 0 && prevMode != currentMode){
@@ -34,7 +34,7 @@ void KbWidget::frameUpdate(){
     prevMode = currentMode;
 }
 
-void KbWidget::readInput(){
+void KbWidget::readInput(QFile& cmd){
     // Read from the notification node
     QFile notify;
     int fd = open(notifypath.toLatin1().constData(), O_RDONLY | O_NONBLOCK);
@@ -53,6 +53,9 @@ void KbWidget::readInput(){
                 for(int mode = 0; mode < modeCount; mode++){
                     KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);
                     light->rgbWidget->map(getKeyMap());
+#ifndef __APPLE__
+                        light->setWinLock(cmd, mode + 1, true);
+#endif
                 }
             } else if(components[0] == "key"){
                 // Key event
@@ -74,6 +77,11 @@ void KbWidget::readInput(){
                     currentMode = 2;
                     ui->modeList->setCurrentRow(2);
                     ui->lightWidgets->setCurrentIndex(2);
+                } else if(components[1] == "+lock"){
+#ifndef __APPLE__
+                    KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(currentMode);
+                    light->setWinLock(cmd, currentMode + 1, !light->winLock);
+#endif
                 }
             } else if(components[0] == "profilename"){
                 // Profile name - update list
@@ -203,7 +211,11 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
         notifypath = path + "/notify0";
     cmd.write("get :profilename :layout :mode\n");
     for(int i = 0; i < modeCount; i++)
+#ifndef __APPLE__
+        cmd.write(QString("mode %1 rebind lwin rwin get :name :rgbon :rgb\n").arg(i + 1).toLatin1());
+#else
         cmd.write(QString("mode %1 get :name :rgbon :rgb\n").arg(i + 1).toLatin1());
+#endif
     cmd.close();
     usleep(100000);
 }

@@ -122,7 +122,9 @@ void KbLightWidget::frameUpdate(QFile& cmd, int modenumber, bool dimMute){
     QStringList inactiveList = QStringList();
     float inactiveLight = 1.f;
     if(ui->inactiveCheck->isChecked()){
-        inactiveList << "mr" << "m1" << "m2" << "m3" << "lock";
+        inactiveList << "mr" << "m1" << "m2" << "m3";
+        if(!winLock)
+            inactiveList << "lock";
         if(dimMute)
             inactiveList << "mute";
         inactiveList.removeAll(QString("m%1").arg(modenumber));
@@ -162,6 +164,14 @@ void KbLightWidget::close(QFile &cmd, int modenumber){
     cmd.write("\n");
 }
 
+void KbLightWidget::setWinLock(QFile& cmd, int modenumber, bool lock){
+    winLock = lock;
+    if(lock)
+        cmd.write(QString().sprintf("mode %d unbind lwin rwin\n", modenumber).toLatin1());
+    else
+        cmd.write(QString().sprintf("mode %d rebind lwin rwin\n", modenumber).toLatin1());
+}
+
 void KbLightWidget::newSelection(QColor selectedColor, int selectedCount){
     ui->bgButton->color = selectedColor;
     ui->bgButton->updateImage();
@@ -195,7 +205,7 @@ void KbLightWidget::on_animBox_currentIndexChanged(int index){
 }
 
 KbLightWidget::KbLightWidget(QWidget *parent) :
-    QWidget(parent), active(false), forceLight(true),
+    QWidget(parent), active(false), forceLight(true), winLock(false),
     ui(new Ui::KbLightWidget)
 {
     ui->setupUi(this);

@@ -55,7 +55,7 @@ private:
     KeyMap getKeyMap();
 
     void getCmd(QFile& file);
-    void readInput();
+    void readInput(QFile& cmd);
 };
 
 #endif // KBWIDGET_H

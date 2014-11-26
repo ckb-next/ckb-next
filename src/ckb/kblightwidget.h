@@ -21,11 +21,14 @@ public:
 
     QColor fgColor;
     bool active, forceLight;
+    bool winLock;
 
     RgbWidget* rgbWidget;
 
     void frameUpdate(QFile& cmd, int modenumber, bool dimMute);
     void close(QFile& cmd, int modenumber);
+
+    void setWinLock(QFile& cmd, int modenumber, bool lock);
 
 private slots:
     void newSelection(QColor selectedColor, int selectedCount);

@@ -253,8 +253,8 @@ void readcmd(usbdevice* kb, const char* line){
     char* word = malloc(strlen(line) + 1);
     int wordlen;
     const char* newline = 0;
-    usbprofile* profile;
-    const key* keymap;
+    usbprofile* profile = 0;
+    const key* keymap = keymap_system;
     usbmode* mode = 0;
     cmd command = NONE;
     cmdhandler handler = 0;

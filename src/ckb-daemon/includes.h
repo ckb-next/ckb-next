@@ -27,6 +27,9 @@ typedef unsigned short ushort;
 // Gets the index of an object within an array
 #define INDEX_OF(entry, array) (int)(entry - array)
 
+// Better __FILE__ macro
+#define __FILE_NOPATH__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
 #include "structures.h"
 
 #endif

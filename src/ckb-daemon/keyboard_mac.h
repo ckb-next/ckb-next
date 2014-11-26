@@ -124,7 +124,6 @@
 #define KEY_VOLUMEUP        kVK_VolumeUp
 #define KEY_VOLUMEDOWN      kVK_VolumeDown
 // Media keys don't generate keypresses.
-// TOOD: figure out how to emulate these
 #define KEY_STOP            -1
 #define KEY_PREVIOUSSONG    -1
 #define KEY_PLAYPAUSE       -1

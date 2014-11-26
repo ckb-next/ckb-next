@@ -9,13 +9,21 @@
 // Number used to track whether or not a device connects successfully
 volatile int connectstatus = 0;
 
-int usbdequeue(usbdevice* kb){
+int _usbdequeue(usbdevice* kb, const char* file, int line){
     if(kb->queuecount == 0 || !kb->handle)
         return -1;
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 50, kb->queue[0] };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-    if(res <= 0)
+    if(res == -110){
+        printf("Warning: usbdequeue (%s:%d): Ignoring \"%s\"\n", file, line, strerror(-res));
+        res = MSG_SIZE;
+    }
+    if(res <= 0){
+        printf("Error: usbdequeue (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data written");
         return 0;
+    }
+    if(res != MSG_SIZE)
+        printf("Warning: usbdequeue (%s:%d): Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     // Rotate queue
     uchar* first = kb->queue[0];
     for(int i = 1; i < QUEUE_LEN; i++)
@@ -25,12 +33,18 @@ int usbdequeue(usbdevice* kb){
     return res;
 }
 
-int usbinput(usbdevice* kb, uchar* message){
+int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     if(!IS_ACTIVE(kb))
         return -1;
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 50, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-    return res < 0 ? 0 : res;
+    if(res <= 0){
+        printf("Error: usbdequeue (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
+        return 0;
+    }
+    if(res != MSG_SIZE)
+        printf("Warning: usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+    return res;
 }
 
 void* intreap(void* context){
@@ -92,18 +106,20 @@ void setint(usbdevice* kb){
     pthread_detach(kb->usbthread);
 }
 
-int usbunclaim(usbdevice* kb){
+int usbunclaim(usbdevice* kb, int resetting){
     for(int i = 0; i < 4; i++)
         ioctl(kb->handle, USBDEVFS_RELEASEINTERFACE, &i);
-    // The kernel driver should only be reconnected to interface 1 (HID)
+    // The kernel driver should only be reconnected to interface 1 (HID), and only if we're not about to do a USB reset
     // Reconnecting any of the others causes trouble
-    struct usbdevfs_ioctl ctl = { 1, USBDEVFS_CONNECT, 0 };
-    ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+    if(!resetting){
+        struct usbdevfs_ioctl ctl = { 1, USBDEVFS_CONNECT, 0 };
+        ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+    }
     return 0;
 }
 
 void closehandle(usbdevice* kb){
-    usbunclaim(kb);
+    usbunclaim(kb, 0);
     close(kb->handle);
     udev_device_unref(kb->udev);
     kb->handle = 0;
@@ -123,11 +139,21 @@ int usbclaim(usbdevice* kb){
     return 0;
 }
 
-int os_resetusb(usbdevice* kb){
-    int res = usbunclaim(kb);
-    if(res)
+int os_resetusb(usbdevice* kb, const char* file, int line){
+    int res = usbunclaim(kb, 1);
+    if(res){
+        printf("Error: resetusb (%s:%d): usbunclaim failed: %s\n", file, line, strerror(errno));
         return res;
-    return usbclaim(kb);
+    }
+    res = ioctl(kb->handle, USBDEVFS_RESET, 0);
+    if(res){
+        printf("Error: resetusb (%s:%d): USBDEVFS_RESET ioctl failed: %s\n", file, line, strerror(errno));
+        return res;
+    }
+    res = usbclaim(kb);
+    if(res)
+        printf("Error: resetusb (%s:%d): usbclaim failed: %s\n", file, line, strerror(errno));
+    return res;
 }
 
 int openusb(struct udev_device* dev, int model){

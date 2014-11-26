@@ -8,7 +8,7 @@
 
 #define INCOMPLETE (IOHIDDeviceRef)-1l
 
-int usbdequeue(usbdevice* kb){
+int _usbdequeue(usbdevice* kb, const char* file, int line){
     if(kb->queuecount == 0 || !kb->handle)
         return -1;
     IOReturn res = IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, kb->queue[0], MSG_SIZE);
@@ -18,17 +18,25 @@ int usbdequeue(usbdevice* kb){
         kb->queue[i - 1] = kb->queue[i];
     kb->queue[QUEUE_LEN - 1] = first;
     kb->queuecount--;
-    if(res != kIOReturnSuccess)
+    if(res != kIOReturnSuccess){
+        printf("Error: usbdequeue (%s:%d): Got return value %d\n", file, line, res);
         return 0;
+    }
     return MSG_SIZE;
 }
 
-int usbinput(usbdevice* kb, uchar* message){
+int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     if(!IS_ACTIVE(kb))
         return -1;
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
-    return res != kIOReturnSuccess ? 0 : length;
+    if(res != kIOReturnSuccess){
+        printf("Error: usbinput (%s:%d): Got return value %d\n", file, line, res);
+        return 0;
+    }
+    if(length != MSG_SIZE)
+        printf("Warning: usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
+    return length;
 }
 
 void closehandle(usbdevice* kb){
@@ -41,7 +49,7 @@ void closehandle(usbdevice* kb){
     }
 }
 
-int os_resetusb(usbdevice* kb){
+int os_resetusb(usbdevice* kb, const char* file, int line){
     // I don't think it's actually possible to do this.
     // Just return success without doing anything...
     return 0;

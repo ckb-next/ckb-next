@@ -8,7 +8,7 @@
 #include "usb.h"
 
 // OS-specific USB reset
-extern int os_resetusb(usbdevice* kb);
+extern int os_resetusb(usbdevice* kb, const char* file, int line);
 
 int usbqueue(usbdevice* kb, uchar* messages, int count){
     // Don't add messages unless the queue has enough room for all of them
@@ -113,9 +113,9 @@ int setupusb(usbdevice* kb){
     return 0;
 }
 
-int resetusb(usbdevice* kb){
+int _resetusb(usbdevice* kb, const char* file, int line){
     // Perform a USB reset
-    int res = os_resetusb(kb);
+    int res = os_resetusb(kb, file, line);
     if(res)
         return res;
     // Empty the queue. Re-send the firmware message as well as the input messages.

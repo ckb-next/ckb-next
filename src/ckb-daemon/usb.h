@@ -30,7 +30,8 @@ int setupusb(usbdevice* kb);
 int closeusb(usbdevice* kb);
 // Reset a USB device. Returns 0 on success, -1 if device should be removed
 // Threading: Lock the device mutex before calling
-int resetusb(usbdevice* kb);
+int _resetusb(usbdevice* kb, const char* file, int line);
+#define resetusb(kb) _resetusb(kb, __FILE_NOPATH__, __LINE__)
 // Close handles on a USB device
 // Threading: Lock device before use, unlock after finish
 void closehandle(usbdevice* kb);
@@ -41,9 +42,11 @@ int usbqueue(usbdevice* kb, uchar* messages, int count);
 // Output a message from the USB queue to the device, if any. Returns number of bytes written.
 // If the message was not sent successfully it will not be removed from the queue.
 // Threading: Lock device before use, unlock after finish
-int usbdequeue(usbdevice* kb);
+int _usbdequeue(usbdevice* kb, const char* file, int line);
+#define usbdequeue(kb) _usbdequeue(kb, __FILE_NOPATH__, __LINE__)
 // Gets input from a USB device.
 // Threading: Lock device before use, unlock after finish
-int usbinput(usbdevice* kb, uchar* message);
+int _usbinput(usbdevice* kb, uchar* message, const char* file, int line);
+#define usbinput(kb, message) _usbinput(kb, message, __FILE_NOPATH__, __LINE__)
 
 #endif

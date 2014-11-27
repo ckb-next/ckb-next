@@ -147,6 +147,7 @@ int closeusb(usbdevice* kb){
     if(kb->handle){
         printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
         inputclose(kb);
+        updateconnected();
         // Delete USB queue
         for(int i = 0; i < QUEUE_LEN; i++)
             free(kb->queue[i]);
@@ -159,9 +160,9 @@ int closeusb(usbdevice* kb){
         }
         // Close USB device
         closehandle(kb);
-        updateconnected();
         notifyconnect(kb, 0);
-    }
+    } else
+        updateconnected();
     // Delete the control path
     rmdevpath(kb);
 

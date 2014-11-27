@@ -9,6 +9,10 @@
 #define KEY_GRAVE_UK KEY_GRAVE
 #endif
 
+#define KEY_NONE    -1
+#define KEY_CORSAIR -2
+#define KEY_UNBOUND -3
+
 // Number of keys
 #define N_KEYS 144
 

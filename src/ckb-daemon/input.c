@@ -153,7 +153,7 @@ void cmd_bind(usbmode* mode, const key* keymap, int keyindex, const char* to){
 }
 
 void cmd_unbind(usbmode* mode, const key* keymap, int keyindex, const char* to){
-    mode->bind.base[keyindex] = 0;
+    mode->bind.base[keyindex] = KEY_UNBOUND;
 }
 
 void cmd_rebind(usbmode* mode, const key* keymap, int keyindex, const char* to){

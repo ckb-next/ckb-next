@@ -221,28 +221,26 @@ unsigned readlines(int fd, const char** input){
     }
     buffer[length] = 0;
     // Input should be issued one line at a time and should end with a newline.
-    // Find the last newline in the input
     char* lastline = memrchr(buffer, '\n', length);
     if(lastline == buffer + length - 1){
-        // If it's the last characcter, return the whole string
+        // If the buffer ends in a newline, process the whole string
         *input = buffer;
         return length - leftoverlen;
     } else if(lastline){
-        // Otherwise, chop off the input at the end and process it next time
+        // Otherwise, chop off the last line but process everything else
         *lastline = 0;
         leftover = lastline + 1 - buffer;
         leftoverlen = length - leftover;
         *input = buffer;
         return leftover - 1;
     } else {
-        // If it wasn't found at all, process the whole buffer next time
+        // If a newline wasn't found at all, process the whole buffer next time
         *input = 0;
         if(length == MAX_BUFFER){
             // Unless the buffer is completely full, in which case discard it
             printf("Warning: Too much input (128KB). Dropping.\n");
             return 0;
         }
-        leftover = 0;
         leftoverlen = length;
         return 0;
     }

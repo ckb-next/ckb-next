@@ -14,15 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
    <item row="12" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -158,7 +149,7 @@
       </font>
      </property>
      <property name="text">
-      <string>ckb v0.0.6</string>
+      <string>ckb v0.0.7</string>
      </property>
     </widget>
    </item>

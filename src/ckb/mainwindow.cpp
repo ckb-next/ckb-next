@@ -53,6 +53,7 @@ void MainWindow::scanKeyboards(){
         foreach(KbWidget* w, kbWidgets)
             w->deleteLater();
         kbWidgets.clear();
+        return;
     }
 
     // Scan connected devices

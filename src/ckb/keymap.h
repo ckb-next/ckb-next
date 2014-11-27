@@ -6,6 +6,7 @@
 // Key information
 struct KeyPos {
     // Key name
+    const char* friendlyName;
     const char* name;
     // LED position, measured roughly in 16th inches. Most keys are 3/4" apart.
     int x, y;

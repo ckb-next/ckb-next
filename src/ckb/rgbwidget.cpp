@@ -39,15 +39,13 @@ void RgbWidget::setSelected(const QColor& color){
 void RgbWidget::paintEvent(QPaintEvent*){
     const QColor bColor(64, 60, 60);
     const QColor kColor(112, 110, 110);
-    const QColor hColor(160, 168, 240);
+    const QColor hColor(136, 176, 240);
 
     float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
     float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
     uint count = keyMap.count();
 
-    QPainter painter(this);
-    painter.setPen(Qt::NoPen);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+    // Determine which keys to highlight
     QBitArray highlight;
     switch(mouseDownMode){
     case SET:
@@ -59,11 +57,52 @@ void RgbWidget::paintEvent(QPaintEvent*){
     case SUBTRACT:
         highlight = selection & ~newSelection;
         break;
+    case TOGGLE:
+        highlight = selection ^ newSelection;
+        break;
     default:
         highlight = selection;
     }
+
+    QPainter painter(this);
+    // Draw background
+    painter.setPen(Qt::NoPen);
+    painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setBrush(QBrush(bColor));
     painter.drawRect(0, 0, width(), height());
+
+    // Draw key backgrounds
+    for(uint i = 0; i < count; i++){
+        const KeyPos& key = *keyMap.key(i);
+        float x = key.x + 6.f - key.width / 2.f + 1.f;
+        float y = key.y + 6.f - key.height / 2.f + 1.f;
+        float w = key.width - 2.f;
+        float h = key.height - 2.f;
+        // Set color based on key highlight
+        if(highlight.testBit(i))
+            painter.setBrush(QBrush(hColor));
+        else
+            painter.setBrush(QBrush(kColor));
+        if(!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+                || !strcmp(key.name, "light") || !strcmp(key.name, "lock")){
+            // Switch keys are circular
+            x += w / 8.f;
+            y += h / 8.f;
+            w *= 0.75f;
+            h *= 0.75f;
+            painter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
+        } else {
+            // UK enter key isn't rectangular
+            if(key.height == 24 && !strcmp(key.name, "enter")){
+                y = key.y + 1.f;
+                h = 10.f;
+                painter.drawRect(QRectF((x + w - 13.f) * xScale, y * yScale, 13.f * xScale, 22.f * yScale));
+            }
+            painter.drawRect(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
+        }
+    }
+
+    // Draw mouse highlight (if any)
     if(mouseDownMode != NONE && (mouseDownX != mouseCurrentX || mouseDownY != mouseCurrentY)){
         int x1 = (mouseDownX > mouseCurrentX) ? mouseCurrentX : mouseDownX;
         int x2 = (mouseDownX > mouseCurrentX) ? mouseDownX : mouseCurrentX;
@@ -75,37 +114,13 @@ void RgbWidget::paintEvent(QPaintEvent*){
         painter.drawRect(x1, y1, x2 - x1, y2 - y1);
     }
 
+    // Draw key colors
     for(uint i = 0; i < count; i++){
         const KeyPos& key = *keyMap.key(i);
-        float x = key.x + 6.f - key.width / 2.f + 1.f;
-        float y = key.y + 6.f - key.height / 2.f + 1.f;
-        float w = key.width - 2.f;
-        float h = key.height - 2.f;
-        if(!strcmp(key.name, "enter"))
-            y = key.y + 1.f;
-        if(highlight.testBit(i))
-            painter.setBrush(QBrush(hColor));
-        else
-            painter.setBrush(QBrush(kColor));
-        if(!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
-                || !strcmp(key.name, "light") || !strcmp(key.name, "lock")){
-            x += w / 8.f;
-            y += h / 8.f;
-            w *= 0.75f;
-            h *= 0.75f;
-            painter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
-        } else {
-            // UK enter key isn't rectangular
-            if(key.height == 24 && !strcmp(key.name, "enter")){
-                h = 10.f;
-                painter.drawRect(QRectF((x + w - 13.f) * xScale, y * yScale, 13.f * xScale, 22.f * yScale));
-            }
-            painter.drawRect(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
-        }
-        x += w / 2.f - 2.f;
-        y += h / 2.f - 2.f;
-        w = 4.f;
-        h = 4.f;
+        float x = key.x + 6.f - 2.f;
+        float y = key.y + 6.f - 2.f;
+        float w = 4.f;
+        float h = 4.f;
         painter.setBrush(QBrush(QColor(255, 255, 255)));
         painter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
         x += w / 2.f - 1.5f;
@@ -119,21 +134,10 @@ void RgbWidget::paintEvent(QPaintEvent*){
 
 void RgbWidget::mousePressEvent(QMouseEvent* event){
     event->accept();
-    mouseDownMode = (event->modifiers() & Qt::AltModifier) ? SUBTRACT : (event->modifiers() & Qt::ControlModifier) ? ADD : SET;
-    // If shift is held down and the previous mousedown didn't have any movement, select all keys between the two clicks
-    if(event->modifiers() & Qt::ShiftModifier && mouseCurrentX >= 0 && mouseCurrentY >= 0){
-        // Use mouseMoveEvent to make the selection
-        mouseDownMode = SET;
-        mouseMoveEvent(event);
-        // And immediately close it off
-        mouseReleaseEvent(event);
-        mouseDownX = mouseCurrentX = event->x();
-        mouseDownY = mouseCurrentY = event->y();
-        return;
-    }
+    mouseDownMode = (event->modifiers() & Qt::AltModifier) ? SUBTRACT : (event->modifiers() & Qt::ShiftModifier) ? ADD : (event->modifiers() & Qt::ControlModifier) ? TOGGLE : SET;
     mouseDownX = mouseCurrentX = event->x();
     mouseDownY = mouseCurrentY = event->y();
-    // See if the event hit any keys
+    // See if the event hit a key
     float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
     float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
     float mx = mouseCurrentX / xScale - 6.f, my = mouseCurrentY / yScale - 6.f;
@@ -158,29 +162,34 @@ void RgbWidget::mouseMoveEvent(QMouseEvent* event){
         float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
         float mx1, mx2, my1, my2;
         if(mouseCurrentX >= mouseDownX){
-            mx1 = mouseDownX / xScale - 5.f;
-            mx2 = mouseCurrentX / xScale + 5.f;
+            mx1 = mouseDownX / xScale - 6.f;
+            mx2 = mouseCurrentX / xScale - 6.f;
         } else {
-            mx1 = mouseCurrentX / xScale - 5.f;
-            mx2 = mouseDownX / xScale + 5.f;
+            mx1 = mouseCurrentX / xScale - 6.f;
+            mx2 = mouseDownX / xScale - 6.f;
         }
         if(mouseCurrentY >= mouseDownY){
-            my1 = mouseDownY / yScale - 5.f;
-            my2 = mouseCurrentY / yScale + 5.f;
+            my1 = mouseDownY / yScale - 6.f;
+            my2 = mouseCurrentY / yScale - 6.f;
         } else {
-            my1 = mouseCurrentY / yScale - 5.f;
-            my2 = mouseDownY / yScale + 5.f;
+            my1 = mouseCurrentY / yScale - 6.f;
+            my2 = mouseDownY / yScale - 6.f;
         }
         // Clear new selection
         newSelection.fill(false);
         // See if the event hit any keys
         uint count = keyMap.count();
         for(uint i = 0; i < count; i++){
+            // Find key rectangle
             const KeyPos& key = *keyMap.key(i);
-            if(key.x + 6.f >= mx1 && key.x + 6.f <= mx2
-                    && key.y + 6.f >= my1 && key.y + 6.f <= my2){
+            float kx1 = key.x - key.width / 2.f + 1.f;
+            float ky1 = key.y - key.height / 2.f + 1.f;
+            float kx2 = kx1 + key.width - 2.f;
+            float ky2 = ky1 + key.height - 2.f;
+            // If they overlap, add the key to the selection
+            if(!(mx1 >= kx2 || kx1 >= mx2)
+                    && !(my1 >= ky2 || ky1 >= my2))
                 newSelection.setBit(i);
-            }
         }
         update();
     }
@@ -192,7 +201,7 @@ void RgbWidget::mouseMoveEvent(QMouseEvent* event){
     for(uint i = 0; i < count; i++){
         const KeyPos& key = *keyMap.key(i);
         if(fabs(key.x - mx) <= key.width / 2.f - 2.f && fabs(key.y - my) <= key.height / 2.f - 2.f){
-            setToolTip(key.name);
+            setToolTip(key.friendlyName ? QString(key.friendlyName) : QString(key.name).toUpper());
             return;
         }
     }
@@ -212,6 +221,9 @@ void RgbWidget::mouseReleaseEvent(QMouseEvent* event){
             break;
         case SUBTRACT:
             selection &= ~newSelection;
+            break;
+        case TOGGLE:
+            selection ^= newSelection;
             break;
         default:;
         }

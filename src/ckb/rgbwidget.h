@@ -38,7 +38,8 @@ private:
         NONE,
         SET,
         ADD,
-        SUBTRACT
+        SUBTRACT,
+        TOGGLE,
     } mouseDownMode;
 
     void mousePressEvent(QMouseEvent* event);

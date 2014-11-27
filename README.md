@@ -1,16 +1,16 @@
 ckb: Corsair K70/K95 Driver for Linux and OSX
 =============================================
 
-ckb is a userspace (i.e. non-kernel) driver for Corsair RGB keyboards for Linux and OSX. It contains a daemon program, which runs in the background and must be started as root, as well as a user interface which may be run as any user.
+ckb is a userspace (non-kernel) driver for Corsair RGB keyboards for Linux and OSX. It contains a daemon program, which runs in the background and must be started as root, as well as a user interface which may be run by any user.
 
-Building for Linux
+Linux instructions
 ------------------
 
 `qt5-base`, `libudev`, `gcc`, `g++`, and `glibc` are required. Check with your package manager to make sure you have the correct libraries/headers installed (Note: on Ubuntu you need `qt5-default` and `libudev-dev`). You also need a kernel with uinput support (all distros should ship with this by default; don't worry about it unless you're running a custom kernel).
 
 You can build the project by running `qmake && make` in the directory you downloaded it to. The binaries will be placed in a new `bin` directory assuming they compile successfully. To start the daemon, run `sudo bin/ckb-daemon`. After that, open the `ckb` binary as a normal user to start the user interface.
 
-Building for OSX
+OSX instructions
 ----------------
 
 Install Qt5 from here: http://www.qt.io/download-open-source/ (you'll also be prompted to install Xcode from the app store if you don't have it already)
@@ -28,13 +28,42 @@ Usage
 
 See `DAEMON.md` for info about the daemon program.
 
-The user interface is currently very limited and only supports a handful of options. They should be self-explanatory.
+The user interface is still a work in progress.
 
-**Coming soon:**
-- More animations
-- Reactive lighting for keypresses
-- Key rebinding
-- Key macros
+**Supported features:**
+- Multiple keyboards at once (note: not tested)
+- United States and United Kingdom keyboard layouts
+- Per-key lighting
+- Store up to 3 lighting modes (K95 only). Modes can be exported/imported from hardware.
+- Wave and Ripple animations with customizable color
+
+**Roadmap** (roughly in order)
+- **Alpha builds (v0.0.x):**
+- Saved ckb settings so you don't lose them when you restart
+- Multiple profiles
+- Per-key animations
+- More customizable animations (Gradient and Random will be back, as well as a new Raindrop animation)
+- Animations triggered by keypress
+- **v0.1 release:**
+- (Daemon) Allow the daemon to disconnect all keyboards without shutting down, reconnect later. This way ckb can soft stop/soft start the daemon, because using the daemon without ckb running isn't very useful.
+- (Daemon) Repeatable key macros, notification macros
+- (Daemon) Indicator (Num Lock, etc) notifications
+- (Daemon) Ability to generate mouse press/release events
+- System service files so that ckb-daemon can be run at system start.
+- **v0.2 release:**
+- Support for more modes, instead of being limited to the number of hardware modes.
+- Key rebinding in ckb
+- More functions for the Win Lock key
+- **v0.3 release:**
+- Key combos
+- Key macros, other advanced keypress features like running a custom command
+- **v0.4 release:**
+- Ability to tie profiles to which application has focus, or switch them with keys
+- Timers
+- **v1.0 release:**
+- OSD? (Not sure if this can actually be done)
+- Extra settings?
+- ????
 
 Closing ckb will actually minimize it to the system tray. Use the Exit option from the tray icon or program settings to exit the application.
 
@@ -42,4 +71,3 @@ Known issues
 ------------
 
 - The system tray icon doesn't always appear in Linux. Apparently this is a known Qt bug.
-- The Linux driver doesn't work 100% consistently and can be very slow to start up or shut down. This seems to be a driver/firmware conflict at an OS level, so it probably can't be fixed in ckb.

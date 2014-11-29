@@ -61,11 +61,8 @@ KeyMap KeyMap::standard(KeyMap::Model model, KeyMap::Layout layout){
                 if(keyIn[i].x < K70_X_START || !strcmp(keyIn[i].name, "mr")
                         || !strcmp(keyIn[i].name, "m1") || !strcmp(keyIn[i].name, "m2") || !strcmp(keyIn[i].name, "m3"))
                     continue;
-                keyOut[j].name = keyIn[i].name;
-                keyOut[j].x = keyIn[i].x - K70_X_START;
-                keyOut[j].y = keyIn[i].y;
-                keyOut[j].width = keyIn[i].width;
-                keyOut[j].height = keyIn[i].height;
+                keyOut[j] = keyIn[i];
+                keyOut[j].x -= K70_X_START;
                 j++;
             }
             // Do the same thing for the UK table
@@ -76,11 +73,8 @@ KeyMap KeyMap::standard(KeyMap::Model model, KeyMap::Layout layout){
                 if(keyIn[i].x < K70_X_START || !strcmp(keyIn[i].name, "mr")
                         || !strcmp(keyIn[i].name, "m1") || !strcmp(keyIn[i].name, "m2") || !strcmp(keyIn[i].name, "m3"))
                     continue;
-                keyOut[j].name = keyIn[i].name;
-                keyOut[j].x = keyIn[i].x - K70_X_START;
-                keyOut[j].y = keyIn[i].y;
-                keyOut[j].width = keyIn[i].width;
-                keyOut[j].height = keyIn[i].height;
+                keyOut[j] = keyIn[i];
+                keyOut[j].x -= K70_X_START;
                 j++;
             }
         }

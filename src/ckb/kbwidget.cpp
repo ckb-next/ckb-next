@@ -11,6 +11,8 @@
 void KbWidget::frameUpdate(){
     QFile cmd;
     getCmd(cmd);
+    if(!cmd.isOpen())
+        return;
 
     // Read from the notification node
     readInput(cmd);
@@ -170,7 +172,7 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
     QFile mpath(path + "/model"), spath(path + "/serial"), fpath(path + "/fwversion");
     if(mpath.open(QIODevice::ReadOnly)){
         model = mpath.read(100);
-        model = model.remove("Corsair").remove("Gaming Keyboard").remove("Keyboard").trimmed();
+        model = model.remove("Corsair").remove("Gaming Keyboard").remove("Keyboard").remove("Bootloader").trimmed();
         mpath.close();
     }
     if(spath.open(QIODevice::ReadOnly)){
@@ -204,6 +206,8 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
     }
     QFile cmd;
     getCmd(cmd);
+    if(!cmd.isOpen())
+        return;
     if(notifyNumber > 0){
         cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
         cmd.flush();
@@ -222,13 +226,14 @@ KbWidget::KbWidget(QWidget *parent, const QString &path) :
 }
 
 KbWidget::~KbWidget(){
-    if(notifyNumber > 0){
-        QFile cmd;
-        getCmd(cmd);
+    QFile cmd;
+    getCmd(cmd);
+    if(cmd.isOpen()){
         // Close all modes
         for(int i = 0; i < modeCount; i++)
             ((KbLightWidget*)ui->lightWidgets->widget(i))->close(cmd, i + 1);
-        cmd.write(QString("notifyoff %1\n").arg(notifyNumber).toLatin1());
+        if(notifyNumber > 0)
+            cmd.write(QString("notifyoff %1\n").arg(notifyNumber).toLatin1());
         cmd.close();
     }
     delete ui;
@@ -255,6 +260,8 @@ void KbWidget::getCmd(QFile& file){
 void KbWidget::on_layoutBox_currentIndexChanged(int index){
     QFile cmd;
     getCmd(cmd);
+    if(!cmd.isOpen())
+        return;
     // Close modes so that the RGB settings will be translated to the new layout correctly
     for(int mode = 0; mode < modeCount; mode++){
         KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);
@@ -291,6 +298,8 @@ void KbWidget::on_profileText_editingFinished(){
         // Write the name to the daemon
         QFile cmd;
         getCmd(cmd);
+        if(!cmd.isOpen())
+            return;
         cmd.write("profilename ");
         cmd.write(QUrl::toPercentEncoding(newName));
         cmd.write("\n");
@@ -316,6 +325,8 @@ void KbWidget::on_modeList_itemChanged(QListWidgetItem *item){
         // Write the name to the daemon
         QFile cmd;
         getCmd(cmd);
+        if(!cmd.isOpen())
+            return;
         cmd.write(QString("mode %1 name ").arg(index + 1).toLatin1());
         cmd.write(QUrl::toPercentEncoding(newName));
         cmd.write("\n");
@@ -326,6 +337,8 @@ void KbWidget::on_modeList_itemChanged(QListWidgetItem *item){
 void KbWidget::on_pushButton_clicked(){
     QFile cmd;
     getCmd(cmd);
+    if(!cmd.isOpen())
+        return;
     // Close every mode so that only the base colors are written, not the animations
     for(int mode = 0; mode < modeCount; mode++){
         KbLightWidget* light = (KbLightWidget*)ui->lightWidgets->widget(mode);

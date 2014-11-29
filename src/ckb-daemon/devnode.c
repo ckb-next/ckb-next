@@ -317,14 +317,18 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(!strcmp(word, "name")){
             command = NAME;
             handler = cmd_setmodename;
-            if(mode)
-                updatemod(&mode->id);
             continue;
         } else if(!strcmp(word, "profilename")){
             command = PROFILENAME;
             handler = 0;
-            if(profile)
-                updatemod(&profile->id);
+            continue;
+        } else if(!strcmp(word, "id")){
+            command = ID;
+            handler = 0;
+            continue;
+        } else if(!strcmp(word, "profileid")){
+            command = PROFILEID;
+            handler = 0;
             continue;
         } else if(!strcmp(word, "layout")){
             command = LAYOUT;
@@ -464,6 +468,18 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(command == PROFILENAME){
             // Profile name is the same, but takes a different parameter
             setprofilename(profile, word);
+            continue;
+        } else if(command == ID){
+            // ID takes either a GUID or an 8-digit hex number
+            int newmodified;
+            if(!setid(&mode->id, word) && sscanf(word, "%08x", &newmodified) == 1)
+                memcpy(mode->id.modified, &newmodified, sizeof(newmodified));
+            continue;
+        } else if(command == PROFILEID){
+            // Profile ID is the same but applies to the profile instead of the mode
+            int newmodified;
+            if(!setid(&profile->id, word) && sscanf(word, "%08x", &newmodified) == 1)
+                memcpy(profile->id.modified, &newmodified, sizeof(newmodified));
             continue;
         } else if(command == RGB){
             // RGB command has a special response for "on", "off", and a hex constant

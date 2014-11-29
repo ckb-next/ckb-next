@@ -50,7 +50,7 @@ typedef struct {
 // ID structure
 typedef struct {
     char guid[16];
-    char modified[2];
+    char modified[4];
 } usbid;
 
 #define PR_NAME_LEN 16

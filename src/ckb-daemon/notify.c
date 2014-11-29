@@ -120,5 +120,17 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         char* name = getmodename(mode);
         nprintf(kb, 0, mode, "name %s\n", name[0] ? name : "Unnamed");
         free(name);
+    } else if(!strcmp(setting, ":profileid")){
+        char* guid = getid(&profile->id);
+        int modified;
+        memcpy(&modified, &profile->id.modified, sizeof(modified));
+        nprintf(kb, 0, 0, "profileid %s %08x\n", guid, modified);
+        free(guid);
+    } else if(!strcmp(setting, ":id")){
+        char* guid = getid(&mode->id);
+        int modified;
+        memcpy(&modified, &mode->id.modified, sizeof(modified));
+        nprintf(kb, 0, mode, "id %s %08x\n", guid, modified);
+        free(guid);
     }
 }

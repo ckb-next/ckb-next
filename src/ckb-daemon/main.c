@@ -85,7 +85,7 @@ void* sigmain(void* context){
 }
 
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.0.7\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.8\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){

@@ -185,13 +185,41 @@ void genid(usbid* id){
 }
 
 void updatemod(usbid* id){
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    short new = (short)tv.tv_usec, old;
-    memcpy(&old, id->modified, 2);
+    int new = rand(), old;
+    memcpy(&old, id->modified, sizeof(id->modified));
     if(new == old)
         new++;
-    memcpy(id->modified, &new, 2);
+    memcpy(id->modified, &new, sizeof(id->modified));
+}
+
+int setid(usbid* id, const char* guid){
+    int32_t data1;
+    int16_t data2, data3, data4a;
+    char data4b[6];
+    if(sscanf(guid, "{%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}",
+              &data1, &data2, &data3, &data4a, data4b, data4b + 1, data4b + 2, data4b + 3, data4b + 4, data4b + 5) != 10)
+        return 0;
+    memcpy(id->guid + 0x0, &data1, 4);
+    memcpy(id->guid + 0x4, &data2, 2);
+    memcpy(id->guid + 0x6, &data3, 2);
+    memcpy(id->guid + 0x8, &data4a, 2);
+    memcpy(id->guid + 0xA, data4b, 6);
+    return 1;
+}
+
+char* getid(usbid* id){
+    int32_t data1;
+    int16_t data2, data3, data4a;
+    char data4b[6];
+    memcpy(&data1, id->guid + 0x0, 4);
+    memcpy(&data2, id->guid + 0x4, 2);
+    memcpy(&data3, id->guid + 0x6, 2);
+    memcpy(&data4a, id->guid + 0x8, 2);
+    memcpy(data4b, id->guid + 0xA, 6);
+    char* guid = malloc(39);
+    snprintf(guid, 39, "{%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}",
+             data1, data2, data3, data4a, data4b[0], data4b[1], data4b[2], data4b[3], data4b[4], data4b[5]);
+    return guid;
 }
 
 // Converts a hardware profile to a native profile
@@ -216,9 +244,12 @@ void nativetohw(usbprofile* profile, hwprofile* hw, int modes){
     for(int i = 0; i < modes; i++)
         memcpy(hw->name[i + 1], profile->mode[i].name, MD_NAME_LEN * 2);
     // Copy the profile and mode IDs
+    updatemod(&profile->id);
     memcpy(hw->id, &profile->id, sizeof(usbid));
-    for(int i = 0; i < modes; i++)
+    for(int i = 0; i < modes; i++){
+        updatemod(&profile->mode[i].id);
         memcpy(hw->id + i + 1, &profile->mode[i].id, sizeof(usbid));
+    }
     // Copy the key lighting
     for(int i = 0; i < modes; i++)
         memcpy(hw->light + i, &profile->mode[i].light, sizeof(keylight));

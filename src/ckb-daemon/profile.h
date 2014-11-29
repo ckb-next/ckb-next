@@ -26,6 +26,10 @@ void freeprofile(usbprofile* profile);
 void genid(usbid* id);
 // Updates an ID's modification
 void updatemod(usbid* id);
+// Updates a profile/mode with the supplied GUID. Returns 1 if valid or 0 if invalid.
+int setid(usbid* id, const char* guid);
+// Generates a GUID from the given ID. Returns a string which must be freed later.
+char* getid(usbid* id);
 
 // Loads the profile name from hardware. apply = 1 to apply/activate hardware profile, 1 to simply store it.
 int hwloadprofile(usbdevice* kb, int apply);

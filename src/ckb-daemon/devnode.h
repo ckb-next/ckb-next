@@ -42,6 +42,8 @@ typedef enum {
     MODE,
     NAME,
     PROFILENAME,
+    ID,
+    PROFILEID,
 
     LAYOUT,
     BIND,

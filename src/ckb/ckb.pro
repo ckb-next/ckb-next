@@ -14,7 +14,7 @@ TEMPLATE = app
 QMAKE_MAC_SDK = macosx10.10
 ICON = ckb-logo.icns
 macx {
-	LIBS += -framework AudioToolbox.framework
+	LIBS += -framework AudioToolbox
 }
 
 OBJECTS_DIR = $$PWD/../../tmp-ckb

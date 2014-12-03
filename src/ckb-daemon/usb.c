@@ -129,7 +129,7 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     setinput(kb, IN_CORSAIR);
     // If the hardware profile hasn't been loaded yet, load it here
     res = 0;
-    if(!kb->profile.hw){
+    if(!kb->hw){
         if(findstore(kb->profile.serial))
             res = hwloadprofile(kb, 0);
         else

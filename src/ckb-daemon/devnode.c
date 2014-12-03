@@ -189,7 +189,7 @@ void writefwnode(usbdevice* kb){
     }
 }
 
-#define MAX_BUFFER (128 * 1024 - 1)
+#define MAX_BUFFER (1024 * 1024 - 1)
 unsigned readlines(int fd, const char** input){
     // Allocate static buffers to store data
     static int buffersize = 4095;
@@ -238,7 +238,7 @@ unsigned readlines(int fd, const char** input){
         *input = 0;
         if(length == MAX_BUFFER){
             // Unless the buffer is completely full, in which case discard it
-            printf("Warning: Too much input (128KB). Dropping.\n");
+            printf("Warning: Too much input (1MB). Dropping.\n");
             return 0;
         }
         leftoverlen = length;
@@ -458,7 +458,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         if(command == MODE){
             int newmode;
-            if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode < MODE_MAX)
+            if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_MAX)
                 mode = getusbmode(newmode - 1, profile, keymap);
             continue;
         } else if(command == NAME || command == IOFF || command == ION || command == IAUTO){

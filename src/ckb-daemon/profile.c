@@ -3,10 +3,12 @@
 #include "led.h"
 #include "profile.h"
 
+#define MODE_STEP   4
+#define MODE_ROUND_UP(number)   ((number) / MODE_STEP * MODE_STEP + MODE_STEP)
 usbmode* getusbmode(int id, usbprofile* profile, const key* keymap){
     if(id < profile->modecount)
         return profile->mode + id;
-    int cap = id / 4 * 4 + 4;
+    int cap = MODE_ROUND_UP(id);
     if(cap > profile->modecap){
         int curidx = (!profile->currentmode || !profile->mode) ? -1 : INDEX_OF(profile->currentmode, profile->mode);
         profile->mode = realloc(profile->mode, cap * sizeof(usbmode));
@@ -103,19 +105,23 @@ void setprofilename(usbprofile* profile, const char* name){
     iconv(utf8to16, &in, &srclen, &out, &dstlen);
 }
 
-char* getmodename(usbmode* mode){
-    // Convert the name to UTF-8
+void nameconv(ushort* in, char* out, size_t* srclen, size_t* dstlen){
     if(!utf16to8)
         utf16to8 = iconv_open("UTF-8", "UTF-16LE");
-    char* buffer = calloc(1, MD_NAME_LEN * 4 - 3);
-    size_t srclen = 0, dstlen = MD_NAME_LEN * 4 - 4;
-    for(; srclen < MD_NAME_LEN; srclen++){
-        if(!mode->name[srclen])
+    size_t srclen2 = 0;
+    for(; srclen2 < MD_NAME_LEN; srclen2++){
+        if(!in[srclen2])
             break;
     }
-    srclen *= 2;
-    char* in = (char*)mode->name, *out = buffer;
-    iconv(utf16to8, &in, &srclen, &out, &dstlen);
+    *srclen = srclen2 * 2;
+    iconv(utf16to8, (char**)&in, srclen, &out, dstlen);
+}
+
+char* printname(ushort* name, int length){
+    // Convert the name to UTF-8
+    char* buffer = calloc(1, length * 4 - 3);
+    size_t srclen, dstlen = length * 4 - 4;
+    nameconv(name, buffer, &srclen, &dstlen);
     // URL-encode it
     char* buffer2 = malloc(strlen(buffer) * 3 + 1);
     urlencode2(buffer2, buffer);
@@ -123,24 +129,20 @@ char* getmodename(usbmode* mode){
     return buffer2;
 }
 
+char* getmodename(usbmode* mode){
+    return printname(mode->name, MD_NAME_LEN);
+}
+
 char* getprofilename(usbprofile* profile){
-    // Convert the name to UTF-8
-    if(!utf16to8)
-        utf16to8 = iconv_open("UTF-8", "UTF-16LE");
-    char* buffer = calloc(1, PR_NAME_LEN * 4 - 3);
-    size_t srclen = 0, dstlen = PR_NAME_LEN * 4 - 4;
-    for(; srclen < PR_NAME_LEN; srclen++){
-        if(!profile->name[srclen])
-            break;
-    }
-    srclen *= 2;
-    char* in = (char*)profile->name, *out = buffer;
-    iconv(utf16to8, &in, &srclen, &out, &dstlen);
-    // URL-encode it
-    char* buffer2 = malloc(strlen(buffer) * 3 + 1);
-    urlencode2(buffer2, buffer);
-    free(buffer);
-    return buffer2;
+    return printname(profile->name, PR_NAME_LEN);
+}
+
+char* gethwmodename(hwprofile* profile, int index){
+    return printname(profile->name[index + 1], MD_NAME_LEN);
+}
+
+char* gethwprofilename(hwprofile* profile){
+    return printname(profile->name[0], MD_NAME_LEN);
 }
 
 void erasemode(usbmode *mode, const key* keymap){
@@ -156,7 +158,9 @@ void eraseprofile(usbprofile* profile, int modecount){
     for(int i = 0; i < profile->modecount; i++)
         closebind(&profile->mode[i].bind);
     free(profile->mode);
-    memset(profile, 0, sizeof(*profile));
+    profile->mode = profile->currentmode = 0;
+    profile->modecount = profile->modecap = 0;
+    profile->name[0] = 0;
     genid(&profile->id);
     // There need to be at as many modes as there are hardware modes
     profile->currentmode = getusbmode(0, profile, profile->keymap);
@@ -251,8 +255,10 @@ void nativetohw(usbprofile* profile, hwprofile* hw, int modes){
         memcpy(hw->id + i + 1, &profile->mode[i].id, sizeof(usbid));
     }
     // Copy the key lighting
-    for(int i = 0; i < modes; i++)
+    for(int i = 0; i < modes; i++){
         memcpy(hw->light + i, &profile->mode[i].light, sizeof(keylight));
+        profile->mode[i].light.enabled = 1;
+    }
 }
 
 int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
@@ -329,17 +335,17 @@ int hwloadprofile(usbdevice* kb, int apply){
     if(apply)
         hwtonative(&kb->profile, hw, modes);
     // Free the existing profile (if any)
-    free(kb->profile.hw);
-    kb->profile.hw = hw;
+    free(kb->hw);
+    kb->hw = hw;
     return 0;
 }
 
 void hwsaveprofile(usbdevice* kb){
     if(!IS_ACTIVE(kb))
         return;
-    hwprofile* hw = kb->profile.hw;
+    hwprofile* hw = kb->hw;
     if(!hw)
-        hw = kb->profile.hw = calloc(1, sizeof(hwprofile));
+        hw = kb->hw = calloc(1, sizeof(hwprofile));
     int modes = (kb->model == 95 ? HWMODE_K95 : HWMODE_K70);
     nativetohw(&kb->profile, hw, modes);
     // Save the profile and mode names

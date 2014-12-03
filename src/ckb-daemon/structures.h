@@ -96,13 +96,11 @@ typedef struct {
     const key* keymap;
     // Device serial number
     char serial[SERIAL_LEN];
-    // Hardware modes. Null if not read yet
-    hwprofile* hw;
     // Name and UUID
     ushort name[PR_NAME_LEN];
     usbid id;
 } usbprofile;
-#define MODE_MAX    16
+#define MODE_MAX    100
 
 // Structure for tracking keyboard devices
 #define NAME_LEN    33
@@ -148,6 +146,8 @@ typedef struct {
     int queuecount;
     // Keyboard settings
     usbprofile profile;
+    // Hardware modes. Null if not read yet
+    hwprofile* hw;
     // Firmware version
     short fwversion;
     // Keyboard type (70 or 95 for keyboards, -1 for root)

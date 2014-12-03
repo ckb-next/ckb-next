@@ -53,6 +53,20 @@ void cmd_notify(usbmode* mode, const key* keymap, int keyindex, const char* togg
         CLEAR_KEYBIT(mode->notify, keyindex);
 }
 
+#define HWMODE_OR_RETURN(kb, index) \
+    switch((kb)->model){            \
+    case 95:                        \
+        if((index) >= HWMODE_K95)   \
+            return;                 \
+        break;                      \
+    case 70:                        \
+        if((index) >= HWMODE_K70)   \
+            return;                 \
+        break;                      \
+    default:                        \
+        return;                     \
+    }
+
 void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
     if(!strcmp(setting, ":hello")){
         if(kb && mode)
@@ -86,6 +100,7 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         free(rgb);
         return;
     } else if(!strcmp(setting, ":rgbon")){
+        // Get the current RGB status
         if(mode->light.enabled)
             nprintf(kb, 0, mode, "rgb on\n");
         else
@@ -93,44 +108,75 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         return;
     } else if(!strcmp(setting, ":hwrgb")){
         // Get the current hardware RGB settings
+        if(!kb->hw)
+            return;
         unsigned index = INDEX_OF(mode, profile->mode);
         // Make sure the mode number is valid
-        switch(kb->model){
-        case 95:
-            if(index >= HWMODE_K95)
-                return;
-            break;
-        case 70:
-            if(index >= HWMODE_K70)
-                return;
-            break;
-        default:
-            return;
-        }
+        HWMODE_OR_RETURN(kb, index);
         // Get the mode from the hardware store
-        char* rgb = printrgb(profile->hw->light + index, profile->keymap);
+        char* rgb = printrgb(kb->hw->light + index, profile->keymap);
         nprintf(kb, 0, mode, "hwrgb %s\n", rgb);
         free(rgb);
         return;
     } else if(!strcmp(setting, ":profilename")){
+        // Get the current profile name
         char* name = getprofilename(profile);
         nprintf(kb, 0, 0, "profilename %s\n", name[0] ? name : "Unnamed");
         free(name);
     } else if(!strcmp(setting, ":name")){
+        // Get the current mode name
         char* name = getmodename(mode);
         nprintf(kb, 0, mode, "name %s\n", name[0] ? name : "Unnamed");
         free(name);
+    } else if(!strcmp(setting, ":hwprofilename")){
+        // Get the current hardware profile name
+        if(!kb->hw)
+            return;
+        char* name = gethwprofilename(kb->hw);
+        nprintf(kb, 0, 0, "hwprofilename %s\n", name[0] ? name : "Unnamed");
+        free(name);
+    } else if(!strcmp(setting, ":hwname")){
+        // Get the current hardware mode name
+        if(!kb->hw)
+            return;
+        unsigned index = INDEX_OF(mode, profile->mode);
+        HWMODE_OR_RETURN(kb, index);
+        char* name = gethwmodename(kb->hw, index);
+        nprintf(kb, 0, mode, "hwname %s\n", name[0] ? name : "Unnamed");
+        free(name);
     } else if(!strcmp(setting, ":profileid")){
+        // Get the current profile ID
         char* guid = getid(&profile->id);
         int modified;
         memcpy(&modified, &profile->id.modified, sizeof(modified));
-        nprintf(kb, 0, 0, "profileid %s %08x\n", guid, modified);
+        nprintf(kb, 0, 0, "profileid %s %x\n", guid, modified);
         free(guid);
     } else if(!strcmp(setting, ":id")){
+        // Get the current mode ID
         char* guid = getid(&mode->id);
         int modified;
         memcpy(&modified, &mode->id.modified, sizeof(modified));
-        nprintf(kb, 0, mode, "id %s %08x\n", guid, modified);
+        nprintf(kb, 0, mode, "id %s %x\n", guid, modified);
+        free(guid);
+    } else if(!strcmp(setting, ":hwprofileid")){
+        // Get the current hardware profile ID
+        if(!kb->hw)
+            return;
+        char* guid = getid(&kb->hw->id[0]);
+        int modified;
+        memcpy(&modified, &kb->hw->id[0].modified, sizeof(modified));
+        nprintf(kb, 0, 0, "hwprofileid %s %x\n", guid, modified);
+        free(guid);
+    } else if(!strcmp(setting, ":hwid")){
+        // Get the current hardware mode ID
+        if(!kb->hw)
+            return;
+        unsigned index = INDEX_OF(mode, profile->mode);
+        HWMODE_OR_RETURN(kb, index);
+        char* guid = getid(&kb->hw->id[index + 1]);
+        int modified;
+        memcpy(&modified, &kb->hw->id[index + 1].modified, sizeof(modified));
+        nprintf(kb, 0, mode, "hwid %s %x\n", guid, modified);
         free(guid);
     }
 }

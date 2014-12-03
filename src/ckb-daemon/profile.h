@@ -14,6 +14,9 @@ void setprofilename(usbprofile* profile, const char* name);
 char* getmodename(usbmode* mode);
 // Gets a profile's name. See above.
 char* getprofilename(usbprofile* profile);
+// Gets hardware names.
+char* gethwmodename(hwprofile* profile, int index);
+char* gethwprofilename(hwprofile* profile);
 
 // Resets a mode to its default settings
 void erasemode(usbmode* mode, const key* keymap);

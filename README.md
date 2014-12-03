@@ -1,7 +1,9 @@
-ckb: Corsair K70/K95 Driver for Linux and OSX
-=============================================
+ckb: Corsair K70/K95 RGB Driver for Linux and OSX
+=================================================
 
 ckb is a userspace (non-kernel) driver for Corsair RGB keyboards for Linux and OSX. It contains a daemon program, which runs in the background and must be started as root, as well as a user interface which may be run by any user.
+
+**Note:** When downloading a new version of ckb, please delete your old download first and build it again from scratch. This helps ensure there are no problems lingering from an old build.
 
 Linux instructions
 ------------------
@@ -17,7 +19,7 @@ Install Qt5 from here: http://www.qt.io/download-open-source/ (you'll also be pr
 
 Open ckb.pro in Qt Creator. You should be prompted to configure the project (the default settings should work). Open `Build` from the menu bar and select `Run qmake`. Now press Cmd+B to build the project. The binaries should be placed in a newly-created `bin` directory assuming they compile successfully. Exit Qt Creator.
 
-**Note:** The project is intended to compile on OSX Yosemite. If you're running an earlier version, open `ckb.pro`, `src/ckb/ckb.pro`, and `src/ckb-daemon/ckb-daemon.pro` and find the `QMAKE_MAC_SDK` lines. Edit them from `macosx10.10` to your OSX version, e.g. `macosx10.9` for Mountain Lion.
+**Note:** The project is intended to compile on OSX Yosemite. If you're running an earlier version, open `ckb.pro`, `src/ckb/ckb.pro`, and `src/ckb-daemon/ckb-daemon.pro` and find the `QMAKE_MAC_SDK` lines. Edit them from `macosx10.10` to your OSX version, e.g. `macosx10.9` for Mavericks.
 
 ckb-daemon needs to be run as root. Open the `bin` directory in a Terminal window and run `sudo ./ckb-daemon`. Then open `ckb.app` as a normal application to start the user interface.
 
@@ -30,17 +32,15 @@ See `DAEMON.md` for info about the daemon program.
 
 The user interface is still a work in progress.
 
-**Supported features:**
-- Multiple keyboards at once (note: not tested)
+**Major features:**
+- Multiple keyboards (note: not tested)
 - United States and United Kingdom keyboard layouts
 - Per-key lighting
-- Store up to 3 lighting modes (K95 only). Modes can be exported/imported from hardware.
+- Multiple keyboard profiles/modes with hardware save function
 - Wave and Ripple animations with customizable color
 
 **Roadmap** (roughly in order)
 - **Alpha builds (v0.0.x):**
-- Saved ckb settings so you don't lose them when you restart
-- Multiple profiles
 - Per-key animations
 - More customizable animations (Gradient and Random will be back, as well as a new Raindrop animation)
 - Animations triggered by keypress
@@ -51,7 +51,6 @@ The user interface is still a work in progress.
 - (Daemon) Ability to generate mouse press/release events
 - System service files so that ckb-daemon can be run at system start.
 - **v0.2 release:**
-- Support for more modes, instead of being limited to the number of hardware modes.
 - Key rebinding in ckb
 - More functions for the Win Lock key
 - **v0.3 release:**

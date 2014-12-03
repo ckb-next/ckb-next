@@ -1,4 +1,4 @@
-The daemon provides devices at `/dev/input/ckb*`, where * is the device number, starting at 1. Up to 9 keyboards may be connected at once (note: not tested...) and controlled independently. Hot-plugging is supported; if you unplug a keyboard while the daemon is running and then plug it back in, the keyboard's previous settings will be restored. If a keyboard is plugged in which has not yet been assigned any settings, its saved settings will be loaded from the hardware. The daemon additionally provides `/dev/input/ckb0`, which can be used to control keyboards when they are not plugged in. Settings are only remembered as long as the daemon is running; if you restart the daemon, all settings will be forgotten.
+The daemon provides devices at `/dev/input/ckb*`, where * is the device number, starting at 1. Up to 9 keyboards may be connected at once and controlled independently. Hot-plugging is supported; if you unplug a keyboard while the daemon is running and then plug it back in, the keyboard's previous settings will be restored. If a keyboard is plugged in which has not yet been assigned any settings, its saved settings will be loaded from the hardware. The daemon additionally provides `/dev/input/ckb0`, which can be used to control keyboards when they are not plugged in. Settings are only remembered as long as the daemon is running; if you restart the daemon, all settings will be forgotten.
 
 After running the daemon, it will log some status messages to the terminal and you should now be able to access `/dev/input/ckb*`.
 
@@ -36,14 +36,20 @@ Note that changing a keyboard's layout will reset all bindings and remove all ma
 Profiles and modes
 ------------------
 
-Keyboard settings are grouped into modes, where each mode has its own independent binding and lighting setup. By default, all commands will update the currently selected mode. The `mode <n>` command may be used to change the settings for a different mode. Up to 64 modes are available. Each keyboard has one profile, which may be given a name. Modes 1 through 3 may be saved to the device hardware (only mode 1 for K70s). Only the RGB settings can be saved, not the bindings or any other info. Commands are as follows:
+Keyboard settings are grouped into modes, where each mode has its own independent binding and lighting setup. When the daemon starts or a keyboard is plugged in, the profile will be loaded from the hardware. By default, all commands will update the currently selected mode. The `mode <n>` command may be used to change the settings for a different mode. Up to 100 modes are available. Each keyboard has one profile, which may be given a name. Modes 1 through 3 may be saved to the device hardware (only mode 1 for K70s). Only the RGB settings can be saved, not the bindings or any other info. Commands are as follows:
 - `profilename <name>` sets the profile's name. The name must be written without spaces; to add a space, use `%20`.
 - `name <name>` sets the current mode's name. Use `mode <n> name <name>` to set a different mode's name.
-- `mode <n> switch` switches the keyboard to mode N.
-- `hwload` loads the RGB profile from the hardware. The profile's bindings are not affected.
+- `profileid <guid> [<modification>]` sets a profile's ID. The GUID must be written in registry format, like `{12345678-ABCD-EF01-2345-6789ABCDEF01}`. The optional modification number must be written with 8 hex digits, like `ABCDEF01`. Note that the modification number will be set to a random value when issuing a hardware save.
+- `id <guid> [<modification>]` sets a mode's ID. All hardware modes will get a random modification number upon hardware save (modes not saved to hardware are unaffected). Modes receive a random ID when they are created
+- `mode <n> switch` switches the keyboard to mode N. If the mode does not exist, it will be created with a newly-generated ID and default settings.
+- `hwload` loads the RGB profile from the hardware. Key bindings and non-hardware RGB modes are unaffected.
 - `hwsave` saves the RGB profile to the hardware.
-- `erase` erases the current mode, resetting its lighting and bindings. Use `mode <n> erase` to erase a different mode.
-- `eraseprofile` resets the entire profile, erasing its name and all of its modes.
+- `erase` erases the current mode, resetting its lighting and bindings. Use `mode <n> erase` to erase a different mode. Note that erasing a mode only resets its settings; it does not remove the mode from the profile.
+- `eraseprofile` erases the entire profile, deleting its name, ID, and all of its modes. Mode 1 (K70) or modes 1-3 (K95) will be recreated with default settings.
+
+**Examples:**
+- `profilename My%20Profile mode 1 name Mode%201 mode 2 name Mode%202 mode 3 name Mode%203` will name the profile "My Profile" and name modes 1-3 "Mode 1", "Mode 2", and "Mode 3".
+- `eraseprofile hwload` resets the entire profile to its hardware settings.
 
 LED commands
 ------------
@@ -58,8 +64,10 @@ The backlighting is controlled by the `rgb` commands. Any of the following combi
 - `rgb ffffff` makes the whole keyboard white.
 - `rgb 000000` makes the whole keyboard black. This is NOT equivalent to `rgb off` as the keys are still considered "on" but are simply not lit.
 - `rgb esc:ff0000` sets the Esc key red but leaves the rest of the keyboard unchanged.
+
 Multiple keys may be changed to one color when separated with commas, for instance:
 - `rgb w,a,s,d:0000ff` sets the WASD keys to blue.
+
 Additionally, multiple commands may be combined into one, for instance:
 - `rgb ffffff esc:ff0000 w,a,s,d:0000ff` sets the Esc key red, the WASD keys blue, and the rest of the keyboard white (note the lack of a key name before `ffffff`, implying the whole keyboard is to be set).
 
@@ -106,9 +114,9 @@ Notifications
 
 The keyboard can be configured to generate user-readable notifications on keypress events. These are controlled with the `notify` commands. In order to see events, read from `/dev/input/ckb*/notify0`. In a terminal, you can do this like `cat /dev/input/ckb1/notify0`. Programmatically, you can open it for reading like a regular file.
 
-Note that the file can only reliably be read by one application: if you try to open it in two different programs, they may both fail to get data. Data will be buffered as long as no programs are reading, so you will receive all unread notifications as soon as you open the file. If you'd like to read notifications from two separate applications, send the command `notifyon <n>` to the keyboard you wish to receive notifications from, where N is a number between 1 and 9. If `/dev/input/ckb*/notify<n>` does not already exist, it will be created, and you can read notifications from there without disrupting any other program currently reading them. To close a notification node, send `notifyoff <n>`.
+Note that the file can only reliably be read by one application: if you try to open it in two different programs, they may both fail to get data. Data will be buffered as long as no programs are reading, so you will receive all unread notifications as soon as you open the file. If you'd like to read notifications from two separate applications, send the command `notifyon <n>` to the keyboard you wish to receive notifications from, where N is a number between 1 and 9. If `/dev/input/ckb*/notify<n>` does not already exist, it will be created, and you can read notifications from there without disrupting any other program. To close a notification node, send `notifyoff <n>`. `notify0` is always open and will not be affected by `notifyon`/`notifyoff` commands.
 
-Notifications are printed in the format of one notification per line. If you are reading from `ckb0/notify*` you will see notifications for all keyboards, with `device <serial>` printed at the beginning of each line. Reading from `ckb1` or above will show you only notifications for that keyboard, with no serial number.
+Notifications are printed with one notification per line. If you are reading from `ckb0/notify*` you will see notifications for all keyboards, with `device <serial>` printed at the beginning of each line. Reading from `ckb1` or above will show you only notifications for that keyboard, with no serial number.
 
 Notification commands are as follows:
 - `notify <key>:on` or simply `notify <key>` enables notifications for a key. Each key will generate two notifications: `key +<key>` when the key is pressed, and `key -<key>` when it is released.
@@ -135,10 +143,14 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :fps` gets the current frame rate. Returns `fps <rate>`. Like `:hello`, this will be ignored if it is issued to an actual keyboard.
 - `get :layout` gets the current keyboard layout. Returns `layout <country>`. This may be issued to `ckb0` to get the default layout or to any keyboard to get the keyboard's layout.
 - `get :mode` returns the current mode in the form of a `switch` command. (Note: Do not use this in a line containing a `mode` command or it will return the mode that you selected, rather than the keyboard's current mode.)
-- `get :name` returns the current mode's name in the form of `mode <n> name <name>`. To see the name of another mode, use `mode <n> get :name`. The name is URL-encoded, so spaces are written as %20. The name may be truncated, so `name <some long string> get :name` may return something shorter than what was entered.
+- `get :name` returns the current mode's name in the form of `mode <n> name <name>`. To see the name of another mode, use `mode <n> get :name`. The name is URL-encoded; spaces are written as %20. The name may be truncated, so `name <some long string> get :name` may return something shorter than what was entered.
 - `get :profilename` returns the profile's name, in the form of `profilename <name>`. As above, it is URL-encoded and may be truncated.
-- `get :rgb` returns an `rgb` command equivalent to the RGB state of the current mode. Note that the keyboard has a limited color precision, so `rgb 123456 get :rgb` will not output `rgb 123456`. The only guarantee is that the `rgb` output will produce the same colors seen on the keyboard.
-- `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile. The output is the same except that it says `hwrgb` instead of `rgb`.
+- `get :hwname` and `get :hwprofilename` return the same thing except taken from the current hardware profile instead of the in-memory profile. The output is identical but will read `hwname` instead of `name` and `hwprofilename` instead of `profilename`.
+- `get :id` returns the current mode's ID and modification number in the form of `mode <n> id <guid> <modification>`.
+- `get :profileid` returns the current profile's ID and modification number in the form of `profileid <guid> <modification>`.
+- `get :hwid` and `get :hwprofileid` return the same thing except from the current hardware profile/mode. As before, the ouput will be the same but with `hwid` and `hwprofileid` instead of `id` and `profileid`.
+- `get :rgb` returns an `rgb` command equivalent to the current RGB state. Note that the keyboard has a limited color precision, so `rgb 123456 get :rgb` will not output `rgb 123456`. The only guarantee is that the `rgb` output will produce the same colors seen on the keyboard.
+- `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile. The output will say `hwrgb` instead of `rgb`.
 - `get :rgbon` returns either `rgb off` or `rgb on` depending on whether or not lighting was enabled. There is no `:hwrgbon` because the hardware lights are always on.
 
 Firmware updates

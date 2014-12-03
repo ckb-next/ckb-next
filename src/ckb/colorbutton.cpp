@@ -3,14 +3,19 @@
 #include <QPainter>
 
 ColorButton::ColorButton(QWidget *parent) :
-    QPushButton(parent), color(QColor())
+    QPushButton(parent)
 {
     connect(this, SIGNAL(clicked()), this, SLOT(pickColor()));
     updateImage();
 }
 
+void ColorButton::color(const QColor& newColor){
+    _color = newColor;
+    updateImage();
+}
+
 void ColorButton::updateImage(){
-    if(!color.isValid()){
+    if(!_color.isValid()){
         setIcon(QIcon());
         setText("Pick color...");
         return;
@@ -20,16 +25,16 @@ void ColorButton::updateImage(){
     QPainter painter(&image);
     painter.setPen(Qt::NoPen);
     painter.fillRect(0, 0, w, h, QColor(0, 0, 0));
-    painter.fillRect(1, 1, w - 2, h - 2, color);
+    painter.fillRect(1, 1, w - 2, h - 2, _color);
     setIcon(QIcon(QPixmap::fromImage(image)));
-    setText(" " + color.name().toUpper());
+    setText(" " + _color.name().toUpper());
 }
 
 void ColorButton::pickColor(){
-    QColor newColor = QColorDialog::getColor(color, this);
+    QColor newColor = QColorDialog::getColor(_color, this);
     if(newColor.isValid()){
-        color = newColor;
+        _color = newColor;
         updateImage();
-        emit colorChanged(color);
+        emit colorChanged(_color);
     }
 }

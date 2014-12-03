@@ -1,5 +1,14 @@
 <RCC>
     <qresource prefix="/img">
         <file>ckb-logo.png</file>
+        <file>icon_mode.png</file>
+        <file>icon_mode1_hardware.png</file>
+        <file>icon_mode1.png</file>
+        <file>icon_mode2_hardware.png</file>
+        <file>icon_mode2.png</file>
+        <file>icon_mode3_hardware.png</file>
+        <file>icon_mode3.png</file>
+        <file>icon_profile_hardware.png</file>
+        <file>icon_profile.png</file>
     </qresource>
 </RCC>

@@ -5,6 +5,7 @@
 #include <QColor>
 #include <QFile>
 #include <QResizeEvent>
+#include "kblight.h"
 #include "rgbwidget.h"
 
 namespace Ui {
@@ -19,16 +20,9 @@ public:
     explicit KbLightWidget(QWidget *parent = 0);
     ~KbLightWidget();
 
-    QColor fgColor;
-    bool active, forceLight;
-    bool winLock;
-
     RgbWidget* rgbWidget;
 
-    void frameUpdate(QFile& cmd, int modenumber, bool dimMute);
-    void close(QFile& cmd, int modenumber);
-
-    void setWinLock(QFile& cmd, int modenumber, bool lock);
+    void setLight(KbLight* newLight);
 
 private slots:
     void newSelection(QColor selectedColor, int selectedCount);
@@ -41,9 +35,7 @@ private slots:
     void on_inactiveLevelBox_currentIndexChanged(int index);
 
 private:
-    void animSolid(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
-    void animWave(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
-    void animRipple(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
+    KbLight* light;
 
     Ui::KbLightWidget *ui;
     friend class KbWidget;

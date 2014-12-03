@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(eventTimer, SIGNAL(timeout()), this, SLOT(timerTick()));
     eventTimer->start(1000 / 60);
 
+    QCoreApplication::setOrganizationName("ckb");
+
     scanKeyboards();
 }
 
@@ -76,7 +78,7 @@ void MainWindow::scanKeyboards(){
         if(widget)
             continue;
         // Add the keyboard
-        widget = new KbWidget(this, dev);
+        widget = new KbWidget(this, dev, "Devices");
         if(widget->cmdpath == ""){
             delete widget;
             continue;

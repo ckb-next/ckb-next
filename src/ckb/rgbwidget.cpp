@@ -210,44 +210,44 @@ void RgbWidget::mouseMoveEvent(QMouseEvent* event){
 
 void RgbWidget::mouseReleaseEvent(QMouseEvent* event){
     event->accept();
-    if(mouseDownMode != NONE){
-        // Apply the new selection
-        switch(mouseDownMode){
-        case SET:
-            selection = newSelection;
-            break;
-        case ADD:
-            selection |= newSelection;
-            break;
-        case SUBTRACT:
-            selection &= ~newSelection;
-            break;
-        case TOGGLE:
-            selection ^= newSelection;
-            break;
-        default:;
-        }
-        // Clear mousedown state.
-        newSelection.fill(false);
-        mouseDownMode = NONE;
-        // Determine the color of the selected keys (invalid color if there are any conflicts)
-        QColor color = QColor();
-        uint count = keyMap.count();
-        for(uint i = 0; i < count; i++){
-            if(selection.testBit(i)){
-                if(!color.isValid()){
-                    color = keyMap.color(i);
-                    continue;
-                }
-                if(keyMap.color(i) != color){
-                    color = QColor();
-                    break;
-                }
+    if(mouseDownMode == NONE)
+        return;
+    // Apply the new selection
+    switch(mouseDownMode){
+    case SET:
+        selection = newSelection;
+        break;
+    case ADD:
+        selection |= newSelection;
+        break;
+    case SUBTRACT:
+        selection &= ~newSelection;
+        break;
+    case TOGGLE:
+        selection ^= newSelection;
+        break;
+    default:;
+    }
+    // Clear mousedown state.
+    newSelection.fill(false);
+    mouseDownMode = NONE;
+    // Determine the color of the selected keys (invalid color if there are any conflicts)
+    QColor color = QColor();
+    uint count = keyMap.count();
+    for(uint i = 0; i < count; i++){
+        if(selection.testBit(i)){
+            if(!color.isValid()){
+                color = keyMap.color(i);
+                continue;
+            }
+            if(keyMap.color(i) != color){
+                color = QColor();
+                break;
             }
         }
-        emit selectionChanged(color, selection.count(true));
     }
-    // Set tooltip according to which key the mouse is over
+    update();
+    emit selectionChanged(color, selection.count(true));
 }
 
 void RgbWidget::clearSelection(){

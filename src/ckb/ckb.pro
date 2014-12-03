@@ -28,7 +28,9 @@ SOURCES += main.cpp\
 	kblightwidget.cpp \
 	keymap.cpp \
 	rgbwidget.cpp \
-    media_linux.cpp
+	media_linux.cpp \
+	kblight.cpp \
+    kbprofile.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
@@ -37,7 +39,9 @@ HEADERS  += mainwindow.h \
 	kblightwidget.h \
 	keymap.h \
 	rgbwidget.h \
-	media.h
+	media.h \
+	kblight.h \
+    kbprofile.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \

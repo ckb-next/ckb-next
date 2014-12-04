@@ -340,9 +340,15 @@ int hwloadprofile(usbdevice* kb, int apply){
     return 0;
 }
 
-void hwsaveprofile(usbdevice* kb){
+int hwsaveprofile(usbdevice* kb){
     if(!IS_ACTIVE(kb))
-        return;
+        return 0;
+    // Empty the current USB queue first
+    while(kb->queuecount > 0){
+        DELAY_SHORT;
+        if(!usbdequeue(kb))
+            return -1;
+    }
     hwprofile* hw = kb->hw;
     if(!hw)
         hw = kb->hw = calloc(1, sizeof(hwprofile));
@@ -368,4 +374,11 @@ void hwsaveprofile(usbdevice* kb){
     // Save the RGB data
     for(int i = 0; i < modes; i++)
         savergb(kb, i);
+    // Send all of the queued messages to the hardware. Return failure if any aren't sent.
+    while(kb->queuecount > 0){
+        DELAY_SHORT;
+        if(!usbdequeue(kb))
+            return -1;
+    }
+    return 0;
 }

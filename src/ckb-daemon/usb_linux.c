@@ -210,29 +210,16 @@ int openusb(struct udev_device* dev, int model){
                 // -1 indicates a software failure. Give up.
                 printf("Failed to set up device.\n");
                 closehandle(kb);
+                return -1;
+            } else if(usb_tryreset(kb)){
+                // Any other failure is hardware based. Reset and try again.
+                closehandle(kb);
                 connectstatus |= 2;
-            } else if(setup){
-                // Any other failure is hardware based. Reset and try again (may take several tries).
-                printf("Failed to set up device, trying to reset...\n");
-                int rsuccess = 0;
-                for(int try = 0; try < 10; try++){
-                    DELAY_LONG;
-                    if(!resetusb(kb)){
-                        printf("Reset success\n");
-                        rsuccess = 1;
-                        break;
-                    }
-                }
-                if(!rsuccess){
-                    printf("Reset failed. Disconnecting.\n");
-                    closehandle(kb);
-                    connectstatus |= 2;
-                    pthread_mutex_unlock(&kb->mutex);
-                    pthread_mutex_destroy(&kb->mutex);
-                    pthread_mutex_destroy(&kb->keymutex);
-                    DELAY_LONG;
-                    return -1;
-                }
+                pthread_mutex_unlock(&kb->mutex);
+                pthread_mutex_destroy(&kb->mutex);
+                pthread_mutex_destroy(&kb->keymutex);
+                DELAY_LONG;
+                return -1;
             }
 
             // We should receive an interrupt transfer shortly after setting them up. If it doesn't happen, the device
@@ -240,7 +227,7 @@ int openusb(struct udev_device* dev, int model){
             kb->INPUT_READY = 1;
             int received = 0;
             for(int wait = 0; wait < 10; wait++){
-                usleep(50000);
+                DELAY_LONG;
                 if(kb->INPUT_TEST){
                     received = 1;
                     break;
@@ -248,8 +235,7 @@ int openusb(struct udev_device* dev, int model){
             }
             if(!received && kb->fwversion > 0){
                 printf("Didn't get input, trying to reset...\n");
-                if(resetusb(kb)){
-                    printf("Reset failed. Disconnecting.\n");
+                if(usb_tryreset(kb)){
                     closehandle(kb);
                     connectstatus |= 2;
                     pthread_mutex_unlock(&kb->mutex);
@@ -257,8 +243,7 @@ int openusb(struct udev_device* dev, int model){
                     pthread_mutex_destroy(&kb->keymutex);
                     DELAY_LONG;
                     return -1;
-                } else
-                    printf("Reset success\n");
+                }
             }
 
             updateconnected();

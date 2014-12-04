@@ -139,6 +139,21 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     return res;
 }
 
+#define MAX_TRIES 10
+int usb_tryreset(usbdevice* kb){
+    printf("USB failure. ");
+    for(int try = 0; try < MAX_TRIES; try++){
+        printf("Attempting reset (%d of %d)...\n", try + 1, MAX_TRIES);
+        DELAY_LONG;
+        if(!resetusb(kb)){
+            printf("Reset success\n");
+            return 0;
+        }
+    }
+    printf("Reset failed. Disconnecting.\n");
+    return -1;
+}
+
 int closeusb(usbdevice* kb){
     // Close file handles
     if(!kb->infifo)

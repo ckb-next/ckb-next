@@ -185,7 +185,7 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     else if(input == 0 && output == 0 && feature == 64)
         kb->handles[3] = device;
     else
-        printf("Warning: Got unknown handle\n");
+        printf("Warning: Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
 
     // If all handles have been set up, finish initializing the keyboard
     if(kb->handles[0] && kb->handles[1] && kb->handles[2] && kb->handles[3])

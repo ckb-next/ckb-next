@@ -7,6 +7,7 @@
 int getfwversion(usbdevice* kb);
 
 // Updates firmware with data at the specified path. Prints notifications on success/failure.
-void cmd_fwupdate(usbdevice* kb, const char* path);
+// Returns 0 if the device is ok or -1 if it needs to be removed.
+int cmd_fwupdate(usbdevice* kb, const char* path);
 
 #endif

@@ -39,7 +39,7 @@ void closehandle(usbdevice* kb);
 // Add a message to a USB device to be sent to the device. Returns 0 on success.
 // Threading: Lock device before use, unlock after finish
 int usbqueue(usbdevice* kb, uchar* messages, int count);
-// Output a message from the USB queue to the device, if any. Returns number of bytes written.
+// Output a message from the USB queue to the device, if any. Returns number of bytes written, zero on failure, or -1 if the queue was empty.
 // If the message was not sent successfully it will not be removed from the queue.
 // Threading: Lock device before use, unlock after finish
 int _usbdequeue(usbdevice* kb, const char* file, int line);
@@ -48,5 +48,8 @@ int _usbdequeue(usbdevice* kb, const char* file, int line);
 // Threading: Lock device before use, unlock after finish
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line);
 #define usbinput(kb, message) _usbinput(kb, message, __FILE_NOPATH__, __LINE__)
+
+// Try to perform a task, reset device if needed. Returns zero on success. The action will NOT be re-attempted if the reset is successful.
+int usb_tryreset(usbdevice* kb);
 
 #endif

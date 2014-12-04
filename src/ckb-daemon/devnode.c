@@ -248,6 +248,8 @@ unsigned readlines(int fd, const char** input){
 
 void readcmd(usbdevice* kb, const char* line){
     usbdevice* kb0 = kb;
+    if(IS_ACTIVE(kb))
+        pthread_mutex_lock(&kb->mutex);
     char* word = malloc(strlen(line) + 1);
     int wordlen;
     const char* newline = 0;
@@ -272,8 +274,13 @@ void readcmd(usbdevice* kb, const char* line){
             if(!newline)
                 newline = line + strlen(line);
             // Send the RGB command to the last device if its colors changed
-            if(kb != prevkb)
+            if(kb != prevkb){
                 updatergb(prevkb, 0);
+                if(IS_ACTIVE(prevkb))
+                    pthread_mutex_unlock(&prevkb->mutex);
+                if(IS_ACTIVE(kb))
+                    pthread_mutex_lock(&kb->mutex);
+            }
         }
         // Check for a command word
         if(!strcmp(word, "device")){
@@ -293,13 +300,29 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(!strcmp(word, "hwload")){
             command = NONE;
             handler = 0;
-            if(profile)
-                hwloadprofile(kb, 1);
+            if(kb && profile){
+                // Try to load the profile from hardware
+                while(hwloadprofile(kb, 1)){
+                    if(usb_tryreset(kb)){
+                        closeusb(kb);
+                        free(word);
+                        return;
+                    }
+                }
+            }
         } else if(!strcmp(word, "hwsave")){
             command = NONE;
             handler = 0;
-            if(profile)
-                hwsaveprofile(kb);
+            if(kb && profile){
+                // Save the profile to hardware
+                while(hwsaveprofile(kb)){
+                    if(usb_tryreset(kb)){
+                        closeusb(kb);
+                        free(word);
+                        return;
+                    }
+                }
+            }
         } else if(!strcmp(word, "erase")){
             command = NONE;
             handler = 0;
@@ -410,8 +433,13 @@ void readcmd(usbdevice* kb, const char* line){
                 keymap = (profile ? profile->keymap : keymap_system);
                 mode = (profile ? profile->currentmode : 0);
                 // Send the RGB command to the last device if its colors changed
-                if(kb != prevkb)
+                if(kb != prevkb){
                     updatergb(prevkb, 0);
+                    if(IS_ACTIVE(prevkb))
+                        pthread_mutex_unlock(&prevkb->mutex);
+                    if(IS_ACTIVE(kb))
+                        pthread_mutex_lock(&kb->mutex);
+                }
             }
             continue;
         } else if(command == LAYOUT){
@@ -501,7 +529,12 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         } else if(command == FWUPDATE){
             // FW update also parses a whole word
-            cmd_fwupdate(kb, word);
+            if(cmd_fwupdate(kb, word)){
+                // If the USB device failed, close it
+                closeusb(kb);
+                free(word);
+                return;
+            }
             continue;
         }
         // Split the parameter at the colon
@@ -545,5 +578,7 @@ void readcmd(usbdevice* kb, const char* line){
         }
     }
     updatergb(kb, 0);
+    if(IS_ACTIVE(kb))
+        pthread_mutex_unlock(&kb->mutex);
     free(word);
 }

@@ -34,9 +34,9 @@ int setid(usbid* id, const char* guid);
 // Generates a GUID from the given ID. Returns a string which must be freed later.
 char* getid(usbid* id);
 
-// Loads the profile name from hardware. apply = 1 to apply/activate hardware profile, 1 to simply store it.
+// Loads the profile name from hardware. apply = 1 to apply/activate hardware profile, 1 to simply store it. Returns 0 on success.
 int hwloadprofile(usbdevice* kb, int apply);
-// Saves the profile name to hardware
-void hwsaveprofile(usbdevice* kb);
+// Saves the profile name to hardware. Returns 0 on success.
+int hwsaveprofile(usbdevice* kb);
 
 #endif

@@ -171,12 +171,15 @@ int fwupdate(usbdevice* kb, const char* path){
     return FW_OK;
 }
 
-void cmd_fwupdate(usbdevice* kb, const char* path){
-    // Lock the keyboard's mutex first
-    pthread_mutex_lock(&kb->mutex);
+int cmd_fwupdate(usbdevice* kb, const char* path){
     // Update the firmware
     int ret = fwupdate(kb, path);
-    pthread_mutex_unlock(&kb->mutex);
+    while(ret == FW_USBFAIL){
+        // Try to reset the device if it fails
+        if(usb_tryreset(kb))
+            break;
+        ret = fwupdate(kb, path);
+    }
     switch(ret){
     case FW_OK:
         nprintf(kb, 0, 0, "fwupdate %s ok\n", path);
@@ -187,6 +190,7 @@ void cmd_fwupdate(usbdevice* kb, const char* path){
         break;
     case FW_USBFAIL:
         nprintf(kb, 0, 0, "fwupdate %s fail\n", path);
-        break;
+        return -1;
     }
+    return 0;
 }

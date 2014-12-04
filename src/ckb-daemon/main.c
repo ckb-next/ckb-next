@@ -85,7 +85,7 @@ void* sigmain(void* context){
 }
 
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.0.9\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.10\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){
@@ -170,22 +170,17 @@ int main(int argc, char** argv){
         for(int i = 1; i < DEV_MAX; i++){
             if(IS_ACTIVE(keyboard + i)){
                 pthread_mutex_lock(&keyboard[i].mutex);
-                if(usbdequeue(keyboard + i) == 0){
-                    printf("Device ckb%d not responding, trying to reset...\n", i);
-                    if(resetusb(keyboard + i)){
-                        printf("Reset failed\n");
-                        closeusb(keyboard + i);
-                    } else {
-                        printf("Reset success\n");
-                        updateindicators(keyboard + i, 1);
-                    }
+                if(usbdequeue(keyboard + i) == 0
+                        && usb_tryreset(keyboard + i)){
+                    // If it failed and couldn't be reset, close the keyboard
+                    closeusb(keyboard + i);
                 } else {
                     // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
                     // immediately and may be changed externally by the OS.
                     if(!frame)
                         updateindicators(keyboard + i, 0);
+                    pthread_mutex_unlock(&keyboard[i].mutex);
                 }
-                pthread_mutex_unlock(&keyboard[i].mutex);
             }
         }
         pthread_mutex_unlock(&kblistmutex);

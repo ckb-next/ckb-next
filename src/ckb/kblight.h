@@ -35,6 +35,9 @@ public:
     inline bool winLock() { return _winLock; }
     void winLock(QFile& cmd, bool lock);
 
+    inline QStringList animated() { return _animated; }
+    inline void animated(const QStringList& newAnimated) { _animated = newAnimated; }
+
     void frameUpdate(QFile& cmd, bool dimMute);
     void close(QFile& cmd);
 
@@ -48,13 +51,15 @@ private:
     int _brightness;
     int _inactive;
     int _animation;
+    QStringList _animated;
     bool _winLock;
 
     float animPos;
 
-    void animSolid(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
-    void animWave(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
-    void animRipple(QFile& cmd, float light, QStringList inactive, float inactiveLevel);
+    void animWave(const QStringList& keys, KeyMap& colorMap);
+    void animRipple(const QStringList& keys, KeyMap& colorMap);
+
+    void printRGB(QFile& cmd, KeyMap& colorMap);
 };
 
 #endif // KBLIGHT_H

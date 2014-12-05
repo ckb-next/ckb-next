@@ -49,6 +49,7 @@ public:
     // Gets key info
     const KeyPos* key(uint index) const;
     const KeyPos* key(const QString& name) const;
+    int index(const QString& name) const;
 
     // Gets or sets key colors
     QColor color(uint index) const;

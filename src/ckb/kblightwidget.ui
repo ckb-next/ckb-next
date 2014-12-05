@@ -205,20 +205,10 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Foreground color:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <spacer name="horizontalSpacer">
+     <item row="0" column="0" rowspan="2">
+      <spacer name="horizontalSpacer_7">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -228,12 +218,32 @@
        </property>
       </spacer>
      </item>
+     <item row="0" column="3">
+      <widget class="ColorButton" name="fgButton">
+       <property name="text">
+        <string> #FFFFFF</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Animation:</string>
        </property>
       </widget>
+     </item>
+     <item row="0" column="4" rowspan="2">
+      <spacer name="horizontalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item row="1" column="3">
       <widget class="QComboBox" name="animBox">
@@ -254,38 +264,35 @@
        </item>
       </widget>
      </item>
-     <item row="0" column="3">
-      <widget class="ColorButton" name="fgButton">
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string> #FFFFFF</string>
+        <string>Foreground color:</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="4" rowspan="2">
-      <spacer name="horizontalSpacer_8">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+     <item row="2" column="1" colspan="3">
+      <widget class="QPushButton" name="animButton">
+       <property name="text">
+        <string>Animate selected keys</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="0" column="0" rowspan="2">
-      <spacer name="horizontalSpacer_7">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      </widget>
      </item>
     </layout>
    </item>

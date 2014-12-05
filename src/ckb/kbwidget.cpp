@@ -84,6 +84,7 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
 
 void KbWidget::save(){
     QSettings settings;
+    settings.remove(prefsPath);
     settings.beginGroup(prefsPath);
     QString guids, currentGuid;
     foreach(KbProfile* profile, profiles){
@@ -135,7 +136,6 @@ void KbWidget::updateUI(){
         return;
 
     ui->lightWidget->setLight(currentLight());
-    ui->lightWidget->rgbWidget->map(currentLight()->map());
 
     if(currentMode() == 0)
         ui->modeUpButton->setEnabled(false);

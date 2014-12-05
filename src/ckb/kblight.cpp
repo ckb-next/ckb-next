@@ -10,99 +10,63 @@ KbLight::KbLight(QObject* parent, int modeIndex, const KeyMap& map) :
 
 extern int framerate;
 
-void KbLight::animSolid(QFile& cmd, float light, QStringList inactive, float inactiveLevel){
-    cmd.write(" rgb on");
-    uint count = _map.count();
-    for(uint i = 0; i < count; i++){
-        QColor bg = _map.color(i);
-        float r = bg.redF() * 255.f;
-        float g = bg.greenF() * 255.f;
-        float b = bg.blueF() * 255.f;
-        r *= light;
-        g *= light;
-        b *= light;
-        const KeyPos& pos = *_map.key(i);
-        foreach(QString name, inactive){
-            if(!strcmp(pos.name, name.toLatin1().constData())){
-                r *= inactiveLevel;
-                g *= inactiveLevel;
-                b *= inactiveLevel;
-                break;
-            }
-        }
-        cmd.write(QString().sprintf(" %s:%02x%02x%02x", pos.name, (int)r, (int)g, (int)b).toLatin1());
-    }
-}
-
-void KbLight::animWave(QFile& cmd, float light, QStringList inactive, float inactiveLevel){
-    int fg = _fgColor.rgb() & 0xFFFFFF;
-    float size = _map.width() + 36.f;
-    cmd.write(" rgb on");
-    uint count = _map.count();
-    for(uint i = 0; i < count; i++){
-        const KeyPos& pos = *_map.key(i);
-        QColor bg = _map.color(i);
-        float r = bg.redF() * 255.f;
-        float g = bg.greenF() * 255.f;
-        float b = bg.blueF() * 255.f;
+void KbLight::animWave(const QStringList& keys, KeyMap& colorMap){
+    float fgr = _fgColor.redF();
+    float fgg = _fgColor.greenF();
+    float fgb = _fgColor.blueF();
+    float size = colorMap.width() + 36.f;
+    foreach(QString key, keys){
+        const KeyPos& pos = *colorMap.key(key);
+        QColor bg = colorMap.color(key);
+        float r = bg.redF();
+        float g = bg.greenF();
+        float b = bg.blueF();
         float distance = fabs(pos.x - animPos);
         if(distance <= 36.f){
-            r = r * distance / 36.f + ((fg >> 16) & 0xFF) * (1.f - distance / 36.f);
-            g = g * distance / 36.f + ((fg >> 8) & 0xFF) * (1.f - distance / 36.f);
-            b = b * distance / 36.f + (fg & 0xFF) * (1.f - distance / 36.f);
+            r = r * distance / 36.f + fgr * (1.f - distance / 36.f);
+            g = g * distance / 36.f + fgg * (1.f - distance / 36.f);
+            b = b * distance / 36.f + fgb * (1.f - distance / 36.f);
         }
-        r *= light;
-        g *= light;
-        b *= light;
-        foreach(QString name, inactive){
-            if(!strcmp(pos.name, name.toLatin1().constData())){
-                r *= inactiveLevel;
-                g *= inactiveLevel;
-                b *= inactiveLevel;
-                break;
-            }
-        }
-        cmd.write(QString().sprintf(" %s:%02x%02x%02x", pos.name, (int)r, (int)g, (int)b).toLatin1());
+        colorMap.color(key, QColor::fromRgbF(r, g, b));
     }
     animPos += (size + 36.f) / 2.f / (float)framerate;
     if(animPos >= size)
         animPos = -36.f;
 }
 
-void KbLight::animRipple(QFile& cmd, float light, QStringList inactive, float inactiveLevel){
-    int fg = _fgColor.rgb() & 0xFFFFFF;
+void KbLight::animRipple(const QStringList& keys, KeyMap& colorMap){
+    float fgr = _fgColor.redF();
+    float fgg = _fgColor.greenF();
+    float fgb = _fgColor.blueF();
     float size = sqrt(((double)_map.width())*_map.width()/2. + ((double)_map.height())*_map.height()/2.);
     float cx = _map.width() / 2.f, cy = _map.height() / 2.f;
-    cmd.write(" rgb on");
-    uint count = _map.count();
-    for(uint i = 0; i < count; i++){
-        const KeyPos& pos = *_map.key(i);
-        QColor bg = _map.color(i);
-        float r = bg.redF() * 255.f;
-        float g = bg.greenF() * 255.f;
-        float b = bg.blueF() * 255.f;
+    foreach(QString key, keys){
+        const KeyPos& pos = *colorMap.key(key);
+        QColor bg = colorMap.color(key);
+        float r = bg.redF();
+        float g = bg.greenF();
+        float b = bg.blueF();
         float distance = fabs(sqrt(pow(pos.x - cx, 2.) + pow(pos.y - cy, 2.)) - animPos);
         if(distance <= 36.f){
-            r = r * distance / 36.f + ((fg >> 16) & 0xFF) * (1.f - distance / 36.f);
-            g = g * distance / 36.f + ((fg >> 8) & 0xFF) * (1.f - distance / 36.f);
-            b = b * distance / 36.f + (fg & 0xFF) * (1.f - distance / 36.f);
+            r = r * distance / 36.f + fgr * (1.f - distance / 36.f);
+            g = g * distance / 36.f + fgg * (1.f - distance / 36.f);
+            b = b * distance / 36.f + fgb * (1.f - distance / 36.f);
         }
-        r *= light;
-        g *= light;
-        b *= light;
-        foreach(QString name, inactive){
-            if(!strcmp(pos.name, name.toLatin1().constData())){
-                r *= inactiveLevel;
-                g *= inactiveLevel;
-                b *= inactiveLevel;
-                break;
-            }
-        }
-        cmd.write(QString().sprintf(" %s:%02x%02x%02x", pos.name, (int)r, (int)g, (int)b).toLatin1());
+        colorMap.color(key, QColor::fromRgbF(r, g, b));
     }
     animPos += (size + 36.f) / (float)framerate;
     if(animPos >= size)
         animPos = -36.f;
+}
+
+void KbLight::printRGB(QFile& cmd, KeyMap& colorMap){
+    cmd.write(" rgb on");
+    uint count = colorMap.count();
+    for(uint i = 0; i < count; i++){
+        const KeyPos& pos = *colorMap.key(i);
+        QColor color = colorMap.color(i);
+        cmd.write(QString().sprintf(" %s:%02x%02x%02x", pos.name, color.red(), color.green(), color.blue()).toLatin1());
+    }
 }
 
 void KbLight::frameUpdate(QFile& cmd, bool dimMute){
@@ -112,6 +76,7 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
         cmd.write(" rgb off\n");
         return;
     }
+    KeyMap colorMap = _map;
     float light = (3 - _brightness) / 3.f;
     QStringList inactiveList = QStringList();
     float inactiveLight = 1.f;
@@ -126,33 +91,56 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
     }
 
     switch(_animation){
-    case 0:
-        // No animation
-        animSolid(cmd, light, inactiveList, inactiveLight);
-        break;
-    case 1: {
+    case 1:
         // Wave
-        animWave(cmd, light, inactiveList, inactiveLight);
+        animWave(_animated, colorMap);
         break;
-    }
-    case 2: {
+    case 2:
         // Ripple
-        animRipple(cmd, light, inactiveList, inactiveLight);
+        animRipple(_animated, colorMap);
         break;
+    default:;
     }
+    // Dim inactive keys
+    if(light != 1.f || inactiveLight != 1.f){
+        uint count = colorMap.count();
+        for(uint i = 0; i < count; i++){
+            const KeyPos& pos = *colorMap.key(i);
+            QColor bg = colorMap.color(i);
+            float r = bg.redF();
+            float g = bg.greenF();
+            float b = bg.blueF();
+            r *= light;
+            g *= light;
+            b *= light;
+            if(inactiveList.contains(pos.name)){
+                r *= inactiveLight;
+                g *= inactiveLight;
+                b *= inactiveLight;
+            }
+            colorMap.color(i, QColor::fromRgbF(r, g, b));
+        }
     }
+    // Apply light
+    printRGB(cmd, colorMap);
     cmd.write("\n");
 }
 
 void KbLight::close(QFile &cmd){
     animPos = -36.f;
     if(_brightness == MAX_BRIGHTNESS){
-        cmd.write(QString().sprintf("mode %d rgb off\n", _modeIndex).toLatin1());
+        cmd.write(QString().sprintf("mode %d rgb off", _modeIndex).toLatin1());
         return;
     }
     // Set just the background color, ignoring any animation
     cmd.write(QString().sprintf("mode %d", _modeIndex).toLatin1());
-    animSolid(cmd, 1.f, QStringList() << "mr" << "m1" << "m2" << "m3" << "lock", 0.f);
+    KeyMap colorMap = _map;
+    colorMap.color("mr", QColor(0, 0, 0));
+    colorMap.color("m1", QColor(0, 0, 0));
+    colorMap.color("m2", QColor(0, 0, 0));
+    colorMap.color("m3", QColor(0, 0, 0));
+    colorMap.color("lock", QColor(0, 0, 0));
+    printRGB(cmd, colorMap);
 }
 
 void KbLight::winLock(QFile& cmd, bool lock){
@@ -186,6 +174,7 @@ void KbLight::load(QSettings& settings){
         _map.color(i, color);
     }
     settings.endGroup();
+    _animated = settings.value("AnimatedKeys").toStringList();
     settings.endGroup();
 }
 
@@ -201,5 +190,6 @@ void KbLight::save(QSettings& settings){
     for(uint i = 0; i < count; i++)
         settings.setValue(QString(_map.key(i)->name).toUpper(), _map.color(i).name());
     settings.endGroup();
+    settings.setValue("AnimatedKeys", _animated);
     settings.endGroup();
 }

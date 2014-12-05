@@ -63,7 +63,7 @@ private:
         quint32 modified;
 
         inline UsbId(const QString& _guid, quint32 _modified) : guid(_guid), modified(_modified) {}
-        inline UsbId() : modified(0) {}
+        inline UsbId() : guid(QUuid::createUuid()),modified(0) {}
     };
 
     QString _name;

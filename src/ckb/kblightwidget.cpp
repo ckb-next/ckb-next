@@ -11,10 +11,8 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     connect(ui->fgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeFG(QColor)));
     connect(ui->bgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeBG(QColor)));
 
-    connect(ui->rgbWidget, SIGNAL(selectionChanged(QColor,int)), this, SLOT(newSelection(QColor,int)));
+    connect(ui->rgbWidget, SIGNAL(selectionChanged(QColor,QStringList)), this, SLOT(newSelection(QColor,QStringList)));
     ui->bgButton->setVisible(false);
-
-    rgbWidget = ui->rgbWidget;
 }
 
 KbLightWidget::~KbLightWidget(){
@@ -25,31 +23,38 @@ void KbLightWidget::setLight(KbLight* newLight){
     if(light == newLight)
         return;
     light = newLight;
-    rgbWidget->clearSelection();
+    ui->rgbWidget->clearSelection();
+    ui->rgbWidget->map(newLight->map());
     ui->inactiveCheck->setChecked(newLight->inactive() >= 0);
     ui->inactiveLevelBox->setCurrentIndex(newLight->inactive() >= 0 ? newLight->inactive() : KbLight::MAX_INACTIVE);
     ui->fgButton->color(newLight->fgColor());
     ui->animBox->setCurrentIndex(newLight->animation());
     ui->brightnessBox->setCurrentIndex(newLight->brightness());
+    if(light->animation() != 0)
+        ui->rgbWidget->setAnimation(light->animated());
+    else
+        ui->rgbWidget->setAnimation(QStringList());
 }
 
-void KbLightWidget::newSelection(QColor selectedColor, int selectedCount){
+void KbLightWidget::newSelection(QColor selectedColor, QStringList selection){
+    currentSelection = selection;
     ui->bgButton->color(selectedColor);
-    if(selectedCount == 0){
+    int count = selection.count();
+    if(count == 0){
         ui->selLabel->setText("No keys selected");
         ui->bgButton->setVisible(false);
         return;
-    } else if(selectedCount == 1)
+    } else if(count == 1)
         ui->selLabel->setText("1 key selected");
     else
-        ui->selLabel->setText(QString("%1 keys selected").arg(selectedCount));
+        ui->selLabel->setText(QString("%1 keys selected").arg(count));
     ui->bgButton->setVisible(true);
 }
 
 void KbLightWidget::changeBG(QColor newColor){
-    rgbWidget->setSelected(newColor);
+    ui->rgbWidget->setSelected(newColor);
     if(light)
-        light->map(rgbWidget->map());
+        light->map(ui->rgbWidget->map());
 }
 
 void KbLightWidget::changeFG(QColor newColor){
@@ -77,6 +82,16 @@ void KbLightWidget::on_brightnessBox_currentIndexChanged(int index){
 }
 
 void KbLightWidget::on_animBox_currentIndexChanged(int index){
-    if(light)
+    if(light){
         light->animation(index);
+        if(index == 0)
+            ui->rgbWidget->setAnimation(QStringList());
+        else
+            ui->rgbWidget->setAnimation(light->animated());
+    }
+}
+
+void KbLightWidget::on_animButton_clicked(){
+    light->animated(currentSelection);
+    ui->rgbWidget->setAnimationToSelection();
 }

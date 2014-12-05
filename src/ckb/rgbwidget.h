@@ -22,8 +22,11 @@ public:
 
     void clearSelection();
 
+    void setAnimation(const QStringList& keys);
+    void setAnimationToSelection();
+
 signals:
-    void selectionChanged(QColor selectedColor, int selectedCount);
+    void selectionChanged(QColor selectedColor, QStringList selected);
 
 private:
     KeyMap keyMap;
@@ -32,6 +35,7 @@ private:
 
     QBitArray selection;
     QBitArray newSelection;
+    QBitArray animation;
     int mouseDownX, mouseDownY;
     int mouseCurrentX, mouseCurrentY;
     enum {

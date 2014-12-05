@@ -14,6 +14,7 @@ void RgbWidget::map(const KeyMap& newMap){
     keyMap = newMap;
     selection = QBitArray(keyMap.count());
     newSelection = QBitArray(keyMap.count());
+    animation = QBitArray(keyMap.count());
     setFixedSize((keyMap.width() + KEY_SIZE) * 2, (keyMap.height() + KEY_SIZE) * 2);
     update();
 }
@@ -40,6 +41,8 @@ void RgbWidget::paintEvent(QPaintEvent*){
     const QColor bColor(64, 60, 60);
     const QColor kColor(112, 110, 110);
     const QColor hColor(136, 176, 240);
+    const QColor haColor(136, 200, 240);
+    const QColor aColor(112, 200, 110);
 
     float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
     float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
@@ -79,8 +82,13 @@ void RgbWidget::paintEvent(QPaintEvent*){
         float w = key.width - 2.f;
         float h = key.height - 2.f;
         // Set color based on key highlight
-        if(highlight.testBit(i))
-            painter.setBrush(QBrush(hColor));
+        if(highlight.testBit(i)){
+            if(animation.testBit(i))
+                painter.setBrush(QBrush(haColor));
+            else
+                painter.setBrush(QBrush(hColor));
+        } else if(animation.testBit(i))
+            painter.setBrush(QBrush(aColor));
         else
             painter.setBrush(QBrush(kColor));
         if(!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
@@ -246,13 +254,33 @@ void RgbWidget::mouseReleaseEvent(QMouseEvent* event){
             }
         }
     }
+    QStringList selectedNames;
+    for(uint i = 0; i < count; i++){
+        if(selection.testBit(i))
+            selectedNames << keyMap.key(i)->name;
+    }
+    emit selectionChanged(color, selectedNames);
     update();
-    emit selectionChanged(color, selection.count(true));
 }
 
 void RgbWidget::clearSelection(){
     selection.fill(false);
     newSelection.fill(false);
     mouseDownMode = NONE;
-    emit selectionChanged(QColor(), 0);
+    emit selectionChanged(QColor(), QStringList());
+}
+
+void RgbWidget::setAnimation(const QStringList& keys){
+    animation.fill(false);
+    foreach(QString key, keys){
+        int index = keyMap.index(key);
+        if(index >= 0)
+            animation.setBit(index);
+    }
+    update();
+}
+
+void RgbWidget::setAnimationToSelection(){
+    animation = selection;
+    update();
 }

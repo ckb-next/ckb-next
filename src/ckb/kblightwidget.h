@@ -20,12 +20,10 @@ public:
     explicit KbLightWidget(QWidget *parent = 0);
     ~KbLightWidget();
 
-    RgbWidget* rgbWidget;
-
     void setLight(KbLight* newLight);
 
 private slots:
-    void newSelection(QColor selectedColor, int selectedCount);
+    void newSelection(QColor selectedColor, QStringList selection);
     void changeBG(QColor newColor);
     void changeFG(QColor newColor);
 
@@ -34,8 +32,12 @@ private slots:
     void on_inactiveCheck_stateChanged(int arg1);
     void on_inactiveLevelBox_currentIndexChanged(int index);
 
+    void on_animButton_clicked();
+
 private:
     KbLight* light;
+
+    QStringList currentSelection;
 
     Ui::KbLightWidget *ui;
     friend class KbWidget;

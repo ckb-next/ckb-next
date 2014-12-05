@@ -337,6 +337,7 @@ int hwloadprofile(usbdevice* kb, int apply){
     // Free the existing profile (if any)
     free(kb->hw);
     kb->hw = hw;
+    DELAY_LONG;
     return 0;
 }
 
@@ -380,5 +381,6 @@ int hwsaveprofile(usbdevice* kb){
         if(!usbdequeue(kb))
             return -1;
     }
+    DELAY_LONG;
     return 0;
 }

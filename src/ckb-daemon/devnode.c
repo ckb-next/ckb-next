@@ -310,6 +310,7 @@ void readcmd(usbdevice* kb, const char* line){
                     }
                 }
             }
+            updatergb(kb, 1);
         } else if(!strcmp(word, "hwsave")){
             command = NONE;
             handler = 0;
@@ -323,6 +324,7 @@ void readcmd(usbdevice* kb, const char* line){
                     }
                 }
             }
+            updatergb(kb, 1);
         } else if(!strcmp(word, "erase")){
             command = NONE;
             handler = 0;

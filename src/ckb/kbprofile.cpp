@@ -142,8 +142,12 @@ void KbProfile::moveMode(int from, int to){
     KbLight* light = modeLight(from);
     modeNames.removeAt(from);
     modeLights.removeAt(from);
+    while(modeIds.length() <= from)
+        modeIds.append(UsbId());
+    UsbId id = modeIds.takeAt(from);
     modeNames.insert(to, name);
     modeLights.insert(to, light);
+    modeIds.insert(id);
     // Recompute mode indices
     int i = 0;
     foreach(KbLight* light, modeLights)
@@ -155,6 +159,7 @@ void KbProfile::duplicateMode(int mode){
     KbLight* light = new KbLight(this, mode + 1, modeLight(mode)->map());
     modeNames.insert(mode + 1, name);
     modeLights.insert(mode + 1, light);
+    modeIds.insert(index + 1, UsbId());
     // Recompute mode indices
     int i = 0;
     foreach(KbLight* light, modeLights)
@@ -164,6 +169,7 @@ void KbProfile::duplicateMode(int mode){
 void KbProfile::deleteMode(int mode){
     modeNames.removeAt(mode);
     modeLights.takeAt(mode)->deleteLater();
+    modeIds.removeAt(mode);
     if(currentMode() >= modeCount())
         currentMode(currentMode() - 1);
     // Recompute mode indices

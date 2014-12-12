@@ -1,9 +1,10 @@
+bin/
 .DS_Store
 ._*
-bin/
-tmp-*/
+*.o
 *.pro.*
 Makefile
+Makefile.*
 moc_*
 ui_*
 qrc_*

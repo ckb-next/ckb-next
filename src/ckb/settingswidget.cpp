@@ -1,3 +1,4 @@
+#include "animscript.h"
 #include "mainwindow.h"
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
@@ -61,6 +62,9 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
         }
         cmd.close();
     }
+
+    ui->animPathLabel->setText(AnimScript::path());
+    on_animScanButton_clicked();
 }
 
 SettingsWidget::~SettingsWidget(){
@@ -83,4 +87,15 @@ void SettingsWidget::on_fpsBox_currentIndexChanged(const QString &arg1){
         cmd.write(QString("fps %1\n").arg(framerate).toLatin1());
         cmd.close();
     }
+}
+
+void SettingsWidget::on_animScanButton_clicked(){
+    AnimScript::scan();
+    int count = AnimScript::count();
+    if(count == 0)
+        ui->animCountLabel->setText("No animations found");
+    else if(count == 1)
+        ui->animCountLabel->setText("1 animation found");
+    else
+        ui->animCountLabel->setText(QString("%1 animations found").arg(count));
 }

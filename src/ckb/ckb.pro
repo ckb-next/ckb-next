@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-11-15T21:35:37
-#
-#-------------------------------------------------
-
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -17,7 +11,6 @@ macx {
 	LIBS += -framework AudioToolbox
 }
 
-OBJECTS_DIR = $$PWD/../../tmp-ckb
 DESTDIR = $$PWD/../../bin
 
 SOURCES += main.cpp\
@@ -30,7 +23,11 @@ SOURCES += main.cpp\
 	rgbwidget.cpp \
 	media_linux.cpp \
 	kblight.cpp \
-    kbprofile.cpp
+	kbprofile.cpp \
+	kbanimwidget.cpp \
+	animscript.cpp \
+    kbanim.cpp \
+    animadddialog.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
@@ -41,12 +38,19 @@ HEADERS  += mainwindow.h \
 	rgbwidget.h \
 	media.h \
 	kblight.h \
-    kbprofile.h
+	kbprofile.h \
+	kbanimwidget.h \
+	animscript.h \
+    ckb-anim.h \
+    kbanim.h \
+    animadddialog.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \
 	settingswidget.ui \
-	kblightwidget.ui
+	kblightwidget.ui \
+	kbanimwidget.ui \
+    animadddialog.ui
 
 RESOURCES += \
 	image.qrc

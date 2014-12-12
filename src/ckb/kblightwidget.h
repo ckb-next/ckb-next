@@ -24,14 +24,11 @@ public:
 
 private slots:
     void newSelection(QColor selectedColor, QStringList selection);
-    void changeBG(QColor newColor);
-    void changeFG(QColor newColor);
+    void changeColor(QColor newColor);
+    void changeAnim(KbAnim* newAnim);
+    void changeAnimKeys(QStringList keys);
 
     void on_brightnessBox_currentIndexChanged(int index);
-    void on_animBox_currentIndexChanged(int index);
-    void on_inactiveCheck_stateChanged(int arg1);
-    void on_inactiveLevelBox_currentIndexChanged(int index);
-
     void on_animButton_clicked();
 
 private:

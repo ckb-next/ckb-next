@@ -31,6 +31,8 @@ public:
     inline void guid(const QString& newGuid) { id.guid = newGuid; }
     inline QString modified() const { return QString::number(id.modified, 16); }
     inline void modified(const QString& newModified) { id.modified = newModified.toUInt(0, 16); }
+    inline bool hwAssigned() const { return _hwAssigned; }
+    inline void hwAssigned(bool newHwAssigned) { _hwAssigned = newHwAssigned; }
 
     // Profile key map
     inline const KeyMap& keyMap() const { return _keyMap; }
@@ -73,6 +75,7 @@ private:
     UsbId id;
     KeyMap _keyMap;
     int _currentMode;
+    bool _hwAssigned;
 };
 
 #endif // KBPROFILE_H

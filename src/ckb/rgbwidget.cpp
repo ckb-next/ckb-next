@@ -239,34 +239,34 @@ void RgbWidget::mouseReleaseEvent(QMouseEvent* event){
     // Clear mousedown state.
     newSelection.fill(false);
     mouseDownMode = NONE;
-    // Determine the color of the selected keys (invalid color if there are any conflicts)
-    QColor color = QColor();
-    uint count = keyMap.count();
-    for(uint i = 0; i < count; i++){
-        if(selection.testBit(i)){
-            if(!color.isValid()){
-                color = keyMap.color(i);
-                continue;
-            }
-            if(keyMap.color(i) != color){
-                color = QColor();
-                break;
-            }
-        }
-    }
     QStringList selectedNames;
+    uint count = keyMap.count();
     for(uint i = 0; i < count; i++){
         if(selection.testBit(i))
             selectedNames << keyMap.key(i)->name;
     }
-    emit selectionChanged(color, selectedNames);
+    emit selectionChanged(selectedColor(), selectedNames);
     update();
+}
+
+void RgbWidget::setSelection(const QStringList& keys){
+    selection.fill(false);
+    foreach(QString key, keys){
+        int index = keyMap.index(key);
+        if(index >= 0)
+            selection.setBit(index);
+    }
+    newSelection.fill(false);
+    mouseDownMode = NONE;
+    update();
+    emit selectionChanged(selectedColor(), keys);
 }
 
 void RgbWidget::clearSelection(){
     selection.fill(false);
     newSelection.fill(false);
     mouseDownMode = NONE;
+    update();
     emit selectionChanged(QColor(), QStringList());
 }
 
@@ -283,4 +283,25 @@ void RgbWidget::setAnimation(const QStringList& keys){
 void RgbWidget::setAnimationToSelection(){
     animation = selection;
     update();
+}
+
+void RgbWidget::clearAnimation(){
+    animation.fill(false);
+    update();
+}
+
+QColor RgbWidget::selectedColor(){
+    QColor color = QColor();
+    uint count = keyMap.count();
+    for(uint i = 0; i < count; i++){
+        if(selection.testBit(i)){
+            if(!color.isValid()){
+                color = keyMap.color(i);
+                continue;
+            }
+            if(keyMap.color(i) != color)
+                return QColor();
+        }
+    }
+    return color;
 }

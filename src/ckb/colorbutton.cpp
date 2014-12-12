@@ -17,7 +17,7 @@ void ColorButton::color(const QColor& newColor){
 void ColorButton::updateImage(){
     if(!_color.isValid()){
         setIcon(QIcon());
-        setText("Pick color...");
+        setText("Change color...");
         return;
     }
     const int w = 12, h = 12;

@@ -20,6 +20,8 @@ private slots:
 
     void on_fpsBox_currentIndexChanged(const QString &arg1);
 
+    void on_animScanButton_clicked();
+
 private:
     Ui::SettingsWidget *ui;
     friend class MainWindow;

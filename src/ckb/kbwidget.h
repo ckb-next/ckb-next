@@ -59,6 +59,10 @@ private slots:
     void on_showModes_2_toggled(bool checked);
     void on_showProfiles_2_toggled(bool checked);
 
+    void on_inactiveSwitchBox_activated(int index);
+    void on_inactiveSwitchCheck_clicked(bool checked);
+    void on_muteCheck_clicked(bool checked);
+
 private:
     QString prefsPath;
 

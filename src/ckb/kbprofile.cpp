@@ -1,12 +1,12 @@
 #include "kbprofile.h"
 
 KbProfile::KbProfile(QObject* parent, const KeyMap& keyMap, const QString& guid, const QString& modified) :
-    QObject(parent), id(guid, modified.toUInt(0, 16)), _keyMap(keyMap), _currentMode(0)
+    QObject(parent), id(guid, modified.toUInt(0, 16)), _keyMap(keyMap), _currentMode(0), _hwAssigned(true)
 {
 }
 
 KbProfile::KbProfile(QObject* parent, const KeyMap& keyMap, QSettings& settings, const QString& guid) :
-    QObject(parent), id(guid, 0), _keyMap(keyMap)
+    QObject(parent), id(guid, 0), _keyMap(keyMap), _hwAssigned(true)
 {
     // Load data from preferences
     settings.beginGroup(guid);
@@ -90,7 +90,7 @@ void KbProfile::keyLayout(KeyMap::Layout layout){
     _keyMap.layout(layout);
     int count = modeCount();
     for(int i = 0; i < count; i++)
-        modeLight(i)->map().layout(layout);
+        modeLight(i)->layout(layout);
 }
 
 QString KbProfile::modeName(int mode) const {

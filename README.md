@@ -15,13 +15,13 @@ You can build the project by running `qmake && make` in the directory you downlo
 OSX instructions
 ----------------
 
-Install Qt5 from here: http://www.qt.io/download-open-source/ (you'll also be prompted to install Xcode from the app store if you don't have it already)
+Install the latest version of Xcode from the App Store. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
-Open ckb.pro in Qt Creator. You should be prompted to configure the project (the default settings should work). Open `Build` from the menu bar and select `Run qmake`. Now press Cmd+B to build the project. The binaries should be placed in a newly-created `bin` directory assuming they compile successfully. Exit Qt Creator.
+Open ckb.pro in Qt Creator. You should be prompted to configure the project (the default settings should work). Once it's finished loading the project, press `Cmd+B` or select `Edit > Build Project "ckb"` from the menu bar. The binaries should be placed in a newly-created `bin` directory assuming they compile successfully. Exit Qt Creator.
 
-**Note:** The project is intended to compile on OSX Yosemite. If you're running an earlier version, open `ckb.pro`, `src/ckb/ckb.pro`, and `src/ckb-daemon/ckb-daemon.pro` and find the `QMAKE_MAC_SDK` lines. Edit them from `macosx10.10` to your OSX version, e.g. `macosx10.9` for Mavericks.
+**Note:** The project is intended to compile on OSX Yosemite. If you're running an earlier version, open the `.pro` files and find the `QMAKE_MAC_SDK` lines. Edit them from `macosx10.10` to your OSX version, e.g. `macosx10.9` for Mavericks.
 
-ckb-daemon needs to be run as root. Open the `bin` directory in a Terminal window and run `sudo ./ckb-daemon`. Then open `ckb.app` as a normal application to start the user interface.
+`ckb-daemon` needs to be run as root. Open the `bin` directory in a Terminal window and run `sudo ./ckb-daemon`. Then open `ckb.app` as a normal application to start the user interface.
 
 If you've rebound your modifier keys in System Preferences, those changes won't work anymore. You have to switch them using ckb-daemon's `bind` command. For instance, to switch Cmd and Ctrl, run: `echo bind lctrl:lwin lwin:lctrl rctrl:rwin rwin:rctrl > /tmp/ckb1/cmd`. This functionality is coming to the user interface soon.
 
@@ -33,27 +33,25 @@ See `DAEMON.md` for info about the daemon program.
 The user interface is still a work in progress.
 
 **Major features:**
-- Multiple keyboards (note: not tested)
+- Control multiple keyboards independently (note: not tested)
 - United States and United Kingdom keyboard layouts
-- Per-key lighting
-- Multiple keyboard profiles/modes with hardware save function
-- Wave and Ripple animations with customizable color
+- Per-key lighting and animation
+- Multiple profiles/modes with hardware save function
 
 **Roadmap** (roughly in order)
 - **Alpha builds (v0.0.x):**
-- Per-key animations
-- More customizable animations (Gradient and Random will be back, as well as a new Raindrop animation)
+- More customizable animations
 - Animations triggered by keypress
 - **v0.1 release:**
 - (Daemon) Allow the daemon to disconnect all keyboards without shutting down, reconnect later. This way ckb can soft stop/soft start the daemon, because using the daemon without ckb running isn't very useful.
-- (Daemon) Repeatable key macros, notification macros
 - (Daemon) Indicator (Num Lock, etc) notifications
-- (Daemon) Ability to generate mouse press/release events
 - System service files so that ckb-daemon can be run at system start.
 - **v0.2 release:**
 - Key rebinding in ckb
 - More functions for the Win Lock key
 - **v0.3 release:**
+- (Daemon) Repeatable key macros, notification macros
+- (Daemon) Ability to generate mouse press/release events
 - Key combos
 - Key macros, other advanced keypress features like running a custom command
 - **v0.4 release:**
@@ -64,9 +62,9 @@ The user interface is still a work in progress.
 - Extra settings?
 - ????
 
-Closing ckb will actually minimize it to the system tray. Use the Exit option from the tray icon or program settings to exit the application.
+Closing ckb will actually minimize it to the system tray. Use the Exit option from the tray icon or the settings screen to exit the application.
 
 Known issues
 ------------
 
-- The system tray icon doesn't always appear in Linux. Apparently this is a known Qt bug.
+- The system tray icon doesn't always appear in Linux. Apparently this is a known Qt bug. To bring ckb back after hiding it, re-run the application.

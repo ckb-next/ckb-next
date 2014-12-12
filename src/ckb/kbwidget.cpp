@@ -155,6 +155,10 @@ void KbWidget::updateUI(){
     else
         ui->profileDownButton->setEnabled(true);
 
+    ui->inactiveSwitchCheck->setChecked(currentLight()->inactive() >= 0);
+    ui->inactiveSwitchBox->setCurrentIndex(currentLight()->inactive() >= 0 ? currentLight()->inactive() : KbLight::MAX_INACTIVE);
+    ui->muteCheck->setChecked(currentLight()->showMute());
+
     int i = 0;
     ui->modeBox->setIconSize(QSize(24, 18));
     ui->profileBox->setIconSize(QSize(24, 18));
@@ -531,13 +535,17 @@ void KbWidget::readInput(QFile& cmd){
                 if(!hwProfile){
                     addProfile(new KbProfile(this, getKeyMap(), guid, modified));
                     hwProfile = profiles.last();
+                    hwProfile->hwAssigned(false);
                     hwLoading = true;
                     cmd.write("get :hwprofilename\n");
-                } else if(hwProfile->modified() != modified){
-                    // If it's been updated (and we're loading hardware profiles), fetch its name
-                    hwProfile->modified(modified);
-                    if(hwLoading)
-                        cmd.write("get :hwprofilename\n");
+                } else {
+                    hwProfile->hwAssigned(true);
+                    if(hwProfile->modified() != modified){
+                        // If it's been updated (and we're loading hardware profiles), fetch its name
+                        hwProfile->modified(modified);
+                        if(hwLoading)
+                            cmd.write("get :hwprofilename\n");
+                    }
                 }
             } else if(components[0] == "hwprofilename"){
                 // Profile name
@@ -556,7 +564,7 @@ void KbWidget::readInput(QFile& cmd){
                     QString modified = components[4];
                     // See if the profile has the same mode in the same place (or a blank mode here)
                     hwModes[mode] = -1;
-                    if(hwProfile->modeGuid(mode) == "{00000000-0000-0000-0000-000000000000}" || hwProfile->modeGuid(mode) == guid){
+                    if(!hwProfile->hwAssigned() || hwProfile->modeGuid(mode) == guid){
                         hwProfile->modeGuid(mode, guid);
                         hwModes[mode] = mode;
                     } else {
@@ -568,14 +576,16 @@ void KbWidget::readInput(QFile& cmd){
                                 break;
                             }
                         }
-                        // If it still wasn't found, add it
-                        addMode(hwProfile);
-                        hwModes[mode] = hwProfile->modeCount() - 1;
-                        hwProfile->modeGuid(hwModes[mode], guid);
+                        if(hwModes[mode] == -1){
+                            // If it still wasn't found, add it
+                            addMode(hwProfile);
+                            hwModes[mode] = hwProfile->modeCount() - 1;
+                            hwProfile->modeGuid(hwModes[mode], guid);
+                        }
                     }
                     // Update modification time
                     if(hwProfile->modeModified(hwModes[mode]) != modified){
-                        hwProfile->modeModified(mode, modified);
+                        hwProfile->modeModified(hwModes[mode], modified);
                         // If loading hardware profile, fetch the updated data
                         if(hwLoading)
                             cmd.write(QString("mode %1 get :hwname :hwrgb\n").arg(mode + 1).toLatin1());
@@ -590,7 +600,6 @@ void KbWidget::readInput(QFile& cmd){
                 } else if(components[2] == "hwrgb"){
                     // RGB - set mode lighting
                     KbLight* light = hwProfile->modeLight(hwModes[mode]);
-                    KeyMap& map = light->map();
                     // If it's a color command, scan the input
                     QColor lightColor = QColor();
                     for(int i = 3; i < components.count(); i++){
@@ -600,7 +609,7 @@ void KbWidget::readInput(QFile& cmd){
                             bool ok;
                             int rgb = comp.toInt(&ok, 16);
                             if(ok)
-                                map.colorAll(QColor::fromRgb((QRgb)rgb));
+                                light->colorAll(QColor::fromRgb((QRgb)rgb));
                         } else {
                             // List of keys. Parse color first
                             QStringList set = comp.split(":");
@@ -611,7 +620,7 @@ void KbWidget::readInput(QFile& cmd){
                                 // Parse keys
                                 QStringList keys = set[0].split(",");
                                 foreach(QString key, keys){
-                                    map.color(key, color);
+                                    light->color(key, color);
                                     if(key == "light")
                                         // Extrapolate the Light key to the M-keys and Lock key, since those will be set to black on exit
                                         lightColor = color;
@@ -620,11 +629,11 @@ void KbWidget::readInput(QFile& cmd){
                         }
                     }
                     if(lightColor.isValid()){
-                        map.color("mr", lightColor);
-                        map.color("m1", lightColor);
-                        map.color("m2", lightColor);
-                        map.color("m3", lightColor);
-                        map.color("lock", lightColor);
+                        light->color("mr", lightColor);
+                        light->color("m1", lightColor);
+                        light->color("m2", lightColor);
+                        light->color("m3", lightColor);
+                        light->color("lock", lightColor);
                     }
                     updateUI();
                 }
@@ -865,4 +874,27 @@ void KbWidget::on_showProfiles_2_toggled(bool checked){
     ui->showModes_2->setChecked(!checked);
     ui->showProfiles->setChecked(checked);
     ui->profileModeSwitch->setCurrentIndex(checked ? 1 : 0);
+}
+
+void KbWidget::on_inactiveSwitchBox_activated(int index){
+    if(ui->inactiveSwitchCheck->isChecked())
+        currentLight()->inactive(index);
+}
+
+void KbWidget::on_inactiveSwitchCheck_clicked(bool checked){
+    if(checked){
+        currentLight()->inactive(ui->inactiveSwitchBox->currentIndex());
+        currentLight()->showMute(ui->muteCheck->isChecked());
+        ui->inactiveSwitchBox->setEnabled(true);
+        ui->muteCheck->setEnabled(true);
+    } else {
+        currentLight()->inactive(-1);
+        ui->inactiveSwitchBox->setEnabled(false);
+        ui->muteCheck->setEnabled(false);
+    }
+}
+
+void KbWidget::on_muteCheck_clicked(bool checked){
+    if(ui->inactiveSwitchCheck->isCheckable())
+        currentLight()->showMute(checked);
 }

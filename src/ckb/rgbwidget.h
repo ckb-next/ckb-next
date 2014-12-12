@@ -20,18 +20,18 @@ public:
     void set(const QColor& color);
     void setSelected(const QColor& color);
 
+    void setSelection(const QStringList& keys);
     void clearSelection();
 
     void setAnimation(const QStringList& keys);
     void setAnimationToSelection();
+    void clearAnimation();
 
 signals:
     void selectionChanged(QColor selectedColor, QStringList selected);
 
 private:
     KeyMap keyMap;
-
-    void paintEvent(QPaintEvent*);
 
     QBitArray selection;
     QBitArray newSelection;
@@ -46,6 +46,10 @@ private:
         TOGGLE,
     } mouseDownMode;
 
+    // Determine the color of the selected keys (invalid color if there are any conflicts)
+    QColor selectedColor();
+
+    void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);

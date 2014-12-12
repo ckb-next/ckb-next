@@ -1,13 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-11-15T21:21:10
-#
-#-------------------------------------------------
-
-QT       += core
-
-QT       -= gui
-
 TARGET = ckb-daemon
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -24,7 +14,6 @@ macx {
 	LIBS += -lpthread -ludev
 }
 
-OBJECTS_DIR = $$PWD/../../tmp-ckb-daemon
 DESTDIR = $$PWD/../../bin
 
 SOURCES += \

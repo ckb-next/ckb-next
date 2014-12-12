@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QObject>
 #include <QSettings>
+#include "animscript.h"
+#include "kbanim.h"
 #include "keymap.h"
 
 class KbLight : public QObject
@@ -12,11 +14,11 @@ class KbLight : public QObject
 public:
     KbLight(QObject* parent, int modeIndex, const KeyMap& map);
 
-    inline KeyMap& map() { return _map; }
-    inline void map(const KeyMap& map) { _map = map; }
-
-    inline const QColor& fgColor() { return _fgColor; }
-    inline void fgColor(const QColor& color) { _fgColor = color; }
+    inline const KeyMap& map() { return _map; }
+    void map(const KeyMap& map);
+    inline void color(const QString& key, const QColor& newColor) { _map.color(key, newColor); }
+    inline void colorAll(const QColor& newColor) { _map.colorAll(newColor); }
+    void layout(KeyMap::Layout newLayout);
 
     inline int modeIndex() { return _modeIndex - 1; }
     inline void modeIndex(int index) { _modeIndex = index + 1; }
@@ -29,14 +31,14 @@ public:
     inline int inactive() { return _inactive; }
     inline void inactive(int in) { _inactive = in; }
 
-    inline int animation() { return _animation; }
-    inline void animation(int anim) { _animation = anim; animPos = -36.f; }
-
     inline bool winLock() { return _winLock; }
     void winLock(QFile& cmd, bool lock);
 
-    inline QStringList animated() { return _animated; }
-    inline void animated(const QStringList& newAnimated) { _animated = newAnimated; }
+    inline bool showMute() { return _showMute; }
+    inline void showMute(bool newShowMute) { _showMute = newShowMute; }
+
+    KbAnim* addAnim(const AnimScript* base, const QStringList& keys);
+    QList<KbAnim*> animList;
 
     void frameUpdate(QFile& cmd, bool dimMute);
     void close(QFile& cmd);
@@ -44,17 +46,16 @@ public:
     void load(QSettings& settings);
     void save(QSettings& settings);
 
+signals:
+    void didLoad();
+
 private:
-    QColor _fgColor;
     KeyMap _map;
     int _modeIndex;
     int _brightness;
     int _inactive;
-    int _animation;
-    QStringList _animated;
     bool _winLock;
-
-    float animPos;
+    bool _showMute;
 
     void animWave(const QStringList& keys, KeyMap& colorMap);
     void animRipple(const QStringList& keys, KeyMap& colorMap);

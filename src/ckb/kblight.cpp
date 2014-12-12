@@ -1,16 +1,32 @@
 #include <cmath>
 #include "kblight.h"
 
+#include "animscript.h"
+
 KbLight::KbLight(QObject* parent, int modeIndex, const KeyMap& map) :
-    QObject(parent), _fgColor(255, 255, 255), _map(map),
-    _modeIndex(modeIndex + 1), _brightness(0), _inactive(MAX_INACTIVE), _animation(0), _winLock(false),
-    animPos(-36.f)
+    QObject(parent), _map(map), _modeIndex(modeIndex + 1), _brightness(0), _inactive(MAX_INACTIVE), _winLock(false), _showMute(true)
 {
 }
 
-extern int framerate;
+void KbLight::map(const KeyMap& map){
+    _map = map;
+    foreach(KbAnim* anim, animList)
+        anim->map(map);
+}
 
-void KbLight::animWave(const QStringList& keys, KeyMap& colorMap){
+void KbLight::layout(KeyMap::Layout newLayout){
+    _map.layout(newLayout);
+    foreach(KbAnim* anim, animList)
+        anim->map(_map);
+}
+
+KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys){
+    KbAnim* anim = new KbAnim(this, _map, keys, base);
+    animList.append(anim);
+    return anim;
+}
+
+/*void KbLight::animWave(const QStringList& keys, KeyMap& colorMap){
     float fgr = _fgColor.redF();
     float fgg = _fgColor.greenF();
     float fgb = _fgColor.blueF();
@@ -29,7 +45,7 @@ void KbLight::animWave(const QStringList& keys, KeyMap& colorMap){
         }
         colorMap.color(key, QColor::fromRgbF(r, g, b));
     }
-    animPos += (size + 36.f) / 2.f / (float)framerate;
+    animPos += (size + 36.f) / 2.f;
     if(animPos >= size)
         animPos = -36.f;
 }
@@ -54,10 +70,10 @@ void KbLight::animRipple(const QStringList& keys, KeyMap& colorMap){
         }
         colorMap.color(key, QColor::fromRgbF(r, g, b));
     }
-    animPos += (size + 36.f) / (float)framerate;
+    animPos += (size + 36.f);
     if(animPos >= size)
         animPos = -36.f;
-}
+}*/
 
 void KbLight::printRGB(QFile& cmd, KeyMap& colorMap){
     cmd.write(" rgb on");
@@ -84,23 +100,15 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
         inactiveList << "mr" << "m1" << "m2" << "m3";
         if(!_winLock)
             inactiveList << "lock";
-        if(dimMute)
+        if(dimMute && _showMute)
             inactiveList << "mute";
         inactiveList.removeAll(QString("m%1").arg(_modeIndex));
         inactiveLight = (2 - _inactive) / 4.f;
     }
 
-    switch(_animation){
-    case 1:
-        // Wave
-        animWave(_animated, colorMap);
-        break;
-    case 2:
-        // Ripple
-        animRipple(_animated, colorMap);
-        break;
-    default:;
-    }
+    foreach(KbAnim* anim, animList)
+        anim->blend(colorMap);
+
     // Dim inactive keys
     if(light != 1.f || inactiveLight != 1.f){
         uint count = colorMap.count();
@@ -121,13 +129,15 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
             colorMap.color(i, QColor::fromRgbF(r, g, b));
         }
     }
+
     // Apply light
     printRGB(cmd, colorMap);
     cmd.write("\n");
 }
 
 void KbLight::close(QFile &cmd){
-    animPos = -36.f;
+    foreach(KbAnim* anim, animList)
+        anim->stop();
     if(_brightness == MAX_BRIGHTNESS){
         cmd.write(QString().sprintf("mode %d rgb off", _modeIndex).toLatin1());
         return;
@@ -152,6 +162,7 @@ void KbLight::winLock(QFile& cmd, bool lock){
 }
 
 void KbLight::load(QSettings& settings){
+    // Load light settings
     settings.beginGroup("Lighting");
     _brightness = settings.value("Brightness").toUInt();
     if(_brightness > MAX_BRIGHTNESS)
@@ -160,10 +171,9 @@ void KbLight::load(QSettings& settings){
     _inactive = settings.value("InactiveIndicators").toInt(&inOk);
     if(!inOk || _inactive > MAX_INACTIVE)
         _inactive = MAX_INACTIVE;
-    _animation = settings.value("Animation").toUInt();
-    QString clr = settings.value("Foreground").toString();
-    if(clr != "")
-        _fgColor = QColor(clr);
+    _showMute = (settings.value("ShowMute").toInt(&inOk) != 0);
+    if(!inOk)
+        _showMute = true;
     // Load RGB settings
     settings.beginGroup("Keys");
     uint count = _map.count();
@@ -174,22 +184,39 @@ void KbLight::load(QSettings& settings){
         _map.color(i, color);
     }
     settings.endGroup();
-    _animated = settings.value("AnimatedKeys").toStringList();
+    // Load animations
+    foreach(KbAnim* anim, animList)
+        anim->deleteLater();
+    animList.clear();
+    settings.beginGroup("Animations");
+    foreach(QString anim, settings.value("List").toStringList()){
+        QUuid id = anim;
+        animList.append(new KbAnim(this, _map, id, settings));
+    }
     settings.endGroup();
+    settings.endGroup();
+    emit didLoad();
 }
 
 void KbLight::save(QSettings& settings){
     settings.beginGroup("Lighting");
     settings.setValue("Brightness", _brightness);
     settings.setValue("InactiveIndicators", _inactive);
-    settings.setValue("Animation", _animation);
-    settings.setValue("Foreground", fgColor().name());
+    settings.setValue("ShowMute", (int)_showMute);
     // Save RGB settings
     settings.beginGroup("Keys");
     uint count = _map.count();
     for(uint i = 0; i < count; i++)
         settings.setValue(QString(_map.key(i)->name).toUpper(), _map.color(i).name());
     settings.endGroup();
-    settings.setValue("AnimatedKeys", _animated);
+    // Save animations
+    settings.beginGroup("Animations");
+    QStringList aList;
+    foreach(KbAnim* anim, animList){
+        aList << anim->guid().toString().toUpper();
+        anim->save(settings);
+    }
+    settings.setValue("List", aList);
+    settings.endGroup();
     settings.endGroup();
 }

@@ -30,8 +30,6 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 
-    ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
-
     connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(closeAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(show()));
@@ -41,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
     eventTimer->start(1000 / 60);
 
     QCoreApplication::setOrganizationName("ckb");
+
+    ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
 
     scanKeyboards();
 }
@@ -62,8 +62,8 @@ void MainWindow::scanKeyboards(){
     foreach(KbWidget* w, kbWidgets)
         w->disconnect = true;
     QString line;
-    while((line = connected.readLine()) != ""){
-        QString dev = line.split(" ")[0];
+    while((line = connected.readLine().trimmed()) != ""){
+        QString dev = line.split(" ")[0].trimmed();
         if(dev == "")
             break;
         // Connected already?
@@ -71,7 +71,7 @@ void MainWindow::scanKeyboards(){
         foreach(KbWidget* w, kbWidgets){
             if(w->devpath == dev){
                 widget = w;
-                widget->disconnect = 0;
+                widget->disconnect = false;
                 break;
             }
         }

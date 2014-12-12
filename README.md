@@ -17,7 +17,7 @@ OSX instructions
 
 Install the latest version of Xcode from the App Store. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
-Open ckb.pro in Qt Creator. You should be prompted to configure the project (the default settings should work). Once it's finished loading the project, press `Cmd+B` or select `Edit > Build Project "ckb"` from the menu bar. The binaries should be placed in a newly-created `bin` directory assuming they compile successfully. Exit Qt Creator.
+Open ckb.pro in Qt Creator. You should be prompted to configure the project (the default settings should work). Once it's finished loading the project, press `Cmd+B` or select `Build > Build Project "ckb"` from the menu bar. The binaries should be placed in a newly-created `bin` directory assuming they compile successfully. Exit Qt Creator.
 
 **Note:** The project is intended to compile on OSX Yosemite. If you're running an earlier version, open the `.pro` files and find the `QMAKE_MAC_SDK` lines. Edit them from `macosx10.10` to your OSX version, e.g. `macosx10.9` for Mavericks.
 

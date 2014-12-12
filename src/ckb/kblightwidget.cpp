@@ -48,7 +48,8 @@ void KbLightWidget::newSelection(QColor selectedColor, QStringList selection){
     else
         ui->selLabel->setText(QString("%1 keys selected").arg(count));
     ui->bgButton->setVisible(true);
-    ui->animButton->setVisible(true);
+    if(AnimScript::count() > 0)
+        ui->animButton->setVisible(true);
 }
 
 void KbLightWidget::changeColor(QColor newColor){
@@ -75,7 +76,7 @@ void KbLightWidget::on_brightnessBox_currentIndexChanged(int index){
 }
 
 void KbLightWidget::on_animButton_clicked(){
-    if(currentSelection.count() == 0)
+    if(currentSelection.count() == 0 || AnimScript::count() == 0)
         return;
     AnimAddDialog dialog(this);
     dialog.exec();

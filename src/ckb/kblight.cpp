@@ -26,55 +26,6 @@ KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys){
     return anim;
 }
 
-/*void KbLight::animWave(const QStringList& keys, KeyMap& colorMap){
-    float fgr = _fgColor.redF();
-    float fgg = _fgColor.greenF();
-    float fgb = _fgColor.blueF();
-    float size = colorMap.width() + 36.f;
-    foreach(QString key, keys){
-        const KeyPos& pos = *colorMap.key(key);
-        QColor bg = colorMap.color(key);
-        float r = bg.redF();
-        float g = bg.greenF();
-        float b = bg.blueF();
-        float distance = fabs(pos.x - animPos);
-        if(distance <= 36.f){
-            r = r * distance / 36.f + fgr * (1.f - distance / 36.f);
-            g = g * distance / 36.f + fgg * (1.f - distance / 36.f);
-            b = b * distance / 36.f + fgb * (1.f - distance / 36.f);
-        }
-        colorMap.color(key, QColor::fromRgbF(r, g, b));
-    }
-    animPos += (size + 36.f) / 2.f;
-    if(animPos >= size)
-        animPos = -36.f;
-}
-
-void KbLight::animRipple(const QStringList& keys, KeyMap& colorMap){
-    float fgr = _fgColor.redF();
-    float fgg = _fgColor.greenF();
-    float fgb = _fgColor.blueF();
-    float size = sqrt(((double)_map.width())*_map.width()/2. + ((double)_map.height())*_map.height()/2.);
-    float cx = _map.width() / 2.f, cy = _map.height() / 2.f;
-    foreach(QString key, keys){
-        const KeyPos& pos = *colorMap.key(key);
-        QColor bg = colorMap.color(key);
-        float r = bg.redF();
-        float g = bg.greenF();
-        float b = bg.blueF();
-        float distance = fabs(sqrt(pow(pos.x - cx, 2.) + pow(pos.y - cy, 2.)) - animPos);
-        if(distance <= 36.f){
-            r = r * distance / 36.f + fgr * (1.f - distance / 36.f);
-            g = g * distance / 36.f + fgg * (1.f - distance / 36.f);
-            b = b * distance / 36.f + fgb * (1.f - distance / 36.f);
-        }
-        colorMap.color(key, QColor::fromRgbF(r, g, b));
-    }
-    animPos += (size + 36.f);
-    if(animPos >= size)
-        animPos = -36.f;
-}*/
-
 void KbLight::printRGB(QFile& cmd, KeyMap& colorMap){
     cmd.write(" rgb on");
     uint count = colorMap.count();

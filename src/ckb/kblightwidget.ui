@@ -114,6 +114,12 @@
        </item>
        <item row="1" column="0">
         <widget class="ColorButton" name="bgButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Change color...</string>
          </property>
@@ -134,6 +140,12 @@
        </item>
        <item row="1" column="4">
         <widget class="QPushButton" name="animButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>New animation...</string>
          </property>

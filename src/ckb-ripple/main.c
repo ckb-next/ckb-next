@@ -1,5 +1,5 @@
 #include "../ckb/ckb-anim.h"
-#include "math.h"
+#include <math.h>
 
 void ckb_info(){
     // Plugin info

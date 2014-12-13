@@ -139,7 +139,7 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     return res;
 }
 
-#define MAX_TRIES 10
+#define MAX_TRIES 25
 int usb_tryreset(usbdevice* kb){
     printf("USB failure. ");
     for(int try = 0; try < MAX_TRIES; try++){

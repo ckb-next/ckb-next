@@ -302,10 +302,8 @@ void KbWidget::on_layoutBox_currentIndexChanged(int index){
     getCmd(cmd);
     if(!cmd.isOpen())
         return;
-    if(index == 1)
-        cmd.write("layout uk");
-    else
-        cmd.write("layout us");
+    cmd.write("layout ");
+    cmd.write(KeyMap::getLayout((KeyMap::Layout)index).toLatin1());
     cmd.write("\n");
     cmd.close();
 }
@@ -479,10 +477,10 @@ void KbWidget::readInput(QFile& cmd){
             QStringList components = line.trimmed().split(" ");
             if(components[0] == "layout"){
                 // Layout change - set new layout
-                if(components[1] == "uk")
-                    ui->layoutBox->setCurrentIndex(1);
-                else if(components[1] == "us")
-                    ui->layoutBox->setCurrentIndex(0);
+                KeyMap::Layout layout = KeyMap::getLayout(components[1]);
+                if(layout == KeyMap::NO_LAYOUT)
+                    continue;
+                ui->layoutBox->setCurrentIndex((int)layout);
 
                 if(!layoutLoaded){
                     // If the layout wasn't loaded previously, the RGB settings need to be fetched now

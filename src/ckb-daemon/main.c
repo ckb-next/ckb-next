@@ -85,7 +85,7 @@ void* sigmain(void* context){
 }
 
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.0.11\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.13\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){
@@ -115,15 +115,20 @@ int main(int argc, char** argv){
     if(!keymap_system){
         setlocale(LC_ALL, "");
         const char* locale = setlocale(LC_CTYPE, 0);
-        // Check for UK layout
-        if(strstr(locale, "en_GB") || strstr(locale, "en-GB")
-                || strstr(locale, "en_gb") || strstr(locale, "en-gb")){
-            keymap_system = keymap_uk;
-            printf("Setting default layout: uk\n");
-        } else {
-            // Default to US
+        if(strstr(locale, "en_US") || strstr(locale, "en-US")
+                || strstr(locale, "en_us") || strstr(locale, "en-us")){
+            // Check for US layout
             keymap_system = keymap_us;
             printf("Setting default layout: us\n");
+        } else if(strstr(locale, "sv_SE") || strstr(locale, "sv-SE")
+                  || strstr(locale, "sv_se") || strstr(locale, "sv_se")){
+            // Check for SE layout
+            keymap_system = keymap_se;
+            printf("Setting default layout: se\n");
+        } else {
+            // Default to GB
+            keymap_system = keymap_gb;
+            printf("Setting default layout: gb\n");
         }
     }
 

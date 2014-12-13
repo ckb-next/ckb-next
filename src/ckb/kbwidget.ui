@@ -186,12 +186,17 @@
          </property>
          <item>
           <property name="text">
-           <string>United States</string>
+           <string>Sweden</string>
           </property>
          </item>
          <item>
           <property name="text">
            <string>United Kingdom</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>United States</string>
           </property>
          </item>
         </widget>

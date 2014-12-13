@@ -22,7 +22,6 @@ SOURCES += \
 	input_linux.c \
 	input_mac.c \
 	input.c \
-	keyboard_uk.c \
 	keyboard_us.c \
 	keyboard.c \
 	led.c \
@@ -32,7 +31,9 @@ SOURCES += \
 	usb_mac.c \
 	usb.c \
 	firmware.c \
-	profile.c
+	profile.c \
+    keyboard_se.c \
+    keyboard_gb.c
 
 HEADERS += \
 	device.h \

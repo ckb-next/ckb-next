@@ -12,7 +12,7 @@ AnimScript::AnimScript(QObject* parent, const QString& path) :
 }
 
 AnimScript::AnimScript(QObject* parent, const AnimScript& base) :
-    QObject(parent), _guid(base._guid), _name(base._name), _version(base._version), _copyright(base._copyright), _license(base._license), _path(base._path), initialized(false), _currentPos(0.)
+    QObject(parent), _guid(base._guid), _name(base._name), _version(base._version), _copyright(base._copyright), _license(base._license), _path(base._path), _currentPos(0.), initialized(false)
 {
 }
 
@@ -120,6 +120,8 @@ void AnimScript::start(){
     int minX = INT_MAX, minY = INT_MAX;
     foreach(QString key, _keys){
         const KeyPos* pos = _map.key(key);
+        if(!pos)
+            continue;
         if(pos->x < minX)
             minX = pos->x;
         if(pos->y < minY)
@@ -130,6 +132,8 @@ void AnimScript::start(){
     process.write(QString("keycount %1\n").arg(_keys.count()).toLatin1());
     foreach(QString key, _keys){
         const KeyPos* pos = _map.key(key);
+        if(!pos)
+            continue;
         process.write(QString("key %1 %2,%3\n").arg(key).arg(pos->x - minX).arg(pos->y - minY).toLatin1());
     }
     process.write("end keymap\n");

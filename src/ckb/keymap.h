@@ -19,8 +19,9 @@ public:
     // Key layouts
     enum Layout {
         NO_LAYOUT = -1,
-        US,
-        UK
+        SE,
+        GB,
+        US
     };
     // Keyboard models
     enum Model {
@@ -31,6 +32,9 @@ public:
 
     // Copies a standard key map
     static KeyMap standard(Model model, Layout layout);
+    // Gets a layout by name or name by layout
+    static Layout getLayout(const QString& name);
+    static QString getLayout(Layout layout);
 
     // Keyboard model
     inline Model model() const { return keyModel; }

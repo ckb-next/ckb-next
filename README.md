@@ -34,7 +34,7 @@ The user interface is still a work in progress.
 
 **Major features:**
 - Control multiple keyboards independently (note: not tested)
-- United States and United Kingdom keyboard layouts
+- United States, United Kingdom, and Swedish keyboard layouts
 - Per-key lighting and animation
 - Multiple profiles/modes with hardware save function
 

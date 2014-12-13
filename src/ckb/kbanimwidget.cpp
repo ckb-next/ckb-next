@@ -3,9 +3,13 @@
 #include "ui_kbanimwidget.h"
 
 KbAnimWidget::KbAnimWidget(QWidget* parent) :
-    QWidget(parent), light(0), current(0), noReorder(false),
+    QWidget(parent), light(0), current(0), dragSelected(0), noReorder(false),
     ui(new Ui::KbAnimWidget)
 {
+    reorderTimer.setSingleShot(true);
+    reorderTimer.setInterval(10);
+    connect(&reorderTimer, SIGNAL(timeout()), this, SLOT(reorderAnims()));
+
     ui->setupUi(this);
     ui->animList->setVisible(false);
     setCurrent(0);
@@ -53,6 +57,24 @@ void KbAnimWidget::refreshList(){
     }
     ui->noAnimLabel->setVisible(false);
     noReorder = false;
+}
+
+void KbAnimWidget::reorderAnims(){
+    if(light && !noReorder){
+        // Clear and rebuild the list of animations in case the animation moved
+        int count = ui->animList->count();
+        light->animList.clear();
+        for(int i = 0; i < count; i++){
+            QListWidgetItem* item = ui->animList->item(i);
+            KbAnim* anim = animations[item->data(Qt::UserRole).toUuid()];
+            if(anim && !light->animList.contains(anim))
+                light->animList.append(anim);
+            if(anim && anim == dragSelected){
+                dragSelected = 0;
+                item->setSelected(true);
+            }
+        }
+    }
 }
 
 void KbAnimWidget::clearSelection(){
@@ -127,17 +149,12 @@ void KbAnimWidget::on_animList_itemChanged(QListWidgetItem *item){
                 ui->nameBox->setText(anim->name());
         }
     }
-    if(light && !noReorder){
-        // Clear and rebuild the list of animations in case the animation moved
-        int count = ui->animList->count();
-        light->animList.clear();
-        for(int i = 0; i < count; i++){
-            QListWidgetItem* item2 = ui->animList->item(i);
-            KbAnim* anim = animations[item2->data(Qt::UserRole).toUuid()];
-            if(anim && !light->animList.contains(anim))
-                light->animList.append(anim);
-        }
-    }
+    reorderTimer.stop();
+    reorderTimer.start();
+}
+
+void KbAnimWidget::on_animList_itemEntered(QListWidgetItem *item){
+    dragSelected = current;
 }
 
 void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint &pos){

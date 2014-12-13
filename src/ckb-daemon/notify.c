@@ -80,9 +80,9 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         return;
     } else if(!strcmp(setting, ":layout")){
         if(kb && mode)
-            nprintf(kb, 0, 0, "layout %s\n", kb->profile.keymap == keymap_uk ? "uk" : "us");
+            nprintf(kb, 0, 0, "layout %s\n", getmapname(kb->profile.keymap));
         else
-            nrprintf("layout %s\n", keymap_system == keymap_uk ? "uk" : "us");
+            nrprintf("layout %s\n", getmapname(keymap_system));
         return;
     } else if(!kb || !mode)
         // Only FPS and layout can be printed without an active mode

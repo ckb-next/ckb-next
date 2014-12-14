@@ -4,25 +4,26 @@
 #include "notify.h"
 #include "profile.h"
 
-void nprintf(usbdevice* kb, usbprofile* profile, usbmode* mode, const char* format, ...){
-    if(!kb && !profile)
+void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, ...){
+    if(!kb)
         return;
-    if(!profile)
-        profile = &kb->profile;
+    usbprofile* profile = &kb->profile;
     va_list va_args;
     int fifo;
-    // Write the string to the keyboard's FIFOs (if any)
-    for(int i = 0; i < OUTFIFO_MAX; i++){
-        va_start(va_args, format);
-        if(kb && (fifo = kb->outfifo[i])){
+    if(nodenumber >= 0){
+        // If node number was given, print to that node (if open)
+        if((fifo = kb->outfifo[nodenumber])){
+            va_start(va_args, format);
             if(mode)
                 dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
             vdprintf(fifo, format, va_args);
         }
-        // Write it to the root FIFOs and include the serial number
-        va_start(va_args, format);
-        if((fifo = keyboard[0].outfifo[i])){
-            dprintf(fifo, "device %s ", profile->serial);
+        return;
+    }
+    // Otherwise, print to all nodes
+    for(int i = 0; i < OUTFIFO_MAX; i++){
+        if((fifo = kb->outfifo[i])){
+            va_start(va_args, format);
             if(mode)
                 dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
             vdprintf(fifo, format, va_args);
@@ -30,12 +31,23 @@ void nprintf(usbdevice* kb, usbprofile* profile, usbmode* mode, const char* form
     }
 }
 
-void nrprintf(const char* format, ...){
+void nrprintf(int nodenumber, const char* format, ...){
+    if(nodenumber >= OUTFIFO_MAX)
+        return;
     va_list va_args;
     int fifo;
+    if(nodenumber >= 0){
+        // If node number was given, print to that node (if open)
+        if((fifo = keyboard[0].outfifo[nodenumber])){
+            va_start(va_args, format);
+            vdprintf(fifo, format, va_args);
+        }
+        return;
+    }
+    // Otherwise, print to all nodes
     for(int i = 0; i < OUTFIFO_MAX; i++){
-        va_start(va_args, format);
         if((fifo = keyboard[0].outfifo[i])){
+            va_start(va_args, format);
             vdprintf(fifo, format, va_args);
         }
     }
@@ -43,14 +55,14 @@ void nrprintf(const char* format, ...){
 
 void notifyconnect(usbdevice* kb, int connecting){
     int index = INDEX_OF(kb, keyboard);
-    nrprintf("device %s %s %s%d\n", kb->profile.serial, connecting ? "added at" : "removed from", devpath, index);
+    nrprintf(-1, "device %s %s %s%d\n", kb->profile.serial, connecting ? "added at" : "removed from", devpath, index);
 }
 
-void cmd_notify(usbmode* mode, const key* keymap, int keyindex, const char* toggle){
+void cmd_notify(usbmode* mode, const key* keymap, int nnumber, int keyindex, const char* toggle){
     if(!strcmp(toggle, "on") || *toggle == 0)
-        SET_KEYBIT(mode->notify, keyindex);
+        SET_KEYBIT(mode->notify[nnumber], keyindex);
     else if(!strcmp(toggle, "off"))
-        CLEAR_KEYBIT(mode->notify, keyindex);
+        CLEAR_KEYBIT(mode->notify[nnumber], keyindex);
 }
 
 #define HWMODE_OR_RETURN(kb, index) \
@@ -67,22 +79,22 @@ void cmd_notify(usbmode* mode, const key* keymap, int keyindex, const char* togg
         return;                     \
     }
 
-void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
+void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
     if(!strcmp(setting, ":hello")){
         if(kb && mode)
             return;
-        nrprintf("hello\n");
+        nrprintf(nnumber, "hello\n");
         return;
     } else if(!strcmp(setting, ":fps")){
         if(kb && mode)
             return;
-        nrprintf("fps %d\n", fps);
+        nrprintf(nnumber, "fps %d\n", fps);
         return;
     } else if(!strcmp(setting, ":layout")){
         if(kb && mode)
-            nprintf(kb, 0, 0, "layout %s\n", getmapname(kb->profile.keymap));
+            nprintf(kb, nnumber, 0, "layout %s\n", getmapname(kb->profile.keymap));
         else
-            nrprintf("layout %s\n", getmapname(keymap_system));
+            nrprintf(nnumber, "layout %s\n", getmapname(keymap_system));
         return;
     } else if(!kb || !mode)
         // Only FPS and layout can be printed without an active mode
@@ -91,20 +103,20 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
     usbprofile* profile = &kb->profile;
     if(!strcmp(setting, ":mode")){
         // Get the current mode number
-        nprintf(kb, 0, mode, "switch\n");
+        nprintf(kb, nnumber, mode, "switch\n");
         return;
     } else if(!strcmp(setting, ":rgb")){
         // Get the current RGB settings
         char* rgb = printrgb(&mode->light, profile->keymap);
-        nprintf(kb, 0, mode, "rgb %s\n", rgb);
+        nprintf(kb, nnumber, mode, "rgb %s\n", rgb);
         free(rgb);
         return;
     } else if(!strcmp(setting, ":rgbon")){
         // Get the current RGB status
         if(mode->light.enabled)
-            nprintf(kb, 0, mode, "rgb on\n");
+            nprintf(kb, nnumber, mode, "rgb on\n");
         else
-            nprintf(kb, 0, mode, "rgb off\n");
+            nprintf(kb, nnumber, mode, "rgb off\n");
         return;
     } else if(!strcmp(setting, ":hwrgb")){
         // Get the current hardware RGB settings
@@ -115,25 +127,25 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         HWMODE_OR_RETURN(kb, index);
         // Get the mode from the hardware store
         char* rgb = printrgb(kb->hw->light + index, profile->keymap);
-        nprintf(kb, 0, mode, "hwrgb %s\n", rgb);
+        nprintf(kb, nnumber, mode, "hwrgb %s\n", rgb);
         free(rgb);
         return;
     } else if(!strcmp(setting, ":profilename")){
         // Get the current profile name
         char* name = getprofilename(profile);
-        nprintf(kb, 0, 0, "profilename %s\n", name[0] ? name : "Unnamed");
+        nprintf(kb, nnumber, 0, "profilename %s\n", name[0] ? name : "Unnamed");
         free(name);
     } else if(!strcmp(setting, ":name")){
         // Get the current mode name
         char* name = getmodename(mode);
-        nprintf(kb, 0, mode, "name %s\n", name[0] ? name : "Unnamed");
+        nprintf(kb, nnumber, mode, "name %s\n", name[0] ? name : "Unnamed");
         free(name);
     } else if(!strcmp(setting, ":hwprofilename")){
         // Get the current hardware profile name
         if(!kb->hw)
             return;
         char* name = gethwprofilename(kb->hw);
-        nprintf(kb, 0, 0, "hwprofilename %s\n", name[0] ? name : "Unnamed");
+        nprintf(kb, nnumber, 0, "hwprofilename %s\n", name[0] ? name : "Unnamed");
         free(name);
     } else if(!strcmp(setting, ":hwname")){
         // Get the current hardware mode name
@@ -142,21 +154,21 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         unsigned index = INDEX_OF(mode, profile->mode);
         HWMODE_OR_RETURN(kb, index);
         char* name = gethwmodename(kb->hw, index);
-        nprintf(kb, 0, mode, "hwname %s\n", name[0] ? name : "Unnamed");
+        nprintf(kb, nnumber, mode, "hwname %s\n", name[0] ? name : "Unnamed");
         free(name);
     } else if(!strcmp(setting, ":profileid")){
         // Get the current profile ID
         char* guid = getid(&profile->id);
         int modified;
         memcpy(&modified, &profile->id.modified, sizeof(modified));
-        nprintf(kb, 0, 0, "profileid %s %x\n", guid, modified);
+        nprintf(kb, nnumber, 0, "profileid %s %x\n", guid, modified);
         free(guid);
     } else if(!strcmp(setting, ":id")){
         // Get the current mode ID
         char* guid = getid(&mode->id);
         int modified;
         memcpy(&modified, &mode->id.modified, sizeof(modified));
-        nprintf(kb, 0, mode, "id %s %x\n", guid, modified);
+        nprintf(kb, nnumber, mode, "id %s %x\n", guid, modified);
         free(guid);
     } else if(!strcmp(setting, ":hwprofileid")){
         // Get the current hardware profile ID
@@ -165,7 +177,7 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         char* guid = getid(&kb->hw->id[0]);
         int modified;
         memcpy(&modified, &kb->hw->id[0].modified, sizeof(modified));
-        nprintf(kb, 0, 0, "hwprofileid %s %x\n", guid, modified);
+        nprintf(kb, nnumber, 0, "hwprofileid %s %x\n", guid, modified);
         free(guid);
     } else if(!strcmp(setting, ":hwid")){
         // Get the current hardware mode ID
@@ -176,7 +188,7 @@ void getinfo(usbdevice* kb, usbmode* mode, const char* setting){
         char* guid = getid(&kb->hw->id[index + 1]);
         int modified;
         memcpy(&modified, &kb->hw->id[index + 1].modified, sizeof(modified));
-        nprintf(kb, 0, mode, "hwid %s %x\n", guid, modified);
+        nprintf(kb, nnumber, mode, "hwid %s %x\n", guid, modified);
         free(guid);
     }
 }

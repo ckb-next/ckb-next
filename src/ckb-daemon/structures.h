@@ -37,6 +37,9 @@ typedef struct {
 #define SET_KEYBIT(array, index) do { (array)[(index) / 8] |= 1 << ((index) % 8); } while(0)
 #define CLEAR_KEYBIT(array, index) do { (array)[(index) / 8] &= ~(1 << ((index) % 8)); } while(0)
 
+// Maximum number of notification nodes
+#define OUTFIFO_MAX 10
+
 // End key bind structures
 
 // Lighting structure for a mode
@@ -75,7 +78,7 @@ typedef struct {
     keylight light;
     keybind bind;
     // Key notification settings
-    uchar notify[N_KEYS / 8];
+    uchar notify[OUTFIFO_MAX][N_KEYS / 8];
     // Indicators permanently off/on
     uchar ioff, ion;
     // Name and UUID
@@ -106,7 +109,6 @@ typedef struct {
 #define NAME_LEN    33
 #define QUEUE_LEN   40
 #define MSG_SIZE    64
-#define OUTFIFO_MAX 10
 typedef struct {
     // I/O devices
 #ifdef OS_LINUX

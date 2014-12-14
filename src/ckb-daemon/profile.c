@@ -83,7 +83,7 @@ void urlencode2(char* dst, const char* src){
     *dst = '\0';
 }
 
-void cmd_setmodename(usbmode* mode, const key* keymap, int zero, const char* name){
+void cmd_setmodename(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* name){
     if(!utf8to16)
         utf8to16 = iconv_open("UTF-16LE", "UTF-8");
     memset(mode->name, 0, sizeof(mode->name));

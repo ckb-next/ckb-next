@@ -171,7 +171,7 @@ int fwupdate(usbdevice* kb, const char* path){
     return FW_OK;
 }
 
-int cmd_fwupdate(usbdevice* kb, const char* path){
+int cmd_fwupdate(usbdevice* kb, int nnumber, const char* path){
     // Update the firmware
     int ret = fwupdate(kb, path);
     while(ret == FW_USBFAIL){
@@ -182,14 +182,14 @@ int cmd_fwupdate(usbdevice* kb, const char* path){
     }
     switch(ret){
     case FW_OK:
-        nprintf(kb, 0, 0, "fwupdate %s ok\n", path);
+        nprintf(kb, nnumber, 0, "fwupdate %s ok\n", path);
         break;
     case FW_NOFILE:
     case FW_WRONGDEV:
-        nprintf(kb, 0, 0, "fwupdate %s invalid\n", path);
+        nprintf(kb, nnumber, 0, "fwupdate %s invalid\n", path);
         break;
     case FW_USBFAIL:
-        nprintf(kb, 0, 0, "fwupdate %s fail\n", path);
+        nprintf(kb, nnumber, 0, "fwupdate %s fail\n", path);
         return -1;
     }
     return 0;

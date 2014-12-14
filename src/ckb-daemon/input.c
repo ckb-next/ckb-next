@@ -97,15 +97,16 @@ void inputupdate(usbdevice* kb){
                         }
                     }
                 }
-                // Print a notification if desired
-                int notify = mode->notify[byte] & mask;
-                if(notify){
-                    if(map->name && map->led){
-                        nprintf(kb, 0, 0, "key %c%s\n", new ? '+' : '-', map->name);
-                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN))
-                            nprintf(kb, 0, 0, "%s up", map->name);
-                    } else
-                        nprintf(kb, 0, 0, "key %c#%d\n", new ? '+' : '-', keyindex);
+                // Print notifications if desired
+                for(int notify = 0; notify < OUTFIFO_MAX; notify++){
+                    if(mode->notify[notify][byte] & mask){
+                        if(map->name && map->led){
+                            nprintf(kb, notify, 0, "key %c%s\n", new ? '+' : '-', map->name);
+                            if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN))
+                                nprintf(kb, notify, 0, "%s up", map->name);
+                        } else
+                            nprintf(kb, notify, 0, "key %c#%d\n", new ? '+' : '-', keyindex);
+                    }
                 }
             }
         }
@@ -136,7 +137,7 @@ void closebind(keybind* bind){
     memset(bind, 0, sizeof(*bind));
 }
 
-void cmd_bind(usbmode* mode, const key* keymap, int keyindex, const char* to){
+void cmd_bind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
     // Find the key to bind to
     int tocode = 0;
     if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1){
@@ -152,11 +153,11 @@ void cmd_bind(usbmode* mode, const key* keymap, int keyindex, const char* to){
     }
 }
 
-void cmd_unbind(usbmode* mode, const key* keymap, int keyindex, const char* to){
+void cmd_unbind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
     mode->bind.base[keyindex] = KEY_UNBOUND;
 }
 
-void cmd_rebind(usbmode* mode, const key* keymap, int keyindex, const char* to){
+void cmd_rebind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
     mode->bind.base[keyindex] = keymap[keyindex].scan;
 }
 

@@ -22,14 +22,14 @@ void cmd_rgboff(usbmode* mode);
 // Turns LEDs on
 void cmd_rgbon(usbmode* mode);
 // Updates an LED color
-void cmd_rgb(usbmode* mode, const key* keymap, int keyindex, const char* code);
+void cmd_rgb(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* code);
 
 // Turns an indicator off permanently
-void cmd_ioff(usbmode* mode, const key* keymap, int zero, const char* led);
+void cmd_ioff(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
 // Turns an indicator on permanently
-void cmd_ion(usbmode* mode, const key* keymap, int zero, const char* led);
+void cmd_ion(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
 // Sets an indicator to automatic mode
-void cmd_iauto(usbmode* mode, const key* keymap, int zero, const char* led);
+void cmd_iauto(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
 
 // Daemon frame rate
 extern volatile unsigned fps;

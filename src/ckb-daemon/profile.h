@@ -7,7 +7,7 @@
 usbmode* getusbmode(int id, usbprofile* profile, const key* keymap);
 
 // Sets a mode's name
-void cmd_setmodename(usbmode* mode, const key* keymap, int zero, const char* name);
+void cmd_setmodename(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* name);
 // Sets a profile's name
 void setprofilename(usbprofile* profile, const char* name);
 // Gets a mode's name. Returns a URL-encoded UTF-8 buffer that needs to be freed later.

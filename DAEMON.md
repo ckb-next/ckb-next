@@ -114,7 +114,9 @@ Notifications
 
 The keyboard can be configured to generate user-readable notifications on keypress events. These are controlled with the `notify` commands. In order to see events, read from `/dev/input/ckb*/notify0`. In a terminal, you can do this like `cat /dev/input/ckb1/notify0`. Programmatically, you can open it for reading like a regular file.
 
-Note that the file can only reliably be read by one application: if you try to open it in two different programs, they may both fail to get data. Data will be buffered as long as no programs are reading, so you will receive all unread notifications as soon as you open the file. If you'd like to read notifications from two separate applications, send the command `notifyon <n>` to the keyboard you wish to receive notifications from, where N is a number between 1 and 9. If `/dev/input/ckb*/notify<n>` does not already exist, it will be created, and you can read notifications from there without disrupting any other program. To close a notification node, send `notifyoff <n>`. `notify0` is always open and will not be affected by `notifyon`/`notifyoff` commands.
+Note that the file can only reliably be read by one application: if you try to open it in two different programs, they may both fail to get data. Data will be buffered as long as no programs are reading, so you will receive all unread notifications as soon as you open the file. If you'd like to read notifications from two separate applications, send the command `notifyon <n>` to the keyboard you wish to receive notifications from, where N is a number between 1 and 9. If `/dev/input/ckb*/notify<n>` does not already exist, it will be created, and you can read notifications from there without disrupting any other program. To close a notification node, send `notifyoff <n>`.
+
+`notify0` is always open and will not be affected by `notifyon`/`notifyoff` commands. By default, all notifications are printed to `notify0`. To print output to a different node, prefix your command with `@<node>`.
 
 Notifications are printed with one notification per line. If you are reading from `ckb0/notify*` you will see notifications for all keyboards, with `device <serial>` printed at the beginning of each line. Reading from `ckb1` or above will show you only notifications for that keyboard, with no serial number.
 
@@ -126,6 +128,7 @@ Notification commands are as follows:
 - `notify w a s d` sends notifications whenever W, A, S, or D is pressed.
 - `notify g1 g2 g3 g4 g5 g6 g7 g8 g9 g10 g11 g12 g13 g14 g15 g16 g17 g18 mr m1 m2 m3 light lock` prints a notification whenever a non-standard key is pressed.
 - `notify all:off` turns all key notifications off.
+- `@5 notify esc` prints Esc key notifications to `notify5`.
 
 **Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `key +a` `key -a`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
 
@@ -134,6 +137,8 @@ Additionally, the following notifications will be generated at `ckb0/notify*` re
 - `device <serial> removed from <path>` whenever a device is disconnected. These messages are only generated at `ckb0/notify*`, not at the node for the actual device.
 - `fps <rate>` when the FPS is changed.
 - `layout <country>` when the default layout is changed.
+
+Lastly, `layout <country>` will be printed to all `ckb*/notify*` when that keyboard's layout is changed.
 
 Getting parameters
 ------------------
@@ -152,6 +157,8 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :rgb` returns an `rgb` command equivalent to the current RGB state. Note that the keyboard has a limited color precision, so `rgb 123456 get :rgb` will not output `rgb 123456`. The only guarantee is that the `rgb` output will produce the same colors seen on the keyboard.
 - `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile. The output will say `hwrgb` instead of `rgb`.
 - `get :rgbon` returns either `rgb off` or `rgb on` depending on whether or not lighting was enabled. There is no `:hwrgbon` because the hardware lights are always on.
+
+Like `notify`, you must prefix your command with `@<node>` to get data printed to a node other than `notify0`.
 
 Firmware updates
 ----------------

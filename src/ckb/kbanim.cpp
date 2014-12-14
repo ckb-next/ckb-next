@@ -54,6 +54,32 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, cons
 }
 
 void KbAnim::map(const KeyMap& newMap){
+    // Convert the old key list to the new map by positions, if possible
+    uint newCount = newMap.count();
+    QStringList newKeyList;
+    foreach(const QString& key, _keys){
+        const KeyPos* oldPos = _map.key(key);
+        if(!oldPos || key == "enter"){
+            // If the key wasn't in the map, add it anyway
+            if(!newKeyList.contains(key))
+                newKeyList << key;
+            continue;
+        }
+        QString newKey = key;
+        for(uint i = 0; i < newCount; i++){
+            // Scan new map for matching positions
+            const KeyPos* newPos = newMap.key(i);
+            if(newPos->x == oldPos->x && newPos->y == oldPos->y
+                    && strcmp(oldPos->name, "enter")){
+                newKey = newPos->name;
+                break;
+            }
+        }
+        if(!newKeyList.contains(newKey))
+            newKeyList << newKey;
+    }
+    // Set the map
+    _keys = newKeyList;
     _map = newMap;
     if(_script)
         _script->init(newMap, _keys, 2.0);

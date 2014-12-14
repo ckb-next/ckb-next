@@ -25,7 +25,7 @@ void KbLight::map(const KeyMap& map){
             const KeyPos* oldPos = _map.key(j);
             QString oldName = oldPos->name;
             if(oldPos->x == newPos->x && oldPos->y == newPos->y
-                    && _colorMap.contains(oldName)){
+                    && oldName != "enter" && _colorMap.contains(oldName)){
                 // If found, set color
                 found = true;
                 newColorMap[name] = _colorMap.value(oldName);

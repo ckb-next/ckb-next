@@ -4,6 +4,10 @@
 const key* keymap_system = 0;
 
 const key* getkeymap(const char* name){
+    if(!strcmp(name, "de"))
+        return keymap_de;
+    if(!strcmp(name, "fr"))
+        return keymap_fr;
     if(!strcmp(name, "gb"))
         return keymap_gb;
     if(!strcmp(name, "se"))
@@ -14,6 +18,10 @@ const key* getkeymap(const char* name){
 }
 
 const char* getmapname(const key* layout){
+    if(layout == keymap_de)
+        return "de";
+    if(layout == keymap_fr)
+        return "fr";
     if(layout == keymap_gb)
         return "gb";
     if(layout == keymap_se)

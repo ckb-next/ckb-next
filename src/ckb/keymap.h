@@ -19,6 +19,8 @@ public:
     // Key layouts
     enum Layout {
         NO_LAYOUT = -1,
+        FR,
+        DE,
         SE,
         GB,
         US

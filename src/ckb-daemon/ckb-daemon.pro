@@ -33,7 +33,9 @@ SOURCES += \
 	firmware.c \
 	profile.c \
     keyboard_se.c \
-    keyboard_gb.c
+    keyboard_gb.c \
+    keyboard_de.c \
+    keyboard_fr.c
 
 HEADERS += \
 	device.h \

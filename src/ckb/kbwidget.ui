@@ -186,6 +186,16 @@
          </property>
          <item>
           <property name="text">
+           <string>France</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Germany</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Sweden</string>
           </property>
          </item>

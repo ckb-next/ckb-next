@@ -27,7 +27,12 @@ SOURCES += main.cpp\
 	kbanimwidget.cpp \
 	animscript.cpp \
     kbanim.cpp \
-    animadddialog.cpp
+    animadddialog.cpp \
+    keymap_us.cpp \
+    keymap_gb.cpp \
+    keymap_se.cpp \
+    keymap_de.cpp \
+    keymap_fr.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \

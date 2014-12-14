@@ -19,8 +19,6 @@ public:
     // Load profile from settings
     explicit KbProfile(QObject* parent, const KeyMap& keyMap, QSettings& settings, const QString& guid);
 
-    // Reloads lighting settings (does not reload profile name/ID or mode names/IDs)
-    void reloadLight(QSettings& settings);
     // Save profile to settings
     void save(QSettings& settings);
 
@@ -36,10 +34,8 @@ public:
 
     // Profile key map
     inline const KeyMap& keyMap() const { return _keyMap; }
-    // Update key map (destroys RGB settings for all modes)
+    // Update key map
     void keyMap(const KeyMap& newKeyMap);
-    // Update layout (RGB settings preserved)
-    void keyLayout(KeyMap::Layout layout);
 
     // Profile modes
     inline int modeCount() const { return modeNames.count(); }

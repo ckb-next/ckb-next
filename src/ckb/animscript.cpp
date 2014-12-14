@@ -117,11 +117,14 @@ void AnimScript::start(){
     if(!process.waitForStarted(100))
         return;
     // Determine the upper left corner of the given keys
+    QStringList keysCopy = _keys;
     int minX = INT_MAX, minY = INT_MAX;
     foreach(QString key, _keys){
         const KeyPos* pos = _map.key(key);
-        if(!pos)
+        if(!pos){
+            keysCopy.removeAll(key);
             continue;
+        }
         if(pos->x < minX)
             minX = pos->x;
         if(pos->y < minY)
@@ -129,11 +132,9 @@ void AnimScript::start(){
     }
     // Write the keymap to the process
     process.write("begin keymap\n");
-    process.write(QString("keycount %1\n").arg(_keys.count()).toLatin1());
-    foreach(QString key, _keys){
+    process.write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());
+    foreach(QString key, keysCopy){
         const KeyPos* pos = _map.key(key);
-        if(!pos)
-            continue;
         process.write(QString("key %1 %2,%3\n").arg(key).arg(pos->x - minX).arg(pos->y - minY).toLatin1());
     }
     process.write("end keymap\n");

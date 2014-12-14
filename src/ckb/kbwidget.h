@@ -68,7 +68,6 @@ private:
 
     int notifyNumber;
 
-    bool layoutLoaded;
     bool hwLoading;
     bool queueProfileSwitch;
     int hwModeCount;

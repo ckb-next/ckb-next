@@ -11,7 +11,7 @@
 #include "ui_kblightwidget.h"
 
 KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBase) :
-    QWidget(parent), devpath(path), cmdpath(path + "/cmd"), disconnect(false), notifyNumber(0), layoutLoaded(false), hwLoading(true), queueProfileSwitch(true), hwProfile(0), currentProfile(0), prevLight(0),
+    QWidget(parent), devpath(path), cmdpath(path + "/cmd"), disconnect(false), notifyNumber(0), hwLoading(true), queueProfileSwitch(true), hwProfile(0), currentProfile(0), prevLight(0),
     ui(new Ui::KbWidget)
 {
     ui->setupUi(this);
@@ -74,9 +74,10 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
     } else
         // If there were none, take notify0
         notifypath = path + "/notify0";
-    cmd.write("get :hwprofileid :layout\n");
+    cmd.write(QString("@%1 get :hwprofileid :layout").arg(notifyNumber).toLatin1());
     for(int i = 0; i < hwModeCount; i++)
-        cmd.write(QString("mode %1 get :hwid\n").arg(i + 1).toLatin1());
+        cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
+    cmd.write("\n");
     cmd.close();
     // Wait a while for the node to open
     usleep(100000);
@@ -103,11 +104,10 @@ KbWidget::~KbWidget(){
     if(cmd.isOpen()){
         // Save settings
         save();
-        // Reset to hardware profile and save it to the device
-        if(hwProfile){
+        // Reset to hardware profile
+        if(hwProfile)
             currentProfile = hwProfile;
-            on_hwSaveButton_clicked();
-        }
+        switchProfile(cmd);
         if(notifyNumber > 0)
             cmd.write(QString("notifyoff %1\n").arg(notifyNumber).toLatin1());
         cmd.close();
@@ -420,9 +420,10 @@ void KbWidget::on_hwSaveButton_clicked(){
     cmd.write("hwsave\n");
     // Load the new modification times for the profile
     hwLoading = false;
-    cmd.write("get :hwprofileid\n");
+    cmd.write(QString("@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
     for(int i = 0; i < hwModeCount; i++)
-        cmd.write(QString("mode %1 get :hwid\n").arg(i + 1).toLatin1());
+        cmd.write(QString(" mode %1 get:hwid").arg(i + 1).toLatin1());
+    cmd.write("\n");
     cmd.close();
     hwProfile = currentProfile;
     updateUI();
@@ -458,11 +459,15 @@ void KbWidget::frameUpdate(){
     }
     if(prevLight && prevLight != light){
         prevLight->close(cmd);
+        cmd.write(QString(" @%1 notify all:off").arg(notifyNumber).toLatin1());
         cmd.write("\n");
     }
 
     // Output the current mode/animation
     light->frameUpdate(cmd, mute != MUTED);
+    if(prevLight != light)
+        cmd.write(QString(" @%1 notify all").arg(notifyNumber).toLatin1());
+    cmd.write("\n");
     cmd.close();
     prevLight = light;
 }
@@ -482,20 +487,8 @@ void KbWidget::readInput(QFile& cmd){
                     continue;
                 ui->layoutBox->setCurrentIndex((int)layout);
 
-                if(!layoutLoaded){
-                    // If the layout wasn't loaded previously, the RGB settings need to be fetched now
-                    QSettings settings;
-                    settings.beginGroup(prefsPath);
-                    // Set all light setups to the new layout
-                    foreach(KbProfile* profile, profiles){
-                        profile->keyLayout((KeyMap::Layout)ui->layoutBox->currentIndex());
-                        profile->reloadLight(settings);
-                    }
-                    layoutLoaded = true;
-                } else {
-                    foreach(KbProfile* profile, profiles)
-                        profile->keyLayout((KeyMap::Layout)ui->layoutBox->currentIndex());
-                }
+                foreach(KbProfile* profile, profiles)
+                    profile->keyMap(getKeyMap());
                 queueProfileSwitch = true;
                 updateUI();
             } else if(components[0] == "key"){
@@ -535,14 +528,14 @@ void KbWidget::readInput(QFile& cmd){
                     hwProfile = profiles.last();
                     hwProfile->hwAssigned(false);
                     hwLoading = true;
-                    cmd.write("get :hwprofilename\n");
+                    cmd.write(QString("@%1 get :hwprofilename\n").arg(notifyNumber).toLatin1());
                 } else {
                     hwProfile->hwAssigned(true);
                     if(hwProfile->modified() != modified){
                         // If it's been updated (and we're loading hardware profiles), fetch its name
                         hwProfile->modified(modified);
                         if(hwLoading)
-                            cmd.write("get :hwprofilename\n");
+                            cmd.write(QString("@%1 get :hwprofilename\n").arg(notifyNumber).toLatin1());
                     }
                 }
             } else if(components[0] == "hwprofilename"){
@@ -586,7 +579,7 @@ void KbWidget::readInput(QFile& cmd){
                         hwProfile->modeModified(hwModes[mode], modified);
                         // If loading hardware profile, fetch the updated data
                         if(hwLoading)
-                            cmd.write(QString("mode %1 get :hwname :hwrgb\n").arg(mode + 1).toLatin1());
+                            cmd.write(QString("@%1 mode %2 get :hwname :hwrgb\n").arg(notifyNumber).arg(mode + 1).toLatin1());
                     }
                 } else if(components[2] == "hwname"){
                     // Mode name - update list
@@ -607,7 +600,7 @@ void KbWidget::readInput(QFile& cmd){
                             bool ok;
                             int rgb = comp.toInt(&ok, 16);
                             if(ok)
-                                light->colorAll(QColor::fromRgb((QRgb)rgb));
+                                light->color(QColor::fromRgb((QRgb)rgb));
                         } else {
                             // List of keys. Parse color first
                             QStringList set = comp.split(":");

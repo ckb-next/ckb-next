@@ -32,16 +32,18 @@ public:
 
     // Copies a standard key map
     static KeyMap standard(Model model, Layout layout);
+    static KeyMap fromName(const QString& name);
     // Gets a layout by name or name by layout
     static Layout getLayout(const QString& name);
     static QString getLayout(Layout layout);
+    // Gets a model by name or name by model
+    static Model getModel(const QString& name);
+    static QString getModel(Model model);
 
-    // Keyboard model
+    // Keyboard model and layout
     inline Model model() const { return keyModel; }
-
-    // Key layout
     inline Layout layout() const { return keyLayout; }
-    void layout(Layout layout);
+    QString name() const;
 
     // Number of keys in the keymap
     inline uint count() const { return keyCount; }
@@ -50,28 +52,15 @@ public:
     // Keyboard total height
     inline uint height() const { return keyHeight; }
 
-    // Gets key info
+    // Gets key info. Returns null if key not found.
     const KeyPos* key(uint index) const;
     const KeyPos* key(const QString& name) const;
     int index(const QString& name) const;
 
-    // Gets or sets key colors
-    QColor color(uint index) const;
-    QColor color(const QString& name) const;
-    void color(uint index, const QColor& newColor);
-    void color(const QString& name, const QColor& newColor);
-
-    // Sets the color for the entire keyboard
-    void colorAll(const QColor& newColor);
-
     KeyMap();
-    ~KeyMap();
-    const KeyMap& operator = (const KeyMap& rhs);
-    KeyMap(const KeyMap& rhs);
 
 private:
     const KeyPos* positions;
-    QRgb* rgb;
     uint keyCount, keyWidth, keyHeight;
     Model keyModel;
     Layout keyLayout;

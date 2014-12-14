@@ -30,7 +30,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
         }
         if(notifyNumber > 0){
             // Create notification node and ask for FPS
-            cmd.write(QString("notifyon %1\nget :fps\n").arg(notifyNumber).toLatin1());
+            cmd.write(QString("notifyon %1\n@%1 get :fps\n").arg(notifyNumber).toLatin1());
             cmd.flush();
             // Open the node and read it
             usleep(100000);

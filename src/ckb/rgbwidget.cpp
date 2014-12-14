@@ -19,22 +19,9 @@ void RgbWidget::map(const KeyMap& newMap){
     update();
 }
 
-void RgbWidget::set(const QString& name, const QColor& color){
-    keyMap.color(name, color);
+void RgbWidget::colorMap(const QHash<QString, QRgb>& newColorMap){
+    _colorMap = newColorMap;
     update();
-}
-
-void RgbWidget::set(const QColor& color){
-    keyMap.colorAll(color);
-    update();
-}
-
-void RgbWidget::setSelected(const QColor& color){
-    uint count = keyMap.count();
-    for(uint i = 0; i < count; i++){
-        if(selection.testBit(i))
-            keyMap.color(i, color);
-    }
 }
 
 void RgbWidget::paintEvent(QPaintEvent*){
@@ -135,7 +122,7 @@ void RgbWidget::paintEvent(QPaintEvent*){
         y += h / 2.f - 1.5f;
         w = 3.f;
         h = 3.f;
-        painter.setBrush(QBrush(keyMap.color(i)));
+        painter.setBrush(QBrush(_colorMap[key.name]));
         painter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
     }
 }
@@ -295,11 +282,12 @@ QColor RgbWidget::selectedColor(){
     uint count = keyMap.count();
     for(uint i = 0; i < count; i++){
         if(selection.testBit(i)){
+            QColor newColor = _colorMap[keyMap.key(i)->name];
             if(!color.isValid()){
-                color = keyMap.color(i);
+                color = newColor;
                 continue;
             }
-            if(keyMap.color(i) != color)
+            if(newColor != color)
                 return QColor();
         }
     }

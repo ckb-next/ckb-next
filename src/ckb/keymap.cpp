@@ -70,11 +70,12 @@ static KeyLayout K70Pos[KEYLAYOUT_COUNT] = {
 #define K70_HEIGHT      K95_HEIGHT
 
 KeyMap::Layout KeyMap::getLayout(const QString& name){
-    if(name == "se")
+    QString lower = name.toLower();
+    if(lower == "se")
         return SE;
-    if(name == "gb")
+    if(lower == "gb")
         return GB;
-    if(name == "us")
+    if(lower == "us")
         return US;
     return NO_LAYOUT;
 }
@@ -87,6 +88,26 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "gb";
     case US:
         return "us";
+    default:
+        return "";
+    }
+}
+
+KeyMap::Model KeyMap::getModel(const QString& name){
+    QString lower = name.toLower();
+    if(lower == "k70")
+        return K70;
+    if(lower == "k95")
+        return K95;
+    return NO_MODEL;
+}
+
+QString KeyMap::getModel(KeyMap::Model model){
+    switch(model){
+    case K70:
+        return "k70";
+    case K95:
+        return "k95";
     default:
         return "";
     }
@@ -122,53 +143,26 @@ KeyMap KeyMap::standard(KeyMap::Model model, KeyMap::Layout layout){
     return KeyMap(model, layout, K95Pos[layout].count, K95_WIDTH, K95Pos[layout].positions);
 }
 
+KeyMap KeyMap::fromName(const QString &name){
+    QStringList list = name.trimmed().split(" ");
+    if(list.length() != 2)
+        return KeyMap();
+    return standard(getModel(list[0]), getLayout(list[1]));
+}
+
+QString KeyMap::name() const {
+    return (getModel(model()) + " " + getLayout(layout())).toUpper();
+}
+
 KeyMap::KeyMap(Model _keyModel, Layout _keyLayout, uint _keyCount, uint _width, const KeyPos* _positions) :
-    positions(_positions), rgb(new QRgb[_keyCount]()),
-    keyCount(_keyCount), keyWidth(_width), keyHeight(K95_HEIGHT),
+    positions(_positions), keyCount(_keyCount), keyWidth(_width), keyHeight(K95_HEIGHT),
     keyModel(_keyModel), keyLayout(_keyLayout)
 {}
 
 KeyMap::KeyMap() :
-     positions(0), rgb(0),
-     keyCount(0), keyWidth(0), keyHeight(0),
+     positions(0), keyCount(0), keyWidth(0), keyHeight(0),
      keyModel(NO_MODEL), keyLayout(NO_LAYOUT)
 {}
-
-KeyMap::~KeyMap(){
-    delete[] rgb;
-}
-
-const KeyMap& KeyMap::operator = (const KeyMap& rhs){
-    if(keyCount < rhs.keyCount){
-        delete[] rgb;
-        rgb = new QRgb[rhs.keyCount]();
-    }
-    positions = rhs.positions;
-    keyCount = rhs.keyCount;
-    keyWidth = rhs.keyWidth;
-    keyHeight = rhs.keyHeight;
-    keyModel = rhs.keyModel;
-    keyLayout = rhs.keyLayout;
-    memcpy(rgb, rhs.rgb, keyCount * sizeof(QRgb));
-    return rhs;
-}
-
-KeyMap::KeyMap(const KeyMap& rhs) :
-    positions(rhs.positions), rgb(new QRgb[rhs.keyCount]()),
-    keyCount(rhs.keyCount), keyWidth(rhs.keyWidth), keyHeight(rhs.keyHeight),
-    keyModel(rhs.keyModel), keyLayout(rhs.keyLayout)
-{
-    memcpy(rgb, rhs.rgb, keyCount * sizeof(QRgb));
-}
-
-void KeyMap::layout(KeyMap::Layout layout){
-    KeyMap newMap = standard(keyModel, layout);
-    // Copy RGB values by key name
-    uint keyCount = count();
-    for(uint i = 0; i < keyCount; i++)
-        newMap.color(key(i)->name, color(i));
-    *this = newMap;
-}
 
 const KeyPos* KeyMap::key(uint index) const {
     return positions + index;
@@ -192,40 +186,4 @@ int KeyMap::index(const QString& name) const {
             return i;
     }
     return -1;
-}
-
-QColor KeyMap::color(uint index) const {
-    return QColor::fromRgb(rgb[index]);
-}
-
-QColor KeyMap::color(const QString& name) const {
-    uint c = count();
-    const char* cname = name.toLatin1();
-    for(uint i = 0; i < c; i++){
-        if(!strcmp(positions[i].name, cname))
-            return QColor::fromRgb(rgb[i]);
-    }
-    return QColor();
-}
-
-void KeyMap::color(uint index, const QColor& newColor) {
-    rgb[index] = newColor.rgb();
-}
-
-void KeyMap::color(const QString& name, const QColor& newColor){
-    uint c = count();
-    const char* cname = name.toLatin1();
-    for(uint i = 0; i < c; i++){
-        if(!strcmp(positions[i].name, cname))
-            rgb[i] = newColor.rgb();
-    }
-}
-
-// Sets the color for the entire keyboard
-void KeyMap::colorAll(const QColor& newColor){
-    QRgb clr = newColor.rgb();
-    uint c = count();
-    for(uint i = 0; i < c; i++){
-        rgb[i] = clr;
-    }
 }

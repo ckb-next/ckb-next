@@ -22,6 +22,7 @@ KbLightWidget::~KbLightWidget(){
 
 void KbLightWidget::setLight(KbLight* newLight){
     ui->rgbWidget->map(newLight->map());
+    ui->rgbWidget->colorMap(newLight->colorMap());
     ui->rgbWidget->clearSelection();
     ui->rgbWidget->clearAnimation();
     ui->animWidget->clearSelection();
@@ -53,9 +54,11 @@ void KbLightWidget::newSelection(QColor selectedColor, QStringList selection){
 }
 
 void KbLightWidget::changeColor(QColor newColor){
-    ui->rgbWidget->setSelected(newColor);
-    if(light)
-        light->map(ui->rgbWidget->map());
+    if(light){
+        foreach(QString key, currentSelection)
+            light->color(key, newColor);
+        ui->rgbWidget->colorMap(light->colorMap());
+    }
 }
 
 void KbLightWidget::changeAnim(KbAnim *newAnim){

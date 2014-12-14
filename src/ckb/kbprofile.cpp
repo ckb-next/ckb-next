@@ -37,17 +37,6 @@ KbProfile::KbProfile(QObject* parent, const KeyMap& keyMap, QSettings& settings,
     settings.endGroup();
 }
 
-void KbProfile::reloadLight(QSettings& settings){
-    settings.beginGroup(guid());
-    uint count = modeCount();
-    for(uint i = 0; i < count; i++){
-        settings.beginGroup(QString::number(i));
-        modeLight(i)->load(settings);
-        settings.endGroup();
-    }
-    settings.endGroup();
-}
-
 void KbProfile::save(QSettings& settings){
     // Save data to preferences
     settings.beginGroup(guid());
@@ -84,13 +73,6 @@ void KbProfile::keyMap(const KeyMap& newKeyMap){
     int count = modeCount();
     for(int i = 0; i < count; i++)
         modeLight(i)->map(newKeyMap);
-}
-
-void KbProfile::keyLayout(KeyMap::Layout layout){
-    _keyMap.layout(layout);
-    int count = modeCount();
-    for(int i = 0; i < count; i++)
-        modeLight(i)->layout(layout);
 }
 
 QString KbProfile::modeName(int mode) const {

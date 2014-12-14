@@ -11,6 +11,7 @@ class KbAnim : public QObject
     Q_OBJECT
     Q_ENUMS(Mode)
 public:
+    // Blending modes
     enum Mode {
         Normal,
         Add,
@@ -19,19 +20,29 @@ public:
         Divide
     };
 
-    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings& settings);
+    // Create a new animation
     KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, const AnimScript* script);
+    // Load an animation from settings
+    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings& settings);
+    // Save an animation to settings
     void save(QSettings& settings);
 
+    // Key map
     inline const KeyMap& map() { return _map; }
     void map(const KeyMap& newMap);
+    // Keys to animate
     inline const QStringList& keys() { return _keys; }
     void keys(const QStringList& newKeys);
 
+    // Begins or re-triggers the animation
     void trigger();
-    void blend(KeyMap& colorMap);
+    // Stops the animation
     void stop();
 
+    // Blends the animation into a color map, taking opacity and mode into account
+    void blend(QHash<QString, QRgb>& animMap);
+
+    // Animation properties
     inline const QUuid& guid() { return _guid; }
     inline const QString& name() { return _name; }
     inline void name(const QString& newName) { _name = newName; }
@@ -40,6 +51,7 @@ public:
     inline Mode mode() { return _mode; }
     inline void mode(Mode newMode) { _mode = newMode; }
 
+    // Animation script properties
     const AnimScript* script() { return _script; }
     const QString& scriptName() { return _scriptName; }
 

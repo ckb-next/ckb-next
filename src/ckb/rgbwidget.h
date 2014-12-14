@@ -13,25 +13,30 @@ class RgbWidget : public QWidget
 public:
     explicit RgbWidget(QWidget *parent = 0);
 
+    // Key map
     const KeyMap& map() const { return keyMap; }
     void map(const KeyMap& newMap);
+    // Key -> color map
+    const QHash<QString, QRgb>& colorMap() const { return _colorMap; }
+    void colorMap(const QHash<QString, QRgb>& newColorMap);
 
-    void set(const QString& name, const QColor& color);
-    void set(const QColor& color);
-    void setSelected(const QColor& color);
-
+    // Set current selection
     void setSelection(const QStringList& keys);
     void clearSelection();
 
+    // Set animated keys
     void setAnimation(const QStringList& keys);
     void setAnimationToSelection();
     void clearAnimation();
 
 signals:
+    // Emitted when the selection is changed.
+    // selectedColor is the color of the selected keys or invalid color if none selected or not all keys are the same
     void selectionChanged(QColor selectedColor, QStringList selected);
 
 private:
     KeyMap keyMap;
+    QHash<QString, QRgb> _colorMap;
 
     QBitArray selection;
     QBitArray newSelection;

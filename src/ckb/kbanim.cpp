@@ -1,3 +1,4 @@
+#include <cmath>
 #include <QMetaEnum>
 #include "kbanim.h"
 
@@ -110,24 +111,29 @@ static float blendDivide(float bg, float fg){
 typedef float (*blendFunc)(float,float);
 static blendFunc functions[5] = { blendNormal, blendAdd, blendSubtract, blendMultiply, blendDivide };
 
-void KbAnim::blend(KeyMap& colorMap){
+#include <QDateTime>
+#include <QDebug>
+
+void KbAnim::blend(QHash<QString, QRgb>& animMap){
     if(!_script || _opacity == 0.f)
         return;
     // Fetch the next frame from the script
     _script->frame();
-    QHash<QString, QRgb> mix = _script->colors();
-    foreach(QString key, mix.keys()){
+    QHashIterator<QString, QRgb> i(_script->colors());
+    blendFunc f = functions[(int)_mode];
+    while(i.hasNext()){
         // Mix the colors in with the color map according to blend mode and alpha
-        QColor bg = colorMap.color(key);
-        if(!bg.isValid())
+        i.next();
+        const QString& key = i.key();
+        if(!animMap.contains(key))
             continue;
-        QColor fg = QColor::fromRgba(mix.value(key));
-        blendFunc f = functions[(int)_mode];
-        float r = bg.redF(), g = bg.greenF(), b = bg.blueF();
-        float a = fg.alphaF() * _opacity;
-        r = r * (1.f - a) + f(r, fg.redF()) * a;
-        g = g * (1.f - a) + f(g, fg.greenF()) * a;
-        b = b * (1.f - a) + f(b, fg.blueF()) * a;
-        colorMap.color(key, QColor::fromRgbF(r, g, b));
+        QRgb& bg = animMap[key];
+        QRgb fg = i.value();
+        float r = qRed(bg) / 255.f, g = qGreen(bg) / 255.f, b = qBlue(bg) / 255.f;
+        float a = qAlpha(fg) * _opacity / 255.f;
+        r = r * (1.f - a) + f(r, qRed(fg) / 255.f) * a;
+        g = g * (1.f - a) + f(g, qGreen(fg) / 255.f) * a;
+        b = b * (1.f - a) + f(b, qBlue(fg) / 255.f) * a;
+        bg = qRgb(round(r * 255.f), round(g * 255.f), round(b * 255.f));
     }
 }

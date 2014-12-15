@@ -136,7 +136,7 @@ int _resetusb(usbdevice* kb, const char* file, int line){
             res = hwloadprofile(kb, 1);
     }
     updatergb(kb, 1);
-    return res;
+    return res ? -1 : 0;
 }
 
 #define MAX_TRIES 25
@@ -145,10 +145,13 @@ int usb_tryreset(usbdevice* kb){
     for(int try = 0; try < MAX_TRIES; try++){
         printf("Attempting reset (%d of %d)...\n", try + 1, MAX_TRIES);
         DELAY_LONG;
-        if(!resetusb(kb)){
+        int res = resetusb(kb);
+        if(!res){
             printf("Reset success\n");
             return 0;
         }
+        if(res == -2)
+            break;
     }
     printf("Reset failed. Disconnecting.\n");
     return -1;

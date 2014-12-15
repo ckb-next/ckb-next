@@ -155,7 +155,15 @@ void KbWidget::updateUI(){
     else
         ui->profileDownButton->setEnabled(true);
 
-    ui->inactiveSwitchCheck->setChecked(currentLight()->inactive() >= 0);
+    bool inactiveCheck = (currentLight()->inactive() >= 0);
+    ui->inactiveSwitchCheck->setChecked(inactiveCheck);
+    if(inactiveCheck){
+        ui->inactiveSwitchBox->setEnabled(true);
+        ui->muteCheck->setEnabled(true);
+    } else {
+        ui->inactiveSwitchBox->setEnabled(false);
+        ui->muteCheck->setEnabled(false);
+    }
     ui->inactiveSwitchBox->setCurrentIndex(currentLight()->inactive() >= 0 ? currentLight()->inactive() : KbLight::MAX_INACTIVE);
     ui->muteCheck->setChecked(currentLight()->showMute());
 
@@ -460,7 +468,7 @@ void KbWidget::frameUpdate(){
     if(prevLight && prevLight != light){
         prevLight->close(cmd);
         cmd.write(QString(" @%1 notify all:off").arg(notifyNumber).toLatin1());
-        cmd.write("\n");
+        cmd.write(" ");
     }
 
     // Output the current mode/animation

@@ -147,17 +147,25 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
     int res = usbunclaim(kb, 1);
     if(res){
         printf("Error: resetusb (%s:%d): usbunclaim failed: %s\n", file, line, strerror(errno));
-        return res;
+        if(errno == ENODEV)
+            return -2;
+        return -1;
     }
     res = ioctl(kb->handle, USBDEVFS_RESET, 0);
     if(res){
         printf("Error: resetusb (%s:%d): USBDEVFS_RESET ioctl failed: %s\n", file, line, strerror(errno));
-        return res;
+        if(errno == ENODEV)
+            return -2;
+        return -1;
     }
     res = usbclaim(kb);
-    if(res)
+    if(res){
         printf("Error: resetusb (%s:%d): usbclaim failed: %s\n", file, line, strerror(errno));
-    return res;
+        if(errno == ENODEV)
+            return -2;
+        return -1;
+    }
+    return 0;
 }
 
 int openusb(struct udev_device* dev, int model){

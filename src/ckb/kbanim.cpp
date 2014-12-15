@@ -69,9 +69,10 @@ void KbAnim::map(const KeyMap& newMap){
         for(uint i = 0; i < newCount; i++){
             // Scan new map for matching positions
             const KeyPos* newPos = newMap.key(i);
+            QString newName = newPos->name;
             if(newPos->x == oldPos->x && newPos->y == oldPos->y
-                    && strcmp(oldPos->name, "enter")){
-                newKey = newPos->name;
+                    && newName != "enter"){
+                newKey = newName;
                 break;
             }
         }

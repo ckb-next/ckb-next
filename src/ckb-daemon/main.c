@@ -84,8 +84,25 @@ void* sigmain(void* context){
     return 0;
 }
 
+void localecase(char* dst, size_t length, const char* src){
+    char* ldst = dst + length;
+    char s;
+    while((s = *src++)){
+        if(s == '_')
+            s = '-';
+        else
+            s = tolower(s);
+        *dst++ = s;
+        if(dst == ldst){
+            dst--;
+            break;
+        }
+    }
+    *dst = 0;
+}
+
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.0.15\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.16\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){
@@ -114,24 +131,30 @@ int main(int argc, char** argv){
     // If the keymap wasn't set via command-line, get it from the system locale
     if(!keymap_system){
         setlocale(LC_ALL, "");
-        const char* locale = setlocale(LC_CTYPE, 0);
-        if(strstr(locale, "de_DE") || strstr(locale, "de-DE")
-                || strstr(locale, "de_de") || strstr(locale, "de-de")){
+        const char* loc = setlocale(LC_CTYPE, 0);
+        char locale[strlen(loc) + 1];
+        localecase(locale, sizeof(locale), loc);
+        if(strstr(locale, "de-de")){
             // Check for DE layout
             keymap_system = keymap_de;
             printf("Setting default layout: de\n");
-        } else if(strstr(locale, "fr_FR") || strstr(locale, "fr-FR")
-                  || strstr(locale, "fr_fr") || strstr(locale, "fr-fr")){
+        } else if(strstr(locale, "fr-fr")){
             // Check for FR layout
             keymap_system = keymap_fr;
             printf("Setting default layout: fr\n");
-        } else if(strstr(locale, "sv_SE") || strstr(locale, "sv-SE")
-                  || strstr(locale, "sv_se") || strstr(locale, "sv-se")){
+        } else if(strstr(locale, "sv-se")){
             // Check for SE layout
             keymap_system = keymap_se;
             printf("Setting default layout: se\n");
-        } else if(strstr(locale, "en_US") || strstr(locale, "en-US")
-                  || strstr(locale, "en_us") || strstr(locale, "en-us")){
+        } else if(strstr(locale, "en-us")
+                  || strstr(locale, "en-au")
+                  || strstr(locale, "en-ca")
+                  || strstr(locale, "en-hk")
+                  || strstr(locale, "en-in")
+                  || strstr(locale, "en-nz")
+                  || strstr(locale, "en-ph")
+                  || strstr(locale, "en-sg")
+                  || strstr(locale, "en-za")){
             // Check for US layout
             keymap_system = keymap_us;
             printf("Setting default layout: us\n");

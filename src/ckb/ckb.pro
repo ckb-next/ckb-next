@@ -1,4 +1,5 @@
 QT       += core gui
+CONFIG   += debug_and_release
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,13 +27,14 @@ SOURCES += main.cpp\
 	kbprofile.cpp \
 	kbanimwidget.cpp \
 	animscript.cpp \
-    kbanim.cpp \
-    animadddialog.cpp \
-    keymap_us.cpp \
-    keymap_gb.cpp \
-    keymap_se.cpp \
-    keymap_de.cpp \
-    keymap_fr.cpp
+	kbanim.cpp \
+	animadddialog.cpp \
+	keymap_us.cpp \
+	keymap_gb.cpp \
+	keymap_se.cpp \
+	keymap_de.cpp \
+	keymap_fr.cpp \
+	animsettingdialog.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
@@ -46,16 +48,18 @@ HEADERS  += mainwindow.h \
 	kbprofile.h \
 	kbanimwidget.h \
 	animscript.h \
-    ckb-anim.h \
-    kbanim.h \
-    animadddialog.h
+	ckb-anim.h \
+	kbanim.h \
+	animadddialog.h \
+	animsettingdialog.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \
 	settingswidget.ui \
 	kblightwidget.ui \
 	kbanimwidget.ui \
-    animadddialog.ui
+	animadddialog.ui \
+	animsettingdialog.ui
 
 RESOURCES += \
 	image.qrc

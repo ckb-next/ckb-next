@@ -46,6 +46,8 @@ private slots:
     void reorderAnims();
 
 
+    void on_propertyButton_clicked();
+
 private:
     KbLight* light;
     QHash<QUuid, KbAnim*> animations;

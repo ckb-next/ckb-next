@@ -12,6 +12,12 @@ Linux instructions
 
 You can build the project by running `qmake && make` in the directory you downloaded it to. The binaries will be placed in a new `bin` directory assuming they compile successfully. To start the daemon, run `sudo bin/ckb-daemon`. After that, open the `ckb` binary as a normal user to start the user interface.
 
+**Note:** If you have problems connecting the keyboard to your system, try adding the following to your kernel's cmdline (for K70):
+
+`usbhid.quirks=0x1B1C:0x1B13:0x20000000`
+
+If you own a K95, replace `1B13` with `1B11`. For instructions on adding cmdline parameters in Ubuntu, see here: https://wiki.ubuntu.com/Kernel/KernelBootParameters
+
 OSX instructions
 ----------------
 
@@ -36,12 +42,10 @@ The user interface is still a work in progress.
 - Control multiple keyboards independently (note: not tested)
 - United States and European keyboard layouts
 - Per-key lighting and animation
+- Reactive lighting
 - Multiple profiles/modes with hardware save function
 
 **Roadmap** (roughly in order)
-- **Alpha builds (v0.0.x):**
-- More customizable animations
-- Animations triggered by keypress
 - **v0.1 release:**
 - (Daemon) Allow the daemon to disconnect all keyboards without shutting down, reconnect later. This way ckb can soft stop/soft start the daemon, because using the daemon without ckb running isn't very useful.
 - (Daemon) Indicator (Num Lock, etc) notifications

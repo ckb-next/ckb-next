@@ -8,8 +8,8 @@
 //     Prints information about the program and any parameters it wishes to receive
 //   void ckb_parameter(ckb_runctx* context, const char* name, const char* value) :
 //     Receives the value of a parameter specified from ckb_info
-//   void ckb_keypress(ckb_runctx* context, const char* keyname, int state) :
-//     Receives a key down / key up event. state = 1 for down, 0 for up. keyname may be null.
+//   void ckb_keypress(ckb_runctx* context, ckb_key* key, int state) :
+//     Receives a key down / key up event. state = 1 for down, 0 for up.
 //   void ckb_start(ckb_runctx* context) :
 //     Starts or restarts an animation not based on keypress.
 //   int ckb_frame(ckb_runctx* context, double delta) :
@@ -29,15 +29,32 @@
 // * Info output helpers
 
 // Plugin GUID
-#define CKB_GUID(guid)              CKB_CONTAINER( printf("guid "); printurl(guid); printf("\n"); )
+#define CKB_GUID(guid)                  CKB_CONTAINER( printf("guid "); printurl(guid); printf("\n"); )
 // Plugin name
-#define CKB_NAME(name)              CKB_CONTAINER( printf("name "); printurl(name); printf("\n"); )
+#define CKB_NAME(name)                  CKB_CONTAINER( printf("name "); printurl(name); printf("\n"); )
 // Plugin version
-#define CKB_VERSION(version)        CKB_CONTAINER( printf("version "); printurl(version); printf("\n"); )
+#define CKB_VERSION(version)            CKB_CONTAINER( printf("version "); printurl(version); printf("\n"); )
 // Plugin copyright
-#define CKB_COPYRIGHT(copyright)    CKB_CONTAINER( printf("copyright "); printurl(copyright); printf("\n"); )
+#define CKB_COPYRIGHT(year, author)     CKB_CONTAINER( printf("author "); printurl(author); printf("\nyear %s\n", year); )
 // Plugin license
-#define CKB_LICENSE(license)        CKB_CONTAINER( printf("license "); printurl(license); printf("\n"); )
+#define CKB_LICENSE(license)            CKB_CONTAINER( printf("license "); printurl(license); printf("\n"); )
+// Plugin description
+#define CKB_DESCRIPTION(description)    CKB_CONTAINER( printf("description "); printurl(description); printf("\n"); )
+
+// Parameter helpers
+#define CKB_PARAM(type, name, prefix, postfix, extra)               CKB_CONTAINER( printf("param %s %s ", type, name); printurl(prefix); printf(" "); printurl(postfix); extra; printf("\n"); )
+#define CKB_PARAM_LONG(name, prefix, postfix, default, min, max)    CKB_PARAM("long", name, prefix, postfix, printf(" %ld %ld %ld", (long)(default), (long)(min), (long)(max)))
+#define CKB_PARAM_DOUBLE(name, prefix, postfix, default, min, max)  CKB_PARAM("double", name, prefix, postfix, printf(" %lf %lf %lf", (double)(default), (double)(min), (double)(max)))
+#define CKB_PARAM_BOOL(name, prefix, postfix, default)              CKB_PARAM("bool", name, prefix, postfix, printf((default) ? " 1" : " 0"))
+#define CKB_PARAM_RGB(name, prefix, postfix, r, g, b)               CKB_PARAM("rgb", name, prefix, postfix, printf(" %02x%02x%02x", (unsigned char)(r), (unsigned char)(g), (unsigned char)(b)))
+#define CKB_PARAM_ARGB(name, prefix, postfix, a, r, g, b)           CKB_PARAM("argb", name, prefix, postfix, printf(" %02x%02x%02x%02x", (unsigned char)(a), (unsigned char)(r), (unsigned char)(g), (unsigned char)(b)))
+
+// Special parameters (most values are ignored)
+#define CKB_PARAM_DURATION(default)                                 CKB_PARAM_DOUBLE("duration", "", "", default, 0., 0.)
+#define CKB_PARAM_TRIGGER(default)                                  CKB_PARAM_BOOL("trigger", "", "", default)
+#define CKB_PARAM_TRIGGER_KP(default)                               CKB_PARAM_BOOL("kptrigger", "", "", default)
+#define CKB_PARAM_REPEAT(default)                                   CKB_PARAM_DOUBLE("repeat", "", "", default, 0., 0.)
+#define CKB_PARAM_REPEAT_KP(default)                                CKB_PARAM_DOUBLE("kprepeat", "", "", default, 0., 0.)
 
 // * Runtime information
 
@@ -59,7 +76,21 @@ typedef struct {
 } ckb_runctx;
 
 // Clear all keys in a context (ARGB 00000000)
-#define CKB_KEYCLEAR(context)       do { ckb_key* key = context->keys; unsigned count = context->keycount; unsigned i = 0; for(; i < count; i++) key[i].a = key[i].r = key[i].g = key[i].b = 0; } while(0)
+#define CKB_KEYCLEAR(context)       CKB_CONTAINER( ckb_key* key = context->keys; unsigned count = context->keycount; unsigned i = 0; for(; i < count; i++) key[i].a = key[i].r = key[i].g = key[i].b = 0; )
+
+// Parameter input parsers. Usage (within ckb_parameter only):
+//  CKB_PARSE_BOOL("mybool", &mybool){
+//      <actions to take when bool is parsed>
+//  }
+// or:
+//  CKB_PARSE_BOOL("mybool", &mybool){}
+
+#define CKB_PARSE_LONG(param_name, value_ptr)                   if(!strcmp(name, param_name) && sscanf(value, "%ld", value_ptr) == 1)
+#define CKB_PARSE_DOUBLE(param_name, value_ptr)                 if(!strcmp(name, param_name) && sscanf(value, "%lf", value_ptr) == 1)
+#define CKB_PARSE_BOOL(param_name, value_ptr)                   if(!strcmp(name, param_name) && sscanf(value, "%u", value_ptr) == 1)
+#define CKB_PARSE_RGB(param_name, r_ptr, g_ptr, b_ptr)          if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx", r_ptr, g_ptr, b_ptr) == 3)
+#define CKB_PARSE_ARGB(param_name, a_ptr, r_ptr, g_ptr, b_ptr)  if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx%2hhx", a_ptr, r_ptr, g_ptr, b_ptr) == 4)
+
 
 // * Internal functions
 
@@ -143,10 +174,12 @@ void ckb_getline(char word1[CKB_MAX_WORD], char word2[CKB_MAX_WORD], char word3[
 
 extern void ckb_info();
 extern void ckb_parameter(ckb_runctx*, const char*, const char*);
-extern void ckb_keypress(ckb_runctx*, const char*, int);
+extern void ckb_keypress(ckb_runctx*, ckb_key* key, int);
 extern void ckb_start(ckb_runctx*);
 extern int ckb_frame(ckb_runctx*, double);
 int main(int argc, char *argv[]){
+    printf("hi\n");
+    fflush(stdout);
     if(argc == 2){
         if(!strcmp(argv[1], "--ckb-info")){
             ckb_info();
@@ -156,6 +189,8 @@ int main(int argc, char *argv[]){
             // Read the keymap lines
             char cmd[CKB_MAX_WORD], param[CKB_MAX_WORD], value[CKB_MAX_WORD];
             // Skip anything up until "begin keymap"
+            printf("keymap\n");
+            fflush(stdout);
             do {
                 ckb_getline(cmd, param, value);
                 if(!*cmd){
@@ -165,12 +200,14 @@ int main(int argc, char *argv[]){
                 }
             } while(strcmp(cmd, "begin") || strcmp(param, "keymap"));
             ckb_getline(cmd, param, value);
-            if(strcmp(cmd, "keycount") || sscanf(param, "%u", &ctx.keycount) != 1 || ctx.keycount == 0){
+            unsigned keycount;
+            if(strcmp(cmd, "keycount") || sscanf(param, "%u", &keycount) != 1 || keycount == 0){
                 // If keycount isn't the next line, something is wrong
                 printf("Error [ckb-main]: \"begin keymap\" not followed with \"keycount\"");
                 return -3;
             }
-            ctx.keys = (ckb_key*)calloc(ctx.keycount, sizeof(ckb_key));
+            ctx.keys = (ckb_key*)calloc(keycount, sizeof(ckb_key));
+            ctx.keycount = keycount;
             unsigned max_x = 0, max_y = 0;
             unsigned i = 0;
             for(; i < ctx.keycount; i++){
@@ -199,6 +236,31 @@ int main(int argc, char *argv[]){
                     return -2;
                 }
             } while(strcmp(cmd, "end") || strcmp(param, "keymap"));
+            printf("params\n");
+            fflush(stdout);
+            // Skip anything else until "begin params"
+            do {
+                ckb_getline(cmd, param, value);
+                if(!*cmd){
+                    printf("Error [ckb-main]: Reached EOF looking for \"begin params\"");
+                    return -2;
+                }
+            } while(strcmp(cmd, "begin") || strcmp(param, "params"));
+            // Parse parameters
+            do {
+                ckb_getline(cmd, param, value);
+                if(!*cmd){
+                    printf("Error [ckb-main]: Reached EOF reading parameters");
+                    return -2;
+                }
+                if(!strcmp(cmd, "end") && !strcmp(param, "params"))
+                    break;
+                if(strcmp(cmd, "param"))
+                    continue;
+                ckb_parameter(&ctx, param, value);
+            } while(1);
+            printf("run\n");
+            fflush(stdout);
             // Skip anything else until "begin run"
             do {
                 ckb_getline(cmd, param, value);
@@ -217,9 +279,18 @@ int main(int argc, char *argv[]){
                 // Parse input
                 if(!strcmp(cmd, "start"))
                     ckb_start(&ctx);
-                else if(!strcmp(cmd, "key"))
-                    ckb_keypress(&ctx, param, !strcmp(value, "down"));
-                else {
+                else if(!strcmp(cmd, "key")){
+                    // Find a key with this name
+                    ckb_key* key = 0;
+                    for(i = 0; i < keycount; i++){
+                        if(!strcmp(ctx.keys[i].name, param)){
+                            key = ctx.keys + i;
+                            break;
+                        }
+                    }
+                    if(key)
+                        ckb_keypress(&ctx, key, !strcmp(value, "down"));
+                } else {
                     double delta = 0.;
                     if(!strcmp(cmd, "frame") && sscanf(param, "%lf", &delta) == 1){
                         int end = ckb_frame(&ctx, delta);

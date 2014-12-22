@@ -34,8 +34,15 @@ public:
     inline const QStringList& keys() { return _keys; }
     void keys(const QStringList& newKeys);
 
+    // Parameters (name -> value)
+    QMap<QString, QVariant> parameters;
+    // Re-initialize animation after changing parameters
+    void reInit();
+
     // Begins or re-triggers the animation
     void trigger();
+    // Triggers a keypress in the animation
+    void keypress(const QString& key, bool pressed);
     // Stops the animation
     void stop();
 
@@ -62,6 +69,9 @@ private:
 
     KeyMap _map;
     QStringList _keys;
+    QString repeatKey;
+    quint64 repeatTime;
+    double repeatLength;
 
     QUuid _guid;
     QString _name;

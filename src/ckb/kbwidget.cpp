@@ -472,9 +472,12 @@ void KbWidget::frameUpdate(){
     }
 
     // Output the current mode/animation
-    light->frameUpdate(cmd, mute != MUTED);
-    if(prevLight != light)
+    if(prevLight != light){
+        light->open();
+        light->frameUpdate(cmd, mute != MUTED);
         cmd.write(QString(" @%1 notify all").arg(notifyNumber).toLatin1());
+    } else
+        light->frameUpdate(cmd, mute != MUTED);
     cmd.write("\n");
     cmd.close();
     prevLight = light;
@@ -488,6 +491,8 @@ void KbWidget::readInput(QFile& cmd){
         QString line;
         while((line = notify.readLine()) != ""){
             QStringList components = line.trimmed().split(" ");
+            if(components.count() < 2)
+                continue;
             if(components[0] == "layout"){
                 // Layout change - set new layout
                 KeyMap::Layout layout = KeyMap::getLayout(components[1]);
@@ -501,26 +506,34 @@ void KbWidget::readInput(QFile& cmd){
                 updateUI();
             } else if(components[0] == "key"){
                 // Key event
+                KbLight* light = currentLight();
                 if(components[1] == "+light"){
-                    KbLight* light = currentLight();
                     int brightness = light->brightness() - 1;
                     if(brightness < 0)
                         brightness = KbLight::MAX_BRIGHTNESS;
                     ui->lightWidget->ui->brightnessBox->setCurrentIndex(brightness);
                 } else if(components[1] == "+m1"){
                     setCurrentMode(currentProfile, 0);
+                    light = currentLight();
                 } else if(components[1] == "+m2"){
                     setCurrentMode(currentProfile, 1);
+                    light = currentLight();
                 } else if(components[1] == "+m3"){
                     setCurrentMode(currentProfile, 2);
+                    light = currentLight();
                 } else if(components[1] == "+lock"){
 #ifndef __APPLE__
-                    KbLight* light = currentLight();
-                    light->winLock(cmd, !light->winLock());
-                    cmd.write("\n");
+                    if(light){
+                        light->winLock(cmd, !light->winLock());
+                        cmd.write("\n");
+                    }
 #endif
                 }
+                if(light)
+                    light->animKeypress(components[1]);
             } else if(components[0] == "hwprofileid"){
+                if(components.count() < 3)
+                    continue;
                 // Find the hardware profile in the list of profiles
                 QString guid = components[1];
                 QString modified = components[2];
@@ -554,10 +567,12 @@ void KbWidget::readInput(QFile& cmd){
                     // Don't change the name if it's a truncated version of what we already have
                     setProfileName(hwProfile, name);
             } else if(components[0] == "mode"){
-                if(components.count() < 3)
+                if(components.count() < 4)
                     continue;
                 int mode = components[1].toInt() - 1;
                 if(components[2] == "hwid"){
+                    if(components.count() < 5)
+                        continue;
                     // Mode ID
                     QString guid = components[3];
                     QString modified = components[4];

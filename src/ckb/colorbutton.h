@@ -7,7 +7,7 @@ class ColorButton : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit ColorButton(QWidget *parent = 0);
+    explicit ColorButton(QWidget* parent = 0, bool allowAlpha = false);
 
     inline const QColor& color() { return _color; }
     void color(const QColor& newColor);
@@ -20,6 +20,7 @@ private slots:
 
 private:
     QColor _color;
+    bool _alpha;
 
     void updateImage();
 };

@@ -12,7 +12,7 @@ class KbLight : public QObject
 {
     Q_OBJECT
 public:
-    KbLight(QObject* parent, int modeIndex, const KeyMap& map);
+    KbLight(QObject* parent, int modeIndex, const KeyMap& keyMap);
 
     // Key map
     inline const KeyMap& map() { return _map; }
@@ -49,7 +49,11 @@ public:
     // Lighting animations
     KbAnim* addAnim(const AnimScript* base, const QStringList& keys);
     QList<KbAnim*> animList;
+    // Sends a keypress event to active animations
+    void animKeypress(const QString& keyEvent);
 
+    // Start the mode
+    void open();
     // Write a new frame to the keyboard
     void frameUpdate(QFile& cmd, bool dimMute);
     // Make the lighting idle, stopping any animations

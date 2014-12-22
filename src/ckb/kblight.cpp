@@ -3,9 +3,10 @@
 
 #include "animscript.h"
 
-KbLight::KbLight(QObject* parent, int modeIndex, const KeyMap& map) :
-    QObject(parent), _map(map), _modeIndex(modeIndex + 1), _brightness(0), _inactive(MAX_INACTIVE), _winLock(false), _showMute(true)
+KbLight::KbLight(QObject* parent, int modeIndex, const KeyMap& keyMap) :
+    QObject(parent), _map(), _modeIndex(modeIndex + 1), _brightness(0), _inactive(MAX_INACTIVE), _winLock(false), _showMute(true)
 {
+    map(keyMap);
 }
 
 void KbLight::map(const KeyMap& map){
@@ -16,24 +17,23 @@ void KbLight::map(const KeyMap& map){
     for(uint i = 0; i < newCount; i++){
         const KeyPos* newPos = map.key(i);
         QString name = newPos->name;
-        if(name == "enter")
-            // Leave the enter key alone
-            continue;
-        bool found = false;
-        for(uint j = 0; j < oldCount; j++){
-            // Scan old map for matching positions
-            const KeyPos* oldPos = _map.key(j);
-            QString oldName = oldPos->name;
-            if(oldPos->x == newPos->x && oldPos->y == newPos->y
-                    && oldName != "enter" && _colorMap.contains(oldName)){
-                // If found, set color
-                found = true;
-                newColorMap[name] = _colorMap.value(oldName);
-                break;
+        if(name != "enter"){
+            bool found = false;
+            for(uint j = 0; j < oldCount; j++){
+                // Scan old map for matching positions
+                const KeyPos* oldPos = _map.key(j);
+                QString oldName = oldPos->name;
+                if(oldPos->x == newPos->x && oldPos->y == newPos->y
+                        && oldName != "enter" && _colorMap.contains(oldName)){
+                    // If found, set color
+                    found = true;
+                    newColorMap[name] = _colorMap.value(oldName);
+                    break;
+                }
             }
+            if(found)
+                continue;
         }
-        if(found)
-            continue;
         // If the map still doesn't contain the key, set it to white.
         if(!newColorMap.contains(name))
             newColorMap[name] = 0xFFFFFFFF;
@@ -55,7 +55,19 @@ void KbLight::color(const QColor& newColor){
 KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys){
     KbAnim* anim = new KbAnim(this, _map, keys, base);
     animList.append(anim);
+    anim->trigger();
     return anim;
+}
+
+void KbLight::animKeypress(const QString& keyEvent){
+    if(keyEvent.length() < 2)
+        return;
+    QString keyName = keyEvent.mid(1);
+    bool keyPressed = (keyEvent[0] == '+');
+    foreach(KbAnim* anim, animList){
+        if(anim->keys().contains(keyName))
+            anim->keypress(keyName, keyPressed);
+    }
 }
 
 void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
@@ -67,7 +79,7 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
         cmd.write(" ");
         cmd.write(i.key().toLatin1());
         char output[8];
-        snprintf(output, 8, ":%02x%02x%02x", qRed(color), qGreen(color), qBlue(color));
+        snprintf(output, sizeof(output), ":%02x%02x%02x", qRed(color), qGreen(color), qBlue(color));
         cmd.write(output);
     }
 }
@@ -120,6 +132,11 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
 
     // Apply light
     printRGB(cmd, animMap);
+}
+
+void KbLight::open(){
+    foreach(KbAnim* anim, animList)
+        anim->trigger();
 }
 
 void KbLight::close(QFile &cmd){

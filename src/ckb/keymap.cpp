@@ -24,15 +24,15 @@ struct KeyLayout {
     uint count;
 };
 
-static const KeyLayout K95Pos[] = {
+#define KEYLAYOUT_COUNT 5
+
+static const KeyLayout K95Pos[KEYLAYOUT_COUNT] = {
     { K95PosFR, sizeof(K95PosSE) / sizeof(KeyPos) },
     { K95PosDE, sizeof(K95PosSE) / sizeof(KeyPos) },
     { K95PosSE, sizeof(K95PosSE) / sizeof(KeyPos) },
     { K95PosGB, sizeof(K95PosGB) / sizeof(KeyPos) },
     { K95PosUS, sizeof(K95PosUS) / sizeof(KeyPos) }
 };
-
-static const uint KEYLAYOUT_COUNT = sizeof(K95Pos) / sizeof(KeyLayout);
 
 #define K95_WIDTH       298
 #define K95_HEIGHT      76
@@ -43,6 +43,8 @@ static KeyLayout K70Pos[KEYLAYOUT_COUNT] = {
     { 0, K95Pos[0].count - K70_COUNT_DIFF },
     { 0, K95Pos[1].count - K70_COUNT_DIFF },
     { 0, K95Pos[2].count - K70_COUNT_DIFF },
+    { 0, K95Pos[3].count - K70_COUNT_DIFF },
+    { 0, K95Pos[4].count - K70_COUNT_DIFF }
 };
 
 #define K70_X_START     38

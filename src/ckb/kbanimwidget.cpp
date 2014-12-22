@@ -1,4 +1,5 @@
 #include <QMenu>
+#include "animsettingdialog.h"
 #include "kbanimwidget.h"
 #include "ui_kbanimwidget.h"
 
@@ -98,6 +99,9 @@ void KbAnimWidget::addAnim(const AnimScript* base, const QStringList& keyList){
 
     setCurrent(animation);
     noReorder = false;
+
+    // Activate settings dialog
+    on_propertyButton_clicked();
 }
 
 void KbAnimWidget::setCurrent(KbAnim* newCurrent){
@@ -117,7 +121,7 @@ void KbAnimWidget::setCurrent(KbAnim* newCurrent){
     }
     ui->selectionStack->setCurrentIndex(1);
     ui->aNameLabel->setText(script->name());
-    ui->aVerLabel->setText(script->version());
+    ui->aVerLabel->setText("v" + script->version());
     ui->aCopyLabel->setText(script->copyright());
 
     ui->nameBox->setText(current->name());
@@ -213,4 +217,15 @@ void KbAnimWidget::on_deleteButton_clicked(){
             ui->noAnimLabel->setVisible(true);
         }
     }
+}
+
+void KbAnimWidget::on_propertyButton_clicked(){
+    if(!current)
+        return;
+    AnimSettingDialog dialog(this, current);
+    dialog.exec();
+    if(dialog.result() != QDialog::Accepted)
+        return;
+    dialog.applySettings();
+    current->trigger();
 }

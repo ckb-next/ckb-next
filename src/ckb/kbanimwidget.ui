@@ -285,6 +285,13 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="6">
+          <widget class="QPushButton" name="propertyButton">
+           <property name="text">
+            <string>Edit properties</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

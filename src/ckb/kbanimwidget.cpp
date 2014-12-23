@@ -73,6 +73,7 @@ void KbAnimWidget::reorderAnims(){
             if(anim && anim == dragSelected){
                 dragSelected = 0;
                 item->setSelected(true);
+                ui->animList->setCurrentItem(item);
             }
         }
     }
@@ -140,8 +141,11 @@ void KbAnimWidget::setSelectedKeys(const QStringList& keys){
 void KbAnimWidget::on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous){
     if(!current)
         setCurrent(0);
-    else
+    else {
         setCurrent(animations[current->data(Qt::UserRole).toUuid()]);
+        // Editable flag can get scrambled by reorder
+        current->setFlags(current->flags() | Qt::ItemIsEditable);
+    }
 }
 
 void KbAnimWidget::on_animList_itemChanged(QListWidgetItem *item){

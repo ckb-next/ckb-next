@@ -55,6 +55,7 @@ void MainWindow::scanKeyboards(){
         foreach(KbWidget* w, kbWidgets)
             w->deleteLater();
         kbWidgets.clear();
+        settingsWidget->ui->devicesLabel->setText("Daemon inactive");
         return;
     }
 
@@ -110,6 +111,8 @@ void MainWindow::scanKeyboards(){
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
+    if(!event->spontaneous())
+        return;
     QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb\" on the Settings screen.");
     hide();
     event->ignore();

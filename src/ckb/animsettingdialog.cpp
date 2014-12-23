@@ -28,7 +28,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         if(param.type != AnimScript::Param::BOOL)
             ui->settingsGrid->addWidget(new QLabel(param.prefix, this), row, 1);
         if(row == 2)
-            ui->settingsGrid->addItem(new QSpacerItem(10, 0, QSizePolicy::Fixed), row, 2);
+            ui->settingsGrid->addItem(new QSpacerItem(15, 0, QSizePolicy::Fixed), row, 2);
         // Configure and display main widget
         QWidget* widget = 0;
         int colSpan = 1;
@@ -36,7 +36,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         case AnimScript::Param::BOOL:
             widget = new QCheckBox(param.prefix, this);
             ((QCheckBox*)widget)->setChecked(value.toBool());
-            colSpan = 2;
+            colSpan = 4;
             break;
         case AnimScript::Param::LONG:
             widget = new QSpinBox(this);
@@ -54,7 +54,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         case AnimScript::Param::RGB:
             widget = new ColorButton(this);
             ((ColorButton*)widget)->color(QColor("#" + value.toString()));
-            colSpan = 2;
+            colSpan = 3;
             break;
         case AnimScript::Param::ARGB:{
             widget = new ColorButton(this, true);
@@ -66,7 +66,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             } else
                 color = "#" + val;
             ((ColorButton*)widget)->color(color);
-            colSpan = 2;
+            colSpan = 3;
             break;
         }
         default:
@@ -77,7 +77,12 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ui->settingsGrid->addWidget(widget, row, 3, 1, colSpan);
         }
         // Display postfix label on the right
-        ui->settingsGrid->addWidget(new QLabel(param.postfix, this), row, 3 + colSpan, 1, 3 - colSpan);
+        if(param.type != AnimScript::Param::BOOL){
+            ui->settingsGrid->addWidget(new QLabel(param.postfix, this), row, 3 + colSpan, 1, 4 - colSpan);
+            if(colSpan < 3)
+                // Additionally add spacers to compress short elements to the left
+                ui->settingsGrid->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding), row, 4 + colSpan);
+        }
         // On the first row, add a horizontal spacer to collapse the layout on to the left side
         if(row == 2)
             ui->settingsGrid->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding), row, 6);
@@ -121,7 +126,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 double repValue = anim->parameters.value("repeat").toDouble();
                 repCheck = new QCheckBox("Repeat every:", this);
                 repCheck->setChecked(repValue >= 0.);
-                ui->settingsGrid->addWidget(repCheck, row, 1, 1, 2);
+                ui->settingsGrid->addWidget(repCheck, row, 1);
                 QDoubleSpinBox* spinner = new QDoubleSpinBox(this);
                 spinner->setDecimals(1);
                 spinner->setMinimum(0.1);
@@ -155,7 +160,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 double repValue = anim->parameters.value("kprepeat").toDouble();
                 kpRepCheck = new QCheckBox("Repeat every:", this);
                 kpRepCheck->setChecked(repValue >= 0.);
-                ui->settingsGrid->addWidget(kpRepCheck, row, 1, 1, 2);
+                ui->settingsGrid->addWidget(kpRepCheck, row, 1);
                 QDoubleSpinBox* spinner = new QDoubleSpinBox(this);
                 spinner->setDecimals(1);
                 spinner->setMinimum(0.1);
@@ -180,6 +185,8 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->sYearLabel->setText(script->year());
     ui->sLicenseLabel->setText(script->license());
     ui->sDescLabel->setText(script->description());
+
+    setFixedSize(minimumSize());
 }
 
 void AnimSettingDialog::newDuration(double duration){

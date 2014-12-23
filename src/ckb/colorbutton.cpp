@@ -20,7 +20,7 @@ void ColorButton::updateImage(){
         setText("Change color...");
         return;
     }
-    const int w = 12, h = 12;
+    const int w = 24, h = 12;
     QImage image(w, h, QImage::Format_RGB888);
     QPainter painter(&image);
     painter.setPen(Qt::NoPen);

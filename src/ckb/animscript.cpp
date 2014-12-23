@@ -23,7 +23,7 @@ AnimScript::~AnimScript(){
 }
 
 QString AnimScript::path(){
-#ifdef __APPLE
+#ifdef __APPLE__
     return QDir(QApplication::applicationDirPath() + "../../../../").absoluteFilePath("animations");
 #else
     return QDir().absoluteFilePath("animations");

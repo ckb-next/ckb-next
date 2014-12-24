@@ -102,7 +102,7 @@ void localecase(char* dst, size_t length, const char* src){
 }
 
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.0.16\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.18\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){
@@ -126,7 +126,7 @@ int main(int argc, char** argv){
 
     // Set FPS if not done already
     if(!fps)
-        setfps(60);
+        setfps(30);
 
     // If the keymap wasn't set via command-line, get it from the system locale
     if(!keymap_system){

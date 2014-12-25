@@ -89,6 +89,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, cons
 void KbAnim::reInit(){
     if(_script)
         _script->init(_map, _keys, parameters);
+    repeatKey = "";
 }
 
 void KbAnim::map(const KeyMap& newMap){
@@ -132,11 +133,8 @@ void KbAnim::trigger(){
     if(_script && parameters.value("trigger").toBool()){
         _script->retrigger();
         double repeat = parameters.value("repeat").toDouble();
-        if(repeat >= 0.01){
-            repeatKey = "";
-            repeatLength = repeat;
-            repeatTime = QDateTime::currentMSecsSinceEpoch();
-        }
+        repeatLength = repeat;
+        repeatTime = QDateTime::currentMSecsSinceEpoch();
     }
 }
 
@@ -144,11 +142,9 @@ void KbAnim::keypress(const QString& key, bool pressed){
     if(_script && parameters.value("kptrigger").toBool()){
         _script->keypress(key, pressed);
         double repeat = parameters.value("kprepeat").toDouble();
-        if(repeat >= 0.01){
-            repeatKey = key;
-            repeatLength = repeat;
-            repeatTime = QDateTime::currentMSecsSinceEpoch();
-        }
+        repeatKey = key;
+        kpRepeatLength = repeat;
+        kpRepeatTime = QDateTime::currentMSecsSinceEpoch();
     }
 }
 
@@ -156,6 +152,8 @@ void KbAnim::stop(){
     if(_script)
         _script->stop();
     repeatTime = 0;
+    kpRepeatTime = 0;
+    repeatKey = "";
 }
 
 // Blending functions
@@ -198,13 +196,15 @@ void KbAnim::blend(QHash<QString, QRgb>& animMap){
     // Restart the animation if its repeat time is up
     quint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     if(repeatLength >= 0.01 && currentTime >= repeatTime + repeatLength * 1000.){
-        if(repeatKey != ""){
-            _script->keypress(repeatKey, 1);
-            _script->keypress(repeatKey, 0);
-        } else
-            _script->retrigger();
+        _script->retrigger();
         repeatTime = currentTime;
     }
+    if(repeatKey != "" && kpRepeatLength >= 0.01 && currentTime >= kpRepeatTime + kpRepeatLength * 1000.){
+        _script->keypress(repeatKey, 1);
+        _script->keypress(repeatKey, 0);
+        kpRepeatTime = currentTime;
+    }
+
     // Fetch the next frame from the script
     _script->frame();
     QHashIterator<QString, QRgb> i(_script->colors());

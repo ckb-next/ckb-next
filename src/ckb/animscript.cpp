@@ -14,12 +14,15 @@ AnimScript::AnimScript(QObject* parent, const QString& path) :
 }
 
 AnimScript::AnimScript(QObject* parent, const AnimScript& base) :
-    QObject(parent), _guid(base._guid), _name(base._name), _version(base._version), _year(base._year), _author(base._author), _license(base._license), _description(base._description), _path(base._path), _params(base._params), initialized(false)
+    QObject(parent), _guid(base._guid), _name(base._name), _version(base._version), _year(base._year), _author(base._author), _license(base._license), _description(base._description), _path(base._path), _params(base._params), initialized(false), process(0)
 {
 }
 
 AnimScript::~AnimScript(){
-    stop();
+    if(process){
+        process->kill();
+        process->waitForFinished(1000);
+    }
 }
 
 QString AnimScript::path(){
@@ -72,9 +75,13 @@ bool AnimScript::load(){
     // Run the process to get script info
     QProcess infoProcess;
     infoProcess.start(_path, QStringList("--ckb-info"));
-    infoProcess.waitForFinished(100);
-    if(infoProcess.state() == QProcess::Running)
+    qDebug() << "Scanning " << _path;
+    infoProcess.waitForFinished(1000);
+    if(infoProcess.state() == QProcess::Running){
+        // Kill the process if it takes more than 1s
         infoProcess.kill();
+        return false;
+    }
     // Read output
     QString line;
     while((line = infoProcess.readLine()) != ""){
@@ -149,19 +156,17 @@ void AnimScript::init(const KeyMap& map, const QStringList& keys, const QMap<QSt
     if(_duration <= 0.)
         _duration = -1.;
     _paramValues = paramValues;
-    firstFrame = false;
-    stopped = false;
-    clearNext = true;
+    stopped = firstFrame = false;
     initialized = true;
 }
 
 void AnimScript::start(){
-    if(!initialized || process.state() != QProcess::NotRunning)
+    if(!initialized)
         return;
-    process.start(_path, QStringList("--ckb-run"));
-    if(!process.waitForStarted(100))
-        return;
-    stopped = false;
+    stop();
+    stopped = firstFrame = false;
+    process = new QProcess(this);
+    process->start(_path, QStringList("--ckb-run"));
     qDebug() << "Starting " << _path;
     // Determine the upper left corner of the given keys
     QStringList keysCopy = _keys;
@@ -178,98 +183,91 @@ void AnimScript::start(){
             minY = pos->y;
     }
     // Write the keymap to the process
-    process.write("begin keymap\n");
-    process.write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());
+    process->write("begin keymap\n");
+    process->write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());
     foreach(const QString& key, keysCopy){
         const KeyPos* pos = _map.key(key);
-        process.write(QString("key %1 %2,%3\n").arg(key).arg(pos->x - minX).arg(pos->y - minY).toLatin1());
+        process->write(QString("key %1 %2,%3\n").arg(key).arg(pos->x - minX).arg(pos->y - minY).toLatin1());
     }
-    process.write("end keymap\n");
+    process->write("end keymap\n");
     // Write parameters
-    process.write("begin params\n");
+    process->write("begin params\n");
     QMapIterator<QString, QVariant> i(_paramValues);
     while(i.hasNext()){
         i.next();
-        process.write("param ");
-        process.write(i.key().toLatin1());
-        process.write(" ");
-        process.write(QUrl::toPercentEncoding(i.value().toString()));
-        process.write("\n");
+        process->write("param ");
+        process->write(i.key().toLatin1());
+        process->write(" ");
+        process->write(QUrl::toPercentEncoding(i.value().toString()));
+        process->write("\n");
     }
-    process.write("end params\n");
+    process->write("end params\n");
     // Begin animating
-    process.write("begin run\n");
-    firstFrame = false;
+    process->write("begin run\n");
     lastFrame = QDateTime::currentMSecsSinceEpoch();
 }
 
 void AnimScript::retrigger(){
     if(!initialized)
         return;
-    if(process.state() == QProcess::NotRunning)
+    if(!process)
         start();
-    process.write("start\n");
-    if(!firstFrame){
-        process.write("frame 0\n");
-        firstFrame = true;
-    }
+    process->write("start\n");
+    _frame(false);
 }
 
 void AnimScript::keypress(const QString& key, bool pressed){
     if(!initialized)
         return;
-    if(process.state() == QProcess::NotRunning)
+    if(!process)
         start();
-    process.write(("key " + key + (pressed ? " down\n" : " up\n")).toLatin1());
-    if(!firstFrame){
-        process.write("frame 0\n");
-        firstFrame = true;
-    }
+    process->write(("key " + key + (pressed ? " down\n" : " up\n")).toLatin1());
+    _frame(false);
 }
 
 void AnimScript::stop(){
-    if(!initialized || process.state() == QProcess::NotRunning)
-        return;
-    process.write("end run\n");
-    if(!process.waitForFinished(100))
-        process.kill();
-    clearNext = true;
+    _colors.clear();
+    if(process){
+        process->kill();
+        connect(process, SIGNAL(finished(int)), process, SLOT(deleteLater()));
+        process = 0;
+    }
 }
 
-void AnimScript::frame(){
+void AnimScript::_frame(bool parseOutput){
     if(!initialized || stopped)
         return;
-    if(process.state() == QProcess::NotRunning && !process.canReadLine())
+    // Start the animation if it's not running yet
+    if(!process)
         start();
-    bool skipped = true;
+
     // Buffer the current output.
-    while(process.canReadLine()){
-        QString line = process.readLine().trimmed();
-        if(inputBuffer.length() == 0 && line != "begin frame"){
-            // Ignore anything not between "begin frame" and "end frame", except for "end run", which indicates that the program is done.
-            if(line == "end run"){
-                //stopped = true;
-                return;
+    bool skipped = true;
+    if(parseOutput){
+        while(process->canReadLine()){
+            QString line = process->readLine().trimmed();
+            if(inputBuffer.length() == 0 && line != "begin frame"){
+                // Ignore anything not between "begin frame" and "end frame", except for "end run", which indicates that the program is done.
+                if(line == "end run"){
+                    stopped = true;
+                    return;
+                }
+                continue;
             }
-            continue;
+            if(line == "end frame"){
+                // Process this frame
+                skipped = false;
+                foreach(QString input, inputBuffer){
+                    QStringList split = input.split(" ");
+                    if(split.length() != 3 || split[0] != "argb")
+                        continue;
+                    _colors[split[1]] = split[2].toUInt(0, 16);
+                }
+                inputBuffer.clear();
+                continue;
+            }
+            inputBuffer += line;
         }
-        if(line == "end frame"){
-            // Process this frame
-            skipped = false;
-            if(clearNext){
-                _colors.clear();
-                clearNext = false;
-            }
-            foreach(QString input, inputBuffer){
-                QStringList split = input.split(" ");
-                if(split.length() != 3 || split[0] != "argb")
-                    continue;
-                _colors[split[1]] = split[2].toUInt(0, 16);
-            }
-            inputBuffer.clear();
-            continue;
-        }
-        inputBuffer += line;
     }
     // If at least one frame was read, advance the animation
     if(!skipped || !firstFrame){
@@ -280,7 +278,7 @@ void AnimScript::frame(){
         else if(delta < 0.)
             delta = 0.;
         lastFrame = nextFrame;
-        process.write(QString("frame %1\n").arg(delta).toLatin1());
+        process->write(QString("frame %1\n").arg(delta).toLatin1());
         firstFrame = true;
     }
 

@@ -70,8 +70,8 @@ private:
     KeyMap _map;
     QStringList _keys;
     QString repeatKey;
-    quint64 repeatTime;
-    double repeatLength;
+    quint64 repeatTime, kpRepeatTime;
+    double repeatLength, kpRepeatLength;
 
     QUuid _guid;
     QString _name;

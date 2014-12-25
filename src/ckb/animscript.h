@@ -72,7 +72,7 @@ public:
     void keypress(const QString& key, bool pressed);
     void keypress(int x, int y, bool pressed);
     // Executes the next frame of the animation.
-    void frame();
+    inline void frame() { _frame(true); }
     // Stops the animation.
     void stop();
 
@@ -101,12 +101,12 @@ private:
 
     quint64 lastFrame;
     double _duration;
-    bool firstFrame;
 
-    bool initialized, stopped, clearNext;
-    QProcess process;
+    bool initialized, firstFrame, stopped;
+    QProcess* process;
     QStringList inputBuffer;
     void start();
+    void _frame(bool parseOutput);
 
     static QHash<QUuid, AnimScript*> scripts;
 

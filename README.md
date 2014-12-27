@@ -8,15 +8,17 @@ ckb is a userspace (non-kernel) driver for Corsair RGB keyboards for Linux and O
 Linux instructions
 ------------------
 
-`qt5-base`, `libudev`, `gcc`, `g++`, and `glibc` are required. Check with your package manager to make sure you have the correct libraries/headers installed (Note: on Ubuntu you need `qt5-default` and `libudev-dev`). You also need a kernel with uinput support (all distros should ship with this by default; don't worry about it unless you're running a custom kernel).
+Requires Qt5 and libudev (Ubuntu: `qt5-default` and `libudev-dev`. Qt5 packages may also be under `qt5-base` or `libqt5*-devel`). `gcc`, `g++`, and `glibc` are also required. Check with your package manager to make sure you have the correct libraries/headers installed.
 
-You can build the project by running `qmake && make` in the directory you downloaded it to. The binaries will be placed in a new `bin` directory assuming they compile successfully. To start the daemon, run `sudo bin/ckb-daemon`. After that, open the `ckb` binary as a normal user to start the user interface.
+You can build the project by running `qmake-qt5 && make` in the directory you downloaded it to. If you don't have `qmake-qt5` (e.g. Ubuntu), run `qmake && make` instead. The binaries will be placed in a new `bin` directory assuming they compile successfully. To start the daemon, run `sudo bin/ckb-daemon`. After that, open the `ckb` binary as a normal user to start the user interface.
 
-**Note:** If you have problems connecting the keyboard to your system, try adding the following to your kernel's cmdline (for K70):
+**Note:** If you have problems connecting the keyboard to your system, try adding the following to your kernel's `cmdline`:
 
-`usbhid.quirks=0x1B1C:0x1B13:0x20000000`
+K70: `usbhid.quirks=0x1B1C:0x1B13:0x20000000`
 
-If you own a K95, replace `1B13` with `1B11`. For instructions on adding cmdline parameters in Ubuntu, see here: https://wiki.ubuntu.com/Kernel/KernelBootParameters
+K95: `usbhid.quirks=0x1B1C:0x1B11:0x20000000` 
+
+For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
 OSX instructions
 ----------------

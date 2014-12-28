@@ -123,7 +123,7 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     // Get the model and serial number
     long idproduct = usbgetvalue(device, CFSTR(kIOHIDProductIDKey));
     int model;
-    if(idproduct == P_K70)
+    if(idproduct == P_K70 || idproduct == P_K70_VENG)
         model = 70;
     else if(idproduct == P_K95)
         model = 95;
@@ -200,7 +200,7 @@ static pthread_t keyrepeatthread;
 CGEventRef tapcallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon){
     CGEventFlags flags = CGEventGetFlags(event);
     for(int i = 1; i < DEV_MAX; i++)
-        flags |= keyboard[i].eflags;
+        flags |= keyboard[i].eventflags;
     CGEventSetFlags(event, flags);
     return event;
 }
@@ -239,19 +239,16 @@ void* threadrun(void* context){
     CFMutableArrayRef devices = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     if(devices){
         int vendor = V_CORSAIR, product1 = P_K70, product2 = P_K95;
-        CFMutableDictionaryRef device = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        if(device){
-            CFDictionarySetValue(device, CFSTR(kIOHIDVendorIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor));
-            CFDictionarySetValue(device, CFSTR(kIOHIDProductIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product1));
-            CFArrayAppendValue(devices, device);
-            CFRelease(device);
-        }
-        device = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        if(device){
-            CFDictionarySetValue(device, CFSTR(kIOHIDVendorIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor));
-            CFDictionarySetValue(device, CFSTR(kIOHIDProductIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product2));
-            CFArrayAppendValue(devices, device);
-            CFRelease(device);
+        int products[] = { P_K70, P_K70_VENG, P_K95 };
+        for(int i = 0; i < sizeof(products) / sizeof(int); i++){
+            int product = products[i];
+            CFMutableDictionaryRef device = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+            if(device){
+                CFDictionarySetValue(device, CFSTR(kIOHIDVendorIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor));
+                CFDictionarySetValue(device, CFSTR(kIOHIDProductIDKey), CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product));
+                CFArrayAppendValue(devices, device);
+                CFRelease(device);
+            }
         }
         IOHIDManagerSetDeviceMatchingMultiple(usbmanager, devices);
         CFRelease(devices);

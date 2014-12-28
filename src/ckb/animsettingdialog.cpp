@@ -1,9 +1,11 @@
 #include <cstdio>
 #include <QDoubleSpinBox>
+#include <QLineEdit>
 #include <QSpinBox>
 #include "animsettingdialog.h"
 #include "ui_animsettingdialog.h"
 #include "colorbutton.h"
+#include "gradientbutton.h"
 
 AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     QDialog(parent),
@@ -18,6 +20,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->settingsGrid->addWidget(new QLabel("<b>Animation</b>", this), 0, 0, 1, 7);
     ui->settingsGrid->addWidget(hLine(), 1, 0, 1, 7);
     int row = 2;
+    bool lSpacePlaced = false, rSpacePlaced = false;
     QListIterator<AnimScript::Param> i(script->paramIterator());
     while(i.hasNext()){
         const AnimScript::Param& param = i.next();
@@ -25,10 +28,13 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             continue;
         QVariant value = anim->parameters.value(param.name);
         // Display prefix label on the left (except for booleans)
-        if(param.type != AnimScript::Param::BOOL)
+        if(param.type != AnimScript::Param::BOOL){
             ui->settingsGrid->addWidget(new QLabel(param.prefix, this), row, 1);
-        if(row == 2)
-            ui->settingsGrid->addItem(new QSpacerItem(15, 0, QSizePolicy::Fixed), row, 2);
+            if(!lSpacePlaced){
+                ui->settingsGrid->addItem(new QSpacerItem(15, 0, QSizePolicy::Fixed), row, 2);
+                lSpacePlaced = true;
+            }
+        }
         // Configure and display main widget
         QWidget* widget = 0;
         int colSpan = 1;
@@ -36,7 +42,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         case AnimScript::Param::BOOL:
             widget = new QCheckBox(param.prefix, this);
             ((QCheckBox*)widget)->setChecked(value.toBool());
-            colSpan = 4;
+            colSpan = 6;
             break;
         case AnimScript::Param::LONG:
             widget = new QSpinBox(this);
@@ -69,19 +75,41 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             colSpan = 3;
             break;
         }
+        case AnimScript::Param::GRADIENT:
+            widget = new GradientButton(this);
+            ((GradientButton*)widget)->fromString(value.toString());
+            colSpan = 3;
+            break;
+        case AnimScript::Param::AGRADIENT:
+            widget = new GradientButton(this, true);
+            ((GradientButton*)widget)->fromString(value.toString());
+            colSpan = 3;
+            break;
+        case AnimScript::Param::STRING:
+            widget = new QLineEdit(this);
+            ((QLineEdit*)widget)->setText(value.toString());
+            colSpan = 3;
+            break;
         default:
             break;
         }
-        if(widget){
+        if(param.type == AnimScript::Param::BOOL){
+            // Boolean values are placed on the left with no prefix or postfix
             settingWidgets[param.name] = widget;
-            ui->settingsGrid->addWidget(widget, row, 3, 1, colSpan);
-        }
-        // Display postfix label on the right
-        if(param.type != AnimScript::Param::BOOL){
+            ui->settingsGrid->addWidget(widget, row, 1, 1, colSpan);
+        } else {
+            // Display the widget
+            if(widget){
+                settingWidgets[param.name] = widget;
+                ui->settingsGrid->addWidget(widget, row, 3, 1, colSpan);
+            }
+            // Display postfix label on the right
             ui->settingsGrid->addWidget(new QLabel(param.postfix, this), row, 3 + colSpan, 1, 4 - colSpan);
-            if(colSpan < 3)
+            if(colSpan < 3 && !rSpacePlaced){
                 // Additionally add spacers to compress short elements to the left
                 ui->settingsGrid->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding), row, 4 + colSpan);
+                rSpacePlaced = true;
+            }
         }
         // On the first row, add a horizontal spacer to collapse the layout on to the left side
         if(row == 2)
@@ -96,7 +124,11 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         // Duration is required for all other timing parameters
         lastDuration = anim->parameters.value("duration").toDouble();
         // Show duration spinner
-        ui->settingsGrid->addWidget(new QLabel("Duration", this), row, 1);
+        ui->settingsGrid->addWidget(new QLabel("Duration:", this), row, 1);
+        if(!lSpacePlaced){
+            ui->settingsGrid->addItem(new QSpacerItem(15, 0, QSizePolicy::Fixed), row, 2);
+            lSpacePlaced = true;
+        }
         QDoubleSpinBox* spinner = new QDoubleSpinBox(this);
         spinner->setDecimals(1);
         spinner->setMinimum(0.1);

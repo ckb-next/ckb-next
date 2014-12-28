@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>430</width>
     <height>300</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>400</width>
+    <width>430</width>
     <height>0</height>
    </size>
   </property>
@@ -148,7 +148,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Animation name:</string>
+          <string>Script name:</string>
          </property>
         </widget>
        </item>

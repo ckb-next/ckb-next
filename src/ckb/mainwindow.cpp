@@ -3,6 +3,7 @@
 #include "ui_settingswidget.h"
 #include <QSharedMemory>
 #include <QMessageBox>
+#include <QMenuBar>
 
 extern QSharedMemory appShare;
 
@@ -30,11 +31,19 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 
+#ifdef __APPLE__
+    // Make a custom "Close" menu action for OSX, as the default one brings up the "still running" popup unnecessarily
+    QMenuBar* menuBar = new QMenuBar(this);
+    this->setMenuBar(menuBar);
+    this->menuBar()->addMenu("ckb")->addAction(closeAction);
+#endif
+
     connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(closeAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(show()));
 
     eventTimer = new QTimer(this);
+    eventTimer->setTimerType(Qt::PreciseTimer);
     connect(eventTimer, SIGNAL(timeout()), this, SLOT(timerTick()));
     eventTimer->start(1000 / 60);
 

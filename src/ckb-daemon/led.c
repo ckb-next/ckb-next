@@ -267,11 +267,11 @@ void setfps(unsigned newfps){
     if(newfps > 60 || newfps == 0){
         // There's no point running higher than 60FPS.
         // The LED controller is locked to 60Hz so it will only cause tearing and/or device freezes.
-        printf("Warning: Requested %d FPS but setting to 60\n", newfps);
-        fps = 60;
-    } else {
-        fps = newfps;
-        printf("Setting FPS to %u\n", fps);
+        printf("Warning: Refusing request for %d FPS\n", newfps);
+        return;
     }
-    nrprintf(-1, "fps %d\n", fps);
+    if(newfps != fps){
+        printf("Setting FPS to %u\n", newfps);
+        fps = newfps;
+    }
 }

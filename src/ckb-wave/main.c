@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Wave");
-    CKB_VERSION("0.2");
+    CKB_VERSION("0.3");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{E0BBA19E-C328-4C0E-8E3C-A06D5722B4FC}");
@@ -65,7 +65,7 @@ int ckb_frame(ckb_runctx* context, double delta){
     for(unsigned i = 0; i < ANIM_MAX; i++){
         if(anim[i].active){
             anim[i].x += (context->width + animlength) * delta;
-            if(anim[i].x >= anim[i].maxx){
+            if(anim[i].x > anim[i].maxx){
                 anim[i].active = 0;
                 continue;
             }

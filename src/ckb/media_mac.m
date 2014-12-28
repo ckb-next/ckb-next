@@ -1,4 +1,5 @@
 #import <AudioToolbox/AudioServices.h>
+#import <Foundation/Foundation.h>
 #include "media.h"
 
 muteState getMuteState(){
@@ -28,4 +29,8 @@ muteState getMuteState(){
             != kAudioHardwareNoError)
         return UNKNOWN;
     return state ? MUTED : UNMUTED;
+}
+
+void disableAppNap(){
+    [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep reason:@"Keyboard animation"];
 }

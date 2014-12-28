@@ -6,10 +6,14 @@
 
 // Vendor/product codes
 #define V_CORSAIR       0x1b1c
-#define P_K70           0x1b13
-#define P_K95           0x1b11
 #define V_CORSAIR_STR   "1b1c"
+
+#define P_K70           0x1b13
 #define P_K70_STR       "1b13"
+#define P_K70_VENG      0x1b09
+#define P_K70_VENG_STR  "1b09"
+
+#define P_K95           0x1b11
 #define P_K95_STR       "1b11"
 
 // USB delays for when the keyboards get picky about timing

@@ -5,6 +5,12 @@
 
 QSharedMemory appShare("ckb");
 
+#ifdef __APPLE__
+// App Nap is an OSX feature designed to save power by putting background apps to sleep.
+// However, it interferes with ckb's animations, so we want it off
+extern "C" void disableAppNap();
+#endif
+
 bool isRunning(){
     if(!appShare.create(16)){
         if(!appShare.attach() || !appShare.lock())
@@ -22,6 +28,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     if(isRunning())
         return 0;
+#ifdef __APPLE__
+    disableAppNap();
+#endif
     MainWindow w;
     w.show();
 

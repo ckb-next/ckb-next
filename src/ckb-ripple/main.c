@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Ripple");
-    CKB_VERSION("0.2");
+    CKB_VERSION("0.3");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25A1CDB02C9D}");
@@ -73,7 +73,7 @@ int ckb_frame(ckb_runctx* context, double delta){
     for(unsigned i = 0; i < ANIM_MAX; i++){
         if(anim[i].active){
             anim[i].cursize += kbsize * delta;
-            if(anim[i].cursize >= anim[i].maxsize){
+            if(anim[i].cursize > anim[i].maxsize){
                 anim[i].active = 0;
                 continue;
             }

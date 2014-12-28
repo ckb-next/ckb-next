@@ -124,7 +124,7 @@ typedef struct {
     IOHIDDeviceRef handle;
     IOHIDDeviceRef handles[4];
     CGEventSourceRef event;
-    CGEventFlags eflags;
+    CGEventFlags lflags, rflags, eventflags;
     long keypresstime;
     short lastkeypress;
 #endif

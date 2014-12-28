@@ -42,17 +42,20 @@
 #define CKB_DESCRIPTION(description)    CKB_CONTAINER( printf("description "); printurl(description); printf("\n"); )
 
 // Parameter helpers
-#define CKB_PARAM(type, name, prefix, postfix, extra)               CKB_CONTAINER( printf("param %s %s ", type, name); printurl(prefix); printf(" "); printurl(postfix); extra; printf("\n"); )
-#define CKB_PARAM_LONG(name, prefix, postfix, default, min, max)    CKB_PARAM("long", name, prefix, postfix, printf(" %ld %ld %ld", (long)(default), (long)(min), (long)(max)))
-#define CKB_PARAM_DOUBLE(name, prefix, postfix, default, min, max)  CKB_PARAM("double", name, prefix, postfix, printf(" %lf %lf %lf", (double)(default), (double)(min), (double)(max)))
-#define CKB_PARAM_BOOL(name, prefix, postfix, default)              CKB_PARAM("bool", name, prefix, postfix, printf((default) ? " 1" : " 0"))
-#define CKB_PARAM_RGB(name, prefix, postfix, r, g, b)               CKB_PARAM("rgb", name, prefix, postfix, printf(" %02x%02x%02x", (unsigned char)(r), (unsigned char)(g), (unsigned char)(b)))
-#define CKB_PARAM_ARGB(name, prefix, postfix, a, r, g, b)           CKB_PARAM("argb", name, prefix, postfix, printf(" %02x%02x%02x%02x", (unsigned char)(a), (unsigned char)(r), (unsigned char)(g), (unsigned char)(b)))
+#define CKB_PARAM(type, name, prefix, postfix, extra)               CKB_CONTAINER( printf("param %s %s ", type, name); printurl(prefix); printf(" "); printurl(postfix); printf(" "); extra; printf("\n"); )
+#define CKB_PARAM_LONG(name, prefix, postfix, default, min, max)    CKB_PARAM("long", name, prefix, postfix, printf("%ld %ld %ld", (long)(default), (long)(min), (long)(max)))
+#define CKB_PARAM_DOUBLE(name, prefix, postfix, default, min, max)  CKB_PARAM("double", name, prefix, postfix, printf("%lf %lf %lf", (double)(default), (double)(min), (double)(max)))
+#define CKB_PARAM_BOOL(name, text, default)                         CKB_PARAM("bool", name, text, "", printf((default) ? "1" : "0"))
+#define CKB_PARAM_RGB(name, prefix, postfix, r, g, b)               CKB_PARAM("rgb", name, prefix, postfix, printf("%02x%02x%02x", (unsigned char)(r), (unsigned char)(g), (unsigned char)(b)))
+#define CKB_PARAM_ARGB(name, prefix, postfix, a, r, g, b)           CKB_PARAM("argb", name, prefix, postfix, printf("%02x%02x%02x%02x", (unsigned char)(a), (unsigned char)(r), (unsigned char)(g), (unsigned char)(b)))
+#define CKB_PARAM_GRADIENT(name, prefix, postfix, default)          CKB_PARAM("gradient", name, prefix, postfix, printurl(default))
+#define CKB_PARAM_AGRADIENT(name, prefix, postfix, default)         CKB_PARAM("agradient", name, prefix, postfix, printurl(default))
+#define CKB_PARAM_STRING(name, prefix, postfix, default)            CKB_PARAM("string", name, prefix, postfix, printurl(default))
 
 // Special parameters (most values are ignored)
 #define CKB_PARAM_DURATION(default)                                 CKB_PARAM_DOUBLE("duration", "", "", default, 0., 0.)
-#define CKB_PARAM_TRIGGER(default)                                  CKB_PARAM_BOOL("trigger", "", "", default)
-#define CKB_PARAM_TRIGGER_KP(default)                               CKB_PARAM_BOOL("kptrigger", "", "", default)
+#define CKB_PARAM_TRIGGER(default)                                  CKB_PARAM_BOOL("trigger", "", default)
+#define CKB_PARAM_TRIGGER_KP(default)                               CKB_PARAM_BOOL("kptrigger", "", default)
 #define CKB_PARAM_REPEAT(default)                                   CKB_PARAM_DOUBLE("repeat", "", "", default, 0., 0.)
 #define CKB_PARAM_REPEAT_KP(default)                                CKB_PARAM_DOUBLE("kprepeat", "", "", default, 0., 0.)
 
@@ -78,6 +81,24 @@ typedef struct {
 // Clear all keys in a context (ARGB 00000000)
 #define CKB_KEYCLEAR(context)       CKB_CONTAINER( ckb_key* key = context->keys; unsigned count = context->keycount; unsigned i = 0; for(; i < count; i++) key[i].a = key[i].r = key[i].g = key[i].b = 0; )
 
+// Gradient structure
+#define CKB_GRAD_MAX                100
+typedef struct {
+    // Number of points
+    // Gradients must ALWAYS have at least two points, one at zero and one at 100
+    int ptcount;
+    // Point positions, in order (range: [0, 100])
+    char pts[CKB_GRAD_MAX];
+    // Point colors
+    unsigned char r[CKB_GRAD_MAX];
+    unsigned char g[CKB_GRAD_MAX];
+    unsigned char b[CKB_GRAD_MAX];
+    unsigned char a[CKB_GRAD_MAX];
+} ckb_gradient;
+
+// Color of a point on a gradient, with position given between 0 and 100 inclusive
+void ckb_grad_color(float* a, float* r, float* g, float* b, const ckb_gradient* grad, float pos);
+
 // Parameter input parsers. Usage (within ckb_parameter only):
 //  CKB_PARSE_BOOL("mybool", &mybool){
 //      <actions to take when bool is parsed>
@@ -85,11 +106,16 @@ typedef struct {
 // or:
 //  CKB_PARSE_BOOL("mybool", &mybool){}
 
+int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha);
+
 #define CKB_PARSE_LONG(param_name, value_ptr)                   if(!strcmp(name, param_name) && sscanf(value, "%ld", value_ptr) == 1)
 #define CKB_PARSE_DOUBLE(param_name, value_ptr)                 if(!strcmp(name, param_name) && sscanf(value, "%lf", value_ptr) == 1)
 #define CKB_PARSE_BOOL(param_name, value_ptr)                   if(!strcmp(name, param_name) && sscanf(value, "%u", value_ptr) == 1)
 #define CKB_PARSE_RGB(param_name, r_ptr, g_ptr, b_ptr)          if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx", r_ptr, g_ptr, b_ptr) == 3)
 #define CKB_PARSE_ARGB(param_name, a_ptr, r_ptr, g_ptr, b_ptr)  if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx%2hhx", a_ptr, r_ptr, g_ptr, b_ptr) == 4)
+#define CKB_PARSE_GRADIENT(param_name, gradient_ptr)            if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 0))
+#define CKB_PARSE_AGRADIENT(param_name, gradient_ptr)           if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 1))
+#define CKB_PARSE_STRING(param_name)                            if(!strcmp(name, param_name))
 
 
 // * Internal functions
@@ -172,25 +198,74 @@ void ckb_getline(char word1[CKB_MAX_WORD], char word2[CKB_MAX_WORD], char word3[
     line[strlen(line) - 1] = 0;
 }
 
+// Gradient interpolation
+void ckb_grad_color(float* a, float* r, float* g, float* b, const ckb_gradient* grad, float pos){
+    // Find the points surrounding this position
+    int count = grad->ptcount;
+    if(count == 0){
+        *a = *r = *g = *b = 0.f;
+        return;
+    }
+    int i = 1;
+    for(; i < count; i++){
+        if(grad->pts[i] >= pos)
+            break;
+    }
+    // Get color by linear interpolation
+    float distance = grad->pts[i] - grad->pts[i - 1];
+    float dx = (pos - grad->pts[i - 1]) / distance;
+    *a = grad->a[i] * dx + grad->a[i - 1] * (1.f - dx);
+    *r = grad->r[i] * dx + grad->r[i - 1] * (1.f - dx);
+    *g = grad->g[i] * dx + grad->g[i - 1] * (1.f - dx);
+    *b = grad->b[i] * dx + grad->b[i - 1] * (1.f - dx);
+}
+
+// Gradient parser
+int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
+    char pos = -1;
+    unsigned char a = 255, r, g, b;
+    int count = 0;
+    while(1){
+        int scanned = 0;
+        char newpos;
+        if(sscanf(string, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
+            break;
+        string += scanned;
+        // Don't allow stops out-of-order or past 100
+        if(newpos <= pos || newpos > 100)
+            return 0;
+        pos = newpos;
+        if(!alpha)
+            a = 255;
+        gradient->pts[count] = pos;
+        gradient->a[count] = a;
+        gradient->r[count] = r;
+        gradient->g[count] = g;
+        gradient->b[count] = b;
+        count++;
+    }
+    if(count < 2)
+        return 0;
+    gradient->ptcount = count;
+    return 1;
+}
+
 extern void ckb_info();
 extern void ckb_parameter(ckb_runctx*, const char*, const char*);
 extern void ckb_keypress(ckb_runctx*, ckb_key* key, int);
 extern void ckb_start(ckb_runctx*);
 extern int ckb_frame(ckb_runctx*, double);
 int main(int argc, char *argv[]){
-    printf("hi\n");
-    fflush(stdout);
     if(argc == 2){
         if(!strcmp(argv[1], "--ckb-info")){
             ckb_info();
+            fflush(stdout);
             return 0;
         } else if(!strcmp(argv[1], "--ckb-run")){
             ckb_runctx ctx;
             // Read the keymap lines
             char cmd[CKB_MAX_WORD], param[CKB_MAX_WORD], value[CKB_MAX_WORD];
             // Skip anything up until "begin keymap"
-            printf("keymap\n");
-            fflush(stdout);
             do {
                 ckb_getline(cmd, param, value);
                 if(!*cmd){
@@ -236,8 +311,6 @@ int main(int argc, char *argv[]){
                     return -2;
                 }
             } while(strcmp(cmd, "end") || strcmp(param, "keymap"));
-            printf("params\n");
-            fflush(stdout);
             // Skip anything else until "begin params"
             do {
                 ckb_getline(cmd, param, value);
@@ -259,8 +332,6 @@ int main(int argc, char *argv[]){
                     continue;
                 ckb_parameter(&ctx, param, value);
             } while(1);
-            printf("run\n");
-            fflush(stdout);
             // Skip anything else until "begin run"
             do {
                 ckb_getline(cmd, param, value);

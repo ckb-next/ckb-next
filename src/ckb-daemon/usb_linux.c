@@ -196,7 +196,11 @@ int openusb(struct udev_device* dev, int model){
 
             // Copy device description and serial
             strncpy(kb->name, udev_device_get_sysattr_value(dev, "product"), NAME_LEN);
-            strncpy(kb->profile.serial, udev_device_get_sysattr_value(dev, "serial"), SERIAL_LEN);
+            const char* serial = udev_device_get_sysattr_value(dev, "serial");
+            if(serial)
+                strncpy(kb->profile.serial, serial, SERIAL_LEN);
+            else
+                snprintf(kb->profile.serial, SERIAL_LEN, "K%d-NoID", model);
             printf("Connecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
 
             // Claim the USB interfaces
@@ -283,7 +287,7 @@ void udevenum(){
         struct udev_device* dev = udev_device_new_from_syspath(udev, path);
         // If the device matches a recognized device ID, open it
         const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-        if(!strcmp(product, P_K70_STR)){
+        if(!strcmp(product, P_K70_STR) || !strcmp(product, P_K70_VENG_STR)){
             pthread_mutex_lock(&kblistmutex);
             openusb(dev, 70);
             pthread_mutex_unlock(&kblistmutex);
@@ -332,7 +336,7 @@ void* udevmain(void* context){
                     const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
                     if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
                         const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-                        if(product && !strcmp(product, P_K70_STR)){
+                        if(product && (!strcmp(product, P_K70_STR) | !strcmp(product, P_K70_VENG_STR))){
                             pthread_mutex_lock(&kblistmutex);
                             openusb(dev, 70);
                             pthread_mutex_unlock(&kblistmutex);

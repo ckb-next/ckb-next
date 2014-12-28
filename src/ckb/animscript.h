@@ -22,7 +22,10 @@ public:
             DOUBLE,
             BOOL,
             RGB,
-            ARGB
+            ARGB,
+            GRADIENT,
+            AGRADIENT,
+            STRING
         };
         Type type;
         // Internal name

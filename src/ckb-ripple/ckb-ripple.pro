@@ -7,6 +7,7 @@ QMAKE_MAC_SDK = macosx10.10
 TARGET = ckb-ripple
 CONFIG   += console
 CONFIG   -= app_bundle
+CONFIG   += debug_and_release
 
 TEMPLATE = app
 

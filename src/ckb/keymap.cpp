@@ -27,11 +27,11 @@ struct KeyLayout {
 #define KEYLAYOUT_COUNT 5
 
 static const KeyLayout K95Pos[KEYLAYOUT_COUNT] = {
-    { K95PosFR, sizeof(K95PosSE) / sizeof(KeyPos) },
-    { K95PosDE, sizeof(K95PosSE) / sizeof(KeyPos) },
-    { K95PosSE, sizeof(K95PosSE) / sizeof(KeyPos) },
-    { K95PosGB, sizeof(K95PosGB) / sizeof(KeyPos) },
-    { K95PosUS, sizeof(K95PosUS) / sizeof(KeyPos) }
+    { K95PosFR, KEYCOUNT_K95_105 },
+    { K95PosDE, KEYCOUNT_K95_105 },
+    { K95PosSE, KEYCOUNT_K95_105 },
+    { K95PosGB, KEYCOUNT_K95_105 },
+    { K95PosUS, KEYCOUNT_K95_104 }
 };
 
 #define K95_WIDTH       298

@@ -6,15 +6,15 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Random");
-    CKB_VERSION("0.2");
+    CKB_VERSION("0.3");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{22418DA4-A181-4B93-A4D3-03682BA283D2}");
     CKB_DESCRIPTION("An effect that changes key colors randomly.");
 
     // Effect parameters
-    CKB_PARAM_BOOL("fade", "Fade in", "", 0);
-    CKB_PARAM_BOOL("useopacity", "Randomize opacity", "", 0);
+    CKB_PARAM_BOOL("fade", "Fade in", 0);
+    CKB_PARAM_BOOL("useopacity", "Randomize opacity", 0);
 
     // Timing/input parameters
     CKB_PARAM_TRIGGER(1);

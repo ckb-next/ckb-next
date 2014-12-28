@@ -462,19 +462,20 @@ void readcmd(usbdevice* kb, const char* line){
                 continue;
             if(profile){
                 // If applied to a device, reset all key bindings to the new key map
-                keymap = profile->keymap = newkeymap;
-                for(int i = 0; i < profile->modecount; i++){
-                    usbmode* mode = profile->mode + i;
-                    closebind(&mode->bind);
-                    memset(&mode->bind, 0, sizeof(mode->bind));
-                    initbind(&mode->bind, keymap);
+                if(keymap != newkeymap){
+                    keymap = profile->keymap = newkeymap;
+                    for(int i = 0; i < profile->modecount; i++){
+                        usbmode* mode = profile->mode + i;
+                        closebind(&mode->bind);
+                        memset(&mode->bind, 0, sizeof(mode->bind));
+                        initbind(&mode->bind, keymap);
+                    }
+                    nprintf(kb, -1, 0, "layout %s\n", word);
                 }
-                nprintf(kb, -1, 0, "layout %s\n", word);
             } else {
                 // If applied to the root controller, update the system keymap but not any devices
                 keymap_system = newkeymap;
                 printf("Setting default layout: %s\n", word);
-                nrprintf(-1, "layout %s\n", word);
             }
             continue;
         } else if(command == FPS){

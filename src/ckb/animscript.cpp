@@ -122,6 +122,12 @@ bool AnimScript::load(){
                 type = Param::RGB;
             else if(sType == "argb")
                 type = Param::ARGB;
+            else if(sType == "gradient")
+                type = Param::GRADIENT;
+            else if(sType == "agradient")
+                type = Param::AGRADIENT;
+            else if(sType == "string")
+                type = Param::STRING;
             else
                 continue;
             // "param <type> <name> <prefix> <postfix> <default>"

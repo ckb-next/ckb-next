@@ -102,7 +102,7 @@ void localecase(char* dst, size_t length, const char* src){
 }
 
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.0.20\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.21\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){

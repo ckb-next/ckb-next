@@ -88,7 +88,7 @@ int setupusb(usbdevice* kb){
         if(store){
             memcpy(&kb->profile, store, sizeof(usbprofile));
             if(kb->model == 95){
-                // On the K95, make sure at least 3 profiles are available
+                // On the K95, make sure at least 3 modes are available
                 getusbmode(1, &kb->profile, keymap_system);
                 getusbmode(2, &kb->profile, keymap_system);
             }

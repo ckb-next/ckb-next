@@ -23,7 +23,7 @@ int getfwversion(usbdevice* kb){
     if(!usbdequeue(kb))
         return -1;
     // Wait for the response
-    DELAY_MEDIUM;
+    DELAY_SHORT;
     uchar in_pkt[MSG_SIZE];
     if(!usbinput(kb, in_pkt) || in_pkt[0] != 0x0e || in_pkt[1] != 0x01)
         return -1;

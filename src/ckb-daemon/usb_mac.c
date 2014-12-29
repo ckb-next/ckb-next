@@ -52,6 +52,7 @@ void closehandle(usbdevice* kb){
 int os_resetusb(usbdevice* kb, const char* file, int line){
     // I don't think it's actually possible to do this.
     // Just return success without doing anything...
+    sleep(1);
     return 0;
 }
 
@@ -89,11 +90,8 @@ void openusb(usbdevice* kb){
         pthread_mutex_destroy(&kb->mutex);
         pthread_mutex_destroy(&kb->keymutex);
         return;
-    } else if(setup){
-        // If the setup had a communication error, wait a bit and try again.
-        sleep(1);
-        resetusb(kb);
-    }
+    } else if(setup && usb_tryreset(kb))
+        printf("Setup failed, device may not work...\n");
 
     // Start handling HID reports for the Corsair input
     IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->intinput, MSG_SIZE, reportcallback, kb);
@@ -123,7 +121,7 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     // Get the model and serial number
     long idproduct = usbgetvalue(device, CFSTR(kIOHIDProductIDKey));
     int model;
-    if(idproduct == P_K70 || idproduct == P_K70_VENG)
+    if(idproduct == P_K70)
         model = 70;
     else if(idproduct == P_K95)
         model = 95;
@@ -239,7 +237,7 @@ void* threadrun(void* context){
     CFMutableArrayRef devices = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     if(devices){
         int vendor = V_CORSAIR, product1 = P_K70, product2 = P_K95;
-        int products[] = { P_K70, P_K70_VENG, P_K95 };
+        int products[] = { P_K70, P_K95 };
         for(int i = 0; i < sizeof(products) / sizeof(int); i++){
             int product = products[i];
             CFMutableDictionaryRef device = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);

@@ -303,7 +303,7 @@ int hwloadprofile(usbdevice* kb, int apply){
             return -1;
         }
         // Wait for the response
-        DELAY_MEDIUM;
+        DELAY_SHORT;
         if(!usbinput(kb, in_pkt)){
             free(hw);
             return -1;

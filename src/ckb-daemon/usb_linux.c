@@ -223,7 +223,7 @@ int openusb(struct udev_device* dev, int model){
                 printf("Failed to set up device.\n");
                 closehandle(kb);
                 return -1;
-            } else if(usb_tryreset(kb)){
+            } else if(setup && usb_tryreset(kb)){
                 // Any other failure is hardware based. Reset and try again.
                 closehandle(kb);
                 connectstatus |= 2;
@@ -287,7 +287,7 @@ void udevenum(){
         struct udev_device* dev = udev_device_new_from_syspath(udev, path);
         // If the device matches a recognized device ID, open it
         const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-        if(!strcmp(product, P_K70_STR) || !strcmp(product, P_K70_VENG_STR)){
+        if(!strcmp(product, P_K70_STR) || !strcmp(product, P_K70_NRGB_STR)){
             pthread_mutex_lock(&kblistmutex);
             openusb(dev, 70);
             pthread_mutex_unlock(&kblistmutex);
@@ -336,7 +336,7 @@ void* udevmain(void* context){
                     const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
                     if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
                         const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-                        if(product && (!strcmp(product, P_K70_STR) | !strcmp(product, P_K70_VENG_STR))){
+                        if(product && (!strcmp(product, P_K70_STR) | !strcmp(product, P_K70_NRGB_STR))){
                             pthread_mutex_lock(&kblistmutex);
                             openusb(dev, 70);
                             pthread_mutex_unlock(&kblistmutex);

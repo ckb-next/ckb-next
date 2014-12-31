@@ -14,10 +14,6 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
         return -1;
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 50, kb->queue[0] };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-    if(res == -110){
-        printf("Warning: usbdequeue (%s:%d): Ignoring \"%s\"\n", file, line, strerror(-res));
-        res = MSG_SIZE;
-    }
     if(res <= 0){
         printf("Error: usbdequeue (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data written");
         return 0;
@@ -52,9 +48,13 @@ void* intreap(void* context){
     int fd = kb->handle;
     while(1){
         struct usbdevfs_urb* urb = 0;
-        if(ioctl(fd, USBDEVFS_REAPURB, &urb) && errno == ENODEV){
-            // Stop the thread if the handle closes
-            break;
+        if(ioctl(fd, USBDEVFS_REAPURB, &urb)){
+            if(errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
+                // Stop the thread if the handle closes
+                break;
+            else if(errno == EPIPE)
+                // On EPIPE, clear halt on the endpoint
+                ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
         }
         if(urb){
             // Process input (if any)
@@ -96,10 +96,6 @@ void setint(usbdevice* kb){
     urb->buffer_length = MSG_SIZE;
     urb->usercontext = kb;
     ioctl(kb->handle, USBDEVFS_SUBMITURB, urb);
-
-    // Clear any halt conditions
-    for(int i = 0x81; i <= 0x83; i++)
-        ioctl(kb->handle, USBDEVFS_CLEAR_HALT, &i);
 
     // Launch a thread to reap transfers
     pthread_create(&kb->usbthread, 0, intreap, kb);

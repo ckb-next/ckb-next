@@ -121,7 +121,9 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     // Get the model and serial number
     long idproduct = usbgetvalue(device, CFSTR(kIOHIDProductIDKey));
     int model;
-    if(idproduct == P_K70)
+    if(idproduct == P_K65)
+      model = 65;
+    else if(idproduct == P_K70)
         model = 70;
     else if(idproduct == P_K95)
         model = 95;
@@ -236,8 +238,8 @@ void* threadrun(void* context){
     // Tell it which devices we want to look for
     CFMutableArrayRef devices = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     if(devices){
-        int vendor = V_CORSAIR, product1 = P_K70, product2 = P_K95;
-        int products[] = { P_K70, P_K95 };
+        int vendor = V_CORSAIR, product0 = P_K65, product1 = P_K70, product2 = P_K95;
+        int products[] = { P_K65, P_K70, P_K95 };
         for(int i = 0; i < sizeof(products) / sizeof(int); i++){
             int product = products[i];
             CFMutableDictionaryRef device = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);

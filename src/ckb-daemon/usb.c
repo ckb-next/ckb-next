@@ -24,7 +24,7 @@ int usbqueue(usbdevice* kb, uchar* messages, int count){
 }
 
 int setupusb(usbdevice* kb, short vendor, short product){
-    kb->model = (product == P_K70 || product == P_K70_NRGB) ? 70 : 95;
+    kb->model = (product == P_K65) ? 65 : (product == P_K70 || product == P_K70_NRGB) ? 70 : 95;
     kb->vendor = vendor;
     kb->product = product;
     kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;

@@ -1,7 +1,6 @@
 #include <cmath>
+#include <QDateTime>
 #include "kblight.h"
-
-#include "animscript.h"
 
 KbLight::KbLight(QObject* parent, int modeIndex, const KeyMap& keyMap) :
     QObject(parent), _map(), _modeIndex(modeIndex + 1), _brightness(0), _inactive(MAX_INACTIVE), _winLock(false), _showMute(true)
@@ -53,9 +52,16 @@ void KbLight::color(const QColor& newColor){
 }
 
 KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys){
+    // Stop and restart all existing animations
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    foreach(KbAnim* anim, animList){
+        anim->stop();
+        anim->trigger(timestamp);
+    }
+    // Add the new animation and start it
     KbAnim* anim = new KbAnim(this, _map, keys, base);
     animList.append(anim);
-    anim->trigger();
+    anim->trigger(timestamp);
     return anim;
 }
 
@@ -66,7 +72,7 @@ void KbLight::animKeypress(const QString& keyEvent){
     bool keyPressed = (keyEvent[0] == '+');
     foreach(KbAnim* anim, animList){
         if(anim->keys().contains(keyName))
-            anim->keypress(keyName, keyPressed);
+            anim->keypress(keyName, keyPressed, QDateTime::currentMSecsSinceEpoch());
     }
 }
 
@@ -85,12 +91,20 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
 }
 
 void KbLight::frameUpdate(QFile& cmd, bool dimMute){
+    // Advance animations
+    QHash<QString, QRgb> animMap = _colorMap;
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    foreach(KbAnim* anim, animList)
+        anim->blend(animMap, timestamp);
+
     cmd.write(QString().sprintf("mode %d switch", _modeIndex).toLatin1());
     if(_brightness == 3){
+        // If brightness is at 0%, turn off lighting entirely
         cmd.write(" rgb off");
         return;
     }
-    QHash<QString, QRgb> animMap = _colorMap;
+
+    // Dim inactive keys
     float light = (3 - _brightness) / 3.f;
     QStringList inactiveList = QStringList();
     float inactiveLight = 1.f;
@@ -104,10 +118,7 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
         inactiveLight = (2 - _inactive) / 4.f;
     }
 
-    foreach(KbAnim* anim, animList)
-        anim->blend(animMap);
-
-    // Dim inactive keys
+    // Set brightness
     if(light != 1.f || inactiveLight != 1.f){
         QMutableHashIterator<QString, QRgb> i(animMap);
         while(i.hasNext()){
@@ -135,8 +146,9 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
 }
 
 void KbLight::open(){
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, animList)
-        anim->trigger();
+        anim->trigger(timestamp);
 }
 
 void KbLight::close(QFile &cmd){

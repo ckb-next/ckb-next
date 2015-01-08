@@ -1,17 +1,21 @@
+#include <cmath>
 #include <cstdio>
 #include <QPainter>
 #include "gradientbutton.h"
+#include "gradientdialog.h"
 
 GradientButton::GradientButton(QWidget* parent, bool allowAlpha) :
     QPushButton(parent), _alpha(allowAlpha)
 {
     connect(this, SIGNAL(clicked()), this, SLOT(pickGradient()));
+    setAutoDefault(false);
+    setDefault(false);
     fromString("");
     setText("");
 }
 
 void GradientButton::updateImage(){
-    const int w = 98, h = 16;
+    const int w = 130, h = 16;
     QImage image(w, h, QImage::Format_RGB888);
     QPainter painter(&image);
     painter.setPen(Qt::NoPen);
@@ -24,7 +28,7 @@ void GradientButton::updateImage(){
             painter.fillRect(x + h / 2, h / 2, h / 2, h / 2 - 1, QColor(255, 255, 255));
         }
     }
-    QLinearGradient gradient(0., 0., w - 2, 0.);
+    QLinearGradient gradient(1., 0., w - 1, 0.);
     gradient.setStops(_stops);
     painter.fillRect(1, 1, w - 2, h - 2, QBrush(gradient));
     setIconSize(QSize(w, h));
@@ -53,7 +57,14 @@ void GradientButton::fromString(const QString& string){
             a = 255;
         _stops.append(QGradientStop(pos / 100., QColor(r, g, b, a)));
     }
-    // If no stops were scanned, create them from white
+    if(_stops.count() == 0){
+        // If nothing was read, try a single ARGB constant.
+        if(sscanf(data, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
+            _stops.append(QGradientStop(0., QColor(r, g, b, a)));
+            _stops.append(QGradientStop(1., QColor(r, g, b, 0.)));
+        }
+    }
+    // If that still didn't work, fill with white
     if(_stops.count() == 0){
         _stops.append(QGradientStop(0., QColor(255, 255, 255)));
         _stops.append(QGradientStop(1., QColor(255, 255, 255)));
@@ -67,9 +78,18 @@ void GradientButton::fromString(const QString& string){
 }
 
 QString GradientButton::toString() const {
-
+    QStringList result;
+    foreach(const QGradientStop& stop, _stops){
+        QString string;
+        const QColor& color = stop.second;
+        result << string.sprintf("%d:%02x%02x%02x%02x", (int)round(stop.first * 100.f), color.alpha(), color.red(), color.green(), color.blue());
+    }
+    return result.join(" ");
 }
 
 void GradientButton::pickGradient(){
+    GradientDialog dialog(this);
+    _stops = dialog.getGradient(_stops);
+    updateImage();
 }
 

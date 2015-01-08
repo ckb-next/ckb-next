@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     trayIconMenu = new QMenu(this);
     restoreAction = new QAction(tr("Restore"), this);
-    closeAction = new QAction(tr("Exit"), this);
+    closeAction = new QAction(tr("Quit ckb"), this);
     trayIconMenu->addAction(restoreAction);
     trayIconMenu->addAction(closeAction);
     trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-logo.png"), this);
@@ -120,8 +120,11 @@ void MainWindow::scanKeyboards(){
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
-    if(!event->spontaneous())
+    // If the window is hidden already or the event is non-spontaneous (can happen on OSX when using the Quit menu), accept it and close
+    if(!event->spontaneous() || isHidden()){
+        event->accept();
         return;
+    }
     QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb\" on the Settings screen.");
     hide();
     event->ignore();

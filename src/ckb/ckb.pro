@@ -6,13 +6,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ckb
 TEMPLATE = app
 
+DESTDIR = $$PWD/../../bin
+
 QMAKE_MAC_SDK = macosx10.10
-ICON = ckb-logo.icns
+QMAKE_INFO_PLIST = ckb-info.plist
 macx {
     LIBS += -framework Foundation -framework AudioToolbox
 }
-
-DESTDIR = $$PWD/../../bin
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -35,7 +35,9 @@ SOURCES += main.cpp\
     keymap_de.cpp \
     keymap_fr.cpp \
     animsettingdialog.cpp \
-    gradientbutton.cpp
+    gradientbutton.cpp \
+    gradientdialog.cpp \
+    gradientdialogwidget.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -53,7 +55,9 @@ HEADERS  += mainwindow.h \
     kbanim.h \
     animadddialog.h \
     animsettingdialog.h \
-    gradientbutton.h
+    gradientbutton.h \
+    gradientdialog.h \
+    gradientdialogwidget.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \
@@ -61,10 +65,14 @@ FORMS    += mainwindow.ui \
     kblightwidget.ui \
     kbanimwidget.ui \
     animadddialog.ui \
-    animsettingdialog.ui
+    animsettingdialog.ui \
+    gradientdialog.ui
 
 RESOURCES += \
     image.qrc
 
 OBJECTIVE_SOURCES += \
     media_mac.m
+
+DISTFILES += \
+    ckb-info.plist

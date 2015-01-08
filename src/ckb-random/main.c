@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Random");
-    CKB_VERSION("0.3");
+    CKB_VERSION("0.4");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{22418DA4-A181-4B93-A4D3-03682BA283D2}");
@@ -17,8 +17,12 @@ void ckb_info(){
     CKB_PARAM_BOOL("useopacity", "Randomize opacity", 0);
 
     // Timing/input parameters
-    CKB_PARAM_TRIGGER(1);
-    CKB_PARAM_DURATION(1.);
+    CKB_KPMODE(CKB_KP_NONE);
+    CKB_TIMEMODE(CKB_TIME_DURATION);
+    CKB_REPEAT(FALSE);
+    CKB_DEFAULT_DURATION(1.);
+    CKB_DEFAULT_TRIGGER(TRUE);
+    CKB_DEFAULT_TRIGGER_KP(FALSE);
 }
 
 int fadein = 0, useopacity = 0;
@@ -28,7 +32,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_BOOL("useopacity", &useopacity) {}
 }
 
-void ckb_keypress(ckb_runctx* context, ckb_key* key, int state){
+void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
 
 }
 
@@ -38,6 +42,7 @@ typedef struct {
 
 rgb* current = 0;
 rgb* target = 0;
+double phase = -1.;
 
 void newtarget(rgb* data, unsigned count){
     for(unsigned i = 0; i < count; i++){
@@ -49,14 +54,17 @@ void newtarget(rgb* data, unsigned count){
     }
 }
 
+void ckb_init(ckb_runctx* context){
+    unsigned count = context->keycount;
+    current = malloc(count * sizeof(rgb));
+    target = malloc(count * sizeof(rgb));
+    srand(time(NULL));
+}
+
 void ckb_start(ckb_runctx* context){
+    phase = 0.;
     ckb_key* keys = context->keys;
     unsigned count = context->keycount;
-    if(!current){
-        current = malloc(count * sizeof(rgb));
-        target = malloc(count * sizeof(rgb));
-        srand(time(NULL));
-    }
     newtarget(current, count);
     newtarget(target, count);
     // Set all keys to current
@@ -72,9 +80,10 @@ void ckb_start(ckb_runctx* context){
 }
 
 int ckb_frame(ckb_runctx* context, double delta){
+    if(phase < 0.)
+        return 0;
     ckb_key* keys = context->keys;
     unsigned count = context->keycount;
-    static double phase = 0.;
     phase += delta;
     if(phase >= 1.){
         phase -= 1.;

@@ -25,7 +25,8 @@ public:
             ARGB,
             GRADIENT,
             AGRADIENT,
-            STRING
+            STRING,
+            LABEL
         };
         Type type;
         // Internal name
@@ -49,19 +50,19 @@ public:
     static QList<const AnimScript*> list();
 
     // Script properties
-    inline const QUuid& guid() const { return _guid; }
-    inline const QString& name() const { return _name; }
-    inline const QString& version() const { return _version; }
-    inline QString copyright() const { return "Copyright © " + _year + " " + _author; }
-    inline const QString& year() const { return _year; }
-    inline const QString& author() const { return _author; }
-    inline const QString& license() const { return _license; }
-    inline const QString& description() const { return _description; }
+    inline const QUuid& guid() const { return _info.guid; }
+    inline const QString& name() const { return _info.name; }
+    inline const QString& version() const { return _info.version; }
+    inline QString copyright() const { return "Copyright © " + _info.year + " " + _info.author; }
+    inline const QString& year() const { return _info.year; }
+    inline const QString& author() const { return _info.author; }
+    inline const QString& license() const { return _info.license; }
+    inline const QString& description() const { return _info.description; }
 
     // Parameters, in the order they were given
-    inline QListIterator<Param> paramIterator() const { return _params; }
-    inline Param param(const QString& name) const { QListIterator<Param> i(_params); while(i.hasNext()){ Param p = i.next(); if(p.name == name) return p; } return Param(); }
-    inline bool hasParam(const QString& name) const { QListIterator<Param> i(_params); while(i.hasNext()){ if(i.next().name == name) return true; } return false; }
+    inline QListIterator<Param> paramIterator() const { return _info.params; }
+    inline Param param(const QString& name) const { QListIterator<Param> i(_info.params); while(i.hasNext()){ Param p = i.next(); if(p.name == name) return p; } return ((Param[]){ { Param::INVALID, "", "", "", 0, 0, 0 } })[0]; }
+    inline bool hasParam(const QString& name) const { QListIterator<Param> i(_info.params); while(i.hasNext()){ if(i.next().name == name) return true; } return false; }
 
     // Creates a usable script object with the given parent object. Returns null if no such script exists.
     static AnimScript* copy(QObject* parent, const QUuid& id);
@@ -70,12 +71,11 @@ public:
     // paramValues should contain parameter name/value pairs to run the script with.
     void init(const KeyMap& map, const QStringList& keys, const QMap<QString, QVariant>& paramValues);
     // Starts or restarts the animation.
-    void retrigger();
+    void retrigger(quint64 timestamp, bool allowPreempt = false);
     // Triggers a keypress event.
-    void keypress(const QString& key, bool pressed);
-    void keypress(int x, int y, bool pressed);
+    void keypress(const QString& key, bool pressed, quint64 timestamp);
     // Executes the next frame of the animation.
-    inline void frame() { _frame(true); }
+    void frame(quint64 timestamp);
     // Stops the animation.
     void stop();
 
@@ -83,34 +83,47 @@ public:
     const QHash<QString, QRgb>& colors() const { return _colors; }
 
     ~AnimScript();
+
 private:
     bool load();
 
-    QUuid _guid;
-    QString _name;
-    QString _version;
-    QString _year;
-    QString _author;
-    QString _license;
-    QString _description;
-
+    // Basic info
+    struct {
+        QUuid guid;
+        QString name;
+        QString version;
+        QString year;
+        QString author;
+        QString license;
+        QString description;
+        // Parameter list
+        QList<Param> params;
+        // Playback flags
+        int kpMode :3;
+        bool absoluteTime :1, repeat :1, preempt :1, liveParams :1;
+    } _info;
+    const static int KP_NONE = 0, KP_NAME = 1, KP_POSITION = 2;
+    // Script path
     QString _path;
-
+    // Key map (positions)
     KeyMap _map;
+    int minX, minY;
+    // Keys in use
     QStringList _keys;
+    // Current colors
     QHash<QString, QRgb> _colors;
-    QList<Param> _params;
     QMap<QString, QVariant> _paramValues;
 
+    // Animation state
     quint64 lastFrame;
-    double _duration;
-
-    bool initialized, firstFrame, stopped;
+    int durationMsec;
+    bool initialized :1, firstFrame :1, stopped :1;
     QProcess* process;
     QStringList inputBuffer;
-    void start();
-    void _frame(bool parseOutput);
+    void start(quint64 timestamp);
+    void nextFrame(quint64 timestamp);
 
+    // Global script list
     static QHash<QUuid, AnimScript*> scripts;
 
     AnimScript(QObject* parent, const QString& path);

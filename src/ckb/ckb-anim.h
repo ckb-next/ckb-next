@@ -1,45 +1,66 @@
 #ifndef CKB_ANIM_H
 #define CKB_ANIM_H
 
-// Standardized header for CKB animations.
+// Standardized header for C/C++ CKB animations.
 // If your animation contains multiple source files, #define CKB_NO_MAIN in all but one of them so you don't get duplicate symbols.
-// The main function will be defined for you and will call several specialized functions (which you must write):
-//   void ckb_info() :
-//     Prints information about the program and any parameters it wishes to receive
-//   void ckb_parameter(ckb_runctx* context, const char* name, const char* value) :
-//     Receives the value of a parameter specified from ckb_info
-//   void ckb_keypress(ckb_runctx* context, ckb_key* key, int state) :
-//     Receives a key down / key up event. state = 1 for down, 0 for up.
-//   void ckb_start(ckb_runctx* context) :
-//     Starts or restarts an animation not based on keypress.
-//   int ckb_frame(ckb_runctx* context, double delta) :
-//     Advances the animation frame, where a delta of 1.0 represents the entire animation duration. Delta may be zero.
-//     Should return 0 to continue running or any other number to exit.
+// The main function will be defined for you. You must write several specialized functions in order to handle animations:
 
-// ckb_info will only be called once and then the program will exit. All other functions may be called multiple times.
-// ckb_parameter will only be called at the beginning of the program run; ckb_keypress and ckb_start may be called at any time.
-// ckb_frame will be called at least once with a delta of 0 at program start.
+//   void ckb_info()
+//     Prints information about the program and any parameters it wishes to receive. See info helpers section.
+//     This function will be caled in a separate invocation of the program. No other functions will be called at this time.
+
+//   void ckb_init(ckb_runctx* context)
+//     Called during normal invocation of the program, once, before any other functions. See runtime information section.
+//   void ckb_parameter(ckb_runctx* context, const char* name, const char* value)
+//     Receives the user-chosen value of a parameter (specified from ckb_info).
+//     Do not make assumptions about the order or presence of parameters. Assign sane defaults as fallbacks and use the CKB parameter parsing macros.
+//     This function will be called at start up, after ckb_init but before any other functions, once for each parameter.
+//     If live params are enabled, it will also be called while the animation is running.
+
+//   void ckb_start(ckb_runctx* context)
+//     Starts or restarts an animation in the center of the keyboard (i.e. without a keypress).
+//     Do not assume that this will be called at start up, or at all. It may not be the case depending on configuration.
+//   void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state)
+//     Receives a key down / key up event. Called only if KP mode is not NONE.
+//     x and y are always filled and valid. key may be null if KP mode is POSITION.
+//     Once again, do not assume when (or if) this will be called.
+//   int ckb_frame(ckb_runctx* context, double delta)
+//     Advances the animation frame. Do not assume that this will occur at a regular interval; use delta to see how much time has passed.
+//     If timing mode is DURATION, delta is in durations (0 <= delta <= 1). If timing mode is ABSOLUTE, delta is in seconds (0 <= delta).
+//     Try to return as quickly as possible, because ckb may stop sending frames if it does not receive a response in time.
+//     Return 0 to continue running or any other number to exit. On exit, the last-printed image will remain on the keyboard.
 
 #include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #define CKB_CONTAINER(macro) do { macro } while(0)
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#define CKB_DOWN    1
+#define CKB_UP      0
+
 // * Info output helpers
 
 // Plugin GUID
-#define CKB_GUID(guid)                  CKB_CONTAINER( printf("guid "); printurl(guid); printf("\n"); )
+#define CKB_GUID(guid)                                              CKB_CONTAINER( printf("guid "); printurl(guid); printf("\n"); )
 // Plugin name
-#define CKB_NAME(name)                  CKB_CONTAINER( printf("name "); printurl(name); printf("\n"); )
+#define CKB_NAME(name)                                              CKB_CONTAINER( printf("name "); printurl(name); printf("\n"); )
 // Plugin version
-#define CKB_VERSION(version)            CKB_CONTAINER( printf("version "); printurl(version); printf("\n"); )
+#define CKB_VERSION(version)                                        CKB_CONTAINER( printf("version "); printurl(version); printf("\n"); )
 // Plugin copyright
-#define CKB_COPYRIGHT(year, author)     CKB_CONTAINER( printf("author "); printurl(author); printf("\nyear %s\n", year); )
+#define CKB_COPYRIGHT(year, author)                                 CKB_CONTAINER( printf("author "); printurl(author); printf("\nyear %s\n", year); )
 // Plugin license
-#define CKB_LICENSE(license)            CKB_CONTAINER( printf("license "); printurl(license); printf("\n"); )
+#define CKB_LICENSE(license)                                        CKB_CONTAINER( printf("license "); printurl(license); printf("\n"); )
 // Plugin description
-#define CKB_DESCRIPTION(description)    CKB_CONTAINER( printf("description "); printurl(description); printf("\n"); )
+#define CKB_DESCRIPTION(description)                                CKB_CONTAINER( printf("description "); printurl(description); printf("\n"); )
 
 // Parameter helpers
 #define CKB_PARAM(type, name, prefix, postfix, extra)               CKB_CONTAINER( printf("param %s %s ", type, name); printurl(prefix); printf(" "); printurl(postfix); printf(" "); extra; printf("\n"); )
@@ -51,15 +72,52 @@
 #define CKB_PARAM_GRADIENT(name, prefix, postfix, default)          CKB_PARAM("gradient", name, prefix, postfix, printurl(default))
 #define CKB_PARAM_AGRADIENT(name, prefix, postfix, default)         CKB_PARAM("agradient", name, prefix, postfix, printurl(default))
 #define CKB_PARAM_STRING(name, prefix, postfix, default)            CKB_PARAM("string", name, prefix, postfix, printurl(default))
+#define CKB_PARAM_LABEL(name, text)                                 CKB_PARAM("label", name, text, "", )
+
+// Keypress interaction (none, by name, or by position). Default: NONE
+#define CKB_KP_NONE         "none"
+#define CKB_KP_NAME         "name"
+#define CKB_KP_POSITION     "position"
+#define CKB_KPMODE(mode)                                            CKB_CONTAINER( printf("kpmode %s\n", mode); )
+// Timing mode (relative to a duration, or absolute). Default: DURATION
+#define CKB_TIME_DURATION   "duration"
+#define CKB_TIME_ABSOLUTE   "absolute"
+#define CKB_TIMEMODE(mode)                                          CKB_CONTAINER( printf("time %s\n", mode); )
+// Repeatability. If enabled, the animation will be restarted after a user-chosen amount of time. Default: TRUE
+#define CKB_REPEAT(enable)                                          CKB_CONTAINER( printf("repeat %s\n", (enable) ? "on" : "off"); )
+// Startup preemption. Requires duration and repeat enabled. Default: FALSE
+// If enabled, ckb will play an extra start command on mode switch, placed 1 duration before the actual starting animation.
+#define CKB_PREEMPT(enable)                                         CKB_CONTAINER( printf("preempt %s\n", (enable) ? "on" : "off"); )
+// Live parameter updates. Default: FALSE
+#define CKB_LIVEPARAMS(enable)                                      CKB_CONTAINER( printf("parammode %s\n", (enable) ? "live" : "static"))
 
 // Special parameters (most values are ignored)
-#define CKB_PARAM_DURATION(default)                                 CKB_PARAM_DOUBLE("duration", "", "", default, 0., 0.)
-#define CKB_PARAM_TRIGGER(default)                                  CKB_PARAM_BOOL("trigger", "", default)
-#define CKB_PARAM_TRIGGER_KP(default)                               CKB_PARAM_BOOL("kptrigger", "", default)
-#define CKB_PARAM_REPEAT(default)                                   CKB_PARAM_DOUBLE("repeat", "", "", default, 0., 0.)
-#define CKB_PARAM_REPEAT_KP(default)                                CKB_PARAM_DOUBLE("kprepeat", "", "", default, 0., 0.)
+// Duration (default: 1.0). Requires CKB_TIMEMODE(CKB_TIME_DURATION).
+#define CKB_DEFAULT_DURATION(default)                               CKB_PARAM_DOUBLE("duration", "", "", default, 0., 0.)
+// Trigger with mode (default: TRUE)
+#define CKB_DEFAULT_TRIGGER(default)                                CKB_PARAM_BOOL("trigger", "", default)
+// Trigger with keypress (default: FALSE)
+#define CKB_DEFAULT_TRIGGER_KP(default)                             CKB_PARAM_BOOL("kptrigger", "", default)
+// Release with keyrelease (default: FALSE)
+#define CKB_DEFAULT_RELEASE_KP(default)                             CKB_PARAM_BOOL("kprelease", "", default)
 
 // * Runtime information
+
+// Parameter input parsers. Usage (within ckb_parameter only):
+//  CKB_PARSE_BOOL("mybool", &mybool){
+//      <actions to take when bool is parsed>
+//  }
+// or:
+//  CKB_PARSE_BOOL("mybool", &mybool){}
+
+#define CKB_PARSE_LONG(param_name, value_ptr)                       if(!strcmp(name, param_name) && sscanf(value, "%ld", value_ptr) == 1)
+#define CKB_PARSE_DOUBLE(param_name, value_ptr)                     if(!strcmp(name, param_name) && sscanf(value, "%lf", value_ptr) == 1)
+#define CKB_PARSE_BOOL(param_name, value_ptr)                       if(!strcmp(name, param_name) && sscanf(value, "%u", value_ptr) == 1)
+#define CKB_PARSE_RGB(param_name, r_ptr, g_ptr, b_ptr)              if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx", r_ptr, g_ptr, b_ptr) == 3)
+#define CKB_PARSE_ARGB(param_name, a_ptr, r_ptr, g_ptr, b_ptr)      if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx%2hhx", a_ptr, r_ptr, g_ptr, b_ptr) == 4)
+#define CKB_PARSE_GRADIENT(param_name, gradient_ptr)                if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 0))
+#define CKB_PARSE_AGRADIENT(param_name, gradient_ptr)               if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 1))
+#define CKB_PARSE_STRING(param_name)                                if(!strcmp(name, param_name))
 
 // Key definition
 #define CKB_KEYNAME_MAX 12
@@ -78,44 +136,31 @@ typedef struct {
     unsigned width, height;
 } ckb_runctx;
 
-// Clear all keys in a context (ARGB 00000000)
-#define CKB_KEYCLEAR(context)       CKB_CONTAINER( ckb_key* key = context->keys; unsigned count = context->keycount; unsigned i = 0; for(; i < count; i++) key[i].a = key[i].r = key[i].g = key[i].b = 0; )
+// Clear all keys in a context (ARGB 00000000).
+// Call this at the beginning of ckb_frame to start from a blank slate. If you don't, the colors from the previous frame are left intact.
+#define CKB_KEYCLEAR(context)                                       CKB_CONTAINER( ckb_key* key = context->keys; unsigned count = context->keycount; unsigned i = 0; for(; i < count; i++) key[i].a = key[i].r = key[i].g = key[i].b = 0; )
 
 // Gradient structure
 #define CKB_GRAD_MAX                100
 typedef struct {
-    // Number of points
-    // Gradients must ALWAYS have at least two points, one at zero and one at 100
+    // Number of points (at least two)
+    // Gradients MUST have points at 0 and at 100
     int ptcount;
     // Point positions, in order (range: [0, 100])
     char pts[CKB_GRAD_MAX];
     // Point colors
+    unsigned char a[CKB_GRAD_MAX];
     unsigned char r[CKB_GRAD_MAX];
     unsigned char g[CKB_GRAD_MAX];
     unsigned char b[CKB_GRAD_MAX];
-    unsigned char a[CKB_GRAD_MAX];
 } ckb_gradient;
+int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha);
 
 // Color of a point on a gradient, with position given between 0 and 100 inclusive
 void ckb_grad_color(float* a, float* r, float* g, float* b, const ckb_gradient* grad, float pos);
 
-// Parameter input parsers. Usage (within ckb_parameter only):
-//  CKB_PARSE_BOOL("mybool", &mybool){
-//      <actions to take when bool is parsed>
-//  }
-// or:
-//  CKB_PARSE_BOOL("mybool", &mybool){}
-
-int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha);
-
-#define CKB_PARSE_LONG(param_name, value_ptr)                   if(!strcmp(name, param_name) && sscanf(value, "%ld", value_ptr) == 1)
-#define CKB_PARSE_DOUBLE(param_name, value_ptr)                 if(!strcmp(name, param_name) && sscanf(value, "%lf", value_ptr) == 1)
-#define CKB_PARSE_BOOL(param_name, value_ptr)                   if(!strcmp(name, param_name) && sscanf(value, "%u", value_ptr) == 1)
-#define CKB_PARSE_RGB(param_name, r_ptr, g_ptr, b_ptr)          if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx", r_ptr, g_ptr, b_ptr) == 3)
-#define CKB_PARSE_ARGB(param_name, a_ptr, r_ptr, g_ptr, b_ptr)  if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx%2hhx", a_ptr, r_ptr, g_ptr, b_ptr) == 4)
-#define CKB_PARSE_GRADIENT(param_name, gradient_ptr)            if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 0))
-#define CKB_PARSE_AGRADIENT(param_name, gradient_ptr)           if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 1))
-#define CKB_PARSE_STRING(param_name)                            if(!strcmp(name, param_name))
+// Alpha blend a color into a key
+void ckb_alpha_blend(ckb_key* key, float a, float r, float g, float b);
 
 
 // * Internal functions
@@ -211,13 +256,35 @@ void ckb_grad_color(float* a, float* r, float* g, float* b, const ckb_gradient* 
         if(grad->pts[i] >= pos)
             break;
     }
-    // Get color by linear interpolation
+    // Get color by linear interpolation. Premultiply the alpha value so that it returns the expected color
+    // (i.e. stops with zero opacity won't contribute to color)
     float distance = grad->pts[i] - grad->pts[i - 1];
     float dx = (pos - grad->pts[i - 1]) / distance;
-    *a = grad->a[i] * dx + grad->a[i - 1] * (1.f - dx);
-    *r = grad->r[i] * dx + grad->r[i - 1] * (1.f - dx);
-    *g = grad->g[i] * dx + grad->g[i - 1] * (1.f - dx);
-    *b = grad->b[i] * dx + grad->b[i - 1] * (1.f - dx);
+    float a1 = grad->a[i] / 255., a2 = grad->a[i - 1] / 255.;
+    float a3 = *a = a1 * dx + a2 * (1.f - dx);
+    if(a3 == 0.){
+        *a = *r = *g = *b = 0.f;
+        return;
+    }
+    *a *= 255.f;
+    *r = (grad->r[i] * a1 * dx + grad->r[i - 1] * a2 * (1.f - dx)) / a3;
+    *g = (grad->g[i] * a1 * dx + grad->g[i - 1] * a2 * (1.f - dx)) / a3;
+    *b = (grad->b[i] * a1 * dx + grad->b[i - 1] * a2 * (1.f - dx)) / a3;
+}
+
+// Alpha blend
+void ckb_alpha_blend(ckb_key* key, float a, float r, float g, float b){
+    a /= 255.f;
+    float ka = key->a / 255.f;
+    float a2 = a + (1.f - a) * ka;
+    if(a2 == 0.f){
+        key->a = key->r = key->g = key->b = 0;
+        return;
+    }
+    key->a = round(a2 * 255.f);
+    key->r = round((r * a + key->r * ka * (1.f - a)) / a2);
+    key->g = round((g * a + key->g * ka * (1.f - a)) / a2);
+    key->b = round((b * a + key->b * ka * (1.f - a)) / a2);
 }
 
 // Gradient parser
@@ -231,6 +298,8 @@ int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
         if(sscanf(string, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
         string += scanned;
+        if(*string == ',')
+            string++;
         // Don't allow stops out-of-order or past 100
         if(newpos <= pos || newpos > 100)
             return 0;
@@ -244,6 +313,19 @@ int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
         gradient->b[count] = b;
         count++;
     }
+    if(count == 0){
+        // If nothing was read, try a single ARGB constant.
+        if(sscanf(string, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) != 4)
+            return 0;
+        count = 2;
+        gradient->pts[0] = 0;
+        gradient->pts[1] = 100;
+        gradient->a[0] = a;
+        gradient->a[1] = 0;
+        gradient->r[0] = gradient->r[1] = r;
+        gradient->g[0] = gradient->g[1] = g;
+        gradient->b[0] = gradient->b[1] = b;
+    }
     if(count < 2)
         return 0;
     gradient->ptcount = count;
@@ -251,8 +333,9 @@ int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
 }
 
 extern void ckb_info();
+extern void ckb_init(ckb_runctx* context);
 extern void ckb_parameter(ckb_runctx*, const char*, const char*);
-extern void ckb_keypress(ckb_runctx*, ckb_key* key, int);
+extern void ckb_keypress(ckb_runctx*, ckb_key*, int, int, int);
 extern void ckb_start(ckb_runctx*);
 extern int ckb_frame(ckb_runctx*, double);
 int main(int argc, char *argv[]){
@@ -311,6 +394,8 @@ int main(int argc, char *argv[]){
                     return -2;
                 }
             } while(strcmp(cmd, "end") || strcmp(param, "keymap"));
+            // Run init function
+            ckb_init(&ctx);
             // Skip anything else until "begin params"
             do {
                 ckb_getline(cmd, param, value);
@@ -351,16 +436,32 @@ int main(int argc, char *argv[]){
                 if(!strcmp(cmd, "start"))
                     ckb_start(&ctx);
                 else if(!strcmp(cmd, "key")){
-                    // Find a key with this name
-                    ckb_key* key = 0;
-                    for(i = 0; i < keycount; i++){
-                        if(!strcmp(ctx.keys[i].name, param)){
-                            key = ctx.keys + i;
-                            break;
+                    int x, y;
+                    if(sscanf(param, "%d,%d", &x, &y) == 2){
+                        // Find a key with this position
+                        ckb_key* key = 0;
+                        for(i = 0; i < keycount; i++){
+                            if(ctx.keys[i].x == x && ctx.keys[i].y == y){
+                                key = ctx.keys + i;
+                                break;
+                            }
                         }
+                        if(key)
+                            ckb_keypress(&ctx, key, key->x, key->y, !strcmp(value, "down"));
+                        else
+                            ckb_keypress(&ctx, 0, x, y, !strcmp(value, "down"));
+                    } else {
+                        // Find a key with this name
+                        ckb_key* key = 0;
+                        for(i = 0; i < keycount; i++){
+                            if(!strcmp(ctx.keys[i].name, param)){
+                                key = ctx.keys + i;
+                                break;
+                            }
+                        }
+                        if(key)
+                            ckb_keypress(&ctx, key, key->x, key->y, !strcmp(value, "down"));
                     }
-                    if(key)
-                        ckb_keypress(&ctx, key, !strcmp(value, "down"));
                 } else {
                     double delta = 0.;
                     if(!strcmp(cmd, "frame") && sscanf(param, "%lf", &delta) == 1){

@@ -1,3 +1,4 @@
+#include <QDateTime>
 #include <QMenu>
 #include "animsettingdialog.h"
 #include "kbanimwidget.h"
@@ -226,10 +227,19 @@ void KbAnimWidget::on_deleteButton_clicked(){
 void KbAnimWidget::on_propertyButton_clicked(){
     if(!current)
         return;
+    // Present animation property popup
     AnimSettingDialog dialog(this, current);
     dialog.exec();
     if(dialog.result() != QDialog::Accepted)
         return;
+    // Apply settings and restart all animations
     dialog.applySettings();
-    current->trigger();
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    foreach(KbAnim* anim, light->animList){
+        anim->stop();
+        anim->trigger(timestamp);
+    }
+    // Update name
+    ui->nameBox->setText(dialog.name());
+    on_nameBox_textEdited(dialog.name());
 }

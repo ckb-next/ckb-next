@@ -6,11 +6,15 @@ ColorButton::ColorButton(QWidget* parent, bool allowAlpha) :
     QPushButton(parent), _alpha(allowAlpha)
 {
     connect(this, SIGNAL(clicked()), this, SLOT(pickColor()));
+    setAutoDefault(false);
+    setDefault(false);
     updateImage();
 }
 
 void ColorButton::color(const QColor& newColor){
     _color = newColor;
+    if(!_alpha)
+        _color.setAlpha(255);
     updateImage();
 }
 

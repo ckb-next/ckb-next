@@ -40,14 +40,14 @@ public:
     void reInit();
 
     // Begins or re-triggers the animation
-    void trigger();
+    void trigger(quint64 timestamp);
     // Triggers a keypress in the animation
-    void keypress(const QString& key, bool pressed);
+    void keypress(const QString& key, bool pressed, quint64 timestamp);
     // Stops the animation
     void stop();
 
     // Blends the animation into a color map, taking opacity and mode into account
-    void blend(QHash<QString, QRgb>& animMap);
+    void blend(QHash<QString, QRgb>& animMap, quint64 timestamp);
 
     // Animation properties
     inline const QUuid& guid() { return _guid; }
@@ -70,8 +70,8 @@ private:
     KeyMap _map;
     QStringList _keys;
     QString repeatKey;
-    quint64 repeatTime, kpRepeatTime;
-    double repeatLength, kpRepeatLength;
+    quint64 repeatTime, kpRepeatTime, stopTime, kpStopTime;
+    int repeatMsec, kpRepeatMsec;
 
     QUuid _guid;
     QString _name;

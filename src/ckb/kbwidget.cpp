@@ -99,11 +99,12 @@ void KbWidget::save(){
 }
 
 KbWidget::~KbWidget(){
+    // Save settings
+    save();
+
     QFile cmd;
     getCmd(cmd);
     if(cmd.isOpen()){
-        // Save settings
-        save();
         // Reset to hardware profile
         if(hwProfile)
             currentProfile = hwProfile;
@@ -301,7 +302,7 @@ KeyMap KbWidget::getKeyMap(){
 
 void KbWidget::getCmd(QFile& file){
     int fd = open(cmdpath.toLatin1().constData(), O_WRONLY | O_NONBLOCK);
-    if(!file.open(fd, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle))
+    if(fd <= 0 || !file.open(fd, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle))
         cmdpath = notifypath = devpath = "";
 }
 
@@ -487,7 +488,7 @@ void KbWidget::readInput(QFile& cmd){
     // Read from the notification node
     QFile notify;
     int fd = open(notifypath.toLatin1().constData(), O_RDONLY | O_NONBLOCK);
-    if(notify.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle)){
+    if(fd > 0 && notify.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle)){
         QString line;
         while((line = notify.readLine()) != ""){
             QStringList components = line.trimmed().split(" ");

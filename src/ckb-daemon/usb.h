@@ -10,6 +10,7 @@
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"
+
 #define P_K70           0x1b13
 #define P_K70_STR       "1b13"
 #define P_K70_NRGB      0x1b09

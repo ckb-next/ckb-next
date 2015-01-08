@@ -313,6 +313,19 @@ int openusb(struct udev_device* dev, short vendor, short product){
 static struct udev* udev;
 pthread_t usbthread, udevthread;
 
+// String -> numeric model map
+typedef struct {
+    const char* name;
+    short number;
+} _model;
+static _model models[] = {
+    { P_K65_STR, P_K65 },
+    { P_K70_STR, P_K70 },
+    { P_K70_NRGB_STR, P_K70_NRGB },
+    { P_K95_STR, P_K95 },
+};
+#define N_MODELS (sizeof(models) / sizeof(_model))
+
 void udevenum(){
     struct udev_enumerate* enumerator = udev_enumerate_new(udev);
     udev_enumerate_add_match_subsystem(enumerator, "usb");
@@ -326,26 +339,19 @@ void udevenum(){
         struct udev_device* dev = udev_device_new_from_syspath(udev, path);
         // If the device matches a recognized device ID, open it
         const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-        if(!strcmp(product, P_K70_STR)){
-            pthread_mutex_lock(&kblistmutex);
-            openusb(dev, V_CORSAIR, P_K70);
-            pthread_mutex_unlock(&kblistmutex);
-            continue;
-        }
-        if(!strcmp(product, P_K70_NRGB_STR)){
-            pthread_mutex_lock(&kblistmutex);
-            openusb(dev, V_CORSAIR, P_K70_NRGB);
-            pthread_mutex_unlock(&kblistmutex);
-            continue;
-        }
-        if(!strcmp(product, P_K95_STR)){
-            pthread_mutex_lock(&kblistmutex);
-            openusb(dev, V_CORSAIR, P_K95);
-            pthread_mutex_unlock(&kblistmutex);
-            continue;
+        int found = 0;
+        for(_model* model = models; model < models + N_MODELS; model++){
+            if(!strcmp(product, model->name)){
+                found = 1;
+                pthread_mutex_lock(&kblistmutex);
+                openusb(dev, V_CORSAIR, model->number);
+                pthread_mutex_unlock(&kblistmutex);
+                break;
+            }
         }
         // Free the device if it wasn't used
-        udev_device_unref(dev);
+        if(!found)
+            udev_device_unref(dev);
     }
     udev_enumerate_unref(enumerator);
 }
@@ -381,20 +387,20 @@ void* udevmain(void* context){
                     const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
                     if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
                         const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-                        if(product && !strcmp(product, P_K70_STR)){
-                            pthread_mutex_lock(&kblistmutex);
-                            openusb(dev, V_CORSAIR, P_K70);
-                            pthread_mutex_unlock(&kblistmutex);
-                        } else if(product && !strcmp(product, P_K70_NRGB_STR)){
-                            pthread_mutex_lock(&kblistmutex);
-                            openusb(dev, V_CORSAIR, P_K70_NRGB);
-                            pthread_mutex_unlock(&kblistmutex);
-                        } else if(product && !strcmp(product, P_K95_STR)){
-                            pthread_mutex_lock(&kblistmutex);
-                            openusb(dev, V_CORSAIR, P_K95);
-                            pthread_mutex_unlock(&kblistmutex);
-                        } else
-                            // Free the device if it wasn't used
+                        int found = 0;
+                        if(product){
+                            for(_model* model = models; model < models + N_MODELS; model++){
+                                if(!strcmp(product, model->name)){
+                                    found = 1;
+                                    pthread_mutex_lock(&kblistmutex);
+                                    openusb(dev, V_CORSAIR, model->number);
+                                    pthread_mutex_unlock(&kblistmutex);
+                                    break;
+                                }
+                            }
+                        }
+                        // Free the device if it wasn't used
+                        if(!found)
                             udev_device_unref(dev);
                     } else
                         udev_device_unref(dev);

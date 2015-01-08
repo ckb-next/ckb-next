@@ -18,8 +18,9 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
         kb->queue[i - 1] = kb->queue[i];
     kb->queue[QUEUE_LEN - 1] = first;
     kb->queuecount--;
+    kb->lastError = res;
     if(res != kIOReturnSuccess){
-        printf("Error: usbdequeue (%s:%d): Got return value %d\n", file, line, res);
+        printf("Error: usbdequeue (%s:%d): Got return value 0x%x\n", file, line, res);
         return 0;
     }
     return MSG_SIZE;
@@ -30,8 +31,9 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
         return -1;
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
+    kb->lastError = res;
     if(res != kIOReturnSuccess){
-        printf("Error: usbinput (%s:%d): Got return value %d\n", file, line, res);
+        printf("Error: usbinput (%s:%d): Got return value 0x%x\n", file, line, res);
         return 0;
     }
     if(length != MSG_SIZE)
@@ -41,18 +43,17 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
 
 void closehandle(usbdevice* kb){
     kb->handle = 0;
-    for(int i = 0; i < 4; i++){
-        if(kb->handles[i]){
-            IOHIDDeviceClose(kb->handles[i], kIOHIDOptionsTypeNone);
-            kb->handles[i] = 0;
-        }
-    }
+    for(int i = 0; i < 4; i++)
+        kb->handles[i] = 0;
 }
 
 int os_resetusb(usbdevice* kb, const char* file, int line){
-    // I don't think it's actually possible to do this.
-    // Just return success without doing anything...
-    sleep(1);
+    // Don't try if the keyboard was disconnected
+    if(kb->lastError == kIOReturnBadArgument)
+        return -2;
+    // USB reset via IOHIDDevice doesn't seem to be possible.
+    // Just wait a little and then return success anyway...
+    DELAY_LONG;
     return 0;
 }
 
@@ -74,7 +75,7 @@ void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportTyp
         inputupdate(kb);
 }
 
-void openusb(usbdevice* kb){
+void openusb(usbdevice* kb, short vendor, short product){
     // The driver sometimes isn't completely ready yet, so give it a short delay
     sleep(1);
 
@@ -83,18 +84,17 @@ void openusb(usbdevice* kb){
     kb->handle = kb->handles[3];
 
     // Set up the device
-    int setup = setupusb(kb);
-    if(setup == -1){
+    int setup = setupusb(kb, vendor, product);
+    if(setup == -1 || (setup && usb_tryreset(kb))){
         closehandle(kb);
         pthread_mutex_unlock(&kb->mutex);
         pthread_mutex_destroy(&kb->mutex);
         pthread_mutex_destroy(&kb->keymutex);
         return;
-    } else if(setup && usb_tryreset(kb))
-        printf("Setup failed, device may not work...\n");
+    }
 
     // Start handling HID reports for the Corsair input
-    IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->intinput, MSG_SIZE, reportcallback, kb);
+    IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->kbinput, MSG_SIZE, reportcallback, kb);
 
     // Register for close notification
     IOHIDDeviceRegisterRemovalCallback(kb->handle, usbremove, kb);
@@ -120,13 +120,6 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
         return;
     // Get the model and serial number
     long idproduct = usbgetvalue(device, CFSTR(kIOHIDProductIDKey));
-    int model;
-    if(idproduct == P_K70)
-        model = 70;
-    else if(idproduct == P_K95)
-        model = 95;
-    else
-        return;
     char serial[SERIAL_LEN];
     CFTypeRef cfserial = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDSerialNumberKey));
     if(!cfserial || CFGetTypeID(cfserial) != CFStringGetTypeID() || !CFStringGetCString(cfserial, serial, SERIAL_LEN, kCFStringEncodingASCII))
@@ -148,11 +141,10 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
                 // Mark the device as in use and print out a message
                 index = i;
                 keyboard[i].handle = INCOMPLETE;
-                keyboard[i].model = model;
                 strcpy(keyboard[i].profile.serial, serial);
                 CFTypeRef cfname = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductKey));
                 if(cfname && CFGetTypeID(cfname) == CFStringGetTypeID())
-                    CFStringGetCString(cfname, keyboard[i].name, SERIAL_LEN, kCFStringEncodingASCII);
+                    CFStringGetCString(cfname, keyboard[i].name, NAME_LEN, kCFStringEncodingASCII);
                 printf("Connecting %s (S/N: %s)\n", keyboard[i].name, keyboard[i].profile.serial);
                 break;
             }
@@ -187,19 +179,37 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
 
     // If all handles have been set up, finish initializing the keyboard
     if(kb->handles[0] && kb->handles[1] && kb->handles[2] && kb->handles[3])
-        openusb(kb);
+        openusb(kb, V_CORSAIR, (short)idproduct);
     pthread_mutex_unlock(&kblistmutex);
 }
 
 static IOHIDManagerRef usbmanager;
 static pthread_t usbthread;
 static pthread_t keyrepeatthread;
+static CFMachPortRef eventTap;
 
 CGEventRef tapcallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon){
-    CGEventFlags flags = CGEventGetFlags(event);
-    for(int i = 1; i < DEV_MAX; i++)
-        flags |= keyboard[i].eventflags;
-    CGEventSetFlags(event, flags);
+    if(type == kCGEventTapDisabledByUserInput || type == kCGEventTapDisabledByTimeout){
+        // Re-enable the tap if it gets disabled
+        CGEventTapEnable(eventTap, true);
+        return 0;
+    }
+    if((type == kCGEventKeyDown || type == kCGEventKeyUp)){
+        if(CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode) == KEY_ESC){
+            CGEventFlags flags = CGEventGetFlags(event);
+            // This flag gets inserted into all of our keyboard events automatically. It can't be removed when the event is broadcast.
+            // It must be removed in order for Cmd+Option+Esc to work, but ONLY removed for Esc.
+            // Otherwise it causes keystrokes to be missed in some apps.
+            //  LOGIC! 
+            flags &= ~0x20000000;
+            CGEventSetFlags(event, flags);
+        }
+    } else {
+        CGEventFlags flags = CGEventGetFlags(event);
+        for(int i = 1; i < DEV_MAX; i++)
+            flags |= keyboard[i].eventflags;
+        CGEventSetFlags(event, flags);
+    }
     return event;
 }
 
@@ -236,7 +246,7 @@ void* threadrun(void* context){
     // Tell it which devices we want to look for
     CFMutableArrayRef devices = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     if(devices){
-        int vendor = V_CORSAIR, product1 = P_K70, product2 = P_K95;
+        int vendor = V_CORSAIR;
         int products[] = { P_K70, P_K95 };
         for(int i = 0; i < sizeof(products) / sizeof(int); i++){
             int product = products[i];
@@ -251,13 +261,15 @@ void* threadrun(void* context){
         IOHIDManagerSetDeviceMatchingMultiple(usbmanager, devices);
         CFRelease(devices);
     }
+
     // Set up device add callback
     IOHIDManagerRegisterDeviceMatchingCallback(usbmanager, usbadd, 0);
     IOHIDManagerScheduleWithRunLoop(usbmanager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
     IOHIDManagerOpen(usbmanager, kIOHIDOptionsTypeNone);
 
     // Run an event tap to modify the state of mouse events. The OS won't take care of this for us so this is needed for Shift and other modifiers to work
-    CFRunLoopAddSource(CFRunLoopGetCurrent(), CFMachPortCreateRunLoopSource(kCFAllocatorDefault, CGEventTapCreate(kCGHIDEventTap, kCGTailAppendEventTap, kCGEventTapOptionDefault, CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseDragged) | CGEventMaskBit(kCGEventLeftMouseUp) | CGEventMaskBit(kCGEventRightMouseDown) | CGEventMaskBit(kCGEventRightMouseDragged) | CGEventMaskBit(kCGEventRightMouseUp), tapcallback, 0), 0), kCFRunLoopDefaultMode);
+    eventTap = CGEventTapCreate(kCGHIDEventTap, kCGHeadInsertEventTap, kCGEventTapOptionDefault, CGEventMaskBit(kCGEventKeyDown) | CGEventMaskBit(kCGEventKeyUp) | CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseDragged) | CGEventMaskBit(kCGEventLeftMouseUp) | CGEventMaskBit(kCGEventRightMouseDown) | CGEventMaskBit(kCGEventRightMouseDragged) | CGEventMaskBit(kCGEventRightMouseUp), tapcallback, 0);
+    CFRunLoopAddSource(CFRunLoopGetCurrent(), CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0), kCFRunLoopDefaultMode);
 
     // Another thing the OS won't do on its own: key repeats. Make a new thread for that
     pthread_create(&keyrepeatthread, 0, krthread, 0);

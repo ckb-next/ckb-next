@@ -16,6 +16,8 @@
 #define P_K95           0x1b11
 #define P_K95_STR       "1b11"
 
+#define IS_RGB(vendor, product) (product != P_K70_NRGB)
+
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT     usleep(3000)
 #define DELAY_MEDIUM    usleep(10000)
@@ -28,9 +30,12 @@ void usbdeinit();
 
 // Set up a USB device after all its handles are open. Returns 0 on success
 // Threading: Creates device mutex and locks it. Unlocks mutex ONLY if return is -1 (software error). Unlock manually otherwise.
-int setupusb(usbdevice* kb);
+int setupusb(usbdevice* kb, short vendor, short product);
+// Puts a USB device back into hardware mode. Returns 0 on success.
+// Threading: Lock device mutex before calling.
+int revertusb(usbdevice* kb);
 // Close a USB device and remove device entry. Returns 0 on success
-// Threading: Lock the device mutex BEFORE calling this. It will be released.
+// Threading: Lock the device mutex before calling. It will be released.
 int closeusb(usbdevice* kb);
 // Reset a USB device. Returns 0 on success, -1 if device should be removed
 // Threading: Lock the device mutex before calling

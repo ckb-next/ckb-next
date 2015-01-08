@@ -105,6 +105,21 @@ typedef struct {
 } usbprofile;
 #define MODE_MAX    100
 
+// Device features
+#define FEAT_RGB        1   // RGB backlighting?
+#define FEAT_BIND       2   // Rebindable keys?
+#define FEAT_NOTIFY     4   // Key notifications?
+#define FEAT_FWVERSION  8   // Has firmware version?
+#define FEAT_FWUPDATE   16  // Has firmware update?
+
+// Standard feature sets
+#define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION)
+#define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_FWUPDATE)
+#define FEAT_STD_NRGB   (FEAT_COMMON)
+
+// Feature test (usbdevice* kb, int feat)
+#define HAS_FEATURES(kb, feat)    ((kb)->features & (feat))
+
 // Structure for tracking keyboard devices
 #define NAME_LEN    33
 #define QUEUE_LEN   40
@@ -114,13 +129,14 @@ typedef struct {
 #ifdef OS_LINUX
     struct udev_device* udev;
     struct usbdevfs_urb urb[3];
-    char unusedinput[36];
+    uchar urbinput[32];
     int handle;
     int uinput;
     int event;
     pthread_t usbthread;
 #endif
 #ifdef OS_MAC
+    IOReturn lastError;
     IOHIDDeviceRef handle;
     IOHIDDeviceRef handles[4];
     CGEventSourceRef event;
@@ -132,26 +148,30 @@ typedef struct {
     pthread_mutex_t mutex;
     // Similar, but used only for key input.
     pthread_mutex_t keymutex;
+    // Keyboard settings
+    usbprofile profile;
+    // Hardware modes. Null if not read yet
+    hwprofile* hw;
+    // Last RGB data sent to the device
+    keylight lastlight;
     // Command FIFO
     int infifo;
     // Notification FIFO
     int outfifo[OUTFIFO_MAX];
     // Interrupt transfers (keypresses)
-    uchar intinput[MSG_SIZE];
-    uchar previntinput[N_KEYS / 8];
-    // Last RGB data sent to the device
-    keylight lastlight;
-    // Indicator LED state
-    uchar ileds;
+    uchar kbinput[MSG_SIZE];
+    uchar prevkbinput[N_KEYS / 8];
     // USB output queue
     uchar* queue[QUEUE_LEN];
     int queuecount;
-    // Keyboard settings
-    usbprofile profile;
-    // Hardware modes. Null if not read yet
-    hwprofile* hw;
+    // Features (see F_ macros)
+    int features;
+    // Vendor and product IDs
+    short vendor, product;
     // Firmware version
     short fwversion;
+    // Indicator LED state
+    uchar ileds;
     // Keyboard type (70 or 95 for keyboards, -1 for root)
     char model;
     // Device name

@@ -4,6 +4,8 @@
 #include "led.h"
 #include "notify.h"
 
+extern int features_mask;
+
 // Not supported on OSX...
 #ifdef OS_MAC
 #define pthread_mutex_timedlock(mutex, timespec) pthread_mutex_lock(mutex)
@@ -19,29 +21,7 @@ void quit(){
             pthread_mutex_timedlock(&keyboard[i].mutex, &timeout);
             // Stop the uinput device now to ensure no keys get stuck
             inputclose(keyboard + i);
-            // Empty the USB queue first
-            while(keyboard[i].queuecount > 0){
-                DELAY_SHORT;
-                if(usbdequeue(keyboard + i) <= 0)
-                    break;
-            }
-            DELAY_MEDIUM;
-            setinput(keyboard + i, IN_HID);
-            while(keyboard[i].queuecount > 0){
-                DELAY_SHORT;
-                if(usbdequeue(keyboard + i) <= 0)
-                    break;
-            }
-            // Set the M-keys back into hardware mode and restore the RGB profile. It has to be sent twice for some reason.
-            uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x01, 0 };
-            usbqueue(keyboard + i, msg, 1);
-            usbqueue(keyboard + i, msg, 1);
-            // Flush the USB queue and close the device
-            while(keyboard[i].queuecount > 0){
-                DELAY_MEDIUM;
-                if(usbdequeue(keyboard + i) <= 0)
-                    break;
-            }
+            revertusb(keyboard + i);
             closeusb(keyboard + i);
         }
     }
@@ -102,7 +82,7 @@ void localecase(char* dst, size_t length, const char* src){
 }
 
 int main(int argc, char** argv){
-    printf("ckb Corsair Keyboard RGB driver v0.0.22\n");
+    printf("ckb Corsair Keyboard RGB driver v0.0.23\n");
 
     // Read parameters
     for(int i = 1; i < argc; i++){
@@ -121,6 +101,14 @@ int main(int argc, char** argv){
             // Set dev node GID
             gid = newgid;
             printf("Setting /dev node gid: %u\n", newgid);
+        } else if(!strcmp(argument, "--nobind")){
+            // Disable key notifications and rebinding
+            features_mask &= ~FEAT_BIND & ~FEAT_NOTIFY;
+            printf("Key binding and key notifications are disabled\n");
+        } else if(!strcmp(argument, "--nonotify")){
+            // Disable key notifications
+            features_mask &= ~FEAT_NOTIFY;
+            printf("Key notifications are disabled\n");
         }
     }
 
@@ -170,6 +158,7 @@ int main(int argc, char** argv){
     memset(keyboard, 0, sizeof(keyboard));
     pthread_mutex_init(&keyboard[0].mutex, 0);
     keyboard[0].model = -1;
+    keyboard[0].features = FEAT_NOTIFY & features_mask;
     if(!makedevpath(keyboard))
         printf("Root controller ready at %s0\n", devpath);
 

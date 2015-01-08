@@ -31,7 +31,7 @@ void inputupdate(usbdevice* kb){
     const key* keymap = kb->profile.keymap;
     keybind* bind = &mode->bind;
     // Don't do anything if the state hasn't changed
-    if(!memcmp(kb->previntinput, kb->intinput, N_KEYS / 8)){
+    if(!memcmp(kb->prevkbinput, kb->kbinput, N_KEYS / 8)){
         pthread_mutex_unlock(&kb->keymutex);
         return;
     }
@@ -39,7 +39,7 @@ void inputupdate(usbdevice* kb){
     int macrotrigger = 0;
     for(int i = 0; i < bind->macrocount; i++){
         keymacro* macro = &bind->macros[i];
-        if(macromask(kb->intinput, macro->combo)){
+        if(macromask(kb->kbinput, macro->combo)){
             if(!macro->triggered){
                 macrotrigger = 1;
                 macro->triggered = 1;
@@ -58,7 +58,7 @@ void inputupdate(usbdevice* kb){
     int events[N_KEYS + 2];
     int modcount = 0, keycount = 0, rmodcount = 0;
     for(int byte = 0; byte < N_KEYS / 8; byte++){
-        char oldb = kb->previntinput[byte], newb = kb->intinput[byte];
+        char oldb = kb->prevkbinput[byte], newb = kb->kbinput[byte];
         if(oldb == newb)
             continue;
         for(int bit = 0; bit < 8; bit++){
@@ -67,7 +67,7 @@ void inputupdate(usbdevice* kb){
             int scancode = bind->base[keyindex];
             char mask = 1 << bit;
             char old = oldb & mask, new = newb & mask;
-            // If the key state changed, send it to the uinput device
+            // If the key state changed, send it to the input device
             if(old != new){
                 // Don't echo a key press if a macro was triggered or if there's no scancode associated
                 if(!macrotrigger && scancode >= 0){
@@ -93,7 +93,7 @@ void inputupdate(usbdevice* kb){
                             for(int i = rmodcount; i > 0; i--)
                                 events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                             events[modcount + keycount++] = -(scancode + 1);
-                            kb->intinput[byte] &= ~mask;
+                            kb->kbinput[byte] &= ~mask;
                         }
                     }
                 }
@@ -118,7 +118,7 @@ void inputupdate(usbdevice* kb){
         os_keypress(kb, (scancode < 0 ? -scancode : scancode) - 1, scancode > 0);
     }
     os_kpsync(kb);
-    memcpy(kb->previntinput, kb->intinput, N_KEYS / 8);
+    memcpy(kb->prevkbinput, kb->kbinput, N_KEYS / 8);
     pthread_mutex_unlock(&kb->keymutex);
 }
 

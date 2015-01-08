@@ -33,11 +33,10 @@ int getfwversion(usbdevice* kb){
     memcpy(&vendor, in_pkt + 12, 2);
     memcpy(&product, in_pkt + 14, 2);
     // Print a warning if the vendor or product isn't what it should be
-    if(vendor != V_CORSAIR)
-        printf("Warning: Got vendor ID %04x (expected %04x)", vendor, V_CORSAIR);
-    int eproduct = (kb->model == 95) ? P_K95 : P_K70;
-    if(product != eproduct)
-        printf("Warning: Got product ID %04x (expected %04x)", product, eproduct);
+    if(vendor != kb->vendor)
+        printf("Warning: Got vendor ID %04x (expected %04x)\n", vendor, kb->vendor);
+    if(product != kb->product)
+        printf("Warning: Got product ID %04x (expected %04x)\n", product, kb->product);
     // Set firmware version
     kb->fwversion = version;
     writefwnode(kb);

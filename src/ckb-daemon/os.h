@@ -35,8 +35,8 @@
 #define UINPUT_VERSION 2
 #endif
 
-#define INPUT_READY unusedinput[34]
-#define INPUT_TEST  unusedinput[35]
+#define INPUT_READY urbinput[30]
+#define INPUT_TEST  urbinput[31]
 
 #endif  // OS_LINUX
 
@@ -44,6 +44,8 @@
 
 #include <Carbon/Carbon.h>
 #include <IOKit/hid/IOHIDLib.h>
+#include <IOKit/hidsystem/ev_keymap.h>
+#include <IOKit/pwr_mgt/IOPMLib.h>
 
 // Various POSIX functions that aren't present on OSX
 

@@ -120,14 +120,14 @@
 #define KEY_KP9             kVK_ANSI_Keypad9
 #define KEY_KP0             kVK_ANSI_Keypad0
 
-#define KEY_MUTE            kVK_Mute
-#define KEY_VOLUMEUP        kVK_VolumeUp
-#define KEY_VOLUMEDOWN      kVK_VolumeDown
-// Media keys don't generate keypresses.
-#define KEY_STOP            -1
-#define KEY_PREVIOUSSONG    -1
-#define KEY_PLAYPAUSE       -1
-#define KEY_NEXTSONG        -1
+#define KEY_MEDIA           1000
+#define KEY_MUTE            (KEY_MEDIA + NX_KEYTYPE_MUTE)
+#define KEY_VOLUMEUP        (KEY_MEDIA + NX_KEYTYPE_SOUND_UP)
+#define KEY_VOLUMEDOWN      (KEY_MEDIA + NX_KEYTYPE_SOUND_DOWN)
+#define KEY_STOP            -1              // OSX has no stop key
+#define KEY_PREVIOUSSONG    (KEY_MEDIA + NX_KEYTYPE_PREVIOUS)
+#define KEY_PLAYPAUSE       (KEY_MEDIA + NX_KEYTYPE_PLAY)
+#define KEY_NEXTSONG        (KEY_MEDIA + NX_KEYTYPE_NEXT)
 
 #endif  // OS_MAC
 

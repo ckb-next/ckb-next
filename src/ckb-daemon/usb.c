@@ -7,6 +7,9 @@
 #include "profile.h"
 #include "usb.h"
 
+// Mask of features to exclude from all devices
+int features_mask = -1;
+
 // OS-specific USB reset
 extern int os_resetusb(usbdevice* kb, const char* file, int line);
 
@@ -20,7 +23,11 @@ int usbqueue(usbdevice* kb, uchar* messages, int count){
     return 0;
 }
 
-int setupusb(usbdevice* kb){
+int setupusb(usbdevice* kb, short vendor, short product){
+    kb->model = (product == P_K70 || product == P_K70_NRGB) ? 70 : 95;
+    kb->vendor = vendor;
+    kb->product = product;
+    kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;
     pthread_mutex_init(&kb->mutex, 0);
     pthread_mutex_init(&kb->keymutex, 0);
     pthread_mutex_lock(&kb->mutex);
@@ -56,6 +63,17 @@ int setupusb(usbdevice* kb){
         getusbmode(2, &kb->profile, keymap_system);
     } else {
         updateindicators(kb, 1);
+        // Nothing else needs to be done for non-RGB keyboards
+        if(!HAS_FEATURES(kb, FEAT_RGB)){
+            writefwnode(kb);
+            kb->profile.keymap = keymap_system;
+            kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
+            if(kb->model == 95){
+                getusbmode(1, &kb->profile, keymap_system);
+                getusbmode(2, &kb->profile, keymap_system);
+            }
+            return 0;
+        }
 
         // Get the firmware version from the device
         int fail = !!getfwversion(kb);
@@ -109,6 +127,35 @@ int setupusb(usbdevice* kb){
         if(fail)
             return -2;
         updatergb(kb, 1);
+    }
+    return 0;
+}
+
+int revertusb(usbdevice* kb){
+    if(!HAS_FEATURES(kb, FEAT_RGB))
+        return 0;
+    // Empty the USB queue first
+    while(kb->queuecount > 0){
+        DELAY_SHORT;
+        if(usbdequeue(kb) <= 0)
+            return -1;
+    }
+    DELAY_MEDIUM;
+    setinput(kb, IN_HID);
+    while(kb->queuecount > 0){
+        DELAY_SHORT;
+        if(usbdequeue(kb) <= 0)
+            return -1;
+    }
+    // Set the M-keys back into hardware mode and restore the RGB profile. It has to be sent twice for some reason.
+    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x01, 0 };
+    usbqueue(kb, msg, 1);
+    usbqueue(kb, msg, 1);
+    // Flush the USB queue
+    while(kb->queuecount > 0){
+        DELAY_MEDIUM;
+        if(usbdequeue(kb) <= 0)
+            return -1;
     }
     return 0;
 }

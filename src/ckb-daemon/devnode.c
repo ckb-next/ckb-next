@@ -428,7 +428,10 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         }
 
-        if(command == NONE)
+        // Reject unrecognized commands. Reject bind or notify related commands if the keyboard doesn't have the feature enabled.
+        if(command == NONE
+                || (kb && ((!HAS_FEATURES(kb, FEAT_BIND) && (command == BIND || command == UNBIND || command == REBIND || command == MACRO))
+                           || (!HAS_FEATURES(kb, FEAT_NOTIFY) && command == NOTIFY))))
             continue;
 
         // Specially handled commands:

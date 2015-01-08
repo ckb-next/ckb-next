@@ -1,7 +1,20 @@
-ckb: Corsair K70/K95 RGB Driver for Linux and OSX
+ckb: Corsair K65/K70/K95 Driver for Linux and OSX
 =================================================
 
-ckb is a userspace (non-kernel) driver for Corsair RGB keyboards for Linux and OSX. It contains a daemon program, which runs in the background and must be started as root, as well as a user interface which may be run by any user.
+**ckb** is an open-source driver for Corsair RGB keyboards. It aims to bring the functionality of their proprietary Corsair Utility Engine software to the Linux and Mac operating systems. This project is currently a work in progress, but several features are already complete and the software has full RGB animation support. More features are coming soon. Testing feedback and bug reports are very much appreciated!
+
+Disclaimer: ckb comes with no warranty and is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful for those of us wishing to take advantage of the keyboard's features on non-Windows OSes.
+
+If you use and enjoy this project, I'd greatly appreciate it if you could spare a few dollars for a donation. This is completely voluntary, of course - the project will remain free and open source regardless. `:)`
+
+I accept donationations through PayPal: [Click here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+
+Or through Bitcoin: [1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ (click for QR code)](https://i.imgur.com/h3gyLiv.png)
+
+Building
+--------
+
+Pre-built binaries will be available at a later date. For now, follow the instructions below to compile from source. The project contains two main applications: `ckb-daemon`, which runs in the background and provides the actual driver, and `ckb`, which provides the user interface.
 
 **Note:** When downloading a new version of ckb, please delete your old download first and build it again from scratch. This helps ensure there are no problems lingering from an old build.
 
@@ -14,9 +27,9 @@ You can build the project by running `qmake-qt5 && make` in the directory you do
 
 **Note:** If you have problems connecting the keyboard to your system, try adding the following to your kernel's `cmdline`:
 
-K70: `usbhid.quirks=0x1B1C:0x1B13:0x20000000`
-
-K95: `usbhid.quirks=0x1B1C:0x1B11:0x20000000` 
+* K65: `usbhid.quirks=0x1B1C:0x1B17:0x20000000`
+* K70: `usbhid.quirks=0x1B1C:0x1B13:0x20000000`
+* K95: `usbhid.quirks=0x1B1C:0x1B11:0x20000000`
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
@@ -26,8 +39,6 @@ OSX instructions
 Install the latest version of Xcode from the App Store. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
 Open ckb.pro in Qt Creator. You should be prompted to configure the project (the default settings should work). Once it's finished loading the project, press `Cmd+B` or select `Build > Build Project "ckb"` from the menu bar. The binaries should be placed in a newly-created `bin` directory assuming they compile successfully. Exit Qt Creator.
-
-**Note:** The project is intended to compile on OSX Yosemite. If you're running an earlier version, open the `.pro` files and find the `QMAKE_MAC_SDK` lines. Edit them from `macosx10.10` to your OSX version, e.g. `macosx10.9` for Mavericks.
 
 `ckb-daemon` needs to be run as root. Open the `bin` directory in a Terminal window and run `sudo ./ckb-daemon`. Then open `ckb.app` as a normal application to start the user interface.
 
@@ -68,7 +79,7 @@ The user interface is still a work in progress.
 - Extra settings?
 - ????
 
-Closing ckb will actually minimize it to the system tray. Use the Exit option from the tray icon or the settings screen to exit the application.
+Closing ckb will actually minimize it to the system tray. Use the Quit option from the tray icon or the settings screen to exit the application.
 
 Known issues
 ------------

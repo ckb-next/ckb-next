@@ -3,11 +3,13 @@ ckb: Corsair K65/K70/K95 Driver for Linux and OSX
 
 **ckb** is an open-source driver for Corsair RGB keyboards. It aims to bring the functionality of their proprietary Corsair Utility Engine software to the Linux and Mac operating systems. This project is currently a work in progress, but several features are already complete and the software has full RGB animation support. More features are coming soon. Testing feedback and bug reports are very much appreciated!
 
+*ckb currently does not support non-RGB Corsair keyboards, but if you have one and are willing to do some tests, don't hesitate to contact me. I'm intrested in adding support for them.*
+
 Disclaimer: ckb comes with no warranty and is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful for those of us wishing to take advantage of the keyboard's features on non-Windows OSes.
 
 If you use and enjoy this project, I'd greatly appreciate it if you could spare a few dollars for a donation. This is completely voluntary, of course - the project will remain free and open source regardless. `:)`
 
-I accept donationations through PayPal: [Click here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+I accept donations through PayPal: [Click here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
 Or through Bitcoin: [1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ (click for QR code)](https://i.imgur.com/h3gyLiv.png)
 

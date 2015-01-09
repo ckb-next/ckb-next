@@ -29,7 +29,7 @@ int mknotifynode(usbdevice* kb, int notify);
 // Removes a notification node for the specified keyboard.
 int rmnotifynode(usbdevice* kb, int notify);
 
-// Writes a keyboard's firmware version to its device node.
+// Writes a keyboard's firmware version and poll rate to its device node.
 void writefwnode(usbdevice* kb);
 
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.

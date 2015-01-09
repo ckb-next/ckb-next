@@ -4,12 +4,12 @@
 #include "includes.h"
 #include "usb.h"
 
-// Opens uinput device
+// Opens input device
 int inputopen(usbdevice* kb);
-// Closes uinput device
+// Closes input device
 void inputclose(usbdevice* kb);
 
-// Updates keypresses on uinput device
+// Updates keypresses on input device
 void inputupdate(usbdevice* kb);
 // Read LEDs from the event device and update them (if needed).
 void updateindicators(usbdevice* kb, int force);
@@ -17,7 +17,7 @@ void updateindicators(usbdevice* kb, int force);
 // OS-specific event handlers
 // Generate a keypress event
 void os_keypress(usbdevice* kb, int scancode, int down);
-// Generate a SYN event
+// Synchronize key input (called after sending key presses)
 void os_kpsync(usbdevice* kb);
 
 // Initializes key bindings for a device

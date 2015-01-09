@@ -56,78 +56,84 @@ int setupusb(usbdevice* kb, short vendor, short product){
     if(strstr(kb->name, "Bootloader")){
         // Device needs a firmware update. Finish setting up but don't do anything.
         printf("Device needs a firmware update. Please issue a fwupdate command.\n");
+        kb->features = FEAT_RGB;
         kb->fwversion = 0;
+        kb->pollrate = -1;
         kb->profile.keymap = keymap_system;
         kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
         getusbmode(1, &kb->profile, keymap_system);
         getusbmode(2, &kb->profile, keymap_system);
-    } else {
-        updateindicators(kb, 1);
-        // Nothing else needs to be done for non-RGB keyboards
-        if(!HAS_FEATURES(kb, FEAT_RGB)){
-            writefwnode(kb);
-            kb->profile.keymap = keymap_system;
-            kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
-            if(kb->model == 95){
-                getusbmode(1, &kb->profile, keymap_system);
-                getusbmode(2, &kb->profile, keymap_system);
-            }
-            return 0;
-        }
-
-        // Get the firmware version from the device
-        int fail = !!getfwversion(kb);
-
-        // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
-        // This packet disables their hardware-based functions.
-        uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02, 0 };
-        usbqueue(kb, msg, 1);
-
-        // Wait a little bit and then send this message.
-        // The keyboard doesn't always respond immediately.
-        DELAY_LONG;
-        if(!usbdequeue(kb))
-            fail = 1;
-
-        // Set all keys to use the Corsair input. HID input is unused.
-        setinput(kb, IN_CORSAIR);
-
-        while(kb->queuecount > 0){
-            DELAY_SHORT;
-            if(!usbdequeue(kb)){
-                fail = 1;
-                break;
-            }
-        }
-
-        // Restore profile (if any)
-        DELAY_LONG;
-        usbprofile* store = findstore(kb->profile.serial);
-        if(store){
-            memcpy(&kb->profile, store, sizeof(usbprofile));
-            if(kb->model == 95){
-                // On the K95, make sure at least 3 modes are available
-                getusbmode(1, &kb->profile, keymap_system);
-                getusbmode(2, &kb->profile, keymap_system);
-            }
-            if(hwloadprofile(kb, 0))
-                return -2;
-        } else {
-            // If there is no profile, load it from the device
-            kb->profile.keymap = keymap_system;
-            kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
-            if(kb->model == 95){
-                getusbmode(1, &kb->profile, keymap_system);
-                getusbmode(2, &kb->profile, keymap_system);
-            }
-            if(hwloadprofile(kb, 1))
-                return -2;
-        }
-        DELAY_SHORT;
-        if(fail)
-            return -2;
-        updatergb(kb, 1);
+        return 0;
     }
+
+    updateindicators(kb, 1);
+    // Nothing else needs to be done for non-RGB keyboards
+    if(!HAS_FEATURES(kb, FEAT_RGB)){
+        writefwnode(kb);
+        kb->profile.keymap = keymap_system;
+        // Fill out RGB features for consistency, even though the keyboard doesn't have them
+        kb->pollrate = -1;
+        kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
+        if(kb->model == 95){
+            getusbmode(1, &kb->profile, keymap_system);
+            getusbmode(2, &kb->profile, keymap_system);
+        }
+        return 0;
+    }
+
+    // Get the firmware version from the device
+    int fail = !!getfwversion(kb);
+
+    // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
+    // This packet disables their hardware-based functions.
+    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02, 0 };
+    usbqueue(kb, msg, 1);
+
+    // Wait a little bit and then send this message.
+    // The keyboard doesn't always respond immediately.
+    DELAY_LONG;
+    if(!usbdequeue(kb))
+        fail = 1;
+
+    // Set all keys to use the Corsair input. HID input is unused.
+    setinput(kb, IN_CORSAIR);
+
+    while(kb->queuecount > 0){
+        DELAY_SHORT;
+        if(!usbdequeue(kb)){
+            fail = 1;
+            break;
+        }
+    }
+
+    // Restore profile (if any)
+    DELAY_LONG;
+    usbprofile* store = findstore(kb->profile.serial);
+    if(store){
+        memcpy(&kb->profile, store, sizeof(usbprofile));
+        if(kb->model == 95){
+            // On the K95, make sure at least 3 modes are available
+            getusbmode(1, &kb->profile, keymap_system);
+            getusbmode(2, &kb->profile, keymap_system);
+        }
+        if(hwloadprofile(kb, 0))
+            return -2;
+    } else {
+        // If there is no profile, load it from the device
+        kb->profile.keymap = keymap_system;
+        kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
+        if(kb->model == 95){
+            getusbmode(1, &kb->profile, keymap_system);
+            getusbmode(2, &kb->profile, keymap_system);
+        }
+        if(hwloadprofile(kb, 1))
+            return -2;
+    }
+    DELAY_SHORT;
+    if(fail)
+        return -2;
+    updatergb(kb, 1);
+
     return 0;
 }
 

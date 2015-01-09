@@ -84,8 +84,10 @@ int makedevpath(usbdevice* kb){
     }
     if(gid >= 0)
         fchown(kb->infifo, 0, gid);
+
     // Create notification FIFO
     mknotifynode(kb, 0);
+
     if(kb->model == -1){
         // Root keyboard: write a list of devices
         updateconnected();
@@ -117,6 +119,33 @@ int makedevpath(usbdevice* kb){
         } else {
             printf("Warning: Unable to create %s: %s\n", spath, strerror(errno));
             remove(spath);
+        }
+        // Write the keyboard's features
+        char fpath[sizeof(path) + 9];
+        snprintf(fpath, sizeof(fpath), "%s/features", path);
+        FILE* ffile = fopen(fpath, "w");
+        if(ffile){
+            fprintf(ffile, "corsair k%d", kb->model);
+            if(HAS_FEATURES(kb, FEAT_RGB))
+                fputs(" rgb", ffile);
+            if(HAS_FEATURES(kb, FEAT_POLLRATE))
+                fputs(" pollrate", ffile);
+            if(HAS_FEATURES(kb, FEAT_BIND))
+                fputs(" bind", ffile);
+            if(HAS_FEATURES(kb, FEAT_NOTIFY))
+                fputs(" notify", ffile);
+            if(HAS_FEATURES(kb, FEAT_FWVERSION))
+                fputs(" fwversion", ffile);
+            if(HAS_FEATURES(kb, FEAT_FWUPDATE))
+                fputs(" fwupdate", ffile);
+            fputc('\n', ffile);
+            fclose(ffile);
+            chmod(fpath, gid >= 0 ? S_CUSTOM_R : S_READ);
+            if(gid >= 0)
+             chown(fpath, 0, gid);
+        } else {
+            printf("Warning: Unable to create %s: %s\n", fpath, strerror(errno));
+            remove(fpath);
         }
     }
     return 0;
@@ -186,6 +215,20 @@ void writefwnode(usbdevice* kb){
     } else {
         printf("Warning: Unable to create %s: %s\n", fwpath, strerror(errno));
         remove(fwpath);
+    }
+    char ppath[strlen(devpath) + 11];
+    snprintf(ppath, sizeof(ppath), "%s%d/pollrate", devpath, index);
+    FILE* pfile = fopen(ppath, "w");
+    if(pfile){
+        fprintf(pfile, "%d ms", kb->pollrate / 1000000);
+        fputc('\n', pfile);
+        fclose(pfile);
+        chmod(ppath, gid >= 0 ? S_CUSTOM_R : S_READ);
+        if(gid >= 0)
+         chown(ppath, 0, gid);
+    } else {
+        printf("Warning: Unable to create %s: %s\n", fwpath, strerror(errno));
+        remove(ppath);
     }
 }
 

@@ -28,17 +28,19 @@ int getfwversion(usbdevice* kb){
     if(!usbinput(kb, in_pkt) || in_pkt[0] != 0x0e || in_pkt[1] != 0x01)
         return -1;
     short vendor, product, version;
-    // Copy the vendor ID, product ID, and version from the firmware data
+    // Copy the vendor ID, product ID, version, and poll rate from the firmware data
     memcpy(&version, in_pkt + 8, 2);
     memcpy(&vendor, in_pkt + 12, 2);
     memcpy(&product, in_pkt + 14, 2);
+    uchar poll = in_pkt[16];
     // Print a warning if the vendor or product isn't what it should be
     if(vendor != kb->vendor)
         printf("Warning: Got vendor ID %04x (expected %04x)\n", vendor, kb->vendor);
     if(product != kb->product)
         printf("Warning: Got product ID %04x (expected %04x)\n", product, kb->product);
-    // Set firmware version
+    // Set firmware version and poll rate
     kb->fwversion = version;
+    kb->pollrate = (int)poll * 1000000;
     writefwnode(kb);
     return 0;
 }
@@ -67,7 +69,7 @@ int fwupdate(usbdevice* kb, const char* path){
     memcpy(&product, fwdata + 0x104, 2);
     memcpy(&version, fwdata + 0x106, 2);
     // Check against the actual device
-    if(vendor != V_CORSAIR || !((kb->model == 70 && product == P_K70) || (kb->model == 95 && product == P_K95))){
+    if(vendor != kb->vendor || product != kb->product){
         printf("Error: Firmware file %s doesn't match device (V: %04x P: %04x)\n", path, vendor, product);
         return FW_WRONGDEV;
     }

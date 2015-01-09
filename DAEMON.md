@@ -29,7 +29,7 @@ The `device` command, followed by the keyboard's serial number, specifies which 
 Keyboard layout
 ---------------
 
-ckb currently supports both US and UK keyboard layouts. By default, the keyboard layout will be detected from the system locale. You can override this by specifying `--layout=<country>` at the command-line. For instance, `ckb-daemon --layout=uk` makes the UK layout default regardless of locale. You can also change it after starting the daemon by issuing `layout <country>` to `/dev/input/ckb0/cmd` (without including any device ID). It can be overwritten on a per-keyboard basis by issuing the `layout` command to `ckb*/cmd`. Sending the command to `ckb0` does not change the layout of any already-connected keyboards, only the default layout.
+ckb currently supports several keyboard layouts: `de` (Germany), `fr` (France), `gb` (United Kingdom), `se` (Sweden), and `us` (United States). By default, the keyboard layout will be detected from the system locale. You can override this by specifying `--layout=<country>` at the command-line. For instance, `ckb-daemon --layout=gb` makes the UK layout default regardless of locale. You can also change it after starting the daemon by issuing `layout <country>` to `/dev/input/ckb0/cmd` (without including any device ID). It can be overwritten on a per-keyboard basis by issuing the `layout` command to `ckb*/cmd`. Sending the command to `ckb0` does not change the layout of any already-connected keyboards, only the default layout.
 
 Note that changing a keyboard's layout will reset all bindings and remove all macros associated with the keyboard. This is because not all keys are supported by all layouts (for instance, the UK has a separate hash key which is not present on the US layout). You can re-add the bindings manually after resetting the layout.
 
@@ -118,9 +118,7 @@ Note that the file can only reliably be read by one application: if you try to o
 
 `notify0` is always open and will not be affected by `notifyon`/`notifyoff` commands. By default, all notifications are printed to `notify0`. To print output to a different node, prefix your command with `@<node>`.
 
-Notifications are printed with one notification per line. If you are reading from `ckb0/notify*` you will see notifications for all keyboards, with `device <serial>` printed at the beginning of each line. Reading from `ckb1` or above will show you only notifications for that keyboard, with no serial number.
-
-Notification commands are as follows:
+Notifications are printed with one notification per line. Commands are as follows:
 - `notify <key>:on` or simply `notify <key>` enables notifications for a key. Each key will generate two notifications: `key +<key>` when the key is pressed, and `key -<key>` when it is released.
 - `notify <key>:off` turns notifications off for a key.
 
@@ -134,17 +132,13 @@ Notification commands are as follows:
 
 Additionally, the following notifications will be generated at `ckb0/notify*` regardless of circumstance:
 - `device <serial> added at <path>` whenever a device is connected.
-- `device <serial> removed from <path>` whenever a device is disconnected. These messages are only generated at `ckb0/notify*`, not at the node for the actual device.
-- `fps <rate>` when the FPS is changed.
-- `layout <country>` when the default layout is changed.
-
-Lastly, `layout <country>` will be printed to all `ckb*/notify*` when that keyboard's layout is changed.
+- `device <serial> removed from <path>` whenever a device is disconnected.
 
 Getting parameters
 ------------------
 
 Parameters can be retrieved using the `get` command. The data will be sent out as a notification. Generally, the syntax to get the data associated with a command is `get :<command>` (note the colon), and the associated data will be returned in the form of `<command> <data>`. The following data may be gotten:
-- `get :hello` simply prints `hello` to the notification nodes. This may be useful to determine whether or not the daemon is responding. It can only be issued to `ckb0` with no `device` command; in any other circumstance, it will be ignored.
+- `get :hello` simply prints `hello` to the notification node. This may be useful to determine whether or not the daemon is responding. It can only be issued to `ckb0` with no `device` command; in any other circumstance, it will be ignored.
 - `get :fps` gets the current frame rate. Returns `fps <rate>`. Like `:hello`, this will be ignored if it is issued to an actual keyboard.
 - `get :layout` gets the current keyboard layout. Returns `layout <country>`. This may be issued to `ckb0` to get the default layout or to any keyboard to get the keyboard's layout.
 - `get :mode` returns the current mode in the form of a `switch` command. (Note: Do not use this in a line containing a `mode` command or it will return the mode that you selected, rather than the keyboard's current mode.)
@@ -165,9 +159,10 @@ Firmware updates
 
 **WARNING:** Improper use of `fwupdate` may brick your device; use this command *at your own risk*. I accept no responsibility for broken keyboards.
 
-The latest K70 RGB firmware may be downloaded from here: http://www3.corsair.com/software/HID/K70RGB.zip
-
-The latest K95 RGB firmware may be downloaded from here: http://www3.corsair.com/software/HID/K95RGB.zip
+The latest RGB keyboard firmware may be found here:
+* K65: http://www3.corsair.com/software/HID/K65RGB.zip
+* K70: http://www3.corsair.com/software/HID/K70RGB.zip
+* K95: http://www3.corsair.com/software/HID/K95RGB.zip
 
 To update your keyboard's firmware, first extract the contents of the zip file and then issue the command `fwupdate /path/to/fw/file.bin` to the keyboard you wish to update. The path name must be absolute and must not include spaces. If it succeeded, you should see `fwupdate <path> ok` logged to the keyboard's notification node and then the device will disconnect and reconnect. If you see `fwupdate <path> invalid` it means that the firmware file was not valid for the device; more info may be available in the daemon's `stdout`. If you see `fwupdate <path> fail` it means that the file was valid but the update failed at a hardware level. The keyboard may disconnect/reconnect anyway or it may remain in operation.
 

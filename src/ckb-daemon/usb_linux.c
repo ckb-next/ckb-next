@@ -46,7 +46,6 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
 void* intreap(void* context){
     usbdevice* kb = context;
     int fd = kb->handle;
-    int rgb = HAS_FEATURES(kb, FEAT_RGB);
     while(1){
         struct usbdevfs_urb* urb = 0;
         if(ioctl(fd, USBDEVFS_REAPURB, &urb)){
@@ -64,7 +63,7 @@ void* intreap(void* context){
         if(urb){
             // Process input (if any)
             if(kb->INPUT_READY){
-                if(!rgb){
+                if(!HAS_FEATURES(kb, FEAT_RGB)){
                     // For non RGB keyboards, translate input first
                     switch(urb->endpoint){
                     case 0x81:

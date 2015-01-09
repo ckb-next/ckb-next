@@ -61,7 +61,8 @@ int _usbdequeue(usbdevice* kb, const char* file, int line);
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line);
 #define usbinput(kb, message) _usbinput(kb, message, __FILE_NOPATH__, __LINE__)
 
-// Try to perform a task, reset device if needed. Returns zero on success. The action will NOT be re-attempted if the reset is successful.
+// Tries to reset a USB device after a failed action. Returns 0 on success.
+// The previous action will NOT be re-attempted and the keyboard's USB queue will be cleared.
 int usb_tryreset(usbdevice* kb);
 
 #endif

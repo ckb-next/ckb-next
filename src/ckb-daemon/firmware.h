@@ -3,7 +3,7 @@
 
 #include "includes.h"
 
-// Gets firmware version from device. Returns 0 on success.
+// Gets firmware version and poll rate from device. Returns 0 on success.
 int getfwversion(usbdevice* kb);
 
 // Updates firmware with data at the specified path. Prints notifications on success/failure.

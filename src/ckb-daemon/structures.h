@@ -107,14 +107,15 @@ typedef struct {
 
 // Device features
 #define FEAT_RGB        1   // RGB backlighting?
-#define FEAT_BIND       2   // Rebindable keys?
-#define FEAT_NOTIFY     4   // Key notifications?
-#define FEAT_FWVERSION  8   // Has firmware version?
-#define FEAT_FWUPDATE   16  // Has firmware update?
+#define FEAT_POLLRATE   2   // Known poll rate?
+#define FEAT_BIND       4   // Rebindable keys?
+#define FEAT_NOTIFY     8   // Key notifications?
+#define FEAT_FWVERSION  16  // Has firmware version?
+#define FEAT_FWUPDATE   32  // Has firmware update?
 
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION)
-#define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_FWUPDATE)
+#define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)
 #define FEAT_STD_NRGB   (FEAT_COMMON)
 
 // Feature test (usbdevice* kb, int feat)
@@ -166,13 +167,15 @@ typedef struct {
     int queuecount;
     // Features (see F_ macros)
     int features;
-    // Vendor and product IDs
+    // Poll rate (ns), or -1 if unsupported
+    int pollrate;
+    // USB vendor and product IDs
     short vendor, product;
     // Firmware version
-    short fwversion;
+    ushort fwversion;
     // Indicator LED state
     uchar ileds;
-    // Keyboard type (70 or 95 for keyboards, -1 for root)
+    // Keyboard type (65, 70, or 95 for keyboards, -1 for root)
     char model;
     // Device name
     char name[NAME_LEN];

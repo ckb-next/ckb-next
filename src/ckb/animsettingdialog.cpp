@@ -1,11 +1,19 @@
 #include <cstdio>
+#include <QDial>
 #include <QDoubleSpinBox>
 #include <QLineEdit>
-#include <QSpinBox>
 #include "animsettingdialog.h"
 #include "ui_animsettingdialog.h"
 #include "colorbutton.h"
 #include "gradientbutton.h"
+
+// QDial shows angles upside down (180° = top, 0° = bottom), so flip it
+static inline int angleFlip(int angle){
+    if(angle <= 180)
+        return 180 - angle;
+    else
+       return 360 - (angle - 180);
+}
 
 AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     QDialog(parent),
@@ -16,6 +24,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     setWindowTitle(anim->scriptName() + " Animation");
     ui->animName->setText(anim->name());
     const AnimScript* script = anim->script();
+
+    connect(&angleDialMapper, SIGNAL(mapped(QString)), this, SLOT(angleDialChanged(QString)));
+    connect(&angleSpinnerMapper, SIGNAL(mapped(QString)), this, SLOT(angleSpinnerChanged(QString)));
 
     // Build settings UI
     int row = 1;
@@ -96,6 +107,23 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((GradientButton*)widget)->fromString(value.toString());
             colSpan = 3;
             break;
+        case AnimScript::Param::ANGLE:
+            widget = new QDial(this);
+            ((QDial*)widget)->setFixedSize(60, 60);
+            ((QDial*)widget)->setMinimum(0);
+            ((QDial*)widget)->setMaximum(360);
+            // this is NOT a typo...     ^
+            // Even though 360 shouldn't be valid, the wheel/arrow keys will lose 1 degree at the bottom unless 360 is set as max
+            ((QDial*)widget)->setSingleStep(5);
+            ((QDial*)widget)->setPageStep(15);
+            ((QDial*)widget)->setNotchTarget(6);
+            ((QDial*)widget)->setNotchesVisible(true);
+            ((QDial*)widget)->setWrapping(true);
+            ((QDial*)widget)->setInvertedAppearance(true);
+            ((QDial*)widget)->setValue(angleFlip(value.toInt()));
+            angleDialMapper.setMapping(widget, param.name);
+            connect(widget, SIGNAL(valueChanged(int)), &angleDialMapper, SLOT(map()));
+            break;
         case AnimScript::Param::STRING:
             widget = new QLineEdit(this);
             ((QLineEdit*)widget)->setText(value.toString());
@@ -119,10 +147,24 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 settingWidgets[param.name] = widget;
                 ui->settingsGrid->addWidget(widget, row, 3, 1, colSpan);
             }
+            // Angles additionally have a spin box
+            if(param.type == AnimScript::Param::ANGLE){
+                QSpinBox* spinner = new QSpinBox(this);
+                spinner->setMinimum(0);
+                spinner->setMaximum(359);
+                spinner->setWrapping(true);
+                spinner->setSuffix("°");
+                spinner->setValue(value.toInt());
+                angleSpinners[param.name] = spinner;
+                angleSpinnerMapper.setMapping(spinner, param.name);
+                connect(spinner, SIGNAL(valueChanged(int)), &angleSpinnerMapper, SLOT(map()));
+                ui->settingsGrid->addWidget(spinner, row, 4);
+                colSpan = 2;
+            }
             // Display postfix label on the right
             ui->settingsGrid->addWidget(new QLabel(postfix, this), row, 3 + colSpan, 1, 4 - colSpan);
             if(colSpan < 3 && !rSpacePlaced){
-                // Additionally add spacers to compress short elements to the left
+                // Add a spacer to compress short elements to the left
                 ui->settingsGrid->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum), row, 4 + colSpan);
                 rSpacePlaced = true;
             }
@@ -260,6 +302,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->sLicenseLabel->setText(script->license());
     ui->sDescLabel->setText(script->description());
 
+    // Lock dialog size
     setFixedSize(minimumSize());
 }
 
@@ -284,6 +327,16 @@ void AnimSettingDialog::updateStops(){
         settingWidgets.value("stop")->setEnabled(stopCheck->isChecked());
         settingWidgets.value("kpstop")->setEnabled(kpStopCheck->isChecked());
     }
+}
+
+void AnimSettingDialog::angleDialChanged(QString name){
+    // Dial changed; update spinner value
+    angleSpinners[name]->setValue(angleFlip(((QDial*)settingWidgets[name])->value()));
+}
+
+void AnimSettingDialog::angleSpinnerChanged(QString name){
+    // Spinner changed; update dial value
+    ((QDial*)settingWidgets[name])->setValue(angleFlip(angleSpinners[name]->value()));
 }
 
 void AnimSettingDialog::applySettings(){
@@ -338,9 +391,15 @@ void AnimSettingDialog::applySettings(){
             _anim->parameters[name] = widget->toString();
             break;
         }
+        case AnimScript::Param::ANGLE:{
+            QDial* widget = (QDial*)settingWidgets[name];
+            _anim->parameters[name] = angleFlip(widget->value());
+            break;
+        }
         case AnimScript::Param::STRING:{
             QLineEdit* widget = (QLineEdit*)settingWidgets[name];
             _anim->parameters[name] = widget->text();
+            break;
         }
         default:
             break;

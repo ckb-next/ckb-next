@@ -11,13 +11,16 @@
 #include "ui_kblightwidget.h"
 
 KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBase) :
-    QWidget(parent), devpath(path), cmdpath(path + "/cmd"), disconnect(false), notifyNumber(0), hwLoading(true), queueProfileSwitch(true), hwProfile(0), currentProfile(0), prevLight(0),
+    QWidget(parent), devpath(path), cmdpath(path + "/cmd"),
+    features("N/A"), firmware("N/A"), pollrate("N/A"),
+    disconnect(false),
+    notifyNumber(0), hwLoading(true), queueProfileSwitch(true), hwProfile(0), currentProfile(0), prevLight(0),
     ui(new Ui::KbWidget)
 {
     ui->setupUi(this);
 
-    // Get the model, serial number, and firmware version
-    QFile mpath(path + "/model"), spath(path + "/serial"), fpath(path + "/fwversion");
+    // Get the model, serial number, features, FW version (if available), and poll rate (if available) from /dev nodes
+    QFile mpath(path + "/model"), spath(path + "/serial"), ftpath(path + "/features"), fwpath(path + "/fwversion"), ppath(path + "/pollrate");
     if(mpath.open(QIODevice::ReadOnly)){
         model = mpath.read(100);
         model = model.remove("Corsair").remove("Gaming Keyboard").remove("Keyboard").remove("Bootloader").trimmed();
@@ -29,15 +32,26 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
         spath.close();
         ui->serialLabel->setText(serial);
     }
-    if(fpath.open(QIODevice::ReadOnly)){
-        firmware = fpath.read(100);
+    if(ftpath.open(QIODevice::ReadOnly)){
+        features = ftpath.read(1000);
+        features = features.trimmed();
+        ftpath.close();
+    }
+    if(features.contains("fwversion") && fwpath.open(QIODevice::ReadOnly)){
+        firmware = fwpath.read(100);
         firmware = QString::number(firmware.trimmed().toInt() / 100., 'f', 2);
-        fpath.close();
+        fwpath.close();
         ui->fwLabel->setText(firmware);
+    }
+    if(features.contains("pollrate") && ppath.open(QIODevice::ReadOnly)){
+        pollrate = ppath.read(100);
+        pollrate = pollrate.trimmed();
+        ppath.close();
+        ui->pollLabel->setText(pollrate);
     }
 
     prefsPath = prefsBase + "/" + serial;
-    hwModeCount = (model.indexOf("K95") >= 0) ? 3 : 1;
+    hwModeCount = (features.contains("k95")) ? 3 : 1;
 
     // Load profiles from stored settings
     QSettings settings;
@@ -297,7 +311,7 @@ void KbWidget::setCurrentMode(KbProfile* profile, int mode){
 }
 
 KeyMap KbWidget::getKeyMap(){
-    return KeyMap::standard(model.indexOf("K95") >= 0 ? KeyMap::K95 : KeyMap::K70, (KeyMap::Layout)ui->layoutBox->currentIndex());
+    return KeyMap::standard(features.contains("k95") ? KeyMap::K95 : KeyMap::K70, (KeyMap::Layout)ui->layoutBox->currentIndex());
 }
 
 void KbWidget::getCmd(QFile& file){
@@ -459,7 +473,7 @@ void KbWidget::frameUpdate(){
     // Get system mute state
     muteState mute = getMuteState();
     if(mute == UNKNOWN)
-        mute = UNMUTED;
+        mute = MUTED;
     // If the mode changed, close the old one first
     KbLight* light = currentLight();
     if(!light){

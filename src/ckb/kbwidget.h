@@ -19,9 +19,8 @@ public:
     ~KbWidget();
 
     QString devpath, cmdpath, notifypath;
-    QString serial;
-    QString model;
-    QString firmware;
+    QString model, serial;
+    QString features, firmware, pollrate;
 
     bool disconnect;
 

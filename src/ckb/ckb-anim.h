@@ -35,7 +35,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define CKB_CONTAINER(macro) do { macro } while(0)
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 #ifndef TRUE
 #define TRUE 1
@@ -48,6 +51,8 @@
 #define CKB_UP      0
 
 // * Info output helpers
+
+#define CKB_CONTAINER(macro) do { macro } while(0)
 
 // Plugin GUID
 #define CKB_GUID(guid)                                              CKB_CONTAINER( printf("guid "); printurl(guid); printf("\n"); )
@@ -71,6 +76,7 @@
 #define CKB_PARAM_ARGB(name, prefix, postfix, a, r, g, b)           CKB_PARAM("argb", name, prefix, postfix, printf("%02x%02x%02x%02x", (unsigned char)(a), (unsigned char)(r), (unsigned char)(g), (unsigned char)(b)))
 #define CKB_PARAM_GRADIENT(name, prefix, postfix, default)          CKB_PARAM("gradient", name, prefix, postfix, printurl(default))
 #define CKB_PARAM_AGRADIENT(name, prefix, postfix, default)         CKB_PARAM("agradient", name, prefix, postfix, printurl(default))
+#define CKB_PARAM_ANGLE(name, prefix, postfix, default)             CKB_PARAM("angle", name, prefix, postfix, printf("%ld", (long)(default)))
 #define CKB_PARAM_STRING(name, prefix, postfix, default)            CKB_PARAM("string", name, prefix, postfix, printurl(default))
 #define CKB_PARAM_LABEL(name, text)                                 CKB_PARAM("label", name, text, "", )
 
@@ -117,7 +123,12 @@
 #define CKB_PARSE_ARGB(param_name, a_ptr, r_ptr, g_ptr, b_ptr)      if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx%2hhx", a_ptr, r_ptr, g_ptr, b_ptr) == 4)
 #define CKB_PARSE_GRADIENT(param_name, gradient_ptr)                if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 0))
 #define CKB_PARSE_AGRADIENT(param_name, gradient_ptr)               if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 1))
+#define CKB_PARSE_ANGLE(param_name, value_ptr)                      if(!strcmp(name, param_name) && sscanf(value, "%ld", value_ptr) == 1)
 #define CKB_PARSE_STRING(param_name)                                if(!strcmp(name, param_name))
+
+// Converts an angle from ckb output to the correct angle for math functions.
+// Input: [0, 359], positive direction CW. Output: [0, 2π), positive direction CCW.
+#define CKB_REAL_ANGLE(angle)           fmod((-(angle) + 90.) * M_PI / 180. + M_PI * 2., M_PI * 2.)
 
 // Key definition
 #define CKB_KEYNAME_MAX 12

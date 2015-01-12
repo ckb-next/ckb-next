@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Gradient");
-    CKB_VERSION("0.4");
+    CKB_VERSION("0.5");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{54DD2975-E192-457D-BCFC-D912A24E33B4}");
@@ -30,7 +30,7 @@ void ckb_init(ckb_runctx* context){
     unsigned count = context->keycount;
     target = malloc(count * sizeof(float));
     for(unsigned i = 0; i < count; i++)
-        target[i] = 1.f;
+        target[i] = -1.f;
 }
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
@@ -55,9 +55,12 @@ void ckb_start(ckb_runctx* context){
 int ckb_frame(ckb_runctx* context, double delta){
     unsigned count = context->keycount;
     for(unsigned i = 0; i < count; i++){
-        float phase = (target[i] += delta);
-        if(phase > 1.f)
-            phase = 1.f;
+        float phase = target[i];
+        if(phase > 1.f || phase < 0.f){
+            phase = -1.f;
+            continue;
+        }
+        target[i] = (phase += delta);
         ckb_key* key = context->keys + i;
         float a, r, g, b;
         ckb_grad_color(&a, &r, &g, &b, &animcolor, phase * 100.);

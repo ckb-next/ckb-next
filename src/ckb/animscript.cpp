@@ -147,6 +147,8 @@ bool AnimScript::load(){
                 type = Param::GRADIENT;
             else if(sType == "agradient")
                 type = Param::AGRADIENT;
+            else if(sType == "angle")
+                type = Param::ANGLE;
             else if(sType == "string")
                 type = Param::STRING;
             else if(sType == "label")

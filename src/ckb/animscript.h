@@ -25,6 +25,7 @@ public:
             ARGB,
             GRADIENT,
             AGRADIENT,
+            ANGLE,
             STRING,
             LABEL
         };

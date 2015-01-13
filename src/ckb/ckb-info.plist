@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIconFile</key>
-	<string>ckb-icon.icns</string>
+	<string>ckb-logo.icns</string>
 	<key>LSUIElement</key>
 	<true/>
 </dict>

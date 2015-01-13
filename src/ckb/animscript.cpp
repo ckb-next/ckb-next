@@ -28,9 +28,9 @@ AnimScript::~AnimScript(){
 
 QString AnimScript::path(){
 #ifdef __APPLE__
-    return QDir(QApplication::applicationDirPath() + "../../../../").absoluteFilePath("animations");
+    return QDir(QApplication::applicationDirPath() + "/../Resources").absoluteFilePath("ckb-animations");
 #else
-    return QDir().absoluteFilePath("animations");
+    return QDir().absoluteFilePath("ckb-animations");
 #endif
 }
 

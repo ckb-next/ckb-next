@@ -40,9 +40,9 @@ OSX instructions
 
 Install the latest version of Xcode from the App Store. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
-Open ckb.pro in Qt Creator. You should be prompted to configure the project (the default settings should work). Once it's finished loading the project, press `Cmd+B` or select `Build > Build Project "ckb"` from the menu bar. The binaries should be placed in a newly-created `bin` directory assuming they compile successfully. Exit Qt Creator.
+Open ckb.pro in Qt Creator. You should be prompted to configure the project (make sure the "Desktop" configuration is selected and not iOS). Once it's finished loading the project, press `Cmd+B` or select `Build > Build Project "ckb"` from the menu bar. When it'd done, you should see a newly-created `ckb.app` application in the project directory. Exit Qt Creator.
 
-`ckb-daemon` needs to be run as root. Open the `bin` directory in a Terminal window and run `sudo ./ckb-daemon`. Then open `ckb.app` as a normal application to start the user interface.
+Before launching ckb, the `ckb-daemon` program needs to be run as root. Open the ckb directory in a Terminal window and run `sudo ckb.app/Contents/Resources/ckb-daemon`. Then open `ckb.app` as a normal application to start the user interface.
 
 If you've rebound your modifier keys in System Preferences, those changes won't work anymore. You have to switch them using ckb-daemon's `bind` command. For instance, to switch Cmd and Ctrl, run: `echo bind lctrl:lwin lwin:lctrl rctrl:rwin rwin:rctrl > /tmp/ckb1/cmd`. This functionality is coming to the user interface soon.
 

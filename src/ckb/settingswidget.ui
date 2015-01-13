@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="versionLabel">
      <property name="font">
       <font>
        <weight>75</weight>
@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>ckb v0.0.25</string>
+      <string>ckb</string>
      </property>
     </widget>
    </item>

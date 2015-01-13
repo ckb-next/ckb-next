@@ -11,7 +11,11 @@ CONFIG   += debug_and_release
 
 TEMPLATE = app
 
-DESTDIR = $$PWD/../../bin/animations
+macx {
+	DESTDIR = $$PWD/../../ckb.app/Contents/Resources/ckb-animations
+} else {
+	DESTDIR = $$PWD/../../bin/ckb-animations
+}
 
 SOURCES += \
 	main.c

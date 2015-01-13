@@ -8,6 +8,6 @@ SUBDIRS = \
 	src/ckb-gradient \
 	src/ckb-pinwheel \
 	src/ckb-random \
-    src/ckb-rain
+	src/ckb-rain
 
 QMAKE_MAC_SDK = macosx10.10

@@ -15,6 +15,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     ui(new Ui::SettingsWidget)
 {
     ui->setupUi(this);
+    ui->versionLabel->setText("ckb " CKB_VERSION_STR);
 
     // Try to get frame rate from ckb-daemon
     QFile cmd(devpath.arg(0) + "/cmd");

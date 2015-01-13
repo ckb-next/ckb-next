@@ -1,4 +1,5 @@
 bin/
+ckb.app/
 .DS_Store
 ._*
 *.o

@@ -25,6 +25,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->animName->setText(anim->name());
     const AnimScript* script = anim->script();
 
+    connect(&updateMapper, SIGNAL(mapped(QString)), this, SLOT(updateParam(QString)));
     connect(&angleDialMapper, SIGNAL(mapped(QString)), this, SLOT(angleDialChanged(QString)));
     connect(&angleSpinnerMapper, SIGNAL(mapped(QString)), this, SLOT(angleSpinnerChanged(QString)));
 
@@ -44,7 +45,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 || param.name == "repeat" || param.name == "kprepeat"
                 || param.name == "stop" || param.name == "kpstop" || param.name == "kprelease")
             continue;
-        QVariant value = anim->parameters.value(param.name);
+        QVariant value = anim->parameter(param.name);
         // Display prefix label on the left (except for booleans and labels)
         if(param.type != AnimScript::Param::BOOL && param.type != AnimScript::Param::LABEL)
             ui->settingsGrid->addWidget(new QLabel(param.prefix, this), row, 1);
@@ -57,6 +58,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             widget = new QCheckBox(param.prefix, this);
             ((QCheckBox*)widget)->setChecked(value.toBool());
             colSpan = 4;
+            connect(widget, SIGNAL(stateChanged(int)), &updateMapper, SLOT(map()));
             break;
         case AnimScript::Param::LONG:
             widget = new QSpinBox(this);
@@ -67,6 +69,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 ((QSpinBox*)widget)->setSuffix(postfix);
                 postfix = "";
             }
+            connect(widget, SIGNAL(valueChanged(int)), &updateMapper, SLOT(map()));
             break;
         case AnimScript::Param::DOUBLE:
             widget = new QDoubleSpinBox(this);
@@ -78,11 +81,13 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 ((QDoubleSpinBox*)widget)->setSuffix(postfix);
                 postfix = "";
             }
+            connect(widget, SIGNAL(valueChanged(double)), &updateMapper, SLOT(map()));
             break;
         case AnimScript::Param::RGB:
             widget = new ColorButton(this);
             ((ColorButton*)widget)->color(QColor("#" + value.toString()));
             colSpan = 3;
+            connect(widget, SIGNAL(colorChanged(QColor)), &updateMapper, SLOT(map()));
             break;
         case AnimScript::Param::ARGB:{
             widget = new ColorButton(this, true);
@@ -95,17 +100,20 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 color = "#" + val;
             ((ColorButton*)widget)->color(color);
             colSpan = 3;
+            connect(widget, SIGNAL(colorChanged(QColor)), &updateMapper, SLOT(map()));
             break;
         }
         case AnimScript::Param::GRADIENT:
             widget = new GradientButton(this);
             ((GradientButton*)widget)->fromString(value.toString());
             colSpan = 3;
+            connect(widget, SIGNAL(gradientChanged()), &updateMapper, SLOT(map()));
             break;
         case AnimScript::Param::AGRADIENT:
             widget = new GradientButton(this, true);
             ((GradientButton*)widget)->fromString(value.toString());
             colSpan = 3;
+            connect(widget, SIGNAL(gradientChanged()), &updateMapper, SLOT(map()));
             break;
         case AnimScript::Param::ANGLE:
             widget = new QDial(this);
@@ -128,6 +136,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             widget = new QLineEdit(this);
             ((QLineEdit*)widget)->setText(value.toString());
             colSpan = 3;
+            connect(widget, SIGNAL(textEdit(const QString&)), &updateMapper, SLOT(map()));
             break;
         case AnimScript::Param::LABEL:
             widget = new QLabel(this);
@@ -137,6 +146,8 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         default:
             break;
         }
+        if(widget)
+            updateMapper.setMapping(widget, param.name);
         if(param.type == AnimScript::Param::BOOL || param.type == AnimScript::Param::LABEL){
             // Boolean values are placed on the left with no prefix or postfix
             settingWidgets[param.name] = widget;
@@ -177,7 +188,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->settingsGrid->addWidget(hLine(), row++, 0, 1, 7);
     if(script->hasParam("duration")){
         // Show duration spinner (if allowed)
-        lastDuration = anim->parameters.value("duration").toDouble();
+        lastDuration = anim->parameter("duration").toDouble();
         ui->settingsGrid->addWidget(new QLabel("Duration:", this), row, 1);
         QDoubleSpinBox* spinner = new QDoubleSpinBox(this);
         spinner->setDecimals(1);
@@ -191,15 +202,20 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     }
     // Show boxes for start with mode/with keypress
     QCheckBox* check = new QCheckBox("Start with mode", this);
-    check->setChecked(anim->parameters.value("trigger").toBool());
+    check->setChecked(anim->parameter("trigger").toBool());
     ui->settingsGrid->addWidget(check, row, 3, 1, 4);
     settingWidgets["trigger"] = check;
+    connect(check, SIGNAL(stateChanged(int)), &updateMapper, SLOT(map()));
+    updateMapper.setMapping(check, "trigger");
     row++;
     check = new QCheckBox("Start with key press", this);
-    check->setChecked(anim->parameters.value("kptrigger").toBool());
+    check->setChecked(anim->parameter("kptrigger").toBool());
     ui->settingsGrid->addWidget(check, row, 3, 1, 4);
     settingWidgets["kptrigger"] = check;
+    connect(check, SIGNAL(stateChanged(int)), &updateMapper, SLOT(map()));
+    updateMapper.setMapping(check, "kptrigger");
     row++;
+
     // Add horizontal spacer to compress content to left
     ui->settingsGrid->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding), 0, 6);
     // Add vertical spacer to compress content to top
@@ -207,48 +223,52 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
 
     // Add timing fields
     settingWidgets["delay"] = ui->delayBox;
-    ui->delayBox->setValue(anim->parameters.value("delay").toDouble());
+    ui->delayBox->setValue(anim->parameter("delay").toDouble());
     settingWidgets["kpdelay"] = ui->kpDelayBox;
-    ui->kpDelayBox->setValue(anim->parameters.value("kpdelay").toDouble());
-    ui->kpReleaseBox->setChecked(anim->parameters.value("kprelease").toBool());
+    ui->kpDelayBox->setValue(anim->parameter("kpdelay").toDouble());
     settingWidgets["kprelease"] = ui->kpReleaseBox;
-    if(anim->parameters.contains("repeat")){
+    ui->kpReleaseBox->setChecked(anim->parameter("kprelease").toBool());
+    if(anim->hasParameter("repeat")){
         hasRepeat = true;
         settingWidgets["repeat"] = ui->repeatBox;
+        ui->repeatBox->setValue(anim->parameter("repeat").toDouble());
         settingWidgets["kprepeat"] = ui->kpRepeatBox;
-        ui->repeatBox->setValue(anim->parameters.value("repeat").toDouble());
-        ui->kpRepeatBox->setValue(anim->parameters.value("kprepeat").toDouble());
-        // If repeat enabled, add repeat counts as integer values
-        QSpinBox* spinner;
+        ui->kpRepeatBox->setValue(anim->parameter("kprepeat").toDouble());
+        // If repeat is enabled, add repeat counts as integer values
+        // Mode repeat
         ui->timeGrid->addWidget(new QLabel("Repeat:", this), 4, 1);
-        spinner = new QSpinBox(this);
+        QSpinBox* spinner = new QSpinBox(this);
         spinner->setMinimum(0);
         spinner->setMaximum(1000000);
-        spinner->setValue(anim->parameters.value("stop").toInt());
+        spinner->setValue(anim->parameter("stop").toInt());
         settingWidgets["stop"] = spinner;
+        connect(spinner, SIGNAL(valueChanged(int)), &updateMapper, SLOT(map()));
+        updateMapper.setMapping(spinner, "stop");
         ui->timeGrid->addWidget(spinner, 4, 3);
         ui->timeGrid->addWidget(new QLabel("times", this), 4, 4);
-
+        // KP repeat
         ui->timeGrid->addWidget(new QLabel("Repeat:", this), 10, 1);
         spinner = new QSpinBox(this);
         spinner->setMinimum(0);
         spinner->setMaximum(1000000);
-        spinner->setValue(anim->parameters.value("kpstop").toInt());
+        spinner->setValue(anim->parameter("kpstop").toInt());
         settingWidgets["kpstop"] = spinner;
+        connect(spinner, SIGNAL(valueChanged(int)), &updateMapper, SLOT(map()));
+        updateMapper.setMapping(spinner, "kpstop");
         ui->timeGrid->addWidget(spinner, 10, 3);
         ui->timeGrid->addWidget(new QLabel("times", this), 10, 4);
-
+        // Infinite repeat toggles
         stopCheck = new QCheckBox("Forever", this);
-        stopCheck->setChecked(anim->parameters.value("stop").toInt() < 0);
+        stopCheck->setChecked(anim->parameter("stop").toInt() < 0);
         ui->timeGrid->addWidget(stopCheck, 4, 5);
         kpStopCheck = new QCheckBox("Forever", this);
         connect(stopCheck, SIGNAL(clicked()), this, SLOT(updateStops()));
-        kpStopCheck->setChecked(anim->parameters.value("kpstop").toInt() < 0);
+        kpStopCheck->setChecked(anim->parameter("kpstop").toInt() < 0);
         ui->timeGrid->addWidget(kpStopCheck, 10, 5);
         connect(kpStopCheck, SIGNAL(clicked()), this, SLOT(updateStops()));
     } else {
         hasRepeat = false;
-        // Hide repeat fields if not supported
+        // If repeat is not enabled, hide repeat-related fields
         ui->repeatBox->setHidden(true);
         ui->repeatLabel->setHidden(true);
         ui->repeatLabel_2->setHidden(true);
@@ -256,33 +276,37 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         ui->kpRepeatLabel->setHidden(true);
         ui->kpRepeatLabel_2->setHidden(true);
         // Add stop times as double values
-        QDoubleSpinBox* spinner;
-        spinner = new QDoubleSpinBox(this);
+        // Stop time
+        QDoubleSpinBox* spinner = new QDoubleSpinBox(this);
         spinner->setDecimals(1);
         spinner->setMinimum(0.1);
         spinner->setMaximum(24. * 60. * 60.);
-        double stop = anim->parameters.value("stop").toDouble();
+        double stop = anim->parameter("stop").toDouble();
         if(stop <= 0.)
             spinner->setValue(lastDuration);
         else
             spinner->setValue(stop);
         settingWidgets["stop"] = spinner;
+        connect(spinner, SIGNAL(valueChanged(double)), &updateMapper, SLOT(map()));
+        updateMapper.setMapping(spinner, "stop");
         ui->timeGrid->addWidget(spinner, 4, 3);
         ui->timeGrid->addWidget(new QLabel("seconds", this), 4, 4);
-
+        // KP stop time
         spinner = new QDoubleSpinBox(this);
         spinner->setDecimals(1);
         spinner->setMinimum(0.1);
         spinner->setMaximum(24. * 60. * 60.);
-        double kpstop = anim->parameters.value("kpstop").toDouble();
+        double kpstop = anim->parameter("kpstop").toDouble();
         if(kpstop <= 0.)
             spinner->setValue(lastDuration);
         else
             spinner->setValue(kpstop);
         settingWidgets["kpstop"] = spinner;
+        connect(spinner, SIGNAL(valueChanged(double)), &updateMapper, SLOT(map()));
+        updateMapper.setMapping(spinner, "kpstop");
         ui->timeGrid->addWidget(spinner, 10, 3);
         ui->timeGrid->addWidget(new QLabel("seconds", this), 10, 4);
-
+        // Infinite run toggles
         stopCheck = new QCheckBox("Stop after:", this);
         stopCheck->setChecked(stop > 0.);
         ui->timeGrid->addWidget(stopCheck, 4, 1);
@@ -315,6 +339,7 @@ void AnimSettingDialog::newDuration(double duration){
     if(kpRep && kpRep->value() == lastDuration)
         kpRep->setValue(duration);
     lastDuration = duration;
+    updateParam("duration");
 }
 
 void AnimSettingDialog::updateStops(){
@@ -327,85 +352,83 @@ void AnimSettingDialog::updateStops(){
         settingWidgets.value("stop")->setEnabled(stopCheck->isChecked());
         settingWidgets.value("kpstop")->setEnabled(kpStopCheck->isChecked());
     }
+    updateParam("stop");
+    updateParam("kpstop");
 }
 
 void AnimSettingDialog::angleDialChanged(QString name){
     // Dial changed; update spinner value
     angleSpinners[name]->setValue(angleFlip(((QDial*)settingWidgets[name])->value()));
+    updateParam(name);
 }
 
 void AnimSettingDialog::angleSpinnerChanged(QString name){
     // Spinner changed; update dial value
     ((QDial*)settingWidgets[name])->setValue(angleFlip(angleSpinners[name]->value()));
+    updateParam(name);
 }
 
-void AnimSettingDialog::applySettings(){
-    // Apply all settings entered on the UI
-    const AnimScript* script = _anim->script();
-    QMapIterator<QString, QWidget*> i(settingWidgets);
-    while(i.hasNext()){
-        i.next();
-        const QString& name = i.key();
-        // stop and kpstop have defeat switches
-        if((name == "stop" && stopCheck->isChecked() == hasRepeat)
-                || (name == "kpstop" && kpStopCheck->isChecked() == hasRepeat)){
-            _anim->parameters[name] = -1;
-            continue;
-        }
-        // Read value based on type
-        switch(script->param(name).type){
-        case AnimScript::Param::BOOL:{
-            QCheckBox* widget = (QCheckBox*)settingWidgets[name];
-            _anim->parameters[name] = (int)widget->isChecked();
-            break;
-        }
-        case AnimScript::Param::LONG:{
-            QSpinBox* widget = (QSpinBox*)settingWidgets[name];
-            _anim->parameters[name] = widget->value();
-            break;
-        }
-        case AnimScript::Param::DOUBLE:{
-            QDoubleSpinBox* widget = (QDoubleSpinBox*)settingWidgets[name];
-            _anim->parameters[name] = widget->value();
-            break;
-        }
-        case AnimScript::Param::RGB:{
-            ColorButton* widget = (ColorButton*)settingWidgets[name];
-            QColor color = widget->color();
-            char hex[7];
-            snprintf(hex, sizeof(hex), "%02x%02x%02x", color.red(), color.green(), color.blue());
-            _anim->parameters[name] = QString(hex);
-            break;
-        }
-        case AnimScript::Param::ARGB:{
-            ColorButton* widget = (ColorButton*)settingWidgets[name];
-            QColor color = widget->color();
-            char hex[9];
-            snprintf(hex, sizeof(hex), "%02x%02x%02x%02x", color.alpha(), color.red(), color.green(), color.blue());
-            _anim->parameters[name] = QString(hex);
-            break;
-        }
-        case AnimScript::Param::GRADIENT:
-        case AnimScript::Param::AGRADIENT:{
-            GradientButton* widget = (GradientButton*)settingWidgets[name];
-            _anim->parameters[name] = widget->toString();
-            break;
-        }
-        case AnimScript::Param::ANGLE:{
-            QDial* widget = (QDial*)settingWidgets[name];
-            _anim->parameters[name] = angleFlip(widget->value());
-            break;
-        }
-        case AnimScript::Param::STRING:{
-            QLineEdit* widget = (QLineEdit*)settingWidgets[name];
-            _anim->parameters[name] = widget->text();
-            break;
-        }
-        default:
-            break;
-        }
+void AnimSettingDialog::updateParam(QString name){
+    if(!settingWidgets.contains(name))
+        return;
+    // stop and kpstop have defeat switches
+    if((name == "stop" && stopCheck->isChecked() == hasRepeat)
+            || (name == "kpstop" && kpStopCheck->isChecked() == hasRepeat)){
+        _anim->parameter(name, -1);
+        return;
     }
-    _anim->reInit();
+    // Read value based on type
+    switch(_anim->script()->param(name).type){
+    case AnimScript::Param::BOOL:{
+        QCheckBox* widget = (QCheckBox*)settingWidgets[name];
+        _anim->parameter(name, (int)widget->isChecked());
+        break;
+    }
+    case AnimScript::Param::LONG:{
+        QSpinBox* widget = (QSpinBox*)settingWidgets[name];
+        _anim->parameter(name, widget->value());
+        break;
+    }
+    case AnimScript::Param::DOUBLE:{
+        QDoubleSpinBox* widget = (QDoubleSpinBox*)settingWidgets[name];
+        _anim->parameter(name, widget->value());
+        break;
+    }
+    case AnimScript::Param::RGB:{
+        ColorButton* widget = (ColorButton*)settingWidgets[name];
+        QColor color = widget->color();
+        char hex[7];
+        snprintf(hex, sizeof(hex), "%02x%02x%02x", color.red(), color.green(), color.blue());
+        _anim->parameter(name, QString(hex));
+        break;
+    }
+    case AnimScript::Param::ARGB:{
+        ColorButton* widget = (ColorButton*)settingWidgets[name];
+        QColor color = widget->color();
+        char hex[9];
+        snprintf(hex, sizeof(hex), "%02x%02x%02x%02x", color.alpha(), color.red(), color.green(), color.blue());
+        _anim->parameter(name, QString(hex));
+        break;
+    }
+    case AnimScript::Param::GRADIENT:
+    case AnimScript::Param::AGRADIENT:{
+        GradientButton* widget = (GradientButton*)settingWidgets[name];
+        _anim->parameter(name, widget->toString());
+        break;
+    }
+    case AnimScript::Param::ANGLE:{
+        QDial* widget = (QDial*)settingWidgets[name];
+        _anim->parameter(name, angleFlip(widget->value()));
+        break;
+    }
+    case AnimScript::Param::STRING:{
+        QLineEdit* widget = (QLineEdit*)settingWidgets[name];
+        _anim->parameter(name, widget->text());
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 QString AnimSettingDialog::name() const {
@@ -421,4 +444,24 @@ QFrame* AnimSettingDialog::hLine(){
     frame->setFrameShape(QFrame::HLine);
     frame->setFrameShadow(QFrame::Sunken);
     return frame;
+}
+
+void AnimSettingDialog::on_delayBox_valueChanged(double arg1){
+    updateParam("delay");
+}
+
+void AnimSettingDialog::on_repeatBox_valueChanged(double arg1){
+    updateParam("repeat");
+}
+
+void AnimSettingDialog::on_kpDelayBox_valueChanged(double arg1){
+    updateParam("kpdelay");
+}
+
+void AnimSettingDialog::on_kpRepeatBox_valueChanged(double arg1){
+    updateParam("kprepeat");
+}
+
+void AnimSettingDialog::on_kpReleaseBox_stateChanged(int arg1){
+    updateParam("kprelease");
 }

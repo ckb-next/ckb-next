@@ -102,16 +102,16 @@ int GradientDialogWidget::moveCurrent(int to){
 void GradientDialogWidget::setCurrentColor(const QColor& color){
     if(_current < 0 || selected.isValid())
         return;
+    QRgb rgb = _colors.value(_current).rgb();
     _colors[_current] = color;
-    // If any points follow with the same color but zero opacity, change them to match
-    QRgb rgb = color.rgb();
+    // If any points follow with the same color but different opacity, change them to match
     QMutableMapIterator<int, QColor> i(_colors);
     while(i.hasNext()){
         i.next();
         if(i.key() <= _current)
             continue;
         QColor& value = i.value();
-        if(value.rgb() != rgb || value.alpha() != 0)
+        if(value.rgb() != rgb)
             break;
         int alpha = value.alpha();
         value = color;

@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Random");
-    CKB_VERSION("0.4");
+    CKB_VERSION("0.6");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{22418DA4-A181-4B93-A4D3-03682BA283D2}");
@@ -19,6 +19,7 @@ void ckb_info(){
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NONE);
     CKB_TIMEMODE(CKB_TIME_DURATION);
+    CKB_LIVEPARAMS(TRUE);
     CKB_REPEAT(FALSE);
     CKB_DEFAULT_DURATION(1.);
     CKB_DEFAULT_TRIGGER(TRUE);

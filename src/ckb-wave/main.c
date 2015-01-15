@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Wave");
-    CKB_VERSION("0.5");
+    CKB_VERSION("0.6");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{E0BBA19E-C328-4C0E-8E3C-A06D5722B4FC}");
@@ -19,6 +19,7 @@ void ckb_info(){
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_POSITION);
     CKB_TIMEMODE(CKB_TIME_DURATION);
+    CKB_LIVEPARAMS(TRUE);
     CKB_PREEMPT(TRUE);
     CKB_DEFAULT_DURATION(2.);
     CKB_DEFAULT_TRIGGER(TRUE);
@@ -93,7 +94,7 @@ void anim_add(float x, float y){
         anim[i].active = 1;
         anim[i].x = x;
         anim[i].y = y;
-        anim[i].curx = 0.f;
+        anim[i].curx = symmetric ? -animlength * width : 0.f;
         return;
     }
 }
@@ -130,14 +131,12 @@ int ckb_frame(ckb_runctx* context, double delta){
                 // Translate and rotate the key position into the animation's coordinate system
                 float x = key->x - anim[i].x, y = key->y - anim[i].y;
                 float distance = anim[i].curx - (x * cos(angle) - y * sin(angle));
-                if(distance < length){
-                    if(symmetric)
-                        distance = fabs(distance);
-                    if(distance >= 0. && distance < length){
-                        float a, r, g, b;
-                        ckb_grad_color(&a, &r, &g, &b, &animcolor, distance / length * 100.);
-                        ckb_alpha_blend(key, a, r, g, b);
-                    }
+                if(symmetric)
+                    distance = fabs(distance);
+                if(distance < length && distance >= 0.){
+                    float a, r, g, b;
+                    ckb_grad_color(&a, &r, &g, &b, &animcolor, distance / length * 100.);
+                    ckb_alpha_blend(key, a, r, g, b);
                 }
             }
         }

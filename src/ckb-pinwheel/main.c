@@ -3,7 +3,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Pinwheel");
-    CKB_VERSION("0.4");
+    CKB_VERSION("0.6");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{07551A90-D97A-4DD0-A770-E9E280A90891}");
@@ -17,6 +17,7 @@ void ckb_info(){
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NONE);
     CKB_TIMEMODE(CKB_TIME_DURATION);
+    CKB_LIVEPARAMS(TRUE);
     CKB_REPEAT(FALSE);
     CKB_DEFAULT_DURATION(2.);
     CKB_DEFAULT_TRIGGER(TRUE);

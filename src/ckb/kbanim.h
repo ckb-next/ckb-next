@@ -34,9 +34,16 @@ public:
     inline const QStringList& keys() { return _keys; }
     void keys(const QStringList& newKeys);
 
-    // Parameters (name -> value)
-    QMap<QString, QVariant> parameters;
-    // Re-initialize animation after changing parameters
+    // Gets a parameter value
+    inline bool hasParameter(const QString& name) const { return _parameters.contains(name); }
+    inline QVariant parameter(const QString& name) const { return _parameters.value(name); }
+    // Sets a parameter value. Parameter changes are not permanent until commited.
+    void parameter(const QString& name, const QVariant& value);
+    // Commits unsaved parameters
+    void commitParams();
+    // Discards unsaved parameters
+    void resetParams();
+    // Re-initialize the animation. Useful for doing a hard restart.
     void reInit();
 
     // Begins or re-triggers the animation
@@ -63,12 +70,25 @@ public:
     const QString& scriptName() { return _scriptName; }
 
 private:
+    // Script (null if not loaded)
     AnimScript* _script;
+    // GUID and name (duplicated here in case the load fails)
     QUuid _scriptGuid;
     QString _scriptName;
 
     KeyMap _map;
     QStringList _keys;
+    // Committed parameters
+    QMap<QString, QVariant> _parameters;
+    // Uncommitted parameters
+    QMap<QString, QVariant> _tempParameters;
+
+    // Effective parameters (including unsaved)
+    QMap<QString, QVariant> effectiveParams();
+    // Updates parameters to animation if live params are enabled
+    void updateParams();
+
+    // Repeat/stop info (set from parameters)
     QString repeatKey;
     quint64 repeatTime, kpRepeatTime, stopTime, kpStopTime;
     int repeatMsec, kpRepeatMsec;

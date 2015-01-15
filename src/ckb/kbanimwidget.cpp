@@ -230,10 +230,13 @@ void KbAnimWidget::on_propertyButton_clicked(){
     // Present animation property popup
     AnimSettingDialog dialog(this, current);
     dialog.exec();
-    if(dialog.result() != QDialog::Accepted)
+    if(dialog.result() != QDialog::Accepted){
+        current->resetParams();
         return;
+    }
     // Apply settings and restart all animations
-    dialog.applySettings();
+    current->commitParams();
+    current->reInit();
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, light->animList){
         anim->stop();

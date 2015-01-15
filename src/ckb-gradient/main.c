@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Gradient");
-    CKB_VERSION("0.5");
+    CKB_VERSION("0.6");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{54DD2975-E192-457D-BCFC-D912A24E33B4}");
@@ -16,6 +16,7 @@ void ckb_info(){
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NAME);
     CKB_TIMEMODE(CKB_TIME_DURATION);
+    CKB_LIVEPARAMS(TRUE);
     CKB_DEFAULT_DURATION(1.);
     CKB_DEFAULT_TRIGGER(FALSE);
     CKB_DEFAULT_TRIGGER_KP(TRUE);

@@ -226,16 +226,42 @@ void AnimScript::init(const KeyMap& map, const QStringList& keys, const QMap<QSt
     stop();
     _map = map;
     _keys = keys;
+    _paramValues = paramValues;
+    setDuration();
+    stopped = firstFrame = false;
+    initialized = true;
+}
+
+void AnimScript::setDuration(){
     if(_info.absoluteTime)
         durationMsec = 1000;
     else {
-        durationMsec = round(paramValues.value("duration").toDouble() * 1000.);
+        durationMsec = round(_paramValues.value("duration").toDouble() * 1000.);
         if(durationMsec <= 0)
             durationMsec = -1;
     }
+}
+
+void AnimScript::parameters(const QMap<QString, QVariant>& paramValues){
+    if(!initialized || !process || !_info.liveParams)
+        return;
     _paramValues = paramValues;
-    stopped = firstFrame = false;
-    initialized = true;
+    setDuration();
+    printParams();
+}
+
+void AnimScript::printParams(){
+    process->write("begin params\n");
+    QMapIterator<QString, QVariant> i(_paramValues);
+    while(i.hasNext()){
+        i.next();
+        process->write("param ");
+        process->write(i.key().toLatin1());
+        process->write(" ");
+        process->write(QUrl::toPercentEncoding(i.value().toString()));
+        process->write("\n");
+    }
+    process->write("end params\n");
 }
 
 void AnimScript::start(quint64 timestamp){
@@ -270,17 +296,7 @@ void AnimScript::start(quint64 timestamp){
     }
     process->write("end keymap\n");
     // Write parameters
-    process->write("begin params\n");
-    QMapIterator<QString, QVariant> i(_paramValues);
-    while(i.hasNext()){
-        i.next();
-        process->write("param ");
-        process->write(i.key().toLatin1());
-        process->write(" ");
-        process->write(QUrl::toPercentEncoding(i.value().toString()));
-        process->write("\n");
-    }
-    process->write("end params\n");
+    printParams();
     // Begin animating
     process->write("begin run\n");
     lastFrame = timestamp;

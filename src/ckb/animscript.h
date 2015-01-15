@@ -71,6 +71,8 @@ public:
     // Initializes or re-initializes a script. Must be called at least once.
     // paramValues should contain parameter name/value pairs to run the script with.
     void init(const KeyMap& map, const QStringList& keys, const QMap<QString, QVariant>& paramValues);
+    // Updates parameters without a complete re-initialization. Does nothing if the animation does not support live params.
+    void parameters(const QMap<QString, QVariant>& paramValues);
     // Starts or restarts the animation.
     void retrigger(quint64 timestamp, bool allowPreempt = false);
     // Triggers a keypress event.
@@ -121,6 +123,10 @@ private:
     bool initialized :1, firstFrame :1, stopped :1;
     QProcess* process;
     QStringList inputBuffer;
+
+    // Helper functions
+    void setDuration();
+    void printParams();
     void start(quint64 timestamp);
     void nextFrame(quint64 timestamp);
 

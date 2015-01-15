@@ -21,9 +21,7 @@ public:
     explicit AnimSettingDialog(QWidget* parent, KbAnim* anim);
     ~AnimSettingDialog();
 
-    // Applies settings to the animation
-    void applySettings();
-    // Gets the name entered
+    // Name entered for the animation
     QString name() const;
 
 private:
@@ -34,6 +32,8 @@ private:
     KbAnim* _anim;
     double lastDuration;
     QMap<QString, QWidget*> settingWidgets;
+    QSignalMapper updateMapper;
+
     QMap<QString, QSpinBox*> angleSpinners;
     QSignalMapper angleDialMapper, angleSpinnerMapper;
 
@@ -44,6 +44,12 @@ private slots:
     void updateStops();
     void angleDialChanged(QString name);
     void angleSpinnerChanged(QString name);
+    void updateParam(QString name);
+    void on_delayBox_valueChanged(double arg1);
+    void on_repeatBox_valueChanged(double arg1);
+    void on_kpDelayBox_valueChanged(double arg1);
+    void on_kpRepeatBox_valueChanged(double arg1);
+    void on_kpReleaseBox_stateChanged(int arg1);
 };
 
 #endif // ANIMSETTINGDIALOG_H

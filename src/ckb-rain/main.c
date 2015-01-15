@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Raindrop");
-    CKB_VERSION("0.4");
+    CKB_VERSION("0.6");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{5D6695AF-0496-41E2-BEE7-F7D0ABAA49E9}");
@@ -21,6 +21,8 @@ void ckb_info(){
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_POSITION);
     CKB_TIMEMODE(CKB_TIME_ABSOLUTE);
+    CKB_REPEAT(FALSE);
+    CKB_LIVEPARAMS(TRUE);
     CKB_DEFAULT_TRIGGER(TRUE);
     CKB_DEFAULT_TRIGGER_KP(TRUE);
 }
@@ -46,7 +48,7 @@ void drop_add(float x, float y, int slow){
         drop[i].active = 1;
         drop[i].x = x;
         drop[i].y = y;
-        float msize = maxsize * (0.75 + (rand() / (double)RAND_MAX * 0.5));
+        float msize = maxsize * (0.9 + (rand() / (double)RAND_MAX * 0.2));
         drop[i].size = -msize / 2. * slow;
         drop[i].msize = msize;
         return;
@@ -86,9 +88,9 @@ void ckb_start(ckb_runctx* context){
 double tick = 0.;
 
 int ckb_frame(ckb_runctx* context, double delta){
-    CKB_KEYCLEAR(context);
-    if(delta < 0. || delta > 1.)
+    if(delta <= 0.)
         return 0;
+    CKB_KEYCLEAR(context);
     tick += delta;
     if(tick > period){
         drop_add(rand() / (double)RAND_MAX * context->width, rand() / (double)RAND_MAX * context->height, 1);
@@ -107,12 +109,16 @@ int ckb_frame(ckb_runctx* context, double delta){
                 float distance = drop[i].size - sqrt(pow(key->x - drop[i].x, 2.f) + pow(key->y - drop[i].y, 2.f));
                 if(distance < 0.)
                     distance = -distance / 2.;
-                float scale = round(drop[i].size / 4.f);
+                float scale = drop[i].size / 4.f;
                 if(scale < 10.)
                     scale = 10.;
                 distance /= scale;
-                if(distance <= 1.)
-                    ckb_alpha_blend(key, (1.f - distance) * (1.f - drop[i].size / drop[i].msize) * aa * 255., ar, ag, ab);
+                if(distance <= 1.){
+                    float ascale = (1.f - drop[i].size / drop[i].msize);
+                    if(ascale > 1.f)
+                        ascale = 1.f;
+                    ckb_alpha_blend(key, (1.f - distance) * ascale * aa * 255., ar, ag, ab);
+                }
             }
         }
     }

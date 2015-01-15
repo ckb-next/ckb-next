@@ -24,25 +24,25 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& se
     _scriptGuid = settings.value("ScriptGuid").toString();
     settings.beginGroup("Parameters");
     foreach(const QString& param, settings.childKeys())
-        parameters[param.toLower()] = settings.value(param);
+        _parameters[param.toLower()] = settings.value(param);
     settings.endGroup();
     settings.endGroup();
 
     if(!_scriptGuid.isNull()){
         _script = AnimScript::copy(this, _scriptGuid);
         if(_script){
-            // Remove unused parameters
-            foreach(const QString& name, parameters.keys()){
+            // Remove nonexistant parameters
+            foreach(const QString& name, _parameters.keys()){
                 AnimScript::Param param = _script->param(name);
                 if(param.type == AnimScript::Param::INVALID || param.type == AnimScript::Param::LABEL)
-                    parameters.remove(name);
+                    _parameters.remove(name);
             }
             // Add defaults for unset parameters
             QListIterator<AnimScript::Param> i = _script->paramIterator();
             while(i.hasNext()){
                 AnimScript::Param param = i.next();
-                if(!parameters.contains(param.name) && param.type != AnimScript::Param::LABEL)
-                    parameters[param.name] = param.defaultValue;
+                if(!_parameters.contains(param.name) && param.type != AnimScript::Param::LABEL)
+                    _parameters[param.name] = param.defaultValue;
             }
             _scriptName = _script->name();
             reInit();
@@ -59,7 +59,7 @@ void KbAnim::save(QSettings& settings){
     settings.setValue("ScriptName", _scriptName);
     settings.setValue("ScriptGuid", _scriptGuid.toString().toUpper());
     settings.beginGroup("Parameters");
-    QMapIterator<QString, QVariant> i(parameters);
+    QMapIterator<QString, QVariant> i(_parameters);
     while(i.hasNext()){
         i.next();
         settings.setValue(i.key(), i.value());
@@ -80,7 +80,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, cons
         while(i.hasNext()){
             AnimScript::Param param = i.next();
             if(param.type != AnimScript::Param::LABEL)
-                parameters[param.name] = param.defaultValue;
+                _parameters[param.name] = param.defaultValue;
         }
         _scriptGuid = script->guid();
         _scriptName = script->name();
@@ -88,9 +88,41 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, cons
     }
 }
 
+void KbAnim::parameter(const QString& name, const QVariant& value){
+    _tempParameters[name] = value;
+    updateParams();
+}
+
+void KbAnim::commitParams(){
+    _parameters = effectiveParams();
+    _tempParameters.clear();
+}
+
+void KbAnim::resetParams(){
+    _tempParameters.clear();
+    updateParams();
+}
+
+void KbAnim::updateParams(){
+    if(_script)
+        _script->parameters(effectiveParams());
+    repeatKey = "";
+}
+
+QMap<QString, QVariant> KbAnim::effectiveParams(){
+    QMap<QString, QVariant> res = _parameters;
+    // Apply all uncommited parameters
+    QMapIterator<QString, QVariant> i(_tempParameters);
+    while(i.hasNext()){
+        i.next();
+        res[i.key()] = i .value();
+    }
+    return res;
+}
+
 void KbAnim::reInit(){
     if(_script)
-        _script->init(_map, _keys, parameters);
+        _script->init(_map, _keys, effectiveParams());
     repeatKey = "";
 }
 
@@ -132,6 +164,7 @@ void KbAnim::keys(const QStringList& newKeys){
 }
 
 void KbAnim::trigger(quint64 timestamp){
+    QMap<QString, QVariant> parameters = effectiveParams();
     if(_script && parameters.value("trigger").toBool()){
         int delay = round(parameters.value("delay").toDouble() * 1000.);
         if(delay > 0){
@@ -164,6 +197,7 @@ void KbAnim::trigger(quint64 timestamp){
 }
 
 void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
+    QMap<QString, QVariant> parameters = effectiveParams();
     if(_script && parameters.value("kptrigger").toBool()){
         int delay = round(parameters.value("kpdelay").toDouble() * 1000.);
         if(pressed){
@@ -252,6 +286,7 @@ static blendFunc functions[5] = { blendNormal, blendAdd, blendSubtract, blendMul
 void KbAnim::blend(QHash<QString, QRgb>& animMap, quint64 timestamp){
     if(!_script)
         return;
+    QMap<QString, QVariant> parameters = effectiveParams();
     // Stop the animation if its time has run out
     if(stopTime != 0 && timestamp >= stopTime){
         repeatMsec = repeatTime = 0;

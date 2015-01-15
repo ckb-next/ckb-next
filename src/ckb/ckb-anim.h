@@ -95,7 +95,7 @@
 // If enabled, ckb will play an extra start command on mode switch, placed 1 duration before the actual starting animation.
 #define CKB_PREEMPT(enable)                                         CKB_CONTAINER( printf("preempt %s\n", (enable) ? "on" : "off"); )
 // Live parameter updates. Default: FALSE
-#define CKB_LIVEPARAMS(enable)                                      CKB_CONTAINER( printf("parammode %s\n", (enable) ? "live" : "static"))
+#define CKB_LIVEPARAMS(enable)                                      CKB_CONTAINER( printf("parammode %s\n", (enable) ? "live" : "static"); )
 
 // Special parameters (most values are ignored)
 // Duration (default: 1.0). Requires CKB_TIMEMODE(CKB_TIME_DURATION).
@@ -349,6 +349,24 @@ extern void ckb_parameter(ckb_runctx*, const char*, const char*);
 extern void ckb_keypress(ckb_runctx*, ckb_key*, int, int, int);
 extern void ckb_start(ckb_runctx*);
 extern int ckb_frame(ckb_runctx*, double);
+
+// Update parameter values
+void ckb_read_params(ckb_runctx* ctx){
+    char cmd[CKB_MAX_WORD], param[CKB_MAX_WORD], value[CKB_MAX_WORD];
+    do {
+        ckb_getline(cmd, param, value);
+        if(!*cmd){
+            printf("Error [ckb-main]: Reached EOF reading parameters");
+            return;
+        }
+        if(!strcmp(cmd, "end") && !strcmp(param, "params"))
+            break;
+        if(strcmp(cmd, "param"))
+            continue;
+        ckb_parameter(ctx, param, value);
+    } while(1);
+}
+
 int main(int argc, char *argv[]){
     if(argc == 2){
         if(!strcmp(argv[1], "--ckb-info")){
@@ -416,18 +434,7 @@ int main(int argc, char *argv[]){
                 }
             } while(strcmp(cmd, "begin") || strcmp(param, "params"));
             // Parse parameters
-            do {
-                ckb_getline(cmd, param, value);
-                if(!*cmd){
-                    printf("Error [ckb-main]: Reached EOF reading parameters");
-                    return -2;
-                }
-                if(!strcmp(cmd, "end") && !strcmp(param, "params"))
-                    break;
-                if(strcmp(cmd, "param"))
-                    continue;
-                ckb_parameter(&ctx, param, value);
-            } while(1);
+            ckb_read_params(&ctx);
             // Skip anything else until "begin run"
             do {
                 ckb_getline(cmd, param, value);
@@ -446,6 +453,8 @@ int main(int argc, char *argv[]){
                 // Parse input
                 if(!strcmp(cmd, "start"))
                     ckb_start(&ctx);
+                else if(!strcmp(cmd, "begin") && !strcmp(param, "params"))
+                    ckb_read_params(&ctx);
                 else if(!strcmp(cmd, "key")){
                     int x, y;
                     if(sscanf(param, "%d,%d", &x, &y) == 2){

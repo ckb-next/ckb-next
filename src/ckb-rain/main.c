@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Raindrop");
-    CKB_VERSION("0.6");
+    CKB_VERSION("0.7");
     CKB_COPYRIGHT("2014", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{5D6695AF-0496-41E2-BEE7-F7D0ABAA49E9}");
@@ -29,6 +29,7 @@ void ckb_info(){
 
 #define DROP_MAX 1000
 
+int spawn = 0;
 double period = 0.1;
 double maxsize = 100.;
 double speed = 100.;
@@ -75,6 +76,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_LONG("frequency", &frequency){
         period = 1. / frequency;
     }
+    CKB_PARSE_BOOL("trigger", &spawn){}
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
@@ -92,7 +94,7 @@ int ckb_frame(ckb_runctx* context, double delta){
         return 0;
     CKB_KEYCLEAR(context);
     tick += delta;
-    if(tick > period){
+    if(tick > period && spawn){
         drop_add(rand() / (double)RAND_MAX * context->width, rand() / (double)RAND_MAX * context->height, 1);
         tick -= period;
     }

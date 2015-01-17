@@ -58,6 +58,7 @@ typedef enum {
     IAUTO,
 
     NOTIFY,
+    INOTIFY,
     NOTIFYON,
     NOTIFYOFF,
     GET,

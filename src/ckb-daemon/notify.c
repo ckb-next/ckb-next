@@ -58,6 +58,32 @@ void notifyconnect(usbdevice* kb, int connecting){
     nrprintf(-1, "device %s %s %s%d\n", kb->profile.serial, connecting ? "added at" : "removed from", devpath, index);
 }
 
+void nprintkey(usbdevice* kb, int nnumber, const key* keymap, int keyindex, int down){
+    const key* map = keymap + keyindex;
+    if(map->name)
+        nprintf(kb, nnumber, 0, "key %c%s\n", down ? '+' : '-', map->name);
+    else
+        nprintf(kb, nnumber, 0, "key %c#%d\n", down ? '+' : '-', keyindex);
+}
+
+void nprintind(usbdevice* kb, int nnumber, int led, int on){
+    const char* name = 0;
+    switch(led){
+    case I_NUM:
+        name = "num";
+        break;
+    case I_CAPS:
+        name = "caps";
+        break;
+    case I_SCROLL:
+        name = "scroll";
+        break;
+    default:
+        return;
+    }
+    nprintf(kb, nnumber, 0, "i %c%s\n", on ? '+' : '-', name);
+}
+
 void cmd_notify(usbmode* mode, const key* keymap, int nnumber, int keyindex, const char* toggle){
     if(!strcmp(toggle, "on") || *toggle == 0)
         SET_KEYBIT(mode->notify[nnumber], keyindex);
@@ -190,5 +216,20 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         memcpy(&modified, &kb->hw->id[index + 1].modified, sizeof(modified));
         nprintf(kb, nnumber, mode, "hwid %s %x\n", guid, modified);
         free(guid);
+    } else if(!strcmp(setting, ":keys")){
+        // Get the current state of all keys
+        const key* keymap = kb->profile.keymap;
+        for(int i = 0; i < N_KEYS; i++){
+            if(!keymap[i].name)
+                continue;
+            int byte = i / 8, bit = 1 << (i & 7);
+            uchar state = kb->kbinput[byte] & bit;
+            nprintkey(kb, nnumber, keymap, i, state);
+        }
+    } else if(!strcmp(setting, ":i")){
+        // Get the current state of all LEDs
+        nprintind(kb, nnumber, I_NUM, kb->ileds & I_NUM);
+        nprintind(kb, nnumber, I_CAPS, kb->ileds & I_CAPS);
+        nprintind(kb, nnumber, I_SCROLL, kb->ileds & I_SCROLL);
     }
 }

@@ -13,9 +13,13 @@ void nrprintf(int nodenumber, const char* format, ...);
 // Notifies of a device connection or disconnection.
 void notifyconnect(usbdevice* kb, int connecting);
 
+// Prints a key's current state to a notification node
+void nprintkey(usbdevice* kb, int nnumber, const key* keymap, int keyindex, int down);
+// Prints the current indicator state to a notification node (led should be an I_ constant)
+void nprintind(usbdevice* kb, int nnumber, int led, int on);
+
 // Enables or disables notification for a key
 void cmd_notify(usbmode* mode, const key* keymap, int nnumber, int keyindex, const char* toggle);
-
 // Gets info about a particular setting.
 void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting);
 

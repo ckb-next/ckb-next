@@ -1,3 +1,4 @@
+#include "device.h"
 #include "input.h"
 #include "notify.h"
 
@@ -100,12 +101,10 @@ void inputupdate(usbdevice* kb){
                 // Print notifications if desired
                 for(int notify = 0; notify < OUTFIFO_MAX; notify++){
                     if(mode->notify[notify][byte] & mask){
-                        if(map->name){
-                            nprintf(kb, notify, 0, "key %c%s\n", new ? '+' : '-', map->name);
-                            if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN))
-                                nprintf(kb, notify, 0, "%s up", map->name);
-                        } else
-                            nprintf(kb, notify, 0, "key %c#%d\n", new ? '+' : '-', keyindex);
+                        nprintkey(kb, notify, keymap, keyindex, new);
+                        // Volume wheel doesn't generate keyups
+                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN))
+                            nprintkey(kb, notify, keymap, keyindex, 0);
                     }
                 }
             }
@@ -120,6 +119,28 @@ void inputupdate(usbdevice* kb){
     os_kpsync(kb);
     memcpy(kb->prevkbinput, kb->kbinput, N_KEYS / 8);
     pthread_mutex_unlock(&kb->keymutex);
+}
+
+void updateindicators(usbdevice* kb, int force){
+    if(!IS_ACTIVE(kb))
+        return;
+    uchar old = kb->ileds;
+    os_updateindicators(kb, force);
+    // Print notifications if desired
+    uchar new = kb->ileds;
+    usbmode* mode = kb->profile.currentmode;
+    if(!mode)
+        return;
+    uchar indicators[] = { I_NUM, I_CAPS, I_SCROLL };
+    for(unsigned i = 0; i < sizeof(indicators) / sizeof(uchar); i++){
+        uchar mask = indicators[i];
+        if((old & mask) == (new & mask))
+            continue;
+        for(int notify = 0; notify < OUTFIFO_MAX; notify++){
+            if(mode->inotify[notify] & mask)
+                nprintind(kb, notify, mask, new & mask);
+        }
+    }
 }
 
 void initbind(keybind* bind, const key* keymap){

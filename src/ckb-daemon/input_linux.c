@@ -162,10 +162,8 @@ void os_kpsync(usbdevice* kb){
         printf("Write error: %s\n", strerror(errno));
 }
 
-void updateindicators(usbdevice* kb, int force){
+void os_updateindicators(usbdevice* kb, int force){
     // Read the indicator LEDs for this device and update them if necessary.
-    if(!IS_ACTIVE(kb))
-        return;
     char leds[LED_CNT / 8] = { 0 };
     ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds);
     char ileds = leds[0];

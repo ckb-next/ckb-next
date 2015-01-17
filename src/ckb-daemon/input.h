@@ -14,12 +14,6 @@ void inputupdate(usbdevice* kb);
 // Read LEDs from the event device and update them (if needed).
 void updateindicators(usbdevice* kb, int force);
 
-// OS-specific event handlers
-// Generate a keypress event
-void os_keypress(usbdevice* kb, int scancode, int down);
-// Synchronize key input (called after sending key presses)
-void os_kpsync(usbdevice* kb);
-
 // Initializes key bindings for a device
 void initbind(keybind* bind, const key* keymap);
 // Frees key binding data for a device
@@ -35,5 +29,15 @@ void cmd_rebind(usbmode* mode, const key* keymap, int dummy, int keyindex, const
 void cmd_macro(usbmode* mode, const key* keymap, const char* keys, const char* assignment);
 // Clears all macros
 void cmd_macroclear(usbmode* mode);
+
+
+// OS-specific event handlers
+
+// Generate a keypress event
+void os_keypress(usbdevice* kb, int scancode, int down);
+// Synchronize key input (called after sending key presses)
+void os_kpsync(usbdevice* kb);
+// Updates indicator state. Should read state, update ileds (applying mask for current mode as appropriate) and send control message to keyboard
+void os_updateindicators(usbdevice* kb, int force);
 
 #endif

@@ -446,6 +446,10 @@ void readcmd(usbdevice* kb, const char* line){
             command = NOTIFY;
             handler = cmd_notify;
             continue;
+        } else if(!strcmp(word, "inotify")){
+            command = INOTIFY;
+            handler = cmd_inotify;
+            continue;
         } else if(!strcmp(word, "notifyon")){
             command = NOTIFYON;
             handler = 0;
@@ -550,7 +554,7 @@ void readcmd(usbdevice* kb, const char* line){
             if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_MAX)
                 mode = getusbmode(newmode - 1, profile, keymap);
             continue;
-        } else if(command == NAME || command == IOFF || command == ION || command == IAUTO){
+        } else if(command == NAME || command == IOFF || command == ION || command == IAUTO || command == INOTIFY){
             // All of the above just parse the whole word
             handler(mode, keymap, notifynumber, 0, word);
             continue;

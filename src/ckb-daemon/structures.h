@@ -37,6 +37,11 @@ typedef struct {
 #define SET_KEYBIT(array, index) do { (array)[(index) / 8] |= 1 << ((index) % 8); } while(0)
 #define CLEAR_KEYBIT(array, index) do { (array)[(index) / 8] &= ~(1 << ((index) % 8)); } while(0)
 
+// Indicator LEDs
+#define I_NUM       1
+#define I_CAPS      2
+#define I_SCROLL    4
+
 // Maximum number of notification nodes
 #define OUTFIFO_MAX 10
 
@@ -79,11 +84,13 @@ typedef struct {
     keybind bind;
     // Key notification settings
     uchar notify[OUTFIFO_MAX][N_KEYS / 8];
-    // Indicators permanently off/on
-    uchar ioff, ion;
     // Name and UUID
     ushort name[MD_NAME_LEN];
     usbid id;
+    // Indicators permanently off/on
+    uchar ioff, ion;
+    // Notify mask for indicator LEDs
+    uchar inotify[OUTFIFO_MAX];
 } usbmode;
 
 // Native profile structure

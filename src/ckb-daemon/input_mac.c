@@ -121,7 +121,7 @@ void os_kpsync(usbdevice* kb){
     IOPMAssertionRelease(assertionID);
 }
 
-void updateindicators(usbdevice* kb, int force){
+void os_updateindicators(usbdevice* kb, int force){
     // Set NumLock on permanently
     char ileds = 1;
     // Set Caps Lock if enabled. Unlike Linux, OSX keyboards have independent caps lock states, so
@@ -147,7 +147,6 @@ void updateindicators(usbdevice* kb, int force){
             CFRelease(value);
         }
         CFRelease(leds);
-        IOHIDDeviceSetReport(kb->handles[1], kIOHIDReportTypeOutput, 0, &kb->ileds, 1);
     }
 }
 

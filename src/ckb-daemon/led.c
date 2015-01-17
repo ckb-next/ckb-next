@@ -221,44 +221,49 @@ void cmd_rgb(usbmode* mode, const key* keymap, int dummy, int keyindex, const ch
     }
 }
 
-static int iselect(const char* led){
-    if(!strcmp(led, "num"))
-        return 1;
-    if(!strcmp(led, "caps"))
-        return 2;
-    if(!strcmp(led, "scroll"))
-        return 3;
-    return 0;
+// Indicator bitfield from string
+static uchar iselect(const char* led){
+    int result = 0;
+    if(!strncmp(led, "num", 3) || strstr(led, ",num"))
+        result |= I_NUM;
+    if(!strncmp(led, "caps", 4) || strstr(led, ",caps"))
+        result |= I_CAPS;
+    if(!strncmp(led, "scroll", 6) || strstr(led, ",scroll"))
+        result |= I_SCROLL;
+    if(!strncmp(led, "all", 3) || strstr(led, ",all"))
+        result |= I_NUM | I_CAPS | I_SCROLL;
+    return result;
 }
 
 void cmd_ioff(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
-    int bit = iselect(led);
-    if(!bit)
-        return;
-    // Add the bit to ioff, remove it from ion
-    bit = 1 << (bit - 1);
-    mode->ioff |= bit;
-    mode->ion &= ~bit;
+    uchar bits = iselect(led);
+    // Add the bits to ioff, remove them from ion
+    mode->ioff |= bits;
+    mode->ion &= ~bits;
 }
 
 void cmd_ion(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
-    int bit = iselect(led);
-    if(!bit)
-        return;
-    // Remove the bit from ioff, add it to ion
-    bit = 1 << (bit - 1);
-    mode->ioff &= ~bit;
-    mode->ion |= bit;
+    uchar bits = iselect(led);
+    // Remove the bits from ioff, add them to ion
+    mode->ioff &= ~bits;
+    mode->ion |= bits;
 }
 
 void cmd_iauto(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
-    int bit = iselect(led);
-    if(!bit)
-        return;
-    // Remove the bit from both ioff and ion
-    bit = 1 << (bit - 1);
-    mode->ioff &= ~bit;
-    mode->ion &= ~bit;
+    uchar bits = iselect(led);
+    // Remove the bits from both ioff and ion
+    mode->ioff &= ~bits;
+    mode->ion &= ~bits;
+}
+
+void cmd_inotify(usbmode* mode, const key* keymap, int nnumber, int dummy, const char* led){
+    uchar bits = iselect(led);
+    if(strstr(led, ":off"))
+        // Turn notifications for these bits off
+        mode->inotify[nnumber] &= ~bits;
+    else
+        // Turn notifications for these bits on
+        mode->inotify[nnumber] |= bits;
 }
 
 volatile unsigned fps = 0;

@@ -30,6 +30,8 @@ void cmd_ioff(usbmode* mode, const key* keymap, int dummy1, int dummy2, const ch
 void cmd_ion(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
 // Sets an indicator to automatic mode
 void cmd_iauto(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
+// Sets indicator notifications
+void cmd_inotify(usbmode* mode, const key* keymap, int nnumber, int dummy, const char* led);
 
 // Daemon frame rate
 extern volatile unsigned fps;

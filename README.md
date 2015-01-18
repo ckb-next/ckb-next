@@ -5,7 +5,9 @@ ckb: Corsair K65/K70/K95 Driver for Linux and OSX
 
 *ckb currently does not support non-RGB Corsair keyboards, but if you have one and are willing to do some tests, don't hesitate to contact me. I'm intrested in adding support for them.*
 
-Disclaimer: ckb comes with no warranty and is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful for those of us wishing to take advantage of the keyboard's features on non-Windows OSes.
+**Disclaimer:** ckb comes with no warranty and is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful for those of us wishing to take advantage of the keyboard's features on non-Windows OSes.
+
+When downloading a new version of ckb, please delete your old download first. This helps ensure there are no problems lingering from an old build.
 
 If you use and enjoy this project, I'd greatly appreciate it if you could spare a few dollars for a donation. This is completely voluntary, of course - the project will remain free and open source regardless. `:)`
 
@@ -13,19 +15,12 @@ I accept donations through PayPal: [Click here](https://www.paypal.com/cgi-bin/w
 
 Or through Bitcoin: [1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ (click for QR code)](https://i.imgur.com/h3gyLiv.png)
 
-Building
---------
-
-Pre-built binaries will be available at a later date. For now, follow the instructions below to compile from source. The project contains two main applications: `ckb-daemon`, which runs in the background and provides the actual driver, and `ckb`, which provides the user interface.
-
-**Note:** When downloading a new version of ckb, please delete your old download first and build it again from scratch. This helps ensure there are no problems lingering from an old build.
-
-Linux instructions
+Building for Linux
 ------------------
 
 Requires Qt5 and libudev (Ubuntu: `qt5-default` and `libudev-dev`. Qt5 packages may also be under `qt5-base` or `libqt5*-devel`). `gcc`, `g++`, and `glibc` are also required. Check with your package manager to make sure you have the correct libraries/headers installed.
 
-You can build the project by running `qmake-qt5 && make` in the directory you downloaded it to. If you don't have `qmake-qt5` (e.g. Ubuntu), run `qmake && make` instead. The binaries will be placed in a new `bin` directory assuming they compile successfully. To start the daemon, run `sudo bin/ckb-daemon`. After that, open the `ckb` binary as a normal user to start the user interface.
+You can build the project by running `qmake-qt5 && make` in the directory you downloaded it to. If you don't have `qmake-qt5` (e.g. Ubuntu), run `qmake && make` instead. The binaries will be placed in a new `bin` directory assuming they compile successfully. To use the driver, first start the daemon program by running `sudo bin/ckb-daemon`. After that, open the `ckb` binary as a normal user to start the user interface.
 
 **Note:** If you have problems connecting the keyboard to your system, try adding the following to your kernel's `cmdline`:
 
@@ -35,7 +30,14 @@ You can build the project by running `qmake-qt5 && make` in the directory you do
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
-OSX instructions
+OSX Binaries
+------------
+
+Pre-compiled binaries for OSX are provided by Xiy. The latest OSX binary can be downloaded here: http://mbx.cm/t/_guh4 (version: alpha-v0.0.27)
+
+To install it, open the dmg and copy "ckb" to your Applications folder. To start the driver, open Terminal and run `sudo /Applications/ckb.app/Contents/Resources/ckb-daemon`. After that, open the ckb app to start the user interface.
+
+Building for OSX
 ----------------
 
 Install the latest version of Xcode from the App Store. Then install Qt5 from here: http://www.qt.io/download-open-source/
@@ -62,18 +64,16 @@ The user interface is still a work in progress.
 
 **Roadmap** (roughly in order)
 - **v0.1 release:**
+- Key rebinding in ckb
 - (Daemon) Allow the daemon to disconnect all keyboards without shutting down, reconnect later. This way ckb can soft stop/soft start the daemon, because using the daemon without ckb running isn't very useful.
-- (Daemon) Indicator (Num Lock, etc) notifications
 - System service files so that ckb-daemon can be run at system start.
 - **v0.2 release:**
-- Key rebinding in ckb
-- More functions for the Win Lock key
-- **v0.3 release:**
 - (Daemon) Repeatable key macros, notification macros
 - (Daemon) Ability to generate mouse press/release events
+- More functions for the Win Lock key
 - Key combos
 - Key macros, other advanced keypress features like running a custom command
-- **v0.4 release:**
+- **v0.3 release:**
 - Ability to tie profiles to which application has focus, or switch them with keys
 - Timers
 - **v1.0 release:**

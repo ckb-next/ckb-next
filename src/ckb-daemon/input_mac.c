@@ -44,6 +44,18 @@ CGEventRef eventcreate(CGEventSourceRef source, int scancode, int down){
 }
 
 void os_keypress(usbdevice* kb, int scancode, int down){
+    // Some of the media keys need two separate events
+    switch(scancode){
+    case KEY_MUTE:
+        os_keypress(kb, kVK_Mute, down);
+        break;
+    case KEY_VOLUMEUP:
+        os_keypress(kb, kVK_VolumeUp, down);
+        break;
+    case KEY_VOLUMEDOWN:
+        os_keypress(kb, kVK_VolumeDown, down);
+        break;
+    }
     // Check for modifier keys and update flags
     int flags = 0;
     if(scancode == KEY_CAPSLOCK){
@@ -106,6 +118,18 @@ void os_keypress(usbdevice* kb, int scancode, int down){
 }
 
 void keyretrigger(usbdevice* kb, int scancode){
+    // Some of the media keys need two separate events
+    switch(scancode){
+    case KEY_MUTE:
+        keyretrigger(kb, kVK_Mute);
+        break;
+    case KEY_VOLUMEUP:
+        keyretrigger(kb, kVK_VolumeUp);
+        break;
+    case KEY_VOLUMEDOWN:
+        keyretrigger(kb, kVK_VolumeDown);
+        break;
+    }
     CGEventRef kp = eventcreate(kb->event, scancode, 1);
     CGEventSetIntegerValueField(kp, kCGKeyboardEventAutorepeat, 1);
     CGEventSetFlags(kp, kb->eventflags);

@@ -20,117 +20,98 @@ void inputclose(usbdevice* kb){
     }
 }
 
-// Helper function to create CGEvents
-CGEventRef eventcreate(CGEventSourceRef source, int scancode, int down){
-    if(scancode < KEY_MEDIA)
-        return CGEventCreateKeyboardEvent(source, scancode, down);
-    else {
-        // Media keys need a special event type
-        CGEventRef kp = CGEventCreate(source);
-        CGEventSetType(kp, NX_SYSDEFINED);
-        CGEventSetIntegerValueField(kp, 83, NX_SUBTYPE_AUX_CONTROL_BUTTONS);
-        // This is a terrible hack, but I have no idea how to get the correct data in here without setting the bytes manually...
-        CFDataRef data = CGEventCreateData(kCFAllocatorDefault, kp);
-        CFRelease(kp);
-        CFMutableDataRef mutdata = CFDataCreateMutableCopy(kCFAllocatorDefault, 0, data);
-        CFRelease(data);
-        int evdata = (scancode - KEY_MEDIA) << 8 | (down ? 0x0a : 0x0b) << 16;
-        CFRange range = { 31 * 4, 4 };
-        CFDataReplaceBytes(mutdata, range, (const uchar*)&evdata, 4);
-        kp = CGEventCreateFromData(kCFAllocatorDefault, mutdata);
-        CFRelease(mutdata);
-        return kp;
-    }
-}
+// extra_mac.m: Need access to NSEvent for this
+extern CGEventRef media_event(uint data1, uint modifiers);
+#define MEDIA_FLAGS(scancode, down, is_repeat) (((scancode) - KEY_MEDIA) << 16 | ((down) ? 0x0a00 : 0x0b00) | !!(is_repeat))
 
 void os_keypress(usbdevice* kb, int scancode, int down){
-    // Some of the media keys need two separate events
-    switch(scancode){
-    case KEY_MUTE:
-        os_keypress(kb, kVK_Mute, down);
-        break;
-    case KEY_VOLUMEUP:
-        os_keypress(kb, kVK_VolumeUp, down);
-        break;
-    case KEY_VOLUMEDOWN:
-        os_keypress(kb, kVK_VolumeDown, down);
-        break;
-    }
     // Check for modifier keys and update flags
     int flags = 0;
+    // Keep a separate list of left/right side modifiers - combine them below
+    // Apple's HID driver seems to include a lot of odd bits that aren't documented. Those are included here as well for completeness.
+    CGEventFlags* side = (scancode == KEY_RIGHTSHIFT || scancode == KEY_RIGHTCTRL || scancode == KEY_RIGHTMETA || scancode == KEY_RIGHTALT) ? &kb->rflags : &kb->lflags;
+    CGEventFlags mod = 0;
     if(scancode == KEY_CAPSLOCK){
         if(down)
             kb->lflags ^= kCGEventFlagMaskAlphaShift;
         flags = 1;
-    } else {
-        // Keep a separate list of left/right side modifiers - combine them below
-        // Apple's HID driver seems to include a lot of odd bits that aren't documented. Those are included here as well for completeness.
-        CGEventFlags* side = (scancode == KEY_RIGHTSHIFT || scancode == KEY_RIGHTCTRL || scancode == KEY_RIGHTMETA || scancode == KEY_RIGHTALT) ? &kb->rflags : &kb->lflags;
-        CGEventFlags mod = 0, mod2 = 0;
-        if(scancode == KEY_LEFTSHIFT || scancode == KEY_RIGHTSHIFT){
-            mod = kCGEventFlagMaskShift;
-            mod2 = 0x2;
-            flags = 1;
-        } else if(scancode == KEY_LEFTCTRL || scancode == KEY_RIGHTCTRL){
-            mod = kCGEventFlagMaskControl;
-            if(side == &kb->lflags)
-                mod2 = 0x1;
-            else
-                mod2 = 0x100;
-            flags = 1;
-        } else if(scancode == KEY_LEFTMETA || scancode == KEY_RIGHTMETA){
-            mod = kCGEventFlagMaskCommand;
-            mod2 = 0x8;
-            flags = 1;
-        } else if(scancode == KEY_LEFTALT || scancode == KEY_RIGHTALT){
-            mod = kCGEventFlagMaskAlternate;
-            mod2 = 0x20;
-            flags = 1;
-        }
-        if(side == &kb->rflags)
-            mod2 <<= 1;
-        mod |= mod2;
-        if(flags){
-            if(down)
-                *side |= mod;
-            else
-                *side &= ~mod;
-        }
+    } else if(scancode == KEY_LEFTSHIFT || scancode == KEY_RIGHTSHIFT){
+        mod = kCGEventFlagMaskShift;
+        mod |= (scancode == KEY_LEFTSHIFT) ? 0x2 : 0x4;
+        flags = 1;
+    } else if(scancode == KEY_LEFTCTRL || scancode == KEY_RIGHTCTRL){
+        mod = kCGEventFlagMaskControl;
+        mod |= (scancode == KEY_LEFTCTRL) ? 0x1 : 0x200;
+        flags = 1;
+    } else if(scancode == KEY_LEFTMETA || scancode == KEY_RIGHTMETA){
+        mod = kCGEventFlagMaskCommand;
+        mod |= (scancode == KEY_LEFTMETA) ? 0x8 : 0x10;
+        flags = 1;
+    } else if(scancode == KEY_LEFTALT || scancode == KEY_RIGHTALT){
+        mod = kCGEventFlagMaskAlternate;
+        mod |= (scancode == KEY_LEFTALT) ? 0x20 : 0x40;
+        flags = 1;
     }
 
-    CGEventRef kp;
     if(flags){
-        // Create flag change event
+        // Update flags when a modifier key is pressed
+        if(down)
+            *side |= mod;
+        else
+            *side &= ~mod;
         kb->eventflags = kb->lflags | kb->rflags | 0x100;
-        kp = CGEventCreate(kb->event);
-        CGEventSetType(kp, kCGEventFlagsChanged);
-        CGEventSetIntegerValueField(kp, kCGKeyboardEventKeycode, scancode);
-        kb->lastkeypress = -1;
+        kb->lastkeypress = KEY_NONE;
     } else {
-        // Create keypress event
-        kp = eventcreate(kb->event, scancode, down);
         kb->lastkeypress = (down ? scancode : -1);
+        kb->keypresstime = 0;
     }
-    kb->keypresstime = 0;
-    CGEventSetFlags(kp, kb->eventflags);
-    CGEventPost(kCGHIDEventTap, kp);
-    CFRelease(kp);
+    if(scancode >= KEY_MEDIA){
+        // Media keys get a separate event
+        CGEventRef mevent = media_event(MEDIA_FLAGS(scancode, down, 0), kb->eventflags);
+        CGEventPost(kCGHIDEventTap, mevent);
+        // Volume keys also get regular key events
+        switch(scancode){
+        case KEY_MUTE:
+            scancode = kVK_Mute;
+            break;
+        case KEY_VOLUMEUP:
+            scancode = kVK_VolumeUp;
+            break;
+        case KEY_VOLUMEDOWN:
+            scancode = kVK_VolumeDown;
+            break;
+        default:
+            return;
+        }
+    }
+    // Create keypress event
+    CGEventRef kevent = CGEventCreateKeyboardEvent(kb->event, scancode, down);
+    CGEventSetFlags(kevent, kb->eventflags);
+    CGEventPost(kCGHIDEventTap, kevent);
+    CFRelease(kevent);
 }
 
 void keyretrigger(usbdevice* kb, int scancode){
-    // Some of the media keys need two separate events
-    switch(scancode){
-    case KEY_MUTE:
-        keyretrigger(kb, kVK_Mute);
-        break;
-    case KEY_VOLUMEUP:
-        keyretrigger(kb, kVK_VolumeUp);
-        break;
-    case KEY_VOLUMEDOWN:
-        keyretrigger(kb, kVK_VolumeDown);
-        break;
+    if(scancode >= KEY_MEDIA){
+        // Media keys get a separate event
+        CGEventRef mevent = media_event(MEDIA_FLAGS(scancode, 1, 1), kb->eventflags);
+        CGEventPost(kCGHIDEventTap, mevent);
+        // Volume keys also get regular key events
+        switch(scancode){
+        case KEY_MUTE:
+            scancode = kVK_Mute;
+            break;
+        case KEY_VOLUMEUP:
+            scancode = kVK_VolumeUp;
+            break;
+        case KEY_VOLUMEDOWN:
+            scancode = kVK_VolumeDown;
+            break;
+        default:
+            return;
+        }
     }
-    CGEventRef kp = eventcreate(kb->event, scancode, 1);
+    CGEventRef kp = CGEventCreateKeyboardEvent(kb->event, scancode, 1);
     CGEventSetIntegerValueField(kp, kCGKeyboardEventAutorepeat, 1);
     CGEventSetFlags(kp, kb->eventflags);
     CGEventPost(kCGHIDEventTap, kp);

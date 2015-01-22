@@ -194,22 +194,10 @@ CGEventRef tapcallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
         CGEventTapEnable(eventTap, true);
         return 0;
     }
-    if((type == kCGEventKeyDown || type == kCGEventKeyUp)){
-        if(CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode) == KEY_ESC){
-            CGEventFlags flags = CGEventGetFlags(event);
-            // This flag gets inserted into all of our keyboard events automatically. It can't be removed when the event is broadcast.
-            // It must be removed in order for Cmd+Option+Esc to work, but ONLY removed for Esc.
-            // Otherwise it causes keystrokes to be missed in some apps.
-            //  LOGIC! 
-            flags &= ~0x20000000;
-            CGEventSetFlags(event, flags);
-        }
-    } else {
-        CGEventFlags flags = CGEventGetFlags(event);
-        for(int i = 1; i < DEV_MAX; i++)
-            flags |= keyboard[i].eventflags;
-        CGEventSetFlags(event, flags);
-    }
+    CGEventFlags flags = CGEventGetFlags(event);
+    for(int i = 1; i < DEV_MAX; i++)
+        flags |= keyboard[i].eventflags;
+    CGEventSetFlags(event, flags);
     return event;
 }
 
@@ -268,7 +256,7 @@ void* threadrun(void* context){
     IOHIDManagerOpen(usbmanager, kIOHIDOptionsTypeNone);
 
     // Run an event tap to modify the state of mouse events. The OS won't take care of this for us so this is needed for Shift and other modifiers to work
-    eventTap = CGEventTapCreate(kCGHIDEventTap, kCGHeadInsertEventTap, kCGEventTapOptionDefault, CGEventMaskBit(kCGEventKeyDown) | CGEventMaskBit(kCGEventKeyUp) | CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseDragged) | CGEventMaskBit(kCGEventLeftMouseUp) | CGEventMaskBit(kCGEventRightMouseDown) | CGEventMaskBit(kCGEventRightMouseDragged) | CGEventMaskBit(kCGEventRightMouseUp), tapcallback, 0);
+    eventTap = CGEventTapCreate(kCGHIDEventTap, kCGHeadInsertEventTap, kCGEventTapOptionDefault, CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseDragged) | CGEventMaskBit(kCGEventLeftMouseUp) | CGEventMaskBit(kCGEventRightMouseDown) | CGEventMaskBit(kCGEventRightMouseDragged) | CGEventMaskBit(kCGEventRightMouseUp), tapcallback, 0);
     CFRunLoopAddSource(CFRunLoopGetCurrent(), CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0), kCFRunLoopDefaultMode);
 
     // Another thing the OS won't do on its own: key repeats. Make a new thread for that

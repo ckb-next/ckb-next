@@ -72,3 +72,9 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp, 
         return 0;
     return errno;
 }
+
+// Creates a media key event. This isn't possible using a standard CGEventCreate.
+CGEventRef media_event(uint data1, uint modifiers){
+    NSEvent* event = [NSEvent otherEventWithType:NSSystemDefined location:CGPointMake(0, 0) modifierFlags:modifiers timestamp:[[NSProcessInfo processInfo] systemUptime] windowNumber:0 context:0 subtype:NX_SUBTYPE_AUX_CONTROL_BUTTONS data1:data1 data2:0];
+    return [event CGEvent];
+}

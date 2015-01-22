@@ -102,7 +102,20 @@ int loadrgb(usbdevice* kb, keylight* light, int mode){
     return 0;
 }
 
-char* printrgb(keylight* light, const key* keymap){
+// Does a key exist in the current LED layout?
+int has_key(const char* name, int model){
+    if(!name
+            // Only K95 has G keys and M keys (G1 - G18, MR, M1 - M3)
+            || (model != 95 && ((name[0] == 'g' && name[1] >= '1' && name[1] <= '9') || (name[0] == 'm' && (name[1] == 'r' || name[1] == '1' || name[1] == '2' || name[1] == '3'))))
+            // Only K65 has lights on VolUp/VolDn
+            || (model != 65 && (!strcmp(name, "volup") || !strcmp(name, "voldn")))
+            // K65 lacks numpad and media buttons
+            || (model == 65 && (strstr(name, "num") == name || !strcmp(name, "stop") || !strcmp(name, "prev") || !strcmp(name, "play") || !strcmp(name, "next"))))
+        return 0;
+    return 1;
+}
+
+char* printrgb(keylight* light, const key* keymap, int kbmodel){
     int length = 0;
     // Unpack LED data back to 8bpc format.
     uchar r[N_KEYS], g[N_KEYS], b[N_KEYS];
@@ -136,7 +149,7 @@ char* printrgb(keylight* light, const key* keymap){
     char names[N_KEYS][11];
     for(int i = 0; i < N_KEYS; i++){
         const char* name = keymap[i].name;
-        if(!name || keymap[i].led < 0)
+        if(keymap[i].led < 0 || !has_key(name, kbmodel))
             names[i][0] = 0;
         else
             strncpy(names[i], name, 11);

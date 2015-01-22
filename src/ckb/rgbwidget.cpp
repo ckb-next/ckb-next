@@ -62,6 +62,7 @@ void RgbWidget::paintEvent(QPaintEvent*){
     painter.drawRect(0, 0, width(), height());
 
     // Draw key backgrounds
+    KeyMap::Model model = keyMap.model();
     for(uint i = 0; i < count; i++){
         const KeyPos& key = *keyMap.key(i);
         float x = key.x + 6.f - key.width / 2.f + 1.f;
@@ -79,7 +80,7 @@ void RgbWidget::paintEvent(QPaintEvent*){
         else
             painter.setBrush(QBrush(kColor));
         if(!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
-                || !strcmp(key.name, "light") || !strcmp(key.name, "lock")){
+                || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute"))){
             // Switch keys are circular
             x += w / 8.f;
             y += h / 8.f;

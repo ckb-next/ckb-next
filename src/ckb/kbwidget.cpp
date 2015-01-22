@@ -311,7 +311,7 @@ void KbWidget::setCurrentMode(KbProfile* profile, int mode){
 }
 
 KeyMap KbWidget::getKeyMap(){
-    return KeyMap::standard(features.contains("k95") ? KeyMap::K95 : KeyMap::K70, (KeyMap::Layout)ui->layoutBox->currentIndex());
+    return KeyMap::standard(KeyMap::getModel(features.split(" ")[1]), (KeyMap::Layout)ui->layoutBox->currentIndex());
 }
 
 void KbWidget::getCmd(QFile& file){

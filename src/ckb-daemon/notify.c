@@ -133,7 +133,7 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         return;
     } else if(!strcmp(setting, ":rgb")){
         // Get the current RGB settings
-        char* rgb = printrgb(&mode->light, profile->keymap);
+        char* rgb = printrgb(&mode->light, profile->keymap, kb->model);
         nprintf(kb, nnumber, mode, "rgb %s\n", rgb);
         free(rgb);
         return;
@@ -152,7 +152,7 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         // Make sure the mode number is valid
         HWMODE_OR_RETURN(kb, index);
         // Get the mode from the hardware store
-        char* rgb = printrgb(kb->hw->light + index, profile->keymap);
+        char* rgb = printrgb(kb->hw->light + index, profile->keymap, kb->model);
         nprintf(kb, nnumber, mode, "hwrgb %s\n", rgb);
         free(rgb);
         return;

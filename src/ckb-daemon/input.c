@@ -90,7 +90,7 @@ void inputupdate(usbdevice* kb){
                             events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                         events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
                         // The volume wheel doesn't generate keyups, so create them automatically
-                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN)){
+                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && kb->model != 65){
                             for(int i = rmodcount; i > 0; i--)
                                 events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                             events[modcount + keycount++] = -(scancode + 1);
@@ -103,7 +103,7 @@ void inputupdate(usbdevice* kb){
                     if(mode->notify[notify][byte] & mask){
                         nprintkey(kb, notify, keymap, keyindex, new);
                         // Volume wheel doesn't generate keyups
-                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN))
+                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && kb->model != 65)
                             nprintkey(kb, notify, keymap, keyindex, 0);
                     }
                 }

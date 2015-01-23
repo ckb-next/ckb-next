@@ -69,20 +69,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         // Media keys get a separate event
         CGEventRef mevent = media_event(MEDIA_FLAGS(scancode, down, 0), kb->eventflags);
         CGEventPost(kCGHIDEventTap, mevent);
-        // Volume keys also get regular key events
-        switch(scancode){
-        case KEY_MUTE:
-            scancode = kVK_Mute;
-            break;
-        case KEY_VOLUMEUP:
-            scancode = kVK_VolumeUp;
-            break;
-        case KEY_VOLUMEDOWN:
-            scancode = kVK_VolumeDown;
-            break;
-        default:
-            return;
-        }
+        return;
     }
     // Create keypress event
     CGEventRef kevent = CGEventCreateKeyboardEvent(kb->event, scancode, down);
@@ -96,20 +83,7 @@ void keyretrigger(usbdevice* kb, int scancode){
         // Media keys get a separate event
         CGEventRef mevent = media_event(MEDIA_FLAGS(scancode, 1, 1), kb->eventflags);
         CGEventPost(kCGHIDEventTap, mevent);
-        // Volume keys also get regular key events
-        switch(scancode){
-        case KEY_MUTE:
-            scancode = kVK_Mute;
-            break;
-        case KEY_VOLUMEUP:
-            scancode = kVK_VolumeUp;
-            break;
-        case KEY_VOLUMEDOWN:
-            scancode = kVK_VolumeDown;
-            break;
-        default:
-            return;
-        }
+        return;
     }
     CGEventRef kp = CGEventCreateKeyboardEvent(kb->event, scancode, 1);
     CGEventSetIntegerValueField(kp, kCGKeyboardEventAutorepeat, 1);

@@ -277,7 +277,7 @@ void* threadrun(void* context){
     CFMutableArrayRef devices = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     if(devices){
         int vendor = V_CORSAIR;
-        int products[] = { P_K65, P_K70, P_K95 };
+        int products[] = { P_K65, P_K70, P_K70_NRGB, P_K95 };
         for(int i = 0; i < sizeof(products) / sizeof(int); i++){
             int product = products[i];
             CFMutableDictionaryRef device = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);

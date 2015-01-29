@@ -96,7 +96,7 @@ int setupusb(usbdevice* kb, short vendor, short product){
         fail = 1;
 
     // Set all keys to use the Corsair input. HID input is unused.
-    setinput(kb, IN_CORSAIR);
+    setinput(kb, IN_CORSAIR | IN_HID);
 
     while(kb->queuecount > 0){
         DELAY_SHORT;

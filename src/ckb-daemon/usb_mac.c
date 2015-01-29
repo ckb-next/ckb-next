@@ -43,7 +43,8 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
 
 void closehandle(usbdevice* kb){
     kb->handle = 0;
-    for(int i = 0; i < 4; i++)
+    int count = (IS_RGB(kb->vendor, kb->product)) ? 4 : 3;
+    for(int i = 0; i < count; i++)
         kb->handles[i] = 0;
 }
 
@@ -71,17 +72,41 @@ void usbremove(void* context, IOReturn result, void* sender){
 
 void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
     usbdevice* kb = context;
-    if(length == MSG_SIZE)
+    if(!HAS_FEATURES(kb, FEAT_RGB)){
+        // For non RGB keyboards, translate HID input
+        switch(length){
+        case 8:
+            hid_translate(kb->kbinput, 1, 8, kb->urbinput);
+            break;
+        case 4:
+            hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
+            break;
+        case 15:
+            hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
+            break;
+        }
         inputupdate(kb);
+    } else {
+        // For RGB keyboards, process Corsair input or BIOS input
+        if(length == 8){
+            hid_translate(kb->kbinput, 1, 8, kb->urbinput);
+            inputupdate(kb);
+        } else if(length == MSG_SIZE)
+            inputupdate(kb);
+    }
 }
 
 void openusb(usbdevice* kb, short vendor, short product){
     // The driver sometimes isn't completely ready yet, so give it a short delay
     sleep(1);
 
-    // Handle 3 is the control handle
     kb->lastkeypress = -1;
-    kb->handle = kb->handles[3];
+    if(IS_RGB(vendor, product))
+        // Handle 3 is the control handle
+        kb->handle = kb->handles[3];
+    else
+        // Non RGB keyboards don't have one, so just use 0
+        kb->handle = kb->handles[0];
 
     // Set up the device
     int setup = setupusb(kb, vendor, product);
@@ -93,8 +118,16 @@ void openusb(usbdevice* kb, short vendor, short product){
         return;
     }
 
-    // Start handling HID reports for the Corsair input
-    IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->kbinput, MSG_SIZE, reportcallback, kb);
+    // Start handling HID reports for the input
+    IOHIDDeviceRegisterInputReportCallback(kb->handles[0], kb->urbinput, 8, reportcallback, kb);
+    if(IS_RGB(vendor, product))
+        IOHIDDeviceRegisterInputReportCallback(kb->handles[1], kb->urbinput + 8, 21, reportcallback, kb);
+    else
+        IOHIDDeviceRegisterInputReportCallback(kb->handles[1], kb->urbinput + 8, 4, reportcallback, kb);
+    if(IS_RGB(vendor, product))
+        IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->kbinput, MSG_SIZE, reportcallback, kb);
+    else
+        IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->urbinput + 8 + 4, 15, reportcallback, kb);
 
     // Register for close notification
     IOHIDDeviceRegisterRemovalCallback(kb->handle, usbremove, kb);
@@ -162,14 +195,14 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     long output = usbgetvalue(device, CFSTR(kIOHIDMaxOutputReportSizeKey));
     long feature = usbgetvalue(device, CFSTR(kIOHIDMaxFeatureReportSizeKey));
 
-    // Handle 0 is unused
+    // Handle 0 is for BIOS mode/non-RGB key input
     if(input == 8 && output == 1 && feature == 0)
         kb->handles[0] = device;
-    // Handle 1 is for HID inputs (ignored by ckb)
-    else if(input == 21 && output == 1 && feature == 1)
+    // Handle 1 is for standard HID key input
+    else if((input == 21 || input == 4) && output == 1 && feature == 1)
         kb->handles[1] = device;
     // Handle 2 is for Corsair inputs
-    else if(input == 64 && output == 0 && feature == 0)
+    else if((input == 64 || input == 15) && output == 0 && feature == 0)
         kb->handles[2] = device;
     // Handle 3 is for controlling the device
     else if(input == 0 && output == 0 && feature == 64)
@@ -178,7 +211,7 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
         printf("Warning: Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
 
     // If all handles have been set up, finish initializing the keyboard
-    if(kb->handles[0] && kb->handles[1] && kb->handles[2] && kb->handles[3])
+    if(kb->handles[0] && kb->handles[1] && kb->handles[2] && (kb->handles[3] || !IS_RGB(V_CORSAIR, (short)idproduct)))
         openusb(kb, V_CORSAIR, (short)idproduct);
     pthread_mutex_unlock(&kblistmutex);
 }
@@ -262,7 +295,7 @@ void* threadrun(void* context){
     // Set up device add callback
     IOHIDManagerRegisterDeviceMatchingCallback(usbmanager, usbadd, 0);
     IOHIDManagerScheduleWithRunLoop(usbmanager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-    IOHIDManagerOpen(usbmanager, kIOHIDOptionsTypeNone);
+    IOHIDManagerOpen(usbmanager, kIOHIDOptionsTypeSeizeDevice);
 
     // Run an event tap to modify the state of mouse events. The OS won't take care of this for us so this is needed for Shift and other modifiers to work
     eventTap = CGEventTapCreate(kCGHIDEventTap, kCGHeadInsertEventTap, kCGEventTapOptionDefault, CGEventMaskBit(kCGEventKeyDown) | CGEventMaskBit(kCGEventKeyUp) | CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseDragged) | CGEventMaskBit(kCGEventLeftMouseUp) | CGEventMaskBit(kCGEventRightMouseDown) | CGEventMaskBit(kCGEventRightMouseDragged) | CGEventMaskBit(kCGEventRightMouseUp), tapcallback, 0);
@@ -280,7 +313,7 @@ void* threadrun(void* context){
 
 int usbinit(){
     // Create the device manager
-    if(!(usbmanager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone))){
+    if(!(usbmanager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeSeizeDevice))){
         printf("Fatal: Failed to create device manager\n");
         return -1;
     }

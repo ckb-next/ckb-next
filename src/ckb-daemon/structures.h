@@ -137,7 +137,6 @@ typedef struct {
 #ifdef OS_LINUX
     struct udev_device* udev;
     struct usbdevfs_urb urb[3];
-    uchar urbinput[32];
     int handle;
     int uinput;
     int event;
@@ -167,6 +166,7 @@ typedef struct {
     // Notification FIFO
     int outfifo[OUTFIFO_MAX];
     // Interrupt transfers (keypresses)
+    uchar urbinput[32];
     uchar kbinput[MSG_SIZE];
     uchar prevkbinput[N_KEYS / 8];
     // USB output queue

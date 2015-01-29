@@ -64,7 +64,7 @@ void* intreap(void* context){
             // Process input (if any)
             if(kb->INPUT_READY){
                 if(!HAS_FEATURES(kb, FEAT_RGB)){
-                    // For non RGB keyboards, translate input first
+                    // For non RGB keyboards, translate HID input
                     switch(urb->endpoint){
                     case 0x81:
                         hid_translate(kb->kbinput, 1, 8, kb->urbinput);
@@ -77,9 +77,14 @@ void* intreap(void* context){
                         break;
                     }
                     inputupdate(kb);
-                } else if(urb->actual_length == MSG_SIZE)
-                    // For RGB keyboards, process any input of the correct size
-                    inputupdate(kb);
+                } else {
+                    // For RGB keyboards, process Corsair input or BIOS input
+                    if(urb->endpoint == 0x81){
+                        hid_translate(kb->kbinput, 1, 8, kb->urbinput);
+                        inputupdate(kb);
+                    } else if(urb->actual_length == MSG_SIZE)
+                        inputupdate(kb);
+                }
             }
             // Mark the keyboard as having received input
             kb->INPUT_TEST = 1;
@@ -92,8 +97,7 @@ void* intreap(void* context){
 }
 
 void setint(usbdevice* kb, short vendor, short product){
-    // EPs 1, 2, and 3 are capable of generating input transfers and the keyboard can lock up if they're not received.
-    // Only EP 3 (corsair input) is actually interesting, however
+    // Monitor input transfers on all endpoints
     struct usbdevfs_urb* urb = kb->urb;
     urb->type = USBDEVFS_URB_TYPE_INTERRUPT;
     urb->endpoint = 0x81;
@@ -153,9 +157,9 @@ void closehandle(usbdevice* kb){
 }
 
 int usbclaim(usbdevice* kb, int rgb){
-    // 0 is useless (but claim it anyway for completeness)
-    // 1 is for HID inputs
-    // 2 is for Corsair inputs
+    // 0 is for BIOS mode/non-RGB key input
+    // 1 is for standard HID key input
+    // 2 is for Corsair input
     // 3 is for the LED and board controller (not present on non-RGB models)
     int count = (rgb) ? 4 : 3;
     for(int i = 0; i < count; i++){

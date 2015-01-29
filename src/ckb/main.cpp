@@ -32,7 +32,8 @@ int main(int argc, char *argv[])
     disableAppNap();
 #endif
     MainWindow w;
-    w.show();
+    if(!qApp->arguments().contains("--background"))
+        w.show();
 
     return a.exec();
 }

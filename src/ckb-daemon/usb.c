@@ -179,7 +179,7 @@ int _resetusb(usbdevice* kb, const char* file, int line){
         return -1;
     uchar msg[MSG_SIZE] = { 0x07, 0x04, 0x02, 0 };
     usbqueue(kb, msg, 1);
-    setinput(kb, IN_CORSAIR);
+    setinput(kb, IN_CORSAIR | IN_HID);
     // If the hardware profile hasn't been loaded yet, load it here
     res = 0;
     if(!kb->hw){

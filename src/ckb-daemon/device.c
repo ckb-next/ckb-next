@@ -55,34 +55,31 @@ void setinput(usbdevice* kb, int input){
     datapkt[5][1] = 0x05;
     datapkt[5][2] = 0x02;
     datapkt[5][4] = 0x03;
-    // The special corsair keys don't have any HID scancode, so don't allow them to generate HID interrupts no matter what.
-    // (these should have the same key index regardless of layout)
-#define IMASK(key) ~((keymap_system[key].scan == -2) << 7)
     for(int i = 0; i < 30; i++){
         int key = i;
         datapkt[0][i * 2 + 4] = key;
-        datapkt[0][i * 2 + 5] = input & IMASK(key);
+        datapkt[0][i * 2 + 5] = input;
     }
     for(int i = 0; i < 30; i++){
         int key = i + 30;
         datapkt[1][i * 2 + 4] = key;
-        datapkt[1][i * 2 + 5] = input & IMASK(key);
+        datapkt[1][i * 2 + 5] = input;
     }
     for(int i = 0; i < 30; i++){
         int key = i + 60;
         datapkt[2][i * 2 + 4] = key;
-        datapkt[2][i * 2 + 5] = input & IMASK(key);
+        datapkt[2][i * 2 + 5] = input;
     }
     for(int i = 0; i < 30; i++){
         int key = i + 90;
         datapkt[3][i * 2 + 4] = key;
-        datapkt[3][i * 2 + 5] = input & IMASK(key);
+        datapkt[3][i * 2 + 5] = input;
     }
     for(int i = 0; i < 24; i++){
         int key = i + 120;
         datapkt[4][i * 2 + 4] = key;
         // Set the MR button to toggle the MR ring (0x9)
-        datapkt[4][i * 2 + 5] = (input & IMASK(key)) | (!strcmp(keymap_system[key].name, "mr") ? 0x9 : 0);
+        datapkt[4][i * 2 + 5] = input | (!strcmp(keymap_system[key].name, "mr") ? 0x9 : 0);
     }
 #undef IMASK
     usbqueue(kb, datapkt[0], 6);

@@ -85,6 +85,7 @@ int main(int argc, char** argv){
     printf("ckb Corsair Keyboard RGB driver %s\n", CKB_VERSION_STR);
 
     // Read parameters
+    int forceroot = 1;
     for(int i = 1; i < argc; i++){
         char* argument = argv[i];
         char layout[10];
@@ -109,7 +110,19 @@ int main(int argc, char** argv){
             // Disable key notifications
             features_mask &= ~FEAT_NOTIFY;
             printf("Key notifications are disabled\n");
+        } else if(!strcmp(argument, "--nonroot")){
+            // Allow running as a non-root user
+            forceroot = 0;
         }
+    }
+
+    // Check UID
+    if(getuid() != 0){
+        if(forceroot){
+            printf("Fatal: ckb-daemon must be run as root. Try `sudo %s`\n", argv[0]);
+            exit(0);
+        } else
+            printf("Warning: not running as root, allowing anyway per command-line parameter...\n");
     }
 
     // Set FPS if not done already

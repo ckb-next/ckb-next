@@ -46,7 +46,11 @@ SOURCES += main.cpp\
 	animsettingdialog.cpp \
 	gradientbutton.cpp \
 	gradientdialog.cpp \
-	gradientdialogwidget.cpp
+	gradientdialogwidget.cpp \
+    kbmode.cpp \
+    kb.cpp \
+    rlistwidget.cpp \
+    kbprofiledialog.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
@@ -66,7 +70,11 @@ HEADERS  += mainwindow.h \
 	animsettingdialog.h \
 	gradientbutton.h \
 	gradientdialog.h \
-	gradientdialogwidget.h
+	gradientdialogwidget.h \
+    kbmode.h \
+    kb.h \
+    rlistwidget.h \
+    kbprofiledialog.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \
@@ -75,10 +83,12 @@ FORMS    += mainwindow.ui \
 	kbanimwidget.ui \
 	animadddialog.ui \
 	animsettingdialog.ui \
-	gradientdialog.ui
+	gradientdialog.ui \
+    kbprofiledialog.ui
 
 RESOURCES += \
-	image.qrc
+	image.qrc \
+    text.qrc
 
 OBJECTIVE_SOURCES += \
 	media_mac.m

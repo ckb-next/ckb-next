@@ -5,16 +5,13 @@
 #include "ui_kbanimwidget.h"
 
 KbAnimWidget::KbAnimWidget(QWidget* parent) :
-    QWidget(parent), light(0), current(0), dragSelected(0), noReorder(false),
+    QWidget(parent), light(0), current(0), noReorder(false),
     ui(new Ui::KbAnimWidget)
 {
-    reorderTimer.setSingleShot(true);
-    reorderTimer.setInterval(10);
-    connect(&reorderTimer, SIGNAL(timeout()), this, SLOT(reorderAnims()));
-
     ui->setupUi(this);
     ui->animList->setVisible(false);
     setCurrent(0);
+    connect(ui->animList, SIGNAL(orderChanged()), this, SLOT(reorderAnims()));
 }
 
 KbAnimWidget::~KbAnimWidget(){
@@ -71,11 +68,7 @@ void KbAnimWidget::reorderAnims(){
             KbAnim* anim = animations[item->data(Qt::UserRole).toUuid()];
             if(anim && !light->animList.contains(anim))
                 light->animList.append(anim);
-            if(anim && anim == dragSelected){
-                dragSelected = 0;
-                item->setSelected(true);
-                ui->animList->setCurrentItem(item);
-            }
+            item->setFlags(item->flags() | Qt::ItemIsEditable);
         }
     }
 }
@@ -142,11 +135,8 @@ void KbAnimWidget::setSelectedKeys(const QStringList& keys){
 void KbAnimWidget::on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous){
     if(!current)
         setCurrent(0);
-    else {
+    else
         setCurrent(animations[current->data(Qt::UserRole).toUuid()]);
-        // Editable flag can get scrambled by reorder
-        current->setFlags(current->flags() | Qt::ItemIsEditable);
-    }
 }
 
 void KbAnimWidget::on_animList_itemChanged(QListWidgetItem *item){
@@ -158,12 +148,6 @@ void KbAnimWidget::on_animList_itemChanged(QListWidgetItem *item){
                 ui->nameBox->setText(anim->name());
         }
     }
-    reorderTimer.stop();
-    reorderTimer.start();
-}
-
-void KbAnimWidget::on_animList_itemEntered(QListWidgetItem *item){
-    dragSelected = current;
 }
 
 void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint &pos){
@@ -208,6 +192,7 @@ void KbAnimWidget::on_keyButton_clicked(){
         current->keys(selectedKeys);
         emit didUpdateSelection(selectedKeys);
     }
+    light->restartAnimation();
 }
 
 void KbAnimWidget::on_deleteButton_clicked(){
@@ -222,6 +207,7 @@ void KbAnimWidget::on_deleteButton_clicked(){
             ui->noAnimLabel->setVisible(true);
         }
     }
+    light->restartAnimation();
 }
 
 void KbAnimWidget::on_propertyButton_clicked(){
@@ -237,11 +223,7 @@ void KbAnimWidget::on_propertyButton_clicked(){
     // Apply settings and restart all animations
     current->commitParams();
     current->reInit();
-    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    foreach(KbAnim* anim, light->animList){
-        anim->stop();
-        anim->trigger(timestamp);
-    }
+    light->restartAnimation();
     // Update name
     ui->nameBox->setText(dialog.name());
     on_nameBox_textEdited(dialog.name());

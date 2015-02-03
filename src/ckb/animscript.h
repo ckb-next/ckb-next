@@ -82,10 +82,16 @@ public:
     // Stops the animation.
     void stop();
 
+    // Whether or not the animation has processed any frames yet.
+    inline bool hasFrame() const { return initialized && readAnyFrame; }
+
     // Colors returned from the last executed frame.
     const QHash<QString, QRgb>& colors() const { return _colors; }
 
     ~AnimScript();
+
+private slots:
+    void readProcess();
 
 private:
     bool load();
@@ -120,7 +126,7 @@ private:
     // Animation state
     quint64 lastFrame;
     int durationMsec;
-    bool initialized :1, firstFrame :1, stopped :1;
+    bool initialized :1, firstFrame :1, readFrame :1, readAnyFrame :1, stopped :1;
     QProcess* process;
     QStringList inputBuffer;
 

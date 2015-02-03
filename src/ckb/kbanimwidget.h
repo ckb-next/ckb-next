@@ -34,7 +34,6 @@ signals:
 private slots:
     void on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
     void on_animList_itemChanged(QListWidgetItem *item);
-    void on_animList_itemEntered(QListWidgetItem *item);
     void on_animList_customContextMenuRequested(const QPoint &pos);
     void on_nameBox_textEdited(const QString &arg1);
     void on_opacityBox_valueChanged(double arg1);
@@ -53,8 +52,6 @@ private:
     QHash<QUuid, KbAnim*> animations;
 
     KbAnim* current;
-    KbAnim* dragSelected;
-    QTimer reorderTimer;
     void setCurrent(KbAnim* newCurrent);
     QStringList selectedKeys;
     bool noReorder;

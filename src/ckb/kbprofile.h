@@ -6,72 +6,46 @@
 #include <QSettings>
 #include <QString>
 #include <QUuid>
-#include "kblight.h"
+#include "kbmode.h"
 
 class KbProfile : public QObject
 {
     Q_OBJECT
 public:
     // Default constructor
-    explicit KbProfile(QObject *parent, KbProfile& other);
+    explicit KbProfile(Kb *parent, const KeyMap& keyMap, const KbProfile& other);
     // Construct empty profile with GUID/modification
-    explicit KbProfile(QObject* parent, const KeyMap& keyMap, const QString& guid, const QString& modified);
+    explicit KbProfile(Kb* parent, const KeyMap& keyMap, const QString& guid = "", const QString& modified = "");
     // Load profile from settings
-    explicit KbProfile(QObject* parent, const KeyMap& keyMap, QSettings& settings, const QString& guid);
+    explicit KbProfile(Kb* parent, const KeyMap& keyMap, QSettings& settings, const QString& guid);
 
     // Save profile to settings
     void save(QSettings& settings);
 
     // Profile properties
     inline QString name() const { return _name; }
-    inline void name(const QString& newName) { _name = newName; }
-    inline QString guid() const { return id.guid.toString().toUpper(); }
-    inline void guid(const QString& newGuid) { id.guid = newGuid; }
-    inline QString modified() const { return QString::number(id.modified, 16); }
-    inline void modified(const QString& newModified) { id.modified = newModified.toUInt(0, 16); }
-    inline bool hwAssigned() const { return _hwAssigned; }
-    inline void hwAssigned(bool newHwAssigned) { _hwAssigned = newHwAssigned; }
+    inline void name(const QString& newName) { _name = newName.trimmed(); if(_name == "") _name = "Unnamed"; }
+    inline UsbId& id() { return _id; }
+    inline void id(const UsbId& newId) { _id = newId; }
+
+    // Creates a new ID for the profile and all of its modes
+    void newId();
 
     // Profile key map
     inline const KeyMap& keyMap() const { return _keyMap; }
-    // Update key map
     void keyMap(const KeyMap& newKeyMap);
 
-    // Profile modes
-    inline int modeCount() const { return modeNames.count(); }
-    inline int currentMode() const { return _currentMode; }
-    inline void currentMode(int newCurrentMode) { _currentMode = newCurrentMode; }
-
-    void duplicateMode(int mode);
-    void deleteMode(int mode);
-    void moveMode(int from, int to);
-
-    QString modeName(int mode) const;
-    void modeName(int mode, const QString& newName);
-    QString modeGuid(int mode);
-    void modeGuid(int mode, const QString& newGuid);
-    QString modeModified(int mode);
-    void modeModified(int mode, const QString& newModified);
-
-    KbLight* modeLight(int mode);
+    // Modes in this profile
+    QList<KbMode*> modes;
+    inline int indexOf(KbMode* mode) { return modes.indexOf(mode); }
+    inline KbMode* find(const QUuid& id) { foreach(KbMode* mode, modes) { if(mode->id().guid == id) return mode; } return 0; }
+    // Currently-selected mode
+    KbMode* currentMode;
 
 private:
-    struct UsbId {
-        QUuid guid;
-        quint32 modified;
-
-        inline UsbId(const QString& _guid, quint32 _modified) : guid(_guid), modified(_modified) {}
-        inline UsbId() : guid(QUuid::createUuid()),modified(0) {}
-    };
-
     QString _name;
-    QStringList modeNames;
-    QList<KbLight*> modeLights;
-    QList<UsbId> modeIds;
-    UsbId id;
+    UsbId _id;
     KeyMap _keyMap;
-    int _currentMode;
-    bool _hwAssigned;
 };
 
 #endif // KBPROFILE_H

@@ -64,45 +64,45 @@ void MainWindow::scanKeyboards(){
         foreach(KbWidget* w, kbWidgets)
             w->deleteLater();
         kbWidgets.clear();
-        settingsWidget->ui->devicesLabel->setText("Daemon inactive");
+        settingsWidget->ui->devicesLabel->setText("Driver inactive");
         return;
     }
 
     // Scan connected devices
     foreach(KbWidget* w, kbWidgets)
-        w->disconnect = true;
+        w->active(false);
     QString line;
     while((line = connected.readLine().trimmed()) != ""){
-        QString dev = line.split(" ")[0].trimmed();
-        if(dev == "")
-            break;
+        QStringList components = line.trimmed().split(" ");
+        if(components.length() < 2)
+            continue;
+        QString path = components[0], serial = components[1];
         // Connected already?
         KbWidget* widget = 0;
         foreach(KbWidget* w, kbWidgets){
-            if(w->devpath == dev){
+            if(w->device && w->device->devpath == path && w->device->usbSerial == serial){
                 widget = w;
-                widget->disconnect = false;
+                w->active(true);
                 break;
             }
         }
         if(widget)
             continue;
         // Add the keyboard
-        widget = new KbWidget(this, dev, "Devices");
-        if(widget->cmdpath == ""){
+        widget = new KbWidget(this, path, "Devices");
+        if(!widget->isActive()){
             delete widget;
             continue;
         }
         kbWidgets.append(widget);
-        ui->tabWidget->insertTab(ui->tabWidget->count() - 1, widget, widget->model);
-        connect(eventTimer, SIGNAL(timeout()), widget, SLOT(frameUpdate()));
+        ui->tabWidget->insertTab(ui->tabWidget->count() - 1, widget, widget->name());
+        connect(eventTimer, SIGNAL(timeout()), widget->device, SLOT(frameUpdate()));
     }
     connected.close();
 
     // Remove any devices not found in the connected list
-    QList<KbWidget*> kbWidgets2 = kbWidgets;
-    foreach(KbWidget* w, kbWidgets2){
-        if(w->disconnect){
+    foreach(KbWidget* w, kbWidgets){
+        if(!w->isActive()){
             int i = kbWidgets.indexOf(w);
             ui->tabWidget->removeTab(i);
             kbWidgets.removeAt(i);

@@ -6,8 +6,8 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Random");
-    CKB_VERSION("0.6");
-    CKB_COPYRIGHT("2014", "MSC");
+    CKB_VERSION("0.7");
+    CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{22418DA4-A181-4B93-A4D3-03682BA283D2}");
     CKB_DESCRIPTION("An effect that changes key colors randomly.");
@@ -82,7 +82,8 @@ void ckb_start(ckb_runctx* context){
 
 int ckb_frame(ckb_runctx* context, double delta){
     if(phase < 0.)
-        return 0;
+        // Generate an initial state if it hasn't been done yet
+        ckb_start(context);
     ckb_key* keys = context->keys;
     unsigned count = context->keycount;
     phase += delta;

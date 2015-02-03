@@ -31,6 +31,8 @@ private slots:
     void on_brightnessBox_currentIndexChanged(int index);
     void on_animButton_clicked();
 
+    void update();
+
 private:
     KbLight* light;
 

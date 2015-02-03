@@ -216,9 +216,9 @@ const KeyPos* KeyMap::key(const QString& name) const {
 
 int KeyMap::index(const QString& name) const {
     uint c = count();
-    const char* cname = name.toLatin1();
+    QByteArray cname = name.toLatin1();
     for(uint i = 0; i < c; i++){
-        if(!strcmp(positions[i].name, cname))
+        if(!strcmp(positions[i].name, cname.constData()))
             return i;
     }
     return -1;

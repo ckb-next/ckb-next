@@ -85,7 +85,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>© 2014. Licensed under GPLv2.</string>
+        <string>© 2014-2015. Licensed under GPLv2.</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

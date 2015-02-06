@@ -50,26 +50,27 @@ OSX Binaries
 
 Pre-compiled binaries for OSX are provided by Xiy. The latest OSX binary can be downloaded here: http://mbx.cm/t/_guh4 (version: alpha-v0.0.27)
 
+**Note:** In order to use the OSX binaries you currently need to install Qt5 first: http://www.qt.io/download-open-source/
+
+Make sure to install it to `/Applications/Qt` (the default path is `/Users/<yourusername>/Qt` which won't work). This is a temporary fix; a more permanent solution will be provided in a future version. If the binary version doesn't run, try following the build instructions instead.
+
 To install it, open the dmg and copy "ckb" to your Applications folder. To start the driver, open Terminal and run `sudo /Applications/ckb.app/Contents/Resources/ckb-daemon`. After that, open the ckb app to start the user interface.
 
 Building for OSX
 ----------------
 
-Install the latest version of Xcode from the App Store. Then install Qt5 from here: http://www.qt.io/download-open-source/
+Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
 Open ckb.pro in Qt Creator. You should be prompted to configure the project (make sure the "Desktop" configuration is selected and not iOS). Once it's finished loading the project, press `Cmd+B` or select `Build > Build Project "ckb"` from the menu bar. When it'd done, you should see a newly-created `ckb.app` application in the project directory. Exit Qt Creator.
 
 Before launching ckb, the `ckb-daemon` program needs to be run as root. Open the ckb directory in a Terminal window and run `sudo ckb.app/Contents/Resources/ckb-daemon`. Then open `ckb.app` as a normal application to start the user interface.
 
-If you've rebound your modifier keys in System Preferences, those changes won't work anymore. You have to switch them using ckb-daemon's `bind` command. For instance, to switch Cmd and Ctrl, run: `echo bind lctrl:lwin lwin:lctrl rctrl:rwin rwin:rctrl > /tmp/ckb1/cmd`. This functionality is coming to the user interface soon.
-
 Troubleshooting (OSX)
 ---------------------
 
-`Project ERROR: Xcode not set up properly. You may need to confirm the license agreement by running /usr/bin/xcodebuild`
-Can usually be fixed by launching Xcode and accepting the license agreement. If you still see this error, open a Terminal window, type `/usr/bin/xcodebuild`, and hit enter.
+Make sure your system is up-to-date and that Xcode works on its own. Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt.
 
-If you still have problems compiling the application, try re-installing Xcode and/or Qt. Make sure your system is up-to-date first.
+If you've rebound your modifier keys in System Preferences, those changes won't work anymore. You have to switch them using ckb-daemon's `bind` command. For instance, to switch Cmd and Ctrl, run: `echo bind lctrl:lwin lwin:lctrl rctrl:rwin rwin:rctrl > /tmp/ckb1/cmd`. This functionality is coming to the user interface soon.
 
 Usage
 -----

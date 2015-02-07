@@ -139,11 +139,18 @@ int usbunclaim(usbdevice* kb, int resetting, int rgb){
     int count = (rgb) ? 4 : 3;
     for(int i = 0; i < count; i++)
         ioctl(kb->handle, USBDEVFS_RELEASEINTERFACE, &i);
-    // The kernel driver should only be reconnected to interface 1 (HID), and only if we're not about to do a USB reset
-    // Reconnecting any of the others causes trouble
+    // For RGB keyboards, the kernel driver should only be reconnected to interface 1 (HID), and only if we're not about to do a USB reset.
+    // Reconnecting any of the others causes trouble.
     if(!resetting){
         struct usbdevfs_ioctl ctl = { 1, USBDEVFS_CONNECT, 0 };
         ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+        // Reconnect all handles for non-RGB keyboards
+        if(!HAS_FEATURES(kb, FEAT_RGB)){
+            ctl.ifno = 0;
+            ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+            ctl.ifno = 2;
+            ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+        }
     }
     return 0;
 }

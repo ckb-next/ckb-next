@@ -2,10 +2,19 @@
 #include <QDateTime>
 #include "kblight.h"
 
-KbLight::KbLight(QObject* parent, int modeIndex, const KeyMap& keyMap) :
-    QObject(parent), _map(), _modeIndex(modeIndex + 1), _brightness(0), _inactive(MAX_INACTIVE), _winLock(false), _showMute(true)
+KbLight::KbLight(QObject* parent, const KeyMap& keyMap) :
+    QObject(parent), _map(), _brightness(0), _inactive(MAX_INACTIVE), _winLock(false), _showMute(true), _start(false)
 {
     map(keyMap);
+}
+
+KbLight::KbLight(QObject* parent, const KeyMap& keyMap, const KbLight& other) :
+    QObject(parent), _map(other._map), _colorMap(other._colorMap), _brightness(other._brightness), _inactive(other._inactive), _winLock(other._winLock), _showMute(other._showMute), _start(false)
+{
+    map(keyMap);
+    // Duplicate animations
+    foreach(KbAnim* animation, other.animList)
+        animList.append(new KbAnim(this, keyMap, *animation));
 }
 
 void KbLight::map(const KeyMap& map){
@@ -42,6 +51,7 @@ void KbLight::map(const KeyMap& map){
     foreach(KbAnim* anim, animList)
         anim->map(map);
     _colorMap = newColorMap;
+    emit updated();
 }
 
 void KbLight::color(const QColor& newColor){
@@ -62,7 +72,27 @@ KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys){
     KbAnim* anim = new KbAnim(this, _map, keys, base);
     animList.append(anim);
     anim->trigger(timestamp);
+    _start = true;
     return anim;
+}
+
+bool KbLight::isStarted(){
+    if(!_start)
+        return false;
+    foreach(KbAnim* animation, animList){
+        if(!animation->isRunning())
+            return false;
+    }
+    return true;
+}
+
+void KbLight::restartAnimation(){
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    foreach(KbAnim* anim, animList){
+        anim->stop();
+        anim->trigger(timestamp);
+    }
+    _start = true;
 }
 
 void KbLight::animKeypress(const QString& keyEvent){
@@ -90,14 +120,14 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
     }
 }
 
-void KbLight::frameUpdate(QFile& cmd, bool dimMute){
+void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute){
     // Advance animations
     QHash<QString, QRgb> animMap = _colorMap;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, animList)
         anim->blend(animMap, timestamp);
 
-    cmd.write(QString().sprintf("mode %d switch", _modeIndex).toLatin1());
+    cmd.write(QString().sprintf("mode %d switch", modeIndex + 1).toLatin1());
     if(_brightness == 3){
         // If brightness is at 0%, turn off lighting entirely
         cmd.write(" rgb off");
@@ -114,7 +144,7 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
             inactiveList << "lock";
         if(dimMute && _showMute)
             inactiveList << "mute";
-        inactiveList.removeAll(QString("m%1").arg(_modeIndex));
+        inactiveList.removeAll(QString("m%1").arg(modeIndex + 1));
         inactiveLight = (2 - _inactive) / 4.f;
     }
 
@@ -146,20 +176,28 @@ void KbLight::frameUpdate(QFile& cmd, bool dimMute){
 }
 
 void KbLight::open(){
+    if(_start)
+        return;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, animList)
         anim->trigger(timestamp);
+    _start = true;
 }
 
-void KbLight::close(QFile &cmd){
+void KbLight::close(){
     foreach(KbAnim* anim, animList)
         anim->stop();
+    _start = false;
+}
+
+void KbLight::base(QFile &cmd, int modeIndex){
+    close();
     if(_brightness == MAX_BRIGHTNESS){
-        cmd.write(QString().sprintf("mode %d rgb off", _modeIndex).toLatin1());
+        cmd.write(QString().sprintf("mode %d rgb off", modeIndex + 1).toLatin1());
         return;
     }
     // Set just the background color, ignoring any animation
-    cmd.write(QString().sprintf("mode %d", _modeIndex).toLatin1());
+    cmd.write(QString().sprintf("mode %d", modeIndex + 1).toLatin1());
     QHash<QString, QRgb> animMap = _colorMap;
     animMap["mr"] = qRgb(0, 0, 0);
     animMap["m1"] = qRgb(0, 0, 0);
@@ -169,12 +207,13 @@ void KbLight::close(QFile &cmd){
     printRGB(cmd, animMap);
 }
 
-void KbLight::winLock(QFile& cmd, bool lock){
+void KbLight::winLock(QFile& cmd, int modeIndex, bool lock){
     _winLock = lock;
     if(lock)
-        cmd.write(QString().sprintf("mode %d unbind lwin rwin", _modeIndex).toLatin1());
+        cmd.write(QString().sprintf("mode %d unbind lwin rwin", modeIndex + 1).toLatin1());
     else
-        cmd.write(QString().sprintf("mode %d rebind lwin rwin", _modeIndex).toLatin1());
+        cmd.write(QString().sprintf("mode %d rebind lwin rwin", modeIndex + 1).toLatin1());
+    emit updated();
 }
 
 void KbLight::load(QSettings& settings){

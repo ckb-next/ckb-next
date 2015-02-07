@@ -38,7 +38,7 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
         printf(" %02hhx", urbinput[i]);
     printf("\n");
     // LUT for HID -> Corsair scancodes (-1 for no scan code, -2 for currently unsupported)
-    // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with array indices
+    // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with array indices and K95 keys added
     static const short hid_codes[256] = {
         -1,  -1,  -1,  -1,  37,  54,  52,  39,  27,  40,  41,  42,  32,  43,  44,  45,
         56,  55,  33,  34,  25,  28,  38,  29,  31,  53,  26,  51,  30,  50,  13,  14,
@@ -53,9 +53,9 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-        -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-        60,  48,  62,  61,  91,  90,  67,  68, 100,  -2,  99, 101,  -2, 130, 131,  97,
-        -2,  -2,  -2,  98,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -1,  -1,  -1,  -1,
+       120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 136, 137, 138, 139, 140, 141,
+        60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97,
+        -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  -2,  -1,  -1,  -1,  -1,
     };
     if(endpoint == 1){
         // Clear previous input

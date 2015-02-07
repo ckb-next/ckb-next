@@ -21,17 +21,24 @@ KbLightWidget::~KbLightWidget(){
 }
 
 void KbLightWidget::setLight(KbLight* newLight){
-    ui->rgbWidget->map(newLight->map());
-    ui->rgbWidget->colorMap(newLight->colorMap());
     ui->rgbWidget->clearSelection();
     ui->rgbWidget->clearAnimation();
     ui->animWidget->clearSelection();
     if(light == newLight)
         return;
+    if(light)
+        disconnect(light, SIGNAL(updated()), this, SLOT(update()));
+    connect(newLight, SIGNAL(updated()), this, SLOT(update()));
     light = newLight;
-    ui->brightnessBox->setCurrentIndex(newLight->brightness());
+    update();
     ui->rgbWidget->setAnimation(QStringList());
     ui->animWidget->setLight(newLight);
+}
+
+void KbLightWidget::update(){
+    ui->rgbWidget->map(light->map());
+    ui->rgbWidget->colorMap(light->colorMap());
+    ui->brightnessBox->setCurrentIndex(light->brightness());
 }
 
 void KbLightWidget::newSelection(QColor selectedColor, QStringList selection){
@@ -86,4 +93,5 @@ void KbLightWidget::on_animButton_clicked(){
     if(dialog.result() != QDialog::Accepted)
         return;
     ui->animWidget->addAnim(dialog.chosenScript(), currentSelection);
+    light->restartAnimation();
 }

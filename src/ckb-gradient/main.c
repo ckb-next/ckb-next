@@ -5,7 +5,7 @@ void ckb_info(){
     // Plugin info
     CKB_NAME("Gradient");
     CKB_VERSION("0.7");
-    CKB_COPYRIGHT("2014", "MSC");
+    CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{54DD2975-E192-457D-BCFC-D912A24E33B4}");
     CKB_DESCRIPTION("A transition from one color to another.");

@@ -20,12 +20,15 @@ public:
         Divide
     };
 
-    // Create a new animation
-    KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, const AnimScript* script);
     // Load an animation from settings
     KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings& settings);
     // Save an animation to settings
     void save(QSettings& settings);
+
+    // Create a new animation
+    KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, const AnimScript* script);
+    // Copy an existing animation
+    KbAnim(QObject *parent, const KeyMap& map, const KbAnim& other);
 
     // Key map
     inline const KeyMap& map() { return _map; }
@@ -52,22 +55,25 @@ public:
     void keypress(const QString& key, bool pressed, quint64 timestamp);
     // Stops the animation
     void stop();
+    // Whether or not the animation is running
+    inline bool isRunning() { return forceStarted || _script->hasFrame(); }
 
     // Blends the animation into a color map, taking opacity and mode into account
     void blend(QHash<QString, QRgb>& animMap, quint64 timestamp);
 
     // Animation properties
-    inline const QUuid& guid() { return _guid; }
-    inline const QString& name() { return _name; }
+    inline const QUuid& guid() const { return _guid; }
+    inline void newId() { _guid = QUuid::createUuid(); }
+    inline const QString& name() const { return _name; }
     inline void name(const QString& newName) { _name = newName; }
-    inline float opacity() { return _opacity; }
+    inline float opacity() const { return _opacity; }
     inline void opacity(float newOpacity) { _opacity = newOpacity; }
-    inline Mode mode() { return _mode; }
+    inline Mode mode() const { return _mode; }
     inline void mode(Mode newMode) { _mode = newMode; }
 
     // Animation script properties
-    const AnimScript* script() { return _script; }
-    const QString& scriptName() { return _scriptName; }
+    const AnimScript* script() const { return _script; }
+    const QString& scriptName() const { return _scriptName; }
 
 private:
     // Script (null if not loaded)
@@ -92,6 +98,8 @@ private:
     QString repeatKey;
     quint64 repeatTime, kpRepeatTime, stopTime, kpStopTime;
     int repeatMsec, kpRepeatMsec;
+    // Depending on the animation settings, it may not start immediately when it's "started", so this is used to avoid waiting for it.
+    bool forceStarted;
 
     QUuid _guid;
     QString _name;

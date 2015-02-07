@@ -88,11 +88,23 @@ void RgbWidget::paintEvent(QPaintEvent*){
             h *= 0.75f;
             painter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
         } else {
-            // UK enter key isn't rectangular
-            if(key.height == 24 && !strcmp(key.name, "enter")){
-                y = key.y + 1.f;
-                h = 10.f;
-                painter.drawRect(QRectF((x + w - 13.f) * xScale, y * yScale, 13.f * xScale, 22.f * yScale));
+            if(!strcmp(key.name, "enter")){
+                if(key.height == 24){
+                    // ISO enter key isn't rectangular
+                    y = key.y + 1.f;
+                    h = 10.f;
+                    painter.drawRect(QRectF((x + w - 13.f) * xScale, y * yScale, 13.f * xScale, 22.f * yScale));
+                } else {
+                    // US enter key isn't perfectly centered, needs an extra pixel on the left to appear correctly
+                    x -= 1.f;
+                    w += 1.f;
+                }
+            } else if(!strcmp(key.name, "rshift") || !strcmp(key.name, "stop")){
+                // A few other keys also need extra pixels
+                x -= 1.f;
+                w += 1.f;
+            } else if(!strcmp(key.name, "caps") || !strcmp(key.name, "lshift") || !strcmp(key.name, "next")){
+                w += 1.f;
             }
             painter.drawRect(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
         }

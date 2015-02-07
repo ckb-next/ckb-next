@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/txt">
+        <file>demoprofile.conf</file>
+    </qresource>
+</RCC>

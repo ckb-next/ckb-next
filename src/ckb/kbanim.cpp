@@ -5,7 +5,7 @@
 
 KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& settings) :
     QObject(parent), _script(0), _map(map),
-    repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0), stopTime(0), kpStopTime(0),
+    repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
     _guid(id)
 {
     settings.beginGroup(_guid.toString().toUpper());
@@ -71,7 +71,7 @@ void KbAnim::save(QSettings& settings){
 KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, const AnimScript* script) :
     QObject(parent),
     _script(AnimScript::copy(this, script->guid())), _map(map), _keys(keys),
-    repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0),
+    repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
     _guid(QUuid::createUuid()), _name(_script ? _script->name() : ""), _opacity(1.), _mode(Normal)
 {
     if(_script){
@@ -86,6 +86,16 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, cons
         _scriptName = script->name();
         reInit();
     }
+}
+
+KbAnim::KbAnim(QObject* parent, const KeyMap& map, const KbAnim& other) :
+    QObject(parent),
+    _script(AnimScript::copy(this, other.script()->guid())), _scriptGuid(_script->guid()), _scriptName(_script->name()),
+    _map(map), _keys(other._keys), _parameters(other._parameters),
+    repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
+    _guid(other._guid), _name(other._name), _opacity(other._opacity), _mode(other._mode)
+{
+    reInit();
 }
 
 void KbAnim::parameter(const QString& name, const QVariant& value){
@@ -124,6 +134,7 @@ void KbAnim::reInit(){
     if(_script)
         _script->init(_map, _keys, effectiveParams());
     repeatKey = "";
+    forceStarted = false;
 }
 
 void KbAnim::map(const KeyMap& newMap){
@@ -171,6 +182,7 @@ void KbAnim::trigger(quint64 timestamp){
             // If delay is enabled, wait to trigger the event
             timestamp += delay;
             repeatTime = timestamp;
+            forceStarted = true;
         } else
             _script->retrigger(timestamp, true);
         int repeat = round(parameters.value("repeat").toDouble() * 1000.);
@@ -193,7 +205,8 @@ void KbAnim::trigger(quint64 timestamp){
             else
                 stopTime = timestamp + repeat * (1 + stop);
         }
-    }
+    } else
+        forceStarted = true;
 }
 
 void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
@@ -205,6 +218,7 @@ void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
                 // If delay is enabled, wait to trigger the event
                 timestamp += delay;
                 kpRepeatTime = timestamp;
+                forceStarted = true;
             } else
                 _script->keypress(key, pressed, timestamp);
             int repeat = round(parameters.value("kprepeat").toDouble() * 1000.);
@@ -247,6 +261,7 @@ void KbAnim::stop(){
     stopTime = 0;
     kpStopTime = 0;
     repeatKey = "";
+    forceStarted = false;
 }
 
 // Blending functions

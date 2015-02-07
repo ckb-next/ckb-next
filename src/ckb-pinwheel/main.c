@@ -3,8 +3,8 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Pinwheel");
-    CKB_VERSION("0.6");
-    CKB_COPYRIGHT("2014", "MSC");
+    CKB_VERSION("0.7");
+    CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{07551A90-D97A-4DD0-A770-E9E280A90891}");
     CKB_DESCRIPTION("A spinning pinwheel effect.");
@@ -58,7 +58,7 @@ void ckb_start(ckb_runctx* context){
 
 int ckb_frame(ckb_runctx* context, double delta){
     if(frame < 0.)
-        return 0;
+        ckb_start(context);
     CKB_KEYCLEAR(context);
     frame += delta;
     if(frame > 1.)

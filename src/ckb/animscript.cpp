@@ -184,6 +184,14 @@ bool AnimScript::load(){
     if(_info.guid.isNull() || _info.name == "" || _info.version == "" || _info.year == "" || _info.author == "" || _info.license == "")
         return false;
     // Add timing parameters
+    if(!hasParam("trigger")){
+        Param trigger = { Param::BOOL, "trigger", "", "", true, 0, 0 };
+        _info.params.append(trigger);
+    }
+    if(!hasParam("kptrigger")){
+        Param kptrigger = { Param::BOOL, "kptrigger", "", "", false, 0, 0 };
+        _info.params.append(kptrigger);
+    }
     if(_info.absoluteTime || !_info.repeat)
         _info.preempt = false;
     Param delay = { Param::DOUBLE, "delay", "", "", 0., 0., ONE_DAY };
@@ -268,15 +276,16 @@ void AnimScript::start(quint64 timestamp){
     if(!initialized)
         return;
     stop();
-    stopped = firstFrame = false;
+    stopped = firstFrame = readFrame = readAnyFrame = false;
     process = new QProcess(this);
+    connect(process, SIGNAL(readyRead()), this, SLOT(readProcess()));
     process->start(_path, QStringList("--ckb-run"));
     qDebug() << "Starting " << _path;
     // Determine the upper left corner of the given keys
     QStringList keysCopy = _keys;
     minX = INT_MAX;
     minY = INT_MAX;
-    foreach(const QString& key, _keys){
+    foreach(const QString& key, keysCopy){
         const KeyPos* pos = _map.key(key);
         if(!pos){
             keysCopy.removeAll(key);
@@ -346,19 +355,12 @@ void AnimScript::stop(){
     if(process){
         process->kill();
         connect(process, SIGNAL(finished(int)), process, SLOT(deleteLater()));
+        disconnect(process, SIGNAL(readyRead()), this, SLOT(readProcess()));
         process = 0;
     }
 }
 
-void AnimScript::frame(quint64 timestamp){
-    if(!initialized || stopped)
-        return;
-    // Start the animation if it's not running yet
-    if(!process)
-        start(timestamp);
-
-    // Buffer the current output.
-    bool skipped = true;
+void AnimScript::readProcess(){
     while(process->canReadLine()){
         QString line = process->readLine().trimmed();
         if(inputBuffer.length() == 0 && line != "begin frame"){
@@ -371,7 +373,6 @@ void AnimScript::frame(quint64 timestamp){
         }
         if(line == "end frame"){
             // Process this frame
-            skipped = false;
             foreach(QString input, inputBuffer){
                 QStringList split = input.split(" ");
                 if(split.length() != 3 || split[0] != "argb")
@@ -379,16 +380,29 @@ void AnimScript::frame(quint64 timestamp){
                 _colors[split[1]] = split[2].toUInt(0, 16);
             }
             inputBuffer.clear();
+            readFrame = readAnyFrame = true;
             continue;
         }
         inputBuffer += line;
     }
+}
+
+void AnimScript::frame(quint64 timestamp){
+    if(!initialized || stopped)
+        return;
+    // Start the animation if it's not running yet
+    if(!process)
+        start(timestamp);
+
     // If at least one frame was read (or no frame commands have been sent yet), advance the animation
-    if(!skipped || !firstFrame)
+    if(readFrame || !firstFrame)
         nextFrame(timestamp);
+    readFrame = false;
 }
 
 void AnimScript::nextFrame(quint64 timestamp){
+    if(timestamp <= lastFrame)
+        lastFrame = timestamp;
     double delta = (timestamp - lastFrame) / (double)durationMsec;
     // Skip any complete durations
     if(!_info.absoluteTime){

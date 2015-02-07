@@ -52,12 +52,13 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
         -2,  -2,  -2,  -2,  -2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-        -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
+        -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -3,  -1,  -1,  -1,  // <- -3 = program key
        120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 136, 137, 138, 139, 140, 141,
         60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97,
-        -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  -2,  -1,  -1,  -1,  -1,
+        -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
     };
     if(endpoint == 1){
+        // EP 1: RGB BIOS mode input, non-RGB key input
         // Clear previous input
         for(int i = 0; i < 256; i++){
             if(hid_codes[i] >= 0)
@@ -77,8 +78,38 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
                 //    printf("Got unknown key press %d on EP %d\n", urbinput[i], endpoint);
             }
         }
+    } else if(endpoint == 2){
+        // EP 2: Non-RGB media keys
+        CLEAR_KEYBIT(kbinput, 97);          // mute
+        CLEAR_KEYBIT(kbinput, 98);          // stop
+        CLEAR_KEYBIT(kbinput, 99);          // prev
+        CLEAR_KEYBIT(kbinput, 100);         // play
+        CLEAR_KEYBIT(kbinput, 101);         // next
+        CLEAR_KEYBIT(kbinput, 130);         // volup
+        CLEAR_KEYBIT(kbinput, 131);         // voldn
+        for(int i = 0; i < length; i++){
+            switch(urbinput[i]){
+            case 181:
+                SET_KEYBIT(kbinput, 101);   // next
+                break;
+            case 182:
+                SET_KEYBIT(kbinput, 99);    // prev
+                break;
+            case 183:
+                SET_KEYBIT(kbinput, 98);    // stop
+                break;
+            case 205:
+                SET_KEYBIT(kbinput, 100);   // play
+                break;
+            case 233:
+                SET_KEYBIT(kbinput, 130);   // volup
+                break;
+            case 234:
+                SET_KEYBIT(kbinput, 131);   // voldn
+                break;
+            }
+        }
     } else {
-        // TO-DO: handle other endpoints
         for(int i = 0; i < length; i++){
             if(urbinput[i] != 0){
                 //printf("Got unknown key press %d on EP %d\n", urbinput[i], endpoint);

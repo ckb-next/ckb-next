@@ -32,11 +32,6 @@ const char* getmapname(const key* layout){
 }
 
 void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput){
-    // Test keycodes
-    printf("EP %d:", endpoint);
-    for(int i = 0; i < length; i++)
-        printf(" %02hhx", urbinput[i]);
-    printf("\n");
     // LUT for HID -> Corsair scancodes (-1 for no scan code, -2 for currently unsupported)
     // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with array indices and K95 keys added
     static const short hid_codes[256] = {
@@ -74,8 +69,8 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
                 int bit = hid_codes[urbinput[i]];
                 if(bit >= 0)
                     SET_KEYBIT(kbinput, bit);
-                //else
-                //    printf("Got unknown key press %d on EP %d\n", urbinput[i], endpoint);
+                else
+                    printf("Got unknown key press %d on EP %d\n", urbinput[i], endpoint);
             }
         }
     } else if(endpoint == 2){
@@ -112,7 +107,7 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
     } else {
         for(int i = 0; i < length; i++){
             if(urbinput[i] != 0){
-                //printf("Got unknown key press %d on EP %d\n", urbinput[i], endpoint);
+                printf("Got unknown key press %d on EP %d\n", urbinput[i], endpoint);
             }
         }
     }

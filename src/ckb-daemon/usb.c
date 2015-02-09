@@ -28,6 +28,9 @@ int setupusb(usbdevice* kb, short vendor, short product){
     kb->vendor = vendor;
     kb->product = product;
     kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;
+    // Make up a device name if one wasn't assigned
+    if(!kb->name[0])
+        snprintf(kb->name, NAME_LEN, "Corsair K%d%s", kb->model, HAS_FEATURES(kb, FEAT_RGB) ? " RGB" : "");
     pthread_mutex_init(&kb->mutex, 0);
     pthread_mutex_init(&kb->keymutex, 0);
     pthread_mutex_lock(&kb->mutex);

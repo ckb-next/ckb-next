@@ -209,6 +209,8 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
 int openusb(struct udev_device* dev, short vendor, short product){
     // Make sure it's not connected yet
     const char* path = udev_device_get_devnode(dev);
+    if(!path)
+        return -1;
     for(int i = 1; i < DEV_MAX; i++){
         if(keyboard[i].udev && !strcmp(path, udev_device_get_devnode(keyboard[i].udev)))
             return 0;
@@ -232,7 +234,9 @@ int openusb(struct udev_device* dev, short vendor, short product){
             }
 
             // Copy device description and serial
-            strncpy(kb->name, udev_device_get_sysattr_value(dev, "product"), NAME_LEN);
+            const char* name = udev_device_get_sysattr_value(dev, "product");
+            if(name)
+                strncpy(kb->name, name, NAME_LEN);
             const char* serial = udev_device_get_sysattr_value(dev, "serial");
             if(serial)
                 strncpy(kb->profile.serial, serial, SERIAL_LEN);
@@ -346,17 +350,23 @@ void udevenum(){
 
     udev_list_entry_foreach(dev_list_entry, devices){
         const char* path = udev_list_entry_get_name(dev_list_entry);
+        if(!path)
+            continue;
         struct udev_device* dev = udev_device_new_from_syspath(udev, path);
+        if(!dev)
+            continue;
         // If the device matches a recognized device ID, open it
         const char* product = udev_device_get_sysattr_value(dev, "idProduct");
         int found = 0;
-        for(_model* model = models; model < models + N_MODELS; model++){
-            if(!strcmp(product, model->name)){
-                found = 1;
-                pthread_mutex_lock(&kblistmutex);
-                openusb(dev, V_CORSAIR, model->number);
-                pthread_mutex_unlock(&kblistmutex);
-                break;
+        if(product){
+            for(_model* model = models; model < models + N_MODELS; model++){
+                if(!strcmp(product, model->name)){
+                    found = 1;
+                    pthread_mutex_lock(&kblistmutex);
+                    openusb(dev, V_CORSAIR, model->number);
+                    pthread_mutex_unlock(&kblistmutex);
+                    break;
+                }
             }
         }
         // Free the device if it wasn't used
@@ -390,55 +400,59 @@ void* udevmain(void* context){
         // Block until an event is read
         if(select(fd + 1, &fds, 0, 0, 0) > 0 && FD_ISSET(fd, &fds)){
             struct udev_device* dev = udev_monitor_receive_device(monitor);
-            if(dev){
-                const char* action = udev_device_get_action(dev);
-                if(action && !strcmp(action, "add")){
-                    // Device added. Check vendor and product ID and add the device if it matches.
-                    const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
-                    if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
-                        const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-                        int found = 0;
-                        if(product){
-                            for(_model* model = models; model < models + N_MODELS; model++){
-                                if(!strcmp(product, model->name)){
-                                    found = 1;
-                                    pthread_mutex_lock(&kblistmutex);
-                                    openusb(dev, V_CORSAIR, model->number);
-                                    pthread_mutex_unlock(&kblistmutex);
-                                    break;
-                                }
+            if(!dev)
+                continue;
+            const char* action = udev_device_get_action(dev);
+            if(!action){
+                udev_device_unref(dev);
+                continue;
+            }
+            if(!strcmp(action, "add")){
+                // Device added. Check vendor and product ID and add the device if it matches.
+                const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
+                if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
+                    const char* product = udev_device_get_sysattr_value(dev, "idProduct");
+                    int found = 0;
+                    if(product){
+                        for(_model* model = models; model < models + N_MODELS; model++){
+                            if(!strcmp(product, model->name)){
+                                found = 1;
+                                pthread_mutex_lock(&kblistmutex);
+                                openusb(dev, V_CORSAIR, model->number);
+                                pthread_mutex_unlock(&kblistmutex);
+                                break;
                             }
                         }
-                        // Free the device if it wasn't used
-                        if(!found)
-                            udev_device_unref(dev);
-                    } else
-                        udev_device_unref(dev);
-                    // Wait a little bit and then re-enumerate devices. Sometimes the keyboard doesn't get picked up right away.
-                    DELAY_LONG;
+                    }
+                    // Don't free the device if it's now in use
+                    if(found)
+                        continue;
+                }
+                // Wait a little bit and then re-enumerate devices. Sometimes the keyboard doesn't get picked up right away.
+                DELAY_LONG;
+                connectstatus = 0;
+                udevenum();
+                tries = 0;
+                while((connectstatus & 2) && ++tries < 5){
+                    // If a device failed to connect, enumerate again to make sure we reconnect it (if possible)
+                    printf("Trying again...\n");
                     connectstatus = 0;
                     udevenum();
-                    tries = 0;
-                    while((connectstatus & 2) && ++tries < 5){
-                        // If a device failed to connect, enumerate again to make sure we reconnect it (if possible)
-                        printf("Trying again...\n");
-                        connectstatus = 0;
-                        udevenum();
-                    }
-                } else if(!strcmp(action, "remove")){
-                    // Device removed. Look for it in our list of keyboards
-                    pthread_mutex_lock(&kblistmutex);
-                    const char* path = udev_device_get_syspath(dev);
-                    for(int i = 1; i < DEV_MAX; i++){
-                        if(keyboard[i].udev && !strcmp(path, udev_device_get_syspath(keyboard[i].udev))){
-                            pthread_mutex_lock(&keyboard[i].mutex);
-                            closeusb(keyboard + i);
-                            break;
-                        }
-                    }
-                    pthread_mutex_unlock(&kblistmutex);
                 }
+            } else if(!strcmp(action, "remove")){
+                // Device removed. Look for it in our list of keyboards
+                pthread_mutex_lock(&kblistmutex);
+                const char* path = udev_device_get_syspath(dev);
+                for(int i = 1; i < DEV_MAX; i++){
+                    if(keyboard[i].udev && !strcmp(path, udev_device_get_syspath(keyboard[i].udev))){
+                        pthread_mutex_lock(&keyboard[i].mutex);
+                        closeusb(keyboard + i);
+                        break;
+                    }
+                }
+                pthread_mutex_unlock(&kblistmutex);
             }
+            udev_device_unref(dev);
         }
     }
     udev_monitor_unref(monitor);

@@ -1,4 +1,5 @@
 QT       -= gui
+QT       -= core
 
 QMAKE_CFLAGS += -std=c99
 
@@ -12,10 +13,10 @@ CONFIG   += debug_and_release
 TEMPLATE = app
 
 macx {
-	DESTDIR = $$PWD/../../ckb.app/Contents/Resources/ckb-animations
+    DESTDIR = $$PWD/../../ckb.app/Contents/Resources/ckb-animations
 } else {
-	DESTDIR = $$PWD/../../bin/ckb-animations
+    DESTDIR = $$PWD/../../bin/ckb-animations
 }
 
 SOURCES += \
-	main.c
+    main.c

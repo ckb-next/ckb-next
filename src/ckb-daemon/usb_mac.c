@@ -243,27 +243,25 @@ CGEventRef tapcallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
     return event;
 }
 
-extern int keyrepeatdelay();
-extern int keyrepeatinterval();
+extern long keyrepeatinterval();
 extern void keyretrigger(usbdevice*, int);
 
 void* krthread(void* context){
     while(1){
-        // Max repeat speed: 1ms
+        // Re-scan every 1ms
         usleep(1000);
-        int delay = keyrepeatdelay();
-        if(delay <= 0)
-            delay = 1;
-        int interval = keyrepeatinterval();
-        if(interval <= 0)
-            interval = 1;
+        long interval = keyrepeatinterval();
+        struct timespec time;
+        clock_gettime(CLOCK_MONOTONIC, &time);
         for(int i = 1; i < DEV_MAX; i++){
             if(IS_ACTIVE(keyboard + i)){
                 pthread_mutex_lock(&keyboard[i].keymutex);
-                if(keyboard[i].lastkeypress != -1){
-                    keyboard[i].keypresstime++;
-                    if(keyboard[i].keypresstime >= delay && (keyboard[i].keypresstime - delay) % interval == 0)
+                if(keyboard[i].lastkeypress != KEY_NONE){
+                    // Repeat the key as many times as needed to catch up
+                    while(timespec_ge(time, keyboard[i].keyrepeat)){
                         keyretrigger(keyboard + i, keyboard[i].lastkeypress);
+                        timespec_add(&keyboard[i].keyrepeat, interval);
+                    }
                 }
                 pthread_mutex_unlock(&keyboard[i].keymutex);
             }

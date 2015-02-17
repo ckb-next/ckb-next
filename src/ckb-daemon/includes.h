@@ -30,6 +30,14 @@ typedef unsigned short ushort;
 // Better __FILE__ macro
 #define __FILE_NOPATH__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
+// Timespec utilities
+void timespec_add(struct timespec* timespec, long nanoseconds);
+#define timespec_gt(left, right)    ((left).tv_sec > (right).tv_sec || ((left).tv_sec == (right).tv_sec && (left).tv_nsec > (right).tv_nsec))
+#define timespec_eq(left, right)    ((left).tv_sec == (right).tv_sec && (left).tv_nsec == (right).tv_nsec)
+#define timespec_ge(left, right)    ((left).tv_sec > (right).tv_sec || ((left).tv_sec == (right).tv_sec && (left).tv_nsec >= (right).tv_nsec))
+#define timespec_lt(left, right)    (!timespec_ge(left, right))
+#define timespec_le(left, right)    (!timespec_gt(left, right))
+
 #include "structures.h"
 
 #endif

@@ -5,12 +5,12 @@
 
 // ¯\_(ツ)_/¯
 
-int keyrepeatdelay(){
-    return round([NSEvent keyRepeatDelay] * 1000.);
+long keyrepeatdelay(){
+    return round([NSEvent keyRepeatDelay] * 1000000000.);
 }
 
-int keyrepeatinterval(){
-    return round([NSEvent keyRepeatInterval] * 1000.);
+long keyrepeatinterval(){
+    return round([NSEvent keyRepeatInterval] * 1000000000.);
 }
 
 void *memrchr(const void *s, int c, size_t n){

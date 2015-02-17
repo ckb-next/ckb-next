@@ -20,7 +20,8 @@ void inputclose(usbdevice* kb){
     }
 }
 
-// extra_mac.m: Need access to NSEvent for this
+// extra_mac.m
+extern long keyrepeatdelay();
 extern CGEventRef media_event(uint data1, uint modifiers);
 #define MEDIA_FLAGS(scancode, down, is_repeat) (((scancode) - KEY_MEDIA) << 16 | ((down) ? 0x0a00 : 0x0b00) | !!(is_repeat))
 
@@ -62,8 +63,14 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         kb->eventflags = kb->lflags | kb->rflags | 0x100;
         kb->lastkeypress = KEY_NONE;
     } else {
-        kb->lastkeypress = (down ? scancode : -1);
-        kb->keypresstime = 0;
+        // For any other key, trigger key repeat
+        long repeat = keyrepeatdelay();
+        if(down && repeat > 0){
+            kb->lastkeypress = scancode;
+            clock_gettime(CLOCK_MONOTONIC, &kb->keyrepeat);
+            timespec_add(&kb->keyrepeat, repeat);
+        } else
+            kb->lastkeypress = KEY_NONE;
     }
     if(scancode >= KEY_MEDIA){
         // Media keys get a separate event

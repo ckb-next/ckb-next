@@ -6,6 +6,13 @@
 
 extern int features_mask;
 
+// Timespec utility function
+void timespec_add(struct timespec* timespec, long nanoseconds){
+    nanoseconds += timespec->tv_nsec;
+    timespec->tv_sec += nanoseconds / 1000000000;
+    timespec->tv_nsec = nanoseconds % 1000000000;
+}
+
 // Not supported on OSX...
 #ifdef OS_MAC
 #define pthread_mutex_timedlock(mutex, timespec) pthread_mutex_lock(mutex)
@@ -225,16 +232,12 @@ int main(int argc, char** argv){
         }
         pthread_mutex_unlock(&kblistmutex);
         // Sleep for long enough to achieve the desired frame rate (5 packets per frame).
-        long newnsec = time.tv_nsec + 1000000000 / fps / 5;
-        nexttime.tv_sec = time.tv_sec + newnsec / 1000000000;
-        nexttime.tv_nsec = newnsec % 1000000000;
-        // Don't ever sleep for less than 1.5ms. It can lock the keyboard.
+        memcpy(&nexttime, &time, sizeof(time));
+        timespec_add(&nexttime, 1000000000 / fps / 5);
+        // Don't ever sleep for less than 1.5ms. It can lock the keyboard. Restart the sleep if it gets interrupted.
         clock_gettime(CLOCK_MONOTONIC, &time);
-        newnsec = time.tv_nsec + 1500000;
-        time.tv_sec += newnsec / 1000000000;
-        time.tv_nsec = newnsec % 1000000000;
-        // Sleep for whichever time period is greater. Restart the sleep if it gets interrupted.
-        if(nexttime.tv_sec > time.tv_sec || (nexttime.tv_sec == time.tv_sec && nexttime.tv_nsec > time.tv_nsec))
+        timespec_add(&time, 1500000);
+        if(timespec_gt(nexttime, time))
             while(clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nexttime, 0) == EINTR);
         else
             while(clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, 0) == EINTR);

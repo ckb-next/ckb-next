@@ -148,7 +148,7 @@ typedef struct {
     IOHIDDeviceRef handles[4];
     CGEventSourceRef event;
     CGEventFlags lflags, rflags, eventflags;
-    long keypresstime;
+    struct timespec keyrepeat;
     short lastkeypress;
 #endif
     // A mutex used for USB controls. Needs to be locked before reading or writing the handle

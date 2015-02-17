@@ -45,6 +45,16 @@ For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubun
 
 If the keyboard still doesn't work, try replacing `0x20000000` with `0x00000004`. Note that this will cause the kernel driver to ignore the keyboard completely, so you'll need to make sure ckb-daemon is running at boot or else you'll have no keyboard input.
 
+Installing as a Service (Linux / SystemD)
+-----------------------------------------
+From bash:
+sudo cp systemd/ckb-daemon.service to /usr/lib/systemd/system/ckb-daemon.service
+
+Then
+sudo systemctl enable ckb-daemon.service
+and
+sudo systemctl start  ckb-daemon.service
+
 OSX Binaries
 ------------
 

@@ -27,10 +27,10 @@ public:
     // Color all keys in the current map
     void color(const QColor& newColor);
 
-    // Overally brightness. 0 = max, 3 = min
-    static const int MAX_BRIGHTNESS = 3;
-    inline int brightness() { return _brightness; }
-    inline void brightness(int bright) { _brightness = bright; emit updated(); }
+    // Overall dimming. 0 = max brightness, 3 = off
+    static const int MAX_DIM = 3;
+    inline int dimming() { return _dimming; }
+    inline void dimming(int newDimming) { _dimming = newDimming; emit updated(); }
 
     // Inactive indicator level. -1 for no dimming, 2 for off
     static const int MAX_INACTIVE = 2;
@@ -41,24 +41,21 @@ public:
     inline bool showMute() { return _showMute; }
     inline void showMute(bool newShowMute) { _showMute = newShowMute; emit updated(); }
 
-    // Windows lock
-    inline bool winLock() { return _winLock; }
-    void winLock(QFile& cmd, int modeIndex, bool lock);
-
     // Lighting animations
     KbAnim* addAnim(const AnimScript* base, const QStringList& keys);
+    KbAnim* duplicateAnim(KbAnim* oldAnim);
     QList<KbAnim*> animList;
     // Stops and restarts all animations
     void restartAnimation();
     // Sends a keypress event to active animations
-    void animKeypress(const QString& keyEvent);
+    void animKeypress(const QString& key, bool down);
 
     // Start the mode
     void open();
     // Whether or not all animations have started
     bool isStarted();
     // Write a new frame to the keyboard.
-    void frameUpdate(QFile& cmd, int modeIndex, bool dimMute);
+    void frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock);
     // Make the lighting idle, stopping any animations.
     void close();
     // Write the mode's base colors without any animation
@@ -75,9 +72,8 @@ signals:
 private:
     KeyMap _map;
     QHash<QString, QRgb> _colorMap;
-    int _brightness;
+    int _dimming;
     int _inactive;
-    bool _winLock;
     bool _showMute;
     bool _start;
 

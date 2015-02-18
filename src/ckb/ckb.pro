@@ -30,7 +30,6 @@ SOURCES += main.cpp\
 	settingswidget.cpp \
 	kblightwidget.cpp \
 	keymap.cpp \
-	rgbwidget.cpp \
 	media_linux.cpp \
 	kblight.cpp \
 	kbprofile.cpp \
@@ -50,7 +49,13 @@ SOURCES += main.cpp\
     kbmode.cpp \
     kb.cpp \
     rlistwidget.cpp \
-    kbprofiledialog.cpp
+    kbprofiledialog.cpp \
+    keywidget.cpp \
+    kbbindwidget.cpp \
+    kbbind.cpp \
+    keymap_us_dvorak.cpp \
+    keymap_gb_dvorak.cpp \
+    rebindwidget.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
@@ -58,7 +63,6 @@ HEADERS  += mainwindow.h \
 	settingswidget.h \
 	kblightwidget.h \
 	keymap.h \
-	rgbwidget.h \
 	media.h \
 	kblight.h \
 	kbprofile.h \
@@ -74,7 +78,11 @@ HEADERS  += mainwindow.h \
     kbmode.h \
     kb.h \
     rlistwidget.h \
-    kbprofiledialog.h
+    kbprofiledialog.h \
+    keywidget.h \
+    kbbindwidget.h \
+    kbbind.h \
+    rebindwidget.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \
@@ -84,7 +92,9 @@ FORMS    += mainwindow.ui \
 	animadddialog.ui \
 	animsettingdialog.ui \
 	gradientdialog.ui \
-    kbprofiledialog.ui
+    kbprofiledialog.ui \
+    kbbindwidget.ui \
+    rebindwidget.ui
 
 RESOURCES += \
 	image.qrc \

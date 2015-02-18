@@ -3,13 +3,13 @@
 #include "kblight.h"
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap) :
-    QObject(parent), _map(), _brightness(0), _inactive(MAX_INACTIVE), _winLock(false), _showMute(true), _start(false)
+    QObject(parent), _map(), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _map(other._map), _colorMap(other._colorMap), _brightness(other._brightness), _inactive(other._inactive), _winLock(other._winLock), _showMute(other._showMute), _start(false)
+    QObject(parent), _map(other._map), _colorMap(other._colorMap), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false)
 {
     map(keyMap);
     // Duplicate animations
@@ -76,6 +76,26 @@ KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys){
     return anim;
 }
 
+KbAnim* KbLight::duplicateAnim(KbAnim* oldAnim){
+    // Stop and restart all existing animations
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    foreach(KbAnim* anim, animList){
+        anim->stop();
+        anim->trigger(timestamp);
+    }
+    // Same as addAnim, just duplicate the existing one
+    KbAnim* anim = new KbAnim(this, _map, *oldAnim);
+    anim->newId();
+    int index = animList.indexOf(oldAnim);
+    if(index < 0)
+        animList.append(anim);
+    else
+        animList.insert(index + 1, anim);
+    anim->trigger(timestamp);
+    _start = true;
+    return anim;
+}
+
 bool KbLight::isStarted(){
     if(!_start)
         return false;
@@ -95,14 +115,10 @@ void KbLight::restartAnimation(){
     _start = true;
 }
 
-void KbLight::animKeypress(const QString& keyEvent){
-    if(keyEvent.length() < 2)
-        return;
-    QString keyName = keyEvent.mid(1);
-    bool keyPressed = (keyEvent[0] == '+');
+void KbLight::animKeypress(const QString& key, bool down){
     foreach(KbAnim* anim, animList){
-        if(anim->keys().contains(keyName))
-            anim->keypress(keyName, keyPressed, QDateTime::currentMSecsSinceEpoch());
+        if(anim->keys().contains(key))
+            anim->keypress(key, down, QDateTime::currentMSecsSinceEpoch());
     }
 }
 
@@ -120,7 +136,7 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
     }
 }
 
-void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute){
+void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock){
     // Advance animations
     QHash<QString, QRgb> animMap = _colorMap;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -128,19 +144,19 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute){
         anim->blend(animMap, timestamp);
 
     cmd.write(QString().sprintf("mode %d switch", modeIndex + 1).toLatin1());
-    if(_brightness == 3){
+    if(_dimming == 3){
         // If brightness is at 0%, turn off lighting entirely
         cmd.write(" rgb off");
         return;
     }
 
     // Dim inactive keys
-    float light = (3 - _brightness) / 3.f;
+    float light = (3 - _dimming) / 3.f;
     QStringList inactiveList = QStringList();
     float inactiveLight = 1.f;
     if(_inactive >= 0){
         inactiveList << "mr" << "m1" << "m2" << "m3";
-        if(!_winLock)
+        if(dimLock)
             inactiveList << "lock";
         if(dimMute && _showMute)
             inactiveList << "mute";
@@ -192,7 +208,7 @@ void KbLight::close(){
 
 void KbLight::base(QFile &cmd, int modeIndex){
     close();
-    if(_brightness == MAX_BRIGHTNESS){
+    if(_dimming == MAX_DIM){
         cmd.write(QString().sprintf("mode %d rgb off", modeIndex + 1).toLatin1());
         return;
     }
@@ -207,22 +223,14 @@ void KbLight::base(QFile &cmd, int modeIndex){
     printRGB(cmd, animMap);
 }
 
-void KbLight::winLock(QFile& cmd, int modeIndex, bool lock){
-    _winLock = lock;
-    if(lock)
-        cmd.write(QString().sprintf("mode %d unbind lwin rwin", modeIndex + 1).toLatin1());
-    else
-        cmd.write(QString().sprintf("mode %d rebind lwin rwin", modeIndex + 1).toLatin1());
-    emit updated();
-}
-
 void KbLight::load(QSettings& settings){
     // Load light settings
     settings.beginGroup("Lighting");
+    KeyMap currentMap = _map;
     _map = KeyMap::fromName(settings.value("KeyMap").toString());
-    _brightness = settings.value("Brightness").toUInt();
-    if(_brightness > MAX_BRIGHTNESS)
-        _brightness = MAX_BRIGHTNESS;
+    _dimming = settings.value("Brightness").toUInt();
+    if(_dimming > MAX_DIM)
+        _dimming = MAX_DIM;
     bool inOk = false;
     _inactive = settings.value("InactiveIndicators").toInt(&inOk);
     if(!inOk || _inactive > MAX_INACTIVE)
@@ -251,12 +259,13 @@ void KbLight::load(QSettings& settings){
     settings.endGroup();
     settings.endGroup();
     emit didLoad();
+    map(currentMap);
 }
 
 void KbLight::save(QSettings& settings){
     settings.beginGroup("Lighting");
     settings.setValue("KeyMap", _map.name());
-    settings.setValue("Brightness", _brightness);
+    settings.setValue("Brightness", _dimming);
     settings.setValue("InactiveIndicators", _inactive);
     settings.setValue("ShowMute", (int)_showMute);
     // Save RGB settings

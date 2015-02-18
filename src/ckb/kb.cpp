@@ -5,7 +5,7 @@
 #include "media.h"
 
 Kb::Kb(QObject *parent, const QString& path) :
-    QObject(parent), devpath(path), cmdpath(path + "/cmd"),
+    QThread(parent), devpath(path), cmdpath(path + "/cmd"),
     features("N/A"), firmware("N/A"), pollrate("N/A"),
     hwProfile(0), currentProfile(0), currentMode(0), _model(KeyMap::NO_MODEL), _layout(KeyMap::NO_LAYOUT),
     prevProfile(0), prevMode(0),
@@ -67,13 +67,13 @@ Kb::Kb(QObject *parent, const QString& path) :
         QString notify = QString(path + "/notify%1").arg(i);
         if(!QFile::exists(notify)){
             notifyNumber = i;
-            notifypath = notify;
+            notifyPath = notify;
             break;
         }
     }
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
-    cmd.write(QString("@%1 get :hwprofileid :layout").arg(notifyNumber).toLatin1());
+    cmd.write(QString("@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
     for(int i = 0; i < hwModeCount; i++)
         cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
     cmd.write("\n");
@@ -82,28 +82,40 @@ Kb::Kb(QObject *parent, const QString& path) :
     emit infoUpdated();
 
     // Start a separate thread to read from the notification node
-    notify.setFileName(notifypath);
-    QtConcurrent::run(this, &Kb::_readNotify);
+    start();
 }
 
 Kb::~Kb(){
-    // Release notification thread
-    QThreadPool::globalInstance()->releaseThread();
     if(!isOpen())
         return;
+    // Kill notification thread and remove node
     if(notifyNumber > 0)
         cmd.write(QString("notifyoff %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
+    terminate();
     // Reset to hardware profile
     if(hwProfile){
         currentProfile = hwProfile;
         hwSave();
     }
     cmd.close();
-    notify.close();
 }
 
 void Kb::load(QSettings &settings){
+    // Read layout
+    _layout = KeyMap::getLayout(settings.value("Layout").toString());
+    if(_layout == KeyMap::NO_LAYOUT){
+        // If the layout couldn't be loaded, fetch it from the driver
+        cmd.write(QString("@%1 get :layout\n").arg(notifyNumber).toLatin1());
+    } else {
+        cmd.write("layout ");
+        cmd.write(KeyMap::getLayoutHw(_layout).toLatin1());
+        cmd.write("\n");
+        emit infoUpdated();
+    }
+    cmd.flush();
+
+    // Read profiles
     KbProfile* newCurrentProfile = 0;
     QString current = settings.value("CurrentProfile").toString().trimmed().toUpper();
     foreach(QString guid, settings.value("Profiles").toString().split(" ")){
@@ -115,7 +127,6 @@ void Kb::load(QSettings &settings){
                 newCurrentProfile = profile;
         }
     }
-    emit profileAdded();
     if(newCurrentProfile)
         setCurrentProfile(newCurrentProfile);
     else {
@@ -125,6 +136,8 @@ void Kb::load(QSettings &settings){
         profiles.append(demo);
         setCurrentProfile(demo);
     }
+
+    emit profileAdded();
 }
 
 void Kb::save(QSettings& settings){
@@ -137,11 +150,17 @@ void Kb::save(QSettings& settings){
     }
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
+    settings.setValue("Layout", KeyMap::getLayout(_layout));
 }
 
 void Kb::hwSave(){
     if(!currentProfile)
         return;
+    // Close active lighting (if any)
+    if(prevMode){
+        prevMode->light()->close();
+        deletePrevious();
+    }
     hwProfile = currentProfile;
     hwLoading = false;
     // Rewrite the current profile from scratch to ensure consistency
@@ -152,15 +171,12 @@ void Kb::hwSave(){
         cmd.write("\n");
         KbLight* light = mode->light();
         light->base(cmd, i);
-#ifndef __APPLE__
-        // Bindings will be reset, so re-enable Win Lock if it's turned on
-        if(light->winLock()){
-            cmd.write(" ");
-            light->winLock(cmd, i, true);
-        }
-#endif
         if(mode == currentMode)
             cmd.write(" switch");
+#ifdef Q_OS_MACX
+        if(KeyPos::osxCmdSwap)
+            cmd.write(" bind lctrl:lwin rctrl:rwin lwin:lctrl rwin:rctrl");
+#endif
         // Write the mode name and ID
         cmd.write(" name ");
         cmd.write(QUrl::toPercentEncoding(mode->name()));
@@ -199,7 +215,7 @@ void Kb::layout(KeyMap::Layout newLayout, bool write){
     _layout = newLayout;
     if(write){
         cmd.write("layout ");
-        cmd.write(KeyMap::getLayout(newLayout).toLatin1());
+        cmd.write(KeyMap::getLayoutHw(newLayout).toLatin1());
         cmd.write("\n");
         cmd.flush();
     }
@@ -220,6 +236,7 @@ void Kb::frameUpdate(){
         mute = MUTED;
 
     // Stop animations on the previously active mode (if any)
+    bool changed = false;
     if(prevMode != currentMode){
         if(prevMode){
             prevMode->light()->close();
@@ -228,12 +245,14 @@ void Kb::frameUpdate(){
         prevMode = currentMode;
         if(prevMode)
             connect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
+        changed = true;
     }
 
     // Advance animation frame
     if(!currentMode)
         return;
     KbLight* light = currentMode->light();
+    KbBind* bind = currentMode->bind();
     if(!light->isStarted()){
         // Don't do anything until the animations are started
         light->open();
@@ -246,24 +265,20 @@ void Kb::frameUpdate(){
         prevProfile = currentProfile;
     }
     int index = currentProfile->indexOf(currentMode);
-    light->frameUpdate(cmd, index, mute != MUTED);
-    cmd.write(QString(" @%1 notify all").arg(notifyNumber).toLatin1());
-#ifndef __APPLE__
-    // Write Win lock if enabled
-    if(light->winLock()){
-        cmd.write(" ");
-        light->winLock(cmd, index, true);
-    }
-#endif
+    light->frameUpdate(cmd, index, mute != MUTED, !bind->winLock());
+    cmd.write(QString(" @%1 ").arg(notifyNumber).toLatin1());
+    bind->update(cmd, changed);
     cmd.write("\n");
     cmd.flush();
 }
 
 void Kb::deletePrevious(){
+    disconnect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
     prevMode = 0;
 }
 
-void Kb::_readNotify(){
+void Kb::run(){
+    QFile notify(notifyPath);
     // Wait a small amount of time for the node to open (100ms)
     QThread::usleep(100000);
     if(!notify.open(QIODevice::ReadOnly)){
@@ -274,9 +289,11 @@ void Kb::_readNotify(){
     }
     // Read data from notification node
     QByteArray line;
-    while((line = notify.readLine()).length() > 0){
-        QString text = QString::fromUtf8(line);
-        metaObject()->invokeMethod(this, "readNotify", Qt::QueuedConnection, Q_ARG(QString, text));
+    while(1){
+        if((line = notify.readLine()).length() > 0){
+            QString text = QString::fromUtf8(line);
+            metaObject()->invokeMethod(this, "readNotify", Qt::QueuedConnection, Q_ARG(QString, text));
+        }
     }
 }
 
@@ -290,32 +307,16 @@ void Kb::readNotify(QString line){
         layout(newLayout, false);
     } else if(components[0] == "key"){
         // Key event
-        KbLight* light = currentLight();
-        if(components[1] == "+light" && light){
-            int brightness = light->brightness() - 1;
-            if(brightness < 0)
-                brightness = KbLight::MAX_BRIGHTNESS;
-            light->brightness(brightness);
-        } else if(components[1] == "+m1"){
-            setCurrentMode(currentProfile, 0);
-            light = currentLight();
-        } else if(components[1] == "+m2"){
-            setCurrentMode(currentProfile, 1);
-            light = currentLight();
-        } else if(components[1] == "+m3"){
-            setCurrentMode(currentProfile, 2);
-            light = currentLight();
-        } else if(components[1] == "+lock"){
-#ifndef __APPLE__
-            if(light){
-                light->winLock(cmd, currentProfile->indexOf(currentMode), !light->winLock());
-                cmd.write("\n");
-                cmd.flush();
-            }
-#endif
+        QString key = components[1];
+        if(key.length() < 2)
+            return;
+        QString keyName = key.mid(1);
+        bool keyPressed = (key[0] == '+');
+        KbMode* mode = currentMode;
+        if(mode){
+            mode->light()->animKeypress(keyName, keyPressed);
+            mode->bind()->keyEvent(keyName, keyPressed);
         }
-        if(light)
-            light->animKeypress(components[1]);
     } else if(components[0] == "hwprofileid"){
         // Hardware profile ID
         if(components.count() < 3)

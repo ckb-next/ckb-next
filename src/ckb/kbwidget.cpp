@@ -33,6 +33,12 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
     connect(device, SIGNAL(modeRenamed()), this, SLOT(modeChanged()));
     connect(device, SIGNAL(modeChanged(bool)), this, SLOT(modeChanged(bool)));
 
+    // Remove the Lighting and Misc tabs from non-RGB keyboards
+    if(!device->features.contains("rgb")){
+        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
+        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->miscTab));
+    }
+
     // Load profiles from stored settings
     QSettings settings;
     settings.beginGroup(prefsPath);
@@ -129,8 +135,9 @@ void KbWidget::modeChanged(bool spontaneous){
     int index = device->currentProfile->modes.indexOf(device->currentMode);
     if(index < 0)
         return;
-    // Update lighting tab
+    // Update tabs
     ui->lightWidget->setLight(device->currentLight());
+    ui->bindWidget->setBind(device->currentBind(), device->currentProfile);
     // Update selection
     if(spontaneous)
         ui->modesList->setCurrentRow(index);

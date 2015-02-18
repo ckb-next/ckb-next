@@ -11,7 +11,7 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     ui->animButton->setVisible(false);
 
     connect(ui->bgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeColor(QColor)));
-    connect(ui->rgbWidget, SIGNAL(selectionChanged(QColor,QStringList)), this, SLOT(newSelection(QColor,QStringList)));
+    connect(ui->keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
     connect(ui->animWidget, SIGNAL(animChanged(KbAnim*)), this, SLOT(changeAnim(KbAnim*)));
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
 }
@@ -21,27 +21,40 @@ KbLightWidget::~KbLightWidget(){
 }
 
 void KbLightWidget::setLight(KbLight* newLight){
-    ui->rgbWidget->clearSelection();
-    ui->rgbWidget->clearAnimation();
+    ui->keyWidget->clearSelection();
+    ui->keyWidget->clearAnimation();
     ui->animWidget->clearSelection();
     if(light == newLight)
         return;
     if(light)
-        disconnect(light, SIGNAL(updated()), this, SLOT(update()));
-    connect(newLight, SIGNAL(updated()), this, SLOT(update()));
+        disconnect(light, SIGNAL(updated()), this, SLOT(updateLight()));
+    connect(newLight, SIGNAL(updated()), this, SLOT(updateLight()));
     light = newLight;
-    update();
-    ui->rgbWidget->setAnimation(QStringList());
+    updateLight();
+    ui->keyWidget->setAnimation(QStringList());
     ui->animWidget->setLight(newLight);
 }
 
-void KbLightWidget::update(){
-    ui->rgbWidget->map(light->map());
-    ui->rgbWidget->colorMap(light->colorMap());
-    ui->brightnessBox->setCurrentIndex(light->brightness());
+void KbLightWidget::updateLight(){
+    ui->keyWidget->map(light->map());
+    ui->keyWidget->colorMap(light->colorMap());
+    ui->brightnessBox->setCurrentIndex(light->dimming());
 }
 
-void KbLightWidget::newSelection(QColor selectedColor, QStringList selection){
+void KbLightWidget::newSelection(QStringList selection){
+    // Determine selected color (invalid color if no selection or if they're not all the same)
+    QColor selectedColor;
+    const QHash<QString, QRgb>& colorMap = light->colorMap();
+    foreach(const QString& key, selection){
+        QColor color = colorMap.value(key);
+        if(!selectedColor.isValid())
+            selectedColor = color;
+        else if(color != selectedColor){
+            selectedColor = QColor();
+            break;
+        }
+    }
+
     currentSelection = selection;
     ui->animWidget->setSelectedKeys(selection);
     ui->bgButton->color(selectedColor);
@@ -64,25 +77,25 @@ void KbLightWidget::changeColor(QColor newColor){
     if(light){
         foreach(QString key, currentSelection)
             light->color(key, newColor);
-        ui->rgbWidget->colorMap(light->colorMap());
+        ui->keyWidget->colorMap(light->colorMap());
     }
 }
 
 void KbLightWidget::changeAnim(KbAnim *newAnim){
     if(newAnim)
-        ui->rgbWidget->setSelection(newAnim->keys());
+        ui->keyWidget->setSelection(newAnim->keys());
     else
-        ui->rgbWidget->clearSelection();
-    ui->rgbWidget->setAnimationToSelection();
+        ui->keyWidget->clearSelection();
+    ui->keyWidget->setAnimationToSelection();
 }
 
 void KbLightWidget::changeAnimKeys(QStringList keys){
-    ui->rgbWidget->setAnimation(keys);
+    ui->keyWidget->setAnimation(keys);
 }
 
 void KbLightWidget::on_brightnessBox_currentIndexChanged(int index){
     if(light)
-        light->brightness(index);
+        light->dimming(index);
 }
 
 void KbLightWidget::on_animButton_clicked(){

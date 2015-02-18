@@ -22,6 +22,7 @@ public:
 
     void setLight(KbLight* newLight);
     void addAnim(const AnimScript* base, const QStringList& keyList);
+    void duplicateAnim(KbAnim* old);
 
     void clearSelection();
 

@@ -14,11 +14,23 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
+   <property name="spacing">
+    <number>9</number>
+   </property>
+   <item row="0" column="0">
     <widget class="QComboBox" name="profileBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>22</horstretch>
+       <horstretch>18</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
@@ -30,11 +42,11 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1" rowspan="3">
+   <item row="0" column="1" rowspan="3">
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>78</horstretch>
+       <horstretch>82</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
@@ -45,7 +57,25 @@
       <attribute name="title">
        <string>Lighting</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_2">
+      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0">
+       <property name="leftMargin">
+        <number>6</number>
+       </property>
+       <property name="topMargin">
+        <number>6</number>
+       </property>
+       <property name="rightMargin">
+        <number>6</number>
+       </property>
+       <property name="bottomMargin">
+        <number>6</number>
+       </property>
+       <property name="horizontalSpacing">
+        <number>0</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>6</number>
+       </property>
        <item row="0" column="0">
         <widget class="KbLightWidget" name="lightWidget" native="true">
          <property name="sizePolicy">
@@ -58,6 +88,51 @@
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Tip: Drag+drop items to reorder. Right-click for menu.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="bindTab">
+      <attribute name="title">
+       <string>Binding</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <property name="leftMargin">
+        <number>6</number>
+       </property>
+       <property name="topMargin">
+        <number>6</number>
+       </property>
+       <property name="rightMargin">
+        <number>6</number>
+       </property>
+       <property name="bottomMargin">
+        <number>6</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="KbBindWidget" name="bindWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -248,7 +323,17 @@
          </item>
          <item>
           <property name="text">
+           <string>United Kingdom (Dvorak)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>United States</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>United States (Dvorak)</string>
           </property>
          </item>
         </widget>
@@ -293,6 +378,20 @@
         <widget class="QLabel" name="label_4">
          <property name="text">
           <string>USB device ID:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="pollLabel">
+         <property name="text">
+          <string>N/A</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Poll rate:</string>
          </property>
         </widget>
        </item>
@@ -357,20 +456,6 @@
          </property>
         </spacer>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Poll rate:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QLabel" name="pollLabel">
-         <property name="text">
-          <string>N/A</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="3">
         <spacer name="verticalSpacer_6">
          <property name="orientation">
@@ -391,24 +476,11 @@
      </widget>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QPushButton" name="hwSaveButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>22</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Save to hardware</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
+   <item row="1" column="0">
     <widget class="RListWidget" name="modesList">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>22</horstretch>
+       <horstretch>18</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
@@ -432,9 +504,27 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="hwSaveButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>18</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Save to hardware</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>RListWidget</class>
+   <extends>QListWidget</extends>
+   <header>rlistwidget.h</header>
+  </customwidget>
   <customwidget>
    <class>KbLightWidget</class>
    <extends>QWidget</extends>
@@ -442,9 +532,10 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>RListWidget</class>
-   <extends>QListWidget</extends>
-   <header>rlistwidget.h</header>
+   <class>KbBindWidget</class>
+   <extends>QWidget</extends>
+   <header>kbbindwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

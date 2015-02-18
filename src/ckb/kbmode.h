@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "kblight.h"
+#include "kbbind.h"
 
 struct UsbId {
     QUuid guid;
@@ -41,8 +42,9 @@ public:
     // Device key map
     void keyMap(const KeyMap& keyMap);
 
-    // Lighting setup
+    // Lighting and binding setup
     inline KbLight* light() { return _light; }
+    inline KbBind* bind() { return _bind; }
 
     // Save settings
     void save(QSettings& settings);
@@ -55,6 +57,7 @@ private:
     UsbId _id;
 
     KbLight* _light;
+    KbBind* _bind;
 
 private slots:
     void doUpdate();

@@ -3,9 +3,10 @@
 
 #include <QObject>
 #include <QFile>
+#include <QThread>
 #include "kbprofile.h"
 
-class Kb : public QObject
+class Kb : public QThread
 {
     Q_OBJECT
 public:
@@ -14,7 +15,7 @@ public:
     ~Kb();
 
     // File paths
-    QString devpath, cmdpath, notifypath;
+    QString devpath, cmdpath, notifyPath;
     // USB model and serial number
     QString usbModel, usbSerial;
     // Device information
@@ -39,6 +40,7 @@ public:
     inline KbProfile* find(const QUuid& id) { foreach(KbProfile* profile, profiles) { if(profile->id().guid == id) return profile; } return 0; }
     KbMode* currentMode;
     inline KbLight* currentLight() { return !currentMode ? 0 : currentMode->light(); }
+    inline KbBind* currentBind() { return !currentMode ? 0 : currentMode->bind(); }
 
     // Create a new profile/mode. The newly-created object will not be inserted into the current profile/mode list.
     inline KbProfile* newProfile() { return new KbProfile(this, getKeyMap()); }
@@ -86,7 +88,7 @@ private:
     void writeProfileHeader();
 
     // cmd and notify file handles
-    QFile cmd, notify;
+    QFile cmd;
     // Notification number
     int notifyNumber;
 
@@ -96,9 +98,9 @@ private:
     // Key map for this keyboard
     KeyMap getKeyMap();
 
-    // Launched in a separate thread, handles actually reading lines from file
+    // Notification reader, launches as a separate thread and reads from file.
     // (QFile doesn't have readyRead() so there's no other way to do this asynchronously)
-    void _readNotify();
+    void run();
 };
 
 #endif // KB_H

@@ -40,7 +40,7 @@ void AnimScript::scan(){
         delete script;
     scripts.clear();
     foreach(QString file, dir.entryList(QDir::Files | QDir::Executable)){
-        AnimScript* script = new AnimScript(0, dir.absoluteFilePath(file));
+        AnimScript* script = new AnimScript(qApp, dir.absoluteFilePath(file));
         if(script->load() && !scripts.contains(script->_info.guid))
             scripts[script->_info.guid] = script;
         else
@@ -241,12 +241,14 @@ void AnimScript::init(const KeyMap& map, const QStringList& keys, const QMap<QSt
 }
 
 void AnimScript::setDuration(){
-    if(_info.absoluteTime)
+    if(_info.absoluteTime){
         durationMsec = 1000;
-    else {
+        repeatMsec = 0;
+    } else {
         durationMsec = round(_paramValues.value("duration").toDouble() * 1000.);
         if(durationMsec <= 0)
             durationMsec = -1;
+        repeatMsec = round(_paramValues.value("repeat").toDouble() * 1000.);
     }
 }
 
@@ -314,9 +316,9 @@ void AnimScript::start(quint64 timestamp){
 void AnimScript::retrigger(quint64 timestamp, bool allowPreempt){
     if(!initialized)
         return;
-    if(allowPreempt && _info.preempt)
+    if(allowPreempt && _info.preempt && repeatMsec > 0)
         // If preemption is wanted, trigger the animation 1 duration in the past first
-        retrigger(timestamp - durationMsec);
+        retrigger(timestamp - repeatMsec);
     if(!process)
         start(timestamp);
     nextFrame(timestamp);

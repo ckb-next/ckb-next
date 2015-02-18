@@ -18,9 +18,9 @@ public:
 private slots:
     void on_pushButton_clicked();
 
-    void on_fpsBox_currentIndexChanged(const QString &arg1);
-
+    void on_fpsBox_activated(const QString &arg1);
     void on_animScanButton_clicked();
+    void on_osxSwapBox_clicked(bool checked);
 
 private:
     Ui::SettingsWidget *ui;

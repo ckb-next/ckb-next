@@ -7,11 +7,14 @@
 #include <QWidget>
 #include "keymap.h"
 
-class RgbWidget : public QWidget
+class KeyWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit RgbWidget(QWidget *parent = 0);
+    // New key widget. rgbMode = true to display colors, false to display key names
+    explicit KeyWidget(QWidget *parent = 0, bool rgbMode = true);
+    inline bool rgbMode() { return _rgbMode; }
+    inline void rgbMode(bool newRgbMode) { _rgbMode = newRgbMode; update(); }
 
     // Key map
     const KeyMap& map() const { return keyMap; }
@@ -19,24 +22,27 @@ public:
     // Key -> color map
     const QHash<QString, QRgb>& colorMap() const { return _colorMap; }
     void colorMap(const QHash<QString, QRgb>& newColorMap);
+    // Key -> binding map
+    const QHash<QString, QString>& bindMap() const { return _bindMap; }
+    void bindMap(const QHash<QString, QString>& newBindMap);
 
-    // Set current selection
+    // Set current selection (highlighted in blue)
     void setSelection(const QStringList& keys);
     void clearSelection();
 
-    // Set animated keys
+    // Set animated keys (highlighted in green)
     void setAnimation(const QStringList& keys);
     void setAnimationToSelection();
     void clearAnimation();
 
 signals:
     // Emitted when the selection is changed.
-    // selectedColor is the color of the selected keys or invalid color if none selected or not all keys are the same
-    void selectionChanged(QColor selectedColor, QStringList selected);
+    void selectionChanged(QStringList selected);
 
 private:
     KeyMap keyMap;
     QHash<QString, QRgb> _colorMap;
+    QHash<QString, QString> _bindMap;
 
     QBitArray selection;
     QBitArray newSelection;
@@ -50,9 +56,7 @@ private:
         SUBTRACT,
         TOGGLE,
     } mouseDownMode;
-
-    // Determine the color of the selected keys (invalid color if there are any conflicts)
-    QColor selectedColor();
+    bool _rgbMode;
 
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* event);

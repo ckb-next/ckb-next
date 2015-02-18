@@ -6,7 +6,7 @@
 #include <QFile>
 #include <QResizeEvent>
 #include "kblight.h"
-#include "rgbwidget.h"
+#include "keywidget.h"
 
 namespace Ui {
 class KbLightWidget;
@@ -23,15 +23,14 @@ public:
     void setLight(KbLight* newLight);
 
 private slots:
-    void newSelection(QColor selectedColor, QStringList selection);
+    void updateLight();
+    void newSelection(QStringList selection);
     void changeColor(QColor newColor);
     void changeAnim(KbAnim* newAnim);
     void changeAnimKeys(QStringList keys);
 
     void on_brightnessBox_currentIndexChanged(int index);
     void on_animButton_clicked();
-
-    void update();
 
 private:
     KbLight* light;

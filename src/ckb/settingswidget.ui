@@ -307,6 +307,13 @@
      </item>
     </layout>
    </item>
+   <item row="9" column="1">
+    <widget class="QCheckBox" name="osxSwapBox">
+     <property name="text">
+      <string>Swap Cmd and Ctrl keys on OSX</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

@@ -99,6 +99,26 @@ void KbAnimWidget::addAnim(const AnimScript* base, const QStringList& keyList){
     on_propertyButton_clicked();
 }
 
+void KbAnimWidget::duplicateAnim(KbAnim* old){
+    if(!light)
+        return;
+    noReorder = true;
+    KbAnim* animation = light->duplicateAnim(old);
+    QListWidgetItem* item = new QListWidgetItem(animation->name(), ui->animList);
+    item->setData(Qt::UserRole, animation->guid());
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    animations[animation->guid()] = animation;
+    ui->animList->insertItem(light->animList.indexOf(animation), item);
+    // Refresh the list. insertItem doesn't seem to place the item in the correct position on its own...
+    refreshList();
+    ui->animList->setCurrentItem(item);
+    ui->animList->setVisible(true);
+    ui->noAnimLabel->setVisible(false);
+
+    setCurrent(animation);
+    noReorder = false;
+}
+
 void KbAnimWidget::setCurrent(KbAnim* newCurrent){
     if(newCurrent != current)
         emit animChanged(current = newCurrent);
@@ -158,12 +178,16 @@ void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint &pos){
 
     QMenu menu(this);
     QAction* rename = new QAction("Rename...", this);
+    QAction* duplicate = new QAction("Duplicate", this);
     QAction* del = new QAction("Delete", this);
     menu.addAction(rename);
+    menu.addAction(duplicate);
     menu.addAction(del);
     QAction* result = menu.exec(QCursor::pos());
     if(result == rename)
         ui->animList->editItem(item);
+    else if(result == duplicate)
+        duplicateAnim(current);
     else if(result == del)
         on_deleteButton_clicked();
 }

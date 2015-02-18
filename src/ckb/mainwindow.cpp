@@ -31,10 +31,10 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 
-#ifdef __APPLE__
+#ifdef Q_OS_MACX
     // Make a custom "Close" menu action for OSX, as the default one brings up the "still running" popup unnecessarily
     QMenuBar* menuBar = new QMenuBar(this);
-    this->setMenuBar(menuBar);
+    setMenuBar(menuBar);
     this->menuBar()->addMenu("ckb")->addAction(closeAction);
 #endif
 
@@ -95,7 +95,10 @@ void MainWindow::scanKeyboards(){
             continue;
         }
         kbWidgets.append(widget);
-        ui->tabWidget->insertTab(ui->tabWidget->count() - 1, widget, widget->name());
+        int count = ui->tabWidget->count();
+        ui->tabWidget->insertTab(count - 1, widget, widget->name());
+        if(ui->tabWidget->currentIndex() == count)
+            ui->tabWidget->setCurrentIndex(count - 1);
         connect(eventTimer, SIGNAL(timeout()), widget->device, SLOT(frameUpdate()));
     }
     connected.close();

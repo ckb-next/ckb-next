@@ -1,7 +1,7 @@
 ckb: Corsair K65/K70/K95 Driver for Linux and OSX
 =================================================
 
-**ckb** is an open-source driver for Corsair RGB keyboards. It aims to bring the functionality of their proprietary Corsair Utility Engine software to the Linux and Mac operating systems. This project is currently a work in progress, but several features are already complete and the software has full RGB animation support. More features are coming soon. Testing feedback and bug reports are very much appreciated!
+**ckb** is an open-source driver for Corsair keyboards. It aims to bring the functionality of their proprietary Corsair Utility Engine software to the Linux and Mac operating systems. This project is currently a work in progress, but several features are already complete and the software has full RGB animation support. More features are coming soon. Testing feedback and bug reports are very much appreciated!
 
 **Disclaimer:** ckb comes with no warranty and is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful for those of us wishing to take advantage of the keyboard's features on non-Windows OSes.
 
@@ -17,7 +17,7 @@ Device Support
 ckb currently supports the following Corsair keyboards:
 
 * K65 RGB
-* K70 (work in progress)
+* K70
 * K70 RGB
 * K95 RGB
 
@@ -38,6 +38,7 @@ Troubleshooting (Linux)
 If you have problems connecting the keyboard to your system (keyboard doesn't respond, ckb-daemon doesn't recognize it or can't connect the keyboard), try adding the following to your kernel's `cmdline`:
 
 * K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x20000000`
+* K70: `usbhid.quirks=0x1B1C:0x1B09:0x20000000`
 * K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000000`
 * K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x20000000`
 
@@ -45,15 +46,16 @@ For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubun
 
 If the keyboard still doesn't work, try replacing `0x20000000` with `0x00000004`. Note that this will cause the kernel driver to ignore the keyboard completely, so you'll need to make sure ckb-daemon is running at boot or else you'll have no keyboard input.
 
-Installing as a Service (Linux / SystemD)
+Installing as a Service (Linux / Systemd)
 -----------------------------------------
-From bash:
-sudo cp systemd/ckb-daemon.service to /usr/lib/systemd/system/ckb-daemon.service
 
-Then
-sudo systemctl enable ckb-daemon.service
-and
-sudo systemctl start  ckb-daemon.service
+A service file is provided so that Linux users with systemd can launch the daemon on startup. To use it, first copy the binary files and the service to their system directories:
+
+`sudo cp -R bin/* /usr/bin && sudo cp systemd/ckb-daemon.service /usr/lib/systemd/system`
+
+To launch the daemon and enable it at start-up:
+
+`sudo systemctl start ckb-daemon && sudo systemctl enable ckb-daemon`
 
 OSX Binaries
 ------------
@@ -80,7 +82,7 @@ Troubleshooting (OSX)
 
 Make sure your system is up-to-date and that Xcode works on its own. Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt.
 
-If you've rebound your modifier keys in System Preferences, those changes won't work anymore. You have to switch them using ckb-daemon's `bind` command. For instance, to switch Cmd and Ctrl, run: `echo bind lctrl:lwin lwin:lctrl rctrl:rwin rwin:rctrl > /tmp/ckb1/cmd`. This functionality is coming to the user interface soon.
+If you've rebound your modifier keys in System Preferences, the changes will not be recognized anymore. You can rebind them again within the application.
 
 Usage
 -----
@@ -92,24 +94,31 @@ The user interface is still a work in progress.
 **Major features:**
 - Control multiple keyboards independently (note: not tested)
 - United States and European keyboard layouts
+- Customizable key bindings
 - Per-key lighting and animation
 - Reactive lighting
 - Multiple profiles/modes with hardware save function
 
 **Roadmap** (roughly in order)
 - **v0.1 release:**
-- Key rebinding in ckb
+- Ability to share lighting or binding between multiple modes
+- Ability to copy animations, settings to different modes
+- User interface for firmware updates
 - (Daemon) Allow the daemon to disconnect all keyboards without shutting down, reconnect later. This way ckb can soft stop/soft start the daemon, because using the daemon without ckb running isn't very useful.
 - System service files so that ckb-daemon can be run at system start.
 - **v0.2 release:**
-- (Daemon) Repeatable key macros, notification macros
-- (Daemon) Ability to generate mouse press/release events
 - More functions for the Win Lock key
 - Key combos
 - Key macros, other advanced keypress features like running a custom command
+- (Daemon) Macros with timing info, delays, repeats
+- (Daemon) Notification macros
+- (Daemon) Ability to generate mouse events
 - **v0.3 release:**
-- Ability to tie profiles to which application has focus, or switch them with keys
+- Ability to store profiles separately from devices, import/export them
+- Ability to tie profiles to which application has focus
 - Timers
+- **v0.4 release:**
+- Ability to import CUE profiles
 - **v1.0 release:**
 - OSD? (Not sure if this can actually be done)
 - Extra settings?

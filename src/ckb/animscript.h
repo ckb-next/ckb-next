@@ -125,7 +125,7 @@ private:
 
     // Animation state
     quint64 lastFrame;
-    int durationMsec;
+    int durationMsec, repeatMsec;
     bool initialized :1, firstFrame :1, readFrame :1, readAnyFrame :1, stopped :1;
     QProcess* process;
     QStringList inputBuffer;

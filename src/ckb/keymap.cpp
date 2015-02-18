@@ -1,13 +1,9 @@
 #include "keymap.h"
 
+bool KeyPos::osxCmdSwap = false;
+
 // Normal size
 #define NS 12, 12
-
-#ifdef __APPLE__
-#define WIN_NAME "Cmd"
-#else
-#define WIN_NAME "Super"
-#endif
 
 #define KEYCOUNT_K95_104 133
 #define KEYCOUNT_K95_105 134
@@ -17,21 +13,25 @@ extern const KeyPos K95PosFR[KEYCOUNT_K95_105];
 extern const KeyPos K95PosDE[KEYCOUNT_K95_105];
 extern const KeyPos K95PosSE[KEYCOUNT_K95_105];
 extern const KeyPos K95PosGB[KEYCOUNT_K95_105];
+extern const KeyPos K95PosGB_Dvorak[KEYCOUNT_K95_105];
 extern const KeyPos K95PosUS[KEYCOUNT_K95_104];
+extern const KeyPos K95PosUS_Dvorak[KEYCOUNT_K95_104];
 
 struct KeyLayout {
     const KeyPos* positions;
     uint count;
 };
 
-#define KEYLAYOUT_COUNT 5
+#define KEYLAYOUT_COUNT 7
 
 static const KeyLayout K95Pos[KEYLAYOUT_COUNT] = {
     { K95PosFR, KEYCOUNT_K95_105 },
     { K95PosDE, KEYCOUNT_K95_105 },
     { K95PosSE, KEYCOUNT_K95_105 },
     { K95PosGB, KEYCOUNT_K95_105 },
-    { K95PosUS, KEYCOUNT_K95_104 }
+    { K95PosGB_Dvorak, KEYCOUNT_K95_105 },
+    { K95PosUS, KEYCOUNT_K95_104 },
+    { K95PosUS_Dvorak, KEYCOUNT_K95_104 }
 };
 
 #define K95_WIDTH       298
@@ -44,7 +44,9 @@ static KeyLayout K70Pos[KEYLAYOUT_COUNT] = {
     { 0, K95Pos[1].count - K70_COUNT_DIFF },
     { 0, K95Pos[2].count - K70_COUNT_DIFF },
     { 0, K95Pos[3].count - K70_COUNT_DIFF },
-    { 0, K95Pos[4].count - K70_COUNT_DIFF }
+    { 0, K95Pos[4].count - K70_COUNT_DIFF },
+    { 0, K95Pos[5].count - K70_COUNT_DIFF },
+    { 0, K95Pos[6].count - K70_COUNT_DIFF }
 };
 
 #define K70_X_START     38
@@ -58,7 +60,9 @@ static KeyLayout K65Pos[KEYLAYOUT_COUNT] = {
     { 0, K70Pos[1].count - K65_COUNT_DIFF },
     { 0, K70Pos[2].count - K65_COUNT_DIFF },
     { 0, K70Pos[3].count - K65_COUNT_DIFF },
-    { 0, K70Pos[4].count - K65_COUNT_DIFF }
+    { 0, K70Pos[4].count - K65_COUNT_DIFF },
+    { 0, K70Pos[5].count - K65_COUNT_DIFF },
+    { 0, K70Pos[6].count - K65_COUNT_DIFF }
 };
 
 #define K65_WIDTH       209
@@ -79,8 +83,12 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
         return SE;
     if(lower == "gb")
         return GB;
+    if(lower == "gb_dvorak")
+        return GB_DVORAK;
     if(lower == "us")
         return US;
+    if(lower == "us_dvorak")
+        return US_DVORAK;
     return NO_LAYOUT;
 }
 
@@ -94,8 +102,12 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "se";
     case GB:
         return "gb";
+    case GB_DVORAK:
+        return "gb_dvorak";
     case US:
         return "us";
+    case US_DVORAK:
+        return "us_dvorak";
     default:
         return "";
     }
@@ -206,7 +218,8 @@ const KeyPos* KeyMap::key(uint index) const {
 
 const KeyPos* KeyMap::key(const QString& name) const {
     uint c = count();
-    const char* cname = name.toLatin1();
+    QByteArray rawname = name.toLatin1();
+    const char* cname = rawname.constData();
     for(uint i = 0; i < c; i++){
         if(!strcmp(positions[i].name, cname))
             return positions + i;
@@ -216,10 +229,19 @@ const KeyPos* KeyMap::key(const QString& name) const {
 
 int KeyMap::index(const QString& name) const {
     uint c = count();
-    QByteArray cname = name.toLatin1();
+    QByteArray rawname = name.toLatin1();
+    const char* cname = rawname.constData();
     for(uint i = 0; i < c; i++){
-        if(!strcmp(positions[i].name, cname.constData()))
+        if(!strcmp(positions[i].name, cname))
             return i;
     }
     return -1;
+}
+
+QStringList KeyMap::allKeys() const {
+    QStringList result;
+    uint c = count();
+    for(uint i = 0; i < c; i++)
+        result << positions[i].name;
+    return result;
 }

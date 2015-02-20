@@ -235,6 +235,17 @@ void Kb::frameUpdate(){
     if(mute == UNKNOWN)
         mute = MUTED;
 
+    // Advance animation frame
+    if(!currentMode)
+        return;
+    KbLight* light = currentMode->light();
+    KbBind* bind = currentMode->bind();
+    if(!light->isStarted()){
+        // Don't do anything until the animations are started
+        light->open();
+        return;
+    }
+
     // Stop animations on the previously active mode (if any)
     bool changed = false;
     if(prevMode != currentMode){
@@ -248,22 +259,13 @@ void Kb::frameUpdate(){
         changed = true;
     }
 
-    // Advance animation frame
-    if(!currentMode)
-        return;
-    KbLight* light = currentMode->light();
-    KbBind* bind = currentMode->bind();
-    if(!light->isStarted()){
-        // Don't do anything until the animations are started
-        light->open();
-        return;
-    }
     // If the profile has changed, update it
     if(prevProfile != currentProfile){
         writeProfileHeader();
         cmd.write(" ");
         prevProfile = currentProfile;
     }
+    // Update current mode
     int index = currentProfile->indexOf(currentMode);
     light->frameUpdate(cmd, index, mute != MUTED, !bind->winLock());
     cmd.write(QString(" @%1 ").arg(notifyNumber).toLatin1());

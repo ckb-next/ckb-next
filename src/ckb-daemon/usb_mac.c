@@ -27,7 +27,7 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
 }
 
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
-    if(!IS_ACTIVE(kb))
+    if(!IS_CONNECTED(kb))
         return -1;
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
@@ -44,8 +44,10 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
 void closehandle(usbdevice* kb){
     kb->handle = 0;
     int count = (IS_RGB(kb->vendor, kb->product)) ? 4 : 3;
-    for(int i = 0; i < count; i++)
+    for(int i = 0; i < count; i++){
+        IOHIDDeviceClose(kb->handles[i], kIOHIDOptionsTypeSeizeDevice);
         kb->handles[i] = 0;
+    }
 }
 
 int os_resetusb(usbdevice* kb, const char* file, int line){
@@ -72,27 +74,38 @@ void usbremove(void* context, IOReturn result, void* sender){
 
 void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
     usbdevice* kb = context;
-    if(!HAS_FEATURES(kb, FEAT_RGB)){
-        // For non RGB keyboards, translate HID input
+    if(HAS_FEATURES(kb, FEAT_RGB)){
         switch(length){
         case 8:
-            hid_translate(kb->kbinput, 1, 8, kb->urbinput);
+            // RGB EP 1: BIOS HID input
+            hid_translate(kb->kbinput, -1, 8, kb->urbinput);
+            inputupdate(kb);
             break;
-        case 4:
-            hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
+        case 21:
+            // RGB EP 2: non-BIOS HID input (accept only if keyboard is inactive)
+            if(!kb->active){
+                hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);
+                inputupdate(kb);
+            }
             break;
-        case 15:
-            hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
+        case MSG_SIZE:
+            // RGB EP 3: Corsair input
+            inputupdate(kb);
             break;
         }
-        inputupdate(kb);
     } else {
-        // For RGB keyboards, process Corsair input or BIOS input
-        if(length == 8){
+        switch(length){
+        case 8:
+            // Non-RGB EP 1: input
             hid_translate(kb->kbinput, 1, 8, kb->urbinput);
             inputupdate(kb);
-        } else if(length == MSG_SIZE)
+            break;
+        case 4:
+            // Non-RGB EP 2: media keys
+            hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
             inputupdate(kb);
+            break;
+        }
     }
 }
 
@@ -254,7 +267,7 @@ void* krthread(void* context){
         struct timespec time;
         clock_gettime(CLOCK_MONOTONIC, &time);
         for(int i = 1; i < DEV_MAX; i++){
-            if(IS_ACTIVE(keyboard + i)){
+            if(IS_CONNECTED(keyboard + i)){
                 pthread_mutex_lock(&keyboard[i].keymutex);
                 if(keyboard[i].lastkeypress != KEY_NONE){
                     // Repeat the key as many times as needed to catch up
@@ -276,7 +289,7 @@ void* threadrun(void* context){
     if(devices){
         int vendor = V_CORSAIR;
         int products[] = { P_K65, P_K70, P_K70_NRGB, P_K95 };
-        for(int i = 0; i < sizeof(products) / sizeof(int); i++){
+        for(uint i = 0; i < sizeof(products) / sizeof(int); i++){
             int product = products[i];
             CFMutableDictionaryRef device = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
             if(device){
@@ -328,7 +341,7 @@ int usbinit(){
 }
 
 void usbdeinit(){
-    IOHIDManagerClose(usbmanager, kIOHIDOptionsTypeNone);
+    IOHIDManagerClose(usbmanager, kIOHIDOptionsTypeSeizeDevice);
 }
 
 #endif

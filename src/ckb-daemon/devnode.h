@@ -40,10 +40,17 @@ typedef enum {
     NONE,
     DEVICE,
     MODE,
+    HWLOAD,
+    HWSAVE,
+    ERASE,
+    ERASEPROFILE,
     NAME,
     PROFILENAME,
     ID,
     PROFILEID,
+
+    ACTIVE,
+    IDLE,
 
     LAYOUT,
     BIND,

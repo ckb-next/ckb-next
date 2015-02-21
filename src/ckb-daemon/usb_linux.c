@@ -30,7 +30,7 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
 }
 
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
-    if(!IS_ACTIVE(kb))
+    if(!IS_CONNECTED(kb))
         return -1;
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 50, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
@@ -51,7 +51,7 @@ void* intreap(void* context){
         if(ioctl(fd, USBDEVFS_REAPURB, &urb)){
             if(errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
-                break;
+                return 0;
             else if(errno == EPIPE && urb){
                 // On EPIPE, clear halt on the endpoint
                 ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
@@ -63,27 +63,38 @@ void* intreap(void* context){
         if(urb){
             // Process input (if any)
             if(kb->INPUT_READY){
-                if(!HAS_FEATURES(kb, FEAT_RGB)){
-                    // For non RGB keyboards, translate HID input
+                if(HAS_FEATURES(kb, FEAT_RGB)){
                     switch(urb->endpoint){
                     case 0x81:
-                        hid_translate(kb->kbinput, 1, 8, kb->urbinput);
+                        // RGB EP 1: BIOS HID input
+                        hid_translate(kb->kbinput, -1, 8, kb->urbinput);
+                        inputupdate(kb);
                         break;
                     case 0x82:
-                        hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
+                        // RGB EP 2: non-BIOS HID input (accept only if keyboard is inactive)
+                        if(!kb->active){
+                            hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);
+                            inputupdate(kb);
+                        }
                         break;
                     case 0x83:
-                        hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
+                        // RGB EP 3: Corsair input
+                        inputupdate(kb);
                         break;
                     }
-                    inputupdate(kb);
                 } else {
-                    // For RGB keyboards, process Corsair input or BIOS input
-                    if(urb->endpoint == 0x81){
+                    switch(urb->endpoint){
+                    case 0x81:
+                        // Non-RGB EP 1: input
                         hid_translate(kb->kbinput, 1, 8, kb->urbinput);
                         inputupdate(kb);
-                    } else if(urb->actual_length == MSG_SIZE)
+                        break;
+                    case 0x82:
+                        // Non-RGB EP 2: media keys
+                        hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
                         inputupdate(kb);
+                        break;
+                    }
                 }
             }
             // Mark the keyboard as having received input
@@ -218,7 +229,7 @@ int openusb(struct udev_device* dev, short vendor, short product){
     // Find a free USB slot
     for(int index = 1; index < DEV_MAX; index++){
         usbdevice* kb = keyboard + index;
-        if(!IS_ACTIVE(kb)){
+        if(!IS_CONNECTED(kb)){
             // Open the sysfs device
             kb->udev = dev;
             kb->handle = open(path, O_RDWR);

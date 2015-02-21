@@ -8,16 +8,14 @@
 #define DEV_MAX     10
 extern usbdevice keyboard[DEV_MAX];
 // Is a device active?
-#define IS_ACTIVE(kb) ((kb) && (kb)->handle && (kb)->event)
+#define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
 // A mutex used when accessing the device table. This mutex must be locked
 // during any operation that could add or remove a device, or during any
 // operation that accesses the devices as a list.
 extern pthread_mutex_t kblistmutex;
 
-// Set input mode on a device
-#define IN_CORSAIR  0x40
-#define IN_HID      0x80
-void setinput(usbdevice* kb, int input);
+// Activates/deactives a keyboard
+void setactive(usbdevice* kb, int active);
 
 // Find a connected USB device. Returns 0 if not found
 usbdevice* findusb(const char* serial);

@@ -38,18 +38,20 @@ void inputupdate(usbdevice* kb){
     }
     // Look for macros matching the current state
     int macrotrigger = 0;
-    for(int i = 0; i < bind->macrocount; i++){
-        keymacro* macro = &bind->macros[i];
-        if(macromask(kb->kbinput, macro->combo)){
-            if(!macro->triggered){
-                macrotrigger = 1;
-                macro->triggered = 1;
-                // Send events for each keypress in the macro
-                for(int a = 0; a < macro->actioncount; a++)
-                    os_keypress(kb, macro->actions[a].scan, macro->actions[a].down);
+    if(kb->active){
+        for(int i = 0; i < bind->macrocount; i++){
+            keymacro* macro = &bind->macros[i];
+            if(macromask(kb->kbinput, macro->combo)){
+                if(!macro->triggered){
+                    macrotrigger = 1;
+                    macro->triggered = 1;
+                    // Send events for each keypress in the macro
+                    for(int a = 0; a < macro->actioncount; a++)
+                        os_keypress(kb, macro->actions[a].scan, macro->actions[a].down);
+                }
+            } else {
+                macro->triggered = 0;
             }
-        } else {
-            macro->triggered = 0;
         }
     }
     // Make a list of keycodes to send. Rearrange them so that modifier keydowns always come first
@@ -65,7 +67,7 @@ void inputupdate(usbdevice* kb){
         for(int bit = 0; bit < 8; bit++){
             int keyindex = byte * 8 + bit;
             const key* map = keymap + keyindex;
-            int scancode = bind->base[keyindex];
+            int scancode = (kb->active) ? bind->base[keyindex] : map->scan;
             char mask = 1 << bit;
             char old = oldb & mask, new = newb & mask;
             // If the key state changed, send it to the input device
@@ -99,12 +101,14 @@ void inputupdate(usbdevice* kb){
                     }
                 }
                 // Print notifications if desired
-                for(int notify = 0; notify < OUTFIFO_MAX; notify++){
-                    if(mode->notify[notify][byte] & mask){
-                        nprintkey(kb, notify, keymap, keyindex, new);
-                        // Volume wheel doesn't generate keyups
-                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && kb->model != 65)
-                            nprintkey(kb, notify, keymap, keyindex, 0);
+                if(kb->active){
+                    for(int notify = 0; notify < OUTFIFO_MAX; notify++){
+                        if(mode->notify[notify][byte] & mask){
+                            nprintkey(kb, notify, keymap, keyindex, new);
+                            // Volume wheel doesn't generate keyups
+                            if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && kb->model != 65)
+                                nprintkey(kb, notify, keymap, keyindex, 0);
+                        }
                     }
                 }
             }
@@ -122,14 +126,14 @@ void inputupdate(usbdevice* kb){
 }
 
 void updateindicators(usbdevice* kb, int force){
-    if(!IS_ACTIVE(kb))
+    if(!IS_CONNECTED(kb))
         return;
     uchar old = kb->ileds;
     os_updateindicators(kb, force);
     // Print notifications if desired
     uchar new = kb->ileds;
     usbmode* mode = kb->profile.currentmode;
-    if(!mode)
+    if(!mode || !kb->active)
         return;
     uchar indicators[] = { I_NUM, I_CAPS, I_SCROLL };
     for(unsigned i = 0; i < sizeof(indicators) / sizeof(uchar); i++){

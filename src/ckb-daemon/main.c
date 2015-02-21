@@ -24,7 +24,7 @@ void quit(){
     pthread_mutex_timedlock(&kblistmutex, &timeout);
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
-        if(IS_ACTIVE(keyboard + i)){
+        if(IS_CONNECTED(keyboard + i)){
             pthread_mutex_timedlock(&keyboard[i].mutex, &timeout);
             // Stop the uinput device now to ensure no keys get stuck
             inputclose(keyboard + i);
@@ -215,7 +215,7 @@ int main(int argc, char** argv){
             pthread_mutex_lock(&kblistmutex);
         // Run the USB queue. Messages must be queued because sending multiple messages at the same time can cause the interface to freeze
         for(int i = 1; i < DEV_MAX; i++){
-            if(IS_ACTIVE(keyboard + i)){
+            if(IS_CONNECTED(keyboard + i)){
                 pthread_mutex_lock(&keyboard[i].mutex);
                 if(usbdequeue(keyboard + i) == 0
                         && usb_tryreset(keyboard + i)){

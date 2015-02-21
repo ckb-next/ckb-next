@@ -104,7 +104,6 @@ The user interface is still a work in progress.
 - Ability to share lighting or binding between multiple modes
 - Ability to copy animations, settings to different modes
 - User interface for firmware updates
-- (Daemon) Allow the daemon to disconnect all keyboards without shutting down, reconnect later. This way ckb can soft stop/soft start the daemon, because using the daemon without ckb running isn't very useful.
 - System service files so that ckb-daemon can be run at system start.
 - **v0.2 release:**
 - More functions for the Win Lock key

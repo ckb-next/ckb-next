@@ -171,21 +171,23 @@ typedef struct {
     uchar prevkbinput[N_KEYS / 8];
     // USB output queue
     uchar* queue[QUEUE_LEN];
-    int queuecount;
+    char queuecount;
     // Features (see F_ macros)
-    int features;
-    // Poll rate (ns), or -1 if unsupported
-    int pollrate;
+    char features;
     // USB vendor and product IDs
     short vendor, product;
     // Firmware version
     ushort fwversion;
+    // Poll rate (ns), or -1 if unsupported
+    int pollrate;
     // Indicator LED state
     uchar ileds;
     // Keyboard type (65, 70, or 95 for keyboards, -1 for root)
     char model;
     // Device name
     char name[NAME_LEN];
+    // Whether the keyboard is being actively controlled by the driver
+    char active;
 } usbdevice;
 
 #endif

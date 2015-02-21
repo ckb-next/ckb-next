@@ -73,7 +73,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     }
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
-    cmd.write(QString("@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
+    cmd.write(QString("active\n@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
     for(int i = 0; i < hwModeCount; i++)
         cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
     cmd.write("\n");
@@ -90,7 +90,7 @@ Kb::~Kb(){
         return;
     // Kill notification thread and remove node
     if(notifyNumber > 0)
-        cmd.write(QString("notifyoff %1\n").arg(notifyNumber).toLatin1());
+        cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
     terminate();
     // Reset to hardware profile
@@ -254,8 +254,7 @@ void Kb::frameUpdate(){
             disconnect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
         }
         prevMode = currentMode;
-        if(prevMode)
-            connect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
+        connect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
         changed = true;
     }
 

@@ -10,6 +10,13 @@ int inputopen(usbdevice* kb){
         return 0;
     }
     kb->event = event;
+    // Send keyup events for every scancode in the keymap
+    for(int key = 0; key < N_KEYS; key++){
+        int scan = keymap_system[key].scan;
+        if(scan < 0)
+            continue;
+        os_keypress(kb, scan, 0);
+    }
     return 1;
 }
 
@@ -115,7 +122,7 @@ void os_updateindicators(usbdevice* kb, int force){
     if(kb->eventflags & kCGEventFlagMaskAlphaShift)
         ileds |= 2;
     usbmode* mode = kb->profile.currentmode;
-    if(mode)
+    if(mode && kb->active)
         ileds = (ileds & ~mode->ioff) | mode->ion;
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;

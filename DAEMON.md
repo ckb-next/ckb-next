@@ -26,6 +26,8 @@ In a terminal shell, you can do this like `echo mycommand > /dev/input/ckb1/cmd`
 
 The `device` command, followed by the keyboard's serial number, specifies which keyboard to control. It is only required when issuing commands to `ckb0` or when controlling a keyboard that is not plugged in. In all other cases, the device is inferred from the control path. Additionally, the following commands may be issued to `ckb0` without any device: `layout`, `fps`, `notifyon`, and `notifyoff`. See below for documentation.
 
+By default, all keyboards start in an idle mode and will not respond to software controls. Before issuing any other commands, write `active` to their command node, like `echo active > /dev/input/ckb1/cmd`. To put a keyboard back into idle mode, issue the `idle` command.
+
 Keyboard layout
 ---------------
 

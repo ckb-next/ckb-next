@@ -278,7 +278,7 @@ int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
 }
 
 int hwloadprofile(usbdevice* kb, int apply){
-    if(!IS_ACTIVE(kb) || !HAS_FEATURES(kb, FEAT_RGB))
+    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
         return 0;
     // Empty the board's USB queue
     while(kb->queuecount > 0){
@@ -342,7 +342,7 @@ int hwloadprofile(usbdevice* kb, int apply){
 }
 
 int hwsaveprofile(usbdevice* kb){
-    if(!IS_ACTIVE(kb) || !HAS_FEATURES(kb, FEAT_RGB))
+    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
         return 0;
     // Empty the current USB queue first
     while(kb->queuecount > 0){

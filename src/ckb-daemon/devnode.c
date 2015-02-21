@@ -44,7 +44,7 @@ void updateconnected(){
     }
     int written = 0;
     for(int i = 1; i < DEV_MAX; i++){
-        if(IS_ACTIVE(keyboard + i)){
+        if(IS_CONNECTED(keyboard + i)){
             written = 1;
             fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].profile.serial, keyboard[i].name);
         }
@@ -291,7 +291,7 @@ unsigned readlines(int fd, const char** input){
 
 void readcmd(usbdevice* kb, const char* line){
     usbdevice* kb0 = kb;
-    if(IS_ACTIVE(kb))
+    if(IS_CONNECTED(kb))
         pthread_mutex_lock(&kb->mutex);
     char* word = malloc(strlen(line) + 1);
     int wordlen;
@@ -309,7 +309,7 @@ void readcmd(usbdevice* kb, const char* line){
         if(line > newline){
             usbdevice* prevkb = kb;
             kb = kb0;
-            profile = (IS_ACTIVE(kb) ? &kb->profile : 0);
+            profile = (IS_CONNECTED(kb) ? &kb->profile : 0);
             keymap = (profile ? profile->keymap : keymap_system);
             mode = (profile ? profile->currentmode : 0);
             command = NONE;
@@ -321,9 +321,9 @@ void readcmd(usbdevice* kb, const char* line){
             // Send the RGB command to the last device if its colors changed
             if(kb != prevkb){
                 updatergb(prevkb, 0);
-                if(IS_ACTIVE(prevkb))
+                if(IS_CONNECTED(prevkb))
                     pthread_mutex_unlock(&prevkb->mutex);
-                if(IS_ACTIVE(kb))
+                if(IS_CONNECTED(kb))
                     pthread_mutex_lock(&kb->mutex);
             }
         }
@@ -343,47 +343,17 @@ void readcmd(usbdevice* kb, const char* line){
                 profile->currentmode = mode;
             continue;
         } else if(!strcmp(word, "hwload")){
-            command = NONE;
+            command = HWLOAD;
             handler = 0;
-            if(kb && profile){
-                // Try to load the profile from hardware
-                while(hwloadprofile(kb, 1)){
-                    if(usb_tryreset(kb)){
-                        closeusb(kb);
-                        free(word);
-                        return;
-                    }
-                }
-            }
-            updatergb(kb, 1);
         } else if(!strcmp(word, "hwsave")){
-            command = NONE;
+            command = HWSAVE;
             handler = 0;
-            if(kb && profile){
-                // Save the profile to hardware
-                while(hwsaveprofile(kb)){
-                    if(usb_tryreset(kb)){
-                        closeusb(kb);
-                        free(word);
-                        return;
-                    }
-                }
-            }
-            updatergb(kb, 1);
         } else if(!strcmp(word, "erase")){
-            command = NONE;
+            command = ERASE;
             handler = 0;
-            if(mode)
-                erasemode(mode, keymap);
-            continue;
         } else if(!strcmp(word, "eraseprofile")){
-            command = NONE;
+            command = ERASEPROFILE;
             handler = 0;
-            if(profile){
-                eraseprofile(profile, kb->model == 95 ? 3 : 1);
-                mode = profile->currentmode;
-            }
-            continue;
         } else if(!strcmp(word, "name")){
             command = NAME;
             handler = cmd_setmodename;
@@ -400,6 +370,12 @@ void readcmd(usbdevice* kb, const char* line){
             command = PROFILEID;
             handler = 0;
             continue;
+        } else if(!strcmp(word, "active")){
+            command = ACTIVE;
+            handler = 0;
+        } else if(!strcmp(word, "idle")){
+            command = IDLE;
+            handler = 0;
         } else if(!strcmp(word, "layout")){
             command = LAYOUT;
             handler = 0;
@@ -499,9 +475,9 @@ void readcmd(usbdevice* kb, const char* line){
                 // Send the RGB command to the last device if its colors changed
                 if(kb != prevkb){
                     updatergb(prevkb, 0);
-                    if(IS_ACTIVE(prevkb))
+                    if(IS_CONNECTED(prevkb))
                         pthread_mutex_unlock(&prevkb->mutex);
-                    if(IS_ACTIVE(kb))
+                    if(IS_CONNECTED(kb))
                         pthread_mutex_lock(&kb->mutex);
                 }
             }
@@ -549,32 +525,75 @@ void readcmd(usbdevice* kb, const char* line){
         // Only the DEVICE, LAYOUT, FPS, GET, and NOTIFYON/OFF commands are valid without an existing mode
         if(!mode)
             continue;
-        if(command == MODE){
+        // If a keyboard is inactive, it must be activated before receiving any other commands
+        if(!kb->active){
+            if(command == ACTIVE)
+                setactive(kb, 1);
+            continue;
+        }
+        // Process commands with special actions
+        switch(command){
+        case IDLE:
+            setactive(kb, 0);
+            continue;
+        case HWLOAD:
+            // Try to load the profile from hardware. Reset on failure, disconnect if reset fails.
+            while(hwloadprofile(kb, 1)){
+                if(usb_tryreset(kb)){
+                    closeusb(kb);
+                    free(word);
+                    return;
+                }
+            }
+            continue;
+        case HWSAVE:
+            // Save the profile to hardware. Reset on failure
+            while(hwsaveprofile(kb)){
+                if(usb_tryreset(kb)){
+                    closeusb(kb);
+                    free(word);
+                    return;
+                }
+            }
+            // Re-send the current RGB state as the save sometimes scrambles it
+            updatergb(kb, 1);
+            continue;
+        case ERASE:
+            // Erase the current mode
+            erasemode(mode, keymap);
+            continue;
+        case ERASEPROFILE:
+            // Erase the current profile
+            eraseprofile(profile, kb->model == 95 ? 3 : 1);
+            mode = profile->currentmode;
+            continue;
+        case MODE: {
+            // Mode selection processes a number
             int newmode;
             if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_MAX)
                 mode = getusbmode(newmode - 1, profile, keymap);
             continue;
-        } else if(command == NAME || command == IOFF || command == ION || command == IAUTO || command == INOTIFY){
+        } case NAME: case IOFF: case ION: case IAUTO: case INOTIFY:
             // All of the above just parse the whole word
             handler(mode, keymap, notifynumber, 0, word);
             continue;
-        } else if(command == PROFILENAME){
+        case PROFILENAME:
             // Profile name is the same, but takes a different parameter
             setprofilename(profile, word);
             continue;
-        } else if(command == ID){
+        case ID: {
             // ID takes either a GUID or an 8-digit hex number
             int newmodified;
             if(!setid(&mode->id, word) && sscanf(word, "%08x", &newmodified) == 1)
                 memcpy(mode->id.modified, &newmodified, sizeof(newmodified));
             continue;
-        } else if(command == PROFILEID){
+        } case PROFILEID: {
             // Profile ID is the same but applies to the profile instead of the mode
             int newmodified;
             if(!setid(&profile->id, word) && sscanf(word, "%08x", &newmodified) == 1)
                 memcpy(profile->id.modified, &newmodified, sizeof(newmodified));
             continue;
-        } else if(command == RGB){
+        } case RGB: {
             // RGB command has a special response for "on", "off", and a hex constant
             int r, g, b;
             if(!strcmp(word, "on")){
@@ -588,11 +607,14 @@ void readcmd(usbdevice* kb, const char* line){
                     cmd_rgb(mode, keymap, notifynumber, i, word);
                 continue;
             }
-        } else if(command == MACRO && !strcmp(word, "clear")){
-            // Macro has a special clear command
-            cmd_macroclear(mode);
-            continue;
-        } else if(command == FWUPDATE){
+        } case MACRO:
+            if(!strcmp(word, "clear")){
+                // Macro has a special clear command
+                cmd_macroclear(mode);
+                continue;
+            }
+            break;
+        case FWUPDATE:
             // FW update also parses a whole word
             if(cmd_fwupdate(kb, notifynumber, word)){
                 // If the USB device failed, close it
@@ -601,8 +623,9 @@ void readcmd(usbdevice* kb, const char* line){
                 return;
             }
             continue;
+        default:
+            break;
         }
-
         // For anything else, split the parameter at the colon
         int left = -1;
         sscanf(word, "%*[^:]%n", &left);
@@ -646,7 +669,7 @@ void readcmd(usbdevice* kb, const char* line){
 
     // Finish up
     updatergb(kb, 0);
-    if(IS_ACTIVE(kb))
+    if(IS_CONNECTED(kb))
         pthread_mutex_unlock(&kb->mutex);
     free(word);
 }

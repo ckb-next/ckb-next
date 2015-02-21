@@ -47,12 +47,12 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
         -2,  -2,  -2,  -2,  -2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-        -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -3,  -1,  -1,  -1,  // <- -3 = program key
+        -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -3,  -1,  -1,  -1,  // <- -3 = non-RGB program key
        120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 136, 137, 138, 139, 140, 141,
         60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97,
         -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
     };
-    if(endpoint == 1){
+    if(endpoint == 1 || endpoint == -1){
         // EP 1: RGB BIOS mode input, non-RGB key input
         // Clear previous input
         for(int i = 0; i < 256; i++){
@@ -66,15 +66,38 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
         }
         for(int i = 2; i < length; i++){
             if(urbinput[i] > 3){
-                int bit = hid_codes[urbinput[i]];
-                if(bit >= 0)
-                    SET_KEYBIT(kbinput, bit);
+                int scan = hid_codes[urbinput[i]];
+                if(scan >= 0)
+                    SET_KEYBIT(kbinput, scan);
                 else
-                    printf("Got unknown key press %d on EP %d\n", urbinput[i], endpoint);
+                    printf("Got unknown key press %d on EP 1\n", urbinput[i]);
+            }
+        }
+    } else if(endpoint == -2){
+        // EP 2 RGB: HID input
+        if(length != 21 || urbinput[0] != 1)
+            return;
+        for(int bit = 0; bit < 8; bit++){
+            if((urbinput[1] >> bit) & 1)
+                SET_KEYBIT(kbinput, hid_codes[bit + 224]);
+            else
+                CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
+        }
+        for(int byte = 0; byte < 19; byte++){
+            char input = urbinput[byte + 2];
+            for(int bit = 0; bit < 8; bit++){
+                int scan = hid_codes[byte * 8 + bit];
+                if((input >> bit) & 1){
+                    if(scan >= 0)
+                        SET_KEYBIT(kbinput, hid_codes[byte * 8 + bit]);
+                    else
+                        printf("Got unknown key press %d on EP 2\n", byte * 8 + bit);
+                } else if(scan >= 0)
+                    CLEAR_KEYBIT(kbinput, hid_codes[byte * 8 + bit]);
             }
         }
     } else if(endpoint == 2){
-        // EP 2: Non-RGB media keys
+        // EP 2 Non-RGB: media keys
         CLEAR_KEYBIT(kbinput, 97);          // mute
         CLEAR_KEYBIT(kbinput, 98);          // stop
         CLEAR_KEYBIT(kbinput, 99);          // prev
@@ -96,18 +119,15 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
             case 205:
                 SET_KEYBIT(kbinput, 100);   // play
                 break;
+            case 226:
+                SET_KEYBIT(kbinput, 97);    // mute
+                break;
             case 233:
                 SET_KEYBIT(kbinput, 130);   // volup
                 break;
             case 234:
                 SET_KEYBIT(kbinput, 131);   // voldn
                 break;
-            }
-        }
-    } else {
-        for(int i = 0; i < length; i++){
-            if(urbinput[i] != 0){
-                printf("Got unknown key press %d on EP %d\n", urbinput[i], endpoint);
             }
         }
     }

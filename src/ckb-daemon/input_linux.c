@@ -168,7 +168,7 @@ void os_updateindicators(usbdevice* kb, int force){
     ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds);
     char ileds = leds[0];
     usbmode* mode = kb->profile.currentmode;
-    if(mode)
+    if(mode && kb->active)
         ileds = (ileds & ~mode->ioff) | mode->ion;
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;

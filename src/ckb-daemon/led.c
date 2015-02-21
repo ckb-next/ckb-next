@@ -28,7 +28,7 @@ void makergb(const keylight* light, uchar data_pkt[5][MSG_SIZE], int forceon){
 }
 
 void updatergb(usbdevice* kb, int force){
-    if(!IS_ACTIVE(kb) || !HAS_FEATURES(kb, FEAT_RGB))
+    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB) || !kb->active)
         return;
     // Don't do anything if the lighting hasn't changed
     keylight* lastlight = &kb->lastlight;

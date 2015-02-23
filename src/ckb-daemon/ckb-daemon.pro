@@ -1,13 +1,14 @@
-TARGET = ckb-daemon
-CONFIG   += console
-CONFIG   += debug_and_release
-
 TEMPLATE = app
-CONFIG   -= app_bundle
-QT       -= core
-QT       -= gui
+TARGET = ckb-daemon
+
+CONFIG   += debug_and_release
+CONFIG   += console
+CONFIG   -= qt app_bundle
+QT       -= core gui
+LIBS     -= -lQtGui -lQtCore
 
 QMAKE_MAC_SDK = macosx10.10
+
 macx {
     DESTDIR = $$PWD/../../ckb.app/Contents/Resources
 } else {

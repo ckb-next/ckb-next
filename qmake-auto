@@ -1,0 +1,17 @@
+#!/bin/sh
+function die {
+    echo "No suitable qmake found."
+    exit 1
+}
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    QMAKE=`find ~/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name qmake -print -quit 2>/dev/null`
+    [[ $QMAKE == "" ]] && die
+else
+    QMAKE=`which qmake-qt5 2>/dev/null`
+    if [[ $? -ne 0 ]]; then
+        QMAKE=`which qmake 2>/dev/null`
+        [[ $? -ne 0 ]] && die
+    fi
+fi
+[[ `$QMAKE -v | grep -i "Qt version 5" | wc -l` -ne 1 ]] && die
+$QMAKE "$@"

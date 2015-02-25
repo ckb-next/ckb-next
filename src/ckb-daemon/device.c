@@ -60,6 +60,12 @@ usbprofile* addstore(const char* serial, int autosetup){
 #define ACT_M3          12
 
 void setactive(usbdevice* kb, int active){
+    // Empty the board's USB queue first
+    while(kb->queuecount > 0){
+        DELAY_SHORT;
+        if(!usbdequeue(kb))
+            return;
+    }
     uchar msg[3][MSG_SIZE] = {
         { 0x07, 0x04, 0 },                  // Disables or enables HW control for top row
         { 0x07, 0x40, 0 },                  // Selects key input
@@ -78,8 +84,8 @@ void setactive(usbdevice* kb, int active){
                 // Select both standard and Corsair input. The standard input will be ignored except in BIOS mode.
                 uchar action = IN_HID | IN_CORSAIR;
                 // Additionally, make MR activate the MR ring
-                if(keymap_system[key].name && !strcmp(keymap_system[key].name, "mr"))
-                    action |= ACT_MR_RING;
+                //if(keymap_system[key].name && !strcmp(keymap_system[key].name, "mr"))
+                //    action |= ACT_MR_RING;
                 msg[1][4 + pair * 2] = key;
                 msg[1][5 + pair * 2] = action;
             }

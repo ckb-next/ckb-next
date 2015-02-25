@@ -173,10 +173,6 @@ void Kb::hwSave(){
         light->base(cmd, i);
         if(mode == currentMode)
             cmd.write(" switch");
-#ifdef Q_OS_MACX
-        if(KeyPos::osxCmdSwap)
-            cmd.write(" bind lctrl:lwin rctrl:rwin lwin:lctrl rwin:rctrl");
-#endif
         // Write the mode name and ID
         cmd.write(" name ");
         cmd.write(QUrl::toPercentEncoding(mode->name()));

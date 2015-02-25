@@ -21,7 +21,9 @@ public:
 
 private slots:
     void updateBind();
+    void newLayout();
     void newSelection(QStringList selection);
+    void updateSelDisplay();
 
     void on_resetButton_clicked();
     void on_unbindButton_clicked();

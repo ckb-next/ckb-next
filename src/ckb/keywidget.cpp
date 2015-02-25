@@ -34,7 +34,7 @@ void KeyWidget::bindMap(const QHash<QString, QString>& newBindMap){
 }
 
 void KeyWidget::paintEvent(QPaintEvent*){
-    const QColor bgColor(64, 60, 60);
+    const QColor bgColor(68, 64, 64);
     const QColor keyColor(112, 110, 110);
     const QColor highlightColor(136, 176, 240);
     const QColor highlightAnimColor(136, 200, 240);
@@ -70,24 +70,46 @@ void KeyWidget::paintEvent(QPaintEvent*){
     painter.setBrush(QBrush(bgColor));
     painter.drawRect(0, 0, width(), height());
 
-    // Draw key backgrounds
+    // Draw mouse highlight (if any)
+    if(mouseDownMode != NONE && (mouseDownX != mouseCurrentX || mouseDownY != mouseCurrentY)){
+        int x1 = (mouseDownX > mouseCurrentX) ? mouseCurrentX : mouseDownX;
+        int x2 = (mouseDownX > mouseCurrentX) ? mouseDownX : mouseCurrentX;
+        int y1 = (mouseDownY > mouseCurrentY) ? mouseCurrentY : mouseDownY;
+        int y2 = (mouseDownY > mouseCurrentY) ? mouseDownY : mouseCurrentY;
+        painter.setPen(QPen(highlightColor, 0.5));
+        QColor bColor = highlightColor;
+        bColor.setAlpha(128);
+        painter.setBrush(QBrush(bColor));
+        painter.drawRect(x1, y1, x2 - x1, y2 - y1);
+    }
+
+    // Draw key backgrounds on a separate pixmap so that a drop shadow can be applied to them.
+    int wWidth = width(), wHeight = height();
     KeyMap::Model model = keyMap.model();
+    QPixmap keyBG(wWidth, wHeight);
+    keyBG.fill(QColor(0, 0, 0, 0));
+    QPainter bgPainter(&keyBG);
+    bgPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    bgPainter.setPen(Qt::NoPen);
     for(uint i = 0; i < count; i++){
         const KeyPos& key = *keyMap.key(i);
         float x = key.x + 6.f - key.width / 2.f + 1.f;
         float y = key.y + 6.f - key.height / 2.f + 1.f;
         float w = key.width - 2.f;
         float h = key.height - 2.f;
+        // In RGB mode, ignore volume wheel on K70/K95
+        if(model != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
+            continue;
         // Set color based on key highlight
         if(highlight.testBit(i)){
             if(animation.testBit(i))
-                painter.setBrush(QBrush(highlightAnimColor));
+                bgPainter.setBrush(QBrush(highlightAnimColor));
             else
-                painter.setBrush(QBrush(highlightColor));
+                bgPainter.setBrush(QBrush(highlightColor));
         } else if(animation.testBit(i))
-            painter.setBrush(QBrush(animColor));
+            bgPainter.setBrush(QBrush(animColor));
         else
-            painter.setBrush(QBrush(keyColor));
+            bgPainter.setBrush(QBrush(keyColor));
         if(!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute"))){
             // Switch keys are circular
@@ -95,14 +117,14 @@ void KeyWidget::paintEvent(QPaintEvent*){
             y += h / 8.f;
             w *= 0.75f;
             h *= 0.75f;
-            painter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
+            bgPainter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
         } else {
             if(!strcmp(key.name, "enter")){
                 if(key.height == 24){
                     // ISO enter key isn't rectangular
                     y = key.y + 1.f;
                     h = 10.f;
-                    painter.drawRect(QRectF((x + w - 13.f) * xScale, y * yScale, 13.f * xScale, 22.f * yScale));
+                    bgPainter.drawRect(QRectF((x + w - 13.f) * xScale, y * yScale, 13.f * xScale, 22.f * yScale));
                 } else {
                     // US enter key isn't perfectly centered, needs an extra pixel on the left to appear correctly
                     x -= 1.f;
@@ -115,50 +137,35 @@ void KeyWidget::paintEvent(QPaintEvent*){
             } else if(!strcmp(key.name, "caps") || !strcmp(key.name, "lshift") || !strcmp(key.name, "next")){
                 w += 1.f;
             }
-            painter.drawRect(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
+            bgPainter.drawRect(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
         }
     }
 
-    // Draw mouse highlight (if any)
-    if(mouseDownMode != NONE && (mouseDownX != mouseCurrentX || mouseDownY != mouseCurrentY)){
-        int x1 = (mouseDownX > mouseCurrentX) ? mouseCurrentX : mouseDownX;
-        int x2 = (mouseDownX > mouseCurrentX) ? mouseDownX : mouseCurrentX;
-        int y1 = (mouseDownY > mouseCurrentY) ? mouseCurrentY : mouseDownY;
-        int y2 = (mouseDownY > mouseCurrentY) ? mouseDownY : mouseCurrentY;
-        QColor hColor2 = highlightColor;
-        hColor2.setAlpha(128);
-        painter.setBrush(QBrush(hColor2));
-        painter.drawRect(x1, y1, x2 - x1, y2 - y1);
-    }
-
+    // Render the key decorations (RGB -> light circles, binding -> key names) on yet another layer
+    QPixmap decoration(wWidth, wHeight);
+    decoration.fill(QColor(0, 0, 0, 0));
+    QPainter decPainter(&decoration);
+    decPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     if(_rgbMode){
         // Draw key colors (RGB mode)
+        decPainter.setPen(QPen(QColor(255, 255, 255), 1.5));
         for(uint i = 0; i < count; i++){
             const KeyPos& key = *keyMap.key(i);
-            float x = key.x + 6.f - 2.f;
-            float y = key.y + 6.f - 2.f;
-            float w = 4.f;
-            float h = 4.f;
-            painter.setBrush(QBrush(QColor(255, 255, 255)));
-            painter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
-            x += w / 2.f - 1.5f;
-            y += h / 2.f - 1.5f;
-            w = 3.f;
-            h = 3.f;
-            painter.setBrush(QBrush(_colorMap[key.name]));
-            painter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
+            if(model != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
+                continue;
+            float x = key.x + 6.f - 1.8f;
+            float y = key.y + 6.f - 1.8f;
+            float w = 3.6f;
+            float h = 3.6f;
+            decPainter.setBrush(QBrush(_colorMap[key.name]));
+            decPainter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
         }
     } else {
-        // Render the text to a separate pixmap so that it can be drawn with a drop shadow
-        int wWidth = width(), wHeight = height();
-        QPixmap txt(wWidth, wHeight);
-        txt.fill(QColor(0, 0, 0, 0));
-        QPainter txtPainter(&txt);
         // Draw key names
-        txtPainter.setBrush(Qt::NoBrush);
+        decPainter.setBrush(Qt::NoBrush);
         QFont font = painter.font();
         font.setBold(true);
-        font.setPixelSize(4.8f * yScale);
+        font.setPixelSize(5.25f * yScale);
         QFont font0 = font;
         for(uint i = 0; i < count; i++){
             const KeyPos& key = *keyMap.key(i);
@@ -167,95 +174,99 @@ void KeyWidget::paintEvent(QPaintEvent*){
             float w = key.width - 2.f;
             float h = key.height;
             // Print the key's friendly name (with some exceptions)
+            QString keyName = KbBind::globalRemap(key.name);
             QString name = key.friendlyName(false);
             name = name.split(" ").last();
             struct _names {
                 const char* keyName, *displayName;
             };
             _names names[] = {
-                {"light", "☼"}, {"lock", "☒"}, {"mute", "◖⊘"}, {"volup", "◖))"}, {"voldn", "◖)"},
+                {"light", "☼"}, {"lock", "☒"}, {"mute", "◖⊘"}, {"volup", keyMap.model() == KeyMap::K65 ? "◖))" : "▲"}, {"voldn", keyMap.model() == KeyMap::K65 ? "◖)" : "▼"},
                 {"prtscn",  "PrtScn\nSysRq"}, {"scroll", "Scroll\nLock"}, {"pause", "Pause\nBreak"}, {"stop", "▪"}, {"prev", "|◂◂"}, {"play", "▸||"}, {"next", "▸▸|"},
-                {"pgup", "Page\nUp"}, {"pgdn", "Page\nDown"}, {"numlock", "Num\nLock"}, {"caps", "Caps"},
+                {"pgup", "Page\nUp"}, {"pgdn", "Page\nDown"}, {"numlock", "Num\nLock"},
+                {"caps", "Caps"}, {"lshift", "Shift"}, {"rshift", "Shift"},
 #ifdef Q_OS_MACX
                 {"lctrl", "⌃"}, {"rctrl", "⌃"}, {"lwin", "⌘"}, {"rwin", "⌘"}, {"lalt", "⌥"}, {"ralt", "⌥"},
 #else
-                {"lwin", "❖"}, {"rwin", "❖"},
+                {"lctrl", "Ctrl"}, {"rctrl", "Ctrl"}, {"lwin", "❖"}, {"rwin", "❖"}, {"lalt", "Alt"}, {"ralt", "Alt"},
 #endif
                 {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"}
             };
             for(uint k = 0; k < sizeof(names) / sizeof(_names); k++){
-                const char* keyName = key.name;
-#ifdef Q_OS_MACX
-                if(KeyPos::osxCmdSwap){
-                    if(!strcmp(keyName, "lctrl")) keyName = "lwin";
-                    else if(!strcmp(keyName, "rctrl")) keyName = "rwin";
-                    else if(!strcmp(keyName, "lwin")) keyName = "lctrl";
-                    else if(!strcmp(keyName, "rwin")) keyName = "rctrl";
-                }
-#endif
-                if(!strcmp(keyName, names[k].keyName)){
+                if(keyName == names[k].keyName){
                     name = names[k].displayName;
                     break;
                 }
             }
-            if((key.name[0] == 'm' && (key.name[1] == 'r' || key.name[1] <= '3')) || !strcmp(key.name, "up") || !strcmp(key.name, "down") || !strcmp(key.name, "left") || !strcmp(key.name, "right"))
+            if(keyName == "mr" || keyName == "m1" || keyName == "m2" || keyName == "m3" || keyName == "up" || keyName == "down" || keyName == "left" || keyName == "right")
                 // Use a smaller size for MR, M1 - M3, and arrow keys
-                font.setPixelSize(font.pixelSize() * 0.85);
-            else if(!strcmp(key.name, "end"))
+                font.setPixelSize(font.pixelSize() * 0.75);
+            else if(keyName == "end")
                 // Use a smaller size for "End" to match everything else in that area
-                font.setPixelSize(font.pixelSize() * 0.72);
-            else if(!strcmp(key.name, "light")
+                font.setPixelSize(font.pixelSize() * 0.65);
+            else if(keyName == "light"
 #ifndef Q_OS_MACX
-                    || !strcmp(key.name, "lwin") || !strcmp(key.name, "rwin")
+                    || keyName == "lwin" || keyName == "rwin"
 #endif
                     )
-                // Use a larger font size for Win and Brightness to compensate for the unicode symbols looking smaller
+                // Use a larger font size for Win and Brightness to compensate for the unicode symbols looking smaller (Linux only)
                 font.setPixelSize(font.pixelSize() * 1.3);
             // Determine the appropriate size to draw the text at
-            txtPainter.setFont(font);
+            decPainter.setFont(font);
             QRectF rect(x * xScale, y * yScale - 1, w * xScale, h * yScale);
             int flags = Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextWordWrap;
-            QRectF bounds = txtPainter.boundingRect(rect, flags, name);
-            while((bounds.height() >= rect.height() - 6. || bounds.width() >= rect.width() - 2.) && font.pixelSize() >= 5){
+            QRectF bounds = decPainter.boundingRect(rect, flags, name);
+            while((bounds.height() >= rect.height() - 8. || bounds.width() >= rect.width() - 2.) && font.pixelSize() >= 5){
                 // Scale font size down until it fits inside the key
                 font.setPixelSize(font.pixelSize() - 2);
-                txtPainter.setFont(font);
-                bounds = txtPainter.boundingRect(rect, flags, name);
+                decPainter.setFont(font);
+                bounds = decPainter.boundingRect(rect, flags, name);
             }
             // Pick color based on key function
             QString bind = _bindMap.value(key.name);
             QString def = KbBind::defaultAction(key.name);
             if(bind.isEmpty())
                 // Unbound - red
-                txtPainter.setPen(QColor(255, 136, 136));
+                decPainter.setPen(QColor(255, 136, 136));
+            else if(KbBind::isProgram(bind))
+                // Custom program - orange
+                decPainter.setPen(QColor(255, 224, 192));
             else if(KbBind::isSpecial(bind) && (bind == def || !KbBind::isSpecial(def)))
                 // Special function - blue (only if not mapped to a different function - if a special function is remapped, color it yellow)
-                txtPainter.setPen(QColor(128, 224, 255));
+                decPainter.setPen(QColor(128, 224, 255));
             else if(KbBind::isMedia(bind) && (bind == def || !KbBind::isMedia(def)))
                 // Media key - green
-                txtPainter.setPen(QColor(160, 255, 168));
-            else if(bind == key.name)
+                decPainter.setPen(QColor(160, 255, 168));
+            else if(bind == def)
                 // Standard key - white
-                txtPainter.setPen(QColor(255, 255, 255));
+                decPainter.setPen(QColor(255, 255, 255));
             else
                 // Remapped key - yellow
-                txtPainter.setPen(QColor(255, 248, 128));
-            txtPainter.drawText(rect, flags, name);
+                decPainter.setPen(QColor(255, 248, 128));
+            decPainter.drawText(rect, flags, name);
             font = font0;
         }
-        // Apply the drop shadow effect and paint the text
-        QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect;  // Have to use "new", creating this on the stack causes a crash...
-        effect->setBlurRadius(4.);
-        effect->setColor(QColor(0, 0, 0, 192));
-        effect->setOffset(0, 1);
-        QGraphicsScene scene;
-        QGraphicsPixmapItem item;
-        item.setPixmap(txt);
-        item.setGraphicsEffect(effect);
-        scene.addItem(&item);
-        scene.render(&painter, QRectF(), QRectF(0, 0, wWidth, wHeight));
-        delete effect;
     }
+    // Create drop shadow effects
+    QGraphicsDropShadowEffect* bgEffect = new QGraphicsDropShadowEffect;  // Have to use "new", creating these on the stack causes a crash...
+    bgEffect->setBlurRadius(2.);
+    bgEffect->setColor(QColor(0, 0, 0, 32));
+    bgEffect->setOffset(0, 1);
+    QGraphicsDropShadowEffect* decEffect = new QGraphicsDropShadowEffect;
+    decEffect->setBlurRadius(4.);
+    decEffect->setColor(QColor(0, 0, 0, 104));
+    decEffect->setOffset(0, 1);
+    // Apply them to the pixmaps
+    QGraphicsPixmapItem* bgItem = new QGraphicsPixmapItem(keyBG);
+    bgItem->setGraphicsEffect(bgEffect);
+    QGraphicsPixmapItem* decItem = new QGraphicsPixmapItem(decoration);
+    decItem->setGraphicsEffect(decEffect);
+    // Render everything
+    QGraphicsScene* scene = new QGraphicsScene;
+    scene->addItem(bgItem);
+    scene->addItem(decItem);
+    scene->render(&painter, QRectF(), QRectF(0, 0, wWidth, wHeight));
+    delete scene;   // <- Automatically cleans up the rest of the objects
 }
 
 void KeyWidget::mousePressEvent(QMouseEvent* event){
@@ -270,6 +281,8 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
     uint count = keyMap.count();
     for(uint i = 0; i < count; i++){
         const KeyPos& key = *keyMap.key(i);
+        if(keyMap.model() != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
+            continue;
         if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f){
             newSelection.setBit(i);
             update();
@@ -308,6 +321,9 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
         for(uint i = 0; i < count; i++){
             // Find key rectangle
             const KeyPos& key = *keyMap.key(i);
+            // Ignore volume wheel on K70/K95 in RGB mode
+            if(keyMap.model() != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
+                continue;
             float kx1 = key.x - key.width / 2.f + 1.f;
             float ky1 = key.y - key.height / 2.f + 1.f;
             float kx2 = kx1 + key.width - 2.f;
@@ -326,6 +342,8 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
     uint count = keyMap.count();
     for(uint i = 0; i < count; i++){
         const KeyPos& key = *keyMap.key(i);
+        if(keyMap.model() != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
+            continue;
         if(fabs(key.x - mx) <= key.width / 2.f - 2.f && fabs(key.y - my) <= key.height / 2.f - 2.f){
             setToolTip(key.friendlyName(false));
             return;

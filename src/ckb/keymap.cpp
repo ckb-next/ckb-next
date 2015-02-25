@@ -1,12 +1,10 @@
 #include "keymap.h"
 
-bool KeyPos::osxCmdSwap = false;
-
 // Normal size
 #define NS 12, 12
 
-#define KEYCOUNT_K95_104 133
-#define KEYCOUNT_K95_105 134
+#define KEYCOUNT_K95_104 135
+#define KEYCOUNT_K95_105 136
 
 // Key positions (K95)
 extern const KeyPos K95PosFR[KEYCOUNT_K95_105];
@@ -53,7 +51,7 @@ static KeyLayout K70Pos[KEYLAYOUT_COUNT] = {
 #define K70_WIDTH       (K95_WIDTH - K70_X_START)
 #define K70_HEIGHT      K95_HEIGHT
 
-#define K65_COUNT_DIFF  19      // 17 NumPad keys, Stop, Prev, Play, Next (21 removed), but add VolUp and VolDn
+#define K65_COUNT_DIFF  21      // 17 NumPad keys, Stop, Prev, Play, Next
 
 static KeyLayout K65Pos[KEYLAYOUT_COUNT] = {
     { 0, K70Pos[0].count - K65_COUNT_DIFF },
@@ -174,7 +172,7 @@ KeyMap KeyMap::standard(KeyMap::Model model, KeyMap::Layout layout){
                     const KeyPos* keyIn = K70Pos[keyboard].positions;
                     for(uint i = 0; i < count; i++){
                         // Remove anything after X end as well as the top row keys
-                        if(keyIn[i].x >= K65_WIDTH || keyIn[i].y == 0)
+                        if(keyIn[i].x >= K65_WIDTH || keyIn[i].y < 14)
                             continue;
                         keyOut[j] = keyIn[i];
                         j++;

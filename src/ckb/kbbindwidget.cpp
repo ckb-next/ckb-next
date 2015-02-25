@@ -22,17 +22,21 @@ void KbBindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     newSelection(QStringList());
     if(bind == newBind)
         return;
-    if(bind)
+    if(bind){
+        disconnect(bind, SIGNAL(layoutChanged()), this, SLOT(newLayout()));
         disconnect(bind, SIGNAL(updated()), this, SLOT(updateBind()));
+    }
+    connect(newBind, SIGNAL(layoutChanged()), this, SLOT(newLayout()));
     connect(newBind, SIGNAL(updated()), this, SLOT(updateBind()));
     bind = newBind;
     profile = newProfile;
+    newLayout();
+    ui->rbWidget->setBind(bind, profile);
     updateBind();
 }
 
 void KbBindWidget::updateBind(){
     const KeyMap& map = bind->map();
-    ui->keyWidget->map(map);
     // Build the action list based on the keymap
     QHash<QString, QString> actions;
     uint count = map.count();
@@ -41,16 +45,24 @@ void KbBindWidget::updateBind(){
         actions[key] = bind->action(key);
     }
     ui->keyWidget->bindMap(actions);
+    ui->rbWidget->setSelection(currentSelection);
+    updateSelDisplay();
+}
+
+void KbBindWidget::newLayout(){
+    ui->keyWidget->map(bind->map());
     if(!currentSelection.isEmpty())
         ui->keyWidget->setSelection(currentSelection);
-    ui->rbWidget->setBind(bind, profile);
-    ui->rbWidget->setSelection(currentSelection);
 }
 
 void KbBindWidget::newSelection(QStringList selection){
     currentSelection = selection;
-    ui->rbWidget->setSelection(selection);
-    int count = selection.count();
+    ui->rbWidget->setSelection(selection, true);
+    updateSelDisplay();
+}
+
+void KbBindWidget::updateSelDisplay(){
+    int count = currentSelection.count();
     if(count == 0){
         // No keys selected
         ui->selectLabel->setText("Click to select keys");
@@ -58,12 +70,12 @@ void KbBindWidget::newSelection(QStringList selection){
     }
     if(count == 1){
         // Single key selected: show key name and binding
-        QString key = selection[0];
+        QString key = currentSelection[0];
         const KeyPos* pos = bind->map().key(key);
         if(!pos)
             ui->selectLabel->setText("(Unknown)");
         else
-            ui->selectLabel->setText(pos->friendlyName(false).split("\n")[0] + " → " + bind->friendlyName(key).split("\n")[0]);
+            ui->selectLabel->setText(pos->friendlyName(false).split("\n")[0] + " → " + bind->friendlyActionName(key).split("\n")[0]);
         return;
     }
     ui->selectLabel->setText(QString("%1 keys selected").arg(count));
@@ -85,8 +97,7 @@ void KbBindWidget::on_resetButton_clicked(){
         text = tr("<center>Reset %1 keys to default?</center>").arg(count);
     if(QMessageBox(QMessageBox::NoIcon, "Confirm action", text, QMessageBox::Yes | QMessageBox::No, this).exec() != QMessageBox::Yes)
         return;
-    foreach(const QString& key, selection)
-        bind->resetAction(key);
+    bind->resetAction(selection);
     updateBind();
 }
 
@@ -106,7 +117,7 @@ void KbBindWidget::on_unbindButton_clicked(){
         text = tr("<center>Unbind %1 keys?</center>").arg(count);
     if(QMessageBox(QMessageBox::NoIcon, "Confirm action", text, QMessageBox::Yes | QMessageBox::No, this).exec() != QMessageBox::Yes)
         return;
-    foreach(const QString& key, selection)
-        bind->noAction(key);
+    ui->rbWidget->setSelection(QStringList());
+    bind->noAction(selection);
     updateBind();
 }

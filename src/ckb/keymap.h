@@ -12,21 +12,11 @@ struct KeyPos {
     int x, y;
     int width, height;
 
-    // Swap Cmd/Ctrl on OSX
-    static bool osxCmdSwap;
-
     inline QString friendlyName(bool os = true) const {
         if(os){
 #ifdef Q_OS_MACX
-            if(osxCmdSwap){
-                if(!strcmp(name, "lctrl")) return "Left Cmd";
-                if(!strcmp(name, "rctrl")) return "Right Cmd";
-                if(!strcmp(name, "lwin")) return "Left Ctrl";
-                if(!strcmp(name, "rwin")) return "Right Ctrl";
-            } else {
-                if(!strcmp(name, "lwin")) return "Left Cmd";
-                if(!strcmp(name, "rwin")) return "Right Cmd";
-            }
+            if(!strcmp(name, "lwin")) return "Left Cmd";
+            if(!strcmp(name, "rwin")) return "Right Cmd";
             if(!strcmp(name, "lalt")) return "Left Option";
             if(!strcmp(name, "ralt")) return "Right Option";
             if(!strcmp(name, "prtscn")) return "F13";

@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QHash>
 #include <QObject>
+#include <QProcess>
 #include <QSettings>
 #include "keymap.h"
 
@@ -27,6 +28,13 @@ public:
     inline const KeyMap& map() { return _map; }
     void map(const KeyMap& map);
 
+    // Global key remap (changes modifiers per Settings widget)
+    // Use only when iterating the map manually; all KbBind functions already take this into account
+    static QString globalRemap(const QString& key);
+    static void setGlobalRemap(const QHash<QString, QString> keyToActual);
+    static void loadGlobalRemap();
+    static void saveGlobalRemap();
+
     // Action for a given key. Blank means no action (unbound). Special actions start with '$'.
     QString action(const QString& key);
     // Default action for a key.
@@ -37,11 +45,15 @@ public:
     static inline bool isNormal(const QString& action) { return !action.isEmpty() && !isSpecial(action); }
     static inline bool isMedia(const QString& action) { return action == "mute" || action == "volup" || action == "voldn" || action == "stop" || action == "prev" || action == "play" || action == "next"; }
     static inline bool isSpecial(const QString& action) { return !action.isEmpty() && action[0] == '$'; }
+    static inline bool isProgram(const QString& action) { return action.left(8) == "$program"; }
     // Splits a special action into action and parameter.
-    static inline QString specialInfo(const QString& action, int& parameter) { QStringList list = action.split(":"); if(list.length() < 2){ parameter = INT_MIN; return ""; } parameter = list[1].toInt(); return list[0].replace("$", ""); }
+    static QString specialInfo(const QString& action, int& parameter);
+    static int programInfo(const QString& action, QString& onPress, QString& onRelease);
 
-    // Friendly name for the action associated with a key
+    // Friendly name for a key, taking into account the global key remap
     QString friendlyName(const QString& key);
+    // Friendly name for the action associated with a key
+    QString friendlyActionName(const QString& key);
 
     // Resets a key to the default action.
     void resetAction(const QString &key);
@@ -52,6 +64,7 @@ public:
     // Sets a key to a standard keypress. (key is the key to set, actionKey is what to set it to)
     void keyAction(const QString& key, const QString& actionKey);
     inline void keyAction(const QStringList& keys, const QString& actionKey) { foreach(const QString& key, keys) keyAction(key, actionKey); }
+
     // Sets a key to a mode-switch action.
     // 0 for first mode, 1 for second, etc. Constants below for movement options
     const static int MODE_PREV = -2, MODE_NEXT = -1;
@@ -68,6 +81,12 @@ public:
     void lockAction(const QString& key, int type = LOCK_TOGGLE);
     inline void lockAction(const QStringList& keys, int type = LOCK_TOGGLE) { foreach(const QString& key, keys) lockAction(key, type); }
 
+    // Sets a key to launch a program. stop should be <press stop> | <release stop>.
+    static const int PROGRAM_PR_INDEF = 0x00, PROGRAM_PR_KRSTOP = 0x01, PROGRAM_PR_KPSTOP = 0x02;
+    static const int PROGRAM_RE_INDEF = 0x00, PROGRAM_RE_KPSTOP = 0x20;
+    void programAction(const QString& key, const QString& onPress, const QString& onRelease, int stop);
+    inline void programAction(const QStringList& keys, const QString& onPress, const QString& onRelease, int stop) { foreach(const QString& key, keys) programAction(key, onPress, onRelease, stop); }
+
     // Current win lock state
     inline bool winLock() { return _winLock; }
     void winLock(bool newWinLock) { _winLock = newWinLock; _needsUpdate = true; }
@@ -82,6 +101,7 @@ public slots:
 
 signals:
     void didLoad();
+    void layoutChanged();
     void updated();
 
 
@@ -90,13 +110,20 @@ private:
     inline Kb* devParent() { return _devParent; }
     inline KbMode* modeParent() { return (KbMode*)parent(); }
 
+    static QHash<QString, QString> _globalRemap;
+    static quint64 globalRemapTime;
+    quint64 lastGlobalRemapTime;
+
     KeyMap _map;
     // Key -> action map (no entry = default action)
     QHash<QString, QString> _bind;
 
+    // Currently-running programs
+    QHash<QString, QProcess*> kpPrograms;
+    QHash<QString, QProcess*> krPrograms;
+
     bool _winLock;
     bool _needsUpdate;
-    bool _osxSwap;
 };
 
 #endif // KBBIND_H

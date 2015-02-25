@@ -18,11 +18,12 @@ public:
     ~RebindWidget();
 
     void setBind(KbBind* newBind, KbProfile* newProfile);
-    void setSelection(const QStringList& newSelection);
+    void setSelection(const QStringList& newSelection, bool applyPrevious = false);
 
 private slots:
+    void applyChanges(const QStringList& keys, bool doUnbind);
     void on_applyButton_clicked();
-    void on_apply2Button_clicked();
+    void on_cancelButton_clicked();
 
     void on_typingBox_currentIndexChanged(int index);
     void on_modBox_currentIndexChanged(int index);
@@ -32,6 +33,8 @@ private slots:
     void on_modeBox_currentIndexChanged(int index);
     void on_lightBox_currentIndexChanged(int index);
     void on_lockBox_currentIndexChanged(int index);
+    void on_programKpBox_textChanged(const QString &arg1);
+    void on_programKrBox_textChanged(const QString &arg1);
 
     void on_typingButton_clicked(bool checked);
     void on_modButton_clicked(bool checked);
@@ -41,9 +44,13 @@ private slots:
     void on_modeButton_clicked(bool checked);
     void on_lightButton_clicked(bool checked);
     void on_lockButton_clicked(bool checked);
+    void on_programKpButton_clicked(bool checked);
+    void on_programKrButton_clicked(bool checked);
 
 private:
     Ui::RebindWidget *ui;
+
+    void setBox(QWidget* box);
 
     KbBind* bind;
     KbProfile* profile;

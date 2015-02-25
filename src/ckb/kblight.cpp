@@ -127,9 +127,13 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
     QHashIterator<QString, QRgb> i(animMap);
     while(i.hasNext()){
         i.next();
+        QString name = i.key();
+        // Volume buttons don't have LEDs except on the K65
+        if(_map.model() != KeyMap::K65 && (name == "volup" || name == "voldn"))
+            continue;
         QRgb color = i.value();
         cmd.write(" ");
-        cmd.write(i.key().toLatin1());
+        cmd.write(name.toLatin1());
         char output[8];
         snprintf(output, sizeof(output), ":%02x%02x%02x", qRed(color), qGreen(color), qBlue(color));
         cmd.write(output);

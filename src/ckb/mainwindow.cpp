@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "ui_settingswidget.h"
 #include <QSharedMemory>
 #include <QMessageBox>
 #include <QMenuBar>
@@ -64,7 +63,7 @@ void MainWindow::scanKeyboards(){
         foreach(KbWidget* w, kbWidgets)
             w->deleteLater();
         kbWidgets.clear();
-        settingsWidget->ui->devicesLabel->setText("Driver inactive");
+        settingsWidget->setStatus("Driver inactive");
         return;
     }
 
@@ -115,11 +114,11 @@ void MainWindow::scanKeyboards(){
 
     int count = kbWidgets.count();
     if(count == 0)
-        settingsWidget->ui->devicesLabel->setText("No devices connected");
+        settingsWidget->setStatus("No devices connected");
     else if(count == 1)
-        settingsWidget->ui->devicesLabel->setText("1 device connected");
+        settingsWidget->setStatus("1 device connected");
     else
-        settingsWidget->ui->devicesLabel->setText(QString("%1 devices connected").arg(count));
+        settingsWidget->setStatus(QString("%1 devices connected").arg(count));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){

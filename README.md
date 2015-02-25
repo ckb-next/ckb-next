@@ -28,9 +28,9 @@ When downloading a new version of ckb, please delete your old download first. Th
 Building for Linux
 ------------------
 
-Requires Qt5 and libudev (Ubuntu: `qt5-default` and `libudev-dev`. Qt5 packages may also be under `qt5-base` or `libqt5*-devel`). `gcc`, `g++`, and `glibc` are also required. Check with your package manager to make sure you have the correct libraries/headers installed.
+Requires Qt5 and libudev (Ubuntu: `qt5-default` and `libudev-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). `gcc`, `g++`, and `glibc` are also required. Check with your package manager to make sure you have the correct libraries/headers installed.
 
-You can build the project by running `qmake-qt5 && make` in the directory you downloaded it to. If you don't have `qmake-qt5` (e.g. Ubuntu), run `qmake && make` instead. The binaries will be placed in a new `bin` directory assuming they compile successfully. To use the driver, first start the daemon program by running `sudo bin/ckb-daemon`. After that, open the `ckb` binary as a normal user to start the user interface.
+You can build the project by running `./qmake-auto && make` in the directory you downloaded it to. The binaries will be placed in a new `bin` directory assuming they compile successfully. To use the driver, first start the daemon program by running `sudo bin/ckb-daemon`. After that, open the `ckb` binary as a normal user to start the user interface.
 
 Troubleshooting (Linux)
 -----------------------
@@ -80,7 +80,7 @@ Before launching ckb, the `ckb-daemon` program needs to be run as root. Open the
 Troubleshooting (OSX)
 ---------------------
 
-Make sure your system is up-to-date and that Xcode works on its own. Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt.
+Make sure your system is up-to-date and that Xcode works on its own. Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt. Be sure to delete the `ckb` directory as well as any automatically-generated `build-ckb` directories and start fresh with a new download.
 
 If you've rebound your modifier keys in System Preferences, the changes will not be recognized anymore. You can rebind them again within the application.
 

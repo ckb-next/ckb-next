@@ -167,13 +167,20 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     if(CFGetTypeID(device) != IOHIDDeviceGetTypeID())
         return;
     // Get the model and serial number
-    long idproduct = usbgetvalue(device, CFSTR(kIOHIDProductIDKey));
+    long idvendor = V_CORSAIR, idproduct = usbgetvalue(device, CFSTR(kIOHIDProductIDKey));
     char serial[SERIAL_LEN];
     CFTypeRef cfserial = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDSerialNumberKey));
     if(!cfserial || CFGetTypeID(cfserial) != CFStringGetTypeID() || !CFStringGetCString(cfserial, serial, SERIAL_LEN, kCFStringEncodingASCII))
-        return;
+        // If the serial can't be read, make one up
+        snprintf(serial, SERIAL_LEN, "%04x:%x04-NoID", (uint)idvendor, (uint)idproduct);
+
+    // For non-RGB models, get the firmware version here as well
+    long fwversion = 0;
+    if(!IS_RGB(idvendor, idproduct))
+        fwversion = usbgetvalue(device, CFSTR(kIOHIDVersionNumberKey));
+
     pthread_mutex_lock(&kblistmutex);
-    // A single keyboard will generate 4 match events, so each handle has to be added to the board separately.
+    // A single keyboard will generate multiple match events, so each handle has to be added to the board separately.
     // Look for any partially-set up boards matching this serial number
     int index = -1;
     for(int i = 1; i < DEV_MAX; i++){
@@ -189,6 +196,7 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
                 // Mark the device as in use and print out a message
                 index = i;
                 keyboard[i].handle = INCOMPLETE;
+                keyboard[i].fwversion = fwversion;
                 strcpy(keyboard[i].profile.serial, serial);
                 CFTypeRef cfname = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductKey));
                 if(cfname && CFGetTypeID(cfname) == CFStringGetTypeID())
@@ -226,8 +234,9 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
         printf("Warning: Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
 
     // If all handles have been set up, finish initializing the keyboard
-    if(kb->handles[0] && kb->handles[1] && kb->handles[2] && (kb->handles[3] || !IS_RGB(V_CORSAIR, (short)idproduct)))
-        openusb(kb, V_CORSAIR, (short)idproduct);
+    if(kb->handles[0] && kb->handles[1] && kb->handles[2]
+            && (kb->handles[3] || !IS_RGB(idvendor, idproduct)))
+        openusb(kb, (short)idvendor, (short)idproduct);
     pthread_mutex_unlock(&kblistmutex);
 }
 

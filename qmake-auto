@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 function die {
     echo "No suitable qmake found."
     exit 1
 }
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    QMAKE=`find ~/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name qmake -print -quit 2>/dev/null`
+    QMAKE=`find ~/Qt/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name qmake -print -quit 2>/dev/null`
     [[ $QMAKE == "" ]] && die
 else
     QMAKE=`which qmake-qt5 2>/dev/null`

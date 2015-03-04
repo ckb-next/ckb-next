@@ -75,6 +75,11 @@ void usbremove(void* context, IOReturn result, void* sender){
 }
 
 void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
+    // DEBUG: Print out message contents
+    printf("Report ID %d: ", reportid);
+    for(CFIndex i = 0; i < length; i++)
+        printf("%hhx", data[i]);
+    printf("\n");
     usbdevice* kb = context;
     if(HAS_FEATURES(kb, FEAT_RGB)){
         switch(length){
@@ -218,6 +223,8 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     long output = usbgetvalue(device, CFSTR(kIOHIDMaxOutputReportSizeKey));
     long feature = usbgetvalue(device, CFSTR(kIOHIDMaxFeatureReportSizeKey));
 
+    // DEBUG: print out handle info
+    printf("Got handle I: %d, O: %d, F: %d\n", (int)input, (int)output, (int)feature);
     // Handle 0 is for BIOS mode/non-RGB key input
     if(input == 8 && output == 1 && feature == 0)
         kb->handles[0] = device;

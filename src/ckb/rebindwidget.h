@@ -24,6 +24,8 @@ private slots:
     void applyChanges(const QStringList& keys, bool doUnbind);
     void on_applyButton_clicked();
     void on_cancelButton_clicked();
+    void on_resetButton_clicked();
+    void on_unbindButton_clicked();
 
     void on_typingBox_currentIndexChanged(int index);
     void on_modBox_currentIndexChanged(int index);

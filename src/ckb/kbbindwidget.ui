@@ -84,7 +84,7 @@
      <item row="1" column="1" colspan="3">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QPushButton" name="unbindButton">
+        <widget class="QPushButton" name="copyButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>1</horstretch>
@@ -92,7 +92,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Unbind</string>
+          <string>Copy to mode...</string>
          </property>
         </widget>
        </item>

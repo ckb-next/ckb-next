@@ -1,6 +1,7 @@
 #include <QMessageBox>
-#include "rebindwidget.h"
 #include "kbbindwidget.h"
+#include "modeselectdialog.h"
+#include "rebindwidget.h"
 #include "ui_kbbindwidget.h"
 
 KbBindWidget::KbBindWidget(QWidget *parent) :
@@ -101,23 +102,27 @@ void KbBindWidget::on_resetButton_clicked(){
     updateBind();
 }
 
-void KbBindWidget::on_unbindButton_clicked(){
+void KbBindWidget::on_copyButton_clicked(){
     QStringList selection = currentSelection;
     const KeyMap& map = bind->map();
-    if(selection.isEmpty())
-        // Reset all keys if none selected
+    int count = selection.count();
+    QString text = tr("%1 key").arg(count) + (count == 1 ? "" : "s");
+    if(count == 0){
+        // Copy all keys if none selected
         selection = map.allKeys();
-    uint count = selection.count();
-    QString text;
-    if(count == map.count())
-        text = "<center>Unbind all keys?<br />(WARNING: You won't be able to use the keyboard)</center>";
-    else if(count == 1)
-        text = "<center>Unbind this key?</center>";
-    else
-        text = tr("<center>Unbind %1 keys?</center>").arg(count);
-    if(QMessageBox(QMessageBox::NoIcon, "Confirm action", text, QMessageBox::Yes | QMessageBox::No, this).exec() != QMessageBox::Yes)
+        text = "all keys";
+    }
+    text = "Copy binding for " + text + " to:";
+    // Display popup
+    ModeSelectDialog dialog(this, profile->currentMode, profile->modes, text);
+    if(dialog.exec() != QDialog::Accepted)
         return;
-    ui->rbWidget->setSelection(QStringList());
-    bind->noAction(selection);
-    updateBind();
+    // Copy selected keys to selected modes
+    QList<KbMode*> selectedModes = dialog.selection();
+    foreach(KbMode* mode, selectedModes){
+        KbBind* modeBind = mode->bind();
+        foreach(const QString& key, selection){
+            modeBind->keyAction(key, bind->action(key));
+        }
+    }
 }

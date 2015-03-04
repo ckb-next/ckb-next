@@ -261,6 +261,14 @@ void RebindWidget::on_cancelButton_clicked(){
     setSelection(selection);
 }
 
+void RebindWidget::on_resetButton_clicked(){
+    bind->resetAction(selection);
+}
+
+void RebindWidget::on_unbindButton_clicked(){
+    bind->noAction(selection);
+}
+
 void RebindWidget::setBox(QWidget* box){
     // Un-select every item except for the current one.
     // on_*_currentIndexChanged will take care of deselecting the checkbox.

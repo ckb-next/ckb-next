@@ -55,7 +55,8 @@ SOURCES += main.cpp\
     kbbind.cpp \
     keymap_us_dvorak.cpp \
     keymap_gb_dvorak.cpp \
-    rebindwidget.cpp
+    rebindwidget.cpp \
+    modeselectdialog.cpp
 
 HEADERS  += mainwindow.h \
 	kbwidget.h \
@@ -82,7 +83,8 @@ HEADERS  += mainwindow.h \
     keywidget.h \
     kbbindwidget.h \
     kbbind.h \
-    rebindwidget.h
+    rebindwidget.h \
+    modeselectdialog.h
 
 FORMS    += mainwindow.ui \
 	kbwidget.ui \
@@ -94,7 +96,8 @@ FORMS    += mainwindow.ui \
 	gradientdialog.ui \
     kbprofiledialog.ui \
     kbbindwidget.ui \
-    rebindwidget.ui
+    rebindwidget.ui \
+    modeselectdialog.ui
 
 RESOURCES += \
 	image.qrc \

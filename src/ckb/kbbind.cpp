@@ -206,7 +206,7 @@ void KbBind::noAction(const QString& key){
 
 void KbBind::keyAction(const QString& key, const QString& actionKey){
     QString rKey = globalRemap(key);
-    if(!_map.key(rKey) || !_map.key(actionKey))
+    if(!_map.key(rKey))
         return;
     _bind[rKey] = actionKey;
     _needsUpdate = true;

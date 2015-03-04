@@ -344,12 +344,10 @@ void Kb::readNotify(QString line){
                 }
             }
         }
-        if(newProfile != hwProfile){
-            hwProfile = newProfile;
-            emit profileAdded();
-            if(hwProfile == currentProfile)
-                emit profileChanged();
-        }
+        hwProfile = newProfile;
+        emit profileAdded();
+        if(hwProfile == currentProfile)
+            emit profileChanged();
     } else if(components[0] == "hwprofilename"){
         // Hardware profile name
         QString name = QUrl::fromPercentEncoding(components[1].toUtf8());

@@ -95,14 +95,12 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
         // Select nothing if any are unbound or different
         foreach(const QString& key, selection){
             QString keyAction = bind->action(key);
-            if(keyAction.isEmpty())
-                break;
-            if(action.isEmpty()){
-                action = keyAction;
-                hasAction = true;
-            } else if(keyAction != action){
+            if(keyAction.isEmpty() || (hasAction && keyAction != action)){
                 hasAction = false;
                 break;
+            } else if(action.isEmpty()){
+                action = keyAction;
+                hasAction = true;
             }
         }
     }

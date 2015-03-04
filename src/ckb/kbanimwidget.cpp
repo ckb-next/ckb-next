@@ -104,14 +104,9 @@ void KbAnimWidget::duplicateAnim(KbAnim* old){
         return;
     noReorder = true;
     KbAnim* animation = light->duplicateAnim(old);
-    QListWidgetItem* item = new QListWidgetItem(animation->name(), ui->animList);
-    item->setData(Qt::UserRole, animation->guid());
-    item->setFlags(item->flags() | Qt::ItemIsEditable);
-    animations[animation->guid()] = animation;
-    ui->animList->insertItem(light->animList.indexOf(animation), item);
     // Refresh the list. insertItem doesn't seem to place the item in the correct position on its own...
     refreshList();
-    ui->animList->setCurrentItem(item);
+    ui->animList->setCurrentRow(light->animList.indexOf(animation));
     ui->animList->setVisible(true);
     ui->noAnimLabel->setVisible(false);
 

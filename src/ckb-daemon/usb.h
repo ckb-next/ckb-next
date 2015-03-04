@@ -18,8 +18,10 @@
 
 #define P_K95           0x1b11
 #define P_K95_STR       "1b11"
+#define P_K95_NRGB      0x1b08
+#define P_K95_NRGB_STR  "1b08"
 
-#define IS_RGB(vendor, product) (product != P_K70_NRGB)
+#define IS_RGB(vendor, product) ((product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT     usleep(3000)

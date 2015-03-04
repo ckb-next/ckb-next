@@ -350,6 +350,7 @@ static _model models[] = {
     { P_K70_STR, P_K70 },
     { P_K70_NRGB_STR, P_K70_NRGB },
     { P_K95_STR, P_K95 },
+    { P_K95_NRGB_STR, P_K95_NRGB },
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

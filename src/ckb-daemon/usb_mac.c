@@ -45,7 +45,9 @@ void closehandle(usbdevice* kb){
     kb->handle = 0;
     int count = (IS_RGB(kb->vendor, kb->product)) ? 4 : 3;
     for(int i = 0; i < count; i++){
-        IOHIDDeviceClose(kb->handles[i], kIOHIDOptionsTypeSeizeDevice);
+        //IOHIDDeviceClose(kb->handles[i], kIOHIDOptionsTypeSeizeDevice);
+        // ^ This is the right thing to do only when shutting down the daemon. If done on device disconnect, it causes a crash.
+        // Technically a memory leak, but one that only happens on shutdown, so no harm done.
         kb->handles[i] = 0;
     }
 }

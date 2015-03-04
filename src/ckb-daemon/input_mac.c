@@ -109,9 +109,9 @@ void keyretrigger(usbdevice* kb, int scancode){
 void os_kpsync(usbdevice* kb){
     // OSX doesn't have any equivalent to the SYN_ events, but we do need to prevent idle sleep
     // This stops the system from sleeping or wakes it up if it was asleep already
-    IOPMAssertionID assertionID;
-    IOPMAssertionDeclareUserActivity(CFSTR(""), kIOPMUserActiveLocal, &assertionID);
-    IOPMAssertionRelease(assertionID);
+    static IOPMAssertionID assertionID = 0;
+    if(IOPMAssertionDeclareUserActivity(CFSTR(""), kIOPMUserActiveLocal, &assertionID) != kIOReturnSuccess)
+        assertionID = 0;
 }
 
 void os_updateindicators(usbdevice* kb, int force){

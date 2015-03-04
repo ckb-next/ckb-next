@@ -56,20 +56,6 @@ int setupusb(usbdevice* kb, short vendor, short product){
     for(int q = 0; q < QUEUE_LEN; q++)
         kb->queue[q] = malloc(MSG_SIZE);
 
-    if(strstr(kb->name, "Bootloader")){
-        // Device needs a firmware update. Finish setting up but don't do anything.
-        printf("Device needs a firmware update. Please issue a fwupdate command.\n");
-        kb->features = FEAT_RGB | FEAT_FWVERSION | FEAT_FWUPDATE;
-        kb->active = 1;
-        kb->fwversion = 0;
-        kb->pollrate = -1;
-        kb->profile.keymap = keymap_system;
-        kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
-        getusbmode(1, &kb->profile, keymap_system);
-        getusbmode(2, &kb->profile, keymap_system);
-        return 0;
-    }
-
     updateindicators(kb, 1);
     // Nothing else needs to be done for non-RGB keyboards
     if(!HAS_FEATURES(kb, FEAT_RGB)){
@@ -83,6 +69,20 @@ int setupusb(usbdevice* kb, short vendor, short product){
             getusbmode(1, &kb->profile, keymap_system);
             getusbmode(2, &kb->profile, keymap_system);
         }
+        return 0;
+    }
+
+    if(strstr(kb->name, "Bootloader")){
+        // Device needs a firmware update. Finish setting up but don't do anything.
+        printf("Device needs a firmware update. Please issue a fwupdate command.\n");
+        kb->features = FEAT_RGB | FEAT_FWVERSION | FEAT_FWUPDATE;
+        kb->active = 1;
+        kb->fwversion = 0;
+        kb->pollrate = -1;
+        kb->profile.keymap = keymap_system;
+        kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
+        getusbmode(1, &kb->profile, keymap_system);
+        getusbmode(2, &kb->profile, keymap_system);
         return 0;
     }
 

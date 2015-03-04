@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(closeAction, SIGNAL(triggered()), qApp, SLOT(quit()));
-    connect(restoreAction, SIGNAL(triggered()), this, SLOT(show()));
+    connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
 
     eventTimer = new QTimer(this);
     eventTimer->setTimerType(Qt::PreciseTimer);
@@ -136,17 +136,23 @@ void MainWindow::timerTick(){
     // Check if another instance requested this in the foreground
     if(appShare.lock()){
         void* data = appShare.data();
-        if((QString)QByteArray((const char*)data) == "Open"){
-            show();
-            raise();
-            activateWindow();
-        }
+        if((QString)QByteArray((const char*)data) == "Open")
+            showWindow();
         // Remove the request
         *(char*)data = 0;
         appShare.unlock();
     }
     // Scan for connected/disconnected keyboards
     scanKeyboards();
+}
+
+void MainWindow::showWindow(){
+    showNormal();
+    raise();
+    activateWindow();
+    // QTrayIcon has some issues...
+    trayIcon->hide();
+    trayIcon->show();
 }
 
 MainWindow::~MainWindow(){

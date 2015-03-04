@@ -35,6 +35,7 @@ public:
 
 public slots:
     void timerTick();
+    void showWindow();
 
 private:
     Ui::MainWindow *ui;

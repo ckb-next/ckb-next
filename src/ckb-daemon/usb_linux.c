@@ -180,8 +180,9 @@ int usbclaim(usbdevice* kb, int rgb){
     // 3 is for the LED and board controller (not present on non-RGB models)
     int count = (rgb) ? 4 : 3;
     for(int i = 0; i < count; i++){
-        struct usbdevfs_disconnect_claim claim = { i, 0, {0} };
-        if((ioctl(kb->handle, USBDEVFS_DISCONNECT_CLAIM, &claim) && errno != ENODATA))
+        struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
+        if((ioctl(kb->handle, USBDEVFS_IOCTL, &ctl) && errno != ENODATA)
+                || ioctl(kb->handle, USBDEVFS_CLAIMINTERFACE, &i))
             return -1;
     }
     return 0;

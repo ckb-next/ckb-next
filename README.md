@@ -60,11 +60,9 @@ To launch the daemon and enable it at start-up:
 OSX Binaries
 ------------
 
-Pre-compiled binaries for OSX are provided by Xiy. The latest OSX binary can be downloaded here: http://mbx.cm/t/_guh4 (version: alpha-v0.0.27)
+Pre-compiled binaries for OSX are provided by Xiy.
 
-**Note:** In order to use the OSX binaries you currently need to install Qt5 first: http://www.qt.io/download-open-source/
-
-Make sure to install it to `/Applications/Qt` (the default path is `/Users/<yourusername>/Qt` which won't work). This is a temporary fix; a more permanent solution will be provided in a future version. If the binary version doesn't run, try following the build instructions instead.
+[Click here to download the latest version (alpha-v0.0.42).](https://github.com/ccMSC/ckb/releases/download/0.0.42-alpha/ckb-0.0.42-alpha-osx.zip)
 
 To install it, open the dmg and copy "ckb" to your Applications folder. To start the driver, open Terminal and run `sudo /Applications/ckb.app/Contents/Resources/ckb-daemon`. After that, open the ckb app to start the user interface.
 
@@ -80,7 +78,7 @@ Before launching ckb, the `ckb-daemon` program needs to be run as root. Open the
 Troubleshooting (OSX)
 ---------------------
 
-Make sure your system is up-to-date and that Xcode works on its own. Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt. Be sure to delete the `ckb` directory as well as any automatically-generated `build-ckb` directories and start fresh with a new download.
+Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure your system is up-to-date and that Xcode works on its own. Be sure to delete the `ckb` directory as well as any automatically-generated `build-ckb` directories and start fresh with a new download.
 
 If you've rebound your modifier keys in System Preferences, the changes will not be recognized anymore. You can rebind them again within the application.
 
@@ -101,8 +99,6 @@ The user interface is still a work in progress.
 
 **Roadmap** (roughly in order)
 - **v0.1 release:**
-- Ability to share lighting or binding between multiple modes
-- Ability to copy animations, settings to different modes
 - User interface for firmware updates
 - System service files so that ckb-daemon can be run at system start.
 - **v0.2 release:**
@@ -129,3 +125,4 @@ Known issues
 ------------
 
 - The system tray icon doesn't always appear in Linux. Apparently this is a known Qt bug. To bring ckb back after hiding it, re-run the application.
+- When starting the driver on OSX, the Terminal window sometimes gets spammed with enter keys. You can stop it by unplugging and replugging the keyboard or by moving the poll rate switch.

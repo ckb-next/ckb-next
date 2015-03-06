@@ -19,7 +19,11 @@ void GradientDialogWidget::setStops(const QGradientStops& stops){
         _colors[round(pos * 100.)] = stop.second;
     }
     _current = 0;
+#if QT_VERSION_CHECK(5, 2, 0)
     emit currentChanged(_colors.first(), false, 0);
+#else
+    emit currentChanged(_colors.value(_colors.keys().first()), false, 0);
+#endif
     update();
 }
 
@@ -35,10 +39,17 @@ void GradientDialogWidget::makeStops(){
         return;
     }
     // Add colors at 0 and 100 if needed
+#if QT_VERSION_CHECK(5, 2, 0)
     if(!colors.contains(0))
         colors[0] = colors.first();
     if(!colors.contains(100))
         colors[100] = colors.last();
+#else
+    if(!colors.contains(0))
+        colors[0] = colors.value(colors.keys().first());
+    if(!colors.contains(100))
+        colors[100] = colors.value(colors.keys().last());
+#endif
     QMapIterator<int, QColor> i(colors);
     while(i.hasNext()){
         i.next();

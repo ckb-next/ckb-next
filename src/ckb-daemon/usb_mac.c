@@ -225,16 +225,17 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
 
     // DEBUG: print out handle info
     printf("Got handle I: %d, O: %d, F: %d\n", (int)input, (int)output, (int)feature);
-    // Handle 0 is for BIOS mode/non-RGB key input
+    // Handle 0 is for BIOS mode input (RGB) or non-RGB key input
     if(input == 8 && output == 1 && feature == 0)
         kb->handles[0] = device;
-    // Handle 1 is for standard HID key input
-    else if((input == 21 || input == 4) && output == 1 && feature == 1)
+    // Handle 1 is for standard HID input (RGB) or media keys (non-RGB)
+    else if((input == 21 && output == 1 && feature == 1)
+            || (input == 4 && output == 0 && feature == 0))
         kb->handles[1] = device;
-    // Handle 2 is for Corsair inputs
+    // Handle 2 is for Corsair inputs, unused on non-RGB
     else if((input == 64 || input == 15) && output == 0 && feature == 0)
         kb->handles[2] = device;
-    // Handle 3 is for controlling the device
+    // Handle 3 is for controlling the device (only exists for RGB)
     else if(input == 0 && output == 0 && feature == 64)
         kb->handles[3] = device;
     else

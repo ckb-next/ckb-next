@@ -29,7 +29,8 @@ public:
     inline bool isOpen() const { return cmd.isOpen(); }
 
     // Profile saved to hardware
-    KbProfile* hwProfile;
+    inline KbProfile* hwProfile() { return _hwProfile; }
+    void hwProfile(KbProfile* newHwProfile);
     // Required hardware modes
     int hwModeCount;
 
@@ -74,6 +75,7 @@ private slots:
     // Processes lines read from the notification node
     void readNotify(QString line);
 
+    void deleteHw();
     void deletePrevious();
 
 private:
@@ -81,6 +83,7 @@ private:
     KeyMap::Layout _layout;
     void layout(KeyMap::Layout newLayout, bool write);
 
+    KbProfile* _hwProfile;
     // Previously-selected profile and mode
     KbProfile* prevProfile;
     KbMode* prevMode;

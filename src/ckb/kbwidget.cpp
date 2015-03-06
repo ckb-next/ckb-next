@@ -58,7 +58,7 @@ KbWidget::~KbWidget(){
 
 void KbWidget::updateProfileList(){
     // Clear profile list and rebuild
-    KbProfile* hwProfile = device->hwProfile, *currentProfile = device->currentProfile;
+    KbProfile* hwProfile = device->hwProfile(), *currentProfile = device->currentProfile;
     ui->profileBox->clear();
     int i = 0;
     foreach(KbProfile* profile, device->profiles){
@@ -111,7 +111,7 @@ void KbWidget::on_profileBox_activated(int index){
 }
 
 QIcon KbWidget::modeIcon(int i){
-    KbProfile* currentProfile = device->currentProfile, *hwProfile = device->hwProfile;
+    KbProfile* currentProfile = device->currentProfile, *hwProfile = device->hwProfile();
     int hwModeCount = device->hwModeCount;
     if(i >= hwModeCount)
         return QIcon(":/img/icon_mode.png");

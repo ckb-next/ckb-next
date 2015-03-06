@@ -6,20 +6,17 @@
 
 #ifdef OS_LINUX
 
-// Number used to track whether or not a device connects successfully
-volatile int connectstatus = 0;
-
 int _usbdequeue(usbdevice* kb, const char* file, int line){
     if(kb->queuecount == 0 || !kb->handle)
         return -1;
-    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 50, kb->queue[0] };
+    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 500, kb->queue[0] };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     if(res <= 0){
-        printf("Error: usbdequeue (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data written");
+        printf("usbdequeue (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data written");
         return 0;
     }
     if(res != MSG_SIZE)
-        printf("Warning: usbdequeue (%s:%d): Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        printf("usbdequeue (%s:%d): Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     // Rotate queue
     uchar* first = kb->queue[0];
     for(int i = 1; i < QUEUE_LEN; i++)
@@ -32,14 +29,14 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     if(!IS_CONNECTED(kb))
         return -1;
-    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 50, message };
+    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 500, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     if(res <= 0){
-        printf("Error: usbinput (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
+        printf("usbinput (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
         return 0;
     }
     if(res != MSG_SIZE)
-        printf("Warning: usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        printf("usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     return res;
 }
 
@@ -184,11 +181,8 @@ int usbclaim(usbdevice* kb, int rgb){
     int count = (rgb) ? 4 : 3;
     for(int i = 0; i < count; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        if((ioctl(kb->handle, USBDEVFS_IOCTL, &ctl) && errno != ENODATA))
-            return -1;
-    }
-    for(int i = 0; i < count; i++){
-        if(ioctl(kb->handle, USBDEVFS_CLAIMINTERFACE, &i))
+        if((ioctl(kb->handle, USBDEVFS_IOCTL, &ctl) && errno != ENODATA)
+                || ioctl(kb->handle, USBDEVFS_CLAIMINTERFACE, &i))
             return -1;
     }
     return 0;
@@ -197,24 +191,24 @@ int usbclaim(usbdevice* kb, int rgb){
 int os_resetusb(usbdevice* kb, const char* file, int line){
     int res = usbunclaim(kb, 1, HAS_FEATURES(kb, FEAT_RGB));
     if(res){
-        printf("Error: resetusb (%s:%d): usbunclaim failed: %s\n", file, line, strerror(errno));
-        if(errno == ENODEV)
-            return -2;
-        return -1;
+        printf("resetusb (%s:%d): usbunclaim failed: %s\n", file, line, strerror(errno));
+        if(errno == EINTR || errno == EAGAIN)
+            return -1;
+        return -2;
     }
     res = ioctl(kb->handle, USBDEVFS_RESET, 0);
     if(res){
-        printf("Error: resetusb (%s:%d): USBDEVFS_RESET ioctl failed: %s\n", file, line, strerror(errno));
-        if(errno == ENODEV)
-            return -2;
-        return -1;
+        printf("resetusb (%s:%d): USBDEVFS_RESET ioctl failed: %s\n", file, line, strerror(errno));
+        if(errno == EINTR || errno == EAGAIN)
+            return -1;
+        return -2;
     }
     res = usbclaim(kb, HAS_FEATURES(kb, FEAT_RGB));
     if(res){
-        printf("Error: resetusb (%s:%d): usbclaim failed: %s\n", file, line, strerror(errno));
-        if(errno == ENODEV)
-            return -2;
-        return -1;
+        printf("resetusb (%s:%d): usbclaim failed: %s\n", file, line, strerror(errno));
+        if(errno == EINTR || errno == EAGAIN)
+            return -1;
+        return -2;
     }
     return 0;
 }
@@ -237,9 +231,6 @@ int openusb(struct udev_device* dev, short vendor, short product){
             kb->handle = open(path, O_RDWR);
             if(kb->handle <= 0){
                 printf("Error: Failed to open USB device: %s\n", strerror(errno));
-                // Don't try again if it failed with ENOENT or EINVAL
-                if(errno != ENOENT && errno != ENODEV && errno != EINVAL)
-                    connectstatus |= 2;
                 udev_device_unref(kb->udev);
                 kb->handle = 0;
                 kb->udev = 0;
@@ -270,7 +261,6 @@ int openusb(struct udev_device* dev, short vendor, short product){
             if(usbclaim(kb, IS_RGB(vendor, product))){
                 printf("Error: Failed to claim interface: %s\n", strerror(errno));
                 closehandle(kb);
-                connectstatus |= 2;
                 return -1;
             }
 
@@ -290,7 +280,6 @@ int openusb(struct udev_device* dev, short vendor, short product){
             } else if(setup && usb_tryreset(kb)){
                 // Any other failure is hardware based. Reset and try again.
                 closehandle(kb);
-                connectstatus |= 2;
                 pthread_mutex_unlock(&kb->mutex);
                 pthread_mutex_destroy(&kb->mutex);
                 pthread_mutex_destroy(&kb->keymutex);
@@ -299,36 +288,10 @@ int openusb(struct udev_device* dev, short vendor, short product){
             }
 
             kb->INPUT_READY = 1;
-            if(IS_RGB(vendor, product)){
-                // We should receive an interrupt transfer shortly after setting them up. If it doesn't happen, the device
-                // isn't working correctly and needs to be reset
-                int received = 0;
-                for(int wait = 0; wait < 10; wait++){
-                    DELAY_LONG;
-                    if(kb->INPUT_TEST){
-                        received = 1;
-                        break;
-                    }
-                }
-                if(!received && kb->fwversion > 0){
-                    printf("Didn't get input, trying to reset...\n");
-                    if(usb_tryreset(kb)){
-                        closehandle(kb);
-                        connectstatus |= 2;
-                        pthread_mutex_unlock(&kb->mutex);
-                        pthread_mutex_destroy(&kb->mutex);
-                        pthread_mutex_destroy(&kb->keymutex);
-                        DELAY_LONG;
-                        return -1;
-                    }
-                }
-            }
-
             updateconnected();
             notifyconnect(kb, 1);
             int index = INDEX_OF(kb, keyboard);
             printf("Device ready at %s%d\n", devpath, index);
-            connectstatus |= 1;
             pthread_mutex_unlock(&kb->mutex);
             return 0;
         }
@@ -353,7 +316,8 @@ static _model models[] = {
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 
-void udevenum(){
+void* udevmain(void* context){
+    // Enumerate all currently connected devices
     struct udev_enumerate* enumerator = udev_enumerate_new(udev);
     udev_enumerate_add_match_subsystem(enumerator, "usb");
     udev_enumerate_add_match_sysattr(enumerator, "idVendor", V_CORSAIR_STR);
@@ -387,18 +351,6 @@ void udevenum(){
             udev_device_unref(dev);
     }
     udev_enumerate_unref(enumerator);
-}
-
-void* udevmain(void* context){
-    // Enumerate all currently connected devices
-    udevenum();
-    int tries = 0;
-    while((connectstatus & 2) && ++tries < 5){
-        // If a device failed to connect, enumerate again to make sure we reconnect it (if possible)
-        printf("Trying again...\n");
-        connectstatus = 0;
-        udevenum();
-    }
 
     // Done scanning. Enter a loop to poll for device updates
     struct udev_monitor* monitor = udev_monitor_new_from_netlink(udev, "udev");
@@ -440,17 +392,6 @@ void* udevmain(void* context){
                     // Don't free the device if it's now in use
                     if(found)
                         continue;
-                }
-                // Wait a little bit and then re-enumerate devices. Sometimes the keyboard doesn't get picked up right away.
-                DELAY_LONG;
-                connectstatus = 0;
-                udevenum();
-                tries = 0;
-                while((connectstatus & 2) && ++tries < 5){
-                    // If a device failed to connect, enumerate again to make sure we reconnect it (if possible)
-                    printf("Trying again...\n");
-                    connectstatus = 0;
-                    udevenum();
                 }
             } else if(!strcmp(action, "remove")){
                 // Device removed. Look for it in our list of keyboards

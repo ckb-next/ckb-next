@@ -7,8 +7,8 @@
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), devpath(path), cmdpath(path + "/cmd"),
     features("N/A"), firmware("N/A"), pollrate("N/A"),
-    hwProfile(0), currentProfile(0), currentMode(0), _model(KeyMap::NO_MODEL), _layout(KeyMap::NO_LAYOUT),
-    prevProfile(0), prevMode(0),
+    currentProfile(0), currentMode(0), _model(KeyMap::NO_MODEL), _layout(KeyMap::NO_LAYOUT),
+    _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), hwLoading(true)
 {
     // Reserve a thread for the notification reader
@@ -94,8 +94,8 @@ Kb::~Kb(){
     cmd.flush();
     terminate();
     // Reset to hardware profile
-    if(hwProfile){
-        currentProfile = hwProfile;
+    if(_hwProfile){
+        currentProfile = _hwProfile;
         hwSave();
     }
     cmd.close();
@@ -161,7 +161,7 @@ void Kb::hwSave(){
         prevMode->light()->close();
         deletePrevious();
     }
-    hwProfile = currentProfile;
+    hwProfile(currentProfile);
     hwLoading = false;
     // Rewrite the current profile from scratch to ensure consistency
     writeProfileHeader();
@@ -217,8 +217,8 @@ void Kb::layout(KeyMap::Layout newLayout, bool write){
     }
     foreach(KbProfile* profile, profiles)
         profile->keyMap(getKeyMap());
-    if(hwProfile && !profiles.contains(hwProfile))
-        hwProfile->keyMap(getKeyMap());
+    if(_hwProfile && !profiles.contains(_hwProfile))
+        _hwProfile->keyMap(getKeyMap());
     // Stop all animations as they'll need to be restarted
     foreach(KbMode* mode, currentProfile->modes)
         mode->light()->close();
@@ -272,6 +272,21 @@ void Kb::frameUpdate(){
 void Kb::deletePrevious(){
     disconnect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
     prevMode = 0;
+}
+
+void Kb::hwProfile(KbProfile* newHwProfile){
+    if(_hwProfile == newHwProfile)
+        return;
+    if(_hwProfile)
+        disconnect(_hwProfile, SIGNAL(destroyed()), this, SLOT(deleteHw()));
+    _hwProfile = newHwProfile;
+    if(_hwProfile)
+        connect(_hwProfile, SIGNAL(destroyed()), this, SLOT(deleteHw()));
+}
+
+void Kb::deleteHw(){
+    disconnect(_hwProfile, SIGNAL(destroyed()), this, SLOT(deleteHw()));
+    _hwProfile = 0;
 }
 
 void Kb::run(){
@@ -344,17 +359,19 @@ void Kb::readNotify(QString line){
                 }
             }
         }
-        hwProfile = newProfile;
+        hwProfile(newProfile);
         emit profileAdded();
-        if(hwProfile == currentProfile)
+        if(_hwProfile == currentProfile)
             emit profileChanged();
     } else if(components[0] == "hwprofilename"){
         // Hardware profile name
         QString name = QUrl::fromPercentEncoding(components[1].toUtf8());
-        QString oldName = hwProfile->name();
+        if(!_hwProfile)
+            return;
+        QString oldName = _hwProfile->name();
         if(!(oldName.length() >= name.length() && oldName.left(name.length()) == name)){
             // Don't change the name if it's a truncated version of what we already have
-            hwProfile->name(name);
+            _hwProfile->name(name);
             emit profileRenamed();
         }
     } else if(components[0] == "mode"){
@@ -363,7 +380,7 @@ void Kb::readNotify(QString line){
             return;
         int mode = components[1].toInt() - 1;
         if(components[2] == "hwid"){
-            if(components.count() < 5)
+            if(components.count() < 5 || !_hwProfile)
                 return;
             // Hardware mode ID
             QString guid = components[3];
@@ -371,7 +388,7 @@ void Kb::readNotify(QString line){
             // Look for this mode in the hardware profile
             KbMode* hwMode = 0;
             bool isNew = false;
-            foreach(KbMode* mode, hwProfile->modes){
+            foreach(KbMode* mode, _hwProfile->modes){
                 if(mode->id().guid == guid){
                     hwMode = mode;
                     if(mode->id().modifiedString() != modified){
@@ -386,19 +403,19 @@ void Kb::readNotify(QString line){
             if(!hwMode){
                 isNew = true;
                 hwMode = new KbMode(this, getKeyMap(), guid, modified);
-                hwProfile->modes.append(hwMode);
+                _hwProfile->modes.append(hwMode);
                 // If the hardware profile now contains enough modes to be added to the list, do so
-                if(!profiles.contains(hwProfile) && hwProfile->modes.count() >= hwModeCount){
-                    profiles.append(hwProfile);
+                if(!profiles.contains(_hwProfile) && _hwProfile->modes.count() >= hwModeCount){
+                    profiles.append(_hwProfile);
                     emit profileAdded();
                     if(!currentProfile)
-                        setCurrentProfile(hwProfile);
+                        setCurrentProfile(_hwProfile);
                 }
             }
             // If the mode isn't in the right place, move it
-            int index = hwProfile->modes.indexOf(hwMode);
-            if(isNew && mode < hwProfile->modes.count() && index != mode)
-                hwProfile->modes.move(index, mode);
+            int index = _hwProfile->modes.indexOf(hwMode);
+            if(isNew && mode < _hwProfile->modes.count() && index != mode)
+                _hwProfile->modes.move(index, mode);
             // If loading hardware profile, fetch the updated data
             if(isNew && hwLoading){
                 cmd.write(QString("@%1 mode %2 get :hwname :hwrgb\n").arg(notifyNumber).arg(mode + 1).toLatin1());
@@ -406,22 +423,22 @@ void Kb::readNotify(QString line){
             }
         } else if(components[2] == "hwname"){
             // Mode name - update list
-            if(hwProfile->modes.count() <= mode)
+            if(!_hwProfile || _hwProfile->modes.count() <= mode)
                 return;
-            KbMode* hwMode = hwProfile->modes[mode];
+            KbMode* hwMode = _hwProfile->modes[mode];
             QString name = QUrl::fromPercentEncoding(components[3].toUtf8());
             QString oldName = hwMode->name();
             if(!(oldName.length() >= name.length() && oldName.left(name.length()) == name)){
                 // Don't change the name if it's a truncated version of what we already have
                 hwMode->name(name);
-                if(hwProfile == currentProfile)
+                if(_hwProfile == currentProfile)
                     emit modeRenamed();
             }
         } else if(components[2] == "hwrgb"){
             // RGB - set mode lighting
-            if(hwProfile->modes.count() <= mode)
+            if(!_hwProfile || _hwProfile->modes.count() <= mode)
                 return;
-            KbLight* light = hwProfile->modes[mode]->light();
+            KbLight* light = _hwProfile->modes[mode]->light();
             // If it's a color command, scan the input
             QColor lightColor = QColor();
             for(int i = 3; i < components.count(); i++){

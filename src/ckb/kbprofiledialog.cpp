@@ -49,7 +49,7 @@ void KbProfileDialog::repopulate(){
     ui->profileList->clear();
     QListWidgetItem* current = 0;
     foreach(KbProfile* profile, device->profiles){
-        QListWidgetItem* item = new QListWidgetItem(QIcon((profile == device->hwProfile) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"), profile->name(), ui->profileList);
+        QListWidgetItem* item = new QListWidgetItem(QIcon((profile == device->hwProfile()) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"), profile->name(), ui->profileList);
         item->setData(GUID, profile->id().guid);
         item->setFlags(item->flags() | Qt::ItemIsEditable);
         if(profile == device->currentProfile){
@@ -164,7 +164,7 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
             if(item->data(NEW_FLAG).toUInt() == 1)
                 continue;
             KbProfile* profile = device->find(item->data(GUID).toUuid());
-            item->setIcon(QIcon((profile == device->hwProfile) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"));
+            item->setIcon(QIcon((profile == device->hwProfile()) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"));
         }
     } else if(result == moveup){
         profiles.removeAll(currentProfile);

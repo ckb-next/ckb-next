@@ -14,6 +14,7 @@ const char *const devpath = "/tmp/ckb";
 #endif
 
 long gid = -1;
+#define S_GID_READ  (gid >= 0 ? S_CUSTOM_R : S_READ)
 
 int rm_recursive(const char* path){
     DIR* dir = opendir(path);
@@ -52,7 +53,7 @@ void updateconnected(){
     if(!written)
         fputc('\n', cfile);
     fclose(cfile);
-    chmod(cpath, gid >= 0 ? S_CUSTOM_R : S_READ);
+    chmod(cpath, S_GID_READ);
     if(gid >= 0)
         chown(cpath, 0, gid);
 }
@@ -91,6 +92,20 @@ int makedevpath(usbdevice* kb){
     if(kb->model == -1){
         // Root keyboard: write a list of devices
         updateconnected();
+        // Also write version number
+        char vpath[sizeof(path) + 8];
+        snprintf(vpath, sizeof(vpath), "%s/version", path);
+        FILE* vfile = fopen(vpath, "w");
+        if(vfile){
+            fprintf(vfile, "%s\n", CKB_VERSION_STR);
+            fclose(vfile);
+            chmod(vpath, S_GID_READ);
+            if(gid >= 0)
+                chown(vpath, 0, gid);
+        } else {
+            printf("Warning: Unable to create %s: %s\n", vpath, strerror(errno));
+            remove(vpath);
+        }
     } else {
         // Write the model and serial to files
         char mpath[sizeof(path) + 6], spath[sizeof(path) + 7];
@@ -101,7 +116,7 @@ int makedevpath(usbdevice* kb){
             fputs(kb->name, mfile);
             fputc('\n', mfile);
             fclose(mfile);
-            chmod(mpath, gid >= 0 ? S_CUSTOM_R : S_READ);
+            chmod(mpath, S_GID_READ);
             if(gid >= 0)
                 chown(mpath, 0, gid);
         } else {
@@ -113,7 +128,7 @@ int makedevpath(usbdevice* kb){
             fputs(kb->profile.serial, sfile);
             fputc('\n', sfile);
             fclose(sfile);
-            chmod(spath, gid >= 0 ? S_CUSTOM_R : S_READ);
+            chmod(spath, S_GID_READ);
             if(gid >= 0)
                 chown(spath, 0, gid);
         } else {
@@ -140,9 +155,9 @@ int makedevpath(usbdevice* kb){
                 fputs(" fwupdate", ffile);
             fputc('\n', ffile);
             fclose(ffile);
-            chmod(fpath, gid >= 0 ? S_CUSTOM_R : S_READ);
+            chmod(fpath, S_GID_READ);
             if(gid >= 0)
-             chown(fpath, 0, gid);
+                chown(fpath, 0, gid);
         } else {
             printf("Warning: Unable to create %s: %s\n", fpath, strerror(errno));
             remove(fpath);
@@ -176,7 +191,7 @@ int mknotifynode(usbdevice* kb, int notify){
     int index = INDEX_OF(kb, keyboard);
     char outpath[strlen(devpath) + 10];
     snprintf(outpath, sizeof(outpath), "%s%d/notify%d", devpath, index, notify);
-    if(mkfifo(outpath, gid >= 0 ? S_CUSTOM_R : S_READ) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK)) <= 0){
+    if(mkfifo(outpath, S_GID_READ) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK)) <= 0){
         printf("Warning: Unable to create %s: %s\n", outpath, strerror(errno));
         kb->outfifo[notify] = 0;
         remove(outpath);
@@ -209,7 +224,7 @@ void writefwnode(usbdevice* kb){
         fprintf(fwfile, "%04x", kb->fwversion);
         fputc('\n', fwfile);
         fclose(fwfile);
-        chmod(fwpath, gid >= 0 ? S_CUSTOM_R : S_READ);
+        chmod(fwpath, S_GID_READ);
         if(gid >= 0)
          chown(fwpath, 0, gid);
     } else {
@@ -223,7 +238,7 @@ void writefwnode(usbdevice* kb){
         fprintf(pfile, "%d ms", kb->pollrate / 1000000);
         fputc('\n', pfile);
         fclose(pfile);
-        chmod(ppath, gid >= 0 ? S_CUSTOM_R : S_READ);
+        chmod(ppath, S_GID_READ);
         if(gid >= 0)
          chown(ppath, 0, gid);
     } else {

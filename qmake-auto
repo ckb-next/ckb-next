@@ -3,15 +3,22 @@ function die {
     echo "No suitable qmake found."
     exit 1
 }
+if [[ "$QMAKE" != "" ]]; then
+    $QMAKE "$@"
+    exit $?
+fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
+    # OSX: Look for qmake in standard install locations
     QMAKE=`find ~/Qt/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name qmake -print -quit 2>/dev/null`
     [[ $QMAKE == "" ]] && die
 else
+    # Linux: Look for system-installed Qt5
     QMAKE=`which qmake-qt5 2>/dev/null`
-    if [[ $? -ne 0 ]]; then
-        QMAKE=`which qmake 2>/dev/null`
-        [[ $? -ne 0 ]] && die
+    [[ $? -ne 0 ]] && QMAKE=`which qmake 2>/dev/null`
+    # If not found, look in standard locations
+    if [[ `$QMAKE -v 2>/dev/null | grep -i "Qt version 5" | wc -l` -ne 1 ]]; then
+        QMAKE=`find /usr/lib/*/qt5/bin ~/Qt/*/gcc_64/bin -name qmake -print -quit 2>/dev/null`
     fi
 fi
-[[ `$QMAKE -v | grep -i "Qt version 5" | wc -l` -ne 1 ]] && die
+[[ `$QMAKE -v 2>/dev/null | grep -i "Qt version 5" | wc -l` -ne 1 ]] && die
 $QMAKE "$@"

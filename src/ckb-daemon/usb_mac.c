@@ -76,9 +76,9 @@ void usbremove(void* context, IOReturn result, void* sender){
 
 void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
     // DEBUG: Print out message contents
-    printf("Report ID %d: ", reportid);
+    printf("Report ID %d length %d type %d:\n   ", reportid, (int)length, (int)reporttype);
     for(CFIndex i = 0; i < length; i++)
-        printf("%hhx", data[i]);
+        printf(" %02hhx", data[i]);
     printf("\n");
     usbdevice* kb = context;
     if(HAS_FEATURES(kb, FEAT_RGB)){

@@ -7,7 +7,7 @@
 #ifdef OS_LINUX
 
 int _usbdequeue(usbdevice* kb, const char* file, int line){
-    if(kb->queuecount == 0 || !kb->handle)
+    if(kb->queuecount == 0 || !kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 500, kb->queue[0] };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
@@ -27,7 +27,7 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
 }
 
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
-    if(!IS_CONNECTED(kb))
+    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 500, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);

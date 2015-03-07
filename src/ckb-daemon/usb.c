@@ -14,6 +14,8 @@ int features_mask = -1;
 extern int os_resetusb(usbdevice* kb, const char* file, int line);
 
 int usbqueue(usbdevice* kb, uchar* messages, int count){
+    if(!HAS_FEATURES(kb, FEAT_RGB))
+        return 0;
     // Don't add messages unless the queue has enough room for all of them
     if(!kb->handle || kb->queuecount + count > QUEUE_LEN)
         return -1;
@@ -146,6 +148,8 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     if(res)
         return res;
     DELAY_LONG;
+    if(!HAS_FEATURES(kb, FEAT_RGB))
+        return 0;
     // Empty the queue. Re-initialize the device.
     kb->queuecount = 0;
     if(getfwversion(kb))

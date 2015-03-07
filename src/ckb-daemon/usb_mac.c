@@ -9,7 +9,7 @@
 #define INCOMPLETE (IOHIDDeviceRef)-1l
 
 int _usbdequeue(usbdevice* kb, const char* file, int line){
-    if(kb->queuecount == 0 || !kb->handle)
+    if(kb->queuecount == 0 || !kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
     IOReturn res = IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, kb->queue[0], MSG_SIZE);
     // Rotate queue
@@ -27,7 +27,7 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
 }
 
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
-    if(!IS_CONNECTED(kb))
+    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);

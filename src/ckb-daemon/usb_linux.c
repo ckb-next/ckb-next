@@ -63,12 +63,12 @@ void* intreap(void* context){
                 if(HAS_FEATURES(kb, FEAT_RGB)){
                     switch(urb->endpoint){
                     case 0x81:
-                        // RGB EP 1: BIOS HID input
+                        // RGB EP 1: 6KRO (BIOS mode) input
                         hid_translate(kb->kbinput, -1, 8, kb->urbinput);
                         inputupdate(kb);
                         break;
                     case 0x82:
-                        // RGB EP 2: non-BIOS HID input (accept only if keyboard is inactive)
+                        // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
                         if(!kb->active){
                             hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);
                             inputupdate(kb);
@@ -82,13 +82,18 @@ void* intreap(void* context){
                 } else {
                     switch(urb->endpoint){
                     case 0x81:
-                        // Non-RGB EP 1: input
+                        // Non-RGB EP 1: 6KRO input
                         hid_translate(kb->kbinput, 1, 8, kb->urbinput);
                         inputupdate(kb);
                         break;
                     case 0x82:
                         // Non-RGB EP 2: media keys
                         hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
+                        inputupdate(kb);
+                        break;
+                    case 0x83:
+                        // Non-RGB EP 3: NKRO input
+                        hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
                         inputupdate(kb);
                         break;
                     }

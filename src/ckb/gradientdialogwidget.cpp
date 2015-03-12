@@ -19,7 +19,11 @@ void GradientDialogWidget::setStops(const QGradientStops& stops){
         _colors[round(pos * 100.)] = stop.second;
     }
     _current = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
     emit currentChanged(_colors.first(), false, 0);
+#else
+    emit currentChanged(_colors.value(_colors.keys().first()), false, 0);
+#endif
     update();
 }
 
@@ -28,17 +32,28 @@ void GradientDialogWidget::makeStops(){
     QMap<int, QColor> colors = selectionColors();
     // If there's only a single color, put it at the beginning and end
     if(colors.count() == 1){
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
         QColor color = colors.first();
+#else
+        QColor color = colors.value(colors.keys().first());
+#endif
         _stops.append(QGradientStop(0., color));
         _stops.append(QGradientStop(1., color));
         update();
         return;
     }
     // Add colors at 0 and 100 if needed
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
     if(!colors.contains(0))
         colors[0] = colors.first();
     if(!colors.contains(100))
         colors[100] = colors.last();
+#else
+    if(!colors.contains(0))
+        colors[0] = colors.value(colors.keys().first());
+    if(!colors.contains(100))
+        colors[100] = colors.value(colors.keys().last());
+#endif
     QMapIterator<int, QColor> i(colors);
     while(i.hasNext()){
         i.next();
@@ -279,4 +294,3 @@ void GradientDialogWidget::mouseReleaseEvent(QMouseEvent* event){
     else
         setCursor(QCursor(Qt::ArrowCursor));
 }
-

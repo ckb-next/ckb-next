@@ -21,6 +21,9 @@ public:
     // Device information
     QString features, firmware, pollrate;
 
+    // Is this the keyboard at the given serial/path?
+    inline bool matches(const QString& path, const QString& serial) { return path.trimmed() == devpath.trimmed() && usbSerial == serial.trimmed().toUpper(); }
+
     // Keyboard model and layout
     inline KeyMap::Model model() const { return _model; }
     inline KeyMap::Layout layout() const { return _layout; }

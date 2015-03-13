@@ -37,14 +37,14 @@ Troubleshooting (Linux)
 
 If you have problems connecting the keyboard to your system (keyboard doesn't respond, ckb-daemon doesn't recognize it or can't connect the keyboard), try adding the following to your kernel's `cmdline`:
 
-* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x20000000`
-* K70: `usbhid.quirks=0x1B1C:0x1B09:0x20000000`
-* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000000`
-* K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x20000000`
+* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x400`
+* K70: `usbhid.quirks=0x1B1C:0x1B09:0x400`
+* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400`
+* K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x408`
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
-If the keyboard still doesn't work, try replacing `0x20000000` with `0x00000004`. Note that this will cause the kernel driver to ignore the keyboard completely, so you'll need to make sure ckb-daemon is running at boot or else you'll have no keyboard input.
+If the keyboard still doesn't work, try replacing `0x400`/`0x408` with `0x4`. Note that this will cause the kernel driver to ignore the keyboard completely, so you'll need to make sure ckb-daemon is running at boot or else you'll have no keyboard input.
 
 Installing as a Service (Linux / Systemd)
 -----------------------------------------

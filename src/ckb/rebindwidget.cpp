@@ -38,6 +38,7 @@ RebindWidget::~RebindWidget(){
 void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     bind = newBind;
     profile = newProfile;
+    setSelection(QStringList());
 
     // Populate typing keys by position
     ui->typingBox->clear();

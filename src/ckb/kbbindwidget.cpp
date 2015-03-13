@@ -52,8 +52,8 @@ void KbBindWidget::updateBind(){
 
 void KbBindWidget::newLayout(){
     ui->keyWidget->map(bind->map());
-    if(!currentSelection.isEmpty())
-        ui->keyWidget->setSelection(currentSelection);
+    ui->rbWidget->setBind(bind, profile);
+    updateSelDisplay();
 }
 
 void KbBindWidget::newSelection(QStringList selection){

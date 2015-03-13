@@ -75,7 +75,11 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         if(down && repeat > 0){
             kb->lastkeypress = scancode;
             clock_gettime(CLOCK_MONOTONIC, &kb->keyrepeat);
-            timespec_add(&kb->keyrepeat, repeat);
+            if((scancode == KEY_VOLUMEUP || scancode == KEY_VOLUMEDOWN) && kb->model != 65)
+                // Set a 1ms timeout for the volume wheel
+                timespec_add(&kb->keyrepeat, 1000000);
+            else
+                timespec_add(&kb->keyrepeat, repeat);
         } else
             kb->lastkeypress = KEY_NONE;
     }
@@ -93,7 +97,13 @@ void os_keypress(usbdevice* kb, int scancode, int down){
 }
 
 void keyretrigger(usbdevice* kb, int scancode){
-    if(scancode >= KEY_MEDIA){
+    if((scancode == KEY_VOLUMEUP || scancode == KEY_VOLUMEDOWN) && kb->model != 65){
+        // Volume wheel doesn't repeat
+        CGEventRef mevent = media_event(MEDIA_FLAGS(scancode, 0, 0), kb->eventflags);
+        CGEventPost(kCGHIDEventTap, mevent);
+        kb->lastkeypress = KEY_NONE;
+        return;
+    } else if(scancode >= KEY_MEDIA){
         // Media keys get a separate event
         CGEventRef mevent = media_event(MEDIA_FLAGS(scancode, 1, 1), kb->eventflags);
         CGEventPost(kCGHIDEventTap, mevent);

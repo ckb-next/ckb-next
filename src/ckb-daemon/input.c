@@ -93,9 +93,12 @@ void inputupdate(usbdevice* kb){
                         events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
                         // The volume wheel doesn't generate keyups, so create them automatically
                         if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && kb->model != 65){
+#ifdef OS_LINUX
+                            // On OSX, this is handled in the key repeat thread.
                             for(int i = rmodcount; i > 0; i--)
                                 events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                             events[modcount + keycount++] = -(scancode + 1);
+#endif
                             kb->kbinput[byte] &= ~mask;
                         }
                     }

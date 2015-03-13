@@ -245,7 +245,7 @@ int openusb(struct udev_device* dev, short vendor, short product){
             if(serial)
                 strncpy(kb->profile.serial, serial, SERIAL_LEN);
             else
-                snprintf(kb->profile.serial, SERIAL_LEN, "%04x:%x04-NoID", vendor, product);
+                snprintf(kb->profile.serial, SERIAL_LEN, "%04x:%04x-NoID", vendor, product);
             printf("Connecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
             // If the keyboard is a non-RGB model, the FW version needs to be copied here too
             if(!IS_RGB(vendor, product)){

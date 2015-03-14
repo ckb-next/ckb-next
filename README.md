@@ -46,16 +46,18 @@ For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubun
 
 If the keyboard still doesn't work, try replacing `0x400`/`0x408` with `0x4`. Note that this will cause the kernel driver to ignore the keyboard completely, so you'll need to make sure ckb-daemon is running at boot or else you'll have no keyboard input.
 
-Installing as a Service (Linux / Systemd)
------------------------------------------
+Installing as a Service (Linux Systemd / Upstart)
+-------------------------------------------------
 
-A service file is provided so that Linux users with systemd can launch the daemon on startup. To use it, first copy the binary files and the service to their system directories:
+Service files are provided so that Linux users with systemd can launch the daemon on startup. To use them, first copy the binary files and the service to their system directories:
 
-`sudo cp -R bin/* /usr/bin && sudo cp systemd/ckb-daemon.service /usr/lib/systemd/system`
+Systemd: `sudo cp -R bin/* /usr/bin && sudo cp service/systemd/ckb-daemon.service /usr/lib/systemd/system`
+Upstart (Ubuntu, prior to 15.04): `sudo cp -R bin/* /usr/bin && sudo cp service/upstart/ckb-daemon.conf /etc/init`
 
 To launch the daemon and enable it at start-up:
 
-`sudo systemctl start ckb-daemon && sudo systemctl enable ckb-daemon`
+Systemd: `sudo systemctl start ckb-daemon && sudo systemctl enable ckb-daemon`
+Upstart: `sudo service ckb-daemon start`
 
 OSX Binaries
 ------------
@@ -81,6 +83,13 @@ Troubleshooting (OSX)
 Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure your system is up-to-date and that Xcode works on its own. Be sure to delete the `ckb` directory as well as any automatically-generated `build-ckb` directories and start fresh with a new download.
 
 If you've rebound your modifier keys in System Preferences, the changes will not be recognized anymore. You can rebind them again within the application.
+
+Installing as a service (OSX)
+-----------------------------
+
+To launch the driver at boot you must first copy `ckb.app` to your Applications folder and then copy the file `service/launchd/com.ckb.daemon.plist` to your computer's `/Library/LaunchDaemons` folder. Then run the following Terminal command to start/enable the driver:
+
+`sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist && sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist`
 
 Usage
 -----

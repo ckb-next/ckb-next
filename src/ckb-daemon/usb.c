@@ -54,13 +54,12 @@ int setupusb(usbdevice* kb, short vendor, short product){
         return -1;
     }
 
-    // Create the USB queue
-    for(int q = 0; q < QUEUE_LEN; q++)
-        kb->queue[q] = malloc(MSG_SIZE);
-
+    // Set indicator LEDs
     updateindicators(kb, 1);
-    // Nothing else needs to be done for non-RGB keyboards
+
+    // Put non-RGB K95 into software mode. Nothing else needs to be done for non-RGB boards
     if(!HAS_FEATURES(kb, FEAT_RGB)){
+        nk95cmd(kb, NK95_HWOFF);
         kb->active = 1;
         writefwnode(kb);
         kb->profile.keymap = keymap_system;
@@ -73,6 +72,10 @@ int setupusb(usbdevice* kb, short vendor, short product){
         }
         return 0;
     }
+
+    // Create the USB queue
+    for(int q = 0; q < QUEUE_LEN; q++)
+        kb->queue[q] = malloc(MSG_SIZE);
 
     if(strstr(kb->name, "Bootloader")){
         // Device needs a firmware update. Finish setting up but don't do anything.
@@ -122,8 +125,10 @@ int setupusb(usbdevice* kb, short vendor, short product){
 }
 
 int revertusb(usbdevice* kb){
-    if(!HAS_FEATURES(kb, FEAT_RGB))
+    if(!HAS_FEATURES(kb, FEAT_RGB)){
+        nk95cmd(kb, NK95_HWON);
         return 0;
+    }
     // Empty the USB queue first
     while(kb->queuecount > 0){
         DELAY_SHORT;

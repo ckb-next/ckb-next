@@ -63,6 +63,13 @@ int _usbdequeue(usbdevice* kb, const char* file, int line);
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line);
 #define usbinput(kb, message) _usbinput(kb, message, __FILE_NOPATH__, __LINE__)
 
+// Non-RGB K95 command. Returns 0 on success.
+int _nk95cmd(usbdevice* kb, ushort command, const char* file, int line);
+#define nk95cmd(kb, command) _nk95cmd(kb, command, __FILE_NOPATH__, __LINE__)
+
+#define NK95_HWOFF  0x0030      // Hardware playback off
+#define NK95_HWON   0x0001      // Hardware playback on
+
 // Tries to reset a USB device after a failed action. Returns 0 on success.
 // The previous action will NOT be re-attempted and the keyboard's USB queue will be cleared.
 int usb_tryreset(usbdevice* kb);

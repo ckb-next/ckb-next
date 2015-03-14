@@ -40,6 +40,18 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     return res;
 }
 
+int _nk95cmd(usbdevice* kb, ushort command, const char* file, int line){
+    if(kb->vendor != V_CORSAIR || kb->product != P_K95_NRGB)
+        return 0;
+    struct usbdevfs_ctrltransfer transfer = { 0x40, 0x02, command, 0, 0, 500, 0 };
+    int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+    if(res < 0){
+        printf("nk95cmd (%s:%d): %s\n", file, line, strerror(-res));
+        return 1;
+    }
+    return 0;
+}
+
 void* intreap(void* context){
     usbdevice* kb = context;
     int fd = kb->handle;

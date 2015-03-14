@@ -41,6 +41,11 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     return length;
 }
 
+int _nk95cmd(usbdevice* kb, ushort command, const char* file, int line){
+    // TODO: stub
+    return 0;
+}
+
 void closehandle(usbdevice* kb){
     kb->handle = 0;
     int count = (IS_RGB(kb->vendor, kb->product)) ? 4 : 3;

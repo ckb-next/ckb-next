@@ -51,13 +51,13 @@ Installing as a Service (Linux Systemd / Upstart)
 
 Service files are provided so that Linux users with systemd can launch the daemon on startup. To use them, first copy the binary files and the service to their system directories:
 
-Systemd: `sudo cp -R bin/* /usr/bin && sudo cp service/systemd/ckb-daemon.service /usr/lib/systemd/system`
-Upstart (Ubuntu, prior to 15.04): `sudo cp -R bin/* /usr/bin && sudo cp service/upstart/ckb-daemon.conf /etc/init`
+* Systemd: `sudo cp -R bin/* /usr/bin && sudo cp service/systemd/ckb-daemon.service /usr/lib/systemd/system`
+* Upstart (Ubuntu, prior to 15.04): `sudo cp -R bin/* /usr/bin && sudo cp service/upstart/ckb-daemon.conf /etc/init`
 
 To launch the daemon and enable it at start-up:
 
-Systemd: `sudo systemctl start ckb-daemon && sudo systemctl enable ckb-daemon`
-Upstart: `sudo service ckb-daemon start`
+* Systemd: `sudo systemctl start ckb-daemon && sudo systemctl enable ckb-daemon`
+* Upstart: `sudo service ckb-daemon start`
 
 OSX Binaries
 ------------
@@ -84,7 +84,7 @@ Compile problems can usually be resolved by rebooting your computer and/or reins
 
 If you've rebound your modifier keys in System Preferences, the changes will not be recognized anymore. You can rebind them again within the application.
 
-Installing as a service (OSX)
+Installing as a Service (OSX)
 -----------------------------
 
 To launch the driver at boot you must first copy `ckb.app` to your Applications folder and then copy the file `service/launchd/com.ckb.daemon.plist` to your computer's `/Library/LaunchDaemons` folder. Then run the following Terminal command to start/enable the driver:

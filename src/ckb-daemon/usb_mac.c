@@ -41,7 +41,7 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     return length;
 }
 
-int _nk95cmd(usbdevice* kb, ushort command, const char* file, int line){
+int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
     // TODO: stub
     return 0;
 }

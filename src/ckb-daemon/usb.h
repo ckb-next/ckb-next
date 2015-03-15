@@ -64,11 +64,14 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line);
 #define usbinput(kb, message) _usbinput(kb, message, __FILE_NOPATH__, __LINE__)
 
 // Non-RGB K95 command. Returns 0 on success.
-int _nk95cmd(usbdevice* kb, ushort command, const char* file, int line);
-#define nk95cmd(kb, command) _nk95cmd(kb, command, __FILE_NOPATH__, __LINE__)
+int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);
+#define nk95cmd(kb, command) _nk95cmd(kb, (command) >> 16 & 0xFF, (command) & 0xFFFF, __FILE_NOPATH__, __LINE__)
 
-#define NK95_HWOFF  0x0030      // Hardware playback off
-#define NK95_HWON   0x0001      // Hardware playback on
+#define NK95_HWOFF  0x020030    // Hardware playback off
+#define NK95_HWON   0x020001    // Hardware playback on
+#define NK95_M1     0x200001    // Mode switches
+#define NK95_M2     0x200002
+#define NK95_M3     0x200003
 
 // Tries to reset a USB device after a failed action. Returns 0 on success.
 // The previous action will NOT be re-attempted and the keyboard's USB queue will be cleared.

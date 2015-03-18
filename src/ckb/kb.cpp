@@ -11,9 +11,6 @@ Kb::Kb(QObject *parent, const QString& path) :
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), hwLoading(true)
 {
-    // Reserve a thread for the notification reader
-    QThreadPool::globalInstance()->reserveThread();
-
     // Get the features, model, serial number, FW version (if available), and poll rate (if available) from /dev nodes
     QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate");
     if(ftpath.open(QIODevice::ReadOnly)){
@@ -93,6 +90,7 @@ Kb::~Kb(){
         cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
     terminate();
+    wait(1000);
     // Reset to hardware profile
     if(_hwProfile){
         currentProfile = _hwProfile;

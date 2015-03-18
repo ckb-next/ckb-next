@@ -14,6 +14,8 @@ int features_mask = -1;
 extern int os_resetusb(usbdevice* kb, const char* file, int line);
 
 int usbqueue(usbdevice* kb, uchar* messages, int count){
+    if(!HAS_FEATURES(kb, FEAT_RGB))
+        return 0;
     // Don't add messages unless the queue has enough room for all of them
     if(!kb->handle || kb->queuecount + count > QUEUE_LEN)
         return -1;
@@ -52,13 +54,12 @@ int setupusb(usbdevice* kb, short vendor, short product){
         return -1;
     }
 
-    // Create the USB queue
-    for(int q = 0; q < QUEUE_LEN; q++)
-        kb->queue[q] = malloc(MSG_SIZE);
-
+    // Set indicator LEDs
     updateindicators(kb, 1);
-    // Nothing else needs to be done for non-RGB keyboards
+
+    // Put non-RGB K95 into software mode. Nothing else needs to be done for non-RGB boards
     if(!HAS_FEATURES(kb, FEAT_RGB)){
+        nk95cmd(kb, NK95_HWOFF);
         kb->active = 1;
         writefwnode(kb);
         kb->profile.keymap = keymap_system;
@@ -71,6 +72,10 @@ int setupusb(usbdevice* kb, short vendor, short product){
         }
         return 0;
     }
+
+    // Create the USB queue
+    for(int q = 0; q < QUEUE_LEN; q++)
+        kb->queue[q] = malloc(MSG_SIZE);
 
     if(strstr(kb->name, "Bootloader")){
         // Device needs a firmware update. Finish setting up but don't do anything.
@@ -120,8 +125,10 @@ int setupusb(usbdevice* kb, short vendor, short product){
 }
 
 int revertusb(usbdevice* kb){
-    if(!HAS_FEATURES(kb, FEAT_RGB))
+    if(!HAS_FEATURES(kb, FEAT_RGB)){
+        nk95cmd(kb, NK95_HWON);
         return 0;
+    }
     // Empty the USB queue first
     while(kb->queuecount > 0){
         DELAY_SHORT;
@@ -146,6 +153,8 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     if(res)
         return res;
     DELAY_LONG;
+    if(!HAS_FEATURES(kb, FEAT_RGB))
+        return 0;
     // Empty the queue. Re-initialize the device.
     kb->queuecount = 0;
     if(getfwversion(kb))

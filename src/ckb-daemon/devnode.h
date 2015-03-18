@@ -40,6 +40,7 @@ typedef enum {
     NONE,
     DEVICE,
     MODE,
+    SWITCH,
     HWLOAD,
     HWSAVE,
     ERASE,

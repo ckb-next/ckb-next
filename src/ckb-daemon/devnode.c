@@ -352,11 +352,8 @@ void readcmd(usbdevice* kb, const char* line){
             handler = 0;
             continue;
         } else if(!strcmp(word, "switch")){
-            command = NONE;
+            command = SWITCH;
             handler = 0;
-            if(profile)
-                profile->currentmode = mode;
-            continue;
         } else if(!strcmp(word, "hwload")){
             command = HWLOAD;
             handler = 0;
@@ -551,6 +548,28 @@ void readcmd(usbdevice* kb, const char* line){
         case IDLE:
             setactive(kb, 0);
             continue;
+        case MODE: {
+            // Mode selection processes a number
+            int newmode;
+            if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_MAX)
+                mode = getusbmode(newmode - 1, profile, keymap);
+            continue;
+        } case SWITCH:
+            profile->currentmode = mode;
+            // Set mode light for non-RGB K95
+            int index = INDEX_OF(mode, profile->mode) % 3;
+            switch(index){
+            case 0:
+                nk95cmd(kb, NK95_M1);
+                break;
+            case 1:
+                nk95cmd(kb, NK95_M2);
+                break;
+            case 2:
+                nk95cmd(kb, NK95_M3);
+                break;
+            }
+            continue;
         case HWLOAD:
             // Try to load the profile from hardware. Reset on failure, disconnect if reset fails.
             while(hwloadprofile(kb, 1)){
@@ -582,13 +601,7 @@ void readcmd(usbdevice* kb, const char* line){
             eraseprofile(profile, kb->model == 95 ? 3 : 1);
             mode = profile->currentmode;
             continue;
-        case MODE: {
-            // Mode selection processes a number
-            int newmode;
-            if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_MAX)
-                mode = getusbmode(newmode - 1, profile, keymap);
-            continue;
-        } case NAME: case IOFF: case ION: case IAUTO: case INOTIFY:
+        case NAME: case IOFF: case ION: case IAUTO: case INOTIFY:
             // All of the above just parse the whole word
             handler(mode, keymap, notifynumber, 0, word);
             continue;

@@ -79,7 +79,7 @@ void MainWindow::scanKeyboards(){
         // Connected already?
         KbWidget* widget = 0;
         foreach(KbWidget* w, kbWidgets){
-            if(w->device && w->device->devpath == path && w->device->usbSerial == serial){
+            if(w->device && w->device->matches(path, serial)){
                 widget = w;
                 w->active(true);
                 break;

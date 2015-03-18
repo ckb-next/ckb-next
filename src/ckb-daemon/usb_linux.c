@@ -7,7 +7,7 @@
 #ifdef OS_LINUX
 
 int _usbdequeue(usbdevice* kb, const char* file, int line){
-    if(kb->queuecount == 0 || !kb->handle)
+    if(kb->queuecount == 0 || !kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 500, kb->queue[0] };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
@@ -27,7 +27,7 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
 }
 
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
-    if(!IS_CONNECTED(kb))
+    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 500, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
@@ -38,6 +38,18 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     if(res != MSG_SIZE)
         printf("usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     return res;
+}
+
+int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
+    if(kb->vendor != V_CORSAIR || kb->product != P_K95_NRGB)
+        return 0;
+    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 500, 0 };
+    int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+    if(res < 0){
+        printf("nk95cmd (%s:%d): %s\n", file, line, strerror(-res));
+        return 1;
+    }
+    return 0;
 }
 
 void* intreap(void* context){
@@ -63,12 +75,12 @@ void* intreap(void* context){
                 if(HAS_FEATURES(kb, FEAT_RGB)){
                     switch(urb->endpoint){
                     case 0x81:
-                        // RGB EP 1: BIOS HID input
+                        // RGB EP 1: 6KRO (BIOS mode) input
                         hid_translate(kb->kbinput, -1, 8, kb->urbinput);
                         inputupdate(kb);
                         break;
                     case 0x82:
-                        // RGB EP 2: non-BIOS HID input (accept only if keyboard is inactive)
+                        // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
                         if(!kb->active){
                             hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);
                             inputupdate(kb);
@@ -82,13 +94,18 @@ void* intreap(void* context){
                 } else {
                     switch(urb->endpoint){
                     case 0x81:
-                        // Non-RGB EP 1: input
+                        // Non-RGB EP 1: 6KRO input
                         hid_translate(kb->kbinput, 1, 8, kb->urbinput);
                         inputupdate(kb);
                         break;
                     case 0x82:
                         // Non-RGB EP 2: media keys
                         hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
+                        inputupdate(kb);
+                        break;
+                    case 0x83:
+                        // Non-RGB EP 3: NKRO input
+                        hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
                         inputupdate(kb);
                         break;
                     }
@@ -313,6 +330,7 @@ static _model models[] = {
     { P_K70_STR, P_K70 },
     { P_K70_NRGB_STR, P_K70_NRGB },
     { P_K95_STR, P_K95 },
+    { P_K95_NRGB_STR, P_K95_NRGB },
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

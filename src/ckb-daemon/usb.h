@@ -18,8 +18,10 @@
 
 #define P_K95           0x1b11
 #define P_K95_STR       "1b11"
+#define P_K95_NRGB      0x1b08
+#define P_K95_NRGB_STR  "1b08"
 
-#define IS_RGB(vendor, product) (product != P_K70_NRGB)
+#define IS_RGB(vendor, product) ((product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT     usleep(3000)
@@ -60,6 +62,16 @@ int _usbdequeue(usbdevice* kb, const char* file, int line);
 // Threading: Lock device before use, unlock after finish
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line);
 #define usbinput(kb, message) _usbinput(kb, message, __FILE_NOPATH__, __LINE__)
+
+// Non-RGB K95 command. Returns 0 on success.
+int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);
+#define nk95cmd(kb, command) _nk95cmd(kb, (command) >> 16 & 0xFF, (command) & 0xFFFF, __FILE_NOPATH__, __LINE__)
+
+#define NK95_HWOFF  0x020030    // Hardware playback off
+#define NK95_HWON   0x020001    // Hardware playback on
+#define NK95_M1     0x200001    // Mode switches
+#define NK95_M2     0x200002
+#define NK95_M3     0x200003
 
 // Tries to reset a USB device after a failed action. Returns 0 on success.
 // The previous action will NOT be re-attempted and the keyboard's USB queue will be cleared.

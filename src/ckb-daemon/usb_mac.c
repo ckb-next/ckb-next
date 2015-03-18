@@ -94,6 +94,7 @@ void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportTyp
             inputupdate(kb);
             break;
         case 21:
+        case 5:
             // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
             if(!kb->active){
                 hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);

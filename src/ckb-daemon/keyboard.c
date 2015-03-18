@@ -52,8 +52,10 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
         60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97,
         -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
     };
-    if(endpoint == 1 || endpoint == -1){
-        // EP 1: 6KRO input
+    switch(endpoint){
+    case 1:
+    case -1:
+        // EP 1: 6KRO input (RGB and non-RGB)
         // Clear previous input
         for(int i = 0; i < 256; i++){
             if(hid_codes[i] >= 0)
@@ -73,55 +75,38 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
                     printf("Got unknown key press %d on EP 1\n", urbinput[i]);
             }
         }
-    } else if(endpoint == -2){
+    case -2:
         // EP 2 RGB: NKRO input
-        if(length != 21 || urbinput[0] != 1)
-            return;
-        for(int bit = 0; bit < 8; bit++){
-            if((urbinput[1] >> bit) & 1)
-                SET_KEYBIT(kbinput, hid_codes[bit + 224]);
-            else
-                CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
-        }
-        for(int byte = 0; byte < 19; byte++){
-            char input = urbinput[byte + 2];
+        if(urbinput[0] == 1){
+            // Type 1: standard key
+            if(length != 21)
+                return;
             for(int bit = 0; bit < 8; bit++){
-                int keybit = byte * 8 + bit;
-                int scan = hid_codes[keybit];
-                if((input >> bit) & 1){
-                    if(scan >= 0)
-                        SET_KEYBIT(kbinput, hid_codes[keybit]);
-                    else
-                        printf("Got unknown key press %d on EP 2\n", keybit);
-                } else if(scan >= 0)
-                    CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
+                if((urbinput[1] >> bit) & 1)
+                    SET_KEYBIT(kbinput, hid_codes[bit + 224]);
+                else
+                    CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
             }
-        }
-    } else if(endpoint == 3){
-        // EP 3 non-RGB: NKRO input
-        if(length != 15)
-            return;
-        for(int bit = 0; bit < 8; bit++){
-            if((urbinput[0] >> bit) & 1)
-                SET_KEYBIT(kbinput, hid_codes[bit + 224]);
-            else
-                CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
-        }
-        for(int byte = 0; byte < 14; byte++){
-            char input = urbinput[byte + 1];
-            for(int bit = 0; bit < 8; bit++){
-                int keybit = byte * 8 + bit;
-                int scan = hid_codes[keybit];
-                if((input >> bit) & 1){
-                    if(scan >= 0)
-                        SET_KEYBIT(kbinput, hid_codes[keybit]);
-                    else
-                        printf("Got unknown key press %d on EP 3\n", keybit);
-                } else if(scan >= 0)
-                    CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
+            for(int byte = 0; byte < 19; byte++){
+                char input = urbinput[byte + 2];
+                for(int bit = 0; bit < 8; bit++){
+                    int keybit = byte * 8 + bit;
+                    int scan = hid_codes[keybit];
+                    if((input >> bit) & 1){
+                        if(scan >= 0)
+                            SET_KEYBIT(kbinput, hid_codes[keybit]);
+                        else
+                            printf("Got unknown key press %d on EP 2\n", keybit);
+                    } else if(scan >= 0)
+                        CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
+                }
             }
-        }
-    } else if(endpoint == 2){
+            break;
+        } else if(urbinput[0] == 2)
+            ;       // Type 2: media key (fall through)
+        else
+            break;  // No other known types
+    case 2:
         // EP 2 Non-RGB: media keys
         CLEAR_KEYBIT(kbinput, 97);          // mute
         CLEAR_KEYBIT(kbinput, 98);          // stop
@@ -153,6 +138,31 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
             case 234:
                 SET_KEYBIT(kbinput, 131);   // voldn
                 break;
+            }
+        }
+        break;
+    case 3:
+        // EP 3 non-RGB: NKRO input
+        if(length != 15)
+            return;
+        for(int bit = 0; bit < 8; bit++){
+            if((urbinput[0] >> bit) & 1)
+                SET_KEYBIT(kbinput, hid_codes[bit + 224]);
+            else
+                CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
+        }
+        for(int byte = 0; byte < 14; byte++){
+            char input = urbinput[byte + 1];
+            for(int bit = 0; bit < 8; bit++){
+                int keybit = byte * 8 + bit;
+                int scan = hid_codes[keybit];
+                if((input >> bit) & 1){
+                    if(scan >= 0)
+                        SET_KEYBIT(kbinput, hid_codes[keybit]);
+                    else
+                        printf("Got unknown key press %d on EP 3\n", keybit);
+                } else if(scan >= 0)
+                    CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
             }
         }
     }

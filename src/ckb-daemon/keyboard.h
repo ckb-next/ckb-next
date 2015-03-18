@@ -43,7 +43,8 @@ extern const key* keymap_system;
 const key* getkeymap(const char* name);
 const char* getmapname(const key* layout);
 
-// Translates input from HID input (non-RGB keyboards) to a Corsair RGB input bitfield
+// Translates input from HID to a Corsair RGB input bitfield.
+// Use positive endpoint for non-RGB keyboards, negative endpoint for RGB
 void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput);
 
 #endif

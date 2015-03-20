@@ -10,13 +10,6 @@ int inputopen(usbdevice* kb){
         return 0;
     }
     kb->event = event;
-    // Send keyup events for every scancode in the keymap
-    for(int key = 0; key < N_KEYS; key++){
-        int scan = keymap_system[key].scan;
-        if(scan < 0)
-            continue;
-        os_keypress(kb, scan, 0);
-    }
     return 1;
 }
 

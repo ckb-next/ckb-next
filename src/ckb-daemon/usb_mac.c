@@ -20,7 +20,7 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
     kb->queuecount--;
     kb->lastError = res;
     if(res != kIOReturnSuccess){
-        printf("Error: usbdequeue (%s:%d): Got return value 0x%x\n", file, line, res);
+        printf("usbdequeue (%s:%d): Got return value 0x%x\n", file, line, res);
         return 0;
     }
     return MSG_SIZE;
@@ -33,11 +33,11 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
     kb->lastError = res;
     if(res != kIOReturnSuccess){
-        printf("Error: usbinput (%s:%d): Got return value 0x%x\n", file, line, res);
+        printf("usbinput (%s:%d): Got return value 0x%x\n", file, line, res);
         return 0;
     }
     if(length != MSG_SIZE)
-        printf("Warning: usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
+        printf("usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
     return length;
 }
 
@@ -61,9 +61,10 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
     // Don't try if the keyboard was disconnected
     if(kb->lastError == kIOReturnBadArgument)
         return -2;
-    // USB reset via IOHIDDevice doesn't seem to be possible.
-    // Just wait a little and then return success anyway...
-    DELAY_LONG;
+    // This does more harm than good...
+    //if(!IOHIDDeviceSetProperty(kb->handle, CFSTR(kIOHIDResetKey), kCFBooleanTrue))
+    //    return -1;
+    sleep(1);
     return 0;
 }
 
@@ -80,7 +81,6 @@ void usbremove(void* context, IOReturn result, void* sender){
 }
 
 void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
-    printf("\n");
     usbdevice* kb = context;
     if(HAS_FEATURES(kb, FEAT_RGB)){
         switch(length){
@@ -264,7 +264,7 @@ CGEventRef tapcallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
         CGEventTapEnable(eventTap, true);
         return 0;
     }
-    if((type == kCGEventKeyDown || type == kCGEventKeyUp)){
+    if(type == kCGEventKeyDown || type == kCGEventKeyUp || kCGEventFlagsChanged){
         CGEventFlags flags = CGEventGetFlags(event);
         // This flag gets inserted into all of our keyboard events automatically. It can't be removed when the event is broadcast.
         // It must be removed or else Cmd+Option+Esc, but ONLY Cmd+Option+Esc, fails to work.
@@ -336,7 +336,7 @@ void* threadrun(void* context){
     while(!eventTap){
         // When the daemon is run at boot the event tap might not work immediately, so wait until it does.
         usleep(0);
-        eventTap = CGEventTapCreate(kCGHIDEventTap, kCGHeadInsertEventTap, kCGEventTapOptionDefault, CGEventMaskBit(kCGEventKeyDown) | CGEventMaskBit(kCGEventKeyUp) | CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseDragged) | CGEventMaskBit(kCGEventLeftMouseUp) | CGEventMaskBit(kCGEventRightMouseDown) | CGEventMaskBit(kCGEventRightMouseDragged) | CGEventMaskBit(kCGEventRightMouseUp), tapcallback, 0);
+        eventTap = CGEventTapCreate(kCGHIDEventTap, kCGHeadInsertEventTap, kCGEventTapOptionDefault, kCGEventMaskForAllEvents, tapcallback, 0);
     }
     CFRunLoopAddSource(CFRunLoopGetCurrent(), CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0), kCFRunLoopDefaultMode);
 

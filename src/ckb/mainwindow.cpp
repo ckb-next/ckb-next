@@ -1,3 +1,4 @@
+#include "kbfirmware.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSharedMemory>
@@ -5,6 +6,10 @@
 #include <QMenuBar>
 
 extern QSharedMemory appShare;
+
+float ckbGuiVersion = 0.f;
+// Assume daemon has no version limitations if it's not connected
+float ckbDaemonVersion = INFINITY;
 
 static const QString configLabel = "Settings";
 #ifndef __APPLE__
@@ -41,6 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(closeAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
 
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
+
     eventTimer = new QTimer(this);
     eventTimer->setTimerType(Qt::PreciseTimer);
     connect(eventTimer, SIGNAL(timeout()), this, SLOT(timerTick()));
@@ -50,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
 
+    ckbGuiVersion = PARSE_CKB_VERSION(CKB_VERSION_STR);
     scanKeyboards();
 }
 
@@ -64,8 +72,17 @@ void MainWindow::scanKeyboards(){
             w->deleteLater();
         kbWidgets.clear();
         settingsWidget->setStatus("Driver inactive");
+        ckbDaemonVersion = INFINITY;
         return;
     }
+    // Check daemon version
+    QFile version(rootdev + "/version");
+    if(version.open(QIODevice::ReadOnly)){
+        ckbDaemonVersion = PARSE_CKB_VERSION(QString::fromUtf8(version.readLine()));
+        version.close();
+    } else
+        // Assume 0.0.42 if not readable (this was the last revision before the version node was added)
+        ckbDaemonVersion = PARSE_CKB_VERSION("alpha-v0.0.42");
 
     // Scan connected devices
     foreach(KbWidget* w, kbWidgets)
@@ -103,8 +120,27 @@ void MainWindow::scanKeyboards(){
     connected.close();
 
     // Remove any devices not found in the connected list
+    bool updateShown = false;
     foreach(KbWidget* w, kbWidgets){
-        if(!w->isActive()){
+        if(w->isActive()){
+            if(updateShown)
+                continue;
+            // Display firmware upgrade notification if a new version is available (and user has automatic updates enabled)
+            QSettings settings;
+            if(settings.value("Program/DisableAutoFWCheck").toBool())
+                continue;
+            float version = KbFirmware::versionForBoard(w->device->features);
+            if(version > w->device->firmware.toFloat()){
+                if(w->hasShownNewFW)
+                    continue;
+                w->hasShownNewFW = true;
+                // Don't display more than one of these at once
+                updateShown = true;
+                // Don't run this method here because it will lock up the timer and prevent devices from working properly
+                // Use a queued invocation instead
+                metaObject()->invokeMethod(this, "showFwUpdateNotification", Qt::QueuedConnection, Q_ARG(QWidget*, w), Q_ARG(float, version));
+            }
+        } else {
             int i = kbWidgets.indexOf(w);
             ui->tabWidget->removeTab(i);
             kbWidgets.removeAt(i);
@@ -119,6 +155,18 @@ void MainWindow::scanKeyboards(){
         settingsWidget->setStatus("1 device connected");
     else
         settingsWidget->setStatus(QString("%1 devices connected").arg(count));
+}
+
+void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
+    showWindow();
+    KbWidget* w = (KbWidget*)widget;
+    // Ask for update
+    if(QMessageBox::information(this, "Firmware update", tr("A new firmware is available for your %1 (v%2)\nWould you like to install it now?").arg(w->device->usbModel).arg(version), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), QMessageBox::Yes) == QMessageBox::Yes){
+        // If accepted, switch to firmware tab and bring up update window
+        w->showLastTab();
+        ui->tabWidget->setCurrentIndex(kbWidgets.indexOf(w));
+        w->on_fwUpdButton_clicked();
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){
@@ -142,6 +190,10 @@ void MainWindow::timerTick(){
         *(char*)data = 0;
         appShare.unlock();
     }
+    // Check for firmware updates (when appropriate)
+    QSettings settings;
+    if(!settings.value("Program/DisableAutoFWCheck").toBool())
+        KbFirmware::checkUpdates();
     // Scan for connected/disconnected keyboards
     scanKeyboards();
 }
@@ -155,6 +207,13 @@ void MainWindow::showWindow(){
     trayIcon->show();
 }
 
+void MainWindow::cleanup(){
+    foreach(KbWidget* w, kbWidgets)
+        delete w;
+    kbWidgets.clear();
+}
+
 MainWindow::~MainWindow(){
+    cleanup();
     delete ui;
 }

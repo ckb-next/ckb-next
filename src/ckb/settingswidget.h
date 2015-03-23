@@ -29,6 +29,8 @@ private slots:
     void on_altBox_activated(int index);
     void on_winBox_activated(int index);
 
+    void on_autoFWBox_clicked(bool checked);
+
 private:
     Ui::SettingsWidget *ui;
     friend class MainWindow;

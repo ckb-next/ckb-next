@@ -1,7 +1,11 @@
 #include <cmath>
+#include <QFileDialog>
 #include <QMenu>
+#include <QMessageBox>
 #include <QSettings>
 #include <QUrl>
+#include "fwupgradedialog.h"
+#include "kbfirmware.h"
 #include "kbwidget.h"
 #include "kblightwidget.h"
 #include "kbprofiledialog.h"
@@ -10,7 +14,7 @@
 
 KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBase) :
     QWidget(parent),
-    device(new Kb(this, path)),
+    device(new Kb(this, path)), hasShownNewFW(false),
     ui(new Ui::KbWidget), _active(true),
     currentMode(0)
 {
@@ -38,6 +42,16 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->miscTab));
     }
+    // Hide poll rate and FW update as appropriate
+    if(!device->features.contains("pollrate")){
+        ui->pollLabel->hide();
+        ui->pollLabel2->hide();
+    }
+    if(!device->features.contains("fwupdate")){
+        ui->fwUpdButton->hide();
+        ui->fwUpdLabel->hide();
+        ui->fwUpdLayout->removeItem(ui->fwUpdLayout->itemAt(1));
+    }
 
     // Load profiles from stored settings
     QSettings settings;
@@ -53,8 +67,18 @@ KbWidget::~KbWidget(){
     device->save(settings);
     settings.endGroup();
 
+    delete device;
     delete ui;
 }
+
+void KbWidget::showFirstTab(){
+    ui->tabWidget->setCurrentIndex(0);
+}
+
+void KbWidget::showLastTab(){
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
+}
+
 
 void KbWidget::updateProfileList(){
     // Clear profile list and rebuild
@@ -329,4 +353,62 @@ void KbWidget::on_muteCheck_clicked(bool checked){
 
 void KbWidget::on_layoutBox_activated(int index){
     device->layout((KeyMap::Layout)index);
+}
+
+void KbWidget::on_tabWidget_currentChanged(int index){
+    if(!device)
+        return;
+    if(index == ui->tabWidget->count() - 1){
+        // Device tab
+        // Update firmware button
+        if(!KbFirmware::hasDownloaded())
+            ui->fwUpdButton->setText("Check for updates");
+        else {
+            float newVersion = KbFirmware::versionForBoard(device->features);
+            float oldVersion = device->firmware.toFloat();
+            if(newVersion <= 0.f || newVersion <= oldVersion)
+                ui->fwUpdButton->setText("Up to date");
+            else
+                ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(newVersion));
+        }
+    }
+}
+
+void KbWidget::on_fwUpdButton_clicked(){
+    // Check version numbers
+    float newVersion = KbFirmware::versionForBoard(device->features, true);
+    float oldVersion = device->firmware.toFloat();
+    // If alt is pressed, ignore upgrades and go straight to the manual prompt
+    if(!(qApp->keyboardModifiers() & Qt::AltModifier)){
+        if(newVersion == -1.f){
+            QMessageBox::information(this, "Firmware update", "<center>There is a new firmware available for this device.<br />However, it requires a newer version of ckb.<br />Please upgrade ckb and try again.</center>");
+            return;
+        } else if(newVersion == 0.f){
+            if(QMessageBox::question(this, "Firmware update", "<center>There was a problem getting the status for this device.<br />Would you like to select a file manually?</center>") != QMessageBox::Yes)
+                return;
+            // "Yes" -> fall through to browse file
+        } else if(newVersion <= oldVersion){
+            if(QMessageBox::question(this, "Firmware update", "<center>Your firmware is already up to date.<br />Would you like to select a file manually?</center>") != QMessageBox::Yes)
+                return;
+            // "Yes" -> fall through to browse file
+        } else {
+            // Automatic upgrade. Fetch file from web.
+            // FwUpgradeDialog can't be parented to KbWidget because KbWidget may be deleted before the dialog exits
+            FwUpgradeDialog dialog(parentWidget(), newVersion, "", device);
+            dialog.exec();
+            return;
+        }
+    }
+    // Browse for file
+    QString path = QFileDialog::getOpenFileName(this, "Select firmware file", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), "Firmware blobs (*.bin)");
+    if(path.isEmpty())
+        return;
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly)){
+        QMessageBox::warning(parentWidget(), "Error", "<center>File could not be read.</center>");
+        return;
+    }
+    QByteArray blob = file.readAll();
+    FwUpgradeDialog dialog(parentWidget(), newVersion, blob, device);
+    dialog.exec();
 }

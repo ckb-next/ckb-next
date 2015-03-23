@@ -1,6 +1,5 @@
 #include <fcntl.h>
-#include <QtConcurrent/QtConcurrent>
-#include <QThreadPool>
+#include <QUrl>
 #include "kb.h"
 #include "media.h"
 
@@ -83,8 +82,11 @@ Kb::Kb(QObject *parent, const QString& path) :
 }
 
 Kb::~Kb(){
-    if(!isOpen())
+    if(!isOpen()){
+        terminate();
+        wait(1000);
         return;
+    }
     // Kill notification thread and remove node
     if(notifyNumber > 0)
         cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
@@ -221,6 +223,16 @@ void Kb::layout(KeyMap::Layout newLayout, bool write){
     foreach(KbMode* mode, currentProfile->modes)
         mode->light()->close();
     emit infoUpdated();
+}
+
+void Kb::fwUpdate(const QString& path){
+    fwUpdPath = path;
+    // Write the active command to ensure it's not ignored
+    cmd.write("active");
+    cmd.write(QString(" @%1 ").arg(notifyNumber).toLatin1());
+    cmd.write("fwupdate ");
+    cmd.write(path.toLatin1());
+    cmd.write("\n");
 }
 
 void Kb::frameUpdate(){
@@ -472,6 +484,24 @@ void Kb::readNotify(QString line){
                 light->color("m3", lightColor);
                 light->color("lock", lightColor);
             }
+        }
+    } else if(components[0] == "fwupdate"){
+        if(components.count() < 3)
+            return;
+        // Make sure path is the same
+        if(components[1] != fwUpdPath)
+            return;
+        QString res = components[2];
+        if(res == "invalid" || res == "fail")
+            emit fwUpdateFinished(false);
+        else if(res == "ok")
+            emit fwUpdateFinished(true);
+        else {
+            // "xx/yy" indicates progress
+            if(!res.contains("/"))
+                return;
+            QStringList numbers = res.split("/");
+            emit fwUpdateProgress(numbers[0].toInt(), numbers[1].toInt());
         }
     }
 }

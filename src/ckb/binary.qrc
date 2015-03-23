@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/bin">
+        <file>msckey.gpg</file>
+    </qresource>
+</RCC>

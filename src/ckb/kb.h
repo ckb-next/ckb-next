@@ -6,6 +6,8 @@
 #include <QThread>
 #include "kbprofile.h"
 
+// Class for managing devices
+
 class Kb : public QThread
 {
     Q_OBJECT
@@ -46,30 +48,40 @@ public:
     inline KbLight* currentLight() { return !currentMode ? 0 : currentMode->light(); }
     inline KbBind* currentBind() { return !currentMode ? 0 : currentMode->bind(); }
 
+    void setCurrentProfile(KbProfile* profile, bool spontaneous = true);
+    void setCurrentMode(KbProfile* profile, KbMode* mode, bool spontaneous = true);
+    inline void setCurrentMode(KbProfile* profile, int index, bool spontaneous = true) { setCurrentMode(profile, profile->modes[index], spontaneous); }
+    inline void setCurrentMode(KbMode* mode, bool spontaneous = true) { setCurrentMode(currentProfile, mode, spontaneous); }
+
     // Create a new profile/mode. The newly-created object will not be inserted into the current profile/mode list.
     inline KbProfile* newProfile() { return new KbProfile(this, getKeyMap()); }
     inline KbProfile* newProfile(KbProfile* other) { return new KbProfile(this, getKeyMap(), *other); }
     inline KbMode* newMode() { return new KbMode(this, getKeyMap()); }
     inline KbMode* newMode(KbMode* other) { return new KbMode(this, getKeyMap(), *other); }
 
-    void setCurrentProfile(KbProfile* profile, bool spontaneous = true);
-    void setCurrentMode(KbProfile* profile, KbMode* mode, bool spontaneous = true);
-    inline void setCurrentMode(KbProfile* profile, int index, bool spontaneous = true) { setCurrentMode(profile, profile->modes[index], spontaneous); }
-    inline void setCurrentMode(KbMode* mode, bool spontaneous = true) { setCurrentMode(currentProfile, mode, spontaneous); }
-
+    // Load/save stored settings
     void load(QSettings& settings);
     void save(QSettings& settings);
     void hwSave();
 
+    // Perform a firmware update
+    void fwUpdate(const QString& path);
+
 signals:
+    // Layout/model updated
     void infoUpdated();
 
+    // Profile/mode updates
     void profileAdded();
     void profileRenamed();
     void modeRenamed();
 
     void profileChanged();
     void modeChanged(bool spontaneous);
+
+    // FW update status
+    void fwUpdateProgress(int current, int total);
+    void fwUpdateFinished(bool succeeded);
 
 public slots:
     void frameUpdate();
@@ -85,6 +97,9 @@ private:
     KeyMap::Model _model;
     KeyMap::Layout _layout;
     void layout(KeyMap::Layout newLayout, bool write);
+
+    // Current firmware update file
+    QString fwUpdPath;
 
     KbProfile* _hwProfile;
     // Previously-selected profile and mode

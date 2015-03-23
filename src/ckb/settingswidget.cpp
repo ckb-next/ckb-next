@@ -81,6 +81,9 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
         cmd.close();
     }
 
+    // Read auto update settings
+    ui->autoFWBox->setChecked(!settings.value("DisableAutoFWCheck").toBool());
+
     ui->animPathLabel->setText(AnimScript::path());
     on_animScanButton_clicked();
 }
@@ -164,4 +167,9 @@ void SettingsWidget::on_altBox_activated(int index){
 
 void SettingsWidget::on_winBox_activated(int index){
     updateModifiers();
+}
+
+void SettingsWidget::on_autoFWBox_clicked(bool checked){
+    QSettings settings;
+    settings.setValue("Program/DisableAutoFWCheck", !checked);
 }

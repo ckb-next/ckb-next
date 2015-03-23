@@ -23,7 +23,17 @@ public:
     inline bool isActive() { return _active && device && device->isOpen(); }
     inline void active(bool newActive) { _active = newActive; }
 
+    // Has the "there is a firmware upgrade for this device..." screen already been shown?
+    bool hasShownNewFW;
+
     inline QString name() { return device ? device->usbModel : ""; }
+
+public slots:
+    void showFirstTab();
+    void showLastTab();
+
+    // Display firmware update dialog
+    void on_fwUpdButton_clicked();
 
 private:
     Ui::KbWidget *ui;
@@ -58,6 +68,7 @@ private slots:
     void on_inactiveSwitchBox_activated(int index);
     void on_muteCheck_clicked(bool checked);
     void on_layoutBox_activated(int index);
+    void on_tabWidget_currentChanged(int index);
 };
 
 #endif // KBWIDGET_H

@@ -1,0 +1,28 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+# My GPG key: 8DC8D309 - A full copy of it can also be found in src/ckb/msckey.gpg
+# This document is signed to prevent tampering. Signature verification is enabled only when GnuPG is available.
+# Firmware versions listed may not necessarily reflect the latest on Corsair's site; new versions will not be added until ckb has been tested with them.
+# ckb does NOT read this file when flashing firmware manually. It will allow you to load any valid FW blob (at your own risk).
+
+!BEGIN FW ENTRIES
+
+# Vendor   Model  FW   URL                                             Min.ckb File Name         SHA256
+  Corsair  K65RGB 1.12 http://www3.corsair.com/software/HID/K65RGB.zip 0.0.1   K65RGB_app112.bin 4d730a6c6716c59e2c0a73a1afeeef8ee6a5384b07d7baace4e4c333b6c956c6
+  Corsair  K70RGB 1.15 http://www3.corsair.com/software/HID/K70RGB.zip 0.0.1   K70RGB_app115.bin b26e99c006f02fed03e0ed1bc7580b674b93804e0ed6ee3dce530a7474cad43f
+  Corsair  K95RGB 1.15 http://www3.corsair.com/software/HID/K95RGB.zip 0.0.1   K95RGB_app115.bin 55d81e715eb92351fcc1808c7ed0430779daf7e939a446e546d045e84b19ef6c
+
+!END FW ENTRIES
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJVBH95AAoJEBXtkzSNyNMJbEwIAKgv4i/v3qYGIFBKkyyyC2LJ
+v+WIdTJ7y3hk+9mMrJ6d4zz82/HwN7FlBDOZhSeFzSJcVrutfYCVDZogWtG0EUae
+2yn8/iq22MH7ZeeJ54ZBsymMlX/dp1metTvVmnRG2fq43o0n4/JOMTGBzl532h0w
+UfJZQwninV8jYXb3DcrKUOO91HKt6wCXjD2uFk4qpaIeE1u2G1DORL2cIdsrIjMG
+0iBvmROy5QA3EPUYMQRxe8/W2CTlQ2xineko6rWKz5xT01xbNxffBSh4H+T5xLFO
+bWj5/njJhw+d6ygL/YGlECCb/ILinHfl+TN+yK+OFOHLoQoluGQqv2pSONWabcE=
+=afc6
+-----END PGP SIGNATURE-----

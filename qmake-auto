@@ -1,6 +1,8 @@
 #!/bin/bash
 function die {
     echo "No suitable qmake found."
+    echo "Please make sure you have Qt5 installed."
+    echo "Re-run this program with QMAKE=/path/to/qmake to select qmake manually."
     exit 1
 }
 if [[ "$QMAKE" != "" ]]; then

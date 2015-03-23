@@ -1,7 +1,8 @@
 bin/
 ckb.app/
 .DS_Store
-._*
+.*
+!.gitignore
 *.o
 *.pro.*
 Makefile

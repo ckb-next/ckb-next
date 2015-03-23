@@ -29,7 +29,7 @@ When downloading a new version of ckb, please delete your old download first. Th
 Linux Installation
 ------------------
 
-Requires Qt5 and libudev (Ubuntu: `qt5-default` and `libudev-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). `gcc`, `g++`, and `glibc` (Ubuntu: `build-essential`) are also required. Check with your package manager to make sure you have the correct libraries/headers installed.
+Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libudev-dev`, `build-essential`, `zlib1g-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). Check with your package manager to make sure you have the correct libraries/headers installed.
 
 You can build the project by running `./qmake-auto && make` in a Terminal in the directory you downloaded it to. The binaries will be placed in a new `bin` directory assuming they compile successfully.
 
@@ -54,13 +54,13 @@ Open the `bin` directory in a Terminal and run `sudo ./ckb-daemon` to start the 
 OSX Installation
 ----------------
 
-#### Binary download
+#### Binary download:
 
 Pre-compiled binaries for OSX are provided by Xiy. They may be updated less frequently.
 
 [Click here to download the latest version (alpha-v0.0.42).](https://github.com/ccMSC/ckb/releases/download/0.0.42-alpha/ckb-0.0.42-alpha-osx.zip)
 
-#### Building from source
+#### Building from source:
 
 Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
@@ -70,9 +70,9 @@ Alternatively, open a Terminal in the ckb directory and run `./qmake-auto && mak
 
 #### Running as a service (recommended):
 
-Copy `ckb.app` to your Applications folder. Copy the file [service/launchd/com.ckb.daemon.plist] to your computer's `/Library/LaunchDaemons` folder (you can get to it by pressing `Cmd+Shift+G` in Finder and typing the location). Then open a Terminal and run the following command to launch the driver:
+Copy `ckb.app` to your Applications folder. Copy the file  [`service/launchd/com.ckb.daemon.plist`](https://raw.githubusercontent.com/ccMSC/ckb/master/service/launchd/com.ckb.daemon.plist) to your computer's `/Library/LaunchDaemons` folder (you can get to it by pressing `Cmd+Shift+G` in Finder and typing the location). Then open a Terminal and run the following command to launch the driver:
 
-`sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist && sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist`
+`sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist && sudo chmod 0700 /Library/LaunchDaemons/com.ckb.daemon.plist && sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist`
 
 After you're done, open `ckb.app` to launch the user interface.
 
@@ -97,7 +97,8 @@ The user interface is still a work in progress.
 
 **Roadmap** (roughly in order)
 - **v0.1 release:**
-- User interface for firmware updates
+- Animation presets
+- Script to automatically build/install ckb and run it as a service
 - **v0.2 release:**
 - More functions for the Win Lock key
 - Key combos

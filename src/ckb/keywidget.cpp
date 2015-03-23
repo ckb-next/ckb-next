@@ -40,8 +40,6 @@ void KeyWidget::paintEvent(QPaintEvent*){
     const QColor highlightAnimColor(136, 200, 240);
     const QColor animColor(112, 200, 110);
 
-    float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
-    float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
     uint count = keyMap.count();
 
     // Determine which keys to highlight
@@ -64,6 +62,13 @@ void KeyWidget::paintEvent(QPaintEvent*){
     }
 
     QPainter painter(this);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
+    int ratio = painter.device()->devicePixelRatio();
+#else
+    int ratio = 1;
+#endif
+    float xScale = (float)width() / (keyMap.width() + KEY_SIZE) * ratio;
+    float yScale = (float)height() / (keyMap.height() + KEY_SIZE) * ratio;
     // Draw background
     painter.setPen(Qt::NoPen);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -86,7 +91,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     // Draw key backgrounds on a separate pixmap so that a drop shadow can be applied to them.
     int wWidth = width(), wHeight = height();
     KeyMap::Model model = keyMap.model();
-    QPixmap keyBG(wWidth, wHeight);
+    QPixmap keyBG(wWidth * ratio, wHeight * ratio);
     keyBG.fill(QColor(0, 0, 0, 0));
     QPainter bgPainter(&keyBG);
     bgPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
@@ -142,7 +147,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     }
 
     // Render the key decorations (RGB -> light circles, binding -> key names) on yet another layer
-    QPixmap decoration(wWidth, wHeight);
+    QPixmap decoration(wWidth * ratio, wHeight * ratio);
     decoration.fill(QColor(0, 0, 0, 0));
     QPainter decPainter(&decoration);
     decPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
@@ -265,8 +270,16 @@ void KeyWidget::paintEvent(QPaintEvent*){
     QGraphicsScene* scene = new QGraphicsScene;
     scene->addItem(bgItem);
     scene->addItem(decItem);
-    scene->render(&painter, QRectF(), QRectF(0, 0, wWidth, wHeight));
+    // It has to be rendered onto yet another pixmap or else DPI scaling will look terrible...
+    QPixmap final(wWidth * ratio, wHeight * ratio);
+    final.fill(QColor(0, 0, 0, 0));
+    QPainter finalPainter(&final);
+    scene->render(&finalPainter, QRectF(0, 0, wWidth * ratio, wHeight * ratio), QRectF(0, 0, wWidth * ratio, wHeight * ratio));
     delete scene;   // <- Automatically cleans up the rest of the objects
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
+    final.setDevicePixelRatio(ratio);
+#endif
+    painter.drawPixmap(QPointF(0., 0.), final);
 }
 
 void KeyWidget::mousePressEvent(QMouseEvent* event){

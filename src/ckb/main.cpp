@@ -31,6 +31,10 @@ int main(int argc, char *argv[])
 #ifdef __APPLE__
     disableAppNap();
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
+    // Enable HiDPI support
+    qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
     MainWindow w;
     if(!qApp->arguments().contains("--background"))
         w.show();

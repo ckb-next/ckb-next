@@ -264,7 +264,7 @@ CGEventRef tapcallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
         CGEventTapEnable(eventTap, true);
         return 0;
     }
-    if(type == kCGEventKeyDown || type == kCGEventKeyUp || kCGEventFlagsChanged){
+    if(type == kCGEventKeyDown || type == kCGEventKeyUp || type == kCGEventFlagsChanged){
         CGEventFlags flags = CGEventGetFlags(event);
         // This flag gets inserted into all of our keyboard events automatically. It can't be removed when the event is broadcast.
         // It must be removed or else Cmd+Option+Esc, but ONLY Cmd+Option+Esc, fails to work.

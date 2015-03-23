@@ -10,6 +10,13 @@ int inputopen(usbdevice* kb){
         return 0;
     }
     kb->event = event;
+    // Send keyup events for every scancode in the keymap
+    for(int key = 0; key < N_KEYS; key++){
+        int scan = keymap_system[key].scan;
+        if(scan < 0 || scan >= KEY_MEDIA)
+            continue;
+        os_keypress(kb, scan, 0);
+    }
     return 1;
 }
 
@@ -25,11 +32,13 @@ extern long keyrepeatdelay();
 extern CGEventRef media_event(uint data1, uint modifiers);
 #define MEDIA_FLAGS(scancode, down, is_repeat) (((scancode) - KEY_MEDIA) << 16 | ((down) ? 0x0a00 : 0x0b00) | !!(is_repeat))
 
+// Numpad keys have an extra flag
+#define IS_NUMPAD(scancode) ((scancode) >= kVK_ANSI_KeypadDecimal && (scancode) <= kVK_ANSI_Keypad9 && (scancode) != kVK_ANSI_KeypadClear && (scancode) != kVK_ANSI_KeypadEnter)
+
 void os_keypress(usbdevice* kb, int scancode, int down){
     // Check for modifier keys and update flags
     int flags = 0;
     // Keep a separate list of left/right side modifiers - combine them below
-    // Apple's HID driver seems to include a lot of odd bits that aren't documented. Those are included here as well for completeness.
     CGEventFlags* side = (scancode == KEY_RIGHTSHIFT || scancode == KEY_RIGHTCTRL || scancode == KEY_RIGHTMETA || scancode == KEY_RIGHTALT) ? &kb->rflags : &kb->lflags;
     CGEventFlags mod = 0;
     if(scancode == KEY_CAPSLOCK){
@@ -38,19 +47,19 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         flags = 1;
     } else if(scancode == KEY_LEFTSHIFT || scancode == KEY_RIGHTSHIFT){
         mod = kCGEventFlagMaskShift;
-        mod |= (scancode == KEY_LEFTSHIFT) ? 0x2 : 0x4;
+        mod |= (scancode == KEY_LEFTSHIFT) ? NX_DEVICELSHIFTKEYMASK : NX_DEVICERSHIFTKEYMASK;
         flags = 1;
     } else if(scancode == KEY_LEFTCTRL || scancode == KEY_RIGHTCTRL){
         mod = kCGEventFlagMaskControl;
-        mod |= (scancode == KEY_LEFTCTRL) ? 0x1 : 0x200;
+        mod |= (scancode == KEY_LEFTCTRL) ? NX_DEVICELCTLKEYMASK : NX_DEVICERCTLKEYMASK;
         flags = 1;
     } else if(scancode == KEY_LEFTMETA || scancode == KEY_RIGHTMETA){
         mod = kCGEventFlagMaskCommand;
-        mod |= (scancode == KEY_LEFTMETA) ? 0x8 : 0x10;
+        mod |= (scancode == KEY_LEFTMETA) ? NX_DEVICELCMDKEYMASK : NX_DEVICERCMDKEYMASK;
         flags = 1;
     } else if(scancode == KEY_LEFTALT || scancode == KEY_RIGHTALT){
         mod = kCGEventFlagMaskAlternate;
-        mod |= (scancode == KEY_LEFTALT) ? 0x20 : 0x40;
+        mod |= (scancode == KEY_LEFTALT) ? NX_DEVICELALTKEYMASK : NX_DEVICERALTKEYMASK;
         flags = 1;
     }
 
@@ -60,7 +69,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
             *side |= mod;
         else
             *side &= ~mod;
-        kb->eventflags = kb->lflags | kb->rflags | 0x100;
+        kb->eventflags = kb->lflags | kb->rflags;
         kb->lastkeypress = KEY_NONE;
     } else {
         // For any other key, trigger key repeat
@@ -83,10 +92,13 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         return;
     }
     // Create keypress event
-    CGEventRef kevent = CGEventCreateKeyboardEvent(kb->event, scancode, down);
-    CGEventSetFlags(kevent, kb->eventflags);
-    CGEventPost(kCGHIDEventTap, kevent);
-    CFRelease(kevent);
+    CGEventRef kp = CGEventCreateKeyboardEvent(kb->event, scancode, down);
+    if(IS_NUMPAD(scancode))
+        CGEventSetFlags(kp, kb->eventflags | kCGEventFlagMaskNumericPad | NX_NONCOALSESCEDMASK);
+    else
+        CGEventSetFlags(kp, kb->eventflags | NX_NONCOALSESCEDMASK);
+    CGEventPost(kCGHIDEventTap, kp);
+    CFRelease(kp);
 }
 
 void keyretrigger(usbdevice* kb, int scancode){
@@ -104,7 +116,10 @@ void keyretrigger(usbdevice* kb, int scancode){
     }
     CGEventRef kp = CGEventCreateKeyboardEvent(kb->event, scancode, 1);
     CGEventSetIntegerValueField(kp, kCGKeyboardEventAutorepeat, 1);
-    CGEventSetFlags(kp, kb->eventflags);
+    if(IS_NUMPAD(scancode))
+        CGEventSetFlags(kp, kb->eventflags | kCGEventFlagMaskNumericPad | NX_NONCOALSESCEDMASK);
+    else
+        CGEventSetFlags(kp, kb->eventflags | NX_NONCOALSESCEDMASK);
     CGEventPost(kCGHIDEventTap, kp);
     CFRelease(kp);
 }

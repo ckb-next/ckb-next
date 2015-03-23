@@ -32,7 +32,7 @@ bool KbFirmware::_checkUpdates(){
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;
-    tableDownload = networkManager->get(QNetworkRequest(QUrl("http://raw.githubusercontent.com/ccMSC/ckb/master/FIRMWARE")));
+    tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/ccMSC/ckb/master/FIRMWARE")));
     connect(tableDownload, SIGNAL(finished()), this, SLOT(downloadFinished()));
     lastCheck = now;
     return true;

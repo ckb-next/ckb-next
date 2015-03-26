@@ -25,6 +25,7 @@ public:
 
     // Has the "there is a firmware upgrade for this device..." screen already been shown?
     bool hasShownNewFW;
+    void updateFwButton();
 
     inline QString name() { return device ? device->usbModel : ""; }
 

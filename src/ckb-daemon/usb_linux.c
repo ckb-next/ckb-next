@@ -213,7 +213,7 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
             return -1;
         return -2;
     }
-    res = ioctl(kb->handle, USBDEVFS_RESET, 0);
+    res = ioctl(kb->handle, USBDEVFS_RESET);
     if(res){
         printf("resetusb (%s:%d): USBDEVFS_RESET ioctl failed: %s\n", file, line, strerror(errno));
         if(errno == EINTR || errno == EAGAIN)

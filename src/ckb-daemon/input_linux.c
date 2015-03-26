@@ -163,6 +163,8 @@ void os_kpsync(usbdevice* kb){
 }
 
 void os_updateindicators(usbdevice* kb, int force){
+    if(!IS_CONNECTED(kb) || NEEDS_FW_UPDATE(kb))
+        return;
     // Read the indicator LEDs for this device and update them if necessary.
     char leds[LED_CNT / 8] = { 0 };
     ioctl(kb->event, EVIOCGLED(sizeof(leds)), &leds);

@@ -128,6 +128,9 @@ typedef struct {
 // Feature test (usbdevice* kb, int feat)
 #define HAS_FEATURES(kb, feat)    ((kb)->features & (feat))
 
+// Bricked firmware?
+#define NEEDS_FW_UPDATE(kb) ((kb)->fwversion == 0 && HAS_FEATURES((kb), FEAT_FWUPDATE | FEAT_FWVERSION))
+
 // Structure for tracking keyboard devices
 #define NAME_LEN    33
 #define QUEUE_LEN   40

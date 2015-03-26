@@ -360,26 +360,35 @@ void KbWidget::on_tabWidget_currentChanged(int index){
         return;
     if(index == ui->tabWidget->count() - 1){
         // Device tab
-        // Update firmware button
-        if(!KbFirmware::hasDownloaded())
-            ui->fwUpdButton->setText("Check for updates");
-        else {
-            float newVersion = KbFirmware::versionForBoard(device->features);
-            float oldVersion = device->firmware.toFloat();
-            if(newVersion <= 0.f || newVersion <= oldVersion)
-                ui->fwUpdButton->setText("Up to date");
-            else
-                ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(newVersion));
-        }
+        updateFwButton();
+    }
+}
+
+void KbWidget::updateFwButton(){
+    if(!KbFirmware::hasDownloaded())
+        ui->fwUpdButton->setText("Check for updates");
+    else {
+        float newVersion = KbFirmware::versionForBoard(device->features);
+        float oldVersion = device->firmware.toFloat();
+        if(newVersion <= 0.f || newVersion <= oldVersion)
+            ui->fwUpdButton->setText("Up to date");
+        else
+            ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(newVersion));
     }
 }
 
 void KbWidget::on_fwUpdButton_clicked(){
-    // Check version numbers
-    float newVersion = KbFirmware::versionForBoard(device->features, true);
-    float oldVersion = device->firmware.toFloat();
     // If alt is pressed, ignore upgrades and go straight to the manual prompt
     if(!(qApp->keyboardModifiers() & Qt::AltModifier)){
+        // Check version numbers
+        if(!KbFirmware::hasDownloaded()){
+            ui->fwUpdButton->setText("Checking...");
+            ui->fwUpdButton->setEnabled(false);
+        }
+        float newVersion = KbFirmware::versionForBoard(device->features, true);
+        float oldVersion = device->firmware.toFloat();
+        ui->fwUpdButton->setEnabled(true);
+        updateFwButton();
         if(newVersion == -1.f){
             QMessageBox::information(this, "Firmware update", "<center>There is a new firmware available for this device.<br />However, it requires a newer version of ckb.<br />Please upgrade ckb and try again.</center>");
             return;
@@ -409,6 +418,6 @@ void KbWidget::on_fwUpdButton_clicked(){
         return;
     }
     QByteArray blob = file.readAll();
-    FwUpgradeDialog dialog(parentWidget(), newVersion, blob, device);
+    FwUpgradeDialog dialog(parentWidget(), 0.f, blob, device);
     dialog.exec();
 }

@@ -468,6 +468,9 @@ void readcmd(usbdevice* kb, const char* line){
                 || (kb && ((!HAS_FEATURES(kb, FEAT_BIND) && (command == BIND || command == UNBIND || command == REBIND || command == MACRO))
                            || (!HAS_FEATURES(kb, FEAT_NOTIFY) && command == NOTIFY))))
             continue;
+        // Reject anything other than fwupdate if device has a bricked FW
+        if(NEEDS_FW_UPDATE(kb) && command != FWUPDATE && command != NOTIFYON && command != NOTIFYOFF)
+            continue;
 
         // Specially handled commands:
         else if(command == DEVICE){
@@ -696,7 +699,8 @@ void readcmd(usbdevice* kb, const char* line){
     }
 
     // Finish up
-    updatergb(kb, 0);
+    if(!NEEDS_FW_UPDATE(kb))
+        updatergb(kb, 0);
     if(IS_CONNECTED(kb))
         pthread_mutex_unlock(&kb->mutex);
     free(word);

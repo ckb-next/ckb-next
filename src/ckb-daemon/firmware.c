@@ -25,9 +25,10 @@ int getfwversion(usbdevice* kb){
     uchar in_pkt[MSG_SIZE];
     if(!usbinput(kb, in_pkt) || in_pkt[0] != 0x0e || in_pkt[1] != 0x01)
         return -1;
-    short vendor, product, version;
+    short vendor, product, version, bootloader;
     // Copy the vendor ID, product ID, version, and poll rate from the firmware data
     memcpy(&version, in_pkt + 8, 2);
+    memcpy(&bootloader, in_pkt + 10, 2);
     memcpy(&vendor, in_pkt + 12, 2);
     memcpy(&product, in_pkt + 14, 2);
     uchar poll = in_pkt[16];
@@ -37,8 +38,14 @@ int getfwversion(usbdevice* kb){
     if(product != kb->product)
         printf("getfwversion (%s:%d): Got product ID %04x (expected %04x)\n", __FILE_NOPATH__, __LINE__, product, kb->product);
     // Set firmware version and poll rate
-    kb->fwversion = version;
-    kb->pollrate = (int)poll * 1000000;
+    if(version == 0 || bootloader == 0){
+        // Needs firmware update
+        kb->fwversion = 0;
+        kb->pollrate = -1;
+    } else {
+        kb->fwversion = version;
+        kb->pollrate = (int)poll * 1000000;
+    }
     writefwnode(kb);
     return 0;
 }

@@ -60,7 +60,7 @@ usbprofile* addstore(const char* serial, int autosetup){
 #define ACT_M3          12
 
 void setactive(usbdevice* kb, int active){
-    if(!HAS_FEATURES(kb, FEAT_RGB))
+    if(!HAS_FEATURES(kb, FEAT_RGB) || NEEDS_FW_UPDATE(kb))
         return;
     // Empty the board's USB queue first
     while(kb->queuecount > 0){

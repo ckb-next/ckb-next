@@ -133,6 +133,8 @@ void os_kpsync(usbdevice* kb){
 }
 
 void os_updateindicators(usbdevice* kb, int force){
+    if(!IS_CONNECTED(kb) || NEEDS_FW_UPDATE(kb))
+        return;
     // Set NumLock on permanently
     char ileds = 1;
     // Set Caps Lock if enabled. Unlike Linux, OSX keyboards have independent caps lock states, so

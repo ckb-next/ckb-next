@@ -4,6 +4,9 @@
 #include "kbfirmware.h"
 #include "ui_fwupgradedialog.h"
 
+static const int DIALOG_WIDTH = 380;
+static const int DIALOG_HEIGHT_MIN = 180, DIALOG_HEIGHT_MAX(240);
+
 FwUpgradeDialog::FwUpgradeDialog(QWidget* parent, float newV, const QByteArray& fwBlob, Kb* device) :
     QDialog(parent),
     ui(new Ui::FwUpgradeDialog),
@@ -11,12 +14,14 @@ FwUpgradeDialog::FwUpgradeDialog(QWidget* parent, float newV, const QByteArray& 
 {
     ui->setupUi(this);
     ui->curLabel->setText(kb->firmware);
-    ui->newLabel->setText(QString::number(newV));
+    ui->newLabel->setText(QString::number(newV, 'f', 2));
     ui->devLabel->setText(kb->usbModel);
 
     connect(device, SIGNAL(destroyed()), this, SLOT(removeDev()));
     connect(device, SIGNAL(fwUpdateProgress(int,int)), this, SLOT(fwUpdateProgress(int,int)));
     connect(device, SIGNAL(fwUpdateFinished(bool)), this, SLOT(fwUpdateFinished(bool)));
+
+    setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MIN);
 }
 
 FwUpgradeDialog::~FwUpgradeDialog(){
@@ -100,7 +105,7 @@ int FwUpgradeDialog::exec(){
             QMessageBox::warning(parentWidget(), "Error", "<center>Not a valid firmware for this device.</center>");
             return QDialog::Rejected;
         }
-        ui->newLabel->setText(QString::number(newV));
+        ui->newLabel->setText(QString::number(newV, 'f', 2));
     } else {
         // Download a new blob file
         ui->progressBar->show();
@@ -113,7 +118,7 @@ int FwUpgradeDialog::exec(){
         float newV = verifyFw(blob, features);
         if(newV == 0.f){
             hide();
-            QMessageBox::warning(parentWidget(), "Error", "<center>There was a problem with the downloaded file.\nPlease try again later.</center>");
+            QMessageBox::warning(parentWidget(), "Error", "<center>There was a problem with the downloaded file.<br />Please try again later.</center>");
             return QDialog::Rejected;
         }
     }
@@ -127,9 +132,10 @@ int FwUpgradeDialog::exec(){
     ui->progressBar->setValue(0);
     ui->progressBar->setMaximum(1);
     ui->progressBar->setTextVisible(false);
-    ui->statusLabel->setText("Ready to install new firmware.");
+    ui->statusLabel->setText("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb is not endorsed by Corsair. This is <i>unlikely</i> to brick your device, but I accept no responsibility if it does. If you're paranoid, get a Windows PC and run the update from CUE.");
     ui->cancelButton->setEnabled(true);
     ui->actionButton->setEnabled(true);
+    setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MAX);
     show();
     // Run modal event loop
     evLoop = new QEventLoop(this);
@@ -161,6 +167,8 @@ void FwUpgradeDialog::fwUpdateFinished(bool succeeded){
         ui->statusLabel->setText("Update failed.");
     ui->actionButton->setText("OK");
     ui->actionButton->setEnabled(true);
+    ui->progressBar->setMaximum(1);
+    ui->progressBar->setValue(1);
     // Exit after 10s
     if(evLoop)
         QTimer::singleShot(10000, evLoop, SLOT(quit()));
@@ -175,6 +183,7 @@ void FwUpgradeDialog::on_cancelButton_clicked(){
 void FwUpgradeDialog::on_actionButton_clicked(){
     if(!savePath.isEmpty() && kb){
         // Start upgrade
+        setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MIN);
         ui->progressBar->show();
         ui->progressBar->setValue(0);
         ui->progressBar->setMaximum(0);

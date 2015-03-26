@@ -77,22 +77,20 @@ int setupusb(usbdevice* kb, short vendor, short product){
     for(int q = 0; q < QUEUE_LEN; q++)
         kb->queue[q] = malloc(MSG_SIZE);
 
-    if(strstr(kb->name, "Bootloader")){
+    // Get the firmware version from the device
+    int fail = !!getfwversion(kb);
+
+    if(!fail && NEEDS_FW_UPDATE(kb)){
         // Device needs a firmware update. Finish setting up but don't do anything.
         printf("Device needs a firmware update. Please issue a fwupdate command.\n");
         kb->features = FEAT_RGB | FEAT_FWVERSION | FEAT_FWUPDATE;
         kb->active = 1;
-        kb->fwversion = 0;
-        kb->pollrate = -1;
         kb->profile.keymap = keymap_system;
         kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
         getusbmode(1, &kb->profile, keymap_system);
         getusbmode(2, &kb->profile, keymap_system);
         return 0;
     }
-
-    // Get the firmware version from the device
-    int fail = !!getfwversion(kb);
 
     // Restore profile (if any)
     DELAY_LONG;
@@ -104,7 +102,7 @@ int setupusb(usbdevice* kb, short vendor, short product){
             getusbmode(1, &kb->profile, keymap_system);
             getusbmode(2, &kb->profile, keymap_system);
         }
-        if(hwloadprofile(kb, 0))
+        if(fail || hwloadprofile(kb, 0))
             return -2;
     } else {
         // If there is no profile, load it from the device
@@ -114,17 +112,16 @@ int setupusb(usbdevice* kb, short vendor, short product){
             getusbmode(1, &kb->profile, keymap_system);
             getusbmode(2, &kb->profile, keymap_system);
         }
-        if(hwloadprofile(kb, 1))
+        if(fail || hwloadprofile(kb, 1))
             return -2;
     }
     DELAY_SHORT;
-    if(fail)
-        return -2;
-
     return 0;
 }
 
 int revertusb(usbdevice* kb){
+    if(NEEDS_FW_UPDATE(kb))
+        return 0;
     if(!HAS_FEATURES(kb, FEAT_RGB)){
         nk95cmd(kb, NK95_HWON);
         return 0;
@@ -153,12 +150,14 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     if(res)
         return res;
     DELAY_LONG;
-    if(!HAS_FEATURES(kb, FEAT_RGB))
-        return 0;
     // Empty the queue. Re-initialize the device.
     kb->queuecount = 0;
+    if(!HAS_FEATURES(kb, FEAT_RGB))
+        return 0;
     if(getfwversion(kb))
         return -1;
+    if(NEEDS_FW_UPDATE(kb))
+        return 0;
     setactive(kb, kb->active);
     // If the hardware profile hasn't been loaded yet, load it here
     res = 0;

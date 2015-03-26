@@ -134,6 +134,7 @@ void MainWindow::scanKeyboards(){
                 if(w->hasShownNewFW)
                     continue;
                 w->hasShownNewFW = true;
+                w->updateFwButton();
                 // Don't display more than one of these at once
                 updateShown = true;
                 // Don't run this method here because it will lock up the timer and prevent devices from working properly
@@ -158,6 +159,10 @@ void MainWindow::scanKeyboards(){
 }
 
 void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
+    static bool isShowing = false;
+    if(isShowing)
+        return;
+    isShowing = true;
     showWindow();
     KbWidget* w = (KbWidget*)widget;
     // Ask for update
@@ -167,6 +172,7 @@ void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
         ui->tabWidget->setCurrentIndex(kbWidgets.indexOf(w));
         w->on_fwUpdButton_clicked();
     }
+    isShowing = false;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event){

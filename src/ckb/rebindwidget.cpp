@@ -1,3 +1,4 @@
+#include <QStandardPaths>
 #include "rebindwidget.h"
 #include "ui_rebindwidget.h"
 
@@ -28,6 +29,11 @@ RebindWidget::RebindWidget(QWidget *parent) :
     ui->fnBox->setItemText(fnKeys.indexOf("pause") + 1, "F15");
     ui->fnBox->setItemText(fnKeys.indexOf("ins") + 1, "Help");
     ui->numBox->setItemText(numKeys.indexOf("numlock") + 1, "Clear");
+
+    // Add tip label
+    ui->progTipLabel->setText("<p style=\"line-height:150%\">Tip: use the <font face=\"monospace\">open</font> command to launch a file, directory, or app. For instance, to start Safari:<br /><font face=\"monospace\">&nbsp;&nbsp;open /Applications/Safari.app</font></p>");
+#else
+    ui->progTipLabel->setText("<p style=\"line-height:150%\">Tip: use <font face=\"monospace\">xdg-open</font> to launch a file or directory. For instance, to open your home folder:<br /><font face=\"monospace\">&nbsp;&nbsp;xdg-open " + QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "</font></p>");
 #endif
 }
 

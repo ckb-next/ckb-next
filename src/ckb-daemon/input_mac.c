@@ -3,13 +3,7 @@
 
 #ifdef OS_MAC
 
-int inputopen(usbdevice* kb){
-    CGEventSourceRef event = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
-    if(!event){
-        kb->event = 0;
-        return 0;
-    }
-    kb->event = event;
+void clearkeys(usbdevice* kb){
     // Send keyup events for every scancode in the keymap
     for(int key = 0; key < N_KEYS; key++){
         int scan = keymap_system[key].scan;
@@ -17,11 +11,22 @@ int inputopen(usbdevice* kb){
             continue;
         os_keypress(kb, scan, 0);
     }
+}
+
+int inputopen(usbdevice* kb){
+    CGEventSourceRef event = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+    if(!event){
+        kb->event = 0;
+        return 0;
+    }
+    kb->event = event;
+    clearkeys(kb);
     return 1;
 }
 
 void inputclose(usbdevice* kb){
     if(kb->event){
+        clearkeys(kb);
         CFRelease(kb->event);
         kb->event = 0;
     }

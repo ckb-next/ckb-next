@@ -123,24 +123,25 @@ void MainWindow::scanKeyboards(){
     bool updateShown = false;
     foreach(KbWidget* w, kbWidgets){
         if(w->isActive()){
-            if(updateShown)
-                continue;
-            // Display firmware upgrade notification if a new version is available (and user has automatic updates enabled)
-            QSettings settings;
-            if(settings.value("Program/DisableAutoFWCheck").toBool())
-                continue;
-            float version = KbFirmware::versionForBoard(w->device->features);
-            if(version > w->device->firmware.toFloat()){
-                if(w->hasShownNewFW)
+            if(!updateShown){
+                // Display firmware upgrade notification if a new version is available (and user has automatic updates enabled)
+                QSettings settings;
+                if(settings.value("Program/DisableAutoFWCheck").toBool())
                     continue;
-                w->hasShownNewFW = true;
-                w->updateFwButton();
-                // Don't display more than one of these at once
-                updateShown = true;
-                // Don't run this method here because it will lock up the timer and prevent devices from working properly
-                // Use a queued invocation instead
-                metaObject()->invokeMethod(this, "showFwUpdateNotification", Qt::QueuedConnection, Q_ARG(QWidget*, w), Q_ARG(float, version));
+                float version = KbFirmware::versionForBoard(w->device->features);
+                if(version > w->device->firmware.toFloat()){
+                    if(w->hasShownNewFW)
+                        continue;
+                    w->hasShownNewFW = true;
+                    w->updateFwButton();
+                    // Don't display more than one of these at once
+                    updateShown = true;
+                    // Don't run this method here because it will lock up the timer and prevent devices from working properly
+                    // Use a queued invocation instead
+                    metaObject()->invokeMethod(this, "showFwUpdateNotification", Qt::QueuedConnection, Q_ARG(QWidget*, w), Q_ARG(float, version));
+                }
             }
+            w->saveIfNeeded();
         } else {
             int i = kbWidgets.indexOf(w);
             ui->tabWidget->removeTab(i);

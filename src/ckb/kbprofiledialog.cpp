@@ -29,11 +29,11 @@ void KbProfileDialog::profileList_reordered(){
         item->setFlags(item->flags() | Qt::ItemIsEditable);
     }
     // Add any missing profiles at the end of the list
-    foreach(KbProfile* profile, device->profiles){
+    foreach(KbProfile* profile, device->profiles()){
         if(!newProfiles.contains(profile))
             newProfiles.append(profile);
     }
-    device->profiles = newProfiles;
+    device->profiles(newProfiles);
 }
 
 void KbProfileDialog::on_profileList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous){
@@ -48,11 +48,11 @@ void KbProfileDialog::on_profileList_currentItemChanged(QListWidgetItem *current
 void KbProfileDialog::repopulate(){
     ui->profileList->clear();
     QListWidgetItem* current = 0;
-    foreach(KbProfile* profile, device->profiles){
+    foreach(KbProfile* profile, device->profiles()){
         QListWidgetItem* item = new QListWidgetItem(QIcon((profile == device->hwProfile()) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"), profile->name(), ui->profileList);
         item->setData(GUID, profile->id().guid);
         item->setFlags(item->flags() | Qt::ItemIsEditable);
-        if(profile == device->currentProfile){
+        if(profile == device->currentProfile()){
             item->setSelected(true);
             current = item;
         }
@@ -88,7 +88,7 @@ void KbProfileDialog::on_profileList_itemClicked(QListWidgetItem *item){
         item->setIcon(QIcon(":/img/icon_profile.png"));
         // Add the new profile and assign it to this item
         KbProfile* newProfile = device->newProfile();
-        device->profiles.append(newProfile);
+        device->appendProfile(newProfile);
         item->setData(GUID, newProfile->id().guid);
         item->setData(NEW_FLAG, 0);
         device->setCurrentProfile(newProfile);
@@ -98,7 +98,7 @@ void KbProfileDialog::on_profileList_itemClicked(QListWidgetItem *item){
 }
 
 void KbProfileDialog::on_profileList_itemChanged(QListWidgetItem *item){
-    KbProfile* currentProfile = device->currentProfile;
+    KbProfile* currentProfile = device->currentProfile();
     if(!item || !currentProfile || item->data(GUID).toUuid() != currentProfile->id().guid)
         return;
     currentProfile->name(item->text());
@@ -108,11 +108,11 @@ void KbProfileDialog::on_profileList_itemChanged(QListWidgetItem *item){
 
 void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &pos){
     QListWidgetItem* item = ui->profileList->itemAt(pos);
-    KbProfile* currentProfile = device->currentProfile;
+    KbProfile* currentProfile = device->currentProfile();
     if(!item || !currentProfile || item->data(GUID).toUuid() != currentProfile->id().guid)
         return;
     int index = device->indexOf(currentProfile);
-    QList<KbProfile*>& profiles = device->profiles;
+    QList<KbProfile*> profiles = device->profiles();
 
     QMenu menu(this);
     QAction* rename = new QAction("Rename...", this);
@@ -127,7 +127,7 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     if(index == 0)
         moveup->setEnabled(false);
     QAction* movedown = new QAction("Move Down", this);
-    if(index >= device->profiles.count() - 1)
+    if(index >= profiles.count() - 1)
         movedown->setEnabled(false);
     menu.addAction(rename);
     menu.addAction(duplicate);
@@ -144,11 +144,13 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
         KbProfile* newProfile = device->newProfile(currentProfile);
         newProfile->newId();
         profiles.insert(index + 1, newProfile);
+        device->profiles(profiles);
         device->setCurrentProfile(newProfile);
     } else if(result == del){
         if(!canDelete)
             return;
         profiles.removeAll(currentProfile);
+        device->profiles(profiles);
         currentProfile->deleteLater();
         // Select next profile
         if(index < profiles.count())
@@ -169,9 +171,11 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     } else if(result == moveup){
         profiles.removeAll(currentProfile);
         profiles.insert(index - 1, currentProfile);
+        device->profiles(profiles);
     } else if(result == movedown){
         profiles.removeAll(currentProfile);
         profiles.insert(index + 1, currentProfile);
+        device->profiles(profiles);
     }
     repopulate();
 }

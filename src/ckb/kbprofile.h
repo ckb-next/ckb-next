@@ -21,12 +21,13 @@ public:
 
     // Save profile to settings
     void save(QSettings& settings);
+    bool needsSave() const;
 
     // Profile properties
     inline QString name() const { return _name; }
-    inline void name(const QString& newName) { _name = newName.trimmed(); if(_name == "") _name = "Unnamed"; }
+    inline void name(const QString& newName) { _needsSave = true; _name = newName.trimmed(); if(_name == "") _name = "Unnamed"; }
     inline UsbId& id() { return _id; }
-    inline void id(const UsbId& newId) { _id = newId; }
+    inline void id(const UsbId& newId) { _needsSave = true; _id = newId; }
 
     // Creates a new ID for the profile and all of its modes
     void newId();
@@ -36,16 +37,28 @@ public:
     void keyMap(const KeyMap& newKeyMap);
 
     // Modes in this profile
-    QList<KbMode*> modes;
-    inline int indexOf(KbMode* mode) { return modes.indexOf(mode); }
-    inline KbMode* find(const QUuid& id) { foreach(KbMode* mode, modes) { if(mode->id().guid == id) return mode; } return 0; }
+    inline const QList<KbMode*>& modes() const { return _modes; }
+    inline void modes(const QList<KbMode*>& newModes) { _needsSave = true; _modes = newModes; }
+    inline void append(KbMode* newMode) { _needsSave = true; _modes.append(newMode); }
+    inline void insert(int index, KbMode* newMode) { _needsSave = true; _modes.insert(index, newMode); }
+    inline void removeAll(KbMode* mode) { _needsSave = true; _modes.removeAll(mode); }
+    inline void move(int from, int to) { _needsSave = true; _modes.move(from, to); }
+
+    inline int modeCount() const { return _modes.count(); }
+    inline int indexOf(KbMode* mode) const { return _modes.indexOf(mode); }
+    inline KbMode* find(const QUuid& id) { foreach(KbMode* mode, _modes) { if(mode->id().guid == id) return mode; } return 0; }
+
     // Currently-selected mode
-    KbMode* currentMode;
+    inline KbMode* currentMode() const { return _currentMode; }
+    inline void currentMode(KbMode* newCurrentMode) { _needsSave = true; _currentMode = newCurrentMode; }
 
 private:
+    KbMode* _currentMode;
     QString _name;
     UsbId _id;
     KeyMap _keyMap;
+    QList<KbMode*> _modes;
+    bool _needsSave;
 };
 
 #endif // KBPROFILE_H

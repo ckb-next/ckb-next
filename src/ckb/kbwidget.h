@@ -29,6 +29,9 @@ public:
 
     inline QString name() { return device ? device->usbModel : ""; }
 
+    void saveSettings();
+    void saveIfNeeded();
+
 public slots:
     void showFirstTab();
     void showLastTab();
@@ -38,11 +41,12 @@ public slots:
 
 private:
     Ui::KbWidget *ui;
+    quint64 lastAutoSave;
+
+    KbMode* currentMode;
 
     QString prefsPath;
     bool _active;
-
-    KbMode* currentMode;
 
     const static int GUID = Qt::UserRole;
     const static int NEW_FLAG = Qt::UserRole + 1;

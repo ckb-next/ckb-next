@@ -6,7 +6,7 @@
 KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& settings) :
     QObject(parent), _script(0), _map(map),
     repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
-    _guid(id)
+    _guid(id), _needsSave(false)
 {
     settings.beginGroup(_guid.toString().toUpper());
     _keys = settings.value("Keys").toStringList();
@@ -51,6 +51,7 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& se
 }
 
 void KbAnim::save(QSettings& settings){
+    _needsSave = false;
     settings.beginGroup(_guid.toString().toUpper());
     settings.setValue("Keys", _keys);
     settings.setValue("Name", _name);
@@ -72,7 +73,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, cons
     QObject(parent),
     _script(AnimScript::copy(this, script->guid())), _map(map), _keys(keys),
     repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
-    _guid(QUuid::createUuid()), _name(_script ? _script->name() : ""), _opacity(1.), _mode(Normal)
+    _guid(QUuid::createUuid()), _name(_script ? _script->name() : ""), _opacity(1.), _mode(Normal), _needsSave(true)
 {
     if(_script){
         // Set default parameters
@@ -93,7 +94,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const KbAnim& other) :
     _script(AnimScript::copy(this, other.script()->guid())), _scriptGuid(_script->guid()), _scriptName(_script->name()),
     _map(map), _keys(other._keys), _parameters(other._parameters),
     repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
-    _guid(other._guid), _name(other._name), _opacity(other._opacity), _mode(other._mode)
+    _guid(other._guid), _name(other._name), _opacity(other._opacity), _mode(other._mode), _needsSave(true)
 {
     reInit();
 }
@@ -104,6 +105,7 @@ void KbAnim::parameter(const QString& name, const QVariant& value){
 }
 
 void KbAnim::commitParams(){
+    _needsSave = true;
     _parameters = effectiveParams();
     _tempParameters.clear();
 }

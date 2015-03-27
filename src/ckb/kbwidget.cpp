@@ -1,4 +1,5 @@
 #include <cmath>
+#include <QDateTime>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -15,8 +16,8 @@
 KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBase) :
     QWidget(parent),
     device(new Kb(this, path)), hasShownNewFW(false),
-    ui(new Ui::KbWidget), _active(true),
-    currentMode(0)
+    ui(new Ui::KbWidget),
+    lastAutoSave(QDateTime::currentMSecsSinceEpoch()), currentMode(0), _active(true)
 {
     ui->setupUi(this);
     connect(ui->modesList, SIGNAL(orderChanged()), this, SLOT(modesList_reordered()));
@@ -60,15 +61,26 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
 }
 
 KbWidget::~KbWidget(){
-    // Save settings
+    saveSettings();
+    delete device;
+    delete ui;
+}
+
+void KbWidget::saveSettings(){
     QSettings settings;
     settings.remove(prefsPath);
     settings.beginGroup(prefsPath);
     device->save(settings);
     settings.endGroup();
+}
 
-    delete device;
-    delete ui;
+void KbWidget::saveIfNeeded(){
+    quint64 now = QDateTime::currentMSecsSinceEpoch();
+    // Auto-save every 10s (if settings have changed)
+    if(device->needsSave() && now >= lastAutoSave + 10 * 1000){
+        saveSettings();
+        lastAutoSave = now;
+    }
 }
 
 void KbWidget::showFirstTab(){
@@ -82,10 +94,10 @@ void KbWidget::showLastTab(){
 
 void KbWidget::updateProfileList(){
     // Clear profile list and rebuild
-    KbProfile* hwProfile = device->hwProfile(), *currentProfile = device->currentProfile;
+    KbProfile* hwProfile = device->hwProfile(), *currentProfile = device->currentProfile();
     ui->profileBox->clear();
     int i = 0;
-    foreach(KbProfile* profile, device->profiles){
+    foreach(KbProfile* profile, device->profiles()){
         ui->profileBox->addItem((profile == hwProfile) ? QIcon(":/img/icon_profile_hardware.png") : QIcon(":/img/icon_profile.png"),
                                 profile->name());
         if(profile == currentProfile)
@@ -103,7 +115,7 @@ void KbWidget::profileChanged(){
     ui->modesList->clear();
     int i = 0;
     QListWidgetItem* current = 0;
-    foreach(KbMode* mode, device->currentProfile->modes){
+    foreach(KbMode* mode, device->currentProfile()->modes()){
         QListWidgetItem* item = new QListWidgetItem(modeIcon(i), mode->name(), ui->modesList);
         item->setData(GUID, mode->id().guid);
         item->setFlags(item->flags() | Qt::ItemIsEditable);
@@ -123,19 +135,19 @@ void KbWidget::profileChanged(){
 void KbWidget::on_profileBox_activated(int index){
     if(index < 0)
         return;
-    if(index >= device->profiles.count()){
+    if(index >= device->profiles().count()){
         // "Manage profiles" option
         KbProfileDialog dialog(this);
         dialog.exec();
         updateProfileList();
         return;
     }
-    device->setCurrentProfile(device->profiles[index]);
+    device->setCurrentProfile(device->profiles()[index]);
     // Device will emit profileChanged() and modeChanged() signals to update UI
 }
 
 QIcon KbWidget::modeIcon(int i){
-    KbProfile* currentProfile = device->currentProfile, *hwProfile = device->hwProfile();
+    KbProfile* currentProfile = device->currentProfile(), *hwProfile = device->hwProfile();
     int hwModeCount = device->hwModeCount;
     if(i >= hwModeCount)
         return QIcon(":/img/icon_mode.png");
@@ -156,19 +168,19 @@ void KbWidget::addNewModeItem(){
 }
 
 void KbWidget::modeChanged(bool spontaneous){
-    int index = device->currentProfile->modes.indexOf(device->currentMode);
+    int index = device->currentProfile()->indexOf(device->currentMode());
     if(index < 0)
         return;
     // Update tabs
     ui->lightWidget->setLight(device->currentLight());
-    ui->bindWidget->setBind(device->currentBind(), device->currentProfile);
+    ui->bindWidget->setBind(device->currentBind(), device->currentProfile());
     // Update selection
     if(spontaneous)
         ui->modesList->setCurrentRow(index);
     // Connect signals
     if(currentMode)
         disconnect(currentMode, SIGNAL(updated()), this, SLOT(modeUpdate()));
-    currentMode = device->currentMode;
+    currentMode = device->currentMode();
     connect(currentMode, SIGNAL(updated()), this, SLOT(modeUpdate()));
     modeUpdate();
 }
@@ -176,14 +188,14 @@ void KbWidget::modeChanged(bool spontaneous){
 void KbWidget::on_modesList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous){
     if(!current)
         return;
-    KbMode* mode = device->currentProfile->find(current->data(GUID).toUuid());
+    KbMode* mode = device->currentProfile()->find(current->data(GUID).toUuid());
     if(!mode)
         return;
     device->setCurrentMode(mode, false);
 }
 
 void KbWidget::modesList_reordered(){
-    KbProfile* currentProfile = device->currentProfile;
+    KbProfile* currentProfile = device->currentProfile();
     // Rebuild mode list from items
     QList<KbMode*> newModes;
     int count = ui->modesList->count();
@@ -197,11 +209,11 @@ void KbWidget::modesList_reordered(){
         item->setFlags(item->flags() | Qt::ItemIsEditable);
     }
     // Add any missing modes at the end of the list
-    foreach(KbMode* mode, currentProfile->modes){
+    foreach(KbMode* mode, currentProfile->modes()){
         if(!newModes.contains(mode))
             newModes.append(mode);
     }
-    currentProfile->modes = newModes;
+    currentProfile->modes(newModes);
 }
 
 void KbWidget::on_modesList_itemChanged(QListWidgetItem *item){
@@ -225,7 +237,7 @@ void KbWidget::on_modesList_itemClicked(QListWidgetItem* item){
         item->setIcon(QIcon(":/img/icon_mode.png"));
         // Add the new mode and assign it to this item
         KbMode* newMode = device->newMode();
-        device->currentProfile->modes.append(newMode);
+        device->currentProfile()->append(newMode);
         item->setData(GUID, newMode->id().guid);
         item->setData(NEW_FLAG, 0);
         device->setCurrentMode(newMode, false);
@@ -238,14 +250,14 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     QListWidgetItem* item = ui->modesList->itemAt(pos);
     if(!item || !currentMode || item->data(GUID).toUuid() != currentMode->id().guid)
         return;
-    KbProfile* currentProfile = device->currentProfile;
-    int index = currentProfile->modes.indexOf(currentMode);
+    KbProfile* currentProfile = device->currentProfile();
+    int index = currentProfile->indexOf(currentMode);
 
     QMenu menu(this);
     QAction* rename = new QAction("Rename...", this);
     QAction* duplicate = new QAction("Duplicate", this);
     QAction* del = new QAction("Delete", this);
-    bool canDelete = (device->currentProfile->modes.count() > device->hwModeCount);
+    bool canDelete = (device->currentProfile()->modeCount() > device->hwModeCount);
     if(!canDelete)
         // Can't delete modes if they're required by hardware
         del->setEnabled(false);
@@ -253,7 +265,7 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     if(index == 0)
         moveup->setEnabled(false);
     QAction* movedown = new QAction("Move Down", this);
-    if(index >= currentProfile->modes.count() - 1)
+    if(index >= currentProfile->modeCount() - 1)
         movedown->setEnabled(false);
     menu.addAction(rename);
     menu.addAction(duplicate);
@@ -267,31 +279,31 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     } else if(result == duplicate){
         KbMode* newMode = device->newMode(currentMode);
         newMode->newId();
-        currentProfile->modes.insert(index + 1, newMode);
+        currentProfile->insert(index + 1, newMode);
         // Update UI
         profileChanged();
         device->setCurrentMode(newMode);
     } else if(result == del){
         if(!canDelete)
             return;
-        currentProfile->modes.removeAll(currentMode);
+        currentProfile->removeAll(currentMode);
         currentMode->deleteLater();
         currentMode = 0;
         // Select next mode
         profileChanged();
-        if(index < currentProfile->modes.count())
-            device->setCurrentMode(currentProfile->modes.at(index));
+        if(index < currentProfile->modeCount())
+            device->setCurrentMode(currentProfile->modes()[index]);
         else
-            device->setCurrentMode(currentProfile->modes.last());
+            device->setCurrentMode(currentProfile->modes().last());
     } else if(result == moveup){
-        currentProfile->modes.removeAll(currentMode);
-        currentProfile->modes.insert(index - 1, currentMode);
+        currentProfile->removeAll(currentMode);
+        currentProfile->insert(index - 1, currentMode);
         // Update UI
         profileChanged();
         modeChanged(true);
     } else if(result == movedown){
-        currentProfile->modes.removeAll(currentMode);
-        currentProfile->modes.insert(index + 1, currentMode);
+        currentProfile->removeAll(currentMode);
+        currentProfile->insert(index + 1, currentMode);
         // Update UI
         profileChanged();
         modeChanged(true);
@@ -322,6 +334,7 @@ void KbWidget::modeUpdate(){
 }
 
 void KbWidget::on_hwSaveButton_clicked(){
+    saveSettings();
     device->hwSave();
     updateProfileList();
     profileChanged();

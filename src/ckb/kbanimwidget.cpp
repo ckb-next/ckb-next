@@ -40,7 +40,7 @@ void KbAnimWidget::refreshList(){
         ui->noAnimLabel->setVisible(true);
         return;
     }
-    QList<KbAnim*> newAnimations = light->animList;
+    QList<KbAnim*> newAnimations = light->animList();
     if(newAnimations.count() == 0){
         ui->animList->setVisible(false);
         ui->noAnimLabel->setVisible(true);
@@ -62,14 +62,15 @@ void KbAnimWidget::reorderAnims(){
     if(light && !noReorder){
         // Clear and rebuild the list of animations in case the animation moved
         int count = ui->animList->count();
-        light->animList.clear();
+        QList<KbAnim*> animList;
         for(int i = 0; i < count; i++){
             QListWidgetItem* item = ui->animList->item(i);
             KbAnim* anim = animations[item->data(Qt::UserRole).toUuid()];
-            if(anim && !light->animList.contains(anim))
-                light->animList.append(anim);
+            if(anim && !animList.contains(anim))
+                animList.append(anim);
             item->setFlags(item->flags() | Qt::ItemIsEditable);
         }
+        light->animList(animList);
     }
 }
 
@@ -106,7 +107,7 @@ void KbAnimWidget::duplicateAnim(KbAnim* old){
     KbAnim* animation = light->duplicateAnim(old);
     // Refresh the list. insertItem doesn't seem to place the item in the correct position on its own...
     refreshList();
-    ui->animList->setCurrentRow(light->animList.indexOf(animation));
+    ui->animList->setCurrentRow(light->animList().indexOf(animation));
     ui->animList->setVisible(true);
     ui->noAnimLabel->setVisible(false);
 
@@ -217,7 +218,9 @@ void KbAnimWidget::on_keyButton_clicked(){
 void KbAnimWidget::on_deleteButton_clicked(){
     if(current){
         animations.remove(current->guid());
-        light->animList.removeAll(current);
+        QList<KbAnim*> animList = light->animList();
+        animList.removeAll(current);
+        light->animList(animList);
         current->deleteLater();
         setCurrent(0);
         delete ui->animList->currentItem();

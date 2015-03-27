@@ -23,6 +23,7 @@ public:
     // Load and save from stored settings
     void load(QSettings& settings);
     void save(QSettings& settings);
+    inline bool needsSave() const { return _needsSave; }
 
     // Key map
     inline const KeyMap& map() { return _map; }
@@ -124,6 +125,7 @@ private:
 
     bool _winLock;
     bool _needsUpdate;
+    bool _needsSave;
 };
 
 #endif // KBBIND_H

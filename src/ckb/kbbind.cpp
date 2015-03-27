@@ -9,16 +9,17 @@ quint64 KbBind::globalRemapTime = 0;
 
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _map(keyMap),
-    _winLock(false), _needsUpdate(true) {
+    _winLock(false), _needsUpdate(true), _needsSave(true) {
 }
 
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const KbBind& other) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _bind(other._bind),
-    _winLock(false), _needsUpdate(true) {
+    _winLock(false), _needsUpdate(true), _needsSave(true) {
     map(keyMap);
 }
 
 void KbBind::load(QSettings& settings){
+    _needsSave = false;
     settings.beginGroup("Binding");
     KeyMap currentMap = _map;
     _map = KeyMap::fromName(settings.value("KeyMap").toString());
@@ -36,6 +37,7 @@ void KbBind::load(QSettings& settings){
 }
 
 void KbBind::save(QSettings& settings){
+    _needsSave = false;
     settings.beginGroup("Binding");
     settings.setValue("KeyMap", _map.name());
     // Save key settings
@@ -98,6 +100,7 @@ void KbBind::map(const KeyMap& map){
             _bind.remove(key);
     }
     _needsUpdate = true;
+    _needsSave = true;
     emit layoutChanged();
 }
 
@@ -194,6 +197,7 @@ void KbBind::resetAction(const QString &key){
     QString rKey = globalRemap(key);
     _bind.remove(rKey);
     _needsUpdate = true;
+    _needsSave = true;
 }
 
 void KbBind::noAction(const QString& key){
@@ -202,6 +206,7 @@ void KbBind::noAction(const QString& key){
         return;
     _bind[rKey] = "";
     _needsUpdate = true;
+    _needsSave = true;
 }
 
 void KbBind::keyAction(const QString& key, const QString& actionKey){
@@ -210,6 +215,7 @@ void KbBind::keyAction(const QString& key, const QString& actionKey){
         return;
     _bind[rKey] = actionKey;
     _needsUpdate = true;
+    _needsSave = true;
 }
 
 void KbBind::modeAction(const QString& key, int mode){
@@ -218,6 +224,7 @@ void KbBind::modeAction(const QString& key, int mode){
         return;
     _bind[rKey] = QString("$mode:%1").arg(mode);
     _needsUpdate = true;
+    _needsSave = true;
 }
 
 void KbBind::lightAction(const QString& key, int type){
@@ -226,6 +233,7 @@ void KbBind::lightAction(const QString& key, int type){
         return;
     _bind[rKey] = QString("$light:%1").arg(type);
     _needsUpdate = true;
+    _needsSave = true;
 }
 
 void KbBind::lockAction(const QString& key, int type){
@@ -234,6 +242,7 @@ void KbBind::lockAction(const QString& key, int type){
         return;
     _bind[rKey] = QString("$lock:%1").arg(type);
     _needsUpdate = true;
+    _needsSave = true;
 }
 
 void KbBind::programAction(const QString& key, const QString& onPress, const QString& onRelease, int stop){
@@ -243,6 +252,7 @@ void KbBind::programAction(const QString& key, const QString& onPress, const QSt
     // URL-encode the commands and place them in the string (":" and "+" are both replaced, so they won't interfere)
     _bind[rKey] = "$program:" + QString::fromUtf8(QUrl::toPercentEncoding(onPress.trimmed())) + "+" + QString::fromUtf8(QUrl::toPercentEncoding(onRelease.trimmed())) + QString("+%1").arg(stop);
     _needsUpdate = true;
+    _needsSave = true;
 }
 
 QString KbBind::specialInfo(const QString& action, int& parameter){
@@ -327,9 +337,9 @@ void KbBind::keyEvent(const QString& key, bool down){
             return;
         // Change mode
         Kb* device = devParent();
-        KbProfile* currentProfile = device->currentProfile;
-        int mode = currentProfile->modes.indexOf(currentProfile->currentMode);
-        int modeCount = currentProfile->modes.count();
+        KbProfile* currentProfile = device->currentProfile();
+        int mode = currentProfile->indexOf(currentProfile->currentMode());
+        int modeCount = currentProfile->modeCount();
         switch(suffix){
         case MODE_PREV_WRAP:
             mode--;
@@ -354,7 +364,7 @@ void KbBind::keyEvent(const QString& key, bool down){
         }
         if(mode < 0 || mode >= modeCount)
             return;
-        device->setCurrentMode(currentProfile->modes.at(mode));
+        device->setCurrentMode(currentProfile->modes()[mode]);
     } else if(prefix == "$light"){
         if(!down)
             return;

@@ -114,7 +114,7 @@ void KbBindWidget::on_copyButton_clicked(){
     }
     text = "Copy binding for " + text + " to:";
     // Display popup
-    ModeSelectDialog dialog(this, profile->currentMode, profile->modes, text);
+    ModeSelectDialog dialog(this, profile->currentMode(), profile->modes(), text);
     if(dialog.exec() != QDialog::Accepted)
         return;
     // Copy selected keys to selected modes

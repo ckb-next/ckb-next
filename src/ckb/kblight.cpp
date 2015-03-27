@@ -3,18 +3,18 @@
 #include "kblight.h"
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap) :
-    QObject(parent), _map(), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false)
+    QObject(parent), _map(), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false), _needsSave(true)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _map(other._map), _colorMap(other._colorMap), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false)
+    QObject(parent), _map(other._map), _colorMap(other._colorMap), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false), _needsSave(true)
 {
     map(keyMap);
     // Duplicate animations
-    foreach(KbAnim* animation, other.animList)
-        animList.append(new KbAnim(this, keyMap, *animation));
+    foreach(KbAnim* animation, other._animList)
+        _animList.append(new KbAnim(this, keyMap, *animation));
 }
 
 void KbLight::map(const KeyMap& map){
@@ -48,9 +48,10 @@ void KbLight::map(const KeyMap& map){
     }
     // Set the new map
     _map = map;
-    foreach(KbAnim* anim, animList)
+    foreach(KbAnim* anim, _animList)
         anim->map(map);
     _colorMap = newColorMap;
+    _needsSave = true;
     emit updated();
 }
 
@@ -59,47 +60,50 @@ void KbLight::color(const QColor& newColor){
     uint count = _map.count();
     for(uint i = 0; i < count; i++)
         _colorMap[_map.key(i)->name] = newRgb;
+    _needsSave = true;
 }
 
 KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys){
     // Stop and restart all existing animations
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    foreach(KbAnim* anim, animList){
+    foreach(KbAnim* anim, _animList){
         anim->stop();
         anim->trigger(timestamp);
     }
     // Add the new animation and start it
     KbAnim* anim = new KbAnim(this, _map, keys, base);
-    animList.append(anim);
+    _animList.append(anim);
     anim->trigger(timestamp);
     _start = true;
+    _needsSave = true;
     return anim;
 }
 
 KbAnim* KbLight::duplicateAnim(KbAnim* oldAnim){
     // Stop and restart all existing animations
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    foreach(KbAnim* anim, animList){
+    foreach(KbAnim* anim, _animList){
         anim->stop();
         anim->trigger(timestamp);
     }
     // Same as addAnim, just duplicate the existing one
     KbAnim* anim = new KbAnim(this, _map, *oldAnim);
     anim->newId();
-    int index = animList.indexOf(oldAnim);
+    int index = _animList.indexOf(oldAnim);
     if(index < 0)
-        animList.append(anim);
+        _animList.append(anim);
     else
-        animList.insert(index + 1, anim);
+        _animList.insert(index + 1, anim);
     anim->trigger(timestamp);
     _start = true;
+    _needsSave = true;
     return anim;
 }
 
 bool KbLight::isStarted(){
     if(!_start)
         return false;
-    foreach(KbAnim* animation, animList){
+    foreach(KbAnim* animation, _animList){
         if(!animation->isRunning())
             return false;
     }
@@ -108,7 +112,7 @@ bool KbLight::isStarted(){
 
 void KbLight::restartAnimation(){
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    foreach(KbAnim* anim, animList){
+    foreach(KbAnim* anim, _animList){
         anim->stop();
         anim->trigger(timestamp);
     }
@@ -116,7 +120,7 @@ void KbLight::restartAnimation(){
 }
 
 void KbLight::animKeypress(const QString& key, bool down){
-    foreach(KbAnim* anim, animList){
+    foreach(KbAnim* anim, _animList){
         if(anim->keys().contains(key))
             anim->keypress(key, down, QDateTime::currentMSecsSinceEpoch());
     }
@@ -144,7 +148,7 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
     // Advance animations
     QHash<QString, QRgb> animMap = _colorMap;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    foreach(KbAnim* anim, animList)
+    foreach(KbAnim* anim, _animList)
         anim->blend(animMap, timestamp);
 
     cmd.write(QString().sprintf("mode %d switch", modeIndex + 1).toLatin1());
@@ -199,13 +203,13 @@ void KbLight::open(){
     if(_start)
         return;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    foreach(KbAnim* anim, animList)
+    foreach(KbAnim* anim, _animList)
         anim->trigger(timestamp);
     _start = true;
 }
 
 void KbLight::close(){
-    foreach(KbAnim* anim, animList)
+    foreach(KbAnim* anim, _animList)
         anim->stop();
     _start = false;
 }
@@ -229,6 +233,7 @@ void KbLight::base(QFile &cmd, int modeIndex){
 
 void KbLight::load(QSettings& settings){
     // Load light settings
+    _needsSave = false;
     settings.beginGroup("Lighting");
     KeyMap currentMap = _map;
     _map = KeyMap::fromName(settings.value("KeyMap").toString());
@@ -252,13 +257,13 @@ void KbLight::load(QSettings& settings){
     }
     settings.endGroup();
     // Load animations
-    foreach(KbAnim* anim, animList)
+    foreach(KbAnim* anim, _animList)
         anim->deleteLater();
-    animList.clear();
+    _animList.clear();
     settings.beginGroup("Animations");
     foreach(QString anim, settings.value("List").toStringList()){
         QUuid id = anim;
-        animList.append(new KbAnim(this, _map, id, settings));
+        _animList.append(new KbAnim(this, _map, id, settings));
     }
     settings.endGroup();
     settings.endGroup();
@@ -267,6 +272,7 @@ void KbLight::load(QSettings& settings){
 }
 
 void KbLight::save(QSettings& settings){
+    _needsSave = false;
     settings.beginGroup("Lighting");
     settings.setValue("KeyMap", _map.name());
     settings.setValue("Brightness", _dimming);
@@ -280,11 +286,21 @@ void KbLight::save(QSettings& settings){
     // Save animations
     settings.beginGroup("Animations");
     QStringList aList;
-    foreach(KbAnim* anim, animList){
+    foreach(KbAnim* anim, _animList){
         aList << anim->guid().toString().toUpper();
         anim->save(settings);
     }
     settings.setValue("List", aList);
     settings.endGroup();
     settings.endGroup();
+}
+
+bool KbLight::needsSave() const {
+    if(_needsSave)
+        return true;
+    foreach(KbAnim* anim, _animList){
+        if(anim->needsSave())
+            return true;
+    }
+    return false;
 }

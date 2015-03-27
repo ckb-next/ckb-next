@@ -71,7 +71,7 @@ void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     ui->modeBox->addItem("(Previous)");
     ui->modeBox->addItem("(Next)");
     int idx = 1;
-    foreach(KbMode* mode, newProfile->modes)
+    foreach(KbMode* mode, newProfile->modes())
         ui->modeBox->addItem(QString("%1: %2").arg(idx++).arg(mode->name()));
 }
 

@@ -34,9 +34,9 @@ public:
 
     // Mode properties
     inline const QString& name() const { return _name; }
-    inline void name(const QString& newName) { _name = newName.trimmed(); if(_name == "") _name = "Unnamed"; }
+    inline void name(const QString& newName) { _needsSave = true; _name = newName.trimmed(); if(_name == "") _name = "Unnamed"; }
     inline UsbId& id() { return _id; }
-    inline void id(const UsbId& newId) { _id = newId; }
+    inline void id(const UsbId& newId) { _needsSave = true; _id = newId; }
     void newId();
 
     // Device key map
@@ -48,6 +48,7 @@ public:
 
     // Save settings
     void save(QSettings& settings);
+    bool needsSave() const;
 
 signals:
     void updated();
@@ -58,6 +59,8 @@ private:
 
     KbLight* _light;
     KbBind* _bind;
+
+    bool _needsSave;
 
 private slots:
     void doUpdate();

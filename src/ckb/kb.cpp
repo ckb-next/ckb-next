@@ -6,9 +6,9 @@
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), devpath(path), cmdpath(path + "/cmd"),
     features("N/A"), firmware("N/A"), pollrate("N/A"),
-    currentProfile(0), currentMode(0), _model(KeyMap::NO_MODEL), _layout(KeyMap::NO_LAYOUT),
+    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), _layout(KeyMap::NO_LAYOUT),
     _hwProfile(0), prevProfile(0), prevMode(0),
-    cmd(cmdpath), notifyNumber(1), hwLoading(true)
+    cmd(cmdpath), notifyNumber(1), _needsSave(false), hwLoading(true)
 {
     // Get the features, model, serial number, FW version (if available), and poll rate (if available) from /dev nodes
     QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate");
@@ -95,13 +95,14 @@ Kb::~Kb(){
     wait(1000);
     // Reset to hardware profile
     if(_hwProfile){
-        currentProfile = _hwProfile;
+        _currentProfile = _hwProfile;
         hwSave();
     }
     cmd.close();
 }
 
 void Kb::load(QSettings &settings){
+    _needsSave = false;
     // Read layout
     _layout = KeyMap::getLayout(settings.value("Layout").toString());
     if(_layout == KeyMap::NO_LAYOUT){
@@ -122,7 +123,7 @@ void Kb::load(QSettings &settings){
         guid = guid.trimmed().toUpper();
         if(guid != ""){
             KbProfile* profile = new KbProfile(this, getKeyMap(), settings, guid);
-            profiles.append(profile);
+            _profiles.append(profile);
             if(guid == current || !newCurrentProfile)
                 newCurrentProfile = profile;
         }
@@ -133,7 +134,7 @@ void Kb::load(QSettings &settings){
         // If nothing was loaded, load the demo profile
         QSettings demoSettings(":/txt/demoprofile.conf", QSettings::IniFormat, this);
         KbProfile* demo = new KbProfile(this, getKeyMap(), demoSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
-        profiles.append(demo);
+        _profiles.append(demo);
         setCurrentProfile(demo);
     }
 
@@ -141,10 +142,11 @@ void Kb::load(QSettings &settings){
 }
 
 void Kb::save(QSettings& settings){
+    _needsSave = false;
     QString guids, currentGuid;
-    foreach(KbProfile* profile, profiles){
+    foreach(KbProfile* profile, _profiles){
         guids.append(" " + profile->id().guidString());
-        if(profile == currentProfile)
+        if(profile == _currentProfile)
             currentGuid = profile->id().guidString();
         profile->save(settings);
     }
@@ -154,24 +156,24 @@ void Kb::save(QSettings& settings){
 }
 
 void Kb::hwSave(){
-    if(!currentProfile)
+    if(!_currentProfile)
         return;
     // Close active lighting (if any)
     if(prevMode){
         prevMode->light()->close();
         deletePrevious();
     }
-    hwProfile(currentProfile);
+    hwProfile(_currentProfile);
     hwLoading = false;
     // Rewrite the current profile from scratch to ensure consistency
     writeProfileHeader();
     // Write only the base colors of each mode, no animations
     for(int i = 0; i < hwModeCount; i++){
-        KbMode* mode = currentProfile->modes.at(i);
+        KbMode* mode = _currentProfile->modes()[i];
         cmd.write("\n");
         KbLight* light = mode->light();
         light->base(cmd, i);
-        if(mode == currentMode)
+        if(mode == _currentMode)
             cmd.write(" switch");
         // Write the mode name and ID
         cmd.write(" name ");
@@ -194,15 +196,25 @@ void Kb::hwSave(){
     cmd.flush();
 }
 
+bool Kb::needsSave() const {
+    if(_needsSave)
+        return true;
+    foreach(const KbProfile* profile, _profiles){
+        if(profile->needsSave())
+            return true;
+    }
+    return false;
+}
+
 void Kb::writeProfileHeader(){
     cmd.write("eraseprofile");
     // Write the profile name and ID
     cmd.write(" profilename ");
-    cmd.write(QUrl::toPercentEncoding(currentProfile->name()));
+    cmd.write(QUrl::toPercentEncoding(_currentProfile->name()));
     cmd.write(" profileid ");
-    cmd.write(currentProfile->id().guidString().toLatin1());
+    cmd.write(_currentProfile->id().guidString().toLatin1());
     cmd.write(" ");
-    cmd.write(currentProfile->id().modifiedString().toLatin1());
+    cmd.write(_currentProfile->id().modifiedString().toLatin1());
 }
 
 void Kb::layout(KeyMap::Layout newLayout, bool write){
@@ -215,12 +227,12 @@ void Kb::layout(KeyMap::Layout newLayout, bool write){
         cmd.write("\n");
         cmd.flush();
     }
-    foreach(KbProfile* profile, profiles)
+    foreach(KbProfile* profile, _profiles)
         profile->keyMap(getKeyMap());
-    if(_hwProfile && !profiles.contains(_hwProfile))
+    if(_hwProfile && !_profiles.contains(_hwProfile))
         _hwProfile->keyMap(getKeyMap());
     // Stop all animations as they'll need to be restarted
-    foreach(KbMode* mode, currentProfile->modes)
+    foreach(KbMode* mode, _currentProfile->modes())
         mode->light()->close();
     emit infoUpdated();
 }
@@ -242,10 +254,10 @@ void Kb::frameUpdate(){
         mute = MUTED;
 
     // Advance animation frame
-    if(!currentMode)
+    if(!_currentMode)
         return;
-    KbLight* light = currentMode->light();
-    KbBind* bind = currentMode->bind();
+    KbLight* light = _currentMode->light();
+    KbBind* bind = _currentMode->bind();
     if(!light->isStarted()){
         // Don't do anything until the animations are started
         light->open();
@@ -254,24 +266,24 @@ void Kb::frameUpdate(){
 
     // Stop animations on the previously active mode (if any)
     bool changed = false;
-    if(prevMode != currentMode){
+    if(prevMode != _currentMode){
         if(prevMode){
             prevMode->light()->close();
             disconnect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
         }
-        prevMode = currentMode;
+        prevMode = _currentMode;
         connect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
         changed = true;
     }
 
     // If the profile has changed, update it
-    if(prevProfile != currentProfile){
+    if(prevProfile != _currentProfile){
         writeProfileHeader();
         cmd.write(" ");
-        prevProfile = currentProfile;
+        prevProfile = _currentProfile;
     }
     // Update current mode
-    int index = currentProfile->indexOf(currentMode);
+    int index = _currentProfile->indexOf(_currentMode);
     light->frameUpdate(cmd, index, mute != MUTED, !bind->winLock());
     cmd.write(QString(" @%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
@@ -334,7 +346,7 @@ void Kb::readNotify(QString line){
             return;
         QString keyName = key.mid(1);
         bool keyPressed = (key[0] == '+');
-        KbMode* mode = currentMode;
+        KbMode* mode = _currentMode;
         if(mode){
             mode->light()->animKeypress(keyName, keyPressed);
             mode->bind()->keyEvent(keyName, keyPressed);
@@ -347,7 +359,7 @@ void Kb::readNotify(QString line){
         QString guid = components[1];
         QString modified = components[2];
         KbProfile* newProfile = 0;
-        foreach(KbProfile* profile, profiles){
+        foreach(KbProfile* profile, _profiles){
             if(profile->id().guid == guid){
                 newProfile = profile;
                 break;
@@ -371,7 +383,7 @@ void Kb::readNotify(QString line){
         }
         hwProfile(newProfile);
         emit profileAdded();
-        if(_hwProfile == currentProfile)
+        if(_hwProfile == _currentProfile)
             emit profileChanged();
     } else if(components[0] == "hwprofilename"){
         // Hardware profile name
@@ -398,7 +410,7 @@ void Kb::readNotify(QString line){
             // Look for this mode in the hardware profile
             KbMode* hwMode = 0;
             bool isNew = false;
-            foreach(KbMode* mode, _hwProfile->modes){
+            foreach(KbMode* mode, _hwProfile->modes()){
                 if(mode->id().guid == guid){
                     hwMode = mode;
                     if(mode->id().modifiedString() != modified){
@@ -413,19 +425,20 @@ void Kb::readNotify(QString line){
             if(!hwMode){
                 isNew = true;
                 hwMode = new KbMode(this, getKeyMap(), guid, modified);
-                _hwProfile->modes.append(hwMode);
+                _hwProfile->append(hwMode);
                 // If the hardware profile now contains enough modes to be added to the list, do so
-                if(!profiles.contains(_hwProfile) && _hwProfile->modes.count() >= hwModeCount){
-                    profiles.append(_hwProfile);
+                if(!_profiles.contains(_hwProfile) && _hwProfile->modeCount() >= hwModeCount){
+                    _profiles.append(_hwProfile);
+                    _needsSave = true;
                     emit profileAdded();
-                    if(!currentProfile)
+                    if(!_currentProfile)
                         setCurrentProfile(_hwProfile);
                 }
             }
             // If the mode isn't in the right place, move it
-            int index = _hwProfile->modes.indexOf(hwMode);
-            if(isNew && mode < _hwProfile->modes.count() && index != mode)
-                _hwProfile->modes.move(index, mode);
+            int index = _hwProfile->indexOf(hwMode);
+            if(isNew && mode < _hwProfile->modeCount() && index != mode)
+                _hwProfile->move(index, mode);
             // If loading hardware profile, fetch the updated data
             if(isNew && hwLoading){
                 cmd.write(QString("@%1 mode %2 get :hwname :hwrgb\n").arg(notifyNumber).arg(mode + 1).toLatin1());
@@ -433,22 +446,22 @@ void Kb::readNotify(QString line){
             }
         } else if(components[2] == "hwname"){
             // Mode name - update list
-            if(!_hwProfile || _hwProfile->modes.count() <= mode)
+            if(!_hwProfile || _hwProfile->modeCount() <= mode)
                 return;
-            KbMode* hwMode = _hwProfile->modes[mode];
+            KbMode* hwMode = _hwProfile->modes()[mode];
             QString name = QUrl::fromPercentEncoding(components[3].toUtf8());
             QString oldName = hwMode->name();
             if(!(oldName.length() >= name.length() && oldName.left(name.length()) == name)){
                 // Don't change the name if it's a truncated version of what we already have
                 hwMode->name(name);
-                if(_hwProfile == currentProfile)
+                if(_hwProfile == _currentProfile)
                     emit modeRenamed();
             }
         } else if(components[2] == "hwrgb"){
             // RGB - set mode lighting
-            if(!_hwProfile || _hwProfile->modes.count() <= mode)
+            if(!_hwProfile || _hwProfile->modeCount() <= mode)
                 return;
-            KbLight* light = _hwProfile->modes[mode]->light();
+            KbLight* light = _hwProfile->modes()[mode]->light();
             // If it's a color command, scan the input
             QColor lightColor = QColor();
             for(int i = 3; i < components.count(); i++){
@@ -511,21 +524,23 @@ KeyMap Kb::getKeyMap(){
 }
 
 void Kb::setCurrentProfile(KbProfile *profile, bool spontaneous){
-    while(profile->modes.count() < hwModeCount)
-        profile->modes.append(new KbMode(this, getKeyMap()));
-    KbMode* mode = profile->currentMode;
+    while(profile->modeCount() < hwModeCount)
+        profile->append(new KbMode(this, getKeyMap()));
+    KbMode* mode = profile->currentMode();
     if(!mode)
-        mode = profile->currentMode = profile->modes.first();
+        profile->currentMode(mode = profile->modes().first());
     setCurrentMode(profile, mode, spontaneous);
 }
 
 void Kb::setCurrentMode(KbProfile* profile, KbMode* mode, bool spontaneous){
-    if(currentProfile != profile){
-        currentProfile = profile;
+    if(_currentProfile != profile){
+        _currentProfile = profile;
+        _needsSave = true;
         emit profileChanged();
     }
-    if(currentMode != mode || currentProfile->currentMode != mode){
-        currentMode = currentProfile->currentMode = mode;
+    if(_currentMode != mode || _currentProfile->currentMode() != mode){
+        _currentProfile->currentMode(_currentMode = mode);
+        _needsSave = true;
         emit modeChanged(spontaneous);
     }
 }

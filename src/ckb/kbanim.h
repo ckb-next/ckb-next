@@ -24,6 +24,7 @@ public:
     KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings& settings);
     // Save an animation to settings
     void save(QSettings& settings);
+    inline bool needsSave() const { return _needsSave; }
 
     // Create a new animation
     KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, const AnimScript* script);
@@ -63,13 +64,13 @@ public:
 
     // Animation properties
     inline const QUuid& guid() const { return _guid; }
-    inline void newId() { _guid = QUuid::createUuid(); }
+    inline void newId() { _needsSave = true; _guid = QUuid::createUuid(); }
     inline const QString& name() const { return _name; }
-    inline void name(const QString& newName) { _name = newName; }
+    inline void name(const QString& newName) { _needsSave = true; _name = newName; }
     inline float opacity() const { return _opacity; }
-    inline void opacity(float newOpacity) { _opacity = newOpacity; }
+    inline void opacity(float newOpacity) { _needsSave = true; _opacity = newOpacity; }
     inline Mode mode() const { return _mode; }
-    inline void mode(Mode newMode) { _mode = newMode; }
+    inline void mode(Mode newMode) { _needsSave = true; _mode = newMode; }
 
     // Animation script properties
     const AnimScript* script() const { return _script; }
@@ -105,6 +106,7 @@ private:
     QString _name;
     float _opacity;
     Mode _mode;
+    bool _needsSave;
 };
 
 #endif // KBANIM_H

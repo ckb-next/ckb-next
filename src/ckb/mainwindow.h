@@ -54,6 +54,7 @@ public:
 private slots:
     void timerTick();
     void showWindow();
+    void quitApp();
     void cleanup();
     void showFwUpdateNotification(QWidget* widget, float version);
 

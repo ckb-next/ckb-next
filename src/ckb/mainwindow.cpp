@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSharedMemory>
+#include <QShortcut>
 #include <QMessageBox>
 #include <QMenuBar>
 
@@ -40,10 +41,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMenuBar* menuBar = new QMenuBar(this);
     setMenuBar(menuBar);
     this->menuBar()->addMenu("ckb")->addAction(closeAction);
+#else
+    // On linux, add a handler for Ctrl+Q
+    new QShortcut(QKeySequence("Ctrl+Q"), this, SLOT(quitApp()));
 #endif
 
-    connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
-    connect(closeAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(quitApp()));
+    connect(closeAction, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
@@ -212,6 +216,10 @@ void MainWindow::showWindow(){
     // QTrayIcon has some issues...
     trayIcon->hide();
     trayIcon->show();
+}
+
+void MainWindow::quitApp(){
+    qApp->quit();
 }
 
 void MainWindow::cleanup(){

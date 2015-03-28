@@ -58,7 +58,7 @@ OSX Installation
 
 Pre-compiled binaries for OSX are provided by Xiy. They may be updated less frequently.
 
-[Click here to download the latest version (alpha-v0.0.42).](https://github.com/ccMSC/ckb/releases/download/0.0.42-alpha/ckb-0.0.42-alpha-osx.zip)
+[Click here to download the latest version (alpha-v0.0.52).](https://github.com/ccMSC/ckb/releases/download/0.0.52/ckb-0.0.52-osx.zip)
 
 #### Building from source:
 

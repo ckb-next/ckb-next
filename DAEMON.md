@@ -2,7 +2,7 @@ The daemon provides devices at `/dev/input/ckb*`, where * is the device number, 
 
 After running the daemon, it will log some status messages to the terminal and you should now be able to access `/dev/input/ckb*`.
 
-**Mac note:** The devices on OSX are located at `/tmp/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input` in this document, replace it with `/tmp`.
+**Mac note:** The devices on OSX are located at `/var/run/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input` in this document, replace it with `/var/run`.
 
 `/dev/input/ckb0` contains the following files:
 - `connected`: A list of all connected keyboards, one per line. Each line contains a device path followed by the device's serial number and its description.

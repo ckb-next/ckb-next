@@ -10,7 +10,7 @@
 #ifndef OS_MAC
 const char *const devpath = "/dev/input/ckb";
 #else
-const char *const devpath = "/tmp/ckb";
+const char *const devpath = "/var/run/ckb";
 #endif
 
 long gid = -1;

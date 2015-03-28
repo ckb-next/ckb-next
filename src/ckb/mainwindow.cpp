@@ -16,7 +16,7 @@ static const QString configLabel = "Settings";
 #ifndef __APPLE__
 QString devpath = "/dev/input/ckb%1";
 #else
-QString devpath = "/tmp/ckb%1";
+QString devpath = "/var/run/ckb%1";
 #endif
 
 QTimer* eventTimer = 0;

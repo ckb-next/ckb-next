@@ -1,7 +1,7 @@
+#ifdef OS_MAC
+
 #include <mach/mach_time.h>
 #include "includes.h"
-
-#ifdef OS_MAC
 
 // ¯\_(ツ)_/¯
 

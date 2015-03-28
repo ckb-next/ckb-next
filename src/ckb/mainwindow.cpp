@@ -213,9 +213,11 @@ void MainWindow::showWindow(){
     showNormal();
     raise();
     activateWindow();
+#ifdef Q_OS_MACX
     // QTrayIcon has some issues...
     trayIcon->hide();
     trayIcon->show();
+#endif
 }
 
 void MainWindow::quitApp(){

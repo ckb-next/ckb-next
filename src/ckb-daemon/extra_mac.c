@@ -14,13 +14,14 @@ void *memrchr(const void *s, int c, size_t n){
     return 0;
 }
 
-unsigned long getfactor(){
+// Mach timebase scale
+double getfactor(){
     static unsigned long factor = 0;
     if(factor)
         return factor;
     mach_timebase_info_data_t info;
     mach_timebase_info(&info);
-    return factor = info.numer / info.denom;
+    return factor = (double)info.numer / (double)info.denom;
 }
 
 int clock_gettime(clockid_t clk_id, struct timespec *tp){
@@ -43,7 +44,7 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp, 
         // Determine the amount of time left to wait
         struct timespec curtime, realtime;
         clock_gettime(clock_id, &curtime);
-        if(curtime.tv_sec > rqtp->tv_sec || (curtime.tv_sec == rqtp->tv_sec && curtime.tv_nsec >= rqtp->tv_nsec))
+        if(timespec_ge(curtime, *rqtp))
             // Time already passed
             return 0;
         realtime.tv_sec = rqtp->tv_sec - curtime.tv_sec;

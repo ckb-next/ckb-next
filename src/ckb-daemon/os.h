@@ -44,8 +44,8 @@
 
 #include <Carbon/Carbon.h>
 #include <IOKit/hid/IOHIDLib.h>
+#include <IOKit/hidsystem/IOHIDLib.h>
 #include <IOKit/hidsystem/ev_keymap.h>
-#include <IOKit/pwr_mgt/IOPMLib.h>
 
 // Various POSIX functions that aren't present on OSX
 

@@ -149,8 +149,8 @@ typedef struct {
     IOReturn lastError;
     IOHIDDeviceRef handle;
     IOHIDDeviceRef handles[4];
-    CGEventSourceRef event;
-    CGEventFlags lflags, rflags, eventflags;
+    io_connect_t event;
+    IOOptionBits lflags, rflags, eventflags;
     struct timespec keyrepeat;
     short lastkeypress;
 #endif

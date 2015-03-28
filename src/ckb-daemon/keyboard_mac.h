@@ -121,6 +121,7 @@
 #define KEY_KP0             kVK_ANSI_Keypad0
 
 #define KEY_MEDIA           1000
+#define IS_MEDIA(scancode)  ((scancode) >= KEY_MEDIA)
 #define KEY_MUTE            (KEY_MEDIA + NX_KEYTYPE_MUTE)
 #define KEY_VOLUMEUP        (KEY_MEDIA + NX_KEYTYPE_SOUND_UP)
 #define KEY_VOLUMEDOWN      (KEY_MEDIA + NX_KEYTYPE_SOUND_DOWN)

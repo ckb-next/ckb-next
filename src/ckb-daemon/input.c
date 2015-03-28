@@ -11,14 +11,6 @@ int macromask(const uchar* key1, const uchar* key2){
     return 1;
 }
 
-#ifdef OS_LINUX
-// Is a key a modifier?
-#define IS_MOD(s) ((s) == KEY_CAPSLOCK || (s) == KEY_NUMLOCK || (s) == KEY_SCROLLLOCK || (s) == KEY_LEFTSHIFT || (s) == KEY_RIGHTSHIFT || (s) == KEY_LEFTCTRL || (s) == KEY_RIGHTCTRL || (s) == KEY_LEFTMETA || (s) == KEY_RIGHTMETA || (s) == KEY_LEFTALT || (s) == KEY_RIGHTALT)
-#else
-// Scroll Lock and Num Lock aren't modifiers on OSX
-#define IS_MOD(s) ((s) == KEY_CAPSLOCK || (s) == KEY_LEFTSHIFT || (s) == KEY_RIGHTSHIFT || (s) == KEY_LEFTCTRL || (s) == KEY_RIGHTCTRL || (s) == KEY_LEFTMETA || (s) == KEY_RIGHTMETA || (s) == KEY_LEFTALT || (s) == KEY_RIGHTALT)
-#endif
-
 void inputupdate(usbdevice* kb){
 #ifdef OS_LINUX
     if(!kb->uinput)

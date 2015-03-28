@@ -18,7 +18,7 @@ macx {
 QMAKE_CFLAGS += -std=c99 -Wno-unused-parameter -Werror=implicit
 
 macx {
-    LIBS += -framework AppKit -framework CoreFoundation -framework CoreGraphics -framework IOKit -liconv
+    LIBS += -framework CoreFoundation -framework IOKit -liconv
 } else {
     LIBS += -lpthread -ludev
 }
@@ -45,7 +45,8 @@ SOURCES += \
     keyboard_se.c \
     keyboard_gb.c \
     keyboard_de.c \
-    keyboard_fr.c
+    keyboard_fr.c \
+    extra_mac.c
 
 HEADERS += \
     device.h \
@@ -62,5 +63,4 @@ HEADERS += \
     firmware.h \
     profile.h
 
-OBJECTIVE_SOURCES += \
-    extra_mac.m
+OBJECTIVE_SOURCES +=

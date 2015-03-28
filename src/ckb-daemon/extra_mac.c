@@ -1,17 +1,9 @@
-#import <Foundation/Foundation.h>
-#import <AppKit/AppKit.h>
 #include <mach/mach_time.h>
 #include "includes.h"
 
+#ifdef OS_MAC
+
 // ¯\_(ツ)_/¯
-
-long keyrepeatdelay(){
-    return round([NSEvent keyRepeatDelay] * 1000000000.);
-}
-
-long keyrepeatinterval(){
-    return round([NSEvent keyRepeatInterval] * 1000000000.);
-}
 
 void *memrchr(const void *s, int c, size_t n){
     const char* cs = s;
@@ -73,8 +65,4 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp, 
     return errno;
 }
 
-// Creates a media key event. This isn't possible using a standard CGEventCreate.
-CGEventRef media_event(uint data1, uint modifiers){
-    NSEvent* event = [NSEvent otherEventWithType:NSSystemDefined location:CGPointMake(0, 0) modifierFlags:modifiers timestamp:[[NSProcessInfo processInfo] systemUptime] windowNumber:0 context:0 subtype:NX_SUBTYPE_AUX_CONTROL_BUTTONS data1:data1 data2:0];
-    return [event CGEvent];
-}
+#endif

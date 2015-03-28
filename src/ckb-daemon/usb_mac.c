@@ -256,59 +256,11 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
 static IOHIDManagerRef usbmanager;
 static pthread_t usbthread;
 static pthread_t keyrepeatthread;
-static CFMachPortRef eventTap;
-
-CGEventRef tapcallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon){
-    if(type == kCGEventTapDisabledByUserInput || type == kCGEventTapDisabledByTimeout){
-        // Re-enable the tap if it gets disabled
-        CGEventTapEnable(eventTap, true);
-        return 0;
-    }
-    if(type == kCGEventKeyDown || type == kCGEventKeyUp || type == kCGEventFlagsChanged){
-        CGEventFlags flags = CGEventGetFlags(event);
-        // This flag gets inserted into all of our keyboard events automatically. It can't be removed when the event is broadcast.
-        // It must be removed or else Cmd+Option+Esc, but ONLY Cmd+Option+Esc, fails to work.
-        //  LOGIC! 
-        flags &= ~0x20000000;
-        CGEventSetFlags(event, flags);
-    } else {
-        CGEventFlags flags = CGEventGetFlags(event);
-        for(int i = 1; i < DEV_MAX; i++)
-            flags |= keyboard[i].eventflags;
-        CGEventSetFlags(event, flags);
-    }
-    return event;
-}
-
-extern long keyrepeatinterval();
-extern void keyretrigger(usbdevice*, int);
-
-void* krthread(void* context){
-    while(1){
-        // Re-scan every 1ms
-        usleep(1000);
-        long interval = keyrepeatinterval();
-        struct timespec time;
-        clock_gettime(CLOCK_MONOTONIC, &time);
-        for(int i = 1; i < DEV_MAX; i++){
-            if(IS_CONNECTED(keyboard + i)){
-                pthread_mutex_lock(&keyboard[i].keymutex);
-                if(keyboard[i].lastkeypress != KEY_NONE){
-                    // Repeat the key as many times as needed to catch up
-                    while(timespec_ge(time, keyboard[i].keyrepeat)){
-                        keyretrigger(keyboard + i, keyboard[i].lastkeypress);
-                        timespec_add(&keyboard[i].keyrepeat, interval);
-                    }
-                }
-                pthread_mutex_unlock(&keyboard[i].keymutex);
-            }
-        }
-    }
-    return 0;
-}
+// input_mac.c
+extern void* krthread(void* context);
 
 void* threadrun(void* context){
-    // Tell it which devices we want to look for
+    // Tell the device manager which devices we want to look for
     CFMutableArrayRef devices = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     if(devices){
         int vendor = V_CORSAIR;
@@ -332,15 +284,7 @@ void* threadrun(void* context){
     IOHIDManagerScheduleWithRunLoop(usbmanager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
     IOHIDManagerOpen(usbmanager, kIOHIDOptionsTypeSeizeDevice);
 
-    // Run an event tap to modify the state of mouse events. The OS won't take care of this for us so this is needed for Shift and other modifiers to work
-    while(!eventTap){
-        // When the daemon is run at boot the event tap might not work immediately, so wait until it does.
-        usleep(0);
-        eventTap = CGEventTapCreate(kCGHIDEventTap, kCGHeadInsertEventTap, kCGEventTapOptionDefault, kCGEventMaskForAllEvents, tapcallback, 0);
-    }
-    CFRunLoopAddSource(CFRunLoopGetCurrent(), CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0), kCFRunLoopDefaultMode);
-
-    // Another thing the OS won't do on its own: key repeats. Make a new thread for that
+    // Make a new thread to handle key repeats. The OS won't do it for us.
     pthread_create(&keyrepeatthread, 0, krthread, 0);
 
     // Run the event loop. Existing devices will be detected automatically.

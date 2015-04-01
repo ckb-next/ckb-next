@@ -80,7 +80,8 @@ SOURCES += main.cpp\
     quazip/unzip.c \
     quazip/zip.c \
     kbfirmware.cpp \
-    fwupgradedialog.cpp
+    fwupgradedialog.cpp \
+    autorun.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -126,7 +127,8 @@ HEADERS  += mainwindow.h \
     quazip/unzip.h \
     quazip/zip.h \
     kbfirmware.h \
-    fwupgradedialog.h
+    fwupgradedialog.h \
+    autorun.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \

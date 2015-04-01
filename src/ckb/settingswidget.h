@@ -31,6 +31,8 @@ private slots:
 
     void on_autoFWBox_clicked(bool checked);
 
+    void on_loginItemBox_clicked(bool checked);
+
 private:
     Ui::SettingsWidget *ui;
     friend class MainWindow;

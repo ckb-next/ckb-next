@@ -1,6 +1,7 @@
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
 #include "animscript.h"
+#include "autorun.h"
 #include "mainwindow.h"
 #include <unistd.h>
 
@@ -83,6 +84,16 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 
     // Read auto update settings
     ui->autoFWBox->setChecked(!settings.value("DisableAutoFWCheck").toBool());
+
+    // Read auto run settings
+    if(!AutoRun::available())
+        ui->loginItemBox->hide();
+    else {
+        if(!AutoRun::once())
+            // If this is the first time running the app, enable auto run by default
+            AutoRun::enable();
+        ui->loginItemBox->setChecked(AutoRun::isEnabled());
+    }
 
     ui->animPathLabel->setText(AnimScript::path());
     on_animScanButton_clicked();
@@ -172,4 +183,11 @@ void SettingsWidget::on_winBox_activated(int index){
 void SettingsWidget::on_autoFWBox_clicked(bool checked){
     QSettings settings;
     settings.setValue("Program/DisableAutoFWCheck", !checked);
+}
+
+void SettingsWidget::on_loginItemBox_clicked(bool checked){
+    if(checked)
+        AutoRun::enable();
+    else
+        AutoRun::disable();
 }

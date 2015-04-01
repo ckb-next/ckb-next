@@ -14,6 +14,40 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="22" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>© 2014-2015. Licensed under GPLv2.</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Quit ckb</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="10" column="1">
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="0" column="3">
@@ -214,7 +248,7 @@
      </property>
     </widget>
    </item>
-   <item row="19" column="0" colspan="2">
+   <item row="21" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>&lt;a href=&quot;https://github.com/ccMSC/ckb&quot;&gt;https://github.com/ccMSC/ckb&lt;/a&gt;</string>
@@ -223,40 +257,6 @@
       <bool>true</bool>
      </property>
     </widget>
-   </item>
-   <item row="20" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>© 2014-2015. Licensed under GPLv2.</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Quit ckb</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item row="1" column="0" colspan="2">
     <widget class="Line" name="line">
@@ -281,7 +281,7 @@
      </property>
     </spacer>
    </item>
-   <item row="17" column="0" colspan="2">
+   <item row="19" column="0" colspan="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -476,6 +476,13 @@
      </property>
     </widget>
    </item>
+   <item row="17" column="1">
+    <widget class="QCheckBox" name="loginItemBox">
+     <property name="text">
+      <string>Start ckb at login</string>
+     </property>
+    </widget>
+   </item>
    <item row="7" column="0" colspan="2">
     <widget class="Line" name="line_3">
      <property name="sizePolicy">
@@ -532,9 +539,9 @@
     </widget>
    </item>
    <item row="16" column="1">
-    <widget class="QCheckBox" name="loginItemBox">
+    <widget class="QCheckBox" name="trayBox">
      <property name="text">
-      <string>Start ckb at login</string>
+      <string>Show tray icon</string>
      </property>
     </widget>
    </item>

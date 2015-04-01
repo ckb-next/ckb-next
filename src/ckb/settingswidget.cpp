@@ -85,6 +85,9 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     // Read auto update settings
     ui->autoFWBox->setChecked(!settings.value("DisableAutoFWCheck").toBool());
 
+    // Read tray icon setting
+    ui->trayBox->setChecked(!settings.value("SuppressTrayIcon").toBool());
+
     // Read auto run settings
     if(!AutoRun::available())
         ui->loginItemBox->hide();
@@ -190,4 +193,10 @@ void SettingsWidget::on_loginItemBox_clicked(bool checked){
         AutoRun::enable();
     else
         AutoRun::disable();
+}
+
+void SettingsWidget::on_trayBox_clicked(bool checked){
+    QSettings settings;
+    settings.setValue("Program/SuppressTrayIcon", !checked);
+    MainWindow::mainWindow->trayIcon->setVisible(checked);
 }

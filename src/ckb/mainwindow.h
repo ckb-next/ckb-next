@@ -51,6 +51,8 @@ public:
 
     void closeEvent(QCloseEvent *event);
 
+    static MainWindow* mainWindow;
+
 private slots:
     void timerTick();
     void showWindow();

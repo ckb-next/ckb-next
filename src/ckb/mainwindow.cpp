@@ -20,12 +20,14 @@ QString devpath = "/var/run/ckb%1";
 #endif
 
 QTimer* eventTimer = 0;
+MainWindow* MainWindow::mainWindow = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    mainWindow = this;
 
     trayIconMenu = new QMenu(this);
     restoreAction = new QAction(tr("Restore"), this);
@@ -34,7 +36,9 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIconMenu->addAction(closeAction);
     trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-logo.png"), this);
     trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->show();
+    QSettings settings;
+    if(!settings.value("Program/SuppressTrayIcon").toBool())
+        trayIcon->show();
 
 #ifdef Q_OS_MACX
     // Make a custom "Close" menu action for OSX, as the default one brings up the "still running" popup unnecessarily
@@ -186,7 +190,11 @@ void MainWindow::closeEvent(QCloseEvent *event){
         event->accept();
         return;
     }
-    QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb\" on the Settings screen.");
+    QSettings settings;
+    if(!settings.value("Popups/BGWarning").toBool()){
+        QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb\" on the Settings screen.");
+        settings.setValue("Popups/BGWarning", true);
+    }
     hide();
     event->ignore();
 }
@@ -215,8 +223,11 @@ void MainWindow::showWindow(){
     activateWindow();
 #ifdef Q_OS_MACX
     // QTrayIcon has some issues...
-    trayIcon->hide();
-    trayIcon->show();
+    QSettings settings;
+    if(!settings.value("Program/SuppressTrayIcon").toBool()){
+        trayIcon->hide();
+        trayIcon->show();
+    }
 #endif
 }
 

@@ -5,13 +5,17 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ckb
 TEMPLATE = app
+# GL isn't needed
+QMAKE_LIBS_OPENGL =
 
+# Output path
 macx {
     DESTDIR = $$PWD/../..
 } else {
     DESTDIR = $$PWD/../../bin
 }
 
+# OSX settings
 QMAKE_MAC_SDK = macosx10.10
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 ICON = ckb-logo.icns
@@ -20,9 +24,11 @@ macx {
     LIBS += -framework Foundation -framework AudioToolbox
 }
 
+# Load version number from VERSION file
 CKB_VERSION_STR = `cat $$PWD/../../VERSION`
 DEFINES += CKB_VERSION_STR="\\\"$$CKB_VERSION_STR\\\""
 
+# Zip library for decompressing firmwares
 LIBS += -lz
 DEFINES += QUAZIP_STATIC
 

@@ -1,0 +1,170 @@
+#!/bin/bash
+# ckb auto build/install script
+
+# Temporary files for program output
+TMPFILE=`mktemp /tmp/ckb.XXXXXXXX`
+function newtmp {
+    rm -f $TMPFILE
+    TMPFILE=`mktemp /tmp/ckb.XXXXXXXX`
+}
+
+# Check for failure, quit if unsuccessful
+function checkfail {
+    if [[ $1 -ne 0 ]]; then
+        cat $TMPFILE
+        finish $1
+    fi
+}
+
+# Exit function
+function finish {
+    rm -f $TMPFILE
+    echo ""
+    echo "Press enter to exit."
+    read -rs dummy
+    exit $1
+}
+
+# Directories
+cd "`dirname \"$0\"`"
+SRCDIR="src"
+BINDIR="bin"
+[[ "$OSTYPE" == "darwin"* ]] && BINDIR="ckb.app"
+# This script respects the PREFIX variable on Linux (always /Applications on OSX)
+[[ $PREFIX == "" ]] && PREFIX="/usr/bin"
+[[ "$OSTYPE" == "darwin"* ]] && PREFIX="/Applications"
+
+if [[ `pwd` == *" "* ]]; then
+    echo "Error: you must compile ckb in a directory with no spaces."
+    echo "Move or rename the folder and try again."
+    finish 1
+fi
+
+if [[ -d $SRCDIR ]]; then
+    # Generate makefiles
+    echo "Preparing build files..."
+    ./qmake-auto $QMAKEFLAGS > $TMPFILE 2>&1
+    checkfail $?
+    # Run make with command arguments
+    echo "Compiling binaries..."
+    echo "(This can take a while, please be patient)"
+    newtmp
+    make -j 24 "$@" 2>$TMPFILE
+    checkfail $?
+    echo ""
+    echo "Finished!"
+fi
+if [[ ! -d $BINDIR ]]; then
+    # No binaries and no source ($SRCDIR branch will surely create $BINDIR or die trying)
+    echo "There is nothing to do."
+    finish 0
+fi
+
+# Offer to install ckb at a standard location
+shopt -s nocasematch
+read -rp "Install ckb system-wide [Y/n]? " doinstall
+if [[ $doinstall =~ no? ]]; then
+    echo "ckb will not be installed system-wide or run as a service."
+    echo "Re-run this script if you change your mind."
+    finish 0
+fi
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # OSX
+    # Run macdeployqt to avoid linking problems
+    [[ $MACDEPLOYQT == "" ]] && MACDEPLOYQT=`find ~/Qt/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name macdeployqt -print -quit 2>/dev/null`
+    $MACDEPLOYQT ckb.app >/dev/null 2>&1
+    # Install
+    sudo cp -R ckb.app /Applications
+    [[ $? -ne 0 ]] && exit 0
+    echo "Installed at /Applications/ckb.app"
+else
+    # Linux
+    # Install apps
+    sudo install bin/ckb $PREFIX/ckb
+    [[ $? -ne 0 ]] && exit 0
+    sudo install bin/ckb-daemon $PREFIX/ckb-daemon
+    [[ $? -ne 0 ]] && exit 0
+    sudo mkdir -p $PREFIX/ckb-animations
+    [[ $? -ne 0 ]] && exit 0
+    sudo install bin/ckb-animations/* $PREFIX/ckb-animations
+    [[ $? -ne 0 ]] && exit 0
+    # Install .desktop and icon
+    sudo mkdir -p /usr/share/applications
+    [[ $? -ne 0 ]] && exit 0
+    sudo install usr/ckb.desktop /usr/share/applications/ckb.desktop
+    sudo mkdir -p /usr/share/icons/hicolor/512x512/apps
+    [[ $? -ne 0 ]] && exit 0
+    sudo install usr/ckb.png /usr/share/icons/hicolor/512x512/apps/ckb.png
+    echo "Installed in $PREFIX"
+fi
+
+# Offer to run as a system service
+systemd=`systemctl --version 2>/dev/null`
+systemdc=$?
+upstart=`service --version 2>/dev/null`
+upstartc=$?
+launchd=`launchctl version 2>/dev/null`
+launchdc=$?
+
+echo ""
+if [[ $systemdc -eq 0 && `echo "$systemd" | wc -l` -ge 1 ]]; then
+    echo "System service: systemd detected"
+    read -rp "Run the driver as a startup service [Y/n]? " doservice
+    if [[ $doservice =~ no? ]]; then
+        echo "You will need to start the driver manually."
+        echo "Re-run this script if you change your mind."
+    else
+        sudo install service/systemd/ckb-daemon.service /usr/lib/systemd/system
+        [[ $? -ne 0 ]] && exit 0
+        sudo systemctl enable ckb-daemon
+        [[ $? -ne 0 ]] && exit 0
+        sudo systemctl start ckb-daemon
+        [[ $? -ne 0 ]] && exit 0
+    fi
+elif [[ $upstartc -eq 0 && `echo $upstart | wc -l` -ge 1 ]]; then
+    echo "System service: Upstart detected"
+    read -rp "Run the driver as a startup service [Y/n]? " doservice
+    if [[ $doservice =~ no? ]]; then
+        echo "You will need to start the driver manually."
+        echo "Re-run this script if you change your mind."
+    else
+        sudo install service/upstart/ckb-daemon.conf /etc/init
+        [[ $? -ne 0 ]] && exit 0
+        sudo service ckb-daemon start
+    fi
+elif [[ $launchdc -eq 0 && `echo "$launchd" | wc -l` -ge 1 ]]; then
+    echo "System service: launchd detected"
+    read -rp "Run the driver as a startup service [Y/n]? " doservice
+    if [[ $doservice =~ no? ]]; then
+        echo "You will need to start the driver manually."
+        echo "Re-run this script if you change your mind."
+    else
+        # Running the driver immediately can cause enter to get spammed. Wait for the key to release first.
+        sleep 0.5
+        sudo cp service/launchd/com.ckb.daemon.plist /Library/LaunchDaemons
+        [[ $? -ne 0 ]] && exit 0
+        sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist
+        [[ $? -ne 0 ]] && exit 0
+        sudo chmod 0700 /Library/LaunchDaemons/com.ckb.daemon.plist
+        [[ $? -ne 0 ]] && exit 0
+        sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist
+        [[ $? -ne 0 ]] && exit 0
+    fi
+else
+    echo "No supported system service daemons detected."
+    echo "You will need to start the driver manually."
+    read -rp "Start it now [Y/n]? " dodriver
+    if [[ ! $dodriver =~ no? ]]; then
+        sudo nohup $PREFIX/ckb-daemon >/dev/null 2>&1 &
+        [[ $? -ne 0 ]] && exit 0
+    fi
+fi
+
+echo ""
+read -rp "Start ckb now [Y/n]? " dolaunch
+[[ $dolaunch =~ no? ]] && exit 0
+sleep 0.2
+APP=$PREFIX/ckb
+[[ "$OSTYPE" == "darwin"* ]] && APP=$APP.app/Contents/MacOS/ckb
+nohup $APP >/dev/null 2>&1 &
+exit 0

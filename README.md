@@ -31,6 +31,12 @@ Linux Installation
 
 Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libudev-dev`, `build-essential`, `zlib1g-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). Check with your package manager to make sure you have the correct libraries/headers installed.
 
+#### Automatic build:
+
+The quickest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will compile the application and then ask you if you'd like to install it (default answer is "yes"; press Enter to continue). Once installed, it will launch the driver and open the user interface. You do not need to follow any of the other instructions unless the automatic build fails.
+
+#### Manual build:
+
 You can build the project by running `./qmake-auto && make` in a Terminal in the directory you downloaded it to. The binaries will be placed in a new `bin` directory assuming they compile successfully.
 
 #### Running as a service (recommended):
@@ -63,6 +69,14 @@ Pre-compiled binaries for OSX are provided by Xiy. They may be updated less freq
 #### Building from source:
 
 Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
+
+#### Automatic build:
+
+The quickest way to install ckb is to open `quickinstall`. It will compile the application and then ask you if you'd like to install it (default answer is "yes"; press Enter to continue). Once installed, it will launch the driver and open the user interface. You do not need to follow any of the other instructions unless the automatic build fails.
+
+You can also use `quickinstall` with the pre-compiled version: Download the ckb binary and then download the source zip. Copy `quickinstall` and `service` from the source directory into the binary directory and then run `quickinstall`.
+
+#### Manual build:
 
 Open ckb.pro in Qt Creator. You should be prompted to configure the project (make sure the "Desktop" configuration is selected and not iOS). Once it's finished loading the project, press `Cmd+B` or select `Build > Build Project "ckb"` from the menu bar. When it'd done, you should see a newly-created `ckb.app` application in the project directory. Exit Qt Creator.
 
@@ -98,7 +112,6 @@ The user interface is still a work in progress.
 **Roadmap** (roughly in order)
 - **v0.1 release:**
 - Animation presets
-- Script to automatically build/install ckb and run it as a service
 - **v0.2 release:**
 - More functions for the Win Lock key
 - Key combos

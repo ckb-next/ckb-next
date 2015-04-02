@@ -151,18 +151,13 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     } else {
         // For any other key, trigger key repeat
         if(down){
-            if((scancode == KEY_VOLUMEUP || scancode == KEY_VOLUMEDOWN) && kb->model != 65)
-                // Set a 1ms timeout for the volume wheel
-                timespec_add(&kb->keyrepeat, 1000000);
-            else {
-                long repeat = repeattime(kb->event, 1);
-                if(repeat > 0){
-                    kb->lastkeypress = scancode;
-                    clock_gettime(CLOCK_MONOTONIC, &kb->keyrepeat);
-                    timespec_add(&kb->keyrepeat, repeat);
-                } else
-                    kb->lastkeypress = KEY_NONE;
-            }
+            long repeat = repeattime(kb->event, 1);
+            if(repeat > 0){
+                kb->lastkeypress = scancode;
+                clock_gettime(CLOCK_MONOTONIC, &kb->keyrepeat);
+                timespec_add(&kb->keyrepeat, repeat);
+            } else
+                kb->lastkeypress = KEY_NONE;
         } else
             kb->lastkeypress = KEY_NONE;
     }
@@ -175,12 +170,6 @@ void keyretrigger(usbdevice* kb){
     if(scancode < 0)
         return;
     // Retrigger the last-pressed key
-    if((scancode == KEY_VOLUMEUP || scancode == KEY_VOLUMEDOWN) && kb->model != 65){
-        // Volume wheel doesn't repeat
-        postevent(kb->event, kb->eventflags, scancode, 0, 0, 0);
-        kb->lastkeypress = KEY_NONE;
-        return;
-    }
     postevent(kb->event, kb->eventflags, scancode, 1, 0, 1);
     // Set next key repeat time
     long repeat = repeattime(kb->event, 0);

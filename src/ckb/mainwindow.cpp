@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(closeAction, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
@@ -217,18 +218,15 @@ void MainWindow::timerTick(){
     scanKeyboards();
 }
 
+void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason){
+    if(reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick)
+        showWindow();
+}
+
 void MainWindow::showWindow(){
     showNormal();
     raise();
     activateWindow();
-#ifdef Q_OS_MACX
-    // QTrayIcon has some issues...
-    QSettings settings;
-    if(!settings.value("Program/SuppressTrayIcon").toBool()){
-        trayIcon->hide();
-        trayIcon->show();
-    }
-#endif
 }
 
 void MainWindow::quitApp(){

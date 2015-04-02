@@ -55,6 +55,7 @@ public:
 
 private slots:
     void timerTick();
+    void iconClicked(QSystemTrayIcon::ActivationReason reason);
     void showWindow();
     void quitApp();
     void cleanup();

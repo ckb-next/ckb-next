@@ -174,6 +174,6 @@ Known issues
 - Using the keyboard in BIOS mode prevents the media keys (including mute and volume wheel) from working. This is a hardware limitation.
 - In BIOS mode, keys sometimes get "stuck" or stop responding. It appears to be a firmware bug. Using the keyboard in BIOS mode while running ckb is not recommended.
 - Animations sometimes cause the keyboard to freeze or cause keys to be dropped. These also seem to be firmware bugs; the best way to mitigate them is to decrease the frame rate in ckb or increase the polling interval on the keyboard.
-- The system tray icon doesn't always appear in Linux. Apparently this is a known Qt bug. To bring ckb back after hiding it, re-run the application.
+- The tray icon doesn't always appear even when enabled. Apparently this is a known Qt bug. If you can't see the icon, reopen ckb to bring the window back.
 - When starting the driver manually on OSX, the Terminal window sometimes gets spammed with enter keys. You can stop it by unplugging and replugging the keyboard or by moving the poll rate switch.
 - When stopping the driver manually, the keyboard sometimes stops working completely. This seems to be a hardware/OS communication issue.

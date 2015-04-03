@@ -17,15 +17,17 @@ void postevent(io_connect_t event, int kbflags, int scancode, int down, int is_f
         kp.compound.subType = NX_SUBTYPE_AUX_CONTROL_BUTTONS;
         kp.compound.misc.L[0] = (scancode - KEY_MEDIA) << 16 | (down ? 0x0a00 : 0x0b00) | is_repeat;
         type = NX_SYSDEFINED;
-    } else if(is_flags){
-        type = NX_FLAGSCHANGED;
-        options = kIOHIDSetGlobalEventFlags;
     } else {
-        // Standard key
+        if(is_flags){
+            // Modifier (shift, ctrl, etc)
+            type = NX_FLAGSCHANGED;
+            options = kIOHIDSetGlobalEventFlags;
+        } else
+            // Standard key
+            type = down ? NX_KEYDOWN : NX_KEYUP;
         kp.key.repeat = is_repeat;
         kp.key.keyCode = scancode;
         kp.key.origCharSet = kp.key.charSet = NX_ASCIISET;
-        type = down ? NX_KEYDOWN : NX_KEYUP;
         if(IS_NUMPAD(scancode))
             flags |= NX_NUMERICPADMASK;
         else if(scancode == kVK_Help)
@@ -49,7 +51,7 @@ void postevent(io_connect_t event, int kbflags, int scancode, int down, int is_f
             setegid(gid);
     }
 
-    kern_return_t res = IOHIDPostEvent(event, type, ((IOGPoint[]){{0, 0}})[0], &kp, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
+    kern_return_t res = IOHIDPostEvent(event, type, *(IOGPoint[]){{0, 0}}, &kp, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
     if(res != KERN_SUCCESS)
         printf("Post event failed: %x\n", res);
 
@@ -69,25 +71,25 @@ long repeattime(io_connect_t event, int first){
 }
 
 void clearkeys(usbdevice* kb){
-    // Reset modifiers
-    postevent(kb->event, 0, 0, 0, 1, 0);
     // Send keyup events for every scancode in the keymap
     for(int key = 0; key < N_KEYS; key++){
         int scan = keymap_system[key].scan;
-        if(scan < 0 || IS_MEDIA(scan) || IS_MOD(scan))
+        if(scan < 0 || IS_MEDIA(scan))
             continue;
         postevent(kb->event, 0, scan, 0, 0, 0);
     }
 }
 
 int inputopen(usbdevice* kb){
-    // Create a keyboard driver
+    // Open master port (if not done yet)
     static mach_port_t master = 0;
     kern_return_t res;
-    if(!master && (res = IOMasterPort(bootstrap_port, &master)) != KERN_SUCCESS){
+    if(!master&& (res = IOMasterPort(bootstrap_port, &master)) != KERN_SUCCESS){
+        master = 0;
         printf("Unable to open master port: 0x%08x\n", res);
         return 0;
     }
+    // Open an HID service
     io_iterator_t iter;
     if((res = IOServiceGetMatchingServices(master, IOServiceMatching(kIOHIDSystemClass), &iter)) != KERN_SUCCESS){
         printf("Unable to get input service iterator: 0x%08x\n", res);

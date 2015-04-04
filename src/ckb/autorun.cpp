@@ -19,9 +19,9 @@ static const QString settingPath = "Program/DidLoginItem";
 bool AutoRun::available(){
     // Allow autostart if the program is located in a system path
 #ifdef Q_OS_LINUX
-    return QStandardPaths::findExecutable("ckb") == qApp->arguments()[0];
+    return QDir::root().absoluteFilePath(QStandardPaths::findExecutable("ckb")) == qApp->applicationFilePath();
 #elif defined(Q_OS_MACX)
-    return qApp->arguments()[0].startsWith("/Applications/ckb.app", Qt::CaseInsensitive);
+    return qApp->applicationFilePath().startsWith("/Applications/ckb.app", Qt::CaseInsensitive);
 #endif
 }
 

@@ -15,6 +15,7 @@ public:
     explicit SettingsWidget(QWidget *parent = 0);
     ~SettingsWidget();
 
+    void setVersion(const QString& version);
     void setStatus(const QString& text);
 
 private slots:

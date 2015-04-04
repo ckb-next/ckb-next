@@ -19,7 +19,7 @@ public:
     // Key map
     const KeyMap& map() const { return keyMap; }
     void map(const KeyMap& newMap);
-    // Key -> color map
+    // Key -> color map (must contain exactly the keys in the key map)
     const QHash<QString, QRgb>& colorMap() const { return _colorMap; }
     void colorMap(const QHash<QString, QRgb>& newColorMap);
     // Key -> binding map
@@ -28,6 +28,7 @@ public:
 
     // Set current selection (highlighted in blue)
     void setSelection(const QStringList& keys);
+    void selectAll();
     void clearSelection();
 
     // Set animated keys (highlighted in green)

@@ -7,8 +7,8 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     ui(new Ui::KbLightWidget)
 {
     ui->setupUi(this);
-    ui->bgButton->setVisible(false);
-    ui->animButton->setVisible(false);
+    if(AnimScript::count() == 0)
+        ui->animButton->setVisible(false);
 
     connect(ui->bgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeColor(QColor)));
     connect(ui->keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
@@ -61,16 +61,11 @@ void KbLightWidget::newSelection(QStringList selection){
     int count = selection.count();
     if(count == 0){
         ui->selLabel->setText("Click to select keys");
-        ui->bgButton->setVisible(false);
-        ui->animButton->setVisible(false);
         return;
     } else if(count == 1)
         ui->selLabel->setText("1 key selected");
     else
         ui->selLabel->setText(QString("%1 keys selected").arg(count));
-    ui->bgButton->setVisible(true);
-    if(AnimScript::count() > 0)
-        ui->animButton->setVisible(true);
 }
 
 void KbLightWidget::changeColor(QColor newColor){
@@ -98,9 +93,16 @@ void KbLightWidget::on_brightnessBox_currentIndexChanged(int index){
         light->dimming(index);
 }
 
+void KbLightWidget::on_bgButton_clicked(){
+    if(currentSelection.isEmpty())
+        ui->keyWidget->selectAll();
+}
+
 void KbLightWidget::on_animButton_clicked(){
-    if(currentSelection.count() == 0 || AnimScript::count() == 0)
+    if(AnimScript::count() == 0)
         return;
+    if(currentSelection.isEmpty())
+        ui->keyWidget->selectAll();
     AnimAddDialog dialog(this);
     dialog.exec();
     if(dialog.result() != QDialog::Accepted)

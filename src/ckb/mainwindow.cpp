@@ -11,6 +11,7 @@ extern QSharedMemory appShare;
 float ckbGuiVersion = 0.f;
 // Assume daemon has no version limitations if it's not connected
 float ckbDaemonVersion = INFINITY;
+QString daemonVStr;
 
 static const QString configLabel = "Settings";
 #ifndef __APPLE__
@@ -65,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QCoreApplication::setOrganizationName("ckb");
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
+    settingsWidget->setVersion("ckb " CKB_VERSION_STR);
 
     ckbGuiVersion = PARSE_CKB_VERSION(CKB_VERSION_STR);
     scanKeyboards();
@@ -82,16 +84,17 @@ void MainWindow::scanKeyboards(){
         kbWidgets.clear();
         settingsWidget->setStatus("Driver inactive");
         ckbDaemonVersion = INFINITY;
+        daemonVStr.clear();
         return;
     }
     // Check daemon version
     QFile version(rootdev + "/version");
     if(version.open(QIODevice::ReadOnly)){
-        ckbDaemonVersion = PARSE_CKB_VERSION(QString::fromUtf8(version.readLine()));
+        daemonVStr = QString::fromUtf8(version.readLine()).trimmed();
         version.close();
     } else
-        // Assume 0.0.42 if not readable (this was the last revision before the version node was added)
-        ckbDaemonVersion = PARSE_CKB_VERSION("alpha-v0.0.42");
+        daemonVStr = "<unavailable>";
+    ckbDaemonVersion = PARSE_CKB_VERSION(daemonVStr);
 
     // Scan connected devices
     foreach(KbWidget* w, kbWidgets)
@@ -160,12 +163,16 @@ void MainWindow::scanKeyboards(){
     }
 
     int count = kbWidgets.count();
+    // Warn if the daemon version doesn't match the GUI
+    QString daemonWarning;
+    if(daemonVStr != CKB_VERSION_STR && !daemonVStr.isEmpty())
+        daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVStr + "). Please upgrade ckb" + QString(ckbDaemonVersion > ckbGuiVersion ? "" : "-daemon") + ". If the problem persists, try rebooting.";
     if(count == 0)
-        settingsWidget->setStatus("No devices connected");
+        settingsWidget->setStatus("No devices connected" + daemonWarning);
     else if(count == 1)
-        settingsWidget->setStatus("1 device connected");
+        settingsWidget->setStatus("1 device connected" + daemonWarning);
     else
-        settingsWidget->setStatus(QString("%1 devices connected").arg(count));
+        settingsWidget->setStatus(QString("%1 devices connected").arg(count) + daemonWarning);
 }
 
 void MainWindow::showFwUpdateNotification(QWidget* widget, float version){

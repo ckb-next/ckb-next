@@ -4,8 +4,8 @@
 #include "kbfirmware.h"
 #include "ui_fwupgradedialog.h"
 
-static const int DIALOG_WIDTH = 380;
-static const int DIALOG_HEIGHT_MIN = 180, DIALOG_HEIGHT_MAX(240);
+static const int DIALOG_WIDTH = 420;
+static const int DIALOG_HEIGHT_MIN = 200, DIALOG_HEIGHT_MAX(240);
 
 FwUpgradeDialog::FwUpgradeDialog(QWidget* parent, float newV, const QByteArray& fwBlob, Kb* device) :
     QDialog(parent),
@@ -132,7 +132,7 @@ int FwUpgradeDialog::exec(){
     ui->progressBar->setValue(0);
     ui->progressBar->setMaximum(1);
     ui->progressBar->setTextVisible(false);
-    ui->statusLabel->setText("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb is not endorsed by Corsair. This is <i>unlikely</i> to brick your device, but I accept no responsibility if it does. If you're paranoid, get a Windows PC and run the update from CUE.");
+    ui->statusLabel->setText("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb is not endorsed by Corsair. This is <i>unlikely</i> to brick your device, but I accept no responsibility if it does. If you're paranoid, update from Windows.");
     ui->cancelButton->setEnabled(true);
     ui->actionButton->setEnabled(true);
     setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MAX);

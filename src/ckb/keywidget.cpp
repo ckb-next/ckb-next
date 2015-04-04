@@ -411,6 +411,14 @@ void KeyWidget::setSelection(const QStringList& keys){
     emit selectionChanged(keys);
 }
 
+void KeyWidget::selectAll(){
+    selection.fill(true);
+    newSelection.fill(false);
+    mouseDownMode = NONE;
+    update();
+    emit selectionChanged(keyMap.allKeys());
+}
+
 void KeyWidget::clearSelection(){
     selection.fill(false);
     newSelection.fill(false);

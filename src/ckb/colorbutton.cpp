@@ -5,7 +5,8 @@
 ColorButton::ColorButton(QWidget* parent, bool allowAlpha) :
     QPushButton(parent), _alpha(allowAlpha)
 {
-    connect(this, SIGNAL(clicked()), this, SLOT(pickColor()));
+    // Pick color on click (use queued connection so that any on_*_clicked() events can be processed first)
+    connect(this, SIGNAL(clicked()), this, SLOT(pickColor()), Qt::QueuedConnection);
     setAutoDefault(false);
     setDefault(false);
     updateImage();
@@ -37,7 +38,10 @@ void ColorButton::updateImage(){
     }
     painter.fillRect(1, 1, w - 2, h - 2, _color);
     setIcon(QIcon(QPixmap::fromImage(image)));
-    setText(QString(_alpha ? " (%1, %2, %3), %4%" : " (%1, %2, %3)").arg(_color.red()).arg(_color.green()).arg(_color.blue()).arg(QString::number(_color.alphaF() * 100., 'f', 0)));
+    QString text = QString(" (%1, %2, %3)").arg(_color.red()).arg(_color.green()).arg(_color.blue());
+    if(_alpha)
+        text += QString(", %4%").arg(QString::number(_color.alphaF() * 100., 'f', 0));
+    setText(text);
 }
 
 void ColorButton::pickColor(){

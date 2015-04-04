@@ -17,7 +17,6 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     ui(new Ui::SettingsWidget)
 {
     ui->setupUi(this);
-    ui->versionLabel->setText("ckb " CKB_VERSION_STR);
     QSettings settings;
     settings.beginGroup("Program");
 
@@ -108,6 +107,10 @@ SettingsWidget::~SettingsWidget(){
 
 void SettingsWidget::setStatus(const QString& text){
     ui->devicesLabel->setText(text);
+}
+
+void SettingsWidget::setVersion(const QString& version){
+    ui->versionLabel->setText(version);
 }
 
 static inline QString right(const QString& left){

@@ -103,7 +103,7 @@ void KbLightWidget::on_animButton_clicked(){
         return;
     if(currentSelection.isEmpty())
         ui->keyWidget->selectAll();
-    AnimAddDialog dialog(this);
+    AnimAddDialog dialog(this, light, currentSelection);
     dialog.exec();
     if(dialog.result() != QDialog::Accepted)
         return;

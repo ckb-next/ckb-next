@@ -3,13 +3,13 @@
 #include "kblight.h"
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap) :
-    QObject(parent), _map(), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false), _needsSave(true)
+    QObject(parent), _previewAnim(0), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false), _needsSave(true)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _map(other._map), _colorMap(other._colorMap), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false), _needsSave(true)
+    QObject(parent), _previewAnim(0), _map(other._map), _colorMap(other._colorMap), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false), _needsSave(true)
 {
     map(keyMap);
     // Duplicate animations
@@ -86,6 +86,30 @@ KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys, const 
     return anim;
 }
 
+void KbLight::previewAnim(const AnimScript* base, const QStringList& keys, const QMap<QString, QVariant>& preset){
+    if(_previewAnim)
+        stopPreview();
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    // Load the new animation and set preset parameters
+    KbAnim* anim = new KbAnim(this, _map, "", keys, base);
+    QMapIterator<QString, QVariant> i(preset);
+    while(i.hasNext()){
+        i.next();
+        anim->parameter(i.key(), i.value());
+    }
+    anim->commitParams();
+    anim->reInit();
+    // Add the animation and start it
+    _previewAnim = anim;
+    anim->trigger(timestamp);
+    _start = true;
+}
+
+void KbLight::stopPreview(){
+    delete _previewAnim;
+    _previewAnim = 0;
+}
+
 KbAnim* KbLight::duplicateAnim(KbAnim* oldAnim){
     // Stop and restart all existing animations
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -123,6 +147,7 @@ void KbLight::restartAnimation(){
         anim->stop();
         anim->trigger(timestamp);
     }
+    stopPreview();
     _start = true;
 }
 
@@ -130,6 +155,10 @@ void KbLight::animKeypress(const QString& key, bool down){
     foreach(KbAnim* anim, _animList){
         if(anim->keys().contains(key))
             anim->keypress(key, down, QDateTime::currentMSecsSinceEpoch());
+    }
+    if(_previewAnim){
+        if(_previewAnim->keys().contains(key))
+            _previewAnim->keypress(key, down, QDateTime::currentMSecsSinceEpoch());
     }
 }
 
@@ -157,6 +186,8 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, _animList)
         anim->blend(animMap, timestamp);
+    if(_previewAnim)
+        _previewAnim->blend(animMap, timestamp);
 
     cmd.write(QString().sprintf("mode %d switch", modeIndex + 1).toLatin1());
     if(_dimming == 3){
@@ -212,12 +243,15 @@ void KbLight::open(){
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, _animList)
         anim->trigger(timestamp);
+    if(_previewAnim)
+        _previewAnim->trigger(timestamp);
     _start = true;
 }
 
 void KbLight::close(){
     foreach(KbAnim* anim, _animList)
         anim->stop();
+    stopPreview();
     _start = false;
 }
 

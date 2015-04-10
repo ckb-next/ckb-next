@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "animscript.h"
+#include "kblight.h"
 
 namespace Ui {
 class AnimAddDialog;
@@ -13,7 +14,7 @@ class AnimAddDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit AnimAddDialog(QWidget *parent = 0);
+    explicit AnimAddDialog(QWidget *parent, KbLight* light, const QStringList& keys);
     ~AnimAddDialog();
 
     const AnimScript* chosenScript();
@@ -21,12 +22,16 @@ public:
 
 private slots:
     void on_animBox_activated(int index);
+    void on_presetBox_activated(int index);
+    void on_previewBox_clicked(bool checked);
 
 private:
     Ui::AnimAddDialog *ui;
     QList<const AnimScript*> scripts;
 
-    bool previewActive;
+    KbLight* _light;
+    QStringList _keys;
+    bool showPreview;
 };
 
 #endif // ANIMADDDIALOG_H

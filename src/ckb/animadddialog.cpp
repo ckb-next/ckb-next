@@ -1,9 +1,9 @@
 #include "animadddialog.h"
 #include "ui_animadddialog.h"
 
-AnimAddDialog::AnimAddDialog(QWidget *parent) :
+AnimAddDialog::AnimAddDialog(QWidget *parent, KbLight *light, const QStringList &keys) :
     QDialog(parent),
-    ui(new Ui::AnimAddDialog)
+    ui(new Ui::AnimAddDialog), _light(light), _keys(keys), showPreview(true)
 {
     ui->setupUi(this);
     scripts = AnimScript::list();
@@ -14,6 +14,7 @@ AnimAddDialog::AnimAddDialog(QWidget *parent) :
 
 AnimAddDialog::~AnimAddDialog(){
     delete ui;
+    _light->stopPreview();
 }
 
 const AnimScript* AnimAddDialog::chosenScript(){
@@ -30,4 +31,19 @@ void AnimAddDialog::on_animBox_activated(int index){
     foreach(const QString& preset, chosenScript()->presets())
         ui->presetBox->addItem(preset);
     ui->presetBox->setCurrentIndex(0);
+    on_presetBox_activated(0);
+}
+
+void AnimAddDialog::on_presetBox_activated(int index){
+    // Update preview
+    if(showPreview)
+        _light->previewAnim(chosenScript(), _keys, chosenScript()->preset(index));
+}
+
+void AnimAddDialog::on_previewBox_clicked(bool checked){
+    showPreview = checked;
+    if(showPreview)
+        on_presetBox_activated(ui->presetBox->currentIndex());
+    else
+        _light->stopPreview();
 }

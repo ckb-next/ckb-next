@@ -46,6 +46,9 @@ public:
     KbAnim* duplicateAnim(KbAnim* oldAnim);
     const QList<KbAnim*>& animList() { return _animList; }
     void animList(const QList<KbAnim*>& newAnimList) { _needsSave = true; _animList = newAnimList; }
+    // Preview animation - temporary animation displayed at the top of the animation list
+    void previewAnim(const AnimScript* base, const QStringList& keys, const QMap<QString, QVariant>& preset);
+    void stopPreview();
     // Stops and restarts all animations
     void restartAnimation();
     // Sends a keypress event to active animations
@@ -73,6 +76,7 @@ signals:
 
 private:
     QList<KbAnim*> _animList;
+    KbAnim* _previewAnim;
     KeyMap _map;
     QHash<QString, QRgb> _colorMap;
     int _dimming;

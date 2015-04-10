@@ -79,11 +79,11 @@ void KbAnimWidget::clearSelection(){
     setCurrent(0);
 }
 
-void KbAnimWidget::addAnim(const AnimScript* base, const QStringList& keyList){
+void KbAnimWidget::addAnim(const AnimScript* base, const QStringList& keyList, const QString& name, const QMap<QString, QVariant>& preset){
     if(!light)
         return;
     noReorder = true;
-    KbAnim* animation = light->addAnim(base, keyList);
+    KbAnim* animation = light->addAnim(base, keyList, name, preset);
     QListWidgetItem* item = new QListWidgetItem(animation->name(), ui->animList);
     item->setData(Qt::UserRole, animation->guid());
     item->setFlags(item->flags() | Qt::ItemIsEditable);

@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Gradient");
-    CKB_VERSION("0.7");
+    CKB_VERSION("0.8");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{54DD2975-E192-457D-BCFC-D912A24E33B4}");
@@ -18,9 +18,25 @@ void ckb_info(){
     CKB_KPMODE(CKB_KP_NAME);
     CKB_TIMEMODE(CKB_TIME_DURATION);
     CKB_LIVEPARAMS(TRUE);
-    CKB_DEFAULT_DURATION(1.);
-    CKB_DEFAULT_TRIGGER(FALSE);
-    CKB_DEFAULT_TRIGGER_KP(TRUE);
+
+    // Presets
+    CKB_PRESET_START("Fade in");
+    CKB_PRESET_PARAM("color", "ff000000");
+    CKB_PRESET_PARAM("duration", "1.0");
+    CKB_PRESET_PARAM("stop", "0");
+    CKB_PRESET_PARAM("kpstop", "0");
+    CKB_PRESET_END;
+
+    CKB_PRESET_START("Rainbow");
+    CKB_PRESET_PARAM("color", "0:ffff0000 17:ffffff00 33:ff00ff00 50:ff00ffff 67:ff0000ff 83:ffff00ff 100:ffff0000");
+    CKB_PRESET_PARAM("duration", "2.0");
+    CKB_PRESET_END;
+
+    CKB_PRESET_START("Type lighting");
+    CKB_PRESET_PARAM("duration", "1.0");
+    CKB_PRESET_PARAM("trigger", "0");
+    CKB_PRESET_PARAM("kptrigger", "1");
+    CKB_PRESET_END;
 }
 
 #define NONE -1.f

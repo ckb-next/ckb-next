@@ -21,7 +21,7 @@ public:
     ~KbAnimWidget();
 
     void setLight(KbLight* newLight);
-    void addAnim(const AnimScript* base, const QStringList& keyList);
+    void addAnim(const AnimScript* base, const QStringList& keyList, const QString& name, const QMap<QString, QVariant>& preset);
     void duplicateAnim(KbAnim* old);
 
     void clearSelection();

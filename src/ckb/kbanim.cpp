@@ -69,11 +69,11 @@ void KbAnim::save(QSettings& settings){
     settings.endGroup();
 }
 
-KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, const AnimScript* script) :
+KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script) :
     QObject(parent),
     _script(AnimScript::copy(this, script->guid())), _map(map), _keys(keys),
     repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
-    _guid(QUuid::createUuid()), _name(_script ? _script->name() : ""), _opacity(1.), _mode(Normal), _needsSave(true)
+    _guid(QUuid::createUuid()), _name(name), _opacity(1.), _mode(Normal), _needsSave(true)
 {
     if(_script){
         // Set default parameters
@@ -100,6 +100,8 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const KbAnim& other) :
 }
 
 void KbAnim::parameter(const QString& name, const QVariant& value){
+    if(!_script->hasParam(name))
+        return;
     _tempParameters[name] = value;
     updateParams();
 }

@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Random");
-    CKB_VERSION("0.7");
+    CKB_VERSION("0.8");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{22418DA4-A181-4B93-A4D3-03682BA283D2}");
@@ -21,9 +21,11 @@ void ckb_info(){
     CKB_TIMEMODE(CKB_TIME_DURATION);
     CKB_LIVEPARAMS(TRUE);
     CKB_REPEAT(FALSE);
-    CKB_DEFAULT_DURATION(1.);
-    CKB_DEFAULT_TRIGGER(TRUE);
-    CKB_DEFAULT_TRIGGER_KP(FALSE);
+
+    // Presets
+    CKB_PRESET_START("Default");
+    CKB_PRESET_PARAM("duration", "1.");
+    CKB_PRESET_END;
 }
 
 int fadein = 0, useopacity = 0;

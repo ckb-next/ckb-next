@@ -9,6 +9,7 @@ AnimAddDialog::AnimAddDialog(QWidget *parent) :
     scripts = AnimScript::list();
     foreach(const AnimScript* script, scripts)
         ui->animBox->addItem(script->name());
+    on_animBox_activated(0);
 }
 
 AnimAddDialog::~AnimAddDialog(){
@@ -17,4 +18,16 @@ AnimAddDialog::~AnimAddDialog(){
 
 const AnimScript* AnimAddDialog::chosenScript(){
     return scripts[ui->animBox->currentIndex()];
+}
+
+int AnimAddDialog::chosenPreset(){
+    return ui->presetBox->currentIndex();
+}
+
+void AnimAddDialog::on_animBox_activated(int index){
+    // Update preset list
+    ui->presetBox->clear();
+    foreach(const QString& preset, chosenScript()->presets())
+        ui->presetBox->addItem(preset);
+    ui->presetBox->setCurrentIndex(0);
 }

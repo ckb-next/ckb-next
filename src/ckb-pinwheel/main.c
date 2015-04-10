@@ -3,7 +3,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Pinwheel");
-    CKB_VERSION("0.7");
+    CKB_VERSION("0.8");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{07551A90-D97A-4DD0-A770-E9E280A90891}");
@@ -19,9 +19,18 @@ void ckb_info(){
     CKB_TIMEMODE(CKB_TIME_DURATION);
     CKB_LIVEPARAMS(TRUE);
     CKB_REPEAT(FALSE);
-    CKB_DEFAULT_DURATION(2.);
-    CKB_DEFAULT_TRIGGER(TRUE);
-    CKB_DEFAULT_TRIGGER_KP(FALSE);
+
+    // Presets
+    CKB_PRESET_START("Search light");
+    CKB_PRESET_PARAM("duration", "2.0");
+    CKB_PRESET_PARAM("length", "50.0");
+    CKB_PRESET_PARAM("symmetric", "1");
+    CKB_PRESET_END;
+
+    CKB_PRESET_START("Rainbow");
+    CKB_PRESET_PARAM("color", "0:ffff0000 17:ffffff00 33:ff00ff00 50:ff00ffff 67:ff0000ff 83:ffff00ff 100:ffff0000");
+    CKB_PRESET_PARAM("duration", "2.0");
+    CKB_PRESET_END;
 }
 
 ckb_gradient animcolor = { 0 };

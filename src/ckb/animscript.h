@@ -59,6 +59,8 @@ public:
     inline const QString& author() const { return _info.author; }
     inline const QString& license() const { return _info.license; }
     inline const QString& description() const { return _info.description; }
+    inline const QStringList& presets() const { return _presets; }
+    inline const QMap<QString, QVariant>& preset(int index) const { return _presetValues[index]; }
 
     // Parameters, in the order they were given
     inline QListIterator<Param> paramIterator() const { return _info.params; }
@@ -112,6 +114,8 @@ private:
         bool absoluteTime :1, repeat :1, preempt :1, liveParams :1;
     } _info;
     const static int KP_NONE = 0, KP_NAME = 1, KP_POSITION = 2;
+    QStringList _presets;
+    QList<QMap<QString, QVariant> > _presetValues;
     // Script path
     QString _path;
     // Key map (positions)

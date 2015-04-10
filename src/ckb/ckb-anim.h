@@ -80,6 +80,10 @@
 #define CKB_PARAM_STRING(name, prefix, postfix, default)            CKB_PARAM("string", name, prefix, postfix, printurl(default))
 #define CKB_PARAM_LABEL(name, text)                                 CKB_PARAM("label", name, text, "", )
 
+#define CKB_PRESET_START(name)                                      CKB_CONTAINER( printf("preset "); printurl(name); )
+#define CKB_PRESET_PARAM(name, value)                               CKB_CONTAINER( printf(" %s=", name); printurl(value); )
+#define CKB_PRESET_END                                              CKB_CONTAINER( printf("\n"); )
+
 // Keypress interaction (none, by name, or by position). Default: NONE
 #define CKB_KP_NONE         "none"
 #define CKB_KP_NAME         "name"
@@ -96,16 +100,6 @@
 #define CKB_PREEMPT(enable)                                         CKB_CONTAINER( printf("preempt %s\n", (enable) ? "on" : "off"); )
 // Live parameter updates. Default: FALSE
 #define CKB_LIVEPARAMS(enable)                                      CKB_CONTAINER( printf("parammode %s\n", (enable) ? "live" : "static"); )
-
-// Special parameters (most values are ignored)
-// Duration (default: 1.0). Requires CKB_TIMEMODE(CKB_TIME_DURATION).
-#define CKB_DEFAULT_DURATION(default)                               CKB_PARAM_DOUBLE("duration", "", "", default, 0., 0.)
-// Trigger with mode (default: TRUE)
-#define CKB_DEFAULT_TRIGGER(default)                                CKB_PARAM_BOOL("trigger", "", default)
-// Trigger with keypress (default: FALSE)
-#define CKB_DEFAULT_TRIGGER_KP(default)                             CKB_PARAM_BOOL("kptrigger", "", default)
-// Release with keyrelease (default: FALSE)
-#define CKB_DEFAULT_RELEASE_KP(default)                             CKB_PARAM_BOOL("kprelease", "", default)
 
 // * Runtime information
 
@@ -309,8 +303,6 @@ int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
         if(sscanf(string, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
         string += scanned;
-        if(*string == ',')
-            string++;
         // Don't allow stops out-of-order or past 100
         if(newpos <= pos || newpos > 100)
             return 0;

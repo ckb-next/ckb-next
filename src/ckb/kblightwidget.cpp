@@ -107,6 +107,8 @@ void KbLightWidget::on_animButton_clicked(){
     dialog.exec();
     if(dialog.result() != QDialog::Accepted)
         return;
-    ui->animWidget->addAnim(dialog.chosenScript(), currentSelection);
+    const AnimScript* script = dialog.chosenScript();
+    int presetId = dialog.chosenPreset();
+    ui->animWidget->addAnim(script, currentSelection, script->presets()[presetId], script->preset(presetId));
     light->restartAnimation();
 }

@@ -63,15 +63,22 @@ void KbLight::color(const QColor& newColor){
     _needsSave = true;
 }
 
-KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys){
+KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys, const QString& name, const QMap<QString, QVariant>& preset){
     // Stop and restart all existing animations
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, _animList){
         anim->stop();
         anim->trigger(timestamp);
     }
-    // Add the new animation and start it
-    KbAnim* anim = new KbAnim(this, _map, keys, base);
+    // Load the new animation and set preset parameters
+    KbAnim* anim = new KbAnim(this, _map, name, keys, base);
+    QMapIterator<QString, QVariant> i(preset);
+    while(i.hasNext()){
+        i.next();
+        anim->parameter(i.key(), i.value());
+    }
+    anim->commitParams();
+    // Add the animation and start it
     _animList.append(anim);
     anim->trigger(timestamp);
     _start = true;

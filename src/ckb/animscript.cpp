@@ -89,13 +89,13 @@ bool AnimScript::load(){
     _info.kpMode = KP_NONE;
     _info.absoluteTime = _info.preempt = _info.liveParams = false;
     _info.repeat = true;
-    double defaultDuration = -1.;
     // Read output
     QString line;
     while((line = infoProcess.readLine()) != ""){
         line = line.trimmed();
         QStringList components = line.split(" ");
-        if(components.count() < 2)
+        int count = components.count();
+        if(count < 2)
             continue;
         QString param = components[0].trimmed();
         if(param == "guid")
@@ -114,12 +114,9 @@ bool AnimScript::load(){
             _info.description = urlParam(components[1]);
         else if(param == "kpmode")
             _info.kpMode = (components[1] == "position") ? KP_POSITION : (components[1] == "name") ? KP_NAME : KP_NONE;
-        else if(param == "time"){
-            if(defaultDuration > 0.)
-                // Can't specify absolute time if a duration is included
-                continue;
+        else if(param == "time")
             _info.absoluteTime = (components[1] == "absolute");
-        } else if(param == "repeat")
+        else if(param == "repeat")
             _info.repeat = (components[1] == "on");
         else if(param == "preempt")
             _info.preempt = (components[1] == "on");
@@ -127,7 +124,7 @@ bool AnimScript::load(){
             _info.liveParams = (components[1] == "live");
         else if(param == "param"){
             // Read parameter
-            if(components.count() < 3)
+            if(count < 3)
                 continue;
             while(components.count() < 8)
                 components.append("");
@@ -162,36 +159,49 @@ bool AnimScript::load(){
                 continue;
             QString prefix = urlParam(components[3]), postfix = urlParam(components[4]);
             QVariant def = urlParam(components[5]), minimum = urlParam(components[6]), maximum = urlParam(components[7]);
-            // Check types of predefined parameters
-            if((name == "trigger" || name == "kptrigger") && type != Param::BOOL)
-                continue;
-            else if(name == "duration"){
-                // For duration, also set min/max appropriately and make sure value is sane
-                double value = def.toDouble();
-                if(_info.absoluteTime || type != Param::DOUBLE || value < 0.1 || value > ONE_DAY)
-                    continue;
-                minimum = 0.1;
-                maximum = ONE_DAY;
-                defaultDuration = value;
-            } else if(name == "delay" || name == "kpdelay" || name == "repeat" || name == "kprepeat" || name == "stop" || name == "kpstop" || name == "kprelease")
-                // Other predefined params may not be specified here
+            // Don't allow predefined params
+            if(name == "trigger" || name == "kptrigger" || name == "duration" || name == "delay" || name == "kpdelay" || name == "repeat" || name == "kprepeat" || name == "stop" || name == "kpstop" || name == "kprelease")
                 continue;
             Param param = { type, name, prefix, postfix, def, minimum, maximum };
             _info.params.append(param);
+        } else if(param == "preset"){
+            // Add preset
+            QString name = urlParam(components.at(1));
+            QMap<QString, QVariant> preset;
+            for(int i = 2; i < count; i++){
+                // Scan name/value setting pairs
+                QString setting = components.at(i);
+                QStringList sComponents = setting.split("=");
+                if(sComponents.count() != 2)
+                    continue;
+                QString param = sComponents.first().trimmed();
+                QString value = urlParam(sComponents.last());
+                preset[param] = value;
+            }
+            // If the preset contains a duration, set the repeat time to the same value
+            if(preset.contains("duration")){
+                QVariant duration = preset.value("duration");
+                preset["repeat"] = duration;
+                preset["kprepeat"] = duration;
+            }
+            _presets.append(name);
+            _presetValues.append(preset);
         }
     }
     // Make sure the required parameters are filled out
     if(_info.guid.isNull() || _info.name == "" || _info.version == "" || _info.year == "" || _info.author == "" || _info.license == "")
         return false;
     // Add timing parameters
-    if(!hasParam("trigger")){
-        Param trigger = { Param::BOOL, "trigger", "", "", true, 0, 0 };
-        _info.params.append(trigger);
+    double defaultDuration = -1.;
+    if(!_info.absoluteTime){
+        defaultDuration = 1.;
+        Param duration = { Param::DOUBLE, "duration", "", "", defaultDuration, 0.1, ONE_DAY };
+        _info.params.append(duration);
     }
-    if(!hasParam("kptrigger")){
-        Param kptrigger = { Param::BOOL, "kptrigger", "", "", false, 0, 0 };
-        _info.params.append(kptrigger);
-    }
+    Param trigger = { Param::BOOL, "trigger", "", "", true, 0, 0 };
+    _info.params.append(trigger);
+    Param kptrigger = { Param::BOOL, "kptrigger", "", "", false, 0, 0 };
+    _info.params.append(kptrigger);
     if(_info.absoluteTime || !_info.repeat)
         _info.preempt = false;
     Param delay = { Param::DOUBLE, "delay", "", "", 0., 0., ONE_DAY };
@@ -200,14 +210,6 @@ bool AnimScript::load(){
     _info.params.append(delay);
     _info.params.append(kpdelay);
     _info.params.append(kprelease);
-    if(defaultDuration < 0.){
-        // If relative time is used but no duration is given, default to 1.0s
-        defaultDuration = 1.;
-        if(!_info.absoluteTime){
-            Param duration = { Param::DOUBLE, "duration", "", "", defaultDuration, 0.1, ONE_DAY };
-            _info.params.append(duration);
-        }
-    }
     if(_info.repeat){
         Param repeat = { Param::DOUBLE, "repeat", "", "", defaultDuration, 0.1, ONE_DAY };
         Param kprepeat = { Param::DOUBLE, "kprepeat", "", "", defaultDuration, 0.1, ONE_DAY };

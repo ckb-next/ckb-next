@@ -27,7 +27,7 @@ public:
     inline bool needsSave() const { return _needsSave; }
 
     // Create a new animation
-    KbAnim(QObject* parent, const KeyMap& map, const QStringList& keys, const AnimScript* script);
+    KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script);
     // Copy an existing animation
     KbAnim(QObject *parent, const KeyMap& map, const KbAnim& other);
 

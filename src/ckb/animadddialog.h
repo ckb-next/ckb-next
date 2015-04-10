@@ -17,10 +17,16 @@ public:
     ~AnimAddDialog();
 
     const AnimScript* chosenScript();
+    int chosenPreset();
+
+private slots:
+    void on_animBox_activated(int index);
 
 private:
     Ui::AnimAddDialog *ui;
     QList<const AnimScript*> scripts;
+
+    bool previewActive;
 };
 
 #endif // ANIMADDDIALOG_H

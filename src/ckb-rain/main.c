@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Raindrop");
-    CKB_VERSION("0.7");
+    CKB_VERSION("0.8");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{5D6695AF-0496-41E2-BEE7-F7D0ABAA49E9}");
@@ -23,8 +23,12 @@ void ckb_info(){
     CKB_TIMEMODE(CKB_TIME_ABSOLUTE);
     CKB_REPEAT(FALSE);
     CKB_LIVEPARAMS(TRUE);
-    CKB_DEFAULT_TRIGGER(TRUE);
-    CKB_DEFAULT_TRIGGER_KP(TRUE);
+
+    // Presets
+    CKB_PRESET_START("Default");
+    CKB_PRESET_PARAM("trigger", "1");
+    CKB_PRESET_PARAM("kptrigger", "1");
+    CKB_PRESET_END;
 }
 
 #define DROP_MAX 1000

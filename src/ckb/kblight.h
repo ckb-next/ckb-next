@@ -42,7 +42,7 @@ public:
     inline void showMute(bool newShowMute) { _needsSave = true; _showMute = newShowMute; emit updated(); }
 
     // Lighting animations
-    KbAnim* addAnim(const AnimScript* base, const QStringList& keys);
+    KbAnim* addAnim(const AnimScript* base, const QStringList& keys, const QString& name, const QMap<QString, QVariant>& preset);
     KbAnim* duplicateAnim(KbAnim* oldAnim);
     const QList<KbAnim*>& animList() { return _animList; }
     void animList(const QList<KbAnim*>& newAnimList) { _needsSave = true; _animList = newAnimList; }

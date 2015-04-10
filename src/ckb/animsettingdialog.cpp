@@ -340,6 +340,8 @@ void AnimSettingDialog::newDuration(double duration){
         kpRep->setValue(duration);
     lastDuration = duration;
     updateParam("duration");
+    updateParam("repeat");
+    updateParam("kprepeat");
 }
 
 void AnimSettingDialog::updateStops(){

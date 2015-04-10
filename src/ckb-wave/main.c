@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Wave");
-    CKB_VERSION("0.6");
+    CKB_VERSION("0.8");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{E0BBA19E-C328-4C0E-8E3C-A06D5722B4FC}");
@@ -21,9 +21,24 @@ void ckb_info(){
     CKB_TIMEMODE(CKB_TIME_DURATION);
     CKB_LIVEPARAMS(TRUE);
     CKB_PREEMPT(TRUE);
-    CKB_DEFAULT_DURATION(2.);
-    CKB_DEFAULT_TRIGGER(TRUE);
-    CKB_DEFAULT_TRIGGER_KP(FALSE);
+
+    // Presets
+    CKB_PRESET_START("Shimmer");
+    CKB_PRESET_PARAM("duration", "2.0");
+    CKB_PRESET_PARAM("length", "50.0");
+    CKB_PRESET_PARAM("symmetric", "1");
+    CKB_PRESET_END;
+
+    CKB_PRESET_START("Rainbow");
+    CKB_PRESET_PARAM("color", "0:ffff0000 17:ffffff00 33:ff00ff00 50:ff00ffff 67:ff0000ff 83:ffff00ff 100:ffff0000");
+    CKB_PRESET_PARAM("duration", "2.0");
+    CKB_PRESET_END;
+
+    CKB_PRESET_START("Vertical rainbow");
+    CKB_PRESET_PARAM("color", "0:ffff0000 17:ffffff00 33:ff00ff00 50:ff00ffff 67:ff0000ff 83:ffff00ff 100:ffff0000");
+    CKB_PRESET_PARAM("duration", "2.0");
+    CKB_PRESET_PARAM("angle", "180");
+    CKB_PRESET_END;
 }
 
 void ckb_init(ckb_runctx* context){

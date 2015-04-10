@@ -81,7 +81,8 @@ SOURCES += main.cpp\
     quazip/zip.c \
     kbfirmware.cpp \
     fwupgradedialog.cpp \
-    autorun.cpp
+    autorun.cpp \
+    keymap_es.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \

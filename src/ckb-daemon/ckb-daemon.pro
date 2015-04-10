@@ -46,7 +46,8 @@ SOURCES += \
     keyboard_gb.c \
     keyboard_de.c \
     keyboard_fr.c \
-    extra_mac.c
+    extra_mac.c \
+    keyboard_es.c
 
 HEADERS += \
     device.h \

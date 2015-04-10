@@ -37,15 +37,16 @@ struct KeyPos {
 // Key lighting/layout class
 class KeyMap {
 public:
-    // Key layouts
+    // Key layouts (ordered alphabetically by name)
     enum Layout {
         NO_LAYOUT = -1,
-        FR,
-        DE,
-        SE,
-        GB,
+        FR,                 // France
+        DE,                 // Germany
+        ES,                 // Spain
+        SE,                 // Sweden
+        GB,                 // United Kingdom
         GB_DVORAK,
-        US,
+        US,                 // United States
         US_DVORAK
     };
     // Keyboard models

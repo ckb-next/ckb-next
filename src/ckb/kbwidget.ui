@@ -413,6 +413,11 @@
            </item>
            <item>
             <property name="text">
+             <string>Spain</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>Sweden</string>
             </property>
            </item>

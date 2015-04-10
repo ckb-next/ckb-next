@@ -25,6 +25,7 @@ typedef struct {
 
 // List of keys, ordered according to where they appear in the keyboard input
 extern const key keymap_de[N_KEYS];
+extern const key keymap_es[N_KEYS];
 extern const key keymap_fr[N_KEYS];
 extern const key keymap_gb[N_KEYS];
 extern const key keymap_se[N_KEYS];
@@ -36,6 +37,7 @@ extern const key* keymap_system;
 // Get a keyboard layout from a string name. Returns null if the name is not supported.
 // Supported:
 //  "de" => German layout
+//  "es" => Spanish layout
 //  "fr" => French layout
 //  "gb" => UK layout
 //  "se" => Swedish layout

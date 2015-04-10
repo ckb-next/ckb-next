@@ -9,6 +9,7 @@
 // Key positions (K95)
 extern const KeyPos K95PosFR[KEYCOUNT_K95_105];
 extern const KeyPos K95PosDE[KEYCOUNT_K95_105];
+extern const KeyPos K95PosES[KEYCOUNT_K95_105];
 extern const KeyPos K95PosSE[KEYCOUNT_K95_105];
 extern const KeyPos K95PosGB[KEYCOUNT_K95_105];
 extern const KeyPos K95PosGB_Dvorak[KEYCOUNT_K95_105];
@@ -20,11 +21,12 @@ struct KeyLayout {
     uint count;
 };
 
-#define KEYLAYOUT_COUNT 7
+#define KEYLAYOUT_COUNT 8
 
 static const KeyLayout K95Pos[KEYLAYOUT_COUNT] = {
     { K95PosFR, KEYCOUNT_K95_105 },
     { K95PosDE, KEYCOUNT_K95_105 },
+    { K95PosES, KEYCOUNT_K95_105 },
     { K95PosSE, KEYCOUNT_K95_105 },
     { K95PosGB, KEYCOUNT_K95_105 },
     { K95PosGB_Dvorak, KEYCOUNT_K95_105 },
@@ -44,7 +46,8 @@ static KeyLayout K70Pos[KEYLAYOUT_COUNT] = {
     { 0, K95Pos[3].count - K70_COUNT_DIFF },
     { 0, K95Pos[4].count - K70_COUNT_DIFF },
     { 0, K95Pos[5].count - K70_COUNT_DIFF },
-    { 0, K95Pos[6].count - K70_COUNT_DIFF }
+    { 0, K95Pos[6].count - K70_COUNT_DIFF },
+    { 0, K95Pos[7].count - K70_COUNT_DIFF }
 };
 
 #define K70_X_START     38
@@ -60,7 +63,8 @@ static KeyLayout K65Pos[KEYLAYOUT_COUNT] = {
     { 0, K70Pos[3].count - K65_COUNT_DIFF },
     { 0, K70Pos[4].count - K65_COUNT_DIFF },
     { 0, K70Pos[5].count - K65_COUNT_DIFF },
-    { 0, K70Pos[6].count - K65_COUNT_DIFF }
+    { 0, K70Pos[6].count - K65_COUNT_DIFF },
+    { 0, K70Pos[7].count - K65_COUNT_DIFF }
 };
 
 #define K65_WIDTH       209
@@ -77,6 +81,8 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
         return FR;
     if(lower == "de")
         return DE;
+    if(lower == "es")
+        return ES;
     if(lower == "se")
         return SE;
     if(lower == "gb")
@@ -96,6 +102,8 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "fr";
     case DE:
         return "de";
+    case ES:
+        return "es";
     case SE:
         return "se";
     case GB:

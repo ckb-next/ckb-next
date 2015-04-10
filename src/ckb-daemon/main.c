@@ -142,15 +142,19 @@ int main(int argc, char** argv){
         const char* loc = setlocale(LC_CTYPE, 0);
         char locale[strlen(loc) + 1];
         localecase(locale, sizeof(locale), loc);
-        if(strstr(locale, "de-de")){
+        if(strstr(locale, "de-")){
             // Check for DE layout
             keymap_system = keymap_de;
             printf("Setting default layout: de\n");
-        } else if(strstr(locale, "fr-fr")){
+        } else if(strstr(locale, "es-")){
+            // Check for ES layout
+            keymap_system = keymap_es;
+            printf("Setting default layout: es\n");
+        } else if(strstr(locale, "fr-")){
             // Check for FR layout
             keymap_system = keymap_fr;
             printf("Setting default layout: fr\n");
-        } else if(strstr(locale, "sv-se")){
+        } else if(strstr(locale, "sv-")){
             // Check for SE layout
             keymap_system = keymap_se;
             printf("Setting default layout: se\n");

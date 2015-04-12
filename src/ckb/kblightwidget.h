@@ -29,7 +29,7 @@ private slots:
     void changeAnim(KbAnim* newAnim);
     void changeAnimKeys(QStringList keys);
 
-    void on_brightnessBox_currentIndexChanged(int index);
+    void on_brightnessBox_activated(int index);
     void on_animButton_clicked();
 
     void on_bgButton_clicked();

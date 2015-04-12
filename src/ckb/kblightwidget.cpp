@@ -88,7 +88,7 @@ void KbLightWidget::changeAnimKeys(QStringList keys){
     ui->keyWidget->setAnimation(keys);
 }
 
-void KbLightWidget::on_brightnessBox_currentIndexChanged(int index){
+void KbLightWidget::on_brightnessBox_activated(int index){
     if(light)
         light->dimming(index);
 }

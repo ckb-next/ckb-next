@@ -16,6 +16,7 @@ public:
     KbLight(QObject* parent, const KeyMap& keyMap);
     // Copy a lighting setup
     KbLight(QObject *parent, const KeyMap& keyMap, const KbLight& other);
+    ~KbLight();
 
     // Key map
     inline const KeyMap& map() { return _map; }
@@ -30,7 +31,10 @@ public:
     // Overall dimming. 0 = max brightness, 3 = off
     static const int MAX_DIM = 3;
     inline int dimming() { return _dimming; }
-    inline void dimming(int newDimming) { _needsSave = true; _dimming = newDimming; emit updated(); }
+    void dimming(int newDimming);
+    // Shared brightness between all modes (-1 for sharing disabled)
+    static int shareDimming();
+    static void shareDimming(int newShareDimming);
 
     // Inactive indicator level. -1 for no dimming, 2 for off
     static const int MAX_INACTIVE = 2;

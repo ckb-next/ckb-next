@@ -2,15 +2,22 @@
 #include "ui_settingswidget.h"
 #include "animscript.h"
 #include "autorun.h"
+#include "kblight.h"
 #include "mainwindow.h"
 #include <unistd.h>
 
-int framerate = 30;
 extern QString devpath;
 extern QTimer* eventTimer;
 
+// Animation FPS
+int framerate = 30;
 int fpsTable[] = { 60, 50, 30, 25, 15 };
+
+// Modifier keys (OS-dependent)
 static QStringList modKeys, modNames;
+
+// KbLight
+static int lastSharedDimming = -2;
 
 SettingsWidget::SettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -81,6 +88,15 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
         cmd.close();
     }
 
+    // Read global brightness setting (default = on, 100% brightness)
+    int dimming = settings.value("GlobalBrightness").toInt();
+    if(dimming < -1 || dimming > KbLight::MAX_DIM)
+        dimming = 0;
+    lastSharedDimming = dimming;
+    KbLight::shareDimming(dimming);
+    // Set checkbox value (-1 = don't share)
+    ui->brightnessBox->setChecked(dimming == -1);
+
     // Read auto update settings
     ui->autoFWBox->setChecked(!settings.value("DisableAutoFWCheck").toBool());
 
@@ -99,6 +115,16 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 
     ui->animPathLabel->setText(AnimScript::path());
     on_animScanButton_clicked();
+}
+
+void SettingsWidget::pollUpdates(){
+    // Check for changes to shared brightness setting
+    int dimming = KbLight::shareDimming();
+    if(dimming != lastSharedDimming){
+        QSettings settings;
+        settings.setValue("Program/GlobalBrightness", dimming);
+        lastSharedDimming = dimming;
+    }
 }
 
 SettingsWidget::~SettingsWidget(){
@@ -186,9 +212,20 @@ void SettingsWidget::on_winBox_activated(int index){
     updateModifiers();
 }
 
+void SettingsWidget::on_brightnessBox_clicked(bool checked){
+    KbLight::shareDimming(checked ? -1 : 0);
+    pollUpdates();
+}
+
 void SettingsWidget::on_autoFWBox_clicked(bool checked){
     QSettings settings;
     settings.setValue("Program/DisableAutoFWCheck", !checked);
+}
+
+void SettingsWidget::on_trayBox_clicked(bool checked){
+    QSettings settings;
+    settings.setValue("Program/SuppressTrayIcon", !checked);
+    MainWindow::mainWindow->trayIcon->setVisible(checked);
 }
 
 void SettingsWidget::on_loginItemBox_clicked(bool checked){
@@ -196,10 +233,4 @@ void SettingsWidget::on_loginItemBox_clicked(bool checked){
         AutoRun::enable();
     else
         AutoRun::disable();
-}
-
-void SettingsWidget::on_trayBox_clicked(bool checked){
-    QSettings settings;
-    settings.setValue("Program/SuppressTrayIcon", !checked);
-    MainWindow::mainWindow->trayIcon->setVisible(checked);
 }

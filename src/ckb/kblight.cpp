@@ -1,6 +1,10 @@
 #include <cmath>
 #include <QDateTime>
+#include <QSet>
 #include "kblight.h"
+
+static int _shareDimming = -1;
+static QSet<KbLight*> activeLights;
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap) :
     QObject(parent), _previewAnim(0), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false), _needsSave(true)
@@ -55,12 +59,36 @@ void KbLight::map(const KeyMap& map){
     emit updated();
 }
 
+KbLight::~KbLight(){
+    activeLights.remove(this);
+}
+
 void KbLight::color(const QColor& newColor){
     QRgb newRgb = newColor.rgb();
     uint count = _map.count();
     for(uint i = 0; i < count; i++)
         _colorMap[_map.key(i)->name] = newRgb;
     _needsSave = true;
+}
+
+int KbLight::shareDimming(){
+    return _shareDimming;
+}
+
+void KbLight::shareDimming(int newShareDimming){
+    _shareDimming = newShareDimming;
+    if(newShareDimming != -1){
+        foreach(KbLight* light, activeLights)
+            light->dimming(newShareDimming);
+    }
+}
+
+void KbLight::dimming(int newDimming){
+    if(_shareDimming != -1)
+        _shareDimming = newDimming;
+    _needsSave = true;
+    _dimming = newDimming;
+    emit updated();
 }
 
 KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys, const QString& name, const QMap<QString, QVariant>& preset){
@@ -238,6 +266,10 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
 }
 
 void KbLight::open(){
+    // Apply shared dimming if needed
+    if(_shareDimming != -1 && _shareDimming != _dimming)
+        dimming(_shareDimming);
+    activeLights.insert(this);
     if(_start)
         return;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -249,6 +281,7 @@ void KbLight::open(){
 }
 
 void KbLight::close(){
+    activeLights.remove(this);
     foreach(KbAnim* anim, _animList)
         anim->stop();
     stopPreview();

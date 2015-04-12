@@ -223,6 +223,8 @@ void MainWindow::timerTick(){
         KbFirmware::checkUpdates();
     // Scan for connected/disconnected keyboards
     scanKeyboards();
+    // Poll for setting updates
+    settingsWidget->pollUpdates();
 }
 
 void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason){

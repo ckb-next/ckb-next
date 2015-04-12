@@ -15,8 +15,12 @@ public:
     explicit SettingsWidget(QWidget *parent = 0);
     ~SettingsWidget();
 
+    // Set text labels
     void setVersion(const QString& version);
     void setStatus(const QString& text);
+
+    // Poll for setting updates and save (if necessary)
+    void pollUpdates();
 
 private slots:
     void on_pushButton_clicked();
@@ -30,11 +34,10 @@ private slots:
     void on_altBox_activated(int index);
     void on_winBox_activated(int index);
 
+    void on_brightnessBox_clicked(bool checked);
     void on_autoFWBox_clicked(bool checked);
-
-    void on_loginItemBox_clicked(bool checked);
-
     void on_trayBox_clicked(bool checked);
+    void on_loginItemBox_clicked(bool checked);
 
 private:
     Ui::SettingsWidget *ui;

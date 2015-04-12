@@ -91,6 +91,23 @@ void localecase(char* dst, size_t length, const char* src){
 int main(int argc, char** argv){
     printf("ckb Corsair Keyboard RGB driver %s\n", CKB_VERSION_STR);
 
+    // Check PID, quit if already running
+    char pidpath[strlen(devpath) + 6];
+    snprintf(pidpath, sizeof(pidpath), "%s0/pid", devpath);
+    FILE* pidfile = fopen(pidpath, "r");
+    if(pidfile){
+        pid_t pid;
+        fscanf(pidfile, "%d", &pid);
+        fclose(pidfile);
+        if(pid > 0){
+            // kill -s 0 checks if the PID is active but doesn't send a signal
+            if(!kill(pid, 0)){
+                printf("ckb-daemon is already running (PID %d). Try killing the existing process first.\n(If this is an error, delete %s and try again)\n", pid, pidpath);
+                return 0;
+            }
+        }
+    }
+
     // Read parameters
     int forceroot = 1;
     for(int i = 1; i < argc; i++){

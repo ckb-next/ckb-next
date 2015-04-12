@@ -92,7 +92,7 @@ int makedevpath(usbdevice* kb){
     if(kb->model == -1){
         // Root keyboard: write a list of devices
         updateconnected();
-        // Also write version number
+        // Write version number
         char vpath[sizeof(path) + 8];
         snprintf(vpath, sizeof(vpath), "%s/version", path);
         FILE* vfile = fopen(vpath, "w");
@@ -105,6 +105,20 @@ int makedevpath(usbdevice* kb){
         } else {
             printf("Warning: Unable to create %s: %s\n", vpath, strerror(errno));
             remove(vpath);
+        }
+        // Write PID
+        char ppath[sizeof(path) + 4];
+        snprintf(ppath, sizeof(ppath), "%s/pid", path);
+        FILE* pfile = fopen(ppath, "w");
+        if(pfile){
+            fprintf(pfile, "%u\n", getpid());
+            fclose(pfile);
+            chmod(ppath, S_READ);
+            if(gid >= 0)
+                chown(vpath, 0, gid);
+        } else {
+            printf("Warning: Unable to create %s: %s\n", ppath, strerror(errno));
+            remove(ppath);
         }
     } else {
         // Write the model and serial to files

@@ -4,7 +4,7 @@
 #include "includes.h"
 #include "usb.h"
 
-// Device path base ("/dev/input/ckb" or "/tmp/ckb")
+// Device path base ("/dev/input/ckb" or "/var/run/ckb")
 const char *const devpath;
 
 // Group ID for the control nodes. -1 to give read/write access to everybody

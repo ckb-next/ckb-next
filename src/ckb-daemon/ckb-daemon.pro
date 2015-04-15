@@ -1,27 +1,24 @@
 TEMPLATE = app
 TARGET = ckb-daemon
 
-CONFIG   += debug_and_release
-CONFIG   += console
-CONFIG   -= qt app_bundle
-QT       -= core gui
-LIBS     -= -lQtGui -lQtCore
-
-QMAKE_MAC_SDK = macosx10.10
-
 macx {
     DESTDIR = $$PWD/../../ckb.app/Contents/Resources
 } else {
     DESTDIR = $$PWD/../../bin
 }
 
-QMAKE_CFLAGS += -std=c99 -Wno-unused-parameter -Werror=implicit
-
 macx {
-    LIBS += -framework CoreFoundation -framework IOKit -liconv
+    LIBS = -framework CoreFoundation -framework IOKit -liconv
 } else {
-    LIBS += -lpthread -ludev
+    LIBS = -lpthread -ludev
 }
+
+QMAKE_CFLAGS += -std=c99 -Wno-unused-parameter -Werror=implicit
+QMAKE_MAC_SDK = macosx10.10
+
+# Minimal build - remove Qt defaults
+CONFIG   =
+QT       =
 
 CKB_VERSION_STR = `cat $$PWD/../../VERSION`
 DEFINES += CKB_VERSION_STR="\\\"$$CKB_VERSION_STR\\\""
@@ -63,5 +60,3 @@ HEADERS += \
     usb.h \
     firmware.h \
     profile.h
-
-OBJECTIVE_SOURCES +=

@@ -114,7 +114,7 @@ systemd=`systemctl --version 2>/dev/null`
 systemdc=$?
 upstart=`service --version 2>/dev/null`
 upstartc=$?
-launchd=`launchctl version 2>/dev/null`
+launchd=`launchctl help 2>/dev/null`
 launchdc=$?
 
 echo ""

@@ -31,31 +31,7 @@ Linux Installation
 
 Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libudev-dev`, `build-essential`, `zlib1g-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). Check with your package manager to make sure you have the correct libraries/headers installed.
 
-#### Automatic build:
-
-The quickest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will compile the application and then ask you if you'd like to install it (default answer is "yes"; press Enter to continue). Once installed, it will launch the driver and open the user interface. You do not need to follow any of the other instructions unless the automatic build fails.
-
-#### Manual build:
-
-You can build the project by running `./qmake-auto && make` in a Terminal in the directory you downloaded it to. The binaries will be placed in a new `bin` directory assuming they compile successfully.
-
-#### Running as a service (recommended):
-
-First copy the binary and the service files to their system directories:
-
-* Upstart (Ubuntu, prior to 15.04): `sudo cp -R bin/* /usr/bin && sudo cp service/upstart/ckb-daemon.conf /etc/init`
-* Systemd (Ubuntu 15.04 and later): `sudo cp -R bin/* /usr/bin && sudo cp service/systemd/ckb-daemon.service /usr/lib/systemd/system`
-
-To launch the driver and enable it at start-up:
-
-* Upstart: `sudo service ckb-daemon start`
-* Systemd: `sudo systemctl start ckb-daemon && sudo systemctl enable ckb-daemon`
-
-Open the `bin` directory and double-click on `ckb` to launch the user interface. If you want to run it at login, add `ckb --background` to your Startup Applications.
-
-#### Running manually:
-
-Open the `bin` directory in a Terminal and run `sudo ./ckb-daemon` to start the driver. To start the user interface, run `./ckb`. This should be unnecessary except for debugging/testing purposes; the recommended method is to run it as a service.
+You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build the application, and if all goes well, will ask if you'd like to install/run ckb on your system (press enter to proceed; default answer is "yes"). If the build doesn't work for some reason, or if you'd like to build ckb yourself, see `BUILD.md` for instructions.
 
 OSX Installation
 ----------------
@@ -66,40 +42,18 @@ Pre-compiled binaries for OSX are provided by Xiy. They may be updated less freq
 
 [Click here to download the latest version (alpha-v0.0.52).](https://github.com/ccMSC/ckb/releases/download/0.0.52/ckb-0.0.52-osx.zip)
 
+The easiest way to install the driver is with the `quickinstall` script. To get it, first click "Download zip" on the right side of the screen to download the source code. Copy the `quickinstall` script and the `service` folder out of the ckb-master folder, and place them in your downloads next to ckb.app _(Note: make sure you copy the scripts OUT of the directory, do not move ckb.app IN to the source directory. Otherwise the script will try to compile the source)._ Double-click on `quickinstall` and it will offer to install/run the app for you. The default answer to all of the questions is "yes"; press enter to proceed. You can close the terminal window after it finishes.
+
 #### Building from source:
 
 Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
-#### Automatic build:
-
-The quickest way to install ckb is to open `quickinstall`. It will compile the application and then ask you if you'd like to install it (default answer is "yes"; press Enter to continue). Once installed, it will launch the driver and open the user interface. You do not need to follow any of the other instructions unless the automatic build fails.
-
-You can also use `quickinstall` with the pre-compiled version: Download the ckb binary and then download the source zip. Copy `quickinstall` and `service` from the source directory into the binary directory and then run `quickinstall`.
-
-#### Manual build:
-
-Open ckb.pro in Qt Creator. You should be prompted to configure the project (make sure the "Desktop" configuration is selected and not iOS). Once it's finished loading the project, press `Cmd+B` or select `Build > Build Project "ckb"` from the menu bar. When it'd done, you should see a newly-created `ckb.app` application in the project directory. Exit Qt Creator.
-
-Alternatively, open a Terminal in the ckb directory and run `./qmake-auto && make`. It will detect your Qt path automatically if you installed it to one of the standard locations. You should see a newly created `ckb.app` if it builds successfully.
-
-#### Running as a service (recommended):
-
-Copy `ckb.app` to your Applications folder. Copy the file  [`service/launchd/com.ckb.daemon.plist`](https://raw.githubusercontent.com/ccMSC/ckb/master/service/launchd/com.ckb.daemon.plist) to your computer's `/Library/LaunchDaemons` folder (you can get to it by pressing `Cmd+Shift+G` in Finder and typing the location). Then open a Terminal and run the following command to launch the driver:
-
-`sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist && sudo chmod 0700 /Library/LaunchDaemons/com.ckb.daemon.plist && sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist`
-
-After you're done, open `ckb.app` to launch the user interface.
-
-#### Running manually:
-
-Open a Terminal in the ckb directory and run `sudo ckb.app/Contents/Resources/ckb-daemon` to start the driver. Open `ckb.app` to start the user interface.
+Like the binary version, it's easiest to install ckb with `quickinstall`. You do not need to copy or move any files since you already have the source downloaded. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see `BUILD.md`.
 
 Usage
 -----
 
-See `DAEMON.md` for info about the daemon program.
-
-The user interface is still a work in progress.
+The user interface is still a work in progress. See `DAEMON.md` for info about the daemon program.
 
 **Major features:**
 - Control multiple keyboards independently (note: not tested)
@@ -110,8 +64,6 @@ The user interface is still a work in progress.
 - Multiple profiles/modes with hardware save function
 
 **Roadmap** (roughly in order)
-- **v0.1 release:**
-- Animation presets
 - **v0.2 release:**
 - More functions for the Win Lock key
 - Key combos

@@ -1,10 +1,11 @@
-#include "settingswidget.h"
-#include "ui_settingswidget.h"
+#include <unistd.h>
 #include "animscript.h"
 #include "autorun.h"
+#include "ckbsettings.h"
 #include "kblight.h"
 #include "mainwindow.h"
-#include <unistd.h>
+#include "settingswidget.h"
+#include "ui_settingswidget.h"
 
 extern QString devpath;
 extern QTimer* eventTimer;
@@ -24,8 +25,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     ui(new Ui::SettingsWidget)
 {
     ui->setupUi(this);
-    QSettings settings;
-    settings.beginGroup("Program");
+    CkbSettings settings("Program");
 
     // Load modifier remap
     KbBind::loadGlobalRemap();
@@ -121,8 +121,7 @@ void SettingsWidget::pollUpdates(){
     // Check for changes to shared brightness setting
     int dimming = KbLight::shareDimming();
     if(dimming != lastSharedDimming){
-        QSettings settings;
-        settings.setValue("Program/GlobalBrightness", dimming);
+        CkbSettings::set("Program/GlobalBrightness", dimming);
         lastSharedDimming = dimming;
     }
 }
@@ -170,8 +169,7 @@ void SettingsWidget::on_fpsBox_activated(const QString &arg1){
     // Set FPS
     framerate = arg1.split(" ")[0].toInt();
     eventTimer->setInterval(1000 / framerate);
-    QSettings settings;
-    settings.beginGroup("Program");
+    CkbSettings settings("Program");
     settings.setValue("framerate", framerate);
     // Send FPS message to ckb-daemon
     QFile cmd(devpath.arg(0) + "/cmd");
@@ -218,13 +216,11 @@ void SettingsWidget::on_brightnessBox_clicked(bool checked){
 }
 
 void SettingsWidget::on_autoFWBox_clicked(bool checked){
-    QSettings settings;
-    settings.setValue("Program/DisableAutoFWCheck", !checked);
+    CkbSettings::set("Program/DisableAutoFWCheck", !checked);
 }
 
 void SettingsWidget::on_trayBox_clicked(bool checked){
-    QSettings settings;
-    settings.setValue("Program/SuppressTrayIcon", !checked);
+    CkbSettings::set("Program/SuppressTrayIcon", !checked);
     MainWindow::mainWindow->trayIcon->setVisible(checked);
 }
 

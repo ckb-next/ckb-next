@@ -7,13 +7,13 @@ static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap) :
-    QObject(parent), _previewAnim(0), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false), _needsSave(true)
+    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false), _needsSave(true)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(QObject* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _previewAnim(0), _map(other._map), _colorMap(other._colorMap), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false), _needsSave(true)
+    QObject(parent), _previewAnim(0), _map(other._map), _colorMap(other._colorMap), lastFrameSignal(0), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false), _needsSave(true)
 {
     map(keyMap);
     // Duplicate animations
@@ -210,7 +210,7 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
 
 void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock){
     // Advance animations
-    QHash<QString, QRgb> animMap = _colorMap;
+    ColorMap animMap = _colorMap;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, _animList)
         anim->blend(animMap, timestamp);
@@ -263,6 +263,11 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
 
     // Apply light
     printRGB(cmd, animMap);
+    if(timestamp >= lastFrameSignal + 50){
+        // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
+        emit frameDisplayed(animMap);
+        lastFrameSignal = timestamp;
+    }
 }
 
 void KbLight::open(){

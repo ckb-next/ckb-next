@@ -1,4 +1,5 @@
 #include "animadddialog.h"
+#include "ckbsettings.h"
 #include "kblightwidget.h"
 #include "ui_kblightwidget.h"
 
@@ -14,6 +15,9 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     connect(ui->keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
     connect(ui->animWidget, SIGNAL(animChanged(KbAnim*)), this, SLOT(changeAnim(KbAnim*)));
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
+
+    // Restore "show animated" setting
+    ui->showAnimBox->setChecked(!CkbSettings::get("UI/Light/ShowBaseOnly").toBool());
 }
 
 KbLightWidget::~KbLightWidget(){
@@ -26,13 +30,32 @@ void KbLightWidget::setLight(KbLight* newLight){
     ui->animWidget->clearSelection();
     if(light == newLight)
         return;
-    if(light)
+    if(light){
         disconnect(light, SIGNAL(updated()), this, SLOT(updateLight()));
+        // Disabled animated colors for previous light
+        on_showAnimBox_clicked(false);
+    }
     connect(newLight, SIGNAL(updated()), this, SLOT(updateLight()));
     light = newLight;
     updateLight();
     ui->keyWidget->setAnimation(QStringList());
     ui->animWidget->setLight(newLight);
+    if(ui->showAnimBox->isChecked())
+        on_showAnimBox_clicked(true);
+}
+
+void KbLightWidget::on_showAnimBox_clicked(bool checked){
+    // FIXME: set globally if there's more than one KbLightWidget active
+    // Connect/disconnect animation slot
+    if(checked){
+        if(light)
+            connect(light, SIGNAL(frameDisplayed(ColorMap)), ui->keyWidget, SLOT(displayColorMap(ColorMap)));
+    } else {
+        if(light)
+            disconnect(light, SIGNAL(frameDisplayed(ColorMap)), ui->keyWidget, SLOT(displayColorMap(ColorMap)));
+        ui->keyWidget->displayColorMap(KeyWidget::ColorMap());
+    }
+    CkbSettings::set("UI/Light/ShowBaseOnly", !checked);
 }
 
 void KbLightWidget::updateLight(){

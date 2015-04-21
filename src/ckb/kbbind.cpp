@@ -1,5 +1,6 @@
 #include <QDateTime>
 #include <QUrl>
+#include "ckbsettings.h"
 #include "kbbind.h"
 #include "kbmode.h"
 #include "kb.h"
@@ -71,17 +72,14 @@ void KbBind::setGlobalRemap(const QHash<QString, QString> keyToActual){
 
 void KbBind::loadGlobalRemap(){
     _globalRemap.clear();
-    QSettings settings;
-    settings.beginGroup("Program/GlobalRemap");
+    CkbSettings settings("Program/GlobalRemap");
     foreach(const QString& key, settings.childKeys())
         _globalRemap[key] = settings.value(key).toString();
     globalRemapTime = QDateTime::currentMSecsSinceEpoch();
 }
 
 void KbBind::saveGlobalRemap(){
-    QSettings settings;
-    settings.remove("Program/GlobalRemap");
-    settings.beginGroup("Program/GlobalRemap");
+    CkbSettings settings("Program/GlobalRemap", true);
     QHashIterator<QString, QString> i(_globalRemap);
     while(i.hasNext()){
         i.next();

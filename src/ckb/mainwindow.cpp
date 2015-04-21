@@ -1,3 +1,4 @@
+#include "ckbsettings.h"
 #include "kbfirmware.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -37,8 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIconMenu->addAction(closeAction);
     trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-logo.png"), this);
     trayIcon->setContextMenu(trayIconMenu);
-    QSettings settings;
-    if(!settings.value("Program/SuppressTrayIcon").toBool())
+    if(!CkbSettings::get("Program/SuppressTrayIcon").toBool())
         trayIcon->show();
 
 #ifdef Q_OS_MACX
@@ -137,8 +137,7 @@ void MainWindow::scanKeyboards(){
         if(w->isActive()){
             if(!updateShown){
                 // Display firmware upgrade notification if a new version is available (and user has automatic updates enabled)
-                QSettings settings;
-                if(settings.value("Program/DisableAutoFWCheck").toBool())
+                if(CkbSettings::get("Program/DisableAutoFWCheck").toBool())
                     continue;
                 float version = KbFirmware::versionForBoard(w->device->features);
                 if(version > w->device->firmware.toFloat()){
@@ -198,10 +197,9 @@ void MainWindow::closeEvent(QCloseEvent *event){
         event->accept();
         return;
     }
-    QSettings settings;
-    if(!settings.value("Popups/BGWarning").toBool()){
+    if(!CkbSettings::get("Popups/BGWarning").toBool()){
         QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb\" on the Settings screen.");
-        settings.setValue("Popups/BGWarning", true);
+        CkbSettings::set("Popups/BGWarning", true);
     }
     hide();
     event->ignore();
@@ -218,8 +216,7 @@ void MainWindow::timerTick(){
         appShare.unlock();
     }
     // Check for firmware updates (when appropriate)
-    QSettings settings;
-    if(!settings.value("Program/DisableAutoFWCheck").toBool())
+    if(!CkbSettings::get("Program/DisableAutoFWCheck").toBool())
         KbFirmware::checkUpdates();
     // Scan for connected/disconnected keyboards
     scanKeyboards();

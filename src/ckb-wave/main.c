@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Wave");
-    CKB_VERSION("0.8");
+    CKB_VERSION("0.9");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{E0BBA19E-C328-4C0E-8E3C-A06D5722B4FC}");
@@ -114,34 +114,45 @@ void anim_add(float x, float y){
     }
 }
 
+void anim_remove(float x, float y){
+    for(int i = 0; i < ANIM_MAX; i++){
+        if(anim[i].active && anim[i].x == x && anim[i].y == y)
+            anim[i].active = 0;
+    }
+}
+
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
     if(state)
         anim_add(x, y);
-    else if(kprelease){
-        // Cancel existing animation if stop on keyup is enabled
-        for(int i = 0; i < ANIM_MAX; i++){
-            if(anim[i].active && anim[i].x == x && anim[i].y == y)
+    else
+        anim_remove(x, y);
+}
+
+void ckb_start(ckb_runctx* context, int state){
+    if(state)
+        anim_add(left, top);
+    else if(kprelease)
+        anim_remove(left, top);
+}
+
+void ckb_time(ckb_runctx* context, double delta){
+    double length = animlength * width;
+    for(unsigned i = 0; i < ANIM_MAX; i++){
+        if(anim[i].active){
+            anim[i].curx += width * delta;
+            if(anim[i].curx > width + length)
                 anim[i].active = 0;
         }
     }
 }
 
-void ckb_start(ckb_runctx* context){
-    anim_add(left, top);
-}
-
-int ckb_frame(ckb_runctx* context, double delta){
+int ckb_frame(ckb_runctx* context){
     CKB_KEYCLEAR(context);
     double length = animlength * width;
+    unsigned count = context->keycount;
+    ckb_key* keys = context->keys;
     for(unsigned i = 0; i < ANIM_MAX; i++){
         if(anim[i].active){
-            anim[i].curx += width * delta;
-            if(anim[i].curx > width + length){
-                anim[i].active = 0;
-                continue;
-            }
-            unsigned count = context->keycount;
-            ckb_key* keys = context->keys;
             for(ckb_key* key = keys; key < keys + count; key++){
                 // Translate and rotate the key position into the animation's coordinate system
                 float x = key->x - anim[i].x, y = key->y - anim[i].y;

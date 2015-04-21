@@ -23,12 +23,19 @@ void KeyWidget::map(const KeyMap& newMap){
     update();
 }
 
-void KeyWidget::colorMap(const QHash<QString, QRgb>& newColorMap){
+void KeyWidget::colorMap(const ColorMap& newColorMap){
     _colorMap = newColorMap;
     update();
 }
 
-void KeyWidget::bindMap(const QHash<QString, QString>& newBindMap){
+void KeyWidget::displayColorMap(ColorMap newDisplayMap){
+    if(!isVisible())
+        return;
+    _displayColorMap = newDisplayMap;
+    update();
+}
+
+void KeyWidget::bindMap(const BindMap& newBindMap){
     _bindMap = newBindMap;
     update();
 }
@@ -162,7 +169,10 @@ void KeyWidget::paintEvent(QPaintEvent*){
             float y = key.y + 6.f - 1.8f;
             float w = 3.6f;
             float h = 3.6f;
-            decPainter.setBrush(QBrush(_colorMap[key.name]));
+            if(_displayColorMap.contains(key.name))
+                decPainter.setBrush(QBrush(_displayColorMap.value(key.name)));
+            else
+                decPainter.setBrush(QBrush(_colorMap.value(key.name)));
             decPainter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
         }
     } else {

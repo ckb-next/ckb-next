@@ -25,12 +25,13 @@ bool isRunning(bool showWindow){
     return false;
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
     QApplication a(argc, argv);
     bool background = qApp->arguments().contains("--background");
-    if(isRunning(!background))
+    if(isRunning(!background)){
+        printf("ckb is already running. Exiting.\n");
         return 0;
+    }
 #ifdef Q_OS_MACX
     disableAppNap();
 #endif

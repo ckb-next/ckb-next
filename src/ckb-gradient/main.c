@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Gradient");
-    CKB_VERSION("0.8");
+    CKB_VERSION("0.9");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{54DD2975-E192-457D-BCFC-D912A24E33B4}");
@@ -75,25 +75,35 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
     }
 }
 
-void ckb_start(ckb_runctx* context){
-    // Start all keys
+void ckb_start(ckb_runctx* context, int state){
+    // Start/stop all keys
     unsigned count = context->keycount;
-    memset(target, 0, count * sizeof(float));
+    if(state)
+        memset(target, 0, count * sizeof(float));
+    else {
+        for(unsigned i = 0; i < count; i++)
+            target[i] = NONE;
+    }
 }
 
-int ckb_frame(ckb_runctx* context, double delta){
+void ckb_time(ckb_runctx* context, double delta){
+    unsigned count = context->keycount;
+    for(unsigned i = 0; i < count; i++){
+        float phase = target[i];
+        if(phase > 1.f || phase < 0.f)
+            continue;
+        target[i] = phase + delta;
+    }
+}
+
+int ckb_frame(ckb_runctx* context){
     unsigned count = context->keycount;
     for(unsigned i = 0; i < count; i++){
         float phase = target[i];
         if(phase == HOLD)
             phase = 0.f;
-        else {
-            if(phase > 1.f || phase < 0.f){
-                phase = -1.f;
-                continue;
-            }
-            target[i] = (phase += delta);
-        }
+        else if(phase < 0.f)
+            phase = 1.f;
         ckb_key* key = context->keys + i;
         float a, r, g, b;
         ckb_grad_color(&a, &r, &g, &b, &animcolor, phase * 100.);

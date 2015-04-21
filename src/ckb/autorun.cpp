@@ -3,6 +3,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include "autorun.h"
+#include "ckbsettings.h"
 
 // Paths
 #ifdef Q_OS_LINUX
@@ -26,8 +27,7 @@ bool AutoRun::available(){
 }
 
 bool AutoRun::once(){
-    QSettings settings;
-    return settings.value(settingPath).toBool();
+    CkbSettings::get(settingPath).toBool();
 }
 
 bool AutoRun::isEnabled(){
@@ -35,8 +35,7 @@ bool AutoRun::isEnabled(){
     if(!path.exists() || !path.exists(file))
         return false;
     // If autostart is enabled, set the flag from once() (in case it hasn't been done yet)
-    QSettings settings;
-    settings.setValue(settingPath, true);
+    CkbSettings::set(settingPath, true);
     return true;
 }
 
@@ -48,8 +47,7 @@ void AutoRun::enable(){
         QDir::home().mkpath(path.absolutePath());
     QFile::copy(internalFile, path.absoluteFilePath(file));
     // Mark once() as done
-    QSettings settings;
-    settings.setValue(settingPath, true);
+    CkbSettings::set(settingPath, true);
 }
 
 void AutoRun::disable(){

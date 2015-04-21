@@ -22,7 +22,8 @@ public:
     inline const KeyMap& map() { return _map; }
     void map(const KeyMap& map);
     // Key -> color map
-    inline const QHash<QString, QRgb>& colorMap() { return _colorMap; }
+    typedef QHash<QString, QRgb> ColorMap;
+    inline const ColorMap& colorMap() { return _colorMap; }
     // Color a key
     inline void color(const QString& key, const QColor& newColor) { _needsSave = true; _colorMap[key] = newColor.rgb(); }
     // Color all keys in the current map
@@ -77,12 +78,14 @@ public:
 signals:
     void didLoad();
     void updated();
+    void frameDisplayed(ColorMap animatedColors);
 
 private:
     QList<KbAnim*> _animList;
     KbAnim* _previewAnim;
     KeyMap _map;
-    QHash<QString, QRgb> _colorMap;
+    ColorMap _colorMap;
+    quint64 lastFrameSignal;
     int _dimming;
     int _inactive;
     bool _showMute;

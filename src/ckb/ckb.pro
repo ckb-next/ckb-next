@@ -82,7 +82,8 @@ SOURCES += main.cpp\
     kbfirmware.cpp \
     fwupgradedialog.cpp \
     autorun.cpp \
-    keymap_es.cpp
+    keymap_es.cpp \
+    ckbsettings.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -129,7 +130,8 @@ HEADERS  += mainwindow.h \
     quazip/zip.h \
     kbfirmware.h \
     fwupgradedialog.h \
-    autorun.h
+    autorun.h \
+    ckbsettings.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \

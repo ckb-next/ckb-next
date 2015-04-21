@@ -17,18 +17,20 @@
 //     This function will be called at start up, after ckb_init but before any other functions, once for each parameter.
 //     If live params are enabled, it will also be called while the animation is running.
 
-//   void ckb_start(ckb_runctx* context)
-//     Starts or restarts an animation in the center of the keyboard (i.e. without a keypress).
+//   void ckb_start(ckb_runctx* context, int state)
+//     Starts/restarts (state = 1) or stops (state = 0) an animation in the center of the keyboard (i.e. without a keypress).
 //     Do not assume that this will be called at start up, or at all. It may not be the case depending on configuration.
 //   void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state)
 //     Receives a key down / key up event. Called only if KP mode is not NONE.
 //     x and y are always filled and valid. key may be null if KP mode is POSITION.
 //     Once again, do not assume when (or if) this will be called.
-//   int ckb_frame(ckb_runctx* context, double delta)
+//   void ckb_time(ckb_runctx* context, double delta)
 //     Advances the animation frame. Do not assume that this will occur at a regular interval; use delta to see how much time has passed.
 //     If timing mode is DURATION, delta is in durations (0 <= delta <= 1). If timing mode is ABSOLUTE, delta is in seconds (0 <= delta).
 //     Try to return as quickly as possible, because ckb may stop sending frames if it does not receive a response in time.
-//     Return 0 to continue running or any other number to exit. On exit, the last-printed image will remain on the keyboard.
+//   int ckb_frame(ckb_runctx* context)
+//     Requests frame data from the animation. Update the context with appropriate colors.
+//     Return 0 to continue running or any other number to exit. On exit, the last-set frame will remain on the keyboard.
 
 #include <ctype.h>
 #include <math.h>
@@ -339,8 +341,9 @@ extern void ckb_info();
 extern void ckb_init(ckb_runctx* context);
 extern void ckb_parameter(ckb_runctx*, const char*, const char*);
 extern void ckb_keypress(ckb_runctx*, ckb_key*, int, int, int);
-extern void ckb_start(ckb_runctx*);
-extern int ckb_frame(ckb_runctx*, double);
+extern void ckb_start(ckb_runctx*, int);
+extern void ckb_time(ckb_runctx*, double);
+extern int ckb_frame(ckb_runctx*);
 
 // Update parameter values
 void ckb_read_params(ckb_runctx* ctx){
@@ -444,7 +447,9 @@ int main(int argc, char *argv[]){
                     break;
                 // Parse input
                 if(!strcmp(cmd, "start"))
-                    ckb_start(&ctx);
+                    ckb_start(&ctx, 1);
+                else if(!strcmp(cmd, "stop"))
+                    ckb_start(&ctx, 0);
                 else if(!strcmp(cmd, "begin") && !strcmp(param, "params"))
                     ckb_read_params(&ctx);
                 else if(!strcmp(cmd, "key")){
@@ -474,21 +479,22 @@ int main(int argc, char *argv[]){
                         if(key)
                             ckb_keypress(&ctx, key, key->x, key->y, !strcmp(value, "down"));
                     }
+                } else if(!strcmp(cmd, "frame")){
+                    int end = ckb_frame(&ctx);
+                    // Output the frame
+                    printf("begin frame\n");
+                    for(i = 0; i < ctx.keycount; i++){
+                        ckb_key* key = ctx.keys + i;
+                        printf("argb %s %02hhx%02hhx%02hhx%02hhx\n", key->name, key->a, key->r, key->g, key->b);
+                    }
+                    printf("end frame\n");
+                    if(end)
+                        break;
+                    fflush(stdout);
                 } else {
                     double delta = 0.;
-                    if(!strcmp(cmd, "frame") && sscanf(param, "%lf", &delta) == 1){
-                        int end = ckb_frame(&ctx, delta);
-                        // Output the frame
-                        printf("begin frame\n");
-                        for(i = 0; i < ctx.keycount; i++){
-                            ckb_key* key = ctx.keys + i;
-                            printf("argb %s %02hhx%02hhx%02hhx%02hhx\n", key->name, key->a, key->r, key->g, key->b);
-                        }
-                        printf("end frame\n");
-                        if(end)
-                            break;
-                        fflush(stdout);
-                    }
+                    if(!strcmp(cmd, "time") && sscanf(param, "%lf", &delta) == 1)
+                        ckb_time(&ctx, delta);
                 }
             }
             printf("end run\n");

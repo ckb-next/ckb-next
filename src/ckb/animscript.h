@@ -75,14 +75,16 @@ public:
     void init(const KeyMap& map, const QStringList& keys, const QMap<QString, QVariant>& paramValues);
     // Updates parameters without a complete re-initialization. Does nothing if the animation does not support live params.
     void parameters(const QMap<QString, QVariant>& paramValues);
-    // Starts or restarts the animation.
+    // Starts or restarts the animation (no key).
     void retrigger(quint64 timestamp, bool allowPreempt = false);
+    // Stops the no-key animation
+    void stop(quint64 timestamp);
     // Triggers a keypress event.
     void keypress(const QString& key, bool pressed, quint64 timestamp);
     // Executes the next frame of the animation.
     void frame(quint64 timestamp);
-    // Stops the animation.
-    void stop();
+    // Ends the animation.
+    void end();
 
     // Whether or not the animation has processed any frames yet.
     inline bool hasFrame() const { return initialized && readAnyFrame; }
@@ -137,8 +139,8 @@ private:
     // Helper functions
     void setDuration();
     void printParams();
-    void start(quint64 timestamp);
-    void nextFrame(quint64 timestamp);
+    void begin(quint64 timestamp);
+    void advance(quint64 timestamp);
 
     // Global script list
     static QHash<QUuid, AnimScript*> scripts;

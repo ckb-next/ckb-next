@@ -3,8 +3,8 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <QSettings>
 #include <QUrl>
+#include "ckbsettings.h"
 #include "fwupgradedialog.h"
 #include "kbfirmware.h"
 #include "kbwidget.h"
@@ -55,8 +55,7 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
     }
 
     // Load profiles from stored settings
-    QSettings settings;
-    settings.beginGroup(prefsPath);
+    CkbSettings settings(prefsPath);
     device->load(settings);
 }
 
@@ -67,9 +66,7 @@ KbWidget::~KbWidget(){
 }
 
 void KbWidget::saveSettings(){
-    QSettings settings;
-    settings.remove(prefsPath);
-    settings.beginGroup(prefsPath);
+    CkbSettings settings(prefsPath, true);
     device->save(settings);
     settings.endGroup();
 }

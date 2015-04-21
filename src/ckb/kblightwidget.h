@@ -34,6 +34,8 @@ private slots:
 
     void on_bgButton_clicked();
 
+    void on_showAnimBox_clicked(bool checked);
+
 private:
     KbLight* light;
 

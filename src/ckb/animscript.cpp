@@ -233,7 +233,7 @@ bool AnimScript::load(){
 void AnimScript::init(const KeyMap& map, const QStringList& keys, const QMap<QString, QVariant>& paramValues){
     if(_path == "")
         return;
-    stop();
+    end();
     _map = map;
     _keys = keys;
     _paramValues = paramValues;
@@ -276,10 +276,10 @@ void AnimScript::printParams(){
     process->write("end params\n");
 }
 
-void AnimScript::start(quint64 timestamp){
+void AnimScript::begin(quint64 timestamp){
     if(!initialized)
         return;
-    stop();
+    end();
     stopped = firstFrame = readFrame = readAnyFrame = false;
     process = new QProcess(this);
     connect(process, SIGNAL(readyRead()), this, SLOT(readProcess()));
@@ -322,25 +322,36 @@ void AnimScript::retrigger(quint64 timestamp, bool allowPreempt){
         // If preemption is wanted, trigger the animation 1 duration in the past first
         retrigger(timestamp - repeatMsec);
     if(!process)
-        start(timestamp);
-    nextFrame(timestamp);
+        begin(timestamp);
+    advance(timestamp);
     process->write("start\n");
+}
+
+void AnimScript::stop(quint64 timestamp){
+    if(!initialized)
+        return;
+    if(!process)
+        begin(timestamp);
+    advance(timestamp);
+    process->write("stop\n");
 }
 
 void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
     if(!initialized)
         return;
     if(!process)
-        start(timestamp);
+        begin(timestamp);
     switch(_info.kpMode){
     case KP_NONE:
-        // If KPs aren't allowed, call retrigger instead
+        // If KPs aren't allowed, call retrigger/stop instead
         if(pressed)
             retrigger(timestamp);
+        else
+            stop(timestamp);
         break;
     case KP_NAME:
         // Print keypress by name
-        nextFrame(timestamp);
+        advance(timestamp);
         process->write(("key " + key + (pressed ? " down\n" : " up\n")).toLatin1());
         break;
     case KP_POSITION:
@@ -348,13 +359,13 @@ void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
         const KeyPos* kp = _map.key(key);
         if(!kp)
             return;
-        nextFrame(timestamp);
+        advance(timestamp);
         process->write(("key " + QString("%1,%2").arg(kp->x - minX).arg(kp->y - minY) + (pressed ? " down\n" : " up\n")).toLatin1());
         break;
     }
 }
 
-void AnimScript::stop(){
+void AnimScript::end(){
     _colors.clear();
     if(process){
         process->kill();
@@ -396,28 +407,30 @@ void AnimScript::frame(quint64 timestamp){
         return;
     // Start the animation if it's not running yet
     if(!process)
-        start(timestamp);
+        begin(timestamp);
 
-    // If at least one frame was read (or no frame commands have been sent yet), advance the animation
+    advance(timestamp);
     if(readFrame || !firstFrame)
-        nextFrame(timestamp);
+        // Don't ask for a new frame if the animation hasn't delivered the last one yet
+        process->write("frame\n");
+    firstFrame = true;
     readFrame = false;
 }
 
-void AnimScript::nextFrame(quint64 timestamp){
-    if(timestamp <= lastFrame)
+void AnimScript::advance(quint64 timestamp){
+    if(timestamp <= lastFrame){
+        // Don't do anything if the current frame is before the last frame (this can happen when starting an animation with preemption)
         lastFrame = timestamp;
+        return;
+    }
     double delta = (timestamp - lastFrame) / (double)durationMsec;
-    // Skip any complete durations
     if(!_info.absoluteTime){
+        // Skip any complete durations
         while(delta > 1.){
-            process->write("frame 1\n");
+            process->write("time 1\n");
             delta--;
         }
     }
-    if(delta < 0.)
-        delta = 0.;
+    process->write(QString("time %1\n").arg(delta).toLatin1());
     lastFrame = timestamp;
-    process->write(QString("frame %1\n").arg(delta).toLatin1());
-    firstFrame = true;
 }

@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Random");
-    CKB_VERSION("0.8");
+    CKB_VERSION("0.9");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{22418DA4-A181-4B93-A4D3-03682BA283D2}");
@@ -64,7 +64,11 @@ void ckb_init(ckb_runctx* context){
     srand(time(NULL));
 }
 
-void ckb_start(ckb_runctx* context){
+void ckb_start(ckb_runctx* context, int state){
+    if(state == 0){
+        phase = -1.;
+        return;
+    }
     phase = 0.;
     ckb_key* keys = context->keys;
     unsigned count = context->keycount;
@@ -82,20 +86,26 @@ void ckb_start(ckb_runctx* context){
     }
 }
 
-int ckb_frame(ckb_runctx* context, double delta){
+void ckb_time(ckb_runctx* context, double delta){
     if(phase < 0.)
-        // Generate an initial state if it hasn't been done yet
-        ckb_start(context);
-    ckb_key* keys = context->keys;
-    unsigned count = context->keycount;
+        return;
     phase += delta;
-    if(phase >= 1.){
+    if(phase > 1.){
         phase -= 1.;
         rgb* temp = target;
         target = current;
         current = temp;
-        newtarget(target, count);
+        newtarget(target, context->keycount);
     }
+}
+
+int ckb_frame(ckb_runctx* context){
+    if(phase < 0.){
+        CKB_KEYCLEAR(context);
+        return 0;
+    }
+    ckb_key* keys = context->keys;
+    unsigned count = context->keycount;
     for(unsigned i = 0; i < count; i++){
         ckb_key* key = keys + i;
         key->a = round(current[i].a * (1. - phase) + target[i].a * phase);

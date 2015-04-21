@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Raindrop");
-    CKB_VERSION("0.8");
+    CKB_VERSION("0.9");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{5D6695AF-0496-41E2-BEE7-F7D0ABAA49E9}");
@@ -88,15 +88,15 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
         drop_add(x, y, 0);
 }
 
-void ckb_start(ckb_runctx* context){
+double tick = -1.;
+
+void ckb_start(ckb_runctx* context, int state){
+    tick = state ? 0. : -1.;
 }
 
-double tick = 0.;
-
-int ckb_frame(ckb_runctx* context, double delta){
-    if(delta <= 0.)
-        return 0;
-    CKB_KEYCLEAR(context);
+void ckb_time(ckb_runctx* context, double delta){
+    if(delta <= 0. || tick < 0.)
+        return;
     tick += delta;
     if(tick > period && spawn){
         drop_add(rand() / (double)RAND_MAX * context->width, rand() / (double)RAND_MAX * context->height, 1);
@@ -105,10 +105,16 @@ int ckb_frame(ckb_runctx* context, double delta){
     for(unsigned i = 0; i < DROP_MAX; i++){
         if(drop[i].active){
             drop[i].size += delta * speed;
-            if(drop[i].size > drop[i].msize){
+            if(drop[i].size > drop[i].msize)
                 drop[i].active = 0;
-                continue;
-            }
+        }
+    }
+}
+
+int ckb_frame(ckb_runctx* context){
+    CKB_KEYCLEAR(context);
+    for(unsigned i = 0; i < DROP_MAX; i++){
+        if(drop[i].active){
             unsigned count = context->keycount;
             ckb_key* keys = context->keys;
             for(ckb_key* key = keys; key < keys + count; key++){

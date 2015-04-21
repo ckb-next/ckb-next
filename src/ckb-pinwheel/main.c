@@ -3,7 +3,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Pinwheel");
-    CKB_VERSION("0.8");
+    CKB_VERSION("0.9");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{07551A90-D97A-4DD0-A770-E9E280A90891}");
@@ -59,19 +59,24 @@ float x, y;
 
 #define ANGLE(theta) fmod((theta) + M_PI * 2., M_PI * 2.)
 
-void ckb_start(ckb_runctx* context){
-    frame = 0.;
+void ckb_start(ckb_runctx* context, int state){
+    frame = state ? 0. : -1.;
     x = context->width / 2.f;
     y = context->height / 2.f;
 }
 
-int ckb_frame(ckb_runctx* context, double delta){
+void ckb_time(ckb_runctx* context, double delta){
     if(frame < 0.)
-        ckb_start(context);
-    CKB_KEYCLEAR(context);
+        return;
     frame += delta;
     if(frame > 1.)
         frame -= 1.;
+}
+
+int ckb_frame(ckb_runctx* context){
+    CKB_KEYCLEAR(context);
+    if(frame < 0.)
+        return 0;
 
     float position = ANGLE(-frame * M_PI * 2.);
     unsigned count = context->keycount;

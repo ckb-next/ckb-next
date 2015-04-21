@@ -57,7 +57,7 @@ public:
     // Stops the animation
     void stop();
     // Whether or not the animation is running
-    inline bool isRunning() { return forceStarted || _script->hasFrame(); }
+    inline bool isRunning() { return _script->hasFrame(); }
 
     // Blends the animation into a color map, taking opacity and mode into account
     void blend(QHash<QString, QRgb>& animMap, quint64 timestamp);
@@ -99,8 +99,6 @@ private:
     QString repeatKey;
     quint64 repeatTime, kpRepeatTime, stopTime, kpStopTime;
     int repeatMsec, kpRepeatMsec;
-    // Depending on the animation settings, it may not start immediately when it's "started", so this is used to avoid waiting for it.
-    bool forceStarted;
 
     QUuid _guid;
     QString _name;

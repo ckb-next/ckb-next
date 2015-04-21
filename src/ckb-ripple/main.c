@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Ripple");
-    CKB_VERSION("0.8");
+    CKB_VERSION("0.9");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25A1CDB02C9D}");
@@ -42,13 +42,14 @@ void ckb_info(){
     CKB_PRESET_END;
 }
 
-void ckb_init(ckb_runctx* context){
-    // Nothing to do
-}
-
+float kbsize = 0.f;
 ckb_gradient animcolor = { 0 };
 int symmetric = 0, kprelease = 0;
 double animlength = 0.;
+
+void ckb_init(ckb_runctx* context){
+    kbsize = sqrt(context->width * context->width / 4.f + context->height * context->height / 4.f);
+}
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_AGRADIENT("color", &animcolor){}
@@ -85,34 +86,43 @@ void anim_add(float x, float y, float width, float height){
     }
 }
 
+void anim_remove(float x, float y){
+    for(int i = 0; i < ANIM_MAX; i++){
+        if(anim[i].active && anim[i].x == x && anim[i].y == y)
+            anim[i].active = 0;
+    }
+}
+
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
     if(state)
         anim_add(x, y, context->width, context->height);
-    else if(kprelease){
-        // Cancel existing animation if stop on keyup is enabled
-        for(int i = 0; i < ANIM_MAX; i++){
-            if(anim[i].active && anim[i].x == x && anim[i].y == y)
+    else if(kprelease)
+        anim_remove(x, y);
+}
+
+void ckb_start(ckb_runctx* context, int state){
+    if(state)
+        anim_add(context->width / 2.f, context->height / 2.f, context->width, context->height);
+    else
+        anim_remove(context->width / 2.f, context->height / 2.f);
+}
+
+void ckb_time(ckb_runctx* context, double delta){
+    for(unsigned i = 0; i < ANIM_MAX; i++){
+        if(anim[i].active){
+            anim[i].cursize += kbsize * delta;
+            if(anim[i].cursize > anim[i].maxsize)
                 anim[i].active = 0;
         }
     }
 }
 
-void ckb_start(ckb_runctx* context){
-    anim_add(context->width / 2.f, context->height / 2.f, context->width, context->height);
-}
-
-int ckb_frame(ckb_runctx* context, double delta){
+int ckb_frame(ckb_runctx* context){
     CKB_KEYCLEAR(context);
-    float kbsize = sqrt(context->width * context->width / 4.f + context->height * context->height / 4.f);
+    unsigned count = context->keycount;
+    ckb_key* keys = context->keys;
     for(unsigned i = 0; i < ANIM_MAX; i++){
         if(anim[i].active){
-            anim[i].cursize += kbsize * delta;
-            if(anim[i].cursize > anim[i].maxsize){
-                anim[i].active = 0;
-                continue;
-            }
-            unsigned count = context->keycount;
-            ckb_key* keys = context->keys;
             for(ckb_key* key = keys; key < keys + count; key++){
                 float distance = anim[i].cursize - sqrt(pow(key->x - anim[i].x, 2.f) + pow(key->y - anim[i].y, 2.f));
                 if(symmetric)

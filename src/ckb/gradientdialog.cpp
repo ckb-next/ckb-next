@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QSettings>
+#include "ckbsettings.h"
 #include "gradientdialog.h"
 #include "ui_gradientdialog.h"
 
@@ -35,8 +36,7 @@ GradientDialog::GradientDialog(QWidget *parent) :
     addPreset(rainbow);
 
     // Load stored presets
-    QSettings settings;
-    settings.beginGroup(prefsPath);
+    CkbSettings settings(prefsPath);
     foreach(const QString& name, settings.childGroups()){
         QString pName = name.toLower();
         if(presets.contains(pName))
@@ -77,9 +77,7 @@ QGradientStops GradientDialog::getGradient(const QGradientStops& prevGradient){
 
 GradientDialog::~GradientDialog(){
     // Save presets
-    QSettings settings;
-    settings.remove(prefsPath);
-    settings.beginGroup(prefsPath);
+    CkbSettings settings(prefsPath, true);
     QMapIterator<QString, Preset> i(presets);
     while(i.hasNext()){
         Preset preset = i.next().value();

@@ -217,9 +217,15 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
     if(_previewAnim)
         _previewAnim->blend(animMap, timestamp);
 
+    // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
+    if(timestamp >= lastFrameSignal + 50){
+        emit frameDisplayed(animMap);
+        lastFrameSignal = timestamp;
+    }
+
+    // If brightness is at 0%, turn off lighting entirely
     cmd.write(QString().sprintf("mode %d switch", modeIndex + 1).toLatin1());
     if(_dimming == 3){
-        // If brightness is at 0%, turn off lighting entirely
         cmd.write(" rgb off");
         return;
     }
@@ -263,11 +269,6 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
 
     // Apply light
     printRGB(cmd, animMap);
-    if(timestamp >= lastFrameSignal + 50){
-        // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
-        emit frameDisplayed(animMap);
-        lastFrameSignal = timestamp;
-    }
 }
 
 void KbLight::open(){

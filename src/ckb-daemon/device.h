@@ -8,7 +8,11 @@
 #define DEV_MAX     10
 extern usbdevice keyboard[DEV_MAX];
 // Is a device active?
+#ifdef OS_LINUX
+#define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->uinput)
+#else
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
+#endif
 // A mutex used when accessing the device table. This mutex must be locked
 // during any operation that could add or remove a device, or during any
 // operation that accesses the devices as a list.

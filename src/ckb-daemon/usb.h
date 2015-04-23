@@ -69,9 +69,9 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 
 #define NK95_HWOFF  0x020030    // Hardware playback off
 #define NK95_HWON   0x020001    // Hardware playback on
-#define NK95_M1     0x200001    // Mode switches
-#define NK95_M2     0x200002
-#define NK95_M3     0x200003
+#define NK95_M1     0x140001    // Mode switches
+#define NK95_M2     0x140002
+#define NK95_M3     0x140003
 
 // Tries to reset a USB device after a failed action. Returns 0 on success.
 // The previous action will NOT be re-attempted and the keyboard's USB queue will be cleared.

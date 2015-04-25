@@ -24,9 +24,9 @@
 #define IS_RGB(vendor, product) ((product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 
 // USB delays for when the keyboards get picky about timing
-#define DELAY_SHORT     usleep(3000)
-#define DELAY_MEDIUM    usleep(10000)
-#define DELAY_LONG      usleep(100000)
+#define DELAY_SHORT     usleep(2000)
+#define DELAY_MEDIUM    usleep(20000)
+#define DELAY_LONG      usleep(200000)
 
 // Start the USB system. Returns 0 on success
 int usbinit();

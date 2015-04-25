@@ -4,15 +4,22 @@
 
 void initrgb(keylight* light){
     // Allocate colors. Default to all white.
+    memset(light, 0xFF, sizeof(keylight));
     light->enabled = 1;
-    memset(light->r, 0, sizeof(light->r));
-    memset(light->g, 0, sizeof(light->g));
-    memset(light->b, 0, sizeof(light->b));
 }
 
-void makergb(const keylight* light, uchar data_pkt[5][MSG_SIZE], int forceon){
+void makergb_512(const keylight* light, uchar data_pkt[5][MSG_SIZE], int forceon){
     if(forceon || light->enabled){
-        const char* r = light->r, *g = light->g, *b = light->b;
+        uchar r[N_KEYS / 2], g[N_KEYS / 2], b[N_KEYS / 2];
+        // Compress RGB values to a 512-color palette
+        for(int i = 0; i < N_KEYS; i += 2){
+            char r1 = light->r[i], r2 = light->r[i + 1];
+            char g1 = light->g[i], g2 = light->g[i + 1];
+            char b1 = light->b[i], b2 = light->b[i + 1];
+            r[i / 2] = (7 - (r2 >> 5)) << 4 | (7 - (r1 >> 5));
+            g[i / 2] = (7 - (g2 >> 5)) << 4 | (7 - (g1 >> 5));
+            b[i / 2] = (7 - (b2 >> 5)) << 4 | (7 - (b1 >> 5));
+        }
         memcpy(data_pkt[0] + 4, r, 60);
         memcpy(data_pkt[1] + 4, r + 60, 12);
         memcpy(data_pkt[1] + 16, g, 48);
@@ -27,6 +34,24 @@ void makergb(const keylight* light, uchar data_pkt[5][MSG_SIZE], int forceon){
     }
 }
 
+void makergb_full(const keylight* light, uchar data_pkt[12][MSG_SIZE], int forceon){
+    if(forceon || light->enabled){
+        const uchar* r = light->r, *g = light->g, *b = light->b;
+        // Red
+        memcpy(data_pkt[0] + 4, r, 60);
+        memcpy(data_pkt[1] + 4, r + 60, 60);
+        memcpy(data_pkt[2] + 4, r + 120, 24);
+        // Green (final R packet is blank)
+        memcpy(data_pkt[4] + 4, g, 60);
+        memcpy(data_pkt[5] + 4, g + 60, 60);
+        memcpy(data_pkt[6] + 4, g + 120, 24);
+        // Blue (final G packet is blank)
+        memcpy(data_pkt[8] + 4, b, 60);
+        memcpy(data_pkt[9] + 4, b + 60, 60);
+        memcpy(data_pkt[10] + 4, b + 120, 24);
+    }
+}
+
 void updatergb(usbdevice* kb, int force){
     if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB) || !kb->active)
         return;
@@ -35,69 +60,187 @@ void updatergb(usbdevice* kb, int force){
     keylight* newlight = &kb->profile.currentmode->light;
     if(!force && ((!lastlight->enabled && !newlight->enabled) || !memcmp(lastlight, newlight, sizeof(keylight))))
         return;
+
+    /*if(kb->fwversion >= 0x0120){
+        uchar data_pkt[12][MSG_SIZE] = {
+            // Red
+            { 0x7f, 0x01, 60, 0 },
+            { 0x7f, 0x02, 60, 0 },
+            { 0x7f, 0x03, 24, 0 },
+            { 0x07, 0x28, 0x01, 0x00, 0x01, 0x01},
+            // Green
+            { 0x7f, 0x01, 60, 0 },
+            { 0x7f, 0x02, 60, 0 },
+            { 0x7f, 0x03, 24, 0 },
+            { 0x07, 0x28, 0x02, 0x00, 0x01, 0x01},
+            // Blue
+            { 0x7f, 0x01, 60, 0 },
+            { 0x7f, 0x02, 60, 0 },
+            { 0x7f, 0x03, 24, 0 },
+            { 0x07, 0x28, 0x03, 0x00, 0x02, 0x01}
+        };
+        makergb_full(newlight, data_pkt, 0);
+        if(usbqueue(kb, data_pkt[0], 12))
+            return;
+    } else {*/
+    // 16.8M color lighting causes flickering and color glitches. Don't use it for this.
+    // Maybe in a future version this can be re-added as an advanced feature.
+        uchar data_pkt[5][MSG_SIZE] = {
+            { 0x7f, 0x01, 60, 0 },
+            { 0x7f, 0x02, 60, 0 },
+            { 0x7f, 0x03, 60, 0 },
+            { 0x7f, 0x04, 36, 0 },
+            { 0x07, 0x27, 0x00, 0x00, 0xD8 }
+        };
+        makergb_512(newlight, data_pkt, 0);
+        if(usbqueue(kb, data_pkt[0], 5))
+            return;
+    //}
+
     memcpy(lastlight, newlight, sizeof(keylight));
-
-    uchar data_pkt[5][MSG_SIZE] = {
-        { 0x7f, 0x01, 60, 0 },
-        { 0x7f, 0x02, 60, 0 },
-        { 0x7f, 0x03, 60, 0 },
-        { 0x7f, 0x04, 36, 0 },
-        { 0x07, 0x27, 0x00, 0x00, 0xD8 }
-    };
-
-    makergb(newlight, data_pkt, 0);
-    usbqueue(kb, data_pkt[0], 5);
 }
 
 void savergb(usbdevice* kb, int mode){
-    uchar data_pkt[5][MSG_SIZE] = {
-        { 0x7f, 0x01, 60, 0 },
-        { 0x7f, 0x02, 60, 0 },
-        { 0x7f, 0x03, 60, 0 },
-        { 0x7f, 0x04, 36, 0 },
-        { 0x07, 0x14, 0x02, 0x00, 0x01, mode + 1 }
-    };
-
-    makergb(&kb->profile.mode[mode].light, data_pkt, 1);
-    usbqueue(kb, data_pkt[0], 5);
+    if(kb->fwversion >= 0x0120){
+        uchar data_pkt[12][MSG_SIZE] = {
+            // Red
+            { 0x7f, 0x01, 60, 0 },
+            { 0x7f, 0x02, 60, 0 },
+            { 0x7f, 0x03, 24, 0 },
+            { 0x07, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x01 },
+            // Green
+            { 0x7f, 0x01, 60, 0 },
+            { 0x7f, 0x02, 60, 0 },
+            { 0x7f, 0x03, 24, 0 },
+            { 0x07, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x02 },
+            // Blue
+            { 0x7f, 0x01, 60, 0 },
+            { 0x7f, 0x02, 60, 0 },
+            { 0x7f, 0x03, 24, 0 },
+            { 0x07, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x03 }
+        };
+        makergb_full(&kb->profile.mode[mode].light, data_pkt, 0);
+        usbqueue(kb, data_pkt[0], 12);
+    } else {
+        uchar data_pkt[5][MSG_SIZE] = {
+            { 0x7f, 0x01, 60, 0 },
+            { 0x7f, 0x02, 60, 0 },
+            { 0x7f, 0x03, 60, 0 },
+            { 0x7f, 0x04, 36, 0 },
+            { 0x07, 0x14, 0x02, 0x00, 0x01, mode + 1 }
+        };
+        makergb_512(&kb->profile.mode[mode].light, data_pkt, 0);
+        usbqueue(kb, data_pkt[0], 5);
+    }
 }
 
 int loadrgb(usbdevice* kb, keylight* light, int mode){
-    uchar data_pkt[5][MSG_SIZE] = {
-        { 0x0e, 0x14, 0x02, 0x01, 0x01, mode + 1, 0 },
-        { 0xff, 0x01, 60, 0 },
-        { 0xff, 0x02, 60, 0 },
-        { 0xff, 0x03, 60, 0 },
-        { 0xff, 0x04, 36, 0 },
-    };
-    uchar in_pkt[4][MSG_SIZE] = {
-        { 0xff, 0x01, 60, 0 },
-        { 0xff, 0x02, 60, 0 },
-        { 0xff, 0x03, 60, 0 },
-        { 0xff, 0x04, 36, 0 },
-    };
-    usbqueue(kb, data_pkt[0], 1);
-    DELAY_SHORT;
-    if(!usbdequeue(kb))
-        return -1;
-    for(int i = 1; i < 5; i++){
-        usbqueue(kb, data_pkt[i], 1);
+    if(kb->fwversion >= 0x0120){
+        uchar data_pkt[12][MSG_SIZE] = {
+            { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x01 },
+            { 0xff, 0x01, 60, 0 },
+            { 0xff, 0x02, 60, 0 },
+            { 0xff, 0x03, 24, 0 },
+            { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x02 },
+            { 0xff, 0x01, 60, 0 },
+            { 0xff, 0x02, 60, 0 },
+            { 0xff, 0x03, 24, 0 },
+            { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x03 },
+            { 0xff, 0x01, 60, 0 },
+            { 0xff, 0x02, 60, 0 },
+            { 0xff, 0x03, 24, 0 },
+        };
+        uchar in_pkt[4][MSG_SIZE] = {
+            { 0x0e, 0x14, 0x03, 0x01 },
+            { 0xff, 0x01, 60, 0 },
+            { 0xff, 0x02, 60, 0 },
+            { 0xff, 0x03, 24, 0 },
+        };
+        // Read colors
+        uchar* colors[3] = { light->r, light->g, light->b };
+        for(int clr = 0; clr < 3; clr++){
+            for(int i = 0; i < 4; i++){
+                usbqueue(kb, data_pkt[i + clr * 4], 1);
+                DELAY_MEDIUM;
+                if(!usbdequeue(kb))
+                    return -1;
+                // Wait for the response. Make sure the first four bytes match
+                DELAY_MEDIUM;
+                if(!usbinput(kb, in_pkt[i]))
+                    return -1;
+                if(memcmp(in_pkt[i], data_pkt[i], 4)){
+                    printf("Error: %s:%d: Bad input header\n", __FILE_NOPATH__, __LINE__);
+                    return -1;
+                }
+            }
+            // Copy colors to lighting. in_pkt[0] is irrelevant.
+            memcpy(colors[clr], in_pkt[1] + 4, 60);
+            memcpy(colors[clr] + 60, in_pkt[2] + 4, 60);
+            memcpy(colors[clr] + 120, in_pkt[3] + 4, 24);
+        }
+    } else {
+        uchar data_pkt[5][MSG_SIZE] = {
+            { 0x0e, 0x14, 0x02, 0x01, 0x01, mode + 1, 0 },
+            { 0xff, 0x01, 60, 0 },
+            { 0xff, 0x02, 60, 0 },
+            { 0xff, 0x03, 60, 0 },
+            { 0xff, 0x04, 36, 0 },
+        };
+        uchar in_pkt[4][MSG_SIZE] = {
+            { 0xff, 0x01, 60, 0 },
+            { 0xff, 0x02, 60, 0 },
+            { 0xff, 0x03, 60, 0 },
+            { 0xff, 0x04, 36, 0 },
+        };
+        // Write initial packet
+        usbqueue(kb, data_pkt[0], 1);
         DELAY_SHORT;
         if(!usbdequeue(kb))
             return -1;
-        // Wait for the response. Make sure the first four bytes match
-        DELAY_SHORT;
-        if(!usbinput(kb, in_pkt[i - 1]) || memcmp(in_pkt[i - 1], data_pkt[i], 4))
-            return -1;
+        // Read colors
+        for(int i = 1; i < 5; i++){
+            usbqueue(kb, data_pkt[i], 1);
+            DELAY_SHORT;
+            if(!usbdequeue(kb))
+                return -1;
+            // Wait for the response. Make sure the first four bytes match
+            DELAY_SHORT;
+            if(!usbinput(kb, in_pkt[i - 1]))
+                return -1;
+            if(memcmp(in_pkt[i - 1], data_pkt[i], 4)){
+                printf("Error: %s:%d: Bad input header\n", __FILE_NOPATH__, __LINE__);
+                return -1;
+            }
+        }
+        // Copy the data back to the mode
+        uchar mr[N_KEYS / 2], mg[N_KEYS / 2], mb[N_KEYS / 2];
+        memcpy(mr, in_pkt[0] + 4, 60);
+        memcpy(mr + 60, in_pkt[1] + 4, 12);
+        memcpy(mg, in_pkt[1] + 16, 48);
+        memcpy(mg + 48, in_pkt[2] + 4, 24);
+        memcpy(mb, in_pkt[2] + 28, 36);
+        memcpy(mb + 36, in_pkt[3] + 4, 36);
+        // Unpack LED data to 8bpc format
+        for(int i = 0; i < N_KEYS; i++){
+            uchar r, g, b;
+            if(i & 1){
+                r = (7 - ((mr[i / 2] & 0xF0) >> 4)) << 5;
+                g = (7 - ((mg[i / 2] & 0xF0) >> 4)) << 5;
+                b = (7 - ((mb[i / 2] & 0xF0) >> 4)) << 5;
+            } else {
+                r = (7 - (mr[i / 2] & 0x0F)) << 5;
+                g = (7 - (mg[i / 2] & 0x0F)) << 5;
+                b = (7 - (mb[i / 2] & 0x0F)) << 5;
+            }
+            // Convert 0xe0 to 0xff (white color)
+            if(r == 0xe0) r = 0xff;
+            if(g == 0xe0) g = 0xff;
+            if(b == 0xe0) b = 0xff;
+            light->r[i] = r;
+            light->g[i] = g;
+            light->b[i] = b;
+        }
     }
-    // Copy the data back to the mode
-    char* r = light->r, *g = light->g, *b = light->b;
-    memcpy(r, in_pkt[0] + 4, 60);
-    memcpy(r + 60, in_pkt[1] + 4, 12);
-    memcpy(g, in_pkt[1] + 16, 48);
-    memcpy(g + 48, in_pkt[2] + 4, 24);
-    memcpy(b, in_pkt[2] + 28, 36);
-    memcpy(b + 36, in_pkt[3] + 4, 36);
     light->enabled = 1;
     return 0;
 }
@@ -115,35 +258,21 @@ int has_key(const char* name, int model){
     return 1;
 }
 
-char* printrgb(keylight* light, const key* keymap, int kbmodel){
+char* printrgb(usbdevice* kb, keylight* light, const key* keymap){
+    int kbmodel = kb->model;
     int length = 0;
-    // Unpack LED data back to 8bpc format.
     uchar r[N_KEYS], g[N_KEYS], b[N_KEYS];
-    char* mr = light->r;
-    char* mg = light->g;
-    char* mb = light->b;
+    uchar* mr = light->r;
+    uchar* mg = light->g;
+    uchar* mb = light->b;
     for(int i = 0; i < N_KEYS; i++){
-        // Translate the RGB index to a key index using the key map
+        // Translate the key index to an RGB index using the key map
         int k = keymap[i].led;
         if(k < 0)
             continue;
-        if(k & 1){
-            r[i] = (7 - ((mr[k / 2] & 0xF0) >> 4)) << 5;
-            g[i] = (7 - ((mg[k / 2] & 0xF0) >> 4)) << 5;
-            b[i] = (7 - ((mb[k / 2] & 0xF0) >> 4)) << 5;
-        } else {
-            r[i] = (7 - (mr[k / 2] & 0x0F)) << 5;
-            g[i] = (7 - (mg[k / 2] & 0x0F)) << 5;
-            b[i] = (7 - (mb[k / 2] & 0x0F)) << 5;
-        }
-
-        // Convert 0xe0 to 0xff (white color)
-        if(r[i] == 0xe0)
-            r[i] = 0xff;
-        if(g[i] == 0xe0)
-            g[i] = 0xff;
-        if(b[i] == 0xe0)
-            b[i] = 0xff;
+        r[i] = mr[k];
+        g[i] = mg[k];
+        b[i] = mb[k];
     }
     // Make a buffer to track key names and to filter out duplicates
     char names[N_KEYS][11];
@@ -199,38 +328,23 @@ char* printrgb(keylight* light, const key* keymap, int kbmodel){
     return buffer;
 }
 
-void cmd_rgboff(usbmode* mode){
+void cmd_rgboff(usbdevice* kb, usbmode* mode){
     mode->light.enabled = 0;
 }
 
-void cmd_rgbon(usbmode* mode){
+void cmd_rgbon(usbdevice* kb, usbmode* mode){
     mode->light.enabled = 1;
 }
 
-void cmd_rgb(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* code){
+void cmd_rgb(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* code){
     int index = keymap[keyindex].led;
     if(index < 0)
         return;
-    unsigned int r, g, b;
-    if(sscanf(code, "%2x%2x%2x", &r, &g, &b) == 3){
-        if(r > 255)
-            r = 255;
-        if(g > 255)
-            g = 255;
-        if(b > 255)
-            b = 255;
-        char* mr = mode->light.r;
-        char* mg = mode->light.g;
-        char* mb = mode->light.b;
-        if(index & 1){
-            mr[index / 2] = (mr[index / 2] & 0x0F) | ((7 - (r >> 5)) << 4);
-            mg[index / 2] = (mg[index / 2] & 0x0F) | ((7 - (g >> 5)) << 4);
-            mb[index / 2] = (mb[index / 2] & 0x0F) | ((7 - (b >> 5)) << 4);
-        } else {
-            mr[index / 2] = (mr[index / 2] & 0xF0) | (7 - (r >> 5));
-            mg[index / 2] = (mg[index / 2] & 0xF0) | (7 - (g >> 5));
-            mb[index / 2] = (mb[index / 2] & 0xF0) | (7 - (b >> 5));
-        }
+    uchar r, g, b;
+    if(sscanf(code, "%2hhx%2hhx%2hhx", &r, &g, &b) == 3){
+        mode->light.r[index] = r;
+        mode->light.g[index] = g;
+        mode->light.b[index] = b;
     }
 }
 
@@ -248,28 +362,28 @@ static uchar iselect(const char* led){
     return result;
 }
 
-void cmd_ioff(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
+void cmd_ioff(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
     uchar bits = iselect(led);
     // Add the bits to ioff, remove them from ion
     mode->ioff |= bits;
     mode->ion &= ~bits;
 }
 
-void cmd_ion(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
+void cmd_ion(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
     uchar bits = iselect(led);
     // Remove the bits from ioff, add them to ion
     mode->ioff &= ~bits;
     mode->ion |= bits;
 }
 
-void cmd_iauto(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
+void cmd_iauto(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
     uchar bits = iselect(led);
     // Remove the bits from both ioff and ion
     mode->ioff &= ~bits;
     mode->ion &= ~bits;
 }
 
-void cmd_inotify(usbmode* mode, const key* keymap, int nnumber, int dummy, const char* led){
+void cmd_inotify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, int dummy, const char* led){
     uchar bits = iselect(led);
     if(strstr(led, ":off"))
         // Turn notifications for these bits off

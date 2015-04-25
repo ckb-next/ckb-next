@@ -154,7 +154,7 @@ void closebind(keybind* bind){
     memset(bind, 0, sizeof(*bind));
 }
 
-void cmd_bind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
+void cmd_bind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
     // Find the key to bind to
     int tocode = 0;
     if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1){
@@ -170,15 +170,15 @@ void cmd_bind(usbmode* mode, const key* keymap, int dummy, int keyindex, const c
     }
 }
 
-void cmd_unbind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
+void cmd_unbind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
     mode->bind.base[keyindex] = KEY_UNBOUND;
 }
 
-void cmd_rebind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
+void cmd_rebind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
     mode->bind.base[keyindex] = keymap[keyindex].scan;
 }
 
-void cmd_macro(usbmode* mode, const key* keymap, const char* keys, const char* assignment){
+void cmd_macro(usbdevice* kb, usbmode* mode, const key* keymap, const char* keys, const char* assignment){
     keybind* bind = &mode->bind;
     if(bind->macrocount >= MACRO_MAX)
         return;
@@ -277,7 +277,7 @@ void cmd_macro(usbmode* mode, const key* keymap, const char* keys, const char* a
         bind->macros = realloc(bind->macros, (bind->macrocap += 16) * sizeof(keymacro));
 }
 
-void cmd_macroclear(usbmode* mode){
+void cmd_macroclear(usbdevice* kb, usbmode* mode){
     keybind* bind = &mode->bind;
     for(int i = 0; i < bind->macrocount; i++)
         free(bind->macros[i].actions);

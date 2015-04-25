@@ -20,15 +20,15 @@ void initbind(keybind* bind, const key* keymap);
 void closebind(keybind* bind);
 
 // Binds a key
-void cmd_bind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to);
+void cmd_bind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to);
 // Unbinds a key
-void cmd_unbind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* ignored);
+void cmd_unbind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* ignored);
 // Resets a key binding
-void cmd_rebind(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* ignored);
+void cmd_rebind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* ignored);
 // Creates or updates a macro
-void cmd_macro(usbmode* mode, const key* keymap, const char* keys, const char* assignment);
+void cmd_macro(usbdevice* kb, usbmode* mode, const key* keymap, const char* keys, const char* assignment);
 // Clears all macros
-void cmd_macroclear(usbmode* mode);
+void cmd_macroclear(usbdevice* kb, usbmode* mode);
 
 #ifdef OS_LINUX
 // Is a key a modifier?

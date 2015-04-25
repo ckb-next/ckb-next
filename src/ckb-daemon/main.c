@@ -217,25 +217,19 @@ int main(int argc, char** argv){
     // Start the signal handling thread
     pthread_create(&sigthread, 0, sigmain, 0);
 
-    int frame = 0;
+    int v120 = 0;
     struct timespec time, nexttime;
     while(1){
         clock_gettime(CLOCK_MONOTONIC, &time);
-        // No need to run most of these functions on every single frame
-        if(!frame){
-            // Process FIFOs
-            pthread_mutex_lock(&kblistmutex);
-            for(int i = 0; i < DEV_MAX; i++){
-                if(keyboard[i].infifo){
-                    const char* line;
-                    if(readlines(keyboard[i].infifo, &line))
-                        readcmd(keyboard + i, line);
-                }
-            }
-        } else
-            pthread_mutex_lock(&kblistmutex);
+        pthread_mutex_lock(&kblistmutex);
+        // Process commands for root controller
+        if(keyboard[0].infifo){
+            const char* line;
+            if(readlines(keyboard[0].infifo, &line))
+                readcmd(keyboard, line);
+        }
         // Run the USB queue. Messages must be queued because sending multiple messages at the same time can cause the interface to freeze
-        for(int i = 1; i < DEV_MAX; i++){
+        for(int i = 0; i < DEV_MAX; i++){
             if(IS_CONNECTED(keyboard + i)){
                 pthread_mutex_lock(&keyboard[i].mutex);
                 if(usbdequeue(keyboard + i) == 0
@@ -243,10 +237,21 @@ int main(int argc, char** argv){
                     // If it failed and couldn't be reset, close the keyboard
                     closeusb(keyboard + i);
                 } else {
-                    // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
-                    // immediately and may be changed externally by the OS.
-                    if(!frame)
+                    if(keyboard[i].queuecount == 0){
+                        // Process FIFOs
+                        for(int i = 0; i < DEV_MAX; i++){
+                            if(keyboard[i].infifo){
+                                const char* line;
+                                if(readlines(keyboard[i].infifo, &line))
+                                    readcmd(keyboard + i, line);
+                                if(keyboard[i].fwversion >= 0x0120)
+                                    v120 = 1;
+                            }
+                        }
+                        // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
+                        // immediately and may be changed externally by the OS.
                         updateindicators(keyboard + i, 0);
+                    }
                     pthread_mutex_unlock(&keyboard[i].mutex);
                 }
             }
@@ -254,15 +259,14 @@ int main(int argc, char** argv){
         pthread_mutex_unlock(&kblistmutex);
         // Sleep for long enough to achieve the desired frame rate (5 packets per frame).
         memcpy(&nexttime, &time, sizeof(time));
-        timespec_add(&nexttime, 1000000000 / fps / 5);
-        // Don't ever sleep for less than 1.5ms. It can lock the keyboard. Restart the sleep if it gets interrupted.
+        timespec_add(&nexttime, 1000000000 / fps / (v120 ? 12 : 5));
+        // Don't ever sleep for less than 100µs. It can lock the keyboard. Restart the sleep if it gets interrupted.
         clock_gettime(CLOCK_MONOTONIC, &time);
-        timespec_add(&time, 1500000);
+        timespec_add(&time, 100000);
         if(timespec_gt(nexttime, time))
             while(clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nexttime, 0) == EINTR);
         else
             while(clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, 0) == EINTR);
-        frame = (frame + 1) % 5;
     }
     quit();
     return 0;

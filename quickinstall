@@ -48,6 +48,7 @@ if [[ -d $SRCDIR ]]; then
     # Generate makefiles
     ./qmake-auto $QMAKEFLAGS > $TMPFILE 2>&1
     checkfail $?
+    make clean >/dev/null 2>&1
     # Run make with command arguments
     echo "Compiling binaries..."
     echo "(This can take a while, please be patient)"

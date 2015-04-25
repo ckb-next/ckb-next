@@ -1,5 +1,6 @@
 bin/
 ckb.app/
+ckb.pkg
 .DS_Store
 .*
 !.gitignore

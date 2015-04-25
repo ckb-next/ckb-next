@@ -23,8 +23,12 @@ int getfwversion(usbdevice* kb){
     // Wait for the response
     DELAY_SHORT;
     uchar in_pkt[MSG_SIZE];
-    if(!usbinput(kb, in_pkt) || in_pkt[0] != 0x0e || in_pkt[1] != 0x01)
+    if(!usbinput(kb, in_pkt))
         return -1;
+    if(in_pkt[0] != 0x0e || in_pkt[1] != 0x01){
+        printf("Error: %s:%d: Bad input header\n", __FILE_NOPATH__, __LINE__);
+        return -1;
+    }
     short vendor, product, version, bootloader;
     // Copy the vendor ID, product ID, version, and poll rate from the firmware data
     memcpy(&version, in_pkt + 8, 2);

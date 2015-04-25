@@ -49,9 +49,11 @@ typedef struct {
 
 // Lighting structure for a mode
 typedef struct {
-    char r[N_KEYS / 2];
-    char g[N_KEYS / 2];
-    char b[N_KEYS / 2];
+    struct {
+        uchar r[N_KEYS];
+        uchar g[N_KEYS];
+        uchar b[N_KEYS];
+    };
     char enabled;
 } keylight;
 
@@ -133,7 +135,7 @@ typedef struct {
 
 // Structure for tracking keyboard devices
 #define NAME_LEN    33
-#define QUEUE_LEN   40
+#define QUEUE_LEN   64
 #define MSG_SIZE    64
 typedef struct {
     // I/O devices

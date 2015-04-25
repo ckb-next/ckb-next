@@ -19,7 +19,7 @@ void nprintkey(usbdevice* kb, int nnumber, const key* keymap, int keyindex, int 
 void nprintind(usbdevice* kb, int nnumber, int led, int on);
 
 // Enables or disables notification for a key
-void cmd_notify(usbmode* mode, const key* keymap, int nnumber, int keyindex, const char* toggle);
+void cmd_notify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, int keyindex, const char* toggle);
 // Gets info about a particular setting.
 void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting);
 

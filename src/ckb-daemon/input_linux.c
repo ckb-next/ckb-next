@@ -174,7 +174,7 @@ void os_updateindicators(usbdevice* kb, int force){
         ileds = (ileds & ~mode->ioff) | mode->ion;
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;
-        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 5000, &kb->ileds };
         ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     }
 }

@@ -9,8 +9,14 @@
 int _usbdequeue(usbdevice* kb, const char* file, int line){
     if(kb->queuecount == 0 || !kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
-    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 500, kb->queue[0] };
-    int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+    int res;
+    if(kb->fwversion >= 0x120){
+        struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, kb->queue[0] };
+        res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
+    } else {
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, kb->queue[0] };
+        res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+    }
     if(res <= 0){
         printf("usbdequeue (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data written");
         return 0;
@@ -29,7 +35,7 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
 int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
-    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 500, message };
+    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     if(res <= 0){
         printf("usbinput (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
@@ -264,15 +270,12 @@ int openusb(struct udev_device* dev, short vendor, short product){
             else
                 snprintf(kb->profile.serial, SERIAL_LEN, "%04x:%04x-NoID", vendor, product);
             printf("Connecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
-            // If the keyboard is a non-RGB model, the FW version needs to be copied here too
-            if(!IS_RGB(vendor, product)){
-                const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
-                if(firmware)
-                    // Scan the version number as a hex constant for consistency with RGB devices
-                    sscanf(firmware, "%hx", &kb->fwversion);
-                else
-                    kb->fwversion = 0;
-            }
+            // Copy firmware version (needed to determine USB protocol)
+            const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
+            if(firmware)
+                sscanf(firmware, "%hx", &kb->fwversion);
+            else
+                kb->fwversion = 0;
 
             // Claim the USB interfaces
             if(usbclaim(kb, IS_RGB(vendor, product))){

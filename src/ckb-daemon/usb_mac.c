@@ -32,7 +32,7 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
     kb->lastError = res;
-    if(res != kIOReturnSuccess){
+    if(res != kIOReturnSuccess && res != 0xe0004051){   // Can't find e0004051 documented, but it seems to be a harmless error, so ignore it.
         printf("usbinput (%s:%d): Got return value 0x%x\n", file, line, res);
         return 0;
     }
@@ -59,7 +59,7 @@ void closehandle(usbdevice* kb){
 
 int os_resetusb(usbdevice* kb, const char* file, int line){
     // Don't try if the keyboard was disconnected
-    if(kb->lastError == kIOReturnBadArgument)
+    if(kb->lastError == kIOReturnBadArgument || kb->lastError == kIOReturnNotOpen)
         return -2;
     // This does more harm than good...
     //if(!IOHIDDeviceSetProperty(kb->handle, CFSTR(kIOHIDResetKey), kCFBooleanTrue))
@@ -124,10 +124,7 @@ void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportTyp
 }
 
 void openusb(usbdevice* kb, short vendor, short product){
-    // The driver sometimes isn't completely ready yet, so give it a short delay
-    sleep(1);
-
-    kb->lastkeypress = -1;
+    kb->lastkeypress = KEY_NONE;
     if(IS_RGB(vendor, product))
         // Handle 3 is the control handle
         kb->handle = kb->handles[3];
@@ -238,10 +235,12 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
             || (input == 4 && output == 0 && feature == 0))
         kb->handles[1] = device;
     // Handle 2 is for Corsair inputs, unused on non-RGB
-    else if((input == 64 || input == 15) && output == 0 && feature == 0)
+    else if(((input == 64 || input == 15) && output == 0 && feature == 0)
+            || (input == 64 && output == 64 && feature == 0))           // FW >= 1.20
         kb->handles[2] = device;
     // Handle 3 is for controlling the device (only exists for RGB)
-    else if(input == 0 && output == 0 && feature == 64)
+    else if((input == 0 && output == 0 && feature == 64)
+            || (input == 64 && output == 64 && feature == 64))          // FW >= 1.20
         kb->handles[3] = device;
     else
         printf("Warning: Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);

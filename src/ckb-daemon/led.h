@@ -15,23 +15,23 @@ int loadrgb(usbdevice* kb, keylight* light, int mode);
 
 // Generates data for an RGB command to match the given RGB data. Returns a string like "ff0000" or "w:ff0000 a:00ff00 ..."
 // The result must be freed later.
-char* printrgb(keylight* light, const key* keymap, int kbmodel);
+char* printrgb(usbdevice* kb, keylight* light, const key* keymap);
 
 // Turns LEDs off
-void cmd_rgboff(usbmode* mode);
+void cmd_rgboff(usbdevice* kb, usbmode* mode);
 // Turns LEDs on
-void cmd_rgbon(usbmode* mode);
+void cmd_rgbon(usbdevice* kb, usbmode* mode);
 // Updates an LED color
-void cmd_rgb(usbmode* mode, const key* keymap, int dummy, int keyindex, const char* code);
+void cmd_rgb(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* code);
 
 // Turns an indicator off permanently
-void cmd_ioff(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
+void cmd_ioff(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
 // Turns an indicator on permanently
-void cmd_ion(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
+void cmd_ion(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
 // Sets an indicator to automatic mode
-void cmd_iauto(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
+void cmd_iauto(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led);
 // Sets indicator notifications
-void cmd_inotify(usbmode* mode, const key* keymap, int nnumber, int dummy, const char* led);
+void cmd_inotify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, int dummy, const char* led);
 
 // Daemon frame rate
 extern volatile unsigned fps;

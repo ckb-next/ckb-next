@@ -72,7 +72,7 @@ void KbAnim::save(QSettings& settings){
 KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script) :
     QObject(parent),
     _script(AnimScript::copy(this, script->guid())), _map(map), _keys(keys),
-    repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
+    repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
     _guid(QUuid::createUuid()), _name(name), _opacity(1.), _mode(Normal), _needsSave(true)
 {
     if(_script){
@@ -93,7 +93,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const KbAnim& other) :
     QObject(parent),
     _script(AnimScript::copy(this, other.script()->guid())), _scriptGuid(_script->guid()), _scriptName(_script->name()),
     _map(map), _keys(other._keys), _parameters(other._parameters),
-    repeatTime(0), kpRepeatTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
+    repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0), forceStarted(false),
     _guid(other._guid), _name(other._name), _opacity(other._opacity), _mode(other._mode), _needsSave(true)
 {
     reInit();

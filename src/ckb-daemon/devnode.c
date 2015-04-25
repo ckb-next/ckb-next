@@ -320,8 +320,6 @@ unsigned readlines(int fd, const char** input){
 
 void readcmd(usbdevice* kb, const char* line){
     usbdevice* kb0 = kb;
-    if(IS_CONNECTED(kb))
-        pthread_mutex_lock(&kb->mutex);
     char* word = malloc(strlen(line) + 1);
     int wordlen;
     const char* newline = 0;
@@ -350,10 +348,6 @@ void readcmd(usbdevice* kb, const char* line){
             // Send the RGB command to the last device if its colors changed
             if(kb != prevkb){
                 updatergb(prevkb, 0);
-                if(IS_CONNECTED(prevkb))
-                    pthread_mutex_unlock(&prevkb->mutex);
-                if(IS_CONNECTED(kb))
-                    pthread_mutex_lock(&kb->mutex);
             }
         }
         // Check for a command word
@@ -504,10 +498,6 @@ void readcmd(usbdevice* kb, const char* line){
                 // Send the RGB command to the last device if its colors changed
                 if(kb != prevkb){
                     updatergb(prevkb, 0);
-                    if(IS_CONNECTED(prevkb))
-                        pthread_mutex_unlock(&prevkb->mutex);
-                    if(IS_CONNECTED(kb))
-                        pthread_mutex_lock(&kb->mutex);
                 }
             }
             continue;
@@ -620,7 +610,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         case NAME: case IOFF: case ION: case IAUTO: case INOTIFY:
             // All of the above just parse the whole word
-            handler(mode, keymap, notifynumber, 0, word);
+            handler(kb, mode, keymap, notifynumber, 0, word);
             continue;
         case PROFILENAME:
             // Profile name is the same, but takes a different parameter
@@ -642,20 +632,20 @@ void readcmd(usbdevice* kb, const char* line){
             // RGB command has a special response for "on", "off", and a hex constant
             int r, g, b;
             if(!strcmp(word, "on")){
-                cmd_rgbon(mode);
+                cmd_rgbon(kb, mode);
                 continue;
             } else if(!strcmp(word, "off")){
-                cmd_rgboff(mode);
+                cmd_rgboff(kb, mode);
                 continue;
             } else if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
                 for(int i = 0; i < N_KEYS; i++)
-                    cmd_rgb(mode, keymap, notifynumber, i, word);
+                    cmd_rgb(kb, mode, keymap, notifynumber, i, word);
                 continue;
             }
         } case MACRO:
             if(!strcmp(word, "clear")){
                 // Macro has a special clear command
-                cmd_macroclear(mode);
+                cmd_macroclear(kb, mode);
                 continue;
             }
             break;
@@ -682,7 +672,7 @@ void readcmd(usbdevice* kb, const char* line){
         // Macros have a separate left-side handler
         if(command == MACRO){
             word[left] = 0;
-            cmd_macro(mode, keymap, word, right);
+            cmd_macro(kb, mode, keymap, word, right);
             continue;
         }
         // Scan the left side for key names and run the request command
@@ -693,16 +683,16 @@ void readcmd(usbdevice* kb, const char* line){
             if(!strcmp(keyname, "all")){
                 // Set all keys
                 for(int i = 0; i < N_KEYS; i++)
-                    handler(mode, keymap, notifynumber, i, right);
+                    handler(kb, mode, keymap, notifynumber, i, right);
             } else if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
                       || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
                 // Set a key numerically
-                handler(mode, keymap, notifynumber, keycode, right);
+                handler(kb, mode, keymap, notifynumber, keycode, right);
             } else {
                 // Find this key in the keymap
                 for(unsigned i = 0; i < N_KEYS; i++){
                     if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
-                        handler(mode, keymap, notifynumber, i, right);
+                        handler(kb, mode, keymap, notifynumber, i, right);
                         break;
                     }
                 }

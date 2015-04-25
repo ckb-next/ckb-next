@@ -83,7 +83,7 @@ void urlencode2(char* dst, const char* src){
     *dst = '\0';
 }
 
-void cmd_setmodename(usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* name){
+void cmd_setmodename(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* name){
     if(!utf8to16)
         utf8to16 = iconv_open("UTF-16LE", "UTF-8");
     memset(mode->name, 0, sizeof(mode->name));
@@ -303,7 +303,7 @@ int hwloadprofile(usbdevice* kb, int apply){
             return -1;
         }
         // Wait for the response
-        DELAY_SHORT;
+        DELAY_MEDIUM;
         if(!usbinput(kb, in_pkt)){
             free(hw);
             return -1;
@@ -318,7 +318,7 @@ int hwloadprofile(usbdevice* kb, int apply){
         return -1;
     }
     // Wait for the response
-    DELAY_SHORT;
+    DELAY_MEDIUM;
     if(!usbinput(kb, in_pkt)){
         free(hw);
         return -1;
@@ -373,13 +373,13 @@ int hwsaveprofile(usbdevice* kb){
         usbqueue(kb, data_pkt[1], 1);
     }
     // Save the RGB data
-    for(int i = 0; i < modes; i++)
+    for(int i = 0; i < modes; i++){
         savergb(kb, i);
-    // Send all of the queued messages to the hardware. Return failure if any aren't sent.
-    while(kb->queuecount > 0){
-        DELAY_SHORT;
-        if(!usbdequeue(kb))
-            return -1;
+        while(kb->queuecount > 0){
+            DELAY_MEDIUM;
+            if(!usbdequeue(kb))
+                return -1;
+        }
     }
     DELAY_LONG;
     return 0;

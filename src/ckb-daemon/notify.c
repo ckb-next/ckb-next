@@ -84,7 +84,7 @@ void nprintind(usbdevice* kb, int nnumber, int led, int on){
     nprintf(kb, nnumber, 0, "i %c%s\n", on ? '+' : '-', name);
 }
 
-void cmd_notify(usbmode* mode, const key* keymap, int nnumber, int keyindex, const char* toggle){
+void cmd_notify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, int keyindex, const char* toggle){
     if(!strcmp(toggle, "on") || *toggle == 0)
         SET_KEYBIT(mode->notify[nnumber], keyindex);
     else if(!strcmp(toggle, "off"))
@@ -133,7 +133,7 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         return;
     } else if(!strcmp(setting, ":rgb")){
         // Get the current RGB settings
-        char* rgb = printrgb(&mode->light, profile->keymap, kb->model);
+        char* rgb = printrgb(kb, &mode->light, profile->keymap);
         nprintf(kb, nnumber, mode, "rgb %s\n", rgb);
         free(rgb);
         return;
@@ -152,7 +152,7 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         // Make sure the mode number is valid
         HWMODE_OR_RETURN(kb, index);
         // Get the mode from the hardware store
-        char* rgb = printrgb(kb->hw->light + index, profile->keymap, kb->model);
+        char* rgb = printrgb(kb, kb->hw->light + index, profile->keymap);
         nprintf(kb, nnumber, mode, "hwrgb %s\n", rgb);
         free(rgb);
         return;

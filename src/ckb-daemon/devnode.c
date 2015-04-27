@@ -319,11 +319,10 @@ unsigned readlines(int fd, const char** input){
 }
 
 void readcmd(usbdevice* kb, const char* line){
-    usbdevice* kb0 = kb;
     char* word = malloc(strlen(line) + 1);
     int wordlen;
     const char* newline = 0;
-    usbprofile* profile = 0;
+    usbprofile* profile = (IS_CONNECTED(kb) ? &kb->profile : 0);
     usbmode* mode = 0;
     cmd command = NONE;
     cmdhandler handler = 0;
@@ -333,9 +332,6 @@ void readcmd(usbdevice* kb, const char* line){
         line += wordlen;
         // If we passed a newline, reset the context
         if(line > newline){
-            usbdevice* prevkb = kb;
-            kb = kb0;
-            profile = (IS_CONNECTED(kb) ? &kb->profile : 0);
             mode = (profile ? profile->currentmode : 0);
             command = NONE;
             handler = 0;
@@ -343,17 +339,9 @@ void readcmd(usbdevice* kb, const char* line){
             newline = strchr(line, '\n');
             if(!newline)
                 newline = line + strlen(line);
-            // Send the RGB command to the last device if its colors changed
-            if(kb != prevkb){
-                updatergb(prevkb, 0);
-            }
         }
         // Check for a command word
-        if(!strcmp(word, "device")){
-            command = DEVICE;
-            handler = 0;
-            continue;
-        } else if(!strcmp(word, "mode")){
+        if(!strcmp(word, "mode")){
             command = MODE;
             handler = 0;
             continue;
@@ -479,35 +467,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
 
         // Specially handled commands:
-        else if(command == DEVICE){
-            if(strlen(word) == SERIAL_LEN - 1){
-                usbdevice* found = findusb(word);
-                usbdevice* prevkb = kb;
-                if(found){
-                    kb = found;
-                    profile = &kb->profile;
-                } else {
-                    // If the device isn't plugged in, find (or add) it to storage
-                    kb = 0;
-                    profile = addstore(word, 1);
-                }
-                mode = (profile ? profile->currentmode : 0);
-                // Send the RGB command to the last device if its colors changed
-                if(kb != prevkb){
-                    updatergb(prevkb, 0);
-                }
-            }
-            continue;
-#ifdef OS_MAC
-        } else if(command == LAYOUT){
-            // OSX keyboards can be switched between ANSI and ISO layouts. On Linux this is not done because they both behave the same
-            // (see os_keypress - input_mac.c)
-            if(!strcmp(word, "ansi"))
-                kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ANSI;
-            else if(!strcmp(word, "iso"))
-                kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ISO;
-#endif
-        } else if(command == FPS){
+        else if(command == FPS){
             unsigned newfps;
             if(kb && sscanf(word, "%u", &newfps) == 1)
                 setfps(newfps);
@@ -524,6 +484,15 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(command == GET){
             getinfo(kb, mode, notifynumber, word);
             continue;
+#ifdef OS_MAC
+        } else if(command == LAYOUT){
+            // OSX keyboards can be switched between ANSI and ISO layouts. On Linux this is not done because they both behave the same
+            // (see os_keypress - input_mac.c)
+            if(!strcmp(word, "ansi"))
+                kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ANSI;
+            else if(!strcmp(word, "iso"))
+                kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ISO;
+#endif
         }
         // Only the DEVICE, LAYOUT, FPS, GET, and NOTIFYON/OFF commands are valid without an existing mode
         if(!mode)
@@ -689,7 +658,5 @@ void readcmd(usbdevice* kb, const char* line){
     // Finish up
     if(!NEEDS_FW_UPDATE(kb))
         updatergb(kb, 0);
-    if(IS_CONNECTED(kb))
-        pthread_mutex_unlock(&kb->mutex);
     free(word);
 }

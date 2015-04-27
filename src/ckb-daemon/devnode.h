@@ -38,7 +38,6 @@ unsigned readlines(int fd, const char** input);
 // Command operations
 typedef enum {
     NONE,
-    DEVICE,
     MODE,
     SWITCH,
     HWLOAD,

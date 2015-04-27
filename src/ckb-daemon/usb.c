@@ -14,10 +14,10 @@ int features_mask = -1;
 extern int os_resetusb(usbdevice* kb, const char* file, int line);
 
 int usbqueue(usbdevice* kb, uchar* messages, int count){
-    if(!HAS_FEATURES(kb, FEAT_RGB))
+    if(!kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
         return 0;
     // Don't add messages unless the queue has enough room for all of them
-    if(!kb->handle || kb->queuecount + count > QUEUE_LEN)
+    if(kb->queuecount + count > QUEUE_LEN)
         return -1;
     for(int i = 0; i < count; i++)
         memcpy(kb->queue[kb->queuecount + i], messages + MSG_SIZE * i, MSG_SIZE);

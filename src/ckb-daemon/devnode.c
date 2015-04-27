@@ -319,12 +319,11 @@ unsigned readlines(int fd, const char** input){
 }
 
 void readcmd(usbdevice* kb, const char* line){
-    usbdevice* kb0 = kb;
     char* word = malloc(strlen(line) + 1);
     int wordlen;
     const char* newline = 0;
-    usbprofile* profile = 0;
-    const key* keymap = keymap_system;
+    usbprofile* profile = (IS_CONNECTED(kb) ? &kb->profile : 0);
+    const key* keymap = (profile ? profile->keymap : keymap_system);
     usbmode* mode = 0;
     cmd command = NONE;
     cmdhandler handler = 0;
@@ -334,10 +333,6 @@ void readcmd(usbdevice* kb, const char* line){
         line += wordlen;
         // If we passed a newline, reset the context
         if(line > newline){
-            usbdevice* prevkb = kb;
-            kb = kb0;
-            profile = (IS_CONNECTED(kb) ? &kb->profile : 0);
-            keymap = (profile ? profile->keymap : keymap_system);
             mode = (profile ? profile->currentmode : 0);
             command = NONE;
             handler = 0;
@@ -345,17 +340,9 @@ void readcmd(usbdevice* kb, const char* line){
             newline = strchr(line, '\n');
             if(!newline)
                 newline = line + strlen(line);
-            // Send the RGB command to the last device if its colors changed
-            if(kb != prevkb){
-                updatergb(prevkb, 0);
-            }
         }
         // Check for a command word
-        if(!strcmp(word, "device")){
-            command = DEVICE;
-            handler = 0;
-            continue;
-        } else if(!strcmp(word, "mode")){
+        if(!strcmp(word, "mode")){
             command = MODE;
             handler = 0;
             continue;
@@ -481,27 +468,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
 
         // Specially handled commands:
-        else if(command == DEVICE){
-            if(strlen(word) == SERIAL_LEN - 1){
-                usbdevice* found = findusb(word);
-                usbdevice* prevkb = kb;
-                if(found){
-                    kb = found;
-                    profile = &kb->profile;
-                } else {
-                    // If the device isn't plugged in, find (or add) it to storage
-                    kb = 0;
-                    profile = addstore(word, 1);
-                }
-                keymap = (profile ? profile->keymap : keymap_system);
-                mode = (profile ? profile->currentmode : 0);
-                // Send the RGB command to the last device if its colors changed
-                if(kb != prevkb){
-                    updatergb(prevkb, 0);
-                }
-            }
-            continue;
-        } else if(command == LAYOUT){
+        else if(command == LAYOUT){
             const key* newkeymap = getkeymap(word);
             if(!newkeymap)
                 continue;
@@ -705,7 +672,5 @@ void readcmd(usbdevice* kb, const char* line){
     // Finish up
     if(!NEEDS_FW_UPDATE(kb))
         updatergb(kb, 0);
-    if(IS_CONNECTED(kb))
-        pthread_mutex_unlock(&kb->mutex);
     free(word);
 }

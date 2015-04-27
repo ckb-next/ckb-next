@@ -19,7 +19,7 @@ int _usbdequeue(usbdevice* kb, const char* file, int line){
     kb->queue[QUEUE_LEN - 1] = first;
     kb->queuecount--;
     kb->lastError = res;
-    if(res != kIOReturnSuccess){
+    if(res != kIOReturnSuccess && res != 0xe0004051){   // Can't find e0004051 documented, but it seems to be a harmless error, so ignore it.
         printf("usbdequeue (%s:%d): Got return value 0x%x\n", file, line, res);
         return 0;
     }
@@ -32,7 +32,7 @@ int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
     kb->lastError = res;
-    if(res != kIOReturnSuccess && res != 0xe0004051){   // Can't find e0004051 documented, but it seems to be a harmless error, so ignore it.
+    if(res != kIOReturnSuccess && res != 0xe0004051){
         printf("usbinput (%s:%d): Got return value 0x%x\n", file, line, res);
         return 0;
     }

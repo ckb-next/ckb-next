@@ -5,7 +5,7 @@
 
 #define MODE_STEP   4
 #define MODE_ROUND_UP(number)   ((number) / MODE_STEP * MODE_STEP + MODE_STEP)
-usbmode* getusbmode(int id, usbprofile* profile, const key* keymap){
+usbmode* getusbmode(int id, usbprofile* profile){
     if(id < profile->modecount)
         return profile->mode + id;
     int cap = MODE_ROUND_UP(id);
@@ -163,9 +163,9 @@ void eraseprofile(usbprofile* profile, int modecount){
     profile->name[0] = 0;
     genid(&profile->id);
     // There need to be at as many modes as there are hardware modes
-    profile->currentmode = getusbmode(0, profile, profile->keymap);
+    profile->currentmode = getusbmode(0, profile);
     for(int i = 1; i < modecount; i++)
-        getusbmode(i, profile, profile->keymap);
+        getusbmode(i, profile);
 }
 
 void freeprofile(usbprofile* profile){
@@ -293,7 +293,7 @@ int hwloadprofile(usbdevice* kb, int apply){
         { 0x0e, 0x16, 0x01, 0 }
     };
     uchar in_pkt[MSG_SIZE];
-    int modes = (kb->model == 95 ? HWMODE_K95 : HWMODE_K70);
+    int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
     for(int i = 0; i <= modes; i++){
         data_pkt[0][3] = i;
         usbqueue(kb, data_pkt[0], 1);
@@ -353,7 +353,7 @@ int hwsaveprofile(usbdevice* kb){
     hwprofile* hw = kb->hw;
     if(!hw)
         hw = kb->hw = calloc(1, sizeof(hwprofile));
-    int modes = (kb->model == 95 ? HWMODE_K95 : HWMODE_K70);
+    int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
     nativetohw(&kb->profile, hw, modes);
     // Save the profile and mode names
     uchar data_pkt[2][MSG_SIZE] = {

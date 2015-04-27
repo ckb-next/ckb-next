@@ -10,16 +10,22 @@
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"
+#define IS_K65(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_K65)
 
 #define P_K70           0x1b13
 #define P_K70_STR       "1b13"
 #define P_K70_NRGB      0x1b09
 #define P_K70_NRGB_STR  "1b09"
+#define IS_K70(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB))
 
 #define P_K95           0x1b11
 #define P_K95_STR       "1b11"
 #define P_K95_NRGB      0x1b08
 #define P_K95_NRGB_STR  "1b08"
+#define IS_K95(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95 || (kb)->product == P_K95_NRGB))
+
+const char* vendor_str(short vendor);
+const char* product_str(short product);
 
 #define IS_RGB(vendor, product) ((product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 

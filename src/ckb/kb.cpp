@@ -105,16 +105,17 @@ void Kb::load(QSettings &settings){
     _needsSave = false;
     // Read layout
     _layout = KeyMap::getLayout(settings.value("Layout").toString());
-    if(_layout == KeyMap::NO_LAYOUT){
-        // If the layout couldn't be loaded, fetch it from the driver
-        cmd.write(QString("@%1 get :layout\n").arg(notifyNumber).toLatin1());
-    } else {
-        cmd.write("layout ");
-        cmd.write(KeyMap::getLayoutHw(_layout).toLatin1());
-        cmd.write("\n");
-        emit infoUpdated();
-    }
+    if(_layout == KeyMap::NO_LAYOUT)
+        // If the layout couldn't be read, try to auto-detect it from the system locale
+        _layout = KeyMap::locale();
+#ifdef Q_OS_MACX
+    // Write ANSI/ISO flag to daemon (OSX only)
+    cmd.write("layout ");
+    cmd.write(KeyMap::isISO(_layout) ? "iso" : "ansi");
+    cmd.write("\n");
     cmd.flush();
+#endif
+    emit infoUpdated();
 
     // Read profiles
     KbProfile* newCurrentProfile = 0;
@@ -217,16 +218,17 @@ void Kb::writeProfileHeader(){
     cmd.write(_currentProfile->id().modifiedString().toLatin1());
 }
 
-void Kb::layout(KeyMap::Layout newLayout, bool write){
+void Kb::layout(KeyMap::Layout newLayout){
     if(newLayout == KeyMap::NO_LAYOUT)
         return;
     _layout = newLayout;
-    if(write){
-        cmd.write("layout ");
-        cmd.write(KeyMap::getLayoutHw(newLayout).toLatin1());
-        cmd.write("\n");
-        cmd.flush();
-    }
+#ifdef Q_OS_MACX
+    // Write ANSI/ISO flag to daemon (OSX only)
+    cmd.write("layout ");
+    cmd.write(KeyMap::isISO(_layout) ? "iso" : "ansi");
+    cmd.write("\n");
+    cmd.flush();
+#endif
     foreach(KbProfile* profile, _profiles)
         profile->keyMap(getKeyMap());
     if(_hwProfile && !_profiles.contains(_hwProfile))
@@ -335,11 +337,7 @@ void Kb::readNotify(QString line){
     QStringList components = line.trimmed().split(" ");
     if(components.count() < 2)
         return;
-    if(components[0] == "layout"){
-        // Layout change - set new layout
-        KeyMap::Layout newLayout = KeyMap::getLayout(components[1]);
-        layout(newLayout, false);
-    } else if(components[0] == "key"){
+    if(components[0] == "key"){
         // Key event
         QString key = components[1];
         if(key.length() < 2)
@@ -520,7 +518,7 @@ void Kb::readNotify(QString line){
 }
 
 KeyMap Kb::getKeyMap(){
-    return KeyMap::standard(_model, _layout);
+    return KeyMap(_model, _layout);
 }
 
 void Kb::setCurrentProfile(KbProfile *profile, bool spontaneous){

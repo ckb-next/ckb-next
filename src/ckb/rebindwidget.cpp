@@ -51,11 +51,10 @@ void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     ui->typingBox->addItem(" ");
     typingKeys.clear();
     const KeyMap& map = bind->map();
-    uint count = map.count();
-    for(uint i = 0; i < count; i++){
-        const KeyPos* pos = map.key(i);
-        QString name = pos->name, friendly = pos->friendlyName();
+    foreach(const QString& name, map.byPosition()){
         if(KbBind::isNormal(KbBind::defaultAction(name)) && !modKeys.contains(name) && !fnKeys.contains(name) && !numKeys.contains(name) && !mediaKeys.contains(name) && name != "enter" && name != "tab" && name != "bspace"){
+            const Key& pos = map[name];
+            QString friendly = pos.friendlyName();
             ui->typingBox->addItem(friendly);
             typingKeys.append(name);
         }

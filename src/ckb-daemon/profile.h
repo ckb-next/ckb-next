@@ -4,7 +4,7 @@
 #include "includes.h"
 
 // Get a mode from a profile. The mode will be created if it didn't already exist.
-usbmode* getusbmode(int id, usbprofile* profile, const key* keymap);
+usbmode* getusbmode(int id, usbprofile* profile);
 
 // Sets a mode's name
 void cmd_setmodename(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* name);

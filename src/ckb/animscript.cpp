@@ -290,22 +290,22 @@ void AnimScript::begin(quint64 timestamp){
     minX = INT_MAX;
     minY = INT_MAX;
     foreach(const QString& key, keysCopy){
-        const KeyPos* pos = _map.key(key);
+        const Key& pos = _map.key(key);
         if(!pos){
             keysCopy.removeAll(key);
             continue;
         }
-        if(pos->x < minX)
-            minX = pos->x;
-        if(pos->y < minY)
-            minY = pos->y;
+        if(pos.x < minX)
+            minX = pos.x;
+        if(pos.y < minY)
+            minY = pos.y;
     }
     // Write the keymap to the process
     process->write("begin keymap\n");
     process->write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());
     foreach(const QString& key, keysCopy){
-        const KeyPos* pos = _map.key(key);
-        process->write(QString("key %1 %2,%3\n").arg(key).arg(pos->x - minX).arg(pos->y - minY).toLatin1());
+        const Key& pos = _map.key(key);
+        process->write(QString("key %1 %2,%3\n").arg(key).arg(pos.x - minX).arg(pos.y - minY).toLatin1());
     }
     process->write("end keymap\n");
     // Write parameters
@@ -356,11 +356,11 @@ void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
         break;
     case KP_POSITION:
         // Print keypress by position
-        const KeyPos* kp = _map.key(key);
+        const Key& kp = _map.key(key);
         if(!kp)
             return;
         advance(timestamp);
-        process->write(("key " + QString("%1,%2").arg(kp->x - minX).arg(kp->y - minY) + (pressed ? " down\n" : " up\n")).toLatin1());
+        process->write(("key " + QString("%1,%2").arg(kp.x - minX).arg(kp.y - minY) + (pressed ? " down\n" : " up\n")).toLatin1());
         break;
     }
 }

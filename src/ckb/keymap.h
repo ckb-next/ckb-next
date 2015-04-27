@@ -2,16 +2,23 @@
 #define KEYMAP_H
 
 #include <QColor>
+#include <QHash>
 
 // Key information
-struct KeyPos {
+struct Key {
+    // Name stored in settings (this is here due to a bad design decision - it will be removed later)
+    const char* _storageName;
+    inline const char* storageName() const { return _storageName ? _storageName : name; }
     // Key name
     const char* _friendlyName;
     const char* name;
-    // LED position, measured roughly in 16th inches. Most keys are 3/4" apart.
-    int x, y;
-    int width, height;
+    // LED position, measured roughly in 16th inches. Most keys are 3/4" apart (12x12).
+    short x, y;
+    short width, height;
+    // Whether or not the key has an LED attached
+    bool hasLed;
 
+    // Friendly name with optional OS-based labels
     inline QString friendlyName(bool os = true) const {
         if(os){
 #ifdef Q_OS_MACX
@@ -24,19 +31,29 @@ struct KeyPos {
             if(!strcmp(name, "pause")) return "F15";
             if(!strcmp(name, "ins")) return "Help";
             if(!strcmp(name, "numlock")) return "Clear";
-#endif
-#ifdef Q_OS_LINUX
+#elif defined(Q_OS_LINUX)
             if(!strcmp(name, "lwin")) return "Left Super";
             if(!strcmp(name, "rwin")) return "Right Super";
 #endif
         }
         return _friendlyName ? _friendlyName : QString(name).toUpper();
     }
+
+    inline operator bool () const { return name != 0; }
+    inline bool operator !() const { return !(bool)*this; }
 };
 
 // Key lighting/layout class
 class KeyMap {
 public:
+    // Keyboard models
+    enum Model {
+        NO_MODEL = -1,
+        K65,
+        K70,
+        K95,
+        _MODEL_MAX
+    };
     // Key layouts (ordered alphabetically by name)
     enum Layout {
         NO_LAYOUT = -1,
@@ -47,56 +64,62 @@ public:
         GB,                 // United Kingdom
         GB_DVORAK,
         US,                 // United States
-        US_DVORAK
+        US_DVORAK,
+        _LAYOUT_MAX
     };
-    // Keyboard models
-    enum Model {
-        NO_MODEL = -1,
-        K65,
-        K70,
-        K95,
-    };
+    // ISO (105-key) or ANSI (104-key)?
+    inline static bool isISO(Layout layout) { return layout != US && layout != US_DVORAK; }
+    inline bool isISO() { return isISO(keyLayout); }
+    // Auto-detects layout from system locale
+    static Layout locale();
 
-    // Copies a standard key map
-    static KeyMap standard(Model model, Layout layout);
+    // Creates a blank key map
+    KeyMap();
+    // Creates a standard key map
+    KeyMap(Model _keyModel, Layout _keyLayout);
     static KeyMap fromName(const QString& name);
     // Gets a layout by name or name by layout
     static Layout getLayout(const QString& name);
     static QString getLayout(Layout layout);
-    // Returns a layout name to send to the daemon
-    static inline QString getLayoutHw(Layout layout) { return getLayout(layout).split("_")[0]; }
+    inline QString strLayout() const { return getLayout(keyLayout); }
     // Gets a model by name or name by model
     static Model getModel(const QString& name);
     static QString getModel(Model model);
+    inline QString strModel() const { return getModel(keyModel); }
 
     // Keyboard model and layout
     inline Model model() const { return keyModel; }
     inline Layout layout() const { return keyLayout; }
-    QString name() const;
+    QString name() const { return (strModel() + " " + strLayout()).toUpper(); }
 
     // Number of keys in the keymap
-    inline uint count() const { return keyCount; }
+    inline uint count() const { return _keys.count(); }
     // Keyboard total width
     inline uint width() const { return keyWidth; }
     // Keyboard total height
     inline uint height() const { return keyHeight; }
 
-    // Gets key info. Returns null if key not found.
-    const KeyPos* key(uint index) const;
-    const KeyPos* key(const QString& name) const;
-    int index(const QString& name) const;
+    // Keys by name
+    inline Key key(const QString& name) const { Key empty = {0,0,0,0,0,0,0,0}; return _keys.value(name, empty); }
+    inline Key operator[](const QString& name) const { return key(name); }
+    inline bool contains(const QString& name) const { return _keys.contains(name); }
+    // List all key names/values
+    inline const QHash<QString, Key>& map() const { return _keys; }
+    inline operator const QHash<QString, Key>& () const { return _keys; }
+    QStringList keys() const { return _keys.keys(); }
+    QList<Key> positions() const { return _keys.values(); }
+    // Key name to/from storage name. Returns the given name if not found.
+    inline QString toStorage(const QString& name) { const char* storage = key(name).storageName(); if(!storage) return name; return storage; }
+    inline QString fromStorage(const QString& storage) { QHashIterator<QString, Key> i(*this); while(i.hasNext()) { i.next(); const char* s = i.value().storageName(); if(s == storage) return s; } return storage; }
 
-    // List of all key names
-    QStringList allKeys() const;
-
-    KeyMap();
+    // Keys by position (top to bottom, left to right)
+    QStringList byPosition() const;
 
 private:
-    const KeyPos* positions;
-    uint keyCount :16, keyWidth :16, keyHeight :16;
-    Model keyModel :4;
-    Layout keyLayout :4;
-    KeyMap(Model _keyModel, Layout _keyLayout, uint _keyCount, uint _width, const KeyPos* _positions);
+    QHash<QString, Key> _keys;
+    short keyWidth, keyHeight;
+    Model keyModel :8;
+    Layout keyLayout :8;
 };
 
 #endif // KEYMAP_H

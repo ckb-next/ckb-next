@@ -21,7 +21,6 @@ void inputupdate(usbdevice* kb){
 #endif
     pthread_mutex_lock(&kb->keymutex);
     usbmode* mode = kb->profile.currentmode;
-    const key* keymap = kb->profile.keymap;
     keybind* bind = &mode->bind;
     // Don't do anything if the state hasn't changed
     if(!memcmp(kb->prevkbinput, kb->kbinput, N_KEYS / 8)){
@@ -84,7 +83,7 @@ void inputupdate(usbdevice* kb){
                             events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                         events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
                         // The volume wheel doesn't generate keyups, so create them automatically
-                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && kb->model != 65){
+                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && !IS_K65(kb)){
                             for(int i = rmodcount; i > 0; i--)
                                 events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                             events[modcount + keycount++] = -(scancode + 1);
@@ -98,7 +97,7 @@ void inputupdate(usbdevice* kb){
                         if(mode->notify[notify][byte] & mask){
                             nprintkey(kb, notify, keymap, keyindex, new);
                             // Volume wheel doesn't generate keyups
-                            if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && kb->model != 65)
+                            if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && !IS_K65(kb))
                                 nprintkey(kb, notify, keymap, keyindex, 0);
                         }
                     }

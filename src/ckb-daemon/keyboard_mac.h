@@ -59,8 +59,7 @@
 #define KEY_Z               kVK_ANSI_Z
 
 #define KEY_GRAVE           kVK_ANSI_Grave
-#define KEY_GRAVE_ISO       kVK_ISO_Section
-#define KEY_102ND           kVK_ANSI_Grave
+#define KEY_102ND           kVK_ISO_Section
 #define KEY_MINUS           kVK_ANSI_Minus
 #define KEY_EQUAL           kVK_ANSI_Equal
 #define KEY_BACKSPACE       kVK_Delete

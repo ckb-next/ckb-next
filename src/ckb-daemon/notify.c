@@ -92,17 +92,12 @@ void cmd_notify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, in
 }
 
 #define HWMODE_OR_RETURN(kb, index) \
-    switch((kb)->model){            \
-    case 95:                        \
+    if(IS_K95(kb)){                 \
         if((index) >= HWMODE_K95)   \
             return;                 \
-        break;                      \
-    case 70:                        \
+    } else {                        \
         if((index) >= HWMODE_K70)   \
             return;                 \
-        break;                      \
-    default:                        \
-        return;                     \
     }
 
 void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
@@ -116,12 +111,6 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
             return;
         nrprintf(nnumber, "fps %d\n", fps);
         return;
-    } else if(!strcmp(setting, ":layout")){
-        if(kb && mode)
-            nprintf(kb, nnumber, 0, "layout %s\n", getmapname(kb->profile.keymap));
-        else
-            nrprintf(nnumber, "layout %s\n", getmapname(keymap_system));
-        return;
     } else if(!kb || !mode)
         // Only FPS and layout can be printed without an active mode
         return;
@@ -133,7 +122,7 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         return;
     } else if(!strcmp(setting, ":rgb")){
         // Get the current RGB settings
-        char* rgb = printrgb(kb, &mode->light, profile->keymap);
+        char* rgb = printrgb(&mode->light, kb);
         nprintf(kb, nnumber, mode, "rgb %s\n", rgb);
         free(rgb);
         return;
@@ -152,7 +141,7 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         // Make sure the mode number is valid
         HWMODE_OR_RETURN(kb, index);
         // Get the mode from the hardware store
-        char* rgb = printrgb(kb, kb->hw->light + index, profile->keymap);
+        char* rgb = printrgb(kb->hw->light + index, kb);
         nprintf(kb, nnumber, mode, "hwrgb %s\n", rgb);
         free(rgb);
         return;
@@ -218,7 +207,6 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         free(guid);
     } else if(!strcmp(setting, ":keys")){
         // Get the current state of all keys
-        const key* keymap = kb->profile.keymap;
         for(int i = 0; i < N_KEYS; i++){
             if(!keymap[i].name)
                 continue;

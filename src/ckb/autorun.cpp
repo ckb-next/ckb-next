@@ -27,7 +27,7 @@ bool AutoRun::available(){
 }
 
 bool AutoRun::once(){
-    CkbSettings::get(settingPath).toBool();
+    return CkbSettings::get(settingPath).toBool();
 }
 
 bool AutoRun::isEnabled(){

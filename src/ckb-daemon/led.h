@@ -15,7 +15,7 @@ int loadrgb(usbdevice* kb, keylight* light, int mode);
 
 // Generates data for an RGB command to match the given RGB data. Returns a string like "ff0000" or "w:ff0000 a:00ff00 ..."
 // The result must be freed later.
-char* printrgb(usbdevice* kb, keylight* light, const key* keymap);
+char* printrgb(const keylight* light, const usbdevice* kb);
 
 // Turns LEDs off
 void cmd_rgboff(usbdevice* kb, usbmode* mode);

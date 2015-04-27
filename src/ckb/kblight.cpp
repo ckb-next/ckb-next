@@ -22,39 +22,18 @@ KbLight::KbLight(QObject* parent, const KeyMap& keyMap, const KbLight& other) :
 }
 
 void KbLight::map(const KeyMap& map){
-    uint newCount = map.count();
-    uint oldCount = _map.count();
-    QHash<QString, QRgb> newColorMap = _colorMap;
-    // Translate key colors by position (if possible)
-    for(uint i = 0; i < newCount; i++){
-        const KeyPos* newPos = map.key(i);
-        QString name = newPos->name;
-        if(name != "enter"){
-            bool found = false;
-            for(uint j = 0; j < oldCount; j++){
-                // Scan old map for matching positions
-                const KeyPos* oldPos = _map.key(j);
-                QString oldName = oldPos->name;
-                if(oldPos->x == newPos->x && oldPos->y == newPos->y
-                        && oldName != "enter" && _colorMap.contains(oldName)){
-                    // If found, set color
-                    found = true;
-                    newColorMap[name] = _colorMap.value(oldName);
-                    break;
-                }
-            }
-            if(found)
-                continue;
-        }
-        // If the map still doesn't contain the key, set it to white.
-        if(!newColorMap.contains(name))
-            newColorMap[name] = 0xFFFFFFFF;
+    // If any of the keys are missing from the color map, set them to white
+    QHashIterator<QString, Key> i(map);
+    while(i.hasNext()){
+        i.next();
+        const QString& key = i.key();
+        if(!_colorMap.contains(key))
+            _colorMap[key] = 0xFFFFFFFF;
     }
     // Set the new map
     _map = map;
     foreach(KbAnim* anim, _animList)
         anim->map(map);
-    _colorMap = newColorMap;
     _needsSave = true;
     emit updated();
 }
@@ -65,9 +44,11 @@ KbLight::~KbLight(){
 
 void KbLight::color(const QColor& newColor){
     QRgb newRgb = newColor.rgb();
-    uint count = _map.count();
-    for(uint i = 0; i < count; i++)
-        _colorMap[_map.key(i)->name] = newRgb;
+    QMutableHashIterator<QString, QRgb> i(_colorMap);
+    while(i.hasNext()){
+        i.next();
+        i.value() = newRgb;
+    }
     _needsSave = true;
 }
 
@@ -196,10 +177,11 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
     while(i.hasNext()){
         i.next();
         QString name = i.key();
-        // Volume buttons don't have LEDs except on the K65
-        if(_map.model() != KeyMap::K65 && (name == "volup" || name == "voldn"))
-            continue;
         QRgb color = i.value();
+        // Make sure the key is in the map before printing it
+        const Key& key = _map[name];
+        if(!key.hasLed)
+            continue;
         cmd.write(" ");
         cmd.write(name.toLatin1());
         char output[8];
@@ -328,12 +310,16 @@ void KbLight::load(QSettings& settings){
     if(!inOk)
         _showMute = true;
     // Load RGB settings
+    bool useReal = settings.value("UseRealNames").toBool();
     settings.beginGroup("Keys");
     foreach(QString key, settings.childKeys()){
+        QString name = key.toLower();
+        if(!useReal)
+            name = _map.fromStorage(name);
         QColor color = settings.value(key).toString();
         if(!color.isValid())
             color = QColor(255, 255, 255);
-        _colorMap[key.toLower()] = color.rgb();
+        _colorMap[name] = color.rgb();
     }
     settings.endGroup();
     // Load animations
@@ -359,6 +345,7 @@ void KbLight::save(QSettings& settings){
     settings.setValue("InactiveIndicators", _inactive);
     settings.setValue("ShowMute", (int)_showMute);
     // Save RGB settings
+    settings.setValue("UseRealNames", true);
     settings.beginGroup("Keys");
     foreach(QString key, _colorMap.keys())
         settings.setValue(key, QColor(_colorMap.value(key)).name());

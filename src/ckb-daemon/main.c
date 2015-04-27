@@ -117,11 +117,6 @@ int main(int argc, char** argv){
         if(sscanf(argument, "--fps=%u", &newfps) == 1){
             // Set FPS
             setfps(newfps);
-        } else if(sscanf(argument, "--layout=%9s", layout) == 1){
-            // Set keyboard layout
-            keymap_system = getkeymap(layout);
-            if(keymap_system)
-                printf("Setting default layout: %s\n", layout);
         } else if(sscanf(argument, "--gid=%u", &newgid) == 1){
             // Set dev node GID
             gid = newgid;
@@ -153,52 +148,10 @@ int main(int argc, char** argv){
     if(!fps)
         setfps(30);
 
-    // If the keymap wasn't set via command-line, get it from the system locale
-    if(!keymap_system){
-        setlocale(LC_ALL, "");
-        const char* loc = setlocale(LC_CTYPE, 0);
-        char locale[strlen(loc) + 1];
-        localecase(locale, sizeof(locale), loc);
-        if(strstr(locale, "de-")){
-            // Check for DE layout
-            keymap_system = keymap_de;
-            printf("Setting default layout: de\n");
-        } else if(strstr(locale, "es-")){
-            // Check for ES layout
-            keymap_system = keymap_es;
-            printf("Setting default layout: es\n");
-        } else if(strstr(locale, "fr-")){
-            // Check for FR layout
-            keymap_system = keymap_fr;
-            printf("Setting default layout: fr\n");
-        } else if(strstr(locale, "sv-")){
-            // Check for SE layout
-            keymap_system = keymap_se;
-            printf("Setting default layout: se\n");
-        } else if(strstr(locale, "en-us")
-                  || strstr(locale, "en-au")
-                  || strstr(locale, "en-ca")
-                  || strstr(locale, "en-hk")
-                  || strstr(locale, "en-in")
-                  || strstr(locale, "en-nz")
-                  || strstr(locale, "en-ph")
-                  || strstr(locale, "en-sg")
-                  || strstr(locale, "en-za")){
-            // Check for US layout
-            keymap_system = keymap_us;
-            printf("Setting default layout: us\n");
-        } else {
-            // Default to GB
-            keymap_system = keymap_gb;
-            printf("Setting default layout: gb\n");
-        }
-    }
-
     // Make root keyboard
     umask(0);
     memset(keyboard, 0, sizeof(keyboard));
     pthread_mutex_init(&keyboard[0].mutex, 0);
-    keyboard[0].model = -1;
     keyboard[0].features = FEAT_NOTIFY & features_mask;
     if(!makedevpath(keyboard))
         printf("Root controller ready at %s0\n", devpath);

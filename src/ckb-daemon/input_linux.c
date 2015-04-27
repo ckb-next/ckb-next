@@ -101,8 +101,8 @@ int inputopen(usbdevice* kb){
     memset(&indev, 0, sizeof(indev));
     snprintf(indev.name, UINPUT_MAX_NAME_SIZE, "ckb%d", index);
     indev.id.bustype = BUS_USB;
-    indev.id.vendor = V_CORSAIR;
-    indev.id.product = (keyboard[index].model == 95 ? P_K95 : P_K70);
+    indev.id.vendor = keyboard[index].vendor;
+    indev.id.product = keyboard[index].product;
     indev.id.version = (UINPUT_VERSION > 4 ? 4 : UINPUT_VERSION);
     int event;
     int fd = uinputopen(&indev, &event);

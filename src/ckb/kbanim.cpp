@@ -10,6 +10,15 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& se
 {
     settings.beginGroup(_guid.toString().toUpper());
     _keys = settings.value("Keys").toStringList();
+    // Convert key list from storage names if needed
+    if(!settings.value("UseRealNames").toBool()){
+        QMutableListIterator<QString> i(_keys);
+        while(i.hasNext()){
+            i.next();
+            QString& key = i.value();
+            key = _map.fromStorage(key);
+        }
+    }
     _name = settings.value("Name").toString().trimmed();
     _opacity = settings.value("Opacity").toString().toDouble();
     if(_opacity < 0.)
@@ -53,6 +62,7 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& se
 void KbAnim::save(QSettings& settings){
     _needsSave = false;
     settings.beginGroup(_guid.toString().toUpper());
+    settings.setValue("UseRealNames", true);
     settings.setValue("Keys", _keys);
     settings.setValue("Name", _name);
     settings.setValue("Opacity", QString::number(_opacity));
@@ -141,33 +151,6 @@ void KbAnim::reInit(){
 }
 
 void KbAnim::map(const KeyMap& newMap){
-    // Convert the old key list to the new map by positions, if possible
-    uint newCount = newMap.count();
-    QStringList newKeyList;
-    foreach(const QString& key, _keys){
-        const KeyPos* oldPos = _map.key(key);
-        if(!oldPos || key == "enter"){
-            // If the key wasn't in the map, add it anyway
-            if(!newKeyList.contains(key))
-                newKeyList << key;
-            continue;
-        }
-        QString newKey = key;
-        for(uint i = 0; i < newCount; i++){
-            // Scan new map for matching positions
-            const KeyPos* newPos = newMap.key(i);
-            QString newName = newPos->name;
-            if(newPos->x == oldPos->x && newPos->y == oldPos->y
-                    && newName != "enter"){
-                newKey = newName;
-                break;
-            }
-        }
-        if(!newKeyList.contains(newKey))
-            newKeyList << newKey;
-    }
-    // Set the map
-    _keys = newKeyList;
     _map = newMap;
     reInit();
 }

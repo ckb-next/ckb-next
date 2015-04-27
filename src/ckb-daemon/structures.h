@@ -104,8 +104,6 @@ typedef struct {
     int modecap;
     // Currently-selected mode
     usbmode* currentmode;
-    // Key map (locale)
-    const key* keymap;
     // Device serial number
     char serial[SERIAL_LEN];
     // Name and UUID
@@ -115,12 +113,16 @@ typedef struct {
 #define MODE_MAX    100
 
 // Device features
-#define FEAT_RGB        1   // RGB backlighting?
-#define FEAT_POLLRATE   2   // Known poll rate?
-#define FEAT_BIND       4   // Rebindable keys?
-#define FEAT_NOTIFY     8   // Key notifications?
-#define FEAT_FWVERSION  16  // Has firmware version?
-#define FEAT_FWUPDATE   32  // Has firmware update?
+#define FEAT_RGB        0x01    // RGB backlighting?
+#define FEAT_POLLRATE   0x02    // Known poll rate?
+#define FEAT_BIND       0x04    // Rebindable keys?
+#define FEAT_NOTIFY     0x08    // Key notifications?
+#define FEAT_FWVERSION  0x10    // Has firmware version?
+#define FEAT_FWUPDATE   0x20    // Has firmware update?
+
+#define FEAT_ANSI       0x40    // ANSI/ISO layout toggle (Mac only - not needed on Linux)
+#define FEAT_ISO        0x80
+#define FEAT_LMASK      0xC0
 
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION)
@@ -128,7 +130,8 @@ typedef struct {
 #define FEAT_STD_NRGB   (FEAT_COMMON)
 
 // Feature test (usbdevice* kb, int feat)
-#define HAS_FEATURES(kb, feat)    ((kb)->features & (feat))
+#define HAS_FEATURES(kb, feat)      (((kb)->features & (feat)) == (feat))
+#define HAS_ANY_FEATURE(kb, feat)   (!!((kb)->features & (feat)))
 
 // Bricked firmware?
 #define NEEDS_FW_UPDATE(kb) ((kb)->fwversion == 0 && HAS_FEATURES((kb), FEAT_FWUPDATE | FEAT_FWVERSION))
@@ -140,20 +143,20 @@ typedef struct {
 typedef struct {
     // I/O devices
 #ifdef OS_LINUX
-    struct udev_device* udev;
     struct usbdevfs_urb urb[3];
+    struct udev_device* udev;
+    pthread_t usbthread;
     int handle;
     int uinput;
     int event;
-    pthread_t usbthread;
 #endif
 #ifdef OS_MAC
-    IOReturn lastError;
+    struct timespec keyrepeat;
     IOHIDDeviceRef handle;
     IOHIDDeviceRef handles[4];
     io_connect_t event;
-    IOOptionBits lflags, rflags, eventflags;
-    struct timespec keyrepeat;
+    IOReturn lastError;
+    IOOptionBits modifiers;
     short lastkeypress;
 #endif
     // A mutex used for USB controls. Needs to be locked before reading or writing the handle
@@ -187,8 +190,6 @@ typedef struct {
     int pollrate;
     // Indicator LED state
     uchar ileds;
-    // Keyboard type (65, 70, or 95 for keyboards, -1 for root)
-    char model;
     // Device name
     char name[NAME_LEN];
     // Whether the keyboard is being actively controlled by the driver

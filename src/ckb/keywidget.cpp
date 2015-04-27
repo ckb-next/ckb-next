@@ -47,8 +47,6 @@ void KeyWidget::paintEvent(QPaintEvent*){
     const QColor highlightAnimColor(136, 200, 240);
     const QColor animColor(112, 200, 110);
 
-    uint count = keyMap.count();
-
     // Determine which keys to highlight
     QBitArray highlight;
     switch(mouseDownMode){
@@ -103,14 +101,18 @@ void KeyWidget::paintEvent(QPaintEvent*){
     QPainter bgPainter(&keyBG);
     bgPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     bgPainter.setPen(Qt::NoPen);
-    for(uint i = 0; i < count; i++){
-        const KeyPos& key = *keyMap.key(i);
+    QHashIterator<QString, Key> k(keyMap);
+    uint i = -1;
+    while(k.hasNext()){
+        k.next();
+        i++;
+        const Key& key = k.value();
         float x = key.x + 6.f - key.width / 2.f + 1.f;
         float y = key.y + 6.f - key.height / 2.f + 1.f;
         float w = key.width - 2.f;
         float h = key.height - 2.f;
-        // In RGB mode, ignore volume wheel on K70/K95
-        if(model != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
+        // In RGB mode, ignore keys without LEDs
+        if(_rgbMode && !key.hasLed)
             continue;
         // Set color based on key highlight
         if(highlight.testBit(i)){
@@ -161,9 +163,13 @@ void KeyWidget::paintEvent(QPaintEvent*){
     if(_rgbMode){
         // Draw key colors (RGB mode)
         decPainter.setPen(QPen(QColor(255, 255, 255), 1.5));
-        for(uint i = 0; i < count; i++){
-            const KeyPos& key = *keyMap.key(i);
-            if(model != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
+        QHashIterator<QString, Key> k(keyMap);
+        uint i = -1;
+        while(k.hasNext()){
+            k.next();
+            i++;
+            const Key& key = k.value();
+            if(!key.hasLed)
                 continue;
             float x = key.x + 6.f - 1.8f;
             float y = key.y + 6.f - 1.8f;
@@ -182,8 +188,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
         font.setBold(true);
         font.setPixelSize(5.25f * yScale);
         QFont font0 = font;
-        for(uint i = 0; i < count; i++){
-            const KeyPos& key = *keyMap.key(i);
+        QHashIterator<QString, Key> k(keyMap);
+        uint i = -1;
+        while(k.hasNext()){
+            k.next();
+            i++;
+            const Key& key = k.value();
             float x = key.x + 6.f - key.width / 2.f + 1.f;
             float y = key.y + 6.f - key.height / 2.f;
             float w = key.width - 2.f;
@@ -192,10 +202,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
             QString keyName = KbBind::globalRemap(key.name);
             QString name = key.friendlyName(false);
             name = name.split(" ").last();
-            struct _names {
+            struct {
                 const char* keyName, *displayName;
-            };
-            _names names[] = {
+            } names[] = {
                 {"light", "☼"}, {"lock", "☒"}, {"mute", "◖⊘"}, {"volup", keyMap.model() == KeyMap::K65 ? "◖))" : "▲"}, {"voldn", keyMap.model() == KeyMap::K65 ? "◖)" : "▼"},
                 {"prtscn",  "PrtScn\nSysRq"}, {"scroll", "Scroll\nLock"}, {"pause", "Pause\nBreak"}, {"stop", "▪"}, {"prev", "|◂◂"}, {"play", "▸||"}, {"next", "▸▸|"},
                 {"pgup", "Page\nUp"}, {"pgdn", "Page\nDown"}, {"numlock", "Num\nLock"},
@@ -207,7 +216,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
 #endif
                 {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"}
             };
-            for(uint k = 0; k < sizeof(names) / sizeof(_names); k++){
+            for(uint k = 0; k < sizeof(names) / sizeof(names[0]); k++){
                 if(keyName == names[k].keyName){
                     name = names[k].displayName;
                     break;
@@ -224,7 +233,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     || keyName == "lwin" || keyName == "rwin"
 #endif
                     )
-                // Use a larger font size for Win and Brightness to compensate for the unicode symbols looking smaller (Linux only)
+                // Use a larger font size for Super (Linux only) and Brightness to compensate for the unicode symbols looking smaller
                 font.setPixelSize(font.pixelSize() * 1.3);
             // Determine the appropriate size to draw the text at
             decPainter.setFont(font);
@@ -301,10 +310,13 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
     float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
     float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
     float mx = mouseCurrentX / xScale - 6.f, my = mouseCurrentY / yScale - 6.f;
-    uint count = keyMap.count();
-    for(uint i = 0; i < count; i++){
-        const KeyPos& key = *keyMap.key(i);
-        if(keyMap.model() != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
+    QHashIterator<QString, Key> k(keyMap);
+    uint i = -1;
+    while(k.hasNext()){
+        k.next();
+        i++;
+        const Key& key = k.value();
+        if(_rgbMode && !key.hasLed)
             continue;
         if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f){
             newSelection.setBit(i);
@@ -316,63 +328,59 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
 
 void KeyWidget::mouseMoveEvent(QMouseEvent* event){
     event->accept();
-    if(mouseDownMode != NONE){
-        // Find selection rectangle
-        mouseCurrentX = event->x();
-        mouseCurrentY = event->y();
-        float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
-        float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
-        float mx1, mx2, my1, my2;
-        if(mouseCurrentX >= mouseDownX){
-            mx1 = mouseDownX / xScale - 6.f;
-            mx2 = mouseCurrentX / xScale - 6.f;
-        } else {
-            mx1 = mouseCurrentX / xScale - 6.f;
-            mx2 = mouseDownX / xScale - 6.f;
-        }
-        if(mouseCurrentY >= mouseDownY){
-            my1 = mouseDownY / yScale - 6.f;
-            my2 = mouseCurrentY / yScale - 6.f;
-        } else {
-            my1 = mouseCurrentY / yScale - 6.f;
-            my2 = mouseDownY / yScale - 6.f;
-        }
-        // Clear new selection
-        newSelection.fill(false);
-        // See if the event hit any keys
-        uint count = keyMap.count();
-        for(uint i = 0; i < count; i++){
-            // Find key rectangle
-            const KeyPos& key = *keyMap.key(i);
-            // Ignore volume wheel on K70/K95 in RGB mode
-            if(keyMap.model() != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
-                continue;
-            float kx1 = key.x - key.width / 2.f + 1.f;
-            float ky1 = key.y - key.height / 2.f + 1.f;
-            float kx2 = kx1 + key.width - 2.f;
-            float ky2 = ky1 + key.height - 2.f;
-            // If they overlap, add the key to the selection
-            if(!(mx1 >= kx2 || kx1 >= mx2)
-                    && !(my1 >= ky2 || ky1 >= my2))
-                newSelection.setBit(i);
-        }
-        update();
-    }
-    // Update tooltip with the moused-over key (if any)
+    QString tooltip;
+
+    // Find selection rectangle
+    mouseCurrentX = event->x();
+    mouseCurrentY = event->y();
     float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
     float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
-    float mx = event->x() / xScale - 6.f, my = event->y() / yScale - 6.f;
-    uint count = keyMap.count();
-    for(uint i = 0; i < count; i++){
-        const KeyPos& key = *keyMap.key(i);
-        if(keyMap.model() != KeyMap::K65 && _rgbMode && (!strcmp(key.name, "volup") || !strcmp(key.name, "voldn")))
-            continue;
-        if(fabs(key.x - mx) <= key.width / 2.f - 2.f && fabs(key.y - my) <= key.height / 2.f - 2.f){
-            setToolTip(key.friendlyName(false));
-            return;
-        }
+    float mx = mouseCurrentX / xScale - 6.f, my = mouseCurrentY / yScale - 6.f;
+    float mx1, mx2, my1, my2;
+    if(mouseCurrentX >= mouseDownX){
+        mx1 = mouseDownX / xScale - 6.f;
+        mx2 = mouseCurrentX / xScale - 6.f;
+    } else {
+        mx1 = mouseCurrentX / xScale - 6.f;
+        mx2 = mouseDownX / xScale - 6.f;
     }
-    setToolTip("");
+    if(mouseCurrentY >= mouseDownY){
+        my1 = mouseDownY / yScale - 6.f;
+        my2 = mouseCurrentY / yScale - 6.f;
+    } else {
+        my1 = mouseCurrentY / yScale - 6.f;
+        my2 = mouseDownY / yScale - 6.f;
+    }
+    // Clear new selection
+    if(mouseDownMode != NONE)
+        newSelection.fill(false);
+    // See if the event hit any keys
+    QHashIterator<QString, Key> k(keyMap);
+    uint i = -1;
+    while(k.hasNext()){
+        k.next();
+        i++;
+        const Key& key = k.value();
+        if(_rgbMode && !key.hasLed)
+            continue;
+        float kx1 = key.x - key.width / 2.f + 1.f;
+        float ky1 = key.y - key.height / 2.f + 1.f;
+        float kx2 = kx1 + key.width - 2.f;
+        float ky2 = ky1 + key.height - 2.f;
+        // If they overlap, add the key to the selection
+        if(!(mx1 >= kx2 || kx1 >= mx2)
+                && !(my1 >= ky2 || ky1 >= my2)
+                && mouseDownMode != NONE)
+            newSelection.setBit(i);
+        // Update tooltip with the moused-over key (if any)
+        if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f
+                && tooltip.isEmpty())
+            tooltip = key.friendlyName(false);
+    }
+
+    if(mouseDownMode != NONE)
+        update();
+    setToolTip(tooltip);
 }
 
 void KeyWidget::mouseReleaseEvent(QMouseEvent* event){
@@ -398,11 +406,12 @@ void KeyWidget::mouseReleaseEvent(QMouseEvent* event){
     // Clear mousedown state.
     newSelection.fill(false);
     mouseDownMode = NONE;
+    // Emit signal with the names of the keys
     QStringList selectedNames;
-    uint count = keyMap.count();
-    for(uint i = 0; i < count; i++){
-        if(selection.testBit(i))
-            selectedNames << keyMap.key(i)->name;
+    uint i = 0;
+    foreach(const QString& key, keyMap.keys()){
+        if(selection.testBit(i++))
+            selectedNames << key;
     }
     emit selectionChanged(selectedNames);
     update();
@@ -410,8 +419,9 @@ void KeyWidget::mouseReleaseEvent(QMouseEvent* event){
 
 void KeyWidget::setSelection(const QStringList& keys){
     selection.fill(false);
-    foreach(QString key, keys){
-        int index = keyMap.index(key);
+    QStringList allNames = keyMap.keys();
+    foreach(const QString& key, keys){
+        int index = allNames.indexOf(key);
         if(index >= 0)
             selection.setBit(index);
     }
@@ -426,7 +436,7 @@ void KeyWidget::selectAll(){
     newSelection.fill(false);
     mouseDownMode = NONE;
     update();
-    emit selectionChanged(keyMap.allKeys());
+    emit selectionChanged(keyMap.keys());
 }
 
 void KeyWidget::clearSelection(){
@@ -439,8 +449,9 @@ void KeyWidget::clearSelection(){
 
 void KeyWidget::setAnimation(const QStringList& keys){
     animation.fill(false);
-    foreach(QString key, keys){
-        int index = keyMap.index(key);
+    QStringList allNames = keyMap.keys();
+    foreach(const QString& key, keys){
+        int index = allNames.indexOf(key);
         if(index >= 0)
             animation.setBit(index);
     }

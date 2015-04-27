@@ -25,11 +25,15 @@ void KbBind::load(QSettings& settings){
     KeyMap currentMap = _map;
     _map = KeyMap::fromName(settings.value("KeyMap").toString());
     // Load key settings
+    bool useReal = settings.value("UseRealNames").toBool();
     _bind.clear();
     settings.beginGroup("Keys");
     foreach(QString key, settings.childKeys()){
+        QString name = key.toLower();
+        if(!useReal)
+            name = _map.fromStorage(name);
         QString bind = settings.value(key).toString();
-        _bind[key] = bind;
+        _bind[name] = bind;
     }
     settings.endGroup();
     settings.endGroup();
@@ -42,6 +46,7 @@ void KbBind::save(QSettings& settings){
     settings.beginGroup("Binding");
     settings.setValue("KeyMap", _map.name());
     // Save key settings
+    settings.setValue("UseRealNames", true);
     settings.beginGroup("Keys");
     foreach(QString key, _bind.keys()){
         QString act = _bind.value(key);
@@ -89,14 +94,6 @@ void KbBind::saveGlobalRemap(){
 
 void KbBind::map(const KeyMap& map){
     _map = map;
-    // Remove any keys not present in the map
-    QHashIterator<QString, QString> i(_bind);
-    while(i.hasNext()){
-        i.next();
-        QString key = i.key();
-        if(!map.key(key))
-            _bind.remove(key);
-    }
     _needsUpdate = true;
     _needsSave = true;
     emit layoutChanged();
@@ -137,10 +134,10 @@ QString KbBind::defaultAction(const QString& key){
 }
 
 QString KbBind::friendlyName(const QString& key){
-    const KeyPos* pos = map().key(globalRemap(key));
+    const Key& pos = _map[globalRemap(key)];
     if(!pos)
         return "(Unknown)";
-    return pos->friendlyName();
+    return pos.friendlyName();
 }
 
 QString KbBind::friendlyActionName(const QString& key){
@@ -150,10 +147,10 @@ QString KbBind::friendlyActionName(const QString& key){
     QStringList parts = act.split(":");
     QString prefix = parts[0];
     if(parts.length() < 2){
-        const KeyPos* key = _map.key(prefix);
+        const Key& key = _map[prefix];
         if(!key)
             return "(Unknown)";
-        return key->friendlyName();
+        return key.friendlyName();
     }
     int suffix = parts[1].toInt();
     if(prefix == "$mode"){

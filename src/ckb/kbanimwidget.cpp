@@ -209,7 +209,15 @@ void KbAnimWidget::on_blendBox_activated(int index){
 
 void KbAnimWidget::on_keyButton_clicked(){
     if(current){
-        current->keys(selectedKeys);
+        QStringList keys = selectedKeys;
+        // If any keys were selected previously that aren't in the keymap now, leave them in
+        // This is important for layout compatibility - e.g. being able to select both bslash_iso and bslash, because no single layout contains both
+        const KeyMap& map = light->map();
+        foreach(const QString& key, current->keys()){
+            if(!map.contains(key))
+                keys << key;
+        }
+        current->keys(keys);
         emit didUpdateSelection(selectedKeys);
     }
     light->restartAnimation();

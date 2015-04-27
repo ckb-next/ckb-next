@@ -29,7 +29,7 @@ public:
     // Keyboard model and layout
     inline KeyMap::Model model() const { return _model; }
     inline KeyMap::Layout layout() const { return _layout; }
-    inline void layout(KeyMap::Layout newLayout) { layout(newLayout, true); }
+    void layout(KeyMap::Layout newLayout);
 
     inline bool isOpen() const { return cmd.isOpen(); }
 
@@ -107,7 +107,6 @@ private:
 
     KeyMap::Model _model;
     KeyMap::Layout _layout;
-    void layout(KeyMap::Layout newLayout, bool write);
 
     // Current firmware update file
     QString fwUpdPath;

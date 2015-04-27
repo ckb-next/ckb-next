@@ -73,7 +73,7 @@ long repeattime(io_connect_t event, int first){
 void clearkeys(usbdevice* kb){
     // Send keyup events for every scancode in the keymap
     for(int key = 0; key < N_KEYS; key++){
-        int scan = keymap_system[key].scan;
+        int scan = keymap[key].scan;
         if(scan < 0 || IS_MEDIA(scan))
             continue;
         postevent(kb->event, 0, scan, 0, 0, 0);
@@ -115,42 +115,53 @@ void inputclose(usbdevice* kb){
 }
 
 void os_keypress(usbdevice* kb, int scancode, int down){
+    // Some boneheaded Apple engineers decided to reverse kVK_ANSI_Grave and kVK_ISO_Section on the 105-key layouts...
+    if(!HAS_ANY_FEATURE(kb, FEAT_LMASK)){
+        // If the layout hasn't been set yet, it can be auto-detected from certain keys
+        if(scancode == KEY_BACKSLASH_ISO || scancode == KEY_102ND)
+            kb->features |= FEAT_ISO;
+        else if(scancode == KEY_BACKSLASH)
+            kb->features |= FEAT_ANSI;
+    }
+    if(scancode == KEY_BACKSLASH_ISO)
+        scancode = KEY_BACKSLASH;
+    if(HAS_FEATURES(kb, FEAT_ISO)){
+        // Compensate for key reversal
+        if(scancode == KEY_GRAVE)
+            scancode = KEY_102ND;
+        else if(scancode == KEY_102ND)
+            scancode = KEY_GRAVE;
+    }
     // Check for modifier keys and update flags
-    int flags = 0;
-    // Keep a separate list of left/right side modifiers - combine them below
-    IOOptionBits* side = (scancode == KEY_RIGHTSHIFT || scancode == KEY_RIGHTCTRL || scancode == KEY_RIGHTMETA || scancode == KEY_RIGHTALT) ? &kb->rflags : &kb->lflags;
-    CGEventFlags mod = 0;
+    int isMod = 0;
+    IOOptionBits mod = 0;
     if(scancode == KEY_CAPSLOCK){
         if(down)
-            kb->lflags ^= NX_ALPHASHIFTMASK;
-        flags = 1;
-    } else if(scancode == KEY_LEFTSHIFT || scancode == KEY_RIGHTSHIFT){
-        mod = NX_SHIFTMASK;
-        mod |= (scancode == KEY_LEFTSHIFT) ? NX_DEVICELSHIFTKEYMASK : NX_DEVICERSHIFTKEYMASK;
-        flags = 1;
-    } else if(scancode == KEY_LEFTCTRL || scancode == KEY_RIGHTCTRL){
-        mod = NX_CONTROLMASK;
-        mod |= (scancode == KEY_LEFTCTRL) ? NX_DEVICELCTLKEYMASK : NX_DEVICERCTLKEYMASK;
-        flags = 1;
-    } else if(scancode == KEY_LEFTMETA || scancode == KEY_RIGHTMETA){
-        mod = NX_COMMANDMASK;
-        mod |= (scancode == KEY_LEFTMETA) ? NX_DEVICELCMDKEYMASK : NX_DEVICERCMDKEYMASK;
-        flags = 1;
-    } else if(scancode == KEY_LEFTALT || scancode == KEY_RIGHTALT){
-        mod = NX_ALTERNATEMASK;
-        mod |= (scancode == KEY_LEFTALT) ? NX_DEVICELALTKEYMASK : NX_DEVICERALTKEYMASK;
-        flags = 1;
+            kb->modifiers ^= NX_ALPHASHIFTMASK;
+        isMod = 1;
     }
-
-    if(flags){
-        // Update flags when a modifier key is pressed
+    else if(scancode == KEY_LEFTSHIFT) mod = NX_DEVICELSHIFTKEYMASK;
+    else if(scancode == KEY_RIGHTSHIFT) mod = NX_DEVICERSHIFTKEYMASK;
+    else if(scancode == KEY_LEFTCTRL) mod = NX_DEVICELCTLKEYMASK;
+    else if(scancode == KEY_RIGHTCTRL) mod = NX_DEVICERCTLKEYMASK;
+    else if(scancode == KEY_LEFTMETA) mod = NX_DEVICELCMDKEYMASK;
+    else if(scancode == KEY_RIGHTMETA) mod = NX_DEVICERCMDKEYMASK;
+    else if(scancode == KEY_LEFTALT) mod = NX_DEVICELALTKEYMASK;
+    else if(scancode == KEY_RIGHTALT) mod = NX_DEVICERALTKEYMASK;
+    if(mod){
+        // Update global modifiers
         if(down)
-            *side |= mod;
+            mod |= kb->modifiers;
         else
-            *side &= ~mod;
-        kb->eventflags = kb->lflags | kb->rflags;
+            mod = kb->modifiers & ~mod;
+        if((mod & NX_DEVICELSHIFTKEYMASK) || (mod & NX_DEVICERSHIFTKEYMASK)) mod |= NX_SHIFTMASK; else mod &= ~NX_SHIFTMASK;
+        if((mod & NX_DEVICELCTLKEYMASK) || (mod & NX_DEVICERCTLKEYMASK)) mod |= NX_CONTROLMASK; else mod &= ~NX_CONTROLMASK;
+        if((mod & NX_DEVICELCMDKEYMASK) || (mod & NX_DEVICERCMDKEYMASK)) mod |= NX_COMMANDMASK; else mod &= ~NX_COMMANDMASK;
+        if((mod & NX_DEVICELALTKEYMASK) || (mod & NX_DEVICERALTKEYMASK)) mod |= NX_ALTERNATEMASK; else mod &= ~NX_ALTERNATEMASK;
+        kb->modifiers = mod;
         kb->lastkeypress = KEY_NONE;
-    } else {
+        isMod = 1;
+    } else if(!isMod){
         // For any other key, trigger key repeat
         if(down){
             long repeat = repeattime(kb->event, 1);
@@ -164,15 +175,13 @@ void os_keypress(usbdevice* kb, int scancode, int down){
             kb->lastkeypress = KEY_NONE;
     }
 
-    postevent(kb->event, kb->eventflags, scancode, down, flags, 0);
+    postevent(kb->event, kb->modifiers, scancode, down, isMod, 0);
 }
 
+// Retrigger the last-pressed key
 void keyretrigger(usbdevice* kb){
     int scancode = kb->lastkeypress;
-    if(scancode < 0)
-        return;
-    // Retrigger the last-pressed key
-    postevent(kb->event, kb->eventflags, scancode, 1, 0, 1);
+    postevent(kb->event, kb->modifiers, scancode, 1, 0, 1);
     // Set next key repeat time
     long repeat = repeattime(kb->event, 0);
     if(repeat > 0)
@@ -193,7 +202,7 @@ void* krthread(void* context){
                 // Scan all connected devices
                 pthread_mutex_lock(&keyboard[i].keymutex);
                 // Repeat the key as many times as needed to catch up
-                while(keyboard[i].lastkeypress != KEY_NONE && timespec_ge(time, keyboard[i].keyrepeat))
+                while(keyboard[i].lastkeypress >= 0 && timespec_ge(time, keyboard[i].keyrepeat))
                     keyretrigger(keyboard + i);
                 pthread_mutex_unlock(&keyboard[i].keymutex);
             }
@@ -213,7 +222,7 @@ void os_updateindicators(usbdevice* kb, int force){
     char ileds = 1;
     // Set Caps Lock if enabled. Unlike Linux, OSX keyboards have independent caps lock states, so
     // we use the last-assigned value rather than fetching it from the system
-    if(kb->eventflags & kCGEventFlagMaskAlphaShift)
+    if(kb->modifiers & kCGEventFlagMaskAlphaShift)
         ileds |= 2;
     usbmode* mode = kb->profile.currentmode;
     if(mode && kb->active)

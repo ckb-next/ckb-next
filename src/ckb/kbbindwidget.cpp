@@ -40,11 +40,8 @@ void KbBindWidget::updateBind(){
     const KeyMap& map = bind->map();
     // Build the action list based on the keymap
     QHash<QString, QString> actions;
-    uint count = map.count();
-    for(uint i = 0; i < count; i++){
-        QString key = map.key(i)->name;
+    foreach(const QString& key, map.keys())
         actions[key] = bind->action(key);
-    }
     ui->keyWidget->bindMap(actions);
     ui->rbWidget->setSelection(currentSelection);
     updateSelDisplay();
@@ -72,11 +69,11 @@ void KbBindWidget::updateSelDisplay(){
     if(count == 1){
         // Single key selected: show key name and binding
         QString key = currentSelection[0];
-        const KeyPos* pos = bind->map().key(key);
+        const Key& pos = bind->map()[key];
         if(!pos)
             ui->selectLabel->setText("(Unknown)");
         else
-            ui->selectLabel->setText(pos->friendlyName(false).split("\n")[0] + " → " + bind->friendlyActionName(key).split("\n")[0]);
+            ui->selectLabel->setText(pos.friendlyName(false).split("\n")[0] + " → " + bind->friendlyActionName(key).split("\n")[0]);
         return;
     }
     ui->selectLabel->setText(QString("%1 keys selected").arg(count));
@@ -87,7 +84,7 @@ void KbBindWidget::on_resetButton_clicked(){
     const KeyMap& map = bind->map();
     if(selection.isEmpty())
         // Reset all keys if none selected
-        selection = map.allKeys();
+        selection = map.keys();
     uint count = selection.count();
     QString text;
     if(count == map.count())
@@ -109,7 +106,7 @@ void KbBindWidget::on_copyButton_clicked(){
     QString text = tr("%1 key").arg(count) + (count == 1 ? "" : "s");
     if(count == 0){
         // Copy all keys if none selected
-        selection = map.allKeys();
+        selection = map.keys();
         text = "all keys";
     }
     text = "Copy binding for " + text + " to:";

@@ -89,7 +89,7 @@ int makedevpath(usbdevice* kb){
     // Create notification FIFO
     mknotifynode(kb, 0);
 
-    if(kb->model == -1){
+    if(kb == keyboard + 0){
         // Root keyboard: write a list of devices
         updateconnected();
         // Write version number
@@ -154,7 +154,7 @@ int makedevpath(usbdevice* kb){
         snprintf(fpath, sizeof(fpath), "%s/features", path);
         FILE* ffile = fopen(fpath, "w");
         if(ffile){
-            fprintf(ffile, "corsair k%d", kb->model);
+            fprintf(ffile, "%s %s", vendor_str(kb->vendor), product_str(kb->product));
             if(HAS_FEATURES(kb, FEAT_RGB))
                 fputs(" rgb", ffile);
             if(HAS_FEATURES(kb, FEAT_POLLRATE))
@@ -324,7 +324,6 @@ void readcmd(usbdevice* kb, const char* line){
     int wordlen;
     const char* newline = 0;
     usbprofile* profile = 0;
-    const key* keymap = keymap_system;
     usbmode* mode = 0;
     cmd command = NONE;
     cmdhandler handler = 0;
@@ -337,7 +336,6 @@ void readcmd(usbdevice* kb, const char* line){
             usbdevice* prevkb = kb;
             kb = kb0;
             profile = (IS_CONNECTED(kb) ? &kb->profile : 0);
-            keymap = (profile ? profile->keymap : keymap_system);
             mode = (profile ? profile->currentmode : 0);
             command = NONE;
             handler = 0;
@@ -493,7 +491,6 @@ void readcmd(usbdevice* kb, const char* line){
                     kb = 0;
                     profile = addstore(word, 1);
                 }
-                keymap = (profile ? profile->keymap : keymap_system);
                 mode = (profile ? profile->currentmode : 0);
                 // Send the RGB command to the last device if its colors changed
                 if(kb != prevkb){
@@ -501,28 +498,15 @@ void readcmd(usbdevice* kb, const char* line){
                 }
             }
             continue;
+#ifdef OS_MAC
         } else if(command == LAYOUT){
-            const key* newkeymap = getkeymap(word);
-            if(!newkeymap)
-                continue;
-            if(profile){
-                // If applied to a device, reset all key bindings to the new key map
-                if(keymap != newkeymap){
-                    keymap = profile->keymap = newkeymap;
-                    for(int i = 0; i < profile->modecount; i++){
-                        usbmode* mode = profile->mode + i;
-                        closebind(&mode->bind);
-                        memset(&mode->bind, 0, sizeof(mode->bind));
-                        initbind(&mode->bind, keymap);
-                    }
-                    nprintf(kb, -1, 0, "layout %s\n", word);
-                }
-            } else {
-                // If applied to the root controller, update the system keymap but not any devices
-                keymap_system = newkeymap;
-                printf("Setting default layout: %s\n", word);
-            }
-            continue;
+            // OSX keyboards can be switched between ANSI and ISO layouts. On Linux this is not done because they both behave the same
+            // (see os_keypress - input_mac.c)
+            if(!strcmp(word, "ansi"))
+                kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ANSI;
+            else if(!strcmp(word, "iso"))
+                kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ISO;
+#endif
         } else if(command == FPS){
             unsigned newfps;
             if(kb && sscanf(word, "%u", &newfps) == 1)
@@ -559,7 +543,7 @@ void readcmd(usbdevice* kb, const char* line){
             // Mode selection processes a number
             int newmode;
             if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_MAX)
-                mode = getusbmode(newmode - 1, profile, keymap);
+                mode = getusbmode(newmode - 1, profile);
             continue;
         } case SWITCH:
             profile->currentmode = mode;
@@ -605,7 +589,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         case ERASEPROFILE:
             // Erase the current profile
-            eraseprofile(profile, kb->model == 95 ? 3 : 1);
+            eraseprofile(profile, IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
             mode = profile->currentmode;
             continue;
         case NAME: case IOFF: case ION: case IAUTO: case INOTIFY:

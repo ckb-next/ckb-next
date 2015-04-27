@@ -8,6 +8,9 @@ TEMPLATE = app
 # GL isn't needed
 QMAKE_LIBS_OPENGL =
 
+QMAKE_CFLAGS += -Wno-unused-parameter
+QMAKE_CXXFLAGS += -Wno-unused-parameter
+
 # Output path
 macx {
     DESTDIR = $$PWD/../..
@@ -46,11 +49,6 @@ SOURCES += main.cpp\
     animscript.cpp \
     kbanim.cpp \
     animadddialog.cpp \
-    keymap_us.cpp \
-    keymap_gb.cpp \
-    keymap_se.cpp \
-    keymap_de.cpp \
-    keymap_fr.cpp \
     animsettingdialog.cpp \
     gradientbutton.cpp \
     gradientdialog.cpp \
@@ -62,8 +60,6 @@ SOURCES += main.cpp\
     keywidget.cpp \
     kbbindwidget.cpp \
     kbbind.cpp \
-    keymap_us_dvorak.cpp \
-    keymap_gb_dvorak.cpp \
     rebindwidget.cpp \
     modeselectdialog.cpp \
     quazip/JlCompress.cpp \
@@ -82,7 +78,6 @@ SOURCES += main.cpp\
     kbfirmware.cpp \
     fwupgradedialog.cpp \
     autorun.cpp \
-    keymap_es.cpp \
     ckbsettings.cpp
 
 HEADERS  += mainwindow.h \

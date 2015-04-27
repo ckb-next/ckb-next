@@ -110,18 +110,18 @@ void setactive(usbdevice* kb, int active){
             for(pair = 0; pair < 30 && key < N_KEYS; pair++, key++){
                 uchar action = IN_HID;
                 // Enable hardware actions
-                if(keymap_system[key].name){
-                    if(!strcmp(keymap_system[key].name, "mr"))
+                if(keymap[key].name){
+                    if(!strcmp(keymap[key].name, "mr"))
                         action = ACT_MR_RING;
-                    else if(!strcmp(keymap_system[key].name, "m1"))
+                    else if(!strcmp(keymap[key].name, "m1"))
                         action = ACT_M1;
-                    else if(!strcmp(keymap_system[key].name, "m2"))
+                    else if(!strcmp(keymap[key].name, "m2"))
                         action = ACT_M2;
-                    else if(!strcmp(keymap_system[key].name, "m3"))
+                    else if(!strcmp(keymap[key].name, "m3"))
                         action = ACT_M3;
-                    else if(!strcmp(keymap_system[key].name, "light"))
+                    else if(!strcmp(keymap[key].name, "light"))
                         action = ACT_LIGHT;
-                    else if(!strcmp(keymap_system[key].name, "lock"))
+                    else if(!strcmp(keymap[key].name, "lock"))
                         action = ACT_LOCK;
                 }
                 msg[1][4 + pair * 2] = key;

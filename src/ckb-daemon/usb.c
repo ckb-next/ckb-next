@@ -7,6 +7,23 @@
 #include "profile.h"
 #include "usb.h"
 
+// Vendor/product string representations
+const char* vendor_str(short vendor){
+    if(vendor == V_CORSAIR)
+        return "corsair";
+    return "";
+}
+
+const char* product_str(short product){
+    if(product == P_K95 || product == P_K95_NRGB)
+        return "k95";
+    if(product == P_K70 || product == P_K70_NRGB)
+        return "k70";
+    if(product == P_K65)
+        return "k65";
+    return "";
+}
+
 // Mask of features to exclude from all devices
 int features_mask = -1;
 
@@ -26,13 +43,12 @@ int usbqueue(usbdevice* kb, uchar* messages, int count){
 }
 
 int setupusb(usbdevice* kb, short vendor, short product){
-    kb->model = (product == P_K65) ? 65 : (product == P_K70 || product == P_K70_NRGB) ? 70 : 95;
     kb->vendor = vendor;
     kb->product = product;
     kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;
     // Make up a device name if one wasn't assigned
     if(!kb->name[0])
-        snprintf(kb->name, NAME_LEN, "Corsair K%d%s", kb->model, HAS_FEATURES(kb, FEAT_RGB) ? " RGB" : "");
+        snprintf(kb->name, NAME_LEN, "Corsair K%d%s", (product == P_K65) ? 65 : (product == P_K70 || product == P_K70_NRGB) ? 70 : 95, HAS_FEATURES(kb, FEAT_RGB) ? " RGB" : "");
     pthread_mutex_init(&kb->mutex, 0);
     pthread_mutex_init(&kb->keymutex, 0);
     pthread_mutex_lock(&kb->mutex);
@@ -62,13 +78,12 @@ int setupusb(usbdevice* kb, short vendor, short product){
         nk95cmd(kb, NK95_HWOFF);
         kb->active = 1;
         writefwnode(kb);
-        kb->profile.keymap = keymap_system;
         // Fill out RGB features for consistency, even though the keyboard doesn't have them
         kb->pollrate = -1;
-        kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
-        if(kb->model == 95){
-            getusbmode(1, &kb->profile, keymap_system);
-            getusbmode(2, &kb->profile, keymap_system);
+        kb->profile.currentmode = getusbmode(0, &kb->profile);
+        if(IS_K95(kb)){
+            getusbmode(1, &kb->profile);
+            getusbmode(2, &kb->profile);
         }
         return 0;
     }
@@ -85,10 +100,9 @@ int setupusb(usbdevice* kb, short vendor, short product){
         printf("Device needs a firmware update. Please issue a fwupdate command.\n");
         kb->features = FEAT_RGB | FEAT_FWVERSION | FEAT_FWUPDATE;
         kb->active = 1;
-        kb->profile.keymap = keymap_system;
-        kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
-        getusbmode(1, &kb->profile, keymap_system);
-        getusbmode(2, &kb->profile, keymap_system);
+        kb->profile.currentmode = getusbmode(0, &kb->profile);
+        getusbmode(1, &kb->profile);
+        getusbmode(2, &kb->profile);
         return 0;
     }
 
@@ -97,20 +111,19 @@ int setupusb(usbdevice* kb, short vendor, short product){
     usbprofile* store = findstore(kb->profile.serial);
     if(store){
         memcpy(&kb->profile, store, sizeof(usbprofile));
-        if(kb->model == 95){
+        if(IS_K95(kb)){
             // On the K95, make sure at least 3 modes are available
-            getusbmode(1, &kb->profile, keymap_system);
-            getusbmode(2, &kb->profile, keymap_system);
+            getusbmode(1, &kb->profile);
+            getusbmode(2, &kb->profile);
         }
         if(fail || hwloadprofile(kb, 0))
             return -2;
     } else {
         // If there is no profile, load it from the device
-        kb->profile.keymap = keymap_system;
-        kb->profile.currentmode = getusbmode(0, &kb->profile, keymap_system);
-        if(kb->model == 95){
-            getusbmode(1, &kb->profile, keymap_system);
-            getusbmode(2, &kb->profile, keymap_system);
+        kb->profile.currentmode = getusbmode(0, &kb->profile);
+        if(IS_K95(kb)){
+            getusbmode(1, &kb->profile);
+            getusbmode(2, &kb->profile);
         }
         if(fail || hwloadprofile(kb, 1))
             return -2;

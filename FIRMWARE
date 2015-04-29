@@ -10,19 +10,19 @@ Hash: SHA256
 
 # Vendor   Model  FW   URL                                             Min.ckb File Name         SHA256
   Corsair  K65RGB 1.12 http://www3.corsair.com/software/HID/K65RGB.zip 0.0.1   K65RGB_app112.bin 4d730a6c6716c59e2c0a73a1afeeef8ee6a5384b07d7baace4e4c333b6c956c6
-  Corsair  K70RGB 1.20 http://www3.corsair.com/software/HID/K70RGB.zip 0.1.2   K70_app115.bin    9748efd89b878e050e121b08c780e81bca5922a8eb0f7e5288f486850493d60e
-  Corsair  K95RGB 1.20 http://www3.corsair.com/software/HID/K95RGB.zip 0.1.2   K95_app115.bin    8a46a97469abe8cee2ae07a463d152686afa0d0f628023694d739a6491d2fd64
+  Corsair  K70RGB 1.20 http://www3.corsair.com/software/HID/K70RGB.zip 0.1.2   K70_app120.bin    9748efd89b878e050e121b08c780e81bca5922a8eb0f7e5288f486850493d60e
+  Corsair  K95RGB 1.20 http://www3.corsair.com/software/HID/K95RGB.zip 0.1.2   K95_app120.bin    8a46a97469abe8cee2ae07a463d152686afa0d0f628023694d739a6491d2fd64
 
 !END FW ENTRIES
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJVOxfCAAoJEBXtkzSNyNMJSs8H/0KIztv5YVHHfhkxHgfBcCgx
-MeChDvQrDVESGbsQhA+89c1RTsgQXA+0U3Hrst81743dR26MZF9cZvCd/HO33TlQ
-HDbCUhxAZXFUucNu+IGJvu5nhI/FkfgDh92FGp54ZfMtCjp+g8w1P0+XtoeEyWLp
-iop7UZeQwft51UxXyVfeMYdHRvL6NxO0pdbxdOag9GlMnRds4n6zp2DSrDSMQzNw
-2JxJFmzPatlnhrwyRPFR3OTPpcTmNVHkhD9fcF04UTMlgIKRPHpemmlKRjlwk9Mt
-DSQ8GsuRrcXaJr/6kVuNPX97BPoQrnwrVh2CueuwrgL+hDAJrnlyma8s+eV+hs0=
-=/eQf
+iQEcBAEBCAAGBQJVQEoDAAoJEBXtkzSNyNMJB9YH/0/ryPtJ1j4oMSjOf1noIS58
+nYf9dUzkKImCSW4lY87zhKhVkvrePIBEaPHdjX52u/QfPyj6kfbSGrre8JrybcLf
++moC1WGdiZuKcVdF1+s6hkZfn1bK/o4wfwlGPckQYV7l5tA9s5mLMguDoqpEghQ+
+T0lCMCLbnkwx1S4MXZfT1KT7SKItdh/k/VMlmJ6aGVATNhAbePpmpP/BtXyXud6v
+PAbZqwoRrue4aYujiPuJ65nG72RTnDFdGLFSMGSDNaENw5+9yQIyfTQ4K4aSiDqk
+6esMKdHYgVvCbcmUBJ3HdsxiF+lnMb6/wZzefZkEcUm+H35H5EyfdxKOpU/FP1U=
+=1GyY
 -----END PGP SIGNATURE-----

@@ -383,7 +383,7 @@ void KbWidget::updateFwButton(){
         if(newVersion <= 0.f || newVersion <= oldVersion)
             ui->fwUpdButton->setText("Up to date");
         else
-            ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(newVersion));
+            ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(QString::number(newVersion, 'f', 2)));
     }
 }
 

@@ -6,43 +6,41 @@
 
 #ifdef OS_LINUX
 
-int _usbdequeue(usbdevice* kb, const char* file, int line){
-    if(kb->queuecount == 0 || !kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
+int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
+    if(!kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
-    int res;
-    if(kb->fwversion >= 0x120){
-        struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, kb->queue[0] };
-        res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
-    } else {
-        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, kb->queue[0] };
-        res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+    for(int i = 0; i < count; i++){
+        DELAY_SHORT;
+        int res;
+        if(kb->fwversion >= 0x120){
+            struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, messages + MSG_SIZE * i };
+            res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
+        } else {
+            struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 0, messages + MSG_SIZE * i };
+            res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+        }
+        if(res <= 0){
+            printf("usbsend (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data written");
+            return 0;
+        }
+        if(res != MSG_SIZE)
+            printf("usbsend (%s:%d): Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     }
-    if(res <= 0){
-        printf("usbdequeue (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data written");
-        return 0;
-    }
-    if(res != MSG_SIZE)
-        printf("usbdequeue (%s:%d): Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
-    // Rotate queue
-    uchar* first = kb->queue[0];
-    for(int i = 1; i < QUEUE_LEN; i++)
-        kb->queue[i - 1] = kb->queue[i];
-    kb->queue[QUEUE_LEN - 1] = first;
-    kb->queuecount--;
-    return res;
+    return MSG_SIZE * count;
 }
 
-int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
+int _usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
     if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
-    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, message };
+    DELAY_MEDIUM;
+    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 0, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     if(res <= 0){
-        printf("usbinput (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
+        printf("usbrecv (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
         return 0;
     }
     if(res != MSG_SIZE)
-        printf("usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        printf("usbrecv (%s:%d): Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     return res;
 }
 
@@ -77,48 +75,44 @@ void* intreap(void* context){
         }
         if(urb){
             // Process input (if any)
-            if(kb->INPUT_READY){
-                if(HAS_FEATURES(kb, FEAT_RGB)){
-                    switch(urb->endpoint){
-                    case 0x81:
-                        // RGB EP 1: 6KRO (BIOS mode) input
-                        hid_translate(kb->kbinput, -1, 8, kb->urbinput);
+            if(HAS_FEATURES(kb, FEAT_RGB)){
+                switch(urb->endpoint){
+                case 0x81:
+                    // RGB EP 1: 6KRO (BIOS mode) input
+                    hid_translate(kb->kbinput, -1, 8, kb->urbinput);
+                    inputupdate(kb);
+                    break;
+                case 0x82:
+                    // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
+                    if(!kb->active){
+                        hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);
                         inputupdate(kb);
-                        break;
-                    case 0x82:
-                        // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
-                        if(!kb->active){
-                            hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);
-                            inputupdate(kb);
-                        }
-                        break;
-                    case 0x83:
-                        // RGB EP 3: Corsair input
-                        inputupdate(kb);
-                        break;
                     }
-                } else {
-                    switch(urb->endpoint){
-                    case 0x81:
-                        // Non-RGB EP 1: 6KRO input
-                        hid_translate(kb->kbinput, 1, 8, kb->urbinput);
-                        inputupdate(kb);
-                        break;
-                    case 0x82:
-                        // Non-RGB EP 2: media keys
-                        hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
-                        inputupdate(kb);
-                        break;
-                    case 0x83:
-                        // Non-RGB EP 3: NKRO input
-                        hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
-                        inputupdate(kb);
-                        break;
-                    }
+                    break;
+                case 0x83:
+                    // RGB EP 3: Corsair input
+                    inputupdate(kb);
+                    break;
+                }
+            } else {
+                switch(urb->endpoint){
+                case 0x81:
+                    // Non-RGB EP 1: 6KRO input
+                    hid_translate(kb->kbinput, 1, 8, kb->urbinput);
+                    inputupdate(kb);
+                    break;
+                case 0x82:
+                    // Non-RGB EP 2: media keys
+                    hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
+                    inputupdate(kb);
+                    break;
+                case 0x83:
+                    // Non-RGB EP 3: NKRO input
+                    hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
+                    inputupdate(kb);
+                    break;
                 }
             }
-            // Mark the keyboard as having received input
-            kb->INPUT_TEST = 1;
             // Re-submit the URB
             ioctl(fd, USBDEVFS_SUBMITURB, urb);
             urb = 0;
@@ -161,9 +155,20 @@ void setint(usbdevice* kb, short vendor, short product){
     urb->usercontext = kb;
     ioctl(kb->handle, USBDEVFS_SUBMITURB, urb);
 
+    if(IS_RGB(vendor, product)){
+        // EP 4 is never used, but may be needed to prevent keyboard lock-ups
+        urb++;
+        urb->type = USBDEVFS_URB_TYPE_INTERRUPT;
+        urb->endpoint = 0x84;
+        urb->buffer = kb->urbinput + 8 + 21;
+        urb->buffer_length = 64;
+        urb->usercontext = kb;
+        ioctl(kb->handle, USBDEVFS_SUBMITURB, urb);
+    }
+
     // Launch a thread to reap transfers
-    pthread_create(&kb->usbthread, 0, intreap, kb);
-    pthread_detach(kb->usbthread);
+    pthread_create(&kb->inputthread, 0, intreap, kb);
+    pthread_detach(kb->inputthread);
 }
 
 int usbunclaim(usbdevice* kb, int resetting, int rgb){
@@ -286,8 +291,6 @@ int openusb(struct udev_device* dev, short vendor, short product){
 
             // Set up the interrupt transfers.
             // This should be done before setting up the keyboard as the device may freeze if inputs aren't processed.
-            kb->INPUT_TEST = 0;
-            kb->INPUT_READY = 0;
             setint(kb, vendor, product);
 
             // Set up the device.
@@ -307,7 +310,6 @@ int openusb(struct udev_device* dev, short vendor, short product){
                 return -1;
             }
 
-            kb->INPUT_READY = 1;
             updateconnected();
             notifyconnect(kb, 1);
             int index = INDEX_OF(kb, keyboard);
@@ -337,7 +339,17 @@ static _model models[] = {
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 
-void* udevmain(void* context){
+int usbmain(){
+    // Load the uinput module (if it's not loaded already)
+    if(system("modprobe uinput") != 0)
+        printf("Warning: Failed to load module uinput\n");
+
+    // Create the udev object
+    if(!(udev = udev_new())){
+        printf("Fatal: Failed to initialize udev\n");
+        return -1;
+    }
+
     // Enumerate all currently connected devices
     struct udev_enumerate* enumerator = udev_enumerate_new(udev);
     udev_enumerate_add_match_subsystem(enumerator, "usb");
@@ -434,26 +446,7 @@ void* udevmain(void* context){
     return 0;
 }
 
-int usbinit(){
-    // Load the uinput module (if it's not loaded already)
-    if(system("modprobe uinput") != 0)
-        printf("Warning: Failed to load module uinput\n");
-
-    // Create the udev object
-    if(!(udev = udev_new())){
-        printf("Fatal: Failed to initialize udev\n");
-        return -1;
-    }
-
-    // Launch the udev thread
-    if(pthread_create(&udevthread, 0, udevmain, 0)){
-        printf("Fatal: Failed to start USB thread\n");
-        return -1;
-    }
-    return 0;
-}
-
-void usbdeinit(){
+void usbkill(){
     udev_unref(udev);
     udev = 0;
 }

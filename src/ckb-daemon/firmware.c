@@ -9,21 +9,14 @@
 #define FW_USBFAIL  -3
 
 int getfwversion(usbdevice* kb){
-    // Empty the board's USB queue
-    while(kb->queuecount > 0){
-        DELAY_SHORT;
-        if(!usbdequeue(kb))
-            return -1;
-    }
     // Ask board for firmware info
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x01, 0 };
-    usbqueue(kb, data_pkt, 1);
-    if(!usbdequeue(kb))
+    if(!usbsend(kb, data_pkt, 1))
         return -1;
     // Wait for the response
     DELAY_SHORT;
     uchar in_pkt[MSG_SIZE];
-    if(!usbinput(kb, in_pkt))
+    if(!usbrecv(kb, in_pkt))
         return -1;
     if(in_pkt[0] != 0x0e || in_pkt[1] != 0x01){
         printf("Error: %s:%d: Bad input header\n", __FILE_NOPATH__, __LINE__);
@@ -85,14 +78,6 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         return FW_WRONGDEV;
     }
     printf("Loading firmware version %04x from %s\n", version, path);
-    // Empty the board's USB queue
-    while(kb->queuecount > 0){
-        DELAY_SHORT;
-        if(!usbdequeue(kb)){
-            printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
-            return FW_USBFAIL;
-        }
-    }
     nprintf(kb, nnumber, 0, "fwupdate %s 0/%d\n", path, (int)length);
     // Send the firmware messages (256 bytes at a time)
     uchar data_pkt[7][MSG_SIZE] = {
@@ -126,25 +111,21 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
             }
         }
         if(index == 1){
-            usbqueue(kb, data_pkt[0], 1);
-            DELAY_MEDIUM;
-            if(!usbdequeue(kb)){
+            if(!usbsend(kb, data_pkt[0], 1)){
                 printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
                 return FW_USBFAIL;
             }
             // The above packet can take a lot longer to process, so wait for a while
             sleep(3);
-            usbqueue(kb, data_pkt[2], npackets - 1);
+            if(!usbsend(kb, data_pkt[2], npackets - 1)){
+                printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
+                return FW_USBFAIL;
+            }
         } else {
             // If the output ends here, set the length byte appropriately
             if(output >= length)
                 data_pkt[npackets][2] = length - last;
-            usbqueue(kb, data_pkt[1], npackets);
-        }
-        // Run the queue
-        while(kb->queuecount > 0){
-            DELAY_MEDIUM;
-            if(!usbdequeue(kb)){
+            if(!usbsend(kb, data_pkt[1], npackets)){
                 printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
                 return FW_USBFAIL;
             }
@@ -156,13 +137,9 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         { 0x07, 0x0d, 0xf0, 0x00, 0x00, 0x00, index },
         { 0x07, 0x02, 0xf0, 0 }
     };
-    usbqueue(kb, data_pkt2[0], 2);
-    while(kb->queuecount > 0){
-        DELAY_MEDIUM;
-        if(!usbdequeue(kb)){
-            printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
-            return FW_USBFAIL;
-        }
+    if(!usbsend(kb, data_pkt2[0], 2)){
+        printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
+        return FW_USBFAIL;
     }
     // Updated successfully
     kb->fwversion = version;

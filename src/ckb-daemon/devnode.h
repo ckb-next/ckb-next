@@ -58,7 +58,6 @@ typedef enum {
     REBIND,
     MACRO,
 
-    FPS,
     RGB,
     IOFF,
     ION,
@@ -72,7 +71,7 @@ typedef enum {
 
     FWUPDATE
 } cmd;
-typedef void (*cmdhandler)(usbdevice*, usbmode*, const key*, int, int, const char*);
+typedef void (*cmdhandler)(usbdevice*, usbmode*, int, int, const char*);
 
 // Reads input from the command FIFO
 void readcmd(usbdevice* kb, const char* line);

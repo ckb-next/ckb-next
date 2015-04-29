@@ -59,15 +59,9 @@ usbprofile* addstore(const char* serial, int autosetup){
 #define ACT_M2          11
 #define ACT_M3          12
 
-void setactive(usbdevice* kb, int active){
+int setactive(usbdevice* kb, int active){
     if(!HAS_FEATURES(kb, FEAT_RGB) || NEEDS_FW_UPDATE(kb))
-        return;
-    // Empty the board's USB queue first
-    while(kb->queuecount > 0){
-        DELAY_SHORT;
-        if(!usbdequeue(kb))
-            return;
-    }
+        return 0;
     uchar msg[3][MSG_SIZE] = {
         { 0x07, 0x04, 0 },                  // Disables or enables HW control for top row
         { 0x07, 0x40, 0 },                  // Selects key input
@@ -77,7 +71,9 @@ void setactive(usbdevice* kb, int active){
         kb->active = 1;
         // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
         msg[0][2] = 2;
-        usbqueue(kb, msg[0], 1);
+        if(!usbsend(kb, msg[0], 1))
+            return -1;
+        DELAY_MEDIUM;
         // Set input mode on the keys. They must be grouped into packets of 60 bytes (+ 4 bytes header)
         // Keys are referenced in byte pairs, with the first byte representing the key and the second byte representing the mode.
         for(int key = 0; key < N_KEYS; ){
@@ -93,16 +89,23 @@ void setactive(usbdevice* kb, int active){
             }
             // Byte 2 = pair count (usually 30, less on final message)
             msg[1][2] = pair;
-            usbqueue(kb, msg[1], 1);
+            if(!usbsend(kb, msg[1], 1))
+                return -1;
         }
         // Commit new input settings
-        usbqueue(kb, msg[2], 1);
+        if(!usbsend(kb, msg[2], 1))
+            return -1;
+        DELAY_MEDIUM;
     } else {
         kb->active = 0;
         // Set the M-keys back into hardware mode, restore hardware RGB profile. It has to be sent twice for some reason.
         msg[0][2] = 1;
-        usbqueue(kb, msg[0], 1);
-        usbqueue(kb, msg[0], 1);
+        if(!usbsend(kb, msg[0], 1))
+            return -1;
+        DELAY_MEDIUM;
+        if(!usbsend(kb, msg[0], 1))
+            return -1;
+        DELAY_MEDIUM;
 #ifdef OS_LINUX
         // On OSX the default key mappings are fine. On Linux, the G keys will freeze the keyboard. Set the keyboard entirely to HID input.
         for(int key = 0; key < N_KEYS; ){
@@ -129,10 +132,14 @@ void setactive(usbdevice* kb, int active){
             }
             // Byte 2 = pair count (usually 30, less on final message)
             msg[1][2] = pair;
-            usbqueue(kb, msg[1], 1);
+            if(!usbsend(kb, msg[1], 1))
+                return -1;
         }
         // Commit new input settings
-        usbqueue(kb, msg[2], 1);
+        if(!usbsend(kb, msg[2], 1))
+            return -1;
+        DELAY_MEDIUM;
 #endif
     }
+    return 0;
 }

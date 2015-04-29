@@ -58,7 +58,7 @@ void notifyconnect(usbdevice* kb, int connecting){
     nrprintf(-1, "device %s %s %s%d\n", kb->profile.serial, connecting ? "added at" : "removed from", devpath, index);
 }
 
-void nprintkey(usbdevice* kb, int nnumber, const key* keymap, int keyindex, int down){
+void nprintkey(usbdevice* kb, int nnumber, int keyindex, int down){
     const key* map = keymap + keyindex;
     if(map->name)
         nprintf(kb, nnumber, 0, "key %c%s\n", down ? '+' : '-', map->name);
@@ -84,7 +84,7 @@ void nprintind(usbdevice* kb, int nnumber, int led, int on){
     nprintf(kb, nnumber, 0, "i %c%s\n", on ? '+' : '-', name);
 }
 
-void cmd_notify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, int keyindex, const char* toggle){
+void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const char* toggle){
     if(!strcmp(toggle, "on") || *toggle == 0)
         SET_KEYBIT(mode->notify[nnumber], keyindex);
     else if(!strcmp(toggle, "off"))
@@ -101,18 +101,7 @@ void cmd_notify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, in
     }
 
 void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
-    if(!strcmp(setting, ":hello")){
-        if(kb && mode)
-            return;
-        nrprintf(nnumber, "hello\n");
-        return;
-    } else if(!strcmp(setting, ":fps")){
-        if(kb && mode)
-            return;
-        nrprintf(nnumber, "fps %d\n", fps);
-        return;
-    } else if(!kb || !mode)
-        // Only FPS and layout can be printed without an active mode
+    if(!kb || !mode)
         return;
 
     usbprofile* profile = &kb->profile;
@@ -212,7 +201,7 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
                 continue;
             int byte = i / 8, bit = 1 << (i & 7);
             uchar state = kb->kbinput[byte] & bit;
-            nprintkey(kb, nnumber, keymap, i, state);
+            nprintkey(kb, nnumber, i, state);
         }
     } else if(!strcmp(setting, ":i")){
         // Get the current state of all LEDs

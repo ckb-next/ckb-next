@@ -18,8 +18,8 @@ extern usbdevice keyboard[DEV_MAX];
 // operation that accesses the devices as a list.
 extern pthread_mutex_t kblistmutex;
 
-// Activates/deactives a keyboard
-void setactive(usbdevice* kb, int active);
+// Activates/deactives a keyboard. Return 0 on success
+int setactive(usbdevice* kb, int active);
 
 // Find a connected USB device. Returns 0 if not found
 usbdevice* findusb(const char* serial);

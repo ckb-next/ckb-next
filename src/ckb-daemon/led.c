@@ -52,14 +52,14 @@ void makergb_full(const keylight* light, uchar data_pkt[12][MSG_SIZE], int force
     }
 }
 
-void updatergb(usbdevice* kb, int force){
+int updatergb(usbdevice* kb, int force){
     if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB) || !kb->active)
-        return;
+        return 0;
     // Don't do anything if the lighting hasn't changed
     keylight* lastlight = &kb->lastlight;
     keylight* newlight = &kb->profile.currentmode->light;
     if(!force && ((!lastlight->enabled && !newlight->enabled) || !memcmp(lastlight, newlight, sizeof(keylight))))
-        return;
+        return 0;
 
     /*if(kb->fwversion >= 0x0120){
         uchar data_pkt[12][MSG_SIZE] = {
@@ -80,8 +80,8 @@ void updatergb(usbdevice* kb, int force){
             { 0x07, 0x28, 0x03, 0x00, 0x02, 0x01}
         };
         makergb_full(newlight, data_pkt, 0);
-        if(usbqueue(kb, data_pkt[0], 12))
-            return;
+        if(!usbsend(kb, data_pkt[0], 12))
+            return -1;
     } else {*/
     // 16.8M color lighting causes flickering and color glitches. Don't use it for this.
     // Maybe in a future version this can be re-added as an advanced feature.
@@ -93,14 +93,15 @@ void updatergb(usbdevice* kb, int force){
             { 0x07, 0x27, 0x00, 0x00, 0xD8 }
         };
         makergb_512(newlight, data_pkt, 0);
-        if(usbqueue(kb, data_pkt[0], 5))
-            return;
+        if(!usbsend(kb, data_pkt[0], 5))
+            return -1;
     //}
 
     memcpy(lastlight, newlight, sizeof(keylight));
+    return 0;
 }
 
-void savergb(usbdevice* kb, int mode){
+int savergb(usbdevice* kb, int mode){
     if(kb->fwversion >= 0x0120){
         uchar data_pkt[12][MSG_SIZE] = {
             // Red
@@ -120,7 +121,8 @@ void savergb(usbdevice* kb, int mode){
             { 0x07, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x03 }
         };
         makergb_full(&kb->profile.mode[mode].light, data_pkt, 0);
-        usbqueue(kb, data_pkt[0], 12);
+        if(!usbsend(kb, data_pkt[0], 12))
+            return -1;
     } else {
         uchar data_pkt[5][MSG_SIZE] = {
             { 0x7f, 0x01, 60, 0 },
@@ -130,8 +132,10 @@ void savergb(usbdevice* kb, int mode){
             { 0x07, 0x14, 0x02, 0x00, 0x01, mode + 1 }
         };
         makergb_512(&kb->profile.mode[mode].light, data_pkt, 0);
-        usbqueue(kb, data_pkt[0], 5);
+        if(!usbsend(kb, data_pkt[0], 5))
+            return -1;
     }
+    return 0;
 }
 
 int loadrgb(usbdevice* kb, keylight* light, int mode){
@@ -160,13 +164,10 @@ int loadrgb(usbdevice* kb, keylight* light, int mode){
         uchar* colors[3] = { light->r, light->g, light->b };
         for(int clr = 0; clr < 3; clr++){
             for(int i = 0; i < 4; i++){
-                usbqueue(kb, data_pkt[i + clr * 4], 1);
-                DELAY_MEDIUM;
-                if(!usbdequeue(kb))
+                if(!usbsend(kb, data_pkt[i + clr * 4], 1))
                     return -1;
                 // Wait for the response. Make sure the first four bytes match
-                DELAY_MEDIUM;
-                if(!usbinput(kb, in_pkt[i]))
+                if(!usbrecv(kb, in_pkt[i]))
                     return -1;
                 if(memcmp(in_pkt[i], data_pkt[i], 4)){
                     printf("Error: %s:%d: Bad input header\n", __FILE_NOPATH__, __LINE__);
@@ -193,19 +194,14 @@ int loadrgb(usbdevice* kb, keylight* light, int mode){
             { 0xff, 0x04, 36, 0 },
         };
         // Write initial packet
-        usbqueue(kb, data_pkt[0], 1);
-        DELAY_SHORT;
-        if(!usbdequeue(kb))
+        if(!usbsend(kb, data_pkt[0], 1))
             return -1;
         // Read colors
         for(int i = 1; i < 5; i++){
-            usbqueue(kb, data_pkt[i], 1);
-            DELAY_SHORT;
-            if(!usbdequeue(kb))
+            if(!usbsend(kb, data_pkt[i], 1))
                 return -1;
             // Wait for the response. Make sure the first four bytes match
-            DELAY_SHORT;
-            if(!usbinput(kb, in_pkt[i - 1]))
+            if(!usbrecv(kb, in_pkt[i - 1]))
                 return -1;
             if(memcmp(in_pkt[i - 1], data_pkt[i], 4)){
                 printf("Error: %s:%d: Bad input header\n", __FILE_NOPATH__, __LINE__);
@@ -335,7 +331,7 @@ void cmd_rgbon(usbdevice* kb, usbmode* mode){
     mode->light.enabled = 1;
 }
 
-void cmd_rgb(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* code){
+void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* code){
     int index = keymap[keyindex].led;
     if(index < 0)
         return;
@@ -361,28 +357,28 @@ static uchar iselect(const char* led){
     return result;
 }
 
-void cmd_ioff(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
+void cmd_ioff(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* led){
     uchar bits = iselect(led);
     // Add the bits to ioff, remove them from ion
     mode->ioff |= bits;
     mode->ion &= ~bits;
 }
 
-void cmd_ion(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
+void cmd_ion(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* led){
     uchar bits = iselect(led);
     // Remove the bits from ioff, add them to ion
     mode->ioff &= ~bits;
     mode->ion |= bits;
 }
 
-void cmd_iauto(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* led){
+void cmd_iauto(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* led){
     uchar bits = iselect(led);
     // Remove the bits from both ioff and ion
     mode->ioff &= ~bits;
     mode->ion &= ~bits;
 }
 
-void cmd_inotify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, int dummy, const char* led){
+void cmd_inotify(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* led){
     uchar bits = iselect(led);
     if(strstr(led, ":off"))
         // Turn notifications for these bits off
@@ -390,19 +386,4 @@ void cmd_inotify(usbdevice* kb, usbmode* mode, const key* keymap, int nnumber, i
     else
         // Turn notifications for these bits on
         mode->inotify[nnumber] |= bits;
-}
-
-volatile unsigned fps = 0;
-
-void setfps(unsigned newfps){
-    if(newfps > 60 || newfps == 0){
-        // There's no point running higher than 60FPS.
-        // The LED controller is locked to 60Hz so it will only cause tearing and/or device freezes.
-        printf("Warning: Refusing request for %d FPS\n", newfps);
-        return;
-    }
-    if(newfps != fps){
-        printf("Setting FPS to %u\n", newfps);
-        fps = newfps;
-    }
 }

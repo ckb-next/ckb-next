@@ -7,7 +7,7 @@
 usbmode* getusbmode(int id, usbprofile* profile);
 
 // Sets a mode's name
-void cmd_setmodename(usbdevice* kb, usbmode* mode, const key* keymap, int dummy1, int dummy2, const char* name);
+void cmd_setmodename(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* name);
 // Sets a profile's name
 void setprofilename(usbprofile* profile, const char* name);
 // Gets a mode's name. Returns a URL-encoded UTF-8 buffer that needs to be freed later.
@@ -19,7 +19,7 @@ char* gethwmodename(hwprofile* profile, int index);
 char* gethwprofilename(hwprofile* profile);
 
 // Resets a mode to its default settings
-void erasemode(usbmode* mode, const key* keymap);
+void erasemode(usbmode* mode);
 // Erases a profile, deleting all of its modes.
 void eraseprofile(usbprofile* profile, int modecount);
 // Frees a profile's memory

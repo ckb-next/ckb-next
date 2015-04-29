@@ -70,7 +70,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     }
 #endif
 
-    // Read frame rate from settings and send to ckb-daemon
+    // Read frame rate from settings
     int rate = settings.value("framerate").toInt();
     if(rate <= 0)
         rate = framerate;
@@ -81,11 +81,6 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
             framerate = fpsTable[i];
             break;
         }
-    }
-    QFile cmd(devpath.arg(0) + "/cmd");
-    if(cmd.open(QIODevice::WriteOnly)){
-        cmd.write(QString("fps %1\n").arg(framerate).toLatin1());
-        cmd.close();
     }
 
     // Read global brightness setting (default = on, 100% brightness)
@@ -171,12 +166,6 @@ void SettingsWidget::on_fpsBox_activated(const QString &arg1){
     eventTimer->setInterval(1000 / framerate);
     CkbSettings settings("Program");
     settings.setValue("framerate", framerate);
-    // Send FPS message to ckb-daemon
-    QFile cmd(devpath.arg(0) + "/cmd");
-    if(cmd.open(QIODevice::WriteOnly)){
-        cmd.write(QString("fps %1\n").arg(framerate).toLatin1());
-        cmd.close();
-    }
 }
 
 void SettingsWidget::on_animScanButton_clicked(){

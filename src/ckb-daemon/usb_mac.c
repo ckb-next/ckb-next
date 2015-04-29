@@ -8,36 +8,34 @@
 
 #define INCOMPLETE (IOHIDDeviceRef)-1l
 
-int _usbdequeue(usbdevice* kb, const char* file, int line){
-    if(kb->queuecount == 0 || !kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
+int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
+    if(!kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
-    IOReturn res = IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, kb->queue[0], MSG_SIZE);
-    // Rotate queue
-    uchar* first = kb->queue[0];
-    for(int i = 1; i < QUEUE_LEN; i++)
-        kb->queue[i - 1] = kb->queue[i];
-    kb->queue[QUEUE_LEN - 1] = first;
-    kb->queuecount--;
-    kb->lastError = res;
-    if(res != kIOReturnSuccess && res != 0xe0004051){   // Can't find e0004051 documented, but it seems to be a harmless error, so ignore it.
-        printf("usbdequeue (%s:%d): Got return value 0x%x\n", file, line, res);
-        return 0;
+    for(int i = 0; i < count; i++){
+        DELAY_SHORT;
+        IOReturn res = IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, messages + MSG_SIZE * i, MSG_SIZE);
+        kb->lastError = res;
+        if(res != kIOReturnSuccess && res != 0xe0004051){   // Can't find e0004051 documented, but it seems to be a harmless error, so ignore it.
+            printf("usbsend (%s:%d): Got return value 0x%x\n", file, line, res);
+            return 0;
+        }
     }
-    return MSG_SIZE;
+    return MSG_SIZE * count;
 }
 
-int _usbinput(usbdevice* kb, uchar* message, const char* file, int line){
+int _usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
     if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
         return -1;
+    DELAY_MEDIUM;
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
     kb->lastError = res;
     if(res != kIOReturnSuccess && res != 0xe0004051){
-        printf("usbinput (%s:%d): Got return value 0x%x\n", file, line, res);
+        printf("usbrecv (%s:%d): Got return value 0x%x\n", file, line, res);
         return 0;
     }
     if(length != MSG_SIZE)
-        printf("usbinput (%s:%d): Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
+        printf("usbrecv (%s:%d): Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
     return length;
 }
 
@@ -252,13 +250,18 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     pthread_mutex_unlock(&kblistmutex);
 }
 
-static IOHIDManagerRef usbmanager;
-static pthread_t usbthread;
-static pthread_t keyrepeatthread;
+static IOHIDManagerRef usbmanager = 0;
+static CFRunLoopRef mainloop = 0;
+static pthread_t keyrepeatthread = 0;
 // input_mac.c
 extern void* krthread(void* context);
 
-void* threadrun(void* context){
+int usbmain(){
+    // Create the device manager
+    if(!(usbmanager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeSeizeDevice))){
+        printf("Fatal: Failed to create device manager\n");
+        return -1;
+    }
     // Tell the device manager which devices we want to look for
     CFMutableArrayRef devices = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     if(devices){
@@ -279,36 +282,24 @@ void* threadrun(void* context){
     }
 
     // Set up device add callback
+    mainloop = CFRunLoopGetCurrent();
     IOHIDManagerRegisterDeviceMatchingCallback(usbmanager, usbadd, 0);
-    IOHIDManagerScheduleWithRunLoop(usbmanager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+    IOHIDManagerScheduleWithRunLoop(usbmanager, mainloop, kCFRunLoopDefaultMode);
     IOHIDManagerOpen(usbmanager, kIOHIDOptionsTypeSeizeDevice);
 
     // Make a new thread to handle key repeats. The OS won't do it for us.
     pthread_create(&keyrepeatthread, 0, krthread, 0);
 
     // Run the event loop. Existing devices will be detected automatically.
-    while(1){
+    while(usbmanager != 0)
         CFRunLoopRun();
-    }
     return 0;
 }
 
-int usbinit(){
-    // Create the device manager
-    if(!(usbmanager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeSeizeDevice))){
-        printf("Fatal: Failed to create device manager\n");
-        return -1;
-    }
-    // Start the device thread
-    if(pthread_create(&usbthread, 0, threadrun, 0)){
-        printf("Fatal: Failed to start USB thread\n");
-        return -1;
-    }
-    return 0;
-}
-
-void usbdeinit(){
+void usbkill(){
     IOHIDManagerClose(usbmanager, kIOHIDOptionsTypeSeizeDevice);
+    usbmanager = 0;
+    CFRunLoopStop(mainloop);
 }
 
 #endif

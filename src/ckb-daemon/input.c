@@ -95,10 +95,10 @@ void inputupdate(usbdevice* kb){
                 if(kb->active){
                     for(int notify = 0; notify < OUTFIFO_MAX; notify++){
                         if(mode->notify[notify][byte] & mask){
-                            nprintkey(kb, notify, keymap, keyindex, new);
+                            nprintkey(kb, notify, keyindex, new);
                             // Volume wheel doesn't generate keyups
                             if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && !IS_K65(kb))
-                                nprintkey(kb, notify, keymap, keyindex, 0);
+                                nprintkey(kb, notify, keyindex, 0);
                         }
                     }
                 }
@@ -153,7 +153,7 @@ void closebind(keybind* bind){
     memset(bind, 0, sizeof(*bind));
 }
 
-void cmd_bind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
+void cmd_bind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
     // Find the key to bind to
     int tocode = 0;
     if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1){
@@ -169,15 +169,15 @@ void cmd_bind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int ke
     }
 }
 
-void cmd_unbind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
+void cmd_unbind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
     mode->bind.base[keyindex] = KEY_UNBOUND;
 }
 
-void cmd_rebind(usbdevice* kb, usbmode* mode, const key* keymap, int dummy, int keyindex, const char* to){
+void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
     mode->bind.base[keyindex] = keymap[keyindex].scan;
 }
 
-void cmd_macro(usbdevice* kb, usbmode* mode, const key* keymap, const char* keys, const char* assignment){
+void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assignment){
     keybind* bind = &mode->bind;
     if(bind->macrocount >= MACRO_MAX)
         return;

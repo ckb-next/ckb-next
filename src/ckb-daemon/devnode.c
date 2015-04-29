@@ -74,20 +74,6 @@ int makedevpath(usbdevice* kb){
     }
     if(gid >= 0)
         chown(path, 0, gid);
-    // Create command FIFO
-    char inpath[sizeof(path) + 4];
-    snprintf(inpath, sizeof(inpath), "%s/cmd", path);
-    if(mkfifo(inpath, gid >= 0 ? S_CUSTOM : S_READWRITE) != 0 || (kb->infifo = open(inpath, O_RDONLY | O_NONBLOCK)) <= 0){
-        printf("Error: Unable to create %s: %s\n", inpath, strerror(errno));
-        rm_recursive(path);
-        kb->infifo = 0;
-        return -1;
-    }
-    if(gid >= 0)
-        fchown(kb->infifo, 0, gid);
-
-    // Create notification FIFO
-    mknotifynode(kb, 0);
 
     if(kb == keyboard + 0){
         // Root keyboard: write a list of devices
@@ -121,6 +107,21 @@ int makedevpath(usbdevice* kb){
             remove(ppath);
         }
     } else {
+        // Create command FIFO
+        char inpath[sizeof(path) + 4];
+        snprintf(inpath, sizeof(inpath), "%s/cmd", path);
+        if(mkfifo(inpath, gid >= 0 ? S_CUSTOM : S_READWRITE) != 0 || (kb->infifo = open(inpath, O_RDONLY | O_NONBLOCK)) <= 0){
+            printf("Error: Unable to create %s: %s\n", inpath, strerror(errno));
+            rm_recursive(path);
+            kb->infifo = 0;
+            return -1;
+        }
+        if(gid >= 0)
+            fchown(kb->infifo, 0, gid);
+
+        // Create notification FIFO
+        mknotifynode(kb, 0);
+
         // Write the model and serial to files
         char mpath[sizeof(path) + 6], spath[sizeof(path) + 7];
         snprintf(mpath, sizeof(mpath), "%s/model", path);
@@ -382,10 +383,14 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(!strcmp(word, "idle")){
             command = IDLE;
             handler = 0;
+#ifdef OS_MAC
         } else if(!strcmp(word, "layout")){
+            // OSX keyboards can be switched between ANSI and ISO layouts. On Linux this is not done because they both behave the same
+            // (see os_keypress - input_mac.c)
             command = LAYOUT;
             handler = 0;
             continue;
+#endif
         } else if(!strcmp(word, "bind")){
             command = BIND;
             handler = cmd_bind;
@@ -400,10 +405,6 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         } else if(!strcmp(word, "macro")){
             command = MACRO;
-            handler = 0;
-            continue;
-        } else if(!strcmp(word, "fps")){
-            command = FPS;
             handler = 0;
             continue;
         } else if(!strcmp(word, "rgb")){
@@ -457,21 +458,18 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         }
 
-        // Reject unrecognized commands. Reject bind or notify related commands if the keyboard doesn't have the feature enabled.
+        // Reject unrecognized commands. Stop if there's no active mode. Reject bind or notify related commands if the keyboard doesn't have the feature enabled.
         if(command == NONE
-                || (kb && ((!HAS_FEATURES(kb, FEAT_BIND) && (command == BIND || command == UNBIND || command == REBIND || command == MACRO))
-                           || (!HAS_FEATURES(kb, FEAT_NOTIFY) && command == NOTIFY))))
+                || !mode
+                || ((!HAS_FEATURES(kb, FEAT_BIND) && (command == BIND || command == UNBIND || command == REBIND || command == MACRO))
+                           || (!HAS_FEATURES(kb, FEAT_NOTIFY) && command == NOTIFY)))
             continue;
         // Reject anything other than fwupdate if device has a bricked FW
         if(NEEDS_FW_UPDATE(kb) && command != FWUPDATE && command != NOTIFYON && command != NOTIFYOFF)
             continue;
 
         // Specially handled commands:
-        else if(command == FPS){
-            unsigned newfps;
-            if(kb && sscanf(word, "%u", &newfps) == 1)
-                setfps(newfps);
-        } else if(command == NOTIFYON){
+        else if(command == NOTIFYON){
             int notify;
             if(kb && sscanf(word, "%u", &notify) == 1)
                 mknotifynode(kb, notify);
@@ -484,19 +482,12 @@ void readcmd(usbdevice* kb, const char* line){
         } else if(command == GET){
             getinfo(kb, mode, notifynumber, word);
             continue;
-#ifdef OS_MAC
         } else if(command == LAYOUT){
-            // OSX keyboards can be switched between ANSI and ISO layouts. On Linux this is not done because they both behave the same
-            // (see os_keypress - input_mac.c)
             if(!strcmp(word, "ansi"))
                 kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ANSI;
             else if(!strcmp(word, "iso"))
                 kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ISO;
-#endif
         }
-        // Only the DEVICE, LAYOUT, FPS, GET, and NOTIFYON/OFF commands are valid without an existing mode
-        if(!mode)
-            continue;
         // If a keyboard is inactive, it must be activated before receiving any other commands
         if(!kb->active){
             if(command == ACTIVE)
@@ -554,7 +545,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         case ERASE:
             // Erase the current mode
-            erasemode(mode, keymap);
+            erasemode(mode);
             continue;
         case ERASEPROFILE:
             // Erase the current profile
@@ -563,7 +554,7 @@ void readcmd(usbdevice* kb, const char* line){
             continue;
         case NAME: case IOFF: case ION: case IAUTO: case INOTIFY:
             // All of the above just parse the whole word
-            handler(kb, mode, keymap, notifynumber, 0, word);
+            handler(kb, mode, notifynumber, 0, word);
             continue;
         case PROFILENAME:
             // Profile name is the same, but takes a different parameter
@@ -592,7 +583,7 @@ void readcmd(usbdevice* kb, const char* line){
                 continue;
             } else if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
                 for(int i = 0; i < N_KEYS; i++)
-                    cmd_rgb(kb, mode, keymap, notifynumber, i, word);
+                    cmd_rgb(kb, mode, notifynumber, i, word);
                 continue;
             }
         } case MACRO:
@@ -625,7 +616,7 @@ void readcmd(usbdevice* kb, const char* line){
         // Macros have a separate left-side handler
         if(command == MACRO){
             word[left] = 0;
-            cmd_macro(kb, mode, keymap, word, right);
+            cmd_macro(kb, mode, word, right);
             continue;
         }
         // Scan the left side for key names and run the request command
@@ -636,16 +627,16 @@ void readcmd(usbdevice* kb, const char* line){
             if(!strcmp(keyname, "all")){
                 // Set all keys
                 for(int i = 0; i < N_KEYS; i++)
-                    handler(kb, mode, keymap, notifynumber, i, right);
+                    handler(kb, mode, notifynumber, i, right);
             } else if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
                       || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
                 // Set a key numerically
-                handler(kb, mode, keymap, notifynumber, keycode, right);
+                handler(kb, mode, notifynumber, keycode, right);
             } else {
                 // Find this key in the keymap
                 for(unsigned i = 0; i < N_KEYS; i++){
                     if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
-                        handler(kb, mode, keymap, notifynumber, i, right);
+                        handler(kb, mode, notifynumber, i, right);
                         break;
                     }
                 }
@@ -656,7 +647,14 @@ void readcmd(usbdevice* kb, const char* line){
     }
 
     // Finish up
-    if(!NEEDS_FW_UPDATE(kb))
-        updatergb(kb, 0);
+    if(!NEEDS_FW_UPDATE(kb)){
+        while(updatergb(kb, 0)){
+            if(usb_tryreset(kb)){
+                closeusb(kb);
+                free(word);
+                return;
+            }
+        }
+    }
     free(word);
 }

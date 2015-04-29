@@ -143,9 +143,9 @@ typedef struct {
 typedef struct {
     // I/O devices
 #ifdef OS_LINUX
-    struct usbdevfs_urb urb[3];
+    struct usbdevfs_urb urb[4];
     struct udev_device* udev;
-    pthread_t usbthread;
+    pthread_t inputthread;
     int handle;
     int uinput;
     int event;
@@ -163,6 +163,8 @@ typedef struct {
     pthread_mutex_t mutex;
     // Similar, but used only for key input.
     pthread_mutex_t keymutex;
+    // Thread used for USB/devnode communication. To close, set handle to zero, then wait for thread to stop
+    pthread_t thread;
     // Keyboard settings
     usbprofile profile;
     // Hardware modes. Null if not read yet
@@ -174,12 +176,9 @@ typedef struct {
     // Notification FIFO
     int outfifo[OUTFIFO_MAX];
     // Interrupt transfers (keypresses)
-    uchar urbinput[32];
+    uchar urbinput[32 + 64];
     uchar kbinput[MSG_SIZE];
     uchar prevkbinput[N_KEYS / 8];
-    // USB output queue
-    uchar* queue[QUEUE_LEN];
-    char queuecount;
     // Features (see F_ macros)
     char features;
     // USB vendor and product IDs

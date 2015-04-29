@@ -34,10 +34,10 @@ const char* product_str(short product);
 #define DELAY_MEDIUM    usleep(20000)
 #define DELAY_LONG      usleep(200000)
 
-// Start the USB system. Returns 0 on success
-int usbinit();
+// Start the USB main loop. Returns program exit code when finished
+int usbmain();
 // Stop the USB system.
-void usbdeinit();
+void usbkill();
 
 // Set up a USB device after all its handles are open. Returns 0 on success
 // Threading: Creates device mutex and locks it. Unlocks mutex ONLY if return is -1 (software error). Unlock manually otherwise.
@@ -56,18 +56,14 @@ int _resetusb(usbdevice* kb, const char* file, int line);
 // Threading: Lock device before use, unlock after finish
 void closehandle(usbdevice* kb);
 
-// Add a message to a USB device to be sent to the device. Returns 0 on success.
+// Send a USB message to the device. Returns number of bytes written, zero on failure.
 // Threading: Lock device before use, unlock after finish
-int usbqueue(usbdevice* kb, uchar* messages, int count);
-// Output a message from the USB queue to the device, if any. Returns number of bytes written, zero on failure, or -1 if the queue was empty.
-// If the message was not sent successfully it will not be removed from the queue.
-// Threading: Lock device before use, unlock after finish
-int _usbdequeue(usbdevice* kb, const char* file, int line);
-#define usbdequeue(kb) _usbdequeue(kb, __FILE_NOPATH__, __LINE__)
+int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line);
+#define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
 // Gets input from a USB device.
 // Threading: Lock device before use, unlock after finish
-int _usbinput(usbdevice* kb, uchar* message, const char* file, int line);
-#define usbinput(kb, message) _usbinput(kb, message, __FILE_NOPATH__, __LINE__)
+int _usbrecv(usbdevice* kb, uchar* message, const char* file, int line);
+#define usbrecv(kb, message) _usbrecv(kb, message, __FILE_NOPATH__, __LINE__)
 
 // Non-RGB K95 command. Returns 0 on success.
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);
@@ -80,7 +76,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 #define NK95_M3     0x140003
 
 // Tries to reset a USB device after a failed action. Returns 0 on success.
-// The previous action will NOT be re-attempted and the keyboard's USB queue will be cleared.
+// The previous action will NOT be re-attempted.
 int usb_tryreset(usbdevice* kb);
 
 #endif

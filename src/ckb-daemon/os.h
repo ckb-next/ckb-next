@@ -35,9 +35,6 @@
 #define UINPUT_VERSION 2
 #endif
 
-#define INPUT_READY urbinput[30]
-#define INPUT_TEST  urbinput[31]
-
 #endif  // OS_LINUX
 
 #ifdef OS_MAC

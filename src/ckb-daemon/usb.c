@@ -30,15 +30,30 @@ int features_mask = -1;
 // OS-specific USB reset
 extern int os_resetusb(usbdevice* kb, const char* file, int line);
 
-int usbqueue(usbdevice* kb, uchar* messages, int count){
-    if(!kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
-        return 0;
-    // Don't add messages unless the queue has enough room for all of them
-    if(kb->queuecount + count > QUEUE_LEN)
-        return -1;
-    for(int i = 0; i < count; i++)
-        memcpy(kb->queue[kb->queuecount + i], messages + MSG_SIZE * i, MSG_SIZE);
-    kb->queuecount += count;
+// USB device main loop
+static void* devmain(void* _kb){
+    usbdevice* kb = _kb;
+    while(1){
+        pthread_mutex_lock(&kb->mutex);
+        // End thread when the handle is removed
+        if(!IS_CONNECTED(kb)){
+            pthread_mutex_unlock(&kb->mutex);
+            break;
+        }
+        // Read from FIFO
+        if(kb->infifo){
+            const char* line;
+            if(readlines(kb->infifo, &line))
+                readcmd(kb, line);
+        }
+        // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
+        // immediately and may be changed externally by the OS.
+        // (also, they can lock the keyboard if they're sent at the wrong time, at least on some firmwares)
+        updateindicators(kb, 0);
+        // Wait a little bit and then read again
+        pthread_mutex_unlock(&kb->mutex);
+        DELAY_SHORT;
+    }
     return 0;
 }
 
@@ -88,10 +103,6 @@ int setupusb(usbdevice* kb, short vendor, short product){
         return 0;
     }
 
-    // Create the USB queue
-    for(int q = 0; q < QUEUE_LEN; q++)
-        kb->queue[q] = malloc(MSG_SIZE);
-
     // Get the firmware version from the device
     int fail = !!getfwversion(kb);
 
@@ -128,7 +139,11 @@ int setupusb(usbdevice* kb, short vendor, short product){
         if(fail || hwloadprofile(kb, 1))
             return -2;
     }
+
+    // Start main thread
     DELAY_SHORT;
+    if(pthread_create(&kb->thread, 0, devmain, kb))
+        return -1;
     return 0;
 }
 
@@ -139,20 +154,8 @@ int revertusb(usbdevice* kb){
         nk95cmd(kb, NK95_HWON);
         return 0;
     }
-    // Empty the USB queue first
-    while(kb->queuecount > 0){
-        DELAY_SHORT;
-        if(usbdequeue(kb) <= 0)
-            return -1;
-    }
-    DELAY_MEDIUM;
-    setactive(kb, 0);
-    // Flush the USB queue
-    while(kb->queuecount > 0){
-        DELAY_MEDIUM;
-        if(usbdequeue(kb) <= 0)
-            return -1;
-    }
+    if(setactive(kb, 0))
+        return -1;
     return 0;
 }
 
@@ -163,15 +166,15 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     if(res)
         return res;
     DELAY_LONG;
-    // Empty the queue. Re-initialize the device.
-    kb->queuecount = 0;
+    // Re-initialize the device.
     if(!HAS_FEATURES(kb, FEAT_RGB))
         return 0;
     if(getfwversion(kb))
         return -1;
     if(NEEDS_FW_UPDATE(kb))
         return 0;
-    setactive(kb, kb->active);
+    if(setactive(kb, kb->active))
+        return -1;
     // If the hardware profile hasn't been loaded yet, load it here
     res = 0;
     if(!kb->hw){
@@ -209,9 +212,6 @@ int closeusb(usbdevice* kb){
         printf("Disconnecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
         inputclose(kb);
         updateconnected();
-        // Delete USB queue
-        for(int i = 0; i < QUEUE_LEN; i++)
-            free(kb->queue[i]);
         // Move the profile data into the device store (unless it wasn't set due to needing a firmware update)
         if(kb->fwversion == 0)
             freeprofile(&kb->profile);
@@ -224,12 +224,16 @@ int closeusb(usbdevice* kb){
         notifyconnect(kb, 0);
     } else
         updateconnected();
+
+    // Wait for thread to close
+    pthread_mutex_unlock(&kb->keymutex);
+    pthread_mutex_unlock(&kb->mutex);
+    pthread_join(kb->thread, 0);
+
     // Delete the control path
     rmdevpath(kb);
 
-    pthread_mutex_unlock(&kb->keymutex);
     pthread_mutex_destroy(&kb->keymutex);
-    pthread_mutex_unlock(&kb->mutex);
     pthread_mutex_destroy(&kb->mutex);
     memset(kb, 0, sizeof(usbdevice));
     return 0;

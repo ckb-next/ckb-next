@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Ripple");
-    CKB_VERSION("0.9");
+    CKB_VERSION("0.10");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25A1CDB02C9D}");
@@ -125,11 +125,16 @@ int ckb_frame(ckb_runctx* context){
         if(anim[i].active){
             for(ckb_key* key = keys; key < keys + count; key++){
                 float distance = anim[i].cursize - sqrt(pow(key->x - anim[i].x, 2.f) + pow(key->y - anim[i].y, 2.f));
+                distance /= animlength;
                 if(symmetric)
                     distance = fabs(distance);
-                if(distance >= 0. && distance < animlength){
+                else if(distance >= -0.005f && distance < 0.f)
+                    distance = 0.f;
+                if(distance > 1.f && distance <= 1.005f)
+                    distance = 1.f;
+                if(distance >= 0. && distance <= 1.f){
                     float a, r, g, b;
-                    ckb_grad_color(&a, &r, &g, &b, &animcolor, distance / animlength * 100.);
+                    ckb_grad_color(&a, &r, &g, &b, &animcolor, distance * 100.);
                     ckb_alpha_blend(key, a, r, g, b);
                 }
             }

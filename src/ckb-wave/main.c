@@ -4,7 +4,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Wave");
-    CKB_VERSION("0.9");
+    CKB_VERSION("0.10");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{E0BBA19E-C328-4C0E-8E3C-A06D5722B4FC}");
@@ -157,11 +157,16 @@ int ckb_frame(ckb_runctx* context){
                 // Translate and rotate the key position into the animation's coordinate system
                 float x = key->x - anim[i].x, y = key->y - anim[i].y;
                 float distance = anim[i].curx - (x * cos(angle) - y * sin(angle));
+                distance /= length;
                 if(symmetric)
                     distance = fabs(distance);
-                if(distance < length && distance >= 0.){
+                else if(distance >= -0.005f && distance < 0.f)
+                    distance = 0.f;
+                if(distance > 1.f && distance <= 1.005f)
+                    distance = 1.f;
+                if(distance <= 1.f && distance >= 0.){
                     float a, r, g, b;
-                    ckb_grad_color(&a, &r, &g, &b, &animcolor, distance / length * 100.);
+                    ckb_grad_color(&a, &r, &g, &b, &animcolor, distance * 100.);
                     ckb_alpha_blend(key, a, r, g, b);
                 }
             }

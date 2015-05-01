@@ -418,11 +418,9 @@ void AnimScript::frame(quint64 timestamp){
 }
 
 void AnimScript::advance(quint64 timestamp){
-    if(timestamp <= lastFrame){
-        // Don't do anything if the current frame is before the last frame (this can happen when starting an animation with preemption)
-        lastFrame = timestamp;
+    if(timestamp <= lastFrame)
+        // Don't do anything if the time hasn't actually advanced.
         return;
-    }
     double delta = (timestamp - lastFrame) / (double)durationMsec;
     if(!_info.absoluteTime){
         // Skip any complete durations

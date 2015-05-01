@@ -99,6 +99,8 @@ private:
     QString repeatKey;
     quint64 repeatTime, kpRepeatTime, stopTime, kpStopTime;
     int repeatMsec, kpRepeatMsec;
+    // Catch up to the current timestamp, performing repeats/stops as necessary
+    void catchUp(quint64 timestamp);
 
     QUuid _guid;
     QString _name;

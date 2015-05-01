@@ -160,10 +160,53 @@ void KbAnim::keys(const QStringList& newKeys){
     reInit();
 }
 
+void KbAnim::catchUp(quint64 timestamp){
+    QMap<QString, QVariant> parameters = effectiveParams();
+    // Stop the animation if its time has run out
+    if(stopTime != 0 && timestamp >= stopTime){
+        repeatMsec = repeatTime = 0;
+        if(!parameters.contains("repeat")){
+            // If repeats aren't allowed, stop the animation entirely
+            _script->end();
+            return;
+        } else
+            // Otherwise, simply stop repeating
+            stopTime = 0;
+    }
+    if(kpStopTime != 0 && timestamp >= kpStopTime){
+        kpRepeatMsec = kpRepeatTime = 0;
+        if(!parameters.contains("kprepeat")){
+            _script->end();
+            return;
+        } else
+            kpStopTime = 0;
+    }
+
+    // Restart (or start, if there was a delay) the animation if its repeat time is up
+    while(repeatTime > 0 && timestamp >= repeatTime){
+        _script->retrigger(repeatTime);
+        if(repeatMsec <= 0){
+            repeatTime = 0;
+            break;
+        }
+        repeatTime += repeatMsec;
+    }
+    while(kpRepeatTime > 0 && timestamp >= kpRepeatTime){
+        _script->keypress(repeatKey, 1, kpRepeatTime);
+        if(kpRepeatMsec <= 0){
+            kpRepeatTime = 0;
+            break;
+        }
+        kpRepeatTime += kpRepeatMsec;
+    }
+}
+
 void KbAnim::trigger(quint64 timestamp){
     if(!_script)
         return;
     QMap<QString, QVariant> parameters = effectiveParams();
+
+    catchUp(timestamp);
     if(parameters.value("trigger").toBool()){
         int delay = round(parameters.value("delay").toDouble() * 1000.);
         if(delay > 0){
@@ -172,6 +215,7 @@ void KbAnim::trigger(quint64 timestamp){
             repeatTime = timestamp;
         } else
             _script->retrigger(timestamp, true);
+
         int repeat = round(parameters.value("repeat").toDouble() * 1000.);
         if(repeat <= 0){
             // If no repeat allowed, calculate stop time in seconds
@@ -193,6 +237,7 @@ void KbAnim::trigger(quint64 timestamp){
                 stopTime = timestamp + repeat * (1 + stop);
         }
     }
+    // Ask the script for a frame even if we didn't do anything here. This way ckb knows the script is responding.
     _script->frame(timestamp);
 }
 
@@ -200,42 +245,47 @@ void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
     if(!_script)
         return;
     QMap<QString, QVariant> parameters = effectiveParams();
-    if(parameters.value("kptrigger").toBool()){
+    if(!parameters.value("kptrigger").toBool())
+        return;
+
+    catchUp(timestamp);
+    if(pressed){
+        // Key pressed
         int delay = round(parameters.value("kpdelay").toDouble() * 1000.);
-        if(pressed){
-            if(delay > 0){
-                // If delay is enabled, wait to trigger the event
-                timestamp += delay;
-                kpRepeatTime = timestamp;
-            } else
-                _script->keypress(key, pressed, timestamp);
-            int repeat = round(parameters.value("kprepeat").toDouble() * 1000.);
-            if(repeat <= 0){
-                // If no repeat allowed, calculate stop time in seconds
-                kpRepeatMsec = -1;
-                double stop = parameters.value("kpstop").toDouble();
-                if(stop <= 0.)
-                    kpStopTime = 0;
-                else
-                    kpStopTime = timestamp + round(stop * 1000.);
-            } else {
-                // If repeat is allowed, calculate stop time in repetitions
-                kpRepeatMsec = repeat;
-                if(delay <= 0)
-                    kpRepeatTime = timestamp + repeat;
-                int stop = parameters.value("kpstop").toInt();
-                if(stop < 0)
-                    kpStopTime = 0;
-                else
-                    kpStopTime = timestamp + repeat * (1 + stop);
-            }
-            repeatKey = key;
-        } else {
+        if(delay > 0){
+            // If delay is enabled, wait to trigger the event
+            timestamp += delay;
+            kpRepeatTime = timestamp;
+        } else
             _script->keypress(key, pressed, timestamp);
-            if(parameters.value("kprelease").toBool())
-                // Stop repeating keypress if "Stop on key release" is enabled
-                kpStopTime = timestamp;
+
+        int repeat = round(parameters.value("kprepeat").toDouble() * 1000.);
+        if(repeat <= 0){
+            // If no repeat allowed, calculate stop time in seconds
+            kpRepeatMsec = -1;
+            double stop = parameters.value("kpstop").toDouble();
+            if(stop <= 0.)
+                kpStopTime = 0;
+            else
+                kpStopTime = timestamp + round(stop * 1000.);
+        } else {
+            // If repeat is allowed, calculate stop time in repetitions
+            kpRepeatMsec = repeat;
+            if(delay <= 0)
+                kpRepeatTime = timestamp + repeat;
+            int stop = parameters.value("kpstop").toInt();
+            if(stop < 0)
+                kpStopTime = 0;
+            else
+                kpStopTime = timestamp + repeat * (1 + stop);
         }
+        repeatKey = key;
+    } else {
+        // Key released
+        _script->keypress(key, pressed, timestamp);
+        if(parameters.value("kprelease").toBool())
+            // Stop repeating keypress if "Stop on key release" is enabled
+            kpStopTime = timestamp;
     }
     _script->frame(timestamp);
 }
@@ -289,45 +339,9 @@ static blendFunc functions[5] = { blendNormal, blendAdd, blendSubtract, blendMul
 void KbAnim::blend(QHash<QString, QRgb>& animMap, quint64 timestamp){
     if(!_script)
         return;
-    QMap<QString, QVariant> parameters = effectiveParams();
-    // Stop the animation if its time has run out
-    if(stopTime != 0 && timestamp >= stopTime){
-        repeatMsec = repeatTime = 0;
-        if(!parameters.contains("repeat")){
-            // If repeats aren't allowed, stop the animation entirely
-            _script->end();
-            return;
-        } else
-            // Otherwise, simply stop repeating
-            stopTime = 0;
-    }
-    if(kpStopTime != 0 && timestamp >= kpStopTime){
-        kpRepeatMsec = kpRepeatTime = 0;
-        if(!parameters.contains("kprepeat")){
-            _script->end();
-            return;
-        } else
-            kpStopTime = 0;
-    }
-    // Restart (or start, if there was a delay) the animation if its repeat time is up
-    while(repeatTime > 0 && timestamp >= repeatTime){
-        _script->retrigger(repeatTime);
-        if(repeatMsec <= 0){
-            repeatTime = 0;
-            break;
-        }
-        repeatTime += repeatMsec;
-    }
-    while(kpRepeatTime > 0 && timestamp >= kpRepeatTime){
-        _script->keypress(repeatKey, 1, kpRepeatTime);
-        if(kpRepeatMsec <= 0){
-            kpRepeatTime = 0;
-            break;
-        }
-        kpRepeatTime += kpRepeatMsec;
-    }
 
     // Fetch the next frame from the script
+    catchUp(timestamp);
     _script->frame(timestamp);
     QHashIterator<QString, QRgb> i(_script->colors());
     blendFunc f = functions[(int)_mode];

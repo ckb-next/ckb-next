@@ -1,5 +1,5 @@
-#ifndef IO_H
-#define IO_H
+#ifndef DEVNODE_H
+#define DEVNODE_H
 
 #include "includes.h"
 #include "usb.h"
@@ -35,45 +35,4 @@ void writefwnode(usbdevice* kb);
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
 unsigned readlines(int fd, const char** input);
 
-// Command operations
-typedef enum {
-    NONE,
-    MODE,
-    SWITCH,
-    HWLOAD,
-    HWSAVE,
-    ERASE,
-    ERASEPROFILE,
-    NAME,
-    PROFILENAME,
-    ID,
-    PROFILEID,
-
-    ACTIVE,
-    IDLE,
-
-    LAYOUT,
-    BIND,
-    UNBIND,
-    REBIND,
-    MACRO,
-
-    RGB,
-    IOFF,
-    ION,
-    IAUTO,
-
-    NOTIFY,
-    INOTIFY,
-    NOTIFYON,
-    NOTIFYOFF,
-    GET,
-
-    FWUPDATE
-} cmd;
-typedef void (*cmdhandler)(usbdevice*, usbmode*, int, int, const char*);
-
-// Reads input from the command FIFO
-void readcmd(usbdevice* kb, const char* line);
-
-#endif
+#endif  // DEVNODE_H

@@ -2,7 +2,7 @@
 #define USB_H
 
 #include "includes.h"
-#include "keyboard.h"
+#include "keymap.h"
 
 // Vendor/product codes
 #define V_CORSAIR       0x1b1c
@@ -24,10 +24,14 @@
 #define P_K95_NRGB_STR  "1b08"
 #define IS_K95(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95 || (kb)->product == P_K95_NRGB))
 
+#define P_M65           0x1b12
+#define P_M65_STR       "1b12"
+
 const char* vendor_str(short vendor);
 const char* product_str(short product);
 
-#define IS_RGB(vendor, product) ((product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+#define IS_RGB(vendor, product)     ((vendor) == (V_CORSAIR) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+#define IS_MOUSE(vendor, product)   ((vendor) == (V_CORSAIR) && (product) == (P_M65))
 
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT     usleep(2000)
@@ -39,29 +43,22 @@ int usbmain();
 // Stop the USB system.
 void usbkill();
 
+// Note: Lock a device's dmutex (see device.h) before accessing the USB interface.
+
 // Set up a USB device after all its handles are open. Returns 0 on success
-// Threading: Creates device mutex and locks it. Unlocks mutex ONLY if return is -1 (software error). Unlock manually otherwise.
 int setupusb(usbdevice* kb, short vendor, short product);
 // Puts a USB device back into hardware mode. Returns 0 on success.
-// Threading: Lock device mutex before calling.
 int revertusb(usbdevice* kb);
 // Close a USB device and remove device entry. Returns 0 on success
-// Threading: Lock the device mutex before calling. It will be released.
 int closeusb(usbdevice* kb);
 // Reset a USB device. Returns 0 on success, -1 if device should be removed
-// Threading: Lock the device mutex before calling
 int _resetusb(usbdevice* kb, const char* file, int line);
 #define resetusb(kb) _resetusb(kb, __FILE_NOPATH__, __LINE__)
-// Close handles on a USB device
-// Threading: Lock device before use, unlock after finish
-void closehandle(usbdevice* kb);
 
 // Send a USB message to the device. Returns number of bytes written, zero on failure.
-// Threading: Lock device before use, unlock after finish
 int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line);
 #define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
 // Gets input from a USB device.
-// Threading: Lock device before use, unlock after finish
 int _usbrecv(usbdevice* kb, uchar* message, const char* file, int line);
 #define usbrecv(kb, message) _usbrecv(kb, message, __FILE_NOPATH__, __LINE__)
 
@@ -79,4 +76,4 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 // The previous action will NOT be re-attempted.
 int usb_tryreset(usbdevice* kb);
 
-#endif
+#endif  // USB_H

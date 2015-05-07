@@ -28,7 +28,7 @@ Kb::Kb(QObject *parent, const QString& path) :
         return;
     if(mpath.open(QIODevice::ReadOnly)){
         usbModel = mpath.read(100);
-        usbModel = usbModel.remove("Corsair").remove("Gaming Keyboard").remove("Keyboard").remove("Bootloader").trimmed();
+        usbModel = usbModel.remove("Corsair").remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").trimmed();
         mpath.close();
     }
     if(usbModel == "")
@@ -287,7 +287,7 @@ void Kb::frameUpdate(){
     // Update current mode
     int index = _currentProfile->indexOf(_currentMode);
     light->frameUpdate(cmd, index, mute != MUTED, !bind->winLock());
-    cmd.write(QString(" @%1 ").arg(notifyNumber).toLatin1());
+    cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
     cmd.write("\n");
     cmd.flush();

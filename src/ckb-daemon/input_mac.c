@@ -14,7 +14,7 @@ void postevent(io_connect_t event, int kbflags, int scancode, int down, int is_f
     IOOptionBits flags = kbflags;
     IOOptionBits options = 0;
     if(IS_MEDIA(scancode)){
-        kp.compound.subType = NX_SUBTYPE_AUX_CONTROL_BUTTONS;
+        kp.compound.subType = (scancode != KEY_POWER ? NX_SUBTYPE_AUX_CONTROL_BUTTONS : NX_SUBTYPE_POWER_KEY);
         kp.compound.misc.L[0] = (scancode - KEY_MEDIA) << 16 | (down ? 0x0a00 : 0x0b00) | is_repeat;
         type = NX_SYSDEFINED;
     } else {
@@ -53,7 +53,7 @@ void postevent(io_connect_t event, int kbflags, int scancode, int down, int is_f
 
     kern_return_t res = IOHIDPostEvent(event, type, *(IOGPoint[]){{0, 0}}, &kp, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
     if(res != KERN_SUCCESS)
-        printf("Post event failed: %x\n", res);
+        ckb_warn("Post event failed: %x\n", res);
 
     if(uid != 0)
         seteuid(0);
@@ -72,9 +72,9 @@ long repeattime(io_connect_t event, int first){
 
 void clearkeys(usbdevice* kb){
     // Send keyup events for every scancode in the keymap
-    for(int key = 0; key < N_KEYS; key++){
+    for(int key = 0; key < N_KEYS_INPUT; key++){
         int scan = keymap[key].scan;
-        if(scan < 0 || IS_MEDIA(scan))
+        if((scan & SCAN_SILENT) || scan == BTN_WHEELUP || scan == BTN_WHEELDOWN || IS_MEDIA(scan))
             continue;
         postevent(kb->event, 0, scan, 0, 0, 0);
     }
@@ -86,18 +86,18 @@ int inputopen(usbdevice* kb){
     kern_return_t res;
     if(!master&& (res = IOMasterPort(bootstrap_port, &master)) != KERN_SUCCESS){
         master = 0;
-        printf("Unable to open master port: 0x%08x\n", res);
+        ckb_err("Unable to open master port: 0x%08x\n", res);
         return 0;
     }
     // Open an HID service
     io_iterator_t iter;
     if((res = IOServiceGetMatchingServices(master, IOServiceMatching(kIOHIDSystemClass), &iter)) != KERN_SUCCESS){
-        printf("Unable to get input service iterator: 0x%08x\n", res);
+        ckb_err("Unable to get input service iterator: 0x%08x\n", res);
         return 0;
     }
     if((res = IOServiceOpen(IOIteratorNext(iter), mach_task_self(), kIOHIDParamConnectType, &kb->event)) != KERN_SUCCESS){
         IOObjectRelease(iter);
-        printf("Unable to open IO service: 0x%08x\n", res);
+        ckb_err("Unable to open IO service: 0x%08x\n", res);
         kb->event = 0;
         return 0;
     }
@@ -115,6 +115,10 @@ void inputclose(usbdevice* kb){
 }
 
 void os_keypress(usbdevice* kb, int scancode, int down){
+    if(scancode & SCAN_MOUSE){
+        // TODO: implement
+        return;
+    }
     // Some boneheaded Apple engineers decided to reverse kVK_ANSI_Grave and kVK_ISO_Section on the 105-key layouts...
     if(!HAS_ANY_FEATURE(kb, FEAT_LMASK)){
         // If the layout hasn't been set yet, it can be auto-detected from certain keys
@@ -198,35 +202,38 @@ void* krthread(void* context){
         struct timespec time;
         clock_gettime(CLOCK_MONOTONIC, &time);
         for(int i = 1; i < DEV_MAX; i++){
+            // Scan all connected devices
+            pthread_mutex_lock(inputmutex + i);
             if(IS_CONNECTED(keyboard + i)){
-                // Scan all connected devices
-                pthread_mutex_lock(&keyboard[i].keymutex);
                 // Repeat the key as many times as needed to catch up
                 while(keyboard[i].lastkeypress >= 0 && timespec_ge(time, keyboard[i].keyrepeat))
                     keyretrigger(keyboard + i);
-                pthread_mutex_unlock(&keyboard[i].keymutex);
             }
+            pthread_mutex_unlock(inputmutex + i);
         }
     }
     return 0;
 }
 
-void os_kpsync(usbdevice* kb){
+void os_mousemove(usbdevice* kb, int x, int y){
+    // TODO: stub
+}
+
+void os_isync(usbdevice* kb){
     // OSX doesn't have any equivalent to the SYN_ events
 }
 
 void os_updateindicators(usbdevice* kb, int force){
-    if(!IS_CONNECTED(kb) || NEEDS_FW_UPDATE(kb))
-        return;
     // Set NumLock on permanently
     char ileds = 1;
     // Set Caps Lock if enabled. Unlike Linux, OSX keyboards have independent caps lock states, so
     // we use the last-assigned value rather than fetching it from the system
     if(kb->modifiers & kCGEventFlagMaskAlphaShift)
         ileds |= 2;
-    usbmode* mode = kb->profile.currentmode;
-    if(mode && kb->active)
+    if(kb->active){
+        usbmode* mode = kb->profile->currentmode;
         ileds = (ileds & ~mode->ioff) | mode->ion;
+    }
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;
         // Set the LEDs

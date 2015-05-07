@@ -7,7 +7,7 @@
 void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, ...){
     if(!kb)
         return;
-    usbprofile* profile = &kb->profile;
+    kbprofile* profile = kb->profile;
     va_list va_args;
     int fifo;
     if(nodenumber >= 0){
@@ -55,7 +55,7 @@ void nrprintf(int nodenumber, const char* format, ...){
 
 void notifyconnect(usbdevice* kb, int connecting){
     int index = INDEX_OF(kb, keyboard);
-    nrprintf(-1, "device %s %s %s%d\n", kb->profile.serial, connecting ? "added at" : "removed from", devpath, index);
+    nrprintf(-1, "device %s %s %s%d\n", kb->serial, connecting ? "added at" : "removed from", devpath, index);
 }
 
 void nprintkey(usbdevice* kb, int nnumber, int keyindex, int down){
@@ -85,10 +85,12 @@ void nprintind(usbdevice* kb, int nnumber, int led, int on){
 }
 
 void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const char* toggle){
+    pthread_mutex_lock(imutex(kb));
     if(!strcmp(toggle, "on") || *toggle == 0)
         SET_KEYBIT(mode->notify[nnumber], keyindex);
     else if(!strcmp(toggle, "off"))
         CLEAR_KEYBIT(mode->notify[nnumber], keyindex);
+    pthread_mutex_unlock(imutex(kb));
 }
 
 #define HWMODE_OR_RETURN(kb, index) \
@@ -100,11 +102,8 @@ void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const c
             return;                 \
     }
 
-void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
-    if(!kb || !mode)
-        return;
-
-    usbprofile* profile = &kb->profile;
+static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
+    kbprofile* profile = kb->profile;
     if(!strcmp(setting, ":mode")){
         // Get the current mode number
         nprintf(kb, nnumber, mode, "switch\n");
@@ -115,22 +114,17 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         nprintf(kb, nnumber, mode, "rgb %s\n", rgb);
         free(rgb);
         return;
-    } else if(!strcmp(setting, ":rgbon")){
-        // Get the current RGB status
-        if(mode->light.enabled)
-            nprintf(kb, nnumber, mode, "rgb on\n");
-        else
-            nprintf(kb, nnumber, mode, "rgb off\n");
-        return;
     } else if(!strcmp(setting, ":hwrgb")){
         // Get the current hardware RGB settings
-        if(!kb->hw)
+        if(!kb->hw){
+            nprintf(kb, nnumber, mode, "hwrgb FFFFFF\n");
             return;
+        }
         unsigned index = INDEX_OF(mode, profile->mode);
         // Make sure the mode number is valid
         HWMODE_OR_RETURN(kb, index);
         // Get the mode from the hardware store
-        char* rgb = printrgb(kb->hw->light + index, kb);
+        char* rgb = printrgb(kb->hw->klight + index, kb);
         nprintf(kb, nnumber, mode, "hwrgb %s\n", rgb);
         free(rgb);
         return;
@@ -196,11 +190,11 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         free(guid);
     } else if(!strcmp(setting, ":keys")){
         // Get the current state of all keys
-        for(int i = 0; i < N_KEYS; i++){
+        for(int i = 0; i < N_KEYS_INPUT; i++){
             if(!keymap[i].name)
                 continue;
             int byte = i / 8, bit = 1 << (i & 7);
-            uchar state = kb->kbinput[byte] & bit;
+            uchar state = kb->input.keys[byte] & bit;
             nprintkey(kb, nnumber, i, state);
         }
     } else if(!strcmp(setting, ":i")){
@@ -209,4 +203,10 @@ void getinfo(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
         nprintind(kb, nnumber, I_CAPS, kb->ileds & I_CAPS);
         nprintind(kb, nnumber, I_SCROLL, kb->ileds & I_SCROLL);
     }
+}
+
+void cmd_get(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* setting){
+    pthread_mutex_lock(imutex(kb));
+    _cmd_get(kb, mode, nnumber, setting);
+    pthread_mutex_unlock(imutex(kb));
 }

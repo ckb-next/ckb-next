@@ -2,28 +2,39 @@
 #define PROFILE_H
 
 #include "includes.h"
+#include "device.h"
 
-// Get a mode from a profile. The mode will be created if it didn't already exist.
-usbmode* getusbmode(int id, usbprofile* profile);
+// Note: Lock dmutex before using profile commands (see device.h).
+// Allocating/deallocating a profile additionally requires imutex to be locked
 
 // Sets a mode's name
-void cmd_setmodename(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* name);
+void cmd_name(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* name);
 // Sets a profile's name
-void setprofilename(usbprofile* profile, const char* name);
-// Gets a mode's name. Returns a URL-encoded UTF-8 buffer that needs to be freed later.
+void cmd_profilename(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* name);
+// Get a mode's name. Returns a URL-encoded UTF-8 buffer that needs to be freed later.
 char* getmodename(usbmode* mode);
-// Gets a profile's name. See above.
-char* getprofilename(usbprofile* profile);
-// Gets hardware names.
+// Get a profile's name. See above.
+char* getprofilename(kbprofile* profile);
+// Get hardware names.
 char* gethwmodename(hwprofile* profile, int index);
 char* gethwprofilename(hwprofile* profile);
 
-// Resets a mode to its default settings
-void erasemode(usbmode* mode);
-// Erases a profile, deleting all of its modes.
-void eraseprofile(usbprofile* profile, int modecount);
-// Frees a profile's memory
-void freeprofile(usbprofile* profile);
+// Allocate a native profile
+void allocprofile(usbdevice* kb);
+// Allocate/load a hardware profile and copy it to native. Returns 0 on success.
+int loadprofile(usbdevice* kb);
+// Free a native profile and the corresponding HW profile
+void freeprofile(usbdevice* kb);
+
+// Command: Reset a mode to its default settings
+void cmd_erase(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* dummy3);
+// Command: Erase a profile, deleting all of its modes.
+void cmd_eraseprofile(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
+
+// Command: Set mode ID
+void cmd_id(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id);
+// Command: Set profile ID
+void cmd_profileid(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id);
 
 // Generates a new ID
 void genid(usbid* id);
@@ -34,9 +45,10 @@ int setid(usbid* id, const char* guid);
 // Generates a GUID from the given ID. Returns a string which must be freed later.
 char* getid(usbid* id);
 
-// Loads the profile name from hardware. apply = 1 to apply/activate hardware profile, 1 to simply store it. Returns 0 on success.
-int hwloadprofile(usbdevice* kb, int apply);
-// Saves the profile name to hardware. Returns 0 on success.
-int hwsaveprofile(usbdevice* kb);
+// Command: Load profile from hardware. apply = 1 to apply/activate hardware profile, 0 to simply store it. Returns 0 on success.
+int cmd_hwload(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3);
+#define hwloadprofile(kb, apply) (kb)->vtable->hwload(kb, 0, 0, apply, 0)
+// Command: Saves the profile name to hardware. Returns 0 on success.
+int cmd_hwsave(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 
-#endif
+#endif  // PROFILE_H

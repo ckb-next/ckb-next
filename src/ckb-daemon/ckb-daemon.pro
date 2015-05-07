@@ -13,11 +13,11 @@ macx {
     LIBS = -lpthread -ludev
 }
 
-QMAKE_CFLAGS += -std=c99 -Wno-unused-parameter -Werror=implicit
+QMAKE_CFLAGS  = -std=c99 -Wno-unused-parameter -Werror=all
 QMAKE_MAC_SDK = macosx10.10
 
 # Minimal build - remove Qt defaults
-CONFIG   =
+CONFIG   = debug_and_release
 QT       =
 
 CKB_VERSION_STR = `cat $$PWD/../../VERSION`
@@ -29,8 +29,6 @@ SOURCES += \
     input_linux.c \
     input_mac.c \
     input.c \
-    keyboard.c \
-    led.c \
     main.c \
     notify.c \
     usb_linux.c \
@@ -38,19 +36,28 @@ SOURCES += \
     usb.c \
     firmware.c \
     profile.c \
-    extra_mac.c
+    extra_mac.c \
+    keymap.c \
+    command.c \
+    device_vtable.c \
+    device_keyboard.c \
+    device_mouse.c \
+    led_keyboard.c \
+    led.c \
+    led_mouse.c
 
 HEADERS += \
     device.h \
     devnode.h \
     includes.h \
     input.h \
-    keyboard_mac.h \
-    keyboard.h \
     led.h \
     notify.h \
     os.h \
-    structures.h \
     usb.h \
     firmware.h \
-    profile.h
+    profile.h \
+    command.h \
+    keymap.h \
+    keymap_mac.h \
+    structures.h

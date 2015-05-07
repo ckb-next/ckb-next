@@ -46,12 +46,14 @@ struct Key {
 // Key lighting/layout class
 class KeyMap {
 public:
-    // Keyboard models
     enum Model {
         NO_MODEL = -1,
+        // Keyboard models
         K65,
         K70,
         K95,
+        // Mouse models
+        M65,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

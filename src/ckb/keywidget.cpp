@@ -214,7 +214,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
 #else
                 {"lctrl", "Ctrl"}, {"rctrl", "Ctrl"}, {"lwin", "❖"}, {"rwin", "❖"}, {"lalt", "Alt"}, {"ralt", "Alt"},
 #endif
-                {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"}
+                {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"},
+                {"mousel", ""}, {"mouser", ""}, {"mousem", "-"}, {"dpiup", "▲"}, {"dpidn", "▼"}, {"dpi", "◉"}, {"mouses1", "▲"}, {"mouses2", "▼"}, {"sniper", "☀"}
             };
             for(uint k = 0; k < sizeof(names) / sizeof(names[0]); k++){
                 if(keyName == names[k].keyName){

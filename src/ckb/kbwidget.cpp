@@ -60,8 +60,10 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
 }
 
 KbWidget::~KbWidget(){
-    saveSettings();
-    delete device;
+    if(device && device->isOpen()){
+        saveSettings();
+        delete device;
+    }
     delete ui;
 }
 

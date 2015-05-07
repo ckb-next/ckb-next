@@ -56,4 +56,4 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp, 
 
 #endif  // OS_MAC
 
-#endif
+#endif  // OS_H

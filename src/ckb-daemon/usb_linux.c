@@ -7,168 +7,141 @@
 #ifdef OS_LINUX
 
 int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
-    if(!kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
-        return -1;
     for(int i = 0; i < count; i++){
         DELAY_SHORT;
         int res;
         if(kb->fwversion >= 0x120){
+#if 1       // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
+            struct usbdevfs_bulktransfer transfer;
+            memset(&transfer, 0, sizeof(transfer));
+            transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 5000; transfer.data = messages + MSG_SIZE * i;
+#else
             struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, messages + MSG_SIZE * i };
+#endif
             res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
         } else {
-            struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 0, messages + MSG_SIZE * i };
+            struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, messages + MSG_SIZE * i };
             res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
         }
         if(res <= 0){
-            printf("usbsend (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data written");
+            ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data written");
             return 0;
         }
         if(res != MSG_SIZE)
-            printf("usbsend (%s:%d): Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+            ckb_err_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     }
     return MSG_SIZE * count;
 }
 
 int _usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
-    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
-        return -1;
     DELAY_MEDIUM;
-    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 0, message };
+    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     if(res <= 0){
-        printf("usbrecv (%s:%d): %s\n", file, line, res ? strerror(-res) : "No data read");
+        ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data read");
         return 0;
     }
     if(res != MSG_SIZE)
-        printf("usbrecv (%s:%d): Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        ckb_err_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     return res;
 }
 
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
-    if(kb->vendor != V_CORSAIR || kb->product != P_K95_NRGB)
+    if(kb->product != P_K95_NRGB)
         return 0;
-    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 500, 0 };
+    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 5000, 0 };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     if(res < 0){
-        printf("nk95cmd (%s:%d): %s\n", file, line, strerror(-res));
+        ckb_err_fn("%s\n", file, line, strerror(-res));
         return 1;
     }
     return 0;
 }
 
-void* intreap(void* context){
+static void* inputmain(void* context){
     usbdevice* kb = context;
     int fd = kb->handle;
+    short vendor = kb->vendor, product = kb->product;
+
+    // Monitor input transfers on all endpoints
+    int urbcount = IS_RGB(vendor, product) ? 4 : 3;
+    struct usbdevfs_urb urbs[urbcount];
+    memset(urbs, 0, sizeof(urbs));
+    urbs[0].buffer_length = 8;
+    if(IS_RGB(vendor, product)){
+        if(IS_MOUSE(vendor, product))
+            urbs[1].buffer_length = 10;
+        else
+            urbs[1].buffer_length = 21;
+        urbs[2].buffer_length = MSG_SIZE;
+        urbs[3].buffer_length = MSG_SIZE;
+    } else {
+        urbs[1].buffer_length = 4;
+        urbs[2].buffer_length = 15;
+    }
+    // Submit URBs
+    for(int i = 0; i < urbcount; i++){
+        urbs[i].type = USBDEVFS_URB_TYPE_INTERRUPT;
+        urbs[i].endpoint = 0x80 | (i + 1);
+        urbs[i].buffer = malloc(urbs[i].buffer_length);
+        ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
+    }
+    // Start monitoring input
     while(1){
         struct usbdevfs_urb* urb = 0;
         if(ioctl(fd, USBDEVFS_REAPURB, &urb)){
             if(errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
-                return 0;
+                break;
             else if(errno == EPIPE && urb){
                 // On EPIPE, clear halt on the endpoint
                 ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
                 // Re-submit the URB
-                ioctl(fd, USBDEVFS_SUBMITURB, urb);
+                if(urb)
+                    ioctl(fd, USBDEVFS_SUBMITURB, urb);
                 urb = 0;
             }
         }
         if(urb){
             // Process input (if any)
-            if(HAS_FEATURES(kb, FEAT_RGB)){
-                switch(urb->endpoint){
-                case 0x81:
-                    // RGB EP 1: 6KRO (BIOS mode) input
-                    hid_translate(kb->kbinput, -1, 8, kb->urbinput);
-                    inputupdate(kb);
-                    break;
-                case 0x82:
-                    // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
-                    if(!kb->active){
-                        hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);
-                        inputupdate(kb);
+            pthread_mutex_lock(imutex(kb));
+            if(IS_RGB(vendor, product)){
+                if(IS_MOUSE(vendor, product)){
+                    // RGB mouse input
+                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -(urb->endpoint & 0xF), urb->actual_length, urb->buffer);
+                } else {
+                    switch(urb->endpoint){
+                    case 0x81:
+                        // RGB EP 1: 6KRO (BIOS mode) input
+                        hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
+                        break;
+                    case 0x82:
+                        // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
+                        if(!kb->active)
+                            hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
+                        break;
+                    case 0x83:
+                        // RGB EP 3: Corsair input
+                        memcpy(kb->input.keys, urb->buffer, N_KEYBYTES_KB);
+                        break;
                     }
-                    break;
-                case 0x83:
-                    // RGB EP 3: Corsair input
-                    inputupdate(kb);
-                    break;
                 }
-            } else {
-                switch(urb->endpoint){
-                case 0x81:
-                    // Non-RGB EP 1: 6KRO input
-                    hid_translate(kb->kbinput, 1, 8, kb->urbinput);
-                    inputupdate(kb);
-                    break;
-                case 0x82:
-                    // Non-RGB EP 2: media keys
-                    hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
-                    inputupdate(kb);
-                    break;
-                case 0x83:
-                    // Non-RGB EP 3: NKRO input
-                    hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
-                    inputupdate(kb);
-                    break;
-                }
-            }
+            } else
+                // Non-RGB input
+                hid_kb_translate(kb->input.keys, urb->endpoint & 0xF, urb->actual_length, urb->buffer);
+            inputupdate(kb);
+            pthread_mutex_unlock(imutex(kb));
             // Re-submit the URB
             ioctl(fd, USBDEVFS_SUBMITURB, urb);
             urb = 0;
         }
     }
+    // Clean up
+    for(int i = 0; i < urbcount; i++){
+        ioctl(fd, USBDEVFS_DISCARDURB, urbs + i);
+        free(urbs[i].buffer);
+    }
     return 0;
-}
-
-void setint(usbdevice* kb, short vendor, short product){
-    // Monitor input transfers on all endpoints
-    struct usbdevfs_urb* urb = kb->urb;
-    urb->type = USBDEVFS_URB_TYPE_INTERRUPT;
-    urb->endpoint = 0x81;
-    urb->buffer = kb->urbinput;
-    urb->buffer_length = 8;
-    urb->usercontext = kb;
-    ioctl(kb->handle, USBDEVFS_SUBMITURB, urb);
-
-    urb++;
-    urb->type = USBDEVFS_URB_TYPE_INTERRUPT;
-    urb->endpoint = 0x82;
-    urb->buffer = kb->urbinput + 8;
-    if(IS_RGB(vendor, product))
-        urb->buffer_length = 21;
-    else
-        urb->buffer_length = 4;
-    urb->usercontext = kb;
-    ioctl(kb->handle, USBDEVFS_SUBMITURB, urb);
-
-    urb++;
-    urb->type = USBDEVFS_URB_TYPE_INTERRUPT;
-    urb->endpoint = 0x83;
-    if(IS_RGB(vendor, product)){
-        urb->buffer = kb->kbinput;
-        urb->buffer_length = MSG_SIZE;
-    } else {
-        urb->buffer = kb->urbinput + 8 + 4;
-        urb->buffer_length = 15;
-    }
-    urb->usercontext = kb;
-    ioctl(kb->handle, USBDEVFS_SUBMITURB, urb);
-
-    if(IS_RGB(vendor, product)){
-        // EP 4 is never used, but may be needed to prevent keyboard lock-ups
-        urb++;
-        urb->type = USBDEVFS_URB_TYPE_INTERRUPT;
-        urb->endpoint = 0x84;
-        urb->buffer = kb->urbinput + 8 + 21;
-        urb->buffer_length = 64;
-        urb->usercontext = kb;
-        ioctl(kb->handle, USBDEVFS_SUBMITURB, urb);
-    }
-
-    // Launch a thread to reap transfers
-    pthread_create(&kb->inputthread, 0, intreap, kb);
-    pthread_detach(kb->inputthread);
 }
 
 int usbunclaim(usbdevice* kb, int resetting, int rgb){
@@ -216,109 +189,109 @@ int usbclaim(usbdevice* kb, int rgb){
     return 0;
 }
 
+#define TEST_RESET(op)                                                      \
+    if(op){                                                                 \
+        ckb_err_fn("usbunclaim failed: %s\n", file, line, strerror(errno)); \
+        if(errno == EINTR || errno == EAGAIN)                               \
+            return -1;              /* try again if status code says so */  \
+        return -2;                  /* else, remove device */               \
+    }
+
 int os_resetusb(usbdevice* kb, const char* file, int line){
-    int res = usbunclaim(kb, 1, HAS_FEATURES(kb, FEAT_RGB));
-    if(res){
-        printf("resetusb (%s:%d): usbunclaim failed: %s\n", file, line, strerror(errno));
-        if(errno == EINTR || errno == EAGAIN)
-            return -1;
-        return -2;
-    }
-    res = ioctl(kb->handle, USBDEVFS_RESET);
-    if(res){
-        printf("resetusb (%s:%d): USBDEVFS_RESET ioctl failed: %s\n", file, line, strerror(errno));
-        if(errno == EINTR || errno == EAGAIN)
-            return -1;
-        return -2;
-    }
-    res = usbclaim(kb, HAS_FEATURES(kb, FEAT_RGB));
-    if(res){
-        printf("resetusb (%s:%d): usbclaim failed: %s\n", file, line, strerror(errno));
-        if(errno == EINTR || errno == EAGAIN)
-            return -1;
-        return -2;
-    }
+    TEST_RESET(usbunclaim(kb, 1, HAS_FEATURES(kb, FEAT_RGB)));
+    TEST_RESET(ioctl(kb->handle, USBDEVFS_RESET));
+    TEST_RESET(usbclaim(kb, HAS_FEATURES(kb, FEAT_RGB)));
+    // Success!
     return 0;
 }
 
-int openusb(struct udev_device* dev, short vendor, short product){
+int openusb(usbdevice* kb, struct udev_device* dev, short vendor, short product){
+    // Copy device description and serial
+    const char* name = udev_device_get_sysattr_value(dev, "product");
+    if(name)
+        strncpy(kb->name, name, KB_NAME_LEN);
+    const char* serial = udev_device_get_sysattr_value(dev, "serial");
+    if(serial)
+        strncpy(kb->serial, serial, SERIAL_LEN);
+    else
+        snprintf(kb->serial, SERIAL_LEN, "%04x:%04x-NoID", vendor, product);
+    // Copy firmware version (needed to determine USB protocol)
+    const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
+    if(firmware)
+        sscanf(firmware, "%hx", &kb->fwversion);
+    else
+        kb->fwversion = 0;
+    ckb_info("Connecting %s (S/N: %s)\n", kb->name, kb->serial);
+
+    // Claim the USB interfaces
+    if(usbclaim(kb, IS_RGB(vendor, product))){
+        ckb_err("Failed to claim interface: %s\n", strerror(errno));
+        return -1;
+    }
+
+    // Set up the interrupt transfers
+    // This should be done before setting up the keyboard as the device may freeze if inputs aren't processed.
+    pthread_create(&kb->inputthread, 0, inputmain, kb);
+    pthread_detach(kb->inputthread);
+
+    // Set up the device
+    int setup = setupusb(kb, vendor, product);
+    if(setup == -1){
+        // -1 indicates a software failure. Give up.
+        ckb_err("Failed to set up device.\n");
+        return -1;
+    } else if(setup && usb_tryreset(kb))
+        // Any other failure is hardware based. Reset and try again. Give up if reset fails
+        return -1;
+
+    // Finish up
+    updateconnected();
+    notifyconnect(kb, 1);
+    int index = INDEX_OF(kb, keyboard);
+    ckb_info("Device ready at %s%d\n", devpath, index);
+    return 0;
+}
+
+int usbadd(struct udev_device* dev, short vendor, short product){
     // Make sure it's not connected yet
     const char* path = udev_device_get_devnode(dev);
     if(!path)
         return -1;
     for(int i = 1; i < DEV_MAX; i++){
-        if(keyboard[i].udev && !strcmp(path, udev_device_get_devnode(keyboard[i].udev)))
+        pthread_mutex_lock(devmutex + i);
+        if(keyboard[i].udev && !strcmp(path, udev_device_get_devnode(keyboard[i].udev))){
+            pthread_mutex_unlock(devmutex + i);
             return 0;
+        }
+        pthread_mutex_unlock(devmutex + i);
     }
     // Find a free USB slot
     for(int index = 1; index < DEV_MAX; index++){
         usbdevice* kb = keyboard + index;
+        pthread_mutex_lock(dmutex(kb));
         if(!IS_CONNECTED(kb)){
             // Open the sysfs device
             kb->udev = dev;
             kb->handle = open(path, O_RDWR);
+            int res;
             if(kb->handle <= 0){
-                printf("Error: Failed to open USB device: %s\n", strerror(errno));
+                ckb_err("Failed to open USB device: %s\n", strerror(errno));
                 udev_device_unref(kb->udev);
                 kb->handle = 0;
                 kb->udev = 0;
-                return -1;
+                res = -1;
+            } else {
+                // Set up device
+                res = openusb(kb, dev, vendor, product);
+                if(res)
+                    closehandle(kb);
             }
-
-            // Copy device description and serial
-            const char* name = udev_device_get_sysattr_value(dev, "product");
-            if(name)
-                strncpy(kb->name, name, NAME_LEN);
-            const char* serial = udev_device_get_sysattr_value(dev, "serial");
-            if(serial)
-                strncpy(kb->profile.serial, serial, SERIAL_LEN);
-            else
-                snprintf(kb->profile.serial, SERIAL_LEN, "%04x:%04x-NoID", vendor, product);
-            printf("Connecting %s (S/N: %s)\n", kb->name, kb->profile.serial);
-            // Copy firmware version (needed to determine USB protocol)
-            const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
-            if(firmware)
-                sscanf(firmware, "%hx", &kb->fwversion);
-            else
-                kb->fwversion = 0;
-
-            // Claim the USB interfaces
-            if(usbclaim(kb, IS_RGB(vendor, product))){
-                printf("Error: Failed to claim interface: %s\n", strerror(errno));
-                closehandle(kb);
-                return -1;
-            }
-
-            // Set up the interrupt transfers.
-            // This should be done before setting up the keyboard as the device may freeze if inputs aren't processed.
-            setint(kb, vendor, product);
-
-            // Set up the device.
-            int setup = setupusb(kb, vendor, product);
-            if(setup == -1){
-                // -1 indicates a software failure. Give up.
-                printf("Failed to set up device.\n");
-                closehandle(kb);
-                return -1;
-            } else if(setup && usb_tryreset(kb)){
-                // Any other failure is hardware based. Reset and try again.
-                closehandle(kb);
-                pthread_mutex_unlock(&kb->mutex);
-                pthread_mutex_destroy(&kb->mutex);
-                pthread_mutex_destroy(&kb->keymutex);
-                DELAY_LONG;
-                return -1;
-            }
-
-            updateconnected();
-            notifyconnect(kb, 1);
-            int index = INDEX_OF(kb, keyboard);
-            printf("Device ready at %s%d\n", devpath, index);
-            pthread_mutex_unlock(&kb->mutex);
-            return 0;
+            pthread_mutex_unlock(dmutex(kb));
+            return res;
         }
+        pthread_mutex_unlock(dmutex(kb));
     }
-    printf("Error: No free devices\n");
+    ckb_err("No free devices\n");
     return -1;
 }
 
@@ -331,22 +304,58 @@ typedef struct {
     short number;
 } _model;
 static _model models[] = {
+    // Keyboards
     { P_K65_STR, P_K65 },
     { P_K70_STR, P_K70 },
     { P_K70_NRGB_STR, P_K70_NRGB },
     { P_K95_STR, P_K95 },
     { P_K95_NRGB_STR, P_K95_NRGB },
+    // Mice
+    { P_M65_STR, P_M65 }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
+
+// Add a udev device. Returns 0 if device was recognized/added.
+static int usb_add_device(struct udev_device* dev){
+    const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
+    if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
+        const char* product = udev_device_get_sysattr_value(dev, "idProduct");
+        if(product){
+            for(_model* model = models; model < models + N_MODELS; model++){
+                if(!strcmp(product, model->name)){
+                    pthread_mutex_lock(&devlistmutex);
+                    usbadd(dev, V_CORSAIR, model->number);
+                    pthread_mutex_unlock(&devlistmutex);
+                    return 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+// Remove a udev device.
+static void usb_rm_device(struct udev_device* dev){
+    // Device removed. Look for it in our list of keyboards
+    const char* path = udev_device_get_syspath(dev);
+    pthread_mutex_lock(&devlistmutex);
+    for(int i = 1; i < DEV_MAX; i++){
+        pthread_mutex_lock(devmutex + i);
+        if(keyboard[i].udev && !strcmp(path, udev_device_get_syspath(keyboard[i].udev)))
+            closeusb(keyboard + i);
+        pthread_mutex_unlock(devmutex + i);
+    }
+    pthread_mutex_unlock(&devlistmutex);
+}
 
 int usbmain(){
     // Load the uinput module (if it's not loaded already)
     if(system("modprobe uinput") != 0)
-        printf("Warning: Failed to load module uinput\n");
+        ckb_warn("Failed to load uinput module\n");
 
     // Create the udev object
     if(!(udev = udev_new())){
-        printf("Fatal: Failed to initialize udev\n");
+        ckb_fatal("Failed to initialize udev\n");
         return -1;
     }
 
@@ -366,21 +375,8 @@ int usbmain(){
         if(!dev)
             continue;
         // If the device matches a recognized device ID, open it
-        const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-        int found = 0;
-        if(product){
-            for(_model* model = models; model < models + N_MODELS; model++){
-                if(!strcmp(product, model->name)){
-                    found = 1;
-                    pthread_mutex_lock(&kblistmutex);
-                    openusb(dev, V_CORSAIR, model->number);
-                    pthread_mutex_unlock(&kblistmutex);
-                    break;
-                }
-            }
-        }
-        // Free the device if it wasn't used
-        if(!found)
+        if(usb_add_device(dev))
+            // Release device if not
             udev_device_unref(dev);
     }
     udev_enumerate_unref(enumerator);
@@ -405,40 +401,12 @@ int usbmain(){
                 udev_device_unref(dev);
                 continue;
             }
+            // Add/remove device
             if(!strcmp(action, "add")){
-                // Device added. Check vendor and product ID and add the device if it matches.
-                const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
-                if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
-                    const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-                    int found = 0;
-                    if(product){
-                        for(_model* model = models; model < models + N_MODELS; model++){
-                            if(!strcmp(product, model->name)){
-                                found = 1;
-                                pthread_mutex_lock(&kblistmutex);
-                                openusb(dev, V_CORSAIR, model->number);
-                                pthread_mutex_unlock(&kblistmutex);
-                                break;
-                            }
-                        }
-                    }
-                    // Don't free the device if it's now in use
-                    if(found)
-                        continue;
-                }
-            } else if(!strcmp(action, "remove")){
-                // Device removed. Look for it in our list of keyboards
-                pthread_mutex_lock(&kblistmutex);
-                const char* path = udev_device_get_syspath(dev);
-                for(int i = 1; i < DEV_MAX; i++){
-                    if(keyboard[i].udev && !strcmp(path, udev_device_get_syspath(keyboard[i].udev))){
-                        pthread_mutex_lock(&keyboard[i].mutex);
-                        closeusb(keyboard + i);
-                        break;
-                    }
-                }
-                pthread_mutex_unlock(&kblistmutex);
-            }
+                if(!usb_add_device(dev))
+                    continue;
+            } else if(!strcmp(action, "remove"))
+                usb_rm_device(dev);
             udev_device_unref(dev);
         }
     }

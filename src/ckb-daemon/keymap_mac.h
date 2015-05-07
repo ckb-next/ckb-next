@@ -1,5 +1,5 @@
-#ifndef KEYBOARD_MAC_H
-#define KEYBOARD_MAC_H
+#ifndef KEYMAP_MAC_H
+#define KEYMAP_MAC_H
 
 #include "os.h"
 #ifdef OS_MAC
@@ -19,6 +19,14 @@
 #define KEY_F10             kVK_F10
 #define KEY_F11             kVK_F11
 #define KEY_F12             kVK_F12
+#define KEY_F13             kVK_F13
+#define KEY_F14             kVK_F14
+#define KEY_F15             kVK_F15
+#define KEY_F16             kVK_F16
+#define KEY_F17             kVK_F17
+#define KEY_F18             kVK_F18
+#define KEY_F19             kVK_F19
+#define KEY_F20             kVK_F20
 
 #define KEY_1               kVK_ANSI_1
 #define KEY_2               kVK_ANSI_2
@@ -119,7 +127,7 @@
 #define KEY_KP9             kVK_ANSI_Keypad9
 #define KEY_KP0             kVK_ANSI_Keypad0
 
-#define KEY_MEDIA           1000
+#define KEY_MEDIA           0x800
 #define IS_MEDIA(scancode)  ((scancode) >= KEY_MEDIA)
 #define KEY_MUTE            (KEY_MEDIA + NX_KEYTYPE_MUTE)
 #define KEY_VOLUMEUP        (KEY_MEDIA + NX_KEYTYPE_SOUND_UP)
@@ -128,7 +136,17 @@
 #define KEY_PREVIOUSSONG    (KEY_MEDIA + NX_KEYTYPE_PREVIOUS)
 #define KEY_PLAYPAUSE       (KEY_MEDIA + NX_KEYTYPE_PLAY)
 #define KEY_NEXTSONG        (KEY_MEDIA + NX_KEYTYPE_NEXT)
+#define KEY_BRIGHTNESSUP    (KEY_MEDIA + NX_KEYTYPE_BRIGHTNESS_UP)
+#define KEY_BRIGHTNESSDOWN  (KEY_MEDIA + NX_KEYTYPE_BRIGHTNESS_DOWN)
+#define KEY_EJECTCD         (KEY_MEDIA + NX_KEYTYPE_EJECT)
+#define KEY_POWER           (KEY_MEDIA + NX_POWER_KEY)
 
-#endif  // OS_MAC
+#define BTN_LEFT            0
+#define BTN_RIGHT           1
+#define BTN_MIDDLE          2
+#define BTN_SIDE            3
+#define BTN_EXTRA           4
 
-#endif
+#endif // OS_MAC
+
+#endif // KEYMAP_MAC_H

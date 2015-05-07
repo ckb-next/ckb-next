@@ -2,35 +2,13 @@
 #define STRUCTURES_H
 
 #include "includes.h"
-#include "keyboard.h"
+#include "keymap.h"
 
-// Key binding structures
-
-// Action triggered when activating a macro
+// Profile ID structure
 typedef struct {
-    short scan;
-    // down = 0 for keyup, down = 1 for keydown
-    char down;
-} macroaction;
-
-// Key macro
-typedef struct {
-    macroaction* actions;
-    int actioncount;
-    uchar combo[N_KEYS / 8];
-    char triggered;
-} keymacro;
-
-// Key bindings for a device/profile
-typedef struct {
-    // Base bindings
-    int base[N_KEYS];
-    // Macros
-    keymacro* macros;
-    int macrocount;
-    int macrocap;
-} keybind;
-#define MACRO_MAX   1024
+    char guid[16];
+    char modified[4];
+} usbid;
 
 // Used to manipulate key bitfields
 // The do-while business is a hack to make statements like "if(a) SET_KEYBIT(...); else CLEAR_KEYBIT(...);" work
@@ -45,50 +23,56 @@ typedef struct {
 // Maximum number of notification nodes
 #define OUTFIFO_MAX 10
 
-// End key bind structures
+// Action triggered when activating a macro
+typedef struct {
+    short scan;         // Key scancode, OR
+    short rel_x, rel_y; // Mouse movement
+    char down;          // 0 for keyup, 1 for keydown (ignored if rel_x != 0 || rel_y != 0)
+} macroaction;
+
+// Key macro
+typedef struct {
+    macroaction* actions;
+    int actioncount;
+    uchar combo[N_KEYBYTES_INPUT];
+    char triggered;
+} keymacro;
+
+// Key bindings for a mode (keyboard + mouse)
+typedef struct {
+    // Base bindings
+    int base[N_KEYS_INPUT];
+    // Macros
+    keymacro* macros;
+    int macrocount;
+    int macrocap;
+} keybind;
+#define MACRO_MAX   1024
+
+// Keyboard/mouse input tracking
+typedef struct {
+    uchar keys[N_KEYBYTES_INPUT];
+    uchar prevkeys[N_KEYBYTES_INPUT];
+    short rel_x, rel_y;
+} devinput;
 
 // Lighting structure for a mode
 typedef struct {
-    struct {
-        uchar r[N_KEYS];
-        uchar g[N_KEYS];
-        uchar b[N_KEYS];
-    };
-    char enabled;
+    uchar r[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
+    uchar g[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
+    uchar b[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
 } keylight;
 
-// ID structure
-typedef struct {
-    char guid[16];
-    char modified[4];
-} usbid;
-
-#define PR_NAME_LEN 16
-#define MD_NAME_LEN 16
-
-#define HWMODE_K70 1
-#define HWMODE_K95 3
-#define HWMODE_MAX 3
-
-// Hardware profile structure
-typedef struct {
-    // RGB settings
-    keylight light[HWMODE_MAX];
-    // Mode/profile IDs
-    usbid id[HWMODE_MAX + 1];
-    // Mode/profile names
-    ushort name[HWMODE_MAX + 1][MD_NAME_LEN];
-} hwprofile;
-
 // Native mode structure
+#define MD_NAME_LEN 16
 typedef struct {
     keylight light;
     keybind bind;
-    // Key notification settings
-    uchar notify[OUTFIFO_MAX][N_KEYS / 8];
     // Name and UUID
-    ushort name[MD_NAME_LEN];
     usbid id;
+    ushort name[MD_NAME_LEN];
+    // Key notification settings (bitfield - 0: off, 1: on)
+    uchar notify[OUTFIFO_MAX][N_KEYBYTES_INPUT];
     // Indicators permanently off/on
     uchar ioff, ion;
     // Notify mask for indicator LEDs
@@ -96,21 +80,37 @@ typedef struct {
 } usbmode;
 
 // Native profile structure
-#define SERIAL_LEN  33
+#define PR_NAME_LEN 16
+#define MODE_COUNT  6
 typedef struct {
     // Modes
-    usbmode* mode;
-    int modecount;
-    int modecap;
+    usbmode mode[MODE_COUNT];
     // Currently-selected mode
     usbmode* currentmode;
-    // Device serial number
-    char serial[SERIAL_LEN];
-    // Name and UUID
+    // Last RGB data sent to the device
+    keylight lastlight;
+    // Profile name and UUID
     ushort name[PR_NAME_LEN];
     usbid id;
-} usbprofile;
-#define MODE_MAX    100
+} kbprofile;
+
+// Hardware profile structure
+#define HWMODE_K70 1
+#define HWMODE_K95 3
+#define HWMODE_MAX 3
+typedef struct {
+    // RGB settings
+    keylight klight[HWMODE_MAX];
+    // Mode/profile IDs
+    usbid id[HWMODE_MAX + 1];
+    // Mode/profile names
+    ushort name[HWMODE_MAX + 1][MD_NAME_LEN];
+} hwprofile;
+
+// vtables for keyboards/mice (see command.h)
+extern const union devcmd vtable_keyboard;
+extern const union devcmd vtable_keyboard_nonrgb;
+extern const union devcmd vtable_mouse;
 
 // Device features
 #define FEAT_RGB        0x01    // RGB backlighting?
@@ -122,12 +122,12 @@ typedef struct {
 
 #define FEAT_ANSI       0x40    // ANSI/ISO layout toggle (Mac only - not needed on Linux)
 #define FEAT_ISO        0x80
-#define FEAT_LMASK      0xC0
 
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION)
 #define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)
 #define FEAT_STD_NRGB   (FEAT_COMMON)
+#define FEAT_LMASK      (FEAT_ANSI | FEAT_ISO)
 
 // Feature test (usbdevice* kb, int feat)
 #define HAS_FEATURES(kb, feat)      (((kb)->features & (feat)) == (feat))
@@ -136,21 +136,22 @@ typedef struct {
 // Bricked firmware?
 #define NEEDS_FW_UPDATE(kb) ((kb)->fwversion == 0 && HAS_FEATURES((kb), FEAT_FWUPDATE | FEAT_FWVERSION))
 
-// Structure for tracking keyboard devices
-#define NAME_LEN    33
-#define QUEUE_LEN   64
+// Structure for tracking keyboard/mouse devices
+#define KB_NAME_LEN 34
+#define SERIAL_LEN  34
 #define MSG_SIZE    64
 typedef struct {
+    // Function table (see command.h)
+    const union devcmd* vtable;
     // I/O devices
 #ifdef OS_LINUX
-    struct usbdevfs_urb urb[4];
     struct udev_device* udev;
     pthread_t inputthread;
     int handle;
     int uinput;
     int event;
-#endif
-#ifdef OS_MAC
+#else
+    uchar urbinput[8 + 21 + MSG_SIZE];
     struct timespec keyrepeat;
     IOHIDDeviceRef handle;
     IOHIDDeviceRef handles[4];
@@ -159,40 +160,34 @@ typedef struct {
     IOOptionBits modifiers;
     short lastkeypress;
 #endif
-    // A mutex used for USB controls. Needs to be locked before reading or writing the handle
-    pthread_mutex_t mutex;
-    // Similar, but used only for key input.
-    pthread_mutex_t keymutex;
-    // Thread used for USB/devnode communication. To close, set handle to zero, then wait for thread to stop
+    // Thread used for USB/devnode communication. To close: lock mutexes, set handle to zero, unlock, then wait for thread to stop
     pthread_t thread;
     // Keyboard settings
-    usbprofile profile;
+    kbprofile* profile;
     // Hardware modes. Null if not read yet
     hwprofile* hw;
-    // Last RGB data sent to the device
-    keylight lastlight;
     // Command FIFO
     int infifo;
-    // Notification FIFO
+    // Notification FIFOs, or zero if a FIFO is closed
     int outfifo[OUTFIFO_MAX];
-    // Interrupt transfers (keypresses)
-    uchar urbinput[32 + 64];
-    uchar kbinput[MSG_SIZE];
-    uchar prevkbinput[N_KEYS / 8];
     // Features (see F_ macros)
     char features;
+    // Whether the keyboard is being actively controlled by the driver
+    char active;
+    // Device name
+    char name[KB_NAME_LEN];
+    // Device serial number
+    char serial[SERIAL_LEN];
     // USB vendor and product IDs
     short vendor, product;
     // Firmware version
     ushort fwversion;
     // Poll rate (ns), or -1 if unsupported
     int pollrate;
+    // Current input state
+    devinput input;
     // Indicator LED state
     uchar ileds;
-    // Device name
-    char name[NAME_LEN];
-    // Whether the keyboard is being actively controlled by the driver
-    char active;
 } usbdevice;
 
-#endif
+#endif  // STRUCTURES_H

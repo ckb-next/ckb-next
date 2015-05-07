@@ -1,30 +1,8 @@
+#include "command.h"
 #include "device.h"
 #include "input.h"
 #include "led.h"
 #include "profile.h"
-
-#define MODE_STEP   4
-#define MODE_ROUND_UP(number)   ((number) / MODE_STEP * MODE_STEP + MODE_STEP)
-usbmode* getusbmode(int id, usbprofile* profile){
-    if(id < profile->modecount)
-        return profile->mode + id;
-    int cap = MODE_ROUND_UP(id);
-    if(cap > profile->modecap){
-        int curidx = (!profile->currentmode || !profile->mode) ? -1 : INDEX_OF(profile->currentmode, profile->mode);
-        profile->mode = realloc(profile->mode, cap * sizeof(usbmode));
-        profile->modecap = cap;
-        profile->currentmode = (curidx >= 0) ? profile->mode + curidx : 0;
-    }
-    // Initialize any newly-created modes
-    for(int i = profile->modecount; i <= id; i++){
-        memset(profile->mode + i, 0, sizeof(profile->mode[i]));
-        initrgb(&profile->mode[i].light);
-        initbind(&profile->mode[i].bind, keymap);
-        genid(&profile->mode[i].id);
-    }
-    profile->modecount = id + 1;
-    return profile->mode + id;
-}
 
 iconv_t utf8to16 = 0, utf16to8 = 0;
 
@@ -83,7 +61,7 @@ void urlencode2(char* dst, const char* src){
     *dst = '\0';
 }
 
-void cmd_setmodename(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* name){
+void cmd_name(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* name){
     if(!utf8to16)
         utf8to16 = iconv_open("UTF-16LE", "UTF-8");
     memset(mode->name, 0, sizeof(mode->name));
@@ -94,7 +72,8 @@ void cmd_setmodename(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const
     iconv(utf8to16, &in, &srclen, &out, &dstlen);
 }
 
-void setprofilename(usbprofile* profile, const char* name){
+void cmd_profilename(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* name){
+    kbprofile* profile = kb->profile;
     if(!utf8to16)
         utf8to16 = iconv_open("UTF-16LE", "UTF-8");
     memset(profile->name, 0, sizeof(profile->name));
@@ -133,7 +112,7 @@ char* getmodename(usbmode* mode){
     return printname(mode->name, MD_NAME_LEN);
 }
 
-char* getprofilename(usbprofile* profile){
+char* getprofilename(kbprofile* profile){
     return printname(profile->name, PR_NAME_LEN);
 }
 
@@ -145,35 +124,77 @@ char* gethwprofilename(hwprofile* profile){
     return printname(profile->name[0], MD_NAME_LEN);
 }
 
-void erasemode(usbmode *mode){
-    closebind(&mode->bind);
+static void initmode(usbmode* mode){
     memset(mode, 0, sizeof(*mode));
-    initrgb(&mode->light);
-    initbind(&mode->bind, keymap);
+    initbind(&mode->bind);
     genid(&mode->id);
 }
 
-void eraseprofile(usbprofile* profile, int modecount){
-    // Clear all mode data
-    for(int i = 0; i < profile->modecount; i++)
-        closebind(&profile->mode[i].bind);
-    free(profile->mode);
-    profile->mode = profile->currentmode = 0;
-    profile->modecount = profile->modecap = 0;
-    profile->name[0] = 0;
-    genid(&profile->id);
-    // There need to be at as many modes as there are hardware modes
-    profile->currentmode = getusbmode(0, profile);
-    for(int i = 1; i < modecount; i++)
-        getusbmode(i, profile);
+void allocprofile(usbdevice* kb){
+    if(kb->profile)
+        return;
+    kbprofile* profile = kb->profile = calloc(1, sizeof(kbprofile));
+    for(int i = 0; i < MODE_COUNT; i++)
+        initmode(profile->mode + i);
+    profile->currentmode = profile->mode;
 }
 
-void freeprofile(usbprofile* profile){
+int loadprofile(usbdevice* kb){
+    if(hwloadprofile(kb, 1))
+        return -1;
+    return 0;
+}
+
+static void freemode(usbmode* mode){
+    freebind(&mode->bind);
+    memset(mode, 0, sizeof(*mode));
+}
+
+void cmd_erase(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* dummy3){
+    pthread_mutex_lock(imutex(kb));
+    freemode(mode);
+    initmode(mode);
+    pthread_mutex_unlock(imutex(kb));
+}
+
+static void _freeprofile(usbdevice* kb){
+    kbprofile* profile = kb->profile;
+    if(!profile)
+        return;
     // Clear all mode data
-    for(int i = 0; i < profile->modecount; i++)
-        closebind(&profile->mode[i].bind);
-    free(profile->mode);
-    memset(profile, 0, sizeof(*profile));
+    for(int i = 0; i < MODE_COUNT; i++)
+        freemode(profile->mode + i);
+    free(profile);
+    kb->profile = 0;
+}
+
+void cmd_eraseprofile(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    pthread_mutex_lock(imutex(kb));
+    _freeprofile(kb);
+    allocprofile(kb);
+    pthread_mutex_unlock(imutex(kb));
+}
+
+void freeprofile(usbdevice* kb){
+    _freeprofile(kb);
+    // Also free HW profile
+    free(kb->hw);
+    kb->hw = 0;
+}
+
+void cmd_id(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id){
+    // ID is either a GUID or an 8-digit hex number
+    int newmodified;
+    if(!setid(&mode->id, id) && sscanf(id, "%08x", &newmodified) == 1)
+        memcpy(mode->id.modified, &newmodified, sizeof(newmodified));
+}
+
+void cmd_profileid(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id){
+    kbprofile* profile = kb->profile;
+    int newmodified;
+    if(!setid(&profile->id, id) && sscanf(id, "%08x", &newmodified) == 1)
+        memcpy(profile->id.modified, &newmodified, sizeof(newmodified));
+
 }
 
 void genid(usbid* id){
@@ -227,7 +248,7 @@ char* getid(usbid* id){
 }
 
 // Converts a hardware profile to a native profile
-void hwtonative(usbprofile* profile, hwprofile* hw, int modes){
+void hwtonative(kbprofile* profile, hwprofile* hw, int modes){
     // Copy the profile and mode names
     memcpy(profile->name, hw->name[0], PR_NAME_LEN * 2);
     for(int i = 0; i < modes; i++)
@@ -238,11 +259,11 @@ void hwtonative(usbprofile* profile, hwprofile* hw, int modes){
         memcpy(&profile->mode[i].id, hw->id + i + 1, sizeof(usbid));
     // Copy the key lighting
     for(int i = 0; i < modes; i++)
-        memcpy(&profile->mode[i].light, hw->light + i, sizeof(keylight));
+        memcpy(&profile->mode[i].light, hw->klight + i, sizeof(keylight));
 }
 
 // Converts a native profile to a hardware profile
-void nativetohw(usbprofile* profile, hwprofile* hw, int modes){
+void nativetohw(kbprofile* profile, hwprofile* hw, int modes){
     // Copy the profile and mode names
     memcpy(hw->name[0], profile->name, PR_NAME_LEN * 2);
     for(int i = 0; i < modes; i++)
@@ -255,10 +276,8 @@ void nativetohw(usbprofile* profile, hwprofile* hw, int modes){
         memcpy(hw->id + i + 1, &profile->mode[i].id, sizeof(usbid));
     }
     // Copy the key lighting
-    for(int i = 0; i < modes; i++){
-        memcpy(hw->light + i, &profile->mode[i].light, sizeof(keylight));
-        profile->mode[i].light.enabled = 1;
-    }
+    for(int i = 0; i < modes; i++)
+        memcpy(hw->klight + i, &profile->mode[i].light, sizeof(keylight));
 }
 
 int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
@@ -271,12 +290,10 @@ int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
         return -1;
     memcpy(hw->name[mode + 1], data_pkt + 4, MD_NAME_LEN * 2);
     // Load the RGB setting
-    return loadrgb(kb, hw->light + mode, mode);
+    return loadrgb_kb(kb, hw->klight + mode, mode);
 }
 
-int hwloadprofile(usbdevice* kb, int apply){
-    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
-        return 0;
+int cmd_hwload(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3){
     hwprofile* hw = calloc(1, sizeof(hwprofile));
     // Ask for profile and mode IDs
     uchar data_pkt[2][MSG_SIZE] = {
@@ -318,7 +335,7 @@ int hwloadprofile(usbdevice* kb, int apply){
     }
     // Make the profile active (if requested)
     if(apply)
-        hwtonative(&kb->profile, hw, modes);
+        hwtonative(kb->profile, hw, modes);
     // Free the existing profile (if any)
     free(kb->hw);
     kb->hw = hw;
@@ -326,14 +343,12 @@ int hwloadprofile(usbdevice* kb, int apply){
     return 0;
 }
 
-int hwsaveprofile(usbdevice* kb){
-    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
-        return 0;
+int cmd_hwsave(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
     hwprofile* hw = kb->hw;
     if(!hw)
         hw = kb->hw = calloc(1, sizeof(hwprofile));
     int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
-    nativetohw(&kb->profile, hw, modes);
+    nativetohw(kb->profile, hw, modes);
     // Save the profile and mode names
     uchar data_pkt[2][MSG_SIZE] = {
         {0x07, 0x16, 0x01, 0 },
@@ -355,7 +370,7 @@ int hwsaveprofile(usbdevice* kb){
     }
     // Save the RGB data
     for(int i = 0; i < modes; i++)
-        savergb(kb, i);
+        savergb_kb(kb, i);
     DELAY_LONG;
     return 0;
 }

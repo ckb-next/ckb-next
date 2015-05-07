@@ -7,8 +7,7 @@
 
 // Key positions (K95 - English)
 // This is the master key map that includes both ANSI and ISO layouts - use ansiPatch() or isoPatch() to finalize it
-#define KEYCOUNT_K95 137
-static const Key K95Keys[KEYCOUNT_K95] = {
+static const Key K95Keys[] = {
     {0, 0, "mr", 38, 0, NS, true}, {0, 0, "m1", 50, 0, NS, true}, {0, 0, "m2", 62, 0, NS, true}, {0, 0, "m3", 74, 0, NS, true}, {0, "Brightness", "light", 222, 0, NS, true}, {0, "Windows Lock", "lock", 234, 0, NS, true}, {0, "Mute", "mute", 273, 0, 13, 8, true}, {0, "Volume Up", "volup", 290, -2, 18, 6, false}, {0, "Volume down", "voldn", 290, 2, 18, 6, false},
     {0, 0, "g1", 0, 14, NS, true}, {0, 0, "g2", 11, 14, NS, true}, {0, 0, "g3", 22, 14, NS, true}, {0, "Esc", "esc", 38, 14, NS, true}, {0, 0, "f1", 58, 14, NS, true}, {0, 0, "f2", 70, 14, NS, true}, {0, 0, "f3", 82, 14, NS, true}, {0, 0, "f4", 94, 14, NS, true}, {0, 0, "f5", 114, 14, NS, true}, {0, 0, "f6", 126, 14, NS, true}, {0, 0, "f7", 138, 14, NS, true}, {0, 0, "f8", 150, 14, NS, true}, {0, 0, "f9", 170, 14, NS, true}, {0, 0, "f10", 182, 14, NS, true}, {0, 0, "f11", 194, 14, NS, true}, {0, 0, "f12", 206, 14, NS, true}, {0, "Print Screen\nSysRq", "prtscn", 222, 14, NS, true}, {0, "Scroll Lock", "scroll", 234, 14, NS, true}, {0, "Pause\nBreak", "pause", 246, 14, NS, true}, {0, "Stop", "stop", 262, 14, 12, 8, true}, {0, "Previous", "prev", 273, 14, 13, 8, true}, {0, "Play/Pause", "play", 285, 14, 13, 8, true}, {0, "Next", "next", 296, 14, 12, 8, true},
     {0, 0, "g4", 0, 25, NS, true}, {0, 0, "g5", 11, 25, NS, true}, {0, 0, "g6", 22, 25, NS, true}, {0, "`", "grave", 38, 27, NS, true}, {0, 0, "1", 50, 27, NS, true}, {0, 0, "2", 62, 27, NS, true}, {0, 0, "3", 74, 27, NS, true}, {0, 0, "4", 86, 27, NS, true}, {0, 0, "5", 98, 27, NS, true}, {0, 0, "6", 110, 27, NS, true}, {0, 0, "7", 122, 27, NS, true}, {0, 0, "8", 134, 27, NS, true}, {0, 0, "9", 146, 27, NS, true}, {0, 0, "0", 158, 27, NS, true}, {0, "-", "minus", 170, 27, NS, true}, {0, "=", "equal", 182, 27, NS, true}, {0, "Backspace", "bspace", 200, 27, 24, 12, true}, {0, "Insert", "ins", 222, 27, NS, true}, {0, "Home", "home", 234, 27, NS, true}, {0, "Page Up", "pgup", 246, 27, NS, true}, {0, "Num Lock", "numlock", 261, 27, NS, true}, {0, "NumPad /", "numslash", 273, 27, NS, true}, {0, "NumPad *", "numstar", 285, 27, NS, true}, {0, "NumPad -", "numminus", 297, 27, NS, true},
@@ -17,6 +16,7 @@ static const Key K95Keys[KEYCOUNT_K95] = {
     {0, 0, "g13", 0, 64, NS, true}, {0, 0, "g14", 11, 64, NS, true}, {0, 0, "g15", 22, 64, NS, true}, {0, "Left Shift", "lshift", 39, 63, 14, 12, true}, {"bslash", "\\", "bslash_iso", 53, 63, NS, true}, {0, 0, "z", 65, 63, NS, true}, {0, 0, "x", 77, 63, NS, true}, {0, 0, "c", 89, 63, NS, true}, {0, 0, "v", 101, 63, NS, true}, {0, 0, "b", 113, 63, NS, true}, {0, 0, "n", 125, 63, NS, true}, {0, 0, "m", 137, 63, NS, true}, {0, ",", "comma", 149, 63, NS, true}, {0, ".", "dot", 161, 63, NS, true}, {0, "/", "slash", 173, 63, NS, true}, {0, "Right Shift", "rshift", 196, 63, 32, 12, true}, {0, "Up", "up", 234, 63, NS, true}, {0, "NumPad 1", "num1", 261, 63, NS, true}, {0, "NumPad 2", "num2", 273, 63, NS, true}, {0, "NumPad 3", "num3", 285, 63, NS, true}, {0, "NumPad Enter", "numenter", 297, 69, 12, 24, true},
     {0, 0, "g16", 0, 75, NS, true}, {0, 0, "g17", 11, 75, NS, true}, {0, 0, "g18", 22, 75, NS, true}, {0, "Left Ctrl", "lctrl", 40, 75, 16, 12, true}, {0, "Left Windows", "lwin", 54, 75, NS, true}, {0, "Left Alt", "lalt", 67, 75, 14, 12, true}, {0, "Space", "space", 116, 75, 84, 12, true}, {0, "Right Alt", "ralt", 165, 75, 14, 12, true}, {0, "Right Windows", "rwin", 178, 75, NS, true}, {0, "Menu", "rmenu", 190, 75, NS, true}, {0, "Right Ctrl", "rctrl", 204, 75, 16, 12, true}, {0, "Left", "left", 222, 75, NS, true}, {0, "Down", "down", 234, 75, NS, true}, {0, "Right", "right", 246, 75, NS, true}, {0, "NumPad 0", "num0", 267, 75, 24, 12, true}, {0, "NumPad .", "numdot", 285, 75, NS, true}
 };
+#define KEYCOUNT_K95 (sizeof(K95Keys) / sizeof(Key))
 
 // ANSI layouts use a different Enter/LShift key
 #define ANSI_ENTER_X    199
@@ -109,15 +109,28 @@ static void patchANSI(QHash<QString, Key>& map){
 #define K65_WIDTH       209
 #define K65_HEIGHT      K70_HEIGHT
 
-const Key K65TopRow[] = {
+static const Key K65TopRow[] = {
     {0, "Brightness", "light", 164 - K70_X_START, 0, 12, 12, true}, {0, "Mute", "mute", 176 - K70_X_START, 0, 12, 12, true}, {0, "Volume Down", "voldn", 192 - K70_X_START, 0, 14, 8, true}, {0, "Volume Up", "volup", 205 - K70_X_START, 0, 14, 8, true}, {0, "Windows Lock", "lock", 222 - K70_X_START, 0, 12, 12, true}
 };
 #define K65_TOP_COUNT (sizeof(K65TopRow) / sizeof(Key))
 
+// Mouse map
+static const Key M65Keys[] = {
+    {0, "Left Mouse", "mousel", 12, 0, 14, 32, false}, {0, "Right Mouse", "mouser", 34, 0, 14, 32, false}, {0, "Middle Mouse", "mousem", 26, 8, 8, 8, false},
+    {0, "Wheel Up", "wheelup", 26, 2, 8, 6, false}, {0, "Wheel Down", "wheeldn", 26, 16, 8, 6, false}, {0, "Wheel Light", "front", 26, 20, 8, 4, true},
+    {0, "DPI Up", "dpiup", 26, 20, 8, 4, false}, {0, "DPI Light", "dpi", 26, 24, 8, 8, true}, {0, "DPI Down", "dpidn", 26, 32, 8, 6, false},
+    {0, "Forward", "mouses1", 8, 28, 4, 8, false}, {0, "Back", "mouses2", 8, 36, 4, 8, false}, {0, "Sniper", "sniper", 0, 29, 4, 10, false},
+    {0, "Logo", "back", 12, 55, 36, 12, true}
+};
+#define KEYCOUNT_M65 (sizeof(M65Keys) / sizeof(Key))
+
+#define M65_WIDTH       48
+#define M65_HEIGHT      68
+
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
 #define N_LAYOUTS   KeyMap::_LAYOUT_MAX
-static QHash<QString, Key> K95BaseMap;
+static QHash<QString, Key> K95BaseMap, M65BaseMap;
 static QHash<QString, Key> standardMaps[N_MODELS][N_LAYOUTS];
 static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     if(model < 0 || layout < 0 || model >= N_MODELS || layout >= N_LAYOUTS)
@@ -129,7 +142,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     // Otherwise, create it
     switch(model){
     case KeyMap::K95:{
-        // The K95 maps serve as bases for all the other devices
+        // The K95 maps serve as bases for all the other keyboards
         // Fetch the master map, or create it if not yet done
         if(K95BaseMap.empty()){
             for(const Key* key = K95Keys; key < K95Keys + KEYCOUNT_K95; key++)
@@ -194,6 +207,20 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         for(const Key* key = K65TopRow; key < K65TopRow + K65_TOP_COUNT; key++)
             map[key->name] = *key;
         // Done!
+        break;
+    }
+    case KeyMap::M65:{
+        // M65 isn't a keyboard; it has its own base
+        for(const Key* key = M65Keys; key < M65Keys + KEYCOUNT_M65; key++){
+            // Keyboard keys are written from the center because that's where the LEDs are, but the mouse buttons are odd shapes so they're
+            // written from the upper left
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            M65BaseMap[key->name] = translatedKey;
+        }
+        map = M65BaseMap;
+        // Mice have no layout patches - no other changes necessary
         break;
     }
     default:;    // <- stop GCC from complaining
@@ -274,6 +301,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70;
     if(lower == "k95")
         return K95;
+    if(lower == "m65")
+        return M65;
     return NO_MODEL;
 }
 
@@ -285,6 +314,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70";
     case K95:
         return "k95";
+    case M65:
+        return "m65";
     default:
         return "";
     }
@@ -299,8 +330,8 @@ KeyMap KeyMap::fromName(const QString &name){
 
 KeyMap::KeyMap(Model _keyModel, Layout _keyLayout) :
     _keys(getMap(_keyModel, _keyLayout)),
-    keyWidth(_keyModel == K95 ? K95_WIDTH : _keyModel == K70 ? K70_WIDTH : _keyModel == K65 ? K65_WIDTH : 0),
-    keyHeight(_keyModel == K95 || _keyModel == K70 || _keyModel == K65 ? K95_HEIGHT : 0),
+    keyWidth(_keyModel == K95 ? K95_WIDTH : _keyModel == K70 ? K70_WIDTH : _keyModel == K65 ? K65_WIDTH : _keyModel == M65 ? M65_WIDTH : 0),
+    keyHeight(_keyModel == K95 || _keyModel == K70 || _keyModel == K65 ? K95_HEIGHT : _keyModel == M65 ? M65_HEIGHT : 0),
     keyModel(_keyModel), keyLayout(_keyLayout)
 {}
 

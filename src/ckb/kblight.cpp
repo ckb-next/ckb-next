@@ -57,6 +57,8 @@ int KbLight::shareDimming(){
 }
 
 void KbLight::shareDimming(int newShareDimming){
+    if(_shareDimming == newShareDimming)
+        return;
     _shareDimming = newShareDimming;
     if(newShareDimming != -1){
         foreach(KbLight* light, activeLights)
@@ -66,7 +68,7 @@ void KbLight::shareDimming(int newShareDimming){
 
 void KbLight::dimming(int newDimming){
     if(_shareDimming != -1)
-        _shareDimming = newDimming;
+        shareDimming(newDimming);
     _needsSave = true;
     _dimming = newDimming;
     emit updated();
@@ -205,10 +207,10 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
         lastFrameSignal = timestamp;
     }
 
-    // If brightness is at 0%, turn off lighting entirely
     cmd.write(QString().sprintf("mode %d switch", modeIndex + 1).toLatin1());
+    // If brightness is at 0%, turn off lighting entirely
     if(_dimming == 3){
-        cmd.write(" rgb off");
+        cmd.write(" rgb 000000");
         return;
     }
 

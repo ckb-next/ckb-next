@@ -9,14 +9,12 @@
 #define INCOMPLETE (IOHIDDeviceRef)-1l
 
 int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
-    if(!kb->handle || !HAS_FEATURES(kb, FEAT_RGB))
-        return -1;
     for(int i = 0; i < count; i++){
         DELAY_SHORT;
         IOReturn res = IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, messages + MSG_SIZE * i, MSG_SIZE);
         kb->lastError = res;
         if(res != kIOReturnSuccess && res != 0xe0004051){   // Can't find e0004051 documented, but it seems to be a harmless error, so ignore it.
-            printf("usbsend (%s:%d): Got return value 0x%x\n", file, line, res);
+            ckb_err_fn("Got return value 0x%x\n", file, line, res);
             return 0;
         }
     }
@@ -24,18 +22,16 @@ int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int li
 }
 
 int _usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
-    if(!IS_CONNECTED(kb) || !HAS_FEATURES(kb, FEAT_RGB))
-        return -1;
     DELAY_MEDIUM;
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
     kb->lastError = res;
     if(res != kIOReturnSuccess && res != 0xe0004051){
-        printf("usbrecv (%s:%d): Got return value 0x%x\n", file, line, res);
+        ckb_err_fn("Got return value 0x%x\n", file, line, res);
         return 0;
     }
     if(length != MSG_SIZE)
-        printf("usbrecv (%s:%d): Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
+        ckb_err_fn("Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
     return length;
 }
 
@@ -67,15 +63,10 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
 }
 
 void usbremove(void* context, IOReturn result, void* sender){
-    pthread_mutex_lock(&kblistmutex);
     usbdevice* kb = context;
-    for(int i = 0; i < DEV_MAX; i++){
-        if(keyboard + i == kb){
-            pthread_mutex_lock(&keyboard[i].mutex);
-            closeusb(keyboard + i);
-        }
-    }
-    pthread_mutex_unlock(&kblistmutex);
+    pthread_mutex_lock(dmutex(kb));
+    closeusb(kb);
+    pthread_mutex_unlock(dmutex(kb));
 }
 
 void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
@@ -84,41 +75,37 @@ void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportTyp
         switch(length){
         case 8:
             // RGB EP 1: 6KRO (BIOS mode) input
-            hid_translate(kb->kbinput, -1, 8, kb->urbinput);
-            inputupdate(kb);
+            hid_kb_translate(kb->input.keys, -1, length, data);
             break;
         case 21:
         case 5:
             // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
             if(!kb->active){
-                hid_translate(kb->kbinput, -2, 21, kb->urbinput + 8);
-                inputupdate(kb);
+                hid_kb_translate(kb->input.keys, -2, length, data);
             }
             break;
         case MSG_SIZE:
             // RGB EP 3: Corsair input
-            inputupdate(kb);
+            memcpy(kb->input.keys, data, N_KEYBYTES_KB);
             break;
         }
     } else {
         switch(length){
         case 8:
             // Non-RGB EP 1: 6KRO input
-            hid_translate(kb->kbinput, 1, 8, kb->urbinput);
-            inputupdate(kb);
+            hid_kb_translate(kb->input.keys, 1, length, data);
             break;
         case 4:
             // Non-RGB EP 2: media keys
-            hid_translate(kb->kbinput, 2, 4, kb->urbinput + 8);
-            inputupdate(kb);
+            hid_kb_translate(kb->input.keys, 2, length, data);
             break;
         case 15:
             // Non-RGB EP 3: NKRO input
-            hid_translate(kb->kbinput, 3, 15, kb->urbinput + 8 + 4);
-            inputupdate(kb);
+            hid_kb_translate(kb->input.keys, 3, length, data);
             break;
         }
     }
+    inputupdate(kb);
 }
 
 void openusb(usbdevice* kb, short vendor, short product){
@@ -134,9 +121,6 @@ void openusb(usbdevice* kb, short vendor, short product){
     int setup = setupusb(kb, vendor, product);
     if(setup == -1 || (setup && usb_tryreset(kb))){
         closehandle(kb);
-        pthread_mutex_unlock(&kb->mutex);
-        pthread_mutex_destroy(&kb->mutex);
-        pthread_mutex_destroy(&kb->keymutex);
         return;
     }
 
@@ -147,7 +131,7 @@ void openusb(usbdevice* kb, short vendor, short product){
     else
         IOHIDDeviceRegisterInputReportCallback(kb->handles[1], kb->urbinput + 8, 4, reportcallback, kb);
     if(IS_RGB(vendor, product))
-        IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->kbinput, MSG_SIZE, reportcallback, kb);
+        IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->urbinput + 8 + 21, MSG_SIZE, reportcallback, kb);
     else
         IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->urbinput + 8 + 4, 15, reportcallback, kb);
 
@@ -158,8 +142,7 @@ void openusb(usbdevice* kb, short vendor, short product){
     updateconnected();
     notifyconnect(kb, 1);
     int index = INDEX_OF(kb, keyboard);
-    printf("Device ready at %s%d\n", devpath, index);
-    pthread_mutex_unlock(&kb->mutex);
+    ckb_info("Device ready at %s%d\n", devpath, index);
 }
 
 long usbgetvalue(IOHIDDeviceRef device, CFStringRef key){
@@ -186,36 +169,43 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     if(!IS_RGB(idvendor, idproduct))
         fwversion = usbgetvalue(device, CFSTR(kIOHIDVersionNumberKey));
 
-    pthread_mutex_lock(&kblistmutex);
+    pthread_mutex_lock(&devlistmutex);
     // A single keyboard will generate multiple match events, so each handle has to be added to the board separately.
     // Look for any partially-set up boards matching this serial number
     int index = -1;
     for(int i = 1; i < DEV_MAX; i++){
-        if(!strcmp(keyboard[i].profile.serial, serial) && keyboard[i].handle == INCOMPLETE){
+        pthread_mutex_lock(devmutex + i);
+        if(!strcmp(keyboard[i].serial, serial) && keyboard[i].handle == INCOMPLETE){
             index = i;
+            // Device mutex remains locked
             break;
         }
+        pthread_mutex_unlock(devmutex + i);
     }
     // If none was found, grab the first free device
     if(index == -1){
         for(int i = 1; i < DEV_MAX; i++){
+            pthread_mutex_lock(devmutex + i);
             if(!keyboard[i].handle){
                 // Mark the device as in use and print out a message
                 index = i;
                 keyboard[i].handle = INCOMPLETE;
                 keyboard[i].fwversion = fwversion;
-                strcpy(keyboard[i].profile.serial, serial);
+                strcpy(keyboard[i].serial, serial);
                 CFTypeRef cfname = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductKey));
                 if(cfname && CFGetTypeID(cfname) == CFStringGetTypeID())
-                    CFStringGetCString(cfname, keyboard[i].name, NAME_LEN, kCFStringEncodingASCII);
-                printf("Connecting %s (S/N: %s)\n", keyboard[i].name, keyboard[i].profile.serial);
+                    CFStringGetCString(cfname, keyboard[i].name, KB_NAME_LEN, kCFStringEncodingASCII);
+                ckb_info("Connecting %s (S/N: %s)\n", keyboard[i].name, keyboard[i].serial);
+                // Device mutex remains locked
                 break;
             }
+            pthread_mutex_unlock(devmutex + i);
         }
     }
     if(index == -1){
-        printf("Error: No free devices\n");
-        pthread_mutex_unlock(&kblistmutex);
+        ckb_err("No free devices\n");
+        // No device mutex locked, main list still locked
+        pthread_mutex_unlock(&devlistmutex);
         return;
     }
     usbdevice* kb = keyboard + index;
@@ -241,13 +231,14 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
             || (input == 64 && output == 64 && feature == 64))          // FW >= 1.20
         kb->handles[3] = device;
     else
-        printf("Warning: Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
+        ckb_warn("Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
 
     // If all handles have been set up, finish initializing the keyboard
     if(kb->handles[0] && kb->handles[1] && kb->handles[2]
             && (kb->handles[3] || !IS_RGB(idvendor, idproduct)))
         openusb(kb, (short)idvendor, (short)idproduct);
-    pthread_mutex_unlock(&kblistmutex);
+    pthread_mutex_unlock(devmutex + index);
+    pthread_mutex_unlock(&devlistmutex);
 }
 
 static IOHIDManagerRef usbmanager = 0;
@@ -259,7 +250,7 @@ extern void* krthread(void* context);
 int usbmain(){
     // Create the device manager
     if(!(usbmanager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeSeizeDevice))){
-        printf("Fatal: Failed to create device manager\n");
+        ckb_fatal("Failed to create device manager\n");
         return -1;
     }
     // Tell the device manager which devices we want to look for

@@ -19,7 +19,7 @@ int getfwversion(usbdevice* kb){
     if(!usbrecv(kb, in_pkt))
         return -1;
     if(in_pkt[0] != 0x0e || in_pkt[1] != 0x01){
-        printf("Error: %s:%d: Bad input header\n", __FILE_NOPATH__, __LINE__);
+        ckb_err("Bad input header\n");
         return -1;
     }
     short vendor, product, version, bootloader;
@@ -31,9 +31,9 @@ int getfwversion(usbdevice* kb){
     uchar poll = in_pkt[16];
     // Print a warning if the vendor or product isn't what it should be
     if(vendor != kb->vendor)
-        printf("getfwversion (%s:%d): Got vendor ID %04x (expected %04x)\n", __FILE_NOPATH__, __LINE__, vendor, kb->vendor);
+        ckb_warn("Got vendor ID %04x (expected %04x)\n", vendor, kb->vendor);
     if(product != kb->product)
-        printf("getfwversion (%s:%d): Got product ID %04x (expected %04x)\n", __FILE_NOPATH__, __LINE__, product, kb->product);
+        ckb_warn("Got product ID %04x (expected %04x)\n", product, kb->product);
     // Set firmware version and poll rate
     if(version == 0 || bootloader == 0){
         // Needs firmware update
@@ -56,12 +56,12 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     char* fwdata = calloc(1, FW_MAXSIZE + 256);
     int fd = open(path, O_RDONLY);
     if(fd <= 0){
-        printf("fupdate (%s:%d): Failed to open firmware file %s: %s\n", __FILE_NOPATH__, __LINE__, path, strerror(errno));
+        ckb_err("Failed to open firmware file %s: %s\n", path, strerror(errno));
         return FW_NOFILE;
     }
     ssize_t length = read(fd, fwdata, FW_MAXSIZE);
     if(length <= 0x108 || length >= FW_MAXSIZE){
-        printf("fwupdate (%s:%d): Failed to read firmware file %s: %s\n", __FILE_NOPATH__, __LINE__, path, length <= 0 ? strerror(errno) : "Wrong size");
+        ckb_err("Failed to read firmware file %s: %s\n", path, length <= 0 ? strerror(errno) : "Wrong size");
         close(fd);
         return FW_NOFILE;
     }
@@ -74,10 +74,10 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     memcpy(&version, fwdata + 0x106, 2);
     // Check against the actual device
     if(vendor != kb->vendor || product != kb->product){
-        printf("fwupdate (%s:%d): Firmware file %s doesn't match device (V: %04x P: %04x)\n", __FILE_NOPATH__, __LINE__, path, vendor, product);
+        ckb_err("Firmware file %s doesn't match device (V: %04x P: %04x)\n", path, vendor, product);
         return FW_WRONGDEV;
     }
-    printf("Loading firmware version %04x from %s\n", version, path);
+    ckb_info("Loading firmware version %04x from %s\n", version, path);
     nprintf(kb, nnumber, 0, "fwupdate %s 0/%d\n", path, (int)length);
     // Send the firmware messages (256 bytes at a time)
     uchar data_pkt[7][MSG_SIZE] = {
@@ -112,13 +112,13 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         }
         if(index == 1){
             if(!usbsend(kb, data_pkt[0], 1)){
-                printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
+                ckb_err("Firmware update failed\n");
                 return FW_USBFAIL;
             }
             // The above packet can take a lot longer to process, so wait for a while
             sleep(3);
             if(!usbsend(kb, data_pkt[2], npackets - 1)){
-                printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
+                ckb_err("Firmware update failed\n");
                 return FW_USBFAIL;
             }
         } else {
@@ -126,7 +126,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
             if(output >= length)
                 data_pkt[npackets][2] = length - last;
             if(!usbsend(kb, data_pkt[1], npackets)){
-                printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
+                ckb_err("Firmware update failed\n");
                 return FW_USBFAIL;
             }
         }
@@ -138,17 +138,17 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         { 0x07, 0x02, 0xf0, 0 }
     };
     if(!usbsend(kb, data_pkt2[0], 2)){
-        printf("fwupdate (%s:%d): Firmware update failed\n", __FILE_NOPATH__, __LINE__);
+        ckb_err("Firmware update failed\n");
         return FW_USBFAIL;
     }
     // Updated successfully
     kb->fwversion = version;
     writefwnode(kb);
-    printf("Firmware update complete\n");
+    ckb_info("Firmware update complete\n");
     return FW_OK;
 }
 
-int cmd_fwupdate(usbdevice* kb, int nnumber, const char* path){
+int cmd_fwupdate(usbdevice* kb, usbmode* dummy1, int nnumber, int dummy2, const char* path){
     if(!HAS_FEATURES(kb, FEAT_FWUPDATE))
         return 0;
     // Update the firmware

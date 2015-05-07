@@ -4,41 +4,37 @@
 
 int macromask(const uchar* key1, const uchar* key2){
     // Scan a macro against key input. Return 0 if any of them don't match
-    for(int i = 0; i < N_KEYS / 8; i++){
+    for(int i = 0; i < N_KEYS_INPUT / 8; i++){
         if((key1[i] & key2[i]) != key2[i])
             return 0;
     }
     return 1;
 }
 
-void inputupdate(usbdevice* kb){
-#ifdef OS_LINUX
-    if(!kb->uinput)
-        return;
-#else
-    if(!kb->event)
-        return;
-#endif
-    pthread_mutex_lock(&kb->keymutex);
-    usbmode* mode = kb->profile.currentmode;
+static void inputupdate_keys(usbdevice* kb){
+    usbmode* mode = kb->profile->currentmode;
     keybind* bind = &mode->bind;
+    devinput* input = &kb->input;
     // Don't do anything if the state hasn't changed
-    if(!memcmp(kb->prevkbinput, kb->kbinput, N_KEYS / 8)){
-        pthread_mutex_unlock(&kb->keymutex);
+    if(!memcmp(input->prevkeys, input->keys, N_KEYBYTES_INPUT))
         return;
-    }
     // Look for macros matching the current state
     int macrotrigger = 0;
     if(kb->active){
         for(int i = 0; i < bind->macrocount; i++){
             keymacro* macro = &bind->macros[i];
-            if(macromask(kb->kbinput, macro->combo)){
+            if(macromask(input->keys, macro->combo)){
                 if(!macro->triggered){
                     macrotrigger = 1;
                     macro->triggered = 1;
                     // Send events for each keypress in the macro
-                    for(int a = 0; a < macro->actioncount; a++)
-                        os_keypress(kb, macro->actions[a].scan, macro->actions[a].down);
+                    for(int a = 0; a < macro->actioncount; a++){
+                        macroaction* action = macro->actions + a;
+                        if(action->rel_x != 0 || action->rel_y != 0)
+                            os_mousemove(kb, action->rel_x, action->rel_y);
+                        else
+                            os_keypress(kb, action->scan, action->down);
+                    }
                 }
             } else {
                 macro->triggered = 0;
@@ -48,15 +44,18 @@ void inputupdate(usbdevice* kb){
     // Make a list of keycodes to send. Rearrange them so that modifier keydowns always come first
     // and modifier keyups always come last. This ensures that shortcut keys will register properly
     // even if both keydown events happen at once.
-    // N_KEYS + 2 is used because the volume wheel generates keydowns and keyups at the same time
-    int events[N_KEYS + 2];
+    // N_KEYS + 4 is used because the volume wheel generates keydowns and keyups at the same time
+    // (it's currently impossible to press all four at once, but safety first)
+    int events[N_KEYS_INPUT + 4];
     int modcount = 0, keycount = 0, rmodcount = 0;
-    for(int byte = 0; byte < N_KEYS / 8; byte++){
-        char oldb = kb->prevkbinput[byte], newb = kb->kbinput[byte];
+    for(int byte = 0; byte < N_KEYBYTES_INPUT; byte++){
+        char oldb = input->prevkeys[byte], newb = input->keys[byte];
         if(oldb == newb)
             continue;
         for(int bit = 0; bit < 8; bit++){
             int keyindex = byte * 8 + bit;
+            if(keyindex >= N_KEYS_INPUT)
+                break;
             const key* map = keymap + keyindex;
             int scancode = (kb->active) ? bind->base[keyindex] : map->scan;
             char mask = 1 << bit;
@@ -64,7 +63,7 @@ void inputupdate(usbdevice* kb){
             // If the key state changed, send it to the input device
             if(old != new){
                 // Don't echo a key press if a macro was triggered or if there's no scancode associated
-                if(!macrotrigger && scancode >= 0){
+                if(!macrotrigger && !(scancode & SCAN_SILENT)){
                     if(IS_MOD(scancode)){
                         if(new){
                             // Modifier down: Add to the end of modifier keys
@@ -82,12 +81,13 @@ void inputupdate(usbdevice* kb){
                         for(int i = rmodcount; i > 0; i--)
                             events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                         events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
-                        // The volume wheel doesn't generate keyups, so create them automatically
-                        if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && !IS_K65(kb)){
+                        // The volume wheel and the mouse wheel don't generate keyups, so create them automatically
+#define IS_WHEEL(scan, kb)  (((scan) == KEY_VOLUMEUP || (scan) == KEY_VOLUMEDOWN || (scan) == BTN_WHEELUP || (scan) == BTN_WHEELDOWN) && !IS_K65(kb))
+                        if(new && IS_WHEEL(map->scan, kb)){
                             for(int i = rmodcount; i > 0; i--)
                                 events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                             events[modcount + keycount++] = -(scancode + 1);
-                            kb->kbinput[byte] &= ~mask;
+                            input->keys[byte] &= ~mask;
                         }
                     }
                 }
@@ -96,8 +96,8 @@ void inputupdate(usbdevice* kb){
                     for(int notify = 0; notify < OUTFIFO_MAX; notify++){
                         if(mode->notify[notify][byte] & mask){
                             nprintkey(kb, notify, keyindex, new);
-                            // Volume wheel doesn't generate keyups
-                            if(new && (map->scan == KEY_VOLUMEUP || map->scan == KEY_VOLUMEDOWN) && !IS_K65(kb))
+                            // Wheels doesn't generate keyups
+                            if(new && IS_WHEEL(map->scan, kb))
                                 nprintkey(kb, notify, keyindex, 0);
                         }
                     }
@@ -111,21 +111,37 @@ void inputupdate(usbdevice* kb){
         int scancode = events[i];
         os_keypress(kb, (scancode < 0 ? -scancode : scancode) - 1, scancode > 0);
     }
-    os_kpsync(kb);
-    memcpy(kb->prevkbinput, kb->kbinput, N_KEYS / 8);
-    pthread_mutex_unlock(&kb->keymutex);
 }
 
-void updateindicators(usbdevice* kb, int force){
-    if(!IS_CONNECTED(kb))
+void inputupdate(usbdevice* kb){
+#ifdef OS_LINUX
+    if(!kb->uinput
+#else
+    if(!kb->event
+#endif
+            || !kb->profile)
         return;
+    // Process key/button input
+    inputupdate_keys(kb);
+    // Process mouse movement
+    devinput* input = &kb->input;
+    if(input->rel_x != 0 || input->rel_y != 0){
+        os_mousemove(kb, input->rel_x, input->rel_y);
+        input->rel_x = input->rel_y = 0;
+    }
+    // Finish up
+    os_isync(kb);
+    memcpy(input->prevkeys, input->keys, N_KEYBYTES_INPUT);
+}
+
+void updateindicators_kb(usbdevice* kb, int force){
     uchar old = kb->ileds;
     os_updateindicators(kb, force);
     // Print notifications if desired
-    uchar new = kb->ileds;
-    usbmode* mode = kb->profile.currentmode;
-    if(!mode || !kb->active)
+    if(!kb->active)
         return;
+    uchar new = kb->ileds;
+    usbmode* mode = kb->profile->currentmode;
     uchar indicators[] = { I_NUM, I_CAPS, I_SCROLL };
     for(unsigned i = 0; i < sizeof(indicators) / sizeof(uchar); i++){
         uchar mask = indicators[i];
@@ -138,15 +154,15 @@ void updateindicators(usbdevice* kb, int force){
     }
 }
 
-void initbind(keybind* bind, const key* keymap){
-    for(int i = 0; i < N_KEYS; i++)
+void initbind(keybind* bind){
+    for(int i = 0; i < N_KEYS_INPUT; i++)
         bind->base[i] = keymap[i].scan;
     bind->macros = calloc(32, sizeof(keymacro));
     bind->macrocap = 32;
     bind->macrocount = 0;
 }
 
-void closebind(keybind* bind){
+void freebind(keybind* bind){
     for(int i = 0; i < bind->macrocount; i++)
         free(bind->macros[i].actions);
     free(bind->macros);
@@ -154,31 +170,52 @@ void closebind(keybind* bind){
 }
 
 void cmd_bind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
+    if(keyindex >= N_KEYS_INPUT)
+        return;
     // Find the key to bind to
     int tocode = 0;
-    if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1){
+    if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1 && tocode < N_KEYS_INPUT){
+        pthread_mutex_lock(imutex(kb));
         mode->bind.base[keyindex] = tocode;
+        pthread_mutex_unlock(imutex(kb));
         return;
     }
     // If not numeric, look it up
-    for(int i = 0; i < N_KEYS; i++){
+    for(int i = 0; i < N_KEYS_INPUT; i++){
         if(keymap[i].name && !strcmp(to, keymap[i].name)){
+            pthread_mutex_lock(imutex(kb));
             mode->bind.base[keyindex] = keymap[i].scan;
+            pthread_mutex_unlock(imutex(kb));
             return;
         }
     }
 }
 
 void cmd_unbind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
+    if(keyindex >= N_KEYS_INPUT)
+        return;
+    pthread_mutex_lock(imutex(kb));
     mode->bind.base[keyindex] = KEY_UNBOUND;
+    pthread_mutex_unlock(imutex(kb));
 }
 
 void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
+    if(keyindex >= N_KEYS_INPUT)
+        return;
+    pthread_mutex_lock(imutex(kb));
     mode->bind.base[keyindex] = keymap[keyindex].scan;
+    pthread_mutex_unlock(imutex(kb));
 }
 
-void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assignment){
+static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
     keybind* bind = &mode->bind;
+    if(!keys && !assignment){
+        // Null strings = "macro clear" -> erase the whole thing
+        for(int i = 0; i < bind->macrocount; i++)
+            free(bind->macros[i].actions);
+        bind->macrocount = 0;
+        return;
+    }
     if(bind->macrocount >= MACRO_MAX)
         return;
     // Create a key macro
@@ -191,14 +228,14 @@ void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assig
     char keyname[12];
     while(position < left && sscanf(keys + position, "%10[^+]%n", keyname, &field) == 1){
         int keycode;
-        if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
-                  || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
+        if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)
+                  || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)){
             // Set a key numerically
             SET_KEYBIT(macro.combo, keycode);
             empty = 0;
         } else {
             // Find this key in the keymap
-            for(unsigned i = 0; i < N_KEYS; i++){
+            for(unsigned i = 0; i < N_KEYS_INPUT; i++){
                 if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
                     macro.combo[i / 8] |= 1 << (i % 8);
                     empty = 0;
@@ -229,15 +266,15 @@ void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assig
         int down = (keyname[0] == '+');
         if(down || keyname[0] == '-'){
             int keycode;
-            if((sscanf(keyname + 1, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS)
-                      || (sscanf(keyname + 1, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS)){
+            if((sscanf(keyname + 1, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)
+                      || (sscanf(keyname + 1, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)){
                 // Set a key numerically
                 macro.actions[macro.actioncount].scan = keymap[keycode].scan;
                 macro.actions[macro.actioncount].down = down;
                 macro.actioncount++;
             } else {
                 // Find this key in the keymap
-                for(unsigned i = 0; i < N_KEYS; i++){
+                for(unsigned i = 0; i < N_KEYS_INPUT; i++){
                     if(keymap[i].name && !strcmp(keyname + 1, keymap[i].name)){
                         macro.actions[macro.actioncount].scan = keymap[i].scan;
                         macro.actions[macro.actioncount].down = down;
@@ -254,7 +291,7 @@ void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assig
     // See if there's already a macro with this trigger
     keymacro* macros = bind->macros;
     for(int i = 0; i < bind->macrocount; i++){
-        if(!memcmp(macros[i].combo, macro.combo, N_KEYS / 8)){
+        if(!memcmp(macros[i].combo, macro.combo, N_KEYBYTES_INPUT)){
             free(macros[i].actions);
             // If the new macro has no actions, erase the existing one
             if(!macro.actioncount){
@@ -276,9 +313,8 @@ void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assig
         bind->macros = realloc(bind->macros, (bind->macrocap += 16) * sizeof(keymacro));
 }
 
-void cmd_macroclear(usbdevice* kb, usbmode* mode){
-    keybind* bind = &mode->bind;
-    for(int i = 0; i < bind->macrocount; i++)
-        free(bind->macros[i].actions);
-    bind->macrocount = 0;
+void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assignment){
+    pthread_mutex_lock(imutex(kb));
+    _cmd_macro(mode, keys, assignment);
+    pthread_mutex_unlock(imutex(kb));
 }

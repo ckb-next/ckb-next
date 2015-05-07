@@ -1,7 +1,9 @@
+#include "device.h"
 #include "includes.h"
-#include "keyboard.h"
+#include "keymap.h"
 
-const key keymap[N_KEYS] = {
+const key keymap[N_KEYS_EXTENDED] = {
+    // Keyboard keys
     { "esc",        0x00, KEY_ESC },
     { "f1",         0x0c, KEY_F1 },
     { "f2",         0x18, KEY_F2 },
@@ -145,10 +147,48 @@ const key keymap[N_KEYS] = {
     { "g15",        0x6b, KEY_CORSAIR },
     { "g16",        0x77, KEY_CORSAIR },
     { "g17",        0x83, KEY_CORSAIR },
-    { "g18",        0x8f, KEY_CORSAIR }
+    { "g18",        0x8f, KEY_CORSAIR },
+
+    // Keys not present on any device
+    { "lightup",    -1, KEY_BRIGHTNESSUP },
+    { "lightdn",    -1, KEY_BRIGHTNESSDOWN },
+    { "eject",      -1, KEY_EJECTCD },
+    { "power",      -1, KEY_POWER },
+    { "f13",        -1, KEY_F13 },
+    { "f14",        -1, KEY_F14 },
+    { "f15",        -1, KEY_F15 },
+    { "f16",        -1, KEY_F16 },
+    { "f17",        -1, KEY_F17 },
+    { "f18",        -1, KEY_F18 },
+    { "f19",        -1, KEY_F19 },
+    { "f20",        -1, KEY_F20 },
+
+    // Mouse buttons
+    { "mousel",     -1, SCAN_MOUSE | BTN_LEFT },
+    { "mouser",     -1, SCAN_MOUSE | BTN_RIGHT },
+    { "mousem",     -1, SCAN_MOUSE | BTN_MIDDLE },
+    { "mouses1",    -1, SCAN_MOUSE | BTN_SIDE },
+    { "mouses2",    -1, SCAN_MOUSE | BTN_EXTRA },
+    { "dpiup",      -1, KEY_CORSAIR },
+    { "dpidn",      -1, KEY_CORSAIR },
+    { "sniper",     -1, KEY_CORSAIR },
+    { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },
+    { "wheeldn",    -1, SCAN_MOUSE | BTN_WHEELDOWN },
+
+    // RGB mouse zones
+    { "front",      LED_MOUSE, KEY_NONE },
+    { "back",       LED_MOUSE + 1, KEY_NONE },
+    { "dpi",        LED_MOUSE + 2, KEY_NONE },  // SW DPI light
+    { "dpi1",       LED_MOUSE + 4, KEY_NONE },  // HW DPI lights
+    { "dpi2",       LED_MOUSE + 5, KEY_NONE },
+    { "dpi3",       LED_MOUSE + 6, KEY_NONE },
+    { "dpi4",       LED_MOUSE + 7, KEY_NONE },
+    { "dpi5",       LED_MOUSE + 8, KEY_NONE },
+    { "dpis",       LED_MOUSE + 9, KEY_NONE },
+    { "dpio",       LED_MOUSE + 10, KEY_NONE },
 };
 
-void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput){
+void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput){
     // LUT for HID -> Corsair scancodes (-1 for no scan code, -2 for currently unsupported)
     // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with array indices and K95 keys added
     static const short hid_codes[256] = {
@@ -189,7 +229,7 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
                 if(scan >= 0)
                     SET_KEYBIT(kbinput, scan);
                 else
-                    printf("Got unknown key press %d on EP 1\n", urbinput[i]);
+                    ckb_warn("Got unknown key press %d on EP 1\n", urbinput[i]);
             }
         }
     case -2:
@@ -213,7 +253,7 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
                         if(scan >= 0)
                             SET_KEYBIT(kbinput, hid_codes[keybit]);
                         else
-                            printf("Got unknown key press %d on EP 2\n", keybit);
+                            ckb_warn("Got unknown key press %d on EP 2\n", keybit);
                     } else if(scan >= 0)
                         CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
                 }
@@ -277,10 +317,38 @@ void hid_translate(unsigned char* kbinput, int endpoint, int length, const unsig
                     if(scan >= 0)
                         SET_KEYBIT(kbinput, hid_codes[keybit]);
                     else
-                        printf("Got unknown key press %d on EP 3\n", keybit);
+                        ckb_warn("Got unknown key press %d on EP 3\n", keybit);
                 } else if(scan >= 0)
                     CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
             }
         }
     }
+}
+
+void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput){
+    if((endpoint != 2 && endpoint != -2) || length < 8)
+        return;
+    // EP 2: mouse input
+    if(urbinput[0] != 1)
+        return;
+    // Byte 1 = mouse buttons (bitfield)
+    for(int bit = 0; bit < 8; bit++){
+        if(urbinput[1] & (1 << bit))
+            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+        else
+            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+    }
+    // Bytes 5 - 8: movement
+    *xaxis += *(short*)(urbinput + 5);
+    *yaxis += *(short*)(urbinput + 7);
+    // Byte 9: wheel
+    char wheel = urbinput[9];
+    if(wheel > 0)
+        SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 8);    // wheelup
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 8);
+    if(wheel < 0)
+        SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 9);    // wheeldn
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 9);
 }

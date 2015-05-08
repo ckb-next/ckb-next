@@ -4,12 +4,12 @@
 #include "usb.h"
 
 // Compare two light structures, ignore keys
-static int rgbcmp(const keylight* lhs, const keylight* rhs){
+static int rgbcmp(const lighting* lhs, const lighting* rhs){
     return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) + memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) + memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES);
 }
 
 // Return true if all mouse zones are black
-static int isblack(const keylight* light){
+static int isblack(const lighting* light){
     uchar black[N_MOUSE_ZONES] = { 0 };
     return !memcmp(light->r + LED_MOUSE, black, sizeof(black)) && !memcmp(light->g + LED_MOUSE, black, sizeof(black)) && !memcmp(light->b + LED_MOUSE, black, sizeof(black));
 }
@@ -17,8 +17,8 @@ static int isblack(const keylight* light){
 int updatergb_mouse(usbdevice* kb, int force){
     if(!kb->active)
         return 0;
-    keylight* lastlight = &kb->profile->lastlight;
-    keylight* newlight = &kb->profile->currentmode->light;
+    lighting* lastlight = &kb->profile->lastlight;
+    lighting* newlight = &kb->profile->currentmode->light;
     // Don't do anything if the lighting hasn't changed
     if(!force && !rgbcmp(lastlight, newlight))
         return 0;
@@ -50,6 +50,6 @@ int updatergb_mouse(usbdevice* kb, int force){
             return -1;
     }
 
-    memcpy(lastlight, newlight, sizeof(keylight));
+    memcpy(lastlight, newlight, sizeof(lighting));
     return 0;
 }

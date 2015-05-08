@@ -3,7 +3,7 @@
 #include "profile.h"
 #include "usb.h"
 
-static void makergb_512(const keylight* light, uchar data_pkt[5][MSG_SIZE]){
+static void makergb_512(const lighting* light, uchar data_pkt[5][MSG_SIZE]){
     uchar r[N_KEYS_KB / 2], g[N_KEYS_KB / 2], b[N_KEYS_KB / 2];
     // Compress RGB values to a 512-color palette
     for(int i = 0; i < N_KEYS_KB; i += 2){
@@ -22,7 +22,7 @@ static void makergb_512(const keylight* light, uchar data_pkt[5][MSG_SIZE]){
     memcpy(data_pkt[3] + 4, b + 36, 36);
 }
 
-static void makergb_full(const keylight* light, uchar data_pkt[12][MSG_SIZE]){
+static void makergb_full(const lighting* light, uchar data_pkt[12][MSG_SIZE]){
     const uchar* r = light->r, *g = light->g, *b = light->b;
     // Red
     memcpy(data_pkt[0] + 4, r, 60);
@@ -38,7 +38,7 @@ static void makergb_full(const keylight* light, uchar data_pkt[12][MSG_SIZE]){
     memcpy(data_pkt[10] + 4, b + 120, 24);
 }
 
-static int rgbcmp(const keylight* lhs, const keylight* rhs){
+static int rgbcmp(const lighting* lhs, const lighting* rhs){
     // Compare two light structures, ignore mouse zones
     return memcmp(lhs->r, rhs->r, N_KEYS_KB) + memcmp(lhs->g, rhs->g, N_KEYS_KB) + memcmp(lhs->b, rhs->b, N_KEYS_KB);
 }
@@ -46,8 +46,8 @@ static int rgbcmp(const keylight* lhs, const keylight* rhs){
 int updatergb_kb(usbdevice* kb, int force){
     if(!kb->active)
         return 0;
-    keylight* lastlight = &kb->profile->lastlight;
-    keylight* newlight = &kb->profile->currentmode->light;
+    lighting* lastlight = &kb->profile->lastlight;
+    lighting* newlight = &kb->profile->currentmode->light;
     // Don't do anything if the lighting hasn't changed
     if(!force && !rgbcmp(lastlight, newlight))
         return 0;
@@ -88,7 +88,7 @@ int updatergb_kb(usbdevice* kb, int force){
             return -1;
     //}
 
-    memcpy(lastlight, newlight, sizeof(keylight));
+    memcpy(lastlight, newlight, sizeof(lighting));
     return 0;
 }
 
@@ -129,7 +129,7 @@ int savergb_kb(usbdevice* kb, int mode){
     return 0;
 }
 
-int loadrgb_kb(usbdevice* kb, keylight* light, int mode){
+int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
     if(kb->fwversion >= 0x0120){
         uchar data_pkt[12][MSG_SIZE] = {
             { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x01 },
@@ -244,7 +244,7 @@ int has_key(const char* name, const usbdevice* kb){
     return 1;
 }
 
-char* printrgb(const keylight* light, const usbdevice* kb){
+char* printrgb(const lighting* light, const usbdevice* kb){
     int length = 0;
     uchar r[N_KEYS_KB], g[N_KEYS_KB], b[N_KEYS_KB];
     const uchar* mr = light->r;

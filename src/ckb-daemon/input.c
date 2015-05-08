@@ -4,7 +4,7 @@
 
 int macromask(const uchar* key1, const uchar* key2){
     // Scan a macro against key input. Return 0 if any of them don't match
-    for(int i = 0; i < N_KEYS_INPUT / 8; i++){
+    for(int i = 0; i < N_KEYBYTES_INPUT; i++){
         if((key1[i] & key2[i]) != key2[i])
             return 0;
     }
@@ -13,8 +13,8 @@ int macromask(const uchar* key1, const uchar* key2){
 
 static void inputupdate_keys(usbdevice* kb){
     usbmode* mode = kb->profile->currentmode;
-    keybind* bind = &mode->bind;
-    devinput* input = &kb->input;
+    binding* bind = &mode->bind;
+    usbinput* input = &kb->input;
     // Don't do anything if the state hasn't changed
     if(!memcmp(input->prevkeys, input->keys, N_KEYBYTES_INPUT))
         return;
@@ -124,7 +124,7 @@ void inputupdate(usbdevice* kb){
     // Process key/button input
     inputupdate_keys(kb);
     // Process mouse movement
-    devinput* input = &kb->input;
+    usbinput* input = &kb->input;
     if(input->rel_x != 0 || input->rel_y != 0){
         os_mousemove(kb, input->rel_x, input->rel_y);
         input->rel_x = input->rel_y = 0;
@@ -154,7 +154,7 @@ void updateindicators_kb(usbdevice* kb, int force){
     }
 }
 
-void initbind(keybind* bind){
+void initbind(binding* bind){
     for(int i = 0; i < N_KEYS_INPUT; i++)
         bind->base[i] = keymap[i].scan;
     bind->macros = calloc(32, sizeof(keymacro));
@@ -162,7 +162,7 @@ void initbind(keybind* bind){
     bind->macrocount = 0;
 }
 
-void freebind(keybind* bind){
+void freebind(binding* bind){
     for(int i = 0; i < bind->macrocount; i++)
         free(bind->macros[i].actions);
     free(bind->macros);
@@ -208,7 +208,7 @@ void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const cha
 }
 
 static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
-    keybind* bind = &mode->bind;
+    binding* bind = &mode->bind;
     if(!keys && !assignment){
         // Null strings = "macro clear" -> erase the whole thing
         for(int i = 0; i < bind->macrocount; i++)

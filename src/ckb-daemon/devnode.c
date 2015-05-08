@@ -36,11 +36,13 @@ int rm_recursive(const char* path){
 }
 
 void updateconnected(){
+    pthread_mutex_lock(devmutex);
     char cpath[strlen(devpath) + 12];
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
     FILE* cfile = fopen(cpath, "w");
     if(!cfile){
         ckb_warn("Unable to update %s: %s\n", cpath, strerror(errno));
+        pthread_mutex_unlock(devmutex);
         return;
     }
     int written = 0;
@@ -56,9 +58,10 @@ void updateconnected(){
     chmod(cpath, S_GID_READ);
     if(gid >= 0)
         chown(cpath, 0, gid);
+    pthread_mutex_unlock(devmutex);
 }
 
-int makedevpath(usbdevice* kb){
+int mkdevpath(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
     // Create the control path
     char path[strlen(devpath) + 2];
@@ -177,6 +180,8 @@ int makedevpath(usbdevice* kb){
             ckb_warn("Unable to create %s: %s\n", fpath, strerror(errno));
             remove(fpath);
         }
+        // Write firmware version and poll rate
+        mkfwnode(kb);
     }
     return 0;
 }
@@ -194,6 +199,41 @@ int rmdevpath(usbdevice* kb){
         return -1;
     }
     ckb_info("Removed device path %s\n", path);
+    return 0;
+}
+
+int mkfwnode(usbdevice* kb){
+    int index = INDEX_OF(kb, keyboard);
+    char fwpath[strlen(devpath) + 12];
+    snprintf(fwpath, sizeof(fwpath), "%s%d/fwversion", devpath, index);
+    FILE* fwfile = fopen(fwpath, "w");
+    if(fwfile){
+        fprintf(fwfile, "%04x", kb->fwversion);
+        fputc('\n', fwfile);
+        fclose(fwfile);
+        chmod(fwpath, S_GID_READ);
+        if(gid >= 0)
+            chown(fwpath, 0, gid);
+    } else {
+        ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
+        remove(fwpath);
+        return -1;
+    }
+    char ppath[strlen(devpath) + 11];
+    snprintf(ppath, sizeof(ppath), "%s%d/pollrate", devpath, index);
+    FILE* pfile = fopen(ppath, "w");
+    if(pfile){
+        fprintf(pfile, "%d ms", kb->pollrate / 1000000);
+        fputc('\n', pfile);
+        fclose(pfile);
+        chmod(ppath, S_GID_READ);
+        if(gid >= 0)
+            chown(ppath, 0, gid);
+    } else {
+        ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
+        remove(ppath);
+        return -2;
+    }
     return 0;
 }
 
@@ -228,38 +268,6 @@ int rmnotifynode(usbdevice* kb, int notify){
     kb->outfifo[notify] = 0;
     // Delete node
     return remove(outpath);
-}
-
-void writefwnode(usbdevice* kb){
-    int index = INDEX_OF(kb, keyboard);
-    char fwpath[strlen(devpath) + 12];
-    snprintf(fwpath, sizeof(fwpath), "%s%d/fwversion", devpath, index);
-    FILE* fwfile = fopen(fwpath, "w");
-    if(fwfile){
-        fprintf(fwfile, "%04x", kb->fwversion);
-        fputc('\n', fwfile);
-        fclose(fwfile);
-        chmod(fwpath, S_GID_READ);
-        if(gid >= 0)
-         chown(fwpath, 0, gid);
-    } else {
-        ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
-        remove(fwpath);
-    }
-    char ppath[strlen(devpath) + 11];
-    snprintf(ppath, sizeof(ppath), "%s%d/pollrate", devpath, index);
-    FILE* pfile = fopen(ppath, "w");
-    if(pfile){
-        fprintf(pfile, "%d ms", kb->pollrate / 1000000);
-        fputc('\n', pfile);
-        fclose(pfile);
-        chmod(ppath, S_GID_READ);
-        if(gid >= 0)
-         chown(ppath, 0, gid);
-    } else {
-        ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
-        remove(ppath);
-    }
 }
 
 #define MAX_BUFFER (1024 * 1024 - 1)

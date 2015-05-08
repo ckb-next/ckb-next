@@ -8,7 +8,7 @@
 
 #define INCOMPLETE (IOHIDDeviceRef)-1l
 
-int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
+int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
     for(int i = 0; i < count; i++){
         DELAY_SHORT;
         IOReturn res = IOHIDDeviceSetReport(kb->handle, kIOHIDReportTypeFeature, 0, messages + MSG_SIZE * i, MSG_SIZE);
@@ -21,7 +21,7 @@ int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int li
     return MSG_SIZE * count;
 }
 
-int _usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
+int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
     DELAY_MEDIUM;
     CFIndex length = MSG_SIZE;
     IOReturn res = IOHIDDeviceGetReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length);
@@ -40,7 +40,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
     return 0;
 }
 
-void closehandle(usbdevice* kb){
+void os_closeusb(usbdevice* kb){
     kb->handle = 0;
     int count = (IS_RGB(kb->vendor, kb->product)) ? 4 : 3;
     for(int i = 0; i < count; i++){
@@ -108,48 +108,49 @@ void reportcallback(void* context, IOReturn result, void* sender, IOHIDReportTyp
     inputupdate(kb);
 }
 
-void openusb(usbdevice* kb, short vendor, short product){
+long usbgetvalue(IOHIDDeviceRef device, CFStringRef key){
+    long res = 0;
+    CFTypeRef output = IOHIDDeviceGetProperty(device, key);
+    if(output && CFGetTypeID(output) == CFNumberGetTypeID() && CFNumberGetValue(output, kCFNumberLongType, &res))
+        return res;
+    return 0;
+}
+
+int os_setupusb(usbdevice* kb){
     kb->lastkeypress = KEY_NONE;
-    if(IS_RGB(vendor, product))
+
+    if(IS_RGB(kb->vendor, kb->product))
         // Handle 3 is the control handle
         kb->handle = kb->handles[3];
     else
         // Non RGB keyboards don't have one, so just use 0
         kb->handle = kb->handles[0];
 
-    // Set up the device
-    int setup = setupusb(kb, vendor, product);
-    if(setup == -1 || (setup && usb_tryreset(kb))){
-        closehandle(kb);
-        return;
-    }
+    // Get the device firmware version
+    long fwversion = usbgetvalue(kb->handle, CFSTR(kIOHIDVersionNumberKey));
+    kb->fwversion = fwversion;
 
     // Start handling HID reports for the input
     IOHIDDeviceRegisterInputReportCallback(kb->handles[0], kb->urbinput, 8, reportcallback, kb);
-    if(IS_RGB(vendor, product))
+    if(IS_RGB(kb->vendor, kb->product))
         IOHIDDeviceRegisterInputReportCallback(kb->handles[1], kb->urbinput + 8, 21, reportcallback, kb);
     else
         IOHIDDeviceRegisterInputReportCallback(kb->handles[1], kb->urbinput + 8, 4, reportcallback, kb);
-    if(IS_RGB(vendor, product))
+    if(IS_RGB(kb->vendor, kb->product))
         IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->urbinput + 8 + 21, MSG_SIZE, reportcallback, kb);
     else
         IOHIDDeviceRegisterInputReportCallback(kb->handles[2], kb->urbinput + 8 + 4, 15, reportcallback, kb);
 
     // Register for close notification
     IOHIDDeviceRegisterRemovalCallback(kb->handle, usbremove, kb);
-
-    // Update connected
-    updateconnected();
-    notifyconnect(kb, 1);
-    int index = INDEX_OF(kb, keyboard);
-    ckb_info("Device ready at %s%d\n", devpath, index);
+    return 0;
 }
 
-long usbgetvalue(IOHIDDeviceRef device, CFStringRef key){
-    long res = 0;
-    CFTypeRef output = IOHIDDeviceGetProperty(device, key);
-    if(output && CFGetTypeID(output) == CFNumberGetTypeID() && CFNumberGetValue(output, kCFNumberLongType, &res))
-        return res;
+void* os_inputmain(void* kb){
+    // TODO: implement this...
+    // The HID events will go back to the thread that owns the HID manager (i.e. the main thread)
+    // Ideally each USB device should have its own input/event thread, which is what the driver already does on Linux
+    // This will be implemented later.
     return 0;
 }
 
@@ -164,17 +165,13 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
         // If the serial can't be read, make one up
         snprintf(serial, SERIAL_LEN, "%04x:%x04-NoID", (uint)idvendor, (uint)idproduct);
 
-    // For non-RGB models, get the firmware version here as well
-    long fwversion = 0;
-    if(!IS_RGB(idvendor, idproduct))
-        fwversion = usbgetvalue(device, CFSTR(kIOHIDVersionNumberKey));
-
-    pthread_mutex_lock(&devlistmutex);
     // A single keyboard will generate multiple match events, so each handle has to be added to the board separately.
     // Look for any partially-set up boards matching this serial number
     int index = -1;
     for(int i = 1; i < DEV_MAX; i++){
-        pthread_mutex_lock(devmutex + i);
+        if(pthread_mutex_trylock(devmutex + i))
+            // If the mutex is locked then the device is obviously in use, so keep going
+            continue;
         if(!strcmp(keyboard[i].serial, serial) && keyboard[i].handle == INCOMPLETE){
             index = i;
             // Device mutex remains locked
@@ -185,12 +182,12 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     // If none was found, grab the first free device
     if(index == -1){
         for(int i = 1; i < DEV_MAX; i++){
-            pthread_mutex_lock(devmutex + i);
+            if(pthread_mutex_trylock(devmutex + i))
+                continue;
             if(!keyboard[i].handle){
                 // Mark the device as in use and print out a message
                 index = i;
                 keyboard[i].handle = INCOMPLETE;
-                keyboard[i].fwversion = fwversion;
                 strcpy(keyboard[i].serial, serial);
                 CFTypeRef cfname = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductKey));
                 if(cfname && CFGetTypeID(cfname) == CFStringGetTypeID())
@@ -204,8 +201,6 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
     }
     if(index == -1){
         ckb_err("No free devices\n");
-        // No device mutex locked, main list still locked
-        pthread_mutex_unlock(&devlistmutex);
         return;
     }
     usbdevice* kb = keyboard + index;
@@ -235,10 +230,12 @@ void usbadd(void* context, IOReturn result, void* sender, IOHIDDeviceRef device)
 
     // If all handles have been set up, finish initializing the keyboard
     if(kb->handles[0] && kb->handles[1] && kb->handles[2]
-            && (kb->handles[3] || !IS_RGB(idvendor, idproduct)))
-        openusb(kb, (short)idvendor, (short)idproduct);
-    pthread_mutex_unlock(devmutex + index);
-    pthread_mutex_unlock(&devlistmutex);
+            && (kb->handles[3] || !IS_RGB(idvendor, idproduct))){
+        kb->vendor = idvendor;
+        kb->product = idproduct;
+        setupusb(kb);
+    } else
+        pthread_mutex_unlock(devmutex + index);
 }
 
 static IOHIDManagerRef usbmanager = 0;

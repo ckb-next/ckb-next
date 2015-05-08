@@ -14,7 +14,6 @@ void timespec_add(struct timespec* timespec, long nanoseconds){
 }
 
 void quit(){
-    pthread_mutex_lock(&devlistmutex);
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
         pthread_mutex_lock(devmutex + i);
@@ -25,7 +24,6 @@ void quit(){
         pthread_mutex_unlock(devmutex + i);
     }
     rmdevpath(keyboard);
-    pthread_mutex_unlock(&devlistmutex);
     usbkill();
 }
 
@@ -115,7 +113,7 @@ int main(int argc, char** argv){
     // Make root keyboard
     umask(0);
     memset(keyboard, 0, sizeof(keyboard));
-    if(!makedevpath(keyboard))
+    if(!mkdevpath(keyboard))
         ckb_info("Root controller ready at %s0\n", devpath);
 
     // Set signals

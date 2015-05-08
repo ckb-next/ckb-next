@@ -4,10 +4,10 @@
 #include "includes.h"
 #include "usb.h"
 
-// Opens input device
-int inputopen(usbdevice* kb);
-// Closes input device
-void inputclose(usbdevice* kb);
+// Open input device. Return 0 on success
+int os_inputopen(usbdevice* kb);
+// Close input device
+void os_inputclose(usbdevice* kb);
 
 // Updates keypresses on input device. Lock imutex first (see device.h).
 void inputupdate(usbdevice* kb);
@@ -15,9 +15,9 @@ void inputupdate(usbdevice* kb);
 void updateindicators_kb(usbdevice* kb, int force);
 
 // Initializes key bindings for a device. Lock imutex first.
-void initbind(keybind* bind);
+void initbind(binding* bind);
 // Frees key binding data for a device. Lock imutex first.
-void freebind(keybind* bind);
+void freebind(binding* bind);
 
 // Note: unlike most commands, bind commands will lock/unlock the device's imutex
 // Binds a key

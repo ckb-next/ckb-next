@@ -12,11 +12,11 @@ int updatergb_mouse(usbdevice* kb, int force);
 // Saves RGB data to device memory. Returns 0 on success.
 int savergb_kb(usbdevice* kb, int mode);
 // Loads RGB data from device memory. Returns 0 on success.
-int loadrgb_kb(usbdevice* kb, keylight* light, int mode);
+int loadrgb_kb(usbdevice* kb, lighting* light, int mode);
 
 // Generates data for an RGB command to match the given RGB data. Returns a string like "ff0000" or "w:ff0000 a:00ff00 ..."
 // The result must be freed later.
-char* printrgb(const keylight* light, const usbdevice* kb);
+char* printrgb(const lighting* light, const usbdevice* kb);
 
 // Command: Update an LED color
 void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* code);

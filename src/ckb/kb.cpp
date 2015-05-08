@@ -192,7 +192,7 @@ void Kb::hwSave(){
     // Load the new modification times for the profile
     cmd.write(QString("@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
     for(int i = 0; i < hwModeCount; i++)
-        cmd.write(QString(" mode %1 get:hwid").arg(i + 1).toLatin1());
+        cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
     cmd.write("\n");
     cmd.flush();
 }
@@ -318,9 +318,14 @@ void Kb::run(){
     // Wait a small amount of time for the node to open (100ms)
     QThread::usleep(100000);
     if(!notify.open(QIODevice::ReadOnly)){
-        // If it's still not open, try again before giving up (1s total)
+        // If it's still not open, try again before giving up (10s total)
         QThread::usleep(900000);
-        if(!notify.open(QIODevice::ReadOnly))
+        for(int i = 1; i < 10; i++){
+            if(notify.open(QIODevice::ReadOnly))
+                break;
+            QThread::sleep(1);
+        }
+        if(!notify.isOpen())
             return;
     }
     // Read data from notification node

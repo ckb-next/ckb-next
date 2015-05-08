@@ -34,9 +34,9 @@ const char* product_str(short product);
 #define IS_MOUSE(vendor, product)   ((vendor) == (V_CORSAIR) && (product) == (P_M65))
 
 // USB delays for when the keyboards get picky about timing
-#define DELAY_SHORT     usleep(2000)
-#define DELAY_MEDIUM    usleep(20000)
-#define DELAY_LONG      usleep(200000)
+#define DELAY_SHORT     usleep(3000)    // 3ms
+#define DELAY_MEDIUM    usleep(30000)   // 30ms
+#define DELAY_LONG      usleep(100000)  // 100ms
 
 // Start the USB main loop. Returns program exit code when finished
 int usbmain();
@@ -45,22 +45,35 @@ void usbkill();
 
 // Note: Lock a device's dmutex (see device.h) before accessing the USB interface.
 
-// Set up a USB device after all its handles are open. Returns 0 on success
-int setupusb(usbdevice* kb, short vendor, short product);
+// A global mutex used by the USB driver.
+// USB communication is serialized so that only one message is sent at a time, then the next message is sent after a short delay.
+// This is needed even
+extern pthread_mutex_t usbmutex;
+
+// Set up a USB device after its handle is open. Spawns a new thread.
+// dmutex must be locked prior to calling this function. The function will unlock it when finished.
+void setupusb(usbdevice* kb);
+// OS-specific setup. Return 0 on success.
+int os_setupusb(usbdevice* kb);
+// Per keyboard input thread (OS specific). Will be detached from the main thread, so it needs to clean up its own resources.
+void* os_inputmain(void* kb);
+
 // Puts a USB device back into hardware mode. Returns 0 on success.
 int revertusb(usbdevice* kb);
 // Close a USB device and remove device entry. Returns 0 on success
 int closeusb(usbdevice* kb);
+void os_closeusb(usbdevice* kb);
 // Reset a USB device. Returns 0 on success, -1 if device should be removed
 int _resetusb(usbdevice* kb, const char* file, int line);
 #define resetusb(kb) _resetusb(kb, __FILE_NOPATH__, __LINE__)
+int os_resetusb(usbdevice* kb, const char* file, int line);
 
-// Send a USB message to the device. Returns number of bytes written, zero on failure.
-int _usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line);
-#define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
-// Gets input from a USB device.
-int _usbrecv(usbdevice* kb, uchar* message, const char* file, int line);
-#define usbrecv(kb, message) _usbrecv(kb, message, __FILE_NOPATH__, __LINE__)
+// OS: Send a USB message to the device. Returns number of bytes written, zero on failure.
+int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line);
+#define usbsend(kb, messages, count) os_usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
+// OS: Gets input from a USB device.
+int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line);
+#define usbrecv(kb, message) os_usbrecv(kb, message, __FILE_NOPATH__, __LINE__)
 
 // Non-RGB K95 command. Returns 0 on success.
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);

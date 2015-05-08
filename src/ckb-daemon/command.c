@@ -57,7 +57,7 @@ int readcmd(usbdevice* kb, const char* line){
     int wordlen;
     const char* newline = 0;
     const devcmd* vt = kb->vtable;
-    kbprofile* profile = kb->profile;
+    usbprofile* profile = kb->profile;
     usbmode* mode = 0;
     int notifynumber = 0;
     // Read words from the input

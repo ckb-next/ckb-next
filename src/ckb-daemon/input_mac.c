@@ -80,33 +80,33 @@ void clearkeys(usbdevice* kb){
     }
 }
 
-int inputopen(usbdevice* kb){
+int os_inputopen(usbdevice* kb){
     // Open master port (if not done yet)
     static mach_port_t master = 0;
     kern_return_t res;
     if(!master&& (res = IOMasterPort(bootstrap_port, &master)) != KERN_SUCCESS){
         master = 0;
         ckb_err("Unable to open master port: 0x%08x\n", res);
-        return 0;
+        return -1;
     }
     // Open an HID service
     io_iterator_t iter;
     if((res = IOServiceGetMatchingServices(master, IOServiceMatching(kIOHIDSystemClass), &iter)) != KERN_SUCCESS){
         ckb_err("Unable to get input service iterator: 0x%08x\n", res);
-        return 0;
+        return -2;
     }
     if((res = IOServiceOpen(IOIteratorNext(iter), mach_task_self(), kIOHIDParamConnectType, &kb->event)) != KERN_SUCCESS){
         IOObjectRelease(iter);
         ckb_err("Unable to open IO service: 0x%08x\n", res);
         kb->event = 0;
-        return 0;
+        return -3;
     }
     IOObjectRelease(iter);
     clearkeys(kb);
-    return 1;
+    return 0;
 }
 
-void inputclose(usbdevice* kb){
+void os_inputclose(usbdevice* kb){
     if(kb->event){
         clearkeys(kb);
         IOServiceClose(kb->event);
@@ -237,6 +237,7 @@ void os_updateindicators(usbdevice* kb, int force){
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;
         // Set the LEDs
+        pthread_mutex_lock(&usbmutex);
         CFArrayRef leds = IOHIDDeviceCopyMatchingElements(kb->handles[0], 0, kIOHIDOptionsTypeNone);
         CFIndex count = CFArrayGetCount(leds);
         for(CFIndex i = 0; i < count; i++){
@@ -250,6 +251,7 @@ void os_updateindicators(usbdevice* kb, int force){
             CFRelease(value);
         }
         CFRelease(leds);
+        pthread_mutex_unlock(&usbmutex);
     }
 }
 

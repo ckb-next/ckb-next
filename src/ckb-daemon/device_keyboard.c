@@ -11,7 +11,6 @@ int start_kb_nrgb(usbdevice* kb, int makeactive){
     nk95cmd(kb, NK95_HWOFF);
     // Fill out RGB features for consistency, even though the keyboard doesn't have them
     kb->active = 1;
-    writefwnode(kb);
     kb->pollrate = -1;
     return 0;
 }

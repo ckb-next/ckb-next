@@ -189,6 +189,8 @@ const key keymap[N_KEYS_EXTENDED] = {
 };
 
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput){
+    if(length < 1)
+        return;
     // LUT for HID -> Corsair scancodes (-1 for no scan code, -2 for currently unsupported)
     // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with array indices and K95 keys added
     static const short hid_codes[256] = {
@@ -326,7 +328,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
 }
 
 void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput){
-    if((endpoint != 2 && endpoint != -2) || length < 8)
+    if((endpoint != 2 && endpoint != -2) || length < 10)
         return;
     // EP 2: mouse input
     if(urbinput[0] != 1)

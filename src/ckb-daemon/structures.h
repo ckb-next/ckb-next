@@ -46,7 +46,7 @@ typedef struct {
     keymacro* macros;
     int macrocount;
     int macrocap;
-} keybind;
+} binding;
 #define MACRO_MAX   1024
 
 // Keyboard/mouse input tracking
@@ -54,20 +54,20 @@ typedef struct {
     uchar keys[N_KEYBYTES_INPUT];
     uchar prevkeys[N_KEYBYTES_INPUT];
     short rel_x, rel_y;
-} devinput;
+} usbinput;
 
 // Lighting structure for a mode
 typedef struct {
     uchar r[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
     uchar g[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
     uchar b[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
-} keylight;
+} lighting;
 
 // Native mode structure
 #define MD_NAME_LEN 16
 typedef struct {
-    keylight light;
-    keybind bind;
+    lighting light;
+    binding bind;
     // Name and UUID
     usbid id;
     ushort name[MD_NAME_LEN];
@@ -88,11 +88,11 @@ typedef struct {
     // Currently-selected mode
     usbmode* currentmode;
     // Last RGB data sent to the device
-    keylight lastlight;
+    lighting lastlight;
     // Profile name and UUID
     ushort name[PR_NAME_LEN];
     usbid id;
-} kbprofile;
+} usbprofile;
 
 // Hardware profile structure
 #define HWMODE_K70 1
@@ -100,7 +100,7 @@ typedef struct {
 #define HWMODE_MAX 3
 typedef struct {
     // RGB settings
-    keylight klight[HWMODE_MAX];
+    lighting light[HWMODE_MAX];
     // Mode/profile IDs
     usbid id[HWMODE_MAX + 1];
     // Mode/profile names
@@ -146,7 +146,6 @@ typedef struct {
     // I/O devices
 #ifdef OS_LINUX
     struct udev_device* udev;
-    pthread_t inputthread;
     int handle;
     int uinput;
     int event;
@@ -162,8 +161,10 @@ typedef struct {
 #endif
     // Thread used for USB/devnode communication. To close: lock mutexes, set handle to zero, unlock, then wait for thread to stop
     pthread_t thread;
+    // Thread for device input. Will close on its own when the device is terminated.
+    pthread_t inputthread;
     // Keyboard settings
-    kbprofile* profile;
+    usbprofile* profile;
     // Hardware modes. Null if not read yet
     hwprofile* hw;
     // Command FIFO
@@ -185,7 +186,7 @@ typedef struct {
     // Poll rate (ns), or -1 if unsupported
     int pollrate;
     // Current input state
-    devinput input;
+    usbinput input;
     // Indicator LED state
     uchar ileds;
 } usbdevice;

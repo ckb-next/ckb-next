@@ -8,6 +8,8 @@
 #include "profile.h"
 #include "usb.h"
 
+pthread_mutex_t usbmutex = PTHREAD_MUTEX_INITIALIZER;
+
 // Vendor/product string representations
 const char* vendor_str(short vendor){
     if(vendor == V_CORSAIR)
@@ -35,12 +37,8 @@ static const devcmd* get_vtable(short vendor, short product){
 // Mask of features to exclude from all devices
 int features_mask = -1;
 
-// OS-specific USB reset
-extern int os_resetusb(usbdevice* kb, const char* file, int line);
-
 // USB device main loop
-static void* devmain(void* _kb){
-    usbdevice* kb = _kb;
+static void* devmain(usbdevice* kb){
     while(1){
         pthread_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
@@ -67,40 +65,58 @@ static void* devmain(void* _kb){
     return 0;
 }
 
-int setupusb(usbdevice* kb, short vendor, short product){
+static void* _setupusb(void* context){
+    usbdevice* kb = context;
     // Set standard fields
+    short vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
-    kb->vendor = vendor;
-    kb->product = product;
     kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;
+
+    // Perform OS-specific setup
+    if(os_setupusb(kb))
+        goto fail;
+    if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
+        goto fail;
+    pthread_detach(kb->inputthread);
+
     // Make up a device name if one wasn't assigned
     if(!kb->name[0])
         snprintf(kb->name, KB_NAME_LEN, "Corsair K%d%s", (product == P_K65) ? 65 : (product == P_K70 || product == P_K70_NRGB) ? 70 : 95, HAS_FEATURES(kb, FEAT_RGB) ? " RGB" : "");
 
-    // Make /dev path
-    if(makedevpath(kb)){
-        pthread_mutex_unlock(dmutex(kb));
-        return -1;
-    }
-
     // Set up an input device for key events
-    if(!inputopen(kb)){
-        rmdevpath(kb);
-        pthread_mutex_unlock(dmutex(kb));
-        return -1;
-    }
+    if(os_inputopen(kb))
+        goto fail;
 
     // Set up device
     vt->allocprofile(kb);
     vt->updateindicators(kb, 1);
-    if(vt->start(kb, 0))
-        return -2;
+    if(vt->start(kb, 0) && usb_tryreset(kb))
+        goto fail;
 
-    // Start main thread
-    DELAY_LONG;
-    if(pthread_create(&kb->thread, 0, devmain, kb))
-        return -1;
+    // Make /dev path
+    if(mkdevpath(kb))
+        goto fail;
+
+    // Finished. Enter main loop
+    int index = INDEX_OF(kb, keyboard);
+    ckb_info("%s ready at %s%d\n", kb->name, devpath, index);
+    updateconnected();
+    notifyconnect(kb, 1);
+    pthread_mutex_unlock(imutex(kb));
+    pthread_mutex_unlock(dmutex(kb));
+    return devmain(kb);
+
+    fail:
+    pthread_mutex_unlock(imutex(kb));
+    closeusb(kb);
+    pthread_mutex_unlock(dmutex(kb));
     return 0;
+}
+
+void setupusb(usbdevice* kb){
+    pthread_mutex_lock(imutex(kb));
+    if(pthread_create(&kb->thread, 0, _setupusb, kb))
+        ckb_err("Failed to create USB thread");
 }
 
 int revertusb(usbdevice* kb){
@@ -148,27 +164,22 @@ int usb_tryreset(usbdevice* kb){
     return -1;
 }
 
-// OS-specific close function
-extern void closehandle(usbdevice* kb);
-
 int closeusb(usbdevice* kb){
     // Close file handles
-    if(!kb->infifo)
-        return 0;
     pthread_mutex_lock(imutex(kb));
     if(kb->handle){
         ckb_info("Disconnecting %s (S/N: %s)\n", kb->name, kb->serial);
-        inputclose(kb);
+        os_inputclose(kb);
         updateconnected();
         // Close USB device
-        closehandle(kb);
+        os_closeusb(kb);
         notifyconnect(kb, 0);
     } else
         updateconnected();
 
     // Wait for thread to close
-    pthread_mutex_unlock(dmutex(kb));
     pthread_mutex_unlock(imutex(kb));
+    pthread_mutex_unlock(dmutex(kb));
     pthread_join(kb->thread, 0);
     pthread_mutex_lock(dmutex(kb));
 

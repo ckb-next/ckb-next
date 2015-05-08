@@ -7,7 +7,7 @@
 void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, ...){
     if(!kb)
         return;
-    kbprofile* profile = kb->profile;
+    usbprofile* profile = kb->profile;
     va_list va_args;
     int fifo;
     if(nodenumber >= 0){
@@ -85,6 +85,8 @@ void nprintind(usbdevice* kb, int nnumber, int led, int on){
 }
 
 void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const char* toggle){
+    if(keyindex >= N_KEYS_INPUT)
+        return;
     pthread_mutex_lock(imutex(kb));
     if(!strcmp(toggle, "on") || *toggle == 0)
         SET_KEYBIT(mode->notify[nnumber], keyindex);
@@ -103,7 +105,7 @@ void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const c
     }
 
 static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
-    kbprofile* profile = kb->profile;
+    usbprofile* profile = kb->profile;
     if(!strcmp(setting, ":mode")){
         // Get the current mode number
         nprintf(kb, nnumber, mode, "switch\n");
@@ -124,7 +126,7 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
         // Make sure the mode number is valid
         HWMODE_OR_RETURN(kb, index);
         // Get the mode from the hardware store
-        char* rgb = printrgb(kb->hw->klight + index, kb);
+        char* rgb = printrgb(kb->hw->light + index, kb);
         nprintf(kb, nnumber, mode, "hwrgb %s\n", rgb);
         free(rgb);
         return;

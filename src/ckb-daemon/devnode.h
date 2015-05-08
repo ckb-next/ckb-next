@@ -20,7 +20,7 @@ extern long gid;
 // Update the list of connected devices.
 void updateconnected();
 // Create a dev path for the keyboard at index. Returns 0 on success.
-int makedevpath(usbdevice* kb);
+int mkdevpath(usbdevice* kb);
 // Remove the dev path for the keyboard at index. Returns 0 on success.
 int rmdevpath(usbdevice* kb);
 
@@ -30,7 +30,7 @@ int mknotifynode(usbdevice* kb, int notify);
 int rmnotifynode(usbdevice* kb, int notify);
 
 // Writes a keyboard's firmware version and poll rate to its device node.
-void writefwnode(usbdevice* kb);
+int mkfwnode(usbdevice* kb);
 
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
 unsigned readlines(int fd, const char** input);

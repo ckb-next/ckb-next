@@ -14,7 +14,7 @@ void cmd_profilename(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
 // Get a mode's name. Returns a URL-encoded UTF-8 buffer that needs to be freed later.
 char* getmodename(usbmode* mode);
 // Get a profile's name. See above.
-char* getprofilename(kbprofile* profile);
+char* getprofilename(usbprofile* profile);
 // Get hardware names.
 char* gethwmodename(hwprofile* profile, int index);
 char* gethwprofilename(hwprofile* profile);

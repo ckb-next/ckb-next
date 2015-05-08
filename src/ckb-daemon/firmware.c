@@ -43,7 +43,6 @@ int getfwversion(usbdevice* kb){
         kb->fwversion = version;
         kb->pollrate = (int)poll * 1000000;
     }
-    writefwnode(kb);
     return 0;
 }
 
@@ -143,7 +142,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     }
     // Updated successfully
     kb->fwversion = version;
-    writefwnode(kb);
+    mkfwnode(kb);
     ckb_info("Firmware update complete\n");
     return FW_OK;
 }

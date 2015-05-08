@@ -13,13 +13,11 @@ extern usbdevice keyboard[DEV_MAX];
 #else
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
 #endif
-// A mutex used when accessing the device table. Lock this before adding/removing/iterating devices, unlock when finished.
-// Note: you must lock the list mutex BEFORE any device mutexes, if you intend to lock both
-extern pthread_mutex_t devlistmutex;
 // A mutex used for USB controls. Needs to be locked before reading or writing the device handle or accessing its profile
 extern pthread_mutex_t devmutex[DEV_MAX];
 #define dmutex(kb) (devmutex + INDEX_OF(kb, keyboard))
 // Similar, but for key input. Also needs to be locked before accessing output FIFOs.
+// When adding or removing a device you must lock BOTH mutexes, dmutex first.
 extern pthread_mutex_t inputmutex[DEV_MAX];
 #define imutex(kb) (inputmutex + INDEX_OF(kb, keyboard))
 

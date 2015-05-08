@@ -104,7 +104,7 @@ int uinputopen(struct uinput_user_dev* indev, int* event){
     return fd;
 }
 
-int inputopen(usbdevice* kb){
+int os_inputopen(usbdevice* kb){
     // Create the new input device
     int index = INDEX_OF(kb, keyboard);
     struct uinput_user_dev indev;
@@ -120,10 +120,10 @@ int inputopen(usbdevice* kb){
         ckb_warn("No event device found. Indicator lights will be disabled\n");
     keyboard[index].uinput = fd;
     keyboard[index].event = event;
-    return fd != 0;
+    return fd <= 0;
 }
 
-void inputclose(usbdevice* kb){
+void os_inputclose(usbdevice* kb){
     if(kb->uinput <= 0)
         return;
     close(kb->event);
@@ -205,8 +205,10 @@ void os_updateindicators(usbdevice* kb, int force){
     }
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;
+        pthread_mutex_lock(&usbmutex);
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 5000, &kb->ileds };
         ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+        pthread_mutex_unlock(&usbmutex);
     }
 }
 

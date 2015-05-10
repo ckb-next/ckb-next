@@ -6,8 +6,52 @@
 // Numpad keys have an extra flag
 #define IS_NUMPAD(scancode) ((scancode) >= kVK_ANSI_KeypadDecimal && (scancode) <= kVK_ANSI_Keypad9 && (scancode) != kVK_ANSI_KeypadClear && (scancode) != kVK_ANSI_KeypadEnter)
 
-// Event helper
-void postevent(io_connect_t event, int kbflags, int scancode, int down, int is_flags, int is_repeat){
+pthread_mutex_t _euid_guard = PTHREAD_MUTEX_INITIALIZER;
+
+// Event helpers
+static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOptionBits flags, IOOptionBits options){
+    // Hack #1: IOHIDPostEvent will fail with kIOReturnNotPrivileged if the event doesn't originate from the UID that owns /dev/console
+    // You'd think being root would be good enough. You'd be wrong. ckb-daemon needs to run as root for other reasons though
+    // (namely, being able to seize the physical IOHIDDevices) so what we do instead is change our EUID to the appropriate owner,
+    // post the event, and then change it right back.
+    // Yeah...
+    uid_t uid = 0;
+    gid_t gid = 0;
+    struct stat file;
+    if(!stat("/dev/console", &file)){
+        uid = file.st_uid;
+        gid = file.st_gid;
+    }
+    euid_guard_start;
+    if(uid != 0)
+        seteuid(uid);
+    if(gid != 0)
+        setegid(gid);
+
+    IOGPoint location = {0, 0};
+    if((options & kIOHIDSetRelativeCursorPosition) && type != NX_MOUSEMOVED){
+        // Hack #2: IOHIDPostEvent will not accept relative mouse coordinates for any event other than NX_MOUSEMOVED
+        // So we need to get the current absolute coordinates from CoreGraphics and then modify those...
+        CGEventRef cge = CGEventCreate(nil);
+        CGPoint loc = CGEventGetLocation(cge);
+        CFRelease(cge);
+        location.x = loc.x + ev->mouseMove.dx;
+        location.y = loc.y + ev->mouseMove.dy;
+        options = (options & ~kIOHIDSetRelativeCursorPosition) | kIOHIDSetCursorPosition;
+    }
+    kern_return_t res = IOHIDPostEvent(event, type, location, ev, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
+    if(res != kIOReturnSuccess)
+        ckb_warn("Post event failed: %x\n", res);
+
+    if(uid != 0)
+        seteuid(0);
+    if(gid != 0)
+        setegid(0);
+    euid_guard_stop;
+}
+
+// Keypress
+static void postevent_kp(io_connect_t event, int kbflags, int scancode, int down, int is_flags, int is_repeat){
     NXEventData kp;
     memset(&kp, 0, sizeof(kp));
     UInt32 type;
@@ -33,32 +77,74 @@ void postevent(io_connect_t event, int kbflags, int scancode, int down, int is_f
         else if(scancode == kVK_Help)
             flags |= NX_HELPMASK;
     }
+    postevent(event, type, &kp, flags, options);
+}
 
-    // HACK: IOHIDPostEvent will fail with kIOReturnNotPrivileged if the event doesn't originate from the UID that owns /dev/console
-    // You'd think being root would be good enough. You'd be wrong. ckb-daemon needs to run as root for other reasons though
-    // (namely, being able to seize the physical IOHIDDevices) so what we do instead is change our EUID to the appropriate owner,
-    // post the event, and then change it right back.
-    // Yeah...
-    uid_t uid = 0;
-    gid_t gid = 0;
-    struct stat file;
-    if(!stat("/dev/console", &file)){
-        uid = file.st_uid;
-        gid = file.st_gid;
-        if(uid != 0)
-            seteuid(uid);
-        if(gid != 0)
-            setegid(gid);
+// Mouse button
+static void postevent_mb(io_connect_t event, int button, int down){
+    NXEventData mb;
+    memset(&mb, 0, sizeof(mb));
+    mb.compound.subType = NX_SUBTYPE_AUX_MOUSE_BUTTONS;
+    mb.compound.misc.L[0] = (1 << button);
+    mb.compound.misc.L[1] = down ? (1 << button) : 0;
+    postevent(event, NX_SYSDEFINED, &mb, 0, 0);
+    // Mouse presses actually generate two events, one with a bitfield of buttons, one with a button number
+    memset(&mb, 0, sizeof(mb));
+    UInt32 type;
+    mb.mouse.buttonNumber = button;
+    switch(button){
+    case 0:
+        type = down ? NX_LMOUSEDOWN : NX_LMOUSEUP;
+        break;
+    case 1:
+        type = down ? NX_RMOUSEDOWN : NX_RMOUSEUP;
+        break;
+    default:
+        type = down ? NX_OMOUSEDOWN : NX_OMOUSEUP;
     }
+    if(down)
+        mb.mouse.pressure = 255;
+    postevent(event, type, &mb, 0, 0);
+}
 
-    kern_return_t res = IOHIDPostEvent(event, type, *(IOGPoint[]){{0, 0}}, &kp, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
-    if(res != KERN_SUCCESS)
-        ckb_warn("Post event failed: %x\n", res);
+// Mouse wheel
+static void postevent_wheel(io_connect_t event, int value){
+    NXEventData mm;
+    memset(&mm, 0, sizeof(mm));
+    mm.scrollWheel.deltaAxis1 = value;
+    postevent(event, NX_SCROLLWHEELMOVED, &mm, 0, 0);
+}
 
-    if(uid != 0)
-        seteuid(0);
-    if(gid != 0)
-        setegid(0);
+// input_mac_mouse.c
+extern void mouse_accel(io_connect_t event, int* x, int* y);
+
+// Mouse axis
+static void postevent_mm(io_connect_t event, int x, int y, int use_accel, uchar buttons){
+    NXEventData mm;
+    memset(&mm, 0, sizeof(mm));
+    UInt32 type = NX_MOUSEMOVED;
+    if(use_accel)
+        mouse_accel(event, &x, &y);
+    mm.mouseMove.dx = x;
+    mm.mouseMove.dy = y;
+    if(buttons != 0){
+        // If a button is pressed, the event type changes
+        if(buttons & 1)
+            type = NX_LMOUSEDRAGGED;
+        else if(buttons & 2)
+            type = NX_RMOUSEDRAGGED;
+        else
+            type = NX_OMOUSEDRAGGED;
+        // Pick the button index based on the lowest-numbered button
+        int button = 0;
+        while(!(buttons & 1)){
+            button++;
+            buttons >>= 1;
+        }
+        mm.mouse.pressure = 255;
+        mm.mouse.buttonNumber = button;
+    }
+    postevent(event, type, &mm, 0, kIOHIDSetRelativeCursorPosition);
 }
 
 // Key repeat delay helper (result in ns)
@@ -70,13 +156,22 @@ long repeattime(io_connect_t event, int first){
     return delay;
 }
 
+// Mouse double-click helper (also ns)
+long doubleclicktime(io_connect_t event){
+    long delay = 0;
+    IOByteCount actualSize = 0;
+    if(IOHIDGetParameter(event, CFSTR(kIOHIDClickTimeKey), sizeof(long), &delay, &actualSize) != KERN_SUCCESS || actualSize == 0)
+        return -1;
+    return delay;
+}
+
+// Send keyup events for every scancode in the keymap
 void clearkeys(usbdevice* kb){
-    // Send keyup events for every scancode in the keymap
     for(int key = 0; key < N_KEYS_INPUT; key++){
         int scan = keymap[key].scan;
         if((scan & SCAN_SILENT) || scan == BTN_WHEELUP || scan == BTN_WHEELDOWN || IS_MEDIA(scan))
             continue;
-        postevent(kb->event, 0, scan, 0, 0, 0);
+        postevent_kp(kb->event, 0, scan, 0, 0, 0);
     }
 }
 
@@ -84,7 +179,7 @@ int os_inputopen(usbdevice* kb){
     // Open master port (if not done yet)
     static mach_port_t master = 0;
     kern_return_t res;
-    if(!master&& (res = IOMasterPort(bootstrap_port, &master)) != KERN_SUCCESS){
+    if(!master && (res = IOMasterPort(bootstrap_port, &master)) != KERN_SUCCESS){
         master = 0;
         ckb_err("Unable to open master port: 0x%08x\n", res);
         return -1;
@@ -95,12 +190,14 @@ int os_inputopen(usbdevice* kb){
         ckb_err("Unable to get input service iterator: 0x%08x\n", res);
         return -2;
     }
-    if((res = IOServiceOpen(IOIteratorNext(iter), mach_task_self(), kIOHIDParamConnectType, &kb->event)) != KERN_SUCCESS){
+    io_service_t service = IOIteratorNext(iter);
+    if((res = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &kb->event)) != KERN_SUCCESS){
         IOObjectRelease(iter);
         ckb_err("Unable to open IO service: 0x%08x\n", res);
         kb->event = 0;
         return -3;
     }
+
     IOObjectRelease(iter);
     clearkeys(kb);
     return 0;
@@ -116,7 +213,27 @@ void os_inputclose(usbdevice* kb){
 
 void os_keypress(usbdevice* kb, int scancode, int down){
     if(scancode & SCAN_MOUSE){
-        // TODO: implement
+        if(scancode == BTN_WHEELUP){
+            postevent_wheel(kb->event, 1);
+            return;
+        } else if(scancode == BTN_WHEELDOWN){
+            postevent_wheel(kb->event, -1);
+            return;
+        }
+        int button = scancode & ~SCAN_MOUSE;
+        // Reverse or collapse left/right buttons if the system preferences say so
+        int mode;
+        if(IOHIDGetMouseButtonMode(kb->event, &mode) == kIOReturnSuccess){
+            if(mode == kIOHIDButtonMode_ReverseLeftRightClicks && button == 0)
+                button = 1;
+            else if(mode != kIOHIDButtonMode_EnableRightClick && button == 1)
+                button = 0;
+        }
+        postevent_mb(kb->event, button, down);
+        if(down)
+            kb->mousestate |= (1 << button);
+        else
+            kb->mousestate &= ~(1 << button);
         return;
     }
     // Some boneheaded Apple engineers decided to reverse kVK_ANSI_Grave and kVK_ISO_Section on the 105-key layouts...
@@ -179,13 +296,13 @@ void os_keypress(usbdevice* kb, int scancode, int down){
             kb->lastkeypress = KEY_NONE;
     }
 
-    postevent(kb->event, kb->modifiers, scancode, down, isMod, 0);
+    postevent_kp(kb->event, kb->modifiers, scancode, down, isMod, 0);
 }
 
 // Retrigger the last-pressed key
-void keyretrigger(usbdevice* kb){
+void _keyretrigger(usbdevice* kb){
     int scancode = kb->lastkeypress;
-    postevent(kb->event, kb->modifiers, scancode, 1, 0, 1);
+    postevent_kp(kb->event, kb->modifiers, scancode, 1, 0, 1);
     // Set next key repeat time
     long repeat = repeattime(kb->event, 0);
     if(repeat > 0)
@@ -194,29 +311,16 @@ void keyretrigger(usbdevice* kb){
         kb->lastkeypress = KEY_NONE;
 }
 
-// Key repeat thread
-void* krthread(void* context){
-    while(1){
-        // Re-scan every 1ms
-        usleep(1000);
-        struct timespec time;
-        clock_gettime(CLOCK_MONOTONIC, &time);
-        for(int i = 1; i < DEV_MAX; i++){
-            // Scan all connected devices
-            pthread_mutex_lock(inputmutex + i);
-            if(IS_CONNECTED(keyboard + i)){
-                // Repeat the key as many times as needed to catch up
-                while(keyboard[i].lastkeypress >= 0 && timespec_ge(time, keyboard[i].keyrepeat))
-                    keyretrigger(keyboard + i);
-            }
-            pthread_mutex_unlock(inputmutex + i);
-        }
-    }
-    return 0;
+void keyretrigger(usbdevice* kb){
+    // Repeat the key as many times as needed to catch up
+    struct timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    while(!(kb->lastkeypress & (SCAN_SILENT | SCAN_MOUSE)) && timespec_ge(time, kb->keyrepeat))
+        _keyretrigger(kb);
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
-    // TODO: stub
+    postevent_mm(kb->event, x, y, !!(kb->features & FEAT_MOUSEACCEL), kb->mousestate);
 }
 
 void os_isync(usbdevice* kb){
@@ -236,18 +340,25 @@ void os_updateindicators(usbdevice* kb, int force){
     }
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;
-        // Set the LEDs
+        // Get a list of LED elements from handle 0
+        long ledpage = kHIDPage_LEDs;
+        const void* keys[] = { CFSTR(kIOHIDElementUsagePageKey) };
+        const void* values[] = { CFNumberCreate(kCFAllocatorDefault, kCFNumberLongType, &ledpage) };
+        CFDictionaryRef matching = CFDictionaryCreate(kCFAllocatorDefault, keys, values, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        CFRelease(values[0]);
+        CFArrayRef leds;
+        kern_return_t res = (*kb->handles[0])->copyMatchingElements(kb->handles[0], matching, &leds, 0);
+        CFRelease(matching);
+        if(res != kIOReturnSuccess)
+            return;
+        // Iterate through them and update the LEDs which have changed
         pthread_mutex_lock(&usbmutex);
-        CFArrayRef leds = IOHIDDeviceCopyMatchingElements(kb->handles[0], 0, kIOHIDOptionsTypeNone);
         CFIndex count = CFArrayGetCount(leds);
         for(CFIndex i = 0; i < count; i++){
             IOHIDElementRef led = (void*)CFArrayGetValueAtIndex(leds, i);
-            uint32_t page = IOHIDElementGetUsagePage(led);
-            if(page != kHIDPage_LEDs)
-                continue;
             uint32_t usage = IOHIDElementGetUsage(led);
             IOHIDValueRef value = IOHIDValueCreateWithIntegerValue(kCFAllocatorDefault, led, 0, !!(ileds & (1 << (usage - 1))));
-            IOHIDDeviceSetValue(kb->handles[0], led, value);
+            (*kb->handles[0])->setValue(kb->handles[0], led, value, 5000, 0, 0, 0);
             CFRelease(value);
         }
         CFRelease(leds);

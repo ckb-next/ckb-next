@@ -114,26 +114,26 @@ void* os_inputmain(void* context){
         if(urb){
             // Process input (if any)
             pthread_mutex_lock(imutex(kb));
-            if(IS_RGB(vendor, product)){
-                if(IS_MOUSE(vendor, product)){
+            if(IS_MOUSE(vendor, product)){
+                if(urb->endpoint == 0x82){
                     // RGB mouse input
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -(urb->endpoint & 0xF), urb->actual_length, urb->buffer);
-                } else {
-                    switch(urb->endpoint){
-                    case 0x81:
-                        // RGB EP 1: 6KRO (BIOS mode) input
-                        hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
-                        break;
-                    case 0x82:
-                        // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
-                        if(!kb->active)
-                            hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
-                        break;
-                    case 0x83:
-                        // RGB EP 3: Corsair input
-                        memcpy(kb->input.keys, urb->buffer, N_KEYBYTES_KB);
-                        break;
-                    }
+                }
+            } else if(IS_RGB(vendor, product)){
+                switch(urb->endpoint){
+                case 0x81:
+                    // RGB EP 1: 6KRO (BIOS mode) input
+                    hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
+                    break;
+                case 0x82:
+                    // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
+                    if(!kb->active)
+                        hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
+                    break;
+                case 0x83:
+                    // RGB EP 3: Corsair input
+                    memcpy(kb->input.keys, urb->buffer, N_KEYBYTES_KB);
+                    break;
                 }
             } else
                 // Non-RGB input

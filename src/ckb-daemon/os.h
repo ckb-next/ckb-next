@@ -35,14 +35,29 @@
 #define UINPUT_VERSION 2
 #endif
 
+// The OSX process needs to change its EUID to post events, so thread safety must be ensured
+// On Linux the EUID is always root
+#define euid_guard_start
+#define euid_guard_stop
+
 #endif  // OS_LINUX
 
 #ifdef OS_MAC
 
 #include <Carbon/Carbon.h>
+#include <IOKit/IOMessage.h>
+#include <IOKit/hid/IOHIDDevicePlugin.h>
 #include <IOKit/hid/IOHIDLib.h>
 #include <IOKit/hidsystem/IOHIDLib.h>
 #include <IOKit/hidsystem/ev_keymap.h>
+
+typedef IOHIDDeviceDeviceInterface** hid_dev_t;
+
+// The OSX process needs to change its EUID to post events, so thread safety must be ensured
+// On Linux the EUID is always root
+extern pthread_mutex_t _euid_guard;
+#define euid_guard_start    pthread_mutex_lock(&_euid_guard)
+#define euid_guard_stop     pthread_mutex_unlock(&_euid_guard)
 
 // Various POSIX functions that aren't present on OSX
 

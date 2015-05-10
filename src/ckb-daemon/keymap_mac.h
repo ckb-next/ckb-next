@@ -144,8 +144,8 @@
 #define BTN_LEFT            0
 #define BTN_RIGHT           1
 #define BTN_MIDDLE          2
-#define BTN_SIDE            3
-#define BTN_EXTRA           4
+#define BTN_SIDE            4
+#define BTN_EXTRA           5
 
 #endif // OS_MAC
 

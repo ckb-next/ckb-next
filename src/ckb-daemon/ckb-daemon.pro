@@ -8,7 +8,7 @@ macx {
 }
 
 macx {
-    LIBS = -framework CoreFoundation -framework IOKit -liconv
+    LIBS = -framework CoreFoundation -framework CoreGraphics -framework IOKit -liconv
 } else {
     LIBS = -lpthread -ludev
 }
@@ -44,7 +44,8 @@ SOURCES += \
     device_mouse.c \
     led_keyboard.c \
     led.c \
-    led_mouse.c
+    led_mouse.c \
+    input_mac_mouse.c
 
 HEADERS += \
     device.h \

@@ -113,18 +113,24 @@ extern const union devcmd vtable_keyboard_nonrgb;
 extern const union devcmd vtable_mouse;
 
 // Device features
-#define FEAT_RGB        0x01    // RGB backlighting?
-#define FEAT_POLLRATE   0x02    // Known poll rate?
-#define FEAT_BIND       0x04    // Rebindable keys?
-#define FEAT_NOTIFY     0x08    // Key notifications?
-#define FEAT_FWVERSION  0x10    // Has firmware version?
-#define FEAT_FWUPDATE   0x20    // Has firmware update?
+#define FEAT_RGB        0x001   // RGB backlighting?
+#define FEAT_POLLRATE   0x002   // Known poll rate?
+#define FEAT_BIND       0x004   // Rebindable keys?
+#define FEAT_NOTIFY     0x008   // Key notifications?
+#define FEAT_FWVERSION  0x010   // Has firmware version?
+#define FEAT_FWUPDATE   0x020   // Has firmware update?
 
-#define FEAT_ANSI       0x40    // ANSI/ISO layout toggle (Mac only - not needed on Linux)
-#define FEAT_ISO        0x80
+#define FEAT_ANSI       0x040   // ANSI/ISO layout toggle (Mac only - not needed on Linux)
+#define FEAT_ISO        0x080
+
+#ifdef OS_MAC
+#define FEAT_MOUSEACCEL 0x100   // Mouse acceleration (also Mac only)
+#else
+#define FEAT_MOUSEACCEL 0
+#endif
 
 // Standard feature sets
-#define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION)
+#define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL)
 #define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)
 #define FEAT_STD_NRGB   (FEAT_COMMON)
 #define FEAT_LMASK      (FEAT_ANSI | FEAT_ISO)
@@ -150,14 +156,15 @@ typedef struct {
     int uinput;
     int event;
 #else
-    uchar urbinput[8 + 21 + MSG_SIZE];
     struct timespec keyrepeat;
-    IOHIDDeviceRef handle;
-    IOHIDDeviceRef handles[4];
+    hid_dev_t handle;
+    hid_dev_t handles[4];
+    io_object_t rm_notify[4];
+    kern_return_t lastresult;
     io_connect_t event;
-    IOReturn lastError;
     IOOptionBits modifiers;
     short lastkeypress;
+    uchar mousestate;
 #endif
     // Thread used for USB/devnode communication. To close: lock mutexes, set handle to zero, unlock, then wait for thread to stop
     pthread_t thread;
@@ -172,7 +179,7 @@ typedef struct {
     // Notification FIFOs, or zero if a FIFO is closed
     int outfifo[OUTFIFO_MAX];
     // Features (see F_ macros)
-    char features;
+    ushort features;
     // Whether the keyboard is being actively controlled by the driver
     char active;
     // Device name

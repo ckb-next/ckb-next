@@ -1,0 +1,818 @@
+#include "includes.h"
+
+#ifdef OS_MAC
+
+struct timespec lastpoll;
+static pthread_mutex_t accelmutex = PTHREAD_MUTEX_INITIALIZER;
+static int has_setup = 0;
+static io_connect_t _handle = 0;
+static void* _scaleSegments = 0;
+static IOItemCount _scaleSegCount = 0;
+static IOFixed _acceleration = -1, _fractX = 0, _fractY = 0;
+
+// Most of this code shamelessly stolen from http://www.opensource.apple.com/source/IOHIDFamily/IOHIDFamily-606.1.7/IOHIDSystem/IOHIPointing.cpp
+// and http://www.opensource.apple.com/source/IOHIDFamily/IOHIDFamily-606.1.7/IOHIDSystem/IOFixed64.h
+// As such this file is licensed as BSD and not GPL
+// Why they thought that mouse acceleration belongs in a low-level input driver is beyond me...
+
+#define MAX_DEVICE_THRESHOLD        0x7fffffff
+
+#define FRAME_RATE		(67 << 16)
+#define SCREEN_RESOLUTION	(96 << 16)
+
+typedef struct {
+    SInt64 value;
+} IOFixed64;
+
+#define sc2f(sc)    ((sc) * 65536LL)
+#define f2sc(f)     ((f).value / 65536LL)
+static SInt32 as32(IOFixed64 f) { SInt64 res = f2sc(f); if(res > INT_MAX) return INT_MAX; if(res < INT_MIN) return INT_MIN; return (SInt32)res; }
+static bool f_gt_sc(IOFixed64 lhs, SInt64 rhs) { return lhs.value > sc2f(rhs); }
+static IOFixed64 f_add(IOFixed64 lhs, IOFixed64 rhs) { IOFixed64 r = { lhs.value + rhs.value }; return r; }
+static IOFixed64 f_sub(IOFixed64 lhs, IOFixed64 rhs) { IOFixed64 r = { lhs.value - rhs.value }; return r; }
+static IOFixed64 f_div(IOFixed64 lhs, IOFixed64 rhs) { IOFixed64 r = { lhs.value * 65536LL / rhs.value }; return r; }
+static IOFixed64 f_mul(IOFixed64 lhs, IOFixed64 rhs) { IOFixed64 r = { (lhs.value * rhs.value) / 65536LL }; return r; }
+static IOFixed64 f_mul_sc(IOFixed64 lhs, SInt64 rhs) { IOFixed64 r = { lhs.value * rhs }; return r; }
+
+static IOFixed64 exponent(const IOFixed64 original, const UInt8 power)
+{
+    IOFixed64 result = {0};
+    if (power) {
+        int i;
+        result = original;
+        for (i = 1; i < power; i++) {
+            result = f_mul(result, original);
+        }
+    }
+    return result;
+}
+
+static UInt32 llsqrt(UInt64 x)
+{
+    UInt64 rem = 0;
+    UInt64 root = 0;
+    int i;
+
+    for (i = 0; i < 32; i++) {
+        root <<= 1;
+        rem = ((rem << 2) + (x >> 62));
+        x <<= 2;
+
+        root++;
+
+        if (root <= rem) {
+            rem -=  root;
+            root++;
+        } else {
+            root--;
+        }
+    }
+
+    return(UInt32)(root >> 1);
+}
+
+UInt16 lsqrt(UInt32 x)
+{
+    UInt32 rem = 0;
+    UInt32 root = 0;
+    int i;
+
+    for (i = 0; i < 16; i++) {
+        root <<= 1;
+        rem = ((rem << 2) + (x >> 30));
+        x <<= 2;
+
+        root++;
+
+        if (root <= rem) {
+            rem -=  root;
+            root++;
+        } else {
+            root--;
+        }
+    }
+
+    return(UInt16)(root >> 1);
+}
+
+static IOFixed64 IOQuarticFunction( const IOFixed64 x, const IOFixed64 *gains )
+{
+    // Computes hyper-cubic polynomial with 0-intercept: f(x) = m1*x + m2^2 * x^2 + m3^3 * x^3 + m4^4 * x^4
+    IOFixed64 function_at_x = f_add(f_mul(x, gains[0]), exponent(f_mul(x, gains[1]), 2));
+
+    // -- Because of IOFixed overhead, don't bother computing higher expansions unless their gain coefficients are non-zero:
+    if( gains[2].value != 0LL )
+        function_at_x = f_add(function_at_x, exponent(f_mul(x, gains[2]), 3));
+
+    if( gains[3].value != 0LL )
+        function_at_x = f_add(function_at_x, exponent(f_mul(x, gains[3]), 4));
+
+    return function_at_x;
+}
+
+static IOFixed64 IOQuarticDerivative( const IOFixed64 x, const IOFixed64 *gains )
+{
+    // For hyper-cubic polynomial with 0-intercept: f(x) = m1*x + m2^2 * x^2 + m3^3 * x^3 + m4^4 * x^4
+    // This function evaluates the derivative: f'(x) = m1 + 2 * x * m2^2 + 3 * x^2 * m3^3 + 4 * x^3 * m4^4
+    IOFixed64 derivative_at_x = f_add(gains[0], f_mul_sc(f_mul(x, exponent(gains[1], 2)), 2LL));
+
+    // -- Because of IOFixed overhead, don't bother computing higher expansions unless their gain coefficients are non-zero:
+    if( gains[2].value != 0LL )
+        derivative_at_x = f_add(derivative_at_x, f_mul_sc(f_mul(exponent(x, 2), exponent(gains[2], 3)), 3LL));
+
+    if( gains[3].value != 0LL )
+        derivative_at_x = f_add(derivative_at_x, f_mul_sc(f_mul(exponent(x, 3), exponent(gains[3], 4)), 4LL));
+
+    return derivative_at_x;
+}
+
+static inline IOFixed IOFixedMultiply(IOFixed a, IOFixed b)
+{
+    return (IOFixed)((((SInt64) a) * ((SInt64) b)) >> 16);
+}
+
+static inline IOFixed IOFixedDivide(IOFixed a, IOFixed b)
+{
+    return (IOFixed)((((SInt64) a) << 16) / ((SInt64) b));
+}
+
+static IOFixed64 OSObjectToIOFixed64(CFNumberRef object){
+    IOFixed64 result = {0};
+    if(object && CFGetTypeID(object) == CFNumberGetTypeID())
+        CFNumberGetValue(object, kCFNumberIntType, &result.value);
+    return result;
+}
+
+typedef struct
+{
+    IOFixed64   deviceMickysDivider;
+    IOFixed64   cursorSpeedMultiplier;
+    IOFixed64   accelIndex;
+    IOFixed64   gain[4];
+    IOFixed64   tangent[2];
+} IOHIPointing__PAParameters;
+
+typedef struct
+{
+    int         firstTangent;
+    IOFixed64   m0; // m1 == m0
+    IOFixed64   b0; // no b1
+    IOFixed64   y0;
+    IOFixed64   y1;
+    IOFixed64   m_root;
+    IOFixed64   b_root;
+} IOHIPointing__PASecondaryParameters;
+
+static IOHIPointing__PAParameters* _paraAccelParams = 0;
+static IOHIPointing__PASecondaryParameters* _paraAccelSecondaryParams = 0;
+
+struct CursorDeviceSegment {
+    SInt32	devUnits;
+    SInt32	slope;
+    SInt32	intercept;
+};
+typedef struct CursorDeviceSegment CursorDeviceSegment;
+
+bool
+PACurvesFillParamsFromDict(CFDictionaryRef parameters,
+                           const IOFixed64 devScale,
+                           const IOFixed64 crsrScale,
+                           IOHIPointing__PAParameters *outParams)
+{
+    require(parameters, exit_early);
+    require(CFGetTypeID(parameters) == CFDictionaryGetTypeID(), exit_early);
+
+    outParams->deviceMickysDivider = devScale;
+    outParams->cursorSpeedMultiplier = crsrScale;
+
+    outParams->accelIndex = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelIndexKey)));
+
+    outParams->gain[0] = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelGainLinearKey)));
+    outParams->gain[1] = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelGainParabolicKey)));
+    outParams->gain[2] = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelGainCubicKey)));
+    outParams->gain[3] = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelGainQuarticKey)));
+
+    outParams->tangent[0] = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelTangentSpeedLinearKey)));
+    outParams->tangent[1] = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelTangentSpeedParabolicRootKey)));
+//    outParams->tangent[2] = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelTangentSpeedCubicRootKey)));
+//    outParams->tangent[3] = OSObjectToIOFixed64(CFDictionaryGetValue(parameters, CFSTR(kHIDAccelTangentSpeedQuarticRootKey)));
+
+    return ((outParams->gain[0].value != 0LL) ||
+            (outParams->gain[1].value != 0LL) ||
+            (outParams->gain[2].value != 0LL) ||
+            (outParams->gain[3].value != 0LL));
+
+exit_early:
+    return false;
+}
+
+bool
+PACurvesSetupAccelParams (CFArrayRef parametricCurves,
+                          IOFixed64 desired,
+                          IOFixed64 devScale,
+                          IOFixed64 crsrScale,
+                          IOHIPointing__PAParameters *primaryParams,
+                          IOHIPointing__PASecondaryParameters *secondaryParams)
+{
+    bool                    success = false;
+    CFDictionaryRef         dict = NULL;
+
+    IOHIPointing__PAParameters high_curve_params;
+    IOHIPointing__PAParameters low_curve_params;
+
+//  IOLog("%s %d: Called with %08x, %08x, %08x\n", __PRETTY_FUNCTION__, __LINE__, desired.asFixed(), devScale.asFixed(), crsrScale.asFixed());
+
+    require(parametricCurves, exit_early);
+    require(f_gt_sc(crsrScale, 0LL), exit_early);
+    require(f_gt_sc(devScale, 0LL), exit_early);
+    require(f_gt_sc(desired, 0LL), exit_early);
+
+    CFIndex itrCount = CFArrayGetCount(parametricCurves);
+    CFIndex itr = 0;
+    require(itr, exit_early);
+
+    while (!success) {
+        itr = 0;
+        dict = (CFDictionaryRef)CFArrayGetValueAtIndex(parametricCurves, itr++);
+        require(PACurvesFillParamsFromDict(dict, devScale, crsrScale, &low_curve_params),
+                exit_early);
+
+        while (itr < itrCount && !success && (NULL != dict)) {
+            if (!PACurvesFillParamsFromDict(dict, devScale, crsrScale, &high_curve_params)) {
+                break;
+            }
+            if (desired.value <= high_curve_params.accelIndex.value) {
+                success = true;
+            }
+            else {
+                low_curve_params = high_curve_params;
+            }
+            dict = (CFDictionaryRef)CFArrayGetValueAtIndex(parametricCurves, itr++);
+        }
+
+        require(success || itr == itrCount, exit_early);
+    };
+
+    if ( high_curve_params.accelIndex.value > low_curve_params.accelIndex.value ) {
+        IOFixed64   ratio = f_div(f_sub(desired, low_curve_params.accelIndex), f_sub(high_curve_params.accelIndex, low_curve_params.accelIndex));
+        int         index;
+
+//      IOLog("%s %d: Using %08x, %08x, %08x\n", __PRETTY_FUNCTION__, __LINE__, high_curve_params.accelIndex.asFixed(), low_curve_params.accelIndex.asFixed(), ratio.asFixed());
+
+        primaryParams->deviceMickysDivider   = high_curve_params.deviceMickysDivider;
+        primaryParams->cursorSpeedMultiplier = high_curve_params.cursorSpeedMultiplier;
+        primaryParams->accelIndex            = desired;
+
+        for (index = 0; index < 4; index++) {
+            primaryParams->gain[index] = f_add(low_curve_params.gain[index], f_mul(f_sub(high_curve_params.gain[index], low_curve_params.gain[index]), ratio));
+            if (primaryParams->gain[index].value < 0LL)
+                primaryParams->gain[index].value = 0;
+        }
+        for (index = 0; index < 2; index++) {
+            primaryParams->tangent[index] = f_add(low_curve_params.tangent[index], f_mul(f_sub(high_curve_params.tangent[index], low_curve_params.tangent[index]), ratio));
+            if (primaryParams->tangent[index].value < 0LL)
+                primaryParams->tangent[index].value = 0;
+        }
+    }
+    else {
+        *primaryParams = high_curve_params;
+    }
+
+    success = ((primaryParams->gain[0].value != 0LL) ||
+               (primaryParams->gain[1].value != 0LL) ||
+               (primaryParams->gain[2].value != 0LL) ||
+               (primaryParams->gain[3].value != 0LL));
+
+    // calculate secondary values
+    bzero(secondaryParams, sizeof(secondaryParams));
+    if ((primaryParams->tangent[1].value > 0LL) && (primaryParams->tangent[1].value < primaryParams->tangent[0].value))
+        secondaryParams->firstTangent = 1;
+
+    if (secondaryParams->firstTangent == 0) {
+        secondaryParams->y0 = IOQuarticFunction(primaryParams->tangent[0], primaryParams->gain);
+        secondaryParams->m0 = IOQuarticDerivative(primaryParams->tangent[0], primaryParams->gain);
+        secondaryParams->b0 = f_sub(secondaryParams->y0, f_mul(secondaryParams->m0, primaryParams->tangent[0]));
+        secondaryParams->y1 = f_add(f_mul(secondaryParams->m0, primaryParams->tangent[1]), secondaryParams->b0);
+    }
+    else {
+        secondaryParams->y1 = IOQuarticFunction( primaryParams->tangent[1], primaryParams->gain );
+        secondaryParams->m0 = IOQuarticDerivative( primaryParams->tangent[1], primaryParams->gain );
+    }
+
+    secondaryParams->m_root = f_mul_sc(f_mul(secondaryParams->m0, secondaryParams->y1), 2LL);
+    secondaryParams->b_root = f_sub(exponent(secondaryParams->y1, 2), f_mul(secondaryParams->m_root, primaryParams->tangent[1]));
+
+exit_early:
+
+    return success;
+}
+
+static IOFixed resolution()
+{
+    CFNumberRef number;
+    IOHIDCopyCFTypeParameter(_handle, CFSTR(kIOHIDPointerResolutionKey), (CFTypeRef*)&number);
+    IOFixed result = 100 << 16;
+
+    if (number && CFGetTypeID(number) == CFNumberGetTypeID())
+        CFNumberGetValue(number, kCFNumberIntType, &result);
+    if(number) CFRelease(number);
+
+    return result;
+}
+
+static CFDataRef copyAccelerationTable()
+{
+    static const UInt8 accl[] = {
+    0x00, 0x00, 0x80, 0x00,
+        0x40, 0x32, 0x30, 0x30, 0x00, 0x02, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+        0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+        0x00, 0x09, 0x00, 0x00, 0x71, 0x3B, 0x00, 0x00,
+        0x60, 0x00, 0x00, 0x04, 0x4E, 0xC5, 0x00, 0x10,
+        0x80, 0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x5F,
+        0x00, 0x00, 0x00, 0x16, 0xEC, 0x4F, 0x00, 0x8B,
+        0x00, 0x00, 0x00, 0x1D, 0x3B, 0x14, 0x00, 0x94,
+        0x80, 0x00, 0x00, 0x22, 0x76, 0x27, 0x00, 0x96,
+        0x00, 0x00, 0x00, 0x24, 0x62, 0x76, 0x00, 0x96,
+        0x00, 0x00, 0x00, 0x26, 0x00, 0x00, 0x00, 0x96,
+        0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x96,
+        0x00, 0x00
+    };
+
+    CFDataRef data;
+    IOHIDCopyCFTypeParameter(_handle, CFSTR(kIOHIDPointerAccelerationTableKey), (CFTypeRef*)&data);
+    if(data && CFGetTypeID(data) != CFDataGetTypeID()){
+        CFRelease(data);
+        data = 0;
+    }
+    if (!data)
+        data = CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, accl, sizeof(accl), kCFAllocatorNull);
+
+    return( data );
+}
+
+/*
+ Routine:    Interpolate
+ This routine interpolates to find a point on the line [x1,y1] [x2,y2] which
+ is intersected by the line [x3,y3] [x3,y"].  The resulting y' is calculated
+ by interpolating between y3 and y", towards the higher acceleration curve.
+*/
+
+static SInt32 Interpolate(  SInt32 x1, SInt32 y1,
+                            SInt32 x2, SInt32 y2,
+                            SInt32 x3, SInt32 y3,
+                            SInt32 scale, Boolean lower )
+{
+
+    SInt32 slope;
+    SInt32 intercept;
+    SInt32 resultY;
+
+    slope = (x2 == x1) ? 0 : IOFixedDivide( y2 - y1, x2 - x1 );
+    intercept = y1 - IOFixedMultiply( slope, x1 );
+    resultY = intercept + IOFixedMultiply( slope, x3 );
+    if( lower)
+        resultY = y3 - IOFixedMultiply( scale, y3 - resultY );
+    else
+        resultY = resultY + IOFixedMultiply( scale, y3 - resultY );
+
+    return( resultY );
+}
+
+// RY: This function contains the original portions of
+// setupForAcceleration.  This was separated out to
+// accomidate the acceleration of scroll axes
+static bool SetupAcceleration (CFDataRef data, IOFixed desired, IOFixed devScale, IOFixed crsrScale, void ** scaleSegments, IOItemCount * scaleSegCount) {
+    const UInt16 *	lowTable = 0;
+    const UInt16 *	highTable;
+
+    SInt32	x1, y1, x2, y2, x3, y3;
+    SInt32	prevX1, prevY1;
+    SInt32	upperX, upperY;
+    SInt32	lowerX, lowerY;
+    SInt32	lowAccl = 0, lowPoints = 0;
+    SInt32	highAccl, highPoints;
+    SInt32	scale;
+    UInt32	count;
+    Boolean	lower;
+
+    SInt32	scaledX1, scaledY1;
+    SInt32	scaledX2, scaledY2;
+
+    CursorDeviceSegment *	segments;
+    CursorDeviceSegment *	segment;
+    SInt32			segCount;
+
+    if( !data || !devScale || !crsrScale)
+        return false;
+
+    if( desired < (IOFixed) 0) {
+        // disabling mouse scaling
+        if(*scaleSegments && *scaleSegCount)
+            free( *scaleSegments);
+        *scaleSegments = NULL;
+        *scaleSegCount = 0;
+        return false;
+    }
+
+    highTable = (const UInt16 *)CFDataGetBytePtr(data);
+
+    scaledX1 = scaledY1 = 0;
+
+    scale = OSReadBigInt32((volatile void *)highTable, 0);
+    highTable += 4;
+
+    // normalize table's default (scale) to 0.5
+    if( desired > 0x8000) {
+        desired = IOFixedMultiply( desired - 0x8000,
+                                   0x10000 - scale );
+        desired <<= 1;
+        desired += scale;
+    } else {
+        desired = IOFixedMultiply( desired, scale );
+        desired <<= 1;
+    }
+
+    count = OSReadBigInt16((volatile void *)(highTable++), 0);
+    scale = (1 << 16);
+
+    // find curves bracketing the desired value
+    do {
+        highAccl = OSReadBigInt32((volatile void *)highTable, 0);
+        highTable += 2;
+        highPoints = OSReadBigInt16((volatile void *)(highTable++), 0);
+
+        if( desired <= highAccl)
+            break;
+
+        if( 0 == --count) {
+            // this much over the highest table
+            scale = (highAccl) ? IOFixedDivide( desired, highAccl ) : 0;
+            lowTable	= 0;
+            break;
+        }
+
+        lowTable	= highTable;
+        lowAccl		= highAccl;
+        lowPoints	= highPoints;
+        highTable	+= lowPoints * 4;
+
+    } while( true );
+
+    // scale between the two
+    if( lowTable) {
+        scale = (highAccl == lowAccl) ? 0 :
+                IOFixedDivide((desired - lowAccl), (highAccl - lowAccl));
+
+    }
+
+    // or take all the high one
+    else {
+        lowTable	= highTable;
+        lowAccl		= highAccl;
+        lowPoints	= 0;
+    }
+
+    if( lowPoints > highPoints)
+        segCount = lowPoints;
+    else
+        segCount = highPoints;
+    segCount *= 2;
+/*    IOLog("lowPoints %ld, highPoints %ld, segCount %ld\n",
+            lowPoints, highPoints, segCount); */
+    segments = calloc( sizeof(CursorDeviceSegment), segCount );
+    assert( segments );
+    segment = segments;
+
+    x1 = prevX1 = y1 = prevY1 = 0;
+
+    lowerX = OSReadBigInt32((volatile void *)lowTable, 0);
+    lowTable += 2;
+    lowerY = OSReadBigInt32((volatile void *)lowTable, 0);
+    lowTable += 2;
+    upperX = OSReadBigInt32((volatile void *)highTable, 0);
+    highTable += 2;
+    upperY = OSReadBigInt32((volatile void *)highTable, 0);
+    highTable += 2;
+
+    do {
+        // consume next point from first X
+        lower = (lowPoints && (!highPoints || (lowerX <= upperX)));
+
+        if( lower) {
+            /* highline */
+            x2 = upperX;
+            y2 = upperY;
+            x3 = lowerX;
+            y3 = lowerY;
+            if( lowPoints && (--lowPoints)) {
+                lowerX = OSReadBigInt32((volatile void *)lowTable, 0);
+                lowTable += 2;
+                lowerY = OSReadBigInt32((volatile void *)lowTable, 0);
+                lowTable += 2;
+            }
+        } else  {
+            /* lowline */
+            x2 = lowerX;
+            y2 = lowerY;
+            x3 = upperX;
+            y3 = upperY;
+            if( highPoints && (--highPoints)) {
+                upperX = OSReadBigInt32((volatile void *)highTable, 0);
+                highTable += 2;
+                upperY = OSReadBigInt32((volatile void *)highTable, 0);
+                highTable += 2;
+            }
+        }
+        {
+        // convert to line segment
+        assert( segment < (segments + segCount) );
+
+        scaledX2 = IOFixedMultiply( devScale, /* newX */ x3 );
+        scaledY2 = IOFixedMultiply( crsrScale,
+                      /* newY */    Interpolate( x1, y1, x2, y2, x3, y3,
+                                            scale, lower ) );
+        if( lowPoints || highPoints)
+            segment->devUnits = scaledX2;
+        else
+            segment->devUnits = MAX_DEVICE_THRESHOLD;
+
+        segment->slope = ((scaledX2 == scaledX1)) ? 0 :
+                IOFixedDivide((scaledY2 - scaledY1), (scaledX2 - scaledX1));
+
+        segment->intercept = scaledY2
+                            - IOFixedMultiply( segment->slope, scaledX2 );
+/*        IOLog("devUnits = %08lx, slope = %08lx, intercept = %08lx\n",
+                segment->devUnits, segment->slope, segment->intercept); */
+
+        scaledX1 = scaledX2;
+        scaledY1 = scaledY2;
+        segment++;
+        }
+
+        // continue on from last point
+        if( lowPoints && highPoints) {
+            if( lowerX > upperX) {
+                prevX1 = x1;
+                prevY1 = y1;
+            } else {
+                /* swaplines */
+                prevX1 = x1;
+                prevY1 = y1;
+                x1 = x3;
+                y1 = y3;
+            }
+        } else {
+            x2 = x1;
+            y2 = y1;
+            x1 = prevX1;
+            y1 = prevY1;
+            prevX1 = x2;
+            prevY1 = y2;
+        }
+
+    } while( lowPoints || highPoints );
+
+    if( *scaleSegCount && *scaleSegments)
+        free( *scaleSegments);
+    *scaleSegCount = segCount;
+    *scaleSegments = (void *) segments;
+
+    return true;
+}
+
+static void setupForAcceleration(IOFixed desired){
+    CFArrayRef      parametricAccelerationCurves;
+    IOHIDCopyCFTypeParameter(_handle, CFSTR(kHIDTrackingAccelParametricCurvesKey), (CFTypeRef*)&parametricAccelerationCurves);
+    IOFixed         devScale    = IOFixedDivide( resolution(), FRAME_RATE );
+    IOFixed         crsrScale   = IOFixedDivide( SCREEN_RESOLUTION, FRAME_RATE );
+    bool            useParametric = false;
+
+//  IOLog("%s %d: got %08x and %p\n", __PRETTY_FUNCTION__, __LINE__, desired, parametricAccelerationCurves);
+    if (!parametricAccelerationCurves || CFGetTypeID(parametricAccelerationCurves) != CFArrayGetTypeID()) {
+        if(parametricAccelerationCurves) CFRelease(parametricAccelerationCurves);
+        IOHIDCopyCFTypeParameter(_handle, CFSTR(kHIDAccelParametricCurvesKey), (CFTypeRef*)&parametricAccelerationCurves);
+    }
+    // Try to set up the parametric acceleration data
+    if (parametricAccelerationCurves && CFGetTypeID(parametricAccelerationCurves) == CFArrayGetTypeID()) {
+        if ( !_paraAccelParams )
+        {
+            _paraAccelParams = (IOHIPointing__PAParameters*)malloc(sizeof(IOHIPointing__PAParameters));
+        }
+        if ( !_paraAccelSecondaryParams )
+        {
+            _paraAccelSecondaryParams = (IOHIPointing__PASecondaryParameters*)malloc(sizeof(IOHIPointing__PASecondaryParameters));
+        }
+
+//      IOLog("%s %d: have %p and %p\n", __PRETTY_FUNCTION__, __LINE__, _paraAccelParams, _paraAccelSecondaryParams);
+
+        if (_paraAccelParams && _paraAccelSecondaryParams) {
+            IOFixed64 desired64 = {desired};
+            IOFixed64 devScale64 = {devScale};
+            IOFixed64 crsrScale64 = {crsrScale};
+
+        //  IOLog("%s: Calling PACurvesSetupAccelParams with %08x, %08x, %08x\n", __PRETTY_FUNCTION__, desired, devScale, crsrScale);
+
+            useParametric = PACurvesSetupAccelParams(parametricAccelerationCurves,
+                                                      desired64,
+                                                      devScale64,
+                                                      crsrScale64,
+                                                      _paraAccelParams,
+                                                      _paraAccelSecondaryParams);
+            /*if (useParametric && getProperty(kHIDAccelParametricCurvesDebugKey, gIOServicePlane)) {
+                OSDictionary *debugInfo = PACurvesDebugDictionary(*_paraAccelParams, *_paraAccelSecondaryParams);
+                if (debugInfo) {
+                    setProperty(kHIDAccelParametricCurvesDebugKey, debugInfo);
+                    debugInfo->release();
+                }
+            }*/
+        }
+    }
+    if(parametricAccelerationCurves) CFRelease(parametricAccelerationCurves);
+
+//  IOLog("%s %d: %s parametric\n", __PRETTY_FUNCTION__, __LINE__, useParametric ? "using" : "NOT using");
+
+    // If that fails, fall back to classic acceleration
+    if (!useParametric) {
+        CFDataRef  table         = copyAccelerationTable();
+
+        if (_paraAccelParams)
+            free(_paraAccelParams);
+        if (_paraAccelSecondaryParams)
+            free(_paraAccelSecondaryParams);
+        _paraAccelParams = NULL;
+        _paraAccelSecondaryParams = NULL;
+
+        if (SetupAcceleration (table, desired, devScale, crsrScale, &_scaleSegments, &_scaleSegCount))
+        {
+            _acceleration = desired;
+            _fractX = _fractY = 0;
+        }
+        if(table) CFRelease(table);
+    }
+}
+
+// RY: This function contains the original portions of
+// scalePointer.  This was separated out to accomidate
+// the acceleration of other axes
+static void ScaleAxes (void * scaleSegments, int * axis1p, IOFixed *axis1Fractp, int * axis2p, IOFixed *axis2Fractp)
+{
+    SInt32			dx, dy;
+    SInt32			mag;
+    IOFixed			scale;
+    CursorDeviceSegment	*	segment;
+
+    if( !scaleSegments)
+        return;
+
+    dx = (*axis1p) << 16;
+    dy = (*axis2p) << 16;
+
+    dx /= 10;
+    dy /= 10;
+
+    // mag is (x^2 + y^2)^0.5 and converted to fixed point
+    mag = (lsqrt(*axis1p * *axis1p + *axis2p * *axis2p)) << 16;
+    if (mag == 0)
+        return;
+
+    // scale
+    for(
+        segment = (CursorDeviceSegment *) scaleSegments;
+        mag > segment->devUnits;
+        segment++)	{}
+
+    scale = IOFixedDivide(
+            segment->intercept + IOFixedMultiply( mag, segment->slope ),
+            mag );
+
+    dx = IOFixedMultiply( dx, scale );
+    dy = IOFixedMultiply( dy, scale );
+
+    // add fract parts
+    dx += *axis1Fractp;
+    dy += *axis2Fractp;
+
+    *axis1p = dx / 65536;
+    *axis2p = dy / 65536;
+
+    // get fractional part with sign extend
+    if( dx >= 0)
+    *axis1Fractp = dx & 0xffff;
+    else
+    *axis1Fractp = dx | 0xffff0000;
+    if( dy >= 0)
+    *axis2Fractp = dy & 0xffff;
+    else
+    *axis2Fractp = dy | 0xffff0000;
+}
+
+static IOFixed64
+PACurvesGetAccelerationMultiplier(const IOFixed64 device_speed_mickeys,
+                                  const IOHIPointing__PAParameters *params,
+                                  const IOHIPointing__PASecondaryParameters *secondaryParams)
+{
+    IOFixed64 result = {0};
+
+    if ((device_speed_mickeys.value > result.value) && (params->deviceMickysDivider.value != result.value)) {
+        IOFixed64 standardized_speed = f_div(device_speed_mickeys, params->deviceMickysDivider);
+        IOFixed64 accelerated_speed;
+        if ((params->tangent[secondaryParams->firstTangent].value != 0LL) && (standardized_speed.value <= params->tangent[secondaryParams->firstTangent].value)) {
+            accelerated_speed = IOQuarticFunction(standardized_speed, params->gain);
+        }
+        else {
+            if ((secondaryParams->firstTangent == 0) && (params->tangent[1].value != 0LL) && (standardized_speed.value <= params->tangent[1].value)) {
+                accelerated_speed = f_add(f_mul(secondaryParams->m0, standardized_speed), secondaryParams->b0);
+            }
+            else {
+                accelerated_speed.value = sc2f(llsqrt(f2sc(f_add(f_mul(secondaryParams->m_root, standardized_speed), secondaryParams->b_root))));
+            }
+        }
+        IOFixed64 accelerated_pixels = f_mul(accelerated_speed, params->cursorSpeedMultiplier);
+        result = f_div(accelerated_pixels, device_speed_mickeys);
+    }
+    else {
+        result.value = 1;
+    }
+
+    return result;
+}
+
+static void scalePointer(int * dxp, int * dyp)
+// Description:	Perform pointer acceleration computations here.
+//		Given the resolution, dx, dy, and time, compute the velocity
+//		of the pointer over a Manhatten distance in inches/second.
+//		Using this velocity, do a lookup in the pointerScaling table
+//		to select a scaling factor. Scale dx and dy up as appropriate.
+// Preconditions:
+// *	_deviceLock should be held on entry
+{
+    if (_paraAccelParams && _paraAccelSecondaryParams) {
+        IOFixed64 deltaX = {sc2f(*dxp)}; deltaX.value /= 10;
+        IOFixed64 deltaY = {sc2f(*dyp)}; deltaY.value /= 10;
+        IOFixed64 fractX = {_fractX};
+        IOFixed64 fractY = {_fractY};
+        IOFixed64 mag = {sc2f(llsqrt(f2sc(f_add(f_mul(deltaX, deltaX), f_mul(deltaY, deltaY)))))};
+
+        IOFixed64 mult = PACurvesGetAccelerationMultiplier(mag, _paraAccelParams, _paraAccelSecondaryParams);
+        deltaX = f_mul(deltaX, mult);
+        deltaY = f_mul(deltaY, mult);
+        deltaX = f_add(deltaX, fractX);
+        deltaY = f_add(deltaY, fractY);
+
+        *dxp = as32(deltaX);
+        *dyp = as32(deltaY);
+
+        _fractX = as32(deltaX);
+        _fractY = as32(deltaY);
+
+        // sign extend fractional part
+        if( deltaX.value < 0LL )
+            _fractX |= 0xffff0000;
+        else
+            _fractX &= 0x0000ffff;
+
+        if( deltaY.value < 0LL)
+            _fractY |= 0xffff0000;
+        else
+            _fractY &= 0x0000ffff;
+    }
+    else {
+        ScaleAxes(_scaleSegments, dxp, &_fractX, dyp, &_fractY);
+    }
+}
+
+static int get_desired_accel(){
+    int value = 0;
+    IOByteCount size = 0;
+    CFTypeRef accelKey;
+    if(IOHIDCopyCFTypeParameter(_handle, CFSTR(kIOHIDPointerAccelerationTypeKey), &accelKey) == kIOReturnSuccess){
+        if(CFGetTypeID(accelKey) == CFStringGetTypeID()){
+            if(IOHIDGetParameter(_handle, accelKey, sizeof(int), &value, &size) != kIOReturnSuccess)
+                size = 0;
+        }
+        if(accelKey) CFRelease(accelKey);
+    }
+    if(size == 0)
+        IOHIDGetParameter(_handle, CFSTR(kIOHIDMouseAccelerationType), sizeof(int), &value, &size);
+    return value;
+}
+
+void mouse_accel(io_connect_t event, int* x, int* y){
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    pthread_mutex_lock(&accelmutex);
+    // If the mouse hasn't been polled in a while (1s), check the acceleration values again
+    struct timespec last = lastpoll;
+    timespec_add(&last, 1000000000);
+    if(!has_setup || timespec_gt(now, last)){
+        _handle = event;
+        setupForAcceleration(get_desired_accel());
+        has_setup = 1;
+        lastpoll = now;
+    }
+    pthread_mutex_unlock(&accelmutex);
+    scalePointer(x, y);
+}
+
+#endif  // OS_MAC

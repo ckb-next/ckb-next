@@ -168,6 +168,9 @@ void Kb::hwSave(){
     hwLoading = false;
     // Rewrite the current profile from scratch to ensure consistency
     writeProfileHeader();
+    // Make sure there are enough modes
+    while(_currentProfile->modeCount() < hwModeCount)
+        _currentProfile->append(new KbMode(this, getKeyMap()));
     // Write only the base colors of each mode, no animations
     for(int i = 0; i < hwModeCount; i++){
         KbMode* mode = _currentProfile->modes()[i];

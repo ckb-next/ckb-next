@@ -4,6 +4,8 @@
 #include "led.h"
 #include "notify.h"
 
+// usb.c
+extern volatile int reset_stop;
 extern int features_mask;
 
 // Timespec utility function
@@ -14,6 +16,8 @@ void timespec_add(struct timespec* timespec, long nanoseconds){
 }
 
 void quit(){
+    // Abort any USB resets in progress
+    reset_stop = 1;
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
         pthread_mutex_lock(devmutex + i);
@@ -99,6 +103,13 @@ int main(int argc, char** argv){
             // Allow running as a non-root user
             forceroot = 0;
         }
+#ifdef OS_MAC
+        else if(!strcmp(argument, "--nomouseaccel")){
+            // On OSX, provide an option to disable mouse acceleration
+            features_mask &= ~FEAT_MOUSEACCEL;
+            ckb_info_nofile("Mouse acceleration disabled\n");
+        }
+#endif
     }
 
     // Check UID

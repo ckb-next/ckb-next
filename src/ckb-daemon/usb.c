@@ -10,6 +10,12 @@
 
 pthread_mutex_t usbmutex = PTHREAD_MUTEX_INITIALIZER;
 
+// Reset stopper for when the program shuts down
+volatile int reset_stop = 0;
+
+// Mask of features to exclude from all devices
+int features_mask = -1;
+
 // Vendor/product string representations
 const char* vendor_str(short vendor){
     if(vendor == V_CORSAIR)
@@ -34,9 +40,6 @@ static const devcmd* get_vtable(short vendor, short product){
     return IS_MOUSE(vendor, product) ? &vtable_mouse : IS_RGB(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
 }
 
-// Mask of features to exclude from all devices
-int features_mask = -1;
-
 // USB device main loop
 static void* devmain(usbdevice* kb){
     while(1){
@@ -46,7 +49,10 @@ static void* devmain(usbdevice* kb){
             break;
         // Read from FIFO
         const char* line;
-        if(readlines(kb->infifo, &line)){
+        euid_guard_start;
+        int lines = readlines(kb->infifo, &line);
+        euid_guard_stop;
+        if(lines){
             if(readcmd(kb, line)){
                 // USB transfer failed; destroy device
                 closeusb(kb);
@@ -90,24 +96,25 @@ static void* _setupusb(void* context){
     // Set up device
     vt->allocprofile(kb);
     vt->updateindicators(kb, 1);
+    pthread_mutex_unlock(imutex(kb));
     if(vt->start(kb, 0) && usb_tryreset(kb))
-        goto fail;
+        goto fail_noinput;
 
     // Make /dev path
     if(mkdevpath(kb))
-        goto fail;
+        goto fail_noinput;
 
     // Finished. Enter main loop
     int index = INDEX_OF(kb, keyboard);
     ckb_info("%s ready at %s%d\n", kb->name, devpath, index);
     updateconnected();
     notifyconnect(kb, 1);
-    pthread_mutex_unlock(imutex(kb));
     pthread_mutex_unlock(dmutex(kb));
     return devmain(kb);
 
     fail:
     pthread_mutex_unlock(imutex(kb));
+    fail_noinput:
     closeusb(kb);
     pthread_mutex_unlock(dmutex(kb));
     return 0;
@@ -157,7 +164,7 @@ int usb_tryreset(usbdevice* kb){
             ckb_info("Reset success\n");
             return 0;
         }
-        if(res == -2)
+        if(res == -2 || reset_stop)
             break;
     }
     ckb_err("Reset failed. Disconnecting.\n");
@@ -184,6 +191,8 @@ int closeusb(usbdevice* kb){
     pthread_mutex_lock(dmutex(kb));
 
     // Delete the profile and the control path
+    if(!kb->vtable)
+        return 0;
     kb->vtable->freeprofile(kb);
     rmdevpath(kb);
     memset(kb, 0, sizeof(usbdevice));

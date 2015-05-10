@@ -36,6 +36,7 @@ int rm_recursive(const char* path){
 }
 
 void updateconnected(){
+    euid_guard_start;
     pthread_mutex_lock(devmutex);
     char cpath[strlen(devpath) + 12];
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
@@ -43,6 +44,7 @@ void updateconnected(){
     if(!cfile){
         ckb_warn("Unable to update %s: %s\n", cpath, strerror(errno));
         pthread_mutex_unlock(devmutex);
+        euid_guard_stop;
         return;
     }
     int written = 0;
@@ -59,9 +61,10 @@ void updateconnected(){
     if(gid >= 0)
         chown(cpath, 0, gid);
     pthread_mutex_unlock(devmutex);
+    euid_guard_stop;
 }
 
-int mkdevpath(usbdevice* kb){
+static int _mkdevpath(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
     // Create the control path
     char path[strlen(devpath) + 2];
@@ -80,7 +83,9 @@ int mkdevpath(usbdevice* kb){
 
     if(kb == keyboard + 0){
         // Root keyboard: write a list of devices
+        euid_guard_stop;        // Avoid recursive lock
         updateconnected();
+        euid_guard_start;
         // Write version number
         char vpath[sizeof(path) + 8];
         snprintf(vpath, sizeof(vpath), "%s/version", path);
@@ -123,7 +128,9 @@ int mkdevpath(usbdevice* kb){
             fchown(kb->infifo, 0, gid);
 
         // Create notification FIFO
+        euid_guard_stop;        // Avoid recursive lock
         mknotifynode(kb, 0);
+        euid_guard_start;
 
         // Write the model and serial to files
         char mpath[sizeof(path) + 6], spath[sizeof(path) + 7];
@@ -186,19 +193,31 @@ int mkdevpath(usbdevice* kb){
     return 0;
 }
 
+int mkdevpath(usbdevice* kb){
+    euid_guard_start;
+    int res = _mkdevpath(kb);
+    euid_guard_stop;
+    return res;
+}
+
 int rmdevpath(usbdevice* kb){
+    euid_guard_start;
     int index = INDEX_OF(kb, keyboard);
     close(kb->infifo);
     kb->infifo = 0;
+    euid_guard_stop;
     for(int i = 0; i < OUTFIFO_MAX; i++)
         rmnotifynode(kb, i);
+    euid_guard_start;
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
     if(rm_recursive(path) != 0 && errno != ENOENT){
         ckb_warn("Unable to delete %s: %s\n", path, strerror(errno));
+        euid_guard_stop;
         return -1;
     }
     ckb_info("Removed device path %s\n", path);
+    euid_guard_stop;
     return 0;
 }
 
@@ -242,6 +261,7 @@ int mknotifynode(usbdevice* kb, int notify){
         return -1;
     if(kb->outfifo[notify])
         return 0;
+    euid_guard_start;
     // Create the notification node
     int index = INDEX_OF(kb, keyboard);
     char outpath[strlen(devpath) + 10];
@@ -250,16 +270,19 @@ int mknotifynode(usbdevice* kb, int notify){
         ckb_warn("Unable to create %s: %s\n", outpath, strerror(errno));
         kb->outfifo[notify] = 0;
         remove(outpath);
+        euid_guard_stop;
         return -1;
     }
     if(gid >= 0)
         fchown(kb->outfifo[notify], 0, gid);
+    euid_guard_stop;
     return 0;
 }
 
 int rmnotifynode(usbdevice* kb, int notify){
     if(notify < 0 || notify >= OUTFIFO_MAX || !kb->outfifo[notify])
         return -1;
+    euid_guard_start;
     int index = INDEX_OF(kb, keyboard);
     char outpath[strlen(devpath) + 10];
     snprintf(outpath, sizeof(outpath), "%s%d/notify%d", devpath, index, notify);
@@ -267,7 +290,9 @@ int rmnotifynode(usbdevice* kb, int notify){
     close(kb->outfifo[notify]);
     kb->outfifo[notify] = 0;
     // Delete node
-    return remove(outpath);
+    int res = remove(outpath);
+    euid_guard_stop;
+    return res;
 }
 
 #define MAX_BUFFER (1024 * 1024 - 1)

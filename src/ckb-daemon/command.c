@@ -111,25 +111,35 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
 
         // Specially handled commands - these are available even when keyboard is IDLE
-        else if(command == NOTIFYON){
+        switch(command){
+        case NOTIFYON: {
             int notify;
             if(sscanf(word, "%u", &notify) == 1)
                 mknotifynode(kb, notify);
             continue;
-        } else if(command == NOTIFYOFF){
+        } case NOTIFYOFF: {
             int notify;
             if(sscanf(word, "%u", &notify) == 1 && notify != 0)
                 rmnotifynode(kb, notify);
             continue;
-        } else if(command == GET){
+        } case GET:
             vt->get(kb, mode, notifynumber, 0, word);
             continue;
-        } else if(command == LAYOUT){
+        case LAYOUT:
             if(!strcmp(word, "ansi"))
                 kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ANSI;
             else if(!strcmp(word, "iso"))
                 kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ISO;
+        case MODE: {
+            // Mode selection processes a number
+            int newmode;
+            if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_COUNT)
+                mode = profile->mode + newmode - 1;
+            continue;
         }
+        default:;
+        }
+
         // If a keyboard is inactive, it must be activated before receiving any other commands
         if(!kb->active){
             if(command == ACTIVE)
@@ -141,13 +151,7 @@ int readcmd(usbdevice* kb, const char* line){
         case IDLE:
             TRY_WITH_RESET(vt->idle(kb, mode, notifynumber, 0, 0));
             continue;
-        case MODE: {
-            // Mode selection processes a number
-            int newmode;
-            if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_COUNT)
-                mode = profile->mode + newmode - 1;
-            continue;
-        } case SWITCH:
+        case SWITCH:
             profile->currentmode = mode;
             // Set mode light for non-RGB K95
             int index = INDEX_OF(mode, profile->mode);

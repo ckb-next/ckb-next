@@ -48,6 +48,10 @@ Install the latest version of Xcode from the App Store. Open Xcode, accept the l
 
 The easiest way to install the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see `BUILD.md`.
 
+#### Uninstall:
+
+Drag `ckb.app` into the trash. If the daemon plist file isn't cleaned up automatically, you can find it and remove it here: `/Library/LaunchDaemons/com.ckb.daemon.plist`.
+
 Usage
 -----
 

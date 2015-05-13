@@ -14,7 +14,7 @@ int getfwversion(usbdevice* kb){
     if(!usbsend(kb, data_pkt, 1))
         return -1;
     // Wait for the response
-    DELAY_SHORT;
+    DELAY_SHORT(kb);
     uchar in_pkt[MSG_SIZE];
     if(!usbrecv(kb, in_pkt))
         return -1;
@@ -28,7 +28,11 @@ int getfwversion(usbdevice* kb){
     memcpy(&bootloader, in_pkt + 10, 2);
     memcpy(&vendor, in_pkt + 12, 2);
     memcpy(&product, in_pkt + 14, 2);
-    uchar poll = in_pkt[16];
+    char poll = in_pkt[16];
+    if(poll < 0){
+        poll = -1;
+        kb->features &= ~FEAT_POLLRATE;
+    }
     // Print a warning if the vendor or product isn't what it should be
     if(vendor != kb->vendor)
         ckb_warn("Got vendor ID %04x (expected %04x)\n", vendor, kb->vendor);
@@ -41,7 +45,7 @@ int getfwversion(usbdevice* kb){
         kb->pollrate = -1;
     } else {
         kb->fwversion = version;
-        kb->pollrate = (int)poll * 1000000;
+        kb->pollrate = poll;
     }
     return 0;
 }

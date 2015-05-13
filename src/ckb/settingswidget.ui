@@ -155,32 +155,16 @@
      <item row="0" column="2">
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QComboBox" name="fpsBox">
-         <item>
-          <property name="text">
-           <string>60 FPS</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>50 FPS</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>30 FPS</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>25 FPS</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>15 FPS</string>
-          </property>
-         </item>
+        <widget class="QSpinBox" name="fpsBox">
+         <property name="minimum">
+          <number>5</number>
+         </property>
+         <property name="maximum">
+          <number>60</number>
+         </property>
+         <property name="value">
+          <number>30</number>
+         </property>
         </widget>
        </item>
        <item>
@@ -200,9 +184,9 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="fpsWarnLabel">
          <property name="text">
-          <string>Try adjusting this if you experience animation issues.</string>
+          <string>Warning: High frame rates may cause USB stability issues</string>
          </property>
         </widget>
        </item>
@@ -230,7 +214,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Frame rate:</string>
+        <string>Frame rate (FPS):</string>
        </property>
       </widget>
      </item>

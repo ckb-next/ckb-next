@@ -22,7 +22,6 @@ int start_dev(usbdevice* kb, int makeactive){
         return 0;
     }
     // Load profile from device
-    DELAY_LONG;
     if(hwloadprofile(kb, 1))
         return -2;
     // Active software mode if requested

@@ -190,8 +190,10 @@ typedef struct {
     short vendor, product;
     // Firmware version
     ushort fwversion;
-    // Poll rate (ns), or -1 if unsupported
-    int pollrate;
+    // Poll rate (ms), or -1 if unsupported
+    char pollrate;
+    // USB protocol delay (ms)
+    char usbdelay;
     // Current input state
     usbinput input;
     // Indicator LED state

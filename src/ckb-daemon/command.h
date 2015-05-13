@@ -6,12 +6,14 @@
 // Command operations
 typedef enum {
     // Special - handled by readcmd, no device functions
-    NONE        = -6,
-    MODE        = -5,   CMD_FIRST = MODE,
-    SWITCH      = -4,
-    LAYOUT      = -3,
-    NOTIFYON    = -2,
-    NOTIFYOFF   = -1,
+    NONE        = -8,
+    MODE        = -7,   CMD_FIRST = MODE,
+    SWITCH      = -6,
+    LAYOUT      = -5,
+    ACCEL       = -4,
+    NOTIFYON    = -3,
+    NOTIFYOFF   = -2,
+    USBDELAY    = -1,
 
     // Hardware data
     HWLOAD      = 0,    CMD_VT_FIRST = 0,

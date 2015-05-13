@@ -42,6 +42,8 @@ static const devcmd* get_vtable(short vendor, short product){
 
 // USB device main loop
 static void* devmain(usbdevice* kb){
+    readlines_ctx linectx;
+    readlines_ctx_init(&linectx);
     while(1){
         pthread_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
@@ -50,7 +52,7 @@ static void* devmain(usbdevice* kb){
         // Read from FIFO
         const char* line;
         euid_guard_start;
-        int lines = readlines(kb->infifo, &line);
+        int lines = readlines(kb->infifo, linectx, &line);
         euid_guard_stop;
         if(lines){
             if(readcmd(kb, line)){
@@ -65,9 +67,10 @@ static void* devmain(usbdevice* kb){
         kb->vtable->updateindicators(kb, 0);
         // Wait a little bit and then read again
         pthread_mutex_unlock(dmutex(kb));
-        DELAY_SHORT;
+        DELAY_SHORT(kb);
     }
     pthread_mutex_unlock(dmutex(kb));
+    readlines_ctx_free(linectx);
     return 0;
 }
 
@@ -77,8 +80,10 @@ static void* _setupusb(void* context){
     short vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
     kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;
+    kb->usbdelay = USB_DELAY_DEFAULT;
 
     // Perform OS-specific setup
+    DELAY_LONG(kb);
     if(os_setupusb(kb))
         goto fail;
     if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
@@ -140,11 +145,11 @@ int revertusb(usbdevice* kb){
 
 int _resetusb(usbdevice* kb, const char* file, int line){
     // Perform a USB reset
-    DELAY_LONG;
+    DELAY_LONG(kb);
     int res = os_resetusb(kb, file, line);
     if(res)
         return res;
-    DELAY_LONG;
+    DELAY_LONG(kb);
     // Re-initialize the device
     kb->vtable->start(kb, kb->active);
     // If the hardware profile hasn't been loaded yet, load it here
@@ -158,7 +163,6 @@ int _resetusb(usbdevice* kb, const char* file, int line){
 int usb_tryreset(usbdevice* kb){
     ckb_info("Attempting reset...\n");
     while(1){
-        DELAY_LONG;
         int res = resetusb(kb);
         if(!res){
             ckb_info("Reset success\n");

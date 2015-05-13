@@ -75,6 +75,12 @@ public:
     // Auto-detects layout from system locale
     static Layout locale();
 
+    // Keyboard or mouse?
+    inline static bool isKeyboard(Model model) { return !isMouse(model) && model != NO_MODEL; }
+    inline bool isKeyboard() const { return isKeyboard(keyModel); }
+    inline static bool isMouse(Model model) { return model == M65; }
+    inline bool isMouse() const { return isMouse(keyModel); }
+
     // Creates a blank key map
     KeyMap();
     // Creates a standard key map

@@ -33,6 +33,9 @@ int rmnotifynode(usbdevice* kb, int notify);
 int mkfwnode(usbdevice* kb);
 
 // Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
-unsigned readlines(int fd, const char** input);
+typedef struct _readlines_ctx* readlines_ctx;
+void readlines_ctx_init(readlines_ctx* ctx);
+void readlines_ctx_free(readlines_ctx ctx);
+unsigned readlines(int fd, readlines_ctx ctx, const char** input);
 
 #endif  // DEVNODE_H

@@ -10,17 +10,14 @@ int setactive_mouse(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
     uchar msg[MSG_SIZE] = { 0x07, 0x04, 0 };    // Disables or enables HW control for DPI and Sniper button
-    if(active){
+    if(active)
         // Put the mouse into SW mode
         msg[2] = 2;
-        pthread_mutex_lock(imutex(kb));
-        kb->active = 1;
-    } else {
+    else
         // Restore HW mode
         msg[2] = 1;
-        pthread_mutex_lock(imutex(kb));
-        kb->active = 0;
-    }
+    pthread_mutex_lock(imutex(kb));
+    kb->active = !!active;
     // Clear input
     memset(&kb->input.keys, 0, sizeof(kb->input.keys));
     inputupdate(kb);

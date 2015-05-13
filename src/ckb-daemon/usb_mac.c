@@ -11,7 +11,7 @@
 int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
     for(int i = 0; i < count; i++){
         pthread_mutex_lock(&usbmutex);
-        DELAY_SHORT;
+        DELAY_SHORT(kb);
         kern_return_t res = (*kb->handle)->setReport(kb->handle, kIOHIDReportTypeFeature, 0, messages + i * MSG_SIZE, MSG_SIZE, 5000, 0, 0, 0);
         kb->lastresult = res;
         if(res != kIOReturnSuccess){
@@ -26,7 +26,7 @@ int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int 
 
 int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
     pthread_mutex_lock(&usbmutex);
-    DELAY_MEDIUM;
+    DELAY_MEDIUM(kb);
     CFIndex length = MSG_SIZE;
     kern_return_t res = (*kb->handle)->getReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length, 5000, 0, 0, 0);
     kb->lastresult = res;
@@ -150,7 +150,11 @@ void* os_inputmain(void* context){
         pthread_mutex_unlock(imutex(kb));
     }
 
+    // Clean up
     ckb_info("Stopping input thread for %s%d\n", devpath, index);
+    free(urbinput[0]);
+    free(urbinput[1]);
+    free(urbinput[2]);
     return 0;
 }
 
@@ -170,10 +174,8 @@ static void usbgetstr(hid_dev_t handle, CFStringRef key, char* output, int out_l
         output[0] = 0;
         return;
     }
-    if(!cf || CFGetTypeID(cf) != CFStringGetTypeID() || !CFStringGetCString(cf, output, out_len, kCFStringEncodingASCII)){
+    if(!cf || CFGetTypeID(cf) != CFStringGetTypeID() || !CFStringGetCString(cf, output, out_len, kCFStringEncodingASCII))
         output[0] = 0;
-        return;
-    }
 }
 
 int os_setupusb(usbdevice* kb){

@@ -34,9 +34,10 @@ const char* product_str(short product);
 #define IS_MOUSE(vendor, product)   ((vendor) == (V_CORSAIR) && (product) == (P_M65))
 
 // USB delays for when the keyboards get picky about timing
-#define DELAY_SHORT     usleep(3000)    // 3ms
-#define DELAY_MEDIUM    usleep(30000)   // 30ms
-#define DELAY_LONG      usleep(100000)  // 100ms
+#define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)
+#define DELAY_MEDIUM(kb)    usleep((int)(kb)->usbdelay * 10000) // x10 (default: 50ms)
+#define DELAY_LONG(kb)      usleep(100000)                      // long, fixed 100ms
+#define USB_DELAY_DEFAULT   5
 
 // Start the USB main loop. Returns program exit code when finished
 int usbmain();

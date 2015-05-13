@@ -51,7 +51,7 @@ int setactive_kb(usbdevice* kb, int active){
         msg[0][2] = 2;
         if(!usbsend(kb, msg[0], 1))
             return -1;
-        DELAY_MEDIUM;
+        DELAY_MEDIUM(kb);
         // Set input mode on the keys. They must be grouped into packets of 60 bytes (+ 4 bytes header)
         // Keys are referenced in byte pairs, with the first byte representing the key and the second byte representing the mode.
         for(int key = 0; key < N_KEYS_KB; ){
@@ -73,7 +73,7 @@ int setactive_kb(usbdevice* kb, int active){
         // Commit new input settings
         if(!usbsend(kb, msg[2], 1))
             return -1;
-        DELAY_MEDIUM;
+        DELAY_MEDIUM(kb);
     } else {
         pthread_mutex_lock(imutex(kb));
         kb->active = 0;
@@ -85,10 +85,10 @@ int setactive_kb(usbdevice* kb, int active){
         msg[0][2] = 1;
         if(!usbsend(kb, msg[0], 1))
             return -1;
-        DELAY_MEDIUM;
+        DELAY_MEDIUM(kb);
         if(!usbsend(kb, msg[0], 1))
             return -1;
-        DELAY_MEDIUM;
+        DELAY_MEDIUM(kb);
 #ifdef OS_LINUX
         // On OSX the default key mappings are fine. On Linux, the G keys will freeze the keyboard. Set the keyboard entirely to HID input.
         for(int key = 0; key < N_KEYS_KB; ){
@@ -121,7 +121,7 @@ int setactive_kb(usbdevice* kb, int active){
         // Commit new input settings
         if(!usbsend(kb, msg[2], 1))
             return -1;
-        DELAY_MEDIUM;
+        DELAY_MEDIUM(kb);
 #endif
     }
     return 0;

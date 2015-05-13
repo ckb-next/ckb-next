@@ -242,7 +242,7 @@ int mkfwnode(usbdevice* kb){
     snprintf(ppath, sizeof(ppath), "%s%d/pollrate", devpath, index);
     FILE* pfile = fopen(ppath, "w");
     if(pfile){
-        fprintf(pfile, "%d ms", kb->pollrate / 1000000);
+        fprintf(pfile, "%d ms", kb->pollrate);
         fputc('\n', pfile);
         fclose(pfile);
         chmod(ppath, S_GID_READ);
@@ -296,19 +296,34 @@ int rmnotifynode(usbdevice* kb, int notify){
 }
 
 #define MAX_BUFFER (1024 * 1024 - 1)
-unsigned readlines(int fd, const char** input){
-    // Allocate static buffers to store data
-    static int buffersize = 4095;
-    static int leftover = 0, leftoverlen = 0;
-    static char* buffer = 0;
-    if(!buffer)
-        buffer = malloc(buffersize + 1);
+struct _readlines_ctx {
+    char* buffer;
+    int buffersize;
+    int leftover, leftoverlen;
+};
+
+void readlines_ctx_init(readlines_ctx* ctx){
+    // Allocate buffers to store data
+    *ctx = calloc(1, sizeof(struct _readlines_ctx));
+    int buffersize = (*ctx)->buffersize = 4095;
+    (*ctx)->buffer = malloc(buffersize + 1);
+}
+
+void readlines_ctx_free(readlines_ctx ctx){
+    free(ctx->buffer);
+    free(ctx);
+}
+
+unsigned readlines(int fd, readlines_ctx ctx, const char** input){
     // Move any data left over from a previous read to the start of the buffer
-    if(leftover)
-        memcpy(buffer, buffer + leftover, leftoverlen);
+    char* buffer = ctx->buffer;
+    int buffersize = ctx->buffersize;
+    int leftover = ctx->leftover, leftoverlen = ctx->leftoverlen;
+    memcpy(buffer, buffer + leftover, leftoverlen);
+    // Read data from the file
     ssize_t length = read(fd, buffer + leftoverlen, buffersize - leftoverlen);
     length = (length < 0 ? 0 : length) + leftoverlen;
-    leftover = leftoverlen = 0;
+    leftover = ctx->leftover = leftoverlen = ctx->leftoverlen = 0;
     if(length <= 0){
         *input = 0;
         return 0;
@@ -319,7 +334,8 @@ unsigned readlines(int fd, const char** input){
             break;
         int oldsize = buffersize;
         buffersize += 4096;
-        buffer = realloc(buffer, buffersize + 1);
+        ctx->buffersize = buffersize;
+        buffer = ctx->buffer = realloc(buffer, buffersize + 1);
         ssize_t length2 = read(fd, buffer + oldsize, buffersize - oldsize);
         if(length2 <= 0)
             break;
@@ -331,12 +347,12 @@ unsigned readlines(int fd, const char** input){
     if(lastline == buffer + length - 1){
         // If the buffer ends in a newline, process the whole string
         *input = buffer;
-        return length - leftoverlen;
+        return length;
     } else if(lastline){
         // Otherwise, chop off the last line but process everything else
         *lastline = 0;
-        leftover = lastline + 1 - buffer;
-        leftoverlen = length - leftover;
+        leftover = ctx->leftover = lastline + 1 - buffer;
+        leftoverlen = ctx->leftoverlen = length - leftover;
         *input = buffer;
         return leftover - 1;
     } else {
@@ -347,7 +363,7 @@ unsigned readlines(int fd, const char** input){
             ckb_warn("Too much input (1MB). Dropping.\n");
             return 0;
         }
-        leftoverlen = length;
+        leftoverlen = ctx->leftoverlen = length;
         return 0;
     }
 }

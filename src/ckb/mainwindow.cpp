@@ -97,6 +97,7 @@ void MainWindow::scanKeyboards(){
     ckbDaemonVersion = PARSE_CKB_VERSION(daemonVStr);
 
     // Scan connected devices
+    bool devsUpdated = false;
     foreach(KbWidget* w, kbWidgets)
         w->active(false);
     QString line;
@@ -117,6 +118,7 @@ void MainWindow::scanKeyboards(){
         if(widget)
             continue;
         // Add the keyboard
+        devsUpdated = true;
         widget = new KbWidget(this, path, "Devices");
         if(!widget->isActive()){
             delete widget;
@@ -154,12 +156,17 @@ void MainWindow::scanKeyboards(){
             }
             w->saveIfNeeded();
         } else {
+            devsUpdated = true;
             int i = kbWidgets.indexOf(w);
             ui->tabWidget->removeTab(i);
             kbWidgets.removeAt(i);
             w->deleteLater();
         }
     }
+
+    // Update USB delay (depends on number of devices and frame rate)
+    if(devsUpdated)
+        Kb::updateUsbDelay(settingsWidget->frameRate(), true);
 
     int count = kbWidgets.count();
     // Warn if the daemon version doesn't match the GUI

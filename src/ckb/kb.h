@@ -30,6 +30,8 @@ public:
     inline KeyMap::Model model() const { return _model; }
     inline KeyMap::Layout layout() const { return _layout; }
     void layout(KeyMap::Layout newLayout);
+    bool isKeyboard() const { return KeyMap::isKeyboard(_model); }
+    bool isMouse() const { return KeyMap::isMouse(_model); }
 
     inline bool isOpen() const { return cmd.isOpen(); }
 
@@ -38,6 +40,12 @@ public:
     void hwProfile(KbProfile* newHwProfile);
     // Required hardware modes
     int hwModeCount;
+
+    // Perform a firmware update
+    void fwUpdate(const QString& path);
+
+    // Updated USB protocol delay for all connected devices. Needs to be done after adding/removing a device or after changing FPS.
+    static void updateUsbDelay(int framerate, bool forceSend = false);
 
     // Currently-selected profile
     inline KbProfile* currentProfile() { return _currentProfile; }
@@ -70,9 +78,6 @@ public:
     void save(QSettings& settings);
     void hwSave();
     bool needsSave() const;
-
-    // Perform a firmware update
-    void fwUpdate(const QString& path);
 
 signals:
     // Layout/model updated

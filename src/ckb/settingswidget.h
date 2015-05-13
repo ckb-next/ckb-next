@@ -19,13 +19,16 @@ public:
     void setVersion(const QString& version);
     void setStatus(const QString& text);
 
+    // Current FPS
+    int frameRate() const;
+
     // Poll for setting updates and save (if necessary)
     void pollUpdates();
 
 private slots:
     void on_pushButton_clicked();
 
-    void on_fpsBox_activated(const QString &arg1);
+    void on_fpsBox_valueChanged(int framerate);
     void on_animScanButton_clicked();
 
     void on_capsBox_activated(int index);

@@ -156,15 +156,6 @@ long repeattime(io_connect_t event, int first){
     return delay;
 }
 
-// Mouse double-click helper (also ns)
-long doubleclicktime(io_connect_t event){
-    long delay = 0;
-    IOByteCount actualSize = 0;
-    if(IOHIDGetParameter(event, CFSTR(kIOHIDClickTimeKey), sizeof(long), &delay, &actualSize) != KERN_SUCCESS || actualSize == 0)
-        return -1;
-    return delay;
-}
-
 // Send keyup events for every scancode in the keymap
 void clearkeys(usbdevice* kb){
     for(int key = 0; key < N_KEYS_INPUT; key++){

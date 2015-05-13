@@ -11,8 +11,10 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
     "mode",
     "switch",
     "layout",
+    "accel",
     "notifyon",
     "notifyoff",
+    "usbdelay",
 
     "hwload",
     "hwsave",
@@ -78,8 +80,8 @@ int readcmd(usbdevice* kb, const char* line){
             if(!strcmp(word, cmd_strings[i])){
                 command = i + CMD_FIRST;
 #ifndef OS_MAC
-                // Layout command isn't used on Linux; ignore
-                if(command == LAYOUT)
+                // Layout and mouse acceleration aren't used on Linux; ignore
+                if(command == LAYOUT || command == ACCEL)
                     command = NONE;
 #endif
                 // Most commands require parameters, but a few are actions in and of themselves
@@ -113,28 +115,47 @@ int readcmd(usbdevice* kb, const char* line){
         // Specially handled commands - these are available even when keyboard is IDLE
         switch(command){
         case NOTIFYON: {
+            // Notification node on
             int notify;
             if(sscanf(word, "%u", &notify) == 1)
                 mknotifynode(kb, notify);
             continue;
         } case NOTIFYOFF: {
+            // Notification node off
             int notify;
-            if(sscanf(word, "%u", &notify) == 1 && notify != 0)
+            if(sscanf(word, "%u", &notify) == 1 && notify != 0) // notify0 can't be removed
                 rmnotifynode(kb, notify);
             continue;
         } case GET:
+            // Output data to notification node
             vt->get(kb, mode, notifynumber, 0, word);
             continue;
         case LAYOUT:
+            // OSX: switch ANSI/ISO keyboard layout
             if(!strcmp(word, "ansi"))
                 kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ANSI;
             else if(!strcmp(word, "iso"))
                 kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ISO;
+            continue;
+        case ACCEL:
+            // OSX mouse acceleration on/off
+            if(!strcmp(word, "on"))
+                kb->features |= FEAT_MOUSEACCEL;
+            else if(!strcmp(word, "off"))
+                kb->features &= ~FEAT_MOUSEACCEL;
+            continue;
         case MODE: {
-            // Mode selection processes a number
+            // Select a mode number (1 - 6)
             int newmode;
             if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_COUNT)
                 mode = profile->mode + newmode - 1;
+            continue;
+        }
+        case USBDELAY: {
+            // USB command delay (1 - 25ms)
+            uint delay;
+            if(sscanf(word, "%u", &delay) == 1 && delay > 0 && delay <= 25)
+                kb->usbdelay = delay;
             continue;
         }
         default:;

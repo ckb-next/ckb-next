@@ -10,10 +10,6 @@
 extern QString devpath;
 extern QTimer* eventTimer;
 
-// Animation FPS
-int framerate = 30;
-int fpsTable[] = { 60, 50, 30, 25, 15 };
-
 // Modifier keys (OS-dependent)
 static QStringList modKeys, modNames;
 
@@ -72,16 +68,11 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 
     // Read frame rate from settings
     int rate = settings.value("framerate").toInt();
-    if(rate <= 0)
-        rate = framerate;
-    // Pick the closest rate at or below this one
-    for(uint i = 0; i < sizeof(fpsTable)/sizeof(int); i++){
-        if(rate >= fpsTable[i]){
-            ui->fpsBox->setCurrentIndex(i);
-            framerate = fpsTable[i];
-            break;
-        }
-    }
+    if(rate <= 0 || rate > 60)
+        rate = 30;
+    ui->fpsBox->setValue(rate);
+    Kb::updateUsbDelay(rate);
+    ui->fpsWarnLabel->setVisible(rate > 30);
 
     // Read global brightness setting (default = on, 100% brightness)
     int dimming = settings.value("GlobalBrightness").toInt();
@@ -110,6 +101,10 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 
     ui->animPathLabel->setText(AnimScript::path());
     on_animScanButton_clicked();
+}
+
+int SettingsWidget::frameRate() const {
+    return ui->fpsBox->value();
 }
 
 void SettingsWidget::pollUpdates(){
@@ -158,14 +153,19 @@ void SettingsWidget::on_pushButton_clicked(){
     qApp->quit();
 }
 
-void SettingsWidget::on_fpsBox_activated(const QString &arg1){
+void SettingsWidget::on_fpsBox_valueChanged(int framerate){
     if(!eventTimer)
         return;
     // Set FPS
-    framerate = arg1.split(" ")[0].toInt();
     eventTimer->setInterval(1000 / framerate);
     CkbSettings settings("Program");
     settings.setValue("framerate", framerate);
+    Kb::updateUsbDelay(framerate);
+    // Show warning label if FPS is above 30
+    if(framerate > 30)
+        ui->fpsWarnLabel->show();
+    else
+        ui->fpsWarnLabel->hide();
 }
 
 void SettingsWidget::on_animScanButton_clicked(){

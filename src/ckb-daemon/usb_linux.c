@@ -9,7 +9,7 @@
 int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
     for(int i = 0; i < count; i++){
         pthread_mutex_lock(&usbmutex);
-        DELAY_SHORT;
+        DELAY_SHORT(kb);
         int res;
         if(kb->fwversion >= 0x120){
 #if 1       // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
@@ -38,7 +38,7 @@ int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int 
 
 int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
     pthread_mutex_lock(&usbmutex);
-    DELAY_MEDIUM;
+    DELAY_MEDIUM(kb);
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     pthread_mutex_unlock(&usbmutex);

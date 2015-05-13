@@ -174,7 +174,6 @@ void KbLight::animKeypress(const QString& key, bool down){
 }
 
 void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
-    cmd.write(" rgb on");
     QHashIterator<QString, QRgb> i(animMap);
     while(i.hasNext()){
         i.next();
@@ -207,10 +206,10 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
         lastFrameSignal = timestamp;
     }
 
-    cmd.write(QString().sprintf("mode %d switch", modeIndex + 1).toLatin1());
+    cmd.write(QString().sprintf("mode %d rgb", modeIndex + 1).toLatin1());
     // If brightness is at 0%, turn off lighting entirely
     if(_dimming == 3){
-        cmd.write(" rgb 000000");
+        cmd.write("000000 switch");
         return;
     }
 
@@ -253,6 +252,7 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
 
     // Apply light
     printRGB(cmd, animMap);
+    cmd.write(" switch");
 }
 
 void KbLight::open(){
@@ -281,7 +281,7 @@ void KbLight::close(){
 void KbLight::base(QFile &cmd, int modeIndex){
     close();
     if(_dimming == MAX_DIM){
-        cmd.write(QString().sprintf("mode %d rgb off", modeIndex + 1).toLatin1());
+        cmd.write(QString().sprintf("mode %d rgb 000000", modeIndex + 1).toLatin1());
         return;
     }
     // Set just the background color, ignoring any animation

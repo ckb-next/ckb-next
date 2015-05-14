@@ -35,6 +35,10 @@ public:
 
     inline bool isOpen() const { return cmd.isOpen(); }
 
+    // Frame rate for all devices
+    static inline int frameRate() { return _frameRate; }
+    static void frameRate(int newFrameRate);
+
     // Profile saved to hardware
     inline KbProfile* hwProfile() { return _hwProfile; }
     void hwProfile(KbProfile* newHwProfile);
@@ -43,9 +47,6 @@ public:
 
     // Perform a firmware update
     void fwUpdate(const QString& path);
-
-    // Updated USB protocol delay for all connected devices. Needs to be done after adding/removing a device or after changing FPS.
-    static void updateUsbDelay(int framerate, bool forceSend = false);
 
     // Currently-selected profile
     inline KbProfile* currentProfile() { return _currentProfile; }
@@ -106,6 +107,7 @@ private slots:
     void deletePrevious();
 
 private:
+    static int _frameRate;
     KbProfile* _currentProfile;
     QList<KbProfile*> _profiles;
     KbMode* _currentMode;

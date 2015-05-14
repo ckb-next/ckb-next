@@ -71,7 +71,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     if(rate <= 0 || rate > 60)
         rate = 30;
     ui->fpsBox->setValue(rate);
-    Kb::updateUsbDelay(rate);
+    Kb::frameRate(rate);
     ui->fpsWarnLabel->setVisible(rate > 30);
 
     // Read global brightness setting (default = on, 100% brightness)
@@ -160,7 +160,7 @@ void SettingsWidget::on_fpsBox_valueChanged(int framerate){
     eventTimer->setInterval(1000 / framerate);
     CkbSettings settings("Program");
     settings.setValue("framerate", framerate);
-    Kb::updateUsbDelay(framerate);
+    Kb::frameRate(framerate);
     // Show warning label if FPS is above 30
     if(framerate > 30)
         ui->fpsWarnLabel->show();

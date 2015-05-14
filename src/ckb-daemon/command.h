@@ -13,7 +13,7 @@ typedef enum {
     ACCEL       = -4,
     NOTIFYON    = -3,
     NOTIFYOFF   = -2,
-    USBDELAY    = -1,
+    FPS         = -1,
 
     // Hardware data
     HWLOAD      = 0,    CMD_VT_FIRST = 0,

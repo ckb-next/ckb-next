@@ -14,7 +14,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
     "accel",
     "notifyon",
     "notifyoff",
-    "usbdelay",
+    "fps",
 
     "hwload",
     "hwsave",
@@ -151,11 +151,18 @@ int readcmd(usbdevice* kb, const char* line){
                 mode = profile->mode + newmode - 1;
             continue;
         }
-        case USBDELAY: {
-            // USB command delay (1 - 25ms)
-            uint delay;
-            if(sscanf(word, "%u", &delay) == 1 && delay > 0 && delay <= 25)
+        case FPS: {
+            // USB command delay (1 - 10ms)
+            uint framerate;
+            if(sscanf(word, "%u", &framerate) == 1 && framerate > 0){
+                // Max messages per second: 5 RGB + 1 indicator + 1 wait
+                uint delay = 1000 / framerate / 7;
+                if(delay < 1)
+                    delay = 1;
+                else if(delay > 10)
+                    delay = 10;
                 kb->usbdelay = delay;
+            }
             continue;
         }
         default:;

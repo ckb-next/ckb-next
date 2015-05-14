@@ -46,11 +46,6 @@ void usbkill();
 
 // Note: Lock a device's dmutex (see device.h) before accessing the USB interface.
 
-// A global mutex used by the USB driver.
-// USB communication is serialized so that only one message is sent at a time, then the next message is sent after a short delay.
-// This is needed even
-extern pthread_mutex_t usbmutex;
-
 // Set up a USB device after its handle is open. Spawns a new thread.
 // dmutex must be locked prior to calling this function. The function will unlock it when finished.
 void setupusb(usbdevice* kb);

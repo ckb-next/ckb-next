@@ -343,7 +343,7 @@ void os_updateindicators(usbdevice* kb, int force){
         if(res != kIOReturnSuccess)
             return;
         // Iterate through them and update the LEDs which have changed
-        pthread_mutex_lock(&usbmutex);
+        DELAY_SHORT(kb);
         CFIndex count = CFArrayGetCount(leds);
         for(CFIndex i = 0; i < count; i++){
             IOHIDElementRef led = (void*)CFArrayGetValueAtIndex(leds, i);
@@ -353,7 +353,6 @@ void os_updateindicators(usbdevice* kb, int force){
             CFRelease(value);
         }
         CFRelease(leds);
-        pthread_mutex_unlock(&usbmutex);
     }
 }
 

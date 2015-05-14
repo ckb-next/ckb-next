@@ -10,32 +10,26 @@
 
 int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
     for(int i = 0; i < count; i++){
-        pthread_mutex_lock(&usbmutex);
         DELAY_SHORT(kb);
         kern_return_t res = (*kb->handle)->setReport(kb->handle, kIOHIDReportTypeFeature, 0, messages + i * MSG_SIZE, MSG_SIZE, 5000, 0, 0, 0);
         kb->lastresult = res;
         if(res != kIOReturnSuccess){
             ckb_err_fn("Got return value 0x%x\n", file, line, res);
-            pthread_mutex_unlock(&usbmutex);
             return 0;
         }
-        pthread_mutex_unlock(&usbmutex);
     }
     return MSG_SIZE * count;
 }
 
 int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
-    pthread_mutex_lock(&usbmutex);
     DELAY_MEDIUM(kb);
     CFIndex length = MSG_SIZE;
     kern_return_t res = (*kb->handle)->getReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length, 5000, 0, 0, 0);
     kb->lastresult = res;
     if(res != kIOReturnSuccess && res != 0xe0004051){   // Can't find e0004051 documented, but it seems to be a harmless error, so ignore it.
         ckb_err_fn("Got return value 0x%x\n", file, line, res);
-        pthread_mutex_unlock(&usbmutex);
         return 0;
     }
-    pthread_mutex_unlock(&usbmutex);
     if(length != MSG_SIZE)
         ckb_err_fn("Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
     return length;

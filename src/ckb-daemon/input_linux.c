@@ -205,10 +205,9 @@ void os_updateindicators(usbdevice* kb, int force){
     }
     if(force || ileds != kb->ileds){
         kb->ileds = ileds;
-        pthread_mutex_lock(&usbmutex);
+        DELAY_SHORT(kb);
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 5000, &kb->ileds };
         ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-        pthread_mutex_unlock(&usbmutex);
     }
 }
 

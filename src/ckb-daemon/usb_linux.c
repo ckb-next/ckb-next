@@ -8,7 +8,6 @@
 
 int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
     for(int i = 0; i < count; i++){
-        pthread_mutex_lock(&usbmutex);
         DELAY_SHORT(kb);
         int res;
         if(kb->fwversion >= 0x120){
@@ -24,10 +23,8 @@ int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int 
             struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, messages + MSG_SIZE * i };
             res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
         }
-        pthread_mutex_unlock(&usbmutex);
         if(res <= 0){
             ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data written");
-            pthread_mutex_unlock(&usbmutex);
             return 0;
         }
         if(res != MSG_SIZE)
@@ -37,11 +34,9 @@ int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int 
 }
 
 int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
-    pthread_mutex_lock(&usbmutex);
     DELAY_MEDIUM(kb);
     struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, message };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-    pthread_mutex_unlock(&usbmutex);
     if(res <= 0){
         ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data read");
         return 0;
@@ -54,10 +49,8 @@ int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
     if(kb->product != P_K95_NRGB)
         return 0;
-    pthread_mutex_lock(&usbmutex);
     struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 5000, 0 };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-    pthread_mutex_unlock(&usbmutex);
     if(res < 0){
         ckb_err_fn("%s\n", file, line, strerror(-res));
         return 1;

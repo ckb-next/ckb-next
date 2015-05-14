@@ -7,6 +7,7 @@
 static QSet<Kb*> activeDevices;
 static const int USB_DELAY_DEFAULT = 5;
 static int usbDelay = USB_DELAY_DEFAULT;
+int Kb::_frameRate = 30;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), devpath(path), cmdpath(path + "/cmd"),
@@ -74,6 +75,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     }
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
+    cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
     cmd.write(QString("active\n@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
     for(int i = 0; i < hwModeCount; i++)
         cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
@@ -108,30 +110,13 @@ Kb::~Kb(){
     cmd.close();
 }
 
-void Kb::updateUsbDelay(int framerate, bool forceSend){
-    // Enumerate all connected devices. Count the total number of packets that need to be sent per frame
-    int packetsPerFrame = 0;
-    foreach(Kb* kb, activeDevices){
-        if(kb->isKeyboard())
-            packetsPerFrame += 5;   // Keyboards: 4 RGB + 1 activation
-        if(kb->isMouse())
-            packetsPerFrame += 1;   // Mice: 1 RGB
-    }
-    int delay = USB_DELAY_DEFAULT;
-    if(packetsPerFrame != 0 && framerate != 0){
-        // Add 1 extra packet since all devices have a small delay before receiving commands again
-        packetsPerFrame++;
-        // Calculate delay (ms) needed to send all packets to all devices at the desired FPS, rounded down
-        delay = 1000 / framerate / packetsPerFrame;
-        if(delay < 1)
-            delay = 1;
-    }
-    // If the delay has changed, send to all devices
-    if(delay == usbDelay && !forceSend)
+void Kb::frameRate(int newFrameRate){
+    // If the rate has changed, send to all devices
+    if(newFrameRate == _frameRate)
         return;
-    usbDelay = delay;
+    _frameRate = newFrameRate;
     foreach(Kb* kb, activeDevices){
-        kb->cmd.write(QString("usbdelay %1\n").arg(delay).toLatin1());
+        kb->cmd.write(QString("fps %1\n").arg(newFrameRate).toLatin1());
         kb->cmd.flush();
     }
 }

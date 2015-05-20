@@ -45,6 +45,7 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, QSettings& settings, cons
 
 void KbProfile::save(QSettings& settings){
     _needsSave = false;
+    _id.newModified();
     // Save data to preferences
     settings.beginGroup(id().guidString());
     settings.setValue("Name", name());

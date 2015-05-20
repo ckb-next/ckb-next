@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
+#include <QDateTime>
 #include <QSharedMemory>
 #include <cstring>
 
@@ -27,11 +28,8 @@ bool isRunning(bool showWindow){
 
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
-    bool background = qApp->arguments().contains("--background");
-    if(isRunning(!background)){
-        printf("ckb is already running. Exiting.\n");
-        return 0;
-    }
+    // Seed the RNG for UsbIds
+    qsrand(QDateTime::currentMSecsSinceEpoch());
 #ifdef Q_OS_MACX
     disableAppNap();
 #endif
@@ -39,6 +37,12 @@ int main(int argc, char *argv[]){
     // Enable HiDPI support
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
+
+    bool background = qApp->arguments().contains("--background");
+    if(isRunning(!background)){
+        printf("ckb is already running. Exiting.\n");
+        return 0;
+    }
     MainWindow w;
     if(!background)
         w.show();

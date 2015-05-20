@@ -17,6 +17,10 @@ struct UsbId {
     void guidString(const QString& newGuid) { guid = newGuid; }
     QString modifiedString() const { return QString::number(modified, 16); }
     void modifiedString(const QString& newModified) { modified = newModified.toUInt(0, 16); }
+
+    // Generate a new random ID
+    void newGuid() { guid = QUuid::createUuid(); }
+    void newModified() { quint32 newMod; do { newMod = qrand(); } while(newMod == modified); modified = newMod; }
 };
 
 class Kb;

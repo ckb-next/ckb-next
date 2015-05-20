@@ -68,7 +68,7 @@ public:
     // Make the lighting idle, stopping any animations.
     void close();
     // Write the mode's base colors without any animation
-    void base(QFile& cmd, int modeIndex);
+    void base(QFile& cmd, int modeIndex, bool ignoreDim = false);
 
     // Load and save from stored settings
     void load(QSettings& settings);

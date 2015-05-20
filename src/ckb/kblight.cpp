@@ -209,7 +209,7 @@ void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock)
     cmd.write(QString().sprintf("mode %d rgb", modeIndex + 1).toLatin1());
     // If brightness is at 0%, turn off lighting entirely
     if(_dimming == 3){
-        cmd.write("000000 switch");
+        cmd.write(" 000000 switch");
         return;
     }
 
@@ -278,14 +278,14 @@ void KbLight::close(){
     _start = false;
 }
 
-void KbLight::base(QFile &cmd, int modeIndex){
+void KbLight::base(QFile &cmd, int modeIndex, bool ignoreDim){
     close();
-    if(_dimming == MAX_DIM){
+    if(_dimming == MAX_DIM && !ignoreDim){
         cmd.write(QString().sprintf("mode %d rgb 000000", modeIndex + 1).toLatin1());
         return;
     }
     // Set just the background color, ignoring any animation
-    cmd.write(QString().sprintf("mode %d", modeIndex + 1).toLatin1());
+    cmd.write(QString().sprintf("mode %d rgb", modeIndex + 1).toLatin1());
     QHash<QString, QRgb> animMap = _colorMap;
     animMap["mr"] = qRgb(0, 0, 0);
     animMap["m1"] = qRgb(0, 0, 0);

@@ -36,10 +36,6 @@ void cmd_id(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id
 // Command: Set profile ID
 void cmd_profileid(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id);
 
-// Generates a new ID
-void genid(usbid* id);
-// Updates an ID's modification
-void updatemod(usbid* id);
 // Updates a profile/mode with the supplied GUID. Returns 1 if valid or 0 if invalid.
 int setid(usbid* id, const char* guid);
 // Generates a GUID from the given ID. Returns a string which must be freed later.

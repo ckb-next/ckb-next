@@ -35,18 +35,21 @@ int start_kb_nrgb(usbdevice* kb, int makeactive){
 int setactive_kb(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
+
+    pthread_mutex_lock(imutex(kb));
+    kb->active = !!active;
+    kb->profile->lastlight.forceupdate = 1;
+    // Clear input
+    memset(&kb->input.keys, 0, sizeof(kb->input.keys));
+    inputupdate(kb);
+    pthread_mutex_unlock(imutex(kb));
+
     uchar msg[3][MSG_SIZE] = {
         { 0x07, 0x04, 0 },                  // Disables or enables HW control for top row
         { 0x07, 0x40, 0 },                  // Selects key input
         { 0x07, 0x05, 2, 0, 0x03, 0x00 }    // Commits key input selection
     };
     if(active){
-        pthread_mutex_lock(imutex(kb));
-        kb->active = 1;
-        // Clear input
-        memset(&kb->input.keys, 0, sizeof(kb->input.keys));
-        inputupdate(kb);
-        pthread_mutex_unlock(imutex(kb));
         // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
         msg[0][2] = 2;
         if(!usbsend(kb, msg[0], 1))
@@ -75,12 +78,6 @@ int setactive_kb(usbdevice* kb, int active){
             return -1;
         DELAY_MEDIUM(kb);
     } else {
-        pthread_mutex_lock(imutex(kb));
-        kb->active = 0;
-        // Clear input
-        memset(&kb->input.keys, 0, sizeof(kb->input.keys));
-        inputupdate(kb);
-        pthread_mutex_unlock(imutex(kb));
         // Set the M-keys back into hardware mode, restore hardware RGB profile. It has to be sent twice for some reason.
         msg[0][2] = 1;
         if(!usbsend(kb, msg[0], 1))

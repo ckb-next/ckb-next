@@ -20,8 +20,10 @@ int updatergb_mouse(usbdevice* kb, int force){
     lighting* lastlight = &kb->profile->lastlight;
     lighting* newlight = &kb->profile->currentmode->light;
     // Don't do anything if the lighting hasn't changed
-    if(!force && !rgbcmp(lastlight, newlight))
+    if(!force && !lastlight->forceupdate && !newlight->forceupdate
+            && !rgbcmp(lastlight, newlight))
         return 0;
+    lastlight->forceupdate = newlight->forceupdate = 0;
 
     // Send the RGB values for each zone to the mouse
     uchar data_pkt[2][MSG_SIZE] = {

@@ -5,8 +5,6 @@
 #include "media.h"
 
 static QSet<Kb*> activeDevices;
-static const int USB_DELAY_DEFAULT = 5;
-static int usbDelay = USB_DELAY_DEFAULT;
 int Kb::_frameRate = 30;
 
 Kb::Kb(QObject *parent, const QString& path) :
@@ -186,7 +184,7 @@ void Kb::hwSave(){
     }
     hwProfile(_currentProfile);
     hwLoading = false;
-    // Rewrite the current profile from scratch to ensure consistency
+    // Re-send the current profile from scratch to ensure consistency
     writeProfileHeader();
     // Make sure there are enough modes
     while(_currentProfile->modeCount() < hwModeCount)
@@ -196,7 +194,7 @@ void Kb::hwSave(){
         KbMode* mode = _currentProfile->modes()[i];
         cmd.write("\n");
         KbLight* light = mode->light();
-        light->base(cmd, i);
+        light->base(cmd, i, true);
         if(mode == _currentMode)
             cmd.write(" switch");
         // Write the mode name and ID
@@ -208,15 +206,9 @@ void Kb::hwSave(){
         cmd.write(mode->id().modifiedString().toLatin1());
     }
     cmd.write("\n");
-    cmd.flush();
 
     // Save the profile to memory
     cmd.write("hwsave\n");
-    // Load the new modification times for the profile
-    cmd.write(QString("@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
-    for(int i = 0; i < hwModeCount; i++)
-        cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
-    cmd.write("\n");
     cmd.flush();
 }
 

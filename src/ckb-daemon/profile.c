@@ -126,8 +126,8 @@ char* gethwprofilename(hwprofile* profile){
 
 static void initmode(usbmode* mode){
     memset(mode, 0, sizeof(*mode));
+    mode->light.forceupdate = 1;
     initbind(&mode->bind);
-    genid(&mode->id);
 }
 
 void allocprofile(usbdevice* kb){
@@ -137,6 +137,7 @@ void allocprofile(usbdevice* kb){
     for(int i = 0; i < MODE_COUNT; i++)
         initmode(profile->mode + i);
     profile->currentmode = profile->mode;
+    profile->lastlight.forceupdate = 1;
 }
 
 int loadprofile(usbdevice* kb){
@@ -197,26 +198,6 @@ void cmd_profileid(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const c
 
 }
 
-void genid(usbid* id){
-    static int seeded = 0;
-    if(!seeded){
-        srand(time(NULL));
-        seeded = 1;
-    }
-    // Generate a random ID
-    int numbers[4] = { rand(), rand(), rand(), rand() };
-    memcpy(id->guid, numbers, sizeof(id->guid));
-    memset(id->modified, 0, sizeof(id->modified));
-}
-
-void updatemod(usbid* id){
-    int new = rand(), old;
-    memcpy(&old, id->modified, sizeof(id->modified));
-    if(new == old)
-        new++;
-    memcpy(id->modified, &new, sizeof(id->modified));
-}
-
 int setid(usbid* id, const char* guid){
     int32_t data1;
     int16_t data2, data3, data4a;
@@ -269,12 +250,9 @@ void nativetohw(usbprofile* profile, hwprofile* hw, int modes){
     for(int i = 0; i < modes; i++)
         memcpy(hw->name[i + 1], profile->mode[i].name, MD_NAME_LEN * 2);
     // Copy the profile and mode IDs
-    updatemod(&profile->id);
     memcpy(hw->id, &profile->id, sizeof(usbid));
-    for(int i = 0; i < modes; i++){
-        updatemod(&profile->mode[i].id);
+    for(int i = 0; i < modes; i++)
         memcpy(hw->id + i + 1, &profile->mode[i].id, sizeof(usbid));
-    }
     // Copy the key lighting
     for(int i = 0; i < modes; i++)
         memcpy(hw->light + i, &profile->mode[i].light, sizeof(lighting));
@@ -340,6 +318,7 @@ int cmd_hwload(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char
     // Free the existing profile (if any)
     free(kb->hw);
     kb->hw = hw;
+    kb->profile->lastlight.forceupdate = 1;
     DELAY_LONG(kb);
     return 0;
 }
@@ -351,6 +330,7 @@ int cmd_hwsave(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const cha
         hw = kb->hw = calloc(1, sizeof(hwprofile));
     int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
     nativetohw(kb->profile, hw, modes);
+    kb->profile->lastlight.forceupdate = 1;
     // Save the profile and mode names
     uchar data_pkt[2][MSG_SIZE] = {
         {0x07, 0x16, 0x01, 0 },

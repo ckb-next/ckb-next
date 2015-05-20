@@ -53,6 +53,7 @@ void KbMode::keyMap(const KeyMap &keyMap){
 
 void KbMode::save(QSettings& settings){
     _needsSave = false;
+    _id.newModified();
     settings.setValue("GUID", _id.guidString());
     settings.setValue("Modified", _id.modifiedString());
     settings.setValue("Name", _name);

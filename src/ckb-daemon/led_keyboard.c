@@ -49,8 +49,10 @@ int updatergb_kb(usbdevice* kb, int force){
     lighting* lastlight = &kb->profile->lastlight;
     lighting* newlight = &kb->profile->currentmode->light;
     // Don't do anything if the lighting hasn't changed
-    if(!force && !rgbcmp(lastlight, newlight))
+    if(!force && !lastlight->forceupdate && !newlight->forceupdate
+            && !rgbcmp(lastlight, newlight))
         return 0;
+    lastlight->forceupdate = newlight->forceupdate = 0;
 
     /*if(kb->fwversion >= 0x0120){
         uchar data_pkt[12][MSG_SIZE] = {
@@ -93,6 +95,7 @@ int updatergb_kb(usbdevice* kb, int force){
 }
 
 int savergb_kb(usbdevice* kb, int mode){
+    kb->profile->mode[mode].light.forceupdate = 1;
     if(kb->fwversion >= 0x0120){
         uchar data_pkt[12][MSG_SIZE] = {
             // Red
@@ -111,7 +114,7 @@ int savergb_kb(usbdevice* kb, int mode){
             { 0x7f, 0x03, 24, 0 },
             { 0x07, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x03 }
         };
-        makergb_full(&kb->profile->mode[mode].light, data_pkt);
+        makergb_full(&kb->hw->light[mode], data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;
     } else {
@@ -122,7 +125,7 @@ int savergb_kb(usbdevice* kb, int mode){
             { 0x7f, 0x04, 36, 0 },
             { 0x07, 0x14, 0x02, 0x00, 0x01, mode + 1 }
         };
-        makergb_512(&kb->profile->mode[mode].light, data_pkt);
+        makergb_512(&kb->hw->light[mode], data_pkt);
         if(!usbsend(kb, data_pkt[0], 5))
             return -1;
     }
@@ -130,6 +133,7 @@ int savergb_kb(usbdevice* kb, int mode){
 }
 
 int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
+    light->forceupdate = 1;
     if(kb->fwversion >= 0x0120){
         uchar data_pkt[12][MSG_SIZE] = {
             { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x01 },

@@ -2,7 +2,6 @@
 #include "profile.h"
 
 void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* code){
-    updatemod(&mode->id);
     int index = keymap[keyindex].led;
     if(index < 0)
         return;

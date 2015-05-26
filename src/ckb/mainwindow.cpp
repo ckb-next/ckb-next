@@ -227,9 +227,17 @@ void MainWindow::timerTick(){
     settingsWidget->pollUpdates();
 }
 
-void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason){
-    if(reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick)
-        showWindow();
+void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason) {
+    if (reason == QSystemTrayIcon::Trigger
+        ||  reason == QSystemTrayIcon::DoubleClick)
+    {
+        if (isVisible())
+        {
+            hide();
+        } else {
+            showWindow();
+        }
+    }
 }
 
 void MainWindow::showWindow(){

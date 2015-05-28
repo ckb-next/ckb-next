@@ -179,13 +179,13 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "front",      LED_MOUSE, KEY_NONE },
     { "back",       LED_MOUSE + 1, KEY_NONE },
     { "dpi",        LED_MOUSE + 2, KEY_NONE },  // SW DPI light
-    { "dpi1",       LED_MOUSE + 4, KEY_NONE },  // HW DPI lights
-    { "dpi2",       LED_MOUSE + 5, KEY_NONE },
-    { "dpi3",       LED_MOUSE + 6, KEY_NONE },
-    { "dpi4",       LED_MOUSE + 7, KEY_NONE },
-    { "dpi5",       LED_MOUSE + 8, KEY_NONE },
-    { "dpis",       LED_MOUSE + 9, KEY_NONE },
-    { "dpio",       LED_MOUSE + 10, KEY_NONE },
+    { "zone4",      LED_MOUSE + 3, KEY_NONE },  // TODO: give this a better name. it's not present on the M65, but the hardware requires it to be sent
+    { "dpi0",       LED_MOUSE + 4, KEY_NONE },  // HW DPI light levels (0 = sniper, 1..5 = modes)
+    { "dpi1",       LED_MOUSE + 5, KEY_NONE },
+    { "dpi2",       LED_MOUSE + 6, KEY_NONE },
+    { "dpi3",       LED_MOUSE + 7, KEY_NONE },
+    { "dpi4",       LED_MOUSE + 8, KEY_NONE },
+    { "dpi5",       LED_MOUSE + 9, KEY_NONE },
 };
 
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput){

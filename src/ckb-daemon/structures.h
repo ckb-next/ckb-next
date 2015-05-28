@@ -49,12 +49,24 @@ typedef struct {
 } binding;
 #define MACRO_MAX   1024
 
-// Keyboard/mouse input tracking
+// DPI settings for mice
+#define DPI_COUNT   6
+#define LIFT_MIN    1
+#define LIFT_MAX    5
 typedef struct {
-    uchar keys[N_KEYBYTES_INPUT];
-    uchar prevkeys[N_KEYBYTES_INPUT];
-    short rel_x, rel_y;
-} usbinput;
+    // DPI levels
+    ushort x[DPI_COUNT];
+    ushort y[DPI_COUNT];
+    uchar current;
+    // Enabled modes (bitfield)
+    uchar enabled;
+    // Lift height (lowest to highest)
+    uchar lift;
+    // Angle snap enabled?
+    uchar snap;
+    // Send to device even if unchanged? (used when initializing profiles)
+    uchar forceupdate;
+} dpiset;
 
 // Lighting structure for a mode
 typedef struct {
@@ -69,6 +81,7 @@ typedef struct {
 typedef struct {
     lighting light;
     binding bind;
+    dpiset dpi;
     // Name and UUID
     usbid id;
     ushort name[MD_NAME_LEN];
@@ -88,8 +101,9 @@ typedef struct {
     usbmode mode[MODE_COUNT];
     // Currently-selected mode
     usbmode* currentmode;
-    // Last RGB data sent to the device
+    // Last data sent to the device
     lighting lastlight;
+    dpiset lastdpi;
     // Profile name and UUID
     ushort name[PR_NAME_LEN];
     usbid id;
@@ -102,16 +116,19 @@ typedef struct {
 typedef struct {
     // RGB settings
     lighting light[HWMODE_MAX];
-    // Mode/profile IDs
+    dpiset dpi[HWMODE_MAX];
+    // Profile (0) and mode (1...HWMODE_MAX) IDs
     usbid id[HWMODE_MAX + 1];
-    // Mode/profile names
+    // Profile and mode names
     ushort name[HWMODE_MAX + 1][MD_NAME_LEN];
 } hwprofile;
 
-// vtables for keyboards/mice (see command.h)
-extern const union devcmd vtable_keyboard;
-extern const union devcmd vtable_keyboard_nonrgb;
-extern const union devcmd vtable_mouse;
+// Keyboard/mouse input tracking
+typedef struct {
+    uchar keys[N_KEYBYTES_INPUT];
+    uchar prevkeys[N_KEYBYTES_INPUT];
+    short rel_x, rel_y;
+} usbinput;
 
 // Device features
 #define FEAT_RGB        0x001   // RGB backlighting?
@@ -142,6 +159,11 @@ extern const union devcmd vtable_mouse;
 
 // Bricked firmware?
 #define NEEDS_FW_UPDATE(kb) ((kb)->fwversion == 0 && HAS_FEATURES((kb), FEAT_FWUPDATE | FEAT_FWVERSION))
+
+// vtables for keyboards/mice (see command.h)
+extern const union devcmd vtable_keyboard;
+extern const union devcmd vtable_keyboard_nonrgb;
+extern const union devcmd vtable_mouse;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN 34

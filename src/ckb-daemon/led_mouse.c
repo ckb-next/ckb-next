@@ -55,3 +55,60 @@ int updatergb_mouse(usbdevice* kb, int force){
     memcpy(lastlight, newlight, sizeof(lighting));
     return 0;
 }
+
+int savergb_mouse(usbdevice* kb, lighting* light, int mode){
+    uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x10, 1, 0 };
+    // Zone 1
+    data_pkt[4] = light->r[LED_MOUSE];
+    data_pkt[5] = light->g[LED_MOUSE];
+    data_pkt[6] = light->b[LED_MOUSE];
+    if(!usbsend(kb, data_pkt, 1))
+        return -1;
+    // Zone 2
+    data_pkt[2]++;
+    data_pkt[4] = light->r[LED_MOUSE + 1];
+    data_pkt[5] = light->g[LED_MOUSE + 1];
+    data_pkt[6] = light->b[LED_MOUSE + 1];
+    if(!usbsend(kb, data_pkt, 1))
+        return -1;
+    // TODO: zone 4 for Sabre?
+    return 0;
+}
+
+int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
+    uchar data_pkt[MSG_SIZE] = { 0x0e, 0x13, 0x10, 1, 0 };
+    uchar in_pkt[MSG_SIZE] = { 0 };
+    // Zone 1
+    // Send message
+    if(!usbsend(kb, data_pkt, 1))
+        return -1;
+    // Wait for response
+    if(!usbrecv(kb, in_pkt))
+        return -2;
+    if(memcmp(in_pkt, data_pkt, 4)){
+        ckb_err("Bad input header\n");
+        return -3;
+    }
+    // Copy data
+    light->r[LED_MOUSE] = in_pkt[4];
+    light->g[LED_MOUSE] = in_pkt[5];
+    light->b[LED_MOUSE] = in_pkt[6];
+
+    // Zone 2
+    data_pkt[2]++;
+    if(!usbsend(kb, data_pkt, 1))
+        return -1;
+    if(!usbrecv(kb, in_pkt))
+        return -2;
+    if(memcmp(in_pkt, data_pkt, 4)){
+        ckb_err("Bad input header\n");
+        return -3;
+    }
+    // Copy data
+    light->r[LED_MOUSE + 1] = in_pkt[4];
+    light->g[LED_MOUSE + 1] = in_pkt[5];
+    light->b[LED_MOUSE + 1] = in_pkt[6];
+
+    // TODO: zone 4 for Sabre?
+    return 0;
+}

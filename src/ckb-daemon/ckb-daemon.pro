@@ -45,7 +45,10 @@ SOURCES += \
     led_keyboard.c \
     led.c \
     led_mouse.c \
-    input_mac_mouse.c
+    input_mac_mouse.c \
+    profile_keyboard.c \
+    dpi.c \
+    profile_mouse.c
 
 HEADERS += \
     device.h \
@@ -61,4 +64,5 @@ HEADERS += \
     command.h \
     keymap.h \
     keymap_mac.h \
-    structures.h
+    structures.h \
+    dpi.h

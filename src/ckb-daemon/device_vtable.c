@@ -1,5 +1,6 @@
 #include "command.h"
 #include "device.h"
+#include "dpi.h"
 #include "firmware.h"
 #include "input.h"
 #include "led.h"
@@ -12,6 +13,8 @@ static void cmd_none(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
 static int cmd_io_none(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
     return 0;
 }
+static void cmd_macro_none(usbdevice* kb, usbmode* dummy1, int dummy2, const char* dummy3, const char* dummy4){
+}
 static int loadprofile_none(usbdevice* kb){
     return 0;
 }
@@ -23,8 +26,8 @@ static int int1_int_none(usbdevice* kb, int dummy){
 
 // RGB keyboard vtable
 const devcmd vtable_keyboard = {
-    .hwload = cmd_hwload,
-    .hwsave = cmd_hwsave,
+    .hwload = cmd_hwload_kb,
+    .hwsave = cmd_hwsave_kb,
     .fwupdate = cmd_fwupdate,
 
     .active = cmd_active_kb,
@@ -46,6 +49,11 @@ const devcmd vtable_keyboard = {
     .unbind = cmd_unbind,
     .rebind = cmd_rebind,
 
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
     .notify = cmd_notify,
     .inotify = cmd_inotify,
     .get = cmd_get,
@@ -56,7 +64,8 @@ const devcmd vtable_keyboard = {
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_kb,
-    .updateindicators = updateindicators_kb
+    .updateindicators = updateindicators_kb,
+    .updatedpi = int1_int_none
 };
 
 // Non-RGB keyboard vtable (K70)
@@ -84,6 +93,11 @@ const devcmd vtable_keyboard_nonrgb = {
     .unbind = cmd_unbind,
     .rebind = cmd_rebind,
 
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
     .notify = cmd_notify,
     .inotify = cmd_inotify,
     .get = cmd_get,
@@ -94,13 +108,14 @@ const devcmd vtable_keyboard_nonrgb = {
     .loadprofile = loadprofile_none,
     .freeprofile = freeprofile,
     .updatergb = int1_int_none,
-    .updateindicators = updateindicators_kb
+    .updateindicators = updateindicators_kb,
+    .updatedpi = int1_int_none
 };
 
 // RGB mouse vtable
 const devcmd vtable_mouse = {
-    .hwload = cmd_io_none,
-    .hwsave = cmd_io_none,
+    .hwload = cmd_hwload_mouse,
+    .hwsave = cmd_hwsave_mouse,
     .fwupdate = cmd_io_none,
 
     .active = cmd_active_mouse,
@@ -122,9 +137,14 @@ const devcmd vtable_mouse = {
     .unbind = cmd_unbind,
     .rebind = cmd_rebind,
 
+    .dpi = cmd_dpi,
+    .dpisel = cmd_dpisel,
+    .lift = cmd_lift,
+    .snap = cmd_snap,
+
     .notify = cmd_notify,
     .inotify = cmd_none,
-    .get = cmd_none,
+    .get = cmd_get,
 
     .start = start_dev,
     .setmodeindex = int1_void_none,
@@ -132,5 +152,6 @@ const devcmd vtable_mouse = {
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_mouse,
-    .updateindicators = int1_void_none
+    .updateindicators = int1_void_none,
+    .updatedpi = updatedpi
 };

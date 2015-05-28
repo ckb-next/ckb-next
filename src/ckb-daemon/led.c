@@ -1,5 +1,6 @@
 #include "led.h"
 #include "profile.h"
+#include "usb.h"
 
 void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* code){
     int index = keymap[keyindex].led;
@@ -56,4 +57,90 @@ void cmd_inotify(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const cha
     else
         // Turn notifications for these bits on
         mode->inotify[nnumber] |= bits;
+}
+
+// Does a key exist in the current LED layout?
+static int has_key(const char* name, const usbdevice* kb){
+    if(!name
+            // Mice only have the RGB zones
+            || (IS_MOUSE(kb->vendor, kb->product) && strstr(name, "dpi") != name && strcmp(name, "front") && strcmp(name, "back"))
+            // But keyboards don't have them at all
+            || (!IS_MOUSE(kb->vendor, kb->product) && (strstr(name, "dpi") == name || !strcmp(name, "front") || !strcmp(name, "back")))
+
+            // Only K95 has G keys and M keys (G1 - G18, MR, M1 - M3)
+            || (!IS_K95(kb) && ((name[0] == 'g' && name[1] >= '1' && name[1] <= '9') || (name[0] == 'm' && (name[1] == 'r' || name[1] == '1' || name[1] == '2' || name[1] == '3'))))
+            // Only K65 has lights on VolUp/VolDn
+            || (!IS_K65(kb) && (!strcmp(name, "volup") || !strcmp(name, "voldn")))
+            // K65 lacks numpad and media buttons
+            || (IS_K65(kb) && (strstr(name, "num") == name || !strcmp(name, "stop") || !strcmp(name, "prev") || !strcmp(name, "play") || !strcmp(name, "next"))))
+        return 0;
+    return 1;
+}
+
+char* printrgb(const lighting* light, const usbdevice* kb){
+    uchar r[N_KEYS_EXTENDED], g[N_KEYS_EXTENDED], b[N_KEYS_EXTENDED];
+    const uchar* mr = light->r;
+    const uchar* mg = light->g;
+    const uchar* mb = light->b;
+    for(int i = 0; i < N_KEYS_EXTENDED; i++){
+        // Translate the key index to an RGB index using the key map
+        int k = keymap[i].led;
+        if(k < 0)
+            continue;
+        r[i] = mr[k];
+        g[i] = mg[k];
+        b[i] = mb[k];
+    }
+    // Make a buffer to track key names and to filter out duplicates
+    char names[N_KEYS_EXTENDED][11];
+    for(int i = 0; i < N_KEYS_EXTENDED; i++){
+        const char* name = keymap[i].name;
+        if(keymap[i].led < 0 || !has_key(name, kb))
+            names[i][0] = 0;
+        else
+            strncpy(names[i], name, 11);
+    }
+    // Check to make sure these aren't all the same color
+    int same = 1;
+    for(int i = 1; i < N_KEYS_EXTENDED; i++){
+        if(!names[i][0])
+            continue;
+        if(r[i] != r[0] || g[i] != g[0] || b[i] != b[0]){
+            same = 0;
+            break;
+        }
+    }
+    // If they are, just output that color
+    if(same){
+        char* buffer = malloc(7);
+        snprintf(buffer, 7, "%02x%02x%02x", r[0], g[0], b[0]);
+        return buffer;
+    }
+    const int BUFFER_LEN = 4096;    // Should be more than enough to fit all keys
+    char* buffer = malloc(BUFFER_LEN);
+    int length = 0;
+    for(int i = 0; i < N_KEYS_EXTENDED; i++){
+        if(!names[i][0])
+            continue;
+        // Print the key name
+        int newlen = 0;
+        snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%s%n" : " %s%n", names[i], &newlen);
+        length += newlen;
+        // Look ahead to see if any other keys have this color. If so, print them here as well.
+        uchar kr = r[i], kg = g[i], kb = b[i];
+        for(int j = i + 1; j < N_KEYS_EXTENDED; j++){
+            if(!names[j][0])
+                continue;
+            if(r[j] != kr || g[j] != kg || b[j] != kb)
+                continue;
+            snprintf(buffer + length, BUFFER_LEN - length, ",%s%n", names[j], &newlen);
+            length += newlen;
+            // Erase the key's name so it won't get printed later
+            names[j][0] = 0;
+        }
+        // Print the color
+        snprintf(buffer + length, BUFFER_LEN - length, ":%02x%02x%02x%n", kr, kg, kb, &newlen);
+        length += newlen;
+    }
+    return buffer;
 }

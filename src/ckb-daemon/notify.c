@@ -1,5 +1,6 @@
 #include "device.h"
 #include "devnode.h"
+#include "dpi.h"
 #include "led.h"
 #include "notify.h"
 #include "profile.h"
@@ -95,6 +96,7 @@ void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const c
     pthread_mutex_unlock(imutex(kb));
 }
 
+// Check hardware mode, bail out if it doesn't exist
 #define HWMODE_OR_RETURN(kb, index) \
     if(IS_K95(kb)){                 \
         if((index) >= HWMODE_K95)   \
@@ -103,6 +105,14 @@ void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const c
         if((index) >= HWMODE_K70)   \
             return;                 \
     }
+
+// Standard check for hardware variables: get index, bail if index is too high or no HW profile
+#define HW_STANDARD                                 \
+    if(!kb->hw)                                     \
+        return;                                     \
+    unsigned index = INDEX_OF(mode, profile->mode); \
+    /* Make sure the mode number is valid */        \
+    HWMODE_OR_RETURN(kb, index)
 
 static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
     usbprofile* profile = kb->profile;
@@ -118,14 +128,7 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
         return;
     } else if(!strcmp(setting, ":hwrgb")){
         // Get the current hardware RGB settings
-        if(!kb->hw){
-            nprintf(kb, nnumber, mode, "hwrgb FFFFFF\n");
-            return;
-        }
-        unsigned index = INDEX_OF(mode, profile->mode);
-        // Make sure the mode number is valid
-        HWMODE_OR_RETURN(kb, index);
-        // Get the mode from the hardware store
+        HW_STANDARD;
         char* rgb = printrgb(kb->hw->light + index, kb);
         nprintf(kb, nnumber, mode, "hwrgb %s\n", rgb);
         free(rgb);
@@ -149,10 +152,7 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
         free(name);
     } else if(!strcmp(setting, ":hwname")){
         // Get the current hardware mode name
-        if(!kb->hw)
-            return;
-        unsigned index = INDEX_OF(mode, profile->mode);
-        HWMODE_OR_RETURN(kb, index);
+        HW_STANDARD;
         char* name = gethwmodename(kb->hw, index);
         nprintf(kb, nnumber, mode, "hwname %s\n", name[0] ? name : "Unnamed");
         free(name);
@@ -181,10 +181,7 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
         free(guid);
     } else if(!strcmp(setting, ":hwid")){
         // Get the current hardware mode ID
-        if(!kb->hw)
-            return;
-        unsigned index = INDEX_OF(mode, profile->mode);
-        HWMODE_OR_RETURN(kb, index);
+        HW_STANDARD;
         char* guid = getid(&kb->hw->id[index + 1]);
         int modified;
         memcpy(&modified, &kb->hw->id[index + 1].modified, sizeof(modified));
@@ -200,10 +197,44 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
             nprintkey(kb, nnumber, i, state);
         }
     } else if(!strcmp(setting, ":i")){
-        // Get the current state of all LEDs
+        // Get the current state of all indicator LEDs
         nprintind(kb, nnumber, I_NUM, kb->ileds & I_NUM);
         nprintind(kb, nnumber, I_CAPS, kb->ileds & I_CAPS);
         nprintind(kb, nnumber, I_SCROLL, kb->ileds & I_SCROLL);
+    } else if(!strcmp(setting, ":dpi")){
+        // Get the current DPI levels
+        char* dpi = printdpi(&mode->dpi, kb);
+        nprintf(kb, nnumber, mode, "dpi %s\n", dpi);
+        free(dpi);
+        return;
+    } else if(!strcmp(setting, ":hwdpi")){
+        // Get the current hardware DPI levels
+        HW_STANDARD;
+        char* dpi = printdpi(kb->hw->dpi + index, kb);
+        nprintf(kb, nnumber, mode, "hwdpi %s\n", dpi);
+        free(dpi);
+        return;
+    } else if(!strcmp(setting, ":dpisel")){
+        // Get the currently-selected DPI
+        nprintf(kb, nnumber, mode, "dpisel %d\n", mode->dpi.current);
+    } else if(!strcmp(setting, ":hwdpisel")){
+        // Get the currently-selected hardware DPI
+        HW_STANDARD;
+        nprintf(kb, nnumber, mode, "hwdpisel %d\n", kb->hw->dpi[index].current);
+    } else if(!strcmp(setting, ":lift")){
+        // Get the mouse lift height
+        nprintf(kb, nnumber, mode, "lift %d\n", mode->dpi.lift);
+    } else if(!strcmp(setting, ":hwlift")){
+        // Get the hardware lift height
+        HW_STANDARD;
+        nprintf(kb, nnumber, mode, "hwlift %d\n", kb->hw->dpi[index].lift);
+    } else if(!strcmp(setting, ":snap")){
+        // Get the angle snap status
+        nprintf(kb, nnumber, mode, "snap %s\n", mode->dpi.snap ? "on" : "off");
+    } else if(!strcmp(setting, ":hwsnap")){
+        // Get the hardware angle snap status
+        HW_STANDARD;
+        nprintf(kb, nnumber, mode, "hwsnap %s\n", kb->hw->dpi[index].snap ? "on" : "off");
     }
 }
 

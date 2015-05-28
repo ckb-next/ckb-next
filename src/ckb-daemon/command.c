@@ -40,6 +40,11 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
     "rebind",
     "macro",
 
+    "dpi",
+    "dpisel",
+    "lift",
+    "snap",
+
     "notify",
     "inotify",
     "get"
@@ -205,7 +210,7 @@ int readcmd(usbdevice* kb, const char* line){
             profile = kb->profile;
             mode = profile->currentmode;
             continue;
-        case ERASE: case NAME: case IOFF: case ION: case IAUTO: case INOTIFY: case PROFILENAME: case ID: case PROFILEID:
+        case ERASE: case NAME: case IOFF: case ION: case IAUTO: case INOTIFY: case PROFILENAME: case ID: case PROFILEID: case DPISEL: case LIFT: case SNAP:
             // All of the above just parse the whole word
             vt->do_cmd[command](kb, mode, notifynumber, 0, word);
             continue;
@@ -236,10 +241,10 @@ int readcmd(usbdevice* kb, const char* line){
         const char* right = word + left;
         if(right[0] == ':')
             right++;
-        // Macros have a separate left-side handler
-        if(command == MACRO){
+        // Macros and DPI have a separate left-side handler
+        if(command == MACRO || command == DPI){
             word[left] = 0;
-            vt->macro(kb, mode, notifynumber, word, right);
+            vt->do_macro[command](kb, mode, notifynumber, word, right);
             continue;
         }
         // Scan the left side for key names and run the requested command
@@ -270,8 +275,10 @@ int readcmd(usbdevice* kb, const char* line){
     }
 
     // Finish up
-    if(!NEEDS_FW_UPDATE(kb))
+    if(!NEEDS_FW_UPDATE(kb)){
         TRY_WITH_RESET(vt->updatergb(kb, 0));
+        TRY_WITH_RESET(vt->updatedpi(kb, 0));
+    }
     free(word);
     return 0;
 }

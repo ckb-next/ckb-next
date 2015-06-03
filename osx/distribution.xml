@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <title>ckb</title>
+    <organization>com.ckb</organization>
+    <domains enable_localSystem="true"/>
+    <options customize="never" require-scripts="true" rootVolumeOnly="true" />
+    <license file="LICENSE.html" mime-type="text/html" />
+    <pkg-ref id="com.ckb.ckb" version="0" auth="root">ckb.pkg</pkg-ref>
+    <choices-outline>
+        <line choice="com.ckb.ckb"/>
+    </choices-outline>
+    <choice
+        id="com.ckb.ckb"
+        visible="false"
+        title="ckb"
+        description="Corsair keyboard driver"
+        start_selected="true">
+      <pkg-ref id="com.ckb.ckb" />
+    </choice>
+</installer-gui-script>

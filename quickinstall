@@ -48,6 +48,7 @@ if [[ -d $SRCDIR ]]; then
     # Generate makefiles
     ./qmake-auto $QMAKEFLAGS > $TMPFILE 2>&1
     checkfail $?
+    make clean >/dev/null 2>&1
     # Run make with command arguments
     echo "Compiling binaries..."
     echo "(This can take a while, please be patient)"
@@ -89,6 +90,8 @@ else
     # Linux
     newtmp
     # Install apps
+    sudo mkdir -p $PREFIX
+    checkfail $?
     sudo install bin/ckb $PREFIX/ckb 2>$TMPFILE
     checkfail $?
     sudo install bin/ckb-daemon $PREFIX/ckb-daemon 2>$TMPFILE
@@ -128,6 +131,8 @@ if [[ $systemdc -eq 0 && `echo "$systemd" | wc -l` -ge 1 ]]; then
         # Running the driver immediately can cause enter to get spammed. Wait for the key to release first.
         sleep 0.5
         sudo systemctl stop ckb-daemon >/dev/null 2>&1
+        sudo mkdir -p /usr/lib/systemd/system
+        checkfail $?
         sudo install service/systemd/ckb-daemon.service /usr/lib/systemd/system 2>$TMPFILE
         checkfail $?
         sudo systemctl daemon-reload >/dev/null 2>&1
@@ -145,6 +150,8 @@ elif [[ $upstartc -eq 0 && `echo $upstart | wc -l` -ge 1 ]]; then
     else
         sleep 0.5
         sudo service ckb-daemon stop >/dev/null 2>&1
+        sudo mkdir -p /etc/init
+        checkfail $?
         sudo install service/upstart/ckb-daemon.conf /etc/init 2>$TMPFILE
         checkfail $?
         sudo service ckb-daemon start 2>$TMPFILE
@@ -158,14 +165,16 @@ elif [[ $launchdc -eq 0 && `echo "$launchd" | wc -l` -ge 1 ]]; then
     else
         sleep 0.5
         sudo launchctl unload /Library/LaunchDaemons/com.ckb.daemon.plist >/dev/null 2>&1
+        sudo mkdir -p /Library/LaunchDaemons
+        checkfail $?
         sudo cp -f service/launchd/com.ckb.daemon.plist /Library/LaunchDaemons 2>$TMPFILE
-        [[ $? -ne 0 ]] && exit 0
+        checkfail $?
         sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist 2>$TMPFILE
-        [[ $? -ne 0 ]] && exit 0
+        checkfail $?
         sudo chmod 0700 /Library/LaunchDaemons/com.ckb.daemon.plist 2>$TMPFILE
-        [[ $? -ne 0 ]] && exit 0
+        checkfail $?
         sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist 2>$TMPFILE
-        [[ $? -ne 0 ]] && exit 0
+        checkfail $?
     fi
 else
     echo "No supported system service daemons detected."

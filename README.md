@@ -38,17 +38,19 @@ OSX Installation
 
 #### Binary download:
 
-Pre-compiled binaries for OSX are provided by Xiy. They may be updated less frequently.
+[Click here to download the OSX binary (beta-v0.1.2).](https://github.com/ccMSC/ckb/releases/download/v0.1.2/ckb.pkg)
 
-[Click here to download the latest version (alpha-v0.0.52).](https://github.com/ccMSC/ckb/releases/download/0.0.52/ckb-0.0.52-osx.zip)
-
-The easiest way to install the driver is with the `quickinstall` script. To get it, first click "Download zip" on the right side of the screen to download the source code. Copy the `quickinstall` script and the `service` folder out of the ckb-master folder, and place them in your downloads next to ckb.app _(Note: make sure you copy the scripts OUT of the directory, do not move ckb.app IN to the source directory. Otherwise the script will try to compile the source)._ Double-click on `quickinstall` and it will offer to install/run the app for you. The default answer to all of the questions is "yes"; press enter to proceed. You can close the terminal window after it finishes.
+This is an automated installer which will set up the driver for you. After it's finished, open ckb.app (it will be installed to your Applications directory) to get started.
 
 #### Building from source:
 
 Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
-Like the binary version, it's easiest to install ckb with `quickinstall`. You do not need to copy or move any files since you already have the source downloaded. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see `BUILD.md`.
+The easiest way to install the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see `BUILD.md`.
+
+#### Uninstall:
+
+Drag `ckb.app` into the trash. If the daemon plist file isn't cleaned up automatically, you can find it and remove it here: `/Library/LaunchDaemons/com.ckb.daemon.plist`.
 
 Usage
 -----

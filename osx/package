@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# OSX package generation script
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "This is only for OSX."
+    exit 1
+fi
+
+[[ $MACDEPLOYQT == "" ]] && MACDEPLOYQT=`find ~/Qt/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name macdeployqt -print -quit 2>/dev/null`
+if [[ $MACDEPLOYQT == "" ]]; then
+    echo "macdeployqt not found."
+    echo "Invoke with MACDEPLOYQT=/path/to/macdeployqt to locate it manually."
+    exit 1
+fi
+
+function checkfail {
+    [[ $1 -ne 0 ]] && exit $1
+}
+
+# Build from source
+cd ..
+./qmake-auto
+checkfail $?
+make
+checkfail $?
+# Package Qt frameworks
+$MACDEPLOYQT ckb.app
+checkfail $?
+
+# Create installation directory
+mkdir -p pkg/Applications
+mkdir -p pkg/Library/LaunchDaemons
+# Copy files
+cp -R ckb.app pkg/Applications
+install -m 0644 service/launchd/com.ckb.daemon.plist pkg/Library/LaunchDaemons
+
+# Create packages
+mkdir pkg.ckb
+`which pkgbuild` --root pkg --identifier com.ckb.ckb --version `cat VERSION` --ownership recommended --scripts osx/scripts pkg.ckb/ckb.pkg
+checkfail $?
+`which productbuild` --distribution osx/distribution.xml --resources osx/resources --package-path pkg.ckb --version `cat VERSION` ckb.pkg
+checkfail $?
+
+# Done, package is now in ckb.pkg. Remove temporary dirs
+rm -R pkg.ckb
+rm -R pkg

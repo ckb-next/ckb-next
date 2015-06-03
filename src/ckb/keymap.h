@@ -43,7 +43,7 @@ struct Key {
     inline bool operator !() const { return !(bool)*this; }
 };
 
-// Key lighting/layout class
+// Key layout/device info class
 class KeyMap {
 public:
     enum Model {

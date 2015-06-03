@@ -75,8 +75,11 @@ Kb::Kb(QObject *parent, const QString& path) :
     cmd.flush();
     cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
     cmd.write(QString("active\n@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
-    for(int i = 0; i < hwModeCount; i++)
+    for(int i = 0; i < hwModeCount; i++){
         cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
+        if(isMouse())
+            cmd.write(" :hwdpi :hwdpisel :hwlift :hwsnap");
+    }
     cmd.write("\n");
     cmd.flush();
 
@@ -192,9 +195,9 @@ void Kb::hwSave(){
     // Write only the base colors of each mode, no animations
     for(int i = 0; i < hwModeCount; i++){
         KbMode* mode = _currentProfile->modes()[i];
-        cmd.write("\n");
+        cmd.write(QString("\nmode %1 ").arg(i + 1).toLatin1());
         KbLight* light = mode->light();
-        light->base(cmd, i, true);
+        KbPerf* perf = mode->perf();
         if(mode == _currentMode)
             cmd.write(" switch");
         // Write the mode name and ID
@@ -204,6 +207,10 @@ void Kb::hwSave(){
         cmd.write(mode->id().guidString().toLatin1());
         cmd.write(" ");
         cmd.write(mode->id().modifiedString().toLatin1());
+        // Write lighting and performance
+        light->base(cmd, true);
+        cmd.write(" ");
+        perf->update(cmd, true, false);
     }
     cmd.write("\n");
 
@@ -267,14 +274,13 @@ void Kb::fwUpdate(const QString& path){
 void Kb::frameUpdate(){
     // Get system mute state
     muteState mute = getMuteState();
-    if(mute == UNKNOWN)
-        mute = MUTED;
 
     // Advance animation frame
     if(!_currentMode)
         return;
     KbLight* light = _currentMode->light();
     KbBind* bind = _currentMode->bind();
+    KbPerf* perf = _currentMode->perf();
     if(!light->isStarted()){
         // Don't do anything until the animations are started
         light->open();
@@ -299,15 +305,29 @@ void Kb::frameUpdate(){
         cmd.write(" ");
         prevProfile = _currentProfile;
     }
+
     // Update current mode
     int index = _currentProfile->indexOf(_currentMode);
     // ckb-daemon only has 6 modes: 3 hardware, 3 non-hardware. Beyond mode six, switch back to four.
     // e.g. 1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6 ...
     if(index >= 6)
         index = 3 + index % 3;
-    light->frameUpdate(cmd, index, mute != MUTED, !bind->winLock());
+    // Dim inactive keys
+    QStringList dimKeys;
+    dimKeys << "mr" << "m1" << "m2" << "m3";
+    if(!bind->winLock())
+        dimKeys << "lock";
+    if(mute == UNMUTED && light->showMute())
+        dimKeys << "mute";
+    dimKeys.removeAll(QString("m%1").arg(index + 1));
+
+    // Send lighting/binding to driver
+    cmd.write(QString("mode %1 switch ").arg(index + 1).toLatin1());
+    light->frameUpdate(cmd, dimKeys);
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
+    cmd.write("\n");
+    perf->update(cmd, changed);
     cmd.write("\n");
     cmd.flush();
 }
@@ -519,6 +539,46 @@ void Kb::readNotify(QString line){
                 light->color("m3", lightColor);
                 light->color("lock", lightColor);
             }
+        } else if(components[2] == "hwdpi"){
+            // DPI settings
+            if(!_hwProfile || _hwProfile->modeCount() <= mode)
+                return;
+            KbPerf* perf = _hwProfile->modes()[mode]->perf();
+            // Read the rest of the line as stage:x,y
+            foreach(QString comp, components.mid(3)){
+                QStringList dpi = comp.split(':');
+                if(dpi.length() != 2)
+                    continue;
+                QStringList xy = dpi[1].split(',');
+                int x, y;
+                if(xy.length() < 2)
+                    // If the right side only has one parameter, set both X and Y
+                    x = y = xy[0].toInt();
+                else {
+                    x = xy[0].toInt();
+                    y = xy[1].toInt();
+                }
+                // Set DPI for this stage
+                perf->dpi(dpi[0].toInt(), QPoint(x, y));
+            }
+        } else if(components[2] == "hwdpisel"){
+            // Hardware DPI selection (0...5)
+            if(!_hwProfile || _hwProfile->modeCount() <= mode)
+                return;
+            KbPerf* perf = _hwProfile->modes()[mode]->perf();
+            perf->curDpiIdx(components[3].toInt());
+        } else if(components[2] == "hwlift"){
+            // Mouse lift height (1...5)
+            if(!_hwProfile || _hwProfile->modeCount() <= mode)
+                return;
+            KbPerf* perf = _hwProfile->modes()[mode]->perf();
+            perf->liftHeight((KbPerf::height)components[3].toInt());
+        } else if(components[3] == "hwsnap"){
+            // Mouse angle snapping ("on" or "off")
+            if(!_hwProfile || _hwProfile->modeCount() <= mode)
+                return;
+            KbPerf* perf = _hwProfile->modes()[mode]->perf();
+            perf->angleSnap(components[3] == "on");
         }
     } else if(components[0] == "fwupdate"){
         if(components.count() < 3)

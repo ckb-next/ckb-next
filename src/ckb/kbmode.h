@@ -4,6 +4,9 @@
 #include <QObject>
 #include "kblight.h"
 #include "kbbind.h"
+#include "kbperf.h"
+
+// ID structure for modes/profiles
 
 struct UsbId {
     QUuid guid;
@@ -24,6 +27,8 @@ struct UsbId {
 };
 
 class Kb;
+
+// Profile mode
 
 class KbMode : public QObject
 {
@@ -49,6 +54,7 @@ public:
     // Lighting and binding setup
     inline KbLight* light() { return _light; }
     inline KbBind* bind() { return _bind; }
+    inline KbPerf* perf() { return _perf; }
 
     // Save settings
     void save(QSettings& settings);
@@ -63,6 +69,7 @@ private:
 
     KbLight* _light;
     KbBind* _bind;
+    KbPerf* _perf;
 
     bool _needsSave;
 

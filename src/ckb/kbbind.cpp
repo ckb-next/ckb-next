@@ -10,12 +10,12 @@ quint64 KbBind::globalRemapTime = 0;
 
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _map(keyMap),
-    _winLock(false), _needsUpdate(true), _needsSave(true) {
+    sniperValue(0), _winLock(false), _needsUpdate(true), _needsSave(true) {
 }
 
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const KbBind& other) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _bind(other._bind),
-    _winLock(false), _needsUpdate(true), _needsSave(true) {
+    sniperValue(0), _winLock(false), _needsUpdate(true), _needsSave(true) {
     map(keyMap);
 }
 
@@ -323,8 +323,26 @@ void KbBind::keyEvent(const QString& key, bool down){
     if(!isSpecial(act))
         return;
     QStringList parts = act.split(":");
-    if(parts.length() < 2)
+    if(parts.length() < 2){
+        if(act == "dpiup"){
+            KbPerf* perf = modeParent()->perf();
+            if(down)
+                perf->dpiUp();
+        } else if(act == "dpidn"){
+            KbPerf* perf = modeParent()->perf();
+            if(down)
+                perf->dpiDown();
+        } else if(act == "sniper"){
+            KbPerf* perf = modeParent()->perf();
+            if(down)
+                sniperValue = perf->pushSniper();
+            else {
+                perf->popDpi(sniperValue);
+                sniperValue = 0;
+            }
+        }
         return;
+    }
     QString prefix = parts[0];
     int suffix = parts[1].toInt();
     if(prefix == "$mode"){

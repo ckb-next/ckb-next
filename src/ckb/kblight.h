@@ -8,14 +8,18 @@
 #include "kbanim.h"
 #include "keymap.h"
 
+class KbMode;
+
+// Keyboard lighting setup
+
 class KbLight : public QObject
 {
     Q_OBJECT
 public:
     // New lighting setup
-    KbLight(QObject* parent, const KeyMap& keyMap);
+    KbLight(KbMode* parent, const KeyMap& keyMap);
     // Copy a lighting setup
-    KbLight(QObject *parent, const KeyMap& keyMap, const KbLight& other);
+    KbLight(KbMode *parent, const KeyMap& keyMap, const KbLight& other);
     ~KbLight();
 
     // Key map
@@ -63,12 +67,13 @@ public:
     void open();
     // Whether or not all animations have started
     bool isStarted();
-    // Write a new frame to the keyboard.
-    void frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock);
     // Make the lighting idle, stopping any animations.
     void close();
+
+    // Write a new frame to the keyboard. Write "mode %d" first. Optionally provide a list of keys to show in a dimmed state.
+    void frameUpdate(QFile& cmd, const QStringList &dimKeys = QStringList());
     // Write the mode's base colors without any animation
-    void base(QFile& cmd, int modeIndex, bool ignoreDim = false);
+    void base(QFile& cmd, bool ignoreDim = false);
 
     // Load and save from stored settings
     void load(QSettings& settings);

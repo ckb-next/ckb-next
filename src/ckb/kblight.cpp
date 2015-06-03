@@ -2,17 +2,18 @@
 #include <QDateTime>
 #include <QSet>
 #include "kblight.h"
+#include "kbmode.h"
 
 static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
 
-KbLight::KbLight(QObject* parent, const KeyMap& keyMap) :
+KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
     QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false), _needsSave(true)
 {
     map(keyMap);
 }
 
-KbLight::KbLight(QObject* parent, const KeyMap& keyMap, const KbLight& other) :
+KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
     QObject(parent), _previewAnim(0), _map(other._map), _colorMap(other._colorMap), lastFrameSignal(0), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false), _needsSave(true)
 {
     map(keyMap);
@@ -173,88 +174,6 @@ void KbLight::animKeypress(const QString& key, bool down){
     }
 }
 
-void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
-    QHashIterator<QString, QRgb> i(animMap);
-    while(i.hasNext()){
-        i.next();
-        QString name = i.key();
-        QRgb color = i.value();
-        // Make sure the key is in the map before printing it
-        const Key& key = _map[name];
-        if(!key.hasLed)
-            continue;
-        cmd.write(" ");
-        cmd.write(name.toLatin1());
-        char output[8];
-        snprintf(output, sizeof(output), ":%02x%02x%02x", qRed(color), qGreen(color), qBlue(color));
-        cmd.write(output);
-    }
-}
-
-void KbLight::frameUpdate(QFile& cmd, int modeIndex, bool dimMute, bool dimLock){
-    // Advance animations
-    ColorMap animMap = _colorMap;
-    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    foreach(KbAnim* anim, _animList)
-        anim->blend(animMap, timestamp);
-    if(_previewAnim)
-        _previewAnim->blend(animMap, timestamp);
-
-    // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
-    if(timestamp >= lastFrameSignal + 50){
-        emit frameDisplayed(animMap);
-        lastFrameSignal = timestamp;
-    }
-
-    cmd.write(QString().sprintf("mode %d rgb", modeIndex + 1).toLatin1());
-    // If brightness is at 0%, turn off lighting entirely
-    if(_dimming == 3){
-        cmd.write(" 000000 switch");
-        return;
-    }
-
-    // Dim inactive keys
-    float light = (3 - _dimming) / 3.f;
-    QStringList inactiveList = QStringList();
-    float inactiveLight = 1.f;
-    if(_inactive >= 0){
-        inactiveList << "mr" << "m1" << "m2" << "m3";
-        if(dimLock)
-            inactiveList << "lock";
-        if(dimMute && _showMute)
-            inactiveList << "mute";
-        inactiveList.removeAll(QString("m%1").arg(modeIndex + 1));
-        inactiveLight = (2 - _inactive) / 4.f;
-    }
-
-    // Set brightness
-    if(light != 1.f || inactiveLight != 1.f){
-        QMutableHashIterator<QString, QRgb> i(animMap);
-        while(i.hasNext()){
-            i.next();
-            QRgb& rgb = i.value();
-            float r = qRed(rgb);
-            float g = qGreen(rgb);
-            float b = qBlue(rgb);
-            if(light != 1.f){
-                r *= light;
-                g *= light;
-                b *= light;
-            }
-            if(inactiveLight != 1.f && inactiveList.contains(i.key())){
-                r *= inactiveLight;
-                g *= inactiveLight;
-                b *= inactiveLight;
-            }
-            rgb = qRgb(round(r), round(g), round(b));
-        }
-    }
-
-    // Apply light
-    printRGB(cmd, animMap);
-    cmd.write(" switch");
-}
-
 void KbLight::open(){
     // Apply shared dimming if needed
     if(_shareDimming != -1 && _shareDimming != _dimming)
@@ -278,14 +197,83 @@ void KbLight::close(){
     _start = false;
 }
 
-void KbLight::base(QFile &cmd, int modeIndex, bool ignoreDim){
+void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
+    QHashIterator<QString, QRgb> i(animMap);
+    while(i.hasNext()){
+        i.next();
+        QString name = i.key();
+        QRgb color = i.value();
+        // Make sure the key is in the map before printing it
+        const Key& key = _map[name];
+        if(!key.hasLed)
+            continue;
+        cmd.write(" ");
+        cmd.write(name.toLatin1());
+        char output[8];
+        snprintf(output, sizeof(output), ":%02x%02x%02x", qRed(color), qGreen(color), qBlue(color));
+        cmd.write(output);
+    }
+}
+
+void KbLight::frameUpdate(QFile& cmd, const QStringList& dimKeys){
+    // Advance animations
+    ColorMap animMap = _colorMap;
+    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    foreach(KbAnim* anim, _animList)
+        anim->blend(animMap, timestamp);
+    if(_previewAnim)
+        _previewAnim->blend(animMap, timestamp);
+
+    // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
+    if(timestamp >= lastFrameSignal + 50){
+        emit frameDisplayed(animMap);
+        lastFrameSignal = timestamp;
+    }
+
+    cmd.write(QString().sprintf("rgb").toLatin1());
+    // If brightness is at 0%, turn off lighting entirely
+    if(_dimming == 3){
+        cmd.write(" 000000");
+        return;
+    }
+
+    // Set brightness
+    float light = (3 - _dimming) / 3.f;
+    float inactiveLight = (_inactive >= 0 ? (2 - _inactive) / 4.f : 1.f);
+    if(light != 1.f || inactiveLight != 1.f){
+        QMutableHashIterator<QString, QRgb> i(animMap);
+        while(i.hasNext()){
+            i.next();
+            QRgb& rgb = i.value();
+            float r = qRed(rgb);
+            float g = qGreen(rgb);
+            float b = qBlue(rgb);
+            if(light != 1.f){
+                r *= light;
+                g *= light;
+                b *= light;
+            }
+            if(inactiveLight != 1.f && dimKeys.contains(i.key())){
+                r *= inactiveLight;
+                g *= inactiveLight;
+                b *= inactiveLight;
+            }
+            rgb = qRgb(round(r), round(g), round(b));
+        }
+    }
+
+    // Apply light
+    printRGB(cmd, animMap);
+}
+
+void KbLight::base(QFile &cmd, bool ignoreDim){
     close();
     if(_dimming == MAX_DIM && !ignoreDim){
-        cmd.write(QString().sprintf("mode %d rgb 000000", modeIndex + 1).toLatin1());
+        cmd.write(QString().sprintf("rgb 000000").toLatin1());
         return;
     }
     // Set just the background color, ignoring any animation
-    cmd.write(QString().sprintf("mode %d rgb", modeIndex + 1).toLatin1());
+    cmd.write(QString().sprintf("rgb").toLatin1());
     QHash<QString, QRgb> animMap = _colorMap;
     animMap["mr"] = qRgb(0, 0, 0);
     animMap["m1"] = qRgb(0, 0, 0);

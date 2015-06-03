@@ -6,6 +6,8 @@
 #include "animscript.h"
 #include "keymap.h"
 
+// Animation instance for a lighting mode.
+
 class KbAnim : public QObject
 {
     Q_OBJECT

@@ -19,4 +19,16 @@ public:
     static void set(const QString& key, const QVariant& value);
 };
 
+// QSettings group wrapper. Useful for easily pushing/popping a group without worrying about everything breaking if you forgot endGroup.
+
+class QSGroup
+{
+public:
+    inline QSGroup(QSettings& settings, const QString& prefix) : _settings(settings) { settings.beginGroup(prefix); }
+    inline ~QSGroup() { _settings.endGroup(); }
+
+private:
+    QSettings& _settings;
+};
+
 #endif // CKBSETTINGS_H

@@ -9,13 +9,17 @@
 int setactive_mouse(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
-    uchar msg[MSG_SIZE] = { 0x07, 0x04, 0 };    // Disables or enables HW control for DPI and Sniper button
+    uchar msg[2][MSG_SIZE] = {
+        { 0x07, 0x04, 0 },                                                          // Disables or enables HW control for DPI and Sniper button
+        { 0x07, 0x40, 0x08, 0,
+          1, 0x80, 2, 0x80, 3, 0x80, 4, 0x80, 5, 0x80, 6, 0x80, 7, 0x80, 8, 0x80 }, // Enable button input. This is similar to the keyboard input selection, but we want everything to come through the HID reports.
+    };
     if(active)
         // Put the mouse into SW mode
-        msg[2] = 2;
+        msg[0][2] = 2;
     else
         // Restore HW mode
-        msg[2] = 1;
+        msg[0][2] = 1;
     pthread_mutex_lock(imutex(kb));
     kb->active = !!active;
     kb->profile->lastlight.forceupdate = 1;
@@ -23,7 +27,9 @@ int setactive_mouse(usbdevice* kb, int active){
     memset(&kb->input.keys, 0, sizeof(kb->input.keys));
     inputupdate(kb);
     pthread_mutex_unlock(imutex(kb));
-    if(!usbsend(kb, msg, 1))
+    if(!usbsend(kb, msg[0], 1))
+        return -1;
+    if(active && !usbsend(kb, msg[1], 1))
         return -1;
     return 0;
 }

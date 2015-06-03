@@ -11,6 +11,8 @@
 class Kb;
 class KbMode;
 
+// Binding setup for a device mode
+
 class KbBind : public QObject
 {
     Q_OBJECT
@@ -45,7 +47,7 @@ public:
     static inline bool isUnbound(const QString& action) { return action.isEmpty(); }
     static inline bool isNormal(const QString& action) { return !action.isEmpty() && !isSpecial(action); }
     static inline bool isMedia(const QString& action) { return action == "mute" || action == "volup" || action == "voldn" || action == "stop" || action == "prev" || action == "play" || action == "next"; }
-    static inline bool isSpecial(const QString& action) { return !action.isEmpty() && action[0] == '$'; }
+    static inline bool isSpecial(const QString& action) { return !action.isEmpty() && (action[0] == '$' || action == "dpiup" || action == "dpidn" || action == "sniper"); }
     static inline bool isProgram(const QString& action) { return action.left(8) == "$program"; }
     // Splits a special action into action and parameter.
     static QString specialInfo(const QString& action, int& parameter);
@@ -122,6 +124,8 @@ private:
     // Currently-running programs
     QHash<QString, QProcess*> kpPrograms;
     QHash<QString, QProcess*> krPrograms;
+    // Mouse sniper mode (0 = inactive)
+    quint64 sniperValue;
 
     bool _winLock;
     bool _needsUpdate;

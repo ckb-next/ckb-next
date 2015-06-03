@@ -9,6 +9,9 @@
 #include <QVariant>
 #include "keymap.h"
 
+// Class for tracking an animation script. Has a global list of all possible scripts, and can also provide instances to launch the process and communicate with it.
+// See also: KbAnim, KbLight
+
 class AnimScript : public QObject
 {
     Q_OBJECT

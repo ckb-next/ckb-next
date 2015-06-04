@@ -1,6 +1,7 @@
 #include <cmath>
 #include <QDateTime>
 #include <QMetaEnum>
+#include "ckbsettings.h"
 #include "kbanim.h"
 
 KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& settings) :
@@ -8,7 +9,7 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& se
     repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
     _guid(id), _needsSave(false)
 {
-    settings.beginGroup(_guid.toString().toUpper());
+    QSGroup group(settings, _guid.toString().toUpper());
     _keys = settings.value("Keys").toStringList();
     // Convert key list from storage names if needed
     if(!settings.value("UseRealNames").toBool()){
@@ -31,11 +32,11 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings& se
         _mode = Normal;
     _scriptName = settings.value("ScriptName").toString().trimmed();
     _scriptGuid = settings.value("ScriptGuid").toString();
-    settings.beginGroup("Parameters");
-    foreach(const QString& param, settings.childKeys())
-        _parameters[param.toLower()] = settings.value(param);
-    settings.endGroup();
-    settings.endGroup();
+    {
+        QSGroup group(settings, "Parameters");
+        foreach(const QString& param, settings.childKeys())
+            _parameters[param.toLower()] = settings.value(param);
+    }
 
     if(!_scriptGuid.isNull()){
         _script = AnimScript::copy(this, _scriptGuid);

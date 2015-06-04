@@ -25,17 +25,17 @@ public:
     QString name() const;
 
 private:
-    Ui::AnimSettingDialog *ui;
-    QCheckBox* stopCheck, *kpStopCheck;
-    bool hasRepeat;
+    Ui::AnimSettingDialog* ui;
+    QCheckBox*  stopCheck, *kpStopCheck;
+    bool        hasRepeat;
 
     KbAnim* _anim;
-    double lastDuration;
+    double  lastDuration;
     QMap<QString, QWidget*> settingWidgets;
-    QSignalMapper updateMapper;
+    QSignalMapper           updateMapper;
 
-    QMap<QString, QSpinBox*> angleSpinners;
-    QSignalMapper angleDialMapper, angleSpinnerMapper;
+    QMap<QString, QSpinBox*>    angleSpinners;
+    QSignalMapper               angleDialMapper, angleSpinnerMapper;
 
     QFrame* hLine();
 

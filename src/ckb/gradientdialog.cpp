@@ -41,7 +41,7 @@ GradientDialog::GradientDialog(QWidget *parent) :
         QString pName = name.toLower();
         if(presets.contains(pName))
             continue;
-        settings.beginGroup(name);
+        QSGroup group(settings, name);
         // Create keys in a map to ensure correct order and no duplicates
         QMap<int, QColor> colors;
         foreach(const QString& position, settings.childKeys()){
@@ -59,7 +59,6 @@ GradientDialog::GradientDialog(QWidget *parent) :
             preset.gradient.append(QGradientStop(i.key() / 100., i.value()));
         }
         presets[pName] = preset;
-        settings.endGroup();
     }
 
     updatePresets();
@@ -82,10 +81,9 @@ GradientDialog::~GradientDialog(){
     while(i.hasNext()){
         Preset preset = i.next().value();
         if(!preset.builtIn){
-            settings.beginGroup(preset.name);
+            QSGroup group(settings, preset.name);
             foreach(const QGradientStop& stop, preset.gradient)
                 settings.setValue(QString::number((int)(stop.first * 100.)), stop.second);
-            settings.endGroup();
         }
     }
     delete ui;

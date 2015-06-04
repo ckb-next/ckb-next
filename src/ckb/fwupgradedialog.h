@@ -34,16 +34,16 @@ private:
 
     // FW blob has to be saved to a temporary path for processing.
     // saveBlob() to save, cleanBlob() to remove.
-    QString savePath;
-    const QString& saveBlob();
-    void cleanBlob();
+    QString         savePath;
+    const QString&  saveBlob();
+    void            cleanBlob();
 
-    QByteArray blob;
-    Kb* kb;
+    QByteArray  blob;
+    Kb*         kb;
 
     // Event loop for synchronous exec()
     QEventLoop* evLoop;
-    bool exitSuccess;
+    bool        exitSuccess;
 };
 
 #endif // FWUPGRADEDIALOG_H

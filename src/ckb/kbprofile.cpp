@@ -23,7 +23,7 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, QSettings& settings, cons
     QObject(parent), _currentMode(0), _id(guid, 0), _keyMap(keyMap), _needsSave(false)
 {
     // Load data from preferences
-    settings.beginGroup(guid);
+    QSGroup group(settings, guid);
     _name = settings.value("Name").toString().trimmed();
     if(_name == "")
         _name = "Unnamed";
@@ -32,22 +32,20 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, QSettings& settings, cons
     // Load modes
     uint count = settings.value("ModeCount").toUInt();
     for(uint i = 0; i < count; i++){
-        settings.beginGroup(QString::number(i));
+        QSGroup group(settings, QString::number(i));
         KbMode* mode = new KbMode(parent, _keyMap, settings);
         _modes.append(mode);
         // Set currentMode to the mode matching the current GUID, or the first mode in case it's not found
         if(current == mode->id().guid || !_currentMode)
             _currentMode = mode;
-        settings.endGroup();
     }
-    settings.endGroup();
 }
 
 void KbProfile::save(QSettings& settings){
     _needsSave = false;
     _id.newModified();
     // Save data to preferences
-    settings.beginGroup(id().guidString());
+    QSGroup group(settings, id().guidString());
     settings.setValue("Name", name());
     settings.setValue("Modified", _id.modifiedString());
     if(_currentMode)
@@ -56,12 +54,10 @@ void KbProfile::save(QSettings& settings){
     uint count = modeCount();
     settings.setValue("ModeCount", count);
     for(uint i = 0; i < count; i++){
-        settings.beginGroup(QString::number(i));
+        QSGroup group(settings, QString::number(i));
         KbMode* mode = _modes.at(i);
         mode->save(settings);
-        settings.endGroup();
     }
-    settings.endGroup();
 }
 
 bool KbProfile::needsSave() const {

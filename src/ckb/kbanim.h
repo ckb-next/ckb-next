@@ -34,15 +34,15 @@ public:
     KbAnim(QObject *parent, const KeyMap& map, const KbAnim& other);
 
     // Key map
-    inline const KeyMap& map() { return _map; }
-    void map(const KeyMap& newMap);
+    inline const KeyMap&        map()                               { return _map; }
+    void                        map(const KeyMap& newMap);
     // Keys to animate
-    inline const QStringList& keys() { return _keys; }
-    void keys(const QStringList& newKeys);
+    inline const QStringList&   keys()                              { return _keys; }
+    void                        keys(const QStringList& newKeys);
 
     // Gets a parameter value
-    inline bool hasParameter(const QString& name) const { return _parameters.contains(name); }
-    inline QVariant parameter(const QString& name) const { return _parameters.value(name); }
+    inline bool     hasParameter(const QString& name) const { return _parameters.contains(name); }
+    inline QVariant parameter(const QString& name) const    { return _parameters.value(name); }
     // Sets a parameter value. Parameter changes are not permanent until commited.
     void parameter(const QString& name, const QVariant& value);
     // Commits unsaved parameters
@@ -65,18 +65,18 @@ public:
     void blend(QHash<QString, QRgb>& animMap, quint64 timestamp);
 
     // Animation properties
-    inline const QUuid& guid() const { return _guid; }
-    inline void newId() { _needsSave = true; _guid = QUuid::createUuid(); }
-    inline const QString& name() const { return _name; }
-    inline void name(const QString& newName) { _needsSave = true; _name = newName; }
-    inline float opacity() const { return _opacity; }
-    inline void opacity(float newOpacity) { _needsSave = true; _opacity = newOpacity; }
-    inline Mode mode() const { return _mode; }
-    inline void mode(Mode newMode) { _needsSave = true; _mode = newMode; }
+    inline const QUuid&     guid() const                    { return _guid; }
+    inline void             newId()                         { _needsSave = true; _guid = QUuid::createUuid(); }
+    inline const QString&   name() const                    { return _name; }
+    inline void             name(const QString& newName)    { _needsSave = true; _name = newName; }
+    inline float            opacity() const                 { return _opacity; }
+    inline void             opacity(float newOpacity)       { _needsSave = true; _opacity = newOpacity; }
+    inline Mode             mode() const                    { return _mode; }
+    inline void             mode(Mode newMode)              { _needsSave = true; _mode = newMode; }
 
     // Animation script properties
-    const AnimScript* script() const { return _script; }
-    const QString& scriptName() const { return _scriptName; }
+    const AnimScript*   script() const      { return _script; }
+    const QString&      scriptName() const  { return _scriptName; }
 
 private:
     // Script (null if not loaded)
@@ -100,7 +100,7 @@ private:
     // Repeat/stop info (set from parameters)
     QString repeatKey;
     quint64 repeatTime, kpRepeatTime, stopTime, kpStopTime;
-    int repeatMsec, kpRepeatMsec;
+    int     repeatMsec, kpRepeatMsec;
     // Catch up to the current timestamp, performing repeats/stops as necessary
     void catchUp(quint64 timestamp);
 

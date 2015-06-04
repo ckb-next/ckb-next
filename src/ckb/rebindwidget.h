@@ -5,6 +5,8 @@
 #include "kbbind.h"
 #include "kbprofile.h"
 
+// Key rebinding widget
+
 namespace Ui {
 class RebindWidget;
 }
@@ -17,7 +19,9 @@ public:
     explicit RebindWidget(QWidget* parent);
     ~RebindWidget();
 
+    // Sets current binding setup
     void setBind(KbBind* newBind, KbProfile* newProfile);
+    // Sets current selection (chooses keys to rebind)
     void setSelection(const QStringList& newSelection, bool applyPrevious = false);
 
 private slots:

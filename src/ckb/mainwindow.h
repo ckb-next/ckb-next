@@ -46,8 +46,8 @@ public:
     QAction* restoreAction;
     QAction* closeAction;
 
-    QMenu* trayIconMenu;
-    QSystemTrayIcon* trayIcon;
+    QMenu*              trayIconMenu;
+    QSystemTrayIcon*    trayIcon;
 
     void closeEvent(QCloseEvent *event);
 

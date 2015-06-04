@@ -21,40 +21,40 @@ KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const 
 
 void KbBind::load(QSettings& settings){
     _needsSave = false;
-    settings.beginGroup("Binding");
+    QSGroup group(settings, "Binding");
     KeyMap currentMap = _map;
     _map = KeyMap::fromName(settings.value("KeyMap").toString());
     // Load key settings
     bool useReal = settings.value("UseRealNames").toBool();
     _bind.clear();
-    settings.beginGroup("Keys");
-    foreach(QString key, settings.childKeys()){
-        QString name = key.toLower();
-        if(!useReal)
-            name = _map.fromStorage(name);
-        QString bind = settings.value(key).toString();
-        _bind[name] = bind;
+    {
+        QSGroup group(settings, "Keys");
+        foreach(QString key, settings.childKeys()){
+            QString name = key.toLower();
+            if(!useReal)
+                name = _map.fromStorage(name);
+            QString bind = settings.value(key).toString();
+            _bind[name] = bind;
+        }
     }
-    settings.endGroup();
-    settings.endGroup();
     emit didLoad();
     map(currentMap);
 }
 
 void KbBind::save(QSettings& settings){
     _needsSave = false;
-    settings.beginGroup("Binding");
+    QSGroup group(settings, "Binding");
     settings.setValue("KeyMap", _map.name());
     // Save key settings
     settings.setValue("UseRealNames", true);
-    settings.beginGroup("Keys");
-    foreach(QString key, _bind.keys()){
-        QString act = _bind.value(key);
-        if(act != defaultAction(key))
-            settings.setValue(key, act);
+    {
+        QSGroup group(settings, "Keys");
+        foreach(QString key, _bind.keys()){
+            QString act = _bind.value(key);
+            if(act != defaultAction(key))
+                settings.setValue(key, act);
+        }
     }
-    settings.endGroup();
-    settings.endGroup();
 }
 
 QString KbBind::globalRemap(const QString& key){

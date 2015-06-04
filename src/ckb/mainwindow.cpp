@@ -186,7 +186,7 @@ void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
         // If accepted, switch to firmware tab and bring up update window
         w->showLastTab();
         ui->tabWidget->setCurrentIndex(kbWidgets.indexOf(w));
-        w->on_fwUpdButton_clicked();
+        w->showFwUpdate();
     }
     isShowing = false;
 }
@@ -226,7 +226,7 @@ void MainWindow::timerTick(){
 
 void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason) {
     if (reason == QSystemTrayIcon::Trigger
-        ||  reason == QSystemTrayIcon::DoubleClick)
+            ||  reason == QSystemTrayIcon::DoubleClick)
     {
         if (isVisible())
         {

@@ -286,7 +286,7 @@ void KbLight::base(QFile &cmd, bool ignoreDim){
 void KbLight::load(QSettings& settings){
     // Load light settings
     _needsSave = false;
-    settings.beginGroup("Lighting");
+    QSGroup group(settings, "Lighting");
     KeyMap currentMap = _map;
     _map = KeyMap::fromName(settings.value("KeyMap").toString());
     _dimming = settings.value("Brightness").toUInt();
@@ -301,55 +301,57 @@ void KbLight::load(QSettings& settings){
         _showMute = true;
     // Load RGB settings
     bool useReal = settings.value("UseRealNames").toBool();
-    settings.beginGroup("Keys");
-    foreach(QString key, settings.childKeys()){
-        QString name = key.toLower();
-        if(!useReal)
-            name = _map.fromStorage(name);
-        QColor color = settings.value(key).toString();
-        if(!color.isValid())
-            color = QColor(255, 255, 255);
-        _colorMap[name] = color.rgb();
+    {
+        QSGroup group(settings, "Keys");
+        foreach(QString key, settings.childKeys()){
+            QString name = key.toLower();
+            if(!useReal)
+                name = _map.fromStorage(name);
+            QColor color = settings.value(key).toString();
+            if(!color.isValid())
+                color = QColor(255, 255, 255);
+            _colorMap[name] = color.rgb();
+        }
     }
-    settings.endGroup();
     // Load animations
     foreach(KbAnim* anim, _animList)
         anim->deleteLater();
     _animList.clear();
-    settings.beginGroup("Animations");
-    foreach(QString anim, settings.value("List").toStringList()){
-        QUuid id = anim;
-        _animList.append(new KbAnim(this, _map, id, settings));
+    {
+        QSGroup group(settings, "Animations");
+        foreach(QString anim, settings.value("List").toStringList()){
+            QUuid id = anim;
+            _animList.append(new KbAnim(this, _map, id, settings));
+        }
     }
-    settings.endGroup();
-    settings.endGroup();
     emit didLoad();
     map(currentMap);
 }
 
 void KbLight::save(QSettings& settings){
     _needsSave = false;
-    settings.beginGroup("Lighting");
+    QSGroup group(settings, "Lighting");
     settings.setValue("KeyMap", _map.name());
     settings.setValue("Brightness", _dimming);
     settings.setValue("InactiveIndicators", _inactive);
     settings.setValue("ShowMute", (int)_showMute);
-    // Save RGB settings
     settings.setValue("UseRealNames", true);
-    settings.beginGroup("Keys");
-    foreach(QString key, _colorMap.keys())
-        settings.setValue(key, QColor(_colorMap.value(key)).name());
-    settings.endGroup();
-    // Save animations
-    settings.beginGroup("Animations");
-    QStringList aList;
-    foreach(KbAnim* anim, _animList){
-        aList << anim->guid().toString().toUpper();
-        anim->save(settings);
+    {
+        // Save RGB settings
+        QSGroup group(settings, "Keys");
+        foreach(QString key, _colorMap.keys())
+            settings.setValue(key, QColor(_colorMap.value(key)).name());
     }
-    settings.setValue("List", aList);
-    settings.endGroup();
-    settings.endGroup();
+    {
+        // Save animations
+        QSGroup group(settings, "Animations");
+        QStringList aList;
+        foreach(KbAnim* anim, _animList){
+            aList << anim->guid().toString().toUpper();
+            anim->save(settings);
+        }
+        settings.setValue("List", aList);
+    }
 }
 
 bool KbLight::needsSave() const {

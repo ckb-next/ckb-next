@@ -31,8 +31,8 @@ private slots:
 private:
     Ui::KbBindWidget *ui;
 
-    KbBind* bind;
-    KbProfile* profile;
+    KbBind*     bind;
+    KbProfile*  profile;
     QStringList currentSelection;
 };
 

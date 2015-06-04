@@ -7,8 +7,8 @@
 // Key information
 struct Key {
     // Name stored in settings (this is here due to a bad design decision - it will be removed later)
-    const char* _storageName;
-    inline const char* storageName() const { return _storageName ? _storageName : name; }
+    const char*         _storageName;
+    inline const char*  storageName() const { return _storageName ? _storageName : name; }
     // Key name
     const char* _friendlyName;
     const char* name;
@@ -39,6 +39,7 @@ struct Key {
         return _friendlyName ? _friendlyName : QString(name).toUpper();
     }
 
+    // Convert to bool -> key exists?
     inline operator bool () const { return name != 0; }
     inline bool operator !() const { return !(bool)*this; }
 };
@@ -70,55 +71,55 @@ public:
         _LAYOUT_MAX
     };
     // ISO (105-key) or ANSI (104-key)?
-    inline static bool isISO(Layout layout) { return layout != US && layout != US_DVORAK; }
-    inline bool isISO() { return isISO(keyLayout); }
+    inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK; }
+    inline bool         isISO()                 { return isISO(keyLayout); }
     // Auto-detects layout from system locale
-    static Layout locale();
+    static Layout       locale();
 
     // Keyboard or mouse?
-    inline static bool isKeyboard(Model model) { return !isMouse(model) && model != NO_MODEL; }
-    inline bool isKeyboard() const { return isKeyboard(keyModel); }
-    inline static bool isMouse(Model model) { return model == M65; }
-    inline bool isMouse() const { return isMouse(keyModel); }
+    inline static bool  isKeyboard(Model model) { return !isMouse(model) && model != NO_MODEL; }
+    inline bool         isKeyboard() const      { return isKeyboard(keyModel); }
+    inline static bool  isMouse(Model model)    { return model == M65; }
+    inline bool         isMouse() const         { return isMouse(keyModel); }
 
     // Creates a blank key map
     KeyMap();
     // Creates a standard key map
     KeyMap(Model _keyModel, Layout _keyLayout);
-    static KeyMap fromName(const QString& name);
+    static KeyMap   fromName(const QString& name);
     // Gets a layout by name or name by layout
-    static Layout getLayout(const QString& name);
-    static QString getLayout(Layout layout);
-    inline QString strLayout() const { return getLayout(keyLayout); }
+    static Layout   getLayout(const QString& name);
+    static QString  getLayout(Layout layout);
+    inline QString  strLayout() const { return getLayout(keyLayout); }
     // Gets a model by name or name by model
-    static Model getModel(const QString& name);
-    static QString getModel(Model model);
-    inline QString strModel() const { return getModel(keyModel); }
+    static Model    getModel(const QString& name);
+    static QString  getModel(Model model);
+    inline QString  strModel() const { return getModel(keyModel); }
 
     // Keyboard model and layout
-    inline Model model() const { return keyModel; }
-    inline Layout layout() const { return keyLayout; }
-    QString name() const { return (strModel() + " " + strLayout()).toUpper(); }
+    inline Model    model() const   { return keyModel; }
+    inline Layout   layout() const  { return keyLayout; }
+    inline QString  name() const    { return (strModel() + " " + strLayout()).toUpper(); }
 
     // Number of keys in the keymap
-    inline uint count() const { return _keys.count(); }
+    inline uint count() const   { return _keys.count(); }
     // Keyboard total width
-    inline uint width() const { return keyWidth; }
+    inline uint width() const   { return keyWidth; }
     // Keyboard total height
-    inline uint height() const { return keyHeight; }
+    inline uint height() const  { return keyHeight; }
 
     // Keys by name
-    inline Key key(const QString& name) const { Key empty = {0,0,0,0,0,0,0,0}; return _keys.value(name, empty); }
-    inline Key operator[](const QString& name) const { return key(name); }
-    inline bool contains(const QString& name) const { return _keys.contains(name); }
+    inline Key  key(const QString& name) const          { Key empty = {0,0,0,0,0,0,0,0}; return _keys.value(name, empty); }
+    inline Key  operator[](const QString& name) const   { return key(name); }
+    inline bool contains(const QString& name) const     { return _keys.contains(name); }
     // List all key names/values
-    inline const QHash<QString, Key>& map() const { return _keys; }
-    inline operator const QHash<QString, Key>& () const { return _keys; }
-    QStringList keys() const { return _keys.keys(); }
-    QList<Key> positions() const { return _keys.values(); }
+    inline const QHash<QString, Key>&   map() const                         { return _keys; }
+    inline operator                     const QHash<QString, Key>& () const { return _keys; }
+    QStringList     keys() const                        { return _keys.keys(); }
+    QList<Key>      positions() const                   { return _keys.values(); }
     // Key name to/from storage name. Returns the given name if not found.
-    inline QString toStorage(const QString& name) { const char* storage = key(name).storageName(); if(!storage) return name; return storage; }
-    inline QString fromStorage(const QString& storage) { QHashIterator<QString, Key> i(*this); while(i.hasNext()) { i.next(); const char* s = i.value().storageName(); if(s == storage) return s; } return storage; }
+    inline QString  toStorage(const QString& name)      { const char* storage = key(name).storageName(); if(!storage) return name; return storage; }
+    inline QString  fromStorage(const QString& storage) { QHashIterator<QString, Key> i(*this); while(i.hasNext()) { i.next(); const char* s = i.value().storageName(); if(s == storage) return i.value().name; } return storage; }
 
     // Keys by position (top to bottom, left to right)
     QStringList byPosition() const;

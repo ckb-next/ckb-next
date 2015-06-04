@@ -32,43 +32,44 @@ public:
             STRING,
             LABEL
         };
-        Type type;
+        Type        type;
         // Internal name
-        QString name;
+        QString     name;
         // Parameter friendly name/description
-        QString prefix;
-        QString postfix;
+        QString     prefix;
+        QString     postfix;
         // Default value (if any)
-        QVariant defaultValue;
+        QVariant    defaultValue;
         // Minimum and maximum values (apply to int and double)
-        QVariant minimum;
-        QVariant maximum;
+        QVariant    minimum;
+        QVariant    maximum;
     };
 
     // Global animation path
-    static QString path();
+    static QString      path();
     // Scan the animation path for scripts
-    static void scan();
+    static void         scan();
     // Loaded script count and alphabetical list
-    static inline int count() { return scripts.count(); }
+    static inline int   count()             { return scripts.count(); }
     static QList<const AnimScript*> list();
 
     // Script properties
-    inline const QUuid& guid() const { return _info.guid; }
-    inline const QString& name() const { return _info.name; }
-    inline const QString& version() const { return _info.version; }
-    inline QString copyright() const { return "Copyright © " + _info.year + " " + _info.author; }
-    inline const QString& year() const { return _info.year; }
-    inline const QString& author() const { return _info.author; }
-    inline const QString& license() const { return _info.license; }
-    inline const QString& description() const { return _info.description; }
-    inline const QStringList& presets() const { return _presets; }
-    inline const QMap<QString, QVariant>& preset(int index) const { return _presetValues[index]; }
+    typedef QMap<QString, QVariant> PresetValue;
+    inline const QUuid&         guid() const            { return _info.guid; }
+    inline const QString&       name() const            { return _info.name; }
+    inline const QString&       version() const         { return _info.version; }
+    inline QString              copyright() const       { return "Copyright © " + _info.year + " " + _info.author; }
+    inline const QString&       year() const            { return _info.year; }
+    inline const QString&       author() const          { return _info.author; }
+    inline const QString&       license() const         { return _info.license; }
+    inline const QString&       description() const     { return _info.description; }
+    inline const QStringList&   presets() const         { return _presets; }
+    inline const PresetValue&   preset(int index) const { return _presetValues[index]; }
 
     // Parameters, in the order they were given
-    inline QListIterator<Param> paramIterator() const { return _info.params; }
-    inline Param param(const QString& name) const { QListIterator<Param> i(_info.params); while(i.hasNext()){ Param p = i.next(); if(p.name == name) return p; } return ((Param[]){ { Param::INVALID, "", "", "", 0, 0, 0 } })[0]; }
-    inline bool hasParam(const QString& name) const { QListIterator<Param> i(_info.params); while(i.hasNext()){ if(i.next().name == name) return true; } return false; }
+    inline QListIterator<Param> paramIterator() const               { return _info.params; }
+    inline Param                param(const QString& name) const    { QListIterator<Param> i(_info.params); while(i.hasNext()){ Param p = i.next(); if(p.name == name) return p; } return ((Param[]){ { Param::INVALID, "", "", "", 0, 0, 0 } })[0]; }
+    inline bool                 hasParam(const QString& name) const { QListIterator<Param> i(_info.params); while(i.hasNext()){ if(i.next().name == name) return true; } return false; }
 
     // Creates a usable script object with the given parent object. Returns null if no such script exists.
     static AnimScript* copy(QObject* parent, const QUuid& id);
@@ -90,10 +91,11 @@ public:
     void end();
 
     // Whether or not the animation has processed any frames yet.
-    inline bool hasFrame() const { return initialized && readAnyFrame; }
+    inline bool     hasFrame() const { return initialized && readAnyFrame; }
 
     // Colors returned from the last executed frame.
-    const QHash<QString, QRgb>& colors() const { return _colors; }
+    typedef QHash<QString, QRgb> ColorMap;
+    const ColorMap& colors() const { return _colors; }
 
     ~AnimScript();
 
@@ -118,25 +120,25 @@ private:
         int kpMode :3;
         bool absoluteTime :1, repeat :1, preempt :1, liveParams :1;
     } _info;
-    const static int KP_NONE = 0, KP_NAME = 1, KP_POSITION = 2;
-    QStringList _presets;
-    QList<QMap<QString, QVariant> > _presetValues;
+    const static int    KP_NONE = 0, KP_NAME = 1, KP_POSITION = 2;
+    QStringList         _presets;
+    QList<PresetValue>  _presetValues;
     // Script path
-    QString _path;
+    QString     _path;
     // Key map (positions)
-    KeyMap _map;
-    int minX, minY;
+    KeyMap      _map;
+    int         minX, minY;
     // Keys in use
     QStringList _keys;
     // Current colors
-    QHash<QString, QRgb> _colors;
-    QMap<QString, QVariant> _paramValues;
+    ColorMap    _colors;
+    PresetValue _paramValues;
 
     // Animation state
-    quint64 lastFrame;
-    int durationMsec, repeatMsec;
-    bool initialized :1, firstFrame :1, readFrame :1, readAnyFrame :1, stopped :1;
-    QProcess* process;
+    quint64     lastFrame;
+    int         durationMsec, repeatMsec;
+    bool        initialized :1, firstFrame :1, readFrame :1, readAnyFrame :1, stopped :1;
+    QProcess*   process;
     QStringList inputBuffer;
 
     // Helper functions

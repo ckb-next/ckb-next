@@ -6,6 +6,8 @@
 #include <QWidget>
 #include "kb.h"
 
+// Central widget for displaying/controlling a device
+
 namespace Ui {
 class KbWidget;
 }
@@ -18,26 +20,30 @@ public:
     explicit KbWidget(QWidget *parent, const QString& path, const QString& prefsBase);
     ~KbWidget();
 
-    Kb* device;
+    // Device handle
+    Kb*             device;
+    inline QString  name()              { return device ? device->usbModel : ""; }
 
-    inline bool isActive() { return _active && device && device->isOpen(); }
-    inline void active(bool newActive) { _active = newActive; }
+    // Is open?
+    inline bool isActive()              { return _active && device && device->isOpen(); }
+    inline void active(bool newActive)  { _active = newActive; }
 
     // Has the "there is a firmware upgrade for this device..." screen already been shown?
     bool hasShownNewFW;
+    // Update the "Check for updates" label with the current status
     void updateFwButton();
 
-    inline QString name() { return device ? device->usbModel : ""; }
-
+    //
     void saveSettings();
     void saveIfNeeded();
 
 public slots:
+    // Show a tab
     void showFirstTab();
     void showLastTab();
 
     // Display firmware update dialog
-    void on_fwUpdButton_clicked();
+    inline void showFwUpdate()          { on_fwUpdButton_clicked(); }
 
 private:
     Ui::KbWidget *ui;
@@ -74,6 +80,7 @@ private slots:
     void on_muteCheck_clicked(bool checked);
     void on_layoutBox_activated(int index);
     void on_tabWidget_currentChanged(int index);
+    void on_fwUpdButton_clicked();
 };
 
 #endif // KBWIDGET_H

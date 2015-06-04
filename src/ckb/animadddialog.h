@@ -17,8 +17,8 @@ public:
     explicit AnimAddDialog(QWidget *parent, KbLight* light, const QStringList& keys);
     ~AnimAddDialog();
 
-    const AnimScript* chosenScript();
-    int chosenPreset();
+    const AnimScript*   chosenScript();
+    int                 chosenPreset();
 
 private slots:
     void on_animBox_activated(int index);

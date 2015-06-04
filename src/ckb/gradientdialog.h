@@ -21,20 +21,20 @@ public:
 private:
     // Preset gradients, sorted by lower case name
     struct Preset {
-        QString name;
-        QGradientStops gradient;
-        bool builtIn;
-        inline Preset(QString _name, bool _builtIn = false) : name(_name), builtIn(_builtIn) {}
-        inline Preset(QString _name, const QGradientStops& _gradient) : name(_name), gradient(_gradient), builtIn(false) {}
-        inline Preset() : builtIn(false) {}
+        QString         name;
+        QGradientStops  gradient;
+        bool            builtIn;
+        inline Preset(QString _name, bool _builtIn = false)             : name(_name), builtIn(_builtIn) {}
+        inline Preset(QString _name, const QGradientStops& _gradient)   : name(_name), gradient(_gradient), builtIn(false) {}
+        inline Preset()                                                 : builtIn(false) {}
     };
-    QMap<QString, Preset> presets;
-    QString currentPreset;
+    QMap<QString, Preset>   presets;
+    QString                 currentPreset;
 
     inline void addPreset(const Preset& preset) { presets[preset.name.toLower()] = preset; }
-    QIcon makeIcon(const Preset& preset);
-    void updatePresets();
-    void setPreset(const QString& newPreset);
+    QIcon       makeIcon(const Preset& preset);
+    void        updatePresets();
+    void        setPreset(const QString& newPreset);
 
     Ui::GradientDialog *ui;
 

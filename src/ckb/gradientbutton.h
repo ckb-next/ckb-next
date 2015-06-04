@@ -9,7 +9,7 @@ class GradientButton : public QPushButton
 public:
     explicit GradientButton(QWidget* parent = 0, bool allowAlpha = false);
 
-    void fromString(const QString& string);
+    void    fromString(const QString& string);
     QString toString() const;
 
 signals:

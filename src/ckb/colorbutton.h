@@ -9,8 +9,8 @@ class ColorButton : public QPushButton
 public:
     explicit ColorButton(QWidget* parent = 0, bool allowAlpha = false);
 
-    inline const QColor& color() { return _color; }
-    void color(const QColor& newColor);
+    inline const QColor&    color()                         { return _color; }
+    void                    color(const QColor& newColor);
 
 signals:
     void colorChanged(QColor newColor);

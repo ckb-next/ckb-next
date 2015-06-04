@@ -166,7 +166,7 @@ void KbPerf::update(QFile& cmd, bool force, bool saveCustomDpi){
         stage = 1;
         cmd.write(QString(" 1:%1,%2").arg(dpiCurX).arg(dpiCurY).toLatin1());
     } else {
-        // Otherwise, save stage 0 normally
+        // Otherwise, save stage 1 normally
         cmd.write(QString(" 1:%1,%2").arg(dpiX[1]).arg(dpiY[1]).toLatin1());
     }
     // Save stages 1 - 5

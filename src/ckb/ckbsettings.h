@@ -16,7 +16,7 @@ public:
 
     // One-shot get/set
     static QVariant get(const QString& key, const QVariant& defaultValue = QVariant());
-    static void set(const QString& key, const QVariant& value);
+    static void     set(const QString& key, const QVariant& value);
 };
 
 // QSettings group wrapper. Useful for easily pushing/popping a group without worrying about everything breaking if you forgot endGroup.

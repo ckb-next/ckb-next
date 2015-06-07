@@ -224,17 +224,17 @@ void MainWindow::timerTick(){
     settingsWidget->pollUpdates();
 }
 
-void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason) {
-    if (reason == QSystemTrayIcon::Trigger
-            ||  reason == QSystemTrayIcon::DoubleClick)
-    {
-        if (isVisible())
-        {
+void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason){
+    // On Linux, hide/show the app when the tray icon is clicked
+    // On OSX this just shows the menu
+#ifndef Q_OS_MACX
+    if(reason == QSystemTrayIcon::DoubleClick || reason == QSystemTrayIcon::Trigger){
+        if(isVisible())
             hide();
-        } else {
+        else
             showWindow();
-        }
     }
+#endif
 }
 
 void MainWindow::showWindow(){

@@ -90,9 +90,11 @@ static void* _setupusb(void* context){
         goto fail;
     pthread_detach(kb->inputthread);
 
-    // Make up a device name if one wasn't assigned
+    // Make up a device name and serial if they weren't assigned
+    if(!kb->serial[0])
+        snprintf(kb->serial, SERIAL_LEN, "%04x:%04x-NoID", kb->vendor, kb->product);
     if(!kb->name[0])
-        snprintf(kb->name, KB_NAME_LEN, "Corsair K%d%s", (product == P_K65) ? 65 : (product == P_K70 || product == P_K70_NRGB) ? 70 : 95, HAS_FEATURES(kb, FEAT_RGB) ? " RGB" : "");
+        snprintf(kb->name, KB_NAME_LEN, "%s %s", vendor_str(kb->vendor), product_str(kb->product));
 
     // Set up an input device for key events
     if(os_inputopen(kb))

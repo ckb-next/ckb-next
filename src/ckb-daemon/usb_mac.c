@@ -11,7 +11,11 @@
 int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
     for(int i = 0; i < count; i++){
         DELAY_SHORT(kb);
-        kern_return_t res = (*kb->handle)->setReport(kb->handle, kIOHIDReportTypeFeature, 0, messages + i * MSG_SIZE, MSG_SIZE, 5000, 0, 0, 0);
+        // Firmware versions above 1.20 use Output instead of Feature reports for improved performance
+        // However, it doesn't work well when retrieving the hardware profile, so use Feature reports until it's finished
+        // TODO: figure out why? It doesn't have this problem on Linux
+        IOHIDReportType type = (kb->fwversion >= 0x120 && kb->hw ? kIOHIDReportTypeOutput : kIOHIDReportTypeFeature);
+        kern_return_t res = (*kb->handle)->setReport(kb->handle, type, 0, messages + i * MSG_SIZE, MSG_SIZE, 5000, 0, 0, 0);
         kb->lastresult = res;
         if(res != kIOReturnSuccess){
             ckb_err_fn("Got return value 0x%x\n", file, line, res);
@@ -26,7 +30,7 @@ int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
     CFIndex length = MSG_SIZE;
     kern_return_t res = (*kb->handle)->getReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length, 5000, 0, 0, 0);
     kb->lastresult = res;
-    if(res != kIOReturnSuccess && res != 0xe0004051){   // Can't find e0004051 documented, but it seems to be a harmless error, so ignore it.
+    if(res != kIOReturnSuccess){
         ckb_err_fn("Got return value 0x%x\n", file, line, res);
         return 0;
     }
@@ -199,20 +203,20 @@ void os_closeusb(usbdevice* kb){
 usbdevice* usbadd(hid_dev_t handle, io_object_t** rm_notify){
     // Get the model and serial number
     long idvendor = V_CORSAIR, idproduct = usbgetlong(handle, CFSTR(kIOHIDProductIDKey));
-    char serial[SERIAL_LEN];
-    usbgetstr(handle, CFSTR(kIOHIDSerialNumberKey), serial, SERIAL_LEN);
-    if(!serial[0])
-        // If the serial can't be read, make one up
-        snprintf(serial, SERIAL_LEN, "%04x:%x04-NoID", (uint)idvendor, (uint)idproduct);
+    // Each keyboard generates multiple match events (one for each endpoint)
+    // Use the location ID key to group the handles together
+    long location = usbgetlong(handle, CFSTR(kIOHIDLocationIDKey));
 
-    // A single keyboard will generate multiple match events, so each handle has to be added to the board separately.
-    // Look for any partially-set up boards matching this serial number
+    // Look for any partially-set up boards matching this device
     int index = -1;
     for(int i = 1; i < DEV_MAX; i++){
         if(pthread_mutex_trylock(devmutex + i))
-            // If the mutex is locked then the device is obviously in use, so keep going
+            // If the mutex is locked then the device is obviously set up already, keep going
             continue;
-        if(!strcmp(keyboard[i].serial, serial) && keyboard[i].handle == INCOMPLETE){
+        if(keyboard[i].handle == INCOMPLETE
+                && keyboard[i].vendor == idvendor && keyboard[i].product == idproduct
+                && keyboard[i].location_id == location){
+            // Matched; continue setting up this device
             index = i;
             // Device mutex remains locked
             break;
@@ -228,7 +232,11 @@ usbdevice* usbadd(hid_dev_t handle, io_object_t** rm_notify){
                 // Mark the device as in use and print out a message
                 index = i;
                 keyboard[i].handle = INCOMPLETE;
-                strcpy(keyboard[i].serial, serial);
+                keyboard[i].location_id = location;
+                keyboard[i].vendor = idvendor;
+                keyboard[i].product = idproduct;
+                // Read the serial number and name
+                usbgetstr(handle, CFSTR(kIOHIDSerialNumberKey), keyboard[i].serial, SERIAL_LEN);
                 usbgetstr(handle, CFSTR(kIOHIDProductKey), keyboard[i].name, KB_NAME_LEN);
                 ckb_info("Connecting %s (S/N: %s)\n", keyboard[i].name, keyboard[i].serial);
                 // Device mutex remains locked
@@ -242,7 +250,7 @@ usbdevice* usbadd(hid_dev_t handle, io_object_t** rm_notify){
         return 0;
     }
     usbdevice* kb = keyboard + index;
-    // There's no direct way to tell which of the four handles this is, but there's a workaround
+    // There's no direct way to tell which of the endpoints this is, but there's a workaround
     // Each handle has a unique maximum packet size combination, so use that to place them
     long input = usbgetlong(handle, CFSTR(kIOHIDMaxInputReportSizeKey));
     long output = usbgetlong(handle, CFSTR(kIOHIDMaxOutputReportSizeKey));
@@ -274,11 +282,9 @@ usbdevice* usbadd(hid_dev_t handle, io_object_t** rm_notify){
     // If all handles have been set up, finish initializing the keyboard
     kb->handles[handle_idx] = handle;
     if(kb->handles[0] && kb->handles[1] && kb->handles[2]
-            && (kb->handles[3] || !IS_RGB(idvendor, idproduct))){
-        kb->vendor = idvendor;
-        kb->product = idproduct;
+            && (kb->handles[3] || !IS_RGB(idvendor, idproduct)))
         setupusb(kb);
-    } else
+    else
         pthread_mutex_unlock(devmutex + index);
     *rm_notify = kb->rm_notify + handle_idx;
     return kb;

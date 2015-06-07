@@ -11,7 +11,7 @@ int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int 
         DELAY_SHORT(kb);
         int res;
         if(kb->fwversion >= 0x120){
-#if 1       // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
+#if 0       // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
             struct usbdevfs_bulktransfer transfer;
             memset(&transfer, 0, sizeof(transfer));
             transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 5000; transfer.data = messages + MSG_SIZE * i;
@@ -217,8 +217,6 @@ int os_setupusb(usbdevice* kb){
     const char* serial = udev_device_get_sysattr_value(dev, "serial");
     if(serial)
         strncpy(kb->serial, serial, SERIAL_LEN);
-    else
-        snprintf(kb->serial, SERIAL_LEN, "%04x:%04x-NoID", kb->vendor, kb->product);
     // Copy firmware version (needed to determine USB protocol)
     const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
     if(firmware)

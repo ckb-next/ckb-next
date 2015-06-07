@@ -180,6 +180,7 @@ typedef struct {
     int event;
 #else
     struct timespec keyrepeat;
+    long location_id;
     hid_dev_t handle;
     hid_dev_t handles[4];
     io_object_t rm_notify[4];

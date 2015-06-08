@@ -40,7 +40,7 @@ static void makergb_full(const lighting* light, uchar data_pkt[12][MSG_SIZE]){
 
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
     // Compare two light structures, ignore mouse zones
-    return memcmp(lhs->r, rhs->r, N_KEYS_KB) + memcmp(lhs->g, rhs->g, N_KEYS_KB) + memcmp(lhs->b, rhs->b, N_KEYS_KB);
+    return memcmp(lhs->r, rhs->r, N_KEYS_KB) || memcmp(lhs->g, rhs->g, N_KEYS_KB) || memcmp(lhs->b, rhs->b, N_KEYS_KB);
 }
 
 int updatergb_kb(usbdevice* kb, int force){

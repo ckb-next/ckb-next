@@ -195,7 +195,7 @@ void Kb::hwSave(){
     // Write only the base colors of each mode, no animations
     for(int i = 0; i < hwModeCount; i++){
         KbMode* mode = _currentProfile->modes()[i];
-        cmd.write(QString("\nmode %1 ").arg(i + 1).toLatin1());
+        cmd.write(QString("\nmode %1").arg(i + 1).toLatin1());
         KbLight* light = mode->light();
         KbPerf* perf = mode->perf();
         if(mode == _currentMode)
@@ -207,6 +207,7 @@ void Kb::hwSave(){
         cmd.write(mode->id().guidString().toLatin1());
         cmd.write(" ");
         cmd.write(mode->id().modifiedString().toLatin1());
+        cmd.write(" ");
         // Write lighting and performance
         light->base(cmd, true);
         cmd.write(" ");

@@ -7,9 +7,12 @@
     <key>ProgramArguments</key>
     <array>
         <string>/Applications/ckb.app/Contents/Resources/ckb-daemon</string>
-        <string>--layout=us</string>
     </array>
     <key>KeepAlive</key>
+    <true/>
+    <key>ProcessType</key>
+    <string>Interactive</string>
+    <key>LegacyTimers</key>
     <true/>
 </dict>
 </plist>

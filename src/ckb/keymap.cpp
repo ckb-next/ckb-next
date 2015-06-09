@@ -301,8 +301,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70;
     if(lower == "k95")
         return K95;
-    if(lower == "m65")
-        return M65;
+    //if(lower == "m65")
+    //    return M65;
     return NO_MODEL;
 }
 
@@ -314,8 +314,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70";
     case K95:
         return "k95";
-    case M65:
-        return "m65";
+    //case M65:
+    //    return "m65";
     default:
         return "";
     }

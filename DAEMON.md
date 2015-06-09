@@ -1,53 +1,64 @@
-The daemon provides devices at `/dev/input/ckb*`, where * is the device number, starting at 1. Up to 9 keyboards may be connected at once and controlled independently. Hot-plugging is supported; if you unplug a keyboard while the daemon is running and then plug it back in, the keyboard's previous settings will be restored. If a keyboard is plugged in which has not yet been assigned any settings, its saved settings will be loaded from the hardware. The daemon additionally provides `/dev/input/ckb0`, which can be used to control keyboards when they are not plugged in. Settings are only remembered as long as the daemon is running; if you restart the daemon, all settings will be forgotten.
-
-After running the daemon, it will log some status messages to the terminal and you should now be able to access `/dev/input/ckb*`.
+The daemon provides devices at `/dev/input/ckb*`, where * is the device number, starting at 1. Up to 9 devices may be connected at once and controlled independently. The daemon additionally provides `/dev/input/ckb0`, which stores driver information.
 
 **Mac note:** The devices on OSX are located at `/var/run/ckb*` and not `/dev/input/ckb*`. So wherever you see `/dev/input` in this document, replace it with `/var/run`.
 
 `/dev/input/ckb0` contains the following files:
-- `connected`: A list of all connected keyboards, one per line. Each line contains a device path followed by the device's serial number and its description.
-- `cmd`: Keyboard controller. More information below.
-- `notify0`: Keyboard notifications. See Notification section.
+- `connected`: A list of all connected devices, one per line. Each line contains a device path followed by the device's serial number and its description.
+- `pid`: The process identifier of the daemon.
+- `version`: The daemon version.
 
 Other `ckb*` devices contain the following:
-- `model`: Device description/model.
-- `serial`: Device serial number. `model` and `serial` will match the info found in `ckb0/connected`
-- `fwversion`: Device firmware version.
 - `cmd`: Keyboard controller.
 - `notify0`: Keyboard notifications.
+- `features`: Device features.
+- `fwversion`: Device firmware version (not present on all devices).
+- `model`: Device description/model.
+- `pollrate`: Poll rate in milliseconds (not present on all devices).
+- `serial`: Device serial number. `model` and `serial` will match the info found in `ckb0/connected`
 
 Commands
 --------
 
-The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They may be written by any user. Commands should be given in the following format:
-`[device <serial>] [mode <n>] command1 [paramter1] [command2] [parameter2] [command3] [parameter3] ...`
+The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They are normally accessible to all users on the system (see Security section). Commands should be given in the following format:
+`[mode <n>] command1 [paramter1] [command2] [parameter2] [command3] [parameter3] ...`
 
 In a terminal shell, you can do this like `echo mycommand > /dev/input/ckb1/cmd`. Programmatically, you can open and write them as regular files. When programming, you must append a newline character and flush the output before your command(s) will actually be read.
 
-The `device` command, followed by the keyboard's serial number, specifies which keyboard to control. It is only required when issuing commands to `ckb0` or when controlling a keyboard that is not plugged in. In all other cases, the device is inferred from the control path. Additionally, the following commands may be issued to `ckb0` without any device: `layout`, `fps`, `notifyon`, and `notifyoff`. See below for documentation.
+The `mode` parameter is used to group settings. Most (but not all) settings are mode-specific; that is, changing mode 1 will not affect mode 2. Use `mode <n> switch` to change the current mode.
 
-By default, all keyboards start in an idle mode and will not respond to software controls. Before issuing any other commands, write `active` to their command node, like `echo active > /dev/input/ckb1/cmd`. To put a keyboard back into idle mode, issue the `idle` command.
+When plugged in, all devices start in hardware-controlled mode (also known as idle mode) and will not respond to commands. Before issuing any other commands, write `active` to the command node, like `echo active > /dev/input/ckb1/cmd`. To put the device back into hardware mode, issue the `idle` command.
+
+Features
+--------
+
+The `features` node describes features supported by the device, which may not be present on all devices. The first two words in the `features` node are always `<vendor> <model>`, like `corsair k70`. After that, any of the following features may appear:
+- `bind`: Device supports key rebinding.
+- `fwupdate`: Device supports firmware updates.
+- `fwversion`: Device has a detectable firmware version (stored in the `fwversion` node).
+- `notify`: Device supports key notifications.
+- `pollrate`: Device has a detectable poll rate (stored in the `pollrate` node).
+- `rgb`: Device supports RGB lighting.
 
 Keyboard layout
 ---------------
 
-ckb currently supports several keyboard layouts: `de` (Germany), `fr` (France), `gb` (United Kingdom), `se` (Sweden), and `us` (United States). By default, the keyboard layout will be detected from the system locale. You can override this by specifying `--layout=<country>` at the command-line. For instance, `ckb-daemon --layout=gb` makes the UK layout default regardless of locale. You can also change it after starting the daemon by issuing `layout <country>` to `/dev/input/ckb0/cmd` (without including any device ID). It can be overwritten on a per-keyboard basis by issuing the `layout` command to `ckb*/cmd`. Sending the command to `ckb0` does not change the layout of any already-connected keyboards, only the default layout.
+The driver has no concept of keyboard layouts; all keys are referred to by their English names regardless of the underlying hardware. This means that, for instance, in an AZERTY layout the `q` key in ckb-daemon corresponds to A on the physical keyboard. Note that on UK/european layouts, the backslash key (beside left shift) is called `bslash_iso`, while `bslash` refers to the backslash on the US keyboard. The key next to Enter on the UK keyboard is known as `hash`. See `src/ckb-daemon/keymap.c` for the full table of supported keys.
 
-Note that changing a keyboard's layout will reset all bindings and remove all macros associated with the keyboard. This is because not all keys are supported by all layouts (for instance, the UK has a separate hash key which is not present on the US layout). You can re-add the bindings manually after resetting the layout.
+For technical reasons, the OSX driver may swap the `bslash_iso` and `grave` keys if the keyboard layout is not set correctly. To compensate for this, write `layout iso` or `layout us` to the command node. 
 
 Profiles and modes
 ------------------
 
-Keyboard settings are grouped into modes, where each mode has its own independent binding and lighting setup. When the daemon starts or a keyboard is plugged in, the profile will be loaded from the hardware. By default, all commands will update the currently selected mode. The `mode <n>` command may be used to change the settings for a different mode. Up to 100 modes are available. Each keyboard has one profile, which may be given a name. Modes 1 through 3 may be saved to the device hardware (only mode 1 for K70s). Only the RGB settings can be saved, not the bindings or any other info. Commands are as follows:
+Each mode has its own independent binding and lighting setup. When the daemon starts or a keyboard is plugged in, the profile will be loaded from the hardware. By default, all commands will update the currently selected mode. The `mode <n>` command may be used to change the settings for a different mode. Up to 6 modes are available. Each keyboard has one profile, which may be given a name. Mode 1 may be saved to the device hardware, or modes 1-3 in the case of the K95. Modes 4 through 6 are software-only. Profile management commands are as follows:
 - `profilename <name>` sets the profile's name. The name must be written without spaces; to add a space, use `%20`.
 - `name <name>` sets the current mode's name. Use `mode <n> name <name>` to set a different mode's name.
-- `profileid <guid> [<modification>]` sets a profile's ID. The GUID must be written in registry format, like `{12345678-ABCD-EF01-2345-6789ABCDEF01}`. The optional modification number must be written with 8 hex digits, like `ABCDEF01`. Note that the modification number will be set to a random value when issuing a hardware save.
-- `id <guid> [<modification>]` sets a mode's ID. All hardware modes will get a random modification number upon hardware save (modes not saved to hardware are unaffected). Modes receive a random ID when they are created
-- `mode <n> switch` switches the keyboard to mode N. If the mode does not exist, it will be created with a newly-generated ID and default settings.
+- `profileid <guid> [<modification>]` sets a profile's ID. The GUID must be written in registry format, like `{12345678-ABCD-EF01-2345-6789ABCDEF01}`. The optional modification number must be written with 8 hex digits, like `ABCDEF01`.
+- `id <guid> [<modification>]` sets a mode's ID.
+- `mode <n> switch` switches the keyboard to mode N. If the mode does not exist, it will be created with a blank ID, black lighting, and default bindings.
 - `hwload` loads the RGB profile from the hardware. Key bindings and non-hardware RGB modes are unaffected.
 - `hwsave` saves the RGB profile to the hardware.
-- `erase` erases the current mode, resetting its lighting and bindings. Use `mode <n> erase` to erase a different mode. Note that erasing a mode only resets its settings; it does not remove the mode from the profile.
-- `eraseprofile` erases the entire profile, deleting its name, ID, and all of its modes. Mode 1 (K70) or modes 1-3 (K95) will be recreated with default settings.
+- `erase` erases the current mode, resetting its lighting and bindings. Use `mode <n> erase` to erase a different mode.
+- `eraseprofile` erases the entire profile, deleting its name, ID, and all of its modes.
 
 **Examples:**
 - `profilename My%20Profile mode 1 name Mode%201 mode 2 name Mode%202 mode 3 name Mode%203` will name the profile "My Profile" and name modes 1-3 "Mode 1", "Mode 2", and "Mode 3".
@@ -56,15 +67,13 @@ Keyboard settings are grouped into modes, where each mode has its own independen
 LED commands
 ------------
 
-The backlighting is controlled by the `rgb` commands. Any of the following combinations may be used:
-- `rgb off` turns lighting off. No further color changes will take effect until you issue `rgb on`.
-- `rgb on` turns lighting on.
+The backlighting is controlled by the `rgb` commands.
 - `rgb <RRGGBB>` sets the entire keyboard to the color specified by the hex constant RRGGBB.
-- `rgb <key>:<RRGGBB>` sets the specified key to the specified hex color. See `src/ckb-daemon/keyboard_*.c` for a list of key names in each layout.
+- `rgb <key>:<RRGGBB>` sets the specified key to the specified hex color.
 
 **Examples:**
 - `rgb ffffff` makes the whole keyboard white.
-- `rgb 000000` makes the whole keyboard black. This is NOT equivalent to `rgb off` as the keys are still considered "on" but are simply not lit.
+- `rgb 000000` makes the whole keyboard black.
 - `rgb esc:ff0000` sets the Esc key red but leaves the rest of the keyboard unchanged.
 
 Multiple keys may be changed to one color when separated with commas, for instance:
@@ -73,7 +82,7 @@ Multiple keys may be changed to one color when separated with commas, for instan
 Additionally, multiple commands may be combined into one, for instance:
 - `rgb ffffff esc:ff0000 w,a,s,d:0000ff` sets the Esc key red, the WASD keys blue, and the rest of the keyboard white (note the lack of a key name before `ffffff`, implying the whole keyboard is to be set).
 
-By default, the controller runs at 30 FPS, meaning that attempts to animate the LEDs faster than that will be ignored. If you wish to change it, start `ckb-daemon` with the `--fps=<rate>` option. You may also issue `fps <rate>` to `/dev/input/ckb0/cmd` after starting the daemon. Note that the FPS is global and cannot be set on a per-keyboard basis. The maximum rate is 60 FPS, which matches the rate of the keyboard's internal display.
+By default, the controller runs at 30 FPS, meaning that attempts to animate the LEDs faster than that will be ignored. If you wish to change it, send the command `fps <n>`. The maximum frame rate is 60.
 
 Indicators
 ----------
@@ -87,7 +96,7 @@ Binding keys
 ------------
 
 Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 operation that translates one keypress to a different keypress regardless of circumstance.
-- `bind <key1>:<key2>` remaps key1 to key2. Again, see `src/ckb-daemon/keyboard_*.c` for a list of key names.
+- `bind <key1>:<key2>` remaps key1 to key2.
 - `unbind <key>` unbinds a key, causing it to lose all function.
 - `rebind <key>` resets a key, returning it to its default binding.
 
@@ -109,7 +118,7 @@ Macros are a more advanced form of key binding, controlled with the `macro` comm
 - `macro g1:+lctrl,+a,-a,-lctrl` triggers a Ctrl+A when G1 is pressed.
 - `macro g2+g3:+lalt,+f4,-f4,-lalt` triggers an Alt+F4 when G2 and G3 are pressed simultaneously.
 
-Assigning a macro to a key will cause its binding to be ignored; for instance, `macro a:+b,-b` will cause A to generate a B character regardless of its binding. However, `macro lctrl+a:+b,-b` will cause A to generate a B only when Ctrl is also held down. Macros currently do not have any repeating options and will be triggered only once, when the key is pressed down. This feature will be added soon.
+Assigning a macro to a key will cause its binding to be ignored; for instance, `macro a:+b,-b` will cause A to generate a B character regardless of its binding. However, `macro lctrl+a:+b,-b` will cause A to generate a B only when Ctrl is also held down.
 
 Notifications
 -------------
@@ -132,17 +141,10 @@ Notifications are printed with one notification per line. Commands are as follow
 
 **Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `key +a` `key -a`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
 
-Additionally, the following notifications will be generated at `ckb0/notify*` regardless of circumstance:
-- `device <serial> added at <path>` whenever a device is connected.
-- `device <serial> removed from <path>` whenever a device is disconnected.
-
 Getting parameters
 ------------------
 
 Parameters can be retrieved using the `get` command. The data will be sent out as a notification. Generally, the syntax to get the data associated with a command is `get :<command>` (note the colon), and the associated data will be returned in the form of `<command> <data>`. The following data may be gotten:
-- `get :hello` simply prints `hello` to the notification node. This may be useful to determine whether or not the daemon is responding. It can only be issued to `ckb0` with no `device` command; in any other circumstance, it will be ignored.
-- `get :fps` gets the current frame rate. Returns `fps <rate>`. Like `:hello`, this will be ignored if it is issued to an actual keyboard.
-- `get :layout` gets the current keyboard layout. Returns `layout <country>`. This may be issued to `ckb0` to get the default layout or to any keyboard to get the keyboard's layout.
 - `get :mode` returns the current mode in the form of a `switch` command. (Note: Do not use this in a line containing a `mode` command or it will return the mode that you selected, rather than the keyboard's current mode.)
 - `get :name` returns the current mode's name in the form of `mode <n> name <name>`. To see the name of another mode, use `mode <n> get :name`. The name is URL-encoded; spaces are written as %20. The name may be truncated, so `name <some long string> get :name` may return something shorter than what was entered.
 - `get :profilename` returns the profile's name, in the form of `profilename <name>`. As above, it is URL-encoded and may be truncated.
@@ -150,9 +152,8 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :id` returns the current mode's ID and modification number in the form of `mode <n> id <guid> <modification>`.
 - `get :profileid` returns the current profile's ID and modification number in the form of `profileid <guid> <modification>`.
 - `get :hwid` and `get :hwprofileid` return the same thing except from the current hardware profile/mode. As before, the ouput will be the same but with `hwid` and `hwprofileid` instead of `id` and `profileid`.
-- `get :rgb` returns an `rgb` command equivalent to the current RGB state. Note that the keyboard has a limited color precision, so `rgb 123456 get :rgb` will not output `rgb 123456`. The only guarantee is that the `rgb` output will produce the same colors seen on the keyboard.
+- `get :rgb` returns an `rgb` command equivalent to the current RGB state.
 - `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile. The output will say `hwrgb` instead of `rgb`.
-- `get :rgbon` returns either `rgb off` or `rgb on` depending on whether or not lighting was enabled. There is no `:hwrgbon` because the hardware lights are always on.
 
 Like `notify`, you must prefix your command with `@<node>` to get data printed to a node other than `notify0`.
 
@@ -161,7 +162,7 @@ Firmware updates
 
 **WARNING:** Improper use of `fwupdate` may brick your device; use this command *at your own risk*. I accept no responsibility for broken keyboards.
 
-The latest RGB keyboard firmware may be found here:
+The latest RGB keyboard firmwares may be found here:
 * K65: http://www3.corsair.com/software/HID/K65RGB.zip
 * K70: http://www3.corsair.com/software/HID/K70RGB.zip
 * K95: http://www3.corsair.com/software/HID/K95RGB.zip

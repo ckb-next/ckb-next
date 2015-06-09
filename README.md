@@ -24,8 +24,6 @@ ckb currently supports the following Corsair keyboards:
 
 \* = hardware playback not yet supported. Settings will be saved to software only.
 
-When downloading a new version of ckb, please delete your old download first. This helps ensure there are no problems lingering from an old build. See the Troubleshooting section if you have any problems.
-
 Linux Installation
 ------------------
 
@@ -33,14 +31,39 @@ Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libude
 
 You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build the application, and if all goes well, will ask if you'd like to install/run ckb on your system (press enter to proceed; default answer is "yes"). If the build doesn't work for some reason, or if you'd like to build ckb yourself, see `BUILD.md` for instructions.
 
+#### Reinstalling:
+
+To install a new version of ckb, or to reinstall the same version, first delete the ckb-master directory and the zip file from your previous download. Then download the source code again and re-run `quickinstall`. The script will automatically replace the previous installation. You may need to reboot afterward.
+
+#### Uninstalling:
+
+First, stop the ckb-daemon service and remove the service file.
+* If you have systemd (Ubuntu versions starting with 15.04):
+```
+sudo systemctl stop ckb-daemon
+sudo rm -f /usr/lib/systemd/system/ckb-daemon.service
+```
+* If you have Upstart (Ubuntu versions earlier than 15.04):
+```
+sudo service ckb-daemon stop
+sudo rm -f /etc/init/ckb-daemon.conf
+```
+* If you're not sure, re-run the quickinstall script and it will tell you when it installs itself as a service. The script will say `System service: Upstart detected` or `System service: systemd detected`
+
+Afterward, remove the applications and related files:
+```
+sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop /usr/share/icons/hicolor/512x512/apps/ckb.png
+sudo rm -rf /usr/bin/ckb-animations
+```
+
 OSX Installation
 ----------------
 
 #### Binary download:
 
-[Click here to download the OSX binary (beta-v0.1.2).](https://github.com/ccMSC/ckb/releases/download/v0.1.2/ckb.pkg)
+The latest OSX binary can be downloaded here: https://github.com/ccMSC/ckb/releases/latest
 
-This is an automated installer which will set up the driver for you. After it's finished, open ckb.app (it will be installed to your Applications directory) to get started.
+Click on `ckb.pkg` under the Downloads section. This is an automated installer which will set up the driver for you. After it's finished, open ckb.app (it will be installed to your Applications directory) to get started.
 
 #### Building from source:
 
@@ -48,7 +71,15 @@ Install the latest version of Xcode from the App Store. Open Xcode, accept the l
 
 The easiest way to install the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see `BUILD.md`.
 
-#### Uninstall:
+#### Reinstalling (binary):
+
+Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one..
+
+#### Reinstalling (source):
+
+Remove the existing ckb-master directory and zip file. Re-download the source code and run the `quickinstall` script again. The script will automatically replace the previous installation. You may need to reboot afterward.
+
+#### Uninstalling:
 
 Drag `ckb.app` into the trash. If the daemon plist file isn't cleaned up automatically, you can find it and remove it here: `/Library/LaunchDaemons/com.ckb.daemon.plist`.
 
@@ -58,7 +89,7 @@ Usage
 The user interface is still a work in progress. See `DAEMON.md` for info about the daemon program.
 
 **Major features:**
-- Control multiple keyboards independently (note: not tested)
+- Control multiple keyboards independently
 - United States and European keyboard layouts
 - Customizable key bindings
 - Per-key lighting and animation
@@ -67,17 +98,20 @@ The user interface is still a work in progress. See `DAEMON.md` for info about t
 
 **Roadmap** (roughly in order)
 - **v0.2 release:**
+- M65 RGB support
+- Additional lighting options
+- Customizable indicator lights
+- **v0.3 release:**
 - More functions for the Win Lock key
 - Key combos
 - Key macros, other advanced keypress features like running a custom command
 - (Daemon) Macros with timing info, delays, repeats
 - (Daemon) Notification macros
-- (Daemon) Ability to generate mouse events
-- **v0.3 release:**
+- **v0.4 release:**
 - Ability to store profiles separately from devices, import/export them
 - Ability to tie profiles to which application has focus
 - Timers
-- **v0.4 release:**
+- **v0.5 release:**
 - Ability to import CUE profiles
 - **v1.0 release:**
 - OSD? (Not sure if this can actually be done)
@@ -105,13 +139,13 @@ If the keyboard still doesn't work, try replacing `0x400`/`0x408` with `0x4`. No
 
 #### OSX
 
-Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
-
 If you've rebound your modifier keys in System Preferences, the changes will not be recognized anymore. You can rebind them again within the application.
+
+Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
 
 #### General
 
-**Please note: the keyboards do have some hardware-related problems which Corsair is aware of and working to fix. These are out of my control. Before reporting an issue, connect your keyboard to a Windows computer first and see if your problem happens in Windows. If it does, contact Corsair.** Additionally, please check the Corsair user forums to see if your issue has been reported by other users. If so, try their solutions first.
+**Before reporting an issue, please connect your keyboard to a Windows computer first and see if the problem still occurs. If it does, contact Corsair.** Additionally, please check the Corsair user forums to see if your issue has been reported by other users. If so, try their solutions first.
 
 Connection issues can sometimes be solved by rebooting. Make sure that your system is up to date. If possible, update your computer's BIOS to the latest version as well.
 
@@ -125,9 +159,7 @@ Common problems:
 Known issues
 ------------
 
-- Using the keyboard in BIOS mode prevents the media keys (including mute and volume wheel) from working. This is a hardware limitation.
-- In BIOS mode, keys sometimes get "stuck" or stop responding. It appears to be a firmware bug. Using the keyboard in BIOS mode while running ckb is not recommended.
-- Animations sometimes cause the keyboard to freeze or cause keys to be dropped. These also seem to be firmware bugs; the best way to mitigate them is to decrease the frame rate in ckb or increase the polling interval on the keyboard.
-- The tray icon doesn't always appear even when enabled. Apparently this is a known Qt bug. If you can't see the icon, reopen ckb to bring the window back.
+- Using the keyboard in BIOS mode prevents the media keys (including mute and volume wheel), as well as the K95's G-keys from working. This is a hardware limitation.
+- The tray icon doesn't appear in some desktop environments. This is a known Qt bug. If you can't see the icon, reopen ckb to bring the window back.
 - When starting the driver manually on OSX, the Terminal window sometimes gets spammed with enter keys. You can stop it by unplugging and replugging the keyboard or by moving the poll rate switch.
 - When stopping the driver manually, the keyboard sometimes stops working completely. This seems to be a hardware/OS communication issue.

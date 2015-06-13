@@ -12,9 +12,7 @@ int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int 
     for(int i = 0; i < count; i++){
         DELAY_SHORT(kb);
         // Firmware versions above 1.20 use Output instead of Feature reports for improved performance
-        // However, it doesn't work well when retrieving the hardware profile, so use Feature reports until it's finished
-        // TODO: figure out why? It doesn't have this problem on Linux
-        IOHIDReportType type = (kb->fwversion >= 0x120 && kb->hw ? kIOHIDReportTypeOutput : kIOHIDReportTypeFeature);
+        IOHIDReportType type = (kb->fwversion >= 0x120 ? kIOHIDReportTypeOutput : kIOHIDReportTypeFeature);
         kern_return_t res = (*kb->handle)->setReport(kb->handle, type, 0, messages + i * MSG_SIZE, MSG_SIZE, 5000, 0, 0, 0);
         kb->lastresult = res;
         if(res != kIOReturnSuccess){
@@ -195,6 +193,7 @@ void os_closeusb(usbdevice* kb){
     kb->handle = 0;
     int count = (IS_RGB(kb->vendor, kb->product)) ? 4 : 3;
     for(int i = 0; i < count; i++){
+        (*kb->handles[i])->close(kb->handles[i], kIOHIDOptionsTypeNone);
         (*kb->handles[i])->Release(kb->handles[i]);
         kb->handles[i] = 0;
     }
@@ -342,9 +341,11 @@ static void iterate_devices(void* context, io_iterator_t iterator){
         if(kb)
             // If successful, register for removal notification
             IOServiceAddInterestNotification(notify, device, kIOGeneralInterest, remove_device, kb, rm_notify);
-        else
+        else {
             // Otherwise, release it now
+            (*handle)->close(handle, kIOHIDOptionsTypeNone);
             remove_device(0, device, kIOMessageServiceIsTerminated, 0);
+        }
     }
 }
 

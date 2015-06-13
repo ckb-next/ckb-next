@@ -52,7 +52,7 @@ static void* devmain(usbdevice* kb){
         // Read from FIFO
         const char* line;
         euid_guard_start;
-        int lines = readlines(kb->infifo, linectx, &line);
+        int lines = readlines(kb->infifo - 1, linectx, &line);
         euid_guard_stop;
         if(lines){
             if(readcmd(kb, line)){
@@ -115,7 +115,6 @@ static void* _setupusb(void* context){
     int index = INDEX_OF(kb, keyboard);
     ckb_info("%s ready at %s%d\n", kb->name, devpath, index);
     updateconnected();
-    notifyconnect(kb, 1);
     pthread_mutex_unlock(dmutex(kb));
     return devmain(kb);
 
@@ -154,10 +153,6 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     DELAY_LONG(kb);
     // Re-initialize the device
     kb->vtable->start(kb, kb->active);
-    // If the hardware profile hasn't been loaded yet, load it here
-    res = 0;
-    if(!kb->hw)
-        res = hwloadprofile(kb, 1);
     kb->vtable->updatergb(kb, 1);
     return res ? -1 : 0;
 }
@@ -186,7 +181,6 @@ int closeusb(usbdevice* kb){
         updateconnected();
         // Close USB device
         os_closeusb(kb);
-        notifyconnect(kb, 0);
     } else
         updateconnected();
 

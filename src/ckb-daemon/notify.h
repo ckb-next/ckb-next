@@ -11,12 +11,6 @@
 // Specify a USB mode to print "mode <n>" before the notification. A null mode will not print a number
 void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, ...);
 
-// Prints output to a root notification node. Use nodenumber = -1 to print to all nodes.
-void nrprintf(int nodenumber, const char* format, ...);
-
-// Notifies of a device connection or disconnection.
-void notifyconnect(usbdevice* kb, int connecting);
-
 // Prints a key's current state to a notification node
 void nprintkey(usbdevice* kb, int nnumber, int keyindex, int down);
 // Prints the current indicator state to a notification node (led should be an I_ constant)

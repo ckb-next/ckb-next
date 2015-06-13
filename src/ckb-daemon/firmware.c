@@ -29,7 +29,7 @@ int getfwversion(usbdevice* kb){
     memcpy(&vendor, in_pkt + 12, 2);
     memcpy(&product, in_pkt + 14, 2);
     char poll = in_pkt[16];
-    if(poll < 0){
+    if(poll <= 0){
         poll = -1;
         kb->features &= ~FEAT_POLLRATE;
     }
@@ -58,7 +58,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     // Read the firmware from the given path
     char* fwdata = calloc(1, FW_MAXSIZE + 256);
     int fd = open(path, O_RDONLY);
-    if(fd <= 0){
+    if(fd == -1){
         ckb_err("Failed to open firmware file %s: %s\n", path, strerror(errno));
         return FW_NOFILE;
     }

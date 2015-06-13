@@ -13,7 +13,7 @@ void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, .
     int fifo;
     if(nodenumber >= 0){
         // If node number was given, print to that node (if open)
-        if((fifo = kb->outfifo[nodenumber])){
+        if((fifo = kb->outfifo[nodenumber] - 1) != -1){
             va_start(va_args, format);
             if(mode)
                 dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
@@ -23,40 +23,13 @@ void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, .
     }
     // Otherwise, print to all nodes
     for(int i = 0; i < OUTFIFO_MAX; i++){
-        if((fifo = kb->outfifo[i])){
+        if((fifo = kb->outfifo[i] - 1) != -1){
             va_start(va_args, format);
             if(mode)
                 dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
             vdprintf(fifo, format, va_args);
         }
     }
-}
-
-void nrprintf(int nodenumber, const char* format, ...){
-    if(nodenumber >= OUTFIFO_MAX)
-        return;
-    va_list va_args;
-    int fifo;
-    if(nodenumber >= 0){
-        // If node number was given, print to that node (if open)
-        if((fifo = keyboard[0].outfifo[nodenumber])){
-            va_start(va_args, format);
-            vdprintf(fifo, format, va_args);
-        }
-        return;
-    }
-    // Otherwise, print to all nodes
-    for(int i = 0; i < OUTFIFO_MAX; i++){
-        if((fifo = keyboard[0].outfifo[i])){
-            va_start(va_args, format);
-            vdprintf(fifo, format, va_args);
-        }
-    }
-}
-
-void notifyconnect(usbdevice* kb, int connecting){
-    int index = INDEX_OF(kb, keyboard);
-    nrprintf(-1, "device %s %s %s%d\n", kb->serial, connecting ? "added at" : "removed from", devpath, index);
 }
 
 void nprintkey(usbdevice* kb, int nnumber, int keyindex, int down){

@@ -79,15 +79,11 @@ int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x13, 0x10, 1, 0 };
     uchar in_pkt[MSG_SIZE] = { 0 };
     // Zone 1
-    // Send message
-    if(!usbsend(kb, data_pkt, 1))
+    if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
-    // Wait for response
-    if(!usbrecv(kb, in_pkt))
-        return -2;
     if(memcmp(in_pkt, data_pkt, 4)){
         ckb_err("Bad input header\n");
-        return -3;
+        return -2;
     }
     // Copy data
     light->r[LED_MOUSE] = in_pkt[4];
@@ -96,13 +92,11 @@ int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
 
     // Zone 2
     data_pkt[2]++;
-    if(!usbsend(kb, data_pkt, 1))
+    if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
-    if(!usbrecv(kb, in_pkt))
-        return -2;
     if(memcmp(in_pkt, data_pkt, 4)){
         ckb_err("Bad input header\n");
-        return -3;
+        return -2;
     }
     // Copy data
     light->r[LED_MOUSE + 1] = in_pkt[4];

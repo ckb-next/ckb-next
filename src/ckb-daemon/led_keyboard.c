@@ -157,12 +157,10 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
         uchar* colors[3] = { light->r, light->g, light->b };
         for(int clr = 0; clr < 3; clr++){
             for(int i = 0; i < 4; i++){
-                if(!usbsend(kb, data_pkt[i + clr * 4], 1))
+                if(!usbrecv(kb, data_pkt[i + clr * 4], in_pkt[i]))
                     return -1;
-                // Wait for the response. Make sure the first four bytes match
-                if(!usbrecv(kb, in_pkt[i]))
-                    return -1;
-                if(memcmp(in_pkt[i], data_pkt[i], 4)){
+                // Make sure the first four bytes match
+                if(memcmp(in_pkt[i], data_pkt[i + clr * 4], 4)){
                     ckb_err("Bad input header\n");
                     return -1;
                 }
@@ -191,10 +189,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             return -1;
         // Read colors
         for(int i = 1; i < 5; i++){
-            if(!usbsend(kb, data_pkt[i], 1))
-                return -1;
-            // Wait for the response. Make sure the first four bytes match
-            if(!usbrecv(kb, in_pkt[i - 1]))
+            if(!usbrecv(kb, data_pkt[i],in_pkt[i - 1]))
                 return -1;
             if(memcmp(in_pkt[i - 1], data_pkt[i], 4)){
                 ckb_err("Bad input header\n");

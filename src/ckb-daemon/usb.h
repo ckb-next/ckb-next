@@ -64,12 +64,17 @@ int _resetusb(usbdevice* kb, const char* file, int line);
 #define resetusb(kb) _resetusb(kb, __FILE_NOPATH__, __LINE__)
 int os_resetusb(usbdevice* kb, const char* file, int line);
 
-// OS: Send a USB message to the device. Returns number of bytes written, zero on failure.
-int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line);
-#define usbsend(kb, messages, count) os_usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
-// OS: Gets input from a USB device.
-int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line);
-#define usbrecv(kb, message) os_usbrecv(kb, message, __FILE_NOPATH__, __LINE__)
+// Write data to a USB device. Returns number of bytes written or zero on failure.
+int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line);
+#define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
+// Requests data from a USB device by first sending an output packet and the reading the response. Returns number of bytes read or zero on failure.
+int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line);
+#define usbrecv(kb, out_msg, in_msg) _usbrecv(kb, out_msg, in_msg, __FILE_NOPATH__, __LINE__)
+
+// OS: Send a USB message to the device. Return number of bytes written, zero for permanent failure, -1 for try again
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
+// OS: Gets input from a USB device. Return same as above.
+int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line);
 
 // Non-RGB K95 command. Returns 0 on success.
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);

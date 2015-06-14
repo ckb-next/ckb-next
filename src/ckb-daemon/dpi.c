@@ -159,10 +159,7 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
     };
     uchar in_pkt[4][MSG_SIZE];
     for(int i = 0; i < 4; i++){
-        if(!usbsend(kb, data_pkt[i], 1))
-            return -1;
-        // Wait for response
-        if(!usbrecv(kb, in_pkt[i]))
+        if(!usbrecv(kb, data_pkt[i], in_pkt[i]))
             return -2;
         if(memcmp(in_pkt[i], data_pkt[i], 4)){
             ckb_err("Bad input header\n");
@@ -185,10 +182,7 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
         uchar data_pkt[MSG_SIZE] = { 0x0e, 0x13, 0xd0, 1 };
         uchar in_pkt[MSG_SIZE];
         data_pkt[2] |= i;
-        if(!usbsend(kb, data_pkt, 1))
-            return -1;
-        // Wait for response
-        if(!usbrecv(kb, in_pkt))
+        if(!usbrecv(kb, data_pkt, in_pkt))
             return -2;
         if(memcmp(in_pkt, data_pkt, 4)){
             ckb_err("Bad input header\n");

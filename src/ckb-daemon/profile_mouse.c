@@ -14,12 +14,7 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
     uchar in_pkt[MSG_SIZE];
     for(int i = 0; i <= 1; i++){
         data_pkt[0][3] = i;
-        if(!usbsend(kb, data_pkt[0], 1)){
-            free(hw);
-            return -1;
-        }
-        // Wait for the response
-        if(!usbrecv(kb, in_pkt)){
+        if(!usbrecv(kb, data_pkt[0], in_pkt)){
             free(hw);
             return -1;
         }
@@ -28,12 +23,7 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
     // Ask for profile and mode names
     for(int i = 0; i <= 1; i++){
         data_pkt[1][3] = i;
-        if(!usbsend(kb, data_pkt[1], 1)){
-            free(hw);
-            return -1;
-        }
-        // Wait for the response
-        if(!usbrecv(kb, in_pkt)){
+        if(!usbrecv(kb, data_pkt[1],in_pkt)){
             free(hw);
             return -1;
         }

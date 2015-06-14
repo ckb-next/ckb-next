@@ -6,42 +6,43 @@
 
 #ifdef OS_LINUX
 
-int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
-    for(int i = 0; i < count; i++){
-        DELAY_SHORT(kb);
-        int res;
-        if(kb->fwversion >= 0x120){
-#if 0       // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
-            struct usbdevfs_bulktransfer transfer;
-            memset(&transfer, 0, sizeof(transfer));
-            transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 5000; transfer.data = messages + MSG_SIZE * i;
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
+    int res;
+    if(kb->fwversion >= 0x120){
+#if 0   // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
+        struct usbdevfs_bulktransfer transfer;
+        memset(&transfer, 0, sizeof(transfer));
+        transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 5000; transfer.data = (void*)out_msg;
 #else
-            struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, messages + MSG_SIZE * i };
+        struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, (void*)out_msg };
 #endif
-            res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
-        } else {
-            struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, messages + MSG_SIZE * i };
-            res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-        }
-        if(res <= 0){
-            ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data written");
-            return 0;
-        }
-        if(res != MSG_SIZE)
-            ckb_err_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
+    } else {
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, (void*)out_msg };
+        res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     }
-    return MSG_SIZE * count;
+    if(res == -EPERM){
+        ckb_warn_fn("Send failed (continuing)\n", file, line);
+        return -1;
+    } else if(res <= 0){
+        ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data written");
+        return 0;
+    } else if(res != MSG_SIZE)
+        ckb_err_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+    return res;
 }
 
-int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
+int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     DELAY_MEDIUM(kb);
-    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, message };
+    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, in_msg };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-    if(res <= 0){
+    if(res == -EPERM){
+        ckb_warn_fn("Receive failed (continuing)\n", file, line);
+        return -1;
+    } else if(res <= 0){
         ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data read");
         return 0;
-    }
-    if(res != MSG_SIZE)
+    } else if(res != MSG_SIZE)
         ckb_err_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     return res;
 }

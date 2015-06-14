@@ -35,7 +35,8 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
         CGEventRef cge = CGEventCreate(nil);
         CGPoint loc = CGEventGetLocation(cge);
         CFRelease(cge);
-        location.x = loc.x + ev->mouseMove.dx;
+        // Also, if the X location is negative it needs to be offset by 1. Doesn't apply to Y though?
+        location.x = loc.x + ev->mouseMove.dx - (loc.x < 0 ? 1 : 0);
         location.y = loc.y + ev->mouseMove.dy;
         options = (options & ~kIOHIDSetRelativeCursorPosition) | kIOHIDSetCursorPosition;
     }

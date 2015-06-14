@@ -77,8 +77,8 @@ public:
     void base(QFile& cmd, bool ignoreDim = false);
 
     // Load and save from stored settings
-    void load(QSettings& settings);
-    void save(QSettings& settings);
+    void load(CkbSettings& settings);
+    void save(CkbSettings& settings);
     bool needsSave() const;
 
 signals:

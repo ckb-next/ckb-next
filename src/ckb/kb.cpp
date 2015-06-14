@@ -122,7 +122,7 @@ void Kb::frameRate(int newFrameRate){
     }
 }
 
-void Kb::load(QSettings &settings){
+void Kb::load(CkbSettings& settings){
     _needsSave = false;
     // Read layout
     _layout = KeyMap::getLayout(settings.value("Layout").toString());
@@ -155,7 +155,8 @@ void Kb::load(QSettings &settings){
     else {
         // If nothing was loaded, load the demo profile
         QSettings demoSettings(":/txt/demoprofile.conf", QSettings::IniFormat, this);
-        KbProfile* demo = new KbProfile(this, getKeyMap(), demoSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
+        CkbSettings cSettings(demoSettings);
+        KbProfile* demo = new KbProfile(this, getKeyMap(), cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
         _profiles.append(demo);
         setCurrentProfile(demo);
     }
@@ -163,7 +164,7 @@ void Kb::load(QSettings &settings){
     emit profileAdded();
 }
 
-void Kb::save(QSettings& settings){
+void Kb::save(CkbSettings& settings){
     _needsSave = false;
     QString guids, currentGuid;
     foreach(KbProfile* profile, _profiles){

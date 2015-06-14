@@ -33,13 +33,13 @@ KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
         curDpi(other.pushedDpis[0]);
 }
 
-void KbPerf::load(QSettings& settings){
+void KbPerf::load(CkbSettings& settings){
     pushedDpis.clear();
     runningPushIdx = 1;
     _needsSave = false;
-    QSGroup group(settings, "Performance");
+    SGroup group(settings, "Performance");
     {
-        QSGroup group(settings, "DPI");
+        SGroup group(settings, "DPI");
         for(int i = 0; i < DPI_COUNT; i++){
             QPoint value = settings.value(QString::number(i)).toPoint();
             if(value.isNull())
@@ -62,11 +62,11 @@ void KbPerf::load(QSettings& settings){
     emit didLoad();
 }
 
-void KbPerf::save(QSettings& settings){
+void KbPerf::save(CkbSettings& settings){
     _needsSave = false;
-    QSGroup group(settings, "Performance");
+    SGroup group(settings, "Performance");
     {
-        QSGroup group(settings, "DPI");
+        SGroup group(settings, "DPI");
         for(int i = 0; i < DPI_COUNT; i++)
             settings.setValue(QString::number(i), QPoint(dpiX[i], dpiY[i]));
         settings.setValue("LastIdx", dpiLastIdx);

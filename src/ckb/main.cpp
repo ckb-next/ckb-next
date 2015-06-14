@@ -28,6 +28,8 @@ bool isRunning(bool showWindow){
 
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
+    QCoreApplication::setOrganizationName("ckb");
+
     // Seed the RNG for UsbIds
     qsrand(QDateTime::currentMSecsSinceEpoch());
 #ifdef Q_OS_MACX

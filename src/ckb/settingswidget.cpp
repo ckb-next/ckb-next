@@ -110,7 +110,7 @@ int SettingsWidget::frameRate() const {
 void SettingsWidget::pollUpdates(){
     // Check for changes to shared brightness setting
     int dimming = KbLight::shareDimming();
-    if(dimming != lastSharedDimming){
+    if(dimming != lastSharedDimming && !CkbSettings::isBusy()){
         CkbSettings::set("Program/GlobalBrightness", dimming);
         lastSharedDimming = dimming;
     }

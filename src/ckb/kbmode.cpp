@@ -21,7 +21,7 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other) :
     connect(_light, SIGNAL(updated()), this, SLOT(doUpdate()));
 }
 
-KbMode::KbMode(Kb *parent, const KeyMap &keyMap, QSettings &settings) :
+KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings) :
     QObject(parent),
     _name(settings.value("Name").toString().trimmed()),
     _id(settings.value("GUID").toString().trimmed(), settings.value("Modified").toString().trimmed()),
@@ -52,7 +52,7 @@ void KbMode::keyMap(const KeyMap &keyMap){
     _bind->map(keyMap);
 }
 
-void KbMode::save(QSettings& settings){
+void KbMode::save(CkbSettings& settings){
     _needsSave = false;
     _id.newModified();
     settings.setValue("GUID", _id.guidString());

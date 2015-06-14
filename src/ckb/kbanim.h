@@ -2,7 +2,7 @@
 #define KBANIM_H
 
 #include <QObject>
-#include <QSettings>
+#include "ckbsettings.h"
 #include "animscript.h"
 #include "keymap.h"
 
@@ -23,9 +23,9 @@ public:
     };
 
     // Load an animation from settings
-    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings& settings);
+    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettings& settings);
     // Save an animation to settings
-    void save(QSettings& settings);
+    void save(CkbSettings& settings);
     inline bool needsSave() const { return _needsSave; }
 
     // Create a new animation

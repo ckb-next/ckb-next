@@ -37,7 +37,7 @@ public:
     // New mode with key map, and optionally ID
     KbMode(Kb* parent, const KeyMap& keyMap, const QString& guid = "", const QString& modified = "");
     // Mode from settings
-    KbMode(Kb* parent, const KeyMap& keyMap, QSettings& settings);
+    KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings);
     // Mode by copy
     KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other);
 
@@ -57,7 +57,7 @@ public:
     inline KbPerf*  perf() { return _perf; }
 
     // Save settings
-    void save(QSettings& settings);
+    void save(CkbSettings& settings);
     bool needsSave() const;
 
 signals:

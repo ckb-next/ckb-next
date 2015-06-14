@@ -63,8 +63,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(eventTimer, SIGNAL(timeout()), this, SLOT(timerTick()));
     eventTimer->start(1000 / 60);
 
-    QCoreApplication::setOrganizationName("ckb");
-
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
     settingsWidget->setVersion("ckb " CKB_VERSION_STR);
 

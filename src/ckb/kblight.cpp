@@ -283,10 +283,10 @@ void KbLight::base(QFile &cmd, bool ignoreDim){
     printRGB(cmd, animMap);
 }
 
-void KbLight::load(QSettings& settings){
+void KbLight::load(CkbSettings& settings){
     // Load light settings
     _needsSave = false;
-    QSGroup group(settings, "Lighting");
+    SGroup group(settings, "Lighting");
     KeyMap currentMap = _map;
     _map = KeyMap::fromName(settings.value("KeyMap").toString());
     _dimming = settings.value("Brightness").toUInt();
@@ -302,7 +302,7 @@ void KbLight::load(QSettings& settings){
     // Load RGB settings
     bool useReal = settings.value("UseRealNames").toBool();
     {
-        QSGroup group(settings, "Keys");
+        SGroup group(settings, "Keys");
         foreach(QString key, settings.childKeys()){
             QString name = key.toLower();
             if(!useReal)
@@ -318,7 +318,7 @@ void KbLight::load(QSettings& settings){
         anim->deleteLater();
     _animList.clear();
     {
-        QSGroup group(settings, "Animations");
+        SGroup group(settings, "Animations");
         foreach(QString anim, settings.value("List").toStringList()){
             QUuid id = anim;
             _animList.append(new KbAnim(this, _map, id, settings));
@@ -328,9 +328,9 @@ void KbLight::load(QSettings& settings){
     map(currentMap);
 }
 
-void KbLight::save(QSettings& settings){
+void KbLight::save(CkbSettings& settings){
     _needsSave = false;
-    QSGroup group(settings, "Lighting");
+    SGroup group(settings, "Lighting");
     settings.setValue("KeyMap", _map.name());
     settings.setValue("Brightness", _dimming);
     settings.setValue("InactiveIndicators", _inactive);
@@ -338,13 +338,13 @@ void KbLight::save(QSettings& settings){
     settings.setValue("UseRealNames", true);
     {
         // Save RGB settings
-        QSGroup group(settings, "Keys");
+        SGroup group(settings, "Keys");
         foreach(QString key, _colorMap.keys())
             settings.setValue(key, QColor(_colorMap.value(key)).name());
     }
     {
         // Save animations
-        QSGroup group(settings, "Animations");
+        SGroup group(settings, "Animations");
         QStringList aList;
         foreach(KbAnim* anim, _animList){
             aList << anim->guid().toString().toUpper();

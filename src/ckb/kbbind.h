@@ -5,7 +5,7 @@
 #include <QHash>
 #include <QObject>
 #include <QProcess>
-#include <QSettings>
+#include "ckbsettings.h"
 #include "keymap.h"
 
 class Kb;
@@ -23,8 +23,8 @@ public:
     KbBind(KbMode* modeParent, Kb* devParent, const KeyMap& keyMap, const KbBind& other);
 
     // Load and save from stored settings
-    void        load(QSettings& settings);
-    void        save(QSettings& settings);
+    void        load(CkbSettings& settings);
+    void        save(CkbSettings& settings);
     inline bool needsSave() const                   { return _needsSave; }
 
     // Key map

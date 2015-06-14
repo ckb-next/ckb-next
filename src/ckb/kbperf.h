@@ -20,8 +20,8 @@ public:
     KbPerf(KbMode* parent, const KbPerf& other);
 
     // Load and save from stored settings
-    void        load(QSettings& settings);
-    void        save(QSettings& settings);
+    void        load(CkbSettings& settings);
+    void        save(CkbSettings& settings);
     inline bool needsSave() const { return _needsSave; }
 
     // Stored DPI settings (X/Y)

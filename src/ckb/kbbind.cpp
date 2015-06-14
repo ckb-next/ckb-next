@@ -19,16 +19,16 @@ KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const 
     map(keyMap);
 }
 
-void KbBind::load(QSettings& settings){
+void KbBind::load(CkbSettings& settings){
     _needsSave = false;
-    QSGroup group(settings, "Binding");
+    SGroup group(settings, "Binding");
     KeyMap currentMap = _map;
     _map = KeyMap::fromName(settings.value("KeyMap").toString());
     // Load key settings
     bool useReal = settings.value("UseRealNames").toBool();
     _bind.clear();
     {
-        QSGroup group(settings, "Keys");
+        SGroup group(settings, "Keys");
         foreach(QString key, settings.childKeys()){
             QString name = key.toLower();
             if(!useReal)
@@ -41,14 +41,14 @@ void KbBind::load(QSettings& settings){
     map(currentMap);
 }
 
-void KbBind::save(QSettings& settings){
+void KbBind::save(CkbSettings& settings){
     _needsSave = false;
-    QSGroup group(settings, "Binding");
+    SGroup group(settings, "Binding");
     settings.setValue("KeyMap", _map.name());
     // Save key settings
     settings.setValue("UseRealNames", true);
     {
-        QSGroup group(settings, "Keys");
+        SGroup group(settings, "Keys");
         foreach(QString key, _bind.keys()){
             QString act = _bind.value(key);
             if(act != defaultAction(key))

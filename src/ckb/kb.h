@@ -75,8 +75,8 @@ public:
     inline KbMode*      newMode(KbMode* other)          { return new KbMode(this, getKeyMap(), *other); }
 
     // Load/save stored settings
-    void load(QSettings& settings);
-    void save(QSettings& settings);
+    void load(CkbSettings& settings);
+    void save(CkbSettings& settings);
     void hwSave();
     bool needsSave() const;
 

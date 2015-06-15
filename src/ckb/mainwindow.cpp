@@ -249,6 +249,7 @@ void MainWindow::cleanup(){
     foreach(KbWidget* w, kbWidgets)
         delete w;
     kbWidgets.clear();
+    CkbSettings::cleanUp();
 }
 
 MainWindow::~MainWindow(){

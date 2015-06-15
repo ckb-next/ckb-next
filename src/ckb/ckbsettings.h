@@ -25,6 +25,9 @@ public:
     // The global set() will also block if busy, but global get() will not, unless the value has never been read before.
     static bool isBusy();
 
+    // Finalize all writes, clean up and release resources
+    static void cleanUp();
+
     // QSettings functions
     void        beginGroup(const QString& prefix);
     void        endGroup();

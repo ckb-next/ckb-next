@@ -1,36 +1,52 @@
 #include "ckbsettings.h"
+#include "ckbsettingswriter.h"
 #include <QThread>
+#include <QMutex>
 
 // Shared global QSettings object
 static QSettings* _globalSettings = 0;
 static QThread* globalThread = 0;
+QAtomicInt cacheWritesInProgress(0);
 // Global one-shot settings cache, to avoid reading/writing QSettings constantly
 static QMap<QString, QVariant> globalCache;
 // Mutexes for accessing settings
-static QMutex mutex(QMutex::Recursive), cacheMutex(QMutex::Recursive);
-#define lockMutex           QMutexLocker locker(backing == _globalSettings ? &mutex : 0)
-#define lockMutexStatic     QMutexLocker locker(&mutex)
-#define lockMutexStatic2    QMutexLocker locker2(&mutex)
-#define lockMutexCache      QMutexLocker locker(&cacheMutex)
+QMutex settingsMutex(QMutex::Recursive), settingsCacheMutex(QMutex::Recursive);
+#define lockMutex           QMutexLocker locker(backing == _globalSettings ? &settingsMutex : 0)
+#define lockMutexStatic     QMutexLocker locker(&settingsMutex)
+#define lockMutexStatic2    QMutexLocker locker2(&settingsMutex)
+#define lockMutexCache      QMutexLocker locker(&settingsCacheMutex)
 
 static QSettings* globalSettings(){
-    lockMutexStatic;
     if(!_globalSettings){
-        // Put the settings object in a separate thread so that it won't lock up the GUI when it syncs
-        globalThread = new QThread;
-        globalThread->start();
-        _globalSettings = new QSettings;
-        _globalSettings->moveToThread(globalThread);
+        lockMutexStatic;
+        if(!(volatile QSettings*)_globalSettings){   // Check again after locking mutex in case another thread created the object
+            // Put the settings object in a separate thread so that it won't lock up the GUI when it syncs
+            globalThread = new QThread;
+            globalThread->start();
+            _globalSettings = new QSettings;
+            _globalSettings->moveToThread(globalThread);
+        }
     }
     return _globalSettings;
 }
 
 bool CkbSettings::isBusy(){
-    if(mutex.tryLock()){
-        mutex.unlock();
-        return false;
-    }
-    return true;
+    return cacheWritesInProgress.load() > 0;
+}
+
+void CkbSettings::cleanUp(){
+    if(!_globalSettings)
+        return;
+    // Wait for all writers to finish
+    while(cacheWritesInProgress.load() > 0)
+        QThread::yieldCurrentThread();
+    // Stop thread and delete objects
+    globalThread->quit();
+    globalThread->wait();
+    delete globalThread;
+    delete _globalSettings;
+    globalThread = 0;
+    _globalSettings = 0;
 }
 
 CkbSettings::CkbSettings() :
@@ -102,41 +118,14 @@ void CkbSettings::remove(const QString& key){
     removeCache.append(pwd(key));
 }
 
-// Writes to the cache happen in a separate thread so that they don't slow the main application down
-class CacheWriter : public QThread {
-public:
-    CacheWriter(const QStringList& removals, const QMap<QString, QVariant>& updates) :
-        _removals(removals), _updates(updates) {
-    }
-
-    void run(){
-        lockMutexStatic;
-        // Process key removals
-        QSettings* settings = globalSettings();
-        foreach(const QString& rm, _removals){
-            settings->remove(rm);
-        }
-        // Process writes
-        QMapIterator<QString, QVariant> i(_updates);
-        while(i.hasNext()){
-            i.next();
-            settings->setValue(i.key(), i.value());
-            // Updating the global cache was done above
-        }
-    }
-
-private:
-    QStringList _removals;
-    QMap<QString, QVariant> _updates;
-};
-
 CkbSettings::~CkbSettings(){
     if(removeCache.isEmpty() && writeCache.isEmpty())
         return;
-    // Launch a new thread to save the settings
-    CacheWriter* writeThread = new CacheWriter(removeCache, writeCache);
-    QObject::connect(writeThread, SIGNAL(finished()), writeThread, SLOT(deleteLater()));
-    writeThread->start();
+    // Save the settings from the settings thread.
+    // They have to be saved from that thread specifically to avoid performance issues
+    CkbSettingsWriter* writer = new CkbSettingsWriter(backing, removeCache, writeCache);
+    writer->moveToThread(globalThread);
+    QObject::staticMetaObject.invokeMethod(writer, "run", Qt::QueuedConnection);
 }
 
 QVariant CkbSettings::get(const QString& key, const QVariant& defaultValue){

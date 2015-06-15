@@ -68,6 +68,8 @@ KbWidget::~KbWidget(){
 }
 
 void KbWidget::saveSettings(){
+    if(!device->needsSave())
+        return;
     CkbSettings settings(prefsPath, true);
     device->save(settings);
     settings.endGroup();
@@ -76,7 +78,7 @@ void KbWidget::saveSettings(){
 void KbWidget::saveIfNeeded(){
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     // Auto-save every 15s (if settings have changed, and no other writes are in progress)
-    if(device->needsSave() && now >= lastAutoSave + 15 * 1000 && !CkbSettings::isBusy()){
+    if(now >= lastAutoSave + 15 * 1000 && !CkbSettings::isBusy()){
         saveSettings();
         lastAutoSave = now;
     }

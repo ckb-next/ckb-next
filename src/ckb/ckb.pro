@@ -79,7 +79,8 @@ SOURCES += main.cpp\
     fwupgradedialog.cpp \
     autorun.cpp \
     ckbsettings.cpp \
-    kbperf.cpp
+    kbperf.cpp \
+    ckbsettingswriter.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -128,7 +129,8 @@ HEADERS  += mainwindow.h \
     fwupgradedialog.h \
     autorun.h \
     ckbsettings.h \
-    kbperf.h
+    kbperf.h \
+    ckbsettingswriter.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \

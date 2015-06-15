@@ -177,7 +177,7 @@ typedef struct {
     struct udev_device* udev;
     int handle;
     int uinput;
-    int event;
+    uchar ev_ileds;
 #else
     struct timespec keyrepeat;
     long location_id;

@@ -35,9 +35,8 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
         CGEventRef cge = CGEventCreate(nil);
         CGPoint loc = CGEventGetLocation(cge);
         CFRelease(cge);
-        // Also, if the X location is negative it needs to be offset by 1. Doesn't apply to Y though?
-        location.x = loc.x + ev->mouseMove.dx - (loc.x < 0 ? 1 : 0);
-        location.y = loc.y + ev->mouseMove.dy;
+        location.x = floor(loc.x + ev->mouseMove.dx);
+        location.y = floor(loc.y + ev->mouseMove.dy);
         options = (options & ~kIOHIDSetRelativeCursorPosition) | kIOHIDSetCursorPosition;
     }
     kern_return_t res = IOHIDPostEvent(event, type, location, ev, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
@@ -118,16 +117,23 @@ static void postevent_mb(io_connect_t event, int button, int down){
     postevent(event, type, &mb, 0, 0);
 }
 
+// input_mac_mouse.c
+extern void wheel_accel(io_connect_t event, int* deltaAxis1, SInt32* fixedDeltaAxis1, SInt32* pointDeltaAxis1);
+extern void mouse_accel(io_connect_t event, int* x, int* y);
+
 // Mouse wheel
-static void postevent_wheel(io_connect_t event, int value){
+static void postevent_wheel(io_connect_t event, int use_accel, int value){
     NXEventData mm;
     memset(&mm, 0, sizeof(mm));
-    mm.scrollWheel.deltaAxis1 = value;
+    if(use_accel){
+        wheel_accel(event, &value, &mm.scrollWheel.fixedDeltaAxis1, &mm.scrollWheel.pointDeltaAxis1);
+        mm.scrollWheel.deltaAxis1 = value;
+    } else {
+        // If acceleration is disabled, use a fixed delta of 3
+        mm.scrollWheel.deltaAxis1 = value * 3;
+    }
     postevent(event, NX_SCROLLWHEELMOVED, &mm, 0, 0);
 }
-
-// input_mac_mouse.c
-extern void mouse_accel(io_connect_t event, int* x, int* y);
 
 // Mouse axis
 static void postevent_mm(io_connect_t event, int x, int y, int use_accel, uchar buttons){
@@ -216,10 +222,12 @@ void os_inputclose(usbdevice* kb){
 void os_keypress(usbdevice* kb, int scancode, int down){
     if(scancode & SCAN_MOUSE){
         if(scancode == BTN_WHEELUP){
-            postevent_wheel(kb->event, 1);
+            if(down)
+                postevent_wheel(kb->event, !!(kb->features & FEAT_MOUSEACCEL), 1);
             return;
         } else if(scancode == BTN_WHEELDOWN){
-            postevent_wheel(kb->event, -1);
+            if(down)
+                postevent_wheel(kb->event, !!(kb->features & FEAT_MOUSEACCEL), -1);
             return;
         }
         int button = scancode & ~SCAN_MOUSE;

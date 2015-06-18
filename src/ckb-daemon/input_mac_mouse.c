@@ -15,6 +15,53 @@ static IOFixed _acceleration = -1, _fractX = 0, _fractY = 0;
 // As such this file is licensed as BSD and not GPL
 // Why they thought that mouse acceleration belongs in a low-level input driver is beyond me...
 
+static kern_return_t IOPointingCopyCFTypeParameter( CFStringRef key, CFTypeRef * parameter )
+{
+    // Open master port (if not done yet)
+    static mach_port_t master = 0;
+    kern_return_t res;
+    if(!master && (res = IOMasterPort(bootstrap_port, &master)) != KERN_SUCCESS){
+        master = 0;
+        ckb_err("Unable to open master port: 0x%08x\n", res);
+        return kIOReturnError;
+    }
+    // Open an HID service
+    io_iterator_t iter;
+    if((res = IOServiceGetMatchingServices(master, IOServiceMatching(kIOHIPointingClass), &iter)) != KERN_SUCCESS){
+        ckb_err("Unable to get input service iterator: 0x%08x\n", res);
+        return kIOReturnError;
+    }
+    io_service_t service = IOIteratorNext(iter);
+
+    kern_return_t	kr = KERN_SUCCESS;
+    CFDictionaryRef	paramDict;
+    CFTypeRef		tempParameter = NULL;
+
+    if (!parameter)
+        return kIOReturnError;
+
+    if( (paramDict = IORegistryEntryCreateCFProperty( service, CFSTR(kIOHIDParametersKey), kCFAllocatorDefault, kNilOptions)))
+    {
+        if ( (tempParameter = CFDictionaryGetValue( paramDict, key)) )
+            CFRetain(tempParameter);
+
+        CFRelease(paramDict);
+    }
+
+    if ( !tempParameter )
+        tempParameter = IORegistryEntryCreateCFProperty( service, key, kCFAllocatorDefault, kNilOptions);
+
+    if ( !tempParameter )
+        kr = kIOReturnBadArgument;
+
+    *parameter = tempParameter;
+
+    IOObjectRelease( service );
+    IOObjectRelease(iter);
+
+    return( kr );
+}
+
 #define MAX_DEVICE_THRESHOLD        0x7fffffff
 
 #define FRAME_RATE		(67 << 16)
@@ -28,6 +75,8 @@ typedef struct {
 #define f2sc(f)     ((f).value / 65536LL)
 static SInt32 as32(IOFixed64 f) { SInt64 res = f2sc(f); if(res > INT_MAX) return INT_MAX; if(res < INT_MIN) return INT_MIN; return (SInt32)res; }
 static bool f_gt_sc(IOFixed64 lhs, SInt64 rhs) { return lhs.value > sc2f(rhs); }
+static bool f_lt(IOFixed64 lhs, IOFixed64 rhs) { return lhs.value < rhs.value; }
+static bool f_gt(IOFixed64 lhs, IOFixed64 rhs) { return lhs.value > rhs.value; }
 static IOFixed64 f_add(IOFixed64 lhs, IOFixed64 rhs) { IOFixed64 r = { lhs.value + rhs.value }; return r; }
 static IOFixed64 f_sub(IOFixed64 lhs, IOFixed64 rhs) { IOFixed64 r = { lhs.value - rhs.value }; return r; }
 static IOFixed64 f_div(IOFixed64 lhs, IOFixed64 rhs) { IOFixed64 r = { lhs.value * 65536LL / rhs.value }; return r; }
@@ -166,12 +215,108 @@ typedef struct
 static IOHIPointing__PAParameters* _paraAccelParams = 0;
 static IOHIPointing__PASecondaryParameters* _paraAccelSecondaryParams = 0;
 
+enum {
+    kAccelTypeGlobal = -1,
+    kAccelTypeY = 0, //delta axis 1
+    kAccelTypeX = 1, //delta axis 2
+    kAccelTypeZ = 2  //delta axis 3
+};
+
 struct CursorDeviceSegment {
     SInt32	devUnits;
     SInt32	slope;
     SInt32	intercept;
 };
 typedef struct CursorDeviceSegment CursorDeviceSegment;
+
+static IOFixed _scrollFixedDeltaAxis1 = 0, _scrollFixedDeltaAxis2 = 0, _scrollFixedDeltaAxis3 = 0;
+static SInt32 _scrollPointDeltaAxis1 = 0, _scrollPointDeltaAxis2 = 0, _scrollPointDeltaAxis3 = 0;
+
+#define kIOFixedOne                     0x10000ULL
+#define SCROLL_DEFAULT_RESOLUTION       (9 * kIOFixedOne)
+#define SCROLL_CONSUME_RESOLUTION       (100 * kIOFixedOne)
+#define SCROLL_CONSUME_COUNT_MULTIPLIER 3
+#define SCROLL_EVENT_THRESHOLD_MS_LL    150ULL
+#define SCROLL_EVENT_THRESHOLD_MS       (SCROLL_EVENT_THRESHOLD_MS_LL * kIOFixedOne)
+#define SCROLL_CLEAR_THRESHOLD_MS_LL    500ULL
+
+#define SCROLL_MULTIPLIER_RANGE         0x00018000
+#define SCROLL_MULTIPLIER_A             0x00000002 /*IOFixedDivide(SCROLL_MULTIPLIER_RANGE,SCROLL_EVENT_THRESHOLD_MS*2)*/
+#define SCROLL_MULTIPLIER_B             0x000003bb /*IOFixedDivide(SCROLL_MULTIPLIER_RANGE*3,(SCROLL_EVENT_THRESHOLD_MS^2)*2)*/
+#define SCROLL_MULTIPLIER_C             0x00018041
+
+
+#define SCROLL_WHEEL_TO_PIXEL_SCALE     0x000a0000/* IOFixedDivide(SCREEN_RESOLUTION, SCROLL_DEFAULT_RESOLUTION) */
+#define SCROLL_PIXEL_TO_WHEEL_SCALE     0x0000199a/* IOFixedDivide(SCREEN_RESOLUTION, SCROLL_DEFAULT_RESOLUTION) */
+#define SCROLL_TIME_DELTA_COUNT		8
+
+struct ScaleDataState
+{
+    UInt8           deltaIndex;
+    IOFixed         deltaTime[SCROLL_TIME_DELTA_COUNT];
+    IOFixed         deltaAxis[SCROLL_TIME_DELTA_COUNT];
+    IOFixed         fraction;
+};
+typedef struct ScaleDataState ScaleDataState;
+struct ScaleConsumeState
+{
+    UInt32      consumeCount;
+    IOFixed     consumeAccum;
+};
+typedef struct ScaleConsumeState ScaleConsumeState;
+struct ScrollAxisAccelInfo
+{
+    struct timespec     lastEventTime;
+    void *              scaleSegments;
+    IOItemCount         scaleSegCount;
+    ScaleDataState      state;
+    ScaleConsumeState   consumeState;
+    IOHIPointing__PAParameters          primaryParametrics;
+    IOHIPointing__PASecondaryParameters secondaryParametrics;
+    SInt32              lastValue;
+    UInt32              consumeClearThreshold;
+    UInt32              consumeCountThreshold;
+    bool                isHighResScroll;
+    bool                isParametric;
+};
+typedef struct ScrollAxisAccelInfo ScrollAxisAccelInfo;
+struct ScrollAccelInfo
+{
+    ScrollAxisAccelInfo axis[3];
+
+    IOFixed             rateMultiplier;
+    UInt32              zoom:1;
+};
+typedef struct ScrollAccelInfo ScrollAccelInfo;
+static ScrollAccelInfo _scrollWheelInfo;
+static ScrollAccelInfo _scrollPointerInfo;
+
+#define CONVERT_SCROLL_FIXED_TO_FRACTION(fixed, fraction)   \
+{                                                           \
+        if( fixed >= 0)                                     \
+            fraction = fixed & 0xffff;                      \
+        else                                                \
+            fraction = fixed | 0xffff0000;                  \
+}
+
+#define CONVERT_SCROLL_FIXED_TO_INTEGER(fixedAxis, integer) \
+{                                                           \
+        SInt32 tempInt = 0;                                 \
+        if((fixedAxis < 0) && (fixedAxis & 0xffff))         \
+            tempInt = (fixedAxis >> 16) + 1;                \
+        else                                                \
+            tempInt = (fixedAxis >> 16);                    \
+        integer = tempInt;                                  \
+}
+
+#define CONVERT_SCROLL_FIXED_TO_COARSE(fixedAxis, coarse)   \
+{                                                           \
+        SInt32 tempCoarse = 0;                              \
+        CONVERT_SCROLL_FIXED_TO_INTEGER(fixedAxis, tempCoarse)  \
+        if (!tempCoarse && (fixedAxis & 0xffff))            \
+            tempCoarse = (fixedAxis < 0) ? -1 : 1;          \
+        coarse = tempCoarse;                                \
+}
 
 bool
 PACurvesFillParamsFromDict(CFDictionaryRef parameters,
@@ -310,7 +455,7 @@ exit_early:
 static IOFixed resolution()
 {
     CFNumberRef number;
-    IOHIDCopyCFTypeParameter(_handle, CFSTR(kIOHIDPointerResolutionKey), (CFTypeRef*)&number);
+    IOPointingCopyCFTypeParameter(CFSTR(kIOHIDPointerResolutionKey), (CFTypeRef*)&number);
     IOFixed result = 100 << 16;
 
     if (number && CFGetTypeID(number) == CFNumberGetTypeID())
@@ -340,13 +485,46 @@ static CFDataRef copyAccelerationTable()
     };
 
     CFDataRef data;
-    IOHIDCopyCFTypeParameter(_handle, CFSTR(kIOHIDPointerAccelerationTableKey), (CFTypeRef*)&data);
+    IOPointingCopyCFTypeParameter(CFSTR(kIOHIDPointerAccelerationTableKey), (CFTypeRef*)&data);
     if(data && CFGetTypeID(data) != CFDataGetTypeID()){
         CFRelease(data);
         data = 0;
     }
     if (!data)
         data = CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, accl, sizeof(accl), kCFAllocatorNull);
+
+    return( data );
+}
+
+static CFDataRef copyScrollAccelerationTableForType(SInt32 type)
+{
+    CFDataRef    data    = NULL;
+    CFStringRef key     = NULL;
+
+    switch ( type ) {
+        case kAccelTypeY:
+            key = CFSTR(kIOHIDScrollAccelerationTableYKey);
+            break;
+        case kAccelTypeX:
+            key = CFSTR(kIOHIDScrollAccelerationTableXKey);
+            break;
+        case kAccelTypeZ:
+            key = CFSTR(kIOHIDScrollAccelerationTableZKey);
+            break;
+    }
+
+    if ( key )
+        IOPointingCopyCFTypeParameter(key, (CFTypeRef*)&data);
+
+    if ( !data || CFGetTypeID(data) != CFDataGetTypeID()) {
+        if(data) CFRelease(data);
+        IOPointingCopyCFTypeParameter(CFSTR(kIOHIDScrollAccelerationTableKey), (CFTypeRef*)&data);
+    }
+
+    if ( !data || CFGetTypeID(data) != CFDataGetTypeID()) {
+        if(data) CFRelease(data);
+        data = copyAccelerationTable();
+    }
 
     return( data );
 }
@@ -583,7 +761,7 @@ static bool SetupAcceleration (CFDataRef data, IOFixed desired, IOFixed devScale
 
 static void setupForAcceleration(IOFixed desired){
     CFArrayRef      parametricAccelerationCurves;
-    IOHIDCopyCFTypeParameter(_handle, CFSTR(kHIDTrackingAccelParametricCurvesKey), (CFTypeRef*)&parametricAccelerationCurves);
+    IOPointingCopyCFTypeParameter(CFSTR(kHIDTrackingAccelParametricCurvesKey), (CFTypeRef*)&parametricAccelerationCurves);
     IOFixed         devScale    = IOFixedDivide( resolution(), FRAME_RATE );
     IOFixed         crsrScale   = IOFixedDivide( SCREEN_RESOLUTION, FRAME_RATE );
     bool            useParametric = false;
@@ -591,7 +769,7 @@ static void setupForAcceleration(IOFixed desired){
 //  IOLog("%s %d: got %08x and %p\n", __PRETTY_FUNCTION__, __LINE__, desired, parametricAccelerationCurves);
     if (!parametricAccelerationCurves || CFGetTypeID(parametricAccelerationCurves) != CFArrayGetTypeID()) {
         if(parametricAccelerationCurves) CFRelease(parametricAccelerationCurves);
-        IOHIDCopyCFTypeParameter(_handle, CFSTR(kHIDAccelParametricCurvesKey), (CFTypeRef*)&parametricAccelerationCurves);
+        IOPointingCopyCFTypeParameter(CFSTR(kHIDAccelParametricCurvesKey), (CFTypeRef*)&parametricAccelerationCurves);
     }
     // Try to set up the parametric acceleration data
     if (parametricAccelerationCurves && CFGetTypeID(parametricAccelerationCurves) == CFArrayGetTypeID()) {
@@ -668,8 +846,8 @@ static void ScaleAxes (void * scaleSegments, int * axis1p, IOFixed *axis1Fractp,
     dx = (*axis1p) << 16;
     dy = (*axis2p) << 16;
 
-    dx /= 10;
-    dy /= 10;
+    dx = dx * 2 / 3;
+    dy = dy * 2 / 3;
 
     // mag is (x^2 + y^2)^0.5 and converted to fixed point
     mag = (lsqrt(*axis1p * *axis1p + *axis2p * *axis2p)) << 16;
@@ -738,7 +916,7 @@ PACurvesGetAccelerationMultiplier(const IOFixed64 device_speed_mickeys,
     return result;
 }
 
-static void scalePointer(int * dxp, int * dyp)
+static void scalePointer(int* dxp, int* dyp)
 // Description:	Perform pointer acceleration computations here.
 //		Given the resolution, dx, dy, and time, compute the velocity
 //		of the pointer over a Manhatten distance in inches/second.
@@ -748,8 +926,8 @@ static void scalePointer(int * dxp, int * dyp)
 // *	_deviceLock should be held on entry
 {
     if (_paraAccelParams && _paraAccelSecondaryParams) {
-        IOFixed64 deltaX = {sc2f(*dxp)}; deltaX.value /= 10;
-        IOFixed64 deltaY = {sc2f(*dyp)}; deltaY.value /= 10;
+        IOFixed64 deltaX = {sc2f(*dxp)}; deltaX.value *= 2 / 3;
+        IOFixed64 deltaY = {sc2f(*dyp)}; deltaY.value *= 2 / 3;
         IOFixed64 fractX = {_fractX};
         IOFixed64 fractY = {_fractY};
         IOFixed64 mag = {sc2f(llsqrt(f2sc(f_add(f_mul(deltaX, deltaX), f_mul(deltaY, deltaY)))))};
@@ -782,25 +960,409 @@ static void scalePointer(int * dxp, int * dyp)
     }
 }
 
+// RY: Added this method to obtain the report rate
+// of the scroll wheel.  The default value is 67 << 16.
+static IOFixed	scrollReportRate()
+{
+    IOFixed     result = FRAME_RATE;
+    CFNumberRef number;
+    IOPointingCopyCFTypeParameter(CFSTR(kIOHIDPointerResolutionKey), (CFTypeRef*)&number);
+
+    if (number && CFGetTypeID(number) == CFNumberGetTypeID())
+        CFNumberGetValue(number, kCFNumberIntType, &result);
+    if(number) CFRelease(number);
+
+    if (result == 0)
+        result = FRAME_RATE;
+
+    return result;
+}
+
+// RY: Added this method to obtain the resolution
+// of the scroll wheel.  The default value is 0,
+// which should prevent any accel from being applied.
+static IOFixed	scrollResolutionForType(SInt32 type)
+{
+    IOFixed     res         = 0;
+    CFNumberRef 	number      = NULL;
+    CFStringRef key         = NULL;
+
+    switch ( type ) {
+        case kAccelTypeY:
+            key = CFSTR(kIOHIDScrollResolutionYKey);
+            break;
+        case kAccelTypeX:
+            key = CFSTR(kIOHIDScrollResolutionXKey);
+            break;
+        case kAccelTypeZ:
+            key = CFSTR(kIOHIDScrollResolutionZKey);
+            break;
+        default:
+            key = CFSTR(kIOHIDScrollResolutionKey);
+            break;
+
+    }
+    IOPointingCopyCFTypeParameter(key, (CFTypeRef*)&number);
+    if (number && CFGetTypeID(number) == CFNumberGetTypeID())
+        CFNumberGetValue(number, kCFNumberIntType, &res);
+    if(number) CFRelease(number);
+    if(res != 0)
+        return res;
+
+    IOPointingCopyCFTypeParameter(CFSTR(kIOHIDScrollResolutionKey), (CFTypeRef*)&number);
+    if (number && CFGetTypeID(number) == CFNumberGetTypeID())
+        CFNumberGetValue(number, kCFNumberIntType, &res);
+    if(number) CFRelease(number);
+
+    return res;
+}
+
+static void setupScrollForAcceleration( IOFixed desired ){
+    IOFixed     devScale    = 0;
+    IOFixed     scrScale    = 0;
+    IOFixed     reportRate  = scrollReportRate();
+    CFDataRef   accelTable  = NULL;
+    UInt32      type        = 0;
+
+    _scrollWheelInfo.rateMultiplier    = IOFixedDivide(reportRate, FRAME_RATE);
+    _scrollPointerInfo.rateMultiplier  = IOFixedDivide(reportRate, FRAME_RATE);
+
+    if (desired < 0) {
+    }
+    else {
+
+        CFArrayRef parametricAccelerationCurves;
+        IOPointingCopyCFTypeParameter(CFSTR(kHIDScrollAccelParametricCurvesKey), (CFTypeRef*)&parametricAccelerationCurves);
+
+        for ( type=kAccelTypeY; type<=kAccelTypeZ; type++) {
+            IOFixed     res = scrollResolutionForType(type);
+            // Zero scroll resolution says you don't want acceleration.
+            if ( res ) {
+                _scrollWheelInfo.axis[type].isHighResScroll    = res > (SCROLL_DEFAULT_RESOLUTION * 2);
+                _scrollPointerInfo.axis[type].isHighResScroll  = _scrollWheelInfo.axis[type].isHighResScroll;
+
+                _scrollWheelInfo.axis[type].consumeClearThreshold = (IOFixedDivide(res, SCROLL_CONSUME_RESOLUTION) >> 16) * 2;
+                _scrollPointerInfo.axis[type].consumeClearThreshold = _scrollWheelInfo.axis[type].consumeClearThreshold;
+
+                _scrollWheelInfo.axis[type].consumeCountThreshold = _scrollWheelInfo.axis[type].consumeClearThreshold * SCROLL_CONSUME_COUNT_MULTIPLIER;
+                _scrollPointerInfo.axis[type].consumeCountThreshold = _scrollPointerInfo.axis[type].consumeClearThreshold * SCROLL_CONSUME_COUNT_MULTIPLIER;
+
+                bzero(&(_scrollWheelInfo.axis[type].state), sizeof(ScaleDataState));
+                bzero(&(_scrollWheelInfo.axis[type].consumeState), sizeof(ScaleConsumeState));
+                bzero(&(_scrollPointerInfo.axis[type].state), sizeof(ScaleDataState));
+                bzero(&(_scrollPointerInfo.axis[type].consumeState), sizeof(ScaleConsumeState));
+
+                clock_gettime(CLOCK_MONOTONIC, &(_scrollWheelInfo.axis[type].lastEventTime));
+                _scrollPointerInfo.axis[type].lastEventTime = _scrollWheelInfo.axis[type].lastEventTime;
+
+                if (reportRate) {
+                    IOFixed64 desired64 = { desired };
+                    IOFixed64 devScale64 = { res };
+                    IOFixed64 scrScale64 = { SCREEN_RESOLUTION };
+
+                    devScale64 = f_div(devScale64, *(IOFixed64[]){{ reportRate }});
+
+                    scrScale64 = f_div(scrScale64, *(IOFixed64[]){{ FRAME_RATE }});
+
+                    _scrollWheelInfo.axis[type].isParametric =
+                            PACurvesSetupAccelParams(parametricAccelerationCurves,
+                                                     desired64,
+                                                     devScale64,
+                                                     scrScale64,
+                                                     &_scrollWheelInfo.axis[type].primaryParametrics,
+                                                     &_scrollWheelInfo.axis[type].secondaryParametrics);
+                }
+
+                if (!_scrollWheelInfo.axis[type].isParametric) {
+                    accelTable = copyScrollAccelerationTableForType(type);
+
+                    // Setup pixel scroll wheel acceleration table
+                    devScale = IOFixedDivide( res, reportRate );
+                    scrScale = IOFixedDivide( SCREEN_RESOLUTION, FRAME_RATE );
+
+                    SetupAcceleration (accelTable, desired, devScale, scrScale, &(_scrollWheelInfo.axis[type].scaleSegments), &(_scrollWheelInfo.axis[type].scaleSegCount));
+
+                    // Grab the pointer resolution
+                    res = resolution();
+                    reportRate = FRAME_RATE;
+
+                    // Setup pixel pointer drag/scroll acceleration table
+                    devScale = IOFixedDivide( res, reportRate );
+                    scrScale = IOFixedDivide( SCREEN_RESOLUTION, FRAME_RATE );
+
+                    SetupAcceleration (accelTable, desired, devScale, scrScale, &(_scrollPointerInfo.axis[type].scaleSegments), &(_scrollPointerInfo.axis[type].scaleSegCount));
+
+                    if (accelTable)
+                        CFRelease(accelTable);
+                }
+            }
+        }
+        if(parametricAccelerationCurves) CFRelease(parametricAccelerationCurves);
+    }
+}
+
+static void AccelerateScrollAxis(   IOFixed *               axisp,
+                                    ScrollAxisAccelInfo *   scaleInfo,
+                                    struct timespec*        timeStamp,
+                                    IOFixed                 rateMultiplier,
+                                    bool                    clear)
+{
+    IOFixed absAxis             = 0;
+    int     avgIndex            = 0;
+    IOFixed	avgCount            = 0;
+    IOFixed avgAxis             = 0;
+    IOFixed	timeDeltaMS         = 0;
+    IOFixed	avgTimeDeltaMS      = 0;
+    UInt64	currentTimeNSLL     = 0;
+    UInt64	lastEventTimeNSLL   = 0;
+    UInt64  timeDeltaMSLL       = 0;
+
+    if ( ! (scaleInfo && ( scaleInfo->scaleSegments || scaleInfo->isParametric) ) )
+        return;
+
+    absAxis = abs(*axisp);
+
+    if( absAxis == 0 )
+        return;
+
+    currentTimeNSLL = timeStamp->tv_nsec + timeStamp->tv_sec * 1000000000;
+    lastEventTimeNSLL = scaleInfo->lastEventTime.tv_nsec + scaleInfo->lastEventTime.tv_sec * 1000000000;
+
+    scaleInfo->lastEventTime = *timeStamp;
+
+    timeDeltaMSLL = (currentTimeNSLL - lastEventTimeNSLL) / 1000000;
+
+    // RY: To compensate for non continual motion, we have added a second
+    // threshold.  This whill allow a user with a standard scroll wheel
+    // to continue with acceleration when lifting the finger within a
+    // predetermined time.  We should also clear out the last time deltas
+    // if the direction has changed.
+    if ((timeDeltaMSLL >= SCROLL_CLEAR_THRESHOLD_MS_LL) || clear) {
+        bzero(&(scaleInfo->state), sizeof(ScaleDataState));
+        timeDeltaMSLL = SCROLL_CLEAR_THRESHOLD_MS_LL;
+    }
+
+    timeDeltaMS = ((UInt32) timeDeltaMSLL) * kIOFixedOne;
+
+    scaleInfo->state.deltaTime[scaleInfo->state.deltaIndex] = timeDeltaMS;
+    scaleInfo->state.deltaAxis[scaleInfo->state.deltaIndex] = absAxis;
+
+    // RY: To eliminate jerkyness associated with the scroll acceleration,
+    // we scroll based on the average of the last n events.  This has the
+    // effect of make acceleration smoother with accel and decel.
+    for (int index=0; index < SCROLL_TIME_DELTA_COUNT; index++)
+    {
+        avgIndex = (scaleInfo->state.deltaIndex + SCROLL_TIME_DELTA_COUNT - index) % SCROLL_TIME_DELTA_COUNT;
+        avgAxis         += scaleInfo->state.deltaAxis[avgIndex];
+        avgCount ++;
+
+        if ((scaleInfo->state.deltaTime[avgIndex] <= 0) ||
+            (scaleInfo->state.deltaTime[avgIndex] >= SCROLL_EVENT_THRESHOLD_MS)) {
+            // the previous event was too long before this one. stop looking.
+            avgTimeDeltaMS += SCROLL_EVENT_THRESHOLD_MS;
+            break;
+        }
+
+        avgTimeDeltaMS  += scaleInfo->state.deltaTime[avgIndex];
+
+        if (avgTimeDeltaMS >= (SCROLL_CLEAR_THRESHOLD_MS_LL * kIOFixedOne)) {
+            // the previous event was too long ago. stop looking.
+            break;
+        }
+    }
+
+    // Bump the next index
+    scaleInfo->state.deltaIndex = (scaleInfo->state.deltaIndex + 1) % SCROLL_TIME_DELTA_COUNT;
+
+    avgAxis         = (avgCount) ? (avgAxis / avgCount) : 0;
+    avgTimeDeltaMS  = (avgCount) ? (avgTimeDeltaMS / avgCount) : 0;
+    //avgTimeDeltaMS  = IOFixedMultiply(avgTimeDeltaMS, rateMultiplier);
+    if (avgTimeDeltaMS > SCROLL_EVENT_THRESHOLD_MS) {
+        avgTimeDeltaMS = SCROLL_EVENT_THRESHOLD_MS;
+    }
+    else if (avgTimeDeltaMS < kIOFixedOne) {
+        // anything less than 1 ms is not resonable
+        avgTimeDeltaMS = kIOFixedOne;
+    }
+
+    // RY: Since we want scroll acceleration to work with the
+    // time delta and the accel curves, we have come up with
+    // this approach:
+    //
+    // scrollMultiplier = (SCROLL_MULTIPLIER_A * (avgTimeDeltaMS^2)) +
+    //                      (SCROLL_MULTIPLIER_B * avgTimeDeltaMS) +
+    //                          SCROLL_MULTIPLIER_C
+    //
+    // scrollMultiplier *= avgDeviceDelta
+    //
+    // The boost curve follows a quadratic/parabolic curve which
+    // results in a smoother boost.
+    //
+    // The resulting multipler is applied to the average axis
+    // magnitude and then compared against the accleration curve.
+    //
+    // The value acquired from the graph will then be multiplied
+    // to the current axis delta.
+    IOFixed64           scrollMultiplier;
+    IOFixed64           timedDelta = { avgTimeDeltaMS };
+    IOFixed64           axisValue = { *axisp };
+    IOFixed64           minimumMultiplier = { kIOFixedOne >> 4 };
+
+    scrollMultiplier    = f_mul(f_mul(*(IOFixed64[]){ { SCROLL_MULTIPLIER_A } }, timedDelta), timedDelta);
+    scrollMultiplier = f_sub(scrollMultiplier,     f_mul(*(IOFixed64[]){ { SCROLL_MULTIPLIER_B } }, timedDelta));
+    scrollMultiplier = f_add(scrollMultiplier,     *(IOFixed64[]){ { SCROLL_MULTIPLIER_C } });
+    scrollMultiplier = f_mul(scrollMultiplier,     *(IOFixed64[]){ { rateMultiplier } });
+    scrollMultiplier = f_mul(scrollMultiplier,     *(IOFixed64[]){ { avgAxis } });
+    if (f_lt(scrollMultiplier, minimumMultiplier)) {
+        scrollMultiplier = minimumMultiplier;
+    }
+
+    if (scaleInfo->isParametric) {
+        scrollMultiplier = PACurvesGetAccelerationMultiplier(scrollMultiplier, &scaleInfo->primaryParametrics, &scaleInfo->secondaryParametrics);
+    }
+    else {
+        CursorDeviceSegment	*segment;
+
+        // scale
+        for(segment = (CursorDeviceSegment *) scaleInfo->scaleSegments;
+            f_gt(scrollMultiplier, *(IOFixed64[]){ { segment->devUnits } });
+            segment++)
+        {}
+
+        if (avgCount > 2) {
+            // Continuous scrolling in one direction indicates a desire to go faster.
+            scrollMultiplier = f_mul(scrollMultiplier, *(IOFixed64[]){ { sc2f((SInt64)lsqrt(avgCount * 16)) } });
+            scrollMultiplier = f_div(scrollMultiplier, *(IOFixed64[]){ { sc2f(4) } });
+        }
+
+        scrollMultiplier = f_add(*(IOFixed64[]){ { segment->intercept } }, f_div(f_mul(scrollMultiplier, *(IOFixed64[]){ { segment->slope } }), *(IOFixed64[]){ { absAxis } } ));
+    }
+    axisValue = f_mul(axisValue, scrollMultiplier);
+    *axisp = axisValue.value;
+}
+
+void scaleWheel(int* deltaAxis1, SInt32* fixedDeltaAxis1, SInt32* pointDeltaAxis1, struct timespec ts){
+    int deltaAxis2 = 0, deltaAxis3 = 0;
+
+    bool negative = (*deltaAxis1 < 0);
+    _scrollFixedDeltaAxis1 = *deltaAxis1 << 16;
+    CONVERT_SCROLL_FIXED_TO_COARSE(IOFixedMultiply(_scrollFixedDeltaAxis1, SCROLL_WHEEL_TO_PIXEL_SCALE), _scrollPointDeltaAxis1);
+
+    bool            directionChange[3]          = {0,0,0};
+    bool            typeChange                  = FALSE;
+    SInt32*         pDeltaAxis[3]               = {deltaAxis1, &deltaAxis2, &deltaAxis3};
+    SInt32*         pScrollFixedDeltaAxis[3]    = {&_scrollFixedDeltaAxis1, &_scrollFixedDeltaAxis2, &_scrollFixedDeltaAxis3};
+    IOFixed*        pScrollPointDeltaAxis[3]    = {&_scrollPointDeltaAxis1, &_scrollPointDeltaAxis2, &_scrollPointDeltaAxis3};
+
+    UInt32 type = kAccelTypeY;//for (UInt32 type=kAccelTypeY; type<=kAccelTypeZ; type++ ) {
+        directionChange[type]       = ((_scrollPointerInfo.axis[type].lastValue == 0) ||
+                                       ((_scrollPointerInfo.axis[type].lastValue < 0) && (*(pDeltaAxis[type]) > 0)) ||
+                                       ((_scrollPointerInfo.axis[type].lastValue > 0) && (*(pDeltaAxis[type]) < 0)));
+        _scrollPointerInfo.axis[type].lastValue  = *(pDeltaAxis[type]);
+
+        if ( _scrollPointerInfo.axis[type].scaleSegments || _scrollPointerInfo.axis[type].isParametric ) {
+            *deltaAxis1 *= 8;
+            _scrollPointerInfo.axis[type].lastValue  = *(pDeltaAxis[type]);
+            _scrollFixedDeltaAxis1 = *deltaAxis1 << 16;
+            CONVERT_SCROLL_FIXED_TO_COARSE(IOFixedMultiply(_scrollFixedDeltaAxis1, SCROLL_WHEEL_TO_PIXEL_SCALE), _scrollPointDeltaAxis1);
+            *(pScrollPointDeltaAxis[type])  = _scrollPointerInfo.axis[type].lastValue << 16;
+
+            AccelerateScrollAxis(pScrollPointDeltaAxis[type],
+                                 &(_scrollPointerInfo.axis[type]),
+                                 &ts,
+                                 _scrollPointerInfo.rateMultiplier,
+                                 directionChange[type] || typeChange);
+
+            CONVERT_SCROLL_FIXED_TO_COARSE(pScrollPointDeltaAxis[type][0], pScrollPointDeltaAxis[type][0]);
+
+            // RY: Convert pixel value to points
+            *(pScrollFixedDeltaAxis[type]) = *(pScrollPointDeltaAxis[type]) << 16;
+
+            if ( directionChange[type] )
+                bzero(&(_scrollPointerInfo.axis[type].consumeState), sizeof(ScaleConsumeState));
+
+            // RY: throttle the tranlation of scroll based on the resolution threshold.
+            // This allows us to not generated traditional scroll wheel (line) events
+            // for high res devices at really low (fine granularity) speeds.  This
+            // prevents a succession of single scroll events that can make scrolling
+            // slowly actually seem faster.
+            if ( _scrollPointerInfo.axis[type].consumeCountThreshold )
+            {
+                _scrollPointerInfo.axis[type].consumeState.consumeAccum += *(pScrollFixedDeltaAxis[type]) + ((*(pScrollFixedDeltaAxis[type])) ? _scrollPointerInfo.axis[type].state.fraction : 0);
+                _scrollPointerInfo.axis[type].consumeState.consumeCount += abs(_scrollPointerInfo.axis[type].lastValue);
+
+                if (*(pScrollFixedDeltaAxis[type]) &&
+                   ((abs(_scrollPointerInfo.axis[type].lastValue) >= (SInt32)_scrollPointerInfo.axis[type].consumeClearThreshold) ||
+                    (_scrollPointerInfo.axis[type].consumeState.consumeCount >= _scrollPointerInfo.axis[type].consumeCountThreshold)))
+                {
+                    *(pScrollFixedDeltaAxis[type]) = _scrollPointerInfo.axis[type].consumeState.consumeAccum;
+                    _scrollPointerInfo.axis[type].consumeState.consumeAccum = 0;
+                    _scrollPointerInfo.axis[type].consumeState.consumeCount = 0;
+                }
+                else
+                {
+                    *(pScrollFixedDeltaAxis[type]) = 0;
+                }
+            }
+
+            *(pScrollFixedDeltaAxis[type]) = IOFixedMultiply(*(pScrollFixedDeltaAxis[type]), SCROLL_PIXEL_TO_WHEEL_SCALE);
+
+            // RY: Generate fixed point and course scroll deltas.
+            CONVERT_SCROLL_FIXED_TO_COARSE(*(pScrollFixedDeltaAxis[type]), *(pDeltaAxis[type]));
+        }
+    //}
+    *fixedDeltaAxis1 = _scrollFixedDeltaAxis1;
+    *pointDeltaAxis1 = _scrollPointDeltaAxis1;
+    // Prevent direction reversing (I'm not sure why this happens...)
+    if(negative != (*fixedDeltaAxis1 < 0))
+        *fixedDeltaAxis1 = -*fixedDeltaAxis1;
+    if(negative != (*pointDeltaAxis1 < 0))
+        *pointDeltaAxis1 = -*pointDeltaAxis1;
+}
+
 static int get_desired_accel(){
     int value = 0;
     IOByteCount size = 0;
     CFTypeRef accelKey;
-    if(IOHIDCopyCFTypeParameter(_handle, CFSTR(kIOHIDPointerAccelerationTypeKey), &accelKey) == kIOReturnSuccess){
+    if(IOPointingCopyCFTypeParameter(CFSTR(kIOHIDPointerAccelerationTypeKey), &accelKey) == kIOReturnSuccess){
         if(CFGetTypeID(accelKey) == CFStringGetTypeID()){
             if(IOHIDGetParameter(_handle, accelKey, sizeof(int), &value, &size) != kIOReturnSuccess)
                 size = 0;
         }
         if(accelKey) CFRelease(accelKey);
     }
-    if(size == 0)
-        IOHIDGetParameter(_handle, CFSTR(kIOHIDMouseAccelerationType), sizeof(int), &value, &size);
+    if(size == 0){
+        CFNumberRef number = 0;
+        IOPointingCopyCFTypeParameter(CFSTR(kIOHIDMouseAccelerationType), (CFTypeRef*)&number);
+        if (number && CFGetTypeID(number) == CFNumberGetTypeID())
+            CFNumberGetValue(number, kCFNumberIntType, &value);
+        if(number) CFRelease(number);
+    }
     return value;
 }
 
-void mouse_accel(io_connect_t event, int* x, int* y){
-    struct timespec now;
-    clock_gettime(CLOCK_MONOTONIC, &now);
+static int get_desired_wheel(){
+    int value = 0;
+    IOByteCount size = 0;
+    CFTypeRef accelKey;
+    if(IOPointingCopyCFTypeParameter(CFSTR(kIOHIDScrollAccelerationTypeKey), &accelKey) == kIOReturnSuccess){
+        if(CFGetTypeID(accelKey) == CFStringGetTypeID()){
+            if(IOHIDGetParameter(_handle, accelKey, sizeof(int), &value, &size) != kIOReturnSuccess)
+                size = 0;
+        }
+        if(accelKey) CFRelease(accelKey);
+    }
+    if(size == 0){
+        CFNumberRef number = 0;
+        IOPointingCopyCFTypeParameter(CFSTR(kIOHIDScrollAccelerationKey), (CFTypeRef*)&number);
+        if (number && CFGetTypeID(number) == CFNumberGetTypeID())
+            CFNumberGetValue(number, kCFNumberIntType, &value);
+        if(number) CFRelease(number);
+    }
+    return value;
+}
+
+static void do_setup(io_connect_t event, struct timespec now){
     pthread_mutex_lock(&accelmutex);
     // If the mouse hasn't been polled in a while (1s), check the acceleration values again
     struct timespec last = lastpoll;
@@ -808,11 +1370,25 @@ void mouse_accel(io_connect_t event, int* x, int* y){
     if(!has_setup || timespec_gt(now, last)){
         _handle = event;
         setupForAcceleration(get_desired_accel());
+        setupScrollForAcceleration(get_desired_wheel());
         has_setup = 1;
         lastpoll = now;
     }
     pthread_mutex_unlock(&accelmutex);
+}
+
+void mouse_accel(io_connect_t event, int* x, int* y){
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    do_setup(event, now);
     scalePointer(x, y);
+}
+
+void wheel_accel(io_connect_t event, int* deltaAxis1, SInt32* fixedDeltaAxis1, SInt32* pointDeltaAxis1){
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    do_setup(event, now);
+    scaleWheel(deltaAxis1, fixedDeltaAxis1, pointDeltaAxis1, now);
 }
 
 #endif  // OS_MAC

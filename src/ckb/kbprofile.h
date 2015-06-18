@@ -22,6 +22,7 @@ public:
     // Save profile to settings
     void save(CkbSettings& settings);
     bool needsSave() const;
+    inline void setNeedsSave()          { _needsSave = true; }
 
     // Profile properties
     inline QString  name() const                    { return _name; }

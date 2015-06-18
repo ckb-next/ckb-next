@@ -44,6 +44,7 @@ public:
     void                hwProfile(KbProfile* newHwProfile);
     // Required hardware modes
     int hwModeCount;
+    const static int HWMODE_MAX = 3;
 
     // Perform a firmware update
     void fwUpdate(const QString& path);
@@ -134,7 +135,8 @@ private:
     bool _needsSave;
 
     // Whether or not the hardware profile is being loaded
-    bool hwLoading;
+    // (0 = profile, 1...3 = modes)
+    bool hwLoading[HWMODE_MAX + 1];
 
     // Key map for this keyboard
     KeyMap getKeyMap();

@@ -28,6 +28,10 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettings& settings, co
     if(_name == "")
         _name = "Unnamed";
     _id.modifiedString(settings.value("Modified").toString());
+    if(settings.contains("HwModified"))
+        _id.hwModifiedString(settings.value("HwModified").toString());
+    else
+        _id.hwModified = _id.modified;
     QUuid current = settings.value("CurrentMode").toString().trimmed();
     // Load modes
     uint count = settings.value("ModeCount").toUInt();
@@ -48,6 +52,7 @@ void KbProfile::save(CkbSettings& settings){
     SGroup group(settings, id().guidString());
     settings.setValue("Name", name());
     settings.setValue("Modified", _id.modifiedString());
+    settings.setValue("HwModified", _id.hwModifiedString());
     if(_currentMode)
         settings.setValue("CurrentMode", _currentMode->id().guidString());
     // Save modes

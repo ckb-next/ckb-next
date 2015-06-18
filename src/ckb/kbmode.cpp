@@ -28,6 +28,11 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings) :
     _light(new KbLight(this, keyMap)), _bind(new KbBind(this, parent, keyMap)), _perf(new KbPerf(this)),
     _needsSave(false)
 {
+    if(settings.contains("HwModified"))
+        _id.hwModifiedString(settings.value("HwModified").toString());
+    else
+        _id.hwModified = _id.modified;
+
     connect(_light, SIGNAL(updated()), this, SLOT(doUpdate()));
     if(_id.guid.isNull())
         _id.guid = QUuid::createUuid();
@@ -57,6 +62,7 @@ void KbMode::save(CkbSettings& settings){
     _id.newModified();
     settings.setValue("GUID", _id.guidString());
     settings.setValue("Modified", _id.modifiedString());
+    settings.setValue("HwModified", _id.hwModifiedString());
     settings.setValue("Name", _name);
     _light->save(settings);
     _bind->save(settings);

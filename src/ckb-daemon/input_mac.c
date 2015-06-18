@@ -52,15 +52,25 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
 }
 
 // Keypress
+#define aux_key_data(scancode, down, is_repeat) ((scancode) << 16 | ((down) ? 0x0a00 : 0x0b00) | !!(is_repeat))
 static void postevent_kp(io_connect_t event, int kbflags, int scancode, int down, int is_flags, int is_repeat){
     NXEventData kp;
     memset(&kp, 0, sizeof(kp));
     UInt32 type;
     IOOptionBits flags = kbflags;
     IOOptionBits options = 0;
+    if(scancode == KEY_CAPSLOCK){
+        // Caps lock emits NX_FLAGSCHANGED when pressed, but also NX_SYSDEFINED on both press and release
+        kp.compound.subType = NX_SUBTYPE_AUX_CONTROL_BUTTONS;
+        kp.compound.misc.L[0] = aux_key_data(NX_KEYTYPE_CAPS_LOCK, down, is_repeat);
+        postevent(event, NX_SYSDEFINED, &kp, flags, options);
+        if(!down)
+            return;
+        memset(&kp, 0, sizeof(kp));
+    }
     if(IS_MEDIA(scancode)){
         kp.compound.subType = (scancode != KEY_POWER ? NX_SUBTYPE_AUX_CONTROL_BUTTONS : NX_SUBTYPE_POWER_KEY);
-        kp.compound.misc.L[0] = (scancode - KEY_MEDIA) << 16 | (down ? 0x0a00 : 0x0b00) | is_repeat;
+        kp.compound.misc.L[0] = aux_key_data(scancode - KEY_MEDIA, down, is_repeat);
         type = NX_SYSDEFINED;
     } else {
         if(is_flags){

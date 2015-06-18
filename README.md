@@ -1,7 +1,7 @@
-ckb: Corsair K65/K70/K95 Driver for Linux and OSX
-=================================================
+ckb: Corsair Input Driver for Linux and OSX
+===========================================
 
-**ckb** is an open-source driver for Corsair keyboards. It aims to bring the features of their proprietary software to the Linux and Mac operating systems. This project is currently a work in progress but already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+**ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary software to the Linux and Mac operating systems. This project is currently a work in progress but already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
 **Disclaimer:** ckb is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO warranty of any kind.
 
@@ -14,13 +14,14 @@ Or through Bitcoin: [1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ (click for QR code)](htt
 Device Support
 --------------
 
-ckb currently supports the following Corsair keyboards:
+ckb currently supports the following Corsair devices:
 
-* K65 RGB
-* K70
-* K70 RGB
-* K95*
-* K95 RGB
+* K65 RGB keyboard
+* K70 keyboard
+* K70 RGB keyboard
+* K95* keyboard
+* K95 RGB keyboard
+* M65 RGB mouse
 
 \* = hardware playback not yet supported. Settings will be saved to software only.
 
@@ -69,11 +70,11 @@ Click on `ckb.pkg` under the Downloads section. This is an automated installer w
 
 Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
-The easiest way to install the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see `BUILD.md`.
+The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see `BUILD.md`.
 
 #### Reinstalling (binary):
 
-Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one..
+Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one.
 
 #### Reinstalling (source):
 
@@ -132,6 +133,7 @@ If you have problems connecting the keyboard to your system (keyboard doesn't re
 * K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400`
 * K95: `usbhid.quirks=0x1B1C:0x1B08:0x400`
 * K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x408`
+* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x400`
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
@@ -139,17 +141,21 @@ If the keyboard still doesn't work, try replacing `0x400`/`0x408` with `0x4`. No
 
 #### OSX
 
-If you've rebound your modifier keys in System Preferences, the changes will not be recognized anymore. You can rebind them again within the application.
-
-Compile problems can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
+- **“ckb.pkg” can’t be opened because it is from an unidentified developer.**
+- Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
+- **Modifier keys (Shift, Ctrl, etc) are not rebound correctly.**
+- ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
+- **Compile problems** can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
 
 #### General
 
-**Before reporting an issue, please connect your keyboard to a Windows computer first and see if the problem still occurs. If it does, contact Corsair.** Additionally, please check the Corsair user forums to see if your issue has been reported by other users. If so, try their solutions first.
+**Please ensure your keyboard firmware is up to date. If you've just bought the keyboard, connect it to a Windows computer first and update the firmware from Corsair's official utility.**
 
-Connection issues can sometimes be solved by rebooting. Make sure that your system is up to date. If possible, update your computer's BIOS to the latest version as well.
+**Before reporting an issue, connect your keyboard to a Windows computer and see if the problem still occurs. If it does, contact Corsair.** Additionally, please check the Corsair user forums to see if your issue has been reported by other users. If so, try their solutions first.
 
-Common problems:
+Common issues:
+- **Problem:** ckb says "No devices connected" or "Driver inactive"
+- **Solution:** Try rebooting the computer and/or reinstalling ckb. Try removing the keyboard and plugging it back in. If the error doesn't go away, try the following:
 - **Problem:** Keyboard doesn't work in BIOS, doesn't work at boot
 - **Solution:** Some BIOSes have trouble communicating with the keyboard. They may prevent the keyboard from working correctly in the operating system as well. First, try booting the OS *without* the keyboard attached, and plug the keyboard in after logging in. If the keyboard works after the computer is running but does not work at boot, you may need to use the keyboard's BIOS mode option.
 - BIOS mode can be activated using the poll rate switch at the back of the keyboard. Slide it all the way to the position marked "BIOS". You should see the scroll lock light blinking to indicate that it is on. (Note: Unfortunately, this has its own problems - see Known Issues. You may need to activate BIOS mode when booting the computer and deactivate it after logging in).
@@ -161,5 +167,6 @@ Known issues
 
 - Using the keyboard in BIOS mode prevents the media keys (including mute and volume wheel), as well as the K95's G-keys from working. This is a hardware limitation.
 - The tray icon doesn't appear in some desktop environments. This is a known Qt bug. If you can't see the icon, reopen ckb to bring the window back.
-- When starting the driver manually on OSX, the Terminal window sometimes gets spammed with enter keys. You can stop it by unplugging and replugging the keyboard or by moving the poll rate switch.
-- When stopping the driver manually, the keyboard sometimes stops working completely. This seems to be a hardware/OS communication issue.
+- Mouse acceleration on OSX isn't exactly the same as the system's default acceleration. I do not know of a workaround for this. If you need the cursor to behave consistently, disable mouse acceleration.
+- When starting the driver manually, the Terminal window sometimes gets spammed with enter keys. You can stop it by unplugging and replugging the keyboard or by moving the poll rate switch.
+- When stopping the driver manually, the keyboard sometimes stops working completely. You can reconnect it by moving the poll rate switch.

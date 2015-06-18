@@ -295,8 +295,6 @@ usbdevice* usbadd(hid_dev_t handle, io_object_t** rm_notify){
 
 static CFRunLoopRef mainloop = 0;
 static IONotificationPortRef notify = 0;
-// input_mac.c
-extern void* krthread(void* context);
 
 static void remove_device(void* context, io_service_t device, uint32_t message_type, void* message_argument){
     if(message_type != kIOMessageServiceIsTerminated)

@@ -9,7 +9,7 @@
 pthread_mutex_t _euid_guard = PTHREAD_MUTEX_INITIALIZER;
 
 // Event helpers
-static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOptionBits flags, IOOptionBits options){
+static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOptionBits flags, IOOptionBits options, int silence_errors){
     // Hack #1: IOHIDPostEvent will fail with kIOReturnNotPrivileged if the event doesn't originate from the UID that owns /dev/console
     // You'd think being root would be good enough. You'd be wrong. ckb-daemon needs to run as root for other reasons though
     // (namely, being able to seize the physical IOHIDDevices) so what we do instead is change our EUID to the appropriate owner,
@@ -40,7 +40,7 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
         options = (options & ~kIOHIDSetRelativeCursorPosition) | kIOHIDSetCursorPosition;
     }
     kern_return_t res = IOHIDPostEvent(event, type, location, ev, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
-    if(res != kIOReturnSuccess)
+    if(res != kIOReturnSuccess && !silence_errors)
         ckb_warn("Post event failed: %x\n", res);
 
     if(uid != 0)
@@ -62,7 +62,7 @@ static void postevent_kp(io_connect_t event, int kbflags, int scancode, int down
         // Caps lock emits NX_FLAGSCHANGED when pressed, but also NX_SYSDEFINED on both press and release
         kp.compound.subType = NX_SUBTYPE_AUX_CONTROL_BUTTONS;
         kp.compound.misc.L[0] = aux_key_data(NX_KEYTYPE_CAPS_LOCK, down, is_repeat);
-        postevent(event, NX_SYSDEFINED, &kp, flags, options);
+        postevent(event, NX_SYSDEFINED, &kp, flags, options, 1);
         if(!down)
             return;
         memset(&kp, 0, sizeof(kp));
@@ -87,7 +87,8 @@ static void postevent_kp(io_connect_t event, int kbflags, int scancode, int down
         else if(scancode == kVK_Help)
             flags |= NX_HELPMASK;
     }
-    postevent(event, type, &kp, flags, options);
+    postevent(event, type, &kp, flags, options, !down || is_repeat);
+    // Don't print errors on key up or key repeat ^
 }
 
 // Mouse button
@@ -97,7 +98,7 @@ static void postevent_mb(io_connect_t event, int button, int down){
     mb.compound.subType = NX_SUBTYPE_AUX_MOUSE_BUTTONS;
     mb.compound.misc.L[0] = (1 << button);
     mb.compound.misc.L[1] = down ? (1 << button) : 0;
-    postevent(event, NX_SYSDEFINED, &mb, 0, 0);
+    postevent(event, NX_SYSDEFINED, &mb, 0, 0, !down);
     // Mouse presses actually generate two events, one with a bitfield of buttons, one with a button number
     memset(&mb, 0, sizeof(mb));
     UInt32 type;
@@ -114,7 +115,7 @@ static void postevent_mb(io_connect_t event, int button, int down){
     }
     if(down)
         mb.mouse.pressure = 255;
-    postevent(event, type, &mb, 0, 0);
+    postevent(event, type, &mb, 0, 0, 1);
 }
 
 // input_mac_mouse.c
@@ -132,7 +133,7 @@ static void postevent_wheel(io_connect_t event, int use_accel, int value){
         // If acceleration is disabled, use a fixed delta of 3
         mm.scrollWheel.deltaAxis1 = value * 3;
     }
-    postevent(event, NX_SCROLLWHEELMOVED, &mm, 0, 0);
+    postevent(event, NX_SCROLLWHEELMOVED, &mm, 0, 0, 0);
 }
 
 // Mouse axis
@@ -161,7 +162,7 @@ static void postevent_mm(io_connect_t event, int x, int y, int use_accel, uchar 
         mm.mouse.pressure = 255;
         mm.mouse.buttonNumber = button;
     }
-    postevent(event, type, &mm, 0, kIOHIDSetRelativeCursorPosition);
+    postevent(event, type, &mm, 0, kIOHIDSetRelativeCursorPosition, 1);
 }
 
 // Key repeat delay helper (result in ns)
@@ -183,30 +184,50 @@ void clearkeys(usbdevice* kb){
     }
 }
 
-int os_inputopen(usbdevice* kb){
+// Opens HID service. Returns kIOReturnSuccess on success.
+static int open_iohid(io_connect_t* connection){
+    io_iterator_t iter;
+    io_service_t service;
     // Open master port (if not done yet)
     static mach_port_t master = 0;
     kern_return_t res;
-    if(!master && (res = IOMasterPort(bootstrap_port, &master)) != KERN_SUCCESS){
+    if(!master && (res = IOMasterPort(bootstrap_port, &master)) != kIOReturnSuccess){
         master = 0;
         ckb_err("Unable to open master port: 0x%08x\n", res);
-        return -1;
+        goto failure;
     }
-    // Open an HID service
-    io_iterator_t iter;
-    if((res = IOServiceGetMatchingServices(master, IOServiceMatching(kIOHIDSystemClass), &iter)) != KERN_SUCCESS){
-        ckb_err("Unable to get input service iterator: 0x%08x\n", res);
-        return -2;
+    // Open the HID service
+    if((res = IOServiceGetMatchingServices(master, IOServiceMatching(kIOHIDSystemClass), &iter)) != kIOReturnSuccess)
+        goto failure;
+    service = IOIteratorNext(iter);
+    if(!service){
+        res = kIOReturnNotOpen;
+        goto failure_release_iter;
     }
-    io_service_t service = IOIteratorNext(iter);
-    if((res = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &kb->event)) != KERN_SUCCESS){
-        IOObjectRelease(iter);
-        ckb_err("Unable to open IO service: 0x%08x\n", res);
-        kb->event = 0;
-        return -3;
+    if((res = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, connection)) != kIOReturnSuccess){
+        *connection = 0;
+        goto failure_release_iter;
     }
-
+    // Finished; release objects and return success
+    IOObjectRelease(service);
+    failure_release_iter:
     IOObjectRelease(iter);
+    failure:
+    return res;
+}
+
+int os_inputopen(usbdevice* kb){
+    // The IO service isn't always ready at startup, so if it's not, wait until it is
+    IOReturn res;
+    while((res = open_iohid(&kb->event)) != kIOReturnSuccess){
+        if(res != kIOReturnNotOpen){
+            // If this is a more serious error, at least print a warning
+            ckb_err("Unable to open HID system: 0x%08x\n", res);
+            sleep(1);
+            continue;
+        }
+        usleep(10000);
+    }
     clearkeys(kb);
     return 0;
 }

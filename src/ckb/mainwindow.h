@@ -9,6 +9,17 @@
 #include "kbwidget.h"
 #include "settingswidget.h"
 
+#ifdef USE_LIBAPPINDICATOR
+#define signals_BACKUP signals
+#undef signals
+extern "C" {
+  #include <libappindicator/app-indicator.h>
+  #include <gtk/gtk.h>
+}
+#define signals signals_BACKUP
+#undef signals_BACKUP
+#endif // USE_LIBAPPINDICATOR
+
 // ckb version info (populated at load)
 extern float ckbGuiVersion;
 extern float ckbDaemonVersion;
@@ -39,6 +50,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void toggleTrayIcon(bool visible);
     void scanKeyboards();
     SettingsWidget* settingsWidget;
     QList<KbWidget*> kbWidgets;
@@ -46,6 +58,13 @@ public:
     QAction* restoreAction;
     QAction* closeAction;
 
+#ifdef USE_LIBAPPINDICATOR
+    bool                unityDesktop;
+    AppIndicator*       indicator;
+    GtkWidget*          indicatorMenu;
+    GtkWidget*          indicatorMenuQuitItem;
+    GtkWidget*          indicatorMenuRestoreItem;
+#endif // USE_LIBAPPINDICATOR
     QMenu*              trayIconMenu;
     QSystemTrayIcon*    trayIcon;
 
@@ -53,11 +72,13 @@ public:
 
     static MainWindow* mainWindow;
 
+public slots:
+    void showWindow();
+    void quitApp();
+
 private slots:
     void timerTick();
     void iconClicked(QSystemTrayIcon::ActivationReason reason);
-    void showWindow();
-    void quitApp();
     void cleanup();
     void showFwUpdateNotification(QWidget* widget, float version);
 

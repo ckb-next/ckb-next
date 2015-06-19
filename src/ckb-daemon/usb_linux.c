@@ -12,13 +12,13 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 #if 0   // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
         struct usbdevfs_bulktransfer transfer;
         memset(&transfer, 0, sizeof(transfer));
-        transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 5000; transfer.data = (void*)out_msg;
+        transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 500; transfer.data = (void*)out_msg;
 #else
-        struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, (void*)out_msg };
+        struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 500, (void*)out_msg };
 #endif
         res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
     } else {
-        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, (void*)out_msg };
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 500, (void*)out_msg };
         res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     }
     if(res == -EPERM){

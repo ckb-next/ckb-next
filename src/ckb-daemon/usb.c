@@ -189,22 +189,25 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
                 total_sent += res;
                 break;
             }
-            // Retry as long as the result is temporary failure
+            // Stop immediately if the program is shutting down
             if(reset_stop)
                 return 0;
+            // Retry as long as the result is temporary failure
         }
     }
     return total_sent;
 }
 
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line){
-    while(1){
+    // Try a maximum of 10 times
+    for(int try = 0; try < 10; try++){
         // Send the output message
         DELAY_SHORT(kb);
         int res = os_usbsend(kb, out_msg, 1, file, line);
         if(res == 0)
             return 0;
         else if(res == -1){
+            // Retry on temporary failure
             if(reset_stop)
                 return 0;
             continue;
@@ -216,10 +219,12 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             return 0;
         else if(res != -1)
             return res;
-        // Don't retry if the program is shutting down
         if(reset_stop)
             return 0;
     }
+    // Give up
+    ckb_err_fn("Too many recv failures. Dropping.\n", file, line);
+    return 0;
 }
 
 int closeusb(usbdevice* kb){

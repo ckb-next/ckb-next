@@ -11,7 +11,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), devpath(path), cmdpath(path + "/cmd"),
     features("N/A"), firmware("N/A"), pollrate("N/A"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), _layout(KeyMap::NO_LAYOUT),
-    _hwProfile(0), prevProfile(0), prevMode(0),
+    _dither(false), _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), _needsSave(false)
 {
     memset(hwLoading, 0, sizeof(hwLoading));
@@ -74,8 +74,9 @@ Kb::Kb(QObject *parent, const QString& path) :
     }
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
-    // Activate device, set FPS, and ask for hardware profile
+    // Activate device, set FPS and no dithering, and ask for hardware profile
     cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
+    cmd.write(QString("dither %1\n").arg(static_cast<int>(_dither)).toLatin1());
     cmd.write(QString("active\n@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
     hwLoading[0] = true;
     for(int i = 0; i < hwModeCount; i++){
@@ -124,6 +125,16 @@ void Kb::frameRate(int newFrameRate){
     }
 }
 
+void Kb::dither(bool newDither){
+    if(newDither == _dither)
+        return;
+    _dither = newDither;
+    _needsSave = true;
+    cmd.write(QString("dither %1\n").arg(static_cast<int>(newDither)).toLatin1());
+    cmd.flush();
+}
+
+
 void Kb::load(CkbSettings& settings){
     _needsSave = false;
     // Read layout
@@ -138,6 +149,9 @@ void Kb::load(CkbSettings& settings){
     cmd.write("\n");
     cmd.flush();
 #endif
+    // Read dithering setup.
+    _dither = settings.value("Dither").toBool();
+    cmd.write(QString("dither %1\n").arg(static_cast<int>(_dither)).toLatin1());
     emit infoUpdated();
 
     // Read profiles
@@ -178,6 +192,7 @@ void Kb::save(CkbSettings& settings){
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
     settings.setValue("Layout", KeyMap::getLayout(_layout));
+    settings.setValue("Dither", _dither);
 }
 
 void Kb::hwSave(){

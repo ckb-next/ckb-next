@@ -39,6 +39,10 @@ public:
     static inline int   frameRate()                     { return _frameRate; }
     static void         frameRate(int newFrameRate);
 
+    // Whether dithering is used
+    inline bool  dither()                        { return _dither; }
+    void         dither(bool newDither);
+
     // Profile saved to hardware
     inline KbProfile*   hwProfile() { return _hwProfile; }
     void                hwProfile(KbProfile* newHwProfile);
@@ -109,12 +113,15 @@ private slots:
 
 private:
     static int _frameRate;
+
     KbProfile*          _currentProfile;
     QList<KbProfile*>   _profiles;
     KbMode*             _currentMode;
 
     KeyMap::Model   _model;
     KeyMap::Layout  _layout;
+
+    bool _dither;
 
     // Current firmware update file
     QString fwUpdPath;

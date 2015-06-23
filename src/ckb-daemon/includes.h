@@ -31,12 +31,12 @@ typedef unsigned short ushort;
 
 // Output helpers
 // Use ckb_* to output info or ckb_*_fn to override the file/line numbers (useful when describing where a function was invoked from)
-#define ckb_fatal_nofile(fmt, args...)          printf("[F] " fmt, ## args)
-#define ckb_fatal_fn(fmt, file, line, args...)  printf("[F] %s (via %s:%d): " fmt, __func__, file, line, ## args)
-#define ckb_fatal(fmt, args...)                 printf("[F] %s (%s:%d): " fmt, __func__, __FILE_NOPATH__, __LINE__, ## args)
-#define ckb_err_nofile(fmt, args...)            printf("[E] " fmt, ## args)
-#define ckb_err_fn(fmt, file, line, args...)    printf("[E] %s (via %s:%d): " fmt, __func__, file, line, ## args)
-#define ckb_err(fmt, args...)                   printf("[E] %s (%s:%d): " fmt, __func__, __FILE_NOPATH__, __LINE__, ## args)
+#define ckb_fatal_nofile(fmt, args...)          fprintf(stderr, "[F] " fmt, ## args)
+#define ckb_fatal_fn(fmt, file, line, args...)  fprintf(stderr, "[F] %s (via %s:%d): " fmt, __func__, file, line, ## args)
+#define ckb_fatal(fmt, args...)                 fprintf(stderr, "[F] %s (%s:%d): " fmt, __func__, __FILE_NOPATH__, __LINE__, ## args)
+#define ckb_err_nofile(fmt, args...)            fprintf(stderr, "[E] " fmt, ## args)
+#define ckb_err_fn(fmt, file, line, args...)    fprintf(stderr, "[E] %s (via %s:%d): " fmt, __func__, file, line, ## args)
+#define ckb_err(fmt, args...)                   fprintf(stderr, "[E] %s (%s:%d): " fmt, __func__, __FILE_NOPATH__, __LINE__, ## args)
 #define ckb_warn_nofile(fmt, args...)           printf("[W] " fmt, ## args)
 #define ckb_warn_fn(fmt, file, line, args...)   printf("[W] %s (via %s:%d): " fmt, __func__, file, line, ## args)
 #define ckb_warn(fmt, args...)                  printf("[W] %s (%s:%d): " fmt, __func__, __FILE_NOPATH__, __LINE__, ## args)

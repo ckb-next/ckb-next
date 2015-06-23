@@ -14,9 +14,5 @@
     <string>Interactive</string>
     <key>LegacyTimers</key>
     <true/>
-    <key>StandardOutPath</key>
-    <string>/var/log/ckb.log</string>
-    <key>Debug</key>
-    <true />
 </dict>
 </plist>

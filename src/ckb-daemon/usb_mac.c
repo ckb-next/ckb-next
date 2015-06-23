@@ -8,14 +8,16 @@
 
 #define INCOMPLETE (hid_dev_t)-1l
 
+#define IS_TEMP_FAILURE(res)        ((res) == kIOUSBTransactionTimeout || (res) == kIOUSBTransactionReturned || (res) == kIOUSBPipeStalled)
+#define IS_DISCONNECT_FAILURE(res)  ((res) == kIOReturnBadArgument || (res) == kIOReturnNoDevice || (res) == kIOReturnNotOpen || (res) == kIOReturnNotAttached || (res) == kIOReturnExclusiveAccess)
+
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
     // Firmware versions above 1.20 use Output instead of Feature reports for improved performance
     // It doesn't work well when receiving data, however (Not sure why...linux doesn't have that problem)
     IOHIDReportType type = (kb->fwversion >= 0x120 && !is_recv ? kIOHIDReportTypeOutput : kIOHIDReportTypeFeature);
-    kern_return_t res = (*kb->handle)->setReport(kb->handle, type, 0, out_msg, MSG_SIZE, 500, 0, 0, 0);
+    kern_return_t res = (*kb->handle)->setReport(kb->handle, type, 0, out_msg, MSG_SIZE, 5000, 0, 0, 0);
     kb->lastresult = res;
-    if(res == 0xe0004051){
-        // Can't find this error documented, but it seems to indicate packet transmission failure
+    if(IS_TEMP_FAILURE(res)){
         ckb_warn_fn("Got return value 0x%x (continuing)\n", file, line, res);
         return -1;
     } else if(res != kIOReturnSuccess){
@@ -27,9 +29,9 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     CFIndex length = MSG_SIZE;
-    kern_return_t res = (*kb->handle)->getReport(kb->handle, kIOHIDReportTypeFeature, 0, in_msg, &length, 500, 0, 0, 0);
+    kern_return_t res = (*kb->handle)->getReport(kb->handle, kIOHIDReportTypeFeature, 0, in_msg, &length, 5000, 0, 0, 0);
     kb->lastresult = res;
-    if(res == 0xe0004051){
+    if(IS_TEMP_FAILURE(res)){
         ckb_warn_fn("Got return value 0x%x (continuing)\n", file, line, res);
         return -1;
     } else if(res != kIOReturnSuccess){
@@ -48,7 +50,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 
 int os_resetusb(usbdevice* kb, const char* file, int line){
     kern_return_t res = kb->lastresult;
-    if(res == kIOReturnBadArgument || res == kIOReturnNotOpen || res == kIOReturnNotAttached)
+    if(IS_DISCONNECT_FAILURE(res))
         // Don't try if the keyboard was disconnected
         return -2;
     // Reset all handles

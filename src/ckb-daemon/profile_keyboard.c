@@ -5,12 +5,10 @@
 static int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
     // Ask for mode's name
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x16, 0x01, mode + 1, 0 };
-    if(!usbsend(kb, data_pkt, 1))
+    uchar in_pkt[MSG_SIZE];
+    if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
-    // Wait for the response
-    if(!usbrecv(kb, data_pkt))
-        return -1;
-    memcpy(hw->name[mode + 1], data_pkt + 4, MD_NAME_LEN * 2);
+    memcpy(hw->name[mode + 1], in_pkt + 4, MD_NAME_LEN * 2);
     // Load the RGB setting
     return loadrgb_kb(kb, hw->light + mode, mode);
 }
@@ -27,24 +25,14 @@ int cmd_hwload_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const c
     int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
     for(int i = 0; i <= modes; i++){
         data_pkt[0][3] = i;
-        if(!usbsend(kb, data_pkt[0], 1)){
-            free(hw);
-            return -1;
-        }
-        // Wait for the response
-        if(!usbrecv(kb, in_pkt)){
+        if(!usbrecv(kb, data_pkt[0], in_pkt)){
             free(hw);
             return -1;
         }
         memcpy(hw->id + i, in_pkt + 4, sizeof(usbid));
     }
     // Ask for profile name
-    if(!usbsend(kb, data_pkt[1], 1)){
-        free(hw);
-        return -1;
-    }
-    // Wait for the response
-    if(!usbrecv(kb, in_pkt)){
+    if(!usbrecv(kb, data_pkt[1], in_pkt)){
         free(hw);
         return -1;
     }

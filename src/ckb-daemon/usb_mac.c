@@ -8,27 +8,33 @@
 
 #define INCOMPLETE (hid_dev_t)-1l
 
-int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
-    for(int i = 0; i < count; i++){
-        DELAY_SHORT(kb);
-        // Firmware versions above 1.20 use Output instead of Feature reports for improved performance
-        IOHIDReportType type = (kb->fwversion >= 0x120 ? kIOHIDReportTypeOutput : kIOHIDReportTypeFeature);
-        kern_return_t res = (*kb->handle)->setReport(kb->handle, type, 0, messages + i * MSG_SIZE, MSG_SIZE, 5000, 0, 0, 0);
-        kb->lastresult = res;
-        if(res != kIOReturnSuccess){
-            ckb_err_fn("Got return value 0x%x\n", file, line, res);
-            return 0;
-        }
+#define IS_TEMP_FAILURE(res)        ((res) == kIOUSBTransactionTimeout || (res) == kIOUSBTransactionReturned || (res) == kIOUSBPipeStalled)
+#define IS_DISCONNECT_FAILURE(res)  ((res) == kIOReturnBadArgument || (res) == kIOReturnNoDevice || (res) == kIOReturnNotOpen || (res) == kIOReturnNotAttached || (res) == kIOReturnExclusiveAccess)
+
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
+    // Firmware versions above 1.20 use Output instead of Feature reports for improved performance
+    // It doesn't work well when receiving data, however (Not sure why...linux doesn't have that problem)
+    IOHIDReportType type = (kb->fwversion >= 0x120 && !is_recv ? kIOHIDReportTypeOutput : kIOHIDReportTypeFeature);
+    kern_return_t res = (*kb->handle)->setReport(kb->handle, type, 0, out_msg, MSG_SIZE, 5000, 0, 0, 0);
+    kb->lastresult = res;
+    if(IS_TEMP_FAILURE(res)){
+        ckb_warn_fn("Got return value 0x%x (continuing)\n", file, line, res);
+        return -1;
+    } else if(res != kIOReturnSuccess){
+        ckb_err_fn("Got return value 0x%x\n", file, line, res);
+        return 0;
     }
-    return MSG_SIZE * count;
+    return MSG_SIZE;
 }
 
-int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
-    DELAY_MEDIUM(kb);
+int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     CFIndex length = MSG_SIZE;
-    kern_return_t res = (*kb->handle)->getReport(kb->handle, kIOHIDReportTypeFeature, 0, message, &length, 5000, 0, 0, 0);
+    kern_return_t res = (*kb->handle)->getReport(kb->handle, kIOHIDReportTypeFeature, 0, in_msg, &length, 5000, 0, 0, 0);
     kb->lastresult = res;
-    if(res != kIOReturnSuccess){
+    if(IS_TEMP_FAILURE(res)){
+        ckb_warn_fn("Got return value 0x%x (continuing)\n", file, line, res);
+        return -1;
+    } else if(res != kIOReturnSuccess){
         ckb_err_fn("Got return value 0x%x\n", file, line, res);
         return 0;
     }
@@ -44,7 +50,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 
 int os_resetusb(usbdevice* kb, const char* file, int line){
     kern_return_t res = kb->lastresult;
-    if(res == kIOReturnBadArgument || res == kIOReturnNotOpen || res == kIOReturnNotAttached)
+    if(IS_DISCONNECT_FAILURE(res))
         // Don't try if the keyboard was disconnected
         return -2;
     // Reset all handles
@@ -291,8 +297,6 @@ usbdevice* usbadd(hid_dev_t handle, io_object_t** rm_notify){
 
 static CFRunLoopRef mainloop = 0;
 static IONotificationPortRef notify = 0;
-// input_mac.c
-extern void* krthread(void* context);
 
 static void remove_device(void* context, io_service_t device, uint32_t message_type, void* message_argument){
     if(message_type != kIOMessageServiceIsTerminated)

@@ -6,43 +6,48 @@
 
 #ifdef OS_LINUX
 
-int os_usbsend(usbdevice* kb, uchar* messages, int count, const char* file, int line){
-    for(int i = 0; i < count; i++){
-        DELAY_SHORT(kb);
-        int res;
-        if(kb->fwversion >= 0x120){
-#if 0       // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
-            struct usbdevfs_bulktransfer transfer;
-            memset(&transfer, 0, sizeof(transfer));
-            transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 5000; transfer.data = messages + MSG_SIZE * i;
+static char kbsyspath[DEV_MAX][FILENAME_MAX];
+
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
+    int res;
+    if(kb->fwversion >= 0x120){
+#if 0   // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
+        struct usbdevfs_bulktransfer transfer;
+        memset(&transfer, 0, sizeof(transfer));
+        transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 5000; transfer.data = (void*)out_msg;
 #else
-            struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, messages + MSG_SIZE * i };
+        struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, (void*)out_msg };
 #endif
-            res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
-        } else {
-            struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, messages + MSG_SIZE * i };
-            res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-        }
-        if(res <= 0){
-            ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data written");
-            return 0;
-        }
-        if(res != MSG_SIZE)
-            ckb_err_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
+    } else {
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, (void*)out_msg };
+        res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     }
-    return MSG_SIZE * count;
+    if(res <= 0){
+        if(res == -1 && errno == ETIMEDOUT){
+            ckb_warn_fn("%s (continuing)\n", file, line, strerror(errno));
+            return -1;
+        }
+        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
+        return 0;
+    } else if(res != MSG_SIZE)
+        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+    return res;
 }
 
-int os_usbrecv(usbdevice* kb, uchar* message, const char* file, int line){
+int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     DELAY_MEDIUM(kb);
-    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, message };
+    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, in_msg };
     int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     if(res <= 0){
-        ckb_err_fn("%s\n", file, line, res ? strerror(-res) : "No data read");
+        if(res == -1 && errno == ETIMEDOUT){
+            ckb_warn_fn("%s (continuing)\n", file, line, strerror(errno));
+            return -1;
+        }
+        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data read");
         return 0;
-    }
-    if(res != MSG_SIZE)
-        ckb_err_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+    } else if(res != MSG_SIZE)
+        ckb_warn_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     return res;
 }
 
@@ -175,6 +180,7 @@ void os_closeusb(usbdevice* kb){
     udev_device_unref(kb->udev);
     kb->handle = 0;
     kb->udev = 0;
+    kbsyspath[INDEX_OF(kb, keyboard)][0] = 0;
 }
 
 int usbclaim(usbdevice* kb, int rgb){
@@ -235,12 +241,22 @@ int os_setupusb(usbdevice* kb){
 
 int usbadd(struct udev_device* dev, short vendor, short product){
     const char* path = udev_device_get_devnode(dev);
+    const char* syspath = udev_device_get_syspath(dev);
+    if(!path || !syspath || path[0] == 0 || syspath[0] == 0){
+        ckb_err("Failed to get device path\n");
+        return -1;
+    }
     // Find a free USB slot
     for(int index = 1; index < DEV_MAX; index++){
         usbdevice* kb = keyboard + index;
-        if(pthread_mutex_trylock(dmutex(kb)))
+        if(pthread_mutex_trylock(dmutex(kb))){
             // If the mutex is locked then the device is obviously in use, so keep going
+            if(!strcmp(syspath, kbsyspath[index])){
+                // Make sure this existing keyboard doesn't have the same syspath (this shouldn't happen)
+                return 0;
+            }
             continue;
+        }
         if(!IS_CONNECTED(kb)){
             // Open the sysfs device
             kb->handle = open(path, O_RDWR);
@@ -254,6 +270,8 @@ int usbadd(struct udev_device* dev, short vendor, short product){
                 kb->udev = dev;
                 kb->vendor = vendor;
                 kb->product = product;
+                strncpy(kbsyspath[index], syspath, FILENAME_MAX);
+                // Mutex remains locked
                 setupusb(kb);
                 return 0;
             }
@@ -303,10 +321,12 @@ static int usb_add_device(struct udev_device* dev){
 // Remove a udev device.
 static void usb_rm_device(struct udev_device* dev){
     // Device removed. Look for it in our list of keyboards
-    const char* path = udev_device_get_syspath(dev);
+    const char* syspath = udev_device_get_syspath(dev);
+    if(!syspath || syspath[0] == 0)
+        return;
     for(int i = 1; i < DEV_MAX; i++){
         pthread_mutex_lock(devmutex + i);
-        if(keyboard[i].udev && !strcmp(path, udev_device_get_syspath(keyboard[i].udev)))
+        if(!strcmp(syspath, kbsyspath[i]))
             closeusb(keyboard + i);
         pthread_mutex_unlock(devmutex + i);
     }

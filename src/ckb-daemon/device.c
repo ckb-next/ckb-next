@@ -26,7 +26,7 @@ int start_dev(usbdevice* kb, int makeactive){
     // Load profile from device
     if(!kb->hw){
         if(hwloadprofile(kb, 1))
-            return -2;
+            ckb_warn("Unable to load hardware profile\n");
     }
     // Active software mode if requested
     if(makeactive)

@@ -152,12 +152,16 @@ int _resetusb(usbdevice* kb, const char* file, int line){
         return res;
     DELAY_LONG(kb);
     // Re-initialize the device
-    kb->vtable->start(kb, kb->active);
-    kb->vtable->updatergb(kb, 1);
-    return res ? -1 : 0;
+    if(kb->vtable->start(kb, kb->active) != 0)
+        return -1;
+    if(kb->vtable->updatergb(kb, 1) != 0)
+        return -1;
+    return 0;
 }
 
 int usb_tryreset(usbdevice* kb){
+    if(reset_stop)
+        return -1;
     ckb_info("Attempting reset...\n");
     while(1){
         int res = resetusb(kb);
@@ -170,6 +174,60 @@ int usb_tryreset(usbdevice* kb){
     }
     ckb_err("Reset failed. Disconnecting.\n");
     return -1;
+}
+
+int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line){
+    int total_sent = 0;
+    for(int i = 0; i < count; i++){
+        // Send each message via the OS function
+        while(1){
+            DELAY_SHORT(kb);
+            int res = os_usbsend(kb, messages + i * MSG_SIZE, 0, file, line);
+            if(res == 0)
+                return 0;
+            else if(res != -1){
+                total_sent += res;
+                break;
+            }
+            // Stop immediately if the program is shutting down
+            if(reset_stop)
+                return 0;
+            // Retry as long as the result is temporary failure
+            DELAY_LONG(kb);
+        }
+    }
+    return total_sent;
+}
+
+int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line){
+    // Try a maximum of 10 times
+    for(int try = 0; try < 10; try++){
+        // Send the output message
+        DELAY_SHORT(kb);
+        int res = os_usbsend(kb, out_msg, 1, file, line);
+        if(res == 0)
+            return 0;
+        else if(res == -1){
+            // Retry on temporary failure
+            if(reset_stop)
+                return 0;
+            DELAY_LONG(kb);
+            continue;
+        }
+        // Wait for the response
+        DELAY_MEDIUM(kb);
+        res = os_usbrecv(kb, in_msg, file, line);
+        if(res == 0)
+            return 0;
+        else if(res != -1)
+            return res;
+        if(reset_stop)
+            return 0;
+        DELAY_LONG(kb);
+    }
+    // Give up
+    ckb_err_fn("Too many recv failures. Dropping.\n", file, line);
+    return 0;
 }
 
 int closeusb(usbdevice* kb){

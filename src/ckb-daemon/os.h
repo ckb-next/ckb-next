@@ -50,6 +50,7 @@
 #include <IOKit/hid/IOHIDLib.h>
 #include <IOKit/hidsystem/IOHIDLib.h>
 #include <IOKit/hidsystem/ev_keymap.h>
+#include <IOKit/usb/USB.h>
 
 typedef IOHIDDeviceDeviceInterface** hid_dev_t;
 

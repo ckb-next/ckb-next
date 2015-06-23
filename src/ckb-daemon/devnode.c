@@ -252,7 +252,8 @@ int mkdevpath(usbdevice* kb){
 int rmdevpath(usbdevice* kb){
     euid_guard_start;
     int index = INDEX_OF(kb, keyboard);
-    close(kb->infifo - 1);
+    if(kb->infifo != 0)
+        close(kb->infifo - 1);
     kb->infifo = 0;
     for(int i = 0; i < OUTFIFO_MAX; i++)
         _rmnotifynode(kb, i);

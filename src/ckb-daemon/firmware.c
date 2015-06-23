@@ -11,12 +11,8 @@
 int getfwversion(usbdevice* kb){
     // Ask board for firmware info
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x01, 0 };
-    if(!usbsend(kb, data_pkt, 1))
-        return -1;
-    // Wait for the response
-    DELAY_SHORT(kb);
     uchar in_pkt[MSG_SIZE];
-    if(!usbrecv(kb, in_pkt))
+    if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
     if(in_pkt[0] != 0x0e || in_pkt[1] != 0x01){
         ckb_err("Bad input header\n");

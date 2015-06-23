@@ -193,6 +193,7 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
             if(reset_stop)
                 return 0;
             // Retry as long as the result is temporary failure
+            DELAY_LONG(kb);
         }
     }
     return total_sent;
@@ -210,6 +211,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             // Retry on temporary failure
             if(reset_stop)
                 return 0;
+            DELAY_LONG(kb);
             continue;
         }
         // Wait for the response
@@ -221,6 +223,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             return res;
         if(reset_stop)
             return 0;
+        DELAY_LONG(kb);
     }
     // Give up
     ckb_err_fn("Too many recv failures. Dropping.\n", file, line);

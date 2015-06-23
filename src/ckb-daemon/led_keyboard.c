@@ -22,7 +22,7 @@ static uchar bit_reverse_table[256] = { O8(0) };
 static uchar ordered8to3(int index, uchar value){
     int m = value * 7;
     int b = m / 255;
-    if((m % 255) > bit_reverse_table[index])
+    if((m % 255) > bit_reverse_table[index & 0xff])
         b++;
     return b;
 }

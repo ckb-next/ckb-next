@@ -102,7 +102,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "right",      0x8b, KEY_RIGHT },
     { "lock",       0x08, KEY_CORSAIR },
     { "mute",       0x14, KEY_MUTE },
-    { "stop",       0x20, KEY_STOP },
+    { "stop",       0x20, KEY_STOPCD },
     { "prev",       0x2c, KEY_PREVIOUSSONG },
     { "play",       0x38, KEY_PLAYPAUSE },
     { "next",       0x44, KEY_NEXTSONG },

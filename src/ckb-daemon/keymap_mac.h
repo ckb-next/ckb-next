@@ -132,7 +132,7 @@
 #define KEY_MUTE            (KEY_MEDIA + NX_KEYTYPE_MUTE)
 #define KEY_VOLUMEUP        (KEY_MEDIA + NX_KEYTYPE_SOUND_UP)
 #define KEY_VOLUMEDOWN      (KEY_MEDIA + NX_KEYTYPE_SOUND_DOWN)
-#define KEY_STOP            -1                                  // OSX has no stop key
+#define KEY_STOPCD          -1                                  // OSX has no stop key
 #define KEY_PREVIOUSSONG    (KEY_MEDIA + NX_KEYTYPE_PREVIOUS)
 #define KEY_PLAYPAUSE       (KEY_MEDIA + NX_KEYTYPE_PLAY)
 #define KEY_NEXTSONG        (KEY_MEDIA + NX_KEYTYPE_NEXT)

@@ -122,6 +122,7 @@ void anim_remove(float x, float y){
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
+    // Start or stop animation on a key
     if(state)
         anim_add(x, y);
     else
@@ -129,6 +130,7 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
 }
 
 void ckb_start(ckb_runctx* context, int state){
+    // Start or stop animation on the edge of the keyboard
     if(state)
         anim_add(left, top);
     else if(kprelease)
@@ -136,6 +138,7 @@ void ckb_start(ckb_runctx* context, int state){
 }
 
 void ckb_time(ckb_runctx* context, double delta){
+    // Advance all waves, remove them if they pass the edge
     double length = animlength * width;
     for(unsigned i = 0; i < ANIM_MAX; i++){
         if(anim[i].active){
@@ -148,6 +151,7 @@ void ckb_time(ckb_runctx* context, double delta){
 
 int ckb_frame(ckb_runctx* context){
     CKB_KEYCLEAR(context);
+    // Draw keys
     double length = animlength * width;
     unsigned count = context->keycount;
     ckb_key* keys = context->keys;
@@ -156,14 +160,19 @@ int ckb_frame(ckb_runctx* context){
             for(ckb_key* key = keys; key < keys + count; key++){
                 // Translate and rotate the key position into the animation's coordinate system
                 float x = key->x - anim[i].x, y = key->y - anim[i].y;
+                // Distance is the current X minus the key's X
                 float distance = anim[i].curx - (x * cos(angle) - y * sin(angle));
                 distance /= length;
+                // If symmetric, use absolute distance
                 if(symmetric)
                     distance = fabs(distance);
                 else if(distance >= -0.005f && distance < 0.f)
+                    // If not symmetric, round values close to 0
                     distance = 0.f;
                 if(distance > 1.f && distance <= 1.005f)
+                    // Round values close to 1
                     distance = 1.f;
+                // Pick gradient position based on distance
                 if(distance <= 1.f && distance >= 0.){
                     float a, r, g, b;
                     ckb_grad_color(&a, &r, &g, &b, &animcolor, distance * 100.);

@@ -36,7 +36,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
-
+    // Unused
 }
 
 typedef struct {
@@ -47,6 +47,7 @@ rgb* current = 0;
 rgb* target = 0;
 double phase = -1.;
 
+// Make a new target color for each key
 void newtarget(rgb* data, unsigned count){
     for(unsigned i = 0; i < count; i++){
         rgb* key = data + i;
@@ -66,13 +67,17 @@ void ckb_init(ckb_runctx* context){
 
 void ckb_start(ckb_runctx* context, int state){
     if(state == 0){
+        // Stop animation
         phase = -1.;
         return;
     }
+    // Start animation
     phase = 0.;
     ckb_key* keys = context->keys;
     unsigned count = context->keycount;
+    // Randomize starting colors and pick a random target
     newtarget(current, count);
+    // Over the course of the animation, the keys fade between the current pattern and the target pattern
     newtarget(target, count);
     // Set all keys to current
     for(unsigned i = 0; i < count; i++){
@@ -89,8 +94,10 @@ void ckb_start(ckb_runctx* context, int state){
 void ckb_time(ckb_runctx* context, double delta){
     if(phase < 0.)
         return;
+    // Advance animation
     phase += delta;
     if(phase > 1.){
+        // If the animation is complete, pick a new target pattern and start again
         phase -= 1.;
         rgb* temp = target;
         target = current;
@@ -107,6 +114,7 @@ int ckb_frame(ckb_runctx* context){
     ckb_key* keys = context->keys;
     unsigned count = context->keycount;
     for(unsigned i = 0; i < count; i++){
+        // Color each key according to the position between the last color set and the new color set
         ckb_key* key = keys + i;
         key->a = round(current[i].a * (1. - phase) + target[i].a * phase);
         key->r = round(current[i].r * (1. - phase) + target[i].r * phase);

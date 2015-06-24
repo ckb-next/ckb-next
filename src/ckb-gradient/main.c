@@ -87,6 +87,7 @@ void ckb_start(ckb_runctx* context, int state){
 }
 
 void ckb_time(ckb_runctx* context, double delta){
+    // Advance animation on each key
     unsigned count = context->keycount;
     for(unsigned i = 0; i < count; i++){
         float phase = target[i];
@@ -97,6 +98,7 @@ void ckb_time(ckb_runctx* context, double delta){
 }
 
 int ckb_frame(ckb_runctx* context){
+    // Draw key colors
     unsigned count = context->keycount;
     for(unsigned i = 0; i < count; i++){
         float phase = target[i];

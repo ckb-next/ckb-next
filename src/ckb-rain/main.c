@@ -6,7 +6,7 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Raindrop");
-    CKB_VERSION("0.9");
+    CKB_VERSION("0.10");
     CKB_COPYRIGHT("2014-2015", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{5D6695AF-0496-41E2-BEE7-F7D0ABAA49E9}");
@@ -84,6 +84,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
+    // Add a drop on keypress
     if(state)
         drop_add(x, y, 0);
 }
@@ -91,17 +92,14 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
 double tick = -1.;
 
 void ckb_start(ckb_runctx* context, int state){
+    // Start or stop random spawning
     tick = state ? 0. : -1.;
 }
 
 void ckb_time(ckb_runctx* context, double delta){
-    if(delta <= 0. || tick < 0.)
+    if(delta <= 0.)
         return;
-    tick += delta;
-    if(tick > period && spawn){
-        drop_add(rand() / (double)RAND_MAX * context->width, rand() / (double)RAND_MAX * context->height, 1);
-        tick -= period;
-    }
+    // Process existing drops
     for(unsigned i = 0; i < DROP_MAX; i++){
         if(drop[i].active){
             drop[i].size += delta * speed;
@@ -109,26 +107,40 @@ void ckb_time(ckb_runctx* context, double delta){
                 drop[i].active = 0;
         }
     }
+    if(tick >= 0.){
+        // Spawn a new randomly-placed drop, if the spawn time has passed
+        tick += delta;
+        if(tick > period && spawn){
+            drop_add(rand() / (double)RAND_MAX * context->width, rand() / (double)RAND_MAX * context->height, 1);
+            tick -= period;
+        }
+    }
 }
 
 int ckb_frame(ckb_runctx* context){
     CKB_KEYCLEAR(context);
+    // Draw drops
     for(unsigned i = 0; i < DROP_MAX; i++){
         if(drop[i].active){
             unsigned count = context->keycount;
             ckb_key* keys = context->keys;
             for(ckb_key* key = keys; key < keys + count; key++){
+                // Calculate distance between key and drop, relative to the current drop size
                 float distance = drop[i].size - sqrt(pow(key->x - drop[i].x, 2.f) + pow(key->y - drop[i].y, 2.f));
+                // On the outside, cut the distance in half
                 if(distance < 0.)
                     distance = -distance / 2.;
+                // Scale according to drop size (fade-out radius expands as the drop becomes larger)
                 float scale = drop[i].size / 4.f;
                 if(scale < 10.)
                     scale = 10.;
                 distance /= scale;
                 if(distance <= 1.){
+                    // Scale alpha according to size divided by maximum size (drops fade out as they expand)
                     float ascale = (1.f - drop[i].size / drop[i].msize);
                     if(ascale > 1.f)
                         ascale = 1.f;
+                    // Apply color
                     ckb_alpha_blend(key, (1.f - distance) * ascale * aa * 255., ar, ag, ab);
                 }
             }

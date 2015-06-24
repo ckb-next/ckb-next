@@ -94,6 +94,7 @@ void anim_remove(float x, float y){
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
+    // Add or remove a ring on this key
     if(state)
         anim_add(x, y, context->width, context->height);
     else if(kprelease)
@@ -101,6 +102,7 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
 }
 
 void ckb_start(ckb_runctx* context, int state){
+    // Add or remove a ring in the center of the keyboard
     if(state)
         anim_add(context->width / 2.f, context->height / 2.f, context->width, context->height);
     else
@@ -108,6 +110,7 @@ void ckb_start(ckb_runctx* context, int state){
 }
 
 void ckb_time(ckb_runctx* context, double delta){
+    // Advance animation on all rings
     for(unsigned i = 0; i < ANIM_MAX; i++){
         if(anim[i].active){
             anim[i].cursize += kbsize * delta;
@@ -119,19 +122,25 @@ void ckb_time(ckb_runctx* context, double delta){
 
 int ckb_frame(ckb_runctx* context){
     CKB_KEYCLEAR(context);
+    // Draw rings
     unsigned count = context->keycount;
     ckb_key* keys = context->keys;
     for(unsigned i = 0; i < ANIM_MAX; i++){
         if(anim[i].active){
             for(ckb_key* key = keys; key < keys + count; key++){
+                // Calculate distance between this key and the ring
                 float distance = anim[i].cursize - sqrt(pow(key->x - anim[i].x, 2.f) + pow(key->y - anim[i].y, 2.f));
+                // Divide distance by ring size (use absolute distance if symmetric)
                 distance /= animlength;
                 if(symmetric)
                     distance = fabs(distance);
                 else if(distance >= -0.005f && distance < 0.f)
+                    // If not symmetric, round down values very close to zero
                     distance = 0.f;
                 if(distance > 1.f && distance <= 1.005f)
+                    // Round values close to 1
                     distance = 1.f;
+                // Blend color gradient according to position
                 if(distance >= 0. && distance <= 1.f){
                     float a, r, g, b;
                     ckb_grad_color(&a, &r, &g, &b, &animcolor, distance * 100.);

@@ -6,6 +6,7 @@
 #include <QShortcut>
 #include <QMessageBox>
 #include <QMenuBar>
+#include <unistd.h>
 
 extern QSharedMemory appShare;
 
@@ -204,14 +205,29 @@ void MainWindow::closeEvent(QCloseEvent *event){
 }
 
 void MainWindow::timerTick(){
-    // Check if another instance requested this in the foreground
+    // Check shared memory for changes
     if(appShare.lock()){
         void* data = appShare.data();
-        if((QString)QByteArray((const char*)data) == "Open")
-            showWindow();
-        // Remove the request
-        *(char*)data = 0;
+        QStringList commands = QString((const char*)data).split("\n");
+        // Restore PID, remove all other data
+        snprintf((char*)appShare.data(), appShare.size(), "PID %ld", (long)getpid());
         appShare.unlock();
+        // Parse commands
+        foreach(const QString& line, commands){
+            // Old ckb option line - bring application to foreground
+            if(line == "Open")
+                showWindow();
+            if(line.startsWith("Option ")){
+                // New ckb option line
+                QString option = line.split(" ")[1];
+                if(option == "Open")
+                    // Bring to foreground
+                    showWindow();
+                else if(option == "Close")
+                    // Quit application
+                    qApp->quit();
+            }
+        }
     }
     // Check for firmware updates (when appropriate)
     if(!CkbSettings::get("Program/DisableAutoFWCheck").toBool())

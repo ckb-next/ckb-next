@@ -63,7 +63,6 @@ if [[ ! -d $BINDIR ]]; then
     echo "There is nothing to do."
     finish 0
 fi
-
 # Offer to install ckb at a standard location
 shopt -s nocasematch
 read -rp "Install ckb system-wide [Y/n]? " doinstall
@@ -191,8 +190,11 @@ sleep 1
 echo ""
 read -rp "Start ckb now [Y/n]? " dolaunch
 [[ $dolaunch =~ no? ]] && exit 0
-sleep 0.5
 APP=$PREFIX/ckb
 [[ "$OSTYPE" == "darwin"* ]] && APP=$APP.app/Contents/MacOS/ckb
+# Ask ckb to close if there's an instance already running
+$APP --close >/dev/null 2>&1
+sleep 0.5
+# Launch
 nohup $APP >/dev/null 2>&1 &
 exit 0

@@ -3,6 +3,9 @@
 #include <QDateTime>
 #include <QSharedMemory>
 #include <cstring>
+#include <unistd.h>
+#include <signal.h>
+#include <errno.h>
 
 QSharedMemory appShare("ckb");
 
@@ -12,17 +15,64 @@ QSharedMemory appShare("ckb");
 extern "C" void disableAppNap();
 #endif
 
-bool isRunning(bool showWindow){
-    if(!appShare.create(16)){
-        if(!appShare.attach() || !appShare.lock())
-            return false;
-        if(showWindow){
-            void* data = appShare.data();
-            snprintf((char*)data, 16, "Open");
+// Shared memory sizes
+#define SHMEM_SIZE      128 * 1024
+#define SHMEM_SIZE_V015 16
+
+// Scan shared memory for an active PID
+static bool pidActive(const QStringList& lines){
+    foreach(const QString& line, lines){
+        if(line.startsWith("PID ")){
+            bool ok;
+            pid_t pid;
+            // Valid PID found?
+            if((pid = line.split(" ")[1].toLong(&ok)) > 0 && ok){
+                // kill -0 does nothing to the application, but checks if it's running
+                return (kill(pid, 0) == 0 || errno != ESRCH);
+            }
         }
-        appShare.unlock();
-        return true;
     }
+    // If the PID wasn't listed in the shmem, assume it is running
+    return true;
+}
+
+// Check if the application is running. Optionally write something to its shared memory.
+static bool isRunning(const char* command){
+    // Try to create shared memory (if successful, application was not already running)
+    if(!appShare.create(SHMEM_SIZE) || !appShare.lock()){
+        // Lock existing shared memory
+        if(!appShare.attach() || !appShare.lock())
+            return true;
+        bool running = false;
+        if(appShare.size() == SHMEM_SIZE_V015){
+            // Old shmem - no PID listed so assume the process is running, and print the command directly to the buffer
+            if(command){
+                void* data = appShare.data();
+                snprintf((char*)data, SHMEM_SIZE_V015, "%s", command);
+            }
+            running = true;
+        } else {
+            // New shmem. Scan the contents of the shared memory for a PID
+            QStringList lines = QString((const char*)appShare.constData()).split("\n");
+            if(pidActive(lines)){
+                running = true;
+                // Append the command
+                if(command){
+                    lines.append(QString("Option ") + command);
+                    QByteArray newMem = lines.join("\n").left(SHMEM_SIZE).toLatin1();
+                    // Copy the NUL byte as well as the string
+                    memcpy(appShare.data(), newMem.constData(), newMem.length() + 1);
+                }
+            }
+        }
+        if(running){
+            appShare.unlock();
+            return true;
+        }
+    }
+    // Not already running. Initialize the shared memory with our PID
+    snprintf((char*)appShare.data(), appShare.size(), "PID %ld", (long)getpid());
+    appShare.unlock();
     return false;
 }
 
@@ -40,8 +90,24 @@ int main(int argc, char *argv[]){
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 
+    // If launched with --version, print version info and then quit
+    if(qApp->arguments().contains("--version")){
+        printf("ckb %s\n", CKB_VERSION_STR);
+        return 0;
+    }
+
+    // Kill existing app when launched with --close
+    if(qApp->arguments().contains("--close")){
+        if(isRunning("Close"))
+            printf("Asking existing instance to close.\n");
+        else
+            printf("ckb is not running.\n");
+        return 0;
+    }
+
+    // Launch in background if requested
     bool background = qApp->arguments().contains("--background");
-    if(isRunning(!background)){
+    if(isRunning(background ? 0 : "Open")){
         printf("ckb is already running. Exiting.\n");
         return 0;
     }

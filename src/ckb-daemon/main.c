@@ -65,6 +65,39 @@ void localecase(char* dst, size_t length, const char* src){
 int main(int argc, char** argv){
     printf("    ckb: Corsair RGB driver %s\n", CKB_VERSION_STR);
 
+    // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
+    for(int i = 1; i < argc; i++){
+        if(!strcmp(argv[i], "--help")){
+            printf(
+#ifdef OS_MAC
+                        "Usage: ckb-daemon [--gid=<gid>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
+#else
+                        "Usage: ckb-daemon [--gid=<gid>] [--nonotify] [--nobind] [--nonroot]\n"
+#endif
+                        "\n"
+                        "See https://github.com/ccMSC/ckb/blob/master/DAEMON.md for full instructions.\n"
+                        "\n"
+                        "Command-line parameters:\n"
+                        "    --gid=<gid>\n"
+                        "        Restrict access to %s* nodes to users in group <gid>.\n"
+                        "        (Ordinarily they are accessible to anyone)\n"
+                        "    --nonotify\n"
+                        "        Disables key monitoring/notifications.\n"
+                        "        Note that this makes reactive lighting impossible.\n"
+                        "    --nobind\n"
+                        "        Disables all key rebinding, macros, and notifications. Implies --nonotify.\n"
+#ifdef OS_MAC
+                        "    --nomouseaccel\n"
+                        "        Completely disables mouse acceleration, even if the system preferences enable it.\n"
+#endif
+                        "    --nonroot\n"
+                        "        Allows running ckb-daemon as a non root user.\n"
+                        "        This will almost certainly not work. Use only if you know what you're doing.\n"
+                        "\n", devpath);
+            exit(0);
+        }
+    }
+
     // Check PID, quit if already running
     char pidpath[strlen(devpath) + 6];
     snprintf(pidpath, sizeof(pidpath), "%s0/pid", devpath);
@@ -76,7 +109,8 @@ int main(int argc, char** argv){
         if(pid > 0){
             // kill -s 0 checks if the PID is active but doesn't send a signal
             if(!kill(pid, 0)){
-                ckb_fatal_nofile("ckb-daemon is already running (PID %d). Try killing the existing process first.\n(If this is an error, delete %s and try again)\n", pid, pidpath);
+                ckb_fatal_nofile("ckb-daemon is already running (PID %d). Try `killall ckb-daemon`.\n", pid);
+                ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)\n", pidpath);
                 return 0;
             }
         }

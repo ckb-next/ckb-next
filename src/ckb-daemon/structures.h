@@ -222,6 +222,8 @@ typedef struct {
     usbinput input;
     // Indicator LED state
     uchar ileds;
+    // Color dithering in use
+    char dither;
 } usbdevice;
 
 #endif  // STRUCTURES_H

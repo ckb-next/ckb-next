@@ -317,6 +317,7 @@ void KbWidget::devUpdate(){
     ui->fwLabel->setText(device->firmware);
     ui->pollLabel->setText(device->pollrate);
     ui->layoutBox->setCurrentIndex(device->layout());
+    ui->ditherCheck->setChecked(device->dither());
 }
 
 void KbWidget::modeUpdate(){
@@ -363,6 +364,11 @@ void KbWidget::on_inactiveSwitchBox_activated(int index){
 void KbWidget::on_muteCheck_clicked(bool checked){
     if(ui->inactiveSwitchCheck->isCheckable())
         currentMode->light()->showMute(checked);
+}
+
+void KbWidget::on_ditherCheck_clicked(bool checked){
+    if(ui->ditherCheck->isCheckable())
+        device->dither(checked);
 }
 
 void KbWidget::on_layoutBox_activated(int index){

@@ -210,7 +210,7 @@ void SettingsWidget::on_autoFWBox_clicked(bool checked){
 
 void SettingsWidget::on_trayBox_clicked(bool checked){
     CkbSettings::set("Program/SuppressTrayIcon", !checked);
-    MainWindow::mainWindow->trayIcon->setVisible(checked);
+    MainWindow::mainWindow->toggleTrayIcon(checked);
 }
 
 void SettingsWidget::on_loginItemBox_clicked(bool checked){

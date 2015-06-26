@@ -15,6 +15,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
     "notifyon",
     "notifyoff",
     "fps",
+    "dither",
 
     "hwload",
     "hwsave",
@@ -167,6 +168,14 @@ int readcmd(usbdevice* kb, const char* line){
                 else if(delay > 10)
                     delay = 10;
                 kb->usbdelay = delay;
+            }
+            continue;
+        }
+        case DITHER: {
+            // 0: No dither, 1: Ordered dither.
+            uint dither;
+            if(sscanf(word, "%u", &dither) == 1 && dither >= 0 && dither <= 1){
+                kb->dither = dither;
             }
             continue;
         }

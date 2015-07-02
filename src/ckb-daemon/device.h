@@ -38,6 +38,9 @@ int cmd_active_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
 int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 
+// Command: Set poll rate (mouse only)
+int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
+
 // Sets a device's current mode index. This is only used on the non-RGB K95; the RGB keyboards have no gettable HW index.
 void setmodeindex_nrgb(usbdevice* kb, int index);
 

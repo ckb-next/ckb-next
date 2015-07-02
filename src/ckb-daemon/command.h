@@ -20,6 +20,7 @@ typedef enum {
     HWLOAD      = 0,    CMD_VT_FIRST = 0,
     HWSAVE,
     FWUPDATE,
+    POLLRATE,
 
     // Software control on/off
     ACTIVE,
@@ -77,6 +78,8 @@ typedef union devcmd {
         cmdhandler_io hwsave;
         // firmware.h
         cmdhandler_io fwupdate;
+        // device.h
+        cmdhandler_io pollrate;
 
         // device.h
         cmdhandler_io active;

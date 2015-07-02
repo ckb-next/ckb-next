@@ -219,6 +219,8 @@ static int _mkdevpath(usbdevice* kb){
                 fputs(" rgb", ffile);
             if(HAS_FEATURES(kb, FEAT_POLLRATE))
                 fputs(" pollrate", ffile);
+            if(HAS_FEATURES(kb, FEAT_ADJRATE))
+                fputs(" adjrate", ffile);
             if(HAS_FEATURES(kb, FEAT_BIND))
                 fputs(" bind", ffile);
             if(HAS_FEATURES(kb, FEAT_NOTIFY))

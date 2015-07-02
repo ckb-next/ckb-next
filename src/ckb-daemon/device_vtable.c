@@ -29,6 +29,7 @@ const devcmd vtable_keyboard = {
     .hwload = cmd_hwload_kb,
     .hwsave = cmd_hwsave_kb,
     .fwupdate = cmd_fwupdate,
+    .pollrate = cmd_io_none,
 
     .active = cmd_active_kb,
     .idle = cmd_idle_kb,
@@ -73,6 +74,7 @@ const devcmd vtable_keyboard_nonrgb = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
     .fwupdate = cmd_io_none,
+    .pollrate = cmd_io_none,
 
     .active = cmd_io_none,
     .idle = cmd_io_none,
@@ -116,7 +118,8 @@ const devcmd vtable_keyboard_nonrgb = {
 const devcmd vtable_mouse = {
     .hwload = cmd_hwload_mouse,
     .hwsave = cmd_hwsave_mouse,
-    .fwupdate = cmd_io_none,
+    .fwupdate = cmd_fwupdate,
+    .pollrate = cmd_pollrate,
 
     .active = cmd_active_mouse,
     .idle = cmd_idle_mouse,

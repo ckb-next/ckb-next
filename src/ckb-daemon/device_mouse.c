@@ -41,3 +41,14 @@ int cmd_active_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
 int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
     return setactive_mouse(kb, 0);
 }
+
+int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3){
+    uchar msg[MSG_SIZE] = {
+        0x07, 0x0a, 0, 0, (uchar)rate
+    };
+    if(!usbsend(kb, msg, 1))
+        return -1;
+    // Device should disconnect+reconnect, but update the poll rate field in case it doesn't
+    kb->pollrate = rate;
+    return 0;
+}

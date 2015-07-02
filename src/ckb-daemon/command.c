@@ -20,6 +20,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
     "hwload",
     "hwsave",
     "fwupdate",
+    "pollrate",
 
     "active",
     "idle",
@@ -212,6 +213,12 @@ int readcmd(usbdevice* kb, const char* line){
                 return 1;
             }
             continue;
+        case POLLRATE: {
+            uint rate;
+            if(sscanf(word, "%u", &rate) == 1 && (rate == 1 || rate == 2 || rate == 4 || rate == 8))
+                TRY_WITH_RESET(vt->pollrate(kb, mode, notifynumber, rate, 0));
+            continue;
+        }
         case ERASEPROFILE:
             // Erase the current profile
             vt->eraseprofile(kb, mode, notifynumber, 0, 0);

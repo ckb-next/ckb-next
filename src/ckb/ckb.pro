@@ -36,10 +36,12 @@ LIBS += -lz
 DEFINES += QUAZIP_STATIC
 
 # Conditionally use libappindicator to support Unity indicators
+linux {
 system(pkg-config --exists appindicator-0.1) {
     CONFIG += link_pkgconfig
     PKGCONFIG += appindicator-0.1
     DEFINES += USE_LIBAPPINDICATOR
+}
 }
 
 SOURCES += main.cpp\

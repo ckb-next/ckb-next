@@ -76,9 +76,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
         indicator = app_indicator_new("ckb", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
 
+        // Write app icon to temporary file
+        QString path = iconPath = QDir::temp().absoluteFilePath("ckb.png");
+        if(!QFile::copy(":/img/ckb-logo.png", iconPath)){
+            // Fall back to preset path
+            path = "/usr/share/icons/hicolor/512x512/apps/ckb.png";
+            iconPath = "";
+            if(!QFile::exists(path))
+                path = "ckb";
+        }
+        QByteArray cPath = path.toUtf8();
+
         app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
         app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
-        app_indicator_set_icon(indicator, "ckb");
+        app_indicator_set_icon(indicator, cPath.constData());
     } else
 #endif // USE_LIBAPPINDICATOR
     {
@@ -323,6 +334,11 @@ void MainWindow::cleanup(){
         delete w;
     kbWidgets.clear();
     CkbSettings::cleanUp();
+#ifdef USE_LIBAPPINDICATOR
+    // Remove temporary icon file
+    if(!iconPath.isEmpty())
+        QFile::remove(iconPath);
+#endif  // USE_LIBAPPINDICATOR
 }
 
 MainWindow::~MainWindow(){

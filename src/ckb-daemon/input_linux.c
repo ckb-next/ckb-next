@@ -45,7 +45,7 @@ int os_inputopen(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
     struct uinput_user_dev indev;
     memset(&indev, 0, sizeof(indev));
-    snprintf(indev.name, UINPUT_MAX_NAME_SIZE, "ckb%d", index);
+    snprintf(indev.name, UINPUT_MAX_NAME_SIZE, "ckb%d: %s", index, kb->name);
     indev.id.bustype = BUS_USB;
     indev.id.vendor = kb->vendor;
     indev.id.product = kb->product;

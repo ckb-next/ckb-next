@@ -354,3 +354,14 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     else
         CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 9);
 }
+
+void corsair_keycopy(unsigned char* kbinput, const unsigned char* urbinput){
+    // Mask of key bits with scancode KEY_CORSAIR
+    const uchar bitmask[] = {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xff, 0xf3, 0xff
+    };
+    for(int i = 0; i < sizeof(bitmask); i++){
+        uchar mask = bitmask[i];
+        kbinput[i] = (kbinput[i] & ~mask) | (urbinput[i] & mask);
+    }
+}

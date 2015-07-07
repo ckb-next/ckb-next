@@ -60,4 +60,7 @@ extern const key keymap[N_KEYS_EXTENDED];
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput);
 void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput);
 
+// Copies Corsair key input to ckb input, ignoring keys that come through HID input
+void corsair_keycopy(unsigned char* kbinput, const unsigned char* urbinput);
+
 #endif // KEYMAP_H

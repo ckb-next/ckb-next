@@ -76,13 +76,12 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             break;
         case 21:
         case 5:
-            // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
-            if(!kb->active)
-                hid_kb_translate(kb->input.keys, -2, length, data);
+            // RGB EP 2: NKRO (non-BIOS) input
+            hid_kb_translate(kb->input.keys, -2, length, data);
             break;
         case MSG_SIZE:
             // RGB EP 3: Corsair input
-            memcpy(kb->input.keys, data, N_KEYBYTES_KB);
+            corsair_keycopy(kb->input.keys, data);
             break;
         }
     } else {

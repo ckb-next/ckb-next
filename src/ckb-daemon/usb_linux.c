@@ -124,13 +124,12 @@ void* os_inputmain(void* context){
                     hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
                     break;
                 case 0x82:
-                    // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
-                    if(!kb->active)
-                        hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
+                    // RGB EP 2: NKRO (non-BIOS) input
+                    hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
                     break;
                 case 0x83:
                     // RGB EP 3: Corsair input
-                    memcpy(kb->input.keys, urb->buffer, N_KEYBYTES_KB);
+                    corsair_keycopy(kb->input.keys, urb->buffer);
                     break;
                 }
             } else
@@ -214,15 +213,35 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
     return 0;
 }
 
+void strtrim(char* string){
+    // Find last non-space
+    char* last = string;
+    for(char* c = string; *c != 0; c++){
+        if(!isspace(*c))
+            last = c;
+    }
+    last[1] = 0;
+    // Find first non-space
+    char* first = string;
+    for(; *first != 0; first++){
+        if(!isspace(*first))
+            break;
+    }
+    if(first != string)
+        memmove(string, first, last - first);
+}
+
 int os_setupusb(usbdevice* kb){
     // Copy device description and serial
     struct udev_device* dev = kb->udev;
     const char* name = udev_device_get_sysattr_value(dev, "product");
     if(name)
         strncpy(kb->name, name, KB_NAME_LEN);
+    strtrim(kb->name);
     const char* serial = udev_device_get_sysattr_value(dev, "serial");
     if(serial)
         strncpy(kb->serial, serial, SERIAL_LEN);
+    strtrim(kb->serial);
     // Copy firmware version (needed to determine USB protocol)
     const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
     if(firmware)

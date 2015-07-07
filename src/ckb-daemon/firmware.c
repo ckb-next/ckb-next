@@ -29,7 +29,7 @@ int getfwversion(usbdevice* kb){
         poll = -1;
         kb->features &= ~FEAT_POLLRATE;
     }
-    // Print a warning if the vendor or product isn't what it should be
+    // Print a warning if the message didn't match the expected data
     if(vendor != kb->vendor)
         ckb_warn("Got vendor ID %04x (expected %04x)\n", vendor, kb->vendor);
     if(product != kb->product)
@@ -40,6 +40,8 @@ int getfwversion(usbdevice* kb){
         kb->fwversion = 0;
         kb->pollrate = -1;
     } else {
+        if(version != kb->fwversion && kb->fwversion != 0)
+            ckb_warn("Got firmware version %04x (expected %04x)\n", version, kb->fwversion);
         kb->fwversion = version;
         kb->pollrate = poll;
     }

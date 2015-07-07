@@ -201,8 +201,8 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
 }
 
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line){
-    // Try a maximum of 10 times
-    for(int try = 0; try < 10; try++){
+    // Try a maximum of 3 times
+    for(int try = 0; try < 3; try++){
         // Send the output message
         DELAY_SHORT(kb);
         int res = os_usbsend(kb, out_msg, 1, file, line);
@@ -227,7 +227,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
         DELAY_LONG(kb);
     }
     // Give up
-    ckb_err_fn("Too many recv failures. Dropping.\n", file, line);
+    ckb_err_fn("Too many send/recv failures. Dropping.\n", file, line);
     return 0;
 }
 

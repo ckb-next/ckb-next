@@ -13,8 +13,13 @@ pthread_mutex_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIA
 int start_dev(usbdevice* kb, int makeactive){
     // Get the firmware version from the device
     if(kb->pollrate == 0){
-        if(getfwversion(kb))
-            return -1;
+        if(getfwversion(kb)){
+            ckb_warn("Unable to load firmware version/poll rate\n");
+            kb->pollrate = 0;
+            kb->features &= ~(FEAT_POLLRATE | FEAT_ADJRATE);
+            if(kb->fwversion == 0)
+                kb->features &= ~(FEAT_FWVERSION | FEAT_FWUPDATE);
+        }
     }
     if(NEEDS_FW_UPDATE(kb)){
         // Device needs a firmware update. Finish setting up but don't do anything.

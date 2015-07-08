@@ -84,6 +84,8 @@ Additionally, multiple commands may be combined into one, for instance:
 
 By default, the controller runs at 30 FPS, meaning that attempts to animate the LEDs faster than that will be ignored. If you wish to change it, send the command `fps <n>`. The maximum frame rate is 60.
 
+For devices running in 512-color mode, color dithering can be enabled by sending the command `dither 1`. The command `dither 0` disables dithering.
+
 Indicators
 ----------
 

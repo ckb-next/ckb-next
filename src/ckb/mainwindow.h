@@ -64,7 +64,6 @@ public:
     GtkWidget*          indicatorMenu;
     GtkWidget*          indicatorMenuQuitItem;
     GtkWidget*          indicatorMenuRestoreItem;
-    QString             iconPath;
 #endif // USE_LIBAPPINDICATOR
     QMenu*              trayIconMenu;
     QSystemTrayIcon*    trayIcon;

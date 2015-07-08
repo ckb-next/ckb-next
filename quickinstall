@@ -67,6 +67,12 @@ fi
 shopt -s nocasematch
 read -rp "Install ckb system-wide [Y/n]? " doinstall
 if [[ $doinstall =~ no? ]]; then
+    # Install icon and .desktop locally
+    echo "Installing icon and application launcher for the local user..."
+    xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>$TMPFILE
+    checkfail $?
+    xdg-desktop-menu install --novendor usr/ckb.desktop 2>$TMPFILE
+    checkfail $?
     echo "ckb will not be installed system-wide or run as a service."
     echo "Re-run this script if you change your mind."
     finish 0
@@ -99,14 +105,10 @@ else
     checkfail $?
     sudo install bin/ckb-animations/* $PREFIX/ckb-animations 2>$TMPFILE
     checkfail $?
-    # Install .desktop and icon
-    sudo mkdir -p /usr/share/applications 2>$TMPFILE
+    # Install icon and .desktop
+    sudo xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>$TMPFILE
     checkfail $?
-    sudo install usr/ckb.desktop /usr/share/applications/ckb.desktop 2>$TMPFILE
-    checkfail $?
-    sudo mkdir -p /usr/share/icons/hicolor/512x512/apps 2>$TMPFILE
-    checkfail $?
-    sudo install usr/ckb.png /usr/share/icons/hicolor/512x512/apps/ckb.png 2>$TMPFILE
+    sudo xdg-desktop-menu install --novendor usr/ckb.desktop 2>$TMPFILE
     checkfail $?
     echo "Installed in $PREFIX"
 fi

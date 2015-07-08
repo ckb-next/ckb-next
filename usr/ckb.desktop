@@ -5,4 +5,4 @@ Type=Application
 Name=ckb
 Comment=Corsair keyboard driver user interface
 Exec=ckb
-Icon=/usr/share/icons/hicolor/512x512/apps/ckb.png
+Icon=ckb

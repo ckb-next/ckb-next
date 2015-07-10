@@ -67,12 +67,14 @@ fi
 shopt -s nocasematch
 read -rp "Install ckb system-wide [Y/n]? " doinstall
 if [[ $doinstall =~ no? ]]; then
-    # Install icon and .desktop locally
-    echo "Installing icon and application launcher for the local user..."
-    xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>$TMPFILE
-    checkfail $?
-    xdg-desktop-menu install --novendor usr/ckb.desktop 2>$TMPFILE
-    checkfail $?
+    if [[ "$OSTYPE" != "darwin"* ]]; then
+        # Install icon and .desktop locally
+        echo "Installing icon and application launcher for the local user..."
+        xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>$TMPFILE
+        checkfail $?
+        xdg-desktop-menu install --novendor usr/ckb.desktop 2>$TMPFILE
+        checkfail $?
+    fi
     echo "ckb will not be installed system-wide or run as a service."
     echo "Re-run this script if you change your mind."
     finish 0

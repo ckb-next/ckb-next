@@ -234,6 +234,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
                     ckb_warn("Got unknown key press %d on EP 1\n", urbinput[i]);
             }
         }
+        break;
     case -2:
         // EP 2 RGB: NKRO input
         if(urbinput[0] == 1){
@@ -324,6 +325,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
                     CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
             }
         }
+        break;
     }
 }
 

@@ -63,7 +63,7 @@ void KbBindWidget::updateSelDisplay(){
     int count = currentSelection.count();
     if(count == 0){
         // No keys selected
-        ui->selectLabel->setText("Click to select keys");
+        ui->selectLabel->setText("Click to select");
         return;
     }
     if(count == 1){
@@ -76,7 +76,7 @@ void KbBindWidget::updateSelDisplay(){
             ui->selectLabel->setText(pos.friendlyName(false).split("\n")[0] + " → " + bind->friendlyActionName(key).split("\n")[0]);
         return;
     }
-    ui->selectLabel->setText(QString("%1 keys selected").arg(count));
+    ui->selectLabel->setText(QString("%1 %2 selected").arg(count).arg(bind->isMouse() ? "buttons" : "keys"));
 }
 
 void KbBindWidget::on_resetButton_clicked(){
@@ -86,14 +86,15 @@ void KbBindWidget::on_resetButton_clicked(){
         // Reset all keys if none selected
         selection = map.keys();
     uint count = selection.count();
+    QString type = bind->isMouse() ? "button" : "key";
     QString text;
     if(count == map.count())
-        text = "<center>Reset all keys to default?</center>";
+        text = "<center>Reset all %1s to default?</center>";
     else if(count == 1)
-        text = "<center>Reset this key to default?</center>";
+        text = "<center>Reset this %1 to default?</center>";
     else
-        text = tr("<center>Reset %1 keys to default?</center>").arg(count);
-    if(QMessageBox(QMessageBox::NoIcon, "Confirm action", text, QMessageBox::Yes | QMessageBox::No, this).exec() != QMessageBox::Yes)
+        text = tr("<center>Reset %1 %2s to default?</center>").arg(count);
+    if(QMessageBox(QMessageBox::NoIcon, "Confirm action", text.arg(type), QMessageBox::Yes | QMessageBox::No, this).exec() != QMessageBox::Yes)
         return;
     bind->resetAction(selection);
     updateBind();
@@ -103,11 +104,12 @@ void KbBindWidget::on_copyButton_clicked(){
     QStringList selection = currentSelection;
     const KeyMap& map = bind->map();
     int count = selection.count();
-    QString text = tr("%1 key").arg(count) + (count == 1 ? "" : "s");
+    QString type = bind->isMouse() ? "button" : "key";
+    QString text = tr("%1 %2").arg(count).arg(type) + (count == 1 ? "" : "s");
     if(count == 0){
         // Copy all keys if none selected
         selection = map.keys();
-        text = "all keys";
+        text = tr("all %1s").arg(type);
     }
     text = "Copy binding for " + text + " to:";
     // Display popup
@@ -119,7 +121,7 @@ void KbBindWidget::on_copyButton_clicked(){
     foreach(KbMode* mode, selectedModes){
         KbBind* modeBind = mode->bind();
         foreach(const QString& key, selection){
-            modeBind->keyAction(key, bind->action(key));
+            modeBind->setAction(key, bind->action(key));
         }
     }
 }

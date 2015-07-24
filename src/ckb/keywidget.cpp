@@ -4,14 +4,18 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include "keywidget.h"
+#include "keyaction.h"
 #include "kbbind.h"
 
 static const int KEY_SIZE = 12;
+
+static QImage* m65Overlay = 0;
 
 KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
     QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1), mouseDownMode(NONE), _rgbMode(rgbMode)
 {
     setMouseTracking(true);
+    setAutoFillBackground(false);
 }
 
 void KeyWidget::map(const KeyMap& newMap){
@@ -19,8 +23,27 @@ void KeyWidget::map(const KeyMap& newMap){
     selection = QBitArray(keyMap.count());
     newSelection = QBitArray(keyMap.count());
     animation = QBitArray(keyMap.count());
-    setFixedSize((keyMap.width() + KEY_SIZE) * 2.3, (keyMap.height() + KEY_SIZE) * 2.3);
+    int width, height;
+    if(keyMap.isMouse()){
+        width = (keyMap.width() + KEY_SIZE) * 2.6;
+        height = (keyMap.height() + KEY_SIZE) * 2.6;
+    } else {
+        width = (keyMap.width() + KEY_SIZE) * 2.3;
+        height = (keyMap.height() + KEY_SIZE) * 2.3;
+    }
+    if(width < 500)
+        width = 500;
+    setFixedSize(width, height);
     update();
+}
+
+void KeyWidget::drawInfo(float& scale, float& offsetX, float& offsetY){
+    int w = width(), h = height();
+    float xScale = (float)w / (keyMap.width() + KEY_SIZE);
+    float yScale = (float)h / (keyMap.height() + KEY_SIZE);
+    scale = fmin(xScale, yScale);
+    offsetX = (w / scale - keyMap.width()) / 2.f;
+    offsetY = (h / scale - keyMap.height()) / 2.f;
 }
 
 void KeyWidget::colorMap(const ColorMap& newColorMap){
@@ -43,6 +66,7 @@ void KeyWidget::bindMap(const BindMap& newBindMap){
 void KeyWidget::paintEvent(QPaintEvent*){
     const QColor bgColor(68, 64, 64);
     const QColor keyColor(112, 110, 110);
+    const QColor sniperColor(130, 90, 90);
     const QColor highlightColor(136, 176, 240);
     const QColor highlightAnimColor(136, 200, 240);
     const QColor animColor(112, 200, 110);
@@ -72,13 +96,33 @@ void KeyWidget::paintEvent(QPaintEvent*){
 #else
     int ratio = 1;
 #endif
-    float xScale = (float)width() / (keyMap.width() + KEY_SIZE) * ratio;
-    float yScale = (float)height() / (keyMap.height() + KEY_SIZE) * ratio;
+    int wWidth = width(), wHeight = height();
+    KeyMap::Model model = keyMap.model();
+    float scale, offX, offY;
+    drawInfo(scale, offX, offY);
     // Draw background
     painter.setPen(Qt::NoPen);
     painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(QBrush(bgColor));
-    painter.drawRect(0, 0, width(), height());
+
+    if(model == KeyMap::M65){
+        // M65: Draw overlay
+        if(!m65Overlay)
+            m65Overlay = new QImage(":/img/overlay_m65.png");
+        const QImage& overlay = *m65Overlay;
+        painter.setBrush(palette().brush(QPalette::Window));
+        painter.drawRect(0, 0, width(), height());
+        float oXScale = scale / 9.f, oYScale = scale / 9.f;             // The overlay has a resolution of 9px per keymap unit
+        float x = (2.f + offX) * scale, y = (-2.f + offY) * scale;      // It is positioned at (2, -2)
+        int w = overlay.width() * oXScale, h = overlay.height() * oYScale;
+        // We need to transform the image with QImage::scaled() because painter.drawImage() will butcher it, even with smoothing enabled
+        // However, the width/height need to be rounded to integers
+        int iW = round(w), iH = round(h);
+        painter.drawImage(QRectF(x - (iW - w) / 2.f, y - (iH - h) / 2.f, iW, iH), overlay.scaled(iW, iH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    } else {
+        // Otherwise, draw a solid background
+        painter.setBrush(QBrush(bgColor));
+        painter.drawRect(0, 0, width(), height());
+    }
 
     // Draw mouse highlight (if any)
     if(mouseDownMode != NONE && (mouseDownX != mouseCurrentX || mouseDownY != mouseCurrentY)){
@@ -94,8 +138,6 @@ void KeyWidget::paintEvent(QPaintEvent*){
     }
 
     // Draw key backgrounds on a separate pixmap so that a drop shadow can be applied to them.
-    int wWidth = width(), wHeight = height();
-    KeyMap::Model model = keyMap.model();
     QPixmap keyBG(wWidth * ratio, wHeight * ratio);
     keyBG.fill(QColor(0, 0, 0, 0));
     QPainter bgPainter(&keyBG);
@@ -107,23 +149,33 @@ void KeyWidget::paintEvent(QPaintEvent*){
         k.next();
         i++;
         const Key& key = k.value();
-        float x = key.x + 6.f - key.width / 2.f + 1.f;
-        float y = key.y + 6.f - key.height / 2.f + 1.f;
+        float x = key.x + offX - key.width / 2.f + 1.f;
+        float y = key.y + offY - key.height / 2.f + 1.f;
         float w = key.width - 2.f;
         float h = key.height - 2.f;
         // In RGB mode, ignore keys without LEDs
-        if(_rgbMode && !key.hasLed)
+        if((_rgbMode && !key.hasLed)
+                || (!_rgbMode && !key.hasScan))
             continue;
         // Set color based on key highlight
+        bgPainter.setOpacity(1.);
         if(highlight.testBit(i)){
             if(animation.testBit(i))
                 bgPainter.setBrush(QBrush(highlightAnimColor));
             else
                 bgPainter.setBrush(QBrush(highlightColor));
-        } else if(animation.testBit(i))
+        } else if(animation.testBit(i)){
             bgPainter.setBrush(QBrush(animColor));
-        else
-            bgPainter.setBrush(QBrush(keyColor));
+        } else {
+            if(!strcmp(key.name, "sniper"))
+                // Sniper key uses a reddish base color instead of the usual grey
+                bgPainter.setBrush(QBrush(sniperColor));
+            else {
+                bgPainter.setBrush(QBrush(keyColor));
+                if(KeyMap::isMouse(model))
+                    bgPainter.setOpacity(0.7);
+            }
+        }
         if(!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute"))){
             // Switch keys are circular
@@ -131,14 +183,14 @@ void KeyWidget::paintEvent(QPaintEvent*){
             y += h / 8.f;
             w *= 0.75f;
             h *= 0.75f;
-            bgPainter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
+            bgPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
         } else {
             if(!strcmp(key.name, "enter")){
                 if(key.height == 24){
                     // ISO enter key isn't rectangular
                     y = key.y + 1.f;
                     h = 10.f;
-                    bgPainter.drawRect(QRectF((x + w - 13.f) * xScale, y * yScale, 13.f * xScale, 22.f * yScale));
+                    bgPainter.drawRect(QRectF((x + w - 13.f) * scale, y * scale, 13.f * scale, 22.f * scale));
                 } else {
                     // US enter key isn't perfectly centered, needs an extra pixel on the left to appear correctly
                     x -= 1.f;
@@ -151,7 +203,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             } else if(!strcmp(key.name, "caps") || !strcmp(key.name, "lshift") || !strcmp(key.name, "next")){
                 w += 1.f;
             }
-            bgPainter.drawRect(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
+            bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
         }
     }
 
@@ -171,22 +223,22 @@ void KeyWidget::paintEvent(QPaintEvent*){
             const Key& key = k.value();
             if(!key.hasLed)
                 continue;
-            float x = key.x + 6.f - 1.8f;
-            float y = key.y + 6.f - 1.8f;
+            float x = key.x + offX - 1.8f;
+            float y = key.y + offY - 1.8f;
             float w = 3.6f;
             float h = 3.6f;
             if(_displayColorMap.contains(key.name))
                 decPainter.setBrush(QBrush(_displayColorMap.value(key.name)));
             else
                 decPainter.setBrush(QBrush(_colorMap.value(key.name)));
-            decPainter.drawEllipse(QRectF(x * xScale, y * yScale, w * xScale, h * yScale));
+            decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
         }
     } else {
         // Draw key names
         decPainter.setBrush(Qt::NoBrush);
         QFont font = painter.font();
         font.setBold(true);
-        font.setPixelSize(5.25f * yScale);
+        font.setPixelSize(5.25f * scale);
         QFont font0 = font;
         QHashIterator<QString, Key> k(keyMap);
         uint i = -1;
@@ -194,8 +246,10 @@ void KeyWidget::paintEvent(QPaintEvent*){
             k.next();
             i++;
             const Key& key = k.value();
-            float x = key.x + 6.f - key.width / 2.f + 1.f;
-            float y = key.y + 6.f - key.height / 2.f;
+            if(!key.hasScan)
+                continue;
+            float x = key.x + offX - key.width / 2.f + 1.f;
+            float y = key.y + offY - key.height / 2.f;
             float w = key.width - 2.f;
             float h = key.height;
             // Print the key's friendly name (with some exceptions)
@@ -215,7 +269,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 {"lctrl", "Ctrl"}, {"rctrl", "Ctrl"}, {"lwin", "❖"}, {"rwin", "❖"}, {"lalt", "Alt"}, {"ralt", "Alt"},
 #endif
                 {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"},
-                {"mousel", ""}, {"mouser", ""}, {"mousem", "-"}, {"dpiup", "▲"}, {"dpidn", "▼"}, {"dpi", "◉"}, {"mouses1", "▲"}, {"mouses2", "▼"}, {"sniper", "☀"}
+                {"mouse1", ""}, {"mouse2", ""}, {"mouse3", "∙"}, {"dpiup", "▲"}, {"dpidn", "▼"}, {"wheelup", "▲"}, {"wheeldn", "▼"}, {"dpi", "◉"}, {"mouse5", "▲"}, {"mouse4", "▼"}, {"sniper", "⊕"}
             };
             for(uint k = 0; k < sizeof(names) / sizeof(names[0]); k++){
                 if(keyName == names[k].keyName){
@@ -238,7 +292,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 font.setPixelSize(font.pixelSize() * 1.3);
             // Determine the appropriate size to draw the text at
             decPainter.setFont(font);
-            QRectF rect(x * xScale, y * yScale - 1, w * xScale, h * yScale);
+            QRectF rect(x * scale, y * scale - 1, w * scale, h * scale);
             int flags = Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextWordWrap;
             QRectF bounds = decPainter.boundingRect(rect, flags, name);
             while((bounds.height() >= rect.height() - 8. || bounds.width() >= rect.width() - 2.) && font.pixelSize() >= 5){
@@ -253,13 +307,13 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(bind.isEmpty())
                 // Unbound - red
                 decPainter.setPen(QColor(255, 136, 136));
-            else if(KbBind::isProgram(bind))
+            else if(KeyAction(bind).isProgram())
                 // Custom program - orange
                 decPainter.setPen(QColor(255, 224, 192));
-            else if(KbBind::isSpecial(bind) && (bind == def || !KbBind::isSpecial(def)))
+            else if(KeyAction(bind).isSpecial() && (bind == def || !KeyAction(def).isSpecial()))
                 // Special function - blue (only if not mapped to a different function - if a special function is remapped, color it yellow)
                 decPainter.setPen(QColor(128, 224, 255));
-            else if(KbBind::isMedia(bind) && (bind == def || !KbBind::isMedia(def)))
+            else if(KeyAction(bind).isMedia() && (bind == def || !KeyAction(def).isMedia()))
                 // Media key - green
                 decPainter.setPen(QColor(160, 255, 168));
             else if(bind == def)
@@ -308,16 +362,17 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
     mouseDownX = mouseCurrentX = event->x();
     mouseDownY = mouseCurrentY = event->y();
     // See if the event hit a key
-    float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
-    float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
-    float mx = mouseCurrentX / xScale - 6.f, my = mouseCurrentY / yScale - 6.f;
+    float scale, offX, offY;
+    drawInfo(scale, offX, offY);
+    float mx = mouseCurrentX / scale - offX, my = mouseCurrentY / scale - offY;
     QHashIterator<QString, Key> k(keyMap);
     uint i = -1;
     while(k.hasNext()){
         k.next();
         i++;
         const Key& key = k.value();
-        if(_rgbMode && !key.hasLed)
+        if((_rgbMode && !key.hasLed)
+                || (!_rgbMode && !key.hasScan))
             continue;
         if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f){
             newSelection.setBit(i);
@@ -334,23 +389,23 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
     // Find selection rectangle
     mouseCurrentX = event->x();
     mouseCurrentY = event->y();
-    float xScale = (float)width() / (keyMap.width() + KEY_SIZE);
-    float yScale = (float)height() / (keyMap.height() + KEY_SIZE);
-    float mx = mouseCurrentX / xScale - 6.f, my = mouseCurrentY / yScale - 6.f;
+    float scale, offX, offY;
+    drawInfo(scale, offX, offY);
+    float mx = mouseCurrentX / scale - offX, my = mouseCurrentY / scale - offY;
     float mx1, mx2, my1, my2;
     if(mouseCurrentX >= mouseDownX){
-        mx1 = mouseDownX / xScale - 6.f;
-        mx2 = mouseCurrentX / xScale - 6.f;
+        mx1 = mouseDownX / scale - offX;
+        mx2 = mouseCurrentX / scale - offX;
     } else {
-        mx1 = mouseCurrentX / xScale - 6.f;
-        mx2 = mouseDownX / xScale - 6.f;
+        mx1 = mouseCurrentX / scale - offX;
+        mx2 = mouseDownX / scale - offX;
     }
     if(mouseCurrentY >= mouseDownY){
-        my1 = mouseDownY / yScale - 6.f;
-        my2 = mouseCurrentY / yScale - 6.f;
+        my1 = mouseDownY / scale - offY;
+        my2 = mouseCurrentY / scale - offY;
     } else {
-        my1 = mouseCurrentY / yScale - 6.f;
-        my2 = mouseDownY / yScale - 6.f;
+        my1 = mouseCurrentY / scale - offY;
+        my2 = mouseDownY / scale - offY;
     }
     // Clear new selection
     if(mouseDownMode != NONE)
@@ -362,7 +417,8 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
         k.next();
         i++;
         const Key& key = k.value();
-        if(_rgbMode && !key.hasLed)
+        if((_rgbMode && !key.hasLed)
+                || (!_rgbMode && !key.hasScan))
             continue;
         float kx1 = key.x - key.width / 2.f + 1.f;
         float ky1 = key.y - key.height / 2.f + 1.f;
@@ -433,11 +489,23 @@ void KeyWidget::setSelection(const QStringList& keys){
 }
 
 void KeyWidget::selectAll(){
-    selection.fill(true);
+    selection.fill(false);
+    // Fill the selection with all keys that have an LED/scancode (depending on widget mode)
+    int i = 0;
+    QStringList selectedNames;
+    foreach(const Key& key, keyMap.positions()){
+        if((_rgbMode && key.hasLed)
+                || !(_rgbMode && key.hasScan)){
+            selection.setBit(i);
+            selectedNames << key.name;
+        }
+        i++;
+    }
+    // Clear mousedown state
     newSelection.fill(false);
     mouseDownMode = NONE;
     update();
-    emit selectionChanged(keyMap.keys());
+    emit selectionChanged(selectedNames);
 }
 
 void KeyWidget::clearSelection(){

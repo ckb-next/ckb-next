@@ -83,12 +83,12 @@ void KbLightWidget::newSelection(QStringList selection){
     ui->bgButton->color(selectedColor);
     int count = selection.count();
     if(count == 0){
-        ui->selLabel->setText("Click to select keys");
+        ui->selLabel->setText("Click to select");
         return;
     } else if(count == 1)
-        ui->selLabel->setText("1 key selected");
+        ui->selLabel->setText(tr("1 %1 selected").arg(light->map().isMouse() ? "zone" : "key"));
     else
-        ui->selLabel->setText(QString("%1 keys selected").arg(count));
+        ui->selLabel->setText(tr("%1 %2 selected").arg(count).arg(light->map().isMouse() ? "zones" : "keys"));
 }
 
 void KbLightWidget::changeColor(QColor newColor){

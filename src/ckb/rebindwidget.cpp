@@ -2,6 +2,9 @@
 #include "rebindwidget.h"
 #include "ui_rebindwidget.h"
 
+static const int DPI_OFFSET = -KeyAction::DPI_UP + 1;
+static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
+
 RebindWidget::RebindWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RebindWidget),
@@ -18,6 +21,9 @@ RebindWidget::RebindWidget(QWidget *parent) :
     fnKeys << "esc" << "f1" << "f2" << "f3" << "f4" << "f5" << "f6" << "f7" << "f8" << "f9" << "f10" << "f11" << "f12" << "prtscn" << "scroll" << "pause" << "ins" << "del" << "home" << "end" << "pgup" << "pgdn" << "up" << "down" << "left" << "right";
     numKeys << "numlock" << "num0" << "num1" << "num2" << "num3" << "num4" << "num5" << "num6" << "num7" << "num8" << "num9" << "numslash" << "numstar" << "numminus" << "numplus" << "numdot" << "numenter";
     mediaKeys << "stop" << "prev" << "play" << "next" << "volup" << "voldn" << "mute";
+    mouseKeys << "mouse1" << "mouse2" << "mouse3";
+    mouseExtKeys << "mouse4" << "mouse5" << "mouse6" << "mouse7" << "mouse8";
+    wheelKeys << "wheelup" << "wheeldn";
 #ifdef Q_OS_MACX
     // Replace some OSX keys with their actual meanings
     ui->modBox->setItemText(modKeys.indexOf("lwin") + 1, "Left Cmd");
@@ -50,9 +56,11 @@ void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     ui->typingBox->clear();
     ui->typingBox->addItem(" ");
     typingKeys.clear();
-    const KeyMap& map = bind->map();
+    // Use the K95 map as it has all keys
+    const KeyMap& map = KeyMap(KeyMap::K95, bind->map().layout());
     foreach(const QString& name, map.byPosition()){
-        if(KbBind::isNormal(KbBind::defaultAction(name)) && !modKeys.contains(name) && !fnKeys.contains(name) && !numKeys.contains(name) && !mediaKeys.contains(name) && name != "enter" && name != "tab" && name != "bspace"){
+        KeyAction action(KbBind::defaultAction(name));
+        if(action.isNormal() && !modKeys.contains(name) && !fnKeys.contains(name) && !numKeys.contains(name) && !mediaKeys.contains(name) && name != "enter" && name != "tab" && name != "bspace"){
             const Key& pos = map[name];
             QString friendly = pos.friendlyName();
             ui->typingBox->addItem(friendly);
@@ -63,6 +71,11 @@ void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     ui->typingBox->addItem("Enter");
     ui->typingBox->addItem("Tab");
     ui->typingBox->addItem("Backspace");
+    if(!map.isISO()){
+        // Add ISO backslash (aka KEY_102ND) to ANSI options
+        typingKeys << "bslash_iso";
+        ui->typingBox->addItem("Backslash (ISO layout)");
+    }
 
     // Populate mode list
     ui->modeBox->clear();
@@ -72,6 +85,31 @@ void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     int idx = 1;
     foreach(KbMode* mode, newProfile->modes())
         ui->modeBox->addItem(QString("%1: %2").arg(idx++).arg(mode->name()));
+
+    // Enable/disable DPI based on device
+    if(bind->isMouse()){
+        ui->dpiButton->setEnabled(true);
+        ui->dpiBox->setEnabled(true);
+        ui->dpiWarning->hide();
+        // Fill DPI slots
+        const KbPerf* perf = bind->perf();
+        for(int i = 0; i < KbPerf::DPI_COUNT; i++){
+            bool sniper = (i == 0);
+            int boxIdx = i + 3;
+            QPoint dpi = perf->dpi(i);
+            QString text = tr(sniper ? "Sniper:\t%1 x %2" : "%3:\t%1 x %2").arg(dpi.x()).arg(dpi.y());
+            if(!sniper) text = text.arg(i);
+            ui->dpiBox->setItemText(boxIdx, text);
+        }
+    } else {
+        ui->dpiButton->setEnabled(false);
+        ui->dpiBox->setEnabled(false);
+        ui->dpiWarning->show();
+    }
+    // Always disable custom DPI boxes until selected
+    ui->dpiCustXBox->setEnabled(false);
+    ui->dpiCustYBox->setEnabled(false);
+    ui->dpiCustLabel->setEnabled(false);
 }
 
 void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevious){
@@ -113,72 +151,88 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
 
     if(!hasAction)
         action = "";
-    // Standard key - tab 0
-    if(KbBind::isNormal(action)){
+    KeyAction act(action);
+    // Clear everything
+    setBox(0);
+    ui->dpiCustXBox->setValue(400);
+    ui->dpiCustYBox->setValue(400);
+    ui->programKpBox->setText("");
+    ui->programKrBox->setText("");
+    // Fill in field and select tab according to action type
+    bool mouse = act.isMouse();
+    if(mouse){
+        // Mouse buttons - tab 1
+        ui->tabWidget->setCurrentIndex(1);
+        // Set mouse buttons (indexOf returns -1 if not found, index zero is blank)
+        ui->mbBox->setCurrentIndex(mouseKeys.indexOf(action) + 1);
+        ui->mb2Box->setCurrentIndex(mouseExtKeys.indexOf(action) + 1);
+        ui->wheelBox->setCurrentIndex(wheelKeys.indexOf(action) + 1);
+        if(act.isDPI()){
+            QPoint custom;
+            int value = act.dpiInfo(custom);
+            if(value <= -DPI_OFFSET || value > KeyAction::DPI_CUSTOM)
+                return;
+            ui->dpiBox->setCurrentIndex(value + DPI_OFFSET);
+            if(value == KeyAction::DPI_CUSTOM){
+                ui->dpiCustXBox->setValue(custom.x());
+                ui->dpiCustYBox->setValue(custom.y());
+            }
+        }
+    } else if(act.isNormal()){
+        // Standard key - tab 0
         ui->tabWidget->setCurrentIndex(0);
-        // Set normal keys (indexOf returns -1 if not found, index zero is blank)
         ui->typingBox->setCurrentIndex(typingKeys.indexOf(action) + 1);
         ui->modBox->setCurrentIndex(modKeys.indexOf(action) + 1);
         ui->fnBox->setCurrentIndex(fnKeys.indexOf(action) + 1);
         ui->numBox->setCurrentIndex(numKeys.indexOf(action) + 1);
         ui->mediaBox->setCurrentIndex(mediaKeys.indexOf(action) + 1);
-    } else {
-        ui->typingBox->setCurrentIndex(0);
-        ui->modBox->setCurrentIndex(0);
-        ui->fnBox->setCurrentIndex(0);
-        ui->numBox->setCurrentIndex(0);
-        ui->mediaBox->setCurrentIndex(0);
-    }
-    // Program key - tab 2
-    ui->programKpBox->setText("");
-    ui->programKrBox->setText("");
-    if(KbBind::isProgram(action)){
-        ui->tabWidget->setCurrentIndex(2);
+    } else if(act.isProgram()){
+        // Program key - tab 3
+        ui->tabWidget->setCurrentIndex(3);
         QString onPress, onRelease;
-        int stop = KbBind::programInfo(action, onPress, onRelease);
+        int stop = act.programInfo(onPress, onRelease);
         ui->programKpBox->setText(onPress);
         ui->programKrBox->setText(onRelease);
-        switch(stop & 0xF){
-        case KbBind::PROGRAM_PR_INDEF:
+        switch(stop & 0x0F){
+        case KeyAction::PROGRAM_PR_INDEF:
             ui->programKpIndefButton->setChecked(true);
             ui->programKpSKrButton->setChecked(false);
             ui->programKpSKpButton->setChecked(false);
             break;
-        case KbBind::PROGRAM_PR_KRSTOP:
+        case KeyAction::PROGRAM_PR_KRSTOP:
             ui->programKpIndefButton->setChecked(false);
             ui->programKpSKrButton->setChecked(true);
             ui->programKpSKpButton->setChecked(false);
             break;
-        case KbBind::PROGRAM_PR_KPSTOP:
+        case KeyAction::PROGRAM_PR_KPSTOP:
             ui->programKpIndefButton->setChecked(false);
             ui->programKpSKrButton->setChecked(false);
             ui->programKpSKpButton->setChecked(true);
             break;
         }
         switch(stop & 0xF0){
-        case KbBind::PROGRAM_RE_INDEF:
+        case KeyAction::PROGRAM_RE_INDEF:
             ui->programKrIndefButton->setChecked(true);
             ui->programKrSKpButton->setChecked(false);
             break;
-        case KbBind::PROGRAM_RE_KPSTOP:
+        case KeyAction::PROGRAM_RE_KPSTOP:
             ui->programKrIndefButton->setChecked(false);
             ui->programKrSKpButton->setChecked(true);
             break;
         }
-    }
-    // Other special keys - tab 1
-    if(KbBind::isSpecial(action) && !KbBind::isProgram(action)){
-        ui->tabWidget->setCurrentIndex(1);
+    } else if(act.isSpecial()){
+        // Other special keys - tab 2
+        ui->tabWidget->setCurrentIndex(2);
         int param;
-        QString sAction = KbBind::specialInfo(action, param);
+        QString sAction = act.specialInfo(param);
         // Mode selection. Check wrap-around flag
         ui->modeWrapBox->setChecked(true);
         if(sAction == "mode"){
             ui->modeWrapBox->setChecked(true);
-            if(param == KbBind::MODE_PREV_WRAP)
-                param = KbBind::MODE_PREV;
-            else if(param == KbBind::MODE_NEXT_WRAP)
-                param = KbBind::MODE_NEXT;
+            if(param == KeyAction::MODE_PREV_WRAP)
+                param = KeyAction::MODE_PREV;
+            else if(param == KeyAction::MODE_NEXT_WRAP)
+                param = KeyAction::MODE_NEXT;
             else if(param < 0)
                 ui->modeWrapBox->setChecked(false);
             // Set mode box to current selection, or to mode 1 if invalid
@@ -193,10 +247,10 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
         // Brightness control. Also check wrap
         if(sAction == "light"){
             ui->lightWrapBox->setChecked(true);
-            if(param == KbBind::LIGHT_DOWN_WRAP)
-                param = KbBind::LIGHT_DOWN;
-            else if(param == KbBind::LIGHT_UP_WRAP)
-                param = KbBind::LIGHT_UP;
+            if(param == KeyAction::LIGHT_DOWN_WRAP)
+                param = KeyAction::LIGHT_DOWN;
+            else if(param == KeyAction::LIGHT_UP_WRAP)
+                param = KeyAction::LIGHT_UP;
             else
                 ui->lightWrapBox->setChecked(false);
             if(param < 0 || param > 1)
@@ -211,47 +265,51 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             ui->lockBox->setCurrentIndex(param + 1);
         } else
             ui->lockBox->setCurrentIndex(0);
-    } else {
-        ui->modeBox->setCurrentIndex(0);
-        ui->lightBox->setCurrentIndex(0);
-        ui->lockBox->setCurrentIndex(0);
     }
 }
 
 void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
     if(ui->typingBox->currentIndex() > 0)
-        bind->keyAction(keys, typingKeys[ui->typingBox->currentIndex() - 1]);
+        bind->setAction(keys, typingKeys[ui->typingBox->currentIndex() - 1]);
     else if(ui->modBox->currentIndex() > 0)
-        bind->keyAction(keys, modKeys[ui->modBox->currentIndex() - 1]);
+        bind->setAction(keys, modKeys[ui->modBox->currentIndex() - 1]);
     else if(ui->fnBox->currentIndex() > 0)
-        bind->keyAction(keys, fnKeys[ui->fnBox->currentIndex() - 1]);
+        bind->setAction(keys, fnKeys[ui->fnBox->currentIndex() - 1]);
     else if(ui->numBox->currentIndex() > 0)
-        bind->keyAction(keys, numKeys[ui->numBox->currentIndex() - 1]);
+        bind->setAction(keys, numKeys[ui->numBox->currentIndex() - 1]);
     else if(ui->mediaBox->currentIndex() > 0)
-        bind->keyAction(keys, mediaKeys[ui->mediaBox->currentIndex() - 1]);
+        bind->setAction(keys, mediaKeys[ui->mediaBox->currentIndex() - 1]);
+    else if(ui->mbBox->currentIndex() > 0)
+        bind->setAction(keys, mouseKeys[ui->mbBox->currentIndex() - 1]);
+    else if(ui->mb2Box->currentIndex() > 0)
+        bind->setAction(keys, mouseExtKeys[ui->mb2Box->currentIndex() - 1]);
+    else if(ui->wheelBox->currentIndex() > 0)
+        bind->setAction(keys, wheelKeys[ui->wheelBox->currentIndex() - 1]);
+    else if(ui->dpiBox->currentIndex() > 0)
+        bind->setAction(keys, KeyAction::dpiAction(ui->dpiBox->currentIndex() - DPI_OFFSET, ui->dpiCustXBox->value(), ui->dpiCustYBox->value()));
     else if(ui->modeBox->currentIndex() > 0)
-        bind->modeAction(keys, ui->modeBox->currentIndex() - 3 - (ui->modeWrapBox->isChecked() && ui->modeBox->currentIndex() < 3 ? 2 : 0));
+        bind->setAction(keys, KeyAction::modeAction(ui->modeBox->currentIndex() - 3 - (ui->modeWrapBox->isChecked() && ui->modeBox->currentIndex() < 3 ? 2 : 0)));
     else if(ui->lightBox->currentIndex() > 0)
-        bind->lightAction(keys, ui->lightBox->currentIndex() - 1 + (ui->lightWrapBox->isChecked() ? 2 : 0));
+        bind->setAction(keys, KeyAction::lightAction(ui->lightBox->currentIndex() - 1 + (ui->lightWrapBox->isChecked() ? 2 : 0)));
     else if(ui->lockBox->currentIndex() > 0)
-        bind->lockAction(keys, ui->lockBox->currentIndex() - 1);
+        bind->setAction(keys, KeyAction::lockAction(ui->lockBox->currentIndex() - 1));
     else if(!ui->programKpBox->text().isEmpty() || !ui->programKrBox->text().isEmpty()){
         int kpStop = 0, krStop = 0;
         if(!ui->programKpBox->text().isEmpty()){
             if(ui->programKpIndefButton->isChecked())
-                kpStop = KbBind::PROGRAM_PR_INDEF;
+                kpStop = KeyAction::PROGRAM_PR_INDEF;
             else if(ui->programKpSKpButton->isChecked())
-                kpStop = KbBind::PROGRAM_PR_KPSTOP;
+                kpStop = KeyAction::PROGRAM_PR_KPSTOP;
             else if(ui->programKpSKrButton->isChecked())
-                kpStop = KbBind::PROGRAM_PR_KRSTOP;
+                kpStop = KeyAction::PROGRAM_PR_KRSTOP;
         }
         if(!ui->programKrBox->text().isEmpty()){
             if(ui->programKrIndefButton->isChecked())
-                krStop = KbBind::PROGRAM_RE_INDEF;
+                krStop = KeyAction::PROGRAM_RE_INDEF;
             else if(ui->programKrSKpButton->isChecked())
-                krStop = KbBind::PROGRAM_RE_KPSTOP;
+                krStop = KeyAction::PROGRAM_RE_KPSTOP;
         }
-        bind->programAction(keys, ui->programKpBox->text(), ui->programKrBox->text(), kpStop | krStop);
+        bind->setAction(keys, KeyAction::programAction(ui->programKpBox->text(), ui->programKrBox->text(), kpStop | krStop));
     } else if(doUnbind)
         bind->noAction(keys);
 }
@@ -276,14 +334,22 @@ void RebindWidget::on_unbindButton_clicked(){
 void RebindWidget::setBox(QWidget* box){
     // Un-select every item except for the current one.
     // on_*_currentIndexChanged will take care of deselecting the checkbox.
+    // Key
     if(box != ui->typingBox) ui->typingBox->setCurrentIndex(0);
     if(box != ui->modBox) ui->modBox->setCurrentIndex(0);
     if(box != ui->fnBox) ui->fnBox->setCurrentIndex(0);
     if(box != ui->numBox) ui->numBox->setCurrentIndex(0);
     if(box != ui->mediaBox) ui->mediaBox->setCurrentIndex(0);
+    // Mouse
+    if(box != ui->mbBox) ui->mbBox->setCurrentIndex(0);
+    if(box != ui->mb2Box) ui->mb2Box->setCurrentIndex(0);
+    if(box != ui->wheelBox) ui->wheelBox->setCurrentIndex(0);
+    if(box != ui->dpiBox) ui->dpiBox->setCurrentIndex(0);
+    // Special
     if(box != ui->modeBox) ui->modeBox->setCurrentIndex(0);
     if(box != ui->lightBox) ui->lightBox->setCurrentIndex(0);
     if(box != ui->lockBox) ui->lockBox->setCurrentIndex(0);
+    // Program
     if(box != ui->programKpBox && box != ui->programKrBox){
         ui->programKpButton->setChecked(false);
         ui->programKrButton->setChecked(false);
@@ -332,6 +398,52 @@ void RebindWidget::on_mediaBox_currentIndexChanged(int index){
     else {
         ui->mediaButton->setChecked(true);
         setBox(ui->mediaBox);
+    }
+}
+
+void RebindWidget::on_mbBox_currentIndexChanged(int index){
+    if(index == 0)
+        ui->mbButton->setChecked(false);
+    else {
+        ui->mbButton->setChecked(true);
+        setBox(ui->mbBox);
+    }
+}
+
+void RebindWidget::on_mb2Box_currentIndexChanged(int index){
+    if(index == 0)
+        ui->mb2Button->setChecked(false);
+    else {
+        ui->mb2Button->setChecked(true);
+        setBox(ui->mb2Box);
+    }
+}
+
+void RebindWidget::on_wheelBox_currentIndexChanged(int index){
+    if(index == 0)
+        ui->wheelButton->setChecked(false);
+    else {
+        ui->wheelButton->setChecked(true);
+        setBox(ui->wheelBox);
+    }
+}
+
+void RebindWidget::on_dpiBox_currentIndexChanged(int index){
+    if(index != DPI_CUST_IDX){
+        // Clear custom DPI
+        ui->dpiCustXBox->setEnabled(false);
+        ui->dpiCustYBox->setEnabled(false);
+        ui->dpiCustLabel->setEnabled(false);
+    } else {
+        ui->dpiCustXBox->setEnabled(true);
+        ui->dpiCustYBox->setEnabled(true);
+        ui->dpiCustLabel->setEnabled(true);
+    }
+    if(index == 0)
+        ui->dpiButton->setChecked(false);
+    else {
+        ui->dpiButton->setChecked(true);
+        setBox(ui->dpiBox);
     }
 }
 
@@ -446,4 +558,24 @@ void RebindWidget::on_programKrButton_clicked(bool checked){
         ui->programKrBox->setFocus();
         setBox(ui->programKrBox);
     }
+}
+
+void RebindWidget::on_mbButton_clicked(bool checked){
+    if(checked && ui->mbBox->currentIndex() == 0)
+        ui->mbBox->setCurrentIndex(1);
+}
+
+void RebindWidget::on_mb2Button_clicked(bool checked){
+    if(checked && ui->mb2Box->currentIndex() == 0)
+        ui->mb2Box->setCurrentIndex(1);
+}
+
+void RebindWidget::on_wheelButton_clicked(bool checked){
+    if(checked && ui->wheelBox->currentIndex() == 0)
+        ui->wheelBox->setCurrentIndex(1);
+}
+
+void RebindWidget::on_dpiButton_clicked(bool checked){
+    if(checked && ui->dpiBox->currentIndex() == 0)
+        ui->dpiBox->setCurrentIndex(1);
 }

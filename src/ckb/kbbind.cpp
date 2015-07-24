@@ -10,13 +10,21 @@ quint64 KbBind::globalRemapTime = 0;
 
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _map(keyMap),
-    sniperValue(0), _winLock(false), _needsUpdate(true), _needsSave(true) {
+    _winLock(false), _needsUpdate(true), _needsSave(true) {
 }
 
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const KbBind& other) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _bind(other._bind),
-    sniperValue(0), _winLock(false), _needsUpdate(true), _needsSave(true) {
+    _winLock(false), _needsUpdate(true), _needsSave(true) {
     map(keyMap);
+}
+
+KbPerf* KbBind::perf(){
+    return modeParent()->perf();
+}
+
+KbLight* KbBind::light() {
+    return modeParent()->light();
 }
 
 void KbBind::load(CkbSettings& settings){
@@ -34,7 +42,7 @@ void KbBind::load(CkbSettings& settings){
             if(!useReal)
                 name = _map.fromStorage(name);
             QString bind = settings.value(key).toString();
-            _bind[name] = bind;
+            _bind[name] = new KeyAction(bind, this);
         }
     }
     emit didLoad();
@@ -50,9 +58,9 @@ void KbBind::save(CkbSettings& settings){
     {
         SGroup group(settings, "Keys");
         foreach(QString key, _bind.keys()){
-            QString act = _bind.value(key);
-            if(act != defaultAction(key))
-                settings.setValue(key, act);
+            KeyAction* act = _bind.value(key);
+            if(act && act->value() != defaultAction(key))
+                settings.setValue(key, act->value());
         }
     }
 }
@@ -101,36 +109,12 @@ void KbBind::map(const KeyMap& map){
 
 QString KbBind::action(const QString& key){
     QString rKey = globalRemap(key);
-    if(_bind.contains(rKey))
-        return _bind.value(rKey);
-    if(!_map.key(rKey))
-        return "";
-    // If the key isn't reassigned, return the default action
-    return defaultAction(key);
+    return bindAction(rKey)->value();
 }
 
 QString KbBind::defaultAction(const QString& key){
     QString rKey = globalRemap(key);
-    // G1-G18 are unbound by default
-    if(rKey.length() >= 2 && rKey[0] == 'g' && rKey[1] >= '0' && rKey[1] <= '9')
-        return "";
-    // TODO: default action for MR
-    if(rKey == "mr")
-        return "";
-    // M1-M3 switch modes
-    if(rKey == "m1")
-        return "$mode:0";
-    if(rKey == "m2")
-        return "$mode:1";
-    if(rKey == "m3")
-        return "$mode:2";
-    // Brightness and Win Lock are their own functions
-    if(rKey == "light")
-        return "$light:2";
-    if(rKey == "lock")
-        return "$lock:0";
-    // Everything else is a standard keypress
-    return rKey;
+    return KeyAction::defaultAction(rKey);
 }
 
 QString KbBind::friendlyName(const QString& key){
@@ -142,134 +126,33 @@ QString KbBind::friendlyName(const QString& key){
 
 QString KbBind::friendlyActionName(const QString& key){
     QString act = action(key);
-    if(act.isEmpty())
-        return "Unbound";
-    QStringList parts = act.split(":");
-    QString prefix = parts[0];
-    if(parts.length() < 2){
-        const Key& key = _map[prefix];
-        if(!key)
-            return "(Unknown)";
-        return key.friendlyName();
-    }
-    int suffix = parts[1].toInt();
-    if(prefix == "$mode"){
-        switch(suffix){
-        case MODE_PREV:
-        case MODE_PREV_WRAP:
-            return "Switch to previous mode";
-        case MODE_NEXT:
-        case MODE_NEXT_WRAP:
-            return "Switch to next mode";
-        default:
-            return tr("Switch to mode %1").arg(suffix + 1);
-        }
-    } else if(prefix == "$light"){
-        switch(suffix){
-        case LIGHT_UP:
-        case LIGHT_UP_WRAP:
-            return "Brightness up";
-        case LIGHT_DOWN:
-        case LIGHT_DOWN_WRAP:
-            return "Brightness down";
-        }
-    } else if(prefix == "$lock"){
-        switch(suffix){
-        case LOCK_TOGGLE:
-            return "Toggle Windows lock";
-        case LOCK_ON:
-            return "Windows lock on";
-        case LOCK_OFF:
-            return "Windows lock off";
-        }
-    } else if(prefix == "$program"){
-        return "Launch program";
-    }
-    return "(Unknown)";
+    return KeyAction(act).friendlyName(_map);
 }
 
 void KbBind::resetAction(const QString &key){
     QString rKey = globalRemap(key);
+    // Clean up existing action (if any)
+    KeyAction* action = _bind.value(rKey);
+    delete action;
     _bind.remove(rKey);
     _needsUpdate = true;
     _needsSave = true;
 }
 
 void KbBind::noAction(const QString& key){
+    resetAction(key);
     QString rKey = globalRemap(key);
     if(!_map.key(rKey))
         return;
-    _bind[rKey] = "";
-    _needsUpdate = true;
-    _needsSave = true;
+    _bind[rKey] = new KeyAction(this);
 }
 
-void KbBind::keyAction(const QString& key, const QString& actionKey){
+void KbBind::setAction(const QString& key, const QString& action){
+    resetAction(key);
     QString rKey = globalRemap(key);
     if(!_map.key(rKey))
         return;
-    _bind[rKey] = actionKey;
-    _needsUpdate = true;
-    _needsSave = true;
-}
-
-void KbBind::modeAction(const QString& key, int mode){
-    QString rKey = globalRemap(key);
-    if(!_map.key(rKey))
-        return;
-    _bind[rKey] = QString("$mode:%1").arg(mode);
-    _needsUpdate = true;
-    _needsSave = true;
-}
-
-void KbBind::lightAction(const QString& key, int type){
-    QString rKey = globalRemap(key);
-    if(!_map.key(rKey))
-        return;
-    _bind[rKey] = QString("$light:%1").arg(type);
-    _needsUpdate = true;
-    _needsSave = true;
-}
-
-void KbBind::lockAction(const QString& key, int type){
-    QString rKey = globalRemap(key);
-    if(!_map.key(rKey))
-        return;
-    _bind[rKey] = QString("$lock:%1").arg(type);
-    _needsUpdate = true;
-    _needsSave = true;
-}
-
-void KbBind::programAction(const QString& key, const QString& onPress, const QString& onRelease, int stop){
-    QString rKey = globalRemap(key);
-    if(!_map.key(rKey))
-        return;
-    // URL-encode the commands and place them in the string (":" and "+" are both replaced, so they won't interfere)
-    _bind[rKey] = "$program:" + QString::fromUtf8(QUrl::toPercentEncoding(onPress.trimmed())) + "+" + QString::fromUtf8(QUrl::toPercentEncoding(onRelease.trimmed())) + QString("+%1").arg(stop);
-    _needsUpdate = true;
-    _needsSave = true;
-}
-
-QString KbBind::specialInfo(const QString& action, int& parameter){
-    QStringList list = action.split(":");
-    if(list.length() < 2){
-        parameter = INT_MIN;
-        return "";
-    }
-    parameter = list[1].toInt();
-    return list[0].replace("$", "");
-}
-
-int KbBind::programInfo(const QString& action, QString& onPress, QString& onRelease){
-    if(!isProgram(action))
-        return 0;
-    QString param = action.mid(9);
-    QStringList programs = param.split("+");
-    if(programs.length() != 3)
-        return 0;
-    onPress = QUrl::fromPercentEncoding(programs[0].toUtf8());
-    onRelease = QUrl::fromPercentEncoding(programs[1].toUtf8());
-    return programs[2].toInt();
+    _bind[rKey] = new KeyAction(action, this);
 }
 
 void KbBind::update(QFile& cmd, bool force){
@@ -281,25 +164,28 @@ void KbBind::update(QFile& cmd, bool force){
     // Reset all keys and enable notifications for all
     cmd.write("rebind all notify all");
     // Make sure modifier keys are included as they may be remapped globally
-    QHash<QString, QString> bind(_bind);
-    if(!_bind.contains("caps")) bind["caps"] = "caps";
-    if(!_bind.contains("lshift")) bind["lshift"] = "lshift";
-    if(!_bind.contains("rshift")) bind["rshift"] = "rshift";
-    if(!_bind.contains("lctrl")) bind["lctrl"] = "lctrl";
-    if(!_bind.contains("rctrl")) bind["rctrl"] = "rctrl";
-    if(!_bind.contains("lwin")) bind["lwin"] = "lwin";
-    if(!_bind.contains("rwin")) bind["rwin"] = "rwin";
-    if(!_bind.contains("lalt")) bind["lalt"] = "lalt";
-    if(!_bind.contains("ralt")) bind["ralt"] = "ralt";
-    QHashIterator<QString, QString> i(bind);
+    QHash<QString, KeyAction*> bind(_bind);
+    if(!_bind.contains("caps")) bind["caps"] = 0;
+    if(!_bind.contains("lshift")) bind["lshift"] = 0;
+    if(!_bind.contains("rshift")) bind["rshift"] = 0;
+    if(!_bind.contains("lctrl")) bind["lctrl"] = 0;
+    if(!_bind.contains("rctrl")) bind["rctrl"] = 0;
+    if(!_bind.contains("lwin")) bind["lwin"] = 0;
+    if(!_bind.contains("rwin")) bind["rwin"] = 0;
+    if(!_bind.contains("lalt")) bind["lalt"] = 0;
+    if(!_bind.contains("ralt")) bind["ralt"] = 0;
+    QHashIterator<QString, KeyAction*> i(bind);
     // Write out rebound keys
     while(i.hasNext()){
         i.next();
         QString key = i.key();
-        QString act = i.value();
+        KeyAction* act = i.value();
         if(_globalRemap.contains(key))
-            act = action(key);
-        if(act.isEmpty() || isSpecial(act)){
+            act = bindAction(_globalRemap.value(key));
+        if(!act)
+            continue;
+        QString value = act->driverName();
+        if(value.isEmpty()){
             // If the key is unbound or is a special action, unbind it
             cmd.write(" unbind ");
             cmd.write(key.toLatin1());
@@ -308,7 +194,7 @@ void KbBind::update(QFile& cmd, bool force){
             cmd.write(" bind ");
             cmd.write(key.toLatin1());
             cmd.write(":");
-            cmd.write(act.toLatin1());
+            cmd.write(value.toLatin1());
         }
     }
     // If win lock is enabled, unbind windows keys
@@ -318,145 +204,7 @@ void KbBind::update(QFile& cmd, bool force){
 
 void KbBind::keyEvent(const QString& key, bool down){
     QString rKey = globalRemap(key);
-    QString act = action(key);
-    // No need to respond to standard actions
-    if(!isSpecial(act))
-        return;
-    QStringList parts = act.split(":");
-    if(parts.length() < 2){
-        if(act == "dpiup"){
-            KbPerf* perf = modeParent()->perf();
-            if(down)
-                perf->dpiUp();
-        } else if(act == "dpidn"){
-            KbPerf* perf = modeParent()->perf();
-            if(down)
-                perf->dpiDown();
-        } else if(act == "sniper"){
-            KbPerf* perf = modeParent()->perf();
-            if(down)
-                sniperValue = perf->pushSniper();
-            else {
-                perf->popDpi(sniperValue);
-                sniperValue = 0;
-            }
-        }
-        return;
-    }
-    QString prefix = parts[0];
-    int suffix = parts[1].toInt();
-    if(prefix == "$mode"){
-        if(!down)
-            return;
-        // Change mode
-        Kb* device = devParent();
-        KbProfile* currentProfile = device->currentProfile();
-        int mode = currentProfile->indexOf(currentProfile->currentMode());
-        int modeCount = currentProfile->modeCount();
-        switch(suffix){
-        case MODE_PREV_WRAP:
-            mode--;
-            if(mode < 0)
-                mode = modeCount - 1;
-            break;
-        case MODE_NEXT_WRAP:
-            mode++;
-            if(mode >= modeCount)
-                mode = 0;
-            break;
-        case MODE_PREV:
-            mode--;
-            break;
-        case MODE_NEXT:
-            mode++;
-            break;
-        default:
-            // Absolute
-            mode = suffix;
-            break;
-        }
-        if(mode < 0 || mode >= modeCount)
-            return;
-        device->setCurrentMode(currentProfile->modes()[mode]);
-    } else if(prefix == "$light"){
-        if(!down)
-            return;
-        // Change brightness
-        KbLight* light = modeParent()->light();
-        int dim = light->dimming();
-        switch(suffix){
-        case LIGHT_UP:
-            if(dim > 0)
-                dim--;
-            break;
-        case LIGHT_DOWN:
-            if(dim < KbLight::MAX_DIM)
-                dim++;
-            break;
-        case LIGHT_UP_WRAP:
-            dim--;
-            if(dim < 0)
-                dim = KbLight::MAX_DIM;
-            break;
-        case LIGHT_DOWN_WRAP:
-            dim++;
-            if(dim > KbLight::MAX_DIM)
-                dim = 0;
-            break;
-        }
-        light->dimming(dim);
-    } else if(prefix == "$lock"){
-        if(!down)
-            return;
-        // Change win lock
-        switch(suffix){
-        case LOCK_TOGGLE:
-            winLock(!winLock());
-            break;
-        case LOCK_ON:
-            winLock(true);
-            break;
-        case LOCK_OFF:
-            winLock(false);
-            break;
-        }
-    } else if(prefix == "$program"){
-        // Launch program
-        QString onPress, onRelease;
-        int stop = programInfo(act, onPress, onRelease);
-        // Stop running programs based on setting
-        QProcess* process = 0;
-        if(down){
-            if(stop & PROGRAM_PR_KPSTOP){
-                process = kpPrograms.value(rKey);
-                if(process)
-                    process->kill();
-                process = 0;
-            }
-            if(stop & PROGRAM_RE_KPSTOP)
-                process = krPrograms.value(rKey);
-        } else {
-            if(stop & PROGRAM_PR_KRSTOP)
-                process = kpPrograms.value(rKey);
-        }
-        if(process)
-            process->kill();
-        // Launch new process if requested
-        QString& program = down ? onPress : onRelease;
-        if(program.isEmpty())
-            return;
-        // Check if the program is running already. If so, don't start it again.
-        QHash<QString, QProcess*>& running = down ? kpPrograms : krPrograms;
-        process = running.value(rKey);
-        if(process){
-            if(process->state() == QProcess::NotRunning)
-                delete process;
-            else
-                return;
-        }
-        // Start the program. Wrap it around sh to parse arguments.
-        process = new QProcess(this);
-        process->start("sh", QStringList() << "-c" << program);
-        running[rKey] = process;
-    }
+    KeyAction* act = bindAction(rKey);
+    if(act)
+        act->keyEvent(this, down);
 }

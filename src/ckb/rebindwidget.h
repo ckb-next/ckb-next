@@ -36,6 +36,10 @@ private slots:
     void on_fnBox_currentIndexChanged(int index);
     void on_numBox_currentIndexChanged(int index);
     void on_mediaBox_currentIndexChanged(int index);
+    void on_mbBox_currentIndexChanged(int index);
+    void on_mb2Box_currentIndexChanged(int index);
+    void on_wheelBox_currentIndexChanged(int index);
+    void on_dpiBox_currentIndexChanged(int index);
     void on_modeBox_currentIndexChanged(int index);
     void on_lightBox_currentIndexChanged(int index);
     void on_lockBox_currentIndexChanged(int index);
@@ -47,6 +51,10 @@ private slots:
     void on_fnButton_clicked(bool checked);
     void on_numButton_clicked(bool checked);
     void on_mediaButton_clicked(bool checked);
+    void on_mbButton_clicked(bool checked);
+    void on_mb2Button_clicked(bool checked);
+    void on_wheelButton_clicked(bool checked);
+    void on_dpiButton_clicked(bool checked);
     void on_modeButton_clicked(bool checked);
     void on_lightButton_clicked(bool checked);
     void on_lockButton_clicked(bool checked);
@@ -67,6 +75,9 @@ private:
     QStringList fnKeys;
     QStringList numKeys;
     QStringList mediaKeys;
+    QStringList mouseKeys;
+    QStringList mouseExtKeys;
+    QStringList wheelKeys;
 };
 
 #endif // BINDDIALOG_H

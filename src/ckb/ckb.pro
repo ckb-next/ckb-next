@@ -89,7 +89,8 @@ SOURCES += main.cpp\
     autorun.cpp \
     ckbsettings.cpp \
     kbperf.cpp \
-    ckbsettingswriter.cpp
+    ckbsettingswriter.cpp \
+    keyaction.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -139,7 +140,8 @@ HEADERS  += mainwindow.h \
     autorun.h \
     ckbsettings.h \
     kbperf.h \
-    ckbsettingswriter.h
+    ckbsettingswriter.h \
+    keyaction.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \

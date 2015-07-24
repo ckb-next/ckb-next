@@ -70,6 +70,9 @@ private:
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
+
+    // Get drawing scale/offset. drawX = (keymapX + offsetX) * scale
+    void drawInfo(float& scale, float& offsetX, float& offsetY);
 };
 
 #endif // RGBWIDGET_H

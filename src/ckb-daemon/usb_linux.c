@@ -71,7 +71,7 @@ void* os_inputmain(void* context){
     ckb_info("Starting input thread for %s%d\n", devpath, index);
 
     // Monitor input transfers on all endpoints
-    int urbcount = IS_RGB(vendor, product) ? 4 : 3;
+    const int urbcount = 3;
     struct usbdevfs_urb urbs[urbcount];
     memset(urbs, 0, sizeof(urbs));
     urbs[0].buffer_length = 8;
@@ -81,7 +81,6 @@ void* os_inputmain(void* context){
         else
             urbs[1].buffer_length = 21;
         urbs[2].buffer_length = MSG_SIZE;
-        urbs[3].buffer_length = MSG_SIZE;
     } else {
         urbs[1].buffer_length = 4;
         urbs[2].buffer_length = 15;

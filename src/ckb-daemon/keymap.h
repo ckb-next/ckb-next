@@ -26,7 +26,7 @@
 // Keys recognized by the driver but not present on keyboard
 #define N_KEYS_EXTRA            12
 // Mouse buttons
-#define N_MOUSE_BUTTONS         10
+#define N_MOUSE_BUTTONS         13
 #define MOUSE_BUTTON_FIRST      (N_KEYS_KB + N_KEYS_EXTRA)
 // Number of keys that generate input
 #define N_KEYS_INPUT            (MOUSE_BUTTON_FIRST + N_MOUSE_BUTTONS)

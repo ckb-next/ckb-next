@@ -15,8 +15,9 @@ struct Key {
     // LED position, measured roughly in 16th inches. Most keys are 3/4" apart (12x12).
     short x, y;
     short width, height;
-    // Whether or not the key has an LED attached
+    // Whether or not the key has an LED, scancode, or both
     bool hasLed;
+    bool hasScan;
 
     // Friendly name with optional OS-based labels
     inline QString friendlyName(bool os = true) const {
@@ -72,7 +73,7 @@ public:
     };
     // ISO (105-key) or ANSI (104-key)?
     inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK; }
-    inline bool         isISO()                 { return isISO(keyLayout); }
+    inline bool         isISO() const           { return isISO(keyLayout); }
     // Auto-detects layout from system locale
     static Layout       locale();
 
@@ -109,7 +110,7 @@ public:
     inline uint height() const  { return keyHeight; }
 
     // Keys by name
-    inline Key  key(const QString& name) const          { Key empty = {0,0,0,0,0,0,0,0}; return _keys.value(name, empty); }
+    inline Key  key(const QString& name) const          { Key empty = {0,0,0,0,0,0,0,0,0}; return _keys.value(name, empty); }
     inline Key  operator[](const QString& name) const   { return key(name); }
     inline bool contains(const QString& name) const     { return _keys.contains(name); }
     // List all key names/values
@@ -123,6 +124,9 @@ public:
 
     // Keys by position (top to bottom, left to right)
     QStringList byPosition() const;
+
+    // Friendly key name on any device
+    static QString friendlyName(const QString& key, Layout layout);
 
 private:
     QHash<QString, Key> _keys;

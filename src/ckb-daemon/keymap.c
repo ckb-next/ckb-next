@@ -164,16 +164,19 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "f20",        -1, KEY_F20 },
 
     // Mouse buttons
-    { "mousel",     -1, SCAN_MOUSE | BTN_LEFT },
-    { "mouser",     -1, SCAN_MOUSE | BTN_RIGHT },
-    { "mousem",     -1, SCAN_MOUSE | BTN_MIDDLE },
-    { "mouses1",    -1, SCAN_MOUSE | BTN_SIDE },
-    { "mouses2",    -1, SCAN_MOUSE | BTN_EXTRA },
+    { "mouse1",     -1, SCAN_MOUSE | BTN_LEFT },
+    { "mouse2",     -1, SCAN_MOUSE | BTN_RIGHT },
+    { "mouse3",     -1, SCAN_MOUSE | BTN_MIDDLE },
+    { "mouse4",     -1, SCAN_MOUSE | BTN_SIDE },
+    { "mouse5",     -1, SCAN_MOUSE | BTN_EXTRA },
     { "dpiup",      -1, KEY_CORSAIR },
     { "dpidn",      -1, KEY_CORSAIR },
     { "sniper",     -1, KEY_CORSAIR },
     { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },
     { "wheeldn",    -1, SCAN_MOUSE | BTN_WHEELDOWN },
+    { "mouse6",     -1, SCAN_MOUSE | BTN_FORWARD },
+    { "mouse7",     -1, SCAN_MOUSE | BTN_BACK },
+    { "mouse8",     -1, SCAN_MOUSE | BTN_TASK },
 
     // RGB mouse zones
     { "front",      LED_MOUSE, KEY_NONE },

@@ -146,6 +146,9 @@
 #define BTN_MIDDLE          2
 #define BTN_SIDE            4
 #define BTN_EXTRA           5
+#define BTN_FORWARD         6
+#define BTN_BACK            7
+#define BTN_TASK            8
 
 #endif // OS_MAC
 

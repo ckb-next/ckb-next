@@ -60,8 +60,8 @@ int setactive_kb(usbdevice* kb, int active){
         for(int key = 0; key < N_KEYS_KB; ){
             int pair;
             for(pair = 0; pair < 30 && key < N_KEYS_KB; pair++, key++){
-                // Select proprietary mode for proprietary keys, standard HID for all others
-                uchar action = (keymap[key].scan == KEY_CORSAIR ? IN_CORSAIR : IN_HID);
+                // Enable both HID and Corsair inputs on all keys. They're filtered according to key type when the reports come in.
+                uchar action = IN_HID | IN_CORSAIR;
                 // Additionally, make MR activate the MR ring (this is disabled for now, may be back later)
                 //if(keymap[key].name && !strcmp(keymap[key].name, "mr"))
                 //    action |= ACT_MR_RING;

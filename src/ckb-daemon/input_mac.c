@@ -39,7 +39,7 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
         location.y = floor(loc.y + ev->mouseMove.dy);
         options = (options & ~kIOHIDSetRelativeCursorPosition) | kIOHIDSetCursorPosition;
     }
-    kern_return_t res = IOHIDPostEvent(event, type, location, ev, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options | kIOHIDPostHIDManagerEvent);
+    kern_return_t res = IOHIDPostEvent(event, type, location, ev, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
     if(res != kIOReturnSuccess && !silence_errors)
         ckb_warn("Post event failed: %x\n", res);
 

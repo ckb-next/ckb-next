@@ -4,6 +4,8 @@
 #include "profile.h"
 #include "usb.h"
 
+int hwload_enabled = 1;
+
 // Device list
 usbdevice keyboard[DEV_MAX];
 pthread_mutex_t devlistmutex = PTHREAD_MUTEX_INITIALIZER;
@@ -13,8 +15,9 @@ pthread_mutex_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIA
 int start_dev(usbdevice* kb, int makeactive){
     // Get the firmware version from the device
     if(kb->pollrate == 0){
-        if(getfwversion(kb)){
-            ckb_warn("Unable to load firmware version/poll rate\n");
+        if(!hwload_enabled || getfwversion(kb)){
+            if(hwload_enabled)
+                ckb_warn("Unable to load firmware version/poll rate\n");
             kb->pollrate = 0;
             kb->features &= ~(FEAT_POLLRATE | FEAT_ADJRATE);
             if(kb->fwversion == 0)
@@ -29,7 +32,7 @@ int start_dev(usbdevice* kb, int makeactive){
         return 0;
     }
     // Load profile from device
-    if(!kb->hw){
+    if(!kb->hw && hwload_enabled){
         if(hwloadprofile(kb, 1))
             ckb_warn("Unable to load hardware profile\n");
     }

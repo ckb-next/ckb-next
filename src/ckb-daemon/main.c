@@ -7,6 +7,8 @@
 // usb.c
 extern volatile int reset_stop;
 extern int features_mask;
+// device.c
+extern int hwload_enabled;
 
 // Timespec utility function
 void timespec_add(struct timespec* timespec, long nanoseconds){
@@ -70,9 +72,9 @@ int main(int argc, char** argv){
         if(!strcmp(argv[i], "--help")){
             printf(
 #ifdef OS_MAC
-                        "Usage: ckb-daemon [--gid=<gid>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
+                        "Usage: ckb-daemon [--gid=<gid>] [--nohwload] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
 #else
-                        "Usage: ckb-daemon [--gid=<gid>] [--nonotify] [--nobind] [--nonroot]\n"
+                        "Usage: ckb-daemon [--gid=<gid>] [--nohwload] [--nonotify] [--nobind] [--nonroot]\n"
 #endif
                         "\n"
                         "See https://github.com/ccMSC/ckb/blob/master/DAEMON.md for full instructions.\n"
@@ -81,6 +83,8 @@ int main(int argc, char** argv){
                         "    --gid=<gid>\n"
                         "        Restrict access to %s* nodes to users in group <gid>.\n"
                         "        (Ordinarily they are accessible to anyone)\n"
+                        "    --nohwload\n"
+                        "        Disables loading of hardware profiles. May improve startup performance.\n"
                         "    --nonotify\n"
                         "        Disables key monitoring/notifications.\n"
                         "        Note that this makes reactive lighting impossible.\n"
@@ -88,7 +92,7 @@ int main(int argc, char** argv){
                         "        Disables all key rebinding, macros, and notifications. Implies --nonotify.\n"
 #ifdef OS_MAC
                         "    --nomouseaccel\n"
-                        "        Completely disables mouse acceleration, even if the system preferences enable it.\n"
+                        "        Disables mouse acceleration, even if the system preferences enable it.\n"
 #endif
                         "    --nonroot\n"
                         "        Allows running ckb-daemon as a non root user.\n"
@@ -133,6 +137,9 @@ int main(int argc, char** argv){
             // Disable key notifications
             features_mask &= ~FEAT_NOTIFY;
             ckb_info_nofile("Key notifications are disabled\n");
+        } else if(!strcmp(argument, "--nohwload")){
+            hwload_enabled = 0;
+            ckb_info_nofile("Hardware load disabled\n");
         } else if(!strcmp(argument, "--nonroot")){
             // Allow running as a non-root user
             forceroot = 0;

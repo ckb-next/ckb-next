@@ -87,10 +87,6 @@ static void* _setupusb(void* context){
     DELAY_LONG(kb);
     if(os_setupusb(kb))
         goto fail;
-    if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
-        goto fail;
-    pthread_detach(kb->inputthread);
-
     // Make up a device name and serial if they weren't assigned
     if(!kb->serial[0])
         snprintf(kb->serial, SERIAL_LEN, "%04x:%04x-NoID", kb->vendor, kb->product);
@@ -100,6 +96,9 @@ static void* _setupusb(void* context){
     // Set up an input device for key events
     if(os_inputopen(kb))
         goto fail;
+    if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
+        goto fail;
+    pthread_detach(kb->inputthread);
 
     // Set up device
     vt->allocprofile(kb);

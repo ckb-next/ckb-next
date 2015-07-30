@@ -11,13 +11,12 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
     int res;
     if(kb->fwversion >= 0x120){
-#if 0   // Change to #if 1 if using valgrind (4 padding bytes between timeout/data; valgrind thinks they're uninit'd and complains)
         struct usbdevfs_bulktransfer transfer;
         memset(&transfer, 0, sizeof(transfer));
-        transfer.ep = 3; transfer.len = MSG_SIZE; transfer.timeout = 5000; transfer.data = (void*)out_msg;
-#else
-        struct usbdevfs_bulktransfer transfer = { 3, MSG_SIZE, 5000, (void*)out_msg };
-#endif
+        transfer.ep = (kb->fwversion >= 0x130) ? 4 : 3;
+        transfer.len = MSG_SIZE;
+        transfer.timeout = 5000;
+        transfer.data = (void*)out_msg;
         res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
     } else {
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, (void*)out_msg };
@@ -37,8 +36,19 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     DELAY_MEDIUM(kb);
-    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, in_msg };
-    int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+    int res;
+    if(kb->fwversion >= 0x130){
+        struct usbdevfs_bulktransfer transfer;
+        memset(&transfer, 0, sizeof(transfer));
+        transfer.ep = 0x84;
+        transfer.len = MSG_SIZE;
+        transfer.timeout = 5000;
+        transfer.data = in_msg;
+        res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
+    } else {
+        struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, in_msg };
+        res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+    }
     if(res <= 0){
         if(res == -1 && errno == ETIMEDOUT){
             ckb_warn_fn("%s (continuing)\n", file, line, strerror(errno));
@@ -71,7 +81,7 @@ void* os_inputmain(void* context){
     ckb_info("Starting input thread for %s%d\n", devpath, index);
 
     // Monitor input transfers on all endpoints
-    int urbcount = IS_RGB(vendor, product) ? 4 : 3;
+    int urbcount = 3;
     struct usbdevfs_urb urbs[urbcount];
     memset(urbs, 0, sizeof(urbs));
     urbs[0].buffer_length = 8;

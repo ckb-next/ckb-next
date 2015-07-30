@@ -9,9 +9,8 @@ Hash: SHA256
 !BEGIN FW ENTRIES
 
 # Vendor  Model  FW   URL                                             Min.ckb File Name         SHA256
-  Corsair K65RGB 1.12 http://www3.corsair.com/software/HID/K65RGB.zip 0.0.1   K65RGB_app112.bin 4d730a6c6716c59e2c0a73a1afeeef8ee6a5384b07d7baace4e4c333b6c956c6
-  Corsair K70RGB 1.20 http://www3.corsair.com/software/HID/K70RGB.zip 0.1.2   K70_app120.bin    9748efd89b878e050e121b08c780e81bca5922a8eb0f7e5288f486850493d60e
-  Corsair K95RGB 1.20 http://www3.corsair.com/software/HID/K95RGB.zip 0.1.2   K95_app120.bin    8a46a97469abe8cee2ae07a463d152686afa0d0f628023694d739a6491d2fd64
+  Corsair K70RGB 1.20 http://www3.corsair.com/software/HID/K70RGB.zip 0.1.6   K70RGB_app130.bin e4ec7852d0457e3eeea794f2a278228c3eb3e26de03973960afa453698968cf5
+  Corsair K95RGB 1.20 http://www3.corsair.com/software/HID/K95RGB.zip 0.1.6   K95RGB_app130.bin 192d3ca125cb560dce2a764b9e29491875d5073c34b0845de48e805a27de3699
   Corsair M65RGB 1.19 http://www3.corsair.com/software/HID/M65RGB.zip 0.2.0   M65RGB_app119.bin be214ab1f0cc1fc7f785c926c117ef270597f80d1fad9133a730022834267f4f
 
 !END FW ENTRIES
@@ -19,11 +18,11 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJVlQ7AAAoJEBXtkzSNyNMJrkgIAIVy4PZ6mRCFxhqSQLADCFki
-u1XRVusPlFOPsYzjhdJN+GtG5OmzwGuRKWqGcfff/Clh+wt7f1ShHhqFjWzkDldl
-cbNRD6GWqxWYR3mpG9QTkGtDE/hSXrkI0PgA7OMFrvIcYuzIXW3gHPKCKKGLzeVA
-Gncm/zyBVcXu0SHFsXOVxCEShl92kzzjg9qw/PWDcg6ZxsMvo+gBLj3Tu1+tPqFe
-hCB0hJwu6VMcPcu5dZ3x2AFWib8DT/+chvVBRf5WgJ49iPNDgWoWt2Dh8+pmVPPZ
-kkOGJpnGivbrXeW6YQJ0E4ZmY01viPuDy54lk3bMR0QETXnWxG+8azHjnHsU4ic=
-=9qwb
+iQEcBAEBCAAGBQJVuXwHAAoJEBXtkzSNyNMJQqMH/jbCIXNYTzFIFIAlmDJbHPAB
+VWCeCKEiSVKlBz2jlmaoJ342rSO6nfuQgpmDQl+Buqop2MpFhHDzpa72t/NB7r0T
+XK5OXlrcMQWIN/YymmOBeKKE0ZIt1URfBE5b8AUgXqfDGmuoPWIG+Gieqp0fAn4w
+RX1/oTMdJQEGv3G+vrLlvsfIz+NQrdqOXYffitAdRUjsBf5I6sfZslUl/GupipvB
+DaMAYoEljOrzNTdtfInVpd+dVGMCKZhohlpsCzQ/Mi/UPwlgck07CD8jx47Wd/RH
+mvabnjVV2pUJDPUwM9lH6SNOU1DvHT6M78+i6gIlytICaYWecPtOuRrlLzlaf18=
+=LSGm
 -----END PGP SIGNATURE-----

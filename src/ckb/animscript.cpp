@@ -281,10 +281,6 @@ void AnimScript::begin(quint64 timestamp){
         return;
     end();
     stopped = firstFrame = readFrame = readAnyFrame = false;
-    process = new QProcess(this);
-    connect(process, SIGNAL(readyRead()), this, SLOT(readProcess()));
-    process->start(_path, QStringList("--ckb-run"));
-    qDebug() << "Starting " << _path;
     // Determine the upper left corner of the given keys
     QStringList keysCopy = _keys;
     minX = INT_MAX;
@@ -300,6 +296,15 @@ void AnimScript::begin(quint64 timestamp){
         if(pos.y < minY)
             minY = pos.y;
     }
+    if(keysCopy.isEmpty()){
+        // If the key list is empty, don't actually start the animation but pretend it's running anyway
+        firstFrame = readFrame = readAnyFrame = true;
+        return;
+    }
+    process = new QProcess(this);
+    connect(process, SIGNAL(readyRead()), this, SLOT(readProcess()));
+    process->start(_path, QStringList("--ckb-run"));
+    qDebug() << "Starting " << _path;
     // Write the keymap to the process
     process->write("begin keymap\n");
     process->write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());
@@ -324,7 +329,8 @@ void AnimScript::retrigger(quint64 timestamp, bool allowPreempt){
     if(!process)
         begin(timestamp);
     advance(timestamp);
-    process->write("start\n");
+    if(process)
+        process->write("start\n");
 }
 
 void AnimScript::stop(quint64 timestamp){
@@ -333,7 +339,8 @@ void AnimScript::stop(quint64 timestamp){
     if(!process)
         begin(timestamp);
     advance(timestamp);
-    process->write("stop\n");
+    if(process)
+        process->write("stop\n");
 }
 
 void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
@@ -410,7 +417,7 @@ void AnimScript::frame(quint64 timestamp){
         begin(timestamp);
 
     advance(timestamp);
-    if(readFrame || !firstFrame)
+    if((readFrame || !firstFrame) && process)
         // Don't ask for a new frame if the animation hasn't delivered the last one yet
         process->write("frame\n");
     firstFrame = true;
@@ -418,7 +425,7 @@ void AnimScript::frame(quint64 timestamp){
 }
 
 void AnimScript::advance(quint64 timestamp){
-    if(timestamp <= lastFrame)
+    if(timestamp <= lastFrame || !process)
         // Don't do anything if the time hasn't actually advanced.
         return;
     double delta = (timestamp - lastFrame) / (double)durationMsec;

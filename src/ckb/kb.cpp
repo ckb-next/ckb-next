@@ -346,7 +346,7 @@ void Kb::frameUpdate(){
 
     // Send lighting/binding to driver
     cmd.write(QString("mode %1 switch ").arg(index + 1).toLatin1());
-    light->frameUpdate(cmd, dimKeys);
+    light->frameUpdate(cmd, dimKeys, perf->indicatorLights());
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
     cmd.write("\n");
@@ -380,7 +380,7 @@ void Kb::run(){
     // Wait a small amount of time for the node to open (100ms)
     QThread::usleep(100000);
     if(!notify.open(QIODevice::ReadOnly)){
-        // If it's still not open, try again before giving up (10s total)
+        // If it's still not open, try again before giving up (1s at a time, 10s total)
         QThread::usleep(900000);
         for(int i = 1; i < 10; i++){
             if(notify.open(QIODevice::ReadOnly))
@@ -537,7 +537,8 @@ void Kb::readNotify(QString line){
             // RGB - set mode lighting
             if(!_hwProfile || _hwProfile->modeCount() <= mode || mode >= HWMODE_MAX || !hwLoading[mode + 1])
                 return;
-            KbLight* light = _hwProfile->modes()[mode]->light();
+            KbMode* kbmode = _hwProfile->modes()[mode];
+            KbLight* light = kbmode->light();
             // Scan the input for colors
             QColor lightColor = QColor();
             for(int i = 3; i < components.count(); i++){
@@ -558,10 +559,18 @@ void Kb::readNotify(QString line){
                         // Parse keys
                         QStringList keys = set[0].split(",");
                         foreach(QString key, keys){
-                            light->color(key, color);
                             if(key == "light")
                                 // Extrapolate the Light key to the M-keys and Lock key, since those will be set to black on hwsave
                                 lightColor = color;
+                            if(key.startsWith("dpi") && key.length() > 3){
+                                // DPI levels go to the KbPerf object instead of KbLight
+                                bool ok = false;
+                                int index = key.mid(3).toInt(&ok);
+                                if(ok)
+                                    kbmode->perf()->dpiColor(index, color);
+                                continue;
+                            }
+                            light->color(key, color);
                         }
                     }
                 }

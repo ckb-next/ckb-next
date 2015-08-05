@@ -66,6 +66,7 @@ public:
     inline KbMode*  currentMode()   { return _currentMode; }
     inline KbLight* currentLight()  { return !_currentMode ? 0 : _currentMode->light(); }
     inline KbBind*  currentBind()   { return !_currentMode ? 0 : _currentMode->bind(); }
+    inline KbPerf*  currentPerf()   { return !_currentMode ? 0 : _currentMode->perf(); }
 
     // Update selection
     void        setCurrentProfile(KbProfile* profile, bool spontaneous = true);

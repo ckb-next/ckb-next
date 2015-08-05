@@ -5,11 +5,11 @@
 ColorButton::ColorButton(QWidget* parent, bool allowAlpha) :
     QPushButton(parent), _alpha(allowAlpha)
 {
-    // Pick color on click (use queued connection so that any on_*_clicked() events can be processed first)
-    connect(this, SIGNAL(clicked()), this, SLOT(pickColor()), Qt::QueuedConnection);
     setAutoDefault(false);
     setDefault(false);
     updateImage();
+    // Pick color on click (use queued connection so that any on_*_clicked() events can be processed first)
+    connect(this, SIGNAL(clicked()), this, SLOT(pickColor()), Qt::QueuedConnection);
 }
 
 void ColorButton::color(const QColor& newColor){
@@ -19,13 +19,24 @@ void ColorButton::color(const QColor& newColor){
     updateImage();
 }
 
+void ColorButton::allowAlpha(bool newAllowAlpha){
+    _alpha = newAllowAlpha;
+    updateImage();
+}
+
+void ColorButton::bigIcons(bool newBigIcons){
+    _bigIcons = newBigIcons;
+    updateImage();
+}
+
 void ColorButton::updateImage(){
     if(!_color.isValid()){
         setIcon(QIcon());
-        setText("Change color...");
+        if(_setLabel)
+            setText("Change color...");
         return;
     }
-    const int w = 24, h = 12;
+    const int w = 24, h = _bigIcons ? 24 : 12;
     QImage image(w, h, QImage::Format_RGB888);
     QPainter painter(&image);
     painter.setPen(Qt::NoPen);
@@ -38,10 +49,12 @@ void ColorButton::updateImage(){
     }
     painter.fillRect(1, 1, w - 2, h - 2, _color);
     setIcon(QIcon(QPixmap::fromImage(image)));
-    QString text = QString(" (%1, %2, %3)").arg(_color.red()).arg(_color.green()).arg(_color.blue());
-    if(_alpha)
-        text += QString(", %4%").arg(QString::number(_color.alphaF() * 100., 'f', 0));
-    setText(text);
+    if(_setLabel){
+        QString text = QString(" (%1, %2, %3)").arg(_color.red()).arg(_color.green()).arg(_color.blue());
+        if(_alpha)
+            text += QString(", %4%").arg(QString::number(_color.alphaF() * 100., 'f', 0));
+        setText(text);
+    }
 }
 
 void ColorButton::pickColor(){

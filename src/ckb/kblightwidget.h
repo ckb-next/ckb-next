@@ -38,11 +38,9 @@ private slots:
 
 private:
     KbLight* light;
-
     QStringList currentSelection;
 
     Ui::KbLightWidget *ui;
-    friend class KbWidget;
 };
 
 #endif // KBLIGHTWIDGET_H

@@ -8,7 +8,7 @@
 #endif
 
 KbPerf::KbPerf(KbMode* parent) :
-    QObject(parent), _liftHeight(MEDIUM), _angleSnap(false),
+    QObject(parent), _liftHeight(MEDIUM), _angleSnap(false), _enableIndicator(true),
     _needsUpdate(true), _needsSave(true), runningPushIdx(1) {
     // Default DPI settings
     dpiX[0] = dpiY[0] = 400;
@@ -17,6 +17,15 @@ KbPerf::KbPerf(KbMode* parent) :
     dpiX[3] = dpiY[3] = 1500;
     dpiX[4] = dpiY[4] = 3000;
     dpiX[5] = dpiY[5] = 6000;
+    dpiClr[0] = QColor(255, 0, 0);
+    dpiClr[1] = QColor(255, 192, 0);
+    dpiClr[2] = QColor(255, 255, 0);
+    dpiClr[3] = QColor(0, 255, 0);
+    dpiClr[4] = QColor(0, 255, 255);
+    dpiClr[5] = QColor(255, 255, 255);
+    dpiClr[6] = QColor(192, 192, 192);
+    for(int i = 0; i < DPI_COUNT; i++)
+        dpiOn[i] = true;
     dpiLastIdx = dpiCurIdx = 3;
     dpiCurX = dpiX[dpiCurIdx];
     dpiCurY = dpiY[dpiCurIdx];
@@ -24,10 +33,13 @@ KbPerf::KbPerf(KbMode* parent) :
 
 KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
     QObject(parent), dpiCurX(other.dpiCurX), dpiCurY(other.dpiCurY), dpiCurIdx(other.dpiCurIdx), dpiLastIdx(other.dpiLastIdx),
-    _liftHeight(other._liftHeight), _angleSnap(other._angleSnap),
+    _liftHeight(other._liftHeight), _angleSnap(other._angleSnap), _enableIndicator(other._enableIndicator),
     _needsUpdate(true), _needsSave(true), runningPushIdx(1) {
     memcpy(dpiX, other.dpiX, sizeof(dpiX));
     memcpy(dpiY, other.dpiY, sizeof(dpiY));
+    for(int i = 0; i < DPI_COUNT + 1; i++)
+        dpiClr[i] = other.dpiClr[i];
+    memcpy(dpiOn, other.dpiOn, sizeof(dpiOn));
     // Don't copy pushed DPI states. If the other mode has any, restore the original DPI
     if(!other.pushedDpis.isEmpty())
         curDpi(other.pushedDpis[0]);
@@ -41,11 +53,20 @@ void KbPerf::load(CkbSettings& settings){
     {
         SGroup group(settings, "DPI");
         for(int i = 0; i < DPI_COUNT; i++){
-            QPoint value = settings.value(QString::number(i)).toPoint();
+            QString iStr = QString::number(i);
+            QPoint value = settings.value(iStr).toPoint();
             if(value.isNull())
                 continue;
             dpiX[i] = value.x(); dpiY[i] = value.y();
+            QColor color = settings.value(iStr + "RGB").toString();
+            if(color.isValid())
+                dpiClr[i] = color;
+            if(i != 0)
+                dpiOn[i] = !settings.value(iStr + "Disabled").toBool();
         }
+        QColor color = settings.value("6RGB").toString();
+        if(color.isValid())
+            dpiClr[OTHER] = color;
         if(settings.contains("LastIdx")){
             dpiLastIdx = settings.value("LastIdx").toInt();
             if(dpiLastIdx >= DPI_COUNT || dpiLastIdx < 0)
@@ -59,6 +80,7 @@ void KbPerf::load(CkbSettings& settings){
     if(_liftHeight < LOW || _liftHeight > HIGH)
         _liftHeight = MEDIUM;
     _angleSnap = settings.value("AngleSnap").toBool();
+    _enableIndicator = !settings.value("NoIndicator").toBool();
     emit didLoad();
 }
 
@@ -67,8 +89,14 @@ void KbPerf::save(CkbSettings& settings){
     SGroup group(settings, "Performance");
     {
         SGroup group(settings, "DPI");
-        for(int i = 0; i < DPI_COUNT; i++)
-            settings.setValue(QString::number(i), QPoint(dpiX[i], dpiY[i]));
+        for(int i = 0; i < DPI_COUNT; i++){
+            QString iStr = QString::number(i);
+            settings.setValue(iStr, QPoint(dpiX[i], dpiY[i]));
+            settings.setValue(iStr + "RGB", dpiClr[i].name());
+            if(i != 0)
+                settings.setValue(iStr + "Disabled", !dpiOn[i]);
+        }
+        settings.setValue("6RGB", dpiClr[OTHER].name());
         settings.setValue("LastIdx", dpiLastIdx);
         int curX = dpiCurX, curY = dpiCurY;
         // Ignore any pushed modes
@@ -80,6 +108,7 @@ void KbPerf::save(CkbSettings& settings){
     }
     settings.setValue("LiftHeight", _liftHeight);
     settings.setValue("AngleSnap", _angleSnap);
+    settings.setValue("NoIndicator", !_enableIndicator);
 }
 
 void KbPerf::dpi(int index, const QPoint& newValue){
@@ -141,6 +170,27 @@ void KbPerf::popDpi(quint64 pushIdx){
     _needsUpdate = _needsSave = true;
 }
 
+void KbPerf::dpiUp(){
+    // Scroll past disabled DPIs and choose the next one up
+    int idx = curDpiIdx();
+    do {
+        idx++;
+        if(idx >= DPI_COUNT)
+            return;
+    } while(!dpiOn[idx]);
+    curDpiIdx(idx);
+}
+
+void KbPerf::dpiDown(){
+    int idx = curDpiIdx();
+    do {
+        idx--;
+        if(idx <= SNIPER)
+            return;
+    } while(!dpiOn[idx]);
+    curDpiIdx(idx);
+}
+
 void KbPerf::liftHeight(height newHeight){
     if(newHeight < LOW || newHeight > HIGH)
         return;
@@ -174,5 +224,26 @@ void KbPerf::update(QFile& cmd, bool force, bool saveCustomDpi){
         cmd.write(QString(" %1:%2,%3").arg(i).arg(dpiX[i]).arg(dpiY[i]).toLatin1());
     // Save stage selection, lift height, and angle snap
     cmd.write(QString(" dpisel %1 lift %2 snap %3").arg(stage).arg(_liftHeight).arg(_angleSnap ? "on" : "off").toLatin1());
+    // Save DPI colors
+    cmd.write(" rgb");
+    for(int i = 0; i < DPI_COUNT; i++){
+        QColor color = dpiColor(i);
+        cmd.write(" dpi");
+        char output[9];
+        snprintf(output, sizeof(output), "%1d:%02x%02x%02x", i, color.red(), color.green(), color.blue());
+        cmd.write(output);
+    }
+}
+
+QHash<QString, QRgb> KbPerf::indicatorLights() const {
+    QHash<QString, QRgb> res;
+    if(_enableIndicator){
+        // Set DPI indicator according to index
+        int index = curDpiIdx();
+        if(index == -1 || index > OTHER)
+            index = OTHER;
+        res["dpi"] = dpiClr[index].rgb();
+    }
+    return res;
 }
 

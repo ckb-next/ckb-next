@@ -1,0 +1,958 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MPerfWidget</class>
+ <widget class="QWidget" name="MPerfWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>932</width>
+    <height>636</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>DPI</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="6" column="1">
+      <widget class="QCheckBox" name="eBox2">
+       <property name="toolTip">
+        <string>Uncheck this box to skip the stage while moving up or down.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="8">
+      <widget class="QSlider" name="ySlider3">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="5">
+      <widget class="QSlider" name="xSlider2">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="6">
+      <widget class="QSpinBox" name="xBox3">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="9">
+      <widget class="QSpinBox" name="yBox0">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="8">
+      <widget class="QSlider" name="ySlider0">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="2">
+      <widget class="ColorButton" name="iButton4">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="2">
+      <widget class="ColorButton" name="iButton5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="4">
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>5</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="2" column="2">
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>15</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="3" column="7">
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>5</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="7" column="2">
+      <widget class="ColorButton" name="iButton3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="5">
+      <widget class="QLabel" name="label_12">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>X Value:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="6">
+      <widget class="QSpinBox" name="xBox4">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="9">
+      <widget class="QSpinBox" name="yBox5">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="5">
+      <widget class="QSlider" name="xSlider5">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="6">
+      <widget class="QSpinBox" name="xBox0">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="6">
+      <widget class="QSpinBox" name="xBox1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="9">
+      <widget class="QSpinBox" name="yBox2">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="9">
+      <widget class="QSpinBox" name="yBox3">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="5">
+      <widget class="QSlider" name="xSlider4">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="5">
+      <widget class="QSlider" name="xSlider0">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="ColorButton" name="iButton2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="8">
+      <widget class="QLabel" name="label_4">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Y Value:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="2">
+      <widget class="ColorButton" name="iButtonO">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="11">
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="8">
+      <widget class="QSlider" name="ySlider2">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="9">
+      <widget class="QSpinBox" name="yBox1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="5">
+      <widget class="QSlider" name="xSlider1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>25</number>
+       </property>
+       <property name="pageStep">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="6">
+      <widget class="QSpinBox" name="xBox2">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>5</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="5" column="2">
+      <widget class="ColorButton" name="iButton1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="8">
+      <widget class="QSlider" name="ySlider4">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="9">
+      <widget class="QSpinBox" name="yBox4">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="8">
+      <widget class="QSlider" name="ySlider1">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="5">
+      <widget class="QSlider" name="xSlider3">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="6">
+      <widget class="QSpinBox" name="xBox5">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="2">
+      <widget class="ColorButton" name="iButton0">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="8">
+      <widget class="QSlider" name="ySlider5">
+       <property name="minimum">
+        <number>400</number>
+       </property>
+       <property name="maximum">
+        <number>8500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="5" colspan="5">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>You can assign other DPIs in the Binding tab.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="3">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>2:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="3">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>3:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="3">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>4:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>1:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="3">
+      <widget class="QLabel" name="label_15">
+       <property name="text">
+        <string>Other:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="3">
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>5:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="3">
+      <widget class="QLabel" name="label_14">
+       <property name="text">
+        <string>Sniper:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QCheckBox" name="eBox5">
+       <property name="toolTip">
+        <string>Uncheck this box to skip the stage while moving up or down.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QCheckBox" name="eBox4">
+       <property name="toolTip">
+        <string>Uncheck this box to skip the stage while moving up or down.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2" colspan="2">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>DPI Stage:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QCheckBox" name="eBox3">
+       <property name="toolTip">
+        <string>Uncheck this box to skip the stage while moving up or down.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QCheckBox" name="eBox1">
+       <property name="toolTip">
+        <string>Uncheck this box to skip the stage while moving up or down.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" colspan="5">
+      <widget class="QCheckBox" name="indicBox">
+       <property name="text">
+        <string>Use DPI indicator light</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" colspan="5">
+      <widget class="QCheckBox" name="xyBox">
+       <property name="text">
+        <string>Independent X/Y states</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>30</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Movement</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="5">
+      <widget class="QWidget" name="widget_2" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>2</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="aSnapBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>2</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Angle snap</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>5</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="3">
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="4">
+      <widget class="QComboBox" name="lHeightBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text">
+         <string>Low</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Medium-low</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Medium</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Medium-high</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>High</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_25">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>2</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Lift height:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ColorButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">colorbutton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

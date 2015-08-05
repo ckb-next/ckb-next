@@ -43,6 +43,12 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->miscTab));
     }
+    // Remove Performance tab from non-mice
+    if(!device->isMouse())
+        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->perfTab));
+    // Remove Misc tab from non-keyboards
+    if(!device->isKeyboard())
+        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->miscTab));
     // Hide poll rate and FW update as appropriate
     if(!device->features.contains("pollrate")){
         ui->pollLabel->hide();
@@ -175,6 +181,7 @@ void KbWidget::modeChanged(bool spontaneous){
     // Update tabs
     ui->lightWidget->setLight(device->currentLight());
     ui->bindWidget->setBind(device->currentBind(), device->currentProfile());
+    ui->perfWidget->setPerf(device->currentPerf());
     // Update selection
     if(spontaneous)
         ui->modesList->setCurrentRow(index);

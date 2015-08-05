@@ -195,10 +195,12 @@ int readcmd(usbdevice* kb, const char* line){
             TRY_WITH_RESET(vt->idle(kb, mode, notifynumber, 0, 0));
             continue;
         case SWITCH:
-            profile->currentmode = mode;
-            // Set mode light for non-RGB K95
-            int index = INDEX_OF(mode, profile->mode);
-            vt->setmodeindex(kb, index);
+            if(profile->currentmode != mode){
+                profile->currentmode = mode;
+                // Set mode light for non-RGB K95
+                int index = INDEX_OF(mode, profile->mode);
+                vt->setmodeindex(kb, index);
+            }
             continue;
         case HWLOAD: case HWSAVE:
             // Try to load/save the hardware profile. Reset on failure, disconnect if reset fails.

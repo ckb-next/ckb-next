@@ -176,6 +176,9 @@ int usb_tryreset(usbdevice* kb){
     return -1;
 }
 
+// device.c
+extern int hwload_mode;
+
 int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line){
     int total_sent = 0;
     for(int i = 0; i < count; i++){
@@ -189,8 +192,8 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
                 total_sent += res;
                 break;
             }
-            // Stop immediately if the program is shutting down
-            if(reset_stop)
+            // Stop immediately if the program is shutting down or hardware load is set to tryonce
+            if(reset_stop || hwload_mode != 2)
                 return 0;
             // Retry as long as the result is temporary failure
             DELAY_LONG(kb);
@@ -201,7 +204,7 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
 
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line){
     // Try a maximum of 3 times
-    for(int try = 0; try < 3; try++){
+    for(int try = 0; try < 5; try++){
         // Send the output message
         DELAY_SHORT(kb);
         int res = os_usbsend(kb, out_msg, 1, file, line);
@@ -221,7 +224,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             return 0;
         else if(res != -1)
             return res;
-        if(reset_stop)
+        if(reset_stop || hwload_mode != 2)
             return 0;
         DELAY_LONG(kb);
     }

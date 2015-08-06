@@ -17,12 +17,12 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     IOHIDReportType type = (kb->fwversion >= 0x120 && !is_recv ? kIOHIDReportTypeOutput : kIOHIDReportTypeFeature);
     kern_return_t res = (*kb->handle)->setReport(kb->handle, type, 0, out_msg, MSG_SIZE, 5000, 0, 0, 0);
     kb->lastresult = res;
-    if(IS_TEMP_FAILURE(res)){
-        ckb_warn_fn("Got return value 0x%x (continuing)\n", file, line, res);
-        return -1;
-    } else if(res != kIOReturnSuccess){
+    if(res != kIOReturnSuccess){
         ckb_err_fn("Got return value 0x%x\n", file, line, res);
-        return 0;
+        if(IS_TEMP_FAILURE(res))
+            return -1;
+        else
+            return 0;
     }
     return MSG_SIZE;
 }
@@ -31,12 +31,12 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     CFIndex length = MSG_SIZE;
     kern_return_t res = (*kb->handle)->getReport(kb->handle, kIOHIDReportTypeFeature, 0, in_msg, &length, 5000, 0, 0, 0);
     kb->lastresult = res;
-    if(IS_TEMP_FAILURE(res)){
-        ckb_warn_fn("Got return value 0x%x (continuing)\n", file, line, res);
-        return -1;
-    } else if(res != kIOReturnSuccess){
+    if(res != kIOReturnSuccess){
         ckb_err_fn("Got return value 0x%x\n", file, line, res);
-        return 0;
+        if(IS_TEMP_FAILURE(res))
+            return -1;
+        else
+            return 0;
     }
     if(length != MSG_SIZE)
         ckb_err_fn("Read %d bytes (expected %d)\n", file, line, (int)length, MSG_SIZE);
@@ -76,12 +76,13 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             break;
         case 21:
         case 5:
-            // RGB EP 2: NKRO (non-BIOS) input
-            hid_kb_translate(kb->input.keys, -2, length, data);
+            // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
+            if(!kb->active)
+                hid_kb_translate(kb->input.keys, -2, length, data);
             break;
         case MSG_SIZE:
             // RGB EP 3: Corsair input
-            corsair_keycopy(kb->input.keys, data);
+            memcpy(kb->input.keys, data, N_KEYBYTES_KB);
             break;
         }
     } else {

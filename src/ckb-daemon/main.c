@@ -8,7 +8,7 @@
 extern volatile int reset_stop;
 extern int features_mask;
 // device.c
-extern int hwload_enabled;
+extern int hwload_mode;
 
 // Timespec utility function
 void timespec_add(struct timespec* timespec, long nanoseconds){
@@ -72,9 +72,9 @@ int main(int argc, char** argv){
         if(!strcmp(argv[i], "--help")){
             printf(
 #ifdef OS_MAC
-                        "Usage: ckb-daemon [--gid=<gid>] [--nohwload] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
+                        "Usage: ckb-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
 #else
-                        "Usage: ckb-daemon [--gid=<gid>] [--nohwload] [--nonotify] [--nobind] [--nonroot]\n"
+                        "Usage: ckb-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
 #endif
                         "\n"
                         "See https://github.com/ccMSC/ckb/blob/master/DAEMON.md for full instructions.\n"
@@ -83,8 +83,10 @@ int main(int argc, char** argv){
                         "    --gid=<gid>\n"
                         "        Restrict access to %s* nodes to users in group <gid>.\n"
                         "        (Ordinarily they are accessible to anyone)\n"
-                        "    --nohwload\n"
-                        "        Disables loading of hardware profiles. May improve startup performance.\n"
+                        "    --hwload=<always|try|never>\n"
+                        "        --hwload=always will force loading of stored hardware profiles on compatible devices. May result in long start up times.\n"
+                        "        --hwload=try will try to load the profiles, but give up if not immediately successful (default).\n"
+                        "        --hwload=never will ignore hardware profiles completely.\n"
                         "    --nonotify\n"
                         "        Disables key monitoring/notifications.\n"
                         "        Note that this makes reactive lighting impossible.\n"
@@ -125,6 +127,7 @@ int main(int argc, char** argv){
     for(int i = 1; i < argc; i++){
         char* argument = argv[i];
         unsigned newgid;
+        char hwload[7];
         if(sscanf(argument, "--gid=%u", &newgid) == 1){
             // Set dev node GID
             gid = newgid;
@@ -137,9 +140,17 @@ int main(int argc, char** argv){
             // Disable key notifications
             features_mask &= ~FEAT_NOTIFY;
             ckb_info_nofile("Key notifications are disabled\n");
-        } else if(!strcmp(argument, "--nohwload")){
-            hwload_enabled = 0;
-            ckb_info_nofile("Hardware load disabled\n");
+        } else if(sscanf(argument, "--hwload=%6s", hwload) == 1){
+            if(!strcmp(hwload, "always") || !strcmp(hwload, "yes") || !strcmp(hwload, "y") || !strcmp(hwload, "a")){
+                hwload_mode = 2;
+                ckb_info_nofile("Setting hardware load: always\n");
+            } else if(!strcmp(hwload, "tryonce") || !strcmp(hwload, "try") || !strcmp(hwload, "once") || !strcmp(hwload, "t") || !strcmp(hwload, "o")){
+                hwload_mode = 1;
+                ckb_info_nofile("Setting hardware load: tryonce\n");
+            } else if(!strcmp(hwload, "never") || !strcmp(hwload, "none") || !strcmp(hwload, "no") || !strcmp(hwload, "n")){
+                hwload_mode = 0;
+                ckb_info_nofile("Setting hardware load: never\n");
+            }
         } else if(!strcmp(argument, "--nonroot")){
             // Allow running as a non-root user
             forceroot = 0;

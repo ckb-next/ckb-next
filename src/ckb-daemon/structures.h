@@ -138,13 +138,14 @@ typedef struct {
 #define FEAT_NOTIFY     0x010   // Key notifications?
 #define FEAT_FWVERSION  0x020   // Has firmware version?
 #define FEAT_FWUPDATE   0x040   // Has firmware update?
+#define FEAT_HWLOAD     0x080   // Hardware load enabled?
 
-#define FEAT_ANSI       0x080   // ANSI/ISO layout toggle (Mac only - not needed on Linux)
-#define FEAT_ISO        0x100
-#define FEAT_MOUSEACCEL 0x200   // Mouse acceleration (also Mac only)
+#define FEAT_ANSI       0x100   // ANSI/ISO layout toggle (Mac only - not needed on Linux)
+#define FEAT_ISO        0x200
+#define FEAT_MOUSEACCEL 0x400   // Mouse acceleration (also Mac only)
 
 // Standard feature sets
-#define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL)
+#define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL | FEAT_HWLOAD)
 #define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)
 #define FEAT_STD_NRGB   (FEAT_COMMON)
 #define FEAT_LMASK      (FEAT_ANSI | FEAT_ISO)

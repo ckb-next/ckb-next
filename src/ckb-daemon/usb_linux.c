@@ -10,7 +10,7 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
     int res;
-    if(kb->fwversion >= 0x120){
+    if(kb->fwversion >= 0x120 && !is_recv){
         struct usbdevfs_bulktransfer transfer;
         memset(&transfer, 0, sizeof(transfer));
         transfer.ep = (kb->fwversion >= 0x130) ? 4 : 3;
@@ -23,21 +23,20 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
     }
     if(res <= 0){
-        if(res == -1 && errno == ETIMEDOUT){
-            ckb_warn_fn("%s (continuing)\n", file, line, strerror(errno));
-            return -1;
-        }
         ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
-        return 0;
+        if(res == -1 && errno == ETIMEDOUT)
+            return -1;
+        else
+            return 0;
     } else if(res != MSG_SIZE)
         ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     return res;
 }
 
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
-    DELAY_MEDIUM(kb);
     int res;
-    if(kb->fwversion >= 0x130){
+    // This is what CUE does, but it doesn't seem to work on linux.
+    /*if(kb->fwversion >= 0x130){
         struct usbdevfs_bulktransfer transfer;
         memset(&transfer, 0, sizeof(transfer));
         transfer.ep = 0x84;
@@ -45,17 +44,16 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         transfer.timeout = 5000;
         transfer.data = in_msg;
         res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
-    } else {
+    } else {*/
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, in_msg };
         res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
-    }
+    //}
     if(res <= 0){
-        if(res == -1 && errno == ETIMEDOUT){
-            ckb_warn_fn("%s (continuing)\n", file, line, strerror(errno));
+        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
+        if(res == -1 && errno == ETIMEDOUT)
             return -1;
-        }
-        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data read");
-        return 0;
+        else
+            return 0;
     } else if(res != MSG_SIZE)
         ckb_warn_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
     return res;
@@ -133,12 +131,13 @@ void* os_inputmain(void* context){
                     hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
                     break;
                 case 0x82:
-                    // RGB EP 2: NKRO (non-BIOS) input
-                    hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
+                    // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
+                    if(!kb->active)
+                        hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
                     break;
                 case 0x83:
                     // RGB EP 3: Corsair input
-                    corsair_keycopy(kb->input.keys, urb->buffer);
+                    memcpy(kb->input.keys, urb->buffer, N_KEYBYTES_KB);
                     break;
                 }
             } else

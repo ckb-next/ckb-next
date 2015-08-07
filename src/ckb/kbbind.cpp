@@ -59,7 +59,7 @@ void KbBind::save(CkbSettings& settings){
         SGroup group(settings, "Keys");
         foreach(QString key, _bind.keys()){
             KeyAction* act = _bind.value(key);
-            if(act && act->value() != defaultAction(key))
+            if(act && act->value() != KeyAction::defaultAction(key))
                 settings.setValue(key, act->value());
         }
     }

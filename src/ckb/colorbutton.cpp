@@ -3,7 +3,7 @@
 #include <QPainter>
 
 ColorButton::ColorButton(QWidget* parent, bool allowAlpha) :
-    QPushButton(parent), _alpha(allowAlpha)
+    QPushButton(parent), _alpha(allowAlpha), _setLabel(true), _bigIcons(false)
 {
     setAutoDefault(false);
     setDefault(false);

@@ -217,11 +217,18 @@ void KbPerf::update(QFile& cmd, bool force, bool saveCustomDpi){
         cmd.write(QString(" 1:%1,%2").arg(dpiCurX).arg(dpiCurY).toLatin1());
     } else {
         // Otherwise, save stage 1 normally
-        cmd.write(QString(" 1:%1,%2").arg(dpiX[1]).arg(dpiY[1]).toLatin1());
+        if(!dpiOn[1] && stage != 1)
+            cmd.write(" 1:off");
+        else
+            cmd.write(QString(" 1:%1,%2").arg(dpiX[1]).arg(dpiY[1]).toLatin1());
     }
     // Save stages 1 - 5
-    for(int i = 2; i < DPI_COUNT; i++)
+    for(int i = 2; i < DPI_COUNT; i++){
+        if(!dpiOn[i] && stage != i)
+            cmd.write(QString(" %1:off").arg(i).toLatin1());
+        else
         cmd.write(QString(" %1:%2,%3").arg(i).arg(dpiX[i]).arg(dpiY[i]).toLatin1());
+    }
     // Save stage selection, lift height, and angle snap
     cmd.write(QString(" dpisel %1 lift %2 snap %3").arg(stage).arg(_liftHeight).arg(_angleSnap ? "on" : "off").toLatin1());
     // Save DPI colors

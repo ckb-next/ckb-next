@@ -175,7 +175,7 @@ int readcmd(usbdevice* kb, const char* line){
         case DITHER: {
             // 0: No dither, 1: Ordered dither.
             uint dither;
-            if(sscanf(word, "%u", &dither) == 1 && dither >= 0 && dither <= 1){
+            if(sscanf(word, "%u", &dither) == 1 && dither <= 1){
                 kb->dither = dither;
             }
             continue;

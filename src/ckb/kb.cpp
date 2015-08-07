@@ -590,15 +590,25 @@ void Kb::readNotify(QString line){
                     continue;
                 QStringList xy = dpi[1].split(',');
                 int x, y;
-                if(xy.length() < 2)
+                bool off = false;
+                if(xy.length() < 2){
                     // If the right side only has one parameter, set both X and Y
-                    x = y = xy[0].toInt();
-                else {
+                    if(xy[0] == "off")
+                        off = true;
+                    else
+                        x = y = xy[0].toInt();
+                } else {
                     x = xy[0].toInt();
                     y = xy[1].toInt();
                 }
                 // Set DPI for this stage
-                perf->dpi(dpi[0].toInt(), QPoint(x, y));
+                int index = dpi[0].toInt();
+                if(off)
+                    perf->dpiEnabled(index, false);
+                else {
+                    perf->dpiEnabled(index, true);
+                    perf->dpi(index, QPoint(x, y));
+                }
             }
         } else if(components[2] == "hwdpisel"){
             // Hardware DPI selection (0...5)

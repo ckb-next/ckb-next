@@ -41,6 +41,8 @@ private slots:
     void on_autoFWBox_clicked(bool checked);
     void on_trayBox_clicked(bool checked);
     void on_loginItemBox_clicked(bool checked);
+    void on_layoutBox_currentIndexChanged(int index);
+    void on_ditherBox_clicked(bool checked);
 
 private:
     Ui::SettingsWidget *ui;

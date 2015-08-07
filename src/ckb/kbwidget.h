@@ -78,8 +78,6 @@ private slots:
     void on_inactiveSwitchCheck_clicked(bool checked);
     void on_inactiveSwitchBox_activated(int index);
     void on_muteCheck_clicked(bool checked);
-    void on_ditherCheck_clicked(bool checked);
-    void on_layoutBox_activated(int index);
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();
 };

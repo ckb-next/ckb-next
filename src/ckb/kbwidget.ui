@@ -253,37 +253,6 @@
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Colors</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="gridLayout_6">
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="ditherCheck">
-           <property name="text">
-            <string>Use spacial dithering to simulate extra color resolution</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
         <spacer name="verticalSpacer_5">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -337,21 +306,8 @@
        <property name="bottomMargin">
         <number>6</number>
        </property>
-       <item row="0" column="2">
-        <widget class="QLabel" name="serialLabel">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_4">
+       <item row="4" column="0">
+        <widget class="QLabel" name="fwUpdLabel">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -359,11 +315,11 @@
           </size>
          </property>
          <property name="text">
-          <string>USB device ID:</string>
+          <string>Status:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="2">
+       <item row="6" column="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -389,8 +345,8 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_9">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_4">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -398,33 +354,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Firmware version:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="fwUpdLabel">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>34</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Status:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>34</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Layout:</string>
+          <string>USB device ID:</string>
          </property>
         </widget>
        </item>
@@ -444,72 +374,31 @@
          </property>
         </spacer>
        </item>
-       <item row="6" column="2">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QComboBox" name="layoutBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <item>
-            <property name="text">
-             <string>France</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Germany</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Spain</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Sweden</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>United Kingdom</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>United Kingdom (Dvorak)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>United States</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>United States (Dvorak)</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>34</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Firmware version:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="serialLabel">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
        </item>
        <item row="4" column="2">
         <layout class="QHBoxLayout" name="fwUpdLayout">

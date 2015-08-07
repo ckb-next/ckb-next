@@ -6,12 +6,14 @@
 
 static QSet<Kb*> activeDevices;
 int Kb::_frameRate = 30;
+KeyMap::Layout Kb::_layout = KeyMap::NO_LAYOUT;
+bool Kb::_dither = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), devpath(path), cmdpath(path + "/cmd"),
     features("N/A"), firmware("N/A"), pollrate("N/A"),
-    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), _layout(KeyMap::NO_LAYOUT),
-    _dither(false), _hwProfile(0), prevProfile(0), prevMode(0),
+    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
+    _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), _needsSave(false)
 {
     memset(hwLoading, 0, sizeof(hwLoading));
@@ -74,10 +76,15 @@ Kb::Kb(QObject *parent, const QString& path) :
     }
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
-    // Activate device, set FPS and no dithering, and ask for hardware profile
+    // Activate device, apply settings, and ask for hardware profile
     cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
     cmd.write(QString("dither %1\n").arg(static_cast<int>(_dither)).toLatin1());
-    cmd.write(QString("active\n@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
+#ifdef Q_OS_MACX
+    // Write ANSI/ISO flag to daemon (OSX only)
+    cmd.write("layout ");
+    cmd.write(KeyMap::isISO(_layout) ? "iso" : "ansi");
+#endif
+    cmd.write(QString("\nactive\n@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
     hwLoading[0] = true;
     for(int i = 0; i < hwModeCount; i++){
         cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
@@ -125,23 +132,16 @@ void Kb::frameRate(int newFrameRate){
     }
 }
 
-void Kb::dither(bool newDither){
-    if(newDither == _dither)
+void Kb::layout(KeyMap::Layout newLayout){
+    if(newLayout == KeyMap::NO_LAYOUT || newLayout == _layout)
         return;
-    _dither = newDither;
-    _needsSave = true;
-    cmd.write(QString("dither %1\n").arg(static_cast<int>(newDither)).toLatin1());
-    cmd.flush();
+    _layout = newLayout;
+    // Update all devices
+    foreach(Kb* kb, activeDevices)
+        kb->updateLayout();
 }
 
-
-void Kb::load(CkbSettings& settings){
-    _needsSave = false;
-    // Read layout
-    _layout = KeyMap::getLayout(settings.value("Layout").toString());
-    if(_layout == KeyMap::NO_LAYOUT)
-        // If the layout couldn't be read, try to auto-detect it from the system locale
-        _layout = KeyMap::locale();
+void Kb::updateLayout(){
 #ifdef Q_OS_MACX
     // Write ANSI/ISO flag to daemon (OSX only)
     cmd.write("layout ");
@@ -149,11 +149,29 @@ void Kb::load(CkbSettings& settings){
     cmd.write("\n");
     cmd.flush();
 #endif
-    // Read dithering setup.
-    _dither = settings.value("Dither").toBool();
-    cmd.write(QString("dither %1\n").arg(static_cast<int>(_dither)).toLatin1());
+    foreach(KbProfile* profile, _profiles)
+        profile->keyMap(getKeyMap());
+    if(_hwProfile && !_profiles.contains(_hwProfile))
+        _hwProfile->keyMap(getKeyMap());
+    // Stop all animations as they'll need to be restarted
+    foreach(KbMode* mode, _currentProfile->modes())
+        mode->light()->close();
     emit infoUpdated();
+}
 
+void Kb::dither(bool newDither){
+    if(newDither == _dither)
+        return;
+    _dither = newDither;
+    // Update all devices
+    foreach(Kb* kb, activeDevices){
+        kb->cmd.write(QString("dither %1\n").arg(static_cast<int>(newDither)).toLatin1());
+        kb->cmd.flush();
+    }
+}
+
+void Kb::load(CkbSettings& settings){
+    _needsSave = false;
     // Read profiles
     KbProfile* newCurrentProfile = 0;
     QString current = settings.value("CurrentProfile").toString().trimmed().toUpper();
@@ -177,6 +195,7 @@ void Kb::load(CkbSettings& settings){
         setCurrentProfile(demo);
     }
 
+    emit infoUpdated();
     emit profileAdded();
 }
 
@@ -191,8 +210,6 @@ void Kb::save(CkbSettings& settings){
     }
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
-    settings.setValue("Layout", KeyMap::getLayout(_layout));
-    settings.setValue("Dither", _dither);
 }
 
 void Kb::hwSave(){
@@ -261,27 +278,6 @@ void Kb::writeProfileHeader(){
     cmd.write(_currentProfile->id().guidString().toLatin1());
     cmd.write(" ");
     cmd.write(_currentProfile->id().modifiedString().toLatin1());
-}
-
-void Kb::layout(KeyMap::Layout newLayout){
-    if(newLayout == KeyMap::NO_LAYOUT)
-        return;
-    _layout = newLayout;
-#ifdef Q_OS_MACX
-    // Write ANSI/ISO flag to daemon (OSX only)
-    cmd.write("layout ");
-    cmd.write(KeyMap::isISO(_layout) ? "iso" : "ansi");
-    cmd.write("\n");
-    cmd.flush();
-#endif
-    foreach(KbProfile* profile, _profiles)
-        profile->keyMap(getKeyMap());
-    if(_hwProfile && !_profiles.contains(_hwProfile))
-        _hwProfile->keyMap(getKeyMap());
-    // Stop all animations as they'll need to be restarted
-    foreach(KbMode* mode, _currentProfile->modes())
-        mode->light()->close();
-    emit infoUpdated();
 }
 
 void Kb::fwUpdate(const QString& path){

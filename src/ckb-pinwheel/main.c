@@ -12,6 +12,7 @@ void ckb_info(){
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Wheel color:", "", "ffffffff");
     CKB_PARAM_DOUBLE("length", "Wheel size:", "%", 100, 1., 100.);
+    CKB_PARAM_BOOL("counter_clock", "Counter Clockwise", 0);
     CKB_PARAM_BOOL("symmetric", "Symmetric", 0);
 
     // Timing/input parameters
@@ -36,6 +37,7 @@ void ckb_info(){
 ckb_gradient animcolor = { 0 };
 double animlength = 0.;
 int symmetric = 0;
+int counter_clock = 0;
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_AGRADIENT("color", &animcolor){}
@@ -44,6 +46,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
         animlength = len / 100. * M_PI * 2.;
     }
     CKB_PARSE_BOOL("symmetric", &symmetric){}
+    CKB_PARSE_BOOL("counter_clock", &counter_clock){}
 }
 
 void ckb_init(ckb_runctx* context){
@@ -80,7 +83,11 @@ int ckb_frame(ckb_runctx* context){
     if(frame < 0.)
         return 0;
     // Color each key according to its angle from the center
-    float position = ANGLE(-frame * M_PI * 2.);
+        float position;
+        if(counter_clock)
+	    position = ANGLE(frame * M_PI * 2.);
+        else
+            position = ANGLE(-frame * M_PI * 2.);
     unsigned count = context->keycount;
     ckb_key* keys = context->keys;
     for(ckb_key* key = keys; key < keys + count; key++){

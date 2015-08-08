@@ -24,7 +24,7 @@ The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They 
 
 In a terminal shell, you can do this like `echo mycommand > /dev/input/ckb1/cmd`. Programmatically, you can open and write them as regular files. When programming, you must append a newline character and flush the output before your command(s) will actually be read.
 
-The `mode` parameter is used to group settings. Most (but not all) settings are mode-specific; that is, changing mode 1 will not affect mode 2. Use `mode <n> switch` to change the current mode.
+The `mode` parameter is used to group settings. Most (but not all) settings are mode-specific; that is, changing mode 1 will not affect mode 2. By default, all commands affect the current mode. Use `mode <n> switch` to change the current mode.
 
 When plugged in, all devices start in hardware-controlled mode (also known as idle mode) and will not respond to commands. Before issuing any other commands, write `active` to the command node, like `echo active > /dev/input/ckb1/cmd`. To put the device back into hardware mode, issue the `idle` command.
 
@@ -32,6 +32,7 @@ Features
 --------
 
 The `features` node describes features supported by the device, which may not be present on all devices. The first two words in the `features` node are always `<vendor> <model>`, like `corsair k70`. After that, any of the following features may appear:
+- `adjrate`: Device supports adjustable poll rate.
 - `bind`: Device supports key rebinding.
 - `fwupdate`: Device supports firmware updates.
 - `fwversion`: Device has a detectable firmware version (stored in the `fwversion` node).
@@ -42,9 +43,14 @@ The `features` node describes features supported by the device, which may not be
 Keyboard layout
 ---------------
 
-The driver has no concept of keyboard layouts; all keys are referred to by their English names regardless of the underlying hardware. This means that, for instance, in an AZERTY layout the `q` key in ckb-daemon corresponds to A on the physical keyboard. Note that on UK/european layouts, the backslash key (beside left shift) is called `bslash_iso`, while `bslash` refers to the backslash on the US keyboard. The key next to Enter on the UK keyboard is known as `hash`. See `src/ckb-daemon/keymap.c` for the full table of supported keys.
+The driver has no concept of keyboard layouts; all keys are referred to by their English names regardless of the underlying hardware. This means that, for instance, in an AZERTY layout the `q` key in ckb-daemon corresponds to A on the physical keyboard. Note that on UK/european (ISO) layouts, the backslash key (beside left shift) is called `bslash_iso`, while `bslash` refers to the backslash on the US keyboard. The key next to Enter on the ISO keyboard is known as `hash`. See `src/ckb-daemon/keymap.c` for the full table of supported keys.
 
-For technical reasons, the OSX driver may swap the `bslash_iso` and `grave` keys if the keyboard layout is not set correctly. To compensate for this, write `layout iso` or `layout us` to the command node. 
+For technical reasons, the OSX driver may swap the `bslash_iso` and `grave` keys if the keyboard layout is not set correctly. To compensate for this, write `layout iso` or `layout ansi` to the command node.
+
+Poll rate
+---------
+
+A device's current poll rate can be read from its `pollrate` node, assuming it has one. Keyboards have a hardware switch to control poll rate and cannot be adjusted via software. However, mice have a software-controlled poll rate. You can change it by issuing `pollrate <interval>` to the command node, where `interval` is the time in milliseconds. Valid poll rates are `1`, `2`, `4`, and `8`.
 
 Profiles and modes
 ------------------
@@ -122,6 +128,22 @@ Macros are a more advanced form of key binding, controlled with the `macro` comm
 
 Assigning a macro to a key will cause its binding to be ignored; for instance, `macro a:+b,-b` will cause A to generate a B character regardless of its binding. However, `macro lctrl+a:+b,-b` will cause A to generate a B only when Ctrl is also held down.
 
+DPI and mouse settings
+----------------------
+
+DPI settings are stored in a bank. They are controlled with the `dpi` command.
+- `dpi <stage>:<x>,<y>` sets the DPI for a given `stage` to `x` by `y`. Valid stages are `0` through `5`. In hardware, `1` is the first (lowest) stage and `5` is the highest. Stage `0` is used for Sniper mode.
+- `dpi <stage>:<xy>` sets both X and Y.
+- `dpi <stage>:off` disables a DPI stage.
+- `dpisel <stage>` sets the current stage selection.
+
+In order to change the mouse's current DPI, first update one of the stages with the value you want, then select that stage. For instance:
+- `dpi 1:1000 dpisel 1` sets the current DPI to 1000x1000.
+
+Additional mouse settings:
+- `lift <height>` sets the lift height, from `1` (lowest) to `5` (highest)
+- `snap <on|off>` enables or disables Angle Snap.
+
 Notifications
 -------------
 
@@ -156,6 +178,11 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :hwid` and `get :hwprofileid` return the same thing except from the current hardware profile/mode. As before, the ouput will be the same but with `hwid` and `hwprofileid` instead of `id` and `profileid`.
 - `get :rgb` returns an `rgb` command equivalent to the current RGB state.
 - `get :hwrgb` does the same thing, but retrieves the colors currently stored in the hardware profile. The output will say `hwrgb` instead of `rgb`.
+- `get :dpi` returns a `dpi` command equivalent to the current DPI bank.
+- `get :dpisel` returns a `dpisel` command for the currently-selected DPI stage.
+- `get :lift` returns a `lift` command for the current lift height.
+- `get :snap` returns the current angle snap status.
+- `get :hwdpi`, `get :hwdpisel`, `get :hwlift`, and `get :hwsnap` return the same properties, but for the current hardware profile.
 
 Like `notify`, you must prefix your command with `@<node>` to get data printed to a node other than `notify0`.
 
@@ -164,12 +191,7 @@ Firmware updates
 
 **WARNING:** Improper use of `fwupdate` may brick your device; use this command *at your own risk*. I accept no responsibility for broken keyboards.
 
-The latest RGB keyboard firmwares may be found here:
-* K65: http://www3.corsair.com/software/HID/K65RGB.zip
-* K70: http://www3.corsair.com/software/HID/K70RGB.zip
-* K95: http://www3.corsair.com/software/HID/K95RGB.zip
-
-To update your keyboard's firmware, first extract the contents of the zip file and then issue the command `fwupdate /path/to/fw/file.bin` to the keyboard you wish to update. The path name must be absolute and must not include spaces. If it succeeded, you should see `fwupdate <path> ok` logged to the keyboard's notification node and then the device will disconnect and reconnect. If you see `fwupdate <path> invalid` it means that the firmware file was not valid for the device; more info may be available in the daemon's `stdout`. If you see `fwupdate <path> fail` it means that the file was valid but the update failed at a hardware level. The keyboard may disconnect/reconnect anyway or it may remain in operation.
+The latest firmware versions and their URLs can be found in the `FIRMWARE` document. To update your keyboard's firmware, first extract the contents of the zip file and then issue the command `fwupdate /path/to/fw/file.bin` to the keyboard you wish to update. The path name must be absolute and must not include spaces. If it succeeded, you should see `fwupdate <path> ok` logged to the keyboard's notification node and then the device will disconnect and reconnect. If you see `fwupdate <path> invalid` it means that the firmware file was not valid for the device; more info may be available in the daemon's `stdout`. If you see `fwupdate <path> fail` it means that the file was valid but the update failed at a hardware level. The keyboard may disconnect/reconnect anyway or it may remain in operation.
 
 When the device reconnects you should see the new firmware version in its `fwversion` node; if you see `0000` instead it means that the keyboard did not update successfully and will need another `fwupdate` command in order to function again. If the update fails repeatedly, try connecting the keyboard to a Windows PC and using the official firmware update in CUE.
 

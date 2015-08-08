@@ -3,13 +3,27 @@ ckb: Corsair Input Driver for Linux and OSX
 
 **ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary software to the Linux and Mac operating systems. This project is currently a work in progress but already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
-**Disclaimer:** ckb is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO warranty of any kind.
+**Disclaimer:** ckb is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
 If you use and enjoy this project, I'd appreciate if you could spare a few dollars for a donation. This is completely voluntary - the project will remain free and open source regardless. `:)`
 
 I accept donations through PayPal: [Click here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
-Or through Bitcoin: [1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ (click for QR code)](https://i.imgur.com/h3gyLiv.png)
+Or through Bitcoin: 1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ [(click here for QR code)](https://i.imgur.com/h3gyLiv.png)
+
+Contents
+--------
+
+* [Device Support](#device-support)
+* [Linux Installation](#linux-installation)
+* [OSX Installaction](#osx-installation)
+* [Usage](#usage)
+* [Troubleshooting](#troubleshooting)
+* [Known Issues](#known-issues)
+
+See also:
+
+* [Manual for the driver daemon](https://github.com/ccMSC/ckb/blob/master/DAEMON.md)
 
 Device Support
 --------------
@@ -30,7 +44,7 @@ Linux Installation
 
 Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libudev-dev`, `build-essential`, `zlib1g-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). Check with your package manager to make sure you have the correct libraries/headers installed.
 
-You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build the application, and if all goes well, will ask if you'd like to install/run ckb on your system (press enter to proceed; default answer is "yes"). If the build doesn't work for some reason, or if you'd like to build ckb yourself, see `BUILD.md` for instructions.
+You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build the application, and if all goes well, will ask if you'd like to install/run ckb on your system (press enter to proceed; default answer is "yes"). If the build doesn't succeed, or if you'd like to build ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
 
 #### Reinstalling:
 
@@ -70,7 +84,7 @@ Click on `ckb.pkg` under the Downloads section. This is an automated installer w
 
 Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
-The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see `BUILD.md`.
+The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md).
 
 #### Reinstalling (binary):
 
@@ -82,15 +96,15 @@ Remove the existing ckb-master directory and zip file. Re-download the source co
 
 #### Uninstalling:
 
-Drag `ckb.app` into the trash. If the daemon plist file isn't cleaned up automatically, you can find it and remove it here: `/Library/LaunchDaemons/com.ckb.daemon.plist`.
+Drag `ckb.app` into the trash. If the system service file isn't cleaned up automatically, you can find it and remove it here: `/Library/LaunchDaemons/com.ckb.daemon.plist`.
 
 Usage
 -----
 
-The user interface is still a work in progress. See `DAEMON.md` for info about the daemon program.
+The user interface is still a work in progress.
 
 **Major features:**
-- Control multiple keyboards independently
+- Control multiple devices independently
 - United States and European keyboard layouts
 - Customizable key bindings
 - Per-key lighting and animation
@@ -98,11 +112,8 @@ The user interface is still a work in progress. See `DAEMON.md` for info about t
 - Multiple profiles/modes with hardware save function
 
 **Roadmap** (roughly in order)
-- **v0.2 release:**
-- M65 RGB support
-- Additional lighting options
-- Customizable indicator lights
 - **v0.3 release:**
+- Additional lighting options
 - More functions for the Win Lock key
 - Key combos
 - Key macros, other advanced keypress features like running a custom command
@@ -128,16 +139,20 @@ Troubleshooting
 
 If you have problems connecting the keyboard to your system (keyboard doesn't respond, ckb-daemon doesn't recognize it or can't connect the keyboard), try adding the following to your kernel's `cmdline`:
 
-* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x400`
-* K70: `usbhid.quirks=0x1B1C:0x1B09:0x400`
-* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400`
-* K95: `usbhid.quirks=0x1B1C:0x1B08:0x400`
-* K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x408`
-* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x400`
+```
+usbhid.quirks=0x1B1C:0x1B08:0x408,0x1B1C:0x1B09:0x400,0x1B1C:0x1B11:0x408,0x1B1C:0x1B12:0x400,0x1B1C:0x1B13:0x400,0x1B1C:0x1B17:0x400
+```
 
-For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
+This should apply the correct fix for all supported devices. For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
-If the keyboard still doesn't work, try replacing `0x400`/`0x408` with `0x4`. Note that this will cause the kernel driver to ignore the keyboard completely, so you'll need to make sure ckb-daemon is running at boot or else you'll have no keyboard input.
+If the keyboard still doesn't work, try this instead:
+
+```
+usbhid.quirks=0x1B1C:0x1B08:0x4,0x1B1C:0x1B09:0x4,0x1B1C:0x1B11:0x4,0x1B1C:0x1B12:0x4,0x1B1C:0x1B13:0x4,0x1B1C:0x1B17:0x4
+```
+Note that this will cause the kernel driver to ignore the keyboard completely, so you need to ensure ckb-daemon is running at boot or else you'll have no keyboard input.
+
+If you're using **Unity** and the tray icon doesn't appear correctly, install the following package: `libappindicator-dev`. Then reinstall ckb.
 
 #### OSX
 
@@ -167,6 +182,5 @@ Known issues
 
 - Using the keyboard in BIOS mode prevents the media keys (including mute and volume wheel), as well as the K95's G-keys from working. This is a hardware limitation.
 - The tray icon doesn't appear in some desktop environments. This is a known Qt bug. If you can't see the icon, reopen ckb to bring the window back.
-- Mouse acceleration on OSX isn't exactly the same as the system's default acceleration. I do not know of a workaround for this. If you need the cursor to behave consistently, disable mouse acceleration.
 - When starting the driver manually, the Terminal window sometimes gets spammed with enter keys. You can stop it by unplugging and replugging the keyboard or by moving the poll rate switch.
 - When stopping the driver manually, the keyboard sometimes stops working completely. You can reconnect it by moving the poll rate switch.

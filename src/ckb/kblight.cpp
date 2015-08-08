@@ -77,6 +77,7 @@ void KbLight::dimming(int newDimming){
 
 KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys, const QString& name, const QMap<QString, QVariant>& preset){
     // Stop and restart all existing animations
+    stopPreview();
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, _animList){
         anim->stop();

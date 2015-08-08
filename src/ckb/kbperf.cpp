@@ -45,6 +45,21 @@ KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
         curDpi(other.pushedDpis[0]);
 }
 
+const KbPerf& KbPerf::operator= (const KbPerf& other){
+    dpiCurX = other.dpiCurX; dpiCurY = other.dpiCurY; dpiCurIdx = other.dpiCurIdx; dpiLastIdx = other.dpiLastIdx;
+    _liftHeight = other._liftHeight; _angleSnap = other._angleSnap; _enableIndicator = other._enableIndicator;
+    _needsUpdate = true; _needsSave = true; runningPushIdx = 1;
+    memcpy(dpiX, other.dpiX, sizeof(dpiX));
+    memcpy(dpiY, other.dpiY, sizeof(dpiY));
+    for(int i = 0; i < DPI_COUNT + 1; i++)
+        dpiClr[i] = other.dpiClr[i];
+    memcpy(dpiOn, other.dpiOn, sizeof(dpiOn));
+    // Don't copy pushed DPI states. If the other mode has any, restore the original DPI
+    if(!other.pushedDpis.isEmpty())
+        curDpi(other.pushedDpis[0]);
+    return other;
+}
+
 void KbPerf::load(CkbSettings& settings){
     pushedDpis.clear();
     runningPushIdx = 1;

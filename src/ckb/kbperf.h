@@ -18,6 +18,7 @@ public:
     explicit KbPerf(KbMode* parent);
     // Copy a setup
     KbPerf(KbMode* parent, const KbPerf& other);
+    const KbPerf& operator= (const KbPerf& rhs);
 
     // Load and save from stored settings
     void        load(CkbSettings& settings);

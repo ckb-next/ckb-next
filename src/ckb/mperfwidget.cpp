@@ -1,11 +1,12 @@
 #include "mperfwidget.h"
 #include "ui_mperfwidget.h"
+#include "modeselectdialog.h"
 #include <cmath>
 
 const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 
 MPerfWidget::MPerfWidget(QWidget *parent) :
-    QWidget(parent), ui(new Ui::MPerfWidget), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), isSetting(false) {
+    QWidget(parent), ui(new Ui::MPerfWidget), perf(0), profile(0), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), isSetting(false) {
     ui->setupUi(this);
     ui->xyBox->setChecked(!_xyLink);
     // Set up DPI stages
@@ -53,8 +54,9 @@ MPerfWidget::~MPerfWidget(){
     delete ui;
 }
 
-void MPerfWidget::setPerf(KbPerf *newPerf){
+void MPerfWidget::setPerf(KbPerf *newPerf, KbProfile *newProfile){
     perf = newPerf;
+    profile = newProfile;
     for(int i = 0; i < DPI_COUNT; i++){
         stages[i].indicator->color(perf->dpiColor(i));
         bool oldLink = _xyLink;
@@ -150,4 +152,14 @@ void MPerfWidget::on_aSnapBox_clicked(bool checked){
 
 void MPerfWidget::on_lHeightBox_activated(int index){
     perf->liftHeight((KbPerf::height)(index + 1));
+}
+
+void MPerfWidget::on_copyButton_clicked(){
+    ModeSelectDialog dialog(this, profile->currentMode(), profile->modes(), "Copy performance settings to:");
+    if(dialog.exec() != QDialog::Accepted)
+        return;
+    QList<KbMode*> selectedModes = dialog.selection();
+    foreach(KbMode* mode, selectedModes){
+        *mode->perf() = *perf;
+    }
 }

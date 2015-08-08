@@ -181,7 +181,7 @@ void KbWidget::modeChanged(bool spontaneous){
     // Update tabs
     ui->lightWidget->setLight(device->currentLight());
     ui->bindWidget->setBind(device->currentBind(), device->currentProfile());
-    ui->perfWidget->setPerf(device->currentPerf());
+    ui->perfWidget->setPerf(device->currentPerf(), device->currentProfile());
     // Update selection
     if(spontaneous)
         ui->modesList->setCurrentRow(index);

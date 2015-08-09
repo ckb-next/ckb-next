@@ -20,10 +20,12 @@ Contents
 * [Usage](#usage)
 * [Troubleshooting](#troubleshooting)
 * [Known Issues](#known-issues)
+* [Contributing](#contributing)
 
 See also:
 
 * [Manual for the driver daemon](https://github.com/ccMSC/ckb/blob/master/DAEMON.md)
+* [ckb testing repository](https://github.com/ccMSC/ckb/tree/testing) (updated more frequently, but may be unstable)
 
 Device Support
 --------------
@@ -110,6 +112,7 @@ The user interface is still a work in progress.
 - Per-key lighting and animation
 - Reactive lighting
 - Multiple profiles/modes with hardware save function
+- Adjustable mouse DPI with ability to change DPI on button press
 
 **Roadmap** (roughly in order)
 - **v0.3 release:**
@@ -177,6 +180,10 @@ Common issues:
 - **Problem:** Keyboard isn't detected when plugged in, even if driver is already running
 - **Solution:** Try moving to a different USB port. Be sure to follow [Corsair's USB connection requirements](http://forum.corsair.com/v3/showthread.php?t=132322). Note that the keyboard does not work with some USB3 controllers - if you have problems with USB3 ports, try USB2 instead. If you have any USB hubs on hand, try those as well. You may also have success sliding the poll switch back and forth a few times.
 
+#### Reporting issues
+
+If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/ccMSC/ckb/issues) or [the Corsair User Forum thread](http://forum.corsair.com/v3/showthread.php?t=133929). I usually try to respond within 48 hours. Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
+
 Known issues
 ------------
 
@@ -184,3 +191,8 @@ Known issues
 - The tray icon doesn't appear in some desktop environments. This is a known Qt bug. If you can't see the icon, reopen ckb to bring the window back.
 - When starting the driver manually, the Terminal window sometimes gets spammed with enter keys. You can stop it by unplugging and replugging the keyboard or by moving the poll rate switch.
 - When stopping the driver manually, the keyboard sometimes stops working completely. You can reconnect it by moving the poll rate switch.
+
+Contributing
+------------
+
+You can contribute to the project by [opening a pull request](https://github.com/ccMSC/ckb/pulls). It's best if you base your changes off of the `testing` branch as opposed to the `master`, because the pull request will be merged there first. If you'd like to contribute but don't know what you can do, take a look at [the issue tracker](https://github.com/ccMSC/ckb/issues) and see if any features/problems are still unresolved. Feel free to ask if you'd like some ideas.

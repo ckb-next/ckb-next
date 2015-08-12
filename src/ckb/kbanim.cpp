@@ -303,6 +303,12 @@ void KbAnim::stop(){
     repeatKey = "";
 }
 
+bool KbAnim::isRunning() const {
+    if(!_script)
+        return true;    // If the script wasn't loaded, pretend it's running anyway so it won't lock up
+    return _script->hasFrame();
+}
+
 // Blending functions
 
 static float blendNormal(float bg, float fg){

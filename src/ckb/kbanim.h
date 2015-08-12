@@ -59,7 +59,7 @@ public:
     // Stops the animation
     void stop();
     // Whether or not the animation is running
-    inline bool isRunning() { return _script->hasFrame(); }
+    bool isRunning() const;
 
     // Blends the animation into a color map, taking opacity and mode into account
     void blend(QHash<QString, QRgb>& animMap, quint64 timestamp);

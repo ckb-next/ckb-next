@@ -168,9 +168,9 @@ void KbAnimWidget::on_animList_itemChanged(QListWidgetItem *item){
 
 void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint &pos){
     QListWidgetItem* item = ui->animList->itemAt(pos);
-    setCurrent(animations[item->data(Qt::UserRole).toUuid()]);
     if(!item)
         return;
+    setCurrent(animations[item->data(Qt::UserRole).toUuid()]);
 
     QMenu menu(this);
     QAction* rename = new QAction("Rename...", this);

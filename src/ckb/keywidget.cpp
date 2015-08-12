@@ -37,8 +37,8 @@ void KeyWidget::map(const KeyMap& newMap){
     update();
 }
 
-void KeyWidget::drawInfo(float& scale, float& offsetX, float& offsetY){
-    int w = width(), h = height();
+void KeyWidget::drawInfo(float& scale, float& offsetX, float& offsetY, int ratio){
+    int w = width() * ratio, h = height() * ratio;
     float xScale = (float)w / (keyMap.width() + KEY_SIZE);
     float yScale = (float)h / (keyMap.height() + KEY_SIZE);
     scale = fmin(xScale, yScale);
@@ -99,7 +99,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     int wWidth = width(), wHeight = height();
     KeyMap::Model model = keyMap.model();
     float scale, offX, offY;
-    drawInfo(scale, offX, offY);
+    drawInfo(scale, offX, offY, ratio);
     // Draw background
     painter.setPen(Qt::NoPen);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -117,7 +117,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
         // We need to transform the image with QImage::scaled() because painter.drawImage() will butcher it, even with smoothing enabled
         // However, the width/height need to be rounded to integers
         int iW = round(w), iH = round(h);
-        painter.drawImage(QRectF(x - (iW - w) / 2.f, y - (iH - h) / 2.f, iW, iH), overlay.scaled(iW, iH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+        painter.drawImage(QRectF((x - (iW - w) / 2.f) / ratio, (y - (iH - h) / 2.f) / ratio, iW / ratio, iH / ratio), overlay.scaled(iW, iH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     } else {
         // Otherwise, draw a solid background
         painter.setBrush(QBrush(bgColor));

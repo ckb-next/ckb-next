@@ -107,11 +107,11 @@ void KbPerf::save(CkbSettings& settings){
         for(int i = 0; i < DPI_COUNT; i++){
             QString iStr = QString::number(i);
             settings.setValue(iStr, QPoint(dpiX[i], dpiY[i]));
-            settings.setValue(iStr + "RGB", dpiClr[i].name());
+            settings.setValue(iStr + "RGB", dpiClr[i].name(QColor::HexArgb));
             if(i != 0)
                 settings.setValue(iStr + "Disabled", !dpiOn[i]);
         }
-        settings.setValue("6RGB", dpiClr[OTHER].name());
+        settings.setValue("6RGB", dpiClr[OTHER].name(QColor::HexArgb));
         settings.setValue("LastIdx", dpiLastIdx);
         int curX = dpiCurX, curY = dpiCurY;
         // Ignore any pushed modes
@@ -264,7 +264,7 @@ QHash<QString, QRgb> KbPerf::indicatorLights() const {
         int index = curDpiIdx();
         if(index == -1 || index > OTHER)
             index = OTHER;
-        res["dpi"] = dpiClr[index].rgb();
+        res["dpi"] = dpiClr[index].rgba();
     }
     return res;
 }

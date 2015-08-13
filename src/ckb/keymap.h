@@ -63,6 +63,7 @@ public:
         NO_LAYOUT = -1,
         FR,                 // France
         DE,                 // Germany
+        IT,                 // Italy
         ES,                 // Spain
         SE,                 // Sweden
         GB,                 // United Kingdom

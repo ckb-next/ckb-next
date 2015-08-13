@@ -47,6 +47,13 @@ static const KeyPatch patchDE[] = {
     {"angle", "<", "bslash_iso"}, {"y", "Y", "z"}, {"minus", "-", "slash"}
 };
 
+static const KeyPatch patchIT[] = {
+    {0, "\\", "grave"}, {0, "'", "minus"}, {0, "¡", "equal"},
+    {0, "È", "lbrace"}, {0, "+", "rbrace"},
+    {0, "Ò", "colon"}, {0, "À", "quote"}, {0, "Ù", "hash"},
+    {0, "<", "bslash_iso"}, {0, "-", "slash"},
+};
+
 static const KeyPatch patchES[] = {
     {"oa", "º", "grave"}, {"quote", "'", "minus"}, {"lexclam", "¡", "equal"},
     {"grave", "`", "lbrace"}, {"plus", "+", "rbrace"},
@@ -157,6 +164,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         case KeyMap::DE:
             patch(map, patchDE);
             break;
+        case KeyMap::IT:
+            patch(map, patchIT);
+            break;
         case KeyMap::ES:
             patch(map, patchES);
             break;
@@ -237,6 +247,8 @@ KeyMap::Layout KeyMap::locale(){
         return KeyMap::FR;
     else if(loc.startsWith("de-"))
         return KeyMap::DE;
+    else if(loc.startsWith("it-"))
+        return KeyMap::IT;
     else if(loc.startsWith("es-"))
         return KeyMap::ES;
     else if(loc.startsWith("se-"))
@@ -255,6 +267,8 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
         return FR;
     if(lower == "de")
         return DE;
+    if(lower == "it")
+        return IT;
     if(lower == "es")
         return ES;
     if(lower == "se")
@@ -276,6 +290,8 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "fr";
     case DE:
         return "de";
+    case IT:
+        return "it";
     case ES:
         return "es";
     case SE:

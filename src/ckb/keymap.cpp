@@ -48,7 +48,7 @@ static const KeyPatch patchDE[] = {
 };
 
 static const KeyPatch patchIT[] = {
-    {0, "\\", "grave"}, {0, "'", "minus"}, {0, "¡", "equal"},
+    {0, "\\", "grave"}, {0, "'", "minus"}, {0, "Ì", "equal"},
     {0, "È", "lbrace"}, {0, "+", "rbrace"},
     {0, "Ò", "colon"}, {0, "À", "quote"}, {0, "Ù", "hash"},
     {0, "<", "bslash_iso"}, {0, "-", "slash"},

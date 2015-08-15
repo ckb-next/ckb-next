@@ -13,7 +13,7 @@
 
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
     // Firmware versions above 1.20 use Output instead of Feature reports for improved performance
-    // It doesn't work well when receiving data, however (Not sure why...linux doesn't have that problem)
+    // It doesn't work well when receiving data, however
     IOHIDReportType type = (kb->fwversion >= 0x120 && !is_recv ? kIOHIDReportTypeOutput : kIOHIDReportTypeFeature);
     kern_return_t res = (*kb->handle)->setReport(kb->handle, type, 0, out_msg, MSG_SIZE, 5000, 0, 0, 0);
     kb->lastresult = res;
@@ -311,6 +311,45 @@ static void remove_device(void* context, io_service_t device, uint32_t message_t
     IOObjectRelease(device);
 }
 
+static int seize_wait(hid_dev_t handle){
+    // HACK: We shouldn't seize the HID device until it's successfully added to the service registry.
+    // Otherwise, OSX might think there's no keyboard/mouse connected.
+    long location = usbgetlong(handle, CFSTR(kIOHIDLocationIDKey));
+    char location_str[18];
+    snprintf(location_str, sizeof(location_str), "@%lx", location);
+    // Open master port (if not done yet)
+    static mach_port_t master = 0;
+    kern_return_t res;
+    if(!master && (res = IOMasterPort(bootstrap_port, &master)) != kIOReturnSuccess){
+        master = 0;
+        ckb_warn("Unable to open master port: 0x%08x\n", res);
+        return -1;
+    }
+    const int max_tries = 50;     // give up after ~5s
+    for(int try = 0; try < max_tries; try++){
+        usleep(100);
+        // Iterate the whole IOService registry
+        io_iterator_t child_iter;
+        if((res = IORegistryCreateIterator(master, kIOServicePlane, kIORegistryIterateRecursively, &child_iter)) != kIOReturnSuccess)
+            return -2;
+
+        io_registry_entry_t child_service;
+        while((child_service = IOIteratorNext(child_iter)) != 0){
+            io_string_t path;
+            IORegistryEntryGetPath(child_service, kIOServicePlane, path);
+            IOObjectRelease(child_service);
+            // Look for an entry that matches the location of the device and says "HID". If found, we can proceed with adding the device
+            if(strstr(path, location_str) && strstr(path, "HID")){
+                IOObjectRelease(child_iter);
+                return 0;
+            }
+        }
+        IOObjectRelease(child_iter);
+    }
+    // Timed out
+    return -3;
+}
+
 static void iterate_devices(void* context, io_iterator_t iterator){
     io_service_t device;
     while((device = IOIteratorNext(iterator)) != 0){
@@ -333,6 +372,8 @@ static void iterate_devices(void* context, io_iterator_t iterator){
         IODestroyPlugInInterface(plugin);
         // Seize the device handle
         euid_guard_start;
+        if(seize_wait(handle))
+            ckb_warn("seize_wait failed, connecting anyway...\n");
         err = (*handle)->open(handle, kIOHIDOptionsTypeSeizeDevice);
         euid_guard_stop;
         if(err != kIOReturnSuccess){

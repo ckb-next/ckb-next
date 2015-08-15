@@ -66,15 +66,17 @@ static kern_return_t IOServiceCopyCF(io_registry_entry_t service, CFStringRef ke
     return( kr );
 }
 
-static kern_return_t IOServiceCopyCFRecursive(mach_port_t master, io_registry_entry_t service, CFStringRef key, CFTypeRef* parameter){
-    // Iterate child registries in the service plane (I have no idea what I'm doing...)
+static kern_return_t IOServiceCopyCFRecursive(io_registry_entry_t service, CFStringRef key, CFTypeRef* parameter){
+    // Iterate child registries
     kern_return_t res;
     io_iterator_t child_iter;
-    if((res = IORegistryCreateIterator(master, kIOServicePlane, kIORegistryIterateRecursively, &child_iter)) != KERN_SUCCESS)
+    if((res = IORegistryEntryCreateIterator(service, kIOServicePlane, kIORegistryIterateRecursively, &child_iter)) != KERN_SUCCESS)
         return kIOReturnBadArgument;
 
     io_registry_entry_t child_service;
     while((child_service = IOIteratorNext(child_iter)) != 0){
+        io_string_t path;
+        IORegistryEntryGetPath(child_service, kIOServicePlane, path);
         res = IOServiceCopyCF(child_service, key, parameter);
         IOObjectRelease(child_service);
         // If the child has it, return success
@@ -122,9 +124,9 @@ static kern_return_t IOPointingCopyCFTypeParameter(CFStringRef key, CFTypeRef * 
     else if(IOServiceCopyCF(hidsystem, key, &tempParameter) == KERN_SUCCESS)
         *parameter = tempParameter;
     // Try recursive searches
-    else if(IOServiceCopyCFRecursive(master, hipointing, key, &tempParameter) == KERN_SUCCESS)
+    else if(IOServiceCopyCFRecursive(hipointing, key, &tempParameter) == KERN_SUCCESS)
         *parameter = tempParameter;
-    else if(IOServiceCopyCFRecursive(master, hidsystem, key, &tempParameter) == KERN_SUCCESS)
+    else if(IOServiceCopyCFRecursive(hidsystem, key, &tempParameter) == KERN_SUCCESS)
         *parameter = tempParameter;
     else {
         // Not found

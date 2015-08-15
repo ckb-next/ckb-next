@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>932</width>
-    <height>636</height>
+    <height>637</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,16 +43,19 @@
      <item row="7" column="8">
       <widget class="QSlider" name="ySlider3">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -62,16 +65,19 @@
      <item row="6" column="5">
       <widget class="QSlider" name="xSlider2">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -107,16 +113,19 @@
      <item row="10" column="8">
       <widget class="QSlider" name="ySlider0">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -137,6 +146,9 @@
          <height>40</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Tip: alt+click to set all colors at once</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -155,6 +167,9 @@
          <width>0</width>
          <height>40</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Tip: alt+click to set all colors at once</string>
        </property>
        <property name="text">
         <string/>
@@ -223,6 +238,9 @@
          <height>40</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Tip: alt+click to set all colors at once</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -270,16 +288,19 @@
      <item row="9" column="5">
       <widget class="QSlider" name="xSlider5">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -347,16 +368,19 @@
      <item row="8" column="5">
       <widget class="QSlider" name="xSlider4">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -366,16 +390,19 @@
      <item row="10" column="5">
       <widget class="QSlider" name="xSlider0">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -395,6 +422,9 @@
          <width>0</width>
          <height>40</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Tip: alt+click to set all colors at once</string>
        </property>
        <property name="text">
         <string/>
@@ -428,6 +458,9 @@
          <height>40</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Tip: alt+click to set all colors at once</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -443,16 +476,19 @@
      <item row="6" column="8">
       <widget class="QSlider" name="ySlider2">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -487,16 +523,19 @@
         </sizepolicy>
        </property>
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
-        <number>25</number>
+        <number>10</number>
        </property>
        <property name="pageStep">
-        <number>100</number>
+        <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -546,6 +585,9 @@
          <height>40</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Tip: alt+click to set all colors at once</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -554,16 +596,19 @@
      <item row="8" column="8">
       <widget class="QSlider" name="ySlider4">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -586,16 +631,19 @@
      <item row="5" column="8">
       <widget class="QSlider" name="ySlider1">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -605,16 +653,19 @@
      <item row="7" column="5">
       <widget class="QSlider" name="xSlider3">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -648,6 +699,9 @@
          <height>40</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Tip: alt+click to set all colors at once</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -656,16 +710,19 @@
      <item row="9" column="8">
       <widget class="QSlider" name="ySlider5">
        <property name="minimum">
-        <number>400</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>1000</number>
        </property>
        <property name="singleStep">
         <number>10</number>
        </property>
        <property name="pageStep">
         <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

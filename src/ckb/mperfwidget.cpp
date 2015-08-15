@@ -6,7 +6,7 @@
 const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 
 MPerfWidget::MPerfWidget(QWidget *parent) :
-    QWidget(parent), ui(new Ui::MPerfWidget), perf(0), profile(0), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), isSetting(false) {
+    QWidget(parent), ui(new Ui::MPerfWidget), perf(0), profile(0), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), colorLink(false), isSetting(false) {
     ui->setupUi(this);
     ui->xyBox->setChecked(!_xyLink);
     // Set up DPI stages
@@ -24,7 +24,8 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
         stages[i].indicator->bigIcons(true);
         stages[i].indicator->allowAlpha(true);
         // Map signals
-        connect(stages[i].indicator, SIGNAL(colorChanged(QColor)), &buttonMapper, SLOT(map()));
+        connect(stages[i].indicator, SIGNAL(clicked(bool)), &buttonMapper1, SLOT(map()));
+        connect(stages[i].indicator, SIGNAL(colorChanged(QColor)), &buttonMapper2, SLOT(map()));
         connect(stages[i].xSlider, SIGNAL(valueChanged(int)), &sliderXMapper, SLOT(map()));
         connect(stages[i].ySlider, SIGNAL(valueChanged(int)), &sliderYMapper, SLOT(map()));
         connect(stages[i].xBox, SIGNAL(valueChanged(int)), &boxXMapper, SLOT(map()));
@@ -33,7 +34,8 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
             // Sniper has no enable
             connect(stages[i].enableCheck, SIGNAL(stateChanged(int)), &enableMapper, SLOT(map()));
         // Set names
-        buttonMapper.setMapping(stages[i].indicator, i);
+        buttonMapper1.setMapping(stages[i].indicator, i);
+        buttonMapper2.setMapping(stages[i].indicator, i);
         sliderXMapper.setMapping(stages[i].xSlider, i);
         sliderYMapper.setMapping(stages[i].ySlider, i);
         boxXMapper.setMapping(stages[i].xBox, i);
@@ -42,7 +44,8 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
             enableMapper.setMapping(stages[i].enableCheck, i);
     }
     // Connect to slots
-    connect(&buttonMapper, SIGNAL(mapped(int)), this, SLOT(colorChanged(int)));
+    connect(&buttonMapper1, SIGNAL(mapped(int)), this, SLOT(colorClicked(int)));
+    connect(&buttonMapper2, SIGNAL(mapped(int)), this, SLOT(colorChanged(int)));
     connect(&sliderXMapper, SIGNAL(mapped(int)), this, SLOT(sliderXMoved(int)));
     connect(&sliderYMapper, SIGNAL(mapped(int)), this, SLOT(sliderYMoved(int)));
     connect(&boxXMapper, SIGNAL(mapped(int)), this, SLOT(boxXChanged(int)));
@@ -74,8 +77,40 @@ void MPerfWidget::setPerf(KbPerf *newPerf, KbProfile *newProfile){
     ui->indicBox->setChecked(perf->enableIndicator());
 }
 
+void MPerfWidget::colorClicked(int index){
+    // Set all colors at once if Alt is held down
+    colorLink = !!(qApp->keyboardModifiers() & Qt::AltModifier);
+}
+
 void MPerfWidget::colorChanged(int index){
-    perf->dpiColor(index, stages[index].indicator->color());
+    QColor color = stages[index].indicator->color();
+    if(colorLink){
+        // Alt was held down - set all
+        for(int i = 0; i < DPI_COUNT; i++){
+            stages[i].indicator->color(color);
+            perf->dpiColor(i, color);
+        }
+        ui->iButtonO->color(color);
+        perf->dpiColor(KbPerf::OTHER, color);
+    } else {
+        // Set one
+        perf->dpiColor(index, color);
+    }
+    colorLink = false;
+}
+
+static const double DPI_BASE = (double)KbPerf::DPI_MAX / (double)KbPerf::DPI_MIN;
+
+inline int dpiExp(int value, int min, int max){
+    double val = (value - min) / (double)(max - min);
+    val = pow(DPI_BASE, val);
+    return round(KbPerf::DPI_MIN * val);
+}
+
+inline int dpiLog(int value, int min, int max){
+    double val = value / (double)KbPerf::DPI_MIN;
+    val = log(val) / log(DPI_BASE);
+    return round(val * (max - min) + min);
 }
 
 inline int dpiRound(int value){
@@ -92,8 +127,12 @@ inline int dpiRound(int value){
 void MPerfWidget::sliderXMoved(int index){
     SET_START;
     QSlider* slider = stages[index].xSlider;
-    int value = dpiRound(slider->value());
+    int value = dpiRound(dpiExp(slider->value(), slider->minimum(), slider->maximum()));
     stages[index].xBox->setValue(value);
+    if(_xyLink)
+        perf->dpi(index, value);
+    else
+        perf->dpi(index, QPoint(value, perf->dpi(index).y()));
     SET_END;
     if(_xyLink)
         stages[index].ySlider->setValue(slider->value());
@@ -102,8 +141,12 @@ void MPerfWidget::sliderXMoved(int index){
 void MPerfWidget::sliderYMoved(int index){
     SET_START;
     QSlider* slider = stages[index].ySlider;
-    int value = dpiRound(slider->value());
+    int value = dpiRound(dpiExp(slider->value(), slider->minimum(), slider->maximum()));
     stages[index].yBox->setValue(value);
+    if(_xyLink)
+        perf->dpi(index, value);
+    else
+        perf->dpi(index, QPoint(perf->dpi(index).x(), value));
     SET_END;
     if(!ui->xyBox->isChecked())
         // X/Y linked?
@@ -115,7 +158,11 @@ void MPerfWidget::boxXChanged(int index){
     QSpinBox* box = stages[index].xBox;
     QSlider* slider = stages[index].xSlider;
     int value = box->value();
-    slider->setValue(value);
+    slider->setValue(dpiLog(value, slider->minimum(), slider->maximum()));
+    if(_xyLink)
+        perf->dpi(index, value);
+    else
+        perf->dpi(index, QPoint(value, perf->dpi(index).y()));
     SET_END;
     if(_xyLink)
         stages[index].yBox->setValue(value);
@@ -126,7 +173,11 @@ void MPerfWidget::boxYChanged(int index){
     QSpinBox* box = stages[index].yBox;
     QSlider* slider = stages[index].ySlider;
     int value = box->value();
-    slider->setValue(value);
+    slider->setValue(dpiLog(value, slider->minimum(), slider->maximum()));
+    if(_xyLink)
+        perf->dpi(index, value);
+    else
+        perf->dpi(index, QPoint(perf->dpi(index).x(), value));
     SET_END;
     if(_xyLink)
         stages[index].xBox->setValue(value);

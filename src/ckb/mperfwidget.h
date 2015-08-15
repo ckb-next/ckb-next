@@ -42,8 +42,9 @@ private:
     };
     DpiUi stages[DPI_COUNT];
     bool _xyLink;
+    bool colorLink;
 
-    QSignalMapper buttonMapper;
+    QSignalMapper buttonMapper1, buttonMapper2;
     QSignalMapper sliderXMapper, sliderYMapper;
     QSignalMapper boxXMapper, boxYMapper;
     QSignalMapper enableMapper;
@@ -52,6 +53,7 @@ private:
     bool isSetting;
 
 private slots:
+    void colorClicked(int index);
     void colorChanged(int index);
     void sliderXMoved(int index);
     void sliderYMoved(int index);

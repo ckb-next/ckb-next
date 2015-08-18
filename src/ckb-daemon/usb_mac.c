@@ -352,33 +352,32 @@ static int seize_wait(hid_dev_t handle){
 
 static void iterate_devices(void* context, io_iterator_t iterator){
     io_service_t device;
+    euid_guard_start;
     while((device = IOIteratorNext(iterator)) != 0){
         // Get the plugin interface for the device
-        IOCFPlugInInterface** plugin;
-        SInt32 score;
+        IOCFPlugInInterface** plugin = 0;
+        SInt32 score = 0;
         kern_return_t err = IOCreatePlugInInterfaceForService(device, kIOHIDDeviceTypeID, kIOCFPlugInInterfaceID, &plugin, &score);
         if(err != kIOReturnSuccess){
             ckb_err("Failed to create device plugin: %x\n", err);
-            continue;
+            goto release;
         }
         // Get the device interface
         hid_dev_t handle;
         err = (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOHIDDeviceDeviceInterfaceID), (LPVOID*)&handle);
         if(err != kIOReturnSuccess){
             ckb_err("QueryInterface failed: %x\n", err);
-            continue;
+            goto release;
         }
         // Plugin is no longer needed
         IODestroyPlugInInterface(plugin);
         // Seize the device handle
-        euid_guard_start;
         if(seize_wait(handle))
             ckb_warn("seize_wait failed, connecting anyway...\n");
         err = (*handle)->open(handle, kIOHIDOptionsTypeSeizeDevice);
-        euid_guard_stop;
         if(err != kIOReturnSuccess){
             ckb_err("Failed to seize device: %x\n", err);
-            continue;
+            goto release;
         }
         // Connect it
         io_object_t* rm_notify = 0;
@@ -386,12 +385,13 @@ static void iterate_devices(void* context, io_iterator_t iterator){
         if(kb)
             // If successful, register for removal notification
             IOServiceAddInterestNotification(notify, device, kIOGeneralInterest, remove_device, kb, rm_notify);
-        else {
+        else
             // Otherwise, release it now
-            (*handle)->close(handle, kIOHIDOptionsTypeNone);
-            remove_device(0, device, kIOMessageServiceIsTerminated, 0);
-        }
+            (*handle)->close(handle, kIOHIDOptionsTypeSeizeDevice);
+        release:
+        IOObjectRelease(device);
     }
+    euid_guard_stop;
 }
 
 int usbmain(){
@@ -414,14 +414,15 @@ int usbmain(){
 
     notify = IONotificationPortCreate(kIOMasterPortDefault);
     CFRunLoopAddSource(mainloop = CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify), kCFRunLoopDefaultMode);
-    io_iterator_t iterator;
+    io_iterator_t iterator = 0;
     IOReturn res = IOServiceAddMatchingNotification(notify, kIOMatchedNotification, match, iterate_devices, 0, &iterator);
     if(res != kIOReturnSuccess){
         ckb_fatal("Failed to list devices: %x\n", res);
         return -1;
     }
     // Iterate existing devices
-    iterate_devices(0, iterator);
+    if(iterator)
+        iterate_devices(0, iterator);
     // Enter loop to scan/connect new devices
     CFRunLoopRun();
     return 0;

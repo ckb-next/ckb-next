@@ -98,6 +98,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
 #endif
     int wWidth = width(), wHeight = height();
     KeyMap::Model model = keyMap.model();
+    KeyMap::Layout layout = keyMap.layout();
     float scale, offX, offY;
     drawInfo(scale, offX, offY, ratio);
     // Draw background
@@ -290,6 +291,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     )
                 // Use a larger font size for Super (Linux only) and Brightness to compensate for the unicode symbols looking smaller
                 font.setPixelSize(font.pixelSize() * 1.3);
+            if((layout == KeyMap::EU || layout == KeyMap::EU_DVORAK) && (keyName == "hash" || keyName == "bslash_iso"))
+                // Don't differentiate backslashes on the EU layout
+                name = "\\";
             // Determine the appropriate size to draw the text at
             decPainter.setFont(font);
             QRectF rect(x * scale, y * scale - 1, w * scale, h * scale);

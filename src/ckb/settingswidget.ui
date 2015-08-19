@@ -47,47 +47,62 @@
       <widget class="QComboBox" name="layoutBox">
        <item>
         <property name="text">
-         <string>France</string>
+         <string>English (ISO/European)</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Germany</string>
+         <string>English (ISO/European, Dvorak)</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Italy</string>
+         <string>English (United Kingdom)</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Spain</string>
+         <string>English (United Kingdom, Dvorak)</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Sweden</string>
+         <string>English (United States)</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>United Kingdom</string>
+         <string>English (United States, Dvorak)</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>United Kingdom (Dvorak)</string>
+         <string>French</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>United States</string>
+         <string>German</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>United States (Dvorak)</string>
+         <string>Italian</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Polish</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Spanish</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Swedish</string>
         </property>
        </item>
       </widget>

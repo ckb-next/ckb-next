@@ -33,6 +33,11 @@ struct KeyPatch {
     const char* name;
 };
 
+static const KeyPatch patchEU[] = {
+    {0, "\\ (R)", "hash"},
+    {0, "\\ (L)", "bslash_iso"}
+};
+
 static const KeyPatch patchFR[] = {
     {"sup2", "²", "grave"}, {0, "&", "1"}, {0, "É", "2"}, {0, "\"", "3"}, {0, "'", "4"}, {0, "(", "5"}, {0, "-", "6"}, {0, "È", "7"}, {0, "_", "8"}, {0, "Ç", "9"}, {0, "À", "0"}, {"rparen", ")", "minus"},
     {"a", "A", "q"}, {"z", "Z", "w"}, {"caret", "^", "lbrace"}, {"dollar", "$", "rbrace"},
@@ -158,6 +163,15 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map = K95BaseMap;
         // Patch the map for the layout
         switch(layout){
+        case KeyMap::EU_DVORAK:
+            patch(map, patchDvorak);    // fall through
+        case KeyMap::EU:
+            patch(map, patchEU);
+            break;
+        case KeyMap::GB_DVORAK:
+        case KeyMap::US_DVORAK:
+            patch(map, patchDvorak);
+            break;
         case KeyMap::FR:
             patch(map, patchFR);
             break;
@@ -172,10 +186,6 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             break;
         case KeyMap::SE:
             patch(map, patchSE);
-            break;
-        case KeyMap::GB_DVORAK:
-        case KeyMap::US_DVORAK:
-            patch(map, patchDvorak);
             break;
         default:;
             // English QWERTY - no patch needed
@@ -249,6 +259,8 @@ KeyMap::Layout KeyMap::locale(){
         return KeyMap::DE;
     else if(loc.startsWith("it-"))
         return KeyMap::IT;
+    else if(loc.startsWith("pl-"))
+        return KeyMap::PL;
     else if(loc.startsWith("es-"))
         return KeyMap::ES;
     else if(loc.startsWith("se-"))
@@ -263,39 +275,39 @@ KeyMap::Layout KeyMap::locale(){
 
 KeyMap::Layout KeyMap::getLayout(const QString& name){
     QString lower = name.toLower();
-    if(lower == "fr")
-        return FR;
-    if(lower == "de")
-        return DE;
-    if(lower == "it")
-        return IT;
-    if(lower == "es")
-        return ES;
-    if(lower == "se")
-        return SE;
-    if(lower == "gb")
-        return GB;
+    if(lower == "eu")
+        return EU;
+    if(lower == "eu_dvorak")
+        return EU_DVORAK;
     if(lower == "gb_dvorak")
         return GB_DVORAK;
     if(lower == "us")
         return US;
     if(lower == "us_dvorak")
         return US_DVORAK;
+    if(lower == "fr")
+        return FR;
+    if(lower == "de")
+        return DE;
+    if(lower == "it")
+        return IT;
+    if(lower == "pl")
+        return PL;
+    if(lower == "es")
+        return ES;
+    if(lower == "se")
+        return SE;
+    if(lower == "gb")
+        return GB;
     return NO_LAYOUT;
 }
 
 QString KeyMap::getLayout(KeyMap::Layout layout){
     switch(layout){
-    case FR:
-        return "fr";
-    case DE:
-        return "de";
-    case IT:
-        return "it";
-    case ES:
-        return "es";
-    case SE:
-        return "se";
+    case EU:
+        return "eu";
+    case EU_DVORAK:
+        return "eu_dvorak";
     case GB:
         return "gb";
     case GB_DVORAK:
@@ -304,6 +316,18 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "us";
     case US_DVORAK:
         return "us_dvorak";
+    case FR:
+        return "fr";
+    case DE:
+        return "de";
+    case IT:
+        return "it";
+    case PL:
+        return "pl";
+    case ES:
+        return "es";
+    case SE:
+        return "se";
     default:
         return "";
     }

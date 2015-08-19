@@ -61,19 +61,22 @@ public:
     // Key layouts (ordered alphabetically by name)
     enum Layout {
         NO_LAYOUT = -1,
-        FR,                 // France
-        DE,                 // Germany
-        IT,                 // Italy
-        ES,                 // Spain
-        SE,                 // Sweden
-        GB,                 // United Kingdom
+        EU,                 // English (EU)
+        EU_DVORAK,
+        GB,                 // English (UK)
         GB_DVORAK,
-        US,                 // United States
+        US,                 // English (US)
         US_DVORAK,
+        FR,                 // French
+        DE,                 // German
+        IT,                 // Italian
+        PL,                 // Polish (identical to US)
+        ES,                 // Spanish
+        SE,                 // Swedish
         _LAYOUT_MAX
     };
     // ISO (105-key) or ANSI (104-key)?
-    inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK; }
+    inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK && layout != PL; }
     inline bool         isISO() const           { return isISO(keyLayout); }
     // Auto-detects layout from system locale
     static Layout       locale();

@@ -3,6 +3,11 @@
 #include "kbprofile.h"
 #include <QUrl>
 
+#include <cstdint>
+#include <cstring>
+#include <cstdio>
+#include <X11/Xlib.h>
+
 KeyAction::Type KeyAction::type() const {
     if(_value.isEmpty())
         return UNBOUND;
@@ -354,6 +359,10 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
             else
                 return;
         }
+
+        // Adjust the selected display.
+        adjust_display();
+
         // Start the program. Wrap it around sh to parse arguments.
         process = new QProcess(this);
         process->start("sh", QStringList() << "-c" << program);
@@ -362,4 +371,39 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         else
             relProgram = process;
     }
+}
+
+void KeyAction::adjust_display()
+{
+    char * display_name = XDisplayName(NULL);
+    Display * display = XOpenDisplay (display_name);
+    size_t envstr_size = strlen(DisplayString(display)) + 8 + 1;
+    char* envstr = new char[envstr_size + 2];
+    Window root_window = XRootWindow(display, DefaultScreen(display));
+    Window root_window_ret, child_window_ret, window;
+    XWindowAttributes attr;
+    int root_x, root_y, win_x, win_y;
+    unsigned int mask_ret;
+    char* ptr;
+    char buf[16];
+
+    XQueryPointer (display, root_window, &root_window_ret, &child_window_ret, &root_x, &root_y, &win_x, &win_y, &mask_ret);
+    if (child_window_ret == (Window)NULL) {
+        window = root_window_ret;
+    }
+    else {
+        window = child_window_ret;
+    }
+    snprintf (envstr, envstr_size, "DISPLAY=%s", DisplayString(display));
+
+    XGetWindowAttributes (display, window,  &attr);
+
+    ptr = strchr (strchr (envstr, ':'), '.');
+    if (ptr)
+        *ptr = '\0';
+
+    snprintf (buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
+    strncat (envstr, buf, 16);
+
+    putenv (envstr);
 }

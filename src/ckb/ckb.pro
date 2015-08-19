@@ -8,8 +8,8 @@ TEMPLATE = app
 # GL isn't needed
 QMAKE_LIBS_OPENGL =
 
-QMAKE_CFLAGS += -Wno-unused-parameter
-QMAKE_CXXFLAGS += -Wno-unused-parameter
+QMAKE_CFLAGS += -Wno-unused-parameter -std=c++11
+QMAKE_CXXFLAGS += -Wno-unused-parameter -std=c++11
 
 # Output path
 macx {
@@ -32,7 +32,7 @@ CKB_VERSION_STR = `cat $$PWD/../../VERSION`
 DEFINES += CKB_VERSION_STR="\\\"$$CKB_VERSION_STR\\\""
 
 # Zip library for decompressing firmwares
-LIBS += -lz
+LIBS += -lz -lX11
 DEFINES += QUAZIP_STATIC
 
 # Conditionally use libappindicator to support Unity indicators

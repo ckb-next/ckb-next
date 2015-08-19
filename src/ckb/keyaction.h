@@ -80,6 +80,8 @@ public:
     void keyEvent(KbBind* bind, bool down);
     // Perform keyup action (if any)
     void keyRelease(KbBind* bind);
+    // Adjusts the DISPLAY variable to the selected screen.
+    void adjust_display();
 
 
     ~KeyAction();

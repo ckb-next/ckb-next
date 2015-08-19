@@ -2,11 +2,12 @@
 #include "kb.h"
 #include "kbprofile.h"
 #include <QUrl>
-
 #include <cstdint>
 #include <cstring>
 #include <cstdio>
+#ifdef USE_LIBX11
 #include <X11/Xlib.h>
+#endif
 
 KeyAction::Type KeyAction::type() const {
     if(_value.isEmpty())
@@ -361,7 +362,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         }
 
         // Adjust the selected display.
-        adjust_display();
+        adjustDisplay();
 
         // Start the program. Wrap it around sh to parse arguments.
         process = new QProcess(this);
@@ -373,12 +374,19 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
     }
 }
 
-void KeyAction::adjust_display()
-{
-    char * display_name = XDisplayName(NULL);
-    Display * display = XOpenDisplay (display_name);
-    size_t envstr_size = strlen(DisplayString(display)) + 8 + 1;
-    char* envstr = new char[envstr_size + 2];
+void KeyAction::adjustDisplay(){
+#ifdef USE_LIBX11
+    char* display_name = XDisplayName(NULL);
+    if(!display_name)
+        return;
+    Display* display = XOpenDisplay(display_name);
+    if(!display)
+        return;
+    char* display_string = DisplayString(display);
+    if(!display_string)
+        return;
+    size_t envstr_size = strlen(display_string) + 8 + 2;
+    char* envstr = new char[envstr_size + 1];
     Window root_window = XRootWindow(display, DefaultScreen(display));
     Window root_window_ret, child_window_ret, window;
     XWindowAttributes attr;
@@ -387,23 +395,24 @@ void KeyAction::adjust_display()
     char* ptr;
     char buf[16];
 
-    XQueryPointer (display, root_window, &root_window_ret, &child_window_ret, &root_x, &root_y, &win_x, &win_y, &mask_ret);
-    if (child_window_ret == (Window)NULL) {
+    XQueryPointer(display, root_window, &root_window_ret, &child_window_ret, &root_x, &root_y, &win_x, &win_y, &mask_ret);
+    if(child_window_ret == (Window)NULL)
         window = root_window_ret;
-    }
-    else {
+    else
         window = child_window_ret;
-    }
-    snprintf (envstr, envstr_size, "DISPLAY=%s", DisplayString(display));
+    snprintf(envstr, envstr_size, "DISPLAY=%s", display_string);
 
-    XGetWindowAttributes (display, window,  &attr);
+    XGetWindowAttributes(display, window,  &attr);
 
-    ptr = strchr (strchr (envstr, ':'), '.');
-    if (ptr)
+    ptr = strchr(envstr, ':');
+    ptr = ptr ? strchr(ptr, '.') : NULL;
+    if(ptr)
         *ptr = '\0';
 
-    snprintf (buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
-    strncat (envstr, buf, 16);
+    snprintf(buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
+    strncat(envstr, buf, envstr_size - strlen(envstr));
 
-    putenv (envstr);
+    putenv(envstr);
+    delete[] envstr;
+#endif
 }

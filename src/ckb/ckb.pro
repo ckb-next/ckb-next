@@ -8,7 +8,7 @@ TEMPLATE = app
 # GL isn't needed
 QMAKE_LIBS_OPENGL =
 
-QMAKE_CFLAGS += -Wno-unused-parameter -std=c++11
+QMAKE_CFLAGS += -Wno-unused-parameter
 QMAKE_CXXFLAGS += -Wno-unused-parameter -std=c++11
 
 # Output path
@@ -32,15 +32,20 @@ CKB_VERSION_STR = `cat $$PWD/../../VERSION`
 DEFINES += CKB_VERSION_STR="\\\"$$CKB_VERSION_STR\\\""
 
 # Zip library for decompressing firmwares
-LIBS += -lz -lX11
+LIBS += -lz
 DEFINES += QUAZIP_STATIC
 
-# Conditionally use libappindicator to support Unity indicators
 linux {
+# Conditionally use libappindicator to support Unity indicators
 system(pkg-config --exists appindicator-0.1) {
     CONFIG += link_pkgconfig
     PKGCONFIG += appindicator-0.1
     DEFINES += USE_LIBAPPINDICATOR
+}
+# Also use libx11 for screen detection
+system(pkg-config --exists x11) {
+    LIBS += -lX11
+    DEFINES += USE_LIBX11
 }
 }
 

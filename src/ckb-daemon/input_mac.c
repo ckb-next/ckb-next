@@ -366,6 +366,7 @@ void os_updateindicators(usbdevice* kb, int force){
     // we use the last-assigned value rather than fetching it from the system
     if(kb->modifiers & kCGEventFlagMaskAlphaShift)
         ileds |= 2;
+    kb->hw_ileds = ileds;
     if(kb->active){
         usbmode* mode = kb->profile->currentmode;
         ileds = (ileds & ~mode->ioff) | mode->ion;

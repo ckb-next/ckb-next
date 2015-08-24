@@ -126,7 +126,7 @@ void os_isync(usbdevice* kb){
 
 void os_updateindicators(usbdevice* kb, int force){
     // Read LED events from the device
-    uchar ileds = kb->ev_ileds;
+    uchar ileds = kb->hw_ileds;
     struct input_event event;
     while(read(kb->uinput, &event, sizeof(event)) > 0){
         if(event.type == EV_LED && event.code < 8){
@@ -137,7 +137,7 @@ void os_updateindicators(usbdevice* kb, int force){
                 ileds &= ~which;
         }
     }
-    kb->ev_ileds = ileds;
+    kb->hw_ileds = ileds;
     // Update them if needed
     if(kb->active){
         usbmode* mode = kb->profile->currentmode;

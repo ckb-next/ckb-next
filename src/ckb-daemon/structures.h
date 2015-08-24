@@ -174,7 +174,6 @@ typedef struct {
     struct udev_device* udev;
     int handle;
     int uinput;
-    uchar ev_ileds;
 #else
     struct timespec keyrepeat;
     long location_id;
@@ -218,7 +217,7 @@ typedef struct {
     // Current input state
     usbinput input;
     // Indicator LED state
-    uchar ileds;
+    uchar hw_ileds, ileds;
     // Color dithering in use
     char dither;
 } usbdevice;

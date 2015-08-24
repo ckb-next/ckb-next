@@ -135,12 +135,12 @@ void inputupdate(usbdevice* kb){
 }
 
 void updateindicators_kb(usbdevice* kb, int force){
-    uchar old = kb->ileds;
+    uchar old = kb->hw_ileds;
     os_updateindicators(kb, force);
     // Print notifications if desired
     if(!kb->active)
         return;
-    uchar new = kb->ileds;
+    uchar new = kb->hw_ileds;
     usbmode* mode = kb->profile->currentmode;
     uchar indicators[] = { I_NUM, I_CAPS, I_SCROLL };
     for(unsigned i = 0; i < sizeof(indicators) / sizeof(uchar); i++){

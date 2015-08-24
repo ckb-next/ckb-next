@@ -9,7 +9,7 @@ TEMPLATE = app
 QMAKE_LIBS_OPENGL =
 
 QMAKE_CFLAGS += -Wno-unused-parameter
-QMAKE_CXXFLAGS += -Wno-unused-parameter -std=c++11
+QMAKE_CXXFLAGS += -Wno-unused-parameter
 
 # Output path
 macx {
@@ -96,7 +96,8 @@ SOURCES += main.cpp\
     kbperf.cpp \
     ckbsettingswriter.cpp \
     keyaction.cpp \
-    mperfwidget.cpp
+    mperfwidget.cpp \
+    kperfwidget.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -148,7 +149,8 @@ HEADERS  += mainwindow.h \
     kbperf.h \
     ckbsettingswriter.h \
     keyaction.h \
-    mperfwidget.h
+    mperfwidget.h \
+    kperfwidget.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \
@@ -163,7 +165,8 @@ FORMS    += mainwindow.ui \
     rebindwidget.ui \
     modeselectdialog.ui \
     fwupgradedialog.ui \
-    mperfwidget.ui
+    mperfwidget.ui \
+    kperfwidget.ui
 
 RESOURCES += \
     image.qrc \

@@ -8,13 +8,13 @@ static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
-    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _inactive(MAX_INACTIVE), _showMute(true), _start(false), _needsSave(true)
+    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _start(false), _needsSave(true)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _previewAnim(0), _map(other._map), _colorMap(other._colorMap), lastFrameSignal(0), _dimming(other._dimming), _inactive(other._inactive), _showMute(other._showMute), _start(false), _needsSave(true)
+    QObject(parent), _previewAnim(0), _map(other._map), _colorMap(other._colorMap), lastFrameSignal(0), _dimming(other._dimming), _start(false), _needsSave(true)
 {
     map(keyMap);
     // Duplicate animations
@@ -216,7 +216,7 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
     }
 }
 
-void KbLight::frameUpdate(QFile& cmd, const QStringList& dimKeys, const ColorMap& indicators){
+void KbLight::frameUpdate(QFile& cmd, const ColorMap& indicators){
     // Advance animations
     ColorMap animMap = _colorMap;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -240,8 +240,7 @@ void KbLight::frameUpdate(QFile& cmd, const QStringList& dimKeys, const ColorMap
 
     // Set brightness and indicators
     float light = (3 - _dimming) / 3.f;
-    float inactiveLight = (_inactive >= 0 ? (2 - _inactive) / 4.f : 1.f);
-    if(light != 1.f || inactiveLight != 1.f){
+    if(light != 1.f || !indicators.isEmpty()){
         QMutableHashIterator<QString, QRgb> i(animMap);
         while(i.hasNext()){
             i.next();
@@ -268,12 +267,6 @@ void KbLight::frameUpdate(QFile& cmd, const QStringList& dimKeys, const ColorMap
                 r *= light;
                 g *= light;
                 b *= light;
-            }
-            // Apply indicator dimming
-            if(inactiveLight != 1.f && dimKeys.contains(key)){
-                r *= inactiveLight;
-                g *= inactiveLight;
-                b *= inactiveLight;
             }
             rgb = qRgb(round(r), round(g), round(b));
         }
@@ -309,13 +302,6 @@ void KbLight::load(CkbSettings& settings){
     _dimming = settings.value("Brightness").toUInt();
     if(_dimming > MAX_DIM)
         _dimming = MAX_DIM;
-    bool inOk = false;
-    _inactive = settings.value("InactiveIndicators").toInt(&inOk);
-    if(!inOk || _inactive > MAX_INACTIVE)
-        _inactive = MAX_INACTIVE;
-    _showMute = (settings.value("ShowMute").toInt(&inOk) != 0);
-    if(!inOk)
-        _showMute = true;
     // Load RGB settings
     bool useReal = settings.value("UseRealNames").toBool();
     {
@@ -350,8 +336,6 @@ void KbLight::save(CkbSettings& settings){
     SGroup group(settings, "Lighting");
     settings.setValue("KeyMap", _map.name());
     settings.setValue("Brightness", _dimming);
-    settings.setValue("InactiveIndicators", _inactive);
-    settings.setValue("ShowMute", (int)_showMute);
     settings.setValue("UseRealNames", true);
     {
         // Save RGB settings

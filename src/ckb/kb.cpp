@@ -2,7 +2,6 @@
 #include <QSet>
 #include <QUrl>
 #include "kb.h"
-#include "media.h"
 
 static QSet<Kb*> activeDevices;
 int Kb::_frameRate = 30;
@@ -16,6 +15,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), _needsSave(false)
 {
+    memset(iState, 0, sizeof(iState));
     memset(hwLoading, 0, sizeof(hwLoading));
     // Get the features, model, serial number, FW version (if available), and poll rate (if available) from /dev nodes
     QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate");
@@ -90,7 +90,8 @@ Kb::Kb(QObject *parent, const QString& path) :
         cmd.write(QString(" mode %1 get :hwid").arg(i + 1).toLatin1());
         hwLoading[i + 1] = true;
     }
-    cmd.write("\n");
+    // Ask for current indicator and key state
+    cmd.write(" get :i :keys\n");
     cmd.flush();
 
     emit infoUpdated();
@@ -291,9 +292,6 @@ void Kb::fwUpdate(const QString& path){
 }
 
 void Kb::frameUpdate(){
-    // Get system mute state
-    muteState mute = getMuteState();
-
     // Advance animation frame
     if(!_currentMode)
         return;
@@ -331,21 +329,13 @@ void Kb::frameUpdate(){
     // e.g. 1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6 ...
     if(index >= 6)
         index = 3 + index % 3;
-    // Dim inactive keys
-    QStringList dimKeys;
-    dimKeys << "mr" << "m1" << "m2" << "m3";
-    if(!bind->winLock())
-        dimKeys << "lock";
-    if(mute == UNMUTED && light->showMute())
-        dimKeys << "mute";
-    dimKeys.removeAll(QString("m%1").arg(index + 1));
 
     // Send lighting/binding to driver
     cmd.write(QString("mode %1 switch ").arg(index + 1).toLatin1());
-    light->frameUpdate(cmd, dimKeys, perf->indicatorLights());
+    light->frameUpdate(cmd, perf->indicatorLights(index, iState));
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
-    cmd.write("\n");
+    cmd.write(" ");
     perf->update(cmd, changed);
     cmd.write("\n");
     cmd.flush();
@@ -412,6 +402,19 @@ void Kb::readNotify(QString line){
             mode->light()->animKeypress(keyName, keyPressed);
             mode->bind()->keyEvent(keyName, keyPressed);
         }
+    } else if(components[0] == "i"){
+        // Indicator event
+        QString i = components[1];
+        if(i.length() < 2)
+            return;
+        QString iName = i.mid(1);
+        bool on = (i[0] == '+');
+        if(iName == "num")
+            iState[0] = on;
+        else if(iName == "caps")
+            iState[1] = on;
+        else if(iName == "scroll")
+            iState[2] = on;
     } else if(components[0] == "hwprofileid"){
         // Hardware profile ID
         if(components.count() < 3)

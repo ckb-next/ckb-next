@@ -41,15 +41,6 @@ public:
     static int          shareDimming();
     static void         shareDimming(int newShareDimming);
 
-    // Inactive indicator level. -1 for no dimming, 2 for off
-    static const int    MAX_INACTIVE = 2;
-    inline int          inactive()              { return _inactive; }
-    inline void         inactive(int in)        { _needsSave = true; _inactive = in; emit updated(); }
-
-    // Whether or not to indicate the mute key
-    inline bool showMute()                  { return _showMute; }
-    inline void showMute(bool newShowMute)  { _needsSave = true; _showMute = newShowMute; emit updated(); }
-
     // Lighting animations
     typedef QList<KbAnim*> AnimList;
     KbAnim*             addAnim(const AnimScript* base, const QStringList& keys, const QString& name, const QMap<QString, QVariant>& preset);
@@ -71,9 +62,8 @@ public:
     // Make the lighting idle, stopping any animations.
     void close();
 
-    // Write a new frame to the keyboard. Write "mode %d" first. Optionally provide a list of keys to show in a dimmed state and a list of keys to
-    // use as indicators. (note: indicator list and dim list should not overlap)
-    void frameUpdate(QFile& cmd, const QStringList &dimKeys = QStringList(), const ColorMap& indicators = ColorMap());
+    // Write a new frame to the keyboard. Write "mode %d" first. Optionally provide a list of keys to use as indicators and overwrite the lighting
+    void frameUpdate(QFile& cmd, const ColorMap& indicators = ColorMap());
     // Write the mode's base colors without any animation
     void base(QFile& cmd, bool ignoreDim = false);
 
@@ -94,8 +84,6 @@ private:
     ColorMap    _colorMap;
     quint64     lastFrameSignal;
     int         _dimming;
-    int         _inactive;
-    bool        _showMute;
     bool        _start;
     bool        _needsSave;
 

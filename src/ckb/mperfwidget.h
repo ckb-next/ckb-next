@@ -26,7 +26,7 @@ public:
     void setPerf(KbPerf* newPerf, KbProfile* newProfile);
 
     static const int DPI_COUNT = KbPerf::DPI_COUNT;
-    const static int DPI_MIN = KbPerf::DPI_MIN, DPI_MAX = KbPerf::DPI_MAX;
+    static const int DPI_MIN = KbPerf::DPI_MIN, DPI_MAX = KbPerf::DPI_MAX;
 
 private:
     Ui::MPerfWidget *ui;
@@ -66,6 +66,7 @@ private slots:
     void on_aSnapBox_clicked(bool checked);
     void on_lHeightBox_activated(int index);
     void on_copyButton_clicked();
+    void on_spinBox_valueChanged(int arg1);
 };
 
 #endif // MPERFWIDGET_H

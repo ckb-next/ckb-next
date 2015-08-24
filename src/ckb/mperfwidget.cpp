@@ -60,6 +60,7 @@ MPerfWidget::~MPerfWidget(){
 void MPerfWidget::setPerf(KbPerf *newPerf, KbProfile *newProfile){
     perf = newPerf;
     profile = newProfile;
+    ui->spinBox->setValue(round(perf->iOpacity() * 100.f));
     for(int i = 0; i < DPI_COUNT; i++){
         stages[i].indicator->color(perf->dpiColor(i));
         bool oldLink = _xyLink;
@@ -74,7 +75,7 @@ void MPerfWidget::setPerf(KbPerf *newPerf, KbProfile *newProfile){
     ui->iButtonO->color(perf->dpiColor(KbPerf::OTHER));
     ui->aSnapBox->setChecked(perf->angleSnap());
     ui->lHeightBox->setCurrentIndex(perf->liftHeight() - 1);
-    ui->indicBox->setChecked(perf->enableIndicator());
+    ui->indicBox->setChecked(perf->dpiIndicator());
 }
 
 void MPerfWidget::colorClicked(int index){
@@ -194,7 +195,7 @@ void MPerfWidget::on_xyBox_clicked(bool checked){
 }
 
 void MPerfWidget::on_indicBox_clicked(bool checked){
-    perf->enableIndicator(checked);
+    perf->dpiIndicator(checked);
 }
 
 void MPerfWidget::on_aSnapBox_clicked(bool checked){
@@ -213,4 +214,10 @@ void MPerfWidget::on_copyButton_clicked(){
     foreach(KbMode* mode, selectedModes){
         *mode->perf() = *perf;
     }
+}
+
+void MPerfWidget::on_spinBox_valueChanged(int arg1){
+    if(!perf)
+        return;
+    perf->iOpacity(arg1 / 100.f);
 }

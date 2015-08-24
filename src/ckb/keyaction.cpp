@@ -2,7 +2,6 @@
 #include "kb.h"
 #include "kbprofile.h"
 #include <QUrl>
-#include <cstdint>
 #include <cstring>
 #include <cstdio>
 #ifdef USE_LIBX11

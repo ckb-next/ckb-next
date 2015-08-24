@@ -1,5 +1,8 @@
 #include "kbperf.h"
 #include "kbmode.h"
+#include "kb.h"
+#include "media.h"
+#include <cmath>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
 #define map_last(map) ((map).last())
@@ -8,8 +11,9 @@
 #endif
 
 KbPerf::KbPerf(KbMode* parent) :
-    QObject(parent), _liftHeight(MEDIUM), _angleSnap(false), _enableIndicator(true),
-    _needsUpdate(true), _needsSave(true), runningPushIdx(1) {
+    QObject(parent), runningPushIdx(1),
+    _iOpacity(1.f), _dpiIndicator(true), _liftHeight(MEDIUM), _angleSnap(false),
+    _needsUpdate(true), _needsSave(true) {
     // Default DPI settings
     dpiX[0] = dpiY[0] = 400;
     dpiX[1] = dpiY[1] = 450;
@@ -29,42 +33,108 @@ KbPerf::KbPerf(KbMode* parent) :
     dpiLastIdx = dpiCurIdx = 3;
     dpiCurX = dpiX[dpiCurIdx];
     dpiCurY = dpiY[dpiCurIdx];
+    // Default indicators
+    iColor[NUM][0] = iColor[CAPS][0] = iColor[SCROLL][0] = QColor(0, 255, 0);   // Lock lights: on = green, off = black
+    iColor[NUM][1] = iColor[CAPS][1] = iColor[SCROLL][1] = QColor(0, 0, 0);
+    iColor[MACRO][0] = QColor(255, 0, 0);                                       // Macro: on = red, off = black
+    iColor[LOCK][0] = QColor(255, 255, 255);                                    // Win lock: on = white, off = black
+    iColor[MODE][0] = iColor[MUTE][0] = QColor(255, 255, 255, 0);               // Mode, mute: on = transparent, off = black
+    iColor[MODE][1] = iColor[MACRO][1] = iColor[LOCK][1] = iColor[MUTE][1] = muteNAColor = QColor(0, 0, 0);
+    iColor[LIGHT][0] = QColor(255, 0, 0);       // Brightness: red, yellow, white
+    iColor[LIGHT][1] = QColor(255, 255, 0);
+    light100Color = QColor(255, 255, 255);
+    for(int i = 0; i < HW_I_COUNT; i++){
+        // Set all lock lights to HW mode
+        iEnable[i] = false;
+        hwIType[i] = NORMAL;
+    }
+    for(int i = HW_I_COUNT; i < I_COUNT; i++){
+        // Turn all other indicators on
+        iEnable[i] = true;
+    }
 }
 
 KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
-    QObject(parent), dpiCurX(other.dpiCurX), dpiCurY(other.dpiCurY), dpiCurIdx(other.dpiCurIdx), dpiLastIdx(other.dpiLastIdx),
-    _liftHeight(other._liftHeight), _angleSnap(other._angleSnap), _enableIndicator(other._enableIndicator),
-    _needsUpdate(true), _needsSave(true), runningPushIdx(1) {
+    QObject(parent), dpiCurX(other.dpiCurX), dpiCurY(other.dpiCurY), dpiCurIdx(other.dpiCurIdx), dpiLastIdx(other.dpiLastIdx), runningPushIdx(1),
+    _iOpacity(other._iOpacity), light100Color(other.light100Color), muteNAColor(other.muteNAColor), _dpiIndicator(other._dpiIndicator),
+    _liftHeight(other._liftHeight), _angleSnap(other._angleSnap),
+    _needsUpdate(true), _needsSave(true) {
     memcpy(dpiX, other.dpiX, sizeof(dpiX));
     memcpy(dpiY, other.dpiY, sizeof(dpiY));
     for(int i = 0; i < DPI_COUNT + 1; i++)
         dpiClr[i] = other.dpiClr[i];
     memcpy(dpiOn, other.dpiOn, sizeof(dpiOn));
+    for(int i = 0; i < I_COUNT; i++){
+        iColor[i][0] = other.iColor[i][0];
+        iColor[i][1] = other.iColor[i][1];
+    }
+    memcpy(iEnable, other.iEnable, sizeof(iEnable));
+    memcpy(hwIType, other.hwIType, sizeof(hwIType));
     // Don't copy pushed DPI states. If the other mode has any, restore the original DPI
     if(!other.pushedDpis.isEmpty())
         curDpi(other.pushedDpis[0]);
 }
 
 const KbPerf& KbPerf::operator= (const KbPerf& other){
-    dpiCurX = other.dpiCurX; dpiCurY = other.dpiCurY; dpiCurIdx = other.dpiCurIdx; dpiLastIdx = other.dpiLastIdx;
-    _liftHeight = other._liftHeight; _angleSnap = other._angleSnap; _enableIndicator = other._enableIndicator;
-    _needsUpdate = true; _needsSave = true; runningPushIdx = 1;
+    dpiCurX = other.dpiCurX; dpiCurY = other.dpiCurY; dpiCurIdx = other.dpiCurIdx; dpiLastIdx = other.dpiLastIdx; runningPushIdx = 1;
+    _iOpacity = other._iOpacity; light100Color = other.light100Color; muteNAColor = other.muteNAColor; _dpiIndicator = other._dpiIndicator;
+    _liftHeight = other._liftHeight; _angleSnap = other._angleSnap;
+    _needsUpdate = true; _needsSave = true;
     memcpy(dpiX, other.dpiX, sizeof(dpiX));
     memcpy(dpiY, other.dpiY, sizeof(dpiY));
     for(int i = 0; i < DPI_COUNT + 1; i++)
         dpiClr[i] = other.dpiClr[i];
     memcpy(dpiOn, other.dpiOn, sizeof(dpiOn));
+    for(int i = 0; i < I_COUNT; i++){
+        iColor[i][0] = other.iColor[i][0];
+        iColor[i][1] = other.iColor[i][1];
+    }
+    memcpy(iEnable, other.iEnable, sizeof(iEnable));
+    memcpy(hwIType, other.hwIType, sizeof(hwIType));
     // Don't copy pushed DPI states. If the other mode has any, restore the original DPI
     if(!other.pushedDpis.isEmpty())
         curDpi(other.pushedDpis[0]);
     return other;
 }
 
+KbBind* KbPerf::bind() const {
+    return modeParent()->bind();
+}
+
+KbLight* KbPerf::light() const {
+    return modeParent()->light();
+}
+
 void KbPerf::load(CkbSettings& settings){
     pushedDpis.clear();
     runningPushIdx = 1;
     _needsSave = false;
+    bool readIndicators = true;
+    {
+        // Read old indicator settings from the lighting group, if present
+        // (ckb <= v0.2.0)
+        SGroup group(settings, "Lighting");
+        if(settings.contains("InactiveIndicators")){
+            bool inOk = false;
+            int inactive = settings.value("InactiveIndicators").toInt(&inOk);
+            if(!inOk || inactive > 2)
+                inactive = 2;
+            if(inactive == 1)
+                _iOpacity = 0.75f;
+            else if(inactive == 0)
+                _iOpacity = 0.5f;
+            else if(inactive < 0){
+                // Indicators disabled
+                iEnable[MODE] = iEnable[MACRO] = iEnable[LIGHT] = iEnable[LOCK]  = iEnable[MUTE] = false;
+            }
+            bool showMute = (settings.value("ShowMute").toInt(&inOk) != 0);
+            if(inOk && !showMute)
+                iEnable[MUTE] = false;
+            readIndicators = false;
+        }
+    }
     SGroup group(settings, "Performance");
+    // Read DPI settings
     {
         SGroup group(settings, "DPI");
         for(int i = 0; i < DPI_COUNT; i++){
@@ -91,11 +161,46 @@ void KbPerf::load(CkbSettings& settings){
         if(!value.isNull())
             curDpi(value);
     }
+    // Read misc. mouse settings
     _liftHeight = (height)settings.value("LiftHeight").toInt();
     if(_liftHeight < LOW || _liftHeight > HIGH)
         _liftHeight = MEDIUM;
     _angleSnap = settings.value("AngleSnap").toBool();
-    _enableIndicator = !settings.value("NoIndicator").toBool();
+    if(settings.contains("NoIndicator")){
+        // ckb <= v0.2.0
+        _dpiIndicator = !settings.value("NoIndicator").toBool();
+    } else {
+        _dpiIndicator = settings.value("Indicators/DPI", true).toBool();
+    }
+    // Read indicator settings
+    if(readIndicators){
+        SGroup group(settings, "Indicators");
+        _iOpacity = settings.value("Opacity", 100).toInt() / 100.f;
+        for(int i = 0; i < I_COUNT; i++){
+            SGroup group(settings, QString::number(i));
+            QColor color = settings.value("RGB0").toString();
+            if(color.isValid())
+                iColor[i][0] = color;
+            color = settings.value("RGB1").toString();
+            if(color.isValid())
+                iColor[i][1] = color;
+            if(i == LIGHT){
+                color = settings.value("RGB2").toString();
+                if(color.isValid())
+                    light100Color = color;
+            } else if(i == MUTE){
+                color = settings.value("RGB2").toString();
+                if(color.isValid())
+                    muteNAColor = color;
+            }
+            if(i <= HW_IMAX){
+                iEnable[i] = settings.value("Enable", false).toBool();
+                hwIType[i] = (i_hw)settings.value("Hardware", (int)NORMAL).toInt();
+            } else {
+                iEnable[i] = settings.value("Enable", true).toBool();
+            }
+        }
+    }
     emit didLoad();
 }
 
@@ -123,7 +228,22 @@ void KbPerf::save(CkbSettings& settings){
     }
     settings.setValue("LiftHeight", _liftHeight);
     settings.setValue("AngleSnap", _angleSnap);
-    settings.setValue("NoIndicator", !_enableIndicator);
+    {
+        SGroup group(settings, "Indicators");
+        settings.setValue("DPI", _dpiIndicator);
+        for(int i = 0; i < I_COUNT; i++){
+            SGroup group(settings, QString::number(i));
+            settings.setValue("RGB0", iColor[i][0].name(QColor::HexArgb));
+            settings.setValue("RGB1", iColor[i][1].name(QColor::HexArgb));
+            if(i == LIGHT)
+                settings.setValue("RGB2", light100Color.name(QColor::HexArgb));
+            else if(i == MUTE)
+                settings.setValue("RGB2", muteNAColor.name(QColor::HexArgb));
+            settings.setValue("Enable", iEnable[i]);
+            if(i <= HW_IMAX)
+                settings.setValue("Hardware", (int)hwIType[i]);
+        }
+    }
 }
 
 void KbPerf::dpi(int index, const QPoint& newValue){
@@ -206,6 +326,38 @@ void KbPerf::dpiDown(){
     curDpiIdx(idx);
 }
 
+void KbPerf::getIndicator(indicator index, QColor& color1, QColor& color2, QColor& color3, bool& software_enable, i_hw& hardware_enable){
+    if(index < 0 || index >= I_COUNT)
+        return;
+    color1 = iColor[index][0];
+    color2 = iColor[index][1];
+    if(index == LIGHT)
+        color3 = light100Color;
+    else if(index == MUTE)
+        color3 = muteNAColor;
+    else
+        color3 = QColor();
+    software_enable = iEnable[index];
+    hardware_enable = (index <= HW_IMAX ? hwIType[index] : NONE);
+}
+
+void KbPerf::setIndicator(indicator index, const QColor& color1, const QColor& color2, const QColor& color3, bool software_enable, i_hw hardware_enable){
+    if(index < 0 || index >= I_COUNT)
+        return;
+    iColor[index][0] = color1;
+    iColor[index][1] = color2;
+    if(index == LIGHT)
+        light100Color = color3;
+    else if(index == MUTE)
+        muteNAColor = color3;
+    iEnable[index] = software_enable;
+    if(hardware_enable == NONE)
+        hardware_enable = NORMAL;
+    if(index <= HW_IMAX)
+        hwIType[index] = hardware_enable;
+    _needsUpdate = _needsSave = true;
+}
+
 void KbPerf::liftHeight(height newHeight){
     if(newHeight < LOW || newHeight > HIGH)
         return;
@@ -255,16 +407,97 @@ void KbPerf::update(QFile& cmd, bool force, bool saveCustomDpi){
         snprintf(output, sizeof(output), "%1d:%02x%02x%02x", i, color.red(), color.green(), color.blue());
         cmd.write(output);
     }
+    // Enable indicator notifications
+    cmd.write(" inotify all");
+    // Set indicator state
+    const char* iNames[HW_I_COUNT] = { "num", "caps", "scroll" };
+    for(int i = 0; i < HW_I_COUNT; i++){
+        if(hwIType[i] == ON)
+            cmd.write(" ion ");
+        else if(hwIType[i] == OFF)
+            cmd.write(" ioff ");
+        else
+            cmd.write(" iauto ");
+        cmd.write(iNames[i]);
+    }
 }
 
-QHash<QString, QRgb> KbPerf::indicatorLights() const {
+QHash<QString, QRgb> KbPerf::indicatorLights(int modeIndex, const bool indicatorState[]) const {
     QHash<QString, QRgb> res;
-    if(_enableIndicator){
+    if(_iOpacity <= 0.f)
+        return res;
+    if(_dpiIndicator){
         // Set DPI indicator according to index
         int index = curDpiIdx();
         if(index == -1 || index > OTHER)
             index = OTHER;
         res["dpi"] = dpiClr[index].rgba();
+    }
+    // KB indicators
+    if(iEnable[MODE]){
+        for(int i = 0; i < Kb::HWMODE_MAX; i++){
+            QString name = "m%1";
+            name = name.arg(i + 1);
+            if(modeIndex == i)
+                res[name] = iColor[MODE][0].rgba();
+            else
+                res[name] = iColor[MODE][1].rgba();
+        }
+    }
+    if(iEnable[MACRO])
+        res["mr"] = iColor[MUTE][1].rgba();
+    if(iEnable[LIGHT]){
+        switch(light()->dimming()){
+        case 0:
+            res["light"] = light100Color.rgba();
+            break;
+        case 1:
+            res["light"] = iColor[LIGHT][1].rgba();
+            break;
+        case 2:
+            res["light"] = iColor[LIGHT][0].rgba();
+            break;
+            // 3 (light off): do nothing
+        }
+    }
+    if(iEnable[LOCK]){
+        if(bind()->winLock())
+            res["lock"] = iColor[LOCK][0].rgba();
+        else
+            res["lock"] = iColor[LOCK][1].rgba();
+    }
+    if(iEnable[MUTE]){
+        switch(getMuteState()){
+        case MUTED:
+            res["mute"] = iColor[MUTE][0].rgba();
+            break;
+        case UNMUTED:
+            res["mute"] = iColor[MUTE][1].rgba();
+            break;
+        default:
+            res["mute"] = muteNAColor.rgba();
+            break;
+        }
+    }
+    // Lock lights
+    if(iEnable[NUM])
+        res["numlock"] = indicatorState[0] ? iColor[NUM][0].rgba() : iColor[NUM][1].rgba();
+    if(iEnable[CAPS])
+        res["caps"] = indicatorState[1] ? iColor[CAPS][0].rgba() : iColor[CAPS][1].rgba();
+    if(iEnable[SCROLL])
+        res["scroll"] = indicatorState[2] ? iColor[SCROLL][0].rgba() : iColor[SCROLL][1].rgba();
+    // Apply opacity if needed
+    if(_iOpacity < 1.f){
+        QMutableHashIterator<QString, QRgb> i(res);
+        while(i.hasNext()){
+            i.next();
+            QRgb& rgba = i.value();
+            int a = round(qAlpha(rgba) * _iOpacity);
+            if(a <= 0)
+                i.remove();
+            else
+                rgba = qRgba(qRed(rgba), qGreen(rgba), qBlue(rgba), a);
+        }
     }
     return res;
 }

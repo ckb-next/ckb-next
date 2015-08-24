@@ -124,6 +124,9 @@ private:
 
     KeyMap::Model   _model;
 
+    // Indicator light state
+    bool iState[KbPerf::HW_I_COUNT];
+
     // Current firmware update file
     QString fwUpdPath;
 

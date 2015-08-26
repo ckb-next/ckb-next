@@ -142,18 +142,18 @@ Troubleshooting
 
 If you have problems connecting the keyboard to your system (keyboard doesn't respond, ckb-daemon doesn't recognize it or can't connect the keyboard), try adding the following to your kernel's `cmdline`:
 
-```
-usbhid.quirks=0x1B1C:0x1B08:0x408,0x1B1C:0x1B09:0x400,0x1B1C:0x1B11:0x408,0x1B1C:0x1B12:0x400,0x1B1C:0x1B13:0x400,0x1B1C:0x1B17:0x400
-```
+* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x400`
+* K70: `usbhid.quirks=0x1B1C:0x1B09:0x400`
+* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400`
+* K95: `usbhid.quirks=0x1B1C:0x1B08:0x408`
+* K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x408`
+* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x400`
 
-This should apply the correct fix for all supported devices. For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
+For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
-If the keyboard still doesn't work, try this instead:
+If you have multiple devices, combine them with commas. For instance, for K70 RGB + M65 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400,0x1B1C:0x1B12:0x400`
 
-```
-usbhid.quirks=0x1B1C:0x1B08:0x4,0x1B1C:0x1B09:0x4,0x1B1C:0x1B11:0x4,0x1B1C:0x1B12:0x4,0x1B1C:0x1B13:0x4,0x1B1C:0x1B17:0x4
-```
-Note that this will cause the kernel driver to ignore the keyboard completely, so you need to ensure ckb-daemon is running at boot or else you'll have no keyboard input.
+If the keyboard still doesn't work, try replacing `0x400` and `0x408` with `0x4`. Note that this will cause the kernel driver to ignore the keyboard completely, so you need to ensure ckb-daemon is running at boot or else you'll have no keyboard input.
 
 If you're using **Unity** and the tray icon doesn't appear correctly, install the following package: `libappindicator-dev`. Then reinstall ckb.
 

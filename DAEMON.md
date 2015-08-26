@@ -165,6 +165,13 @@ Notifications are printed with one notification per line. Commands are as follow
 
 **Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `key +a` `key -a`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
 
+Indicator notifications
+-----------------------
+
+You can also choose to receive notifications for the indicator LEDs by using the `inotify` command. For instance, `inotify caps:on` or simply `inotify caps` will print notifications whenever the Caps Lock LED is toggled. The notifications will read `i +caps` when the light is turned on and `i -caps` when it is turned off. It is also possible to toggle all indicators at once using `inotify all` or `inotify all:off`.
+
+Like key notifications, indicator notifications are not affected by bindings, nor by the `ion`, `ioff`, or `iauto` commands. The notifications will reflect the state of the LEDs as seen be the event device.
+
 Getting parameters
 ------------------
 
@@ -183,6 +190,7 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 - `get :lift` returns a `lift` command for the current lift height.
 - `get :snap` returns the current angle snap status.
 - `get :hwdpi`, `get :hwdpisel`, `get :hwlift`, and `get :hwsnap` return the same properties, but for the current hardware profile.
+- `get :keys` and `get :i` return the current keypress status and indicator status, respectively. They will indicate all currently pressed keys and all currently active indicators, like `key +enter` and `i +num`.
 
 Like `notify`, you must prefix your command with `@<node>` to get data printed to a node other than `notify0`.
 

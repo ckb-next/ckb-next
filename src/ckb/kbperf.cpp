@@ -110,7 +110,7 @@ void KbPerf::load(CkbSettings& settings){
     runningPushIdx = 1;
     _needsSave = false;
     bool readIndicators = true;
-    {
+    if(!settings.containsGroup("Performance/Indicators")){
         // Read old indicator settings from the lighting group, if present
         // (ckb <= v0.2.0)
         SGroup group(settings, "Lighting");

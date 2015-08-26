@@ -99,6 +99,16 @@ bool CkbSettings::contains(const QString& key) const {
     return backing->contains(pwd(key));
 }
 
+bool CkbSettings::containsGroup(const QString &group){
+    QStringList components = group.split("/");
+    if(components.length() > 1){
+        // Find sub-group
+        SGroup group(*this, components[0]);
+        return containsGroup(components.mid(1).join('/'));
+    }
+    return childGroups().contains(group);
+}
+
 QVariant CkbSettings::value(const QString& key, const QVariant& defaultValue) const {
     lockMutex;
     return backing->value(pwd(key), defaultValue);

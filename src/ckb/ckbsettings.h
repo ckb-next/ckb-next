@@ -2,6 +2,9 @@
 #define CKBSETTINGS_H
 
 #include <QSettings>
+#include <QStringList>
+#include <QMap>
+#include <QVariant>
 
 // QSettings replacement with convenience functions
 
@@ -34,6 +37,7 @@ public:
     QStringList childGroups() const;
     QStringList childKeys() const;
     bool        contains(const QString& key) const;
+    bool        containsGroup(const QString& group);
     QVariant    value(const QString& key, const QVariant& defaultValue = QVariant()) const;
     void        setValue(const QString& key, const QVariant& value);
     void        remove(const QString& key);

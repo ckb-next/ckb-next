@@ -104,7 +104,7 @@ bool CkbSettings::containsGroup(const QString &group){
     if(components.length() > 1){
         // Find sub-group
         SGroup group(*this, components[0]);
-        return containsGroup(components.mid(1).join('/'));
+        return containsGroup(QStringList(components.mid(1)).join('/'));
     }
     return childGroups().contains(group);
 }

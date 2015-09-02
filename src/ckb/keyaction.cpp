@@ -384,14 +384,16 @@ void KeyAction::adjustDisplay(){
     char* display_string = DisplayString(display);
     if(!display_string)
         return;
-    size_t envstr_size = strlen(display_string) + 8 + 2;
-    char* envstr = new char[envstr_size + 1];
+    size_t envstr_size = strlen(display_string) + 2;
+    char* envstr = new char[envstr_size];
+    strncpy(envstr, display_string, envstr_size);
+    envstr[envstr_size - 1] = 0;
+
     Window root_window = XRootWindow(display, DefaultScreen(display));
     Window root_window_ret, child_window_ret, window;
     XWindowAttributes attr;
     int root_x, root_y, win_x, win_y;
     unsigned int mask_ret;
-    char* ptr;
     char buf[16];
 
     XQueryPointer(display, root_window, &root_window_ret, &child_window_ret, &root_x, &root_y, &win_x, &win_y, &mask_ret);
@@ -399,19 +401,18 @@ void KeyAction::adjustDisplay(){
         window = root_window_ret;
     else
         window = child_window_ret;
-    snprintf(envstr, envstr_size, "DISPLAY=%s", display_string);
-
     XGetWindowAttributes(display, window,  &attr);
 
-    ptr = strchr(envstr, ':');
+    char* ptr = strchr(envstr, ':');
     ptr = ptr ? strchr(ptr, '.') : NULL;
     if(ptr)
         *ptr = '\0';
 
     snprintf(buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
-    strncat(envstr, buf, envstr_size - strlen(envstr));
+    strncat(envstr, buf, envstr_size - 1 - strlen(envstr));
+    setenv("DISPLAY", envstr, 1);
 
-    putenv(envstr);
     delete[] envstr;
+    XCloseDisplay(display);
 #endif
 }

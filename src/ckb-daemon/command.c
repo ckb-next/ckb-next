@@ -177,6 +177,8 @@ int readcmd(usbdevice* kb, const char* line){
             uint dither;
             if(sscanf(word, "%u", &dither) == 1 && dither <= 1){
                 kb->dither = dither;
+                profile->currentmode->light.forceupdate = 1;
+                mode->light.forceupdate = 1;
             }
             continue;
         }

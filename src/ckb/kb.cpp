@@ -1,15 +1,21 @@
 #include <fcntl.h>
 #include <QSet>
 #include <QUrl>
+#include <QMutex>
 #include "kb.h"
 
+// All active devices
 static QSet<Kb*> activeDevices;
+// Active notification node paths
+static QSet<QString> notifyPaths;
+static QMutex notifyPathMutex;
+
 int Kb::_frameRate = 30;
 KeyMap::Layout Kb::_layout = KeyMap::NO_LAYOUT;
 bool Kb::_dither = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
-    QThread(parent), devpath(path), cmdpath(path + "/cmd"),
+    QThread(parent), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"),
     features("N/A"), firmware("N/A"), pollrate("N/A"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
     _hwProfile(0), prevProfile(0), prevMode(0),
@@ -66,13 +72,17 @@ Kb::Kb(QObject *parent, const QString& path) :
         return;
 
     // Find an available notification node (if none is found, take notify1)
-    for(int i = 1; i < 10; i++){
-        QString notify = QString(path + "/notify%1").arg(i);
-        if(!QFile::exists(notify)){
-            notifyNumber = i;
-            notifyPath = notify;
-            break;
+    {
+        QMutexLocker locker(&notifyPathMutex);
+        for(int i = 1; i < 10; i++){
+            QString notify = QString(path + "/notify%1").arg(i);
+            if(!QFile::exists(notify) && !notifyPaths.contains(notify)){
+                notifyNumber = i;
+                notifyPath = notify;
+                break;
+            }
         }
+        notifyPaths.insert(notifyPath);
     }
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
@@ -378,12 +388,12 @@ void Kb::run(){
     }
     // Read data from notification node
     QByteArray line;
-    while(1){
-        if((line = notify.readLine()).length() > 0){
-            QString text = QString::fromUtf8(line);
-            metaObject()->invokeMethod(this, "readNotify", Qt::QueuedConnection, Q_ARG(QString, text));
-        }
+    while(notify.isOpen() && (line = notify.readLine()).length() > 0){
+        QString text = QString::fromUtf8(line);
+        metaObject()->invokeMethod(this, "readNotify", Qt::QueuedConnection, Q_ARG(QString, text));
     }
+    QMutexLocker locker(&notifyPathMutex);
+    notifyPaths.remove(notifyPath);
 }
 
 void Kb::readNotify(QString line){

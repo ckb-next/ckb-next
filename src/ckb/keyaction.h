@@ -47,8 +47,8 @@ public:
     const static int LOCK_TOGGLE = 0, LOCK_ON = 1, LOCK_OFF = 2;
     static QString  lockAction(int type = LOCK_TOGGLE);
     // Key to launch a program. stop should be (<press stop> | <release stop>)
-    static const int PROGRAM_PR_INDEF = 0x00, PROGRAM_PR_KRSTOP = 0x01, PROGRAM_PR_KPSTOP = 0x02;
-    static const int PROGRAM_RE_INDEF = 0x00, PROGRAM_RE_KPSTOP = 0x20;
+    static const int PROGRAM_PR_MULTI = 0x04, PROGRAM_PR_INDEF = 0x00, PROGRAM_PR_KRSTOP = 0x01, PROGRAM_PR_KPSTOP = 0x02;
+    static const int PROGRAM_RE_MULTI = 0x40, PROGRAM_RE_INDEF = 0x00, PROGRAM_RE_KPSTOP = 0x20;
     static QString  programAction(const QString& onPress, const QString& onRelease, int stop);
 
     // Action type

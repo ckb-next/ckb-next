@@ -158,6 +158,12 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     ui->dpiCustYBox->setValue(400);
     ui->programKpBox->setText("");
     ui->programKrBox->setText("");
+    ui->programKpSIBox->setChecked(false);
+    ui->programKrSIBox->setChecked(false);
+    ui->programKpModeBox->setCurrentIndex(0);
+    ui->programKrModeBox->setCurrentIndex(0);
+    ui->programKpModeBox->setEnabled(false);
+    ui->programKrModeBox->setEnabled(false);
     // Fill in field and select tab according to action type
     bool mouse = act.isMouse();
     if(mouse){
@@ -194,30 +200,32 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
         ui->programKpBox->setText(onPress);
         ui->programKrBox->setText(onRelease);
         switch(stop & 0x0F){
-        case KeyAction::PROGRAM_PR_INDEF:
-            ui->programKpIndefButton->setChecked(true);
-            ui->programKpSKrButton->setChecked(false);
-            ui->programKpSKpButton->setChecked(false);
+        case KeyAction::PROGRAM_PR_MULTI:
+            ui->programKpSIBox->setChecked(false);
+            ui->programKpModeBox->setCurrentIndex(0);
+            ui->programKpModeBox->setEnabled(false);
             break;
-        case KeyAction::PROGRAM_PR_KRSTOP:
-            ui->programKpIndefButton->setChecked(false);
-            ui->programKpSKrButton->setChecked(true);
-            ui->programKpSKpButton->setChecked(false);
-            break;
-        case KeyAction::PROGRAM_PR_KPSTOP:
-            ui->programKpIndefButton->setChecked(false);
-            ui->programKpSKrButton->setChecked(false);
-            ui->programKpSKpButton->setChecked(true);
+        default:
+            ui->programKpSIBox->setChecked(true);
+            ui->programKpModeBox->setCurrentIndex(stop & 0x0F);
+            ui->programKpModeBox->setEnabled(true);
             break;
         }
         switch(stop & 0xF0){
+        case KeyAction::PROGRAM_RE_MULTI:
+            ui->programKrSIBox->setChecked(false);
+            ui->programKrModeBox->setCurrentIndex(0);
+            ui->programKrModeBox->setEnabled(false);
+            break;
         case KeyAction::PROGRAM_RE_INDEF:
-            ui->programKrIndefButton->setChecked(true);
-            ui->programKrSKpButton->setChecked(false);
+            ui->programKrSIBox->setChecked(true);
+            ui->programKrModeBox->setCurrentIndex(0);
+            ui->programKrModeBox->setEnabled(true);
             break;
         case KeyAction::PROGRAM_RE_KPSTOP:
-            ui->programKrIndefButton->setChecked(false);
-            ui->programKrSKpButton->setChecked(true);
+            ui->programKrSIBox->setChecked(true);
+            ui->programKrModeBox->setCurrentIndex(1);
+            ui->programKrModeBox->setEnabled(true);
             break;
         }
     } else if(act.isSpecial()){
@@ -296,17 +304,17 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
     else if(!ui->programKpBox->text().isEmpty() || !ui->programKrBox->text().isEmpty()){
         int kpStop = 0, krStop = 0;
         if(!ui->programKpBox->text().isEmpty()){
-            if(ui->programKpIndefButton->isChecked())
-                kpStop = KeyAction::PROGRAM_PR_INDEF;
-            else if(ui->programKpSKpButton->isChecked())
-                kpStop = KeyAction::PROGRAM_PR_KPSTOP;
-            else if(ui->programKpSKrButton->isChecked())
-                kpStop = KeyAction::PROGRAM_PR_KRSTOP;
+            if(!ui->programKpSIBox->isChecked())
+                kpStop = KeyAction::PROGRAM_PR_MULTI;
+            else
+                kpStop = ui->programKpModeBox->currentIndex();
         }
         if(!ui->programKrBox->text().isEmpty()){
-            if(ui->programKrIndefButton->isChecked())
+            if(!ui->programKrSIBox->isChecked())
+                krStop = KeyAction::PROGRAM_RE_MULTI;
+            else if(ui->programKrModeBox->currentIndex() == 0)
                 krStop = KeyAction::PROGRAM_RE_INDEF;
-            else if(ui->programKrSKpButton->isChecked())
+            else
                 krStop = KeyAction::PROGRAM_RE_KPSTOP;
         }
         bind->setAction(keys, KeyAction::programAction(ui->programKpBox->text(), ui->programKrBox->text(), kpStop | krStop));
@@ -578,4 +586,14 @@ void RebindWidget::on_wheelButton_clicked(bool checked){
 void RebindWidget::on_dpiButton_clicked(bool checked){
     if(checked && ui->dpiBox->currentIndex() == 0)
         ui->dpiBox->setCurrentIndex(1);
+}
+
+void RebindWidget::on_programKpSIBox_clicked(bool checked){
+    ui->programKpModeBox->setCurrentIndex(0);
+    ui->programKpModeBox->setEnabled(checked);
+}
+
+void RebindWidget::on_programKrSIBox_clicked(bool checked){
+    ui->programKrModeBox->setCurrentIndex(0);
+    ui->programKrModeBox->setEnabled(checked);
 }

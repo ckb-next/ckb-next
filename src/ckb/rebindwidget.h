@@ -61,6 +61,9 @@ private slots:
     void on_programKpButton_clicked(bool checked);
     void on_programKrButton_clicked(bool checked);
 
+    void on_programKpSIBox_clicked(bool checked);
+    void on_programKrSIBox_clicked(bool checked);
+
 private:
     Ui::RebindWidget *ui;
 

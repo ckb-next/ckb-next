@@ -364,12 +364,18 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         adjustDisplay();
 
         // Start the program. Wrap it around sh to parse arguments.
-        process = new QProcess(this);
-        process->start("sh", QStringList() << "-c" << program);
-        if(down)
-            preProgram = process;
-        else
-            relProgram = process;
+        if((down && (stop & PROGRAM_PR_MULTI))
+                || (!down && (stop & PROGRAM_RE_MULTI))){
+            // Multiple instances allowed? Start detached process
+            QProcess::startDetached("sh", QStringList() << "-c" << program);
+        } else {
+            process = new QProcess(this);
+            process->start("sh", QStringList() << "-c" << program);
+            if(down)
+                preProgram = process;
+            else
+                relProgram = process;
+        }
     }
 }
 

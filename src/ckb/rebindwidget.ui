@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="keyTab">
       <property name="sizePolicy">
@@ -1292,27 +1292,29 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QRadioButton" name="programKpIndefButton">
+           <widget class="QCheckBox" name="programKpSIBox">
             <property name="text">
-             <string>Indefinite</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Single instance</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="programKpSKrButton">
-            <property name="text">
-             <string>Stop on release</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="programKpSKpButton">
-            <property name="text">
-             <string>Stop on re-press</string>
-            </property>
+           <widget class="QComboBox" name="programKpModeBox">
+            <item>
+             <property name="text">
+              <string>Run indefinitely</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Stop on release</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Stop on re-press</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
@@ -1350,20 +1352,24 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QRadioButton" name="programKrIndefButton">
+           <widget class="QCheckBox" name="programKrSIBox">
             <property name="text">
-             <string>Indefinite</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Single instance</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="programKrSKpButton">
-            <property name="text">
-             <string>Stop on re-press</string>
-            </property>
+           <widget class="QComboBox" name="programKrModeBox">
+            <item>
+             <property name="text">
+              <string>Run indefinitely</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Stop on re-press</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>

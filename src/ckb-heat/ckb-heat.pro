@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = ckb-hist
+TARGET = ckb-heat
 
 QMAKE_CFLAGS += -std=c99
 QMAKE_MAC_SDK = macosx10.10

@@ -9,6 +9,6 @@ SUBDIRS = \
 	src/ckb-pinwheel \
 	src/ckb-random \
 	src/ckb-rain \
-	src/ckb-hist
+	src/ckb-heat
 
 QMAKE_MAC_SDK = macosx10.10

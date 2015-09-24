@@ -53,7 +53,7 @@ if [[ -d $SRCDIR ]]; then
     echo "Compiling binaries..."
     echo "(This can take a while, please be patient)"
     newtmp
-    make -j 24 "$@" 2>$TMPFILE
+    make -j 8 "$@" 2>$TMPFILE
     checkfail $?
     echo ""
     echo "Finished!"

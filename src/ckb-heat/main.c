@@ -138,7 +138,7 @@ int ckb_frame(ckb_runctx* context){
 					continue;
                 if(max(abs(anim[i].x - key->x), abs(anim[i].y - key->y)) <= radius){
 					float a, r, g, b;
-                   if(random)
+                   if(randomBright)
 					   ckb_grad_color(&a, &r, &g, &b, &animcolor, ((float)(rand() % 1000))/10.f);
 				   else
 				       ckb_grad_color(&a, &r, &g, &b, &animcolor, ((float)min(keyUsages[anim[i].press-keys],300))/3.f);

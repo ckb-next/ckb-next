@@ -13,7 +13,6 @@ void ckb_info(){
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
     CKB_PARAM_BOOL("random", "Random Brightness", 0);
-	CKB_PARAM_LONG("ifade", "Inverse Frame Speed", "frames", 3, 1, 100);
 	CKB_PARAM_LONG("ffade", "Frames to fade", "frames", 30, 10, 1000);
 	CKB_PARAM_DOUBLE("pressestofull", "Presses to full", "keypresses", 10.f, 1.f, 100.f);
 
@@ -26,7 +25,6 @@ void ckb_info(){
     // Presets
     CKB_PRESET_START("Single Spot");
 	CKB_PRESET_PARAM("random", "0");
-	CKB_PRESET_PARAM("ifade", "3");
 	CKB_PRESET_PARAM("ffade", "30");
 	CKB_PRESET_PARAM("pressestofull", "10");
 	CKB_PRESET_PARAM("trigger", "0");
@@ -36,8 +34,6 @@ void ckb_info(){
 
 ckb_gradient animcolor = { 0 };
 int randomBright = 0;
-long ifade = 3;
-int gcounter = 0;
 long ffade = 30;
 double pressestofull = 10.f;
 
@@ -62,7 +58,6 @@ void ckb_init(ckb_runctx* context){
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_AGRADIENT("color", &animcolor){}
 	CKB_PARSE_BOOL("random", &randomBright){}
-	CKB_PARSE_LONG("ifade", &ifade){}
     CKB_PARSE_LONG("ffade", &ffade){}
 	CKB_PARSE_DOUBLE("pressestofull", &pressestofull){}
 }
@@ -96,10 +91,7 @@ void ckb_time(ckb_runctx* context, double delta){
 			anims[i].timing -= delta;
 			while(anims[i].timing < 0){
 				anims[i].timing += 1.f/30.f;
-				gcounter++;
-				if(!(gcounter %= ifade)){
-					anims[i].usages--;
-				}
+				anims[i].usages--;
 			}	
 		}
 	}

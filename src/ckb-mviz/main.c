@@ -19,6 +19,7 @@ void ckb_info(){
 
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
+	CKB_PARAM_BOOL("power", "Use Power instead of Magnitude?", 0);
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NONE);
@@ -28,21 +29,18 @@ void ckb_info(){
     
     // Presets
     CKB_PRESET_START("Default");
-    CKB_PRESET_PARAM("trigger", "0");
+    CKB_PRESET_PARAM("power", "0");
+	CKB_PRESET_PARAM("trigger", "0");
     CKB_PRESET_PARAM("kptrigger", "1");
     CKB_PRESET_END;
 }
 
-typedef struct{
-	int freq;
-    unsigned int power;
-} freqdec;
-
-freqdec buf[2048];
+double powers[2048] = { 0.f  };
 kiss_fft_cpx* inbuf;
 kiss_fft_cpx* outbuf;
 ckb_gradient animcolor = { 0 };
 pa_simple *pas = NULL;
+int power = 0;
 
 void ckb_init(ckb_runctx* context){
 	static const pa_sample_spec ss ={
@@ -51,14 +49,13 @@ void ckb_init(ckb_runctx* context){
 		.channels = 1
 	};
 	pas = pa_simple_new(NULL, "CKB Music Viz", PA_STREAM_RECORD, NULL, "CKB Music Viz", &ss, NULL, NULL, NULL);
-	for(int i=0; i<2048; i++)
-		buf[i].freq = 22050*i/2048;
 	inbuf = malloc(2048*sizeof(kiss_fft_cpx));
 	outbuf = malloc(2048*sizeof(kiss_fft_cpx));
 }
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_AGRADIENT("color", &animcolor){}
+	CKB_PARSE_BOOL("power", &power);
 }
 
 void anim_add(ckb_key* press, float x, float y){
@@ -102,8 +99,10 @@ void getFreqDec(){
 	kiss_fft(config, inbuf, outbuf);
 
 	for(unsigned int j=0; j < 2048; j++)
-		buf[j].power = sqrt(outbuf[j].r*outbuf[j].r + outbuf[j].i*outbuf[j].i);
-	
+		if(power)
+			powers[j] = outbuf[j].r*outbuf[j].r + outbuf[j].i*outbuf[j].i;
+		else
+			powers[j] = sqrt(outbuf[j].r*outbuf[j].r + outbuf[j].i*outbuf[j].i);
 	kiss_fft_free(config);
 	kiss_fft_cleanup();
 }
@@ -122,15 +121,15 @@ int ckb_frame(ckb_runctx* context){
 		posr = max(posr, 0);
 		int lowi = floorf(pow(2,posl*11.f/frames));
 		int highi = ceilf(pow(2,posr*11.f/frames));
-		highi= min(highi, (int)sizeof(buf)/sizeof(freqdec)-1); 
+		highi= min(highi, (int)sizeof(powers)/sizeof(double)-1); 
 		lowi = max(lowi, 0);
-		long long total = 0;
+		double total = 0;
 		unsigned int height = context->height;
 		for(unsigned int i = lowi; i <= highi; i++)
-			total += buf[i].power;
+			total += powers[i];
 		total /= highi - lowi + 1;
 		float a, r, g, b;
-		ckb_grad_color(&a, &r, &g, &b, &animcolor, total/12288.f);
+		ckb_grad_color(&a, &r, &g, &b, &animcolor, total/(power ? 150994944.f : 12288.f));
 		ckb_alpha_blend(key, a, r, g, b);
 	}
     return 0;

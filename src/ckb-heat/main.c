@@ -14,8 +14,8 @@ void ckb_info(){
     CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
     CKB_PARAM_BOOL("random", "Random Brightness", 0);
 	CKB_PARAM_LONG("ifade", "Inverse Frame Speed", "frames", 3, 1, 100);
-	CKB_PARAM_LONG("duration", "Frames to fade", "frames", 30, 10, 1000);
-	CKB_PARAM_DOUBLE("clicktofull", "Presses to full", "keypresses", 10, 1, 100);
+	CKB_PARAM_LONG("ffade", "Frames to fade", "frames", 30, 10, 1000);
+	CKB_PARAM_DOUBLE("pressestofull", "Presses to full", "keypresses", 10.f, 1.f, 100.f);
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_POSITION);
@@ -25,20 +25,20 @@ void ckb_info(){
     
     // Presets
     CKB_PRESET_START("Single Spot");
-    CKB_PRESET_PARAM("duration", "1.0");
-    CKB_PRESET_PARAM("radius", "1");
+	CKB_PRESET_PARAM("random", "0");
 	CKB_PRESET_PARAM("ifade", "3");
+	CKB_PRESET_PARAM("ffade", "30");
+	CKB_PRESET_PARAM("pressestofull", "10");
 	CKB_PRESET_PARAM("trigger", "0");
     CKB_PRESET_PARAM("kptrigger", "1");
     CKB_PRESET_END;
 }
 
 ckb_gradient animcolor = { 0 };
-double duration = 1.f;
 int randomBright = 0;
 long ifade = 3;
 int gcounter = 0;
-long duration = 30;
+long ffade = 30;
 double pressestofull = 10.f;
 
 typedef struct{
@@ -61,13 +61,14 @@ void ckb_init(ckb_runctx* context){
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_AGRADIENT("color", &animcolor){}
+	CKB_PARSE_BOOL("random", &randomBright){}
 	CKB_PARSE_LONG("ifade", &ifade){}
-    //CKB_PARSE_DOUBLE("duration", &duration){}
-    CKB_PARSE_BOOL("random", &randomBright){}
+    CKB_PARSE_LONG("ffade", &ffade){}
+	CKB_PARSE_DOUBLE("pressestofull", &pressestofull){}
 }
 
 void anim_add(int index){
-	anims[index].usages += 45;
+	anims[index].usages += ffade;
 	anims[index].pressed = 1;
 	anims[index].timing = 0.f;
 }
@@ -117,14 +118,15 @@ int ckb_frame(ckb_runctx* context){
     // Draw spots
     unsigned count = context->keycount;
     ckb_key* keys = context->keys;
-    for(int i =0; i < count; i++){
+    unsigned int full = pressestofull*ffade;
+	for(int i =0; i < count; i++){
 		if(!anims[i].usages)
 			continue;
 		float a, r, g, b;
 		if(randomBright)
-			ckb_grad_color(&a, &r, &g, &b, &animcolor, ((float)(rand() % 1000))/10.f);
+			ckb_grad_color(&a, &r, &g, &b, &animcolor, ((float)(rand() % 1024))/10.f);
 		else
-			ckb_grad_color(&a, &r, &g, &b, &animcolor, ((float)min(anims[i].usages,300))/3.f);
+			ckb_grad_color(&a, &r, &g, &b, &animcolor, (float)min(anims[i].usages,full)*100.f/full);
 		ckb_alpha_blend(keys+i, a, r, g, b);
     }
     return 0;

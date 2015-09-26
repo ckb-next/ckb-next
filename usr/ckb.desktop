@@ -6,3 +6,4 @@ Name=ckb
 Comment=Corsair keyboard driver user interface
 Exec=ckb
 Icon=ckb
+Categories=Settings;System;

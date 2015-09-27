@@ -160,7 +160,7 @@ bool AnimScript::load(){
             QString prefix = urlParam(components[3]), postfix = urlParam(components[4]);
             QVariant def = urlParam(components[5]), minimum = urlParam(components[6]), maximum = urlParam(components[7]);
             // Don't allow predefined params
-            if(name == "trigger" || name == "kptrigger" || name == "duration" || name == "delay" || name == "kpdelay" || name == "repeat" || name == "kprepeat" || name == "stop" || name == "kpstop" || name == "kprelease")
+            if(name == "trigger" || name == "kptrigger" || name == "kpmode" || name == "duration" || name == "delay" || name == "kpdelay" || name == "repeat" || name == "kprepeat" || name == "stop" || name == "kpstop" || name == "kpmodestop" || name == "kprelease")
                 continue;
             Param param = { type, name, prefix, postfix, def, minimum, maximum };
             _info.params.append(param);
@@ -204,11 +204,17 @@ bool AnimScript::load(){
     _info.params.append(kptrigger);
     if(_info.absoluteTime || !_info.repeat)
         _info.preempt = false;
+    Param kpmode = { Param::BOOL, "kpmode", "", "", false, 0, 0 };
+    if(_info.kpMode)
+        kpmode.defaultValue = true;
+    _info.params.append(kpmode);
     Param delay = { Param::DOUBLE, "delay", "", "", 0., 0., ONE_DAY };
     Param kpdelay = { Param::DOUBLE, "kpdelay", "", "", 0., 0., ONE_DAY };
-    Param kprelease = { Param::BOOL, "kprelease", "", "", false, 0, 03 };
     _info.params.append(delay);
     _info.params.append(kpdelay);
+    Param kpmodestop = { Param::BOOL, "kpmodestop", "", "", false, 0, 0 };
+    Param kprelease = { Param::BOOL, "kprelease", "", "", false, 0, 0 };
+    _info.params.append(kpmodestop);
     _info.params.append(kprelease);
     if(_info.repeat){
         Param repeat = { Param::DOUBLE, "repeat", "", "", defaultDuration, 0.1, ONE_DAY };
@@ -348,12 +354,16 @@ void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
         return;
     if(!process)
         begin(timestamp);
-    switch(_info.kpMode){
+    int kpMode = _info.kpMode;
+    if(!_paramValues.value("kpmode", true).toBool())
+        // Disable KP mode according to user preferences
+        kpMode = KP_NONE;
+    switch(kpMode){
     case KP_NONE:
         // If KPs aren't allowed, call retrigger/stop instead
         if(pressed)
             retrigger(timestamp);
-        else
+        else if(_paramValues.value("kprelease", false).toBool())
             stop(timestamp);
         break;
     case KP_NAME:

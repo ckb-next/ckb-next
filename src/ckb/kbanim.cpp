@@ -246,10 +246,17 @@ void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
     if(!_script)
         return;
     QMap<QString, QVariant> parameters = effectiveParams();
-    if(!parameters.value("kptrigger").toBool())
-        return;
+    if(pressed && parameters.value("kpmodestop").toBool()){
+        // If stop on key press is enabled, stop mode-wide animation
+        catchUp(timestamp);
+        _script->stop(timestamp);
+        stopTime = repeatTime = repeatMsec = 0;
+    } else {
+        if(!parameters.value("kptrigger").toBool())
+            return;
+        catchUp(timestamp);
+    }
 
-    catchUp(timestamp);
     if(pressed){
         // Key pressed
         int delay = round(parameters.value("kpdelay").toDouble() * 1000.);

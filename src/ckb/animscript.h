@@ -63,6 +63,7 @@ public:
     inline const QString&       author() const          { return _info.author; }
     inline const QString&       license() const         { return _info.license; }
     inline const QString&       description() const     { return _info.description; }
+    inline bool                 hasKeypress() const     { return _info.kpMode != KP_NONE; }
     inline const QStringList&   presets() const         { return _presets; }
     inline const PresetValue&   preset(int index) const { return _presetValues[index]; }
 

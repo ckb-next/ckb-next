@@ -2,6 +2,7 @@
 #include <QDial>
 #include <QDoubleSpinBox>
 #include <QLineEdit>
+#include <QComboBox>
 #include "animsettingdialog.h"
 #include "ui_animsettingdialog.h"
 #include "colorbutton.h"
@@ -41,9 +42,11 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         // Skip timing/playback params
         if(param.name == "duration"
                 || param.name == "trigger" || param.name == "kptrigger"
+                || param.name == "kpmode"
                 || param.name == "delay" || param.name == "kpdelay"
                 || param.name == "repeat" || param.name == "kprepeat"
-                || param.name == "stop" || param.name == "kpstop" || param.name == "kprelease")
+                || param.name == "stop" || param.name == "kpstop"
+                || param.name == "kpmodestop" || param.name == "kprelease")
             continue;
         QVariant value = anim->parameter(param.name);
         // Display prefix label on the left (except for booleans and labels)
@@ -210,10 +213,20 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     row++;
     check = new QCheckBox("Start with key press", this);
     check->setChecked(anim->parameter("kptrigger").toBool());
-    ui->settingsGrid->addWidget(check, row, 3, 1, 4);
+    ui->settingsGrid->addWidget(check, row, 3, 1, 2);
     settingWidgets["kptrigger"] = check;
     connect(check, SIGNAL(stateChanged(int)), &updateMapper, SLOT(map()));
     updateMapper.setMapping(check, "kptrigger");
+    if(script->hasKeypress()){
+        // If the script has a handler for keypresses, add an option allowing the user to select keypress mode
+        QComboBox* combo = new QComboBox(this);
+        combo->addItem("on pressed key");
+        combo->addItem("on whole keyboard");
+        ui->settingsGrid->addWidget(combo, row, 5, 1, 2);
+        settingWidgets["kpmode"] = combo;
+        connect(combo, SIGNAL(activated(int)), &updateMapper, SLOT(map()));
+        updateMapper.setMapping(combo, "kpmode");
+    }
     row++;
 
     // Add horizontal spacer to compress content to left
@@ -226,6 +239,10 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->delayBox->setValue(anim->parameter("delay").toDouble());
     settingWidgets["kpdelay"] = ui->kpDelayBox;
     ui->kpDelayBox->setValue(anim->parameter("kpdelay").toDouble());
+    settingWidgets["kpmodestop"] = ui->kpModeStopBox;
+    ui->kpModeStopBox->setChecked(anim->parameter("kpmodestop").toBool());
+    connect(ui->kpModeStopBox, SIGNAL(clicked(bool)), &updateMapper, SLOT(map()));
+    updateMapper.setMapping(ui->kpModeStopBox, "kpmodestop");
     settingWidgets["kprelease"] = ui->kpReleaseBox;
     ui->kpReleaseBox->setChecked(anim->parameter("kprelease").toBool());
     if(anim->hasParameter("repeat")){
@@ -247,7 +264,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         ui->timeGrid->addWidget(spinner, 4, 3);
         ui->timeGrid->addWidget(new QLabel("times", this), 4, 4);
         // KP repeat
-        ui->timeGrid->addWidget(new QLabel("Repeat:", this), 10, 1);
+        ui->timeGrid->addWidget(new QLabel("Repeat:", this), 12, 1);
         spinner = new QSpinBox(this);
         spinner->setMinimum(0);
         spinner->setMaximum(1000000);
@@ -255,8 +272,8 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         settingWidgets["kpstop"] = spinner;
         connect(spinner, SIGNAL(valueChanged(int)), &updateMapper, SLOT(map()));
         updateMapper.setMapping(spinner, "kpstop");
-        ui->timeGrid->addWidget(spinner, 10, 3);
-        ui->timeGrid->addWidget(new QLabel("times", this), 10, 4);
+        ui->timeGrid->addWidget(spinner, 12, 3);
+        ui->timeGrid->addWidget(new QLabel("times", this), 12, 4);
         // Infinite repeat toggles
         stopCheck = new QCheckBox("Forever", this);
         stopCheck->setChecked(anim->parameter("stop").toInt() < 0);
@@ -264,7 +281,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         kpStopCheck = new QCheckBox("Forever", this);
         connect(stopCheck, SIGNAL(clicked()), this, SLOT(updateStops()));
         kpStopCheck->setChecked(anim->parameter("kpstop").toInt() < 0);
-        ui->timeGrid->addWidget(kpStopCheck, 10, 5);
+        ui->timeGrid->addWidget(kpStopCheck, 12, 5);
         connect(kpStopCheck, SIGNAL(clicked()), this, SLOT(updateStops()));
     } else {
         hasRepeat = false;
@@ -304,8 +321,8 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         settingWidgets["kpstop"] = spinner;
         connect(spinner, SIGNAL(valueChanged(double)), &updateMapper, SLOT(map()));
         updateMapper.setMapping(spinner, "kpstop");
-        ui->timeGrid->addWidget(spinner, 10, 3);
-        ui->timeGrid->addWidget(new QLabel("seconds", this), 10, 4);
+        ui->timeGrid->addWidget(spinner, 12, 3);
+        ui->timeGrid->addWidget(new QLabel("seconds", this), 12, 4);
         // Infinite run toggles
         stopCheck = new QCheckBox("Stop after:", this);
         stopCheck->setChecked(stop > 0.);
@@ -313,7 +330,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         connect(stopCheck, SIGNAL(clicked()), this, SLOT(updateStops()));
         kpStopCheck = new QCheckBox("Stop after:", this);
         kpStopCheck->setChecked(kpstop > 0.);
-        ui->timeGrid->addWidget(kpStopCheck, 10, 1);
+        ui->timeGrid->addWidget(kpStopCheck, 12, 1);
         connect(kpStopCheck, SIGNAL(clicked()), this, SLOT(updateStops()));
     }
     updateStops();
@@ -377,6 +394,11 @@ void AnimSettingDialog::updateParam(QString name){
     if((name == "stop" && stopCheck->isChecked() == hasRepeat)
             || (name == "kpstop" && kpStopCheck->isChecked() == hasRepeat)){
         _anim->parameter(name, -1);
+        return;
+    } else if(name == "kpmode"){
+        // kpmode uses a drop-down, and selection is inverted
+        QComboBox* widget = (QComboBox*)settingWidgets[name];
+        _anim->parameter(name, widget->currentIndex() == 0);
         return;
     }
     // Read value based on type

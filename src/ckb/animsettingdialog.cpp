@@ -217,16 +217,27 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     settingWidgets["kptrigger"] = check;
     connect(check, SIGNAL(stateChanged(int)), &updateMapper, SLOT(map()));
     updateMapper.setMapping(check, "kptrigger");
+    // Add an option allowing the user to select keypress mode
+    QComboBox* combo = new QComboBox(this);
+    int selected = anim->parameter("kpmode").toInt();
     if(script->hasKeypress()){
-        // If the script has a handler for keypresses, add an option allowing the user to select keypress mode
-        QComboBox* combo = new QComboBox(this);
+        // If the script supports keypresses, show the option to handle them that way (default)
         combo->addItem("on pressed key");
         combo->addItem("on whole keyboard");
-        ui->settingsGrid->addWidget(combo, row, 5, 1, 2);
-        settingWidgets["kpmode"] = combo;
-        connect(combo, SIGNAL(activated(int)), &updateMapper, SLOT(map()));
-        updateMapper.setMapping(combo, "kpmode");
+        combo->addItem("on keyboard (once)");
+    } else {
+        selected--;
+        // Otherwise, just show the choice of whether to start it every time or just once
+        combo->addItem("every time");
+        combo->addItem("only once");
     }
+    if(selected < 0 || selected > combo->count())
+        selected = 0;
+    combo->setCurrentIndex(selected);
+    ui->settingsGrid->addWidget(combo, row, 5, 1, 2);
+    settingWidgets["kpmode"] = combo;
+    connect(combo, SIGNAL(activated(int)), &updateMapper, SLOT(map()));
+    updateMapper.setMapping(combo, "kpmode");
     row++;
 
     // Add horizontal spacer to compress content to left
@@ -398,7 +409,10 @@ void AnimSettingDialog::updateParam(QString name){
     } else if(name == "kpmode"){
         // kpmode uses a drop-down, and selection is inverted
         QComboBox* widget = (QComboBox*)settingWidgets[name];
-        _anim->parameter(name, widget->currentIndex() == 0);
+        int selected = widget->currentIndex();
+        if(!_anim->script()->hasKeypress())
+            selected++;
+        _anim->parameter(name, selected);
         return;
     }
     // Read value based on type

@@ -259,6 +259,9 @@ void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
 
     if(pressed){
         // Key pressed
+        if(parameters.value("kpmode", 0).toInt() == 2 && repeatKey != "")
+            // If mode is start once and a key has already been pressed, do nothing
+            return;
         int delay = round(parameters.value("kpdelay").toDouble() * 1000.);
         if(delay > 0){
             // If delay is enabled, wait to trigger the event

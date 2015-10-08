@@ -4,8 +4,14 @@
 
 void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* code){
     int index = keymap[keyindex].led;
-    if(index < 0)
+    if(index < 0) {
+        if (index == -2){     // Process strafe sidelights
+            uchar sideshine;
+            if (sscanf(code, "%2hhx",&sideshine)) // monochromatic
+                mode->light.sidelight = sideshine;
+        }
         return;
+    }
     uchar r, g, b;
     if(sscanf(code, "%2hhx%2hhx%2hhx", &r, &g, &b) == 3){
         mode->light.r[index] = r;

@@ -67,6 +67,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     const QColor bgColor(68, 64, 64);
     const QColor keyColor(112, 110, 110);
     const QColor sniperColor(130, 90, 90);
+    const QColor sidelightColor(0, 0, 0, 0);
     const QColor highlightColor(136, 176, 240);
     const QColor highlightAnimColor(136, 200, 240);
     const QColor animColor(112, 200, 110);
@@ -171,15 +172,18 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!strcmp(key.name, "sniper"))
                 // Sniper key uses a reddish base color instead of the usual grey
                 bgPainter.setBrush(QBrush(sniperColor));
+            else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel"))
+                // Strafe side lights have transparent background
+                bgPainter.setBrush(QBrush(sidelightColor));
             else {
                 bgPainter.setBrush(QBrush(keyColor));
                 if(KeyMap::isMouse(model))
                     bgPainter.setOpacity(0.7);
             }
         }
-        if(!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
-                || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute"))){
-            // Switch keys are circular
+        if(model != KeyMap::STRAFE && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+                || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
+            // Switch keys are circula except for Strafe. All Strafe keys are circular
             x += w / 8.f;
             y += h / 8.f;
             w *= 0.75f;
@@ -379,6 +383,12 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
                 || (!_rgbMode && !key.hasScan))
             continue;
         if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f){
+            // Sidelights can't have a color, but they can be toggled
+            if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")){
+                emit sidelightToggled(); // get the kblightwidget to record it
+                update();
+                break;
+            }
             newSelection.setBit(i);
             update();
             break;
@@ -423,6 +433,9 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
         const Key& key = k.value();
         if((_rgbMode && !key.hasLed)
                 || (!_rgbMode && !key.hasScan))
+            continue;
+        // Sidelights can't be selected
+        if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel"))
             continue;
         float kx1 = key.x - key.width / 2.f + 1.f;
         float ky1 = key.y - key.height / 2.f + 1.f;
@@ -498,8 +511,9 @@ void KeyWidget::selectAll(){
     int i = 0;
     QStringList selectedNames;
     foreach(const Key& key, keyMap.positions()){
-        if((_rgbMode && key.hasLed)
-                || !(_rgbMode && key.hasScan)){
+        // Sidelights can't be selected
+        if(strcmp(key.name, "lsidel") && strcmp(key.name, "rsidel")
+           && ((_rgbMode && key.hasLed) || !(_rgbMode && key.hasScan))){
             selection.setBit(i);
             selectedNames << key.name;
         }
@@ -524,6 +538,9 @@ void KeyWidget::setAnimation(const QStringList& keys){
     animation.fill(false);
     QStringList allNames = keyMap.keys();
     foreach(const QString& key, keys){
+        // Sidelights can't be selected
+        if(!strcmp(key.toLatin1(), "lsidel") || !strcmp(key.toLatin1(), "rsidel"))
+            continue;
         int index = allNames.indexOf(key);
         if(index >= 0)
             animation.setBit(index);

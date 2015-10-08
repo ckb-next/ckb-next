@@ -54,6 +54,7 @@ public:
         K65,
         K70,
         K95,
+        STRAFE,
         // Mouse models
         M65,
         _MODEL_MAX

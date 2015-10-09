@@ -390,7 +390,7 @@ void KeyAction::adjustDisplay(){
     char* display_string = DisplayString(display);
     if(!display_string)
         return;
-    size_t envstr_size = strlen(display_string) + 2;
+    size_t envstr_size = strlen(display_string) + 4;
     char* envstr = new char[envstr_size];
     strncpy(envstr, display_string, envstr_size);
     envstr[envstr_size - 1] = 0;
@@ -400,7 +400,6 @@ void KeyAction::adjustDisplay(){
     XWindowAttributes attr;
     int root_x, root_y, win_x, win_y;
     unsigned int mask_ret;
-    char buf[16];
 
     XQueryPointer(display, root_window, &root_window_ret, &child_window_ret, &root_x, &root_y, &win_x, &win_y, &mask_ret);
     if(child_window_ret == (Window)NULL)
@@ -410,12 +409,14 @@ void KeyAction::adjustDisplay(){
     XGetWindowAttributes(display, window,  &attr);
 
     char* ptr = strchr(envstr, ':');
-    ptr = ptr ? strchr(ptr, '.') : NULL;
-    if(ptr)
-        *ptr = '\0';
-
-    snprintf(buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
-    strncat(envstr, buf, envstr_size - 1 - strlen(envstr));
+    if(ptr){
+        ptr = strchr(ptr, '.');
+        if(ptr)
+            *ptr = '\0';
+        char buf[16];
+        snprintf(buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
+        strncat(envstr, buf, envstr_size - 1 - strlen(envstr));
+    }
     setenv("DISPLAY", envstr, 1);
 
     delete[] envstr;

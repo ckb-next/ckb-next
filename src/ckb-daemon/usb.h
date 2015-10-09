@@ -24,8 +24,17 @@
 #define P_K95_NRGB_STR  "1b08"
 #define IS_K95(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95 || (kb)->product == P_K95_NRGB))
 
+#define P_STRAFE            0x1b20
+#define P_STRAFE_STR        "1b20"
+#define P_STRAFE_NRGB       0x1b15
+#define P_STRAFE_NRGB_STR   "1b15"
+#define IS_STRAFE(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB))
+
 #define P_M65           0x1b12
 #define P_M65_STR       "1b12"
+
+//uncomment to see USB packets sent to the device
+//#define DEBUG_USB
 
 const char* vendor_str(short vendor);
 const char* product_str(short product);

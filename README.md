@@ -38,6 +38,7 @@ ckb currently supports the following Corsair devices:
 * K95* keyboard
 * K95 RGB keyboard
 * M65 RGB mouse
+* Strafe RGB keyboard
 
 \* = hardware playback not yet supported. Settings will be saved to software only.
 
@@ -48,7 +49,7 @@ Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libude
 
 You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build the application, and if all goes well, will ask if you'd like to install/run ckb on your system (press enter to proceed; default answer is "yes"). If the build doesn't succeed, or if you'd like to build ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
 
-Running the daemon requires the uinput flag to be enabled in your kernel. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you do not know what that means you can most likely ignore this. 
+Running the daemon requires the uinput flag to be enabled in your kernel. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you do not know what that means you can most likely ignore this.
 
 #### Reinstalling:
 
@@ -150,6 +151,7 @@ If you have problems connecting the keyboard to your system (keyboard doesn't re
 * K95: `usbhid.quirks=0x1B1C:0x1B08:0x408`
 * K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x408`
 * M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x400`
+* Strafe RGB: `usbhid.quirks=0x1B1C:0x1B20:0x408`
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 

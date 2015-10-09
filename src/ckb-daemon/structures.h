@@ -74,6 +74,7 @@ typedef struct {
     uchar g[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
     uchar b[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
     uchar forceupdate;
+    uchar sidelight; // strafe sidelight
 } lighting;
 
 // Native mode structure
@@ -203,7 +204,7 @@ typedef struct {
     // Whether the keyboard is being actively controlled by the driver
     char active;
     // Device name
-    char name[KB_NAME_LEN];
+    char name[KB_NAME_LEN+1]; // increase by 1 for the trailing \0 for names that are exactly KB_NAME_LEN, e.g. "Corsair STRAFE RGB Gaming Keyboard"
     // Device serial number
     char serial[SERIAL_LEN];
     // USB vendor and product IDs

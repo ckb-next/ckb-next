@@ -46,6 +46,7 @@ public slots:
 signals:
     // Emitted when the selection is changed.
     void selectionChanged(QStringList selected);
+    void sidelightToggled();
 
 private:
     KeyMap keyMap;

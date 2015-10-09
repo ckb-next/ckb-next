@@ -36,7 +36,7 @@
 #define N_MOUSE_ZONES           4
 #define N_MOUSE_ZONES_EXTENDED  10
 // Total number of keys recognized by software
-#define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED)
+#define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED + 2) // 2 sidezones for Strafe
 #define N_KEYBYTES_EXTENDED     ((N_KEYS_EXTENDED + 7) / 8)
 
 // Map from key name to LED code and USB scan code

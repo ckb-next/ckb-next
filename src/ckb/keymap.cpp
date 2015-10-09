@@ -126,6 +126,15 @@ static const Key K65TopRow[] = {
 };
 #define K65_TOP_COUNT (sizeof(K65TopRow) / sizeof(Key))
 
+// Strafe has side lights
+#define KSTRAFE_X_START     10
+#define KSTRAFE_WIDTH       (K70_WIDTH + (KSTRAFE_X_START * 2))
+#define KSTRAFE_HEIGHT      K95_HEIGHT
+
+static const Key KStrafeKeys[] = {
+  {0, "Sidelight", "lsidel", 0, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT*2-4, true, false}, {0, "Sidelight", "rsidel", KSTRAFE_WIDTH, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT*2-4, true, false}
+};
+
 // Mouse map
 static const Key M65Keys[] = {
     {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
@@ -226,6 +235,34 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         for(const Key* key = K65TopRow; key < K65TopRow + K65_TOP_COUNT; key++)
             map[key->name] = *key;
+        // Done!
+        break;
+    }
+    case KeyMap::STRAFE:{
+        // The Strafe RGB maps are based on the K70 map minus the media keys
+        map = getMap(KeyMap::K70, layout);
+        //move light and lock right
+        map["light"].x=285 - K70_X_START;
+        map["light"].hasLed=false;
+        map["lock"].x=297 - K70_X_START;
+        map["lock"].hasLed=false;
+        // move everything right to make the space for the left sidelight
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            i.value().x += KSTRAFE_X_START;
+        }
+        // add sidelights
+        map["lsidel"] = KStrafeKeys[0];
+        map["rsidel"] = KStrafeKeys[1];
+        // remove media controls
+        map.remove("mute");
+        map.remove("volup");
+        map.remove("voldn");
+        map.remove("stop");
+        map.remove("prev");
+        map.remove("play");
+        map.remove("next");
         // Done!
         break;
     }
@@ -341,6 +378,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70;
     if(lower == "k95")
         return K95;
+    if(lower == "strafe")
+        return STRAFE;
     if(lower == "m65")
         return M65;
     return NO_MODEL;
@@ -354,6 +393,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70";
     case K95:
         return "k95";
+    case STRAFE:
+        return "strafe";
     case M65:
         return "m65";
     default:
@@ -370,8 +411,8 @@ KeyMap KeyMap::fromName(const QString &name){
 
 KeyMap::KeyMap(Model _keyModel, Layout _keyLayout) :
     _keys(getMap(_keyModel, _keyLayout)),
-    keyWidth(_keyModel == K95 ? K95_WIDTH : _keyModel == K70 ? K70_WIDTH : _keyModel == K65 ? K65_WIDTH : _keyModel == M65 ? M65_WIDTH : 0),
-    keyHeight(_keyModel == K95 || _keyModel == K70 || _keyModel == K65 ? K95_HEIGHT : _keyModel == M65 ? M65_HEIGHT : 0),
+    keyWidth(_keyModel == K95 ? K95_WIDTH : _keyModel == STRAFE ? KSTRAFE_WIDTH : _keyModel == K70 ? K70_WIDTH : _keyModel == K65 ? K65_WIDTH : _keyModel == M65 ? M65_WIDTH : 0),
+    keyHeight(_keyModel == K95 || _keyModel == K70 ||_keyModel == STRAFE || _keyModel == K65 ? K95_HEIGHT : _keyModel == M65 ? M65_HEIGHT : 0),
     keyModel(_keyModel), keyLayout(_keyLayout)
 {}
 

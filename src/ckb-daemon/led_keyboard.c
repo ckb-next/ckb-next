@@ -79,32 +79,45 @@ int updatergb_kb(usbdevice* kb, int force){
     lighting* newlight = &kb->profile->currentmode->light;
     // Don't do anything if the lighting hasn't changed
     if(!force && !lastlight->forceupdate && !newlight->forceupdate
-            && !rgbcmp(lastlight, newlight))
+            && !rgbcmp(lastlight, newlight) && lastlight->sidelight == newlight->sidelight)   // strafe sidelights
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    /*if(kb->fwversion >= 0x0120){
+    /*if(kb->fwversion >= 0x0120){ */
+    if (IS_STRAFE(kb)){
+        // update strafe sidelights if necessary
+        if(lastlight->sidelight != newlight->sidelight) {
+            uchar data_pkt[2][MSG_SIZE] = {
+                 { 0x07, 0x05, 0x08, 0x00, 0x00 },
+                 { 0x07, 0x05, 0x02, 0, 0x03 }
+             };
+             if (newlight->sidelight)
+                 data_pkt[0][4]=1;    // turn on
+             if(!usbsend(kb, data_pkt[0], 2))
+                 return -1;
+        }
+        // 16.8M color lighting works fine on strafe and is the only way it actually works
         uchar data_pkt[12][MSG_SIZE] = {
             // Red
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x28, 0x01, 0x00, 0x01, 0x01},
+            { 0x7f, 0x01, 0x3c, 0 },
+            { 0x7f, 0x02, 0x3c, 0 },
+            { 0x7f, 0x03, 0x18, 0 },
+            { 0x07, 0x28, 0x01, 0x03, 0x01, 0},
             // Green
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x28, 0x02, 0x00, 0x01, 0x01},
+            { 0x7f, 0x01, 0x3c, 0 },
+            { 0x7f, 0x02, 0x3c, 0 },
+            { 0x7f, 0x03, 0x18, 0 },
+            { 0x07, 0x28, 0x02, 0x03, 0x01, 0},
             // Blue
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x28, 0x03, 0x00, 0x02, 0x01}
+            { 0x7f, 0x01, 0x3c, 0 },
+            { 0x7f, 0x02, 0x3c, 0 },
+            { 0x7f, 0x03, 0x18, 0 },
+            { 0x07, 0x28, 0x03, 0x03, 0x02, 0}
         };
         makergb_full(newlight, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;
-    } else {*/
+    } else {
     // 16.8M color lighting causes flickering and color glitches. Don't use it for this.
     // Maybe in a future version this can be re-added as an advanced feature.
         uchar data_pkt[5][MSG_SIZE] = {
@@ -117,7 +130,7 @@ int updatergb_kb(usbdevice* kb, int force){
         makergb_512(newlight, data_pkt, kb->dither ? ordered8to3 : quantize8to3);
         if(!usbsend(kb, data_pkt[0], 5))
             return -1;
-    //}
+    }
 
     memcpy(lastlight, newlight, sizeof(lighting));
     return 0;
@@ -145,6 +158,11 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
         makergb_full(light, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;
+        if (IS_STRAFE(kb)){ // end save
+            uchar save_end_pkt[MSG_SIZE] = { 0x07, 0x14, 0x04, 0x01, 0x01 };
+            if(!usbsend(kb, save_end_pkt, 1))
+                return -1;
+        }
     } else {
         uchar data_pkt[5][MSG_SIZE] = {
             { 0x7f, 0x01, 60, 0 },

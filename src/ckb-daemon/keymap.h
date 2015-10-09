@@ -23,20 +23,22 @@
 // Number of keys (according to keyboard hardware)
 #define N_KEYS_KB               144
 #define N_KEYBYTES_KB           ((N_KEYS_KB + 7) / 8)
+// Light zones (have LED codes but don't generate input)
+#define N_KEY_ZONES             2
 // Keys recognized by the driver but not present on keyboard
 #define N_KEYS_EXTRA            12
 // Mouse buttons
 #define N_MOUSE_BUTTONS         13
-#define MOUSE_BUTTON_FIRST      (N_KEYS_KB + N_KEYS_EXTRA)
+#define MOUSE_BUTTON_FIRST      (N_KEYS_KB + N_KEY_ZONES + N_KEYS_EXTRA)
 // Number of keys that generate input
 #define N_KEYS_INPUT            (MOUSE_BUTTON_FIRST + N_MOUSE_BUTTONS)
 #define N_KEYBYTES_INPUT        ((N_KEYS_INPUT + 7) / 8)
-// Mouse zones (have LED codes but don't generate input)
+// Mouse zones
 #define LED_MOUSE               N_KEYS_KB
 #define N_MOUSE_ZONES           4
 #define N_MOUSE_ZONES_EXTENDED  10
 // Total number of keys recognized by software
-#define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED + 2) // 2 sidezones for Strafe
+#define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED)
 #define N_KEYBYTES_EXTENDED     ((N_KEYS_EXTENDED + 7) / 8)
 
 // Map from key name to LED code and USB scan code

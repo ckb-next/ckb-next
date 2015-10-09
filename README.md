@@ -1,7 +1,7 @@
-ckb: Corsair Input Driver for Linux and OSX
-===========================================
+ckb: Corsair Input Driver for Linux and OS X
+============================================
 
-**ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary software to the Linux and Mac operating systems. This project is currently a work in progress but already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+**ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
 **Disclaimer:** ckb is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
@@ -16,7 +16,7 @@ Contents
 
 * [Device Support](#device-support)
 * [Linux Installation](#linux-installation)
-* [OSX Installaction](#osx-installation)
+* [OS X Installaction](#osx-installation)
 * [Usage](#usage)
 * [Troubleshooting](#troubleshooting)
 * [Known Issues](#known-issues)
@@ -48,7 +48,7 @@ Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libude
 
 You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build the application, and if all goes well, will ask if you'd like to install/run ckb on your system (press enter to proceed; default answer is "yes"). If the build doesn't succeed, or if you'd like to build ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
 
-Running the daemon requires the uinput flag to be enabled in your kernel. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`.If you do not know what that means you can most likely ignore this. 
+Running the daemon requires the uinput flag to be enabled in your kernel. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you do not know what that means you can most likely ignore this. 
 
 #### Reinstalling:
 
@@ -75,12 +75,12 @@ sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop 
 sudo rm -rf /usr/bin/ckb-animations
 ```
 
-OSX Installation
-----------------
+OS X Installation
+-----------------
 
 #### Binary download:
 
-The latest OSX binary can be downloaded here: https://github.com/ccMSC/ckb/releases/latest
+The latest OS X binary can be downloaded here: https://github.com/ccMSC/ckb/releases/latest
 
 Click on `ckb.pkg` under the Downloads section. This is an automated installer which will set up the driver for you. After it's finished, open ckb.app (it will be installed to your Applications directory) to get started.
 
@@ -159,11 +159,11 @@ If the keyboard still doesn't work, try replacing `0x400` and `0x408` with `0x4`
 
 If you're using **Unity** and the tray icon doesn't appear correctly, install the following package: `libappindicator-dev`. Then reinstall ckb.
 
-#### OSX
+#### OS X
 
 - **“ckb.pkg” can’t be opened because it is from an unidentified developer.**
 - Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
-- **Modifier keys (Shift, Ctrl, etc) are not rebound correctly.**
+- **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly.**
 - ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
 - **Compile problems** can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
 

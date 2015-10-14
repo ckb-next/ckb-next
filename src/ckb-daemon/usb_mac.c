@@ -396,7 +396,7 @@ static void iterate_devices(void* context, io_iterator_t iterator){
 
 int usbmain(){
     int vendor = V_CORSAIR;
-    int products[] = { P_K65, P_K70, P_K70_NRGB, P_K95, P_K95_NRGB, P_M65, P_STRAFE_RGB };
+    int products[] = { P_K65, P_K70, P_K70_NRGB, P_K95, P_K95_NRGB, P_M65, P_STRAFE };
     // Tell IOService which type of devices we want (IOHIDDevices matching the supported vendor/products)
     CFMutableDictionaryRef match = IOServiceMatching(kIOHIDDeviceKey);
     CFNumberRef cfvendor = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor);

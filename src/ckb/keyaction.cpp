@@ -1,6 +1,8 @@
 #include "keyaction.h"
 #include "kb.h"
+#include "kbanim.h"
 #include "kbprofile.h"
+#include <QDateTime>
 #include <QUrl>
 #include <cstring>
 #include <cstdio>
@@ -128,6 +130,8 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         case LOCK_OFF:
             return "Windows lock off";
         }
+    } else if(prefix == "$anim"){
+        return "Start animation";
     } else if(prefix == "$program"){
         return "Launch program";
     }
@@ -156,6 +160,13 @@ QString KeyAction::lockAction(int type){
 QString KeyAction::programAction(const QString& onPress, const QString& onRelease, int stop){
     // URL-encode the commands and place them in the string (":" and "+" are both replaced, so they won't interfere)
     return "$program:" + QString::fromUtf8(QUrl::toPercentEncoding(onPress.trimmed())) + "+" + QString::fromUtf8(QUrl::toPercentEncoding(onRelease.trimmed())) + QString("+%1").arg(stop);
+}
+
+const static int ANIM_ONCE = 0x1, ANIM_KRSTOP = 0x2;
+
+QString KeyAction::animAction(const QUuid& guid, bool onlyOnce, bool stopOnRelease){
+    int flags = (onlyOnce ? ANIM_ONCE : 0) | (stopOnRelease ? ANIM_KRSTOP : 0);
+    return "$anim:" + guid.toString() + QString("+%1").arg(flags);
 }
 
 QString KeyAction::specialInfo(int& parameter) const {
@@ -192,6 +203,20 @@ int KeyAction::dpiInfo(QPoint& custom) const {
         custom = QPoint(lxy[1].toInt(), lxy[2].toInt());
     }
     return level;
+}
+
+QUuid KeyAction::animInfo(bool &onlyOnce, bool &stopOnRelease) const {
+    if(!isAnim())
+        return QUuid();
+    QString param = _value.mid(6);
+    QStringList split = param.split("+");
+    if(split.length() < 2)
+        return QUuid();
+    QUuid id = split[0];
+    int flags = split[1].toInt();
+    onlyOnce = !!(flags & ANIM_ONCE);
+    stopOnRelease = !!(flags & ANIM_KRSTOP);
+    return id;
 }
 
 QString KeyAction::driverName() const {
@@ -325,6 +350,21 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         case LOCK_OFF:
             bind->winLock(false);
             break;
+        }
+    } else if(prefix == "$anim"){
+        // Start animation
+        bool onlyOnce = false, stopOnRelease = false;
+        QUuid id = animInfo(onlyOnce, stopOnRelease);
+        KbAnim* anim = bind->light()->findAnim(id);
+        if(!anim)
+            return;
+        if(down){
+            if(!onlyOnce || !anim->isActive())
+                // If "only once" is enabled, don't start the animation when it's already running
+                anim->trigger(QDateTime::currentMSecsSinceEpoch(), true);
+        } else if(stopOnRelease){
+            // Key released - stop animation
+            anim->stop();
         }
     } else if(prefix == "$program"){
         // Launch program

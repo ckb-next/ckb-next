@@ -45,6 +45,7 @@ private slots:
     void on_lockBox_currentIndexChanged(int index);
     void on_programKpBox_textChanged(const QString &arg1);
     void on_programKrBox_textChanged(const QString &arg1);
+    void on_animBox_currentIndexChanged(int index);
 
     void on_typingButton_clicked(bool checked);
     void on_modButton_clicked(bool checked);
@@ -60,12 +61,15 @@ private slots:
     void on_lockButton_clicked(bool checked);
     void on_programKpButton_clicked(bool checked);
     void on_programKrButton_clicked(bool checked);
-
     void on_programKpSIBox_clicked(bool checked);
     void on_programKrSIBox_clicked(bool checked);
+    void on_animButton_clicked(bool checked);
 
 private:
     Ui::RebindWidget *ui;
+
+    // Tab indices
+    const static int TAB_KB = 0, TAB_MOUSE = 1, TAB_ANIM = 2, TAB_SPECIAL = 3, TAB_PROGRAM = 4;
 
     void setBox(QWidget* box);
 

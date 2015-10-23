@@ -33,9 +33,9 @@ static uchar quantize8to3(int index, uchar value){
 
 static void makergb_512(const lighting* light, uchar data_pkt[5][MSG_SIZE],
                         uchar (*ditherfn)(int, uchar)){
-    uchar r[N_KEYS_KB / 2], g[N_KEYS_KB / 2], b[N_KEYS_KB / 2];
+    uchar r[N_KEYS_HW / 2], g[N_KEYS_HW / 2], b[N_KEYS_HW / 2];
     // Compress RGB values to a 512-color palette
-    for(int i = 0; i < N_KEYS_KB; i += 2){
+    for(int i = 0; i < N_KEYS_HW; i += 2){
         char r1 = ditherfn(i, light->r[i]), r2 = ditherfn(i + 1, light->r[i + 1]);
         char g1 = ditherfn(i, light->g[i]), g2 = ditherfn(i + 1, light->g[i + 1]);
         char b1 = ditherfn(i, light->b[i]), b2 = ditherfn(i + 1, light->b[i + 1]);
@@ -69,7 +69,7 @@ static void makergb_full(const lighting* light, uchar data_pkt[12][MSG_SIZE]){
 
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
     // Compare two light structures, ignore mouse zones
-    return memcmp(lhs->r, rhs->r, N_KEYS_KB) || memcmp(lhs->g, rhs->g, N_KEYS_KB) || memcmp(lhs->b, rhs->b, N_KEYS_KB);
+    return memcmp(lhs->r, rhs->r, N_KEYS_HW) || memcmp(lhs->g, rhs->g, N_KEYS_HW) || memcmp(lhs->b, rhs->b, N_KEYS_HW);
 }
 
 int updatergb_kb(usbdevice* kb, int force){
@@ -244,7 +244,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             }
         }
         // Copy the data back to the mode
-        uchar mr[N_KEYS_KB / 2], mg[N_KEYS_KB / 2], mb[N_KEYS_KB / 2];
+        uchar mr[N_KEYS_HW / 2], mg[N_KEYS_HW / 2], mb[N_KEYS_HW / 2];
         memcpy(mr, in_pkt[0] + 4, 60);
         memcpy(mr + 60, in_pkt[1] + 4, 12);
         memcpy(mg, in_pkt[1] + 16, 48);
@@ -252,7 +252,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
         memcpy(mb, in_pkt[2] + 28, 36);
         memcpy(mb + 36, in_pkt[3] + 4, 36);
         // Unpack LED data to 8bpc format
-        for(int i = 0; i < N_KEYS_KB; i++){
+        for(int i = 0; i < N_KEYS_HW; i++){
             uchar r, g, b;
             if(i & 1){
                 r = (7 - ((mr[i / 2] & 0xF0) >> 4)) << 5;

@@ -27,8 +27,8 @@ int updatergb_mouse(usbdevice* kb, int force){
 
     // Send the RGB values for each zone to the mouse
     uchar data_pkt[2][MSG_SIZE] = {
-        { 0x07, 0x22, 0x04, 0x01, 0 },      // RGB colors
-        { 0x07, 0x05, 0x02, 0 }             // Lighting on/off
+        { 0x07, 0x22, N_MOUSE_ZONES, 0x01, 0 }, // RGB colors
+        { 0x07, 0x05, 0x02, 0 }                 // Lighting on/off
     };
     uchar* rgb_data = &data_pkt[0][4];
     for(int i = 0; i < N_MOUSE_ZONES; i++){
@@ -58,51 +58,44 @@ int updatergb_mouse(usbdevice* kb, int force){
 
 int savergb_mouse(usbdevice* kb, lighting* light, int mode){
     uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x10, 1, 0 };
-    // Zone 1
-    data_pkt[4] = light->r[LED_MOUSE];
-    data_pkt[5] = light->g[LED_MOUSE];
-    data_pkt[6] = light->b[LED_MOUSE];
-    if(!usbsend(kb, data_pkt, 1))
-        return -1;
-    // Zone 2
-    data_pkt[2]++;
-    data_pkt[4] = light->r[LED_MOUSE + 1];
-    data_pkt[5] = light->g[LED_MOUSE + 1];
-    data_pkt[6] = light->b[LED_MOUSE + 1];
-    if(!usbsend(kb, data_pkt, 1))
-        return -1;
-    // TODO: zone 4 for Sabre?
+    // Save each RGB zone, minus the DPI light which is sent in the DPI packets
+    int zonecount = IS_SCIMITAR(kb) ? 4 : 2;
+    for(int i = 0; i < zonecount; i++){
+        int led = LED_MOUSE + i;
+        if(led >= LED_DPI)
+            led++;          // Skip DPI light
+        data_pkt[4] = light->r[led];
+        data_pkt[5] = light->g[led];
+        data_pkt[6] = light->b[led];
+        if(!usbsend(kb, data_pkt, 1))
+            return -1;
+        // Set packet for next zone
+        data_pkt[2]++;
+    }
     return 0;
 }
 
 int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x13, 0x10, 1, 0 };
     uchar in_pkt[MSG_SIZE] = { 0 };
-    // Zone 1
-    if(!usbrecv(kb, data_pkt, in_pkt))
-        return -1;
-    if(memcmp(in_pkt, data_pkt, 4)){
-        ckb_err("Bad input header\n");
-        return -2;
+    // Load each RGB zone
+    int zonecount = IS_SCIMITAR(kb) ? 4 : 2;
+    for(int i = 0; i < zonecount; i++){
+        if(!usbrecv(kb, data_pkt, in_pkt))
+            return -1;
+        if(memcmp(in_pkt, data_pkt, 4)){
+            ckb_err("Bad input header\n");
+            return -2;
+        }
+        // Copy data
+        int led = LED_MOUSE + i;
+        if(led >= LED_DPI)
+            led++;          // Skip DPI light
+        light->r[led] = in_pkt[4];
+        light->g[led] = in_pkt[5];
+        light->b[led] = in_pkt[6];
+        // Set packet for next zone
+        data_pkt[2]++;
     }
-    // Copy data
-    light->r[LED_MOUSE] = in_pkt[4];
-    light->g[LED_MOUSE] = in_pkt[5];
-    light->b[LED_MOUSE] = in_pkt[6];
-
-    // Zone 2
-    data_pkt[2]++;
-    if(!usbrecv(kb, data_pkt, in_pkt))
-        return -1;
-    if(memcmp(in_pkt, data_pkt, 4)){
-        ckb_err("Bad input header\n");
-        return -2;
-    }
-    // Copy data
-    light->r[LED_MOUSE + 1] = in_pkt[4];
-    light->g[LED_MOUSE + 1] = in_pkt[5];
-    light->b[LED_MOUSE + 1] = in_pkt[6];
-
-    // TODO: zone 4 for Sabre?
     return 0;
 }

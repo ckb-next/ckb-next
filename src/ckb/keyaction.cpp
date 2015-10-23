@@ -44,6 +44,9 @@ QString KeyAction::defaultAction(const QString& key){
     // G1-G18 are unbound by default
     if(key.length() >= 2 && key[0] == 'g' && key[1] >= '0' && key[1] <= '9')
         return "";
+    // So are thumbgrid buttons
+    if(key.startsWith("thumb"))
+        return "";
     // TODO: default action for MR
     if(key == "mr")
         return "";

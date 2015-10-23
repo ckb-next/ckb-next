@@ -9,10 +9,10 @@
 int setactive_mouse(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
+    const int keycount = 20;
     uchar msg[2][MSG_SIZE] = {
-        { 0x07, 0x04, 0 },                                                          // Disables or enables HW control for DPI and Sniper button
-        { 0x07, 0x40, 0x08, 0,
-          1, 0x80, 2, 0x80, 3, 0x80, 4, 0x80, 5, 0x80, 6, 0x80, 7, 0x80, 8, 0x80 }, // Enable button input. This is similar to the keyboard input selection, but we want everything to come through the HID reports.
+        { 0x07, 0x04, 0 },                  // Disables or enables HW control for DPI and Sniper button
+        { 0x07, 0x40, keycount, 0 },        // Select button input (simlilar to the packet sent to keyboards, but lacks a commit packet)
     };
     if(active)
         // Put the mouse into SW mode
@@ -29,8 +29,15 @@ int setactive_mouse(usbdevice* kb, int active){
     pthread_mutex_unlock(imutex(kb));
     if(!usbsend(kb, msg[0], 1))
         return -1;
-    if(active && !usbsend(kb, msg[1], 1))
-        return -1;
+    if(active){
+        // Set up key input
+        if(!usbsend(kb, msg[1], 1))
+            return -1;
+        for(int i = 0; i < keycount; i++){
+            msg[1][i * 2 + 4] = i + 1;
+            msg[1][i * 2 + 5] = (i < 6 ? IN_HID : IN_CORSAIR);
+        }
+    }
     return 0;
 }
 

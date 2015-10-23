@@ -126,9 +126,14 @@ void* os_inputmain(void* context){
             // Process input (if any)
             pthread_mutex_lock(imutex(kb));
             if(IS_MOUSE(vendor, product)){
-                if(urb->endpoint == 0x82){
+                switch(urb->endpoint){
+                case 0x82:
                     // RGB mouse input
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -(urb->endpoint & 0xF), urb->actual_length, urb->buffer);
+                    break;
+                case 0x83:
+                    corsair_mousecopy(kb->input.keys, urb->buffer);
+                    break;
                 }
             } else if(IS_RGB(vendor, product)){
                 switch(urb->endpoint){
@@ -143,7 +148,7 @@ void* os_inputmain(void* context){
                     break;
                 case 0x83:
                     // RGB EP 3: Corsair input
-                    memcpy(kb->input.keys, urb->buffer, N_KEYBYTES_KB);
+                    corsair_kbcopy(kb->input.keys, urb->buffer);
                     break;
                 }
             } else
@@ -334,7 +339,8 @@ static _model models[] = {
     { P_STRAFE_STR, P_STRAFE },
     { P_STRAFE_NRGB_STR, P_STRAFE_NRGB },
     // Mice
-    { P_M65_STR, P_M65 }
+    { P_M65_STR, P_M65 },
+    { P_SCIMITAR_STR, P_SCIMITAR }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

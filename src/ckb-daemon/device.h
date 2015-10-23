@@ -44,4 +44,22 @@ int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const cha
 // Sets a device's current mode index. This is only used on the non-RGB K95; the RGB keyboards have no gettable HW index.
 void setmodeindex_nrgb(usbdevice* kb, int index);
 
+
+// Per-key input settings for device setup
+// The upper nybble controls input mode. 0x80 generates a normal HID interrupt, 0x40 generates a proprietary interrupt. 0xc0 generates both.
+// The exceptions are the proprietary Corsair keys, which only report HID input in BIOS mode and only report Corsair input in non-BIOS mode.
+// In BIOS mode, the Corsair input is disabled no matter what.
+#define IN_HID          0x80
+#define IN_CORSAIR      0x40
+
+// The lower nybble controls various hardware actions
+#define ACT_LIGHT       1
+#define ACT_NEXT        3
+#define ACT_NEXT_NOWRAP 5
+#define ACT_LOCK        8
+#define ACT_MR_RING     9
+#define ACT_M1          10
+#define ACT_M2          11
+#define ACT_M3          12
+
 #endif  // DEVICE_H

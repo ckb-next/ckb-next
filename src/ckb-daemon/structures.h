@@ -70,9 +70,9 @@ typedef struct {
 
 // Lighting structure for a mode
 typedef struct {
-    uchar r[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
-    uchar g[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
-    uchar b[N_KEYS_KB + N_MOUSE_ZONES_EXTENDED];
+    uchar r[N_KEYS_HW + N_MOUSE_ZONES_EXTENDED];
+    uchar g[N_KEYS_HW + N_MOUSE_ZONES_EXTENDED];
+    uchar b[N_KEYS_HW + N_MOUSE_ZONES_EXTENDED];
     uchar forceupdate;
     uchar sidelight; // strafe sidelight
 } lighting;

@@ -21,22 +21,26 @@
 #endif
 
 // Number of keys (according to keyboard hardware)
-#define N_KEYS_KB               144
-#define N_KEYBYTES_KB           ((N_KEYS_KB + 7) / 8)
+#define N_KEYS_HW               144
+#define N_KEYBYTES_HW           ((N_KEYS_HW + 7) / 8)
 // Light zones (have LED codes but don't generate input)
 #define N_KEY_ZONES             2
 // Keys recognized by the driver but not present on keyboard
 #define N_KEYS_EXTRA            12
 // Mouse buttons
-#define N_MOUSE_BUTTONS         13
-#define MOUSE_BUTTON_FIRST      (N_KEYS_KB + N_KEY_ZONES + N_KEYS_EXTRA)
+#define N_BUTTONS_HW            20
+#define N_BUTTONS_EXTENDED      25
+#define MOUSE_BUTTON_FIRST      (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA)
+#define MOUSE_EXTRA_FIRST       (MOUSE_BUTTON_FIRST + N_BUTTONS_HW)
 // Number of keys that generate input
-#define N_KEYS_INPUT            (MOUSE_BUTTON_FIRST + N_MOUSE_BUTTONS)
+#define N_KEYS_INPUT            (MOUSE_BUTTON_FIRST + N_BUTTONS_EXTENDED)
 #define N_KEYBYTES_INPUT        ((N_KEYS_INPUT + 7) / 8)
 // Mouse zones
-#define LED_MOUSE               N_KEYS_KB
-#define N_MOUSE_ZONES           4
-#define N_MOUSE_ZONES_EXTENDED  10
+#define LED_MOUSE               N_KEYS_HW
+#define N_MOUSE_ZONES           5
+#define N_MOUSE_ZONES_EXTENDED  11
+// Index of DPI light
+#define LED_DPI                 (LED_MOUSE + 2)
 // Total number of keys recognized by software
 #define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED)
 #define N_KEYBYTES_EXTENDED     ((N_KEYS_EXTENDED + 7) / 8)
@@ -61,5 +65,9 @@ extern const key keymap[N_KEYS_EXTENDED];
 // Use positive endpoint for non-RGB keyboards, negative endpoint for RGB
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput);
 void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput);
+
+// Copies input from Corsair reports
+void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput);
+void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
 
 #endif // KEYMAP_H

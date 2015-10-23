@@ -15,23 +15,6 @@ int start_kb_nrgb(usbdevice* kb, int makeactive){
     return 0;
 }
 
-// Per-key input settings and hardware actions
-// 0x80 generates a normal HID interrupt, 0x40 generates a proprietary interrupt. 0xc0 generates both.
-// The exceptions are the proprietary Corsair keys, which only report HID input in BIOS mode and only report Corsair input in non-BIOS mode.
-// In BIOS mode, the Corsair input is disabled no matter what.
-#define IN_HID          0x80
-#define IN_CORSAIR      0x40
-
-// The lower nybble controls various hardware actions
-#define ACT_LIGHT       1
-#define ACT_NEXT        3
-#define ACT_NEXT_NOWRAP 5
-#define ACT_LOCK        8
-#define ACT_MR_RING     9
-#define ACT_M1          10
-#define ACT_M2          11
-#define ACT_M3          12
-
 int setactive_kb(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
@@ -57,9 +40,9 @@ int setactive_kb(usbdevice* kb, int active){
         DELAY_MEDIUM(kb);
         // Set input mode on the keys. They must be grouped into packets of 60 bytes (+ 4 bytes header)
         // Keys are referenced in byte pairs, with the first byte representing the key and the second byte representing the mode.
-        for(int key = 0; key < N_KEYS_KB; ){
+        for(int key = 0; key < N_KEYS_HW; ){
             int pair;
-            for(pair = 0; pair < 30 && key < N_KEYS_KB; pair++, key++){
+            for(pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++){
                 // Select both standard and Corsair input. The standard input will be ignored except in BIOS mode.
                 uchar action = IN_HID | IN_CORSAIR;
                 // Additionally, make MR activate the MR ring (this is disabled for now, may be back later)
@@ -88,9 +71,9 @@ int setactive_kb(usbdevice* kb, int active){
         DELAY_MEDIUM(kb);
 #ifdef OS_LINUX
         // On OSX the default key mappings are fine. On Linux, the G keys will freeze the keyboard. Set the keyboard entirely to HID input.
-        for(int key = 0; key < N_KEYS_KB; ){
+        for(int key = 0; key < N_KEYS_HW; ){
             int pair;
-            for(pair = 0; pair < 30 && key < N_KEYS_KB; pair++, key++){
+            for(pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++){
                 uchar action = IN_HID;
                 // Enable hardware actions
                 if(keymap[key].name){

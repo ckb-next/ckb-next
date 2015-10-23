@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0;
+static QImage* m65Overlay = 0, *scimOverlay = 0;
 
 KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
     QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1), mouseDownMode(NONE), _rgbMode(rgbMode)
@@ -67,6 +67,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     const QColor bgColor(68, 64, 64);
     const QColor keyColor(112, 110, 110);
     const QColor sniperColor(130, 90, 90);
+    const QColor thumbColor(34, 32, 32);
     const QColor sidelightColor(0, 0, 0, 0);
     const QColor highlightColor(136, 176, 240);
     const QColor highlightAnimColor(136, 200, 240);
@@ -106,20 +107,34 @@ void KeyWidget::paintEvent(QPaintEvent*){
     painter.setPen(Qt::NoPen);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    if(model == KeyMap::M65){
-        // M65: Draw overlay
-        if(!m65Overlay)
-            m65Overlay = new QImage(":/img/overlay_m65.png");
-        const QImage& overlay = *m65Overlay;
-        painter.setBrush(palette().brush(QPalette::Window));
-        painter.drawRect(0, 0, width(), height());
-        float oXScale = scale / 9.f, oYScale = scale / 9.f;             // The overlay has a resolution of 9px per keymap unit
-        float x = (2.f + offX) * scale, y = (-2.f + offY) * scale;      // It is positioned at (2, -2)
-        int w = overlay.width() * oXScale, h = overlay.height() * oYScale;
-        // We need to transform the image with QImage::scaled() because painter.drawImage() will butcher it, even with smoothing enabled
-        // However, the width/height need to be rounded to integers
-        int iW = round(w), iH = round(h);
-        painter.drawImage(QRectF((x - (iW - w) / 2.f) / ratio, (y - (iH - h) / 2.f) / ratio, iW / ratio, iH / ratio), overlay.scaled(iW, iH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    if(keyMap.isMouse()){
+        // Draw mouse overlays
+        const QImage* overlay;
+        float xpos = 0.f, ypos = 0.f;
+        if(model == KeyMap::M65){
+            if(!m65Overlay)
+                m65Overlay = new QImage(":/img/overlay_m65.png");
+            overlay = m65Overlay;
+            xpos = 2.f;
+            ypos = -2.f;
+        } else if(model == KeyMap::SCIMITAR){
+            if(!scimOverlay)
+                scimOverlay = new QImage(":/img/overlay_scimitar.png");
+            overlay = scimOverlay;
+            xpos = 4.5f;
+            ypos = -2.f;
+        }
+        if(overlay){
+            painter.setBrush(palette().brush(QPalette::Window));
+            painter.drawRect(0, 0, width(), height());
+            float oXScale = scale / 9.f, oYScale = scale / 9.f;             // The overlay has a resolution of 9px per keymap unit
+            float x = (xpos + offX) * scale, y = (ypos + offY) * scale;
+            int w = overlay->width() * oXScale, h = overlay->height() * oYScale;
+            // We need to transform the image with QImage::scaled() because painter.drawImage() will butcher it, even with smoothing enabled
+            // However, the width/height need to be rounded to integers
+            int iW = round(w), iH = round(h);
+            painter.drawImage(QRectF((x - (iW - w) / 2.f) / ratio, (y - (iH - h) / 2.f) / ratio, iW / ratio, iH / ratio), overlay->scaled(iW, iH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+        }
     } else {
         // Otherwise, draw a solid background
         painter.setBrush(QBrush(bgColor));
@@ -172,6 +187,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!strcmp(key.name, "sniper"))
                 // Sniper key uses a reddish base color instead of the usual grey
                 bgPainter.setBrush(QBrush(sniperColor));
+            else if(!strncmp(key.name, "thumb", 5) && strcmp(key.name, "thumb"))
+                // Thumbgrid keys use a black color
+                bgPainter.setBrush(QBrush(thumbColor));
             else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel"))
                 // Strafe side lights have transparent background
                 bgPainter.setBrush(QBrush(sidelightColor));

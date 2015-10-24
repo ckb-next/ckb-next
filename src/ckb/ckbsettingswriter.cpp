@@ -31,5 +31,6 @@ void CkbSettingsWriter::run(){
         _backing->setValue(i.key(), i.value());
         // Updating the global cache was done above
     }
+    _backing->sync();
     deleteLater();
 }

@@ -12,7 +12,7 @@ pthread_mutex_t devlistmutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t devmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };
 pthread_mutex_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };
 
-int start_dev(usbdevice* kb, int makeactive){
+int _start_dev(usbdevice* kb, int makeactive){
     // Get the firmware version from the device
     if(kb->pollrate == 0){
         if(!hwload_mode || (HAS_FEATURES(kb, FEAT_HWLOAD) && getfwversion(kb))){
@@ -50,4 +50,12 @@ int start_dev(usbdevice* kb, int makeactive){
     if(makeactive)
         return setactive(kb, 1);
     return 0;
+}
+
+int start_dev(usbdevice* kb, int makeactive){
+    // Force USB interval to 10ms during initial setup phase; return to nominal 5ms after setup completes.
+    kb->usbdelay = 10;
+    int res = _start_dev(kb, makeactive);
+    kb->usbdelay = USB_DELAY_DEFAULT;
+    return res;
 }

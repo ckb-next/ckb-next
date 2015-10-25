@@ -67,19 +67,29 @@ void cmd_inotify(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const cha
 
 // Does a key exist in the current LED layout?
 static int has_key(const char* name, const usbdevice* kb){
-    if(!name
-            // Mice only have the RGB zones
-            || (IS_MOUSE(kb->vendor, kb->product) && strstr(name, "dpi") != name && strcmp(name, "front") && strcmp(name, "back"))
-            // But keyboards don't have them at all
-            || (!IS_MOUSE(kb->vendor, kb->product) && (strstr(name, "dpi") == name || !strcmp(name, "front") || !strcmp(name, "back")))
-
-            // Only K95 has G keys and M keys (G1 - G18, MR, M1 - M3)
-            || (!IS_K95(kb) && ((name[0] == 'g' && name[1] >= '1' && name[1] <= '9') || (name[0] == 'm' && (name[1] == 'r' || name[1] == '1' || name[1] == '2' || name[1] == '3'))))
-            // Only K65 has lights on VolUp/VolDn
-            || (!IS_K65(kb) && (!strcmp(name, "volup") || !strcmp(name, "voldn")))
-            // K65 lacks numpad and media buttons
-            || (IS_K65(kb) && (strstr(name, "num") == name || !strcmp(name, "stop") || !strcmp(name, "prev") || !strcmp(name, "play") || !strcmp(name, "next"))))
+    if(!name)
         return 0;
+    if(IS_MOUSE(kb->vendor, kb->product)){
+        // Mice only have the RGB zones
+        if(IS_SCIMITAR(kb) && (!strcmp(name, "wheel") || !strcmp(name, "thumb")))
+            return 1;
+        if(strstr(name, "dpi") == name || !strcmp(name, "front") || !strcmp(name, "back"))
+            return 1;
+        return 0;
+    } else {
+        // But keyboards don't have them at all
+        if(strstr(name, "dpi") == name || !strcmp(name, "front") || !strcmp(name, "back") || !strcmp(name, "wheel") || !strcmp(name, "thumb"))
+            return 0;
+        // Only K95 has G keys and M keys (G1 - G18, MR, M1 - M3)
+        if(!IS_K95(kb) && ((name[0] == 'g' && name[1] >= '1' && name[1] <= '9') || (name[0] == 'm' && (name[1] == 'r' || name[1] == '1' || name[1] == '2' || name[1] == '3'))))
+            return 0;
+        // Only K65 has lights on VolUp/VolDn
+        if(!IS_K65(kb) && (!strcmp(name, "volup") || !strcmp(name, "voldn")))
+            return 0;
+        // K65 lacks numpad and media buttons
+        if(IS_K65(kb) && (strstr(name, "num") == name || !strcmp(name, "stop") || !strcmp(name, "prev") || !strcmp(name, "play") || !strcmp(name, "next")))
+            return 0;
+    }
     return 1;
 }
 

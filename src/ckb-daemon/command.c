@@ -204,12 +204,18 @@ int readcmd(usbdevice* kb, const char* line){
                 vt->setmodeindex(kb, index);
             }
             continue;
-        case HWLOAD: case HWSAVE:
+        case HWLOAD: case HWSAVE:{
+            char delay = kb->usbdelay;
+            // Ensure delay of at least 10ms as the device can get overwhelmed otherwise
+            if(delay < 10)
+                kb->usbdelay = 10;
             // Try to load/save the hardware profile. Reset on failure, disconnect if reset fails.
             TRY_WITH_RESET(vt->do_io[command](kb, mode, notifynumber, 1, 0));
             // Re-send the current RGB state as it sometimes gets scrambled
             TRY_WITH_RESET(vt->updatergb(kb, 1));
+            kb->usbdelay = delay;
             continue;
+        }
         case FWUPDATE:
             // FW update parses a whole word. Unlike hwload/hwsave, there's no try again on failure.
             if(vt->fwupdate(kb, mode, notifynumber, 0, word)){

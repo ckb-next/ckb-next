@@ -74,8 +74,9 @@ public:
     void        winLock(bool newWinLock)    { _winLock = newWinLock; _needsUpdate = true; }
 
     // Updates bindings to the driver. Write "mode %d" first.
-    // By default, nothing will be written unless bindings have changed. Use force = true to overwrite.
-    void update(QFile& cmd, bool force = false);
+    // By default, nothing will be written unless bindings have changed. Use force = true or call setNeedsUpdate() to override.
+    void        update(QFile& cmd, bool force = false);
+    inline void setNeedsUpdate()                        { _needsUpdate = true; }
 
 public slots:
     // Callback for a keypress event.

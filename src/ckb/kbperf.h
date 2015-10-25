@@ -44,7 +44,7 @@ public:
 
     // Stored DPI settings (X/Y)
     const static int DPI_COUNT = 6, SNIPER = 0;
-    const static int DPI_MIN = 400, DPI_MAX = 8500;
+    const static int DPI_MIN = 100, DPI_MAX = 12000;
     inline QPoint   dpi(int index) const                    { if(index < 0 || index >= DPI_COUNT) return QPoint(); return QPoint(dpiX[index], dpiY[index]); }
     void            dpi(int index, const QPoint& newValue);
     inline QPoint   sniperDpi() const                       { return dpi(SNIPER); }
@@ -64,7 +64,7 @@ public:
     void            dpiDown();
     // DPI stages enabled (default all). Disabled stages will be bypassed when invoking dpiUp/dpiDown (but not any other functions).
     inline bool     dpiEnabled(int index) const             { return dpiOn[index]; }
-    inline void     dpiEnabled(int index, bool newEnabled)  { if(index == 0) return; dpiOn[index] = newEnabled; _needsUpdate = _needsSave = true; }
+    inline void     dpiEnabled(int index, bool newEnabled)  { if(index <= 0) return; dpiOn[index] = newEnabled; _needsUpdate = _needsSave = true; }
     // Push/pop a DPI state. Useful for toggling custom DPI. pushDpi returns an index which must be passed back to popDpi.
     // Note that calling curDpi will empty the stack, so any previously-pushed DPIs are automatically popped.
     quint64         pushDpi(const QPoint& newDpi);
@@ -108,8 +108,9 @@ public:
     void setIndicator(indicator index, const QColor& color1, const QColor& color2, const QColor& color3 = QColor(), bool software_enable = true, i_hw hardware_enable = NORMAL);
 
     // Updates settings to the driver. Write "mode %d" first. Disable saveCustomDpi when writing a hardware profile or other permanent storage.
-    // By default, nothing will be written unless the settings have changed. Use force = true to overwrite.
-    void update(QFile& cmd, bool force = false, bool saveCustomDpi = true);
+    // By default, nothing will be written unless the settings have changed. Use force = true or call setNeedsUpdate() to override.
+    void        update(QFile& cmd, bool force = false, bool saveCustomDpi = true);
+    inline void setNeedsUpdate()        { _needsUpdate = true; }
 
     // Get indicator status to send to KbLight
     QHash<QString, QRgb> indicatorLights(int modeIndex, const bool indicatorState[HW_I_COUNT]) const;

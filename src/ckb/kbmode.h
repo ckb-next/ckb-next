@@ -63,6 +63,7 @@ public:
     void save(CkbSettings& settings);
     bool needsSave() const;
     inline void setNeedsSave()          { _needsSave = true; }
+    inline void setNeedsUpdate()        { _bind->setNeedsUpdate(); _perf->setNeedsUpdate(); }
 
 signals:
     void updated();

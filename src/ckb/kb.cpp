@@ -616,9 +616,21 @@ void Kb::readNotify(QString line){
                 }
                 // Set DPI for this stage
                 int index = dpi[0].toInt();
-                if(off)
+                if(off){
                     perf->dpiEnabled(index, false);
-                else {
+                    // If all DPIs have been disabled, turn them back on
+                    bool allOff = true;
+                    for(int i = 1; i < KbPerf::DPI_COUNT; i++){
+                        if(perf->dpiEnabled(i)){
+                            allOff = false;
+                            break;
+                        }
+                    }
+                    if(allOff){
+                        for(int i = 1; i < KbPerf::DPI_COUNT; i++)
+                            perf->dpiEnabled(i, true);
+                    }
+                } else {
                     perf->dpiEnabled(index, true);
                     perf->dpi(index, QPoint(x, y));
                 }
@@ -628,7 +640,12 @@ void Kb::readNotify(QString line){
             if(!_hwProfile || _hwProfile->modeCount() <= mode || mode >= HWMODE_MAX || !hwLoading[mode + 1])
                 return;
             KbPerf* perf = _hwProfile->modes()[mode]->perf();
-            perf->curDpiIdx(components[3].toInt());
+            int idx = components[3].toInt();
+            if(idx < 1)
+                idx = 1;
+            if(idx >= KbPerf::DPI_COUNT)
+                idx = KbPerf::DPI_COUNT - 1;
+            perf->curDpiIdx(idx);
         } else if(components[2] == "hwlift"){
             // Mouse lift height (1...5)
             if(!_hwProfile || _hwProfile->modeCount() <= mode || mode >= HWMODE_MAX || !hwLoading[mode + 1])

@@ -149,10 +149,10 @@
      <item row="8" column="6">
       <widget class="QSpinBox" name="xBox3">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -162,10 +162,10 @@
      <item row="11" column="9">
       <widget class="QSpinBox" name="yBox0">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -324,10 +324,10 @@
      <item row="9" column="6">
       <widget class="QSpinBox" name="xBox4">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -337,10 +337,10 @@
      <item row="11" column="6">
       <widget class="QSpinBox" name="xBox0">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -350,10 +350,10 @@
      <item row="10" column="9">
       <widget class="QSpinBox" name="yBox5">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -401,10 +401,10 @@
         </sizepolicy>
        </property>
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -414,10 +414,10 @@
      <item row="7" column="9">
       <widget class="QSpinBox" name="yBox2">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -427,10 +427,10 @@
      <item row="8" column="9">
       <widget class="QSpinBox" name="yBox3">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -554,10 +554,10 @@
         </sizepolicy>
        </property>
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -589,10 +589,10 @@
      <item row="7" column="6">
       <widget class="QSpinBox" name="xBox2">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -646,10 +646,10 @@
      <item row="9" column="9">
       <widget class="QSpinBox" name="yBox4">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>
@@ -769,10 +769,10 @@
      <item row="10" column="6">
       <widget class="QSpinBox" name="xBox5">
        <property name="minimum">
-        <number>400</number>
+        <number>100</number>
        </property>
        <property name="maximum">
-        <number>8500</number>
+        <number>12000</number>
        </property>
        <property name="singleStep">
         <number>50</number>

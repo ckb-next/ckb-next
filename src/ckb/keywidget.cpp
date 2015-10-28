@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *scimOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0;
 
 KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
     QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1), mouseDownMode(NONE), _rgbMode(rgbMode)
@@ -109,7 +109,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
 
     if(keyMap.isMouse()){
         // Draw mouse overlays
-        const QImage* overlay;
+        const QImage* overlay = 0;
         float xpos = 0.f, ypos = 0.f;
         if(model == KeyMap::M65){
             if(!m65Overlay)
@@ -117,11 +117,17 @@ void KeyWidget::paintEvent(QPaintEvent*){
             overlay = m65Overlay;
             xpos = 2.f;
             ypos = -2.f;
+        } else if(model == KeyMap::SABRE){
+            if(!sabOverlay)
+                sabOverlay = new QImage(":/img/overlay_sabre.png");
+            overlay = sabOverlay;
+            xpos = 1.f;
+            ypos = -2.f;
         } else if(model == KeyMap::SCIMITAR){
             if(!scimOverlay)
                 scimOverlay = new QImage(":/img/overlay_scimitar.png");
             overlay = scimOverlay;
-            xpos = 4.5f;
+            xpos = 3.5f;
             ypos = -2.f;
         }
         if(overlay){
@@ -187,7 +193,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!strcmp(key.name, "sniper"))
                 // Sniper key uses a reddish base color instead of the usual grey
                 bgPainter.setBrush(QBrush(sniperColor));
-            else if(!strncmp(key.name, "thumb", 5) && strcmp(key.name, "thumb"))
+            else if(model == KeyMap::SCIMITAR && !strncmp(key.name, "thumb", 5) && strcmp(key.name, "thumb"))
                 // Thumbgrid keys use a black color
                 bgPainter.setBrush(QBrush(thumbColor));
             else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel"))
@@ -300,6 +306,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     break;
                 }
             }
+            if(keyName == "thumb1" && model == KeyMap::SABRE)
+                name = "∙";
             if(keyName == "mr" || keyName == "m1" || keyName == "m2" || keyName == "m3" || keyName == "up" || keyName == "down" || keyName == "left" || keyName == "right")
                 // Use a smaller size for MR, M1 - M3, and arrow keys
                 font.setPixelSize(font.pixelSize() * 0.75);

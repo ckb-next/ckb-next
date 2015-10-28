@@ -57,6 +57,7 @@ public:
         STRAFE,
         // Mouse models
         M65,
+        SABRE,
         SCIMITAR,
         _MODEL_MAX
     };
@@ -86,7 +87,7 @@ public:
     // Keyboard or mouse?
     inline static bool  isKeyboard(Model model) { return !isMouse(model) && model != NO_MODEL; }
     inline bool         isKeyboard() const      { return isKeyboard(keyModel); }
-    inline static bool  isMouse(Model model)    { return model == M65 || model == SCIMITAR; }
+    inline static bool  isMouse(Model model)    { return model == M65 || model == SABRE || model == SCIMITAR; }
     inline bool         isMouse() const         { return isMouse(keyModel); }
 
     // Creates a blank key map

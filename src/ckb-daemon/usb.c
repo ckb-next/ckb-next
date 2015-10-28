@@ -34,6 +34,8 @@ const char* product_str(short product){
         return "strafe";
     if(product == P_M65)
         return "m65";
+    if(product == P_SABRE)
+        return "sabre";
     if(product == P_SCIMITAR)
         return "scimitar";
     return "";

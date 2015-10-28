@@ -135,7 +135,7 @@ static const Key KStrafeKeys[] = {
   {0, "Sidelight", "lsidel", 0, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT*2-4, true, false}, {0, "Sidelight", "rsidel", KSTRAFE_WIDTH, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT*2-4, true, false}
 };
 
-// Mouse map
+// Mouse map - M65
 static const Key M65Keys[] = {
     {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
     {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "Wheel Light", "front", 22, 15, 8, 8, true, false},
@@ -143,13 +143,28 @@ static const Key M65Keys[] = {
     {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper", "sniper", 0, 25, 5, 15, false, true},
     {0, "Logo", "back", 14, 55, 24, 12, true, false}
 };
-#define KEYCOUNT_M65 (sizeof(M65Keys) / sizeof(Key))
+#define KEYCOUNT_M65    (sizeof(M65Keys) / sizeof(Key))
 
 #define M65_WIDTH       52
 #define M65_HEIGHT      67
+
+// Sabre
+static const Key SabreKeys[] = {
+    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 8, 7, false, true}, {0, "Front light", "front", 8, -2, 14, 8, true, false },
+    {0, "Wheel Up", "wheelup", 22, 5, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 15, 8, 5, false, true}, {0, "Wheel Light", "wheel", 22, 5, 8, 15, true, false}, {0, "Extra button", "thumb1", 22, 20, 8, 18, false, true},
+    {0, "DPI Up", "dpiup", 5, 3, 5, 7, false, true}, {0, "DPI Down", "dpidn", 5, 10, 5, 7, false, true}, {0, "DPI Light", "dpi", 5, 4, 5, 12, true, false},
+    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true},
+    {0, "Logo", "back", 14, 50, 24, 12, true, false}
+};
+#define KEYCOUNT_SABRE  (sizeof(SabreKeys) / sizeof(Key))
+
+#define SABRE_WIDTH     M65_WIDTH
+#define SABRE_HEIGHT    M65_HEIGHT
+
+// Scimitar
 static const Key ScimKeys[] = {
-    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 12, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true}, {0, "Front light", "front", 30, 0, 12, 8, true, false },
-    {0, "Wheel Up", "wheelup", 22, 3, 8, 6, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 6, false, true}, {0, "Wheel Light", "wheel", 22, 8, 8, 8, true, false},
+    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 12, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 8, 6, false, true}, {0, "Front light", "front", 30, 0, 12, 8, true, false },
+    {0, "Wheel Up", "wheelup", 22, 3, 8, 6, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 6, false, true}, {0, "Wheel Light", "wheel", 22, 3, 8, 17, true, false},
     {0, "DPI Up", "dpiup", 22, 19, 8, 9, false, true}, {0, "DPI Light", "dpi", 1, 12, 8, 4, true, false}, {0, "DPI Down", "dpidn", 22, 28, 8, 9, false, true},
     {0, "Thumb light", "thumb", 0, 21, 10, 24, true, false},
     {0, "1", "thumb1", -13, 18, 7, 7, false, true}, {0, "2", "thumb2", -6, 18, 7, 7, false, true}, {0, "3", "thumb3", 1, 18, 7, 7, false, true},
@@ -158,10 +173,10 @@ static const Key ScimKeys[] = {
     {0, "10", "thumb10", -13, 39, 7, 7, false, true}, {0, "11", "thumb11", -6, 39, 7, 7, false, true}, {0, "12", "thumb12", 1, 39, 7, 7, false, true},
     {0, "Logo", "back", 14, 50, 24, 16, true, false}
 };
-#define KEYCOUNT_SCIM (sizeof(ScimKeys) / sizeof(Key))
+#define KEYCOUNT_SCIM   (sizeof(ScimKeys) / sizeof(Key))
 
-#define SCIM_WIDTH       M65_WIDTH
-#define SCIM_HEIGHT      M65_HEIGHT
+#define SCIM_WIDTH      M65_WIDTH
+#define SCIM_HEIGHT     M65_HEIGHT
 
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
@@ -294,10 +309,20 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Mice also have no layout patches - no other changes necessary
         break;
     }
+    case KeyMap::SABRE:{
+        // Scimitar mouse
+        for(const Key* key = SabreKeys; key < SabreKeys + KEYCOUNT_SABRE; key++){
+            // Like the M65, the keys are upper-left justified
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     case KeyMap::SCIMITAR:{
         // Scimitar mouse
         for(const Key* key = ScimKeys; key < ScimKeys + KEYCOUNT_SCIM; key++){
-            // Like the M65, the keys are upper-left justified
             Key translatedKey = *key;
             translatedKey.x += translatedKey.width / 2;
             translatedKey.y += translatedKey.height / 2;
@@ -407,6 +432,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return STRAFE;
     if(lower == "m65")
         return M65;
+    if(lower == "sabre")
+        return SABRE;
     if(lower == "scimitar")
         return SCIMITAR;
     return NO_MODEL;
@@ -424,6 +451,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "strafe";
     case M65:
         return "m65";
+    case SABRE:
+        return "sabre";
     case SCIMITAR:
         return "scimitar";
     default:
@@ -449,6 +478,7 @@ int KeyMap::modelWidth(Model model){
     case STRAFE:
         return KSTRAFE_WIDTH;
     case M65:
+    case SABRE:
     case SCIMITAR:
         return M65_WIDTH;
     default:
@@ -464,6 +494,7 @@ int KeyMap::modelHeight(Model model){
     case STRAFE:
         return K95_HEIGHT;
     case M65:
+    case SABRE:
     case SCIMITAR:
         return M65_HEIGHT;
     default:
@@ -510,7 +541,10 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     KeyMap map(K95, layout);
     if(map.contains(key))
         return map[key].friendlyName();
-    // If that didn't work, try M65
+    // If that didn't work, try mice
+    map = KeyMap(SCIMITAR, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
     map = KeyMap(M65, layout);
     if(map.contains(key))
         return map[key].friendlyName();

@@ -9,7 +9,10 @@ static int rgbcmp(const lighting* lhs, const lighting* rhs){
 }
 
 // Return true if all mouse zones are black
-static int isblack(const lighting* light){
+// Automatically returns false for all devices except M65, because they don't like this packet
+static int isblack(const usbdevice* kb, const lighting* light){
+    if(IS_M65(kb))
+        return 0;
     uchar black[N_MOUSE_ZONES] = { 0 };
     return !memcmp(light->r + LED_MOUSE, black, sizeof(black)) && !memcmp(light->g + LED_MOUSE, black, sizeof(black)) && !memcmp(light->b + LED_MOUSE, black, sizeof(black));
 }
@@ -37,16 +40,16 @@ int updatergb_mouse(usbdevice* kb, int force){
         *rgb_data++ = newlight->g[LED_MOUSE + i];
         *rgb_data++ = newlight->b[LED_MOUSE + i];
     }
-    int was_black = isblack(lastlight), is_black = isblack(newlight);
     // Send RGB data
     if(!usbsend(kb, data_pkt[0], 1))
         return -1;
+    int was_black = isblack(kb, lastlight), is_black = isblack(kb, newlight);
     if(is_black){
-        // If the lighting is black, send the deactivation packet
+        // If the lighting is black, send the deactivation packet (M65 only)
         if(!usbsend(kb, data_pkt[1], 1))
             return -1;
     } else if(was_black || force){
-        // If the lighting WAS black, send the activation packet
+        // If the lighting WAS black, or if we're on forced update, send the activation packet
         data_pkt[1][4] = 1;
         if(!usbsend(kb, data_pkt[1], 1))
             return -1;
@@ -59,7 +62,7 @@ int updatergb_mouse(usbdevice* kb, int force){
 int savergb_mouse(usbdevice* kb, lighting* light, int mode){
     uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x10, 1, 0 };
     // Save each RGB zone, minus the DPI light which is sent in the DPI packets
-    int zonecount = IS_SCIMITAR(kb) ? 4 : 2;
+    int zonecount = IS_SCIMITAR(kb) ? 4 : IS_SABRE(kb) ? 3 : 2;
     for(int i = 0; i < zonecount; i++){
         int led = LED_MOUSE + i;
         if(led >= LED_DPI)
@@ -79,7 +82,7 @@ int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x13, 0x10, 1, 0 };
     uchar in_pkt[MSG_SIZE] = { 0 };
     // Load each RGB zone
-    int zonecount = IS_SCIMITAR(kb) ? 4 : 2;
+    int zonecount = IS_SCIMITAR(kb) ? 4 : IS_SABRE(kb) ? 3 : 2;
     for(int i = 0; i < zonecount; i++){
         if(!usbrecv(kb, data_pkt, in_pkt))
             return -1;

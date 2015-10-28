@@ -71,7 +71,9 @@ static int has_key(const char* name, const usbdevice* kb){
         return 0;
     if(IS_MOUSE(kb->vendor, kb->product)){
         // Mice only have the RGB zones
-        if(IS_SCIMITAR(kb) && (!strcmp(name, "wheel") || !strcmp(name, "thumb")))
+        if((IS_SABRE(kb) || IS_SCIMITAR(kb)) && !strcmp(name, "wheel"))
+            return 1;
+        if(IS_SCIMITAR(kb) && !strcmp(name, "thumb"))
             return 1;
         if(strstr(name, "dpi") == name || !strcmp(name, "front") || !strcmp(name, "back"))
             return 1;

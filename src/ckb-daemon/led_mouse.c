@@ -11,7 +11,7 @@ static int rgbcmp(const lighting* lhs, const lighting* rhs){
 // Return true if all mouse zones are black
 // Automatically returns false for all devices except M65, because they don't like this packet
 static int isblack(const usbdevice* kb, const lighting* light){
-    if(IS_M65(kb))
+    if(!IS_M65(kb))
         return 0;
     uchar black[N_MOUSE_ZONES] = { 0 };
     return !memcmp(light->r + LED_MOUSE, black, sizeof(black)) && !memcmp(light->g + LED_MOUSE, black, sizeof(black)) && !memcmp(light->b + LED_MOUSE, black, sizeof(black));

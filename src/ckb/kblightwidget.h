@@ -21,6 +21,7 @@ public:
     ~KbLightWidget();
 
     void setLight(KbLight* newLight);
+    void setMonochrome();
 
 private slots:
     void updateLight();

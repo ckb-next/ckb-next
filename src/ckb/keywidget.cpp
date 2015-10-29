@@ -11,8 +11,11 @@ static const int KEY_SIZE = 12;
 
 static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0;
 
+// KbLight.cpp
+extern QRgb monoRgb(float r, float g, float b);
+
 KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
-    QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1), mouseDownMode(NONE), _rgbMode(rgbMode)
+    QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1), mouseDownMode(NONE), _rgbMode(rgbMode), _monochrome(false)
 {
     setMouseTracking(true);
     setAutoFillBackground(false);
@@ -51,10 +54,11 @@ void KeyWidget::colorMap(const ColorMap& newColorMap){
     update();
 }
 
-void KeyWidget::displayColorMap(ColorMap newDisplayMap){
+void KeyWidget::displayColorMap(ColorMap newDisplayMap, QStringList indicators){
     if(!isVisible())
         return;
     _displayColorMap = newDisplayMap;
+    _indicators = indicators;
     update();
 }
 
@@ -243,7 +247,6 @@ void KeyWidget::paintEvent(QPaintEvent*){
     decPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     if(_rgbMode){
         // Draw key colors (RGB mode)
-        decPainter.setPen(QPen(QColor(255, 255, 255), 1.5));
         QHashIterator<QString, Key> k(keyMap);
         uint i = -1;
         while(k.hasNext()){
@@ -256,10 +259,23 @@ void KeyWidget::paintEvent(QPaintEvent*){
             float y = key.y + offY - 1.8f;
             float w = 3.6f;
             float h = 3.6f;
-            if(_displayColorMap.contains(key.name))
-                decPainter.setBrush(QBrush(_displayColorMap.value(key.name)));
+            // Display a white circle around regular keys, red circle around indicators
+            if(_indicators.contains(key.name))
+                decPainter.setPen(QPen(QColor(255, 248, 136), 1.5));
             else
-                decPainter.setBrush(QBrush(_colorMap.value(key.name)));
+                decPainter.setPen(QPen(QColor(255, 255, 255), 1.5));
+            QRgb color;
+            if(_displayColorMap.contains(key.name))
+                // Color in display map? Grab it from there
+                // (monochrome conversion not necessary as this would have been done by the animation)
+                color = _displayColorMap.value(key.name);
+            else {
+                // Otherwise, read from base map
+                color = _colorMap.value(key.name);
+                if(_monochrome)
+                    color = monoRgb(qRed(color), qGreen(color), qBlue(color));
+            }
+            decPainter.setBrush(QBrush(color));
             decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
         }
     } else {

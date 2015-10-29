@@ -216,7 +216,36 @@ void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
     }
 }
 
-void KbLight::frameUpdate(QFile& cmd, const ColorMap& indicators){
+// Colorspace conversion: linear <-> sRGB
+// (sRGB: [0, 255], linear: [0, 1])
+
+static float sToL(float srgb){
+    srgb /= 255.f;
+    if(srgb <= 0.04045f)
+        return srgb / 12.92f;
+    return pow((srgb + 0.055f) / 1.055f, 2.4f);
+}
+
+static float lToS(float linear){
+    if(linear <= 0.0031308f)
+        return 12.92f * linear * 255.f;
+    return (1.055f * pow(linear, 1.f / 2.4f) - 0.055f) * 255.f;
+}
+
+// Convert RGB to monochrome
+QRgb monoRgb(float r, float g, float b){
+    // It's important to use a linear colorspace for this, otherwise the colors will appear inconsistent
+    // Note that although we could use linear space for alpha blending or the animation blending functions, we don't.
+    // The reason for this is that photo manipulation programs don't do it either, so even though the result would technically be more correct,
+    // it would look wrong to most people.
+    r = sToL(r);
+    g = sToL(g);
+    b = sToL(b);
+    int value = round(lToS((r + g + b) / 3.f));
+    return qRgb(value, value, value);
+}
+
+void KbLight::frameUpdate(QFile& cmd, const ColorMap& indicators, bool monochrome){
     // Advance animations
     ColorMap animMap = _colorMap;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -225,22 +254,9 @@ void KbLight::frameUpdate(QFile& cmd, const ColorMap& indicators){
     if(_previewAnim)
         _previewAnim->blend(animMap, timestamp);
 
-    // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
-    if(timestamp >= lastFrameSignal + 50){
-        emit frameDisplayed(animMap);
-        lastFrameSignal = timestamp;
-    }
-
-    cmd.write(QString().sprintf("rgb").toLatin1());
-    // If brightness is at 0%, turn off lighting entirely
-    if(_dimming == 3){
-        cmd.write(" 000000");
-        return;
-    }
-
     // Set brightness and indicators
-    float light = (3 - _dimming) / 3.f;
-    if(light != 1.f || !indicators.isEmpty()){
+    QStringList activeIndicators;
+    if(monochrome || !indicators.isEmpty()){
         QMutableHashIterator<QString, QRgb> i(animMap);
         while(i.hasNext()){
             i.next();
@@ -261,14 +277,44 @@ void KbLight::frameUpdate(QFile& cmd, const ColorMap& indicators){
                 r = round((r2 * a2 + r * a * (1.f - a2)) / a3);
                 g = round((g2 * a2 + g * a * (1.f - a2)) / a3);
                 b = round((b2 * a2 + b * a * (1.f - a2)) / a3);
+                activeIndicators << key;
             }
-            // Apply global dimming
-            if(light != 1.f){
-                r *= light;
-                g *= light;
-                b *= light;
-            }
-            rgb = qRgb(round(r), round(g), round(b));
+            // If monochrome mode is active, average them all out to get a grayscale image
+            if(monochrome)
+                rgb = monoRgb(r, g, b);
+            else
+                rgb = qRgb(r, g, b);
+        }
+    }
+
+    // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
+    if(timestamp >= lastFrameSignal + 50){
+        emit frameDisplayed(animMap, activeIndicators);
+        lastFrameSignal = timestamp;
+    }
+
+    cmd.write(QString().sprintf("rgb").toLatin1());
+    // If brightness is at 0%, turn off lighting entirely
+    if(_dimming == 3){
+        cmd.write(" 000000");
+        return;
+    }
+
+    float light = (3 - _dimming) / 3.f;
+    // Apply global dimming
+    if(light != 1.f){
+        QMutableHashIterator<QString, QRgb> i(animMap);
+        while(i.hasNext()){
+            i.next();
+            QRgb& rgb = i.value();
+            // Like the monochrome conversion, we want a linear colorspace for this
+            float r = sToL(qRed(rgb));
+            float g = sToL(qGreen(rgb));
+            float b = sToL(qBlue(rgb));
+            r *= light;
+            g *= light;
+            b *= light;
+            rgb = qRgb(round(lToS(r)), round(lToS(g)), round(lToS(b)));
         }
     }
 
@@ -276,7 +322,7 @@ void KbLight::frameUpdate(QFile& cmd, const ColorMap& indicators){
     printRGB(cmd, animMap);
 }
 
-void KbLight::base(QFile &cmd, bool ignoreDim){
+void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){
     close();
     if(_dimming == MAX_DIM && !ignoreDim){
         cmd.write(QString().sprintf("rgb 000000").toLatin1());
@@ -285,6 +331,15 @@ void KbLight::base(QFile &cmd, bool ignoreDim){
     // Set just the background color, ignoring any animation
     cmd.write(QString().sprintf("rgb").toLatin1());
     QHash<QString, QRgb> animMap = _colorMap;
+    // If monochrome is active, create grayscale
+    if(monochrome){
+        QMutableHashIterator<QString, QRgb> i(animMap);
+        while(i.hasNext()){
+            i.next();
+            QRgb& rgb = i.value();
+            rgb = monoRgb(qRed(rgb), qGreen(rgb), qBlue(rgb));
+        }
+    }
     animMap["mr"] = qRgb(0, 0, 0);
     animMap["m1"] = qRgb(0, 0, 0);
     animMap["m2"] = qRgb(0, 0, 0);

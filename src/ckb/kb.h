@@ -22,6 +22,7 @@ public:
     QString usbModel, usbSerial;
     // Device information
     QString features, firmware, pollrate;
+    bool monochrome;
 
     // Is this the keyboard at the given serial/path?
     inline bool matches(const QString& path, const QString& serial) { return path.trimmed() == devpath.trimmed() && usbSerial == serial.trimmed().toUpper(); }

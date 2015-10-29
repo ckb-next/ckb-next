@@ -48,7 +48,11 @@
 const char* vendor_str(short vendor);
 const char* product_str(short product);
 
+// RGB vs non-RGB test
+// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
 #define IS_RGB(vendor, product)     ((vendor) == (V_CORSAIR) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+
+// Mouse vs keyboard test
 #define IS_MOUSE(vendor, product)   ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_SABRE) || (product) == (P_SCIMITAR)))
 
 // USB delays for when the keyboards get picky about timing

@@ -400,7 +400,7 @@ int usbmain(){
     int vendor = V_CORSAIR;
     int products[] = {
         // Keyboards
-        P_K65, P_K70, P_K70_NRGB, P_K95, P_K95_NRGB, P_STRAFE,
+        P_K65, P_K70, P_K70_NRGB, P_K95, P_K95_NRGB, P_STRAFE, P_STRAFE_NRGB
         // Mice
         P_M65, P_SABRE, P_SCIMITAR
     };

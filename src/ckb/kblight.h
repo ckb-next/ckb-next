@@ -65,9 +65,9 @@ public:
     void close();
 
     // Write a new frame to the keyboard. Write "mode %d" first. Optionally provide a list of keys to use as indicators and overwrite the lighting
-    void frameUpdate(QFile& cmd, const ColorMap& indicators = ColorMap());
+    void frameUpdate(QFile& cmd, const ColorMap& indicators = ColorMap(), bool monochrome = false);
     // Write the mode's base colors without any animation
-    void base(QFile& cmd, bool ignoreDim = false);
+    void base(QFile& cmd, bool ignoreDim = false, bool monochrome = false);
 
     // Load and save from stored settings
     void load(CkbSettings& settings);
@@ -77,7 +77,7 @@ public:
 signals:
     void didLoad();
     void updated();
-    void frameDisplayed(ColorMap animatedColors);
+    void frameDisplayed(ColorMap animatedColors, QStringList indicatorList);
 
 private:
     AnimList    _animList;

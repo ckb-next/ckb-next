@@ -16,7 +16,7 @@ bool Kb::_dither = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"),
-    features("N/A"), firmware("N/A"), pollrate("N/A"),
+    features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), _needsSave(false)
@@ -39,6 +39,8 @@ Kb::Kb(QObject *parent, const QString& path) :
     } else
         // Bail if features aren't readable
         return;
+    if(features.contains("monochrome"))
+        monochrome = true;
     if(mpath.open(QIODevice::ReadOnly)){
         usbModel = mpath.read(100);
         usbModel = usbModel.remove("Corsair").remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").trimmed();
@@ -256,7 +258,7 @@ void Kb::hwSave(){
         cmd.write(mode->id().modifiedString().toLatin1());
         cmd.write(" ");
         // Write lighting and performance
-        light->base(cmd, true);
+        light->base(cmd, true, monochrome);
         cmd.write(" ");
         perf->update(cmd, true, false);
         // Update mode ID
@@ -342,7 +344,7 @@ void Kb::frameUpdate(){
 
     // Send lighting/binding to driver
     cmd.write(QString("mode %1 switch ").arg(index + 1).toLatin1());
-    light->frameUpdate(cmd, perf->indicatorLights(index, iState));
+    light->frameUpdate(cmd, perf->indicatorLights(index, iState), monochrome);
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
     cmd.write(" ");

@@ -45,15 +45,19 @@ void KbLightWidget::setLight(KbLight* newLight){
         on_showAnimBox_clicked(true);
 }
 
+void KbLightWidget::setMonochrome(){
+    ui->keyWidget->monochrome(true);
+}
+
 void KbLightWidget::on_showAnimBox_clicked(bool checked){
     // FIXME: set globally if there's more than one KbLightWidget active
     // Connect/disconnect animation slot
     if(checked){
         if(light)
-            connect(light, SIGNAL(frameDisplayed(ColorMap)), ui->keyWidget, SLOT(displayColorMap(ColorMap)));
+            connect(light, SIGNAL(frameDisplayed(ColorMap,QStringList)), ui->keyWidget, SLOT(displayColorMap(ColorMap,QStringList)));
     } else {
         if(light)
-            disconnect(light, SIGNAL(frameDisplayed(ColorMap)), ui->keyWidget, SLOT(displayColorMap(ColorMap)));
+            disconnect(light, SIGNAL(frameDisplayed(ColorMap,QStringList)), ui->keyWidget, SLOT(displayColorMap(ColorMap,QStringList)));
         ui->keyWidget->displayColorMap(KeyWidget::ColorMap());
     }
     CkbSettings::set("UI/Light/ShowBaseOnly", !checked);

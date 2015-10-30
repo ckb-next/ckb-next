@@ -9,7 +9,7 @@ If you use and enjoy this project, I'd appreciate if you could spare a few dolla
 
 I accept donations through PayPal: [Click here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
-Or through Bitcoin: 1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ [(click here for QR code)](https://i.imgur.com/h3gyLiv.png)
+Or through Bitcoin: [1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ](https://blockchain.info/address/1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ) [(click here for QR code)](https://i.imgur.com/h3gyLiv.png)
 
 Contents
 --------

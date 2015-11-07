@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = ckb-random
 
 QMAKE_CFLAGS += -std=c99
-QMAKE_MAC_SDK = macosx10.10
+QMAKE_MAC_SDK = macosx10.11
 
 macx {
     DESTDIR = $$PWD/../../ckb.app/Contents/Resources/ckb-animations

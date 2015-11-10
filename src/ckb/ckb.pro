@@ -96,7 +96,8 @@ SOURCES += main.cpp\
     ckbsettingswriter.cpp \
     keyaction.cpp \
     mperfwidget.cpp \
-    kperfwidget.cpp
+    kperfwidget.cpp \
+    layoutdialog.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -149,7 +150,8 @@ HEADERS  += mainwindow.h \
     ckbsettingswriter.h \
     keyaction.h \
     mperfwidget.h \
-    kperfwidget.h
+    kperfwidget.h \
+    layoutdialog.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \
@@ -165,7 +167,8 @@ FORMS    += mainwindow.ui \
     modeselectdialog.ui \
     fwupgradedialog.ui \
     mperfwidget.ui \
-    kperfwidget.ui
+    kperfwidget.ui \
+    layoutdialog.ui
 
 RESOURCES += \
     image.qrc \

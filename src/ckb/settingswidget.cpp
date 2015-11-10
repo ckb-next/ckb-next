@@ -4,6 +4,7 @@
 #include "ckbsettings.h"
 #include "kblight.h"
 #include "mainwindow.h"
+#include "layoutdialog.h"
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
 
@@ -24,12 +25,14 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     CkbSettings settings("Program");
 
     // Read keyboard layout
+    ui->layoutBox->addItems(KeyMap::layoutNames());
     KeyMap::Layout layout = KeyMap::getLayout(settings.value("KbdLayout").toString());
-    if(layout == KeyMap::NO_LAYOUT)
-        // If the layout couldn't be read, try to auto-detect it from the system locale
-        layout = KeyMap::locale();
-    Kb::layout(layout);
-    ui->layoutBox->setCurrentIndex((int)layout);
+    if(layout == KeyMap::NO_LAYOUT){
+        // If the layout hasn't been set yet, show a dialog to let the user choose it
+        Kb::layout(KeyMap::locale());
+        QTimer::singleShot(1000, this, &SettingsWidget::showLayoutDialog);  // Run the function after a delay as the dialog may not appear correctly othewise
+    } else
+        ui->layoutBox->setCurrentIndex((int)layout);
 
     // Load modifier remap
     KbBind::loadGlobalRemap();
@@ -114,6 +117,13 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 
     ui->animPathLabel->setText(AnimScript::path());
     on_animScanButton_clicked();
+}
+
+void SettingsWidget::showLayoutDialog(){
+    LayoutDialog dialog(this);
+    dialog.exec();
+    // Set selected layout
+    ui->layoutBox->setCurrentIndex((int)dialog.selected());
 }
 
 int SettingsWidget::frameRate() const {
@@ -234,6 +244,12 @@ void SettingsWidget::on_loginItemBox_clicked(bool checked){
 }
 
 void SettingsWidget::on_layoutBox_currentIndexChanged(int index){
+    // HACK: The index changes to zero when we first add items to the box, ignore that one
+    static bool first = true;
+    if(first){
+        first = false;
+        return;
+    }
     KeyMap::Layout layout = (KeyMap::Layout)index;
     CkbSettings::set("Program/KbdLayout", KeyMap::getLayout(layout));
     Kb::layout(layout);

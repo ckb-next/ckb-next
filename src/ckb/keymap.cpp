@@ -420,6 +420,19 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
     }
 }
 
+QStringList KeyMap::layoutNames(){
+    return QStringList()
+            << "English (ISO/European)" << "English (ISO/European, Dvorak)"
+            << "English (United Kingdom)" << "English (United Kingdom, Dvorak)"
+            << "English (United States)" << "English (United States, Dvorak)"
+            << "French"
+            << "German"
+            << "Italian"
+            << "Polish"
+            << "Spanish"
+            << "Swedish";
+}
+
 KeyMap::Model KeyMap::getModel(const QString& name){
     QString lower = name.toLower();
     if(lower == "k65")

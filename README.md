@@ -16,7 +16,7 @@ Contents
 
 * [Device Support](#device-support)
 * [Linux Installation](#linux-installation)
-* [OS X Installaction](#osx-installation)
+* [OS X Installation](#osx-installation)
 * [Usage](#usage)
 * [Troubleshooting](#troubleshooting)
 * [Known Issues](#known-issues)

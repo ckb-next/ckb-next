@@ -19,7 +19,6 @@ macx {
 }
 
 # OSX settings
-QMAKE_MAC_SDK = macosx10.10
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 ICON = ckb-logo.icns
 QMAKE_INFO_PLIST = ckb-info.plist
@@ -97,7 +96,8 @@ SOURCES += main.cpp\
     ckbsettingswriter.cpp \
     keyaction.cpp \
     mperfwidget.cpp \
-    kperfwidget.cpp
+    kperfwidget.cpp \
+    layoutdialog.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -150,7 +150,8 @@ HEADERS  += mainwindow.h \
     ckbsettingswriter.h \
     keyaction.h \
     mperfwidget.h \
-    kperfwidget.h
+    kperfwidget.h \
+    layoutdialog.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \
@@ -166,7 +167,8 @@ FORMS    += mainwindow.ui \
     modeselectdialog.ui \
     fwupgradedialog.ui \
     mperfwidget.ui \
-    kperfwidget.ui
+    kperfwidget.ui \
+    layoutdialog.ui
 
 RESOURCES += \
     image.qrc \

@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = ckb-gradient
 
 QMAKE_CFLAGS += -std=c99
-QMAKE_MAC_SDK = macosx10.10
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 
 macx {
     DESTDIR = $$PWD/../../ckb.app/Contents/Resources/ckb-animations

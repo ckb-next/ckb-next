@@ -54,8 +54,11 @@ public:
         K65,
         K70,
         K95,
+        STRAFE,
         // Mouse models
         M65,
+        SABRE,
+        SCIMITAR,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)
@@ -75,6 +78,8 @@ public:
         SE,                 // Swedish
         _LAYOUT_MAX
     };
+    // Human-readable names of each layout
+    static QStringList layoutNames();
     // ISO (105-key) or ANSI (104-key)?
     inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK && layout != PL; }
     inline bool         isISO() const           { return isISO(keyLayout); }
@@ -84,7 +89,7 @@ public:
     // Keyboard or mouse?
     inline static bool  isKeyboard(Model model) { return !isMouse(model) && model != NO_MODEL; }
     inline bool         isKeyboard() const      { return isKeyboard(keyModel); }
-    inline static bool  isMouse(Model model)    { return model == M65; }
+    inline static bool  isMouse(Model model)    { return model == M65 || model == SABRE || model == SCIMITAR; }
     inline bool         isMouse() const         { return isMouse(keyModel); }
 
     // Creates a blank key map
@@ -133,6 +138,9 @@ public:
     static QString friendlyName(const QString& key, Layout layout);
 
 private:
+    static int modelWidth(Model model);
+    static int modelHeight(Model model);
+
     QHash<QString, Key> _keys;
     short keyWidth, keyHeight;
     Model keyModel :8;

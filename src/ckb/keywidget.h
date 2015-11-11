@@ -13,8 +13,11 @@ class KeyWidget : public QWidget
 public:
     // New key widget. rgbMode = true to display colors, false to display key names
     explicit KeyWidget(QWidget *parent = 0, bool rgbMode = true);
-    inline bool     rgbMode() { return _rgbMode; }
-    inline void     rgbMode(bool newRgbMode) { _rgbMode = newRgbMode; update(); }
+    inline bool     rgbMode()                   { return _rgbMode; }
+    inline void     rgbMode(bool newRgbMode)    { _rgbMode = newRgbMode; update(); }
+    // For RGB maps, monochrome = true to covert everything to grayscale
+    inline bool     monochrome()                { return _monochrome; }
+    inline void     monochrome(bool newMono)    { _monochrome = newMono; update(); }
 
     // Key map
     const KeyMap&   map() const                         { return keyMap; }
@@ -41,16 +44,18 @@ public:
 public slots:
     // Sets display colors. Pass an empty map to clear.
     // These will be displayed instead of the regular color map, if supplied.
-    void displayColorMap(ColorMap newDisplayMap);
+    void displayColorMap(ColorMap newDisplayMap, QStringList indicators = QStringList());
 
 signals:
     // Emitted when the selection is changed.
     void selectionChanged(QStringList selected);
+    void sidelightToggled();
 
 private:
     KeyMap keyMap;
     ColorMap _colorMap, _displayColorMap;
     BindMap _bindMap;
+    QStringList _indicators;
 
     QBitArray selection;
     QBitArray newSelection;
@@ -64,7 +69,7 @@ private:
         SUBTRACT,
         TOGGLE,
     } mouseDownMode;
-    bool _rgbMode;
+    bool _rgbMode, _monochrome;
 
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* event);

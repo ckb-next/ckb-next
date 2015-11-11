@@ -17,5 +17,3 @@ linux {
         SUBDIRS += src/ckb-mviz
     }
 }
-
-QMAKE_MAC_SDK = macosx10.10

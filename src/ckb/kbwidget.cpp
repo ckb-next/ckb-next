@@ -61,7 +61,9 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
         ui->fwUpdLabel->hide();
         ui->fwUpdLayout->removeItem(ui->fwUpdLayout->itemAt(1));
     }
-
+    // Set monochrome mode according to hardware
+    if(device->monochrome)
+        ui->lightWidget->setMonochrome();
     // Load profiles from stored settings
     CkbSettings settings(prefsPath);
     device->load(settings);

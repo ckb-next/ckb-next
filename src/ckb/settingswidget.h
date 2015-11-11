@@ -44,6 +44,8 @@ private slots:
     void on_layoutBox_currentIndexChanged(int index);
     void on_ditherBox_clicked(bool checked);
 
+    void showLayoutDialog();
+
 private:
     Ui::SettingsWidget *ui;
     friend class MainWindow;

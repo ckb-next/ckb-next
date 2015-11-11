@@ -21,6 +21,7 @@ public:
     ~KbLightWidget();
 
     void setLight(KbLight* newLight);
+    void setMonochrome();
 
 private slots:
     void updateLight();
@@ -35,6 +36,8 @@ private slots:
     void on_bgButton_clicked();
 
     void on_showAnimBox_clicked(bool checked);
+
+    void toggleSidelight(); //strafe
 
 private:
     KbLight* light;

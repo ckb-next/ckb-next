@@ -113,6 +113,15 @@ void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
 }
 
 void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevious){
+    if(bind){
+        // Populate animation list
+        // FIXME: There should be a trigger to update this whenever an animation is added/removed, even if the key selection hasn't changed
+        ui->animBox->clear();
+        ui->animBox->addItem(" ");
+        foreach(KbAnim* anim, bind->light()->animList())
+            ui->animBox->addItem(anim->name());
+    }
+
     // Apply changes to previous selection (if any)
     if(!selection.isEmpty() && applyPrevious){
         QStringList previous = selection;
@@ -156,6 +165,8 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     setBox(0);
     ui->dpiCustXBox->setValue(400);
     ui->dpiCustYBox->setValue(400);
+    ui->animOnceBox->setChecked(false);
+    ui->animKrBox->setChecked(false);
     ui->programKpBox->setText("");
     ui->programKrBox->setText("");
     ui->programKpSIBox->setChecked(false);
@@ -167,8 +178,8 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     // Fill in field and select tab according to action type
     bool mouse = act.isMouse();
     if(mouse){
-        // Mouse buttons - tab 1
-        ui->tabWidget->setCurrentIndex(1);
+        // Mouse buttons
+        ui->tabWidget->setCurrentIndex(TAB_MOUSE);
         // Set mouse buttons (indexOf returns -1 if not found, index zero is blank)
         ui->mbBox->setCurrentIndex(mouseKeys.indexOf(action) + 1);
         ui->mb2Box->setCurrentIndex(mouseExtKeys.indexOf(action) + 1);
@@ -185,16 +196,16 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             }
         }
     } else if(act.isNormal()){
-        // Standard key - tab 0
-        ui->tabWidget->setCurrentIndex(0);
+        // Standard key
+        ui->tabWidget->setCurrentIndex(TAB_KB);
         ui->typingBox->setCurrentIndex(typingKeys.indexOf(action) + 1);
         ui->modBox->setCurrentIndex(modKeys.indexOf(action) + 1);
         ui->fnBox->setCurrentIndex(fnKeys.indexOf(action) + 1);
         ui->numBox->setCurrentIndex(numKeys.indexOf(action) + 1);
         ui->mediaBox->setCurrentIndex(mediaKeys.indexOf(action) + 1);
     } else if(act.isProgram()){
-        // Program key - tab 3
-        ui->tabWidget->setCurrentIndex(3);
+        // Program key
+        ui->tabWidget->setCurrentIndex(TAB_PROGRAM);
         QString onPress, onRelease;
         int stop = act.programInfo(onPress, onRelease);
         ui->programKpBox->setText(onPress);
@@ -228,9 +239,19 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             ui->programKrModeBox->setEnabled(true);
             break;
         }
+    } else if(act.isAnim()){
+        // Animation key
+        ui->tabWidget->setCurrentIndex(TAB_ANIM);
+        bool onlyOnce = false, stopOnRelease = false;
+        QUuid id = act.animInfo(onlyOnce, stopOnRelease);
+        // Find this animation in the list. If not found, -1 will be returned, resulting in the blank space being selected
+        int index = bind->light()->findAnimIdx(id);
+        ui->animBox->setCurrentIndex(index + 1);
+        ui->animOnceBox->setChecked(!onlyOnce);
+        ui->animKrBox->setChecked(stopOnRelease);
     } else if(act.isSpecial()){
-        // Other special keys - tab 2
-        ui->tabWidget->setCurrentIndex(2);
+        // Other special keys
+        ui->tabWidget->setCurrentIndex(TAB_SPECIAL);
         int param;
         QString sAction = act.specialInfo(param);
         // Mode selection. Check wrap-around flag
@@ -301,7 +322,10 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         bind->setAction(keys, KeyAction::lightAction(ui->lightBox->currentIndex() - 1 + (ui->lightWrapBox->isChecked() ? 2 : 0)));
     else if(ui->lockBox->currentIndex() > 0)
         bind->setAction(keys, KeyAction::lockAction(ui->lockBox->currentIndex() - 1));
-    else if(!ui->programKpBox->text().isEmpty() || !ui->programKrBox->text().isEmpty()){
+    else if(ui->animBox->currentIndex() > 0){
+        KbAnim* anim = bind->light()->animList().at(ui->animBox->currentIndex() - 1);
+        bind->setAction(keys, KeyAction::animAction(anim->guid(), !ui->animOnceBox->isChecked(), ui->animKrBox->isChecked()));
+    } else if(!ui->programKpBox->text().isEmpty() || !ui->programKrBox->text().isEmpty()){
         int kpStop = 0, krStop = 0;
         if(!ui->programKpBox->text().isEmpty()){
             if(!ui->programKpSIBox->isChecked())
@@ -353,6 +377,8 @@ void RebindWidget::setBox(QWidget* box){
     if(box != ui->mb2Box) ui->mb2Box->setCurrentIndex(0);
     if(box != ui->wheelBox) ui->wheelBox->setCurrentIndex(0);
     if(box != ui->dpiBox) ui->dpiBox->setCurrentIndex(0);
+    // Anim
+    if(box != ui->animBox) ui->animBox->setCurrentIndex(0);
     // Special
     if(box != ui->modeBox) ui->modeBox->setCurrentIndex(0);
     if(box != ui->lightBox) ui->lightBox->setCurrentIndex(0);
@@ -510,6 +536,15 @@ void RebindWidget::on_programKrBox_textChanged(const QString &arg1){
     }
 }
 
+void RebindWidget::on_animBox_currentIndexChanged(int index){
+    if(index == 0)
+        ui->animButton->setChecked(false);
+    else {
+        ui->animButton->setChecked(true);
+        setBox(ui->animBox);
+    }
+}
+
 void RebindWidget::on_typingButton_clicked(bool checked){
     if(checked && ui->typingBox->currentIndex() == 0)
         ui->typingBox->setCurrentIndex(1);
@@ -596,4 +631,9 @@ void RebindWidget::on_programKpSIBox_clicked(bool checked){
 void RebindWidget::on_programKrSIBox_clicked(bool checked){
     ui->programKrModeBox->setCurrentIndex(0);
     ui->programKrModeBox->setEnabled(checked);
+}
+
+void RebindWidget::on_animButton_clicked(bool checked){
+    if(checked && ui->animBox->currentIndex() == 0)
+        ui->animBox->setCurrentIndex(1);
 }

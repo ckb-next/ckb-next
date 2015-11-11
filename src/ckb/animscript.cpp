@@ -204,9 +204,9 @@ bool AnimScript::load(){
     _info.params.append(kptrigger);
     if(_info.absoluteTime || !_info.repeat)
         _info.preempt = false;
-    Param kpmode = { Param::BOOL, "kpmode", "", "", false, 0, 0 };
+    Param kpmode = { Param::LONG, "kpmode", "", "", 1, 0, 0 };
     if(_info.kpMode)
-        kpmode.defaultValue = true;
+        kpmode.defaultValue = 0;
     _info.params.append(kpmode);
     Param delay = { Param::DOUBLE, "delay", "", "", 0., 0., ONE_DAY };
     Param kpdelay = { Param::DOUBLE, "kpdelay", "", "", 0., 0., ONE_DAY };
@@ -355,7 +355,7 @@ void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
     if(!process)
         begin(timestamp);
     int kpMode = _info.kpMode;
-    if(!_paramValues.value("kpmode", true).toBool())
+    if(_paramValues.value("kpmode", 0).toInt() != 0)
         // Disable KP mode according to user preferences
         kpMode = KP_NONE;
     switch(kpMode){

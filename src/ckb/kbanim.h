@@ -53,12 +53,15 @@ public:
     void reInit();
 
     // Begins or re-triggers the animation
-    void trigger(quint64 timestamp);
+    // Normally this will only start the animation if specified in the parameters. To ignore this and start it no matter what, use ignoreParameter.
+    void trigger(quint64 timestamp, bool ignoreParameter = false);
     // Triggers a keypress in the animation
     void keypress(const QString& key, bool pressed, quint64 timestamp);
     // Stops the animation
     void stop();
-    // Whether or not the animation is running
+    // Whether or not the animation is currently active
+    bool isActive() const       { return _isActive || _isActiveKp; }
+    // Whether or not the animation script is responding
     bool isRunning() const;
 
     // Blends the animation into a color map, taking opacity and mode into account
@@ -108,6 +111,7 @@ private:
     QString _name;
     float _opacity;
     Mode _mode;
+    bool _isActive, _isActiveKp;
     bool _needsSave;
 };
 

@@ -30,6 +30,12 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
             return 0;
     } else if(res != MSG_SIZE)
         ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+#ifdef DEBUG_USB
+    char converted[MSG_SIZE*3 + 1];
+    for(int i=0;i<MSG_SIZE;i++)
+        sprintf(&converted[i*3], "%02x ", out_msg[i]);
+    ckb_warn_fn("Sent %s\n", file, line, converted);
+#endif
     return res;
 }
 
@@ -120,9 +126,14 @@ void* os_inputmain(void* context){
             // Process input (if any)
             pthread_mutex_lock(imutex(kb));
             if(IS_MOUSE(vendor, product)){
-                if(urb->endpoint == 0x82){
+                switch(urb->endpoint){
+                case 0x82:
                     // RGB mouse input
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -(urb->endpoint & 0xF), urb->actual_length, urb->buffer);
+                    break;
+                case 0x83:
+                    corsair_mousecopy(kb->input.keys, urb->buffer);
+                    break;
                 }
             } else if(IS_RGB(vendor, product)){
                 switch(urb->endpoint){
@@ -137,7 +148,7 @@ void* os_inputmain(void* context){
                     break;
                 case 0x83:
                     // RGB EP 3: Corsair input
-                    memcpy(kb->input.keys, urb->buffer, N_KEYBYTES_KB);
+                    corsair_kbcopy(kb->input.keys, urb->buffer);
                     break;
                 }
             } else
@@ -256,6 +267,7 @@ int os_setupusb(usbdevice* kb){
         sscanf(firmware, "%hx", &kb->fwversion);
     else
         kb->fwversion = 0;
+    ckb_info("8 %s \n", kb->name);
     ckb_info("Connecting %s (S/N: %s)\n", kb->name, kb->serial);
 
     // Claim the USB interfaces
@@ -324,8 +336,12 @@ static _model models[] = {
     { P_K70_NRGB_STR, P_K70_NRGB },
     { P_K95_STR, P_K95 },
     { P_K95_NRGB_STR, P_K95_NRGB },
+    { P_STRAFE_STR, P_STRAFE },
+    { P_STRAFE_NRGB_STR, P_STRAFE_NRGB },
     // Mice
-    { P_M65_STR, P_M65 }
+    { P_M65_STR, P_M65 },
+    { P_SABRE_STR, P_SABRE },
+    { P_SCIMITAR_STR, P_SCIMITAR }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

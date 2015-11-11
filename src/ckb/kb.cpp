@@ -16,7 +16,7 @@ bool Kb::_dither = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"),
-    features("N/A"), firmware("N/A"), pollrate("N/A"),
+    features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), _needsSave(false)
@@ -39,6 +39,8 @@ Kb::Kb(QObject *parent, const QString& path) :
     } else
         // Bail if features aren't readable
         return;
+    if(features.contains("monochrome"))
+        monochrome = true;
     if(mpath.open(QIODevice::ReadOnly)){
         usbModel = mpath.read(100);
         usbModel = usbModel.remove("Corsair").remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").trimmed();
@@ -256,7 +258,7 @@ void Kb::hwSave(){
         cmd.write(mode->id().modifiedString().toLatin1());
         cmd.write(" ");
         // Write lighting and performance
-        light->base(cmd, true);
+        light->base(cmd, true, monochrome);
         cmd.write(" ");
         perf->update(cmd, true, false);
         // Update mode ID
@@ -342,7 +344,7 @@ void Kb::frameUpdate(){
 
     // Send lighting/binding to driver
     cmd.write(QString("mode %1 switch ").arg(index + 1).toLatin1());
-    light->frameUpdate(cmd, perf->indicatorLights(index, iState));
+    light->frameUpdate(cmd, perf->indicatorLights(index, iState), monochrome);
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
     cmd.write(" ");
@@ -616,9 +618,21 @@ void Kb::readNotify(QString line){
                 }
                 // Set DPI for this stage
                 int index = dpi[0].toInt();
-                if(off)
+                if(off){
                     perf->dpiEnabled(index, false);
-                else {
+                    // If all DPIs have been disabled, turn them back on
+                    bool allOff = true;
+                    for(int i = 1; i < KbPerf::DPI_COUNT; i++){
+                        if(perf->dpiEnabled(i)){
+                            allOff = false;
+                            break;
+                        }
+                    }
+                    if(allOff){
+                        for(int i = 1; i < KbPerf::DPI_COUNT; i++)
+                            perf->dpiEnabled(i, true);
+                    }
+                } else {
                     perf->dpiEnabled(index, true);
                     perf->dpi(index, QPoint(x, y));
                 }
@@ -628,7 +642,12 @@ void Kb::readNotify(QString line){
             if(!_hwProfile || _hwProfile->modeCount() <= mode || mode >= HWMODE_MAX || !hwLoading[mode + 1])
                 return;
             KbPerf* perf = _hwProfile->modes()[mode]->perf();
-            perf->curDpiIdx(components[3].toInt());
+            int idx = components[3].toInt();
+            if(idx < 1)
+                idx = 1;
+            if(idx >= KbPerf::DPI_COUNT)
+                idx = KbPerf::DPI_COUNT - 1;
+            perf->curDpiIdx(idx);
         } else if(components[2] == "hwlift"){
             // Mouse lift height (1...5)
             if(!_hwProfile || _hwProfile->modeCount() <= mode || mode >= HWMODE_MAX || !hwLoading[mode + 1])

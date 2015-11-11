@@ -154,7 +154,7 @@ static QString tableName(const QString& features){
     // First two components are vendor and model
     QString vendorModel = components[0].toUpper() + "-" + components[1].toUpper();
     // Add "RGB" on RGB boards
-    if(features.contains("rgb"))
+    if(features.contains("rgb") && !features.contains("monochrome"))
         vendorModel += "RGB";
     return vendorModel;
 }

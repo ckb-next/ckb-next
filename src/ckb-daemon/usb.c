@@ -30,8 +30,14 @@ const char* product_str(short product){
         return "k70";
     if(product == P_K65)
         return "k65";
+    if(product == P_STRAFE || product == P_STRAFE_NRGB)
+        return "strafe";
     if(product == P_M65)
         return "m65";
+    if(product == P_SABRE)
+        return "sabre";
+    if(product == P_SCIMITAR)
+        return "scimitar";
     return "";
 }
 
@@ -81,6 +87,7 @@ static void* _setupusb(void* context){
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
     kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;
     if(IS_MOUSE(vendor, product)) kb->features |= FEAT_ADJRATE;
+    if(IS_MONOCHROME(vendor, product)) kb->features |= FEAT_MONOCHROME;
     kb->usbdelay = USB_DELAY_DEFAULT;
 
     // Perform OS-specific setup

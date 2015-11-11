@@ -40,11 +40,11 @@ public:
     // Modes in this profile
     typedef QList<KbMode*> ModeList;
     inline const ModeList&  modes() const                           { return _modes; }
-    inline void             modes(const QList<KbMode*>& newModes)   { _needsSave = true; _modes = newModes; }
-    inline void             append(KbMode* newMode)                 { _needsSave = true; _modes.append(newMode); }
-    inline void             insert(int index, KbMode* newMode)      { _needsSave = true; _modes.insert(index, newMode); }
-    inline void             removeAll(KbMode* mode)                 { _needsSave = true; _modes.removeAll(mode); }
-    inline void             move(int from, int to)                  { _needsSave = true; _modes.move(from, to); }
+    inline void             modes(const QList<KbMode*>& newModes)   { setNeedsUpdate(); _modes = newModes; }
+    inline void             append(KbMode* newMode)                 { setNeedsUpdate(); _modes.append(newMode); }
+    inline void             insert(int index, KbMode* newMode)      { setNeedsUpdate(); _modes.insert(index, newMode); }
+    inline void             removeAll(KbMode* mode)                 { setNeedsUpdate(); _modes.removeAll(mode); }
+    inline void             move(int from, int to)                  { setNeedsUpdate(); _modes.move(from, to); }
 
     inline int              modeCount() const           { return _modes.count(); }
     inline int              indexOf(KbMode* mode) const { return _modes.indexOf(mode); }
@@ -61,6 +61,9 @@ private:
     KeyMap  _keyMap;
     ModeList _modes;
     bool _needsSave;
+
+    // Make note that all modes should be re-sent to the driver
+    inline void setNeedsUpdate() { setNeedsSave(); foreach(KbMode* mode, _modes){ mode->setNeedsUpdate(); } }
 };
 
 #endif // KBPROFILE_H

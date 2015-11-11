@@ -149,6 +149,10 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "g17",        0x83, KEY_CORSAIR },
     { "g18",        0x8f, KEY_CORSAIR },
 
+    // Strafe specific side led, that are set via a special command
+    { "lsidel",     -2, KEY_CORSAIR },
+    { "rsidel",     -2, KEY_CORSAIR },
+
     // Keys not present on any device
     { "lightup",    -1, KEY_BRIGHTNESSUP },
     { "lightdn",    -1, KEY_BRIGHTNESSDOWN },
@@ -172,6 +176,20 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "dpiup",      -1, KEY_CORSAIR },
     { "dpidn",      -1, KEY_CORSAIR },
     { "sniper",     -1, KEY_CORSAIR },
+    { "thumb1",     -1, KEY_CORSAIR },
+    { "thumb2",     -1, KEY_CORSAIR },
+    { "thumb3",     -1, KEY_CORSAIR },
+    { "thumb4",     -1, KEY_CORSAIR },
+    { "thumb5",     -1, KEY_CORSAIR },
+    { "thumb6",     -1, KEY_CORSAIR },
+    { "thumb7",     -1, KEY_CORSAIR },
+    { "thumb8",     -1, KEY_CORSAIR },
+    { "thumb9",     -1, KEY_CORSAIR },
+    { "thumb10",    -1, KEY_CORSAIR },
+    { "thumb11",    -1, KEY_CORSAIR },
+    { "thumb12",    -1, KEY_CORSAIR },
+
+    // Extended mouse buttons (wheel is an axis in HW, 6-8 are recognized by the OS but not present in HW)
     { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },
     { "wheeldn",    -1, SCAN_MOUSE | BTN_WHEELDOWN },
     { "mouse6",     -1, SCAN_MOUSE | BTN_FORWARD },
@@ -182,13 +200,14 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "front",      LED_MOUSE, KEY_NONE },
     { "back",       LED_MOUSE + 1, KEY_NONE },
     { "dpi",        LED_MOUSE + 2, KEY_NONE },  // SW DPI light
-    { "zone4",      LED_MOUSE + 3, KEY_NONE },  // TODO: give this a better name. it's not present on the M65, but the hardware requires it to be sent
-    { "dpi0",       LED_MOUSE + 4, KEY_NONE },  // HW DPI light levels (0 = sniper, 1..5 = modes)
-    { "dpi1",       LED_MOUSE + 5, KEY_NONE },
-    { "dpi2",       LED_MOUSE + 6, KEY_NONE },
-    { "dpi3",       LED_MOUSE + 7, KEY_NONE },
-    { "dpi4",       LED_MOUSE + 8, KEY_NONE },
-    { "dpi5",       LED_MOUSE + 9, KEY_NONE },
+    { "wheel",      LED_MOUSE + 3, KEY_NONE },
+    { "thumb",      LED_MOUSE + 4, KEY_NONE },
+    { "dpi0",       LED_MOUSE + 5, KEY_NONE },  // HW DPI light levels (0 = sniper, 1..5 = modes)
+    { "dpi1",       LED_MOUSE + 6, KEY_NONE },
+    { "dpi2",       LED_MOUSE + 7, KEY_NONE },
+    { "dpi3",       LED_MOUSE + 8, KEY_NONE },
+    { "dpi4",       LED_MOUSE + 9, KEY_NONE },
+    { "dpi5",       LED_MOUSE + 10, KEY_NONE },
 };
 
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput){
@@ -332,6 +351,8 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
     }
 }
 
+#define BUTTON_HID_COUNT    5
+
 void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput){
     if((endpoint != 2 && endpoint != -2) || length < 10)
         return;
@@ -339,7 +360,7 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     if(urbinput[0] != 1)
         return;
     // Byte 1 = mouse buttons (bitfield)
-    for(int bit = 0; bit < 8; bit++){
+    for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
         if(urbinput[1] & (1 << bit))
             SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
         else
@@ -351,11 +372,26 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     // Byte 9: wheel
     char wheel = urbinput[9];
     if(wheel > 0)
-        SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 8);    // wheelup
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);         // wheelup
     else
-        CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 8);
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
     if(wheel < 0)
-        SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 9);    // wheeldn
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);     // wheeldn
     else
-        CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 9);
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+}
+
+void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput){
+    memcpy(kbinput, urbinput, N_KEYBYTES_HW);
+}
+
+void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
+    for(int bit = BUTTON_HID_COUNT; bit < N_BUTTONS_HW; bit++){
+        int byte = bit / 8;
+        uchar test = 1 << (bit % 8);
+        if(urbinput[byte] & test)
+            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+        else
+            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+    }
 }

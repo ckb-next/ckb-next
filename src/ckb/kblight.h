@@ -47,6 +47,8 @@ public:
     KbAnim*             duplicateAnim(KbAnim* oldAnim);
     const AnimList&     animList()                              { return _animList; }
     void                animList(const AnimList& newAnimList)   { _needsSave = true; _animList = newAnimList; }
+    KbAnim*             findAnim(const QUuid& guid) const       { foreach(KbAnim* anim, _animList) { if(anim->guid() == guid) return anim; } return 0; }
+    int                 findAnimIdx(const QUuid& guid) const    { return _animList.indexOf(findAnim(guid)); }
     // Preview animation - temporary animation displayed at the top of the animation list
     void previewAnim(const AnimScript* base, const QStringList& keys, const QMap<QString, QVariant>& preset);
     void stopPreview();
@@ -63,9 +65,9 @@ public:
     void close();
 
     // Write a new frame to the keyboard. Write "mode %d" first. Optionally provide a list of keys to use as indicators and overwrite the lighting
-    void frameUpdate(QFile& cmd, const ColorMap& indicators = ColorMap());
+    void frameUpdate(QFile& cmd, const ColorMap& indicators = ColorMap(), bool monochrome = false);
     // Write the mode's base colors without any animation
-    void base(QFile& cmd, bool ignoreDim = false);
+    void base(QFile& cmd, bool ignoreDim = false, bool monochrome = false);
 
     // Load and save from stored settings
     void load(CkbSettings& settings);
@@ -75,7 +77,7 @@ public:
 signals:
     void didLoad();
     void updated();
-    void frameDisplayed(ColorMap animatedColors);
+    void frameDisplayed(ColorMap animatedColors, QStringList indicatorList);
 
 private:
     AnimList    _animList;

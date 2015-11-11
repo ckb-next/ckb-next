@@ -33,9 +33,9 @@ static uchar quantize8to3(int index, uchar value){
 
 static void makergb_512(const lighting* light, uchar data_pkt[5][MSG_SIZE],
                         uchar (*ditherfn)(int, uchar)){
-    uchar r[N_KEYS_KB / 2], g[N_KEYS_KB / 2], b[N_KEYS_KB / 2];
+    uchar r[N_KEYS_HW / 2], g[N_KEYS_HW / 2], b[N_KEYS_HW / 2];
     // Compress RGB values to a 512-color palette
-    for(int i = 0; i < N_KEYS_KB; i += 2){
+    for(int i = 0; i < N_KEYS_HW; i += 2){
         char r1 = ditherfn(i, light->r[i]), r2 = ditherfn(i + 1, light->r[i + 1]);
         char g1 = ditherfn(i, light->g[i]), g2 = ditherfn(i + 1, light->g[i + 1]);
         char b1 = ditherfn(i, light->b[i]), b2 = ditherfn(i + 1, light->b[i + 1]);
@@ -69,7 +69,7 @@ static void makergb_full(const lighting* light, uchar data_pkt[12][MSG_SIZE]){
 
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
     // Compare two light structures, ignore mouse zones
-    return memcmp(lhs->r, rhs->r, N_KEYS_KB) || memcmp(lhs->g, rhs->g, N_KEYS_KB) || memcmp(lhs->b, rhs->b, N_KEYS_KB);
+    return memcmp(lhs->r, rhs->r, N_KEYS_HW) || memcmp(lhs->g, rhs->g, N_KEYS_HW) || memcmp(lhs->b, rhs->b, N_KEYS_HW);
 }
 
 int updatergb_kb(usbdevice* kb, int force){
@@ -79,32 +79,45 @@ int updatergb_kb(usbdevice* kb, int force){
     lighting* newlight = &kb->profile->currentmode->light;
     // Don't do anything if the lighting hasn't changed
     if(!force && !lastlight->forceupdate && !newlight->forceupdate
-            && !rgbcmp(lastlight, newlight))
+            && !rgbcmp(lastlight, newlight) && lastlight->sidelight == newlight->sidelight)   // strafe sidelights
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    /*if(kb->fwversion >= 0x0120){
+    /*if(kb->fwversion >= 0x0120){ */
+    if (IS_STRAFE(kb)){
+        // update strafe sidelights if necessary
+        if(lastlight->sidelight != newlight->sidelight) {
+            uchar data_pkt[2][MSG_SIZE] = {
+                 { 0x07, 0x05, 0x08, 0x00, 0x00 },
+                 { 0x07, 0x05, 0x02, 0, 0x03 }
+             };
+             if (newlight->sidelight)
+                 data_pkt[0][4]=1;    // turn on
+             if(!usbsend(kb, data_pkt[0], 2))
+                 return -1;
+        }
+        // 16.8M color lighting works fine on strafe and is the only way it actually works
         uchar data_pkt[12][MSG_SIZE] = {
             // Red
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x28, 0x01, 0x00, 0x01, 0x01},
+            { 0x7f, 0x01, 0x3c, 0 },
+            { 0x7f, 0x02, 0x3c, 0 },
+            { 0x7f, 0x03, 0x18, 0 },
+            { 0x07, 0x28, 0x01, 0x03, 0x01, 0},
             // Green
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x28, 0x02, 0x00, 0x01, 0x01},
+            { 0x7f, 0x01, 0x3c, 0 },
+            { 0x7f, 0x02, 0x3c, 0 },
+            { 0x7f, 0x03, 0x18, 0 },
+            { 0x07, 0x28, 0x02, 0x03, 0x01, 0},
             // Blue
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x28, 0x03, 0x00, 0x02, 0x01}
+            { 0x7f, 0x01, 0x3c, 0 },
+            { 0x7f, 0x02, 0x3c, 0 },
+            { 0x7f, 0x03, 0x18, 0 },
+            { 0x07, 0x28, 0x03, 0x03, 0x02, 0}
         };
         makergb_full(newlight, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;
-    } else {*/
+    } else {
     // 16.8M color lighting causes flickering and color glitches. Don't use it for this.
     // Maybe in a future version this can be re-added as an advanced feature.
         uchar data_pkt[5][MSG_SIZE] = {
@@ -117,7 +130,7 @@ int updatergb_kb(usbdevice* kb, int force){
         makergb_512(newlight, data_pkt, kb->dither ? ordered8to3 : quantize8to3);
         if(!usbsend(kb, data_pkt[0], 5))
             return -1;
-    //}
+    }
 
     memcpy(lastlight, newlight, sizeof(lighting));
     return 0;
@@ -145,6 +158,11 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
         makergb_full(light, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;
+        if (IS_STRAFE(kb)){ // end save
+            uchar save_end_pkt[MSG_SIZE] = { 0x07, 0x14, 0x04, 0x01, 0x01 };
+            if(!usbsend(kb, save_end_pkt, 1))
+                return -1;
+        }
     } else {
         uchar data_pkt[5][MSG_SIZE] = {
             { 0x7f, 0x01, 60, 0 },
@@ -226,7 +244,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             }
         }
         // Copy the data back to the mode
-        uchar mr[N_KEYS_KB / 2], mg[N_KEYS_KB / 2], mb[N_KEYS_KB / 2];
+        uchar mr[N_KEYS_HW / 2], mg[N_KEYS_HW / 2], mb[N_KEYS_HW / 2];
         memcpy(mr, in_pkt[0] + 4, 60);
         memcpy(mr + 60, in_pkt[1] + 4, 12);
         memcpy(mg, in_pkt[1] + 16, 48);
@@ -234,7 +252,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
         memcpy(mb, in_pkt[2] + 28, 36);
         memcpy(mb + 36, in_pkt[3] + 4, 36);
         // Unpack LED data to 8bpc format
-        for(int i = 0; i < N_KEYS_KB; i++){
+        for(int i = 0; i < N_KEYS_HW; i++){
             uchar r, g, b;
             if(i & 1){
                 r = (7 - ((mr[i / 2] & 0xF0) >> 4)) << 5;

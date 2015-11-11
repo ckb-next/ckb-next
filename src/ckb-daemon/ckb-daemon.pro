@@ -14,7 +14,7 @@ macx {
 }
 
 QMAKE_CFLAGS  = -std=gnu99 -Wno-unused-parameter -Werror=all
-QMAKE_MAC_SDK = macosx10.10
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 
 # Minimal build - remove Qt defaults
 CONFIG   = debug_and_release

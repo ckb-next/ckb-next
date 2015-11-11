@@ -68,6 +68,8 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
     if(IS_MOUSE(kb->vendor, kb->product)){
         if(length == 10)
             hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data);
+        else if(length == MSG_SIZE)
+            corsair_mousecopy(kb->input.keys, data);
     } else if(HAS_FEATURES(kb, FEAT_RGB)){
         switch(length){
         case 8:
@@ -82,7 +84,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             break;
         case MSG_SIZE:
             // RGB EP 3: Corsair input
-            memcpy(kb->input.keys, data, N_KEYBYTES_KB);
+            corsair_kbcopy(kb->input.keys, data);
             break;
         }
     } else {
@@ -396,7 +398,12 @@ static void iterate_devices(void* context, io_iterator_t iterator){
 
 int usbmain(){
     int vendor = V_CORSAIR;
-    int products[] = { P_K65, P_K70, P_K70_NRGB, P_K95, P_K95_NRGB, P_M65 };
+    int products[] = {
+        // Keyboards
+        P_K65, P_K70, P_K70_NRGB, P_K95, P_K95_NRGB, P_STRAFE, P_STRAFE_NRGB,
+        // Mice
+        P_M65, P_SABRE, P_SCIMITAR
+    };
     // Tell IOService which type of devices we want (IOHIDDevices matching the supported vendor/products)
     CFMutableDictionaryRef match = IOServiceMatching(kIOHIDDeviceKey);
     CFNumberRef cfvendor = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor);

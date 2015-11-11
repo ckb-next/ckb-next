@@ -13,5 +13,7 @@
         <file>icon_profile.png</file>
         <file>icon_profile_hardware.png</file>
         <file>overlay_m65.png</file>
+        <file>overlay_scimitar.png</file>
+        <file>overlay_sabre.png</file>
     </qresource>
 </RCC>

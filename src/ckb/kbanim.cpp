@@ -7,7 +7,7 @@
 KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, CkbSettings& settings) :
     QObject(parent), _script(0), _map(map),
     repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
-    _guid(id), _needsSave(false)
+    _guid(id), _isActive(false), _isActiveKp(false), _needsSave(false)
 {
     SGroup group(settings, _guid.toString().toUpper());
     _keys = settings.value("Keys").toStringList();
@@ -84,7 +84,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QS
     QObject(parent),
     _script(AnimScript::copy(this, script->guid())), _map(map), _keys(keys),
     repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
-    _guid(QUuid::createUuid()), _name(name), _opacity(1.), _mode(Normal), _needsSave(true)
+    _guid(QUuid::createUuid()), _name(name), _opacity(1.), _mode(Normal), _isActive(false), _isActiveKp(false), _needsSave(true)
 {
     if(_script){
         // Set default parameters
@@ -105,7 +105,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const KbAnim& other) :
     _script(AnimScript::copy(this, other.script()->guid())), _scriptGuid(_script->guid()), _scriptName(_script->name()),
     _map(map), _keys(other._keys), _parameters(other._parameters),
     repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
-    _guid(other._guid), _name(other._name), _opacity(other._opacity), _mode(other._mode), _needsSave(true)
+    _guid(other._guid), _name(other._name), _opacity(other._opacity), _mode(other._mode), _isActive(false), _isActiveKp(false), _needsSave(true)
 {
     reInit();
 }
@@ -149,6 +149,7 @@ void KbAnim::reInit(){
     if(_script)
         _script->init(_map, _keys, effectiveParams());
     repeatKey = "";
+    _isActive = _isActiveKp = false;
 }
 
 void KbAnim::map(const KeyMap& newMap){
@@ -169,6 +170,7 @@ void KbAnim::catchUp(quint64 timestamp){
         if(!parameters.contains("repeat")){
             // If repeats aren't allowed, stop the animation entirely
             _script->end();
+            _isActive = false;
             return;
         } else
             // Otherwise, simply stop repeating
@@ -178,6 +180,7 @@ void KbAnim::catchUp(quint64 timestamp){
         kpRepeatMsec = kpRepeatTime = 0;
         if(!parameters.contains("kprepeat")){
             _script->end();
+            _isActiveKp = false;
             return;
         } else
             kpStopTime = 0;
@@ -202,13 +205,14 @@ void KbAnim::catchUp(quint64 timestamp){
     }
 }
 
-void KbAnim::trigger(quint64 timestamp){
+void KbAnim::trigger(quint64 timestamp, bool ignoreParameter){
     if(!_script)
         return;
     QMap<QString, QVariant> parameters = effectiveParams();
 
     catchUp(timestamp);
-    if(parameters.value("trigger").toBool()){
+    if(parameters.value("trigger").toBool() || ignoreParameter){
+        _isActive = true;
         int delay = round(parameters.value("delay").toDouble() * 1000.);
         if(delay > 0){
             // If delay is enabled, wait to trigger the event
@@ -251,6 +255,7 @@ void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
         catchUp(timestamp);
         _script->stop(timestamp);
         stopTime = repeatTime = repeatMsec = 0;
+        _isActive = false;
     } else {
         if(!parameters.value("kptrigger").toBool())
             return;
@@ -259,6 +264,10 @@ void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
 
     if(pressed){
         // Key pressed
+        _isActiveKp = true;
+        if(parameters.value("kpmode", 0).toInt() == 2 && isActive())
+            // If mode is start once and a key has already been pressed, do nothing
+            return;
         int delay = round(parameters.value("kpdelay").toDouble() * 1000.);
         if(delay > 0){
             // If delay is enabled, wait to trigger the event
@@ -290,6 +299,7 @@ void KbAnim::keypress(const QString& key, bool pressed, quint64 timestamp){
         repeatKey = key;
     } else {
         // Key released
+        _isActiveKp = false;
         _script->keypress(key, pressed, timestamp);
         if(parameters.value("kprelease").toBool())
             // Stop repeating keypress if "Stop on key release" is enabled
@@ -308,6 +318,7 @@ void KbAnim::stop(){
     stopTime = 0;
     kpStopTime = 0;
     repeatKey = "";
+    _isActive = _isActiveKp = false;
 }
 
 bool KbAnim::isRunning() const {

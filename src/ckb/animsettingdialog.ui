@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
-    <height>440</height>
+    <width>480</width>
+    <height>457</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>430</width>
+    <width>480</width>
     <height>0</height>
    </size>
   </property>
@@ -43,6 +43,21 @@
        <string>Settings</string>
       </attribute>
       <layout class="QGridLayout" name="settingsGrid">
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <property name="topMargin">
+        <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>12</number>
+       </property>
+       <property name="bottomMargin">
+        <number>12</number>
+       </property>
+       <property name="spacing">
+        <number>12</number>
+       </property>
        <item row="0" column="1">
         <widget class="QLabel" name="label_2">
          <property name="text">
@@ -60,7 +75,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>15</width>
+           <width>5</width>
            <height>0</height>
           </size>
          </property>
@@ -76,6 +91,21 @@
        <string>Timing</string>
       </attribute>
       <layout class="QGridLayout" name="timeGrid">
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <property name="topMargin">
+        <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>12</number>
+       </property>
+       <property name="bottomMargin">
+        <number>12</number>
+       </property>
+       <property name="spacing">
+        <number>12</number>
+       </property>
        <item row="3" column="2">
         <spacer name="horizontalSpacer_5">
          <property name="orientation">
@@ -301,6 +331,21 @@
        <string>About</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <property name="topMargin">
+        <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>12</number>
+       </property>
+       <property name="bottomMargin">
+        <number>12</number>
+       </property>
+       <property name="spacing">
+        <number>12</number>
+       </property>
        <item row="0" column="2">
         <widget class="QLabel" name="sNameLabel">
          <property name="text">

@@ -13,6 +13,7 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
 
     connect(ui->bgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeColor(QColor)));
     connect(ui->keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
+    connect(ui->keyWidget, SIGNAL(sidelightToggled()), this, SLOT(toggleSidelight())); // click on a toggle button, like sidelight
     connect(ui->animWidget, SIGNAL(animChanged(KbAnim*)), this, SLOT(changeAnim(KbAnim*)));
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
 
@@ -44,15 +45,19 @@ void KbLightWidget::setLight(KbLight* newLight){
         on_showAnimBox_clicked(true);
 }
 
+void KbLightWidget::setMonochrome(){
+    ui->keyWidget->monochrome(true);
+}
+
 void KbLightWidget::on_showAnimBox_clicked(bool checked){
     // FIXME: set globally if there's more than one KbLightWidget active
     // Connect/disconnect animation slot
     if(checked){
         if(light)
-            connect(light, SIGNAL(frameDisplayed(ColorMap)), ui->keyWidget, SLOT(displayColorMap(ColorMap)));
+            connect(light, SIGNAL(frameDisplayed(ColorMap,QStringList)), ui->keyWidget, SLOT(displayColorMap(ColorMap,QStringList)));
     } else {
         if(light)
-            disconnect(light, SIGNAL(frameDisplayed(ColorMap)), ui->keyWidget, SLOT(displayColorMap(ColorMap)));
+            disconnect(light, SIGNAL(frameDisplayed(ColorMap,QStringList)), ui->keyWidget, SLOT(displayColorMap(ColorMap,QStringList)));
         ui->keyWidget->displayColorMap(KeyWidget::ColorMap());
     }
     CkbSettings::set("UI/Light/ShowBaseOnly", !checked);
@@ -98,6 +103,20 @@ void KbLightWidget::changeColor(QColor newColor){
         ui->keyWidget->colorMap(light->colorMap());
     }
 }
+
+void KbLightWidget::toggleSidelight(){
+    if(light){
+        if (light->colorMap()["lsidel"] == 0xFF000000){
+                light->color("lsidel",QRgb(0xFFFFFFFF));
+                light->color("rsidel",QRgb(0xFFFFFFFF));
+        } else {
+                light->color("lsidel", QRgb(0xFF000000));
+                light->color("rsidel", QRgb(0xFF000000));
+        }
+        ui->keyWidget->colorMap(light->colorMap());
+    }
+}
+
 
 void KbLightWidget::changeAnim(KbAnim *newAnim){
     if(newAnim)

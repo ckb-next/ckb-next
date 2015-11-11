@@ -4,6 +4,25 @@
 #include "kbfirmware.h"
 #include "ui_fwupgradedialog.h"
 
+// IDs for verifying firmware suitability
+struct KbId {
+    short vendor;
+    short product;
+    const char* feature;
+};
+
+static KbId ids[] = {
+    // Keyboards
+    { 0x1b1c, 0x1b17, "corsair k65 rgb" },
+    { 0x1b1c, 0x1b13, "corsair k70 rgb" },
+    { 0x1b1c, 0x1b11, "corsair k95 rgb" },
+    { 0x1b1c, 0x1b15, "corsair strafe monochrome" },
+    { 0x1b1c, 0x1b20, "corsair strafe rgb" },
+    // Mice
+    { 0x1b1c, 0x1b12, "corsair m65 rgb" },
+    { 0x1b1c, 0x1b1e, "corsair scimitar rgb" }
+};
+
 static const int DIALOG_WIDTH = 420;
 static const int DIALOG_HEIGHT_MIN = 200, DIALOG_HEIGHT_MAX(240);
 
@@ -59,19 +78,6 @@ void FwUpgradeDialog::cleanBlob(){
     QFile(savePath).remove();
     savePath = "";
 }
-
-// IDs for verifying firmware suitability
-struct KbId {
-    short vendor;
-    short product;
-    const char* feature;
-};
-
-static KbId ids[] = {
-    { 0x1b1c, 0x1b17, "corsair k65 rgb" },
-    { 0x1b1c, 0x1b13, "corsair k70 rgb" },
-    { 0x1b1c, 0x1b11, "corsair k95 rgb" }
-};
 
 // Returns firmware version if valid for device, 0 if invalid
 static float verifyFw(const QByteArray& blob, const QString& features){

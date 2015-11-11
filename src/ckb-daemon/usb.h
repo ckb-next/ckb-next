@@ -42,6 +42,9 @@
 #define P_SCIMITAR_STR  "1b1e"
 #define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR))
 
+// NOTE: when adding new devices please update src/ckb/fwupgradedialog.cpp as well.
+// It should contain the same vendor/product IDs for any devices supporting firmware updates.
+
 //uncomment to see USB packets sent to the device
 //#define DEBUG_USB
 
@@ -50,10 +53,11 @@ const char* product_str(short product);
 
 // RGB vs non-RGB test
 // (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
-#define IS_RGB(vendor, product)     ((vendor) == (V_CORSAIR) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+#define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
 
 // Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)   ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_SABRE) || (product) == (P_SCIMITAR)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_SABRE) || (product) == (P_SCIMITAR)))
 
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)

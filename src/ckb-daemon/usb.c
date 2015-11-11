@@ -87,6 +87,7 @@ static void* _setupusb(void* context){
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
     kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;
     if(IS_MOUSE(vendor, product)) kb->features |= FEAT_ADJRATE;
+    if(IS_MONOCHROME(vendor, product)) kb->features |= FEAT_MONOCHROME;
     kb->usbdelay = USB_DELAY_DEFAULT;
 
     // Perform OS-specific setup

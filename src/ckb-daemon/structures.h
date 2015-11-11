@@ -133,17 +133,18 @@ typedef struct {
 
 // Device features
 #define FEAT_RGB        0x001   // RGB backlighting?
-#define FEAT_POLLRATE   0x002   // Known poll rate?
-#define FEAT_ADJRATE    0x004   // Adjustable poll rate?
-#define FEAT_BIND       0x008   // Rebindable keys?
-#define FEAT_NOTIFY     0x010   // Key notifications?
-#define FEAT_FWVERSION  0x020   // Has firmware version?
-#define FEAT_FWUPDATE   0x040   // Has firmware update?
-#define FEAT_HWLOAD     0x080   // Hardware load enabled?
+#define FEAT_MONOCHROME 0x002   // RGB protocol but single-color only?
+#define FEAT_POLLRATE   0x004   // Known poll rate?
+#define FEAT_ADJRATE    0x008   // Adjustable poll rate?
+#define FEAT_BIND       0x010   // Rebindable keys?
+#define FEAT_NOTIFY     0x020   // Key notifications?
+#define FEAT_FWVERSION  0x040   // Has firmware version?
+#define FEAT_FWUPDATE   0x080   // Has firmware update?
+#define FEAT_HWLOAD     0x100   // Hardware load enabled?
 
-#define FEAT_ANSI       0x100   // ANSI/ISO layout toggle (Mac only - not needed on Linux)
-#define FEAT_ISO        0x200
-#define FEAT_MOUSEACCEL 0x400   // Mouse acceleration (also Mac only)
+#define FEAT_ANSI       0x200   // ANSI/ISO layout toggle (Mac only - not needed on Linux)
+#define FEAT_ISO        0x400
+#define FEAT_MOUSEACCEL 0x800   // Mouse acceleration (also Mac only)
 
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL | FEAT_HWLOAD)

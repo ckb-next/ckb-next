@@ -215,6 +215,8 @@ static int _mkdevpath(usbdevice* kb){
         FILE* ffile = fopen(fpath, "w");
         if(ffile){
             fprintf(ffile, "%s %s", vendor_str(kb->vendor), product_str(kb->product));
+            if(HAS_FEATURES(kb, FEAT_MONOCHROME))
+                fputs(" monochrome", ffile);
             if(HAS_FEATURES(kb, FEAT_RGB))
                 fputs(" rgb", ffile);
             if(HAS_FEATURES(kb, FEAT_POLLRATE))
@@ -229,8 +231,6 @@ static int _mkdevpath(usbdevice* kb){
                 fputs(" fwversion", ffile);
             if(HAS_FEATURES(kb, FEAT_FWUPDATE))
                 fputs(" fwupdate", ffile);
-            if(kb->vendor == V_CORSAIR && kb->product == P_STRAFE_NRGB)
-                fputs(" monochrome", ffile);
             fputc('\n', ffile);
             fclose(ffile);
             chmod(fpath, S_GID_READ);

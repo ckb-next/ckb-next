@@ -1,7 +1,7 @@
-ckb: Corsair Input Driver for Linux and OS X
-============================================
+ckb: RGB keyboards and mice on Linux and OS X
+=============================================
 
-**ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+**ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
 **Disclaimer:** ckb is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
@@ -16,7 +16,7 @@ Contents
 
 * [Device Support](#device-support)
 * [Linux Installation](#linux-installation)
-* [OS X Installation](#osx-installation)
+* [OS X Installation](#os-x-installation)
 * [Usage](#usage)
 * [Troubleshooting](#troubleshooting)
 * [Known Issues](#known-issues)
@@ -30,26 +30,31 @@ See also:
 Device Support
 --------------
 
-ckb currently supports the following Corsair devices:
+Keyboards:
 
-* K65 RGB keyboard
-* K70 keyboard
-* K70 RGB keyboard
-* K95* keyboard
-* K95 RGB keyboard
-* M65 RGB mouse
-* Strafe RGB keyboard
+* K65 RGB
+* K70
+* K70 RGB
+* K95*
+* K95 RGB
+* Strafe
+* Strafe RGB
 
-\* = hardware playback not yet supported. Settings will be saved to software only.
+\* = hardware playback not supported. Settings will be saved to software only.
+
+Mice:
+
+* M65 RGB
+* Scimitar RGB
 
 Linux Installation
 ------------------
 
 Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libudev-dev`, `build-essential`, `zlib1g-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). Check with your package manager to make sure you have the correct libraries/headers installed.
 
-You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build the application, and if all goes well, will ask if you'd like to install/run ckb on your system (press enter to proceed; default answer is "yes"). If the build doesn't succeed, or if you'd like to build ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
+You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
 
-Running the daemon requires the uinput flag to be enabled in your kernel. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you do not know what that means you can most likely ignore this.
+Note: If you build your own kernels, ckb requires the uinput flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
 #### Reinstalling:
 
@@ -68,7 +73,7 @@ sudo rm -f /usr/lib/systemd/system/ckb-daemon.service
 sudo service ckb-daemon stop
 sudo rm -f /etc/init/ckb-daemon.conf
 ```
-* If you're not sure, re-run the quickinstall script and it will tell you when it installs itself as a service. The script will say `System service: Upstart detected` or `System service: systemd detected`
+* If you're not sure, re-run the `quickinstall` script and proceed to the service installation. The script will say `System service: Upstart detected` or `System service: systemd detected`
 
 Afterward, remove the applications and related files:
 ```
@@ -89,7 +94,7 @@ Click on `ckb.pkg` under the Downloads section. This is an automated installer w
 
 Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
-The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason or if you'd like to compile manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md).
+The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason, or if you'd like to compile manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md).
 
 #### Reinstalling (binary):
 
@@ -117,26 +122,23 @@ The user interface is still a work in progress.
 - Multiple profiles/modes with hardware save function
 - Adjustable mouse DPI with ability to change DPI on button press
 
+Closing ckb will actually minimize it to the system tray. Use the Quit option from the tray icon or the settings screen to exit the application.
+
 **Roadmap** (roughly in order)
 - **v0.3 release:**
-- Additional lighting options
-- More functions for the Win Lock key
-- Key combos
-- Key macros, other advanced keypress features like running a custom command
-- (Daemon) Macros with timing info, delays, repeats
-- (Daemon) Notification macros
-- **v0.4 release:**
 - Ability to store profiles separately from devices, import/export them
-- Ability to tie profiles to which application has focus
-- Timers
-- **v0.5 release:**
+- More functions for the Win Lock key
+- Key macros
+- **v0.4 release:**
 - Ability to import CUE profiles
+- Ability to tie profiles to which application has focus
+- **v0.5 release:**
+- Key combos
+- Timers?
 - **v1.0 release:**
 - OSD? (Not sure if this can actually be done)
 - Extra settings?
 - ????
-
-Closing ckb will actually minimize it to the system tray. Use the Quit option from the tray icon or the settings screen to exit the application.
 
 Troubleshooting
 ---------------
@@ -145,19 +147,21 @@ Troubleshooting
 
 If you have problems connecting the keyboard to your system (keyboard doesn't respond, ckb-daemon doesn't recognize it or can't connect the keyboard), try adding the following to your kernel's `cmdline`:
 
-* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x400`
-* K70: `usbhid.quirks=0x1B1C:0x1B09:0x400`
-* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400`
+* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x408`
+* K70: `usbhid.quirks=0x1B1C:0x1B09:0x408`
+* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x408`
 * K95: `usbhid.quirks=0x1B1C:0x1B08:0x408`
 * K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x408`
-* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x400`
+* Strafe: `usbhid.quirks=0x1B1C:0x1B15:0x408`
 * Strafe RGB: `usbhid.quirks=0x1B1C:0x1B20:0x408`
+* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x408`
+* Scimitar RGB: `usbhid.quirks=0x1B1C:0x1B1E:0x408`
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
 If you have multiple devices, combine them with commas. For instance, for K70 RGB + M65 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400,0x1B1C:0x1B12:0x400`
 
-If the keyboard still doesn't work, try replacing `0x400` and `0x408` with `0x4`. Note that this will cause the kernel driver to ignore the keyboard completely, so you need to ensure ckb-daemon is running at boot or else you'll have no keyboard input.
+If the keyboard still doesn't work, try replacing `0x408` with `0x4`. Note that this will cause the kernel driver to ignore the keyboard completely, so you need to ensure ckb-daemon is running at boot or else you'll have no keyboard input.
 
 If you're using **Unity** and the tray icon doesn't appear correctly, install the following package: `libappindicator-dev`. Then reinstall ckb.
 
@@ -168,6 +172,8 @@ If you're using **Unity** and the tray icon doesn't appear correctly, install th
 - **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly.**
 - ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
 - **Compile problems** can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
+- **Keyboard doesn't work at boot, even when ckb is not installed.**
+- Unfortunately there is no known fix for this. You will need to unplug and replug the keyboard or try a different port/USB hub.
 
 #### General
 

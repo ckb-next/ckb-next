@@ -17,10 +17,10 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
-        res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
+        res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, (void*)out_msg };
-        res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+        res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     }
     if(res <= 0){
         ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
@@ -49,10 +49,10 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = in_msg;
-        res = ioctl(kb->handle, USBDEVFS_BULK, &transfer);
+        res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {*/
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, in_msg };
-        res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+        res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     //}
     if(res <= 0){
         ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
@@ -69,7 +69,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
     if(kb->product != P_K95_NRGB)
         return 0;
     struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 5000, 0 };
-    int res = ioctl(kb->handle, USBDEVFS_CONTROL, &transfer);
+    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     if(res < 0){
         ckb_err_fn("%s\n", file, line, strerror(-res));
         return 1;
@@ -79,7 +79,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 
 void* os_inputmain(void* context){
     usbdevice* kb = context;
-    int fd = kb->handle;
+    int fd = kb->handle - 1;
     short vendor = kb->vendor, product = kb->product;
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Starting input thread for %s%d\n", devpath, index);
@@ -171,22 +171,23 @@ void* os_inputmain(void* context){
 }
 
 int usbunclaim(usbdevice* kb, int resetting, int rgb){
+    int handle = kb->handle - 1;
     int count = (rgb) ? 4 : 3;
     for(int i = 0; i < count; i++)
-        ioctl(kb->handle, USBDEVFS_RELEASEINTERFACE, &i);
+        ioctl(handle, USBDEVFS_RELEASEINTERFACE, &i);
     // For RGB keyboards, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
     // Reconnecting any of the others causes trouble.
     if(!resetting){
         struct usbdevfs_ioctl ctl = { 0, USBDEVFS_CONNECT, 0 };
-        ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+        ioctl(handle, USBDEVFS_IOCTL, &ctl);
         ctl.ifno = 1;
-        ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+        ioctl(handle, USBDEVFS_IOCTL, &ctl);
         // Reconnect all handles for non-RGB keyboards
         if(!HAS_FEATURES(kb, FEAT_RGB)){
             ctl.ifno = 0;
-            ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+            ioctl(handle, USBDEVFS_IOCTL, &ctl);
             ctl.ifno = 2;
-            ioctl(kb->handle, USBDEVFS_IOCTL, &ctl);
+            ioctl(handle, USBDEVFS_IOCTL, &ctl);
         }
     }
     return 0;
@@ -194,7 +195,7 @@ int usbunclaim(usbdevice* kb, int resetting, int rgb){
 
 void os_closeusb(usbdevice* kb){
     usbunclaim(kb, 0, HAS_FEATURES(kb, FEAT_RGB));
-    close(kb->handle);
+    close(kb->handle - 1);
     udev_device_unref(kb->udev);
     kb->handle = 0;
     kb->udev = 0;
@@ -209,8 +210,8 @@ int usbclaim(usbdevice* kb, int rgb){
     int count = (rgb) ? 4 : 3;
     for(int i = 0; i < count; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        if((ioctl(kb->handle, USBDEVFS_IOCTL, &ctl) && errno != ENODATA)
-                || ioctl(kb->handle, USBDEVFS_CLAIMINTERFACE, &i))
+        if((ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl) && errno != ENODATA)
+                || ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
             return -1;
     }
     return 0;
@@ -218,7 +219,7 @@ int usbclaim(usbdevice* kb, int rgb){
 
 #define TEST_RESET(op)                                                      \
     if(op){                                                                 \
-        ckb_err_fn("usbunclaim failed: %s\n", file, line, strerror(errno)); \
+        ckb_err_fn("resetusb failed: %s\n", file, line, strerror(errno));   \
         if(errno == EINTR || errno == EAGAIN)                               \
             return -1;              /* try again if status code says so */  \
         return -2;                  /* else, remove device */               \
@@ -226,7 +227,7 @@ int usbclaim(usbdevice* kb, int rgb){
 
 int os_resetusb(usbdevice* kb, const char* file, int line){
     TEST_RESET(usbunclaim(kb, 1, HAS_FEATURES(kb, FEAT_RGB)));
-    TEST_RESET(ioctl(kb->handle, USBDEVFS_RESET));
+    TEST_RESET(ioctl(kb->handle - 1, USBDEVFS_RESET));
     TEST_RESET(usbclaim(kb, HAS_FEATURES(kb, FEAT_RGB)));
     // Success!
     return 0;
@@ -267,8 +268,8 @@ int os_setupusb(usbdevice* kb){
         sscanf(firmware, "%hx", &kb->fwversion);
     else
         kb->fwversion = 0;
-    ckb_info("8 %s \n", kb->name);
-    ckb_info("Connecting %s (S/N: %s)\n", kb->name, kb->serial);
+    int index = INDEX_OF(kb, keyboard);
+    ckb_info("Connecting %s at %s%d\n", kb->name, devpath, index);
 
     // Claim the USB interfaces
     if(usbclaim(kb, HAS_FEATURES(kb, FEAT_RGB))){
@@ -298,7 +299,7 @@ int usbadd(struct udev_device* dev, short vendor, short product){
         }
         if(!IS_CONNECTED(kb)){
             // Open the sysfs device
-            kb->handle = open(path, O_RDWR);
+            kb->handle = open(path, O_RDWR) + 1;
             if(kb->handle <= 0){
                 ckb_err("Failed to open USB device: %s\n", strerror(errno));
                 kb->handle = 0;

@@ -29,6 +29,7 @@ void quit(){
         }
         pthread_mutex_unlock(devmutex + i);
     }
+    ckb_info("Closing root controller\n");
     rmdevpath(keyboard);
     usbkill();
 }

@@ -245,7 +245,7 @@ usbdevice* usbadd(hid_dev_t handle, io_object_t** rm_notify){
                 // Read the serial number and name
                 usbgetstr(handle, CFSTR(kIOHIDSerialNumberKey), keyboard[i].serial, SERIAL_LEN);
                 usbgetstr(handle, CFSTR(kIOHIDProductKey), keyboard[i].name, KB_NAME_LEN);
-                ckb_info("Connecting %s (S/N: %s)\n", keyboard[i].name, keyboard[i].serial);
+                ckb_info("Connecting %s at %s%d\n", keyboard[i].name, devpath, i);
                 // Device mutex remains locked
                 break;
             }

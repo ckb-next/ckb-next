@@ -115,7 +115,7 @@ static void inputupdate_keys(usbdevice* kb){
 
 void inputupdate(usbdevice* kb){
 #ifdef OS_LINUX
-    if(!kb->uinput
+    if((!kb->uinput_kb || !kb->uinput_mouse)
 #else
     if(!kb->event
 #endif

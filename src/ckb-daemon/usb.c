@@ -120,7 +120,7 @@ static void* _setupusb(void* context){
 
     // Finished. Enter main loop
     int index = INDEX_OF(kb, keyboard);
-    ckb_info("%s ready at %s%d\n", kb->name, devpath, index);
+    ckb_info("Setup finished for %s%d\n", devpath, index);
     updateconnected();
     pthread_mutex_unlock(dmutex(kb));
     return devmain(kb);
@@ -136,7 +136,7 @@ static void* _setupusb(void* context){
 void setupusb(usbdevice* kb){
     pthread_mutex_lock(imutex(kb));
     if(pthread_create(&kb->thread, 0, _setupusb, kb))
-        ckb_err("Failed to create USB thread");
+        ckb_err("Failed to create USB thread\n");
 }
 
 int revertusb(usbdevice* kb){
@@ -244,7 +244,8 @@ int closeusb(usbdevice* kb){
     // Close file handles
     pthread_mutex_lock(imutex(kb));
     if(kb->handle){
-        ckb_info("Disconnecting %s (S/N: %s)\n", kb->name, kb->serial);
+        int index = INDEX_OF(kb, keyboard);
+        ckb_info("Disconnecting %s%d\n", devpath, index);
         os_inputclose(kb);
         updateconnected();
         // Close USB device

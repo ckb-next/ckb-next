@@ -172,10 +172,12 @@ typedef struct {
     // Function table (see command.h)
     const union devcmd* vtable;
     // I/O devices
+    // Note that FDs have 1 added to them, because these are initialized to zero when the program starts but zero is technically a valid FD
+    // So the actual value is (fd - 1)
 #ifdef OS_LINUX
     struct udev_device* udev;
     int handle;
-    int uinput;
+    int uinput_kb, uinput_mouse;
 #else
     struct timespec keyrepeat;
     long location_id;

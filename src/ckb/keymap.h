@@ -74,7 +74,8 @@ public:
         DE,                 // German
         IT,                 // Italian
         PL,                 // Polish (identical to US)
-        ES,                 // Spanish
+        MX,                 // Spanish (Mexico/Latin America)
+        ES,                 // Spanish (Spain)
         SE,                 // Swedish
         _LAYOUT_MAX
     };

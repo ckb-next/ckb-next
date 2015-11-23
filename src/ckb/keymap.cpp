@@ -59,6 +59,13 @@ static const KeyPatch patchIT[] = {
     {0, "<", "bslash_iso"}, {0, "-", "slash"},
 };
 
+static const KeyPatch patchMX[] = {
+    {0, "|", "grave"}, {0, "'", "minus"}, {0, "¿", "equal"},
+    {0, "´", "lbrace"}, {0, "+", "rbrace"},
+    {0, "Ñ", "colon"}, {0, "{", "quote"}, {0, "}", "hash"},
+    {0, "<", "bslash_iso"}, {0, "-", "slash"},
+};
+
 static const KeyPatch patchES[] = {
     {"oa", "º", "grave"}, {"quote", "'", "minus"}, {"lexclam", "¡", "equal"},
     {"grave", "`", "lbrace"}, {"plus", "+", "rbrace"},
@@ -220,6 +227,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         case KeyMap::IT:
             patch(map, patchIT);
             break;
+        case KeyMap::MX:
+            patch(map, patchMX);
+            break;
         case KeyMap::ES:
             patch(map, patchES);
             break;
@@ -348,8 +358,12 @@ KeyMap::Layout KeyMap::locale(){
         return KeyMap::IT;
     else if(loc.startsWith("pl-"))
         return KeyMap::PL;
-    else if(loc.startsWith("es-"))
+    else if(loc.startsWith("es-es"))
+        // Spain uses the ES layout
         return KeyMap::ES;
+    else if(loc.startsWith("es-"))
+        // Other Spanish locales use MX
+        return KeyMap::MX;
     else if(loc.startsWith("se-"))
         return KeyMap::SE;
     else if(loc.startsWith("en-us") || loc.startsWith("en-au") || loc.startsWith("en-ca") || loc.startsWith("en-hk") || loc.startsWith("en-in") || loc.startsWith("en-nz") || loc.startsWith("en-ph") || loc.startsWith("en-sg") || loc.startsWith("en-za"))
@@ -380,6 +394,8 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
         return IT;
     if(lower == "pl")
         return PL;
+    if(lower == "mx")
+        return MX;
     if(lower == "es")
         return ES;
     if(lower == "se")
@@ -411,6 +427,8 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "it";
     case PL:
         return "pl";
+    case MX:
+        return "mx";
     case ES:
         return "es";
     case SE:
@@ -429,7 +447,8 @@ QStringList KeyMap::layoutNames(){
             << "German"
             << "Italian"
             << "Polish"
-            << "Spanish"
+            << "Spanish (Latin America)"
+            << "Spanish (Spain)"
             << "Swedish";
 }
 

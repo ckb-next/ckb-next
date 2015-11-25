@@ -123,15 +123,15 @@ extern void wheel_accel(io_connect_t event, int* deltaAxis1, SInt32* fixedDeltaA
 extern void mouse_accel(io_connect_t event, int* x, int* y);
 
 // Mouse wheel
-static void postevent_wheel(io_connect_t event, int use_accel, int value){
+static void postevent_wheel(io_connect_t event, int scroll_rate, int value){
     NXEventData mm;
     memset(&mm, 0, sizeof(mm));
-    if(use_accel){
+    if(scroll_rate == SCROLL_ACCELERATED){
         wheel_accel(event, &value, &mm.scrollWheel.fixedDeltaAxis1, &mm.scrollWheel.pointDeltaAxis1);
         mm.scrollWheel.deltaAxis1 = value;
     } else {
-        // If acceleration is disabled, use a fixed delta of 3
-        mm.scrollWheel.deltaAxis1 = value * 3;
+        // If acceleration is disabled, use a fixed delta
+        mm.scrollWheel.deltaAxis1 = value * scroll_rate;
     }
     postevent(event, NX_SCROLLWHEELMOVED, &mm, 0, 0, 0);
 }
@@ -245,11 +245,11 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     if(scancode & SCAN_MOUSE){
         if(scancode == BTN_WHEELUP){
             if(down)
-                postevent_wheel(kb->event, !!(kb->features & FEAT_MOUSEACCEL), 1);
+                postevent_wheel(kb->event, kb->scroll_rate, 1);
             return;
         } else if(scancode == BTN_WHEELDOWN){
             if(down)
-                postevent_wheel(kb->event, !!(kb->features & FEAT_MOUSEACCEL), -1);
+                postevent_wheel(kb->event, kb->scroll_rate, -1);
             return;
         }
         int button = scancode & ~SCAN_MOUSE;
@@ -352,7 +352,7 @@ void keyretrigger(usbdevice* kb){
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
-    postevent_mm(kb->event, x, y, !!(kb->features & FEAT_MOUSEACCEL), kb->mousestate);
+    postevent_mm(kb->event, x, y, HAS_FEATURES(kb, FEAT_MOUSEACCEL), kb->mousestate);
 }
 
 void os_isync(usbdevice* kb){

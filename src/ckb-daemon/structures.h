@@ -159,6 +159,11 @@ typedef struct {
 // Bricked firmware?
 #define NEEDS_FW_UPDATE(kb) ((kb)->fwversion == 0 && HAS_FEATURES((kb), FEAT_FWUPDATE | FEAT_FWVERSION))
 
+// Lines per scroll (OSX only)
+#define SCROLL_ACCELERATED  0
+#define SCROLL_MIN          1
+#define SCROLL_MAX          10
+
 // vtables for keyboards/mice (see command.h)
 extern const union devcmd vtable_keyboard;
 extern const union devcmd vtable_keyboard_nonrgb;
@@ -189,6 +194,7 @@ typedef struct {
     IOOptionBits modifiers;
     short lastkeypress;
     uchar mousestate;
+    char scroll_rate;
 #endif
     // Thread used for USB/devnode communication. To close: lock mutexes, set handle to zero, unlock, then wait for thread to stop
     pthread_t thread;

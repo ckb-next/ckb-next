@@ -12,6 +12,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
     "switch",
     "layout",
     "accel",
+    "scrollspeed",
     "notifyon",
     "notifyoff",
     "fps",
@@ -88,7 +89,7 @@ int readcmd(usbdevice* kb, const char* line){
                 command = i + CMD_FIRST;
 #ifndef OS_MAC
                 // Layout and mouse acceleration aren't used on Linux; ignore
-                if(command == LAYOUT || command == ACCEL)
+                if(command == LAYOUT || command == ACCEL || command == SCROLLSPEED)
                     command = NONE;
 #endif
                 // Most commands require parameters, but a few are actions in and of themselves
@@ -144,6 +145,7 @@ int readcmd(usbdevice* kb, const char* line){
             else if(!strcmp(word, "iso"))
                 kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ISO;
             continue;
+#ifdef OS_MAC
         case ACCEL:
             // OSX mouse acceleration on/off
             if(!strcmp(word, "on"))
@@ -151,6 +153,18 @@ int readcmd(usbdevice* kb, const char* line){
             else if(!strcmp(word, "off"))
                 kb->features &= ~FEAT_MOUSEACCEL;
             continue;
+        case SCROLLSPEED:{
+            int newscroll;
+            if(sscanf(word, "%d", &newscroll) != 1)
+                break;
+            if(newscroll < SCROLL_MIN)
+                newscroll = SCROLL_ACCELERATED;
+            if(newscroll > SCROLL_MAX)
+                newscroll = SCROLL_MAX;
+            kb->scroll_rate = newscroll;
+            continue;
+        }
+#endif
         case MODE: {
             // Select a mode number (1 - 6)
             int newmode;

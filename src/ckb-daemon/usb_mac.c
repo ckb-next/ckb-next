@@ -317,8 +317,9 @@ static int seize_wait(hid_dev_t handle){
     // HACK: We shouldn't seize the HID device until it's successfully added to the service registry.
     // Otherwise, OSX might think there's no keyboard/mouse connected.
     long location = usbgetlong(handle, CFSTR(kIOHIDLocationIDKey));
-    char location_str[18];
-    snprintf(location_str, sizeof(location_str), "@%lx", location);
+    char location_var[18], location_fixed[18];
+    snprintf(location_var, sizeof(location_var), "@%lx", location);
+    snprintf(location_fixed, sizeof(location_fixed), "@%08x", (int)location);
     // Open master port (if not done yet)
     static mach_port_t master = 0;
     kern_return_t res;
@@ -341,7 +342,7 @@ static int seize_wait(hid_dev_t handle){
             IORegistryEntryGetPath(child_service, kIOServicePlane, path);
             IOObjectRelease(child_service);
             // Look for an entry that matches the location of the device and says "HID". If found, we can proceed with adding the device
-            if(strstr(path, location_str) && strstr(path, "HID")){
+            if((strstr(path, location_var) || strstr(path, location_fixed)) && strstr(path, "HID")){
                 IOObjectRelease(child_iter);
                 return 0;
             }

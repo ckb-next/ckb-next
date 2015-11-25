@@ -139,7 +139,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             widget = new QLineEdit(this);
             ((QLineEdit*)widget)->setText(value.toString());
             colSpan = 3;
-            connect(widget, SIGNAL(textEdit(const QString&)), &updateMapper, SLOT(map()));
+            connect(widget, SIGNAL(textEdited(const QString&)), &updateMapper, SLOT(map()));
             break;
         case AnimScript::Param::LABEL:
             widget = new QLabel(this);

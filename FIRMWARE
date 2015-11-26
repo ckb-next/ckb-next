@@ -8,24 +8,24 @@ Hash: SHA256
 
 !BEGIN FW ENTRIES
 
-# Vendor  Model       FW   URL                                                 Min.ckb File Name             SHA256
-  Corsair K70RGB      1.30 http://www3.corsair.com/software/HID/K70RGB.zip     0.2.0   K70RGB_app130.bin     e4ec7852d0457e3eeea794f2a278228c3eb3e26de03973960afa453698968cf5
-  Corsair K95RGB      1.30 http://www3.corsair.com/software/HID/K95RGB.zip     0.2.0   K95RGB_app130.bin     192d3ca125cb560dce2a764b9e29491875d5073c34b0845de48e805a27de3699
-  Corsair STRAFE      1.30 http://www3.corsair.com/software/HID/STRAFE.zip     0.2.2   STRAFE_app130.bin     8aa1ef7959ea4d885a4da6348460847b160d207782f6fca0550de39c9bb56b03
-  Corsair STRAFERGB   1.31 http://www3.corsair.com/software/HID/STRAFE_RGB.zip 0.2.2   STRAFE_RGB_app131.bin cd17477fc50739bf23dfc670eba3febd4df0ff9694806ba1f38aee3696a88f6a
-  Corsair M65RGB      1.19 http://www3.corsair.com/software/HID/M65RGB.zip     0.2.0   M65RGB_app119.bin     be214ab1f0cc1fc7f785c926c117ef270597f80d1fad9133a730022834267f4f
-  Corsair SCIMITARRGB 1.03 http://www3.corsair.com/software/HID/Scimitar.zip   0.2.2   Scimitar_App103.bin   f10ab86b80ca342b60e60c0f8f4bfa10b94656a3b1c0b2e70b0ef5a5eefb55a5
+# Vendor  Model       FW   URL                                                 Min.ckb File Name                SHA256
+  Corsair K70RGB      1.33 http://www3.corsair.com/software/HID/K70RGB.zip     0.2.0   K70RGB_app133_RC.bin     a63f3f9d0f6d9ba3fea6b2e312e3c948c07c4bbcdf84f9720d4e25cde74fd633
+  Corsair K95RGB      1.33 http://www3.corsair.com/software/HID/K95RGB.zip     0.2.0   K95RGB_app133_RC.bin     010efb4b0b002d922e0c5e76263f1892eaf0ad7ed1a76008f9b7c1cffdfd712e
+  Corsair STRAFE      1.33 http://www3.corsair.com/software/HID/STRAFE.zip     0.2.2   STRAFE_app133_RC.bin     a6ea43354810afab6eea1ef41537178c545acbedbd4ebe48dd9d18c61b45c9c1
+  Corsair STRAFERGB   1.33 http://www3.corsair.com/software/HID/STRAFE_RGB.zip 0.2.2   STRAFE_RGB_app133_RC.bin 8526070e4f118137c0bea30805dbdbce5b26beecc3237d65f7d3c10ad7494f1d
+  Corsair M65RGB      1.19 http://www3.corsair.com/software/HID/M65RGB.zip     0.2.0   M65RGB_app119.bin        be214ab1f0cc1fc7f785c926c117ef270597f80d1fad9133a730022834267f4f
+  Corsair SCIMITARRGB 1.06 http://www3.corsair.com/software/HID/Scimitar.zip   0.2.2   Scimitar_V106.bin        fdc9bc14f6320ff7be47303cae543f1fbe406acb6590333084817da54cf3eb60
 
 !END FW ENTRIES
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJWQrxxAAoJEBXtkzSNyNMJ4SAIAKllewj0aKhbpJPcLqgaHFIT
-p/FjCA0VFcTi8YJ/GDWlG6tVcgm4s7kFyJXK2yoYhQeGtfDPzZsiJ+T21B7Lp0HN
-1BzG8PUW4livQa1pFp0uHPETWvXFRMrB2flGdupBsUGjHwIiq1eDDoY2Ba6ZES1l
-Soh41m4wkwr8XEkgjtBdK/ZhhFivg7cNT+wA0//aQaAfY7WG3vKMo+eqElnRbAl1
-8v6Nq4Ui4lVXrnFJbrnNQ44FcgEZAVfF7LEp6aiVBQMQJs5LNrZ0kEAmuGzcemJc
-lBWCo+Rvg7dRtyaRmqEqZ/cbqSyNJEBudgSxobBL5o3bKmW+zTvD5QTu9eyPgZg=
-=7lW9
+iQEcBAEBCAAGBQJWVtkQAAoJEBXtkzSNyNMJHNEIAJieZ1pwU2WJu6GD14lwZEXI
+/carx6KogdtGbFvs5aE0BnYwq6iL/Q7GvY7KpVmYorJHl9PnwcDPoLe4H3IVYTbi
+nd0dLaBSGsGFhyR2Uz4aGknEhCQH9qybqrRk6znC0nvksiH/OcvFysqG/sPr9AWN
+679064VyXwMLUlqCRJtmfIMsb+BH6O/VNsvliIfC0VKsiIyuqaQqZptgpll9lkHL
+LDBLD514Vkg8z6c/dvUOL8Ey3v4qSGvvfBS36y/qh49Q5EvI7v0xVvNOxudLZ+7k
+or1PTCFFi03qzeI77XsF7mAyKmh1S2BjkEfAmxPfpl4s/WtkO1opPAtQdprxeDw=
+=D4qQ
 -----END PGP SIGNATURE-----

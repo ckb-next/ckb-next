@@ -34,9 +34,11 @@
 #define P_M65_STR       "1b12"
 #define IS_M65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65))
 
-#define P_SABRE         0x1b19
-#define P_SABRE_STR     "1b19"
-#define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE))
+#define P_SABRE_O       0x1b14
+#define P_SABRE_O_STR   "1b14"
+#define P_SABRE_L       0x1b19
+#define P_SABRE_L_STR   "1b19"
+#define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L))
 
 #define P_SCIMITAR      0x1b1e
 #define P_SCIMITAR_STR  "1b1e"
@@ -57,7 +59,7 @@ const char* product_str(short product);
 #define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
 
 // Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_SABRE) || (product) == (P_SCIMITAR)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SCIMITAR)))
 
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)

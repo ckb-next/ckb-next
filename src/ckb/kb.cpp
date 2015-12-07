@@ -10,9 +10,9 @@ static QSet<Kb*> activeDevices;
 static QSet<QString> notifyPaths;
 static QMutex notifyPathMutex;
 
-int Kb::_frameRate = 30;
+int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
 KeyMap::Layout Kb::_layout = KeyMap::NO_LAYOUT;
-bool Kb::_dither = false;
+bool Kb::_dither = false, Kb::_mouseAccel = true;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"),
@@ -95,6 +95,9 @@ Kb::Kb(QObject *parent, const QString& path) :
     // Write ANSI/ISO flag to daemon (OSX only)
     cmd.write("layout ");
     cmd.write(KeyMap::isISO(_layout) ? "iso" : "ansi");
+    // Also OSX only: scroll speed and mouse acceleration
+    cmd.write(QString("accel %1\n").arg(QString(_mouseAccel ? "on" : "off")).toLatin1());
+    cmd.write(QString("scrollspeed %1\n").arg(_scrollSpeed).toLatin1());
 #endif
     cmd.write(QString("\nactive\n@%1 get :hwprofileid").arg(notifyNumber).toLatin1());
     hwLoading[0] = true;
@@ -181,6 +184,32 @@ void Kb::dither(bool newDither){
         kb->cmd.write(QString("dither %1\n").arg(static_cast<int>(newDither)).toLatin1());
         kb->cmd.flush();
     }
+}
+
+void Kb::mouseAccel(bool newAccel){
+    if(newAccel == _mouseAccel)
+        return;
+    _mouseAccel = newAccel;
+#ifdef Q_OS_MACX
+    // Update all devices
+    foreach(Kb* kb, activeDevices){
+        kb->cmd.write(QString("accel %1\n").arg(QString(newAccel ? "on" : "off")).toLatin1());
+        kb->cmd.flush();
+    }
+#endif
+}
+
+void Kb::scrollSpeed(int newSpeed){
+    if(newSpeed == _scrollSpeed)
+        return;
+    _scrollSpeed = newSpeed;
+#ifdef Q_OS_MACX
+    // Update all devices
+    foreach(Kb* kb, activeDevices){
+        kb->cmd.write(QString("scrollspeed %1\n").arg(newSpeed).toLatin1());
+        kb->cmd.flush();
+    }
+#endif
 }
 
 void Kb::load(CkbSettings& settings){

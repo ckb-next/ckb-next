@@ -64,7 +64,7 @@
      </item>
     </layout>
    </item>
-   <item row="24" column="0" colspan="2">
+   <item row="21" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QLabel" name="label_3">
@@ -98,7 +98,7 @@
      </item>
     </layout>
    </item>
-   <item row="21" column="0" colspan="2">
+   <item row="18" column="0" colspan="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -111,7 +111,7 @@
      </property>
     </spacer>
    </item>
-   <item row="19" column="0">
+   <item row="16" column="0">
     <spacer name="verticalSpacer_8">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -127,7 +127,7 @@
      </property>
     </spacer>
    </item>
-   <item row="23" column="0" colspan="2">
+   <item row="20" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>&lt;a href=&quot;https://github.com/ccMSC/ckb&quot;&gt;https://github.com/ccMSC/ckb&lt;/a&gt;</string>
@@ -137,7 +137,7 @@
      </property>
     </widget>
    </item>
-   <item row="19" column="1">
+   <item row="16" column="1">
     <widget class="QCheckBox" name="loginItemBox">
      <property name="toolTip">
       <string>ckb will be started when you log in to your computer.</string>
@@ -147,170 +147,7 @@
      </property>
     </widget>
    </item>
-   <item row="18" column="1">
-    <widget class="QCheckBox" name="trayBox">
-     <property name="toolTip">
-      <string>Displays a ckb icon in the system tray. Note: you can still minimize ckb to the background even with this turned off.</string>
-     </property>
-     <property name="text">
-      <string>Show tray icon</string>
-     </property>
-    </widget>
-   </item>
-   <item row="14" column="1">
-    <layout class="QGridLayout" name="gridLayout_2">
-     <item row="1" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <item>
-        <widget class="QLabel" name="animPathLabel">
-         <property name="text">
-          <string>/</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="animCountLabel">
-         <property name="text">
-          <string>No animations found</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="animScanButton">
-         <property name="text">
-          <string>Re-scan</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="1" rowspan="2">
-      <spacer name="horizontalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>1</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="0" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QSpinBox" name="fpsBox">
-         <property name="minimum">
-          <number>5</number>
-         </property>
-         <property name="maximum">
-          <number>60</number>
-         </property>
-         <property name="value">
-          <number>30</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>1</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="fpsWarnLabel">
-         <property name="text">
-          <string>Warning: High frame rates may cause USB stability issues</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Frame rate (FPS):</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Animation scripts:</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="17" column="0">
+   <item row="15" column="0">
     <spacer name="verticalSpacer_6">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -326,7 +163,7 @@
      </property>
     </spacer>
    </item>
-   <item row="17" column="1">
+   <item row="15" column="1">
     <widget class="QCheckBox" name="autoFWBox">
      <property name="toolTip">
       <string>You will be notified when new firmware versions are available. You'll have the option to install them immediately or wait until later.</string>
@@ -346,22 +183,6 @@
      </property>
     </widget>
    </item>
-   <item row="15" column="0">
-    <spacer name="verticalSpacer_9">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>28</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="8" column="1">
     <widget class="QLabel" name="label_8">
      <property name="font">
@@ -373,22 +194,6 @@
       <string>These will override the keyboard profile. See &quot;Binding&quot; tab for more settings.</string>
      </property>
     </widget>
-   </item>
-   <item row="18" column="0">
-    <spacer name="verticalSpacer_7">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>28</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item row="10" column="1">
     <layout class="QGridLayout" name="gridLayout_3">
@@ -543,7 +348,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Settings</string>
+      <string>Application</string>
      </property>
     </widget>
    </item>
@@ -615,16 +420,6 @@
      </property>
     </spacer>
    </item>
-   <item row="15" column="1">
-    <widget class="QCheckBox" name="brightnessBox">
-     <property name="toolTip">
-      <string>If enabled, the keyboard brightness will be independent for each lighting mode. If disabled (default), the brightness will be the same for all modes.</string>
-     </property>
-     <property name="text">
-      <string>Set brightness per-mode</string>
-     </property>
-    </widget>
-   </item>
    <item row="6" column="0" colspan="2">
     <widget class="QLabel" name="label">
      <property name="font">
@@ -667,15 +462,32 @@
      </property>
     </widget>
    </item>
-   <item row="16" column="1">
-    <widget class="QCheckBox" name="ditherBox">
-     <property name="text">
-      <string>Use spatial dithering to simulate extra color resolution</string>
-     </property>
-    </widget>
+   <item row="17" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="extraButton">
+       <property name="text">
+        <string>More settings</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
-   <item row="16" column="0">
-    <spacer name="verticalSpacer_11">
+   <item row="17" column="0">
+    <spacer name="verticalSpacer_7">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>

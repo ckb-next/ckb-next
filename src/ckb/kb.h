@@ -43,6 +43,12 @@ public:
     // Whether dithering is used (all devices)
     static inline bool              dither()                            { return _dither; }
     static void                     dither(bool newDither);
+    // OSX: mouse acceleration toggle (all devices)
+    static inline bool              mouseAccel()                        { return _mouseAccel; }
+    static void                     mouseAccel(bool newAccel);
+    // OSX: scroll speed (-1 = use acceleration)
+    static inline int               scrollSpeed()                       { return _scrollSpeed; }
+    static void                     scrollSpeed(int newSpeed);
 
     // Profile saved to hardware
     inline KbProfile*   hwProfile() { return _hwProfile; }
@@ -114,10 +120,10 @@ private slots:
     void deletePrevious();
 
 private:
-    static int _frameRate;
+    static int _frameRate, _scrollSpeed;
     static KeyMap::Layout _layout;
     void updateLayout();
-    static bool _dither;
+    static bool _dither, _mouseAccel;
 
     KbProfile*          _currentProfile;
     QList<KbProfile*>   _profiles;

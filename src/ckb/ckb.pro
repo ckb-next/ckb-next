@@ -97,7 +97,8 @@ SOURCES += main.cpp\
     keyaction.cpp \
     mperfwidget.cpp \
     kperfwidget.cpp \
-    layoutdialog.cpp
+    layoutdialog.cpp \
+    extrasettingswidget.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -151,7 +152,8 @@ HEADERS  += mainwindow.h \
     keyaction.h \
     mperfwidget.h \
     kperfwidget.h \
-    layoutdialog.h
+    layoutdialog.h \
+    extrasettingswidget.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \
@@ -168,7 +170,8 @@ FORMS    += mainwindow.ui \
     fwupgradedialog.ui \
     mperfwidget.ui \
     kperfwidget.ui \
-    layoutdialog.ui
+    layoutdialog.ui \
+    extrasettingswidget.ui
 
 RESOURCES += \
     image.qrc \

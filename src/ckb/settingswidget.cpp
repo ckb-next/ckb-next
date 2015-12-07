@@ -1,21 +1,16 @@
-#include <unistd.h>
+#include <QTimer>
 #include "animscript.h"
 #include "autorun.h"
 #include "ckbsettings.h"
-#include "kblight.h"
-#include "mainwindow.h"
+#include "kb.h"
 #include "layoutdialog.h"
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
 
 extern QString devpath;
-extern QTimer* eventTimer;
 
 // Modifier keys (OS-dependent)
 static QStringList modKeys, modNames;
-
-// KbLight
-static int lastSharedDimming = -2;
 
 SettingsWidget::SettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -29,10 +24,12 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     KeyMap::Layout layout = KeyMap::getLayout(settings.value("KbdLayout").toString());
     if(layout == KeyMap::NO_LAYOUT){
         // If the layout hasn't been set yet, show a dialog to let the user choose it
-        Kb::layout(KeyMap::locale());
-        QTimer::singleShot(1000, this, SIGNAL(showLayoutDialog));   // Run the function after a delay as the dialog may not appear correctly othewise
-    } else
-        ui->layoutBox->setCurrentIndex((int)layout);
+        layout = KeyMap::locale();
+        QTimer::singleShot(1000, this, SLOT(showLayoutDialog()));   // Run the function after a delay as the dialog may not appear correctly othewise
+        settings.setValue("KbdLayout", KeyMap::getLayout(layout));
+    }
+    Kb::layout(layout);
+    ui->layoutBox->setCurrentIndex((int)layout);
 
     // Load modifier remap
     KbBind::loadGlobalRemap();
@@ -77,33 +74,8 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     }
 #endif
 
-    // Read frame rate from settings
-    int rate = settings.value("framerate").toInt();
-    if(rate <= 0 || rate > 60)
-        rate = 30;
-    ui->fpsBox->setValue(rate);
-    Kb::frameRate(rate);
-    ui->fpsWarnLabel->setVisible(rate > 30);
-
-    // Read global brightness setting (default = on, 100% brightness)
-    int dimming = settings.value("GlobalBrightness").toInt();
-    if(dimming < -1 || dimming > KbLight::MAX_DIM)
-        dimming = 0;
-    lastSharedDimming = dimming;
-    KbLight::shareDimming(dimming);
-    // Set checkbox value (-1 = don't share)
-    ui->brightnessBox->setChecked(dimming == -1);
-
-    // Read dither
-    bool dither = settings.value("Dither").toBool();
-    Kb::dither(dither);
-    ui->ditherBox->setChecked(dither);
-
     // Read auto update settings
     ui->autoFWBox->setChecked(!settings.value("DisableAutoFWCheck").toBool());
-
-    // Read tray icon setting
-    ui->trayBox->setChecked(!settings.value("SuppressTrayIcon").toBool());
 
     // Read auto run settings
     if(!AutoRun::available())
@@ -115,8 +87,12 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
         ui->loginItemBox->setChecked(AutoRun::isEnabled());
     }
 
-    ui->animPathLabel->setText(AnimScript::path());
-    on_animScanButton_clicked();
+    // Prepare extra settings
+    extra = new ExtraSettingsWidget(this);
+}
+
+SettingsWidget::~SettingsWidget(){
+    delete ui;
 }
 
 void SettingsWidget::showLayoutDialog(){
@@ -124,23 +100,11 @@ void SettingsWidget::showLayoutDialog(){
     dialog.exec();
     // Set selected layout
     ui->layoutBox->setCurrentIndex((int)dialog.selected());
-}
-
-int SettingsWidget::frameRate() const {
-    return ui->fpsBox->value();
+    on_layoutBox_activated((int)dialog.selected());         // Call activated() signal manually to trigger save
 }
 
 void SettingsWidget::pollUpdates(){
-    // Check for changes to shared brightness setting
-    int dimming = KbLight::shareDimming();
-    if(dimming != lastSharedDimming && !CkbSettings::isBusy()){
-        CkbSettings::set("Program/GlobalBrightness", dimming);
-        lastSharedDimming = dimming;
-    }
-}
-
-SettingsWidget::~SettingsWidget(){
-    delete ui;
+    extra->pollUpdates();
 }
 
 void SettingsWidget::setStatus(const QString& text){
@@ -176,32 +140,6 @@ void SettingsWidget::on_pushButton_clicked(){
     qApp->quit();
 }
 
-void SettingsWidget::on_fpsBox_valueChanged(int framerate){
-    if(!eventTimer)
-        return;
-    // Set FPS
-    eventTimer->setInterval(1000 / framerate);
-    CkbSettings settings("Program");
-    settings.setValue("framerate", framerate);
-    Kb::frameRate(framerate);
-    // Show warning label if FPS is above 30
-    if(framerate > 30)
-        ui->fpsWarnLabel->show();
-    else
-        ui->fpsWarnLabel->hide();
-}
-
-void SettingsWidget::on_animScanButton_clicked(){
-    AnimScript::scan();
-    int count = AnimScript::count();
-    if(count == 0)
-        ui->animCountLabel->setText("No animations found");
-    else if(count == 1)
-        ui->animCountLabel->setText("1 animation found");
-    else
-        ui->animCountLabel->setText(QString("%1 animations found").arg(count));
-}
-
 void SettingsWidget::on_capsBox_activated(int index){
     updateModifiers();
 }
@@ -222,18 +160,8 @@ void SettingsWidget::on_winBox_activated(int index){
     updateModifiers();
 }
 
-void SettingsWidget::on_brightnessBox_clicked(bool checked){
-    KbLight::shareDimming(checked ? -1 : 0);
-    pollUpdates();
-}
-
 void SettingsWidget::on_autoFWBox_clicked(bool checked){
     CkbSettings::set("Program/DisableAutoFWCheck", !checked);
-}
-
-void SettingsWidget::on_trayBox_clicked(bool checked){
-    CkbSettings::set("Program/SuppressTrayIcon", !checked);
-    MainWindow::mainWindow->toggleTrayIcon(checked);
 }
 
 void SettingsWidget::on_loginItemBox_clicked(bool checked){
@@ -243,19 +171,12 @@ void SettingsWidget::on_loginItemBox_clicked(bool checked){
         AutoRun::disable();
 }
 
-void SettingsWidget::on_layoutBox_currentIndexChanged(int index){
-    // HACK: The index changes to zero when we first add items to the box, ignore that one
-    static bool first = true;
-    if(first){
-        first = false;
-        return;
-    }
+void SettingsWidget::on_layoutBox_activated(int index){
     KeyMap::Layout layout = (KeyMap::Layout)index;
     CkbSettings::set("Program/KbdLayout", KeyMap::getLayout(layout));
     Kb::layout(layout);
 }
 
-void SettingsWidget::on_ditherBox_clicked(bool checked){
-    CkbSettings::set("Program/Dither", checked);
-    Kb::dither(checked);
+void SettingsWidget::on_extraButton_clicked(){
+    extra->exec();
 }

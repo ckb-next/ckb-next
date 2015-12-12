@@ -27,7 +27,7 @@ void cmd_unbind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const cha
 // Resets a key binding
 void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* ignored);
 // Creates or updates a macro. Pass null strings to clear all macros
-void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assignment);
+void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char* keys, const char* assignment);
 
 #ifdef OS_LINUX
 // Is a key a modifier?

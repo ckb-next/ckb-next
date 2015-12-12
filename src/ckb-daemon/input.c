@@ -313,7 +313,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
         bind->macros = realloc(bind->macros, (bind->macrocap += 16) * sizeof(keymacro));
 }
 
-void cmd_macro(usbdevice* kb, usbmode* mode, const char* keys, const char* assignment){
+void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char* keys, const char* assignment){
     pthread_mutex_lock(imutex(kb));
     _cmd_macro(mode, keys, assignment);
     pthread_mutex_unlock(imutex(kb));

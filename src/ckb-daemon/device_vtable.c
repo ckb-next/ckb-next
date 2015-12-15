@@ -49,6 +49,7 @@ const devcmd vtable_keyboard = {
     .bind = cmd_bind,
     .unbind = cmd_unbind,
     .rebind = cmd_rebind,
+    .macro = cmd_macro,
 
     .dpi = cmd_macro_none,
     .dpisel = cmd_none,

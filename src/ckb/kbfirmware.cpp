@@ -1,5 +1,5 @@
 #include "kbfirmware.h"
-#include "mainwindow.h"     // For PARSE_CKB_VERSION
+#include "kbmanager.h"
 #include "quazip/quazip.h"
 #include "quazip/quazipfile.h"
 #include <QDateTime>
@@ -129,7 +129,7 @@ void KbFirmware::processDownload(QNetworkReply* reply){
         FW fw;
         fw.fwVersion = components[2].toFloat();                             // Firmware blob version
         fw.url = QUrl::fromPercentEncoding(components[3].toLatin1());       // URL to zip file
-        fw.ckbVersion = PARSE_CKB_VERSION(components[4]);                   // Minimum ckb version
+        fw.ckbVersion = KbManager::parseVersionString(components[4]);       // Minimum ckb version
         fw.fileName = QUrl::fromPercentEncoding(components[5].toLatin1());  // Name of file inside zip
         fw.hash = QByteArray::fromHex(components[6].toLatin1());            // SHA256 of file inside zip
         // Update entry
@@ -172,7 +172,7 @@ float KbFirmware::_latestForBoard(const QString& features, bool waitForComplete)
     if(info.hash.isEmpty())
         return 0.f;
     // Don't return the new version if the current ckb doesn't support it
-    if(info.ckbVersion > ckbGuiVersion || info.ckbVersion > ckbDaemonVersion)
+    if(info.ckbVersion > KbManager::ckbGuiVersionF() || info.ckbVersion > KbManager::ckbDaemonVersionF())
         return -1.f;
     return info.fwVersion;
 }

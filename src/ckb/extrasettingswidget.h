@@ -26,7 +26,7 @@ private slots:
 
     void on_mAccelBox_clicked(bool checked);
     void on_sAccelBox_clicked(bool checked);
-    void on_sSpeedBox_activated(int arg1);
+    void on_sSpeedBox_valueChanged(int arg1);
 
 private:
     Ui::ExtraSettingsWidget *ui;

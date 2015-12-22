@@ -2,7 +2,9 @@
 #include <QSet>
 #include <QUrl>
 #include <QMutex>
+#include <QDateTime>
 #include "kb.h"
+#include "kbmanager.h"
 
 // All active devices
 static QSet<Kb*> activeDevices;
@@ -15,14 +17,16 @@ KeyMap::Layout Kb::_layout = KeyMap::NO_LAYOUT;
 bool Kb::_dither = false, Kb::_mouseAccel = true;
 
 Kb::Kb(QObject *parent, const QString& path) :
-    QThread(parent), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"),
-    features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false),
+    QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false),
+    devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
+    lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), _needsSave(false)
 {
     memset(iState, 0, sizeof(iState));
     memset(hwLoading, 0, sizeof(hwLoading));
+
     // Get the features, model, serial number, FW version (if available), and poll rate (if available) from /dev nodes
     QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate");
     if(ftpath.open(QIODevice::ReadOnly)){
@@ -65,6 +69,8 @@ Kb::Kb(QObject *parent, const QString& path) :
         pollrate = pollrate.trimmed();
         ppath.close();
     }
+
+    prefsPath = "Devices/" + usbSerial;
 
     hwModeCount = (_model == KeyMap::K95) ? 3 : 1;
     // Open cmd in non-blocking mode so that it doesn't lock up if nothing is reading
@@ -117,27 +123,25 @@ Kb::Kb(QObject *parent, const QString& path) :
 }
 
 Kb::~Kb(){
+    // Save settings first
+    save();
+    // Kill notification thread and remove node
     activeDevices.remove(this);
     if(!isOpen()){
         terminate();
         wait(1000);
         return;
     }
-    // Kill notification thread and remove node
     if(notifyNumber > 0)
         cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
     terminate();
     wait(1000);
-    // Reset to hardware profile
-    if(_hwProfile){
-        _currentProfile = _hwProfile;
-        hwSave();
-    }
     cmd.close();
 }
 
 void Kb::frameRate(int newFrameRate){
+    KbManager::fps(newFrameRate);
     // If the rate has changed, send to all devices
     if(newFrameRate == _frameRate)
         return;
@@ -212,8 +216,11 @@ void Kb::scrollSpeed(int newSpeed){
 #endif
 }
 
-void Kb::load(CkbSettings& settings){
+void Kb::load(){
+    if(prefsPath.isEmpty())
+        return;
     _needsSave = false;
+    CkbSettings settings(prefsPath);
     // Read profiles
     KbProfile* newCurrentProfile = 0;
     QString current = settings.value("CurrentProfile").toString().trimmed().toUpper();
@@ -241,8 +248,11 @@ void Kb::load(CkbSettings& settings){
     emit profileAdded();
 }
 
-void Kb::save(CkbSettings& settings){
+void Kb::save(){
+    if(prefsPath.isEmpty())
+        return;
     _needsSave = false;
+    CkbSettings settings(prefsPath, true);
     QString guids, currentGuid;
     foreach(KbProfile* profile, _profiles){
         guids.append(" " + profile->id().guidString());
@@ -252,6 +262,14 @@ void Kb::save(CkbSettings& settings){
     }
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
+}
+
+void Kb::autoSave(){
+    quint64 now = QDateTime::currentMSecsSinceEpoch();
+    if(now >= lastAutoSave + 15 * 1000 && !CkbSettings::isBusy()){
+        save();
+        lastAutoSave = now;
+    }
 }
 
 void Kb::hwSave(){

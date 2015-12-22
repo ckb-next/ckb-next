@@ -1,4 +1,5 @@
 #include "ckbsettings.h"
+#include "kbmanager.h"
 #include "kbfirmware.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -11,19 +12,8 @@
 
 extern QSharedMemory appShare;
 
-float ckbGuiVersion = 0.f;
-// Assume daemon has no version limitations if it's not connected
-float ckbDaemonVersion = INFINITY;
-QString daemonVStr;
-
 static const QString configLabel = "Settings";
-#ifndef __APPLE__
-QString devpath = "/dev/input/ckb%1";
-#else
-QString devpath = "/var/run/ckb%1";
-#endif
 
-QTimer* eventTimer = 0;
 MainWindow* MainWindow::mainWindow = 0;
 
 #ifdef USE_LIBAPPINDICATOR
@@ -49,9 +39,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     mainWindow = this;
 
+    // Start device manager
+    KbManager::init(CKB_VERSION_STR);
+    connect(KbManager::kbManager(), SIGNAL(kbConnected(Kb*)), this, SLOT(addDevice(Kb*)));
+    connect(KbManager::kbManager(), SIGNAL(kbDisconnected(Kb*)), this, SLOT(removeDevice(Kb*)));
+    connect(KbManager::kbManager(), SIGNAL(versionUpdated()), this, SLOT(updateVersion()));
+    connect(KbManager::scanTimer(), SIGNAL(timeout()), this, SLOT(timerTick()));
+
+    // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
     closeAction = new QAction(tr("Quit ckb"), this);
-
 #ifdef USE_LIBAPPINDICATOR
     QString desktop = std::getenv("XDG_CURRENT_DESKTOP");
     unityDesktop = (desktop.toLower() == "unity");
@@ -107,16 +104,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
-    eventTimer = new QTimer(this);
-    eventTimer->setTimerType(Qt::PreciseTimer);
-    connect(eventTimer, SIGNAL(timeout()), this, SLOT(timerTick()));
-    eventTimer->start(1000 / 60);
-
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
     settingsWidget->setVersion("ckb " CKB_VERSION_STR);
-
-    ckbGuiVersion = PARSE_CKB_VERSION(CKB_VERSION_STR);
-    scanKeyboards();
 }
 
 void MainWindow::toggleTrayIcon(bool visible) {
@@ -128,106 +117,73 @@ void MainWindow::toggleTrayIcon(bool visible) {
         trayIcon->setVisible(visible);
 }
 
-void MainWindow::scanKeyboards(){
-    QString rootdev = devpath.arg(0);
-    QFile connected(rootdev + "/connected");
-    if(!connected.open(QIODevice::ReadOnly)){
-        // No root controller - remove all keyboards
-        while(ui->tabWidget->count() > 1)
-            ui->tabWidget->removeTab(0);
-        foreach(KbWidget* w, kbWidgets)
-            w->deleteLater();
-        kbWidgets.clear();
-        settingsWidget->setStatus("Driver inactive");
-        ckbDaemonVersion = INFINITY;
-        daemonVStr.clear();
-        return;
-    }
-    // Check daemon version
-    QFile version(rootdev + "/version");
-    if(version.open(QIODevice::ReadOnly)){
-        daemonVStr = QString::fromUtf8(version.readLine()).trimmed();
-        version.close();
-    } else
-        daemonVStr = "<unavailable>";
-    ckbDaemonVersion = PARSE_CKB_VERSION(daemonVStr);
-
-    // Scan connected devices
-    foreach(KbWidget* w, kbWidgets)
-        w->active(false);
-    QString line;
-    while((line = connected.readLine().trimmed()) != ""){
-        QStringList components = line.trimmed().split(" ");
-        if(components.length() < 2)
-            continue;
-        QString path = components[0], serial = components[1];
-        // Connected already?
-        KbWidget* widget = 0;
-        foreach(KbWidget* w, kbWidgets){
-            if(w->device && w->device->matches(path, serial)){
-                widget = w;
-                w->active(true);
-                break;
-            }
-        }
-        if(widget)
-            continue;
-        // Add the keyboard
-        widget = new KbWidget(this, path, "Devices");
-        if(!widget->isActive()){
-            delete widget;
-            continue;
-        }
-        kbWidgets.append(widget);
-        int count = ui->tabWidget->count();
-        ui->tabWidget->insertTab(count - 1, widget, widget->name());
-        if(ui->tabWidget->currentIndex() == count)
-            ui->tabWidget->setCurrentIndex(count - 1);
-        connect(eventTimer, SIGNAL(timeout()), widget->device, SLOT(frameUpdate()));
-    }
-    connected.close();
-
-    // Remove any devices not found in the connected list
-    bool updateShown = false;
+void MainWindow::addDevice(Kb* device){
+    // Connected already?
     foreach(KbWidget* w, kbWidgets){
-        if(w->isActive()){
-            if(!updateShown){
-                // Display firmware upgrade notification if a new version is available (and user has automatic updates enabled)
-                if(CkbSettings::get("Program/DisableAutoFWCheck").toBool())
-                    continue;
-                float version = KbFirmware::versionForBoard(w->device->features);
-                if(version > w->device->firmware.toFloat()){
-                    if(w->hasShownNewFW)
-                        continue;
-                    w->hasShownNewFW = true;
-                    w->updateFwButton();
-                    // Don't display more than one of these at once
-                    updateShown = true;
-                    // Don't run this method here because it will lock up the timer and prevent devices from working properly
-                    // Use a queued invocation instead
-                    metaObject()->invokeMethod(this, "showFwUpdateNotification", Qt::QueuedConnection, Q_ARG(QWidget*, w), Q_ARG(float, version));
-                }
-            }
-            w->saveIfNeeded();
-        } else {
+        if(w->device == device)
+            return;
+    }
+    // Add the keyboard
+    KbWidget* widget = new KbWidget(this, device);
+    kbWidgets.append(widget);
+    // Add to tabber; switch to this device if on the settings screen
+    int count = ui->tabWidget->count();
+    ui->tabWidget->insertTab(count - 1, widget, widget->name());
+    if(ui->tabWidget->currentIndex() == count)
+        ui->tabWidget->setCurrentIndex(count - 1);
+    // Update connected device count
+    updateVersion();
+}
+
+void MainWindow::removeDevice(Kb* device){
+    foreach(KbWidget* w, kbWidgets){
+        // Remove this device from the UI
+        if(w->device == device){
             int i = kbWidgets.indexOf(w);
             ui->tabWidget->removeTab(i);
             kbWidgets.removeAt(i);
             w->deleteLater();
         }
     }
+    // Update connected device count
+    updateVersion();
+}
 
+void MainWindow::updateVersion(){
+    QString daemonVersion = KbManager::ckbDaemonVersion();
+    if(daemonVersion == DAEMON_UNAVAILABLE_STR){
+        settingsWidget->setStatus("Driver inactive");
+        return;
+    }
     int count = kbWidgets.count();
     // Warn if the daemon version doesn't match the GUI
     QString daemonWarning;
-    if(daemonVStr != CKB_VERSION_STR && !daemonVStr.isEmpty())
-        daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVStr + "). Please upgrade ckb" + QString(ckbDaemonVersion > ckbGuiVersion ? "" : "-daemon") + ". If the problem persists, try rebooting.";
+    if(daemonVersion != CKB_VERSION_STR)
+        daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVersion + "). Please upgrade ckb" + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + ". If the problem persists, try rebooting.";
     if(count == 0)
         settingsWidget->setStatus("No devices connected" + daemonWarning);
     else if(count == 1)
         settingsWidget->setStatus("1 device connected" + daemonWarning);
     else
         settingsWidget->setStatus(QString("%1 devices connected").arg(count) + daemonWarning);
+}
+
+void MainWindow::checkFwUpdates(){
+    foreach(KbWidget* w, kbWidgets){
+        // Display firmware upgrade notification if a new version is available
+        float version = KbFirmware::versionForBoard(w->device->features);
+        if(version > w->device->firmware.toFloat()){
+            if(w->hasShownNewFW)
+                continue;
+            w->hasShownNewFW = true;
+            w->updateFwButton();
+            // Don't run this method here because it will lock up the timer and prevent devices from working properly
+            // Use a queued invocation instead
+            metaObject()->invokeMethod(this, "showFwUpdateNotification", Qt::QueuedConnection, Q_ARG(QWidget*, w), Q_ARG(float, version));
+            // Don't display more than one of these at once
+            return;
+        }
+    }
 }
 
 void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
@@ -287,10 +243,10 @@ void MainWindow::timerTick(){
         }
     }
     // Check for firmware updates (when appropriate)
-    if(!CkbSettings::get("Program/DisableAutoFWCheck").toBool())
+    if(!CkbSettings::get("Program/DisableAutoFWCheck").toBool()){
         KbFirmware::checkUpdates();
-    // Scan for connected/disconnected keyboards
-    scanKeyboards();
+        checkFwUpdates();
+    }
     // Poll for setting updates
     settingsWidget->pollUpdates();
 }
@@ -322,6 +278,7 @@ void MainWindow::cleanup(){
     foreach(KbWidget* w, kbWidgets)
         delete w;
     kbWidgets.clear();
+    KbManager::stop();
     CkbSettings::cleanUp();
 }
 

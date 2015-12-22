@@ -20,24 +20,6 @@ extern "C" {
 #undef signals_BACKUP
 #endif // USE_LIBAPPINDICATOR
 
-// ckb version info (populated at load)
-extern float ckbGuiVersion;
-extern float ckbDaemonVersion;
-// String (e.g. "alpha-v0.0.1" or "0.0.1") -> float
-inline float PARSE_CKB_VERSION(QString version){
-    // Remove extraneous info (anything after a +, anything non-numeric)
-    QStringList dots = version.replace(QRegExp("\\+.+"), "").replace(QRegExp("[^\\d\\.]"), "").split(".");
-    float base = 1.f;
-    float res = 0.f;
-    // A number like "1.2.3" will result in 1.0203
-    // NB: will fail if a point version goes over 99 or if using more than two dots. floats can only reliably encode 7 decimal digits.
-    foreach(const QString& dot, dots){
-        res += dot.toFloat() * base;
-        base /= 100.f;
-    }
-    return res;
-}
-
 namespace Ui {
 class MainWindow;
 }
@@ -50,8 +32,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    static MainWindow* mainWindow;
+
     void toggleTrayIcon(bool visible);
-    void scanKeyboards();
+
+private:
     SettingsWidget* settingsWidget;
     QList<KbWidget*> kbWidgets;
 
@@ -70,13 +55,16 @@ public:
 
     void closeEvent(QCloseEvent *event);
 
-    static MainWindow* mainWindow;
-
 public slots:
     void showWindow();
     void quitApp();
 
 private slots:
+    void addDevice(Kb* device);
+    void removeDevice(Kb* device);
+    void updateVersion();
+    void checkFwUpdates();
+
     void timerTick();
     void iconClicked(QSystemTrayIcon::ActivationReason reason);
     void cleanup();

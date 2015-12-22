@@ -17,25 +17,17 @@ class KbWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit KbWidget(QWidget *parent, const QString& path, const QString& prefsBase);
+    explicit KbWidget(QWidget *parent, Kb* _device);
     ~KbWidget();
 
     // Device handle
-    Kb*             device;
-    inline QString  name()              { return device ? device->usbModel : ""; }
-
-    // Is open?
-    inline bool isActive()              { return _active && device && device->isOpen(); }
-    inline void active(bool newActive)  { _active = newActive; }
+    Kb* device;
+    inline QString name() const { return device->usbModel; }
 
     // Has the "there is a firmware upgrade for this device..." screen already been shown?
     bool hasShownNewFW;
     // Update the "Check for updates" label with the current status
     void updateFwButton();
-
-    //
-    void saveSettings();
-    void saveIfNeeded();
 
 public slots:
     // Show a tab
@@ -50,9 +42,6 @@ private:
     quint64 lastAutoSave;
 
     KbMode* currentMode;
-
-    QString prefsPath;
-    bool _active;
 
     const static int GUID = Qt::UserRole;
     const static int NEW_FLAG = Qt::UserRole + 1;

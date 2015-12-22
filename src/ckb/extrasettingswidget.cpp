@@ -4,8 +4,6 @@
 #include "mainwindow.h"
 #include "ckbsettings.h"
 
-extern QTimer* eventTimer;
-
 // KbLight
 static int lastSharedDimming = -2;
 
@@ -93,10 +91,7 @@ void ExtraSettingsWidget::on_animScanButton_clicked(){
 }
 
 void ExtraSettingsWidget::on_fpsBox_valueChanged(int arg1){
-    if(!eventTimer)
-        return;
     // Set FPS
-    eventTimer->setInterval(1000 / arg1);
     CkbSettings settings("Program");
     settings.setValue("framerate", arg1);
     Kb::frameRate(arg1);
@@ -135,7 +130,7 @@ void ExtraSettingsWidget::on_sAccelBox_clicked(bool checked){
         ui->sSpeedWidget->hide();
 }
 
-void ExtraSettingsWidget::on_sSpeedBox_activated(int arg1){
+void ExtraSettingsWidget::on_sSpeedBox_valueChanged(int arg1){
     CkbSettings::set("Program/ScrollSpeed", arg1);
     Kb::scrollSpeed(ui->sAccelBox->isChecked() ? arg1 : 0);
 }

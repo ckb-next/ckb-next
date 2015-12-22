@@ -2,6 +2,7 @@
 #include "ckbsettingswriter.h"
 #include <QThread>
 #include <QMutex>
+#include <QDebug>
 
 // Shared global QSettings object
 static QSettings* _globalSettings = 0;
@@ -55,6 +56,11 @@ CkbSettings::CkbSettings() :
 
 CkbSettings::CkbSettings(const QString& basePath, bool eraseExisting) :
     backing(globalSettings()) {
+    if(basePath.isEmpty()){
+        if(eraseExisting)
+            qDebug() << "CkbSettings created with basePath = \"\" and eraseExisting = true. This is a mistake.";
+        return;
+    }
     if(eraseExisting)
         remove(basePath);
     beginGroup(basePath);

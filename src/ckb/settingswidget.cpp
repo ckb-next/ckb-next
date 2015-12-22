@@ -25,7 +25,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     if(layout == KeyMap::NO_LAYOUT){
         // If the layout hasn't been set yet, show a dialog to let the user choose it
         layout = KeyMap::locale();
-        QTimer::singleShot(1000, this, SLOT(showLayoutDialog()));   // Run the function after a delay as the dialog may not appear correctly othewise
+        QTimer::singleShot(1000, this, SLOT(showLayoutDialog()));   // Run the function after a delay as the dialog may not appear correctly otherwise
         settings.setValue("KbdLayout", KeyMap::getLayout(layout));
     }
     Kb::layout(layout);

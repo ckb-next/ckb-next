@@ -8,7 +8,7 @@ RListWidget::RListWidget(QWidget *parent) :
     setMovement(QListView::Snap);
 
     reorderTimer.setSingleShot(true);
-    reorderTimer.setInterval(10);
+    reorderTimer.setInterval(100);
     connect(&reorderTimer, SIGNAL(timeout()), this, SLOT(timerTick()));
 
     connect(this, SIGNAL(itemEntered(QListWidgetItem*)), this, SLOT(enter(QListWidgetItem*)));

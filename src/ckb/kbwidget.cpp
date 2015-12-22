@@ -1,5 +1,4 @@
 #include <cmath>
-#include <QDateTime>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -13,22 +12,14 @@
 #include "ui_kbwidget.h"
 #include "ui_kblightwidget.h"
 
-KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBase) :
+KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     QWidget(parent),
-    device(new Kb(this, path)), hasShownNewFW(false),
+    device(_device), hasShownNewFW(false),
     ui(new Ui::KbWidget),
-    lastAutoSave(QDateTime::currentMSecsSinceEpoch()), currentMode(0), _active(true)
+    currentMode(0)
 {
     ui->setupUi(this);
     connect(ui->modesList, SIGNAL(orderChanged()), this, SLOT(modesList_reordered()));
-
-    if(!device->isOpen() || device->usbSerial == ""){
-        _active = false;
-        delete device;
-        device = 0;
-        return;
-    }
-    prefsPath = prefsBase + "/" + device->usbSerial;
 
     connect(device, SIGNAL(infoUpdated()), this, SLOT(devUpdate()));
     connect(device, SIGNAL(profileAdded()), this, SLOT(updateProfileList()));
@@ -64,34 +55,10 @@ KbWidget::KbWidget(QWidget *parent, const QString &path, const QString &prefsBas
     // Set monochrome mode according to hardware
     if(device->monochrome)
         ui->lightWidget->setMonochrome();
-    // Load profiles from stored settings
-    CkbSettings settings(prefsPath);
-    device->load(settings);
 }
 
 KbWidget::~KbWidget(){
-    if(device && device->isOpen()){
-        saveSettings();
-        delete device;
-    }
     delete ui;
-}
-
-void KbWidget::saveSettings(){
-    if(!device->needsSave())
-        return;
-    CkbSettings settings(prefsPath, true);
-    device->save(settings);
-    settings.endGroup();
-}
-
-void KbWidget::saveIfNeeded(){
-    quint64 now = QDateTime::currentMSecsSinceEpoch();
-    // Auto-save every 15s (if settings have changed, and no other writes are in progress)
-    if(now >= lastAutoSave + 15 * 1000 && !CkbSettings::isBusy()){
-        saveSettings();
-        lastAutoSave = now;
-    }
 }
 
 void KbWidget::showFirstTab(){
@@ -334,7 +301,7 @@ void KbWidget::modeUpdate(){
 }
 
 void KbWidget::on_hwSaveButton_clicked(){
-    saveSettings();
+    device->save();
     device->hwSave();
     updateProfileList();
     profileChanged();

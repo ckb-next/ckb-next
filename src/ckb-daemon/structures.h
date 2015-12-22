@@ -184,6 +184,8 @@ typedef struct {
     int handle;
     int uinput_kb, uinput_mouse;
 #else
+    CFRunLoopRef input_loop;
+    CFRunLoopTimerRef krtimer;
     struct timespec keyrepeat;
     long location_id;
     hid_dev_t handle;

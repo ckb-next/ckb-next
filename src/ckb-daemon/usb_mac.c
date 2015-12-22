@@ -108,13 +108,13 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
 }
 
 // input_mac.c
-extern void keyretrigger(usbdevice* kb);
+extern void keyretrigger(CFRunLoopTimerRef timer, void* info);
 
 void* os_inputmain(void* context){
     usbdevice* kb = context;
     int index = INDEX_OF(kb, keyboard);
     // Schedule async events for the device on this thread
-    CFRunLoopRef runloop = CFRunLoopGetCurrent();
+    CFRunLoopRef runloop = kb->input_loop = CFRunLoopGetCurrent();
     int count = (IS_RGB(kb->vendor, kb->product)) ? 4 : 3;
     for(int i = 0; i < count; i++){
         CFTypeRef eventsource;
@@ -141,16 +141,25 @@ void* os_inputmain(void* context){
         (*kb->handles[2])->setInputReportCallback(kb->handles[2], urbinput[2], 15, intreport, kb, 0);
     }
 
-    // Run the run loop for up to 2ms at a time, then check for key repeats
+    // Start a timer for key repeat broadcasts
+    CFRunLoopTimerContext krctx = { 0, kb, NULL, NULL, NULL };
+    CFRunLoopTimerRef krtimer = kb->krtimer = CFRunLoopTimerCreate(kCFAllocatorDefault,
+                                                                   CFAbsoluteTimeGetCurrent() + 0.001, 0.001,   // Set it to run every 1ms
+                                                                   0, 0,
+                                                                   keyretrigger, &krctx);
+    CFRunLoopTimerSetTolerance(krtimer, 0.015);         // Set a maximum tolerance of 15ms
+    // We don't actually add the timer to the run loop yet. There's no need to run the function until a key is actually pressed,
+    // so the timer is added and removed dynamically.
+
+    // Start the run loop
     while(1){
-        CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.002, false);
+        CFRunLoopRun();
+        // If we get here, the device should be disconnected
         pthread_mutex_lock(imutex(kb));
         if(!IS_CONNECTED(kb)){
-            // Make sure the device hasn't disconnected
             pthread_mutex_unlock(imutex(kb));
             break;
         }
-        keyretrigger(kb);
         pthread_mutex_unlock(imutex(kb));
     }
 
@@ -204,6 +213,10 @@ void os_closeusb(usbdevice* kb){
         (*kb->handles[i])->close(kb->handles[i], kIOHIDOptionsTypeNone);
         (*kb->handles[i])->Release(kb->handles[i]);
         kb->handles[i] = 0;
+    }
+    if(kb->input_loop){
+        CFRunLoopStop(kb->input_loop);
+        kb->input_loop = 0;
     }
 }
 
@@ -353,6 +366,15 @@ static int seize_wait(hid_dev_t handle){
     return -3;
 }
 
+// Hacky way of trying something over and over again until it works. 500ms intervals, max 5s
+#define wait_loop(error, operation)  do {               \
+    int trial = 0;                                      \
+    while(((error) = (operation)) != kIOReturnSuccess){ \
+        if(++trial == 10)                               \
+            break;                                      \
+        usleep(500000);                                 \
+    } } while(0)
+
 static void iterate_devices(void* context, io_iterator_t iterator){
     io_service_t device;
     euid_guard_start;
@@ -360,14 +382,15 @@ static void iterate_devices(void* context, io_iterator_t iterator){
         // Get the plugin interface for the device
         IOCFPlugInInterface** plugin = 0;
         SInt32 score = 0;
-        kern_return_t err = IOCreatePlugInInterfaceForService(device, kIOHIDDeviceTypeID, kIOCFPlugInInterfaceID, &plugin, &score);
+        kern_return_t err;
+        wait_loop(err, IOCreatePlugInInterfaceForService(device, kIOHIDDeviceTypeID, kIOCFPlugInInterfaceID, &plugin, &score));
         if(err != kIOReturnSuccess){
             ckb_err("Failed to create device plugin: %x\n", err);
             goto release;
         }
         // Get the device interface
         hid_dev_t handle;
-        err = (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOHIDDeviceDeviceInterfaceID), (LPVOID*)&handle);
+        wait_loop(err, (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOHIDDeviceDeviceInterfaceID), (LPVOID*)&handle));
         if(err != kIOReturnSuccess){
             ckb_err("QueryInterface failed: %x\n", err);
             goto release;

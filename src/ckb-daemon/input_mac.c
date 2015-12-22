@@ -241,7 +241,40 @@ void os_inputclose(usbdevice* kb){
     }
 }
 
+// Starts/stops key-repeat timer as appropriate
+static void setkrtimer(usbdevice* kb){
+    if(kb->lastkeypress == KEY_NONE)
+        CFRunLoopRemoveTimer(kb->input_loop, kb->krtimer, kCFRunLoopCommonModes);
+    else
+        CFRunLoopAddTimer(kb->input_loop, kb->krtimer, kCFRunLoopCommonModes);
+}
+
+// Retrigger the last-pressed key
+static void _keyretrigger(usbdevice* kb){
+    int scancode = kb->lastkeypress;
+    postevent_kp(kb->event, kb->modifiers, scancode, 1, 0, 1);
+    // Set next key repeat time
+    long repeat = repeattime(kb->event, 0);
+    if(repeat > 0)
+        timespec_add(&kb->keyrepeat, repeat);
+    else
+        kb->lastkeypress = KEY_NONE;
+}
+
+void keyretrigger(CFRunLoopTimerRef timer, void* info){
+    usbdevice* kb = info;
+    // Repeat the key as many times as needed to catch up
+    struct timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    while(!(kb->lastkeypress & (SCAN_SILENT | SCAN_MOUSE)) && timespec_ge(time, kb->keyrepeat))
+        _keyretrigger(kb);
+    setkrtimer(kb);
+}
+
 void os_keypress(usbdevice* kb, int scancode, int down){
+    // Trigger any pending repeats first
+    keyretrigger(NULL, kb);
+    // Key/button pressed
     if(scancode & SCAN_MOUSE){
         if(scancode == BTN_WHEELUP){
             if(down)
@@ -329,26 +362,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     }
 
     postevent_kp(kb->event, kb->modifiers, scancode, down, isMod, 0);
-}
-
-// Retrigger the last-pressed key
-void _keyretrigger(usbdevice* kb){
-    int scancode = kb->lastkeypress;
-    postevent_kp(kb->event, kb->modifiers, scancode, 1, 0, 1);
-    // Set next key repeat time
-    long repeat = repeattime(kb->event, 0);
-    if(repeat > 0)
-        timespec_add(&kb->keyrepeat, repeat);
-    else
-        kb->lastkeypress = KEY_NONE;
-}
-
-void keyretrigger(usbdevice* kb){
-    // Repeat the key as many times as needed to catch up
-    struct timespec time;
-    clock_gettime(CLOCK_MONOTONIC, &time);
-    while(!(kb->lastkeypress & (SCAN_SILENT | SCAN_MOUSE)) && timespec_ge(time, kb->keyrepeat))
-        _keyretrigger(kb);
+    setkrtimer(kb);
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){

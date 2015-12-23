@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "led.h"
 #include "notify.h"
 #include "profile.h"
@@ -244,32 +246,32 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             }
         }
         // Copy the data back to the mode
-        uchar mr[N_KEYS_HW / 2], mg[N_KEYS_HW / 2], mb[N_KEYS_HW / 2];
-        memcpy(mr, in_pkt[0] + 4, 60);
-        memcpy(mr + 60, in_pkt[1] + 4, 12);
-        memcpy(mg, in_pkt[1] + 16, 48);
-        memcpy(mg + 48, in_pkt[2] + 4, 24);
-        memcpy(mb, in_pkt[2] + 28, 36);
-        memcpy(mb + 36, in_pkt[3] + 4, 36);
+        uint8_t mr[N_KEYS_HW / 2], mg[N_KEYS_HW / 2], mb[N_KEYS_HW / 2];
+        memcpy(mr,      in_pkt[0] +  4, 60);
+        memcpy(mr + 60, in_pkt[1] +  4, 12);
+        memcpy(mg,      in_pkt[1] + 16, 48);
+        memcpy(mg + 48, in_pkt[2] +  4, 24);
+        memcpy(mb,      in_pkt[2] + 28, 36);
+        memcpy(mb + 36, in_pkt[3] +  4, 36);
         // Unpack LED data to 8bpc format
         for(int i = 0; i < N_KEYS_HW; i++){
-            uchar r, g, b;
-            if(i & 1){
-                r = (7 - ((mr[i / 2] & 0xF0) >> 4)) << 5;
-                g = (7 - ((mg[i / 2] & 0xF0) >> 4)) << 5;
-                b = (7 - ((mb[i / 2] & 0xF0) >> 4)) << 5;
+            int     i_2 = i / 2;
+            uint8_t r, g, b;
+
+            // 3-bit intensities stored in alternate nybbles.
+            if (i & 1) {
+                r = 7 - (mr[i_2] >> 4);
+                g = 7 - (mg[i_2] >> 4);
+                b = 7 - (mb[i_2] >> 4);
             } else {
-                r = (7 - (mr[i / 2] & 0x0F)) << 5;
-                g = (7 - (mg[i / 2] & 0x0F)) << 5;
-                b = (7 - (mb[i / 2] & 0x0F)) << 5;
+                r = 7 - (mr[i_2] & 0x0F);
+                g = 7 - (mg[i_2] & 0x0F);
+                b = 7 - (mb[i_2] & 0x0F);
             }
-            // Convert 0xe0 to 0xff (white color)
-            if(r == 0xe0) r = 0xff;
-            if(g == 0xe0) g = 0xff;
-            if(b == 0xe0) b = 0xff;
-            light->r[i] = r;
-            light->g[i] = g;
-            light->b[i] = b;
+            // Scale 3-bit values up to 8 bits.
+            light->r[i] = r << 5 | r << 2 | r >> 1;
+            light->g[i] = g << 5 | g << 2 | g >> 1;
+            light->b[i] = b << 5 | b << 2 | b >> 1;
         }
     }
     return 0;

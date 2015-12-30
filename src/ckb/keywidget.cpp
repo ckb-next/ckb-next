@@ -72,7 +72,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     const QColor keyColor(112, 110, 110);
     const QColor sniperColor(130, 90, 90);
     const QColor thumbColor(34, 32, 32);
-    const QColor sidelightColor(0, 0, 0, 0);
+    const QColor transparentColor(0, 0, 0, 0);
     const QColor highlightColor(136, 176, 240);
     const QColor highlightAnimColor(136, 200, 240);
     const QColor animColor(112, 200, 110);
@@ -200,9 +200,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
             else if(model == KeyMap::SCIMITAR && !strncmp(key.name, "thumb", 5) && strcmp(key.name, "thumb"))
                 // Thumbgrid keys use a black color
                 bgPainter.setBrush(QBrush(thumbColor));
-            else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel"))
-                // Strafe side lights have transparent background
-                bgPainter.setBrush(QBrush(sidelightColor));
+            else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel") || !strcmp(key.name, "logo"))
+                // Strafe side lights have different background
+                bgPainter.setBrush(QBrush(transparentColor));
             else {
                 bgPainter.setBrush(QBrush(keyColor));
                 if(KeyMap::isMouse(model))
@@ -211,7 +211,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
         }
         if(model != KeyMap::STRAFE && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
-            // Switch keys are circula except for Strafe. All Strafe keys are circular
+            // Switch keys are circular except for Strafe. All Strafe keys are square
             x += w / 8.f;
             y += h / 8.f;
             w *= 0.75f;
@@ -276,7 +276,40 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     color = monoRgb(qRed(color), qGreen(color), qBlue(color));
             }
             decPainter.setBrush(QBrush(color));
-            decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
+            if (model == KeyMap::STRAFE) { // STRAFE custom design and special keys
+                float kx = key.x + offX - key.width / 2.f + 1.f;
+                float ky = key.y + offY - key.height / 2.f + 1.f;
+                float kw = key.width - 2.f;
+                float kh = key.height - 2.f;
+                decPainter.setPen(QPen(QColor(255, 255, 255), 1.2)); // less invasive outline to show the key color better
+                if(!strcmp(key.name, "logo")) { // stylized logo
+                    float lx = key.x + offX - key.width / 2.f + 2.f;
+                    float ly = key.y + offY - key.height / 2.f + 2.f;
+                    float lw = key.width - 4.f;
+                    float lh = key.height - 4.f;
+                    QPainterPath logo;
+                    logo.moveTo(lx*scale,(ly+lh)*scale);
+                    logo.quadTo((lx+2.f)*scale,(ly+lh/2.f)*scale,lx*scale,ly*scale);
+                    logo.quadTo((lx+lw)*scale,ly*scale,(lx+lw)*scale,(ly+lh)*scale);
+                    logo.quadTo((lx+lw/2.f)*scale,(ly+lh-4.f)*scale,lx*scale,(ly+lh)*scale);
+                    decPainter.drawPath(logo);
+                    //decPainter.setPen(QPen(Qt::green, 1.2)); //QColor(125,125,125)
+                    //decPainter.drawRect(QRectF(lx * scale, ly * scale, lw * scale, lh * scale)); // don't really know why the 12 and 24 make it work here, but they do
+                } else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")) { // Strafe side lights (toggle lights with no animation)
+                    QRadialGradient gradient(QPointF(wWidth/2.f * ratio, wHeight/2.f * ratio), wWidth/2.f * ratio);//,QPointF(10, 5));
+                    gradient.setColorAt(0, color);
+                    gradient.setColorAt(0.9, color); // bring up intensity
+                    gradient.setColorAt(1, bgColor);
+                    decPainter.setBrush(QBrush(gradient));
+                    decPainter.setPen(QPen(keyColor, 1.2)); //QColor(125,125,125)
+                    decPainter.drawRect(QRectF(kx * scale, ky * scale - 12 , kw * scale, kh * scale+24)); // don't really know why the 12 and 24 make it work here, but they do
+                } else if(_indicators.contains(key.name)) { // FIX: This check fails whenever _indicators is empty because "show animated" is unchecked
+                    decPainter.setPen(QPen(QColor(0,0,0,0), 1));    // no outline for the indicators, you can't change their color the standard way
+                    decPainter.drawRect(QRectF((kx+2.f) * scale, (ky+2.f) * scale, (kw-4.f) * scale, (kh-4.f) * scale)); // square indicators
+               } else //everything else is a circle, just a tad bigger to show the key color better
+                    decPainter.drawEllipse(QRectF((x-1.f) * scale, (y-1.f) * scale, (w+2.f) * scale, (h+2.f) * scale));
+            } else
+                decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
         }
     } else {
         // Draw key names
@@ -476,8 +509,12 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
         if((_rgbMode && !key.hasLed)
                 || (!_rgbMode && !key.hasScan))
             continue;
-        // Sidelights can't be selected
-        if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel"))
+        // Update tooltip with the mouse hover (if any), even if it's not selectable
+        if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f
+                && tooltip.isEmpty())
+            tooltip = key.friendlyName(false);
+        // on STRAFE Sidelights and indicators can't be assigned color the way other keys are colored
+        if(keyMap.model() == KeyMap::STRAFE && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel") || _indicators.contains(key.name))) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
             continue;
         float kx1 = key.x - key.width / 2.f + 1.f;
         float ky1 = key.y - key.height / 2.f + 1.f;
@@ -488,10 +525,6 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
                 && !(my1 >= ky2 || ky1 >= my2)
                 && mouseDownMode != NONE)
             newSelection.setBit(i);
-        // Update tooltip with the moused-over key (if any)
-        if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f
-                && tooltip.isEmpty())
-            tooltip = key.friendlyName(false);
     }
 
     if(mouseDownMode != NONE)

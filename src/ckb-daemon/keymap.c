@@ -149,9 +149,11 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "g17",        0x83, KEY_CORSAIR },
     { "g18",        0x8f, KEY_CORSAIR },
 
-    // Strafe specific side led, that are set via a special command
-    { "lsidel",     -2, KEY_CORSAIR },
-    { "rsidel",     -2, KEY_CORSAIR },
+    // Strafe specific side leds, that are set via a special command
+    { "lsidel",      -2, KEY_CORSAIR },
+    { "rsidel",      -2, KEY_CORSAIR },
+    // Strafe logo backlight
+    { "logo",      0x7d, KEY_CORSAIR },
 
     // Keys not present on any device
     { "lightup",    -1, KEY_BRIGHTNESSUP },

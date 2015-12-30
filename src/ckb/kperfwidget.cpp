@@ -144,6 +144,21 @@ void KPerfWidget::setPerf(KbPerf* newPerf, KbProfile* newProfile){
     } else {
         foreach(QWidget* w, k95Widgets)
             w->hide();
+        if(profile->keyMap().model() == KeyMap::STRAFE) { // hide indicators unsupported by STRAFE
+            ui->muteBox->hide();
+            ui->muteColorOn->hide();
+            ui->muteColorOff->hide();
+            ui->muteColorNA->hide();
+            ui->label_12->hide();
+            ui->label_14->hide();
+            ui->label_17->hide();
+            ui->numBox->removeItem(3); // remove item # 4 (RGB)
+            ui->numBox->removeItem(3); // not an error - removing the NEW item 4 (RGB+light) (that was item 5 before the previous line was run)
+            ui->capsBox->removeItem(3);
+            ui->capsBox->removeItem(3);
+            ui->scrollBox->removeItem(3);
+            ui->scrollBox->removeItem(3);
+       }
     }
 }
 

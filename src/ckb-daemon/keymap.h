@@ -24,7 +24,7 @@
 #define N_KEYS_HW               144
 #define N_KEYBYTES_HW           ((N_KEYS_HW + 7) / 8)
 // Light zones (have LED codes but don't generate input)
-#define N_KEY_ZONES             2
+#define N_KEY_ZONES             3       // two strafe side lights (although really they are tied into one control) + logo backlight
 // Keys recognized by the driver but not present on keyboard
 #define N_KEYS_EXTRA            12
 // Mouse buttons

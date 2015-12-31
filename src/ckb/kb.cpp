@@ -266,7 +266,7 @@ void Kb::save(){
 
 void Kb::autoSave(){
     quint64 now = QDateTime::currentMSecsSinceEpoch();
-    if(now >= lastAutoSave + 15 * 1000 && !CkbSettings::isBusy()){
+    if(needsSave() && now >= lastAutoSave + 15 * 1000 && !CkbSettings::isBusy()){
         save();
         lastAutoSave = now;
     }

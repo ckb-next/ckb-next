@@ -141,6 +141,7 @@ void KbManager::scanKeyboards(){
         emit kbConnected(kb);
         kb->load();
         connect(_eventTimer, SIGNAL(timeout()), kb, SLOT(frameUpdate()));
+        connect(_scanTimer, SIGNAL(timeout()), kb, SLOT(autoSave()));
     }
 }
 

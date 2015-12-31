@@ -80,8 +80,6 @@ public:
     void load();
     void save();
     bool needsSave() const;
-    // Auto-save every 15s (if settings have changed, and no other writes are in progress)
-    void autoSave();
 
     void hwSave();
 
@@ -104,7 +102,11 @@ signals:
     void fwUpdateFinished(bool succeeded);
 
 public slots:
+    // Send lighting and settings to the driver
     void frameUpdate();
+
+    // Auto-save every 15s (if settings have changed, and no other writes are in progress)
+    void autoSave();
 
 private slots:
     // Processes lines read from the notification node

@@ -8,4 +8,12 @@ SUBDIRS = \
     src/ckb-gradient \
     src/ckb-pinwheel \
     src/ckb-random \
-    src/ckb-rain
+    src/ckb-rain \
+    src/ckb-heat
+
+# Music visualizer requires Pulseaudio libraries
+linux {
+    system(pkg-config --exists libpulse) {
+        SUBDIRS += src/ckb-mviz
+    }
+}

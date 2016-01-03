@@ -1,6 +1,7 @@
 #include <QStandardPaths>
 #include "rebindwidget.h"
 #include "ui_rebindwidget.h"
+#include <qdebug.h>     // lae.
 
 static const int DPI_OFFSET = -KeyAction::DPI_UP + 1;
 static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
@@ -283,6 +284,8 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             else
                 // 0 -> "", 1 -> Prev, 2 -> Next, 3 -> Mode 1
                 ui->modeBox->setCurrentIndex(3);
+        } else if (sAction == "macro") {
+            ui->tabWidget->setCurrentIndex(TAB_MACRO);
         } else
             ui->modeBox->setCurrentIndex(0);
         // Brightness control. Also check wrap
@@ -354,6 +357,8 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
                 krStop = KeyAction::PROGRAM_RE_KPSTOP;
         }
         bind->setAction(keys, KeyAction::programAction(ui->programKpBox->text(), ui->programKrBox->text(), kpStop | krStop));
+    } else if (ui->pteMacroBox->toPlainText().length() > 0) {
+        bind->setAction(keys, KeyAction::macroAction(ui->pteMacroBox->toPlainText())); // lae.: does not work
     } else if(doUnbind)
         bind->noAction(keys);
 }
@@ -400,6 +405,9 @@ void RebindWidget::setBox(QWidget* box){
         ui->programKpButton->setChecked(false);
         ui->programKrButton->setChecked(false);
     }
+    // lae.: Macro pane clear input window on start up
+    if (box != ui->pteMacroBox)
+        ui->pteMacroBox->setPlainText("");
 }
 
 void RebindWidget::on_typingBox_currentIndexChanged(int index){
@@ -408,6 +416,12 @@ void RebindWidget::on_typingBox_currentIndexChanged(int index){
     else {
         ui->typingButton->setChecked(true);
         setBox(ui->typingBox);
+    }
+}
+
+void RebindWidget::on_pteMacroBox_textChanged() {
+    if (ui->pteMacroBox->toPlainText().length() > 0) {
+        setBox(ui->pteMacroBox);
     }
 }
 

@@ -9,6 +9,7 @@
 #ifdef USE_LIBX11
 #include <X11/Xlib.h>
 #endif
+#include <qdebug.h>     // lae.
 
 KeyAction::Type KeyAction::type() const {
     if(_value.isEmpty())
@@ -42,7 +43,9 @@ KeyAction::~KeyAction(){
 
 QString KeyAction::defaultAction(const QString& key){
     // G1-G18 are unbound by default
-    if(key.length() >= 2 && key[0] == 'g' && key[1] >= '0' && key[1] <= '9')
+    if(key.length() >= 2 && key[0] == 'g'
+		&& ((key.length() == 2 && key[1] >= '0' && key[1] <= '9')
+		|| (key.length() == 3 && key[1] == '1' && key[2] >= '0' && key[2] <= '8')))
         return "";
     // So are thumbgrid buttons
     if(key.startsWith("thumb"))
@@ -368,6 +371,8 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         } else if(stopOnRelease){
             // Key released - stop animation
             anim->stop();
+        } else if (prefix == "$macro") {
+            qDebug ("ToDo: keyEvent with Macro");
         }
     } else if(prefix == "$program"){
         // Launch program
@@ -466,3 +471,11 @@ void KeyAction::adjustDisplay(){
     XCloseDisplay(display);
 #endif
 }
+
+// Changes made by lae. concerning G-Key macro definition user interface
+QString KeyAction::macroAction(QString macroDef) {
+    qWarning() << "______\n[" << macroDef << "]\n_______\n";
+    qWarning() << "Length of QString in pteMacroKeys = " << macroDef.length() << "\n";
+    return QString ("$macro:%1").arg(macroDef);
+}
+

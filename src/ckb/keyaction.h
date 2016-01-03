@@ -53,6 +53,7 @@ public:
     static QString  programAction(const QString& onPress, const QString& onRelease, int stop);
     // Key to start an animation
     static QString animAction(const QUuid& guid, bool onlyOnce, bool stopOnRelease);
+    static QString macroAction(QString macroDef);
 
     // Action type
     enum Type {
@@ -66,9 +67,10 @@ public:
     inline bool isSpecial() const       { return type() == SPECIAL; }
     // Media is a type of normal key
     inline bool isMedia() const         { return _value == "mute" || _value == "volup" || _value == "voldn" || _value == "stop" || _value == "prev" || _value == "play" || _value == "next"; }
-    // Program and animation are types of special key
+    // Macro, program and animation are types of special key
     inline bool isProgram() const       { return _value.startsWith("$program:"); }
     inline bool isAnim() const          { return _value.startsWith("$anim:"); }
+    inline bool isMacro() const         { return _value.startsWith("$macro:"); }
     // Mouse is some normal keys plus DPI
     inline bool isDPI() const           { return _value.startsWith("$dpi:"); }
     inline bool isMouse() const         { return (isNormal() && (_value.startsWith("mouse") || _value.startsWith("wheel"))) || isDPI(); }

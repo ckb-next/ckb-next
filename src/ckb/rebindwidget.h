@@ -64,12 +64,13 @@ private slots:
     void on_programKpSIBox_clicked(bool checked);
     void on_programKrSIBox_clicked(bool checked);
     void on_animButton_clicked(bool checked);
+    void on_pteMacroBox_textChanged();
 
 private:
     Ui::RebindWidget *ui;
 
     // Tab indices
-    const static int TAB_KB = 0, TAB_MOUSE = 1, TAB_ANIM = 2, TAB_SPECIAL = 3, TAB_PROGRAM = 4;
+    const static int TAB_KB = 0, TAB_MOUSE = 1, TAB_ANIM = 2, TAB_SPECIAL = 3, TAB_PROGRAM = 4, TAB_MACRO = 5;
 
     void setBox(QWidget* box);
 

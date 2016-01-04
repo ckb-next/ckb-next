@@ -77,6 +77,11 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
     return 0;
 }
 
+void os_sendindicators(usbdevice* kb){
+    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 5000, &kb->ileds };
+    ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+}
+
 void* os_inputmain(void* context){
     usbdevice* kb = context;
     int fd = kb->handle - 1;
@@ -194,9 +199,12 @@ int usbunclaim(usbdevice* kb, int resetting, int rgb){
 }
 
 void os_closeusb(usbdevice* kb){
-    usbunclaim(kb, 0, HAS_FEATURES(kb, FEAT_RGB));
-    close(kb->handle - 1);
-    udev_device_unref(kb->udev);
+    if(kb->handle){
+        usbunclaim(kb, 0, HAS_FEATURES(kb, FEAT_RGB));
+        close(kb->handle - 1);
+    }
+    if(kb->udev)
+        udev_device_unref(kb->udev);
     kb->handle = 0;
     kb->udev = 0;
     kbsyspath[INDEX_OF(kb, keyboard)][0] = 0;

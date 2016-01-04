@@ -48,6 +48,31 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
     return 0;
 }
 
+void os_sendindicators(usbdevice* kb){
+    uchar ileds = kb->ileds;
+    // Get a list of LED elements from handle 0
+    long ledpage = kHIDPage_LEDs;
+    const void* keys[] = { CFSTR(kIOHIDElementUsagePageKey) };
+    const void* values[] = { CFNumberCreate(kCFAllocatorDefault, kCFNumberLongType, &ledpage) };
+    CFDictionaryRef matching = CFDictionaryCreate(kCFAllocatorDefault, keys, values, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    CFRelease(values[0]);
+    CFArrayRef leds;
+    kern_return_t res = (*kb->handles[0])->copyMatchingElements(kb->handles[0], matching, &leds, 0);
+    CFRelease(matching);
+    if(res != kIOReturnSuccess)
+        return;
+    // Iterate through them and update the LEDs which have changed
+    CFIndex count = CFArrayGetCount(leds);
+    for(CFIndex i = 0; i < count; i++){
+        IOHIDElementRef led = (void*)CFArrayGetValueAtIndex(leds, i);
+        uint32_t usage = IOHIDElementGetUsage(led);
+        IOHIDValueRef value = IOHIDValueCreateWithIntegerValue(kCFAllocatorDefault, led, 0, !!(ileds & (1 << (usage - 1))));
+        (*kb->handles[0])->setValue(kb->handles[0], led, value, 5000, 0, 0, 0);
+        CFRelease(value);
+    }
+    CFRelease(leds);
+}
+
 int os_resetusb(usbdevice* kb, const char* file, int line){
     kern_return_t res = kb->lastresult;
     if(IS_DISCONNECT_FAILURE(res))

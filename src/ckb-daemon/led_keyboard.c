@@ -85,9 +85,8 @@ int updatergb_kb(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    /*if(kb->fwversion >= 0x0120){ */
-    if (IS_STRAFE(kb)){
-        // update strafe sidelights if necessary
+    if(IS_STRAFE(kb)){
+        // Update strafe sidelights if necessary
         if(lastlight->sidelight != newlight->sidelight) {
             uchar data_pkt[2][MSG_SIZE] = {
                  { 0x07, 0x05, 0x08, 0x00, 0x00 },
@@ -120,8 +119,7 @@ int updatergb_kb(usbdevice* kb, int force){
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;
     } else {
-    // 16.8M color lighting causes flickering and color glitches. Don't use it for this.
-    // Maybe in a future version this can be re-added as an advanced feature.
+        // On older keyboards it looks flickery and causes lighting glitches, so we don't use it.
         uchar data_pkt[5][MSG_SIZE] = {
             { 0x7f, 0x01, 60, 0 },
             { 0x7f, 0x02, 60, 0 },

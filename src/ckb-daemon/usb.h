@@ -57,9 +57,12 @@ const char* product_str(short product);
 // (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
 #define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 #define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
+#define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
+#define IS_MONOCHROME_DEV(kb)           IS_MONOCHROME((kb)->vendor, (kb)->product)
 
 // Mouse vs keyboard test
 #define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SCIMITAR)))
+#define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)
@@ -103,6 +106,8 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
 // OS: Gets input from a USB device. Return same as above.
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line);
+// OS: Update HID indicator LEDs (Num Lock, Caps, etc). Read from kb->ileds.
+void os_sendindicators(usbdevice* kb);
 
 // Non-RGB K95 command. Returns 0 on success.
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);

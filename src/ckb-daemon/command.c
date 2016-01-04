@@ -173,13 +173,14 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
         }
         case FPS: {
-            // USB command delay (1 - 10ms)
+            // USB command delay (2 - 10ms)
             uint framerate;
             if(sscanf(word, "%u", &framerate) == 1 && framerate > 0){
-                // Max messages per second: 5 RGB + 1 indicator + 1 wait
-                uint delay = 1000 / framerate / 7;
-                if(delay < 1)
-                    delay = 1;
+                // Not all devices require the same number of messages per frame; select delay appropriately
+                uint per_frame = IS_MOUSE_DEV(kb) ? 2 : IS_STRAFE(kb) ? 14 : 5;
+                uint delay = 1000 / framerate / per_frame;
+                if(delay < 2)
+                    delay = 2;
                 else if(delay > 10)
                     delay = 10;
                 kb->usbdelay = delay;

@@ -197,6 +197,7 @@ typedef struct {
     short lastkeypress;
     uchar mousestate;
     char scroll_rate;
+    pthread_t indicthread;
 #endif
     // Thread used for USB/devnode communication. To close: lock mutexes, set handle to zero, unlock, then wait for thread to stop
     pthread_t thread;
@@ -229,7 +230,7 @@ typedef struct {
     // Current input state
     usbinput input;
     // Indicator LED state
-    uchar hw_ileds, ileds;
+    uchar hw_ileds, hw_ileds_old, ileds;
     // Color dithering in use
     char dither;
 } usbdevice;

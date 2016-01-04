@@ -45,7 +45,9 @@ void os_keypress(usbdevice* kb, int scancode, int down);
 void os_mousemove(usbdevice* kb, int x, int y);
 // Synchronize input (called after sending key presses)
 void os_isync(usbdevice* kb);
-// Updates indicator state. Should read state, update ileds (applying mask for current mode as appropriate) and send control message to keyboard
-void os_updateindicators(usbdevice* kb, int force);
+
+// Perform OS-specific setup for indicator lights. Called when the device is created. Return 0 on success.
+int os_setupindicators(usbdevice* kb);
+
 
 #endif  // INPUT_H

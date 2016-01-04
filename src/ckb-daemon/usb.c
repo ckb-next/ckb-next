@@ -48,18 +48,19 @@ static const devcmd* get_vtable(short vendor, short product){
 
 // USB device main loop
 static void* devmain(usbdevice* kb){
+    // dmutex should still be locked when this is called
+    int kbfifo = kb->infifo - 1;
     readlines_ctx linectx;
     readlines_ctx_init(&linectx);
     while(1){
+        pthread_mutex_unlock(dmutex(kb));
+        // Read from FIFO
+        const char* line;
+        int lines = readlines(kbfifo, linectx, &line);
         pthread_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
         if(!IS_CONNECTED(kb))
             break;
-        // Read from FIFO
-        const char* line;
-        euid_guard_start;
-        int lines = readlines(kb->infifo - 1, linectx, &line);
-        euid_guard_stop;
         if(lines){
             if(readcmd(kb, line)){
                 // USB transfer failed; destroy device
@@ -67,13 +68,6 @@ static void* devmain(usbdevice* kb){
                 break;
             }
         }
-        // Update indicator LEDs for this keyboard. These are polled rather than processed during events because they don't update
-        // immediately and may be changed externally by the OS.
-        // (also, they can lock the keyboard if they're sent at the wrong time, at least on some firmwares)
-        kb->vtable->updateindicators(kb, 0);
-        // Wait a little bit and then read again
-        pthread_mutex_unlock(dmutex(kb));
-        DELAY_SHORT(kb);
     }
     pthread_mutex_unlock(dmutex(kb));
     readlines_ctx_free(linectx);
@@ -106,6 +100,8 @@ static void* _setupusb(void* context){
     if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
         goto fail;
     pthread_detach(kb->inputthread);
+    if(os_setupindicators(kb))
+        goto fail;
 
     // Set up device
     vt->allocprofile(kb);
@@ -122,7 +118,6 @@ static void* _setupusb(void* context){
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Setup finished for %s%d\n", devpath, index);
     updateconnected();
-    pthread_mutex_unlock(dmutex(kb));
     return devmain(kb);
 
     fail:
@@ -241,7 +236,6 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 }
 
 int closeusb(usbdevice* kb){
-    // Close file handles
     pthread_mutex_lock(imutex(kb));
     if(kb->handle){
         int index = INDEX_OF(kb, keyboard);
@@ -252,6 +246,7 @@ int closeusb(usbdevice* kb){
         os_closeusb(kb);
     } else
         updateconnected();
+    rmdevpath(kb);
 
     // Wait for thread to close
     pthread_mutex_unlock(imutex(kb));
@@ -263,7 +258,6 @@ int closeusb(usbdevice* kb){
     if(!kb->vtable)
         return 0;
     kb->vtable->freeprofile(kb);
-    rmdevpath(kb);
     memset(kb, 0, sizeof(usbdevice));
     return 0;
 }

@@ -178,7 +178,12 @@ void KbBind::update(QFile& cmd, bool force){
     if(!_bind.contains("ralt")) bind["ralt"] = 0;
     if(!_bind.contains("fn")) bind["fn"] = 0;
     QHashIterator<QString, KeyAction*> i(bind);
-    // Write out rebound keys
+
+    // Initialize String buffer for macro Key definitions (G-keys)
+    // "macro clear" is neccessary, if an older definition is unbound.
+    QString macros = "\nmacro clear\n";
+
+    // Write out rebound keys and collect infos for macro definitions
     while(i.hasNext()){
         i.next();
         QString key = i.key();
@@ -192,6 +197,14 @@ void KbBind::update(QFile& cmd, bool force){
             // If the key is unbound or is a special action, unbind it
             cmd.write(" unbind ");
             cmd.write(key.toLatin1());
+            // if a macro definiton for the key is given,
+            // add the converted string to key-buffer "macro"
+            if (act->isMacro()) {
+                QString mac = act->macroContent();  // macroContent assures start of String with "macro" or ""
+                if (mac.length() > 0) {
+                    macros.append("macro " + key.toLatin1() + ":" + mac.right(mac.length()-6).toLatin1() + "\n");
+                }
+            }
         } else {
             // Otherwise, write the binding
             cmd.write(" bind ");
@@ -203,6 +216,11 @@ void KbBind::update(QFile& cmd, bool force){
     // If win lock is enabled, unbind windows keys
     if(_winLock)
         cmd.write(" unbind lwin rwin");
+
+    // At last, send Macro definitions if avalilable.
+    // If no definitions are made, clear macro will be sent only to reset all macros.
+    qDebug(macros.toLatin1());
+    cmd.write(macros.toLatin1());
 }
 
 void KbBind::keyEvent(const QString& key, bool down){

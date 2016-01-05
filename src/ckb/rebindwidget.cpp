@@ -358,7 +358,10 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         }
         bind->setAction(keys, KeyAction::programAction(ui->programKpBox->text(), ui->programKrBox->text(), kpStop | krStop));
     } else if (ui->pteMacroBox->toPlainText().length() > 0) {
-        bind->setAction(keys, KeyAction::macroAction(ui->pteMacroBox->toPlainText())); // lae.: does not work
+        // G-key macro handling:
+        // Set the macro definiton for all keys selected (indeed, it may be multiple keys).
+        // ToDo: We need more than pteMacroBox for later display what has been typed
+        bind->setAction(keys, KeyAction::macroAction(ui->pteMacroBox->toPlainText())); // lae.
     } else if(doUnbind)
         bind->noAction(keys);
 }
@@ -405,7 +408,7 @@ void RebindWidget::setBox(QWidget* box){
         ui->programKpButton->setChecked(false);
         ui->programKrButton->setChecked(false);
     }
-    // lae.: Macro pane clear input window on start up
+    // lae. ToDo: Clear macro pane, so update will not occure in applyChanges() (it's too simple) 
     if (box != ui->pteMacroBox)
         ui->pteMacroBox->setPlainText("");
 }
@@ -663,3 +666,4 @@ void RebindWidget::on_animButton_clicked(bool checked){
     if(checked && ui->animBox->currentIndex() == 0)
         ui->animBox->setCurrentIndex(1);
 }
+

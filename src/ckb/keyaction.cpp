@@ -140,6 +140,8 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         return "Start animation";
     } else if(prefix == "$program"){
         return "Launch program";
+    } else if(prefix == "$macro"){
+        return "Send G-key macro";
     }
     return "(Unknown)";
 }
@@ -229,6 +231,14 @@ QString KeyAction::driverName() const {
     if(isSpecial())
         return "";
     return _value;
+}
+
+// If a macro definition exists for the given key ,
+// return the string except the leading "$"
+// (it may confuse an other function)
+// If no definition exists, return ""
+QString KeyAction::macroContent() const {
+    return isMacro() ? _value.right(_value.length()-1) : "";
 }
 
 void KeyAction::keyEvent(KbBind* bind, bool down){
@@ -371,9 +381,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         } else if(stopOnRelease){
             // Key released - stop animation
             anim->stop();
-        } else if (prefix == "$macro") {
-            qDebug ("ToDo: keyEvent with Macro");
-        }
+	}
     } else if(prefix == "$program"){
         // Launch program
         QString onPress, onRelease;
@@ -424,6 +432,11 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
             else
                 relProgram = process;
         }
+    } else if (prefix == "$macro") {
+        // Do nothing, because all work is done by the keyboard itself.
+        // For now, there is no reason to react on G-key press or release.
+        // If u find some reason, then here is the place for it.
+        // qDebug ("keyEvent with Macro");
     }
 }
 
@@ -472,10 +485,15 @@ void KeyAction::adjustDisplay(){
 #endif
 }
 
-// Changes made by lae. concerning G-Key macro definition user interface
+// G-Key macro definition
+// macroAction ist called, while being in the macro pane
+// and clicking apply with something in the text boxes.
+// Tag that input with $macro: for further recognition.
+// ToDo: The input should be read from both text panes
+// and concatted.
 QString KeyAction::macroAction(QString macroDef) {
-    qWarning() << "______\n[" << macroDef << "]\n_______\n";
-    qWarning() << "Length of QString in pteMacroKeys = " << macroDef.length() << "\n";
+    qDebug() << "______\n[" << macroDef << "]\n";
+    qDebug() << "Length of QString in pteMacroKeys = " << macroDef.length() << "\n";
     return QString ("$macro:%1").arg(macroDef);
 }
 

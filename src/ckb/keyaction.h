@@ -30,6 +30,7 @@ public:
     QString friendlyName(const KeyMap& map) const;
     // Name to send to driver (empty string for unbind)
     QString driverName() const;
+    QString macroContent() const;
 
     // Mode-switch action.
     // 0 for first mode, 1 for second, etc. Constants below for movement options

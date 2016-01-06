@@ -218,7 +218,6 @@ void KbBind::update(QFile& cmd, bool force){
 
     // At last, send Macro definitions if avalilable.
     // If no definitions are made, clear macro will be sent only to reset all macros.
-    qDebug(macros.toLatin1());
     cmd.write(macros.toLatin1());
 }
 

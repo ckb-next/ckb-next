@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "kbbind.h"
 #include "kbprofile.h"
+#include "macroreader.h"
 
 // Key rebinding widget
 
@@ -65,6 +66,8 @@ private slots:
     void on_programKrSIBox_clicked(bool checked);
     void on_animButton_clicked(bool checked);
     void on_pteMacroBox_textChanged();
+    void on_btnStartMacro_clicked();
+    void on_btnStopMacro_clicked();
 
 private:
     Ui::RebindWidget *ui;
@@ -86,6 +89,8 @@ private:
     QStringList mouseKeys;
     QStringList mouseExtKeys;
     QStringList wheelKeys;
+
+    MacroReader* macReader = 0;
 };
 
 #endif // BINDDIALOG_H

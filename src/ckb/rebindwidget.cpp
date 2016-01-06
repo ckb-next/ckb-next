@@ -684,3 +684,15 @@ void RebindWidget::on_animButton_clicked(bool checked){
         ui->animBox->setCurrentIndex(1);
 }
 
+
+void RebindWidget::on_btnStartMacro_clicked()
+{
+    if (!macReader)
+        macReader = new MacroReader;
+}
+
+void RebindWidget::on_btnStopMacro_clicked()
+{
+    if (macReader) delete macReader;
+    macReader = 0;
+}

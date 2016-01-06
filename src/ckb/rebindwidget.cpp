@@ -188,6 +188,9 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     ui->programKrModeBox->setCurrentIndex(0);
     ui->programKpModeBox->setEnabled(false);
     ui->programKrModeBox->setEnabled(false);
+    // Clear neu UI elements in MacroTab
+    ui->pteMacroBox->setPlainText("");
+    ui->pteMacroText->setPlainText("");
     // Fill in field and select tab according to action type
     bool mouse = act.isMouse();
     if(mouse){
@@ -286,6 +289,13 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                 ui->modeBox->setCurrentIndex(3);
         } else if (sAction == "macro") {
             ui->tabWidget->setCurrentIndex(TAB_MACRO);
+            if (act.isValidMacro()) {
+                ui->pteMacroBox->setPlainText(act.macroContent());
+                ui->pteMacroText->setPlainText(act.macroLine()[1].replace("&das_IST_31N_col0n;", ":"));
+            } else {
+                qDebug("RebindWidget::setSelection found invalid macro definition.");
+                act.macroDisplay();
+            }
         } else
             ui->modeBox->setCurrentIndex(0);
         // Brightness control. Also check wrap
@@ -360,8 +370,13 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
     } else if (ui->pteMacroBox->toPlainText().length() > 0) {
         // G-key macro handling:
         // Set the macro definiton for all keys selected (indeed, it may be multiple keys).
-        // ToDo: We need more than pteMacroBox for later display what has been typed
-        bind->setAction(keys, KeyAction::macroAction(ui->pteMacroBox->toPlainText())); // lae.
+        // First, concat the Macro Key Definion and the Macro plain text
+        // after escaping possible colos in the Macro Plain Text.
+        ui->pteMacroText->setPlainText("Das ist ein Beispieltext mit vielen Doppelpunkten < < >> ::: und einem &colon; zwischendrin haha, geht : doch! : ! :::");
+        QString mac;
+        mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;");
+        mac = ui->pteMacroBox->toPlainText() + ":" + mac;
+        bind->setAction(keys, KeyAction::macroAction(mac));
     } else if(doUnbind)
         bind->noAction(keys);
 }
@@ -408,9 +423,11 @@ void RebindWidget::setBox(QWidget* box){
         ui->programKpButton->setChecked(false);
         ui->programKrButton->setChecked(false);
     }
-    // lae. ToDo: Clear macro pane, so update will not occure in applyChanges() (it's too simple) 
-    if (box != ui->pteMacroBox)
+    // Clear macro panel
+    if (box != ui->pteMacroBox) {
         ui->pteMacroBox->setPlainText("");
+        ui->pteMacroText->setPlainText("");
+    }
 }
 
 void RebindWidget::on_typingBox_currentIndexChanged(int index){

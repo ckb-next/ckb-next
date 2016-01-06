@@ -233,14 +233,6 @@ QString KeyAction::driverName() const {
     return _value;
 }
 
-// If a macro definition exists for the given key ,
-// return the string except the leading "$"
-// (it may confuse an other function)
-// If no definition exists, return ""
-QString KeyAction::macroContent() const {
-    return isMacro() ? _value.right(_value.length()-1) : "";
-}
-
 void KeyAction::keyEvent(KbBind* bind, bool down){
     // No need to respond to standard actions
     if(!isSpecial())
@@ -438,6 +430,15 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         // If u find some reason, then here is the place for it.
         // qDebug ("keyEvent with Macro");
     }
+}
+
+// Just for debugging
+void KeyAction::macroDisplay() {
+    qDebug() << "isMacro returns" << (isMacro() ? "true" : "false");
+    qDebug() << "isValidMacro returns" << (isValidMacro() ? "true" : "false");
+    QStringList ret =_value.split(":");
+    qDebug() << "Macro definition conains" << ret.count() << "elements";
+    qDebug() << "Macro definition is" << _value;
 }
 
 void KeyAction::adjustDisplay(){

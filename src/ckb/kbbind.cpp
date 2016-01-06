@@ -199,10 +199,9 @@ void KbBind::update(QFile& cmd, bool force){
             cmd.write(key.toLatin1());
             // if a macro definiton for the key is given,
             // add the converted string to key-buffer "macro"
-            if (act->isMacro()) {
-                QString mac = act->macroContent();  // macroContent assures start of String with "macro" or ""
-                if (mac.length() > 0) {
-                    macros.append("macro " + key.toLatin1() + ":" + mac.right(mac.length()-6).toLatin1() + "\n");
+            if (act->isValidMacro()) {
+                if (act->macroContent().length() > 0) {
+                    macros.append("macro " + key.toLatin1() + ":" + act->macroContent().toLatin1() + "\n");
                 }
             }
         } else {

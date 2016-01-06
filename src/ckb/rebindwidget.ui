@@ -1312,7 +1312,7 @@
         <string>Macro Text</string>
        </property>
       </widget>
-      <widget class="QPlainTextEdit" name="pte_MacroText">
+      <widget class="QPlainTextEdit" name="pteMacroText">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -1353,7 +1353,7 @@
        </property>
       </widget>
       <zorder>groupBox_3</zorder>
-      <zorder>pte_MacroText</zorder>
+      <zorder>pteMacroText</zorder>
       <zorder>layoutWidget1</zorder>
       <zorder>layoutWidget</zorder>
      </widget>
@@ -1462,7 +1462,7 @@
   <connection>
    <sender>btnClearMacro</sender>
    <signal>clicked()</signal>
-   <receiver>pte_MacroText</receiver>
+   <receiver>pteMacroText</receiver>
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">

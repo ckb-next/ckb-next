@@ -30,7 +30,56 @@ public:
     QString friendlyName(const KeyMap& map) const;
     // Name to send to driver (empty string for unbind)
     QString driverName() const;
-    QString macroContent() const;
+
+    // Three inline functions for macros.
+    // This helps QSting mengling with the macro-action string:
+    // That string consists of 3 elements:
+    //  1.  "$macro:"
+    //  2.  Macro Key Definition (coming from pteMacroBox)
+    //      This sequence will program the keyboard,
+    //      is hardly readable and is delimited by ":"
+    //  3.  Readable Macro String
+    //      This is displayed in pteMacroText
+    //
+    // If a macro definition exists for the given key,
+    // returns the string except the leading "$"
+    // (the $ may confuse some caller).
+    // All 3 parts are returned in one QString .
+    // If no definition exists, return ""
+    inline QString macroFullLine() const {
+        return isMacro() ? _value.right(_value.length()-1) : "";
+    }
+
+    // isValidMacro returns true, iff the macro definition
+    // contains exactly all three elements.
+    inline bool isValidMacro() const {
+        if (isMacro()) {
+            QStringList ret;
+            ret =_value.split(":");
+            return (ret.count() == 3);
+        } else {
+            return false;
+        }
+    }
+
+    // Return Macro Key Definition and
+    // Readble Macro String as QStringList.
+    inline QStringList macroLine() const {
+        if (isValidMacro()) {
+            QStringList ret =_value.split(":");
+            ret.removeFirst();
+            return ret;
+        } else return QStringList();
+    }
+
+    // Return the macro key definition only
+    // (the second part of the macro definition)
+    inline QString macroContent() const {
+        return isValidMacro() ? _value.split(":")[1] : "";
+    }
+
+    // Debug output for invalid macro Definitions
+    void macroDisplay();
 
     // Mode-switch action.
     // 0 for first mode, 1 for second, etc. Constants below for movement options

@@ -372,7 +372,6 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         // Set the macro definiton for all keys selected (indeed, it may be multiple keys).
         // First, concat the Macro Key Definion and the Macro plain text
         // after escaping possible colos in the Macro Plain Text.
-        ui->pteMacroText->setPlainText("Das ist ein Beispieltext mit vielen Doppelpunkten < < >> ::: und einem &colon; zwischendrin haha, geht : doch! : ! :::");
         QString mac;
         mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;");
         mac = ui->pteMacroBox->toPlainText() + ":" + mac;
@@ -382,6 +381,11 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
 }
 
 void RebindWidget::on_applyButton_clicked(){
+    // Normally, this should be done via signalling.
+    // Because there is no serarate thread, we have to call it directly
+    // (otherwise we could do Key char conversion step by step,
+    // but so it is more easy to change the key definition):
+    on_btnStopMacro_clicked();
     applyChanges(selection, true);
 }
 
@@ -685,14 +689,26 @@ void RebindWidget::on_animButton_clicked(bool checked){
 }
 
 
-void RebindWidget::on_btnStartMacro_clicked()
-{
+void RebindWidget::on_btnStartMacro_clicked() {
     if (!macReader)
-        macReader = new MacroReader;
+        bind->handleNotificationChannel(true);
+        macReader = new MacroReader(bind->getMacroNumber(), bind->getMacroPath(), ui->pteMacroBox, ui->pteMacroText);
 }
 
-void RebindWidget::on_btnStopMacro_clicked()
-{
-    if (macReader) delete macReader;
-    macReader = 0;
+void RebindWidget::on_btnStopMacro_clicked() {
+    if (macReader) {
+        bind->handleNotificationChannel(false);
+        delete macReader;
+        macReader = 0;
+        convertMacroBox();
+    }
+}
+
+void RebindWidget::convertMacroBox() {
+    QString in;
+
+    in = ui->pteMacroBox->toPlainText();
+    in.replace (QRegExp("\n"), ",");
+    in.replace (QRegExp("key "), "");
+    ui->pteMacroBox->setPlainText(in);
 }

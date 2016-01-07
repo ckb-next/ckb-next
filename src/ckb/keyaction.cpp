@@ -493,8 +493,7 @@ void KeyAction::adjustDisplay(){
 // ToDo: The input should be read from both text panes
 // and concatted.
 QString KeyAction::macroAction(QString macroDef) {
-    qDebug() << "______\n[" << macroDef << "]\n";
-    qDebug() << "Length of QString in pteMacroKeys = " << macroDef.length() << "\n";
+    qDebug() << "[" << macroDef << "]\n";
     return QString ("$macro:%1").arg(macroDef);
 }
 

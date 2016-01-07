@@ -37,7 +37,6 @@ public:
     inline bool             isISO()         const   { return _map.isISO(); }
     inline bool             isKeyboard()    const   { return _map.isKeyboard(); }
     inline bool             isMouse()       const   { return _map.isMouse(); }
-
     // Related objects
     KbPerf*     perf();
     KbLight*    light();
@@ -78,6 +77,12 @@ public:
     void        update(QFile& cmd, bool force = false);
     inline void setNeedsUpdate()                        { _needsUpdate = true; }
 
+    // For usage with macro definions, these two params must only be readable.
+    // So there are no setters.
+    int getMacroNumber();
+    QString getMacroPath();
+    void handleNotificationChannel(bool start);
+
 public slots:
     // Callback for a keypress event.
     void keyEvent(const QString& key, bool down);
@@ -98,6 +103,7 @@ private:
     static QHash<QString, QString>  _globalRemap;
     static quint64                  globalRemapTime;
     quint64                         lastGlobalRemapTime;
+    QFile*                           lastCmd;
 
     KeyMap _map;
     // Key -> action map (no entry = default action)
@@ -106,7 +112,6 @@ private:
     bool _winLock;
     bool _needsUpdate;
     bool _needsSave;
-
     friend class KeyAction;
 };
 

@@ -4,6 +4,7 @@
 #include "kbbind.h"
 #include "kbmode.h"
 #include "kb.h"
+#include "qdebug.h"
 
 QHash<QString, QString> KbBind::_globalRemap;
 quint64 KbBind::globalRemapTime = 0;
@@ -219,7 +220,43 @@ void KbBind::update(QFile& cmd, bool force){
     // At last, send Macro definitions if avalilable.
     // If no definitions are made, clear macro will be sent only to reset all macros.
     cmd.write(macros.toLatin1());
+    lastCmd = &cmd;
 }
+
+////////
+/// \brief KbBind::getMacroNumber
+/// \return number of notification channel. Use it in combination with notifyon/off-Statement
+///
+int KbBind::getMacroNumber() {
+    return devParent()->getMacroNumber();
+}
+
+////////
+/// \brief KbBind::getMacroPath
+/// \return Filepath of macro notification pipe. If not set, return ""
+///
+QString KbBind::getMacroPath() {
+    return devParent()->getMacroPath();
+}
+
+////////
+/// \brief handleMacro
+/// \param start is boolean. If true, notification channel is opened for all keys, otherwise channel ist closed.
+/// send a notify cmd to the keyboard to set or clear notification for reading macro definition
+void KbBind::handleNotificationChannel(bool start) {
+    if (getMacroNumber() > 0 && lastCmd) {
+        if (start) {
+            lastCmd->write (QString("\nnotifyon %1\n@%1 notify all:on\n").arg(getMacroNumber()).toLatin1());
+            lastCmd->flush();
+            qDebug() << (QString("\nnotifyon %1\n@%1 notify all:on\n").arg(getMacroNumber())).toLatin1();
+        } else {
+            lastCmd->write (QString("\n@%1 notify all:off\nnotifyoff %1\n").arg(getMacroNumber()).toLatin1());
+            qDebug() << QString("\n@%1 notify all:off\nnotifyoff %1\n").arg(getMacroNumber()).toLatin1();
+        }
+    } else qDebug() << QString("No cmd or valid handle for notification found, macroNumber = %1, lastCmd = %2")
+                       .arg(getMacroNumber()).arg(lastCmd? "set" : "unset");
+}
+
 
 void KbBind::keyEvent(const QString& key, bool down){
     QString rKey = globalRemap(key);

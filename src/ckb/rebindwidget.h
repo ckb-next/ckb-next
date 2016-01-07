@@ -77,6 +77,9 @@ private:
 
     void setBox(QWidget* box);
 
+    // convert keyboard definion into macro definition
+    void convertMacroBox();
+
     KbBind* bind;
     KbProfile* profile;
     QStringList selection;

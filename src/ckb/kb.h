@@ -83,6 +83,11 @@ public:
 
     void hwSave();
 
+    // For usage with macro definions, these two params must only be readable.
+    // So there are no setters.
+    inline int getMacroNumber (){ return macroNumber; }
+    inline QString getMacroPath (){ return macroPath; }
+
     ~Kb();
 
 signals:
@@ -124,8 +129,10 @@ private:
 
     inline bool isOpen() const { return cmd.isOpen(); }
 
-    // File paths
-    QString devpath, cmdpath, notifyPath;
+    // File paths;
+    // notifyPath is the standard input monitor for general purpose.
+    // macroPath added for a second thread to read macro input.
+    QString devpath, cmdpath, notifyPath, macroPath;
     // Is this the keyboard at the given serial/path?
     inline bool matches(const QString& path, const QString& serial) { return path.trimmed() == devpath.trimmed() && usbSerial == serial.trimmed().toUpper(); }
 
@@ -164,6 +171,8 @@ private:
     QFile cmd;
     // Notification number
     int notifyNumber;
+    // Macro Numer to notify macro definition events
+    int macroNumber;
 
     // Needs to be saved?
     bool _needsSave;

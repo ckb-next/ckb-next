@@ -690,9 +690,15 @@ void RebindWidget::on_animButton_clicked(bool checked){
 
 
 void RebindWidget::on_btnStartMacro_clicked() {
-    if (!macReader)
+    if (!macReader) {
         bind->handleNotificationChannel(true);
         macReader = new MacroReader(bind->getMacroNumber(), bind->getMacroPath(), ui->pteMacroBox, ui->pteMacroText);
+        // because of the second thread we need to disable three of the four bottom buttons.
+        // Clicking "Stop" will enable them again.
+        ui->applyButton->setEnabled(false);
+        ui->resetButton->setEnabled(false);
+        ui->unbindButton->setEnabled(false);
+    }
 }
 
 void RebindWidget::on_btnStopMacro_clicked() {
@@ -701,6 +707,9 @@ void RebindWidget::on_btnStopMacro_clicked() {
         delete macReader;
         macReader = 0;
         convertMacroBox();
+        ui->applyButton->setEnabled(true);
+        ui->resetButton->setEnabled(true);
+        ui->unbindButton->setEnabled(true);
     }
 }
 

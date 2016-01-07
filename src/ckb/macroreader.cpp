@@ -1,5 +1,4 @@
 #include <fcntl.h>
-#include <QDateTime>
 #include <qdebug.h>
 #include "macroreader.h"
 

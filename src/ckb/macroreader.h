@@ -14,8 +14,8 @@ class MacroReaderThread : public QThread
     Q_OBJECT
     int macroNumber;
     QString macroPath;
-    QPlainTextEdit *macroBox;
-    QPlainTextEdit *macroText;
+    QPlainTextEdit* macroBox;
+    QPlainTextEdit* macroText;
 
 public:
     MacroReaderThread(int macNum, QString macPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {

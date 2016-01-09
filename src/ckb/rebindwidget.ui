@@ -1381,7 +1381,7 @@
        <property name="geometry">
         <rect>
          <x>300</x>
-         <y>150</y>
+         <y>160</y>
          <width>436</width>
          <height>30</height>
         </rect>
@@ -1396,6 +1396,9 @@
         </item>
         <item row="0" column="2">
          <widget class="QPushButton" name="btnStopMacro">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Stop</string>
           </property>
@@ -1417,11 +1420,25 @@
         </item>
        </layout>
       </widget>
+      <widget class="QLabel" name="lbl_macro">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>130</y>
+         <width>431</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Comment label for help</string>
+       </property>
+      </widget>
       <zorder>pteMacroComment</zorder>
       <zorder>layoutWidget1</zorder>
       <zorder>layoutWidget</zorder>
       <zorder>pteMacroText</zorder>
       <zorder>layoutWidget_2</zorder>
+      <zorder>lbl_macro</zorder>
      </widget>
     </widget>
    </item>
@@ -1434,7 +1451,7 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>5</width>
          <height>20</height>
         </size>
        </property>
@@ -1478,23 +1495,21 @@
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>pteMacroComment</tabstop>
-  <tabstop>btnStartMacro</tabstop>
-  <tabstop>btnStopMacro</tabstop>
-  <tabstop>btnClearMacro</tabstop>
-  <tabstop>applyButton</tabstop>
-  <tabstop>cancelButton</tabstop>
-  <tabstop>resetButton</tabstop>
-  <tabstop>unbindButton</tabstop>
   <tabstop>pteMacroBox</tabstop>
   <tabstop>dpiButton</tabstop>
   <tabstop>mb2Box</tabstop>
-  <tabstop>dpiBox</tabstop>
+  <tabstop>btnStartMacro</tabstop>
   <tabstop>fnBox</tabstop>
   <tabstop>dpiCustYBox</tabstop>
+  <tabstop>dpiBox</tabstop>
+  <tabstop>applyButton</tabstop>
   <tabstop>mbBox</tabstop>
+  <tabstop>cancelButton</tabstop>
   <tabstop>wheelBox</tabstop>
+  <tabstop>btnStopMacro</tabstop>
   <tabstop>mbButton</tabstop>
   <tabstop>dpiCustXBox</tabstop>
+  <tabstop>btnClearMacro</tabstop>
   <tabstop>wheelButton</tabstop>
   <tabstop>mb2Button</tabstop>
   <tabstop>animBox</tabstop>
@@ -1506,9 +1521,11 @@
   <tabstop>lightWrapBox</tabstop>
   <tabstop>lockButton</tabstop>
   <tabstop>lightBox</tabstop>
+  <tabstop>resetButton</tabstop>
   <tabstop>lockBox</tabstop>
   <tabstop>lightButton</tabstop>
   <tabstop>modeBox</tabstop>
+  <tabstop>unbindButton</tabstop>
   <tabstop>programKpButton</tabstop>
   <tabstop>programKpBox</tabstop>
   <tabstop>programKrBox</tabstop>

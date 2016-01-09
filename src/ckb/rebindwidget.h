@@ -69,6 +69,8 @@ private slots:
     void on_btnStartMacro_clicked();
     void on_btnStopMacro_clicked();
 
+    void on_btnClearMacro_clicked();
+
 private:
     Ui::RebindWidget *ui;
 
@@ -79,6 +81,8 @@ private:
 
     // convert keyboard definion into macro definition
     void convertMacroBox();
+    // Show some help info
+    void helpStatus(int status);
 
     KbBind* bind;
     KbProfile* profile;
@@ -93,7 +97,7 @@ private:
     QStringList mouseExtKeys;
     QStringList wheelKeys;
 
-    MacroReader* macReader = 0;
+    MacroReader* macReader;
 };
 
 #endif // BINDDIALOG_H

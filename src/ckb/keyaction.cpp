@@ -431,7 +431,11 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
     }
 }
 
-// Just for debugging
+
+//////////
+/// \brief KeyAction::macroDisplay
+/// Just for debugging
+///
 void KeyAction::macroDisplay() {
     qDebug() << "isMacro returns" << (isMacro() ? "true" : "false");
     qDebug() << "isValidMacro returns" << (isValidMacro() ? "true" : "false");
@@ -485,13 +489,15 @@ void KeyAction::adjustDisplay(){
 #endif
 }
 
-// G-Key macro definition
-// macroAction ist called, while being in the macro pane
-// and clicking apply with something in the text boxes.
-// Tag that input with $macro: for further recognition.
-// ToDo: The input should be read from both text panes
-// and concatted.
+//////////
+/// \brief KeyAction::macroAction
+/// \param macroDef
+/// \return QString holding G-Key macro definition
+///
+/// macroAction ist called while being in the macro pane
+/// and clicking Apply with something in the Macro Text Box.
+/// Tag that input with "$macro:" for further recognition.
+///
 QString KeyAction::macroAction(QString macroDef) {
     return QString ("$macro:%1").arg(macroDef);
 }
-

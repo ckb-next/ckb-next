@@ -9,7 +9,7 @@ static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
 RebindWidget::RebindWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RebindWidget),
-    bind(0), profile(0)
+    bind(0), profile(0), macReader(0)
 {
     ui->setupUi(this);
     ui->lightWrapBox->hide();
@@ -191,6 +191,7 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     // Clear neu UI elements in MacroTab
     ui->pteMacroBox->setPlainText("");
     ui->pteMacroText->setPlainText("");
+    ui->pteMacroComment->setPlainText("");
     // Fill in field and select tab according to action type
     bool mouse = act.isMouse();
     if(mouse){
@@ -292,6 +293,7 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             if (act.isValidMacro()) {
                 ui->pteMacroBox->setPlainText(act.macroContent());
                 ui->pteMacroText->setPlainText(act.macroLine()[1].replace("&das_IST_31N_col0n;", ":"));
+                ui->pteMacroComment->setPlainText(act.macroLine()[2].replace("&das_IST_31N_col0n;", ":"));
             } else {
                 qDebug("RebindWidget::setSelection found invalid macro definition.");
                 act.macroDisplay();
@@ -371,9 +373,10 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         // G-key macro handling:
         // Set the macro definiton for all keys selected (indeed, it may be multiple keys).
         // First, concat the Macro Key Definion and the Macro plain text
-        // after escaping possible colos in the Macro Plain Text.
+        // after escaping possible colos in the parts for Macro Text and Macro Comment.
         QString mac;
-        mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;");
+        mac = ui->pteMacroComment->toPlainText().replace(":", "&das_IST_31N_col0n;");
+        mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
         mac = ui->pteMacroBox->toPlainText() + ":" + mac;
         bind->setAction(keys, KeyAction::macroAction(mac));
     } else if(doUnbind)
@@ -381,11 +384,6 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
 }
 
 void RebindWidget::on_applyButton_clicked(){
-    // Normally, this should be done via signalling.
-    // Because there is no serarate thread, we have to call it directly
-    // (otherwise we could do Key char conversion step by step,
-    // but so it is more easy to change the key definition):
-    on_btnStopMacro_clicked();
     applyChanges(selection, true);
 }
 
@@ -430,7 +428,7 @@ void RebindWidget::setBox(QWidget* box){
     // Clear macro panel
     if (box != ui->pteMacroBox) {
         ui->pteMacroBox->setPlainText("");
-        ui->pteMacroText->setPlainText("");
+        helpStatus(1);
     }
 }
 
@@ -698,6 +696,9 @@ void RebindWidget::on_btnStartMacro_clicked() {
         ui->applyButton->setEnabled(false);
         ui->resetButton->setEnabled(false);
         ui->unbindButton->setEnabled(false);
+        ui->btnStartMacro->setEnabled(false);
+        ui->btnStopMacro->setEnabled(true);
+        helpStatus(2);
     }
 }
 
@@ -710,6 +711,29 @@ void RebindWidget::on_btnStopMacro_clicked() {
         ui->applyButton->setEnabled(true);
         ui->resetButton->setEnabled(true);
         ui->unbindButton->setEnabled(true);
+        ui->btnStartMacro->setEnabled(true);
+        ui->btnStopMacro->setEnabled(false);
+        helpStatus(3);
+    }
+}
+
+void RebindWidget::on_btnClearMacro_clicked() {
+    helpStatus(1);
+}
+
+void RebindWidget::helpStatus(int status) {
+    switch (status) {
+    case 1:
+        ui->lbl_macro->setText("Type in a macro name in the comment box and click start.");
+        break;
+    case 2:
+        ui->lbl_macro->setText("Type your macro and click stop when finished.");
+        break;
+    case 3:
+        ui->lbl_macro->setText("Click Apply or change values in Macro Key Actions in advance.");
+        break;
+    default:
+        ui->lbl_macro->setText(QString("Oops: Some magic in RebindWidget::helpStatus (%1)").arg(status));
     }
 }
 
@@ -721,3 +745,4 @@ void RebindWidget::convertMacroBox() {
     in.replace (QRegExp("key "), "");
     ui->pteMacroBox->setPlainText(in);
 }
+

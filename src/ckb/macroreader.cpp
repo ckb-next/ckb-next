@@ -34,6 +34,9 @@ void MacroReaderThread::readMacro(QString line) {
     // Because it is possible to change the Focus via keyboard,
     // we must set the focus on each call.
     macroText->setFocus();
+    QTextCursor c = macroText->textCursor();
+    c.setPosition(macroText->toPlainText().length());
+    macroText->setTextCursor(c);
     macroBox->appendPlainText(line.left(line.size()-1));
 }
 

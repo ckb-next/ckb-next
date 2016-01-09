@@ -31,39 +31,56 @@ public:
     // Name to send to driver (empty string for unbind)
     QString driverName() const;
 
-    // Three inline functions for macros.
-    // This helps QSting mengling with the macro-action string:
-    // That string consists of 3 elements:
-    //  1.  "$macro:"
-    //  2.  Macro Key Definition (coming from pteMacroBox)
-    //      This sequence will program the keyboard,
-    //      is hardly readable and is delimited by ":"
-    //  3.  Readable Macro String
-    //      This is displayed in pteMacroText
-    //
-    // If a macro definition exists for the given key,
-    // returns the string except the leading "$"
-    // (the $ may confuse some caller).
-    // All 3 parts are returned in one QString .
-    // If no definition exists, return ""
+    //////////
+    ///     Three inline functions for macros.
+    ///     This helps QSting mengling with the macro-action string:
+    ///     That string consists of 4 elements:
+    ///      1.  "$macro:"
+    ///      2.  Macro Key Definition (coming from pteMacroBox)
+    ///          This sequence will program the keyboard,
+    ///          is hardly readable and is delimited by ":"
+    ///      3.  Readable Macro String
+    ///          This is displayed in pteMacroText
+    ///      4.  Readable Macro Comment
+    ///          This is displayed in pteMacroComment
+    //////////
+
+    //////////
+    /// \brief macroFullLine
+    /// \return QString
+    ///     If a macro definition exists for the given key,
+    ///     returns the string except the leading "$"
+    ///     (the $ may confuse some caller).
+    ///     All 4 parts are returned in one QString.
+    ///     If no definition exists, return ""
+    ///
     inline QString macroFullLine() const {
         return isMacro() ? _value.right(_value.length()-1) : "";
     }
 
-    // isValidMacro returns true, iff the macro definition
-    // contains exactly all three elements.
-    inline bool isValidMacro() const {
+     //////////
+     /// \brief isValidMacro
+     /// \return bool
+     ///    true, iff the macro definition
+     ///    contains exactly all three elements.
+     ///
+     inline bool isValidMacro() const {
         if (isMacro()) {
             QStringList ret;
             ret =_value.split(":");
-            return (ret.count() == 3);
+            return (ret.count() == 4);
         } else {
             return false;
         }
     }
 
-    // Return Macro Key Definition and
-    // Readble Macro String as QStringList.
+    //////////
+    /// \brief macroLine
+    /// \return QStringList
+    ///     Macro Key Definition,
+    ///     Readble Macro String and
+    ///     Readable Macro Comment as QStringList.
+    ///
     inline QStringList macroLine() const {
         if (isValidMacro()) {
             QStringList ret =_value.split(":");
@@ -72,13 +89,20 @@ public:
         } else return QStringList();
     }
 
-    // Return the macro key definition only
-    // (the second part of the macro definition)
+    //////////
+    /// \brief macroContent
+    /// \return QString
+    ///     Return the macro key definition only
+    ///     (the second part of the macro definition)
+    ///
     inline QString macroContent() const {
         return isValidMacro() ? _value.split(":")[1] : "";
     }
 
-    // Debug output for invalid macro Definitions
+    //////////
+    /// \brief macroDisplay
+    ///     Debug output for invalid macro Definitions
+    ///
     void macroDisplay();
 
     // Mode-switch action.

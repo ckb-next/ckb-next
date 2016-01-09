@@ -10,6 +10,8 @@
 
 namespace Ui {
 class KbWidget;
+class KbBindWidget;
+class RebindWidget;
 }
 
 class KbWidget : public QWidget

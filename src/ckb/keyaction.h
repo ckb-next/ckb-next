@@ -32,25 +32,11 @@ public:
     QString driverName() const;
 
     //////////
-    ///     Three inline functions for macros.
-    ///     This helps QSting mengling with the macro-action string:
-    ///     That string consists of 4 elements:
-    ///      1.  "$macro:"
-    ///      2.  Macro Key Definition (coming from pteMacroBox)
-    ///          This sequence will program the keyboard,
-    ///          is hardly readable and is delimited by ":"
-    ///      3.  Readable Macro String
-    ///          This is displayed in pteMacroText
-    ///      4.  Readable Macro Comment
-    ///          This is displayed in pteMacroComment
-    //////////
-
-    //////////
     /// \brief macroFullLine
-    /// \return QString
-    ///     If a macro definition exists for the given key,
-    ///     returns the string except the leading "$"
+    ///     If a macro command and a macro definition exists for the given key,
+    ///     returns the complete string except the leading "$"
     ///     (the $ may confuse some caller).
+    /// \return QString
     ///     All 4 parts are returned in one QString.
     ///     If no definition exists, return ""
     ///
@@ -59,10 +45,12 @@ public:
     }
 
      //////////
-     /// \brief isValidMacro
-     /// \return bool
-     ///    true, iff the macro definition
-     ///    contains exactly all three elements.
+     /// \brief isValidMacro checks whether a keyAction contains a valid macro.
+     /// This is easy done: If the macro action starts with $macro:
+     /// and has four elements, delimited by ":", we may assume,
+     /// thats a structural correct macro action.
+     /// \return bool is true, iff the macro definition
+     ///    contains all four elements.
      ///
      inline bool isValidMacro() const {
         if (isMacro()) {
@@ -75,9 +63,8 @@ public:
     }
 
     //////////
-    /// \brief macroLine
-    /// \return QStringList
-    ///     Macro Key Definition,
+    /// \brief macroLine returns all interresting content for a macro definition.
+    /// \return QStringList returns the Macro Key Definition,
     ///     Readble Macro String and
     ///     Readable Macro Comment as QStringList.
     ///
@@ -90,18 +77,28 @@ public:
     }
 
     //////////
-    /// \brief macroContent
-    /// \return QString
-    ///     Return the macro key definition only
-    ///     (the second part of the macro definition)
+    /// \brief macroContent returns the macro key definition only
+    /// (the second part of the macro action).
+    /// \return QString macroContent
     ///
     inline QString macroContent() const {
         return isValidMacro() ? _value.split(":")[1] : "";
     }
 
     //////////
-    /// \brief macroDisplay
-    ///     Debug output for invalid macro Definitions
+    /// \brief Debug output for invalid macro Definitions
+    ///
+    /// General Info on KeyAction::_value for macros:
+    ///     That string consists of 4 elements:
+    ///      1.  Macro command "$macro:"
+    ///      2.  Macro Key Definition (coming from pteMacroBox)
+    ///          This sequence will program the keyboard,
+    ///          is hardly readable and is delimited by ":"
+    ///      3.  Readable Macro String
+    ///          This is displayed in pteMacroText
+    ///      4.  Readable Macro Comment
+    ///          This is displayed in pteMacroComment
+    ///
     ///
     void macroDisplay();
 

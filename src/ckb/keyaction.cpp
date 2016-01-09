@@ -434,7 +434,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
 
 //////////
 /// \brief KeyAction::macroDisplay
-/// Just for debugging
+/// Just for debugging.
 ///
 void KeyAction::macroDisplay() {
     qDebug() << "isMacro returns" << (isMacro() ? "true" : "false");
@@ -490,13 +490,12 @@ void KeyAction::adjustDisplay(){
 }
 
 //////////
-/// \brief KeyAction::macroAction
-/// \param macroDef
-/// \return QString holding G-Key macro definition
-///
+/// \brief KeyAction::macroAction is called when applying changes on a macro definition.
 /// macroAction ist called while being in the macro pane
 /// and clicking Apply with something in the Macro Text Box.
 /// Tag that input with "$macro:" for further recognition.
+/// \param macroDef holds the String containing parts 2-4 of a complete macro definition.
+/// \return QString holding the complete G-Key macro definition (parts 1-4)
 ///
 QString KeyAction::macroAction(QString macroDef) {
     return QString ("$macro:%1").arg(macroDef);

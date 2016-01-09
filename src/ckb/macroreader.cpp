@@ -2,17 +2,18 @@
 #include <qdebug.h>
 #include "macroreader.h"
 
+//////////
+/// \class MacroReader
+///
+
 MacroReader::MacroReader() {
     qDebug() << "Calling MacroReader without params is not allowed.";
 }
 
 MacroReader::MacroReader(int macroNumber, QString macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
-    macText->setFocus();    // we want to see the keys as they appear in the macroText Widget
     startWorkInAThread(macroNumber, macroPath, macBox, macText);
 }
-
-MacroReader::~MacroReader() {
-}
+MacroReader::~MacroReader() {}
 
 void MacroReader::startWorkInAThread(int macroNumber, QString macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
     macroReaderThread = new MacroReaderThread(macroNumber, macroPath, macBox, macText);
@@ -20,19 +21,13 @@ void MacroReader::startWorkInAThread(int macroNumber, QString macroPath, QPlainT
     macroReaderThread->start();
 }
 
-//////////////////////
-/// \brief MacroReaderThread::readMacro
-/// \param line as QString
-///
-/// That method ist called wia signal from the worker thread,
-/// which reads the keyboard input.
-/// Just display the key code in the macroBox Widget
-/// without he trailing \n
+//////////
+/// \class MacroReaderThread
 ///
 void MacroReaderThread::readMacro(QString line) {
-    // we want to see the keys as they appear in the macroText Widget
-    // Because it is possible to change the Focus via keyboard,
-    // we must set the focus on each call.
+    /// \detail We want to see the keys as they appear in the macroText Widget
+    /// Because it is possible to change the Focus via keyboard,
+    /// we must set the focus on each call.
     macroText->setFocus();
     QTextCursor c = macroText->textCursor();
     c.setPosition(macroText->toPlainText().length());
@@ -40,6 +35,14 @@ void MacroReaderThread::readMacro(QString line) {
     macroBox->appendPlainText(line.left(line.size()-1));
 }
 
+//////////
+/// \brief MacroReaderThread::run is the standard main function for a thread.
+/// Tries to open a file <macroPath><macroNumber> several times
+/// (in this case, it should be possible the first time. The code was recycled from kb.cpp)
+///
+/// While the file is open, read lines an signal them via metaObject() to the main thread.
+/// When the file is closed by the sender, close it as reader and terminate.
+///
 void MacroReaderThread::run() {
     qDebug() << "MacroReader::run() started with" << macroNumber << "and" << macroPath << "and" << macroBox << "and" << macroText;
 

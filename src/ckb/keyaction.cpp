@@ -373,7 +373,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         } else if(stopOnRelease){
             // Key released - stop animation
             anim->stop();
-	}
+        }
     } else if(prefix == "$program"){
         // Launch program
         QString onPress, onRelease;
@@ -431,10 +431,8 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
     }
 }
 
-
-//////////
-/// \brief KeyAction::macroDisplay
-/// Just for debugging.
+/// \brief KeyAction::macroDisplay is just for debugging.
+/// It shows the content of the key action and some other info.
 ///
 void KeyAction::macroDisplay() {
     qDebug() << "isMacro returns" << (isMacro() ? "true" : "false");
@@ -493,7 +491,7 @@ void KeyAction::adjustDisplay(){
 /// \brief KeyAction::macroAction is called when applying changes on a macro definition.
 /// macroAction ist called while being in the macro pane
 /// and clicking Apply with something in the Macro Text Box.
-/// Tag that input with "$macro:" for further recognition.
+/// It tags that input with "$macro:" for further recognition.
 /// \param macroDef holds the String containing parts 2-4 of a complete macro definition.
 /// \return QString holding the complete G-Key macro definition (parts 1-4)
 ///

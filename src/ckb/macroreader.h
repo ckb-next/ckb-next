@@ -14,8 +14,6 @@
 ///
 /// While the worker Thread gets input from the keyboard,
 /// the lines are sent via signalling (metaobject) to run a member function in the context of the Qt UI manager.
-/// (BTW: in this case it is not interesting, but you may have a lot of parallel running worker threads.
-/// Just create more than one object from MacroReaderThread).
 ///
 /// When the notify channel is closed (that's normally done by pressing "Stop"-Button in the UI),
 /// the worker thread closes the channelFile and leaves.
@@ -68,7 +66,7 @@ public:
 private slots:
     //////////
     /// \brief readMacro is called for each line received by the worker thread.
-    /// The method ist called via signal (metaobject) from the worker thread,
+    /// The method ist called via signal (metaObject) from the worker thread,
     /// which reads the keyboard input.
     /// Just display the key code in the macroBox Widget without he trailing newline
     /// and reposition the cursor in the macro pane.

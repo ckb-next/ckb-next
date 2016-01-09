@@ -77,10 +77,21 @@ public:
     void        update(QFile& cmd, bool force = false);
     inline void setNeedsUpdate()                        { _needsUpdate = true; }
 
-    // For usage with macro definions, these two params must only be readable.
-    // So there are no setters.
+    ////////
+    /// \brief KbBind::getMacroNumber
+    /// \return number of notification channel. Use it in combination with notifyon/off-Statement
     int getMacroNumber();
+
+    ////////
+    /// \brief KbBind::getMacroPath
+    /// \return Filepath of macro notification pipe. If not set, returns initial value ""
     QString getMacroPath();
+
+    ////////
+    /// \brief handleNotificationChannel sends commands to ckb-daemon for (de-) activating the notify channel.
+    /// Send a notify cmd to the keyboard to set or clear notification for reading macro definition.
+    /// The file handle for the cmd pipe is stored in lastCmd.
+    /// \param start is boolean. If true, notification channel is opened for all keys, otherwise channel ist closed.
     void handleNotificationChannel(bool start);
 
 public slots:
@@ -103,6 +114,11 @@ private:
     static QHash<QString, QString>  _globalRemap;
     static quint64                  globalRemapTime;
     quint64                         lastGlobalRemapTime;
+
+    //////////
+    /// \brief lastCmd is a cache-hack.
+    /// Because the QFile ist opened in Kb, and we need it in the macro processing functions,
+    /// we cache the value her in lastCmd.
     QFile*                           lastCmd;
 
     KeyMap _map;

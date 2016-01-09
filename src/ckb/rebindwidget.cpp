@@ -691,7 +691,15 @@ void RebindWidget::on_animButton_clicked(bool checked){
         ui->animBox->setCurrentIndex(1);
 }
 
-
+//////////
+/// \brief RebindWidget::on_btnStartMacro_clicked starts macro recording.
+/// A new notification channel and MacroReader are created to do the job.
+///
+/// The UI is protected against false clicking
+/// (e.g. if you type start and than Apply, the channel is closed in wrong order).
+///
+/// At this time, all neccessary params like macroNumber, macroPath, cmdFile etc. had been cached.
+///
 void RebindWidget::on_btnStartMacro_clicked() {
     if (!macReader) {
         bind->handleNotificationChannel(true);
@@ -707,6 +715,13 @@ void RebindWidget::on_btnStartMacro_clicked() {
     }
 }
 
+//////////
+/// \brief RebindWidget::on_btnStopMacro_clicked ends the macro recording.
+/// Notify channel ist closed, the ReaderThread is deleted if the notification is really down.
+///
+/// Afterwards, the characters in the MacroBox are changed from KB-out format to cmd-in format.
+/// At last the UI changes to the new state.
+///
 void RebindWidget::on_btnStopMacro_clicked() {
     if (macReader) {
         bind->handleNotificationChannel(false);
@@ -722,10 +737,18 @@ void RebindWidget::on_btnStopMacro_clicked() {
     }
 }
 
+//////////
+/// \brief RebindWidget::on_btnClearMacro_clicked changes the help info an the panel.
+/// The job of clearing the input panels is triggerd with signal/slot via the RebindWidget.ui file.
+///
 void RebindWidget::on_btnClearMacro_clicked() {
     helpStatus(1);
 }
 
+//////////
+/// \brief RebindWidget::helpStatus shows a help line in the ui.
+/// \param status determines what to display.
+///
 void RebindWidget::helpStatus(int status) {
     switch (status) {
     case 1:
@@ -742,6 +765,14 @@ void RebindWidget::helpStatus(int status) {
     }
 }
 
+//////////
+/// \brief RebindWidget::convertMacroBox converts the macroBox content.
+/// The KB sends each keypress as "key [+|-]<keyname><newline>"
+///
+/// the ckb-daemon needs a shorter format, only " [+|-]<keyname>"
+///
+/// That function does the conversion.
+///
 void RebindWidget::convertMacroBox() {
     QString in;
 
@@ -750,4 +781,3 @@ void RebindWidget::convertMacroBox() {
     in.replace (QRegExp("key "), "");
     ui->pteMacroBox->setPlainText(in);
 }
-

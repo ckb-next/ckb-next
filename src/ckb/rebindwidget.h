@@ -68,7 +68,6 @@ private slots:
     void on_pteMacroBox_textChanged();
     void on_btnStartMacro_clicked();
     void on_btnStopMacro_clicked();
-
     void on_btnClearMacro_clicked();
 
 private:
@@ -96,8 +95,7 @@ private:
     QStringList mouseKeys;
     QStringList mouseExtKeys;
     QStringList wheelKeys;
-
-    MacroReader* macReader;
+    MacroReader* macReader;     ///< \brief macReader holds the MacroReader when macro recording starts.
 };
 
 #endif // BINDDIALOG_H

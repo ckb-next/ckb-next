@@ -107,7 +107,7 @@ Kb::Kb(QObject *parent, const QString& path) :
                 break;
             }
         }
-        notifyPaths.insert(notifyPath); // ToDo: Neccessary?
+        notifyPaths.insert(notifyPath); ///< \todo Is adding notify2 to the notifypaths neccessary?
     }
     // Activate device, apply settings, and ask for hardware profile
     cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
@@ -141,14 +141,14 @@ Kb::~Kb(){
     // Save settings first
     save();
 
-    if(macroNumber > 0)
-        cmd.write(QString("idle\nnotifyoff %1\n").arg(macroNumber).toLatin1());
+    // remove the notify channel from the list of notifyPaths.
+    ///< \todo I don't think, that notifypaths is used somewhere. So why do we have it?
+    /// If we do not need it, searching for an ununsed notify channel can easy be refactored to a private member function.
     notifyPaths.remove(macroPath);
 
     // Kill notification thread and remove node
     activeDevices.remove(this);
     if(!isOpen()){
-        // Detach macro notify channel
         terminate();
         wait(1000);
         return;

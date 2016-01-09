@@ -33,12 +33,12 @@ public:
 
     //////////
     /// \brief macroFullLine
-    ///     If a macro command and a macro definition exists for the given key,
-    ///     returns the complete string except the leading "$"
-    ///     (the $ may confuse some caller).
+    /// If a macro command and a macro definition exists for the given key,
+    /// returns the complete string except the leading "$"
+    /// (the $ may confuse some caller).
     /// \return QString
-    ///     All 4 parts are returned in one QString.
-    ///     If no definition exists, return ""
+    /// All 4 parts are returned in one QString.
+    /// If no definition exists, return ""
     ///
     inline QString macroFullLine() const {
         return isMacro() ? _value.right(_value.length()-1) : "";
@@ -46,11 +46,10 @@ public:
 
      //////////
      /// \brief isValidMacro checks whether a keyAction contains a valid macro.
-     /// This is easy done: If the macro action starts with $macro:
+     /// This is done easily: If the macro action starts with $macro:
      /// and has four elements, delimited by ":", we may assume,
-     /// thats a structural correct macro action.
-     /// \return bool is true, iff the macro definition
-     ///    contains all four elements.
+     /// that is a structural correct macro action.
+     /// \return bool as true iff the macro definition contains all four elements.
      ///
      inline bool isValidMacro() const {
         if (isMacro()) {
@@ -89,16 +88,12 @@ public:
     /// \brief Debug output for invalid macro Definitions
     ///
     /// General Info on KeyAction::_value for macros:
-    ///     That string consists of 4 elements:
-    ///      1.  Macro command "$macro:"
-    ///      2.  Macro Key Definition (coming from pteMacroBox)
-    ///          This sequence will program the keyboard,
-    ///          is hardly readable and is delimited by ":"
-    ///      3.  Readable Macro String
-    ///          This is displayed in pteMacroText
-    ///      4.  Readable Macro Comment
-    ///          This is displayed in pteMacroComment
-    ///
+    /// That string consists of 4 elements, all delimited by ":".
+    ///      1.  Macro command indicator "$macro:"
+    ///      2.  Macro Key Definition (coming from pteMacroBox):
+    ///          This sequence will program the keyboard and is hardly readable
+    ///      3.  Readable Macro String: This is displayed in pteMacroText
+    ///      4.  Readable Macro Comment:This is displayed in pteMacroComment
     ///
     void macroDisplay();
 
@@ -124,7 +119,7 @@ public:
     static QString  programAction(const QString& onPress, const QString& onRelease, int stop);
     // Key to start an animation
     static QString animAction(const QUuid& guid, bool onlyOnce, bool stopOnRelease);
-    static QString macroAction(QString macroDef);
+    static QString macroAction(QString macroDef);   ///< \brief well documented in cpp file
 
     // Action type
     enum Type {

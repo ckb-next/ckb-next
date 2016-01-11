@@ -1,3 +1,4 @@
+#include <qdebug.h>
 #include "keyaction.h"
 #include "kb.h"
 #include "kbanim.h"
@@ -9,7 +10,6 @@
 #ifdef USE_LIBX11
 #include <X11/Xlib.h>
 #endif
-#include <qdebug.h>     // lae.
 
 KeyAction::Type KeyAction::type() const {
     if(_value.isEmpty())

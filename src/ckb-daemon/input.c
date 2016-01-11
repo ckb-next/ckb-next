@@ -32,8 +32,10 @@ static void inputupdate_keys(usbdevice* kb){
                         macroaction* action = macro->actions + a;
                         if(action->rel_x != 0 || action->rel_y != 0)
                             os_mousemove(kb, action->rel_x, action->rel_y);
-                        else
+                        else {
                             os_keypress(kb, action->scan, action->down);
+                            if (a > 200) usleep (100); else if (a > 20) usleep(30);
+                         }
                     }
                 }
             } else {

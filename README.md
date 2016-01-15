@@ -45,12 +45,17 @@ Keyboards:
 Mice:
 
 * M65 RGB
+* Sabre RGB
 * Scimitar RGB
 
 Linux Installation
 ------------------
 
-Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libudev-dev`, `build-essential`, `zlib1g-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). Check with your package manager to make sure you have the correct libraries/headers installed.
+Preparation: ckb requires Qt5, libudev, zlib, gcc, g++, and glibc.
+
+* Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
+* Arch: `sudo pacman -S base-devel qt5-base zlib`
+* Other distros: Look for `qt5` or `libqt5*-devel`
 
 You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
 
@@ -145,7 +150,7 @@ Troubleshooting
 
 #### Linux
 
-If you have problems connecting the keyboard to your system (keyboard doesn't respond, ckb-daemon doesn't recognize it or can't connect the keyboard), try adding the following to your kernel's `cmdline`:
+If you have problems connecting the device to your system (device doesn't respond, ckb-daemon doesn't recognize or can't connect it), try adding the following to your kernel's `cmdline`:
 
 * K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x408`
 * K70: `usbhid.quirks=0x1B1C:0x1B09:0x408`
@@ -155,15 +160,17 @@ If you have problems connecting the keyboard to your system (keyboard doesn't re
 * Strafe: `usbhid.quirks=0x1B1C:0x1B15:0x408`
 * Strafe RGB: `usbhid.quirks=0x1B1C:0x1B20:0x408`
 * M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x408`
+* Sabre RGB Optical: `usbhid.quirks=0x1B1C:0x1B14:0x408`
+* Sabre RGB Laser: `usbhid.quirks=0x1B1C:0x1B19:0x408`
 * Scimitar RGB: `usbhid.quirks=0x1B1C:0x1B1E:0x408`
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
-If you have multiple devices, combine them with commas. For instance, for K70 RGB + M65 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400,0x1B1C:0x1B12:0x400`
+If you have multiple devices, combine them with commas, starting after the `=`. For instance, for K70 RGB + M65 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400,0x1B1C:0x1B12:0x400`
 
-If the keyboard still doesn't work, try replacing `0x408` with `0x4`. Note that this will cause the kernel driver to ignore the keyboard completely, so you need to ensure ckb-daemon is running at boot or else you'll have no keyboard input.
+If it still doesn't work, try replacing `0x408` with `0x4`. Note that this will cause the kernel driver to ignore the device(s) completely, so you need to ensure ckb-daemon is running at boot or else you'll have no input. This will not work if you are using full-disk encryption.
 
-If you're using **Unity** and the tray icon doesn't appear correctly, install the following package: `libappindicator-dev`. Then reinstall ckb.
+If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo apt-get install libappindicator-dev`. Then reinstall ckb.
 
 #### OS X
 
@@ -171,9 +178,11 @@ If you're using **Unity** and the tray icon doesn't appear correctly, install th
 - Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
 - **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly.**
 - ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
-- **Compile problems** can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
+- **`~` key prints `§±`**
+- Check your keyboard layout on ckb's Settings screen. Choose the layout that matches your physical keyboard.
 - **Keyboard doesn't work at boot, even when ckb is not installed.**
 - Unfortunately there is no known fix for this. You will need to unplug and replug the keyboard or try a different port/USB hub.
+- **Compile problems** can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
 
 #### General
 

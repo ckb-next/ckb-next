@@ -80,6 +80,12 @@ int main(int argc, char *argv[]){
     QApplication a(argc, argv);
     QCoreApplication::setOrganizationName("ckb");
 
+    // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
+    if(getuid() == 0){
+        printf("The ckb GUI should not be run as root.\n");
+        return 0;
+    }
+
     // Seed the RNG for UsbIds
     qsrand(QDateTime::currentMSecsSinceEpoch());
 #ifdef Q_OS_MACX
@@ -105,8 +111,8 @@ int main(int argc, char *argv[]){
         return 0;
     }
 
-    // Launch in background if requested
-    bool background = qApp->arguments().contains("--background");
+    // Launch in background if requested, or if re-launching a previous session
+    bool background = qApp->arguments().contains("--background") || qApp->arguments().contains("-session") || qApp->arguments().contains("--session");
     if(isRunning(background ? 0 : "Open")){
         printf("ckb is already running. Exiting.\n");
         return 0;

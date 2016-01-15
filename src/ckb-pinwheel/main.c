@@ -4,7 +4,7 @@ void ckb_info(){
     // Plugin info
     CKB_NAME("Pinwheel");
     CKB_VERSION("0.9");
-    CKB_COPYRIGHT("2014-2015", "MSC");
+    CKB_COPYRIGHT("2014-2016", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{07551A90-D97A-4DD0-A770-E9E280A90891}");
     CKB_DESCRIPTION("A spinning pinwheel effect.");
@@ -85,7 +85,7 @@ int ckb_frame(ckb_runctx* context){
     // Color each key according to its angle from the center
         float position;
         if(counter_clock)
-	    position = ANGLE(frame * M_PI * 2.);
+        position = ANGLE(frame * M_PI * 2.);
         else
             position = ANGLE(-frame * M_PI * 2.);
     unsigned count = context->keycount;

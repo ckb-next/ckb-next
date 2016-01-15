@@ -5,7 +5,7 @@ void ckb_info(){
     // Plugin info
     CKB_NAME("Wave");
     CKB_VERSION("0.10");
-    CKB_COPYRIGHT("2014-2015", "MSC");
+    CKB_COPYRIGHT("2014-2016", "MSC");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{E0BBA19E-C328-4C0E-8E3C-A06D5722B4FC}");
     CKB_DESCRIPTION("A moving wave effect.");

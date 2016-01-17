@@ -70,16 +70,18 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
         return 0;
     struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 5000, 0 };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
-    if(res < 0){
-        ckb_err_fn("%s\n", file, line, strerror(-res));
+    if(res <= 0){
+        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
         return 1;
     }
     return 0;
 }
 
 void os_sendindicators(usbdevice* kb){
-    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 5000, &kb->ileds };
-    ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
+    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    if(res <= 0)
+        ckb_err("%s\n", res ? strerror(errno) : "No data written");
 }
 
 void* os_inputmain(void* context){

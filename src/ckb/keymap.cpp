@@ -295,14 +295,11 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             i.next();
             i.value().x += KSTRAFE_X_START;
         }
-        // add sidelights
+        // Add Strafe lights and keys
         map["lsidel"] = KStrafeKeys[0];
         map["rsidel"] = KStrafeKeys[1];
         map["logo"] = KStrafeKeys[2];
-        // rename rwin to fn
-        //Key& key = map["rwin"];
-        //map["rwin"]._friendlyName="Function";
-        map["fn"]=KStrafeKeys[3];
+        map["fn"] = KStrafeKeys[3];
         map.remove("rwin");
         // remove media controls
         map.remove("mute");

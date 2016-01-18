@@ -17,7 +17,7 @@ RebindWidget::RebindWidget(QWidget *parent) :
     ui->programKrExtra->hide();
 
     // Populate key lists
-    modKeys << "caps" << "lshift" << "rshift" << "lctrl" << "rctrl" << "lwin" << "rwin" << "lalt" << "ralt" << "rmenu";
+    modKeys << "caps" << "lshift" << "rshift" << "lctrl" << "rctrl" << "lwin" << "rwin" << "lalt" << "ralt" << "rmenu" << "fn";
     fnKeys << "esc" << "f1" << "f2" << "f3" << "f4" << "f5" << "f6" << "f7" << "f8" << "f9" << "f10" << "f11" << "f12" << "prtscn" << "scroll" << "pause" << "ins" << "del" << "home" << "end" << "pgup" << "pgdn" << "up" << "down" << "left" << "right";
     numKeys << "numlock" << "num0" << "num1" << "num2" << "num3" << "num4" << "num5" << "num6" << "num7" << "num8" << "num9" << "numslash" << "numstar" << "numminus" << "numplus" << "numdot" << "numenter";
     mediaKeys << "stop" << "prev" << "play" << "next" << "volup" << "voldn" << "mute";

@@ -154,6 +154,8 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "rsidel",      -2, KEY_CORSAIR },
     // Strafe logo backlight
     { "logo",      0x7d, KEY_CORSAIR },
+    // Strafe Fn
+    { "fn",        0x65, KEY_FN },  // rwin on other keyboards
 
     // Keys not present on any device
     { "lightup",    -1, KEY_BRIGHTNESSUP },

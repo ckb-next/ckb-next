@@ -141,7 +141,8 @@ static const Key K65TopRow[] = {
 static const Key KStrafeKeys[] = {
     {0, "Sidelight", "lsidel", 0, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT, true, false},
     {0, "Sidelight", "rsidel", KSTRAFE_WIDTH, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT, true, false},
-    {0, "Logo", "logo", KSTRAFE_X_START, 0, NS, true, false}
+    {0, "Logo", "logo", KSTRAFE_X_START, 0, NS, true, false},
+    {0, "Function", "fn", 152, 75, NS, true, true}
 };
 
 // Mouse map - M65
@@ -298,6 +299,11 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["lsidel"] = KStrafeKeys[0];
         map["rsidel"] = KStrafeKeys[1];
         map["logo"] = KStrafeKeys[2];
+        // rename rwin to fn
+        //Key& key = map["rwin"];
+        //map["rwin"]._friendlyName="Function";
+        map["fn"]=KStrafeKeys[3];
+        map.remove("rwin");
         // remove media controls
         map.remove("mute");
         map.remove("volup");
@@ -573,6 +579,7 @@ QStringList KeyMap::byPosition() const {
 
 QString KeyMap::friendlyName(const QString& key, Layout layout){
     // Try K95 map first
+    // FIXME: This is an odd function and probably should be refactored
     KeyMap map(K95, layout);
     if(map.contains(key))
         return map[key].friendlyName();
@@ -581,6 +588,9 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     if(map.contains(key))
         return map[key].friendlyName();
     map = KeyMap(M65, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+    map = KeyMap(STRAFE, layout);
     if(map.contains(key))
         return map[key].friendlyName();
     return "";

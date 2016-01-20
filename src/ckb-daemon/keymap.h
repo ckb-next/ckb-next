@@ -20,13 +20,13 @@
 #define KEY_BACKSLASH_ISO KEY_BACKSLASH
 #endif
 
-// Number of keys (according to keyboard hardware)
-#define N_KEYS_HW               144
+// Number of keys, according to keyboard hardware (NOTE: should be divisible by 8)
+#define N_KEYS_HW               152
 #define N_KEYBYTES_HW           ((N_KEYS_HW + 7) / 8)
 // Light zones (have LED codes but don't generate input)
 #define N_KEY_ZONES             3       // two strafe side lights (although really they are tied into one control) + logo backlight
 // Additional keys recognized by the driver but may not be present on keyboard
-#define N_KEYS_EXTRA            13
+#define N_KEYS_EXTRA            12
 // Mouse buttons
 #define N_BUTTONS_HW            20
 #define N_BUTTONS_EXTENDED      25

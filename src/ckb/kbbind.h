@@ -103,7 +103,6 @@ signals:
     void layoutChanged();
     void updated();
 
-
 private:
     Kb* _devParent;
     inline Kb*      devParent()     const   { return _devParent; }

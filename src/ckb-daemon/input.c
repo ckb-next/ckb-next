@@ -34,7 +34,10 @@ static void inputupdate_keys(usbdevice* kb){
                             os_mousemove(kb, action->rel_x, action->rel_y);
                         else {
                             os_keypress(kb, action->scan, action->down);
-                            if (a > 200) usleep (100); else if (a > 20) usleep(30);
+                            if (kb->delay) {
+                                if (a > 200) usleep (100);
+                                else if (a > 20) usleep(30);
+                            }
                          }
                     }
                 }

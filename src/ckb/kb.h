@@ -32,6 +32,9 @@ public:
     // Whether dithering is used (all devices)
     static inline bool              dither()                            { return _dither; }
     static void                     dither(bool newDither);
+    // Macro Delay setting
+    static inline bool              macroDelay()                        { return _delay; }
+    static void                     macroDelay(bool flag);
     // OSX: mouse acceleration toggle (all devices)
     static inline bool              mouseAccel()                        { return _mouseAccel; }
     static void                     mouseAccel(bool newAccel);
@@ -83,15 +86,15 @@ public:
 
     void hwSave();
 
-    // For usage with macro definions, these two params must only be readable.
-    // So there are no setters.
     //////////
+    /// For usage with macro definions, these two params must only be readable.
+    /// So there are no setters.
     /// \brief getMacroNumber returns the macroNumber, which we have saved in the constructor.
     /// For usage with macro definions, this param must only be readable.
     /// So there is no setter.
     /// \return The Number is returned as int.
     ///
-    inline int getMacroNumber (){ return macroNumber; }
+    inline int getMacroNumber () { return macroNumber; }
 
     ///
     /// \brief getMacroPath returns the macroPath (e.g. /dev/input/ckb1/notify),
@@ -100,7 +103,7 @@ public:
     /// So there is no setter.
     /// \return The absolute path as String
     ///
-    inline QString getMacroPath (){ return macroPath; }
+    inline QString getMacroPath () { return macroPath; }
 
     ~Kb();
 
@@ -191,6 +194,8 @@ private:
     int notifyNumber;
     // Macro Numer to notify macro definition events
     int macroNumber;
+    // flag if macro delay hast to be switched on
+    static bool _delay;
 
     // Needs to be saved?
     bool _needsSave;

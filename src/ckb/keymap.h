@@ -136,7 +136,7 @@ public:
     QStringList byPosition() const;
 
     // Friendly key name on any device
-    static QString friendlyName(const QString& key, Layout layout);
+    static QString friendlyName(const QString& key, Layout layout = US);
 
 private:
     static int modelWidth(Model model);

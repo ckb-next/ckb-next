@@ -577,18 +577,34 @@ QStringList KeyMap::byPosition() const {
 QString KeyMap::friendlyName(const QString& key, Layout layout){
     // Try K95 map first
     // FIXME: This is an odd function and probably should be refactored
+    // it would probably be best to remove the friendly names from the maps and have a completely separate name->friendlyName store
     KeyMap map(K95, layout);
     if(map.contains(key))
         return map[key].friendlyName();
-    // If that didn't work, try mice
+
+    // The only key missing from it should be Fn, which is found on STRAFE
+    map = KeyMap(STRAFE, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+
+    // Additionally, there are a handful of keys not present on any physical keyboard, but we need names for them
+    if(key == "f13" || key == "f14" || key == "f15" || key == "f16" || key == "f17" || key == "f18" || key == "f19" || key == "f20")
+        return key.toUpper();
+    else if(key == "lightup")
+        return "Screen Brightness Up";
+    else if(key == "lightdn")
+        return "Screen Brightness Down";
+    else if(key == "eject" || key == "power")
+        return key[0].toUpper() + key.mid(1);   // capitalize first letter
+
+    // All other names are found on mice
     map = KeyMap(SCIMITAR, layout);
     if(map.contains(key))
         return map[key].friendlyName();
     map = KeyMap(M65, layout);
     if(map.contains(key))
         return map[key].friendlyName();
-    map = KeyMap(STRAFE, layout);
-    if(map.contains(key))
-        return map[key].friendlyName();
+
+    // Not found at all
     return "";
 }

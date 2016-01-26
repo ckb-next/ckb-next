@@ -18,12 +18,21 @@ RebindWidget::RebindWidget(QWidget *parent) :
 
     // Populate key lists
     modKeys << "caps" << "lshift" << "rshift" << "lctrl" << "rctrl" << "lwin" << "rwin" << "lalt" << "ralt" << "rmenu" << "fn";
-    fnKeys << "esc" << "f1" << "f2" << "f3" << "f4" << "f5" << "f6" << "f7" << "f8" << "f9" << "f10" << "f11" << "f12" << "prtscn" << "scroll" << "pause" << "ins" << "del" << "home" << "end" << "pgup" << "pgdn" << "up" << "down" << "left" << "right";
+    fnKeys << "esc" << "f1" << "f2" << "f3" << "f4" << "f5" << "f6" << "f7" << "f8" << "f9" << "f10" << "f11" << "f12" << "prtscn" << "scroll" << "pause" << "f13" << "f14" << "f15" << "f16" << "f17" << "f18" << "f19" << "f20" << "ins" << "del" << "home" << "end" << "pgup" << "pgdn" << "power" << "lightup" << "lightdn" << "up" << "down" << "left" << "right";
     numKeys << "numlock" << "num0" << "num1" << "num2" << "num3" << "num4" << "num5" << "num6" << "num7" << "num8" << "num9" << "numslash" << "numstar" << "numminus" << "numplus" << "numdot" << "numenter";
-    mediaKeys << "stop" << "prev" << "play" << "next" << "volup" << "voldn" << "mute";
+    mediaKeys << "stop" << "prev" << "play" << "next" << "volup" << "voldn" << "mute" << "eject";
     mouseKeys << "mouse1" << "mouse2" << "mouse3";
     mouseExtKeys << "mouse4" << "mouse5" << "mouse6" << "mouse7" << "mouse8";
     wheelKeys << "wheelup" << "wheeldn";
+    // Populate boxes
+    foreach(const QString& key, modKeys)
+        ui->modBox->addItem(KeyMap::friendlyName(key));
+    foreach(const QString& key, fnKeys)
+        ui->fnBox->addItem(KeyMap::friendlyName(key).replace("\n", " / "));
+    foreach(const QString& key, numKeys)
+        ui->numBox->addItem(KeyMap::friendlyName(key).remove("NumPad "));
+    foreach(const QString& key, mediaKeys)
+        ui->mediaBox->addItem(KeyMap::friendlyName(key));
 #ifdef Q_OS_MACX
     // Replace some OSX keys with their actual meanings
     ui->modBox->setItemText(modKeys.indexOf("lwin") + 1, "Left Cmd");
@@ -33,6 +42,9 @@ RebindWidget::RebindWidget(QWidget *parent) :
     ui->fnBox->setItemText(fnKeys.indexOf("prtscn") + 1, "F13");
     ui->fnBox->setItemText(fnKeys.indexOf("scroll") + 1, "F14");
     ui->fnBox->setItemText(fnKeys.indexOf("pause") + 1, "F15");
+    ui->fnBox->setItemText(fnKeys.indexOf("f13") + 1, "F13 (Windows/Linux)");
+    ui->fnBox->setItemText(fnKeys.indexOf("f14") + 1, "F14 (Windows/Linux)");
+    ui->fnBox->setItemText(fnKeys.indexOf("f15") + 1, "F15 (Windows/Linux)");
     ui->fnBox->setItemText(fnKeys.indexOf("ins") + 1, "Help");
     ui->numBox->setItemText(numKeys.indexOf("numlock") + 1, "Clear");
 

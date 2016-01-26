@@ -93,6 +93,7 @@
 #define KEY_LEFTALT         kVK_Option
 #define KEY_RIGHTALT        kVK_RightOption
 #define KEY_COMPOSE         -1                  // OSX has no context menu key
+#define KEY_FN              kVK_Function
 
 #define KEY_SYSRQ           kVK_F13
 #define KEY_SCROLLLOCK      kVK_F14

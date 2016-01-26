@@ -353,7 +353,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
             // Due to the logic inside the thread, this means that it could theoretically be spawned twice, but never a third time.
             // Moreover, if it is spawned more than once, the indicator state will remain correct due to dmutex staying locked.
             if(!pthread_create(&kb->indicthread, 0, indicator_update, kb))
-                pthread_detach(kb->inputthread);
+                pthread_detach(kb->indicthread);
         }
     }
     else if(scancode == KEY_LEFTSHIFT) mod = NX_DEVICELSHIFTKEYMASK;
@@ -364,6 +364,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     else if(scancode == KEY_RIGHTMETA) mod = NX_DEVICERCMDKEYMASK;
     else if(scancode == KEY_LEFTALT) mod = NX_DEVICELALTKEYMASK;
     else if(scancode == KEY_RIGHTALT) mod = NX_DEVICERALTKEYMASK;
+    else if(scancode == KEY_FN) mod = NX_SECONDARYFNMASK;
     if(mod){
         // Update global modifiers
         if(down)

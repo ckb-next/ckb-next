@@ -49,12 +49,12 @@ void KeyWidget::drawInfo(float& scale, float& offsetX, float& offsetY, int ratio
     offsetY = (h / scale - keyMap.height()) / 2.f;
 }
 
-void KeyWidget::colorMap(const ColorMap& newColorMap){
+void KeyWidget::colorMap(const QColorMap& newColorMap){
     _colorMap = newColorMap;
     update();
 }
 
-void KeyWidget::displayColorMap(ColorMap newDisplayMap, QStringList indicators){
+void KeyWidget::displayColorMap(const ColorMap &newDisplayMap, const QSet<QString> &indicators){
     if(!isVisible())
         return;
     _displayColorMap = newDisplayMap;
@@ -265,13 +265,14 @@ void KeyWidget::paintEvent(QPaintEvent*){
             else
                 decPainter.setPen(QPen(QColor(255, 255, 255), 1.5));
             QRgb color;
-            if(_displayColorMap.contains(key.name))
+            const QRgb* inDisplay = _displayColorMap.colorForName(key.name);
+            if(inDisplay)
                 // Color in display map? Grab it from there
                 // (monochrome conversion not necessary as this would have been done by the animation)
-                color = _displayColorMap.value(key.name);
+                color = *inDisplay;
             else {
                 // Otherwise, read from base map
-                color = _colorMap.value(key.name);
+                color = _colorMap.value(k.key());
                 if(_monochrome)
                     color = monoRgb(qRed(color), qGreen(color), qBlue(color));
             }

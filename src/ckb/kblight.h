@@ -3,10 +3,12 @@
 
 #include <QFile>
 #include <QObject>
+#include <QSet>
 #include <QSettings>
 #include "animscript.h"
 #include "kbanim.h"
 #include "keymap.h"
+#include "colormap.h"
 
 class KbMode;
 
@@ -26,10 +28,9 @@ public:
     inline const KeyMap&    map() { return _map; }
     void                    map(const KeyMap& map);
     // Key -> color map
-    typedef QHash<QString, QRgb> ColorMap;
-    inline const ColorMap&  colorMap() { return _colorMap; }
+    inline const QColorMap& colorMap() { return _qColorMap; }
     // Color a key
-    inline void             color(const QString& key, const QColor& newColor) { _needsSave = true; _colorMap[key] = newColor.rgb(); }
+    void                    color(const QString& key, const QColor& newColor);
     // Color all keys in the current map
     void                    color(const QColor& newColor);
 
@@ -64,8 +65,13 @@ public:
     // Make the lighting idle, stopping any animations.
     void close();
 
+    // Reset indicator state
+    void resetIndicators();
+    // Set an indicator to a given ARGB value
+    void setIndicator(const char* name, QRgb argb);
+
     // Write a new frame to the keyboard. Write "mode %d" first. Optionally provide a list of keys to use as indicators and overwrite the lighting
-    void frameUpdate(QFile& cmd, const ColorMap& indicators = ColorMap(), bool monochrome = false);
+    void frameUpdate(QFile& cmd, bool monochrome = false);
     // Write the mode's base colors without any animation
     void base(QFile& cmd, bool ignoreDim = false, bool monochrome = false);
 
@@ -77,19 +83,24 @@ public:
 signals:
     void didLoad();
     void updated();
-    void frameDisplayed(ColorMap animatedColors, QStringList indicatorList);
+    void frameDisplayed(const ColorMap& animatedColors, const QSet<QString>& indicatorList);
 
 private:
-    AnimList    _animList;
-    KbAnim*     _previewAnim;
-    KeyMap      _map;
-    ColorMap    _colorMap;
-    quint64     lastFrameSignal;
-    int         _dimming;
-    bool        _start;
-    bool        _needsSave;
+    AnimList        _animList;
+    KbAnim*         _previewAnim;
+    KeyMap          _map;
+    QColorMap       _qColorMap;
+    ColorMap        _colorMap, _animMap, _indicatorMap;
+    QSet<QString>   _indicatorList;
+    quint64         lastFrameSignal;
+    int             _dimming;
+    bool            _start;
+    bool            _needsSave, _needsMapRefresh;
 
-    void printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap);
+    // Rebuild base ColorMap (if needed)
+    void rebuildBaseMap();
+    // Print RGB values to cmd node
+    void printRGB(QFile& cmd, const ColorMap& animMap);
 };
 
 #endif // KBLIGHT_H

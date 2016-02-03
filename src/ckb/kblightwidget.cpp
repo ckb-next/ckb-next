@@ -54,11 +54,11 @@ void KbLightWidget::on_showAnimBox_clicked(bool checked){
     // Connect/disconnect animation slot
     if(checked){
         if(light)
-            connect(light, SIGNAL(frameDisplayed(ColorMap,QStringList)), ui->keyWidget, SLOT(displayColorMap(ColorMap,QStringList)));
+            connect(light, SIGNAL(frameDisplayed(const ColorMap&,const QSet<QString>&)), ui->keyWidget, SLOT(displayColorMap(const ColorMap&,const QSet<QString>&)));
     } else {
         if(light)
-            disconnect(light, SIGNAL(frameDisplayed(ColorMap,QStringList)), ui->keyWidget, SLOT(displayColorMap(ColorMap,QStringList)));
-        ui->keyWidget->displayColorMap(KeyWidget::ColorMap());
+            disconnect(light, SIGNAL(frameDisplayed(const ColorMap&,const QSet<QString>&)), ui->keyWidget, SLOT(displayColorMap(const ColorMap&,const QSet<QString>&)));
+        ui->keyWidget->displayColorMap(ColorMap());
     }
     CkbSettings::set("UI/Light/ShowBaseOnly", !checked);
 }
@@ -72,7 +72,7 @@ void KbLightWidget::updateLight(){
 void KbLightWidget::newSelection(QStringList selection){
     // Determine selected color (invalid color if no selection or if they're not all the same)
     QColor selectedColor;
-    const QHash<QString, QRgb>& colorMap = light->colorMap();
+    const QColorMap& colorMap = light->colorMap();
     foreach(const QString& key, selection){
         QColor color = colorMap.value(key);
         if(!selectedColor.isValid())

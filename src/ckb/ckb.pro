@@ -99,7 +99,8 @@ SOURCES += main.cpp\
     kperfwidget.cpp \
     layoutdialog.cpp \
     extrasettingswidget.cpp \
-    kbmanager.cpp
+    kbmanager.cpp \
+    colormap.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -155,7 +156,8 @@ HEADERS  += mainwindow.h \
     kperfwidget.h \
     layoutdialog.h \
     extrasettingswidget.h \
-    kbmanager.h
+    kbmanager.h \
+    colormap.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \

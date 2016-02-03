@@ -241,6 +241,8 @@ void AnimScript::init(const KeyMap& map, const QStringList& keys, const QMap<QSt
         return;
     end();
     _map = map;
+    _colors.init(map);
+    _colorBuffer.init(map);
     _keys = keys;
     _paramValues = paramValues;
     setDuration();
@@ -286,7 +288,7 @@ void AnimScript::begin(quint64 timestamp){
     if(!initialized)
         return;
     end();
-    stopped = firstFrame = readFrame = readAnyFrame = false;
+    stopped = firstFrame = readFrame = readAnyFrame = inFrame = false;
     // Determine the upper left corner of the given keys
     QStringList keysCopy = _keys;
     minX = INT_MAX;
@@ -394,28 +396,34 @@ void AnimScript::end(){
 
 void AnimScript::readProcess(){
     while(process->canReadLine()){
-        QString line = process->readLine().trimmed();
-        if(inputBuffer.length() == 0 && line != "begin frame"){
+        QByteArray line = process->readLine().trimmed();
+        if(!inFrame){
             // Ignore anything not between "begin frame" and "end frame", except for "end run", which indicates that the program is done.
-            if(line == "end run"){
+            if(line == "begin frame")
+                inFrame = true;
+            else if(line == "end run"){
                 stopped = true;
                 return;
             }
             continue;
         }
-        if(line == "end frame"){
-            // Process this frame
-            foreach(QString input, inputBuffer){
-                QStringList split = input.split(" ");
-                if(split.length() != 3 || split[0] != "argb")
-                    continue;
-                _colors[split[1]] = split[2].toUInt(0, 16);
-            }
-            inputBuffer.clear();
-            readFrame = readAnyFrame = true;
-            continue;
+        if(line.startsWith("argb ")){
+            // Add a color to the buffer
+            char keyName[31];
+            QRgb keyColor = 0;
+            if(sscanf(line, "argb %30s %x", keyName, &keyColor) != 2)
+                continue;
+            QRgb* inMap = _colorBuffer.colorForName(keyName);
+            if(!inMap)
+                continue;
+            *inMap = keyColor;
         }
-        inputBuffer += line;
+        if(line == "end frame"){
+            // Frame is finished. Copy color buffer back to the atomic map
+            memcpy(_colors.colors(), _colorBuffer.colors(), sizeof(QRgb) * _colors.count());
+            inFrame = false;
+            readFrame = readAnyFrame = true;
+        }
     }
 }
 

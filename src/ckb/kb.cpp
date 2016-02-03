@@ -391,7 +391,8 @@ void Kb::frameUpdate(){
 
     // Send lighting/binding to driver
     cmd.write(QString("mode %1 switch ").arg(index + 1).toLatin1());
-    light->frameUpdate(cmd, perf->indicatorLights(index, iState), monochrome);
+    perf->applyIndicators(index, iState);
+    light->frameUpdate(cmd, monochrome);
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
     cmd.write(" ");

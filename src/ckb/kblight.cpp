@@ -8,13 +8,13 @@ static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
-    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _start(false), _needsSave(true)
+    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _start(false), _needsSave(true), _needsMapRefresh(true)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _previewAnim(0), _map(other._map), _colorMap(other._colorMap), lastFrameSignal(0), _dimming(other._dimming), _start(false), _needsSave(true)
+    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap), lastFrameSignal(0), _dimming(other._dimming), _start(false), _needsSave(true), _needsMapRefresh(true)
 {
     map(keyMap);
     // Duplicate animations
@@ -28,14 +28,17 @@ void KbLight::map(const KeyMap& map){
     while(i.hasNext()){
         i.next();
         const QString& key = i.key();
-        if(!_colorMap.contains(key))
-            _colorMap[key] = 0xFFFFFFFF;
+        if(!_qColorMap.contains(key))
+            _qColorMap[key] = 0xFFFFFFFF;
     }
     // Set the new map
     _map = map;
     foreach(KbAnim* anim, _animList)
         anim->map(map);
-    _needsSave = true;
+    _colorMap.init(_map);
+    _animMap.init(_map);
+    _indicatorMap.init(_map);
+    _needsSave = _needsMapRefresh = true;
     emit updated();
 }
 
@@ -43,14 +46,33 @@ KbLight::~KbLight(){
     activeLights.remove(this);
 }
 
+void KbLight::color(const QString& key, const QColor& newColor){
+    QRgb newRgb = newColor.rgb();
+    _qColorMap[key] = newRgb;
+    _needsSave = true;
+    if(!_needsMapRefresh){
+        // Update flat map if we're not scheduled to rebuild it
+        QByteArray rawName = key.toLatin1();
+        QRgb* rawRgb = _colorMap.colorForName(rawName.data());
+        if(rawRgb)
+            *rawRgb = newRgb;
+    }
+}
+
 void KbLight::color(const QColor& newColor){
     QRgb newRgb = newColor.rgb();
-    QMutableHashIterator<QString, QRgb> i(_colorMap);
+    QMutableColorMapIterator i(_qColorMap);
     while(i.hasNext()){
         i.next();
         i.value() = newRgb;
     }
     _needsSave = true;
+    // Reset flat map
+    _needsMapRefresh = false;
+    int mapCount = _colorMap.count();
+    QRgb* flat = _colorMap.colors();
+    for(int i = 0; i < mapCount; i++)
+        flat[i] = mapCount;
 }
 
 int KbLight::shareDimming(){
@@ -198,21 +220,47 @@ void KbLight::close(){
     _start = false;
 }
 
-void KbLight::printRGB(QFile& cmd, const QHash<QString, QRgb>& animMap){
-    QHashIterator<QString, QRgb> i(animMap);
-    while(i.hasNext()){
-        i.next();
-        QString name = i.key();
-        QRgb color = i.value();
-        // Make sure the key is in the map before printing it
-        const Key& key = _map[name];
-        if(!key.hasLed)
-            continue;
+void KbLight::printRGB(QFile& cmd, const ColorMap &animMap){
+    int count = animMap.count();
+    const char* const* names = animMap.keyNames();
+    const QRgb* colors = animMap.colors();
+    // Print each color and the corresponding RGB value
+    for(int i = 0; i < count; i++){
         cmd.write(" ");
-        cmd.write(name.toLatin1());
+        cmd.write(names[i]);
         char output[8];
+        QRgb color = colors[i];
         snprintf(output, sizeof(output), ":%02x%02x%02x", qRed(color), qGreen(color), qBlue(color));
         cmd.write(output);
+    }
+}
+
+void KbLight::rebuildBaseMap(){
+    if(!_needsMapRefresh)
+        return;
+    _needsMapRefresh = false;
+    // Copy RGB values from QColorMap to ColorMap
+    QColorMapIterator i(_qColorMap);
+    while(i.hasNext()){
+        i.next();
+        QByteArray rawName = i.key().toLatin1();
+        QRgb color = i.value();
+        QRgb* rawColor = _colorMap.colorForName(rawName.data());
+        if(rawColor)
+            *rawColor = color;
+    }
+}
+
+void KbLight::resetIndicators(){
+    _indicatorMap.clear();
+    _indicatorList.clear();
+}
+
+void KbLight::setIndicator(const char* name, QRgb argb){
+    QRgb* dest = _indicatorMap.colorForName(name);
+    if(dest){
+        *dest = argb;
+        _indicatorList.insert(name);
     }
 }
 
@@ -245,41 +293,38 @@ QRgb monoRgb(float r, float g, float b){
     return qRgb(value, value, value);
 }
 
-void KbLight::frameUpdate(QFile& cmd, const ColorMap& indicators, bool monochrome){
+void KbLight::frameUpdate(QFile& cmd, bool monochrome){
+    rebuildBaseMap();
+    _animMap = _colorMap;
     // Advance animations
-    ColorMap animMap = _colorMap;
     quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     foreach(KbAnim* anim, _animList)
-        anim->blend(animMap, timestamp);
+        anim->blend(_animMap, timestamp);
     if(_previewAnim)
-        _previewAnim->blend(animMap, timestamp);
+        _previewAnim->blend(_animMap, timestamp);
 
-    // Set brightness and indicators
-    QStringList activeIndicators;
-    if(monochrome || !indicators.isEmpty()){
-        QMutableHashIterator<QString, QRgb> i(animMap);
-        while(i.hasNext()){
-            i.next();
-            const QString& key = i.key();
-            QRgb& rgb = i.value();
+    int count = _animMap.count();
+    QRgb* colors = _animMap.colors();
+    // Apply active indicators and/or perform monochrome conversion
+    if(monochrome || !_indicatorList.isEmpty()){
+        QRgb* indicators = _indicatorMap.colors();
+        for(int i = 0; i < count; i++){
+            QRgb& rgb = colors[i];
             float r = qRed(rgb);
             float g = qGreen(rgb);
             float b = qBlue(rgb);
             // Apply indicators
-            if(indicators.contains(key)){
-                const QRgb& rgb2 = indicators.value(key);
+            QRgb rgb2 = indicators[i];
+            if(qAlpha(rgb2) != 0){
                 float r2 = qRed(rgb2);
                 float g2 = qGreen(rgb2);
                 float b2 = qBlue(rgb2);
                 float a2 = qAlpha(rgb2) / 255.f;
-                float a = 1.f;
-                float a3 = a2 + (1.f - a2) * a;
-                r = round((r2 * a2 + r * a * (1.f - a2)) / a3);
-                g = round((g2 * a2 + g * a * (1.f - a2)) / a3);
-                b = round((b2 * a2 + b * a * (1.f - a2)) / a3);
-                activeIndicators << key;
+                r = round(r2 * a2 + r * (1.f - a2));
+                g = round(g2 * a2 + g * (1.f - a2));
+                b = round(b2 * a2 + b * (1.f - a2));
             }
-            // If monochrome mode is active, average them all out to get a grayscale image
+            // If monochrome mode is active, average the channels to get a grayscale image
             if(monochrome)
                 rgb = monoRgb(r, g, b);
             else
@@ -289,37 +334,38 @@ void KbLight::frameUpdate(QFile& cmd, const ColorMap& indicators, bool monochrom
 
     // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
     if(timestamp >= lastFrameSignal + 50){
-        emit frameDisplayed(animMap, activeIndicators);
+        emit frameDisplayed(_animMap, _indicatorList);
         lastFrameSignal = timestamp;
     }
 
-    cmd.write(QString().sprintf("rgb").toLatin1());
     // If brightness is at 0%, turn off lighting entirely
     if(_dimming == 3){
-        cmd.write(" 000000");
+        cmd.write("rgb 000000");
         return;
     }
 
     float light = (3 - _dimming) / 3.f;
     // Apply global dimming
-    if(light != 1.f){
-        QMutableHashIterator<QString, QRgb> i(animMap);
-        while(i.hasNext()){
-            i.next();
-            QRgb& rgb = i.value();
-            // Like the monochrome conversion, we want a linear colorspace for this
+    if(light != 1.f || monochrome){
+        for(int i = 0; i < count; i++){
+            QRgb& rgb = colors[i];
+            // Like the monochrome conversion, this should be done in a linear colorspace
             float r = sToL(qRed(rgb));
             float g = sToL(qGreen(rgb));
             float b = sToL(qBlue(rgb));
             r *= light;
             g *= light;
             b *= light;
-            rgb = qRgb(round(lToS(r)), round(lToS(g)), round(lToS(b)));
+            r = round(lToS(r));
+            g = round(lToS(g));
+            b = round(lToS(b));
+            rgb = qRgb(r, g, b);
         }
     }
 
     // Apply light
-    printRGB(cmd, animMap);
+    cmd.write("rgb");
+    printRGB(cmd, _animMap);
 }
 
 void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){
@@ -329,23 +375,27 @@ void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){
         return;
     }
     // Set just the background color, ignoring any animation
-    cmd.write(QString().sprintf("rgb").toLatin1());
-    QHash<QString, QRgb> animMap = _colorMap;
+    rebuildBaseMap();
+    _animMap = _colorMap;
     // If monochrome is active, create grayscale
     if(monochrome){
-        QMutableHashIterator<QString, QRgb> i(animMap);
-        while(i.hasNext()){
-            i.next();
-            QRgb& rgb = i.value();
+        int count = _animMap.count();
+        QRgb* colors = _animMap.colors();
+        for(int i = 0; i < count; i++){
+            QRgb& rgb = colors[i];
             rgb = monoRgb(qRed(rgb), qGreen(rgb), qBlue(rgb));
         }
     }
-    animMap["mr"] = qRgb(0, 0, 0);
-    animMap["m1"] = qRgb(0, 0, 0);
-    animMap["m2"] = qRgb(0, 0, 0);
-    animMap["m3"] = qRgb(0, 0, 0);
-    animMap["lock"] = qRgb(0, 0, 0);
-    printRGB(cmd, animMap);
+    // Set a few indicators to black as the hardware handles them differently
+    QRgb* mr = _animMap.colorForName("mr"), *m1 = _animMap.colorForName("m1"), *m2 = _animMap.colorForName("m2"), *m3 = _animMap.colorForName("m3"), *lock = _animMap.colorForName("lock");
+    if(mr) *mr = 0;
+    if(m1) *m1 = 0;
+    if(m2) *m2 = 0;
+    if(m3) *m3 = 0;
+    if(lock) *lock = 0;
+    // Send to driver
+    cmd.write("rgb");
+    printRGB(cmd, _animMap);
 }
 
 void KbLight::load(CkbSettings& settings){
@@ -368,8 +418,9 @@ void KbLight::load(CkbSettings& settings){
             QColor color = settings.value(key).toString();
             if(!color.isValid())
                 color = QColor(255, 255, 255);
-            _colorMap[name] = color.rgb();
+            _qColorMap[name] = color.rgb();
         }
+        _needsMapRefresh = true;
     }
     // Load animations
     foreach(KbAnim* anim, _animList)
@@ -395,8 +446,11 @@ void KbLight::save(CkbSettings& settings){
     {
         // Save RGB settings
         SGroup group(settings, "Keys");
-        foreach(QString key, _colorMap.keys())
-            settings.setValue(key, QColor(_colorMap.value(key)).name());
+        QMutableColorMapIterator i(_qColorMap);
+        while(i.hasNext()){
+            i.next();
+            settings.setValue(i.key(), QColor(i.value()).name());
+        }
     }
     {
         // Save animations

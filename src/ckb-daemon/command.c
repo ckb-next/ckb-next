@@ -6,6 +6,8 @@
 #include "profile.h"
 #include "usb.h"
 
+//#define INIT_ERROR      // for debugging purposes. MacroClient sends invalid macro-clear cmd to mouse
+
 static const char* const cmd_strings[CMD_COUNT - 1] = {
     // NONE is implicit
     "delay",
@@ -272,6 +274,13 @@ int readcmd(usbdevice* kb, const char* line){
         } case MACRO:
             if(!strcmp(word, "clear")){
                 // Macro has a special clear command
+#ifdef INIT_ERROR
+                if(IS_MOUSE(kb->vendor, kb->product)) {
+                    fprintf (stderr, "Detected MACRO command for mouse. Ignored.\n");
+                    continue;
+                }
+                fprintf (stderr, "Detected MACRO command for keyboard. Handled.\n");
+#endif
                 vt->macro(kb, mode, notifynumber, 0, 0);
                 continue;
             }

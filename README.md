@@ -1,5 +1,5 @@
-ckb: RGB keyboards and mice on Linux and OS X
-=============================================
+ckb: RGB Driver for Linux and OS X
+==================================
 
 **ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
@@ -51,17 +51,21 @@ Mice:
 Linux Installation
 ------------------
 
-Preparation: ckb requires Qt5, libudev, zlib, gcc, g++, and glibc.
+#### Preparation:
+
+ckb requires Qt5, libudev, zlib, gcc, g++, and glibc.
 
 * Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
 * Arch: `sudo pacman -S base-devel qt5-base zlib`
 * Other distros: Look for `qt5` or `libqt5*-devel`
 
-You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
-
 Note: If you build your own kernels, ckb requires the uinput flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
-#### Reinstalling:
+#### Installing:
+
+You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
+
+#### Upgrading:
 
 To install a new version of ckb, or to reinstall the same version, first delete the ckb-master directory and the zip file from your previous download. Then download the source code again and re-run `quickinstall`. The script will automatically replace the previous installation. You may need to reboot afterward.
 
@@ -101,11 +105,11 @@ Install the latest version of Xcode from the App Store. Open Xcode, accept the l
 
 The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason, or if you'd like to compile manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md).
 
-#### Reinstalling (binary):
+#### Upgrading (binary):
 
 Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one.
 
-#### Reinstalling (source):
+#### Upgrading (source):
 
 Remove the existing ckb-master directory and zip file. Re-download the source code and run the `quickinstall` script again. The script will automatically replace the previous installation. You may need to reboot afterward.
 
@@ -150,25 +154,25 @@ Troubleshooting
 
 #### Linux
 
-If you have problems connecting the device to your system (device doesn't respond, ckb-daemon doesn't recognize or can't connect it), try adding the following to your kernel's `cmdline`:
+If you have problems connecting the device to your system (device doesn't respond, ckb-daemon doesn't recognize or can't connect it) and/or you experience long boot times when using the keyboard, try adding the following to your kernel's `cmdline`:
 
-* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x408`
-* K70: `usbhid.quirks=0x1B1C:0x1B09:0x408`
-* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x408`
-* K95: `usbhid.quirks=0x1B1C:0x1B08:0x408`
-* K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x408`
-* Strafe: `usbhid.quirks=0x1B1C:0x1B15:0x408`
-* Strafe RGB: `usbhid.quirks=0x1B1C:0x1B20:0x408`
-* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x408`
-* Sabre RGB Optical: `usbhid.quirks=0x1B1C:0x1B14:0x408`
-* Sabre RGB Laser: `usbhid.quirks=0x1B1C:0x1B19:0x408`
-* Scimitar RGB: `usbhid.quirks=0x1B1C:0x1B1E:0x408`
+* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x20000408`
+* K70: `usbhid.quirks=0x1B1C:0x1B09:0x0x20000408`
+* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000408`
+* K95: `usbhid.quirks=0x1B1C:0x1B08:0x20000408`
+* K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x20000408`
+* Strafe: `usbhid.quirks=0x1B1C:0x1B15:0x20000408`
+* Strafe RGB: `usbhid.quirks=0x1B1C:0x1B20:0x20000408`
+* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x20000408`
+* Sabre RGB Optical: `usbhid.quirks=0x1B1C:0x1B14:0x20000408`
+* Sabre RGB Laser: `usbhid.quirks=0x1B1C:0x1B19:0x20000408`
+* Scimitar RGB: `usbhid.quirks=0x1B1C:0x1B1E:0x20000408`
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
-If you have multiple devices, combine them with commas, starting after the `=`. For instance, for K70 RGB + M65 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400,0x1B1C:0x1B12:0x400`
+If you have multiple devices, combine them with commas, starting after the `=`. For instance, for K70 RGB + M65 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000408,0x1B1C:0x1B12:0x20000408`
 
-If it still doesn't work, try replacing `0x408` with `0x4`. Note that this will cause the kernel driver to ignore the device(s) completely, so you need to ensure ckb-daemon is running at boot or else you'll have no input. This will not work if you are using full-disk encryption.
+If it still doesn't work, try replacing `0x20000408` with `0x4`. Note that this will cause the kernel driver to ignore the device(s) completely, so you need to ensure ckb-daemon is running at boot or else you'll have no input. This will not work if you are using full-disk encryption.
 
 If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo apt-get install libappindicator-dev`. Then reinstall ckb.
 

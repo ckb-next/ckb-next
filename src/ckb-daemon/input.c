@@ -5,7 +5,8 @@
 int macromask(const uchar* key1, const uchar* key2){
     // Scan a macro against key input. Return 0 if any of them don't match
     for(int i = 0; i < N_KEYBYTES_INPUT; i++){
-        if((key1[i] & key2[i]) != key2[i])
+        // if((key1[i] & key2[i]) != key2[i])
+        if(key1[i] != key2[i])  // Changed to detect G-keys + modifiers
             return 0;
     }
     return 1;
@@ -38,7 +39,7 @@ static void inputupdate_keys(usbdevice* kb){
                                 if (a > 200) usleep (100);
                                 else if (a > 20) usleep(30);
                             }
-                         }
+                        }
                     }
                 }
             } else {

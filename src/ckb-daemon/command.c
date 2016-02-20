@@ -298,7 +298,8 @@ int readcmd(usbdevice* kb, const char* line){
         // Macros and DPI have a separate left-side handler
         if(command == MACRO || command == DPI){
             word[left] = 0;
-            vt->do_macro[command](kb, mode, notifynumber, word, right);
+            if (vt->do_macro[command]) vt->do_macro[command](kb, mode, notifynumber, word, right);
+            else fprintf (stderr, "Got null-ptr in vt->do_cmd[MACRO]. Did you try to send a macro to mouse (maybe wrong cmd-pipe)?\n");
             continue;
         }
         // Scan the left side for key names and run the requested command

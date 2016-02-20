@@ -384,6 +384,11 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
 }
 
 void RebindWidget::on_applyButton_clicked(){
+    // Normally, this should be done via signalling.
+    // Because there is no serarate thread, we have to call it directly
+    // (otherwise we could do Key char conversion step by step,
+    // but so it is more easy to change the key definition):
+    on_btnStopMacro_clicked();
     applyChanges(selection, true);
 }
 

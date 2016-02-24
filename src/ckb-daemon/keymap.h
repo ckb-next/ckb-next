@@ -68,6 +68,6 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
 
 // Copies input from Corsair reports
 void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput);
-void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
+void corsair_mousecopy(unsigned char* kbinput, int endpoint, const unsigned char* urbinput);
 
 #endif // KEYMAP_H

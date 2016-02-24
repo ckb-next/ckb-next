@@ -181,6 +181,7 @@ typedef struct {
     // So the actual value is (fd - 1)
 #ifdef OS_LINUX
     struct udev_device* udev;
+    int epcount;
     int handle;
     int uinput_kb, uinput_mouse;
 #else

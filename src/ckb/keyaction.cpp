@@ -424,6 +424,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
 
 void KeyAction::adjustDisplay(){
 #ifdef USE_LIBX11
+    // Try to get the current display from the X server
     char* display_name = XDisplayName(NULL);
     if(!display_name)
         return;
@@ -431,8 +432,10 @@ void KeyAction::adjustDisplay(){
     if(!display)
         return;
     char* display_string = DisplayString(display);
-    if(!display_string)
+    if(!display_string || strlen(display_string) == 0){
+        XCloseDisplay(display);
         return;
+    }
     size_t envstr_size = strlen(display_string) + 4;
     char* envstr = new char[envstr_size];
     strncpy(envstr, display_string, envstr_size);
@@ -444,6 +447,7 @@ void KeyAction::adjustDisplay(){
     int root_x, root_y, win_x, win_y;
     unsigned int mask_ret;
 
+    // Find the screen which currently has the mouse
     XQueryPointer(display, root_window, &root_window_ret, &child_window_ret, &root_x, &root_y, &win_x, &win_y, &mask_ret);
     if(child_window_ret == (Window)NULL)
         window = root_window_ret;
@@ -459,8 +463,10 @@ void KeyAction::adjustDisplay(){
         char buf[16];
         snprintf(buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
         strncat(envstr, buf, envstr_size - 1 - strlen(envstr));
+
+        // Update environment variable
+        setenv("DISPLAY", envstr, 1);
     }
-    setenv("DISPLAY", envstr, 1);
 
     delete[] envstr;
     XCloseDisplay(display);

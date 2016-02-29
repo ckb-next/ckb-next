@@ -208,7 +208,13 @@ int main(int argc, char *argv[]){
         break;
     }
 
-    // Launch in background if requested
+#ifdef Q_OS_LINUX
+    // This isn't technically a command line option, but some WMs will add it when restoring a previous session.
+    // We don't want to activate the window when that happens.
+    if(qApp->arguments().contains("-session") || qApp->arguments().contains("--session"))
+        background = true;
+#endif
+
     if(isRunning(background ? 0 : "Open")){
         printf("ckb is already running. Exiting.\n");
         return 0;

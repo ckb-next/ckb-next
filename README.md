@@ -55,6 +55,7 @@ Linux Installation
 
 ckb requires Qt5, libudev, zlib, gcc, g++, and glibc.
 
+* Gentoo: `emerge -av app-misc/ckb`
 * Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
 * Arch: `sudo pacman -S base-devel qt5-base zlib`
 * Other distros: Look for `qt5` or `libqt5*-devel`

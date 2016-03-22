@@ -54,8 +54,8 @@
 #include <IOKit/usb/USB.h>
 
 typedef IOHIDDeviceDeviceInterface**    hid_dev_t;
-typedef IOUSBDeviceInterface**          usb_dev_t;
-typedef IOUSBInterfaceInterface**       usb_iface_t;
+typedef IOUSBDeviceInterface182**       usb_dev_t;
+typedef IOUSBInterfaceInterface183**    usb_iface_t;
 
 // The OSX process needs to change its EUID to post events, so thread safety must be ensured
 // On Linux the EUID is always root

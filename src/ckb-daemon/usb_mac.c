@@ -81,9 +81,19 @@ static int get_pipe_index(usb_iface_t handle, int desired_direction){
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
     kern_return_t res = kIOReturnSuccess;
     if(kb->fwversion < 0x120 || is_recv){
+        int ep = kb->epcount;
         // For old devices, or for receiving data, use control transfers
-        IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, (void*)out_msg, 0, 5000, 5000 };
+        IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, ep - 1, MSG_SIZE, (void*)out_msg, 0, 5000, 5000 };
         res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
+        if(res == kIOReturnNotOpen){
+            // Device handle not open - try to send directly to the endpoint instead
+            usb_iface_t h_usb = kb->ifusb[ep - 1];
+            hid_dev_t h_hid = kb->ifhid[ep - 1];
+            if(h_usb)
+                res = (*h_usb)->ControlRequestTO(h_usb, 0, &rq);
+            else if(h_hid)
+                res = (*h_hid)->setReport(h_hid, kIOHIDReportTypeFeature, 0, out_msg, MSG_SIZE, 5000, 0, 0, 0);
+        }
     } else {
         // For newer devices, use interrupt transfers
         int ep = (kb->fwversion >= 0x130 && !IS_MOUSE_DEV(kb)) ? 4 : 3;
@@ -92,7 +102,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         if(h_usb)
             res = (*h_usb)->WritePipe(h_usb, get_pipe_index(h_usb, kUSBOut), (void*)out_msg, MSG_SIZE);
         else if(h_hid)
-            res = (*h_hid)->setReport(h_hid, kIOHIDReportTypeFeature, 0, out_msg, MSG_SIZE, 5000, 0, 0, 0);
+            res = (*h_hid)->setReport(h_hid, kIOHIDReportTypeOutput, 0, out_msg, MSG_SIZE, 5000, 0, 0, 0);
     }
     kb->lastresult = res;
     if(res != kIOReturnSuccess){
@@ -106,9 +116,19 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 }
 
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
-    IOUSBDevRequestTO rq = { 0xa1, 0x01, 0x0200, kb->epcount - 1, MSG_SIZE, in_msg, 0, 5000, 5000 };
+    int ep = kb->epcount;
+    IOUSBDevRequestTO rq = { 0xa1, 0x01, 0x0200, ep - 1, MSG_SIZE, in_msg, 0, 5000, 5000 };
     kern_return_t res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
-    int length = rq.wLenDone;
+    CFIndex length = rq.wLenDone;
+    if(res == kIOReturnNotOpen){
+        // Device handle not open - try to send directly to the endpoint instead
+        usb_iface_t h_usb = kb->ifusb[ep - 1];
+        hid_dev_t h_hid = kb->ifhid[ep - 1];
+        if(h_usb)
+            res = (*h_usb)->ControlRequestTO(h_usb, 0, &rq);
+        else if(h_hid)
+            res = (*h_hid)->getReport(h_hid, kIOHIDReportTypeFeature, 0, in_msg, &length, 5000, 0, 0, 0);
+    }
     kb->lastresult = res;
     if(res != kIOReturnSuccess){
         ckb_err_fn("Got return value 0x%x\n", file, line, res);
@@ -118,7 +138,7 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
             return 0;
     }
     if(length != MSG_SIZE)
-        ckb_err_fn("Read %d bytes (expected %d)\n", file, line, length, MSG_SIZE);
+        ckb_err_fn("Read %ld bytes (expected %d)\n", file, line, length, MSG_SIZE);
     return length;
 }
 
@@ -135,6 +155,34 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 void os_sendindicators(usbdevice* kb){
     IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, 0x00, 1, &kb->ileds, 0, 500, 500 };
     kern_return_t res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
+    if(res == kIOReturnNotOpen){
+        // Handle not open - try to go through the HID system instead
+        hid_dev_t handle = kb->ifhid[0];
+        if(handle){
+            uchar ileds = kb->ileds;
+            // Get a list of LED elements from handle 0
+            long ledpage = kHIDPage_LEDs;
+            const void* keys[] = { CFSTR(kIOHIDElementUsagePageKey) };
+            const void* values[] = { CFNumberCreate(kCFAllocatorDefault, kCFNumberLongType, &ledpage) };
+            CFDictionaryRef matching = CFDictionaryCreate(kCFAllocatorDefault, keys, values, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+            CFRelease(values[0]);
+            CFArrayRef leds;
+            kern_return_t res = (*handle)->copyMatchingElements(handle, matching, &leds, 0);
+            CFRelease(matching);
+            if(res != kIOReturnSuccess)
+                return;
+            // Iterate through them and update the LEDs which have changed
+            CFIndex count = CFArrayGetCount(leds);
+            for(CFIndex i = 0; i < count; i++){
+                IOHIDElementRef led = (void*)CFArrayGetValueAtIndex(leds, i);
+                uint32_t usage = IOHIDElementGetUsage(led);
+                IOHIDValueRef value = IOHIDValueCreateWithIntegerValue(kCFAllocatorDefault, led, 0, !!(ileds & (1 << (usage - 1))));
+                (*handle)->setValue(handle, led, value, 5000, 0, 0, 0);
+                CFRelease(value);
+            }
+            CFRelease(leds);
+        }
+    }
     if(res != kIOReturnSuccess)
         ckb_err("Got return value 0x%x\n", res);
 }
@@ -572,8 +620,11 @@ static void iterate_devices_usb(void* context, io_iterator_t iterator){
         // Plugin is no longer needed
         IODestroyPlugInInterface(plugin);
 
-        err = (*handle)->USBDeviceOpen(handle);
-        if(err != kIOReturnSuccess){
+        err = (*handle)->USBDeviceOpenSeize(handle);
+        if(err == kIOReturnExclusiveAccess){
+            // We can't send control transfers but most of the other functions should work
+            ckb_warn("Unable to seize USB handle, continuing anyway...\n");
+        } else if(err != kIOReturnSuccess){
             ckb_err("USBDeviceOpen failed: %x\n", err);
             continue;
         }

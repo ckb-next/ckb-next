@@ -101,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(closeAction, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
@@ -268,6 +269,15 @@ void MainWindow::showWindow(){
     showNormal();
     raise();
     activateWindow();
+}
+
+void MainWindow::stateChange(Qt::ApplicationState state){
+    // On OSX it's possible for the app to be brought to the foreground without the window actually reappearing.
+    // We want to make sure it's shown when this happens.
+#ifdef Q_OS_MAC
+    if(state == Qt::ApplicationActive)
+        showWindow();
+#endif
 }
 
 void MainWindow::quitApp(){

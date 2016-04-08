@@ -51,11 +51,19 @@ Mice:
 Linux Installation
 ------------------
 
+#### Pre-made packages:
+
+* Arch: [`aur/ckb-git`](https://aur.archlinux.org/packages/ckb-git/)
+* Gentoo: `emerge -av app-misc/ckb`
+
+These can be used to install ckb from your package manager. Note that I do not personally maintain these packages. For other distros, or if you want to create your own package, see instructions below.
+
 #### Preparation:
 
 ckb requires Qt5, libudev, zlib, gcc, g++, and glibc.
 
 * Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
+* Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
 * Arch: `sudo pacman -S base-devel qt5-base zlib`
 * Other distros: Look for `qt5` or `libqt5*-devel`
 
@@ -184,8 +192,6 @@ If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo 
 - ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
 - **`~` key prints `§±`**
 - Check your keyboard layout on ckb's Settings screen. Choose the layout that matches your physical keyboard.
-- **Keyboard doesn't work at boot, even when ckb is not installed.**
-- Unfortunately there is no known fix for this. You will need to unplug and replug the keyboard or try a different port/USB hub.
 - **Compile problems** can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
 
 #### General

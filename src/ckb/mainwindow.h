@@ -57,6 +57,7 @@ private:
 
 public slots:
     void showWindow();
+    void stateChange(Qt::ApplicationState state);
     void quitApp();
 
 private slots:

@@ -14,18 +14,18 @@ Hash: SHA256
   Corsair STRAFE      1.33 http://www3.corsair.com/software/HID/STRAFE.zip     0.2.2   STRAFE_app133_RC.bin     a6ea43354810afab6eea1ef41537178c545acbedbd4ebe48dd9d18c61b45c9c1
   Corsair STRAFERGB   1.33 http://www3.corsair.com/software/HID/STRAFE_RGB.zip 0.2.2   STRAFE_RGB_app133_RC.bin 8526070e4f118137c0bea30805dbdbce5b26beecc3237d65f7d3c10ad7494f1d
   Corsair M65RGB      1.19 http://www3.corsair.com/software/HID/M65RGB.zip     0.2.0   M65RGB_app119.bin        be214ab1f0cc1fc7f785c926c117ef270597f80d1fad9133a730022834267f4f
-  Corsair SCIMITARRGB 1.06 http://www3.corsair.com/software/HID/Scimitar.zip   0.2.2   Scimitar_V106.bin        fdc9bc14f6320ff7be47303cae543f1fbe406acb6590333084817da54cf3eb60
+  Corsair SCIMITARRGB 2.01 http://www3.corsair.com/software/HID/Scimitar.zip   0.2.5   Scimitar_App_V201.bin    f0e13a5cabdc2bfae00b51d50a369376d0cc19d8e201dcdc4d4ef1d5ac284c53
 
 !END FW ENTRIES
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJWVtkQAAoJEBXtkzSNyNMJHNEIAJieZ1pwU2WJu6GD14lwZEXI
-/carx6KogdtGbFvs5aE0BnYwq6iL/Q7GvY7KpVmYorJHl9PnwcDPoLe4H3IVYTbi
-nd0dLaBSGsGFhyR2Uz4aGknEhCQH9qybqrRk6znC0nvksiH/OcvFysqG/sPr9AWN
-679064VyXwMLUlqCRJtmfIMsb+BH6O/VNsvliIfC0VKsiIyuqaQqZptgpll9lkHL
-LDBLD514Vkg8z6c/dvUOL8Ey3v4qSGvvfBS36y/qh49Q5EvI7v0xVvNOxudLZ+7k
-or1PTCFFi03qzeI77XsF7mAyKmh1S2BjkEfAmxPfpl4s/WtkO1opPAtQdprxeDw=
-=D4qQ
+iQEcBAEBCAAGBQJWzUYDAAoJEBXtkzSNyNMJBkUH/jY6AgU1b19kEs5ub572cF8H
+t/IsMdbKKkVj9WYvWXcNW3c72rEN3IzO3Aa5+k/fvgGzkuz1/zHxyWJ6u0q2uKkz
+B2X7afHgTOZ/vFiuIcJZb2dzA/yTfWk2doUl6trN+nE3u2r2v8xmgiQGH/NaRD27
+7DS2/Vn8zm6epdUxO/vwyAO3x/oeNpCseWRRMZp/LbgZF6MCcWQ2cVNqcH4Z2z7s
+nQ4987+v6EX1WHsX2fq4km77wCe35dpCdKSpO2d3xxMkK9FKrftr9f5VhkyY4Yk3
+eJlHGZ2PAHlUkRs9WVCqoUQjC3HbJbTY6pqyX4VBv87+Wem/SnqASd41lej/yxs=
+=0giP
 -----END PGP SIGNATURE-----

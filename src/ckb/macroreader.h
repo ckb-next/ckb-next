@@ -61,7 +61,7 @@ public:
 
     //////////
     /// \brief run is the notification reader main loop.
-    void run Q_DECL_OVERRIDE ();
+    void run () Q_DECL_OVERRIDE;
 
 private slots:
     //////////

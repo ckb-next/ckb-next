@@ -220,8 +220,8 @@ int usbclaim(usbdevice* kb){
     int count = kb->epcount;
     for(int i = 0; i < count; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        if((ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl) && errno != ENODATA)
-                || ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
+        ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
+        if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
             return -1;
     }
     return 0;

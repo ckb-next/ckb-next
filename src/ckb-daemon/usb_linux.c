@@ -218,8 +218,10 @@ void os_closeusb(usbdevice* kb){
 
 int usbclaim(usbdevice* kb){
     int count = kb->epcount;
+    ckb_info("Connecting %d endpoints\n", count);
     for(int i = 0; i < count; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
+        ckb_info("Claiming EP %d\n", i);
         ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
         if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
             return -1;

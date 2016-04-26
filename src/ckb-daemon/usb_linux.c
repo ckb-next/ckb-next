@@ -13,7 +13,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     if(kb->fwversion >= 0x120 && !is_recv){
         struct usbdevfs_bulktransfer transfer;
         memset(&transfer, 0, sizeof(transfer));
-        transfer.ep = (kb->fwversion >= 0x130 && !IS_MOUSE_DEV(kb)) ? 4 : 3;
+        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;

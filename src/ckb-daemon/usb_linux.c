@@ -145,23 +145,24 @@ void* os_inputmain(void* context){
                     break;
                 case MSG_SIZE:
                     // Corsair mouse input
-                    corsair_mousecopy(kb->input.keys, urb->endpoint & 0xF, urb->buffer);
+                    corsair_mousecopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
                     break;
                 }
             } else if(IS_RGB(vendor, product)){
-                switch(urb->endpoint){
-                case 0x81:
+                switch(urb->actual_length){
+                case 8:
                     // RGB EP 1: 6KRO (BIOS mode) input
                     hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
                     break;
-                case 0x82:
+                case 21:
+                case 5:
                     // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
                     if(!kb->active)
                         hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
                     break;
-                case 0x83:
+                case MSG_SIZE:
                     // RGB EP 3: Corsair input
-                    corsair_kbcopy(kb->input.keys, urb->buffer);
+                    corsair_kbcopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
                     break;
                 }
             } else

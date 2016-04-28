@@ -209,7 +209,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data);
             break;
         case MSG_SIZE:
-            corsair_mousecopy(kb->input.keys, kb->ifhid[3] ? 3 : 2, data);
+            corsair_mousecopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);
             break;
         }
     } else if(HAS_FEATURES(kb, FEAT_RGB)){
@@ -226,7 +226,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             break;
         case MSG_SIZE:
             // RGB EP 3: Corsair input
-            corsair_kbcopy(kb->input.keys, data);
+            corsair_kbcopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);
             break;
         }
     } else {

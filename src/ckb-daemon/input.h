@@ -43,8 +43,6 @@ void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char*
 void os_keypress(usbdevice* kb, int scancode, int down);
 // Generate mouse movement
 void os_mousemove(usbdevice* kb, int x, int y);
-// Synchronize input (called after sending key presses)
-void os_isync(usbdevice* kb);
 
 // Perform OS-specific setup for indicator lights. Called when the device is created. Return 0 on success.
 int os_setupindicators(usbdevice* kb);

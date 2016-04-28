@@ -136,7 +136,6 @@ void inputupdate(usbdevice* kb){
         input->rel_x = input->rel_y = 0;
     }
     // Finish up
-    os_isync(kb);
     memcpy(input->prevkeys, input->keys, N_KEYBYTES_INPUT);
 }
 

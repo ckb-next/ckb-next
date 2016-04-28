@@ -219,8 +219,7 @@ void KbBind::update(QFile& cmd, bool force){
 
     // At last, send Macro definitions if avalilable.
     // If no definitions are made, clear macro will be sent only to reset all macros,
-    // but prevent Macro Clear Cmd for mouse devices
-    if (!isMouse()) cmd.write(macros.toLatin1());
+    cmd.write(macros.toLatin1());
     lastCmd = &cmd;
 }
 

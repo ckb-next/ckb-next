@@ -95,6 +95,7 @@ const devcmd vtable_keyboard_nonrgb = {
     .bind = cmd_bind,
     .unbind = cmd_unbind,
     .rebind = cmd_rebind,
+    .macro = cmd_macro,
 
     .dpi = cmd_macro_none,
     .dpisel = cmd_none,
@@ -140,6 +141,7 @@ const devcmd vtable_mouse = {
     .bind = cmd_bind,
     .unbind = cmd_unbind,
     .rebind = cmd_rebind,
+    .macro = cmd_macro,
 
     .dpi = cmd_dpi,
     .dpisel = cmd_dpisel,

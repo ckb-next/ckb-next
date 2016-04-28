@@ -17,11 +17,9 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
-        ckb_info_fn("Sending URB_INTERRUPT to ep %d\n", file, line, transfer.ep);
         res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
-        ckb_info_fn("Sending URB_CONTROL to ep %d\n", file, line, transfer.wIndex);
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     }
     if(res <= 0){
@@ -54,7 +52,6 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {*/
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
-        ckb_info_fn("Receiving URB_CONTROL from ep %d\n", file, line, transfer.wIndex);
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     //}
     if(res <= 0){

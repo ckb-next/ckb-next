@@ -391,12 +391,17 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
         CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
 }
 
-void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput){
+void corsair_kbcopy(unsigned char* kbinput, int endpoint, const unsigned char* urbinput){
+    if(endpoint == 2 || endpoint == -2){
+        if(urbinput[0] != 3)
+            return;
+        urbinput++;
+    }
     memcpy(kbinput, urbinput, N_KEYBYTES_HW);
 }
 
 void corsair_mousecopy(unsigned char* kbinput, int endpoint, const unsigned char* urbinput){
-    if(endpoint == 2){
+    if(endpoint == 2 || endpoint == -2){
         if(urbinput[0] != 3)
             return;
         urbinput++;

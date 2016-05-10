@@ -96,7 +96,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         }
     } else {
         // For newer devices, use interrupt transfers
-        int ep = (kb->fwversion >= 0x130 && !IS_MOUSE_DEV(kb)) ? 4 : 3;
+        int ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
         usb_iface_t h_usb = kb->ifusb[ep - 1];
         hid_dev_t h_hid = kb->ifhid[ep - 1];
         if(h_usb)
@@ -209,7 +209,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data);
             break;
         case MSG_SIZE:
-            corsair_mousecopy(kb->input.keys, kb->ifhid[3] ? 3 : 2, data);
+            corsair_mousecopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);
             break;
         }
     } else if(HAS_FEATURES(kb, FEAT_RGB)){
@@ -226,7 +226,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             break;
         case MSG_SIZE:
             // RGB EP 3: Corsair input
-            corsair_kbcopy(kb->input.keys, data);
+            corsair_kbcopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);
             break;
         }
     } else {

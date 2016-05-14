@@ -112,7 +112,7 @@ int main(int argc, char *argv[]){
     }
 
     // Launch in background if requested, or if re-launching a previous session
-    bool background = qApp->arguments().contains("--background") || qApp->arguments().contains("-session") || qApp->arguments().contains("--session");
+    bool background = qApp->arguments().contains("--background") || qApp->isSessionRestored();
     if(isRunning(background ? 0 : "Open")){
         printf("ckb is already running. Exiting.\n");
         return 0;

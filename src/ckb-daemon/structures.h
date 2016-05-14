@@ -188,7 +188,7 @@ typedef struct {
     int uinput_kb, uinput_mouse;
 #else
     // USB identifier
-    long location_id;
+    uint32_t location_id[IFACE_MAX + 1];
     // Device handles
     usb_dev_t handle;
     usb_iface_t ifusb[IFACE_MAX];

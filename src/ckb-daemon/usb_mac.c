@@ -419,17 +419,21 @@ static void remove_device(void* context, io_service_t device, uint32_t message_t
 
 // Finds a USB device by location ID. Returns a new device if none was found or -1 if no devices available.
 // If successful, devmutex[index] will be locked when the function returns. Unlock it when finished.
-static int find_device(long idvendor, long idproduct, long location){
+static int find_device(uint16_t idvendor, uint16_t idproduct, uint32_t location, int handle_idx){
     // Look for any partially-set up boards matching this device
     for(int i = 1; i < DEV_MAX; i++){
         if(pthread_mutex_trylock(devmutex + i))
             // If the mutex is locked then the device is obviously set up already, keep going
             continue;
-        if(keyboard[i].vendor == idvendor && keyboard[i].product == idproduct
-                && keyboard[i].location_id == location){
-            // Matched; continue setting up this device
-            // Device mutex remains locked
-            return i;
+        if(keyboard[i].vendor == idvendor && keyboard[i].product == idproduct){
+            for(int iface = 0; iface <= IFACE_MAX; iface++){
+                if(keyboard[i].location_id[iface] == location){
+                    // Matched; continue setting up this device
+                    keyboard[i].location_id[handle_idx] = location;
+                    // Device mutex remains locked
+                    return i;
+                }
+            }
         }
         pthread_mutex_unlock(devmutex + i);
     }
@@ -440,7 +444,7 @@ static int find_device(long idvendor, long idproduct, long location){
         if(!keyboard[i].handle){
             // Mark the device as in use and print out a message
             keyboard[i].handle = INCOMPLETE;
-            keyboard[i].location_id = location;
+            keyboard[i].location_id[handle_idx] = location;
             keyboard[i].vendor = idvendor;
             keyboard[i].product = idproduct;
             // Device mutex remains locked
@@ -501,12 +505,13 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
     (*handle)->GetDeviceProduct(handle, &idproduct);
     (*handle)->GetLocationID(handle, &location);
     // Use the location ID key to group the USB handle with the HID handles
-    int index = find_device(idvendor, idproduct, location);
+    int index = find_device(idvendor, idproduct, location, 0);
     if(index == -1){
         ckb_err("No free devices\n");
         return 0;
     }
     usbdevice* kb = keyboard + index;
+    ckb_info("USB: ckb%d.location[0] = 0x%08x\n", index, location);
 
     // Set the handle for the keyboard
     if(kb->handle && kb->handle != INCOMPLETE){
@@ -560,6 +565,9 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
         // Plugin is no longer needed
         IODestroyPlugInInterface(plugin);
 
+        // Get location ID in case it's different from the main USB
+        (*if_handle)->GetLocationID(if_handle, kb->location_id + iface_count + 1);
+        ckb_info("USB: ckb%d.location[%d] = 0x%08x\n", index, iface_count + 1, kb->location_id[iface_count + 1]);
         // Try to open the interface. If it succeeds, add it to the device's interface list.
         err = (*if_handle)->USBInterfaceOpenSeize(if_handle);   // no wait_loop here because this is expected to fail
         if(err == kIOReturnSuccess){
@@ -644,25 +652,7 @@ release:
 }
 
 static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
-    // Get the model and serial number
-    long idvendor = hidgetlong(handle, CFSTR(kIOHIDVendorIDKey)), idproduct = hidgetlong(handle, CFSTR(kIOHIDProductIDKey));
     // Each keyboard generates multiple match events (one for each endpoint)
-    // Use the location ID key to group the handles together
-    long location = hidgetlong(handle, CFSTR(kIOHIDLocationIDKey));
-    int index = find_device(idvendor, idproduct, location);
-    if(index == -1){
-        ckb_err("No free devices\n");
-        return 0;
-    }
-    usbdevice* kb = keyboard + index;
-
-    // Read the serial number and name (if not done yet)
-    if(!keyboard[index].serial[0] && !keyboard[index].name[0]){
-        hidgetstr(handle, CFSTR(kIOHIDSerialNumberKey), keyboard[index].serial, SERIAL_LEN);
-        hidgetstr(handle, CFSTR(kIOHIDProductKey), keyboard[index].name, KB_NAME_LEN);
-        ckb_info("Connecting %s at %s%d\n", keyboard[index].name, devpath, index);
-    }
-
     // There's no direct way to tell which of the endpoints this is, but there's a workaround
     // Each handle has a unique maximum packet size combination, so use that to place them
     long input = hidgetlong(handle, CFSTR(kIOHIDMaxInputReportSizeKey));
@@ -692,8 +682,28 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         handle_idx = 1;
     else {
         ckb_warn("Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
-        goto error;
+        return 0;
     }
+
+    // Get the model and serial number
+    uint16_t idvendor = hidgetlong(handle, CFSTR(kIOHIDVendorIDKey)), idproduct = hidgetlong(handle, CFSTR(kIOHIDProductIDKey));
+    // Use the location ID key to group the handles together
+    uint32_t location = hidgetlong(handle, CFSTR(kIOHIDLocationIDKey));
+    int index = find_device(idvendor, idproduct, location, handle_idx + 1);
+    if(index == -1){
+        ckb_err("No free devices\n");
+        return 0;
+    }
+    usbdevice* kb = keyboard + index;
+    ckb_info("HID: ckb%d.location[%d] = 0x%08x\n", index, handle_idx + 1, kb->location_id[handle_idx + 1]);
+
+    // Read the serial number and name (if not done yet)
+    if(!keyboard[index].serial[0] && !keyboard[index].name[0]){
+        hidgetstr(handle, CFSTR(kIOHIDSerialNumberKey), keyboard[index].serial, SERIAL_LEN);
+        hidgetstr(handle, CFSTR(kIOHIDProductKey), keyboard[index].name, KB_NAME_LEN);
+        ckb_info("Connecting %s at %s%d\n", keyboard[index].name, devpath, index);
+    }
+
 
     // Set the handle
     if(kb->ifhid[handle_idx]){

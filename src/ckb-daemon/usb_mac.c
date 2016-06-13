@@ -307,7 +307,6 @@ void* os_inputmain(void* context){
     memset(input, 0, sizeof(input));
     for(int i = 0; i < count; i++){
         if(kb->ifusb[i]){
-            ckb_info("Reading ckb%d.ifusb[%d]\n", index, i);
             usb_iface_t handle = kb->ifusb[i];
             int pipe = get_pipe_index(handle, kUSBIn);
             uchar direction, number, transfertype, interval;
@@ -323,7 +322,6 @@ void* os_inputmain(void* context){
             input[i].maxsize = maxpacketsize;
             (*handle)->ReadPipeAsync(handle, 1, buffer, maxpacketsize, pipecomplete, input + i);
         } else if(kb->ifhid[i]){
-            ckb_info("Reading ckb%d.ifhid[%d]\n", index, i);
             hid_dev_t handle = kb->ifhid[i];
             long maxsize = hidgetlong(handle, CFSTR(kIOHIDMaxInputReportSizeKey));
             uchar* buffer = malloc(maxsize);
@@ -511,7 +509,6 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
         return 0;
     }
     usbdevice* kb = keyboard + index;
-    ckb_info("USB: ckb%d.location[0] = 0x%08x\n", index, location);
 
     // Set the handle for the keyboard
     if(kb->handle && kb->handle != INCOMPLETE){
@@ -567,7 +564,6 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
 
         // Get location ID in case it's different from the main USB
         (*if_handle)->GetLocationID(if_handle, kb->location_id + iface_count + 1);
-        ckb_info("USB: ckb%d.location[%d] = 0x%08x\n", index, iface_count + 1, kb->location_id[iface_count + 1]);
         // Try to open the interface. If it succeeds, add it to the device's interface list.
         err = (*if_handle)->USBInterfaceOpenSeize(if_handle);   // no wait_loop here because this is expected to fail
         if(err == kIOReturnSuccess){
@@ -575,7 +571,6 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
             iface_success++;
             // Register for removal notification
             IOServiceAddInterestNotification(notify, iface, kIOGeneralInterest, remove_device, kb, kb->rm_notify + 1 + iface_count);
-            ckb_info("Adding ckb%d.ifusb[%d]\n", index, iface_count);
         } else {
             kb->ifusb[iface_count] = 0;
             (*if_handle)->Release(if_handle);
@@ -695,7 +690,6 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         return 0;
     }
     usbdevice* kb = keyboard + index;
-    ckb_info("HID: ckb%d.location[%d] = 0x%08x\n", index, handle_idx + 1, kb->location_id[handle_idx + 1]);
 
     // Read the serial number and name (if not done yet)
     if(!keyboard[index].serial[0] && !keyboard[index].name[0]){
@@ -711,7 +705,6 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         ckb_warn("Tried to set up ifhid[%d] for device ckb%d, but it was already set up. Skipping...\n", handle_idx, index);
         goto error;
     }
-    ckb_info("Adding ckb%d.ifhid[%d]\n", index, handle_idx);
     kb->ifhid[handle_idx] = handle;
     kb->epcount_hid++;
     if(HAS_ALL_HANDLES(kb))

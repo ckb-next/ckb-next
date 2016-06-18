@@ -85,7 +85,7 @@ int updatergb_kb(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    if(IS_STRAFE(kb)){
+    if(IS_FULLRANGE(kb)){
         // Update strafe sidelights if necessary
         if(lastlight->sidelight != newlight->sidelight) {
             uchar data_pkt[2][MSG_SIZE] = {

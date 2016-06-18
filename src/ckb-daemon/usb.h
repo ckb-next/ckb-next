@@ -66,6 +66,9 @@ const char* product_str(short product);
 #define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
 #define IS_MONOCHROME_DEV(kb)           IS_MONOCHROME((kb)->vendor, (kb)->product)
 
+// Full color range (16.8M) vs partial color range (512)
+#define IS_FULLRANGE(kb)                (IS_RGB((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95)
+
 // Mouse vs keyboard test
 #define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR)))
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)

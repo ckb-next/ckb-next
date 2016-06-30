@@ -9,10 +9,10 @@ Hash: SHA256
 !BEGIN FW ENTRIES
 
 # Vendor  Model       FW   URL                                                 Min.ckb File Name              SHA256
-  Corsair K70RGB      2.04 http://www3.corsair.com/software/HID/K70RGB.zip     0.2.6   K70RGB_APP_V204.bin    013f3013ea84b8647d8c471b5c77bf0658de93b352cfbdd992904776e818aaad
-  Corsair K95RGB      2.04 http://www3.corsair.com/software/HID/K95RGB.zip     0.2.6   K95RGB_APP_V204.bin    6b820cd138c5ba1b269420813a379179a97a3f21a3feb9be11cbe409d8fe600f
+  Corsair K70RGB      2.05 http://www3.corsair.com/software/HID/K70RGB.zip     0.2.6   K70RGB_APP_V205.bin    3e43bdcc5077dc413fbdee7ff6e57a978f758599142eef6979a96e3b8c3a566a
+  Corsair K95RGB      2.05 http://www3.corsair.com/software/HID/K95RGB.zip     0.2.6   K95RGB_APP_V205.bin    8d0680dd033d6020a53bc9bfa83e761143699d1122f1d0133e95ad3056d63a15
   Corsair STRAFE      2.04 http://www3.corsair.com/software/HID/STRAFE.zip     0.2.6   STRAFE_APP_V204.bin    51156ae7aa5b04405668582496cf28bbfb2e492accf93c65c3072aca9ef7ed65
-  Corsair STRAFERGB   2.04 http://www3.corsair.com/software/HID/STRAFERGB.zip  0.2.6   STRAFERGB_APP_V204.bin bf14b420c521e28faf5fea6b406b2ad5ec10ca9e2ddfac69c448f01f615aa74c
+  Corsair STRAFERGB   2.05 http://www3.corsair.com/software/HID/STRAFERGB.zip  0.2.6   STRAFERGB_APP_V205.bin dff16fec9a0ae0d33aad0482f9ea02e3e55e231706b8c4e7fb66820aba98adc5
   Corsair M65RGB      2.02 http://www3.corsair.com/software/HID/M65RGB.zip     0.2.5   M65RGB_App_v202.bin    0b6080b98d9199fd23837b7927e7868420f458f2f24ac545f33e34f79c317a79
   Corsair SCIMITARRGB 2.03 http://www3.corsair.com/software/HID/Scimitar.zip   0.2.5   Scimitar_App_v203.bin  59194c3ae8a6ae0a801f7b6cf528ad292ae996923699cf063c7deed38fb326aa
 
@@ -21,11 +21,11 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJXXiTGAAoJEBXtkzSNyNMJOnIIAJ5F9nM/SC/T4Ykj9a6MdCUo
-oen73KK8Jb1MWVfl0BW6pXBx5Ww+nbhyXRQwW1vyAAXRd3hxZya9+WOSxPHy5cck
-nTjN37sbR4Uu1SQ9VN6oMaLo7N3+wN5/NyjtoAUkP0us5Edk46bBQ/P/2dzutDvk
-EtEQa84q1hqHNgUDYxPkdfd17J2U48bSQJHCoyr7bDJC5u2Gq3ykbi65RiOTjGw+
-QHbhUu2UgvOaMRtGn1p2hqRJi+K6h6aDhuOipwnzmmFSqxdaZB83jSnfJtdbnmKJ
-FYGQvG/K/lybTdF4kmXU8z0e3N14bBhMRDxyaCvRv75Skcwyv3Bkt7LazaDeS80=
-=LX5l
+iQEcBAEBCAAGBQJXdMclAAoJEBXtkzSNyNMJRnQIAL0sz5zhYX2OKTDkZ+BTndh+
+c5sq45o3M7GPsE3fRsDAt9BE2PU1K69dDdIv2oeKldvsgShhcF/iYYKDBVCH3Gai
+jFKljnSpoBLy+aU77Pf2tBb9BC3yzD9MKUa+Rh2hOCwKGtXZwq2DqLoJwRl6KSbD
++oI4DF4M3pAhxG0FgxAeGfro1NIO2YPBULIH6qDdFxVTE+JoLlCkKslqTFBWEzvd
+9L2bA4mOxJhsEt1be6twJ9vGiPfHMq8AKjNLsbJ3hg+E3Lft4X7ySG2uqSPYRK37
+5t3d+H9aJg22oEZfU7VuykhdlTijmc88ekQZIb3v2cMHXi2HcBNxUIDVXq3dkbA=
+=TQno
 -----END PGP SIGNATURE-----

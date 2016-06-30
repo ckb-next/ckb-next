@@ -96,7 +96,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         }
     } else {
         // For newer devices, use interrupt transfers
-        int ep = (kb->fwversion >= 0x130 && !IS_MOUSE_DEV(kb)) ? 4 : 3;
+        int ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
         usb_iface_t h_usb = kb->ifusb[ep - 1];
         hid_dev_t h_hid = kb->ifhid[ep - 1];
         if(h_usb)
@@ -209,7 +209,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data);
             break;
         case MSG_SIZE:
-            corsair_mousecopy(kb->input.keys, kb->ifhid[3] ? 3 : 2, data);
+            corsair_mousecopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);
             break;
         }
     } else if(HAS_FEATURES(kb, FEAT_RGB)){
@@ -226,7 +226,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
             break;
         case MSG_SIZE:
             // RGB EP 3: Corsair input
-            corsair_kbcopy(kb->input.keys, data);
+            corsair_kbcopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);
             break;
         }
     } else {
@@ -307,7 +307,6 @@ void* os_inputmain(void* context){
     memset(input, 0, sizeof(input));
     for(int i = 0; i < count; i++){
         if(kb->ifusb[i]){
-            ckb_info("Reading ckb%d.ifusb[%d]\n", index, i);
             usb_iface_t handle = kb->ifusb[i];
             int pipe = get_pipe_index(handle, kUSBIn);
             uchar direction, number, transfertype, interval;
@@ -323,7 +322,6 @@ void* os_inputmain(void* context){
             input[i].maxsize = maxpacketsize;
             (*handle)->ReadPipeAsync(handle, 1, buffer, maxpacketsize, pipecomplete, input + i);
         } else if(kb->ifhid[i]){
-            ckb_info("Reading ckb%d.ifhid[%d]\n", index, i);
             hid_dev_t handle = kb->ifhid[i];
             long maxsize = hidgetlong(handle, CFSTR(kIOHIDMaxInputReportSizeKey));
             uchar* buffer = malloc(maxsize);
@@ -419,17 +417,21 @@ static void remove_device(void* context, io_service_t device, uint32_t message_t
 
 // Finds a USB device by location ID. Returns a new device if none was found or -1 if no devices available.
 // If successful, devmutex[index] will be locked when the function returns. Unlock it when finished.
-static int find_device(long idvendor, long idproduct, long location){
+static int find_device(uint16_t idvendor, uint16_t idproduct, uint32_t location, int handle_idx){
     // Look for any partially-set up boards matching this device
     for(int i = 1; i < DEV_MAX; i++){
         if(pthread_mutex_trylock(devmutex + i))
             // If the mutex is locked then the device is obviously set up already, keep going
             continue;
-        if(keyboard[i].vendor == idvendor && keyboard[i].product == idproduct
-                && keyboard[i].location_id == location){
-            // Matched; continue setting up this device
-            // Device mutex remains locked
-            return i;
+        if(keyboard[i].vendor == idvendor && keyboard[i].product == idproduct){
+            for(int iface = 0; iface <= IFACE_MAX; iface++){
+                if(keyboard[i].location_id[iface] == location){
+                    // Matched; continue setting up this device
+                    keyboard[i].location_id[handle_idx] = location;
+                    // Device mutex remains locked
+                    return i;
+                }
+            }
         }
         pthread_mutex_unlock(devmutex + i);
     }
@@ -440,7 +442,7 @@ static int find_device(long idvendor, long idproduct, long location){
         if(!keyboard[i].handle){
             // Mark the device as in use and print out a message
             keyboard[i].handle = INCOMPLETE;
-            keyboard[i].location_id = location;
+            keyboard[i].location_id[handle_idx] = location;
             keyboard[i].vendor = idvendor;
             keyboard[i].product = idproduct;
             // Device mutex remains locked
@@ -501,7 +503,7 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
     (*handle)->GetDeviceProduct(handle, &idproduct);
     (*handle)->GetLocationID(handle, &location);
     // Use the location ID key to group the USB handle with the HID handles
-    int index = find_device(idvendor, idproduct, location);
+    int index = find_device(idvendor, idproduct, location, 0);
     if(index == -1){
         ckb_err("No free devices\n");
         return 0;
@@ -560,6 +562,8 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
         // Plugin is no longer needed
         IODestroyPlugInInterface(plugin);
 
+        // Get location ID in case it's different from the main USB
+        (*if_handle)->GetLocationID(if_handle, kb->location_id + iface_count + 1);
         // Try to open the interface. If it succeeds, add it to the device's interface list.
         err = (*if_handle)->USBInterfaceOpenSeize(if_handle);   // no wait_loop here because this is expected to fail
         if(err == kIOReturnSuccess){
@@ -567,7 +571,6 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
             iface_success++;
             // Register for removal notification
             IOServiceAddInterestNotification(notify, iface, kIOGeneralInterest, remove_device, kb, kb->rm_notify + 1 + iface_count);
-            ckb_info("Adding ckb%d.ifusb[%d]\n", index, iface_count);
         } else {
             kb->ifusb[iface_count] = 0;
             (*if_handle)->Release(if_handle);
@@ -644,25 +647,7 @@ release:
 }
 
 static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
-    // Get the model and serial number
-    long idvendor = hidgetlong(handle, CFSTR(kIOHIDVendorIDKey)), idproduct = hidgetlong(handle, CFSTR(kIOHIDProductIDKey));
     // Each keyboard generates multiple match events (one for each endpoint)
-    // Use the location ID key to group the handles together
-    long location = hidgetlong(handle, CFSTR(kIOHIDLocationIDKey));
-    int index = find_device(idvendor, idproduct, location);
-    if(index == -1){
-        ckb_err("No free devices\n");
-        return 0;
-    }
-    usbdevice* kb = keyboard + index;
-
-    // Read the serial number and name (if not done yet)
-    if(!keyboard[index].serial[0] && !keyboard[index].name[0]){
-        hidgetstr(handle, CFSTR(kIOHIDSerialNumberKey), keyboard[index].serial, SERIAL_LEN);
-        hidgetstr(handle, CFSTR(kIOHIDProductKey), keyboard[index].name, KB_NAME_LEN);
-        ckb_info("Connecting %s at %s%d\n", keyboard[index].name, devpath, index);
-    }
-
     // There's no direct way to tell which of the endpoints this is, but there's a workaround
     // Each handle has a unique maximum packet size combination, so use that to place them
     long input = hidgetlong(handle, CFSTR(kIOHIDMaxInputReportSizeKey));
@@ -692,8 +677,27 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         handle_idx = 1;
     else {
         ckb_warn("Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
-        goto error;
+        return 0;
     }
+
+    // Get the model and serial number
+    uint16_t idvendor = hidgetlong(handle, CFSTR(kIOHIDVendorIDKey)), idproduct = hidgetlong(handle, CFSTR(kIOHIDProductIDKey));
+    // Use the location ID key to group the handles together
+    uint32_t location = hidgetlong(handle, CFSTR(kIOHIDLocationIDKey));
+    int index = find_device(idvendor, idproduct, location, handle_idx + 1);
+    if(index == -1){
+        ckb_err("No free devices\n");
+        return 0;
+    }
+    usbdevice* kb = keyboard + index;
+
+    // Read the serial number and name (if not done yet)
+    if(!keyboard[index].serial[0] && !keyboard[index].name[0]){
+        hidgetstr(handle, CFSTR(kIOHIDSerialNumberKey), keyboard[index].serial, SERIAL_LEN);
+        hidgetstr(handle, CFSTR(kIOHIDProductKey), keyboard[index].name, KB_NAME_LEN);
+        ckb_info("Connecting %s at %s%d\n", keyboard[index].name, devpath, index);
+    }
+
 
     // Set the handle
     if(kb->ifhid[handle_idx]){
@@ -701,7 +705,6 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         ckb_warn("Tried to set up ifhid[%d] for device ckb%d, but it was already set up. Skipping...\n", handle_idx, index);
         goto error;
     }
-    ckb_info("Adding ckb%d.ifhid[%d]\n", index, handle_idx);
     kb->ifhid[handle_idx] = handle;
     kb->epcount_hid++;
     if(HAS_ALL_HANDLES(kb))

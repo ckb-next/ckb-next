@@ -13,7 +13,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     if(kb->fwversion >= 0x120 && !is_recv){
         struct usbdevfs_bulktransfer transfer;
         memset(&transfer, 0, sizeof(transfer));
-        transfer.ep = (kb->fwversion >= 0x130 && !IS_MOUSE_DEV(kb)) ? 4 : 3;
+        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
@@ -145,23 +145,24 @@ void* os_inputmain(void* context){
                     break;
                 case MSG_SIZE:
                     // Corsair mouse input
-                    corsair_mousecopy(kb->input.keys, urb->endpoint & 0xF, urb->buffer);
+                    corsair_mousecopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
                     break;
                 }
             } else if(IS_RGB(vendor, product)){
-                switch(urb->endpoint){
-                case 0x81:
+                switch(urb->actual_length){
+                case 8:
                     // RGB EP 1: 6KRO (BIOS mode) input
                     hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
                     break;
-                case 0x82:
+                case 21:
+                case 5:
                     // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
                     if(!kb->active)
                         hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
                     break;
-                case 0x83:
+                case MSG_SIZE:
                     // RGB EP 3: Corsair input
-                    corsair_kbcopy(kb->input.keys, urb->buffer);
+                    corsair_kbcopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
                     break;
                 }
             } else
@@ -220,8 +221,8 @@ int usbclaim(usbdevice* kb){
     int count = kb->epcount;
     for(int i = 0; i < count; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        if((ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl) && errno != ENODATA)
-                || ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
+        ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
+        if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
             return -1;
     }
     return 0;

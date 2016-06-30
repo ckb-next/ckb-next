@@ -3,13 +3,15 @@ ckb: RGB Driver for Linux and OS X
 
 **ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
+![Screenshot](https://i.imgur.com/zMK9jOP.png)
+
 **Disclaimer:** ckb is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
 If you use and enjoy this project, I'd appreciate if you could spare a few dollars for a donation. This is completely voluntary - the project will remain free and open source regardless. `:)`
 
-I accept donations through PayPal: [Click here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+I accept donations through PayPal: [![Click Here](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
-Or through Bitcoin: [1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ](https://blockchain.info/address/1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ) [(click here for QR code)](https://i.imgur.com/h3gyLiv.png)
+Or through Bitcoin: [![](https://i.imgur.com/DJTlQcJ.png) 1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ](https://blockchain.info/address/1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ)
 
 Contents
 --------
@@ -211,7 +213,7 @@ Common issues:
 
 #### Reporting issues
 
-If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/ccMSC/ckb/issues) or [the Corsair User Forum thread](http://forum.corsair.com/v3/showthread.php?t=133929). I usually try to respond within 48 hours. Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
+If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/ccMSC/ckb/issues). Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
 
 Known issues
 ------------

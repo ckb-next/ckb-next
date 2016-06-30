@@ -14,6 +14,8 @@ void ckb_info(){
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Ripple color:", "", "ffffffff");
     CKB_PARAM_DOUBLE("length", "Ring length:", "%", 100, 1, 100);
+    CKB_PARAM_DOUBLE("x_offset", "X offset:", "%", 0, -100, 100);
+    CKB_PARAM_DOUBLE("y_offset", "Y offset:", "%", 0, -100, 100);
     CKB_PARAM_BOOL("symmetric", "Symmetric", 0);
     CKB_PARAM_BOOL("randomize", "Randomly select from gradient", 0);
 
@@ -48,6 +50,7 @@ float kbsize = 0.f;
 ckb_gradient animcolor = { 0 };
 int symmetric = 0, kprelease = 0, randomize = 0;
 double animlength = 0.;
+double x_offset = 0, y_offset = 0;
 
 void ckb_init(ckb_runctx* context){
     kbsize = sqrt(context->width * context->width / 4.f + context->height * context->height / 4.f);
@@ -65,6 +68,8 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_BOOL("symmetric", &symmetric){}
     CKB_PARSE_BOOL("kprelease", &kprelease){}
     CKB_PARSE_BOOL("randomize", &randomize){}
+    CKB_PARSE_DOUBLE("x_offset", &x_offset) {}
+    CKB_PARSE_DOUBLE("y_offset", &y_offset) {}
 }
 
 #define ANIM_MAX (144 * 2)
@@ -110,7 +115,7 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
 void ckb_start(ckb_runctx* context, int state){
     // Add or remove a ring in the center of the keyboard
     if(state)
-        anim_add(context->width / 2.f, context->height / 2.f, context->width, context->height);
+        anim_add((context->width + (context->width * x_offset * 0.01)) / 2.f, (context->height - (context->height * y_offset * 0.01)) / 2.f, context->width, context->height);
     else
         anim_remove(context->width / 2.f, context->height / 2.f);
 }

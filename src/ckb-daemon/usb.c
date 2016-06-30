@@ -32,7 +32,7 @@ const char* product_str(short product){
         return "k65";
     if(product == P_STRAFE || product == P_STRAFE_NRGB)
         return "strafe";
-    if(product == P_M65)
+    if(product == P_M65 || product == P_M65_PRO)
         return "m65";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N)
         return "sabre";

@@ -36,8 +36,7 @@ static void inputupdate_keys(usbdevice* kb){
                         else {
                             os_keypress(kb, action->scan, action->down);
                             if (kb->delay) {
-                                if (a > 200) usleep (100);
-                                else if (a > 20) usleep(30);
+                                usleep(5000); // fixed 5ms delay
                             }
                         }
                     }

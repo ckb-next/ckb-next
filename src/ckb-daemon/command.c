@@ -200,9 +200,20 @@ int readcmd(usbdevice* kb, const char* line){
             }
             continue;
         }
-        case DELAY:
-            kb->delay = (!strcmp (word, "on")); // independendant from parameter to handle false commands like "delay off"
+        case DELAY: {
+            uint delay;
+            if(sscanf(word, "%u", &delay) == 1) {
+                // Add delay of `newdelay` microseconds to macro playback
+                kb->delay = delay; 
+            } else if(strcmp(word, "on") == 0) { 
+                // allow previous syntax, `delay on` means 30us delay
+                kb->delay = 30;
+            } else {
+                // bad parameter to handle false commands like "delay off"                
+                kb->delay = 0; // No delay.
+            }
             continue;
+        }
         case RESTART: {
             char mybuffer[] = "no reason specified";
             if (sscanf(line, " %[^\n]", word) == -1) { ///< Because length of word is length of line + 1, there should be no problem with buffer overflow.
@@ -211,7 +222,6 @@ int readcmd(usbdevice* kb, const char* line){
             vt->do_cmd[command](kb, mode, notifynumber, 0, word);
             continue;
         }
-
         default:;
         }
 

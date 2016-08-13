@@ -24,7 +24,7 @@ Global delay can also be set to `on` which maintains backwards compatibility wit
                 #   100us for 'long' macros (>=200 acitions)
     delay off   # no delay (same as 0)
     delay 0     # no delay (same as off)
-    delay spearmint-potato    # invalid setting, no change in delay
+    delay spearmint-potato    # invalid input, no delay (same as off)
 ````
 
 Local Delay

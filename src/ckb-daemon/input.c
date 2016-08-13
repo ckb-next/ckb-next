@@ -35,8 +35,16 @@ static void inputupdate_keys(usbdevice* kb){
                             os_mousemove(kb, action->rel_x, action->rel_y);
                         else {
                             os_keypress(kb, action->scan, action->down);
-                            if (kb->delay) {
+                            if (action->delay != UINT_MAX) {    // local delay set
+                                usleep(action->delay);
+                            } else if (kb->delay != UINT_MAX) { // use default global delay
                                 usleep(kb->delay);
+                            } else {                            // use old long macro delay code
+                                if (a > 200) {
+                                    usleep (100);
+                                } else if (a > 20) {
+                                    usleep(30);
+                                }
                             }
                         }
                     }
@@ -286,6 +294,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
                 // Set a key numerically
                 macro.actions[macro.actioncount].scan = keymap[keycode].scan;
                 macro.actions[macro.actioncount].down = down;
+                macro.actions[macro.actioncount].delay = UINT_MAX;
                 macro.actioncount++;
             } else {
                 // Find this key in the keymap
@@ -293,6 +302,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
                     if(keymap[i].name && !strcmp(keyname + 1, keymap[i].name)){
                         macro.actions[macro.actioncount].scan = keymap[i].scan;
                         macro.actions[macro.actioncount].down = down;
+                        macro.actions[macro.actioncount].delay = UINT_MAX;
                         macro.actioncount++;
                         break;
                     }

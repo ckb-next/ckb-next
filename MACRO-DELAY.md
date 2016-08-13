@@ -3,15 +3,14 @@ ckb: RGB Driver for Linux and OS X with Macro Delay
 
 This `macro-delay` version of `ckb` implements global and local delays during macro action playback.  Setting a _global delay_ value introduces a time delay between events during macro execution or playback. _Local delay_ allows setting the delay after an individual event, overriding the global delay value for that event. Thus global delay can be used to set the overall playback speed of macros and local delays can be used to tune individual events within a macro.
 
-All delay values are specified in microseconds (us) and are positive values from `0` to  `UINT_MAX - 1`. This means delays range from 0 to just over 1 hour (4,294,967,294us, 
-4,294 seconds, 71 minutes, or 1.19 hours). A value of zero (0) represents no delay between actions.
+All delay values are specified in microseconds (us) and are positive values from `0` to  `UINT_MAX - 1`. This means delays range from 0 to just over 1 hour (4,294,967,294us, 4,294 seconds, 71 minutes, or 1.19 hours). A value of zero (0) represents no delay between actions.
 
 Global Delay
 ------------
 
 Global delay allows macro playback speed to be changed. It sets the time between (actually after) each recorded macro event. If global delay is set to 1 microsecond then a 1 ms delay will follow each individual macro event when the macro is triggered.
 
-The _global delay_ is set with the ckb-daemon's existing (in testing branch) `delay` command followed by an unsigned integer representing the number of microseconds to wait after each macro action and before the next. 
+The _global delay_ is set with the ckb-daemon's existing (in testing branch) `delay` command followed by an unsigned integer representing the number of microseconds to wait after each macro action and before the next.
 
 Global delay can also be set to `on` which maintains backwards compatibility with the current development of `ckb-daemon` for long macro playback. That is, setting the global delay to `on` introduces a 30us and a 100us delay based on the macro's length during playback.
 

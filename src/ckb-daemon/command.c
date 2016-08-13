@@ -204,13 +204,13 @@ int readcmd(usbdevice* kb, const char* line){
             uint delay;
             if(sscanf(word, "%u", &delay) == 1) {
                 // Add delay of `newdelay` microseconds to macro playback
-                kb->delay = delay; 
-            } else if(strcmp(word, "on") == 0) { 
+                kb->delay = delay;
+            } else if(strcmp(word, "on") == 0) {
                 // allow previous syntax, `delay on` means use old long macro delay
                 // 30us for short macros (<200 actions) and 100us for long macros (>=200 actions)
                 kb->delay = UINT_MAX;
             } else {
-                // bad parameter to handle false commands like "delay off"                
+                // bad parameter to handle false commands like "delay off"
                 kb->delay = 0; // No delay.
             }
             continue;

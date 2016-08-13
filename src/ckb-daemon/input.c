@@ -292,13 +292,13 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
         long int long_delay;    // scanned delay value, used to keep delay in range.
         unsigned int delay = UINT_MAX; // computed delay value. UINT_MAX means use global delay value.
         char real_keyname[12];  // temp to hold the left side (key) of the <key>=<delay>
-        int scan_matches = sscanf(keyname, "%11[^=]=%ld", real_keyname, &long_delay); 
+        int scan_matches = sscanf(keyname, "%11[^=]=%ld", real_keyname, &long_delay);
         if (scan_matches == 2) {
             if (0 <= long_delay && long_delay < UINT_MAX) {
                 delay = (unsigned int)long_delay;
                 strcpy(keyname, real_keyname); // keyname[24], real_keyname[12]
             }
-        } 
+        }
 
         int down = (keyname[0] == '+');
         if(down || keyname[0] == '-'){

@@ -248,7 +248,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
     int empty = 1;
     int left = strlen(keys), right = strlen(assignment);
     int position = 0, field = 0;
-    char keyname[12];
+    char keyname[24];
     while(position < left && sscanf(keys + position, "%10[^+]%n", keyname, &field) == 1){
         int keycode;
         if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)
@@ -283,9 +283,23 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
     // Scan the actions
     position = 0;
     field = 0;
-    while(position < right && sscanf(assignment + position, "%11[^,]%n", keyname, &field) == 1){
+    // max action = old 11 chars plus 12 chars which is the max 32-bit int 4294967295 size
+    while(position < right && sscanf(assignment + position, "%23[^,]%n", keyname, &field) == 1){
         if(!strcmp(keyname, "clear"))
             break;
+
+        // Check for local key delay of the form '[+-]<key>=<delay>'
+        long int long_delay;    // scanned delay value, used to keep delay in range.
+        unsigned int delay = UINT_MAX; // computed delay value. UINT_MAX means use global delay value.
+        char real_keyname[12];  // temp to hold the left side (key) of the <key>=<delay>
+        int scan_matches = sscanf(keyname, "%11[^=]=%ld", real_keyname, &long_delay); 
+        if (scan_matches == 2) {
+            if (0 <= long_delay && long_delay < UINT_MAX) {
+                delay = (unsigned int)long_delay;
+                strcpy(keyname, real_keyname); // keyname[24], real_keyname[12]
+            }
+        } 
+
         int down = (keyname[0] == '+');
         if(down || keyname[0] == '-'){
             int keycode;
@@ -294,7 +308,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
                 // Set a key numerically
                 macro.actions[macro.actioncount].scan = keymap[keycode].scan;
                 macro.actions[macro.actioncount].down = down;
-                macro.actions[macro.actioncount].delay = UINT_MAX;
+                macro.actions[macro.actioncount].delay = delay;
                 macro.actioncount++;
             } else {
                 // Find this key in the keymap
@@ -302,7 +316,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
                     if(keymap[i].name && !strcmp(keyname + 1, keymap[i].name)){
                         macro.actions[macro.actioncount].scan = keymap[i].scan;
                         macro.actions[macro.actioncount].down = down;
-                        macro.actions[macro.actioncount].delay = UINT_MAX;
+                        macro.actions[macro.actioncount].delay = delay;
                         macro.actioncount++;
                         break;
                     }

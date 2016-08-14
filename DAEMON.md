@@ -145,11 +145,11 @@ Global delay can also be set to `on` which maintains backwards compatibility wit
 **NOTE**: This setting also introduces a delay after the last macro action. This functionality exists in the current testing branch and was left as-is. It is still to be determined if this is a bug or a feature.
 
 **Examples:**
-`delay 1000` sets a 1,000us delay between action playback.
-`delay on` sets long macro delay; 30us for actions between 20 and 200, 100us for actions > 200.
-`delay off` sets no delay (same as 0).
-`delay 0` sets no delay (same as off).
-`delay spearmint-potato` is invalid input, sets no delay (same as off).
+* `delay 1000` sets a 1,000us delay between action playback.
+* `delay on` sets long macro delay; 30us for actions between 20 and 200, 100us for actions > 200.
+* `delay off` sets no delay (same as 0).
+* `delay 0` sets no delay (same as off).
+* `delay spearmint-potato` is invalid input, sets no delay (same as off).
 
 #### Local macro delay (keystroke delay)
 

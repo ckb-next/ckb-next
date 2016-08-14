@@ -201,10 +201,10 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
         }
         case DELAY: {
-            uint delay;
-            if(sscanf(word, "%u", &delay) == 1) {
+            long int delay;
+            if(sscanf(word, "%ld", &delay) == 1 && 0 <= delay && delay < UINT_MAX) {
                 // Add delay of `newdelay` microseconds to macro playback
-                kb->delay = delay;
+                kb->delay = (unsigned int)delay;
             } else if(strcmp(word, "on") == 0) {
                 // allow previous syntax, `delay on` means use old `long macro delay`
                 kb->delay = UINT_MAX;

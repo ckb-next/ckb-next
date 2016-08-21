@@ -69,17 +69,20 @@ void MacroReaderThread::run() {
     timeval t;
     gettimeofday(&t, NULL);
     double tstart = t.tv_sec+(t.tv_usec/1000000.0);
+    bool firstline = true;
 
     while(macroFile.isOpen() && (line = macroFile.readLine()).length() > 0){
         QString text = QString::fromUtf8(line);
         gettimeofday(&t, NULL);
         double tnow = t.tv_sec+(t.tv_usec/1000000.0);
 
-        text.chop (1);  // Remove last Character, because it is a newline
-        text.append ("=");
-        text.append (QString::number ((tnow - tstart) * 1000000.0, 'f', 0));
-        text.append ("\n");
+        if (!firstline) {
+            text.prepend ("\n");
+            text.prepend (QString::number ((tnow - tstart) * 1000000.0, 'f', 0));
+            text.prepend ("=");
+        } else firstline = false;
         tstart = tnow;
+
         metaObject()->invokeMethod(this, "readMacro", Qt::QueuedConnection, Q_ARG(QString, text));
     }
     qDebug() << "MacroReader::run() ends.";

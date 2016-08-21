@@ -768,8 +768,10 @@ void RebindWidget::helpStatus(int status) {
 //////////
 /// \brief RebindWidget::convertMacroBox converts the macroBox content.
 /// The KB sends each keypress as "key [+|-]<keyname><newline>"
+/// This is followed by timing information (delays between keystrokes).
 ///
-/// the ckb-daemon needs a shorter format, only " [+|-]<keyname>"
+/// The ckb-daemon needs a shorter format, only " [+|-]<keyname>=<delay>",
+/// multiple entries are separated by comma.
 ///
 /// That function does the conversion.
 ///
@@ -777,7 +779,8 @@ void RebindWidget::convertMacroBox() {
     QString in;
 
     in = ui->pteMacroBox->toPlainText();
-    in.replace (QRegExp("\n"), ",");
-    in.replace (QRegExp("key "), "");
+    in.replace (QRegExp("\n"), ",");    // first join all in one line
+    in.replace (QRegExp("key "), "");   // then delete keyword "key" followed by space
+    in.replace (QRegExp(",="), "=");    // at last join each keystroke with its delay parameter
     ui->pteMacroBox->setPlainText(in);
 }

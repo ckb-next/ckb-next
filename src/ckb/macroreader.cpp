@@ -76,6 +76,7 @@ void MacroReaderThread::run() {
         gettimeofday(&t, NULL);
         double tnow = t.tv_sec+(t.tv_usec/1000000.0);
 
+		// in the first line, there is only a delay "before start". Don't use it.
         if (!firstline) {
             text.prepend ("\n");
             text.prepend (QString::number ((tnow - tstart) * 1000000.0, 'f', 0));

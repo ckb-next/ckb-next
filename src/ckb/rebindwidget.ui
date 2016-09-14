@@ -20,7 +20,13 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
+     </property>
+     <property name="usesScrollButtons">
+      <bool>false</bool>
+     </property>
+     <property name="documentMode">
+      <bool>false</bool>
      </property>
      <widget class="QWidget" name="keyTab">
       <property name="sizePolicy">
@@ -1239,12 +1245,21 @@
          <x>40</x>
          <y>12</y>
          <width>241</width>
-         <height>171</height>
+         <height>151</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_8">
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_2">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>39</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
           <property name="title">
            <string>Macro Key Actions</string>
           </property>
@@ -1268,8 +1283,8 @@
        </property>
        <property name="geometry">
         <rect>
-         <x>420</x>
-         <y>20</y>
+         <x>410</x>
+         <y>10</y>
          <width>311</width>
          <height>31</height>
         </rect>
@@ -1317,10 +1332,10 @@
       <widget class="QPlainTextEdit" name="pteMacroText">
        <property name="geometry">
         <rect>
-         <x>420</x>
-         <y>60</y>
+         <x>410</x>
+         <y>50</y>
          <width>311</width>
-         <height>61</height>
+         <height>81</height>
         </rect>
        </property>
        <property name="focusPolicy">
@@ -1354,10 +1369,10 @@
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>300</x>
-         <y>20</y>
-         <width>119</width>
-         <height>81</height>
+         <x>290</x>
+         <y>10</y>
+         <width>121</width>
+         <height>66</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1383,7 +1398,7 @@
          <x>300</x>
          <y>160</y>
          <width>436</width>
-         <height>30</height>
+         <height>41</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_10">
@@ -1433,6 +1448,55 @@
         <string>Comment label for help</string>
        </property>
       </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>170</y>
+         <width>241</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="delayButtons">
+        <item>
+         <widget class="QRadioButton" name="rb_delay_0">
+          <property name="whatsThis">
+           <string>configure delays between keystrokes: Disable delay</string>
+          </property>
+          <property name="text">
+           <string>0 delay</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rb_delay_1">
+          <property name="whatsThis">
+           <string>configure delays between keystrokes: Remember delays as they had been typed while the macro definition process</string>
+          </property>
+          <property name="text">
+           <string>as typed</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rb_delay_2">
+          <property name="whatsThis">
+           <string>configure delays between keystrokes: Set delay to default values: 20us up to 15 chars, 200us above</string>
+          </property>
+          <property name="text">
+           <string>default</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="autoExclusive">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <zorder>layoutWidget</zorder>
       <zorder>pteMacroComment</zorder>
       <zorder>layoutWidget1</zorder>
       <zorder>layoutWidget</zorder>
@@ -1554,12 +1618,12 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>735</x>
+     <x>590</x>
      <y>331</y>
     </hint>
     <hint type="destinationlabel">
-     <x>252</x>
-     <y>201</y>
+     <x>264</x>
+     <y>200</y>
     </hint>
    </hints>
   </connection>
@@ -1602,8 +1666,8 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>723</x>
-     <y>201</y>
+     <x>745</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel">
      <x>722</x>

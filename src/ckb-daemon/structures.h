@@ -173,6 +173,7 @@ extern const union devcmd vtable_mouse;
 #define KB_NAME_LEN 34
 #define SERIAL_LEN  34
 #define MSG_SIZE    64
+#define IFACE_MAX   4
 typedef struct {
     // Function table (see command.h)
     const union devcmd* vtable;
@@ -180,25 +181,37 @@ typedef struct {
     // Note that FDs have 1 added to them, because these are initialized to zero when the program starts but zero is technically a valid FD
     // So the actual value is (fd - 1)
 #ifdef OS_LINUX
+    // USB device
     struct udev_device* udev;
     int handle;
+    // uinput handles
     int uinput_kb, uinput_mouse;
 #else
+    // USB identifier
+    uint32_t location_id[IFACE_MAX + 1];
+    // Device handles
+    usb_dev_t handle;
+    usb_iface_t ifusb[IFACE_MAX];
+    hid_dev_t ifhid[IFACE_MAX];
+    io_object_t rm_notify[IFACE_MAX * 2 + 1];   // one for each: handle, ifusb, ifhid
+    int epcount_hid, epcount_usb;
+    // Result code from the last USB transfer
+    kern_return_t lastresult;
+    // Input handle
+    io_connect_t event;
+    // Key-repeat info
     CFRunLoopRef input_loop;
     CFRunLoopTimerRef krtimer;
     struct timespec keyrepeat;
-    long location_id;
-    hid_dev_t handle;
-    hid_dev_t handles[4];
-    io_object_t rm_notify[4];
-    kern_return_t lastresult;
-    io_connect_t event;
-    IOOptionBits modifiers;
     short lastkeypress;
+    // Modifier/mouse button state
+    pthread_t indicthread;
+    IOOptionBits modifiers;
     uchar mousestate;
     char scroll_rate;
-    pthread_t indicthread;
 #endif
+    // Number of endpoints on the USB device
+    int epcount;
     // Thread used for USB/devnode communication. To close: lock mutexes, set handle to zero, unlock, then wait for thread to stop
     pthread_t thread;
     // Thread for device input. Will close on its own when the device is terminated.

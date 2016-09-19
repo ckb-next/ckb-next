@@ -259,7 +259,9 @@ int rmdevpath(usbdevice* kb){
     euid_guard_start;
     int index = INDEX_OF(kb, keyboard);
     if(kb->infifo != 0){
+#ifdef OS_LINUX
         write(kb->infifo - 1, "\n", 1); // hack to prevent the FIFO thread from perma-blocking
+#endif
         close(kb->infifo - 1);
         kb->infifo = 0;
     }

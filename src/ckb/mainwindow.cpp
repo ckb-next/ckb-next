@@ -101,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(closeAction, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
@@ -169,6 +170,8 @@ void MainWindow::updateVersion(){
 }
 
 void MainWindow::checkFwUpdates(){
+    if(!mainWindow->isVisible())
+        return;
     foreach(KbWidget* w, kbWidgets){
         // Display firmware upgrade notification if a new version is available
         float version = KbFirmware::versionForBoard(w->device->features);
@@ -268,6 +271,21 @@ void MainWindow::showWindow(){
     showNormal();
     raise();
     activateWindow();
+}
+
+void MainWindow::stateChange(Qt::ApplicationState state){
+    // On OSX it's possible for the app to be brought to the foreground without the window actually reappearing.
+    // We want to make sure it's shown when this happens.
+#ifdef Q_OS_MAC
+    static quint64 lastStateChange = 0;
+    quint64 now = QDateTime::currentMSecsSinceEpoch();
+    if(state == Qt::ApplicationActive){
+        // This happens once at startup so ignore it. Also don't allow it to be called more than once every 2s.
+        if(lastStateChange != 0 && now >= lastStateChange + 2 * 1000)
+            showWindow();
+        lastStateChange = now;
+    }
+#endif
 }
 
 void MainWindow::quitApp(){

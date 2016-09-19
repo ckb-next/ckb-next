@@ -1408,10 +1408,10 @@ static void do_setup(io_connect_t event, struct timespec now){
         static uint desired_mouse = UINT_MAX, desired_wheel = UINT_MAX;
         uint desired = get_desired(CFSTR(kIOHIDPointerAccelerationTypeKey), CFSTR(kIOHIDPointerAccelerationKey));
         // Set up parameters again if the value has changed
-        if(desired != desired_mouse)
+        if(desired != desired_mouse || !has_setup)
             setupForAcceleration(desired_mouse = desired);
         desired = get_desired(CFSTR(kIOHIDScrollAccelerationTypeKey), CFSTR(kIOHIDScrollAccelerationKey));
-        if(desired != desired_wheel)
+        if(desired != desired_wheel || !has_setup)
             setupScrollForAcceleration(desired_wheel = desired);
         has_setup = 1;
         last_setup_poll = now;

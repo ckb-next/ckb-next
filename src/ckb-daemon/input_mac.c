@@ -23,11 +23,6 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
         uid = file.st_uid;
         gid = file.st_gid;
     }
-    euid_guard_start;
-    if(uid != 0)
-        seteuid(uid);
-    if(gid != 0)
-        setegid(gid);
 
     IOGPoint location = {0, 0};
     if((options & kIOHIDSetRelativeCursorPosition) && type != NX_MOUSEMOVED){
@@ -40,6 +35,13 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
         location.y = floor(loc.y + ev->mouseMove.dy);
         options = (options & ~kIOHIDSetRelativeCursorPosition) | kIOHIDSetCursorPosition;
     }
+
+    euid_guard_start;
+    if(uid != 0)
+        seteuid(uid);
+    if(gid != 0)
+        setegid(gid);
+
     kern_return_t res = IOHIDPostEvent(event, type, location, ev, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
     if(res != kIOReturnSuccess && !silence_errors)
         ckb_warn("Post event failed: %x\n", res);

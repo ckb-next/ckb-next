@@ -16,6 +16,7 @@ RebindWidget::RebindWidget(QWidget *parent) :
     ui->modeWrapBox->hide();
     ui->programKpExtra->hide();
     ui->programKrExtra->hide();
+    macroSafe = "";
 
     // Populate key lists
     modKeys << "caps" << "lshift" << "rshift" << "lctrl" << "rctrl" << "lwin" << "rwin" << "lalt" << "ralt" << "rmenu" << "fn";
@@ -375,7 +376,8 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         // First, concat the Macro Key Definion and the Macro plain text
         // after escaping possible colos in the parts for Macro Text and Macro Comment.
         QString mac;
-        mac = ui->pteMacroComment->toPlainText().replace(":", "&das_IST_31N_col0n;");
+        mac = ui->txtBuffer->text();
+        mac = ui->pteMacroComment->toPlainText().replace(":", "&das_IST_31N_col0n;");// + ":" + mac;
         mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
         mac = ui->pteMacroBox->toPlainText() + ":" + mac;
         bind->setAction(keys, KeyAction::macroAction(mac));
@@ -711,13 +713,16 @@ void RebindWidget::on_btnStartMacro_clicked() {
         ui->unbindButton->setEnabled(false);
         ui->btnStartMacro->setEnabled(false);
         ui->btnStopMacro->setEnabled(true);
+        ui->rb_delay_asTyped->setEnabled(false);
+        ui->rb_delay_no->setEnabled(false);
+        ui->rb_delay_default->setEnabled(false);
         helpStatus(2);
     }
 }
 
 //////////
 /// \brief RebindWidget::on_btnStopMacro_clicked ends the macro recording.
-/// Notify channel ist closed, the ReaderThread is deleted if the notification is really down.
+/// Notify channel ist closed, the ReaderThread is deleted when the notification is really down.
 ///
 /// Afterwards, the characters in the MacroBox are changed from KB-out format to cmd-in format.
 /// At last the UI changes to the new state.
@@ -733,6 +738,9 @@ void RebindWidget::on_btnStopMacro_clicked() {
         ui->unbindButton->setEnabled(true);
         ui->btnStartMacro->setEnabled(true);
         ui->btnStopMacro->setEnabled(false);
+        ui->rb_delay_asTyped->setEnabled(true);
+        ui->rb_delay_no->setEnabled(true);
+        ui->rb_delay_default->setEnabled(true);
         helpStatus(3);
     }
 }
@@ -740,6 +748,9 @@ void RebindWidget::on_btnStopMacro_clicked() {
 //////////
 /// \brief RebindWidget::on_btnClearMacro_clicked changes the help info an the panel.
 /// The job of clearing the input panels is triggerd with signal/slot via the RebindWidget.ui file.
+///
+/// \todo I do not know what is the better solution with the delay-buttons in case of clicking clear:
+/// Reset the button to the default value or do not touch it? Not clear is ignored.
 ///
 void RebindWidget::on_btnClearMacro_clicked() {
     helpStatus(1);
@@ -778,9 +789,74 @@ void RebindWidget::helpStatus(int status) {
 void RebindWidget::convertMacroBox() {
     QString in;
 
-    in = ui->pteMacroBox->toPlainText();
+    // Remember the original input stream before it is converted.
+    // In case of new choice of delay mode we have to restore it.
+    if (ui->txtBuffer->text() == "") {
+        ui->txtBuffer->setText(ui->pteMacroBox->toPlainText());
+        in = ui->pteMacroBox->toPlainText();
+    } else in = ui->txtBuffer->text();
+
     in.replace (QRegExp("\n"), ",");    // first join all in one line
     in.replace (QRegExp("key "), "");   // then delete keyword "key" followed by space
     in.replace (QRegExp(",="), "=");    // at last join each keystroke with its delay parameter
+
+    // How to deal with the delay params?
+    // Because the three radio buttons are mututally exclusive,
+    // we can run through the if-chain w/o conflicts.
+
+    if (ui->rb_delay_asTyped->isChecked()) {
+        // Do nothing, because the timing parameters are added by default into the strings.
+    } else {
+        in.replace(QRegExp("=\\d*,"), ",");  // Delete the timing infos
+        in.replace(QRegExp("^delay o..?,"), "");  // Delete older delay defaulting infos, if available
+
+        if (ui->rb_delay_default->isChecked()) {
+            in = "delay on\n" + in;
+        }
+        if (ui->rb_delay_no->isChecked()) {
+            in = "delay off\n" + in;
+        }
+    }
+
     ui->pteMacroBox->setPlainText(in);
+    ui->pteMacroText->setPlainText(ui->txtBuffer->text());
+}
+
+//////////
+/// \brief RebindWidget::on_rb_delay_no_toggled
+/// \param checked
+/// The following slots are triggerd by changing the mutual exclusive radio buttons
+/// when choosing the delay.
+/// They are called, if the button ist enabled.
+/// This first one should disable all delay.
+///
+void RebindWidget::on_rb_delay_no_toggled(bool checked)
+{
+    ui->pteMacroText->setPlainText("Delay_no was toggled\n");
+    convertMacroBox();
+}
+
+//////////
+/// \brief RebindWidget::on_rb_delay_asTyped_toggled
+/// \param checked
+/// This button ist clicked to use the delay times, as they are recorded.
+/// Returs a warning message, if we are not in the recording phase,
+/// because then we don't have the delay times any more.
+///
+void RebindWidget::on_rb_delay_asTyped_toggled(bool checked)
+{
+    ui->pteMacroText->setPlainText("Delay_asTyped was toggled\n");
+    convertMacroBox();
+}
+
+//////////
+/// \brief RebindWidget::on_rb_delay_default_toggled
+/// \param checked
+/// This is as easy as the no-delay-button, because this means
+/// take the default values.
+///
+void RebindWidget::on_rb_delay_default_toggled(bool checked)
+{
+    ui->pteMacroText->setPlainText("Delay_default was toggled\n");
+    convertMacroBox();
 }

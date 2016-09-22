@@ -40,7 +40,7 @@ static void inputupdate_keys(usbdevice* kb){
                                 usleep(action->delay);
                             } else if (kb->delay != UINT_MAX) { // use default global delay
                                 usleep(kb->delay);
-                            } else {                            // use old long macro delay code
+                            } else if (a < (macro->actioncount - 1)) { // use delays depending on macro length
                                 if (a > 200) {
                                     usleep (100);
                                 } else if (a > 20) {

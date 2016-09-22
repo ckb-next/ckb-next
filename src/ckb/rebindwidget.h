@@ -89,12 +89,11 @@ private:
     // Show some help info
     void helpStatus(int status);
 
+    void setCorrectRadioButton (QString macdef);
+
     KbBind* bind;
     KbProfile* profile;
     QStringList selection;
-
-    // Hold complete macro information while fiddling with delay params
-    QString macroSafe;
 
     QStringList typingKeys;
     QStringList modKeys;

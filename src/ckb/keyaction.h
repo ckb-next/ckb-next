@@ -37,7 +37,7 @@ public:
     /// returns the complete string except the leading "$"
     /// (the $ may confuse some caller).
     /// \return QString
-    /// All 4 parts are returned in one QString.
+    /// All 5 parts are returned in one QString.
     /// If no definition exists, return ""
     ///
     inline QString macroFullLine() const {
@@ -47,7 +47,7 @@ public:
      //////////
      /// \brief isValidMacro checks whether a keyAction contains a valid macro.
      /// This is done easily: If the macro action starts with $macro:
-     /// and has four elements, delimited by ":", we may assume,
+     /// and has five elements, delimited by ":", we may assume,
      /// that is a structural correct macro action.
      /// \return bool as true iff the macro definition contains all four elements.
      ///
@@ -55,7 +55,7 @@ public:
         if (isMacro()) {
             QStringList ret;
             ret =_value.split(":");
-            return (ret.count() == 4);
+            return (ret.count() == 5);
         } else {
             return false;
         }
@@ -64,8 +64,10 @@ public:
     //////////
     /// \brief macroLine returns all interresting content for a macro definition.
     /// \return QStringList returns the Macro Key Definition,
-    ///     Readble Macro String and
-    ///     Readable Macro Comment as QStringList.
+    ///     Readble Macro String,
+    ///     Readable Macro Comment and
+    ///     the original timing information
+    ///     as QStringList.
     ///
     inline QStringList macroLine() const {
         if (isValidMacro()) {
@@ -85,6 +87,15 @@ public:
     }
 
     //////////
+    /// \brief macroTiming returns the macro key definition with original timing infos
+    /// (the fifth and up to now last part of the macro action).
+    /// \return QString macroTiming
+    ///
+    inline QString macroTiming() const {
+        return isValidMacro() ? _value.split(":")[4] : "";
+    }
+
+    //////////
     /// \brief Debug output for invalid macro Definitions
     ///
     /// General Info on KeyAction::_value for macros:
@@ -94,6 +105,7 @@ public:
     ///          This sequence will program the keyboard and is hardly readable
     ///      3.  Readable Macro String: This is displayed in pteMacroText
     ///      4.  Readable Macro Comment:This is displayed in pteMacroComment
+    ///      5.  completely unreadable original macro information with timing values
     ///
     void macroDisplay();
 

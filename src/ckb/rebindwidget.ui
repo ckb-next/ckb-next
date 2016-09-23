@@ -16,9 +16,15 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="styleSheet">
+   <string notr="true">font-size: 12px ;</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -1297,7 +1303,7 @@
          <x>410</x>
          <y>50</y>
          <width>311</width>
-         <height>81</height>
+         <height>66</height>
         </rect>
        </property>
        <property name="focusPolicy">
@@ -1332,19 +1338,12 @@
        <property name="geometry">
         <rect>
          <x>300</x>
-         <y>169</y>
-         <width>402</width>
-         <height>39</height>
+         <y>160</y>
+         <width>407</width>
+         <height>36</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_10">
-        <item row="0" column="1">
-         <widget class="QPushButton" name="btnStartMacro">
-          <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="2">
          <widget class="QPushButton" name="btnStopMacro">
           <property name="enabled">
@@ -1362,28 +1361,21 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="btnStartMacro">
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox">
-          <property name="enabled">
-           <bool>true</bool>
+         <widget class="QLabel" name="label">
+          <property name="styleSheet">
+           <string notr="true">font: 75 10pt ; 
+</string>
           </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="title">
-           <string>Macro recording</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-          <property name="checkable">
-           <bool>false</bool>
+          <property name="text">
+           <string>Record macro </string>
           </property>
          </widget>
         </item>
@@ -1393,10 +1385,13 @@
        <property name="geometry">
         <rect>
          <x>300</x>
-         <y>135</y>
+         <y>130</y>
          <width>431</width>
          <height>27</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 75 11pt ; color: darkblue;</string>
        </property>
        <property name="text">
         <string>Comment label for help</string>
@@ -1407,15 +1402,24 @@
         <rect>
          <x>40</x>
          <y>170</y>
-         <width>251</width>
+         <width>236</width>
          <height>28</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="delayButtons">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
+        </property>
         <item>
          <widget class="QRadioButton" name="rb_delay_no">
           <property name="whatsThis">
            <string>configure delays between keystrokes: Disable delay</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 10pt ; color:  green;</string>
           </property>
           <property name="text">
            <string>No delay</string>
@@ -1426,6 +1430,9 @@
          <widget class="QRadioButton" name="rb_delay_default">
           <property name="whatsThis">
            <string>configure delays between keystrokes: Set delay to default values: 20us up to 15 chars, 200us above</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 10pt ; color:  green;</string>
           </property>
           <property name="text">
            <string>default</string>
@@ -1443,6 +1450,9 @@
           <property name="whatsThis">
            <string>configure delays between keystrokes: Remember delays as they had been typed while the macro definition process</string>
           </property>
+          <property name="styleSheet">
+           <string notr="true">font: 10pt ; color:  green;</string>
+          </property>
           <property name="text">
            <string>as typed</string>
           </property>
@@ -1453,61 +1463,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QGroupBox" name="groupBox_4">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>60</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Macro Text</string>
-       </property>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_3">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>11</y>
-         <width>101</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Macro Comment</string>
-       </property>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_2">
-       <property name="geometry">
-        <rect>
-         <x>42</x>
-         <y>11</y>
-         <width>226</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>39</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="title">
-        <string>Macro Key Actions</string>
-       </property>
-      </widget>
       <widget class="QPlainTextEdit" name="pteMacroBox">
        <property name="geometry">
         <rect>
-         <x>42</x>
-         <y>29</y>
+         <x>43</x>
+         <y>40</y>
          <width>236</width>
-         <height>131</height>
+         <height>121</height>
         </rect>
        </property>
        <property name="focusPolicy">
@@ -1544,12 +1506,6 @@
          <height>0</height>
         </size>
        </property>
-       <property name="font">
-        <font>
-         <stylestrategy>NoAntialias</stylestrategy>
-         <kerning>false</kerning>
-        </font>
-       </property>
        <property name="contextMenuPolicy">
         <enum>Qt::NoContextMenu</enum>
        </property>
@@ -1584,9 +1540,57 @@
         <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
-      <zorder>groupBox_4</zorder>
-      <zorder>groupBox_3</zorder>
-      <zorder>groupBox_2</zorder>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>45</x>
+         <y>15</y>
+         <width>141</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 75 10pt ; 
+</string>
+       </property>
+       <property name="text">
+        <string>Macro Key Actions</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_3">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>15</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 75 10pt ; 
+</string>
+       </property>
+       <property name="text">
+        <string>Macro Comment</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_4">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>65</y>
+         <width>101</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 75 10pt ; 
+</string>
+       </property>
+       <property name="text">
+        <string>Macro Text</string>
+       </property>
+      </widget>
       <zorder>pteMacroBox</zorder>
       <zorder>pteMacroComment</zorder>
       <zorder>layoutWidget</zorder>
@@ -1594,6 +1598,9 @@
       <zorder>layoutWidget_2</zorder>
       <zorder>lbl_macro</zorder>
       <zorder>txtBuffer</zorder>
+      <zorder>label_2</zorder>
+      <zorder>label_3</zorder>
+      <zorder>label_4</zorder>
      </widget>
     </widget>
    </item>

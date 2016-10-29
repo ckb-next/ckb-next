@@ -12,11 +12,13 @@ First copy the binary and the service files to their system directories:
 
 * Upstart (Ubuntu, prior to 15.04): `sudo cp -R bin/* /usr/bin && sudo cp service/upstart/ckb-daemon.conf /etc/init`
 * Systemd (Ubuntu 15.04 and later): `sudo cp -R bin/* /usr/bin && sudo cp service/systemd/ckb-daemon.service /usr/lib/systemd/system`
+* OpenRC: `sudo cp -R bin/* /usr/bin && sudo cp service/openrc/ckb-daemon /etc/init.d/`
 
 To launch the driver and enable it at start-up:
 
 * Upstart: `sudo service ckb-daemon start`
 * Systemd: `sudo systemctl start ckb-daemon && sudo systemctl enable ckb-daemon`
+* OpenRC: `sudo rc-service ckb-daemon start && sudo rc-update add ckb-daemon default`
 
 Open the `bin` directory and double-click on `ckb` to launch the user interface. If you want to run it at login, add `ckb --background` to your Startup Applications.
 

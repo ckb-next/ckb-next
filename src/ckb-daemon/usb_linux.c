@@ -363,7 +363,8 @@ static _model models[] = {
     { P_M65_STR, P_M65 },
     { P_SABRE_O_STR, P_SABRE_O },
     { P_SABRE_L_STR, P_SABRE_L },
-    { P_SCIMITAR_STR, P_SCIMITAR }
+    { P_SCIMITAR_STR, P_SCIMITAR },
+    { P_SABRE_O2_STR, P_SABRE_O2 }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

@@ -1,3 +1,7 @@
+lessThan(QT_VERSION, 5.0) {
+    error("ckb requires at least Qt 5.0!")
+}
+
 TEMPLATE = subdirs
 CONFIG   += debug_and_release
 SUBDIRS = \

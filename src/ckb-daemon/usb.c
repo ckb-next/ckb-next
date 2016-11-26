@@ -26,7 +26,7 @@ const char* vendor_str(short vendor){
 const char* product_str(short product){
     if(product == P_K95 || product == P_K95_NRGB)
         return "k95";
-    if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_RFIRE)
+    if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE)
         return "k70";
     if(product == P_K65 || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";

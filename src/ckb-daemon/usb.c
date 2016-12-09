@@ -26,15 +26,15 @@ const char* vendor_str(short vendor){
 const char* product_str(short product){
     if(product == P_K95 || product == P_K95_NRGB)
         return "k95";
-    if(product == P_K70 || product == P_K70_NRGB)
+    if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_RFIRE)
         return "k70";
-    if(product == P_K65)
+    if(product == P_K65 || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";
     if(product == P_STRAFE || product == P_STRAFE_NRGB)
         return "strafe";
-    if(product == P_M65)
+    if(product == P_M65 || product == P_M65_PRO)
         return "m65";
-    if(product == P_SABRE_O || product == P_SABRE_L)
+    if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N)
         return "sabre";
     if(product == P_SCIMITAR)
         return "scimitar";

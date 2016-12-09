@@ -178,7 +178,7 @@ int readcmd(usbdevice* kb, const char* line){
             uint framerate;
             if(sscanf(word, "%u", &framerate) == 1 && framerate > 0){
                 // Not all devices require the same number of messages per frame; select delay appropriately
-                uint per_frame = IS_MOUSE_DEV(kb) ? 2 : IS_STRAFE(kb) ? 14 : 5;
+                uint per_frame = IS_MOUSE_DEV(kb) ? 2 : IS_FULLRANGE(kb) ? 14 : 5;
                 uint delay = 1000 / framerate / per_frame;
                 if(delay < 2)
                     delay = 2;

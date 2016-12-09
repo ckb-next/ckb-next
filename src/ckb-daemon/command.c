@@ -8,6 +8,7 @@
 
 static const char* const cmd_strings[CMD_COUNT - 1] = {
     // NONE is implicit
+    "delay",
     "mode",
     "switch",
     "layout",
@@ -111,7 +112,7 @@ int readcmd(usbdevice* kb, const char* line){
 
         // Reject unrecognized commands. Reject bind or notify related commands if the keyboard doesn't have the feature enabled.
         if(command == NONE
-                || ((!HAS_FEATURES(kb, FEAT_BIND) && (command == BIND || command == UNBIND || command == REBIND || command == MACRO))
+                || ((!HAS_FEATURES(kb, FEAT_BIND) && (command == BIND || command == UNBIND || command == REBIND || command == MACRO || command == DELAY))
                            || (!HAS_FEATURES(kb, FEAT_NOTIFY) && command == NOTIFY))){
             next_loop:
             continue;
@@ -197,6 +198,9 @@ int readcmd(usbdevice* kb, const char* line){
             }
             continue;
         }
+        case DELAY:
+            kb->delay = (!strcmp (word, "on")); // independendant from parameter to handle false commands like "delay off"
+            continue;
         default:;
         }
 

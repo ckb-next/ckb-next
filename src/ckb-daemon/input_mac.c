@@ -402,10 +402,6 @@ void os_mousemove(usbdevice* kb, int x, int y){
     postevent_mm(kb->event, x, y, HAS_FEATURES(kb, FEAT_MOUSEACCEL), kb->mousestate);
 }
 
-void os_isync(usbdevice* kb){
-    // OSX doesn't have any equivalent to the SYN_ events
-}
-
 int os_setupindicators(usbdevice* kb){
     // Set NumLock on permanently
     kb->hw_ileds = kb->hw_ileds_old = kb->ileds = 1;

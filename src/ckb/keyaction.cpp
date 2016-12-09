@@ -1,3 +1,4 @@
+#include <qdebug.h>
 #include "keyaction.h"
 #include "kb.h"
 #include "kbanim.h"
@@ -42,7 +43,9 @@ KeyAction::~KeyAction(){
 
 QString KeyAction::defaultAction(const QString& key){
     // G1-G18 are unbound by default
-    if(key.length() >= 2 && key[0] == 'g' && key[1] >= '0' && key[1] <= '9')
+    if(key.length() >= 2 && key[0] == 'g'
+		&& ((key.length() == 2 && key[1] >= '0' && key[1] <= '9')
+		|| (key.length() == 3 && key[1] == '1' && key[2] >= '0' && key[2] <= '8')))
         return "";
     // So are thumbgrid buttons
     if(key.startsWith("thumb"))
@@ -137,6 +140,8 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         return "Start animation";
     } else if(prefix == "$program"){
         return "Launch program";
+    } else if(prefix == "$macro"){
+        return "Send G-key macro";
     }
     return "(Unknown)";
 }
@@ -419,7 +424,22 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
             else
                 relProgram = process;
         }
+    } else if (prefix == "$macro") {
+        // Do nothing, because all work is done by the keyboard itself.
+        // For now, there is no reason to react on G-key press or release.
+        // If u find some reason, then here is the place for it.
     }
+}
+
+/// \brief KeyAction::macroDisplay is just for debugging.
+/// It shows the content of the key action and some other info.
+///
+void KeyAction::macroDisplay() {
+    qDebug() << "isMacro returns" << (isMacro() ? "true" : "false");
+    qDebug() << "isValidMacro returns" << (isValidMacro() ? "true" : "false");
+    QStringList ret =_value.split(":");
+    qDebug() << "Macro definition conains" << ret.count() << "elements";
+    qDebug() << "Macro definition is" << _value;
 }
 
 void KeyAction::adjustDisplay(){
@@ -471,4 +491,16 @@ void KeyAction::adjustDisplay(){
     delete[] envstr;
     XCloseDisplay(display);
 #endif
+}
+
+//////////
+/// \brief KeyAction::macroAction is called when applying changes on a macro definition.
+/// macroAction ist called while being in the macro pane
+/// and clicking Apply with something in the Macro Text Box.
+/// It tags that input with "$macro:" for further recognition.
+/// \param macroDef holds the String containing parts 2-4 of a complete macro definition.
+/// \return QString holding the complete G-Key macro definition (parts 1-4)
+///
+QString KeyAction::macroAction(QString macroDef) {
+    return QString ("$macro:%1").arg(macroDef);
 }

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "kbbind.h"
 #include "kbprofile.h"
+#include "macroreader.h"
 
 // Key rebinding widget
 
@@ -64,14 +65,23 @@ private slots:
     void on_programKpSIBox_clicked(bool checked);
     void on_programKrSIBox_clicked(bool checked);
     void on_animButton_clicked(bool checked);
+    void on_pteMacroBox_textChanged();
+    void on_btnStartMacro_clicked();
+    void on_btnStopMacro_clicked();
+    void on_btnClearMacro_clicked();
 
 private:
     Ui::RebindWidget *ui;
 
     // Tab indices
-    const static int TAB_KB = 0, TAB_MOUSE = 1, TAB_ANIM = 2, TAB_SPECIAL = 3, TAB_PROGRAM = 4;
+    const static int TAB_KB = 0, TAB_MOUSE = 1, TAB_ANIM = 2, TAB_SPECIAL = 3, TAB_PROGRAM = 4, TAB_MACRO = 5;
 
     void setBox(QWidget* box);
+
+    // convert keyboard definion into macro definition
+    void convertMacroBox();
+    // Show some help info
+    void helpStatus(int status);
 
     KbBind* bind;
     KbProfile* profile;
@@ -85,6 +95,7 @@ private:
     QStringList mouseKeys;
     QStringList mouseExtKeys;
     QStringList wheelKeys;
+    MacroReader* macReader;     ///< \brief macReader holds the MacroReader when macro recording starts.
 };
 
 #endif // BINDDIALOG_H

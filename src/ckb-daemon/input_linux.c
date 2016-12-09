@@ -97,6 +97,18 @@ void os_inputclose(usbdevice* kb){
     kb->uinput_mouse = 0;
 }
 
+// Generate SYN reports to synchronize device
+static void isync(usbdevice* kb){
+    struct input_event event;
+    memset(&event, 0, sizeof(event));
+    event.type = EV_SYN;
+    event.code = SYN_REPORT;
+    if(write(kb->uinput_kb - 1, &event, sizeof(event)) <= 0)
+        ckb_warn("uinput write failed: %s\n", strerror(errno));
+    if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
+        ckb_warn("uinput write failed: %s\n", strerror(errno));
+}
+
 void os_keypress(usbdevice* kb, int scancode, int down){
     struct input_event event;
     memset(&event, 0, sizeof(event));
@@ -118,6 +130,8 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     }
     if(write((is_mouse ? kb->uinput_mouse : kb->uinput_kb) - 1, &event, sizeof(event)) <= 0)
         ckb_warn("uinput write failed: %s\n", strerror(errno));
+    else
+        isync(kb);
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
@@ -129,24 +143,17 @@ void os_mousemove(usbdevice* kb, int x, int y){
         event.value = x;
         if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
             ckb_warn("uinput write failed: %s\n", strerror(errno));
+        else
+            isync(kb);
     }
     if(y != 0){
         event.code = REL_Y;
         event.value = y;
         if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
             ckb_warn("uinput write failed: %s\n", strerror(errno));
+        else
+            isync(kb);
     }
-}
-
-void os_isync(usbdevice* kb){
-    struct input_event event;
-    memset(&event, 0, sizeof(event));
-    event.type = EV_SYN;
-    event.code = SYN_REPORT;
-    if(write(kb->uinput_kb - 1, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
-    if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
 }
 
 void* _ledthread(void* ctx){

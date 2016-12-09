@@ -4,6 +4,7 @@
 #include "kbbind.h"
 #include "kbmode.h"
 #include "kb.h"
+#include "qdebug.h"
 
 QHash<QString, QString> KbBind::_globalRemap;
 quint64 KbBind::globalRemapTime = 0;
@@ -178,7 +179,12 @@ void KbBind::update(QFile& cmd, bool force){
     if(!_bind.contains("ralt")) bind["ralt"] = 0;
     if(!_bind.contains("fn")) bind["fn"] = 0;
     QHashIterator<QString, KeyAction*> i(bind);
-    // Write out rebound keys
+
+    // Initialize String buffer for macro Key definitions (G-keys)
+    // "macro clear" is neccessary, if an older definition is unbound.
+    QString macros = "\nmacro clear\n";
+
+    // Write out rebound keys and collect infos for macro definitions
     while(i.hasNext()){
         i.next();
         QString key = i.key();
@@ -192,6 +198,13 @@ void KbBind::update(QFile& cmd, bool force){
             // If the key is unbound or is a special action, unbind it
             cmd.write(" unbind ");
             cmd.write(key.toLatin1());
+            // if a macro definiton for the key is given,
+            // add the converted string to key-buffer "macro"
+            if (act->isValidMacro()) {
+                if (act->macroContent().length() > 0) {
+                    macros.append("macro " + key.toLatin1() + ":" + act->macroContent().toLatin1() + "\n");
+                }
+            }
         } else {
             // Otherwise, write the binding
             cmd.write(" bind ");
@@ -203,6 +216,45 @@ void KbBind::update(QFile& cmd, bool force){
     // If win lock is enabled, unbind windows keys
     if(_winLock)
         cmd.write(" unbind lwin rwin");
+
+    // At last, send Macro definitions if avalilable.
+    // If no definitions are made, clear macro will be sent only to reset all macros,
+    cmd.write(macros.toLatin1());
+    lastCmd = &cmd;
+}
+
+////////
+/// \brief KbBind::getMacroNumber
+/// \return number of notification channel. Use it in combination with notifyon/off-Statement
+///
+int KbBind::getMacroNumber() {
+    return devParent()->getMacroNumber();
+}
+
+////////
+/// \brief KbBind::getMacroPath
+/// \return Filepath of macro notification pipe. If not set, returns initial value ""
+///
+QString KbBind::getMacroPath() {
+    return devParent()->getMacroPath();
+}
+
+////////
+/// \brief handleNotificationChannel sends commands to ckb-daemon for (de-) activating the notify channel.
+/// Send a notify cmd to the keyboard to set or clear notification for reading macro definition.
+/// The file handle for the cmd pipe is stored in lastCmd.
+/// \param start If true, notification channel is opened for all keys, otherwise channel ist closed.
+///
+void KbBind::handleNotificationChannel(bool start) {
+    if (getMacroNumber() > 0 && lastCmd) {
+        if (start) {
+            lastCmd->write (QString("\nnotifyon %1\n@%1 notify all:on\n").arg(getMacroNumber()).toLatin1());
+        } else {
+            lastCmd->write (QString("\n@%1 notify all:off\nnotifyoff %1\n").arg(getMacroNumber()).toLatin1());
+        }
+        lastCmd->flush();
+    } else qDebug() << QString("No cmd or valid handle for notification found, macroNumber = %1, lastCmd = %2")
+                       .arg(getMacroNumber()).arg(lastCmd? "set" : "unset");
 }
 
 void KbBind::keyEvent(const QString& key, bool down){

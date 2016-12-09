@@ -1,5 +1,6 @@
 #include "../ckb/ckb-anim.h"
 #include <math.h>
+#include <time.h>
 
 void ckb_info(){
     // Plugin info
@@ -14,6 +15,7 @@ void ckb_info(){
     CKB_PARAM_AGRADIENT("color", "Ripple color:", "", "ffffffff");
     CKB_PARAM_DOUBLE("length", "Ring length:", "%", 100, 1, 100);
     CKB_PARAM_BOOL("symmetric", "Symmetric", 0);
+    CKB_PARAM_BOOL("randomize", "Randomly select from gradient", 0);
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_POSITION);
@@ -44,11 +46,12 @@ void ckb_info(){
 
 float kbsize = 0.f;
 ckb_gradient animcolor = { 0 };
-int symmetric = 0, kprelease = 0;
+int symmetric = 0, kprelease = 0, randomize = 0;
 double animlength = 0.;
 
 void ckb_init(ckb_runctx* context){
     kbsize = sqrt(context->width * context->width / 4.f + context->height * context->height / 4.f);
+    srand((unsigned)time(NULL));
 }
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
@@ -61,6 +64,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     }
     CKB_PARSE_BOOL("symmetric", &symmetric){}
     CKB_PARSE_BOOL("kprelease", &kprelease){}
+    CKB_PARSE_BOOL("randomize", &randomize){}
 }
 
 #define ANIM_MAX (144 * 2)
@@ -69,6 +73,7 @@ struct {
     float x, y;
     float maxsize;
     float cursize;
+    float choice;
 } anim[ANIM_MAX] = { };
 
 void anim_add(float x, float y, float width, float height){
@@ -82,6 +87,7 @@ void anim_add(float x, float y, float width, float height){
         float sizey = fmax(y, height - y);
         anim[i].maxsize = sqrt(sizex * sizex + sizey * sizey) + animlength;
         anim[i].cursize = (symmetric) ? -animlength : 0;
+        anim[i].choice = (float)rand()/(float)(RAND_MAX);
         return;
     }
 }
@@ -140,10 +146,12 @@ int ckb_frame(ckb_runctx* context){
                 if(distance > 1.f && distance <= 1.005f)
                     // Round values close to 1
                     distance = 1.f;
+
                 // Blend color gradient according to position
                 if(distance >= 0. && distance <= 1.f){
                     float a, r, g, b;
-                    ckb_grad_color(&a, &r, &g, &b, &animcolor, distance * 100.);
+                    float gradChoice = randomize ? anim[i].choice : distance;
+                    ckb_grad_color(&a, &r, &g, &b, &animcolor, gradChoice * 100.);
                     ckb_alpha_blend(key, a, r, g, b);
                 }
             }

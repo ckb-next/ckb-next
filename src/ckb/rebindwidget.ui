@@ -1229,6 +1229,217 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="macroTab">
+      <attribute name="title">
+       <string>Macro</string>
+      </attribute>
+      <widget class="QWidget" name="layoutWidget1">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>12</y>
+         <width>241</width>
+         <height>171</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_8">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Macro Key Actions</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPlainTextEdit" name="pteMacroBox">
+          <property name="focusPolicy">
+           <enum>Qt::WheelFocus</enum>
+          </property>
+          <property name="tabChangesFocus">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QPlainTextEdit" name="pteMacroComment">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>20</y>
+         <width>311</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string>What is this macro for?</string>
+       </property>
+       <property name="toolTipDuration">
+        <number>1</number>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhNone</set>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="tabChangesFocus">
+        <bool>true</bool>
+       </property>
+       <property name="documentTitle">
+        <string/>
+       </property>
+       <property name="undoRedoEnabled">
+        <bool>true</bool>
+       </property>
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
+       <property name="plainText">
+        <string/>
+       </property>
+       <property name="tabStopWidth">
+        <number>1</number>
+       </property>
+      </widget>
+      <widget class="QPlainTextEdit" name="pteMacroText">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>60</y>
+         <width>311</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhNoAutoUppercase</set>
+       </property>
+       <property name="documentTitle">
+        <string/>
+       </property>
+       <property name="undoRedoEnabled">
+        <bool>false</bool>
+       </property>
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
+       <property name="plainText">
+        <string/>
+       </property>
+       <property name="tabStopWidth">
+        <number>1</number>
+       </property>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>20</y>
+         <width>119</width>
+         <height>81</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Macro Comment</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="title">
+           <string>Macro Text</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>160</y>
+         <width>436</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_10">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Macro recording</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="btnStopMacro">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="btnStartMacro">
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="btnClearMacro">
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QLabel" name="lbl_macro">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>130</y>
+         <width>431</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Comment label for help</string>
+       </property>
+      </widget>
+      <zorder>pteMacroComment</zorder>
+      <zorder>layoutWidget1</zorder>
+      <zorder>layoutWidget</zorder>
+      <zorder>pteMacroText</zorder>
+      <zorder>layoutWidget_2</zorder>
+      <zorder>lbl_macro</zorder>
+     </widget>
     </widget>
    </item>
    <item>
@@ -1281,6 +1492,140 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>pteMacroComment</tabstop>
+  <tabstop>pteMacroBox</tabstop>
+  <tabstop>dpiButton</tabstop>
+  <tabstop>mb2Box</tabstop>
+  <tabstop>btnStartMacro</tabstop>
+  <tabstop>fnBox</tabstop>
+  <tabstop>dpiCustYBox</tabstop>
+  <tabstop>dpiBox</tabstop>
+  <tabstop>applyButton</tabstop>
+  <tabstop>mbBox</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>wheelBox</tabstop>
+  <tabstop>btnStopMacro</tabstop>
+  <tabstop>mbButton</tabstop>
+  <tabstop>dpiCustXBox</tabstop>
+  <tabstop>btnClearMacro</tabstop>
+  <tabstop>wheelButton</tabstop>
+  <tabstop>mb2Button</tabstop>
+  <tabstop>animBox</tabstop>
+  <tabstop>animKrBox</tabstop>
+  <tabstop>animOnceBox</tabstop>
+  <tabstop>animButton</tabstop>
+  <tabstop>modeButton</tabstop>
+  <tabstop>modeWrapBox</tabstop>
+  <tabstop>lightWrapBox</tabstop>
+  <tabstop>lockButton</tabstop>
+  <tabstop>lightBox</tabstop>
+  <tabstop>resetButton</tabstop>
+  <tabstop>lockBox</tabstop>
+  <tabstop>lightButton</tabstop>
+  <tabstop>modeBox</tabstop>
+  <tabstop>unbindButton</tabstop>
+  <tabstop>programKpButton</tabstop>
+  <tabstop>programKpBox</tabstop>
+  <tabstop>programKrBox</tabstop>
+  <tabstop>programKrButton</tabstop>
+  <tabstop>programKpSIBox</tabstop>
+  <tabstop>programKpModeBox</tabstop>
+  <tabstop>programKrSIBox</tabstop>
+  <tabstop>programKrModeBox</tabstop>
+  <tabstop>typingBox</tabstop>
+  <tabstop>numBox</tabstop>
+  <tabstop>pteMacroText</tabstop>
+  <tabstop>typingButton</tabstop>
+  <tabstop>mediaButton</tabstop>
+  <tabstop>modBox</tabstop>
+  <tabstop>modButton</tabstop>
+  <tabstop>fnButton</tabstop>
+  <tabstop>mediaBox</tabstop>
+  <tabstop>numButton</tabstop>
+ </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>pteMacroBox</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>735</x>
+     <y>331</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>201</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClearMacro</sender>
+   <signal>clicked()</signal>
+   <receiver>pteMacroBox</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>702</x>
+     <y>206</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClearMacro</sender>
+   <signal>clicked()</signal>
+   <receiver>pteMacroText</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>718</x>
+     <y>206</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>705</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClearMacro</sender>
+   <signal>clicked()</signal>
+   <receiver>pteMacroComment</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>723</x>
+     <y>201</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>722</x>
+     <y>85</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClearMacro</sender>
+   <signal>clicked()</signal>
+   <receiver>btnStopMacro</receiver>
+   <slot>animateClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>671</x>
+     <y>208</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>612</x>
+     <y>206</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -5,7 +5,8 @@
 int macromask(const uchar* key1, const uchar* key2){
     // Scan a macro against key input. Return 0 if any of them don't match
     for(int i = 0; i < N_KEYBYTES_INPUT; i++){
-        if((key1[i] & key2[i]) != key2[i])
+        // if((key1[i] & key2[i]) != key2[i])
+        if(key1[i] != key2[i])  // Changed to detect G-keys + modifiers
             return 0;
     }
     return 1;
@@ -32,8 +33,13 @@ static void inputupdate_keys(usbdevice* kb){
                         macroaction* action = macro->actions + a;
                         if(action->rel_x != 0 || action->rel_y != 0)
                             os_mousemove(kb, action->rel_x, action->rel_y);
-                        else
+                        else {
                             os_keypress(kb, action->scan, action->down);
+                            if (kb->delay) {
+                                if (a > 200) usleep (100);
+                                else if (a > 20) usleep(30);
+                            }
+                        }
                     }
                 }
             } else {
@@ -130,7 +136,6 @@ void inputupdate(usbdevice* kb){
         input->rel_x = input->rel_y = 0;
     }
     // Finish up
-    os_isync(kb);
     memcpy(input->prevkeys, input->keys, N_KEYBYTES_INPUT);
 }
 

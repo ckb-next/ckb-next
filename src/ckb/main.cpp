@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QSharedMemory>
+#include <QCommandLineParser>
 #include <cstring>
 #include <unistd.h>
 #include <signal.h>
@@ -18,6 +19,74 @@ extern "C" void disableAppNap();
 // Shared memory sizes
 #define SHMEM_SIZE      128 * 1024
 #define SHMEM_SIZE_V015 16
+
+// Command line options
+enum CommandLineParseResults {
+    CommandLineOK,
+    CommandLineError,
+    CommandLineVersionRequested,
+    CommandLineHelpRequested,
+    CommandLineClose,
+    CommandLineBackground
+};
+
+/**
+ * parseCommandLine - Setup options and parse command line arguments.
+ *
+ * @param parser        parser instance to use for parse the arguments
+ * @param errorMessage  argument parse error message
+ *
+ * @return  integer, representing the requested argument
+ */
+CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *errorMessage) {
+    // setup parser to interpret -abc as -a -b -c
+    parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsCompactedShortOptions);
+
+    /* add command line options */
+    // add -v, --version
+    const QCommandLineOption versionOption = parser.addVersionOption();
+    // add -h, --help (/? on windows)
+    const QCommandLineOption helpOption = parser.addHelpOption();
+    // add -b, --background
+    const QCommandLineOption backgroundOption(QStringList() << "b" << "background",
+                                              "Starts in background, without displaying the main window.");
+    parser.addOption(backgroundOption);
+    // add -c, --close
+    const QCommandLineOption closeOption(QStringList() << "c" << "close",
+                                         "Causes already running instance (if any) to exit.");
+    parser.addOption(closeOption);
+
+    /* parse arguments */
+    if (!parser.parse(QCoreApplication::arguments())) {
+        // set error, if there already are some
+        *errorMessage = parser.errorText();
+        return CommandLineError;
+    }
+
+    /* return requested operation/setup */
+    if (parser.isSet(versionOption)) {
+        // print version and exit
+        return CommandLineVersionRequested;
+    }
+
+    if (parser.isSet(helpOption)) {
+        // print help and exit
+        return CommandLineHelpRequested;
+    }
+
+    if (parser.isSet(backgroundOption)) {
+        // open application in background
+        return CommandLineBackground;
+    }
+
+    if (parser.isSet(closeOption)) {
+        // close already running application instances, if any
+        return CommandLineClose;
+    }
+
+    /* no explicit argument was passed */
+    return CommandLineOK;
+};
 
 // Scan shared memory for an active PID
 static bool pidActive(const QStringList& lines){
@@ -77,8 +146,19 @@ static bool isRunning(const char* command){
 }
 
 int main(int argc, char *argv[]){
+    // Setup main application
     QApplication a(argc, argv);
+
+    // Setup names and versions
     QCoreApplication::setOrganizationName("ckb");
+    QCoreApplication::setApplicationVersion(CKB_VERSION_STR);
+    QCoreApplication::setApplicationName("ckb");
+
+    // Setup argument parser
+    QCommandLineParser parser;
+    QString errorMessage;
+    parser.setApplicationDescription("Open Source Corsair Input Device Driver for Linux and OSX.");
+    bool background = 0;
 
     // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
     if(getuid() == 0){
@@ -96,23 +176,41 @@ int main(int argc, char *argv[]){
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 
-    // If launched with --version, print version info and then quit
-    if(qApp->arguments().contains("--version")){
-        printf("ckb %s\n", CKB_VERSION_STR);
+    // Parse arguments
+    switch (parseCommandLine(parser, &errorMessage)) {
+    case CommandLineOK:
+        // If launched with no argument
+        break;
+    case CommandLineError:
+        fputs(qPrintable(errorMessage), stderr);
+        fputs("\n\n", stderr);
+        fputs(qPrintable(parser.helpText()), stderr);
+        return 1;
+    case CommandLineVersionRequested:
+        // If launched with --version, print version info and then quit
+        printf("%s %s\n", qPrintable(QCoreApplication::applicationName()),
+               qPrintable(QCoreApplication::applicationVersion()));
         return 0;
-    }
-
-    // Kill existing app when launched with --close
-    if(qApp->arguments().contains("--close")){
-        if(isRunning("Close"))
+    case CommandLineHelpRequested:
+        // If launched with --help, print help and then quit
+        parser.showHelp();
+        return 0;
+    case CommandLineClose:
+        // If launched with --close, kill existing app
+        if (isRunning("Close"))
             printf("Asking existing instance to close.\n");
         else
             printf("ckb is not running.\n");
         return 0;
+    case CommandLineBackground:
+        // If launched with --background, launch in background
+        background = 1;
+        break;
     }
 
     // Launch in background if requested, or if re-launching a previous session
-    bool background = qApp->arguments().contains("--background") || qApp->arguments().contains("-session") || qApp->arguments().contains("--session");
+    if(qApp->isSessionRestored())
+            background = 1;
     if(isRunning(background ? 0 : "Open")){
         printf("ckb is already running. Exiting.\n");
         return 0;

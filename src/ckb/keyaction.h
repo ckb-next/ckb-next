@@ -31,6 +31,72 @@ public:
     // Name to send to driver (empty string for unbind)
     QString driverName() const;
 
+    //////////
+    /// \brief macroFullLine
+    /// If a macro command and a macro definition exists for the given key,
+    /// returns the complete string except the leading "$"
+    /// (the $ may confuse some caller).
+    /// \return QString
+    /// All 4 parts are returned in one QString.
+    /// If no definition exists, return ""
+    ///
+    inline QString macroFullLine() const {
+        return isMacro() ? _value.right(_value.length()-1) : "";
+    }
+
+     //////////
+     /// \brief isValidMacro checks whether a keyAction contains a valid macro.
+     /// This is done easily: If the macro action starts with $macro:
+     /// and has four elements, delimited by ":", we may assume,
+     /// that is a structural correct macro action.
+     /// \return bool as true iff the macro definition contains all four elements.
+     ///
+     inline bool isValidMacro() const {
+        if (isMacro()) {
+            QStringList ret;
+            ret =_value.split(":");
+            return (ret.count() == 4);
+        } else {
+            return false;
+        }
+    }
+
+    //////////
+    /// \brief macroLine returns all interresting content for a macro definition.
+    /// \return QStringList returns the Macro Key Definition,
+    ///     Readble Macro String and
+    ///     Readable Macro Comment as QStringList.
+    ///
+    inline QStringList macroLine() const {
+        if (isValidMacro()) {
+            QStringList ret =_value.split(":");
+            ret.removeFirst();
+            return ret;
+        } else return QStringList();
+    }
+
+    //////////
+    /// \brief macroContent returns the macro key definition only
+    /// (the second part of the macro action).
+    /// \return QString macroContent
+    ///
+    inline QString macroContent() const {
+        return isValidMacro() ? _value.split(":")[1] : "";
+    }
+
+    //////////
+    /// \brief Debug output for invalid macro Definitions
+    ///
+    /// General Info on KeyAction::_value for macros:
+    /// That string consists of 4 elements, all delimited by ":".
+    ///      1.  Macro command indicator "$macro:"
+    ///      2.  Macro Key Definition (coming from pteMacroBox):
+    ///          This sequence will program the keyboard and is hardly readable
+    ///      3.  Readable Macro String: This is displayed in pteMacroText
+    ///      4.  Readable Macro Comment:This is displayed in pteMacroComment
+    ///
+    void macroDisplay();
+
     // Mode-switch action.
     // 0 for first mode, 1 for second, etc. Constants below for movement options
     const static int MODE_PREV = -2, MODE_NEXT = -1;
@@ -53,6 +119,7 @@ public:
     static QString  programAction(const QString& onPress, const QString& onRelease, int stop);
     // Key to start an animation
     static QString animAction(const QUuid& guid, bool onlyOnce, bool stopOnRelease);
+    static QString macroAction(QString macroDef);   ///< \brief well documented in cpp file
 
     // Action type
     enum Type {
@@ -66,9 +133,10 @@ public:
     inline bool isSpecial() const       { return type() == SPECIAL; }
     // Media is a type of normal key
     inline bool isMedia() const         { return _value == "mute" || _value == "volup" || _value == "voldn" || _value == "stop" || _value == "prev" || _value == "play" || _value == "next"; }
-    // Program and animation are types of special key
+    // Macro, program and animation are types of special key
     inline bool isProgram() const       { return _value.startsWith("$program:"); }
     inline bool isAnim() const          { return _value.startsWith("$anim:"); }
+    inline bool isMacro() const         { return _value.startsWith("$macro:"); }
     // Mouse is some normal keys plus DPI
     inline bool isDPI() const           { return _value.startsWith("$dpi:"); }
     inline bool isMouse() const         { return (isNormal() && (_value.startsWith("mouse") || _value.startsWith("wheel"))) || isDPI(); }

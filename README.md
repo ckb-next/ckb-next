@@ -188,13 +188,18 @@ If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo 
 
 #### OS X
 
-- **“ckb.pkg” can’t be opened because it is from an unidentified developer.**
-- Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
-- **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly.**
-- ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
-- **`~` key prints `§±`**
-- Check your keyboard layout on ckb's Settings screen. Choose the layout that matches your physical keyboard.
-- **Compile problems** can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
+- **“ckb.pkg” can’t be opened because it is from an unidentified developer**    
+    Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
+- **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly**    
+    ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
+- **`~` key prints `§±`**    
+    Check your keyboard layout on ckb's Settings screen. Choose the layout that matches your physical keyboard.
+- **Compile problems**    
+    Can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
+- **Scroll wheel does not scroll**    
+    As of #c3474d2 it's now possible to **disable scroll acceleration** from the GUI. You can access it under "OSX tweaks" in the "More settings" screen. Once disabled, the scroll wheel should behave consistently.
+
+
 
 #### General
 

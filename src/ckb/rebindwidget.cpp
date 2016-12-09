@@ -1,6 +1,7 @@
 #include <QStandardPaths>
 #include "rebindwidget.h"
 #include "ui_rebindwidget.h"
+#include <qdebug.h>     // lae.
 
 static const int DPI_OFFSET = -KeyAction::DPI_UP + 1;
 static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
@@ -8,7 +9,7 @@ static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
 RebindWidget::RebindWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RebindWidget),
-    bind(0), profile(0)
+    bind(0), profile(0), macReader(0)
 {
     ui->setupUi(this);
     ui->lightWrapBox->hide();
@@ -187,6 +188,10 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     ui->programKrModeBox->setCurrentIndex(0);
     ui->programKpModeBox->setEnabled(false);
     ui->programKrModeBox->setEnabled(false);
+    // Clear neu UI elements in MacroTab
+    ui->pteMacroBox->setPlainText("");
+    ui->pteMacroText->setPlainText("");
+    ui->pteMacroComment->setPlainText("");
     // Fill in field and select tab according to action type
     bool mouse = act.isMouse();
     if(mouse){
@@ -283,6 +288,16 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             else
                 // 0 -> "", 1 -> Prev, 2 -> Next, 3 -> Mode 1
                 ui->modeBox->setCurrentIndex(3);
+        } else if (sAction == "macro") {
+            ui->tabWidget->setCurrentIndex(TAB_MACRO);
+            if (act.isValidMacro()) {
+                ui->pteMacroBox->setPlainText(act.macroContent());
+                ui->pteMacroText->setPlainText(act.macroLine()[1].replace("&das_IST_31N_col0n;", ":"));
+                ui->pteMacroComment->setPlainText(act.macroLine()[2].replace("&das_IST_31N_col0n;", ":"));
+            } else {
+                qDebug("RebindWidget::setSelection found invalid macro definition.");
+                act.macroDisplay();
+            }
         } else
             ui->modeBox->setCurrentIndex(0);
         // Brightness control. Also check wrap
@@ -354,11 +369,26 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
                 krStop = KeyAction::PROGRAM_RE_KPSTOP;
         }
         bind->setAction(keys, KeyAction::programAction(ui->programKpBox->text(), ui->programKrBox->text(), kpStop | krStop));
+    } else if (ui->pteMacroBox->toPlainText().length() > 0) {
+        // G-key macro handling:
+        // Set the macro definiton for all keys selected (indeed, it may be multiple keys).
+        // First, concat the Macro Key Definion and the Macro plain text
+        // after escaping possible colos in the parts for Macro Text and Macro Comment.
+        QString mac;
+        mac = ui->pteMacroComment->toPlainText().replace(":", "&das_IST_31N_col0n;");
+        mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
+        mac = ui->pteMacroBox->toPlainText() + ":" + mac;
+        bind->setAction(keys, KeyAction::macroAction(mac));
     } else if(doUnbind)
         bind->noAction(keys);
 }
 
 void RebindWidget::on_applyButton_clicked(){
+    // Normally, this should be done via signalling.
+    // Because there is no serarate thread, we have to call it directly
+    // (otherwise we could do Key char conversion step by step,
+    // but so it is more easy to change the key definition):
+    on_btnStopMacro_clicked();
     applyChanges(selection, true);
 }
 
@@ -400,6 +430,11 @@ void RebindWidget::setBox(QWidget* box){
         ui->programKpButton->setChecked(false);
         ui->programKrButton->setChecked(false);
     }
+    // Clear macro panel
+    if (box != ui->pteMacroBox) {
+        ui->pteMacroBox->setPlainText("");
+        helpStatus(1);
+    }
 }
 
 void RebindWidget::on_typingBox_currentIndexChanged(int index){
@@ -408,6 +443,12 @@ void RebindWidget::on_typingBox_currentIndexChanged(int index){
     else {
         ui->typingButton->setChecked(true);
         setBox(ui->typingBox);
+    }
+}
+
+void RebindWidget::on_pteMacroBox_textChanged() {
+    if (ui->pteMacroBox->toPlainText().length() > 0) {
+        setBox(ui->pteMacroBox);
     }
 }
 
@@ -648,4 +689,95 @@ void RebindWidget::on_programKrSIBox_clicked(bool checked){
 void RebindWidget::on_animButton_clicked(bool checked){
     if(checked && ui->animBox->currentIndex() == 0)
         ui->animBox->setCurrentIndex(1);
+}
+
+//////////
+/// \brief RebindWidget::on_btnStartMacro_clicked starts macro recording.
+/// A new notification channel and MacroReader are created to do the job.
+///
+/// The UI is protected against false clicking
+/// (e.g. if you type start and than Apply, the channel is closed in wrong order).
+///
+/// At this time, all neccessary params like macroNumber, macroPath, cmdFile etc. had been cached.
+///
+void RebindWidget::on_btnStartMacro_clicked() {
+    if (!macReader) {
+        bind->handleNotificationChannel(true);
+        macReader = new MacroReader(bind->getMacroNumber(), bind->getMacroPath(), ui->pteMacroBox, ui->pteMacroText);
+        // because of the second thread we need to disable three of the four bottom buttons.
+        // Clicking "Stop" will enable them again.
+        ui->applyButton->setEnabled(false);
+        ui->resetButton->setEnabled(false);
+        ui->unbindButton->setEnabled(false);
+        ui->btnStartMacro->setEnabled(false);
+        ui->btnStopMacro->setEnabled(true);
+        helpStatus(2);
+    }
+}
+
+//////////
+/// \brief RebindWidget::on_btnStopMacro_clicked ends the macro recording.
+/// Notify channel ist closed, the ReaderThread is deleted if the notification is really down.
+///
+/// Afterwards, the characters in the MacroBox are changed from KB-out format to cmd-in format.
+/// At last the UI changes to the new state.
+///
+void RebindWidget::on_btnStopMacro_clicked() {
+    if (macReader) {
+        bind->handleNotificationChannel(false);
+        delete macReader;
+        macReader = 0;
+        convertMacroBox();
+        ui->applyButton->setEnabled(true);
+        ui->resetButton->setEnabled(true);
+        ui->unbindButton->setEnabled(true);
+        ui->btnStartMacro->setEnabled(true);
+        ui->btnStopMacro->setEnabled(false);
+        helpStatus(3);
+    }
+}
+
+//////////
+/// \brief RebindWidget::on_btnClearMacro_clicked changes the help info an the panel.
+/// The job of clearing the input panels is triggerd with signal/slot via the RebindWidget.ui file.
+///
+void RebindWidget::on_btnClearMacro_clicked() {
+    helpStatus(1);
+}
+
+//////////
+/// \brief RebindWidget::helpStatus shows a help line in the ui.
+/// \param status determines what to display.
+///
+void RebindWidget::helpStatus(int status) {
+    switch (status) {
+    case 1:
+        ui->lbl_macro->setText("Type in a macro name in the comment box and click start.");
+        break;
+    case 2:
+        ui->lbl_macro->setText("Type your macro and click stop when finished.");
+        break;
+    case 3:
+        ui->lbl_macro->setText("Click Apply or change values in Macro Key Actions in advance.");
+        break;
+    default:
+        ui->lbl_macro->setText(QString("Oops: Some magic in RebindWidget::helpStatus (%1)").arg(status));
+    }
+}
+
+//////////
+/// \brief RebindWidget::convertMacroBox converts the macroBox content.
+/// The KB sends each keypress as "key [+|-]<keyname><newline>"
+///
+/// the ckb-daemon needs a shorter format, only " [+|-]<keyname>"
+///
+/// That function does the conversion.
+///
+void RebindWidget::convertMacroBox() {
+    QString in;
+
+    in = ui->pteMacroBox->toPlainText();
+    in.replace (QRegExp("\n"), ",");
+    in.replace (QRegExp("key "), "");
+    ui->pteMacroBox->setPlainText(in);
 }

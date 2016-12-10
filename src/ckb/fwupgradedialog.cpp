@@ -20,7 +20,9 @@ static KbId ids[] = {
     { 0x1b1c, 0x1b20, "corsair strafe rgb" },
     // Mice
     { 0x1b1c, 0x1b12, "corsair m65 rgb" },
-    { 0x1b1c, 0x1b1e, "corsair scimitar rgb" }
+    { 0x1b1c, 0x1b1e, "corsair scimitar rgb" },
+    //SABRE CH-9000111-EU
+    { 0x1b1c, 0x1b32, "corsair sabre optical rgb" }
 };
 
 static const int DIALOG_WIDTH = 420;

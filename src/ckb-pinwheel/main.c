@@ -12,6 +12,8 @@ void ckb_info(){
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Wheel color:", "", "ffffffff");
     CKB_PARAM_DOUBLE("length", "Wheel size:", "%", 100, 1., 100.);
+    CKB_PARAM_DOUBLE("x_offset", "X offset:", "%", 0, -100, 100);
+    CKB_PARAM_DOUBLE("y_offset", "Y offset:", "%", 0, -100, 100);
     CKB_PARAM_BOOL("counter_clock", "Counter Clockwise", 0);
     CKB_PARAM_BOOL("symmetric", "Symmetric", 0);
 
@@ -38,6 +40,7 @@ ckb_gradient animcolor = { 0 };
 double animlength = 0.;
 int symmetric = 0;
 int counter_clock = 0;
+double x_offset = 0, y_offset = 0;
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_AGRADIENT("color", &animcolor){}
@@ -47,6 +50,8 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     }
     CKB_PARSE_BOOL("symmetric", &symmetric){}
     CKB_PARSE_BOOL("counter_clock", &counter_clock){}
+    CKB_PARSE_DOUBLE("x_offset", &x_offset) {}
+    CKB_PARSE_DOUBLE("y_offset", &y_offset) {}
 }
 
 void ckb_init(ckb_runctx* context){
@@ -65,8 +70,8 @@ float x, y;
 void ckb_start(ckb_runctx* context, int state){
     // Begin or end animation
     frame = state ? 0. : -1.;
-    x = context->width / 2.f;
-    y = context->height / 2.f;
+    x = (context->width + (context->width * x_offset * 0.01)) / 2.f;
+    y = (context->height - (context->height * y_offset * 0.01)) / 2.f;
 }
 
 void ckb_time(ckb_runctx* context, double delta){
@@ -83,11 +88,11 @@ int ckb_frame(ckb_runctx* context){
     if(frame < 0.)
         return 0;
     // Color each key according to its angle from the center
-        float position;
-        if(counter_clock)
+    float position;
+    if(counter_clock)
         position = ANGLE(frame * M_PI * 2.);
-        else
-            position = ANGLE(-frame * M_PI * 2.);
+    else
+        position = ANGLE(-frame * M_PI * 2.);
     unsigned count = context->keycount;
     ckb_key* keys = context->keys;
     for(ckb_key* key = keys; key < keys + count; key++){

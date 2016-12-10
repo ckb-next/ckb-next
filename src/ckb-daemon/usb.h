@@ -16,15 +16,17 @@
 #define P_K65_RFIRE_STR "1b39"
 #define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
-#define P_K70           0x1b13
-#define P_K70_STR       "1b13"
-#define P_K70_NRGB      0x1b09
-#define P_K70_NRGB_STR  "1b09"
-#define P_K70_LUX       0x1b33
-#define P_K70_LUX_STR   "1b33"
-#define P_K70_RFIRE     0x1b38
-#define P_K70_RFIRE_STR "1b38"
-#define IS_K70(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_LUX))
+#define P_K70                0x1b13
+#define P_K70_STR            "1b13"
+#define P_K70_NRGB           0x1b09
+#define P_K70_NRGB_STR       "1b09"
+#define P_K70_LUX            0x1b33
+#define P_K70_LUX_STR        "1b33"
+#define P_K70_LUX_NRGB	     0x1b36
+#define P_K70_LUX_NRGB_STR   "1b36"
+#define P_K70_RFIRE          0x1b38
+#define P_K70_RFIRE_STR      "1b38"
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
 
 #define P_K95           0x1b11
 #define P_K95_STR       "1b11"

@@ -44,6 +44,7 @@
 
 #ifdef OS_MAC
 
+#include <Availability.h>
 #include <Carbon/Carbon.h>
 #include <IOKit/IOMessage.h>
 #include <IOKit/hid/IOHIDDevicePlugin.h>
@@ -69,7 +70,9 @@ void *memrchr(const void *s, int c, size_t n);
 
 #define CLOCK_MONOTONIC 1
 #define TIMER_ABSTIME   1
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101200
 typedef int clockid_t;
+#endif
 int clock_gettime(clockid_t clk_id, struct timespec *tp);
 int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp, struct timespec *rmtp);
 

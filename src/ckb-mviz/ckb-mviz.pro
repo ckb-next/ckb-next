@@ -3,7 +3,6 @@ TARGET = ckb-mviz
 
 QMAKE_CFLAGS += -std=c99
 QMAKE_MAC_SDK = macosx10.10
-QMAKE_LFLAGS += -lpulse-simple
 
 macx {
     DESTDIR = $$PWD/../../ckb.app/Contents/Resources/ckb-animations
@@ -11,9 +10,9 @@ macx {
     DESTDIR = $$PWD/../../bin/ckb-animations
 }
 
-CONFIG   = debug
+CONFIG   = 
 QT       =
-LIBS     =
+LIBS += -lpulse-simple
 
 SOURCES += \
     main.c \

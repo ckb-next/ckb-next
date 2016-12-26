@@ -13,7 +13,7 @@ SUBDIRS = \
 
 # Music visualizer requires Pulseaudio libraries
 linux {
-    system(pkg-config --exists libpulse) {
+    packagesExist(libpulse libpulse-simple) {
         SUBDIRS += src/ckb-mviz
     }
 }

@@ -113,7 +113,7 @@ public:
     inline void setNeedsUpdate()        { _needsUpdate = true; }
 
     // Get indicator status to send to KbLight
-    QHash<QString, QRgb> indicatorLights(int modeIndex, const bool indicatorState[HW_I_COUNT]) const;
+    void applyIndicators(int modeIndex, const bool indicatorState[HW_I_COUNT]);
 
 signals:
     void didLoad();
@@ -124,6 +124,9 @@ private:
     inline KbMode*  modeParent() const { return (KbMode*)parent(); }
     KbBind*         bind() const;
     KbLight*        light() const;
+
+    // Send indicator state to KbLight, taking current opacity into account
+    void lightIndicator(const char* name, QRgb rgba);
 
     // DPI
     int dpiX[DPI_COUNT];

@@ -422,83 +422,76 @@ void KbPerf::update(QFile& cmd, bool force, bool saveCustomDpi){
     }
 }
 
-QHash<QString, QRgb> KbPerf::indicatorLights(int modeIndex, const bool indicatorState[]) const {
-    QHash<QString, QRgb> res;
+void KbPerf::lightIndicator(const char* name, QRgb rgba){
+    int a = round(qAlpha(rgba) * _iOpacity);
+    if(a <= 0)
+        return;
+    light()->setIndicator(name, qRgba(qRed(rgba), qGreen(rgba), qBlue(rgba), a));
+}
+
+void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
+    light()->resetIndicators();
     if(_iOpacity <= 0.f)
-        return res;
+        return;
     if(_dpiIndicator){
         // Set DPI indicator according to index
         int index = curDpiIdx();
         if(index == -1 || index > OTHER)
             index = OTHER;
-        res["dpi"] = dpiClr[index].rgba();
+        lightIndicator("dpi", dpiClr[index].rgba());
     }
     // KB indicators
     if(iEnable[MODE]){
         for(int i = 0; i < Kb::HWMODE_MAX; i++){
-            QString name = "m%1";
-            name = name.arg(i + 1);
+            char name[4];
+            snprintf(name, sizeof(name), "m%d", i + 1);
             if(modeIndex == i)
-                res[name] = iColor[MODE][0].rgba();
+                lightIndicator(name, iColor[MODE][0].rgba());
             else
-                res[name] = iColor[MODE][1].rgba();
+                lightIndicator(name, iColor[MODE][1].rgba());
         }
     }
     if(iEnable[MACRO])
-        res["mr"] = iColor[MUTE][1].rgba();
+        lightIndicator("mr", iColor[MUTE][1].rgba());
     if(iEnable[LIGHT]){
         switch(light()->dimming()){
-        case 0:
-            res["light"] = light100Color.rgba();
+        case 0: // 100%
+            lightIndicator("light", light100Color.rgba());
             break;
-        case 1:
-            res["light"] = iColor[LIGHT][1].rgba();
+        case 1: // 67%
+            lightIndicator("light", iColor[LIGHT][1].rgba());
             break;
-        case 2:
-            res["light"] = iColor[LIGHT][0].rgba();
+        case 2: // 33%
+        case 3: // light off
+            lightIndicator("light", iColor[LIGHT][0].rgba());
             break;
-            // 3 (light off): do nothing
         }
     }
     if(iEnable[LOCK]){
         if(bind()->winLock())
-            res["lock"] = iColor[LOCK][0].rgba();
+            lightIndicator("lock", iColor[LOCK][0].rgba());
         else
-            res["lock"] = iColor[LOCK][1].rgba();
+            lightIndicator("lock", iColor[LOCK][1].rgba());
     }
     if(iEnable[MUTE]){
         switch(getMuteState()){
         case MUTED:
-            res["mute"] = iColor[MUTE][0].rgba();
+            lightIndicator("mute", iColor[MUTE][0].rgba());
             break;
         case UNMUTED:
-            res["mute"] = iColor[MUTE][1].rgba();
+            lightIndicator("mute", iColor[MUTE][1].rgba());
             break;
         default:
-            res["mute"] = muteNAColor.rgba();
+            lightIndicator("mute", muteNAColor.rgba());
             break;
         }
     }
     // Lock lights
     if(iEnable[NUM])
-        res["numlock"] = indicatorState[0] ? iColor[NUM][0].rgba() : iColor[NUM][1].rgba();
+        lightIndicator("numlock", indicatorState[0] ? iColor[NUM][0].rgba() : iColor[NUM][1].rgba());
     if(iEnable[CAPS])
-        res["caps"] = indicatorState[1] ? iColor[CAPS][0].rgba() : iColor[CAPS][1].rgba();
+        lightIndicator("caps", indicatorState[1] ? iColor[CAPS][0].rgba() : iColor[CAPS][1].rgba());
     if(iEnable[SCROLL])
-        res["scroll"] = indicatorState[2] ? iColor[SCROLL][0].rgba() : iColor[SCROLL][1].rgba();
-    // Apply opacity if needed
-    if(_iOpacity < 1.f){
-        QMutableHashIterator<QString, QRgb> i(res);
-        while(i.hasNext()){
-            i.next();
-            QRgb& rgba = i.value();
-            int a = round(qAlpha(rgba) * _iOpacity);
-            if(a <= 0)
-                i.remove();
-            else
-                rgba = qRgba(qRed(rgba), qGreen(rgba), qBlue(rgba), a);
-        }
-    }
-    return res;
+        lightIndicator("scroll", indicatorState[2] ? iColor[SCROLL][0].rgba() : iColor[SCROLL][1].rgba());
 }
 

@@ -6,6 +6,7 @@
 #include <QPaintEvent>
 #include <QWidget>
 #include "keymap.h"
+#include "colormap.h"
 
 class KeyWidget : public QWidget
 {
@@ -20,16 +21,15 @@ public:
     inline void     monochrome(bool newMono)    { _monochrome = newMono; update(); }
 
     // Key map
-    const KeyMap&   map() const                         { return keyMap; }
-    void            map(const KeyMap& newMap);
+    const KeyMap&       map() const                         { return keyMap; }
+    void                map(const KeyMap& newMap);
     // Key -> color map (must contain exactly the keys in the key map)
-    typedef QHash<QString, QRgb> ColorMap;
-    const ColorMap& colorMap() const                    { return _colorMap; }
-    void            colorMap(const ColorMap& newColorMap);
+    const QColorMap&    colorMap() const                    { return _colorMap; }
+    void                colorMap(const QColorMap& newColorMap);
     // Key -> binding map
     typedef QHash<QString, QString> BindMap;
-    const BindMap&  bindMap() const                     { return _bindMap; }
-    void            bindMap(const BindMap& newBindMap);
+    const BindMap&      bindMap() const                     { return _bindMap; }
+    void                bindMap(const BindMap& newBindMap);
 
     // Set current selection (highlighted in blue)
     void setSelection(const QStringList& keys);
@@ -44,7 +44,7 @@ public:
 public slots:
     // Sets display colors. Pass an empty map to clear.
     // These will be displayed instead of the regular color map, if supplied.
-    void displayColorMap(ColorMap newDisplayMap, QStringList indicators = QStringList());
+    void displayColorMap(const ColorMap& newDisplayMap, const QSet<QString>& indicators = QSet<QString>());
 
 signals:
     // Emitted when the selection is changed.
@@ -53,9 +53,10 @@ signals:
 
 private:
     KeyMap keyMap;
-    ColorMap _colorMap, _displayColorMap;
+    QColorMap _colorMap;
+    ColorMap _displayColorMap;
     BindMap _bindMap;
-    QStringList _indicators;
+    QSet<QString> _indicators;
 
     QBitArray selection;
     QBitArray newSelection;

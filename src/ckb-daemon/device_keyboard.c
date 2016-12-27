@@ -104,6 +104,8 @@ int setactive_kb(usbdevice* kb, int active){
         DELAY_MEDIUM(kb);
 #endif
     }
+    // Update indicator LEDs if the profile contains settings for them
+    kb->vtable->updateindicators(kb, 0);
     return 0;
 }
 

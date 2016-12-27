@@ -8,6 +8,7 @@
 
 static const char* const cmd_strings[CMD_COUNT - 1] = {
     // NONE is implicit
+    "delay",
     "mode",
     "switch",
     "layout",
@@ -111,7 +112,7 @@ int readcmd(usbdevice* kb, const char* line){
 
         // Reject unrecognized commands. Reject bind or notify related commands if the keyboard doesn't have the feature enabled.
         if(command == NONE
-                || ((!HAS_FEATURES(kb, FEAT_BIND) && (command == BIND || command == UNBIND || command == REBIND || command == MACRO))
+                || ((!HAS_FEATURES(kb, FEAT_BIND) && (command == BIND || command == UNBIND || command == REBIND || command == MACRO || command == DELAY))
                            || (!HAS_FEATURES(kb, FEAT_NOTIFY) && command == NOTIFY))){
             next_loop:
             continue;
@@ -173,13 +174,14 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
         }
         case FPS: {
-            // USB command delay (1 - 10ms)
+            // USB command delay (2 - 10ms)
             uint framerate;
             if(sscanf(word, "%u", &framerate) == 1 && framerate > 0){
-                // Max messages per second: 5 RGB + 1 indicator + 1 wait
-                uint delay = 1000 / framerate / 7;
-                if(delay < 1)
-                    delay = 1;
+                // Not all devices require the same number of messages per frame; select delay appropriately
+                uint per_frame = IS_MOUSE_DEV(kb) ? 2 : IS_FULLRANGE(kb) ? 14 : 5;
+                uint delay = 1000 / framerate / per_frame;
+                if(delay < 2)
+                    delay = 2;
                 else if(delay > 10)
                     delay = 10;
                 kb->usbdelay = delay;
@@ -196,6 +198,9 @@ int readcmd(usbdevice* kb, const char* line){
             }
             continue;
         }
+        case DELAY:
+            kb->delay = (!strcmp (word, "on")); // independendant from parameter to handle false commands like "delay off"
+            continue;
         default:;
         }
 

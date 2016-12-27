@@ -65,7 +65,7 @@ public:
     bool isRunning() const;
 
     // Blends the animation into a color map, taking opacity and mode into account
-    void blend(QHash<QString, QRgb>& animMap, quint64 timestamp);
+    void blend(ColorMap &animMap, quint64 timestamp);
 
     // Animation properties
     inline const QUuid&     guid() const                    { return _guid; }

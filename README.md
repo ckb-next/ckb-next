@@ -1,15 +1,17 @@
-ckb: RGB keyboards and mice on Linux and OS X
-=============================================
+ckb: RGB Driver for Linux and OS X
+==================================
 
 **ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+
+![Screenshot](https://i.imgur.com/zMK9jOP.png)
 
 **Disclaimer:** ckb is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
 If you use and enjoy this project, I'd appreciate if you could spare a few dollars for a donation. This is completely voluntary - the project will remain free and open source regardless. `:)`
 
-I accept donations through PayPal: [Click here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+I accept donations through PayPal: [![Click Here](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
-Or through Bitcoin: [1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ](https://blockchain.info/address/1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ) [(click here for QR code)](https://i.imgur.com/h3gyLiv.png)
+Or through Bitcoin: [![](https://i.imgur.com/DJTlQcJ.png) 1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ](https://blockchain.info/address/1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ)
 
 Contents
 --------
@@ -35,6 +37,7 @@ Keyboards:
 * K65 RGB
 * K70
 * K70 RGB
+* K70 LUX RGB
 * K95*
 * K95 RGB
 * Strafe
@@ -45,18 +48,36 @@ Keyboards:
 Mice:
 
 * M65 RGB
+* M65 PRO RGB
+* Sabre RGB
 * Scimitar RGB
 
 Linux Installation
 ------------------
 
-Requires Qt5, libudev, zlib, gcc, g++, and glibc (Ubuntu: `qt5-default`, `libudev-dev`, `build-essential`, `zlib1g-dev`. In other distros, Qt5 may be known as `qt5-base` or `libqt5*-devel`). Check with your package manager to make sure you have the correct libraries/headers installed.
+#### Pre-made packages:
 
-You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
+* Arch: [`aur/ckb-git`](https://aur.archlinux.org/packages/ckb-git/)
+* Gentoo: `emerge -av app-misc/ckb`
+
+These can be used to install ckb from your package manager. Note that I do not personally maintain these packages. For other distros, or if you want to create your own package, see instructions below.
+
+#### Preparation:
+
+ckb requires Qt5, libudev, zlib, gcc, g++, and glibc.
+
+* Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
+* Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
+* Arch: `sudo pacman -S base-devel qt5-base zlib`
+* Other distros: Look for `qt5` or `libqt5*-devel`
 
 Note: If you build your own kernels, ckb requires the uinput flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
-#### Reinstalling:
+#### Installing:
+
+You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
+
+#### Upgrading:
 
 To install a new version of ckb, or to reinstall the same version, first delete the ckb-master directory and the zip file from your previous download. Then download the source code again and re-run `quickinstall`. The script will automatically replace the previous installation. You may need to reboot afterward.
 
@@ -96,11 +117,11 @@ Install the latest version of Xcode from the App Store. Open Xcode, accept the l
 
 The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason, or if you'd like to compile manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md).
 
-#### Reinstalling (binary):
+#### Upgrading (binary):
 
 Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one.
 
-#### Reinstalling (source):
+#### Upgrading (source):
 
 Remove the existing ckb-master directory and zip file. Re-download the source code and run the `quickinstall` script again. The script will automatically replace the previous installation. You may need to reboot afterward.
 
@@ -145,35 +166,42 @@ Troubleshooting
 
 #### Linux
 
-If you have problems connecting the keyboard to your system (keyboard doesn't respond, ckb-daemon doesn't recognize it or can't connect the keyboard), try adding the following to your kernel's `cmdline`:
+If you have problems connecting the device to your system (device doesn't respond, ckb-daemon doesn't recognize or can't connect it) and/or you experience long boot times when using the keyboard, try adding the following to your kernel's `cmdline`:
 
-* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x408`
-* K70: `usbhid.quirks=0x1B1C:0x1B09:0x408`
-* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x408`
-* K95: `usbhid.quirks=0x1B1C:0x1B08:0x408`
-* K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x408`
-* Strafe: `usbhid.quirks=0x1B1C:0x1B15:0x408`
-* Strafe RGB: `usbhid.quirks=0x1B1C:0x1B20:0x408`
-* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x408`
-* Scimitar RGB: `usbhid.quirks=0x1B1C:0x1B1E:0x408`
+* K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x20000408`
+* K70: `usbhid.quirks=0x1B1C:0x1B09:0x0x20000408`
+* K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000408`
+* K95: `usbhid.quirks=0x1B1C:0x1B08:0x20000408`
+* K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x20000408`
+* Strafe: `usbhid.quirks=0x1B1C:0x1B15:0x20000408`
+* Strafe RGB: `usbhid.quirks=0x1B1C:0x1B20:0x20000408`
+* M65 RGB: `usbhid.quirks=0x1B1C:0x1B12:0x20000408`
+* Sabre RGB Optical: `usbhid.quirks=0x1B1C:0x1B14:0x20000408`
+* Sabre RGB Laser: `usbhid.quirks=0x1B1C:0x1B19:0x20000408`
+* Scimitar RGB: `usbhid.quirks=0x1B1C:0x1B1E:0x20000408`
 
 For instructions on adding `cmdline` parameters in Ubuntu, see https://wiki.ubuntu.com/Kernel/KernelBootParameters
 
-If you have multiple devices, combine them with commas. For instance, for K70 RGB + M65 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x400,0x1B1C:0x1B12:0x400`
+If you have multiple devices, combine them with commas, starting after the `=`. For instance, for K70 RGB + M65 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000408,0x1B1C:0x1B12:0x20000408`
 
-If the keyboard still doesn't work, try replacing `0x408` with `0x4`. Note that this will cause the kernel driver to ignore the keyboard completely, so you need to ensure ckb-daemon is running at boot or else you'll have no keyboard input.
+If it still doesn't work, try replacing `0x20000408` with `0x4`. Note that this will cause the kernel driver to ignore the device(s) completely, so you need to ensure ckb-daemon is running at boot or else you'll have no input. This will not work if you are using full-disk encryption.
 
-If you're using **Unity** and the tray icon doesn't appear correctly, install the following package: `libappindicator-dev`. Then reinstall ckb.
+If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo apt-get install libappindicator-dev`. Then reinstall ckb.
 
 #### OS X
 
-- **“ckb.pkg” can’t be opened because it is from an unidentified developer.**
-- Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
-- **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly.**
-- ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
-- **Compile problems** can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
-- **Keyboard doesn't work at boot, even when ckb is not installed.**
-- Unfortunately there is no known fix for this. You will need to unplug and replug the keyboard or try a different port/USB hub.
+- **“ckb.pkg” can’t be opened because it is from an unidentified developer**    
+    Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
+- **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly**    
+    ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
+- **`~` key prints `§±`**    
+    Check your keyboard layout on ckb's Settings screen. Choose the layout that matches your physical keyboard.
+- **Compile problems**    
+    Can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
+- **Scroll wheel does not scroll**    
+    As of #c3474d2 it's now possible to **disable scroll acceleration** from the GUI. You can access it under "OSX tweaks" in the "More settings" screen. Once disabled, the scroll wheel should behave consistently.
+
+
 
 #### General
 
@@ -192,7 +220,7 @@ Common issues:
 
 #### Reporting issues
 
-If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/ccMSC/ckb/issues) or [the Corsair User Forum thread](http://forum.corsair.com/v3/showthread.php?t=133929). I usually try to respond within 48 hours. Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
+If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/ccMSC/ckb/issues). Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
 
 Known issues
 ------------

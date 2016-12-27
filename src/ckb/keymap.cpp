@@ -33,6 +33,13 @@ struct KeyPatch {
     const char* name;
 };
 
+static const KeyPatch patchDK[] = {
+    {0, "§", "grave"}, {0, "+", "minus"}, {0, "´", "equal"},
+    {0, "Å", "lbrace"}, {0, "¨", "rbrace"},
+    {0, "Æ", "colon"}, {0, "Ø", "quote"}, {0, "'", "hash"},
+    {0, "<", "bslash_iso"}, {0, "-", "slash"},
+};
+
 static const KeyPatch patchEU[] = {
     {0, "\\ (R)", "hash"},
     {0, "\\ (L)", "bslash_iso"}
@@ -56,6 +63,13 @@ static const KeyPatch patchIT[] = {
     {0, "\\", "grave"}, {0, "'", "minus"}, {0, "Ì", "equal"},
     {0, "È", "lbrace"}, {0, "+", "rbrace"},
     {0, "Ò", "colon"}, {0, "À", "quote"}, {0, "Ù", "hash"},
+    {0, "<", "bslash_iso"}, {0, "-", "slash"},
+};
+
+static const KeyPatch patchNO[] = {
+    {0, "§", "grave"}, {0, "+", "minus"}, {0, "´", "equal"},
+    {0, "Å", "lbrace"}, {0, "¨", "rbrace"},
+    {0, "Ø", "colon"}, {0, "Æ", "quote"}, {0, "'", "hash"},
     {0, "<", "bslash_iso"}, {0, "-", "slash"},
 };
 
@@ -141,7 +155,8 @@ static const Key K65TopRow[] = {
 static const Key KStrafeKeys[] = {
     {0, "Sidelight", "lsidel", 0, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT, true, false},
     {0, "Sidelight", "rsidel", KSTRAFE_WIDTH, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT, true, false},
-    {0, "Logo", "logo", KSTRAFE_X_START, 0, NS, true, false}
+    {0, "Logo", "logo", KSTRAFE_X_START, 0, NS, true, false},
+    {0, "Function", "fn", 152, 75, NS, true, true}
 };
 
 // Mouse map - M65
@@ -211,6 +226,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map = K95BaseMap;
         // Patch the map for the layout
         switch(layout){
+        case KeyMap::DK:
+            patch(map, patchDK);
+            break;
         case KeyMap::EU_DVORAK:
             patch(map, patchDvorak);    // fall through
         case KeyMap::EU:
@@ -228,6 +246,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             break;
         case KeyMap::IT:
             patch(map, patchIT);
+            break;
+        case KeyMap::NO:
+            patch(map, patchNO);
             break;
         case KeyMap::MX:
             patch(map, patchMX);
@@ -294,10 +315,12 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             i.next();
             i.value().x += KSTRAFE_X_START;
         }
-        // add sidelights
+        // Add Strafe lights and keys
         map["lsidel"] = KStrafeKeys[0];
         map["rsidel"] = KStrafeKeys[1];
         map["logo"] = KStrafeKeys[2];
+        map["fn"] = KStrafeKeys[3];
+        map.remove("rwin");
         // remove media controls
         map.remove("mute");
         map.remove("volup");
@@ -353,7 +376,9 @@ KeyMap::Layout KeyMap::locale(){
     setlocale(LC_ALL, "");
     QString loc = setlocale(LC_CTYPE, 0);
     loc = loc.toLower().replace('_', '-');
-    if(loc.startsWith("fr-"))
+    if(loc.startsWith("dk-"))
+        return KeyMap::DK;
+    else if(loc.startsWith("fr-"))
         return KeyMap::FR;
     else if(loc.startsWith("de-"))
         return KeyMap::DE;
@@ -361,6 +386,8 @@ KeyMap::Layout KeyMap::locale(){
         return KeyMap::IT;
     else if(loc.startsWith("pl-"))
         return KeyMap::PL;
+    else if(loc.startsWith("no-"))
+        return KeyMap::NO;
     else if(loc.startsWith("es-es"))
         // Spain uses the ES layout
         return KeyMap::ES;
@@ -379,6 +406,8 @@ KeyMap::Layout KeyMap::locale(){
 
 KeyMap::Layout KeyMap::getLayout(const QString& name){
     QString lower = name.toLower();
+    if(lower == "dk")
+        return DK;
     if(lower == "eu")
         return EU;
     if(lower == "eu_dvorak")
@@ -395,6 +424,8 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
         return DE;
     if(lower == "it")
         return IT;
+    if(lower == "no")
+        return NO;
     if(lower == "pl")
         return PL;
     if(lower == "mx")
@@ -410,6 +441,8 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
 
 QString KeyMap::getLayout(KeyMap::Layout layout){
     switch(layout){
+    case DK:
+        return "dk";
     case EU:
         return "eu";
     case EU_DVORAK:
@@ -428,6 +461,8 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "de";
     case IT:
         return "it";
+    case NO:
+        return "no";
     case PL:
         return "pl";
     case MX:
@@ -443,12 +478,14 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
 
 QStringList KeyMap::layoutNames(){
     return QStringList()
+            << "Danish"
             << "English (ISO/European)" << "English (ISO/European, Dvorak)"
             << "English (United Kingdom)" << "English (United Kingdom, Dvorak)"
             << "English (United States)" << "English (United States, Dvorak)"
             << "French"
             << "German"
             << "Italian"
+            << "Norwegian"
             << "Polish"
             << "Spanish (Latin America)"
             << "Spanish (Spain)"
@@ -573,15 +610,35 @@ QStringList KeyMap::byPosition() const {
 
 QString KeyMap::friendlyName(const QString& key, Layout layout){
     // Try K95 map first
+    // FIXME: This is an odd function and probably should be refactored
+    // it would probably be best to remove the friendly names from the maps and have a completely separate name->friendlyName store
     KeyMap map(K95, layout);
     if(map.contains(key))
         return map[key].friendlyName();
-    // If that didn't work, try mice
+
+    // The only key missing from it should be Fn, which is found on STRAFE
+    map = KeyMap(STRAFE, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+
+    // Additionally, there are a handful of keys not present on any physical keyboard, but we need names for them
+    if(key == "f13" || key == "f14" || key == "f15" || key == "f16" || key == "f17" || key == "f18" || key == "f19" || key == "f20")
+        return key.toUpper();
+    else if(key == "lightup")
+        return "Screen Brightness Up";
+    else if(key == "lightdn")
+        return "Screen Brightness Down";
+    else if(key == "eject" || key == "power")
+        return key[0].toUpper() + key.mid(1);   // capitalize first letter
+
+    // All other names are found on mice
     map = KeyMap(SCIMITAR, layout);
     if(map.contains(key))
         return map[key].friendlyName();
     map = KeyMap(M65, layout);
     if(map.contains(key))
         return map[key].friendlyName();
+
+    // Not found at all
     return "";
 }

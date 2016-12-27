@@ -241,7 +241,6 @@
   </layout>
   <zorder>label</zorder>
   <zorder>line</zorder>
-  <zorder>verticalSpacer</zorder>
   <zorder>label_2</zorder>
   <zorder>line_2</zorder>
   <zorder>widget</zorder>

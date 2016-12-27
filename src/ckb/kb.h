@@ -32,6 +32,9 @@ public:
     // Whether dithering is used (all devices)
     static inline bool              dither()                            { return _dither; }
     static void                     dither(bool newDither);
+    // Macro Delay setting
+    static inline bool              macroDelay()                        { return _delay; }
+    static void                     macroDelay(bool flag);
     // OSX: mouse acceleration toggle (all devices)
     static inline bool              mouseAccel()                        { return _mouseAccel; }
     static void                     mouseAccel(bool newAccel);
@@ -83,6 +86,25 @@ public:
 
     void hwSave();
 
+    //////////
+    /// For usage with macro definions, these two params must only be readable.
+    /// So there are no setters.
+    /// \brief getMacroNumber returns the macroNumber, which we have saved in the constructor.
+    /// For usage with macro definions, this param must only be readable.
+    /// So there is no setter.
+    /// \return The Number is returned as int.
+    ///
+    inline int getMacroNumber () { return macroNumber; }
+
+    ///
+    /// \brief getMacroPath returns the macroPath (e.g. /dev/input/ckb1/notify),
+    /// which we have saved in the constructor.
+    /// For usage with macro definions, this param must only be readable.
+    /// So there is no setter.
+    /// \return The absolute path as String
+    ///
+    inline QString getMacroPath () { return macroPath; }
+
     ~Kb();
 
 signals:
@@ -124,8 +146,13 @@ private:
 
     inline bool isOpen() const { return cmd.isOpen(); }
 
-    // File paths
-    QString devpath, cmdpath, notifyPath;
+    //////////
+    /// \brief pathVars
+    /// devpath is the device root path (e.g. /dev/device/ckb1),
+    /// cmdpath leads to the daemon input pipe for daemon commands,
+    /// notifyPath is the standard input monitor for general purpose,
+    /// macroPath added for a second thread to read macro input.
+    QString devpath, cmdpath, notifyPath, macroPath;
     // Is this the keyboard at the given serial/path?
     inline bool matches(const QString& path, const QString& serial) { return path.trimmed() == devpath.trimmed() && usbSerial == serial.trimmed().toUpper(); }
 
@@ -162,8 +189,13 @@ private:
 
     // cmd and notify file handles
     QFile cmd;
-    // Notification number
+
+    /// \brief notifyNumber is the trailing number in the device path.
     int notifyNumber;
+    // Macro Numer to notify macro definition events
+    int macroNumber;
+    // flag if macro delay hast to be switched on
+    static bool _delay;
 
     // Needs to be saved?
     bool _needsSave;

@@ -1,3 +1,4 @@
+#include <qdebug.h>
 #include "keyaction.h"
 #include "kb.h"
 #include "kbanim.h"
@@ -42,7 +43,9 @@ KeyAction::~KeyAction(){
 
 QString KeyAction::defaultAction(const QString& key){
     // G1-G18 are unbound by default
-    if(key.length() >= 2 && key[0] == 'g' && key[1] >= '0' && key[1] <= '9')
+    if(key.length() >= 2 && key[0] == 'g'
+		&& ((key.length() == 2 && key[1] >= '0' && key[1] <= '9')
+		|| (key.length() == 3 && key[1] == '1' && key[2] >= '0' && key[2] <= '8')))
         return "";
     // So are thumbgrid buttons
     if(key.startsWith("thumb"))
@@ -137,6 +140,8 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         return "Start animation";
     } else if(prefix == "$program"){
         return "Launch program";
+    } else if(prefix == "$macro"){
+        return "Send G-key macro";
     }
     return "(Unknown)";
 }
@@ -419,11 +424,27 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
             else
                 relProgram = process;
         }
+    } else if (prefix == "$macro") {
+        // Do nothing, because all work is done by the keyboard itself.
+        // For now, there is no reason to react on G-key press or release.
+        // If u find some reason, then here is the place for it.
     }
+}
+
+/// \brief KeyAction::macroDisplay is just for debugging.
+/// It shows the content of the key action and some other info.
+///
+void KeyAction::macroDisplay() {
+    qDebug() << "isMacro returns" << (isMacro() ? "true" : "false");
+    qDebug() << "isValidMacro returns" << (isValidMacro() ? "true" : "false");
+    QStringList ret =_value.split(":");
+    qDebug() << "Macro definition conains" << ret.count() << "elements";
+    qDebug() << "Macro definition is" << _value;
 }
 
 void KeyAction::adjustDisplay(){
 #ifdef USE_LIBX11
+    // Try to get the current display from the X server
     char* display_name = XDisplayName(NULL);
     if(!display_name)
         return;
@@ -431,8 +452,10 @@ void KeyAction::adjustDisplay(){
     if(!display)
         return;
     char* display_string = DisplayString(display);
-    if(!display_string)
+    if(!display_string || strlen(display_string) == 0){
+        XCloseDisplay(display);
         return;
+    }
     size_t envstr_size = strlen(display_string) + 4;
     char* envstr = new char[envstr_size];
     strncpy(envstr, display_string, envstr_size);
@@ -444,6 +467,7 @@ void KeyAction::adjustDisplay(){
     int root_x, root_y, win_x, win_y;
     unsigned int mask_ret;
 
+    // Find the screen which currently has the mouse
     XQueryPointer(display, root_window, &root_window_ret, &child_window_ret, &root_x, &root_y, &win_x, &win_y, &mask_ret);
     if(child_window_ret == (Window)NULL)
         window = root_window_ret;
@@ -459,10 +483,24 @@ void KeyAction::adjustDisplay(){
         char buf[16];
         snprintf(buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
         strncat(envstr, buf, envstr_size - 1 - strlen(envstr));
+
+        // Update environment variable
+        setenv("DISPLAY", envstr, 1);
     }
-    setenv("DISPLAY", envstr, 1);
 
     delete[] envstr;
     XCloseDisplay(display);
 #endif
+}
+
+//////////
+/// \brief KeyAction::macroAction is called when applying changes on a macro definition.
+/// macroAction ist called while being in the macro pane
+/// and clicking Apply with something in the Macro Text Box.
+/// It tags that input with "$macro:" for further recognition.
+/// \param macroDef holds the String containing parts 2-4 of a complete macro definition.
+/// \return QString holding the complete G-Key macro definition (parts 1-4)
+///
+QString KeyAction::macroAction(QString macroDef) {
+    return QString ("$macro:%1").arg(macroDef);
 }

@@ -5,7 +5,8 @@
 int macromask(const uchar* key1, const uchar* key2){
     // Scan a macro against key input. Return 0 if any of them don't match
     for(int i = 0; i < N_KEYBYTES_INPUT; i++){
-        if((key1[i] & key2[i]) != key2[i])
+        // if((key1[i] & key2[i]) != key2[i])
+        if(key1[i] != key2[i])  // Changed to detect G-keys + modifiers
             return 0;
     }
     return 1;
@@ -32,8 +33,13 @@ static void inputupdate_keys(usbdevice* kb){
                         macroaction* action = macro->actions + a;
                         if(action->rel_x != 0 || action->rel_y != 0)
                             os_mousemove(kb, action->rel_x, action->rel_y);
-                        else
+                        else {
                             os_keypress(kb, action->scan, action->down);
+                            if (kb->delay) {
+                                if (a > 200) usleep (100);
+                                else if (a > 20) usleep(30);
+                            }
+                        }
                     }
                 }
             } else {
@@ -130,26 +136,36 @@ void inputupdate(usbdevice* kb){
         input->rel_x = input->rel_y = 0;
     }
     // Finish up
-    os_isync(kb);
     memcpy(input->prevkeys, input->keys, N_KEYBYTES_INPUT);
 }
 
 void updateindicators_kb(usbdevice* kb, int force){
-    uchar old = kb->hw_ileds;
-    os_updateindicators(kb, force);
+    // Read current hardware indicator state (set externally)
+    uchar old = kb->ileds, hw_old = kb->hw_ileds_old;
+    uchar new = kb->hw_ileds, hw_new = new;
+    // Update them if needed
+    if(kb->active){
+        usbmode* mode = kb->profile->currentmode;
+        new = (new & ~mode->ioff) | mode->ion;
+    }
+    kb->ileds = new;
+    kb->hw_ileds_old = hw_new;
+    if(old != new || force){
+        DELAY_SHORT(kb);
+        os_sendindicators(kb);
+    }
     // Print notifications if desired
     if(!kb->active)
         return;
-    uchar new = kb->hw_ileds;
     usbmode* mode = kb->profile->currentmode;
     uchar indicators[] = { I_NUM, I_CAPS, I_SCROLL };
     for(unsigned i = 0; i < sizeof(indicators) / sizeof(uchar); i++){
         uchar mask = indicators[i];
-        if((old & mask) == (new & mask))
+        if((hw_old & mask) == (hw_new & mask))
             continue;
         for(int notify = 0; notify < OUTFIFO_MAX; notify++){
             if(mode->inotify[notify] & mask)
-                nprintind(kb, notify, mask, new & mask);
+                nprintind(kb, notify, mask, hw_new & mask);
         }
     }
 }

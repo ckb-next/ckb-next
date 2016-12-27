@@ -10,13 +10,23 @@
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"
-#define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K65)
+#define P_K65_LUX       0x1b37
+#define P_K65_LUX_STR   "1b37"
+#define P_K65_RFIRE     0x1b39
+#define P_K65_RFIRE_STR "1b39"
+#define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
-#define P_K70           0x1b13
-#define P_K70_STR       "1b13"
-#define P_K70_NRGB      0x1b09
-#define P_K70_NRGB_STR  "1b09"
-#define IS_K70(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB))
+#define P_K70                0x1b13
+#define P_K70_STR            "1b13"
+#define P_K70_NRGB           0x1b09
+#define P_K70_NRGB_STR       "1b09"
+#define P_K70_LUX            0x1b33
+#define P_K70_LUX_STR        "1b33"
+#define P_K70_LUX_NRGB	     0x1b36
+#define P_K70_LUX_NRGB_STR   "1b36"
+#define P_K70_RFIRE          0x1b38
+#define P_K70_RFIRE_STR      "1b38"
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
 
 #define P_K95           0x1b11
 #define P_K95_STR       "1b11"
@@ -32,13 +42,19 @@
 
 #define P_M65           0x1b12
 #define P_M65_STR       "1b12"
-#define IS_M65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65))
+#define P_M65_PRO       0x1b2e
+#define P_M65_PRO_STR   "1b2e"
+#define IS_M65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO))
 
-#define P_SABRE_O       0x1b14
+#define P_SABRE_O       0x1b14  /* optical */
 #define P_SABRE_O_STR   "1b14"
-#define P_SABRE_L       0x1b19
+#define P_SABRE_L       0x1b19  /* laser */
 #define P_SABRE_L_STR   "1b19"
-#define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L))
+#define P_SABRE_N       0x1b2f  /* new? */
+#define P_SABRE_N_STR   "1b2f"
+#define P_SABRE_O2      0x1b32 /* Observed on a CH-9000111-EU model SABRE */
+#define P_SABRE_O2_STR  "1b32"
+#define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
 
 #define P_SCIMITAR      0x1b1e
 #define P_SCIMITAR_STR  "1b1e"
@@ -57,9 +73,15 @@ const char* product_str(short product);
 // (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
 #define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 #define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
+#define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
+#define IS_MONOCHROME_DEV(kb)           IS_MONOCHROME((kb)->vendor, (kb)->product)
+
+// Full color range (16.8M) vs partial color range (512)
+#define IS_FULLRANGE(kb)                (IS_RGB((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95)
 
 // Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SCIMITAR)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SABRE_O2)))
+#define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)
@@ -103,6 +125,8 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
 // OS: Gets input from a USB device. Return same as above.
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line);
+// OS: Update HID indicator LEDs (Num Lock, Caps, etc). Read from kb->ileds.
+void os_sendindicators(usbdevice* kb);
 
 // Non-RGB K95 command. Returns 0 on success.
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);

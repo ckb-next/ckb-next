@@ -34,7 +34,7 @@ BINDIR="bin"
 [[ $PREFIX == "" ]] && PREFIX="/usr/bin"
 [[ "$OSTYPE" == "darwin"* ]] && PREFIX="/Applications"
 
-if [[ `pwd` == *" "* ]]; then
+if [[ $(readlink -f "`pwd`") == *" "* ]]; then
     echo "Error: you must compile ckb in a directory with no spaces."
     echo "Move or rename the folder and try again."
     finish 1
@@ -53,7 +53,13 @@ if [[ -d $SRCDIR ]]; then
     echo "Compiling binaries..."
     echo "(This can take a while, please be patient)"
     newtmp
-    make -j 24 "$@" 2>$TMPFILE
+    # Find out how many cores the system has, for make
+    JOBS=$(getconf _NPROCESSORS_ONLN 2>/dev/null)
+    # Default to 2 jobs if something went wrong earlier
+    if [[ -z "$JOBS" ]]; then
+        JOBS=2
+    fi
+    make -j "$JOBS" "$@" 2>$TMPFILE
     checkfail $?
     echo ""
     echo "Finished!"
@@ -136,7 +142,7 @@ if [[ $systemdc -eq 0 && `echo "$systemd" | wc -l` -ge 1 ]]; then
         sudo systemctl stop ckb-daemon >/dev/null 2>&1
         sudo mkdir -p /usr/lib/systemd/system
         checkfail $?
-        sudo install service/systemd/ckb-daemon.service /usr/lib/systemd/system 2>$TMPFILE
+        sudo install -m 0644 service/systemd/ckb-daemon.service /usr/lib/systemd/system 2>$TMPFILE
         checkfail $?
         sudo systemctl daemon-reload >/dev/null 2>&1
         sudo systemctl enable ckb-daemon 2>$TMPFILE

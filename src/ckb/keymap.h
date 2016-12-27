@@ -64,6 +64,7 @@ public:
     // Key layouts (ordered alphabetically by name)
     enum Layout {
         NO_LAYOUT = -1,
+        DK,                 // Danish
         EU,                 // English (EU)
         EU_DVORAK,
         GB,                 // English (UK)
@@ -73,6 +74,7 @@ public:
         FR,                 // French
         DE,                 // German
         IT,                 // Italian
+        NO,                 // Norwegian
         PL,                 // Polish (identical to US)
         MX,                 // Spanish (Mexico/Latin America)
         ES,                 // Spanish (Spain)
@@ -136,7 +138,7 @@ public:
     QStringList byPosition() const;
 
     // Friendly key name on any device
-    static QString friendlyName(const QString& key, Layout layout);
+    static QString friendlyName(const QString& key, Layout layout = US);
 
 private:
     static int modelWidth(Model model);

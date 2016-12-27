@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#Newline
+N=$'\r\n'
+
+echo "This script will collect information about the Corsair devices in your system."
+read -p "Please make sure they are plugged in and press Enter.${N}"
+
+#Force English
+export LANG=C
+
+#Check if user can write to the PWD
+touch ckb-dev-detect-report.gz
+TOUCHRET=$?
+if [ $TOUCHRET -ne 0 ]; then
+    echo "Could not write the report to disk, make sure this user can write to ${PWD}/"
+    echo "Retval: $TOUCHRET"
+    exit
+fi
+
+OUT="ckb-dev-detect - $(date)"
+
+#Applies to both
+OUT="${OUT}${N}${N}Kernel: `uname -a`"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    #Mac
+    OUT="${OUT}${N}${N}OS Version:${N}`sw_vers`"
+    OUT="${OUT}${N}${N}USB Devices:${N}`system_profiler SPUSBDataType -detailLevel mini | grep -i -B3 -A9 1b1c`"
+else
+    #Linux
+    OUT="${OUT}${N}${N}OS Version:${N}`lsb_release -a 2>/dev/null`"
+    OUT="${OUT}${N}${N}USB Devices:${N}`lsusb -vd '1b1c:'` 2>&1"
+    OUT="${OUT}${N}${N}Dmesg:${N}`dmesg | grep -i \"ckb\|corsair\|1b1c\|hid-generic\"`"
+fi
+
+#Gzip and write output
+echo "$OUT" | gzip > ckb-dev-detect-report.gz
+
+echo "Done! Please send the following report to the developers."
+echo "Location: ${PWD}/ckb-dev-detect-report.gz"

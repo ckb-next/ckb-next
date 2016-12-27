@@ -13,13 +13,13 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     if(kb->fwversion >= 0x120 && !is_recv){
         struct usbdevfs_bulktransfer transfer;
         memset(&transfer, 0, sizeof(transfer));
-        transfer.ep = (kb->fwversion >= 0x130) ? 4 : 3;
+        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
         res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {
-        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, (void*)out_msg };
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     }
     if(res <= 0){
@@ -51,11 +51,11 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         transfer.data = in_msg;
         res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {*/
-        struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, 0x03, MSG_SIZE, 5000, in_msg };
+        struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     //}
     if(res <= 0){
-        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
+        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data read");
         if(res == -1 && errno == ETIMEDOUT)
             return -1;
         else
@@ -70,11 +70,18 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
         return 0;
     struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 5000, 0 };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
-    if(res < 0){
-        ckb_err_fn("%s\n", file, line, strerror(-res));
+    if(res <= 0){
+        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
         return 1;
     }
     return 0;
+}
+
+void os_sendindicators(usbdevice* kb){
+    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
+    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    if(res <= 0)
+        ckb_err("%s\n", res ? strerror(errno) : "No data written");
 }
 
 void* os_inputmain(void* context){
@@ -84,8 +91,9 @@ void* os_inputmain(void* context){
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Starting input thread for %s%d\n", devpath, index);
 
-    // Monitor input transfers on all endpoints
-    const int urbcount = 3;
+    // Monitor input transfers on all endpoints for non-RGB devices
+    // For RGB, monitor all but the last, as it's used for input/output
+    int urbcount = IS_RGB(vendor, product) ? (kb->epcount - 1) : kb->epcount;
     struct usbdevfs_urb urbs[urbcount];
     memset(urbs, 0, sizeof(urbs));
     urbs[0].buffer_length = 8;
@@ -95,6 +103,8 @@ void* os_inputmain(void* context){
         else
             urbs[1].buffer_length = 21;
         urbs[2].buffer_length = MSG_SIZE;
+        if(urbcount != 3)
+            urbs[urbcount - 1].buffer_length = MSG_SIZE;
     } else {
         urbs[1].buffer_length = 4;
         urbs[2].buffer_length = 15;
@@ -126,29 +136,33 @@ void* os_inputmain(void* context){
             // Process input (if any)
             pthread_mutex_lock(imutex(kb));
             if(IS_MOUSE(vendor, product)){
-                switch(urb->endpoint){
-                case 0x82:
-                    // RGB mouse input
+                switch(urb->actual_length){
+                case 8:
+                case 10:
+                case 11:
+                    // HID mouse input
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -(urb->endpoint & 0xF), urb->actual_length, urb->buffer);
                     break;
-                case 0x83:
-                    corsair_mousecopy(kb->input.keys, urb->buffer);
+                case MSG_SIZE:
+                    // Corsair mouse input
+                    corsair_mousecopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
                     break;
                 }
             } else if(IS_RGB(vendor, product)){
-                switch(urb->endpoint){
-                case 0x81:
+                switch(urb->actual_length){
+                case 8:
                     // RGB EP 1: 6KRO (BIOS mode) input
                     hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
                     break;
-                case 0x82:
+                case 21:
+                case 5:
                     // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
                     if(!kb->active)
                         hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
                     break;
-                case 0x83:
+                case MSG_SIZE:
                     // RGB EP 3: Corsair input
-                    corsair_kbcopy(kb->input.keys, urb->buffer);
+                    corsair_kbcopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
                     break;
                 }
             } else
@@ -170,9 +184,9 @@ void* os_inputmain(void* context){
     return 0;
 }
 
-int usbunclaim(usbdevice* kb, int resetting, int rgb){
+int usbunclaim(usbdevice* kb, int resetting){
     int handle = kb->handle - 1;
-    int count = (rgb) ? 4 : 3;
+    int count = kb->epcount;
     for(int i = 0; i < count; i++)
         ioctl(handle, USBDEVFS_RELEASEINTERFACE, &i);
     // For RGB keyboards, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
@@ -182,10 +196,8 @@ int usbunclaim(usbdevice* kb, int resetting, int rgb){
         ioctl(handle, USBDEVFS_IOCTL, &ctl);
         ctl.ifno = 1;
         ioctl(handle, USBDEVFS_IOCTL, &ctl);
-        // Reconnect all handles for non-RGB keyboards
+        // Also reconnect iface #2 (HID) for non-RGB keyboards
         if(!HAS_FEATURES(kb, FEAT_RGB)){
-            ctl.ifno = 0;
-            ioctl(handle, USBDEVFS_IOCTL, &ctl);
             ctl.ifno = 2;
             ioctl(handle, USBDEVFS_IOCTL, &ctl);
         }
@@ -194,24 +206,23 @@ int usbunclaim(usbdevice* kb, int resetting, int rgb){
 }
 
 void os_closeusb(usbdevice* kb){
-    usbunclaim(kb, 0, HAS_FEATURES(kb, FEAT_RGB));
-    close(kb->handle - 1);
-    udev_device_unref(kb->udev);
+    if(kb->handle){
+        usbunclaim(kb, 0);
+        close(kb->handle - 1);
+    }
+    if(kb->udev)
+        udev_device_unref(kb->udev);
     kb->handle = 0;
     kb->udev = 0;
     kbsyspath[INDEX_OF(kb, keyboard)][0] = 0;
 }
 
-int usbclaim(usbdevice* kb, int rgb){
-    // 0 is for BIOS mode/non-RGB key input
-    // 1 is for standard HID key input
-    // 2 is for Corsair input
-    // 3 is for the LED and board controller (not present on non-RGB models)
-    int count = (rgb) ? 4 : 3;
+int usbclaim(usbdevice* kb){
+    int count = kb->epcount;
     for(int i = 0; i < count; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        if((ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl) && errno != ENODATA)
-                || ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
+        ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
+        if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
             return -1;
     }
     return 0;
@@ -226,9 +237,9 @@ int usbclaim(usbdevice* kb, int rgb){
     }
 
 int os_resetusb(usbdevice* kb, const char* file, int line){
-    TEST_RESET(usbunclaim(kb, 1, HAS_FEATURES(kb, FEAT_RGB)));
+    TEST_RESET(usbunclaim(kb, 1));
     TEST_RESET(ioctl(kb->handle - 1, USBDEVFS_RESET));
-    TEST_RESET(usbclaim(kb, HAS_FEATURES(kb, FEAT_RGB)));
+    TEST_RESET(usbclaim(kb));
     // Success!
     return 0;
 }
@@ -272,8 +283,17 @@ int os_setupusb(usbdevice* kb){
     ckb_info("Connecting %s at %s%d\n", kb->name, devpath, index);
 
     // Claim the USB interfaces
-    if(usbclaim(kb, HAS_FEATURES(kb, FEAT_RGB))){
-        ckb_err("Failed to claim interface: %s\n", strerror(errno));
+    const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
+    kb->epcount = 0;
+    if(ep_str)
+        sscanf(ep_str, "%d", &kb->epcount);
+    if(kb->epcount == 0){
+        // This shouldn't happen, but if it does, assume EP count based on what the device is supposed to have
+        kb->epcount = (HAS_FEATURES(kb, FEAT_RGB) ? 4 : 3);
+        ckb_warn("Unable to read endpoint count from udev, assuming %d...\n", kb->epcount);
+    }
+    if(usbclaim(kb)){
+        ckb_err("Failed to claim interfaces: %s\n", strerror(errno));
         return -1;
     }
     return 0;
@@ -333,17 +353,25 @@ typedef struct {
 static _model models[] = {
     // Keyboards
     { P_K65_STR, P_K65 },
+    { P_K65_LUX_STR, P_K65_LUX },
+    { P_K65_RFIRE_STR, P_K65_RFIRE },
     { P_K70_STR, P_K70 },
     { P_K70_NRGB_STR, P_K70_NRGB },
+    { P_K70_LUX_STR, P_K70_LUX },
+    { P_K70_LUX_NRGB_STR, P_K70_LUX_NRGB },
+    { P_K70_RFIRE_STR, P_K70_RFIRE },
     { P_K95_STR, P_K95 },
     { P_K95_NRGB_STR, P_K95_NRGB },
     { P_STRAFE_STR, P_STRAFE },
     { P_STRAFE_NRGB_STR, P_STRAFE_NRGB },
     // Mice
     { P_M65_STR, P_M65 },
+    { P_M65_PRO_STR, P_M65_PRO },
     { P_SABRE_O_STR, P_SABRE_O },
     { P_SABRE_L_STR, P_SABRE_L },
-    { P_SCIMITAR_STR, P_SCIMITAR }
+    { P_SABRE_N_STR, P_SABRE_N },
+    { P_SCIMITAR_STR, P_SCIMITAR },
+    { P_SABRE_O2_STR, P_SABRE_O2 }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

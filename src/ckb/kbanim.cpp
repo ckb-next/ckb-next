@@ -1,6 +1,7 @@
 #include <cmath>
 #include <QDateTime>
 #include <QMetaEnum>
+#include <QDebug>
 #include "ckbsettings.h"
 #include "kbanim.h"
 
@@ -361,28 +362,55 @@ static float blendDivide(float bg, float fg){
 typedef float (*blendFunc)(float,float);
 static blendFunc functions[5] = { blendNormal, blendAdd, blendSubtract, blendMultiply, blendDivide };
 
-void KbAnim::blend(QHash<QString, QRgb>& animMap, quint64 timestamp){
+void KbAnim::blend(ColorMap& animMap, quint64 timestamp){
     if(!_script)
         return;
 
     // Fetch the next frame from the script
     catchUp(timestamp);
     _script->frame(timestamp);
-    QHashIterator<QString, QRgb> i(_script->colors());
-    blendFunc f = functions[(int)_mode];
-    while(i.hasNext()){
+
+    // Blend the script's map with the current map
+    int blendMode = (int)_mode;
+    blendFunc blend = functions[blendMode];
+    float fOpacity = _opacity / 255.f;  // save some math by pre-dividing the 255 for qAlpha
+
+    const ColorMap& scriptMap = _script->colors();
+    int count = animMap.count();
+    if(scriptMap.count() != count){
+        qDebug() << "Script map didn't match base map (" << count << " vs " << scriptMap.count() << "). This should never happen.";
+        return;
+    }
+    QRgb* background = animMap.colors();
+    const QRgb* foreground = scriptMap.colors();
+    for(int i = 0; i < count; i++){
         // Mix the colors in with the color map according to blend mode and alpha
-        i.next();
-        const QString& key = i.key();
-        if(!animMap.contains(key))
+        QRgb& bg = background[i];
+        QRgb fg = foreground[i];
+        int alpha = qAlpha(fg);
+        if(alpha == 0)
             continue;
-        QRgb& bg = animMap[key];
-        QRgb fg = i.value();
-        float r = qRed(bg) / 255.f, g = qGreen(bg) / 255.f, b = qBlue(bg) / 255.f;
-        float a = qAlpha(fg) * _opacity / 255.f;
-        r = r * (1.f - a) + f(r, qRed(fg) / 255.f) * a;
-        g = g * (1.f - a) + f(g, qGreen(fg) / 255.f) * a;
-        b = b * (1.f - a) + f(b, qBlue(fg) / 255.f) * a;
-        bg = qRgb(round(r * 255.f), round(g * 255.f), round(b * 255.f));
+        if(blendMode == 0){
+            // Blend: normal
+            // This is the most common use case and it requires much less arithmetic
+            if(alpha == 255){
+                bg = fg;
+            } else {
+                float r = qRed(bg), g = qGreen(bg), b = qBlue(bg);
+                float a = alpha * fOpacity;
+                r = r * (1.f - a) + qRed(fg) * a;
+                g = g * (1.f - a) + qGreen(fg) * a;
+                b = b * (1.f - a) + qBlue(fg) * a;
+                bg = qRgb(round(r), round(g), round(b));
+            }
+        } else {
+            // Use blend function
+            float r = qRed(bg) / 255.f, g = qGreen(bg) / 255.f, b = qBlue(bg) / 255.f;
+            float a = alpha * fOpacity;
+            r = r * (1.f - a) + blend(r, qRed(fg) / 255.f) * a;
+            g = g * (1.f - a) + blend(g, qGreen(fg) / 255.f) * a;
+            b = b * (1.f - a) + blend(b, qBlue(fg) / 255.f) * a;
+            bg = qRgb(round(r * 255.f), round(g * 255.f), round(b * 255.f));
+        }
     }
 }

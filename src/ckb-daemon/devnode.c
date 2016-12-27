@@ -168,7 +168,9 @@ static int _mkdevpath(usbdevice* kb){
         // Create command FIFO
         char inpath[sizeof(path) + 4];
         snprintf(inpath, sizeof(inpath), "%s/cmd", path);
-        if(mkfifo(inpath, gid >= 0 ? S_CUSTOM : S_READWRITE) != 0 || (kb->infifo = open(inpath, O_RDONLY | O_NONBLOCK) + 1) == 0){
+        if(mkfifo(inpath, gid >= 0 ? S_CUSTOM : S_READWRITE) != 0
+                // Open the node in RDWR mode because RDONLY will lock the thread
+                || (kb->infifo = open(inpath, O_RDWR) + 1) == 0){
             // Add one to the FD because 0 is a valid descriptor, but ckb uses 0 for uninitialized devices
             ckb_err("Unable to create %s: %s\n", inpath, strerror(errno));
             rm_recursive(path);
@@ -256,9 +258,13 @@ int mkdevpath(usbdevice* kb){
 int rmdevpath(usbdevice* kb){
     euid_guard_start;
     int index = INDEX_OF(kb, keyboard);
-    if(kb->infifo != 0)
+    if(kb->infifo != 0){
+#ifdef OS_LINUX
+        write(kb->infifo - 1, "\n", 1); // hack to prevent the FIFO thread from perma-blocking
+#endif
         close(kb->infifo - 1);
-    kb->infifo = 0;
+        kb->infifo = 0;
+    }
     for(int i = 0; i < OUTFIFO_MAX; i++)
         _rmnotifynode(kb, i);
     char path[strlen(devpath) + 2];

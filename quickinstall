@@ -142,7 +142,7 @@ if [[ $systemdc -eq 0 && `echo "$systemd" | wc -l` -ge 1 ]]; then
         sudo systemctl stop ckb-daemon >/dev/null 2>&1
         sudo mkdir -p /usr/lib/systemd/system
         checkfail $?
-        sudo install service/systemd/ckb-daemon.service /usr/lib/systemd/system 2>$TMPFILE
+        sudo install -m 0644 service/systemd/ckb-daemon.service /usr/lib/systemd/system 2>$TMPFILE
         checkfail $?
         sudo systemctl daemon-reload >/dev/null 2>&1
         sudo systemctl enable ckb-daemon 2>$TMPFILE

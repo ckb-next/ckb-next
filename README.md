@@ -1,7 +1,8 @@
 ckb: RGB Driver for Linux and OS X
 ==================================
+** New Name: ckb-next ** 
 
-**ckb** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+**ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
 ![Screenshot](https://i.imgur.com/zMK9jOP.png)
 
@@ -18,7 +19,7 @@ Contents
 
 * [Device Support](#device-support)
 * [Linux Installation](#linux-installation)
-* [OS X Installation](#os-x-installation)
+* [OS X/macOS Installation](#os-x-macos-installation)
 * [Usage](#usage)
 * [Troubleshooting](#troubleshooting)
 * [Known Issues](#known-issues)
@@ -26,8 +27,8 @@ Contents
 
 See also:
 
-* [Manual for the driver daemon](https://github.com/ccMSC/ckb/blob/master/DAEMON.md)
-* [ckb testing repository](https://github.com/ccMSC/ckb/tree/testing) (updated more frequently, but may be unstable)
+* [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
+* [ckb testing repository](https://github.com/mattanger/ckb-next/tree/testing) (updated more frequently, but may be unstable)
 
 Device Support
 --------------
@@ -64,7 +65,7 @@ These can be used to install ckb from your package manager. Note that I do not p
 
 #### Preparation:
 
-ckb requires Qt5, libudev, zlib, gcc, g++, and glibc.
+ckb-next requires Qt5, libudev, zlib, gcc, g++, and glibc.
 
 * Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
 * Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
@@ -102,18 +103,18 @@ sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop 
 sudo rm -rf /usr/bin/ckb-animations
 ```
 
-OS X Installation
+OS X/macOS Installation
 -----------------
 
 #### Binary download:
 
-The latest OS X binary can be downloaded here: https://github.com/ccMSC/ckb/releases/latest
+The latest OS X/macOS binary can be downloaded here: https://github.com/mattanger/ckb-next/releases/latest
 
 Click on `ckb.pkg` under the Downloads section. This is an automated installer which will set up the driver for you. After it's finished, open ckb.app (it will be installed to your Applications directory) to get started.
 
 #### Building from source:
 
-Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Qt5 from here: http://www.qt.io/download-open-source/
+Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Ensure that the Xcode Command Line Tools package is installed if it is not installed on initial setup. Then install Qt5 from here: http://www.qt.io/download-open-source/
 
 The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason, or if you'd like to compile manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md).
 
@@ -188,7 +189,7 @@ If it still doesn't work, try replacing `0x20000408` with `0x4`. Note that this 
 
 If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo apt-get install libappindicator-dev`. Then reinstall ckb.
 
-#### OS X
+#### OS X/macOS
 
 - **“ckb.pkg” can’t be opened because it is from an unidentified developer**    
     Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
@@ -220,7 +221,7 @@ Common issues:
 
 #### Reporting issues
 
-If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/ccMSC/ckb/issues). Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
+If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/mattanger/ckb-next/issues). Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
 
 Known issues
 ------------
@@ -233,4 +234,4 @@ Known issues
 Contributing
 ------------
 
-You can contribute to the project by [opening a pull request](https://github.com/ccMSC/ckb/pulls). It's best if you base your changes off of the `testing` branch as opposed to the `master`, because the pull request will be merged there first. If you'd like to contribute but don't know what you can do, take a look at [the issue tracker](https://github.com/ccMSC/ckb/issues) and see if any features/problems are still unresolved. Feel free to ask if you'd like some ideas.
+You can contribute to the project by [opening a pull request](https://github.com/mattanger/ckb-next/pulls). It's best if you base your changes off of the `testing` branch as opposed to the `master`, because the pull request will be merged there first. If you'd like to contribute but don't know what you can do, take a look at [the issue tracker](https://github.com/mattanger/ckb-next/issues) and see if any features/problems are still unresolved. Feel free to ask if you'd like some ideas.

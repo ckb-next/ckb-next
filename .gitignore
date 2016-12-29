@@ -1,6 +1,7 @@
 bin/
 ckb.app/
 ckb.pkg
+cmake-build-debug/
 .DS_Store
 .*
 !.gitignore

@@ -36,12 +36,12 @@ int bullet_row = 1;
 float bullet_position = 0;
 int enemy_row = 1;
 float enemy_position = 12;
-int fire = 1;
+int fire = 0;
 
-char* row1[14] = { "grave",  "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "back" };
-char* row2[14] = { "tab",    "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\" };
-char* row3[14] = { "caps",   "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", ";", "'", "enter" };
-char* row4[13] = { "lshift", "z", "x", "c", "v", "b", "n", "m", ",", ".", ".", "/", "rshift" };
+char* row1[14] = { "grave",  "1", "2", "3", "4", "5", "6", "7", "8",     "9",   "0",     "minus",  "equal",  "back" };
+char* row2[14] = { "tab",    "q", "w", "e", "r", "t", "y", "u", "i",     "o",   "p",     "lbrace", "rbrace", "bslash" };
+char* row3[13] = { "caps",   "a", "s", "d", "f", "g", "h", "j", "k",     "l",   "colon", "quote",  "enter" };
+char* row4[12] = { "lshift", "z", "x", "c", "v", "b", "n", "m", "comma", "dot", "slash", "rshift" };
 
 void ckb_init(ckb_runctx* context){
     srand(time(NULL));
@@ -56,6 +56,11 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
     // Start or stop animation on key
     char* keyname = key->name;
+
+    if(strcmp(keyname, "esc") == 0) {
+        restart();
+    }
+
     if(fire == 0) {
         if (strcmp(keyname, row1[0]) == 0) {
             fire = 1;
@@ -68,6 +73,10 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
         if (strcmp(keyname, row3[0]) == 0) {
             fire = 1;
             bullet_row = 3;
+        }
+        if (strcmp(keyname, row4[0]) == 0) {
+            fire = 1;
+            bullet_row = 4;
         }
     }
 }
@@ -83,6 +92,8 @@ char* get_bullet_key_name() {
         return row2[bp];
     } else if (bullet_row == 3) {
         return row3[bp];
+    } else if (bullet_row == 4) {
+        return row4[bp];
     }
     return "esc";
 }
@@ -95,26 +106,36 @@ char* get_enemy_key_name() {
         return row2[ep];
     } else if (enemy_row == 3) {
         return row3[ep];
+    } else if (enemy_row == 4) {
+        return row4[ep];
     }
     return "esc";
 }
 
+void restart() {
+    enemy_row = 1;
+    bullet_row = 1;
+    fire = 0;
+    enemy_position = 12;
+    bullet_position = 0;
+}
+
 void explode_enemy(){
+    enemy_row = rand() % 4 + 1;
     enemy_position = 12;
     bullet_position = 0;
     fire = 0;
-    enemy_row = rand() % 3 + 1;
 }
 
 void ckb_time(ckb_runctx* context, double delta){
     if(fire == 1) {
-        bullet_position += 0.08;
+        bullet_position += 0.4;
     }
     if(bullet_position > 12) {
         fire = 0;
         bullet_position = 0;
     }
-    enemy_position -= 0.04;
+    enemy_position -= 0.08;
     if(enemy_position == 0
         || round(enemy_position) == round(bullet_position) && bullet_row == enemy_row) {
         explode_enemy();

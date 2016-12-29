@@ -1,5 +1,6 @@
 bin/
 ckb.app/
+cmake-build-debug/
 ckb.pkg
 .DS_Store
 .*

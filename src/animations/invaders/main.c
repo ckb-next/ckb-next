@@ -37,11 +37,15 @@ float bullet_position = 0;
 int enemy_row = 1;
 float enemy_position = 12;
 int fire = 0;
+int enemies = 0;
+int level = 0;
 
 char* row1[14] = { "grave",  "1", "2", "3", "4", "5", "6", "7", "8",     "9",   "0",     "minus",  "equal",  "back" };
 char* row2[14] = { "tab",    "q", "w", "e", "r", "t", "y", "u", "i",     "o",   "p",     "lbrace", "rbrace", "bslash" };
 char* row3[13] = { "caps",   "a", "s", "d", "f", "g", "h", "j", "k",     "l",   "colon", "quote",  "enter" };
 char* row4[12] = { "lshift", "z", "x", "c", "v", "b", "n", "m", "comma", "dot", "slash", "rshift" };
+
+char* levels[12] = {"f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12" };
 
 void ckb_init(ckb_runctx* context){
     srand(time(NULL));
@@ -127,18 +131,108 @@ void explode_enemy(){
     fire = 0;
 }
 
+void game_over(){
+
+}
+
+void draw_level(ckb_runctx* context, int level) {
+    unsigned count = context->keycount;
+    for (unsigned i = 0; i < count; i++) {
+        ckb_key *key = context->keys + i;
+        char *key_name = key->name;
+        if (strcmp(key_name, "f1") == 0 && level > 0) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f2") == 0 && level > 1) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f3") == 0 && level > 2) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f4") == 0 && level > 3) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f5") == 0 && level > 4) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f6") == 0 && level > 5) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f7") == 0 && level > 6) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f8") == 0 && level > 7) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f9") == 0 && level > 8) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f10") == 0 && level > 9) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f11") == 0 && level > 10) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+        if (strcmp(key_name, "f12") == 0 && level > 11) {
+            key->a = 255;
+            key->r = 0;
+            key->g = 0;
+            key->b = 255;
+        }
+    }
+}
+
 void ckb_time(ckb_runctx* context, double delta){
     if(fire == 1) {
-        bullet_position += 0.4;
+        bullet_position += (0.4 + level * 0.02);
     }
     if(bullet_position > 12) {
         fire = 0;
         bullet_position = 0;
     }
-    enemy_position -= 0.08;
-    if(enemy_position == 0
-        || round(enemy_position) == round(bullet_position) && bullet_row == enemy_row) {
+    enemy_position -= (0.08 + level * 0.02);
+    if(enemy_position == 0) {
+        game_over();
+    } else if (round(enemy_position) == round(bullet_position) && bullet_row == enemy_row) {
         explode_enemy();
+        enemies++;
+        if(enemies > 8) {
+            level++;
+            enemies = 0;
+        }
     }
     unsigned count = context->keycount;
     for(unsigned i = 0; i < count; i++){
@@ -161,6 +255,7 @@ void ckb_time(ckb_runctx* context, double delta){
             key->b = 0;
         }
     }
+    draw_level(context, level);
 }
 
 int ckb_frame(ckb_runctx* context){

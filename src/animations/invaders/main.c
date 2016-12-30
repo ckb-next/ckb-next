@@ -241,7 +241,27 @@ void ckb_time(ckb_runctx* context, double delta){
         char* bullet_key_name = get_bullet_key_name();
         char* enemy_key_name = get_enemy_key_name();
         key->a = 255;
-        if (strcmp(key_name, bullet_key_name) == 0 && fire == 1) {
+        if (strcmp(key_name, row1[0]) == 0) {
+            key->r = 255;
+            key->g = 255;
+            key->b = 255;
+        } else if (strcmp(key_name, row2[0]) == 0) {
+            key->r = 255;
+            key->g = 255;
+            key->b = 255;
+        } else if (strcmp(key_name, row3[0]) == 0) {
+            key->r = 255;
+            key->g = 255;
+            key->b = 255;
+        } else if (strcmp(key_name, row4[0]) == 0) {
+            key->r = 255;
+            key->g = 255;
+            key->b = 255;
+        } else if (strcmp(key_name, "scroll") == 0) {
+            key->r = 255;
+            key->g = 0;
+            key->b = 255;
+        } else if (strcmp(key_name, bullet_key_name) == 0 && fire == 1) {
             key->r = 0;
             key->g = 255;
             key->b = 0;

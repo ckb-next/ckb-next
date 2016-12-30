@@ -65,7 +65,7 @@ These can be used to install ckb from your package manager. Note that I do not p
 
 #### Preparation:
 
-ckb-next requires Qt5, libudev, zlib, gcc, g++, and glibc.
+ckb-next requires Qt5 (Qt 5.6 recommened for OS X), libudev, zlib, gcc, g++, and glibc.
 
 * Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
 * Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`

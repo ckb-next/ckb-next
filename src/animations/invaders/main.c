@@ -21,7 +21,7 @@ void ckb_info(){
     CKB_LIVEPARAMS(TRUE);
 
     // Presets
-    CKB_PRESET_START("Test settings");
+    CKB_PRESET_START("Default Settings");
     CKB_PRESET_PARAM("color", "ff000000");
     CKB_PRESET_PARAM("duration", "0.1");
     CKB_PRESET_PARAM("stop", "0");
@@ -29,7 +29,6 @@ void ckb_info(){
     CKB_PRESET_END;
 }
 
-ckb_gradient animcolor = { 0 };
 int kphold = 0, kprelease = 0;
 
 int bullet_row = 1;
@@ -52,7 +51,6 @@ void ckb_init(ckb_runctx* context){
 }
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
-    CKB_PARSE_AGRADIENT("color", &animcolor){}
     CKB_PARSE_BOOL("kphold", &kphold){}
     CKB_PARSE_BOOL("kprelease", &kprelease){}
 }

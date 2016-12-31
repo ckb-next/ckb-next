@@ -1,18 +1,23 @@
-ckb: RGB Driver for Linux and OS X
+ckb-next: RGB Driver for Linux and OS X
 ==================================
-** New Name: ckb-next ** 
 
 **ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
 ![Screenshot](https://i.imgur.com/zMK9jOP.png)
 
-**Disclaimer:** ckb is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
+**Disclaimer:** ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
-If you use and enjoy this project, I'd appreciate if you could spare a few dollars for a donation. This is completely voluntary - the project will remain free and open source regardless. `:)`
+What happened to the original [ckb](https://github.com/ccMSC/ckb)?
+---
+We don't know. The author of **ckb** [ccMSC](https://github.com/ccMSC) suddenly disappeared and hasn't showed up since July 2016. So the community around ckb decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to original ckb.
 
-I accept donations through PayPal: [![Click Here](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+From the **ckb** author:
 
-Or through Bitcoin: [![](https://i.imgur.com/DJTlQcJ.png) 1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ](https://blockchain.info/address/1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ)
+>If you use and enjoy this project, I'd appreciate if you could spare a few dollars for a donation. This is completely voluntary - the project will remain free and open source regardless. `:)`
+>
+>I accept donations through PayPal: [![Click Here](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+>
+>Or through Bitcoin: [![](https://i.imgur.com/DJTlQcJ.png) 1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ](https://blockchain.info/address/1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ)
 
 Contents
 --------
@@ -57,11 +62,14 @@ Linux Installation
 ------------------
 
 #### Pre-made packages:
+**! old ckb versions, ckb-next will be shipped soon !**
 
-* Arch: [`aur/ckb-git`](https://aur.archlinux.org/packages/ckb-git/)
-* Gentoo: `emerge -av app-misc/ckb`
+* Arch Linux (maintained by [@light2yellow](https://github.com/light2yellow)):
+	* [`aur/ckb-git`](https://aur.archlinux.org/packages/ckb-git/) - based on `master` branch (more stable)
+	* [`aur/ckb-git-latest`](https://aur.archlinux.org/packages/ckb-git-latest/) - based on `testing` branch (less stable but fresher)
+* Gentoo (maintained by [@mrueg](https://github.com/mrueg)): `emerge -av app-misc/ckb`
 
-These can be used to install ckb from your package manager. Note that I do not personally maintain these packages. For other distros, or if you want to create your own package, see instructions below.
+These can be used to install *ckb* with your package manager. If you want to discuss something with package maintainters do so either directly or mention them in the issues. *If you would like to maintain a package for your favourite distro or Homebrew please do!*
 
 #### Preparation:
 
@@ -72,11 +80,11 @@ ckb-next requires Qt5 (Qt 5.6 recommened for OS X), libudev, zlib, gcc, g++, and
 * Arch: `sudo pacman -S base-devel qt5-base zlib`
 * Other distros: Look for `qt5` or `libqt5*-devel`
 
-Note: If you build your own kernels, ckb requires the uinput flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
+Note: If you build your own kernels, ckb-next requires the uinput flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
 #### Installing:
 
-You can download ckb using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
+You can download ckb-next using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
 
 #### Upgrading:
 
@@ -105,7 +113,7 @@ sudo rm -rf /usr/bin/ckb-animations
 
 OS X/macOS Installation
 -----------------
-
+<!--- TODO ship a new binary for mac, this section wastes user's time because most of the times people end up building from source -->
 #### Binary download:
 
 The latest OS X/macOS binary can be downloaded here: https://github.com/mattanger/ckb-next/releases/latest
@@ -114,7 +122,7 @@ Click on `ckb.pkg` under the Downloads section. This is an automated installer w
 
 #### Building from source:
 
-Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Ensure that the Xcode Command Line Tools package is installed if it is not installed on initial setup. Then install Qt5 from here: http://www.qt.io/download-open-source/
+Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Xcode Command Line Tools package issuing `xcode-select --install` in a Terminal app. Afterwards install Qt5 from here: http://www.qt.io/download-open-source/
 
 The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason, or if you'd like to compile manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md).
 
@@ -191,15 +199,15 @@ If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo 
 
 #### OS X/macOS
 
-- **“ckb.pkg” can’t be opened because it is from an unidentified developer**    
+- **“ckb.pkg” can’t be opened because it is from an unidentified developer**
     Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
-- **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly**    
+- **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly**
     ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
-- **`~` key prints `§±`**    
+- **`~` key prints `§±`**
     Check your keyboard layout on ckb's Settings screen. Choose the layout that matches your physical keyboard.
-- **Compile problems**    
+- **Compile problems**
     Can usually be resolved by rebooting your computer and/or reinstalling Qt. Make sure that Xcode works on its own. If a compile fails, delete the `ckb-master` directory as well as any automatically generated `build-ckb` folders and try again from a new download.
-- **Scroll wheel does not scroll**    
+- **Scroll wheel does not scroll**
     As of #c3474d2 it's now possible to **disable scroll acceleration** from the GUI. You can access it under "OSX tweaks" in the "More settings" screen. Once disabled, the scroll wheel should behave consistently.
 
 

@@ -69,7 +69,7 @@ Linux Installation
 	* [`aur/ckb-git-latest`](https://aur.archlinux.org/packages/ckb-git-latest/) - based on `testing` branch (less stable but fresher)
 * Gentoo (maintained by [@mrueg](https://github.com/mrueg)): `emerge -av app-misc/ckb`
 
-These can be used to install *ckb* with your package manager. If you want to discuss something with package maintainters do so either directly or mention them in the issues. *If you would like to maintain a package for your favourite distro or Homebrew please do!*
+If you are a package maintainer or want to discuss something with package maintainers let us know in the issues, so we can have an accountable and centralized communication about this. *If you would like to maintain a package for your favorite distro/OS, please let us know as well.*
 
 #### Preparation:
 

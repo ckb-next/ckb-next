@@ -12,7 +12,7 @@ function newtmp {
 function checkfail {
     if [[ $1 -ne 0 ]]; then
         cat $TMPFILE
-        finish $1
+        finish "$1"
     fi
 }
 
@@ -38,6 +38,22 @@ if [[ $(readlink -f "`pwd`") == *" "* ]]; then
     echo "Error: you must compile ckb in a directory with no spaces."
     echo "Move or rename the folder and try again."
     finish 1
+fi
+
+# Install command line tools if missing
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if xcode-select --install 2>&1 | grep -q "installed"; then
+        echo "Command line tools are installed"
+    else
+        # check if user installed them after the gui prompt and prompt him once again
+        if xcode-select --install 2>&1 | grep -q "installed"; then
+            echo "The command line tools are installed"
+        else
+            echo "Please install the command line tools to proceed"
+            echo "You can either rerun this script and press 'Install' or do it manually"
+            finish 1
+        fi
+    fi
 fi
 
 if [[ -d $SRCDIR ]]; then

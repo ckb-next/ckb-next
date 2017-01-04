@@ -34,7 +34,7 @@ BINDIR="bin"
 [[ $PREFIX == "" ]] && PREFIX="/usr/bin"
 [[ "$OSTYPE" == "darwin"* ]] && PREFIX="/Applications"
 
-tab=$'\t';
+tab=$'\t'
 bad_chars=" |'|$tab" # characters needed to be escaped
 if [[ "$(pwd)" =~ $bad_chars ]]; then
     echo "Error: you must compile ckb in a directory with no spaces/single quotes/tabs."

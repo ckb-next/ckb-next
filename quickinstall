@@ -34,7 +34,9 @@ BINDIR="bin"
 [[ $PREFIX == "" ]] && PREFIX="/usr/bin"
 [[ "$OSTYPE" == "darwin"* ]] && PREFIX="/Applications"
 
-if [[ $(readlink -f "`pwd`") == *" "* ]]; then
+tab=$'\t';
+bad_chars=" |'|$tab" # characters needed to be escaped
+if [[ "$(pwd)" =~ $bad_chars ]]; then
     echo "Error: you must compile ckb in a directory with no spaces."
     echo "Move or rename the folder and try again."
     finish 1
@@ -49,10 +51,14 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         if xcode-select --install 2>&1 | grep -q "installed"; then
             echo "The command line tools are installed"
         else
-            echo "Please install the command line tools to proceed"
-            echo "You can either rerun this script and press 'Install' or do it manually"
+            echo "Please install command line tools and rerun the script"
             finish 1
         fi
+    fi
+    # Check for Xcode presence
+    if xcodebuild -version | grep "error"; then
+        echo "Please install Xcode and rerun the script"
+        finish 1
     fi
 fi
 

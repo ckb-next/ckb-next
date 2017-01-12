@@ -26,7 +26,7 @@ function finish {
 }
 
 # Directories
-cd "$(dirname \""$0"\")" || exit
+cd "$(dirname "$0")" || exit
 SRCDIR="src"
 BINDIR="bin"
 [[ "$OSTYPE" == "darwin"* ]] && BINDIR="ckb.app"

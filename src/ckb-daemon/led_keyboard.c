@@ -207,8 +207,13 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
                 if(!usbrecv(kb, data_pkt[i + clr * 4], in_pkt[i]))
                     return -1;
                 // Make sure the first four bytes match
-                if(memcmp(in_pkt[i], data_pkt[i + clr * 4], 4)){
+				uchar* p = in_pkt[i];
+				if (i > 0) p++;
+                if(memcmp(p, data_pkt[i + clr * 4], 4)){
                     ckb_err("Bad input header\n");
+					ckb_warn("color = %d, i = %d\nInput:  %x %x %x %x %x %x %x %x\nOutput: %x %x %x %x\n", clr, i,
+						in_pkt[i][0], in_pkt[i][1], in_pkt[i][2], in_pkt[i][3], in_pkt[i][4], in_pkt[i][5], in_pkt[i][6], in_pkt[i][7],
+						data_pkt[i + clr * 4][0], 	data_pkt[i + clr * 4 ][1], 	data_pkt[i + clr * 4 ][2], 	data_pkt[i + clr * 4 ][3]);
                     return -1;
                 }
             }

@@ -200,6 +200,17 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             { 0xff, 0x02, 60, 0 },
             { 0xff, 0x03, 24, 0 },
         };
+
+        /// Since Firmware Version 2.05 the answers for getting the stored color-maps from the hardware
+        /// has changed a bit. So comparing for the correct answer cannot validate against the cmd,
+        /// and has to be done against a third map.
+
+        uchar cmp_pkt[4][4] = {
+            { 0x0e, 0x14, 0x03, 0x01 },
+            { 0x0e, 0xff, 0x01, 60 },
+            { 0x0e, 0xff, 0x02, 60 },
+            { 0x0e, 0xff, 0x03, 24 },
+        };
         // Read colors
         uchar* colors[3] = { light->r, light->g, light->b };
         for(int clr = 0; clr < 3; clr++){
@@ -207,13 +218,19 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
                 if(!usbrecv(kb, data_pkt[i + clr * 4], in_pkt[i]))
                     return -1;
                 // Make sure the first four bytes match
-				uchar* p = in_pkt[i];
-				if (i > 0) p++;
-                if(memcmp(p, data_pkt[i + clr * 4], 4)){
+                // see comment above
+                // if(memcmp(p, data_pkt[i + clr * 4], 4)){
+                if (memcmp(in_pkt[i], (kb->fwversion >= 0x0205)? cmp_pkt[i] : data_pkt[i + clr * 4], 4)) {
                     ckb_err("Bad input header\n");
-					ckb_warn("color = %d, i = %d\nInput:  %x %x %x %x %x %x %x %x\nOutput: %x %x %x %x\n", clr, i,
+                    ckb_err("color = %d, i = %d, mode = %d\nInput(Antwort): %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x\nOutput (Frage): %2.2x %2.2x %2.2x %2.2x\n", clr, i, mode,
 						in_pkt[i][0], in_pkt[i][1], in_pkt[i][2], in_pkt[i][3], in_pkt[i][4], in_pkt[i][5], in_pkt[i][6], in_pkt[i][7],
-						data_pkt[i + clr * 4][0], 	data_pkt[i + clr * 4 ][1], 	data_pkt[i + clr * 4 ][2], 	data_pkt[i + clr * 4 ][3]);
+                            // data_pkt[i + clr * 4][0], 	data_pkt[i + clr * 4 ][1], 	data_pkt[i + clr * 4 ][2], 	data_pkt[i + clr * 4 ][3]);
+                        cmp_pkt[i][0], cmp_pkt[i][1], cmp_pkt[i][2], cmp_pkt[i][3]);
+                    in_pkt[2][0] = 0x99;
+                    in_pkt[2][1] = 0x99;
+                    in_pkt[2][2] = 0x99;
+                    in_pkt[2][3] = 0x99;
+                    usbrecv(kb, in_pkt[2], in_pkt[2]); // just to find it in the wireshark log
                     return -1;
                 }
             }

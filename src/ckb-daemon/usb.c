@@ -535,7 +535,9 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
         // Send each message via the OS function
         while(1){
             DELAY_SHORT(kb);
+            pthread_mutex_lock(mmutex(kb)); // Synchonization between macro output and color information
             int res = os_usbsend(kb, messages + i * MSG_SIZE, 0, file, line);
+            pthread_mutex_unlock(mmutex(kb));
             if(res == 0)
                 return 0;
             else if(res != -1){

@@ -30,6 +30,7 @@ static void inputupdate_keys(usbdevice* kb){
                     macrotrigger = 1;
                     macro->triggered = 1;
                     // Send events for each keypress in the macro
+                    pthread_mutex_lock(mmutex(kb)); // Synchonization between macro output and color information
                     for(int a = 0; a < macro->actioncount; a++){
                         macroaction* action = macro->actions + a;
                         if(action->rel_x != 0 || action->rel_y != 0)
@@ -49,9 +50,11 @@ static void inputupdate_keys(usbdevice* kb){
                             }
                         }
                     }
+                    pthread_mutex_unlock(mmutex(kb));
                 }
             } else {
                 macro->triggered = 0;
+                macrotrigger = 0;
             }
         }
     }

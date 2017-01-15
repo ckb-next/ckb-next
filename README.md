@@ -161,6 +161,8 @@ The user interface is still a work in progress.
 - Reactive lighting
 - Multiple profiles/modes with hardware save function
 - Adjustable mouse DPI with ability to change DPI on button press
+- Key macros (G-Keys also); Have a look at https://youtu.be/qhrKP03_NrM for a short video tutorial
+- Key macro delays: Handle delays between keystrokes when playing a macro
 
 Closing ckb will actually minimize it to the system tray. Use the Quit option from the tray icon or the settings screen to exit the application.
 
@@ -168,7 +170,6 @@ Closing ckb will actually minimize it to the system tray. Use the Quit option fr
 - **v0.3 release:**
 - Ability to store profiles separately from devices, import/export them
 - More functions for the Win Lock key
-- Key macros
 - **v0.4 release:**
 - Ability to import CUE profiles
 - Ability to tie profiles to which application has focus

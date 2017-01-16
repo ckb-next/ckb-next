@@ -25,13 +25,23 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 
-if (Qt5Widgets_FOUND)
-    if (Qt5Widgets_VERSION VERSION_LESS 5.2.0)
-        message(FATAL_ERROR "Minimum supported Qt5 version is 5.2!")
-    endif()
-else()
-    message(SEND_ERROR "The Qt5Widgets library could not be found!")
-endif(Qt5Widgets_FOUND)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+    if (Qt5Widgets_FOUND)
+        if (Qt5Widgets_VERSION VERSION_LESS 5.2.0)
+            message(FATAL_ERROR "Minimum supported Qt5 version is 5.2!")
+        endif()
+    else()
+        message(SEND_ERROR "The Qt5Widgets library could not be found!")
+    endif(Qt5Widgets_FOUND)
+
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") # the right way to check for mac os x, source - documentation
+    message(STATUS "Building for macOS")
+    execute_process(COMMAND brew --prefix qt5  # wrapping it in quotes is wrong
+            OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH}) # prints /usr/local/opt/qt5
+endif()
+
 
 file(GLOB HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/*.h"

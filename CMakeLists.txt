@@ -3,8 +3,8 @@ project(ckb-next)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14")
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 
 # main projects
 add_subdirectory(src/ckb)

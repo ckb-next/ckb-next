@@ -106,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
-    settingsWidget->setVersion("ckb " CKB_VERSION_STR);
+    settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
 }
 
 void MainWindow::toggleTrayIcon(bool visible) {

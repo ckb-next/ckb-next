@@ -125,15 +125,15 @@ else
     # Linux
     newtmp
     # Install apps
-    sudo mkdir -p $PREFIX
+    sudo mkdir -p "$PREFIX"
     checkfail $?
-    sudo install bin/ckb $PREFIX/ckb 2>"$TMPFILE"
+    sudo install bin/ckb "$PREFIX"/ckb 2>"$TMPFILE"
     checkfail $?
-    sudo install bin/ckb-daemon $PREFIX/ckb-daemon 2>"$TMPFILE"
+    sudo install bin/ckb-daemon "$PREFIX"/ckb-daemon 2>"$TMPFILE"
     checkfail $?
-    sudo mkdir -p $PREFIX/ckb-animations 2>"$TMPFILE"
+    sudo mkdir -p "$PREFIX"/ckb-animations 2>"$TMPFILE"
     checkfail $?
-    sudo install bin/ckb-animations/* $PREFIX/ckb-animations 2>"$TMPFILE"
+    sudo install bin/ckb-animations/* "$PREFIX"/ckb-animations 2>"$TMPFILE"
     checkfail $?
     # Install icon and .desktop
     sudo xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>"$TMPFILE"
@@ -213,7 +213,7 @@ else
     read -rp "Start it now [Y/n]? " dodriver
     if [[ ! $dodriver =~ no? ]]; then
         sleep 0.5
-        sudo nohup $PREFIX/ckb-daemon >/dev/null 2>&1 &
+        sudo nohup "$PREFIX"/ckb-daemon >/dev/null 2>&1 &
         checkfail $?
     fi
 fi
@@ -222,11 +222,11 @@ sleep 1
 echo ""
 read -rp "Start ckb now [Y/n]? " dolaunch
 [[ $dolaunch =~ no? ]] && exit 0
-APP=$PREFIX/ckb
-[[ "$OSTYPE" == "darwin"* ]] && APP=$APP.app/Contents/MacOS/ckb
+APP="$PREFIX"/ckb
+[[ "$OSTYPE" == "darwin"* ]] && APP="$APP".app/Contents/MacOS/ckb
 # Ask ckb to close if there's an instance already running
-$APP --close >/dev/null 2>&1
+"$APP" --close >/dev/null 2>&1
 sleep 0.5
 # Launch
-nohup $APP >/dev/null 2>&1 &
+nohup "$APP" >/dev/null 2>&1 &
 exit 0

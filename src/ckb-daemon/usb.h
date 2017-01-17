@@ -10,11 +10,13 @@
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"
+#define P_K65_NRGB      0x1b07
+#define P_K65_NRGB_STR  "1b07"
 #define P_K65_LUX       0x1b37
 #define P_K65_LUX_STR   "1b37"
 #define P_K65_RFIRE     0x1b39
 #define P_K65_RFIRE_STR "1b39"
-#define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
+#define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_NRGB || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
 #define P_K70                0x1b13
 #define P_K70_STR            "1b13"

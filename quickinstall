@@ -2,31 +2,31 @@
 # ckb auto build/install script
 
 # Temporary files for program output
-TMPFILE=`mktemp /tmp/ckb.XXXXXXXX`
+TMPFILE=$(mktemp /tmp/ckb.XXXXXXXX)
 function newtmp {
-    rm -f $TMPFILE
-    TMPFILE=`mktemp /tmp/ckb.XXXXXXXX`
+    rm -f "$TMPFILE"
+    TMPFILE=$(mktemp /tmp/ckb.XXXXXXXX)
 }
 
 # Check for failure, quit if unsuccessful
 function checkfail {
     if [[ $1 -ne 0 ]]; then
-        cat $TMPFILE
-        finish $1
+        cat "$TMPFILE"
+        finish "$1"
     fi
 }
 
 # Exit function
 function finish {
-    rm -f $TMPFILE
+    rm -f "$TMPFILE"
     echo ""
     echo "Press enter to exit."
     read -rs dummy
-    exit $1
+    exit "$1"
 }
 
 # Directories
-cd "`dirname \"$0\"`"
+cd "$(dirname "$0")" || exit
 SRCDIR="src"
 BINDIR="bin"
 [[ "$OSTYPE" == "darwin"* ]] && BINDIR="ckb.app"
@@ -34,19 +34,41 @@ BINDIR="bin"
 [[ $PREFIX == "" ]] && PREFIX="/usr/bin"
 [[ "$OSTYPE" == "darwin"* ]] && PREFIX="/Applications"
 
-if [[ $(readlink -f "`pwd`") == *" "* ]]; then
-    echo "Error: you must compile ckb in a directory with no spaces."
+tab=$'\t'
+bad_chars=" |'|$tab" # characters needed to be escaped
+if [[ "$(pwd)" =~ $bad_chars ]]; then
+    echo "Error: you must compile ckb in a directory with no spaces/single quotes/tabs."
     echo "Move or rename the folder and try again."
     finish 1
+fi
+
+# Install command line tools if missing
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if xcode-select --install 2>&1 | grep -q "installed"; then
+        echo "Command line tools are already installed."
+    else
+        # check if user installed them after the gui prompt and prompt him once again
+        if xcode-select --install 2>&1 | grep -q "installed"; then
+            echo "Command line tools are installed."
+        else
+            echo "Please install command line tools and rerun the script."
+            finish 1
+        fi
+    fi
+    # Check for Xcode presence
+    if xcodebuild -version 2>&1 | grep "error"; then
+        echo "Please install Xcode and rerun the script."
+        finish 1
+    fi
 fi
 
 if [[ -d $SRCDIR ]]; then
     echo "Preparing build files..."
     # Clean first
     make clean >/dev/null 2>&1
-    rm Makefile Makefile.* */*/Makefile */*/Makefile.* >/dev/null 2>&1
+    rm Makefile Makefile.* ./*/*/Makefile ./*/*/Makefile.* >/dev/null 2>&1
     # Generate makefiles
-    ./qmake-auto $QMAKEFLAGS > $TMPFILE 2>&1
+    ./qmake-auto "$QMAKEFLAGS" > "$TMPFILE" 2>&1
     checkfail $?
     make clean >/dev/null 2>&1
     # Run make with command arguments
@@ -59,7 +81,7 @@ if [[ -d $SRCDIR ]]; then
     if [[ -z "$JOBS" ]]; then
         JOBS=2
     fi
-    make -j "$JOBS" "$@" 2>$TMPFILE
+    make -j "$JOBS" "$@" 2>"$TMPFILE"
     checkfail $?
     echo ""
     echo "Finished!"
@@ -76,9 +98,9 @@ if [[ $doinstall =~ no? ]]; then
     if [[ "$OSTYPE" != "darwin"* ]]; then
         # Install icon and .desktop locally
         echo "Installing icon and application launcher for the local user..."
-        xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>$TMPFILE
+        xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>"$TMPFILE"
         checkfail $?
-        xdg-desktop-menu install --novendor usr/ckb.desktop 2>$TMPFILE
+        xdg-desktop-menu install --novendor usr/ckb.desktop 2>"$TMPFILE"
         checkfail $?
     fi
     echo "ckb will not be installed system-wide or run as a service."
@@ -92,45 +114,45 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # OSX
     newtmp
     # Run macdeployqt to avoid linking problems
-    [[ $MACDEPLOYQT == "" ]] && MACDEPLOYQT=`find ~/Qt/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name macdeployqt -print -quit 2>/dev/null`
-    $MACDEPLOYQT ckb.app >/dev/null 2>$TMPFILE
+    [[ $MACDEPLOYQT == "" ]] && MACDEPLOYQT=$(find ~/Qt/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name macdeployqt -print -quit 2>/dev/null)
+    $MACDEPLOYQT ckb.app >/dev/null 2>"$TMPFILE"
     # Install
-    sudo rm -Rf /Applications/ckb.app 2>$TMPFILE
-    sudo cp -R ckb.app /Applications 2>$TMPFILE
+    sudo rm -Rf /Applications/ckb.app 2>"$TMPFILE"
+    sudo cp -R ckb.app /Applications 2>"$TMPFILE"
     checkfail $?
     echo "Installed at /Applications/ckb.app"
 else
     # Linux
     newtmp
     # Install apps
-    sudo mkdir -p $PREFIX
+    sudo mkdir -p "$PREFIX"
     checkfail $?
-    sudo install bin/ckb $PREFIX/ckb 2>$TMPFILE
+    sudo install bin/ckb "$PREFIX"/ckb 2>"$TMPFILE"
     checkfail $?
-    sudo install bin/ckb-daemon $PREFIX/ckb-daemon 2>$TMPFILE
+    sudo install bin/ckb-daemon "$PREFIX"/ckb-daemon 2>"$TMPFILE"
     checkfail $?
-    sudo mkdir -p $PREFIX/ckb-animations 2>$TMPFILE
+    sudo mkdir -p "$PREFIX"/ckb-animations 2>"$TMPFILE"
     checkfail $?
-    sudo install bin/ckb-animations/* $PREFIX/ckb-animations 2>$TMPFILE
+    sudo install bin/ckb-animations/* "$PREFIX"/ckb-animations 2>"$TMPFILE"
     checkfail $?
     # Install icon and .desktop
-    sudo xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>$TMPFILE
+    sudo xdg-icon-resource install --novendor --size 512 usr/ckb.png 2>"$TMPFILE"
     checkfail $?
-    sudo xdg-desktop-menu install --novendor usr/ckb.desktop 2>$TMPFILE
+    sudo xdg-desktop-menu install --novendor usr/ckb.desktop 2>"$TMPFILE"
     checkfail $?
     echo "Installed in $PREFIX"
 fi
 
 # Offer to run as a system service
-systemd=`systemctl --version 2>/dev/null`
+systemd=$(systemctl --version 2>/dev/null)
 systemdc=$?
-upstart=`service --version 2>/dev/null`
+upstart=$(service --version 2>/dev/null)
 upstartc=$?
-launchd=`launchctl help 2>/dev/null`
+launchd=$(launchctl help 2>/dev/null)
 launchdc=$?
 
 echo ""
-if [[ $systemdc -eq 0 && `echo "$systemd" | wc -l` -ge 1 ]]; then
+if [[ $systemdc -eq 0 && $(echo "$systemd" | wc -l) -ge 1 ]]; then
     echo "System service: systemd detected"
     read -rp "Run the driver as a startup service [Y/n]? " doservice
     if [[ $doservice =~ no? ]]; then
@@ -142,15 +164,15 @@ if [[ $systemdc -eq 0 && `echo "$systemd" | wc -l` -ge 1 ]]; then
         sudo systemctl stop ckb-daemon >/dev/null 2>&1
         sudo mkdir -p /usr/lib/systemd/system
         checkfail $?
-        sudo install -m 0644 service/systemd/ckb-daemon.service /usr/lib/systemd/system 2>$TMPFILE
+        sudo install -m 0644 service/systemd/ckb-daemon.service /usr/lib/systemd/system 2>"$TMPFILE"
         checkfail $?
         sudo systemctl daemon-reload >/dev/null 2>&1
-        sudo systemctl enable ckb-daemon 2>$TMPFILE
+        sudo systemctl enable ckb-daemon 2>"$TMPFILE"
         checkfail $?
-        sudo systemctl start ckb-daemon 2>$TMPFILE
+        sudo systemctl start ckb-daemon 2>"$TMPFILE"
         checkfail $?
     fi
-elif [[ $upstartc -eq 0 && `echo $upstart | wc -l` -ge 1 ]]; then
+elif [[ $upstartc -eq 0 && $(echo "$upstart" | wc -l) -ge 1 ]]; then
     echo "System service: Upstart detected"
     read -rp "Run the driver as a startup service [Y/n]? " doservice
     if [[ $doservice =~ no? ]]; then
@@ -161,11 +183,11 @@ elif [[ $upstartc -eq 0 && `echo $upstart | wc -l` -ge 1 ]]; then
         sudo service ckb-daemon stop >/dev/null 2>&1
         sudo mkdir -p /etc/init
         checkfail $?
-        sudo install service/upstart/ckb-daemon.conf /etc/init 2>$TMPFILE
+        sudo install service/upstart/ckb-daemon.conf /etc/init 2>"$TMPFILE"
         checkfail $?
-        sudo service ckb-daemon start 2>$TMPFILE
+        sudo service ckb-daemon start 2>"$TMPFILE"
     fi
-elif [[ $launchdc -eq 0 && `echo "$launchd" | wc -l` -ge 1 ]]; then
+elif [[ $launchdc -eq 0 && $(echo "$launchd" | wc -l) -ge 1 ]]; then
     echo "System service: launchd detected"
     read -rp "Run the driver as a startup service [Y/n]? " doservice
     if [[ $doservice =~ no? ]]; then
@@ -176,13 +198,13 @@ elif [[ $launchdc -eq 0 && `echo "$launchd" | wc -l` -ge 1 ]]; then
         sudo launchctl unload /Library/LaunchDaemons/com.ckb.daemon.plist >/dev/null 2>&1
         sudo mkdir -p /Library/LaunchDaemons
         checkfail $?
-        sudo cp -f service/launchd/com.ckb.daemon.plist /Library/LaunchDaemons 2>$TMPFILE
+        sudo cp -f service/launchd/com.ckb.daemon.plist /Library/LaunchDaemons 2>"$TMPFILE"
         checkfail $?
-        sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist 2>$TMPFILE
+        sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
-        sudo chmod 0700 /Library/LaunchDaemons/com.ckb.daemon.plist 2>$TMPFILE
+        sudo chmod 0700 /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
-        sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist 2>$TMPFILE
+        sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
     fi
 else
@@ -191,7 +213,7 @@ else
     read -rp "Start it now [Y/n]? " dodriver
     if [[ ! $dodriver =~ no? ]]; then
         sleep 0.5
-        sudo nohup $PREFIX/ckb-daemon >/dev/null 2>&1 &
+        sudo nohup "$PREFIX"/ckb-daemon >/dev/null 2>&1 &
         checkfail $?
     fi
 fi
@@ -200,11 +222,11 @@ sleep 1
 echo ""
 read -rp "Start ckb now [Y/n]? " dolaunch
 [[ $dolaunch =~ no? ]] && exit 0
-APP=$PREFIX/ckb
-[[ "$OSTYPE" == "darwin"* ]] && APP=$APP.app/Contents/MacOS/ckb
+APP="$PREFIX"/ckb
+[[ "$OSTYPE" == "darwin"* ]] && APP="$APP".app/Contents/MacOS/ckb
 # Ask ckb to close if there's an instance already running
-$APP --close >/dev/null 2>&1
+"$APP" --close >/dev/null 2>&1
 sleep 0.5
 # Launch
-nohup $APP >/dev/null 2>&1 &
+nohup "$APP" >/dev/null 2>&1 &
 exit 0

@@ -20,7 +20,7 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 CONFIG   = debug_and_release
 QT       =
 
-CKB_VERSION_STR = `cat $$PWD/../../VERSION`
+CKB_VERSION_STR = `cat $$PWD/../../VERSION | tr -d '\n'`
 DEFINES += CKB_VERSION_STR="\\\"$$CKB_VERSION_STR\\\""
 
 SOURCES += \

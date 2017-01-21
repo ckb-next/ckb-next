@@ -203,6 +203,18 @@ The latest firmware versions and their URLs can be found in the `FIRMWARE` docum
 
 When the device reconnects you should see the new firmware version in its `fwversion` node; if you see `0000` instead it means that the keyboard did not update successfully and will need another `fwupdate` command in order to function again. If the update fails repeatedly, try connecting the keyboard to a Windows PC and using the official firmware update in CUE.
 
+Restart
+-------
+
+Because sometimes tho communication between daemon and KB is corrupted after resuming from Standby or suspend, a restart function is implemented.
+It first calls the quit() funtion, then it calls main() again with the original parameter list.
+
+There are two ways to restart the daemon:
+- send the string "restart some-description-as-one-word" to the cmd-pipe (normally /dev/input/ckb1/cmd or /dev/input/ckb2/cmd, dependign on what device gets what usb number
+- sending SIGUSR1 to the daemon-process (as root).
+
+Later on, there may be a user interface in the client for the first method.
+
 Security
 --------
 

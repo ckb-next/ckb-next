@@ -59,6 +59,7 @@ const devcmd vtable_keyboard = {
     .notify = cmd_notify,
     .inotify = cmd_inotify,
     .get = cmd_get,
+    .restart = cmd_restart,
 
     .start = start_dev,
     .setmodeindex = int1_void_none,
@@ -105,6 +106,7 @@ const devcmd vtable_keyboard_nonrgb = {
     .notify = cmd_notify,
     .inotify = cmd_inotify,
     .get = cmd_get,
+    .restart = cmd_restart,
 
     .start = start_kb_nrgb,
     .setmodeindex = setmodeindex_nrgb,
@@ -151,6 +153,7 @@ const devcmd vtable_mouse = {
     .notify = cmd_notify,
     .inotify = cmd_none,
     .get = cmd_get,
+    .restart = cmd_restart,
 
     .start = start_dev,
     .setmodeindex = int1_void_none,

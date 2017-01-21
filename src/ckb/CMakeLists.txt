@@ -1,63 +1,65 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter") # <-- fix this
-set(CMAKE_CXX_STANDARD 14)
-#set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} -Wno-unused-parameter)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
-#set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS} -g -O0 -Wall)
-#set(CMAKE_C_FLAGS_DEBUG "")
-#set(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS} -03 -Wno-unused-parameter)
-#set(CMAKE_C_FLAGS_RELEASE "")
+#-------------------------------------------------------------------------------
+# set compile flags
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # using regular Clang or AppleClang
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Weverything")
+else ()
+    # using GNU
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+endif()
 
 message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
 message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
 
+#-------------------------------------------------------------------------------
 # Qt automagic things
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-# set apple search directories
+#-------------------------------------------------------------------------------
+# set Qt search directories on macOS
 if (APPLE)
-    message(STATUS "Building for macOS")
-    message(STATUS "CMAKE_PREFIX_PATH before brew: " ${CMAKE_PREFIX_PATH})
     execute_process(COMMAND brew --prefix qt5
             RESULT_VARIABLE BREW_AND_QT_FOUND
             OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (NOT ${BREW_AND_QT_FOUND} STREQUAL "0")
         message(FATAL_ERROR "Homebrew is not installed!")
     endif ()
-    message(STATUS "CMAKE_PREFIX_PATH after brew: " ${CMAKE_PREFIX_PATH})
+    message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH})
 endif ()
 
-# look for qt
+#-------------------------------------------------------------------------------
+# find Qt5
 find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
 if (Qt5Core_FOUND)
     if (Qt5Core_VERSION VERSION_LESS 5.6.0)
         message(FATAL_ERROR "Minimum supported Qt5 version is 5.6!")
-    else ()
-        message(STATUS "Found Qt ${Qt5Core_VERSION_STRING}")
     endif ()
 endif ()
 include_directories(${Qt5Core_INCLUDE_DIRS})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${Qt5Network_INCLUDE_DIRS})
 
-# look for zlib
+#-------------------------------------------------------------------------------
+# find Zlib
 find_package(ZLIB REQUIRED)
-message(STATUS "Found Zlib ${ZLIB_VERSION_STRING}")
 include_directories(${ZLIB_INCLUDE_DIRS})
 
-# look for apple frameworks
+#-------------------------------------------------------------------------------
+# find Apple frameworks
 if (APPLE)
     find_library(COREAUDIO_LIBRARY CoreAudio)
-    message(STATUS "Found CoreAudio")
     find_library(FOUNDATION_LIBRARY Foundation)
-    message(STATUS "Found Foundation")
     find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
-    message(STATUS "Found AudioToolbox")
     mark_as_advanced(
             COREAUDIO_LIBRARY
             FOUNDATION_LIBRARY
@@ -65,18 +67,20 @@ if (APPLE)
     )
 endif ()
 
-# bundle settings
+#-------------------------------------------------------------------------------
+# set up macOS Bundle
 if (APPLE)
     set(MACOSX_BUNDLE_DISPLAY_NAME "CKB Next")
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
-    set(MACOSX_BUNDLE_ICON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ckb-logo.icns)
+    set(MACOSX_BUNDLE_ICON_FILE "ckb-logo.icns")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.next.ckb")
     set(MACOSX_BUNDLE_BUNDLE_NAME "ckb")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}")
     set(MACOSX_BUNDLE_COPYRIGHT "2014-2016: ccMSC, 2017: the ckb-next dev team")
 endif ()
 
-# The order is taken from qmake, could be improved later
+#-------------------------------------------------------------------------------
+# mark all source files
 set(HEADERS
         mainwindow.h
         kbwidget.h
@@ -224,6 +228,8 @@ set(OBJC_SOURCES
         media_mac.m
         )
 
+#-------------------------------------------------------------------------------
+# mark libraries
 set(LIBS
         Qt5::Core
         Qt5::Widgets
@@ -239,30 +245,14 @@ if (APPLE)
             )
 endif ()
 
+#-------------------------------------------------------------------------------
+# add definitions to the source code
 add_definitions(-DQUAZIP_STATIC)
 
+#-------------------------------------------------------------------------------
+# set up targets and bundle them
 if (APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${RESOURCES} ${OBJC_SOURCES})
     target_link_libraries(${PROJECT_NAME} ${LIBS} ${APPLE_LIBS})
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in)
 endif ()
-
-#set(CHECK_X11 "pkg-config --exists x11")
-#set(APP_IND "pkg-config --exists appindicator-0.1")
-#
-#execute_process(COMMAND ${CHECK_X11} RESULT_VARIABLE RESULT)
-#if ("${RESULT}" STREQUAL "0")
-#    message("Using X11")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lX11")
-#    add_definitions(-DUSE_LIBX11)
-#endif ("${RESULT}" STREQUAL "0")
-#
-## todo: set this up.
-#execute_process(COMMAND ${APP_IND} RESULT_VARIABLE RESULT)
-#if ("${RESULT}" STREQUAL "0")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lX11")
-#    add_definitions(-DUSE_LIBX11)
-#endif ("${RESULT}" STREQUAL "0")
-#
-#execute_process(COMMAND cat ${CMAKE_SOURCE_DIR}/VERSION RESULT_VARIABLE CKB_VERSION_STR)
-#add_definitions(-DCKB_VERSION_STR="\\\"${CKB_VERSION_STR}\\\"")

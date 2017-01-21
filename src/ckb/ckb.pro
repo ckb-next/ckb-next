@@ -27,7 +27,7 @@ macx {
 }
 
 # Load version number from VERSION file
-CKB_VERSION_STR = `cat $$PWD/../../VERSION`
+CKB_VERSION_STR = `cat $$PWD/../../VERSION | tr -d '\n'`
 DEFINES += CKB_VERSION_STR="\\\"$$CKB_VERSION_STR\\\""
 
 # Zip library for decompressing firmwares

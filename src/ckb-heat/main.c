@@ -97,11 +97,11 @@ void ckb_time(ckb_runctx* context, double delta){
 	}
 }
 
-inline int max(int a, int b){
+int max(int a, int b){
 	return a < b ? b : a;
 }
 
-inline int min(int a, int b){
+int min(int a, int b){
 	return a < b ? a : b;
 }
 

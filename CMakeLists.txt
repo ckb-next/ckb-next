@@ -1,21 +1,45 @@
 cmake_minimum_required(VERSION 3.5)
 project(ckb-next)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14")
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+# create a cosy boolean for Linux
+# http://stackoverflow.com/questions/9160335/os-specific-instructions-in-cmake-how-to ??
+if (UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+else ()
+    set(LINUX FALSE)
+endif ()
+
+# get version string from VERSION
+execute_process(COMMAND cat ${CMAKE_SOURCE_DIR}/VERSION RESULT_VARIABLE CKB_VERSION_STR)
+add_definitions(-DCKB_VERSION_STR="\\\"${CKB_VERSION_STR}\\\"")
+
+message(STATUS "PROJECT: ${PROJECT_NAME} ${CKB_VERSION_STR}")
+
+# force build type
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING  # TODO change this after cmake is fully functional
+    "None Debug Release RelWithDebInfo MinSizeRel"
+    FORCE)
+endif ()
+message(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
+
+# where binaries/bundles go
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+message(STATUS "CMAKE_RUNTIME_OUTPUT_DIRECTORY: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
+# where cmake-related files live
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
-# main projects
-add_subdirectory(src/ckb)
-add_subdirectory(src/ckb-daemon)
+# disallow in-source build
+include(MacroEnsureOutOfSourceBuild)
+macro_ensure_out_of_source_build("${PROJECT_NAME} requires an out of source build. \
+Please create a separate build directory and run 'cmake /path/to/${PROJECT_NAME} [options]' there.")
 
-# animation programs
-add_subdirectory(src/ckb-gradient)
-add_subdirectory(src/ckb-heat)
-#add_subdirectory(src/ckb-mviz)
-add_subdirectory(src/ckb-pinwheel)
-add_subdirectory(src/ckb-rain)
-add_subdirectory(src/ckb-random)
-add_subdirectory(src/ckb-ripple)
-add_subdirectory(src/ckb-wave)
+if (APPLE)
+    message(STATUS "Building for macOS")
+else ()
+    message(STATUS "Building for Linux")
+endif ()
+
+# proceed with source files
+add_subdirectory(src)

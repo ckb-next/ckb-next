@@ -91,8 +91,8 @@ void ckb_time(ckb_runctx* context, double delta){
 			anims[i].timing -= delta;
 			while(anims[i].timing < 0){
 				anims[i].timing += 1.f/30.f;
-                if(anims[i].usages > 0)
-                    anims[i].usages--;
+				if(anims[i].usages > 0)
+					anims[i].usages--;
 			}	
 		}
 	}

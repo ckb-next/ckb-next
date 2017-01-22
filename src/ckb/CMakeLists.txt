@@ -1,29 +1,6 @@
+project(ckb-gui LANGUAGES CXX)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-set(CMAKE_VERBOSE_MAKEFILE OFF)
-
-#-------------------------------------------------------------------------------
-# set compile flags
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
-
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # using regular Clang or AppleClang
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Weverything")
-else ()
-    # using GNU
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-endif()
-
-message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
-message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
-
-#-------------------------------------------------------------------------------
-# Qt automagic things
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
 
 #-------------------------------------------------------------------------------
 # set Qt search directories on macOS
@@ -50,6 +27,12 @@ include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${Qt5Network_INCLUDE_DIRS})
 
 #-------------------------------------------------------------------------------
+# Qt automagic things
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+#-------------------------------------------------------------------------------
 # find Zlib
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIRS})
@@ -69,15 +52,15 @@ endif ()
 
 #-------------------------------------------------------------------------------
 # set up macOS Bundle
-if (APPLE)
-    set(MACOSX_BUNDLE_DISPLAY_NAME "CKB Next")
-    set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
-    set(MACOSX_BUNDLE_ICON_FILE "ckb-logo.icns")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.next.ckb")
-    set(MACOSX_BUNDLE_BUNDLE_NAME "ckb")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}")
-    set(MACOSX_BUNDLE_COPYRIGHT "2014-2016: ccMSC, 2017: the ckb-next dev team")
-endif ()
+#if (APPLE)
+#    set(MACOSX_BUNDLE_DISPLAY_NAME "CKB Next")
+#    set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
+#    set(MACOSX_BUNDLE_ICON_FILE "ckb-logo.icns")
+#    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.next.ckb")
+#    set(MACOSX_BUNDLE_BUNDLE_NAME "ckb")
+#    set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}")
+#    set(MACOSX_BUNDLE_COPYRIGHT "2014-2016: ccMSC, 2017: the ckb-next dev team")
+#endif ()
 
 #-------------------------------------------------------------------------------
 # mark all source files
@@ -250,9 +233,21 @@ endif ()
 add_definitions(-DQUAZIP_STATIC)
 
 #-------------------------------------------------------------------------------
-# set up targets and bundle them
+# set up targets
 if (APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${RESOURCES} ${OBJC_SOURCES})
     target_link_libraries(${PROJECT_NAME} ${LIBS} ${APPLE_LIBS})
-    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in)
+#    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+            MACOSX_BUNDLE_BUNDLE_NAME "ckb-next"
+            MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}"
+            MACOSX_BUNDLE_COPYRIGHT "© 2014-2016 ccMSC, © 2017: the ckb-next dev team"
+            MACOSX_BUNDLE_GUI_IDENTIFIER "com.next.ckb"
+            MACOSX_BUNDLE_ICON_FILE "ckb-logo.icns"
+            MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}"
+            )
+
+    # install additional files for the bundle
+#    install(DIRECTORY Resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Contents)
+#    install(FILES ${MACOSX_BUNDLE_ICON_FILE} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Contents/Resources)
 endif ()

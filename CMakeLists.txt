@@ -1,45 +1,50 @@
-cmake_minimum_required(VERSION 3.7)  # can be lowered later
+# TODO finish mac support
+# TODO finish linux support
+# TODO check build type before defining version, if release - use manually passed string with -D, else use git tags
+# TODO get rid of VERSION and fix qmake to do the above
+# TODO add option to enable/disable compiler warnings
+# TODO add option to build or not build the gui
+# TODO add option to build or not build the animations
 
-project(ckb-next VERSION 0.2.7)  # <-- iterate this manually with VERSION bump
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
-# create a cosy boolean for Linux
-if (UNIX AND NOT APPLE)
-    set(LINUX TRUE)
-else ()
-    set(LINUX FALSE)
-endif ()
+project(ckb-next)
+
+set(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/cmake)
+
+set(${PROJECT_NAME}_VERSION_MAJOR   "0")
+set(${PROJECT_NAME}_VERSION_MINOR   "2")
+set(${PROJECT_NAME}_VERSION_PATCH   "7")
+set(${PROJECT_NAME}_VERSION
+        "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
+
+include(DetermineVersion)
+find_package(Git)
+determine_version(${${PROJECT_NAME}_SOURCE_DIR} ${GIT_EXECUTABLE} "${PROJECT_NAME}")
 
 # define version for source code
-execute_process(COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/VERSION
-        OUTPUT_VARIABLE CKB_VERSION_STR OUTPUT_STRIP_TRAILING_WHITESPACE)
-add_definitions(-DCKB_VERSION_STR="\\\"${CKB_VERSION_STR}\\\"")
+add_definitions(-DCKB_VERSION_STR="\\\"${${PROJECT_NAME}_VERSION}\\\"")
 
-message(STATUS "PROJECT: ${PROJECT_NAME} ${CKB_VERSION_STR}")
+# set build type (debug, release etc.)
+include(BuildType)
+message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
 
-# force build type
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING  # TODO change this after cmake is fully functional
-            "None Debug Release RelWithDebInfo MinSizeRel"
-            FORCE)
-endif ()
-message(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
+# set up binaries/libraries paths
+include(BuildLocation)
 
-# where binaries/bundles go
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-message(STATUS "CMAKE_RUNTIME_OUTPUT_DIRECTORY: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
-# where cmake-related files live
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+# set up compiler flags
+include(CompilerFlags)
 
 # disallow in-source build
 include(MacroEnsureOutOfSourceBuild)
 macro_ensure_out_of_source_build("${PROJECT_NAME} requires an out of source build. \
 Please create a separate build directory and run 'cmake /path/to/${PROJECT_NAME} [options]' there.")
 
-if (APPLE)
-    message(STATUS "Building for macOS")
+# create a boolean for Linux
+if (UNIX AND NOT APPLE)
+    set(LINUX TRUE)
 else ()
-    message(STATUS "Building for Linux")
+    set(LINUX FALSE)
 endif ()
 
 # proceed with source files

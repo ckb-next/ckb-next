@@ -1,7 +1,8 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# gui and daemon
 add_subdirectory(ckb)
-#add_subdirectory(ckb-daemon)
+add_subdirectory(ckb-daemon)
 
 # animation programs
 #add_subdirectory(ckb-gradient)

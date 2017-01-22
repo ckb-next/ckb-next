@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 project(ckb-next)
 
 # create a cosy boolean for Linux
-# http://stackoverflow.com/questions/9160335/os-specific-instructions-in-cmake-how-to ??
 if (UNIX AND NOT APPLE)
     set(LINUX TRUE)
 else ()
@@ -16,12 +15,12 @@ add_definitions(-DCKB_VERSION_STR="\\\"${CKB_VERSION_STR}\\\"")
 message(STATUS "PROJECT: ${PROJECT_NAME} ${CKB_VERSION_STR}")
 
 # force build type
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING  # TODO change this after cmake is fully functional
-    "None Debug Release RelWithDebInfo MinSizeRel"
-    FORCE)
-endif ()
-message(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
+#if (NOT CMAKE_BUILD_TYPE)
+#    set(CMAKE_BUILD_TYPE Release CACHE STRING  # TODO change this after cmake is fully functional
+#    "None Debug Release RelWithDebInfo MinSizeRel"
+#    FORCE)
+#endif ()
+#message(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
 
 # where binaries/bundles go
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

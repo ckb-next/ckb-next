@@ -97,14 +97,6 @@ void ckb_time(ckb_runctx* context, double delta){
 	}
 }
 
-int max(int a, int b){
-	return a < b ? b : a;
-}
-
-int min(int a, int b){
-	return a < b ? a : b;
-}
-
 int ckb_frame(ckb_runctx* context){
     CKB_KEYCLEAR(context);
     // Draw spots
@@ -118,7 +110,7 @@ int ckb_frame(ckb_runctx* context){
 		if(randomBright)
 			ckb_grad_color(&a, &r, &g, &b, &animcolor, ((float)(rand() % 1024))/10.f);
 		else
-			ckb_grad_color(&a, &r, &g, &b, &animcolor, (float)min(anims[i].usages,full)*100.f/full);
+			ckb_grad_color(&a, &r, &g, &b, &animcolor, (float)fmin(anims[i].usages,full)*100.f/full);
 		ckb_alpha_blend(keys+i, a, r, g, b);
     }
     return 0;

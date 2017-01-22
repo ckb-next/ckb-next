@@ -12,7 +12,7 @@ macx {
 
 CONFIG   = debug_and_release
 QT       =
-LIBS     =
+LIBS     = -lm
 
 SOURCES += \
     main.c

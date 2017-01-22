@@ -38,7 +38,7 @@ long ffade = 30;
 double pressestofull = 10.f;
 
 typedef struct{
-	int usages;
+	unsigned int usages;
 	int pressed;
 	double timing;
 	int x;
@@ -91,7 +91,8 @@ void ckb_time(ckb_runctx* context, double delta){
 			anims[i].timing -= delta;
 			while(anims[i].timing < 0){
 				anims[i].timing += 1.f/30.f;
-				anims[i].usages--;
+                if(anims[i].usages > 0)
+                    anims[i].usages--;
 			}	
 		}
 	}

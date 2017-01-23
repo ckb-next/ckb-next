@@ -11,7 +11,7 @@ What happened to the original [ckb](https://github.com/ccMSC/ckb)?
 ---
 We don't know. The author of **ckb** [ccMSC](https://github.com/ccMSC) suddenly disappeared and hasn't showed up since July 2016. So the community around ckb decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to original ckb.
 
-From the **ckb** author:
+Original intro from the **ckb** author:
 
 >If you use and enjoy this project, I'd appreciate if you could spare a few dollars for a donation. This is completely voluntary - the project will remain free and open source regardless. `:)`
 >
@@ -22,9 +22,10 @@ From the **ckb** author:
 Contents
 --------
 
+* [Current Status](#current-status)
 * [Device Support](#device-support)
 * [Linux Installation](#linux-installation)
-* [OS X/macOS Installation](#os-x-macos-installation)
+* [OS X/macOS Installation](#os-xmacos-installation)
 * [Usage](#usage)
 * [Troubleshooting](#troubleshooting)
 * [Known Issues](#known-issues)
@@ -62,7 +63,12 @@ Linux Installation
 ------------------
 
 #### Pre-made packages:
-**! old ckb versions, ckb-next will be shipped soon !**
+**ckb-next** packages:
+
+* Fedora 24/25, CentOS/RHEL 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
+    * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
+
+**ckb** packages (deprecated):
 
 * Arch Linux (maintained by [@light2yellow](https://github.com/light2yellow)):
 	* [`aur/ckb-git`](https://aur.archlinux.org/packages/ckb-git/) - based on `master` branch (more stable)

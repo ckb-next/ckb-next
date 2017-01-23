@@ -65,7 +65,7 @@ Linux Installation
 #### Pre-made packages:
 **ckb-next** packages:
 
-* Fedora 24/25, CentOS 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
+* Fedora 24/25, CentOS/RHEL 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
     * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
 
 **ckb** packages (deprecated):

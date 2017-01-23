@@ -63,7 +63,12 @@ Linux Installation
 ------------------
 
 #### Pre-made packages:
-**! old ckb versions, ckb-next will be shipped soon !**
+**ckb-next** packages:
+
+* Fedora 24/25, CentOS 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
+    * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
+
+**ckb** packages (deprecated):
 
 * Arch Linux (maintained by [@light2yellow](https://github.com/light2yellow)):
 	* [`aur/ckb-git`](https://aur.archlinux.org/packages/ckb-git/) - based on `master` branch (more stable)

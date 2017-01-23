@@ -9,15 +9,7 @@ ckb-next: RGB Driver for Linux and OS X
 
 What happened to the original [ckb](https://github.com/ccMSC/ckb)?
 ---
-We don't know. The author of **ckb** [ccMSC](https://github.com/ccMSC) suddenly disappeared and hasn't showed up since July 2016. So the community around ckb decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to original ckb.
-
-Original intro from the **ckb** author:
-
->If you use and enjoy this project, I'd appreciate if you could spare a few dollars for a donation. This is completely voluntary - the project will remain free and open source regardless. `:)`
->
->I accept donations through PayPal: [![Click Here](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DCLHFH9S3KZ8W&lc=US&item_name=ckb&item_number=ckb%20GitHub%20Page&no_note=1&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
->
->Or through Bitcoin: [![](https://i.imgur.com/DJTlQcJ.png) 1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ](https://blockchain.info/address/1LDHCfyDqAziUPtp3a4BdUaKmwphG1yroQ)
+We don't know. The author of **ckb** [ccMSC](https://github.com/ccMSC) suddenly disappeared and hasn't showed up since July 2016. So the community around ckb decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to the original ckb.
 
 Contents
 --------

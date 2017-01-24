@@ -1,36 +1,38 @@
 # TODO finish mac support
 # TODO finish linux support
-# TODO check build type before defining version, if release - use manually passed string with -D, else use git tags
 # TODO get rid of VERSION and fix qmake to do the above
-# TODO add option to enable/disable compiler warnings
-# TODO add option to build or not build the gui
-# TODO add option to build or not build the animations
+# TODO search for system's quazip and use it if found
 
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
-project(ckb-next)
+project(ckb-next LANGUAGES C CXX)
 
 set(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/cmake)
 
-set(${PROJECT_NAME}_VERSION_MAJOR   "0")
-set(${PROJECT_NAME}_VERSION_MINOR   "2")
-set(${PROJECT_NAME}_VERSION_PATCH   "7")
+# everything we need to load before proceeding with the main CMake file
+include(PreCMakeConfig)
+
+set(${PROJECT_NAME}_VERSION_MAJOR "0")  #  |>|>
+set(${PROJECT_NAME}_VERSION_MINOR "2")  #  |>|> populated manually, must be updated accordingly to annotated tags
+set(${PROJECT_NAME}_VERSION_PATCH "7")  #  |>|>
 set(${PROJECT_NAME}_VERSION
         "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
 
+# enhance the version by a current commit hash if the commit is not a release tag
 include(DetermineVersion)
 find_package(Git)
 determine_version(${${PROJECT_NAME}_SOURCE_DIR} ${GIT_EXECUTABLE} "${PROJECT_NAME}")
 
-# define version for source code
-add_definitions(-DCKB_VERSION_STR="\\\"${${PROJECT_NAME}_VERSION}\\\"")
-
 # set build type (debug, release etc.)
 include(BuildType)
-message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
 
-# set up binaries/libraries paths
+# set up binary paths
 include(BuildLocation)
+
+# GNU-compliant paths
+if (LINUX)
+    include(GNUInstallDirs)
+endif ()
 
 # set up compiler flags
 include(CompilerFlags)
@@ -40,12 +42,29 @@ include(MacroEnsureOutOfSourceBuild)
 macro_ensure_out_of_source_build("${PROJECT_NAME} requires an out of source build. \
 Please create a separate build directory and run 'cmake /path/to/${PROJECT_NAME} [options]' there.")
 
-# create a boolean for Linux
-if (UNIX AND NOT APPLE)
-    set(LINUX TRUE)
-else ()
-    set(LINUX FALSE)
-endif ()
+#if (APPLE)
+#    set(MACOSX_BUNDLE_NAME "CKB Next")
+#    set(prefix "${MACOSX_BUNDLE_NAME}.app/Contents")
+#    set(INSTALL_INCLUDE_DIR "${prefix}/${INSTALL_INCLUDE_DIR}")
+#    set(INSTALL_RUNTIME_DIR "${prefix}/MacOS")
+#    set(INSTALL_LIBRARY_DIR "${prefix}/${INSTALL_LIBRARY_DIR}")
+#    set(INSTALL_ARCHIVE_DIR "${prefix}/${INSTALL_ARCHIVE_DIR}")
+#    set(INSTALL_DATA_DIR "${prefix}/${INSTALL_DATA_DIR}")
+#    set(INSTALL_DOC_DIR "${prefix}/${INSTALL_DOC_DIR}")
+#    set(INSTALL_CMAKE_DIR "${prefix}/Resources")
+#endif ()
 
 # proceed with source files
 add_subdirectory(src)
+
+# TODO fix
+if (APPLE)
+    install(
+            FILES
+            README.md
+            DAEMON.md
+            osx/resources/LICENSE.html
+            DESTINATION "${MACOSX_BUNDLE_BUNDLE_NAME}")
+
+    include(CkbNextCPack)
+endif ()

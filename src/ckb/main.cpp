@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include <ckbnextconfig.h>
 #include <QApplication>
 #include <QDateTime>
 #include <QSharedMemory>

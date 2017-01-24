@@ -5,6 +5,7 @@
 #include "led.h"
 #include "notify.h"
 #include "profile.h"
+#include <ckbnextconfig.h>
 
 // OSX doesn't like putting FIFOs in /dev for some reason
 #ifndef OS_MAC

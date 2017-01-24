@@ -1,6 +1,14 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# gui and daemon
+# export version to source code
+set(CKB_VERSION_STR ${${PROJECT_NAME}_VERSION})
+
+configure_file(ckbnextconfig.h.in ckbnextconfig.h)
+
+# include this directory so that it's possible to write #include <ckbnextconfig.h> in source files
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+# main program, gui and daemon
 add_subdirectory(ckb)
 add_subdirectory(ckb-daemon)
 

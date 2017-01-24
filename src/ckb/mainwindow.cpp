@@ -3,6 +3,7 @@
 #include "kbfirmware.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <ckbnextconfig.h>
 #include <cstdlib>
 #include <QSharedMemory>
 #include <QShortcut>

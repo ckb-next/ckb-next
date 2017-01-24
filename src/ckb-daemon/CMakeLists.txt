@@ -1,4 +1,4 @@
-project(ckb-daemon LANGUAGES C)
+#project(ckb-daemon LANGUAGES C)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -101,12 +101,12 @@ endif ()
 #-------------------------------------------------------------------------------
 # set up targets
 if (APPLE)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-    target_link_libraries(${PROJECT_NAME} ${LIBS} ${APPLE_LIBS})
+    add_executable(${PROJECT_NAME}-daemon ${SOURCES} ${HEADERS})
+    target_link_libraries(${PROJECT_NAME}-daemon ${LIBS} ${APPLE_LIBS})
 endif ()
 
 if (LINUX)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-    target_link_libraries(${PROJECT_NAME} ${LIBS} ${LINUX_LIBS})
-    set_target_properties(${PROJECT_NAME} PROPERTIES THREADS_PREFER_PTHREAD_FLAG ON)
+    add_executable(${PROJECT_NAME}-daemon ${SOURCES} ${HEADERS})
+    target_link_libraries(${PROJECT_NAME}-daemon ${LIBS} ${LINUX_LIBS})
+    set_target_properties(${PROJECT_NAME}-daemon PROPERTIES THREADS_PREFER_PTHREAD_FLAG ON)
 endif ()

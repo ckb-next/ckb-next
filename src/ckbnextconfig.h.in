@@ -1,0 +1,1 @@
+#cmakedefine CKB_VERSION_STR "@CKB_VERSION_STR@"

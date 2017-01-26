@@ -6,7 +6,6 @@ ExecStart=/usr/bin/ckb-daemon
 Restart=always
 StandardOutput=syslog
 StandardError=inherit
-RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

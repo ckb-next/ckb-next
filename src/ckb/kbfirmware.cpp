@@ -17,18 +17,11 @@ KbFirmware::KbFirmware() :
 }
 
 KbFirmware::~KbFirmware(){
-    //delete networkManager;
-    // ^ This can cause a crash (QT bug?)
-}
-
-void KbFirmware::initManager(){
-    if(networkManager)
-        return;
-    networkManager = new QNetworkAccessManager();
+    delete networkManager;
 }
 
 bool KbFirmware::_checkUpdates(){
-    initManager();
+    networkManager = new QNetworkAccessManager();
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;

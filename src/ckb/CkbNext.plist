@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>CFAppleHelpAnchor</key>
+        <string></string>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>English</string>
+        <key>CFBundleDisplayName</key>
+        <string>CKB Next</string>
+        <key>CFBundleExecutable</key>
+        <string>ckb-next</string>
+        <key>CFBundleGetInfoString</key>
+        <string>CKB Next - version 0.2.2-161-g2114846</string>
+        <key>CFBundleIconFile</key>
+        <string>ckb-logo.icns</string>
+        <key>CFBundleIdentifier</key>
+        <string>com.next.ckb</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleLongVersionString</key>
+        <string>0.2.2-161-g2114846</string>
+        <key>CFBundleName</key>
+        <string>ckb-next</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>0.2.2</string>
+        <key>CFBundleSignature</key>
+        <string>ckbn</string>
+        <key>CFBundleVersion</key>
+        <string>0.2.2-161-g2114846</string>
+        <key>LSMinimumSystemVersion</key>
+        <string>10.9.0</string>
+        <key>NSHighResolutionCapable</key>
+        <true/>
+        <key>NSHumanReadableCopyright</key>
+        <string>Copyright © 2014-2016 ccMSC
+Copyright © 2017 ckb-next dev. team</string>
+        <key>NSPrincipalClass</key>
+        <string>NSApplication</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/Applications/ckb.app/Contents/MacOS/ckb</string>
+            <string>--background</string>
+        </array>
+        <key>KeepAlive</key>
+        <dict>
+            <key>SuccessfulExit</key>
+            <false/>
+        </dict>
+    </dict>
+</plist>

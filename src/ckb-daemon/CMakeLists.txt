@@ -1,8 +1,6 @@
-#project(ckb-daemon LANGUAGES C)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # find libraries
 if (APPLE)
     # find Iconv
@@ -26,10 +24,10 @@ if (LINUX)
     include_directories(${UDEV_INCLUDE_DIRS})
 endif ()
 
-# find Threads (for both systems)
+# find POSIX Threads (for both systems)
 find_package(Threads REQUIRED)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # mark all source files
 set(SOURCES
         device.c
@@ -77,7 +75,7 @@ set(HEADERS
         dpi.h
         )
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # mark libraries
 set(LIBS
         Threads::Threads
@@ -98,11 +96,11 @@ if (LINUX)
             )
 endif ()
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # set up targets
 if (APPLE)
-    add_executable(${PROJECT_NAME}-daemon ${SOURCES} ${HEADERS})
-    target_link_libraries(${PROJECT_NAME}-daemon ${LIBS} ${APPLE_LIBS})
+    add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})
+    target_link_libraries(ckb-next-daemon ${LIBS} ${APPLE_LIBS})
 endif ()
 
 if (LINUX)

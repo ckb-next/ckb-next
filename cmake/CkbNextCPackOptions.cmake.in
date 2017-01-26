@@ -1,5 +1,0 @@
-# This file is configured at cmake time, loaded at cpack time.
-
-#if ("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
-#    set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
-#endif ()

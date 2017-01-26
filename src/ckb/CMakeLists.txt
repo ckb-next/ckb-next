@@ -10,11 +10,10 @@ if (APPLE)
         if (NOT ${BREW_AND_QT_FOUND} STREQUAL "0")
             message(FATAL_ERROR "Homebrew is not installed!")
         endif ()
-        message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH})
     endif ()
 endif ()
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # find Qt5
 find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
 if (Qt5Core_FOUND)
@@ -26,12 +25,12 @@ include_directories(${Qt5Core_INCLUDE_DIRS})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${Qt5Network_INCLUDE_DIRS})
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # find Zlib
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIRS})
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # find Apple frameworks
 if (APPLE)
     find_library(COREAUDIO_LIBRARY CoreAudio)
@@ -44,19 +43,7 @@ if (APPLE)
     )
 endif ()
 
-#-------------------------------------------------------------------------------
-# set up macOS Bundle
-#if (APPLE)
-#    set(MACOSX_BUNDLE_DISPLAY_NAME "CKB Next")
-#    set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
-#    set(MACOSX_BUNDLE_ICON_FILE "ckb-logo.icns")
-#    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.next.ckb")
-#    set(MACOSX_BUNDLE_BUNDLE_NAME "ckb")
-#    set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}")
-#    set(MACOSX_BUNDLE_COPYRIGHT "2014-2016: ccMSC, 2017: the ckb-next dev team")
-#endif ()
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # mark all source files
 set(HEADERS
         mainwindow.h
@@ -195,7 +182,7 @@ set(FORMS
         extrasettingswidget.ui
         )
 
-set(RESOURCES
+set(QT_RESOURCES
         image.qrc
         text.qrc
         binary.qrc
@@ -205,19 +192,23 @@ set(OBJC_SOURCES
         media_mac.m
         )
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# add definitions to the source code
+add_definitions(-DQUAZIP_STATIC)
+
+# ------------------------------------------------------------------------------
 # Qt settings
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 qt5_wrap_ui(${FORMS})
-qt5_add_resources(${RESOURCES})
+qt5_add_resources(${QT_RESOURCES})
 
 # need to add current binary dir to include path for UI file headers
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # mark libraries
 set(LIBS
         Qt5::Core
@@ -232,57 +223,34 @@ if (APPLE)
             ${FOUNDATION_LIBRARY}
             ${AUDIOTOOLBOX_LIBRARY}
             )
+
+    # mark additional files to put under /Resources on macOS
+    set(MAC_RESOURCES
+            ckb-logo.icns
+            ${CMAKE_SOURCE_DIR}/osx/resources/LICENSE.html
+            ${CMAKE_SOURCE_DIR}/README.md
+            ${CMAKE_SOURCE_DIR}/BUILD.md
+            ${CMAKE_BINARY_DIR}/ckb-next-daemon
+            )
 endif ()
 
-#-------------------------------------------------------------------------------
-# add definitions to the source code
-add_definitions(-DQUAZIP_STATIC)
-
-#-------------------------------------------------------------------------------
-# set up additional settings
-if (APPLE)
-    set(MACOSX_BUNDLE_ICON_FILE ckb-logo.icns)
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "${${PROJECT_NAME}_VERSION}")
-    set(MACOSX_BUNDLE_INFO_STRING "CKB Next - version ${${PROJECT_NAME}_VERSION}")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.next.ckb")
-    set(MACOSX_BUNDLE_BUNDLE_NAME "CKB Next")
-    set_source_files_properties(ckb-logo.icns PROPERTIES
-            MACOSX_PACKAGE_LOCATION Resources)
-    set(MACOSX_BUNDLE_INFO_PLIST )
-endif ()
-
-if (LINUX)
-    install(FILES "ckb.desktop" DESTINATION "${INSTALL_XDG_APPS_DIR}")
-    install(FILES "ckb-logo.png" DESTINATION "${INSTALL_XDG_ICON_DIR}")
-endif ()
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # set up targets
 if (APPLE)
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${RESOURCES} ${OBJC_SOURCES} ckb-logo.icns)
-    qt5_use_modules(${PROJECT_NAME} Core Widgets Network)
-    target_link_libraries(${PROJECT_NAME} ${LIBS} ${APPLE_LIBS})
-    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${MACOSX_BUNDLE_BUNDLE_NAME})
-endif ()
+    # set variables for creating a plist
+    include(CkbNextPlist)
 
-if (LINUX)
-    # TODO finish this
-    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-endif ()
+    add_executable(ckb-next MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${QT_RESOURCES} ${OBJC_SOURCES} ckb-logo.icns)
+    qt5_use_modules(ckb-next Core Widgets Network)
+    target_link_libraries(ckb-next ${LIBS} ${APPLE_LIBS})
+    set_target_properties(ckb-next PROPERTIES
+#            OUTPUT_NAME "${MACOSX_BUNDLE_BUNDLE_NAME}"
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/CkbNext.plist"
+            RESOURCE ${MAC_RESOURCES}
+            )
 
-install(TARGETS ${PROJECT_NAME}
-        RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}
-        BUNDLE DESTINATION .
-        )
-
-if (APPLE)
-    get_target_property(output_name ${PROJECT_NAME} OUTPUT_NAME)
-    if (output_name)
-        set(exe "${output_name}.app")
-    else ()
-        set(exe "${PROJECT_NAME}.app")
-    endif ()
-
+    # deploy qt5 on macOS
+    set(exe "ckb-next.app")
     set(dirs "")
     if (CMAKE_PREFIX_PATH)
         foreach (dir ${CMAKE_PREFIX_PATH})
@@ -292,5 +260,13 @@ if (APPLE)
 
     include(InstallRequiredSystemLibraries)
     include(DeployQt5)
-    install_qt5_executable(${exe} "" "" "${dirs}" "")
+    install_qt5_executable("${exe}" "" "" "${dirs}" "")
+
+endif ()
+
+if (LINUX)
+    # TODO finish this
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+
+    # Linux installation is supposed to be handled manually by package maintainers
 endif ()

@@ -8,9 +8,9 @@ configure_file(ckbnextconfig.h.in ckbnextconfig.h)
 # include this directory so that it's possible to write #include <ckbnextconfig.h> in source files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# main program, gui and daemon
-add_subdirectory(ckb)
+# we put daemon earlier because the bundle for macOS is created in "ckb"
 add_subdirectory(ckb-daemon)
+add_subdirectory(ckb)
 
 # animation programs
 #add_subdirectory(ckb-gradient)

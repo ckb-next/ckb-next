@@ -7,40 +7,34 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
 project(ckb-next LANGUAGES C CXX)
 
-set(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${ckb-next_SOURCE_DIR}/cmake)
 
 # everything we need to load before proceeding with the main CMake file
 include(PreCMakeConfig)
 
-set(${PROJECT_NAME}_VERSION_MAJOR "0")  #  |>|>
-set(${PROJECT_NAME}_VERSION_MINOR "2")  #  |>|> populated manually, must be updated accordingly to annotated tags
-set(${PROJECT_NAME}_VERSION_PATCH "7")  #  |>|>
-set(${PROJECT_NAME}_VERSION
-        "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
+set(ckb-next_VERSION_MAJOR "0")  #  |>|>
+set(ckb-next_VERSION_MINOR "2")  #  |>|> populated manually, must be updated accordingly to release tags
+set(ckb-next_VERSION_PATCH "7")  #  |>|>
+set(ckb-next_VERSION "${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
 
 # enhance the version by a current commit hash if the commit is not a release tag
 include(DetermineVersion)
 find_package(Git)
-determine_version(${${PROJECT_NAME}_SOURCE_DIR} ${GIT_EXECUTABLE} "${PROJECT_NAME}")
+determine_version(${ckb-next_SOURCE_DIR} ${GIT_EXECUTABLE} "ckb-next")
 
-# set build type (debug, release etc.)
+# set build type (default one is relwithdebinfo)
 include(BuildType)
 
 # set up binary paths
 include(BuildLocation)
-
-# GNU-compliant paths
-if (LINUX)
-    include(GNUInstallDirs)
-endif ()
 
 # set up compiler flags
 include(CompilerFlags)
 
 # disallow in-source build
 include(MacroEnsureOutOfSourceBuild)
-macro_ensure_out_of_source_build("${PROJECT_NAME} requires an out of source build. \
-Please create a separate build directory and run 'cmake /path/to/${PROJECT_NAME} [options]' there.")
+macro_ensure_out_of_source_build("ckb-next requires an out of source build. \
+Please create a separate build directory and run 'cmake /path/to/ckb-next [options]' there.")
 
 #if (APPLE)
 #    set(MACOSX_BUNDLE_NAME "CKB Next")
@@ -57,14 +51,10 @@ Please create a separate build directory and run 'cmake /path/to/${PROJECT_NAME}
 # proceed with source files
 add_subdirectory(src)
 
-# TODO fix
-if (APPLE)
-    install(
-            FILES
-            README.md
-            DAEMON.md
-            osx/resources/LICENSE.html
-            DESTINATION "${MACOSX_BUNDLE_BUNDLE_NAME}")
+# and a bundle
+include(CkbNextBundle)
+# and a dmg
+include(CkbNextCPack)
 
-    include(CkbNextCPack)
-endif ()
+include(CPack)
+

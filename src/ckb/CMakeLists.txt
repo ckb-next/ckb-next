@@ -1,42 +1,21 @@
-project(ckb)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_CXX_STANDARD 14)
-
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # using regular Clang or AppleClang
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Weverything")
-else ()
-    # using GNU
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-endif()
-
-message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
-message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
-
-# Qt automagic things
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-
-
-# set apple search directories
+#-------------------------------------------------------------------------------
+# set Qt search directories on macOS
 if (APPLE)
-    message(STATUS "Building for macOS")
-    message(STATUS "CMAKE_PREFIX_PATH before brew: " ${CMAKE_PREFIX_PATH})
-    execute_process(COMMAND brew --prefix qt5
-            RESULT_VARIABLE BREW_AND_QT_FOUND
-            OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (NOT ${BREW_AND_QT_FOUND} STREQUAL "0")
-        message(FATAL_ERROR "Homebrew is not installed!")
+    if (NOT CMAKE_PREFIX_PATH)
+        execute_process(COMMAND brew --prefix qt5
+                RESULT_VARIABLE BREW_AND_QT_FOUND
+                OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if (NOT ${BREW_AND_QT_FOUND} STREQUAL "0")
+            message(FATAL_ERROR "Homebrew is not installed!")
+        endif ()
     endif ()
-    message(STATUS "CMAKE_PREFIX_PATH after brew: " ${CMAKE_PREFIX_PATH})
 endif ()
 
-
-# look for qt
+# ------------------------------------------------------------------------------
+# find Qt5
 find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
 if (Qt5Core_FOUND)
     if (Qt5Core_VERSION VERSION_LESS 5.6.0)
@@ -45,46 +24,28 @@ if (Qt5Core_FOUND)
         message(STATUS "Found Qt ${Qt5Core_VERSION_STRING}")
     endif ()
 endif ()
-
-# include qt
 include_directories(${Qt5Core_INCLUDE_DIRS})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${Qt5Network_INCLUDE_DIRS})
 
-
-# look for zlib
+# ------------------------------------------------------------------------------
+# find Zlib
 find_package(ZLIB REQUIRED)
 message(STATUS "Found Zlib ${ZLIB_VERSION_STRING}")
 include_directories(${ZLIB_INCLUDE_DIRS})
 
-
-# look for apple frameworks
+# ------------------------------------------------------------------------------
+# find Apple frameworks
 if (APPLE)
     find_library(COREAUDIO_LIBRARY CoreAudio)
-    message(STATUS "Found CoreAudio")
     find_library(FOUNDATION_LIBRARY Foundation)
-    message(STATUS "Found Foundation")
     find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
-    message(STATUS "Found AudioToolbox")
     mark_as_advanced(
             COREAUDIO_LIBRARY
             FOUNDATION_LIBRARY
             AUDIOTOOLBOX_LIBRARY
     )
 endif ()
-
-
-# bundle settings
-if (APPLE)
-    set(MACOSX_BUNDLE_DISPLAY_NAME "CKB Next")
-    set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
-    set(MACOSX_BUNDLE_ICON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ckb-logo.icns)
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.next.ckb")
-    set(MACOSX_BUNDLE_BUNDLE_NAME "ckb")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
-    set(MACOSX_BUNDLE_COPYRIGHT "2014-2016: ccMSC, 2017: the ckb-next dev team")
-endif ()
-
 
 # The order is taken from qmake, could be improved later
 set(HEADERS
@@ -205,12 +166,26 @@ set(OBJC_SOURCES
         media_mac.m
         )
 
-# defs
+# ------------------------------------------------------------------------------
+# add definitions to the source code
 add_definitions(-DQUAZIP_STATIC)
 
+# ------------------------------------------------------------------------------
+# Qt settings
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+#qt5_wrap_ui(${FORMS})
+#qt5_add_resources(${QT_RESOURCES})
+
+# ------------------------------------------------------------------------------
+# include quazip as static lib
 include_directories(quazip)
 add_subdirectory(quazip)
 
+# ------------------------------------------------------------------------------
+# mark libraries
 set(LIBS
         Qt5::Core
         Qt5::Widgets
@@ -225,15 +200,62 @@ if (APPLE)
             ${FOUNDATION_LIBRARY}
             ${AUDIOTOOLBOX_LIBRARY}
             )
+
+    # mark additional files to put under /Resources on macOS
+    set(MAC_RESOURCES
+            ckb-logo.icns
+            ${CMAKE_SOURCE_DIR}/osx/resources/LICENSE.html
+            ${CMAKE_SOURCE_DIR}/README.md
+            ${CMAKE_SOURCE_DIR}/BUILD.md
+            ${CMAKE_BINARY_DIR}/ckb-next-daemon
+            )
 endif ()
 
-if(LINUX)
-    add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${RESOURCES})
-    target_link_libraries(${PROJECT_NAME} ${LIBS})
-elseif (APPLE)
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${RESOURCES} ${OBJC_SOURCES})
-    target_link_libraries(${PROJECT_NAME} ${LIBS} ${APPLE_LIBS})
-    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in)
+# ------------------------------------------------------------------------------
+# set up targets
+if (APPLE)
+    # set variables for creating a plist
+    include(CkbNextPlist)
+
+    add_executable(ckb-next MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${QT_RESOURCES} ${OBJC_SOURCES} ckb-logo.icns)
+    qt5_use_modules(ckb-next Core Widgets Network)
+    target_link_libraries(ckb-next ${LIBS} ${APPLE_LIBS})
+    set_target_properties(ckb-next PROPERTIES
+            #            OUTPUT_NAME "${MACOSX_BUNDLE_BUNDLE_NAME}"
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/CkbNext.plist"
+            RESOURCE ${MAC_RESOURCES}
+            )
+
+    # deploy qt5 on macOS
+    set(exe "ckb-next.app")
+    set(dirs "")
+    if (CMAKE_PREFIX_PATH)
+        foreach (dir ${CMAKE_PREFIX_PATH})
+            list(APPEND dirs "${dir}/bin" "${dir}/lib")
+        endforeach ()
+    endif ()
+
+    include(InstallRequiredSystemLibraries)
+    include(DeployQt5)
+    install_qt5_executable("${exe}" "" "" "${dirs}" "")
+
 endif ()
+
+if (LINUX)
+    # TODO finish this
+    add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${RESOURCES})
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME} ${LIBS})
+    # Linux installation is supposed to be handled manually by package maintainers
+endif ()
+
+#if(LINUX)
+#    add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${RESOURCES})
+#    target_link_libraries(${PROJECT_NAME} ${LIBS})
+#elseif (APPLE)
+#    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${RESOURCES} ${OBJC_SOURCES})
+#    target_link_libraries(${PROJECT_NAME} ${LIBS} ${APPLE_LIBS})
+#    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in)
+#endif ()
 
 

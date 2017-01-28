@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QMenuBar>
 #include <unistd.h>
+#include <ckbnextconfig.h>
 
 extern QSharedMemory appShare;
 

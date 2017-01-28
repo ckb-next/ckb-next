@@ -3,6 +3,8 @@
 #include "input.h"
 #include "led.h"
 #include "notify.h"
+#include <ckbnextconfig.h>
+
 
 // usb.c
 extern volatile int reset_stop;

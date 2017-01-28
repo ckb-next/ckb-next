@@ -65,10 +65,12 @@ fi
 if [[ -d $SRCDIR ]]; then
     echo "Preparing build files..."
     # Clean first
-    make clean >/dev/null 2>&1
-    rm Makefile Makefile.* ./*/*/Makefile ./*/*/Makefile.* >/dev/null 2>&1
+    rm -rf build/*
+    #make clean >/dev/null 2>&1
+    #rm Makefile Makefile.* ./*/*/Makefile ./*/*/Makefile.* >/dev/null 2>&1
     # Generate makefiles
-    ./qmake-auto "$QMAKEFLAGS" > "$TMPFILE" 2>&1
+    #./qmake-auto "$QMAKEFLAGS" > "$TMPFILE" 2>&1
+    cd build/ && cmake ..
     checkfail $?
     make clean >/dev/null 2>&1
     # Run make with command arguments

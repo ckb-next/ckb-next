@@ -14,6 +14,7 @@ KbFirmware::FW::FW() : fwVersion(0.f), ckbVersion(0.f) {}
 KbFirmware::KbFirmware() :
     lastCheck(0), lastFinished(0), networkManager(0), tableDownload(0), hasGPG(UNKNOWN)
 {
+    networkManager = new QNetworkAccessManager();
 }
 
 KbFirmware::~KbFirmware(){
@@ -21,7 +22,6 @@ KbFirmware::~KbFirmware(){
 }
 
 bool KbFirmware::_checkUpdates(){
-    networkManager = new QNetworkAccessManager();
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;

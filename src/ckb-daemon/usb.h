@@ -56,7 +56,9 @@
 #define P_SABRE_N_STR   "1b2f"
 #define P_SABRE_O2      0x1b32 /* Observed on a CH-9000111-EU model SABRE */
 #define P_SABRE_O2_STR  "1b32"
-#define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
+#define P_HARPOON      0x1b3c /* Harpoon test */
+#define P_HARPOON_STR  "1b3c"
+#define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_HARPOON))
 
 #define P_SCIMITAR      0x1b1e
 #define P_SCIMITAR_STR  "1b1e"

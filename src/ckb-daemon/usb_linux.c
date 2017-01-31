@@ -94,8 +94,6 @@ void* os_inputmain(void* context){
     // Monitor input transfers on all endpoints for non-RGB devices
     // For RGB, monitor all but the last, as it's used for input/output
     int urbcount = IS_RGB(vendor, product) ? (kb->epcount - 1) : kb->epcount;
-    if(urbcount == 0)
-        urbcount = 3;
     struct usbdevfs_urb urbs[urbcount];
     memset(urbs, 0, sizeof(urbs));
     urbs[0].buffer_length = 8;

@@ -34,7 +34,9 @@
 #define P_K95_STR       "1b11"
 #define P_K95_NRGB      0x1b08
 #define P_K95_NRGB_STR  "1b08"
-#define IS_K95(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95 || (kb)->product == P_K95_NRGB))
+#define P_K95_PLATINUM  0x1b2d
+#define P_K95_PLATINUM_STR "1b2d"
+#define IS_K95(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95 || (kb)->product == P_K95_NRGB || (kb)->product == P_K95_PLATINUM))
 
 #define P_STRAFE            0x1b20
 #define P_STRAFE_STR        "1b20"
@@ -56,8 +58,8 @@
 #define P_SABRE_N_STR   "1b2f"
 #define P_SABRE_O2      0x1b32 /* Observed on a CH-9000111-EU model SABRE */
 #define P_SABRE_O2_STR  "1b32"
-#define P_HARPOON      0x1b3c /* Harpoon test */
-#define P_HARPOON_STR  "1b3c"
+#define P_HARPOON       0x1b3c /* Harpoon test */
+#define P_HARPOON_STR   "1b3c"
 #define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_HARPOON))
 
 #define P_SCIMITAR      0x1b1e

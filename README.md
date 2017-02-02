@@ -179,6 +179,7 @@ If you have problems connecting the device to your system (device doesn't respon
 
 * K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x20000408`
 * K70: `usbhid.quirks=0x1B1C:0x1B09:0x0x20000408`
+* K70 (newer model): `usbhid.quirks=1B1C:1B36:0x0x20000408`
 * K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000408`
 * K95: `usbhid.quirks=0x1B1C:0x1B08:0x20000408`
 * K95 RGB: `usbhid.quirks=0x1B1C:0x1B11:0x20000408`

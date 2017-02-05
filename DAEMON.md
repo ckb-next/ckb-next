@@ -206,12 +206,12 @@ When the device reconnects you should see the new firmware version in its `fwver
 Restart
 -------
 
-Because sometimes tho communication between daemon and KB is corrupted after resuming from Standby or suspend, a restart function is implemented.
+Because sometimes the communication between daemon and the keyboard is corrupted after resuming from Standby or suspend, a restart function is implemented.
 It first calls the quit() funtion, then it calls main() again with the original parameter list.
 
 There are two ways to restart the daemon:
 - send the string "restart some-description-as-one-word" to the cmd-pipe (normally /dev/input/ckb1/cmd or /dev/input/ckb2/cmd, dependign on what device gets what usb number
-- sending SIGUSR1 to the daemon-process (as root).
+- send SIGUSR1 to the daemon-process (as root).
 
 Later on, there may be a user interface in the client for the first method.
 

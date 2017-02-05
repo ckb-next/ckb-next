@@ -12,7 +12,7 @@ extern volatile int reset_stop;
 extern int features_mask;
 // device.c
 extern int hwload_mode;
-static void quit2(char mut);
+static void quitWithLock(char mut);
 extern int restart();
 
 // Timespec utility function
@@ -22,13 +22,22 @@ void timespec_add(struct timespec* timespec, long nanoseconds){
     timespec->tv_nsec = nanoseconds % 1000000000;
 }
 
+///
+/// \brief quit
+/// Stop working the daemon.
+/// function is called if the daemon received a sigterm
+/// In this case, locking the device-mutex is ok.
 static void quit(){
-    quit2(1);
+    quitWithLock(1);
 }
 
-// try to close files maybe without locking the mutex
-// if mut == true then lock
-void quit2(char mut){
+///
+/// \brief quitWithLock
+/// \param mut
+/// try to close files maybe without locking the mutex
+/// if mut == true then lock
+
+void quitWithLock(char mut) {
     // Abort any USB resets in progress
     reset_stop = 1;
     for(int i = 1; i < DEV_MAX; i++){
@@ -218,6 +227,6 @@ int main(int argc, char** argv){
 
 int restart() {
     ckb_err("restart called, running quit without mutex-lock.\n");
-    quit2(0);
+    quitWithLock(0);
     return main(main_ac, main_av);
 }

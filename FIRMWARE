@@ -12,32 +12,33 @@ Hash: SHA256
 !BEGIN FW ENTRIES
 
 # Vendor  Model             FW   URL                                                        Min.ckb File Name                       SHA256
-  Corsair K70RGB            2.05 https://www3.corsair.com/software/HID/K70RGB.zip           0.2.7   K70RGB_APP_V205.bin             3e43bdcc5077dc413fbdee7ff6e57a978f758599142eef6979a96e3b8c3a566a
-  Corsair K70LUX            2.04 https://www3.corsair.com/software/HID/K70LUX.zip           0.2.7   K70LUX_APP_V204.bin             c2b5411e1dce391788eca294563801b32a14bf7802eb29688213f8f07e112966
-  Corsair K70LUXRGB         2.05 https://www3.corsair.com/software/HID/K70LUXRGB.zip        0.2.7   K70LUX_APP_V205.bin             a1a0a4b2f74890eb708435b21ab197a301ea668269bca895f89f7301c354e83d
-  Corsair K70RAPIDFIRE      2.05 https://www3.corsair.com/software/HID/K70RAPIDFIRE.zip     0.2.7   K70RAPIDFIRE_APP_V205.bin       6b1d2bb962ffd987ce5eb25c46b02a9069c5f79ca05d7b2cc71c749fe9813536
-  Corsair K70RAPIDFIRERGB   2.05 https://www3.corsair.com/software/HID/K70RGBRAPIDFIRE.zip  0.2.7   K70RGBRAPIDFIRE_APP_V205.bin    a5962bd1d890f5061fcf242fa8d3ca806913f899f37585d4367420aaded25104
-  Corsair K95RGB            2.05 https://www3.corsair.com/software/HID/K95RGB.zip           0.2.7   K95RGB_APP_V205.bin             8d0680dd033d6020a53bc9bfa83e761143699d1122f1d0133e95ad3056d63a15
-  Corsair STRAFE            2.04 https://www3.corsair.com/software/HID/STRAFE.zip           0.2.7   STRAFE_APP_V204.bin             51156ae7aa5b04405668582496cf28bbfb2e492accf93c65c3072aca9ef7ed65
-  Corsair STRAFERGB         2.05 https://www3.corsair.com/software/HID/STRAFERGB.zip        0.2.7   STRAFERGB_APP_V205.bin          dff16fec9a0ae0d33aad0482f9ea02e3e55e231706b8c4e7fb66820aba98adc5
-  Corsair M65RGB            2.04 https://www3.corsair.com/software/HID/M65RGB.zip           0.2.7   M65RGB_App_v204.bin             e1f09ce462f77071f91d92951410c14fb18061dd9760b3de89e45d1ca8b6b46c
-  Corsair SCIMITARRGB       2.03 https://www3.corsair.com/software/HID/Scimitar.zip         0.2.7   Scimitar_App_v203.bin           59194c3ae8a6ae0a801f7b6cf528ad292ae996923699cf063c7deed38fb326aa
+  Corsair K70RGB            2.05    https://www3.corsair.com/software/HID/K70RGB.zip           0.2.7   K70RGB_APP_V205.bin             3e43bdcc5077dc413fbdee7ff6e57a978f758599142eef6979a96e3b8c3a566a
+  Corsair K70LUX            2.04    https://www3.corsair.com/software/HID/K70LUX.zip           0.2.7   K70LUX_APP_V204.bin             c2b5411e1dce391788eca294563801b32a14bf7802eb29688213f8f07e112966
+  Corsair K70LUXRGB         2.05    https://www3.corsair.com/software/HID/K70LUXRGB.zip        0.2.7   K70LUX_APP_V205.bin             a1a0a4b2f74890eb708435b21ab197a301ea668269bca895f89f7301c354e83d
+  Corsair K70RAPIDFIRE      2.05    https://www3.corsair.com/software/HID/K70RAPIDFIRE.zip     0.2.7   K70RAPIDFIRE_APP_V205.bin       6b1d2bb962ffd987ce5eb25c46b02a9069c5f79ca05d7b2cc71c749fe9813536
+  Corsair K70RAPIDFIRERGB   2.05    https://www3.corsair.com/software/HID/K70RGBRAPIDFIRE.zip  0.2.7   K70RGBRAPIDFIRE_APP_V205.bin    a5962bd1d890f5061fcf242fa8d3ca806913f899f37585d4367420aaded25104
+  Corsair K95RGB            2.05    https://www3.corsair.com/software/HID/K95RGB.zip           0.2.7   K95RGB_APP_V205.bin             8d0680dd033d6020a53bc9bfa83e761143699d1122f1d0133e95ad3056d63a15
+  Corsair K95PLATINUMRGB    1.07123 https://www3.corsair.com/software/HID/K95RGBPLATINUM.zip   0.2.7   FREYA_App_v1.07.123.bin         6d06b443cd85f4256d2b518b66b5c2d490d8089b678f9e34aecea97b13c5f5d4
+  Corsair STRAFE            2.04    https://www3.corsair.com/software/HID/STRAFE.zip           0.2.7   STRAFE_APP_V204.bin             51156ae7aa5b04405668582496cf28bbfb2e492accf93c65c3072aca9ef7ed65
+  Corsair STRAFERGB         2.05    https://www3.corsair.com/software/HID/STRAFERGB.zip        0.2.7   STRAFERGB_APP_V205.bin          dff16fec9a0ae0d33aad0482f9ea02e3e55e231706b8c4e7fb66820aba98adc5
+  Corsair M65RGB            2.04    https://www3.corsair.com/software/HID/M65RGB.zip           0.2.7   M65RGB_App_v204.bin             e1f09ce462f77071f91d92951410c14fb18061dd9760b3de89e45d1ca8b6b46c
+  Corsair SCIMITARRGB       2.03    https://www3.corsair.com/software/HID/Scimitar.zip         0.2.7   Scimitar_App_v203.bin           59194c3ae8a6ae0a801f7b6cf528ad292ae996923699cf063c7deed38fb326aa
 
 !END FW ENTRIES
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYliLhAAoJEDP9ily68HxrmicP/i9GPhGELmCl9DoB2jlOmdTM
-Kpj9J25bSLZqafierH2GPVTERAOXTVfJ/8fyALhutXOQmLHQYH3zlggAbF2iNjLE
-wQpYIHBxueMSc5f25whQiewXdVjZcnU7+Po8pI0mD1YBHTjVz2O60xDK8RfUBzCT
-34s+OZ07Y3Xu9X7EkigJtJImQcYk3yTnKJNWlLZez6P8iRKM4QI7z6uTjOLJwVEw
-6NHBfY2hhp+z2Uo+B+n3Tguc769iOyzM8uGCQGa7M0MrO0gyJarpkWnXkBjW6bVD
-qC3f0uJmomQRMh3UOJJj+ZgZ+Nopq4gIAQNAK51aCX2LBbmM6iL7pZRJFF+FFXyl
-r4poOFZeSOMi+4A0iKviI8OxPZ22auGrPvbXLksOb+vWQ8Dc9tilTgPTtx+c4lQD
-kAonm/PCsFIZri5LId0onj4qIQm+U8NOdQx/Vn5X0IMz9DLxFsS4ojAbnUVZVTSD
-EcbYQZHDglEw804bUoQ3ctEvDmLSq1EP+XkZWMJQE5fcfa186JTBI3lw5hOu1tj6
-qlkpdS/JoCQ8zPMoH35zLfuoZKMrYuLaUyHp2Dh3sy8igjOO5OGKA1zI3B1OqzA0
-uxaAsERmp7x1Ioo6U74v+Hwu+F7M++OmXIKuFY+ipKycTFaIEe9OKHdJfFf4xFT+
-DNiFL0T/RTOK0grQCsW9
-=AmeL
+iQIcBAEBCAAGBQJYlzqTAAoJEDP9ily68HxrLI0P/iTkBcfl++Ag/WehbZKNyi0c
+fjUaQ8E8yGIZPLCTGeANgJbmUH6ihSgpkd816cSXGvPV1lDjda7QjjrSwtMoBZHE
+njBK1nyhOG0lstQwnG2gfw0qCpjnFAG8cN32qa78V/tRqlmsqPd+s+kd4J/EG6OX
+pIdMKphAGmp8vA56QCHrBqzmm0ZynBaIKUjJKYlomWAdUkqq9dU+PnFMOh/IpvkO
+ge8PjFxftk8f7izYamOk+fJ0ikbYiSf+qP/PwDFQdSdz6SHNeiexDAQiLKWJ4CJC
+Nilii7GVAPm6AX6X+WyDIi9+DpGUck3Gdxw7BQLNIOG000gjzlBFwfepStDlOu8u
+upZBPRKfZRupWzxXSpw8oMpBlyKRY/A36ixnx1CMqEZ15X8rC5JEsKOwg56a0j71
+4wn1trYpDrmo2SkaXninU83ARoKo5qfzXDHoaFxt5eA0TPEpqMWbo1VP2m0UDa5/
+RhpmMXSfr4lxswy3H+bft7ym/YxzwxW1cO6j0gadky/LCXK7nrkn4QaT0GgkQaF4
+TOSdgnoS3HX0GnZA/yxJxN4cqHqLgJSETL/8rNio2+9XAfEkJDKQGGfk2OLaGhda
+c3KKrXM5BhZcunDsdp5Fs6m2M5n34Mk6xW0bLXyVix7cctbs7Mjf2+QbgBFQceyP
+2LMqu3sSPKbPT44FFNk3
+=8ctj
 -----END PGP SIGNATURE-----

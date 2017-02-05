@@ -13,4 +13,4 @@ Makefile.*
 moc_*
 ui_*
 qrc_*
-Firmware
+.firmware

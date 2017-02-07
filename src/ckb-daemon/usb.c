@@ -36,7 +36,7 @@ const char* product_str(short product){
         return "m65";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2 || product == P_HARPOON)
         return "sabre";
-    if(product == P_SCIMITAR)
+    if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)
         return "scimitar";
     return "";
 }

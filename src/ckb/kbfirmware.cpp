@@ -32,7 +32,10 @@ bool KbFirmware::_checkUpdates(){
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;
-    tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/ccMSC/ckb/master/FIRMWARE")));
+    // First location is for debugging only.
+    // tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/frickler24/ckb-next/issues-26-Firmware-Incident/FIRMWARE")));
+    // This one is the production one.
+    tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/mattanger/ckb-next/master/FIRMWARE")));
     connect(tableDownload, SIGNAL(finished()), this, SLOT(downloadFinished()));
     lastCheck = now;
     return true;
@@ -83,7 +86,7 @@ void KbFirmware::processDownload(QNetworkReply* reply){
         firmware.close();
         // Write GPG key
         QString keyPath = tmp.absoluteFilePath(QString("ckb-%1-key.gpg").arg(pid));
-        if(!QFile::copy(":/bin/msckey.gpg", keyPath)){
+        if(!QFile::copy(":/bin/ckb-next-key.gpg", keyPath)){
             firmware.remove();
             qDebug() << "Failed to write GPG key to temporary location, aborting firmware check";
             return;

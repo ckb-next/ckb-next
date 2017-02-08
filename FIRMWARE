@@ -1,7 +1,7 @@
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-# The GPG key: BAF07C6B - A full copy of it can also be found in src/ckb/ckb-next-key.gpg
+# The GPG key: DCEF2F5F - A full copy of it can also be found in src/ckb/ckb-next-key.gpg
 # This document is signed to prevent tampering. Signature verification is enabled only when GnuPG is available.
 # Firmware versions listed may not necessarily reflect the latest on Corsair's site; new versions will not be added until ckb has been tested with them.
 # ckb-next does NOT read this file when flashing firmware manually. It will allow you to load any valid FW blob (at your own risk).
@@ -28,17 +28,12 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYl06/AAoJEDP9ily68HxrKGoQAIOkYQLN+Kf7UtMyw7AEHQ3T
-5HmOMv4N5+A2pYjR7iawwaTu4F445YOHGPpkH6Y/ybFEMCRV711DeDPy51F3IrTf
-uv/aDOg98n+ZZcNWjqp26FbALEdimZFOjgO1+NEzvXJ3bRqiZ2LS8eo+baeCCP7C
-AU0QXK1XyMaxYfJCekJ0hlZXV78HCWcASsFBlfVkF/Vdcsi6GstTsa91Unv0cxCY
-/36ER6zOpi7fi+pE34BacBFUL/O0joNbneHw+kMmrmZVICq1jEkKpjHMPl+HdoQP
-JMNd50bg33wrKzEHnIEIE9gaWIOkOmVKuHEhuXRvZN+XZ9v2ZjjM13+WbtemP6en
-daAyBCS0bvraeB89adX/c4LxRZ3BdBJG8ynL2MfRWDbNgJ7b5eSghr9HgZXV2P0d
-XtPvJ5sLNNOyC745iwmr5eytTsEmT/rx5MYO/veGA3/B/BZTcw6ZiCdwtFUMmd0n
-zgY8GKtDfv3l/miIdYxjVi5FWDS+Z7vlwaKYcYHk23JA9vRM6z2z8wIcEAqrQlF1
-Mgpdl96Jru+ZAMub1od14Dld3/4877L+PWeLbLzrCKe1ux90K8WqSFm+vfAw/EX9
-QJsBFQvpgSfepJF3keKaaXuC0FHy2P8tgW5FMSZ/z5KwbATX1Rxm9AhcKpxpQN0T
-rz2G7E6Rz4MVsSXIwH2A
-=4cPS
+iQEzBAEBCAAdFiEE2efsyk0ijiZmMKgW3+JI69zvL18FAliaY8IACgkQ3+JI69zv
+L1/xCAf9GMBKfc1td2WqXKp+27gDSiZOk/M+ZbiR9z5E2GVnNw2sQMalcvv5yUZ1
+il5vYh/UtbgS8jpiFXJNWV9DoI59AquHAMppvAPO98j7pN3sfn2ZDRSADh9mJ3nT
+b9IcXMcrUeRR2JqWG6MxA1Fz0UATLrp9wYlDo7J78V2/vK3bZwpTuDc5su1PGXD3
+ORLNbVjr8DTLbsJpySHxY4RcJ/H1jnAQG3LwzoFXBMjm77M6B+CUN/dv4QXEGQEh
+6OG3/Mssb5+l6XGjytihEuHaK8laTNbAJ0cwYZu91vca7Sjpwq1ZXX11CA+XfvHs
+bqKRbf9YqV81l8ZOyAIfx0M5vSj8uw==
+=rLNC
 -----END PGP SIGNATURE-----

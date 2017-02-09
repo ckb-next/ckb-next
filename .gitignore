@@ -1,16 +1,9 @@
-bin/
-ckb.app/
-ckb.pkg
 build/
 cmake-build-debug/
 cmake-build-release/
-.DS_Store
 .*
 !.gitignore
 *.o
-*.pro.*
-Makefile
-Makefile.*
 moc_*
 ui_*
 qrc_*

@@ -2,8 +2,8 @@
 Encoding=UTF-8
 Version=1.0
 Type=Application
-Name=ckb
+Name=CKB Next
 Comment=Corsair keyboard driver user interface
-Exec=ckb
-Icon=ckb
-Categories=Settings;System;
+Exec=ckb-next --background
+Icon=ckb-next.png
+StartupNotify=true

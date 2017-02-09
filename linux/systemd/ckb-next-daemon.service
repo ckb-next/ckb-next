@@ -2,11 +2,10 @@
 Description=Corsair Keyboard Daemon
 
 [Service]
-ExecStart=/usr/bin/ckb-daemon
+ExecStart=/usr/bin/ckb-next-daemon
 Restart=always
-StandardOutput=syslog
+StandardOutput=syslog+console
 StandardError=inherit
-RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

@@ -17,11 +17,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>ckb</string>
+   <string>ckb-next</string>
   </property>
   <property name="windowIcon">
    <iconset resource="image.qrc">
-    <normaloff>:/img/ckb-logo.png</normaloff>:/img/ckb-logo.png</iconset>
+    <normaloff>:/img/ckb-next.png</normaloff>:/img/ckb-next.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>

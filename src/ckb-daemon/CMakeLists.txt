@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 if (APPLE)
     # find Iconv
     find_package(ICONV REQUIRED)
-    include_directories(${ICONV_INCLUDE_DIRS})
+    include_directories(SYSTEM ${ICONV_INCLUDE_DIRS})
 
     # find Apple frameworks
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -21,7 +21,7 @@ endif ()
 if (LINUX)
     # find udev
     find_package(UDEV REQUIRED)
-    include_directories(${UDEV_INCLUDE_DIRS})
+    include_directories(SYSTEM ${UDEV_INCLUDE_DIRS})
 endif ()
 
 # find POSIX Threads (for both systems)
@@ -75,6 +75,8 @@ set(HEADERS
         dpi.h
         )
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 # ------------------------------------------------------------------------------
 # mark libraries
 set(LIBS
@@ -82,16 +84,14 @@ set(LIBS
         )
 
 if (APPLE)
-    set(APPLE_LIBS
+    list(APPEND LIBS
             ${COREFOUNDATION_LIBRARY}
             ${COREGRAPHICS_LIBRARY}
             ${IOKIT_LIBRARY}
             ${ICONV_LIBRARIES}
             )
-endif ()
-
-if (LINUX)
-    set(LINUX_LIBS
+elseif (LINUX)
+    list(APPEND LIBS
             ${UDEV_LIBRARIES}
             )
 endif ()
@@ -99,12 +99,17 @@ endif ()
 # ------------------------------------------------------------------------------
 # set up targets
 if (APPLE)
-    add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})
-    target_link_libraries(ckb-next-daemon ${LIBS} ${APPLE_LIBS})
+    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist.in" "${CMAKE_BINARY_DIR}/ckb-next-daemon.plist" @ONLY)
+    install(FILES "${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist"
+            DESTINATION "/Library/LaunchDaemons/ckb-next-daemon.plist")
 endif ()
 
-if (LINUX)
-    add_executable(${PROJECT_NAME}-daemon ${SOURCES} ${HEADERS})
-    target_link_libraries(${PROJECT_NAME}-daemon ${LIBS} ${LINUX_LIBS})
-    set_target_properties(${PROJECT_NAME}-daemon PROPERTIES THREADS_PREFER_PTHREAD_FLAG ON)
-endif ()
+add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})
+target_link_libraries(ckb-next-daemon ${LIBS})
+#if (LINUX)
+#    set_target_properties(ckb-next-daemon PROPERTIES THREADS_PREFER_PTHREAD_FLAG ON)
+#endif ()
+
+install(TARGETS ckb-next-daemon
+        RUNTIME DESTINATION "${INSTALL_CMAKE_DIR}"
+        )

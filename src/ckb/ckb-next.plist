@@ -2,45 +2,50 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
     <dict>
+        <!-- set this to false if you want the app to always be in the Dock -->
+        <key>LSUIElement</key>
+        <true/>
+        <!-- -->
         <key>CFAppleHelpAnchor</key>
-        <string>${MACOSX_BUNDLE_HELP_FILE}</string>
+        <string></string>
         <key>CFBundleDevelopmentRegion</key>
         <string>English</string>
         <key>CFBundleDisplayName</key>
         <string>CKB Next</string>
         <key>CFBundleExecutable</key>
-        <string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+        <string>ckb-next</string>
         <key>CFBundleGetInfoString</key>
-        <string>${MACOSX_BUNDLE_INFO_STRING}</string>
+        <string>ckb-next - version 0.2.2-163-gf1fb53c</string>
         <key>CFBundleIconFile</key>
-        <string>${MACOSX_BUNDLE_ICON_FILE}</string>
+        <string>ckb-next.icns</string>
         <key>CFBundleIdentifier</key>
-        <string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+        <string>org.ckb-next</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
         <key>CFBundleLongVersionString</key>
-        <string>${MACOSX_BUNDLE_LONG_VERSION_STRING}</string>
+        <string>0.2.2-163-gf1fb53c</string>
         <key>CFBundleName</key>
-        <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+        <string>ckb-next</string>
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>CFBundleShortVersionString</key>
-        <string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+        <string>0.2.2</string>
         <key>CFBundleSignature</key>
         <string>ckbn</string>
         <key>CFBundleVersion</key>
-        <string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+        <string>0.2.2-163-gf1fb53c</string>
         <key>LSMinimumSystemVersion</key>
         <string>10.9.0</string>
         <key>NSHighResolutionCapable</key>
         <true/>
         <key>NSHumanReadableCopyright</key>
-        <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+        <string>Copyright © 2014-2016 ccMSC
+Copyright © 2017 ckb-next dev. team</string>
         <key>NSPrincipalClass</key>
         <string>NSApplication</string>
         <key>ProgramArguments</key>
         <array>
-            <string>/Applications/ckb.app/Contents/MacOS/ckb</string>
+            <string>/Applications/ckb-next.app/Contents/MacOS/ckb-next</string>
             <string>--background</string>
         </array>
         <key>KeepAlive</key>

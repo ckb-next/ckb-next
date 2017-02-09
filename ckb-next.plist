@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
     <dict>
+        <!-- set this to false if you want the app to always be in the Dock -->
+        <key>LSUIElement</key>
+        <true/>
+        <!-- -->
         <key>CFAppleHelpAnchor</key>
         <string></string>
         <key>CFBundleDevelopmentRegion</key>
@@ -11,15 +15,15 @@
         <key>CFBundleExecutable</key>
         <string>ckb-next</string>
         <key>CFBundleGetInfoString</key>
-        <string>CKB Next - version 0.2.2-161-g2114846</string>
+        <string>ckb-next - version 0.2.2-163-gf1fb53c</string>
         <key>CFBundleIconFile</key>
-        <string>ckb-logo.icns</string>
+        <string>ckb-next.icns</string>
         <key>CFBundleIdentifier</key>
-        <string>com.next.ckb</string>
+        <string>org.ckb-next</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
         <key>CFBundleLongVersionString</key>
-        <string>0.2.2-161-g2114846</string>
+        <string>0.2.2-163-gf1fb53c</string>
         <key>CFBundleName</key>
         <string>ckb-next</string>
         <key>CFBundlePackageType</key>
@@ -29,7 +33,7 @@
         <key>CFBundleSignature</key>
         <string>ckbn</string>
         <key>CFBundleVersion</key>
-        <string>0.2.2-161-g2114846</string>
+        <string>0.2.2-163-gf1fb53c</string>
         <key>LSMinimumSystemVersion</key>
         <string>10.9.0</string>
         <key>NSHighResolutionCapable</key>
@@ -41,7 +45,7 @@ Copyright © 2017 ckb-next dev. team</string>
         <string>NSApplication</string>
         <key>ProgramArguments</key>
         <array>
-            <string>/Applications/ckb.app/Contents/MacOS/ckb</string>
+            <string>/Applications/ckb-next.app/Contents/MacOS/ckb-next</string>
             <string>--background</string>
         </array>
         <key>KeepAlive</key>

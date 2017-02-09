@@ -87,20 +87,20 @@ To install a new version of ckb, or to reinstall the same version, first delete 
 First, stop the ckb-daemon service and remove the service file.
 * If you have systemd (Ubuntu versions starting with 15.04):
 ```
-sudo systemctl stop ckb-daemon
-sudo rm -f /usr/lib/systemd/system/ckb-daemon.service
+sudo systemctl stop ckb-next-daemon
+sudo rm -f /usr/lib/systemd/system/ckb-next-daemon.service
 ```
 * If you have Upstart (Ubuntu versions earlier than 15.04):
 ```
-sudo service ckb-daemon stop
-sudo rm -f /etc/init/ckb-daemon.conf
+sudo service ckb-next-daemon stop
+sudo rm -f /etc/init/ckb-next-daemon.conf
 ```
 * If you're not sure, re-run the `quickinstall` script and proceed to the service installation. The script will say `System service: Upstart detected` or `System service: systemd detected`
 
 Afterward, remove the applications and related files:
 ```
-sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop /usr/share/icons/hicolor/512x512/apps/ckb.png
-sudo rm -rf /usr/bin/ckb-animations
+sudo rm -f /usr/bin/ckb-next /usr/bin/ckb-next-daemon /usr/share/applications/ckb-next.desktop /usr/share/icons/hicolor/512x512/apps/ckb-next.png
+sudo rm -rf /usr/bin/ckb-next-animations
 ```
 
 OS X/macOS Installation
@@ -110,7 +110,7 @@ OS X/macOS Installation
 
 The latest OS X/macOS binary can be downloaded here: https://github.com/mattanger/ckb-next/releases/latest
 
-Click on `ckb.pkg` under the Downloads section. This is an automated installer which will set up the driver for you. After it's finished, open ckb.app (it will be installed to your Applications directory) to get started.
+Click on `ckb-next.pkg` under the Downloads section. This is an automated installer which will set up the driver for you. After it's finished, open ckb.app (it will be installed to your Applications directory) to get started.
 
 #### Building from source:
 

@@ -92,7 +92,7 @@
      <item>
       <widget class="QPushButton" name="pushButton">
        <property name="text">
-        <string>Quit ckb</string>
+        <string>Quit ckb-next</string>
        </property>
       </widget>
      </item>
@@ -130,7 +130,7 @@
    <item row="20" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>&lt;a href=&quot;https://github.com/ccMSC/ckb&quot;&gt;https://github.com/ccMSC/ckb&lt;/a&gt;</string>
+      <string>&lt;a href=&quot;https://github.com/mattanger/ckb-next&quot;&gt;https://github.com/mattanger/ckb-next&lt;/a&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>
@@ -140,10 +140,10 @@
    <item row="16" column="1">
     <widget class="QCheckBox" name="loginItemBox">
      <property name="toolTip">
-      <string>ckb will be started when you log in to your computer.</string>
+      <string>ckb-next will be started when you log in to your computer.</string>
      </property>
      <property name="text">
-      <string>Start ckb at login</string>
+      <string>Start ckb-next at login</string>
      </property>
     </widget>
    </item>
@@ -458,7 +458,7 @@
       </font>
      </property>
      <property name="text">
-      <string>ckb</string>
+      <string>ckb-next</string>
      </property>
     </widget>
    </item>

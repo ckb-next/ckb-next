@@ -30,6 +30,10 @@ See also:
 * [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
 * [ckb testing repository](https://github.com/mattanger/ckb-next/tree/testing) (updated more frequently, but may be unstable)
 
+Current Status
+--------------
+Right now ckb-next is under active development. *We will cut a release and ship a macOS binary as soon as some important changes are done*. You can always build the software from source with just one command. See [Linux Installation](#linux-installation) and [OS X/macOS Installation](#os-xmacos-installation). Thank you for the interest in this software and your patience.
+
 Device Support
 --------------
 

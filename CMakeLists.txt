@@ -1,7 +1,5 @@
-# TODO finish mac support
 # TODO finish linux support
-# TODO get rid of VERSION and fix qmake to do the above
-# TODO search for system's quazip and use it if found
+# TODO rename daemon's plist to follow the rules for naming
 
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
@@ -57,14 +55,16 @@ if (APPLE)
     configure_file("osx/postflight.sh.in" "${CMAKE_BINARY_DIR}/osx/postflight.sh" @ONLY)
 endif ()
 
-# proceed with source files
-add_subdirectory(src)
+set(INSTALL_ANIMATIONS_DIR "${INSTALL_CMAKE_DIR}/ckb-animations")
 
 install(
         FILES
         README.md
         DAEMON.md
-        DESTINATION "${INSTALL_DOC_DIR}"
+        DESTINATION "${INSTALL_CMAKE_DIR}"
 )
+
+# proceed with source files
+add_subdirectory(src)
 
 include(CKBNextCPack)

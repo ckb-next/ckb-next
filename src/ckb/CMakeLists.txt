@@ -16,7 +16,7 @@ endif ()
 # ------------------------------------------------------------------------------
 # find Qt5
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Network)
-include_directories(SYSTEM
+include_directories(
         ${Qt5Core_INCLUDE_DIRS}
         ${Qt5Widgets_INCLUDE_DIRS}
         ${Qt5Network_INCLUDE_DIRS}
@@ -25,7 +25,16 @@ include_directories(SYSTEM
 # ------------------------------------------------------------------------------
 # find Zlib
 find_package(ZLIB REQUIRED)
-include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
+include_directories(${ZLIB_INCLUDE_DIRS})
+
+# ------------------------------------------------------------------------------
+# find QuaZip, fallback to hardcoded
+find_package(QuaZip)
+if (QUAZIP_FOUND)
+    include_directories(${QUAZIP_INCLUDE_DIR})
+else ()
+    add_subdirectory(quazip)
+endif ()
 
 # ------------------------------------------------------------------------------
 # find Apple frameworks
@@ -70,22 +79,6 @@ set(HEADERS
         kbbind.h
         rebindwidget.h
         modeselectdialog.h
-        quazip/crypt.h
-        quazip/ioapi.h
-        quazip/JlCompress.h
-        quazip/quaadler32.h
-        quazip/quachecksum32.h
-        quazip/quacrc32.h
-        quazip/quagzipfile.h
-        quazip/quaziodevice.h
-        quazip/quazip.h
-        quazip/quazip_global.h
-        quazip/quazipdir.h
-        quazip/quazipfile.h
-        quazip/quazipfileinfo.h
-        quazip/quazipnewinfo.h
-        quazip/unzip.h
-        quazip/zip.h
         kbfirmware.h
         fwupgradedialog.h
         autorun.h
@@ -130,19 +123,6 @@ set(SOURCES
         kbbind.cpp
         rebindwidget.cpp
         modeselectdialog.cpp
-        quazip/JlCompress.cpp
-        quazip/qioapi.cpp
-        quazip/quaadler32.cpp
-        quazip/quacrc32.cpp
-        quazip/quagzipfile.cpp
-        quazip/quaziodevice.cpp
-        quazip/quazip.cpp
-        quazip/quazipdir.cpp
-        quazip/quazipfile.cpp
-        quazip/quazipfileinfo.cpp
-        quazip/quazipnewinfo.cpp
-        quazip/unzip.c
-        quazip/zip.c
         kbfirmware.cpp
         fwupgradedialog.cpp
         autorun.cpp
@@ -190,18 +170,12 @@ if (APPLE)
 endif ()
 
 # ------------------------------------------------------------------------------
-# add definitions to the source code
-add_definitions(-DQUAZIP_STATIC)
-
-# ------------------------------------------------------------------------------
 # Qt settings
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-# need to add current binary dir to include path for UI file headers
-#include_directories(${CMAKE_CURRENT_BINARY_DIR})
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # ------------------------------------------------------------------------------
 # mark libraries
@@ -211,6 +185,12 @@ set(LIBS
         Qt5::Network
         ZLIB::ZLIB
         )
+
+if (QUAZIP_FOUND)
+    list(APPEND LIBS ${QUAZIP_LIBRARIES})
+else ()
+    list(APPEND LIBS LocalQuaZip)
+endif ()
 
 if (APPLE)
     list(APPEND LIBS

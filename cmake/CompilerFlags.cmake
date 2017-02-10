@@ -5,6 +5,7 @@ endif ()
 #-------------------------------------------------------------------------------
 # flags for C
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
 
 if (ENABLE_COMPILER_WARNINGS)
     if (CMAKE_C_COMPILER_ID MATCHES "Clang")
@@ -21,6 +22,7 @@ endif ()
 #-------------------------------------------------------------------------------
 # flags for C++
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 if (ENABLE_COMPILER_WARNINGS)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")

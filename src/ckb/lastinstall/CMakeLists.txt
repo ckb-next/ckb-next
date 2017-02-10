@@ -1,4 +1,5 @@
 if (APPLE)
+    # deploy QT
     set(pfx "")
     set(sfx ".app")
     get_target_property(output_name ckb-next OUTPUT_NAME)
@@ -18,4 +19,6 @@ if (APPLE)
     include(InstallRequiredSystemLibraries)
     include(DeployQt5)
     install_qt5_executable("${exe}" "" "" "${dirs}" "")
+
+    install(CODE [[execute_process(COMMAND sudo launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist)]])
 endif ()

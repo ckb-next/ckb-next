@@ -1,6 +1,6 @@
 if (APPLE)
     #    set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
-    set(CPACK_PACKAGING_INSTALL_PREFIX "/Applications")
+    # set(CPACK_PACKAGING_INSTALL_PREFIX "/Applications")
     set(CPACK_BUNDLE_NAME "ckb-next")
     set(CPACK_BUNDLE_ICON "ckb-next.icns")
     set(CPACK_BUNDLE_PLIST "ckb-next.plist")

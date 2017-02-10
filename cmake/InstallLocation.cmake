@@ -7,9 +7,9 @@
 #
 # Use GNU install directories
 include(GNUInstallDirs)
-#if (NOT CMAKE_INSTALL_PREFIX)
-#    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
-#endif ()
+# if (NOT CMAKE_INSTALL_PREFIX)
+#    set(CMAKE_INSTALL_PREFIX ".")
+# endif ()
 if (NOT INSTALL_RUNTIME_DIR)
     set(INSTALL_RUNTIME_DIR "${CMAKE_INSTALL_BINDIR}")
 endif ()

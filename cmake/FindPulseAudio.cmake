@@ -17,39 +17,39 @@
 
 foreach (pulsevariablename PULSEAUDIOSIMPLE PULSEAUDIO)
     find_path(${pulsevariablename}_INCLUDE_DIR
-        NAMES
-          pulseaudio.h
-          PATH_SUFFIXES pulse
-        PATHS
-          /usr/include
-          /usr/local/include
-          /opt/local/include
-          /sw/include
-    )
+            NAMES
+            pulseaudio.h
+            PATH_SUFFIXES pulse
+            PATHS
+            /usr/include
+            /usr/local/include
+            /opt/local/include
+            /sw/include
+            )
 
     set(pulselibname pulse)
     set(pulsepackagename PulseAudio)
     if (${pulsevariablename} STREQUAL "PULSEAUDIOSIMPLE")
         set(pulselibname pulse-simple)
         set(pulsepackagename PulseAudioSimple)
-    endif()
+    endif ()
 
     find_library(${pulsevariablename}_LIBRARY
-        NAMES
-        ${pulselibname}
-        PATHS
-        /usr/lib
-        /usr/local/lib
-        /opt/local/lib
-        /sw/lib
-    )
+            NAMES
+            ${pulselibname}
+            PATHS
+            /usr/lib
+            /usr/local/lib
+            /opt/local/lib
+            /sw/lib
+            )
 
     set(${pulsevariablename}_INCLUDE_DIRS
-      ${${pulsevariablename}_DIR}
-    )
+            ${${pulsevariablename}_DIR}
+            )
     set(${pulsevariablename}_LIBRARIES
-      ${${pulsevariablename}_LIBRARY}
-    )
+            ${${pulsevariablename}_LIBRARY}
+            )
 
     include(FindPackageHandleStandardArgs)
     # handle the QUIETLY and REQUIRED arguments and set ${pulsevariablename}_FOUND to TRUE if
@@ -58,4 +58,4 @@ foreach (pulsevariablename PULSEAUDIOSIMPLE PULSEAUDIO)
 
     # show the ${pulsevariablename}_INCLUDE_DIRS and ${pulsevariablename}_LIBRARIES variables only in the advanced view
     mark_as_advanced(${pulsevariablename}_INCLUDE_DIRS ${pulsevariablename}_LIBRARIES)
-endforeach(pulsevariablename)
+endforeach (pulsevariablename)

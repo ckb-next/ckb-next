@@ -20,7 +20,7 @@ include_directories(
         ${Qt5Core_INCLUDE_DIRS}
         ${Qt5Widgets_INCLUDE_DIRS}
         ${Qt5Network_INCLUDE_DIRS}
-        )
+)
 
 # ------------------------------------------------------------------------------
 # find Zlib
@@ -239,7 +239,7 @@ endif ()
 install(TARGETS ckb-next
         RUNTIME DESTINATION "${INSTALL_RUNTIME_DIR}"
         BUNDLE DESTINATION .
-#        BUNDLE DESTINATION "${ckb-next_BINARY_DIR}"
+        #        BUNDLE DESTINATION "${ckb-next_BINARY_DIR}"
         )
 
 # Keep "add_subdirectory(lastinstall)" last: fixup_bundle needs to be

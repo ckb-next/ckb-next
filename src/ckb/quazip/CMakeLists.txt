@@ -17,7 +17,7 @@ set(HEADERS
         quazipnewinfo.h
         unzip.h
         zip.h
-    )
+        )
 
 set(SOURCES
         JlCompress.cpp
@@ -33,7 +33,7 @@ set(SOURCES
         quazipnewinfo.cpp
         unzip.c
         zip.c
-    )
+        )
 
 add_library(LocalQuaZip STATIC ${SOURCES} ${HEADERS})
 

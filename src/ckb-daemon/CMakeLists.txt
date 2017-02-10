@@ -98,15 +98,15 @@ endif ()
 # set up targets
 if (APPLE)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist.in"
-        "${CMAKE_BINARY_DIR}/ckb-next-daemon.plist" @ONLY)
-        
+            "${CMAKE_BINARY_DIR}/ckb-next-daemon.plist" @ONLY)
+
     install(CODE [[execute_process(COMMAND sudo launchctl unload /Library/LaunchDaemons/ckb-next-daemon.plist)]])
     install(FILES "${CMAKE_BINARY_DIR}/ckb-next-daemon.plist"
             DESTINATION "/Library/LaunchDaemons"
             PERMISSIONS OWNER_READ OWNER_WRITE
-                        GROUP_READ
-                        WORLD_READ
-        )
+            GROUP_READ
+            WORLD_READ
+            )
 endif ()
 
 add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})

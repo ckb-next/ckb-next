@@ -202,7 +202,7 @@ elif [[ $launchdc -eq 0 && $(echo "$launchd" | wc -l) -ge 1 ]]; then
         checkfail $?
         sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
-        sudo chmod 0700 /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
+        sudo chmod 0644 /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
         sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?

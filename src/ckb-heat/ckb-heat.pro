@@ -10,9 +10,9 @@ macx {
     DESTDIR = $$PWD/../../bin/ckb-animations
 }
 
-CONFIG   =
+CONFIG   = debug_and_release
 QT       =
-LIBS     =
+LIBS     = -lm
 
 SOURCES += \
     main.c

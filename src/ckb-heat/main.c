@@ -38,7 +38,7 @@ long ffade = 30;
 double pressestofull = 10.f;
 
 typedef struct{
-	int usages;
+	unsigned int usages;
 	int pressed;
 	double timing;
 	int x;
@@ -91,18 +91,11 @@ void ckb_time(ckb_runctx* context, double delta){
 			anims[i].timing -= delta;
 			while(anims[i].timing < 0){
 				anims[i].timing += 1.f/30.f;
-				anims[i].usages--;
+				if(anims[i].usages > 0)
+					anims[i].usages--;
 			}	
 		}
 	}
-}
-
-inline int max(int a, int b){
-	return a < b ? b : a;
-}
-
-inline int min(int a, int b){
-	return a < b ? a : b;
 }
 
 int ckb_frame(ckb_runctx* context){
@@ -118,7 +111,7 @@ int ckb_frame(ckb_runctx* context){
 		if(randomBright)
 			ckb_grad_color(&a, &r, &g, &b, &animcolor, ((float)(rand() % 1024))/10.f);
 		else
-			ckb_grad_color(&a, &r, &g, &b, &animcolor, (float)min(anims[i].usages,full)*100.f/full);
+			ckb_grad_color(&a, &r, &g, &b, &animcolor, (float)fmin(anims[i].usages,full)*100.f/full);
 		ckb_alpha_blend(keys+i, a, r, g, b);
     }
     return 0;

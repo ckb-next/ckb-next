@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/bin">
-        <file>msckey.gpg</file>
+        <file>ckb-next-key.gpg</file>
     </qresource>
 </RCC>

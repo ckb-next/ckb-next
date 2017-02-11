@@ -23,7 +23,13 @@ class KbBind : public QObject
 public:
     // New binding setup
     explicit KbBind(KbMode* modeParent, Kb* devParent, const KeyMap& keyMap);
-    // Copy a binding setup
+    ///
+    /// \brief KbBind
+    /// \param modeParent
+    /// \param devParent
+    /// \param keyMap
+    /// \param other        This is the KbBind object to copy from
+    /// Use this constructor to copy an existing Binding
     KbBind(KbMode* modeParent, Kb* devParent, const KeyMap& keyMap, const KbBind& other);
 
     // Load and save from stored settings

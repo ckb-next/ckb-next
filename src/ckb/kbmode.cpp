@@ -12,6 +12,12 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const QString &guid, const QStr
         _id.guid = QUuid::createUuid();
 }
 
+///
+/// \brief KbMode::KbMode
+/// \param parent   Kb as parent (append to the Keyboard list
+/// \param keyMap   Map to copy from
+/// \param other    Mode to copy from
+/// Constructor to copy an existing Keyboard-Mode KbMode &other
 KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other) :
     QObject(parent),
     _name(other._name), _id(other._id),
@@ -75,4 +81,10 @@ bool KbMode::needsSave() const {
 
 void KbMode::doUpdate(){
     emit updated();
+}
+
+///
+/// \brief KbMode::~KbMode
+/// Destructor may be used for Debugging (issue #38 with SIGSEGV). Insert qDebug-statement
+KbMode::~KbMode() {
 }

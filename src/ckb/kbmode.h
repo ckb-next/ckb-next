@@ -44,6 +44,8 @@ public:
     // Mode by copy
     KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other);
 
+    ~KbMode();
+
     // Mode properties
     inline const QString&   name() const                    { return _name; }
     inline void             name(const QString& newName)    { _needsSave = true; _name = newName.trimmed(); if(_name == "") _name = "Unnamed"; }

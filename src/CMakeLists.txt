@@ -2,6 +2,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # export version to source code
 set(CKB_VERSION_STR ${ckb-next_VERSION})
+add_definitions(-DCKB_VERSION_STR)
 
 configure_file(ckbnextconfig.h.in ckbnextconfig.h @ONLY)
 

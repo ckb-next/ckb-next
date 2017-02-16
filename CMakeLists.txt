@@ -10,6 +10,14 @@ set(CMAKE_MODULE_PATH ${ckb-next_SOURCE_DIR}/cmake)
 # everything we need to load before proceeding with the main CMake file
 include(PreCMakeConfig)
 
+# project options
+if (APPLE)
+    option(BREW_QT5 "Use Homebrew package for Qt5" ON)
+elseif (LINUX)
+    option(LINUX_CUSTOM_INSTALL "Manually install project files" OFF)
+endif ()
+option(WITH_ANIMATIONS "Build and install animations" ON)
+
 set(ckb-next_VERSION_MAJOR 0)  #  |>|>
 set(ckb-next_VERSION_MINOR 2)  #  |>|> populated manually, must be updated accordingly to release tags
 set(ckb-next_VERSION_PATCH 7)  #  |>|>
@@ -37,32 +45,16 @@ include(MacroEnsureOutOfSourceBuild)
 macro_ensure_out_of_source_build("ckb-next requires an out of source build. \
 Please create a separate build directory and run 'cmake /path/to/ckb-next [options]' there.")
 
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+#configure_file("osx/preflight.sh.in" "${CMAKE_BINARY_DIR}/osx/preflight.sh" @ONLY)
+#configure_file("osx/postflight.sh.in" "${CMAKE_BINARY_DIR}/osx/postflight.sh" @ONLY)
 
-if (APPLE)
-    set(MACOSX_BUNDLE_NAME "ckb-next")
-    set(CMAKE_INSTALL_PREFIX "/Applications")
-    set(prefix "${MACOSX_BUNDLE_NAME}.app/Contents")
-    set(INSTALL_INCLUDE_DIR "${prefix}/${INSTALL_INCLUDE_DIR}")
-    set(INSTALL_RUNTIME_DIR "${prefix}/MacOS")
-    set(INSTALL_LIBRARY_DIR "${prefix}/${INSTALL_LIBRARY_DIR}")
-    set(INSTALL_ARCHIVE_DIR "${prefix}/${INSTALL_ARCHIVE_DIR}")
-    set(INSTALL_DATA_DIR "${prefix}/${INSTALL_DATA_DIR}")
-    set(INSTALL_DOC_DIR "${prefix}/${INSTALL_DOC_DIR}")
-    set(INSTALL_CMAKE_DIR "${prefix}/Resources")
-
-    configure_file("osx/preflight.sh.in" "${CMAKE_BINARY_DIR}/osx/preflight.sh" @ONLY)
-    configure_file("osx/postflight.sh.in" "${CMAKE_BINARY_DIR}/osx/postflight.sh" @ONLY)
-endif ()
-
-set(INSTALL_ANIMATIONS_DIR "${INSTALL_CMAKE_DIR}/ckb-animations")
-
-install(
-        FILES
-        README.md
-        DAEMON.md
-        DESTINATION "${INSTALL_CMAKE_DIR}"
-)
+## these will go away because of Reamde being rewritten
+# install(
+#         FILES
+#         README.md
+#         DAEMON.md
+#         DESTINATION "${INSTALL_CMAKE_DIR}"
+# )
 
 # proceed with source files
 add_subdirectory(src)

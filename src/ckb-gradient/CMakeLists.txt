@@ -14,5 +14,4 @@ add_executable(ckb-gradient ${SOURCES})
 target_link_libraries(ckb-gradient ${LIBS})
 
 install(TARGETS ckb-gradient
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
-        )
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}")

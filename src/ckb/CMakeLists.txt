@@ -1,20 +1,16 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 #-------------------------------------------------------------------------------
-# set Qt search directories on macOS
-if (APPLE)
-    if (NOT CMAKE_PREFIX_PATH)
-        execute_process(COMMAND brew --prefix qt5
-                RESULT_VARIABLE BREW_AND_QT_FOUND
-                OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if (NOT ${BREW_AND_QT_FOUND} STREQUAL "0")
-            message(FATAL_ERROR "Homebrew is not installed!")
-        endif ()
+# find Qt5
+if (BREW_QT5)
+    execute_process(COMMAND brew --prefix qt5
+            RESULT_VARIABLE BREW_AND_QT_FOUND
+            OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (NOT ${BREW_AND_QT_FOUND} STREQUAL "0")
+        message(FATAL_ERROR "Homebrew is not installed!")
     endif ()
 endif ()
 
-# ------------------------------------------------------------------------------
-# find Qt5
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Network)
 include_directories(
         ${Qt5Core_INCLUDE_DIRS}
@@ -219,11 +215,6 @@ if (APPLE)
     list(APPEND SOURCES ckb-next.icns)
 endif ()
 
-if (LINUX)
-    install(FILES "ckb-next.desktop" DESTINATION "${INSTALL_XDG_APPS_DIR}")
-    install(FILES "ckb-next.png" DESTINATION "${INSTALL_XDG_ICON_DIR}")
-endif ()
-
 add_executable(ckb-next ${HEADERS} ${SOURCES} ${QT_RESOURCES})
 
 target_link_libraries(ckb-next ${LIBS})
@@ -239,8 +230,20 @@ endif ()
 install(TARGETS ckb-next
         RUNTIME DESTINATION "${INSTALL_RUNTIME_DIR}"
         BUNDLE DESTINATION .
-        #        BUNDLE DESTINATION "${ckb-next_BINARY_DIR}"
         )
+
+if (LINUX AND NOT LINUX_CUSTOM_INSTALL)
+    install(FILES "ckb-next.desktop"
+            DESTINATION "/usr/share/applications/ckb.desktop"
+            PERMISSIONS OWNER_READ OWNER_WRITE
+            GROUP_READ
+            WORLD_READ)
+    install(FILES "ckb-next.png"
+            DESTINATION "/usr/share/icons/hicolor/512x512/apps/ckb.png"
+            PERMISSIONS OWNER_READ OWNER_WRITE
+            GROUP_READ
+            WORLD_READ)
+endif ()
 
 # Keep "add_subdirectory(lastinstall)" last: fixup_bundle needs to be
 # *after* all other install(TARGETS) and install(FILES) calls

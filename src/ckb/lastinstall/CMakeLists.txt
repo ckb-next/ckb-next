@@ -21,4 +21,6 @@ if (APPLE)
     install_qt5_executable("${exe}" "" "" "${dirs}" "")
 
     install(CODE [[execute_process(COMMAND sudo launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist)]])
+elseif (LINUX)
+    # ...
 endif ()

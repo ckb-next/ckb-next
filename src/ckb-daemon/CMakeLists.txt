@@ -96,6 +96,12 @@ endif ()
 
 # ------------------------------------------------------------------------------
 # set up targets
+add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})
+target_link_libraries(ckb-next-daemon ${LIBS})
+
+install(TARGETS ckb-next-daemon
+        RUNTIME DESTINATION "${INSTALL_CMAKE_DIR}")
+
 if (APPLE)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist.in"
             "${CMAKE_BINARY_DIR}/ckb-next-daemon.plist" @ONLY)
@@ -105,16 +111,7 @@ if (APPLE)
             DESTINATION "/Library/LaunchDaemons"
             PERMISSIONS OWNER_READ OWNER_WRITE
             GROUP_READ
-            WORLD_READ
-            )
+            WORLD_READ)
+elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
+        # ...
 endif ()
-
-add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})
-target_link_libraries(ckb-next-daemon ${LIBS})
-#if (LINUX)
-#    set_target_properties(ckb-next-daemon PROPERTIES THREADS_PREFER_PTHREAD_FLAG ON)
-#endif ()
-
-install(TARGETS ckb-next-daemon
-        RUNTIME DESTINATION "${INSTALL_CMAKE_DIR}"
-        )

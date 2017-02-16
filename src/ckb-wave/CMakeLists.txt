@@ -14,5 +14,4 @@ add_executable(ckb-wave ${SOURCES})
 target_link_libraries(ckb-wave ${LIBS})
 
 install(TARGETS ckb-wave
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
-        )
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}")

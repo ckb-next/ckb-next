@@ -14,5 +14,4 @@ add_executable(ckb-heat ${SOURCES})
 target_link_libraries(ckb-heat ${LIBS})
 
 install(TARGETS ckb-heat
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
-        )
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}")

@@ -28,19 +28,11 @@ include(DetermineVersion)
 find_package(Git)
 determine_version("${ckb-next_SOURCE_DIR}" "${GIT_EXECUTABLE}" "ckb-next")
 
-# set build type (default one is relwithdebinfo)
 include(BuildType)
-
-# set up binary paths
 include(BuildLocation)
-
-# set up default install paths
 include(InstallLocation)
-
-# set up compiler flags
 include(CompilerFlags)
 
-# disallow in-source build
 include(MacroEnsureOutOfSourceBuild)
 macro_ensure_out_of_source_build("ckb-next requires an out of source build. \
 Please create a separate build directory and run 'cmake /path/to/ckb-next [options]' there.")
@@ -59,4 +51,4 @@ Please create a separate build directory and run 'cmake /path/to/ckb-next [optio
 # proceed with source files
 add_subdirectory(src)
 
-include(CKBNextCPack)
+#include(CKBNextCPack)

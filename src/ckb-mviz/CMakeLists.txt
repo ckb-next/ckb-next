@@ -26,4 +26,5 @@ add_executable(ckb-mviz ${SOURCES} ${HEADERS})
 target_link_libraries(ckb-mviz ${LIBS})
 
 install(TARGETS ckb-mviz
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}")
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
+        )

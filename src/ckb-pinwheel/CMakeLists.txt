@@ -14,4 +14,5 @@ add_executable(ckb-pinwheel ${SOURCES})
 target_link_libraries(ckb-pinwheel ${LIBS})
 
 install(TARGETS ckb-pinwheel
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}")
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
+        )

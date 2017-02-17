@@ -3,7 +3,7 @@
 <plist version="1.0">
     <dict>
         <key>Label</key>
-        <string>org.ckb-next.daemon</string>
+        <string>org.ckb-next-daemon</string>
         <key>ProgramArguments</key>
         <array>
             <string>/Applications/ckb-next.app/Contents/Resources/ckb-next-daemon</string>

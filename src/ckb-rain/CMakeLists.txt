@@ -14,4 +14,5 @@ add_executable(ckb-rain ${SOURCES})
 target_link_libraries(ckb-rain ${LIBS})
 
 install(TARGETS ckb-rain
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}")
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
+        )

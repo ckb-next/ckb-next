@@ -14,4 +14,5 @@ add_executable(ckb-random ${SOURCES})
 target_link_libraries(ckb-random ${LIBS})
 
 install(TARGETS ckb-random
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}")
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
+        )

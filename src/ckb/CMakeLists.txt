@@ -227,24 +227,32 @@ if (APPLE)
             )
 endif ()
 
-install(TARGETS ckb-next
-        RUNTIME DESTINATION "${INSTALL_RUNTIME_DIR}"
-        BUNDLE DESTINATION .
-        )
-
-if (LINUX AND NOT LINUX_CUSTOM_INSTALL)
-    install(FILES "ckb-next.desktop"
-            DESTINATION "/usr/share/applications/ckb.desktop"
-            PERMISSIONS OWNER_READ OWNER_WRITE
-            GROUP_READ
-            WORLD_READ)
-    install(FILES "ckb-next.png"
-            DESTINATION "/usr/share/icons/hicolor/512x512/apps/ckb.png"
-            PERMISSIONS OWNER_READ OWNER_WRITE
-            GROUP_READ
-            WORLD_READ)
+if (NOT LINUX_CUSTOM_INSTALL)
+    install(TARGETS ckb-next
+            RUNTIME DESTINATION "${INSTALL_RUNTIME_DIR}"
+            BUNDLE DESTINATION .
+            )
 endif ()
 
-# Keep "add_subdirectory(lastinstall)" last: fixup_bundle needs to be
-# *after* all other install(TARGETS) and install(FILES) calls
+if (LINUX AND NOT LINUX_CUSTOM_INSTALL)
+    if (NOT "${CMAKE_INSTALL_PREFIX}/${INSTALL_RUNTIME_DIR}" STREQUAL "/usr/bin")
+        # symlink to /usr/bin
+        makeLink("${INSTALL_CMAKE_DIR}/ckb-next" "/usr/bin/ckb-next" "ckb-next")
+    endif ()
+
+    install(FILES "ckb-next.desktop"
+            DESTINATION "/usr/share/applications"
+            PERMISSIONS OWNER_READ OWNER_WRITE
+            GROUP_READ
+            WORLD_READ
+            )
+    install(FILES "ckb-next.png"
+            DESTINATION "/usr/share/icons/hicolor/512x512/apps"
+            PERMISSIONS OWNER_READ OWNER_WRITE
+            GROUP_READ
+            WORLD_READ
+            )
+endif ()
+
+# Keep "add_subdirectory(lastinstall)" last
 add_subdirectory(lastinstall)

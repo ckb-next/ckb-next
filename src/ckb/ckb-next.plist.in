@@ -52,5 +52,11 @@
             <key>SuccessfulExit</key>
             <false/>
         </dict>
+        <!-- comment this out if you don't want to log anything -->
+        <key>StandardOutPath</key>
+        <string>/var/log/ckb-next-daemon.log</string>
+        <key>StandardErrorPath</key>
+        <string>/var/log/ckb-next-daemon.log</string>
+        <!-- -->
     </dict>
 </plist>

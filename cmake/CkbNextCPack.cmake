@@ -3,7 +3,7 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${ckb-next_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${ckb-next_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${ckb-next_VERSION_PATCH})
 set(CPACK_PACKAGE_VERSION ${ckb-next_VERSION})
-set(CPACK_PACKAGE_VENDOR "https://github.com/mattanger/ckb-next/")  # TODO: replace with ckb-next.org when it's ready
+set(CPACK_PACKAGE_VENDOR "https://github.com/mattanger/ckb-next/")  # replace with ckb-next.org when it's ready
 set(CPACK_PACKAGE_DESCRIPTION
         "Corsair RGB driver for Linux and Mac.")
 set(CPACK_VERBATIM_VARIABLES TRUE)

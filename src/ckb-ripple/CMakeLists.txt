@@ -14,4 +14,5 @@ add_executable(ckb-ripple ${SOURCES})
 target_link_libraries(ckb-ripple ${LIBS})
 
 install(TARGETS ckb-ripple
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}")
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
+        )

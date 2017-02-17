@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-sudo chown root:wheel /Library/LaunchDaemons/ckb-next-daemon.plist
-sudo chmod 0644 /Library/LaunchDaemons/ckb-next-daemon.plist
-"$(which launchctl)" load /Library/LaunchDaemons/ckb-next-daemon.plist >/dev/null 2>&1
-exit 0

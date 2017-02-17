@@ -14,3 +14,5 @@ moc_*
 ui_*
 qrc_*
 .firmware
+src/ckb-daemon/doxygenDoc/
+src/ckb/doxygenDoc/

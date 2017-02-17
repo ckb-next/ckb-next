@@ -30,12 +30,27 @@ determine_version("${ckb-next_SOURCE_DIR}" "${GIT_EXECUTABLE}" "ckb-next")
 
 include(BuildType)
 include(BuildLocation)
-include(InstallLocation)
+#include(InstallLocation)
 include(CompilerFlags)
 
 include(MacroEnsureOutOfSourceBuild)
 macro_ensure_out_of_source_build("ckb-next requires an out of source build. \
 Please create a separate build directory and run 'cmake /path/to/ckb-next [options]' there.")
+
+if (APPLE)
+    set(CMAKE_INSTALL_PREFIX "/Applications")
+    set(MACOSX_BUNDLE_NAME "ckb-next")
+    set(prefix "${MACOSX_BUNDLE_NAME}.app/Contents")
+    set(INSTALL_RUNTIME_DIR "${prefix}/MacOS")
+    set(INSTALL_CMAKE_DIR "${prefix}/Resources")
+elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
+    set(CMAKE_INSTALL_PREFIX "/opt")
+    set(prefix "ckb-next")
+    set(INSTALL_RUNTIME_DIR "${prefix}")
+    set(INSTALL_CMAKE_DIR "${prefix}")
+endif ()
+
+set(INSTALL_ANIMATIONS_DIR "${INSTALL_CMAKE_DIR}/ckb-animations")
 
 #configure_file("osx/preflight.sh.in" "${CMAKE_BINARY_DIR}/osx/preflight.sh" @ONLY)
 #configure_file("osx/postflight.sh.in" "${CMAKE_BINARY_DIR}/osx/postflight.sh" @ONLY)

@@ -208,8 +208,8 @@ if (APPLE)
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2014-2016 ccMSC\nCopyright © 2017 ckb-next dev. team")
-    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist.in" "${CMAKE_BINARY_DIR}/ckb-next.plist")
-    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.icns" "${CMAKE_BINARY_DIR}/ckb-next.icns")
+    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist.in" "${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist")
+#    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.icns" "${CMAKE_BINARY_DIR}/ckb-next.icns")
 
     set_source_files_properties(ckb-next.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     list(APPEND SOURCES ckb-next.icns)
@@ -222,7 +222,7 @@ target_link_libraries(ckb-next ${LIBS})
 if (APPLE)
     set_target_properties(ckb-next PROPERTIES
             MACOSX_BUNDLE TRUE
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_BINARY_DIR}/ckb-next.plist"
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist"
             OUTPUT_NAME "${MACOSX_BUNDLE_BUNDLE_NAME}"
             )
 endif ()

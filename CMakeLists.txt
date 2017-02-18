@@ -20,7 +20,7 @@ option(WITH_ANIMATIONS "Build and install animations" ON)
 
 set(ckb-next_VERSION_MAJOR 0)  #  |>|>
 set(ckb-next_VERSION_MINOR 2)  #  |>|> populated manually, must be updated accordingly to release tags
-set(ckb-next_VERSION_PATCH 7)  #  |>|>
+set(ckb-next_VERSION_PATCH 8)  #  |>|>
 set(ckb-next_VERSION "${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
 
 # enhance the version by a current commit hash if the commit is not a release tag
@@ -30,7 +30,6 @@ determine_version("${ckb-next_SOURCE_DIR}" "${GIT_EXECUTABLE}" "ckb-next")
 
 include(BuildType)
 include(BuildLocation)
-#include(InstallLocation)
 include(CompilerFlags)
 
 include(MacroEnsureOutOfSourceBuild)
@@ -52,18 +51,4 @@ endif ()
 
 set(INSTALL_ANIMATIONS_DIR "${INSTALL_CMAKE_DIR}/ckb-animations")
 
-#configure_file("osx/preflight.sh.in" "${CMAKE_BINARY_DIR}/osx/preflight.sh" @ONLY)
-#configure_file("osx/postflight.sh.in" "${CMAKE_BINARY_DIR}/osx/postflight.sh" @ONLY)
-
-## these will go away because of Reamde being rewritten
-# install(
-#         FILES
-#         README.md
-#         DAEMON.md
-#         DESTINATION "${INSTALL_CMAKE_DIR}"
-# )
-
-# proceed with source files
 add_subdirectory(src)
-
-#include(CKBNextCPack)

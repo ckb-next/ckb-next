@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist >/dev/null 2>&1
-open -a 'ckb-next' --args --background >/dev/null 2>&1
+sudo chown -R $(whoami):staff /Applications/ckb-next.app
+launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist
+open -a 'ckb-next'
 exit 0

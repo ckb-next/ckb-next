@@ -29,7 +29,44 @@ find_package(QuaZip)
 if (QUAZIP_FOUND)
     include_directories(${QUAZIP_INCLUDE_DIR})
 else ()
-    add_subdirectory(quazip)
+    include_directories(quazip)
+
+    set(QUAZIP_HEADERS
+            quazip/crypt.h
+            quazip/ioapi.h
+            quazip/JlCompress.h
+            quazip/quaadler32.h
+            quazip/quachecksum32.h
+            quazip/quacrc32.h
+            quazip/quagzipfile.h
+            quazip/quaziodevice.h
+            quazip/quazip.h
+            quazip/quazip_global.h
+            quazip/quazipdir.h
+            quazip/quazipfile.h
+            quazip/quazipfileinfo.h
+            quazip/quazipnewinfo.h
+            quazip/unzip.h
+            quazip/zip.h
+            )
+
+    set(QUAZIP_SOURCES
+            quazip/JlCompress.cpp
+            quazip/qioapi.cpp
+            quazip/quaadler32.cpp
+            quazip/quacrc32.cpp
+            quazip/quagzipfile.cpp
+            quazip/quaziodevice.cpp
+            quazip/quazip.cpp
+            quazip/quazipdir.cpp
+            quazip/quazipfile.cpp
+            quazip/quazipfileinfo.cpp
+            quazip/quazipnewinfo.cpp
+            quazip/unzip.c
+            quazip/zip.c
+            )
+
+    add_definitions(-DQUAZIP_STATIC)
 endif ()
 
 # ------------------------------------------------------------------------------
@@ -185,7 +222,8 @@ set(LIBS
 if (QUAZIP_FOUND)
     list(APPEND LIBS ${QUAZIP_LIBRARIES})
 else ()
-    list(APPEND LIBS LocalQuaZip)
+    list(APPEND HEADERS ${QUAZIP_HEADERS})
+    list(APPEND SOURCES ${QUAZIP_SOURCES})
 endif ()
 
 if (APPLE)
@@ -209,7 +247,7 @@ if (APPLE)
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2014-2016 ccMSC\nCopyright © 2017 ckb-next dev. team")
     configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist.in" "${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist")
-#    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.icns" "${CMAKE_BINARY_DIR}/ckb-next.icns")
+    #    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.icns" "${CMAKE_BINARY_DIR}/ckb-next.icns")
 
     set_source_files_properties(ckb-next.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     list(APPEND SOURCES ckb-next.icns)

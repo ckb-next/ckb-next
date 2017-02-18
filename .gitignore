@@ -1,9 +1,4 @@
-build/
-cmake-build-debug/
+*build*/
 .*
 !.gitignore
-*.o
-moc_*
-ui_*
-qrc_*
 .firmware

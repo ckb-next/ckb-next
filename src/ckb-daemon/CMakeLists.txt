@@ -109,7 +109,7 @@ if (APPLE)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist.in"
             "${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist")
 
-    install(CODE [[execute_process(COMMAND /Applications/ckb-next.app/Contents/MacOS/ckb-next --close)]])
+    install(CODE [[execute_process(COMMAND open -a 'ckb-next' --args --close)]])
     install(CODE [[execute_process(COMMAND sudo launchctl unload /Library/LaunchDaemons/ckb-next-daemon.plist)]])
     install(FILES "${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist"
             DESTINATION "/Library/LaunchDaemons"

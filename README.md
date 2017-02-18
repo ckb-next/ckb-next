@@ -250,7 +250,7 @@ Known issues
 - The tray icon doesn't appear in some desktop environments. This is a known Qt bug. If you can't see the icon, reopen ckb to bring the window back.
 - When starting the driver manually, the Terminal window sometimes gets spammed with enter keys. You can stop it by unplugging and replugging the keyboard or by moving the poll rate switch.
 - When stopping the driver manually, the keyboard sometimes stops working completely. You can reconnect it by moving the poll rate switch.
-- On newer versions of macOS (i.e. 10.12 and up) CMD/Shift+select does not work, yet. Stopping the daemon and GUI for `ckb-next` will fix this issue temporarily.
+- On newer versions of macOS (i.e. 10.12 and up) CMD/Shift+select does not work, yet. Stopping the daemon and GUI for `ckb` will fix this issue temporarily.
 
 Contributing
 ------------

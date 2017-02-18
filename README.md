@@ -65,6 +65,8 @@ Linux Installation
 
 * Fedora 24/25, CentOS/RHEL 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
     * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
+* Arch Linux (maintained by [@makz27](https://github.com/light2yellow)):
+	* [`aur/ckb-next-git`](https://aur.archlinux.org/packages/ckb-next-git/) - based on `master` branch (more stable)
 
 **ckb** packages (deprecated):
 

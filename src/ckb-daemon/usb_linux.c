@@ -6,6 +6,8 @@
 
 #ifdef OS_LINUX
 
+///
+/// \brief all open usb devices have their system path names here in this array.
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
@@ -71,6 +73,7 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     return res;
 }
 
+/// \brief If we control a non RGB keyboard, set the keyboard via ioctl with usbdevfs_ctrltransfer
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
     if(kb->product != P_K95_NRGB)
         return 0;
@@ -242,6 +245,14 @@ int usbclaim(usbdevice* kb){
         return -2;                  /* else, remove device */               \
     }
 
+/// try to reset an usb device in a linux user space driver.
+/// 1. unclaim the device
+/// 2. reset the device via USBDEVFS_RESET command
+/// 3. claim the device again.
+/// Returns 0 on success, -2 if device should be removed and -1 if reset should by tried again
+///
+/// \todo it seems that no one wnats to try the reset again. But I'v seen it somewhere...
+///
 int os_resetusb(usbdevice* kb, const char* file, int line){
     TEST_RESET(usbunclaim(kb, 1));
     TEST_RESET(ioctl(kb->handle - 1, USBDEVFS_RESET));
@@ -250,6 +261,10 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
     return 0;
 }
 
+///
+/// \brief strtrim trims a string by removing leading and trailing spaces.
+/// \param string
+///
 void strtrim(char* string){
     // Find last non-space
     char* last = string;
@@ -268,8 +283,20 @@ void strtrim(char* string){
         memmove(string, first, last - first);
 }
 
-int os_setupusb(usbdevice* kb){
-    // Copy device description and serial
+///
+/// \brief os_setupusb
+/// \param kb THE usbdevice*
+/// \return 0 on success, -1 else
+///
+/// Perform the operating system-specific opening of the interface in os_setupusb().
+/// As a result, some parameters should be set in kb (name, serial, fwversion, epcount = number of usb endpoints),
+/// and all endpoints should be claimed with usbclaim().
+/// Claiming is the only point where os_setupusb() can produce an error (-1).
+///
+
+int os_setupusb(usbdevice* kb) {
+    ///
+    /// - Copy device description and serial
     struct udev_device* dev = kb->udev;
     const char* name = udev_device_get_sysattr_value(dev, "product");
     if(name)
@@ -279,16 +306,23 @@ int os_setupusb(usbdevice* kb){
     if(serial)
         strncpy(kb->serial, serial, SERIAL_LEN);
     strtrim(kb->serial);
-    // Copy firmware version (needed to determine USB protocol)
+    ///
+    /// - Copy firmware version (needed to determine USB protocol)
     const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
     if(firmware)
         sscanf(firmware, "%hx", &kb->fwversion);
     else
         kb->fwversion = 0;
     int index = INDEX_OF(kb, keyboard);
+    ///
+    /// - Do some output abaout connecting interfaces
     ckb_info("Connecting %s at %s%d\n", kb->name, devpath, index);
 
-    // Claim the USB interfaces
+    ///
+    /// - Claim the USB interfaces
+    ///
+    /// \todo in these modules a pullrequest is outstanding
+    ///
     const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
     kb->epcount = 0;
     if(ep_str)
@@ -305,7 +339,7 @@ int os_setupusb(usbdevice* kb){
     return 0;
 }
 
-int usbadd(struct udev_device* dev, short vendor, short product){
+int usbadd(struct udev_device* dev, short vendor, short product) {
     const char* path = udev_device_get_devnode(dev);
     const char* syspath = udev_device_get_syspath(dev);
     if(!path || !syspath || path[0] == 0 || syspath[0] == 0){
@@ -348,7 +382,9 @@ int usbadd(struct udev_device* dev, short vendor, short product){
     return -1;
 }
 
-static struct udev* udev;
+static struct udev* udev;   ///> struct udef is defined in /usr/include/libudev.h
+
+/// \todo These two thread vasriables seem to be unused: usbtread, udevthread
 pthread_t usbthread, udevthread;
 
 // String -> numeric model map
@@ -356,6 +392,12 @@ typedef struct {
     const char* name;
     short number;
 } _model;
+///
+/// \attention when adding new hardware this file hat to be changed too.
+///
+/// In this structure array \a models[] for each device the name
+/// (the device id as string in hex without leading 0x)
+/// and its usb device id as short must be entered in this array.
 static _model models[] = {
     // Keyboards
     { P_K65_STR, P_K65 },
@@ -386,6 +428,16 @@ static _model models[] = {
 #define N_MODELS (sizeof(models) / sizeof(_model))
 
 // Add a udev device. Returns 0 if device was recognized/added.
+///
+/// \brief usb_add_device if the device id can be found, call usbadd() with the appropriate parameters.
+/// \param dev the functions usb_*_device get a struct udev* with the neccessary hardware-related information.
+/// \return the retval of usbadd() or 1 if either vendor is not corsair or product is not mentioned in model[].
+///
+/// First get the idVendor via udev_device_get_sysattr_value(). If this is equal to the ID-string of corsair ("1b1c"),
+/// get the idProduct on the same way.
+/// \n If we can find the model name in the model array,
+/// call usbadd() with the model number.
+/// \todo So why the hell not a transformation between the string and the short presentation? Lets check if the string representation is used elsewhere.
 static int usb_add_device(struct udev_device* dev){
     const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
     if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
@@ -402,6 +454,16 @@ static int usb_add_device(struct udev_device* dev){
 }
 
 // Remove a udev device.
+///
+/// \brief usb_rm_device find the usb port to remove and close it via closeusb().
+/// \param dev the functions usb_*_device get a struct udev* with the neccessary hardware-related information.
+///
+/// First try to find the system path of the device given in parameter dev.
+/// The index where the name is found is the same index we need to address the global keyboard array.
+/// That array holds all usbdevices.
+/// \n Searching for the correct name in kbsyspath-array and closing the usb via closeusb()
+/// are protected by lock..unlock of the corresponding devmutex arraymember.
+///
 static void usb_rm_device(struct udev_device* dev){
     // Device removed. Look for it in our list of keyboards
     const char* syspath = udev_device_get_syspath(dev);
@@ -415,6 +477,20 @@ static void usb_rm_device(struct udev_device* dev){
     }
 }
 
+///
+/// \brief udev_enum use the udev_enumerate_add_match_subsystem() to get all you need but only that.
+///
+/// Reduce the hits of the enumeration by limiting to usb as technology and corsair as idVendor.
+/// Then filter with udev_enumerate_scan_devices () all hits.
+///
+/// The following call to udev_enumerate_get_list_entry() fetches the entire hitlist as udev_list_entry *.
+/// \n Use udev_list_entry_foreach() to iterate through the hit set.
+/// \n If both the device name exists (udev_list_entry_get_name)
+/// and the subsequent creation of a new udev_device (udev_device_new_from_syspath) is ok,
+/// the new device is added to the list with usb_add_device().
+///
+/// If the latter does not work, the new device is released again (udev_device_unref ()).
+/// \n After the last iteration, the enumerator is released with udev_enumerate_unref ().
 static void udev_enum(){
     struct udev_enumerate* enumerator = udev_enumerate_new(udev);
     udev_enumerate_add_match_subsystem(enumerator, "usb");
@@ -438,20 +514,33 @@ static void udev_enum(){
     udev_enumerate_unref(enumerator);
 }
 
+///
+/// \brief usbmain is called by main() after setting up all other stuff.
+/// \return 0 normally or -1 if fatal error occurs (up to now only if no new devices are available)
+///
 int usbmain(){
+    /// First check whether the uinput module is loaded by the kernel.
+    /// \todo Why isn't missing of uinput
+    /// a fatal error?
+    ///
     // Load the uinput module (if it's not loaded already)
     if(system("modprobe uinput") != 0)
         ckb_warn("Failed to load uinput module\n");
 
-    // Create the udev object
-    if(!(udev = udev_new())){
-        ckb_fatal("Failed to initialize udev\n");
+    ///
+    /// Create the udev object with udev_new() (is a function from libudev.h)
+    /// terminate -1 if error
+    if(!(udev = udev_new())) {
+        ckb_fatal("Failed to initialize udev in usbmain(), usb_linux.c\n");
         return -1;
     }
 
-    // Enumerate all currently connected devices
+    ///
+    /// Enumerate all currently connected devices
     udev_enum();
 
+    /// \todo lae. here the work has to go on...
+    ///
     // Done scanning. Enter a loop to poll for device updates
     struct udev_monitor* monitor = udev_monitor_new_from_netlink(udev, "udev");
     udev_monitor_filter_add_match_subsystem_devtype(monitor, "usb", 0);

@@ -62,13 +62,13 @@ const devcmd vtable_keyboard = {
     .restart = cmd_restart,
 
     .start = start_dev,
-    .setmodeindex = int1_void_none,
+    .setmodeindex = int1_void_none,             ///< ähhh... ???
     .allocprofile = allocprofile,
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_kb,
     .updateindicators = updateindicators_kb,
-    .updatedpi = int1_int_none
+    .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
 // Non-RGB keyboard vtable (K70)
@@ -109,13 +109,13 @@ const devcmd vtable_keyboard_nonrgb = {
     .restart = cmd_restart,
 
     .start = start_kb_nrgb,
-    .setmodeindex = setmodeindex_nrgb,
+    .setmodeindex = setmodeindex_nrgb,          ///< this is special for non RGBs
     .allocprofile = allocprofile,
     .loadprofile = loadprofile_none,
     .freeprofile = freeprofile,
-    .updatergb = int1_int_none,
+    .updatergb = int1_int_none,                 ///< non RGB keyboards do not have an rgb update function
     .updateindicators = updateindicators_kb,
-    .updatedpi = int1_int_none
+    .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
 // RGB mouse vtable
@@ -156,11 +156,11 @@ const devcmd vtable_mouse = {
     .restart = cmd_restart,
 
     .start = start_dev,
-    .setmodeindex = int1_void_none,
-    .allocprofile = allocprofile,
-    .loadprofile = loadprofile,
-    .freeprofile = freeprofile,
-    .updatergb = updatergb_mouse,
-    .updateindicators = int1_void_none,
-    .updatedpi = updatedpi
+    .setmodeindex = int1_void_none,         ///< Mice do not have different modes
+    .allocprofile = allocprofile,           ///< same for all keyboards and mice
+    .loadprofile = loadprofile,             ///< same for all keyboards and mice
+    .freeprofile = freeprofile,             ///< same for all keyboards and mice
+    .updatergb = updatergb_mouse,           ///< special for mice
+    .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
+    .updatedpi = updatedpi                  ///< special for mice
 };

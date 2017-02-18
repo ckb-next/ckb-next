@@ -46,6 +46,12 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
     return fd + 1;
 }
 
+///
+/// \brief os_inputopen
+/// \param kb
+/// \return
+///
+/// Some tips on using [uinput_user_dev in](http://thiemonge.org/getting-started-with-uinput)
 int os_inputopen(usbdevice* kb){
     // Create the new input device
     int index = INDEX_OF(kb, keyboard);

@@ -68,78 +68,118 @@
 #define P_SCIMITAR_PRO_STR  "1b3e"
 #define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
 
-// NOTE: when adding new devices please update src/ckb/fwupgradedialog.cpp as well.
-// It should contain the same vendor/product IDs for any devices supporting firmware updates.
+/// NOTE: when adding new devices please update src/ckb/fwupgradedialog.cpp as well.
+/// It should contain the same vendor/product IDs for any devices supporting firmware updates.
 
-//uncomment to see USB packets sent to the device
-//#define DEBUG_USB
+///uncomment to see USB packets sent to the device
+// #define DEBUG_USB
 
-//uncomment to see USB packets sent from the device
-//#define DEBUG_USB_RECV
-
+///
+/// \brief vendor_str Vendor/product string representations
+/// \param vendor \a short vendor ID
+/// \return a string: either "" or "corsair"
 const char* vendor_str(short vendor);
+
+///
+/// \brief product_str returns a condensed view on what type of device we have.
+/// \param product is the \a short USB device product ID
+/// \return string to identify a type of device (see below)
 const char* product_str(short product);
 
-// RGB vs non-RGB test
-// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
+/// RGB vs non-RGB test
+/// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
 #define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 #define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
 #define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
 #define IS_MONOCHROME_DEV(kb)           IS_MONOCHROME((kb)->vendor, (kb)->product)
 
-// Full color range (16.8M) vs partial color range (512)
+/// Full color range (16.8M) vs partial color range (512)
 #define IS_FULLRANGE(kb)                (IS_RGB((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95)
 
-// Mouse vs keyboard test
+/// Mouse vs keyboard test
 #define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2)))
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
-// USB delays for when the keyboards get picky about timing
+/// USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)
 #define DELAY_MEDIUM(kb)    usleep((int)(kb)->usbdelay * 10000) // x10 (default: 50ms)
 #define DELAY_LONG(kb)      usleep(100000)                      // long, fixed 100ms
 #define USB_DELAY_DEFAULT   5
 
-// Start the USB main loop. Returns program exit code when finished
+/// Start the USB main loop. Returns program exit code when finished
 int usbmain();
-// Stop the USB system.
+/// Stop the USB system.
 void usbkill();
 
-// Note: Lock a device's dmutex (see device.h) before accessing the USB interface.
+/// Note: Lock a device's dmutex (see device.h) before accessing the USB interface.
 
-// Set up a USB device after its handle is open. Spawns a new thread.
-// dmutex must be locked prior to calling this function. The function will unlock it when finished.
+///
+/// \brief setupusb starts a thread with kb as parameter and _setupusb() as entrypoint.
+/// \param kb THE usbdeveice* used everywhere
 void setupusb(usbdevice* kb);
-// OS-specific setup. Return 0 on success.
+
+/// OS-specific setup. Return 0 on success.
 int os_setupusb(usbdevice* kb);
-// Per keyboard input thread (OS specific). Will be detached from the main thread, so it needs to clean up its own resources.
+/// Per keyboard input thread (OS specific). Will be detached from the main thread, so it needs to clean up its own resources.
 void* os_inputmain(void* kb);
 
-// Puts a USB device back into hardware mode. Returns 0 on success.
+///
+/// \brief revertusb Puts a USB device back into hardware mode.
+/// \param kb THE usbdevice*
+/// \return Returns 0 on success.
 int revertusb(usbdevice* kb);
-// Close a USB device and remove device entry. Returns 0 on success
+
+///
+/// \brief closeusb Close a USB device and remove device entry.
+/// \param kb
+/// \return Returns 0 on success
 int closeusb(usbdevice* kb);
+
+///
+/// \brief os_closeusb
+/// \param kb
+///
 void os_closeusb(usbdevice* kb);
-// Reset a USB device. Returns 0 on success, -1 if device should be removed
+
+///
+/// \brief _resetusb Reset a USB device.
+/// \param kb THE usbdevice*
+/// \param file filename for error messages
+/// \param line line where it is called for error messages
+/// \return Returns 0 on success, -1 if device should be removed
 int _resetusb(usbdevice* kb, const char* file, int line);
 #define resetusb(kb) _resetusb(kb, __FILE_NOPATH__, __LINE__)
+
+///
+/// \brief os_resetusb is the os specific implementation for resetting usb
+/// \param kb THE usbdevice*
+/// \param file filename for error messages
+/// \param line line where it is called for error messages
+/// \return Returns 0 on success, -2 if device should be removed and -1 if reset should by tried again
 int os_resetusb(usbdevice* kb, const char* file, int line);
 
-// Write data to a USB device. Returns number of bytes written or zero on failure.
+/// Write data to a USB device. Returns number of bytes written or zero on failure.
 int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line);
 #define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
-// Requests data from a USB device by first sending an output packet and the reading the response. Returns number of bytes read or zero on failure.
+/// Requests data from a USB device by first sending an output packet and the reading the response. Returns number of bytes read or zero on failure.
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line);
 #define usbrecv(kb, out_msg, in_msg) _usbrecv(kb, out_msg, in_msg, __FILE_NOPATH__, __LINE__)
 
-// OS: Send a USB message to the device. Return number of bytes written, zero for permanent failure, -1 for try again
+/// OS: Send a USB message to the device. Return number of bytes written, zero for permanent failure, -1 for try again
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
-// OS: Gets input from a USB device. Return same as above.
+/// OS: Gets input from a USB device. Return same as above.
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line);
-// OS: Update HID indicator LEDs (Num Lock, Caps, etc). Read from kb->ileds.
+/// OS: Update HID indicator LEDs (Num Lock, Caps, etc). Read from kb->ileds.
 void os_sendindicators(usbdevice* kb);
 
-// Non-RGB K95 command. Returns 0 on success.
+///
+/// \brief _nk95cmd set a Non-RGB K95 command via ioctl with \c usbdevfs_ctrltransfer.
+/// \param kb THE usbdevice*
+/// \param bRequest the byte array with the usb request
+/// \param wValue
+/// \param file for error message
+/// \param line for error message
+/// \return Returns 0 on success.
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);
 #define nk95cmd(kb, command) _nk95cmd(kb, (command) >> 16 & 0xFF, (command) & 0xFFFF, __FILE_NOPATH__, __LINE__)
 
@@ -149,8 +189,8 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 #define NK95_M2     0x140002
 #define NK95_M3     0x140003
 
-// Tries to reset a USB device after a failed action. Returns 0 on success.
-// The previous action will NOT be re-attempted.
+/// Tries to reset a USB device after a failed action. Returns 0 on success.
+/// The previous action will NOT be re-attempted.
 int usb_tryreset(usbdevice* kb);
 
 #endif  // USB_H

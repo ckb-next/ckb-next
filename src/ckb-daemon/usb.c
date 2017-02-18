@@ -8,21 +8,60 @@
 #include "profile.h"
 #include "usb.h"
 
+///
+/// \brief usbmutex is a never referenced mutex!
+///
+/// \todo We should have a look why this mutex is never used.
+///
 pthread_mutex_t usbmutex = PTHREAD_MUTEX_INITIALIZER;
 
-// Reset stopper for when the program shuts down
+///
+/// \brief reset_stop is boolean: Reset stopper for when the program shuts down.
+///
+/// Is set only by \a quit() to true (1)
+/// to inform several usb_* functions to end their loops and tries.
 volatile int reset_stop = 0;
 
-// Mask of features to exclude from all devices
+///
+/// \brief features_mask Mask of features to exclude from all devices
+///
+/// That bit mask ist set to enable all (-1).
+/// When interpreting the input parameters, some of these bits can be cleared.
+/// \n At the moment binding, notifying and mouse-acceleration can be disabled via command line.
+/// \n Have a look at \a main() in main.c for details.
 int features_mask = -1;
 
-// Vendor/product string representations
+///
+/// vendor_str returns "corsair" iff the given \a vendor argument is equal to \a V_CORSAIR \c (0x1bc)
+/// else it returns ""
+///
+/// \attention There is also a string defined V_CORSAIR_STR, which returns the device number as string in hex "1b1c".
 const char* vendor_str(short vendor){
     if(vendor == V_CORSAIR)
         return "corsair";
     return "";
 }
 
+///
+/// At present, various models and their properties are known from corsair products.
+/// Some models differ in principle (mice and keyboards),
+/// others differ in the way they function (for example, RGB and non RGB), but they are very similar.
+///
+/// Here, only the first point is taken into consideration and we return a unified model string.
+/// If the model is not known with its number, \a product_str returns an empty string.
+///
+/// The model numbers and corresponding strings wwith the numbers in hex-string are defined in \c usb.h
+///
+/// At present, this function is used to initialize \c kb->name and to give information in debug strings.
+///
+/// \attention The combinations below have to fit to the combinations in the macros mentioned above.
+/// So if you add a device with a new number, change both.
+///
+/// \todo There are macros defined in usb.h to detect all the combinations below.
+/// the only difference is the parameter:
+/// The macros need the \a kb*,
+/// product_str() needs the \a product \a ID
+///
 const char* product_str(short product){
     if(product == P_K95 || product == P_K95_NRGB || product == P_K95_PLATINUM)
         return "k95";
@@ -41,18 +80,69 @@ const char* product_str(short product){
     return "";
 }
 
-// Vtable selector
+///
+/// \brief get_vtable returns the correct vtable pointer
+/// \param vendor short usb vendor ID
+/// \param product short usb product ID
+/// \return Depending on the type and model, the corresponding vtable pointer is returned (see below)
+///
+/// At present, we have three different vtables:
+/// - \c vtable_mouse is used for all mouse types. This may be wrong with some newer mice?
+/// - \c vtable_keyboard is used for all RGB Keyboards.
+/// - \c vtable_keyboard_nonrgb for all the rest.
+///
+/// \todo Is the last point really a good decision and always correct?
+///
 static const devcmd* get_vtable(short vendor, short product){
     return IS_MOUSE(vendor, product) ? &vtable_mouse : IS_RGB(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
 }
 
 // USB device main loop
+///
+/// \brief devmain is called by _setupusb
+/// \param kb the pointer to the device. Even if it has the name kb, it is valid also for a mouse (the whole driver seems to be implemented first for a keyboard).
+/// \return always a nullptr
+///
+/// # Synchronization
+/// The syncing via mutexes is interesting:
+/// 1. \a imutex (the Input mutex)\n
+/// This one is locked in \c setupusb().
+/// That function does only two things: Locking the mutex and trying to start a thread at \c _setupusb().
+/// _setupusb() unlocks \a imutex  after getting some buffers and initalizing internal structures from the indicators
+/// (this function often gets problems with error messages like "unable to read indicators" or "Timeout bla blubb").
+/// \warning have a look at \a updateindicators() later.
+/// \warning if creating the thread is not successful, the \a imutex remains blocked. Have a look at setupusb() later.
+///
+/// 2. \a dmutex (the Device mutex)\n
+/// This one is very interesting, because it is handled in devmain().
+/// It seems that it is locked only in \a _ledthread(), which is a thread created in \a os_setupindicators().
+/// os_setupindicators() again is called in \a _setupusb() long before calling devmain().
+/// So this mutex is locked when we start the function as the old comment says.\n
+/// Before reading from the FIFO and direct afterwards an unlock..lock sequence is implemented here.
+/// Even if only the function readlines() should be surrounded by the unlock..lock,
+/// the variable definition of the line pointer is also included here. Not nice, but does not bother either.
+/// Probably the Unlock..lock is needed so that now another process can change the control structure \a linectx while we wait in readlines().
+/// \todo Hope to find the need for dmutex usage later.
+/// \n Should this function be declared as pthread_t* function, because of the defintion of pthread-create? But void* works also...
+///
 static void* devmain(usbdevice* kb){
-    // dmutex should still be locked when this is called
+    /// \attention dmutex should still be locked when this is called
     int kbfifo = kb->infifo - 1;
+    ///
+    /// First a \a readlines_ctx buffer structure is initialized by \c readlines_ctx_init().
     readlines_ctx linectx;
     readlines_ctx_init(&linectx);
+    ///
+    /// After some setup functions, beginning in _setupusb() which has called devmain(),
+    /// we read the input-Fifo designated to that device in an endless loop.
+    /// This loop has two possible exits (plus reaction to signals, not mentioned here).
     while(1){
+        ///
+        /// If the reading via readlines() is successful (we might have read multiple lines),
+        /// the interpretation is done by readcmd() iff the connection to the device is still available
+        /// (checked via IS_CONNECTED(kb)).
+        /// This is true if the kb-structure has a handle and an event pointer both != Null).
+        /// If not, the loop is left (the first exit point).
         pthread_mutex_unlock(dmutex(kb));
         // Read from FIFO
         const char* line;
@@ -61,8 +151,18 @@ static void* devmain(usbdevice* kb){
         // End thread when the handle is removed
         if(!IS_CONNECTED(kb))
             break;
+        ///
+        /// if nothing is in the line buffer (some magic interrupt?),
+        /// continue in the endless while without any reaction.
         if(lines){
+            /// \todo readcmd() gets a a param \b line, not \b lines. have a look on that later.
+            /// \n Is the condition IS_CONNECTED valid? What functions change the condititon for the macro?
             if(readcmd(kb, line)){
+                ///
+                /// If interpretation and communication with the usb device got errors,
+                /// they are signalled by readcmd() (non zero retcode).
+                /// In this case the usb device is closed via closeusb()
+                /// and the endless loop is left (the second exit point).
                 // USB transfer failed; destroy device
                 closeusb(kb);
                 break;
@@ -70,11 +170,49 @@ static void* devmain(usbdevice* kb){
         }
     }
     pthread_mutex_unlock(dmutex(kb));
+    ///
+    /// After leaving the endless loop the readlines-ctx structure and its buffers are freed by readlines_ctx_free().
     readlines_ctx_free(linectx);
     return 0;
 }
 
+///
+/// \brief _setupusb A horrible function for setting up an usb device
+/// \param context As _setupusb() is called as a new thread, the kb* is transferred as void*
+/// \return a ptread_t* 0, here casted as void*. Retval is always null
+///
+/// The basic structure of the function is somewhat habituated.
+/// It is more like an assembler routine than a structured program.
+/// This is not really bad, but just getting used to.
+///
+/// After every action, which can be practically fault-prone,
+/// the routine goes into the same error handling:
+/// It goes via goto to one of two exit labels.
+/// The difference is whether or not an unlock has to be performed on the imutex variable.
+///
+/// In both cases, closeusb() is called, then an unlock is performed on the dmutex.
+///
+/// The only case where this error handling is not performed is the correct return of the call to devmain().
+/// Here simply the return value of devmain() is passed to the caller.
+///
+/// In either case, the routine terminates with a void* 0
+/// because either devmain() has returned constant null or the routine itself returns zero.
+///
+/// The basic idea of ​​the routine is the following:
+///
 static void* _setupusb(void* context){
+    /// First some initialization of kb standard structured and local vars is done:
+    /// - \b kb is set to the pointer given from start environment
+    /// - local vars \b vendor and \b product are set to the values from the corresponding fields of kb
+    /// - local var \b vt \b and the \b kb->vtable are both set to the retval of \a get_vtable()
+    /// - \b kb->features are set depending on the type of hardware connected:
+    ///   - set either to standard non rgb (all common flags like binding, notify, FW, hardware-loading etc)
+    ///     or in case of RGB-device set to standard + RGB, pollrate-change and fw-update
+    ///   - exclude all features which are disabled via feature_mask (set by daemon CLI parameters)
+    ///   - if it is a mouse, add adjust-rate
+    ///   - if it is a monochrome device, set the flag for RGB-protocol, but single color
+    /// - the standard delay time is initialized in kb->usbdelay
+    ///
     usbdevice* kb = context;
     // Set standard fields
     short vendor = kb->vendor, product = kb->product;
@@ -85,9 +223,24 @@ static void* _setupusb(void* context){
     kb->usbdelay = USB_DELAY_DEFAULT;
 
     // Perform OS-specific setup
+    ///
+    /// - A fixed 100ms wait is the start.
+    /// <b>Although the DELAY_LONG macro is given a parameter, it is ignored. Occasionally refactor it.</b>
     DELAY_LONG(kb);
+
+    ///
+    /// - The first relevant point is the operating system-specific opening of the interface in os_setupusb().
+    /// As a result, some parameters should be set in kb (name, serial, fwversion, epcount = number of usb endpoints),
+    /// and all endpoints should be claimed with usbclaim().
+    /// Claiming is the only point where os_setupusb() can produce an error (-1, otherwise 0).
     if(os_setupusb(kb))
         goto fail;
+
+    ///
+    /// - The following two statements deal with possible errors when setting the kb values ​​in the current routine:
+    /// If the version or the name was not read correctly, they are set to default values:
+    ///   - serial is set to "<vendor>: <product> -NoID"
+    ///   - the name is set to "<vendor> <product>".
     // Make up a device name and serial if they weren't assigned
     if(!kb->serial[0])
         snprintf(kb->serial, SERIAL_LEN, "%04x:%04x-NoID", kb->vendor, kb->product);
@@ -95,31 +248,116 @@ static void* _setupusb(void* context){
         snprintf(kb->name, KB_NAME_LEN, "%s %s", vendor_str(kb->vendor), product_str(kb->product));
 
     // Set up an input device for key events
+    ///
+    /// - Then the user level input subsystem is activated via os_openinput().
+    /// There are two file descriptors, one for the mouse and one for the keyboard.
+    /// <b>As mentioned in structures.h, not the just opened FD numbers are stored under kb->uinput_kb or kb->uinput_mouse, but the values ​​increased by 1!</b>
+    /// The reason is, if the open fails or not open has been done until now,
+    /// that struct member is set to 0, not to -1 or other negative value.
+    /// So all usage of this kb->handle must be something like \c "kb->handle - 1", as you can find it in the code.
     if(os_inputopen(kb))
         goto fail;
+    ///
+    /// - The next action is to create a separate thread, which gets as parameter kb and starts with os_inputmain().
+    /// The thread is immediately detached so that it can return its resource completely independently if it should terminate.
     if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
         goto fail;
     pthread_detach(kb->inputthread);
+    ///
+    /// - The same happens with os_setupindicators(),
+    /// which initially initializes all LED variables in kb to off and then starts the _ledthread() thread
+    /// with kb as parameter and then detaches it.
+    /// Here again only the generation of the thread can fail.
     if(os_setupindicators(kb))
         goto fail;
 
     // Set up device
+    ///
+    /// - Via an entry in the vable (allocprofile, identical for all three vtable types),
+    /// allocprofile() is called in profile.c.
+    /// With a valid parameter kb, a usbprofile structure is allocated and stored as a kb->profile.
+    /// Then initmode() is called for each of the initializable modes (MODE_COUNT, currently 6).
+    /// This procedure creates the memory space for the mode information,
+    /// initializes the range to 0, and then sets the light.forceupdate and dpi.forceupdate to true.
+    /// This forces an update later in the initialization of the device.
+    /// \n The first mode is set as the current mode and two force flags are set
+    /// (this seems to be mode-intersecting flags for light and update).
+    /// \warning There is no error handling for the allocprofile() and initmode() procedures.
+    /// However, since they allocate storage areas, the subsequent assignments and initializations can run in a SEGV.
     vt->allocprofile(kb);
+    ///
+    /// - Not completely understandable is why now via the vtable the function updateindicators() is called.
+    /// But this actually happens in the just started thread _ledthread().
+    /// Either the initialization is wrong und must done here with force or the overview is lost, what happens when...\n
+    /// Regardless: For a mouse nothing happens here, for a keyboard updateindicators_kb() is called via the entry in kb->vtable.
+    /// The first parameter is kb again, the second is constant 1 (means force = true).
+    /// This causes the LED status to be sent after a 5ms delay via os_sendindicators()
+    /// (ioctl with a \c usbdevfs_ctrltransfer).
+    /// \n The notification is sent to all currently open notification channels then.
+    /// \n Setupindicators() and with it updateindicators_kb() can fail.
     vt->updateindicators(kb, 1);
+    ///
+    /// - From this point - if an error is detected - the error label is addressed by goto statement,
+    /// which first performs an unlock on the imutex.
+    /// This is interesting because the next statement is exactly this: An unlock on the imutex.
     pthread_mutex_unlock(imutex(kb));
+    ///
+    /// - Via vtable the \a kb->start() function is called next.
+    /// This is the same for a mouse and an RGB keyboard: start_dev(),
+    /// for a non RGB keyboard it is start_kb_nrgb().
+    /// \n First parameter is as always kb, second is 0 (makeactive = false).
+    ///   - In start_kb_nrgb() set the keyboard into a so-called software mode (NK95_HWOFF)
+    /// via ioctl with \c usbdevfs_ctrltransfer in function _nk95cmd(),
+    /// which will in turn is called via macro nk95cmd() via start_kb_nrgb().
+    /// \n Then two dummy values ​​(active and pollrate) are set in the kb structure and ready.
+    ///   - start_dev() does a bit more - because this function is for both mouse and keyboard.
+    /// start_dev() calls - after setting an extended timeout parameter - _start_dev(). Both are located in device.c.
+    ///   - First, _start_dev() attempts to determine the firmware version of the device,
+    /// but only if two conditions are met:
+    /// hwload-mode is not null (then hw-loading is disabled)
+    /// and the device has the FEAT_HWLOAD feature.
+    /// Then the firmware and the poll rate are fetched via getfwversion().
+    /// \n If hwload_mode is set to "load only once" (==1), then the HWLOAD feature is masked, so that no further reading can take place.
+    ///   - Now check if device needs a firmware update. If so, set it up and leave the function without error.
+    ///   - Else load the hardware profile from device if the hw-pointer is not set and hw-loading is possible and allowed.
+    /// \n Return error if mode == 2 (load always) and loading got an error.
+    /// Else mask the HWLOAD feature, because hwload must be 1 and the error couold be a repeated hw-reading.
+    /// \n <b>Puh, that is real Horror code. It seems to be not faulty, but completely unreadable.</b>
+    ///
+    ///   - Finally, the second parameter of _startdev() is used to check whether the device is to be activated.
+    /// Depending on the parameter, the active or the idle-member in the correspondig vtable is called.
+    /// These are device-dependent again:
+    /// Device | active | idle
+    /// ------ | ------ | ----
+    /// RGB Keyboard | cmd_active_kb() means: start the device with a lot of kb-specific initializers (software controlled mode) | cmd_idle_kb() set the device with a lot of kb-specific initializers into the hardware controlled mode)
+    /// non RGB Keyboard | cmd_io_none() means: Do nothing | cmd_io_none() means: Do nothing
+    /// Mouse | cmd_active_mouse() similar to cmd_active_kb() | cmd_idle_mouse similar to cmd_idle_kb()
+    ///
+    /// - If either \a start() succeeded or the next following usb_tryreset(), it goes on, otherwise again a hard abort occurs.
     if(vt->start(kb, 0) && usb_tryreset(kb))
         goto fail_noinput;
-
+    ///
+    /// - Next, go to mkdevpath(). After securing the EUID (effective UID) especially for macOS, work starts really in _mkdevpath().
+    /// Create - no matter how many devices were registered -
+    /// either the ckb0/ files \b version, \b pid and \b connected
+    /// or the \b cmd command fifo, the first notification fifo \b notify0, \b model and \b serial as well as the \b features of the device and the \b pollrate.
     // Make /dev path
     if(mkdevpath(kb))
         goto fail_noinput;
-
+    ///
+    /// - If all this is done and no error has occurred,
+    /// a debug info is printed ("Setup finished for ckbx")
+    /// updateconnected() writes the new device into the text file under ckb0/
+    /// and devmain() is called.
     // Finished. Enter main loop
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Setup finished for %s%d\n", devpath, index);
     updateconnected();
+    ///
+    /// devmain()'s return value is returned by _setupusb() when we terminate.
     return devmain(kb);
-
+    ///
+    /// - The remaining code lines are the two exit labels as described above
     fail:
     pthread_mutex_unlock(imutex(kb));
     fail_noinput:
@@ -128,6 +366,9 @@ static void* _setupusb(void* context){
     return 0;
 }
 
+///
+/// Set up a USB device after its handle is open. Spawns a new thread _setupusb() with standard parameter kb.
+/// dmutex must be locked prior to calling this function. The function will unlock it when finished.
 void setupusb(usbdevice* kb){
     pthread_mutex_lock(imutex(kb));
     if(pthread_create(&kb->thread, 0, _setupusb, kb))
@@ -146,6 +387,12 @@ int revertusb(usbdevice* kb){
     return 0;
 }
 
+///
+/// First reset the device via os_resetusb() after a long delay (it may send something to the host).
+/// If this worked (retval == 0), give the device another long delay
+/// Then perform the initialization via the device specific start() function entry in kb->vtable
+/// and if this is successful also, return the result of the device depenten updatergb() with force=true.
+///
 int _resetusb(usbdevice* kb, const char* file, int line){
     // Perform a USB reset
     DELAY_LONG(kb);
@@ -178,7 +425,9 @@ int usb_tryreset(usbdevice* kb){
     return -1;
 }
 
-// device.c
+///
+/// \brief hwload_mode is defined in device.c
+///
 extern int hwload_mode;
 
 int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line){

@@ -18,7 +18,7 @@ endif ()
 option(WITH_ANIMATIONS "Build and install animations" ON)
 
 set(ckb-next_VERSION_MAJOR 0)  #  |>|>
-set(ckb-next_VERSION_MINOR 2)  #  |>|> populated manually, must be updated accordingly to release tags
+set(ckb-next_VERSION_MINOR 2)  #  |>|> populated manually, must be updated accordingly to annotated tags
 set(ckb-next_VERSION_PATCH 8)  #  |>|>
 set(ckb-next_VERSION "${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
 

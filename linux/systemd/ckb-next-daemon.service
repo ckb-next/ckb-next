@@ -3,7 +3,7 @@ Description=Corsair Keyboard Daemon
 
 [Service]
 ExecStart=/usr/bin/ckb-next-daemon
-Restart=always
+Restart=on-failure
 StandardOutput=syslog+console
 StandardError=inherit
 

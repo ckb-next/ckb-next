@@ -20,6 +20,7 @@ elseif (LINUX)
     # find udev
     find_package(UDEV REQUIRED)
     include_directories(SYSTEM ${UDEV_INCLUDE_DIRS})
+    #set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 endif ()
 
 # find POSIX Threads (for both systems)
@@ -121,7 +122,8 @@ if (APPLE)
 elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     if (NOT EXISTS "/usr/bin/ckb-next-daemon")
         # symlink to /usr/bin
-        install(CODE [[makeLink("${INSTALL_CMAKE_DIR}/ckb-next-daemon" "/usr/bin/ckb-next-daemon" "ckb-next-daemon")]])
+        install(CODE [[message(WARNING "INSTALL_CMAKE_DIR: ${INSTALL_CMAKE_DIR}")]])
+        install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next-daemon" "/usr/bin/ckb-next-daemon")]])
     endif ()
 
     execute_process(COMMAND systemctl --version RESULT_VARIABLE SYSTEMD_FOUND OUTPUT_VARIABLE foo)
@@ -131,7 +133,7 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     install(CODE [[execute_process(COMMAND /usr/bin/ckb-next --close)]])
 
     if (SYSTEMD_FOUND EQUAL 0)
-        message(STATUS "System service: systemd detected")
+        install(CODE [[message(STATUS "System service: systemd detected")]])
         install(CODE [[execute_process(COMMAND sudo systemctl stop ckb-next-daemon)]])
 
         # for legacy ckb, remove in a few releases
@@ -145,6 +147,7 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
                 GROUP_READ
                 WORLD_READ
                 )
+        #install(CODE [[message(FATAL_ERROR "stop here")]])
 
         install(CODE [[execute_process(COMMAND sudo systemctl daemon-reload)]])
         install(CODE [[execute_process(COMMAND sudo systemctl enable ckb-next-daemon)]])

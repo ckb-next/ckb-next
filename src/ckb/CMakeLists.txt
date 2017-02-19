@@ -275,7 +275,7 @@ endif ()
 if (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     if (NOT EXISTS "/usr/bin/ckb-next")
         # symlink to /usr/bin
-        install(CODE [[makeLink("${INSTALL_RUNTIME_DIR}/ckb-next" "/usr/bin/ckb-next" "ckb-next")]])
+        install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next" "/usr/bin/ckb-next")]])
     endif ()
 
     install(FILES "ckb-next.desktop"

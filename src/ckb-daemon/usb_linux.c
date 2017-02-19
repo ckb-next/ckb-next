@@ -6,10 +6,13 @@
 
 #ifdef OS_LINUX
 
-///
+/// \details
 /// \brief all open usb devices have their system path names here in this array.
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
+/// \details
+/// \brief os_usbsend send a data packet (MSG_SIZE = 64) Bytes long
+/// \todo commenting
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
     int res;
     if(kb->fwversion >= 0x120 && !is_recv){
@@ -41,6 +44,9 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     return res;
 }
 
+/// \details
+/// \brief os_usbrecv receive a max MSGSIZE long buffer from usb device
+/// \todo commenting
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     int res;
     // This is what CUE does, but it doesn't seem to work on linux.
@@ -86,6 +92,9 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
     return 0;
 }
 
+/// \details
+/// \brief os_sendindicators update the indicators for the special keys (Numlock, Capslock and what else?)
+/// \todo documenting
 void os_sendindicators(usbdevice* kb){
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
@@ -93,6 +102,12 @@ void os_sendindicators(usbdevice* kb){
         ckb_err("%s\n", res ? strerror(errno) : "No data written");
 }
 
+///
+/// \brief os_inputmain
+/// os_inputmain is run in a separate thread and ill be detached from the main thread,
+/// so it needs to clean up its own resources.
+/// \todo do the commenting
+///
 void* os_inputmain(void* context){
     usbdevice* kb = context;
     int fd = kb->handle - 1;
@@ -214,6 +229,12 @@ int usbunclaim(usbdevice* kb, int resetting){
     return 0;
 }
 
+/// \details
+/// \brief os_closeusb is the linux specific implementation for closing an active usb port.
+/// \n If a valid handle is given in the kb structure, the usb port is unclaimed (usbunclaim()).
+/// \n The device in unrefenced via library function udev_device_unref().
+/// \n handle, udev and the first char of kbsyspath are cleared to 0 (empty string for kbsyspath).
+///
 void os_closeusb(usbdevice* kb){
     if(kb->handle){
         usbunclaim(kb, 0);
@@ -284,16 +305,11 @@ void strtrim(char* string){
 }
 
 ///
-/// \brief os_setupusb
-/// \param kb THE usbdevice*
-/// \return 0 on success, -1 else
-///
 /// Perform the operating system-specific opening of the interface in os_setupusb().
 /// As a result, some parameters should be set in kb (name, serial, fwversion, epcount = number of usb endpoints),
 /// and all endpoints should be claimed with usbclaim().
 /// Claiming is the only point where os_setupusb() can produce an error (-1).
 ///
-
 int os_setupusb(usbdevice* kb) {
     ///
     /// - Copy device description and serial

@@ -4,7 +4,27 @@
 #include "includes.h"
 #include "keymap.h"
 
-// Vendor/product codes
+/// \details Vendor/product codes
+///
+/// The list of defines in the first part of the file describes the various types of equipment from Corsair
+/// and summarizes them according to specific characteristics.
+/// \n Each device type is described with two defines:
+/// - On the one hand the device ID with which the device can be recognized on the USB as a short
+/// - and on the other hand the same representation as a string, but without leading "0x".
+///
+/// First entry-pair is the Provider ID (vendorID) from Corsair.
+///
+/// Block No. | contains | Devices are bundled via
+/// --------- | -------- | -----------------------
+/// 1 | The first block contains the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
+/// 2 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
+/// 3 | the K95 series keyboards | collected with the macro IS_K95().
+/// 4 | strafe keyboards | IS_STRAFE()
+/// 5 | M65 mice with and without RGB | IS_M65()
+/// 6 | The SABRE and HARPOON mice.\n Maybe this will be divided int two different blocks later because of different nummber of special keys | IS_SABRE()
+/// 7 | The Scimitar mouse devices | IS_SCIMITAR()
+///
+///
 #define V_CORSAIR       0x1b1c
 #define V_CORSAIR_STR   "1b1c"
 
@@ -68,10 +88,13 @@
 #define P_SCIMITAR_PRO_STR  "1b3e"
 #define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
 
-/// NOTE: when adding new devices please update src/ckb/fwupgradedialog.cpp as well.
-/// It should contain the same vendor/product IDs for any devices supporting firmware updates.
+/// \warning When adding new devices please update src/ckb/fwupgradedialog.cpp as well.
+/// \n It should contain the same vendor/product IDs for any devices supporting firmware updates.
+/// \n In the same way, all other sites have to be supplemented or modified:
+/// Currently known for this are \b usb_linux.c and \b usb_mac.c
 
-///uncomment to see USB packets sent to the device
+///
+/// uncomment the following Define to see USB packets sent to the device
 // #define DEBUG_USB
 
 ///
@@ -87,10 +110,19 @@ const char* vendor_str(short vendor);
 const char* product_str(short product);
 
 /// RGB vs non-RGB test
-/// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
+/// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol.
+/// The difference is denoted with the "monochrome" feature).
 #define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+
+/// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
+/// nonRGB has no lights.
+/// Change this if new \b monochrome devices are added
 #define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
+
+/// For calling with a usbdevice*, vendor and product are extracted and IS_RGB() is returned.
 #define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
+
+/// For calling with a usbdevice*, vendor and product are extracted and IS_MONOCHROME() is returned.
 #define IS_MONOCHROME_DEV(kb)           IS_MONOCHROME((kb)->vendor, (kb)->product)
 
 /// Full color range (16.8M) vs partial color range (512)
@@ -98,46 +130,66 @@ const char* product_str(short product);
 
 /// Mouse vs keyboard test
 #define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2)))
+
+/// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
 /// USB delays for when the keyboards get picky about timing
+/// That was the original comment, but it is used anytime.
+/// The short delay is used before any send or receive
 #define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)
+
+/// the medium delay is used after sending a command before waiting for the answer.
 #define DELAY_MEDIUM(kb)    usleep((int)(kb)->usbdelay * 10000) // x10 (default: 50ms)
+
+/// The longest delay takes place where something went wrong (eg when resetting the device)
 #define DELAY_LONG(kb)      usleep(100000)                      // long, fixed 100ms
+
+/// This constant is used to initialize \b kb->usbdelay.
+/// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
+/// Pure Hacker code.
 #define USB_DELAY_DEFAULT   5
 
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();
+
 /// Stop the USB system.
 void usbkill();
 
-/// Note: Lock a device's dmutex (see device.h) before accessing the USB interface.
-
+/// \attention Lock a device's dmutex (see device.h) before accessing the USB interface.
 ///
 /// \brief setupusb starts a thread with kb as parameter and _setupusb() as entrypoint.
-/// \param kb THE usbdeveice* used everywhere
+/// \param kb THE usbdevice* used everywhere
+/// \param[OUT] kb->thread is used to store the thread ID of the fresh created thread.
 void setupusb(usbdevice* kb);
 
-/// OS-specific setup. Return 0 on success.
+///
+/// \brief os_setupusb OS-specific setup for a specific usb device.
+/// \param kb THE usbdevice*
+/// \return 0 on success, -1 otherwise.
 int os_setupusb(usbdevice* kb);
-/// Per keyboard input thread (OS specific). Will be detached from the main thread, so it needs to clean up its own resources.
-void* os_inputmain(void* kb);
 
 ///
-/// \brief revertusb Puts a USB device back into hardware mode.
+/// \brief os_inputmain ist called per keyboard input thread (OS specific).
 /// \param kb THE usbdevice*
-/// \return Returns 0 on success.
+/// \return
+///
+void* os_inputmain(void* kb);
+
+/// \brief revertusb sets a given device to inactive (hardware controlled) mode if not a fw-ugrade is indicated
+/// \param kb THE usbdevice*
+/// \return 0 on success or if device needs firmware upgrade, -1 otherwise
 int revertusb(usbdevice* kb);
 
 ///
 /// \brief closeusb Close a USB device and remove device entry.
-/// \param kb
-/// \return Returns 0 on success
+/// \param[IN,OUT] kb
+/// \return Returns 0 (everytime. No error handling is done!)
 int closeusb(usbdevice* kb);
 
 ///
-/// \brief os_closeusb
-/// \param kb
+/// \brief os_closeusb unclaim it, destroy the udev device and clear data structures at kb
+/// \param[IN,OUT] kb THE usbdevice*
 ///
 void os_closeusb(usbdevice* kb);
 
@@ -148,6 +200,8 @@ void os_closeusb(usbdevice* kb);
 /// \param line line where it is called for error messages
 /// \return Returns 0 on success, -1 if device should be removed
 int _resetusb(usbdevice* kb, const char* file, int line);
+
+/// resetusb() is just a macro to call _resetusb() with debuggin constants (file, lineno)
 #define resetusb(kb) _resetusb(kb, __FILE_NOPATH__, __LINE__)
 
 ///
@@ -158,18 +212,62 @@ int _resetusb(usbdevice* kb, const char* file, int line);
 /// \return Returns 0 on success, -2 if device should be removed and -1 if reset should by tried again
 int os_resetusb(usbdevice* kb, const char* file, int line);
 
-/// Write data to a USB device. Returns number of bytes written or zero on failure.
+///
+/// \brief _usbsend send a logical message completely to the given device
+/// \param kb THE usbdevice*
+/// \param[IN] messages a Pointer to the first byte of the logical message
+/// \param[IN] count how many MSG_SIZE buffers is the logical message long?
+/// \param[IN] file for debugging
+/// \param[IN] line for debugging
+/// \param[in] reset_stop global variable is read
+/// \return number of Bytes sent (ideal == count * MSG_SIZE);\n 0 if a block could not be sent and it was not a timeout OR reset_stop was required or hw_load is not set to always
 int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line);
+
+/// \brief usbsend macro is used to wrap _usbsend() with debugging information (file and lineno)
+/// \param kb THE usbdevice*
+/// \param[IN] messages a Pointer to the first byte of the logical message
+/// \param[IN] count how many MSG_SIZE buffers is the logical message long?
 #define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
-/// Requests data from a USB device by first sending an output packet and the reading the response. Returns number of bytes read or zero on failure.
+
+///
+/// \brief _usbrecv Request data from a USB device by first sending an output packet and then reading the response.
+/// \param kb THE usbdevice*
+/// \param[IN] out_msg What information does the caller want from the device?
+/// \param[OUT] in_msg Here comes the answer; The names represent the usb view, not the view of this function! So INput from usb is OUTput of this function.
+/// \param[IN] file for debugging
+/// \param[IN] line for debugging
+/// \param[in] reset_stop global variable is read
+/// \return number of bytes read or zero on failure.
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line);
+
+/// \brief usbrecv macro is used to wrap _usbrecv() with debugging information (file and lineno)
+/// \param kb THE usbdevice*
+/// \param[IN] out_msg What information does the caller want from the device?
+/// \param[OUT] in_msg Here comes the answer; The names represent the usb view, not the view of this function! So INput from usb is OUTput of this function.
 #define usbrecv(kb, out_msg, in_msg) _usbrecv(kb, out_msg, in_msg, __FILE_NOPATH__, __LINE__)
 
-/// OS: Send a USB message to the device. Return number of bytes written, zero for permanent failure, -1 for try again
+/// \details
+/// \brief os_usbsend send a data packet (MSG_SIZE = 64) Bytes long
+/// \param kb THE usbdevice*
+/// \param out_msg the MSGSIZE char long buffer to send
+/// \param is_recv if true, just send an ioctl for further reading packets. if false, send the data at \b out_msg.
+/// \param file for debugging
+/// \param line for debugging
+/// \return -1 on timeout (try again), 0 on hard error, numer of bytes sent otherwise
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
-/// OS: Gets input from a USB device. Return same as above.
+
+///
+/// \brief os_usbrecv receive a max MSGSIZE long buffer from usb device
+/// \param kb THE usbdevice*
+/// \param in_msg the buffer to fill with the message received
+/// \param file for debugging
+/// \param line for debugging
+/// \return -1 on timeout, 0 on hard error, numer of bytes received otherwise
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line);
-/// OS: Update HID indicator LEDs (Num Lock, Caps, etc). Read from kb->ileds.
+
+/// \brief os_sendindicators update the HID indicators for the special key LEDs (Num Lock, Caps, ???).
+/// Read the data from kb->ileds.
+/// \param kb THE usbdevice*
 void os_sendindicators(usbdevice* kb);
 
 ///
@@ -181,16 +279,35 @@ void os_sendindicators(usbdevice* kb);
 /// \param line for error message
 /// \return Returns 0 on success.
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);
+
+/// \brief nk95cmd() macro is used to wrap _nk95cmd() with debugging information (file and lineno).
+/// the command structure is different:
+/// \n Just the bits 23..16 are used as bits 7..0 for bRequest
+/// \n Bits 15..0 are used as wValue
 #define nk95cmd(kb, command) _nk95cmd(kb, (command) >> 16 & 0xFF, (command) & 0xFFFF, __FILE_NOPATH__, __LINE__)
 
-#define NK95_HWOFF  0x020030    // Hardware playback off
-#define NK95_HWON   0x020001    // Hardware playback on
-#define NK95_M1     0x140001    // Mode switches
+/// Hardware-specific commands for the K95 nonRGB,
+/// \see [usb2.0 documentation for details](http://www.usb.org/developers/docs/usb_20.zip).
+/// Hardware playback off
+#define NK95_HWOFF  0x020030
+
+/// Hardware playback on
+#define NK95_HWON   0x020001
+
+/// Switch to mode 1
+#define NK95_M1     0x140001
+
+/// Switch to mode 2
 #define NK95_M2     0x140002
+
+/// Switch to mode 3
 #define NK95_M3     0x140003
 
-/// Tries to reset a USB device after a failed action. Returns 0 on success.
-/// The previous action will NOT be re-attempted.
+///
+/// \brief usb_tryreset does what the name means: Try to reset the usb via resetusb()
+/// \param[in,out] kb THE usbdevice*
+/// \param[in] reset_stop global variable is read
+/// \return 0 on success, -1 otherwise
 int usb_tryreset(usbdevice* kb);
 
 #endif  // USB_H

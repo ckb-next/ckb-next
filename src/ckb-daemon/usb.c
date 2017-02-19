@@ -42,7 +42,7 @@ const char* vendor_str(short vendor){
     return "";
 }
 
-///
+/// \details
 /// At present, various models and their properties are known from corsair products.
 /// Some models differ in principle (mice and keyboards),
 /// others differ in the way they function (for example, RGB and non RGB), but they are very similar.
@@ -366,15 +366,31 @@ static void* _setupusb(void* context){
     return 0;
 }
 
-///
+/// \details
 /// Set up a USB device after its handle is open. Spawns a new thread _setupusb() with standard parameter kb.
 /// dmutex must be locked prior to calling this function. The function will unlock it when finished.
+/// in kb->thread the thread id is mentioned, because closeusb() needs this info for joining that thread again.
+///
 void setupusb(usbdevice* kb){
     pthread_mutex_lock(imutex(kb));
     if(pthread_create(&kb->thread, 0, _setupusb, kb))
         ckb_err("Failed to create USB thread\n");
 }
 
+/// \details
+/// First is checked, whether a firmware-upgrade is indicated for the device.
+/// If so, revertusb() returns 0.
+/// \todo Why is this useful? Are there problems seen with deactivating a device with older fw-version??? Why isn't this an error indicating reason and we return success (0)?
+///
+/// Anyway, the following steps are similar to some other procs, dealing with low level usb handling:
+/// - If we do not have an RGB device, a simple setting to Hardware-mode (NK95_HWON) is sent to the device via n95cmd().
+/// \todo The return value of nk95cmd() is ignored (but sending the ioctl may produce an error and _nk95_cmd will indicate this), instead revertusb() returns success in any case.
+///
+/// - If we have an RGB device, setactive() is called with second param active = false.
+/// That function will have a look on differences between keyboards and mice.
+/// \n More precisely setactive() is just a macro to call via the kk->vtable enties either the active() or the idle() function where the vtable points to.
+/// setactive() may return error indications. If so, revertusb() return -1, otherwise 0 in any other case.
+///
 int revertusb(usbdevice* kb){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
@@ -387,7 +403,7 @@ int revertusb(usbdevice* kb){
     return 0;
 }
 
-///
+/// \details
 /// First reset the device via os_resetusb() after a long delay (it may send something to the host).
 /// If this worked (retval == 0), give the device another long delay
 /// Then perform the initialization via the device specific start() function entry in kb->vtable
@@ -408,6 +424,29 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     return 0;
 }
 
+/// \details
+/// This function is called if an usb command ran into an error
+/// in case of one of the following two situations:
+/// - When setting up a new usb device and the start() function got an error (\see _setupusb())
+/// - If upgrading to a new firmware gets an error (\see cmd_fwupdate()).
+///
+/// The previous action which got the error will NOT be re-attempted.
+///
+/// In an endless loop usb_tryreset() tries to reset the given usb device via the macro resetusb().
+/// \n This macro calls _resetusb() with debugging information.
+/// \n _resetusb() sends a command via the operating system dependent function os_resetusb()
+/// and - if successful - reinitializes the device.
+/// os_resetusb() returns -2 to indicate a broken device and all structures should be removed for it.
+/// \n In that case, the loop is terminated, an error message is produced and usb_tryreset() returns -1.
+///
+/// In case resetusb() has success, the endless loop is left via a return 0 (success).
+/// \n If the return value from resetusb() is -1, the loop is continued with the next try.
+///
+/// If the global variable \b reset_stop is set directly when the function is called or after each try,
+/// usb_tryreset() stops working and returns -1.
+///
+/// \todo Why does usb_tryreset() hide the information returned from resetusb()? Isn't it needed by the callers?
+///
 int usb_tryreset(usbdevice* kb){
     if(reset_stop)
         return -1;
@@ -426,10 +465,54 @@ int usb_tryreset(usbdevice* kb){
 }
 
 ///
-/// \brief hwload_mode is defined in device.c
+/// \var hwload_mode is defined in device.c
 ///
 extern int hwload_mode;
 
+/// \details
+/// \todo A lot of different conditions are combined in this code. Don't think, it is good in every combination...
+///
+/// The main task of _usbsend () is to transfer the complete logical message from the buffer beginning with \a messages to <b>count * MSG_SIZE</b>.
+/// \n According to usb 2.0 specification, a USB transmits a maximum of 64 byte user data packets.
+/// For the transmission of longer messages we need a segmentation.
+/// And that is exactly what happens here.
+///
+/// The message is given one by one to os_usbsend() in MSG_SIZE (= 64) byte large bites.
+/// \attention This means that the buffer given as argument must be n * MSG_SIZE Byte long.
+///
+/// An essential constant parameter which is relevant for os_usbsend() only is is_recv = 0, which means sending.
+///
+/// Now it gets a little complicated again:
+/// - Returns os_usbsend() 0, only zero bytes could be sent in one of the packets,
+/// or it was an error (-1 from the systemcall), but not a timeout.
+/// How many Bytes were sent in total from earlier calls does not seem to matter,
+/// _usbsend() returns a total of 0.
+/// - Returns os_usbsend() -1, first check if \b reset_stop is set globally
+/// or (incomprehensible) hwload_mode is not set to "always".
+/// In either case, _usbsend() returns 0,
+/// otherwise it is assumed to be a temporary transfer error and it simply retransmits the physical packet after a long delay.
+/// - If the return value of os_usbsend() was neither 0 nor -1,
+/// it specifies the numer of bytes transferred.
+/// \n Here is an information hiding conflict with os_usbsend() (at least in the Linux version):
+/// \n If os_usbsend() can not transfer the entire packet,
+/// errors are thrown and the number of bytes sent is returned.
+/// _usbsend() interprets this as well
+/// and remembers the total number of bytes transferred in the local variable \b total_sent.
+/// Subsequently, however, transmission is continued with the next complete MSG_SIZE block
+/// and not with the first of the possibly missing bytes.
+/// \todo Check whether this is the same in the macOS variant. It is not dramatic, but if errors occur, it can certainly irritate the devices completely if they receive incomplete data streams. Do we have errors with the messages "Wrote YY bytes (expected 64)" in the system logs? If not, we do not need to look any further.
+///
+/// When the last packet is transferred,
+/// _usbsend() returns the effectively counted set of bytes (from \b total_sent).
+/// This at least gives the caller the opportunity to check whether something has been lost in the middle.
+///
+/// A bit strange is the structure of the program:
+/// Handling the \b count MSG_SIZE blocks to be transferred is done
+/// in the outer for (...) loop.
+/// Repeating the transfer with a treatable error is managed by the inner while(1) loop.
+/// \n This must be considered when reading the code;
+/// The "break" on successful block transfer leaves the inner while, not the for (...).
+///
 int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line){
     int total_sent = 0;
     for(int i = 0; i < count; i++){
@@ -453,6 +536,49 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
     return total_sent;
 }
 
+/// \details
+/// To fully understand this, you need to know about usb:
+/// All control is at the usb host (the CPU).
+/// If the device wants to communicate something to the host,
+/// it must wait for the host to ask.
+/// The usb protocol defines the cycles and periods in which actions are to be taken.
+///
+/// So in order to receive a data packet from the device,
+/// the host must first send a send request.
+/// \n This is done by _usbrecv() in the first block
+/// by sending the MSG_SIZE large data block from \b out_msg via os_usbsend() as it is a machine depending implementation.
+/// The usb target device is as always determined over kb.
+///
+/// For os_usbsend() to know that it is a receive request,
+/// the \b is_recv parameter is set to true (1).
+/// With this, os_usbsend () generates a control package for the hardware, not a data packet.
+///
+/// If sending of the control package is not successful,
+/// a maximum of 5 times the transmission is repeated (including the first attempt).
+/// If a non-cancelable error is signaled or the drive is stopped via reset_stop,
+/// _usbrecv() immediately returns 0.
+///
+/// After this, the function waits for the requested response from the device using os_usbrecv ().
+///
+/// os_usbrecv() returns 0, -1 or something else.
+/// \n Zero signals a serious error which is not treatable and _usbrecv() also returns 0.
+/// \n -1 means that it is a true-to-treatable error - a timeout for example -
+/// and therefore the next transfer attempt is started after a long pause (DELAY_LONG)
+/// if not reset_stop or the wrong hwload_mode require a termination with a return value of 0.
+///
+/// After 5 attempts, _usbrecv () returns and returns 0 as well as an error message.
+///
+/// When data is received, the number of received bytes is returned.
+/// This should always be MSG_SIZE,
+/// but os_usbrecv() can also return less.
+/// It should not be more,
+/// because then there would be an unhandled buffer overflow,
+/// but it could be less.
+/// This would be signaled in os_usbrecv () with a message.
+///
+/// The buffers behind \b out_msg and \b in_msg are MSG_SIZE at least (currently 64 Bytes).
+/// More is ok but useless, less brings unpredictable behavior.
+///
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line){
     // Try a maximum of 3 times
     for(int try = 0; try < 5; try++){
@@ -484,6 +610,48 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
     return 0;
 }
 
+/// \details
+/// An imutex lock ensures first of all, that no communication is currently running from the viewpoint of the driver to the user input device
+/// (ie the virtual driver with which characters or mouse movements are sent from the daemon to the operating system as inputs).
+///
+/// If the \b kb has an acceptable value = 0,
+/// the index of the device is looked for
+/// and with this index os_inputclose() is called.
+/// After this no more characters can be sent to the operating system.
+///
+/// Then the connection to the usb device is capped by os_closeusb().
+/// \todo What is not yet comprehensible is the call to updateconnected() BEFORE os_closeusb().
+/// Should that be in the other sequence?
+/// Or is updateconnected() not displaying the connected usb devices,
+/// but the representation which uinput devices are loaded?
+/// Questions about questions ...
+///
+/// If there is no valid \b handle, only updateconnected() is called.
+/// We are probably trying to disconnect a connection under construction.
+/// Not clear.
+///
+/// The cmd pipe as well as all open notify pipes are deleted via rmdevpath ().
+/// \n This means that nothing can happen to the input path -
+/// so the device-specific imutex is unlocked again and remains unlocked.
+///
+/// Also the dmutex is unlocked now, but only to join the thread,
+/// which was originally taken under \b kb->thread
+/// (which started with _setupusb()) with pthread_join() again.
+/// Because of the closed devices that thread would have to quit sometime
+/// \see the hack note with rmdevpath())
+///
+/// As soon as the thread is caught, the dmutex is locked again, which is what I do not understand yet: What other thread can do usb communication now?
+/// \n If the vtabel exists for the given kb
+/// (why not? It seems to have race conditions here!!),
+/// via the vtable the actually device-specific, but still everywhere identical freeprofile() is called.
+/// This frees areas that are no longer needed.
+/// Then the \b usbdevice structure in its array is set to zero completely.
+///
+/// Error handling is rather unusual in closeusb();
+/// Everything works
+/// (no matter what the called functions return),
+/// and closeusb() always returns zero (success).
+///
 int closeusb(usbdevice* kb){
     pthread_mutex_lock(imutex(kb));
     if(kb->handle){

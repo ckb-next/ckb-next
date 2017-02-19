@@ -119,7 +119,7 @@ if (APPLE)
             )
     install(CODE [[execute_process(COMMAND sudo launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist)]])
 elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
-    if (NOT "${CMAKE_INSTALL_PREFIX}/${INSTALL_RUNTIME_DIR}" STREQUAL "/usr/bin")
+    if (NOT EXISTS "/usr/bin/ckb-next-daemon")
         # symlink to /usr/bin
         makeLink("${INSTALL_CMAKE_DIR}/ckb-next-daemon" "/usr/bin/ckb-next-daemon" "ckb-next-daemon")
     endif ()
@@ -133,36 +133,56 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     if (SYSTEMD_FOUND STREQUAL "0")
         install(CODE [[message(STATUS "System service: systemd detected")]])
         install(CODE [[execute_process(COMMAND sudo systemctl stop ckb-next-daemon)]])
+
+        # for legacy ckb, remove in a few releases
+        install(CODE [[execute_process(COMMAND sudo systemctl stop ckb-daemon)]])
+        install(CODE [[execute_process(COMMAND sudo systemctl disable ckb-daemon)]])
+        install(CODE [[execute_process(COMMAND sudo rm -f /usr/lib/systemd/system/ckb-daemon.service)]])
+
         install(FILES "${CMAKE_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service"
                 DESTINATION "/usr/lib/systemd/system"
                 PERMISSIONS OWNER_READ OWNER_WRITE
                 GROUP_READ
                 WORLD_READ
                 )
+
         install(CODE [[execute_process(COMMAND sudo systemctl daemon-reload)]])
         install(CODE [[execute_process(COMMAND sudo systemctl enable ckb-next-daemon)]])
         install(CODE [[execute_process(COMMAND sudo systemctl start ckb-next-daemon)]])
     elseif (UPSTART_FOUND STREQUAL "0")
         install(CODE [[message(STATUS "System service: Upstart detected")]])
         install(CODE [[execute_process(COMMAND sudo service ckb-next-daemon stop)]])
+
+        # for legacy ckb, remove in a few releases
+        install(CODE [[execute_process(COMMAND sudo service ckb-daemon stop)]])
+        install(CODE [[execute_process(COMMAND sudo rm -f /etc/init/ckb-daemon.conf)]])
+
         install(FILES "${CMAKE_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf"
                 DESTINATION "/etc/init"
                 PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                 GROUP_READ GROUP_EXECUTE
                 WORLD_READ WORLD_EXECUTE
                 )
+
         install(CODE [[execute_process(COMMAND sudo service ckb-next-daemon start)]])
     elseif (OPENRC_FOUND STREQUAL "0")
         install(CODE [[message(STATUS "System service: OpenRC detected")]])
-        install(CODE [[execute_process(COMMAND sudo rc-service stop ckb-next-daemon)]])
+        install(CODE [[execute_process(COMMAND sudo rc-service ckb-next-daemon stop)]])
+
+        # for legacy ckb, remove in a few releases
+        install(CODE [[execute_process(COMMAND sudo rc-service ckb-daemon stop)]])
+        install(CODE [[execute_process(COMMAND sudo rc-update del ckb-daemon default)]])
+        install(CODE [[execute_process(COMMAND sudo rm -f /etc/init.d/ckb-daemon)]])
+
         install(FILES "${CMAKE_SOURCE_DIR}/linux/openrc/ckb-next-daemon"
                 DESTINATION "/etc/init.d"
                 PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                 GROUP_READ GROUP_EXECUTE
                 WORLD_READ WORLD_EXECUTE
                 )
-        install(CODE [[execute_process(COMMAND sudo rc-service start ckb-next-daemon)]])
-        install(CODE [[execute_process(COMMAND sudo rc-service add ckb-next-daemon)]])
+
+        install(CODE [[execute_process(COMMAND sudo rc-service ckb-next-daemon start)]])
+        install(CODE [[execute_process(COMMAND sudo rc-update add ckb-next-daemon default)]])
     else ()
         message(FATAL_ERROR "No supported system service detected.\
 Supported services are: systemd, launchd, OpenRC, Upstart.\

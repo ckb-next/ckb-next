@@ -1,4 +1,3 @@
-# TODO finish linux support
 # TODO rename daemon's plist to follow the rules for naming
 
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)

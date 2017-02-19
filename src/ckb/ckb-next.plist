@@ -15,7 +15,7 @@
         <key>CFBundleExecutable</key>
         <string>ckb-next</string>
         <key>CFBundleGetInfoString</key>
-        <string>ckb-next - version 0.2.8-1-gafc2034</string>
+        <string>ckb-next - version 0.2.8-5-g9e8fc17</string>
         <key>CFBundleIconFile</key>
         <string>ckb-next.icns</string>
         <key>CFBundleIdentifier</key>
@@ -23,7 +23,7 @@
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
         <key>CFBundleLongVersionString</key>
-        <string>0.2.8-1-gafc2034</string>
+        <string>0.2.8-5-g9e8fc17</string>
         <key>CFBundleName</key>
         <string>ckb-next</string>
         <key>CFBundlePackageType</key>
@@ -33,7 +33,7 @@
         <key>CFBundleSignature</key>
         <string>ckbn</string>
         <key>CFBundleVersion</key>
-        <string>0.2.8-1-gafc2034</string>
+        <string>0.2.8-5-g9e8fc17</string>
         <key>LSMinimumSystemVersion</key>
         <string>10.9.0</string>
         <key>NSHighResolutionCapable</key>

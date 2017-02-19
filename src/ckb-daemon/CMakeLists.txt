@@ -121,17 +121,17 @@ if (APPLE)
 elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     if (NOT EXISTS "/usr/bin/ckb-next-daemon")
         # symlink to /usr/bin
-        makeLink("${INSTALL_CMAKE_DIR}/ckb-next-daemon" "/usr/bin/ckb-next-daemon" "ckb-next-daemon")
+        install(CODE [[makeLink("${INSTALL_CMAKE_DIR}/ckb-next-daemon" "/usr/bin/ckb-next-daemon" "ckb-next-daemon")]])
     endif ()
 
-    execute_process(COMMAND systectl --version RESULT_VARIABLE SYSTEMD_FOUND)
-    execute_process(COMMAND initctl version RESULT_VARIABLE UPSTART_FOUND)
-    execute_process(COMMAND openrc --version RESULT_VARIABLE OPENRC_FOUND)
+    execute_process(COMMAND systemctl --version RESULT_VARIABLE SYSTEMD_FOUND OUTPUT_VARIABLE foo)
+    execute_process(COMMAND initctl version RESULT_VARIABLE UPSTART_FOUND OUTPUT_VARIABLE foo)
+    execute_process(COMMAND openrc --version RESULT_VARIABLE OPENRC_FOUND OUTPUT_VARIABLE foo)
 
     install(CODE [[execute_process(COMMAND /usr/bin/ckb-next --close)]])
 
-    if (SYSTEMD_FOUND STREQUAL "0")
-        install(CODE [[message(STATUS "System service: systemd detected")]])
+    if (SYSTEMD_FOUND EQUAL 0)
+        message(STATUS "System service: systemd detected")
         install(CODE [[execute_process(COMMAND sudo systemctl stop ckb-next-daemon)]])
 
         # for legacy ckb, remove in a few releases
@@ -149,8 +149,8 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
         install(CODE [[execute_process(COMMAND sudo systemctl daemon-reload)]])
         install(CODE [[execute_process(COMMAND sudo systemctl enable ckb-next-daemon)]])
         install(CODE [[execute_process(COMMAND sudo systemctl start ckb-next-daemon)]])
-    elseif (UPSTART_FOUND STREQUAL "0")
-        install(CODE [[message(STATUS "System service: Upstart detected")]])
+    elseif (UPSTART_FOUND EQUAL 0)
+        message(STATUS "System service: Upstart detected")
         install(CODE [[execute_process(COMMAND sudo service ckb-next-daemon stop)]])
 
         # for legacy ckb, remove in a few releases
@@ -165,8 +165,8 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
                 )
 
         install(CODE [[execute_process(COMMAND sudo service ckb-next-daemon start)]])
-    elseif (OPENRC_FOUND STREQUAL "0")
-        install(CODE [[message(STATUS "System service: OpenRC detected")]])
+    elseif (OPENRC_FOUND EQUAL 0)
+        message(STATUS "System service: OpenRC detected")
         install(CODE [[execute_process(COMMAND sudo rc-service ckb-next-daemon stop)]])
 
         # for legacy ckb, remove in a few releases
@@ -184,8 +184,8 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
         install(CODE [[execute_process(COMMAND sudo rc-service ckb-next-daemon start)]])
         install(CODE [[execute_process(COMMAND sudo rc-update add ckb-next-daemon default)]])
     else ()
-        message(FATAL_ERROR "No supported system service detected.\
-Supported services are: systemd, launchd, OpenRC, Upstart.\
+        message(FATAL_ERROR "No supported system service detected.\ 
+Supported services are: systemd, launchd, OpenRC, Upstart.\ 
 Open an issue on Github to support your configuration.")
     endif ()
 endif ()

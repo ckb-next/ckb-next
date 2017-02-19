@@ -6,7 +6,7 @@ if (BREW_QT5)
     execute_process(COMMAND brew --prefix qt5
             RESULT_VARIABLE BREW_AND_QT_FOUND
             OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (NOT ${BREW_AND_QT_FOUND} STREQUAL "0")
+    if (NOT ${BREW_AND_QT_FOUND} EQUAL 0)
         message(FATAL_ERROR "Homebrew is not installed!")
     endif ()
 endif ()
@@ -273,9 +273,9 @@ if (NOT LINUX_CUSTOM_INSTALL)
 endif ()
 
 if (LINUX AND NOT LINUX_CUSTOM_INSTALL)
-    if (NOT "${CMAKE_INSTALL_PREFIX}/${INSTALL_RUNTIME_DIR}" STREQUAL "/usr/bin")
+    if (NOT EXISTS "/usr/bin/ckb-next")
         # symlink to /usr/bin
-        makeLink("${INSTALL_CMAKE_DIR}/ckb-next" "/usr/bin/ckb-next" "ckb-next")
+        install(CODE [[makeLink("${INSTALL_RUNTIME_DIR}/ckb-next" "/usr/bin/ckb-next" "ckb-next")]])
     endif ()
 
     install(FILES "ckb-next.desktop"

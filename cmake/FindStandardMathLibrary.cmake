@@ -12,21 +12,22 @@
 # Copyright (c) 2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 # Redistribution and use is allowed according to the terms of the 2-clause BSD license.
 
+# Adopted for C
 
-include(CheckCXXSourceCompiles)
+include(CheckCSourceCompiles)
 
-# a little test program for c++ math functions.
+# a little test program for c math functions.
 # notice the std:: is required on some platforms such as QNX
 
 set(find_standard_math_library_test_program
-        "#include<cmath>
-int main() { std::sin(0.0); std::log(0.0f); }")
+    "#include <math.h>
+    int main(void) { sin(0.0); log(0.0); return 0; }")
 
 # first try compiling/linking the test program without any linker flags
 
 set(CMAKE_REQUIRED_FLAGS "")
 set(CMAKE_REQUIRED_LIBRARIES "")
-CHECK_CXX_SOURCE_COMPILES(
+CHECK_C_SOURCE_COMPILES(
         "${find_standard_math_library_test_program}"
         standard_math_library_linked_to_automatically
 )
@@ -44,7 +45,7 @@ else ()
     # standard name 'm' for the standard math library.
 
     set(CMAKE_REQUIRED_LIBRARIES "m")
-    CHECK_CXX_SOURCE_COMPILES(
+    CHECK_C_SOURCE_COMPILES(
             "${find_standard_math_library_test_program}"
             standard_math_library_linked_to_as_m)
 

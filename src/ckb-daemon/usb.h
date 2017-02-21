@@ -247,7 +247,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 #define usbrecv(kb, out_msg, in_msg) _usbrecv(kb, out_msg, in_msg, __FILE_NOPATH__, __LINE__)
 
 /// \details
-/// \brief os_usbsend send a data packet (MSG_SIZE = 64) Bytes long
+/// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long
 /// \param kb THE usbdevice*
 /// \param out_msg the MSGSIZE char long buffer to send
 /// \param is_recv if true, just send an ioctl for further reading packets. If false, send the data at \b out_msg.
@@ -257,7 +257,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
 
 ///
-/// \brief os_usbrecv receive a max MSGSIZE long buffer from usb device
+/// \brief os_usbrecv receives a max MSGSIZE long buffer from usb device
 /// \param kb THE usbdevice*
 /// \param in_msg the buffer to fill with the message received
 /// \param file for debugging

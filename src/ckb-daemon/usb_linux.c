@@ -11,7 +11,7 @@
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
 /// \details
-/// \brief os_usbsend send a data packet (MSG_SIZE = 64) Bytes long
+/// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long
 ///
 /// os_usbsend has two functions:
 /// - if is_recv == false, it tries to send a given MSG_SIZE buffer via the usb interface given with kb.
@@ -19,9 +19,14 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 ///
 /// The functionality for sending distinguishes two cases,
 /// depending on the version number of the firmware of the connected device:
-/// \n If the firmware is at or above 1.2, the transmission is done via an ioctl().
+/// \n If the firmware is less or equal 1.2, the transmission is done via an ioctl().
 /// The ioctl() is given a struct usbdevfs_ctrltransfer, in which the relevant parameters are entered:
-/// \n bRequestType = 0x21, bRequest = 0x09, wValue = 0x0200, endpoint to be addressed from epcount, MSG_SIZE, timeout = 5ms, the message buffer pointer.
+///
+/// bRequestType | bRequest | wValue | EP | size | Timeout | data
+/// ------------ | -------- | ------ | -- | ---- | ------- | ----
+/// 0x21 | 0x09 | 0x0200 | endpoint to be addressed from epcount - 1 | MSG_SIZE | 5000 (=5ms) | the message buffer pointer
+/// Host to Device, Type=Class, Recipient=Interface (why not endpoint? Do I have a wrong usb description?) | ??? | specific | Endpoint (!) | 64 | 5000 | out_msg
+///
 /// \n The ioctl command is USBDEVFS_CONTROL.
 ///
 /// The same constellation is used if the device is requested to send its data (is_recv = true).
@@ -51,7 +56,7 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 ///
 /// If this is not the entire blocksize (MSG_SIZE bytes),
 /// an error message is issued on the standard error channel
-/// \n [warning "Wrote YY bytes (expected 64)"].
+/// [warning "Wrote YY bytes (expected 64)"].
 ///
 /// If DEBUG_USB is set during compilation,
 /// the number of bytes sent and their representation are logged to the error channel.
@@ -88,8 +93,34 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 }
 
 /// \details
-/// \brief os_usbrecv receive a max MSGSIZE long buffer from usb device
-/// \todo commenting
+/// \brief os_usbrecv receives a max MSGSIZE long buffer from usb device
+/// os_usbrecv does what its name says:
+///
+/// The comment at the beginning of the procedure
+/// causes the suspicion that the firmware versionspecific distinction
+/// is missing for receiving from usb endpoint 3 or 4.
+/// The commented code contains only the reception from EP4,
+/// but this may be wrong for a software version 2.0 or higher (see the code for os-usbsend ()).
+///
+/// \n So all the receiving is done via an ioctl() like in os_usbsend.
+/// The ioctl() is given a struct usbdevfs_ctrltransfer, in which the relevant parameters are entered:
+///
+/// bRequestType | bRequest | wValue | EP | size | Timeout | data
+/// ------------ | -------- | ------ | -- | ---- | ------- | ----
+/// 0xA1 | 0x01 | 0x0200 | endpoint to be addressed from epcount - 1 | MSG_SIZE | 5ms | the message buffer pointer
+/// Device to Host, Type=Class, Recipient=Interface ??? | ??? | specific | Endpoint (!) | 64 | 5000 | in_msg
+///
+/// The ioctl() returns the number of bytes received.
+/// Here is the usual check again:
+/// - If the return value is -1 AND the error is a timeout (ETIMEOUT),
+/// os_usbrecv() will return -1 to indicate that it is probably a recoverable problem and a retry is recommended.
+/// - For another negative value or other error identifier OR 0 bytes are received, 0 is returned as an identifier for a heavy error.
+/// - In all other cases, the function returns the number of bytes received.
+///
+/// If this is not the entire blocksize (MSG_SIZE bytes),
+/// an error message is issued on the standard error channel
+/// [warning "Read YY bytes (expected 64)"].
+///
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     int res;
     // This is what CUE does, but it doesn't seem to work on linux.
@@ -122,7 +153,30 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     return res;
 }
 
-/// \brief If we control a non RGB keyboard, set the keyboard via ioctl with usbdevfs_ctrltransfer
+///
+/// \brief _nk95cmd If we control a non RGB keyboard, set the keyboard via ioctl with usbdevfs_ctrltransfer
+/// \param kb THE usbdevice*
+/// \param bRequest a usb bRequest
+/// \param wValue a usb wValue
+/// \param file for debugging
+/// \param line for debugging
+/// \return 1 (true) on failure, 0 (false) on success.
+///
+/// To send control packets to a non RGB non color K95 Keyboard,
+/// use this function. Normally it is called via the nk95cmd() macro.
+///
+/// If it is the wrong device for which the function is called, 0 is returned and nothing done.
+/// Otherwise a usbdevfs_ctrltransfer structure is filled and an USBDEVFS_CONTROL ioctl() called.
+///
+/// bRequestType | bRequest | wValue | EP | size | Timeout | data
+/// ------------ | -------- | ------ | -- | ---- | ------- | ----
+/// 0x40 | normally HW_ON and HW_OFF to switch hardware-modus at Keyboard | wValue | device | MSG_SIZE | 5ms | the message buffer pointer
+/// Device to Host, Type=Vendor, Recipient=Device? | bRequest parameter | wValue Parameter | 0 | 0 | 5000 | null
+///
+/// If a 0 or a negative error number is returned by the ioctl, an error message is shown depending on the errno or "No data written" if retval was 0.
+/// In either case 1 is returned to indicate the error.
+/// If the ioctl returned a value > 0, 0 is returned to indicate no error.
+///
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
     if(kb->product != P_K95_NRGB)
         return 0;
@@ -138,6 +192,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 /// \details
 /// \brief os_sendindicators update the indicators for the special keys (Numlock, Capslock and what else?)
 /// \todo documenting
+///
 void os_sendindicators(usbdevice* kb){
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);

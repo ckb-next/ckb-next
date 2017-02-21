@@ -12,7 +12,50 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
 /// \details
 /// \brief os_usbsend send a data packet (MSG_SIZE = 64) Bytes long
-/// \todo commenting
+///
+/// os_usbsend has two functions:
+/// - if is_recv == false, it tries to send a given MSG_SIZE buffer via the usb interface given with kb.
+/// - otherwise a request is sent via the usb device to initiate the receiving of a message from the remote device.
+///
+/// The functionality for sending distinguishes two cases,
+/// depending on the version number of the firmware of the connected device:
+/// \n If the firmware is at or above 1.2, the transmission is done via an ioctl().
+/// The ioctl() is given a struct usbdevfs_ctrltransfer, in which the relevant parameters are entered:
+/// \n bRequestType = 0x21, bRequest = 0x09, wValue = 0x0200, endpoint to be addressed from epcount, MSG_SIZE, timeout = 5ms, the message buffer pointer.
+/// \n The ioctl command is USBDEVFS_CONTROL.
+///
+/// The same constellation is used if the device is requested to send its data (is_recv = true).
+///
+/// For a more recent firmware and is_recv = false,
+/// the ioctl command USBDEVFS_CONTROL is not used
+/// (this tells the bus to enter the control mode),
+/// but the bulk method is used: USBDEVFS_BULK.
+/// For this purpose, a different structure is used for the ioctl() (struct \b usbdevfs_bulktransfer)
+/// and this is also initialized differently:
+/// \n The length and timeout parameters are given the same values as above.
+/// The formal parameter out_msg is also passed as a buffer pointer.
+/// For the endpoints, the firmware version is differentiated again:
+/// \n For a firmware version between 1.3 and <2.0 endpoint 4 is used,
+/// otherwise (it can only be >=2.0) endpoint 3 is used.
+///
+/// \todo Since the handling of endpoints has already led to problems elsewhere, this implementation is extremely hardware-dependent and critical!
+/// \n Eg. the new keyboard K95PLATINUMRGB has a version number significantly less than 2.0 - will it run with this implementation?
+///
+/// The ioctl() - no matter what type -
+/// returns the number of bytes sent.
+/// Now comes the usual check:
+/// - If the return value is -1 AND the error is a timeout (ETIMEOUT),
+/// os_usbsend() will return -1 to indicate that it is probably a recoverable problem and a retry is recommended.
+/// - For another negative value or other error identifier OR 0 bytes sent, 0 is returned as a heavy error identifier.
+/// - In all other cases, the function returns the number of bytes sent.
+///
+/// If this is not the entire blocksize (MSG_SIZE bytes),
+/// an error message is issued on the standard error channel
+/// \n [warning "Wrote YY bytes (expected 64)"].
+///
+/// If DEBUG_USB is set during compilation,
+/// the number of bytes sent and their representation are logged to the error channel.
+///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
     int res;
     if(kb->fwversion >= 0x120 && !is_recv){

@@ -220,7 +220,7 @@ int os_resetusb(usbdevice* kb, const char* file, int line);
 /// \param[IN] file for debugging
 /// \param[IN] line for debugging
 /// \param[in] reset_stop global variable is read
-/// \return number of Bytes sent (ideal == count * MSG_SIZE);\n 0 if a block could not be sent and it was not a timeout OR reset_stop was required or hw_load is not set to always
+/// \return number of Bytes sent (ideal == count * MSG_SIZE);\n 0 if a block could not be sent and it was not a timeout OR \b reset_stop was required or \b hwload_mode is not set to "always"
 int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line);
 
 /// \brief usbsend macro is used to wrap _usbsend() with debugging information (file and lineno)
@@ -250,7 +250,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 /// \brief os_usbsend send a data packet (MSG_SIZE = 64) Bytes long
 /// \param kb THE usbdevice*
 /// \param out_msg the MSGSIZE char long buffer to send
-/// \param is_recv if true, just send an ioctl for further reading packets. if false, send the data at \b out_msg.
+/// \param is_recv if true, just send an ioctl for further reading packets. If false, send the data at \b out_msg.
 /// \param file for debugging
 /// \param line for debugging
 /// \return -1 on timeout (try again), 0 on hard error, numer of bytes sent otherwise

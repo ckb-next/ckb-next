@@ -31,7 +31,8 @@ int setactive_kb(usbdevice* kb, int active);
 int setactive_mouse(usbdevice* kb, int active);
 ///
 /// \brief setactive() calls via the corresponding kb->vtable either the active() or the idle() function.
-/// \n What function is effectively called is device dependent. Have a look at \a device_vtable.c for more information
+/// \n active() is called if the parameter makeactive is true, idle if it is false.
+/// \n What function is called effectively is device dependent. Have a look at \a device_vtable.c for more information.
 #define setactive(kb, makeactive) ((makeactive) ? (kb)->vtable->active((kb), 0, 0, 0, 0) : (kb)->vtable->idle((kb), 0, 0, 0, 0))
 
 // Command: Activate a keyboard

@@ -35,6 +35,23 @@ int rm_recursive(const char* path){
     return remove(path);
 }
 
+///
+/// \brief _updateconnected Update the list of connected devices.
+///
+/// <devicepath> normally is /dev/input/ckb or /input/ckb.
+/// \n Open the normal file under <devicepath>0/connected for writing.
+/// For each device connected, print its devicepath+number,
+/// the serial number of the usb device and the usb name of the device connected to that usb interface.
+/// \n eg:
+/// \n /dev/input/ckb1 0F022014ABABABABABABABABABABA999 Corsair K95 RGB Gaming Keyboard
+/// \n /dev/input/ckb2 0D02303DBACBACBACBACBACBACBAC998 Corsair M65 RGB Gaming Mouse
+///
+/// Set the file ownership to root.
+/// If the glob var gid is explicitly set to something different from -1 (the initial value), set file permission to 640, else to 644.
+/// This is used if you start the daemon with --gid=<GID> Parameter.
+///
+/// Because several independent threads may call updateconnected(), protect that procedure with locking/unlocking of \b devmutex.
+///
 void _updateconnected(){
     pthread_mutex_lock(devmutex);
     char cpath[strlen(devpath) + 12];

@@ -189,6 +189,8 @@ static void* devmain(usbdevice* kb){
 /// the routine goes into the same error handling:
 /// It goes via goto to one of two exit labels.
 /// The difference is whether or not an unlock has to be performed on the imutex variable.
+
+
 ///
 /// In both cases, closeusb() is called, then an unlock is performed on the dmutex.
 ///
@@ -198,10 +200,11 @@ static void* devmain(usbdevice* kb){
 /// In either case, the routine terminates with a void* 0
 /// because either devmain() has returned constant null or the routine itself returns zero.
 ///
-/// The basic idea of ​​the routine is the following:
+/// The basic idea of this routine is the following:
 ///
+
 static void* _setupusb(void* context){
-    /// First some initialization of kb standard structured and local vars is done:
+    /// \n First some initialization of kb standard structured and local vars is done.
     /// - \b kb is set to the pointer given from start environment
     /// - local vars \b vendor and \b product are set to the values from the corresponding fields of kb
     /// - local var \b vt \b and the \b kb->vtable are both set to the retval of \a get_vtable()
@@ -237,7 +240,7 @@ static void* _setupusb(void* context){
         goto fail;
 
     ///
-    /// - The following two statements deal with possible errors when setting the kb values ​​in the current routine:
+    /// - The following two statements deal with possible errors when setting the kb values in the current routine:
     /// If the version or the name was not read correctly, they are set to default values:
     ///   - serial is set to "<vendor>: <product> -NoID"
     ///   - the name is set to "<vendor> <product>".
@@ -251,7 +254,7 @@ static void* _setupusb(void* context){
     ///
     /// - Then the user level input subsystem is activated via os_openinput().
     /// There are two file descriptors, one for the mouse and one for the keyboard.
-    /// <b>As mentioned in structures.h, not the just opened FD numbers are stored under kb->uinput_kb or kb->uinput_mouse, but the values ​​increased by 1!</b>
+    /// <b>As mentioned in structures.h, not the just opened FD numbers are stored under kb->uinput_kb or kb->uinput_mouse, but the values increased by 1!</b>
     /// The reason is, if the open fails or not open has been done until now,
     /// that struct member is set to 0, not to -1 or other negative value.
     /// So all usage of this kb->handle must be something like \c "kb->handle - 1", as you can find it in the code.
@@ -309,7 +312,7 @@ static void* _setupusb(void* context){
     ///   - In start_kb_nrgb() set the keyboard into a so-called software mode (NK95_HWOFF)
     /// via ioctl with \c usbdevfs_ctrltransfer in function _nk95cmd(),
     /// which will in turn is called via macro nk95cmd() via start_kb_nrgb().
-    /// \n Then two dummy values ​​(active and pollrate) are set in the kb structure and ready.
+    /// \n Then two dummy values (active and pollrate) are set in the kb structure and ready.
     ///   - start_dev() does a bit more - because this function is for both mouse and keyboard.
     /// start_dev() calls - after setting an extended timeout parameter - _start_dev(). Both are located in device.c.
     ///   - First, _start_dev() attempts to determine the firmware version of the device,
@@ -483,7 +486,7 @@ extern int hwload_mode;
 /// An essential constant parameter which is relevant for os_usbsend() only is is_recv = 0, which means sending.
 ///
 /// Now it gets a little complicated again:
-/// - Returns os_usbsend() 0, only zero bytes could be sent in one of the packets,
+/// - If os_usbsend() returns 0, only zero bytes could be sent in one of the packets,
 /// or it was an error (-1 from the systemcall), but not a timeout.
 /// How many Bytes were sent in total from earlier calls does not seem to matter,
 /// _usbsend() returns a total of 0.
@@ -562,7 +565,7 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
 ///
 /// os_usbrecv() returns 0, -1 or something else.
 /// \n Zero signals a serious error which is not treatable and _usbrecv() also returns 0.
-/// \n -1 means that it is a true-to-treatable error - a timeout for example -
+/// \n -1 means that it is a treatable error - a timeout for example -
 /// and therefore the next transfer attempt is started after a long pause (DELAY_LONG)
 /// if not reset_stop or the wrong hwload_mode require a termination with a return value of 0.
 ///

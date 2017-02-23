@@ -4,6 +4,9 @@
 #include "includes.h"
 #include "keymap.h"
 
+/// \file usb.h
+/// Definitions for using USB interface
+///
 /// \details Vendor/product codes
 ///
 /// The list of defines in the first part of the file describes the various types of equipment from Corsair
@@ -24,7 +27,8 @@
 /// 6 | The SABRE and HARPOON mice.\n Maybe this will be divided int two different blocks later because of different nummber of special keys | IS_SABRE()
 /// 7 | The Scimitar mouse devices | IS_SCIMITAR()
 ///
-///
+
+/// \brief For the following Defines please see "Detailed Description"
 #define V_CORSAIR       0x1b1c
 #define V_CORSAIR_STR   "1b1c"
 

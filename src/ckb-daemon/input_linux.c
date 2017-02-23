@@ -167,13 +167,16 @@ void* _ledthread(void* ctx){
     uchar ileds = 0;
     // Read LED events from the uinput device
     struct input_event event;
-    while(read(kb->uinput_kb - 1, &event, sizeof(event)) > 0){
-        if(event.type == EV_LED && event.code < 8){
+    int rv;
+    while ((rv = read(kb->uinput_kb - 1, &event, sizeof(event))) > 0) {
+        if (event.type == EV_LED && event.code < 8){
             char which = 1 << event.code;
-            if(event.value)
+            if (event.value)
                 ileds |= which;
             else
                 ileds &= ~which;
+        } else {
+            ckb_warn("_ledthread: got retcode 0x%x\n", rv);
         }
         // Update them if needed
         pthread_mutex_lock(dmutex(kb));
@@ -183,6 +186,7 @@ void* _ledthread(void* ctx){
         }
         pthread_mutex_unlock(dmutex(kb));
     }
+    ckb_warn("_ledthread, pos2: got retcode %d and possibly errno = %d, %s\n", rv, errno, strerror(errno));
     return 0;
 }
 

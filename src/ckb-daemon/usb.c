@@ -134,7 +134,7 @@ static void* devmain(usbdevice* kb){
     readlines_ctx_init(&linectx);
     ///
     /// After some setup functions, beginning in _setupusb() which has called devmain(),
-    /// we read the input-Fifo designated to that device in an endless loop.
+    /// we read the command input-Fifo designated to that device in an endless loop.
     /// This loop has two possible exits (plus reaction to signals, not mentioned here).
     while(1){
         ///
@@ -149,13 +149,15 @@ static void* devmain(usbdevice* kb){
         int lines = readlines(kbfifo, linectx, &line);
         pthread_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
-        if(!IS_CONNECTED(kb))
+        if(!IS_CONNECTED(kb)) {
+            ckb_warn("devmain: not connected: %s\n", kb->name);
             break;
+        }
         ///
         /// if nothing is in the line buffer (some magic interrupt?),
         /// continue in the endless while without any reaction.
         if(lines){
-            /// \todo readcmd() gets a a param \b line, not \b lines. have a look on that later.
+            /// \todo readcmd() gets a \b line, not \b lines. Have a look on that later.
             /// \n Is the condition IS_CONNECTED valid? What functions change the condititon for the macro?
             if(readcmd(kb, line)){
                 ///
@@ -164,6 +166,7 @@ static void* devmain(usbdevice* kb){
                 /// In this case the usb device is closed via closeusb()
                 /// and the endless loop is left (the second exit point).
                 // USB transfer failed; destroy device
+                ckb_warn("devmain: readcmd got error, %s\n", kb->name);
                 closeusb(kb);
                 break;
             }

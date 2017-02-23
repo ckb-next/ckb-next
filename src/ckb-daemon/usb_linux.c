@@ -201,10 +201,13 @@ void os_sendindicators(usbdevice* kb){
 }
 
 ///
-/// \brief os_inputmain
-/// os_inputmain is run in a separate thread and ill be detached from the main thread,
-/// so it needs to clean up its own resources.
-/// \todo do the commenting
+/// \brief os_inputmain is run in a separate thread and will be detached from the main thread, so it needs to clean up its own resources.
+/// \param context THE usbdevice* ; Because os_inputmain() is started as a new thread, its formal parameter is named "context".
+/// \return null
+///
+/// \todo This function is a collection of many tasks. It should be divided into several sub-functions for the sake of greater convenience.
+///
+/// \todo go on commenting
 ///
 void* os_inputmain(void* context){
     usbdevice* kb = context;
@@ -236,21 +239,26 @@ void* os_inputmain(void* context){
         urbs[i].type = USBDEVFS_URB_TYPE_INTERRUPT;
         urbs[i].endpoint = 0x80 | (i + 1);
         urbs[i].buffer = malloc(urbs[i].buffer_length);
-        ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
+        int rv = ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
+        if (rv < 0) ckb_warn("os_inputmain 1: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
     }
     // Start monitoring input
     while(1){
         struct usbdevfs_urb* urb = 0;
-        if(ioctl(fd, USBDEVFS_REAPURB, &urb)){
-            if(errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
+        int rv;
+        if ((rv = ioctl(fd, USBDEVFS_REAPURB, &urb))) {
+            ckb_warn("os_inputmain 2: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
+            if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
             else if(errno == EPIPE && urb){
                 // On EPIPE, clear halt on the endpoint
-                ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
+                rv = ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
+                ckb_warn("os_inputmain 3: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
                 // Re-submit the URB
                 if(urb)
-                    ioctl(fd, USBDEVFS_SUBMITURB, urb);
+                    rv = ioctl(fd, USBDEVFS_SUBMITURB, urb);
+                    if (rv < 0) ckb_warn("os_inputmain 4: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
                 urb = 0;
             }
         }
@@ -293,7 +301,8 @@ void* os_inputmain(void* context){
             inputupdate(kb);
             pthread_mutex_unlock(imutex(kb));
             // Re-submit the URB
-            ioctl(fd, USBDEVFS_SUBMITURB, urb);
+            rv = ioctl(fd, USBDEVFS_SUBMITURB, urb);
+            if (rv < 0) ckb_warn("os_inputmain 5: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
             urb = 0;
         }
     }
@@ -309,6 +318,7 @@ void* os_inputmain(void* context){
 int usbunclaim(usbdevice* kb, int resetting){
     int handle = kb->handle - 1;
     int count = kb->epcount;
+    ckb_warn("usbunclaim called,%s resetting\n", (resetting)? "" : "not");
     for(int i = 0; i < count; i++)
         ioctl(handle, USBDEVFS_RELEASEINTERFACE, &i);
     // For RGB keyboards, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
@@ -372,7 +382,8 @@ int usbclaim(usbdevice* kb){
 ///
 /// \todo it seems that no one wnats to try the reset again. But I'v seen it somewhere...
 ///
-int os_resetusb(usbdevice* kb, const char* file, int line){
+int os_resetusb(usbdevice* kb, const char* file, int line) {
+    ckb_warn("os_resetusb: resetting %s\n", kb->name);
     TEST_RESET(usbunclaim(kb, 1));
     TEST_RESET(ioctl(kb->handle - 1, USBDEVFS_RESET));
     TEST_RESET(usbclaim(kb));

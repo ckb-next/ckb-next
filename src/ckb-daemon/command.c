@@ -98,7 +98,8 @@ int readcmd(usbdevice* kb, const char* line){
                 if(command != SWITCH
                         && command != HWLOAD && command != HWSAVE
                         && command != ACTIVE && command != IDLE
-                        && command != ERASE && command != ERASEPROFILE)
+                        && command != ERASE && command != ERASEPROFILE
+                        && command != RESTART)
                     goto next_loop;
                 break;
             }
@@ -202,6 +203,15 @@ int readcmd(usbdevice* kb, const char* line){
         case DELAY:
             kb->delay = (!strcmp (word, "on")); // independendant from parameter to handle false commands like "delay off"
             continue;
+        case RESTART: {
+            char mybuffer[] = "no reason specified";
+            if (sscanf(line, " %[^\n]", word) == -1) { ///> Because length of word is length of line + 1, there should be no problem with buffer overflow.
+                word = mybuffer;
+            }
+            vt->do_cmd[command](kb, mode, notifynumber, 0, word);
+            continue;
+        }
+
         default:;
         }
 
@@ -270,15 +280,13 @@ int readcmd(usbdevice* kb, const char* line){
                 continue;
             }
             break;
-        } case MACRO:
+        }
+        case MACRO:
             if(!strcmp(word, "clear")){
                 // Macro has a special clear command
                 vt->macro(kb, mode, notifynumber, 0, 0);
                 continue;
             }
-            break;
-        case RESTART:
-            vt->do_cmd[command](kb, mode, notifynumber, 0, word);
             break;
         default:;
         }

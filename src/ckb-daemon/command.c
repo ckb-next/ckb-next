@@ -204,8 +204,9 @@ int readcmd(usbdevice* kb, const char* line){
             kb->delay = (!strcmp (word, "on")); // independendant from parameter to handle false commands like "delay off"
             continue;
         case RESTART: {
-            if (sscanf(line, " %[^\n]", word) == -1) { ///> Because length of word is length of line + 1 and RESTART has leght 7 + \0, there should be no problem with buffer overflow.
-                strcpy(word, "No text");
+            char mybuffer[] = "no reason specified";
+            if (sscanf(line, " %[^\n]", word) == -1) { ///> Because length of word is length of line + 1, there should be no problem with buffer overflow.
+                word = mybuffer;
             }
             vt->do_cmd[command](kb, mode, notifynumber, 0, word);
             continue;

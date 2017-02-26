@@ -62,7 +62,7 @@ const devcmd vtable_keyboard = {
     .restart = cmd_restart,
 
     .start = start_dev,
-    .setmodeindex = int1_void_none,             ///< ähhh... ???
+    .setmodeindex = int1_void_none,             /// is just for non rgb keyboards
     .allocprofile = allocprofile,
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,

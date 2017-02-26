@@ -10,7 +10,7 @@
 /// \brief all open usb devices have their system path names here in this array.
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
-/// \details
+////
 /// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long
 ///
 /// os_usbsend has two functions:
@@ -24,8 +24,8 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 ///
 /// bRequestType | bRequest | wValue | EP | size | Timeout | data
 /// ------------ | -------- | ------ | -- | ---- | ------- | ----
-/// 0x21 | 0x09 | 0x0200 | endpoint to be addressed from epcount - 1 | MSG_SIZE | 5000 (=5ms) | the message buffer pointer
-/// Host to Device, Type=Class, Recipient=Interface (why not endpoint? Do I have a wrong usb description?) | ??? | specific | Endpoint (!) | 64 | 5000 | out_msg
+/// 0x21 | 0x09 | 0x0200 | endpoint / IF to be addressed from epcount-1 | MSG_SIZE | 5000 (=5ms) | the message buffer pointer
+/// Host to Device, Type=Class, Recipient=Interface | 9 = Send data? | specific | last or pre-last device # | 64 | 5000 | out_msg
 ///
 /// \n The ioctl command is USBDEVFS_CONTROL.
 ///
@@ -35,7 +35,9 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 /// the ioctl command USBDEVFS_CONTROL is not used
 /// (this tells the bus to enter the control mode),
 /// but the bulk method is used: USBDEVFS_BULK.
-/// For this purpose, a different structure is used for the ioctl() (struct \b usbdevfs_bulktransfer)
+/// This is astonishing, because all of the endpoints are type Interrupt, not bulk.
+///
+/// Anyhow, forthis purpose a different structure is used for the ioctl() (struct \b usbdevfs_bulktransfer)
 /// and this is also initialized differently:
 /// \n The length and timeout parameters are given the same values as above.
 /// The formal parameter out_msg is also passed as a buffer pointer.
@@ -92,8 +94,9 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     return res;
 }
 
-/// \details
+///
 /// \brief os_usbrecv receives a max MSGSIZE long buffer from usb device
+
 /// os_usbrecv does what its name says:
 ///
 /// The comment at the beginning of the procedure
@@ -108,7 +111,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 /// bRequestType | bRequest | wValue | EP | size | Timeout | data
 /// ------------ | -------- | ------ | -- | ---- | ------- | ----
 /// 0xA1 | 0x01 | 0x0200 | endpoint to be addressed from epcount - 1 | MSG_SIZE | 5ms | the message buffer pointer
-/// Device to Host, Type=Class, Recipient=Interface ??? | ??? | specific | Endpoint (!) | 64 | 5000 | in_msg
+/// Device to Host, Type=Class, Recipient=Interface | 1 = RECEIVE? | specific | Interface # | 64 | 5000 | in_msg
 ///
 /// The ioctl() returns the number of bytes received.
 /// Here is the usual check again:
@@ -155,12 +158,6 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
 
 ///
 /// \brief _nk95cmd If we control a non RGB keyboard, set the keyboard via ioctl with usbdevfs_ctrltransfer
-/// \param kb THE usbdevice*
-/// \param bRequest a usb bRequest
-/// \param wValue a usb wValue
-/// \param file for debugging
-/// \param line for debugging
-/// \return 1 (true) on failure, 0 (false) on success.
 ///
 /// To send control packets to a non RGB non color K95 Keyboard,
 /// use this function. Normally it is called via the nk95cmd() macro.
@@ -170,12 +167,22 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
 ///
 /// bRequestType | bRequest | wValue | EP | size | Timeout | data
 /// ------------ | -------- | ------ | -- | ---- | ------- | ----
-/// 0x40 | normally HW_ON and HW_OFF to switch hardware-modus at Keyboard | wValue | device | MSG_SIZE | 5ms | the message buffer pointer
-/// Device to Host, Type=Vendor, Recipient=Device? | bRequest parameter | wValue Parameter | 0 | 0 | 5000 | null
+/// 0x40 | see table below to switch hardware-modus at Keyboard | wValue | device | MSG_SIZE | 5ms | the message buffer pointer
+/// Host to Device, Type=Vendor, Recipient=Device | bRequest parameter | given wValue Parameter | device 0 | 0 data to write | 5000 | null
 ///
 /// If a 0 or a negative error number is returned by the ioctl, an error message is shown depending on the errno or "No data written" if retval was 0.
 /// In either case 1 is returned to indicate the error.
 /// If the ioctl returned a value > 0, 0 is returned to indicate no error.
+///
+/// Currently the following combinations for bRequest and wValue are used:
+/// Device | what it might to do | constant | bRequest | wValue
+/// ------ | ------------------- | -------- | -------- | ------
+/// non RGB Keyboard | set HW-modus on (leave the ckb driver) | HWON | 0x0002 | 0x0030
+/// non RGB Keyboard | set HW-modus off (initialize the ckb driver) | HWOFF | 0x0002 | 0x0001
+/// non RGB Keyboard | set light modus M1 in single-color keyboards | NK95_M1 | 0x0014 | 0x0001
+/// non RGB Keyboard | set light modus M2 in single-color keyboards | NK95_M2 | 0x0014 | 0x0002
+/// non RGB Keyboard | set light modus M3 in single-color keyboards | NK95_M3 | 0x0014 | 0x0003
+/// \see usb.h
 ///
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
     if(kb->product != P_K95_NRGB)
@@ -189,9 +196,18 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
     return 0;
 }
 
-/// \details
+/// \brief .
+///
 /// \brief os_sendindicators update the indicators for the special keys (Numlock, Capslock and what else?)
-/// \todo documenting
+///
+/// Read the data from kb->ileds ans send them via ioctl() to the keyboard.
+///
+/// bRequestType | bRequest | wValue | EP | size | Timeout | data
+/// ------------ | -------- | ------ | -- | ---- | ------- | ----
+/// 0x21 | 0x09 | 0x0200 | Interface 0 | MSG_SIZE 1 Byte | timeout 0,5ms | the message buffer pointer
+/// Host to Device, Type=Class, Recipient=Interface (why not endpoint?) | 9 = SEND? | specific | 0 | 1 | 500 | struct* kb->ileds
+///
+/// \n The ioctl command is USBDEVFS_CONTROL.
 ///
 void os_sendindicators(usbdevice* kb){
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
@@ -201,26 +217,48 @@ void os_sendindicators(usbdevice* kb){
 }
 
 ///
-/// \brief os_inputmain is run in a separate thread and will be detached from the main thread, so it needs to clean up its own resources.
-/// \param context THE usbdevice* ; Because os_inputmain() is started as a new thread, its formal parameter is named "context".
-/// \return null
+/// \brief os_inputmain This function is run in a separate thread and will be detached from the main thread, so it needs to clean up its own resources.
+/// \todo This function is a collection of many tasks. It should be divided into several sub-functions for the sake of greater convenience:
 ///
-/// \todo This function is a collection of many tasks. It should be divided into several sub-functions for the sake of greater convenience.
+/// 1. set up an URB (Userspace Ressource Buffer) to communicate with the USBDEVFS_* ioctl()s
+/// 2. perform the ioctl()
+/// 3. interpretate the information got into the URB buffer or handle error situations and retry operation or leave the endless loop
+/// 4. inform the os about the data
+/// 5. loop endless via 2.
+/// 6. if endless loop has gone, deinitalize the interface, free buffers etc.
+/// 7. return null
 ///
-/// \todo go on commenting
-///
-void* os_inputmain(void* context){
+
+void* os_inputmain(void* context) {
     usbdevice* kb = context;
     int fd = kb->handle - 1;
     short vendor = kb->vendor, product = kb->product;
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Starting input thread for %s%d\n", devpath, index);
 
-    // Monitor input transfers on all endpoints for non-RGB devices
-    // For RGB, monitor all but the last, as it's used for input/output
+    /// Here the actions in detail:
+    ///
+    /// Monitor input transfers on all endpoints for non-RGB devices
+    /// For RGB, monitor all but the last, as it's used for input/output
     int urbcount = IS_RGB(vendor, product) ? (kb->epcount - 1) : kb->epcount;
+
+    /// Get an usbdevfs_urb data structure and clear it via memset()
     struct usbdevfs_urb urbs[urbcount];
     memset(urbs, 0, sizeof(urbs));
+
+    /// Hopefully the buffer lengths are equal for all devices with congruent types.
+    /// You can find out the correctness for your device with lsusb --v or similar on macOS.
+    /// Currently the following combinations are known and implemented:
+    ///
+    /// device | detect with macro combination | endpoint # | buffer-length
+    /// ------ | ----------------------------- | ---------- | -------------
+    /// each | none | 0 | 8
+    /// RGB Mouse | IS_RGB && IS_MOUSE | 1 | 10
+    /// RGB Keyboard | IS_RGB && !IS_MOUSE | 1 | 21
+    /// RGB Mouse or Keyboard | IS_RGB | 2 | MSG_SIZE (64)
+    /// non RGB Mouse or Keyboard | !IS_RGB | 1 | 4
+    /// non RGB Mouse or Keyboard | !IS_RGB | 2 | 15
+    ///
     urbs[0].buffer_length = 8;
     if(IS_RGB(vendor, product)){
         if(IS_MOUSE(vendor, product))
@@ -234,7 +272,9 @@ void* os_inputmain(void* context){
         urbs[1].buffer_length = 4;
         urbs[2].buffer_length = 15;
     }
-    // Submit URBs
+
+    /// Now submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).
+    /// Endpoint number is 0x80..0x82 or 0x83, depending on the model.
     for(int i = 0; i < urbcount; i++){
         urbs[i].type = USBDEVFS_URB_TYPE_INTERRUPT;
         urbs[i].endpoint = 0x80 | (i + 1);
@@ -242,17 +282,21 @@ void* os_inputmain(void* context){
         int rv = ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
         if (rv < 0) ckb_warn("os_inputmain 1: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
     }
-    // Start monitoring input
-    while(1){
+
+    /// The userSpaceFS knows the URBs now, so start monitoring input
+    while (1) {
         struct usbdevfs_urb* urb = 0;
         int rv;
+
+        /// if the ioctl returns something != 0, let's have a deeper look what happened.
+        /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
         if ((rv = ioctl(fd, USBDEVFS_REAPURB, &urb))) {
             ckb_warn("os_inputmain 2: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
             if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
             else if(errno == EPIPE && urb){
-                // On EPIPE, clear halt on the endpoint
+                /// If just an EPIPE ocurred, give the device a CLEAR_HALT and resubmit the URB.
                 rv = ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
                 ckb_warn("os_inputmain 3: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
                 // Re-submit the URB
@@ -262,8 +306,22 @@ void* os_inputmain(void* context){
                 urb = 0;
             }
         }
-        if(urb){
-            // Process input (if any)
+
+        /// A correct REAPURB returns a Pointer to the URB which we now have a closer look into.
+        /// Lock all following actions with imutex.
+        ///
+        if (urb) {
+            /// Process the input depending on type of device. Interprete the actual size of the URB buffer
+            ///
+            /// device | detect with macro combination | seems to be endpoint # | actual buffer-length | function called
+            /// ------ | ----------------------------- | ---------------------- | -------------------- | ---------------
+            /// mouse (RGB and non RGB) | IS_MOUSE | nA | 8, 10 or 11 | hid_mouse_translate()
+            /// mouse (RGB and non RGB) | IS_MOUSE | nA | MSG_SIZE (64) | corsair_mousecopy()
+            /// RGB Keyboard | IS_RGB && !IS_MOUSE | 1 | 8 (BIOS Mode) | hid_kb_translate()
+            /// RGB Keyboard | IS_RGB && !IS_MOUSE | 2 | 5 or 21, KB inactive! | hid_kb_translate()
+            /// RGB Keyboard | IS_RGB && !IS_MOUSE | 3? | MSG_SIZE | corsair_kbcopy()
+            /// non RGB Keyboard | !IS_RGB && !IS_MOUSE | nA | nA | hid_kb_translate()
+            ///
             pthread_mutex_lock(imutex(kb));
             if(IS_MOUSE(vendor, product)){
                 switch(urb->actual_length){
@@ -295,18 +353,24 @@ void* os_inputmain(void* context){
                     corsair_kbcopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
                     break;
                 }
-            } else
+            } else {
                 // Non-RGB input
                 hid_kb_translate(kb->input.keys, urb->endpoint & 0xF, urb->actual_length, urb->buffer);
+            }
+            ///
+            /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
             inputupdate(kb);
             pthread_mutex_unlock(imutex(kb));
-            // Re-submit the URB
+            /// Re-submit the URB for the next run.
             rv = ioctl(fd, USBDEVFS_SUBMITURB, urb);
             if (rv < 0) ckb_warn("os_inputmain 5: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
             urb = 0;
         }
     }
-    // Clean up
+
+    ///
+    /// If the endless loop is terminated, clean up by discarding the URBs via ioctl(USBDEVFS_DISCARDURB),
+    /// free the URB buffers and return a null pointer as thread exit code.
     ckb_info("Stopping input thread for %s%d\n", devpath, index);
     for(int i = 0; i < urbcount; i++){
         ioctl(fd, USBDEVFS_DISCARDURB, urbs + i);
@@ -315,15 +379,33 @@ void* os_inputmain(void* context){
     return 0;
 }
 
-int usbunclaim(usbdevice* kb, int resetting){
+/// \brief .
+///
+/// \brief usbunclaim do an unclaiming of the usb device gicen by kb.
+/// \param kb THE usbdevice*
+/// \param resetting boolean flag: If resseting is true, the caller will perform a bus reset command after unclaiming the device.
+/// \return always 0.
+///
+/// Unclaim all endpoints for a given device (remeber the decrementing of the file descriptor)
+/// via ioctl(USBDEVFS_DISCARDURB).
+///
+/// Afterwards - if ressetting is false - do a USBDEVFS_CONNECT for EP 0 and 1.
+/// If it is a non RGB device, connect EP 2 also.
+/// The comment mentions RGB keyboards only, but as I understand the code, this is valid also for RGB mice.
+///
+/// There is no error handling yet.
+/// Function is called  in usb_linux.c only, so it is declared as static now.
+///
+static int usbunclaim(usbdevice* kb, int resetting){
     int handle = kb->handle - 1;
     int count = kb->epcount;
     ckb_warn("usbunclaim called,%s resetting\n", (resetting)? "" : "not");
-    for(int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         ioctl(handle, USBDEVFS_RELEASEINTERFACE, &i);
+    }
     // For RGB keyboards, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
     // Reconnecting any of the others causes trouble.
-    if(!resetting){
+    if (!resetting) {
         struct usbdevfs_ioctl ctl = { 0, USBDEVFS_CONNECT, 0 };
         ioctl(handle, USBDEVFS_IOCTL, &ctl);
         ctl.ifno = 1;
@@ -337,7 +419,8 @@ int usbunclaim(usbdevice* kb, int resetting){
     return 0;
 }
 
-/// \details
+/// \brief .
+///
 /// \brief os_closeusb is the linux specific implementation for closing an active usb port.
 /// \n If a valid handle is given in the kb structure, the usb port is unclaimed (usbunclaim()).
 /// \n The device in unrefenced via library function udev_device_unref().
@@ -355,17 +438,38 @@ void os_closeusb(usbdevice* kb){
     kbsyspath[INDEX_OF(kb, keyboard)][0] = 0;
 }
 
-int usbclaim(usbdevice* kb){
+/// \brief .
+///
+/// \brief usbclaim does claiming all EPs for the usb device gicen by kb.
+/// \param kb THE usbdevice*
+/// \return 0 on success, -1 otherwise.
+///
+/// Claim all endpoints for a given device (remeber the decrementing of the file descriptor)
+/// via ioctl(USBDEVFS_DISCONNECT) and ioctl(USBDEVFS_CLAIMINTERFACE).
+///
+/// Error handling is done for the ioctl(USBDEVFS_CLAIMINTERFACE) only. If this fails, now an error message is thrown and -1 is returned.
+/// Function is called  in usb_linux.c only, so it is declared as static now.
+///
+static int usbclaim(usbdevice* kb){
     int count = kb->epcount;
-    for(int i = 0; i < count; i++){
+    for (int i = 0; i < count; i++) {
+        int rv;
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
-        if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))
+        if ((rv = ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl))) {
+            ckb_err("usbclaim 1: got retcode %d and errno = %d, %s. Ignoring.\n", rv, errno, strerror(errno));
+        }
+
+        if ((rv = ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))) {
+            ckb_err("usbclaim 2: got retcode %d and errno = %d, %s. Aborting.\n", rv, errno, strerror(errno));
             return -1;
+        }
     }
     return 0;
 }
 
+///
+/// \brief TEST_RESET doesa "try / catch" for resetting the usb interface
+///
 #define TEST_RESET(op)                                                      \
     if(op){                                                                 \
         ckb_err_fn("resetusb failed: %s\n", file, line, strerror(errno));   \
@@ -374,13 +478,15 @@ int usbclaim(usbdevice* kb){
         return -2;                  /* else, remove device */               \
     }
 
-/// try to reset an usb device in a linux user space driver.
-/// 1. unclaim the device
+/// \brief .
+///
+/// Try to reset an usb device in a linux user space driver.
+/// 1. unclaim the device, but do not reconnect the system driver (second param resetting = true)
 /// 2. reset the device via USBDEVFS_RESET command
 /// 3. claim the device again.
 /// Returns 0 on success, -2 if device should be removed and -1 if reset should by tried again
 ///
-/// \todo it seems that no one wnats to try the reset again. But I'v seen it somewhere...
+/// \todo it seems that no one wants to try the reset again. But I'v seen it somewhere...
 ///
 int os_resetusb(usbdevice* kb, const char* file, int line) {
     ckb_warn("os_resetusb: resetting %s\n", kb->name);
@@ -391,6 +497,7 @@ int os_resetusb(usbdevice* kb, const char* file, int line) {
     return 0;
 }
 
+/// \brief .
 ///
 /// \brief strtrim trims a string by removing leading and trailing spaces.
 /// \param string
@@ -413,6 +520,7 @@ void strtrim(char* string){
         memmove(string, first, last - first);
 }
 
+/// \brief .
 ///
 /// Perform the operating system-specific opening of the interface in os_setupusb().
 /// As a result, some parameters should be set in kb (name, serial, fwversion, epcount = number of usb endpoints),
@@ -552,9 +660,9 @@ static _model models[] = {
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 
-// Add a udev device. Returns 0 if device was recognized/added.
 ///
-/// \brief usb_add_device if the device id can be found, call usbadd() with the appropriate parameters.
+/// \brief Add a udev device. Returns 0 if device was recognized/added.
+/// \brief If the device id can be found, call usbadd() with the appropriate parameters.
 /// \param dev the functions usb_*_device get a struct udev* with the neccessary hardware-related information.
 /// \return the retval of usbadd() or 1 if either vendor is not corsair or product is not mentioned in model[].
 ///
@@ -578,7 +686,6 @@ static int usb_add_device(struct udev_device* dev){
     return 1;
 }
 
-// Remove a udev device.
 ///
 /// \brief usb_rm_device find the usb port to remove and close it via closeusb().
 /// \param dev the functions usb_*_device get a struct udev* with the neccessary hardware-related information.
@@ -639,6 +746,7 @@ static void udev_enum(){
     udev_enumerate_unref(enumerator);
 }
 
+/// \brief .
 ///
 /// \brief usbmain is called by main() after setting up all other stuff.
 /// \return 0 normally or -1 if fatal error occurs (up to now only if no new devices are available)

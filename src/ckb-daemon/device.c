@@ -12,6 +12,7 @@ pthread_mutex_t devlistmutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t devmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };
 pthread_mutex_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };
 
+/// \brief .
 ///
 /// \brief _start_dev get fw-info and pollrate; if available, install new firmware; get all hardware profiles
 /// \param kb   the normal kb pointer to the usbdevice. Is also valid for mice.

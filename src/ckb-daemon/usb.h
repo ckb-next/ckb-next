@@ -29,6 +29,12 @@
 ///
 
 /// \brief For the following Defines please see "Detailed Description"
+///
+/// \warning When adding new devices please update src/ckb/fwupgradedialog.cpp as well.
+/// \n It should contain the same vendor/product IDs for any devices supporting firmware updates.
+/// \n In the same way, all other corresponding files have to be supplemented or modified:
+/// Currently known for this are \b usb_linux.c and \b usb_mac.c
+///
 #define V_CORSAIR       0x1b1c
 #define V_CORSAIR_STR   "1b1c"
 
@@ -91,11 +97,6 @@
 #define P_SCIMITAR_PRO      0x1b3e
 #define P_SCIMITAR_PRO_STR  "1b3e"
 #define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
-
-/// \warning When adding new devices please update src/ckb/fwupgradedialog.cpp as well.
-/// \n It should contain the same vendor/product IDs for any devices supporting firmware updates.
-/// \n In the same way, all other sites have to be supplemented or modified:
-/// Currently known for this are \b usb_linux.c and \b usb_mac.c
 
 ///
 /// uncomment the following Define to see USB packets sent to the device
@@ -174,11 +175,11 @@ void setupusb(usbdevice* kb);
 int os_setupusb(usbdevice* kb);
 
 ///
-/// \brief os_inputmain ist called per keyboard input thread (OS specific).
-/// \param kb THE usbdevice*
-/// \return
+/// \brief os_inputmain is run in a separate thread and will be detached from the main thread, so it needs to clean up its own resources.
+/// \param context THE usbdevice* ; Because os_inputmain() is started as a new thread, its formal parameter is named "context".
+/// \return null
 ///
-void* os_inputmain(void* kb);
+void* os_inputmain(void* context);
 
 /// \brief revertusb sets a given device to inactive (hardware controlled) mode if not a fw-ugrade is indicated
 /// \param kb THE usbdevice*
@@ -269,19 +270,19 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 /// \return -1 on timeout, 0 on hard error, numer of bytes received otherwise
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line);
 
-/// \brief os_sendindicators update the HID indicators for the special key LEDs (Num Lock, Caps, ???).
-/// Read the data from kb->ileds.
+///
+/// \brief os_sendindicators update the indicators for the special keys (Numlock, Capslock and what else?)
 /// \param kb THE usbdevice*
 void os_sendindicators(usbdevice* kb);
 
 ///
-/// \brief _nk95cmd set a Non-RGB K95 command via ioctl with \c usbdevfs_ctrltransfer.
+/// \brief _nk95cmd If we control a non RGB keyboard, set the keyboard via ioctl with usbdevfs_ctrltransfer
 /// \param kb THE usbdevice*
 /// \param bRequest the byte array with the usb request
-/// \param wValue
+/// \param wValue a usb wValue
 /// \param file for error message
 /// \param line for error message
-/// \return Returns 0 on success.
+/// \return 1 (true) on failure, 0 (false) on success.
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);
 
 /// \brief nk95cmd() macro is used to wrap _nk95cmd() with debugging information (file and lineno).
@@ -292,7 +293,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 
 /// Hardware-specific commands for the K95 nonRGB,
 /// \see [usb2.0 documentation for details](http://www.usb.org/developers/docs/usb_20.zip).
-/// Hardware playback off
+/// Set Hardware playback off
 #define NK95_HWOFF  0x020030
 
 /// Hardware playback on

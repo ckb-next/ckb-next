@@ -8,6 +8,7 @@
 #include "profile.h"
 #include "usb.h"
 
+/// brief .
 ///
 /// \brief usbmutex is a never referenced mutex!
 ///
@@ -15,6 +16,7 @@
 ///
 pthread_mutex_t usbmutex = PTHREAD_MUTEX_INITIALIZER;
 
+/// brief .
 ///
 /// \brief reset_stop is boolean: Reset stopper for when the program shuts down.
 ///
@@ -22,6 +24,7 @@ pthread_mutex_t usbmutex = PTHREAD_MUTEX_INITIALIZER;
 /// to inform several usb_* functions to end their loops and tries.
 volatile int reset_stop = 0;
 
+/// brief .
 ///
 /// \brief features_mask Mask of features to exclude from all devices
 ///
@@ -31,6 +34,7 @@ volatile int reset_stop = 0;
 /// \n Have a look at \a main() in main.c for details.
 int features_mask = -1;
 
+/// brief .
 ///
 /// vendor_str returns "corsair" iff the given \a vendor argument is equal to \a V_CORSAIR \c (0x1bc)
 /// else it returns ""
@@ -42,7 +46,8 @@ const char* vendor_str(short vendor){
     return "";
 }
 
-/// \details
+/// brief .
+///
 /// At present, various models and their properties are known from corsair products.
 /// Some models differ in principle (mice and keyboards),
 /// others differ in the way they function (for example, RGB and non RGB), but they are very similar.
@@ -80,6 +85,7 @@ const char* product_str(short product){
     return "";
 }
 
+/// brief .
 ///
 /// \brief get_vtable returns the correct vtable pointer
 /// \param vendor short usb vendor ID
@@ -98,6 +104,7 @@ static const devcmd* get_vtable(short vendor, short product){
 }
 
 // USB device main loop
+/// brief .
 ///
 /// \brief devmain is called by _setupusb
 /// \param kb the pointer to the device. Even if it has the name kb, it is valid also for a mouse (the whole driver seems to be implemented first for a keyboard).
@@ -179,6 +186,7 @@ static void* devmain(usbdevice* kb){
     return 0;
 }
 
+/// brief .
 ///
 /// \brief _setupusb A horrible function for setting up an usb device
 /// \param context As _setupusb() is called as a new thread, the kb* is transferred as void*
@@ -372,10 +380,11 @@ static void* _setupusb(void* context){
     return 0;
 }
 
-/// \details
+/// \brief .
+///
 /// Set up a USB device after its handle is open. Spawns a new thread _setupusb() with standard parameter kb.
 /// dmutex must be locked prior to calling this function. The function will unlock it when finished.
-/// in kb->thread the thread id is mentioned, because closeusb() needs this info for joining that thread again.
+/// In kb->thread the thread id is mentioned, because closeusb() needs this info for joining that thread again.
 ///
 void setupusb(usbdevice* kb){
     pthread_mutex_lock(imutex(kb));
@@ -383,7 +392,8 @@ void setupusb(usbdevice* kb){
         ckb_err("Failed to create USB thread\n");
 }
 
-/// \details
+/// \brief .
+///
 /// First is checked, whether a firmware-upgrade is indicated for the device.
 /// If so, revertusb() returns 0.
 /// \todo Why is this useful? Are there problems seen with deactivating a device with older fw-version??? Why isn't this an error indicating reason and we return success (0)?
@@ -394,8 +404,8 @@ void setupusb(usbdevice* kb){
 ///
 /// - If we have an RGB device, setactive() is called with second param active = false.
 /// That function will have a look on differences between keyboards and mice.
-/// \n More precisely setactive() is just a macro to call via the kk->vtable enties either the active() or the idle() function where the vtable points to.
-/// setactive() may return error indications. If so, revertusb() return -1, otherwise 0 in any other case.
+/// \n More precisely setactive() is just a macro to call via the kb->vtable enties either the active() or the idle() function where the vtable points to.
+/// setactive() may return error indications. If so, revertusb() returns -1, otherwise 0 in any other case.
 ///
 int revertusb(usbdevice* kb){
     if(NEEDS_FW_UPDATE(kb))
@@ -409,7 +419,8 @@ int revertusb(usbdevice* kb){
     return 0;
 }
 
-/// \details
+/// \brief .
+///
 /// First reset the device via os_resetusb() after a long delay (it may send something to the host).
 /// If this worked (retval == 0), give the device another long delay
 /// Then perform the initialization via the device specific start() function entry in kb->vtable
@@ -430,7 +441,8 @@ int _resetusb(usbdevice* kb, const char* file, int line){
     return 0;
 }
 
-/// \details
+/// \brief .
+///
 /// This function is called if an usb command ran into an error
 /// in case of one of the following two situations:
 /// - When setting up a new usb device and the start() function got an error (\see _setupusb())
@@ -453,7 +465,7 @@ int _resetusb(usbdevice* kb, const char* file, int line){
 ///
 /// \todo Why does usb_tryreset() hide the information returned from resetusb()? Isn't it needed by the callers?
 ///
-int usb_tryreset(usbdevice* kb){
+int usb_tryreset(usbdevice* kb) {
     if(reset_stop)
         return -1;
     ckb_info("Attempting reset...\n");
@@ -475,7 +487,8 @@ int usb_tryreset(usbdevice* kb){
 ///
 extern int hwload_mode;
 
-/// \details
+/// \brief .
+///
 /// \todo A lot of different conditions are combined in this code. Don't think, it is good in every combination...
 ///
 /// The main task of _usbsend () is to transfer the complete logical message from the buffer beginning with \a messages to <b>count * MSG_SIZE</b>.
@@ -542,7 +555,8 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
     return total_sent;
 }
 
-/// \details
+/// \brief .
+///
 /// To fully understand this, you need to know about usb:
 /// All control is at the usb host (the CPU).
 /// If the device wants to communicate something to the host,
@@ -616,7 +630,8 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
     return 0;
 }
 
-/// \details
+/// \brief .
+///
 /// An imutex lock ensures first of all, that no communication is currently running from the viewpoint of the driver to the user input device
 /// (ie the virtual driver with which characters or mouse movements are sent from the daemon to the operating system as inputs).
 ///

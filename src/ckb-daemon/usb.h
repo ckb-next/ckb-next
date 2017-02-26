@@ -28,7 +28,9 @@
 #define P_K70_LUX_NRGB_STR   "1b36"
 #define P_K70_RFIRE          0x1b38
 #define P_K70_RFIRE_STR      "1b38"
-#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
+#define P_K70_RFIRE_NRGB     0x1b3a
+#define P_K70_RFIRE_NRGB_STR "1b3a"
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
 
 #define P_K95           0x1b11
 #define P_K95_STR       "1b11"
@@ -79,8 +81,10 @@ const char* product_str(short product);
 
 // RGB vs non-RGB test
 // (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
+
 #define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 #define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
+
 #define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
 #define IS_MONOCHROME_DEV(kb)           IS_MONOCHROME((kb)->vendor, (kb)->product)
 

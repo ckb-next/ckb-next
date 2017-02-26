@@ -51,7 +51,8 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 
     "notify",
     "inotify",
-    "get"
+    "get",
+    "restart"
 };
 
 #define TRY_WITH_RESET(action)  \
@@ -275,6 +276,9 @@ int readcmd(usbdevice* kb, const char* line){
                 vt->macro(kb, mode, notifynumber, 0, 0);
                 continue;
             }
+            break;
+        case RESTART:
+            vt->do_cmd[command](kb, mode, notifynumber, 0, word);
             break;
         default:;
         }

@@ -45,7 +45,7 @@ Step-by-step:
 * `cd` into the source directory
 * run
 	1. `mkdir build && cd build` - required for CMake's out-of-source build
-	2. `cmake ..` - generates CMake configuration files and Makefiles. Here you can pass different options and customize your installation. See [this document](docs/CMAKE_CONFIG.md) for the full list of options.
+	2. `cmake ..` - generates CMake configuration files and Makefiles. Here you can pass different options and customize your installation. See [this document](CMAKE_CONFIG.md) for the full list of options.
 	3. `make -j"$(nproc --all)"` - compiles the code using all cores
 	4. `sudo make install`
 

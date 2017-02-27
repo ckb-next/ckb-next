@@ -1,125 +1,24 @@
-ckb-next: RGB Driver for Linux and OS X
-==================================
+# ckb-next: RGB Driver for Linux and macOS
 
 <a target="_blank" href="http://webchat.freenode.net?channels=%23ckb-next&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>
 
-**ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+**ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring some features of [Corsair Utility Engine](http://www.corsair.com/en-us/landing/cue) to the Linux and Mac operating systems.
 
 ![Screenshot](https://i.imgur.com/zMK9jOP.png)
 
 **Disclaimer:** ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
-What happened to the original [ckb](https://github.com/ccMSC/ckb)?
----
-We don't know. The author of **ckb** [ccMSC](https://github.com/ccMSC) suddenly disappeared and hasn't showed up since July 2016. So the community around ckb decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to the original ckb.
+### Current Status
 
-Contents
---------
-
-* [Current Status](#current-status)
-* [Device Support](#device-support)
-* [Linux Installation](#linux-installation)
-* [OS X/macOS Installation](#os-xmacos-installation)
-* [Usage](#usage)
-* [Troubleshooting](#troubleshooting)
-* [Known Issues](#known-issues)
-* [Contributing](#contributing)
-
-See also:
-
-* [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
-* [ckb testing repository](https://github.com/mattanger/ckb-next/tree/testing) (updated more frequently, but may be unstable)
-
-Current Status
---------------
 Right now ckb-next is under active development. *We will cut a release and ship a macOS binary as soon as some important changes are done*. You can always build the software from source with just one command. See [Linux Installation](#linux-installation) and [OS X/macOS Installation](#os-xmacos-installation). Thank you for the interest in this software and your patience.
 
-Device Support
---------------
+### Device Support
 
-Keyboards:
-
-* K65 RGB
-* K70
-* K70 RGB
-* K70 LUX RGB
-* K95*
-* K95 RGB
-* Strafe
-* Strafe RGB
-
-\* = hardware playback not supported. Settings will be saved to software only.
-
-Mice:
-
-* M65 RGB
-* M65 PRO RGB
-* Sabre RGB
-* Scimitar RGB
+See the maintained [List of Supported Devices](https://github.com/mattanger/ckb-next/wiki/Supported-Hardware).
 
 Linux Installation
 ------------------
 
-#### Pre-made packages:
-**ckb-next** packages:
-
-* Fedora 24/25, CentOS/RHEL 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
-    * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
-
-**ckb** packages (deprecated):
-
-* Arch Linux (maintained by [@light2yellow](https://github.com/light2yellow)):
-	* [`aur/ckb-git`](https://aur.archlinux.org/packages/ckb-git/) - based on `master` branch (more stable)
-	* [`aur/ckb-git-latest`](https://aur.archlinux.org/packages/ckb-git-latest/) - based on `testing` branch (less stable but fresher)
-* Gentoo (maintained by [@mrueg](https://github.com/mrueg)): `emerge -av app-misc/ckb`
-
-If you are a package maintainer or want to discuss something with package maintainers let us know in the issues, so we can have an accountable and centralized communication about this. *If you would like to maintain a package for your favorite distro/OS, please let us know as well.*
-
-#### Preparation:
-
-ckb-next requires Qt5 (Qt 5.6 recommened for OS X), libudev, zlib, gcc, g++, and glibc.
-
-* Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
-* Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
-* Arch: `sudo pacman -S base-devel qt5-base zlib`
-* Other distros: Look for `qt5` or `libqt5*-devel`
-
-Note: If you build your own kernels, ckb-next requires the uinput flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
-
-#### Installing:
-
-You can download ckb-next using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
-
-#### Upgrading:
-
-To install a new version of ckb, or to reinstall the same version, first delete the ckb-master directory and the zip file from your previous download. Then download the source code again and re-run `quickinstall`. The script will automatically replace the previous installation. You may need to reboot afterward.
-
-#### Uninstalling:
-
-First, stop the ckb-daemon service and remove the service file.
-* If you have systemd (Ubuntu versions starting with 15.04):
-```
-sudo systemctl stop ckb-next-daemon
-sudo rm -f /usr/lib/systemd/system/ckb-next-daemon.service
-```
-* If you have Upstart (Ubuntu versions earlier than 15.04):
-```
-sudo service ckb-next-daemon stop
-sudo rm -f /etc/init/ckb-next-daemon.conf
-```
-* If you have OpenRC:
-```
-sudo rc-service ckb-daemon stop
-sudo rc-update del ckb-daemon default
-sudo rm -f /etc/init.d/ckb-daemon
-```
-* If you're not sure, re-run the `quickinstall` script and proceed to the service installation. The script will say `System service: Upstart detected` or `System service: systemd detected`. Please be aware that OpenRC is currently not detected automatically.
-
-Afterward, remove the applications and related files:
-```
-sudo rm -f /usr/bin/ckb-next /usr/bin/ckb-next-daemon /usr/share/applications/ckb-next.desktop /usr/share/icons/hicolor/512x512/apps/ckb-next.png
-sudo rm -rf /usr/bin/ckb-next-animations
-```
 
 OS X/macOS Installation
 -----------------

@@ -30,9 +30,9 @@ Use a package manager to upgrade ckb-next.
 
 ckb-next requires Qt5, libudev, zlib, gcc, g++, and glibc.
 
-* Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
-* Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
-* Arch: `sudo pacman -S base-devel qt5-base zlib`
+* Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev libpulse-dev`
+* Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++ libpulse-devel`
+* Arch: `sudo pacman -S base-devel qt5-base zlib libpulse`
 * Other distros: Look for `qt5` or `libqt5*-devel`
 
 Note: If you build your own kernels, ckb-next requires the `uinput` flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.

@@ -51,7 +51,7 @@ Step-by-step:
 
 ##### Upgrading
 
-To install a new version remove the old source code directory and continue with [Building]() <- add link (starting from cloning again). CMake will replace everything for you. You may need to reboot afterwards.
+To install a new version remove the old source code directory and continue with [Building](LINUX_INSTALLATION.md#building) (starting from cloning again). CMake will replace everything for you. You may need to reboot afterwards.
 
 ##### Uninstalling
 
@@ -64,14 +64,14 @@ The repository contains a script. Run `sudo linux/uninstall.sh` provided that yo
 
 You are highly encouraged to take a look at `CMakeLists.txt` files before trying to install/remove something manually.
 
-#### Preparation:
+##### Preparation:
 
-Same as [Semi-automatic/Preparation]() <- fix the link (or your own version of truth).
+Same as [Semi-automatic/Preparation](LINUX_INSTALLATION.md#preparation) (or your own version of truth).
 
-#### Upgrading:
+##### Upgrading:
 
-Same as [Semi-automatic/Upgrading]() <- fix the link (or your own version of truth).
+Same as [Semi-automatic/Upgrading](LINUX_INSTALLATION.md#upgrading-1) (or your own version of truth).
 
-#### Uninstalling:
+##### Uninstalling:
 
-You can use `uninstall.sh` mentioned in [Semi-automatic/Uninstalling]() <- fix the link (or your own version of truth).
+You can use `uninstall.sh` mentioned in [Semi-automatic/Uninstalling](#uninstalling-2) (or your own version of truth).

@@ -229,7 +229,7 @@ void os_sendindicators(usbdevice* kb){
 /// 7. return null
 ///
 
-void* os_inputmain(void* context) {
+void* os_inputmain(void* context){
     usbdevice* kb = context;
     int fd = kb->handle - 1;
     short vendor = kb->vendor, product = kb->product;
@@ -279,30 +279,25 @@ void* os_inputmain(void* context) {
         urbs[i].type = USBDEVFS_URB_TYPE_INTERRUPT;
         urbs[i].endpoint = 0x80 | (i + 1);
         urbs[i].buffer = malloc(urbs[i].buffer_length);
-        int rv = ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
-        if (rv < 0) ckb_warn("os_inputmain 1: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
+        ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
     }
 
     /// The userSpaceFS knows the URBs now, so start monitoring input
     while (1) {
         struct usbdevfs_urb* urb = 0;
-        int rv;
 
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
-        if ((rv = ioctl(fd, USBDEVFS_REAPURB, &urb))) {
-            ckb_warn("os_inputmain 2: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
+        if (ioctl(fd, USBDEVFS_REAPURB, &urb)){
             if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
             else if(errno == EPIPE && urb){
                 /// If just an EPIPE ocurred, give the device a CLEAR_HALT and resubmit the URB.
-                rv = ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
-                ckb_warn("os_inputmain 3: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
+                ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
                 // Re-submit the URB
                 if(urb)
-                    rv = ioctl(fd, USBDEVFS_SUBMITURB, urb);
-                    if (rv < 0) ckb_warn("os_inputmain 4: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
+                    ioctl(fd, USBDEVFS_SUBMITURB, urb);
                 urb = 0;
             }
         }
@@ -362,8 +357,7 @@ void* os_inputmain(void* context) {
             inputupdate(kb);
             pthread_mutex_unlock(imutex(kb));
             /// Re-submit the URB for the next run.
-            rv = ioctl(fd, USBDEVFS_SUBMITURB, urb);
-            if (rv < 0) ckb_warn("os_inputmain 5: got retcode %d and errno = %d, %s\n", rv, errno, strerror(errno));
+            ioctl(fd, USBDEVFS_SUBMITURB, urb);
             urb = 0;
         }
     }
@@ -396,10 +390,9 @@ void* os_inputmain(void* context) {
 /// There is no error handling yet.
 /// Function is called  in usb_linux.c only, so it is declared as static now.
 ///
-static int usbunclaim(usbdevice* kb, int resetting){
+static int usbunclaim(usbdevice* kb, int resetting) {
     int handle = kb->handle - 1;
     int count = kb->epcount;
-    ckb_warn("usbunclaim called,%s resetting\n", (resetting)? "" : "not");
     for (int i = 0; i < count; i++) {
         ioctl(handle, USBDEVFS_RELEASEINTERFACE, &i);
     }
@@ -453,14 +446,10 @@ void os_closeusb(usbdevice* kb){
 static int usbclaim(usbdevice* kb){
     int count = kb->epcount;
     for (int i = 0; i < count; i++) {
-        int rv;
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        if ((rv = ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl))) {
-            ckb_err("usbclaim 1: got retcode %d and errno = %d, %s. Ignoring.\n", rv, errno, strerror(errno));
-        }
+        ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
 
-        if ((rv = ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i))) {
-            ckb_err("usbclaim 2: got retcode %d and errno = %d, %s. Aborting.\n", rv, errno, strerror(errno));
+        if (ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)){
             return -1;
         }
     }
@@ -489,7 +478,6 @@ static int usbclaim(usbdevice* kb){
 /// \todo it seems that no one wants to try the reset again. But I'v seen it somewhere...
 ///
 int os_resetusb(usbdevice* kb, const char* file, int line) {
-    ckb_warn("os_resetusb: resetting %s\n", kb->name);
     TEST_RESET(usbunclaim(kb, 1));
     TEST_RESET(ioctl(kb->handle - 1, USBDEVFS_RESET));
     TEST_RESET(usbclaim(kb));

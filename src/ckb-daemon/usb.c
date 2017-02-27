@@ -156,10 +156,8 @@ static void* devmain(usbdevice* kb){
         int lines = readlines(kbfifo, linectx, &line);
         pthread_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
-        if(!IS_CONNECTED(kb)) {
-            ckb_warn("devmain: not connected: %s\n", kb->name);
+        if(!IS_CONNECTED(kb))
             break;
-        }
         ///
         /// if nothing is in the line buffer (some magic interrupt?),
         /// continue in the endless while without any reaction.
@@ -173,7 +171,6 @@ static void* devmain(usbdevice* kb){
                 /// In this case the usb device is closed via closeusb()
                 /// and the endless loop is left (the second exit point).
                 // USB transfer failed; destroy device
-                ckb_warn("devmain: readcmd got error, %s\n", kb->name);
                 closeusb(kb);
                 break;
             }
@@ -465,7 +462,7 @@ int _resetusb(usbdevice* kb, const char* file, int line){
 ///
 /// \todo Why does usb_tryreset() hide the information returned from resetusb()? Isn't it needed by the callers?
 ///
-int usb_tryreset(usbdevice* kb) {
+int usb_tryreset(usbdevice* kb){
     if(reset_stop)
         return -1;
     ckb_info("Attempting reset...\n");

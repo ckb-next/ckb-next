@@ -6,23 +6,30 @@
 
 ![Screenshot](https://i.imgur.com/zMK9jOP.png)
 
-**Disclaimer:** ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
+***Disclaimer:** ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.*
+
+Curious how *ckb-next* appeared? See [Project's History](docs/PROJECTS_HISTORY.md).
 
 ### Current Status
 
-Right now ckb-next is under active development. *We will cut a release and ship a macOS binary as soon as some important changes are done*. You can always build the software from source with just one command. See [Linux Installation](#linux-installation) and [OS X/macOS Installation](#os-xmacos-installation). Thank you for the interest in this software and your patience.
+Right now ckb-next is under active development. *We will cut a release and ship a macOS binary as soon as some important changes are done*. You can always build the software from source with just one command. See [Linux Installation](#linux-installation) and [macOS Installation](#macos-installation). Thank you for the interest in this software and your patience.
 
 ### Device Support
 
-See the maintained [List of Supported Devices](https://github.com/mattanger/ckb-next/wiki/Supported-Hardware).
+See the list of [Supported Hardware](docs/SUPPORTED_HARDWARE.md).
 
-Linux Installation
-------------------
+### Installation
 
+***Warning**: this is the `cmake` branch and thus instructions here describe what's best from CMake's perspective. If you're looking for qmake version, you need the `master` branch. If you don't know which one to choose, the original author of this document highly recommends CMake.*
 
-OS X/macOS Installation
------------------
-<!--- TODO ship a new binary for mac, this section wastes user's time because most of the times people end up building from source -->
+#### Linux Installation
+
+Follow the instructions [here](docs/LINUX_INSTALLATION.md).
+
+#### macOS Installation
+
+Follow the instructions [here](docs/MACOS_INSTALLATION.md).
+
 #### Binary download:
 
 The latest OS X/macOS binary can be downloaded here: https://github.com/mattanger/ckb-next/releases/latest

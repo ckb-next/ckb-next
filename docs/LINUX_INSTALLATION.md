@@ -4,15 +4,17 @@ There are three ways to install this software: automatic, semi-automatic and man
 
 ### Automatic method
 
-"Automatic" method that means you install a pre-made package by a package maintainer, thus trusting him and the repository this package comes from. *ckb-next* developers cannot guarantee their operability and integrity. If you encounter any issue with the packages below, contact the maintainer on the package's hosting website before opening an issue. However, the project is always ready to provide a relevant space for further discussions. Moreover, *if you want to maintain a package for your platform, contact us by opening a new issue*. The general discussion on package maintaining is [here](https://github.com/mattanger/ckb-next/issues/5).
+"Automatic" method that means you install a pre-made package by a package maintainer, thus trusting him and the repository this package comes from. *ckb-next* developers cannot guarantee their operability and integrity. If you encounter any issue with the packages below, contact the maintainer on the package's hosting website before opening an issue. However, the project is always ready to provide a relevant space for further discussions. Moreover, *if you would like to maintain a package for your platform, we are happy to accept it, use [this issue](https://github.com/mattanger/ckb-next/issues/5)* for communication.
 
-* **Arch Linux** *(maintained by [@makz27](https://github.com/makz27), [@light2yellow](https://github.com/light2yellow)):*
+* **Arch Linux** (maintained by [@makz27](https://github.com/makz27), [@light2yellow](https://github.com/light2yellow)):
 	* [`aur/ckb-next-git`](https://aur.archlinux.org/packages/ckb-next-git) - based on `master` branch
 	* [`aur/ckb-next-latest-git`](https://aur.archlinux.org/packages/ckb-next-latest-git) - based on `testing` branch
-* **Fedora 24/25, CentOS/RHEL 7** *(maintained by [@hevanaa](https://github.com/hevanaa)):*
+* **Fedora 24/25, CentOS/RHEL 7** (maintained by [@hevanaa](https://github.com/hevanaa)):
     * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
 
 ### Semi-automatic method
+
+"Semi-automatic" means that you can still get the job easily done, but change some of the decisions made by a package maintainer.
 
 #### Preparation:
 

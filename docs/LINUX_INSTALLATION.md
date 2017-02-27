@@ -14,7 +14,13 @@ There are three ways to install this software: automatic, semi-automatic and man
 
 ### Semi-automatic method
 
-"Semi-automatic" means that you can still get the job easily done, but change some of the decisions made by a package maintainer.
+"Semi-automatic" means that you can still get the job easily done, but change some of the decisions made by a package maintainer. Practically this implies that you:
+
+* clone the repository (don't download the zip!)
+* `cd` into the source directory
+* run
+	1. `mkdir build && cd build` - required for CMake's out-of-source build
+	2. `cmake ..` - generate CMake configuration files and Makefiles. Here you can set different options. See [this document](docs/CMAKE_CONFIG.md) for the full list of options with their description. By default the command above is equivalent to `cmake -DLINUX_CUSTOM_INSTALL=OFF -DWITH_ANIMATIONS=ON -G "Unix Makefiles" ..`.
 
 #### Preparation:
 

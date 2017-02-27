@@ -16,6 +16,8 @@ elseif (LINUX)
     option(LINUX_CUSTOM_INSTALL "Manually install project files" OFF)
 endif ()
 option(WITH_ANIMATIONS "Build and install animations" ON)
+option(LOCAL_QUAZIP "Use system's QuaZip library" ON)
+option(ENFORCE_QUAZIP "Use only system's QuaZip library without backtracking to hardcoded one" OFF)
 
 set(ckb-next_VERSION_MAJOR 0)  #  |>|>
 set(ckb-next_VERSION_MINOR 2)  #  |>|> populated manually, must be updated accordingly to annotated tags

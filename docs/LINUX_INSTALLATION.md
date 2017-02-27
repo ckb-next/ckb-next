@@ -1,10 +1,11 @@
-# Linux Installation
+## Linux Installation
 
-There are three ways to install this software: automatic, semi-automatic and manual methods.
+There are three basic ways how to install this software: automatic, semi-automatic and manual methods.
+
 
 ### Automatic method
 
-"Automatic" method that means you install a pre-made package by a package maintainer, thus trusting him and the repository this package comes from. *ckb-next* developers cannot guarantee their operability and integrity. If you encounter any issue with the packages below, contact the maintainer on the package's hosting website before opening an issue. However, the project is always ready to provide a relevant space for further discussions. Moreover, *if you would like to maintain a package for your platform, we are happy to accept it, use [this issue](https://github.com/mattanger/ckb-next/issues/5)* for communication.
+"Automatic" method means you install a pre-made package by a package maintainer, thus trusting him and the repository this package comes from. *ckb-next* developers cannot guarantee their operability and integrity. If you encounter any issue with the packages below, contact the maintainer on the package's hosting website before opening an issue. However, the project is always ready to provide a relevant space for further discussions. Moreover, *if you would like to maintain a package for your platform, we are happy to accept it, use [this issue](https://github.com/mattanger/ckb-next/issues/5)* for communication.
 
 * **Arch Linux** (maintained by [@makz27](https://github.com/makz27), [@light2yellow](https://github.com/light2yellow)):
 	* [`aur/ckb-next-git`](https://aur.archlinux.org/packages/ckb-next-git) - based on `master` branch
@@ -12,58 +13,65 @@ There are three ways to install this software: automatic, semi-automatic and man
 * **Fedora 24/25, CentOS/RHEL 7** (maintained by [@hevanaa](https://github.com/hevanaa)):
     * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
 
+##### Uninstalling
+
+Use a package manager to uninstall ckb-next.
+
+##### Upgrading
+
+Use a package manager to upgrade ckb-next.
+
+
 ### Semi-automatic method
 
-"Semi-automatic" means that you can still get the job easily done, but change some of the decisions made by a package maintainer. Practically this implies that you:
+"Semi-automatic" means that you can still get the job easily done, but change some of the decisions made by a package maintainer.
 
-* clone the repository (don't download the zip!)
-* `cd` into the source directory
-* run
-	1. `mkdir build && cd build` - required for CMake's out-of-source build
-	2. `cmake ..` - generate CMake configuration files and Makefiles. Here you can set different options. See [this document](docs/CMAKE_CONFIG.md) for the full list of options with their description. By default the command above is equivalent to `cmake -DLINUX_CUSTOM_INSTALL=OFF -DWITH_ANIMATIONS=ON -G "Unix Makefiles" ..`.
+##### Preparation:
 
-#### Preparation:
-
-ckb-next requires Qt5 (Qt 5.6 recommened for OS X), libudev, zlib, gcc, g++, and glibc.
+ckb-next requires Qt5, libudev, zlib, gcc, g++, and glibc.
 
 * Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
 * Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
 * Arch: `sudo pacman -S base-devel qt5-base zlib`
 * Other distros: Look for `qt5` or `libqt5*-devel`
 
-Note: If you build your own kernels, ckb-next requires the uinput flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
+Note: If you build your own kernels, ckb-next requires the `uinput` flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
-#### Installing:
+##### Building
 
-You can download ckb-next using the "Download zip" option on the right. Extract it and open the ckb-master directory. The easiest way to install ckb is to double-click the `quickinstall` script and run it in a Terminal. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to compile ckb manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md) for instructions.
+Step-by-step:
+
+* *clone* the repository (don't just download the zip! we need to have git information)
+* `cd` into the source directory
+* run
+	1. `mkdir build && cd build` - required for CMake's out-of-source build
+	2. `cmake ..` - generates CMake configuration files and Makefiles. Here you can pass different options and customize your installation. See [this document](docs/CMAKE_CONFIG.md) for the full list of options.
+	3. `make -j"$(nproc --all)"` - compiles the code using all cores
+	4. `sudo make install`
+
+##### Upgrading
+
+To install a new version remove the old source code directory and continue with [Building]() <- add link (starting from cloning again). CMake will replace everything for you. You may need to reboot afterwards.
+
+##### Uninstalling
+
+The repository contains a script. Run `sudo linux/uninstall.sh` provided that you are in the ckb-next source code root directory.
+
+
+### Manual method
+
+"Manual" method means you're on your own. Do what you want and how you want. Not recommended for users not familiar with the project.
+
+You are highly encouraged to take a look at `CMakeLists.txt` files before trying to install/remove something manually.
+
+#### Preparation:
+
+Same as [Semi-automatic/Preparation]() <- fix the link (or your own version of truth).
 
 #### Upgrading:
 
-To install a new version of ckb, or to reinstall the same version, first delete the ckb-master directory and the zip file from your previous download. Then download the source code again and re-run `quickinstall`. The script will automatically replace the previous installation. You may need to reboot afterward.
+Same as [Semi-automatic/Upgrading]() <- fix the link (or your own version of truth).
 
 #### Uninstalling:
 
-First, stop the ckb-daemon service and remove the service file.
-* If you have systemd (Ubuntu versions starting with 15.04):
-```
-sudo systemctl stop ckb-next-daemon
-sudo rm -f /usr/lib/systemd/system/ckb-next-daemon.service
-```
-* If you have Upstart (Ubuntu versions earlier than 15.04):
-```
-sudo service ckb-next-daemon stop
-sudo rm -f /etc/init/ckb-next-daemon.conf
-```
-* If you have OpenRC:
-```
-sudo rc-service ckb-daemon stop
-sudo rc-update del ckb-daemon default
-sudo rm -f /etc/init.d/ckb-daemon
-```
-* If you're not sure, re-run the `quickinstall` script and proceed to the service installation. The script will say `System service: Upstart detected` or `System service: systemd detected`. Please be aware that OpenRC is currently not detected automatically.
-
-Afterward, remove the applications and related files:
-```
-sudo rm -f /usr/bin/ckb-next /usr/bin/ckb-next-daemon /usr/share/applications/ckb-next.desktop /usr/share/icons/hicolor/512x512/apps/ckb-next.png
-sudo rm -rf /usr/bin/ckb-next-animations
-```
+You can use `uninstall.sh` mentioned in [Semi-automatic/Uninstalling]() <- fix the link (or your own version of truth).

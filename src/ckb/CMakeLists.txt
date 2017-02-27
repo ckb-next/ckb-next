@@ -206,7 +206,7 @@ set(FORMS
 
 set(QT_RESOURCES
         image.qrc
-        text.qrc
+        text.qrc.in
         binary.qrc
         )
 
@@ -259,11 +259,11 @@ if (APPLE)
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2014-2016 ccMSC\nCopyright © 2017 ckb-next dev. team")
     configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist.in" "${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist")
-    #    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.icns" "${CMAKE_BINARY_DIR}/ckb-next.icns")
-
+    set(CMAKE_PLIST "<file>ckb-next.plist</file>") # see text.qrc.in
     set_source_files_properties(ckb-next.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     list(APPEND SOURCES ckb-next.icns)
 endif ()
+configure_file("${CMAKE_CURRENT_LIST_DIR}/text.qrc.in" "${CMAKE_CURRENT_LIST_DIR}/text.qrc" @ONLY)
 
 add_executable(ckb-next ${HEADERS} ${SOURCES} ${QT_RESOURCES})
 

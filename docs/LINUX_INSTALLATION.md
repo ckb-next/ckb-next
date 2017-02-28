@@ -7,6 +7,8 @@ There are three basic ways how to install this software: automatic, semi-automat
 
 "Automatic" method means you install a pre-made package by a package maintainer, thus trusting him and the repository this package comes from. *ckb-next* developers cannot guarantee the operability and integrity of these packages. If you encounter any issue with the packages below, contact the maintainer on the package's hosting website before opening an issue. However, the project is always ready to provide a relevant space for further discussions. Moreover, *if you would like to maintain a package for your platform, we are happy to accept it, use [this issue](https://github.com/mattanger/ckb-next/issues/5) for communication*.
 
+##### Installing
+
 * **Arch Linux** (maintained by [@makz27](https://github.com/makz27), [@light2yellow](https://github.com/light2yellow)):
 	* [`aur/ckb-next-git`](https://aur.archlinux.org/packages/ckb-next-git) - based on `master` branch
 	* [`aur/ckb-next-latest-git`](https://aur.archlinux.org/packages/ckb-next-latest-git) - based on `testing` branch
@@ -26,7 +28,7 @@ Use a package manager to upgrade ckb-next.
 
 "Semi-automatic" means that you can still get the job easily done, but change some of the decisions made by a package maintainer.
 
-##### Preparation:
+##### Preparation for manual compilation:
 
 ckb-next **requires** Qt5, libudev, zlib, gcc, g++, and glibc.
 
@@ -40,7 +42,7 @@ For example:
 
 Note: If you build your own kernels, ckb-next requires the `uinput` flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
-##### Building
+##### Building and installing
 
 Step-by-step:
 
@@ -67,9 +69,9 @@ The repository contains a script. Run `sudo linux/uninstall.sh` provided that yo
 
 You are highly encouraged to take a look at `CMakeLists.txt` files before trying to install/remove something manually.
 
-##### Preparation:
+##### Preparation, building and installing:
 
-Same as [Semi-automatic/Preparation](LINUX_INSTALLATION.md#preparation) (or your own version of truth).
+Same as [Semi-automatic/Preparation, building and installing](LINUX_INSTALLATION.md#preparation) (or your own version of truth).
 
 ##### Upgrading:
 

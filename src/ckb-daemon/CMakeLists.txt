@@ -122,7 +122,6 @@ if (APPLE)
 elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     if (NOT EXISTS "/usr/bin/ckb-next-daemon")
         # symlink to /usr/bin
-        install(CODE "message(WARNING \"INSTALL_CMAKE_DIR: ${INSTALL_CMAKE_DIR}\")")
         install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next-daemon" "/usr/bin/ckb-next-daemon")]])
     endif ()
 

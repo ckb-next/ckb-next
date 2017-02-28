@@ -12,15 +12,15 @@ You can also configure the project in a GUI using `cmake-gui` and in a TUI using
 
 ### Linux only
 
-| Option                | Description                   | Default value   |
-| :---------:           | :-------------:               | :-------------: |
-|LINUX_CUSTOM_INSTALL   |Manually install project files |OFF              |
+| Option                | Description                    | Default value   |
+| :---------:           | :-------------:                | :-------------: |
+| LINUX_CUSTOM_INSTALL  | Manually install project files | OFF             |
 
 ### macOS only
 
 | Option                | Description                   | Default value   |
 | :---------:           | :-------------:               | :-------------: |
-| BREW_QT5<sup>*</sup>  |Use Homebrew package for Qt5   |ON               |
+| BREW_QT5<sup>*</sup>  | Use Homebrew package for Qt5  | ON              |
 
 <sup>*</sup>if you turn `BREW_QT5` off, you must populate `CMAKE_PREFIX_PATH` option with a path to your Qt5 installation.
 

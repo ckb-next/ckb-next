@@ -122,7 +122,7 @@ if (APPLE)
 elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     if (NOT EXISTS "/usr/bin/ckb-next-daemon")
         # symlink to /usr/bin
-        install(CODE [[message(WARNING "INSTALL_CMAKE_DIR: ${INSTALL_CMAKE_DIR}")]])
+        install(CODE "message(WARNING \"INSTALL_CMAKE_DIR: ${INSTALL_CMAKE_DIR}\")")
         install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next-daemon" "/usr/bin/ckb-next-daemon")]])
     endif ()
 
@@ -130,7 +130,9 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     execute_process(COMMAND initctl version RESULT_VARIABLE UPSTART_FOUND OUTPUT_VARIABLE foo)
     execute_process(COMMAND openrc --version RESULT_VARIABLE OPENRC_FOUND OUTPUT_VARIABLE foo)
 
-    install(CODE [[execute_process(COMMAND /usr/bin/ckb-next --close)]])
+    execute_process(COMMAND whoami OUTPUT_VARIABLE user OUTPUT_STRIP_TRAILING_WHITESPACE)
+    # install(CODE "message(STATUS \"${user}\")")
+    install(CODE "execute_process(COMMAND sudo -H -u ${user} bash -c \"/usr/bin/ckb-next --close\")")
 
     if (SYSTEMD_FOUND EQUAL 0)
         install(CODE [[message(STATUS "System service: systemd detected")]])

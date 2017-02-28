@@ -18,6 +18,8 @@ Right now ckb-next is under active development. *We will cut a release and ship 
 
 See the list of [Supported Hardware](docs/SUPPORTED_HARDWARE.md).
 
+# Everything below is WIP
+
 ### Installation
 
 ***Warning**: this is the `cmake` branch and thus instructions here describe what's best from CMake's perspective. If you're looking for qmake version, you need the `master` branch. If you don't know which one to choose, the original author of this document highly recommends CMake.*

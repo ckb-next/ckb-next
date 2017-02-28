@@ -28,16 +28,13 @@ include_directories(${ZLIB_INCLUDE_DIRS})
 if (LOCAL_QUAZIP)
     find_package(QuaZip)
 
-    if (ENFORCE_QUAZIP)
-        if (NOT QUAZIP_FOUND)
-            message(FATAL_ERROR "You enforced local QuaZip, but it's not found")
-        endif ()
+    if (ENFORCE_QUAZIP AND NOT QUAZIP_FOUND)
+        message(FATAL_ERROR "You enforced local QuaZip, but it's not found")
     endif ()
 
     if (QUAZIP_FOUND)
         include_directories(${QUAZIP_INCLUDE_DIR})
     endif ()
-
 endif ()
 
 if (NOT QUAZIP_FOUND)

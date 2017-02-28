@@ -14,10 +14,18 @@ if (APPLE)
     option(BREW_QT5 "Use Homebrew package for Qt5" ON)
 elseif (LINUX)
     option(LINUX_CUSTOM_INSTALL "Manually install project files" OFF)
+    option(WITH_MVIZ "Build with 'Music Visualizer' OFF")
 endif ()
-option(WITH_ANIMATIONS "Build and install animations" ON)
 option(LOCAL_QUAZIP "Use system's QuaZip library" ON)
 option(ENFORCE_QUAZIP "Use only system's QuaZip library without backtracking to hardcoded one" OFF)
+option(WITH_GRADIENT "Build with 'Gradient' animation" ON)
+option(WITH_HEAT     "Build with 'Heat' animation"     ON)
+option(WITH_PINWHEEL "Build with 'Pinwheel' animation" ON)
+option(WITH_RAIN     "Build with 'Rain' animation"     ON)
+option(WITH_RANDOM   "Build with 'Random' animation"   ON)
+option(WITH_RIPPLE   "Build with 'Ripple' animation"   ON)
+option(WITH_WAVE     "Build with 'Wave' animation"     ON)
+
 
 set(ckb-next_VERSION_MAJOR 0)  #  |>|>
 set(ckb-next_VERSION_MINOR 2)  #  |>|> populated manually, must be updated accordingly to annotated tags

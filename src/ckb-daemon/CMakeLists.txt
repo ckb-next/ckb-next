@@ -111,14 +111,14 @@ if (APPLE)
             "${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist")
 
     install(CODE [[execute_process(COMMAND open -a 'ckb-next' --args --close)]])
-    install(CODE [[execute_process(COMMAND sudo launchctl unload /Library/LaunchDaemons/ckb-next-daemon.plist ERROR_QUIET)]])
+    install(CODE [[execute_process(COMMAND launchctl unload /Library/LaunchDaemons/ckb-next-daemon.plist ERROR_QUIET)]])
     install(FILES "${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist"
             DESTINATION "/Library/LaunchDaemons"
             PERMISSIONS OWNER_READ OWNER_WRITE
             GROUP_READ
             WORLD_READ
             )
-    install(CODE [[execute_process(COMMAND sudo launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist)]])
+    install(CODE [[execute_process(COMMAND launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist)]])
 elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
     if (NOT EXISTS "/usr/bin/ckb-next-daemon")
         # symlink to /usr/bin
@@ -135,12 +135,12 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
 
     if (SYSTEMD_FOUND EQUAL 0)
         install(CODE [[message(STATUS "System service: systemd detected")]])
-        install(CODE [[execute_process(COMMAND sudo systemctl stop ckb-next-daemon ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND systemctl stop ckb-next-daemon ERROR_QUIET)]])
 
         # for legacy ckb, remove in a few releases
-        install(CODE [[execute_process(COMMAND sudo systemctl stop ckb-daemon ERROR_QUIET)]])
-        install(CODE [[execute_process(COMMAND sudo systemctl disable ckb-daemon ERROR_QUIET)]])
-        install(CODE [[execute_process(COMMAND sudo rm -f /usr/lib/systemd/system/ckb-daemon.service ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND systemctl stop ckb-daemon ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND systemctl disable ckb-daemon ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rm -f /usr/lib/systemd/system/ckb-daemon.service ERROR_QUIET)]])
 
         install(FILES "${CMAKE_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service"
                 DESTINATION "/usr/lib/systemd/system"
@@ -150,16 +150,16 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
                 )
         #install(CODE [[message(FATAL_ERROR "stop here")]])
 
-        install(CODE [[execute_process(COMMAND sudo systemctl daemon-reload)]])
-        install(CODE [[execute_process(COMMAND sudo systemctl enable ckb-next-daemon)]])
-        install(CODE [[execute_process(COMMAND sudo systemctl start ckb-next-daemon)]])
+        install(CODE [[execute_process(COMMAND systemctl daemon-reload)]])
+        install(CODE [[execute_process(COMMAND systemctl enable ckb-next-daemon)]])
+        install(CODE [[execute_process(COMMAND systemctl start ckb-next-daemon)]])
     elseif (UPSTART_FOUND EQUAL 0)
         message(STATUS "System service: Upstart detected")
-        install(CODE [[execute_process(COMMAND sudo service ckb-next-daemon stop ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND service ckb-next-daemon stop ERROR_QUIET)]])
 
         # for legacy ckb, remove in a few releases
-        install(CODE [[execute_process(COMMAND sudo service ckb-daemon stop ERROR_QUIET)]])
-        install(CODE [[execute_process(COMMAND sudo rm -f /etc/init/ckb-daemon.conf ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND service ckb-daemon stop ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rm -f /etc/init/ckb-daemon.conf ERROR_QUIET)]])
 
         install(FILES "${CMAKE_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf"
                 DESTINATION "/etc/init"
@@ -168,15 +168,15 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
                 WORLD_READ WORLD_EXECUTE
                 )
 
-        install(CODE [[execute_process(COMMAND sudo service ckb-next-daemon start)]])
+        install(CODE [[execute_process(COMMAND service ckb-next-daemon start)]])
     elseif (OPENRC_FOUND EQUAL 0)
         message(STATUS "System service: OpenRC detected")
-        install(CODE [[execute_process(COMMAND sudo rc-service ckb-next-daemon stop ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rc-service ckb-next-daemon stop ERROR_QUIET)]])
 
         # for legacy ckb, remove in a few releases
-        install(CODE [[execute_process(COMMAND sudo rc-service ckb-daemon stop ERROR_QUIET)]])
-        install(CODE [[execute_process(COMMAND sudo rc-update del ckb-daemon default ERROR_QUIET)]])
-        install(CODE [[execute_process(COMMAND sudo rm -f /etc/init.d/ckb-daemon ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rc-service ckb-daemon stop ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rc-update del ckb-daemon default ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rm -f /etc/init.d/ckb-daemon ERROR_QUIET)]])
 
         install(FILES "${CMAKE_SOURCE_DIR}/linux/openrc/ckb-next-daemon"
                 DESTINATION "/etc/init.d"

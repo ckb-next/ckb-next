@@ -131,7 +131,7 @@ elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
 
     execute_process(COMMAND whoami OUTPUT_VARIABLE user OUTPUT_STRIP_TRAILING_WHITESPACE)
     # install(CODE "message(STATUS \"${user}\")")
-    install(CODE "execute_process(COMMAND sudo -H -u ${user} bash -c \"/usr/bin/ckb-next --close\")")
+    install(CODE "execute_process(COMMAND sudo -H -u ${user} bash -c \"/usr/bin/ckb-next --close\" ERROR_QUIET)")
 
     if (SYSTEMD_FOUND EQUAL 0)
         install(CODE [[message(STATUS "System service: systemd detected")]])

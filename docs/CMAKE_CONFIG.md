@@ -32,7 +32,7 @@ You can also configure the project in a GUI using `cmake-gui` and in a TUI using
 | Option            | Description                     | Default value   |
 | :---------:       | :-------------:                 | :-------------: |
 | CMAKE_BUILD_TYPE  | Type of the build. Possible values: "Debug" "Release" "MinSizeRel" "RelWithDebInfo" | RelWithDebInfo |
-| LOCAL_QUAZIP      | Use system's QuaZip library     | ON              |
+| LOCAL_QUAZIP      | Use system's QuaZip library. If not found, backtrack to the hardcoded one    | ON              |
 | ENFORCE_QUAZIP    | Use *only* system's QuaZip library without backtracking to the hardcoded one | OFF |
 | WITH_GRADIENT     | Build with "Gradient" animation | ON              |
 | WITH_HEAT         | Build with "Heat" animation     | ON              |

@@ -22,7 +22,7 @@ Then just launch `ckb-next` like you would normally do with any app.
 The Mac way:
 
 1. Remove ckb-next from `Applications`
-2. `sudo rm -r /Library/LaunchDaemons/ckb-next-daemon.plist` - removes daemon's plist
+2. `sudo rm -f /Library/LaunchDaemons/ckb-next-daemon.plist` - removes daemon's plist
 
 ##### Upgrading
 

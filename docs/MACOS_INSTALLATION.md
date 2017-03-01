@@ -39,9 +39,9 @@ Anyway, if you managed to get a newer `.pkg`, just repeat what [Installing](MACO
 
 ##### Preparation for manual compilation:
 
-ckb-next **requires** Qt5, XCode Command Line Tools and XCode itself.
+ckb-next **requires** Qt5, Xcode Command Line Tools and Xcode itself.
 
-* download XCode from the App Store
+* download Xcode from the App Store
 * install Command Line Tools using (guess what) the command line: `xcode-select --install`
 * install Qt5
     * either using Homebrew: `brew install qt5` aka *the recommended way*

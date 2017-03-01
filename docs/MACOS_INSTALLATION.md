@@ -30,7 +30,7 @@ Here's something you'd not like to hear: you can't really follow project's relea
 
 *However, as soon as somebody starts maintaining this on Homebrew, you can smoothly upgrade ckb-next with the package manager.*
 
-Anyway, if you managed to get a newer `.pkg`, just repeat what [Installing](MACOS_INSTALLATION.md#installing) <- check the link describes.
+Anyway, if you managed to get a newer `.pkg`, just repeat what [Installing](MACOS_INSTALLATION.md#installing) describes.
 
 
 ### Semi-automatic method

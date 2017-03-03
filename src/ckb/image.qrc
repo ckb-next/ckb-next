@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/img">
-        <file>ckb-logo.png</file>
+        <file>ckb-next.png</file>
         <file>icon_blank.png</file>
         <file>icon_mode.png</file>
         <file>icon_mode1.png</file>

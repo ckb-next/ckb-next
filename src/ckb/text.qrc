@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/txt">
         <file>demoprofile.conf</file>
-        <file>ckb.desktop</file>
-        <file>com.ckb.ckb.plist</file>
+        <file>ckb-next.desktop</file>
+        
     </qresource>
 </RCC>

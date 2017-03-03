@@ -1,5 +1,7 @@
-#import <AudioToolbox/AudioServices.h>
-#import <Foundation/Foundation.h>
+#include <AudioToolbox/AudioServices.h>
+#include <Foundation/Foundation.h>
+//#include <CoreServices/CoreServices.h>
+#include <CoreAudio/CoreAudio.h>
 #include "media.h"
 
 muteState getMuteState(){
@@ -11,7 +13,7 @@ muteState getMuteState(){
     };
     AudioDeviceID deviceID = 0;
     UInt32 dataSize = sizeof(deviceID);
-    if(AudioHardwareServiceGetPropertyData(kAudioObjectSystemObject, &propertyAddress, 0, NULL, &dataSize, &deviceID)
+    if(AudioObjectGetPropertyData(kAudioObjectSystemObject, &propertyAddress, 0, NULL, &dataSize, &deviceID)
             != kAudioHardwareNoError){
         return UNKNOWN;
     }
@@ -21,11 +23,11 @@ muteState getMuteState(){
         kAudioDevicePropertyScopeOutput,
         kAudioObjectPropertyElementMaster
     };
-    if(!AudioHardwareServiceHasProperty(deviceID, &propertyAddress2))
+    if(!AudioObjectHasProperty(deviceID, &propertyAddress2))
         return UNKNOWN;
     bool state = 0;
     dataSize = sizeof(state);
-    if(AudioHardwareServiceGetPropertyData(deviceID, &propertyAddress2, 0, NULL, &dataSize, &state)
+    if(AudioObjectGetPropertyData(deviceID, &propertyAddress2, 0, NULL, &dataSize, &state)
             != kAudioHardwareNoError)
         return UNKNOWN;
     return state ? MUTED : UNMUTED;

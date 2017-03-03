@@ -1,32 +1,11 @@
-#project(ckb-next-daemon)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-#
-#file(GLOB HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-#file(GLOB SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
-#
-#
-## find libraries
-#find_package(ICONV REQUIRED)
-#
-## linux only support right now
-## bit of cheat here with the flags. It's not *right*
-#set(CMAKE_C_FLAGS "-lpthread -ludev")
-#
-##get the current ckb version
-##execute_process(COMMAND cat ${CMAKE_SOURCE_DIR}/VERSION RESULT_VARIABLE CKB_VERSION_STR)
-##add_definitions(-DCKB_VERSION_STR="\\\"${CKB_VERSION_STR}\\\"")
-#
-#add_executable(${PROJECT_NAME} ${SOURCE} ${HEADERS})
-#
-#set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # ------------------------------------------------------------------------------
 # find libraries
 if (APPLE)
     # find Iconv
     find_package(ICONV REQUIRED)
-    include_directories(${ICONV_INCLUDE_DIRS})
+    include_directories(SYSTEM ${ICONV_INCLUDE_DIRS})
 
     # find Apple frameworks
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -37,12 +16,11 @@ if (APPLE)
             COREGRAPHICS_LIBRARY
             IOKIT_LIBRARY
     )
-endif ()
-
-if (LINUX)
+elseif (LINUX)
     # find udev
     find_package(UDEV REQUIRED)
-    include_directories(${UDEV_INCLUDE_DIRS})
+    include_directories(SYSTEM ${UDEV_INCLUDE_DIRS})
+    #set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 endif ()
 
 # find POSIX Threads (for both systems)
@@ -96,6 +74,8 @@ set(HEADERS
         dpi.h
         )
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 # ------------------------------------------------------------------------------
 # mark libraries
 set(LIBS
@@ -103,29 +83,113 @@ set(LIBS
         )
 
 if (APPLE)
-    set(APPLE_LIBS
+    list(APPEND LIBS
             ${COREFOUNDATION_LIBRARY}
             ${COREGRAPHICS_LIBRARY}
             ${IOKIT_LIBRARY}
             ${ICONV_LIBRARIES}
             )
-endif ()
-
-if (LINUX)
-    set(LINUX_LIBS
+elseif (LINUX)
+    list(APPEND LIBS
             ${UDEV_LIBRARIES}
             )
 endif ()
 
 # ------------------------------------------------------------------------------
 # set up targets
-if (APPLE)
-    add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})
-    target_link_libraries(ckb-next-daemon ${LIBS} ${APPLE_LIBS})
+add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})
+target_link_libraries(ckb-next-daemon ${LIBS})
+
+if (NOT LINUX_CUSTOM_INSTALL)
+    install(TARGETS ckb-next-daemon
+            RUNTIME DESTINATION "${INSTALL_CMAKE_DIR}"
+            )
 endif ()
 
-if (LINUX)
-    add_executable(${PROJECT_NAME}-daemon ${SOURCES} ${HEADERS})
-    target_link_libraries(${PROJECT_NAME}-daemon ${LIBS} ${LINUX_LIBS})
-    set_target_properties(${PROJECT_NAME}-daemon PROPERTIES THREADS_PREFER_PTHREAD_FLAG ON)
+if (APPLE)
+    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist.in"
+            "${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist")
+
+    install(CODE [[execute_process(COMMAND open -a 'ckb-next' --args --close)]])
+    install(CODE [[execute_process(COMMAND launchctl unload /Library/LaunchDaemons/ckb-next-daemon.plist ERROR_QUIET)]])
+    install(FILES "${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist"
+            DESTINATION "/Library/LaunchDaemons"
+            PERMISSIONS OWNER_READ OWNER_WRITE
+            GROUP_READ
+            WORLD_READ
+            )
+    install(CODE [[execute_process(COMMAND launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist)]])
+elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
+    if (NOT EXISTS "/usr/bin/ckb-next-daemon")
+        # symlink to /usr/bin
+        install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next-daemon" "/usr/bin/ckb-next-daemon")]])
+    endif ()
+
+    execute_process(COMMAND systemctl --version RESULT_VARIABLE SYSTEMD_FOUND OUTPUT_QUIET ERROR_QUIET)
+    execute_process(COMMAND initctl version RESULT_VARIABLE UPSTART_FOUND OUTPUT_QUIET ERROR_QUIET)
+    execute_process(COMMAND openrc --version RESULT_VARIABLE OPENRC_FOUND OUTPUT_QUIET ERROR_QUIET)
+
+    execute_process(COMMAND whoami OUTPUT_VARIABLE user OUTPUT_STRIP_TRAILING_WHITESPACE)
+    # install(CODE "message(STATUS \"${user}\")")
+    install(CODE "execute_process(COMMAND sudo -H -u ${user} bash -c \"/usr/bin/ckb-next --close\" ERROR_QUIET)")
+
+    if (SYSTEMD_FOUND EQUAL 0)
+        install(CODE [[message(STATUS "System service: systemd detected")]])
+        install(CODE [[execute_process(COMMAND systemctl stop ckb-next-daemon ERROR_QUIET)]])
+
+        # for legacy ckb, remove in a few releases
+        install(CODE [[execute_process(COMMAND systemctl stop ckb-daemon ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND systemctl disable ckb-daemon ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rm -f /usr/lib/systemd/system/ckb-daemon.service ERROR_QUIET)]])
+
+        install(FILES "${CMAKE_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service"
+                DESTINATION "/usr/lib/systemd/system"
+                PERMISSIONS OWNER_READ OWNER_WRITE
+                GROUP_READ
+                WORLD_READ
+                )
+        #install(CODE [[message(FATAL_ERROR "stop here")]])
+
+        install(CODE [[execute_process(COMMAND systemctl daemon-reload)]])
+        install(CODE [[execute_process(COMMAND systemctl enable ckb-next-daemon)]])
+        install(CODE [[execute_process(COMMAND systemctl start ckb-next-daemon)]])
+    elseif (UPSTART_FOUND EQUAL 0)
+        message(STATUS "System service: Upstart detected")
+        install(CODE [[execute_process(COMMAND service ckb-next-daemon stop ERROR_QUIET)]])
+
+        # for legacy ckb, remove in a few releases
+        install(CODE [[execute_process(COMMAND service ckb-daemon stop ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rm -f /etc/init/ckb-daemon.conf ERROR_QUIET)]])
+
+        install(FILES "${CMAKE_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf"
+                DESTINATION "/etc/init"
+                PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
+                WORLD_READ WORLD_EXECUTE
+                )
+
+        install(CODE [[execute_process(COMMAND service ckb-next-daemon start)]])
+    elseif (OPENRC_FOUND EQUAL 0)
+        message(STATUS "System service: OpenRC detected")
+        install(CODE [[execute_process(COMMAND rc-service ckb-next-daemon stop ERROR_QUIET)]])
+
+        # for legacy ckb, remove in a few releases
+        install(CODE [[execute_process(COMMAND rc-service ckb-daemon stop ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rc-update del ckb-daemon default ERROR_QUIET)]])
+        install(CODE [[execute_process(COMMAND rm -f /etc/init.d/ckb-daemon ERROR_QUIET)]])
+
+        install(FILES "${CMAKE_SOURCE_DIR}/linux/openrc/ckb-next-daemon"
+                DESTINATION "/etc/init.d"
+                PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
+                WORLD_READ WORLD_EXECUTE
+                )
+
+        install(CODE [[execute_process(COMMAND sudo rc-service ckb-next-daemon start)]])
+        install(CODE [[execute_process(COMMAND sudo rc-update add ckb-next-daemon default)]])
+    else ()
+        message(FATAL_ERROR "No supported system service detected.\ 
+Supported services are: systemd, launchd, OpenRC, Upstart.\ 
+Open an issue on Github to support your configuration.")
+    endif ()
 endif ()

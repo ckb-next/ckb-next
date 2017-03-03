@@ -353,6 +353,7 @@ typedef struct {
 static _model models[] = {
     // Keyboards
     { P_K65_STR, P_K65 },
+    { P_K65_NRGB_STR, P_K65_NRGB },
     { P_K65_LUX_STR, P_K65_LUX },
     { P_K65_RFIRE_STR, P_K65_RFIRE },
     { P_K70_STR, P_K70 },
@@ -362,6 +363,7 @@ static _model models[] = {
     { P_K70_RFIRE_STR, P_K70_RFIRE },
     { P_K95_STR, P_K95 },
     { P_K95_NRGB_STR, P_K95_NRGB },
+    { P_K95_PLATINUM_STR, P_K95_PLATINUM },
     { P_STRAFE_STR, P_STRAFE },
     { P_STRAFE_NRGB_STR, P_STRAFE_NRGB },
     // Mice
@@ -371,7 +373,9 @@ static _model models[] = {
     { P_SABRE_L_STR, P_SABRE_L },
     { P_SABRE_N_STR, P_SABRE_N },
     { P_SCIMITAR_STR, P_SCIMITAR },
-    { P_SABRE_O2_STR, P_SABRE_O2 }
+    { P_SCIMITAR_PRO_STR, P_SCIMITAR_PRO },
+    { P_SABRE_O2_STR, P_SABRE_O2 },
+    { P_HARPOON_STR, P_HARPOON }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

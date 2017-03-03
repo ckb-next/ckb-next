@@ -73,3 +73,11 @@ To install a new version remove the old source code directory and continue with 
 
 The repository contains a script. Run `sudo macos/uninstall.sh` provided that you are in the ckb-next source code root directory.
 
+
+### Manual method
+
+"Manual" method means you're on your own. Do what you want and how you want. Not recommended for users not familiar with the project.
+
+If you are reading this we suppose you can hack on the project and figure everything out yourself.
+
+You are highly advised to take a look at `CMakeLists.txt` files here and there before trying to install/remove something manually, especially on `install()` instructions. It contains all the information you might need. Then there's `macos` directory in the root of the source tree which describes how to generate your own `.pkg` if you want.

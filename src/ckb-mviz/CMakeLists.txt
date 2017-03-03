@@ -1,11 +1,30 @@
-project(ckb-mviz)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/ckb-animations)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c99")
+find_package(PulseAudio REQUIRED)
+find_package(StandardMathLibrary REQUIRED)
 
-set(HEADERS _kiss_fft_guts.h kiss_fft.c kiss_fftr.h)
+include_directories(${PULSEAUDIOSIMPLE_INCLUDE_DIRS})
 
-set(SOURCES main.c kiss_fft.c kiss_fftr.c)
+set(HEADERS
+        _kiss_fft_guts.h
+        kiss_fft.h
+        kiss_fftr.h
+        )
 
-add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} pulse-simple m)
+set(SOURCES
+        main.c
+        kiss_fft.c
+        kiss_fftr.c
+        )
+
+set(LIBS
+        ${STANDARD_MATH_LIBRARY}
+        ${PULSEAUDIOSIMPLE_LIBRARIES}
+        )
+
+add_executable(ckb-mviz ${SOURCES} ${HEADERS})
+target_link_libraries(ckb-mviz ${LIBS})
+
+install(TARGETS ckb-mviz
+        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
+        )

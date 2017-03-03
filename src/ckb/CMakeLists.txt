@@ -1,38 +1,82 @@
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 #-------------------------------------------------------------------------------
-# set Qt search directories on macOS
-if (APPLE)
-    if (NOT CMAKE_PREFIX_PATH)
-        execute_process(COMMAND brew --prefix qt5
-                RESULT_VARIABLE BREW_AND_QT_FOUND
-                OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if (NOT ${BREW_AND_QT_FOUND} STREQUAL "0")
-            message(FATAL_ERROR "Homebrew is not installed!")
-        endif ()
+# find Qt5
+if (BREW_QT5)
+    execute_process(COMMAND brew --prefix qt5
+            RESULT_VARIABLE BREW_AND_QT_FOUND
+            OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (NOT ${BREW_AND_QT_FOUND} EQUAL 0)
+        message(FATAL_ERROR "Homebrew is not installed!")
     endif ()
 endif ()
 
-# ------------------------------------------------------------------------------
-# find Qt5
-find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
-if (Qt5Core_FOUND)
-    if (Qt5Core_VERSION VERSION_LESS 5.6.0)
-        message(FATAL_ERROR "Minimum supported Qt5 version is 5.6!")
-    else ()
-        message(STATUS "Found Qt ${Qt5Core_VERSION_STRING}")
-    endif ()
-endif ()
-include_directories(${Qt5Core_INCLUDE_DIRS})
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
-include_directories(${Qt5Network_INCLUDE_DIRS})
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Network)
+include_directories(
+        ${Qt5Core_INCLUDE_DIRS}
+        ${Qt5Widgets_INCLUDE_DIRS}
+        ${Qt5Network_INCLUDE_DIRS}
+)
 
 # ------------------------------------------------------------------------------
 # find Zlib
 find_package(ZLIB REQUIRED)
-message(STATUS "Found Zlib ${ZLIB_VERSION_STRING}")
 include_directories(${ZLIB_INCLUDE_DIRS})
+
+# ------------------------------------------------------------------------------
+# find QuaZip, fallback to hardcoded
+if (LOCAL_QUAZIP)
+    find_package(QuaZip)
+
+    if (ENFORCE_QUAZIP AND NOT QUAZIP_FOUND)
+        message(FATAL_ERROR "You enforced local QuaZip, but it's not found")
+    endif ()
+
+    if (QUAZIP_FOUND)
+        include_directories(${QUAZIP_INCLUDE_DIR})
+    endif ()
+endif ()
+
+if (NOT QUAZIP_FOUND)
+    include_directories(quazip)
+
+    set(QUAZIP_HEADERS
+            quazip/crypt.h
+            quazip/ioapi.h
+            quazip/JlCompress.h
+            quazip/quaadler32.h
+            quazip/quachecksum32.h
+            quazip/quacrc32.h
+            quazip/quagzipfile.h
+            quazip/quaziodevice.h
+            quazip/quazip.h
+            quazip/quazip_global.h
+            quazip/quazipdir.h
+            quazip/quazipfile.h
+            quazip/quazipfileinfo.h
+            quazip/quazipnewinfo.h
+            quazip/unzip.h
+            quazip/zip.h
+            )
+
+    set(QUAZIP_SOURCES
+            quazip/JlCompress.cpp
+            quazip/qioapi.cpp
+            quazip/quaadler32.cpp
+            quazip/quacrc32.cpp
+            quazip/quagzipfile.cpp
+            quazip/quaziodevice.cpp
+            quazip/quazip.cpp
+            quazip/quazipdir.cpp
+            quazip/quazipfile.cpp
+            quazip/quazipfileinfo.cpp
+            quazip/quazipnewinfo.cpp
+            quazip/unzip.c
+            quazip/zip.c
+            )
+
+    add_definitions(-DQUAZIP_STATIC)
+endif ()
 
 # ------------------------------------------------------------------------------
 # find Apple frameworks
@@ -47,7 +91,8 @@ if (APPLE)
     )
 endif ()
 
-# The order is taken from qmake, could be improved later
+# ------------------------------------------------------------------------------
+# mark all source files
 set(HEADERS
         mainwindow.h
         kbwidget.h
@@ -156,19 +201,15 @@ set(FORMS
         extrasettingswidget.ui
         )
 
-set(RESOURCES
+set(QT_RESOURCES
         image.qrc
-        text.qrc
+        text.qrc.in
         binary.qrc
         )
 
-set(OBJC_SOURCES
-        media_mac.m
-        )
-
-# ------------------------------------------------------------------------------
-# add definitions to the source code
-add_definitions(-DQUAZIP_STATIC)
+if (APPLE)
+    list(APPEND SOURCES media_mac.m)
+endif ()
 
 # ------------------------------------------------------------------------------
 # Qt settings
@@ -176,13 +217,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-#qt5_wrap_ui(${FORMS})
-#qt5_add_resources(${QT_RESOURCES})
-
-# ------------------------------------------------------------------------------
-# include quazip as static lib
-include_directories(quazip)
-add_subdirectory(quazip)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # ------------------------------------------------------------------------------
 # mark libraries
@@ -191,71 +226,80 @@ set(LIBS
         Qt5::Widgets
         Qt5::Network
         ZLIB::ZLIB
-        quazip
         )
 
+if (QUAZIP_FOUND)
+    list(APPEND LIBS ${QUAZIP_LIBRARIES})
+else ()
+    list(APPEND HEADERS ${QUAZIP_HEADERS})
+    list(APPEND SOURCES ${QUAZIP_SOURCES})
+endif ()
+
 if (APPLE)
-    set(APPLE_LIBS
+    list(APPEND LIBS
             ${COREAUDIO_LIBRARY}
             ${FOUNDATION_LIBRARY}
             ${AUDIOTOOLBOX_LIBRARY}
-            )
-
-    # mark additional files to put under /Resources on macOS
-    set(MAC_RESOURCES
-            ckb-logo.icns
-            ${CMAKE_SOURCE_DIR}/osx/resources/LICENSE.html
-            ${CMAKE_SOURCE_DIR}/README.md
-            ${CMAKE_SOURCE_DIR}/BUILD.md
-            ${CMAKE_BINARY_DIR}/ckb-next-daemon
             )
 endif ()
 
 # ------------------------------------------------------------------------------
 # set up targets
 if (APPLE)
-    # set variables for creating a plist
-    include(CkbNextPlist)
+    set(MACOSX_BUNDLE_BUNDLE_NAME "ckb-next")
+    set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
+    set(MACOSX_BUNDLE_INFO_STRING "ckb-next - version ${ckb-next_VERSION}")
+    set(MACOSX_BUNDLE_ICON_FILE "ckb-next.icns")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ckb-next")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "${ckb-next_VERSION}")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "${ckb-next_VERSION}")
+    set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2014-2016 ccMSC\nCopyright © 2017 ckb-next dev. team")
+    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist.in" "${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist")
+    set(CMAKE_PLIST "<file>ckb-next.plist</file>") # see text.qrc.in
+    set_source_files_properties(ckb-next.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    list(APPEND SOURCES ckb-next.icns)
+endif ()
+configure_file("${CMAKE_CURRENT_LIST_DIR}/text.qrc.in" "${CMAKE_CURRENT_LIST_DIR}/text.qrc" @ONLY)
 
-    add_executable(ckb-next MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${QT_RESOURCES} ${OBJC_SOURCES} ckb-logo.icns)
-    qt5_use_modules(ckb-next Core Widgets Network)
-    target_link_libraries(ckb-next ${LIBS} ${APPLE_LIBS})
+add_executable(ckb-next ${HEADERS} ${SOURCES} ${QT_RESOURCES})
+
+target_link_libraries(ckb-next ${LIBS})
+
+if (APPLE)
     set_target_properties(ckb-next PROPERTIES
-            #            OUTPUT_NAME "${MACOSX_BUNDLE_BUNDLE_NAME}"
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/CkbNext.plist"
-            RESOURCE ${MAC_RESOURCES}
+            MACOSX_BUNDLE TRUE
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist"
+            OUTPUT_NAME "${MACOSX_BUNDLE_BUNDLE_NAME}"
             )
+endif ()
 
-    # deploy qt5 on macOS
-    set(exe "ckb-next.app")
-    set(dirs "")
-    if (CMAKE_PREFIX_PATH)
-        foreach (dir ${CMAKE_PREFIX_PATH})
-            list(APPEND dirs "${dir}/bin" "${dir}/lib")
-        endforeach ()
+if (NOT LINUX_CUSTOM_INSTALL)
+    install(TARGETS ckb-next
+            RUNTIME DESTINATION "${INSTALL_RUNTIME_DIR}"
+            BUNDLE DESTINATION .
+            )
+endif ()
+
+if (LINUX AND NOT LINUX_CUSTOM_INSTALL)
+    if (NOT EXISTS "/usr/bin/ckb-next")
+        # symlink to /usr/bin
+        install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next" "/usr/bin/ckb-next")]])
     endif ()
 
-    include(InstallRequiredSystemLibraries)
-    include(DeployQt5)
-    install_qt5_executable("${exe}" "" "" "${dirs}" "")
-
+    install(FILES "ckb-next.desktop"
+            DESTINATION "/usr/share/applications"
+            PERMISSIONS OWNER_READ OWNER_WRITE
+            GROUP_READ
+            WORLD_READ
+            )
+    install(FILES "ckb-next.png"
+            DESTINATION "/usr/share/icons/hicolor/512x512/apps"
+            PERMISSIONS OWNER_READ OWNER_WRITE
+            GROUP_READ
+            WORLD_READ
+            )
 endif ()
 
-if (LINUX)
-    # TODO finish this
-    add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${RESOURCES})
-    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-    target_link_libraries(${PROJECT_NAME} ${LIBS})
-    # Linux installation is supposed to be handled manually by package maintainers
-endif ()
-
-#if(LINUX)
-#    add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${RESOURCES})
-#    target_link_libraries(${PROJECT_NAME} ${LIBS})
-#elseif (APPLE)
-#    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${HEADERS} ${SOURCES} ${RESOURCES} ${OBJC_SOURCES})
-#    target_link_libraries(${PROJECT_NAME} ${LIBS} ${APPLE_LIBS})
-#    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in)
-#endif ()
-
-
+# Keep "add_subdirectory(lastinstall)" last
+add_subdirectory(lastinstall)

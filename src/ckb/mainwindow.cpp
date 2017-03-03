@@ -3,6 +3,7 @@
 #include "kbfirmware.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <ckbnextconfig.h>
 #include <cstdlib>
 #include <QSharedMemory>
 #include <QShortcut>
@@ -49,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
-    closeAction = new QAction(tr("Quit ckb"), this);
+    closeAction = new QAction(tr("Quit ckb-next"), this);
 #ifdef USE_LIBAPPINDICATOR
     QString desktop = std::getenv("XDG_CURRENT_DESKTOP");
     unityDesktop = (desktop.toLower() == "unity");
@@ -59,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
         indicatorMenu = gtk_menu_new();
         indicatorMenuRestoreItem = gtk_menu_item_new_with_label("Restore");
-        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit ckb");
+        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit ckb-next");
 
         gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
         gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
@@ -72,18 +73,18 @@ MainWindow::MainWindow(QWidget *parent) :
         gtk_widget_show(indicatorMenuRestoreItem);
         gtk_widget_show(indicatorMenuQuitItem);
 
-        indicator = app_indicator_new("ckb", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+        indicator = app_indicator_new("ckb-next", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
 
         app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
         app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
-        app_indicator_set_icon(indicator, "ckb");
+        app_indicator_set_icon(indicator, "ckb-next");
     } else
 #endif // USE_LIBAPPINDICATOR
     {
         trayIconMenu = new QMenu(this);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-logo.png"), this);
+        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
         trayIcon->setContextMenu(trayIconMenu);
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
      }
@@ -93,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Make a custom "Close" menu action for OSX, as the default one brings up the "still running" popup unnecessarily
     QMenuBar* menuBar = new QMenuBar(this);
     setMenuBar(menuBar);
-    this->menuBar()->addMenu("ckb")->addAction(closeAction);
+    this->menuBar()->addMenu("ckb-next")->addAction(closeAction);
 #else
     // On linux, add a handler for Ctrl+Q
     new QShortcut(QKeySequence("Ctrl+Q"), this, SLOT(quitApp()));
@@ -161,7 +162,7 @@ void MainWindow::updateVersion(){
     // Warn if the daemon version doesn't match the GUI
     QString daemonWarning;
     if(daemonVersion != CKB_VERSION_STR)
-        daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVersion + "). Please upgrade ckb" + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + ". If the problem persists, try rebooting.";
+        daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVersion + "). Please upgrade ckb-next" + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + ". If the problem persists, try rebooting.";
     if(count == 0)
         settingsWidget->setStatus("No devices connected" + daemonWarning);
     else if(count == 1)
@@ -214,7 +215,7 @@ void MainWindow::closeEvent(QCloseEvent *event){
         return;
     }
     if(!CkbSettings::get("Popups/BGWarning").toBool()){
-        QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb\" on the Settings screen.");
+        QMessageBox::information(this, "ckb-next", "ckb-next will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb-next\" on the Settings screen.");
         CkbSettings::set("Popups/BGWarning", true);
     }
     hide();

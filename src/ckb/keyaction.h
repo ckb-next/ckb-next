@@ -160,7 +160,8 @@ public:
 
     ~KeyAction();
 private:
-    // Don't copy key actions (the old one needs to be deleted first)
+    /// ccMSC: Don't copy key actions (the old one needs to be deleted first)
+    /// frickler24: statement left as described, but copying is done in KbBind copy constructor
     inline void operator=(const KeyAction& rhs) {}
     inline KeyAction(const KeyAction& rhs) : QObject() {}
 

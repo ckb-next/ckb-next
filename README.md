@@ -32,7 +32,7 @@ See also:
 
 Current Status
 --------------
-Right now ckb-next is under active development. *We will cut a release and ship a macOS binary as soon as some important changes are done*. You can always build the software from source with just one command. See [Linux Installation](#linux-installation) and [OS X/macOS Installation](#os-xmacos-installation). Thank you for the interest in this software and your patience.
+Right now ckb-next is under active development. *We will cut a release and ship a macOS binary as soon as some important changes are done. Everything you see under "Releases" came with the old ckb (as it was forked) and is not affiliated with ckb-next. We don't have any releases just for now.* You can always build the software from source with just one command. See [Linux Installation](#linux-installation) and [OS X/macOS Installation](#os-xmacos-installation). Thank you for the interest in this software and your patience.
 
 Device Support
 --------------
@@ -117,12 +117,10 @@ sudo rm -rf /usr/bin/ckb-animations
 
 OS X/macOS Installation
 -----------------
-<!--- TODO ship a new binary for mac, this section wastes user's time because most of the times people end up building from source -->
+
 #### Binary download:
 
-The latest OS X/macOS binary can be downloaded here: https://github.com/mattanger/ckb-next/releases/latest
-
-Click on `ckb.pkg` under the Downloads section. This is an automated installer which will set up the driver for you. After it's finished, open ckb.app (it will be installed to your Applications directory) to get started.
+We do not provide binaries just for now. See [Current Status](#current-status).
 
 #### Building from source:
 

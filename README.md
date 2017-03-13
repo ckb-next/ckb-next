@@ -114,6 +114,11 @@ sudo rm -f /etc/init.d/ckb-daemon
 Afterward, remove the applications and related files:
 ```
 sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop /usr/share/icons/hicolor/512x512/apps/ckb.png
+sudo rm -rf /usr/lib/ckb-animations
+```
+
+Before https://github.com/mattanger/ckb-next/commit/f347e60df211c60452f95084b6c46dc4ec5f42ee animations were located elsewhere, try removing them as well:
+```
 sudo rm -rf /usr/bin/ckb-animations
 ```
 

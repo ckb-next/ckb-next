@@ -62,9 +62,17 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     fi
 fi
 
+# Purge old animations on Linux
+if [ -d "/usr/bin/ckb-animations" ]; then
+    echo "Found deprecated installation scheme, fixing"
+    sudo rm -rf "/usr/bin/ckb-animations"
+    checkfail $?
+    echo "Done"
+fi
+
 if [[ -d $SRCDIR ]]; then
     echo "Preparing build files..."
-    # Clean first
+    # Clean up first
     make clean >/dev/null 2>&1
     rm Makefile Makefile.* ./*/*/Makefile ./*/*/Makefile.* >/dev/null 2>&1
     # Generate makefiles

@@ -30,7 +30,7 @@ QString AnimScript::path(){
 #ifdef __APPLE__
     return QDir(QApplication::applicationDirPath() + "/../Resources").absoluteFilePath("ckb-animations");
 #else
-    return QDir(QApplication::applicationDirPath()).absoluteFilePath("ckb-animations");
+    return QDir("/usr/lib").absoluteFilePath("ckb-animations");
 #endif
 }
 

@@ -205,6 +205,8 @@ and you are using:
 
 - Qt 5.7 and lower, install `qt5ct` package on Arch Linux (find a similar one for your distribution). That's all. This is a known Qt bug. It happened because Qt did not ship required GTK files.
 
+If the above didn't work out for you for some reason, see #70, #51, ccMSC/ckb#500, ccMSC/ckb#461.
+
 If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo apt-get install libappindicator-dev`. Then reinstall ckb.
 
 #### OS X/macOS

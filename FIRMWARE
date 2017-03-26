@@ -3,12 +3,13 @@ Hash: SHA256
 
 # The GPG key: DCEF2F5F - A full copy of it can also be found in src/ckb/ckb-next-key.gpg
 # This document is signed to prevent tampering. Signature verification is enabled only when GnuPG is available.
-# Firmware versions listed may not necessarily reflect the latest on Corsair's site; new versions will not be added until ckb has been tested with them.
+# Firmware versions listed may not necessarily reflect the latest on Corsair's site; new versions will not be added until ckb-next has been tested with them.
 # ckb-next does NOT read this file when flashing firmware manually. It will allow you to load any valid FW blob (at your own risk).
 #
 # -------->>>>>> for Scimitar is a 2.4 available, for Strafe 2.05 !
 #
-
+# Note: M65PRORGB is not yet used, and is added for reference only.
+#
 !BEGIN FW ENTRIES
 
 # Vendor  Model             FW   URL                                                        Min.ckb File Name                       SHA256
@@ -22,18 +23,18 @@ Hash: SHA256
   Corsair STRAFE            2.04    https://www3.corsair.com/software/HID/STRAFE.zip           0.2.7   STRAFE_APP_V204.bin             51156ae7aa5b04405668582496cf28bbfb2e492accf93c65c3072aca9ef7ed65
   Corsair STRAFERGB         2.05    https://www3.corsair.com/software/HID/STRAFERGB.zip        0.2.7   STRAFERGB_APP_V205.bin          dff16fec9a0ae0d33aad0482f9ea02e3e55e231706b8c4e7fb66820aba98adc5
   Corsair M65RGB            2.04    https://www3.corsair.com/software/HID/M65RGB.zip           0.2.7   M65RGB_App_v204.bin             e1f09ce462f77071f91d92951410c14fb18061dd9760b3de89e45d1ca8b6b46c
+  Corsair M65PRORGB         2.06    https://www3.corsair.com/software/HID/M65PRORGB.zip        0.2.7   M65PRORGB_APP_V206.bin          7eb9d98c0cb2f36b64d6935e47642481f5d79b2d7806eb09da3acacc4276a111
   Corsair SCIMITARRGB       2.03    https://www3.corsair.com/software/HID/Scimitar.zip         0.2.7   Scimitar_App_v203.bin           59194c3ae8a6ae0a801f7b6cf528ad292ae996923699cf063c7deed38fb326aa
 
 !END FW ENTRIES
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEzBAEBCAAdFiEE2efsyk0ijiZmMKgW3+JI69zvL18FAliaY8IACgkQ3+JI69zv
-L1/xCAf9GMBKfc1td2WqXKp+27gDSiZOk/M+ZbiR9z5E2GVnNw2sQMalcvv5yUZ1
-il5vYh/UtbgS8jpiFXJNWV9DoI59AquHAMppvAPO98j7pN3sfn2ZDRSADh9mJ3nT
-b9IcXMcrUeRR2JqWG6MxA1Fz0UATLrp9wYlDo7J78V2/vK3bZwpTuDc5su1PGXD3
-ORLNbVjr8DTLbsJpySHxY4RcJ/H1jnAQG3LwzoFXBMjm77M6B+CUN/dv4QXEGQEh
-6OG3/Mssb5+l6XGjytihEuHaK8laTNbAJ0cwYZu91vca7Sjpwq1ZXX11CA+XfvHs
-bqKRbf9YqV81l8ZOyAIfx0M5vSj8uw==
-=rLNC
+iQEcBAEBCAAGBQJY1/5MAAoJEN/iSOvc7y9ffXcH/jBVEzxFsyU8IEfTfrBPJITZ
+veFTX+Qx/ChhRdjYHSOgTSIAZl6zBL6HJP/YyigemQkhGrtCUFA3pDvi79/AYJP3
+gZJnA0zqsMDpmnwb0r2yqow8m/UsOBQOZBGEWl3p5E1RQBUoRe2xwquvfGtTzhJ3
+7EjPl5CWV+AUhUc1L8FbIMH4QEK6BZqOIcCde1tudFrW6dzT5R/TJrmy+XocVnWt
+5JiZSKDNcT63ejxeQEahGFax91NXBapk1FaIKCrKSVkWBejtrbpFg4zzsBGBVjPe
+IvI+ONkblj58j+jAFt7p1jc2C/POfjNs7UJp2UEttLlXYNvvcICL/xYmPVtQYn0=
+=u4Rs
 -----END PGP SIGNATURE-----

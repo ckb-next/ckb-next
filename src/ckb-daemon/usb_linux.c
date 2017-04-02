@@ -62,6 +62,12 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
             return 0;
     } else if(res != MSG_SIZE)
         ckb_warn_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+#ifdef DEBUG_USB_RECV
+    char converted[MSG_SIZE*3 + 1];
+    for(int i=0;i<MSG_SIZE;i++)
+        sprintf(&converted[i*3], "%02x ", in_msg[i]);
+    ckb_warn_fn("Recv %s\n", file, line, converted);
+#endif
     return res;
 }
 

@@ -76,6 +76,9 @@
 //uncomment to see USB packets sent to the device
 //#define DEBUG_USB
 
+//uncomment to see USB packets sent from the device
+//#define DEBUG_USB_RECV
+
 const char* vendor_str(short vendor);
 const char* product_str(short product);
 

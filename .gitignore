@@ -6,6 +6,7 @@ ckb.pkg
 .DS_Store
 .*
 !.gitignore
+!.github
 *.o
 *.pro.*
 Makefile

@@ -120,6 +120,10 @@
 #define P_GLAIVE_STR      "1b34"
 #define IS_GLAIVE(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
 
+#define P_MM800            0x1b3b
+#define P_MM800_STR        "1b3b"
+#define IS_MM800(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_MM800))
+
 ///
 /// uncomment to see USB packets sent to the device
 // #define DEBUG_USB_SEND
@@ -127,6 +131,15 @@
 ///
 ///uncomment to see USB packets received from the device
 // #define DEBUG_USB_RECV
+=======
+
+
+// NOTE: when adding new devices please update src/ckb/fwupgradedialog.cpp as well.
+// It should contain the same vendor/product IDs for any devices supporting firmware updates.
+
+//uncomment to see USB packets sent to the device
+#define DEBUG_USB
+>>>>>>> 25e1d3d... Daemon: Preliminary work for upcoming RGB mousepad support
 
 ///
 /// \brief vendor_str Vendor/product string representations
@@ -165,6 +178,7 @@ const char* product_str(short product);
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
+<<<<<<< HEAD
 /// Used to apply quirks and features to the PLATINUM devices.
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
@@ -189,6 +203,16 @@ const char* product_str(short product);
 /// This constant is used to initialize \b kb->usbdelay.
 /// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
 /// Pure Hacker code.
+=======
+// Mousepad test
+#define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_MM800))
+#define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
+
+// USB delays for when the keyboards get picky about timing
+#define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)
+#define DELAY_MEDIUM(kb)    usleep((int)(kb)->usbdelay * 10000) // x10 (default: 50ms)
+#define DELAY_LONG(kb)      usleep(100000)                      // long, fixed 100ms
+>>>>>>> 25e1d3d... Daemon: Preliminary work for upcoming RGB mousepad support
 #define USB_DELAY_DEFAULT   5
 
 /// Start the USB main loop. Returns program exit code when finished

@@ -169,6 +169,7 @@ typedef struct {
 extern const union devcmd vtable_keyboard;
 extern const union devcmd vtable_keyboard_nonrgb;
 extern const union devcmd vtable_mouse;
+extern const union devcmd vtable_mousepad;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN 40

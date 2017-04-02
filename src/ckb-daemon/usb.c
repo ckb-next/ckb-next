@@ -92,6 +92,8 @@ const char* product_str(short product){
         return "harpoon";
     if(product == P_GLAIVE)
         return "glaive";
+    if(product == P_MM800)
+        return "mm800";
     return "";
 }
 
@@ -110,7 +112,17 @@ const char* product_str(short product){
 /// \todo Is the last point really a good decision and always correct?
 ///
 static const devcmd* get_vtable(short vendor, short product){
-    return IS_MOUSE(vendor, product) ? &vtable_mouse : IS_RGB(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
+    // return IS_MOUSE(vendor, product) ? &vtable_mouse : IS_RGB(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
+    if(IS_MOUSE(vendor, product))
+        return &vtable_mouse;
+    else if(IS_MOUSEPAD(vendor, product))
+        return &vtable_mousepad;
+    else {
+        if(IS_RGB(vendor, product))
+            return &vtable_keyboard;
+        else
+            return &vtable_keyboard_nonrgb;
+    }
 }
 
 // USB device main loop

@@ -70,11 +70,16 @@
 #define P_SCIMITAR_PRO_STR  "1b3e"
 #define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
 
+
+#define P_MM800            0x1b3b
+#define P_MM800_STR        "1b3b"
+#define IS_MM800(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_MM800))
+
 // NOTE: when adding new devices please update src/ckb/fwupgradedialog.cpp as well.
 // It should contain the same vendor/product IDs for any devices supporting firmware updates.
 
 //uncomment to see USB packets sent to the device
-//#define DEBUG_USB
+#define DEBUG_USB
 
 const char* vendor_str(short vendor);
 const char* product_str(short product);
@@ -92,6 +97,10 @@ const char* product_str(short product);
 // Mouse vs keyboard test
 #define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2)))
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
+
+// Mousepad test
+#define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_MM800))
+#define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 // USB delays for when the keyboards get picky about timing
 #define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)

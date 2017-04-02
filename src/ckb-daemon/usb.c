@@ -38,12 +38,24 @@ const char* product_str(short product){
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)
         return "scimitar";
+    if(product == P_MM800)
+        return "mm800";
     return "";
 }
 
 // Vtable selector
 static const devcmd* get_vtable(short vendor, short product){
-    return IS_MOUSE(vendor, product) ? &vtable_mouse : IS_RGB(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
+    // return IS_MOUSE(vendor, product) ? &vtable_mouse : IS_RGB(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
+    if(IS_MOUSE(vendor, product))
+        return &vtable_mouse;
+    else if(IS_MOUSEPAD(vendor, product))
+        return &vtable_mousepad;
+    else {
+        if(IS_RGB(vendor, product))
+            return &vtable_keyboard;
+        else
+            return &vtable_keyboard_nonrgb;
+    }
 }
 
 // USB device main loop

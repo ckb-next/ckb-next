@@ -84,7 +84,7 @@ ckb-next requires Qt5 (Qt 5.6 recommened for OS X), libudev, zlib, gcc, g++, and
 * Arch: `sudo pacman -S base-devel qt5-base zlib`
 * Other distros: Look for `qt5` or `libqt5*-devel`
 
-Note: If you build your own kernels, ckb-next requires the uinput flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
+Note: If you build your own kernels, ckb-next requires the uinput flag to be enabled (CONFIG_INPUT_UINPUT). It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
 #### Installing:
 

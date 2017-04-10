@@ -74,7 +74,7 @@ if [[ -d $SRCDIR ]]; then
     echo "Preparing build files..."
     # Clean up first
     make clean >/dev/null 2>&1
-    rm Makefile Makefile.* ./*/*/Makefile ./*/*/Makefile.* >/dev/null 2>&1
+    rm -f Makefile Makefile.* ./*/*/Makefile ./*/*/Makefile.* >/dev/null 2>&1
     # Generate makefiles
     ./qmake-auto "$QMAKEFLAGS" > "$TMPFILE" 2>&1
     checkfail $?

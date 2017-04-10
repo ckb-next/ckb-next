@@ -92,7 +92,11 @@ public:
     /// \return QString macroTiming
     ///
     inline QString macroTiming() const {
-        return isValidMacro() ? _value.split(":")[4] : "";
+        if (isValidMacro()) {
+            QStringList rval = _value.split(":");
+            return (rval.length() == 4)? rval[1] : rval[4];
+        }
+        return QString("");
     }
 
     //////////

@@ -1245,6 +1245,44 @@
       <attribute name="title">
        <string>Macro</string>
       </attribute>
+      <widget class="QWidget" name="layoutWidget1">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>12</y>
+         <width>241</width>
+         <height>161</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_8">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetNoConstraint</enum>
+        </property>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Macro Key Actions</string>
+          </property>
+          <widget class="QPlainTextEdit" name="pteMacroBox">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>20</y>
+             <width>241</width>
+             <height>131</height>
+            </rect>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::WheelFocus</enum>
+           </property>
+           <property name="tabChangesFocus">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QPlainTextEdit" name="pteMacroComment">
        <property name="enabled">
         <bool>true</bool>
@@ -1334,6 +1372,35 @@
         <number>1</number>
        </property>
       </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>10</y>
+         <width>111</width>
+         <height>71</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetNoConstraint</enum>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Macro Comment</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="title">
+           <string>Macro Text</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="layoutWidget_2">
        <property name="geometry">
         <rect>
@@ -1402,7 +1469,7 @@
         <rect>
          <x>40</x>
          <y>170</y>
-         <width>236</width>
+         <width>238</width>
          <height>28</height>
         </rect>
        </property>
@@ -1463,25 +1530,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QPlainTextEdit" name="pteMacroBox">
-       <property name="geometry">
-        <rect>
-         <x>43</x>
-         <y>40</y>
-         <width>236</width>
-         <height>121</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::WheelFocus</enum>
-       </property>
-       <property name="tabChangesFocus">
-        <bool>true</bool>
-       </property>
-       <property name="documentTitle">
-        <string extracomment="Passiert hier etwas, wenn ich den Kommentar ändere????"/>
-       </property>
-      </widget>
       <widget class="QLabel" name="txtBuffer">
        <property name="enabled">
         <bool>false</bool>
@@ -1540,67 +1588,13 @@
         <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_2">
-       <property name="geometry">
-        <rect>
-         <x>45</x>
-         <y>15</y>
-         <width>141</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font: 75 10pt ; 
-</string>
-       </property>
-       <property name="text">
-        <string>Macro Key Actions</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_3">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>15</y>
-         <width>111</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font: 75 10pt ; 
-</string>
-       </property>
-       <property name="text">
-        <string>Macro Comment</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_4">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>65</y>
-         <width>101</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font: 75 10pt ; 
-</string>
-       </property>
-       <property name="text">
-        <string>Macro Text</string>
-       </property>
-      </widget>
-      <zorder>pteMacroBox</zorder>
-      <zorder>pteMacroComment</zorder>
+      <zorder>layoutWidget</zorder>
+      <zorder>layoutWidget1</zorder>
       <zorder>layoutWidget</zorder>
       <zorder>pteMacroText</zorder>
       <zorder>layoutWidget_2</zorder>
       <zorder>lbl_macro</zorder>
       <zorder>txtBuffer</zorder>
-      <zorder>label_2</zorder>
-      <zorder>label_3</zorder>
-      <zorder>label_4</zorder>
      </widget>
     </widget>
    </item>
@@ -1709,38 +1703,6 @@
  </tabstops>
  <resources/>
  <connections>
-  <connection>
-   <sender>cancelButton</sender>
-   <signal>clicked()</signal>
-   <receiver>pteMacroBox</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>590</x>
-     <y>331</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>275</x>
-     <y>197</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnClearMacro</sender>
-   <signal>clicked()</signal>
-   <receiver>pteMacroBox</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>711</x>
-     <y>238</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>270</x>
-     <y>179</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>btnClearMacro</sender>
    <signal>clicked()</signal>

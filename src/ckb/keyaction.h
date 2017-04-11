@@ -49,13 +49,14 @@ public:
      /// This is done easily: If the macro action starts with $macro:
      /// and has five elements, delimited by ":", we may assume,
      /// that is a structural correct macro action.
+     /// If it has 4 entries only, it is an older definition and ok also.
      /// \return bool as true iff the macro definition contains all four elements.
      ///
      inline bool isValidMacro() const {
         if (isMacro()) {
             QStringList ret;
             ret =_value.split(":");
-            return (ret.count() == 5);
+            return ((ret.count() >= 4) && (ret.count() <= 5));
         } else {
             return false;
         }
@@ -66,7 +67,7 @@ public:
     /// \return QStringList returns the Macro Key Definition,
     ///     Readble Macro String,
     ///     Readable Macro Comment and
-    ///     the original timing information
+    ///     the original timing information (if it exists as a 5th part)
     ///     as QStringList.
     ///
     inline QStringList macroLine() const {
@@ -83,12 +84,15 @@ public:
     /// \return QString macroContent
     ///
     inline QString macroContent() const {
+        // return isValidMacro() ? _value.split(":")[1].replace(QRegExp("=\\d+"), "") : ""; ///> Is used if we have ckb without delay handling
         return isValidMacro() ? _value.split(":")[1] : "";
     }
 
     //////////
     /// \brief macroTiming returns the macro key definition with original timing infos
     /// (the fifth and up to now last part of the macro action).
+    /// If the implementation does not know anything about delays and has no 5th part,
+    /// return first part.
     /// \return QString macroTiming
     ///
     inline QString macroTiming() const {

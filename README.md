@@ -180,7 +180,7 @@ Troubleshooting
 If you have problems connecting the device to your system (device doesn't respond, ckb-daemon doesn't recognize or can't connect it) and/or you experience long boot times when using the keyboard, try adding the following to your kernel's `cmdline`:
 
 * K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x20000408`
-* K70: `usbhid.quirks=0x1B1C:0x1B09:0x0x20000408`
+* K70: `usbhid.quirks=0x1B1C:0x1B09:0x20000408`
 * K70 LUX: `usbhid.quirks=0x1B1C:0x1B36:0x20000408`
 * K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000408`
 * K95: `usbhid.quirks=0x1B1C:0x1B08:0x20000408`

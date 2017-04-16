@@ -30,7 +30,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
     #Linux
     OUT="${OUT}${N}${N}OS Version:${N}`lsb_release -a 2>/dev/null`"
-    OUT="${OUT}${N}${N}USB Devices:${N}`lsusb -vd '1b1c:'` 2>&1"
+    OUT="${OUT}${N}${N}USB Devices:${N}`lsusb -vd '1b1c:' 2>&1`"
     OUT="${OUT}${N}${N}Dmesg:${N}`dmesg | grep -i \"ckb\|corsair\|1b1c\|hid-generic\"`"
 fi
 

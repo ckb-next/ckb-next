@@ -170,7 +170,7 @@ extern const union devcmd vtable_keyboard_nonrgb;
 extern const union devcmd vtable_mouse;
 
 // Structure for tracking keyboard/mouse devices
-#define KB_NAME_LEN 34
+#define KB_NAME_LEN 40
 #define SERIAL_LEN  34
 #define MSG_SIZE    64
 #define IFACE_MAX   4

@@ -32,7 +32,13 @@ See also:
 
 Current Status
 --------------
-Right now ckb-next is under active development. *We will cut a release and ship a macOS binary as soon as some important changes are done. Everything you see under "Releases" came with the old ckb (as it was forked) and is not affiliated with ckb-next. We don't have any releases just for now.* You can always build the software from source with just one command. See [Linux Installation](#linux-installation) and [OS X/macOS Installation](#os-xmacos-installation). Thank you for the interest in this software and your patience.
+Right now ckb-next is under active development.
+
+*We will cut a release and ship a macOS binary as soon as some important changes are done. Everything you see under "Releases" on GitHub are regular tags which are **NOT** releases. We have yet to publish our first release.*
+
+Currently the recommended way to install ckb-next is to build it from source or install an appropriate package from a package repository. See [Linux Installation](#linux-installation) and [OS X/macOS Installation](#os-xmacos-installation).
+
+Thank you for the interest in this software and your patience.
 
 Device Support
 --------------

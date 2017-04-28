@@ -9,6 +9,25 @@
 static CFRunLoopRef mainloop = 0;
 static IONotificationPortRef notify = 0;
 
+// Pointer to the mouse event tap. This tap lets the daemon re-insert modifier keys into
+// the event stream using CoreGraphics. This is necessary because mouse events are processed
+// before IOHID events according to this document: https://github.com/tekezo/Karabiner-Elements/blob/master/DEVELOPMENT.md
+//
+// relevant section quoted below:
+// The modifier flag events are handled in the following sequence in macOS 10.12.
+//
+// Receive HID reports from device.
+// - Treat reports in the keyboard device driver.
+// - Treat flags in accessibility functions. (eg. sticky keys, zoom)
+// - Treat flags in mouse events.
+// - Treat flags in IOHIDSystem.
+// - Treat flags in Coregraphics.
+//
+// Thus, IOHIDPostEvent will be ignored in accessibility functions and mouse events.
+// - endquote
+//
+static CFMachPortRef mouse_event_tap;
+
 static long hidgetlong(hid_dev_t handle, CFStringRef key){
     long raw = 0;
     CFTypeRef cf;
@@ -270,6 +289,80 @@ static void pipecomplete(void* refcon, IOReturn result, void* arg0){
     usb_iface_t handle = kb->ifusb[ctx->index];
     (*handle)->ReadPipeAsync(handle, ctx->pipe, buffer, ctx->maxsize, pipecomplete, ctx);
 }
+
+// Callback for adding modifier keys to mouse events. Every time a mouse event happens on the system
+// this callback will be called and the modifier keys from the keyboard will be added to the mouse event.
+CGEventRef mouse_event_modifier_callback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon) {
+    if (type == kCGEventTapDisabledByTimeout) {
+        CGEventTapEnable(mouse_event_tap, true);
+        return event;
+    }
+
+    usbdevice *kb = NULL;
+    if (event) {
+        // Grab the existing flags from the keyboard, useful for not losing the modifiers when using
+        // the device keyoard when a corsair keyboard is plugged in.
+        CGEventFlags existingFlags = CGEventSourceFlagsState(kCGEventSourceStateHIDSystemState);
+        for(int i = 0; i < DEV_MAX; i++){
+            if(IS_CONNECTED(keyboard + i)){
+                kb = keyboard + i;
+                // Only care about the active keyboard for grabbing the modifier keys.
+                // Once found, can move on.
+                if (!IS_MOUSE_DEV(kb) && kb->active == 1) {
+                    pthread_mutex_lock(imutex(kb));
+                    CGEventSetFlags(event, (kCGEventFlagMaskNonCoalesced | kb->modifiers | existingFlags));
+                    pthread_mutex_unlock(imutex(kb));
+                    break;
+                }
+            }
+        }
+    }
+    return event;
+}
+
+// Register to watch all mouse events, so the daemon can add the modifier keys
+// back into those events. Called with the same runloop that is used to listen
+// for input.
+void register_mouse_event_tap(CFRunLoopRef run_loop) {
+
+    // Set mask to catch all mouse events, as the modifier keys
+    // can change the look of the pointer.
+
+    CGEventMask mask = CGEventMaskBit(kCGEventLeftMouseDown) |
+                        CGEventMaskBit(kCGEventLeftMouseUp) |
+                        CGEventMaskBit(kCGEventRightMouseDown) |
+                        CGEventMaskBit(kCGEventRightMouseUp) |
+                        CGEventMaskBit(kCGEventMouseMoved) |
+                        CGEventMaskBit(kCGEventLeftMouseDragged) |
+                        CGEventMaskBit(kCGEventRightMouseDragged) |
+                        CGEventMaskBit(kCGEventScrollWheel) |
+                        CGEventMaskBit(kCGEventTabletPointer) |
+                        CGEventMaskBit(kCGEventTabletProximity) |
+                        CGEventMaskBit(kCGEventOtherMouseDown) |
+                        CGEventMaskBit(kCGEventOtherMouseUp) |
+                        CGEventMaskBit(kCGEventOtherMouseDragged);
+
+    // Create the tap. This is what will specify what to call (mouse_event_modifier_callback)
+    // whenever a mouse event happens.
+    mouse_event_tap = CGEventTapCreate(kCGHIDEventTap,
+                                 kCGHeadInsertEventTap,
+                                 kCGEventTapOptionDefault,
+                                 mask,
+                                 mouse_event_modifier_callback,
+                                 NULL);
+
+    // Add the tap to the runloop
+    if (mouse_event_tap) {
+        CFRunLoopSourceRef run_loop_source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouse_event_tap, 0);
+        if (run_loop_source) {
+            ckb_info("Registering EventTap for modifier keys.\n");
+            CFRunLoopAddSource(run_loop, run_loop_source, kCFRunLoopCommonModes);
+            CGEventTapEnable(mouse_event_tap, true);
+            CFRelease(run_loop_source);
+        }
+    }
+}
+
 
 // input_mac.c
 extern void keyretrigger(CFRunLoopTimerRef timer, void* info);
@@ -837,6 +930,8 @@ int usbmain(){
     // Iterate existing devices
     if(iterator_hid)
         iterate_devices_hid(0, iterator_hid);
+
+    register_mouse_event_tap(mainloop);
 
     // Enter loop to scan/connect new devices
     CFRunLoopRun();

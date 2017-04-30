@@ -64,9 +64,12 @@ If __yes__, then for
 (fill in if ckb-next was compiled manually, e.g.: _"master"_ or _"testing"_)
 
 #### Logs & crash reports
-(any useful information - an OS crash report, debugger's backtrace etc.)
+(any useful information - an OS crash report, debugger's backtrace, any non-standard way of usage (BIOS mode ...)  etc.)
 
-In case of a crash you should at least provide a journal log gathered by your init system. Look for __usb__, __ckb__, __ckb-daemon__ and provide a meaningful context.
+You should upload:
+
+* a journal log gathered by your init system. Look for __usb__, __ckb__, __ckb-daemon__ and provide a meaningful context
+* the output of `ckb-daemon`: `systemctl status ckb-daemon`
 
 ### What is the program's current behavior?
 

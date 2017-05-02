@@ -34,7 +34,7 @@ Use it to put ticks and then switch back to write in the details where needed.
 - [ ] __Skim__ through other `.md` documents in the project's root. They contain more specific information.
 - [ ] __Search__ in open _and_ closed [Issues](https://github.com/mattanger/ckb-next/issues). [Here's how](https://help.github.com/articles/searching-issues/).
 - [ ] __Avoid__ opening a new issue in case a similar one already exists (don't worry, we get the notifications for closed issues as well, it will be reopened if needed).
-- [ ] __Keep__ unrelated issues separately (create a new one if you are sure your's is unique).
+- [ ] __Keep__ unrelated issues separately (create a new one if you are sure yours is unique).
 - [ ] __Use__ Markdown to write on the GitHub. [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet). Use triple backticks if copy-pasting more than _one_ line.
 
 Now, __before you proceed even further__, make sure you are following the recommendations above. It will save a lot of time for you and us in the future.

@@ -1,6 +1,29 @@
 Switch on the "Preview" mode for better reading experience.
 Use it to put ticks and then switch back to write in the details where needed.
 
+<!-- TOC -->
+
+- [Before you procceed](#before-you-procceed)
+- [Devices](#devices)
+    - [Keyboard](#keyboard)
+    - [Mouse](#mouse)
+- [New device support request](#new-device-support-request)
+- [Feature request](#feature-request)
+        - [What is the program's current behavior?](#what-is-the-programs-current-behavior)
+        - [What would you like it to do instead?](#what-would-you-like-it-to-do-instead)
+        - [Any other notes & comments?](#any-other-notes--comments)
+- [Bug report](#bug-report)
+            - [Whence?](#whence)
+            - [Version](#version)
+            - [Branch](#branch)
+            - [Logs & crash reports](#logs--crash-reports)
+        - [What is the program's current behavior?](#what-is-the-programs-current-behavior-1)
+        - [What is the expected behavior of the program?](#what-is-the-expected-behavior-of-the-program)
+        - [Any other notes & comments?](#any-other-notes--comments-1)
+- [Something else](#something-else)
+
+<!-- /TOC -->
+
 ---
 
 # Before you procceed

@@ -9,17 +9,18 @@ Use it to put ticks and then switch back to write in the details where needed.
     - [Mouse](#mouse)
 - [New device support request](#new-device-support-request)
 - [Feature request](#feature-request)
-        - [What is the program's current behavior?](#what-is-the-programs-current-behavior)
-        - [What would you like it to do instead?](#what-would-you-like-it-to-do-instead)
-        - [Any other notes & comments?](#any-other-notes--comments)
+    - [What is the program's current behavior?](#what-is-the-programs-current-behavior)
+    - [What would you like it to do instead?](#what-would-you-like-it-to-do-instead)
+    - [Any other notes & comments?](#any-other-notes--comments)
 - [Bug report](#bug-report)
-            - [Whence?](#whence)
-            - [Version](#version)
-            - [Branch](#branch)
-            - [Logs & crash reports](#logs--crash-reports)
-        - [What is the program's current behavior?](#what-is-the-programs-current-behavior-1)
-        - [What is the expected behavior of the program?](#what-is-the-expected-behavior-of-the-program)
-        - [Any other notes & comments?](#any-other-notes--comments-1)
+    - [General information](#general-information)
+        - [Whence?](#whence)
+        - [Version](#version)
+        - [Branch](#branch)
+    - [Logs & crash reports](#logs--crash-reports)
+    - [What is the program's current behavior?](#what-is-the-programs-current-behavior-1)
+    - [What is the expected behavior of the program?](#what-is-the-expected-behavior-of-the-program)
+    - [Any other notes & comments?](#any-other-notes--comments-1)
 - [Something else](#something-else)
 
 <!-- /TOC -->
@@ -74,11 +75,11 @@ Now, __before you proceed even further__, make sure you are following the recomm
 
 <sub><sup>leave empty if you have no feature requests</sup></sub>
 
-### What is the program's current behavior?
+## What is the program's current behavior?
 
-### What would you like it to do instead?
+## What would you like it to do instead?
 
-### Any other notes & comments?
+## Any other notes & comments?
 
 ---
 
@@ -94,16 +95,18 @@ Now, __before you proceed even further__, make sure you are following the recomm
 - [ ] __macOS__:
     * _OS version_:
 
-#### Whence?
+## General information
+
+### Whence?
 (how and where did you get this program, e.g.: _"`ckb-next-git` package in AUR"_ or _"built manually using quickinstall script"_ or _"pkg for macOS"_)
 
-#### Version
+### Version
 (ckb-next's version which can be found in the "Settings" tab in the GUI, e.g.: _"ckb-next beta-v0.2.7"_)
 
-#### Branch
+### Branch
 (fill in if ckb-next was compiled manually, e.g.: _"master"_ or _"testing"_)
 
-#### Logs & crash reports
+## Logs & crash reports
 (any useful information - an OS crash report, debugger's backtrace, any non-standard way of usage (BIOS mode ...)  etc.)
 
 You should upload:
@@ -115,11 +118,11 @@ You should upload:
 - [ ] macOS:
     * the output of `ckb-daemon`: `sudo launchctl unload /Library/LaunchDaemons/com.ckb.daemon.plist && sudo /Applications/ckb.app/Contents/Resources/ckb-daemon`
 
-### What is the program's current behavior?
+## What is the program's current behavior?
 
-### What is the expected behavior of the program?
+## What is the expected behavior of the program?
 
-### Any other notes & comments?
+## Any other notes & comments?
 
 ---
 

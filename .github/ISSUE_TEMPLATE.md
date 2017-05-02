@@ -1,24 +1,55 @@
-Switch on the "Preview" mode for better experience.
+Switch on the "Preview" mode for better reading experience.
+Use it to put ticks and then switch back to write in the details where needed.
 
 ---
 
-# You are supposed to:
+# Before you procceed
 
-- [ ] __Read__ the [`README.md`](https://github.com/mattanger/ckb-next/blob/master/README.md).
-- [ ] __Skim__ through the other `.md` documents. The chances are they contain [at least] a mention of your problem or [at most] a solution to it.
-- [ ] __Search__ before submitting an issue. The chances you will find [at least] a mention of your problem or [at most] a solution to it.
+- [ ] __Try__ the latest code from the [`testing` branch](https://github.com/mattanger/ckb-next/tree/testing).
+- [ ] __Read__ the [`README.md`](https://github.com/mattanger/ckb-next/blob/master/README.md) _in full_.
+- [ ] __Skim__ through other `.md` documents in the project's root. They contain more specific information.
+- [ ] __Search__ in open _and_ closed [Issues](https://github.com/mattanger/ckb-next/issues). [Here's how](https://help.github.com/articles/searching-issues/).
 - [ ] __Avoid__ opening a new issue in case a similar one already exists (don't worry, we get the notifications for closed issues as well, it will be reopened if needed).
-- [ ] __Keep__ unrelated issues separately (create a new one for a new problem).
+- [ ] __Keep__ unrelated issues separately (create a new one if you are sure your's is unique).
 - [ ] __Use__ Markdown to write on the GitHub. [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet). Use triple backticks if copy-pasting more than _one_ line.
 
+Now, __before you proceed even further__, make sure you are following the recommendations above. It will save a lot of time for you and us in the future.
+
 ---
 
-# A feature request?
+# Devices
 
-- [ ] yes
-- [ ] no
+## Keyboard
 
-If __yes__, then:
+<sub><sup>leave empty if you have no keyboard</sup></sub>
+
+* _full name_:
+- [ ] RGB
+- [ ] non-RGB
+
+## Mouse
+
+<sub><sup>leave empty if you have no mouse</sup></sub>
+
+* _full name_:
+- [ ] RGB
+- [ ] non-RGB
+
+---
+
+# New device support request
+
+<sub><sup>leave empty if you have no new device support requests</sup></sub>
+
+- [ ] __Linux__: upload the output of `ckb-dev-detect` shell script located at the root of the ckb-next source tree
+
+- [ ] __macOS__: upload a full dump following [the instructions](https://github.com/mattanger/ckb-next/issues/31#issuecomment-285380447)
+
+---
+
+# Feature request
+
+<sub><sup>leave empty if you have no feature requests</sup></sub>
 
 ### What is the program's current behavior?
 
@@ -28,31 +59,17 @@ If __yes__, then:
 
 ---
 
-# A new device support request?
+# Bug report
 
-- [ ] yes
-- [ ] no
-
-If __yes__, then for
-- [ ] __Linux__: upload the output of `ckb-dev-detect` shell script located at the root of the ckb-next source tree
-- [ ] __macOS__: upload a full dump following the instructions [here](https://github.com/mattanger/ckb-next/issues/31#issuecomment-285380447)
-
----
-
-# A bug report?
-
-- [ ] yes
-- [ ] no
-
-If __yes__, then for
+<sub><sup>leave empty if you have no bug reports</sup></sub>
 
 - [ ] __Linux__:
-* distribution's _name_:
-* _version_ (pass if rolling):
-* _output_ of `uname -r`:
+    * _distribution's name_:
+    * _distribution's version_ (pass if rolling):
+    * _output_ of `uname -r`:
 
 - [ ] __macOS__:
-* _version_:
+    * _OS version_:
 
 #### Whence?
 (how and where did you get this program, e.g.: _"`ckb-next-git` package in AUR"_ or _"built manually using quickinstall script"_ or _"pkg for macOS"_)
@@ -68,8 +85,12 @@ If __yes__, then for
 
 You should upload:
 
-* a journal log gathered by your init system. Look for __usb__, __ckb__, __ckb-daemon__ and provide a meaningful context
-* the output of `ckb-daemon`: `systemctl status ckb-daemon`
+- [ ] Linux:
+    * a journal log gathered by your init system (`journalctl(1)` etc.) Look for __usb__, __ckb__, __ckb-daemon__ and provide a meaningful context
+    * the output of `ckb-daemon`: `systemctl status ckb-daemon`
+
+- [ ] macOS:
+    * the output of `ckb-daemon`: `sudo launchctl unload /Library/LaunchDaemons/com.ckb.daemon.plist && sudo /Applications/ckb.app/Contents/Resources/ckb-daemon`
 
 ### What is the program's current behavior?
 
@@ -79,6 +100,6 @@ You should upload:
 
 ---
 
-# Something else?
+# Something else
 
-
+<sub><sup>if your issue is about something else, try your best to describe it here, otherwise leave empty</sup></sub>

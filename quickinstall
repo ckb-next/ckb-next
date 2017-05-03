@@ -223,7 +223,7 @@ else
     read -rp "Start it now [Y/n]? " dodriver
     if [[ ! $dodriver =~ no? ]]; then
         sleep 0.5
-        sudo nohup "$PREFIX"/ckb-daemon >/dev/null 2>&1 &
+        sudo nohup "$PREFIX"/bin/ckb-daemon >/dev/null 2>&1 &
         checkfail $?
     fi
 fi
@@ -232,11 +232,11 @@ sleep 1
 echo ""
 read -rp "Start ckb now [Y/n]? " dolaunch
 [[ $dolaunch =~ no? ]] && exit 0
-APP="$PREFIX"/ckb
+APP="$PREFIX"/bin/ckb
 [[ "$OSTYPE" == "darwin"* ]] && APP="$APP".app/Contents/MacOS/ckb
 # Ask ckb to close if there's an instance already running
 "$APP" --close >/dev/null 2>&1
-sleep 0.5
+sleep 1
 # Launch
 nohup "$APP" >/dev/null 2>&1 &
 exit 0

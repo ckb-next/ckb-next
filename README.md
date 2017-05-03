@@ -1,8 +1,6 @@
 ckb-next: RGB Driver for Linux and OS X
 ==================================
 
-<a target="_blank" href="http://webchat.freenode.net?channels=%23ckb-next&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>
-
 **ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
 ![Screenshot](https://i.imgur.com/zMK9jOP.png)
@@ -43,6 +41,7 @@ TOC
     - [Reporting issues](#reporting-issues)
 - [Known issues](#known-issues)
 - [Contributing](#contributing)
+- [Contact us](#contact-us)
 
 <!-- /TOC -->
 
@@ -273,3 +272,11 @@ If you have a problem that you can't solve (and it isn't mentioned in the Known 
 ## Contributing
 
 You can contribute to the project by [opening a pull request](https://github.com/mattanger/ckb-next/pulls). It's best if you base your changes off of the `testing` branch as opposed to the `master`, because the pull request will be merged there first. If you'd like to contribute but don't know what you can do, take a look at [the issue tracker](https://github.com/mattanger/ckb-next/issues) and see if any features/problems are still unresolved. Feel free to ask if you'd like some ideas.
+
+## Contact us
+
+There are multiple ways you can get in touch with us:
+
+* [join](https://groups.google.com/forum/#!forum/ckb-next/join) `ckb-next` mailing list
+* [open](https://github.com/mattanger/ckb-next/issues) a GitHub Issue
+* hop on `#ckb-next` to chat <a target="_blank" href="http://webchat.freenode.net?channels=%23ckb-next&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>

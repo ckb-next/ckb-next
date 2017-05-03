@@ -3,7 +3,7 @@ Use it to put ticks and then switch back to write in the details where needed.
 
 <!-- TOC -->
 
-- [Before you procceed](#before-you-procceed)
+- [Before you proceed](#before-you-proceed)
 - [Devices](#devices)
     - [Keyboard](#keyboard)
     - [Mouse](#mouse)
@@ -14,7 +14,7 @@ Use it to put ticks and then switch back to write in the details where needed.
     - [Any other notes & comments?](#any-other-notes--comments)
 - [Bug report](#bug-report)
     - [General information](#general-information)
-        - [Whence?](#whence)
+        - [Source](#source)
         - [Version](#version)
         - [Branch](#branch)
     - [Logs & crash reports](#logs--crash-reports)
@@ -27,7 +27,7 @@ Use it to put ticks and then switch back to write in the details where needed.
 
 ---
 
-# Before you procceed
+# Before you proceed
 
 - [ ] __Try__ the latest code from the [`testing` branch](https://github.com/mattanger/ckb-next/tree/testing).
 - [ ] __Read__ the [`README.md`](https://github.com/mattanger/ckb-next/blob/master/README.md) _in full_.
@@ -35,7 +35,7 @@ Use it to put ticks and then switch back to write in the details where needed.
 - [ ] __Search__ in open _and_ closed [Issues](https://github.com/mattanger/ckb-next/issues). [Here's how](https://help.github.com/articles/searching-issues/).
 - [ ] __Avoid__ opening a new issue in case a similar one already exists (don't worry, we get the notifications for closed issues as well, it will be reopened if needed).
 - [ ] __Keep__ unrelated issues separate (create a new one if you are sure yours is unique).
-- [ ] __Use__ Markdown to write on the GitHub. [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet). Use triple backticks if copy-pasting more than _one_ line.
+- [ ] __Use__ [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) to write on GitHub. Use triple backticks if copy-pasting more than _one_ line.
 
 Now, __before you proceed even further__, make sure you are following the recommendations above. It will save a lot of time for you and us in the future.
 
@@ -97,7 +97,7 @@ Now, __before you proceed even further__, make sure you are following the recomm
 
 ## General information
 
-### Whence?
+### Source
 (how and where did you get this program, e.g.: _"`ckb-next-git` package in AUR"_ or _"built manually using quickinstall script"_ or _"pkg for macOS"_)
 
 ### Version

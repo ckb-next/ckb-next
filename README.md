@@ -13,25 +13,46 @@ What happened to the original [ckb](https://github.com/ccMSC/ckb)?
 ---
 Due to time restrictions, the original author of **ckb** [ccMSC](https://github.com/ccMSC) hasn't been able to further develop the software. So the community around it decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and not very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to the original ckb.
 
-Contents
+TOC
 --------
+<!-- TOC -->
 
-* [Current Status](#current-status)
-* [Device Support](#device-support)
-* [Linux Installation](#linux-installation)
-* [OS X/macOS Installation](#os-xmacos-installation)
-* [Usage](#usage)
-* [Troubleshooting](#troubleshooting)
-* [Known Issues](#known-issues)
-* [Contributing](#contributing)
+- [Current Status](#current-status)
+- [Device Support](#device-support)
+    - [Keyboards](#keyboards)
+    - [Mice](#mice)
+- [Linux Installation](#linux-installation)
+    - [Pre-made packages](#pre-made-packages)
+    - [Preparation](#preparation)
+    - [Installing](#installing)
+    - [Upgrading](#upgrading)
+    - [Uninstalling](#uninstalling)
+- [OS X/macOS Installation](#os-xmacos-installation)
+    - [Binary download](#binary-download)
+    - [Building from source](#building-from-source)
+    - [Upgrading (binary)](#upgrading-binary)
+    - [Upgrading (source)](#upgrading-source)
+    - [Uninstalling](#uninstalling-1)
+- [Usage](#usage)
+    - [Major features](#major-features)
+    - [Roadmap](#roadmap)
+- [Troubleshooting](#troubleshooting)
+    - [Linux](#linux)
+    - [OS X/macOS](#os-xmacos)
+    - [General](#general)
+    - [Reporting issues](#reporting-issues)
+- [Known issues](#known-issues)
+- [Contributing](#contributing)
+
+<!-- /TOC -->
 
 See also:
 
 * [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
 * [ckb testing repository](https://github.com/mattanger/ckb-next/tree/testing) (updated more frequently, but may be unstable)
 
-Current Status
---------------
+## Current Status
+
 Right now ckb-next is under active development.
 
 *We will cut a release and ship a macOS binary as soon as some important changes are done. Everything you see under "Releases" on GitHub are regular tags which are **NOT** releases. We have yet to publish our first release.*
@@ -40,10 +61,9 @@ Currently the recommended way to install ckb-next is to build it from source or 
 
 Thank you for the interest in this software and your patience.
 
-Device Support
---------------
+## Device Support
 
-Keyboards:
+### Keyboards
 
 * K65 RGB
 * K70
@@ -56,18 +76,16 @@ Keyboards:
 
 \* = hardware playback not supported. Settings will be saved to software only.
 
-Mice:
+### Mice
 
 * M65 RGB
 * M65 PRO RGB
 * Sabre RGB
 * Scimitar RGB
 
-Linux Installation
-------------------
+## Linux Installation
 
-#### Pre-made packages:
-**ckb-next** packages:
+### Pre-made packages
 
 * Fedora 24/25, CentOS/RHEL 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
     * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
@@ -77,7 +95,7 @@ Linux Installation
 
 If you are a package maintainer or want to discuss something with package maintainers let us know in [#5](https://github.com/mattanger/ckb-next/issues/5), so we can have an accountable and centralized communication about this. *If you would like to maintain a package for your favorite distro/OS, please let us know as well.*
 
-#### Preparation:
+### Preparation
 
 ckb-next requires Qt5 (Qt 5.6 recommened for OS X), libudev, zlib, gcc, g++, and glibc.
 
@@ -88,15 +106,15 @@ ckb-next requires Qt5 (Qt 5.6 recommened for OS X), libudev, zlib, gcc, g++, and
 
 Note: If you build your own kernels, ckb-next requires the uinput flag to be enabled (CONFIG_INPUT_UINPUT). It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
-#### Installing:
+### Installing
 
 You can download ckb-next using the "Download zip" option on the right or clone it using `git clone`. Extract it and open the ckb-master directory in a terminal. Run `./quickinstall`. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to hand-tune the compilation of ckb, see [`BUILD.md`](https://github.com/mattanger/ckb-next/blob/master/BUILD.md) for instructions.
 
-#### Upgrading:
+### Upgrading
 
 To install a new version of ckb, or to reinstall the same version, first delete the ckb-master directory and the zip file from your previous download. Then download the source code again and re-run `./quickinstall`. The script will automatically replace the previous installation. You may need to reboot afterward.
 
-#### Uninstalling:
+### Uninstalling
 
 First, stop the ckb-daemon service and remove the service file.
 * If you have systemd (Ubuntu versions starting with 15.04):
@@ -117,37 +135,37 @@ sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop 
 sudo rm -rf /usr/bin/ckb-animations
 ```
 
-OS X/macOS Installation
------------------
+## OS X/macOS Installation
 
-#### Binary download:
+### Binary download
 
 We do not provide binaries just for now. See [Current Status](#current-status).
 
-#### Building from source:
+### Building from source
 
 Install the latest version of Xcode from the App Store. Open Xcode, accept the license agreement, and wait for it to install any additional components (if necessary). When you see the "Welcome to Xcode" screen, the setup is finished and you can close the app. Then install Xcode Command Line Tools package issuing `xcode-select --install` in a Terminal app. Afterwards install Qt5 from here: http://www.qt.io/download-open-source/
 
 The easiest way to build the driver is with the `quickinstall` script, which is present in the ckb-master folder. Double-click on `quickinstall` and it will compile the app for you, then ask if you'd like to install it system-wide. If the build fails for any reason, or if you'd like to compile manually, see [`BUILD.md`](https://github.com/ccMSC/ckb/blob/master/BUILD.md).
 
-#### Upgrading (binary):
+### Upgrading (binary)
 
-Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one.
+~~Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one.~~
+See [Current Status](#current-status).
 
-#### Upgrading (source):
+### Upgrading (source)
 
 Remove the existing ckb-master directory and zip file. Re-download the source code and run the `quickinstall` script again. The script will automatically replace the previous installation. You may need to reboot afterward.
 
-#### Uninstalling:
+### Uninstalling
 
 Drag `ckb.app` into the trash. If the system service file isn't cleaned up automatically, you can find it and remove it here: `/Library/LaunchDaemons/com.ckb.daemon.plist`.
 
-Usage
------
+## Usage
 
 The user interface is still a work in progress.
 
-**Major features:**
+### Major features
+
 - Control multiple devices independently
 - United States and European keyboard layouts
 - Customizable key bindings
@@ -158,7 +176,8 @@ The user interface is still a work in progress.
 
 Closing ckb will actually minimize it to the system tray. Use the Quit option from the tray icon or the settings screen to exit the application.
 
-**Roadmap** (roughly in order)
+### Roadmap
+
 - **v0.3 release:**
 - Ability to store profiles separately from devices, import/export them
 - More functions for the Win Lock key
@@ -174,10 +193,9 @@ Closing ckb will actually minimize it to the system tray. Use the Quit option fr
 - Extra settings?
 - ????
 
-Troubleshooting
----------------
+## Troubleshooting
 
-#### Linux
+### Linux
 
 If you have problems connecting the device to your system (device doesn't respond, ckb-daemon doesn't recognize or can't connect it) and/or you experience long boot times when using the keyboard, try adding the following to your kernel's `cmdline`:
 
@@ -212,7 +230,7 @@ If the above didn't work out for you for some reason, see [#70](https://github.c
 
 If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo apt-get install libappindicator-dev`. Then reinstall ckb.
 
-#### OS X/macOS
+### OS X/macOS
 
 - **“ckb.pkg” can’t be opened because it is from an unidentified developer**
     Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
@@ -225,9 +243,7 @@ If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo 
 - **Scroll wheel does not scroll**
     As of #c3474d2 it's now possible to **disable scroll acceleration** from the GUI. You can access it under "OSX tweaks" in the "More settings" screen. Once disabled, the scroll wheel should behave consistently.
 
-
-
-#### General
+### General
 
 **Please ensure your keyboard firmware is up to date. If you've just bought the keyboard, connect it to a Windows computer first and update the firmware from Corsair's official utility.**
 
@@ -242,12 +258,11 @@ Common issues:
 - **Problem:** Keyboard isn't detected when plugged in, even if driver is already running
 - **Solution:** Try moving to a different USB port. Be sure to follow [Corsair's USB connection requirements](http://forum.corsair.com/v3/showthread.php?t=132322). Note that the keyboard does not work with some USB3 controllers - if you have problems with USB3 ports, try USB2 instead. If you have any USB hubs on hand, try those as well. You may also have success sliding the poll switch back and forth a few times.
 
-#### Reporting issues
+### Reporting issues
 
 If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/mattanger/ckb-next/issues). Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
 
-Known issues
-------------
+## Known issues
 
 - Using the keyboard in BIOS mode prevents the media keys (including mute and volume wheel), as well as the K95's G-keys from working. This is a hardware limitation.
 - The tray icon doesn't appear in some desktop environments. This is a known Qt bug. If you can't see the icon, reopen ckb to bring the window back.
@@ -255,7 +270,6 @@ Known issues
 - When stopping the driver manually, the keyboard sometimes stops working completely. You can reconnect it by moving the poll rate switch.
 - On newer versions of macOS (i.e. 10.12 and up) CMD/Shift+select does not work, yet. Stopping the daemon and GUI for `ckb` will fix this issue temporarily.
 
-Contributing
-------------
+## Contributing
 
 You can contribute to the project by [opening a pull request](https://github.com/mattanger/ckb-next/pulls). It's best if you base your changes off of the `testing` branch as opposed to the `master`, because the pull request will be merged there first. If you'd like to contribute but don't know what you can do, take a look at [the issue tracker](https://github.com/mattanger/ckb-next/issues) and see if any features/problems are still unresolved. Feel free to ask if you'd like some ideas.

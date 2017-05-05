@@ -24,7 +24,8 @@ static int int1_int_none(usbdevice* kb, int dummy){
     return 0;
 }
 
-// RGB keyboard vtable
+/// \brief RGB keyboard vtable holds functions for each device type.
+///
 const devcmd vtable_keyboard = {
     .hwload = cmd_hwload_kb,
     .hwsave = cmd_hwsave_kb,
@@ -62,7 +63,7 @@ const devcmd vtable_keyboard = {
     .restart = cmd_restart,
 
     .start = start_dev,
-    .setmodeindex = int1_void_none,             /// is just for non rgb keyboards
+    .setmodeindex = int1_void_none,             ///< is just for non rgb keyboards
     .allocprofile = allocprofile,
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,

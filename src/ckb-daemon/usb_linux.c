@@ -603,7 +603,7 @@ int usbadd(struct udev_device* dev, short vendor, short product) {
     return -1;
 }
 
-static struct udev* udev;   ///> struct udef is defined in /usr/include/libudev.h
+static struct udev* udev;   ///< struct udef is defined in /usr/include/libudev.h
 
 /// \todo These two thread vasriables seem to be unused: usbtread, udevthread
 pthread_t usbthread, udevthread;

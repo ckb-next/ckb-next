@@ -480,7 +480,7 @@ int usb_tryreset(usbdevice* kb){
 }
 
 ///
-/// \var hwload_mode is defined in device.c
+/// hwload_mode is defined in device.c
 ///
 extern int hwload_mode;
 

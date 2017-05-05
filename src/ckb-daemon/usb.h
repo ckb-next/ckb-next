@@ -241,7 +241,7 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
 /// \param[OUT] in_msg Here comes the answer; The names represent the usb view, not the view of this function! So INput from usb is OUTput of this function.
 /// \param[IN] file for debugging
 /// \param[IN] line for debugging
-/// \param[in] reset_stop global variable is read
+/// \param[IN] reset_stop global variable is read
 /// \return number of bytes read or zero on failure.
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line);
 

@@ -1,0 +1,84 @@
+# This will run on Travis' 'new' container-based infrastructure
+sudo: required
+
+# Blacklist
+branches:
+  except:
+    - gh-pages
+
+# Environment variables
+env:
+  global:
+    - GH_REPO_REF: "github.com/$GH_REPO_ORG/$GH_REPO_NAME.git"
+    - DOXYFILE1: $TRAVIS_BUILD_DIR/documentation/Doxy-ckb-daemon
+    - DOXYFILE2: $TRAVIS_BUILD_DIR/documentation/Doxy-ckb
+    - DOXYFILE3: $TRAVIS_BUILD_DIR/documentation/Doxy-ckb-all
+    - MAKEFLAGS: "-j 8"
+
+language: cpp
+
+matrix:
+ include:
+#  - os: linux
+#    dist: trusty
+#    sudo: required
+#    compiler: gcc
+#    env:
+#     - QT_BASE=56
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+     - QT_BASE=57
+     - MAKEDOXY=true
+#  - os: osx
+#    compiler: clang
+#    env:
+#     - QT_BASE=57
+
+before_install:
+  - if [ "$QT_BASE" = "56" ]; then sudo add-apt-repository ppa:beineri/opt-qt562-trusty -y; fi
+  - if [[ "$QT_BASE" = "57" && "$TRAVIS_OS_NAME" = "linux" ]]; then sudo add-apt-repository ppa:beineri/opt-qt571-trusty -y; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then 
+      sudo apt-get update -qq;
+    else
+      brew update;
+    fi
+
+install:
+  - if [ "$QT_BASE" = "56" ]; then sudo apt-get install -qq qt56base; source /opt/qt56/bin/qt56-env.sh; fi
+  - if [ "$QT_BASE" = "57" ]; then
+      if [ "$TRAVIS_OS_NAME" = "linux" ]; then 
+        sudo apt-get install -qq qt57base; source /opt/qt57/bin/qt57-env.sh; 
+      else
+        brew install qt5;
+        brew link --force qt5;
+      fi
+    fi
+
+# Install dependencies
+addons:
+  apt:
+    packages:
+      - doxygen
+      - doxygen-latex
+      - graphviz
+      - libudev-dev qt5-default
+      - zlib1g-dev
+      - libappindicator-dev
+
+# Build your code e.g. by calling make
+script:
+  - cd $TRAVIS_BUILD_DIR
+#  - echo "n" | ./quickinstall
+
+# Generate and deploy documentation
+after_success:
+  - if [ "$MAKEDOXY" = true ]; then
+        cd $TRAVIS_BUILD_DIR;
+        documentation/generateDocumentationAndDeploy.sh;
+    else
+        echo "Do not create Doxygen files";
+    fi
+

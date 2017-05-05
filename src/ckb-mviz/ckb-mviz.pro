@@ -10,7 +10,7 @@ macx {
     DESTDIR = $$PWD/../../bin/ckb-animations
 }
 
-CONFIG   = 
+CONFIG   = debug_and_release
 QT       =
 LIBS += -lpulse-simple
 

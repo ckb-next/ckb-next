@@ -10,11 +10,13 @@
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"
+#define P_K65_NRGB      0x1b07
+#define P_K65_NRGB_STR  "1b07"
 #define P_K65_LUX       0x1b37
 #define P_K65_LUX_STR   "1b37"
 #define P_K65_RFIRE     0x1b39
 #define P_K65_RFIRE_STR "1b39"
-#define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
+#define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_NRGB || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
 #define P_K70                0x1b13
 #define P_K70_STR            "1b13"
@@ -26,13 +28,17 @@
 #define P_K70_LUX_NRGB_STR   "1b36"
 #define P_K70_RFIRE          0x1b38
 #define P_K70_RFIRE_STR      "1b38"
-#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
+#define P_K70_RFIRE_NRGB     0x1b3a
+#define P_K70_RFIRE_NRGB_STR "1b3a"
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
 
 #define P_K95           0x1b11
 #define P_K95_STR       "1b11"
 #define P_K95_NRGB      0x1b08
 #define P_K95_NRGB_STR  "1b08"
-#define IS_K95(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95 || (kb)->product == P_K95_NRGB))
+#define P_K95_PLATINUM  0x1b2d
+#define P_K95_PLATINUM_STR "1b2d"
+#define IS_K95(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95 || (kb)->product == P_K95_NRGB || (kb)->product == P_K95_PLATINUM))
 
 #define P_STRAFE            0x1b20
 #define P_STRAFE_STR        "1b20"
@@ -56,9 +62,11 @@
 #define P_SABRE_O2_STR  "1b32"
 #define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
 
-#define P_SCIMITAR      0x1b1e
-#define P_SCIMITAR_STR  "1b1e"
-#define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR))
+#define P_SCIMITAR          0x1b1e
+#define P_SCIMITAR_STR      "1b1e"
+#define P_SCIMITAR_PRO      0x1b3e
+#define P_SCIMITAR_PRO_STR  "1b3e"
+#define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
 
 // NOTE: when adding new devices please update src/ckb/fwupgradedialog.cpp as well.
 // It should contain the same vendor/product IDs for any devices supporting firmware updates.
@@ -66,12 +74,15 @@
 //uncomment to see USB packets sent to the device
 //#define DEBUG_USB
 
+//uncomment to see USB packets sent from the device
+//#define DEBUG_USB_RECV
+
 const char* vendor_str(short vendor);
 const char* product_str(short product);
 
 // RGB vs non-RGB test
 // (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol. The difference is denoted with the "monochrome" feature)
-#define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+#define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 #define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
 #define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
 #define IS_MONOCHROME_DEV(kb)           IS_MONOCHROME((kb)->vendor, (kb)->product)
@@ -80,7 +91,7 @@ const char* product_str(short product);
 #define IS_FULLRANGE(kb)                (IS_RGB((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95)
 
 // Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SABRE_O2)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2)))
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
 // USB delays for when the keyboards get picky about timing

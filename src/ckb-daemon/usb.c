@@ -24,11 +24,11 @@ const char* vendor_str(short vendor){
 }
 
 const char* product_str(short product){
-    if(product == P_K95 || product == P_K95_NRGB)
+    if(product == P_K95 || product == P_K95_NRGB || product == P_K95_PLATINUM)
         return "k95";
-    if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE)
+    if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
-    if(product == P_K65 || product == P_K65_LUX || product == P_K65_RFIRE)
+    if(product == P_K65 || product == P_K65_NRGB || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";
     if(product == P_STRAFE || product == P_STRAFE_NRGB)
         return "strafe";
@@ -36,7 +36,7 @@ const char* product_str(short product){
         return "m65";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
-    if(product == P_SCIMITAR)
+    if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)
         return "scimitar";
     return "";
 }

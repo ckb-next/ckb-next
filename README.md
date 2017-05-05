@@ -126,11 +126,22 @@ sudo rm -f /usr/lib/systemd/system/ckb-daemon.service
 sudo service ckb-daemon stop
 sudo rm -f /etc/init/ckb-daemon.conf
 ```
-* If you're not sure, re-run the `quickinstall` script and proceed to the service installation. The script will say `System service: Upstart detected` or `System service: systemd detected`
+* If you have OpenRC:
+```
+sudo rc-service ckb-daemon stop
+sudo rc-update del ckb-daemon default
+sudo rm -f /etc/init.d/ckb-daemon
+```
+* If you're not sure, re-run the `quickinstall` script and proceed to the service installation. The script will say `System service: Upstart detected` or `System service: systemd detected`. Please be aware that OpenRC is currently not detected automatically.
 
 Afterward, remove the applications and related files:
 ```
 sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop /usr/share/icons/hicolor/512x512/apps/ckb.png
+sudo rm -rf /usr/lib/ckb-animations
+```
+
+Before https://github.com/mattanger/ckb-next/commit/f347e60df211c60452f95084b6c46dc4ec5f42ee animations were located elsewhere, try removing them as well:
+```
 sudo rm -rf /usr/bin/ckb-animations
 ```
 

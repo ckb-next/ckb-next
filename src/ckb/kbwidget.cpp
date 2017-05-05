@@ -226,6 +226,13 @@ void KbWidget::on_modesList_itemClicked(QListWidgetItem* item){
     }
 }
 
+///
+/// \brief KbWidget::on_modesList_customContextMenuRequested
+/// \param pos
+/// Opens on right click in the profiles list a context sensitive menue
+/// at position pos.
+///
+/// When clicking on a command it is located and executed.
 void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     QListWidgetItem* item = ui->modesList->itemAt(pos);
     if(!item || !currentMode || item->data(GUID).toUuid() != currentMode->id().guid)

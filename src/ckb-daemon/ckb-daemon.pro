@@ -13,7 +13,7 @@ macx {
     LIBS = -lpthread -ludev
 }
 
-QMAKE_CFLAGS  = -std=gnu99 -Wno-unused-parameter -Werror=all
+QMAKE_CFLAGS  += -std=gnu99 -Wno-unused-parameter -Werror=all
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 
 # Minimal build - remove Qt defaults

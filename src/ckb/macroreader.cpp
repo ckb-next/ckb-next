@@ -24,7 +24,7 @@ void MacroReader::startWorkInAThread(int macroNumber, QString macroPath, QPlainT
 /// \class MacroReaderThread
 ///
 void MacroReaderThread::readMacro(QString line) {
-    /// \detail We want to see the keys as they appear in the macroText Widget.
+    /// \details We want to see the keys as they appear in the macroText Widget.
     ///
     /// Because it is possible to change the Focus via keyboard,
     /// we must set the focus on each call.
@@ -37,8 +37,8 @@ void MacroReaderThread::readMacro(QString line) {
 
 //////////
 /// \brief MacroReaderThread::run is the standard main function for a thread.
-/// Tries to open a file <macroPath><macroNumber> several times
-/// (in this case, it should be possible the first time. (The code was recycled from kb.cpp).
+/// Tries to open a file \<macroPath\>\<macroNumber\> several times
+/// (in this case, it should be possible the first time (the code was recycled from kb.cpp).
 ///
 /// While the file is open, read lines an signal them via metaObject() to the main thread.
 /// When the file is closed by the sender, close it as reader and terminate.

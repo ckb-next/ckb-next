@@ -17,6 +17,13 @@ QMutex settingsMutex(QMutex::Recursive), settingsCacheMutex(QMutex::Recursive);
 #define lockMutexStatic2    QMutexLocker locker2(&settingsMutex)
 #define lockMutexCache      QMutexLocker locker(&settingsCacheMutex)
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 5, 0)
+#define qInfo       qDebug
+#define qWarning    qDebug
+#define qFatal      qDebug
+#define qCritical   qDebug
+#endif
+
 static QSettings* globalSettings(){
     if(!_globalSettings){
         lockMutexStatic;

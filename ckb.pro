@@ -1,5 +1,5 @@
-lessThan(QT_VERSION, 5.0) {
-    error("ckb requires at least Qt 5.0!")
+lessThan(QT_VERSION, 5.2) {
+    error("ckb requires at least Qt 5.2!")
 }
 
 TEMPLATE = subdirs

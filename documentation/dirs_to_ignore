@@ -1,0 +1,12 @@
+.
+./.git
+./bin
+./src
+./osx
+./doxygenDoc
+./documentation
+./service
+./usr
+./usb-related-comments
+./testing-61-CKB-next-doesnt-remember-settings-after-restart
+./testing-documentation

@@ -1,0 +1,26 @@
+all: refman.pdf
+
+pdf: refman.pdf
+
+refman.pdf: clean refman.tex
+	echo Erster Schritt
+	-pdflatex -interaction=nonstopmode refman
+	echo Zweiter Schritt
+	makeindex refman.idx
+	echo Dritter Schritt
+	-pdflatex -interaction=nonstopmode refman
+	echo Vierter Schritt
+	latex_count=8 ; \
+	while egrep -s 'Rerun (LaTeX|to get cross-references right)' refman.log && [ $$latex_count -gt 0 ] ;\
+	    do \
+	      echo "Rerunning latex...." ;\
+	      echo Schritt $$latex_count ;\
+	      pdflatex -interaction=nonstopmode refman ;\
+	      latex_count=`expr $$latex_count - 1` ;\
+	    done
+	makeindex refman.idx
+	echo letzter Schritt
+	-pdflatex -interaction=nonstopmode refman
+
+clean:
+	rm -f *.ps *.dvi *.aux *.toc *.idx *.ind *.ilg *.log *.out *.brf *.blg *.bbl refman.pdf

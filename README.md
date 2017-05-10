@@ -8,7 +8,6 @@
 
 <!-- TOC depthFrom:2 -->
 
-- [What happened to the original [ckb](https://github.com/ccMSC/ckb)?](#what-happened-to-the-original-ckbhttpsgithubcomccmscckb)
 - [Device Support](#device-support)
     - [Keyboards](#keyboards)
     - [Mice](#mice)
@@ -35,6 +34,7 @@
 - [Known issues](#known-issues)
 - [Contributing](#contributing)
 - [Contact us](#contact-us)
+- [What happened to the original ckb](#what-happened-to-the-original-ckb)
 
 <!-- /TOC -->
 
@@ -42,11 +42,6 @@ See also:
 
 * [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
 * [ckb testing repository](https://github.com/mattanger/ckb-next/tree/testing) (updated more frequently, but may be unstable)
-
-
-## What happened to the original [ckb](https://github.com/ccMSC/ckb)?
-
-Due to time restrictions, the original author of **ckb** [ccMSC](https://github.com/ccMSC) hasn't been able to further develop the software. So the community around it decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and not very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to the original ckb.
 
 ## Device Support
 
@@ -279,3 +274,7 @@ There are multiple ways you can get in touch with us:
 * [join](https://groups.google.com/forum/#!forum/ckb-next/join) `ckb-next` mailing list
 * [open](https://github.com/mattanger/ckb-next/issues) a GitHub Issue
 * hop on `#ckb-next` to chat <a target="_blank" href="http://webchat.freenode.net?channels=%23ckb-next&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>
+
+## What happened to the original ckb
+
+Due to time restrictions, the original author of **ckb** [ccMSC](https://github.com/ccMSC) hasn't been able to further develop the software. So the community around it decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and not very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to the original ckb.

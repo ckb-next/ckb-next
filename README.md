@@ -1,5 +1,4 @@
-ckb-next: RGB Driver for Linux and OS X
-==================================
+# ckb-next: RGB Driver for Linux and OS X
 
 **ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
@@ -7,15 +6,9 @@ ckb-next: RGB Driver for Linux and OS X
 
 **Disclaimer:** ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
-What happened to the original [ckb](https://github.com/ccMSC/ckb)?
----
-Due to time restrictions, the original author of **ckb** [ccMSC](https://github.com/ccMSC) hasn't been able to further develop the software. So the community around it decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and not very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to the original ckb.
+<!-- TOC depthFrom:2 -->
 
-TOC
---------
-<!-- TOC -->
-
-- [Current Status](#current-status)
+- [What happened to the original [ckb](https://github.com/ccMSC/ckb)?](#what-happened-to-the-original-ckbhttpsgithubcomccmscckb)
 - [Device Support](#device-support)
     - [Keyboards](#keyboards)
     - [Mice](#mice)
@@ -50,15 +43,10 @@ See also:
 * [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
 * [ckb testing repository](https://github.com/mattanger/ckb-next/tree/testing) (updated more frequently, but may be unstable)
 
-## Current Status
 
-Right now ckb-next is under active development.
+## What happened to the original [ckb](https://github.com/ccMSC/ckb)?
 
-*We will cut a release and ship a macOS binary as soon as some important changes are done. Everything you see under "Releases" on GitHub are regular tags which are **NOT** releases. We have yet to publish our first release.*
-
-Currently the recommended way to install ckb-next is to build it from source or install an appropriate package from a package repository. See [Linux Installation](#linux-installation) and [OS X/macOS Installation](#os-xmacos-installation).
-
-Thank you for the interest in this software and your patience.
+Due to time restrictions, the original author of **ckb** [ccMSC](https://github.com/ccMSC) hasn't been able to further develop the software. So the community around it decided to take the project over and continue its development. That's how **ckb-next** was created. Currently it's not rock solid and not very easy to set up on newer systems but we are actively working on this. Nevertheless the project already incorporates a notable amount of fixes and patches in comparison to the original ckb.
 
 ## Device Support
 
@@ -96,14 +84,14 @@ If you are a package maintainer or want to discuss something with package mainta
 
 ### Preparation
 
-ckb-next requires Qt5 (Qt 5.6 recommened for OS X), libudev, zlib, gcc, g++, and glibc.
+ckb-next requires Qt5 (Qt 5.8 is recommended), libudev, zlib, gcc, g++, and glibc.
 
 * Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
 * Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
 * Arch: `sudo pacman -S base-devel qt5-base zlib`
 * Other distros: Look for `qt5` or `libqt5*-devel`
 
-Note: If you build your own kernels, ckb-next requires the uinput flag to be enabled (CONFIG_INPUT_UINPUT). It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
+Note: If you build your own kernels, ckb-next requires the `CONFIG_INPUT_UINPUT` flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
 
 ### Installing
 
@@ -149,7 +137,7 @@ sudo rm -rf /usr/bin/ckb-animations
 
 ### Binary download
 
-We do not provide binaries just for now. See [Current Status](#current-status).
+macOS `pkg` can be downloaded from [GitHub Releases](https://github.com/mattanger/ckb-next/releases). It is always built with the last available stable Qt version and tagrets 10.10 SDK. If you run 10.9.x, you'll need to build the project from source and comment out `src/ckb-heat` (and the backslash above it) inside `ckb.pro`.
 
 ### Building from source
 
@@ -159,8 +147,7 @@ The easiest way to build the driver is with the `quickinstall` script, which is 
 
 ### Upgrading (binary)
 
-~~Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one.~~
-See [Current Status](#current-status).
+Download the latest `ckb.pkg`, run the installer, and reboot. The newly-installed driver will replace the old one.
 
 ### Upgrading (source)
 
@@ -168,7 +155,12 @@ Remove the existing ckb-master directory and zip file. Re-download the source co
 
 ### Uninstalling
 
-Drag `ckb.app` into the trash. If the system service file isn't cleaned up automatically, you can find it and remove it here: `/Library/LaunchDaemons/com.ckb.daemon.plist`.
+Drag `ckb.app` into the trash. Then stop and remove the agent:
+
+```sh
+sudo unload /Library/LaunchDaemons/com.ckb.daemon.plist
+sudo rm /Library/LaunchDaemons/com.ckb.daemon.plist
+```
 
 ## Usage
 
@@ -229,14 +221,10 @@ If you have multiple devices, combine them with commas, starting after the `=`. 
 If it still doesn't work, try replacing `0x20000408` with `0x4`. Note that this will cause the kernel driver to ignore the device(s) completely, so you need to ensure ckb-daemon is running at boot or else you'll have no input. This will not work if you are using full-disk encryption.
 
 If you see **GLib** critical errors like
-`GLib-GObject-CRITICAL **: g_type_add_interface_static: assertion 'G_TYPE_IS_INSTANTIATABLE (instance_type)' failed`
-and you are using:
-
-- Qt 5.8 and newer, remove your Qt configuration files and restart the ckb GUI. Also watch out for different style overridings in dotfiles under `~/` generated by Qt automatically, remove them as well.
-
-- Qt 5.7 and lower, install `qt5ct` package on Arch Linux (find a similar one for your distribution). That's all. This is a known Qt bug. It happened because Qt did not ship required GTK files.
-
-If the above didn't work out for you for some reason, see [#70](https://github.com/mattanger/ckb-next/issues/70), [#51](https://github.com/mattanger/ckb-next/issues/51), [ccMSC/ckb#500](https://github.com/ccMSC/ckb/issues/500), [ccMSC/ckb#461](https://github.com/ccMSC/ckb/issues/500).
+```
+GLib-GObject-CRITICAL **: g_type_add_interface_static: assertion 'G_TYPE_IS_INSTANTIATABLE (instance_type)' failed
+```
+read [this Arch Linux thread](https://bbs.archlinux.org/viewtopic.php?id=214147) and try different combinations from it. If it doesn't help, you might want get support from your distribution community and tell them you cannot solve the problem in this thread.
 
 If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo apt-get install libappindicator-dev`. Then reinstall ckb.
 

@@ -344,23 +344,30 @@ void register_mouse_event_tap(CFRunLoopRef run_loop) {
                         CGEventMaskBit(kCGEventOtherMouseUp) |
                         CGEventMaskBit(kCGEventOtherMouseDragged);
 
-    // Create the tap. This is what will specify what to call (mouse_event_modifier_callback)
-    // whenever a mouse event happens.
-    mouse_event_tap = CGEventTapCreate(kCGHIDEventTap,
-                                 kCGHeadInsertEventTap,
-                                 kCGEventTapOptionDefault,
-                                 mask,
-                                 mouse_event_modifier_callback,
-                                 NULL);
-
-    // Add the tap to the runloop
-    if (mouse_event_tap) {
-        CFRunLoopSourceRef run_loop_source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouse_event_tap, 0);
-        if (run_loop_source) {
-            ckb_info("Registering EventTap for modifier keys.\n");
-            CFRunLoopAddSource(run_loop, run_loop_source, kCFRunLoopCommonModes);
-            CGEventTapEnable(mouse_event_tap, true);
-            CFRelease(run_loop_source);
+    // Repeat this step until the mouse_event_tap can be created. This is
+    // because the CGEventTapCreate needs that the windows server are running
+    // to create the event.
+    while (!mouse_event_tap) {
+        // Create the tap. This is what will specify what to call (mouse_event_modifier_callback)
+        // whenever a mouse event happens.
+        mouse_event_tap = CGEventTapCreate(kCGHIDEventTap,
+                                           kCGHeadInsertEventTap,
+                                           kCGEventTapOptionDefault,
+                                           mask,
+                                           mouse_event_modifier_callback,
+                                           NULL);
+        
+        if (mouse_event_tap) {
+            // Add the tap to the runloop
+            CFRunLoopSourceRef run_loop_source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouse_event_tap, 0);
+            if (run_loop_source) {
+                ckb_info("Registering EventTap for modifier keys.\n");
+                CFRunLoopAddSource(run_loop, run_loop_source, kCFRunLoopCommonModes);
+                CGEventTapEnable(mouse_event_tap, true);
+                CFRelease(run_loop_source);
+            }
+        } else {
+            sleep(5);
         }
     }
 }

@@ -201,9 +201,11 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             { 0xff, 0x03, 24, 0 },
         };
 
-        /// Since Firmware Version 2.05 the answers for getting the stored color-maps from the hardware
+        /// Since Firmware Version 2.05 for K95RGB the answers for getting the stored color-maps from the hardware
         /// has changed a bit. So comparing for the correct answer cannot validate against the cmd,
         /// and has to be done against a third map.
+        /// Up to now we know, that K70RGB Pro has firmware version 2.04 and havin the problem also.
+        /// So we have to determine in the most inner loop the firmware version and type of KB to select the correct compare-table.
 
         uchar cmp_pkt[4][4] = {
             { 0x0e, 0x14, 0x03, 0x01 },
@@ -211,21 +213,25 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             { 0x0e, 0xff, 0x02, 60 },
             { 0x0e, 0xff, 0x03, 24 },
         };
-        // Read colors
+        /// Read colors
         uchar* colors[3] = { light->r, light->g, light->b };
         for(int clr = 0; clr < 3; clr++){
             for(int i = 0; i < 4; i++){
                 if(!usbrecv(kb, data_pkt[i + clr * 4], in_pkt[i]))
                     return -1;
-                // Make sure the first four bytes match
-                // see comment above
-                // if(memcmp(p, data_pkt[i + clr * 4], 4)){
-                if (memcmp(in_pkt[i], (kb->fwversion >= 0x0205)? cmp_pkt[i] : data_pkt[i + clr * 4], 4)) {
+
+                uchar* comparePacket = data_pkt[i + clr * 4];   ///> That is the old comparison method: you get back what you sent.
+                /// Normally a firmware version >= 2.05 runs with the new compare array.
+                /// Up to now there is a 2.04 running in K70 RGB Lux with the same behavior.
+                if ((kb->fwversion >= 0x205) || ((kb->fwversion >= 0x204) && (kb->product == P_K70_LUX_NRGB))) {
+                    comparePacket = cmp_pkt[i];
+                }
+
+                if (memcmp(in_pkt[i], comparePacket, 4)) {
                     ckb_err("Bad input header\n");
-                    ckb_err("color = %d, i = %d, mode = %d\nInput(Antwort): %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x\nOutput (Frage): %2.2x %2.2x %2.2x %2.2x\n", clr, i, mode,
-						in_pkt[i][0], in_pkt[i][1], in_pkt[i][2], in_pkt[i][3], in_pkt[i][4], in_pkt[i][5], in_pkt[i][6], in_pkt[i][7],
-                            // data_pkt[i + clr * 4][0], 	data_pkt[i + clr * 4 ][1], 	data_pkt[i + clr * 4 ][2], 	data_pkt[i + clr * 4 ][3]);
-                        cmp_pkt[i][0], cmp_pkt[i][1], cmp_pkt[i][2], cmp_pkt[i][3]);
+                    ckb_err("color = %d, i = %d, mode = %d\nOutput (Request): %2.2x %2.2x %2.2x %2.2x\nInput(Reply): %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x\n", clr, i, mode,
+                        comparePacket[0], comparePacket[1], comparePacket[2], comparePacket[3],
+                        in_pkt[i][0], in_pkt[i][1], in_pkt[i][2], in_pkt[i][3], in_pkt[i][4], in_pkt[i][5], in_pkt[i][6], in_pkt[i][7]);
                     in_pkt[2][0] = 0x99;
                     in_pkt[2][1] = 0x99;
                     in_pkt[2][2] = 0x99;

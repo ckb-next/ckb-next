@@ -232,6 +232,7 @@ const devcmd vtable_mousepad = {
     .updatedpi = int1_int_none
 };
 
+<<<<<<< HEAD
 // Legacy mouse vtable
 const devcmd vtable_mouse_legacy = {
     .hwload = cmd_io_none,
@@ -263,7 +264,6 @@ const devcmd vtable_mouse_legacy = {
     .dpisel = cmd_dpisel,
     .lift = cmd_lift_legacy,
     .snap = cmd_snap_legacy,
-
     .notify = cmd_notify,
     .inotify = cmd_inotify,
     .get = cmd_get,
@@ -276,4 +276,50 @@ const devcmd vtable_mouse_legacy = {
     .updatergb = updatergb_mouse_legacy,
     .updateindicators = int1_void_none,
     .updatedpi = updatedpi_legacy
+};
+
+// RGB Headset
+const devcmd vtable_headset = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_fwupdate,
+    .pollrate = cmd_io_none,
+
+    .active = cmd_io_none,
+    .idle = cmd_io_none,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_none,
+    .ion = cmd_none,
+    .iauto = cmd_none,
+
+    .bind = cmd_none,
+    .unbind = cmd_none,
+    .rebind = cmd_none,
+    .macro = cmd_macro_none,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_dev,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile,
+    .freeprofile = freeprofile,
+    .updatergb = int1_int_none,
+    .updateindicators = int1_void_none,
+    .updatedpi = int1_int_none
 };

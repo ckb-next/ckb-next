@@ -204,7 +204,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
         /// Since Firmware Version 2.05 for K95RGB the answers for getting the stored color-maps from the hardware
         /// has changed a bit. So comparing for the correct answer cannot validate against the cmd,
         /// and has to be done against a third map.
-        /// Up to now we know, that K70RGB Pro has firmware version 2.04 and havin the problem also.
+        /// Up to now we know, that K70RGB Pro and K70 Lux RGB have firmware version 2.04 and having the problem also.
         /// So we have to determine in the most inner loop the firmware version and type of KB to select the correct compare-table.
 
         uchar cmp_pkt[4][4] = {
@@ -223,7 +223,10 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
                 uchar* comparePacket = data_pkt[i + clr * 4];   ///> That is the old comparison method: you get back what you sent.
                 /// Normally a firmware version >= 2.05 runs with the new compare array.
                 /// Up to now there is a 2.04 running in K70 RGB Lux with the same behavior.
-                if ((kb->fwversion >= 0x205) || ((kb->fwversion >= 0x204) && (kb->product == P_K70_LUX_NRGB))) {
+                /// It seems that K70RGB has the same problem
+                if ((kb->fwversion >= 0x205)
+                        || ((kb->fwversion >= 0x204)
+                            && ((kb->product == P_K70_LUX_NRGB) || (kb->product == P_K70_LUX)))) {
                     comparePacket = cmp_pkt[i];
                 }
 

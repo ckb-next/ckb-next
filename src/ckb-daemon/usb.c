@@ -597,7 +597,7 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
 /// More is ok but useless, less brings unpredictable behavior.
 ///
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line){
-    // Try a maximum of 3 times
+    // Try a maximum of 5 times
     for(int try = 0; try < 5; try++){
         // Send the output message
         DELAY_SHORT(kb);

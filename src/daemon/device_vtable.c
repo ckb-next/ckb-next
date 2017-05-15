@@ -234,3 +234,49 @@ const devcmd vtable_mousepad = {
     .updateindicators = int1_void_none,
     .updatedpi = int1_int_none
 };
+
+// RGB Headset
+const devcmd vtable_headset = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_fwupdate,
+    .pollrate = cmd_io_none,
+
+    .active = cmd_io_none,
+    .idle = cmd_io_none,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_none,
+    .ion = cmd_none,
+    .iauto = cmd_none,
+
+    .bind = cmd_none,
+    .unbind = cmd_none,
+    .rebind = cmd_none,
+    .macro = cmd_macro_none,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_dev,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile,
+    .freeprofile = freeprofile,
+    .updatergb = int1_int_none,
+    .updateindicators = int1_void_none,
+    .updatedpi = int1_int_none
+};

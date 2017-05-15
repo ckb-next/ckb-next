@@ -183,6 +183,7 @@ extern const union devcmd vtable_keyboard;
 extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mousepad;
+extern const union devcmd vtable_headset;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN 50

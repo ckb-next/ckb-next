@@ -170,6 +170,10 @@ int main(int argc, char *argv[]){
     qsrand(QDateTime::currentMSecsSinceEpoch());
 #ifdef Q_OS_MACX
     disableAppNap();
+
+    FILE *fp = fopen("/tmp/ckb", "w");
+    fprintf(fp, "%d", getpid());
+    fclose(fp);
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     // Enable HiDPI support

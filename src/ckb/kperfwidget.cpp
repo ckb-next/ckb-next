@@ -3,6 +3,10 @@
 #include "modeselectdialog.h"
 #include <cmath>
 
+///
+/// \brief KPerfWidget::KPerfWidget sets up the UI for Keyboard Performace panel
+/// \param parent
+///
 KPerfWidget::KPerfWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::KPerfWidget)
@@ -51,10 +55,20 @@ KPerfWidget::KPerfWidget(QWidget *parent) :
     k95Widgets << ui->modeBox << ui->modeColorOn << ui->modeColorOff << ui->macroBox << ui->macroColorOn << ui->macroColorOff << ui->k95Label1 << ui->k95Label2 << ui->k95Label3 << ui->k95Label4 << ui->k95Label5 << ui->k95Label6 << ui->k95Line << ui->k95Spacer;
 }
 
+///
+/// \brief KPerfWidget::~KPerfWidget nothing unusual - just delete the ui object
+///
 KPerfWidget::~KPerfWidget(){
     delete ui;
 }
 
+///
+/// \brief KPerfWidget::raw2Mode return hardware mode depending on setiings in \a sw_enable and \a hw_enable
+/// \param sw_enable
+/// \param hw_enable
+/// \return the mode of operation for key-coloring and separate indicators.
+/// \see KPerfWidget::mode2Raw for details.
+///
 KPerfWidget::HwMode KPerfWidget::raw2Mode(bool sw_enable, i_hw hw_enable){
     if(sw_enable){
         if(hw_enable == KbPerf::NORMAL)
@@ -69,6 +83,20 @@ KPerfWidget::HwMode KPerfWidget::raw2Mode(bool sw_enable, i_hw hw_enable){
     }
 }
 
+///
+/// \brief KPerfWidget::mode2Raw Set values of sw_enable and hw_enable to hte value corresponding to input var mode
+/// \param [IN] mode
+/// \param [OUT] sw_enable
+/// \param [OUT] hw_enable
+/// mode determines how colors at a key and separate indicators should be handled:
+/// Mode | sw | hw
+/// _ | _ | _
+/// NORMAL | No color change at the key | use the separate indicator depending on key state
+/// ALWAYS_ON | No color change at the key | switch on separate indicator
+/// ALWAYS_OFF | No color change at the key | switch off separate indicator
+/// RGB | use color change at the key depending on color sliders | switch off separate indicator
+/// BOTH | use color change at the key depending on color sliders | use the separate indicator depending on key state
+///
 void KPerfWidget::mode2Raw(HwMode mode, bool& sw_enable, i_hw& hw_enable){
     switch(mode){
     case NORMAL:

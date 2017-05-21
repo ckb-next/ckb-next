@@ -109,7 +109,7 @@ public:
 
     // Updates settings to the driver. Write "mode %d" first. Disable saveCustomDpi when writing a hardware profile or other permanent storage.
     // By default, nothing will be written unless the settings have changed. Use force = true or call setNeedsUpdate() to override.
-    void        update(QFile& cmd, bool force = false, bool saveCustomDpi = true);
+    void        update(QFile& cmd, int notifyNumber, bool force = false, bool saveCustomDpi = true);
     inline void setNeedsUpdate()        { _needsUpdate = true; }
 
     // Get indicator status to send to KbLight

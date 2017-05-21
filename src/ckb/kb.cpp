@@ -418,7 +418,7 @@ void Kb::frameUpdate(){
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
     cmd.write(" ");
-    perf->update(cmd, changed);
+    perf->update(cmd, notifyNumber, changed);
     cmd.write("\n");
     cmd.flush();
 }

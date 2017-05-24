@@ -370,7 +370,7 @@ void KbPerf::angleSnap(bool newAngleSnap){
     _needsUpdate = _needsSave = true;
 }
 
-void KbPerf::update(QFile& cmd, bool force, bool saveCustomDpi){
+void KbPerf::update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi){
     if(!force && !_needsUpdate)
         return;
     emit settingsUpdated();
@@ -408,7 +408,7 @@ void KbPerf::update(QFile& cmd, bool force, bool saveCustomDpi){
         cmd.write(output);
     }
     // Enable indicator notifications
-    cmd.write(" inotify all");
+    cmd.write(QString("\n@%1 inotify all").arg(notifyNumber).toLatin1());
     // Set indicator state
     const char* iNames[HW_I_COUNT] = { "num", "caps", "scroll" };
     for(int i = 0; i < HW_I_COUNT; i++){

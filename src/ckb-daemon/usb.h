@@ -19,13 +19,14 @@
 ///
 /// Block No. | contains | Devices are bundled via
 /// --------- | -------- | -----------------------
-/// 1 | The first block contains the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
-/// 2 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
-/// 3 | the K95 series keyboards | collected with the macro IS_K95().
-/// 4 | strafe keyboards | IS_STRAFE()
-/// 5 | M65 mice with and without RGB | IS_M65()
-/// 6 | The SABRE and HARPOON mice.\n Maybe this will be divided int two different blocks later because of different nummber of special keys | IS_SABRE()
-/// 7 | The Scimitar mouse devices | IS_SCIMITAR()
+/// 1 | The first block contains the K63 Non RGB Keyboard. No other K63 is known so far.
+/// 2 | the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
+/// 3 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
+/// 4 | the K95 series keyboards | collected with the macro IS_K95().
+/// 5 | strafe keyboards | IS_STRAFE()
+/// 6 | M65 mice with and without RGB | IS_M65()
+/// 7 | The SABRE and HARPOON mice.\n Maybe this will be divided int two different blocks later because of different nummber of special keys | IS_SABRE()
+/// 8 | The Scimitar mouse devices | IS_SCIMITAR()
 ///
 
 /// \brief For the following Defines please see "Detailed Description"
@@ -37,6 +38,10 @@
 ///
 #define V_CORSAIR       0x1b1c
 #define V_CORSAIR_STR   "1b1c"
+
+#define P_K63_NRGB      0x1b40
+#define P_K63_NRGB_STR  "1b40"
+#define IS_K63(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K63_NRGB)
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"

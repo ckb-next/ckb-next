@@ -89,11 +89,14 @@ static int has_key(const char* name, const usbdevice* kb){
         // Only K95 has G keys and M keys (G1 - G18, MR, M1 - M3)
         if(!IS_K95(kb) && ((name[0] == 'g' && name[1] >= '1' && name[1] <= '9') || (name[0] == 'm' && (name[1] == 'r' || name[1] == '1' || name[1] == '2' || name[1] == '3'))))
             return 0;
-        // Only K65 has lights on VolUp/VolDn
-        if(!IS_K65(kb) && (!strcmp(name, "volup") || !strcmp(name, "voldn")))
+        // K65 and K63 have lights on VolUp/VolDn
+        if((!IS_K65(kb) && !IS_K63(kb)) && (!strcmp(name, "volup") || !strcmp(name, "voldn")))
             return 0;
         // K65 lacks numpad and media buttons
         if(IS_K65(kb) && (strstr(name, "num") == name || !strcmp(name, "stop") || !strcmp(name, "prev") || !strcmp(name, "play") || !strcmp(name, "next")))
+            return 0;
+        // K63 lacks numpad
+        if(IS_K63(kb) && strstr(name, "num") == name)
             return 0;
     }
     return 1;

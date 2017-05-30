@@ -143,7 +143,7 @@ static void patchANSI(QHash<QString, Key>& map){
 #define K65_HEIGHT      K70_HEIGHT
 
 // K63 is the same as the K65 in terms of size
-#define K63_WIDTH       209
+#define K63_WIDTH       K65_WIDTH
 #define K63_HEIGHT      K65_HEIGHT
 
 static const Key K65TopRow[] = {

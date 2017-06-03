@@ -125,18 +125,22 @@ void KbFirmware::processDownload(QNetworkReply* reply){
         if(line == "!END FW ENTRIES")
             break;
         QStringList components = line.split(" ");
-        if(components.length() != 7)
+        if(components.length() != 8)
             continue;
         // "VENDOR-PRODUCT"
         QString device = components[0].toUpper() + "-" + components[1].toUpper();
+        bool ok;
         FW fw;
         fw.fwVersion = components[2].toFloat();                             // Firmware blob version
         fw.url = QUrl::fromPercentEncoding(components[3].toLatin1());       // URL to zip file
         fw.ckbVersion = KbManager::parseVersionString(components[4]);       // Minimum ckb version
         fw.fileName = QUrl::fromPercentEncoding(components[5].toLatin1());  // Name of file inside zip
         fw.hash = QByteArray::fromHex(components[6].toLatin1());            // SHA256 of file inside zip
+        fw.productID = components[7].toShort(&ok, 16);                      // Hex productID assigned to this FW
         // Update entry
-        fwTable[device] = fw;
+        fwTable[QString::number(fw.productID)] = fw;
+        // qDebug() << "saving fwTabel entry[" << QString::number(fw.productID) << "] for device" << device
+        //         << fw.fwVersion << fw.fileName << fw.url << "for ckb-next version >=" << fw.ckbVersion;
     }
     qDebug() << "Downloaded new firmware list." << fwTable.count() << "entries found.";
 }
@@ -150,19 +154,7 @@ void KbFirmware::downloadFinished(){
     emit downloaded();
 }
 
-static QString tableName(const QString& features){
-    QStringList components = features.split(" ");
-    if(components.length() < 2)
-        return "";
-    // First two components are vendor and model
-    QString vendorModel = components[0].toUpper() + "-" + components[1].toUpper();
-    // Add "RGB" on RGB boards
-    if(features.contains("rgb") && !features.contains("monochrome"))
-        vendorModel += "RGB";
-    return vendorModel;
-}
-
-float KbFirmware::_latestForBoard(const QString& features, bool waitForComplete){
+float KbFirmware::_latestForBoard(const short productID, bool waitForComplete) {
     if((tableDownload || checkUpdates()) && waitForComplete){
         // If waiting is desired, enter an event loop and stay here until the download is finished
         QEventLoop loop(this);
@@ -170,19 +162,19 @@ float KbFirmware::_latestForBoard(const QString& features, bool waitForComplete)
         loop.exec();
     }
     // Find this board
-    QString name = tableName(features);
-    FW info = fwTable.value(name);
-    if(info.hash.isEmpty())
+    FW info = fwTable.value(QString::number(productID));
+    if (info.hash.isEmpty()) {
+        qDebug() << "Can't find valid firmware version for device" << productID << QString::number(productID);
         return 0.f;
+    }
     // Don't return the new version if the current ckb doesn't support it
     if(info.ckbVersion > KbManager::ckbGuiVersionF() || info.ckbVersion > KbManager::ckbDaemonVersionF())
         return -1.f;
     return info.fwVersion;
 }
 
-QByteArray KbFirmware::_fileForBoard(const QString& features){
-    QString name = tableName(features);
-    FW info = fwTable.value(name);
+QByteArray KbFirmware::_fileForBoard(const short productID){
+    FW info = fwTable.value(QString::number(productID));
     if(info.hash.isEmpty())
         return "";
     // Download zip from URL. Wait for it to finish.

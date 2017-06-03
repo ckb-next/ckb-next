@@ -3,6 +3,7 @@
 #include <QUrl>
 #include <QMutex>
 #include <QDateTime>
+#include <QDebug>
 #include "kb.h"
 #include "kbmanager.h"
 
@@ -28,8 +29,8 @@ Kb::Kb(QObject *parent, const QString& path) :
     memset(hwLoading, 0, sizeof(hwLoading));
 
     // Get the features, model, serial number, FW version (if available), and poll rate (if available) from /dev nodes
-    QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate");
-    if(ftpath.open(QIODevice::ReadOnly)){
+    QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate"), prodpath(path + "/productid");
+    if (ftpath.open(QIODevice::ReadOnly)){
         features = ftpath.read(1000);
         features = features.trimmed();
         ftpath.close();
@@ -38,33 +39,43 @@ Kb::Kb(QObject *parent, const QString& path) :
         if(list.length() < 2)
             return;
         _model = KeyMap::getModel(list[1]);
-        if(_model == KeyMap::NO_MODEL)
+        if(_model == KeyMap::NO_MODEL) {
+            qDebug() << "could not find valid model information:" << list[1] << "produced" << _model;
             return;
-    } else
+        }
+    } else {
         // Bail if features aren't readable
+        qDebug() << "Could not open" << ftpath.fileName();
         return;
-    if(features.contains("monochrome"))
+    }
+    if (features.contains("monochrome"))
         monochrome = true;
-    if(mpath.open(QIODevice::ReadOnly)){
+    if (mpath.open(QIODevice::ReadOnly)){
         usbModel = mpath.read(100);
         usbModel = usbModel.remove("Corsair").remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").trimmed();
         mpath.close();
     }
-    if(usbModel == "")
+    if (usbModel == "")
         usbModel = "Keyboard";
-    if(spath.open(QIODevice::ReadOnly)){
+    if (spath.open(QIODevice::ReadOnly)){
         usbSerial = spath.read(100);
         usbSerial = usbSerial.trimmed().toUpper();
         spath.close();
     }
-    if(usbSerial == "")
+    if (usbSerial == "")
         usbSerial = "Unknown-" + usbModel;
-    if(features.contains("fwversion") && fwpath.open(QIODevice::ReadOnly)){
+    if (features.contains("fwversion") && fwpath.open(QIODevice::ReadOnly)) {
         firmware = fwpath.read(100);
         firmware = QString::number(firmware.trimmed().toInt() / 100., 'f', 2);
         fwpath.close();
+        if (prodpath.open(QIODevice::ReadOnly)) {
+            productID = prodpath.read(4).toUShort(0, 16);
+            // qInfo() << "ProductID of device is" << productID;
+        } else {
+            qCritical() << "could not open" << prodpath.fileName();
+        }
     }
-    if(features.contains("pollrate") && ppath.open(QIODevice::ReadOnly)){
+    if (features.contains("pollrate") && ppath.open(QIODevice::ReadOnly)){
         pollrate = ppath.read(100);
         pollrate = pollrate.trimmed();
         ppath.close();

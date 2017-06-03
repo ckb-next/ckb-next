@@ -174,7 +174,7 @@ void MainWindow::checkFwUpdates(){
         return;
     foreach(KbWidget* w, kbWidgets){
         // Display firmware upgrade notification if a new version is available
-        float version = KbFirmware::versionForBoard(w->device->features);
+        float version = KbFirmware::versionForBoard(w->device->productID);
         if(version > w->device->firmware.toFloat()){
             if(w->hasShownNewFW)
                 continue;

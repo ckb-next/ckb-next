@@ -33,9 +33,9 @@ bool KbFirmware::_checkUpdates(){
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;
     // First location is for debugging only.
-    // tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/frickler24/ckb-next/issues-26-Firmware-Incident/FIRMWARE")));
+    tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/frickler24/ckb-next/new-firmware-file-format/FIRMWARE")));
     // This one is the production one.
-    tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/mattanger/ckb-next/master/FIRMWARE")));
+    // tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/mattanger/ckb-next/master/FIRMWARE")));
     connect(tableDownload, SIGNAL(finished()), this, SLOT(downloadFinished()));
     lastCheck = now;
     return true;

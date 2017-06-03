@@ -164,7 +164,8 @@ float KbFirmware::_latestForBoard(const short productID, bool waitForComplete) {
     // Find this board
     FW info = fwTable.value(QString::number(productID));
     if (info.hash.isEmpty()) {
-        qDebug() << "Can't find valid firmware version for device" << productID << QString::number(productID);
+        if (fwTable.count() > 0)        ///< Only give an error message if we loaded the FIRMWARE file.
+            qDebug() << "Can't find valid firmware version for device" << productID << QString::number(productID);
         return 0.f;
     }
     // Don't return the new version if the current ckb doesn't support it

@@ -66,7 +66,6 @@ Kb::Kb(QObject *parent, const QString& path) :
         usbSerial = "Unknown-" + usbModel;
     if (features.contains("fwversion") && fwpath.open(QIODevice::ReadOnly)) {
         firmware = fwpath.read(100);
-        qDebug() << "Firmware read =" << firmware;
         firmware = QString::number(firmware.trimmed().toInt() / 100., 'f', 2);
         fwpath.close();
         if (prodpath.open(QIODevice::ReadOnly)) {
@@ -75,7 +74,6 @@ Kb::Kb(QObject *parent, const QString& path) :
         } else {
             qCritical() << "could not open" << prodpath.fileName();
         }
-        qDebug() << "Firmware read =" << firmware;
     }
     if (features.contains("pollrate") && ppath.open(QIODevice::ReadOnly)){
         pollrate = ppath.read(100);

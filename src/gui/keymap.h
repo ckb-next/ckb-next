@@ -74,6 +74,7 @@ public:
         M65E,
         M95,
         IRONCLAW,
+        VOID,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

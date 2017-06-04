@@ -53,7 +53,7 @@ Kb::Kb(QObject *parent, const QString& path) :
         hwload = true;
     if (mpath.open(QIODevice::ReadOnly)){
         usbModel = mpath.read(100);
-        usbModel = usbModel.remove("Corsair").remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").trimmed();
+        usbModel = usbModel.remove("Corsair").remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").remove("Headset").remove("USB").trimmed();
         mpath.close();
     }
     if (usbModel == "")

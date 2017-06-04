@@ -71,6 +71,7 @@ public:
         ST100,
         K70MK2,
         STRAFE_MK2,
+        VOID,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

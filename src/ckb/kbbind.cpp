@@ -244,7 +244,7 @@ void KbBind::update(QFile& cmd, bool force){
     if(_winLock)
         cmd.write(" unbind lwin rwin");
 
-    // At last, send Macro definitions if avalilable.
+    // At last, send Macro definitions if available.
     // If no definitions are made, clear macro will be sent only to reset all macros,
     cmd.write(macros.toLatin1());
     lastCmd = &cmd;

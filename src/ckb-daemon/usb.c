@@ -534,8 +534,8 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
     for(int i = 0; i < count; i++){
         // Send each message via the OS function
         while(1){
+            pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
             DELAY_SHORT(kb);
-            pthread_mutex_lock(mmutex(kb)); // Synchonization between macro output and color information
             int res = os_usbsend(kb, messages + i * MSG_SIZE, 0, file, line);
             pthread_mutex_unlock(mmutex(kb));
             if(res == 0)
@@ -600,15 +600,17 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
 ///
 int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line){
     // Try a maximum of 5 times
-    for(int try = 0; try < 5; try++){
+    for (int try = 0; try < 5; try++) {
         // Send the output message
+        pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
         DELAY_SHORT(kb);
         int res = os_usbsend(kb, out_msg, 1, file, line);
-        if(res == 0)
+        pthread_mutex_unlock(mmutex(kb));
+        if (res == 0)
             return 0;
-        else if(res == -1){
+        else if (res == -1) {
             // Retry on temporary failure
-            if(reset_stop)
+            if (reset_stop)
                 return 0;
             DELAY_LONG(kb);
             continue;
@@ -634,7 +636,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 /// An imutex lock ensures first of all, that no communication is currently running from the viewpoint of the driver to the user input device
 /// (ie the virtual driver with which characters or mouse movements are sent from the daemon to the operating system as inputs).
 ///
-/// If the \b kb has an acceptable value = 0,
+/// If the \b kb has an acceptable value != 0,
 /// the index of the device is looked for
 /// and with this index os_inputclose() is called.
 /// After this no more characters can be sent to the operating system.

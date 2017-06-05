@@ -84,7 +84,7 @@ public:
     /// \return QString macroContent
     ///
     inline QString macroContent() const {
-        // return isValidMacro() ? _value.split(":")[1].replace(QRegExp("=\\d+"), "") : ""; ///> Is used if we have ckb without delay handling
+        // return isValidMacro() ? _value.split(":")[1].replace(QRegExp("=\\d+"), "") : ""; ///< Is used if we have ckb without delay handling
         return isValidMacro() ? _value.split(":")[1] : "";
     }
 

@@ -65,9 +65,9 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 /// If DEBUG_USB is set during compilation,
 /// the number of bytes sent and their representation are logged to the error channel.
 ///
-int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
-    if(kb->fwversion >= 0x120 && !is_recv){
+    if (kb->fwversion >= 0x120 && !is_recv) {
         struct usbdevfs_bulktransfer transfer;
         memset(&transfer, 0, sizeof(transfer));
         transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
@@ -79,13 +79,14 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     }
-    if(res <= 0){
-        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
+
+    if (res <= 0){
+        ckb_err_fn(" %s, res = 0x%x\n", file, line, res ? strerror(errno) : "No data written", res);
         if(res == -1 && errno == ETIMEDOUT)
             return -1;
         else
             return 0;
-    } else if(res != MSG_SIZE)
+    } else if (res != MSG_SIZE)
         ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
 #ifdef DEBUG_USB
     char converted[MSG_SIZE*3 + 1];
@@ -254,7 +255,7 @@ void* os_inputmain(void* context){
     }
 
     /// Get an usbdevfs_urb data structure and clear it via memset()
-    struct usbdevfs_urb urbs[urbcount];
+    struct usbdevfs_urb urbs[urbcount + 1];
     memset(urbs, 0, sizeof(urbs));
 
     /// Hopefully the buffer lengths are equal for all devices with congruent types.
@@ -299,7 +300,7 @@ void* os_inputmain(void* context){
 
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
-        if (ioctl(fd, USBDEVFS_REAPURB, &urb)){
+        if (ioctl(fd, USBDEVFS_REAPURB, &urb)) {
             if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
@@ -311,12 +312,14 @@ void* os_inputmain(void* context){
                     ioctl(fd, USBDEVFS_SUBMITURB, urb);
                 urb = 0;
             }
+            continue;
         }
 
         /// A correct REAPURB returns a Pointer to the URB which we now have a closer look into.
         /// Lock all following actions with imutex.
         ///
         if (urb) {
+
             /// Process the input depending on type of device. Interprete the actual size of the URB buffer
             ///
             /// device | detect with macro combination | seems to be endpoint # | actual buffer-length | function called
@@ -367,6 +370,7 @@ void* os_inputmain(void* context){
             /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
             inputupdate(kb);
             pthread_mutex_unlock(imutex(kb));
+
             /// Re-submit the URB for the next run.
             ioctl(fd, USBDEVFS_SUBMITURB, urb);
             urb = 0;

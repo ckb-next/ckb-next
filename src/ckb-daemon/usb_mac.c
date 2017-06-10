@@ -101,7 +101,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     kern_return_t res = kIOReturnSuccess;
     ///
     /// \todo Be aware: This condition is exact inverted to the condition in the linux dependent os_usbsend(). It may be correct, but please check it.
-    if(kb->fwversion < 0x120 || is_recv){
+    if((kb->fwversion < 0x120 && kb->product != P_GLAIVE) || is_recv){
         int ep = kb->epcount;
         // For old devices, or for receiving data, use control transfers
         IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, ep - 1, MSG_SIZE, (void*)out_msg, 0, 5000, 5000 };

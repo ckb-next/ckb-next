@@ -80,7 +80,9 @@
 #define P_M65_STR       "1b12"
 #define P_M65_PRO       0x1b2e
 #define P_M65_PRO_STR   "1b2e"
-#define IS_M65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO))
+#define P_GLAIVE        0x1b34
+#define P_GLAIVE_STR    "1b34"
+#define IS_M65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_GLAIVE))
 
 #define P_SABRE_O       0x1b14  /* optical */
 #define P_SABRE_O_STR   "1b14"

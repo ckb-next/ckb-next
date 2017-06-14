@@ -672,6 +672,7 @@ static _model models[] = {
     // Mice
     { P_M65_STR, P_M65 },
     { P_M65_PRO_STR, P_M65_PRO },
+    { P_GLAIVE_STR, P_GLAIVE },
     { P_SABRE_O_STR, P_SABRE_O },
     { P_SABRE_L_STR, P_SABRE_L },
     { P_SABRE_N_STR, P_SABRE_N },

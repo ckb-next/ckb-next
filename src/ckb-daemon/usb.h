@@ -154,7 +154,7 @@ const char* product_str(short product);
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
 /// Used when a device has a firmware with a low version number that uses the new protocol
-#define IS_NEW_PROTOCOL(kb)             (IS_PLATINUM(kb) || IS_K63(kb))
+#define IS_NEW_PROTOCOL(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || (kb)->product == P_GLAIVE)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

@@ -143,6 +143,9 @@ const char* product_str(short product);
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
+/// Used to apply quirks and features to the PLATINUM devices.
+#define IS_PLATINUM(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
+
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.
 /// The short delay is used before any send or receive

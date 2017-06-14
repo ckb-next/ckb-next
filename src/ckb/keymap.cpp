@@ -142,10 +142,19 @@ static void patchANSI(QHash<QString, Key>& map){
 #define K65_WIDTH       209
 #define K65_HEIGHT      K70_HEIGHT
 
+// K63 is the same as the K65 in terms of size
+#define K63_WIDTH       K65_WIDTH
+#define K63_HEIGHT      K65_HEIGHT
+
 static const Key K65TopRow[] = {
     {0, "Brightness", "light", 164 - K70_X_START, 0, 12, 12, true, true}, {0, "Mute", "mute", 176 - K70_X_START, 0, 12, 12, true, true}, {0, "Volume Down", "voldn", 192 - K70_X_START, 0, 14, 8, true, true}, {0, "Volume Up", "volup", 205 - K70_X_START, 0, 14, 8, true, true}, {0, "Windows Lock", "lock", 222 - K70_X_START, 0, 12, 12, true, true}
 };
 #define K65_TOP_COUNT (sizeof(K65TopRow) / sizeof(Key))
+
+static const Key K63TopRow[] = {
+    {0, "Stop", "stop", K70_X_START - 37, 0, 12, 8, true, true}, {0, "Previous", "prev", K70_X_START - 26, 0, 12, 8, true, true}, {0, "Play/Pause", "play", K70_X_START - 15, 0, 12, 8, true, true}, {0, "Next", "next", K70_X_START - 4, 0, 12, 8, true, true}, {0, "Brightness", "light", 170 - K70_X_START, 0, 12, 12, true, true}, {0, "Windows Lock", "lock", 180 - K70_X_START, 0, 12, 12, true, true}, {0, "Mute", "mute", 222 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Down", "voldn", 234 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 246 - K70_X_START, 0, 13, 8, true, true}
+};
+#define K63_TOP_COUNT (sizeof(K63TopRow) / sizeof(Key))
 
 // Strafe has side lights
 #define KSTRAFE_X_START     12
@@ -299,6 +308,14 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         for(const Key* key = K65TopRow; key < K65TopRow + K65_TOP_COUNT; key++)
             map[key->name] = *key;
         // Done!
+        break;
+    }
+    case KeyMap::K63:{
+        map = getMap(KeyMap::K65, layout);
+
+        for(const Key* key = K63TopRow; key < K63TopRow + K63_TOP_COUNT; key++)
+            map[key->name] = *key;
+
         break;
     }
     case KeyMap::STRAFE:{
@@ -494,6 +511,8 @@ QStringList KeyMap::layoutNames(){
 
 KeyMap::Model KeyMap::getModel(const QString& name){
     QString lower = name.toLower();
+    if(lower == "k63")
+        return K63;
     if(lower == "k65")
         return K65;
     if(lower == "k70")
@@ -513,6 +532,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
 
 QString KeyMap::getModel(KeyMap::Model model){
     switch(model){
+    case K63:
+        return "k63";
     case K65:
         return "k65";
     case K70:
@@ -541,6 +562,8 @@ KeyMap KeyMap::fromName(const QString &name){
 
 int KeyMap::modelWidth(Model model){
     switch(model){
+    case K63:
+        return K63_WIDTH;
     case K65:
         return K65_WIDTH;
     case K70:
@@ -560,6 +583,7 @@ int KeyMap::modelWidth(Model model){
 
 int KeyMap::modelHeight(Model model){
     switch(model){
+    case K63:
     case K65:
     case K70:
     case K95:

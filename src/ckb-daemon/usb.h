@@ -144,7 +144,10 @@ const char* product_str(short product);
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
 /// Used to apply quirks and features to the PLATINUM devices.
-#define IS_PLATINUM(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
+#define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
+
+/// Used when a device has a firmware with a low version number that uses the new protocol
+#define IS_NEW_PROTOCOL(kb)             ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

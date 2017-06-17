@@ -103,6 +103,10 @@
 // #define DEBUG_USB
 
 ///
+///uncomment to see USB packets sent from the device
+// #define DEBUG_USB_RECV
+
+///
 /// \brief vendor_str Vendor/product string representations
 /// \param vendor \a short vendor ID
 /// \return a string: either "" or "corsair"

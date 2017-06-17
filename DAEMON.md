@@ -9,12 +9,15 @@ The daemon provides devices at `/dev/input/ckb*`, where * is the device number, 
 
 Other `ckb*` devices contain the following:
 - `cmd`: Keyboard controller.
-- `notify0`: Keyboard notifications.
+- `notify0`: Keyboard- or mouse notifications.
+- `notify1`: Keyboard- or mouse notifications, useed for macro recording.
 - `features`: Device features.
 - `fwversion`: Device firmware version (not present on all devices).
 - `model`: Device description/model.
 - `pollrate`: Poll rate in milliseconds (not present on all devices).
+- `productid`: Contains the USB productID of the hardware
 - `serial`: Device serial number. `model` and `serial` will match the info found in `ckb0/connected`
+
 
 Commands
 --------

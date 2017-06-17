@@ -102,9 +102,9 @@ static void* play_macro(void* param) {
         else {
             os_keypress(kb, action->scan, action->down);
             pthread_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
-            if (action->delay != UINT_MAX) {            ///< local delay set
+            if (action->delay != UINT_MAX && action->delay) {    ///< local delay set
                 usleep(action->delay);
-            } else if (kb->delay != UINT_MAX) {         ///< use default global delay
+            } else if (kb->delay != UINT_MAX && kb->delay) {     ///< use default global delay
                 usleep(kb->delay);
             } else if (a < (macro->actioncount - 1)) {  ///< use delays depending on macro length
                 if (a > 200) {

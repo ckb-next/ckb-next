@@ -192,6 +192,7 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     ui->pteMacroBox->setPlainText("");
     ui->pteMacroText->setPlainText("");
     ui->pteMacroComment->setPlainText("");
+    ui->txtBuffer->setText("");
     // Fill in field and select tab according to action type
     bool mouse = act.isMouse();
     if(mouse){
@@ -294,6 +295,12 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                 ui->pteMacroBox->setPlainText(act.macroContent());
                 ui->pteMacroText->setPlainText(act.macroLine()[1].replace("&das_IST_31N_col0n;", ":"));
                 ui->pteMacroComment->setPlainText(act.macroLine()[2].replace("&das_IST_31N_col0n;", ":"));
+                // Set the invisible Buffer to the original timing information.
+                // For convenience / Migration from older versions:
+                // If the timing information is only "x", then ignore it by setting it to an empty QString.
+                ui->txtBuffer->setText("");
+                if (act.macroTiming() != "x") ui->txtBuffer->setText(act.macroTiming());
+                setCorrectRadioButton(act.macroContent());
             } else {
                 qDebug("RebindWidget::setSelection found invalid macro definition.");
                 act.macroDisplay();
@@ -370,12 +377,25 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         }
         bind->setAction(keys, KeyAction::programAction(ui->programKpBox->text(), ui->programKrBox->text(), kpStop | krStop));
     } else if (ui->pteMacroBox->toPlainText().length() > 0) {
-        // G-key macro handling:
-        // Set the macro definiton for all keys selected (indeed, it may be multiple keys).
-        // First, concat the Macro Key Definion and the Macro plain text
-        // after escaping possible colos in the parts for Macro Text and Macro Comment.
+        /// G-key macro handling:
+        /// Set the macro definiton for all keys selected (indeed, it may be multiple keys).
+        /// First, concat the Macro Key Definion and the Macro plain text
+        /// after escaping possible colos in the parts for Macro Text and Macro Comment.
+
+        /// But first, there is a special condition to handle:
+        /// You have recorded a macro with timing infos.
+        /// Afterwards you changed manually the timing infos in the pteMacroBox and press Apply.
+        /// In that case we must overwrite the txtBuffer to remember your changes.
+        if (ui->rb_delay_asTyped->isChecked()) ui->txtBuffer->setText(ui->pteMacroBox->toPlainText());
+
+        /// \todo There is still a bug in the state machine:
+        /// If you record a macro in asTyped-mode, switch to another mode
+        /// and change the vontent of the pteMacroBox manually,
+        /// then the changes are not saved in the timing buffer.
+        /// But anyhow, let's do more relevant things...
         QString mac;
-        mac = ui->pteMacroComment->toPlainText().replace(":", "&das_IST_31N_col0n;");
+        mac = ui->txtBuffer->text();
+        mac = ui->pteMacroComment->toPlainText().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
         mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
         mac = ui->pteMacroBox->toPlainText() + ":" + mac;
         bind->setAction(keys, KeyAction::macroAction(mac));
@@ -433,6 +453,7 @@ void RebindWidget::setBox(QWidget* box){
     // Clear macro panel
     if (box != ui->pteMacroBox) {
         ui->pteMacroBox->setPlainText("");
+        ui->txtBuffer->setText("");
         helpStatus(1);
     }
 }
@@ -711,13 +732,16 @@ void RebindWidget::on_btnStartMacro_clicked() {
         ui->unbindButton->setEnabled(false);
         ui->btnStartMacro->setEnabled(false);
         ui->btnStopMacro->setEnabled(true);
+        ui->rb_delay_asTyped->setEnabled(false);
+        ui->rb_delay_no->setEnabled(false);
+        ui->rb_delay_default->setEnabled(false);
         helpStatus(2);
     }
 }
 
 //////////
 /// \brief RebindWidget::on_btnStopMacro_clicked ends the macro recording.
-/// Notify channel ist closed, the ReaderThread is deleted if the notification is really down.
+/// Notify channel ist closed, the ReaderThread is deleted when the notification is really down.
 ///
 /// Afterwards, the characters in the MacroBox are changed from KB-out format to cmd-in format.
 /// At last the UI changes to the new state.
@@ -733,6 +757,9 @@ void RebindWidget::on_btnStopMacro_clicked() {
         ui->unbindButton->setEnabled(true);
         ui->btnStartMacro->setEnabled(true);
         ui->btnStopMacro->setEnabled(false);
+        ui->rb_delay_asTyped->setEnabled(true);
+        ui->rb_delay_no->setEnabled(true);
+        ui->rb_delay_default->setEnabled(true);
         helpStatus(3);
     }
 }
@@ -740,6 +767,9 @@ void RebindWidget::on_btnStopMacro_clicked() {
 //////////
 /// \brief RebindWidget::on_btnClearMacro_clicked changes the help info an the panel.
 /// The job of clearing the input panels is triggerd with signal/slot via the RebindWidget.ui file.
+///
+/// \todo I do not know what is the better solution with the delay-buttons in case of clicking clear:
+/// Reset the button to the default value or do not touch it? Not clear is ignored.
 ///
 void RebindWidget::on_btnClearMacro_clicked() {
     helpStatus(1);
@@ -768,16 +798,100 @@ void RebindWidget::helpStatus(int status) {
 //////////
 /// \brief RebindWidget::convertMacroBox converts the macroBox content.
 /// The KB sends each keypress as "key [+|-]<keyname><newline>"
+/// This is followed by timing information (delays between keystrokes).
 ///
-/// the ckb-daemon needs a shorter format, only " [+|-]<keyname>"
+/// The ckb-daemon needs a shorter format, only " [+|-]<keyname>=<delay>",
+/// multiple entries are separated by comma.
 ///
 /// That function does the conversion.
 ///
 void RebindWidget::convertMacroBox() {
     QString in;
 
-    in = ui->pteMacroBox->toPlainText();
-    in.replace (QRegExp("\n"), ",");
-    in.replace (QRegExp("key "), "");
+    // Remember the original input stream before it is converted.
+    // In case of new choice of delay mode we have to restore it.
+    if (ui->txtBuffer->text() == "") {
+        ui->txtBuffer->setText(ui->pteMacroBox->toPlainText());
+        in = ui->pteMacroBox->toPlainText();
+    } else in = ui->txtBuffer->text();
+
+    in.replace (QRegExp("\n"), ",");    // first join all in one line
+    in.replace (QRegExp("key "), "");   // then delete keyword "key" followed by space
+    in.replace (QRegExp(",="), "=");    // at last join each keystroke with its delay parameter
+
+    // How to deal with the delay params?
+    // Because the three radio buttons are mututally exclusive,
+    // we can run through the if-chain w/o conflicts.
+    // If rb_delay_asTyped is checked, do nothing, because that's the standard.
+
+    if (ui->rb_delay_default->isChecked()) {
+        in.replace(QRegExp("=\\d+,"), ",");  // Delete the timing infos, use default value
+        in.replace(QRegExp("=\\d+$"), "");   // The last entry is without comma
+    }
+    if (ui->rb_delay_no->isChecked()) {
+        in.replace(QRegExp("=\\d+,"), "=0,");  // Set timing infos to zero for no delay
+        in.replace(QRegExp("=\\d+$"), "=0");   // Again the last entry w/o comma
+        in.replace(QRegExp("([\\+\\-]\\w+),"), "\\1=0,");  // If no delay is given, force it to zero
+        in.replace(QRegExp("([\\+\\-]\\w+)$"), "\\1=0");
+    }
+
+    // Show the new format by replacing the older one.
     ui->pteMacroBox->setPlainText(in);
+}
+
+//////////
+/// \brief RebindWidget::on_rb_delay_no_toggled
+/// \param checked
+/// The following slots are triggerd by changing the mutual exclusive radio buttons
+/// when choosing the delay.
+/// They are called, if the button ist enabled.
+/// This first one should disable all delay.
+///
+void RebindWidget::on_rb_delay_no_toggled(bool checked)
+{
+    convertMacroBox();
+}
+
+//////////
+/// \brief RebindWidget::on_rb_delay_asTyped_toggled
+/// \param checked
+/// This button ist clicked to use the delay times, as they are recorded.
+/// Returs a warning message, if we are not in the recording phase,
+/// because then we don't have the delay times any more.
+///
+void RebindWidget::on_rb_delay_asTyped_toggled(bool checked)
+{
+    convertMacroBox();
+}
+
+//////////
+/// \brief RebindWidget::on_rb_delay_default_toggled
+/// \param checked
+/// This is as easy as the no-delay-button, because this means
+/// take the default values.
+///
+void RebindWidget::on_rb_delay_default_toggled(bool checked)
+{
+    convertMacroBox();
+}
+
+//////////
+/// \brief RebindWidget::setCorrectRadioButton
+/// \param macdef
+/// Set the radiobutton for timing paramters according to
+/// the context.
+/// If no "=" followed by a number and comma can be found, it is the default button.
+/// If "=" can be found and numbers with more than one digit (means: > 9), it is the "asTyped" button
+/// Otherwise it is the "no" button.
+///
+void RebindWidget::setCorrectRadioButton (QString macdef) {
+    if (!macdef.contains(QRegExp("=\\d+,"))) {
+        ui->rb_delay_default->setChecked(true);
+        return;
+    }
+    if (macdef.contains(QRegExp("=\\d\\d+,"))) {
+        ui->rb_delay_asTyped->setChecked(true);
+        return;
+    }
+    ui->rb_delay_no->setChecked(true);
 }

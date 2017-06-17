@@ -1,5 +1,6 @@
 #include <qdebug.h>
 #include "macroreader.h"
+#include <sys/time.h>
 
 //////////
 /// \class MacroReader
@@ -63,9 +64,26 @@ void MacroReaderThread::run() {
         }
     }
     // Read data from notification node macroPath
+    // Count time between lines read from the interface
     QByteArray line;
+    timeval t;
+    gettimeofday(&t, NULL);
+    double tstart = t.tv_sec+(t.tv_usec/1000000.0);
+    bool firstline = true;
+
     while(macroFile.isOpen() && (line = macroFile.readLine()).length() > 0){
         QString text = QString::fromUtf8(line);
+        gettimeofday(&t, NULL);
+        double tnow = t.tv_sec+(t.tv_usec/1000000.0);
+
+		// in the first line, there is only a delay "before start". Don't use it.
+        if (!firstline) {
+            text.prepend ("\n");
+            text.prepend (QString::number ((tnow - tstart) * 1000000.0, 'f', 0));
+            text.prepend ("=");
+        } else firstline = false;
+        tstart = tnow;
+
         metaObject()->invokeMethod(this, "readMacro", Qt::QueuedConnection, Q_ARG(QString, text));
     }
     qDebug() << "MacroReader::run() ends.";

@@ -1,5 +1,5 @@
-#ifndef BINDDIALOG_H
-#define BINDDIALOG_H
+#ifndef REBINDWIDGET_H
+#define REBINDWIDGET_H
 
 #include <QWidget>
 #include "kbbind.h"
@@ -70,6 +70,12 @@ private slots:
     void on_btnStopMacro_clicked();
     void on_btnClearMacro_clicked();
 
+    void on_rb_delay_no_toggled(bool checked);
+
+    void on_rb_delay_asTyped_toggled(bool checked);
+
+    void on_rb_delay_default_toggled(bool checked);
+
 private:
     Ui::RebindWidget *ui;
 
@@ -82,6 +88,8 @@ private:
     void convertMacroBox();
     // Show some help info
     void helpStatus(int status);
+
+    void setCorrectRadioButton (QString macdef);
 
     KbBind* bind;
     KbProfile* profile;
@@ -98,4 +106,4 @@ private:
     MacroReader* macReader;     ///< \brief macReader holds the MacroReader when macro recording starts.
 };
 
-#endif // BINDDIALOG_H
+#endif // REBINDWIDGET_H

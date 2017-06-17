@@ -37,7 +37,7 @@ public:
     /// returns the complete string except the leading "$"
     /// (the $ may confuse some caller).
     /// \return QString
-    /// All 4 parts are returned in one QString.
+    /// All 5 parts are returned in one QString.
     /// If no definition exists, return ""
     ///
     inline QString macroFullLine() const {
@@ -47,15 +47,16 @@ public:
      //////////
      /// \brief isValidMacro checks whether a keyAction contains a valid macro.
      /// This is done easily: If the macro action starts with $macro:
-     /// and has four elements, delimited by ":", we may assume,
+     /// and has five elements, delimited by ":", we may assume,
      /// that is a structural correct macro action.
+     /// If it has 4 entries only, it is an older definition and ok also.
      /// \return bool as true iff the macro definition contains all four elements.
      ///
      inline bool isValidMacro() const {
         if (isMacro()) {
             QStringList ret;
             ret =_value.split(":");
-            return (ret.count() == 4);
+            return ((ret.count() >= 4) && (ret.count() <= 5));
         } else {
             return false;
         }
@@ -64,8 +65,10 @@ public:
     //////////
     /// \brief macroLine returns all interresting content for a macro definition.
     /// \return QStringList returns the Macro Key Definition,
-    ///     Readble Macro String and
-    ///     Readable Macro Comment as QStringList.
+    ///     Readble Macro String,
+    ///     Readable Macro Comment and
+    ///     the original timing information (if it exists as a 5th part)
+    ///     as QStringList.
     ///
     inline QStringList macroLine() const {
         if (isValidMacro()) {
@@ -81,7 +84,23 @@ public:
     /// \return QString macroContent
     ///
     inline QString macroContent() const {
+        // return isValidMacro() ? _value.split(":")[1].replace(QRegExp("=\\d+"), "") : ""; ///< Is used if we have ckb without delay handling
         return isValidMacro() ? _value.split(":")[1] : "";
+    }
+
+    //////////
+    /// \brief macroTiming returns the macro key definition with original timing infos
+    /// (the fifth and up to now last part of the macro action).
+    /// If the implementation does not know anything about delays and has no 5th part,
+    /// return first part.
+    /// \return QString macroTiming
+    ///
+    inline QString macroTiming() const {
+        if (isValidMacro()) {
+            QStringList rval = _value.split(":");
+            return (rval.length() == 4)? rval[1] : rval[4];
+        }
+        return QString("");
     }
 
     //////////
@@ -94,6 +113,7 @@ public:
     ///          This sequence will program the keyboard and is hardly readable
     ///      3.  Readable Macro String: This is displayed in pteMacroText
     ///      4.  Readable Macro Comment:This is displayed in pteMacroComment
+    ///      5.  completely unreadable original macro information with timing values
     ///
     void macroDisplay();
 

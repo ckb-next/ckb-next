@@ -21,6 +21,14 @@ extern pthread_mutex_t devmutex[DEV_MAX];
 extern pthread_mutex_t inputmutex[DEV_MAX];
 #define imutex(kb) (inputmutex + INDEX_OF(kb, keyboard))
 
+// Needed to synchronize sending macro-keys to the os and sending color info to the device
+extern pthread_mutex_t macromutex[DEV_MAX];
+#define mmutex(kb) (macromutex + INDEX_OF(kb, keyboard))
+extern pthread_mutex_t macromutex2[DEV_MAX];
+#define mmutex2(kb) (macromutex2 + INDEX_OF(kb, keyboard))
+extern pthread_cond_t macrovar[DEV_MAX];
+#define mvar(kb) (macrovar + INDEX_OF(kb, keyboard))
+
 // Sets up device hardware, after software initialization is finished. Also used during resets
 // Should be called only from setupusb/resetusb
 int start_dev(usbdevice* kb, int makeactive);

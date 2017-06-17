@@ -10,7 +10,7 @@ The daemon provides devices at `/dev/input/ckb*`, where * is the device number, 
 Other `ckb*` devices contain the following:
 - `cmd`: Keyboard controller.
 - `notify0`: Keyboard- or mouse notifications.
-- `notify1`: Keyboard- or mouse notifications, useed for macro recording.
+- `notify1`: Keyboard- or mouse notifications, used for macro recording.
 - `features`: Device features.
 - `fwversion`: Device firmware version (not present on all devices).
 - `model`: Device description/model.

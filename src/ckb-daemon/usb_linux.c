@@ -554,8 +554,8 @@ int os_setupusb(usbdevice* kb) {
     else
         kb->fwversion = 0;
     int index = INDEX_OF(kb, keyboard);
-    ///
-    /// - Do some output abaout connecting interfaces
+
+    /// - Do some output about connecting interfaces
     ckb_info("Connecting %s at %s%d\n", kb->name, devpath, index);
 
     ///
@@ -565,7 +565,6 @@ int os_setupusb(usbdevice* kb) {
     ///
     const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
 #ifdef DEBUG
-    ckb_info("Connecting %s at %s%d\n", kb->name, devpath, index);
     ckb_info("claiming interfaces. name=%s, serial=%s, firmware=%s; Got >>%s<< as ep_str\n", name, serial, firmware, ep_str);
 #endif //DEBUG
     kb->epcount = 0;

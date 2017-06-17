@@ -1,3 +1,4 @@
+#include <limits.h>
 #include "device.h"
 #include "input.h"
 #include "notify.h"

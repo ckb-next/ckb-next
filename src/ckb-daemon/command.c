@@ -1,3 +1,4 @@
+#include <limits.h>
 #include "command.h"
 #include "device.h"
 #include "devnode.h"

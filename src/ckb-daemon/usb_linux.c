@@ -65,11 +65,10 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 /// If DEBUG_USB is set during compilation,
 /// the number of bytes sent and their representation are logged to the error channel.
 ///
-int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
     if((kb->fwversion >= 0x120 || IS_NEW_PROTOCOL(kb)) && !is_recv){
-        struct usbdevfs_bulktransfer transfer;
-        memset(&transfer, 0, sizeof(transfer));
+        struct usbdevfs_bulktransfer transfer = {0};
         transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
@@ -130,8 +129,7 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     int res;
     // This is what CUE does, but it doesn't seem to work on linux.
     /*if(kb->fwversion >= 0x130){
-        struct usbdevfs_bulktransfer transfer;
-        memset(&transfer, 0, sizeof(transfer));
+        struct usbdevfs_bulktransfer transfer = {0};
         transfer.ep = 0x84;
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
@@ -561,8 +559,7 @@ int os_setupusb(usbdevice* kb) {
     ///
     const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
 #ifdef DEBUG
-    ckb_info("Connecting %s at %s%d\n", kb->name, devpath, index);
-    ckb_info("claiming interfaces. name=%s, serial=%s, firmware=%s; Got >>%s<< as ep_str\n", name, serial, firmware, ep_str);
+    ckb_info("claiming interfaces. name=%s, firmware=%s; Got >>%s<< as ep_str\n", name, firmware, ep_str);
 #endif //DEBUG
     kb->epcount = 0;
     if(ep_str)

@@ -99,6 +99,8 @@ static int get_pipe_index(usb_iface_t handle, int desired_direction){
 
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line){
     kern_return_t res = kIOReturnSuccess;
+    ///
+    /// \todo Be aware: This condition is exact inverted to the condition in the linux dependent os_usbsend(). It may be correct, but please check it.
     if(kb->fwversion < 0x120 || is_recv){
         int ep = kb->epcount;
         // For old devices, or for receiving data, use control transfers

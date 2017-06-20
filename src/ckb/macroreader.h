@@ -25,7 +25,7 @@ class MacroReaderThread : public QThread
 
     //////////
     /// \brief macroNumber
-    /// Filenames of nofity channels have the structure <input-device-path>/ckb1/notify<number>
+    /// Filenames of nofity channels have the structure <input-device-path>/ckb1/notify\<number\>
     /// First part is hold in macroPath, the number is hold in macroNumber.
     /// macroNumber may range from 0 to 9.
     int macroNumber;

@@ -28,6 +28,7 @@ typedef struct {
     short scan;         // Key scancode, OR
     short rel_x, rel_y; // Mouse movement
     char down;          // 0 for keyup, 1 for keydown (ignored if rel_x != 0 || rel_y != 0)
+    uint delay;         // us delay after action; UINT_MAX for use global delay
 } macroaction;
 
 // Key macro
@@ -246,8 +247,8 @@ typedef struct {
     uchar hw_ileds, hw_ileds_old, ileds;
     // Color dithering in use
     char dither;
-    // Flag to check, if large macros should be sent delayed
-    char delay;
+    // Flag to check if large macros should be sent delayed
+    uint delay;
 } usbdevice;
 
 #endif  // STRUCTURES_H

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Newline
-N=$'\r\n'
+N=$'\n'
 
 echo "This script will collect information about the Corsair devices in your system."
 read -p "Please make sure they are plugged in and press Enter.${N}"
@@ -31,9 +31,10 @@ else
     #Linux
     OUT="${OUT}${N}${N}OS Version:${N}`lsb_release -a 2>/dev/null`"
     OUT="${OUT}${N}${N}USB Devices:${N}`lsusb -vd '1b1c:' 2>&1`"
-    OUT="${OUT}${N}${N}Dmesg:${N}`dmesg | grep -i \"ckb\|corsair\|1b1c\"`"
-    OUT="${OUT}${N}${N}Daemon on current boot:${N}`journalctl -b -0 --unit=ckb-daemon`"
-    OUT="${OUT}${N}${N}Daemon on last boot:${N}`journalctl -b -1 --unit=ckb-daemon`"
+    OUT="${OUT}${N}${N}Dmesg on current boot:${N}`journalctl --no-hostname -o short-precise -k -b -0 | grep -i \"ckb\|corsair\|1b1c\"`"
+    OUT="${OUT}${N}${N}Dmesg on last boot:${N}`journalctl --no-hostname -o short-precise -k -b -1 | grep -i \"ckb\|corsair\|1b1c\"`"
+    OUT="${OUT}${N}${N}Daemon on current boot:${N}`journalctl --no-hostname -o short-precise -b -0 --unit=ckb-daemon`"
+    OUT="${OUT}${N}${N}Daemon on last boot:${N}`journalctl --no-hostname -o short-precise -b -1 --unit=ckb-daemon`"
 fi
 
 #Gzip and write output

@@ -74,7 +74,7 @@ static void usbgetstr(usb_dev_t handle, uint8 string_index, char* output, int ou
     while(((error) = (operation)) != kIOReturnSuccess){                                                                     \
         if(++trial == 10)                                                                                                   \
             break;                                                                                                          \
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL);                                \
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL);                               \
     } } while(0)
 
 #define IS_TEMP_FAILURE(res)        ((res) == kIOUSBTransactionTimeout || (res) == kIOUSBTransactionReturned || (res) == kIOUSBPipeStalled)

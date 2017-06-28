@@ -108,7 +108,7 @@ static void* play_macro(void* param) {
                 clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = kb->delay * 1000}, NULL);
             } else if (a < (macro->actioncount - 1)) {  ///< use delays depending on macro length
                 if (a > 200) {
-                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 100000}, NULL);
                 } else if (a > 20) {
                     clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000}, NULL);
                 }

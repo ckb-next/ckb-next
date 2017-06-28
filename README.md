@@ -41,7 +41,6 @@
 See also:
 
 * [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
-* [ckb testing repository](https://github.com/mattanger/ckb-next/tree/testing) (updated more frequently, but may be unstable)
 
 ## Device Support
 
@@ -72,8 +71,9 @@ See also:
 * Fedora 24/25, CentOS/RHEL 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
     * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
 * Arch Linux (maintained by [@makz27](https://github.com/makz27), [@light2yellow](https://github.com/light2yellow)):
-	* [`aur/ckb-next-git`](https://aur.archlinux.org/packages/ckb-next-git) - based on `master` branch (more stable)
-    * [`aur/ckb-next-latest-git`](https://aur.archlinux.org/packages/ckb-next-latest-git) - based on `testing` branch (less stable but fresher)
+    * [`aur/ckb-next`](https://aur.archlinux.org/packages/ckb-next) - based on GitHub releases
+    * [`aur/ckb-next-git`](https://aur.archlinux.org/packages/ckb-next-git) - based on `master` branch
+    * [`aur/ckb-next-latest-git`](https://aur.archlinux.org/packages/ckb-next-latest-git) - based on `newdev` branch
 
 If you are a package maintainer or want to discuss something with package maintainers let us know in [#5](https://github.com/mattanger/ckb-next/issues/5), so we can have an accountable and centralized communication about this. *If you would like to maintain a package for your favorite distro/OS, please let us know as well.*
 

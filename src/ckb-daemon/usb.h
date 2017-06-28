@@ -143,16 +143,21 @@ const char* product_str(short product);
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
+
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.
+
 /// The short delay is used before any send or receive
-#define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)
+#define DELAY_SHORT(kb)      \
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = ((int) (kb->usbdelay)) * 1000000}, NULL)  // base (default: 5ms)
 
 /// the medium delay is used after sending a command before waiting for the answer.
-#define DELAY_MEDIUM(kb)    usleep((int)(kb)->usbdelay * 10000) // x10 (default: 50ms)
+#define DELAY_MEDIUM(kb)     \
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = ((int) (kb->usbdelay)) * 10000000}, NULL)  // x10 (default: 50ms)
 
 /// The longest delay takes place where something went wrong (eg when resetting the device)
-#define DELAY_LONG(kb)      usleep(100000)                      // long, fixed 100ms
+#define DELAY_LONG(kb)       \
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL)  // long, fixed 100ms
 
 /// This constant is used to initialize \b kb->usbdelay.
 /// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.

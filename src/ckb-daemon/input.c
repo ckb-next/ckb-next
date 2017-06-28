@@ -103,14 +103,14 @@ static void* play_macro(void* param) {
             os_keypress(kb, action->scan, action->down);
             pthread_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
             if (action->delay != UINT_MAX && action->delay) {    ///< local delay set
-                usleep(action->delay);
+                clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
             } else if (kb->delay != UINT_MAX && kb->delay) {     ///< use default global delay
-                usleep(kb->delay);
+                clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = kb->delay * 1000}, NULL);
             } else if (a < (macro->actioncount - 1)) {  ///< use delays depending on macro length
                 if (a > 200) {
-                    usleep (100);
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
                 } else if (a > 20) {
-                    usleep(30);
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000}, NULL);
                 }
             }
             pthread_mutex_lock(mmutex(kb));

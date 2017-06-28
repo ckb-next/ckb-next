@@ -229,7 +229,7 @@ int os_inputopen(usbdevice* kb){
             sleep(1);
             continue;
         }
-        usleep(10000);
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 10000000}, NULL);
     }
 
     clearkeys(kb);

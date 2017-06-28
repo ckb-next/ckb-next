@@ -69,12 +69,12 @@ static void usbgetstr(usb_dev_t handle, uint8 string_index, char* output, int ou
 #define HAS_ALL_HANDLES(kb) ((kb)->epcount > 0 && (kb)->epcount_hid + (kb)->epcount_usb >= (kb)->epcount)
 
 // Hacky way of trying something over and over again until it works. 100ms intervals, max 1s
-#define wait_loop(error, operation)  do {               \
-    int trial = 0;                                      \
-    while(((error) = (operation)) != kIOReturnSuccess){ \
-        if(++trial == 10)                               \
-            break;                                      \
-        usleep(100000);                                 \
+#define wait_loop(error, operation)  do {                                                                                   \
+    int trial = 0;                                                                                                          \
+    while(((error) = (operation)) != kIOReturnSuccess){                                                                     \
+        if(++trial == 10)                                                                                                   \
+            break;                                                                                                          \
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL);                                \
     } } while(0)
 
 #define IS_TEMP_FAILURE(res)        ((res) == kIOUSBTransactionTimeout || (res) == kIOUSBTransactionReturned || (res) == kIOUSBPipeStalled)
@@ -214,7 +214,7 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
         // Don't try if the keyboard was disconnected
         return -2;
     // Otherwise, just wait and try again
-    usleep(100000);
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL);
     return 0;
 }
 
@@ -564,7 +564,7 @@ static int seize_wait(long location){
     }
     const int max_tries = 20;     // give up after ~2s
     for(int try = 0; try < max_tries; try++){
-        usleep(100000);
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL);
         // Iterate the whole IOService registry
         io_iterator_t child_iter;
         if((res = IORegistryCreateIterator(master, kIOServicePlane, kIORegistryIterateRecursively, &child_iter)) != kIOReturnSuccess)

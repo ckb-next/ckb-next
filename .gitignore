@@ -6,6 +6,7 @@ cmake-build-debug/
 .DS_Store
 .*
 !.gitignore
+!.github
 *.o
 *.pro.*
 Makefile

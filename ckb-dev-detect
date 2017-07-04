@@ -31,10 +31,17 @@ else
     #Linux
     OUT="${OUT}${N}${N}OS Version:${N}`lsb_release -a 2>/dev/null`"
     OUT="${OUT}${N}${N}USB Devices:${N}`lsusb -vd '1b1c:' 2>&1`"
-    OUT="${OUT}${N}${N}Dmesg on current boot:${N}`journalctl --no-hostname -o short-precise -k -b -0 | grep -i \"ckb\|corsair\|1b1c\|usbhid\"`"
-    OUT="${OUT}${N}${N}Dmesg on last boot:${N}`journalctl --no-hostname -o short-precise -k -b -1 | grep -i \"ckb\|corsair\|1b1c\"`"
-    OUT="${OUT}${N}${N}Daemon on current boot:${N}`journalctl --no-hostname -o short-precise -b -0 --unit=ckb-daemon`"
-    OUT="${OUT}${N}${N}Daemon on last boot:${N}`journalctl --no-hostname -o short-precise -b -1 --unit=ckb-daemon`"
+    CURLOG=$(journalctl -o short-precise -k -b -0 2>/dev/null | grep -i "ckb\|corsair\|1b1c\|usbhid")
+    #Check if the above didn't succeed, fall back to dmesg
+    if [ -z "$CURLOG" ]; then
+        OUT="${OUT}${N}${N}Systemctl error, falling back to dmesg:${N}`dmesg | grep -i \"ckb\|corsair\|1b1c\|usbhid\"`"
+    else
+        OUT="${OUT}${N}${N}Dmesg on current boot:${N}${CURLOG}"
+        #Pipe stderr to /dev/null, as grep would filter errors out anyway. In case of an error, it will be captured by the ones below.
+        OUT="${OUT}${N}${N}Dmesg on last boot:${N}`journalctl -o short-precise -k -b -1 2>/dev/null | grep -i \"ckb\|corsair\|1b1c\"`"
+        OUT="${OUT}${N}${N}Daemon on current boot:${N}`journalctl -o short-precise -b -0 --unit=ckb-daemon 2>&1`"
+        OUT="${OUT}${N}${N}Daemon on last boot:${N}`journalctl -o short-precise -b -1 --unit=ckb-daemon 2>&1`"
+    fi
 fi
 
 #Gzip and write output

@@ -58,14 +58,15 @@ typedef enum {
     NOTIFY,
     INOTIFY,
     GET,
+    RESTART,
 
-    CMD_LAST = GET
+    CMD_LAST = RESTART
 } cmd;
 #define CMD_COUNT       (CMD_LAST - CMD_FIRST + 2)
 #define CMD_DEV_COUNT   (CMD_LAST - CMD_VT_FIRST + 1)
 
 // Device command vtable. Most have a standard prototype, but a few are exceptions.
-// Not all parameters are used by all commands - they are sometimes repurposed or used as dummy arguemnts. See relevant headers.
+// Not all parameters are used by all commands - they are sometimes repurposed or used as dummy arguments. See relevant headers.
 typedef void (*cmdhandler)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter);    // Normal command
 typedef int (*cmdhandler_io)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter);  // Command with hardware I/O - returns zero on success
 typedef void (*cmdhandler_mac)(usbdevice* kb, usbmode* modeidx, int notifyidx, const char* keys, const char* assignment); // Macro command has a different left-side handler
@@ -117,6 +118,7 @@ typedef union devcmd {
         cmdhandler notify;
         cmdhandler inotify;
         cmdhandler get;
+        cmdhandler restart;
 
         // Extra functions not command-related
         // device.h

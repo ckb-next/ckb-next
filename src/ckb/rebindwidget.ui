@@ -16,11 +16,23 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="styleSheet">
+   <string notr="true">font-size: 12px ;</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
       <number>0</number>
+     </property>
+     <property name="usesScrollButtons">
+      <bool>false</bool>
+     </property>
+     <property name="documentMode">
+      <bool>false</bool>
      </property>
      <widget class="QWidget" name="keyTab">
       <property name="sizePolicy">
@@ -1239,25 +1251,34 @@
          <x>40</x>
          <y>12</y>
          <width>241</width>
-         <height>171</height>
+         <height>161</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_8">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetNoConstraint</enum>
+        </property>
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_2">
           <property name="title">
            <string>Macro Key Actions</string>
           </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPlainTextEdit" name="pteMacroBox">
-          <property name="focusPolicy">
-           <enum>Qt::WheelFocus</enum>
-          </property>
-          <property name="tabChangesFocus">
-           <bool>true</bool>
-          </property>
+          <widget class="QPlainTextEdit" name="pteMacroBox">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>20</y>
+             <width>241</width>
+             <height>131</height>
+            </rect>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::WheelFocus</enum>
+           </property>
+           <property name="tabChangesFocus">
+            <bool>true</bool>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -1268,8 +1289,8 @@
        </property>
        <property name="geometry">
         <rect>
-         <x>420</x>
-         <y>20</y>
+         <x>410</x>
+         <y>10</y>
          <width>311</width>
          <height>31</height>
         </rect>
@@ -1317,10 +1338,10 @@
       <widget class="QPlainTextEdit" name="pteMacroText">
        <property name="geometry">
         <rect>
-         <x>420</x>
-         <y>60</y>
+         <x>410</x>
+         <y>50</y>
          <width>311</width>
-         <height>61</height>
+         <height>66</height>
         </rect>
        </property>
        <property name="focusPolicy">
@@ -1355,12 +1376,15 @@
        <property name="geometry">
         <rect>
          <x>300</x>
-         <y>20</y>
-         <width>119</width>
-         <height>81</height>
+         <y>10</y>
+         <width>111</width>
+         <height>71</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetNoConstraint</enum>
+        </property>
         <item>
          <widget class="QGroupBox" name="groupBox_3">
           <property name="title">
@@ -1382,25 +1406,25 @@
         <rect>
          <x>300</x>
          <y>160</y>
-         <width>436</width>
-         <height>30</height>
+         <width>407</width>
+         <height>36</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_10">
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Macro recording</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="2">
          <widget class="QPushButton" name="btnStopMacro">
           <property name="enabled">
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>Stop</string>
+           <string extracomment="was passiert, wenn ich hier iregend einen Kommentar reinschreibe?">Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="btnClearMacro">
+          <property name="text">
+           <string>Clear</string>
           </property>
          </widget>
         </item>
@@ -1411,10 +1435,14 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QPushButton" name="btnClearMacro">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="styleSheet">
+           <string notr="true">font: 75 10pt ; 
+</string>
+          </property>
           <property name="text">
-           <string>Clear</string>
+           <string>Record macro </string>
           </property>
          </widget>
         </item>
@@ -1429,16 +1457,144 @@
          <height>27</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 75 11pt ; color: darkblue;</string>
+       </property>
        <property name="text">
         <string>Comment label for help</string>
        </property>
       </widget>
-      <zorder>pteMacroComment</zorder>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>170</y>
+         <width>238</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="delayButtons">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
+        </property>
+        <item>
+         <widget class="QRadioButton" name="rb_delay_no">
+          <property name="whatsThis">
+           <string>configure delays between keystrokes: Disable delay</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 10pt ; color:  green;</string>
+          </property>
+          <property name="text">
+           <string>No delay</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rb_delay_default">
+          <property name="whatsThis">
+           <string>configure delays between keystrokes: Set delay to default values: 20us up to 15 chars, 200us above</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 10pt ; color:  green;</string>
+          </property>
+          <property name="text">
+           <string>default</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+          <property name="autoExclusive">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rb_delay_asTyped">
+          <property name="whatsThis">
+           <string>configure delays between keystrokes: Remember delays as they had been typed while the macro definition process</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 10pt ; color:  green;</string>
+          </property>
+          <property name="text">
+           <string>as typed</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QLabel" name="txtBuffer">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>100</y>
+         <width>0</width>
+         <height>0</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="toolTipDuration">
+        <number>0</number>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="lineWidth">
+        <number>0</number>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="indent">
+        <number>0</number>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
+       </property>
+      </widget>
+      <zorder>layoutWidget</zorder>
       <zorder>layoutWidget1</zorder>
       <zorder>layoutWidget</zorder>
       <zorder>pteMacroText</zorder>
       <zorder>layoutWidget_2</zorder>
       <zorder>lbl_macro</zorder>
+      <zorder>txtBuffer</zorder>
      </widget>
     </widget>
    </item>
@@ -1548,46 +1704,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>cancelButton</sender>
-   <signal>clicked()</signal>
-   <receiver>pteMacroBox</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>735</x>
-     <y>331</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>252</x>
-     <y>201</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnClearMacro</sender>
-   <signal>clicked()</signal>
-   <receiver>pteMacroBox</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>702</x>
-     <y>206</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>270</x>
-     <y>179</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btnClearMacro</sender>
    <signal>clicked()</signal>
    <receiver>pteMacroText</receiver>
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>718</x>
-     <y>206</y>
+     <x>711</x>
+     <y>238</y>
     </hint>
     <hint type="destinationlabel">
      <x>705</x>
@@ -1602,12 +1726,12 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>723</x>
-     <y>201</y>
+     <x>711</x>
+     <y>238</y>
     </hint>
     <hint type="destinationlabel">
-     <x>722</x>
-     <y>85</y>
+     <x>731</x>
+     <y>78</y>
     </hint>
    </hints>
   </connection>
@@ -1618,12 +1742,92 @@
    <slot>animateClick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>671</x>
-     <y>208</y>
+     <x>711</x>
+     <y>238</y>
     </hint>
     <hint type="destinationlabel">
-     <x>612</x>
-     <y>206</y>
+     <x>618</x>
+     <y>238</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>txtBuffer</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>564</x>
+     <y>320</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>143</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClearMacro</sender>
+   <signal>clicked()</signal>
+   <receiver>txtBuffer</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>655</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnStartMacro</sender>
+   <signal>clicked()</signal>
+   <receiver>txtBuffer</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>485</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>352</x>
+     <y>156</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>unbindButton</sender>
+   <signal>clicked()</signal>
+   <receiver>txtBuffer</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>361</x>
+     <y>313</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>332</x>
+     <y>142</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>resetButton</sender>
+   <signal>clicked()</signal>
+   <receiver>txtBuffer</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>452</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>348</x>
+     <y>142</y>
     </hint>
    </hints>
   </connection>

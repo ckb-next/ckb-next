@@ -43,6 +43,12 @@ private:
         BOTH
     };
     HwMode raw2Mode(bool sw_enable, i_hw hw_enable);
+
+    ///
+    /// \brief KPerfWidget::mode2Raw Set values of sw_enable and hw_enable to hte value corresponding to input var mode
+    /// \param [IN] mode
+    /// \param [OUT] sw_enable
+    /// \param [OUT] hw_enable
     void mode2Raw(HwMode mode, bool& sw_enable, i_hw& hw_enable);
 
     struct IndicatorUi {

@@ -47,5 +47,21 @@ void os_mousemove(usbdevice* kb, int x, int y);
 // Perform OS-specific setup for indicator lights. Called when the device is created. Return 0 on success.
 int os_setupindicators(usbdevice* kb);
 
+///
+/// \brief struct parameter contains the values for a fresh started macro_play thread.
+/// \a parameter_t is the typedef for it.
+///
+typedef struct parameter {
+    usbdevice* kb;
+    keymacro* macro;
+} parameter_t;
+
+/// \brief struct ptlist is one element in the single linked list to store  macro_play threads waiting for their execution
+/// \a ptlist_t is the typedef for it.
+///
+typedef struct ptlist {
+    struct ptlist* next;
+    pthread_t thread_id;
+} ptlist_t;
 
 #endif  // INPUT_H

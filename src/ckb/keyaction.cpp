@@ -498,8 +498,8 @@ void KeyAction::adjustDisplay(){
 /// macroAction ist called while being in the macro pane
 /// and clicking Apply with something in the Macro Text Box.
 /// It tags that input with "$macro:" for further recognition.
-/// \param macroDef holds the String containing parts 2-4 of a complete macro definition.
-/// \return QString holding the complete G-Key macro definition (parts 1-4)
+/// \param macroDef holds the String containing parts 2-5 of a complete macro definition.
+/// \return QString holding the complete G-Key macro definition (parts 1-5)
 ///
 QString KeyAction::macroAction(QString macroDef) {
     return QString ("$macro:%1").arg(macroDef);

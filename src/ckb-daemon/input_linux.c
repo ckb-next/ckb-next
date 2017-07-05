@@ -46,6 +46,12 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
     return fd + 1;
 }
 
+///
+/// \brief os_inputopen
+/// \param kb
+/// \return
+///
+/// Some tips on using [uinput_user_dev in](http://thiemonge.org/getting-started-with-uinput)
 int os_inputopen(usbdevice* kb){
     // Create the new input device
     int index = INDEX_OF(kb, keyboard);
@@ -161,8 +167,8 @@ void* _ledthread(void* ctx){
     uchar ileds = 0;
     // Read LED events from the uinput device
     struct input_event event;
-    while(read(kb->uinput_kb - 1, &event, sizeof(event)) > 0){
-        if(event.type == EV_LED && event.code < 8){
+    while (read(kb->uinput_kb - 1, &event, sizeof(event)) > 0) {
+        if (event.type == EV_LED && event.code < 8){
             char which = 1 << event.code;
             if(event.value)
                 ileds |= which;

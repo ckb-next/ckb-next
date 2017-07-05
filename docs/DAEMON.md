@@ -11,14 +11,17 @@ The daemon provides devices at `/dev/input/ckb*`, where * is the device number, 
 
 Other `ckb*` devices contain the following:
 - `cmd`: Keyboard controller.
-- `notify0`: Keyboard notifications.
+- `notify0`: Keyboard- or mouse notifications.
+- `notify1`: Keyboard- or mouse notifications, used for macro recording.
 - `features`: Device features.
 - `fwversion`: Device firmware version (not present on all devices).
 - `model`: Device description/model.
 - `pollrate`: Poll rate in milliseconds (not present on all devices).
+- `productid`: Contains the USB productID of the hardware
 - `serial`: Device serial number. `model` and `serial` will match the info found in `ckb0/connected`
 
-### Commands
+Commands
+--------
 
 The `/dev/input/ckb*/cmd` nodes accept input in the form of text commands. They are normally accessible to all users on the system (see Security section). Commands should be given in the following format:
 `[mode <n>] command1 [paramter1] [command2] [parameter2] [command3] [parameter3] ...`
@@ -29,7 +32,8 @@ The `mode` parameter is used to group settings. Most (but not all) settings are 
 
 When plugged in, all devices start in hardware-controlled mode (also known as idle mode) and will not respond to commands. Before issuing any other commands, write `active` to the command node, like `echo active > /dev/input/ckb1/cmd`. To put the device back into hardware mode, issue the `idle` command.
 
-### Features
+Features
+--------
 
 The `features` node describes features supported by the device, which may not be present on all devices. The first two words in the `features` node are always `<vendor> <model>`, like `corsair k70`. After that, any of the following features may appear:
 - `adjrate`: Device supports adjustable poll rate.
@@ -40,17 +44,20 @@ The `features` node describes features supported by the device, which may not be
 - `pollrate`: Device has a detectable poll rate (stored in the `pollrate` node).
 - `rgb`: Device supports RGB lighting.
 
-### Keyboard layout
+Keyboard layout
+---------------
 
 The driver has no concept of keyboard layouts; all keys are referred to by their English names regardless of the underlying hardware. This means that, for instance, in an AZERTY layout the `q` key in ckb-daemon corresponds to A on the physical keyboard. Note that on UK/european (ISO) layouts, the backslash key (beside left shift) is called `bslash_iso`, while `bslash` refers to the backslash on the US keyboard. The key next to Enter on the ISO keyboard is known as `hash`. See `src/ckb-daemon/keymap.c` for the full table of supported keys.
 
 For technical reasons, the OSX driver may swap the `bslash_iso` and `grave` keys if the keyboard layout is not set correctly. To compensate for this, write `layout iso` or `layout ansi` to the command node.
 
-### Poll rate
+Poll rate
+---------
 
 A device's current poll rate can be read from its `pollrate` node, assuming it has one. Keyboards have a hardware switch to control poll rate and cannot be adjusted via software. However, mice have a software-controlled poll rate. You can change it by issuing `pollrate <interval>` to the command node, where `interval` is the time in milliseconds. Valid poll rates are `1`, `2`, `4`, and `8`.
 
-### Profiles and modes
+Profiles and modes
+------------------
 
 Each mode has its own independent binding and lighting setup. When the daemon starts or a keyboard is plugged in, the profile will be loaded from the hardware. By default, all commands will update the currently selected mode. The `mode <n>` command may be used to change the settings for a different mode. Up to 6 modes are available. Each keyboard has one profile, which may be given a name. Mode 1 may be saved to the device hardware, or modes 1-3 in the case of the K95. Modes 4 through 6 are software-only. Profile management commands are as follows:
 - `profilename <name>` sets the profile's name. The name must be written without spaces; to add a space, use `%20`.
@@ -67,7 +74,8 @@ Each mode has its own independent binding and lighting setup. When the daemon st
 - `profilename My%20Profile mode 1 name Mode%201 mode 2 name Mode%202 mode 3 name Mode%203` will name the profile "My Profile" and name modes 1-3 "Mode 1", "Mode 2", and "Mode 3".
 - `eraseprofile hwload` resets the entire profile to its hardware settings.
 
-### LED commands
+LED commands
+------------
 
 The backlighting is controlled by the `rgb` commands.
 - `rgb <RRGGBB>` sets the entire keyboard to the color specified by the hex constant RRGGBB.
@@ -88,14 +96,16 @@ By default, the controller runs at 30 FPS, meaning that attempts to animate the 
 
 For devices running in 512-color mode, color dithering can be enabled by sending the command `dither 1`. The command `dither 0` disables dithering.
 
-### Indicators
+Indicators
+----------
 
 The indicator LEDs (Num Lock, Caps Lock, Scroll Lock) are controlled with the `i` commands.
 - `ioff <led>` turns an indicator off permanently. Valid LED names are `num`, `caps`, and `scroll`.
 - `ion <led>` turns an indicator on permanently.
 - `iauto <led>` turns an indicator off or on automatically (default behavior).
 
-### Binding keys
+Binding keys
+------------
 
 Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 operation that translates one keypress to a different keypress regardless of circumstance.
 - `bind <key1>:<key2>` remaps key1 to key2.
@@ -108,7 +118,8 @@ Keys may be rebound through use of the `bind` commands. Binding is a 1-to-1 oper
 - `unbind lwin rwin` disables both Windows keys, even without using the keyboard's Windows Lock function.
 - `rebind all` resets the whole keyboard to its default bindings.
 
-### Key macros
+Key macros
+----------
 
 Macros are a more advanced form of key binding, controlled with the `macro` command.
 - `macro <keys>:<command>` binds a key combination to a command, where the command is a series of key presses. To combine keys, separate them with `+`; for instance, `lctrl+a` binds a macro to (left) Ctrl+A. In the command field, enter `+<key>` to trigger a key down or `-<key>` to trigger a key up. To simulate a key press, use `+<key>,-<key>`.
@@ -121,7 +132,39 @@ Macros are a more advanced form of key binding, controlled with the `macro` comm
 
 Assigning a macro to a key will cause its binding to be ignored; for instance, `macro a:+b,-b` will cause A to generate a B character regardless of its binding. However, `macro lctrl+a:+b,-b` will cause A to generate a B only when Ctrl is also held down.
 
-### DPI and mouse settings
+### Macro playback delay
+
+There are two types of playback delay that can be set with macros; global and local. Setting a _global delay_ value introduces a time delay between events during macro execution or playback. _Local delay_ allows setting the delay after an individual event, overriding the global delay value for that event. Thus global delay can be used to set the overall playback speed of macros and local delays can be used to tune individual events within a macro.
+
+All delay values are specified in microseconds (us) and are positive values from `0` to  `UINT_MAX - 1`. This means delays range from 0 to just over 1 hour (4,294,967,294us, 4,294 seconds, 71 minutes, or 1.19 hours). A value of zero (0) represents no delay between actions.
+
+#### Global macro delay (default delay)
+
+Global delay allows macro playback speed to be changed. It sets the time between (actually after) each recorded macro event. If global delay is set to 1 microsecond then a 1 ms delay will follow each individual macro event when the macro is triggered.
+
+The _global delay_ is set with the ckb-daemon's existing (in testing branch) `delay` command followed by an unsigned integer representing the number of microseconds to wait after each macro action and before the next.
+
+Global delay can also be set to `on` which maintains backwards compatibility with the current development of `ckb-daemon` for long macro playback. That is, setting the global delay to `on` introduces a 30us and a 100us delay based on the macro's length during playback.
+
+**NOTE**: This setting also introduces a delay after the last macro action. This functionality exists in the current testing branch and was left as-is. It is still to be determined if this is a bug or a feature.
+
+**Examples:**
+* `delay 1000` sets a 1,000us delay between action playback.
+* `delay on` sets long macro delay; 30us for actions between 20 and 200, 100us for actions > 200.
+* `delay off` sets no delay (same as 0).
+* `delay 0` sets no delay (same as off).
+* `delay spearmint-potato` is invalid input, sets no delay (same as off).
+
+#### Local macro delay (keystroke delay)
+
+Local Delay allows each macro action to have a post-action delay associated with it. This allows a macro to vary it's playback speed for each event. If no local delay is specified for a macro action, then the global `delay` (above) is used. All delay values are in microsecods (us) as with the global delay setting.
+
+***Examples:*** 
+* `macro g5:+d,-d,+e=5000,-e,+l,-l=10000,+a,-a,+y,-y=1000000,+enter,-enter` define a macro for `g5` with a 5,000us delay between the `e`  down and `e` up actions. A 1,000us delay between `l` up and `a` down, a delay of one second (1,000,000us) after `y` up and before `enter`, and the global delay for all other actions.
+* `macro g5:+d,-d=0` use default delay between `d` down and `d` up and no delay (0us) after `d` up. This removes the noted feature/bug (above) where the last action has a trailing delay associated with it.
+
+DPI and mouse settings
+----------------------
 
 DPI settings are stored in a bank. They are controlled with the `dpi` command.
 - `dpi <stage>:<x>,<y>` sets the DPI for a given `stage` to `x` by `y`. Valid stages are `0` through `5`. In hardware, `1` is the first (lowest) stage and `5` is the highest. Stage `0` is used for Sniper mode.
@@ -136,7 +179,8 @@ Additional mouse settings:
 - `lift <height>` sets the lift height, from `1` (lowest) to `5` (highest)
 - `snap <on|off>` enables or disables Angle Snap.
 
-### Notifications
+Notifications
+-------------
 
 The keyboard can be configured to generate user-readable notifications on keypress events. These are controlled with the `notify` commands. In order to see events, read from `/dev/input/ckb*/notify0`. In a terminal, you can do this like `cat /dev/input/ckb1/notify0`. Programmatically, you can open it for reading like a regular file.
 
@@ -156,13 +200,15 @@ Notifications are printed with one notification per line. Commands are as follow
 
 **Note:** Key notifications are _not_ affected by bindings. For instance, if you run `echo bind a:b notify a > /dev/input/ckb1/cmd` and then press the A key, the notifications will read `key +a` `key -a`, despite the fact that the character printed on screen will be `b`. Likewise, unbinding a key or assigning a macro to a key does not affect the notifications.
 
-### Indicator notifications
+Indicator notifications
+-----------------------
 
 You can also choose to receive notifications for the indicator LEDs by using the `inotify` command. For instance, `inotify caps:on` or simply `inotify caps` will print notifications whenever the Caps Lock LED is toggled. The notifications will read `i +caps` when the light is turned on and `i -caps` when it is turned off. It is also possible to toggle all indicators at once using `inotify all` or `inotify all:off`.
 
 Like key notifications, indicator notifications are not affected by bindings, nor by the `ion`, `ioff`, or `iauto` commands. The notifications will reflect the state of the LEDs as seen be the event device.
 
-### Getting parameters
+Getting parameters
+------------------
 
 Parameters can be retrieved using the `get` command. The data will be sent out as a notification. Generally, the syntax to get the data associated with a command is `get :<command>` (note the colon), and the associated data will be returned in the form of `<command> <data>`. The following data may be gotten:
 - `get :mode` returns the current mode in the form of a `switch` command. (Note: Do not use this in a line containing a `mode` command or it will return the mode that you selected, rather than the keyboard's current mode.)
@@ -183,7 +229,8 @@ Parameters can be retrieved using the `get` command. The data will be sent out a
 
 Like `notify`, you must prefix your command with `@<node>` to get data printed to a node other than `notify0`.
 
-### Firmware updates
+Firmware updates
+----------------
 
 **WARNING:** Improper use of `fwupdate` may brick your device; use this command *at your own risk*. I accept no responsibility for broken keyboards.
 
@@ -191,7 +238,20 @@ The latest firmware versions and their URLs can be found in the `FIRMWARE` docum
 
 When the device reconnects you should see the new firmware version in its `fwversion` node; if you see `0000` instead it means that the keyboard did not update successfully and will need another `fwupdate` command in order to function again. If the update fails repeatedly, try connecting the keyboard to a Windows PC and using the official firmware update in CUE.
 
-### Security
+Restart
+-------
+
+Because sometimes the communication between the daemon and the keyboard is corrupted after resuming from standby or suspend, a restart function is implemented.
+It first calls the quit() function, then it calls main() again with the original parameter list.
+
+There are two ways to restart the daemon:
+- send the string "restart some-description-as-one-word" to the cmd-pipe (normally /dev/input/ckb1/cmd or /dev/input/ckb2/cmd, depending on what device gets which ID.
+- send SIGUSR1 to the daemon process (as root).
+
+Later on, there may be a user interface in the client for the first method.
+
+Security
+--------
 
 By default, all of the `ckb*` nodes may be accessed by any user. For most single-user systems this should not present any security issues, since only one person will have access to the computer anyway. However, if you'd like to restrict the users that can write to the `cmd` nodes or read from the `notify` nodes, you can specify the `--gid=<group>` option at start up. For instance, on most systems you could run `ckb-daemon --gid=1000` to make them accessible only by the system's primary user. `ckb-daemon` must still be run as root, regardless of which `gid` you specify. The `gid` option may be set only at startup and cannot be changed while the daemon is running.
 

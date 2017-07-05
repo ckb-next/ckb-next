@@ -1,5 +1,6 @@
 #include <qdebug.h>
 #include "macroreader.h"
+#include <sys/time.h>
 
 //////////
 /// \class MacroReader
@@ -24,7 +25,7 @@ void MacroReader::startWorkInAThread(int macroNumber, QString macroPath, QPlainT
 /// \class MacroReaderThread
 ///
 void MacroReaderThread::readMacro(QString line) {
-    /// \detail We want to see the keys as they appear in the macroText Widget.
+    /// \details We want to see the keys as they appear in the macroText Widget.
     ///
     /// Because it is possible to change the Focus via keyboard,
     /// we must set the focus on each call.
@@ -37,8 +38,8 @@ void MacroReaderThread::readMacro(QString line) {
 
 //////////
 /// \brief MacroReaderThread::run is the standard main function for a thread.
-/// Tries to open a file <macroPath><macroNumber> several times
-/// (in this case, it should be possible the first time. (The code was recycled from kb.cpp).
+/// Tries to open a file \<macroPath\>\<macroNumber\> several times
+/// (in this case, it should be possible the first time (the code was recycled from kb.cpp).
 ///
 /// While the file is open, read lines an signal them via metaObject() to the main thread.
 /// When the file is closed by the sender, close it as reader and terminate.
@@ -63,9 +64,26 @@ void MacroReaderThread::run() {
         }
     }
     // Read data from notification node macroPath
+    // Count time between lines read from the interface
     QByteArray line;
+    timeval t;
+    gettimeofday(&t, NULL);
+    double tstart = t.tv_sec+(t.tv_usec/1000000.0);
+    bool firstline = true;
+
     while(macroFile.isOpen() && (line = macroFile.readLine()).length() > 0){
         QString text = QString::fromUtf8(line);
+        gettimeofday(&t, NULL);
+        double tnow = t.tv_sec+(t.tv_usec/1000000.0);
+
+		// in the first line, there is only a delay "before start". Don't use it.
+        if (!firstline) {
+            text.prepend ("\n");
+            text.prepend (QString::number ((tnow - tstart) * 1000000.0, 'f', 0));
+            text.prepend ("=");
+        } else firstline = false;
+        tstart = tnow;
+
         metaObject()->invokeMethod(this, "readMacro", Qt::QueuedConnection, Q_ARG(QString, text));
     }
     qDebug() << "MacroReader::run() ends.";

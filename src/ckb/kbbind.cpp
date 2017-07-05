@@ -14,10 +14,37 @@ KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap) :
     _winLock(false), _needsUpdate(true), _needsSave(true) {
 }
 
+///
+/// \brief KbBind::KbBind   // copy all existing Key bindings
+/// \param modeParent
+/// \param parentBoard
+/// \param keyMap
+/// \param other
+///
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const KbBind& other) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _bind(other._bind),
     _winLock(false), _needsUpdate(true), _needsSave(true) {
     map(keyMap);
+
+    /// Create a new Hash table and copy all entries
+    QHash<QString, KeyAction*> newBind;
+    foreach(QString key, _bind.keys()) {
+        KeyAction* act = _bind.value(key);
+        if(act) {
+            newBind[key] = new KeyAction(act->value(), this);
+        }
+    }
+
+    /// clear the destination list (there are the original KeyActions as references, so do not delete them)
+    _bind.clear();
+    foreach(QString key, newBind.keys()) {
+        KeyAction* act = newBind.value(key);
+        if(act) {
+            /// and move the KeyActions we just created
+            _bind[key] = new KeyAction(act->value(), this);
+        }
+    }
+    newBind.clear();      // here we *must not* delete the KeyActions, because they are referenced by _bind now
 }
 
 KbPerf* KbBind::perf(){
@@ -217,7 +244,7 @@ void KbBind::update(QFile& cmd, bool force){
     if(_winLock)
         cmd.write(" unbind lwin rwin");
 
-    // At last, send Macro definitions if avalilable.
+    // At last, send Macro definitions if available.
     // If no definitions are made, clear macro will be sent only to reset all macros,
     cmd.write(macros.toLatin1());
     lastCmd = &cmd;

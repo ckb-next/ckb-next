@@ -4,9 +4,7 @@ echo "Stopping GUI"
 ckb --close
 ckb-next --close
 
-echo "Stopping and removing service file"
-
-echo "Detecting init system"
+echo "Stopping the daemon and removing service file"
 if [[ -e "/run/systemd/system" ]]; then
     echo "systemd detected"
     sudo systemctl stop ckb{,-next}-daemon
@@ -19,8 +17,7 @@ elif [[ -e "/run/openrc/softlevel" ]]; then
     sudo rc-service ckb-next-daemon stop
     sudo rc-update del ckb-daemon default
     sudo rc-update del ckb-next-daemon default
-    sudo rm -f /etc/init.d/ckb-daemon
-    sudo rm -f /etc/init.d/ckb-next-daemon
+    sudo rm -f /etc/init.d/ckb{,-next}-daemon
 elif [[ "$(initctl --version)" =~ "upstart" ]]; then
     echo "Upstart detected"
     sudo service ckb-daemon stop

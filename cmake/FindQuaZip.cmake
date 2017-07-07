@@ -23,9 +23,9 @@ ELSE (QUAZIP_INCLUDE_DIRS AND QUAZIP_LIBRARIES)
         FIND_PATH(QUAZIP_INCLUDE_DIR NAMES quazip.h HINTS ${QUAZIP_LIBRARY_DIR}/../ PATH_SUFFIXES include/quazip)
         FIND_PATH(QUAZIP_ZLIB_INCLUDE_DIR NAMES zlib.h)
     ELSE (WIN32)
-        FIND_PACKAGE(PkgConfig)
-        #     pkg_check_modules(PC_QCA2 QUIET qca2)
-        pkg_check_modules(PC_QUAZIP quazip)
+#        FIND_PACKAGE(PkgConfig)
+#        pkg_check_modules(PC_QCA2 QUIET qca2)
+#        pkg_check_modules(PC_QUAZIP quazip)
         FIND_LIBRARY(QUAZIP_LIBRARIES
                 WIN32_DEBUG_POSTFIX d
                 NAMES quazip${QUAZIP_LIB_VERSION_SUFFIX}

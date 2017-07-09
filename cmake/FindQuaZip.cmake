@@ -28,15 +28,13 @@ ELSE (QUAZIP_INCLUDE_DIRS AND QUAZIP_LIBRARIES)
 #        pkg_check_modules(PC_QUAZIP quazip)
         FIND_LIBRARY(QUAZIP_LIBRARIES
                 WIN32_DEBUG_POSTFIX d
-                NAMES quazip${QUAZIP_LIB_VERSION_SUFFIX}
-                libquazip.dylib  # homebrew
-                HINTS /usr/lib /usr/lib64
-                /usr/local/opt/quazip/lib  # homebrew
+                NAMES quazip${QUAZIP_LIB_VERSION_SUFFIX} libquazip.dylib
+                HINTS /usr/lib /usr/lib64 /usr/local/opt/lib
+                PATH_SUFFIXES quazip
                 )
         FIND_PATH(QUAZIP_INCLUDE_DIR quazip.h
-                HINTS /usr/include /usr/local/include /usr/local/bin
-                /usr/local/opt/quazip/include/quazip  # homebrew
-                PATH_SUFFIXES quazip${QUAZIP_LIB_VERSION_SUFFIX}
+                HINTS /usr/include /usr/local/include /usr/local/bin /usr/local/opt/include
+                PATH_SUFFIXES quazip quazip${QUAZIP_LIB_VERSION_SUFFIX}
                 )
         FIND_PATH(QUAZIP_ZLIB_INCLUDE_DIR zlib.h HINTS /usr/include /usr/local/include)
     ENDIF (WIN32)

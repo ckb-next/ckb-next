@@ -11,7 +11,7 @@ if (BREW_QT5)
     endif ()
 endif ()
 
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Network)
+find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
 include_directories(
         ${Qt5Core_INCLUDE_DIRS}
         ${Qt5Widgets_INCLUDE_DIRS}

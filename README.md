@@ -226,7 +226,7 @@ If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo 
 ### OS X/macOS
 
 - **“ckb.pkg” can’t be opened because it is from an unidentified developer**
-    Open `System Preferences > Security & Privacy > General` and click `Open Anyway`.
+    Right-click (control-click) on ckb.pkg and select Open. This new dialog box will give you the option to open anyway, without changing your system preferences.
 - **Modifier keys (Shift, Ctrl, etc.) are not rebound correctly**
     ckb does not recognize modifier keys rebound from System Preferences. You can rebind them again within the application.
 - **`~` key prints `§±`**

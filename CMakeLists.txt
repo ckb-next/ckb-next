@@ -60,4 +60,6 @@ endif ()
 
 set(INSTALL_ANIMATIONS_DIR "${INSTALL_CMAKE_DIR}/ckb-animations")
 
+#include(PrintAllVariables)
+
 add_subdirectory(src)

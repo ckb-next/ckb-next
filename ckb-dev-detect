@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#Newline
+# Newline
 N=$'\n'
 
 echo "This script will collect information about the Corsair devices in your system."
 read -p "Please make sure they are plugged in and press Enter.${N}"
 
-#Force English
+# Force English
 export LANG=C
 
 #Check if user can write to the PWD
@@ -20,31 +20,29 @@ fi
 
 OUT="ckb-dev-detect - $(date)"
 
-#Applies to both
+# Applies to both
 OUT="${OUT}${N}${N}Kernel: `uname -a`"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    #Mac
     OUT="${OUT}${N}${N}OS Version:${N}`sw_vers`"
     OUT="${OUT}${N}${N}USB Devices:${N}`system_profiler SPUSBDataType -detailLevel mini | grep -i -B3 -A9 1b1c`"
 else
-    #Linux
     OUT="${OUT}${N}${N}OS Version:${N}`lsb_release -a 2>/dev/null`"
     OUT="${OUT}${N}${N}USB Devices:${N}`lsusb -vd '1b1c:' 2>&1`"
-    CURLOG=$(journalctl -o short-precise -k -b -0 2>/dev/null | grep -i "ckb\|corsair\|1b1c\|usbhid")
-    #Check if the above didn't succeed, fall back to dmesg
-    if [ -z "$CURLOG" ]; then
-        OUT="${OUT}${N}${N}Systemctl error, falling back to dmesg:${N}`dmesg | grep -i \"ckb\|corsair\|1b1c\|usbhid\"`"
+
+    # Check if kernel ring buffer is reachable through systemd journal, fall back to dmesg
+    if [ -z "$(journalctl -k 2>/dev/null)" ]; then
+        OUT="${OUT}${N}${N}Systemctl error, falling back to dmesg:${N}`dmesg | grep -i \"ckb\|corsair\|1b1c\"`"
     else
-        OUT="${OUT}${N}${N}Dmesg on current boot:${N}${CURLOG}"
-        #Pipe stderr to /dev/null, as grep would filter errors out anyway. In case of an error, it will be captured by the ones below.
+        # Pipe stderr to /dev/null, as grep would filter errors out anyway
+        OUT="${OUT}${N}${N}Dmesg on current boot:${N}`journalctl -o short-precise -k -b -0 2>/dev/null | grep -i \"ckb\|corsair\|1b1c\"`"
         OUT="${OUT}${N}${N}Dmesg on last boot:${N}`journalctl -o short-precise -k -b -1 2>/dev/null | grep -i \"ckb\|corsair\|1b1c\"`"
         OUT="${OUT}${N}${N}Daemon on current boot:${N}`journalctl -o short-precise -b -0 --unit=ckb-daemon 2>&1`"
         OUT="${OUT}${N}${N}Daemon on last boot:${N}`journalctl -o short-precise -b -1 --unit=ckb-daemon 2>&1`"
     fi
 fi
 
-#Gzip and write output
+# Gzip and write output
 echo "$OUT" | gzip > ckb-dev-detect-report.gz
 
 echo "Done! Please send the following report to the developers."

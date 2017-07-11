@@ -1,4 +1,6 @@
-# Used to determine the version for ckb source using "git describe", if git
+# Adopted from OpenChemistry projects.
+#
+# Used to determine the version for ckb-next source using "git describe", if git
 # is found. On success sets following variables in caller's scope:
 #   ${var_prefix}_VERSION
 #   ${var_prefix}_VERSION_MAJOR
@@ -8,7 +10,7 @@
 #   ${var_prefix}_VERSION_IS_RELEASE if patch-extra is empty.
 #
 # If git is not found, or git describe cannot be run successfully, then these
-# variables are left unchanged and status message is printed.
+# variables are left unchanged and a warning message is printed.
 #
 # Arguments are:
 #   source_dir : Source directory
@@ -59,8 +61,8 @@ function(determine_version source_dir git_command var_prefix)
         message(WARNING
                 "\
 Could not use git to determine source version, using version ${${var_prefix}_VERSION}. \
-If you are using the 'testing' branch please clone it with git instead of downloading an archive. \
-For example: git clone -b testing --single-branch https://github.com/mattanger/ckb-next.git"
+Consider cloning the project with git instead of downloading an archive. \
+For example: git clone -b master --single-branch https://github.com/mattanger/ckb-next.git"
                 )
     endif ()
 

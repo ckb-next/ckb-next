@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
 project(ckb-next LANGUAGES C CXX)
 
-set(CMAKE_MODULE_PATH ${ckb-next_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 
 # everything we need to load before proceeding with the main CMake file
 include(PreCMakeConfig)

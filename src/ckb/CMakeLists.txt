@@ -274,14 +274,11 @@ if (APPLE)
             )
 endif ()
 
-if (NOT LINUX_CUSTOM_INSTALL)
-    install(TARGETS ckb-next
-            RUNTIME DESTINATION "${INSTALL_RUNTIME_DIR}"
-            BUNDLE DESTINATION .
-            )
-endif ()
+install(TARGETS ckb-next
+        RUNTIME DESTINATION "${INSTALL_RUNTIME_DIR}"
+        BUNDLE DESTINATION .)
 
-if (LINUX AND NOT LINUX_CUSTOM_INSTALL)
+if (LINUX)
     if (NOT EXISTS "/usr/bin/ckb-next")
         # symlink to /usr/bin
         install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next" "/usr/bin/ckb-next")]])

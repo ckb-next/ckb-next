@@ -100,11 +100,8 @@ endif ()
 add_executable(ckb-next-daemon ${SOURCES} ${HEADERS})
 target_link_libraries(ckb-next-daemon ${LIBS})
 
-if (NOT LINUX_CUSTOM_INSTALL)
-    install(TARGETS ckb-next-daemon
-            RUNTIME DESTINATION "${INSTALL_CMAKE_DIR}"
-            )
-endif ()
+install(TARGETS ckb-next-daemon
+        RUNTIME DESTINATION "${INSTALL_CMAKE_DIR}")
 
 if (APPLE)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next-daemon.plist.in"
@@ -119,7 +116,7 @@ if (APPLE)
             WORLD_READ
             )
     install(CODE [[execute_process(COMMAND launchctl load /Library/LaunchDaemons/ckb-next-daemon.plist)]])
-elseif (LINUX AND NOT LINUX_CUSTOM_INSTALL)
+elseif (LINUX)
     if (NOT EXISTS "/usr/bin/ckb-next-daemon")
         # symlink to /usr/bin
         install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next-daemon" "/usr/bin/ckb-next-daemon")]])

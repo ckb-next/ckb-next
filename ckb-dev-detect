@@ -7,7 +7,7 @@ echo "This script will collect information about the Corsair devices in your sys
 read -p "Please make sure they are plugged in and press Enter.${N}"
 
 # Force English
-export LANG=C
+export LC_ALL=C
 
 #Check if user can write to the PWD
 touch ckb-dev-detect-report.gz

@@ -1,13 +1,11 @@
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Export version to source code
+set(${PROJECT_NAME}_VERSION_STR "${ckb-next_VERSION}")
+configure_file(ckbnextconfig.h.in ckbnextconfig.h)
 
-# export version to source code
-set(CKB_VERSION_STR ${ckb-next_VERSION})
-configure_file(ckbnextconfig.h.in ckbnextconfig.h @ONLY)
-
-# include this directory so that it's possible to write #include <ckbnextconfig.h> in source files
+# Include this directory so that it's possible to write #include <ckbnextconfig.h> in source files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# animations
+# Animations
 if (WITH_GRADIENT)
     add_subdirectory(ckb-gradient)
 endif ()

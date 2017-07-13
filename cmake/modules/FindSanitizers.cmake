@@ -24,7 +24,7 @@
 
 # If any of the used compiler is a GNU compiler, add a second option to static
 # link against the sanitizers.
-option(SANITIZE_LINK_STATIC "Try to link static against sanitizers." Off)
+# option(SANITIZE_LINK_STATIC "Try to link static against sanitizers." Off)
 
 
 

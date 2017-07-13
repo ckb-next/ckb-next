@@ -12,9 +12,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 # Internal booleans
 #------------------------------------------------------------------------------
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(MACOS TRUE CACHE INTERNAL "macOS host" FORCE)
+    set(MACOS ON CACHE INTERNAL "macOS host" FORCE)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(LINUX TRUE CACHE INTERNAL "Linux host" FORCE)
+    set(LINUX ON CACHE INTERNAL "Linux host" FORCE)
 else ()
     message(FATAL_ERROR "${CMAKE_SYSTEM_NAME} is not supported.")
 endif ()
@@ -37,56 +37,80 @@ endif ()
 ###############################################################################
 # Options
 #------------------------------------------------------------------------------
-if (MACOS AND NOT LINUX)
-    option(  BREW_QT5                     "Use Homebrew package for Qt5"                  ON  )
-elseif (LINUX AND NOT MACOS)
-    option(  WITH_MVIZ                    "Build with music visualizer"                   OFF )      # Licence violation, close #187 first
+include(CMakeDependentOption)
+
+if (MACOS)
+    option( USE_BREW_QT5 "Use Homebrew package for Qt5." ON  )
+else ()  #if (LINUX)
+    option( WITH_MVIZ    "Build with music visualizer."  OFF )  # Licence violation, close #187 first
 endif ()
 
-if (MACOS OR LINUX)
-    option(  WITH_SANITIZERS              "Run some sanitizers on some targets"           OFF )
-    option(  WITH_GUI                     "Build with Qt GUI to manipulate animations"    ON  )
-    # Animations
-    option(  WITH_GRADIENT                "Build with 'Gradient' animation"               ON  )
-    option(  WITH_HEAT                    "Build with 'Heat' animation"                   OFF )      # License violation, close #187 first
-    option(  WITH_PINWHEEL                "Build with 'Pinwheel' animation"               ON  )
-    option(  WITH_RAIN                    "Build with 'Rain' animation"                   ON  )
-    option(  WITH_RANDOM                  "Build with 'Random' animation"                 ON  )
-    option(  WITH_RIPPLE                  "Build with 'Ripple' animation"                 ON  )
-    option(  WITH_WAVE                    "Build with 'Wave' animation"                   ON  )
-endif ()
+# GUI
+option( WITH_GUI "Build with Qt GUI to manipulate animations." ON  )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")                                                               # For developers
-    option(  BASIC_COMPILER_FLAGS         "Basic inspections"                             ON  )
-    option(  NORMAL_COMPILER_FLAGS        "Normal inspections"                            ON  )
-    option(  EXTRA_COMPILER_FLAGS         "Extra inspections"                             ON  )
-    option(  WITH_SANITIZERS              "Run some sanitizers on some targets"           ON  )
-elseif (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")                                                  # For casual builds (default)
-    option(  BASIC_COMPILER_FLAGS         "Basic inspections"                             ON  )
-    option(  NORMAL_COMPILER_FLAGS        "Severe inspections"                            ON  )
-    option(  EXTRA_COMPILER_FLAGS         "Extra inspections"                             OFF )
-elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
-    option(  BASIC_COMPILER_FLAGS         "Basic inspections"                             ON  )
-    option(  NORMAL_COMPILER_FLAGS        "Severe inspections"                            OFF )
-    option(  EXTRA_COMPILER_FLAGS         "Extra inspections"                             OFF )
-elseif (CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")                                                      # For static blobs
-    option(  BASIC_COMPILER_FLAGS         "Basic inspections"                             ON  )
-    option(  NORMAL_COMPILER_FLAGS        "Severe inspections"                            ON  )
-    option(  EXTRA_COMPILER_FLAGS         "Extra inspections"                             OFF )
+# Animations
+option( WITH_ANIMATIONS "Build with animations." ON)
+cmake_dependent_option( WITH_GRADIENT  "Build with 'Gradient' animation." ON  "WITH_ANIMATIONS" OFF )
+cmake_dependent_option( WITH_HEAT      "Build with 'Heat' animation."     OFF "WITH_ANIMATIONS" OFF )  # License violation, close #187 first
+cmake_dependent_option( WITH_PINWHEEL  "Build with 'Pinwheel' animation." ON  "WITH_ANIMATIONS" OFF )
+cmake_dependent_option( WITH_RAIN      "Build with 'Rain' animation."     ON  "WITH_ANIMATIONS" OFF )
+cmake_dependent_option( WITH_RANDOM    "Build with 'Random' animation."   ON  "WITH_ANIMATIONS" OFF )
+cmake_dependent_option( WITH_RIPPLE    "Build with 'Ripple' animation."   ON  "WITH_ANIMATIONS" OFF )
+cmake_dependent_option( WITH_WAVE      "Build with 'Wave' animation."     ON  "WITH_ANIMATIONS" OFF )
+
+# Compilation flags
+option( BASIC_COMPILER_FLAGS    "Basic inspections."  OFF )
+option( NORMAL_COMPILER_FLAGS   "Normal inspections." OFF )
+option( EXTRA_COMPILER_FLAGS    "Extra inspections."  OFF )
+
+# USB
+option ( DEBUG_USB_SEND "Show the contents of USB packets being sent"     OFF )
+option ( DEBUG_USB_RECV "Show the contents of USB packets being received" OFF )
+
+# Sanitizers, by arsenm/sanitizers-cmake
+option( WITH_SANITIZERS "Enable certain sanitizers for certain targets." OFF )
+cmake_dependent_option( SANITIZE_ADDRESS     "Enable AddressSanitizer for sanitized targets."           OFF "WITH_SANITIZERS" OFF )
+cmake_dependent_option( SANITIZE_MEMORY      "Enable MemorySanitizer for sanitized targets."            OFF "WITH_SANITIZERS" OFF )
+cmake_dependent_option( SANITIZE_THREAD      "Enable ThreadSanitizer for sanitized targets."            OFF "WITH_SANITIZERS" OFF )
+cmake_dependent_option( SANITIZE_UNDEFINED   "Enable UndefinedBehaviorSanitizer for sanitized targets." OFF "WITH_SANITIZERS" OFF )
+cmake_dependent_option( SANITIZE_LINK_STATIC "Try to link static against sanitizers."                   OFF "WITH_SANITIZERS" OFF )
+
+# Knowledge about generator type is important
+# See https://stackoverflow.com/a/24470998/5164080
+string(COMPARE EQUAL "${CMAKE_CFG_INTDIR}" "." is_single)
+if (is_single)
+    message(STATUS "Single-configuration generator")
+    # In case of such generator CMAKE_CONFIGURATION_TYPES is empty, therefore:
+    list(APPEND CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}")
 else ()
-    message(FATAL_ERROR "Blame CMake developers")
+    message(STATUS "Multi-configuration generator")
 endif ()
+
+foreach (build_type "${CMAKE_CONFIGURATION_TYPES}")
+    if ("${build_type}" STREQUAL "Debug")  # For developers
+        set(WITH_SANITIZERS         ON)
+        set(BASIC_COMPILER_FLAGS    ON)
+        set(NORMAL_COMPILER_FLAGS   ON)
+        set(EXTRA_COMPILER_FLAGS    ON)
+    elseif ("${build_type}" STREQUAL "RelWithDebInfo")  # For casual builds (default)
+        set(BASIC_COMPILER_FLAGS    ON)
+        set(NORMAL_COMPILER_FLAGS   ON)
+    elseif ("${build_type}" STREQUAL "MinSizeRel")  # For static blobs
+        set(BASIC_COMPILER_FLAGS    ON)
+        set(NORMAL_COMPILER_FLAGS   ON)
+    elseif ("${build_type}" STREQUAL "Release")
+        set(BASIC_COMPILER_FLAGS    ON)
+    else ()
+        message(WARNING "Using non-standard build type. Proceed only if you know what you are doing.")
+    endif ()
+endforeach ()
 
 if (WITH_SANITIZERS)
     find_package(Sanitizers REQUIRED)
-    # Options to enable sanitizers will appear in CMake GUI
-    # They are:
-    # SANITIZE_ADDRESS, SANITIZE_MEMORY, SANITIZE_THREAD or SANITIZE_UNDEFINED
-    # SANITIZE_LINK_STATIC to link sanitizers for gcc static
 endif ()
 
 if (NOT WITH_GUI)
-    message(WARNING "Building without GUI is NOT recommended. Proceed only if you know what you are doing.")
+    message(WARNING "Building without GUI. Proceed only if you know what you are doing.")
 endif ()
 ###############################################################################
 

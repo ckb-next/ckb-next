@@ -1,37 +1,36 @@
-# Export version to source code
-set(${PROJECT_NAME}_VERSION_STR "${ckb-next_VERSION}")
+# Export version etc. to source code
 configure_file(ckbnextconfig.h.in ckbnextconfig.h)
 
 # Include this directory so that it's possible to write #include <ckbnextconfig.h> in source files
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+
+add_subdirectory(daemon)
+if (WITH_GUI)
+    add_subdirectory(gui)
+endif ()
 
 # Animations
 if (WITH_GRADIENT)
-    add_subdirectory(ckb-gradient)
+    add_subdirectory(gradient)
 endif ()
 if (WITH_HEAT)
-    add_subdirectory(ckb-heat)
+    add_subdirectory(heat)
 endif ()
 if (WITH_PINWHEEL)
-    add_subdirectory(ckb-pinwheel)
+    add_subdirectory(pinwheel)
 endif ()
 if (WITH_RAIN)
-    add_subdirectory(ckb-rain)
+    add_subdirectory(rain)
 endif ()
 if (WITH_RANDOM)
-    add_subdirectory(ckb-random)
+    add_subdirectory(random)
 endif ()
 if (WITH_RIPPLE)
-    add_subdirectory(ckb-ripple)
+    add_subdirectory(ripple)
 endif ()
 if (WITH_WAVE)
-    add_subdirectory(ckb-wave)
+    add_subdirectory(wave)
 endif ()
-if (LINUX AND WITH_MVIZ)
-    add_subdirectory(ckb-mviz)
+if (WITH_MVIZ)
+    add_subdirectory(mviz)
 endif ()
-
-# daemon and GUI
-add_subdirectory(ckb-daemon)
-# needs to be the last one to process
-add_subdirectory(ckb)

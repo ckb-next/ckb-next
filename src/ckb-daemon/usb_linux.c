@@ -62,7 +62,7 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 /// an error message is issued on the standard error channel
 /// [warning "Wrote YY bytes (expected 64)"].
 ///
-/// If DEBUG_USB is set during compilation,
+/// If DEBUG_USB_SEND is set during compilation,
 /// the number of bytes sent and their representation are logged to the error channel.
 ///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
@@ -87,7 +87,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
             return 0;
     } else if (res != MSG_SIZE)
         ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
-#ifdef DEBUG_USB
+#ifdef DEBUG_USB_SEND
     char converted[MSG_SIZE*3 + 1];
     for(int i=0;i<MSG_SIZE;i++)
         sprintf(&converted[i*3], "%02x ", out_msg[i]);

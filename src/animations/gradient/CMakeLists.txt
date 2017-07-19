@@ -1,18 +1,29 @@
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#[=[
 
-find_package(StandardMathLibrary REQUIRED)
+        Copyright © 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
 
-set(SOURCES
-        main.c
-        )
+        This file is part of ckb-next.
 
-set(LIBS
-        ${STANDARD_MATH_LIBRARY}
-        )
+        ckb-next is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License version 2
+        as published by the Free Software Foundation.
 
-add_executable(ckb-gradient ${SOURCES})
-target_link_libraries(ckb-gradient ${LIBS})
+        ckb-next is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
 
-install(TARGETS ckb-gradient
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
+        You should have received a copy of the GNU General Public License
+        along with ckb-next. If not, see <http://www.gnu.org/licenses/>.
+
+#]=]
+
+project(gradient C)
+
+add_executable(${CMAKE_PROJECT_NAME}-${PROJECT_NAME})
+target_sources(${CMAKE_PROJECT_NAME}-${PROJECT_NAME})
+target_link_libraries(${CMAKE_PROJECT_NAME}-${PROJECT_NAME} "m")
+
+install(TARGETS ${CMAKE_PROJECT_NAME}-${PROJECT_NAME}
+        DESTINATION "${INSTALL_DIR_ANIMATIONS}"
         )

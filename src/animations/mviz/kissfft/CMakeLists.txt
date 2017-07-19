@@ -18,27 +18,12 @@
 
 #]=]
 
-project(mviz C)
+project(kissfft C)
 
-find_package(PulseAudioSimple REQUIRED)
-
-add_executable(${CMAKE_PROJECT_NAME}-${PROJECT_NAME})
-
-target_sources(${CMAKE_PROJECT_NAME}-${PROJECT_NAME}
-        PRIVATE
-            main.c
-        )
-
-target_include_directories(${CMAKE_PROJECT_NAME}-${PROJECT_NAME}
-        PRIVATE
-            ${PULSEAUDIOSIMPLE_INCLUDE_DIRS}
-        )
-
-target_link_libraries(${CMAKE_PROJECT_NAME}-${PROJECT_NAME}
-        PRIVATE
-            m
-            ${PULSEAUDIOSIMPLE_LIBRARIES}
-        )
+add_library(${PROJECT_NAME})
+target_sources(${PROJECT_NAME} PUBLIC )
+target_include_directories(${CMAKE_PROJECT_NAME}-${PROJECT_NAME} PRIVATE ${PULSEAUDIOSIMPLE_INCLUDE_DIRS})
+target_link_libraries(${CMAKE_PROJECT_NAME}-${PROJECT_NAME} PRIVATE m ${PULSEAUDIOSIMPLE_LIBRARIES})
 
 install(TARGETS ${CMAKE_PROJECT_NAME}-${PROJECT_NAME}
         DESTINATION ${INSTALL_DIR_ANIMATIONS}

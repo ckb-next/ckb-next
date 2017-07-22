@@ -260,8 +260,11 @@ sleep 1
 echo ""
 read -rp "Start ckb now [Y/n]? " dolaunch
 [[ $dolaunch =~ no? ]] && exit 0
-APP="$PREFIX"/bin/ckb
-[[ "$OSTYPE" == "darwin"* ]] && APP="$APP".app/Contents/MacOS/ckb
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    APP="$PREFIX"/ckb.app/Contents/MacOS/ckb
+else
+    APP="$PREFIX"/bin/ckb
+fi
 # Ask ckb to close if there's an instance already running
 "$APP" --close >/dev/null 2>&1
 sleep 1

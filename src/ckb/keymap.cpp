@@ -315,8 +315,14 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     case KeyMap::K63:{
-        map = getMap(KeyMap::K65, layout);
-
+        // Same as the K65 but without the Fn key
+        map = getMap(KeyMap::K70, layout);
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            if(i.value().x >= K65_WIDTH)
+                i.remove();
+        }
         for(const Key* key = K63TopRow; key < K63TopRow + K63_TOP_COUNT; key++)
             map[key->name] = *key;
 

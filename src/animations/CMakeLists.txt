@@ -1,9 +1,3 @@
-# if (WITH_ANIMATIONS)
-#     file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/animations")
-#     install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/animations"
-#             DESTINATION "${CMAKE_INSTALL_LIBEXECDIR}")
-# endif ()
-
 if (WITH_GRADIENT)
     add_subdirectory(gradient)
 endif ()

@@ -1,18 +1,32 @@
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#
+#        Copyright © 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#       
+#        This file is part of ckb-next.
+#       
+#        ckb-next is free software: you can redistribute it and/or modify
+#        it under the terms of the GNU General Public License version 2
+#        as published by the Free Software Foundation.
+#       
+#        ckb-next is distributed in the hope that it will be useful,
+#        but WITHOUT ANY WARRANTY; without even the implied warranty of
+#        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#        GNU General Public License for more details.
+#       
+#        You should have received a copy of the GNU General Public License
+#        along with ckb-next. If not, see <http://www.gnu.org/licenses/>.
+#
 
-find_package(StandardMathLibrary REQUIRED)
+project(ripple C)
 
-set(SOURCES
-        main.c
-        )
+add_executable(ripple)
 
-set(LIBS
-        ${STANDARD_MATH_LIBRARY}
-        )
+target_sources(ripple
+                PRIVATE
+                  main.c)
 
-add_executable(ckb-ripple ${SOURCES})
-target_link_libraries(ckb-ripple ${LIBS})
+target_link_libraries(ripple
+                        PRIVATE
+                          m)
 
-install(TARGETS ckb-ripple
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
-        )
+install(TARGETS ripple
+        DESTINATION "${INSTALL_DIR_ANIMATIONS}")

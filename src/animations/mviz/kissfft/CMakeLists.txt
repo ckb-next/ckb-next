@@ -1,30 +1,37 @@
-#[=[
+#
+#        Copyright © 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#       
+#        This file is part of ckb-next.
+#       
+#        ckb-next is free software: you can redistribute it and/or modify
+#        it under the terms of the GNU General Public License version 2
+#        as published by the Free Software Foundation.
+#       
+#        ckb-next is distributed in the hope that it will be useful,
+#        but WITHOUT ANY WARRANTY; without even the implied warranty of
+#        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#        GNU General Public License for more details.
+#       
+#        You should have received a copy of the GNU General Public License
+#        along with ckb-next. If not, see <http://www.gnu.org/licenses/>.
+#
 
-        Copyright © 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+add_library(kissfft STATIC)
 
-        This file is part of ckb-next.
+target_sources(kissfft
+                PRIVATE
+                  _kiss_fft_guts.h
+                  kiss_fft.c
+                  kiss_fft.h
+                  kiss_fftr.c
+                  kiss_fftr.h)
 
-        ckb-next is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License version 2
-        as published by the Free Software Foundation.
+target_include_directories(kissfft
+                            PRIVATE
+                              ${CMAKE_CURRENT_BINARY_DIR})
 
-        ckb-next is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
+target_link_libraries(kissfft
+                       PRIVATE
+                         m)
 
-        You should have received a copy of the GNU General Public License
-        along with ckb-next. If not, see <http://www.gnu.org/licenses/>.
-
-#]=]
-
-project(kissfft C)
-
-add_library(${PROJECT_NAME})
-target_sources(${PROJECT_NAME} PUBLIC )
-target_include_directories(${CMAKE_PROJECT_NAME}-${PROJECT_NAME} PRIVATE ${PULSEAUDIOSIMPLE_INCLUDE_DIRS})
-target_link_libraries(${CMAKE_PROJECT_NAME}-${PROJECT_NAME} PRIVATE m ${PULSEAUDIOSIMPLE_LIBRARIES})
-
-install(TARGETS ${CMAKE_PROJECT_NAME}-${PROJECT_NAME}
-        DESTINATION ${INSTALL_DIR_ANIMATIONS}
-        )
+add_subdirectory(kissfft)

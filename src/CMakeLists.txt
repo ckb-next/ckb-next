@@ -1,4 +1,4 @@
-# Export version etc. to source code
+# Export version, etc. to source code
 configure_file(ckbnextconfig.h.in ckbnextconfig.h)
 
 # Include this directory so that it's possible to write #include <ckbnextconfig.h> in source files

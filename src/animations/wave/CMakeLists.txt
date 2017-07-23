@@ -1,18 +1,32 @@
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#
+#        Copyright © 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#       
+#        This file is part of ckb-next.
+#       
+#        ckb-next is free software: you can redistribute it and/or modify
+#        it under the terms of the GNU General Public License version 2
+#        as published by the Free Software Foundation.
+#       
+#        ckb-next is distributed in the hope that it will be useful,
+#        but WITHOUT ANY WARRANTY; without even the implied warranty of
+#        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#        GNU General Public License for more details.
+#       
+#        You should have received a copy of the GNU General Public License
+#        along with ckb-next. If not, see <http://www.gnu.org/licenses/>.
+#
 
-find_package(StandardMathLibrary REQUIRED)
+project(wave C)
 
-set(SOURCES
-        main.c
-        )
+add_executable(wave)
 
-set(LIBS
-        ${STANDARD_MATH_LIBRARY}
-        )
+target_sources(wave
+                PRIVATE
+                  main.c)
 
-add_executable(ckb-wave ${SOURCES})
-target_link_libraries(ckb-wave ${LIBS})
+target_link_libraries(wave
+                        PRIVATE
+                          m)
 
-install(TARGETS ckb-wave
-        DESTINATION "${INSTALL_ANIMATIONS_DIR}"
-        )
+install(TARGETS wave
+        DESTINATION "${INSTALL_DIR_ANIMATIONS}")

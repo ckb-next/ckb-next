@@ -307,8 +307,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         for(const Key* key = K65TopRow; key < K65TopRow + K65_TOP_COUNT; key++)
             map[key->name] = *key;
-	// Add Fn key, which is found on Strafe
+        // Add Fn key from Strafe and shift it to the left
         map["fn"] = KStrafeKeys[3];
+        map["fn"].x -= 12;
         map.remove("rwin");
         // Done!
         break;

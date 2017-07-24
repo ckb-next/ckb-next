@@ -223,6 +223,10 @@ read [this Arch Linux thread](https://bbs.archlinux.org/viewtopic.php?id=214147)
 
 If you're using **Unity** and the tray icon doesn't appear correctly, run `sudo apt-get install libappindicator-dev`. Then reinstall ckb.
 
+#### Fedora 26 Color Changer Freeze Fix
+
+If you're running Fedora 26, a working solution for the color changer freezing issue is to install qt5ct `dnf install qt5ct` then modify your /etc/environment file to contain the line `QT_QPA_PLATFORMTHEME=qt5ct`
+
 ### OS X/macOS
 
 - **“ckb.pkg” can’t be opened because it is from an unidentified developer**

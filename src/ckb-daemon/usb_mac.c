@@ -27,6 +27,8 @@ static IONotificationPortRef notify = 0;
 // - endquote
 //
 static CFMachPortRef mouse_event_tap;
+static char current_ckb_pid;
+static char mouse_event_tap_pid;
 
 static long hidgetlong(hid_dev_t handle, CFStringRef key){
     long raw = 0;
@@ -322,49 +324,72 @@ CGEventRef mouse_event_modifier_callback(CGEventTapProxy proxy, CGEventType type
     return event;
 }
 
+// Get the current ckb.app instance pid if it's open.
+void update_ckb_pid() {
+    char str[10] = {0};
+    FILE *fp = fopen("/tmp/ckb", "r");
+    if (fp) {
+        fgets(str, sizeof(str), fp);
+        fclose(fp);
+    }
+    current_ckb_pid = *str;
+}
+
 // Register to watch all mouse events, so the daemon can add the modifier keys
 // back into those events. Called with the same runloop that is used to listen
 // for input.
-void register_mouse_event_tap(CFRunLoopRef run_loop) {
+void register_mouse_event_tap(CFRunLoopTimerRef timer, void* info) {
+    CFRunLoopRef run_loop = info;
+    update_ckb_pid();
 
-    // Set mask to catch all mouse events, as the modifier keys
-    // can change the look of the pointer.
+    if (current_ckb_pid) {
+        if (mouse_event_tap && current_ckb_pid != mouse_event_tap_pid) {
+            // If the ckb pid has changed, invalidate the event.
+            CFMachPortInvalidate(mouse_event_tap);
+            mouse_event_tap = NULL;
+        }
+        if (!mouse_event_tap) {
+            // Set mask to catch all mouse events, as the modifier keys
+            // can change the look of the pointer.
+            CGEventMask mask = CGEventMaskBit(kCGEventLeftMouseDown) |
+                               CGEventMaskBit(kCGEventLeftMouseUp) |
+                               CGEventMaskBit(kCGEventRightMouseDown) |
+                               CGEventMaskBit(kCGEventRightMouseUp) |
+                               CGEventMaskBit(kCGEventMouseMoved) |
+                               CGEventMaskBit(kCGEventLeftMouseDragged) |
+                               CGEventMaskBit(kCGEventRightMouseDragged) |
+                               CGEventMaskBit(kCGEventScrollWheel) |
+                               CGEventMaskBit(kCGEventTabletPointer) |
+                               CGEventMaskBit(kCGEventTabletProximity) |
+                               CGEventMaskBit(kCGEventOtherMouseDown) |
+                               CGEventMaskBit(kCGEventOtherMouseUp) |
+                               CGEventMaskBit(kCGEventOtherMouseDragged);
 
-    CGEventMask mask = CGEventMaskBit(kCGEventLeftMouseDown) |
-                        CGEventMaskBit(kCGEventLeftMouseUp) |
-                        CGEventMaskBit(kCGEventRightMouseDown) |
-                        CGEventMaskBit(kCGEventRightMouseUp) |
-                        CGEventMaskBit(kCGEventMouseMoved) |
-                        CGEventMaskBit(kCGEventLeftMouseDragged) |
-                        CGEventMaskBit(kCGEventRightMouseDragged) |
-                        CGEventMaskBit(kCGEventScrollWheel) |
-                        CGEventMaskBit(kCGEventTabletPointer) |
-                        CGEventMaskBit(kCGEventTabletProximity) |
-                        CGEventMaskBit(kCGEventOtherMouseDown) |
-                        CGEventMaskBit(kCGEventOtherMouseUp) |
-                        CGEventMaskBit(kCGEventOtherMouseDragged);
+            // Create the tap. This is what will specify what to call (mouse_event_modifier_callback)
+            // whenever a mouse event happens.
+            mouse_event_tap = CGEventTapCreate(kCGHIDEventTap,
+                                               kCGHeadInsertEventTap,
+                                               kCGEventTapOptionDefault,
+                                               mask,
+                                               mouse_event_modifier_callback,
+                                               NULL);
 
-    // Create the tap. This is what will specify what to call (mouse_event_modifier_callback)
-    // whenever a mouse event happens.
-    mouse_event_tap = CGEventTapCreate(kCGHIDEventTap,
-                                 kCGHeadInsertEventTap,
-                                 kCGEventTapOptionDefault,
-                                 mask,
-                                 mouse_event_modifier_callback,
-                                 NULL);
-
-    // Add the tap to the runloop
-    if (mouse_event_tap) {
-        CFRunLoopSourceRef run_loop_source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouse_event_tap, 0);
-        if (run_loop_source) {
-            ckb_info("Registering EventTap for modifier keys.\n");
-            CFRunLoopAddSource(run_loop, run_loop_source, kCFRunLoopCommonModes);
-            CGEventTapEnable(mouse_event_tap, true);
-            CFRelease(run_loop_source);
+            if (mouse_event_tap) {
+                // Add the tap to the runloop.
+                CFRunLoopSourceRef run_loop_source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouse_event_tap, 0);
+                if (run_loop_source) {
+                    ckb_info("Registering EventTap for modifier keys.\n");
+                    CFRunLoopAddSource(run_loop, run_loop_source, kCFRunLoopCommonModes);
+                    CGEventTapEnable(mouse_event_tap, true);
+                    CFRelease(run_loop_source);
+                }
+                memcpy(&mouse_event_tap_pid, &current_ckb_pid, sizeof mouse_event_tap_pid);
+            } else {
+                ckb_info("EventTap not available");
+            }
         }
     }
 }
-
 
 // input_mac.c
 extern void keyretrigger(CFRunLoopTimerRef timer, void* info);
@@ -933,7 +958,13 @@ int usbmain(){
     if(iterator_hid)
         iterate_devices_hid(0, iterator_hid);
 
-    register_mouse_event_tap(mainloop);
+    // Create a timer for register mouse event tap
+    CFRunLoopTimerContext rmectx = { 0, mainloop, NULL, NULL, NULL };
+    CFRunLoopTimerRef rmetimer = CFRunLoopTimerCreate(kCFAllocatorDefault,
+                                                      CFAbsoluteTimeGetCurrent() + 5, 5,   // Set it to run every 5s
+                                                      0, 0,
+                                                      register_mouse_event_tap, &rmectx);
+    CFRunLoopAddTimer(mainloop, (CFRunLoopTimerRef)rmetimer, kCFRunLoopCommonModes);
 
     // Enter loop to scan/connect new devices
     CFRunLoopRun();

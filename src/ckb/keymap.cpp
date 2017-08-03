@@ -194,6 +194,19 @@ static const Key SabreKeys[] = {
 #define SABRE_WIDTH     M65_WIDTH
 #define SABRE_HEIGHT    M65_HEIGHT
 
+// Harpoon
+static const Key HarpoonKeys[] = {
+    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
+    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true},
+    {0, "DPI Cycle", "dpiup", 22, 19, 8, 6, false, true}, {0, "Logo Light", "dpi", 22, 24, 8, 8, true, false},
+    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}
+    };
+#define KEYCOUNT_HARPOON  (sizeof(HarpoonKeys) / sizeof(Key))
+
+#define HARPOON_WIDTH     M65_WIDTH
+#define HARPOON_HEIGHT    M65_HEIGHT
+
+
 // Scimitar
 static const Key ScimKeys[] = {
     {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 12, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 8, 6, false, true}, {0, "Front light", "front", 30, 0, 12, 8, true, false },
@@ -373,7 +386,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     case KeyMap::SABRE:{
-        // Scimitar mouse
+        // Sabre mouse
         for(const Key* key = SabreKeys; key < SabreKeys + KEYCOUNT_SABRE; key++){
             // Like the M65, the keys are upper-left justified
             Key translatedKey = *key;
@@ -386,6 +399,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     case KeyMap::SCIMITAR:{
         // Scimitar mouse
         for(const Key* key = ScimKeys; key < ScimKeys + KEYCOUNT_SCIM; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
+    case KeyMap::HARPOON:{
+        // Harpoon mouse
+        for(const Key* key = HarpoonKeys; key < HarpoonKeys + KEYCOUNT_HARPOON; key++){
             Key translatedKey = *key;
             translatedKey.x += translatedKey.width / 2;
             translatedKey.y += translatedKey.height / 2;
@@ -537,6 +560,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return SABRE;
     if(lower == "scimitar")
         return SCIMITAR;
+    if(lower == "harpoon")
+        return HARPOON;
     return NO_MODEL;
 }
 
@@ -558,6 +583,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "sabre";
     case SCIMITAR:
         return "scimitar";
+    case HARPOON:
+        return "harpoon";
     default:
         return "";
     }
@@ -585,6 +612,7 @@ int KeyMap::modelWidth(Model model){
     case M65:
     case SABRE:
     case SCIMITAR:
+    case HARPOON:
         return M65_WIDTH;
     default:
         return 0;
@@ -602,6 +630,7 @@ int KeyMap::modelHeight(Model model){
     case M65:
     case SABRE:
     case SCIMITAR:
+    case HARPOON:
         return M65_HEIGHT;
     default:
         return 0;

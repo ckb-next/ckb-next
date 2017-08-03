@@ -60,6 +60,7 @@ public:
         M65,
         SABRE,
         SCIMITAR,
+        HARPOON,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

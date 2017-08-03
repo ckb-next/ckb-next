@@ -11,6 +11,12 @@ QMAKE_LIBS_OPENGL =
 QMAKE_CFLAGS += -Wno-unused-parameter
 QMAKE_CXXFLAGS += -Wno-unused-parameter
 
+# Explicitly require signed char to fix issues on ARM, where char is
+# unsigned by default for performance reasons, compared to x86's
+# default-signed char.
+QMAKE_CFLAGS += -fsigned-char
+QMAKE_CXXFLAGS += -fsigned-char
+
 # Output path
 macx {
     DESTDIR = $$PWD/../..

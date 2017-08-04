@@ -60,6 +60,8 @@ int updatergb_mouse(usbdevice* kb, int force){
 }
 
 int savergb_mouse(usbdevice* kb, lighting* light, int mode){
+    (void)mode;
+
     uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x10, 1, 0 };
     // Save each RGB zone, minus the DPI light which is sent in the DPI packets
     int zonecount = IS_SCIMITAR(kb) ? 4 : IS_SABRE(kb) ? 3 : 2;
@@ -79,6 +81,8 @@ int savergb_mouse(usbdevice* kb, lighting* light, int mode){
 }
 
 int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
+    (void)mode;
+
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x13, 0x10, 1, 0 };
     uchar in_pkt[MSG_SIZE] = { 0 };
     // Load each RGB zone

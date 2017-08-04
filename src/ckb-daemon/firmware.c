@@ -152,6 +152,9 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
 }
 
 int cmd_fwupdate(usbdevice* kb, usbmode* dummy1, int nnumber, int dummy2, const char* path){
+    (void)dummy1;
+    (void)dummy2;
+
     if(!HAS_FEATURES(kb, FEAT_FWUPDATE))
         return 0;
     // Update the firmware

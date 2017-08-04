@@ -30,6 +30,8 @@ static uchar ordered8to3(int index, uchar value){
 }
 
 static uchar quantize8to3(int index, uchar value){
+    (void)index;
+
     return value >> 5;
 }
 

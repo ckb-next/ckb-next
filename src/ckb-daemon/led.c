@@ -4,6 +4,9 @@
 #include "usb.h"
 
 void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* code){
+    (void)kb;
+    (void)dummy;
+
     int index = keymap[keyindex].led;
     if(index < 0) {
         if (index == -2){     // Process strafe sidelights
@@ -36,6 +39,9 @@ static uchar iselect(const char* led){
 }
 
 void cmd_ioff(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* led){
+    (void)dummy1;
+    (void)dummy2;
+
     uchar bits = iselect(led);
     // Add the bits to ioff, remove them from ion
     mode->ioff |= bits;
@@ -44,6 +50,9 @@ void cmd_ioff(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
 }
 
 void cmd_ion(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* led){
+    (void)dummy1;
+    (void)dummy2;
+
     uchar bits = iselect(led);
     // Remove the bits from ioff, add them to ion
     mode->ioff &= ~bits;
@@ -52,6 +61,9 @@ void cmd_ion(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* l
 }
 
 void cmd_iauto(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* led){
+    (void)dummy1;
+    (void)dummy2;
+
     uchar bits = iselect(led);
     // Remove the bits from both ioff and ion
     mode->ioff &= ~bits;
@@ -60,6 +72,9 @@ void cmd_iauto(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char*
 }
 
 void cmd_inotify(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* led){
+    (void)kb;
+    (void)dummy;
+
     uchar bits = iselect(led);
     if(strstr(led, ":off"))
         // Turn notifications for these bits off

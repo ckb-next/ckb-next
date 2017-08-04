@@ -9,18 +9,41 @@
 
 // Do-nothing functions
 static void cmd_none(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    (void)kb;
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
 }
 static int cmd_io_none(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    (void)kb;
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
+
     return 0;
 }
 static void cmd_macro_none(usbdevice* kb, usbmode* dummy1, int dummy2, const char* dummy3, const char* dummy4){
+    (void)kb;
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
 }
 static int loadprofile_none(usbdevice* kb){
+    (void)kb;
+
     return 0;
 }
 static void int1_void_none(usbdevice* kb, int dummy){
+    (void)kb;
+    (void)dummy;
 }
 static int int1_int_none(usbdevice* kb, int dummy){
+    (void)kb;
+    (void)dummy;
+
     return 0;
 }
 

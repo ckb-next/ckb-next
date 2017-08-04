@@ -4,6 +4,10 @@
 #include "led.h"
 
 int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+
     DELAY_LONG(kb);
     hwprofile* hw = calloc(1, sizeof(hwprofile));
     // Ask for profile and mode IDs
@@ -48,6 +52,11 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
 }
 
 int cmd_hwsave_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
+
     DELAY_LONG(kb);
     hwprofile* hw = kb->hw;
     if(!hw)

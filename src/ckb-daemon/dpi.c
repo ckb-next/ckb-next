@@ -2,6 +2,9 @@
 #include "usb.h"
 
 void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const char* values){
+    (void)kb;
+    (void)dummy;
+
     int disable = 0;
     ushort x, y;
     // Try to scan X,Y values
@@ -42,6 +45,10 @@ void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const 
 }
 
 void cmd_dpisel(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* stage){
+    (void)kb;
+    (void)dummy1;
+    (void)dummy2;
+
     uchar stagenum;
     if(sscanf(stage, "%hhu", &stagenum) != 1)
         return;
@@ -51,6 +58,10 @@ void cmd_dpisel(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char
 }
 
 void cmd_lift(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* height){
+    (void)kb;
+    (void)dummy1;
+    (void)dummy2;
+
     uchar heightnum;
     if(sscanf(height, "%hhu", &heightnum) != 1)
         return;
@@ -60,6 +71,10 @@ void cmd_lift(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
 }
 
 void cmd_snap(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* enable){
+    (void)kb;
+    (void)dummy1;
+    (void)dummy2;
+
     if(!strcmp(enable, "on"))
         mode->dpi.snap = 1;
     if(!strcmp(enable, "off"))
@@ -67,6 +82,8 @@ void cmd_snap(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
 }
 
 char* printdpi(const dpiset* dpi, const usbdevice* kb){
+    (void)kb;
+
     // Print all DPI settings
     const int BUFFER_LEN = 100;
     char* buffer = malloc(BUFFER_LEN);

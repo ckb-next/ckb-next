@@ -213,6 +213,8 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
 }
 
 void cmd_get(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* setting){
+    (void)dummy;
+
     pthread_mutex_lock(imutex(kb));
     _cmd_get(kb, mode, nnumber, setting);
     pthread_mutex_unlock(imutex(kb));
@@ -221,6 +223,10 @@ void cmd_get(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* s
 extern int restart();
 
 void cmd_restart(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* content) {
+    (void)mode;
+    (void)nnumber;
+    (void)dummy;
+
     ckb_info("RESTART called with %s\n", content);
     nprintf(kb, -1, 0, "RESTART called with %s\n", content);
     restart();

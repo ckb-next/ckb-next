@@ -294,10 +294,11 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
                 }
             }
             break;
-        } else if(urbinput[0] == 2)
-             __attribute__((fallthrough)) ;  // Type 2: media key (fall through)
+        } else if (urbinput[0] == 2)
+            ; // Type 2: media key (implicitly falls through)
         else
             break;  // No other known types
+        /* FALLTHRU */
     case 2:
         // EP 2 Non-RGB: media keys
         CLEAR_KEYBIT(kbinput, 97);          // mute

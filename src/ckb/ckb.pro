@@ -1,15 +1,12 @@
-QT       += core gui network
+QT       += core gui widgets network
 CONFIG   += debug_and_release
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ckb
 TEMPLATE = app
 # GL isn't needed
 QMAKE_LIBS_OPENGL =
 
-QMAKE_CFLAGS += -Wno-unused-parameter
-QMAKE_CXXFLAGS += -Wno-unused-parameter
+QMAKE_CXXFLAGS += -std=gnu++11 -Wall -Wextra -Wno-unused-parameter
 
 # Explicitly require signed char to fix issues on ARM, where char is
 # unsigned by default for performance reasons, compared to x86's

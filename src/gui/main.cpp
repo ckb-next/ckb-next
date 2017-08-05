@@ -153,7 +153,7 @@ int main(int argc, char *argv[]){
 
     // Setup names and versions
     QCoreApplication::setOrganizationName("ckb-next");
-    QCoreApplication::setApplicationVersion(CKB_VERSION_STR);
+    QCoreApplication::setApplicationVersion(CKB_NEXT_VERSION_STR);
     QCoreApplication::setApplicationName("ckb-next");
 
     // Setup argument parser

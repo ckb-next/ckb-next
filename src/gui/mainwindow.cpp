@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mainWindow = this;
 
     // Start device manager
-    KbManager::init(CKB_VERSION_STR);
+    KbManager::init(CKB_NEXT_VERSION_STR);
     connect(KbManager::kbManager(), SIGNAL(kbConnected(Kb*)), this, SLOT(addDevice(Kb*)));
     connect(KbManager::kbManager(), SIGNAL(kbDisconnected(Kb*)), this, SLOT(removeDevice(Kb*)));
     connect(KbManager::kbManager(), SIGNAL(versionUpdated()), this, SLOT(updateVersion()));
@@ -108,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
-    settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
+    settingsWidget->setVersion("ckb-next " CKB_NEXT_VERSION_STR);
 }
 
 void MainWindow::toggleTrayIcon(bool visible) {
@@ -161,7 +161,7 @@ void MainWindow::updateVersion(){
     int count = kbWidgets.count();
     // Warn if the daemon version doesn't match the GUI
     QString daemonWarning;
-    if(daemonVersion != CKB_VERSION_STR)
+    if(daemonVersion != CKB_NEXT_VERSION_STR)
         daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVersion + "). Please upgrade ckb-next" + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + ". If the problem persists, try rebooting.";
     if(count == 0)
         settingsWidget->setStatus("No devices connected" + daemonWarning);

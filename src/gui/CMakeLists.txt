@@ -1,302 +1,371 @@
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#
+#        Copyright © 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#        
+#        An inspiration on how to use DeployQt5 module was taken from OpenChemistry
+#        project Avogadro 2, where David Cole and Markus D. Hanwell have contributed it.
+#
+#        This file is part of ckb-next.
+#
+#        ckb-next is free software: you can redistribute it and/or modify
+#        it under the terms of the GNU General Public License version 2
+#        as published by the Free Software Foundation.
+#
+#        ckb-next is distributed in the hope that it will be useful,
+#        but WITHOUT ANY WARRANTY; without even the implied warranty of
+#        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#        GNU General Public License version 2 for more details.
+#
+#        You should have received a copy of the GNU General Public License
+#        version 2 along with ckb-next. If not, see
+#        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
+#
 
-#-------------------------------------------------------------------------------
-# find Qt5
+# Declare the target
+add_executable(ckb-next)
+
+# Declare we want macOS Bundle
+if (MACOS)
+    set_target_properties(
+        ckb-next
+            PROPERTIES
+              MACOSX_BUNDLE TRUE)
+endif ()
+
+# Prepare external dependencies' paths
 if (BREW_QT5)
-    execute_process(COMMAND brew --prefix qt5
-            RESULT_VARIABLE BREW_AND_QT_FOUND
-            OUTPUT_VARIABLE CMAKE_PREFIX_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (NOT ${BREW_AND_QT_FOUND} EQUAL 0)
-        message(FATAL_ERROR "Homebrew is not installed!")
+    execute_process(
+        COMMAND brew --prefix qt5
+        RESULT_VARIABLE qt5_found
+        OUTPUT_VARIABLE qt5_path
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (NOT (${qt5_found} EQUAL 0))
+        message(FATAL_ERROR "Homebrew's 'qt5' package is not installed.")
+    else ()
+        message(STATUS "Homebrew's Qt5 found: ${qt5_path}")
+        list(APPEND CMAKE_PREFIX_PATH ${qt5_path})
     endif ()
 endif ()
 
-find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
-include_directories(
-        ${Qt5Core_INCLUDE_DIRS}
-        ${Qt5Widgets_INCLUDE_DIRS}
-        ${Qt5Network_INCLUDE_DIRS}
-)
-
-# ------------------------------------------------------------------------------
-# find Zlib
-find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIRS})
-
-# ------------------------------------------------------------------------------
-# find QuaZip, fallback to hardcoded
-if (LOCAL_QUAZIP)
-    find_package(QuaZip)
-
-    if (ENFORCE_QUAZIP AND NOT QUAZIP_FOUND)
-        message(FATAL_ERROR "You enforced local QuaZip, but it's not found")
-    endif ()
-
-    if (QUAZIP_FOUND)
-        include_directories(${QUAZIP_INCLUDE_DIR})
-    endif ()
+# Find external dependencies
+if (MACOS OR LINUX)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+    find_package(Qt5 COMPONENTS Core Widgets Network Gui REQUIRED)
+    find_package(ZLIB REQUIRED)
+    find_package(QuaZip REQUIRED)
 endif ()
-
-if (NOT QUAZIP_FOUND)
-    include_directories(quazip)
-
-    set(QUAZIP_HEADERS
-            quazip/crypt.h
-            quazip/ioapi.h
-            quazip/JlCompress.h
-            quazip/quaadler32.h
-            quazip/quachecksum32.h
-            quazip/quacrc32.h
-            quazip/quagzipfile.h
-            quazip/quaziodevice.h
-            quazip/quazip.h
-            quazip/quazip_global.h
-            quazip/quazipdir.h
-            quazip/quazipfile.h
-            quazip/quazipfileinfo.h
-            quazip/quazipnewinfo.h
-            quazip/unzip.h
-            quazip/zip.h
-            )
-
-    set(QUAZIP_SOURCES
-            quazip/JlCompress.cpp
-            quazip/qioapi.cpp
-            quazip/quaadler32.cpp
-            quazip/quacrc32.cpp
-            quazip/quagzipfile.cpp
-            quazip/quaziodevice.cpp
-            quazip/quazip.cpp
-            quazip/quazipdir.cpp
-            quazip/quazipfile.cpp
-            quazip/quazipfileinfo.cpp
-            quazip/quazipnewinfo.cpp
-            quazip/unzip.c
-            quazip/zip.c
-            )
-
-    add_definitions(-DQUAZIP_STATIC)
-endif ()
-
-# ------------------------------------------------------------------------------
-# find Apple frameworks
-if (APPLE)
-    find_library(COREAUDIO_LIBRARY CoreAudio)
+if (MACOS)
     find_library(FOUNDATION_LIBRARY Foundation)
+    find_library(COREAUDIO_LIBRARY CoreAudio)
     find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
-    mark_as_advanced(
-            COREAUDIO_LIBRARY
-            FOUNDATION_LIBRARY
-            AUDIOTOOLBOX_LIBRARY
-    )
+    if (FOUNDATION_LIBRARY-NOTFOUND OR COREAUDIO_LIBRARY-NOTFOUND OR AUDIOTOOLBOX_LIBRARY-NOTFOUND)
+        message(FATAL_ERROR "Some Apple libraries were not found:
+Foundation:   ${FOUNDATION_LIBRARY}
+CoreAudio:    ${COREAUDIO_LIBRARY}
+AudioToolbox: ${AUDIOTOOLBOX_LIBRARY}")
+    else ()
+        message(STATUS "Foundation found:   ${FOUNDATION_LIBRARY}")
+        message(STATUS "CoreAudio found:    ${COREAUDIO_LIBRARY}")
+        message(STATUS "AudioToolbox found: ${AUDIOTOOLBOX_LIBRARY}")
+    endif ()
+        mark_as_advanced(FOUNDATION_LIBRARY COREAUDIO_LIBRARY AUDIOTOOLBOX_LIBRARY)
+elseif (LINUX)
 endif ()
 
-# ------------------------------------------------------------------------------
-# mark all source files
-set(HEADERS
-        mainwindow.h
-        kbwidget.h
-        colorbutton.h
-        settingswidget.h
-        kblightwidget.h
-        keymap.h
-        media.h
-        kblight.h
-        kbprofile.h
-        kbanimwidget.h
-        animscript.h
-        ckb-anim.h
-        kbanim.h
-        animadddialog.h
-        animsettingdialog.h
-        gradientbutton.h
-        gradientdialog.h
-        gradientdialogwidget.h
-        kbmode.h
-        kb.h
-        rlistwidget.h
-        kbprofiledialog.h
-        keywidget.h
-        kbbindwidget.h
-        kbbind.h
-        rebindwidget.h
-        modeselectdialog.h
-        kbfirmware.h
-        fwupgradedialog.h
-        autorun.h
-        ckbsettings.h
-        kbperf.h
-        ckbsettingswriter.h
-        keyaction.h
-        mperfwidget.h
-        kperfwidget.h
-        layoutdialog.h
-        extrasettingswidget.h
-        kbmanager.h
-        colormap.h
-        macroreader.h
-        )
-
-set(SOURCES
-        main.cpp
-        mainwindow.cpp
-        kbwidget.cpp
-        colorbutton.cpp
-        settingswidget.cpp
-        kblightwidget.cpp
-        keymap.cpp
-        media_linux.cpp
-        kblight.cpp
-        kbprofile.cpp
-        kbanimwidget.cpp
-        animscript.cpp
-        kbanim.cpp
-        animadddialog.cpp
-        animsettingdialog.cpp
-        gradientbutton.cpp
-        gradientdialog.cpp
-        gradientdialogwidget.cpp
-        kbmode.cpp
-        kb.cpp
-        rlistwidget.cpp
-        kbprofiledialog.cpp
-        keywidget.cpp
-        kbbindwidget.cpp
-        kbbind.cpp
-        rebindwidget.cpp
-        modeselectdialog.cpp
-        kbfirmware.cpp
-        fwupgradedialog.cpp
-        autorun.cpp
-        ckbsettings.cpp
-        kbperf.cpp
-        ckbsettingswriter.cpp
-        keyaction.cpp
-        mperfwidget.cpp
-        kperfwidget.cpp
-        layoutdialog.cpp
-        extrasettingswidget.cpp
-        kbmanager.cpp
-        colormap.cpp
-        macroreader.cpp
-        )
-
-set(FORMS
-        mainwindow.ui
-        kbwidget.ui
-        settingswidget.ui
-        kblightwidget.ui
-        kbanimwidget.ui
-        animadddialog.ui
-        animsettingdialog.ui
-        gradientdialog.ui
-        kbprofiledialog.ui
-        kbbindwidget.ui
-        rebindwidget.ui
-        modeselectdialog.ui
-        fwupgradedialog.ui
-        mperfwidget.ui
-        kperfwidget.ui
-        layoutdialog.ui
-        extrasettingswidget.ui
-        )
-
-set(QT_RESOURCES
-        image.qrc
-        text.qrc.in
-        binary.qrc
-        )
-
-if (APPLE)
-    list(APPEND SOURCES media_mac.m)
-endif ()
-
-# ------------------------------------------------------------------------------
-# Qt settings
+# Automatically handle MOC, UIC and RCC
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-# ------------------------------------------------------------------------------
-# mark libraries
-set(LIBS
-        Qt5::Core
-        Qt5::Widgets
-        Qt5::Network
-        ZLIB::ZLIB
-        )
-
-if (QUAZIP_FOUND)
-    list(APPEND LIBS ${QUAZIP_LIBRARIES})
-else ()
-    list(APPEND HEADERS ${QUAZIP_HEADERS})
-    list(APPEND SOURCES ${QUAZIP_SOURCES})
+# TODO: get rid of os.h and platform ifdefs
+# Declare target's source files
+if (MACOS OR LINUX)
+    target_sources(
+        ckb-next
+            PRIVATE
+              animadddialog.cpp
+              animscript.cpp
+              animsettingdialog.cpp
+              autorun.cpp
+              ckbsettings.cpp
+              ckbsettingswriter.cpp
+              colorbutton.cpp
+              colormap.cpp
+              extrasettingswidget.cpp
+              fwupgradedialog.cpp
+              gradientbutton.cpp
+              gradientdialog.cpp
+              gradientdialogwidget.cpp
+              kbanim.cpp
+              kbanimwidget.cpp
+              kbbind.cpp
+              kbbindwidget.cpp
+              kb.cpp
+              kbfirmware.cpp
+              kblight.cpp
+              kblightwidget.cpp
+              kbmanager.cpp
+              kbmode.cpp
+              kbperf.cpp
+              kbprofile.cpp
+              kbprofiledialog.cpp
+              kbwidget.cpp
+              keyaction.cpp
+              keymap.cpp
+              keywidget.cpp
+              kperfwidget.cpp
+              layoutdialog.cpp
+              macroreader.cpp
+              main.cpp
+              mainwindow.cpp
+              modeselectdialog.cpp
+              mperfwidget.cpp
+              rebindwidget.cpp
+              rlistwidget.cpp
+              settingswidget.cpp
+              animadddialog.h
+              animscript.h
+              animsettingdialog.h
+              autorun.h
+              ckb-anim.h
+              ckbsettings.h
+              ckbsettingswriter.h
+              colorbutton.h
+              colormap.h
+              extrasettingswidget.h
+              fwupgradedialog.h
+              gradientbutton.h
+              gradientdialog.h
+              gradientdialogwidget.h
+              kbanim.h
+              kbanimwidget.h
+              kbbind.h
+              kbbindwidget.h
+              kbfirmware.h
+              kb.h
+              kblight.h
+              kblightwidget.h
+              kbmanager.h
+              kbmode.h
+              kbperf.h
+              kbprofiledialog.h
+              kbprofile.h
+              kbwidget.h
+              keyaction.h
+              keymap.h
+              keywidget.h
+              kperfwidget.h
+              layoutdialog.h
+              macroreader.h
+              mainwindow.h
+              media.h
+              modeselectdialog.h
+              mperfwidget.h
+              rebindwidget.h
+              rlistwidget.h
+              settingswidget.h
+              animadddialog.ui
+              animsettingdialog.ui
+              extrasettingswidget.ui
+              fwupgradedialog.ui
+              gradientdialog.ui
+              kbanimwidget.ui
+              kbbindwidget.ui
+              kblightwidget.ui
+              kbprofiledialog.ui
+              kbwidget.ui
+              kperfwidget.ui
+              layoutdialog.ui
+              mainwindow.ui
+              modeselectdialog.ui
+              mperfwidget.ui
+              rebindwidget.ui
+              settingswidget.ui)
+endif ()
+if (MACOS)
+    target_sources(
+        ckb-next
+            PRIVATE
+              media_mac.m)
+elseif (LINUX)
+    target_sources(
+        ckb-next
+            PRIVATE
+              media_linux.cpp)
 endif ()
 
-if (APPLE)
-    list(APPEND LIBS
-            ${COREAUDIO_LIBRARY}
-            ${FOUNDATION_LIBRARY}
-            ${AUDIOTOOLBOX_LIBRARY}
-            )
-endif ()
+# Manipulate auxiliary files
+if (MACOS OR LINUX)
+    # Import GPG key
+    configure_file(
+        "${CMAKE_CURRENT_LIST_DIR}/resources/ckb-next-key.gpg"
+        "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-key.gpg" COPYONLY)
 
-# ------------------------------------------------------------------------------
-# set up targets
-if (APPLE)
-    set(MACOSX_BUNDLE_BUNDLE_NAME "ckb-next")
+    # Generate binary.qrc
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "<RCC>\n<qresource prefix=\"/bin\">\n")
+    file(APPEND "binary.qrc" "<file>ckb-next-key.gpg</file>\n")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "</qresource>\n</RCC>\n")
+
+    # Import images
+    file(GLOB qt_images "images/*.png")
+    file(COPY ${qt_images} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+    # Generate image.qrc
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "<RCC>\n<qresource prefix=\"/img\">\n")
+    foreach (qt_image IN LISTS qt_images)
+        file(APPEND "image.qrc" "<file>${qt_image}</file>\n")
+    endforeach ()
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "</qresource>\n</RCC>\n")
+
+    # Import demo profile
+    configure_file(
+        "${CMAKE_CURRENT_LIST_DIR}/resources/demoprofile.conf"
+        "${CMAKE_CURRENT_BINARY_DIR}/demoprofile.conf" COPYONLY)
+
+    # Begin generating text.qrc
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<RCC>\n<qresource prefix=\"/txt\">\n")
+    file(APPEND "text.qrc" "<file>demoprofile.conf</file>\n")
+
+endif ()
+if (MACOS)
+    # Import macOS icon
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/macos/ckb-next.icns"
+        "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.icns" COPYONLY)
+
+    # Configure plist
+    set(MACOSX_BUNDLE_HELP_FILE "Help") # FIXME: provide Help.html
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
     set(MACOSX_BUNDLE_INFO_STRING "ckb-next - version ${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_ICON_FILE "ckb-next.icns")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ckb-next")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.next.ckb")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${ckb-next_VERSION}")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "ckb-next_v${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2014-2016 ccMSC\nCopyright © 2017 ckb-next dev. team")
-    configure_file("${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist.in" "${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist")
-    set(CMAKE_PLIST "<file>ckb-next.plist</file>") # see text.qrc.in
-    set_source_files_properties(ckb-next.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-    list(APPEND SOURCES ckb-next.icns)
+
+    # Generate plist
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.plist.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist")
+
+    # End generating text.qrc
+    file(APPEND "text.qrc" "<file>org.next.ckb.plist</file>\n")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
+elseif (LINUX)
+    # Generate desktop file
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/linux/ckb-next.desktop.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop")
+
+    # End generating text.qrc
+    file(APPEND "text.qrc" "<file>ckb-next.desktop</file>\n")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
 endif ()
-configure_file("${CMAKE_CURRENT_LIST_DIR}/text.qrc.in" "${CMAKE_CURRENT_LIST_DIR}/text.qrc" @ONLY)
 
-add_executable(ckb-next ${HEADERS} ${SOURCES} ${QT_RESOURCES})
-
-target_link_libraries(ckb-next ${LIBS})
-
-if (APPLE)
-    set_target_properties(ckb-next PROPERTIES
-            MACOSX_BUNDLE TRUE
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/ckb-next.plist"
-            OUTPUT_NAME "${MACOSX_BUNDLE_BUNDLE_NAME}"
-            )
+# Enhance target's source files based on auxiliary files
+if (MACOS OR LINUX)
+    target_sources(
+        ckb-next
+            PRIVATE
+              ${CMAKE_CURRENT_BINARY_DIR}/binary.qrc
+              ${CMAKE_CURRENT_BINARY_DIR}/text.qrc
+              ${CMAKE_CURRENT_BINARY_DIR}/image.qrc)
 endif ()
 
-install(TARGETS ckb-next
-        RUNTIME DESTINATION "${INSTALL_RUNTIME_DIR}"
-        BUNDLE DESTINATION .)
+# Declare target's include paths
+if (MACOS OR LINUX)
+    target_include_directories(
+        ckb-next
+            PRIVATE
+              ${CMAKE_CURRENT_BINARY_DIR}
+              ${QUAZIP_INCLUDE_DIR}) # TODO: export QuaZip target and inherit dirs
+endif ()
 
-if (LINUX)
-    if (NOT EXISTS "/usr/bin/ckb-next")
-        # symlink to /usr/bin
-        install(CODE [[execute_process(COMMAND ln -sf "/opt/ckb-next/ckb-next" "/usr/bin/ckb-next")]])
+# Declare target's link dependencies
+if (MACOS OR LINUX)
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+              Threads::Threads
+              Qt5::Core
+              Qt5::Network
+              Qt5::Widgets
+              Qt5::Gui
+              ZLIB::ZLIB
+              ${QUAZIP_LIBRARIES})
+endif ()
+if(MACOS)
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+              ${COREAUDIO_LIBRARY}
+              ${FOUNDATION_LIBRARY}
+              ${AUDIOTOOLBOX_LIBRARY})
+elseif (LINUX)
+endif()
+
+# Declare target's installation paths
+if (MACOS)
+    install(
+        TARGETS ckb-next
+        DESTINATION ".") # prefix is /Applications by default, therefore "."
+elseif (LINUX)
+    install(
+        TARGETS ckb-next
+        DESTINATION "bin")
+endif ()
+
+# Declare target's auxiliary files installation paths
+if (MACOS)
+    # Install plist file inside the bundle
+    set_target_properties(
+        ckb-next
+            PROPERTIES
+              MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist")
+
+    # Install icon file and help page inside the bundle
+    set_source_files_properties(
+        ckb-next.icns
+        Help.html # FIXME: generate
+            PROPERTIES
+              MACOSX_PACKAGE_LOCATION Resources)
+elseif (LINUX)
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop"
+        DESTINATION "share/applications"
+        PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ)
+    install(
+        FILES "${CMAKE_SOURCE_DIR}/linux/ckb-next.png"
+        DESTINATION "share/icons/hicolor/512x512/apps"
+        PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ)
+endif ()
+
+# Deploy QT5
+# NOTE: Must be executed after all install() commands
+if (MACOS)
+    get_target_property(output_name ckb-next OUTPUT_NAME)
+    if (output_name)
+        set(app "${output_name}.app")
+    else ()
+        set(app "ckb-next.app")
     endif ()
 
-    install(FILES "ckb-next.desktop"
-            DESTINATION "/usr/share/applications"
-            PERMISSIONS OWNER_READ OWNER_WRITE
-            GROUP_READ
-            WORLD_READ
-            )
-    install(FILES "ckb-next.png"
-            DESTINATION "/usr/share/icons/hicolor/512x512/apps"
-            PERMISSIONS OWNER_READ OWNER_WRITE
-            GROUP_READ
-            WORLD_READ
-            )
-endif ()
+    set(dirs "")
+    if (CMAKE_PREFIX_PATH)
+        foreach (dir ${CMAKE_PREFIX_PATH})
+            list(APPEND dirs "${dir}/bin" "${dir}/lib")
+        endforeach ()
+    endif ()
 
-# Keep "add_subdirectory(lastinstall)" last
-add_subdirectory(lastinstall)
+    include(InstallRequiredSystemLibraries)
+    include(DeployQt5)
+    install_qt5_executable("ckb-next.app" "" "" "${dirs}" "")
+endif ()

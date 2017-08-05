@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/txt">
-        <file>demoprofile.conf</file>
-        <file>ckb-next.desktop</file>
-        @CMAKE_PLIST@
-    </qresource>
-</RCC>

@@ -3,22 +3,23 @@
 <plist version="1.0">
     <dict>
         <key>Label</key>
-        <string>org.ckb-next-daemon</string>
+        <string>org.next.ckb.daemon</string>
         <key>ProgramArguments</key>
         <array>
-            <string>/Applications/ckb-next.app/Contents/Resources/ckb-next-daemon</string>
+            <string>/Library/Application Support/ckb-next-daemon</string>
         </array>
         <key>KeepAlive</key>
         <true/>
+        <key>RunAtLoad</key>
+        <true/>
         <key>ProcessType</key>
-        <string>Interactive</string>
-        <key>LegacyTimers</key>
+        <string>Interactive</string> <!-- highest priority -->
+        <key>LegacyTimers</key> <!-- more precise behaviour -->
         <true/>
         <!-- comment this out if you don't want to log anything -->
         <key>StandardOutPath</key>
         <string>/var/log/ckb-next-daemon.log</string>
         <key>StandardErrorPath</key>
         <string>/var/log/ckb-next-daemon.log</string>
-        <!-- -->
     </dict>
 </plist>

@@ -93,7 +93,7 @@ int main(int argc, char** argv){
     main_ac = argc;
     main_av = argv;
 
-    printf("    ckb-next: Corsair RGB driver %s\n", CKB_VERSION_STR);
+    printf("    ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i], "--help")){

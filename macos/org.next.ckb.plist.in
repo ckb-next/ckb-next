@@ -35,7 +35,7 @@
         <key>CFBundleVersion</key>
         <string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
         <key>LSMinimumSystemVersion</key>
-        <string>10.9.0</string>
+        <string>${CMAKE_OSX_DEPLOYMENT_TARGET}</string>
         <key>NSHighResolutionCapable</key>
         <true/>
         <key>NSHumanReadableCopyright</key>
@@ -45,18 +45,13 @@
         <key>ProgramArguments</key>
         <array>
             <string>/Applications/ckb-next.app/Contents/MacOS/ckb-next</string>
-            <!-- <string> - - background</string> -->
+            <string>--background</string>
         </array>
-        <key>KeepAlive</key>
-        <dict>
-            <key>SuccessfulExit</key>
-            <false/>
-        </dict>
         <!-- comment this out if you don't want to log anything -->
         <key>StandardOutPath</key>
-        <string>/var/log/ckb-next-daemon.log</string>
+        <string>/var/log/ckb-next.log</string>
         <key>StandardErrorPath</key>
-        <string>/var/log/ckb-next-daemon.log</string>
+        <string>/var/log/ckb-next.log</string>
         <!-- -->
     </dict>
 </plist>

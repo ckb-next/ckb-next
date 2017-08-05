@@ -295,7 +295,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
             }
             break;
         } else if(urbinput[0] == 2)
-            __attribute__ ((fallthrough));  // Type 2: media key (fall through)
+             __attribute__((fallthrough)) ;  // Type 2: media key (fall through)
         else
             break;  // No other known types
     case 2:

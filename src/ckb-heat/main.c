@@ -1,3 +1,19 @@
+/*
+ * 
+ * Copyright (C) 2017  Devon Richards
+ * ckb-heat is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * ckb-heat is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with ckb-heat.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "../ckb/ckb-anim.h"
 #include <math.h>
 
@@ -5,8 +21,8 @@ void ckb_info(){
     // Plugin info
     CKB_NAME("Heat Map");
     CKB_VERSION("0.2");
-    CKB_COPYRIGHT("2015", "RULER501");
-    CKB_LICENSE("LGPLv3");
+    CKB_COPYRIGHT("2017", "RULER501");
+    CKB_LICENSE("GPLv2");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25A1CDB0D92C}");
     CKB_DESCRIPTION("A spot effect on pressed keys that shows usage");
 

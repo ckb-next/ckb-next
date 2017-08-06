@@ -25,9 +25,10 @@
 /// 4 | the K95 series keyboards | collected with the macro IS_K95().
 /// 5 | strafe keyboards | IS_STRAFE()
 /// 6 | M65 mice with and without RGB | IS_M65()
-/// 7 | The SABRE and HARPOON mice.\n Maybe this will be divided int two different blocks later because of different nummber of special keys | IS_SABRE()
-/// 8 | The Scimitar mouse devices | IS_SCIMITAR()
-/// 9 | The Harpoon mouse devices | IS_HARPOON()
+/// 7 | Sabre mice | IS_SABRE()
+/// 8 | Scimitar mice | IS_SCIMITAR()
+/// 9 | Harpoon mice | IS_HARPOON()
+/// 10| Glaive mice | IS_GLAIVE()
 ///
 
 /// \brief For the following Defines please see "Detailed Description"
@@ -86,8 +87,6 @@
 #define P_M65_STR       "1b12"
 #define P_M65_PRO       0x1b2e
 #define P_M65_PRO_STR   "1b2e"
-#define P_GLAIVE        0x1b34
-#define P_GLAIVE_STR    "1b34"
 #define IS_M65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_GLAIVE))
 
 #define P_SABRE_O       0x1b14  /* optical */
@@ -109,6 +108,10 @@
 #define P_HARPOON          0x1b3c
 #define P_HARPOON_STR      "1b3c"
 #define IS_HARPOON(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_HARPOON)
+
+#define P_GLAIVE          0x1b34
+#define P_GLAIVE_STR      "1b34"
+#define IS_GLAIVE(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
 
 ///
 /// uncomment the following Define to see USB packets sent to the device
@@ -159,7 +162,7 @@ const char* product_str(short product);
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
 /// Used when a device has a firmware with a low version number that uses the new protocol
-#define IS_NEW_PROTOCOL(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_HARPOON(kb) || (kb)->product == P_GLAIVE)
+#define IS_NEW_PROTOCOL(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb))
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

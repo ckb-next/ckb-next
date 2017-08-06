@@ -206,6 +206,17 @@ static const Key HarpoonKeys[] = {
 #define HARPOON_WIDTH     M65_WIDTH
 #define HARPOON_HEIGHT    M65_HEIGHT
 
+// Glaive
+static const Key GlaiveKeys[] = {
+    {0, "Left Mouse", "mouse1", 17, 3, 14, 18, false, true}, {0, "Right Mouse", "mouse2", 37, 3, 14, 18, false, true}, {0, "Middle Mouse", "mouse3", 31, 9, 7, 7, false, true}, {0, "Front light", "front", 16, -5, 36, 8, true, false },
+    {0, "Wheel Up", "wheelup", 31, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 31, 15, 7, 5, false, true}, {0, "Side Light", "wheel", 22, 24, 7, 20, true, false},
+    {0, "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {0, "Logo Light", "dpi", 24, 43, 20, 20, true, false},
+    {0, "Forward", "mouse5", 15, 22, 5, 11, false, true}, {0, "Back", "mouse4", 15, 32, 5, 11, false, true}
+    };
+#define KEYCOUNT_GLAIVE  (sizeof(GlaiveKeys) / sizeof(Key))
+
+#define GLAIVE_WIDTH     M65_WIDTH
+#define GLAIVE_HEIGHT    M65_HEIGHT
 
 // Scimitar
 static const Key ScimKeys[] = {
@@ -416,6 +427,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::GLAIVE:{
+        // Glaive mouse
+        for(const Key* key = GlaiveKeys; key < GlaiveKeys + KEYCOUNT_GLAIVE; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -562,6 +583,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return SCIMITAR;
     if(lower == "harpoon")
         return HARPOON;
+    if(lower == "glaive")
+        return GLAIVE;
     return NO_MODEL;
 }
 
@@ -585,6 +608,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "scimitar";
     case HARPOON:
         return "harpoon";
+    case GLAIVE:
+        return "glaive";
     default:
         return "";
     }
@@ -613,6 +638,7 @@ int KeyMap::modelWidth(Model model){
     case SABRE:
     case SCIMITAR:
     case HARPOON:
+    case GLAIVE:
         return M65_WIDTH;
     default:
         return 0;
@@ -631,6 +657,7 @@ int KeyMap::modelHeight(Model model){
     case SABRE:
     case SCIMITAR:
     case HARPOON:
+    case GLAIVE:
         return M65_HEIGHT;
     default:
         return 0;
@@ -699,6 +726,9 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     if(map.contains(key))
         return map[key].friendlyName();
     map = KeyMap(M65, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+    map = KeyMap(HARPOON, layout);
     if(map.contains(key))
         return map[key].friendlyName();
 

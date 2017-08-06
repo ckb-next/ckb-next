@@ -28,8 +28,8 @@ void ckb_info(){
     // Plugin info
     CKB_NAME("Music Visualization");
     CKB_VERSION("0.2");
-    CKB_COPYRIGHT("2015", "RULER501");
-    CKB_LICENSE("LGPLv3");
+    CKB_COPYRIGHT("2017", "RULER501");
+    CKB_LICENSE("GPLv2");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25CA1DB0D92C}");
     CKB_DESCRIPTION("A collection of music visualization effects");
 

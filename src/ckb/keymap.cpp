@@ -209,8 +209,8 @@ static const Key HarpoonKeys[] = {
 // Glaive
 static const Key GlaiveKeys[] = {
     {0, "Left Mouse", "mouse1", 17, 3, 14, 18, false, true}, {0, "Right Mouse", "mouse2", 37, 3, 14, 18, false, true}, {0, "Middle Mouse", "mouse3", 31, 9, 7, 7, false, true}, {0, "Front light", "front", 16, -5, 36, 8, true, false },
-    {0, "Wheel Up", "wheelup", 31, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 31, 15, 7, 5, false, true}, {0, "Side Light", "wheel", 22, 24, 7, 20, true, false},
-    {0, "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {0, "Logo Light", "dpi", 24, 43, 20, 20, true, false},
+    {0, "Wheel Up", "wheelup", 31, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 31, 15, 7, 5, false, true}, {0, "Side Light", "thumb", 22, 24, 7, 20, true, false},
+    {0, "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {0, "Logo Light", "back", 24, 43, 20, 20, true, false},
     {0, "Forward", "mouse5", 15, 22, 5, 11, false, true}, {0, "Back", "mouse4", 15, 32, 5, 11, false, true}
     };
 #define KEYCOUNT_GLAIVE  (sizeof(GlaiveKeys) / sizeof(Key))

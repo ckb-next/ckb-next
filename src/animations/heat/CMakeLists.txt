@@ -17,14 +17,7 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-project(heat C)
-
-add_executable(heat)
-
-target_sources(
-    heat
-        PRIVATE
-          main.c)
+add_executable(heat main.c)
 
 target_link_libraries(
     heat

@@ -17,14 +17,7 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-project(random C)
-
-add_executable(random)
-
-target_sources(
-    random
-        PRIVATE
-          main.c)
+add_executable(random main.c)
 
 target_link_libraries(
     random

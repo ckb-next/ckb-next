@@ -16,6 +16,7 @@
 #   source_dir : Source directory
 #   git_command : git executable
 #   var_prefix : project name
+
 function(determine_version source_dir git_command var_prefix)
     set(major)
     set(minor)
@@ -30,8 +31,7 @@ function(determine_version source_dir git_command var_prefix)
                 RESULT_VARIABLE result
                 OUTPUT_VARIABLE output
                 ERROR_QUIET
-                OUTPUT_STRIP_TRAILING_WHITESPACE
-                ERROR_STRIP_TRAILING_WHITESPACE)
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
         if (${result} EQUAL 0)
             string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)[-]*(.*)"
                     version_matches ${output})
@@ -43,7 +43,15 @@ function(determine_version source_dir git_command var_prefix)
                 set(patch ${CMAKE_MATCH_3})
                 set(patch_extra ${CMAKE_MATCH_4})
             endif ()
+        else ()
+            message("\
+Git directory to deduce precise version has not been not found. \
+Consider cloning the project with git instead of downloading an archive. \
+For example: \
+    git clone -b master --single-branch https://github.com/mattanger/ckb-next.git")
         endif ()
+    else ()
+        message("Git executable not found.")
     endif ()
 
     if (full)
@@ -52,18 +60,14 @@ function(determine_version source_dir git_command var_prefix)
         set(${var_prefix}_VERSION_MINOR ${minor} PARENT_SCOPE)
         set(${var_prefix}_VERSION_PATCH ${patch} PARENT_SCOPE)
         set(${var_prefix}_VERSION_PATCH_EXTRA ${patch_extra} PARENT_SCOPE)
-        if ("${major}.${minor}.${patch}" STREQUAL "${full}")
-            set(${var_prefix}_VERSION_IS_RELEASE TRUE PARENT_SCOPE)
-        else ()
-            set(${var_prefix}_VERSION_IS_RELEASE FALSE PARENT_SCOPE)
-        endif ()
+    endif ()
+
+    if ("${major}.${minor}.${patch}" STREQUAL "${full}")
+        set(${var_prefix}_VERSION_IS_RELEASE TRUE PARENT_SCOPE)
+        message(STATUS "${var_prefix} version: ${full} (Release)")
     else ()
-        message(WARNING
-                "\
-Could not use git to determine source version, using version ${${var_prefix}_VERSION}. \
-Consider cloning the project with git instead of downloading an archive. \
-For example: git clone -b master --single-branch https://github.com/mattanger/ckb-next.git"
-                )
+        set(${var_prefix}_VERSION_IS_RELEASE FALSE PARENT_SCOPE)
+        message(STATUS "${var_prefix} version: ${full} (Non-release)")
     endif ()
 
 endfunction()

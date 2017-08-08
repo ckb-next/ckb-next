@@ -17,12 +17,14 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-# TODO: build ckb-anim as a separate library
+# TODO: build ckb-anim as an interface library
 # TODO: get rid of ifdefs in sources. This is CMake's task!
 # TODO: use COMPONENT-wise installation instead of ifs()
 
 # Declare the target
-add_executable(ckb-next-daemon)
+# Unfortunately, CMake doesn't allow doing this
+# without specifying at least one source file, so here you have it
+add_executable(ckb-next-daemon main.c)
 
 # Find external dependencies
 if (MACOS OR LINUX)
@@ -57,7 +59,6 @@ if (MACOS OR LINUX)
               device.c
               devnode.c
               input.c
-              main.c
               notify.c
               usb.c
               firmware.c
@@ -110,8 +111,8 @@ if (MACOS OR LINUX)
     target_include_directories(
         ckb-next-daemon
             PRIVATE
-              ${CMAKE_CURRENT_BINARY_DIR}
-              ${ICONV_INCLUDE_DIR})
+              "${CMAKE_CURRENT_BINARY_DIR}"
+              "${ICONV_INCLUDE_DIR}")
 endif ()
 if (MACOS)
     # Compiler knows better
@@ -119,7 +120,7 @@ elseif (LINUX)
     target_include_directories(
         ckb-next-daemon
             PRIVATE
-              ${UDEV_INCLUDE_DIRS})
+              "${UDEV_INCLUDE_DIRS}")
 endif ()
 
 # Declare target's link dependencies
@@ -128,21 +129,60 @@ if (MACOS OR LINUX)
         ckb-next-daemon
             PRIVATE
               Threads::Threads
-              ${ICONV_LIBRARIES})
+              "${ICONV_LIBRARIES}")
 endif ()
 if (MACOS)
     target_link_libraries(
         ckb-next-daemon
             PRIVATE
-              ${COREFOUNDATION_LIBRARY}
-              ${COREGRAPHICS_LIBRARY}
-              ${IOKIT_LIBRARY})
+              "${COREFOUNDATION_LIBRARY}"
+              "${COREGRAPHICS_LIBRARY}"
+              "${IOKIT_LIBRARY}")
 elseif (LINUX)
     target_link_libraries(
         ckb-next-daemon
             PRIVATE
-              ${UDEV_LIBRARIES})
+              "${UDEV_LIBRARIES}")
 endif ()
+
+# Target compile features and options
+target_compile_features(
+    ckb-next-daemon
+        PRIVATE
+          c_std_11)
+
+if (C_COMPILER_SUPPORTS_-Og)
+    set(opt_lvl "-Og")
+else ()
+    set(opt_lvl "-O0")
+endif ()
+
+target_compile_options(
+    ckb-next-daemon
+        PRIVATE
+          $<$<CONFIG:Debug>:${opt_lvl}>
+          -fsigned-char
+          -Wall
+          -Wextra
+          -Wfloat-equal
+          -Wundef
+          -Wshadow
+          -Wpointer-arith
+          -Wcast-align
+          -Wstrict-prototypes
+          -Wstrict-overflow=5
+          -Wwrite-strings
+          -Waggregate-return
+          -Wcast-qual
+          -Wswitch-default
+          -Wswitch-enum
+          -Wconversion
+          -Wformat=2
+          -Winit-self
+          $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:-save-temps>)
+
+# Add sanitizers after all target information is known
+add_sanitizers(ckb-next-daemon)
 
 # We must be absolutely sure that daemons won't interfere with each other.
 # Therefore we conduct a cleanup at install time before anything else.
@@ -150,7 +190,6 @@ endif ()
 # idiomatic solutions according to their package managers' guidelines to
 # ensure similar behaviour.
 
-# TODO: provide SAFE_INSTALL option
 if (SAFE_INSTALL)
     # We should close GUI first or daemon unloading might hang
     install(CODE [[message(STATUS "Looking for ckb or ckb-next GUI...")]])
@@ -302,7 +341,7 @@ elseif (${init_system} STREQUAL "OpenRC")
         GROUP_READ             GROUP_EXECUTE
         WORLD_READ             WORLD_EXECUTE)
 elseif (${init_system} STREQUAL "unknown")
-        message(FATAL_ERROR "No supported system service detected.\
-Supported services are: systemd, launchd, OpenRC, Upstart.\ 
-Contribute on GitHub to support your configuration.")
+    message(FATAL_ERROR "No supported system service detected. \
+Supported services are: systemd, launchd, OpenRC, Upstart.")
 endif ()
+

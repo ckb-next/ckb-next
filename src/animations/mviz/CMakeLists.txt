@@ -17,16 +17,9 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-project(mviz C)
+find_package(PulseAudio REQUIRED)
 
-find_package(PulseAudioSimple REQUIRED)
-
-add_executable(mviz)
-
-target_sources(
-    mviz
-        PRIVATE
-          main.c)
+add_executable(mviz main.c)
 
 target_include_directories(
     mviz

@@ -17,13 +17,12 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-add_library(kissfft STATIC)
+add_library(kissfft STATIC kiss_fft.c)
 
 target_sources(
     kissfft
         PRIVATE
           _kiss_fft_guts.h
-          kiss_fft.c
           kiss_fft.h
           kiss_fftr.c
           kiss_fftr.h)

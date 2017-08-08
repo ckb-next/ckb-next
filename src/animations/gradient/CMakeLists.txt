@@ -17,14 +17,7 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-project(gradient C)
-
-add_executable(gradient)
-
-target_sources(
-    gradient
-        PRIVATE
-          main.c)
+add_executable(gradient main.c)
 
 target_link_libraries(
     gradient

@@ -17,14 +17,7 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-project(rain C)
-
-add_executable(rain)
-
-target_sources(
-    rain
-        PRIVATE
-          main.c)
+add_executable(rain main.c)
 
 target_link_libraries(
     rain

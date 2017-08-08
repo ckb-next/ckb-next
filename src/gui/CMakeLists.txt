@@ -21,7 +21,9 @@
 #
 
 # Declare the target
-add_executable(ckb-next)
+# Unfortunately, CMake doesn't allow doing this
+# without specifying at least one source file, so here you have it
+add_executable(ckb-next main.cpp)
 
 # Declare we want macOS Bundle
 if (MACOS)
@@ -116,7 +118,6 @@ if (MACOS OR LINUX)
               kperfwidget.cpp
               layoutdialog.cpp
               macroreader.cpp
-              main.cpp
               mainwindow.cpp
               modeselectdialog.cpp
               mperfwidget.cpp
@@ -127,7 +128,7 @@ if (MACOS OR LINUX)
               animscript.h
               animsettingdialog.h
               autorun.h
-              ckb-anim.h
+              ckb-anim.h # FIXME: create a lib
               ckbsettings.h
               ckbsettingswriter.h
               colorbutton.h
@@ -202,20 +203,24 @@ if (MACOS OR LINUX)
         "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-key.gpg" COPYONLY)
 
     # Generate binary.qrc
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "<RCC>\n<qresource prefix=\"/bin\">\n")
-    file(APPEND "binary.qrc" "<file>ckb-next-key.gpg</file>\n")
-    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "</qresource>\n</RCC>\n")
+    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc")
+        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "<RCC>\n<qresource prefix=\"/bin\">\n")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "<file>ckb-next-key.gpg</file>\n")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "</qresource>\n</RCC>\n")
+    endif ()
 
     # Import images
-    file(GLOB qt_images "images/*.png")
-    file(COPY ${qt_images} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    file(GLOB qt_images RELATIVE "${CMAKE_CURRENT_LIST_DIR}/images" "${CMAKE_CURRENT_LIST_DIR}/images/*.png")
+    file(COPY ${qt_images} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
     # Generate image.qrc
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "<RCC>\n<qresource prefix=\"/img\">\n")
-    foreach (qt_image IN LISTS qt_images)
-        file(APPEND "image.qrc" "<file>${qt_image}</file>\n")
-    endforeach ()
-    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "</qresource>\n</RCC>\n")
+    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/image.qrc")
+        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "<RCC>\n<qresource prefix=\"/img\">\n")
+        foreach (qt_image IN LISTS qt_images)
+            file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "<file>${qt_image}</file>\n")
+        endforeach ()
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "</qresource>\n</RCC>\n")
+    endif ()
 
     # Import demo profile
     configure_file(
@@ -223,9 +228,10 @@ if (MACOS OR LINUX)
         "${CMAKE_CURRENT_BINARY_DIR}/demoprofile.conf" COPYONLY)
 
     # Begin generating text.qrc
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<RCC>\n<qresource prefix=\"/txt\">\n")
-    file(APPEND "text.qrc" "<file>demoprofile.conf</file>\n")
-
+    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
+        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<RCC>\n<qresource prefix=\"/txt\">\n")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>demoprofile.conf</file>\n")
+    endif ()
 endif ()
 if (MACOS)
     # Import macOS icon
@@ -251,8 +257,10 @@ if (MACOS)
         "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist")
 
     # End generating text.qrc
-    file(APPEND "text.qrc" "<file>org.next.ckb.plist</file>\n")
-    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
+    if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>org.next.ckb.plist</file>\n")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
+    endif ()
 elseif (LINUX)
     # Generate desktop file
     configure_file(
@@ -260,8 +268,10 @@ elseif (LINUX)
         "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop")
 
     # End generating text.qrc
-    file(APPEND "text.qrc" "<file>ckb-next.desktop</file>\n")
-    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
+    if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>ckb-next.desktop</file>\n")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
+    endif ()
 endif ()
 
 # Enhance target's source files based on auxiliary files
@@ -306,6 +316,45 @@ if(MACOS)
 elseif (LINUX)
 endif()
 
+# Target compile features and options
+target_compile_features(
+    ckb-next
+        PRIVATE
+          cxx_std_11)
+
+if (CXX_COMPILER_SUPPORTS_-Og)
+    set(opt_lvl "-Og")
+else ()
+    set(opt_lvl "-O0")
+endif ()
+
+target_compile_options(
+    ckb-next
+        PRIVATE
+          $<$<CONFIG:Debug>:${opt_lvl}>
+          -fsigned-char
+          -Wall
+          -Wextra
+          -Wfloat-equal
+          -Wundef
+          -Wshadow
+          -Wpointer-arith
+          -Wcast-align
+          -Wstrict-prototypes
+          -Wstrict-overflow=5
+          -Wwrite-strings
+          -Waggregate-return
+          -Wcast-qual
+          -Wswitch-default
+          -Wswitch-enum
+          -Wconversion
+          -Wformat=2
+          -Winit-self
+          $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:-save-temps>)
+
+# Add sanitizers after all target information is known
+add_sanitizers(ckb-next)
+
 # Declare target's installation paths
 if (MACOS)
     install(
@@ -339,6 +388,7 @@ elseif (LINUX)
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
+
     install(
         FILES "${CMAKE_SOURCE_DIR}/linux/ckb-next.png"
         DESTINATION "share/icons/hicolor/512x512/apps"

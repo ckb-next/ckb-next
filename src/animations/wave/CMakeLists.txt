@@ -17,14 +17,7 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-project(wave C)
-
-add_executable(wave)
-
-target_sources(
-    wave
-        PRIVATE
-          main.c)
+add_executable(wave main.c)
 
 target_link_libraries(
     wave

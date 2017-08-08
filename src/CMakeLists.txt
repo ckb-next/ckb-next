@@ -18,10 +18,13 @@
 #
 
 # Export version, etc. to source code
-configure_file(ckbnextconfig.h.in ckbnextconfig.h)
+set(CKB_NEXT_VERSION_STR ${ckb-next_VERSION})
+configure_file(
+    ${CMAKE_CURRENT_LIST_DIR}/ckbnextconfig.h.in
+    ${CMAKE_BINARY_DIR}/ckbnextconfig.h @ONLY)
 
 # Include this directory so that it's possible to write #include <ckbnextconfig.h> in source files
-include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+include_directories("${CMAKE_BINARY_DIR}")
 
 add_subdirectory(daemon)
 

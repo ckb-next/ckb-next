@@ -17,14 +17,7 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-project(pinwheel C)
-
-add_executable(pinwheel)
-
-target_sources(
-    pinwheel
-        PRIVATE
-          main.c)
+add_executable(pinwheel main.c)
 
 target_link_libraries(
     pinwheel

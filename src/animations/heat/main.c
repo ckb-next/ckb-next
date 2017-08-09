@@ -1,4 +1,4 @@
-#include "../ckb/ckb-anim.h"
+#include <ckb-next/animation.h>
 #include <math.h>
 
 void ckb_info(){

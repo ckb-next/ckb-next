@@ -30,6 +30,7 @@ target_link_libraries(
     mviz
         PRIVATE
           kissfft
+          CkbNext::Animation
           m
           ${PULSEAUDIOSIMPLE_LIBRARIES})
 

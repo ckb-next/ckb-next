@@ -22,6 +22,7 @@ add_executable(random main.c)
 target_link_libraries(
     random
         PRIVATE
+          CkbNext::Animation
           m)
 
 target_compile_features(

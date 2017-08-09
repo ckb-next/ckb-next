@@ -22,6 +22,7 @@ add_executable(pinwheel main.c)
 target_link_libraries(
     pinwheel
         PRIVATE
+          CkbNext::Animation
           m)
 
 target_compile_features(

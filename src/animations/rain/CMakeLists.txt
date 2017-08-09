@@ -22,6 +22,7 @@ add_executable(rain main.c)
 target_link_libraries(
     rain
         PRIVATE
+          CkbNext::Animation
           m)
 
 target_compile_features(

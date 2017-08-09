@@ -22,6 +22,7 @@ add_executable(ripple main.c)
 target_link_libraries(
     ripple
         PRIVATE
+          CkbNext::Animation
           m)
 
 target_compile_features(

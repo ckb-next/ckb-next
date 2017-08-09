@@ -22,6 +22,7 @@ add_executable(gradient main.c)
 target_link_libraries(
     gradient
         PRIVATE
+          CkbNext::Animation
           m)
 
 target_compile_features(

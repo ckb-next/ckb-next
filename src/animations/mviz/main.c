@@ -22,7 +22,7 @@
 
 #include <pulse/simple.h>
 
-#include <ckb-anim.h>
+#include <ckb-next/animation.h>
 
 #include <kiss_fftr.h>
 

@@ -33,6 +33,43 @@ target_link_libraries(
           m
           ${PULSEAUDIOSIMPLE_LIBRARIES})
 
+target_compile_features(
+    mviz
+        PRIVATE
+          c_std_11)
+
+if (C_COMPILER_SUPPORTS_-Og)
+    set(opt_lvl "-Og")
+else ()
+    set(opt_lvl "-O0")
+endif ()
+
+target_compile_options(
+    mviz
+        PRIVATE
+          $<$<CONFIG:Debug>:${opt_lvl}>
+          -fsigned-char
+          -Wall
+          -Wextra
+          -Wfloat-equal
+          -Wundef
+          -Wshadow
+          -Wpointer-arith
+          -Wcast-align
+          -Wstrict-prototypes
+          -Wstrict-overflow=5
+          -Wwrite-strings
+          -Waggregate-return
+          -Wcast-qual
+          -Wswitch-default
+          -Wswitch-enum
+          -Wconversion
+          -Wformat=2
+          -Winit-self
+          $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:-save-temps>)
+
+add_sanitizers(mviz)
+
 install(
     TARGETS mviz
     DESTINATION ${INSTALL_DIR_ANIMATIONS})

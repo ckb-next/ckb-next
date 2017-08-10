@@ -17,28 +17,27 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-add_library(kissfft STATIC kiss_fft.c)
+add_library(KissFFT kiss_fft.c)
+add_library(KissFFT::KissFFT ALIAS KissFFT)
 
 target_sources(
-    kissfft
+    KissFFT
         PRIVATE
-          _kiss_fft_guts.h
-          kiss_fft.h
-          kiss_fftr.c
-          kiss_fftr.h)
+          kiss_fftr.c)
+
 
 target_include_directories(
-    kissfft
-        PRIVATE
-          ${CMAKE_CURRENT_BINARY_DIR})
+    KissFFT
+        PUBLIC
+          "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_link_libraries(
-    kissfft
-        PRIVATE
+    KissFFT
+        PUBLIC
           m)
 
 target_compile_features(
-    kissfft
+    KissFFT
         PRIVATE
           c_std_11)
 
@@ -49,7 +48,7 @@ else ()
 endif ()
 
 target_compile_options(
-    kissfft
+    KissFFT
         PRIVATE
           $<$<CONFIG:Debug>:${opt_lvl}>
           -fsigned-char
@@ -72,4 +71,4 @@ target_compile_options(
           -Winit-self
           $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:-save-temps>)
 
-add_sanitizers(kissfft)
+add_sanitizers(KissFFT)

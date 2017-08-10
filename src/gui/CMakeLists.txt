@@ -75,9 +75,14 @@ elseif (LINUX)
 endif ()
 
 # Automatically handle MOC, UIC and RCC
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
+set_target_properties(
+    ckb-next
+        PROPERTIES
+          AUTOMOC ON
+          AUTOUIC ON
+          AUTORCC ON)
+
+set(AUTOGEN_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 # TODO: get rid of os.h and platform ifdefs
 # Declare target's source files
@@ -337,26 +342,25 @@ endif ()
 target_compile_options(
     ckb-next
         PRIVATE
-          $<$<CONFIG:Debug>:${opt_lvl}>
           -fsigned-char
           -Wall
           -Wextra
-          -Wfloat-equal
-          -Wundef
-          -Wshadow
-          -Wpointer-arith
-          -Wcast-align
-          -Wstrict-prototypes
-          -Wstrict-overflow=5
-          -Wwrite-strings
-          -Waggregate-return
-          -Wcast-qual
-          -Wswitch-default
-          -Wswitch-enum
-          -Wconversion
-          -Wformat=2
           -Winit-self
-          $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:-save-temps>)
+          $<$<CONFIG:Debug>:-Wfloat-equal>
+          $<$<CONFIG:Debug>:-Wundef>
+          $<$<CONFIG:Debug>:-Wshadow>
+          $<$<CONFIG:Debug>:-Wpointer-arith>
+          $<$<CONFIG:Debug>:-Wcast-align>
+          $<$<CONFIG:Debug>:-Wstrict-overflow=5>
+          $<$<CONFIG:Debug>:-Wwrite-strings>
+          $<$<CONFIG:Debug>:-Wcast-qual>
+          $<$<CONFIG:Debug>:-Wswitch-default>
+          $<$<CONFIG:Debug>:-Wswitch-enum>
+          $<$<CONFIG:Debug>:-Wconversion>
+          $<$<CONFIG:Debug>:-Wformat=2>
+          $<$<CONFIG:Debug>:-save-temps>
+          $<$<CONFIG:Debug>:${opt_lvl}>
+          $<$<CONFIG:Release>:-Wno-unused-parameter>)
 
 # Add sanitizers after all target information is known
 add_sanitizers(ckb-next)

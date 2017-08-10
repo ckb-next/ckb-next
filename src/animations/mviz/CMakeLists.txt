@@ -18,6 +18,9 @@
 #
 
 find_package(PulseAudio REQUIRED)
+if (NOT ${PULSEAUDIOSIMPLE_FOUND})
+    message(FATAL_ERROR "Missing PulseAudio Simple API")
+endif ()
 
 add_executable(mviz main.c)
 
@@ -29,9 +32,9 @@ target_include_directories(
 target_link_libraries(
     mviz
         PRIVATE
-          kissfft
-          CkbNext::Animation
           m
+          KissFFT::KissFFT
+          CkbNext::Animation
           ${PULSEAUDIOSIMPLE_LIBRARIES})
 
 target_compile_features(
@@ -74,5 +77,3 @@ add_sanitizers(mviz)
 install(
     TARGETS mviz
     DESTINATION ${INSTALL_DIR_ANIMATIONS})
-
-add_subdirectory(kissfft)

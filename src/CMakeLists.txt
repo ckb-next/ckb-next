@@ -27,6 +27,7 @@ configure_file(
 include_directories("${CMAKE_BINARY_DIR}")
 
 add_subdirectory(daemon)
+add_subdirectory(libs)
 
 if (WITH_ANIMATIONS)
     add_subdirectory(animations)

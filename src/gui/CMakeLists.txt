@@ -54,6 +54,7 @@ if (MACOS OR LINUX)
     find_package(Threads REQUIRED)
     find_package(Qt5 5.2.0 REQUIRED COMPONENTS Core Widgets Network Gui)
     find_package(ZLIB REQUIRED)
+    # TODO: rewrite module
     find_package(QuaZip REQUIRED)
 endif ()
 if (MACOS)

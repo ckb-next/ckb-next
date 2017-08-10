@@ -37,8 +37,8 @@
 #define N_KEYBYTES_INPUT        ((N_KEYS_INPUT + 7) / 8)
 // Mouse zones
 #define LED_MOUSE               N_KEYS_HW
-#define N_MOUSE_ZONES           5
-#define N_MOUSE_ZONES_EXTENDED  11
+#define N_MOUSE_ZONES           6
+#define N_MOUSE_ZONES_EXTENDED  12
 // Index of DPI light
 #define LED_DPI                 (LED_MOUSE + 2)
 // Total number of keys recognized by software

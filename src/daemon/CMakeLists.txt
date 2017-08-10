@@ -146,10 +146,11 @@ elseif (LINUX)
 endif ()
 
 # Target compile features and options
-target_compile_features(
-    ckb-next-daemon
-        PRIVATE
-          c_std_11)
+# TODO: replace. cmake 5.5 doesn't know about it
+#target_compile_features(
+#    ckb-next-daemon
+#        PRIVATE
+#          c_std_11)
 
 if (C_COMPILER_SUPPORTS_-Og)
     set(opt_lvl "-Og")
@@ -234,6 +235,7 @@ elseif (LINUX)
 
     # A way to check for systemd
     if (EXISTS "/run/systemd/system")
+        message(STATUS "systemd detected")
         install(CODE [[message(STATUS "systemd detected")]])
         set(init_system "systemd")
         if (SAFE_INSTALL)
@@ -251,6 +253,7 @@ elseif (LINUX)
 
     # A way to check for OpenRC
     if (EXISTS "/run/openrc/softlevel")
+        message(STATUS "OpenRC detected")
         install(CODE [[message(STATUS "OpenRC detected")]])
         set(init_system "OpenRC")
         if (SAFE_INSTALL)
@@ -276,6 +279,7 @@ elseif (LINUX)
         OUTPUT_VARIABLE initctl_output
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (${initctl_output} MATCHES "upstart")
+        message(STATUS "Upstart detected")
         install(CODE [[message(STATUS "Upstart detected")]])
         set(init_system "Upstart")
         if (SAFE_INSTALL)

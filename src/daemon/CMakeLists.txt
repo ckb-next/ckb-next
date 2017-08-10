@@ -276,6 +276,7 @@ elseif (LINUX)
     # A way to check for Upstart
     execute_process(
         COMMAND initctl --version
+        COMMAND head -1
         OUTPUT_VARIABLE initctl_output
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (${initctl_output} MATCHES "upstart")

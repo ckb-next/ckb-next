@@ -232,6 +232,30 @@ if (MACOS)
 elseif (LINUX)
     # Determine init system first.
 
+    # A way to check for Upstart
+    execute_process(
+        COMMAND initctl --version
+        OUTPUT_VARIABLE initctl_output
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if ("${initctl_output}" MATCHES "upstart")
+        message(STATUS "Upstart detected")
+        install(CODE [[message(STATUS "Upstart detected")]])
+        set(init_system "Upstart")
+        if (SAFE_INSTALL)
+            foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
+                execute_process(
+                    COMMAND status ${daemon}
+                    COMMAND grep "${daemon} start"
+                    RESULT_VARIABLE daemon_active)
+                if(daemon_active EQUAL 0)
+                    message(STATUS "Running ${daemon} detected")
+                    install(CODE [[message(STATUS "Stoppping ${daemon}...")]])
+                    install(CODE [[execute_process(COMMAND service ${daemon} stop)]])
+               endif()
+            endforeach(daemon)
+        endif()
+    endif ()
+
     # A way to check for systemd
     if (EXISTS "/run/systemd/system")
         message(STATUS "systemd detected")
@@ -243,6 +267,7 @@ elseif (LINUX)
                     COMMAND systemctl is-active ${daemon}.service
                     RESULT_VARIABLE daemon_active)
                 if(daemon_active EQUAL 0)
+                    message(STATUS "Running ${daemon} detected")
                     install(CODE [[message(STATUS "Stoppping ${daemon}...")]])
                     install(CODE [[execute_process(COMMAND systemctl stop ${daemon}.service)]])
                endif()
@@ -258,13 +283,14 @@ elseif (LINUX)
         if (SAFE_INSTALL)
             execute_process(
                 COMMAND rc-status -a
-                COMMAND grep 'started'
-                COMMAND grep -o 'ckb\|ckb-next'
+                COMMAND grep "started"
+                COMMAND grep -o "ckb\|ckb-next"
                 RESULT_VARIABLE daemons
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (NOT (" ${daemons}" STREQUAL " "))
                 string(REPLACE "\n" ";" daemons_list ${daemons})
                 foreach(daemon IN LISTS daemons_list)
+                    message(STATUS "Running ${daemon} detected")
                     install(CODE [[message(STATUS "Stoppping ${daemon}...")]])
                     install(CODE [[execute_process(COMMAND rc-service ${daemon} stop)]])
                 endforeach(daemon)
@@ -272,29 +298,6 @@ elseif (LINUX)
         endif ()
     endif ()
 
-    # A way to check for Upstart
-    execute_process(
-        COMMAND initctl --version
-        COMMAND head -1
-        OUTPUT_VARIABLE initctl_output
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (${initctl_output} MATCHES "upstart")
-        message(STATUS "Upstart detected")
-        install(CODE [[message(STATUS "Upstart detected")]])
-        set(init_system "Upstart")
-        if (SAFE_INSTALL)
-            foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
-                execute_process(
-                    COMMAND status ${daemon}
-                    COMMAND grep '^${daemon} start'
-                    RESULT_VARIABLE daemon_active)
-                if(daemon_active EQUAL 0)
-                    install(CODE [[message(STATUS "Stoppping ${daemon}...")]])
-                    install(CODE [[execute_process(COMMAND service ${daemon} stop)]])
-               endif()
-            endforeach(daemon)
-        endif()
-    endif ()
 endif ()
 
 # Declare target's installation paths

@@ -37,10 +37,10 @@ target_link_libraries(
           CkbNext::Animation
           ${PULSEAUDIOSIMPLE_LIBRARIES})
 
-target_compile_features(
+set_target_properties(
     mviz
-        PRIVATE
-          c_std_11)
+        PROPERTIES
+          C_STANDARD 11)
 
 if (C_COMPILER_SUPPORTS_-Og)
     set(opt_lvl "-Og")

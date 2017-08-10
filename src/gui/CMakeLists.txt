@@ -328,10 +328,10 @@ elseif (LINUX)
 endif()
 
 # Target compile features and options
-target_compile_features(
+set_target_properties(
     ckb-next
-        PRIVATE
-          cxx_std_11)
+        PROPERTIES
+          CXX_STANDARD 11)
 
 if (CXX_COMPILER_SUPPORTS_-Og)
     set(opt_lvl "-Og")

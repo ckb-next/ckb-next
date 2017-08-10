@@ -36,10 +36,10 @@ target_link_libraries(
         PUBLIC
           m)
 
-target_compile_features(
+set_target_properties(
     KissFFT
-        PRIVATE
-          c_std_11)
+        PROPERTIES
+          C_STANDARD 11)
 
 if (C_COMPILER_SUPPORTS_-Og)
     set(opt_lvl "-Og")

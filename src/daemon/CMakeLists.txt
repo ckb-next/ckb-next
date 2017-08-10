@@ -146,11 +146,10 @@ elseif (LINUX)
 endif ()
 
 # Target compile features and options
-# TODO: replace. cmake 5.5 doesn't know about it
-#target_compile_features(
-#    ckb-next-daemon
-#        PRIVATE
-#          c_std_11)
+set_target_properties(
+    ckb-next-daemon
+        PROPERTIES
+          C_STANDARD 11)
 
 if (C_COMPILER_SUPPORTS_-Og)
     set(opt_lvl "-Og")

@@ -26,9 +26,6 @@
 # Might be as low as 3.3, but again, use at your own risk
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
-# However, never downgrade this. It indicates listfiles were written for 3.8
-cmake_policy(VERSION 3.8)
-
 project(ckb-next LANGUAGES C CXX VERSION 0.2.9) # bumb this in release commit
 
 # Let CMake find custom modules

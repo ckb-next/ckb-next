@@ -24,7 +24,7 @@
 
 # Change this to lower _only_ if tested to work correctly with that version!
 # Might be as low as 3.3, but again, use at your own risk
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
 # However, never downgrade this. It indicates listfiles were written for 3.8
 cmake_policy(VERSION 3.8)

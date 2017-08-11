@@ -76,14 +76,12 @@ elseif (LINUX)
 endif ()
 
 # Automatically handle MOC, UIC and RCC
-set_target_properties(
-    ckb-next
-        PROPERTIES
-          AUTOMOC ON
-          AUTOUIC ON
-          AUTORCC ON)
-
-set(AUTOGEN_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+ set_target_properties(
+     ckb-next
+         PROPERTIES
+           AUTOMOC ON
+           AUTOUIC ON
+           AUTORCC ON)
 
 # TODO: get rid of os.h and platform ifdefs
 # Declare target's source files
@@ -201,45 +199,33 @@ elseif (LINUX)
 endif ()
 
 # Manipulate auxiliary files
-if (MACOS OR LINUX)
-    # Generate binary.qrc
-    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc")
-        message(STATUS "Generating binary.qrc")
-        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "<RCC>\n<qresource prefix=\"/bin\">\n")
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "<file>ckb-next-key.gpg</file>\n")
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "</qresource>\n</RCC>\n")
-        # Import GPG key
-        message(STATUS "Importing ckb-next-key.gpg")
-        configure_file(
-            "${CMAKE_CURRENT_LIST_DIR}/resources/ckb-next-key.gpg"
-            "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-key.gpg" COPYONLY)
-    endif ()
 
-    # Import images and generate image.qrc
-    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/image.qrc")
-        message(STATUS "Generating image.qrc")
-        file(GLOB qt_images RELATIVE "${CMAKE_CURRENT_LIST_DIR}/resources" "${CMAKE_CURRENT_LIST_DIR}/resources/*.png")
-        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "<RCC>\n<qresource prefix=\"/img\">\n")
-        foreach (qt_image IN LISTS qt_images)
-            message(STATUS "Importing ${qt_image}")
-            file(COPY "${CMAKE_CURRENT_LIST_DIR}/resources/${qt_image}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-            file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "<file>${qt_image}</file>\n")
-        endforeach ()
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "</qresource>\n</RCC>\n")
-    endif ()
-
-    # Begin generating text.qrc
-    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
-        # Import demo profile
-        message(STATUS "Importing demoprofile.conf")
-        configure_file(
-            "${CMAKE_CURRENT_LIST_DIR}/resources/demoprofile.conf"
-            "${CMAKE_CURRENT_BINARY_DIR}/demoprofile.conf" COPYONLY)
-        message(STATUS "Generating text.qrc [1/2]")
-        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<RCC>\n<qresource prefix=\"/txt\">\n")
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>demoprofile.conf</file>\n")
-    endif ()
+# Generate binary.qrc
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc")
+    message(STATUS "Generating binary.qrc")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "<RCC>\n<qresource prefix=\"/bin\">\n")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "<file>ckb-next-key.gpg</file>\n")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc" "</qresource>\n</RCC>\n")
+    # Import GPG key
+    message(STATUS "Importing ckb-next-key.gpg")
+    configure_file(
+        "${CMAKE_CURRENT_LIST_DIR}/resources/ckb-next-key.gpg"
+        "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-key.gpg" COPYONLY)
 endif ()
+
+# Import images and generate image.qrc
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/image.qrc")
+    message(STATUS "Generating image.qrc")
+    file(GLOB qt_images RELATIVE "${CMAKE_CURRENT_LIST_DIR}/resources" "${CMAKE_CURRENT_LIST_DIR}/resources/*.png")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "<RCC>\n<qresource prefix=\"/img\">\n")
+    foreach (qt_image IN LISTS qt_images)
+        message(STATUS "Importing ${qt_image}")
+        file(COPY "${CMAKE_CURRENT_LIST_DIR}/resources/${qt_image}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "<file>${qt_image}</file>\n")
+    endforeach ()
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "</qresource>\n</RCC>\n")
+endif ()
+
 if (MACOS)
     # Import macOS icon
     if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.icns")
@@ -261,29 +247,40 @@ if (MACOS)
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2014-2016 ccMSC\nCopyright © 2017 ckb-next dev. team")
 
-    # End generating text.qrc
-    if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
-        message(STATUS "Generating text.qrc [2/2]")
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>org.next.ckb.plist</file>\n")
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
-        # Generate and import plist
-        message(STATUS "Generating and importing org.next.ckb.plist")
-        configure_file(
-            "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.plist.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist")
+    # Generate and import plist
+    message(STATUS "Generating and importing org.next.ckb.plist")
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.plist.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist")
+
+    if (NOT TEXT_QRC_STRING)
+        set(TEXT_QRC_STRING "<file>org.next.ckb.plist</file>\n")
     endif ()
+
 elseif (LINUX)
-    # End generating text.qrc
-    if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
-        message(STATUS "Generating text.qrc [2/2]")
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>ckb-next.desktop</file>\n")
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
-        # Generate and import desktop file
-        message(STATUS "Generating and importing ckb-next.desktop")
-        configure_file(
-            "${CMAKE_SOURCE_DIR}/linux/ckb-next.desktop.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop")
+    if (NOT TEXT_QRC_STRING)
+        set(TEXT_QRC_STRING "<file>ckb-next.desktop</file>\n")
     endif ()
+
+    # Generate and import desktop file
+    message(STATUS "Generating and importing ckb-next.desktop")
+    configure_file(
+      "${CMAKE_SOURCE_DIR}/linux/ckb-next.desktop.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop")
+endif ()
+
+# Generate text.qrc
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
+    # Import demo profile
+    message(STATUS "Importing demoprofile.conf")
+    configure_file(
+      "${CMAKE_CURRENT_LIST_DIR}/resources/demoprofile.conf"
+      "${CMAKE_CURRENT_BINARY_DIR}/demoprofile.conf" COPYONLY)
+    message(STATUS "Generating text.qrc")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<RCC>\n<qresource prefix=\"/txt\">\n")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>demoprofile.conf</file>\n")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "${TEXT_QRC_STRING}")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
 endif ()
 
 # Enhance target's source files based on auxiliary files

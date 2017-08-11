@@ -307,6 +307,7 @@ if (MACOS OR LINUX)
     target_link_libraries(
         ckb-next
             PRIVATE
+              m
               Threads::Threads
               Qt5::Core
               Qt5::Network

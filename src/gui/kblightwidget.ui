@@ -349,7 +349,7 @@
   <customwidget>
    <class>ColorButton</class>
    <extends>QPushButton</extends>
-   <header location="global">colorbutton.h</header>
+   <header>colorbutton.h</header>
   </customwidget>
   <customwidget>
    <class>KbAnimWidget</class>

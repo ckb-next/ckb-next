@@ -299,6 +299,7 @@ if (MACOS OR LINUX)
         ckb-next
             PRIVATE
               ${CMAKE_CURRENT_BINARY_DIR}
+              ${CMAKE_CURRENT_SOURCE_DIR}
               ${QUAZIP_INCLUDE_DIR}) # TODO: export QuaZip target and inherit dirs
 endif ()
 

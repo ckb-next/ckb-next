@@ -50,25 +50,24 @@ endif ()
 target_compile_options(
     KissFFT
         PRIVATE
-          $<$<CONFIG:Debug>:${opt_lvl}>
           -fsigned-char
           -Wall
           -Wextra
-          -Wfloat-equal
-          -Wundef
-          -Wshadow
-          -Wpointer-arith
-          -Wcast-align
-          -Wstrict-prototypes
-          -Wstrict-overflow=5
-          -Wwrite-strings
-          -Waggregate-return
-          -Wcast-qual
-          -Wswitch-default
-          -Wswitch-enum
-          -Wconversion
-          -Wformat=2
           -Winit-self
-          $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:-save-temps>)
+          $<$<CONFIG:Debug>:-Wfloat-equal>
+          $<$<CONFIG:Debug>:-Wundef>
+          $<$<CONFIG:Debug>:-Wshadow>
+          $<$<CONFIG:Debug>:-Wpointer-arith>
+          $<$<CONFIG:Debug>:-Wcast-align>
+          $<$<CONFIG:Debug>:-Wstrict-prototypes>
+          $<$<CONFIG:Debug>:-Wstrict-overflow=5>
+          $<$<CONFIG:Debug>:-Wwrite-strings>
+          $<$<CONFIG:Debug>:-Wcast-qual>
+          $<$<CONFIG:Debug>:-Wswitch-default>
+          $<$<CONFIG:Debug>:-Wswitch-enum>
+          $<$<CONFIG:Debug>:-Wconversion>
+          $<$<CONFIG:Debug>:-Wformat=2>
+          $<$<CONFIG:Debug>:-save-temps>
+          $<$<CONFIG:Debug>:${opt_lvl}>)
 
 add_sanitizers(KissFFT)

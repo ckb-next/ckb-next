@@ -360,7 +360,7 @@ target_compile_options(
           $<$<CONFIG:Debug>:-Wformat=2>
           $<$<CONFIG:Debug>:-save-temps>
           $<$<CONFIG:Debug>:${opt_lvl}>
-          $<$<CONFIG:Release>:-Wno-unused-parameter>)
+          $<$<CONFIG:Release>:-Wno-unused-parameter>) # FIXME: cast out unused parameters
 
 # Add sanitizers after all target information is known
 add_sanitizers(ckb-next)

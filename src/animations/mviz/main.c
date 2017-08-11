@@ -21,10 +21,8 @@
 #include <stdlib.h>
 
 #include <pulse/simple.h>
-
+#include <kissfft/kiss_fftr.h>
 #include <ckb-next/animation.h>
-
-#include "kiss_fftr.h"
 
 void ckb_info(){
     // Plugin info

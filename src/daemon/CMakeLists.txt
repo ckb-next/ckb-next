@@ -111,6 +111,7 @@ if (MACOS OR LINUX)
     target_include_directories(
         ckb-next-daemon
             PRIVATE
+              "${CMAKE_CURRENT_SOURCE_DIR}"
               "${CMAKE_CURRENT_BINARY_DIR}"
               "${ICONV_INCLUDE_DIR}")
 endif ()
@@ -199,7 +200,7 @@ if (SAFE_INSTALL)
         OUTPUT_VARIABLE gui_processes
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (NOT (" ${gui_processes}" STREQUAL " "))
-        string(REPLACE "\n" ";" gui_processes_list ${gui_processes})
+        string(REPLACE "\n" ";" gui_processes_list "${gui_processes}")
         foreach (gui_process IN LISTS gui_processes_list)
             install(CODE [[message(STATUS "Terminating ${gui_process}...")]])
             install(CODE [[execute_process(COMMAND killall -9 ${gui_process})]])
@@ -288,7 +289,7 @@ elseif (LINUX)
                 RESULT_VARIABLE daemons
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (NOT (" ${daemons}" STREQUAL " "))
-                string(REPLACE "\n" ";" daemons_list ${daemons})
+                string(REPLACE "\n" ";" daemons_list "${daemons}")
                 foreach(daemon IN LISTS daemons_list)
                     message(STATUS "Running ${daemon} detected")
                     install(CODE [[message(STATUS "Stoppping ${daemon}...")]])
@@ -312,7 +313,7 @@ elseif (LINUX)
 endif ()
 
 # Declare target's auxiliary files installation paths
-if (${init_system} STREQUAL "launchd")
+if ("${init_system}" STREQUAL "launchd")
     configure_file(
         "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.daemon.plist"
         "${CMAKE_BINARY_DIR}/org.next.ckb.daemon.plist") # TODO: check plist's internals
@@ -323,7 +324,7 @@ if (${init_system} STREQUAL "launchd")
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
-elseif (${init_system} STREQUAL "systemd")
+elseif ("${init_system}" STREQUAL "systemd")
     install(
         FILES "${CMAKE_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service"
         DESTINATION "/usr/lib/systemd/system"
@@ -331,7 +332,7 @@ elseif (${init_system} STREQUAL "systemd")
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
-elseif (${init_system} STREQUAL "Upstart")
+elseif ("${init_system}" STREQUAL "Upstart")
     install(
         FILES "${CMAKE_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf"
         DESTINATION "/etc/init"
@@ -339,7 +340,7 @@ elseif (${init_system} STREQUAL "Upstart")
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ             GROUP_EXECUTE
         WORLD_READ             WORLD_EXECUTE)
-elseif (${init_system} STREQUAL "OpenRC")
+elseif ("${init_system}" STREQUAL "OpenRC")
     install(
         FILES "${CMAKE_SOURCE_DIR}/linux/openrc/ckb-next-daemon"
         DESTINATION "/etc/init.d"
@@ -347,7 +348,7 @@ elseif (${init_system} STREQUAL "OpenRC")
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ             GROUP_EXECUTE
         WORLD_READ             WORLD_EXECUTE)
-elseif (${init_system} STREQUAL "unknown")
+elseif ("${init_system}" STREQUAL "unknown")
     message(FATAL_ERROR "No supported system service detected. \
 Supported services are: systemd, launchd, OpenRC, Upstart.")
 endif ()

@@ -40,11 +40,11 @@ if (BREW_QT5)
         RESULT_VARIABLE qt5_found
         OUTPUT_VARIABLE qt5_path
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (NOT (${qt5_found} EQUAL 0))
+    if (NOT ("${qt5_found}" EQUAL 0))
         message(FATAL_ERROR "Homebrew's 'qt5' package is not installed.")
     else ()
         message(STATUS "Homebrew's Qt5 found: ${qt5_path}")
-        list(APPEND CMAKE_PREFIX_PATH ${qt5_path})
+        list(APPEND CMAKE_PREFIX_PATH "${qt5_path}")
     endif ()
 endif ()
 
@@ -288,9 +288,9 @@ if (MACOS OR LINUX)
     target_sources(
         ckb-next
             PRIVATE
-              ${CMAKE_CURRENT_BINARY_DIR}/binary.qrc
-              ${CMAKE_CURRENT_BINARY_DIR}/text.qrc
-              ${CMAKE_CURRENT_BINARY_DIR}/image.qrc)
+              "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc"
+              "${CMAKE_CURRENT_BINARY_DIR}/text.qrc"
+              "${CMAKE_CURRENT_BINARY_DIR}/image.qrc")
 endif ()
 
 # Declare target's include paths
@@ -298,9 +298,9 @@ if (MACOS OR LINUX)
     target_include_directories(
         ckb-next
             PRIVATE
-              ${CMAKE_CURRENT_BINARY_DIR}
-              ${CMAKE_CURRENT_SOURCE_DIR}
-              ${QUAZIP_INCLUDE_DIR}) # TODO: export QuaZip target and inherit dirs
+              "${CMAKE_CURRENT_BINARY_DIR}"
+              "${CMAKE_CURRENT_SOURCE_DIR}"
+              "${QUAZIP_INCLUDE_DIR}") # TODO: export QuaZip target and inherit dirs
 endif ()
 
 # Declare target's link dependencies
@@ -315,15 +315,15 @@ if (MACOS OR LINUX)
               Qt5::Widgets
               Qt5::Gui
               ZLIB::ZLIB
-              ${QUAZIP_LIBRARIES})
+              "${QUAZIP_LIBRARIES}")
 endif ()
 if(MACOS)
     target_link_libraries(
         ckb-next
             PRIVATE
-              ${COREAUDIO_LIBRARY}
-              ${FOUNDATION_LIBRARY}
-              ${AUDIOTOOLBOX_LIBRARY})
+              "${COREAUDIO_LIBRARY}"
+              "${FOUNDATION_LIBRARY}"
+              "${AUDIOTOOLBOX_LIBRARY}")
 elseif (LINUX)
 endif()
 
@@ -420,7 +420,7 @@ if (MACOS)
 
     set(dirs "")
     if (CMAKE_PREFIX_PATH)
-        foreach (dir ${CMAKE_PREFIX_PATH})
+        foreach (dir "${CMAKE_PREFIX_PATH}")
             list(APPEND dirs "${dir}/bin" "${dir}/lib")
         endforeach ()
     endif ()

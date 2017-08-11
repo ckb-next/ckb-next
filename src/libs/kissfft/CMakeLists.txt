@@ -29,7 +29,8 @@ target_sources(
 target_include_directories(
     KissFFT
         PUBLIC
-          "${CMAKE_CURRENT_SOURCE_DIR}/include")
+          "${CMAKE_CURRENT_SOURCE_DIR}/include"
+          "${CMAKE_CURRENT_SOURCE_DIR}/include/kissfft")
 
 target_link_libraries(
     KissFFT

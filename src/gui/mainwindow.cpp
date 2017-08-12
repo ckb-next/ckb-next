@@ -3,7 +3,6 @@
 #include "kbfirmware.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <ckbnextconfig.h>
 #include <cstdlib>
 #include <QSharedMemory>
 #include <QShortcut>
@@ -77,14 +76,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
         app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
         app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
-        app_indicator_set_icon(indicator, "ckb-next");
+        app_indicator_set_icon(indicator, "ckb-next-logo");
     } else
 #endif // USE_LIBAPPINDICATOR
     {
         trayIconMenu = new QMenu(this);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
+        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next-logo.png"), this);
         trayIcon->setContextMenu(trayIconMenu);
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
      }

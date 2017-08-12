@@ -400,7 +400,7 @@ elseif (LINUX)
         WORLD_READ)
 
     install(
-        FILES "${CMAKE_SOURCE_DIR}/linux/ckb-next.png"
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.png"
         DESTINATION "share/icons/hicolor/512x512/apps"
         PERMISSIONS
         OWNER_READ OWNER_WRITE

@@ -87,13 +87,20 @@ cmake_dependent_option(SANITIZE_LINK_STATIC "Try linking static against sanitize
 
 # Install
 include(GNUInstallDirs)
-set(INSTALL_DIR_ANIMATIONS "${CMAKE_INSTALL_LIBEXECDIR}/ckb-animations" CACHE STRING "Where to install animations.")
+set(ANIMATIONS_DIR_NAME "ckb-next-animations")
+if (MACOS)
+    set(INSTALL_DIR_ANIMATIONS "ckb-next.app/Resources/${ANIMATIONS_DIR_NAME}"
+        CACHE STRING "Where to install animations.")
+elseif (LINUX)
+    set(INSTALL_DIR_ANIMATIONS "${CMAKE_INSTALL_LIBEXECDIR}/${ANIMATIONS_DIR_NAME}"
+        CACHE STRING "Where to install animations.")
+endif ()
 
-option(SAFE_INSTALL "Execute pre-install tasks to ensure correct installation. \
-Intended to be used with direct installations without package manager." ON)
+option(SAFE_INSTALL "Execute pre-install tasks to ensure correct installation.
+    Intended to be used with direct installations without package manager." ON)
 
 if (NOT WITH_GUI)
-    message(WARNING "Building without GUI.")
+    message(WARNING "Building without GUI. Means no animations.")
 endif ()
 
 # Project-specific compiler settings

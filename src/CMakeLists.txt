@@ -18,10 +18,11 @@
 #
 
 # Export version, etc. to source code
-set(CKB_NEXT_VERSION_STR ${ckb-next_VERSION})
+set(CKB_NEXT_VERSION_STR "${ckb-next_VERSION}")
+set(CKB_NEXT_ANIMATIONS_PATH "${CMAKE_INSTALL_PREFIX}/${INSTALL_DIR_ANIMATIONS}")
 configure_file(
     ${CMAKE_CURRENT_LIST_DIR}/ckbnextconfig.h.in
-    ${CMAKE_BINARY_DIR}/ckbnextconfig.h @ONLY)
+    ${CMAKE_BINARY_DIR}/ckbnextconfig.h)
 
 # Include this directory so that it's possible to write #include <ckbnextconfig.h> in source files
 include_directories("${CMAKE_BINARY_DIR}")

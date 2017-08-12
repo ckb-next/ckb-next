@@ -5,5 +5,5 @@ Type=Application
 Name=ckb-next
 Comment=Corsair keyboard driver user interface
 Exec=${CMAKE_INSTALL_PREFIX}/bin/ckb-next --background
-Icon=${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/512x512/apps/ckb-next.png
+Icon=${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/512x512/apps/ckb-next-logo.png
 StartupNotify=true

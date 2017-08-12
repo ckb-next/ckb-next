@@ -1,0 +1,11 @@
+[Unit]
+Description=Corsair Keyboards and Mice Daemon
+
+[Service]
+ExecStart=${CMAKE_INSTALL_PREFIX}/bin/ckb-next-daemon
+Restart=on-failure
+StandardOutput=journal+console
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

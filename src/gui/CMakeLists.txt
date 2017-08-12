@@ -365,6 +365,20 @@ target_compile_options(
 # Add sanitizers after all target information is known
 add_sanitizers(ckb-next)
 
+# Make sure ckb GUI will not autostart and interfere with ckb-next GUI
+if (SAFE_INSTALL)
+    set(autostart_paths
+            "$ENV{HOME}/.config/autostart/ckb.desktop"
+            "$ENV{HOME}/Library/LaunchAgents/com.ckb.ckb.plist")
+    foreach (autostart_path IN LISTS autostart_paths)
+        if (EXISTS "${autostart_path}")
+            message(STATUS "ckb GUI autostart file detected")
+            install(CODE "message(STATUS \"Removing ${autostart_path}\")")
+            install(CODE "execute_process(COMMAND rm ${autostart_path})")
+        endif ()
+    endforeach ()
+endif()
+
 # Declare target's installation paths
 if (MACOS)
     install(

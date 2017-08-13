@@ -337,7 +337,7 @@ elseif (LINUX)
         message(STATUS "Generating and importing ckb-next-daemon (${init_system})")
         configure_file(
             "${ckb-next_SOURCE_DIR}/linux/openrc/ckb-next-daemon.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon")
+            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon" @ONLY)
 
         if (SAFE_INSTALL)
             execute_process(

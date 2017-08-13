@@ -1,7 +1,7 @@
 #!/usr/bin/openrc-run
 description="Daemon for the opensource ckb driver for corsair keyboards and mice"
 
-daemon_ckb="${CMAKE_INSTALL_PREFIX}/bin/ckb-next-daemon"
+daemon_ckb="@CMAKE_INSTALL_PREFIX@/bin/ckb-next-daemon"
 PIDFILE="/dev/input/ckb0/pid"
 
 start() {

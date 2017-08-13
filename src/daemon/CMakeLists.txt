@@ -308,7 +308,7 @@ elseif (LINUX)
         if (SAFE_INSTALL)
             foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
                 execute_process(
-                    COMMAND systemctl is-active ${daemon}.service
+                    COMMAND sudo systemctl is-active ${daemon}.service
                     RESULT_VARIABLE daemon_active)
                 if(daemon_active EQUAL 0)
                     message(STATUS "Running ${daemon} detected")
@@ -316,7 +316,7 @@ elseif (LINUX)
                     install(CODE "execute_process(COMMAND sudo systemctl stop ${daemon}.service)")
                 endif()
                 execute_process(
-                    COMMAND systemctl is-enabled ${daemon}.service
+                    COMMAND sudo systemctl is-enabled ${daemon}.service
                     RESULT_VARIABLE daemon_enabled)
                 if(daemon_enabled EQUAL 0)
                     message(STATUS "Enabled ${daemon} detected")

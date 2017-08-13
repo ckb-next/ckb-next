@@ -1,17 +1,28 @@
-#!/usr/bin/openrc-run
-description="Daemon for the opensource ckb driver for corsair keyboards and mice"
+#!/sbin/openrc-run
+## Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
 
-daemon_ckb="@CMAKE_INSTALL_PREFIX@/bin/ckb-next-daemon"
-PIDFILE="/dev/input/ckb0/pid"
+extra_started_commands="reload"
+command="@CMAKE_INSTALL_PREFIX@/bin/ckb-daemon"
+description="Driver for Corsair Keyboards and Mice"
+pidfile="/run/ckb-next-daemon.pid"
+logfile="/var/run/ckb-next-daemon.log"
 
 start() {
-	ebegin "Starting ckb-next"
-	start-stop-daemon --start --quiet --exec ${daemon_ckb} --background
+	ebegin "Starting Corsair Keyboards and Mice Driver"
+	start-stop-daemon --start --exec "${command}" --pidfile "${pidfile}" --background \
+		--stdout "${logfile}" --stderr "${logfile}"
 	eend $?
 }
 
 stop() {
-	ebegin "Stopping ckb-next"
-	start-stop-daemon --stop --quiet --exec ${daemon_ckb} --pidfile $PIDFILE
+	ebegin "Stopping Corsair Keyboards and Mice Driver"
+	start-stop-daemon --stop --exec "${command}" --pidfile "${pidfile}"
 	eend $?
+}
+
+reload() {
+	stop
+	sleep 3
+	start
 }

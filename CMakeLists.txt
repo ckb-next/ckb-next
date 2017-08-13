@@ -51,6 +51,7 @@ determine_version("${ckb-next_SOURCE_DIR}" "${GIT_EXECUTABLE}" "ckb-next")
 include(CMakeDependentOption)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE STRING "Where to put binaries after compilation.")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE STRING "Where to put libraries after compilation.")
 
 if (MACOS)
     option(USE_BREW_QT5 "Use Homebrew package for Qt5." ON)
@@ -58,10 +59,10 @@ elseif (LINUX)
     option(WITH_MVIZ "Build with music visualizer." ON)
 endif ()
 
-# GUI
+# Options: GUI
 option(WITH_GUI "Build with Qt GUI to manipulate animations." ON)
 
-# GUI animations
+# Options: GUI animations
 option(WITH_ANIMATIONS "Build with animations." ON)
 cmake_dependent_option(WITH_GRADIENT "Build with 'Gradient' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_HEAT     "Build with 'Heat' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
@@ -71,11 +72,11 @@ cmake_dependent_option(WITH_PINWHEEL "Build with 'Pinwheel' animation." ON "WITH
 cmake_dependent_option(WITH_RIPPLE   "Build with 'Ripple' animation."   ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_WAVE     "Build with 'Wave' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 
-# Daemon's USB protocol
+# Options: daemon
 option(DEBUG_USB_SEND "Show the contents of USB packets being sent to device."       OFF)
 option(DEBUG_USB_RECV "Show the contents of USB packets being received from device." OFF)
 
-# Sanitizers
+# Options: sanitizers
 find_package(Sanitizers)
 option(WITH_SANITIZERS "Enable certain sanitizers for certain targets. \
 By default ASan and UBSan will be enabled with this option." OFF)
@@ -85,7 +86,7 @@ cmake_dependent_option(SANITIZE_MEMORY      "Enable MemorySanitizer."           
 cmake_dependent_option(SANITIZE_THREAD      "Enable ThreadSanitizer."                OFF "WITH_SANITIZERS" OFF)
 cmake_dependent_option(SANITIZE_LINK_STATIC "Try linking static against sanitizers." OFF "WITH_SANITIZERS" OFF)
 
-# Install
+# Options: install
 include(GNUInstallDirs)
 set(ANIMATIONS_DIR_NAME "ckb-next-animations")
 if (MACOS)
@@ -96,11 +97,14 @@ elseif (LINUX)
         CACHE STRING "Where to install animations.")
 endif ()
 
+# Options: other
 option(SAFE_INSTALL "Execute pre-install tasks to ensure correct installation.
     Intended to be used with direct installations without package manager." ON)
 
+option(WITH_SHIPPED_QUAZIP "Use shipped QuaZip5 instead of system package" OFF)
+
 if (NOT WITH_GUI)
-    message(WARNING "Building without GUI. Means no animations.")
+    message(WARNING "Building without GUI. Proceed only if you know what you are doing.")
 endif ()
 
 # Project-specific compiler settings

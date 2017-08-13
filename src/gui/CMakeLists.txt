@@ -54,8 +54,10 @@ if (MACOS OR LINUX)
     find_package(Threads REQUIRED)
     find_package(Qt5 5.2.0 REQUIRED COMPONENTS Core Widgets Network Gui)
     find_package(ZLIB REQUIRED)
-    # TODO: rewrite module
-    find_package(QuaZip REQUIRED)
+    if (NOT WITH_SHIPPED_QUAZIP)
+        # TODO: rewrite module
+        find_package(QuaZip REQUIRED)
+    endif ()
 endif ()
 if (MACOS)
     find_library(FOUNDATION_LIBRARY Foundation)
@@ -299,8 +301,14 @@ if (MACOS OR LINUX)
         ckb-next
             PRIVATE
               "${CMAKE_CURRENT_BINARY_DIR}"
-              "${CMAKE_CURRENT_SOURCE_DIR}"
-              "${QUAZIP_INCLUDE_DIR}") # TODO: export QuaZip target and inherit dirs
+              "${CMAKE_CURRENT_SOURCE_DIR}")
+endif ()
+
+if (NOT WITH_SHIPPED_QUAZIP)
+    target_include_directories(
+        ckb-next
+            PRIVATE
+              "${QuaZip_INCLUDE_DIR}") # TODO: export QuaZip target and inherit dirs
 endif ()
 
 # Declare target's link dependencies
@@ -314,8 +322,7 @@ if (MACOS OR LINUX)
               Qt5::Network
               Qt5::Widgets
               Qt5::Gui
-              ZLIB::ZLIB
-              "${QUAZIP_LIBRARIES}")
+              ZLIB::ZLIB)
 endif ()
 if(MACOS)
     target_link_libraries(
@@ -326,6 +333,18 @@ if(MACOS)
               "${AUDIOTOOLBOX_LIBRARY}")
 elseif (LINUX)
 endif()
+
+if (WITH_SHIPPED_QUAZIP)
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+              QuaZip::quazip5)
+else ()
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+            "${QuaZip_LIBRARIES}")
+endif ()
 
 # Target compile features and options
 set_target_properties(

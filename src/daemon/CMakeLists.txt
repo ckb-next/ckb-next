@@ -272,16 +272,23 @@ elseif (LINUX)
         if (SAFE_INSTALL)
             foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
                 execute_process(
-                    COMMAND service ${daemon} status
+                    COMMAND sudo service ${daemon} status
                     COMMAND grep "^${daemon} start"
                     RESULT_VARIABLE daemon_active)
                 if(daemon_active EQUAL 0)
                     message(STATUS "Running ${daemon} detected")
                     install(CODE "message(STATUS \"${init_system}: stopping ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo service ${daemon} stop)")
+                endif()
+                execute_process(
+                    COMMAND sudo initctl show-config ${daemon}
+                    COMMAND grep "^  start on"
+                    RESULT_VARIABLE daemon_enabled)
+                if(daemon_enabled EQUAL 0)
+                    message(STATUS "Enabled ${daemon} detected")
                     install(CODE "message(STATUS \"${init_system}: permanently disabling ${daemon}\")")
                     install(CODE "execute_process(COMMAND echo 'manual' COMMAND sudo tee /etc/init/${daemon}.override)")
-               endif()
+                endif()
             endforeach()
         endif()
 
@@ -307,9 +314,15 @@ elseif (LINUX)
                     message(STATUS "Running ${daemon} detected")
                     install(CODE "message(STATUS \"${init_system}: stoppping ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo systemctl stop ${daemon}.service)")
+                endif()
+                execute_process(
+                    COMMAND systemctl is-enabled ${daemon}.service
+                    RESULT_VARIABLE daemon_enabled)
+                if(daemon_enabled EQUAL 0)
+                    message(STATUS "Enabled ${daemon} detected")
                     install(CODE "message(STATUS \"${init_system}: permanently disabling ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo systemctl disable ${daemon}.service)")
-               endif()
+                endif()
             endforeach()
         endif ()
 

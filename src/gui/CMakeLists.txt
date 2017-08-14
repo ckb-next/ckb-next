@@ -388,6 +388,7 @@ add_sanitizers(ckb-next)
 if (SAFE_INSTALL)
     set(autostart_paths
             "$ENV{HOME}/.config/autostart/ckb.desktop"
+            "$ENV{HOME}/.config/autostart/ckb-next.desktop"
             "$ENV{HOME}/Library/LaunchAgents/com.ckb.ckb.plist")
     foreach (autostart_path IN LISTS autostart_paths)
         if (EXISTS "${autostart_path}")

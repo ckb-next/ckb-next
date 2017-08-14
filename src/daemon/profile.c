@@ -115,6 +115,10 @@ void u16dec(ushort* in, char* out, size_t* srclen, size_t* dstlen){
 }
 
 void cmd_name(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* name){
+    (void)kb;
+    (void)dummy1;
+    (void)dummy2;
+
     char decoded[strlen(name) + 1];
     urldecode2(decoded, name);
     size_t srclen = strlen(decoded), dstlen = MD_NAME_LEN;
@@ -122,6 +126,10 @@ void cmd_name(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
 }
 
 void cmd_profilename(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* name){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+
     usbprofile* profile = kb->profile;
     char decoded[strlen(name) + 1];
     urldecode2(decoded, name);
@@ -158,6 +166,10 @@ char* gethwprofilename(hwprofile* profile){
 }
 
 void cmd_id(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id){
+    (void)kb;
+    (void)dummy1;
+    (void)dummy2;
+
     // ID is either a GUID or an 8-digit hex number
     int newmodified;
     if(!setid(&mode->id, id) && sscanf(id, "%08x", &newmodified) == 1)
@@ -165,6 +177,10 @@ void cmd_id(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id
 }
 
 void cmd_profileid(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id){
+    (void)mode;
+    (void)dummy1;
+    (void)dummy2;
+
     usbprofile* profile = kb->profile;
     int newmodified;
     if(!setid(&profile->id, id) && sscanf(id, "%08x", &newmodified) == 1)
@@ -201,6 +217,10 @@ static void freemode(usbmode* mode){
 }
 
 void cmd_erase(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* dummy3){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+
     pthread_mutex_lock(imutex(kb));
     freemode(mode);
     initmode(mode);
@@ -219,6 +239,11 @@ static void _freeprofile(usbdevice* kb){
 }
 
 void cmd_eraseprofile(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
+
     pthread_mutex_lock(imutex(kb));
     _freeprofile(kb);
     allocprofile(kb);

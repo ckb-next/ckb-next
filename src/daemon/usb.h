@@ -99,11 +99,11 @@
 #define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
 
 ///
-/// uncomment the following Define to see USB packets sent to the device
-// #define DEBUG_USB
+/// uncomment to see USB packets sent to the device
+// #define DEBUG_USB_SEND
 
 ///
-///uncomment to see USB packets sent from the device
+///uncomment to see USB packets received from the device
 // #define DEBUG_USB_RECV
 
 ///

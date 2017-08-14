@@ -42,14 +42,28 @@ int setactive_mouse(usbdevice* kb, int active){
 }
 
 int cmd_active_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
+
     return setactive_mouse(kb, 1);
 }
 
 int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
+
     return setactive_mouse(kb, 0);
 }
 
 int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+
     uchar msg[MSG_SIZE] = {
         0x07, 0x0a, 0, 0, (uchar)rate
     };

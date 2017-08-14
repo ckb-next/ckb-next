@@ -7,6 +7,8 @@
 #include "usb.h"
 
 int start_kb_nrgb(usbdevice* kb, int makeactive){
+    (void)makeactive;
+
     // Put the non-RGB K95 into software mode. Nothing else needs to be done hardware wise
     nk95cmd(kb, NK95_HWOFF);
     // Fill out RGB features for consistency, even though the keyboard doesn't have them
@@ -110,10 +112,20 @@ int setactive_kb(usbdevice* kb, int active){
 }
 
 int cmd_active_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
+
     return setactive_kb(kb, 1);
 }
 
 int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+    (void)dummy4;
+
     return setactive_kb(kb, 0);
 }
 

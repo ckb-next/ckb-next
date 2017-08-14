@@ -305,6 +305,8 @@ void freebind(binding* bind){
 }
 
 void cmd_bind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
+    (void)dummy;
+
     if(keyindex >= N_KEYS_INPUT)
         return;
     // Find the key to bind to
@@ -327,6 +329,9 @@ void cmd_bind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char*
 }
 
 void cmd_unbind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
+    (void)dummy;
+    (void)to;
+
     if(keyindex >= N_KEYS_INPUT)
         return;
     pthread_mutex_lock(imutex(kb));
@@ -335,6 +340,9 @@ void cmd_unbind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const cha
 }
 
 void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
+    (void)dummy;
+    (void)to;
+
     if(keyindex >= N_KEYS_INPUT)
         return;
     pthread_mutex_lock(imutex(kb));
@@ -465,6 +473,8 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
 }
 
 void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char* keys, const char* assignment){
+    (void)notifynumber;
+
     pthread_mutex_lock(imutex(kb));
     _cmd_macro(mode, keys, assignment);
     pthread_mutex_unlock(imutex(kb));

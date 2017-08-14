@@ -343,7 +343,7 @@ elseif (LINUX)
             execute_process(
                 COMMAND rc-status -a
                 COMMAND grep "started"
-                COMMAND grep -o "ckb\|ckb-next"
+                COMMAND grep -o "ckb\\|ckb-next"
                 OUTPUT_VARIABLE daemons
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)
@@ -356,7 +356,7 @@ elseif (LINUX)
            endif()
             execute_process(
                 COMMAND rc-status -a
-                COMMAND grep -o "ckb\|ckb-next"
+                COMMAND grep -o "ckb\\|ckb-next"
                 OUTPUT_VARIABLE daemons
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)

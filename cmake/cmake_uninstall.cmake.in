@@ -64,7 +64,7 @@ elseif ("${init_system}" STREQUAL "upstart")
         if(daemon_enabled EQUAL 0)
             message(STATUS "Enabled ${daemon} detected")
             message(STATUS "${init_system}: permanently disabling ${daemon}")
-            execute_process(COMMAND echo 'manual' COMMAND sudo tee /etc/init/${daemon}.override)
+            execute_process(COMMAND echo manual COMMAND sudo tee /etc/init/${daemon}.override)
         endif()
 
     endforeach()

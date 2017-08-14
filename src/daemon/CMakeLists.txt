@@ -344,7 +344,7 @@ elseif (LINUX)
                 COMMAND rc-status -a
                 COMMAND grep "started"
                 COMMAND grep -o "ckb\|ckb-next"
-                RESULT_VARIABLE daemons
+                OUTPUT_VARIABLE daemons
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)
                 string(REPLACE "\n" ";" daemons_list "${daemons}")
@@ -352,8 +352,19 @@ elseif (LINUX)
                     message(STATUS "Running ${daemon} detected")
                     install(CODE "message(STATUS \"${init_system}: stoppping ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo rc-service ${daemon} stop)")
+                endforeach()
+           endif()
+            execute_process(
+                COMMAND rc-status -a
+                COMMAND grep -o "ckb\|ckb-next"
+                OUTPUT_VARIABLE daemons
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+            if (daemons)
+                string(REPLACE "\n" ";" daemons_list "${daemons}")
+                foreach(daemon IN LISTS daemons_list)
+                    message(STATUS "Enabled ${daemon} detected")
                     install(CODE "message(STATUS \"${init_system}: permanently disabling ${daemon}\")")
-                    install(CODE "execute_process(COMMAND sudo rc-update del ${daemon})")
+                    install(CODE "execute_process(COMMAND sudo rc-update del ${daemon} default)")
                 endforeach()
            endif()
         endif ()
@@ -431,8 +442,9 @@ if (SAFE_INSTALL)
         install(CODE "message(STATUS \"${init_system}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo systemctl start ckb-next-daemon.service)")
     elseif ("${init_system}" STREQUAL "OpenRC")
+        # No need to refresh
         install(CODE "message(STATUS \"${init_system}: enabling ckb-next-daemon\")")
-        install(CODE "execute_process(COMMAND sudo rc-update add ckb-next-daemon)")
+        install(CODE "execute_process(COMMAND sudo rc-update add ckb-next-daemon default)")
         install(CODE "message(STATUS \"${init_system}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo rc-service ckb-next-daemon start)")
     endif ()

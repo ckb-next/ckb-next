@@ -221,14 +221,14 @@ if (SAFE_INSTALL)
 endif ()
 
 # No need to be repetitve, save init system
-set(init_system "unknown")
+set(CKB_NEXT_INIT_SYSTEM "unknown" CACHE INTERNAL "")
 
 if (MACOS)
     message(STATUS "launchd detected")
-    set(init_system "launchd")
+    set(CKB_NEXT_INIT_SYSTEM "launchd" CACHE INTERNAL "")
 
     # Import plist
-    message(STATUS "Importing org.next.ckb.daemon.plist (${init_system})")
+    message(STATUS "Importing org.next.ckb.daemon.plist (${CKB_NEXT_INIT_SYSTEM})")
     configure_file(
         "${ckb-next_SOURCE_DIR}/macos/org.next.ckb.daemon.plist"
         "${CMAKE_CURRENT_BINARY_DIR}/service/org.next.ckb.daemon.plist" COPYONLY)
@@ -241,7 +241,7 @@ if (MACOS)
             string(FIND "${launchctl_jobs}" "${plist_name}" daemon_found)
             if (NOT (daemon_found EQUAL -1))
                 message(STATUS "Running job with ${plist_name} plist detected")
-                install(CODE "message(STATUS \"${init_system}: permanently unloading ${plist_name}\")")
+                install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: permanently unloading ${plist_name}\")")
                 install(CODE "execute_process(COMMAND sudo launchctl unload -w /Library/LaunchDaemons/${plist_name})")
             endif ()
         endforeach ()
@@ -261,10 +261,10 @@ elseif (LINUX)
 
     if ("${initctl_output}" MATCHES "upstart")
         message(STATUS "upstart detected")
-        set(init_system "upstart")
+        set(CKB_NEXT_INIT_SYSTEM "upstart" CACHE INTERNAL "")
 
         # Generate and import service
-        message(STATUS "Generating and importing ckb-next-daemon.conf (${init_system})")
+        message(STATUS "Generating and importing ckb-next-daemon.conf (${CKB_NEXT_INIT_SYSTEM})")
         configure_file(
             "${ckb-next_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf.in"
             "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.conf")
@@ -277,7 +277,7 @@ elseif (LINUX)
                     RESULT_VARIABLE daemon_active)
                 if(daemon_active EQUAL 0)
                     message(STATUS "Running ${daemon} detected")
-                    install(CODE "message(STATUS \"${init_system}: stopping ${daemon}\")")
+                    install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: stopping ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo service ${daemon} stop)")
                 endif()
                 execute_process(
@@ -286,7 +286,7 @@ elseif (LINUX)
                     RESULT_VARIABLE daemon_enabled)
                 if(daemon_enabled EQUAL 0)
                     message(STATUS "Enabled ${daemon} detected")
-                    install(CODE "message(STATUS \"${init_system}: permanently disabling ${daemon}\")")
+                    install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: permanently disabling ${daemon}\")")
                     install(CODE "execute_process(COMMAND echo 'manual' COMMAND sudo tee /etc/init/${daemon}.override)")
                 endif()
             endforeach()
@@ -297,10 +297,10 @@ elseif (LINUX)
     # A way to check for systemd
     if (EXISTS "/run/systemd/system")
         message(STATUS "systemd detected")
-        set(init_system "systemd")
+        set(CKB_NEXT_INIT_SYSTEM "systemd" CACHE INTERNAL "")
 
         # Generate and import service
-        message(STATUS "Generating and importing ckb-next-daemon.service (${init_system})")
+        message(STATUS "Generating and importing ckb-next-daemon.service (${CKB_NEXT_INIT_SYSTEM})")
         configure_file(
             "${ckb-next_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service.in"
             "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service")
@@ -312,7 +312,7 @@ elseif (LINUX)
                     RESULT_VARIABLE daemon_active)
                 if(daemon_active EQUAL 0)
                     message(STATUS "Running ${daemon} detected")
-                    install(CODE "message(STATUS \"${init_system}: stoppping ${daemon}\")")
+                    install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: stoppping ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo systemctl stop ${daemon}.service)")
                 endif()
                 execute_process(
@@ -320,7 +320,7 @@ elseif (LINUX)
                     RESULT_VARIABLE daemon_enabled)
                 if(daemon_enabled EQUAL 0)
                     message(STATUS "Enabled ${daemon} detected")
-                    install(CODE "message(STATUS \"${init_system}: permanently disabling ${daemon}\")")
+                    install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: permanently disabling ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo systemctl disable ${daemon}.service)")
                 endif()
             endforeach()
@@ -331,10 +331,10 @@ elseif (LINUX)
     # A way to check for OpenRC
     if (EXISTS "/run/openrc/softlevel")
         message(STATUS "OpenRC detected")
-        set(init_system "OpenRC")
+        set(CKB_NEXT_INIT_SYSTEM "OpenRC" CACHE INTERNAL "")
 
         # Generate and import service
-        message(STATUS "Generating and importing ckb-next-daemon (${init_system})")
+        message(STATUS "Generating and importing ckb-next-daemon (${CKB_NEXT_INIT_SYSTEM})")
         configure_file(
             "${ckb-next_SOURCE_DIR}/linux/openrc/ckb-next-daemon.in"
             "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon" @ONLY)
@@ -350,10 +350,10 @@ elseif (LINUX)
                 string(REPLACE "\n" ";" daemons_list "${daemons}")
                 foreach(daemon IN LISTS daemons_list)
                     message(STATUS "Running ${daemon} detected")
-                    install(CODE "message(STATUS \"${init_system}: stoppping ${daemon}\")")
+                    install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: stoppping ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo rc-service ${daemon} stop)")
                 endforeach()
-           endif()
+            endif()
             execute_process(
                 COMMAND rc-status -a
                 COMMAND grep -o "ckb-daemon\\|ckb-next-daemon"
@@ -363,10 +363,10 @@ elseif (LINUX)
                 string(REPLACE "\n" ";" daemons_list "${daemons}")
                 foreach(daemon IN LISTS daemons_list)
                     message(STATUS "Enabled ${daemon} detected")
-                    install(CODE "message(STATUS \"${init_system}: permanently disabling ${daemon}\")")
+                    install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: permanently disabling ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo rc-update del ${daemon} default)")
                 endforeach()
-           endif()
+            endif()
         endif ()
 
     endif ()
@@ -385,7 +385,7 @@ elseif (LINUX)
 endif ()
 
 # Declare target's auxiliary files installation paths
-if ("${init_system}" STREQUAL "launchd")
+if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/org.next.ckb.daemon.plist"
         DESTINATION "/Library/Application Support"
@@ -393,7 +393,7 @@ if ("${init_system}" STREQUAL "launchd")
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
-elseif ("${init_system}" STREQUAL "systemd")
+elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
         DESTINATION "/usr/lib/systemd/system"
@@ -401,7 +401,7 @@ elseif ("${init_system}" STREQUAL "systemd")
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
-elseif ("${init_system}" STREQUAL "upstart")
+elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "upstart")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.conf"
         DESTINATION "/etc/init"
@@ -409,7 +409,7 @@ elseif ("${init_system}" STREQUAL "upstart")
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ             GROUP_EXECUTE
         WORLD_READ             WORLD_EXECUTE)
-elseif ("${init_system}" STREQUAL "OpenRC")
+elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "OpenRC")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon"
         DESTINATION "/etc/init.d"
@@ -417,35 +417,35 @@ elseif ("${init_system}" STREQUAL "OpenRC")
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ             GROUP_EXECUTE
         WORLD_READ             WORLD_EXECUTE)
-elseif ("${init_system}" STREQUAL "unknown")
+elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "unknown")
     message(FATAL_ERROR "No supported system service detected.
     Supported services are: systemd, launchd, OpenRC, upstart.")
 endif ()
 
 # Now, we should start and enable new services
 if (SAFE_INSTALL)
-    if ("${init_system}" STREQUAL "launchd")
+    if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
         # Just installing the plist should be enough to enable the job at boot
-        install(CODE "message(STATUS \"${init_system}: loading org.next.ckb.daemon.plist\")")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: loading org.next.ckb.daemon.plist\")")
         install(CODE "execute_process(COMMAND sudo launchctl load /Library/LaunchDaemons/org.next.ckb.daemon.plist)")
-    elseif ("${init_system}" STREQUAL "upstart")
+    elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "upstart")
         # Just installing the service should be enough to enable it at boot
-        install(CODE "message(STATUS \"${init_system}: refreshing services\")")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: refreshing services\")")
         install(CODE "execute_process(COMMAND sudo initctl reload-configuration)")
-        install(CODE "message(STATUS \"${init_system}: starting ckb-next-daemon\")")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo service ckb-next-daemon start)")
-    elseif ("${init_system}" STREQUAL "systemd")
-        install(CODE "message(STATUS \"${init_system}: refreshing services\")")
+    elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: refreshing services\")")
         install(CODE "execute_process(COMMAND sudo systemctl daemon-reload)")
-        install(CODE "message(STATUS \"${init_system}: enabling ckb-next-daemon\")")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: enabling ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo systemctl enable ckb-next-daemon.service)")
-        install(CODE "message(STATUS \"${init_system}: starting ckb-next-daemon\")")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo systemctl start ckb-next-daemon.service)")
-    elseif ("${init_system}" STREQUAL "OpenRC")
+    elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "OpenRC")
         # No need to refresh
-        install(CODE "message(STATUS \"${init_system}: enabling ckb-next-daemon\")")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: enabling ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo rc-update add ckb-next-daemon default)")
-        install(CODE "message(STATUS \"${init_system}: starting ckb-next-daemon\")")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo rc-service ckb-next-daemon start)")
     endif ()
 endif ()

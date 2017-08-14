@@ -100,6 +100,8 @@ endif ()
 # Options: other
 option(SAFE_INSTALL "Execute pre-install tasks to ensure correct installation.
     Intended to be used with direct installations without package manager." ON)
+option(SAFE_UNINSTALL "Execute pre-uninstall tasks to ensure correct removal.
+    Intended to be used with direct removals without package manager." ON)
 
 option(WITH_SHIPPED_QUAZIP "Use shipped QuaZip5 instead of system package" OFF)
 

@@ -23,6 +23,6 @@ stop() {
 
 reload() {
 	stop
-	sleep 1
+	sleep 0.1
 	start
 }

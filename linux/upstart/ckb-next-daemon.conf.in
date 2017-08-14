@@ -7,4 +7,4 @@ stop on runlevel [016]
 
 respawn
 
-exec ${CMAKE_INSTALL_PREFIX}/usr/ckb-next-daemon
+exec ${CMAKE_INSTALL_PREFIX}/bin/ckb-next-daemon

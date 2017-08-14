@@ -336,8 +336,8 @@ elseif (LINUX)
         # Generate and import service
         message(STATUS "Generating and importing ckb-next-daemon (${init_system})")
         configure_file(
-            "${ckb-next_SOURCE_DIR}/linux/openrc/ckb-next-daemon.initd.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.initd" @ONLY)
+            "${ckb-next_SOURCE_DIR}/linux/openrc/ckb-next-daemon.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon" @ONLY)
 
         if (SAFE_INSTALL)
             execute_process(
@@ -400,7 +400,7 @@ elseif ("${init_system}" STREQUAL "upstart")
         WORLD_READ             WORLD_EXECUTE)
 elseif ("${init_system}" STREQUAL "OpenRC")
     install(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.initd"
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon"
         DESTINATION "/etc/init.d"
         PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE

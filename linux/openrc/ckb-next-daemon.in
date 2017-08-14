@@ -1,11 +1,11 @@
 #!/sbin/openrc-run
-## Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 extra_started_commands="reload"
-command="@CMAKE_INSTALL_PREFIX@/bin/ckb-daemon"
+command="@CMAKE_INSTALL_PREFIX@/bin/ckb-next-daemon"
 description="Driver for Corsair Keyboards and Mice"
-pidfile="/run/ckb-next-daemon.pid"
+pidfile="/dev/input/ckb0/pid"
 logfile="/var/run/ckb-next-daemon.log"
 
 start() {
@@ -23,6 +23,6 @@ stop() {
 
 reload() {
 	stop
-	sleep 3
+	sleep 1
 	start
 }

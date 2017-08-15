@@ -211,13 +211,9 @@ endif ()
 
 if (SAFE_INSTALL)
     message(STATUS "NOTE:
-    Privileged access can be required for operations upon the daemon at
-    both configure and install time as it is owned by root. If this is
-    unacceptable, turn off SAFE_INSTALL and prepare the filesystem manually.")
-    install(CODE "message(STATUS \"NOTE:
-    Privileged access can be required for operations upon the daemon at
-    both configure and install time as it is owned by root. If this is
-    unacceptable, turn off SAFE_INSTALL and prepare the filesystem manually.\")")
+    Privileged access is required for operations upon the daemon at
+    configure time as it is owned by root. If this is unacceptable,
+    disable SAFE_INSTALL and prepare the filesystem manually.")
 endif ()
 
 # No need to be repetitve, save init system

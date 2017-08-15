@@ -65,7 +65,7 @@ option(WITH_GUI "Build with Qt GUI to manipulate animations." ON)
 # Options: GUI animations
 option(WITH_ANIMATIONS "Build with animations." ON)
 cmake_dependent_option(WITH_GRADIENT "Build with 'Gradient' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)
-cmake_dependent_option(WITH_HEAT     "Build with 'Heat' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
+cmake_dependent_option(WITH_HEAT     "Build with 'Heat map' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_RAIN     "Build with 'Rain' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_RANDOM   "Build with 'Random' animation."   ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_PINWHEEL "Build with 'Pinwheel' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)

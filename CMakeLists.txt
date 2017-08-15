@@ -128,24 +128,3 @@ add_custom_target(
     uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
     USES_TERMINAL)
-
-# Packaging on macOS
-if (MACOS)
-    set(CPACK_PACKAGE_NAME "ckb-next")
-    set(CPACK_PACKAGE_VENDOR "The ckb-next Development Team")
-    set(CPACK_PACKAGE_VERSION_MAJOR "${ckb-next_VERSION_MAJOR}")
-    set(CPACK_PACKAGE_VERSION_MINOR "${ckb-next_VERSION_MINOR}")
-    if (ckb-next_VERSION_IS_RELEASE)
-        set(CPACK_PACKAGE_VERSION_PATCH "${ckb-next_VERSION_PATCH}")
-    else ()
-        set(CPACK_PACKAGE_VERSION_PATCH "${ckb-next_VERSION_PATCH}-${ckb-next_VERSION_PATCH_EXTRA}")
-    endif ()
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "ckb-next")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_LIST_DIR}/LICENSE")
-    # Make the DragNDrop installer look pretty.
-    set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_LIST_DIR}/cmake/CMakeDMGBackground.tif")
-    set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/cmake/CMakeDMGSetup.scpt")
-    set(CPACK_GENERATOR DragNDrop)
-endif ()
-
-include(CPack)

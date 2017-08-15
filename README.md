@@ -66,67 +66,7 @@ See also:
 
 ## Linux Installation
 
-### Pre-made packages
-
-* Fedora 24/25, CentOS/RHEL 7 (maintained by [@hevanaa](https://github.com/hevanaa)):
-    * [`johanh/ckb`](https://copr.fedorainfracloud.org/coprs/johanh/ckb/) - based on `master` branch
-* Arch Linux (maintained by [@makz27](https://github.com/makz27), [@light2yellow](https://github.com/light2yellow)):
-    * [`aur/ckb-next`](https://aur.archlinux.org/packages/ckb-next) - based on GitHub releases
-    * [`aur/ckb-next-git`](https://aur.archlinux.org/packages/ckb-next-git) - based on `master` branch
-    * [`aur/ckb-next-latest-git`](https://aur.archlinux.org/packages/ckb-next-latest-git) - based on `newdev` branch
-
-If you are a package maintainer or want to discuss something with package maintainers let us know in [#5](https://github.com/mattanger/ckb-next/issues/5), so we can have an accountable and centralized communication about this. *If you would like to maintain a package for your favorite distro/OS, please let us know as well.*
-
-### Preparation
-
-ckb-next requires Qt5 (Qt 5.9 is recommended), libudev, zlib, gcc, g++, and glibc.
-
-* Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
-* Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
-* Arch: `sudo pacman -S base-devel qt5-base zlib`
-* Other distros: Look for `qt5` or `libqt5*-devel`
-
-Note: If you build your own kernels, ckb-next requires the `CONFIG_INPUT_UINPUT` flag to be enabled. It is located in `Device Drivers -> Input Device Support -> Miscellaneous devices -> User level driver support`. If you don't know what this means, you can ignore this.
-
-### Installing
-
-You can download ckb-next using the "Download zip" option on the right or clone it using `git clone`. Extract it and open the ckb-master directory in a terminal. Run `./quickinstall`. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to hand-tune the compilation of ckb, see [`BUILD.md`](https://github.com/mattanger/ckb-next/blob/master/BUILD.md) for instructions.
-
-### Upgrading
-
-To install a new version of ckb, or to reinstall the same version, first delete the ckb-master directory and the zip file from your previous download. Then download the source code again and re-run `./quickinstall`. The script will automatically replace the previous installation. You may need to reboot afterward.
-
-### Uninstalling
-
-First, stop the ckb-daemon service and remove the service file.
-* If you have systemd (Ubuntu versions starting with 15.04):
-```
-sudo systemctl stop ckb-daemon
-sudo rm -f /usr/lib/systemd/system/ckb-daemon.service
-```
-* If you have Upstart (Ubuntu versions earlier than 15.04):
-```
-sudo service ckb-daemon stop
-sudo rm -f /etc/init/ckb-daemon.conf
-```
-* If you have OpenRC:
-```
-sudo rc-service ckb-daemon stop
-sudo rc-update del ckb-daemon default
-sudo rm -f /etc/init.d/ckb-daemon
-```
-* If you're not sure, re-run the `quickinstall` script and proceed to the service installation. The script will say `System service: Upstart detected` or `System service: systemd detected`. Please be aware that OpenRC is currently not detected automatically.
-
-Afterward, remove the applications and related files:
-```
-sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop /usr/share/icons/hicolor/512x512/apps/ckb.png
-sudo rm -rf /usr/lib/ckb-animations
-```
-
-Before https://github.com/mattanger/ckb-next/commit/f347e60df211c60452f95084b6c46dc4ec5f42ee animations were located elsewhere, try removing them as well:
-```
-sudo rm -rf /usr/bin/ckb-animations
-```
+See [Linux Installation](https://github.com/mattanger/ckb-next/wiki/Linux-Installation) wiki page.
 
 ## OS X/macOS Installation
 

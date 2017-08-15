@@ -24,7 +24,7 @@
 
 # Change this to lower _only_ if tested to work correctly with that version!
 # Might be as low as 3.3, but again, use at your own risk
-cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 
 project(ckb-next LANGUAGES C CXX VERSION 0.2.9) # bumb this in release commit
 

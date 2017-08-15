@@ -238,7 +238,7 @@ if (MACOS)
             if (NOT ("${daemon_found}" EQUAL -1))
                 message(STATUS "Running job with ${plist_name} plist detected")
                 install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: permanently unloading ${plist_name}\")")
-                install(CODE "execute_process(COMMAND sudo launchctl unload -w /Library/LaunchDaemons/${plist_name})")
+                install(CODE "execute_process(COMMAND sudo launchctl unload -w /Library/LaunchDaemons/${plist_name}.plist)")
             endif ()
         endforeach ()
     endif ()
@@ -384,7 +384,7 @@ endif ()
 if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/org.next.ckb.daemon.plist"
-        DESTINATION "/Library/Application Support"
+        DESTINATION "/Library/LaunchDaemons"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ
@@ -422,8 +422,8 @@ endif ()
 if (SAFE_INSTALL)
     if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
         # Just installing the plist should be enough to enable the job at boot
-        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: loading org.next.ckb.daemon.plist\")")
-        install(CODE "execute_process(COMMAND sudo launchctl load /Library/LaunchDaemons/org.next.ckb.daemon.plist)")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: loading org.next.ckb.daemon\")")
+        install(CODE "execute_process(COMMAND sudo launchctl load -w /Library/LaunchDaemons/org.next.ckb.daemon.plist)")
     elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "upstart")
         # Just installing the service should be enough to enable it at boot
         install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: refreshing services\")")

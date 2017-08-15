@@ -32,12 +32,12 @@ if ("${init_system}" STREQUAL "launchd")
         COMMAND sudo launchctl list
         OUTPUT_VARIABLE launchctl_jobs)
 
-    foreach (plist_name IN ITEMS "com.ckb.daemon.plist" "org.next.ckb.daemon.plist")
+    foreach (plist_name IN ITEMS "com.ckb.daemon" "org.next.ckb.daemon")
         string(FIND "${launchctl_jobs}" "${plist_name}" daemon_found)
         if (NOT (daemon_found EQUAL -1))
             message(STATUS "Running job with ${plist_name} plist detected")
             message(STATUS "${init_system}: permanently unloading ${plist_name}")
-            execute_process(COMMAND sudo launchctl unload -w /Library/LaunchDaemons/${plist_name})
+            execute_process(COMMAND sudo launchctl unload -w /Library/LaunchDaemons/${plist_name}.plist)
         endif ()
     endforeach ()
 

@@ -233,7 +233,7 @@ if (MACOS)
         execute_process(
             COMMAND sudo launchctl list
             OUTPUT_VARIABLE launchctl_jobs)
-        foreach (plist_name IN ITEMS "com.ckb.daemon.plist" "org.next.ckb.daemon.plist")
+        foreach (plist_name IN ITEMS "com.ckb.daemon" "org.next.ckb.daemon")
             string(FIND "${launchctl_jobs}" "${plist_name}" daemon_found)
             if (NOT ("${daemon_found}" EQUAL -1))
                 message(STATUS "Running job with ${plist_name} plist detected")

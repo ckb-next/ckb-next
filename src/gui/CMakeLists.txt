@@ -36,16 +36,30 @@ endif ()
 # Prepare external dependencies' paths
 if (USE_BREW_QT5)
     execute_process(
-        COMMAND brew --prefix qt5
-        RESULT_VARIABLE qt5_found
-        OUTPUT_VARIABLE qt5_path
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+        COMMAND brew ls --versions qt5
+        RESULT_VARIABLE qt5_found)
     if (NOT ("${qt5_found}" EQUAL 0))
         message(FATAL_ERROR "Homebrew's 'qt5' package is not installed.")
-    else ()
-        message(STATUS "Homebrew's Qt5 found: ${qt5_path}")
-        list(APPEND CMAKE_PREFIX_PATH "${qt5_path}")
     endif ()
+    execute_process(
+        COMMAND brew --prefix qt5
+        OUTPUT_VARIABLE qt5_path
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    list(APPEND CMAKE_PREFIX_PATH "${qt5_path}")
+endif ()
+
+if (USE_BREW_QUAZIP)
+    execute_process(
+        COMMAND brew ls --versions quazip
+        RESULT_VARIABLE quazip_found)
+    if (NOT ("${quazip_found}" EQUAL 0))
+        message(FATAL_ERROR "Homebrew's 'quazip' package is not installed.")
+    endif ()
+    execute_process(
+        COMMAND brew --prefix quazip
+        OUTPUT_VARIABLE quazip_path
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    list(APPEND CMAKE_PREFIX_PATH "${quazip_path}")
 endif ()
 
 # Find external dependencies

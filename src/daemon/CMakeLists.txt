@@ -196,7 +196,7 @@ if (SAFE_INSTALL)
     message(STATUS "Searching for running ckb and/or ckb-next GUI")
     execute_process(
         COMMAND ps axco command
-        COMMAND grep "^ckb$\\|^ckb-next$"
+        COMMAND egrep "^ckb$|^ckb-next$"
         OUTPUT_VARIABLE gui_processes
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (gui_processes)
@@ -269,7 +269,7 @@ elseif (LINUX)
             foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
                 execute_process(
                     COMMAND sudo service ${daemon} status
-                    COMMAND grep "^${daemon} start"
+                    COMMAND egrep "^${daemon} start"
                     RESULT_VARIABLE daemon_active)
                 if(daemon_active EQUAL 0)
                     message(STATUS "Running ${daemon} detected")
@@ -278,7 +278,7 @@ elseif (LINUX)
                 endif()
                 execute_process(
                     COMMAND sudo initctl show-config ${daemon}
-                    COMMAND grep "^  start on"
+                    COMMAND egrep "^  start on"
                     RESULT_VARIABLE daemon_enabled)
                 if(daemon_enabled EQUAL 0)
                     message(STATUS "Enabled ${daemon} detected")
@@ -338,8 +338,8 @@ elseif (LINUX)
         if (SAFE_INSTALL)
             execute_process(
                 COMMAND rc-status -a
-                COMMAND grep "started"
-                COMMAND grep -o "ckb-daemon\\|ckb-next-daemon"
+                COMMAND egrep "started"
+                COMMAND egrep -o "ckb-daemon|ckb-next-daemon"
                 OUTPUT_VARIABLE daemons
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)
@@ -352,7 +352,7 @@ elseif (LINUX)
             endif()
             execute_process(
                 COMMAND rc-status -a
-                COMMAND grep -o "ckb-daemon\\|ckb-next-daemon"
+                COMMAND egrep -o "ckb-daemon|ckb-next-daemon"
                 OUTPUT_VARIABLE daemons
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)

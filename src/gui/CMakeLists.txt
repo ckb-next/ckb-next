@@ -34,7 +34,7 @@ if (MACOS)
 endif ()
 
 # Prepare external dependencies' paths
-if (BREW_QT5)
+if (USE_BREW_QT5)
     execute_process(
         COMMAND brew --prefix qt5
         RESULT_VARIABLE qt5_found

@@ -88,10 +88,14 @@ cmake_dependent_option(SANITIZE_THREAD      "Enable ThreadSanitizer."           
 cmake_dependent_option(SANITIZE_LINK_STATIC "Try linking static against sanitizers." OFF "WITH_SANITIZERS" OFF)
 
 # Options: install
+if (MACOS)
+    set(CMAKE_INSTALL_PREFIX "/Applications")
+endif ()
+
 include(GNUInstallDirs)
 set(ANIMATIONS_DIR_NAME "ckb-next-animations")
 if (MACOS)
-    set(INSTALL_DIR_ANIMATIONS "ckb-next.app/Resources/${ANIMATIONS_DIR_NAME}"
+    set(INSTALL_DIR_ANIMATIONS "ckb-next.app/Contents/Resources/${ANIMATIONS_DIR_NAME}"
         CACHE STRING "Where to install animations.")
 elseif (LINUX)
     set(INSTALL_DIR_ANIMATIONS "${CMAKE_INSTALL_LIBEXECDIR}/${ANIMATIONS_DIR_NAME}"
@@ -112,10 +116,6 @@ endif ()
 
 # Project-specific compiler settings
 include(CkbNextCompileFlags)
-
-if (MACOS)
-    set(CMAKE_INSTALL_PREFIX "/Applications")
-endif ()
 
 add_subdirectory(src)
 

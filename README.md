@@ -6,42 +6,6 @@
 
 **Disclaimer:** ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
-<!-- TOC depthFrom:2 -->
-
-- [Device Support](#device-support)
-    - [Keyboards](#keyboards)
-    - [Mice](#mice)
-- [Linux Installation](#linux-installation)
-    - [Pre-made packages](#pre-made-packages)
-    - [Preparation](#preparation)
-    - [Installing](#installing)
-    - [Upgrading](#upgrading)
-    - [Uninstalling](#uninstalling)
-- [OS X/macOS Installation](#os-xmacos-installation)
-    - [Binary download](#binary-download)
-    - [Building from source](#building-from-source)
-    - [Upgrading (binary)](#upgrading-binary)
-    - [Upgrading (source)](#upgrading-source)
-    - [Uninstalling](#uninstalling-1)
-- [Usage](#usage)
-    - [Major features](#major-features)
-    - [Roadmap](#roadmap)
-- [Troubleshooting](#troubleshooting)
-    - [Linux](#linux)
-    - [OS X/macOS](#os-xmacos)
-    - [General](#general)
-    - [Reporting issues](#reporting-issues)
-- [Known issues](#known-issues)
-- [Contributing](#contributing)
-- [Contact us](#contact-us)
-- [What happened to the original ckb](#what-happened-to-the-original-ckb)
-
-<!-- /TOC -->
-
-See also:
-
-* [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
-
 ## Device Support
 
 ### Keyboards

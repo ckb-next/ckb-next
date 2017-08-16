@@ -46,11 +46,11 @@ install(
     NAMESPACE
       CkbNext::
     DESTINATION
-      "lib/cmake/Animation")
+      "/usr/lib/cmake/Animation")
 
 install(
     FILES
       "cmake/AnimationConfig.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/Animation/AnimationConfigVersion.cmake"
     DESTINATION
-      "lib/cmake/Animation")
+      "/usr/lib/cmake/Animation")

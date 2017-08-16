@@ -244,18 +244,18 @@ endif ()
 
 if (MACOS)
     # Import macOS icon
-    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.icns")
-        message(STATUS "Importing ckb-next.icns")
+    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns")
+        message(STATUS "Importing ckb-next-logo.icns")
         configure_file(
-            "${CMAKE_SOURCE_DIR}/macos/ckb-next.icns"
-            "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.icns" COPYONLY)
+            "${ckb-next_SOURCE_DIR}/macos/ckb-next-logo.icns"
+            "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns" COPYONLY)
     endif ()
 
     # Configure plist
-    set(MACOSX_BUNDLE_HELP_FILE "Help") # FIXME: provide Help.html
+    # set(MACOSX_BUNDLE_HELP_FILE "Help") # TODO: provide Help.html
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
     set(MACOSX_BUNDLE_INFO_STRING "ckb-next - version ${ckb-next_VERSION}")
-    set(MACOSX_BUNDLE_ICON_FILE "ckb-next.icns")
+    set(MACOSX_BUNDLE_ICON_FILE "ckb-next-logo.icns")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.next.ckb")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_BUNDLE_NAME "ckb-next_v${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
@@ -417,7 +417,7 @@ endif()
 if (MACOS)
     install(
         TARGETS ckb-next
-        DESTINATION ".") # prefix is /Applications by default, therefore "."
+        DESTINATION ".")
 elseif (LINUX)
     install(
         TARGETS ckb-next
@@ -432,12 +432,14 @@ if (MACOS)
             PROPERTIES
               MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist")
 
-    # Install icon file and help page inside the bundle
-    set_source_files_properties(
-        ckb-next.icns
-        Help.html # FIXME: generate
-            PROPERTIES
-              MACOSX_PACKAGE_LOCATION Resources)
+    # Install icon file
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns"
+        DESTINATION "ckb-next.app/Contents/Resources"
+        PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ)
 elseif (LINUX)
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop"
@@ -459,13 +461,6 @@ endif ()
 # Deploy QT5
 # NOTE: Must be executed after all install() commands
 if (MACOS)
-    get_target_property(output_name ckb-next OUTPUT_NAME)
-    if (output_name)
-        set(app "${output_name}.app")
-    else ()
-        set(app "ckb-next.app")
-    endif ()
-
     set(dirs "")
     if (CMAKE_PREFIX_PATH)
         foreach (dir "${CMAKE_PREFIX_PATH}")

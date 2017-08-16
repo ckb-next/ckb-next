@@ -2,9 +2,9 @@
 
 **ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of Corsair's proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
-![Screenshot](https://i.imgur.com/zMK9jOP.png)
-
 > __DISCLAIMER__: ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
+
+![Screenshot](https://i.imgur.com/zMK9jOP.png)
 
 Major features:
 

@@ -42,16 +42,5 @@
         <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
         <key>NSPrincipalClass</key>
         <string>NSApplication</string>
-        <key>ProgramArguments</key>
-        <array>
-            <string>/Applications/ckb-next.app/Contents/MacOS/ckb-next</string>
-            <string>--background</string>
-        </array>
-        <!-- comment this out if you don't want to log anything -->
-        <key>StandardOutPath</key>
-        <string>/var/log/ckb-next.log</string>
-        <key>StandardErrorPath</key>
-        <string>/var/log/ckb-next.log</string>
-        <!-- -->
     </dict>
 </plist>

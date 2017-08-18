@@ -263,11 +263,17 @@ if (MACOS)
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2014-2016 ccMSC\nCopyright © 2017 ckb-next dev. team")
 
-    # Generate and import plist
-    message(STATUS "Generating and importing org.next.ckb.plist")
+    # Generate and import Info.plist
+    message(STATUS "Generating and importing org.next.ckb.info.plist")
     configure_file(
-        "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.plist.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist")
+        "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.info.plist.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.info.plist")
+
+    # Import application plist
+    message(STATUS "Importing org.next.ckb.plist")
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.plist"
+        "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist" COPYONLY)
 
     if (NOT TEXT_QRC_STRING)
         set(TEXT_QRC_STRING "<file>org.next.ckb.plist</file>\n")
@@ -427,11 +433,11 @@ endif ()
 
 # Declare target's auxiliary files installation paths
 if (MACOS)
-    # Install plist file inside the bundle
+    # Install Info.plist file inside the bundle
     set_target_properties(
         ckb-next
             PROPERTIES
-              MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist")
+              MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.info.plist")
 
     # Install icon file
     install(

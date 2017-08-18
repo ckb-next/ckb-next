@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>org.next.ckb</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Applications/ckb-next.app/Contents/MacOS/ckb-next</string>
+		<string>--background</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardErrorPath</key>
+    <string>/var/log/ckb-next.log</string>
+	<key>StandardOutPath</key>
+    <string>/var/log/ckb-next.log</string>
+</dict>
+</plist>

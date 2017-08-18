@@ -472,17 +472,3 @@ if (MACOS)
     include(DeployQt5)
     install_qt5_executable("ckb-next.app" "" "" "${dirs}" "")
 endif ()
-
-# chown ckb-next.app
-# XXX: This is a required workaround. Due to `sudo make install` root becomes
-# the owner of ckb-next.app, but this is wrong and is fixed with a hack below.
-# `whoami` output is gathered at configure time, which happens under normal
-# user, and afterwards gets substituted into at installation time.
-if (MACOS)
-    execute_process(
-        COMMAND whoami
-        OUTPUT_VARIABLE my_user
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    install(CODE "message(STATUS \"chown'ing /Applications/ckb-next.app with ${my_user}:staff\")")
-    install(CODE "execute_process(COMMAND sudo chown -R ${my_user}:staff /Applications/ckb-next.app)")
-endif ()

@@ -403,10 +403,11 @@ if (SAFE_INSTALL)
     set(autostart_paths
             "$ENV{HOME}/.config/autostart/ckb.desktop"
             "$ENV{HOME}/.config/autostart/ckb-next.desktop"
-            "$ENV{HOME}/Library/LaunchAgents/com.ckb.ckb.plist")
+            "$ENV{HOME}/Library/LaunchAgents/com.ckb.ckb.plist"
+            "$ENV{HOME}/Library/LaunchAgents/org.next.ckb.plist")
     foreach (autostart_path IN LISTS autostart_paths)
         if (EXISTS "${autostart_path}")
-            message(STATUS "ckb GUI autostart file detected")
+            message(STATUS "ckb GUI autostart file detected: ${autostart_path}")
             install(CODE "message(STATUS \"Removing ${autostart_path}\")")
             install(CODE "execute_process(COMMAND rm ${autostart_path})")
         endif ()

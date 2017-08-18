@@ -1,6 +1,0 @@
-{
-    "title": "ckb-next_v.0.2.8",
-    "contents": [
-        { "x": 0, "y": 0, "type": "file", "path": "pkgproj/build/ckb-next.mpkg" }
-    ]
-}

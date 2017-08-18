@@ -1,0 +1,6 @@
+{
+    "title": "ckb-next",
+    "contents": [
+        { "x": 0, "y": 0, "type": "file", "path": "build/ckb-next.mpkg" }
+    ]
+}

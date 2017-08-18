@@ -17,16 +17,11 @@
 #        <https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>.
 #
 
-# TODO: write up a new doc for pkg generation
-
-# NOTE: Intended for macOS pkg generation, see docs under macos/
-# set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
-
-# Change this to lower _only_ if tested to work correctly with that version!
+# Lower it _only_ if tested to work correctly with that version!
 # Might be as low as 3.3, but again, use at your own risk
 cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 
-project(ckb-next LANGUAGES C CXX VERSION 0.2.8) # bumb this in release commit
+project(ckb-next LANGUAGES C CXX VERSION 0.2.8)
 
 # Let CMake find custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
@@ -128,3 +123,31 @@ add_custom_target(
     uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
     USES_TERMINAL)
+
+# macOS packaging
+if (MACOS AND WITH_GUI)
+    include(ProcessorCount)
+    ProcessorCount(cores)
+    if ("${cores}" EQUAL 0)
+        message(FATAL_ERROR "Counted 0 cores")
+    else ()
+        message(STATUS "Number of cores: ${cores}")
+    endif ()
+
+    add_custom_target(
+        macos-package
+        COMMAND
+          ${CMAKE_MAKE_PROGRAM} -j${cores}
+        COMMAND
+          sudo ${CMAKE_MAKE_PROGRAM} install
+        COMMAND
+          packagesbuild ${ckb-next_SOURCE_DIR}/macos/pkgproj/ckb-next.pkgproj
+        COMMAND
+          appdmg ${ckb-next_SOURCE_DIR}/macos/pkgproj/appdmg.json ckb-next_v${ckb-next_VERSION}_${CMAKE_OSX_DEPLOYMENT_TARGET}-SDK.dmg
+        WORKING_DIRECTORY
+          "${ckb-next_BINARY_DIR}"
+        COMMENT
+          "Generating macOS package"
+        USES_TERMINAL
+        VERBATIM)
+endif ()

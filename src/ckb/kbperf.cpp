@@ -311,6 +311,8 @@ void KbPerf::dpiUp(){
     do {
         idx++;
         if(idx >= DPI_COUNT)
+            idx = SNIPER + 1;
+        if(idx == curDpiIdx())
             return;
     } while(!dpiOn[idx]);
     curDpiIdx(idx);
@@ -321,6 +323,8 @@ void KbPerf::dpiDown(){
     do {
         idx--;
         if(idx <= SNIPER)
+            idx = DPI_COUNT - 1;
+	if(idx == curDpiIdx())
             return;
     } while(!dpiOn[idx]);
     curDpiIdx(idx);

@@ -311,6 +311,27 @@ void KbPerf::dpiUp(){
     do {
         idx++;
         if(idx >= DPI_COUNT)
+            return;
+    } while(!dpiOn[idx]);
+    curDpiIdx(idx);
+}
+
+void KbPerf::dpiDown(){
+    int idx = curDpiIdx();
+    do {
+        idx--;
+        if(idx <= SNIPER)
+            return;
+    } while(!dpiOn[idx]);
+    curDpiIdx(idx);
+}
+
+// dpiCycleUp will loop to lowest setting after passing the highest.
+void KbPerf::dpiCycleUp(){
+    int idx = curDpiIdx();
+    do {
+        idx++;
+        if(idx >= DPI_COUNT)
             idx = SNIPER + 1;
         if(idx == curDpiIdx())
             return;
@@ -318,7 +339,7 @@ void KbPerf::dpiUp(){
     curDpiIdx(idx);
 }
 
-void KbPerf::dpiDown(){
+void KbPerf::dpiCycleDown(){
     int idx = curDpiIdx();
     do {
         idx--;

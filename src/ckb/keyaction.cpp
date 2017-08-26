@@ -104,6 +104,10 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         // Split off custom parameters (if any)
         int level = parts[1].split("+")[0].toInt();
         switch(level){
+        case DPI_CYCLE_UP:
+            return "DPI cycle up";
+        case DPI_CYCLE_DOWN:
+            return "DPI cycle down";
         case DPI_UP:
             return "DPI up";
         case DPI_DOWN:
@@ -279,6 +283,16 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         KbPerf* perf = bind->perf();
         int level = parts[1].split("+")[0].toInt();
         switch(level){
+        case DPI_CYCLE_UP:
+            if(!down)
+                return;
+            perf->dpiCycleUp();
+            break;
+        case DPI_CYCLE_DOWN:
+            if(!down)
+                return;
+            perf->dpiCycleDown();
+            break;
         case DPI_UP:
             if(!down)
                 return;

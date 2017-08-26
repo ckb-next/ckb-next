@@ -3,7 +3,7 @@
 #include "ui_rebindwidget.h"
 #include <qdebug.h>     // lae.
 
-static const int DPI_OFFSET = -KeyAction::DPI_UP + 1;
+static const int DPI_OFFSET = -KeyAction::DPI_CYCLE_UP + 1;
 static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
 
 RebindWidget::RebindWidget(QWidget *parent) :
@@ -108,7 +108,7 @@ void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
         const KbPerf* perf = bind->perf();
         for(int i = 0; i < KbPerf::DPI_COUNT; i++){
             bool sniper = (i == 0);
-            int boxIdx = i + 3;
+            int boxIdx = i + DPI_OFFSET;
             QPoint dpi = perf->dpi(i);
             QString text = tr(sniper ? "Sniper:\t%1 x %2" : "%3:\t%1 x %2").arg(dpi.x()).arg(dpi.y());
             if(!sniper) text = text.arg(i);

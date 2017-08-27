@@ -99,6 +99,8 @@ int updatedpi(usbdevice* kb, int force){
 
     // Send X/Y DPIs
     for(int i = 0; i < DPI_COUNT; i++){
+        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i])
+            continue;
         uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 0 };
         data_pkt[2] |= i;
         *(ushort*)(data_pkt + 5) = newdpi->x[i];
@@ -108,14 +110,27 @@ int updatedpi(usbdevice* kb, int force){
     }
 
     // Send settings
-    uchar data_pkt[4][MSG_SIZE] = {
-        { 0x07, 0x13, 0x05, 0, newdpi->enabled },
-        { 0x07, 0x13, 0x02, 0, newdpi->current },
-        { 0x07, 0x13, 0x03, 0, newdpi->lift },
-        { 0x07, 0x13, 0x04, 0, newdpi->snap, 0x05 }
-    };
-    if(!usbsend(kb, data_pkt[0], 4))
-        return -2;
+    if (newdpi->enabled != lastdpi->enabled) {
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x05, 0, newdpi->enabled };
+        if(!usbsend(kb, data_pkt, 1))
+            return -2;
+    }
+    if (newdpi->current != lastdpi->current) {
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x02, 0, newdpi->current };
+        if(!usbsend(kb, data_pkt, 1))
+            return -2;
+    }
+    if (newdpi->lift != lastdpi->lift) {
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x03, 0, newdpi->lift };
+        if(!usbsend(kb, data_pkt, 1))
+            return -2;
+    }
+    if (newdpi->snap != lastdpi->snap) {
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x04, 0, newdpi->snap, 0x05 };
+        if(!usbsend(kb, data_pkt, 1))
+            return -2;
+    }
+
     // Finished
     memcpy(lastdpi, newdpi, sizeof(dpiset));
     return 0;

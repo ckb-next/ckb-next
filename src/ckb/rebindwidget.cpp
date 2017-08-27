@@ -72,7 +72,7 @@ void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     // Use the K95 map as it has all keys
     const KeyMap& map = KeyMap(KeyMap::K95, bind->map().layout());
     foreach(const QString& name, map.byPosition()){
-        KeyAction action(KbBind::defaultAction(name));
+        KeyAction action(bind->defaultAction(name));
         if(action.isNormal() && !modKeys.contains(name) && !fnKeys.contains(name) && !numKeys.contains(name) && !mediaKeys.contains(name) && name != "enter" && name != "tab" && name != "bspace"){
             const Key& pos = map[name];
             QString friendly = pos.friendlyName();

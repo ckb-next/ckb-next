@@ -41,7 +41,7 @@ KeyAction::~KeyAction(){
     }
 }
 
-QString KeyAction::defaultAction(const QString& key){
+QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
     // G1-G18 are unbound by default
     if(key.length() >= 2 && key[0] == 'g'
 		&& ((key.length() == 2 && key[1] >= '0' && key[1] <= '9')
@@ -66,8 +66,13 @@ QString KeyAction::defaultAction(const QString& key){
     if(key == "lock")
         return "$lock:0";
     // DPI buttons
-    if(key == "dpiup")
-        return "$dpi:-2";
+    if(key == "dpiup"){
+        if(model == KeyMap::HARPOON ||
+	   model == KeyMap::GLAIVE){
+	    return "$dpi:-4";
+        }
+	return "$dpi:-2";
+    }
     if(key == "dpidn")
         return "$dpi:-1";
     if(key == "sniper")

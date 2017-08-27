@@ -24,7 +24,7 @@ public:
     // No action
     static inline QString   noAction()    { return ""; }
     // Default action (usually the same as the key name, but not always)
-    static QString          defaultAction(const QString& key);
+    static QString          defaultAction(const QString& key, KeyMap::Model model);
 
     // Friendly action name
     QString friendlyName(const KeyMap& map) const;

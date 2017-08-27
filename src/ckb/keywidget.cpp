@@ -399,7 +399,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             }
             // Pick color based on key function
             QString bind = _bindMap.value(key.name);
-            QString def = KbBind::defaultAction(key.name);
+            QString def = KbBind::defaultAction(key.name, model);
             if(bind.isEmpty())
                 // Unbound - red
                 decPainter.setPen(QColor(255, 136, 136));

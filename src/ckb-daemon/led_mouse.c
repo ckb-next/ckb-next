@@ -37,7 +37,7 @@ int updatergb_mouse(usbdevice* kb, int force){
     };
     uchar* rgb_data = &data_pkt[0][4];
     for(int i = 0; i < N_MOUSE_ZONES; i++){
-        if (IS_GLAIVE(kb) && (i == 2 || i == 3 || i == 4))
+        if (IS_GLAIVE(kb) && i != 0 && i != 1 && i != 5)
 	    continue;
         *rgb_data++ = i + 1;
         *rgb_data++ = newlight->r[LED_MOUSE + i];

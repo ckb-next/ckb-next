@@ -14,6 +14,7 @@ KbFirmware::FW::FW() : fwVersion(0.f), ckbVersion(0.f) {}
 KbFirmware::KbFirmware() :
     lastCheck(0), lastFinished(0), networkManager(0), tableDownload(0), hasGPG(UNKNOWN)
 {
+    qputenv("QT_BEARER_POLL_TIMEOUT", QByteArray::number(-1));
     networkManager = new QNetworkAccessManager();
 }
 

@@ -14,6 +14,11 @@ KbFirmware::FW::FW() : fwVersion(0.f), ckbVersion(0.f) {}
 KbFirmware::KbFirmware() :
     lastCheck(0), lastFinished(0), networkManager(0), tableDownload(0), hasGPG(UNKNOWN)
 {
+    // Disable bearer polling. This corrects an issue with latency spikes when
+    // using WiFi. The problem and workaround are described here:
+    // https://lostdomain.org/2017/06/17/qt-qnetworkaccessmanager-causing-latency-spikes-on-wifi/
+    qputenv("QT_BEARER_POLL_TIMEOUT", QByteArray::number(-1));
+    networkManager = new QNetworkAccessManager();
 }
 
 KbFirmware::~KbFirmware(){
@@ -21,7 +26,6 @@ KbFirmware::~KbFirmware(){
 }
 
 bool KbFirmware::_checkUpdates(){
-    networkManager = new QNetworkAccessManager();
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;

@@ -24,6 +24,9 @@ public:
     // Downloads and extracts the latest firmware for a keyboard. Returns an empty array on failure.
     static inline QByteArray    dataForBoard(const QString& features)                                   { return instance._fileForBoard(features); }
 
+    // Network manager object to use with QtNetwork
+    QNetworkAccessManager* 	networkManager;
+
 private:
     KbFirmware();
     ~KbFirmware();
@@ -42,10 +45,6 @@ private:
     // SHA256 of last downloaded table (redundancy check)
     QByteArray          fwTableHash;
 
-    // Network manager for downloading updates
-    // It can't be declared as part of the object or it will misbehave. Has to be initialized on use.
-    QNetworkAccessManager* networkManager;
-    void initManager();
     // Current FW table download (null if nothing downloading)
     QNetworkReply* tableDownload;
 

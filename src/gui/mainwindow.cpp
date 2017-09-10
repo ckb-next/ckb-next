@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
-    closeAction = new QAction(tr("Quit ckb-next"), this);
+    closeAction = new QAction(tr("Quit"), this);
 #ifdef USE_LIBAPPINDICATOR
     QString desktop = std::getenv("XDG_CURRENT_DESKTOP");
     unityDesktop = (desktop.toLower() == "unity");
@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
         indicatorMenu = gtk_menu_new();
         indicatorMenuRestoreItem = gtk_menu_item_new_with_label("Restore");
-        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit ckb-next");
+        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit");
 
         gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
         gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
@@ -214,7 +214,7 @@ void MainWindow::closeEvent(QCloseEvent *event){
         return;
     }
     if(!CkbSettings::get("Popups/BGWarning").toBool()){
-        QMessageBox::information(this, "ckb-next", "ckb-next will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb-next\" on the Settings screen.");
+        QMessageBox::information(this, "ckb-next", "ckb-next will still run in the background.\nTo close it, choose Quit from the tray menu\nor click \"Quit\" on the Settings screen.");
         CkbSettings::set("Popups/BGWarning", true);
     }
     hide();

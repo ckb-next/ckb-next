@@ -17,7 +17,6 @@ static const QString configLabel = "Settings";
 
 MainWindow* MainWindow::mainWindow = 0;
 
-#ifdef USE_LIBAPPINDICATOR
 extern "C" {
     void quitIndicator(GtkMenu* menu, gpointer data) {
         Q_UNUSED(menu);
@@ -31,7 +30,6 @@ extern "C" {
         window->showWindow();
     }
 }
-#endif // USE_LIBAPPINDICATOR
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,7 +48,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
     closeAction = new QAction(tr("Quit ckb-next"), this);
-#ifdef USE_LIBAPPINDICATOR
     QString desktop = std::getenv("XDG_CURRENT_DESKTOP");
     unityDesktop = (desktop.toLower() == "unity");
 
@@ -77,17 +74,15 @@ MainWindow::MainWindow(QWidget *parent) :
         app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
         app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
         app_indicator_set_icon(indicator, "ckb-next-logo");
-    } else
-#endif // USE_LIBAPPINDICATOR
-    {
+    } else {
         trayIconMenu = new QMenu(this);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
         trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next-logo.png"), this);
         trayIcon->setContextMenu(trayIconMenu);
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
-     }
-     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
+    }
+    toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
 #ifdef Q_OS_MACX
     // Make a custom "Close" menu action for OSX, as the default one brings up the "still running" popup unnecessarily
@@ -111,11 +106,9 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::toggleTrayIcon(bool visible) {
-#ifdef USE_LIBAPPINDICATOR
     if(unityDesktop)
         app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
     else
-#endif // USE_LIBAPPINDICATOR
         trayIcon->setVisible(visible);
 }
 

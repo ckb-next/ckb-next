@@ -94,6 +94,8 @@ AudioToolbox: ${AUDIOTOOLBOX_LIBRARY}")
     endif ()
         mark_as_advanced(FOUNDATION_LIBRARY COREAUDIO_LIBRARY AUDIOTOOLBOX_LIBRARY)
 elseif (LINUX)
+    find_package(Appindicator REQUIRED)
+    find_package(X11 REQUIRED)
 endif ()
 
 # Automatically handle MOC, UIC and RCC
@@ -328,6 +330,14 @@ if (MACOS OR LINUX)
               "${CMAKE_CURRENT_BINARY_DIR}"
               "${CMAKE_CURRENT_SOURCE_DIR}")
 endif ()
+if (MACOS)
+elseif (LINUX)
+    target_include_directories(
+        ckb-next
+            PRIVATE
+              "${X11_INCLUDE_DIR}"
+              "${Appindicator_INCLUDE_DIRS}")
+endif ()
 
 if (NOT WITH_SHIPPED_QUAZIP)
     target_include_directories(
@@ -357,6 +367,11 @@ if(MACOS)
               "${FOUNDATION_LIBRARY}"
               "${AUDIOTOOLBOX_LIBRARY}")
 elseif (LINUX)
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+              "${X11_LIBRARIES}"
+              "${Appindicator_LIBRARIES}")
 endif()
 
 if (WITH_SHIPPED_QUAZIP)
@@ -386,6 +401,7 @@ endif ()
 target_compile_options(
     ckb-next
         PRIVATE
+          "${Appindicator_DEFINITIONS}"
           -fsigned-char
           -Wall
           -Wextra

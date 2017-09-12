@@ -16,4 +16,5 @@ ui_*
 qrc_*
 .firmware
 ckb-dev-detect-report.gz
+ckb-next-dev-detect-report.gz
 macos/pkgproj/build

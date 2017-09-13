@@ -326,6 +326,31 @@ void KbPerf::dpiDown(){
     curDpiIdx(idx);
 }
 
+// dpiCycleUp will loop to lowest setting after passing the highest.
+void KbPerf::dpiCycleUp(){
+    int idx = curDpiIdx();
+    do {
+        idx++;
+        if(idx >= DPI_COUNT)
+            idx = SNIPER + 1;
+        if(idx == curDpiIdx())
+            return;
+    } while(!dpiOn[idx]);
+    curDpiIdx(idx);
+}
+
+void KbPerf::dpiCycleDown(){
+    int idx = curDpiIdx();
+    do {
+        idx--;
+        if(idx <= SNIPER)
+            idx = DPI_COUNT - 1;
+	if(idx == curDpiIdx())
+            return;
+    } while(!dpiOn[idx]);
+    curDpiIdx(idx);
+}
+
 void KbPerf::getIndicator(indicator index, QColor& color1, QColor& color2, QColor& color3, bool& software_enable, i_hw& hardware_enable){
     if(index < 0 || index >= I_COUNT)
         return;

@@ -57,7 +57,8 @@ public:
     // Action for a given key. Use KeyAction(action) to get info about it.
     QString         action(const QString& key);
     // Default action for a key.
-    static QString  defaultAction(const QString& key);
+    QString         defaultAction(const QString& key);
+    static QString  defaultAction(const QString& key, KeyMap::Model model);
 
     // Friendly name for a key, taking into account the global key remap
     QString friendlyName(const QString& key);
@@ -114,7 +115,7 @@ private:
     inline Kb*      devParent()     const   { return _devParent; }
     inline KbMode*  modeParent()    const   { return (KbMode*)parent(); }
 
-    inline KeyAction* bindAction(const QString& key)    { if(!_bind.contains(key)) return _bind[key] = new KeyAction(KeyAction::defaultAction(key), this); return _bind[key]; }
+    KeyAction* bindAction(const QString& key);
 
     static QHash<QString, QString>  _globalRemap;
     static quint64                  globalRemapTime;

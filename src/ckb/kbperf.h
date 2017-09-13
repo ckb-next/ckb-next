@@ -62,6 +62,8 @@ public:
     inline void     curDpiIdx(int newIdx) { curDpi(dpi(newIdx)); }
     void            dpiUp();
     void            dpiDown();
+    void            dpiCycleUp();
+    void            dpiCycleDown();
     // DPI stages enabled (default all). Disabled stages will be bypassed when invoking dpiUp/dpiDown (but not any other functions).
     inline bool     dpiEnabled(int index) const             { return dpiOn[index]; }
     inline void     dpiEnabled(int index, bool newEnabled)  { if(index <= 0) return; dpiOn[index] = newEnabled; _needsUpdate = _needsSave = true; }

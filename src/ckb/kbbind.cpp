@@ -88,7 +88,7 @@ void KbBind::save(CkbSettings& settings){
         SGroup group(settings, "Keys");
         foreach(QString key, _bind.keys()){
             KeyAction* act = _bind.value(key);
-            if(act && act->value() != KeyAction::defaultAction(key))
+            if(act && act->value() != KeyAction::defaultAction(key, devParent()->model()))
                 settings.setValue(key, act->value());
         }
     }
@@ -137,14 +137,23 @@ void KbBind::map(const KeyMap& map){
     emit layoutChanged();
 }
 
+KeyAction* KbBind::bindAction(const QString& key) {
+  if(!_bind.contains(key)) return _bind[key] = new KeyAction(KeyAction::defaultAction(key, devParent()->model()), this);
+  return _bind[key];
+}
+
 QString KbBind::action(const QString& key){
     QString rKey = globalRemap(key);
     return bindAction(rKey)->value();
 }
 
-QString KbBind::defaultAction(const QString& key){
+QString KbBind::defaultAction(const QString& key, KeyMap::Model model){
     QString rKey = globalRemap(key);
-    return KeyAction::defaultAction(rKey);
+    return KeyAction::defaultAction(rKey, model);
+}
+
+QString KbBind::defaultAction(const QString& key){
+  return defaultAction(key, devParent()->model());
 }
 
 QString KbBind::friendlyName(const QString& key){

@@ -150,12 +150,14 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "g18",        0x8f, KEY_CORSAIR },
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
-    { "fn",         0x65, KEY_FN },         // STRAFE Fn - rwin on other keyboards
-    { 0,            -1,   KEY_NONE },
-    { 0,            -1,   KEY_NONE },
-    { 0,            -1,   KEY_NONE },
-    { 0,            -1,   KEY_NONE },
-    { 0,            -1,   KEY_NONE },
+    { "fn",        0x65,  KEY_FN },         // STRAFE Fn - rwin on other keyboards
+
+    // JP layout only
+    { "muhenkan",   -1,   KEY_MUHENKAN },
+    { "henkan",     -1,   KEY_HENKAN },
+    { "katakanahiragana", -1, KEY_KATAKANAHIRAGANA },
+    { "ro",         -1,   KEY_RO },
+    { "yen",        -1,   KEY_YEN },
 
     // Strafe specific side leds, that are set via a special command
     { "lsidel",      -2, KEY_CORSAIR },
@@ -225,7 +227,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
     if(length < 1)
         return;
     // LUT for HID -> Corsair scancodes (-1 for no scan code, -2 for currently unsupported)
-    // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with array indices and K95 keys added
+    // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with keymap array indices and K95 keys added
     static const short hid_codes[256] = {
         -1,  -1,  -1,  -1,  37,  54,  52,  39,  27,  40,  41,  42,  32,  43,  44,  45,
         56,  55,  33,  34,  25,  28,  38,  29,  31,  53,  26,  51,  30,  50,  13,  14,
@@ -235,7 +237,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
         93,  94,  92, 102, 103, 104, 105, 106, 107, 115, 116, 117, 112, 113, 114, 108,
        109, 110, 118, 119,  49,  69,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,
         -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  98,  -2,  -2,  -2,  -2,  -2,  -2,  97,
-       130, 131,  -1,  -1,  -1,  -2,  -1,  -2,  -2,  -2,  -2,  -2,  -2,  -1,  -1,  -1,
+       130, 131,  -1,  -1,  -1,  -2,  -1, 150, 149, 151, 148, 147,  -2,  -1,  -1,  -1,
         -2,  -2,  -2,  -2,  -2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,

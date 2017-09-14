@@ -77,6 +77,7 @@ public:
         FR,                 // French
         DE,                 // German
         IT,                 // Italian
+        JP,                 // Japanese
         NO,                 // Norwegian
         PL,                 // Polish (identical to US)
         MX,                 // Spanish (Mexico/Latin America)
@@ -89,6 +90,11 @@ public:
     // ISO (105-key) or ANSI (104-key)?
     inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK && layout != PL; }
     inline bool         isISO() const           { return isISO(keyLayout); }
+
+    // JP (106-key)?
+    inline static bool  isJP(Layout layout)    { return layout == JP; }
+    inline bool         isJP() const           { return isISO(keyLayout); }
+
     // Auto-detects layout from system locale
     static Layout       locale();
 

@@ -93,7 +93,7 @@ public:
 
     // JP (106-key)?
     inline static bool  isJP(Layout layout)    { return layout == JP; }
-    inline bool         isJP() const           { return isISO(keyLayout); }
+    inline bool         isJP() const           { return isJP(keyLayout); }
 
     // Auto-detects layout from system locale
     static Layout       locale();

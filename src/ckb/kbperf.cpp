@@ -30,9 +30,9 @@ KbPerf::KbPerf(KbMode* parent) :
     dpiClr[6] = QColor(192, 192, 192);
     for(int i = 0; i < DPI_COUNT; i++)
         dpiOn[i] = true;
-    dpiLastIdx = dpiCurIdx = 3;
-    dpiCurX = dpiX[dpiCurIdx];
-    dpiCurY = dpiY[dpiCurIdx];
+    dpiLastIdx = dpiBaseIdx = 3;
+    dpiCurX = dpiX[dpiBaseIdx];
+    dpiCurY = dpiY[dpiBaseIdx];
     // Default indicators
     iColor[NUM][0] = iColor[CAPS][0] = iColor[SCROLL][0] = QColor(0, 255, 0);   // Lock lights: on = green, off = black
     iColor[NUM][1] = iColor[CAPS][1] = iColor[SCROLL][1] = QColor(0, 0, 0);
@@ -55,7 +55,7 @@ KbPerf::KbPerf(KbMode* parent) :
 }
 
 KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
-    QObject(parent), dpiCurX(other.dpiCurX), dpiCurY(other.dpiCurY), dpiCurIdx(other.dpiCurIdx), dpiLastIdx(other.dpiLastIdx), runningPushIdx(1),
+    QObject(parent), dpiCurX(other.dpiCurX), dpiCurY(other.dpiCurY), dpiBaseIdx(other.dpiBaseIdx), dpiLastIdx(other.dpiLastIdx), runningPushIdx(1),
     _iOpacity(other._iOpacity), light100Color(other.light100Color), muteNAColor(other.muteNAColor), _dpiIndicator(other._dpiIndicator),
     _liftHeight(other._liftHeight), _angleSnap(other._angleSnap),
     _needsUpdate(true), _needsSave(true) {
@@ -71,12 +71,11 @@ KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
     memcpy(iEnable, other.iEnable, sizeof(iEnable));
     memcpy(hwIType, other.hwIType, sizeof(hwIType));
     // Don't copy pushed DPI states. If the other mode has any, restore the original DPI
-    if(!other.pushedDpis.isEmpty())
-        curDpi(other.pushedDpis[0]);
+    _curDpi(dpi(dpiBaseIdx));
 }
 
 const KbPerf& KbPerf::operator= (const KbPerf& other){
-    dpiCurX = other.dpiCurX; dpiCurY = other.dpiCurY; dpiCurIdx = other.dpiCurIdx; dpiLastIdx = other.dpiLastIdx; runningPushIdx = 1;
+    dpiCurX = other.dpiCurX; dpiCurY = other.dpiCurY; dpiBaseIdx = other.dpiBaseIdx; dpiLastIdx = other.dpiLastIdx; runningPushIdx = 1;
     _iOpacity = other._iOpacity; light100Color = other.light100Color; muteNAColor = other.muteNAColor; _dpiIndicator = other._dpiIndicator;
     _liftHeight = other._liftHeight; _angleSnap = other._angleSnap;
     _needsUpdate = true; _needsSave = true;
@@ -92,8 +91,7 @@ const KbPerf& KbPerf::operator= (const KbPerf& other){
     memcpy(iEnable, other.iEnable, sizeof(iEnable));
     memcpy(hwIType, other.hwIType, sizeof(hwIType));
     // Don't copy pushed DPI states. If the other mode has any, restore the original DPI
-    if(!other.pushedDpis.isEmpty())
-        curDpi(other.pushedDpis[0]);
+    _curDpi(dpi(dpiBaseIdx));
     return other;
 }
 
@@ -157,9 +155,17 @@ void KbPerf::load(CkbSettings& settings){
             if(dpiLastIdx >= DPI_COUNT || dpiLastIdx < 0)
                 dpiLastIdx = 1;
         }
+	// The current DPI is stored as a point, not an index. If this point
+	// does not exist in the table, we'll use the table entry with index 1.
         QPoint value = settings.value("Current").toPoint();
-        if(!value.isNull())
-            curDpi(value);
+	dpiBaseIdx = 1;
+	for (int i = 0; i < DPI_COUNT; i++) {
+	    if (dpiX[i] == value.x() && dpiY[i] == value.y()) {
+	        dpiBaseIdx = i;
+	        break;
+	   }
+	}
+	_curDpi(dpi(dpiBaseIdx));
     }
     // Read misc. mouse settings
     _liftHeight = (height)settings.value("LiftHeight").toInt();
@@ -218,12 +224,9 @@ void KbPerf::save(CkbSettings& settings){
         }
         settings.setValue("6RGB", dpiClr[OTHER].name(QColor::HexArgb));
         settings.setValue("LastIdx", dpiLastIdx);
-        int curX = dpiCurX, curY = dpiCurY;
-        // Ignore any pushed modes
-        if(pushedDpis.count() > 0){
-            curX = pushedDpis.value(0).x();
-            curY = pushedDpis.value(0).y();
-        }
+	// Ignore pushed modes when saving current DPI.
+        int curX = dpi(dpiBaseIdx).x();
+	int curY = dpi(dpiBaseIdx).y();
         settings.setValue("Current", QPoint(curX, curY));
     }
     settings.setValue("LiftHeight", _liftHeight);
@@ -252,103 +255,92 @@ void KbPerf::dpi(int index, const QPoint& newValue){
     dpiX[index] = newValue.x();
     dpiY[index] = newValue.y();
     // Update current DPI if needed
-    if(dpiCurIdx == index){
-        dpiCurX = newValue.x();
-        dpiCurY = newValue.y();
+    if(dpiBaseIdx == index && pushedDpis.isEmpty()) {
+        _curDpi(QPoint(dpiX[index], dpiY[index]));
     }
     _needsUpdate = _needsSave = true;
 }
 
-void KbPerf::_curDpi(const QPoint& newDpi){
+void KbPerf::_curDpi(const QPoint& newDpi) {
     dpiCurX = newDpi.x();
     dpiCurY = newDpi.y();
-    // Set current/last index
-    dpiCurIdx = -1;
-    for(int i = 0; i < DPI_COUNT; i++){
-        if(dpiCurX == dpiX[i] && dpiCurY == dpiY[i]){
-            dpiCurIdx = i;
-            if(i != 0)
-                dpiLastIdx = i;
-            break;
-        }
-    }
     _needsUpdate = _needsSave = true;
 }
 
-void KbPerf::curDpi(const QPoint& newDpi){
-    while(pushedDpis.count() > 0)
-        popDpi(pushedDpis.keys().last());
-    _curDpi(newDpi);
+void KbPerf::baseDpiIdx(int newIdx) {
+    if (pushedDpis.isEmpty() && dpiBaseIdx == newIdx)
+        return;
+    pushedDpis.clear();
+    dpiBaseIdx = newIdx;
+    _curDpi(dpi(dpiBaseIdx));
+    _needsUpdate = _needsSave = true; 
 }
 
 quint64 KbPerf::pushDpi(const QPoint& newDpi){
-    if(pushedDpis.isEmpty())
-        // Push original DPI
-        pushedDpis[0] = curDpi();
     quint64 index = runningPushIdx++;
-    if(runningPushIdx == 0)
-        runningPushIdx = 1;
     pushedDpis[index] = newDpi;
     _curDpi(newDpi);
     return index;
 }
 
 void KbPerf::popDpi(quint64 pushIdx){
-    if(pushIdx == 0 || !pushedDpis.contains(pushIdx))
-        return;
+    if(!pushedDpis.contains(pushIdx)) {   
+      return;
+    }
     pushedDpis.remove(pushIdx);
-    // Set the DPI to the last-pushed value still on the stack
-    _curDpi(map_last(pushedDpis));
-    // If all values have been popped, remove the original DPI
-    if(pushedDpis.count() == 1)
-        pushedDpis.clear();
+    if (pushedDpis.isEmpty()) {
+        _curDpi(dpi(dpiBaseIdx));
+    } else {
+        // Set the DPI to the last-pushed value still on the stack
+        _curDpi(map_last(pushedDpis));
+    } 
     _needsUpdate = _needsSave = true;
 }
 
 void KbPerf::dpiUp(){
     // Scroll past disabled DPIs and choose the next one up
-    int idx = curDpiIdx();
+    int idx = baseDpiIdx();
     do {
         idx++;
         if(idx >= DPI_COUNT)
             return;
     } while(!dpiOn[idx]);
-    curDpiIdx(idx);
+    baseDpiIdx(idx);
 }
 
 void KbPerf::dpiDown(){
-    int idx = curDpiIdx();
+    int idx = baseDpiIdx();
     do {
         idx--;
         if(idx <= SNIPER)
             return;
     } while(!dpiOn[idx]);
-    curDpiIdx(idx);
+    baseDpiIdx(idx);
 }
 
 // dpiCycleUp will loop to lowest setting after passing the highest.
 void KbPerf::dpiCycleUp(){
-    int idx = curDpiIdx();
+    int idx = baseDpiIdx();
     do {
         idx++;
         if(idx >= DPI_COUNT)
             idx = SNIPER + 1;
-        if(idx == curDpiIdx())
+        if(idx == baseDpiIdx())
             return;
     } while(!dpiOn[idx]);
-    curDpiIdx(idx);
+    baseDpiIdx(idx);
 }
 
 void KbPerf::dpiCycleDown(){
-    int idx = curDpiIdx();
+    int idx = baseDpiIdx();
     do {
         idx--;
         if(idx <= SNIPER)
             idx = DPI_COUNT - 1;
-	if(idx == curDpiIdx())
+	if(idx == baseDpiIdx())
             return;
     } while(!dpiOn[idx]);
-    curDpiIdx(idx);
+    baseDpiIdx(idx);
 }
 
 void KbPerf::getIndicator(indicator index, QColor& color1, QColor& color2, QColor& color3, bool& software_enable, i_hw& hardware_enable){
@@ -401,21 +393,16 @@ void KbPerf::update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi
     emit settingsUpdated();
     _needsUpdate = false;
     // Save DPI stage 0 (sniper)
-    cmd.write(QString("dpi 0:%1,%2").arg(dpiX[0]).arg(dpiY[0]).toLatin1());
-    // If the mouse is set to a custom DPI, save it in stage 1
-    int stage = dpiCurIdx;
-    if(stage < 0 && saveCustomDpi){
-        stage = 1;
-        cmd.write(QString(" 1:%1,%2").arg(dpiCurX).arg(dpiCurY).toLatin1());
+    // If the mouse is set to a custom DPI, save it in stage 0
+    int stage = pushedDpis.isEmpty() ? dpiBaseIdx : 0;
+    if(!pushedDpis.isEmpty() && saveCustomDpi) {
+        cmd.write(QString("dpi 0:%1,%2").arg(dpiCurX).arg(dpiCurY).toLatin1());
     } else {
-        // Otherwise, save stage 1 normally
-        if(!dpiOn[1] && stage != 1)
-            cmd.write(" 1:off");
-        else
-            cmd.write(QString(" 1:%1,%2").arg(dpiX[1]).arg(dpiY[1]).toLatin1());
+        // Otherwise, save stage 0 normally
+        cmd.write(QString("dpi 0:%1,%2").arg(dpiX[0]).arg(dpiY[0]).toLatin1());
     }
     // Save stages 1 - 5
-    for(int i = 2; i < DPI_COUNT; i++){
+    for(int i = 1; i < DPI_COUNT; i++){
         if(!dpiOn[i] && stage != i)
             cmd.write(QString(" %1:off").arg(i).toLatin1());
         else
@@ -460,7 +447,7 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
         return;
     if(_dpiIndicator){
         // Set DPI indicator according to index
-        int index = curDpiIdx();
+        int index = baseDpiIdx();
         if(index == -1 || index > OTHER)
             index = OTHER;
         lightIndicator("dpi", dpiClr[index].rgba());

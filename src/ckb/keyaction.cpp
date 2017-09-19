@@ -333,7 +333,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
             if(level < 1 || level >= KbPerf::DPI_COUNT
                     || !down)
                 return;
-            perf->dpi(level);
+            perf->baseDpiIdx(level);
             break;
         }
     } else if(prefix == "$light"){

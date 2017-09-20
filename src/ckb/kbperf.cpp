@@ -30,7 +30,7 @@ KbPerf::KbPerf(KbMode* parent) :
     dpiClr[6] = QColor(192, 192, 192);
     for(int i = 0; i < DPI_COUNT; i++)
         dpiOn[i] = true;
-    dpiLastIdx = dpiBaseIdx = 3;
+    dpiBaseIdx = 3;
     dpiCurX = dpiX[dpiBaseIdx];
     dpiCurY = dpiY[dpiBaseIdx];
     // Default indicators
@@ -55,7 +55,7 @@ KbPerf::KbPerf(KbMode* parent) :
 }
 
 KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
-    QObject(parent), dpiCurX(other.dpiCurX), dpiCurY(other.dpiCurY), dpiBaseIdx(other.dpiBaseIdx), dpiLastIdx(other.dpiLastIdx), runningPushIdx(1),
+    QObject(parent), dpiCurX(other.dpiCurX), dpiCurY(other.dpiCurY), dpiBaseIdx(other.dpiBaseIdx), runningPushIdx(1),
     _iOpacity(other._iOpacity), light100Color(other.light100Color), muteNAColor(other.muteNAColor), _dpiIndicator(other._dpiIndicator),
     _liftHeight(other._liftHeight), _angleSnap(other._angleSnap),
     _needsUpdate(true), _needsSave(true) {
@@ -75,7 +75,7 @@ KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
 }
 
 const KbPerf& KbPerf::operator= (const KbPerf& other){
-    dpiCurX = other.dpiCurX; dpiCurY = other.dpiCurY; dpiBaseIdx = other.dpiBaseIdx; dpiLastIdx = other.dpiLastIdx; runningPushIdx = 1;
+    dpiCurX = other.dpiCurX; dpiCurY = other.dpiCurY; dpiBaseIdx = other.dpiBaseIdx; runningPushIdx = 1;
     _iOpacity = other._iOpacity; light100Color = other.light100Color; muteNAColor = other.muteNAColor; _dpiIndicator = other._dpiIndicator;
     _liftHeight = other._liftHeight; _angleSnap = other._angleSnap;
     _needsUpdate = true; _needsSave = true;
@@ -150,11 +150,6 @@ void KbPerf::load(CkbSettings& settings){
         QColor color = settings.value("6RGB").toString();
         if(color.isValid())
             dpiClr[OTHER] = color;
-        if(settings.contains("LastIdx")){
-            dpiLastIdx = settings.value("LastIdx").toInt();
-            if(dpiLastIdx >= DPI_COUNT || dpiLastIdx < 0)
-                dpiLastIdx = 1;
-        }
 	// The current DPI is stored as a point, not an index. If this point
 	// does not exist in the table, we'll use the table entry with index 1.
         QPoint value = settings.value("Current").toPoint();
@@ -223,7 +218,6 @@ void KbPerf::save(CkbSettings& settings){
                 settings.setValue(iStr + "Disabled", !dpiOn[i]);
         }
         settings.setValue("6RGB", dpiClr[OTHER].name(QColor::HexArgb));
-        settings.setValue("LastIdx", dpiLastIdx);
 	// Ignore pushed modes when saving current DPI.
         int curX = dpi(dpiBaseIdx).x();
 	int curY = dpi(dpiBaseIdx).y();

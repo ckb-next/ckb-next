@@ -142,8 +142,6 @@ private:
     int dpiBaseIdx;
     QColor dpiClr[DPI_COUNT + 1];
     bool dpiOn[DPI_COUNT];
-    // Last-set DPI that was on the DPI list, not counting any pushed DPIs or sniper.
-    int dpiLastIdx;
 
     // Current DPI "stack." The value corresponding to the largest key is the
     // active DPI. If this is empty, we use the base DPI.

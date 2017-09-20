@@ -154,8 +154,11 @@ void KbPerf::load(CkbSettings& settings){
 	// does not exist in the table, we'll use the table entry with index 1.
         QPoint value = settings.value("Current").toPoint();
 	dpiBaseIdx = 1;
-	for (int i = 0; i < DPI_COUNT; i++) {
-	    if (dpiX[i] == value.x() && dpiY[i] == value.y()) {
+	// Skip index 0, which is the sniper DPI.
+	for (int i = 1; i < DPI_COUNT; i++) {
+	    if (dpiX[i] == value.x() &&
+		dpiY[i] == value.y() &&
+		dpiOn[i]) {
 	        dpiBaseIdx = i;
 	        break;
 	   }

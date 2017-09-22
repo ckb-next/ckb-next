@@ -153,11 +153,11 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "fn",        0x65,  KEY_FN },         // STRAFE Fn - rwin on other keyboards
 
     // JP layout only
-    { "muhenkan",   -1,   KEY_MUHENKAN },
-    { "henkan",     -1,   KEY_HENKAN },
-    { "katakanahiragana", -1, KEY_KATAKANAHIRAGANA },
-    { "ro",         -1,   KEY_RO },
-    { "yen",        -1,   KEY_YEN },
+    { "muhenkan",   0x29,   KEY_MUHENKAN },
+    { "henkan",     0x41,   KEY_HENKAN },
+    { "katakanahiragana", 0x4e, KEY_KATAKANAHIRAGANA },
+    { "ro",         0x8a,   KEY_RO },
+    { "yen",        0x13,   KEY_YEN },
 
     // Strafe specific side leds, that are set via a special command
     { "lsidel",      -2, KEY_CORSAIR },

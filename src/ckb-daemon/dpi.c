@@ -100,6 +100,13 @@ int updatedpi(usbdevice* kb, int force){
     if (newdpi->current != lastdpi->current) {
         // Before we switch current DPI stage, set the DPI XY for the new stage
         // if necessary.
+        if ((lastdpi->enabled & 1 << newdpi->current) == 0) {
+            uchar newenabled = lastdpi->enabled | 1 << newdpi->current;
+            uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x05, 0, newenabled };
+            if(!usbsend(kb, data_pkt, 1))
+                return -2;
+            lastdpi->enabled = newenabled;
+        }
         if (newdpi->x[newdpi->current] != lastdpi->x[newdpi->current] ||
             newdpi->y[newdpi->current] != lastdpi->y[newdpi->current]) {
             uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 0 };

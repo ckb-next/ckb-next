@@ -70,7 +70,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { "space",      0x35, KEY_SPACE },
     { 0,            -1,   KEY_NONE },
-    { 0,            -1,   KEY_NONE },
+    { "katakanahiragana", 0x4e, KEY_KATAKANAHIRAGANA },
     { "ralt",       0x59, KEY_RIGHTALT },
     { "rwin",       0x65, KEY_RIGHTMETA },
     { "rmenu",      0x71, KEY_COMPOSE },
@@ -87,9 +87,9 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "bslash",     0x66, KEY_BACKSLASH },
     { "hash",       0x72, KEY_BACKSLASH_ISO },
     { "enter",      0x7e, KEY_ENTER },
-    { 0,            -1,   KEY_NONE },
+    { "ro",         0x8a, KEY_RO },
     { "equal",      0x07, KEY_EQUAL },
-    { 0,            -1,   KEY_NONE },
+    { "yen",        0x13, KEY_YEN },
     { "bspace",     0x1f, KEY_BACKSPACE },
     { "del",        0x2b, KEY_DELETE },
     { "end",        0x37, KEY_END },
@@ -149,15 +149,13 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "g17",        0x83, KEY_CORSAIR },
     { "g18",        0x8f, KEY_CORSAIR },
     { 0,            -1,   KEY_NONE },
+    { "henkan",     0x41, KEY_HENKAN },
+    { "fn",         0x65, KEY_FN }         // STRAFE Fn - rwin on other keyboards
+    { "muhenkan",   0x29, KEY_MUHENKAN },
     { 0,            -1,   KEY_NONE },
-    { "fn",        0x65,  KEY_FN },         // STRAFE Fn - rwin on other keyboards
-
-    // JP layout only
-    { "muhenkan",   0x29,   KEY_MUHENKAN },
-    { "henkan",     0x41,   KEY_HENKAN },
-    { "katakanahiragana", 0x4e, KEY_KATAKANAHIRAGANA },
-    { "ro",         0x8a,   KEY_RO },
-    { "yen",        0x13,   KEY_YEN },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
 
     // Strafe specific side leds, that are set via a special command
     { "lsidel",      -2, KEY_CORSAIR },
@@ -228,6 +226,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
         return;
     // LUT for HID -> Corsair scancodes (-1 for no scan code, -2 for currently unsupported)
     // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with keymap array indices and K95 keys added
+    // Make sure the indices match the keyindex as passed to nprintkey() in notify.c
     static const short hid_codes[256] = {
         -1,  -1,  -1,  -1,  37,  54,  52,  39,  27,  40,  41,  42,  32,  43,  44,  45,
         56,  55,  33,  34,  25,  28,  38,  29,  31,  53,  26,  51,  30,  50,  13,  14,
@@ -237,7 +236,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
         93,  94,  92, 102, 103, 104, 105, 106, 107, 115, 116, 117, 112, 113, 114, 108,
        109, 110, 118, 119,  49,  69,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,
         -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  98,  -2,  -2,  -2,  -2,  -2,  -2,  97,
-       130, 131,  -1,  -1,  -1,  -2,  -1, 150, 149, 151, 148, 147,  -2,  -1,  -1,  -1,
+       130, 131,  -1,  -1,  -1,  -2,  -1,  83,  66,  85, 145, 144,  -2,  -1,  -1,  -1,
         -2,  -2,  -2,  -2,  -2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,

@@ -150,7 +150,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "g18",        0x8f, KEY_CORSAIR },
     { 0,            -1,   KEY_NONE },
     { "henkan",     0x41, KEY_HENKAN },
-    { "fn",         0x65, KEY_FN }         // STRAFE Fn - rwin on other keyboards
+    { "fn",         0x65, KEY_FN },         // STRAFE Fn - rwin on other keyboards
     { "muhenkan",   0x29, KEY_MUHENKAN },
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },

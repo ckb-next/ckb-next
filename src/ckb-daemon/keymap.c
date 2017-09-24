@@ -70,7 +70,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { "space",      0x35, KEY_SPACE },
     { 0,            -1,   KEY_NONE },
-    { "katakanahiragana", 0x4e, KEY_KATAKANAHIRAGANA },
+    { "katahira",   0x4d, KEY_KATAKANAHIRAGANA },
     { "ralt",       0x59, KEY_RIGHTALT },
     { "rwin",       0x65, KEY_RIGHTMETA },
     { "rmenu",      0x71, KEY_COMPOSE },

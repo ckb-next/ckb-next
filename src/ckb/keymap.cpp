@@ -14,7 +14,7 @@ static const Key K95Keys[] = {
     {0, 0, "g7", 0, 39, NS, true, true}, {0, 0, "g8", 11, 39, NS, true, true}, {0, 0, "g9", 22, 39, NS, true, true}, {0, "Tab", "tab", 41, 39, 18, 12, true, true}, {0, 0, "q", 56, 39, NS, true, true}, {0, 0, "w", 68, 39, NS, true, true}, {0, 0, "e", 80, 39, NS, true, true}, {0, 0, "r", 92, 39, NS, true, true}, {0, 0, "t", 104, 39, NS, true, true}, {0, 0, "y", 116, 39, NS, true, true}, {0, 0, "u", 128, 39, NS, true, true}, {0, 0, "i", 140, 39, NS, true, true}, {0, 0, "o", 152, 39, NS, true, true}, {0, 0, "p", 164, 39, NS, true, true}, {0, "[", "lbrace", 176, 39, NS, true, true}, {0, "]", "rbrace", 188, 39, NS, true, true}, {0, "\\", "bslash", 203, 39, 18, 12, true, true}, {0, "Enter", "enter", 203, 39, 18, 24, true, true}, {0, "Delete", "del", 222, 39, NS, true, true}, {0, "End", "end", 234, 39, NS, true, true}, {0, "Page Down", "pgdn", 246, 39, NS, true, true}, {0, "NumPad 7", "num7", 261, 39, NS, true, true}, {0, "NumPad 8", "num8", 273, 39, NS, true, true}, {0, "NumPad 9", "num9", 285, 39, NS, true, true}, {0, "NumPad +", "numplus", 297, 45, 12, 24, true, true},
     {0, 0, "g10", 0, 50, NS, true, true}, {0, 0, "g11", 11, 50, NS, true, true}, {0, 0, "g12", 22, 50, NS, true, true}, {0, "Caps Lock", "caps", 42, 51, 20, 12, true, true}, {0, 0, "a", 59, 51, NS, true, true}, {0, 0, "s", 71, 51, NS, true, true}, {0, 0, "d", 83, 51, NS, true, true}, {0, 0, "f", 95, 51, NS, true, true}, {0, 0, "g", 107, 51, NS, true, true}, {0, 0, "h", 119, 51, NS, true, true}, {0, 0, "j", 131, 51, NS, true, true}, {0, 0, "k", 143, 51, NS, true, true}, {0, 0, "l", 155, 51, NS, true, true}, {0, ";", "colon", 167, 51, NS, true, true}, {0, "'", "quote", 179, 51, NS, true, true}, {0, "#", "hash", 191, 51, NS, true, true}, {0, "NumPad 4", "num4", 261, 51, NS, true, true}, {0, "NumPad 5", "num5", 273, 51, NS, true, true}, {0, "NumPad 6", "num6", 285, 51, NS, true, true},
     {0, 0, "g13", 0, 64, NS, true, true}, {0, 0, "g14", 11, 64, NS, true, true}, {0, 0, "g15", 22, 64, NS, true, true}, {0, "Left Shift", "lshift", 39, 63, 14, 12, true, true}, {"bslash", "\\", "bslash_iso", 53, 63, NS, true, true}, {0, 0, "z", 65, 63, NS, true, true}, {0, 0, "x", 77, 63, NS, true, true}, {0, 0, "c", 89, 63, NS, true, true}, {0, 0, "v", 101, 63, NS, true, true}, {0, 0, "b", 113, 63, NS, true, true}, {0, 0, "n", 125, 63, NS, true, true}, {0, 0, "m", 137, 63, NS, true, true}, {0, ",", "comma", 149, 63, NS, true, true}, {0, ".", "dot", 161, 63, NS, true, true}, {0, "/", "slash", 173, 63, NS, true, true}, {0, "_", "ro", 185, 63, NS, true, true}, {0, "Right Shift", "rshift", 196, 63, 32, 12, true, true}, {0, "Up", "up", 234, 63, NS, true, true}, {0, "NumPad 1", "num1", 261, 63, NS, true, true}, {0, "NumPad 2", "num2", 273, 63, NS, true, true}, {0, "NumPad 3", "num3", 285, 63, NS, true, true}, {0, "NumPad Enter", "numenter", 297, 69, 12, 24, true, true},
-    {0, 0, "g16", 0, 75, NS, true, true}, {0, 0, "g17", 11, 75, NS, true, true}, {0, 0, "g18", 22, 75, NS, true, true}, {0, "Left Ctrl", "lctrl", 40, 75, 16, 12, true, true}, {0, "Left Windows", "lwin", 54, 75, NS, true, true}, {0, "Left Alt", "lalt", 67, 75, 14, 12, true, true}, {0, "無変換", "muhenkan", 80, 75, NS, true, true}, {0, "Space", "space", 116, 75, 84, 12, true, true}, {0, "変換", "henkan", 140, 75, NS, true, true}, {0, "ひらがな カタカナ ローマ字", "katakanahiragana", 152, 75, NS, true, true}, {0, "Right Alt", "ralt", 165, 75, 14, 12, true, true}, {0, "Right Windows", "rwin", 178, 75, NS, true, true}, {0, "Menu", "rmenu", 190, 75, NS, true, true}, {0, "Right Ctrl", "rctrl", 204, 75, 16, 12, true, true}, {0, "Left", "left", 222, 75, NS, true, true}, {0, "Down", "down", 234, 75, NS, true, true}, {0, "Right", "right", 246, 75, NS, true, true}, {0, "NumPad 0", "num0", 267, 75, 24, 12, true, true}, {0, "NumPad .", "numdot", 285, 75, NS, true, true}
+    {0, 0, "g16", 0, 75, NS, true, true}, {0, 0, "g17", 11, 75, NS, true, true}, {0, 0, "g18", 22, 75, NS, true, true}, {0, "Left Ctrl", "lctrl", 40, 75, 16, 12, true, true}, {0, "Left Windows", "lwin", 54, 75, NS, true, true}, {0, "Left Alt", "lalt", 67, 75, 14, 12, true, true}, {0, "無変換", "muhenkan", 80, 75, NS, true, true}, {0, "Space", "space", 116, 75, 84, 12, true, true}, {0, "変換", "henkan", 150, 75, NS, true, true}, {0, "ひらがな カタカナ ローマ字", "katahira", 162, 75, NS, true, true}, {0, "Right Alt", "ralt", 165, 75, 14, 12, true, true}, {0, "Right Windows", "rwin", 178, 75, NS, true, true}, {0, "Menu", "rmenu", 190, 75, NS, true, true}, {0, "Right Ctrl", "rctrl", 204, 75, 16, 12, true, true}, {0, "Left", "left", 222, 75, NS, true, true}, {0, "Down", "down", 234, 75, NS, true, true}, {0, "Right", "right", 246, 75, NS, true, true}, {0, "NumPad 0", "num0", 267, 75, 24, 12, true, true}, {0, "NumPad .", "numdot", 285, 75, NS, true, true}
 };
 #define KEYCOUNT_K95 (sizeof(K95Keys) / sizeof(Key))
 
@@ -122,7 +122,7 @@ static void patchnonJP106(QHash<QString, Key>& map){
     map.remove("yen");
     map.remove("henkan");
     map.remove("muhenkan");
-    map.remove("katakanahiragana");
+    map.remove("katahira");
     map.remove("ro");
 }
 static void patchISO(QHash<QString, Key>& map){
@@ -148,7 +148,6 @@ static void patchJP106(QHash<QString, Key>& map){
 
     // Resize Backspace
     Key& bspace = map["bspace"];
-    // Standard key width is 12 (see NS define)
     bspace.width -= 12;
     bspace.x = 206;
 
@@ -159,15 +158,32 @@ static void patchJP106(QHash<QString, Key>& map){
 
     // Resize Spacebar
     Key& space = map["space"];
-    // 36 = 3 * standard key width
-    space.width -= 36;
-    space.x -= 6;
+    space.width -= 26;
+    space.x -= 1;
 
-    map.remove("bslash_iso");
     // Left shift
     Key& lshift = map["lshift"];
     lshift.x = ANSI_LSHIFT_X;
     lshift.width = ANSI_LSHIFT_W;
+
+    map.remove("bslash_iso");
+
+    // Resize and move ralt to make space for the extra keys
+    Key& ralt = map["ralt"];
+    ralt.x += 11;
+    ralt.width += 2;
+
+    // None of these layouts have rwin
+    map.remove("rwin");
+}
+// Used to fix the Fn size and remove Alt when necessary in JP layouts for compatible devices
+static void patchJP106fn(QHash<QString, Key>& map){
+    if(map.contains("fn")){
+        map.remove("ralt");
+        Key& fn = map["fn"];
+        fn.width += 4;
+        fn.x -= 2;
+    }
 }
 
 // Total width/height
@@ -377,10 +393,14 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         for(const Key* key = K65TopRow; key < K65TopRow + K65_TOP_COUNT; key++)
             map[key->name] = *key;
-        // Add Fn key from Strafe and shift it to the left
+
+        map.remove("rwin");
         map["fn"] = KStrafeKeys[3];
         map["fn"].x -= 12;
-        map.remove("rwin");
+
+        if(KeyMap::isJP(layout))
+            patchJP106fn(map);
+
         // Done!
         break;
     }
@@ -426,6 +446,10 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("prev");
         map.remove("play");
         map.remove("next");
+
+        if(KeyMap::isJP(layout))
+            patchJP106fn(map);
+
         // Done!
         break;
     }

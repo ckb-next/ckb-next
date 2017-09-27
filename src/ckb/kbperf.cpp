@@ -150,20 +150,20 @@ void KbPerf::load(CkbSettings& settings){
         QColor color = settings.value("6RGB").toString();
         if(color.isValid())
             dpiClr[OTHER] = color;
-	// The current DPI is stored as a point, not an index. If this point
-	// does not exist in the table, we'll use the table entry with index 1.
-        QPoint value = settings.value("Current").toPoint();
-	dpiBaseIdx = 1;
-	// Skip index 0, which is the sniper DPI.
-	for (int i = 1; i < DPI_COUNT; i++) {
-	    if (dpiX[i] == value.x() &&
-		dpiY[i] == value.y() &&
-		dpiOn[i]) {
-	        dpiBaseIdx = i;
-	        break;
-	   }
-	}
-	_curDpi(dpi(dpiBaseIdx));
+        if (settings.contains("CurIdx")) {
+            dpiBaseIdx = settings.value("CurIdx").toInt();
+        } else {
+            // If there isn't a setting for current DPI stage, pick the first
+            // enabled one. Failing that just pick stage 1.
+            dpiBaseIdx = 1;
+            for (int i = 1; i < DPI_COUNT; i++) {
+                if (dpiOn[i]) {
+                    dpiBaseIdx = i;
+                    break;
+                }
+            }	 
+        }
+        _curDpi(dpi(dpiBaseIdx));
     }
     // Read misc. mouse settings
     _liftHeight = (height)settings.value("LiftHeight").toInt();
@@ -222,9 +222,7 @@ void KbPerf::save(CkbSettings& settings){
         }
         settings.setValue("6RGB", dpiClr[OTHER].name(QColor::HexArgb));
 	// Ignore pushed modes when saving current DPI.
-        int curX = dpi(dpiBaseIdx).x();
-	int curY = dpi(dpiBaseIdx).y();
-        settings.setValue("Current", QPoint(curX, curY));
+        settings.setValue("CurIdx", dpiBaseIdx);
     }
     settings.setValue("LiftHeight", _liftHeight);
     settings.setValue("AngleSnap", _angleSnap);

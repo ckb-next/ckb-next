@@ -46,23 +46,38 @@ See also:
 
 ### Keyboards
 
-* K65 RGB
-* K70
-* K70 RGB
-* K70 LUX RGB
-* K95*
-* K95 RGB
-* Strafe
-* Strafe RGB
+* K65:
+    * RGB
+    * non-RGB
+    * LUX RGB
+    * RGB RAPIDFIRE
+* K70:
+    * RGB
+    * non-RGB
+    * LUX RGB
+    * LUX non-RGB
+    * RGB RAPIDFIRE
+    * non-RGB RAPIDFIRE
+* K95:
+    * RGB
+    * non-RGB\*
+* Strafe:
+    * RGB
+    * non-RGB
 
 \* = hardware playback not supported. Settings will be saved to software only.
 
 ### Mice
 
-* M65 RGB
-* M65 PRO RGB
-* Sabre RGB
-* Scimitar RGB
+* M65:
+    * non-RGB
+    * PRO RGB
+* Sabre:
+    * Optical RGB
+    * Laser RGB
+* Scimitar:
+    * RGB
+    * PRO RGB
 
 ## Linux Installation
 

@@ -580,7 +580,7 @@ PACurvesSetupAccelParams (CFArrayRef parametricCurves,
             (primaryParams->gain[3].value != 0LL));
 
     // calculate secondary values
-    bzero(secondaryParams, sizeof(secondaryParams));
+    bzero(secondaryParams, sizeof(*secondaryParams));
     if ((primaryParams->tangent[1].value > 0LL) && (primaryParams->tangent[1].value < primaryParams->tangent[0].value))
         secondaryParams->firstTangent = 1;
 

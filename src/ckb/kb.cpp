@@ -717,7 +717,7 @@ void Kb::readNotify(QString line){
                 idx = 1;
             if(idx >= KbPerf::DPI_COUNT)
                 idx = KbPerf::DPI_COUNT - 1;
-            perf->curDpiIdx(idx);
+            perf->baseDpiIdx(idx);
         } else if(components[2] == "hwlift"){
             // Mouse lift height (1...5)
             if(!_hwProfile || _hwProfile->modeCount() <= mode || mode >= HWMODE_MAX || !hwLoading[mode + 1])

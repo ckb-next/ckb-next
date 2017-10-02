@@ -28,13 +28,17 @@ int updatergb_mouse(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
+    // Prevent writing to DPI LEDs or non-existent LED zones for the Glaive.
+    int num_zones = IS_GLAIVE(kb) ? 3 : N_MOUSE_ZONES;
     // Send the RGB values for each zone to the mouse
     uchar data_pkt[2][MSG_SIZE] = {
-        { 0x07, 0x22, N_MOUSE_ZONES, 0x01, 0 }, // RGB colors
+        { 0x07, 0x22, num_zones, 0x01, 0 }, // RGB colors
         { 0x07, 0x05, 0x02, 0 }                 // Lighting on/off
     };
     uchar* rgb_data = &data_pkt[0][4];
     for(int i = 0; i < N_MOUSE_ZONES; i++){
+        if (IS_GLAIVE(kb) && i != 0 && i != 1 && i != 5)
+	    continue;
         *rgb_data++ = i + 1;
         *rgb_data++ = newlight->r[LED_MOUSE + i];
         *rgb_data++ = newlight->g[LED_MOUSE + i];

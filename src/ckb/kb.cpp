@@ -329,7 +329,7 @@ void Kb::hwSave(){
         // Write lighting and performance
         light->base(cmd, true, monochrome);
         cmd.write(" ");
-        perf->update(cmd, true, false);
+        perf->update(cmd, notifyNumber, true, false);
         // Update mode ID
         mode->id().hwModified = mode->id().modified;
         mode->setNeedsSave();
@@ -418,7 +418,7 @@ void Kb::frameUpdate(){
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
     cmd.write(" ");
-    perf->update(cmd, notifyNumber, changed);
+    perf->update(cmd, notifyNumber, changed, true);
     cmd.write("\n");
     cmd.flush();
 }

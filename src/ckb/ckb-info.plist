@@ -2,8 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleExecutable</key>
+    <string>ckb</string>
     <key>CFBundleIconFile</key>
     <string>ckb-logo.icns</string>
+    <key>CFBundleName</key>
+    <string>ckb</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSPrincipalClass</key>

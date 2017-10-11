@@ -14,7 +14,7 @@ static muteState lastKnown = UNKNOWN;
 
 #ifdef USE_LIBPULSE
 static pa_context* paContext = nullptr; //Context for communicating with Pulse Audio.
-static quint64 reconnectTime = 0; //Time (in MSecs since epoch) to attempt reconnect.
+static qint64 reconnectTime = 0; //Time (in MSecs since epoch) to attempt reconnect.
 static QString defaultSink; //Name of sink being checked if muted.
 static QMutex mutex;
 

@@ -19,6 +19,7 @@ public:
     ~ColorMap();
     ColorMap(const ColorMap& rhs);
     const ColorMap& operator=(const ColorMap& rhs);
+    bool operator==(const ColorMap& rhs) const;
 
     // Initialize the color map with the given keys. Color values are initialized to transparent black.
     // This may be called more than once; the existing color set will be erased.

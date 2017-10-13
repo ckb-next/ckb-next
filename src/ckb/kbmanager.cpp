@@ -28,8 +28,11 @@ KbManager::KbManager(QObject *parent) : QObject(parent){
     _eventTimer = new QTimer(this);
     _eventTimer->setTimerType(Qt::PreciseTimer);
     _scanTimer = new QTimer(this);
-    _scanTimer->start(100);
+    _scanTimer->start(1000);
     connect(_scanTimer, SIGNAL(timeout()), this, SLOT(scanKeyboards()));
+
+    // Scan for keyboards immediately so they show up as soon as the GUI appears.
+    QTimer::singleShot(0,this,SLOT(scanKeyboards()));
 }
 
 void KbManager::fps(int framerate){

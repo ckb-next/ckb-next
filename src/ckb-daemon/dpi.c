@@ -114,8 +114,53 @@ int updatedpi(usbdevice* kb, int force){
         return 0;
     lastdpi->forceupdate = newdpi->forceupdate = 0;
 
-    // Send X/Y DPIs
+    if (newdpi->current != lastdpi->current) {
+        // Before we switch the current DPI stage, make sure the stage we are
+        // switching to is both enabled and configured to the correct DPI.
+
+        // Enable the stage if necessary.
+        if ((lastdpi->enabled & 1 << newdpi->current) == 0) {
+            uchar newenabled;
+            // If the new enabled flags contain both the current and previous
+            // stages, use it.
+            if (newdpi->enabled & 1 << newdpi->current &&
+                newdpi->enabled & 1 << lastdpi->current) {
+                newenabled = newdpi->enabled;
+            } else {
+                // Otherwise just enable the new stage. We'll write the actual
+                // requested flags after switching stages.
+                newenabled = lastdpi->enabled | 1 << newdpi->current;
+            }
+            uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x05, 0, newenabled };
+            if(!usbsend(kb, data_pkt, 1))
+                return -2;
+            // Cache the flags we wrote.
+            lastdpi->enabled = newenabled;
+        }
+        // Set the DPI for the new stage if necessary.
+        if (newdpi->x[newdpi->current] != lastdpi->x[newdpi->current] ||
+            newdpi->y[newdpi->current] != lastdpi->y[newdpi->current]) {
+            uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 0 };
+            data_pkt[2] |= newdpi->current;
+            *(ushort*)(data_pkt + 5) = newdpi->x[newdpi->current];
+            *(ushort*)(data_pkt + 7) = newdpi->y[newdpi->current];
+            if(!usbsend(kb, data_pkt, 1))
+                return -1;
+            // Set these values in the cache so we don't rewrite them.
+            lastdpi->x[newdpi->current] = newdpi->x[newdpi->current];
+            lastdpi->y[newdpi->current] = newdpi->y[newdpi->current];
+        }
+        // Set current DPI stage.
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x02, 0, newdpi->current };
+        if(!usbsend(kb, data_pkt, 1))
+            return -2;
+    }
+    
+    // Send X/Y DPIs. We've changed to the new stage already so these can be set
+    // safely.
     for(int i = 0; i < DPI_COUNT; i++){
+        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i])
+            continue;
         uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 0 };
         data_pkt[2] |= i;
         *(ushort*)(data_pkt + 5) = newdpi->x[i];
@@ -125,14 +170,22 @@ int updatedpi(usbdevice* kb, int force){
     }
 
     // Send settings
-    uchar data_pkt[4][MSG_SIZE] = {
-        { 0x07, 0x13, 0x05, 0, newdpi->enabled },
-        { 0x07, 0x13, 0x02, 0, newdpi->current },
-        { 0x07, 0x13, 0x03, 0, newdpi->lift },
-        { 0x07, 0x13, 0x04, 0, newdpi->snap, 0x05 }
-    };
-    if(!usbsend(kb, data_pkt[0], 4))
-        return -2;
+    if (newdpi->enabled != lastdpi->enabled) {
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x05, 0, newdpi->enabled };
+        if(!usbsend(kb, data_pkt, 1))
+            return -2;
+    }
+    if (newdpi->lift != lastdpi->lift) {
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x03, 0, newdpi->lift };
+        if(!usbsend(kb, data_pkt, 1))
+            return -2;
+    }
+    if (newdpi->snap != lastdpi->snap) {
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x04, 0, newdpi->snap, 0x05 };
+        if(!usbsend(kb, data_pkt, 1))
+            return -2;
+    }
+
     // Finished
     memcpy(lastdpi, newdpi, sizeof(dpiset));
     return 0;

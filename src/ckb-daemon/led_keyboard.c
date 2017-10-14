@@ -139,7 +139,7 @@ int updatergb_kb(usbdevice* kb, int force){
 }
 
 int savergb_kb(usbdevice* kb, lighting* light, int mode){
-    if(kb->fwversion >= 0x0120){
+    if(kb->fwversion >= 0x0120 || IS_NEW_PROTOCOL(kb)){
         uchar data_pkt[12][MSG_SIZE] = {
             // Red
             { 0x7f, 0x01, 60, 0 },
@@ -181,7 +181,7 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
 }
 
 int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
-    if(kb->fwversion >= 0x0120){
+    if(kb->fwversion >= 0x0120 || IS_NEW_PROTOCOL(kb)){
         uchar data_pkt[12][MSG_SIZE] = {
             { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x01 },
             { 0xff, 0x01, 60, 0 },

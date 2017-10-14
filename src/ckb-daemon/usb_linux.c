@@ -67,7 +67,7 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 ///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
-    if (kb->fwversion >= 0x120 && !is_recv) {
+    if ((kb->fwversion >= 0x120 || IS_NEW_PROTOCOL(kb)) && !is_recv){
         struct usbdevfs_bulktransfer transfer = {0};
         transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
         transfer.len = MSG_SIZE;
@@ -654,6 +654,7 @@ typedef struct {
 /// and its usb device id as short must be entered in this array.
 static _model models[] = {
     // Keyboards
+    { P_K63_NRGB_STR, P_K63_NRGB },
     { P_K65_STR, P_K65 },
     { P_K65_NRGB_STR, P_K65_NRGB },
     { P_K65_LUX_STR, P_K65_LUX },
@@ -672,12 +673,14 @@ static _model models[] = {
     // Mice
     { P_M65_STR, P_M65 },
     { P_M65_PRO_STR, P_M65_PRO },
+    { P_GLAIVE_STR, P_GLAIVE },
     { P_SABRE_O_STR, P_SABRE_O },
     { P_SABRE_L_STR, P_SABRE_L },
     { P_SABRE_N_STR, P_SABRE_N },
     { P_SCIMITAR_STR, P_SCIMITAR },
     { P_SCIMITAR_PRO_STR, P_SCIMITAR_PRO },
-    { P_SABRE_O2_STR, P_SABRE_O2 }
+    { P_SABRE_O2_STR, P_SABRE_O2 },
+    { P_HARPOON_STR, P_HARPOON }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

@@ -49,6 +49,11 @@ system(pkg-config --exists x11) {
     LIBS += -lX11
     DEFINES += USE_LIBX11
 }
+# Use libpulse for audio playback mute detection
+system(pkg-config --exists libpulse) {
+    LIBS += -lpulse
+    DEFINES += USE_LIBPULSE
+}
 }
 
 SOURCES += main.cpp\

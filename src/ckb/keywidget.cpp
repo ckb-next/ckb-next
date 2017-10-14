@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -131,6 +131,18 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!scimOverlay)
                 scimOverlay = new QImage(":/img/overlay_scimitar.png");
             overlay = scimOverlay;
+            xpos = 3.5f;
+            ypos = -2.f;
+        } else if(model == KeyMap::HARPOON){
+            if(!harpOverlay)
+                harpOverlay = new QImage(":/img/overlay_harpoon.png");
+            overlay = harpOverlay;
+            xpos = 3.5f;
+            ypos = -2.f;
+        } else if(model == KeyMap::GLAIVE){
+            if(!glaiveOverlay)
+                glaiveOverlay = new QImage(":/img/overlay_glaive.png");
+            overlay = glaiveOverlay;
             xpos = 3.5f;
             ypos = -2.f;
         }
@@ -387,7 +399,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             }
             // Pick color based on key function
             QString bind = _bindMap.value(key.name);
-            QString def = KbBind::defaultAction(key.name);
+            QString def = KbBind::defaultAction(key.name, model);
             if(bind.isEmpty())
                 // Unbound - red
                 decPainter.setPen(QColor(255, 136, 136));

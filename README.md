@@ -61,11 +61,13 @@ See also:
 * K95:
     * RGB
     * non-RGB\*
+    * Platinum\**
 * Strafe:
     * RGB
     * non-RGB
 
 \* = hardware playback not supported. Settings will be saved to software only.
+\** = partial support, static hardware playback only and inability to control some lights.
 
 ### Mice
 
@@ -78,6 +80,8 @@ See also:
 * Scimitar:
     * RGB
     * PRO RGB
+* Harpoon
+* Glaive
 
 ## Linux Installation
 

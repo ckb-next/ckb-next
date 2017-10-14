@@ -103,7 +103,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     kern_return_t res = kIOReturnSuccess;
     ///
     /// \todo Be aware: This condition is exact inverted to the condition in the linux dependent os_usbsend(). It may be correct, but please check it.
-    if(kb->fwversion < 0x120 || is_recv){
+    if((kb->fwversion < 0x120 && !IS_NEW_PROTOCOL(kb)) || is_recv){
         int ep = kb->epcount;
         // For old devices, or for receiving data, use control transfers
         IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, ep - 1, MSG_SIZE, (void*)out_msg, 0, 5000, 5000 };
@@ -890,9 +890,9 @@ int usbmain(){
     int vendor = V_CORSAIR;
     int products[] = {
         // Keyboards
-        P_K65, P_K65_NRGB, P_K65_LUX, P_K65_RFIRE, P_K70, P_K70_NRGB, P_K70_LUX, P_K70_LUX_NRGB, P_K70_RFIRE, P_K70_RFIRE_NRGB, P_K95, P_K95_NRGB, P_K95_PLATINUM, P_STRAFE, P_STRAFE_NRGB,
+        P_K63_NRGB, P_K65, P_K65_NRGB, P_K65_LUX, P_K65_RFIRE, P_K70, P_K70_NRGB, P_K70_LUX, P_K70_LUX_NRGB, P_K70_RFIRE, P_K70_RFIRE_NRGB, P_K95, P_K95_NRGB, P_K95_PLATINUM, P_STRAFE, P_STRAFE_NRGB,
         // Mice
-        P_M65, P_M65_PRO, P_SABRE_O, P_SABRE_L, P_SABRE_N, P_SCIMITAR, P_SCIMITAR_PRO, P_SABRE_O2
+        P_M65, P_M65_PRO, P_GLAIVE, P_SABRE_O, P_SABRE_L, P_SABRE_N, P_SCIMITAR, P_SCIMITAR_PRO, P_SABRE_O2, P_HARPOON
     };
 
     // Setup global variables

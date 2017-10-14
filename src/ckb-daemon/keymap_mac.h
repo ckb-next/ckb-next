@@ -128,6 +128,12 @@
 #define KEY_KP9             kVK_ANSI_Keypad9
 #define KEY_KP0             kVK_ANSI_Keypad0
 
+#define KEY_YEN             kVK_JIS_Yen
+#define KEY_RO              kVK_JIS_Underscore
+#define KEY_KATAKANAHIRAGANA kVK_JIS_Kana
+#define KEY_HENKAN          -1
+#define KEY_MUHENKAN        -1
+
 #define KEY_MEDIA           0x800
 #define IS_MEDIA(scancode)  ((scancode) >= KEY_MEDIA)
 #define KEY_MUTE            (KEY_MEDIA + NX_KEYTYPE_MUTE)

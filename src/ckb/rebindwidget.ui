@@ -413,6 +413,16 @@
          </item>
          <item>
           <property name="text">
+           <string>(Cycle Up)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>(Cycle Down)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>(Up)</string>
           </property>
          </item>

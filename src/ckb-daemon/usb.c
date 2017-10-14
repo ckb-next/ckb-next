@@ -36,7 +36,7 @@ int features_mask = -1;
 
 /// brief .
 ///
-/// vendor_str returns "corsair" iff the given \a vendor argument is equal to \a V_CORSAIR \c (0x1bc)
+/// vendor_str returns "corsair" if the given \a vendor argument is equal to \a V_CORSAIR \c (0x1bc)
 /// else it returns ""
 ///
 /// \attention There is also a string defined V_CORSAIR_STR, which returns the device number as string in hex "1b1c".
@@ -74,6 +74,8 @@ const char* product_str(short product){
         return "k70";
     if(product == P_K65 || product == P_K65_NRGB || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";
+    if(product == P_K63_NRGB)
+        return "k63";
     if(product == P_STRAFE || product == P_STRAFE_NRGB)
         return "strafe";
     if(product == P_M65 || product == P_M65_PRO)
@@ -82,6 +84,10 @@ const char* product_str(short product){
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)
         return "scimitar";
+    if(product == P_HARPOON)
+        return "harpoon";
+    if(product == P_GLAIVE)
+        return "glaive";
     return "";
 }
 

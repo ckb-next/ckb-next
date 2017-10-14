@@ -329,7 +329,7 @@ void Kb::hwSave(){
         // Write lighting and performance
         light->base(cmd, true, monochrome);
         cmd.write(" ");
-        perf->update(cmd, true, false);
+        perf->update(cmd, notifyNumber, true, false);
         // Update mode ID
         mode->id().hwModified = mode->id().modified;
         mode->setNeedsSave();
@@ -418,7 +418,7 @@ void Kb::frameUpdate(){
     cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
     bind->update(cmd, changed);
     cmd.write(" ");
-    perf->update(cmd, notifyNumber, changed);
+    perf->update(cmd, notifyNumber, changed, true);
     cmd.write("\n");
     cmd.flush();
 }
@@ -717,7 +717,7 @@ void Kb::readNotify(QString line){
                 idx = 1;
             if(idx >= KbPerf::DPI_COUNT)
                 idx = KbPerf::DPI_COUNT - 1;
-            perf->curDpiIdx(idx);
+            perf->baseDpiIdx(idx);
         } else if(components[2] == "hwlift"){
             // Mouse lift height (1...5)
             if(!_hwProfile || _hwProfile->modeCount() <= mode || mode >= HWMODE_MAX || !hwLoading[mode + 1])

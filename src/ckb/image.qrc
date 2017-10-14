@@ -15,5 +15,7 @@
         <file>overlay_m65.png</file>
         <file>overlay_scimitar.png</file>
         <file>overlay_sabre.png</file>
+        <file>overlay_harpoon.png</file>
+        <file>overlay_glaive.png</file>
     </qresource>
 </RCC>

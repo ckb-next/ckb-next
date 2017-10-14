@@ -41,7 +41,7 @@ KeyAction::~KeyAction(){
     }
 }
 
-QString KeyAction::defaultAction(const QString& key){
+QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
     // G1-G18 are unbound by default
     if(key.length() >= 2 && key[0] == 'g'
 		&& ((key.length() == 2 && key[1] >= '0' && key[1] <= '9')
@@ -66,8 +66,13 @@ QString KeyAction::defaultAction(const QString& key){
     if(key == "lock")
         return "$lock:0";
     // DPI buttons
-    if(key == "dpiup")
-        return "$dpi:-2";
+    if(key == "dpiup"){
+        if(model == KeyMap::HARPOON ||
+	   model == KeyMap::GLAIVE){
+	    return "$dpi:-4";
+        }
+	return "$dpi:-2";
+    }
     if(key == "dpidn")
         return "$dpi:-1";
     if(key == "sniper")
@@ -104,6 +109,10 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         // Split off custom parameters (if any)
         int level = parts[1].split("+")[0].toInt();
         switch(level){
+        case DPI_CYCLE_UP:
+            return "DPI cycle up";
+        case DPI_CYCLE_DOWN:
+            return "DPI cycle down";
         case DPI_UP:
             return "DPI up";
         case DPI_DOWN:
@@ -279,6 +288,16 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         KbPerf* perf = bind->perf();
         int level = parts[1].split("+")[0].toInt();
         switch(level){
+        case DPI_CYCLE_UP:
+            if(!down)
+                return;
+            perf->dpiCycleUp();
+            break;
+        case DPI_CYCLE_DOWN:
+            if(!down)
+                return;
+            perf->dpiCycleDown();
+            break;
         case DPI_UP:
             if(!down)
                 return;
@@ -314,7 +333,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
             if(level < 1 || level >= KbPerf::DPI_COUNT
                     || !down)
                 return;
-            perf->dpi(level);
+            perf->baseDpiIdx(level);
             break;
         }
     } else if(prefix == "$light"){

@@ -46,6 +46,7 @@ See also:
 
 ### Keyboards
 
+* K63
 * K65:
     * RGB
     * non-RGB
@@ -67,6 +68,7 @@ See also:
     * non-RGB
 
 \* = hardware playback not supported. Settings will be saved to software only.
+
 \** = partial support, static hardware playback only and inability to control some lights.
 
 ### Mice

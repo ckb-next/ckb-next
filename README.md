@@ -220,6 +220,7 @@ Closing ckb will actually minimize it to the system tray. Use the Quit option fr
 If you have problems connecting the device to your system (device doesn't respond, ckb-daemon doesn't recognize or can't connect it) and/or you experience long boot times when using the keyboard, try adding the following to your kernel's `cmdline`:
 
 * K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x20000408`
+* K65 LUX: `usbhid.quirks=0x1B1C:0x1B37:0x20000408`
 * K70: `usbhid.quirks=0x1B1C:0x1B09:0x20000408`
 * K70 LUX: `usbhid.quirks=0x1B1C:0x1B36:0x20000408`
 * K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000408`

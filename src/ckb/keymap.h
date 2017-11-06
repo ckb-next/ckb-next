@@ -53,6 +53,7 @@ public:
         // Keyboard models
         K63,
         K65,
+        K68,
         K70,
         K95,
         STRAFE,

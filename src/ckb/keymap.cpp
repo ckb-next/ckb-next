@@ -195,6 +195,9 @@ static void patchJP106fn(QHash<QString, Key>& map){
 #define K70_WIDTH       (K95_WIDTH - K70_X_START)
 #define K70_HEIGHT      K95_HEIGHT
 
+#define K68_WIDTH       K70_WIDTH
+#define K68_HEIGHT      K70_HEIGHT
+
 // K65 additionally removes the numpad on the right, and has a different top row
 #define K65_WIDTH       209
 #define K65_HEIGHT      K70_HEIGHT
@@ -202,6 +205,11 @@ static void patchJP106fn(QHash<QString, Key>& map){
 // K63 is the same as the K65 in terms of size
 #define K63_WIDTH       K65_WIDTH
 #define K63_HEIGHT      K65_HEIGHT
+
+static const Key K68TopRow[] = {
+    {0, "Volume Down", "voldn", 285 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 297 - K70_X_START, 0, 13, 8, true, true},
+};
+#define K68_TOP_COUNT (sizeof(K68TopRow) / sizeof(Key))
 
 static const Key K65TopRow[] = {
     {0, "Brightness", "light", 164 - K70_X_START, 0, 12, 12, true, true}, {0, "Mute", "mute", 176 - K70_X_START, 0, 12, 12, true, true}, {0, "Volume Down", "voldn", 192 - K70_X_START, 0, 14, 8, true, true}, {0, "Volume Up", "volup", 205 - K70_X_START, 0, 14, 8, true, true}, {0, "Windows Lock", "lock", 222 - K70_X_START, 0, 12, 12, true, true}
@@ -380,6 +388,14 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("m2");
         map.remove("m3");
         // Done!
+        break;
+    }
+    case KeyMap::K68:{
+        // Same as the K70, except volume up and down keys
+        map = getMap(KeyMap::K70, layout);
+        for(const Key* key = K68TopRow; key < K68TopRow + K68_TOP_COUNT; key++)
+            map[key->name] = *key;
+
         break;
     }
     case KeyMap::K65:{
@@ -646,6 +662,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K63;
     if(lower == "k65")
         return K65;
+    if(lower == "k68")
+        return K68;
     if(lower == "k70")
         return K70;
     if(lower == "k95")
@@ -671,6 +689,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k63";
     case K65:
         return "k65";
+    case K68:
+        return "k68";
     case K70:
         return "k70";
     case K95:
@@ -705,6 +725,8 @@ int KeyMap::modelWidth(Model model){
         return K63_WIDTH;
     case K65:
         return K65_WIDTH;
+    case K68:
+        return K68_WIDTH;
     case K70:
         return K70_WIDTH;
     case K95:
@@ -726,6 +748,7 @@ int KeyMap::modelHeight(Model model){
     switch(model){
     case K63:
     case K65:
+    case K68:
     case K70:
     case K95:
     case STRAFE:

@@ -52,6 +52,7 @@ See also:
     * non-RGB
     * LUX RGB
     * RGB RAPIDFIRE
+* K68
 * K70:
     * RGB
     * non-RGB
@@ -221,6 +222,7 @@ If you have problems connecting the device to your system (device doesn't respon
 
 * K65 RGB: `usbhid.quirks=0x1B1C:0x1B17:0x20000408`
 * K65 LUX: `usbhid.quirks=0x1B1C:0x1B37:0x20000408`
+* K68: `usbhid.quirks=0x1B1C:0x1B3F:0x20000408`
 * K70: `usbhid.quirks=0x1B1C:0x1B09:0x20000408`
 * K70 LUX: `usbhid.quirks=0x1B1C:0x1B36:0x20000408`
 * K70 RGB: `usbhid.quirks=0x1B1C:0x1B13:0x20000408`

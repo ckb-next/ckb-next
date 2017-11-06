@@ -14,6 +14,7 @@ struct KbId {
 static KbId ids[] = {
     // Keyboards
     { 0x1b1c, 0x1b17, "corsair k65 rgb" },
+    { 0x1b1c, 0x1b3f, "corsair k68" },
     { 0x1b1c, 0x1b13, "corsair k70 rgb" },
     { 0x1b1c, 0x1b11, "corsair k95 rgb" },
     { 0x1b1c, 0x1b15, "corsair strafe monochrome" },

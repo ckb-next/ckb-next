@@ -80,6 +80,7 @@ public:
         JP,                 // Japanese
         NO,                 // Norwegian
         PL,                 // Polish (identical to US)
+        PT_BR,              // Portuguese (Brazil)
         MX,                 // Spanish (Mexico/Latin America)
         ES,                 // Spanish (Spain)
         SE,                 // Swedish
@@ -94,6 +95,10 @@ public:
     // JP (106-key)?
     inline static bool  isJP(Layout layout)    { return layout == JP; }
     inline bool         isJP() const           { return isJP(keyLayout); }
+
+    // PT_BR?
+    inline static bool  isPTBR(Layout layout)    { return layout == PT_BR; }
+    inline bool         isPTBR() const           { return isPTBR(keyLayout); }
 
     // Auto-detects layout from system locale
     static Layout       locale();

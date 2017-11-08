@@ -81,7 +81,9 @@
 #define P_STRAFE_STR        "1b20"
 #define P_STRAFE_NRGB       0x1b15
 #define P_STRAFE_NRGB_STR   "1b15"
-#define IS_STRAFE(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB))
+#define P_STRAFE_NRGB_2     0x1b44
+#define P_STRAFE_NRGB_2_STR "1b44"
+#define IS_STRAFE(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2))
 
 #define P_M65           0x1b12
 #define P_M65_STR       "1b12"
@@ -115,11 +117,11 @@
 
 ///
 /// uncomment to see USB packets sent to the device
-// #define DEBUG_USB_SEND
+ #define DEBUG_USB_SEND
 
 ///
 ///uncomment to see USB packets received from the device
-// #define DEBUG_USB_RECV
+ #define DEBUG_USB_RECV
 
 ///
 /// \brief vendor_str Vendor/product string representations
@@ -141,7 +143,7 @@ const char* product_str(short product);
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
 /// Change this if new \b monochrome devices are added
-#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
+#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_RGB() is returned.
 #define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
@@ -162,7 +164,7 @@ const char* product_str(short product);
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
 /// Used when a device has a firmware with a low version number that uses the new protocol
-#define IS_NEW_PROTOCOL(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb))
+#define IS_NEW_PROTOCOL(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

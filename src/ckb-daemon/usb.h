@@ -117,11 +117,11 @@
 
 ///
 /// uncomment to see USB packets sent to the device
- #define DEBUG_USB_SEND
+// #define DEBUG_USB_SEND
 
 ///
 ///uncomment to see USB packets received from the device
- #define DEBUG_USB_RECV
+// #define DEBUG_USB_RECV
 
 ///
 /// \brief vendor_str Vendor/product string representations

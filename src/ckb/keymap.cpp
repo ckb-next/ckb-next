@@ -80,6 +80,13 @@ static const KeyPatch patchMX[] = {
     {0, "<", "bslash_iso"}, {0, "-", "slash"},
 };
 
+static const KeyPatch patchPTBR[] = {
+    {"quote", "'", "grave"},
+    {"accent", "´", "lbrace"}, {"lbrace", "[", "rbrace"},
+    {"cc", "Ç", "colon"}, {"tilde", "~", "quote"}, {"rbrace", "]", "hash"},
+    {"colon", ";", "slash"}, {"slash", "/", "ro"}, {"numcomma", ",", "numdot"},
+};
+
 static const KeyPatch patchES[] = {
     {"oa", "º", "grave"}, {"quote", "'", "minus"}, {"lexclam", "¡", "equal"},
     {"grave", "`", "lbrace"}, {"plus", "+", "rbrace"},
@@ -184,6 +191,19 @@ static void patchJP106fn(QHash<QString, Key>& map){
         fn.width += 4;
         fn.x -= 2;
     }
+}
+// Patch for ABNT 2 layout
+static void patchABNT2(QHash<QString, Key>& map){
+    map.remove("yen");
+    map.remove("henkan");
+    map.remove("muhenkan");
+    map.remove("katahira");
+    map.remove("bslash");
+
+    // Resize RShift
+    Key& rshift = map["rshift"];
+    rshift.width -= 12;
+    rshift.x += 6;
 }
 
 // Total width/height
@@ -343,6 +363,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         case KeyMap::MX:
             patch(map, patchMX);
             break;
+        case KeyMap::PT_BR:
+            patch(map, patchPTBR);
+            break;
         case KeyMap::ES:
             patch(map, patchES);
             break;
@@ -357,6 +380,8 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         if(KeyMap::isJP(layout))
             patchJP106(map);
+        else if(KeyMap::isPTBR(layout))
+            patchABNT2(map);
         else if(KeyMap::isISO(layout))
             patchISO(map);
         else
@@ -529,6 +554,8 @@ KeyMap::Layout KeyMap::locale(){
         return KeyMap::JP;
     else if(loc.startsWith("pl-"))
         return KeyMap::PL;
+    else if(loc.startsWith("pt-br"))
+        return KeyMap::PT_BR;
     else if(loc.startsWith("no-"))
         return KeyMap::NO;
     else if(loc.startsWith("es-es"))
@@ -573,6 +600,8 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
         return JP;
     if(lower == "pl")
         return PL;
+    if(lower == "pt_br")
+        return PT_BR;
     if(lower == "mx")
         return MX;
     if(lower == "es")
@@ -612,6 +641,8 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "no";
     case PL:
         return "pl";
+    case PT_BR:
+        return "pt_br";
     case MX:
         return "mx";
     case ES:
@@ -635,6 +666,7 @@ QStringList KeyMap::layoutNames(){
             << "Japanese"
             << "Norwegian"
             << "Polish"
+            << "Portuguese (Brazil)"
             << "Spanish (Latin America)"
             << "Spanish (Spain)"
             << "Swedish";

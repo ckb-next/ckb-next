@@ -670,6 +670,7 @@ static _model models[] = {
     { P_K95_PLATINUM_STR, P_K95_PLATINUM },
     { P_STRAFE_STR, P_STRAFE },
     { P_STRAFE_NRGB_STR, P_STRAFE_NRGB },
+    { P_STRAFE_NRGB_2_STR, P_STRAFE_NRGB_2 },
     // Mice
     { P_M65_STR, P_M65 },
     { P_M65_PRO_STR, P_M65_PRO },

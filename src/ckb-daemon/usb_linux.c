@@ -69,7 +69,8 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     int res;
     if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !is_recv){
         struct usbdevfs_bulktransfer transfer = {0};
-        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
+        // FW 2.XX uses 0x03, FW 3.XX uses 0x02
+        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : (kb->fwversion >= 0x300 ? 2 : 3);
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;

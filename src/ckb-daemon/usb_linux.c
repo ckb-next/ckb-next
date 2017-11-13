@@ -67,7 +67,7 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 ///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
-    if ((kb->fwversion >= 0x120 || IS_NEW_PROTOCOL(kb)) && !is_recv){
+    if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !is_recv){
         struct usbdevfs_bulktransfer transfer = {0};
         transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
         transfer.len = MSG_SIZE;

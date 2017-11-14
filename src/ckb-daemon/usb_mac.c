@@ -120,7 +120,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     } else {
         // For newer devices, use interrupt transfers
         // macOS sees 4 endpoints (including ep0) for FW 3.XX
-        int ep = (kb->fwversion >= 0x130 && (kb->fwversion < 0x200 || kb->fwversion >= 0x300) ? 4 : 3;
+        int ep = (kb->fwversion >= 0x130 && (kb->fwversion < 0x200 || kb->fwversion >= 0x300)) ? 4 : 3;
         usb_iface_t h_usb = kb->ifusb[ep - 1];
         hid_dev_t h_hid = kb->ifhid[ep - 1];
         if(h_usb)

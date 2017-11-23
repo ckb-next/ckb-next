@@ -177,7 +177,16 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 }
 
 void os_sendindicators(usbdevice* kb){
-    IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, 0x00, 1, &kb->ileds, 0, 500, 500 };
+    void *ileds;
+    ushort leds;
+    if(kb->fwversion >= 0x300) {
+        leds = (kb->ileds << 8) | 0x0001;
+        ileds = &leds;
+    }
+    else {
+        ileds = &kb->ileds;
+    }
+    IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, 0x00, (kb->fwversion >= 0x300 ? 2 : 1), ileds, 0, 500, 500 };
     kern_return_t res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
     if(res == kIOReturnNotOpen){
         // Handle not open - try to go through the HID system instead

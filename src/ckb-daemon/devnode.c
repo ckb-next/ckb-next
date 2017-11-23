@@ -201,9 +201,10 @@ static int _mkdevpath(usbdevice* kb){
         _mknotifynode(kb, 0);
 
         // Write the model and serial to files
-        char mpath[sizeof(path) + 6], spath[sizeof(path) + 7];
+        char mpath[sizeof(path) + 6], spath[sizeof(path) + 7], ipath[sizeof(path) + 10];
         snprintf(mpath, sizeof(mpath), "%s/model", path);
         snprintf(spath, sizeof(spath), "%s/serial", path);
+        snprintf(ipath, sizeof(ipath), "%s/productid", path);
         FILE* mfile = fopen(mpath, "w");
         if(mfile){
             fputs(kb->name, mfile);
@@ -227,6 +228,20 @@ static int _mkdevpath(usbdevice* kb){
         } else {
             ckb_warn("Unable to create %s: %s\n", spath, strerror(errno));
             remove(spath);
+        }
+        FILE* ifile = fopen(ipath, "w");
+        if(ifile){
+            char productid [5];
+            snprintf(productid, 5, "%04x", kb->product);
+            fputs(productid, ifile);
+            fputc('\n', ifile);
+            fclose(ifile);
+            chmod(ipath, S_GID_READ);
+            if(gid >= 0)
+                chown(ipath, 0, gid);
+        } else {
+            ckb_warn("Unable to create %s: %s\n", ipath, strerror(errno));
+            remove(ipath);
         }
         // Write the keyboard's features
         char fpath[sizeof(path) + 9];

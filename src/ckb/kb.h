@@ -17,6 +17,7 @@ public:
     // Device information
     QString features, firmware, pollrate;
     bool monochrome;
+    short productID;
 
     // Keyboard model
     inline KeyMap::Model    model() const                       { return _model; }

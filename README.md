@@ -1,3 +1,4 @@
+<a target="_blank" href="http://webchat.freenode.net?channels=%23ckb-next&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>
 # ckb-next: RGB Driver for Linux and macOS
 
 **ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of their proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
@@ -303,7 +304,7 @@ There are multiple ways you can get in touch with us:
 
 * [join](https://groups.google.com/forum/#!forum/ckb-next/join) `ckb-next` mailing list
 * [open](https://github.com/mattanger/ckb-next/issues) a GitHub Issue
-* hop on `#ckb-next` to chat <a target="_blank" href="http://webchat.freenode.net?channels=%23ckb-next&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>
+* hop on `#ckb-next` on Freenode to chat
 
 ## What happened to the original ckb
 

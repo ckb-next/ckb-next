@@ -56,6 +56,7 @@ public:
         K68,
         K70,
         K95,
+        K95P,
         STRAFE,
         // Mouse models
         M65,

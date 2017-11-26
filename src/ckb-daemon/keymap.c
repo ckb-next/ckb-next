@@ -157,27 +157,32 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
 
+    // K95 Platinum
+    { "topbar1",      0x90, KEY_NONE },
+    { "topbar2",      0x91, KEY_NONE },
+    { "topbar3",      0x92, KEY_NONE },
+    { "topbar4",      0x9E, KEY_NONE },
+    { "topbar5",      0xA0, KEY_NONE },
+    { "topbar6",      0x93, KEY_NONE },
+    { "topbar7",      0x94, KEY_NONE },
+    { "topbar8",      0x95, KEY_NONE },
+    { "topbar9",      0x96, KEY_NONE },
+    { "topbar10",     0x97, KEY_NONE },
+    { "topbar11",     0x98, KEY_NONE },
+    { "topbar12",     0x99, KEY_NONE },
+    { "topbar13",     0x9A, KEY_NONE },
+    { "topbar14",     0x9B, KEY_NONE },
+    { "topbar15",     0x9F, KEY_NONE },
+    { "topbar16",     0xA2, KEY_NONE },
+    { "topbar17",     0xA1, KEY_NONE },
+    { "topbar18",     0x9C, KEY_NONE },
+    { "topbar19",     0x9D, KEY_NONE },
+
     // Strafe specific side leds, that are set via a special command
     { "lsidel",      -2, KEY_CORSAIR },
     { "rsidel",      -2, KEY_CORSAIR },
     // Strafe logo backlight
     { "logo",      0x7d, KEY_CORSAIR },
-
-    // K95 Platinum 
-    { "topbar1",      0x97, KEY_NONE },
-    { "topbar2",      0x98, KEY_NONE },
-    { "topbar3",      0x99, KEY_NONE },
-    { "topbar4",      0x9A, KEY_NONE },
-    { "topbar5",      0x9B, KEY_NONE },
-    { "topbar6",      0x9C, KEY_NONE },
-    { "topbar7",      0x9D, KEY_NONE },
-    { "topbar8",      0x9E, KEY_NONE },
-    { "topbar9",      0x9F, KEY_NONE },
-    { "topbar10",     0xA0, KEY_NONE },
-    { "topbar11",     0xA1, KEY_NONE },
-    { "topbar12",     0xA2, KEY_NONE },
-    { "topbar13",     0xA3, KEY_NONE },
-    { "topbar14",     0xA4, KEY_NONE },
 
     // Keys not present on any device
     { "lightup",    -1, KEY_BRIGHTNESSUP },

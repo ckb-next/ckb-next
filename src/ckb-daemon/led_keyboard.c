@@ -60,15 +60,15 @@ static void makergb_full(const lighting* light, uchar data_pkt[12][MSG_SIZE]){
     // Red
     memcpy(data_pkt[0] + 4, r, 60);
     memcpy(data_pkt[1] + 4, r + 60, 60);
-    memcpy(data_pkt[2] + 4, r + 120, 24);
+    memcpy(data_pkt[2] + 4, r + 120, 60);
     // Green (final R packet is blank)
     memcpy(data_pkt[4] + 4, g, 60);
     memcpy(data_pkt[5] + 4, g + 60, 60);
-    memcpy(data_pkt[6] + 4, g + 120, 24);
+    memcpy(data_pkt[6] + 4, g + 120, 60);
     // Blue (final G packet is blank)
     memcpy(data_pkt[8] + 4, b, 60);
     memcpy(data_pkt[9] + 4, b + 60, 60);
-    memcpy(data_pkt[10] + 4, b + 120, 24);
+    memcpy(data_pkt[10] + 4, b + 120, 60);
 }
 
 static int rgbcmp(const lighting* lhs, const lighting* rhs){

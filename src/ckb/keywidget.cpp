@@ -221,9 +221,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     bgPainter.setOpacity(0.7);
             }
         }
-        if(model != KeyMap::STRAFE && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+        if((model != KeyMap::STRAFE && model != KeyMap::K95P) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
-            // Switch keys are circular except for Strafe. All Strafe keys are square
+            // Not all devices have circular buttons
             x += w / 8.f;
             y += h / 8.f;
             w *= 0.75f;

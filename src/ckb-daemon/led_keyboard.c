@@ -117,6 +117,13 @@ int updatergb_kb(usbdevice* kb, int force){
             { 0x7f, 0x03, 0x18, 0 },
             { 0x07, 0x28, 0x03, 0x03, 0x02, 0}
         };
+        // The K95 Platinum needs 0x30 for the lightbar to work, due to the length of the packet.
+        // A way to dynamically calculate the length would be preferred, based on the device.
+        if(kb->product == P_K95_PLATINUM){
+            data_pkt[2][2] = 0x30;
+            data_pkt[6][2] = 0x30;
+            data_pkt[10][2] = 0x30;
+        }
         makergb_full(newlight, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;

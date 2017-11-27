@@ -212,7 +212,7 @@ static void patchABNT2(QHash<QString, Key>& map){
 #define K95_WIDTH       298
 #define K95_HEIGHT      76
 
-#define K95P_HEIGHT      80
+#define K95P_HEIGHT      82
 #define K95P_X_START     20
 #define K95P_WIDTH       (K95_WIDTH - K95P_X_START + 1)
 
@@ -328,10 +328,10 @@ static const Key ScimKeys[] = {
 
 // K95 Platinum lightbar
 static const Key K95PLbar[] = {
-    {0, 0, "topbar1", 4, -4, LBS, true, false}, {0, 0, "topbar2", 19, -4, LBS, true, false}, {0, 0, "topbar3", 34, -4, LBS, true, false}, {0, 0, "topbar4", 49, -4, LBS, true, false}, {0, 0, "topbar5", 64, -4, LBS, true, false}, {0, 0, "topbar6", 79, -4, LBS, true, false},
-    {0, 0, "topbar7", 94, -4, LBS, true, false}, {0, 0, "topbar8", 109, -4, LBS, true, false}, {0, 0, "topbar9", 124, -4, LBS, true, false}, {0, 0, "topbar10", 139, -4, LBS, true, false}, {0, 0, "topbar11", 154, -4, LBS, true, false}, {0, 0, "topbar12", 169, -4, LBS, true, false},
-    {0, 0, "topbar13", 184, -4, LBS, true, false}, {0, 0, "topbar14", 199, -4, LBS, true, false}, {0, 0, "topbar15", 214, -4, LBS, true, false}, {0, 0, "topbar16", 229, -4, LBS, true, false}, {0, 0, "topbar17", 244, -4, LBS, true, false}, {0, 0, "topbar18", 259, -4, LBS, true, false},
-    {0, 0, "topbar19", 274, -4, LBS, true, false},
+    {0, 0, "topbar1", 4, -3, LBS, true, false}, {0, 0, "topbar2", 19, -3, LBS, true, false}, {0, 0, "topbar3", 34, -3, LBS, true, false}, {0, 0, "topbar4", 49, -3, LBS, true, false}, {0, 0, "topbar5", 64, -3, LBS, true, false}, {0, 0, "topbar6", 79, -3, LBS, true, false},
+    {0, 0, "topbar7", 94, -3, LBS, true, false}, {0, 0, "topbar8", 109, -3, LBS, true, false}, {0, 0, "topbar9", 124, -3, LBS, true, false}, {0, 0, "topbar10", 139, -3, LBS, true, false}, {0, 0, "topbar11", 154, -3, LBS, true, false}, {0, 0, "topbar12", 169, -3, LBS, true, false},
+    {0, 0, "topbar13", 184, -3, LBS, true, false}, {0, 0, "topbar14", 199, -3, LBS, true, false}, {0, 0, "topbar15", 214, -3, LBS, true, false}, {0, 0, "topbar16", 229, -3, LBS, true, false}, {0, 0, "topbar17", 244, -3, LBS, true, false}, {0, 0, "topbar18", 259, -3, LBS, true, false},
+    {0, 0, "topbar19", 274, -3, LBS, true, false},
 };
 #define LBARCOUNT_K95P (sizeof(K95PLbar) / sizeof(Key))
 
@@ -473,7 +473,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         while(i.hasNext()){
             i.next();
             i.value().x -= K95P_X_START;
-            i.value().y += 4;
+            i.value().y += 6;
         }
         // Add lightbar
         for(const Key* key = K95PLbar; key < K95PLbar + LBARCOUNT_K95P; key++)

@@ -5,6 +5,8 @@
 // Normal key size
 #define NS 12, 12
 
+// Lightbar LED size
+#define LBS 17, 6
 // Key positions (K95 - English)
 // This is the master key map that includes ANSI, ISO and JP-106 layouts - use patchANSI(), patchISO() or patchJP106() to finalize it
 static const Key K95Keys[] = {
@@ -210,6 +212,10 @@ static void patchABNT2(QHash<QString, Key>& map){
 #define K95_WIDTH       298
 #define K95_HEIGHT      76
 
+#define K95P_HEIGHT      82
+#define K95P_X_START     20
+#define K95P_WIDTH       (K95_WIDTH - K95P_X_START + 1)
+
 // K70 cuts off the G keys on the left, as well as MR/M1/M2/M3
 #define K70_X_START     38
 #define K70_WIDTH       (K95_WIDTH - K70_X_START)
@@ -320,6 +326,16 @@ static const Key ScimKeys[] = {
 #define SCIM_WIDTH      M65_WIDTH
 #define SCIM_HEIGHT     M65_HEIGHT
 
+// K95 Platinum lightbar
+static const Key K95PLbar[] = {
+    {0, 0, "topbar1", 4, -3, LBS, true, false}, {0, 0, "topbar2", 19, -3, LBS, true, false}, {0, 0, "topbar3", 34, -3, LBS, true, false}, {0, 0, "topbar4", 49, -3, LBS, true, false}, {0, 0, "topbar5", 64, -3, LBS, true, false}, {0, 0, "topbar6", 79, -3, LBS, true, false},
+    {0, 0, "topbar7", 94, -3, LBS, true, false}, {0, 0, "topbar8", 109, -3, LBS, true, false}, {0, 0, "topbar9", 124, -3, LBS, true, false}, {0, 0, "topbar10", 139, -3, LBS, true, false}, {0, 0, "topbar11", 154, -3, LBS, true, false}, {0, 0, "topbar12", 169, -3, LBS, true, false},
+    {0, 0, "topbar13", 184, -3, LBS, true, false}, {0, 0, "topbar14", 199, -3, LBS, true, false}, {0, 0, "topbar15", 214, -3, LBS, true, false}, {0, 0, "topbar16", 229, -3, LBS, true, false}, {0, 0, "topbar17", 244, -3, LBS, true, false}, {0, 0, "topbar18", 259, -3, LBS, true, false},
+    {0, 0, "topbar19", 274, -3, LBS, true, false},
+};
+#define LBARCOUNT_K95P (sizeof(K95PLbar) / sizeof(Key))
+
+
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
 #define N_LAYOUTS   KeyMap::_LAYOUT_MAX
@@ -395,6 +411,74 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         else
             patchANSI(map);
         // Done! return the map
+        break;
+    }
+    case KeyMap::K95P:{
+        // The K95 Platinum map is based on the K95
+        map = getMap(KeyMap::K95, layout);
+        // Remove excess G keys
+        map.remove("g7");
+        map.remove("g8");
+        map.remove("g9");
+        map.remove("g10");
+        map.remove("g11");
+        map.remove("g12");
+        map.remove("g13");
+        map.remove("g14");
+        map.remove("g15");
+        map.remove("g16");
+        map.remove("g17");
+        map.remove("g18");
+        // Place the remaining G keys vertically
+        map["g1"].x = 22;
+        map["g2"].x = 22;
+        map["g3"].x = 22;
+        map["g4"].x = 22;
+        map["g5"].x = 22;
+        map["g6"].x = 22;
+        //map["g1"].y = 14+(12*0);
+        map["g2"].y = 26; //14+(12*1)
+        map["g3"].y = 38; //14+(12*2)
+        map["g4"].y = 50; //14+(12*3)
+        map["g5"].y = 62; //14+(12*4)
+        map["g6"].y = 74; //14+(12*5)
+        // Remove M keys
+        map.remove("m1");
+        map.remove("m2");
+        map.remove("m3");
+        // Centre MR/Brightness/Winlock between F1 and F4
+        map["mr"].x = 64;
+        map["light"].x = 75;
+        map["lock"].x = 86;
+        // Resize them
+        map["mr"].height = 8;
+        map["light"].height = 8;
+        map["lock"].height = 8;
+        map["mr"].width = 11;
+        map["light"].width = 11;
+        map["lock"].width = 11;
+        // Mute is above Stop
+        map["mute"].x -= 11;
+        map["voldn"].x -= 11;
+        map["volup"].x -= 11;
+        // Move the buttons on the top a bit further down to centre them
+        map["mr"].y += 1;
+        map["light"].y += 1;
+        map["lock"].y += 1;
+        map["mute"].y += 1;
+        map["voldn"].y += 1;
+        map["volup"].y += 1;
+        // Shift all keys down (to make room for the lightbar), and to the left
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            i.value().x -= K95P_X_START;
+            i.value().y += 6;
+        }
+        // Add lightbar
+        for(const Key* key = K95PLbar; key < K95PLbar + LBARCOUNT_K95P; key++)
+                map.insert(key->name, *key);
+
         break;
     }
     case KeyMap::K70:{
@@ -700,6 +784,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70;
     if(lower == "k95")
         return K95;
+    if(lower == "k95p")
+        return K95P;
     if(lower == "strafe")
         return STRAFE;
     if(lower == "m65")
@@ -727,6 +813,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70";
     case K95:
         return "k95";
+    case K95P:
+        return "k95P";
     case STRAFE:
         return "strafe";
     case M65:
@@ -762,7 +850,9 @@ int KeyMap::modelWidth(Model model){
     case K70:
         return K70_WIDTH;
     case K95:
-        return K95_WIDTH;
+         return K95_WIDTH;
+    case K95P:
+        return K95P_WIDTH;
     case STRAFE:
         return KSTRAFE_WIDTH;
     case M65:
@@ -785,6 +875,8 @@ int KeyMap::modelHeight(Model model){
     case K95:
     case STRAFE:
         return K95_HEIGHT;
+    case K95P:
+        return K95P_HEIGHT;
     case M65:
     case SABRE:
     case SCIMITAR:

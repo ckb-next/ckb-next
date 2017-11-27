@@ -141,7 +141,7 @@ int FwUpgradeDialog::exec(){
     ui->progressBar->setValue(0);
     ui->progressBar->setMaximum(1);
     ui->progressBar->setTextVisible(false);
-    ui->statusLabel->setText("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb is not endorsed by Corsair. This is <i>unlikely</i> to brick your device, but I accept no responsibility if it does. If you're paranoid, update from Windows.");
+    ui->statusLabel->setText("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb-next is not endorsed by Corsair.<br />This is <i>unlikely</i> to brick your device, however the developers of this software do not accept any responsibility if it does. If you're paranoid, use CUE.");
     ui->cancelButton->setEnabled(true);
     ui->actionButton->setEnabled(true);
     setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MAX);

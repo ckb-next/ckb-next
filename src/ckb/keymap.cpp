@@ -850,6 +850,7 @@ int KeyMap::modelWidth(Model model){
     case K70:
         return K70_WIDTH;
     case K95:
+         return K95_WIDTH;
     case K95P:
         return K95P_WIDTH;
     case STRAFE:

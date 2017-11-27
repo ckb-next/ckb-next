@@ -71,7 +71,7 @@ See also:
 
 \* = hardware playback not supported. Settings will be saved to software only.
 
-\** = partial support, static hardware playback only and inability to control some lights.
+\** = partial support, static hardware playback only.
 
 ### Mice
 

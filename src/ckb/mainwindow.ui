@@ -30,6 +30,12 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QScrollArea" name="scrollArea">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -48,7 +54,7 @@
          <x>0</x>
          <y>0</y>
          <width>982</width>
-         <height>732</height>
+         <height>738</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">

@@ -145,6 +145,9 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>comboBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

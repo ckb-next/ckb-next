@@ -481,6 +481,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>animName</tabstop>
+  <tabstop>delayBox</tabstop>
+  <tabstop>repeatBox</tabstop>
+  <tabstop>kpModeStopBox</tabstop>
+  <tabstop>kpDelayBox</tabstop>
+  <tabstop>kpRepeatBox</tabstop>
+  <tabstop>kpReleaseBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

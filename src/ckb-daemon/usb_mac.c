@@ -239,7 +239,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
         case 8:
         case 10:
         case 11:
-            hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data);
+            hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data, kb->fwversion);
             break;
         case MSG_SIZE:
             corsair_mousecopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);

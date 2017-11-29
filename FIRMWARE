@@ -2,39 +2,33 @@
 Hash: SHA256
 
 # The GPG key: DCEF2F5F - A full copy of it can also be found in src/ckb/ckb-next-key.gpg
-# This document is signed to prevent tampering. Signature verification is enabled only when GnuPG is available.
-# Firmware versions listed may not necessarily reflect the latest on Corsair's site; new versions will not be added until ckb-next has been tested with them.
-# ckb-next does NOT read this file when flashing firmware manually. It will allow you to load any valid FW blob (at your own risk).
-#
-# -------->>>>>> for Scimitar is a 2.4 available, for Strafe 2.05 !
-#
-# Note: M65PRORGB is not yet used, and is added for reference only.
-#
+# WARNING: This firmware table is a stub, and is only used to tell old GUIs to update to a newer version.
+# Newer versions read the FIRMWARE8 table, located at the root of the repository, instead of this one.
 !BEGIN FW ENTRIES
 
 # Vendor  Model             FW   URL                                                        Min.ckb File Name                       SHA256
-  Corsair K70RGB            2.05    https://www3.corsair.com/software/HID/K70RGB.zip           0.2.7   K70RGB_APP_V205.bin             3e43bdcc5077dc413fbdee7ff6e57a978f758599142eef6979a96e3b8c3a566a
-  Corsair K70LUX            2.04    https://www3.corsair.com/software/HID/K70LUX.zip           0.2.7   K70LUX_APP_V204.bin             c2b5411e1dce391788eca294563801b32a14bf7802eb29688213f8f07e112966
-  Corsair K70LUXRGB         2.05    https://www3.corsair.com/software/HID/K70LUXRGB.zip        0.2.7   K70LUX_APP_V205.bin             a1a0a4b2f74890eb708435b21ab197a301ea668269bca895f89f7301c354e83d
-  Corsair K70RFIRE          2.05    https://www3.corsair.com/software/HID/K70RAPIDFIRE.zip     0.2.7   K70RAPIDFIRE_APP_V205.bin       6b1d2bb962ffd987ce5eb25c46b02a9069c5f79ca05d7b2cc71c749fe9813536
-  Corsair K70RFIRERGB       2.05    https://www3.corsair.com/software/HID/K70RGBRAPIDFIRE.zip  0.2.7   K70RGBRAPIDFIRE_APP_V205.bin    a5962bd1d890f5061fcf242fa8d3ca806913f899f37585d4367420aaded25104
-  Corsair K95RGB            2.05    https://www3.corsair.com/software/HID/K95RGB.zip           0.2.7   K95RGB_APP_V205.bin             8d0680dd033d6020a53bc9bfa83e761143699d1122f1d0133e95ad3056d63a15
-  Corsair K95PLATINUMRGB    1.07    https://www3.corsair.com/software/HID/K95RGBPLATINUM.zip   0.2.7   FREYA_App_v1.07.123.bin         6d06b443cd85f4256d2b518b66b5c2d490d8089b678f9e34aecea97b13c5f5d4
-  Corsair STRAFE            2.04    https://www3.corsair.com/software/HID/STRAFE.zip           0.2.7   STRAFE_APP_V204.bin             51156ae7aa5b04405668582496cf28bbfb2e492accf93c65c3072aca9ef7ed65
-  Corsair STRAFERGB         2.05    https://www3.corsair.com/software/HID/STRAFERGB.zip        0.2.7   STRAFERGB_APP_V205.bin          dff16fec9a0ae0d33aad0482f9ea02e3e55e231706b8c4e7fb66820aba98adc5
-  Corsair M65RGB            2.04    https://www3.corsair.com/software/HID/M65RGB.zip           0.2.7   M65RGB_App_v204.bin             e1f09ce462f77071f91d92951410c14fb18061dd9760b3de89e45d1ca8b6b46c
-  Corsair M65PRORGB         2.06    https://www3.corsair.com/software/HID/M65PRORGB.zip        0.2.7   M65PRORGB_APP_V206.bin          7eb9d98c0cb2f36b64d6935e47642481f5d79b2d7806eb09da3acacc4276a111
-  Corsair SCIMITARRGB       2.04    https://www3.corsair.com/software/HID/Scimitar.zip         0.2.7   SCIMITAR_APP_V204.bin           c17dcf20748c423e7c1116c081f88f5945d703126c813153d3407e61c65007fe
+  Corsair K70RGB            2.05    https://www3.corsair.com/software/HID/K70RGB.zip           0.2.9   K70RGB_APP_V205.bin             3e43bdcc5077dc413fbdee7ff6e57a978f758599142eef6979a96e3b8c3a566a
+  Corsair K70LUX            2.04    https://www3.corsair.com/software/HID/K70LUX.zip           0.2.9   K70LUX_APP_V204.bin             c2b5411e1dce391788eca294563801b32a14bf7802eb29688213f8f07e112966
+  Corsair K70LUXRGB         2.05    https://www3.corsair.com/software/HID/K70LUXRGB.zip        0.2.9   K70LUX_APP_V205.bin             a1a0a4b2f74890eb708435b21ab197a301ea668269bca895f89f7301c354e83d
+  Corsair K70RFIRE          2.05    https://www3.corsair.com/software/HID/K70RAPIDFIRE.zip     0.2.9   K70RAPIDFIRE_APP_V205.bin       6b1d2bb962ffd987ce5eb25c46b02a9069c5f79ca05d7b2cc71c749fe9813536
+  Corsair K70RFIRERGB       2.05    https://www3.corsair.com/software/HID/K70RGBRAPIDFIRE.zip  0.2.9   K70RGBRAPIDFIRE_APP_V205.bin    a5962bd1d890f5061fcf242fa8d3ca806913f899f37585d4367420aaded25104
+  Corsair K95RGB            2.05    https://www3.corsair.com/software/HID/K95RGB.zip           0.2.9   K95RGB_APP_V205.bin             8d0680dd033d6020a53bc9bfa83e761143699d1122f1d0133e95ad3056d63a15
+  Corsair K95PLATINUMRGB    1.07    https://www3.corsair.com/software/HID/K95RGBPLATINUM.zip   0.2.9   FREYA_App_v1.07.123.bin         6d06b443cd85f4256d2b518b66b5c2d490d8089b678f9e34aecea97b13c5f5d4
+  Corsair STRAFE            2.04    https://www3.corsair.com/software/HID/STRAFE.zip           0.2.9   STRAFE_APP_V204.bin             51156ae7aa5b04405668582496cf28bbfb2e492accf93c65c3072aca9ef7ed65
+  Corsair STRAFERGB         2.05    https://www3.corsair.com/software/HID/STRAFERGB.zip        0.2.9   STRAFERGB_APP_V205.bin          dff16fec9a0ae0d33aad0482f9ea02e3e55e231706b8c4e7fb66820aba98adc5
+  Corsair M65RGB            2.04    https://www3.corsair.com/software/HID/M65RGB.zip           0.2.9   M65RGB_App_v204.bin             e1f09ce462f77071f91d92951410c14fb18061dd9760b3de89e45d1ca8b6b46c
+  Corsair M65PRORGB         2.06    https://www3.corsair.com/software/HID/M65PRORGB.zip        0.2.9   M65PRORGB_APP_V206.bin          7eb9d98c0cb2f36b64d6935e47642481f5d79b2d7806eb09da3acacc4276a111
+  Corsair SCIMITARRGB       2.04    https://www3.corsair.com/software/HID/Scimitar.zip         0.2.9   SCIMITAR_APP_V204.bin           c17dcf20748c423e7c1116c081f88f5945d703126c813153d3407e61c65007fe
 
 !END FW ENTRIES
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJaBDGOAAoJEN/iSOvc7y9fsw8IAJpY2FPbGg/Jd9q4Lcnoa1Xj
-eP2x6Oeqkq8PnMR3Oqrn/6kiV5K4mPBfoyZrDH9ZihJBZzw3DwCP3ahVjYiAMvdX
-xnnJI0QBOrJbynLBLnMcM7gJYST1+eRWH4K0RN4PXuDcDjomzAVs0ptVwDGGlFBb
-UnbsoWH6OqEjUMm1YQE4pCfUHeBb8i8f0KJwF6sVvon6NxGJ53ODGsHzqkOrWKPK
-4mLkwZSNkU1TKHSXedPDqm1Rv1l2ffh+9enkrQsL0f2/5UJlLwM7s+SdeF842kSj
-YkOE627yD/VVONoEgtRZJu9XdsJRoRTRd0EubbhIF/JqGJtqgnZJCpBxmRsCSgM=
-=O8gI
+iQEcBAEBCAAGBQJaHq5mAAoJEN/iSOvc7y9fviMH/25Iw/ezUq8dfzAQ2oQoB+4o
+wENjAnvKD7kA8maYxvzXy3Xv0pNMUiBjjdvPSqo3VLMqRIJYgd7pNVtyZENjiq6K
+74wwh+oDwgHG6PvPaEOe1KnYz7evMZyrEew6+4N5lXDtT8dnBf1UEl+eCh68KTWL
+0wybPSS7YIE2QIB9SCWeU5cOpq9oImuUD7bAhfuzMLycy7IISTyHbV/z9a6MF8PO
+ASqUYxI6VSeLw9FLFiuXvwrLh9H2j773dNdwHXf8rHH2yjNpRMnS8y/JGpodsOjO
+HTHLjpdMhRAeBM+8vX13X0mMWJM2riNgBGPg/iyibEZPD4E+Twj083hiAauJlh0=
+=e1xj
 -----END PGP SIGNATURE-----

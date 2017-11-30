@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <cstdlib>
+#include <QFileInfo>
 #include <QSharedMemory>
 #include <QShortcut>
 #include <QMessageBox>
@@ -11,6 +12,7 @@
 #include <unistd.h>
 
 extern QSharedMemory appShare;
+extern QString devpath;
 
 static const QString configLabel = "Settings";
 
@@ -107,6 +109,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
     settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
+
+    // check, whether daemon is running
+    // this is done by checking, whether the root device path contains a
+    // readable file "<path>/pid", which is not the case, if the daemon hasn't
+    // started already
+    QFileInfo pid_file_info(devpath + "/pid");
+    bool daemon_running = pid_file_info.exists() && pid_file_info.isFile() &&
+        pid_file_info.isReadable();
+    if (!daemon_running) {
+        settingsWidget->setStatus("Daemon is not running!");
+        // TODO: open dialog to tell the user to start the daemon based on OS
+        //       and how and how to enable etc.
+    }
 }
 
 void MainWindow::toggleTrayIcon(bool visible) {

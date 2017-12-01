@@ -111,14 +111,13 @@ MainWindow::MainWindow(QWidget *parent) :
     settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
 
     // check, whether daemon is running
-    // this is done by checking, whether the root device path contains a
-    // readable file "<path>/pid", which is not the case, if the daemon hasn't
-    // started already
-    QFileInfo pid_file_info(devpath + "/pid");
-    bool daemon_running = pid_file_info.exists() && pid_file_info.isFile() &&
-        pid_file_info.isReadable();
-    if (!daemon_running) {
-        settingsWidget->setStatus("Daemon is not running!");
+    // the daemon creates the root device path on initialization and thus it
+    // can be assumed, that the daemon is not running if doesn't exist
+    // `.arg(0)` is necessary to interpolate the correct suffix into the path
+    // see `./kbmanager.cpp` for details
+    QFileInfo rootDevPath(devpath.arg(0));
+    if (!rootDevPath.exists()) {
+        settingsWidget->setStatus("The ckb-next daemon is not running!");
         // TODO: open dialog to tell the user to start the daemon based on OS
         //       and how and how to enable etc.
     }

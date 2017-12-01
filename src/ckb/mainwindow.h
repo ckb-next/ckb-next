@@ -8,6 +8,7 @@
 #include <QTimer>
 #include "kbwidget.h"
 #include "settingswidget.h"
+#include "daemondialog.h"
 
 #ifdef USE_LIBAPPINDICATOR
 #define signals_BACKUP signals
@@ -42,6 +43,8 @@ private:
 
     QAction* restoreAction;
     QAction* closeAction;
+
+    DaemonDialog* dialog;
 
 #ifdef USE_LIBAPPINDICATOR
     bool                unityDesktop;

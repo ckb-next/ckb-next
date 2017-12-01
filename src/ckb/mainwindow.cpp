@@ -16,6 +16,14 @@ extern QString devpath;
 
 static const QString configLabel = "Settings";
 
+#ifndef Q_OS_MACX
+QString cmdMsgEnable = "sudo systemctl enable ckb-daemon";
+QString cmdMsgStart = "sudo systemctl start ckb-daemon";
+#else
+QString cmdMsgEnable = "sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist";
+QString cmdMsgStart = "sudo launchctl start com.ckb.daemon";
+#endif
+
 MainWindow* MainWindow::mainWindow = 0;
 
 #ifdef USE_LIBAPPINDICATOR
@@ -110,6 +118,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
     settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
 
+    // create deamon dialog unconditionally to be able to remove it safely in
+    // this classes destructor
+    dialog = new DaemonDialog(this, cmdMsgStart, cmdMsgEnable);
+
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it
     // can be assumed, that the daemon is not running if doesn't exist
@@ -118,8 +130,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QFileInfo rootDevPath(devpath.arg(0));
     if (!rootDevPath.exists()) {
         settingsWidget->setStatus("The ckb-next daemon is not running!");
-        // TODO: open dialog to tell the user to start the daemon based on OS
-        //       and how and how to enable etc.
+        // open dialog to tell the user to start the daemon based on OS and how
+        // and how to enable etc.
+        dialog->show();
     }
 }
 
@@ -316,5 +329,6 @@ void MainWindow::cleanup(){
 
 MainWindow::~MainWindow(){
     cleanup();
+    delete dialog;
     delete ui;
 }

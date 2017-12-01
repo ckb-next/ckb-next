@@ -795,9 +795,11 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
             (input <= 1 && output == 64)))      // FW >= 2.00 (Scimitar)
         handle_idx = 2;
     // Handle 0 is for BIOS mode input (RGB) or non-RGB key input
-    else if(output <= 1 && feature <= 1 &&
-            (input == 8 ||                      // Keyboards
-             input == 7))                       // Mice
+    else if((output <= 1 && feature <= 1 &&
+                (input == 8 ||                  // Keyboards
+                 input == 7)) ||                // Mice
+            (input == 64 && output == 2 &&      // FWv3
+                feature == 1))
         handle_idx = 0;
     // Handle 1 is for standard HID input (RGB) or media keys (non-RGB)
     else if(output <= 1 && feature <= 1 &&

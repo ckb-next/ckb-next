@@ -64,7 +64,7 @@ extern const key keymap[N_KEYS_EXTENDED];
 // Translates input from HID to a ckb input bitfield.
 // Use positive endpoint for non-RGB keyboards, negative endpoint for RGB
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput);
-void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput);
+void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput, ushort fwversion);
 
 // Copies input from Corsair reports
 void corsair_kbcopy(unsigned char* kbinput, int endpoint, const unsigned char* urbinput);

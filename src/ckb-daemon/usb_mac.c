@@ -783,7 +783,9 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     long input = hidgetlong(handle, CFSTR(kIOHIDMaxInputReportSizeKey));
     long output = hidgetlong(handle, CFSTR(kIOHIDMaxOutputReportSizeKey));
     long feature = hidgetlong(handle, CFSTR(kIOHIDMaxFeatureReportSizeKey));
+    long fwversion = hidgetlong(handle, CFSTR(kIOHIDVersionNumberKey));
     int handle_idx;
+
     // Handle 3 is for controlling the device (only exists for RGB)
     if(feature == 64)
         handle_idx = 3;
@@ -798,7 +800,9 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     else if((output <= 1 && feature <= 1 &&
                 (input == 8 ||                  // Keyboards
                  input == 7)) ||                // Mice
-            (input == 64 && output == 2 &&      // FWv3
+            (fwversion >= 0x300 &&              // FWv3 hack
+                input == 64 &&
+                output <= 2 &&
                 feature == 1))
         handle_idx = 0;
     // Handle 1 is for standard HID input (RGB) or media keys (non-RGB)

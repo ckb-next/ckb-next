@@ -121,6 +121,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // create deamon dialog unconditionally to be able to remove it safely in
     // this classes destructor
     dialog = new DaemonDialog(this, cmdMsgStart, cmdMsgEnable);
+    // Make the dialog unskippable
+    dialog->setModal(true);
 
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it

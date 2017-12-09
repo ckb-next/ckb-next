@@ -10,6 +10,8 @@ if [[ "$QMAKE" != "" ]]; then
     exit $?
 fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
+    export QMAKE_MACOSX_DEPLOYMENT_TARGET=10.10
+
     # OSX: Look for qmake in standard install locations
     QMAKE=`find ~/Qt/*/clang_64/bin ~/Qt5*/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin ~/Applications/Qt5*/*/clang_64/bin /Applications/Qt/*/clang_64/bin /Applications/Qt5*/*/clang_64/bin /usr/local/opt/qt5/bin -name qmake -print -quit 2>/dev/null`
     [[ $QMAKE == "" ]] && die

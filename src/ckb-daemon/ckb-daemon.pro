@@ -14,10 +14,10 @@ macx {
 }
 
 QMAKE_CFLAGS  += -std=gnu11 -Wall -Wextra -fsigned-char
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 
 # Minimal build - remove Qt defaults
-CONFIG   = debug_and_release
+CONFIG   += debug_and_release
+CONFIG   -= app_bundle
 QT       =
 
 CKB_VERSION_STR = `cat $$PWD/../../VERSION | tr -d '\n'`

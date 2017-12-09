@@ -5,7 +5,7 @@
     <key>CFBundleExecutable</key>
     <string>ckb</string>
     <key>CFBundleIconFile</key>
-    <string>ckb-logo.icns</string>
+    <string>@ICON@</string>
     <key>CFBundleName</key>
     <string>ckb</string>
     <key>LSUIElement</key>

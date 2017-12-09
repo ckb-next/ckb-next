@@ -70,25 +70,6 @@ if [ -d "/usr/bin/ckb-animations" ]; then
     echo "Done"
 fi
 
-# Workaround unknown qmake bug on macOS at configuration stage which happens at generation stage
-# Assumes Homebrew is installed
-# Assumes 'qt' package by 'brew' command is installed
-# TODO: track down the version where the bug is not triggered and do not apply for older versions
-# TODO: try shooting yourself in the head with BSD utils to dynamically resolve /usr/local/opt/qt
-echo "Applying required qmake workaround"
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    if [[ ! -d "/usr/local/Cellar/qt/5.9.1" ]]; then
-        echo "Error: Cannot apply the workaround. The script assumes Homebrew is installed \
-        and the 'qt' package is installed using it (version 5.9.1). \
-        If you have installed the official Qt package, edit this script and provide proper paths \
-        or install Qt with Homebrew."
-        finish 101
-    fi
-    sed -i '' "s/version_min_flag = -m\$\${version_identifier}-version-min=\$\$deployment_target/\
-    version_min_flag = -m\$\${version_identifier}-version-min=10\.10/" \
-    /usr/local/Cellar/qt/5.9.1/mkspecs/features/mac/default_post.prf
-fi
-
 if [[ -d $SRCDIR ]]; then
     echo "Preparing build files..."
     # Clean up first
@@ -117,14 +98,6 @@ if [[ ! -d $BINDIR ]]; then
     # No binaries and no source ($SRCDIR branch will surely create $BINDIR or die trying)
     echo "There is nothing to do."
     finish 0
-fi
-
-# "Unapply" the workaround
-echo "Unapplying qmake workaround"
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    sed -i '' "s/version_min_flag = -m\$\${version_identifier}-version-min=10\.10/\
-    version_min_flag = -m\$\${version_identifier}-version-min=\$\$deployment_target/" \
-    /usr/local/Cellar/qt/5.9.1/mkspecs/features/mac/default_post.prf
 fi
 
 # Offer to install ckb at a standard location

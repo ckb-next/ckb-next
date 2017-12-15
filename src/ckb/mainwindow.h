@@ -57,6 +57,7 @@ private:
     QSystemTrayIcon*    trayIcon;
 
     void closeEvent(QCloseEvent *event);
+    void handleFlatDisplay();
 
 public slots:
     void showWindow();

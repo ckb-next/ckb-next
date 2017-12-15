@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <cstdlib>
+#include <QDesktopWidget>
 #include <QFileInfo>
 #include <QSharedMemory>
 #include <QShortcut>
@@ -117,6 +118,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
     settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
+
+    // resize window to fit into flat displays
+    this->handleFlatDisplay();
 
     // create deamon dialog unconditionally to be able to remove it safely in
     // this classes destructor
@@ -333,4 +337,29 @@ MainWindow::~MainWindow(){
     cleanup();
     delete dialog;
     delete ui;
+}
+
+///
+/// \brief handleFlatDisplay resize window to available space
+///
+/// check, what is smaller: (virtual) 720px, the size of the main window
+///                         or the available screen height
+///
+/// use this value to set the minimum height of the application
+/// also resize to fit into the available space (height && width)
+///
+void MainWindow::handleFlatDisplay(){
+    // get available size of currently used screen, as well as the size
+    // currently in use by the main window
+    QRect screenSize = qApp->desktop()->availableGeometry(this);
+    QSize frameSize = this->frameSize();
+
+    // determine the lower of the two (screen/app)
+    int minHeight = qMin(screenSize.height(), frameSize.height());
+    int minWidth = qMin(screenSize.width(), frameSize.width());
+
+    // set the minimum height to either 720px or the lower value and
+    // resize the window to fit into the screen
+    this->setMinimumHeight(qMin(minHeight, 720));
+    this->resize(minWidth, minHeight);
 }

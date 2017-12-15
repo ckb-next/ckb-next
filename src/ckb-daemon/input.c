@@ -178,7 +178,7 @@ static void inputupdate_keys(usbdevice* kb){
             int keyindex = byte * 8 + bit;
             if(keyindex >= N_KEYS_INPUT)
                 break;
-            const key* map = keymap + keyindex;
+            const key* map = kb->keymap + keyindex;
             int scancode = (kb->active) ? bind->base[keyindex] : map->scan;
             char mask = 1 << bit;
             char old = oldb & mask, new = newb & mask;
@@ -289,9 +289,9 @@ void updateindicators_kb(usbdevice* kb, int force){
     }
 }
 
-void initbind(binding* bind){
+void initbind(binding* bind, usbdevice* kb){
     for(int i = 0; i < N_KEYS_INPUT; i++)
-        bind->base[i] = keymap[i].scan;
+        bind->base[i] = kb->keymap[i].scan;
     bind->macros = calloc(32, sizeof(keymacro));
     bind->macrocap = 32;
     bind->macrocount = 0;
@@ -319,9 +319,9 @@ void cmd_bind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char*
     }
     // If not numeric, look it up
     for(int i = 0; i < N_KEYS_INPUT; i++){
-        if(keymap[i].name && !strcmp(to, keymap[i].name)){
+        if(kb->keymap[i].name && !strcmp(to, kb->keymap[i].name)){
             pthread_mutex_lock(imutex(kb));
-            mode->bind.base[keyindex] = keymap[i].scan;
+            mode->bind.base[keyindex] = kb->keymap[i].scan;
             pthread_mutex_unlock(imutex(kb));
             return;
         }
@@ -346,11 +346,11 @@ void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const cha
     if(keyindex >= N_KEYS_INPUT)
         return;
     pthread_mutex_lock(imutex(kb));
-    mode->bind.base[keyindex] = keymap[keyindex].scan;
+    mode->bind.base[keyindex] = kb->keymap[keyindex].scan;
     pthread_mutex_unlock(imutex(kb));
 }
 
-static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
+static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, usbdevice* kb){
     binding* bind = &mode->bind;
     if(!keys && !assignment){
         // Null strings = "macro clear" -> erase the whole thing
@@ -379,7 +379,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
         } else {
             // Find this key in the keymap
             for(unsigned i = 0; i < N_KEYS_INPUT; i++){
-                if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
+                if(kb->keymap[i].name && !strcmp(keyname, kb->keymap[i].name)){
                     macro.combo[i / 8] |= 1 << (i % 8);
                     empty = 0;
                     break;
@@ -426,15 +426,15 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment){
             if((sscanf(keyname + 1, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)
                       || (sscanf(keyname + 1, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)){
                 // Set a key numerically
-                macro.actions[macro.actioncount].scan = keymap[keycode].scan;
+                macro.actions[macro.actioncount].scan = kb->keymap[keycode].scan;
                 macro.actions[macro.actioncount].down = down;
                 macro.actions[macro.actioncount].delay = delay;
                 macro.actioncount++;
             } else {
                 // Find this key in the keymap
                 for(unsigned i = 0; i < N_KEYS_INPUT; i++){
-                    if(keymap[i].name && !strcmp(keyname + 1, keymap[i].name)){
-                        macro.actions[macro.actioncount].scan = keymap[i].scan;
+                    if(kb->keymap[i].name && !strcmp(keyname + 1, kb->keymap[i].name)){
+                        macro.actions[macro.actioncount].scan = kb->keymap[i].scan;
                         macro.actions[macro.actioncount].down = down;
                         macro.actions[macro.actioncount].delay = delay;
                         macro.actioncount++;
@@ -476,6 +476,6 @@ void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char*
     (void)notifynumber;
 
     pthread_mutex_lock(imutex(kb));
-    _cmd_macro(mode, keys, assignment);
+    _cmd_macro(mode, keys, assignment, kb);
     pthread_mutex_unlock(imutex(kb));
 }

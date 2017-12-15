@@ -2,7 +2,7 @@
 #include "includes.h"
 #include "keymap.h"
 
-const key keymap[N_KEYS_EXTENDED] = {
+key keymap[N_KEYS_EXTENDED] = {
     // Keyboard keys
     { "esc",        0x00, KEY_ESC },
     { "f1",         0x0c, KEY_F1 },

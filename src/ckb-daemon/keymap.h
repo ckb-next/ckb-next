@@ -59,7 +59,7 @@ typedef struct {
 
 // List of keys, ordered according to where they appear in the keyboard input.
 // Begins with keyboard keys, followed by extra keys, then mouse buttons, and finally LED zones
-extern const key keymap[N_KEYS_EXTENDED];
+extern key keymap[N_KEYS_EXTENDED];
 
 // Translates input from HID to a ckb input bitfield.
 // Use positive endpoint for non-RGB keyboards, negative endpoint for RGB

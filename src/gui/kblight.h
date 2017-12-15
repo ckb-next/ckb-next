@@ -90,10 +90,10 @@ private:
     KbAnim*         _previewAnim;
     KeyMap          _map;
     QColorMap       _qColorMap;
-    ColorMap        _colorMap, _animMap, _indicatorMap;
+    ColorMap        _colorMap, _animMap, _lastFrameAnimMap, _indicatorMap, _lastFrameIndicatorMap;
     QSet<QString>   _indicatorList;
     quint64         lastFrameSignal;
-    int             _dimming;
+    int             _dimming, _lastFrameDimming;
     bool            _start;
     bool            _needsSave, _needsMapRefresh;
 

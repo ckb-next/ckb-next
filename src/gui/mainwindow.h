@@ -9,6 +9,7 @@
 #include <QTimer>
 #include "kbwidget.h"
 #include "settingswidget.h"
+#include "daemondialog.h"
 
 // 'signals' has to be undefined as GTK has its own signal mechanism
 #undef signals
@@ -39,6 +40,9 @@ private:
     QAction* restoreAction;
     QAction* closeAction;
 
+    DaemonDialog* dialog;
+
+#ifdef USE_LIBAPPINDICATOR
     bool                unityDesktop;
     AppIndicator*       indicator;
     GtkWidget*          indicatorMenu;

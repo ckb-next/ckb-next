@@ -51,14 +51,19 @@ public:
     enum Model {
         NO_MODEL = -1,
         // Keyboard models
+        K63,
         K65,
+        K68,
         K70,
         K95,
+        K95P,
         STRAFE,
         // Mouse models
         M65,
         SABRE,
         SCIMITAR,
+        HARPOON,
+        GLAIVE,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)
@@ -74,8 +79,10 @@ public:
         FR,                 // French
         DE,                 // German
         IT,                 // Italian
+        JP,                 // Japanese
         NO,                 // Norwegian
         PL,                 // Polish (identical to US)
+        PT_BR,              // Portuguese (Brazil)
         MX,                 // Spanish (Mexico/Latin America)
         ES,                 // Spanish (Spain)
         SE,                 // Swedish
@@ -86,13 +93,22 @@ public:
     // ISO (105-key) or ANSI (104-key)?
     inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK && layout != PL; }
     inline bool         isISO() const           { return isISO(keyLayout); }
+
+    // JP (106-key)?
+    inline static bool  isJP(Layout layout)    { return layout == JP; }
+    inline bool         isJP() const           { return isJP(keyLayout); }
+
+    // PT_BR?
+    inline static bool  isPTBR(Layout layout)    { return layout == PT_BR; }
+    inline bool         isPTBR() const           { return isPTBR(keyLayout); }
+
     // Auto-detects layout from system locale
     static Layout       locale();
 
     // Keyboard or mouse?
     inline static bool  isKeyboard(Model model) { return !isMouse(model) && model != NO_MODEL; }
     inline bool         isKeyboard() const      { return isKeyboard(keyModel); }
-    inline static bool  isMouse(Model model)    { return model == M65 || model == SABRE || model == SCIMITAR; }
+    inline static bool  isMouse(Model model)    { return model == M65 || model == SABRE || model == SCIMITAR || model == HARPOON || model == GLAIVE; }
     inline bool         isMouse() const         { return isMouse(keyModel); }
 
     // Creates a blank key map

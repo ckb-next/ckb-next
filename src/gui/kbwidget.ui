@@ -242,7 +242,7 @@
           </size>
          </property>
          <property name="text">
-          <string>USB device ID:</string>
+          <string>Serial Number:</string>
          </property>
         </widget>
        </item>

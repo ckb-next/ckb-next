@@ -19,13 +19,17 @@
 ///
 /// Block No. | contains | Devices are bundled via
 /// --------- | -------- | -----------------------
-/// 1 | The first block contains the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
-/// 2 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
-/// 3 | the K95 series keyboards | collected with the macro IS_K95().
-/// 4 | strafe keyboards | IS_STRAFE()
-/// 5 | M65 mice with and without RGB | IS_M65()
-/// 6 | The SABRE and HARPOON mice.\n Maybe this will be divided int two different blocks later because of different nummber of special keys | IS_SABRE()
-/// 7 | The Scimitar mouse devices | IS_SCIMITAR()
+/// 1 | The first block contains the K63 Non RGB Keyboard. No other K63 is known so far.
+/// 2 | the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
+/// 3 | K68 keyboard | IS_K68().
+/// 4 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
+/// 5 | the K95 series keyboards | collected with the macro IS_K95().
+/// 6 | strafe keyboards | IS_STRAFE()
+/// 7 | M65 mice with and without RGB | IS_M65()
+/// 8 | Sabre mice | IS_SABRE()
+/// 9 | Scimitar mice | IS_SCIMITAR()
+/// 10| Harpoon mice | IS_HARPOON()
+/// 11| Glaive mice | IS_GLAIVE()
 ///
 
 /// \brief For the following Defines please see "Detailed Description"
@@ -38,6 +42,10 @@
 #define V_CORSAIR       0x1b1c
 #define V_CORSAIR_STR   "1b1c"
 
+#define P_K63_NRGB      0x1b40
+#define P_K63_NRGB_STR  "1b40"
+#define IS_K63(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K63_NRGB)
+
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"
 #define P_K65_NRGB      0x1b07
@@ -47,6 +55,10 @@
 #define P_K65_RFIRE     0x1b39
 #define P_K65_RFIRE_STR "1b39"
 #define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_NRGB || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
+
+#define P_K68           0x1b3f
+#define P_K68_STR       "1b3f"
+#define IS_K68(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K68)
 
 #define P_K70                0x1b13
 #define P_K70_STR            "1b13"
@@ -74,7 +86,9 @@
 #define P_STRAFE_STR        "1b20"
 #define P_STRAFE_NRGB       0x1b15
 #define P_STRAFE_NRGB_STR   "1b15"
-#define IS_STRAFE(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB))
+#define P_STRAFE_NRGB_2     0x1b44
+#define P_STRAFE_NRGB_2_STR "1b44"
+#define IS_STRAFE(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2))
 
 #define P_M65           0x1b12
 #define P_M65_STR       "1b12"
@@ -97,6 +111,14 @@
 #define P_SCIMITAR_PRO      0x1b3e
 #define P_SCIMITAR_PRO_STR  "1b3e"
 #define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
+
+#define P_HARPOON          0x1b3c
+#define P_HARPOON_STR      "1b3c"
+#define IS_HARPOON(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_HARPOON)
+
+#define P_GLAIVE          0x1b34
+#define P_GLAIVE_STR      "1b34"
+#define IS_GLAIVE(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
 
 ///
 /// uncomment to see USB packets sent to the device
@@ -126,7 +148,7 @@ const char* product_str(short product);
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
 /// Change this if new \b monochrome devices are added
-#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && (product) == (P_STRAFE_NRGB))
+#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K68) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_RGB() is returned.
 #define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
@@ -138,11 +160,16 @@ const char* product_str(short product);
 #define IS_FULLRANGE(kb)                (IS_RGB((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
+/// Used to apply quirks and features to the PLATINUM devices.
+#define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
+
+/// Used when a device has a firmware with a low version number that uses the new protocol
+#define IS_V2_OVERRIDE(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

@@ -24,6 +24,22 @@ const ColorMap& ColorMap::operator=(const ColorMap& rhs){
     return rhs;
 }
 
+bool ColorMap::operator==(const ColorMap& rhs) const{
+    if(_count != rhs._count)
+        return false;
+
+    // Compare just the pointers because key names are sorted and the strings are constants.
+    if(memcmp(_keyNames, rhs._keyNames, sizeof(const char*) * _count) != 0)
+        return false;
+
+    for(int x = 0;x < _count;x++){
+        if(_colors[x] != rhs._colors[x])
+            return false;
+    }
+
+    return true;
+}
+
 void ColorMap::alloc(int newCount){
     if(newCount > _mapCount){
         // ^ map never shrinks, only expands

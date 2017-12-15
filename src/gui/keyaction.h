@@ -24,7 +24,7 @@ public:
     // No action
     static inline QString   noAction()    { return ""; }
     // Default action (usually the same as the key name, but not always)
-    static QString          defaultAction(const QString& key);
+    static QString          defaultAction(const QString& key, KeyMap::Model model);
 
     // Friendly action name
     QString friendlyName(const KeyMap& map) const;
@@ -123,6 +123,7 @@ public:
     const static int MODE_PREV_WRAP = -4, MODE_NEXT_WRAP = -3;
     static QString  modeAction(int mode);
     // DPI action. 0 for sniper, 1 for first DPI, etc
+    const static int DPI_CYCLE_UP = -4, DPI_CYCLE_DOWN = -3;
     const static int DPI_UP = -2, DPI_DOWN = -1;
     const static int DPI_SNIPER = 0, DPI_CUSTOM = 6;
     static QString  dpiAction(int level, int customX = 0, int customY = 0);

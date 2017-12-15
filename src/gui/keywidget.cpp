@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -133,6 +133,18 @@ void KeyWidget::paintEvent(QPaintEvent*){
             overlay = scimOverlay;
             xpos = 3.5f;
             ypos = -2.f;
+        } else if(model == KeyMap::HARPOON){
+            if(!harpOverlay)
+                harpOverlay = new QImage(":/img/overlay_harpoon.png");
+            overlay = harpOverlay;
+            xpos = 3.5f;
+            ypos = -2.f;
+        } else if(model == KeyMap::GLAIVE){
+            if(!glaiveOverlay)
+                glaiveOverlay = new QImage(":/img/overlay_glaive.png");
+            overlay = glaiveOverlay;
+            xpos = 3.5f;
+            ypos = -2.f;
         }
         if(overlay){
             painter.setBrush(palette().brush(QPalette::Window));
@@ -209,9 +221,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     bgPainter.setOpacity(0.7);
             }
         }
-        if(model != KeyMap::STRAFE && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+        if((model != KeyMap::STRAFE && model != KeyMap::K95P) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
-            // Switch keys are circular except for Strafe. All Strafe keys are square
+            // Not all devices have circular buttons
             x += w / 8.f;
             y += h / 8.f;
             w *= 0.75f;
@@ -387,7 +399,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             }
             // Pick color based on key function
             QString bind = _bindMap.value(key.name);
-            QString def = KbBind::defaultAction(key.name);
+            QString def = KbBind::defaultAction(key.name, model);
             if(bind.isEmpty())
                 // Unbound - red
                 decPainter.setPen(QColor(255, 136, 136));

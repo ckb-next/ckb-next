@@ -36,7 +36,7 @@ int features_mask = -1;
 
 /// brief .
 ///
-/// vendor_str returns "corsair" iff the given \a vendor argument is equal to \a V_CORSAIR \c (0x1bc)
+/// vendor_str returns "corsair" if the given \a vendor argument is equal to \a V_CORSAIR \c (0x1bc)
 /// else it returns ""
 ///
 /// \attention There is also a string defined V_CORSAIR_STR, which returns the device number as string in hex "1b1c".
@@ -68,13 +68,19 @@ const char* vendor_str(short vendor){
 /// product_str() needs the \a product \a ID
 ///
 const char* product_str(short product){
-    if(product == P_K95 || product == P_K95_NRGB || product == P_K95_PLATINUM)
+    if(product == P_K95 || product == P_K95_NRGB)
         return "k95";
+    if(product == P_K95_PLATINUM)
+        return "k95p";
     if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
+    if(product == P_K68)
+        return "k68";
     if(product == P_K65 || product == P_K65_NRGB || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";
-    if(product == P_STRAFE || product == P_STRAFE_NRGB)
+    if(product == P_K63_NRGB)
+        return "k63";
+    if(product == P_STRAFE || product == P_STRAFE_NRGB || product == P_STRAFE_NRGB_2)
         return "strafe";
     if(product == P_M65 || product == P_M65_PRO)
         return "m65";
@@ -82,6 +88,10 @@ const char* product_str(short product){
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)
         return "scimitar";
+    if(product == P_HARPOON)
+        return "harpoon";
+    if(product == P_GLAIVE)
+        return "glaive";
     return "";
 }
 

@@ -24,7 +24,7 @@
 #define N_KEYS_HW               152
 #define N_KEYBYTES_HW           ((N_KEYS_HW + 7) / 8)
 // Light zones (have LED codes but don't generate input)
-#define N_KEY_ZONES             3       // two strafe side lights (although really they are tied into one control) + logo backlight
+#define N_KEY_ZONES             22      // two strafe side lights (although really they are tied into one control) + logo backlight + Platinum top bar
 // Additional keys recognized by the driver but may not be present on keyboard
 #define N_KEYS_EXTRA            12
 // Mouse buttons
@@ -37,8 +37,8 @@
 #define N_KEYBYTES_INPUT        ((N_KEYS_INPUT + 7) / 8)
 // Mouse zones
 #define LED_MOUSE               N_KEYS_HW
-#define N_MOUSE_ZONES           5
-#define N_MOUSE_ZONES_EXTENDED  11
+#define N_MOUSE_ZONES           6
+#define N_MOUSE_ZONES_EXTENDED  12
 // Index of DPI light
 #define LED_DPI                 (LED_MOUSE + 2)
 // Total number of keys recognized by software
@@ -64,7 +64,7 @@ extern const key keymap[N_KEYS_EXTENDED];
 // Translates input from HID to a ckb input bitfield.
 // Use positive endpoint for non-RGB keyboards, negative endpoint for RGB
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput);
-void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput);
+void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput, ushort fwversion);
 
 // Copies input from Corsair reports
 void corsair_kbcopy(unsigned char* kbinput, int endpoint, const unsigned char* urbinput);

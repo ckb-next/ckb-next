@@ -70,7 +70,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { "space",      0x35, KEY_SPACE },
     { 0,            -1,   KEY_NONE },
-    { 0,            -1,   KEY_NONE },
+    { "katahira",   0x4d, KEY_KATAKANAHIRAGANA },
     { "ralt",       0x59, KEY_RIGHTALT },
     { "rwin",       0x65, KEY_RIGHTMETA },
     { "rmenu",      0x71, KEY_COMPOSE },
@@ -87,9 +87,9 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "bslash",     0x66, KEY_BACKSLASH },
     { "hash",       0x72, KEY_BACKSLASH_ISO },
     { "enter",      0x7e, KEY_ENTER },
-    { 0,            -1,   KEY_NONE },
+    { "ro",         0x8a, KEY_RO },
     { "equal",      0x07, KEY_EQUAL },
-    { 0,            -1,   KEY_NONE },
+    { "yen",        0x13, KEY_YEN },
     { "bspace",     0x1f, KEY_BACKSPACE },
     { "del",        0x2b, KEY_DELETE },
     { "end",        0x37, KEY_END },
@@ -148,14 +148,35 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "g16",        0x77, KEY_CORSAIR },
     { "g17",        0x83, KEY_CORSAIR },
     { "g18",        0x8f, KEY_CORSAIR },
-    { 0,            -1,   KEY_NONE },
-    { 0,            -1,   KEY_NONE },
+    { "muhenkan",   0x29, KEY_MUHENKAN },
+    { "henkan",     0x41, KEY_HENKAN },
     { "fn",         0x65, KEY_FN },         // STRAFE Fn - rwin on other keyboards
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
+
+    // K95 Platinum
+    { "topbar1",      0x90, KEY_NONE },
+    { "topbar2",      0x91, KEY_NONE },
+    { "topbar3",      0x92, KEY_NONE },
+    { "topbar4",      0x9E, KEY_NONE },
+    { "topbar5",      0xA0, KEY_NONE },
+    { "topbar6",      0x93, KEY_NONE },
+    { "topbar7",      0x94, KEY_NONE },
+    { "topbar8",      0x95, KEY_NONE },
+    { "topbar9",      0x96, KEY_NONE },
+    { "topbar10",     0x97, KEY_NONE },
+    { "topbar11",     0x98, KEY_NONE },
+    { "topbar12",     0x99, KEY_NONE },
+    { "topbar13",     0x9A, KEY_NONE },
+    { "topbar14",     0x9B, KEY_NONE },
+    { "topbar15",     0x9F, KEY_NONE },
+    { "topbar16",     0xA2, KEY_NONE },
+    { "topbar17",     0xA1, KEY_NONE },
+    { "topbar18",     0x9C, KEY_NONE },
+    { "topbar19",     0x9D, KEY_NONE },
 
     // Strafe specific side leds, that are set via a special command
     { "lsidel",      -2, KEY_CORSAIR },
@@ -212,19 +233,22 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "dpi",        LED_MOUSE + 2, KEY_NONE },  // SW DPI light
     { "wheel",      LED_MOUSE + 3, KEY_NONE },
     { "thumb",      LED_MOUSE + 4, KEY_NONE },
-    { "dpi0",       LED_MOUSE + 5, KEY_NONE },  // HW DPI light levels (0 = sniper, 1..5 = modes)
-    { "dpi1",       LED_MOUSE + 6, KEY_NONE },
-    { "dpi2",       LED_MOUSE + 7, KEY_NONE },
-    { "dpi3",       LED_MOUSE + 8, KEY_NONE },
-    { "dpi4",       LED_MOUSE + 9, KEY_NONE },
-    { "dpi5",       LED_MOUSE + 10, KEY_NONE },
+    { "side",       LED_MOUSE + 5, KEY_NONE },
+    { "dpi0",       LED_MOUSE + 6, KEY_NONE },  // HW DPI light levels (0 = sniper, 1..5 = modes)
+    { "dpi1",       LED_MOUSE + 7, KEY_NONE },
+    { "dpi2",       LED_MOUSE + 8, KEY_NONE },
+    { "dpi3",       LED_MOUSE + 9, KEY_NONE },
+    { "dpi4",       LED_MOUSE + 10, KEY_NONE },
+    { "dpi5",       LED_MOUSE + 11, KEY_NONE },
+
 };
 
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput){
     if(length < 1)
         return;
     // LUT for HID -> Corsair scancodes (-1 for no scan code, -2 for currently unsupported)
-    // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with array indices and K95 keys added
+    // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with keymap array indices and K95 keys added
+    // Make sure the indices match the keyindex as passed to nprintkey() in notify.c
     static const short hid_codes[256] = {
         -1,  -1,  -1,  -1,  37,  54,  52,  39,  27,  40,  41,  42,  32,  43,  44,  45,
         56,  55,  33,  34,  25,  28,  38,  29,  31,  53,  26,  51,  30,  50,  13,  14,
@@ -234,7 +258,7 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
         93,  94,  92, 102, 103, 104, 105, 106, 107, 115, 116, 117, 112, 113, 114, 108,
        109, 110, 118, 119,  49,  69,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,
         -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  98,  -2,  -2,  -2,  -2,  -2,  -2,  97,
-       130, 131,  -1,  -1,  -1,  -2,  -1,  -2,  -2,  -2,  -2,  -2,  -2,  -1,  -1,  -1,
+       130, 131,  -1,  -1,  -1,  -2,  -1,  83,  66,  85, 145, 144,  -2,  -1,  -1,  -1,
         -2,  -2,  -2,  -2,  -2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
         -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
@@ -364,8 +388,9 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
 
 #define BUTTON_HID_COUNT    5
 
-void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput){
-    if((endpoint != 2 && endpoint != -2) || length < 10)
+void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput, ushort fwversion){
+    //The HID Input Endpoint on FWv3 is 64 bytes, so we can't check for length.
+    if((endpoint != 2 && endpoint != -2) || (fwversion < 0x300 && length < 10))
         return;
     // EP 2: mouse input
     if(urbinput[0] != 1)

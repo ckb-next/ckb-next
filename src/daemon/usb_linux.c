@@ -67,9 +67,10 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 ///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
-    if (kb->fwversion >= 0x120 && !is_recv) {
+    if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !is_recv){
         struct usbdevfs_bulktransfer transfer = {0};
-        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
+        // FW 2.XX uses 0x03, FW 3.XX uses 0x02
+        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : (kb->fwversion >= 0x300 ? 2 : 3);
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
@@ -212,7 +213,16 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 ///
 void os_sendindicators(usbdevice* kb) {
     static int countForReset = 0;
-    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, 1, 500, &kb->ileds };
+    void *ileds;
+    ushort leds;
+    if(kb->fwversion >= 0x300) {
+        leds = (kb->ileds << 8) | 0x0001;
+        ileds = &leds;
+    }
+    else {
+        ileds = &kb->ileds;
+    }
+    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, (kb->fwversion >= 0x300 ? 2 : 1), 500, ileds };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     if(res <= 0) {
         ckb_err("%s\n", res ? strerror(errno) : "No data written");
@@ -262,14 +272,14 @@ void* os_inputmain(void* context){
     ///
     /// device | detect with macro combination | endpoint # | buffer-length
     /// ------ | ----------------------------- | ---------- | -------------
-    /// each | none | 0 | 8
+    /// each | none | 0 | 8, 64 for FW v3
     /// RGB Mouse | IS_RGB && IS_MOUSE | 1 | 10
     /// RGB Keyboard | IS_RGB && !IS_MOUSE | 1 | 21
     /// RGB Mouse or Keyboard | IS_RGB | 2 | MSG_SIZE (64)
     /// non RGB Mouse or Keyboard | !IS_RGB | 1 | 4
     /// non RGB Mouse or Keyboard | !IS_RGB | 2 | 15
     ///
-    urbs[0].buffer_length = 8;
+    urbs[0].buffer_length = (kb->fwversion >= 0x300 ? MSG_SIZE : 8);
     if(urbcount > 1 && IS_RGB(vendor, product)) {
         if(IS_MOUSE(vendor, product))
             urbs[1].buffer_length = 10;
@@ -278,9 +288,9 @@ void* os_inputmain(void* context){
         urbs[2].buffer_length = MSG_SIZE;
         if(urbcount != 3)
             urbs[urbcount - 1].buffer_length = MSG_SIZE;
-    } else {
-        urbs[1].buffer_length = 4;
-        urbs[2].buffer_length = 15;
+    } else if(kb->fwversion < 0x300) {
+            urbs[1].buffer_length = 4;
+            urbs[2].buffer_length = 15;
     }
 
     /// Now submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).
@@ -330,17 +340,20 @@ void* os_inputmain(void* context){
             /// non RGB Keyboard | !IS_RGB && !IS_MOUSE | nA | nA | hid_kb_translate()
             ///
             pthread_mutex_lock(imutex(kb));
+            // EP workaround for FWv3
+            // Corsair input comes through 0x81, but case 1 in keymap.c is used for 6KRO
+            uchar urbendpoint = (kb->fwversion >= 0x300 ? 2 : (urb->endpoint & 0xF));
             if(IS_MOUSE(vendor, product)){
                 switch(urb->actual_length){
                 case 8:
                 case 10:
                 case 11:
                     // HID mouse input
-                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -(urb->endpoint & 0xF), urb->actual_length, urb->buffer);
+                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -urbendpoint, urb->actual_length, urb->buffer, kb->fwversion);
                     break;
                 case MSG_SIZE:
                     // Corsair mouse input
-                    corsair_mousecopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
+                    corsair_mousecopy(kb->input.keys, -urbendpoint, urb->buffer);
                     break;
                 }
             } else if(IS_RGB(vendor, product)){
@@ -357,7 +370,7 @@ void* os_inputmain(void* context){
                     break;
                 case MSG_SIZE:
                     // RGB EP 3: Corsair input
-                    corsair_kbcopy(kb->input.keys, -(urb->endpoint & 0xF), urb->buffer);
+                    corsair_kbcopy(kb->input.keys, -urbendpoint, urb->buffer);
                     break;
                 }
             } else {
@@ -654,10 +667,12 @@ typedef struct {
 /// and its usb device id as short must be entered in this array.
 static _model models[] = {
     // Keyboards
+    { P_K63_NRGB_STR, P_K63_NRGB },
     { P_K65_STR, P_K65 },
     { P_K65_NRGB_STR, P_K65_NRGB },
     { P_K65_LUX_STR, P_K65_LUX },
     { P_K65_RFIRE_STR, P_K65_RFIRE },
+    { P_K68_STR, P_K68 },
     { P_K70_STR, P_K70 },
     { P_K70_NRGB_STR, P_K70_NRGB },
     { P_K70_LUX_STR, P_K70_LUX },
@@ -669,15 +684,18 @@ static _model models[] = {
     { P_K95_PLATINUM_STR, P_K95_PLATINUM },
     { P_STRAFE_STR, P_STRAFE },
     { P_STRAFE_NRGB_STR, P_STRAFE_NRGB },
+    { P_STRAFE_NRGB_2_STR, P_STRAFE_NRGB_2 },
     // Mice
     { P_M65_STR, P_M65 },
     { P_M65_PRO_STR, P_M65_PRO },
+    { P_GLAIVE_STR, P_GLAIVE },
     { P_SABRE_O_STR, P_SABRE_O },
     { P_SABRE_L_STR, P_SABRE_L },
     { P_SABRE_N_STR, P_SABRE_N },
     { P_SCIMITAR_STR, P_SCIMITAR },
     { P_SCIMITAR_PRO_STR, P_SCIMITAR_PRO },
-    { P_SABRE_O2_STR, P_SABRE_O2 }
+    { P_SABRE_O2_STR, P_SABRE_O2 },
+    { P_HARPOON_STR, P_HARPOON }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

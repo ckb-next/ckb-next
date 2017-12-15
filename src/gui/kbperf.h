@@ -45,6 +45,8 @@ public:
     // Stored DPI settings (X/Y)
     const static int DPI_COUNT = 6, SNIPER = 0;
     const static int DPI_MIN = 100, DPI_MAX = 12000;
+
+    // Functions for acessing the DPI table.
     inline QPoint   dpi(int index) const                    { if(index < 0 || index >= DPI_COUNT) return QPoint(); return QPoint(dpiX[index], dpiY[index]); }
     void            dpi(int index, const QPoint& newValue);
     inline QPoint   sniperDpi() const                       { return dpi(SNIPER); }
@@ -52,21 +54,22 @@ public:
     // Set both X and Y
     inline void     dpi(int index, int newValue)    { dpi(index, QPoint(newValue, newValue)); }
     inline void     sniperDpi(int newValue)         { sniperDpi(QPoint(newValue, newValue)); }
-
-    // Current DPI
-    inline QPoint   curDpi() const                  { return QPoint(dpiCurX, dpiCurY); }
-    void            curDpi(const QPoint& newDpi);
-    inline void     curDpi(int newDpi)              { curDpi(QPoint(newDpi, newDpi)); }
-    // DPI index (updated automatically by curDpi). -1 if custom.
-    inline int      curDpiIdx() const                       { return dpiCurIdx; }
-    inline void     curDpiIdx(int newIdx) { curDpi(dpi(newIdx)); }
+   
+    // The following modify the base DPI by setting the index into the DPI
+    // table. If any DPIs are on the stack, the stack will be cleared and the
+    // DPI corresponding to the new index will be made active.
+    inline int      baseDpiIdx() const                       { return dpiBaseIdx; }
+    void            baseDpiIdx(int newIdx);
     void            dpiUp();
     void            dpiDown();
+    void            dpiCycleUp();
+    void            dpiCycleDown();
     // DPI stages enabled (default all). Disabled stages will be bypassed when invoking dpiUp/dpiDown (but not any other functions).
     inline bool     dpiEnabled(int index) const             { return dpiOn[index]; }
     inline void     dpiEnabled(int index, bool newEnabled)  { if(index <= 0) return; dpiOn[index] = newEnabled; _needsUpdate = _needsSave = true; }
-    // Push/pop a DPI state. Useful for toggling custom DPI. pushDpi returns an index which must be passed back to popDpi.
-    // Note that calling curDpi will empty the stack, so any previously-pushed DPIs are automatically popped.
+
+    // Push/pop a DPI state onto the DPI stack. Used for sniper and custom DPIs,
+    // which are only active while a key is held.
     quint64         pushDpi(const QPoint& newDpi);
     inline quint64  pushDpi(int newDpi)             { return pushDpi(QPoint(newDpi, newDpi)); }
     inline quint64  pushSniper()                    { return pushDpi(sniperDpi()); }
@@ -109,7 +112,7 @@ public:
 
     // Updates settings to the driver. Write "mode %d" first. Disable saveCustomDpi when writing a hardware profile or other permanent storage.
     // By default, nothing will be written unless the settings have changed. Use force = true or call setNeedsUpdate() to override.
-    void        update(QFile& cmd, int notifyNumber, bool force = false, bool saveCustomDpi = true);
+    void        update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi);
     inline void setNeedsUpdate()        { _needsUpdate = true; }
 
     // Get indicator status to send to KbLight
@@ -131,18 +134,21 @@ private:
     // DPI
     int dpiX[DPI_COUNT];
     int dpiY[DPI_COUNT];
-    int dpiCurX, dpiCurY, dpiCurIdx;
+    // dpiCurX and dpiCurY store the current active DPI.
+    int dpiCurX, dpiCurY;
+
+    // dpiCurIdx stores the index of the current "base" DPI, which is the DPI
+    // used when the stack is empty.
+    int dpiBaseIdx;
     QColor dpiClr[DPI_COUNT + 1];
     bool dpiOn[DPI_COUNT];
-    // Last-set DPI that was on the DPI list, not counting any pushed DPIs or sniper.
-    int dpiLastIdx;
 
-    // Current DPI stack. If non-empty, pushedDpis[0] represents the last DPI set by curDpi.
-    // (not necessarily the same as dpi(dpiLastIdx), since the last-set DPI might not have been on the DPI list)
+    // Current DPI "stack." The value corresponding to the largest key is the
+    // active DPI. If this is empty, we use the base DPI.
     QMap<quint64, QPoint> pushedDpis;
     uint runningPushIdx;
 
-    // Update DPI without popping stack
+    // Update the active DPI.
     void _curDpi(const QPoint& newDpi);
 
     // Indicators

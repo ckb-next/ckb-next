@@ -44,6 +44,9 @@
 
 #ifdef OS_MAC
 
+#define __ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES 1
+#include <AssertMacros.h>
+
 #include <Availability.h>
 #include <Carbon/Carbon.h>
 #include <IOKit/IOMessage.h>

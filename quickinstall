@@ -29,7 +29,7 @@ rm -rf build 2>/dev/null
 mkdir build
 cd build
 
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 checkfail $?
 
 # Find out how many cores the system has, for make

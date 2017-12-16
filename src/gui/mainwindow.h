@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
 #include <QCloseEvent>
 #include <QMainWindow>
 #include <QMenu>
@@ -42,7 +41,6 @@ private:
 
     DaemonDialog* dialog;
 
-#ifdef USE_LIBAPPINDICATOR
     bool                unityDesktop;
     AppIndicator*       indicator;
     GtkWidget*          indicatorMenu;

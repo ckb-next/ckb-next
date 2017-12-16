@@ -2,9 +2,6 @@
 #include "keymap_patch.h"
 #include "keymap.h"
 
-/*#define K65PATCH_LEN 1
-#define K63PATCH_LEN 2*/
-
 // The Alt code is used for Fn in the K65
 keypatch k65patch[] = {
     { 146, "fn", 0x59, KEY_FN },

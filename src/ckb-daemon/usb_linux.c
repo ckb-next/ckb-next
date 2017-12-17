@@ -576,7 +576,7 @@ int os_setupusb(usbdevice* kb) {
     ///
     const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
 #ifdef DEBUG
-    ckb_info("claiming interfaces. name=%s, firmware=%s; Got >>%s<< as ep_str\n", name, firmware, ep_str);
+    ckb_info("claiming interfaces. name=%s, firmware=%s; ep_str=%s\n", name, firmware, ep_str);
 #endif //DEBUG
     kb->epcount = 0;
     if(ep_str)

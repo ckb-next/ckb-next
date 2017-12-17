@@ -19,11 +19,11 @@
      <property name="text">
       <string>© 2014-2016 &lt;a href=&quot;https://github.com/ccMSC/&quot; style=&quot;text-decoration:none;&quot;&gt;ccMSC&lt;/a&gt;.&lt;br/&gt;© 2017 &lt;a href=&quot;https://github.com/mattanger/ckb-next/graphs/contributors&quot; style=&quot;text-decoration:none;&quot;&gt;The ckb-next development team&lt;/a&gt;.</string>
      </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -510,6 +510,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>layoutBox</tabstop>
+  <tabstop>capsBox</tabstop>
+  <tabstop>shiftBox</tabstop>
+  <tabstop>ctrlBox</tabstop>
+  <tabstop>winBox</tabstop>
+  <tabstop>altBox</tabstop>
+  <tabstop>autoFWBox</tabstop>
+  <tabstop>loginItemBox</tabstop>
+  <tabstop>extraButton</tabstop>
+  <tabstop>pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

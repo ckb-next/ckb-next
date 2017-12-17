@@ -341,15 +341,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>ColorButton</class>
+   <extends>QPushButton</extends>
+   <header>colorbutton.h</header>
+  </customwidget>
+  <customwidget>
    <class>KeyWidget</class>
    <extends>QWidget</extends>
    <header>keywidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ColorButton</class>
-   <extends>QPushButton</extends>
-   <header>colorbutton.h</header>
   </customwidget>
   <customwidget>
    <class>KbAnimWidget</class>
@@ -358,6 +358,12 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>showAnimBox</tabstop>
+  <tabstop>bgButton</tabstop>
+  <tabstop>animButton</tabstop>
+  <tabstop>brightnessBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

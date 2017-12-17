@@ -1061,9 +1061,39 @@
   <customwidget>
    <class>ColorButton</class>
    <extends>QPushButton</extends>
-   <header location="global">colorbutton.h</header>
+   <header>colorbutton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>intensityBox</tabstop>
+  <tabstop>copyButton</tabstop>
+  <tabstop>modeBox</tabstop>
+  <tabstop>modeColorOn</tabstop>
+  <tabstop>modeColorOff</tabstop>
+  <tabstop>macroBox</tabstop>
+  <tabstop>macroColorOn</tabstop>
+  <tabstop>macroColorOff</tabstop>
+  <tabstop>lightBox</tabstop>
+  <tabstop>lightColor3</tabstop>
+  <tabstop>lightColor2</tabstop>
+  <tabstop>lightColor1</tabstop>
+  <tabstop>lockBox</tabstop>
+  <tabstop>lockColorOn</tabstop>
+  <tabstop>lockColorOff</tabstop>
+  <tabstop>muteBox</tabstop>
+  <tabstop>muteColorOn</tabstop>
+  <tabstop>muteColorOff</tabstop>
+  <tabstop>muteColorNA</tabstop>
+  <tabstop>numBox</tabstop>
+  <tabstop>numColorOn</tabstop>
+  <tabstop>numColorOff</tabstop>
+  <tabstop>capsBox</tabstop>
+  <tabstop>capsColorOn</tabstop>
+  <tabstop>capsColorOff</tabstop>
+  <tabstop>scrollBox</tabstop>
+  <tabstop>scrollColorOn</tabstop>
+  <tabstop>scrollColorOff</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

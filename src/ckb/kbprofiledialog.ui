@@ -78,6 +78,9 @@
    <header>rlistwidget.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>profileList</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

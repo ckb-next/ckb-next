@@ -37,6 +37,12 @@
      <property name="sizeType">
       <enum>QSizePolicy::Expanding</enum>
      </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
     </spacer>
    </item>
    <item row="3" column="0">
@@ -287,6 +293,15 @@
    <header>colorbutton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>presetList</tabstop>
+  <tabstop>presetName</tabstop>
+  <tabstop>presetSave</tabstop>
+  <tabstop>presetDelete</tabstop>
+  <tabstop>stopPos</tabstop>
+  <tabstop>stopColor</tabstop>
+  <tabstop>stopOpacity</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

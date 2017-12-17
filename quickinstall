@@ -150,8 +150,11 @@ else
     checkfail $?
     sudo xdg-desktop-menu install --novendor usr/ckb.desktop 2>"$TMPFILE"
     checkfail $?
+    sudo install -m 644 udev/99-ckb-daemon.rules /etc/udev/rules.d/ 2>"$TMPFILE"
+    checkfail $?
     echo "Binaries were installed under $PREFIX/bin"
     echo "Animations were installed under $PREFIX/lib/ckb-animations"
+    echo "Udev rule was installed under /etc/udev/rules.d"
 fi
 
 # Offer to run as a system service

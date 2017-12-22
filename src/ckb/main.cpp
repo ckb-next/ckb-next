@@ -179,6 +179,11 @@ int main(int argc, char *argv[]){
     // Enable HiDPI support
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    // Enable devicePixelRatio scaling on platforms that do not support
+    // it natively
+    qApp->setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
 
     // Parse arguments
     switch (parseCommandLine(parser, &errorMessage)) {

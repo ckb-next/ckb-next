@@ -26,7 +26,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
      </property>
      <property name="usesScrollButtons">
       <bool>false</bool>
@@ -1387,8 +1387,8 @@
         <rect>
          <x>300</x>
          <y>10</y>
-         <width>111</width>
-         <height>71</height>
+         <width>131</width>
+         <height>74</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1598,6 +1598,7 @@
         <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
+      <zorder>pteMacroComment</zorder>
       <zorder>layoutWidget</zorder>
       <zorder>layoutWidget1</zorder>
       <zorder>layoutWidget</zorder>
@@ -1660,56 +1661,59 @@
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>pteMacroComment</tabstop>
-  <tabstop>pteMacroBox</tabstop>
-  <tabstop>dpiButton</tabstop>
-  <tabstop>mb2Box</tabstop>
-  <tabstop>btnStartMacro</tabstop>
+  <tabstop>typingButton</tabstop>
+  <tabstop>typingBox</tabstop>
+  <tabstop>modButton</tabstop>
+  <tabstop>modBox</tabstop>
+  <tabstop>fnButton</tabstop>
   <tabstop>fnBox</tabstop>
-  <tabstop>dpiCustYBox</tabstop>
-  <tabstop>dpiBox</tabstop>
-  <tabstop>applyButton</tabstop>
-  <tabstop>mbBox</tabstop>
-  <tabstop>cancelButton</tabstop>
-  <tabstop>wheelBox</tabstop>
-  <tabstop>btnStopMacro</tabstop>
+  <tabstop>numButton</tabstop>
+  <tabstop>numBox</tabstop>
+  <tabstop>mediaButton</tabstop>
+  <tabstop>mediaBox</tabstop>
   <tabstop>mbButton</tabstop>
-  <tabstop>dpiCustXBox</tabstop>
-  <tabstop>btnClearMacro</tabstop>
-  <tabstop>wheelButton</tabstop>
+  <tabstop>mbBox</tabstop>
   <tabstop>mb2Button</tabstop>
-  <tabstop>animBox</tabstop>
-  <tabstop>animKrBox</tabstop>
-  <tabstop>animOnceBox</tabstop>
+  <tabstop>mb2Box</tabstop>
+  <tabstop>wheelButton</tabstop>
+  <tabstop>wheelBox</tabstop>
+  <tabstop>dpiButton</tabstop>
+  <tabstop>dpiBox</tabstop>
+  <tabstop>dpiCustXBox</tabstop>
+  <tabstop>dpiCustYBox</tabstop>
   <tabstop>animButton</tabstop>
+  <tabstop>animBox</tabstop>
+  <tabstop>animOnceBox</tabstop>
+  <tabstop>animKrBox</tabstop>
   <tabstop>modeButton</tabstop>
+  <tabstop>modeBox</tabstop>
   <tabstop>modeWrapBox</tabstop>
+  <tabstop>lightButton</tabstop>
+  <tabstop>lightBox</tabstop>
   <tabstop>lightWrapBox</tabstop>
   <tabstop>lockButton</tabstop>
-  <tabstop>lightBox</tabstop>
-  <tabstop>resetButton</tabstop>
   <tabstop>lockBox</tabstop>
-  <tabstop>lightButton</tabstop>
-  <tabstop>modeBox</tabstop>
-  <tabstop>unbindButton</tabstop>
   <tabstop>programKpButton</tabstop>
   <tabstop>programKpBox</tabstop>
-  <tabstop>programKrBox</tabstop>
-  <tabstop>programKrButton</tabstop>
   <tabstop>programKpSIBox</tabstop>
   <tabstop>programKpModeBox</tabstop>
+  <tabstop>programKrButton</tabstop>
+  <tabstop>programKrBox</tabstop>
   <tabstop>programKrSIBox</tabstop>
   <tabstop>programKrModeBox</tabstop>
-  <tabstop>typingBox</tabstop>
-  <tabstop>numBox</tabstop>
+  <tabstop>pteMacroBox</tabstop>
+  <tabstop>rb_delay_no</tabstop>
+  <tabstop>rb_delay_default</tabstop>
+  <tabstop>rb_delay_asTyped</tabstop>
+  <tabstop>pteMacroComment</tabstop>
   <tabstop>pteMacroText</tabstop>
-  <tabstop>typingButton</tabstop>
-  <tabstop>mediaButton</tabstop>
-  <tabstop>modBox</tabstop>
-  <tabstop>modButton</tabstop>
-  <tabstop>fnButton</tabstop>
-  <tabstop>mediaBox</tabstop>
-  <tabstop>numButton</tabstop>
+  <tabstop>btnStartMacro</tabstop>
+  <tabstop>btnStopMacro</tabstop>
+  <tabstop>btnClearMacro</tabstop>
+  <tabstop>unbindButton</tabstop>
+  <tabstop>resetButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>applyButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

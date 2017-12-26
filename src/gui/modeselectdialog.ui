@@ -63,6 +63,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>modeList</tabstop>
+  <tabstop>selAllButton</tabstop>
+  <tabstop>selNoneButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

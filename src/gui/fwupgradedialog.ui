@@ -192,6 +192,10 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>actionButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

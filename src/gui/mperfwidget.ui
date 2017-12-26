@@ -1045,9 +1045,53 @@
   <customwidget>
    <class>ColorButton</class>
    <extends>QPushButton</extends>
-   <header location="global">colorbutton.h</header>
+   <header>colorbutton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>indicBox</tabstop>
+  <tabstop>spinBox</tabstop>
+  <tabstop>xyBox</tabstop>
+  <tabstop>eBox1</tabstop>
+  <tabstop>eBox2</tabstop>
+  <tabstop>eBox3</tabstop>
+  <tabstop>eBox4</tabstop>
+  <tabstop>eBox5</tabstop>
+  <tabstop>iButton1</tabstop>
+  <tabstop>iButton2</tabstop>
+  <tabstop>iButton3</tabstop>
+  <tabstop>iButton4</tabstop>
+  <tabstop>iButton5</tabstop>
+  <tabstop>iButton0</tabstop>
+  <tabstop>iButtonO</tabstop>
+  <tabstop>xSlider1</tabstop>
+  <tabstop>xSlider2</tabstop>
+  <tabstop>xSlider3</tabstop>
+  <tabstop>xSlider4</tabstop>
+  <tabstop>xSlider5</tabstop>
+  <tabstop>xSlider0</tabstop>
+  <tabstop>xBox1</tabstop>
+  <tabstop>xBox2</tabstop>
+  <tabstop>xBox3</tabstop>
+  <tabstop>xBox4</tabstop>
+  <tabstop>xBox5</tabstop>
+  <tabstop>xBox0</tabstop>
+  <tabstop>ySlider1</tabstop>
+  <tabstop>ySlider2</tabstop>
+  <tabstop>ySlider3</tabstop>
+  <tabstop>ySlider4</tabstop>
+  <tabstop>ySlider5</tabstop>
+  <tabstop>ySlider0</tabstop>
+  <tabstop>yBox1</tabstop>
+  <tabstop>yBox2</tabstop>
+  <tabstop>yBox3</tabstop>
+  <tabstop>yBox4</tabstop>
+  <tabstop>yBox5</tabstop>
+  <tabstop>yBox0</tabstop>
+  <tabstop>aSnapBox</tabstop>
+  <tabstop>lHeightBox</tabstop>
+  <tabstop>copyButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

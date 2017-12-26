@@ -52,6 +52,9 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+ </tabstops>
  <resources>
   <include location="image.qrc"/>
  </resources>

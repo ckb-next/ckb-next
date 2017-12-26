@@ -1,0 +1,1 @@
+ACTION=="add|change", SUBSYSTEM=="input", ATTRS{name}=="ckb[0-9]: [A-Za-z0-9]*", ENV{ID_INPUT_JOYSTICK}=""

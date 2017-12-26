@@ -515,6 +515,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>trayBox</tabstop>
+  <tabstop>brightnessBox</tabstop>
+  <tabstop>animScanButton</tabstop>
+  <tabstop>fpsBox</tabstop>
+  <tabstop>ditherBox</tabstop>
+  <tabstop>delayBox</tabstop>
+  <tabstop>mAccelBox</tabstop>
+  <tabstop>sAccelBox</tabstop>
+  <tabstop>sSpeedBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

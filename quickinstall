@@ -4,7 +4,7 @@ export LC_ALL=C
 
 function checkfail {
     if [[ $1 -ne 0 ]]; then
-        echo "An error occured,"
+        echo "An error occurred,"
         echo "press enter to exit."
         read -rs dummy
         exit "$1"
@@ -29,7 +29,7 @@ rm -rf build 2>/dev/null
 mkdir build
 cd build
 
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSAFE_INSTALL=ON
 checkfail $?
 
 # Find out how many cores the system has, for make
@@ -40,10 +40,10 @@ if [[ -z "$JOBS" ]]; then
     JOBS=2
 fi
 
-make -j "$JOBS"
+cmake --build build --target all -- -j "$JOBS"
 checkfail $?
 
-sudo make install
+sudo cmake --build build --target install
 checkfail $?
 
 finish

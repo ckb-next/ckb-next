@@ -18,11 +18,11 @@ extern QString devpath;
 static const QString configLabel = "Settings";
 
 #ifndef Q_OS_MACX
-QString cmdMsgEnable = "sudo systemctl enable ckb-daemon";
-QString cmdMsgStart = "sudo systemctl start ckb-daemon";
+QString cmdMsgEnable = "sudo systemctl enable ckb-next-daemon";
+QString cmdMsgStart = "sudo systemctl start ckb-next-daemon";
 #else
-QString cmdMsgEnable = "sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist";
-QString cmdMsgStart = "sudo launchctl start com.ckb.daemon";
+QString cmdMsgEnable = "sudo launchctl load /Library/LaunchDaemons/org.next.ckb.daemon.plist";
+QString cmdMsgStart = "sudo launchctl start org.next.ckb.daemon.plist";
 #endif
 
 MainWindow* MainWindow::mainWindow = 0;

@@ -398,13 +398,15 @@ elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "unknown")
     Supported services are: systemd, launchd, OpenRC, upstart.")
 endif ()
 
-install(
-  FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-daemon.rules"
-  DESTINATION "/etc/udev/rules.d/99-ckb-daemon.rules"
-  PERMISSIONS
-  OWNER_READ OWNER_WRITE
-  GROUP_READ
-  WORLD_READ)
+if (LINUX)
+  install(
+    FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-daemon.rules"
+    DESTINATION "/etc/udev/rules.d/99-ckb-daemon.rules"
+    PERMISSIONS
+    OWNER_READ OWNER_WRITE
+    GROUP_READ
+    WORLD_READ)
+endif ()
 
 # Now, we should start and enable new services
 if (SAFE_INSTALL)

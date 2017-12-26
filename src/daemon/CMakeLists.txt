@@ -28,10 +28,7 @@
 # TODO: get rid of ifdefs in sources. This is CMake's task!
 # TODO: use COMPONENT-wise installation instead of ifs()
 
-# Declare the target
-# Unfortunately, CMake doesn't allow doing this
-# without specifying at least one source file, so here you have it
-add_executable(ckb-next-daemon main.c)
+add_executable(ckb-next-daemon "")
 
 # Find external dependencies
 if (MACOS OR LINUX)
@@ -75,6 +72,7 @@ if (MACOS OR LINUX)
               device_vtable.c
               device_keyboard.c
               device_mouse.c
+              main.c
               led_keyboard.c
               led.c
               led_mouse.c
@@ -159,35 +157,10 @@ set_target_properties(
         PROPERTIES
           C_STANDARD 11)
 
-if (C_COMPILER_SUPPORTS_-Og)
-    set(opt_lvl "-Og")
-else ()
-    set(opt_lvl "-O0")
-endif ()
-
 target_compile_options(
     ckb-next-daemon
-        PRIVATE
-          -fsigned-char
-          -Wall
-          -Wextra
-          -Winit-self
-          $<$<CONFIG:Debug>:-Wfloat-equal>
-          $<$<CONFIG:Debug>:-Wundef>
-          $<$<CONFIG:Debug>:-Wshadow>
-          $<$<CONFIG:Debug>:-Wpointer-arith>
-          $<$<CONFIG:Debug>:-Wcast-align>
-          $<$<CONFIG:Debug>:-Wstrict-prototypes>
-          $<$<CONFIG:Debug>:-Wstrict-overflow=5>
-          $<$<CONFIG:Debug>:-Wwrite-strings>
-          $<$<CONFIG:Debug>:-Wcast-qual>
-          $<$<CONFIG:Debug>:-Wswitch-default>
-          $<$<CONFIG:Debug>:-Wswitch-enum>
-          $<$<CONFIG:Debug>:-Wconversion>
-          $<$<CONFIG:Debug>:-Wformat=2>
-          $<$<CONFIG:Debug>:-save-temps>
-          $<$<CONFIG:Debug>:${opt_lvl}>
-          $<$<CONFIG:Release>:-Wno-unused-parameter>) # FIXME: cast out unused parameters (NOTE: done on master!)
+      PRIVATE
+        "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
 
 # Add sanitizers after all target information is known
 add_sanitizers(ckb-next-daemon)

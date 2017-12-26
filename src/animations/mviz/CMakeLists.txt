@@ -35,7 +35,7 @@ add_executable(mviz main.c)
 target_include_directories(
     mviz
         PRIVATE
-          ${PULSEAUDIOSIMPLE_INCLUDE_DIRS})
+          "${PULSEAUDIOSIMPLE_INCLUDE_DIRS}")
 
 target_link_libraries(
     mviz
@@ -43,42 +43,17 @@ target_link_libraries(
           m
           KissFFT::KissFFT
           CkbNext::Animation
-          ${PULSEAUDIOSIMPLE_LIBRARIES})
+          "${PULSEAUDIOSIMPLE_LIBRARIES}")
 
 set_target_properties(
     mviz
         PROPERTIES
           C_STANDARD 11)
 
-if (C_COMPILER_SUPPORTS_-Og)
-    set(opt_lvl "-Og")
-else ()
-    set(opt_lvl "-O0")
-endif ()
-
 target_compile_options(
     mviz
-        PRIVATE
-          -fsigned-char
-          -Wall
-          -Wextra
-          -Winit-self
-          $<$<CONFIG:Debug>:-Wfloat-equal>
-          $<$<CONFIG:Debug>:-Wundef>
-          $<$<CONFIG:Debug>:-Wshadow>
-          $<$<CONFIG:Debug>:-Wpointer-arith>
-          $<$<CONFIG:Debug>:-Wcast-align>
-          $<$<CONFIG:Debug>:-Wstrict-prototypes>
-          $<$<CONFIG:Debug>:-Wstrict-overflow=5>
-          $<$<CONFIG:Debug>:-Wwrite-strings>
-          $<$<CONFIG:Debug>:-Wcast-qual>
-          $<$<CONFIG:Debug>:-Wswitch-default>
-          $<$<CONFIG:Debug>:-Wswitch-enum>
-          $<$<CONFIG:Debug>:-Wconversion>
-          $<$<CONFIG:Debug>:-Wformat=2>
-          $<$<CONFIG:Debug>:-save-temps>
-          $<$<CONFIG:Debug>:${opt_lvl}>
-          $<$<CONFIG:Release>:-Wno-unused-parameter>) # FIXME: cast out unused parameters
+      PRIVATE
+        "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
 
 add_sanitizers(mviz)
 

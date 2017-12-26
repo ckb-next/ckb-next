@@ -52,33 +52,9 @@ set_target_properties(
         PROPERTIES
           C_STANDARD 11)
 
-if (C_COMPILER_SUPPORTS_-Og)
-    set(opt_lvl "-Og")
-else ()
-    set(opt_lvl "-O0")
-endif ()
-
 target_compile_options(
     KissFFT
-        PRIVATE
-          -fsigned-char
-          -Wall
-          -Wextra
-          -Winit-self
-          $<$<CONFIG:Debug>:-Wfloat-equal>
-          $<$<CONFIG:Debug>:-Wundef>
-          $<$<CONFIG:Debug>:-Wshadow>
-          $<$<CONFIG:Debug>:-Wpointer-arith>
-          $<$<CONFIG:Debug>:-Wcast-align>
-          $<$<CONFIG:Debug>:-Wstrict-prototypes>
-          $<$<CONFIG:Debug>:-Wstrict-overflow=5>
-          $<$<CONFIG:Debug>:-Wwrite-strings>
-          $<$<CONFIG:Debug>:-Wcast-qual>
-          $<$<CONFIG:Debug>:-Wswitch-default>
-          $<$<CONFIG:Debug>:-Wswitch-enum>
-          $<$<CONFIG:Debug>:-Wconversion>
-          $<$<CONFIG:Debug>:-Wformat=2>
-          $<$<CONFIG:Debug>:-save-temps>
-          $<$<CONFIG:Debug>:${opt_lvl}>)
+      PRIVATE
+      "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
 
 add_sanitizers(KissFFT)

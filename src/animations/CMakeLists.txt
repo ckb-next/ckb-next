@@ -27,28 +27,36 @@
 
 # No need to check for WITH_ANIMATIONS, because all the options below
 # already depend on it through cmake_dependent_option()
-if (WITH_GRADIENT)
-    add_subdirectory(gradient)
-endif ()
-if (WITH_HEAT)
-    add_subdirectory(heat)
-endif ()
-if (WITH_PINWHEEL)
-    add_subdirectory(pinwheel)
-endif ()
-if (WITH_RAIN)
-    add_subdirectory(rain)
-endif ()
-if (WITH_RANDOM)
-    add_subdirectory(random)
-endif ()
-if (WITH_RIPPLE)
-    add_subdirectory(ripple)
-endif ()
-if (WITH_WAVE)
-    add_subdirectory(wave)
-endif ()
+
+foreach (animation IN ITEMS "GRADIENT HEAT PINWHEEL RAIN RANDOM RIPPLE WAVE")
+  if (WITH_${animation})
+    add_executable(${animation} ${animation}/main.c)
+
+    target_link_libraries(
+      ${animation}
+        PRIVATE
+          m
+          CkbNext::Animation)
+
+    set_target_properties(
+      ${animation}
+        PROPERTIES
+          C_STANDARD 11)
+
+    target_compile_options(
+      ${animation}
+        PRIVATE
+          "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
+
+    add_sanitizers(${animation})
+
+    install(
+      TARGETS ${animation}
+      DESTINATION "${INSTALL_DIR_ANIMATIONS}")
+  endif ()
+endforeach ()
+
 if (WITH_MVIZ)
-    add_subdirectory(mviz)
+  add_subdirectory(mviz)
 endif ()
 

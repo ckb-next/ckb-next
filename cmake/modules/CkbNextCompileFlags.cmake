@@ -43,3 +43,33 @@ check_c_compiler_flag("-Og" C_COMPILER_SUPPORTS_-Og)
 
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-Og" CXX_COMPILER_SUPPORTS_-Og)
+
+if (C_COMPILER_SUPPORTS_-Og)
+    set(opt_lvl "-Og")
+else ()
+    set(opt_lvl "-O0")
+endif ()
+
+set(CKB_NEXT_COMMON_COMPILE_FLAGS "")
+list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
+        -fsigned-char
+        -Wall
+        -Wextra
+        -Winit-self
+        -Wno-unused-parameter
+        #    $<$<CONFIG:Debug>:-Wfloat-equal>
+        #    $<$<CONFIG:Debug>:-Wundef>
+        #    $<$<CONFIG:Debug>:-Wshadow>
+        #    $<$<CONFIG:Debug>:-Wpointer-arith>
+        #    $<$<CONFIG:Debug>:-Wcast-align>
+        #    $<$<CONFIG:Debug>:-Wstrict-prototypes>
+        #    $<$<CONFIG:Debug>:-Wstrict-overflow=5>
+        #    $<$<CONFIG:Debug>:-Wwrite-strings>
+        #    $<$<CONFIG:Debug>:-Wcast-qual>
+        #    $<$<CONFIG:Debug>:-Wswitch-default>
+        #    $<$<CONFIG:Debug>:-Wswitch-enum>
+        #    $<$<CONFIG:Debug>:-Wconversion>
+        #    $<$<CONFIG:Debug>:-Wformat=2>
+        #    $<$<CONFIG:Debug>:-save-temps>
+        #    $<$<CONFIG:Debug>:${opt_lvl}>
+     )

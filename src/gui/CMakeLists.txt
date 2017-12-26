@@ -25,10 +25,7 @@
 #   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #   POSSIBILITY OF SUCH DAMAGE.
 
-# Declare the target
-# Unfortunately, CMake doesn't allow doing this
-# without specifying at least one source file, so here you have it
-add_executable(ckb-next main.cpp)
+add_executable(ckb-next "")
 
 # Declare we want macOS Bundle
 if (MACOS)
@@ -146,6 +143,7 @@ if (MACOS OR LINUX)
               kperfwidget.cpp
               layoutdialog.cpp
               macroreader.cpp
+              main.cpp
               mainwindow.cpp
               modeselectdialog.cpp
               mperfwidget.cpp
@@ -395,54 +393,14 @@ set_target_properties(
         PROPERTIES
           CXX_STANDARD 11)
 
-if (CXX_COMPILER_SUPPORTS_-Og)
-    set(opt_lvl "-Og")
-else ()
-    set(opt_lvl "-O0")
-endif ()
-
 target_compile_options(
     ckb-next
         PRIVATE
           "${Appindicator_DEFINITIONS}"
-          -fsigned-char
-          -Wall
-          -Wextra
-          -Winit-self
-          $<$<CONFIG:Debug>:-Wfloat-equal>
-          $<$<CONFIG:Debug>:-Wundef>
-          $<$<CONFIG:Debug>:-Wshadow>
-          $<$<CONFIG:Debug>:-Wpointer-arith>
-          $<$<CONFIG:Debug>:-Wcast-align>
-          $<$<CONFIG:Debug>:-Wstrict-overflow=5>
-          $<$<CONFIG:Debug>:-Wwrite-strings>
-          $<$<CONFIG:Debug>:-Wcast-qual>
-          $<$<CONFIG:Debug>:-Wswitch-default>
-          $<$<CONFIG:Debug>:-Wswitch-enum>
-          $<$<CONFIG:Debug>:-Wconversion>
-          $<$<CONFIG:Debug>:-Wformat=2>
-          $<$<CONFIG:Debug>:-save-temps>
-          $<$<CONFIG:Debug>:${opt_lvl}>
-          $<$<CONFIG:Release>:-Wno-unused-parameter>) # FIXME: cast out unused parameters
+          "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
 
 # Add sanitizers after all target information is known
 add_sanitizers(ckb-next)
-
-# Make sure ckb GUI will not autostart and interfere with ckb-next GUI
-if (SAFE_INSTALL)
-    set(autostart_paths
-            "$ENV{HOME}/.config/autostart/ckb.desktop"
-            "$ENV{HOME}/.config/autostart/ckb-next.desktop"
-            "$ENV{HOME}/Library/LaunchAgents/com.ckb.ckb.plist"
-            "$ENV{HOME}/Library/LaunchAgents/org.next.ckb.plist")
-    foreach (autostart_path IN LISTS autostart_paths)
-        if (EXISTS "${autostart_path}")
-            message(STATUS "ckb GUI autostart file detected: ${autostart_path}")
-            install(CODE "message(STATUS \"Removing ${autostart_path}\")")
-            install(CODE "execute_process(COMMAND rm ${autostart_path})")
-        endif ()
-    endforeach ()
-endif()
 
 # Declare target's installation paths
 if (MACOS)

@@ -133,7 +133,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (!rootDevPath.exists()) {
         settingsWidget->setStatus("The ckb-next daemon is not running!");
         // open dialog to tell the user to start the daemon based on OS and how
-        // and how to enable etc.
+        // to enable etc.
         dialog->show();
     }
 }
@@ -156,7 +156,7 @@ void MainWindow::addDevice(Kb* device){
     // Add the keyboard
     KbWidget* widget = new KbWidget(this, device);
     kbWidgets.append(widget);
-    // Add to tabber; switch to this device if on the settings screen
+    // Add to tabber; switch to this device if the user is on the settings screen
     int count = ui->tabWidget->count();
     ui->tabWidget->insertTab(count - 1, widget, widget->name());
     if(ui->tabWidget->currentIndex() == count)
@@ -227,7 +227,7 @@ void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
     KbWidget* w = (KbWidget*)widget;
     // Ask for update
     if(QMessageBox::information(this, "Firmware update", tr("A new firmware is available for your %1 (v%2)\nWould you like to install it now?").arg(w->device->usbModel, QString::number(version, 'f', 2)), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), QMessageBox::Yes) == QMessageBox::Yes){
-        // If accepted, switch to firmware tab and bring up update window
+        // If accepted, switch to the firmware tab and bring up the update window
         w->showLastTab();
         ui->tabWidget->setCurrentIndex(kbWidgets.indexOf(w));
         w->showFwUpdate();

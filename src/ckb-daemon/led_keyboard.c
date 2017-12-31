@@ -71,6 +71,17 @@ static void makergb_full(const lighting* light, uchar data_pkt[12][MSG_SIZE]){
     memcpy(data_pkt[10] + 4, b + 120, 60);
 }
 
+static void makergb_k55(const lighting* light, uchar data_pkt[MSG_SIZE]){
+    const uchar* r = light->r, *g = light->g, *b = light->b;
+    // The K55 uses RGBRGBRGB colouring.
+    for (int i = 0; i < 3; i++) {
+        int index = (i * 3) + 4;
+        data_pkt[index + 0] = r[i];
+        data_pkt[index + 1] = g[i];
+        data_pkt[index + 2] = b[i];
+    }
+}
+
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
     // Compare two light structures, ignore mouse zones
     return memcmp(lhs->r, rhs->r, N_KEYS_HW) || memcmp(lhs->g, rhs->g, N_KEYS_HW) || memcmp(lhs->b, rhs->b, N_KEYS_HW);
@@ -87,7 +98,7 @@ int updatergb_kb(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    if(IS_FULLRANGE(kb)){
+    if(IS_FULLRANGE(kb) && !IS_K55(kb)){
         // Update strafe sidelights if necessary
         if(lastlight->sidelight != newlight->sidelight) {
             uchar data_pkt[2][MSG_SIZE] = {
@@ -126,6 +137,12 @@ int updatergb_kb(usbdevice* kb, int force){
         }
         makergb_full(newlight, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
+            return -1;
+    } else if (IS_K55(kb)) {
+        // The K55 has its own packet type, because it only has three lighting zones.
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };
+        makergb_k55(newlight, data_pkt);
+        if (!usbsend(kb, data_pkt, 1))
             return -1;
     } else {
         // On older keyboards it looks flickery and causes lighting glitches, so we don't use it.

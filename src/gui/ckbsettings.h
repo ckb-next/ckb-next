@@ -22,8 +22,9 @@ public:
 
     ~CkbSettings();
 
-    // At 0.2.8 -> 0.2.9 new config path was introduced, this function copies the old one if it exists.
-    static void upgrade(const QDir&);
+    // On version 0.2.9 the organisation and application names were changed.
+    // This function migrates existing settings to the new location.
+    static void migrateSettings();
 
     // One-shot get/set
     static QVariant get(const QString& key, const QVariant& defaultValue = QVariant());

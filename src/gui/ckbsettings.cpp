@@ -3,9 +3,6 @@
 #include <QThread>
 #include <QMutex>
 #include <QDebug>
-#include <QtCore/QStandardPaths>
-#include <QtCore/QFile>
-#include <QtCore/QDir>
 
 // Shared global QSettings object
 static QSettings* _globalSettings = 0;
@@ -31,18 +28,15 @@ static QSettings* globalSettings(){
     if(!_globalSettings){
         lockMutexStatic;
         if(!(volatile QSettings*)_globalSettings){   // Check again after locking mutex in case another thread created the object
-#ifdef Q_OS_LINUX
-            QDir oldConfig(QDir::homePath() + "/.config/ckb/ckb.conf");
-#elif Q_OS_MACX
-            QDir oldConfig(QDir::homePath() + "/Library/Preferences/com.ckb.ckb.plist");
-#endif
-            if (oldConfig.exists())
-                CkbSettings::upgrade(oldConfig);
+            _globalSettings = new QSettings;
+            qInfo() << "Path to the settings:" << _globalSettings->fileName();
+            // Check if a config migration attempt needs to be made.
+            if(!_globalSettings->value("Program/CkbMigrationChecked", false).toBool()){
+                CkbSettings::migrateSettings();
+            }
             // Put the settings object in a separate thread so that it won't lock up the GUI when it syncs
             globalThread = new QThread;
             globalThread->start();
-            _globalSettings = new QSettings;
-            qInfo() << "Path to the settings:" << _globalSettings->fileName();
             _globalSettings->moveToThread(globalThread);
         }
     }
@@ -53,17 +47,22 @@ bool CkbSettings::isBusy(){
     return cacheWritesInProgress.load() > 0;
 }
 
-void CkbSettings::upgrade(const QDir& oldConfig){
-#ifdef Q_OS_LINUX
-    QDir newConfig(QDir::homePath().append("/.config/ckb-next/ckb-next.conf"));
-    QDir().mkpath(QDir::homePath().append("/.config/ckb-next"));
-#elif Q_OS_MACX
-    QDir newConfig(QDir::homePath().append("/Library/Preferences/org.next.ckb.plist"));
-    QDir().mkpath(QDir::homePath().append("/Library/Preferences"));
-#endif
-    // If new config already exists, it won't be overwritten
-    QFile::copy(oldConfig.absolutePath(), newConfig.absolutePath());
-    qInfo() << "Settings have been copied from previous location.";
+void CkbSettings::migrateSettings(){
+    QSettings *oldSettings = new QSettings("ckb", "ckb");
+    qInfo() << "Looking for old settings in:" << oldSettings->fileName();
+    // Check if a basic key exists
+    if(oldSettings->contains("Program/KbdLayout")){
+        qInfo() << "Found, proceeding to migrate.";
+        QStringList oldKeys = oldSettings->allKeys();
+        foreach (const QString &key, oldKeys){
+            QVariant value = oldSettings->value(key);
+            _globalSettings->setValue(key, value);
+        }
+        // Mark settings as migrated
+        _globalSettings->setValue("Program/CkbMigrationChecked", true);
+        qInfo() << oldKeys.count() << "keys migrated.";
+    }
+    delete oldSettings;
 }
 
 void CkbSettings::cleanUp(){

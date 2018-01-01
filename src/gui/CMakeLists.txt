@@ -334,7 +334,6 @@ if (MACOS OR LINUX)
     target_include_directories(
         ckb-next
             PRIVATE
-              "${CMAKE_CURRENT_BINARY_DIR}"
               "${CMAKE_CURRENT_SOURCE_DIR}")
 endif ()
 if (MACOS)

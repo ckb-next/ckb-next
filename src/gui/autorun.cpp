@@ -1,11 +1,10 @@
 #include <QApplication>
 #include <QDir>
-#include <QSettings>
 #include <QStandardPaths>
 #include "autorun.h"
 #include "ckbsettings.h"
 
-// Paths
+// >=0.2.9 (new) paths
 #ifdef Q_OS_LINUX
 static QDir path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/autostart");
 static const QString file = "ckb-next.desktop";
@@ -15,9 +14,19 @@ static QDir path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation) 
 static const QString file = "org.next.ckb.plist";
 static const QString internalFile(":/txt/org.next.ckb.plist");
 #endif
-static const QString settingPath = "Program/DidLoginItem";
 
-bool AutoRun::available(){
+static const QString settingPath = "Program/NewDidLoginItem";
+
+// <=0.2.8 (old) paths
+#ifdef Q_OS_LINUX
+static const QString oldFile = "ckb.desktop";
+#elif defined(Q_OS_MACX)
+static const QString file = "com.ckb.ckb.plist";
+#endif
+
+static const QString oldSettingPath = "Program/DidLoginItem";
+
+bool AutoRun::available() {
     // Allow autostart if the program is located in a system path
 #ifdef Q_OS_LINUX
     return QDir::root().absoluteFilePath(QStandardPaths::findExecutable("ckb-next")) == qApp->applicationFilePath();
@@ -26,32 +35,39 @@ bool AutoRun::available(){
 #endif
 }
 
-bool AutoRun::once(){
+bool AutoRun::once() {
     return CkbSettings::get(settingPath).toBool();
 }
 
-bool AutoRun::isEnabled(){
+bool AutoRun::isEnabled() {
     // Check if the file exists. If not, autostart is disabled.
-    if(!path.exists() || !path.exists(file))
+    if (!path.exists() || !path.exists(file))
         return false;
     // If autostart is enabled, set the flag from once() (in case it hasn't been done yet)
     CkbSettings::set(settingPath, true);
     return true;
 }
 
-void AutoRun::enable(){
-    if(!available())
+void AutoRun::enable() {
+    if (!available())
         return;
+
     // Copy file into place
-    if(!path.exists())
+    if (!path.exists())
         QDir::home().mkpath(path.absolutePath());
     QFile::copy(internalFile, path.absoluteFilePath(file));
     // Mark once() as done
     CkbSettings::set(settingPath, true);
+
+    // If an old autostart was enabled, disable it and remove
+    if (CkbSettings::get(oldSettingPath).toBool()) {
+        CkbSettings::set(oldSettingPath, false);
+        QFile::remove(path.absoluteFilePath(oldFile));
+    }
 }
 
-void AutoRun::disable(){
-    if(!available())
+void AutoRun::disable() {
+    if (!available())
         return;
     // Remove file
     QFile::remove(path.absoluteFilePath(file));

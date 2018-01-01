@@ -401,7 +401,7 @@ endif ()
 if (LINUX)
   install(
     FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-daemon.rules"
-    DESTINATION "/etc/udev/rules.d/99-ckb-daemon.rules"
+    DESTINATION "/etc/udev/rules.d"
     PERMISSIONS
     OWNER_READ OWNER_WRITE
     GROUP_READ

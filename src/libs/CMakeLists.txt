@@ -34,4 +34,4 @@ if (WITH_SHIPPED_QUAZIP)
 endif ()
 
 # ckb-next libraries
-add_subdirectory(ckbnext)
+add_subdirectory(ckb-next)

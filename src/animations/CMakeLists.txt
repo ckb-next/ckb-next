@@ -37,7 +37,7 @@ foreach (animation IN ITEMS GRADIENT HEAT PINWHEEL RAIN RANDOM RIPPLE WAVE)
       ${animation}
         PRIVATE
           m
-          CkbNext::Animation)
+          ${CMAKE_PROJECT_NAME}::Animation)
 
     set_target_properties(
       ${animation}

@@ -25,59 +25,59 @@
 #   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #   POSSIBILITY OF SUCH DAMAGE.
 
-project(CkbNextLibs VERSION 0.2)
+project(Animation VERSION 0.2)
 
-add_library(Animation INTERFACE)
-add_library(CkbNext::Animation ALIAS Animation)
+add_library(${PROJECT_NAME} INTERFACE)
+add_library(${CMAKE_PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_link_libraries(
-    Animation
+    ${PROJECT_NAME}
         INTERFACE
           m)
 
 target_include_directories(
-    Animation
+    ${PROJECT_NAME}
         INTERFACE
           $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
           $<INSTALL_INTERFACE:include>)
 
 install(
     TARGETS Animation
-    EXPORT AnimationTargets
+    EXPORT ${PROJECT_NAME}Targets
     LIBRARY DESTINATION "lib"
     ARCHIVE DESTINATION "lib"
     INCLUDES DESTINATION "include")
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/Animation/AnimationConfigVersion.cmake"
-    VERSION ${CkbNextLibs_VERSION}
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
     COMPATIBILITY ExactVersion)
 
 export(
-    EXPORT AnimationTargets
+    EXPORT ${PROJECT_NAME}Targets
     NAMESPACE
-      CkbNext::
+      ${CMAKE_PROJECT_NAME}::
     FILE
-      "${CMAKE_CURRENT_BINARY_DIR}/Animation/AnimationTargets.cmake")
+      "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Targets.cmake")
 
 configure_file(
-    "cmake/AnimationConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/Animation/AnimationConfig.cmake"
+    "cmake/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake"
     COPYONLY)
 
 install(
-    EXPORT AnimationTargets
+    EXPORT ${PROJECT_NAME}Targets
     FILE
-      "AnimationTargets.cmake"
+      "${PROJECT_NAME}Targets.cmake"
     NAMESPACE
-      CkbNext::
+      ${CMAKE_PROJECT_NAME}::
     DESTINATION
-      "/usr/lib/cmake/Animation")
+      "/usr/lib/cmake/${CMAKE_PROJECT_NAME}/${PROJECT_NAME}")
 
 install(
     FILES
-      "cmake/AnimationConfig.cmake"
-      "${CMAKE_CURRENT_BINARY_DIR}/Animation/AnimationConfigVersion.cmake"
+      "cmake/${PROJECT_NAME}Config.cmake"
+      "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake"
     DESTINATION
-      "/usr/lib/cmake/Animation")
+      "/usr/lib/cmake/${CMAKE_PROJECT_NAME}/${PROJECT_NAME}")

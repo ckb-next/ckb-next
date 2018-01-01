@@ -42,7 +42,7 @@ target_link_libraries(
         PRIVATE
           m
           KissFFT::KissFFT
-          CkbNext::Animation
+          ${CMAKE_PROJECT_NAME}::Animation
           "${PULSEAUDIOSIMPLE_LIBRARIES}")
 
 set_target_properties(

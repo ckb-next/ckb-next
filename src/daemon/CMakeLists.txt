@@ -1,6 +1,6 @@
-#   Copyright (c) 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#   Copyright 2017-2018 ckb-next Development Team <ckb-next@googlegroups.com>
 #   All rights reserved.
-#   
+#
 #   Redistribution and use in source and binary forms, with or without
 #   modification, are permitted provided that the following conditions are met:
 #   
@@ -167,9 +167,9 @@ add_sanitizers(ckb-next-daemon)
 
 # We must be absolutely sure that daemons won't interfere with each other.
 # Therefore we conduct a cleanup at install time before anything else.
-# Package maintainers are supposed to disable SAFE_INSTALL and provide
-# idiomatic solutions according to their package managers' guidelines to
-# ensure similar behaviour.
+# Distro package maintainers are not supposed to enable SAFE_INSTALL and
+# provide idiomatic solutions according to their package managers' guidelines
+# to ensure similar behaviour.
 
 if (SAFE_INSTALL)
     # We should close GUI first or daemon unloading might hang
@@ -204,16 +204,17 @@ if (MACOS)
     set(CKB_NEXT_INIT_SYSTEM "launchd" CACHE INTERNAL "")
 
     # Import plist
-    message(STATUS "Importing org.next.ckb.daemon.plist (${CKB_NEXT_INIT_SYSTEM})")
+    message(STATUS "Importing org.ckb-next.daemon.plist (${CKB_NEXT_INIT_SYSTEM})")
     configure_file(
-        "${ckb-next_SOURCE_DIR}/macos/org.next.ckb.daemon.plist"
-        "${CMAKE_CURRENT_BINARY_DIR}/service/org.next.ckb.daemon.plist" COPYONLY)
+        "${ckb-next_SOURCE_DIR}/macos/org.ckb-next.daemon.plist"
+        "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon.plist"
+        COPYONLY)
 
     if (SAFE_INSTALL)
         execute_process(
             COMMAND sudo launchctl list
             OUTPUT_VARIABLE launchctl_jobs)
-        foreach (plist_name IN ITEMS "com.ckb.daemon" "org.next.ckb.daemon")
+        foreach (plist_name IN ITEMS "com.ckb.daemon" "org.next.ckb.daemon" "org.ckb-next.daemon")
             string(FIND "${launchctl_jobs}" "${plist_name}" daemon_found)
             if (NOT ("${daemon_found}" EQUAL -1))
                 message(STATUS "Running job with ${plist_name} plist detected")
@@ -243,7 +244,8 @@ elseif (LINUX)
         message(STATUS "Generating and importing ckb-next-daemon.conf (${CKB_NEXT_INIT_SYSTEM})")
         configure_file(
             "${ckb-next_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.conf")
+            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.conf"
+            @ONLY)
 
         if (SAFE_INSTALL)
             foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
@@ -279,27 +281,28 @@ elseif (LINUX)
         message(STATUS "Generating and importing ckb-next-daemon.service (${CKB_NEXT_INIT_SYSTEM})")
         configure_file(
             "${ckb-next_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service")
+            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
+            @ONLY)
 
         if (SAFE_INSTALL)
-            foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
+            foreach (daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
                 execute_process(
                     COMMAND sudo systemctl is-active ${daemon}.service
                     RESULT_VARIABLE daemon_active)
-                if("${daemon_active}" EQUAL 0)
+                if ("${daemon_active}" EQUAL 0)
                     message(STATUS "Running ${daemon} detected")
                     install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: stoppping ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo systemctl stop ${daemon}.service)")
-                endif()
+                endif ()
                 execute_process(
                     COMMAND sudo systemctl is-enabled ${daemon}.service
                     RESULT_VARIABLE daemon_enabled)
-                if("${daemon_enabled}" EQUAL 0)
+                if ("${daemon_enabled}" EQUAL 0)
                     message(STATUS "Enabled ${daemon} detected")
                     install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: permanently disabling ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo systemctl disable ${daemon}.service)")
-                endif()
-            endforeach()
+                endif ()
+            endforeach ()
         endif ()
 
     endif ()
@@ -313,7 +316,8 @@ elseif (LINUX)
         message(STATUS "Generating and importing ckb-next-daemon (${CKB_NEXT_INIT_SYSTEM})")
         configure_file(
             "${ckb-next_SOURCE_DIR}/linux/openrc/ckb-next-daemon.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon" @ONLY)
+            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon"
+            @ONLY)
 
         if (SAFE_INSTALL)
             execute_process(
@@ -324,12 +328,12 @@ elseif (LINUX)
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)
                 string(REPLACE "\n" ";" daemons_list "${daemons}")
-                foreach(daemon IN LISTS daemons_list)
+                foreach (daemon IN LISTS daemons_list)
                     message(STATUS "Running ${daemon} detected")
                     install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: stoppping ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo rc-service ${daemon} stop)")
-                endforeach()
-            endif()
+                endforeach ()
+            endif ()
             execute_process(
                 COMMAND rc-status -a
                 COMMAND egrep -o "ckb-daemon|ckb-next-daemon"
@@ -337,12 +341,12 @@ elseif (LINUX)
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)
                 string(REPLACE "\n" ";" daemons_list "${daemons}")
-                foreach(daemon IN LISTS daemons_list)
+                foreach (daemon IN LISTS daemons_list)
                     message(STATUS "Enabled ${daemon} detected")
                     install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: permanently disabling ${daemon}\")")
                     install(CODE "execute_process(COMMAND sudo rc-update del ${daemon} default)")
-                endforeach()
-            endif()
+                endforeach ()
+            endif ()
         endif ()
 
     endif ()
@@ -363,7 +367,7 @@ endif ()
 # Declare target's auxiliary files installation paths
 if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
     install(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/service/org.next.ckb.daemon.plist"
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon.plist"
         DESTINATION "/Library/LaunchDaemons"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
@@ -412,8 +416,8 @@ endif ()
 if (SAFE_INSTALL)
     if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
         # Just installing the plist should be enough to enable the job at boot
-        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: loading org.next.ckb.daemon\")")
-        install(CODE "execute_process(COMMAND sudo launchctl load -w /Library/LaunchDaemons/org.next.ckb.daemon.plist)")
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: loading org.ckb-next.daemon\")")
+        install(CODE "execute_process(COMMAND sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist)")
     elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "upstart")
         # Just installing the service should be enough to enable it at boot
         install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: refreshing services\")")

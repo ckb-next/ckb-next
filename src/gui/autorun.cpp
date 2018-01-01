@@ -11,8 +11,8 @@ static const QString file = "ckb-next.desktop";
 static const QString internalFile(":/txt/ckb-next.desktop");
 #elif defined(Q_OS_MACX)
 static QDir path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/LaunchAgents");
-static const QString file = "org.next.ckb.plist";
-static const QString internalFile(":/txt/org.next.ckb.plist");
+static const QString file = "org.ckb-next.plist";
+static const QString internalFile(":/txt/org.ckb-next.plist");
 #endif
 
 static const QString settingPath = "Program/NewDidLoginItem";

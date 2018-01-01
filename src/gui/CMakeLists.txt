@@ -1,6 +1,6 @@
-#   Copyright (c) 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#   Copyright 2017-2018 ckb-next Development Team <ckb-next@googlegroups.com>
 #   All rights reserved.
-#   
+#
 #   Redistribution and use in source and binary forms, with or without
 #   modification, are permitted provided that the following conditions are met:
 #   
@@ -233,8 +233,9 @@ if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc")
     # Import GPG key
     message(STATUS "Importing ckb-next-key.gpg")
     configure_file(
-        "${CMAKE_CURRENT_LIST_DIR}/resources/ckb-next-key.gpg"
-        "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-key.gpg" COPYONLY)
+      "${CMAKE_CURRENT_LIST_DIR}/resources/ckb-next-key.gpg"
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-key.gpg"
+        COPYONLY)
 endif ()
 
 # Import images and generate image.qrc
@@ -255,8 +256,9 @@ if (MACOS)
     if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns")
         message(STATUS "Importing ckb-next-logo.icns")
         configure_file(
-            "${ckb-next_SOURCE_DIR}/macos/ckb-next-logo.icns"
-            "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns" COPYONLY)
+          "${ckb-next_SOURCE_DIR}/macos/ckb-next-logo.icns"
+          "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns"
+            COPYONLY)
     endif ()
 
     # Configure plist
@@ -264,7 +266,7 @@ if (MACOS)
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
     set(MACOSX_BUNDLE_INFO_STRING "ckb-next - version ${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_ICON_FILE "ckb-next-logo.icns")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.next.ckb")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ckb-next")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_BUNDLE_NAME "ckb-next_v${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
@@ -272,19 +274,21 @@ if (MACOS)
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2014-2016 ccMSC\nCopyright (c) 2017 ckb-next Development Team")
 
     # Generate and import Info.plist
-    message(STATUS "Generating and importing org.next.ckb.info.plist")
+    message(STATUS "Generating and importing org.ckb-next.info.plist")
     configure_file(
-        "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.info.plist.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.info.plist")
+      "${CMAKE_SOURCE_DIR}/macos/org.ckb-next.info.plist.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/org.ckb-next.info.plist"
+        @ONLY)
 
     # Import application plist
-    message(STATUS "Importing org.next.ckb.plist")
+    message(STATUS "Importing org.ckb-next.plist")
     configure_file(
-        "${CMAKE_SOURCE_DIR}/macos/org.next.ckb.plist"
-        "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.plist" COPYONLY)
+      "${CMAKE_SOURCE_DIR}/macos/org.ckb-next.plist"
+      "${CMAKE_CURRENT_BINARY_DIR}/org.ckb-next.plist"
+        COPYONLY)
 
     if (NOT TEXT_QRC_STRING)
-        set(TEXT_QRC_STRING "<file>org.next.ckb.plist</file>\n")
+        set(TEXT_QRC_STRING "<file>org.ckb-next.plist</file>\n")
     endif ()
 
 elseif (LINUX)
@@ -296,7 +300,8 @@ elseif (LINUX)
     message(STATUS "Generating and importing ckb-next.desktop")
     configure_file(
       "${CMAKE_SOURCE_DIR}/linux/ckb-next.desktop.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop")
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop"
+      @ONLY)
 endif ()
 
 # Generate text.qrc
@@ -305,7 +310,8 @@ if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
     message(STATUS "Importing demoprofile.conf")
     configure_file(
       "${CMAKE_CURRENT_LIST_DIR}/resources/demoprofile.conf"
-      "${CMAKE_CURRENT_BINARY_DIR}/demoprofile.conf" COPYONLY)
+      "${CMAKE_CURRENT_BINARY_DIR}/demoprofile.conf"
+        COPYONLY)
     message(STATUS "Generating text.qrc")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<RCC>\n<qresource prefix=\"/txt\">\n")
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>demoprofile.conf</file>\n")
@@ -419,7 +425,7 @@ if (MACOS)
     set_target_properties(
         ckb-next
             PROPERTIES
-              MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/org.next.ckb.info.plist")
+              MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/org.ckb-next.info.plist")
 
     # Install icon file
     install(

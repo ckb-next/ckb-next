@@ -1,6 +1,6 @@
-#   Copyright (c) 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#   Copyright 2017-2018 ckb-next Development Team <ckb-next@googlegroups.com>
 #   All rights reserved.
-#   
+#
 #   Redistribution and use in source and binary forms, with or without
 #   modification, are permitted provided that the following conditions are met:
 #   
@@ -24,6 +24,8 @@
 #   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #   POSSIBILITY OF SUCH DAMAGE.
+#
+#   See COPYING regarding the distribution of quazip library and not this file.
 
 project(QuaZip VERSION 0.7.3)
 

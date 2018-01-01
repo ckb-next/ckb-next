@@ -1,6 +1,6 @@
-#   Copyright (c) 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#   Copyright 2017-2018 ckb-next Development Team <ckb-next@googlegroups.com>
 #   All rights reserved.
-#   
+#
 #   Redistribution and use in source and binary forms, with or without
 #   modification, are permitted provided that the following conditions are met:
 #   
@@ -125,7 +125,8 @@ add_subdirectory(src)
 # Uninstall target
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" @ONLY)
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    @ONLY)
 
 add_custom_target(
     uninstall

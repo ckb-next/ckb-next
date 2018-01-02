@@ -554,6 +554,65 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
         break;
     }
+    case KeyMap::K55:{
+        // The K95 Platinum map is based on the K95
+        map = getMap(KeyMap::K95, layout);
+        // Remove excess G keys
+        map.remove("g7");
+        map.remove("g8");
+        map.remove("g9");
+        map.remove("g10");
+        map.remove("g11");
+        map.remove("g12");
+        map.remove("g13");
+        map.remove("g14");
+        map.remove("g15");
+        map.remove("g16");
+        map.remove("g17");
+        map.remove("g18");
+        // Place the remaining G keys vertically
+        map["g1"].x = 22;
+        map["g2"].x = 22;
+        map["g3"].x = 22;
+        map["g4"].x = 22;
+        map["g5"].x = 22;
+        map["g6"].x = 22;
+        //map["g1"].y = 14+(12*0);
+        map["g2"].y = 26; //14+(12*1)
+        map["g3"].y = 38; //14+(12*2)
+        map["g4"].y = 50; //14+(12*3)
+        map["g5"].y = 62; //14+(12*4)
+        map["g6"].y = 74; //14+(12*5)
+        // Remove M keys
+        map.remove("m1");
+        map.remove("m2");
+        map.remove("m3");
+        // Move MR to the left of the brightness button
+        map["mr"].x = 210;
+        // Resize and move Volume Up/Down
+        map["voldn"].x = 285;
+        map["voldn"].y = 0;
+        map["voldn"].width = 13;
+        map["voldn"].height = 8;
+        map["volup"].x = 297;
+        map["volup"].y = 0;
+        map["volup"].width = 13;
+        map["volup"].height = 8;
+        // Replace rwin with Fn
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+        if(KeyMap::isJP(layout))
+            patchJP106fn(map);
+        // Shift all keys to the left, and disable their LEDs
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            i.value().x -= K95P_X_START;
+            i.value().hasLed = false;
+        }
+        break;
+    }
     case KeyMap::STRAFE:{
         // The Strafe RGB maps are based on the K70 map minus the media keys
         map = getMap(KeyMap::K70, layout);
@@ -795,6 +854,8 @@ QStringList KeyMap::layoutNames(){
 
 KeyMap::Model KeyMap::getModel(const QString& name){
     QString lower = name.toLower();
+    if(lower == "k55")
+        return K55;
     if(lower == "k63")
         return K63;
     if(lower == "k65")
@@ -826,6 +887,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
 
 QString KeyMap::getModel(KeyMap::Model model){
     switch(model){
+    case K55:
+        return "k55";
     case K63:
         return "k63";
     case K65:
@@ -877,6 +940,7 @@ int KeyMap::modelWidth(Model model){
     case K95:
          return K95_WIDTH;
     case K95P:
+    case K55:
         return K95P_WIDTH;
     case STRAFE:
         return KSTRAFE_WIDTH;
@@ -894,6 +958,7 @@ int KeyMap::modelWidth(Model model){
 
 int KeyMap::modelHeight(Model model){
     switch(model){
+    case K55:
     case K63:
     case K65:
     case K68:

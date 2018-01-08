@@ -169,10 +169,10 @@ const devcmd vtable_mouse = {
     .rebind = cmd_rebind,
     .macro = cmd_macro,
 
-    .dpi = cmd_dpi,
-    .dpisel = cmd_dpisel,
-    .lift = cmd_lift,
-    .snap = cmd_snap,
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
 
     .notify = cmd_notify,
     .inotify = cmd_none,

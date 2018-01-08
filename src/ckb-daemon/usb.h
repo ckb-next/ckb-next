@@ -120,9 +120,9 @@
 #define P_GLAIVE_STR      "1b34"
 #define IS_GLAIVE(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
 
-#define P_MM800            0x1b3b
-#define P_MM800_STR        "1b3b"
-#define IS_MM800(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_MM800))
+#define P_POLARIS            0x1b3b
+#define P_POLARIS_STR        "1b3b"
+#define IS_POLARIS(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
 ///
 /// uncomment to see USB packets sent to the device
@@ -205,7 +205,7 @@ const char* product_str(short product);
 /// Pure Hacker code.
 =======
 // Mousepad test
-#define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_MM800))
+#define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_POLARIS))
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 // USB delays for when the keyboards get picky about timing

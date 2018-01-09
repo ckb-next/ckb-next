@@ -131,15 +131,6 @@
 ///
 ///uncomment to see USB packets received from the device
 // #define DEBUG_USB_RECV
-=======
-
-
-// NOTE: when adding new devices please update src/ckb/fwupgradedialog.cpp as well.
-// It should contain the same vendor/product IDs for any devices supporting firmware updates.
-
-//uncomment to see USB packets sent to the device
-#define DEBUG_USB
->>>>>>> 25e1d3d... Daemon: Preliminary work for upcoming RGB mousepad support
 
 ///
 /// \brief vendor_str Vendor/product string representations

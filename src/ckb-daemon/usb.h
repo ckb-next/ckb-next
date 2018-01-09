@@ -194,16 +194,11 @@ const char* product_str(short product);
 /// This constant is used to initialize \b kb->usbdelay.
 /// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
 /// Pure Hacker code.
-=======
+
 // Mousepad test
 #define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_POLARIS))
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
-// USB delays for when the keyboards get picky about timing
-#define DELAY_SHORT(kb)     usleep((int)(kb)->usbdelay * 1000)  // base (default: 5ms)
-#define DELAY_MEDIUM(kb)    usleep((int)(kb)->usbdelay * 10000) // x10 (default: 50ms)
-#define DELAY_LONG(kb)      usleep(100000)                      // long, fixed 100ms
->>>>>>> 25e1d3d... Daemon: Preliminary work for upcoming RGB mousepad support
 #define USB_DELAY_DEFAULT   5
 
 /// Start the USB main loop. Returns program exit code when finished

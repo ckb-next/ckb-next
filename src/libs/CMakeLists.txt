@@ -1,4 +1,4 @@
-#   Copyright (c) 2017 Oleksii Vilchanskyi <alexvilchansky@yahoo.com>
+#   Copyright 2017-2018 ckb-next Development Team <ckb-next@googlegroups.com>
 #   All rights reserved.
 #   
 #   Redistribution and use in source and binary forms, with or without

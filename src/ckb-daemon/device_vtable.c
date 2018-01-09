@@ -230,7 +230,7 @@ const devcmd vtable_mousepad = {
     .allocprofile = allocprofile,
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
-    .updatergb = updatergb_mouse, // The Polaris is like a mouse with 14 lighting zones.
+    .updatergb = updatergb_mousepad,
     .updateindicators = updateindicators_mouse,
     .updatedpi = int1_int_none
 };

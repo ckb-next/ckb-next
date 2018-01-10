@@ -27,9 +27,9 @@ int updatergb_mousepad(usbdevice* kb, int force){
     };
     uchar* rgb_data = &data_pkt[4];
     for(int i = 0; i < num_zones; i++){
-        *rgb_data++ = newlight->r[LED_MOUSE + i];
-        *rgb_data++ = newlight->g[LED_MOUSE + i];
-        *rgb_data++ = newlight->b[LED_MOUSE + i];
+        *rgb_data++ = newlight->r[i];
+        *rgb_data++ = newlight->g[i];
+        *rgb_data++ = newlight->b[i];
     }
     // Send RGB data
     if(!usbsend(kb, data_pkt, 1))

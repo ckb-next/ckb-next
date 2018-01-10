@@ -28,11 +28,15 @@ static QSettings* globalSettings(){
     if(!_globalSettings){
         lockMutexStatic;
         if(!(volatile QSettings*)_globalSettings){   // Check again after locking mutex in case another thread created the object
+            _globalSettings = new QSettings;
+            qInfo() << "Path to the settings:" << _globalSettings->fileName();
+            // Check if a config migration attempt needs to be made.
+            if(!_globalSettings->value("Program/CkbMigrationChecked", false).toBool()){
+                CkbSettings::migrateSettings();
+            }
             // Put the settings object in a separate thread so that it won't lock up the GUI when it syncs
             globalThread = new QThread;
             globalThread->start();
-            _globalSettings = new QSettings;
-            qInfo() << "Path  to settings is" << _globalSettings->fileName();
             _globalSettings->moveToThread(globalThread);
         }
     }
@@ -41,6 +45,24 @@ static QSettings* globalSettings(){
 
 bool CkbSettings::isBusy(){
     return cacheWritesInProgress.load() > 0;
+}
+
+void CkbSettings::migrateSettings(){
+    QSettings *oldSettings = new QSettings("ckb", "ckb");
+    qInfo() << "Looking for old settings in:" << oldSettings->fileName();
+    // Check if a basic key exists
+    if(oldSettings->contains("Program/KbdLayout")){
+        qInfo() << "Found, proceeding to migrate.";
+        QStringList oldKeys = oldSettings->allKeys();
+        foreach (const QString &key, oldKeys){
+            QVariant value = oldSettings->value(key);
+            _globalSettings->setValue(key, value);
+        }
+        // Mark settings as migrated
+        _globalSettings->setValue("Program/CkbMigrationChecked", true);
+        qInfo() << oldKeys.count() << "keys migrated.";
+    }
+    delete oldSettings;
 }
 
 void CkbSettings::cleanUp(){

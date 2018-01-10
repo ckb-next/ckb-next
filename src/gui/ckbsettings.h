@@ -5,6 +5,8 @@
 #include <QStringList>
 #include <QMap>
 #include <QVariant>
+#include <QtCore/QFile>
+#include <QtCore/QDir>
 
 // QSettings replacement with convenience functions
 
@@ -19,6 +21,10 @@ public:
     CkbSettings(QSettings& settings);
 
     ~CkbSettings();
+
+    // On version 0.2.9 the organisation and application names were changed.
+    // This function migrates existing settings to the new location.
+    static void migrateSettings();
 
     // One-shot get/set
     static QVariant get(const QString& key, const QVariant& defaultValue = QVariant());

@@ -349,7 +349,7 @@ void KbWidget::on_fwUpdButton_clicked(){
         ui->fwUpdButton->setEnabled(true);
         updateFwButton();
         if(newVersion == -1.f){
-            QMessageBox::information(this, "Firmware update", "<center>There is a new firmware available for this device.<br />However, it requires a newer version of ckb.<br />Please upgrade ckb and try again.</center>");
+            QMessageBox::information(this, "Firmware update", "<center>There is a new firmware available for this device.<br />However, it requires a newer version of ckb-next.<br />Please upgrade ckb-next and try again.</center>");
             return;
         } else if(newVersion == 0.f){
             if(QMessageBox::question(this, "Firmware update", "<center>There was a problem getting the status for this device.<br />Would you like to select a file manually?</center>") != QMessageBox::Yes)

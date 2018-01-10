@@ -10,16 +10,11 @@
 #include "settingswidget.h"
 #include "daemondialog.h"
 
-#ifdef USE_LIBAPPINDICATOR
-#define signals_BACKUP signals
+// 'signals' has to be undefined as GTK has its own signal mechanism
 #undef signals
-extern "C" {
-  #include <libappindicator/app-indicator.h>
-  #include <gtk/gtk.h>
-}
-#define signals signals_BACKUP
-#undef signals_BACKUP
-#endif // USE_LIBAPPINDICATOR
+#include <libappindicator/app-indicator.h>
+// Redefine QT signals as per qtbase/src/corelib/kernel/qobjectdefs.h
+#define signals Q_SIGNALS
 
 namespace Ui {
 class MainWindow;
@@ -46,13 +41,11 @@ private:
 
     DaemonDialog* dialog;
 
-#ifdef USE_LIBAPPINDICATOR
     bool                unityDesktop;
     AppIndicator*       indicator;
     GtkWidget*          indicatorMenu;
     GtkWidget*          indicatorMenuQuitItem;
     GtkWidget*          indicatorMenuRestoreItem;
-#endif // USE_LIBAPPINDICATOR
     QMenu*              trayIconMenu;
     QSystemTrayIcon*    trayIcon;
 

@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QUrl>
+#include <ckbnextconfig.h>
 #include "animscript.h"
 
 QHash<QUuid, AnimScript*> AnimScript::scripts;
@@ -27,11 +28,7 @@ AnimScript::~AnimScript(){
 }
 
 QString AnimScript::path(){
-#ifdef __APPLE__
-    return QDir(QApplication::applicationDirPath() + "/../Resources").absoluteFilePath("ckb-animations");
-#else
-    return QDir("/usr/lib").absoluteFilePath("ckb-animations");
-#endif
+    return QString(CKB_NEXT_ANIMATIONS_PATH);
 }
 
 void AnimScript::scan(){

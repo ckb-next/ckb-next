@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include <ckbnextconfig.h>
 #include <QApplication>
 #include <QDateTime>
 #include <QSharedMemory>
@@ -8,7 +9,7 @@
 #include <signal.h>
 #include <errno.h>
 
-QSharedMemory appShare("ckb");
+QSharedMemory appShare("ckb-next");
 
 #ifdef Q_OS_MACX
 // App Nap is an OSX feature designed to save power by putting background apps to sleep.
@@ -150,9 +151,9 @@ int main(int argc, char *argv[]){
     QApplication a(argc, argv);
 
     // Setup names and versions
-    QCoreApplication::setOrganizationName("ckb");
-    QCoreApplication::setApplicationVersion(CKB_VERSION_STR);
-    QCoreApplication::setApplicationName("ckb");
+    QCoreApplication::setOrganizationName("ckb-next");
+    QCoreApplication::setApplicationVersion(CKB_NEXT_VERSION_STR);
+    QCoreApplication::setApplicationName("ckb-next");
 
     // Setup argument parser
     QCommandLineParser parser;
@@ -162,7 +163,7 @@ int main(int argc, char *argv[]){
 
     // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
     if(getuid() == 0){
-        printf("The ckb GUI should not be run as root.\n");
+        printf("The ckb-next GUI should not be run as root.\n");
         return 0;
     }
 
@@ -204,7 +205,7 @@ int main(int argc, char *argv[]){
         if (isRunning("Close"))
             printf("Asking existing instance to close.\n");
         else
-            printf("ckb is not running.\n");
+            printf("ckb-next is not running.\n");
         return 0;
     case CommandLineBackground:
         // If launched with --background, launch in background
@@ -216,7 +217,7 @@ int main(int argc, char *argv[]){
     if(qApp->isSessionRestored())
             background = 1;
     if(isRunning(background ? 0 : "Open")){
-        printf("ckb is already running. Exiting.\n");
+        printf("ckb-next is already running. Exiting.\n");
         return 0;
     }
     MainWindow w;

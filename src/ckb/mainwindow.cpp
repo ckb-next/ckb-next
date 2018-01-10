@@ -17,11 +17,15 @@ extern QString devpath;
 static const QString configLabel = "Settings";
 
 #ifndef Q_OS_MACX
-QString cmdMsgEnable = "sudo systemctl enable ckb-daemon";
-QString cmdMsgStart = "sudo systemctl start ckb-daemon";
+QString daemonDialogText = QObject::tr("Start it once with:") +
+    QObject::tr("<blockquote><code>sudo systemctl start ckb-daemon</code></blockquote>") +
+    QObject::tr("Enable it for every boot:") +
+    QObject::tr("<blockquote><code>sudo systemctl enable ckb-daemon</code></blockquote>");
 #else
-QString cmdMsgEnable = "sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist";
-QString cmdMsgStart = "sudo launchctl start com.ckb.daemon";
+QString daemonDialogText = QObject::tr("Start it once with:") +
+    QObject::tr("<blockquote><code>sudo launchctl start com.ckb.daemon.plist</code></blockquote>") +
+    QObject::tr("Enable it for every boot:") +
+    QObject::tr("<blockquote><code>sudo launchctl enable /Library/LaunchDaemons/com.ckb.daemon.plist</code></blockquote>");
 #endif
 
 MainWindow* MainWindow::mainWindow = 0;
@@ -118,8 +122,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
     settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
 
-    // create deamon dialog unconditionally to be able to remove it safely in
-    // this classes destructor
+    // create daemon dialog as a QMessageBox
+    // this will create a focussed dialog, that has to be interacted with,
+    // if the daemon is not running
+    // set the main and informative text to tell the user about the issue
+    QMessageBox dialog;
+    dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
+    dialog.setInformativeText(daemonDialogText);
+    dialog.setIcon(QMessageBox::Warning);
 
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it
@@ -128,9 +138,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // see `./kbmanager.cpp` for details
     QFileInfo rootDevPath(devpath.arg(0));
     if (!rootDevPath.exists()) {
-        settingsWidget->setStatus("The ckb-next daemon is not running!");
-        // open dialog to tell the user to start the daemon based on OS and how
-        // to enable etc.
+        // set settings widget's status
+        // show the main window (otherwise only the dialog will be visible)
+        // finally show the dialog
+        settingsWidget->setStatus(tr("The ckb-next daemon is not running."));
+        showWindow();
+        dialog.exec();
     }
 }
 

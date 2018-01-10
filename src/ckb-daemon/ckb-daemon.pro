@@ -48,7 +48,8 @@ SOURCES += \
     input_mac_mouse.c \
     profile_keyboard.c \
     dpi.c \
-    profile_mouse.c
+    profile_mouse.c \
+    led_mousepad.c
 
 HEADERS += \
     device.h \

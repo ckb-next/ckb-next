@@ -23,7 +23,7 @@ int updatergb_mousepad(usbdevice* kb, int force){
     int num_zones = 14;
     // Send the RGB values for each zone to the mouse
     uchar data_pkt[MSG_SIZE] = {
-        { 0x07, 0x22, num_zones, 0x00, 0 }, // RGB colors
+        0x07, 0x22, num_zones, 0x00, 0, // RGB colors
     };
     uchar* rgb_data = &data_pkt[4];
     for(int i = 0; i < num_zones; i++){

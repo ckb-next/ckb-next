@@ -169,7 +169,6 @@ const char* product_str(short product);
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
 
-<<<<<<< HEAD
 /// Used to apply quirks and features to the PLATINUM devices.
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 

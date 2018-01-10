@@ -34,7 +34,7 @@
 
 /// \brief For the following Defines please see "Detailed Description"
 ///
-/// \warning When adding new devices please update src/ckb/fwupgradedialog.cpp as well.
+/// \warning When adding new devices please update src/gui/fwupgradedialog.cpp as well.
 /// \n It should contain the same vendor/product IDs for any devices supporting firmware updates.
 /// \n In the same way, all other corresponding files have to be supplemented or modified:
 /// Currently known for this are \b usb_linux.c and \b usb_mac.c

@@ -5,6 +5,7 @@
 #include "led.h"
 #include "notify.h"
 #include "profile.h"
+#include <ckbnextconfig.h>
 
 // OSX doesn't like putting FIFOs in /dev for some reason
 #ifndef OS_MAC
@@ -158,7 +159,7 @@ static int _mkdevpath(usbdevice* kb){
         snprintf(vpath, sizeof(vpath), "%s/version", path);
         FILE* vfile = fopen(vpath, "w");
         if(vfile){
-            fprintf(vfile, "%s\n", CKB_VERSION_STR);
+            fprintf(vfile, "%s\n", CKB_NEXT_VERSION_STR);
             fclose(vfile);
             chmod(vpath, S_GID_READ);
             if(gid >= 0)

@@ -3,6 +3,7 @@
 #include "input.h"
 #include "led.h"
 #include "notify.h"
+#include <ckbnextconfig.h>
 
 static int main_ac;
 static char **main_av;
@@ -92,18 +93,18 @@ int main(int argc, char** argv){
     main_ac = argc;
     main_av = argv;
 
-    printf("    ckb: Corsair RGB driver %s\n", CKB_VERSION_STR);
+    printf("    ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i], "--help")){
             printf(
 #ifdef OS_MAC
-                        "Usage: ckb-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
+                        "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
 #else
-                        "Usage: ckb-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
+                        "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
 #endif
                         "\n"
-                        "See https://github.com/ccMSC/ckb/blob/master/DAEMON.md for full instructions.\n"
+                        "See https://github.com/mattanger/ckb-next/blob/master/DAEMON.md for full instructions.\n"
                         "\n"
                         "Command-line parameters:\n"
                         "    --gid=<gid>\n"
@@ -123,7 +124,7 @@ int main(int argc, char** argv){
                         "        Disables mouse acceleration, even if the system preferences enable it.\n"
 #endif
                         "    --nonroot\n"
-                        "        Allows running ckb-daemon as a non root user.\n"
+                        "        Allows running ckb-next-daemon as a non root user.\n"
                         "        This will almost certainly not work. Use only if you know what you're doing.\n"
                         "\n", devpath);
             exit(0);
@@ -141,7 +142,7 @@ int main(int argc, char** argv){
         if(pid > 0){
             // kill -s 0 checks if the PID is active but doesn't send a signal
             if(!kill(pid, 0)){
-                ckb_fatal_nofile("ckb-daemon is already running (PID %d). Try `killall ckb-daemon`.\n", pid);
+                ckb_fatal_nofile("ckb-next-daemon is already running (PID %d). Try `killall ckb-next-daemon`.\n", pid);
                 ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)\n", pidpath);
                 return 0;
             }
@@ -193,7 +194,7 @@ int main(int argc, char** argv){
     // Check UID
     if(getuid() != 0){
         if(forceroot){
-            ckb_fatal_nofile("ckb-daemon must be run as root. Try `sudo %s`\n", argv[0]);
+            ckb_fatal_nofile("ckb-next-daemon must be run as root. Try `sudo %s`\n", argv[0]);
             exit(0);
         } else
             ckb_warn_nofile("Warning: not running as root, allowing anyway per command-line parameter...\n");

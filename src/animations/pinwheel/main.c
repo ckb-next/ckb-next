@@ -1,4 +1,4 @@
-#include "../ckb/ckb-anim.h"
+#include <ckb-next/animation.h>
 
 void ckb_info(){
     // Plugin info

@@ -1,17 +1,16 @@
 /*
- * 
  * Copyright (C) 2017  Devon Richards
- * ckb-mviz is free software: you can redistribute it and/or modify
+ * mviz is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
- * ckb-mviz is distributed in the hope that it will be useful,
+ * mviz is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with ckb-mviz.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mviz.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <math.h>
@@ -19,17 +18,15 @@
 #include <stdlib.h>
 
 #include <pulse/simple.h>
-
-#include "../ckb/ckb-anim.h"
-
-#include "kiss_fftr.h"
+#include <kissfft/kiss_fftr.h>
+#include <ckb-next/animation.h>
 
 void ckb_info(){
     // Plugin info
     CKB_NAME("Music Visualization");
     CKB_VERSION("0.2");
     CKB_COPYRIGHT("2017", "RULER501");
-    CKB_LICENSE("GPLv2");
+    CKB_LICENSE("GPLv2+");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25CA1DB0D92C}");
     CKB_DESCRIPTION("A collection of music visualization effects");
 

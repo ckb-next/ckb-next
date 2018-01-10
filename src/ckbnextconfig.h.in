@@ -1,0 +1,5 @@
+#cmakedefine CKB_NEXT_VERSION_STR "${ckb-next_VERSION}"
+#cmakedefine CKB_NEXT_ANIMATIONS_PATH "${CMAKE_INSTALL_PREFIX}/${INSTALL_DIR_ANIMATIONS}"
+
+#cmakedefine DEBUG_USB_SEND
+#cmakedefine DEBUG_USB_RECV

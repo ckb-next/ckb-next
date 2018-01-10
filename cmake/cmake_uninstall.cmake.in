@@ -1,0 +1,187 @@
+#   Copyright 2017-2018 ckb-next Development Team <ckb-next@googlegroups.com>
+#   All rights reserved.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   1. Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+#   2. Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions and the following disclaimer in the
+#   documentation and/or other materials provided with the distribution.
+#   3. Neither the name of the copyright holder nor the names of its
+#   contributors may be used to endorse or promote products derived from this
+#   software without specific prior written permission. 
+#   
+#   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+#   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#   POSSIBILITY OF SUCH DAMAGE.
+
+# Also see https://cmake.org/Wiki/CMake_FAQ#Can_I_do_.22make_uninstall.22_with_CMake.3F
+
+if(NOT EXISTS "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: @CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")
+endif(NOT EXISTS "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")
+
+# Stop the GUI
+message(STATUS "Searching for running ckb and/or ckb-next GUI")
+
+execute_process(
+    COMMAND ps axco command
+    COMMAND egrep "^ckb$|^ckb-next$"
+    OUTPUT_VARIABLE gui_processes
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if (gui_processes)
+    string(REPLACE "\n" ";" gui_processes_list "${gui_processes}")
+    foreach (gui_process IN LISTS gui_processes_list)
+        message(STATUS "Running ${gui_process} GUI detected")
+        message(STATUS "Terminating ${gui_process}")
+        execute_process(COMMAND killall -9 "${gui_process}")
+    endforeach ()
+endif ()
+
+set(init_system "@CKB_NEXT_INIT_SYSTEM@")
+message(STATUS "Init system: ${init_system}")
+
+# Stop the daemon
+if ("${init_system}" STREQUAL "launchd")
+
+    execute_process(
+        COMMAND sudo launchctl list
+        OUTPUT_VARIABLE launchctl_jobs)
+
+    foreach (plist_name IN ITEMS "com.ckb.daemon" "org.next.ckb.daemon")
+        string(FIND "${launchctl_jobs}" "${plist_name}" daemon_found)
+        if (NOT (daemon_found EQUAL -1))
+            message(STATUS "Running job with ${plist_name} plist detected")
+            message(STATUS "${init_system}: permanently unloading ${plist_name}")
+            execute_process(COMMAND sudo launchctl unload -w /Library/LaunchDaemons/${plist_name}.plist)
+        endif ()
+    endforeach ()
+
+elseif ("${init_system}" STREQUAL "upstart")
+
+    foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
+
+        execute_process(
+            COMMAND sudo service ${daemon} status
+            COMMAND egrep "^${daemon} start"
+            RESULT_VARIABLE daemon_active)
+
+        if(daemon_active EQUAL 0)
+            message(STATUS "Running ${daemon} detected")
+            message(STATUS "${init_system}: stopping ${daemon}")
+            execute_process(COMMAND sudo service ${daemon} stop)
+        endif()
+
+        execute_process(
+            COMMAND sudo initctl show-config ${daemon}
+            COMMAND egrep "^  start on"
+            RESULT_VARIABLE daemon_enabled)
+
+        if(daemon_enabled EQUAL 0)
+            message(STATUS "Enabled ${daemon} detected")
+            message(STATUS "${init_system}: permanently disabling ${daemon}")
+            execute_process(COMMAND echo manual COMMAND sudo tee /etc/init/${daemon}.override)
+        endif()
+
+    endforeach()
+
+elseif ("${init_system}" STREQUAL "systemd")
+
+    foreach(daemon IN ITEMS "ckb-daemon" "ckb-next-daemon")
+
+        execute_process(
+            COMMAND sudo systemctl is-active ${daemon}.service
+            RESULT_VARIABLE daemon_active)
+
+        if(daemon_active EQUAL 0)
+            message(STATUS "Running ${daemon} detected")
+            message(STATUS "${init_system}: stoppping ${daemon}")
+            execute_process(COMMAND sudo systemctl stop ${daemon}.service)
+        endif()
+
+        execute_process(
+            COMMAND sudo systemctl is-enabled ${daemon}.service
+            RESULT_VARIABLE daemon_enabled)
+
+        if(daemon_enabled EQUAL 0)
+            message(STATUS "Enabled ${daemon} detected")
+            message(STATUS "${init_system}: permanently disabling ${daemon}")
+            execute_process(COMMAND sudo systemctl disable ${daemon}.service)
+        endif()
+
+    endforeach()
+
+elseif ("${init_system}" STREQUAL "OpenRC")
+
+    execute_process(
+        COMMAND rc-status -a
+        COMMAND egrep "started"
+        COMMAND egrep -o "ckb-daemon|ckb-next-daemon"
+        OUTPUT_VARIABLE daemons
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    if (daemons)
+        string(REPLACE "\n" ";" daemons_list "${daemons}")
+        foreach(daemon IN LISTS daemons_list)
+            message(STATUS "Running ${daemon} detected")
+            message(STATUS "${init_system}: stoppping ${daemon}")
+            execute_process(COMMAND sudo rc-service ${daemon} stop)
+        endforeach()
+    endif()
+
+    execute_process(
+        COMMAND rc-status -a
+        COMMAND egrep -o "ckb-daemon|ckb-next-daemon"
+        OUTPUT_VARIABLE daemons
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    if (daemons)
+        string(REPLACE "\n" ";" daemons_list "${daemons}")
+        foreach(daemon IN LISTS daemons_list)
+            message(STATUS "Enabled ${daemon} detected")
+            message(STATUS "${init_system}: permanently disabling ${daemon}")
+            execute_process(COMMAND sudo rc-update del ${daemon} default)
+        endforeach()
+    endif()
+
+else ()
+    message(WARNING "Init system was not detected.
+    Either there's a bug, or your init system is not supported.")
+endif ()
+
+file(READ "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt" files)
+string(REGEX REPLACE "\n" ";" files "${files}")
+
+foreach (file IN LISTS files)
+    message(STATUS "Uninstalling $ENV{DESTDIR}${file}")
+    if (IS_SYMLINK "$ENV{DESTDIR}${file}" OR EXISTS "$ENV{DESTDIR}${file}")
+        exec_program(
+            "@CMAKE_COMMAND@" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
+            OUTPUT_VARIABLE rm_out
+            RETURN_VALUE rm_retval)
+        if (NOT "${rm_retval}" STREQUAL 0)
+            message(FATAL_ERROR "Problem when removing $ENV{DESTDIR}${file}")
+        endif (NOT "${rm_retval}" STREQUAL 0)
+    else ()
+        message(STATUS "File $ENV{DESTDIR}${file} does not exist.")
+    endif ()
+endforeach (file)
+
+if ("${init_system}" STREQUAL "systemd")
+    message(STATUS "${init_system}: refreshing services")
+    execute_process(COMMAND sudo systemctl daemon-reload)
+elseif ("${init_system}" STREQUAL "upstart")
+    message(STATUS "${init_system}: refreshing services")
+    execute_process(COMMAND sudo initctl reload-configuration)
+endif ()

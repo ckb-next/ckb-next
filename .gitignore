@@ -1,7 +1,8 @@
+CMakeLists.txt.user
 bin/
 build/
 *.app/
-cmake-build-debug/
+cmake-build*/
 *.pkg
 .DS_Store
 .*
@@ -16,3 +17,5 @@ ui_*
 qrc_*
 .firmware
 ckb-dev-detect-report.gz
+ckb-next-dev-detect-report.gz
+macos/pkgproj/build

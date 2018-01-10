@@ -7,6 +7,10 @@
 
 // Lightbar LED size
 #define LBS 17, 6
+
+// K55 Zone Size
+#define ZS 97, 75
+
 // Key positions (K95 - English)
 // This is the master key map that includes ANSI, ISO and JP-106 layouts - use patchANSI(), patchISO() or patchJP106() to finalize it
 static const Key K95Keys[] = {
@@ -19,6 +23,7 @@ static const Key K95Keys[] = {
     {0, 0, "g16", 0, 75, NS, true, true}, {0, 0, "g17", 11, 75, NS, true, true}, {0, 0, "g18", 22, 75, NS, true, true}, {0, "Left Ctrl", "lctrl", 40, 75, 16, 12, true, true}, {0, "Left Windows", "lwin", 54, 75, NS, true, true}, {0, "Left Alt", "lalt", 67, 75, 14, 12, true, true}, {0, "無変換", "muhenkan", 80, 75, NS, true, true}, {0, "Space", "space", 116, 75, 84, 12, true, true}, {0, "変換", "henkan", 150, 75, NS, true, true}, {0, "ひらがな カタカナ ローマ字", "katahira", 162, 75, NS, true, true}, {0, "Right Alt", "ralt", 165, 75, 14, 12, true, true}, {0, "Right Windows", "rwin", 178, 75, NS, true, true}, {0, "Menu", "rmenu", 190, 75, NS, true, true}, {0, "Right Ctrl", "rctrl", 204, 75, 16, 12, true, true}, {0, "Left", "left", 222, 75, NS, true, true}, {0, "Down", "down", 234, 75, NS, true, true}, {0, "Right", "right", 246, 75, NS, true, true}, {0, "NumPad 0", "num0", 267, 75, 24, 12, true, true}, {0, "NumPad .", "numdot", 285, 75, NS, true, true}
 };
 #define KEYCOUNT_K95 (sizeof(K95Keys) / sizeof(Key))
+
 
 // ANSI layouts use a different Enter/LShift key
 #define ANSI_ENTER_X    199
@@ -246,6 +251,14 @@ static const Key K63TopRow[] = {
     {0, "Stop", "stop", K70_X_START - 37, 0, 12, 8, true, true}, {0, "Previous", "prev", K70_X_START - 26, 0, 12, 8, true, true}, {0, "Play/Pause", "play", K70_X_START - 15, 0, 12, 8, true, true}, {0, "Next", "next", K70_X_START - 4, 0, 12, 8, true, true}, {0, "Brightness", "light", 170 - K70_X_START, 0, 12, 12, true, true}, {0, "Windows Lock", "lock", 180 - K70_X_START, 0, 12, 12, true, true}, {0, "Mute", "mute", 222 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Down", "voldn", 234 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 246 - K70_X_START, 0, 13, 8, true, true}
 };
 #define K63_TOP_COUNT (sizeof(K63TopRow) / sizeof(Key))
+
+static const Key K55Zones[] = {
+    {0, "Zone 1", "zone1", 46, 45, ZS, true, false},
+    {0, "Zone 2", "zone2", 140, 45, ZS, true, false},
+    {0, "Zone 3", "zone3", 233, 45, ZS, true, false},
+};
+#define K55_ZONES (sizeof(K55Zones) / sizeof(Key))
+
 
 // Strafe has side lights
 #define KSTRAFE_X_START     12
@@ -555,7 +568,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     case KeyMap::K55:{
-        // The K95 Platinum map is based on the K95
+        // The K55 map is based on the K95
         map = getMap(KeyMap::K95, layout);
         // Remove excess G keys
         map.remove("g7");
@@ -611,6 +624,10 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             i.value().x -= K95P_X_START;
             i.value().hasLed = false;
         }
+
+        // Append the zones to the keymap
+        for(const Key* key = K55Zones; key < K55Zones + K55_ZONES; key++)
+            map[key->name] = *key;
         break;
     }
     case KeyMap::STRAFE:{

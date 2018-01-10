@@ -311,6 +311,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
             float y = key.y + offY - 1.8f;
             float w = 3.6f;
             float h = 3.6f;
+            /*if(model == KeyMap::K55){
+                x = key.x;
+                y = key.y;
+                w = key.width;
+                h = key.height;
+            }*/
             // Display a white circle around regular keys, red circle around indicators
             if(_indicators.contains(key.name))
                 decPainter.setPen(QPen(QColor(255, 248, 136), 1.5));
@@ -392,9 +398,10 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     decPainter.drawPolygon(edgePoints, 6);
                  } else
                     decPainter.drawRect(QRectF(kx * scale, ky * scale, kw * scale, kh * scale));
-            } else {
+            } else if (model == KeyMap::K55)
+                decPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
+            else
                 decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
-            }
         }
     } else {
         // Draw key names

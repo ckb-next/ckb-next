@@ -1,9 +1,0 @@
-[Desktop Entry]
-Encoding=UTF-8
-Version=1.0
-Type=Application
-Name=ckb
-Comment=Corsair keyboard driver user interface
-Exec=ckb
-Icon=ckb
-Categories=Settings;System;

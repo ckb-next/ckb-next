@@ -503,7 +503,7 @@ int main(int argc, char *argv[]){
             return 0;
         }
     }
-    printf("This program must be run from within ckb\n");
+    printf("This program must be run from within ckb-next\n");
     return -1;
 }
 

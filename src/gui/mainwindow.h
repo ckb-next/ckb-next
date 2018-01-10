@@ -9,16 +9,16 @@
 #include "kbwidget.h"
 #include "settingswidget.h"
 
-#ifdef USE_LIBAPPINDICATOR
-#define signals_BACKUP signals
+#ifdef Q_OS_LINUX
+// 'signals' has to be undefined as GTK has its own signal mechanism
 #undef signals
 extern "C" {
   #include <libappindicator/app-indicator.h>
   #include <gtk/gtk.h>
 }
-#define signals signals_BACKUP
-#undef signals_BACKUP
-#endif // USE_LIBAPPINDICATOR
+// Redefine QT signals as per qtbase/src/corelib/kernel/qobjectdefs.h
+#define signals Q_SIGNALS
+#endif
 
 namespace Ui {
 class MainWindow;
@@ -43,13 +43,14 @@ private:
     QAction* restoreAction;
     QAction* closeAction;
 
-#ifdef USE_LIBAPPINDICATOR
+#ifdef Q_OS_LINUX
     bool                unityDesktop;
     AppIndicator*       indicator;
     GtkWidget*          indicatorMenu;
     GtkWidget*          indicatorMenuQuitItem;
     GtkWidget*          indicatorMenuRestoreItem;
-#endif // USE_LIBAPPINDICATOR
+#endif
+
     QMenu*              trayIconMenu;
     QSystemTrayIcon*    trayIcon;
 

@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QMenuBar>
 #include <unistd.h>
+#include <ckbnextconfig.h>
 
 extern QSharedMemory appShare;
 extern QString devpath;
@@ -18,17 +19,17 @@ static const QString configLabel = "Settings";
 
 #ifndef Q_OS_MACOS
 QString daemonDialogText = QObject::tr("Start it once with:") +
-    "<blockquote><code>sudo systemctl start ckb-daemon</code></blockquote>" +
+    "<blockquote><code>sudo systemctl start ckb-next-daemon</code></blockquote>" +
     QObject::tr("Enable it for every boot:") +
-    "<blockquote><code>sudo systemctl enable ckb-daemon</code></blockquote>";
+    "<blockquote><code>sudo systemctl enable ckb-next-daemon</code></blockquote>";
 #else
 QString daemonDialogText = QObject::tr("Start and enable it with:") +
-    "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/com.ckb.daemon.plist</code></blockquote>";
+    "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist</code></blockquote>";
 #endif
 
 MainWindow* MainWindow::mainWindow = 0;
 
-#ifdef USE_LIBAPPINDICATOR
+#ifdef Q_OS_LINUX
 extern "C" {
     void quitIndicator(GtkMenu* menu, gpointer data) {
         Q_UNUSED(menu);
@@ -42,7 +43,7 @@ extern "C" {
         window->showWindow();
     }
 }
-#endif // USE_LIBAPPINDICATOR
+#endif
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mainWindow = this;
 
     // Start device manager
-    KbManager::init(CKB_VERSION_STR);
+    KbManager::init(CKB_NEXT_VERSION_STR);
     connect(KbManager::kbManager(), SIGNAL(kbConnected(Kb*)), this, SLOT(addDevice(Kb*)));
     connect(KbManager::kbManager(), SIGNAL(kbDisconnected(Kb*)), this, SLOT(removeDevice(Kb*)));
     connect(KbManager::kbManager(), SIGNAL(versionUpdated()), this, SLOT(updateVersion()));
@@ -60,8 +61,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
-    closeAction = new QAction(tr("Quit ckb"), this);
-#ifdef USE_LIBAPPINDICATOR
+    closeAction = new QAction(tr("Quit"), this);
+
+#ifdef Q_OS_LINUX
     QString desktop = std::getenv("XDG_CURRENT_DESKTOP");
     unityDesktop = (desktop.toLower() == "unity");
 
@@ -70,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
         indicatorMenu = gtk_menu_new();
         indicatorMenuRestoreItem = gtk_menu_item_new_with_label("Restore");
-        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit ckb");
+        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit");
 
         gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
         gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
@@ -83,28 +85,28 @@ MainWindow::MainWindow(QWidget *parent) :
         gtk_widget_show(indicatorMenuRestoreItem);
         gtk_widget_show(indicatorMenuQuitItem);
 
-        indicator = app_indicator_new("ckb", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+        indicator = app_indicator_new("ckb-next", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
 
         app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
         app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
-        app_indicator_set_icon(indicator, "ckb");
+        app_indicator_set_icon(indicator, "ckb-next-logo");
     } else
-#endif // USE_LIBAPPINDICATOR
+#endif
     {
         trayIconMenu = new QMenu(this);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-logo.png"), this);
+        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next-logo.png"), this);
         trayIcon->setContextMenu(trayIconMenu);
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
-     }
-     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
+    }
+    toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
 #ifdef Q_OS_MACOS
     // Make a custom "Close" menu action for OSX, as the default one brings up the "still running" popup unnecessarily
     QMenuBar* menuBar = new QMenuBar(this);
     setMenuBar(menuBar);
-    this->menuBar()->addMenu("ckb")->addAction(closeAction);
+    this->menuBar()->addMenu("ckb-next")->addAction(closeAction);
 #else
     // On linux, add a handler for Ctrl+Q
     new QShortcut(QKeySequence("Ctrl+Q"), this, SLOT(quitApp()));
@@ -118,7 +120,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
-    settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
+    settingsWidget->setVersion("ckb-next " CKB_NEXT_VERSION_STR);
 
     // create daemon dialog as a QMessageBox
     // this will create a focussed dialog, that has to be interacted with,
@@ -146,11 +148,11 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::toggleTrayIcon(bool visible) {
-#ifdef USE_LIBAPPINDICATOR
+#ifdef Q_OS_LINUX
     if(unityDesktop)
         app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
     else
-#endif // USE_LIBAPPINDICATOR
+#endif
         trayIcon->setVisible(visible);
 }
 
@@ -195,8 +197,8 @@ void MainWindow::updateVersion(){
     int count = kbWidgets.count();
     // Warn if the daemon version doesn't match the GUI
     QString daemonWarning;
-    if(daemonVersion != CKB_VERSION_STR)
-        daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVersion + "). Please upgrade ckb" + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + ". If the problem persists, try rebooting.";
+    if(daemonVersion != CKB_NEXT_VERSION_STR)
+        daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVersion + "). Please upgrade ckb-next" + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + ". If the problem persists, try rebooting.";
     if(count == 0)
         settingsWidget->setStatus("No devices connected" + daemonWarning);
     else if(count == 1)
@@ -249,7 +251,7 @@ void MainWindow::closeEvent(QCloseEvent *event){
         return;
     }
     if(!CkbSettings::get("Popups/BGWarning").toBool()){
-        QMessageBox::information(this, "ckb", "ckb will still run in the background.\nTo close it, choose Exit from the tray menu\nor click \"Quit ckb\" on the Settings screen.");
+        QMessageBox::information(this, "ckb-next", "ckb-next will still run in the background.\nTo close it, choose Quit from the tray menu\nor click \"Quit\" on the Settings screen.");
         CkbSettings::set("Popups/BGWarning", true);
     }
     hide();

@@ -46,8 +46,8 @@ void KbManager::fps(int framerate){
 }
 
 float KbManager::parseVersionString(QString version){
-    // Remove extraneous info (anything after a +, anything non-numeric)
-    QStringList dots = version.replace(QRegExp("\\+.+"), "").replace(QRegExp("[^\\d\\.]"), "").split(".");
+    // Remove extraneous info (anything after + or -, anything non-numeric)
+    QStringList dots = version.replace(QRegExp("\\+|-.+"), "").replace(QRegExp("[^\\d\\.]"), "").split(".");
     float base = 1.f;
     float res = 0.f;
     // A number like "1.2.3" will result in 1.0203

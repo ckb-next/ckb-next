@@ -120,9 +120,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // create deamon dialog unconditionally to be able to remove it safely in
     // this classes destructor
-    dialog = new DaemonDialog(this, cmdMsgStart, cmdMsgEnable);
-    // Make the dialog unskippable
-    dialog->setModal(true);
 
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it
@@ -134,7 +131,6 @@ MainWindow::MainWindow(QWidget *parent) :
         settingsWidget->setStatus("The ckb-next daemon is not running!");
         // open dialog to tell the user to start the daemon based on OS and how
         // to enable etc.
-        dialog->show();
     }
 }
 
@@ -331,6 +327,5 @@ void MainWindow::cleanup(){
 
 MainWindow::~MainWindow(){
     cleanup();
-    delete dialog;
     delete ui;
 }

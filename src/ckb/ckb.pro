@@ -108,8 +108,7 @@ SOURCES += main.cpp\
     extrasettingswidget.cpp \
     kbmanager.cpp \
     colormap.cpp \
-    macroreader.cpp \
-    daemondialog.cpp
+    macroreader.cpp
 
 HEADERS  += mainwindow.h \
     kbwidget.h \
@@ -167,8 +166,7 @@ HEADERS  += mainwindow.h \
     extrasettingswidget.h \
     kbmanager.h \
     colormap.h \
-    macroreader.h \
-    daemondialog.h
+    macroreader.h
 
 FORMS    += mainwindow.ui \
     kbwidget.ui \
@@ -186,8 +184,7 @@ FORMS    += mainwindow.ui \
     mperfwidget.ui \
     kperfwidget.ui \
     layoutdialog.ui \
-    extrasettingswidget.ui \
-    daemondialog.ui
+    extrasettingswidget.ui
 
 RESOURCES += \
     image.qrc \

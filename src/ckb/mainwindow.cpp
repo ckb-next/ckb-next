@@ -18,14 +18,14 @@ static const QString configLabel = "Settings";
 
 #ifndef Q_OS_MACX
 QString daemonDialogText = QObject::tr("Start it once with:") +
-    QObject::tr("<blockquote><code>sudo systemctl start ckb-daemon</code></blockquote>") +
+    "<blockquote><code>sudo systemctl start ckb-daemon</code></blockquote>" +
     QObject::tr("Enable it for every boot:") +
-    QObject::tr("<blockquote><code>sudo systemctl enable ckb-daemon</code></blockquote>");
+    "<blockquote><code>sudo systemctl enable ckb-daemon</code></blockquote>";
 #else
 QString daemonDialogText = QObject::tr("Start it once with:") +
-    QObject::tr("<blockquote><code>sudo launchctl start com.ckb.daemon.plist</code></blockquote>") +
+    "<blockquote><code>sudo launchctl start com.ckb.daemon.plist</code></blockquote>" +
     QObject::tr("Enable it for every boot:") +
-    QObject::tr("<blockquote><code>sudo launchctl enable /Library/LaunchDaemons/com.ckb.daemon.plist</code></blockquote>");
+    "<blockquote><code>sudo launchctl enable /Library/LaunchDaemons/com.ckb.daemon.plist</code></blockquote>";
 #endif
 
 MainWindow* MainWindow::mainWindow = 0;

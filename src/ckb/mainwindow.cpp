@@ -129,7 +129,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMessageBox dialog;
     dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
     dialog.setInformativeText(daemonDialogText);
-    dialog.setIcon(QMessageBox::Warning);
+    dialog.setIcon(QMessageBox::Critical);
 
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it

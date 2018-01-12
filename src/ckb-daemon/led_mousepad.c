@@ -19,8 +19,8 @@ int updatergb_mousepad(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    // We pretend the Polaris is a mouse with 14 LED zones.
-    int num_zones = 14;
+    // We pretend the Polaris is a mouse with 15 LED zones.
+    int num_zones = 15;
     // Send the RGB values for each zone to the mouse
     uchar data_pkt[MSG_SIZE] = {
         0x07, 0x22, num_zones, 0x00, 0, // RGB colors

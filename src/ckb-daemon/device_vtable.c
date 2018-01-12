@@ -196,8 +196,8 @@ const devcmd vtable_mousepad = {
     .fwupdate = cmd_io_none,
     .pollrate = cmd_io_none,
 
-    .active = cmd_io_none,
-    .idle = cmd_io_none,
+    .active = cmd_active_mouse,
+    .idle = cmd_idle_mouse,
 
     .erase = cmd_erase,
     .eraseprofile = cmd_eraseprofile,

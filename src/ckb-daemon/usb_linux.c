@@ -69,8 +69,8 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     int res;
     if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !is_recv){
         struct usbdevfs_bulktransfer transfer = {0};
-        // FW 2.XX uses 0x03, FW 3.XX uses 0x02
-        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : (kb->fwversion >= 0x300 ? 2 : 3);
+        // The workaround exists because ccMSC originally had it there. Needs further testing to see if it can be replaced.
+        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200 && !IS_V2_OVERRIDE(kb)) ? 4 : kb->epcount - 1;
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
@@ -279,18 +279,20 @@ void* os_inputmain(void* context){
     /// non RGB Mouse or Keyboard | !IS_RGB | 1 | 4
     /// non RGB Mouse or Keyboard | !IS_RGB | 2 | 15
     ///
-    urbs[0].buffer_length = (kb->fwversion >= 0x300 ? MSG_SIZE : 8);
-    if(urbcount > 1 && IS_RGB(vendor, product)) {
-        if(IS_MOUSE(vendor, product))
-            urbs[1].buffer_length = 10;
-        else
-            urbs[1].buffer_length = 21;
-        urbs[2].buffer_length = MSG_SIZE;
-        if(urbcount != 3)
-            urbs[urbcount - 1].buffer_length = MSG_SIZE;
-    } else if(kb->fwversion < 0x300) {
-            urbs[1].buffer_length = 4;
-            urbs[2].buffer_length = 15;
+    urbs[0].buffer_length = (kb->fwversion >= 0x300 || IS_SINGLE_EP(kb) ? MSG_SIZE : 8);
+    if(urbcount > 1) {
+        if(IS_RGB(vendor, product)) {
+            if(IS_MOUSE(vendor, product))
+                urbs[1].buffer_length = 10;
+            else
+                urbs[1].buffer_length = 21;
+            urbs[2].buffer_length = MSG_SIZE;
+            if(urbcount != 3)
+                urbs[urbcount - 1].buffer_length = MSG_SIZE;
+        } else if(kb->fwversion < 0x300) {
+                urbs[1].buffer_length = 4;
+                urbs[2].buffer_length = 15;
+        }
     }
 
     /// Now submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).

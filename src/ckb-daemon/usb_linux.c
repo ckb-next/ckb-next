@@ -69,13 +69,15 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     int res;
     if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !is_recv){
         struct usbdevfs_bulktransfer transfer = {0};
-        // The workaround exists because ccMSC originally had it there. Needs further testing to see if it can be replaced.
-        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200 && !IS_V2_OVERRIDE(kb)) ? 4 : kb->epcount - 1;
+        // All firmware versions for normal HID devices have the OUT endpoint in the end.
+        // Devices with no input, such as the Polaris, have it in the start.
+        transfer.ep = (IS_SINGLE_EP(kb) ? kb->epcount - 1 : kb->epcount);
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
         res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {
+        // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     }

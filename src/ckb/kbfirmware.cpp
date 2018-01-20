@@ -29,7 +29,7 @@ bool KbFirmware::_checkUpdates(){
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;
-    tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/mattanger/ckb-next/fw8table/FIRMWARE8")));
+    tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/ckb-next/ckb-next/master/FIRMWARE")));
     connect(tableDownload, SIGNAL(finished()), this, SLOT(downloadFinished()));
     lastCheck = now;
     return true;
@@ -119,8 +119,12 @@ void KbFirmware::processDownload(QNetworkReply* reply){
         if(line == "!END FW ENTRIES")
             break;
         QStringList components = line.split(" ");
-        if(components.length() != 8)
-            continue;
+        int len = components.length();
+        if(len != 8){
+            qWarning() << "Found" << len << "components in the firmware list.";
+            if(len < 8)
+                continue;
+        }
         // "VENDOR-PRODUCT"
         QString device = components[0].toUpper() + "-" + components[1].toUpper();
         bool ok;

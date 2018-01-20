@@ -11,21 +11,6 @@ struct KbId {
     const char* feature;
 };
 
-static KbId ids[] = {
-    // Keyboards
-    { 0x1b1c, 0x1b17, "corsair k65 rgb" },
-    { 0x1b1c, 0x1b3f, "corsair k68" },
-    { 0x1b1c, 0x1b13, "corsair k70 rgb" },
-    { 0x1b1c, 0x1b11, "corsair k95 rgb" },
-    { 0x1b1c, 0x1b15, "corsair strafe monochrome" },
-    { 0x1b1c, 0x1b20, "corsair strafe rgb" },
-    // Mice
-    { 0x1b1c, 0x1b12, "corsair m65 rgb" },
-    { 0x1b1c, 0x1b1e, "corsair scimitar rgb" },
-    //SABRE CH-9000111-EU
-    { 0x1b1c, 0x1b32, "corsair sabre optical rgb" }
-};
-
 static const int DIALOG_WIDTH = 420;
 static const int DIALOG_HEIGHT_MIN = 200, DIALOG_HEIGHT_MAX(240);
 
@@ -83,21 +68,18 @@ void FwUpgradeDialog::cleanBlob(){
 }
 
 // Returns firmware version if valid for device, 0 if invalid
-static float verifyFw(const QByteArray& blob, const QString& features){
+static float verifyFw(const QByteArray& blob, const short productID) {
+    short vendor = 0x1b1c;      ///< Corsair has at the moment just one vendorID
     if(blob.length() < 0x0108)
         return 0.f;
     const char* bData = blob.data();
     // Make sure it matches this device based on the vendor and product IDs embedded in the blob
-    bool match = false;
-    for(uint i = 0; i < sizeof(ids)/sizeof(KbId); i++){
-        if(!memcmp(&ids[i].vendor, bData + 0x102, 2) && !memcmp(&ids[i].product, bData + 0x104, 2)
-                && features.startsWith(ids[i].feature, Qt::CaseInsensitive)){
-            match = true;
-            break;
-        }
+
+    if (memcmp(&vendor, bData + 0x102, 2) || memcmp(&productID, bData + 0x104, 2)) {
+        qCritical() << "Something really bad happened - wrong firmware file detected";
+        return 0.f; ///< Something really bad has happened - wrong firmware file detected.
     }
-    if(!match)
-        return 0.f;
+
     // Copy the version from the blob
     short version;
     memcpy(&version, bData + 0x106, 2);
@@ -106,10 +88,11 @@ static float verifyFw(const QByteArray& blob, const QString& features){
 }
 
 int FwUpgradeDialog::exec(){
-    QString features = kb->features;
+    short productID = kb->productID;
+
     if(!blob.isEmpty()){
         // If a blob was already specified, check its version and validity
-        float newV = verifyFw(blob, features);
+        float newV = verifyFw(blob, productID);
         if(newV == 0.f){
             QMessageBox::warning(parentWidget(), "Error", "<center>Not a valid firmware for this device.</center>");
             return QDialog::Rejected;
@@ -122,9 +105,9 @@ int FwUpgradeDialog::exec(){
         ui->actionButton->setEnabled(false);
         show();
         // This can take a while
-        blob = KbFirmware::dataForBoard(features);
+        blob = KbFirmware::dataForBoard(productID);
         // Check validity
-        float newV = verifyFw(blob, features);
+        float newV = verifyFw(blob, productID);
         if(newV == 0.f){
             hide();
             QMessageBox::warning(parentWidget(), "Error", "<center>There was a problem with the downloaded file.<br />Please try again later.</center>");

@@ -1,5 +1,30 @@
 # Change Log
 
+## [v0.2.9](https://github.com/ckb-next/ckb-next/tree/v0.2.9) (2018-01-21)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.2.8...v0.2.9)
+
+Important news:
+* Project was moved to the organization since mattanger has disappeared
+* Binaries will be renamed in `v0.3.0`
+
+Important changes:
+* Significantly lower CPU usage on idle
+* Add support for K95 Platinum
+* Add support for K68
+* Add support for (new) Strafe non-RGB
+* Add support for Glaive
+* Add support for Harpoon
+* Add support for Corsair firmware v3
+* Add support for pt\_br layout
+* Add support for Japanese layout
+* Add macro delays to the GUI
+* New FIRMWARE file structure
+* GUI warning when daemon is not running
+* udev rule to remove joystick tag
+* Dynamic keymap patching
+* Require Qt >=5.2
+* Numerous small fixes and improvements
+
 ## [v0.2.8](https://github.com/mattanger/ckb-next/tree/v0.2.8) (2017-05-06)
 [Full Changelog](https://github.com/mattanger/ckb-next/compare/v0.2.7...v0.2.8)
 

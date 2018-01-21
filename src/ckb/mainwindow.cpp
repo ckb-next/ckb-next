@@ -22,10 +22,8 @@ QString daemonDialogText = QObject::tr("Start it once with:") +
     QObject::tr("Enable it for every boot:") +
     "<blockquote><code>sudo systemctl enable ckb-daemon</code></blockquote>";
 #else
-QString daemonDialogText = QObject::tr("Start it once with:") +
-    "<blockquote><code>sudo launchctl start com.ckb.daemon.plist</code></blockquote>" +
-    QObject::tr("Enable it for every boot:") +
-    "<blockquote><code>sudo launchctl enable /Library/LaunchDaemons/com.ckb.daemon.plist</code></blockquote>";
+QString daemonDialogText = QObject::tr("Start and enable it with:") +
+    "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/com.ckb.daemon.plist</code></blockquote>";
 #endif
 
 MainWindow* MainWindow::mainWindow = 0;

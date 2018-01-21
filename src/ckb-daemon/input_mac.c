@@ -180,7 +180,7 @@ long repeattime(io_connect_t event, int first){
 // Send keyup events for every scancode in the keymap
 void clearkeys(usbdevice* kb){
     for(int key = 0; key < N_KEYS_INPUT; key++){
-        int scan = keymap[key].scan;
+        int scan = kb->keymap[key].scan;
         if((scan & SCAN_SILENT) || scan == BTN_WHEELUP || scan == BTN_WHEELDOWN || IS_MEDIA(scan))
             continue;
         postevent_kp(kb->event, 0, scan, 0, 0, 0);

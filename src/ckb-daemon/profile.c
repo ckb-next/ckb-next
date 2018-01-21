@@ -188,11 +188,11 @@ void cmd_profileid(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const c
 
 }
 
-static void initmode(usbmode* mode){
+static void initmode(usbmode* mode, usbdevice* kb){
     memset(mode, 0, sizeof(*mode));
     mode->light.forceupdate = 1;
     mode->dpi.forceupdate = 1;
-    initbind(&mode->bind);
+    initbind(&mode->bind, kb);
 }
 
 void allocprofile(usbdevice* kb){
@@ -200,7 +200,7 @@ void allocprofile(usbdevice* kb){
         return;
     usbprofile* profile = kb->profile = calloc(1, sizeof(usbprofile));
     for(int i = 0; i < MODE_COUNT; i++)
-        initmode(profile->mode + i);
+        initmode(profile->mode + i, kb);
     profile->currentmode = profile->mode;
     profile->lastlight.forceupdate = profile->lastdpi.forceupdate = 1;
 }
@@ -223,7 +223,7 @@ void cmd_erase(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char*
 
     pthread_mutex_lock(imutex(kb));
     freemode(mode);
-    initmode(mode);
+    initmode(mode, kb);
     pthread_mutex_unlock(imutex(kb));
 }
 

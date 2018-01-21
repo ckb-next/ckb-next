@@ -48,7 +48,7 @@ int setactive_kb(usbdevice* kb, int active){
                 // Select both standard and Corsair input. The standard input will be ignored except in BIOS mode.
                 uchar action = IN_HID | IN_CORSAIR;
                 // Additionally, make MR activate the MR ring (this is disabled for now, may be back later)
-                //if(keymap[key].name && !strcmp(keymap[key].name, "mr"))
+                //if(kb->keymap[key].name && !strcmp(kb->keymap[key].name, "mr"))
                 //    action |= ACT_MR_RING;
                 msg[1][4 + pair * 2] = key;
                 msg[1][5 + pair * 2] = action;
@@ -78,18 +78,18 @@ int setactive_kb(usbdevice* kb, int active){
             for(pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++){
                 uchar action = IN_HID;
                 // Enable hardware actions
-                if(keymap[key].name){
-                    if(!strcmp(keymap[key].name, "mr"))
+                if(kb->keymap[key].name){
+                    if(!strcmp(kb->keymap[key].name, "mr"))
                         action = ACT_MR_RING;
-                    else if(!strcmp(keymap[key].name, "m1"))
+                    else if(!strcmp(kb->keymap[key].name, "m1"))
                         action = ACT_M1;
-                    else if(!strcmp(keymap[key].name, "m2"))
+                    else if(!strcmp(kb->keymap[key].name, "m2"))
                         action = ACT_M2;
-                    else if(!strcmp(keymap[key].name, "m3"))
+                    else if(!strcmp(kb->keymap[key].name, "m3"))
                         action = ACT_M3;
-                    else if(!strcmp(keymap[key].name, "light"))
+                    else if(!strcmp(kb->keymap[key].name, "light"))
                         action = ACT_LIGHT;
-                    else if(!strcmp(keymap[key].name, "lock"))
+                    else if(!strcmp(kb->keymap[key].name, "lock"))
                         action = ACT_LOCK;
                 }
                 msg[1][4 + pair * 2] = key;

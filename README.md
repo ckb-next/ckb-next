@@ -7,6 +7,8 @@
 
 **Disclaimer:** ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
+Please note that this project is released with a [Contributor Code of Conduct](code-of-conduct.md). By participating in this project you agree to abide by its terms.
+
 <!-- TOC depthFrom:2 -->
 
 - [Device Support](#device-support)

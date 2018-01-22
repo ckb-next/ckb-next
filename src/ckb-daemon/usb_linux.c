@@ -281,7 +281,7 @@ void* os_inputmain(void* context){
     /// non RGB Mouse or Keyboard | !IS_RGB | 1 | 4
     /// non RGB Mouse or Keyboard | !IS_RGB | 2 | 15
     ///
-    urbs[0].buffer_length = (kb->fwversion >= 0x300 || IS_SINGLE_EP(kb) ? MSG_SIZE : 8);
+    urbs[0].buffer_length = ((kb->fwversion >= 0x300 || IS_SINGLE_EP(kb)) ? MSG_SIZE : 8);
     if(urbcount > 1) {
         if(IS_RGB(vendor, product)) {
             if(IS_MOUSE(vendor, product))

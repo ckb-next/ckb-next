@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <cstdlib>
+#include <QFileInfo>
 #include <QSharedMemory>
 #include <QShortcut>
 #include <QMessageBox>
@@ -11,8 +12,19 @@
 #include <unistd.h>
 
 extern QSharedMemory appShare;
+extern QString devpath;
 
 static const QString configLabel = "Settings";
+
+#ifndef Q_OS_MACX
+QString daemonDialogText = QObject::tr("Start it once with:") +
+    "<blockquote><code>sudo systemctl start ckb-daemon</code></blockquote>" +
+    QObject::tr("Enable it for every boot:") +
+    "<blockquote><code>sudo systemctl enable ckb-daemon</code></blockquote>";
+#else
+QString daemonDialogText = QObject::tr("Start and enable it with:") +
+    "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/com.ckb.daemon.plist</code></blockquote>";
+#endif
 
 MainWindow* MainWindow::mainWindow = 0;
 
@@ -107,6 +119,30 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
     settingsWidget->setVersion("ckb-next " CKB_VERSION_STR);
+
+    // create daemon dialog as a QMessageBox
+    // this will create a focussed dialog, that has to be interacted with,
+    // if the daemon is not running
+    // set the main and informative text to tell the user about the issue
+    QMessageBox dialog;
+    dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
+    dialog.setInformativeText(daemonDialogText);
+    dialog.setIcon(QMessageBox::Critical);
+
+    // check, whether daemon is running
+    // the daemon creates the root device path on initialization and thus it
+    // can be assumed, that the daemon is not running if doesn't exist
+    // `.arg(0)` is necessary to interpolate the correct suffix into the path
+    // see `./kbmanager.cpp` for details
+    QFileInfo rootDevPath(devpath.arg(0));
+    if (!rootDevPath.exists()) {
+        // set settings widget's status
+        // show the main window (otherwise only the dialog will be visible)
+        // finally show the dialog
+        settingsWidget->setStatus(tr("The ckb-next daemon is not running."));
+        showWindow();
+        dialog.exec();
+    }
 }
 
 void MainWindow::toggleTrayIcon(bool visible) {
@@ -127,7 +163,7 @@ void MainWindow::addDevice(Kb* device){
     // Add the keyboard
     KbWidget* widget = new KbWidget(this, device);
     kbWidgets.append(widget);
-    // Add to tabber; switch to this device if on the settings screen
+    // Add to tabber; switch to this device if the user is on the settings screen
     int count = ui->tabWidget->count();
     ui->tabWidget->insertTab(count - 1, widget, widget->name());
     if(ui->tabWidget->currentIndex() == count)
@@ -174,7 +210,7 @@ void MainWindow::checkFwUpdates(){
         return;
     foreach(KbWidget* w, kbWidgets){
         // Display firmware upgrade notification if a new version is available
-        float version = KbFirmware::versionForBoard(w->device->features);
+        float version = KbFirmware::versionForBoard(w->device->productID);
         if(version > w->device->firmware.toFloat()){
             if(w->hasShownNewFW)
                 continue;
@@ -198,7 +234,7 @@ void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
     KbWidget* w = (KbWidget*)widget;
     // Ask for update
     if(QMessageBox::information(this, "Firmware update", tr("A new firmware is available for your %1 (v%2)\nWould you like to install it now?").arg(w->device->usbModel, QString::number(version, 'f', 2)), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), QMessageBox::Yes) == QMessageBox::Yes){
-        // If accepted, switch to firmware tab and bring up update window
+        // If accepted, switch to the firmware tab and bring up the update window
         w->showLastTab();
         ui->tabWidget->setCurrentIndex(kbWidgets.indexOf(w));
         w->showFwUpdate();

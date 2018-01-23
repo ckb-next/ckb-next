@@ -169,7 +169,7 @@ const char* product_str(short product);
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
 /// Used when a device has a firmware with a low version number that uses the new protocol
-#define IS_NEW_PROTOCOL(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2)
+#define IS_V2_OVERRIDE(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

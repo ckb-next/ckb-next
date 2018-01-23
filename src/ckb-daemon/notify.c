@@ -33,7 +33,7 @@ void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, .
 }
 
 void nprintkey(usbdevice* kb, int nnumber, int keyindex, int down){
-    const key* map = keymap + keyindex;
+    const key* map = kb->keymap + keyindex;
     if(map->name)
         nprintf(kb, nnumber, 0, "key %c%s\n", down ? '+' : '-', map->name);
     else
@@ -163,7 +163,7 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
     } else if(!strcmp(setting, ":keys")){
         // Get the current state of all keys
         for(int i = 0; i < N_KEYS_INPUT; i++){
-            if(!keymap[i].name)
+            if(!kb->keymap[i].name)
                 continue;
             int byte = i / 8, bit = 1 << (i & 7);
             uchar state = kb->input.keys[byte] & bit;

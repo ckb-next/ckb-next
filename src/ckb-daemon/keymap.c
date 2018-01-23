@@ -388,8 +388,9 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
 
 #define BUTTON_HID_COUNT    5
 
-void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput){
-    if((endpoint != 2 && endpoint != -2) || length < 10)
+void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput, ushort fwversion){
+    //The HID Input Endpoint on FWv3 is 64 bytes, so we can't check for length.
+    if((endpoint != 2 && endpoint != -2) || (fwversion < 0x300 && length < 10))
         return;
     // EP 2: mouse input
     if(urbinput[0] != 1)

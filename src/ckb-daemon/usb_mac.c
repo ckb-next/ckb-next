@@ -103,7 +103,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     kern_return_t res = kIOReturnSuccess;
     ///
     /// \todo Be aware: This condition is exact inverted to the condition in the linux dependent os_usbsend(). It may be correct, but please check it.
-    if((kb->fwversion < 0x120 && !IS_NEW_PROTOCOL(kb)) || is_recv){
+    if((kb->fwversion < 0x120 && !IS_V2_OVERRIDE(kb)) || is_recv){
         int ep = kb->epcount;
         // For old devices, or for receiving data, use control transfers
         IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, ep - 1, MSG_SIZE, (void*)out_msg, 0, 5000, 5000 };
@@ -119,7 +119,8 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         }
     } else {
         // For newer devices, use interrupt transfers
-        int ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : 3;
+        // macOS sees 4 endpoints (including ep0) for FW 3.XX
+        int ep = (kb->fwversion >= 0x130 && (kb->fwversion < 0x200 || kb->fwversion >= 0x300)) ? 4 : 3;
         usb_iface_t h_usb = kb->ifusb[ep - 1];
         hid_dev_t h_hid = kb->ifhid[ep - 1];
         if(h_usb)
@@ -176,7 +177,16 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 }
 
 void os_sendindicators(usbdevice* kb){
-    IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, 0x00, 1, &kb->ileds, 0, 500, 500 };
+    void *ileds;
+    ushort leds;
+    if(kb->fwversion >= 0x300) {
+        leds = (kb->ileds << 8) | 0x0001;
+        ileds = &leds;
+    }
+    else {
+        ileds = &kb->ileds;
+    }
+    IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, 0x00, (kb->fwversion >= 0x300 ? 2 : 1), ileds, 0, 500, 500 };
     kern_return_t res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
     if(res == kIOReturnNotOpen){
         // Handle not open - try to go through the HID system instead
@@ -229,7 +239,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
         case 8:
         case 10:
         case 11:
-            hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data);
+            hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data, kb->fwversion);
             break;
         case MSG_SIZE:
             corsair_mousecopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);
@@ -773,7 +783,9 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     long input = hidgetlong(handle, CFSTR(kIOHIDMaxInputReportSizeKey));
     long output = hidgetlong(handle, CFSTR(kIOHIDMaxOutputReportSizeKey));
     long feature = hidgetlong(handle, CFSTR(kIOHIDMaxFeatureReportSizeKey));
+    long fwversion = hidgetlong(handle, CFSTR(kIOHIDVersionNumberKey));
     int handle_idx;
+
     // Handle 3 is for controlling the device (only exists for RGB)
     if(feature == 64)
         handle_idx = 3;
@@ -785,9 +797,13 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
             (input <= 1 && output == 64)))      // FW >= 2.00 (Scimitar)
         handle_idx = 2;
     // Handle 0 is for BIOS mode input (RGB) or non-RGB key input
-    else if(output <= 1 && feature <= 1 &&
-            (input == 8 ||                      // Keyboards
-             input == 7))                       // Mice
+    else if((output <= 1 && feature <= 1 &&
+                (input == 8 ||                  // Keyboards
+                 input == 7)) ||                // Mice
+            (fwversion >= 0x300 &&              // FWv3 hack
+                input == 64 &&
+                output <= 2 &&
+                feature == 1))
         handle_idx = 0;
     // Handle 1 is for standard HID input (RGB) or media keys (non-RGB)
     else if(output <= 1 && feature <= 1 &&

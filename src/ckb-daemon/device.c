@@ -71,9 +71,18 @@ int _start_dev(usbdevice* kb, int makeactive){
             kb->features &= ~FEAT_HWLOAD;
         }
     }
-    // Active software mode if requested
+    // Activate software mode if requested
     if(makeactive)
         return setactive(kb, 1);
+    #ifdef DEBUG
+    // 12 for each device + null terminator
+    char devlist[12*(DEV_MAX-1)+1];
+    int devlistpos = 0;
+    for(unsigned i = 1; i < DEV_MAX; i++){
+        devlistpos += sprintf(&devlist[devlistpos], "%u: 0x%x; ", i, keyboard[i].product);
+    }
+    ckb_info("Attached Devices: %s\n", devlist);
+    #endif
     return 0;
 }
 

@@ -43,7 +43,7 @@ Please note that this project is released with a [Contributor Code of Conduct](c
 
 See also:
 
-* [Manual for the driver daemon](https://github.com/mattanger/ckb-next/blob/master/DAEMON.md)
+* [Manual for the driver daemon](https://github.com/ckb-next/ckb-next/blob/master/DAEMON.md)
 
 ## Device Support
 
@@ -116,7 +116,7 @@ Note: If you build your own kernels, ckb-next requires the `CONFIG_INPUT_UINPUT`
 
 ### Installing
 
-You can download ckb-next using the "Download zip" option on the right or clone it using `git clone`. Extract it and open the ckb-master directory in a terminal. Run `./quickinstall`. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to hand-tune the compilation of ckb, see [`BUILD.md`](https://github.com/mattanger/ckb-next/blob/master/BUILD.md) for instructions.
+You can download ckb-next using the "Download zip" option on the right or clone it using `git clone`. Extract it and open the ckb-master directory in a terminal. Run `./quickinstall`. It will attempt to build ckb and then ask if you'd like to install/run the application. If the build doesn't succeed, or if you'd like to hand-tune the compilation of ckb, see [`BUILD.md`](https://github.com/ckb-next/ckb-next/blob/master/BUILD.md) for instructions.
 
 ### Upgrading
 
@@ -149,7 +149,7 @@ sudo rm -f /usr/bin/ckb /usr/bin/ckb-daemon /usr/share/applications/ckb.desktop 
 sudo rm -rf /usr/lib/ckb-animations
 ```
 
-Before https://github.com/mattanger/ckb-next/commit/f347e60df211c60452f95084b6c46dc4ec5f42ee animations were located elsewhere, try removing them as well:
+Before https://github.com/ckb-next/ckb-next/commit/f347e60df211c60452f95084b6c46dc4ec5f42ee animations were located elsewhere, try removing them as well:
 ```
 sudo rm -rf /usr/bin/ckb-animations
 ```
@@ -158,7 +158,7 @@ sudo rm -rf /usr/bin/ckb-animations
 
 ### Binary download
 
-macOS `pkg` can be downloaded from [GitHub Releases](https://github.com/mattanger/ckb-next/releases). It is always built with the last available stable Qt version and tagrets 10.10 SDK. If you run 10.9.x, you'll need to build the project from source and comment out `src/ckb-heat` (and the backslash above it) inside `ckb.pro`.
+macOS `pkg` can be downloaded from [GitHub Releases](https://github.com/ckb-next/ckb-next/releases). It is always built with the last available stable Qt version and tagrets 10.10 SDK. If you run 10.9.x, you'll need to build the project from source and comment out `src/ckb-heat` (and the backslash above it) inside `ckb.pro`.
 
 ### Building from source
 
@@ -287,7 +287,7 @@ Common issues:
 
 ### Reporting issues
 
-If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/mattanger/ckb-next/issues). Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
+If you have a problem that you can't solve (and it isn't mentioned in the Known Issues section below), you can report it on [the GitHub issue tracker](https://github.com/ckb-next/ckb-next/issues). Before opening a new issue, please check to see if someone else has reported your problem already - if so, feel free to leave a comment there.
 
 ## Known issues
 
@@ -299,14 +299,14 @@ If you have a problem that you can't solve (and it isn't mentioned in the Known 
 
 ## Contributing
 
-You can contribute to the project by [opening a pull request](https://github.com/mattanger/ckb-next/pulls). It's best if you base your changes off of the `testing` branch as opposed to the `master`, because the pull request will be merged there first. If you'd like to contribute but don't know what you can do, take a look at [the issue tracker](https://github.com/mattanger/ckb-next/issues) and see if any features/problems are still unresolved. Feel free to ask if you'd like some ideas.
+You can contribute to the project by [opening a pull request](https://github.com/ckb-next/ckb-next/pulls). It's best if you base your changes off of the `testing` branch as opposed to the `master`, because the pull request will be merged there first. If you'd like to contribute but don't know what you can do, take a look at [the issue tracker](https://github.com/ckb-next/ckb-next/issues) and see if any features/problems are still unresolved. Feel free to ask if you'd like some ideas.
 
 ## Contact us
 
 There are multiple ways you can get in touch with us:
 
 * [join](https://groups.google.com/forum/#!forum/ckb-next/join) `ckb-next` mailing list
-* [open](https://github.com/mattanger/ckb-next/issues) a GitHub Issue
+* [open](https://github.com/ckb-next/ckb-next/issues) a GitHub Issue
 * hop on `#ckb-next` on Freenode to chat
 
 ## What happened to the original ckb

@@ -672,7 +672,7 @@ static _model models[] = {
     { P_K65_NRGB_STR, P_K65_NRGB },
     { P_K65_LUX_STR, P_K65_LUX },
     { P_K65_RFIRE_STR, P_K65_RFIRE },
-    { P_K68_STR, P_K68 },
+    { P_K68_NRGB_STR, P_K68_NRGB },
     { P_K70_STR, P_K70 },
     { P_K70_NRGB_STR, P_K70_NRGB },
     { P_K70_LUX_STR, P_K70_LUX },

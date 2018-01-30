@@ -110,6 +110,7 @@ ckb-next requires Qt5 (Qt 5.9 is recommended), libudev, zlib, gcc, g++, and glib
 
 * Ubuntu: `sudo apt-get install build-essential libudev-dev qt5-default zlib1g-dev libappindicator-dev`
 * Fedora: `sudo dnf install zlib-devel qt5-qtbase-devel libgudev-devel libappindicator-devel systemd-devel gcc-c++`
+* openSUSE: `sudo zypper install zlib-devel libqt5-qtbase-devel libappindicator-devel systemd-devel gcc-c++`
 * Arch: `sudo pacman -S base-devel qt5-base zlib`
 * Other distros: Look for `qt5` or `libqt5*-devel`
 

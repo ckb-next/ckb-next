@@ -21,7 +21,7 @@
 /// --------- | -------- | -----------------------
 /// 1 | The first block contains the K63 Non RGB Keyboard. No other K63 is known so far.
 /// 2 | the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
-/// 3 | K68 keyboard | IS_K68().
+/// 3 | K68 keyboards | IS_K68().
 /// 4 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
 /// 5 | the K95 series keyboards | collected with the macro IS_K95().
 /// 6 | strafe keyboards | IS_STRAFE()
@@ -56,9 +56,9 @@
 #define P_K65_RFIRE_STR "1b39"
 #define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_NRGB || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
-#define P_K68           0x1b3f
-#define P_K68_STR       "1b3f"
-#define IS_K68(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K68)
+#define P_K68_NRGB      0x1b3f
+#define P_K68_NRGB_STR  "1b3f"
+#define IS_K68(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K68_NRGB)
 
 #define P_K70                0x1b13
 #define P_K70_STR            "1b13"
@@ -148,7 +148,7 @@ const char* product_str(short product);
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
 /// Change this if new \b monochrome devices are added
-#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K68) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
+#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K68_NRGB) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_RGB() is returned.
 #define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)

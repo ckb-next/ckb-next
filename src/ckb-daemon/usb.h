@@ -56,9 +56,11 @@
 #define P_K65_RFIRE_STR "1b39"
 #define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_NRGB || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
+#define P_K68           0x1b4f
+#define P_K68_STR       "1b4f"
 #define P_K68_NRGB      0x1b3f
 #define P_K68_NRGB_STR  "1b3f"
-#define IS_K68(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K68_NRGB)
+#define IS_K68(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K68 || (kb)->product == P_K68_NRGB))
 
 #define P_K70                0x1b13
 #define P_K70_STR            "1b13"

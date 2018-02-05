@@ -403,8 +403,8 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
             CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
     }
     // Bytes 5 - 8: movement
-    *xaxis += *(short*)(urbinput + 5);
-    *yaxis += *(short*)(urbinput + 7);
+    *xaxis += (urbinput[6] << 8) | urbinput[5];
+    *yaxis += (urbinput[8] << 8) | urbinput[7];
     // Byte 9: wheel
     char wheel = urbinput[9];
     if(wheel > 0)

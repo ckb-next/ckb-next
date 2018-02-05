@@ -13,7 +13,7 @@ macx {
     LIBS = -lpthread -ludev
 }
 
-QMAKE_CFLAGS  += -std=gnu11 -Wall -Wextra -fsigned-char
+QMAKE_CFLAGS  += -std=gnu11 -Wall -Wextra -Wcast-align -fsigned-char
 
 # Minimal build - remove Qt defaults
 CONFIG   += debug_and_release

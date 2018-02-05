@@ -142,8 +142,10 @@ int updatedpi(usbdevice* kb, int force){
             newdpi->y[newdpi->current] != lastdpi->y[newdpi->current]) {
             uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 0 };
             data_pkt[2] |= newdpi->current;
-            *(ushort*)(data_pkt + 5) = newdpi->x[newdpi->current];
-            *(ushort*)(data_pkt + 7) = newdpi->y[newdpi->current];
+            data_pkt[5] = newdpi->x[newdpi->current] & 0xFF;
+            data_pkt[6] = (newdpi->x[newdpi->current] >> 8) & 0xFF;
+            data_pkt[7] = newdpi->y[newdpi->current] & 0xFF;
+            data_pkt[8] = (newdpi->y[newdpi->current] >> 8) & 0xFF;
             if(!usbsend(kb, data_pkt, 1))
                 return -1;
             // Set these values in the cache so we don't rewrite them.
@@ -163,8 +165,10 @@ int updatedpi(usbdevice* kb, int force){
             continue;
         uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 0 };
         data_pkt[2] |= i;
-        *(ushort*)(data_pkt + 5) = newdpi->x[i];
-        *(ushort*)(data_pkt + 7) = newdpi->y[i];
+        data_pkt[5] = newdpi->x[i] & 0xFF;
+        data_pkt[6] = (newdpi->x[i] >> 8) & 0xFF;
+        data_pkt[7] = newdpi->y[i] & 0xFF;
+        data_pkt[8] = (newdpi->y[i] >> 8) & 0xFF;
         if(!usbsend(kb, data_pkt, 1))
             return -1;
     }
@@ -196,8 +200,10 @@ int savedpi(usbdevice* kb, dpiset* dpi, lighting* light){
     for(int i = 0; i < DPI_COUNT; i++){
         uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 1 };
         data_pkt[2] |= i;
-        *(ushort*)(data_pkt + 5) = dpi->x[i];
-        *(ushort*)(data_pkt + 7) = dpi->y[i];
+        data_pkt[5] = dpi->x[i] & 0xFF;
+        data_pkt[6] = (dpi->x[i] >> 8) & 0xFF;
+        data_pkt[7] = dpi->y[i] & 0xFF;
+        data_pkt[8] = (dpi->y[i] >> 8) & 0xFF;
         // Save the RGB value for this setting too
         data_pkt[9] = light->r[LED_MOUSE + N_MOUSE_ZONES + i];
         data_pkt[10] = light->g[LED_MOUSE + N_MOUSE_ZONES + i];
@@ -259,8 +265,8 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
             return -3;
         }
         // Copy to profile
-        dpi->x[i] = *(ushort*)(in_pkt + 5);
-        dpi->y[i] = *(ushort*)(in_pkt + 7);
+        dpi->x[i] = (in_pkt[6] << 8) | in_pkt[5];
+        dpi->y[i] = (in_pkt[8] << 8) | in_pkt[7];
         light->r[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[9];
         light->g[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[10];
         light->b[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[11];

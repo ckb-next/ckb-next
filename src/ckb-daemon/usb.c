@@ -79,7 +79,7 @@ const char* product_str(short product){
         return "k68";
     if(product == P_K65 || product == P_K65_NRGB || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";
-    if(product == P_K63_NRGB)
+    if(product == P_K63_NRGB || product == P_K63_NRGB_WL)
         return "k63";
     if(product == P_STRAFE || product == P_STRAFE_NRGB || product == P_STRAFE_NRGB_2)
         return "strafe";

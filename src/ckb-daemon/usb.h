@@ -19,7 +19,7 @@
 ///
 /// Block No. | contains | Devices are bundled via
 /// --------- | -------- | -----------------------
-/// 1 | The first block contains the K63 Non RGB Keyboard. No other K63 is known so far.
+/// 1 | The first block contains the K63 Non RGB Keyboard.
 /// 2 | the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
 /// 3 | K68 keyboards | IS_K68().
 /// 4 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
@@ -42,9 +42,11 @@
 #define V_CORSAIR       0x1b1c
 #define V_CORSAIR_STR   "1b1c"
 
-#define P_K63_NRGB      0x1b40
-#define P_K63_NRGB_STR  "1b40"
-#define IS_K63(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K63_NRGB)
+#define P_K63_NRGB        0x1b40
+#define P_K63_NRGB_STR    "1b40"
+#define P_K63_NRGB_WL     0x1b45 /* wireless */
+#define P_K63_NRGB_WL_STR "1b45"
+#define IS_K63(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB || (kb)->product == P_K63_NRGB_WL))
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"

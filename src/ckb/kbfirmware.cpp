@@ -113,8 +113,8 @@ void KbFirmware::processDownload(QNetworkReply* reply){
         if(!scan){
             if(line == "!BEGIN FW ENTRIES")
                 scan = true;
-            else
-                continue;
+
+            continue;
         }
         if(line == "!END FW ENTRIES")
             break;

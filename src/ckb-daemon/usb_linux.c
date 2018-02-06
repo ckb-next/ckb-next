@@ -576,14 +576,19 @@ int os_setupusb(usbdevice* kb) {
     ///
     const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
 #ifdef DEBUG
-    ckb_info("claiming interfaces. name=%s, firmware=%s; ep_str=%s\n", name, firmware, ep_str);
+    ckb_info("Claiming interfaces. name=%s, firmware=%s, ep_str=%s\n", name, firmware, ep_str);
 #endif //DEBUG
     kb->epcount = 0;
     if(ep_str)
         sscanf(ep_str, "%d", &kb->epcount);
     if(kb->epcount < 2){
-        // IF we have an RGB KB with 0 or 1 endpoints, it will be in BIOS mode.
-        ckb_err("Unable to read endpoint count from udev, assuming %d and reading >>%s<< or device is in BIOS mode\n", kb->epcount, ep_str);
+        // If we have an RGB KB with 1 endpoint, it will be in BIOS mode.
+        if(kb->epcount == 1){
+            ckb_info("Device is in BIOS mode\n");
+            return -1;
+        }
+        // Something probably went wrong if we got here
+        ckb_err("Unable to read endpoint count from udev, assuming %d\n", kb->epcount);
         if (usb_tryreset(kb) == 0) { ///< Try to reset the device and recall the function
             static int retryCount = 0; ///< Don't do this endless in recursion
             if (retryCount++ < 5) {

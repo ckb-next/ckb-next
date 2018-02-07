@@ -8,9 +8,19 @@
 
 /// \details
 /// \brief all open usb devices have their system path names here in this array.
-#define DEBUG
 
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
+
+/// Formats and writes the current urb buffer to the console
+void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function){
+    char converted[actual_length * 3 + 1];
+    for(int i = 0; i < actual_length; i++)
+        sprintf(&converted[i * 3], "%02x ", buffer[i]);
+    if(line == 0)
+        ckb_info("%s %s\n", prefix, converted);
+    else
+        ckb_info("%s (via %s:%d) %s %s\n", function, file, line, prefix, converted);
+}
 
 ////
 /// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long
@@ -67,7 +77,12 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 ///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
-    if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !is_recv){
+
+    if (kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
+        // If we need to read a response, lock the mutex so that os_usbrecv() waits for the main thread.
+        if(is_recv)
+            if(!!pthread_mutex_lock(&kb->interruptmutex))
+                ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
         struct usbdevfs_bulktransfer transfer = {0};
         // All firmware versions for normal HID devices have the OUT endpoint at the end.
         // Devices with no input, such as the Polaris, have it at the start.
@@ -83,19 +98,18 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     }
 
     if (res <= 0){
-        ckb_err_fn(" %s, res = 0x%x\n", file, line, res ? strerror(errno) : "No data written", res);
-        if(res == -1 && errno == ETIMEDOUT)
+        int ioctlerrno = errno;
+        ckb_err_fn(" %s, res = 0x%x\n", file, line, res ? strerror(ioctlerrno) : "No data written", res);
+        if(res == -1 && ioctlerrno == ETIMEDOUT)
             return -1;
         else
             return 0;
     } else if (res != MSG_SIZE)
         ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
 #ifdef DEBUG_USB_SEND
-    char converted[MSG_SIZE*3 + 1];
-    for(int i=0;i<MSG_SIZE;i++)
-        sprintf(&converted[i*3], "%02x ", out_msg[i]);
-    ckb_warn_fn("Sent %s\n", file, line, converted);
+    print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__);
 #endif
+
     return res;
 }
 
@@ -131,32 +145,40 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 ///
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     int res;
-    // This is what CUE does, but it doesn't seem to work on linux.
-    /*if(kb->fwversion >= 0x130){
-        struct usbdevfs_bulktransfer transfer = {0};
-        transfer.ep = 0x84;
-        transfer.len = MSG_SIZE;
-        transfer.timeout = 5000;
-        transfer.data = in_msg;
-        res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
-    } else {*/
+    if(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
+        // Wait for 2s
+        struct timespec mutexwait = {0};
+        mutexwait.tv_sec = 2;
+        if(pthread_mutex_timedlock(&kb->interruptmutex, &mutexwait) != 0){
+            if(!!pthread_mutex_unlock(&kb->interruptmutex))
+                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
+            ckb_warn_fn("Interrupt mutex timed out\n", file, line);
+            return -1;
+        }
+        memcpy(in_msg, kb->interruptbuf, MSG_SIZE);
+        memset(kb->interruptbuf, 0, MSG_SIZE);
+        res = MSG_SIZE;
+        if(!!pthread_mutex_unlock(&kb->interruptmutex))
+            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
+    } else {
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
-    //}
-    if(res <= 0){
-        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data read");
-        if(res == -1 && errno == ETIMEDOUT)
-            return -1;
-        else
-            return 0;
-    } else if(res != MSG_SIZE)
-        ckb_warn_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        if(res <= 0){
+            // This is done because ckb_err_fn can set errno itself
+            int ioctlerrno = errno;
+            ckb_err_fn("%s\n", file, line, res ? strerror(ioctlerrno) : "No data read");
+            if(res == -1 && ioctlerrno == ETIMEDOUT)
+                return -1;
+            else
+                return 0;
+        } else if(res != MSG_SIZE)
+            ckb_warn_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+    }
+
 #ifdef DEBUG_USB_RECV
-    char converted[MSG_SIZE*3 + 1];
-    for(int i=0;i<MSG_SIZE;i++)
-        sprintf(&converted[i*3], "%02x ", in_msg[i]);
-    ckb_warn_fn("Recv %s\n", file, line, converted);
+    print_urb_buffer("Recv:", in_msg, MSG_SIZE, file, line, __func__);
 #endif
+
     return res;
 }
 
@@ -321,6 +343,15 @@ void* os_inputmain(void* context){
         udev_device_unref(child);
     }
 
+    /// Allocate memory for the os_usbrecv() buffer and create the mutex
+    kb->interruptbuf = malloc(MSG_SIZE * sizeof(uchar));
+    if(!kb->interruptbuf)
+        ckb_fatal("Error allocating memory for usb_recv() %s\n", strerror(errno));
+    
+    int retval = pthread_mutex_init(&kb->interruptmutex, NULL);
+    if(!!retval)
+        ckb_fatal("Error initialising interrupt mutex %i\n", retval);
+
     /// The userSpaceFS knows the URBs now, so start monitoring input
     while (1) {
         struct usbdevfs_urb* urb = 0;
@@ -359,46 +390,59 @@ void* os_inputmain(void* context){
             /// non RGB Keyboard | !IS_RGB && !IS_MOUSE | nA | nA | hid_kb_translate()
             ///
             pthread_mutex_lock(imutex(kb));
-            // EP workaround for FWv3
-            // Corsair input comes through 0x81, but case 1 in keymap.c is used for 6KRO
-            uchar urbendpoint = ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : (urb->endpoint & 0xF));
-            if(IS_MOUSE(vendor, product)){
-                switch(urb->actual_length){
-                case 8:
-                case 10:
-                case 11:
-                    // HID mouse input
-                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -urbendpoint, urb->actual_length, urb->buffer, kb);
-                    break;
-                case MSG_SIZE:
-                    // Corsair mouse input
-                    corsair_mousecopy(kb->input.keys, -urbendpoint, urb->buffer);
-                    break;
-                }
-            } else if(IS_RGB(vendor, product)){
-                switch(urb->actual_length){
-                case 8:
-                    // RGB EP 1: 6KRO (BIOS mode) input
-                    hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
-                    break;
-                case 21:
-                case 5:
-                    // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
-                    if(!kb->active)
-                        hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
-                    break;
-                case MSG_SIZE:
-                    // RGB EP 3: Corsair input
-                    corsair_kbcopy(kb->input.keys, -urbendpoint, urb->buffer);
-                    break;
-                }
+            uchar* urb_buffer = (uchar*)urb->buffer;
+            #ifdef DEBUG_USB_INPUT
+            print_urb_buffer("Input Recv:", urb_buffer, urb->actual_length, NULL, 0, NULL);
+            #endif
+            // If the response starts with 0x0e, that means it needs to go to os_usbrecv()
+            if(urb->actual_length == MSG_SIZE && urb_buffer[0] == 0x0e){
+                memcpy(kb->interruptbuf, urb->buffer, MSG_SIZE);
+                // Unlock the mutex, signaling os_usbrecv() that the data is ready.
+                retval = pthread_mutex_unlock(&kb->interruptmutex);
+                if(!!retval)
+                    ckb_fatal("Error unlocking interrupt mutex %i\n", retval);
             } else {
-                // Non-RGB input
-                hid_kb_translate(kb->input.keys, urb->endpoint & 0xF, urb->actual_length, urb->buffer);
+                // EP workaround for FWv3
+                // Corsair input comes through 0x81, but case 1 in keymap.c is used for 6KRO
+                uchar urbendpoint = ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : (urb->endpoint & 0xF));
+                if(IS_MOUSE(vendor, product)){
+                    switch(urb->actual_length){
+                    case 8:
+                    case 10:
+                    case 11:
+                        // HID mouse input
+                        hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -urbendpoint, urb->actual_length, urb->buffer, kb);
+                        break;
+                    case MSG_SIZE:
+                        // Corsair mouse input
+                        corsair_mousecopy(kb->input.keys, -urbendpoint, urb->buffer);
+                        break;
+                    }
+                } else if(IS_RGB(vendor, product)){
+                    switch(urb->actual_length){
+                    case 8:
+                        // RGB EP 1: 6KRO (BIOS mode) input
+                        hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
+                        break;
+                    case 21:
+                    case 5:
+                        // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
+                        if(!kb->active)
+                            hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
+                        break;
+                    case MSG_SIZE:
+                        // RGB EP 3: Corsair input
+                        corsair_kbcopy(kb->input.keys, -urbendpoint, urb->buffer);
+                        break;
+                    }
+                } else {
+                    // Non-RGB input
+                    hid_kb_translate(kb->input.keys, urb->endpoint & 0xF, urb->actual_length, urb->buffer);
+                }
+                ///
+                /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
+                inputupdate(kb);
             }
-            ///
-            /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
-            inputupdate(kb);
             pthread_mutex_unlock(imutex(kb));
 
             /// Re-submit the URB for the next run.
@@ -415,6 +459,11 @@ void* os_inputmain(void* context){
         ioctl(fd, USBDEVFS_DISCARDURB, urbs + i);
         free(urbs[i].buffer);
     }
+    // Free the memory used for the os_usbrecv() buffer
+    free(kb->interruptbuf);
+    retval = pthread_mutex_destroy(&kb->interruptmutex);
+    if(!!retval)
+        ckb_fatal("Error destroying interrupt mutex %i\n", retval);
     return 0;
 }
 

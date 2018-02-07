@@ -127,12 +127,16 @@
 #define IS_POLARIS(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
 ///
-/// uncomment to see USB packets sent to the device
+/// Uncomment to see USB packets sent to the device
 // #define DEBUG_USB_SEND
 
 ///
-///uncomment to see USB packets received from the device
+/// Uncomment to see USB packets received from the device through os_usbrecv()
 // #define DEBUG_USB_RECV
+
+///
+/// Uncomment to see USB packets received from the device throug the input thread
+// #define DEBUG_USB_INPUT
 
 ///
 /// \brief vendor_str Vendor/product string representations

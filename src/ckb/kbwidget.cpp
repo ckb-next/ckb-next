@@ -327,7 +327,7 @@ void KbWidget::updateFwButton(){
     if(!KbFirmware::hasDownloaded())
         ui->fwUpdButton->setText("Check for updates");
     else {
-        float newVersion = KbFirmware::versionForBoard(device->features);
+        float newVersion = KbFirmware::versionForBoard(device->productID);
         float oldVersion = device->firmware.toFloat();
         if(newVersion <= 0.f || newVersion <= oldVersion)
             ui->fwUpdButton->setText("Up to date");
@@ -344,7 +344,7 @@ void KbWidget::on_fwUpdButton_clicked(){
             ui->fwUpdButton->setText("Checking...");
             ui->fwUpdButton->setEnabled(false);
         }
-        float newVersion = KbFirmware::versionForBoard(device->features, true);
+        float newVersion = KbFirmware::versionForBoard(device->productID, true);
         float oldVersion = device->firmware.toFloat();
         ui->fwUpdButton->setEnabled(true);
         updateFwButton();

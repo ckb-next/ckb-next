@@ -209,16 +209,16 @@ elif [[ $launchdc -eq 0 && $(echo "$launchd" | wc -l) -ge 1 ]]; then
         echo "Re-run this script if you change your mind."
     else
         sleep 0.5
-        sudo launchctl unload /Library/LaunchDaemons/com.ckb.daemon.plist >/dev/null 2>&1
+        sudo launchctl unload -w /Library/LaunchDaemons/com.ckb.daemon.plist >/dev/null 2>&1
         sudo mkdir -p /Library/LaunchDaemons
         checkfail $?
-        sudo cp -f service/launchd/com.ckb.daemon.plist /Library/LaunchDaemons 2>"$TMPFILE"
+        sudo cp -f service/launchd/com.ckb.daemon.plist /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
         sudo chown root:wheel /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
         sudo chmod 0644 /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
-        sudo launchctl load /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
+        sudo launchctl load -w /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
     fi
 else

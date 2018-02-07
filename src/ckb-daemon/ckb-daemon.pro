@@ -13,7 +13,7 @@ macx {
     LIBS = -lpthread -ludev
 }
 
-QMAKE_CFLAGS  += -std=gnu11 -Wall -Wextra -fsigned-char
+QMAKE_CFLAGS  += -std=gnu11 -Wall -Wextra -Wcast-align -fsigned-char
 
 # Minimal build - remove Qt defaults
 CONFIG   += debug_and_release
@@ -38,6 +38,7 @@ SOURCES += \
     profile.c \
     extra_mac.c \
     keymap.c \
+    keymap_patch.c \
     command.c \
     device_vtable.c \
     device_keyboard.c \
@@ -65,5 +66,6 @@ HEADERS += \
     command.h \
     keymap.h \
     keymap_mac.h \
+    keymap_patch.h \
     structures.h \
     dpi.h

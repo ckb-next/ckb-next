@@ -250,6 +250,8 @@ typedef struct {
     char dither;
     // Flag to check if large macros should be sent delayed
     uint delay;
+    // Keymap that should be applied to this device
+    key* keymap;
 } usbdevice;
 
 #endif  // STRUCTURES_H

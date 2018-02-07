@@ -15,7 +15,7 @@ void inputupdate(usbdevice* kb);
 void updateindicators_kb(usbdevice* kb, int force);
 
 // Initializes key bindings for a device. Lock imutex first.
-void initbind(binding* bind);
+void initbind(binding* bind, usbdevice* kb);
 // Frees key binding data for a device. Lock imutex first.
 void freebind(binding* bind);
 

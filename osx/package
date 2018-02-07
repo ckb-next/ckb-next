@@ -6,7 +6,7 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
     exit 1
 fi
 
-[[ $MACDEPLOYQT == "" ]] && MACDEPLOYQT=`find ~/Qt/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin -name macdeployqt -print -quit 2>/dev/null`
+[[ $MACDEPLOYQT == "" ]] && MACDEPLOYQT=`find ~/Qt/*/clang_64/bin ~/Applications/Qt/*/clang_64/bin /Applications/Qt/*/clang_64/bin /usr/local/opt/qt5/bin -name macdeployqt -print -quit 2>/dev/null`
 if [[ $MACDEPLOYQT == "" ]]; then
     echo "macdeployqt not found."
     echo "Invoke with MACDEPLOYQT=/path/to/macdeployqt to locate it manually."

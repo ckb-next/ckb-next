@@ -331,7 +331,7 @@ int readcmd(usbdevice* kb, const char* line){
             } else {
                 // Find this key in the keymap
                 for(unsigned i = 0; i < N_KEYS_EXTENDED; i++){
-                    if(keymap[i].name && !strcmp(keyname, keymap[i].name)){
+                    if(kb->keymap[i].name && !strcmp(keyname, kb->keymap[i].name)){
                         vt->do_cmd[command](kb, mode, notifynumber, i, right);
                         break;
                     }

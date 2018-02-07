@@ -7,6 +7,7 @@
 #include "notify.h"
 #include "profile.h"
 #include "usb.h"
+#include "keymap_patch.h"
 
 /// brief .
 ///
@@ -74,7 +75,7 @@ const char* product_str(short product){
         return "k95p";
     if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
-    if(product == P_K68)
+    if(product == P_K68_NRGB)
         return "k68";
     if(product == P_K65 || product == P_K65_NRGB || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";
@@ -254,6 +255,9 @@ static void* _setupusb(void* context){
     if(IS_MOUSE(vendor, product)) kb->features |= FEAT_ADJRATE;
     if(IS_MONOCHROME(vendor, product)) kb->features |= FEAT_MONOCHROME;
     kb->usbdelay = USB_DELAY_DEFAULT;
+
+    // Check if the device needs a patched keymap, and if so patch it.
+    patchkeys(kb);
 
     // Perform OS-specific setup
     ///
@@ -714,6 +718,9 @@ int closeusb(usbdevice* kb){
     pthread_mutex_unlock(dmutex(kb));
     pthread_join(kb->thread, 0);
     pthread_mutex_lock(dmutex(kb));
+
+    // Free the device-specific keymap
+    free(kb->keymap);
 
     // Delete the profile and the control path
     if(!kb->vtable)

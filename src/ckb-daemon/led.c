@@ -7,7 +7,7 @@ void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* 
     (void)kb;
     (void)dummy;
 
-    int index = keymap[keyindex].led;
+    int index = kb->keymap[keyindex].led;
     if(index < 0) {
         if (index == -2){     // Process strafe sidelights
             uchar sideshine;
@@ -124,7 +124,7 @@ char* printrgb(const lighting* light, const usbdevice* kb){
     const uchar* mb = light->b;
     for(int i = 0; i < N_KEYS_EXTENDED; i++){
         // Translate the key index to an RGB index using the key map
-        int k = keymap[i].led;
+        int k = kb->keymap[i].led;
         if(k < 0)
             continue;
         r[i] = mr[k];
@@ -134,8 +134,8 @@ char* printrgb(const lighting* light, const usbdevice* kb){
     // Make a buffer to track key names and to filter out duplicates
     char names[N_KEYS_EXTENDED][11];
     for(int i = 0; i < N_KEYS_EXTENDED; i++){
-        const char* name = keymap[i].name;
-        if(keymap[i].led < 0 || !has_key(name, kb))
+        const char* name = kb->keymap[i].name;
+        if(kb->keymap[i].led < 0 || !has_key(name, kb))
             names[i][0] = 0;
         else
             strncpy(names[i], name, 11);

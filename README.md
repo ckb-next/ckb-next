@@ -56,6 +56,7 @@ See also:
     * LUX RGB
     * RGB RAPIDFIRE
 * K68:
+    * RGB
     * non-RGB
 * K70:
     * RGB

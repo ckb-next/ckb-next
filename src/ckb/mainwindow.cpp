@@ -16,7 +16,7 @@ extern QString devpath;
 
 static const QString configLabel = "Settings";
 
-#ifndef Q_OS_MACX
+#ifndef Q_OS_MACOS
 QString daemonDialogText = QObject::tr("Start it once with:") +
     "<blockquote><code>sudo systemctl start ckb-daemon</code></blockquote>" +
     QObject::tr("Enable it for every boot:") +
@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
      }
      toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // Make a custom "Close" menu action for OSX, as the default one brings up the "still running" popup unnecessarily
     QMenuBar* menuBar = new QMenuBar(this);
     setMenuBar(menuBar);
@@ -293,7 +293,7 @@ void MainWindow::timerTick(){
 void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason){
     // On Linux, hide/show the app when the tray icon is clicked
     // On OSX this just shows the menu
-#ifndef Q_OS_MACX
+#ifndef Q_OS_MACOS
     if(reason == QSystemTrayIcon::DoubleClick || reason == QSystemTrayIcon::Trigger){
         if(isVisible())
             hide();

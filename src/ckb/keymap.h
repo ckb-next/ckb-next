@@ -22,7 +22,7 @@ struct Key {
     // Friendly name with optional OS-based labels
     inline QString friendlyName(bool os = true) const {
         if(os){
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
             if(!strcmp(name, "lwin")) return "Left Cmd";
             if(!strcmp(name, "rwin")) return "Right Cmd";
             if(!strcmp(name, "lalt")) return "Left Option";

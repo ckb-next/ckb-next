@@ -36,7 +36,7 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
     Kb::dither(dither);
     ui->ditherBox->setChecked(dither);
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // Read OSX settings
     bool noAccel = settings.value("DisableMouseAccel").toBool();
     Kb::mouseAccel(!noAccel);

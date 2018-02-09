@@ -354,7 +354,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 {"prtscn",  "PrtScn\nSysRq"}, {"scroll", "Scroll\nLock"}, {"pause", "Pause\nBreak"}, {"stop", "▪"}, {"prev", "|◂◂"}, {"play", "▸||"}, {"next", "▸▸|"},
                 {"pgup", "Page\nUp"}, {"pgdn", "Page\nDown"}, {"numlock", "Num\nLock"},
                 {"caps", "Caps"}, {"lshift", "Shift"}, {"rshift", "Shift"},
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
                 {"lctrl", "⌃"}, {"rctrl", "⌃"}, {"lwin", "⌘"}, {"rwin", "⌘"}, {"lalt", "⌥"}, {"ralt", "⌥"},
 #else
                 {"lctrl", "Ctrl"}, {"rctrl", "Ctrl"}, {"lwin", "❖"}, {"rwin", "❖"}, {"lalt", "Alt"}, {"ralt", "Alt"},
@@ -377,7 +377,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 // Use a smaller size for "End" to match everything else in that area
                 font.setPixelSize(font.pixelSize() * 0.65);
             else if(keyName == "light"
-#ifndef Q_OS_MACX
+#ifndef Q_OS_MACOS
                     || keyName == "lwin" || keyName == "rwin"
 #endif
                     )

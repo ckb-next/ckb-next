@@ -10,7 +10,7 @@
 static QDir path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/autostart");
 static const QString file = "ckb.desktop";
 static const QString internalFile(":/txt/ckb.desktop");
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
 static QDir path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/LaunchAgents");
 static const QString file = "com.ckb.ckb.plist";
 static const QString internalFile(":/txt/com.ckb.ckb.plist");
@@ -21,7 +21,7 @@ bool AutoRun::available(){
     // Allow autostart if the program is located in a system path
 #ifdef Q_OS_LINUX
     return QDir::root().absoluteFilePath(QStandardPaths::findExecutable("ckb")) == qApp->applicationFilePath();
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
     return qApp->applicationFilePath().startsWith("/Applications/ckb.app", Qt::CaseInsensitive);
 #endif
 }

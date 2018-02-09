@@ -1,6 +1,6 @@
 #include "kbmanager.h"
 
-#ifndef Q_OS_MACX
+#ifndef Q_OS_MACOS
 QString devpath = "/dev/input/ckb%1";
 #else
 QString devpath = "/var/run/ckb%1";

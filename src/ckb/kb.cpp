@@ -124,7 +124,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
     cmd.write(QString("dither %1\n").arg(static_cast<int>(_dither)).toLatin1());
     cmd.write(QString("\ndelay %1\n").arg(_delay? "on" : "off").toLatin1());
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // Write ANSI/ISO flag to daemon (OSX only)
     cmd.write("layout ");
     cmd.write(KeyMap::isISO(_layout) ? "iso" : "ansi");
@@ -195,7 +195,7 @@ void Kb::layout(KeyMap::Layout newLayout){
 }
 
 void Kb::updateLayout(){
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // Write ANSI/ISO flag to daemon (OSX only)
     cmd.write("layout ");
     cmd.write(KeyMap::isISO(_layout) ? "iso" : "ansi");
@@ -227,7 +227,7 @@ void Kb::mouseAccel(bool newAccel){
     if(newAccel == _mouseAccel)
         return;
     _mouseAccel = newAccel;
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // Update all devices
     foreach(Kb* kb, activeDevices){
         kb->cmd.write(QString("accel %1\n").arg(QString(newAccel ? "on" : "off")).toLatin1());
@@ -240,7 +240,7 @@ void Kb::scrollSpeed(int newSpeed){
     if(newSpeed == _scrollSpeed)
         return;
     _scrollSpeed = newSpeed;
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // Update all devices
     foreach(Kb* kb, activeDevices){
         kb->cmd.write(QString("scrollspeed %1\n").arg(newSpeed).toLatin1());

@@ -89,8 +89,8 @@ void ColorButton::versionWarning(){
             qtWarning.setTextFormat(Qt::RichText);
             qtWarning.setIcon(QMessageBox::Warning);
             qtWarning.setText(tr("A system configuration that can lead to instability issues with this software has been detected.<br><br>"
-                                            "If this application locks up after clicking the OK button below, please refer to "
-                                            "<a href=\"https://github.com/ckb-next/placeholder\">https://github.com/ckb-next/placeholder</a>"));
+                                 "If this application locks up after clicking the OK button below, please refer to "
+                                 "<a href=\"https://github.com/ckb-next/placeholder\">https://github.com/ckb-next/placeholder</a>"));
             qtWarning.setStandardButtons(QMessageBox::Ok);
             qtWarning.exec();
         }

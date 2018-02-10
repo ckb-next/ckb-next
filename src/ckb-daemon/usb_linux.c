@@ -263,15 +263,39 @@ void* os_inputmain(void* context){
     }
 
     /// Get an usbdevfs_urb data structure and clear it via memset()
-    struct usbdevfs_urb urbs[urbcount];
+    struct usbdevfs_urb urbs[urbcount + 1];
     memset(urbs, 0, sizeof(urbs));
+
+    /// Hopefully the buffer lengths are equal for all devices with congruent types.
+    /// You can find out the correctness for your device with lsusb --v or similar on macOS.
+    /// Currently the following combinations are known and implemented:
+    ///
+    /// device | detect with macro combination | endpoint # | buffer-length
+    /// ------ | ----------------------------- | ---------- | -------------
+    /// each | none | 0 | 8, 64 for FW v3
+    /// RGB Mouse | IS_RGB && IS_MOUSE | 1 | 10
+    /// RGB Keyboard | IS_RGB && !IS_MOUSE | 1 | 21
+    /// RGB Mouse or Keyboard | IS_RGB | 2 | MSG_SIZE (64)
+    /// non RGB Mouse or Keyboard | !IS_RGB | 1 | 4
+    /// non RGB Mouse or Keyboard | !IS_RGB | 2 | 15
+    ///
+    urbs[0].buffer_length = (kb->fwversion >= 0x300 ? MSG_SIZE : 8);
+    if(urbcount > 1 && IS_RGB(vendor, product)) {
+        if(IS_MOUSE(vendor, product))
+            urbs[1].buffer_length = 10;
+        else
+            urbs[1].buffer_length = 21;
+        urbs[2].buffer_length = MSG_SIZE;
+        if(urbcount != 3)
+            urbs[urbcount - 1].buffer_length = MSG_SIZE;
+    } else if(kb->fwversion < 0x300) {
+            urbs[1].buffer_length = 4;
+            urbs[2].buffer_length = 15;
+    }
 
     /// Now submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).
     /// Endpoint number is 0x80..0x82 or 0x83, depending on the model.
     for(int i = 0; i < urbcount; i++){
-        /// Max buffer length for the endpoints differs on each major FW version.
-        /// Instead of manually specifying the real length for each endpoint, assume MSG_SIZE.
-        urbs[i].buffer_length = MSG_SIZE;
         urbs[i].type = USBDEVFS_URB_TYPE_INTERRUPT;
         urbs[i].endpoint = 0x80 | (i + 1);
         urbs[i].buffer = malloc(urbs[i].buffer_length);

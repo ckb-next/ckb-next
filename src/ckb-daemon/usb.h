@@ -120,6 +120,10 @@
 #define P_GLAIVE_STR      "1b34"
 #define IS_GLAIVE(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
 
+#define P_POLARIS            0x1b3b
+#define P_POLARIS_STR        "1b3b"
+#define IS_POLARIS(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
+
 ///
 /// uncomment to see USB packets sent to the device
 // #define DEBUG_USB_SEND
@@ -169,8 +173,10 @@ const char* product_str(short product);
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
 /// Used when a device has a firmware with a low version number that uses the new protocol
-#define IS_V2_OVERRIDE(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2)
+#define IS_V2_OVERRIDE(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb))
 
+/// Used for devices that have a single IN endpoint, and no HID input
+#define IS_SINGLE_EP(kb)                (IS_POLARIS(kb))
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.
 
@@ -189,6 +195,11 @@ const char* product_str(short product);
 /// This constant is used to initialize \b kb->usbdelay.
 /// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
 /// Pure Hacker code.
+
+// Mousepad test
+#define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_POLARIS))
+#define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
+
 #define USB_DELAY_DEFAULT   5
 
 /// Start the USB main loop. Returns program exit code when finished

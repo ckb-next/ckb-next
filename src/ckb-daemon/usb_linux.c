@@ -296,7 +296,7 @@ void* os_inputmain(void* context){
         strcpy(finalpath, path);
         // Append the endpoint
         char epstr[7];
-        snprintf(epstr, 7, "/ep_%02x", ep);
+        snprintf(epstr, 7, "/ep_%02x", ep & 0xFF);
         strcat(finalpath, epstr);
         // Access it
         struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);

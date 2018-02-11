@@ -5,7 +5,44 @@
 
 // Compare two light structures, ignore keys
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
-    return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES);
+    return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES) ||
+        memcmp(lhs->r, rhs->r, 3) || memcmp(lhs->g, rhs->g, 3) || memcmp(lhs->b, rhs->b, 3);
+}
+
+static int updatergb_darkcore(usbdevice* kb, lighting* lastlight, lighting* newlight){
+    // Dark Core zone bits:
+    // 1: Front
+    // 2: Thumb
+    // 4: Rear
+
+    // Dark Core commands:
+    // 00: Colour Shift
+    // 01: Colour Pulse
+    // 03: Rainbow
+    // 07: Static Colour
+    // FF: No animation (black)
+
+    for (int zone = 0; zone < 3; zone++) {
+        uchar data_pkt[MSG_SIZE] = {
+            CMD_SET, 0xaa, 0
+        };
+        data_pkt[4]  = 1 << zone;        // Bitmask.
+        data_pkt[5]  = 7;                // Command (static colour).
+        data_pkt[8]  = 100;              // Opacity (100%).
+        data_pkt[9]  = newlight->r[zone];
+        data_pkt[10] = newlight->g[zone];
+        data_pkt[11] = newlight->b[zone];
+        // Colour gets sent twice for some reason.
+        data_pkt[12] = newlight->r[zone];
+        data_pkt[13] = newlight->g[zone];
+        data_pkt[14] = newlight->b[zone];
+        data_pkt[15] = 5 - zone;         // Profile byte?
+        if(!usbsend(kb, data_pkt, 1))
+            return -1;
+    }
+
+    memcpy(lastlight, newlight, sizeof(lighting));
+    return 0;
 }
 
 int updatergb_mouse(usbdevice* kb, int force){
@@ -18,6 +55,10 @@ int updatergb_mouse(usbdevice* kb, int force){
             && !rgbcmp(lastlight, newlight))
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
+
+    // The Dark Core has its own lighting protocol.
+    if(IS_DARK_CORE(kb))
+        return updatergb_darkcore(kb, lastlight, newlight);
 
     // Prevent writing to DPI LEDs or non-existent LED zones for the Glaive.
     int num_zones = IS_GLAIVE(kb) ? 3 : N_MOUSE_ZONES;

@@ -370,6 +370,21 @@ static const Key K95PLbar[] = {
 };
 #define LBARCOUNT_K95P (sizeof(K95PLbar) / sizeof(Key))
 
+// Mouse map - DARK CORE
+static const Key DarkCoreKeys[] = {
+    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
+    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "Wheel Light", "zone3", 22, 15, 8, 8, true, false},
+    {0, "DPI Up", "dpiup", 22, 19, 8, 6, false, true}, {0, "DPI Light", "dpi", 22, 24, 8, 8, true, false}, {0, "DPI Down", "dpidn", 22, 31, 8, 6, false, true},
+    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper", "sniper", 0, 25, 5, 15, false, true},
+    // Stubs
+    {0, "Alt Forward", "thumb1", 10, 44, 5, 9, false, true}, {0, "Alt Back", "thumb2", 10, 53, 5, 10, false, true},
+    {0, "Logo", "zone1", 0, 48, 38, 12, true, false}, {0, "DPI Cycle", "dpiup", 31, 39, 6, 12, false, true},
+    {0, "Side light", "zone2", 0, 21, 10, 24, true, false},
+
+
+};
+#define KEYCOUNT_DARKCORE    (sizeof(DarkCoreKeys) / sizeof(Key))
+
 // MM800 Polaris
 #define POLARIS_V 6, 14
 #define POLARIS_H 14, 6
@@ -872,6 +887,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::DARKCORE:{
+        // Dark Core
+        for(const Key* key = DarkCoreKeys; key < DarkCoreKeys + KEYCOUNT_DARKCORE; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     case KeyMap::POLARIS:{
         // MM800 Polaris Mousepad
         for(const Key* key = PolarisZones; key < PolarisZones + KEYCOUNT_POLARIS; key++){
@@ -1153,6 +1178,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return GLAIVE;
     if(lower == "katar")
         return KATAR;
+    if(lower == "darkcore")
+        return DARKCORE;
     if(lower == "polaris")
         return POLARIS;
     if(lower == "st100")
@@ -1204,6 +1231,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "glaive";
     case KATAR:
         return "katar";
+    case DARKCORE:
+        return "darkcore";
     case POLARIS:
         return "polaris";
     case ST100:
@@ -1259,6 +1288,7 @@ int KeyMap::modelWidth(Model model){
     case HARPOON:
     case GLAIVE:
     case KATAR:
+    case DARKCORE:
     case POLARIS:
     case ST100:
     case M95:
@@ -1292,6 +1322,7 @@ int KeyMap::modelHeight(Model model){
     case HARPOON:
     case GLAIVE:
     case KATAR:
+    case DARKCORE:
     case POLARIS:
     case ST100:
     case M95:

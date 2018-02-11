@@ -263,41 +263,56 @@ void* os_inputmain(void* context){
     }
 
     /// Get an usbdevfs_urb data structure and clear it via memset()
-    struct usbdevfs_urb urbs[urbcount + 1];
+    struct usbdevfs_urb urbs[urbcount];
     memset(urbs, 0, sizeof(urbs));
 
-    /// Hopefully the buffer lengths are equal for all devices with congruent types.
-    /// You can find out the correctness for your device with lsusb --v or similar on macOS.
-    /// Currently the following combinations are known and implemented:
+    /// Query udev for wMaxPacketSize on each endpoint, due to certain devices sending more data than the max defined, causing all sorts of issues.
+    /// A syspath example would be:
+    /// $ cat "/sys/devices/pci0000:00/0000:00:05.0/0000:03:00.0/usb8/8-2/8-2:1.2/ep_03/wMaxPacketSize"
+    /// 0040
+    /// Where 0x0040 == 64
     ///
-    /// device | detect with macro combination | endpoint # | buffer-length
-    /// ------ | ----------------------------- | ---------- | -------------
-    /// each | none | 0 | 8, 64 for FW v3
-    /// RGB Mouse | IS_RGB && IS_MOUSE | 1 | 10
-    /// RGB Keyboard | IS_RGB && !IS_MOUSE | 1 | 21
-    /// RGB Mouse or Keyboard | IS_RGB | 2 | MSG_SIZE (64)
-    /// non RGB Mouse or Keyboard | !IS_RGB | 1 | 4
-    /// non RGB Mouse or Keyboard | !IS_RGB | 2 | 15
-    ///
-    urbs[0].buffer_length = (kb->fwversion >= 0x300 ? MSG_SIZE : 8);
-    if(urbcount > 1 && IS_RGB(vendor, product)) {
-        if(IS_MOUSE(vendor, product))
-            urbs[1].buffer_length = 10;
-        else
-            urbs[1].buffer_length = 21;
-        urbs[2].buffer_length = MSG_SIZE;
-        if(urbcount != 3)
-            urbs[urbcount - 1].buffer_length = MSG_SIZE;
-    } else if(kb->fwversion < 0x300) {
-            urbs[1].buffer_length = 4;
-            urbs[2].buffer_length = 15;
-    }
+    /// Submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).
+    /// Endpoint number is 0x80..0x82 or 0x83, depending on the model and FW version.
 
-    /// Now submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).
-    /// Endpoint number is 0x80..0x82 or 0x83, depending on the model.
+    // Enumerate the current device's children
+    struct udev* dev_udev = udev_device_get_udev(kb->udev);
+    struct udev_enumerate* enumerate = udev_enumerate_new(dev_udev);
+    udev_enumerate_add_match_parent(enumerate, kb->udev);
+    udev_enumerate_scan_devices(enumerate);
+
+    // Create a list containing them
+    struct udev_list_entry* udeventry = udev_enumerate_get_list_entry(enumerate);
+
     for(int i = 0; i < urbcount; i++){
+        ushort ep = 0x80 | (i + 1);
+
+        // Move to the next entry in the udev list (skipping the first one).
+        struct udev_list_entry* nextentry = udev_list_entry_get_next(udeventry);
+        const char* path = udev_list_entry_get_name(nextentry);
+        // Create the path to the endpoint
+        char finalpath[strlen(path)+7];
+        // Copy the base path
+        strcpy(finalpath, path);
+        // Append the endpoint
+        char epstr[7];
+        snprintf(epstr, 7, "/ep_%02x", ep & 0xFF);
+        strcat(finalpath, epstr);
+        // Access it
+        struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
+        const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
+        // Read its wMaxPacketSize
+        ushort size;
+        sscanf(sizehex, "%hx", &size);
+#ifdef DEBUG
+        ckb_info("Endpoint path %s has wMaxPacketSize %i\n", epstr, size);
+#endif
+        // Increment the udev list pointer
+        udeventry = nextentry;
+        // Set the URB parameters
+        urbs[i].buffer_length = size;
         urbs[i].type = USBDEVFS_URB_TYPE_INTERRUPT;
-        urbs[i].endpoint = 0x80 | (i + 1);
+        urbs[i].endpoint = ep;
         urbs[i].buffer = malloc(urbs[i].buffer_length);
         ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
     }

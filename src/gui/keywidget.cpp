@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0, *darkCoreOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -145,6 +145,13 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 katarOverlay = new QImage(":/img/overlay_katar.png");
             overlay = katarOverlay;
             xpos = 3.5f;
+            ypos = -2.f;
+        } else if(model == KeyMap::DARKCORE){
+            if(!darkCoreOverlay)
+                darkCoreOverlay = new QImage(":/img/overlay_darkcore.png");
+            overlay = darkCoreOverlay;
+            xpos = 3.5f;
+            ypos = -2.f;
         } else if(model == KeyMap::POLARIS){
             if(!polarisOverlay)
                 polarisOverlay = new QImage(":/img/overlay_polaris.png");

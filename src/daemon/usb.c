@@ -38,6 +38,8 @@ device_desc models[] = {
     // Keyboards
     { V_CORSAIR, P_K55, },
     { V_CORSAIR, P_K63_NRGB, },
+    { V_CORSAIR, P_K63_NRGB_WL, },
+    { V_CORSAIR, P_K63_NRGB_WL2, },
     { V_CORSAIR, P_K65, },
     { V_CORSAIR, P_K65_LEGACY, },
     { V_CORSAIR, P_K65_LUX, },
@@ -80,6 +82,8 @@ device_desc models[] = {
     { V_CORSAIR, P_KATAR, },
     { V_CORSAIR, P_IRONCLAW, },
     { V_CORSAIR, P_NIGHTSWORD, },
+    { V_CORSAIR, P_DARK_CORE, },
+    { V_CORSAIR, P_DARK_CORE_SE, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
@@ -159,7 +163,7 @@ const char* product_str(ushort product){
         return "k65";
     if(product == P_K66)
         return "k66";
-    if(product == P_K63_NRGB)
+    if(product == P_K63_NRGB || product == P_K63_NRGB_WL || product == P_K63_NRGB_WL2)
         return "k63";
     if(product == P_K55)
         return "k55";
@@ -189,6 +193,8 @@ const char* product_str(ushort product){
         return "nightsword";
     if(product == P_POLARIS)
         return "polaris";
+    if(product == P_DARK_CORE || product == P_DARK_CORE_WL || product == P_DARK_CORE_SE || product == P_DARK_CORE_SE_WL)
+        return "darkcore";
     if(product == P_ST100)
         return "st100";
     return "";

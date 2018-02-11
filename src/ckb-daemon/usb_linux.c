@@ -3,7 +3,6 @@
 #include "input.h"
 #include "notify.h"
 #include "usb.h"
-#include <libudev.h>
 
 #ifdef OS_LINUX
 

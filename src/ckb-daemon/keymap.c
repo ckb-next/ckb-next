@@ -241,6 +241,23 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "dpi4",       LED_MOUSE + 10, KEY_NONE },
     { "dpi5",       LED_MOUSE + 11, KEY_NONE },
 
+    // Generic zones (K55, MM800, ST100, etc)
+    { "zone1",      0x00, KEY_NONE },
+    { "zone2",      0x01, KEY_NONE },
+    { "zone3",      0x02, KEY_NONE },
+    { "zone4",      0x03, KEY_NONE },
+    { "zone5",      0x04, KEY_NONE },
+    { "zone6",      0x05, KEY_NONE },
+    { "zone7",      0x06, KEY_NONE },
+    { "zone8",      0x07, KEY_NONE },
+    { "zone9",      0x08, KEY_NONE },
+    { "zone10",     0x09, KEY_NONE },
+    { "zone11",     0x0A, KEY_NONE },
+    { "zone12",     0x0B, KEY_NONE },
+    { "zone13",     0x0C, KEY_NONE },
+    { "zone14",     0x0D, KEY_NONE },
+    { "zone15",     0x0E, KEY_NONE },
+
 };
 
 void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const unsigned char* urbinput){

@@ -789,9 +789,9 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     int handle_idx;
 
     // Because a single v3 hack wasn't enough
-    struct {uint16_t vendor; uint16_t product;} fakekb;
-    fakekb.vendor = idvendor;
-    fakekb.product = idproduct;
+    struct {uint16_t vendor; uint16_t product;} *fakekb;
+    fakekb->vendor = idvendor;
+    fakekb->product = idproduct;
 
     // Handle 3 is for controlling the device (only exists for RGB)
     if(feature == 64)

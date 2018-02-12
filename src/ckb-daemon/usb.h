@@ -112,13 +112,17 @@
 #define P_SCIMITAR_PRO_STR  "1b3e"
 #define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
 
-#define P_HARPOON          0x1b3c
-#define P_HARPOON_STR      "1b3c"
+#define P_HARPOON           0x1b3c
+#define P_HARPOON_STR       "1b3c"
 #define IS_HARPOON(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_HARPOON)
 
-#define P_GLAIVE          0x1b34
-#define P_GLAIVE_STR      "1b34"
+#define P_GLAIVE            0x1b34
+#define P_GLAIVE_STR        "1b34"
 #define IS_GLAIVE(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
+
+#define P_POLARIS           0x1b3b
+#define P_POLARIS_STR       "1b3b"
+#define IS_POLARIS(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
 ///
 /// uncomment to see USB packets sent to the device
@@ -168,8 +172,14 @@ const char* product_str(short product);
 /// Used to apply quirks and features to the PLATINUM devices.
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
-/// Used when a device has a firmware with a low version number that uses the new protocol
-#define IS_V2_OVERRIDE(kb)             (IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2)
+/// Used for even newer devices that come with V3 firmware out of the factory.
+#define IS_V3_OVERRIDE(kb)              (0)
+
+/// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
+#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2)
+
+/// Used for devices that have a single IN endpoint, and no HID input
+#define IS_SINGLE_EP(kb)                (IS_POLARIS(kb))
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

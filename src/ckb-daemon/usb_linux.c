@@ -69,13 +69,15 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     int res;
     if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !is_recv){
         struct usbdevfs_bulktransfer transfer = {0};
-        // FW 2.XX uses 0x03, FW 3.XX uses 0x02
-        transfer.ep = (kb->fwversion >= 0x130 && kb->fwversion < 0x200) ? 4 : (kb->fwversion >= 0x300 ? 2 : 3);
+        // All firmware versions for normal HID devices have the OUT endpoint at the end.
+        // Devices with no input, such as the Polaris, have it at the start.
+        transfer.ep = kb->epcount - IS_SINGLE_EP(kb);
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
         res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {
+        // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     }
@@ -215,14 +217,14 @@ void os_sendindicators(usbdevice* kb) {
     static int countForReset = 0;
     void *ileds;
     ushort leds;
-    if(kb->fwversion >= 0x300) {
+    if(kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) {
         leds = (kb->ileds << 8) | 0x0001;
         ileds = &leds;
     }
     else {
         ileds = &kb->ileds;
     }
-    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, (kb->fwversion >= 0x300 ? 2 : 1), 500, ileds };
+    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : 1), 500, ileds };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     if(res <= 0) {
         ckb_err("%s\n", res ? strerror(errno) : "No data written");
@@ -357,14 +359,14 @@ void* os_inputmain(void* context){
             pthread_mutex_lock(imutex(kb));
             // EP workaround for FWv3
             // Corsair input comes through 0x81, but case 1 in keymap.c is used for 6KRO
-            uchar urbendpoint = (kb->fwversion >= 0x300 ? 2 : (urb->endpoint & 0xF));
+            uchar urbendpoint = ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : (urb->endpoint & 0xF));
             if(IS_MOUSE(vendor, product)){
                 switch(urb->actual_length){
                 case 8:
                 case 10:
                 case 11:
                     // HID mouse input
-                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -urbendpoint, urb->actual_length, urb->buffer, kb->fwversion);
+                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -urbendpoint, urb->actual_length, urb->buffer, kb);
                     break;
                 case MSG_SIZE:
                     // Corsair mouse input

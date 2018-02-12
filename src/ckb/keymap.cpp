@@ -335,6 +335,18 @@ static const Key K95PLbar[] = {
 };
 #define LBARCOUNT_K95P (sizeof(K95PLbar) / sizeof(Key))
 
+// MM800 Polaris
+#define POLARIS_V 6, 14
+#define POLARIS_H 14, 6
+
+static const Key PolarisZones[] = {
+    {0, "Zone 1", "zone1", -19, 4, POLARIS_V, true, false}, {0, "Zone 2", "zone2", -19, 16, POLARIS_V, true, false}, {0, "Zone 3", "zone3", -19, 28, POLARIS_V, true, false}, {0, "Zone 4", "zone4", -19, 40, POLARIS_V, true, false},
+    {0, "Zone 5", "zone5", -19, 52, POLARIS_V, true, false}, {0, "Zone 6", "zone6", -6, 62, POLARIS_H, true, false}, {0, "Zone 7", "zone7", 6, 62, POLARIS_H, true, false}, {0, "Zone 8", "zone8", 18, 62, POLARIS_H, true, false},
+    {0, "Zone 9", "zone9", 30, 62, POLARIS_H, true, false}, {0, "Zone 10", "zone10", 42, 62, POLARIS_H, true, false}, {0, "Zone 11", "zone11", 66, 52, POLARIS_V, true, false}, {0, "Zone 12", "zone12", 66, 40, POLARIS_V, true, false},
+    {0, "Zone 13", "zone13", 66, 28, POLARIS_V, true, false}, {0, "Zone 14", "zone14", 66, 16, POLARIS_V, true, false}, {0, "Zone 15", "zone15", 66, 4, POLARIS_V, true, false}
+};
+#define KEYCOUNT_POLARIS   (sizeof(PolarisZones) / sizeof(Key))
+
 
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
@@ -632,6 +644,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::POLARIS:{
+        // MM800 Polaris Mousepad
+        for(const Key* key = PolarisZones; key < PolarisZones + KEYCOUNT_POLARIS; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -798,6 +820,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return HARPOON;
     if(lower == "glaive")
         return GLAIVE;
+    if(lower == "polaris")
+        return POLARIS;
     return NO_MODEL;
 }
 
@@ -827,6 +851,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "harpoon";
     case GLAIVE:
         return "glaive";
+    case POLARIS:
+        return "polaris";
     default:
         return "";
     }
@@ -860,6 +886,7 @@ int KeyMap::modelWidth(Model model){
     case SCIMITAR:
     case HARPOON:
     case GLAIVE:
+    case POLARIS:
         return M65_WIDTH;
     default:
         return 0;
@@ -882,6 +909,7 @@ int KeyMap::modelHeight(Model model){
     case SCIMITAR:
     case HARPOON:
     case GLAIVE:
+    case POLARIS:
         return M65_HEIGHT;
     default:
         return 0;

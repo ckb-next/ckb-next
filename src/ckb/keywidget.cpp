@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -111,7 +111,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     painter.setPen(Qt::NoPen);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    if(keyMap.isMouse()){
+    if(keyMap.isMouse() || keyMap.isMousepad()){
         // Draw mouse overlays
         const QImage* overlay = 0;
         float xpos = 0.f, ypos = 0.f;
@@ -144,6 +144,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 glaiveOverlay = new QImage(":/img/overlay_glaive.png");
             overlay = glaiveOverlay;
             xpos = 3.5f;
+            ypos = -2.f;
+        } else if(model == KeyMap::POLARIS){
+            if(!polarisOverlay)
+                polarisOverlay = new QImage(":/img/overlay_polaris.png");
+            overlay = polarisOverlay;
+            xpos = -19.f;
             ypos = -2.f;
         }
         if(overlay){
@@ -229,7 +235,41 @@ void KeyWidget::paintEvent(QPaintEvent*){
             w *= 0.75f;
             h *= 0.75f;
             bgPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
-        } else {
+        } else if (model == KeyMap::POLARIS) {
+            /*float kx = key.x + offX - key.width / 2.f + 2.f;
+            float ky = key.y + offY - key.height / 2.f + 2.f;
+            float kw = key.width - 4.f;
+            float kh = key.height - 4.f;*/
+            float kh = h-2.5;
+            float kw = w-0.f;
+            float ky = y+0.5;
+            float kx = x+0.f;
+
+            // Draw the edges as polygons
+            if(!strcmp(key.name, "zone5")){
+                QPointF edgePoints[6] = {
+                    QPointF(kx*scale,             ky*scale),
+                    QPointF(kx*scale,            (ky + kh + kw)*scale),
+                    QPointF((kx + kw + kh)*scale,(ky + kh + kw)*scale),
+                    QPointF((kx + kw + kh)*scale,(ky + kh)*scale),
+                    QPointF((kx + kw)*scale,     (ky + kh)*scale),
+                    QPointF((kx + kw)*scale,      ky*scale),
+                };
+                bgPainter.drawPolygon(edgePoints, 6);
+
+             } else if(!strcmp(key.name, "zone11")){
+                QPointF edgePoints[6] = {
+                    QPointF(kx*scale,             ky*scale),
+                    QPointF(kx*scale,            (ky + kh)*scale),
+                    QPointF((kx - kw - kh)*scale,(ky + kh)*scale),
+                    QPointF((kx - kw - kh)*scale,(ky + kh + kw)*scale),
+                    QPointF((kx + kw)*scale,     (ky + kh + kw)*scale),
+                    QPointF((kx + kw)*scale,      ky*scale),
+                };
+                bgPainter.drawPolygon(edgePoints, 6);
+            } else
+                bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
+         } else {
             if(!strcmp(key.name, "enter")){
                 if(key.height == 24){
                     // ISO enter key isn't rectangular
@@ -321,8 +361,40 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     decPainter.drawRect(QRectF((kx+2.f) * scale, (ky+2.f) * scale, (kw-4.f) * scale, (kh-4.f) * scale)); // square indicators
                } else //everything else is a circle, just a tad bigger to show the key color better
                     decPainter.drawEllipse(QRectF((x-1.f) * scale, (y-1.f) * scale, (w+2.f) * scale, (h+2.f) * scale));
-            } else
+            } else if (model == KeyMap::POLARIS) {
+                float kx = key.x + offX - key.width / 2.f + 2.f;
+                float ky = key.y + offY - key.height / 2.f + 2.f;
+                float kw = key.width - 4.f;
+                float kh = key.height - 4.f;
+                // No border
+                decPainter.setPen(QPen(QColor(0,0,0,0), 1));
+                // Draw the edges as polygons
+                if(!strcmp(key.name, "zone5")){
+                    QPointF edgePoints[6] = {
+                        QPointF(kx*scale,             ky*scale),
+                        QPointF(kx*scale,            (ky + kh + kw)*scale),
+                        QPointF((kx + kw + kh)*scale,(ky + kh + kw)*scale),
+                        QPointF((kx + kw + kh)*scale,(ky + kh)*scale),
+                        QPointF((kx + kw)*scale,     (ky + kh)*scale),
+                        QPointF((kx + kw)*scale,      ky*scale),
+                    };
+                    decPainter.drawPolygon(edgePoints, 6);
+
+                 } else if(!strcmp(key.name, "zone11")){
+                    QPointF edgePoints[6] = {
+                        QPointF(kx*scale,             ky*scale),
+                        QPointF(kx*scale,            (ky + kh)*scale),
+                        QPointF((kx - kw - kh)*scale,(ky + kh)*scale),
+                        QPointF((kx - kw - kh)*scale,(ky + kh + kw)*scale),
+                        QPointF((kx + kw)*scale,     (ky + kh + kw)*scale),
+                        QPointF((kx + kw)*scale,      ky*scale),
+                    };
+                    decPainter.drawPolygon(edgePoints, 6);
+                 } else
+                    decPainter.drawRect(QRectF(kx * scale, ky * scale, kw * scale, kh * scale));
+            } else {
                 decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
+            }
         }
     } else {
         // Draw key names

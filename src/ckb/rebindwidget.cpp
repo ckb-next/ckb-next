@@ -34,7 +34,7 @@ RebindWidget::RebindWidget(QWidget *parent) :
         ui->numBox->addItem(KeyMap::friendlyName(key).remove("NumPad "));
     foreach(const QString& key, mediaKeys)
         ui->mediaBox->addItem(KeyMap::friendlyName(key));
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // Replace some OSX keys with their actual meanings
     ui->modBox->setItemText(modKeys.indexOf("lwin") + 1, "Left Cmd");
     ui->modBox->setItemText(modKeys.indexOf("rwin") + 1, "Right Cmd");

@@ -267,15 +267,54 @@ void* os_inputmain(void* context){
     /// Get an usbdevfs_urb data structure and clear it via memset()
     struct usbdevfs_urb urbs[urbcount];
     memset(urbs, 0, sizeof(urbs));
-  
-    /// Now submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).
-    /// Endpoint number is 0x80..0x82 or 0x83, depending on the model.
+
+    /// Query udev for wMaxPacketSize on each endpoint, due to certain devices sending more data than the max defined, causing all sorts of issues.
+    /// A syspath example would be:
+    /// $ cat "/sys/devices/pci0000:00/0000:00:05.0/0000:03:00.0/usb8/8-2/8-2:1.2/ep_03/wMaxPacketSize"
+    /// 0040
+    /// Where 0x0040 == 64
+    ///
+    /// Submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).
+    /// Endpoint number is 0x80..0x82 or 0x83, depending on the model and FW version.
+
+    // Enumerate the current device's children
+    struct udev* dev_udev = udev_device_get_udev(kb->udev);
+    struct udev_enumerate* enumerate = udev_enumerate_new(dev_udev);
+    udev_enumerate_add_match_parent(enumerate, kb->udev);
+    udev_enumerate_scan_devices(enumerate);
+
+    // Create a list containing them
+    struct udev_list_entry* udeventry = udev_enumerate_get_list_entry(enumerate);
+
     for(int i = 0; i < urbcount; i++){
-        /// Max buffer length for the endpoints differs on each major FW version.
-        /// Instead of manually specifying the real length for each endpoint, assume MSG_SIZE.
-        urbs[i].buffer_length = MSG_SIZE;
+        ushort ep = 0x80 | (i + 1);
+
+        // Move to the next entry in the udev list (skipping the first one).
+        struct udev_list_entry* nextentry = udev_list_entry_get_next(udeventry);
+        const char* path = udev_list_entry_get_name(nextentry);
+        // Create the path to the endpoint
+        char finalpath[strlen(path)+7];
+        // Copy the base path
+        strcpy(finalpath, path);
+        // Append the endpoint
+        char epstr[7];
+        snprintf(epstr, 7, "/ep_%02x", ep & 0xFF);
+        strcat(finalpath, epstr);
+        // Access it
+        struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
+        const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
+        // Read its wMaxPacketSize
+        ushort size;
+        sscanf(sizehex, "%hx", &size);
+#ifdef DEBUG
+        ckb_info("Endpoint path %s has wMaxPacketSize %i\n", epstr, size);
+#endif
+        // Increment the udev list pointer
+        udeventry = nextentry;
+        // Set the URB parameters
+        urbs[i].buffer_length = size;
         urbs[i].type = USBDEVFS_URB_TYPE_INTERRUPT;
-        urbs[i].endpoint = 0x80 | (i + 1);
+        urbs[i].endpoint = ep;
         urbs[i].buffer = malloc(urbs[i].buffer_length);
         ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
     }
@@ -554,14 +593,19 @@ int os_setupusb(usbdevice* kb) {
     ///
     const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
 #ifdef DEBUG
-    ckb_info("claiming interfaces. name=%s, firmware=%s; ep_str=%s\n", name, firmware, ep_str);
+    ckb_info("Claiming interfaces. name=%s, firmware=%s, ep_str=%s\n", name, firmware, ep_str);
 #endif //DEBUG
     kb->epcount = 0;
     if(ep_str)
         sscanf(ep_str, "%d", &kb->epcount);
     if(kb->epcount < 2){
-        // IF we have an RGB KB with 0 or 1 endpoints, it will be in BIOS mode.
-        ckb_err("Unable to read endpoint count from udev, assuming %d and reading >>%s<< or device is in BIOS mode\n", kb->epcount, ep_str);
+        // If we have an RGB KB with 1 endpoint, it will be in BIOS mode.
+        if(kb->epcount == 1){
+            ckb_info("Device is in BIOS mode\n");
+            return -1;
+        }
+        // Something probably went wrong if we got here
+        ckb_err("Unable to read endpoint count from udev, assuming %d\n", kb->epcount);
         if (usb_tryreset(kb) == 0) { ///< Try to reset the device and recall the function
             static int retryCount = 0; ///< Don't do this endless in recursion
             if (retryCount++ < 5) {

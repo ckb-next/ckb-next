@@ -3,6 +3,11 @@
 #include "input.h"
 
 #ifdef OS_MAC
+#include <errno.h>
+#include <sys/sysctl.h>
+
+bool osx_sierra;
+bool checked_for_osx_sierra = false;
 
 // Numpad keys have an extra flag
 #define IS_NUMPAD(scancode) ((scancode) >= kVK_ANSI_KeypadDecimal && (scancode) <= kVK_ANSI_Keypad9 && (scancode) != kVK_ANSI_KeypadClear && (scancode) != kVK_ANSI_KeypadEnter)
@@ -25,15 +30,29 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
     }
 
     IOGPoint location = {0, 0};
-    if((options & kIOHIDSetRelativeCursorPosition) && type != NX_MOUSEMOVED){
-        // Hack #2: IOHIDPostEvent will not accept relative mouse coordinates for any event other than NX_MOUSEMOVED
-        // So we need to get the current absolute coordinates from CoreGraphics and then modify those...
-        CGEventRef cge = CGEventCreate(nil);
-        CGPoint loc = CGEventGetLocation(cge);
-        CFRelease(cge);
-        location.x = floor(loc.x + ev->mouseMove.dx);
-        location.y = floor(loc.y + ev->mouseMove.dy);
-        options = (options & ~kIOHIDSetRelativeCursorPosition) | kIOHIDSetCursorPosition;
+
+    if(!checked_for_osx_sierra){
+        char osx_version_buf[256];
+        size_t size = sizeof(osx_version_buf);
+        sysctlbyname("kern.osrelease", osx_version_buf, &size, NULL, 0);
+        char osx_version[2];
+        strncpy(osx_version, osx_version_buf, 2);
+        osx_sierra = atoi(osx_version) >= 16;
+        checked_for_osx_sierra = true;
+    }
+
+    if(!osx_sierra){
+        if((options & kIOHIDSetRelativeCursorPosition) && type != NX_MOUSEMOVED){
+            // Hack #2: IOHIDPostEvent will not accept relative mouse coordinates for any event other than NX_MOUSEMOVED
+            // So we need to get the current absolute coordinates from CoreGraphics and then modify those...
+            // No longer required in macOS >= 10.12
+            CGEventRef cge = CGEventCreate(nil);
+            CGPoint loc = CGEventGetLocation(cge);
+            CFRelease(cge);
+            location.x = floor(loc.x + ev->mouseMove.dx);
+            location.y = floor(loc.y + ev->mouseMove.dy);
+            options = (options & ~kIOHIDSetRelativeCursorPosition) | kIOHIDSetCursorPosition;
+        }
     }
 
     euid_guard_start;

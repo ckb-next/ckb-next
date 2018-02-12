@@ -22,7 +22,7 @@ void ckb_info(){
     CKB_NAME("Heat Map");
     CKB_VERSION("0.2");
     CKB_COPYRIGHT("2017", "RULER501");
-    CKB_LICENSE("GPLv2");
+    CKB_LICENSE("GPLv2+");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25A1CDB0D92C}");
     CKB_DESCRIPTION("A spot effect on pressed keys that shows usage");
 

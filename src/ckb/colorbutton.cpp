@@ -1,15 +1,26 @@
 #include "colorbutton.h"
 #include <QColorDialog>
 #include <QPainter>
+#include <QMessageBox>
+#include <QProcessEnvironment>
+#include "ckbsettings.h"
 
 ColorButton::ColorButton(QWidget* parent, bool allowAlpha) :
     QPushButton(parent), _alpha(allowAlpha), _setLabel(true), _bigIcons(false)
 {
+#if QT_VERSION >= 0x050700
+    // Make sure the version warning function is called before there is any attempt to draw the colour picker.
+    connect(this, SIGNAL(clicked()), this, SLOT(versionWarning()), Qt::DirectConnection);
+#endif
     setAutoDefault(false);
     setDefault(false);
     updateImage();
     // Pick color on click (use queued connection so that any on_*_clicked() events can be processed first)
     connect(this, SIGNAL(clicked()), this, SLOT(pickColor()), Qt::QueuedConnection);
+#if QT_VERSION >= 0x050700
+    // If the widget was drawn, mark as dismissed.
+    connect(this, SIGNAL(clicked()), this, SLOT(versionWarningDismissed()), Qt::QueuedConnection);
+#endif
 }
 
 void ColorButton::color(const QColor& newColor){
@@ -64,4 +75,30 @@ void ColorButton::pickColor(){
         updateImage();
         emit colorChanged(_color);
     }
+}
+
+void ColorButton::versionWarning(){
+    CkbSettings settings("Program");
+    if(!settings.value("QtWarningDismissed").toBool()){
+        QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+        QString qpaTheme = procEnv.value("QT_QPA_PLATFORMTHEME");
+        // Whitelist
+        QStringList qpaThemeList = QStringList() << "qt5ct" << "kde";
+        if(!qpaThemeList.contains(qpaTheme)){
+            QMessageBox qtWarning(this);
+            qtWarning.setTextFormat(Qt::RichText);
+            qtWarning.setIcon(QMessageBox::Warning);
+            qtWarning.setText(tr("A system configuration that can lead to instability issues with this software has been detected.<br><br>"
+                                 "If this application locks up after clicking the OK button below, please refer to "
+                                 "<a href=\"https://github.com/ckb-next/placeholder\">https://github.com/ckb-next/placeholder</a>"));
+            qtWarning.setStandardButtons(QMessageBox::Ok);
+            qtWarning.exec();
+        }
+    }
+}
+
+void ColorButton::versionWarningDismissed(){
+    CkbSettings settings("Program");
+    if(!settings.value("QtWarningDismissed").toBool())
+        settings.setValue("QtWarningDismissed", true);
 }

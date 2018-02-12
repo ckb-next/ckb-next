@@ -35,7 +35,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     KbBind::loadGlobalRemap();
     if(modKeys.isEmpty()){
         modKeys << "caps" << "lshift" << "lctrl" << "lalt" << "lwin";
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
         modNames << "Caps Lock" << "Shift" << "Control (⌃)" << "Option (⌥)" << "Command (⌘)";
 #else
         modNames << "Caps Lock" << "Shift" << "Control" << "Alt" << "Super";
@@ -64,7 +64,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     idx = modKeys.indexOf(KbBind::globalRemap("lalt"));
     if(idx >= 0)
         ui->altBox->setCurrentIndex(idx);
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     if(settings.value("osxCmdSwap").toBool()){
         // ckb <0.0.41
         settings.remove("osxCmdSwap");

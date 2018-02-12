@@ -28,6 +28,8 @@ signals:
 
 private slots:
     void pickColor();
+    void versionWarning();
+    void versionWarningDismissed();
 
 private:
     QColor _color;

@@ -10,7 +10,7 @@
 
 QSharedMemory appShare("ckb");
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
 // App Nap is an OSX feature designed to save power by putting background apps to sleep.
 // However, it interferes with ckb's animations, so we want it off
 extern "C" void disableAppNap();
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]){
 
     // Seed the RNG for UsbIds
     qsrand(QDateTime::currentMSecsSinceEpoch());
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     disableAppNap();
 
     FILE *fp = fopen("/tmp/ckb", "w");

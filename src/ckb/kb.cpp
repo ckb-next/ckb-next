@@ -18,7 +18,7 @@ KeyMap::Layout Kb::_layout = KeyMap::NO_LAYOUT;
 bool Kb::_dither = false, Kb::_mouseAccel = true, Kb::_delay = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
-    QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false),
+    QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false),
     devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
@@ -50,6 +50,8 @@ Kb::Kb(QObject *parent, const QString& path) :
     }
     if (features.contains("monochrome"))
         monochrome = true;
+    if (features.contains("hwload"))
+        hwload = true;
     if (mpath.open(QIODevice::ReadOnly)){
         usbModel = mpath.read(100);
         usbModel = usbModel.remove("Corsair").remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").trimmed();

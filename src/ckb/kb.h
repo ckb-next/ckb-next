@@ -18,6 +18,7 @@ public:
     QString features, firmware, pollrate;
     bool monochrome;
     short productID;
+    bool hwload;
 
     // Keyboard model
     inline KeyMap::Model    model() const                       { return _model; }

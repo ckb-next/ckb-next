@@ -42,11 +42,13 @@
 #define V_CORSAIR       0x1b1c
 #define V_CORSAIR_STR   "1b1c"
 
-#define P_K63_NRGB        0x1b40
-#define P_K63_NRGB_STR    "1b40"
-#define P_K63_NRGB_WL     0x1b45 /* wireless */
-#define P_K63_NRGB_WL_STR "1b45"
-#define IS_K63(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB || (kb)->product == P_K63_NRGB_WL))
+#define P_K63_NRGB         0x1b40
+#define P_K63_NRGB_STR     "1b40"
+#define P_K63_NRGB_WL      0x1b45 /* wireless, plugged in */
+#define P_K63_NRGB_WL_STR  "1b45"
+#define P_K63_NRGB_WL2     0x1b50 /* wireless */
+#define P_K63_NRGB_WL2_STR "1b50"
+#define IS_K63(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB || (kb)->product == P_K63_NRGB_WL))
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"

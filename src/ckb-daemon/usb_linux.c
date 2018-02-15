@@ -691,6 +691,7 @@ static _model models[] = {
     // Keyboards
     { P_K63_NRGB_STR, P_K63_NRGB },
     { P_K63_NRGB_WL_STR, P_K63_NRGB_WL },
+    { P_K63_NRGB_WL2_STR, P_K63_NRGB_WL2 },
     { P_K65_STR, P_K65 },
     { P_K65_NRGB_STR, P_K65_NRGB },
     { P_K65_LUX_STR, P_K65_LUX },

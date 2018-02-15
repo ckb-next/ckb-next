@@ -9,6 +9,7 @@
 // Send current RGB values to a device. force = 0 to update only if changed, force = 1 to update no matter what. Returns 0 on success.
 int updatergb_kb(usbdevice* kb, int force);
 int updatergb_mouse(usbdevice* kb, int force);
+int updatergb_mousepad(usbdevice* kb, int force);
 // Saves RGB data to device memory. Returns 0 on success.
 int savergb_kb(usbdevice* kb, lighting* light, int mode);
 int savergb_mouse(usbdevice* kb, lighting* light, int mode);

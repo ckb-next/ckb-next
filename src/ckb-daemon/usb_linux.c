@@ -718,7 +718,9 @@ static _model models[] = {
     { P_SCIMITAR_STR, P_SCIMITAR },
     { P_SCIMITAR_PRO_STR, P_SCIMITAR_PRO },
     { P_SABRE_O2_STR, P_SABRE_O2 },
-    { P_HARPOON_STR, P_HARPOON }
+    { P_HARPOON_STR, P_HARPOON },
+    // Mousepads
+    { P_POLARIS_STR, P_POLARIS }
 };
 #define N_MODELS (sizeof(models) / sizeof(_model))
 

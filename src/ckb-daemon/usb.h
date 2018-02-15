@@ -172,7 +172,7 @@ const char* product_str(short product);
 /// Used to apply quirks and features to the PLATINUM devices.
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
-/// Used for even newer devices that come with V3 firmware out of the factory.
+/// Used for new devices that come with V3 firmware endpoint configuration out of the factory, but have fwversion < 0x300.
 #define IS_V3_OVERRIDE(kb)              (0)
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.

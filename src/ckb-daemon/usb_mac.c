@@ -788,7 +788,7 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     uint16_t idvendor = hidgetlong(handle, CFSTR(kIOHIDVendorIDKey)), idproduct = hidgetlong(handle, CFSTR(kIOHIDProductIDKey));
     int handle_idx;
 
-    // Because a single v3 hack wasn't enough
+    // The usbdevice struct is created later on, however in order to use IS_V3_OVERRIDE we need one with vendor and product, so a temporary one is created
     struct {uint16_t vendor; uint16_t product;} *fakekb;
     fakekb->vendor = idvendor;
     fakekb->product = idproduct;

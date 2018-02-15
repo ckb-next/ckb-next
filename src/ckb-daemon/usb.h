@@ -48,7 +48,8 @@
 #define P_K63_NRGB_WL_STR  "1b45"
 #define P_K63_NRGB_WL2     0x1b50 /* wireless */
 #define P_K63_NRGB_WL2_STR "1b50"
-#define IS_K63(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB || (kb)->product == P_K63_NRGB_WL))
+#define IS_K63_WL(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB_WL || (kb)->product == P_K63_NRGB_WL2))
+#define IS_K63(kb)         (IS_K63_WL(kb) || ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB)))
 
 #define P_K65           0x1b17
 #define P_K65_STR       "1b17"
@@ -179,7 +180,7 @@ const char* product_str(short product);
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
 /// Used for new devices that come with V3 firmware endpoint configuration out of the factory, but have fwversion < 0x300.
-#define IS_V3_OVERRIDE(kb)              (IS_K68(kb))
+#define IS_V3_OVERRIDE(kb)              (IS_K63_WL(kb) || IS_K68(kb))
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
 #define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2)

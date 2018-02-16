@@ -120,7 +120,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     } else {
         // For newer devices, use interrupt transfers
         // macOS sees 4 endpoints (including ep0) for FW 3.XX
-        int ep = (kb->fwversion >= 0x130 && (kb->fwversion < 0x200 || kb->fwversion >= 0x300)) ? 4 : 3;
+        int ep = (kb->fwversion >= 0x130 && (kb->fwversion < 0x200 || kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb))) ? 4 : 3;
         usb_iface_t h_usb = kb->ifusb[ep - 1];
         hid_dev_t h_hid = kb->ifhid[ep - 1];
         if(h_usb)
@@ -179,14 +179,14 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 void os_sendindicators(usbdevice* kb){
     void *ileds;
     ushort leds;
-    if(kb->fwversion >= 0x300) {
+    if(kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) {
         leds = (kb->ileds << 8) | 0x0001;
         ileds = &leds;
     }
     else {
         ileds = &kb->ileds;
     }
-    IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, 0x00, (kb->fwversion >= 0x300 ? 2 : 1), ileds, 0, 500, 500 };
+    IOUSBDevRequestTO rq = { 0x21, 0x09, 0x0200, 0x00, ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : 1), ileds, 0, 500, 500 };
     kern_return_t res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
     if(res == kIOReturnNotOpen){
         // Handle not open - try to go through the HID system instead
@@ -239,7 +239,7 @@ static void intreport(void* context, IOReturn result, void* sender, IOHIDReportT
         case 8:
         case 10:
         case 11:
-            hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data, kb->fwversion);
+            hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -2, length, data, kb);
             break;
         case MSG_SIZE:
             corsair_mousecopy(kb->input.keys, kb->epcount >= 4 ? -3 : -2, data);
@@ -784,7 +784,14 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     long output = hidgetlong(handle, CFSTR(kIOHIDMaxOutputReportSizeKey));
     long feature = hidgetlong(handle, CFSTR(kIOHIDMaxFeatureReportSizeKey));
     long fwversion = hidgetlong(handle, CFSTR(kIOHIDVersionNumberKey));
+    // Get the model and serial number
+    uint16_t idvendor = hidgetlong(handle, CFSTR(kIOHIDVendorIDKey)), idproduct = hidgetlong(handle, CFSTR(kIOHIDProductIDKey));
     int handle_idx;
+
+    // The usbdevice struct is created later on, however in order to use IS_V3_OVERRIDE we need one with vendor and product, so a temporary one is created
+    struct {uint16_t vendor; uint16_t product;} *fakekb;
+    fakekb->vendor = idvendor;
+    fakekb->product = idproduct;
 
     // Handle 3 is for controlling the device (only exists for RGB)
     if(feature == 64)
@@ -800,7 +807,8 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     else if((output <= 1 && feature <= 1 &&
                 (input == 8 ||                  // Keyboards
                  input == 7)) ||                // Mice
-            (fwversion >= 0x300 &&              // FWv3 hack
+            ((fwversion >= 0x300 ||             // FWv3 hack
+                IS_V3_OVERRIDE(fakekb)) &&
                 input == 64 &&
                 output <= 2 &&
                 feature == 1))
@@ -816,8 +824,6 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         return 0;
     }
 
-    // Get the model and serial number
-    uint16_t idvendor = hidgetlong(handle, CFSTR(kIOHIDVendorIDKey)), idproduct = hidgetlong(handle, CFSTR(kIOHIDProductIDKey));
     // Use the location ID key to group the handles together
     uint32_t location = hidgetlong(handle, CFSTR(kIOHIDLocationIDKey));
     int index = find_device(idvendor, idproduct, location, handle_idx + 1);

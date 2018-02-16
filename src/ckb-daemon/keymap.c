@@ -1,6 +1,7 @@
 #include "device.h"
 #include "includes.h"
 #include "keymap.h"
+#include "usb.h"
 
 const key keymap[N_KEYS_EXTENDED] = {
     // Keyboard keys
@@ -74,7 +75,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "ralt",       0x59, KEY_RIGHTALT },
     { "rwin",       0x65, KEY_RIGHTMETA },
     { "rmenu",      0x71, KEY_COMPOSE },
-    { 0,            -1,   KEY_NONE },
+    { "profswitch", 0x7d, KEY_CORSAIR },
     { "light",      0x89, KEY_CORSAIR },
     { "f12",        0x06, KEY_F12 },
     { "prtscn",     0x12, KEY_SYSRQ },
@@ -405,9 +406,10 @@ void hid_kb_translate(unsigned char* kbinput, int endpoint, int length, const un
 
 #define BUTTON_HID_COUNT    5
 
-void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput, ushort fwversion){
+void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int endpoint, int length, const unsigned char* urbinput, void* context){
+    usbdevice* kb = context;
     //The HID Input Endpoint on FWv3 is 64 bytes, so we can't check for length.
-    if((endpoint != 2 && endpoint != -2) || (fwversion < 0x300 && length < 10))
+    if((endpoint != 2 && endpoint != -2) || (kb->fwversion < 0x300 && !IS_V3_OVERRIDE(kb) && length < 10))
         return;
     // EP 2: mouse input
     if(urbinput[0] != 1)

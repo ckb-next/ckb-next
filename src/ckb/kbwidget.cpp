@@ -55,6 +55,11 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     // Set monochrome mode according to hardware
     if(device->monochrome)
         ui->lightWidget->setMonochrome();
+    // Disable Save to hardware button for unsupported devices
+    if(!device->hwload){
+        ui->hwSaveButton->setDisabled(true);
+        ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
+    }
 }
 
 KbWidget::~KbWidget(){

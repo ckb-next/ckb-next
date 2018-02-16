@@ -32,7 +32,7 @@ static QSettings* globalSettings(){
             globalThread = new QThread;
             globalThread->start();
             _globalSettings = new QSettings;
-            qInfo() << "Path  to settings is" << _globalSettings->fileName();
+            qInfo() << "Path to settings is" << _globalSettings->fileName();
             _globalSettings->moveToThread(globalThread);
         }
     }

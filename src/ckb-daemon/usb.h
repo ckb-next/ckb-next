@@ -181,6 +181,8 @@ const char* product_str(short product);
 /// Used for devices that have a single IN endpoint, and no HID input
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb))
 
+/// Used for devices that have a single IN endpoint, and no HID input
+#define IS_SINGLE_EP(kb)                (IS_POLARIS(kb))
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.
 
@@ -199,6 +201,11 @@ const char* product_str(short product);
 /// This constant is used to initialize \b kb->usbdelay.
 /// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
 /// Pure Hacker code.
+
+// Mousepad test
+#define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_POLARIS))
+#define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
+
 #define USB_DELAY_DEFAULT   5
 
 /// Start the USB main loop. Returns program exit code when finished

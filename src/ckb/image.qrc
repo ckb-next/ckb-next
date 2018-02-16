@@ -17,5 +17,6 @@
         <file>overlay_sabre.png</file>
         <file>overlay_harpoon.png</file>
         <file>overlay_glaive.png</file>
+        <file>overlay_polaris.png</file>
     </qresource>
 </RCC>

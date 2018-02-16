@@ -75,7 +75,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "ralt",       0x59, KEY_RIGHTALT },
     { "rwin",       0x65, KEY_RIGHTMETA },
     { "rmenu",      0x71, KEY_COMPOSE },
-    { 0,            -1,   KEY_NONE },
+    { "profswitch", 0x7d, KEY_CORSAIR },
     { "light",      0x89, KEY_CORSAIR },
     { "f12",        0x06, KEY_F12 },
     { "prtscn",     0x12, KEY_SYSRQ },

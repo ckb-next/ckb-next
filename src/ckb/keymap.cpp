@@ -446,15 +446,15 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("m1");
         map.remove("m2");
         map.remove("m3");
-        // Centre MR/Brightness/Winlock between F1 and F4
-        map["mr"].x = 64;
+        map.remove("mr");
+        // Add profile button
+        map["profswitch"] = {0, "Profile Switch", "profswitch", 64, 1, 11, 8, true, true};
+        // Centre Brightness/Winlock between F1 and F4
         map["light"].x = 75;
         map["lock"].x = 86;
         // Resize them
-        map["mr"].height = 8;
         map["light"].height = 8;
         map["lock"].height = 8;
-        map["mr"].width = 11;
         map["light"].width = 11;
         map["lock"].width = 11;
         // Mute is above Stop
@@ -462,7 +462,6 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["voldn"].x -= 11;
         map["volup"].x -= 11;
         // Move the buttons on the top a bit further down to centre them
-        map["mr"].y += 1;
         map["light"].y += 1;
         map["lock"].y += 1;
         map["mute"].y += 1;

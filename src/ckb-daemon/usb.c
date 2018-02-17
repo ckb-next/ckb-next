@@ -75,7 +75,7 @@ const char* product_str(short product){
         return "k95p";
     if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
-    if(product == P_K68_NRGB)
+    if(product == P_K68 || P_K68_NRGB)
         return "k68";
     if(product == P_K65 || product == P_K65_NRGB || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";

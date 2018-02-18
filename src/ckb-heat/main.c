@@ -65,7 +65,7 @@ keyanim* anims = NULL;
 
 void ckb_init(ckb_runctx* context){
 	anims = calloc(context->keycount, sizeof(keyanim));
-	for(int i=0; i < context->keycount; i++){
+	for(unsigned i = 0; i < context->keycount; i++){
 		anims[i].x = context->keys[i].x;
 		anims[i].y = context->keys[i].y;
 	}
@@ -120,7 +120,7 @@ int ckb_frame(ckb_runctx* context){
     unsigned count = context->keycount;
     ckb_key* keys = context->keys;
     unsigned int full = pressestofull*ffade;
-	for(int i =0; i < count; i++){
+	for(unsigned i = 0; i < count; i++){
 		if(!anims[i].usages)
 			continue;
 		float a, r, g, b;

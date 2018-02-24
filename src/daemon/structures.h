@@ -165,6 +165,15 @@ typedef struct {
 #define SCROLL_MIN          1
 #define SCROLL_MAX          10
 
+// Physical layout types; update if more are discovered.
+// Numbering is Corsair layout byte plus one.
+#define LAYOUT_NONE     0 // Layout is irrelevant - use for mice or mousepads, never keyboards!
+#define LAYOUT_ANSI     1 // North American layout with a long enter key.
+#define LAYOUT_ISO      2 // European layout with a tall enter key.
+#define LAYOUT_ABNT     3 // Brazilian layout with a short right shift.
+#define LAYOUT_JIS      4 // Japanese layout with a shorter spacebar and toggle keys.
+#define LAYOUT_UNKNOWN 64 // Keyboard type not yet implemented; file a bug!
+
 // vtables for keyboards/mice (see command.h)
 extern const union devcmd vtable_keyboard;
 extern const union devcmd vtable_keyboard_nonrgb;
@@ -244,6 +253,8 @@ typedef struct {
     ushort fwversion;
     // Poll rate (ms), or -1 if unsupported
     char pollrate;
+    // Physical device layout; LAYOUT_NONE if irrelevant, LAYOUT_UNKNOWN if unimplemented.
+    char layout;
     // USB protocol delay (ms)
     char usbdelay;
     // Current input state

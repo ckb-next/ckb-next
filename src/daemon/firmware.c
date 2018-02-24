@@ -12,6 +12,12 @@ int getfwversion(usbdevice* kb){
     // Ask board for firmware info
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x01, 0 };
     uchar in_pkt[MSG_SIZE];
+    if(IS_MOUSE_DEV(kb) || IS_MOUSEPAD_DEV(kb)){
+        kb->layout = LAYOUT_NONE;
+    } else {
+        kb->layout = LAYOUT_UNKNOWN;
+    }
+
     if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
     if(in_pkt[0] != 0x0e || in_pkt[1] != 0x01){
@@ -44,6 +50,14 @@ int getfwversion(usbdevice* kb){
             ckb_warn("Got firmware version %04x (expected %04x)\n", version, kb->fwversion);
         kb->fwversion = version;
         kb->pollrate = poll;
+    }
+    // Physical layout detection.
+    if (kb->layout == LAYOUT_UNKNOWN) {
+        kb->layout = in_pkt[24] + 1;
+        if (kb->layout > LAYOUT_JIS || kb->layout < LAYOUT_ANSI) {
+            ckb_warn("Got unknown physical layout byte value %d, please file a bug report mentioning your keyboard's physical layout\n", in_pkt[24]);
+            kb->layout = LAYOUT_UNKNOWN;
+        }
     }
     return 0;
 }

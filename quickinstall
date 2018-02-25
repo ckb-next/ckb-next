@@ -131,6 +131,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     checkfail $?
     echo "Installed at /Applications/ckb.app"
 else
+    #runit stores udev rules elsewhere, so checking for runit
+    runit=$(sudo sv status agetty-tty1 2>/dev/null)
+    runitc=$?
     # Linux
     newtmp
     # Install apps
@@ -150,11 +153,22 @@ else
     checkfail $?
     sudo xdg-desktop-menu install --novendor usr/ckb.desktop 2>"$TMPFILE"
     checkfail $?
-    sudo install -m 644 udev/99-ckb-daemon.rules /etc/udev/rules.d/ 2>"$TMPFILE"
-    checkfail $?
+    #runit stores udev rules elsewhere, so checking for runit
+    if [[ $runitc -eq 0 && $(echo "$sudo sv status agetty-tty1" | wc -l) -ge 1 ]]; then
+	sudo install -m 644 udev/99-ckb-daemon.rules /etc/udev/hwdb.d/ 2>"$TMPFILE"
+	checkfail $?
+    else
+	sudo install -m 644 udev/99-ckb-daemon.rules /etc/udev/rules.d/ 2>"$TMPFILE"
+	checkfail $?
+    fi
     echo "Binaries were installed under $PREFIX/bin"
     echo "Animations were installed under $PREFIX/lib/ckb-animations"
-    echo "Udev rule was installed under /etc/udev/rules.d"
+    #runit stores udev rules elsewhere
+    if [[ $runitc -eq 0 && $(echo "$sudo sv status agetty-tty1" | wc -l) -ge 1 ]]; then
+	echo "Udev rule was installed under /etc/udev/hwdb.d"
+    else
+	echo "Udev rule was installed under /etc/udev/rules.d"
+    fi
 fi
 
 # Offer to run as a system service
@@ -164,6 +178,8 @@ upstart=$(service --version 2>/dev/null)
 upstartc=$?
 launchd=$(launchctl help 2>/dev/null)
 launchdc=$?
+runit=$(sudo sv status agetty-tty1 2>/dev/null)
+runitc=$?
 
 echo ""
 if [[ $systemdc -eq 0 && $(echo "$systemd" | wc -l) -ge 1 ]]; then
@@ -221,6 +237,24 @@ elif [[ $launchdc -eq 0 && $(echo "$launchd" | wc -l) -ge 1 ]]; then
         sudo launchctl load -w /Library/LaunchDaemons/com.ckb.daemon.plist 2>"$TMPFILE"
         checkfail $?
     fi
+# check for runit by checking status of tty1. all runit are able to this
+elif [[ $runitc -eq 0 && $(echo "$sudo sv status agetty-tty1" | wc -l) -ge 1 ]]; then
+	echo "System service: runit detected"
+	read -rp "Run the driver as a startup service [Y/n]?" doservice
+	if [[ $doservice =~ no? ]]; then
+	    echo "You will need to start the service manually."
+	    echo "Re-run this script if you change your mind."
+	else
+	    sleep 0.5
+	    sudo sv stop ckb-daemon >/dev/null 2>&1
+	    sudo mkdir -p /etc/sv
+	    checkfail $?
+	    sudo mkdir /etc/sv/ckb
+	    sudo install service/runit/run /etc/sv/ckb/
+	    checkfail $?
+	    sudo ln -s /etc/sv/ckb /var/service
+	    checkfail $?
+	fi	
 else
     echo "No supported system service daemons detected."
     echo "You will need to start the driver manually."

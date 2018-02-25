@@ -91,6 +91,9 @@ See also:
 * Harpoon
 * Glaive
 
+### Mousepads
+* MM800 Polaris
+
 ## Linux Installation
 
 ### Pre-made packages

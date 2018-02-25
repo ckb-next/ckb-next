@@ -188,3 +188,49 @@ const devcmd vtable_mouse = {
     .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
     .updatedpi = updatedpi                  ///< special for mice
 };
+
+// RGB Mousepad vtable
+const devcmd vtable_mousepad = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_io_none,
+
+    .active = cmd_active_mouse,
+    .idle = cmd_idle_mouse,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_none,
+    .ion = cmd_none,
+    .iauto = cmd_none,
+
+    .bind = cmd_none,
+    .unbind = cmd_none,
+    .rebind = cmd_none,
+    .macro = cmd_macro_none,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_dev,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_mousepad,
+    .updateindicators = updateindicators_kb,
+    .updatedpi = int1_int_none
+};

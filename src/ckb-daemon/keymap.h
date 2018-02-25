@@ -24,13 +24,19 @@
 #define N_KEYS_HW               152
 #define N_KEYBYTES_HW           ((N_KEYS_HW + 7) / 8)
 // Light zones (have LED codes but don't generate input)
-#define N_KEY_ZONES             22      // two strafe side lights (although really they are tied into one control) + logo backlight + Platinum top bar
+// Two strafe side lights (although really they are tied into one control) + logo backlight + Platinum top bar
+#define N_KEY_ZONES             22
 // Additional keys recognized by the driver but may not be present on keyboard
 #define N_KEYS_EXTRA            12
+// Generic RGB Zones (Polaris/K55/...)
+#define N_GENERIC_ZONES         15
+#define LED_GENERIC_FIRST       (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA)
+// Mousepad zone count
+#define N_MOUSEPAD_ZONES        15
 // Mouse buttons
 #define N_BUTTONS_HW            20
 #define N_BUTTONS_EXTENDED      25
-#define MOUSE_BUTTON_FIRST      (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA)
+#define MOUSE_BUTTON_FIRST      (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA + N_GENERIC_ZONES)
 #define MOUSE_EXTRA_FIRST       (MOUSE_BUTTON_FIRST + N_BUTTONS_HW)
 // Number of keys that generate input
 #define N_KEYS_INPUT            (MOUSE_BUTTON_FIRST + N_BUTTONS_EXTENDED)

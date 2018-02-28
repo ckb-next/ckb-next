@@ -789,9 +789,9 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     int handle_idx;
 
     // The usbdevice struct is created later on, however in order to use IS_V3_OVERRIDE we need one with vendor and product, so a temporary one is created
-    struct {uint16_t vendor; uint16_t product;} *fakekb;
-    fakekb->vendor = idvendor;
-    fakekb->product = idproduct;
+    struct {uint16_t vendor; uint16_t product;} fakekb;
+    fakekb.vendor = idvendor;
+    fakekb.product = idproduct;
 
     // Handle 3 is for controlling the device (only exists for RGB)
     if(feature == 64)
@@ -808,7 +808,7 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
                 (input == 8 ||                  // Keyboards
                  input == 7)) ||                // Mice
             ((fwversion >= 0x300 ||             // FWv3 hack
-                IS_V3_OVERRIDE(fakekb)) &&
+                IS_V3_OVERRIDE(&fakekb)) &&
                 input == 64 &&
                 output <= 2 &&
                 feature == 1))

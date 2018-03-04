@@ -40,6 +40,8 @@ else
         OUT="${OUT}${N}${N}Daemon on current boot:${N}`journalctl -o short-precise -b 0 --unit=ckb-daemon 2>&1`"
         OUT="${OUT}${N}${N}Daemon on last boot:${N}`journalctl -o short-precise -b -1 --unit=ckb-daemon 2>&1`"
     fi
+    OUT="${OUT}${N}${N}Dev nodes:${N}`find /dev/input/ckb* -print -type f -exec cat {} \; 2>&1`"
+    OUT="${OUT}${N}${N}Environment:${N}`printenv | grep "QT\|XDG.*DESKTOP" 2>&1`"
 fi
 
 # Gzip and write output

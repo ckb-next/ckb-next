@@ -24,17 +24,33 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Keys</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>23</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Keys</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -81,7 +97,7 @@
        </property>
       </spacer>
      </item>
-     <item row="1" column="1" colspan="3">
+     <item row="2" column="1" colspan="3">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="spacing">
         <number>0</number>
@@ -153,6 +169,9 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item row="1" column="4">
+      <layout class="QFormLayout" name="formLayout"/>
      </item>
     </layout>
    </item>

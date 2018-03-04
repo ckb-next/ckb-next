@@ -304,6 +304,7 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
 
 void KbWidget::devUpdate(){
     // Update device tab
+    ui->devLabel->setText(device->usbModel);
     ui->serialLabel->setText(device->usbSerial);
     ui->fwLabel->setText(device->firmware);
     ui->pollLabel->setText(device->pollrate);

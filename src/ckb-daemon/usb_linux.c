@@ -317,6 +317,8 @@ void* os_inputmain(void* context){
         urbs[i].endpoint = ep;
         urbs[i].buffer = malloc(urbs[i].buffer_length);
         ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
+        // Clean up
+        udev_device_unref(child);
     }
 
     /// The userSpaceFS knows the URBs now, so start monitoring input

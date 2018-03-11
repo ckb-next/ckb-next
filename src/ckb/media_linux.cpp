@@ -17,6 +17,7 @@ static pa_context* paContext = nullptr; //Context for communicating with Pulse A
 static qint64 reconnectTime = 0; //Time (in MSecs since epoch) to attempt reconnect.
 static QString defaultSink; //Name of sink being checked if muted.
 static QMutex mutex;
+static int failCount = 0;
 
 static bool CheckPAOperation(pa_operation* operation){
     if(operation == nullptr)
@@ -52,7 +53,7 @@ static void SubscribeCallback(pa_context* context, pa_subscription_event_type_t 
         if(!CheckPAOperation(pa_context_get_sink_info_by_index(context, index, SinkCallback, nullptr)))
             qWarning("getMuteState(): pa_context_get_sink_info_by_index() error");
     }
-    else if(eventFacility ==  PA_SUBSCRIPTION_EVENT_SERVER){
+    else if(eventFacility == PA_SUBSCRIPTION_EVENT_SERVER){
         //Server settings were modified. Get new info to see if default sink
         //was changed.
         if(!CheckPAOperation(pa_context_get_server_info(context, ServerCallback, nullptr)))
@@ -66,6 +67,7 @@ static void ContextStateCallback(pa_context* context, void* data){
 
     pa_context_state_t state = pa_context_get_state(context);
     if(state == PA_CONTEXT_READY){
+        failCount = 0;
         pa_context_set_subscribe_callback(context, SubscribeCallback, nullptr);
         if(!CheckPAOperation(pa_context_subscribe(context,
                                                   static_cast<pa_subscription_mask_t>(PA_SUBSCRIPTION_MASK_SINK |
@@ -83,7 +85,7 @@ static void ContextStateCallback(pa_context* context, void* data){
             qWarning("getMuteState(): pa_context_get_sink_info_list() error");
     }
     else if(state == PA_CONTEXT_FAILED || state == PA_CONTEXT_TERMINATED){
-        QMutexLocker locker(&mutex);
+        //QMutexLocker locker(&mutex); <-- Deadlocks
 
         //Either we could not connect to the server or the on going connection
         //was dropped.
@@ -92,8 +94,9 @@ static void ContextStateCallback(pa_context* context, void* data){
             paContext = nullptr;
 
             //Try to reconnect again shortly.
-            reconnectTime = QDateTime::currentMSecsSinceEpoch() + 1000;
+            reconnectTime = QDateTime::currentMSecsSinceEpoch() + 10000;
         }
+        failCount++;
     }
 }
 
@@ -101,39 +104,41 @@ static void ContextStateCallback(pa_context* context, void* data){
 
 muteState getMuteState(){
 #ifdef USE_LIBPULSE
-    static pa_threaded_mainloop* mainLoop = nullptr;
+    if(failCount < 10){
+        static pa_threaded_mainloop* mainLoop = nullptr;
 
-    QMutexLocker locker(&mutex);
+        QMutexLocker locker(&mutex);
 
-    //Setup main loop thread used for communicating with Pulse Audio. All
-    //communication is done asynchronously.
-    if(mainLoop == nullptr){
-        mainLoop = pa_threaded_mainloop_new();
-        if(mainLoop == nullptr)
-            return lastKnown;
+        //Setup main loop thread used for communicating with Pulse Audio. All
+        //communication is done asynchronously.
+        if(mainLoop == nullptr){
+            mainLoop = pa_threaded_mainloop_new();
+            if(mainLoop == nullptr)
+                return lastKnown;
 
-        if(pa_threaded_mainloop_start(mainLoop) != 0){
-            pa_threaded_mainloop_free(mainLoop);
-            mainLoop = nullptr;
-            return lastKnown;
+            if(pa_threaded_mainloop_start(mainLoop) != 0){
+                pa_threaded_mainloop_free(mainLoop);
+                mainLoop = nullptr;
+                return lastKnown;
+            }
         }
-    }
 
-    //Connect to the local Pulse Audio server. It's usually running but a
-    //reconnect is attempted periodically whenever the connection fails or is
-    //terminated.
-    if(paContext == nullptr && QDateTime::currentMSecsSinceEpoch() >= reconnectTime){
-        pa_threaded_mainloop_lock(mainLoop);
-        {
-            pa_mainloop_api* api = pa_threaded_mainloop_get_api(mainLoop);
-            Q_ASSERT(api != nullptr);
+        //Connect to the local Pulse Audio server. It's usually running but a
+        //reconnect is attempted periodically whenever the connection fails or is
+        //terminated.
+        if(paContext == nullptr && QDateTime::currentMSecsSinceEpoch() >= reconnectTime){
+            pa_threaded_mainloop_lock(mainLoop);
+            {
+                pa_mainloop_api* api = pa_threaded_mainloop_get_api(mainLoop);
+                Q_ASSERT(api != nullptr);
 
-            paContext = pa_context_new(api, "QPulse");
-            Q_ASSERT(paContext != nullptr);
-            pa_context_set_state_callback(paContext, &ContextStateCallback, nullptr);
-            pa_context_connect(paContext, nullptr, PA_CONTEXT_NOFAIL, nullptr);
+                paContext = pa_context_new(api, "QPulse");
+                Q_ASSERT(paContext != nullptr);
+                pa_context_set_state_callback(paContext, &ContextStateCallback, nullptr);
+                pa_context_connect(paContext, nullptr, PA_CONTEXT_NOAUTOSPAWN, nullptr);
+            }
+            pa_threaded_mainloop_unlock(mainLoop);
         }
-        pa_threaded_mainloop_unlock(mainLoop);
     }
 #endif
 

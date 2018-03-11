@@ -49,9 +49,11 @@ void cmd_profileid(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const c
 // Command: Load profile from hardware. apply = 1 to apply/activate hardware profile, 0 to simply store it. Returns 0 on success.
 int cmd_hwload_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3);
 int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3);
+int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3);
 #define hwloadprofile(kb, apply) (kb)->vtable->hwload(kb, 0, 0, apply, 0)
 // Command: Saves the profile name to hardware. Returns 0 on success.
 int cmd_hwsave_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_hwsave_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
+int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 
 #endif  // PROFILE_H

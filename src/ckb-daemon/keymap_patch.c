@@ -8,7 +8,8 @@ keypatch k65patch[] = {
 };
 #define K65PATCH_LEN sizeof(k65patch)/sizeof(*k65patch)
 
-// Vol Up/Dn LED addresses for K63
+// Vol Up/Dn LED addresses for K63 and K68.
+// Possibly for all devices that have LEDs on vol up/dn
 keypatch k63patch[] = {
     { 130, "volup", 0x82, KEY_VOLUMEUP },
     { 131, "voldn", 0x8e, KEY_VOLUMEDOWN },
@@ -16,6 +17,8 @@ keypatch k63patch[] = {
 #define K63PATCH_LEN sizeof(k63patch)/sizeof(*k63patch)
 
 keypatches mappatches[] = {
+    { P_K68,      k63patch, K63PATCH_LEN },
+    { P_K68_NRGB, k63patch, K63PATCH_LEN },
     { P_K65,      k65patch, K65PATCH_LEN },
     { P_K65_NRGB, k65patch, K65PATCH_LEN },
     { P_K63_NRGB, k63patch, K63PATCH_LEN },

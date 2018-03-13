@@ -153,7 +153,7 @@ const char* product_str(short product);
 /// RGB vs non-RGB test
 /// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol.
 /// The difference is denoted with the "monochrome" feature).
-#define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K68_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+#define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
 
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.

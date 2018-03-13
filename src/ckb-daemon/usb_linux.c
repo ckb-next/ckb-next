@@ -343,6 +343,8 @@ void* os_inputmain(void* context){
         udev_device_unref(child);
     }
 
+    udev_enumerate_unref(enumerate);
+
     /// Allocate memory for the os_usbrecv() buffer and create the mutex
     kb->interruptbuf = malloc(MSG_SIZE * sizeof(uchar));
     if(!kb->interruptbuf)

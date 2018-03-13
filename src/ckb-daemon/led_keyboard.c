@@ -76,15 +76,15 @@ static void makergb_k55(const lighting* light, uchar data_pkt[MSG_SIZE]){
     // The K55 uses RGBRGBRGB colouring.
     for (int i = 0; i < 3; i++) {
         int index = (i * 3) + 4;
-        data_pkt[index + 0] = r[i];
-        data_pkt[index + 1] = g[i];
-        data_pkt[index + 2] = b[i];
+        data_pkt[index + 0] = r[LED_GENERIC_FIRST + i];
+        data_pkt[index + 1] = g[LED_GENERIC_FIRST + i];
+        data_pkt[index + 2] = b[LED_GENERIC_FIRST + i];
     }
 }
 
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
-    // Compare two light structures, ignore mouse zones
-    return memcmp(lhs->r, rhs->r, N_KEYS_HW) || memcmp(lhs->g, rhs->g, N_KEYS_HW) || memcmp(lhs->b, rhs->b, N_KEYS_HW);
+    // Compare two light structures, up until the first three generic zones for the K55.
+    return memcmp(lhs->r, rhs->r, LED_GENERIC_FIRST + 3) || memcmp(lhs->g, rhs->g, LED_GENERIC_FIRST + 3) || memcmp(lhs->b, rhs->b, LED_GENERIC_FIRST + 3);
 }
 
 int updatergb_kb(usbdevice* kb, int force){
@@ -98,7 +98,13 @@ int updatergb_kb(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    if(IS_FULLRANGE(kb) && !IS_K55(kb)){
+    if (IS_K55(kb)) {
+    // The K55 has its own packet type, because it only has three lighting zones.
+    uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };
+    makergb_k55(newlight, data_pkt);
+    if (!usbsend(kb, data_pkt, 1))
+        return -1;
+    } else if(IS_FULLRANGE(kb)) {
         // Update strafe sidelights if necessary
         if(lastlight->sidelight != newlight->sidelight) {
             uchar data_pkt[2][MSG_SIZE] = {
@@ -115,34 +121,21 @@ int updatergb_kb(usbdevice* kb, int force){
             // Red
             { 0x7f, 0x01, 0x3c, 0 },
             { 0x7f, 0x02, 0x3c, 0 },
-            { 0x7f, 0x03, 0x18, 0 },
+            { 0x7f, 0x03, 0x30, 0 },
             { 0x07, 0x28, 0x01, 0x03, 0x01, 0},
             // Green
             { 0x7f, 0x01, 0x3c, 0 },
             { 0x7f, 0x02, 0x3c, 0 },
-            { 0x7f, 0x03, 0x18, 0 },
+            { 0x7f, 0x03, 0x30, 0 },
             { 0x07, 0x28, 0x02, 0x03, 0x01, 0},
             // Blue
             { 0x7f, 0x01, 0x3c, 0 },
             { 0x7f, 0x02, 0x3c, 0 },
-            { 0x7f, 0x03, 0x18, 0 },
+            { 0x7f, 0x03, 0x30, 0 },
             { 0x07, 0x28, 0x03, 0x03, 0x02, 0}
         };
-        // The K95 Platinum needs 0x30 for the lightbar to work, due to the length of the packet.
-        // A way to dynamically calculate the length would be preferred, based on the device.
-        if(kb->product == P_K95_PLATINUM){
-            data_pkt[2][2] = 0x30;
-            data_pkt[6][2] = 0x30;
-            data_pkt[10][2] = 0x30;
-        }
         makergb_full(newlight, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
-            return -1;
-    } else if (IS_K55(kb)) {
-        // The K55 has its own packet type, because it only has three lighting zones.
-        uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };
-        makergb_k55(newlight, data_pkt);
-        if (!usbsend(kb, data_pkt, 1))
             return -1;
     } else {
         // On older keyboards it looks flickery and causes lighting glitches, so we don't use it.

@@ -20,22 +20,22 @@ Major features:
 
 ### General information
 
-Most of the information can be found on [ckb-next wiki pages](https://github.com/mattanger/ckb-next/wiki).
+Most of the information can be found on [ckb-next wiki pages](https://github.com/ckb-next/ckb-next/wiki).
 
-[Supported keyboards and mices](https://github.com/mattanger/ckb-next/wiki/Supported-Hardware).
+[Supported keyboards and mice](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware).
 
-[Linux Installation](https://github.com/mattanger/ckb-next/wiki/Linux-Installation).
+[Linux Installation](https://github.com/ckb-next/ckb-next/wiki/Linux-Installation).
 
-[macOS Installation](https://github.com/mattanger/ckb-next/wiki/macOS-Installation).
+[macOS Installation](https://github.com/ckb-next/ckb-next/wiki/macOS-Installation).
 
-[Troubleshooting](https://github.com/mattanger/ckb-next/wiki/Troubleshooting).
+[Troubleshooting](https://github.com/ckb-next/ckb-next/wiki/Troubleshooting).
 
-[Known Issues](https://github.com/mattanger/ckb-next/wiki/Known-issues).
+[Known Issues](https://github.com/ckb-next/ckb-next/wiki/Known-issues).
 
-[Contributing](https://github.com/mattanger/ckb-next/wiki/Contributing).
+[Contributing](https://github.com/ckb-next/ckb-next/wiki/Contributing).
 
 ### Contact
 
 * IRC chat: `#ckb-next` channel at [chat.freenode.net](http://webchat.freenode.net?channels=%23ckb-next&uio=d4)
 * Mailing list: [ckb-next@googlegroups.com](https://groups.google.com/forum/#!forum/ckb-next)
-* [GitHub Issues](https://github.com/mattanger/ckb-next/issues)
+* [GitHub Issues](https://github.com/ckb-next/ckb-next/issues)

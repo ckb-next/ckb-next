@@ -95,6 +95,24 @@ void KbBind::save(CkbSettings& settings){
     settings.setValue("WinLock", _winLock);
 }
 
+void KbBind::bindExport(QSettings* settings){
+    settings->beginGroup("Binding");
+    settings->setValue("KeyMap", _map.name());
+    // Save key settings
+    settings->setValue("UseRealNames", true);
+    {
+        settings->beginGroup("Keys");
+        foreach(QString key, _bind.keys()){
+            KeyAction* act = _bind.value(key);
+            if(act && act->value() != KeyAction::defaultAction(key, devParent()->model()))
+                settings->setValue(key, act->value());
+        }
+        settings->endGroup();
+    }
+    settings->setValue("WinLock", _winLock);
+    settings->endGroup();
+}
+
 QString KbBind::globalRemap(const QString& key){
     if(!_globalRemap.contains(key))
         return key;

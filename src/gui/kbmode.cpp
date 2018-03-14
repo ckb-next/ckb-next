@@ -75,6 +75,16 @@ void KbMode::save(CkbSettings& settings){
     _perf->save(settings);
 }
 
+void KbMode::modeExport(QSettings* settings){
+    settings->setValue("GUID", _id.guidString());
+    settings->setValue("Modified", _id.modifiedString());
+    settings->setValue("HwModified", _id.hwModifiedString());
+    settings->setValue("Name", _name);
+    _light->lightExport(settings);
+    _bind->bindExport(settings);
+    _perf->perfExport(settings);
+}
+
 bool KbMode::needsSave() const {
     return _needsSave || _light->needsSave() || _bind->needsSave() || _perf->needsSave();
 }

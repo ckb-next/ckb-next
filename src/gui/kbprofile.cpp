@@ -65,6 +65,27 @@ void KbProfile::save(CkbSettings& settings){
     }
 }
 
+void KbProfile::profileExport(QSettings* settings){
+    // Save data to preferences
+    settings->beginGroup(id().guidString());
+    settings->setValue("Name", name());
+    settings->setValue("Modified", _id.modifiedString());
+    settings->setValue("HwModified", _id.hwModifiedString());
+    if(_currentMode)
+        settings->setValue("CurrentMode", _currentMode->id().guidString());
+    // Save modes
+    uint count = modeCount();
+    settings->setValue("ModeCount", count);
+    for(uint i = 0; i < count; i++){
+        settings->beginGroup(QString::number(i));
+        KbMode* mode = _modes.at(i);
+        mode->modeExport(settings);
+        settings->endGroup();
+    }
+    settings->endGroup();
+}
+
+
 bool KbProfile::needsSave() const {
     if(_needsSave)
         return true;

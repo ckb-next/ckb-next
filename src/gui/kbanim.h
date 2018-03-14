@@ -28,6 +28,8 @@ public:
     void save(CkbSettings& settings);
     inline bool needsSave() const { return _needsSave; }
 
+    // Import/Export
+    void animExport(QSettings* settings);
     // Create a new animation
     KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script);
     // Copy an existing animation

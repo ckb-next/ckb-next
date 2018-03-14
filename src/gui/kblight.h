@@ -80,6 +80,9 @@ public:
     void save(CkbSettings& settings);
     bool needsSave() const;
 
+    // Import/Export
+    void lightExport(QSettings* settings);
+
 signals:
     void didLoad();
     void updated();

@@ -81,6 +81,25 @@ void KbAnim::save(CkbSettings& settings){
     settings.endGroup();
 }
 
+void KbAnim::animExport(QSettings* settings){
+    settings->beginGroup(_guid.toString().toUpper());
+    settings->setValue("UseRealNames", true);
+    settings->setValue("Keys", _keys);
+    settings->setValue("Name", _name);
+    settings->setValue("Opacity", QString::number(_opacity));
+    settings->setValue("BlendMode", metaObject()->enumerator(metaObject()->indexOfEnumerator("Mode")).valueToKey(_mode));
+    settings->setValue("ScriptName", _scriptName);
+    settings->setValue("ScriptGuid", _scriptGuid.toString().toUpper());
+    settings->beginGroup("Parameters");
+    QMapIterator<QString, QVariant> i(_parameters);
+    while(i.hasNext()){
+        i.next();
+        settings->setValue(i.key(), i.value());
+    }
+    settings->endGroup();
+    settings->endGroup();
+}
+
 KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script) :
     QObject(parent),
     _script(AnimScript::copy(this, script->guid())), _map(map), _keys(keys),

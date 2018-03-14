@@ -67,6 +67,9 @@ public:
     inline void setNeedsSave()          { _needsSave = true; }
     inline void setNeedsUpdate()        { _bind->setNeedsUpdate(); _perf->setNeedsUpdate(); }
 
+    // Import/export
+    void modeExport(QSettings *settings);
+
 signals:
     void updated();
 

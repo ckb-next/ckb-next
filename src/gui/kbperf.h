@@ -27,6 +27,9 @@ public:
     void        save(CkbSettings& settings);
     inline bool needsSave() const { return _needsSave; }
 
+    // Import/Export
+    void perfExport(QSettings* settings);
+
     // Mouse lift height
     enum height {
         LOW = 1,

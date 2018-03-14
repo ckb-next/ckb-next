@@ -244,6 +244,45 @@ void KbPerf::save(CkbSettings& settings){
     }
 }
 
+void KbPerf::perfExport(QSettings* settings){
+    settings->beginGroup("Performance");
+    {
+        settings->beginGroup("DPI");
+        for(int i = 0; i < DPI_COUNT; i++){
+            QString iStr = QString::number(i);
+            settings->setValue(iStr, QPoint(dpiX[i], dpiY[i]));
+            settings->setValue(iStr + "RGB", dpiClr[i].name(QColor::HexArgb));
+            if(i != 0)
+                settings->setValue(iStr + "Disabled", !dpiOn[i]);
+        }
+        settings->endGroup();
+        settings->setValue("6RGB", dpiClr[OTHER].name(QColor::HexArgb));
+    // Ignore pushed modes when saving current DPI.
+        settings->setValue("CurIdx", dpiBaseIdx);
+    }
+    settings->setValue("LiftHeight", _liftHeight);
+    settings->setValue("AngleSnap", _angleSnap);
+    {
+        settings->beginGroup("Indicators");
+        settings->setValue("DPI", _dpiIndicator);
+        for(int i = 0; i < I_COUNT; i++){
+            settings->beginGroup(QString::number(i));
+            settings->setValue("RGB0", iColor[i][0].name(QColor::HexArgb));
+            settings->setValue("RGB1", iColor[i][1].name(QColor::HexArgb));
+            if(i == LIGHT)
+                settings->setValue("RGB2", light100Color.name(QColor::HexArgb));
+            else if(i == MUTE)
+                settings->setValue("RGB2", muteNAColor.name(QColor::HexArgb));
+            settings->setValue("Enable", iEnable[i]);
+            if(i <= HW_IMAX)
+                settings->setValue("Hardware", (int)hwIType[i]);
+            settings->endGroup();
+        }
+        settings->endGroup();
+    }
+    settings->endGroup();
+}
+
 void KbPerf::dpi(int index, const QPoint& newValue){
     if(index < 0 || index >= DPI_COUNT)
         return;

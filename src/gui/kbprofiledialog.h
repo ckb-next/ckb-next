@@ -23,10 +23,17 @@ private slots:
     void on_profileList_itemChanged(QListWidgetItem *item);
     void on_profileList_customContextMenuRequested(const QPoint &pos);
 
+    void on_exportButton_clicked();
+
+    void on_importButton_clicked();
+
+    void on_buttonBox_accepted();
+
 private:
     Ui::KbProfileDialog *ui;
 
     Kb* device;
+    KbProfile* activeProfile;
     const static int GUID = Qt::UserRole;
     const static int NEW_FLAG = Qt::UserRole + 1;
 

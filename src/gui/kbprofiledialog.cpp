@@ -1,6 +1,10 @@
 #include <QMenu>
 #include "kbprofiledialog.h"
 #include "ui_kbprofiledialog.h"
+#include <QFileDialog>
+#include <QDebug>
+#include <QMessageBox>
+#include "quazip/JlCompress.h"
 
 KbProfileDialog::KbProfileDialog(KbWidget *parent) :
     QDialog(parent),
@@ -11,6 +15,7 @@ KbProfileDialog::KbProfileDialog(KbWidget *parent) :
 
     // Populate profile list
     repopulate();
+    //activeProfile = device->newProfile(device->currentProfile());
 }
 
 KbProfileDialog::~KbProfileDialog(){
@@ -178,4 +183,90 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
         device->profiles(profiles);
     }
     repopulate();
+}
+
+
+void KbProfileDialog::on_exportButton_clicked()
+{
+    // Selected items
+    QList<QListWidgetItem*> selectedItems = ui->profileList->selectedItems();
+    QList<KbProfile*> profiles = device->profiles();
+
+    // Set up the file dialog
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("ckb-next profiles (*.ckb)"));
+    dialog.setViewMode(QFileDialog::List);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+
+    if(!dialog.exec())
+        return;
+
+    QStringList filenames = dialog.selectedFiles();
+
+    if(filenames.empty())
+        return;
+
+    // Pick only the first filename
+    QString filename = filenames.at(0);
+    if(!filename.endsWith(".ckb"))
+        filename.append(".ckb");
+
+    QStringList tmpExported;
+    // Create a QSettings ini in /tmp/ for each selected profile
+    for(int p = 0; p < selectedItems.count(); p++)
+    {
+        // Get the profile's pointer
+        QListWidgetItem* item = selectedItems.at(p);
+        KbProfile* prof = device->find(item->data(GUID).toUuid());
+
+        QString tmp("/tmp/ckbprofile");
+        tmp.append(QString::number(p));
+        tmp.append(".ini");
+
+        QSettings exportitem(tmp, QSettings::IniFormat);
+        exportitem.clear();
+        prof->profileExport(&exportitem);
+        exportitem.sync();
+
+        if(exportitem.status() == QSettings::NoError)
+            tmpExported.append(tmp);
+    }
+
+    if(!JlCompress::compressFiles(filename, tmpExported))
+        QMessageBox::warning(this, tr("Error"), tr("An error occured when exporting the selected profiles."), QMessageBox::Ok);
+
+    for(int i = 0; i < tmpExported.count(); i++)
+    {
+        QFile fdel(tmpExported.at(i));
+        fdel.remove();
+    }
+
+    QMessageBox::information(this, tr("Export Successful"), tr("Selected profiles have been exported successfully."), QMessageBox::Ok);
+}
+
+void KbProfileDialog::on_importButton_clicked()
+{
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("ckb-next profiles (*.ckb)"));
+    QStringList files;
+    if(!dialog.exec())
+        return;
+
+    QMessageBox::warning(this, "Not Implemented", "Not Implemented");
+
+    files = dialog.selectedFiles();
+
+    for (int i = 0; i < files.size(); i++)
+    {
+        //if()
+    }
+}
+
+void KbProfileDialog::on_buttonBox_accepted()
+{
+    // If the user clicked ok with multiple profiles selected, revert to the previous one
+    //if(ui->profileList->selectedItems().count() > 1 && activeProfile != nullptr)
+    //    device->setCurrentProfile(activeProfile);
 }

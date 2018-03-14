@@ -471,6 +471,33 @@ void KbLight::save(CkbSettings& settings){
     }
 }
 
+void KbLight::lightExport(QSettings* settings){
+    settings->setValue("KeyMap", _map.name());
+    settings->setValue("Brightness", _dimming);
+    settings->setValue("UseRealNames", true);
+    {
+        // Save RGB settings
+        settings->beginGroup("Keys");
+        QMutableColorMapIterator i(_qColorMap);
+        while(i.hasNext()){
+            i.next();
+            settings->setValue(i.key(), QColor(i.value()).name());
+        }
+        settings->endGroup();
+    }
+    {
+        // Save animations
+        settings->beginGroup("Animations");
+        QStringList aList;
+        foreach(KbAnim* anim, _animList){
+            aList << anim->guid().toString().toUpper();
+            anim->animExport(settings);
+        }
+        settings->setValue("List", aList);
+        settings->endGroup();
+    }
+}
+
 bool KbLight::needsSave() const {
     if(_needsSave)
         return true;

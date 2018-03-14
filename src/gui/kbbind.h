@@ -37,6 +37,9 @@ public:
     void        save(CkbSettings& settings);
     inline bool needsSave() const                   { return _needsSave; }
 
+    // Import/Export
+    void bindExport(QSettings *settings);
+
     // Key map
     inline const KeyMap&    map()                   { return _map; }
     void                    map(const KeyMap& map);

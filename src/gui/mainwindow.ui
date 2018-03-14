@@ -27,7 +27,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="image.qrc">
-    <normaloff>:/img/ckb-next-logo.png</normaloff>:/img/ckb-next-logo.png</iconset>
+    <normaloff>:/img/ckb-next.png</normaloff>:/img/ckb-next.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>

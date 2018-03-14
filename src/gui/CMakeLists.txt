@@ -250,18 +250,18 @@ endif ()
 
 if (MACOS)
     # Import macOS icon
-    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns")
-        message(STATUS "Importing ckb-next-logo.icns")
+    if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.icns")
+        message(STATUS "Importing ckb-next.icns")
         configure_file(
-          "${ckb-next_SOURCE_DIR}/macos/ckb-next-logo.icns"
-          "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns"
+          "${ckb-next_SOURCE_DIR}/macos/ckb-next.icns"
+          "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.icns"
             COPYONLY)
     endif ()
 
     # Configure plist
     set(MACOSX_BUNDLE_EXECUTABLE_NAME "ckb-next")
     set(MACOSX_BUNDLE_INFO_STRING "ckb-next - version ${ckb-next_VERSION}")
-    set(MACOSX_BUNDLE_ICON_FILE "ckb-next-logo.icns")
+    set(MACOSX_BUNDLE_ICON_FILE "ckb-next.icns")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ckb-next")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${ckb-next_VERSION}")
     set(MACOSX_BUNDLE_BUNDLE_NAME "ckb-next_v${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
@@ -430,7 +430,7 @@ if (MACOS)
 
     # Install icon file
     install(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.icns"
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.icns"
         DESTINATION "ckb-next.app/Contents/Resources"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
@@ -446,7 +446,7 @@ elseif (LINUX)
         WORLD_READ)
 
     install(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-logo.png"
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.png"
         DESTINATION "share/icons/hicolor/512x512/apps"
         PERMISSIONS
         OWNER_READ OWNER_WRITE

@@ -89,14 +89,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
         app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
         app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
-        app_indicator_set_icon(indicator, "ckb-next-logo");
+        app_indicator_set_icon(indicator, "ckb-next");
     } else
 #endif
     {
         trayIconMenu = new QMenu(this);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next-logo.png"), this);
+        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
         trayIcon->setContextMenu(trayIconMenu);
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
     }

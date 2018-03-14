@@ -29,7 +29,7 @@ static QSettings* globalSettings(){
         lockMutexStatic;
         if(!(volatile QSettings*)_globalSettings){   // Check again after locking mutex in case another thread created the object
             _globalSettings = new QSettings;
-            qInfo() << "Path to the settings:" << _globalSettings->fileName();
+            qInfo() << "Path to settings:" << _globalSettings->fileName();
             // Check if a config migration attempt needs to be made.
             if(!_globalSettings->value("Program/CkbMigrationChecked", false).toBool()){
                 CkbSettings::migrateSettings();
@@ -48,7 +48,11 @@ bool CkbSettings::isBusy(){
 }
 
 void CkbSettings::migrateSettings(){
-    QSettings *oldSettings = new QSettings("ckb", "ckb");
+    QSettings* oldSettings = new QSettings("ckb", "ckb");
+    // On macOS and iOS, allKeys() will return some extra keys for global settings that apply to all applications.
+    // These keys can be read using value() but cannot be changed, only shadowed. Calling setFallbacksEnabled(false) will hide these global settings.
+    // https://doc.qt.io/qt-5/qsettings.html
+    oldSettings->setFallbacksEnabled(false);
     qInfo() << "Looking for old settings in:" << oldSettings->fileName();
     // Check if a basic key exists
     if(oldSettings->contains("Program/KbdLayout")){

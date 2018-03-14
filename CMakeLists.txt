@@ -29,7 +29,8 @@
 # Might be as low as 3.3, but again, use at your own risk
 cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 
-project(ckb-next LANGUAGES C CXX VERSION 0.2.8)
+project(ckb-next LANGUAGES C CXX)
+include(VERSION.cmake)
 
 # Let CMake find custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")

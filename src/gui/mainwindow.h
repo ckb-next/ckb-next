@@ -9,7 +9,7 @@
 #include "kbwidget.h"
 #include "settingswidget.h"
 
-#ifdef Q_OS_LINUX
+#ifdef USE_LIBAPPINDICATOR
 // 'signals' has to be undefined as GTK has its own signal mechanism
 #undef signals
 extern "C" {
@@ -43,7 +43,7 @@ private:
     QAction* restoreAction;
     QAction* closeAction;
 
-#ifdef Q_OS_LINUX
+#ifdef USE_LIBAPPINDICATOR
     bool                unityDesktop;
     AppIndicator*       indicator;
     GtkWidget*          indicatorMenu;

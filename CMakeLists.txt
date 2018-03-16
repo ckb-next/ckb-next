@@ -81,8 +81,9 @@ cmake_dependent_option(WITH_RIPPLE   "Build with 'Ripple' animation."   ON "WITH
 cmake_dependent_option(WITH_WAVE     "Build with 'Wave' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 
 # Options: daemon
-option(DEBUG_USB_SEND "Show the contents of USB packets being sent to device."       OFF)
-option(DEBUG_USB_RECV "Show the contents of USB packets being received from device." OFF)
+option(DEBUG_USB_SEND  "Show the contents of USB packets being sent to device."                                OFF)
+option(DEBUG_USB_RECV  "Show the contents of USB packets being received from device through usbrecv()."        OFF)
+option(DEBUG_USB_INPUT "Show the contents of USB packets being received from device through the input thread." OFF)
 
 # Options: install
 if (MACOS)

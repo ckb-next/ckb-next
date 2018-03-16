@@ -48,7 +48,7 @@
 #       the version of appindicator found
 
 find_package(PkgConfig REQUIRED)
-pkg_search_module(Appindicator appindicator-0.1 appindicator3-0.1 appindicator-sharp-0.1 REQUIRED)
+pkg_search_module(Appindicator appindicator-0.1 appindicator3-0.1)
 set(Appindicator_DEFINITIONS ${Appindicator_CFLAGS_OTHER})
 
 include(FindPackageHandleStandardArgs)
@@ -62,3 +62,8 @@ find_package_handle_standard_args(
           Appindicator_VERSION)
 
 mark_as_advanced(Appindicator_LIBRARIES Appindicator_DEFINITIONS Appindicator_INCLUDE_DIRS Appindicator_VERSION)
+
+if(NOT Appindicator_FOUND)
+    message(WARNING "Appindicator was not found.\n"
+        "If you encounter issues with the tray icon, please install it.")
+endif()

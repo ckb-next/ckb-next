@@ -29,7 +29,7 @@ QString daemonDialogText = QObject::tr("Start and enable it with:") +
 
 MainWindow* MainWindow::mainWindow = 0;
 
-#ifdef Q_OS_LINUX
+#ifdef USE_LIBAPPINDICATOR
 extern "C" {
     void quitIndicator(GtkMenu* menu, gpointer data) {
         Q_UNUSED(menu);
@@ -63,43 +63,37 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreAction = new QAction(tr("Restore"), this);
     closeAction = new QAction(tr("Quit"), this);
 
-#ifdef Q_OS_LINUX
-    QString desktop = std::getenv("XDG_CURRENT_DESKTOP");
-    unityDesktop = (desktop.toLower() == "unity");
+#ifdef USE_LIBAPPINDICATOR
+    trayIcon = 0;
 
-    if(unityDesktop){
-        trayIcon = 0;
+    indicatorMenu = gtk_menu_new();
+    indicatorMenuRestoreItem = gtk_menu_item_new_with_label("Restore");
+    indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit");
 
-        indicatorMenu = gtk_menu_new();
-        indicatorMenuRestoreItem = gtk_menu_item_new_with_label("Restore");
-        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit");
+    gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
 
-        gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
-        gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
+    g_signal_connect(indicatorMenuQuitItem, "activate",
+        G_CALLBACK(quitIndicator), this);
+    g_signal_connect(indicatorMenuRestoreItem, "activate",
+        G_CALLBACK(restoreIndicator), this);
 
-        g_signal_connect(indicatorMenuQuitItem, "activate",
-            G_CALLBACK(quitIndicator), this);
-        g_signal_connect(indicatorMenuRestoreItem, "activate",
-            G_CALLBACK(restoreIndicator), this);
+    gtk_widget_show(indicatorMenuRestoreItem);
+    gtk_widget_show(indicatorMenuQuitItem);
 
-        gtk_widget_show(indicatorMenuRestoreItem);
-        gtk_widget_show(indicatorMenuQuitItem);
+    indicator = app_indicator_new("ckb-next", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
 
-        indicator = app_indicator_new("ckb-next", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
-
-        app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
-        app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
-        app_indicator_set_icon(indicator, "ckb-next");
-    } else
+    app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
+    app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
+    app_indicator_set_icon(indicator, "ckb-next");
+#else
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(restoreAction);
+    trayIconMenu->addAction(closeAction);
+    trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
+    trayIcon->setContextMenu(trayIconMenu);
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
 #endif
-    {
-        trayIconMenu = new QMenu(this);
-        trayIconMenu->addAction(restoreAction);
-        trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
-        trayIcon->setContextMenu(trayIconMenu);
-        connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
-    }
     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
 #ifdef Q_OS_MACOS
@@ -148,12 +142,11 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::toggleTrayIcon(bool visible) {
-#ifdef Q_OS_LINUX
-    if(unityDesktop)
-        app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
-    else
+#ifdef USE_LIBAPPINDICATOR
+    app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
+#else
+    trayIcon->setVisible(visible);
 #endif
-        trayIcon->setVisible(visible);
 }
 
 void MainWindow::addDevice(Kb* device){

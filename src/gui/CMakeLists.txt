@@ -91,7 +91,13 @@ AudioToolbox: ${AUDIOTOOLBOX_LIBRARY}")
     endif ()
         mark_as_advanced(FOUNDATION_LIBRARY COREAUDIO_LIBRARY AUDIOTOOLBOX_LIBRARY)
 elseif (LINUX)
-    find_package(Appindicator REQUIRED)
+    find_package(Appindicator)
+    if(Appindicator_FOUND)
+        target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_LIBAPPINDICATOR)
+    endif()
     find_package(X11 REQUIRED)
 endif ()
 
@@ -213,6 +219,14 @@ if (MACOS)
             PRIVATE
               media_mac.m)
 elseif (LINUX)
+    find_package(PulseAudio)
+    if (${PULSEAUDIO_FOUND})
+        target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_LIBPULSE)
+    endif ()
+
     target_sources(
         ckb-next
             PRIVATE
@@ -379,7 +393,8 @@ elseif (LINUX)
         ckb-next
             PRIVATE
               "${X11_LIBRARIES}"
-              "${Appindicator_LIBRARIES}")
+              "${Appindicator_LIBRARIES}"
+              "${PULSEAUDIO_LIBRARIES}")
 endif()
 
 if (WITH_SHIPPED_QUAZIP)

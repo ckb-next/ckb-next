@@ -10,7 +10,7 @@
 
 int getfwversion(usbdevice* kb){
     // Ask board for firmware info
-    uchar data_pkt[MSG_SIZE] = { 0x0e, 0x01, 0 };
+    uchar data_pkt[MSG_SIZE] = { CMD_GET, FIELD_IDENT, 0 };
     uchar in_pkt[MSG_SIZE];
     // Mice and mousepads don't have layouts, while the K55 can't report them.
     // If any other devices have the CUE attribute `supportsGetHardwareLayout` set to false,
@@ -23,7 +23,7 @@ int getfwversion(usbdevice* kb){
 
     if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
-    if(in_pkt[0] != 0x0e || in_pkt[1] != 0x01){
+    if(in_pkt[0] != CMD_GET || in_pkt[1] != FIELD_IDENT){
         ckb_err("Bad input header\n");
         return -1;
     }
@@ -101,13 +101,13 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     kb->usbdelay = 10;
     // Send the firmware messages (256 bytes at a time)
     uchar data_pkt[7][MSG_SIZE] = {
-        { 0x07, 0x0c, 0xf0, 0x01, 0 },
-        { 0x07, 0x0d, 0xf0, 0 },
-        { 0x7f, 0x01, 0x3c, 0 },
-        { 0x7f, 0x02, 0x3c, 0 },
-        { 0x7f, 0x03, 0x3c, 0 },
-        { 0x7f, 0x04, 0x3c, 0 },
-        { 0x7f, 0x05, 0x10, 0 }
+        { CMD_SET, FIELD_FW_START, 0xf0, 0x01, 0 },
+        { CMD_SET, FIELD_FW_DATA, 0xf0, 0 },
+        { CMD_WRITE_BULK, 0x01, 0x3c, 0 },
+        { CMD_WRITE_BULK, 0x02, 0x3c, 0 },
+        { CMD_WRITE_BULK, 0x03, 0x3c, 0 },
+        { CMD_WRITE_BULK, 0x04, 0x3c, 0 },
+        { CMD_WRITE_BULK, 0x05, 0x10, 0 }
     };
     int output = 0, last = 0;
     int index = 0;
@@ -154,8 +154,8 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     }
     // Send the final pair of messages
     uchar data_pkt2[2][MSG_SIZE] = {
-        { 0x07, 0x0d, 0xf0, 0x00, 0x00, 0x00, index },
-        { 0x07, 0x02, 0xf0, 0 }
+        { CMD_SET, FIELD_FW_DATA, 0xf0, 0x00, 0x00, 0x00, index },
+        { CMD_SET, FIELD_RESET, RESET_SLOW, 0 }
     };
     if(!usbsend(kb, data_pkt2[0], 2)){
         ckb_err("Firmware update failed\n");

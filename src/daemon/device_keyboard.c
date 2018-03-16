@@ -30,13 +30,13 @@ int setactive_kb(usbdevice* kb, int active){
     pthread_mutex_unlock(imutex(kb));
 
     uchar msg[3][MSG_SIZE] = {
-        { 0x07, 0x04, 0 },                  // Disables or enables HW control for top row
-        { 0x07, 0x40, 0 },                  // Selects key input
-        { 0x07, 0x05, 2, 0, 0x03, 0x00 }    // Commits key input selection
+        { CMD_SET, FIELD_SPECIAL, 0 },                // Disables or enables HW control for top row
+        { CMD_SET, FIELD_KEYINPUT, 0 },               // Selects key input
+        { CMD_SET, FIELD_LIGHTING, 2, 0, 0x03, 0x00 } // Commits key input selection
     };
     if(active){
         // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
-        msg[0][2] = 2;
+        msg[0][2] = MODE_SOFTWARE;
         if(!usbsend(kb, msg[0], 1))
             return -1;
         DELAY_MEDIUM(kb);
@@ -64,7 +64,7 @@ int setactive_kb(usbdevice* kb, int active){
         DELAY_MEDIUM(kb);
     } else {
         // Set the M-keys back into hardware mode, restore hardware RGB profile. It has to be sent twice for some reason.
-        msg[0][2] = 1;
+        msg[0][2] = MODE_HARDWARE;
         if(!usbsend(kb, msg[0], 1))
             return -1;
         DELAY_MEDIUM(kb);

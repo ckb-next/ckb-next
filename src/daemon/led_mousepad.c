@@ -19,9 +19,9 @@ int updatergb_mousepad(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    // Send the RGB values for each zone to the mouse
+    // Send the RGB values for each zone to the mousepad
     uchar data_pkt[MSG_SIZE] = {
-        0x07, 0x22, N_MOUSEPAD_ZONES, 0x00, 0, // RGB colors
+        CMD_SET, FIELD_MP_COLOR, N_MOUSEPAD_ZONES, 0x00, 0, // RGB colors
     };
     uchar* rgb_data = &data_pkt[4];
     for(int i = 0; i < N_MOUSEPAD_ZONES; i++){

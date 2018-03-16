@@ -108,31 +108,31 @@ int updatergb_kb(usbdevice* kb, int force){
         // Update strafe sidelights if necessary
         if(lastlight->sidelight != newlight->sidelight) {
             uchar data_pkt[2][MSG_SIZE] = {
-                 { 0x07, 0x05, 0x08, 0x00, 0x00 },
-                 { 0x07, 0x05, 0x02, 0, 0x03 }
+                 { CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0x00, 0x00 },
+                 { CMD_SET, FIELD_LIGHTING, MODE_SOFTWARE, 0, 0x03 }
              };
              if (newlight->sidelight)
-                 data_pkt[0][4]=1;    // turn on
+                 data_pkt[0][4] = 1;    // turn on
              if(!usbsend(kb, data_pkt[0], 2))
                  return -1;
         }
         // 16.8M color lighting works fine on strafe and is the only way it actually works
         uchar data_pkt[12][MSG_SIZE] = {
             // Red
-            { 0x7f, 0x01, 0x3c, 0 },
-            { 0x7f, 0x02, 0x3c, 0 },
-            { 0x7f, 0x03, 0x30, 0 },
-            { 0x07, 0x28, 0x01, 0x03, 0x01, 0},
+            { CMD_WRITE_BULK, 0x01, 0x3c, 0 },
+            { CMD_WRITE_BULK, 0x02, 0x3c, 0 },
+            { CMD_WRITE_BULK, 0x03, 0x30, 0 },
+            { CMD_SET, FIELD_KB_COLOR, COLOR_RED, 0x03, 0x01, 0},
             // Green
-            { 0x7f, 0x01, 0x3c, 0 },
-            { 0x7f, 0x02, 0x3c, 0 },
-            { 0x7f, 0x03, 0x30, 0 },
-            { 0x07, 0x28, 0x02, 0x03, 0x01, 0},
+            { CMD_WRITE_BULK, 0x01, 0x3c, 0 },
+            { CMD_WRITE_BULK, 0x02, 0x3c, 0 },
+            { CMD_WRITE_BULK, 0x03, 0x30, 0 },
+            { CMD_SET, FIELD_KB_COLOR, COLOR_GREEN, 0x03, 0x01, 0},
             // Blue
-            { 0x7f, 0x01, 0x3c, 0 },
-            { 0x7f, 0x02, 0x3c, 0 },
-            { 0x7f, 0x03, 0x30, 0 },
-            { 0x07, 0x28, 0x03, 0x03, 0x02, 0}
+            { CMD_WRITE_BULK, 0x01, 0x3c, 0 },
+            { CMD_WRITE_BULK, 0x02, 0x3c, 0 },
+            { CMD_WRITE_BULK, 0x03, 0x30, 0 },
+            { CMD_SET, FIELD_KB_COLOR, COLOR_BLUE, 0x03, 0x02, 0}
         };
         makergb_full(newlight, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
@@ -140,11 +140,11 @@ int updatergb_kb(usbdevice* kb, int force){
     } else {
         // On older keyboards it looks flickery and causes lighting glitches, so we don't use it.
         uchar data_pkt[5][MSG_SIZE] = {
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 60, 0 },
-            { 0x7f, 0x04, 36, 0 },
-            { 0x07, 0x27, 0x00, 0x00, 0xD8 }
+            { CMD_WRITE_BULK, 0x01, 60, 0 },
+            { CMD_WRITE_BULK, 0x02, 60, 0 },
+            { CMD_WRITE_BULK, 0x03, 60, 0 },
+            { CMD_WRITE_BULK, 0x04, 36, 0 },
+            { CMD_SET, FIELD_KB_9BCLR, 0x00, 0x00, 0xD8 }
         };
         makergb_512(newlight, data_pkt, kb->dither ? ordered8to3 : quantize8to3);
         if(!usbsend(kb, data_pkt[0], 5))
@@ -159,36 +159,36 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
     if(kb->fwversion >= 0x0120 || IS_V2_OVERRIDE(kb)){
         uchar data_pkt[12][MSG_SIZE] = {
             // Red
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x01 },
+            { CMD_WRITE_BULK, 0x01, 60, 0 },
+            { CMD_WRITE_BULK, 0x02, 60, 0 },
+            { CMD_WRITE_BULK, 0x03, 24, 0 },
+            { CMD_SET, FIELD_KB_HWCLR, 0x03, 0x01, 0x01, mode + 1, COLOR_RED},
             // Green
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x02 },
+            { CMD_WRITE_BULK, 0x01, 60, 0 },
+            { CMD_WRITE_BULK, 0x02, 60, 0 },
+            { CMD_WRITE_BULK, 0x03, 24, 0 },
+            { CMD_SET, FIELD_KB_HWCLR, 0x03, 0x01, 0x01, mode + 1, COLOR_GREEN },
             // Blue
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 24, 0 },
-            { 0x07, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x03 }
+            { CMD_WRITE_BULK, 0x01, 60, 0 },
+            { CMD_WRITE_BULK, 0x02, 60, 0 },
+            { CMD_WRITE_BULK, 0x03, 24, 0 },
+            { CMD_SET, FIELD_KB_HWCLR, 0x03, 0x01, 0x01, mode + 1, COLOR_BLUE }
         };
         makergb_full(light, data_pkt);
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;
         if (IS_STRAFE(kb)){ // end save
-            uchar save_end_pkt[MSG_SIZE] = { 0x07, 0x14, 0x04, 0x01, 0x01 };
+            uchar save_end_pkt[MSG_SIZE] = { CMD_SET, FIELD_KB_HWCLR, 0x04, 0x01, 0x01 };
             if(!usbsend(kb, save_end_pkt, 1))
                 return -1;
         }
     } else {
         uchar data_pkt[5][MSG_SIZE] = {
-            { 0x7f, 0x01, 60, 0 },
-            { 0x7f, 0x02, 60, 0 },
-            { 0x7f, 0x03, 60, 0 },
-            { 0x7f, 0x04, 36, 0 },
-            { 0x07, 0x14, 0x02, 0x00, 0x01, mode + 1 }
+            { CMD_WRITE_BULK, 0x01, 60, 0 },
+            { CMD_WRITE_BULK, 0x02, 60, 0 },
+            { CMD_WRITE_BULK, 0x03, 60, 0 },
+            { CMD_WRITE_BULK, 0x04, 36, 0 },
+            { CMD_SET, FIELD_KB_HWCLR, 0x02, 0x00, 0x01, mode + 1 }
         };
         makergb_512(light, data_pkt, kb->dither ? ordered8to3 : quantize8to3);
         if(!usbsend(kb, data_pkt[0], 5))
@@ -200,24 +200,24 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
 int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
     if(kb->fwversion >= 0x0120 || IS_V2_OVERRIDE(kb)){
         uchar data_pkt[12][MSG_SIZE] = {
-            { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x01 },
-            { 0xff, 0x01, 60, 0 },
-            { 0xff, 0x02, 60, 0 },
-            { 0xff, 0x03, 24, 0 },
-            { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x02 },
-            { 0xff, 0x01, 60, 0 },
-            { 0xff, 0x02, 60, 0 },
-            { 0xff, 0x03, 24, 0 },
-            { 0x0e, 0x14, 0x03, 0x01, 0x01, mode + 1, 0x03 },
-            { 0xff, 0x01, 60, 0 },
-            { 0xff, 0x02, 60, 0 },
-            { 0xff, 0x03, 24, 0 },
+            { CMD_GET, FIELD_KB_HWCLR, 0x03, 0x01, 0x01, mode + 1, COLOR_RED },
+            { CMD_READ_BULK, 0x01, 60, 0 },
+            { CMD_READ_BULK, 0x02, 60, 0 },
+            { CMD_READ_BULK, 0x03, 24, 0 },
+            { CMD_GET, FIELD_KB_HWCLR, 0x03, 0x01, 0x01, mode + 1, COLOR_GREEN },
+            { CMD_READ_BULK, 0x01, 60, 0 },
+            { CMD_READ_BULK, 0x02, 60, 0 },
+            { CMD_READ_BULK, 0x03, 24, 0 },
+            { CMD_GET, FIELD_KB_HWCLR, 0x03, 0x01, 0x01, mode + 1, COLOR_BLUE },
+            { CMD_READ_BULK, 0x01, 60, 0 },
+            { CMD_READ_BULK, 0x02, 60, 0 },
+            { CMD_READ_BULK, 0x03, 24, 0 },
         };
         uchar in_pkt[4][MSG_SIZE] = {
-            { 0x0e, 0x14, 0x03, 0x01 },
-            { 0xff, 0x01, 60, 0 },
-            { 0xff, 0x02, 60, 0 },
-            { 0xff, 0x03, 24, 0 },
+            { CMD_GET, FIELD_KB_HWCLR, 0x03, 0x01 },
+            { CMD_READ_BULK, 0x01, 60, 0 },
+            { CMD_READ_BULK, 0x02, 60, 0 },
+            { CMD_READ_BULK, 0x03, 24, 0 },
         };
 
         /// Since Firmware Version 2.05 for K95RGB the answers for getting the stored color-maps from the hardware
@@ -227,10 +227,10 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
         /// So we have to determine in the most inner loop the firmware version and type of KB to select the correct compare-table.
 
         uchar cmp_pkt[4][4] = {
-            { 0x0e, 0x14, 0x03, 0x01 },
-            { 0x0e, 0xff, 0x01, 60 },
-            { 0x0e, 0xff, 0x02, 60 },
-            { 0x0e, 0xff, 0x03, 24 },
+            { CMD_GET, FIELD_KB_HWCLR, 0x03, 0x01 },
+            { CMD_GET, CMD_READ_BULK, 0x01, 60 },
+            { CMD_GET, CMD_READ_BULK, 0x02, 60 },
+            { CMD_GET, CMD_READ_BULK, 0x03, 24 },
         };
         /// Read colors
         uchar* colors[3] = { light->r, light->g, light->b };
@@ -269,17 +269,17 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
         }
     } else {
         uchar data_pkt[5][MSG_SIZE] = {
-            { 0x0e, 0x14, 0x02, 0x01, 0x01, mode + 1, 0 },
-            { 0xff, 0x01, 60, 0 },
-            { 0xff, 0x02, 60, 0 },
-            { 0xff, 0x03, 60, 0 },
-            { 0xff, 0x04, 36, 0 },
+            { CMD_GET, FIELD_KB_HWCLR, 0x02, 0x01, 0x01, mode + 1, 0 },
+            { CMD_READ_BULK, 0x01, 60, 0 },
+            { CMD_READ_BULK, 0x02, 60, 0 },
+            { CMD_READ_BULK, 0x03, 60, 0 },
+            { CMD_READ_BULK, 0x04, 36, 0 },
         };
         uchar in_pkt[4][MSG_SIZE] = {
-            { 0xff, 0x01, 60, 0 },
-            { 0xff, 0x02, 60, 0 },
-            { 0xff, 0x03, 60, 0 },
-            { 0xff, 0x04, 36, 0 },
+            { CMD_READ_BULK, 0x01, 60, 0 },
+            { CMD_READ_BULK, 0x02, 60, 0 },
+            { CMD_READ_BULK, 0x03, 60, 0 },
+            { CMD_READ_BULK, 0x04, 36, 0 },
         };
         // Write initial packet
         if(!usbsend(kb, data_pkt[0], 1))

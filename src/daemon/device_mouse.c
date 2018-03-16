@@ -11,15 +11,15 @@ int setactive_mouse(usbdevice* kb, int active){
         return 0;
     const int keycount = 20;
     uchar msg[2][MSG_SIZE] = {
-        { 0x07, 0x04, 0 },                  // Disables or enables HW control for DPI and Sniper button
-        { 0x07, 0x40, keycount, 0 },        // Select button input (simlilar to the packet sent to keyboards, but lacks a commit packet)
+        { CMD_SET, FIELD_SPECIAL, 0 },            // Disables or enables HW control for DPI and Sniper button
+        { CMD_SET, FIELD_KEYINPUT, keycount, 0 }, // Select button input (simlilar to the packet sent to keyboards, but lacks a commit packet)
     };
     if(active)
         // Put the mouse into SW mode
-        msg[0][2] = 2;
+        msg[0][2] = MODE_SOFTWARE;
     else
         // Restore HW mode
-        msg[0][2] = 1;
+        msg[0][2] = MODE_HARDWARE;
     pthread_mutex_lock(imutex(kb));
     kb->active = !!active;
     kb->profile->lastlight.forceupdate = 1;
@@ -65,7 +65,7 @@ int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const cha
     (void)dummy3;
 
     uchar msg[MSG_SIZE] = {
-        0x07, 0x0a, 0, 0, (uchar)rate
+        CMD_SET, FIELD_POLLRATE, 0, 0, (uchar)rate
     };
     if(!usbsend(kb, msg, 1))
         return -1;

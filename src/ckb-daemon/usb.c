@@ -73,6 +73,8 @@ const char* product_str(short product){
         return "k65";
     if(product == P_K63_NRGB)
         return "k63";
+    if(product == P_K55)
+        return "k55";
     if(product == P_STRAFE || product == P_STRAFE_NRGB || product == P_STRAFE_NRGB_2)
         return "strafe";
     if(product == P_M65 || product == P_M65_PRO)

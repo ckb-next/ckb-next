@@ -51,6 +51,7 @@ public:
     enum Model {
         NO_MODEL = -1,
         // Keyboard models
+        K55,
         K63,
         K65,
         K68,

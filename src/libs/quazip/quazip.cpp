@@ -39,6 +39,7 @@ quazip/(un)zip.h files for details, basically it's zlib license.
 class QuaZipPrivate {
   friend class QuaZip;
   private:
+    Q_DISABLE_COPY(QuaZipPrivate)
     /// The pointer to the corresponding QuaZip instance.
     QuaZip *q;
     /// The codec for file names.
@@ -90,6 +91,8 @@ class QuaZipPrivate {
       zip64(false),
       autoClose(true)
     {
+        unzFile_f = NULL;
+        zipFile_f = NULL;
         lastMappedDirectoryEntry.num_of_file = 0;
         lastMappedDirectoryEntry.pos_in_zip_directory = 0;
     }
@@ -107,6 +110,8 @@ class QuaZipPrivate {
       zip64(false),
       autoClose(true)
     {
+        unzFile_f = NULL;
+        zipFile_f = NULL;
         lastMappedDirectoryEntry.num_of_file = 0;
         lastMappedDirectoryEntry.pos_in_zip_directory = 0;
     }
@@ -123,6 +128,8 @@ class QuaZipPrivate {
       zip64(false),
       autoClose(true)
     {
+        unzFile_f = NULL;
+        zipFile_f = NULL;
         lastMappedDirectoryEntry.num_of_file = 0;
         lastMappedDirectoryEntry.pos_in_zip_directory = 0;
     }
@@ -747,7 +754,7 @@ QList<QuaZipFileInfo64> QuaZip::getFileInfoList64() const
 Qt::CaseSensitivity QuaZip::convertCaseSensitivity(QuaZip::CaseSensitivity cs)
 {
   if (cs == csDefault) {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
       return Qt::CaseInsensitive;
 #else
       return Qt::CaseSensitive;

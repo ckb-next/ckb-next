@@ -37,6 +37,7 @@ technique known as the Pimpl (private implementation) idiom.
 class QuaZipFilePrivate {
   friend class QuaZipFile;
   private:
+    Q_DISABLE_COPY(QuaZipFilePrivate)
     /// The pointer to the associated QuaZipFile instance.
     QuaZipFile *q;
     /// The QuaZip object to work with.
@@ -76,17 +77,38 @@ class QuaZipFilePrivate {
     void setZipError(int zipError) const;
     /// The constructor for the corresponding QuaZipFile constructor.
     inline QuaZipFilePrivate(QuaZipFile *q):
-      q(q), zip(NULL), internal(true), zipError(UNZ_OK) {}
+      q(q),
+      zip(NULL),
+      caseSensitivity(QuaZip::csDefault),
+      raw(false),
+      writePos(0),
+      uncompressedSize(0),
+      crc(0),
+      internal(true),
+      zipError(UNZ_OK) {}
     /// The constructor for the corresponding QuaZipFile constructor.
     inline QuaZipFilePrivate(QuaZipFile *q, const QString &zipName):
-      q(q), internal(true), zipError(UNZ_OK)
+      q(q),
+      caseSensitivity(QuaZip::csDefault),
+      raw(false),
+      writePos(0),
+      uncompressedSize(0),
+      crc(0),
+      internal(true),
+      zipError(UNZ_OK)
       {
         zip=new QuaZip(zipName);
       }
     /// The constructor for the corresponding QuaZipFile constructor.
     inline QuaZipFilePrivate(QuaZipFile *q, const QString &zipName, const QString &fileName,
         QuaZip::CaseSensitivity cs):
-      q(q), internal(true), zipError(UNZ_OK)
+      q(q),
+      raw(false),
+      writePos(0),
+      uncompressedSize(0),
+      crc(0),
+      internal(true),
+      zipError(UNZ_OK)
       {
         zip=new QuaZip(zipName);
         this->fileName=fileName;
@@ -96,7 +118,14 @@ class QuaZipFilePrivate {
       }
     /// The constructor for the QuaZipFile constructor accepting a file name.
     inline QuaZipFilePrivate(QuaZipFile *q, QuaZip *zip):
-      q(q), zip(zip), internal(false), zipError(UNZ_OK) {}
+      q(q),
+      zip(zip),
+      raw(false),
+      writePos(0),
+      uncompressedSize(0),
+      crc(0),
+      internal(false),
+      zipError(UNZ_OK) {}
     /// The destructor.
     inline ~QuaZipFilePrivate()
     {
@@ -353,7 +382,7 @@ qint64 QuaZipFile::pos()const
       // QIODevice::pos() is broken for sequential devices,
       // but thankfully bytesAvailable() returns the number of
       // bytes buffered, so we know how far ahead we are.
-    return unztell(p->zip->getUnzFile()) - QIODevice::bytesAvailable();
+    return unztell64(p->zip->getUnzFile()) - QIODevice::bytesAvailable();
   else
     return p->writePos;
 }

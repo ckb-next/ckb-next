@@ -42,6 +42,7 @@ class QuaZIODevicePrivate {
     int outBufPos;
     int outBufSize;
     bool zBufError;
+    bool atEnd;
     int doFlush(QString &error);
 };
 
@@ -53,7 +54,8 @@ QuaZIODevicePrivate::QuaZIODevicePrivate(QIODevice *io):
   outBuf(NULL),
   outBufPos(0),
   outBufSize(0),
-  zBufError(false)
+  zBufError(false),
+  atEnd(false)
 {
   zins.zalloc = (alloc_func) NULL;
   zins.zfree = (free_func) NULL;
@@ -211,6 +213,7 @@ qint64 QuaZIODevice::readData(char *data, qint64 maxSize)
       case Z_STREAM_END:
         read = (char *) d->zins.next_out - data;
         d->inBufPos = (char *) d->zins.next_in - d->inBuf;
+        d->atEnd = true;
         return read;
       case Z_BUF_ERROR: // this should never happen, but just in case
         if (!d->zBufError) {
@@ -316,5 +319,21 @@ bool QuaZIODevice::flush()
 
 bool QuaZIODevice::isSequential() const
 {
-  return true;
+    return true;
+}
+
+bool QuaZIODevice::atEnd() const
+{
+    // Here we MUST check QIODevice::bytesAvailable() because WE
+    // might have reached the end, but QIODevice didn't--
+    // it could have simply pre-buffered all remaining data.
+    return (openMode() == NotOpen) || (QIODevice::bytesAvailable() == 0 && d->atEnd);
+}
+
+qint64 QuaZIODevice::bytesAvailable() const
+{
+    // If we haven't recevied Z_STREAM_END, it means that
+    // we have at least one more input byte available.
+    // Plus whatever QIODevice has buffered.
+    return (d->atEnd ? 0 : 1) + QIODevice::bytesAvailable();
 }

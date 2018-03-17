@@ -48,7 +48,7 @@
 #       the version of appindicator found
 
 find_package(PkgConfig REQUIRED)
-pkg_search_module(Appindicator appindicator-0.1 appindicator3-0.1)
+pkg_search_module(Appindicator appindicator-0.1)
 set(Appindicator_DEFINITIONS ${Appindicator_CFLAGS_OTHER})
 
 include(FindPackageHandleStandardArgs)

@@ -3,3 +3,4 @@
 
 #cmakedefine DEBUG_USB_SEND
 #cmakedefine DEBUG_USB_RECV
+#cmakedefine DEBUG_USB_INPUT

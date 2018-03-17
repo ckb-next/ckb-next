@@ -1045,7 +1045,8 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
         return map[key].friendlyName();
 
     // Additionally, there are a handful of keys not present on any physical keyboard, but we need names for them
-    if(key == "f13" || key == "f14" || key == "f15" || key == "f16" || key == "f17" || key == "f18" || key == "f19" || key == "f20")
+    if(key == "f13" || key == "f14" || key == "f15" || key == "f16" || key == "f17" || key == "f18" || key == "f19" || key == "f20"
+        || key == "f21" || key == "f22" || key == "f23" || key == "f24")
         return key.toUpper();
     else if(key == "lightup")
         return "Screen Brightness Up";

@@ -27,7 +27,7 @@
 // Two strafe side lights (although really they are tied into one control) + logo backlight + Platinum top bar
 #define N_KEY_ZONES             22
 // Additional keys recognized by the driver but may not be present on keyboard
-#define N_KEYS_EXTRA            12
+#define N_KEYS_EXTRA            16
 // Generic RGB Zones (Polaris/K55/...)
 #define N_GENERIC_ZONES         15
 #define LED_GENERIC_FIRST       (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA)

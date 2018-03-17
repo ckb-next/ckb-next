@@ -198,6 +198,10 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "f18",        -1, KEY_F18 },
     { "f19",        -1, KEY_F19 },
     { "f20",        -1, KEY_F20 },
+    { "f21",        -1, KEY_F21 },
+    { "f22",        -1, KEY_F22 },
+    { "f23",        -1, KEY_F23 },
+    { "f24",        -1, KEY_F24 },
 
     // Generic zones (K55, MM800, ST100, etc)
     { "zone1",      0x00, KEY_NONE },

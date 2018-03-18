@@ -1,8 +1,0 @@
-[Desktop Entry]
-Encoding=UTF-8
-Version=1.0
-Type=Application
-Name=ckb-next
-Comment=Corsair keyboard driver user interface
-Exec=ckb --background
-Icon=/usr/share/icons/hicolor/512x512/apps/ckb.png

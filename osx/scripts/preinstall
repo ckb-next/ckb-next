@@ -1,3 +1,0 @@
-#!/bin/bash
-`which launchctl` unload /Library/LaunchDaemons/com.ckb.daemon.plist >/dev/null 2>&1
-exit 0

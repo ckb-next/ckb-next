@@ -26,6 +26,7 @@
 #   POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(ckb-next "")
+add_custom_target(gui DEPENDS ckb-next)
 
 # Declare we want macOS Bundle
 if (MACOS)

@@ -29,6 +29,7 @@
 # TODO: use COMPONENT-wise installation instead of ifs()
 
 add_executable(ckb-next-daemon "")
+add_custom_target(daemon DEPENDS ckb-next-daemon)
 
 # Find external dependencies
 if (MACOS OR LINUX)

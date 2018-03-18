@@ -76,9 +76,9 @@ static void makergb_k55(const lighting* light, uchar data_pkt[MSG_SIZE]){
     // The K55 uses RGBRGBRGB colouring.
     for (int i = 0; i < 3; i++) {
         int index = (i * 3) + 4;
-        data_pkt[index + 0] = r[LED_GENERIC_FIRST + i];
-        data_pkt[index + 1] = g[LED_GENERIC_FIRST + i];
-        data_pkt[index + 2] = b[LED_GENERIC_FIRST + i];
+        data_pkt[index + 0] = r[i];
+        data_pkt[index + 1] = g[i];
+        data_pkt[index + 2] = b[i];
     }
 }
 
@@ -99,11 +99,11 @@ int updatergb_kb(usbdevice* kb, int force){
     lastlight->forceupdate = newlight->forceupdate = 0;
 
     if (IS_K55(kb)) {
-    // The K55 has its own packet type, because it only has three lighting zones.
-    uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };
-    makergb_k55(newlight, data_pkt);
-    if (!usbsend(kb, data_pkt, 1))
-        return -1;
+        // The K55 has its own packet type, because it only has three lighting zones.
+        uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };
+        makergb_k55(newlight, data_pkt);
+        if (!usbsend(kb, data_pkt, 1))
+            return -1;
     } else if(IS_FULLRANGE(kb)) {
         // Update strafe sidelights if necessary
         if(lastlight->sidelight != newlight->sidelight) {

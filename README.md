@@ -36,6 +36,9 @@ Most of the information can be found on [ckb-next wiki pages](https://github.com
 
 ### Contact
 
+Maintainers reserve the rights to modify and remove issues, pull requests and comments therein, that are denunciating, off-topic, harmful, hateful and overall inappropriate.
+Please be appreciative, humble and kind to each other.
+
 * IRC chat: `#ckb-next` channel at [chat.freenode.net](http://webchat.freenode.net?channels=%23ckb-next&uio=d4)
 * Mailing list: [ckb-next@googlegroups.com](https://groups.google.com/forum/#!forum/ckb-next)
 * [GitHub Issues](https://github.com/ckb-next/ckb-next/issues)

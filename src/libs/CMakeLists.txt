@@ -30,7 +30,7 @@ if (WITH_MVIZ) # otherwise doesn't make sense to include
 endif ()
 
 find_package(QuaZip)
-if(NOT QUAZIP_FOUND)
+if(NOT QuaZip_FOUND)
     set(WITH_SHIPPED_QUAZIP ON)
     set(WITH_SHIPPED_QUAZIP ON PARENT_SCOPE)
     message(WARNING "Quazip was not found. Using bundled version.")

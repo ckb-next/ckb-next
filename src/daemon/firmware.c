@@ -12,7 +12,10 @@ int getfwversion(usbdevice* kb){
     // Ask board for firmware info
     uchar data_pkt[MSG_SIZE] = { 0x0e, 0x01, 0 };
     uchar in_pkt[MSG_SIZE];
-    if(IS_MOUSE_DEV(kb) || IS_MOUSEPAD_DEV(kb)){
+    // Mice and mousepads don't have layouts, while the K55 can't report them.
+    // If any other devices have the CUE attribute `supportsGetHardwareLayout` set to false,
+    // please add them here.
+    if(IS_MOUSE_DEV(kb) || IS_MOUSEPAD_DEV(kb) || IS_K55(kb)){
         kb->layout = LAYOUT_NONE;
     } else {
         kb->layout = LAYOUT_UNKNOWN;

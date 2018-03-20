@@ -284,17 +284,40 @@ void KbProfileDialog::on_importButton_clicked()
         QMessageBox::warning(this, tr("Error"), QString(tr("Could not extract %1.")).arg(filename), QMessageBox::Ok);
 
     QStringList profilestr;
-    QList<QSettings*> profileptrs;
+    // <Pointer>, <GUID>
+    QList<QPair<QSettings*, QString>> profileptrs;
 
     for(int i = 0; i < extracted.count(); i++)
     {
-        if(extracted.at(i).endsWith("ini"))
+        QString tmpFile = extracted.at(i);
+        if(tmpFile.endsWith("ini"))
         {
-            qDebug() << i;
-            QSettings* sptr = new QSettings(extracted.at(i), QSettings::IniFormat);
-            profileptrs.append(sptr);
-            QString guid(sptr->childGroups().first());
-            profilestr.append(sptr->value(guid + "/Name").toString());
+            QFile iniFile(tmpFile);
+            tmpFile.append(".s256");
+            QFile hashFile(tmpFile);
+            if(iniFile.exists() && hashFile.exists())
+            {
+                if(iniFile.open(QFile::ReadOnly) && hashFile.open(QFile::ReadOnly))
+                {
+                    // Max sha256 string length is 64
+                    QByteArray pkgHash = QByteArray::fromHex(hashFile.read(64).data());
+
+                    QCryptographicHash iniHash(QCryptographicHash::Sha256);
+                    if(iniHash.addData(&iniFile))
+                    {
+                        hashFile.close();
+                        iniFile.close();
+                        if(iniHash.result() == pkgHash)
+                        {
+                            QSettings* sptr = new QSettings(extracted.at(i), QSettings::IniFormat);
+                            QString guid(sptr->childGroups().first());
+
+                            profileptrs.append(QPair<QSettings*, QString>(sptr, guid));
+                            profilestr.append(sptr->value(guid + "/Name").toString());
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -307,14 +330,53 @@ void KbProfileDialog::on_importButton_clicked()
                                    QMessageBox::Cancel);
     if(ret == QMessageBox::Ok)
     {
+        QList<KbProfile*> profiles = device->profiles();
 
+        for(int i = 0; i < profileptrs.count(); i++)
+        {
+            int ret = 0;
+            QSettings* sptr = profileptrs.at(i).first;
+            //QString guid = profileptrs.at(i).second;
+            //QUuid current = guid.trimmed();
+            QUuid guid = sptr->childGroups().first().trimmed();
+            // Messy, shhhh
+            QString profname = profilestr.at(i);
+            KbProfile* profilematch = nullptr;
+            foreach(KbProfile* profile, device->profiles()){
+
+                if(profile->id().guid == guid)
+                {
+                    ret = QMessageBox::question(this, tr("Profile Import"),
+                                                profname + tr(" already exists. Overwrite it?"),
+                                                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                                QMessageBox::Cancel);
+                    profilematch = profile;
+                    break;
+                }
+            }
+
+            if(ret == QMessageBox::Cancel)
+                continue;
+
+            if(ret == QMessageBox::Yes)
+                profiles.removeAll(profilematch);
+
+            if(ret == QMessageBox::No)
+                qDebug() << "Guid change goes here";
+
+            qDebug() << "Importing" << profname;
+
+            // Import code goes here
+        }
+        device->profiles(profiles);
+        qDebug() << profilestr;
     }
 
     // Clean up
 
     // Destroy the open QSettings objects
     for(int i = 0; i < profileptrs.count(); i++)
-        delete profileptrs.at(i);
+        delete profileptrs.at(i).first;
 
     for(int i = 0; i < extracted.count(); i++)
     {
@@ -322,6 +384,8 @@ void KbProfileDialog::on_importButton_clicked()
         QFile fdel(extracted.at(i));
         fdel.remove();
     }
+
+    repopulate();
 
 }
 

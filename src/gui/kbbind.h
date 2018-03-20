@@ -39,6 +39,7 @@ public:
 
     // Import/Export
     void bindExport(QSettings *settings);
+    void bindImport(QSettings *settings);
 
     // Key map
     inline const KeyMap&    map()                   { return _map; }

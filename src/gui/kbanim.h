@@ -24,6 +24,8 @@ public:
 
     // Load an animation from settings
     KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettings& settings);
+    // Load an animation from exported profile
+    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings* settings);
     // Save an animation to settings
     void save(CkbSettings& settings);
     inline bool needsSave() const { return _needsSave; }

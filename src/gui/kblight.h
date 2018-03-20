@@ -82,6 +82,7 @@ public:
 
     // Import/Export
     void lightExport(QSettings* settings);
+    void lightImport(QSettings* settings);
 
 signals:
     void didLoad();

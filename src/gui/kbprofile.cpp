@@ -1,5 +1,6 @@
 #include "kbprofile.h"
 #include "kb.h"
+#include <QDebug>
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const KbProfile& other) :
     QObject(parent), _currentMode(0), _name(other._name), _id(other._id), _keyMap(keyMap), _needsSave(true)
@@ -43,6 +44,34 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettings& settings, co
         if(current == mode->id().guid || !_currentMode)
             _currentMode = mode;
     }
+}
+
+KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, QSettings* settings, const QString& guid) :
+    QObject(parent), _currentMode(0), _id(guid, 0), _keyMap(keyMap), _needsSave(false)
+{
+    // Load data from import
+    settings->beginGroup(guid);
+    _name = settings->value("Name").toString().trimmed();
+    if(_name == "")
+        _name = "Unnamed";
+    _id.modifiedString(settings->value("Modified").toString());
+    if(settings->contains("HwModified"))
+        _id.hwModifiedString(settings->value("HwModified").toString());
+    else
+        _id.hwModified = _id.modified;
+    QUuid current = settings->value("CurrentMode").toString().trimmed();
+    // Load modes
+    uint count = settings->value("ModeCount").toUInt();
+    for(uint i = 0; i < count; i++){
+        settings->beginGroup(QString::number(i));
+        KbMode* mode = new KbMode(parent, _keyMap, settings);
+        _modes.append(mode);
+        // Set currentMode to the mode matching the current GUID, or the first mode in case it's not found
+        if(current == mode->id().guid || !_currentMode)
+            _currentMode = mode;
+        settings->endGroup();
+    }
+    settings->endGroup();
 }
 
 void KbProfile::save(CkbSettings& settings){

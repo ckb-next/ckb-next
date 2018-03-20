@@ -366,7 +366,8 @@ void KbProfileDialog::on_importButton_clicked()
 
             qDebug() << "Importing" << profname;
 
-            // Import code goes here
+            KbProfile* newProfile = device->newProfile(sptr);
+            profiles.append(newProfile);
         }
         device->profiles(profiles);
         qDebug() << profilestr;

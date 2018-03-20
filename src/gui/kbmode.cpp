@@ -49,6 +49,28 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings) :
     _perf->load(settings);
 }
 
+KbMode::KbMode(Kb* parent, const KeyMap& keyMap, QSettings* settings) :
+    QObject(parent),
+    _name(settings->value("Name").toString().trimmed()),
+    _id(settings->value("GUID").toString().trimmed(), settings->value("Modified").toString().trimmed()),
+    _light(new KbLight(this, keyMap)), _bind(new KbBind(this, parent, keyMap)), _perf(new KbPerf(this)),
+    _needsSave(false)
+{
+    if(settings->contains("HwModified"))
+        _id.hwModifiedString(settings->value("HwModified").toString());
+    else
+        _id.hwModified = _id.modified;
+
+    connect(_light, SIGNAL(updated()), this, SLOT(doUpdate()));
+    if(_id.guid.isNull())
+        _id.guid = QUuid::createUuid();
+    if(_name == "")
+        _name = "Unnamed";
+    _light->lightImport(settings);
+    _bind->bindImport(settings);
+    _perf->perfImport(settings);
+}
+
 void KbMode::newId(){
     _needsSave = true;
     _id = UsbId();
@@ -83,6 +105,10 @@ void KbMode::modeExport(QSettings* settings){
     _light->lightExport(settings);
     _bind->bindExport(settings);
     _perf->perfExport(settings);
+}
+
+void KbMode::modeImport(QSettings* settings){
+
 }
 
 bool KbMode::needsSave() const {

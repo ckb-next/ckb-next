@@ -61,6 +61,64 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, CkbSettings& 
     }
 }
 
+KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings* settings) :
+    QObject(parent), _script(0), _map(map),
+    repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
+    _guid(id), _isActive(false), _isActiveKp(false), _needsSave(false)
+{
+    settings->beginGroup(_guid.toString().toUpper());
+    _keys = settings->value("Keys").toStringList();
+    // Convert key list from storage names if needed
+    if(!settings->value("UseRealNames").toBool()){
+        QMutableListIterator<QString> i(_keys);
+        while(i.hasNext()){
+            i.next();
+            QString& key = i.value();
+            key = _map.fromStorage(key);
+        }
+    }
+    _name = settings->value("Name").toString().trimmed();
+    _opacity = settings->value("Opacity").toString().toDouble();
+    if(_opacity < 0.)
+        _opacity = 0.;
+    else if(_opacity > 1.)
+        _opacity = 1.;
+    bool modeOk = false;
+    _mode = (Mode)metaObject()->enumerator(metaObject()->indexOfEnumerator("Mode")).keysToValue(settings->value("BlendMode").toString().toLatin1(), &modeOk);
+    if(!modeOk)
+        _mode = Normal;
+    _scriptName = settings->value("ScriptName").toString().trimmed();
+    _scriptGuid = settings->value("ScriptGuid").toString();
+    {
+        settings->beginGroup("Parameters");
+        foreach(const QString& param, settings->childKeys())
+            _parameters[param.toLower()] = settings->value(param);
+        settings->endGroup();
+    }
+
+    if(!_scriptGuid.isNull()){
+        _script = AnimScript::copy(this, _scriptGuid);
+        if(_script){
+            // Remove nonexistant parameters
+            foreach(const QString& name, _parameters.keys()){
+                AnimScript::Param param = _script->param(name);
+                if(param.type == AnimScript::Param::INVALID || param.type == AnimScript::Param::LABEL)
+                    _parameters.remove(name);
+            }
+            // Add defaults for unset parameters
+            QListIterator<AnimScript::Param> i = _script->paramIterator();
+            while(i.hasNext()){
+                AnimScript::Param param = i.next();
+                if(!_parameters.contains(param.name) && param.type != AnimScript::Param::LABEL)
+                    _parameters[param.name] = param.defaultValue;
+            }
+            _scriptName = _script->name();
+            reInit();
+        }
+    }
+    settings->endGroup();
+}
+
 void KbAnim::save(CkbSettings& settings){
     _needsSave = false;
     settings.beginGroup(_guid.toString().toUpper());

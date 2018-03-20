@@ -41,6 +41,8 @@ public:
     KbMode(Kb* parent, const KeyMap& keyMap, const QString& guid = "", const QString& modified = "");
     // Mode from settings
     KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings);
+    // Mode from import
+    KbMode(Kb* parent, const KeyMap& keyMap, QSettings* settings);
     // Mode by copy
     KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other);
 
@@ -69,6 +71,7 @@ public:
 
     // Import/export
     void modeExport(QSettings *settings);
+    void modeImport(QSettings *settings);
 
 signals:
     void updated();

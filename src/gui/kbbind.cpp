@@ -113,6 +113,31 @@ void KbBind::bindExport(QSettings* settings){
     settings->endGroup();
 }
 
+void KbBind::bindImport(QSettings* settings){
+    _needsSave = false;
+    settings->beginGroup("Binding");
+    KeyMap currentMap = _map;
+    _map = KeyMap::fromName(settings->value("KeyMap").toString());
+    // Load key settings
+    bool useReal = settings->value("UseRealNames").toBool();
+    _bind.clear();
+    {
+        settings->beginGroup("Keys");
+        foreach(QString key, settings->childKeys()){
+            QString name = key.toLower();
+            if(!useReal)
+                name = _map.fromStorage(name);
+            QString bind = settings->value(key).toString();
+            _bind[name] = new KeyAction(bind, this);
+        }
+        settings->endGroup();
+    }
+    _winLock = settings->value("WinLock").toBool();
+    emit didLoad();
+    map(currentMap);
+    settings->endGroup();
+}
+
 QString KbBind::globalRemap(const QString& key){
     if(!_globalRemap.contains(key))
         return key;

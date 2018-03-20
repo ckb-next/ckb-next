@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include "quazip/JlCompress.h"
+#include <QCryptographicHash>
 
 KbProfileDialog::KbProfileDialog(KbWidget *parent) :
     QDialog(parent),
@@ -39,15 +40,6 @@ void KbProfileDialog::profileList_reordered(){
             newProfiles.append(profile);
     }
     device->profiles(newProfiles);
-}
-
-void KbProfileDialog::on_profileList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous){
-    if(!current)
-        return;
-    KbProfile* profile = device->find(current->data(GUID).toUuid());
-    if(!profile)
-        return;
-    device->setCurrentProfile(profile);
 }
 
 void KbProfileDialog::repopulate(){
@@ -221,16 +213,38 @@ void KbProfileDialog::on_exportButton_clicked()
         KbProfile* prof = device->find(item->data(GUID).toUuid());
 
         QString tmp("/tmp/ckbprofile");
-        tmp.append(QString::number(p));
+        tmp.append(QString::number(p)); // TODO: tmp.append(profname.toLower());
         tmp.append(".ini");
 
-        QSettings exportitem(tmp, QSettings::IniFormat);
-        exportitem.clear();
-        prof->profileExport(&exportitem);
-        exportitem.sync();
+        // Used to make sure QSettings is destroyed before trying to hash the ini
+        {
+            QSettings exportitem(tmp, QSettings::IniFormat);
+            exportitem.clear();
+            prof->profileExport(&exportitem);
+            exportitem.sync();
 
-        if(exportitem.status() == QSettings::NoError)
-            tmpExported.append(tmp);
+            if(exportitem.status() == QSettings::NoError)
+                tmpExported.append(tmp);
+        }
+
+        // Create a hash file for the generated ini
+        QFile tmpHashFile(tmp);
+        if(tmpHashFile.open(QFile::ReadOnly))
+        {
+            QCryptographicHash tmpHash(QCryptographicHash::Sha256);
+            if(tmpHash.addData(&tmpHashFile))
+            {
+                tmp.append(".s256");
+                QFile tmpHashFileW(tmp);
+                if(tmpHashFileW.open(QFile::WriteOnly))
+                {
+                    tmpExported.append(tmp);
+                    QTextStream hashStream(&tmpHashFileW);
+                    hashStream << tmpHash.result().toHex() << "\n";
+                }
+            }
+        }
+
     }
 
     if(!JlCompress::compressFiles(filename, tmpExported))
@@ -250,18 +264,65 @@ void KbProfileDialog::on_importButton_clicked()
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("ckb-next profiles (*.ckb)"));
-    QStringList files;
+
     if(!dialog.exec())
         return;
 
-    QMessageBox::warning(this, "Not Implemented", "Not Implemented");
+    //QMessageBox::warning(this, "Not Implemented", "Not Implemented");
 
-    files = dialog.selectedFiles();
+    QStringList filenames = dialog.selectedFiles();
 
-    for (int i = 0; i < files.size(); i++)
+    // Pick only the first filename
+    QString filename = filenames.at(0);
+    if(!filename.endsWith(".ckb"))
+        qDebug() << "Err";
+
+    // Extract the ckb package
+    QStringList extracted = JlCompress::extractDir(filename, QString("/tmp/"));
+    // TODO Better error handling for below
+    if(extracted.empty())
+        QMessageBox::warning(this, tr("Error"), QString(tr("Could not extract %1.")).arg(filename), QMessageBox::Ok);
+
+    QStringList profilestr;
+    QList<QSettings*> profileptrs;
+
+    for(int i = 0; i < extracted.count(); i++)
     {
-        //if()
+        if(extracted.at(i).endsWith("ini"))
+        {
+            qDebug() << i;
+            QSettings* sptr = new QSettings(extracted.at(i), QSettings::IniFormat);
+            profileptrs.append(sptr);
+            QString guid(sptr->childGroups().first());
+            profilestr.append(sptr->value(guid + "/Name").toString());
+        }
     }
+
+    // TODO use a proper widget with a profile picker
+    // For now, import everything
+    QString profilestrf(profilestr.join("\n• "));
+    int ret = QMessageBox::information(this, tr("Profile Import"),
+                                   QString(tr("The following profiles will be imported.\n\n• ")).append(profilestrf),
+                                   QMessageBox::Ok,
+                                   QMessageBox::Cancel);
+    if(ret == QMessageBox::Ok)
+    {
+
+    }
+
+    // Clean up
+
+    // Destroy the open QSettings objects
+    for(int i = 0; i < profileptrs.count(); i++)
+        delete profileptrs.at(i);
+
+    for(int i = 0; i < extracted.count(); i++)
+    {
+        // Delete extracted files
+        QFile fdel(extracted.at(i));
+        fdel.remove();
+    }
+
 }
 
 void KbProfileDialog::on_buttonBox_accepted()
@@ -269,4 +330,21 @@ void KbProfileDialog::on_buttonBox_accepted()
     // If the user clicked ok with multiple profiles selected, revert to the previous one
     //if(ui->profileList->selectedItems().count() > 1 && activeProfile != nullptr)
     //    device->setCurrentProfile(activeProfile);
+}
+
+void KbProfileDialog::on_profileList_itemSelectionChanged()
+{
+    // Only change the profile is a single item is selected
+    if(ui->profileList->selectedItems().count() > 1)
+        return;
+
+    QList<QListWidgetItem*> itemlist = ui->profileList->selectedItems();
+    if(itemlist.empty())
+        return;
+
+    KbProfile* profile = device->find(itemlist.first()->data(GUID).toUuid());
+    if(!profile)
+        return;
+
+    device->setCurrentProfile(profile);
 }

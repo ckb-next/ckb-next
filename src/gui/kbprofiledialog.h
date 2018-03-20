@@ -18,16 +18,13 @@ public:
 
 private slots:
     void profileList_reordered();
-    void on_profileList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
     void on_profileList_itemClicked(QListWidgetItem *item);
     void on_profileList_itemChanged(QListWidgetItem *item);
     void on_profileList_customContextMenuRequested(const QPoint &pos);
-
     void on_exportButton_clicked();
-
     void on_importButton_clicked();
-
     void on_buttonBox_accepted();
+    void on_profileList_itemSelectionChanged();
 
 private:
     Ui::KbProfileDialog *ui;

@@ -27,10 +27,10 @@
 #define KEY_F18             kVK_F18
 #define KEY_F19             kVK_F19
 #define KEY_F20             kVK_F20
-#define KEY_F21             kVK_F21
-#define KEY_F22             kVK_F22
-#define KEY_F23             kVK_F23
-#define KEY_F24             kVK_F24
+#define KEY_F21             -1
+#define KEY_F22             -1
+#define KEY_F23             -1
+#define KEY_F24             -1
 
 #define KEY_1               kVK_ANSI_1
 #define KEY_2               kVK_ANSI_2

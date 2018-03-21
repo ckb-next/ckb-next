@@ -11,6 +11,16 @@
 #include "kbprofiledialog.h"
 #include "ui_kbwidget.h"
 #include "ui_kblightwidget.h"
+#include "layoutdialog.h"
+
+
+void KbWidget::showLayoutDialog(){
+    LayoutDialog dialog(this);
+    dialog.exec();
+    // Set selected layout
+    ui->layoutBox->setCurrentIndex((int)dialog.selected());
+    on_layoutBox_activated((int)dialog.selected());         // Call activated() signal manually to trigger save
+}
 
 KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     QWidget(parent),
@@ -59,6 +69,28 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     if(!device->hwload){
         ui->hwSaveButton->setDisabled(true);
         ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
+    }
+    // Read keyboard layout
+    if(device->isKeyboard())
+    {
+        qDebug() << device->hwlayout;
+        // Enable the dropdown for keyboards and clear the "Default" value
+        ui->layoutBox->setEnabled(true);
+        ui->layoutBox->clear();
+
+        QString layoutSettingsPath("Devices/%1");
+        CkbSettings settings(layoutSettingsPath.arg(device->usbSerial));
+
+        ui->layoutBox->addItems(KeyMap::layoutNames(device->hwlayout));
+        KeyMap::Layout layout = KeyMap::getLayout(settings.value("hwLayout").toString());
+        if(layout == KeyMap::NO_LAYOUT){
+            // If the layout hasn't been set yet, show a dialog to let the user choose it
+            layout = KeyMap::locale();
+            //QTimer::singleShot(1000, this, SLOT(showLayoutDialog()));   // Run the function after a delay as the dialog may not appear correctly otherwise
+            settings.setValue("hwLayout", KeyMap::getLayout(layout));
+        }
+        Kb::layout(layout, device, false);
+        ui->layoutBox->setCurrentIndex((int)layout);
     }
 }
 
@@ -385,4 +417,12 @@ void KbWidget::on_fwUpdButton_clicked(){
     QByteArray blob = file.readAll();
     FwUpgradeDialog dialog(parentWidget(), 0.f, blob, device);
     dialog.exec();
+}
+
+void KbWidget::on_layoutBox_activated(int index)
+{
+    KeyMap::Layout layout = (KeyMap::Layout)index;
+    QString layoutSettingsPath("Devices/%1/hwLayout");
+    CkbSettings::set(layoutSettingsPath.arg(device->usbSerial), KeyMap::getLayout(layout));
+    Kb::layout(layout, device, true);
 }

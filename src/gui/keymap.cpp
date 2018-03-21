@@ -851,7 +851,7 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
     }
 }
 
-QStringList KeyMap::layoutNames(){
+QStringList KeyMap::layoutNames(QString layout){
     return QStringList()
             << "Danish"
             << "English (ISO/European)" << "English (ISO/European, Dvorak)"

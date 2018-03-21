@@ -3,7 +3,6 @@
 #include "autorun.h"
 #include "ckbsettings.h"
 #include "kb.h"
-#include "layoutdialog.h"
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
 
@@ -18,18 +17,6 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     CkbSettings settings("Program");
-
-    // Read keyboard layout
-    ui->layoutBox->addItems(KeyMap::layoutNames());
-    KeyMap::Layout layout = KeyMap::getLayout(settings.value("KbdLayout").toString());
-    if(layout == KeyMap::NO_LAYOUT){
-        // If the layout hasn't been set yet, show a dialog to let the user choose it
-        layout = KeyMap::locale();
-        QTimer::singleShot(1000, this, SLOT(showLayoutDialog()));   // Run the function after a delay as the dialog may not appear correctly otherwise
-        settings.setValue("KbdLayout", KeyMap::getLayout(layout));
-    }
-    Kb::layout(layout);
-    ui->layoutBox->setCurrentIndex((int)layout);
 
     // Load modifier remap
     KbBind::loadGlobalRemap();
@@ -93,14 +80,6 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 
 SettingsWidget::~SettingsWidget(){
     delete ui;
-}
-
-void SettingsWidget::showLayoutDialog(){
-    LayoutDialog dialog(this);
-    dialog.exec();
-    // Set selected layout
-    ui->layoutBox->setCurrentIndex((int)dialog.selected());
-    on_layoutBox_activated((int)dialog.selected());         // Call activated() signal manually to trigger save
 }
 
 void SettingsWidget::pollUpdates(){
@@ -169,12 +148,6 @@ void SettingsWidget::on_loginItemBox_clicked(bool checked){
         AutoRun::enable();
     else
         AutoRun::disable();
-}
-
-void SettingsWidget::on_layoutBox_activated(int index){
-    KeyMap::Layout layout = (KeyMap::Layout)index;
-    CkbSettings::set("Program/KbdLayout", KeyMap::getLayout(layout));
-    Kb::layout(layout);
 }
 
 void SettingsWidget::on_extraButton_clicked(){

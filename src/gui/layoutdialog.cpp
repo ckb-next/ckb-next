@@ -6,9 +6,10 @@ LayoutDialog::LayoutDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LayoutDialog) {
     ui->setupUi(this);
+
     // Populate layout list
-    ui->comboBox->addItems(KeyMap::layoutNames());
-    ui->comboBox->setCurrentIndex((int)Kb::layout());
+    //ui->comboBox->addItems(KeyMap::layoutNames());
+    //ui->comboBox->setCurrentIndex((int)Kb::layout());
 }
 
 LayoutDialog::~LayoutDialog(){

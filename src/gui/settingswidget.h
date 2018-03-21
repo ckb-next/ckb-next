@@ -34,8 +34,6 @@ private slots:
 
     void on_autoFWBox_clicked(bool checked);
     void on_loginItemBox_clicked(bool checked);
-    void on_layoutBox_activated(int index);
-    void showLayoutDialog();
 
     void on_extraButton_clicked();
 

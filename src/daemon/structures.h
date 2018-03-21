@@ -254,7 +254,7 @@ typedef struct {
     // Poll rate (ms), or -1 if unsupported
     char pollrate;
     // Physical device layout; LAYOUT_NONE if irrelevant, LAYOUT_UNKNOWN if unimplemented.
-    char layout;
+    uchar layout;
     // USB protocol delay (ms)
     char usbdelay;
     // Current input state

@@ -23,7 +23,6 @@ private slots:
     void on_profileList_customContextMenuRequested(const QPoint &pos);
     void on_exportButton_clicked();
     void on_importButton_clicked();
-    void on_buttonBox_accepted();
     void on_profileList_itemSelectionChanged();
 
 private:
@@ -36,6 +35,11 @@ private:
 
     void repopulate();
     void addNewProfileItem();
+
+    bool verifyHash(QString file);
+    void importCleanup(QStringList extracted, QList<QPair<QSettings*, QString>> profileptrs);
+    void extractedFileCleanup(QStringList extracted);
+
 };
 
 #endif // KBPROFILEDIALOG_H

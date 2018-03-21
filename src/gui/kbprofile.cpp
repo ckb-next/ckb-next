@@ -50,7 +50,8 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, QSettings* settings, cons
     QObject(parent), _currentMode(0), _id(guid, 0), _keyMap(keyMap), _needsSave(false)
 {
     // Load data from import
-    settings->beginGroup(guid);
+    // (GUID)
+    settings->beginGroup(settings->childGroups().first());
     _name = settings->value("Name").toString().trimmed();
     if(_name == "")
         _name = "Unnamed";

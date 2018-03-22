@@ -25,9 +25,10 @@
 #   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #   POSSIBILITY OF SUCH DAMAGE.
 
-find_package(PulseAudio REQUIRED)
+find_package(PulseAudio)
 if (NOT ${PULSEAUDIOSIMPLE_FOUND})
-    message(FATAL_ERROR "Missing PulseAudio Simple API")
+    message(WARNING "Missing PulseAudio Simple API. Not building mviz.")
+    return()
 endif ()
 
 add_executable(mviz main.c)

@@ -92,6 +92,8 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         Kb::layout(layout, device, false);
         ui->layoutBox->setCurrentIndex((int)layout);
     }
+    else
+        Kb::layout(KeyMap::GB, device, false);
 }
 
 KbWidget::~KbWidget(){

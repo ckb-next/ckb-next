@@ -160,6 +160,8 @@ static char* layoutstr(char layout){
         return "abnt";
     if(layout == LAYOUT_JIS)
         return "jis";
+    if(layout == LAYOUT_DUBEOLSIK)
+        return "dubeolsik";
     return "unknown";
 }
 

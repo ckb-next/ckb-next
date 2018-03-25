@@ -57,7 +57,7 @@ int getfwversion(usbdevice* kb){
     // Physical layout detection.
     if (kb->layout == LAYOUT_UNKNOWN) {
         kb->layout = in_pkt[23] + 1;
-        if (kb->layout > LAYOUT_JIS) {
+        if (kb->layout > LAYOUT_DUBEOLSIK) {
             ckb_warn("Got unknown physical layout byte value %d, please file a bug report mentioning your keyboard's physical layout\n", in_pkt[23]);
             kb->layout = LAYOUT_UNKNOWN;
         }

@@ -812,3 +812,6 @@ void Kb::macroDelay(bool flag) {
    }
 }
 
+KeyMap::Layout Kb::getCurrentLayout(){
+    return _layout;
+}

@@ -90,6 +90,8 @@ public:
 
     void hwSave();
 
+    KeyMap::Layout getCurrentLayout();
+
     //////////
     /// For usage with macro definions, these two params must only be readable.
     /// So there are no setters.

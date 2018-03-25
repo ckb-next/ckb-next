@@ -735,40 +735,53 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     return map;
 }
 
-KeyMap::Layout KeyMap::locale(){
+KeyMap::Layout KeyMap::locale(QList<QPair<int, QString>>* layouts){
     setlocale(LC_ALL, "");
     QString loc = setlocale(LC_CTYPE, 0);
     loc = loc.toLower().replace('_', '-');
+
+    KeyMap::Layout layout = KeyMap::NO_LAYOUT;
+
     if(loc.startsWith("dk-"))
-        return KeyMap::DK;
+        layout = KeyMap::DK;
     else if(loc.startsWith("fr-"))
-        return KeyMap::FR;
+        layout = KeyMap::FR;
     else if(loc.startsWith("de-"))
-        return KeyMap::DE;
+        layout = KeyMap::DE;
     else if(loc.startsWith("it-"))
-        return KeyMap::IT;
+        layout = KeyMap::IT;
     else if(loc.startsWith("ja-"))
-        return KeyMap::JP;
+        layout = KeyMap::JP;
     else if(loc.startsWith("pl-"))
-        return KeyMap::PL;
+        layout = KeyMap::PL;
     else if(loc.startsWith("pt-br"))
-        return KeyMap::PT_BR;
+        layout = KeyMap::PT_BR;
     else if(loc.startsWith("no-"))
-        return KeyMap::NO;
+        layout = KeyMap::NO;
     else if(loc.startsWith("es-es"))
         // Spain uses the ES layout
-        return KeyMap::ES;
+        layout = KeyMap::ES;
     else if(loc.startsWith("es-"))
         // Other Spanish locales use MX
-        return KeyMap::MX;
+        layout = KeyMap::MX;
     else if(loc.startsWith("se-"))
-        return KeyMap::SE;
+        layout = KeyMap::SE;
     else if(loc.startsWith("en-us") || loc.startsWith("en-au") || loc.startsWith("en-ca") || loc.startsWith("en-hk") || loc.startsWith("en-in") || loc.startsWith("en-nz") || loc.startsWith("en-ph") || loc.startsWith("en-sg") || loc.startsWith("en-za"))
         // Most English locales use US
-        return KeyMap::US;
-    else
-        // Default to GB
-        return KeyMap::GB;
+        layout = KeyMap::US;
+
+    // Check if the hardware supports the detected layout
+    for(int i = 0; i < layouts->count(); i++)
+        if(layouts->at(i).first == (int)layout)
+            return layout;
+
+    // If no matching layout was found, pick one from the list
+    KeyMap::Layout retlayout = (KeyMap::Layout)layouts->at(0).first;
+    // Pick English as the default ISO layout
+    if(retlayout == KeyMap::DK)
+        retlayout = KeyMap::GB;
+
+    return retlayout;
 }
 
 KeyMap::Layout KeyMap::getLayout(const QString& name){
@@ -851,22 +864,57 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
     }
 }
 
-QStringList KeyMap::layoutNames(QString layout){
-    return QStringList()
-            << "Danish"
-            << "English (ISO/European)" << "English (ISO/European, Dvorak)"
-            << "English (United Kingdom)" << "English (United Kingdom, Dvorak)"
-            << "English (United States)" << "English (United States, Dvorak)"
-            << "French"
-            << "German"
-            << "Italian"
-            << "Japanese"
-            << "Norwegian"
-            << "Polish"
-            << "Portuguese (Brazil)"
-            << "Spanish (Latin America)"
-            << "Spanish (Spain)"
-            << "Swedish";
+QPair<int, QString> KeyMap::addToList(int i, QStringList* list){
+    return QPair<int, QString>(i, list->at(i));
+}
+
+QList<QPair<int, QString>> KeyMap::layoutNames(QString layout){
+    QStringList list;
+    list << "Danish"
+         << "English (ISO/European)"
+         << "English (ISO/European, Dvorak)"
+         << "English (United Kingdom)"
+         << "English (United Kingdom, Dvorak)"
+         << "English (United States)"
+         << "English (United States, Dvorak)"
+         << "French"
+         << "German"
+         << "Italian"
+         << "Japanese"
+         << "Norwegian"
+         << "Polish"
+         << "Portuguese (Brazil)"
+         << "Spanish (Latin America)"
+         << "Spanish (Spain)"
+         << "Swedish";
+
+    // Create a list containing the layouts supported by the current device
+    QList<QPair<int, QString>> retlist;
+    if(layout == "ansi")
+        retlist << KeyMap::addToList(5, &list)
+                << KeyMap::addToList(6, &list);
+    else if(layout == "iso")
+        retlist << KeyMap::addToList(0, &list)
+                << KeyMap::addToList(1, &list)
+                << KeyMap::addToList(2, &list)
+                << KeyMap::addToList(3, &list)
+                << KeyMap::addToList(4, &list)
+                << KeyMap::addToList(7, &list)
+                << KeyMap::addToList(8, &list)
+                << KeyMap::addToList(10, &list)
+                << KeyMap::addToList(11, &list)
+                << KeyMap::addToList(13, &list)
+                << KeyMap::addToList(14, &list)
+                << KeyMap::addToList(15, &list)
+                << KeyMap::addToList(16, &list);
+    else if(layout == "abnt")
+        retlist << KeyMap::addToList(12, &list);
+    else if(layout == "jis")
+        retlist << KeyMap::addToList(9, &list);
+    else
+        for(int i = 0; i < list.count(); i++)
+            retlist << KeyMap::addToList(i, &list);
+    return retlist;
 }
 
 KeyMap::Model KeyMap::getModel(const QString& name){

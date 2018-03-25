@@ -11,16 +11,6 @@
 #include "kbprofiledialog.h"
 #include "ui_kbwidget.h"
 #include "ui_kblightwidget.h"
-#include "layoutdialog.h"
-
-
-void KbWidget::showLayoutDialog(){
-    LayoutDialog dialog(this);
-    dialog.exec();
-    // Set selected layout
-    ui->layoutBox->setCurrentIndex((int)dialog.selected());
-    on_layoutBox_activated((int)dialog.selected());         // Call activated() signal manually to trigger save
-}
 
 KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     QWidget(parent),
@@ -73,24 +63,47 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     // Read keyboard layout
     if(device->isKeyboard())
     {
-        qDebug() << device->hwlayout;
-        // Enable the dropdown for keyboards and clear the "Default" value
-        ui->layoutBox->setEnabled(true);
+        // Clear the "Default" value
         ui->layoutBox->clear();
 
+        // Load the current device's layout from the settings
         QString layoutSettingsPath("Devices/%1");
         CkbSettings settings(layoutSettingsPath.arg(device->usbSerial));
 
-        ui->layoutBox->addItems(KeyMap::layoutNames(device->hwlayout));
+        QList<QPair<int, QString>> layoutnames = KeyMap::layoutNames(device->hwlayout);
+
+        // Enable the ComboBox only if there is more than one supported layout
+        if(layoutnames.count() > 1)
+            ui->layoutBox->setEnabled(true);
+
+        for(int i = 0; i < layoutnames.count(); i++)
+            ui->layoutBox->addItem(layoutnames[i].second, layoutnames[i].first);
+
         KeyMap::Layout layout = KeyMap::getLayout(settings.value("hwLayout").toString());
         if(layout == KeyMap::NO_LAYOUT){
-            // If the layout hasn't been set yet, show a dialog to let the user choose it
-            layout = KeyMap::locale();
-            //QTimer::singleShot(1000, this, SLOT(showLayoutDialog()));   // Run the function after a delay as the dialog may not appear correctly otherwise
+            // If the layout hasn't been set yet, first check if one was set globally from a previous version
+            // If not, try and pick an appropriate one that's supported by the hardware
+            KeyMap::Layout oldLayout = KeyMap::getLayout(CkbSettings::get("Program/KbdLayout").toString());
+            if(oldLayout == KeyMap::NO_LAYOUT){
+                layout = KeyMap::locale(&layoutnames);
+            } else {
+                CkbSettings::set("Program/KbdLayout", "");
+                layout = oldLayout;
+            }
             settings.setValue("hwLayout", KeyMap::getLayout(layout));
         }
         Kb::layout(layout, device, false);
-        ui->layoutBox->setCurrentIndex((int)layout);
+        // Find the position of the layout in the QComboBox and set it
+        int layoutpos = (int)layout;
+        if(layout != KeyMap::NO_LAYOUT){
+            for(int i = 0; i < layoutnames.count(); i++){
+                if(layoutnames.at(i).first == (int)layout){
+                    layoutpos = i;
+                    break;
+                }
+            }
+        }
+        ui->layoutBox->setCurrentIndex(layoutpos);
     }
     else
         Kb::layout(KeyMap::GB, device, false);
@@ -423,7 +436,13 @@ void KbWidget::on_fwUpdButton_clicked(){
 
 void KbWidget::on_layoutBox_activated(int index)
 {
-    KeyMap::Layout layout = (KeyMap::Layout)index;
+    // Can't use currentIndexChanged as it fires when the GUI is first drawn
+    // before the layout has been initialised
+    int idxLayout = ui->layoutBox->itemData(index).toInt();
+    KeyMap::Layout layout = (KeyMap::Layout)idxLayout;
+    // Only set the layout if it was changed
+    if(layout == device->getCurrentLayout())
+        return;
     QString layoutSettingsPath("Devices/%1/hwLayout");
     CkbSettings::set(layoutSettingsPath.arg(device->usbSerial), KeyMap::getLayout(layout));
     Kb::layout(layout, device, true);

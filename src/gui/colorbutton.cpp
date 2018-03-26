@@ -90,7 +90,7 @@ void ColorButton::versionWarning(){
             qtWarning.setIcon(QMessageBox::Warning);
             qtWarning.setText(tr("A system configuration that can lead to instability issues with this software has been detected.<br><br>"
                                  "If this application locks up after clicking the OK button below, please refer to "
-                                 "<a href=\"https://github.com/ckb-next/ckb-next#linux\">https://github.com/ckb-next/ckb-next#linux</a>"));
+                                 "<a href=\"https://github.com/ckb-next/ckb-next/wiki/Troubleshooting#glib-critical-errors-and-lock-up-at-colour-chooser\">https://github.com/ckb-next/ckb-next/wiki/Troubleshooting#glib-critical-errors-and-lock-up-at-colour-chooser</a>"));
             qtWarning.setStandardButtons(QMessageBox::Ok);
             qtWarning.exec();
         }

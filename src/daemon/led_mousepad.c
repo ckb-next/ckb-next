@@ -5,7 +5,7 @@
 
 // Compare two light structures, ignore keys
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
-    return memcmp(lhs->r + LED_GENERIC_FIRST, rhs->r + LED_GENERIC_FIRST, N_MOUSEPAD_ZONES) || memcmp(lhs->g + LED_GENERIC_FIRST, rhs->g + LED_GENERIC_FIRST, N_MOUSEPAD_ZONES) || memcmp(lhs->b + LED_GENERIC_FIRST, rhs->b + LED_GENERIC_FIRST, N_MOUSEPAD_ZONES);
+    return memcmp(lhs->r, rhs->r, N_MOUSEPAD_ZONES) || memcmp(lhs->g, rhs->g, N_MOUSEPAD_ZONES) || memcmp(lhs->b, rhs->b, N_MOUSEPAD_ZONES);
 }
 
 int updatergb_mousepad(usbdevice* kb, int force){

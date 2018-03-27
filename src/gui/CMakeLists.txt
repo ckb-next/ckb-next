@@ -201,7 +201,6 @@ if (MACOS OR LINUX)
               kbprofiledialog.ui
               kbwidget.ui
               kperfwidget.ui
-              layoutdialog.ui
               mainwindow.ui
               modeselectdialog.ui
               mperfwidget.ui

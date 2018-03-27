@@ -769,6 +769,8 @@ KeyMap::Layout KeyMap::locale(QList<QPair<int, QString>>* layouts){
     else if(loc.startsWith("en-us") || loc.startsWith("en-au") || loc.startsWith("en-ca") || loc.startsWith("en-hk") || loc.startsWith("en-in") || loc.startsWith("en-nz") || loc.startsWith("en-ph") || loc.startsWith("en-sg") || loc.startsWith("en-za"))
         // Most English locales use US
         layout = KeyMap::US;
+    else if(loc.startsWith("en-gb"))
+        layout = KeyMap::GB;
 
     // Check if the hardware supports the detected layout
     for(int i = 0; i < layouts->count(); i++)
@@ -779,7 +781,7 @@ KeyMap::Layout KeyMap::locale(QList<QPair<int, QString>>* layouts){
     KeyMap::Layout retlayout = (KeyMap::Layout)layouts->at(0).first;
     // Pick English as the default ISO layout
     if(retlayout == KeyMap::DK)
-        retlayout = KeyMap::GB;
+        retlayout = KeyMap::EU;
 
     return retlayout;
 }

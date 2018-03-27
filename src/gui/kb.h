@@ -28,9 +28,11 @@ public:
     // Frame rate (all devices). Also updates the event timer in KbManager.
     static inline int               frameRate()                         { return _frameRate; }
     static void                     frameRate(int newFrameRate);
-    // Layout (all devices)
+    // Layout
     static inline KeyMap::Layout    layout()                            { return _layout; }
-    static void                     layout(KeyMap::Layout newLayout);
+    static void                     layout(KeyMap::Layout newLayout, Kb* kb, bool stop);
+    // Layout string as reported by the daemon
+    QString hwlayout;
     // Whether dithering is used (all devices)
     static inline bool              dither()                            { return _dither; }
     static void                     dither(bool newDither);
@@ -87,6 +89,8 @@ public:
     bool needsSave() const;
 
     void hwSave();
+
+    KeyMap::Layout getCurrentLayout();
 
     //////////
     /// For usage with macro definions, these two params must only be readable.
@@ -154,6 +158,7 @@ private:
     /// cmdpath leads to the daemon input pipe for daemon commands,
     /// notifyPath is the standard input monitor for general purpose,
     /// macroPath added for a second thread to read macro input.
+    /// layoutPath is used to get the physical layout from the daemon
     QString devpath, cmdpath, notifyPath, macroPath;
     // Is this the keyboard at the given serial/path?
     inline bool matches(const QString& path, const QString& serial) { return path.trimmed() == devpath.trimmed() && usbSerial == serial.trimmed().toUpper(); }
@@ -161,7 +166,7 @@ private:
 private:
     // Following properties shouldn't be used by any other classes
     static KeyMap::Layout _layout;
-    void updateLayout();
+    void updateLayout(bool stop);
 
     static int _frameRate, _scrollSpeed;
     static bool _dither, _mouseAccel;

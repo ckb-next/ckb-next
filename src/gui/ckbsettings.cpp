@@ -155,6 +155,7 @@ QVariant CkbSettings::value(const QString& key, const QVariant& defaultValue) co
 }
 
 void CkbSettings::setValue(const QString& key, const QVariant& value){
+    //qDebug() << "Setting " << key << "to value" << value;
     // Cache the write values, save them when the object is destroyed
     QString realKey = pwd(key);
     writeCache[realKey] = value;

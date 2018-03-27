@@ -134,6 +134,37 @@ int rmnotifynode(usbdevice* kb, int notify){
     return res;
 }
 
+static void printnode(const char* path, const char* str){
+    FILE* file = fopen(path, "w");
+    if(file){
+        fputs(str, file);
+        fputc('\n', file);
+        fclose(file);
+        chmod(path, S_GID_READ);
+        if(gid >= 0)
+            chown(path, 0, gid);
+    } else {
+        ckb_warn("Unable to create %s: %s\n", path, strerror(errno));
+        remove(path);
+    }
+}
+
+static char* layoutstr(char layout){
+    if(layout == LAYOUT_NONE)
+        return "";
+    if(layout == LAYOUT_ANSI)
+        return "ansi";
+    if(layout == LAYOUT_ISO)
+        return "iso";
+    if(layout == LAYOUT_ABNT)
+        return "abnt";
+    if(layout == LAYOUT_JIS)
+        return "jis";
+    if(layout == LAYOUT_DUBEOLSIK)
+        return "dubeolsik";
+    return "unknown";
+}
+
 static int _mkdevpath(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
     // Create the control path
@@ -202,48 +233,20 @@ static int _mkdevpath(usbdevice* kb){
         _mknotifynode(kb, 0);
 
         // Write the model and serial to files
-        char mpath[sizeof(path) + 6], spath[sizeof(path) + 7], ipath[sizeof(path) + 10];
+        char mpath[sizeof(path) + 6], spath[sizeof(path) + 7], ipath[sizeof(path) + 10], lpath[sizeof(path) + 7];
         snprintf(mpath, sizeof(mpath), "%s/model", path);
         snprintf(spath, sizeof(spath), "%s/serial", path);
         snprintf(ipath, sizeof(ipath), "%s/productid", path);
-        FILE* mfile = fopen(mpath, "w");
-        if(mfile){
-            fputs(kb->name, mfile);
-            fputc('\n', mfile);
-            fclose(mfile);
-            chmod(mpath, S_GID_READ);
-            if(gid >= 0)
-                chown(mpath, 0, gid);
-        } else {
-            ckb_warn("Unable to create %s: %s\n", mpath, strerror(errno));
-            remove(mpath);
-        }
-        FILE* sfile = fopen(spath, "w");
-        if(sfile){
-            fputs(kb->serial, sfile);
-            fputc('\n', sfile);
-            fclose(sfile);
-            chmod(spath, S_GID_READ);
-            if(gid >= 0)
-                chown(spath, 0, gid);
-        } else {
-            ckb_warn("Unable to create %s: %s\n", spath, strerror(errno));
-            remove(spath);
-        }
-        FILE* ifile = fopen(ipath, "w");
-        if(ifile){
-            char productid [5];
-            snprintf(productid, 5, "%04x", kb->product);
-            fputs(productid, ifile);
-            fputc('\n', ifile);
-            fclose(ifile);
-            chmod(ipath, S_GID_READ);
-            if(gid >= 0)
-                chown(ipath, 0, gid);
-        } else {
-            ckb_warn("Unable to create %s: %s\n", ipath, strerror(errno));
-            remove(ipath);
-        }
+        snprintf(lpath, sizeof(lpath), "%s/layout", path);
+
+        char productid[5];
+        snprintf(productid, 5, "%04x", kb->product);
+
+        printnode(mpath, kb->name);
+        printnode(spath, kb->serial);
+        printnode(ipath, productid);
+        printnode(lpath, layoutstr(kb->layout));
+
         // Write the keyboard's features
         char fpath[sizeof(path) + 9];
         snprintf(fpath, sizeof(fpath), "%s/features", path);

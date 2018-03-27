@@ -143,7 +143,6 @@ if (MACOS OR LINUX)
               keymap.cpp
               keywidget.cpp
               kperfwidget.cpp
-              layoutdialog.cpp
               macroreader.cpp
               main.cpp
               mainwindow.cpp
@@ -183,7 +182,6 @@ if (MACOS OR LINUX)
               keymap.h
               keywidget.h
               kperfwidget.h
-              layoutdialog.h
               macroreader.h
               mainwindow.h
               media.h
@@ -203,7 +201,6 @@ if (MACOS OR LINUX)
               kbprofiledialog.ui
               kbwidget.ui
               kperfwidget.ui
-              layoutdialog.ui
               mainwindow.ui
               modeselectdialog.ui
               mperfwidget.ui

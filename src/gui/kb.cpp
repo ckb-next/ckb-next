@@ -28,8 +28,8 @@ Kb::Kb(QObject *parent, const QString& path) :
     memset(iState, 0, sizeof(iState));
     memset(hwLoading, 0, sizeof(hwLoading));
 
-    // Get the features, model, serial number, FW version (if available), and poll rate (if available) from /dev nodes
-    QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate"), prodpath(path + "/productid");
+    // Get the features, model, serial number, FW version (if available), poll rate (if available), and layout from /dev nodes
+    QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate"), prodpath(path + "/productid"), hwlayoutPath(path + "/layout");
     if (ftpath.open(QIODevice::ReadOnly)){
         features = ftpath.read(1000);
         features = features.trimmed();
@@ -81,6 +81,12 @@ Kb::Kb(QObject *parent, const QString& path) :
         pollrate = ppath.read(100);
         pollrate = pollrate.trimmed();
         ppath.close();
+    }
+
+    if(hwlayoutPath.open(QIODevice::ReadOnly)){
+        hwlayout = hwlayoutPath.read(10);
+        hwlayout = hwlayout.trimmed();
+        hwlayoutPath.close();
     }
 
     prefsPath = "Devices/" + usbSerial;
@@ -187,16 +193,15 @@ void Kb::frameRate(int newFrameRate){
     }
 }
 
-void Kb::layout(KeyMap::Layout newLayout){
+void Kb::layout(KeyMap::Layout newLayout, Kb* kb, bool stop){
     if(newLayout == KeyMap::NO_LAYOUT || newLayout == _layout)
         return;
     _layout = newLayout;
-    // Update all devices
-    foreach(Kb* kb, activeDevices)
-        kb->updateLayout();
+    // Update the current device
+    kb->updateLayout(stop);
 }
 
-void Kb::updateLayout(){
+void Kb::updateLayout(bool stop){
 #ifdef Q_OS_MACOS
     // Write ANSI/ISO flag to daemon (OSX only)
     cmd.write("layout ");
@@ -208,9 +213,11 @@ void Kb::updateLayout(){
         profile->keyMap(getKeyMap());
     if(_hwProfile && !_profiles.contains(_hwProfile))
         _hwProfile->keyMap(getKeyMap());
-    // Stop all animations as they'll need to be restarted
-    foreach(KbMode* mode, _currentProfile->modes())
-        mode->light()->close();
+    // Stop all animations as they'll need to be restarted, only if requested
+    if(stop){
+        foreach(KbMode* mode, _currentProfile->modes())
+            mode->light()->close();
+    }
     emit infoUpdated();
 }
 
@@ -287,7 +294,7 @@ void Kb::save(){
     if(prefsPath.isEmpty())
         return;
     _needsSave = false;
-    CkbSettings settings(prefsPath, true);
+    CkbSettings settings(prefsPath);
     QString guids, currentGuid;
     foreach(KbProfile* profile, _profiles){
         guids.append(" " + profile->id().guidString());
@@ -805,3 +812,6 @@ void Kb::macroDelay(bool flag) {
    }
 }
 
+KeyMap::Layout Kb::getCurrentLayout(){
+    return _layout;
+}

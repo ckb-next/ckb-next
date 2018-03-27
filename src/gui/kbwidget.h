@@ -66,6 +66,7 @@ private slots:
     void on_hwSaveButton_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();
+    void on_layoutBox_activated(int index);
 };
 
 #endif // KBWIDGET_H

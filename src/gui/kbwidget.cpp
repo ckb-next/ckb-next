@@ -60,6 +60,53 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->hwSaveButton->setDisabled(true);
         ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
     }
+    // Read keyboard layout
+    if(device->isKeyboard())
+    {
+        // Clear the "Default" value
+        ui->layoutBox->clear();
+
+        // Load the current device's layout from the settings
+        QString layoutSettingsPath("Devices/%1");
+        CkbSettings settings(layoutSettingsPath.arg(device->usbSerial));
+
+        QList<QPair<int, QString>> layoutnames = KeyMap::layoutNames(device->hwlayout);
+
+        // Enable the ComboBox only if there is more than one supported layout
+        if(layoutnames.count() > 1)
+            ui->layoutBox->setEnabled(true);
+
+        for(int i = 0; i < layoutnames.count(); i++)
+            ui->layoutBox->addItem(layoutnames[i].second, layoutnames[i].first);
+
+        KeyMap::Layout layout = KeyMap::getLayout(settings.value("hwLayout").toString());
+        if(layout == KeyMap::NO_LAYOUT){
+            // If the layout hasn't been set yet, first check if one was set globally from a previous version
+            // If not, try and pick an appropriate one that's supported by the hardware
+            KeyMap::Layout oldLayout = KeyMap::getLayout(CkbSettings::get("Program/KbdLayout").toString());
+            if(oldLayout == KeyMap::NO_LAYOUT){
+                layout = KeyMap::locale(&layoutnames);
+            } else {
+                CkbSettings::set("Program/KbdLayout", "");
+                layout = oldLayout;
+            }
+            settings.setValue("hwLayout", KeyMap::getLayout(layout));
+        }
+        Kb::layout(layout, device, false);
+        // Find the position of the layout in the QComboBox and set it
+        int layoutpos = (int)layout;
+        if(layout != KeyMap::NO_LAYOUT){
+            for(int i = 0; i < layoutnames.count(); i++){
+                if(layoutnames.at(i).first == (int)layout){
+                    layoutpos = i;
+                    break;
+                }
+            }
+        }
+        ui->layoutBox->setCurrentIndex(layoutpos);
+    }
+    else
+        Kb::layout(KeyMap::GB, device, false);
 }
 
 KbWidget::~KbWidget(){
@@ -385,4 +432,18 @@ void KbWidget::on_fwUpdButton_clicked(){
     QByteArray blob = file.readAll();
     FwUpgradeDialog dialog(parentWidget(), 0.f, blob, device);
     dialog.exec();
+}
+
+void KbWidget::on_layoutBox_activated(int index)
+{
+    // Can't use currentIndexChanged as it fires when the GUI is first drawn
+    // before the layout has been initialised
+    int idxLayout = ui->layoutBox->itemData(index).toInt();
+    KeyMap::Layout layout = (KeyMap::Layout)idxLayout;
+    // Only set the layout if it was changed
+    if(layout == device->getCurrentLayout())
+        return;
+    QString layoutSettingsPath("Devices/%1/hwLayout");
+    CkbSettings::set(layoutSettingsPath.arg(device->usbSerial), KeyMap::getLayout(layout));
+    Kb::layout(layout, device, true);
 }

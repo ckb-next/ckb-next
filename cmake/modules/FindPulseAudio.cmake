@@ -35,8 +35,6 @@
 #       PULSEAUDIOSIMPLE_INCLUDE_DIRS - the pulseaudio simple include directory
 #       PULSEAUDIOSIMPLE_LIBRARIES - Link these to use pulseaudio simple
 
-# TODO: Fix this properly
-set(PULSEAUDIO_LIBRARY "")
 foreach (pulsevariablename PULSEAUDIOSIMPLE PULSEAUDIO)
     find_path(${pulsevariablename}_INCLUDE_DIR
             NAMES

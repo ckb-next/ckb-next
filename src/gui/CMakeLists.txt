@@ -383,12 +383,20 @@ if(MACOS)
               "${FOUNDATION_LIBRARY}"
               "${AUDIOTOOLBOX_LIBRARY}")
 elseif (LINUX)
-    target_link_libraries(
-        ckb-next
-            PRIVATE
-              "${X11_LIBRARIES}"
-              "${Appindicator_LIBRARIES}"
-              "${PULSEAUDIO_LIBRARIES}")
+    if(${PULSEAUDIO_FOUND})
+        target_link_libraries(
+            ckb-next
+                PRIVATE
+                  "${X11_LIBRARIES}"
+                  "${Appindicator_LIBRARIES}"
+                  "${PULSEAUDIO_LIBRARIES}")
+    else()
+        target_link_libraries(
+            ckb-next
+                PRIVATE
+                  "${X11_LIBRARIES}"
+                  "${Appindicator_LIBRARIES}")
+    endif()
 endif()
 
 if (WITH_SHIPPED_QUAZIP)

@@ -40,32 +40,32 @@
 /// \n In the same way, all other corresponding files have to be supplemented or modified:
 /// Currently known for this are \b usb_linux.c and \b usb_mac.c
 ///
-#define V_CORSAIR       0x1b1c
-#define V_CORSAIR_STR   "1b1c"
+#define V_CORSAIR            0x1b1c
+#define V_CORSAIR_STR        "1b1c"
 
-#define P_K55           0x1b3d
-#define P_K55_STR       "1b3d"
-#define IS_K55(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K55)
+#define P_K55                0x1b3d
+#define P_K55_STR            "1b3d"
+#define IS_K55(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K55)
 
-#define P_K63_NRGB      0x1b40
-#define P_K63_NRGB_STR  "1b40"
-#define IS_K63(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_K63_NRGB)
+#define P_K63_NRGB           0x1b40
+#define P_K63_NRGB_STR       "1b40"
+#define IS_K63(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K63_NRGB)
 
-#define P_K65           0x1b17
-#define P_K65_STR       "1b17"
-#define P_K65_NRGB      0x1b07
-#define P_K65_NRGB_STR  "1b07"
-#define P_K65_LUX       0x1b37
-#define P_K65_LUX_STR   "1b37"
-#define P_K65_RFIRE     0x1b39
-#define P_K65_RFIRE_STR "1b39"
-#define IS_K65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_NRGB || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
+#define P_K65                0x1b17
+#define P_K65_STR            "1b17"
+#define P_K65_NRGB           0x1b07
+#define P_K65_NRGB_STR       "1b07"
+#define P_K65_LUX            0x1b37
+#define P_K65_LUX_STR        "1b37"
+#define P_K65_RFIRE          0x1b39
+#define P_K65_RFIRE_STR      "1b39"
+#define IS_K65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_NRGB || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
-#define P_K68           0x1b4f
-#define P_K68_STR       "1b4f"
-#define P_K68_NRGB      0x1b3f
-#define P_K68_NRGB_STR  "1b3f"
-#define IS_K68(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K68 || (kb)->product == P_K68_NRGB))
+#define P_K68                0x1b4f
+#define P_K68_STR            "1b4f"
+#define P_K68_NRGB           0x1b3f
+#define P_K68_NRGB_STR       "1b3f"
+#define IS_K68(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K68 || (kb)->product == P_K68_NRGB))
 
 #define P_K70                0x1b13
 #define P_K70_STR            "1b13"
@@ -81,55 +81,59 @@
 #define P_K70_RFIRE_NRGB_STR "1b3a"
 #define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
 
-#define P_K95           0x1b11
-#define P_K95_STR       "1b11"
-#define P_K95_NRGB      0x1b08
-#define P_K95_NRGB_STR  "1b08"
-#define P_K95_PLATINUM  0x1b2d
-#define P_K95_PLATINUM_STR "1b2d"
-#define IS_K95(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95 || (kb)->product == P_K95_NRGB || (kb)->product == P_K95_PLATINUM))
+// The K90 NRGB behaves like a K95 NRGB.
+#define P_K90_NRGB           0x1b02
+#define P_K90_NRGB_STR       "1b02"
 
-#define P_STRAFE            0x1b20
-#define P_STRAFE_STR        "1b20"
-#define P_STRAFE_NRGB       0x1b15
-#define P_STRAFE_NRGB_STR   "1b15"
-#define P_STRAFE_NRGB_2     0x1b44
-#define P_STRAFE_NRGB_2_STR "1b44"
-#define IS_STRAFE(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2))
+#define P_K95                0x1b11
+#define P_K95_STR            "1b11"
+#define P_K95_NRGB           0x1b08
+#define P_K95_NRGB_STR       "1b08"
+#define P_K95_PLATINUM       0x1b2d
+#define P_K95_PLATINUM_STR   "1b2d"
+#define IS_K95(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K90_NRGB || (kb)->product == P_K95 || (kb)->product == P_K95_NRGB || (kb)->product == P_K95_PLATINUM))
 
-#define P_M65           0x1b12
-#define P_M65_STR       "1b12"
-#define P_M65_PRO       0x1b2e
-#define P_M65_PRO_STR   "1b2e"
-#define IS_M65(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO))
+#define P_STRAFE             0x1b20
+#define P_STRAFE_STR         "1b20"
+#define P_STRAFE_NRGB        0x1b15
+#define P_STRAFE_NRGB_STR    "1b15"
+#define P_STRAFE_NRGB_2      0x1b44
+#define P_STRAFE_NRGB_2_STR  "1b44"
+#define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2))
 
-#define P_SABRE_O       0x1b14  /* optical */
-#define P_SABRE_O_STR   "1b14"
-#define P_SABRE_L       0x1b19  /* laser */
-#define P_SABRE_L_STR   "1b19"
-#define P_SABRE_N       0x1b2f  /* new? */
-#define P_SABRE_N_STR   "1b2f"
-#define P_SABRE_O2      0x1b32 /* Observed on a CH-9000111-EU model SABRE */
-#define P_SABRE_O2_STR  "1b32"
-#define IS_SABRE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
+#define P_M65                0x1b12
+#define P_M65_STR            "1b12"
+#define P_M65_PRO            0x1b2e
+#define P_M65_PRO_STR        "1b2e"
+#define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO))
 
-#define P_SCIMITAR          0x1b1e
-#define P_SCIMITAR_STR      "1b1e"
-#define P_SCIMITAR_PRO      0x1b3e
-#define P_SCIMITAR_PRO_STR  "1b3e"
-#define IS_SCIMITAR(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
+#define P_SABRE_O            0x1b14  /* optical */
+#define P_SABRE_O_STR        "1b14"
+#define P_SABRE_L            0x1b19  /* laser */
+#define P_SABRE_L_STR        "1b19"
+#define P_SABRE_N            0x1b2f  /* new? */
+#define P_SABRE_N_STR        "1b2f"
+#define P_SABRE_O2           0x1b32 /* Observed on a CH-9000111-EU model SABRE */
+#define P_SABRE_O2_STR       "1b32"
+#define IS_SABRE(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
 
-#define P_HARPOON           0x1b3c
-#define P_HARPOON_STR       "1b3c"
-#define IS_HARPOON(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_HARPOON)
+#define P_SCIMITAR           0x1b1e
+#define P_SCIMITAR_STR       "1b1e"
+#define P_SCIMITAR_PRO       0x1b3e
+#define P_SCIMITAR_PRO_STR   "1b3e"
+#define IS_SCIMITAR(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO))
 
-#define P_GLAIVE            0x1b34
-#define P_GLAIVE_STR        "1b34"
-#define IS_GLAIVE(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
+#define P_HARPOON            0x1b3c
+#define P_HARPOON_STR        "1b3c"
+#define IS_HARPOON(kb)       ((kb)->vendor == V_CORSAIR && (kb)->product == P_HARPOON)
 
-#define P_POLARIS           0x1b3b
-#define P_POLARIS_STR       "1b3b"
-#define IS_POLARIS(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
+#define P_GLAIVE             0x1b34
+#define P_GLAIVE_STR         "1b34"
+#define IS_GLAIVE(kb)        ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
+
+#define P_POLARIS            0x1b3b
+#define P_POLARIS_STR        "1b3b"
+#define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
 ///
 /// Uncomment to see USB packets sent to the device
@@ -158,7 +162,7 @@ const char* product_str(short product);
 /// RGB vs non-RGB test
 /// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol.
 /// The difference is denoted with the "monochrome" feature).
-#define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB))
+#define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB) && (product) != (P_K90_NRGB))
 
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.

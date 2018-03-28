@@ -402,7 +402,7 @@ elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "OpenRC")
         GROUP_READ             GROUP_EXECUTE
         WORLD_READ             WORLD_EXECUTE)
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "unknown")
-    message(FATAL_ERROR "No supported system service detected.
+    message(WARNING "No supported system service detected.
     Supported services are: systemd, launchd, OpenRC, upstart.")
 endif ()
 

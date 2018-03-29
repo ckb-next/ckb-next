@@ -61,15 +61,15 @@ const char* vendor_str(short vendor){
 /// product_str() needs the \a product \a ID
 ///
 const char* product_str(short product){
-    if(product == P_K95 || product == P_K95_NRGB)
+    if(product == P_K95 || product == P_K95_LEGACY)
         return "k95";
     if(product == P_K95_PLATINUM)
         return "k95p";
-    if(product == P_K70 || product == P_K70_NRGB || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
+    if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
     if(product == P_K68 || product == P_K68_NRGB)
         return "k68";
-    if(product == P_K65 || product == P_K65_NRGB || product == P_K65_LUX || product == P_K65_RFIRE)
+    if(product == P_K65 || product == P_K65_LEGACY || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";
     if(product == P_K63_NRGB)
         return "k63";
@@ -107,16 +107,16 @@ const char* product_str(short product){
 /// \todo Is the last point really a good decision and always correct?
 ///
 static const devcmd* get_vtable(short vendor, short product){
-    // return IS_MOUSE(vendor, product) ? &vtable_mouse : IS_RGB(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
+    // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
     if(IS_MOUSE(vendor, product))
         return &vtable_mouse;
     else if(IS_MOUSEPAD(vendor, product))
         return &vtable_mousepad;
     else {
-        if(IS_RGB(vendor, product))
-            return &vtable_keyboard;
+        if(IS_LEGACY(vendor, product))
+            return &vtable_keyboard_legacy;
         else
-            return &vtable_keyboard_nonrgb;
+            return &vtable_keyboard;
     }
 }
 
@@ -245,7 +245,7 @@ static void* _setupusb(void* context){
     // Set standard fields
     short vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
-    kb->features = (IS_RGB(vendor, product) ? FEAT_STD_RGB : FEAT_STD_NRGB) & features_mask;
+    kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(IS_MOUSE(vendor, product)) kb->features |= FEAT_ADJRATE;
     if(IS_MONOCHROME(vendor, product)) kb->features |= FEAT_MONOCHROME;
     kb->usbdelay = USB_DELAY_DEFAULT;

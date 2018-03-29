@@ -17,11 +17,11 @@ keypatch k63patch[] = {
 #define K63PATCH_LEN sizeof(k63patch)/sizeof(*k63patch)
 
 keypatches mappatches[] = {
-    { P_K68,      k63patch, K63PATCH_LEN },
-    { P_K68_NRGB, k63patch, K63PATCH_LEN },
-    { P_K65,      k65patch, K65PATCH_LEN },
-    { P_K65_NRGB, k65patch, K65PATCH_LEN },
-    { P_K63_NRGB, k63patch, K63PATCH_LEN },
+    { P_K68,        k63patch, K63PATCH_LEN },
+    { P_K68_NRGB,   k63patch, K63PATCH_LEN },
+    { P_K65,        k65patch, K65PATCH_LEN },
+    { P_K65_LEGACY, k65patch, K65PATCH_LEN },
+    { P_K63_NRGB,   k63patch, K63PATCH_LEN },
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 

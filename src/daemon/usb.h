@@ -53,13 +53,13 @@
 
 #define P_K65                0x1b17
 #define P_K65_STR            "1b17"
-#define P_K65_NRGB           0x1b07
-#define P_K65_NRGB_STR       "1b07"
+#define P_K65_LEGACY         0x1b07
+#define P_K65_LEGACY_STR     "1b07"
 #define P_K65_LUX            0x1b37
 #define P_K65_LUX_STR        "1b37"
 #define P_K65_RFIRE          0x1b39
 #define P_K65_RFIRE_STR      "1b39"
-#define IS_K65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_NRGB || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
+#define IS_K65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_LEGACY || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
 #define P_K68                0x1b4f
 #define P_K68_STR            "1b4f"
@@ -69,8 +69,8 @@
 
 #define P_K70                0x1b13
 #define P_K70_STR            "1b13"
-#define P_K70_NRGB           0x1b09
-#define P_K70_NRGB_STR       "1b09"
+#define P_K70_LEGACY         0x1b09
+#define P_K70_LEGACY_STR     "1b09"
 #define P_K70_LUX            0x1b33
 #define P_K70_LUX_STR        "1b33"
 #define P_K70_LUX_NRGB	     0x1b36
@@ -79,19 +79,19 @@
 #define P_K70_RFIRE_STR      "1b38"
 #define P_K70_RFIRE_NRGB     0x1b3a
 #define P_K70_RFIRE_NRGB_STR "1b3a"
-#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_NRGB || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
 
-// The K90 NRGB behaves like a K95 NRGB.
-#define P_K90_NRGB           0x1b02
-#define P_K90_NRGB_STR       "1b02"
+// The Legacy K90 behaves like a Legacy K95.
+#define P_K90_LEGACY         0x1b02
+#define P_K90_LEGACY_STR     "1b02"
 
 #define P_K95                0x1b11
 #define P_K95_STR            "1b11"
-#define P_K95_NRGB           0x1b08
-#define P_K95_NRGB_STR       "1b08"
+#define P_K95_LEGACY         0x1b08
+#define P_K95_LEGACY_STR     "1b08"
 #define P_K95_PLATINUM       0x1b2d
 #define P_K95_PLATINUM_STR   "1b2d"
-#define IS_K95(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K90_NRGB || (kb)->product == P_K95 || (kb)->product == P_K95_NRGB || (kb)->product == P_K95_PLATINUM))
+#define IS_K95(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K90_LEGACY || (kb)->product == P_K95 || (kb)->product == P_K95_LEGACY || (kb)->product == P_K95_PLATINUM))
 
 #define P_STRAFE             0x1b20
 #define P_STRAFE_STR         "1b20"
@@ -162,21 +162,21 @@ const char* product_str(short product);
 /// RGB vs non-RGB test
 /// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol.
 /// The difference is denoted with the "monochrome" feature).
-#define IS_RGB(vendor, product)         ((vendor) == (V_CORSAIR) && (product) != (P_K65_NRGB) && (product) != (P_K70_NRGB) && (product) != (P_K95_NRGB) && (product) != (P_K90_NRGB))
+#define IS_LEGACY(vendor, product)      ((vendor) == (V_CORSAIR) && ((product) == (P_K65_LEGACY) || (product) == (P_K70_LEGACY) || (product) == P_K90_LEGACY || (product) == (P_K95_LEGACY)))
 
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
 /// Change this if new \b monochrome devices are added
 #define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K68_NRGB) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
 
-/// For calling with a usbdevice*, vendor and product are extracted and IS_RGB() is returned.
-#define IS_RGB_DEV(kb)                  IS_RGB((kb)->vendor, (kb)->product)
+/// For calling with a usbdevice*, vendor and product are extracted and IS_LEGACY() is returned.
+#define IS_LEGACY_DEV(kb)               IS_LEGACY((kb)->vendor, (kb)->product)
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MONOCHROME() is returned.
 #define IS_MONOCHROME_DEV(kb)           IS_MONOCHROME((kb)->vendor, (kb)->product)
 
 /// Full color range (16.8M) vs partial color range (512)
-#define IS_FULLRANGE(kb)                (IS_RGB((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
+#define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
 #define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON)))

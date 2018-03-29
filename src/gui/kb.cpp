@@ -14,7 +14,7 @@ static QSet<QString> notifyPaths;
 static QMutex notifyPathMutex;
 
 int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
-KeyMap::Layout Kb::_layout = KeyMap::NO_LAYOUT;
+KeyMap::Layout _layout = KeyMap::NO_LAYOUT;
 bool Kb::_dither = false, Kb::_mouseAccel = true, Kb::_delay = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
@@ -193,12 +193,12 @@ void Kb::frameRate(int newFrameRate){
     }
 }
 
-void Kb::layout(KeyMap::Layout newLayout, Kb* kb, bool stop){
+void Kb::layout(KeyMap::Layout newLayout, bool stop){
     if(newLayout == KeyMap::NO_LAYOUT || newLayout == _layout)
         return;
     _layout = newLayout;
     // Update the current device
-    kb->updateLayout(stop);
+    this->updateLayout(stop);
 }
 
 void Kb::updateLayout(bool stop){

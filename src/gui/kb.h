@@ -29,8 +29,8 @@ public:
     static inline int               frameRate()                         { return _frameRate; }
     static void                     frameRate(int newFrameRate);
     // Layout
-    static inline KeyMap::Layout    layout()                            { return _layout; }
-    static void                     layout(KeyMap::Layout newLayout, Kb* kb, bool stop);
+    inline KeyMap::Layout           layout()                            { return _layout; }
+    void                            layout(KeyMap::Layout newLayout, bool stop);
     // Layout string as reported by the daemon
     QString hwlayout;
     // Whether dithering is used (all devices)
@@ -165,7 +165,7 @@ private:
 
 private:
     // Following properties shouldn't be used by any other classes
-    static KeyMap::Layout _layout;
+    KeyMap::Layout _layout;
     void updateLayout(bool stop);
 
     static int _frameRate, _scrollSpeed;

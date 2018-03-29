@@ -92,7 +92,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
             }
             settings.setValue("hwLayout", KeyMap::getLayout(layout));
         }
-        Kb::layout(layout, device, false);
+        device->layout(layout, false);
         // Find the position of the layout in the QComboBox and set it
         int layoutpos = (int)layout;
         if(layout != KeyMap::NO_LAYOUT){
@@ -106,7 +106,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->layoutBox->setCurrentIndex(layoutpos);
     }
     else
-        Kb::layout(KeyMap::GB, device, false);
+        device->layout(KeyMap::GB, false);
 }
 
 KbWidget::~KbWidget(){
@@ -445,5 +445,5 @@ void KbWidget::on_layoutBox_activated(int index)
         return;
     QString layoutSettingsPath("Devices/%1/hwLayout");
     CkbSettings::set(layoutSettingsPath.arg(device->usbSerial), KeyMap::getLayout(layout));
-    Kb::layout(layout, device, true);
+    device->layout(layout, true);
 }

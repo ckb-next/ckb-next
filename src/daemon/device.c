@@ -48,6 +48,12 @@ int _start_dev(usbdevice* kb, int makeactive){
         }
     }
     ///
+    /// The Polaris doesn't support hardware profiles, so remove the FEAT_HWLOAD bit.
+    ///
+    if(IS_POLARIS(kb))
+        kb->features &= ~FEAT_HWLOAD;
+
+    ///
     /// - Now check if device needs a firmware update.
     /// If so, set it up and leave the function without error.
     ///

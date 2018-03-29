@@ -335,12 +335,13 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     color = monoRgb(qRed(color), qGreen(color), qBlue(color));
             }
             decPainter.setBrush(QBrush(color));
-            if (model == KeyMap::STRAFE) { // STRAFE custom design and special keys
+
+            if (model == KeyMap::STRAFE) {
                 float kx = key.x + offX - key.width / 2.f + 1.f;
                 float ky = key.y + offY - key.height / 2.f + 1.f;
                 float kw = key.width - 2.f;
                 float kh = key.height - 2.f;
-                decPainter.setPen(QPen(QColor(255, 255, 255), 1.2)); // less invasive outline to show the key color better
+
                 if(!strcmp(key.name, "logo")) { // stylized logo
                     float lx = key.x + offX - key.width / 2.f + 2.f;
                     float ly = key.y + offY - key.height / 2.f + 2.f;
@@ -352,8 +353,6 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     logo.quadTo((lx+lw)*scale,ly*scale,(lx+lw)*scale,(ly+lh)*scale);
                     logo.quadTo((lx+lw/2.f)*scale,(ly+lh-4.f)*scale,lx*scale,(ly+lh)*scale);
                     decPainter.drawPath(logo);
-                    //decPainter.setPen(QPen(Qt::green, 1.2)); //QColor(125,125,125)
-                    //decPainter.drawRect(QRectF(lx * scale, ly * scale, lw * scale, lh * scale)); // don't really know why the 12 and 24 make it work here, but they do
                 } else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")) { // Strafe side lights (toggle lights with no animation)
                     QRadialGradient gradient(QPointF(wWidth/2.f * ratio, wHeight/2.f * ratio), wWidth/2.f * ratio);//,QPointF(10, 5));
                     gradient.setColorAt(0, color);
@@ -362,11 +361,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     decPainter.setBrush(QBrush(gradient));
                     decPainter.setPen(QPen(keyColor, 1.2)); //QColor(125,125,125)
                     decPainter.drawRect(QRectF(kx * scale, ky * scale - 12 , kw * scale, kh * scale+24)); // don't really know why the 12 and 24 make it work here, but they do
-                } else if(_indicators.contains(key.name)) { // FIX: This check fails whenever _indicators is empty because "show animated" is unchecked
-                    decPainter.setPen(QPen(QColor(0,0,0,0), 1));    // no outline for the indicators, you can't change their color the standard way
-                    decPainter.drawRect(QRectF((kx+2.f) * scale, (ky+2.f) * scale, (kw-4.f) * scale, (kh-4.f) * scale)); // square indicators
-               } else //everything else is a circle, just a tad bigger to show the key color better
-                    decPainter.drawEllipse(QRectF((x-1.f) * scale, (y-1.f) * scale, (w+2.f) * scale, (h+2.f) * scale));
+                    decPainter.setPen(QPen(QColor(0,0,0,0), 1));
+                } else
+                    decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
             } else if (model == KeyMap::POLARIS) {
                 float kx = key.x + offX - key.width / 2.f + 2.f;
                 float ky = key.y + offY - key.height / 2.f + 2.f;

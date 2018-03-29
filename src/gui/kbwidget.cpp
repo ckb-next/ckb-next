@@ -52,6 +52,10 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->fwUpdLabel->hide();
         ui->fwUpdLayout->removeItem(ui->fwUpdLayout->itemAt(1));
     }
+    // Remove binding tab if the device doesn't support it
+    if(!device->features.contains("bind")){
+        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->bindTab));
+    }
     // Set monochrome mode according to hardware
     if(device->monochrome)
         ui->lightWidget->setMonochrome();
@@ -61,8 +65,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
     }
     // Read keyboard layout
-    if(device->isKeyboard())
-    {
+    if(device->isKeyboard()){
         // Clear the "Default" value
         ui->layoutBox->clear();
 

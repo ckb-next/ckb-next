@@ -48,6 +48,12 @@ int _start_dev(usbdevice* kb, int makeactive){
         }
     }
     ///
+    /// SINGLE EP devices do not have any input, thus do not supporting binding.
+    ///
+    if(IS_SINGLE_EP(kb))
+        kb->features &= ~FEAT_BIND;
+    
+    ///
     /// The Polaris doesn't support hardware profiles, so remove the FEAT_HWLOAD bit.
     ///
     if(IS_POLARIS(kb))

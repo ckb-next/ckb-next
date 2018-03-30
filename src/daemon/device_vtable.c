@@ -193,7 +193,7 @@ const devcmd vtable_mouse = {
 const devcmd vtable_mousepad = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
-    .fwupdate = cmd_io_none,
+    .fwupdate = cmd_fwupdate,
     .pollrate = cmd_io_none,
 
     .active = cmd_active_mouse,

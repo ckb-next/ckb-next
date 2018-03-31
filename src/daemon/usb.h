@@ -133,7 +133,7 @@
 
 #define P_KATAR              0x1b22
 #define P_KATAR_STR          "1b22"
-#define IS_KATAR(kb)         ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
+#define IS_KATAR(kb)         ((kb)->vendor == V_CORSAIR && (kb)->product == P_KATAR)
 
 #define P_POLARIS            0x1b3b
 #define P_POLARIS_STR        "1b3b"

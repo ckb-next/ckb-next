@@ -774,6 +774,7 @@ static _model models[] = {
     { P_SCIMITAR_PRO_STR, P_SCIMITAR_PRO },
     { P_SABRE_O2_STR, P_SABRE_O2 },
     { P_HARPOON_STR, P_HARPOON },
+    { P_KATAR_STR, P_KATAR },
     // Mousepads
     { P_POLARIS_STR, P_POLARIS }
 };

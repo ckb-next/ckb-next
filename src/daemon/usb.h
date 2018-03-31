@@ -131,6 +131,10 @@
 #define P_GLAIVE_STR         "1b34"
 #define IS_GLAIVE(kb)        ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
 
+#define P_KATAR              0x1b22
+#define P_KATAR_STR          "1b22"
+#define IS_KATAR(kb)         ((kb)->vendor == V_CORSAIR && (kb)->product == P_GLAIVE)
+
 #define P_POLARIS            0x1b3b
 #define P_POLARIS_STR        "1b3b"
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
@@ -179,7 +183,7 @@ const char* product_str(short product);
 #define IS_FULLRANGE(kb)                (IS_RGB((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_KATAR)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -192,7 +196,7 @@ const char* product_str(short product);
 #define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68)
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
-#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb))
+#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb))
 
 /// Used for devices that have a single IN endpoint, and no HID input
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb))

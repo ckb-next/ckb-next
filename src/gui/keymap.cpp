@@ -304,7 +304,7 @@ static const Key HarpoonKeys[] = {
     {0, "Wheel Up", "wheelup", 25, 7, 6, 5, false, true}, {0, "Wheel Down", "wheeldn", 25, 17, 6, 5, false, true},
     {0, "DPI Cycle", "dpiup", 25, 23, 6, 10, false, true}, {0, "Logo Light", "dpi", 17, 40, 20, 20, true, false},
     {0, "Forward", "mouse5", 3, 24, 5, 10, false, true}, {0, "Back", "mouse4", 3, 33, 5, 10, false, true}
-    };
+};
 #define KEYCOUNT_HARPOON  (sizeof(HarpoonKeys) / sizeof(Key))
 
 #define HARPOON_WIDTH     M65_WIDTH
@@ -316,11 +316,19 @@ static const Key GlaiveKeys[] = {
     {0, "Wheel Up", "wheelup", 31, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 31, 15, 7, 5, false, true}, {0, "Side Lights", "side", 22, 24, 7, 20, true, false},
     {0, "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {0, "Logo Light", "back", 24, 43, 20, 20, true, false},
     {0, "Forward", "mouse5", 15, 22, 5, 11, false, true}, {0, "Back", "mouse4", 15, 32, 5, 11, false, true}
-    };
+};
 #define KEYCOUNT_GLAIVE  (sizeof(GlaiveKeys) / sizeof(Key))
 
 #define GLAIVE_WIDTH     M65_WIDTH
 #define GLAIVE_HEIGHT    M65_HEIGHT
+
+// Katar
+static const Key KatarKeys[] = {
+    {0, "Left Mouse", "mouse1", 7, 4, 14, 18, false, true}, {0, "Right Mouse", "mouse2", 28, 4, 14, 18, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 7, 7, false, true},
+    {0, "Wheel Up", "wheelup", 22, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 15, 7, 5, false, true}, 
+    {0, "DPI Cycle", "dpiup", 22, 19, 6, 12, false, true}, {0, "Logo Light", "front", 15, 43, 20, 20, true, false},
+};
+#define KEYCOUNT_KATAR  (sizeof(KatarKeys) / sizeof(Key))
 
 // Scimitar
 static const Key ScimKeys[] = {
@@ -719,6 +727,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::KATAR:{
+        // Katar
+        for(const Key* key = KatarKeys; key < KatarKeys + KEYCOUNT_KATAR; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     case KeyMap::POLARIS:{
         // MM800 Polaris Mousepad
         for(const Key* key = PolarisZones; key < PolarisZones + KEYCOUNT_POLARIS; key++){
@@ -947,6 +965,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return HARPOON;
     if(lower == "glaive")
         return GLAIVE;
+    if(lower == "katar")
+        return KATAR;
     if(lower == "polaris")
         return POLARIS;
     return NO_MODEL;
@@ -980,6 +1000,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "harpoon";
     case GLAIVE:
         return "glaive";
+    case KATAR:
+        return "katar";
     case POLARIS:
         return "polaris";
     default:
@@ -1016,6 +1038,7 @@ int KeyMap::modelWidth(Model model){
     case SCIMITAR:
     case HARPOON:
     case GLAIVE:
+    case KATAR:
     case POLARIS:
         return M65_WIDTH;
     default:
@@ -1040,6 +1063,7 @@ int KeyMap::modelHeight(Model model){
     case SCIMITAR:
     case HARPOON:
     case GLAIVE:
+    case KATAR:
     case POLARIS:
         return M65_HEIGHT;
     default:

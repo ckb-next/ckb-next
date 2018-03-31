@@ -87,6 +87,8 @@ const char* product_str(short product){
         return "harpoon";
     if(product == P_GLAIVE)
         return "glaive";
+    if(product == P_KATAR)
+        return "katar";
     if(product == P_POLARIS)
         return "polaris";
     return "";

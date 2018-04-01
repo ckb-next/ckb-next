@@ -32,7 +32,7 @@ extern pthread_cond_t macrovar[DEV_MAX];
 // Sets up device hardware, after software initialization is finished. Also used during resets
 // Should be called only from setupusb/resetusb
 int start_dev(usbdevice* kb, int makeactive);
-int start_kb_nrgb(usbdevice* kb, int makeactive);
+int start_kb_legacy(usbdevice* kb, int makeactive);
 
 // Activates/deactives software control on a keyboard. Return 0 on success
 int setactive_kb(usbdevice* kb, int active);
@@ -54,7 +54,7 @@ int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const
 int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 
 // Sets a device's current mode index. This is only used on the non-RGB K95; the RGB keyboards have no gettable HW index.
-void setmodeindex_nrgb(usbdevice* kb, int index);
+void setmodeindex_legacy(usbdevice* kb, int index);
 
 
 // Per-key input settings for device setup

@@ -150,7 +150,7 @@ typedef struct {
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL | FEAT_HWLOAD)
 #define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)
-#define FEAT_STD_NRGB   (FEAT_COMMON)
+#define FEAT_STD_LEGACY (FEAT_COMMON)
 #define FEAT_LMASK      (FEAT_ANSI | FEAT_ISO)
 
 // Feature test (usbdevice* kb, int feat)
@@ -177,7 +177,7 @@ typedef struct {
 
 // vtables for keyboards/mice (see command.h)
 extern const union devcmd vtable_keyboard;
-extern const union devcmd vtable_keyboard_nonrgb;
+extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mousepad;
 

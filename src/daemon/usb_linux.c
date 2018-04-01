@@ -211,7 +211,7 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
 /// \see usb.h
 ///
 int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
-    if(kb->product != P_K95_NRGB)
+    if(kb->product != P_K95_LEGACY)
         return 0;
     struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 5000, 0 };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
@@ -280,7 +280,7 @@ void* os_inputmain(void* context){
     ///
     /// Monitor input transfers on all endpoints for non-RGB devices
     /// For RGB, monitor all but the last, as it's used for input/output
-    int urbcount = IS_RGB(vendor, product) ? (kb->epcount - 1) : kb->epcount;
+    int urbcount = !IS_LEGACY(vendor, product) ? (kb->epcount - 1) : kb->epcount;
     if (urbcount == 0) {
         ckb_err("urbcount = 0, so there is nothing to claim in os_inputmain()\n");
         return 0;
@@ -380,16 +380,16 @@ void* os_inputmain(void* context){
         ///
         if (urb) {
 
-            /// Process the input depending on type of device. Interprete the actual size of the URB buffer
+            /// Process the input depending on type of device. Interpret the actual size of the URB buffer
             ///
             /// device | detect with macro combination | seems to be endpoint # | actual buffer-length | function called
             /// ------ | ----------------------------- | ---------------------- | -------------------- | ---------------
             /// mouse (RGB and non RGB) | IS_MOUSE | nA | 8, 10 or 11 | hid_mouse_translate()
             /// mouse (RGB and non RGB) | IS_MOUSE | nA | MSG_SIZE (64) | corsair_mousecopy()
-            /// RGB Keyboard | IS_RGB && !IS_MOUSE | 1 | 8 (BIOS Mode) | hid_kb_translate()
-            /// RGB Keyboard | IS_RGB && !IS_MOUSE | 2 | 5 or 21, KB inactive! | hid_kb_translate()
-            /// RGB Keyboard | IS_RGB && !IS_MOUSE | 3? | MSG_SIZE | corsair_kbcopy()
-            /// non RGB Keyboard | !IS_RGB && !IS_MOUSE | nA | nA | hid_kb_translate()
+            /// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 1 | 8 (BIOS Mode) | hid_kb_translate()
+            /// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 2 | 5 or 21, KB inactive! | hid_kb_translate()
+            /// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 3? | MSG_SIZE | corsair_kbcopy()
+            /// Legacy Keyboard | IS_LEGACY && !IS_MOUSE | nA | nA | hid_kb_translate()
             ///
             pthread_mutex_lock(imutex(kb));
             uchar* urb_buffer = (uchar*)urb->buffer;
@@ -420,7 +420,7 @@ void* os_inputmain(void* context){
                         corsair_mousecopy(kb->input.keys, -urbendpoint, urb->buffer);
                         break;
                     }
-                } else if(IS_RGB(vendor, product)){
+                } else if(!IS_LEGACY(vendor, product)){
                     switch(urb->actual_length){
                     case 8:
                         // RGB EP 1: 6KRO (BIOS mode) input
@@ -745,20 +745,20 @@ static _model models[] = {
     { P_K55_STR, P_K55 },
     { P_K63_NRGB_STR, P_K63_NRGB },
     { P_K65_STR, P_K65 },
-    { P_K65_NRGB_STR, P_K65_NRGB },
+    { P_K65_LEGACY_STR, P_K65_LEGACY },
     { P_K65_LUX_STR, P_K65_LUX },
     { P_K65_RFIRE_STR, P_K65_RFIRE },
     { P_K68_STR, P_K68 },
     { P_K68_NRGB_STR, P_K68_NRGB },
     { P_K70_STR, P_K70 },
-    { P_K70_NRGB_STR, P_K70_NRGB },
+    { P_K70_LEGACY_STR, P_K70_LEGACY },
     { P_K70_LUX_STR, P_K70_LUX },
     { P_K70_LUX_NRGB_STR, P_K70_LUX_NRGB },
     { P_K70_RFIRE_STR, P_K70_RFIRE },
     { P_K70_RFIRE_NRGB_STR, P_K70_RFIRE_NRGB },
-    { P_K90_NRGB_STR, P_K90_NRGB },
+    { P_K90_LEGACY_STR, P_K90_LEGACY },
     { P_K95_STR, P_K95 },
-    { P_K95_NRGB_STR, P_K95_NRGB },
+    { P_K95_LEGACY_STR, P_K95_LEGACY },
     { P_K95_PLATINUM_STR, P_K95_PLATINUM },
     { P_STRAFE_STR, P_STRAFE },
     { P_STRAFE_NRGB_STR, P_STRAFE_NRGB },

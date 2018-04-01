@@ -95,8 +95,8 @@ const devcmd vtable_keyboard = {
     .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
-// Non-RGB keyboard vtable (K70)
-const devcmd vtable_keyboard_nonrgb = {
+// Legacy keyboard vtable (K70)
+const devcmd vtable_keyboard_legacy = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
     .fwupdate = cmd_io_none,
@@ -132,12 +132,12 @@ const devcmd vtable_keyboard_nonrgb = {
     .get = cmd_get,
     .restart = cmd_restart,
 
-    .start = start_kb_nrgb,
-    .setmodeindex = setmodeindex_nrgb,          ///< this is special for non RGBs
+    .start = start_kb_legacy,
+    .setmodeindex = setmodeindex_legacy,        ///< This is special for legacy keyboards
     .allocprofile = allocprofile,
     .loadprofile = loadprofile_none,
     .freeprofile = freeprofile,
-    .updatergb = int1_int_none,                 ///< non RGB keyboards do not have an rgb update function
+    .updatergb = int1_int_none,                 ///< Legacy keyboards do not have an rgb update function
     .updateindicators = updateindicators_kb,
     .updatedpi = int1_int_none                  ///< This is for mice only
 };

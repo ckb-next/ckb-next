@@ -6,7 +6,7 @@
 #include "profile.h"
 #include "usb.h"
 
-int start_kb_nrgb(usbdevice* kb, int makeactive){
+int start_kb_legacy(usbdevice* kb, int makeactive){
     (void)makeactive;
 
     // Put the non-RGB K95 into software mode. Nothing else needs to be done hardware wise
@@ -129,7 +129,7 @@ int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const ch
     return setactive_kb(kb, 0);
 }
 
-void setmodeindex_nrgb(usbdevice *kb, int index){
+void setmodeindex_legacy(usbdevice *kb, int index){
     switch(index % 3){
     case 0:
         nk95cmd(kb, NK95_M1);

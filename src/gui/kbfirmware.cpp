@@ -12,7 +12,7 @@ KbFirmware KbFirmware::instance;
 KbFirmware::FW::FW() : fwVersion(0.f), ckbVersion(0.f) {}
 
 KbFirmware::KbFirmware() :
-    lastCheck(0), lastFinished(0), networkManager(0), tableDownload(0), hasGPG(UNKNOWN)
+    lastCheck(0), lastFinished(0), tableDownload(0), hasGPG(UNKNOWN)
 {
     // Disable bearer polling. This corrects an issue with latency spikes when
     // using WiFi. The problem and workaround are described here:

@@ -729,57 +729,6 @@ static struct udev* udev;   ///< struct udef is defined in /usr/include/libudev.
 /// \todo These two thread vasriables seem to be unused: usbtread, udevthread
 pthread_t usbthread, udevthread;
 
-// String -> numeric model map
-typedef struct {
-    const char* name;
-    short number;
-} _model;
-///
-/// \attention when adding new hardware this file hat to be changed too.
-///
-/// In this structure array \a models[] for each device the name
-/// (the device id as string in hex without leading 0x)
-/// and its usb device id as short must be entered in this array.
-static _model models[] = {
-    // Keyboards
-    { P_K55_STR, P_K55 },
-    { P_K63_NRGB_STR, P_K63_NRGB },
-    { P_K65_STR, P_K65 },
-    { P_K65_LEGACY_STR, P_K65_LEGACY },
-    { P_K65_LUX_STR, P_K65_LUX },
-    { P_K65_RFIRE_STR, P_K65_RFIRE },
-    { P_K68_STR, P_K68 },
-    { P_K68_NRGB_STR, P_K68_NRGB },
-    { P_K70_STR, P_K70 },
-    { P_K70_LEGACY_STR, P_K70_LEGACY },
-    { P_K70_LUX_STR, P_K70_LUX },
-    { P_K70_LUX_NRGB_STR, P_K70_LUX_NRGB },
-    { P_K70_RFIRE_STR, P_K70_RFIRE },
-    { P_K70_RFIRE_NRGB_STR, P_K70_RFIRE_NRGB },
-    { P_K90_LEGACY_STR, P_K90_LEGACY },
-    { P_K95_STR, P_K95 },
-    { P_K95_LEGACY_STR, P_K95_LEGACY },
-    { P_K95_PLATINUM_STR, P_K95_PLATINUM },
-    { P_STRAFE_STR, P_STRAFE },
-    { P_STRAFE_NRGB_STR, P_STRAFE_NRGB },
-    { P_STRAFE_NRGB_2_STR, P_STRAFE_NRGB_2 },
-    // Mice
-    { P_M65_STR, P_M65 },
-    { P_M65_PRO_STR, P_M65_PRO },
-    { P_GLAIVE_STR, P_GLAIVE },
-    { P_SABRE_O_STR, P_SABRE_O },
-    { P_SABRE_L_STR, P_SABRE_L },
-    { P_SABRE_N_STR, P_SABRE_N },
-    { P_SCIMITAR_STR, P_SCIMITAR },
-    { P_SCIMITAR_PRO_STR, P_SCIMITAR_PRO },
-    { P_SABRE_O2_STR, P_SABRE_O2 },
-    { P_HARPOON_STR, P_HARPOON },
-    { P_KATAR_STR, P_KATAR },
-    // Mousepads
-    { P_POLARIS_STR, P_POLARIS }
-};
-#define N_MODELS (sizeof(models) / sizeof(_model))
-
 ///
 /// \brief Add a udev device. Returns 0 if device was recognized/added.
 /// \brief If the device id can be found, call usbadd() with the appropriate parameters.
@@ -790,15 +739,16 @@ static _model models[] = {
 /// get the idProduct on the same way.
 /// \n If we can find the model name in the model array,
 /// call usbadd() with the model number.
-/// \todo So why the hell not a transformation between the string and the short presentation? Lets check if the string representation is used elsewhere.
 static int usb_add_device(struct udev_device* dev){
     const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
     if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
         const char* product = udev_device_get_sysattr_value(dev, "idProduct");
         if(product){
-            for(_model* model = models; model < models + N_MODELS; model++){
-                if(!strcmp(product, model->name)){
-                    return usbadd(dev, V_CORSAIR, model->number);
+            ushort pid;
+            if(sscanf(product, "%04hx", &pid) && pid){
+                for(size_t c = 0; c < N_MODELS; c++){
+                    if(models[c] == pid)
+                        return usbadd(dev, V_CORSAIR, models[c]);
                 }
             }
         }

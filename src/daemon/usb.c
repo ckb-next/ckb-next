@@ -9,6 +9,45 @@
 #include "usb.h"
 #include "keymap_patch.h"
 
+ushort models[N_MODELS] = {
+    // Keyboards
+    P_K55,
+    P_K63_NRGB,
+    P_K65,
+    P_K65_LEGACY,
+    P_K65_LUX,
+    P_K65_RFIRE,
+    P_K68,
+    P_K68_NRGB,
+    P_K70,
+    P_K70_LEGACY,
+    P_K70_LUX,
+    P_K70_LUX_NRGB,
+    P_K70_RFIRE,
+    P_K70_RFIRE_NRGB,
+    P_K90_LEGACY,
+    P_K95,
+    P_K95_LEGACY,
+    P_K95_PLATINUM,
+    P_STRAFE,
+    P_STRAFE_NRGB,
+    P_STRAFE_NRGB_2,
+    // Mice
+    P_M65,
+    P_M65_PRO,
+    P_GLAIVE,
+    P_SABRE_O,
+    P_SABRE_L,
+    P_SABRE_N,
+    P_SCIMITAR,
+    P_SCIMITAR_PRO,
+    P_SABRE_O2,
+    P_HARPOON,
+    P_KATAR,
+    // Mousepads
+    P_POLARIS,
+};
+
 /// brief .
 ///
 /// \brief reset_stop is boolean: Reset stopper for when the program shuts down.

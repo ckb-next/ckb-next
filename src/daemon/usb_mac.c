@@ -910,12 +910,6 @@ release:
 
 int usbmain(){
     int vendor = V_CORSAIR;
-    int products[] = {
-        // Keyboards
-        P_K55, P_K63_NRGB, P_K65, P_K65_LEGACY, P_K65_LUX, P_K65_RFIRE, P_K68, P_K68_NRGB, P_K70, P_K70_LEGACY, P_K70_LUX, P_K70_LUX_NRGB, P_K70_RFIRE, P_K70_RFIRE_NRGB, P_K90_LEGACY, P_K95, P_K95_LEGACY, P_K95_PLATINUM, P_STRAFE, P_STRAFE_NRGB, P_STRAFE_NRGB_2,
-        // Mice
-        P_M65, P_M65_PRO, P_GLAIVE, P_SABRE_O, P_SABRE_L, P_SABRE_N, P_SCIMITAR, P_SCIMITAR_PRO, P_SABRE_O2, P_HARPOON, P_KATAR,
-    };
 
     // Setup global variables
     notify = IONotificationPortCreate(kIOMasterPortDefault);
@@ -935,8 +929,8 @@ int usbmain(){
     CFDictionarySetValue(match, CFSTR(kUSBVendorName), cfvendor);
     CFRelease(cfvendor);
     CFMutableArrayRef cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
-    for(uint i = 0; i < sizeof(products) / sizeof(int); i++){
-        int product = products[i];
+    for(size_t c = 0; c < N_MODELS; c++){
+        int product = models[c];
         CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
         CFArrayAppendValue(cfproducts, cfproduct);
         CFRelease(cfproduct);
@@ -961,8 +955,8 @@ int usbmain(){
     CFDictionarySetValue(match, CFSTR(kIOHIDVendorIDKey), cfvendor);
     CFRelease(cfvendor);
     cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
-    for(uint i = 0; i < sizeof(products) / sizeof(int); i++){
-        int product = products[i];
+    for(size_t c = 0; c < N_MODELS; c++){
+        int product = models[c];
         CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
         CFArrayAppendValue(cfproducts, cfproduct);
         CFRelease(cfproduct);

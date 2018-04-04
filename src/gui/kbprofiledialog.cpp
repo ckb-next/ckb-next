@@ -372,14 +372,23 @@ void KbProfileDialog::on_importButton_clicked(){
         QString metadataDevModel = metadata.value("model").toString();
         QString currentDevModel = KeyMap::getModel(device->model());
 
+        int currentDevLayout = (int)device->getCurrentLayout();
+        int metadataDevLayout = metadata.value("layout").toInt();
+
         if(currentDevModel != metadataDevModel ||
-           (int)device->getCurrentLayout() != metadata.value("layout").toInt()){
+            currentDevLayout != metadataDevLayout){
+
+            currentDevModel[0] = currentDevModel[0].toUpper();
+            metadataDevModel[0] = metadataDevModel[0].toUpper();
+
+            QString metadataDevLayoutStr = KeyMap::getLayout((KeyMap::Layout)metadataDevLayout).replace("_", " ").toUpper();
+            QString currentDevLayoutStr = KeyMap::getLayout((KeyMap::Layout)currentDevLayout).replace("_", " ").toUpper();
 
             // Only identical devices are supported for now, but let the user override this if they want
             int ret = QMessageBox::question(this, tr("Profile Import"),
-                                            QString(tr("This profile was created for a %1\nbut it is going to be imported to a %2.\n\n"
+                                            QString(tr("This profile was created for a %1 %2\nbut it is going to be imported to a %3 %4.\n\n"
                                                        "You may need to manually add some keys to the appropriate animations.\n\n"
-                                                       "Import Anyway?")).arg(metadataDevModel.toUpper(), currentDevModel.toUpper()),
+                                                       "Import Anyway?")).arg(metadataDevLayoutStr, metadataDevModel, currentDevLayoutStr, currentDevModel),
                                             QMessageBox::Yes,
                                             QMessageBox::No);
 

@@ -4,7 +4,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QMessageBox>
-#include "quazip/JlCompress.h"
+#include <JlCompress.h>
 #include <QCryptographicHash>
 #include <ckbnextconfig.h>
 

@@ -386,9 +386,9 @@ void KbProfileDialog::on_importButton_clicked(){
 
             // Only identical devices are supported for now, but let the user override this if they want
             int ret = QMessageBox::question(this, tr("Profile Import"),
-                                            QString(tr("This profile was created for a %1 %2\nbut it is going to be imported to a %3 %4.\n\n"
+                                            QString(tr("This profile was created for a %1 (%2)\nbut it is going to be imported to a %3 (%4).\n\n"
                                                        "You may need to manually add some keys to the appropriate animations.\n\n"
-                                                       "Import Anyway?")).arg(metadataDevLayoutStr, metadataDevModel, currentDevLayoutStr, currentDevModel),
+                                                       "Import Anyway?")).arg(metadataDevModel, metadataDevLayoutStr, currentDevModel, currentDevLayoutStr),
                                             QMessageBox::Yes,
                                             QMessageBox::No);
 

@@ -242,7 +242,7 @@ void KbProfileDialog::on_exportButton_clicked(){
         KbProfile* prof = device->find(item->data(GUID).toUuid());
 
         QString tmp("/tmp/ckbprofile");
-        tmp.append(QString::number(p)); // TODO: tmp.append(profname.toLower());
+        tmp.append(QString::number(p));
         tmp.append(".ini");
 
         // Used to make sure QSettings is destroyed before trying to hash the ini
@@ -378,7 +378,7 @@ void KbProfileDialog::on_importButton_clicked(){
             // Only identical devices are supported for now, but let the user override this if they want
             int ret = QMessageBox::question(this, tr("Profile Import"),
                                             QString(tr("This profile was created for a %1\nbut it is going to be imported to a %2.\n\n"
-                                                       "This is not officially supported at the moment.\n\n"
+                                                       "You may need to manually add some keys to the appropriate animations.\n\n"
                                                        "Import Anyway?")).arg(metadataDevModel.toUpper(), currentDevModel.toUpper()),
                                             QMessageBox::Yes,
                                             QMessageBox::No);
@@ -482,7 +482,7 @@ void KbProfileDialog::on_importButton_clicked(){
 }
 
 void KbProfileDialog::on_profileList_itemSelectionChanged(){
-    // Only change the profile is a single item is selected
+    // Only change the profile if a single item is selected
     if(ui->profileList->selectedItems().count() > 1)
         return;
 

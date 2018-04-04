@@ -12,8 +12,8 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
     hwprofile* hw = calloc(1, sizeof(hwprofile));
     // Ask for profile and mode IDs
     uchar data_pkt[2][MSG_SIZE] = {
-        { 0x0e, 0x15, 0x01, 0 },
-        { 0x0e, 0x16, 0x01, 0 }
+        { CMD_GET, FIELD_M_PROFID, 0x01, 0 },
+        { CMD_GET, FIELD_M_PROFNM, 0x01, 0 }
     };
     uchar in_pkt[MSG_SIZE];
     for(int i = 0; i <= 1; i++){
@@ -64,8 +64,8 @@ int cmd_hwsave_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
     nativetohw(kb->profile, hw, 1);
     // Save the profile and mode names
     uchar data_pkt[2][MSG_SIZE] = {
-        { 0x07, 0x16, 0x01, 0 },
-        { 0x07, 0x15, 0x01, 0 },
+        { CMD_SET, FIELD_M_PROFNM, 0x01, 0 },
+        { CMD_SET, FIELD_M_PROFID, 0x01, 0 },
     };
     for(int i = 0; i <= 1; i++){
         data_pkt[0][3] = i;

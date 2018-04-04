@@ -131,7 +131,7 @@ int updatedpi(usbdevice* kb, int force){
                 // requested flags after switching stages.
                 newenabled = lastdpi->enabled | 1 << newdpi->current;
             }
-            uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x05, 0, newenabled };
+            uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIMASK, 0, newenabled };
             if(!usbsend(kb, data_pkt, 1))
                 return -2;
             // Cache the flags we wrote.
@@ -140,7 +140,7 @@ int updatedpi(usbdevice* kb, int force){
         // Set the DPI for the new stage if necessary.
         if (newdpi->x[newdpi->current] != lastdpi->x[newdpi->current] ||
             newdpi->y[newdpi->current] != lastdpi->y[newdpi->current]) {
-            uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 0 };
+            uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
             data_pkt[2] |= newdpi->current;
             data_pkt[5] = newdpi->x[newdpi->current] & 0xFF;
             data_pkt[6] = (newdpi->x[newdpi->current] >> 8) & 0xFF;
@@ -153,7 +153,7 @@ int updatedpi(usbdevice* kb, int force){
             lastdpi->y[newdpi->current] = newdpi->y[newdpi->current];
         }
         // Set current DPI stage.
-        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x02, 0, newdpi->current };
+        uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPI, 0, newdpi->current };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
     }
@@ -163,7 +163,7 @@ int updatedpi(usbdevice* kb, int force){
     for(int i = 0; i < DPI_COUNT; i++){
         if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i])
             continue;
-        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 0 };
+        uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
         data_pkt[2] |= i;
         data_pkt[5] = newdpi->x[i] & 0xFF;
         data_pkt[6] = (newdpi->x[i] >> 8) & 0xFF;
@@ -175,17 +175,17 @@ int updatedpi(usbdevice* kb, int force){
 
     // Send settings
     if (newdpi->enabled != lastdpi->enabled) {
-        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x05, 0, newdpi->enabled };
+        uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIMASK, 0, newdpi->enabled };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
     }
     if (newdpi->lift != lastdpi->lift) {
-        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x03, 0, newdpi->lift };
+        uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_LIFT, 0, newdpi->lift };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
     }
     if (newdpi->snap != lastdpi->snap) {
-        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x04, 0, newdpi->snap, 0x05 };
+        uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_SNAP, 0, newdpi->snap, 0x05 };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
     }
@@ -198,7 +198,7 @@ int updatedpi(usbdevice* kb, int force){
 int savedpi(usbdevice* kb, dpiset* dpi, lighting* light){
     // Send X/Y DPIs
     for(int i = 0; i < DPI_COUNT; i++){
-        uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0xd0, 1 };
+        uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 1 };
         data_pkt[2] |= i;
         data_pkt[5] = dpi->x[i] & 0xFF;
         data_pkt[6] = (dpi->x[i] >> 8) & 0xFF;
@@ -214,10 +214,10 @@ int savedpi(usbdevice* kb, dpiset* dpi, lighting* light){
 
     // Send settings
     uchar data_pkt[4][MSG_SIZE] = {
-        { 0x07, 0x13, 0x05, 1, dpi->enabled },
-        { 0x07, 0x13, 0x02, 1, dpi->current },
-        { 0x07, 0x13, 0x03, 1, dpi->lift },
-        { 0x07, 0x13, 0x04, 1, dpi->snap, 0x05 }
+        { CMD_SET, FIELD_MOUSE, MOUSE_DPIMASK, 1, dpi->enabled },
+        { CMD_SET, FIELD_MOUSE, MOUSE_DPI, 1, dpi->current },
+        { CMD_SET, FIELD_MOUSE, MOUSE_LIFT, 1, dpi->lift },
+        { CMD_SET, FIELD_MOUSE, MOUSE_SNAP, 1, dpi->snap, 0x05 }
     };
     if(!usbsend(kb, data_pkt[0], 4))
         return -2;
@@ -228,10 +228,10 @@ int savedpi(usbdevice* kb, dpiset* dpi, lighting* light){
 int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
     // Ask for settings
     uchar data_pkt[4][MSG_SIZE] = {
-        { 0x0e, 0x13, 0x05, 1, },
-        { 0x0e, 0x13, 0x02, 1, },
-        { 0x0e, 0x13, 0x03, 1, },
-        { 0x0e, 0x13, 0x04, 1, }
+        { CMD_GET, FIELD_MOUSE, MOUSE_DPIMASK, 1, },
+        { CMD_GET, FIELD_MOUSE, MOUSE_DPI, 1, },
+        { CMD_GET, FIELD_MOUSE, MOUSE_LIFT, 1, },
+        { CMD_GET, FIELD_MOUSE, MOUSE_SNAP, 1, }
     };
     uchar in_pkt[4][MSG_SIZE];
     for(int i = 0; i < 4; i++){
@@ -255,7 +255,7 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
 
     // Get X/Y DPIs
     for(int i = 0; i < DPI_COUNT; i++){
-        uchar data_pkt[MSG_SIZE] = { 0x0e, 0x13, 0xd0, 1 };
+        uchar data_pkt[MSG_SIZE] = { CMD_GET, FIELD_MOUSE, MOUSE_DPIPROF, 1 };
         uchar in_pkt[MSG_SIZE];
         data_pkt[2] |= i;
         if(!usbrecv(kb, data_pkt, in_pkt))

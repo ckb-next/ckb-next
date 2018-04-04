@@ -1,9 +1,11 @@
 #ifndef USB_H
 #define USB_H
 
+#include <ckbnextconfig.h>
+
 #include "includes.h"
 #include "keymap.h"
-#include <ckbnextconfig.h>
+#include "protocol.h"
 
 /// \file usb.h
 /// Definitions for using USB interface

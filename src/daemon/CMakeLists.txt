@@ -95,6 +95,7 @@ if (MACOS OR LINUX)
               notify.h
               os.h
               profile.h
+              protocol.h
               structures.h
               usb.h)
 endif ()

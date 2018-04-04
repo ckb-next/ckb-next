@@ -32,8 +32,8 @@ int updatergb_mouse(usbdevice* kb, int force){
     int num_zones = IS_GLAIVE(kb) ? 3 : N_MOUSE_ZONES;
     // Send the RGB values for each zone to the mouse
     uchar data_pkt[2][MSG_SIZE] = {
-        { 0x07, 0x22, num_zones, 0x01, 0 }, // RGB colors
-        { 0x07, 0x05, 0x02, 0 }                 // Lighting on/off
+        { CMD_SET, FIELD_M_COLOR, num_zones, 0x01, 0 }, // RGB colors
+        { CMD_SET, FIELD_LIGHTING, MODE_SOFTWARE, 0 }   // Lighting on/off
     };
     uchar* rgb_data = &data_pkt[0][4];
     for(int i = 0; i < N_MOUSE_ZONES; i++){
@@ -54,7 +54,7 @@ int updatergb_mouse(usbdevice* kb, int force){
             return -1;
     } else if(was_black || force){
         // If the lighting WAS black, or if we're on forced update, send the activation packet
-        data_pkt[1][4] = 1;
+        data_pkt[1][4] = MODE_HARDWARE;
         if(!usbsend(kb, data_pkt[1], 1))
             return -1;
     }
@@ -66,7 +66,7 @@ int updatergb_mouse(usbdevice* kb, int force){
 int savergb_mouse(usbdevice* kb, lighting* light, int mode){
     (void)mode;
 
-    uchar data_pkt[MSG_SIZE] = { 0x07, 0x13, 0x10, 1, 0 };
+    uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_HWCOLOR, 1, 0 };
     // Save each RGB zone, minus the DPI light which is sent in the DPI packets
     int zonecount = IS_SCIMITAR(kb) ? 4 : IS_SABRE(kb) ? 3 : 2;
     for(int i = 0; i < zonecount; i++){
@@ -87,7 +87,7 @@ int savergb_mouse(usbdevice* kb, lighting* light, int mode){
 int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
     (void)mode;
 
-    uchar data_pkt[MSG_SIZE] = { 0x0e, 0x13, 0x10, 1, 0 };
+    uchar data_pkt[MSG_SIZE] = { CMD_GET, FIELD_MOUSE, MOUSE_HWCOLOR, 1, 0 };
     uchar in_pkt[MSG_SIZE] = { 0 };
     // Load each RGB zone
     int zonecount = IS_SCIMITAR(kb) ? 4 : IS_SABRE(kb) ? 3 : 2;

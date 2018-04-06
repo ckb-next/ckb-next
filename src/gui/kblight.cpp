@@ -471,6 +471,77 @@ void KbLight::save(CkbSettings& settings){
     }
 }
 
+void KbLight::lightExport(QSettings* settings){
+    settings->beginGroup("Lighting");
+    settings->setValue("KeyMap", _map.name());
+    settings->setValue("Brightness", _dimming);
+    settings->setValue("UseRealNames", true);
+    {
+        // Save RGB settings
+        settings->beginGroup("Keys");
+        QMutableColorMapIterator i(_qColorMap);
+        while(i.hasNext()){
+            i.next();
+            settings->setValue(i.key(), QColor(i.value()).name());
+        }
+        settings->endGroup();
+    }
+    {
+        // Save animations
+        settings->beginGroup("Animations");
+        QStringList aList;
+        foreach(KbAnim* anim, _animList){
+            aList << anim->guid().toString().toUpper();
+            anim->animExport(settings);
+        }
+        settings->setValue("List", aList);
+        settings->endGroup();
+    }
+    settings->endGroup();
+}
+
+void KbLight::lightImport(QSettings* settings){
+    // Load light settings
+    _needsSave = false;
+    settings->beginGroup("Lighting");
+    KeyMap currentMap = _map;
+    _map = KeyMap::fromName(settings->value("KeyMap").toString());
+    _dimming = settings->value("Brightness").toUInt();
+    if(_dimming > MAX_DIM)
+        _dimming = MAX_DIM;
+    // Load RGB settings
+    bool useReal = settings->value("UseRealNames").toBool();
+    {
+        settings->beginGroup("Keys");
+        foreach(QString key, settings->childKeys()){
+            QString name = key.toLower();
+            if(!useReal)
+                name = _map.fromStorage(name);
+            QColor color = settings->value(key).toString();
+            if(!color.isValid())
+                color = QColor(255, 255, 255);
+            _qColorMap[name] = color.rgb();
+        }
+        _needsMapRefresh = true;
+        settings->endGroup();
+    }
+    // Load animations
+    foreach(KbAnim* anim, _animList)
+        anim->deleteLater();
+    _animList.clear();
+    {
+        settings->beginGroup("Animations");
+        foreach(QString anim, settings->value("List").toStringList()){
+            QUuid id = anim;
+            _animList.append(new KbAnim(this, _map, id, settings));
+        }
+        settings->endGroup();
+    }
+    emit didLoad();
+    map(currentMap);
+    settings->endGroup();
+}
+
 bool KbLight::needsSave() const {
     if(_needsSave)
         return true;

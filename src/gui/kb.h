@@ -24,6 +24,7 @@ public:
     inline KeyMap::Model    model() const                       { return _model; }
     bool                    isKeyboard() const                  { return KeyMap::isKeyboard(_model); }
     bool                    isMouse() const                     { return KeyMap::isMouse(_model); }
+    bool                    isMousepad() const                  { return KeyMap::isMousepad(_model); }
 
     // Frame rate (all devices). Also updates the event timer in KbManager.
     static inline int               frameRate()                         { return _frameRate; }
@@ -78,10 +79,11 @@ public:
     inline void setCurrentMode(KbMode* mode, bool spontaneous = true)                       { setCurrentMode(_currentProfile, mode, spontaneous); }
 
     // Create a new profile/mode. The newly-created object will NOT be inserted into the current profile/mode list.
-    inline KbProfile*   newProfile()                    { return new KbProfile(this, getKeyMap()); }
-    inline KbProfile*   newProfile(KbProfile* other)    { return new KbProfile(this, getKeyMap(), *other); }
-    inline KbMode*      newMode()                       { return new KbMode(this, getKeyMap()); }
-    inline KbMode*      newMode(KbMode* other)          { return new KbMode(this, getKeyMap(), *other); }
+    inline KbProfile*   newProfile()                                  { return new KbProfile(this, getKeyMap()); }
+    inline KbProfile*   newProfile(KbProfile* other)                  { return new KbProfile(this, getKeyMap(), *other); }
+    inline KbProfile*   newProfile(QSettings* settings, QString guid) { return new KbProfile(this, getKeyMap(), settings, guid); }
+    inline KbMode*      newMode()                                     { return new KbMode(this, getKeyMap()); }
+    inline KbMode*      newMode(KbMode* other)                        { return new KbMode(this, getKeyMap(), *other); }
 
     // Load/save stored settings
     void load();

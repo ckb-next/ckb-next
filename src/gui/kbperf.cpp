@@ -244,6 +244,124 @@ void KbPerf::save(CkbSettings& settings){
     }
 }
 
+void KbPerf::perfImport(QSettings* settings){
+    pushedDpis.clear();
+    runningPushIdx = 1;
+    _needsSave = false;
+    settings->beginGroup("Performance");
+    // Read DPI settings
+    {
+        settings->beginGroup("DPI");
+        for(int i = 0; i < DPI_COUNT; i++){
+            QString iStr = QString::number(i);
+            QPoint value = settings->value(iStr).toPoint();
+            if(value.isNull())
+                continue;
+            dpiX[i] = value.x(); dpiY[i] = value.y();
+            QColor color = settings->value(iStr + "RGB").toString();
+            if(color.isValid())
+                dpiClr[i] = color;
+            if(i != 0)
+                dpiOn[i] = !settings->value(iStr + "Disabled").toBool();
+        }
+        QColor color = settings->value("6RGB").toString();
+        if(color.isValid())
+            dpiClr[OTHER] = color;
+        if (settings->contains("CurIdx")) {
+            dpiBaseIdx = settings->value("CurIdx").toInt();
+        } else {
+            // If there isn't a setting for current DPI stage, pick the first
+            // enabled one. Failing that just pick stage 1.
+            dpiBaseIdx = 1;
+            for (int i = 1; i < DPI_COUNT; i++) {
+                if (dpiOn[i]) {
+                    dpiBaseIdx = i;
+                    break;
+                }
+            }
+        }
+        _curDpi(dpi(dpiBaseIdx));
+        settings->endGroup();
+    }
+    // Read misc. mouse settings
+    _liftHeight = (height)settings->value("LiftHeight").toInt();
+    if(_liftHeight < LOW || _liftHeight > HIGH)
+        _liftHeight = MEDIUM;
+    _angleSnap = settings->value("AngleSnap").toBool();
+    _dpiIndicator = settings->value("Indicators/DPI", true).toBool();
+
+    // Read indicator settings
+    settings->beginGroup("Indicators");
+    _iOpacity = settings->value("Opacity", 100).toInt() / 100.f;
+    for(int i = 0; i < I_COUNT; i++){
+        settings->beginGroup(QString::number(i));
+        QColor color = settings->value("RGB0").toString();
+        if(color.isValid())
+            iColor[i][0] = color;
+        color = settings->value("RGB1").toString();
+        if(color.isValid())
+            iColor[i][1] = color;
+        if(i == LIGHT){
+            color = settings->value("RGB2").toString();
+            if(color.isValid())
+                light100Color = color;
+        } else if(i == MUTE){
+            color = settings->value("RGB2").toString();
+            if(color.isValid())
+                muteNAColor = color;
+        }
+        if(i <= HW_IMAX){
+            iEnable[i] = settings->value("Enable", false).toBool();
+            hwIType[i] = (i_hw)settings->value("Hardware", (int)NORMAL).toInt();
+        } else {
+            iEnable[i] = settings->value("Enable", true).toBool();
+        }
+        settings->endGroup();
+    }
+    settings->endGroup();
+    emit didLoad();
+    settings->endGroup();
+}
+
+void KbPerf::perfExport(QSettings* settings){
+    settings->beginGroup("Performance");
+    {
+        settings->beginGroup("DPI");
+        for(int i = 0; i < DPI_COUNT; i++){
+            QString iStr = QString::number(i);
+            settings->setValue(iStr, QPoint(dpiX[i], dpiY[i]));
+            settings->setValue(iStr + "RGB", dpiClr[i].name(QColor::HexArgb));
+            if(i != 0)
+                settings->setValue(iStr + "Disabled", !dpiOn[i]);
+        }
+        settings->endGroup();
+        settings->setValue("6RGB", dpiClr[OTHER].name(QColor::HexArgb));
+    // Ignore pushed modes when saving current DPI.
+        settings->setValue("CurIdx", dpiBaseIdx);
+    }
+    settings->setValue("LiftHeight", _liftHeight);
+    settings->setValue("AngleSnap", _angleSnap);
+    {
+        settings->beginGroup("Indicators");
+        settings->setValue("DPI", _dpiIndicator);
+        for(int i = 0; i < I_COUNT; i++){
+            settings->beginGroup(QString::number(i));
+            settings->setValue("RGB0", iColor[i][0].name(QColor::HexArgb));
+            settings->setValue("RGB1", iColor[i][1].name(QColor::HexArgb));
+            if(i == LIGHT)
+                settings->setValue("RGB2", light100Color.name(QColor::HexArgb));
+            else if(i == MUTE)
+                settings->setValue("RGB2", muteNAColor.name(QColor::HexArgb));
+            settings->setValue("Enable", iEnable[i]);
+            if(i <= HW_IMAX)
+                settings->setValue("Hardware", (int)hwIType[i]);
+            settings->endGroup();
+        }
+        settings->endGroup();
+    }
+    settings->endGroup();
+}
+
 void KbPerf::dpi(int index, const QPoint& newValue){
     if(index < 0 || index >= DPI_COUNT)
         return;

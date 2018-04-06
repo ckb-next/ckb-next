@@ -18,6 +18,8 @@ public:
     explicit KbProfile(Kb* parent, const KeyMap& keyMap, const QString& guid = "", const QString& modified = "");
     // Load profile from settings
     explicit KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettings& settings, const QString& guid);
+    // Profile from import
+    explicit KbProfile(Kb* parent, const KeyMap& keyMap, QSettings* settings, const QString& guid);
 
     // Save profile to settings
     void save(CkbSettings& settings);
@@ -53,6 +55,9 @@ public:
     // Currently-selected mode
     inline KbMode*  currentMode() const                 { return _currentMode; }
     inline void     currentMode(KbMode* newCurrentMode) { _needsSave = true; _currentMode = newCurrentMode; }
+
+    // Import/Export wrapper functions
+    void profileExport(QSettings* settings);
 
 private:
     KbMode* _currentMode;

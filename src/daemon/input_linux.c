@@ -32,7 +32,7 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
         // Enable only the first 3 LEDs to work around a kernel bug
         for(int i = 0; i < 3; i++)
             ioctl(fd, UI_SET_LEDBIT, i);
-        // Eanble autorepeat
+        // Enable autorepeat
         ioctl(fd, UI_SET_EVBIT, EV_REP);
     }
     // Enable sychronization

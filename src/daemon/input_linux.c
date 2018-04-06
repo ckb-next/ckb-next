@@ -28,7 +28,9 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
     } else {
         // Enable LEDs
         ioctl(fd, UI_SET_EVBIT, EV_LED);
-        for(int i = 0; i < LED_CNT; i++)
+        //for(int i = 0; i < LED_CNT; i++)
+        // Enable only the first 3 LEDs to work around a kernel bug
+        for(int i = 0; i < 3; i++)
             ioctl(fd, UI_SET_LEDBIT, i);
         // Eanble autorepeat
         ioctl(fd, UI_SET_EVBIT, EV_REP);

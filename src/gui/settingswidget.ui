@@ -17,7 +17,7 @@
    <item row="20" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>© 2014-2016 &lt;a href=&quot;https://github.com/ccMSC/&quot; style=&quot;text-decoration:none;&quot;&gt;ccMSC&lt;/a&gt;.&lt;br/&gt;© 2017 &lt;a href=&quot;https://github.com/ckb-next/ckb-next/graphs/contributors&quot; style=&quot;text-decoration:none;&quot;&gt;The ckb-next development team&lt;/a&gt;.</string>
+      <string>© 2014-2016 &lt;a href=&quot;https://github.com/ccMSC/&quot; style=&quot;text-decoration:none;&quot;&gt;ccMSC&lt;/a&gt;.&lt;br/&gt;© 2017-2018 &lt;a href=&quot;https://github.com/ckb-next/ckb-next/graphs/contributors&quot; style=&quot;text-decoration:none;&quot;&gt;The ckb-next development team&lt;/a&gt;.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

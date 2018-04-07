@@ -104,7 +104,7 @@ int main(int argc, char** argv){
                         "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
 #endif
                         "\n"
-                        "See https://github.com/mattanger/ckb-next/blob/master/DAEMON.md for full instructions.\n"
+                        "See https://github.com/ckb-next/ckb-next/blob/master/DAEMON.md for full instructions.\n"
                         "\n"
                         "Command-line parameters:\n"
                         "    --gid=<gid>\n"

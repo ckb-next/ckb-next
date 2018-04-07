@@ -190,9 +190,15 @@ static void postevent_mm(io_connect_t event, int x, int y, int use_accel, uchar 
 // Key repeat delay helper (result in ns)
 long repeattime(io_connect_t event, int first){
     long delay = 0;
-    IOByteCount actualSize = 0;
-    if(IOHIDGetParameter(event, first ? CFSTR(kIOHIDInitialKeyRepeatKey) : CFSTR(kIOHIDKeyRepeatKey), sizeof(long), &delay, &actualSize) != KERN_SUCCESS || actualSize == 0)
+    CFTypeRef cf;
+
+    kern_return_t param = IOHIDCopyCFTypeParameter(event, (first ? CFSTR(kIOHIDInitialKeyRepeatKey) : CFSTR(kIOHIDKeyRepeatKey)), &cf);
+    if(param != KERN_SUCCESS)
         return -1;
+
+    if(!CFNumberGetValue(cf, kCFNumberLongType, &delay))
+        return -1;
+
     return delay;
 }
 

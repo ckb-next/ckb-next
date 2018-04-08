@@ -213,7 +213,7 @@ function(fixup_qt5_executable executable)
         write_qt5_conf("${qt_conf_dir}" "${qt_conf_contents}")
     endif ()
 
-    // Hack to get fixup_bundle to work with non-brew Qt
+    # Hack to get fixup_bundle to work with non-brew Qt
     set(dirs "${dirs}/../")
     fixup_bundle("${executable}" "${libs}" "${dirs}")
 endfunction()

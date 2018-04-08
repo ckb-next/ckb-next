@@ -202,6 +202,7 @@ typedef struct {
     uchar* interruptbuf;
     // Mutex to share data between the input thread and os_usbrecv()
     pthread_mutex_t interruptmutex;
+    pthread_cond_t interruptcond;
 #else
     // USB identifier
     uint32_t location_id[IFACE_MAX + 1];

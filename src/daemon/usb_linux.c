@@ -77,12 +77,11 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
 ///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
+    if(is_recv)
+        if(pthread_mutex_lock(&kb->interruptmutex))
+            ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
 
     if (kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
-        // If we need to read a response, lock the mutex so that os_usbrecv() waits for the main thread.
-        if(is_recv)
-            if(!!pthread_mutex_lock(&kb->interruptmutex))
-                ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
         struct usbdevfs_bulktransfer transfer = {0};
         // All firmware versions for normal HID devices have the OUT endpoint at the end.
         // Devices with no input, such as the Polaris, have it at the start.
@@ -147,18 +146,19 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     int res;
     if(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
         // Wait for 2s
-        struct timespec mutexwait = {0};
-        mutexwait.tv_sec = 2;
-        if(pthread_mutex_timedlock(&kb->interruptmutex, &mutexwait) != 0){
-            if(!!pthread_mutex_unlock(&kb->interruptmutex))
+        struct timespec condwait = {0};
+        condwait.tv_sec = time(NULL) + 2;
+        int condret = pthread_cond_timedwait(&kb->interruptcond, &kb->interruptmutex, &condwait);
+        if(condret != 0){
+            if(pthread_mutex_unlock(&kb->interruptmutex))
                 ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
-            ckb_warn_fn("Interrupt mutex timed out\n", file, line);
+            ckb_warn_fn("Interrupt cond error %i\n", file, line, condret);
             return -1;
         }
         memcpy(in_msg, kb->interruptbuf, MSG_SIZE);
         memset(kb->interruptbuf, 0, MSG_SIZE);
         res = MSG_SIZE;
-        if(!!pthread_mutex_unlock(&kb->interruptmutex))
+        if(pthread_mutex_unlock(&kb->interruptmutex))
             ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
     } else {
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
@@ -351,8 +351,12 @@ void* os_inputmain(void* context){
         ckb_fatal("Error allocating memory for usb_recv() %s\n", strerror(errno));
     
     int retval = pthread_mutex_init(&kb->interruptmutex, NULL);
-    if(!!retval)
+    if(retval)
         ckb_fatal("Error initialising interrupt mutex %i\n", retval);
+
+    retval = pthread_cond_init(&kb->interruptcond, NULL);
+    if(retval)
+        ckb_fatal("Error initialising interrupt cond %i\n", retval);
 
     /// The userSpaceFS knows the URBs now, so start monitoring input
     while (1) {
@@ -398,10 +402,16 @@ void* os_inputmain(void* context){
             #endif
             // If the response starts with 0x0e, that means it needs to go to os_usbrecv()
             if(urb->actual_length == MSG_SIZE && urb_buffer[0] == 0x0e){
+                retval = pthread_mutex_lock(&kb->interruptmutex);
+                if(retval)
+                    ckb_fatal("Error locking interrupt mutex %i\n", retval);
                 memcpy(kb->interruptbuf, urb->buffer, MSG_SIZE);
                 // Unlock the mutex, signaling os_usbrecv() that the data is ready.
+                retval = pthread_cond_broadcast(&kb->interruptcond);
+                if(retval)
+                    ckb_fatal("Error broadcasting pthread cond %i\n", retval);
                 retval = pthread_mutex_unlock(&kb->interruptmutex);
-                if(!!retval)
+                if(retval)
                     ckb_fatal("Error unlocking interrupt mutex %i\n", retval);
             } else {
                 // EP workaround for FWv3
@@ -463,15 +473,20 @@ void* os_inputmain(void* context){
     }
     // Free the memory used for the os_usbrecv() buffer
     free(kb->interruptbuf);
+    
+    retval = pthread_cond_destroy(&kb->interruptcond);
+    if(retval)
+        ckb_fatal("Error destroying interrupt cond %i\n", retval);
+
     retval = pthread_mutex_destroy(&kb->interruptmutex);
-    if(!!retval)
+    if(retval)
         ckb_fatal("Error destroying interrupt mutex %i\n", retval);
     return 0;
 }
 
 /// \brief .
 ///
-/// \brief usbunclaim do an unclaiming of the usb device gicen by kb.
+/// \brief usbunclaim do an unclaiming of the usb device given by kb.
 /// \param kb THE usbdevice*
 /// \param resetting boolean flag: If resseting is true, the caller will perform a bus reset command after unclaiming the device.
 /// \return always 0.

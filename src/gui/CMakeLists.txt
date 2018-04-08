@@ -275,7 +275,7 @@ if (MACOS)
     set(MACOSX_BUNDLE_BUNDLE_NAME "ckb-next_v${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ckb-next_VERSION_MAJOR}.${ckb-next_VERSION_MINOR}.${ckb-next_VERSION_PATCH}")
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${ckb-next_VERSION}")
-    set(MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2014-2016 ccMSC\nCopyright (c) 2017 ckb-next Development Team")
+    set(MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2014-2016 ccMSC\nCopyright (c) 2017-2018 ckb-next Development Team")
 
     # Generate and import Info.plist
     message(STATUS "Generating and importing org.ckb-next.info.plist")

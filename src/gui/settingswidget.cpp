@@ -5,6 +5,7 @@
 #include "kb.h"
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
+#include <QMessageBox>
 
 extern QString devpath;
 
@@ -152,4 +153,9 @@ void SettingsWidget::on_loginItemBox_clicked(bool checked){
 
 void SettingsWidget::on_extraButton_clicked(){
     extra->exec();
+}
+
+void SettingsWidget::on_aboutQt_clicked()
+{
+    QMessageBox::aboutQt(this);
 }

@@ -37,6 +37,8 @@ private slots:
 
     void on_extraButton_clicked();
 
+    void on_aboutQt_clicked();
+
 private:
     Ui::SettingsWidget *ui;
     friend class MainWindow;

@@ -77,13 +77,14 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
 ///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
-    if(is_recv)
-        if(pthread_mutex_lock(&kb->interruptmutex))
-            ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
-
     if (kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
+        // If we need to read a response, lock the interrupt mutex
+        if(is_recv)
+            if(pthread_mutex_lock(&kb->interruptmutex))
+                ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
+
         struct usbdevfs_bulktransfer transfer = {0};
-        // All firmware versions for normal HID devices have the OUT endpoint at the end.
+        // All firmware versions for normal HID devices have the OUT endpoint at the end
         // Devices with no input, such as the Polaris, have it at the start.
         transfer.ep = kb->epcount - IS_SINGLE_EP(kb);
         transfer.len = MSG_SIZE;

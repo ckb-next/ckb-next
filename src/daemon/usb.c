@@ -298,9 +298,7 @@ static void* _setupusb(void* context){
         ckb_fatal("Error allocating memory for usb_recv() %s\n", strerror(errno));
 
     pthread_mutex_init(&kb->interruptmutex, NULL);
-    int retval = pthread_cond_init(&kb->interruptcond, NULL);
-    if(retval)
-        ckb_fatal("Error initialising interrupt cond %i\n", retval);
+    pthread_cond_init(&kb->interruptcond, NULL);
 
     // Check if the device needs a patched keymap, and if so patch it.
     patchkeys(kb);

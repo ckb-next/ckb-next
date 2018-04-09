@@ -82,7 +82,8 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         for(int i = 0; i < layoutnames.count(); i++)
             ui->layoutBox->addItem(layoutnames[i].second, layoutnames[i].first);
 
-        KeyMap::Layout layout = KeyMap::getLayout(settings.value("hwLayout").toString());
+        KeyMap::Layout settingsLayout;
+        KeyMap::Layout layout = settingsLayout = KeyMap::getLayout(settings.value("hwLayout").toString());
         if(layout == KeyMap::NO_LAYOUT){
             // If the layout hasn't been set yet, first check if one was set globally from a previous version
             // If not, try and pick an appropriate one that's supported by the hardware
@@ -114,7 +115,8 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
 
         // Set the layout and save it
         device->layout(layout, false);
-        settings.setValue("hwLayout", KeyMap::getLayout(layout));
+        if(layout != settingsLayout)
+            settings.setValue("hwLayout", KeyMap::getLayout(layout));
     }
     else
         device->layout(KeyMap::GB, false);

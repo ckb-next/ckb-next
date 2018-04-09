@@ -14,7 +14,6 @@ static QSet<QString> notifyPaths;
 static QMutex notifyPathMutex;
 
 int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
-KeyMap::Layout _layout = KeyMap::NO_LAYOUT;
 bool Kb::_dither = false, Kb::_mouseAccel = true, Kb::_delay = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
@@ -23,7 +22,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
-    cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false)
+    cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT)
 {
     memset(iState, 0, sizeof(iState));
     memset(hwLoading, 0, sizeof(hwLoading));

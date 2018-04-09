@@ -167,7 +167,6 @@ private:
 
 private:
     // Following properties shouldn't be used by any other classes
-    KeyMap::Layout _layout;
     void updateLayout(bool stop);
 
     static int _frameRate, _scrollSpeed;
@@ -208,6 +207,8 @@ private:
 
     // Needs to be saved?
     bool _needsSave;
+
+    KeyMap::Layout _layout;
 
     // Whether or not the hardware profile is being loaded
     // (0 = profile, 1...3 = modes)

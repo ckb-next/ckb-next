@@ -395,7 +395,9 @@ void* os_inputmain(void* context){
                     ckb_fatal("Error locking interrupt mutex %i\n", retval);
                 memcpy(kb->interruptbuf, urb->buffer, MSG_SIZE);
                 // Unlock the mutex, signaling os_usbrecv() that the data is ready.
-                pthread_cond_broadcast(&kb->interruptcond);
+                retval = pthread_cond_broadcast(&kb->interruptcond);
+                if(retval)
+                    ckb_fatal("Error broadcasting pthread cond %i\n", retval);
                 retval = pthread_mutex_unlock(&kb->interruptmutex);
                 if(retval)
                     ckb_fatal("Error unlocking interrupt mutex %i\n", retval);

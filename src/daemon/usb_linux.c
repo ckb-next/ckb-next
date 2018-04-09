@@ -345,7 +345,7 @@ void* os_inputmain(void* context){
     }
 
     udev_enumerate_unref(enumerate);
-    int retval; 
+    int retval;
     /// The userSpaceFS knows the URBs now, so start monitoring input
     while (1) {
         struct usbdevfs_urb* urb = 0;

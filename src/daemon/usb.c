@@ -283,6 +283,7 @@ static void* _setupusb(void* context){
     /// - the standard delay time is initialized in kb->usbdelay
     ///
     usbdevice* kb = context;
+    pthread_mutex_lock(imutex(kb));
     // Set standard fields
     short vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
@@ -458,7 +459,6 @@ static void* _setupusb(void* context){
 /// In kb->thread the thread id is mentioned, because closeusb() needs this info for joining that thread again.
 ///
 void setupusb(usbdevice* kb){
-    pthread_mutex_lock(imutex(kb));
     if(pthread_create(&kb->thread, 0, _setupusb, kb))
         ckb_err("Failed to create USB thread\n");
 }

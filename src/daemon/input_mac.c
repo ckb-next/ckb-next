@@ -6,8 +6,7 @@
 #include <errno.h>
 #include <sys/sysctl.h>
 
-bool osx_sierra;
-bool checked_for_osx_sierra = false;
+int osx_ver = -1;
 
 // Numpad keys have an extra flag
 #define IS_NUMPAD(scancode) ((scancode) >= kVK_ANSI_KeypadDecimal && (scancode) <= kVK_ANSI_Keypad9 && (scancode) != kVK_ANSI_KeypadClear && (scancode) != kVK_ANSI_KeypadEnter)
@@ -31,17 +30,8 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
 
     IOGPoint location = {0, 0};
 
-    if(!checked_for_osx_sierra){
-        char osx_version_buf[256];
-        size_t size = sizeof(osx_version_buf);
-        sysctlbyname("kern.osrelease", osx_version_buf, &size, NULL, 0);
-        char osx_version[2];
-        strncpy(osx_version, osx_version_buf, 2);
-        osx_sierra = atoi(osx_version) >= 16;
-        checked_for_osx_sierra = true;
-    }
-
-    if(!osx_sierra){
+    // Sierra or hgher doesn't need this
+    if(osx_ver >= 16){
         if((options & kIOHIDSetRelativeCursorPosition) && type != NX_MOUSEMOVED){
             // Hack #2: IOHIDPostEvent will not accept relative mouse coordinates for any event other than NX_MOUSEMOVED
             // So we need to get the current absolute coordinates from CoreGraphics and then modify those...
@@ -214,6 +204,13 @@ void clearkeys(usbdevice* kb){
 
 // Opens HID service. Returns kIOReturnSuccess on success.
 static int open_iohid(io_connect_t* connection){
+    char osx_version_buf[256];
+    size_t size = sizeof(osx_version_buf);
+    sysctlbyname("kern.osrelease", osx_version_buf, &size, NULL, 0);
+    char osx_version[3];
+    strncpy(osx_version, osx_version_buf, 2);
+    osx_ver = atoi(osx_version);
+
     io_iterator_t iter;
     io_service_t service;
     // Open master port (if not done yet)

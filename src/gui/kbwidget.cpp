@@ -93,11 +93,9 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
                 CkbSettings::set("Program/KbdLayout", "");
                 layout = oldLayout;
             }
-            settings.setValue("hwLayout", KeyMap::getLayout(layout));
         }
-        device->layout(layout, false);
         // Find the position of the layout in the QComboBox and set it
-        int layoutpos = (int)layout;
+        int layoutpos = -1;
         if(layout != KeyMap::NO_LAYOUT){
             for(int i = 0; i < layoutnames.count(); i++){
                 if(layoutnames.at(i).first == (int)layout){
@@ -106,7 +104,17 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
                 }
             }
         }
+        // If no layout was found, pick the first one from the list
+        if(layoutpos == -1){
+            layout = (KeyMap::Layout)layoutnames.at(0).first;
+            layoutpos = 0;
+        }
+
         ui->layoutBox->setCurrentIndex(layoutpos);
+
+        // Set the layout and save it
+        device->layout(layout, false);
+        settings.setValue("hwLayout", KeyMap::getLayout(layout));
     }
     else
         device->layout(KeyMap::GB, false);

@@ -430,8 +430,8 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             patch(map, patchSE);
             break;
         case KeyMap::JP:
-            patch(map, patchJP);
-            break;
+            /*patch(map, patchJP);
+            break;*/
         default:;
             // English QWERTY - no patch needed
         }
@@ -921,16 +921,16 @@ QList<QPair<int, QString>> KeyMap::layoutNames(QString layout){
                 << KeyMap::addToList(4, &list)
                 << KeyMap::addToList(7, &list)
                 << KeyMap::addToList(8, &list)
-                << KeyMap::addToList(10, &list)
+                << KeyMap::addToList(9, &list)
                 << KeyMap::addToList(11, &list)
-                << KeyMap::addToList(13, &list)
+                << KeyMap::addToList(12, &list)
                 << KeyMap::addToList(14, &list)
                 << KeyMap::addToList(15, &list)
                 << KeyMap::addToList(16, &list);
     else if(layout == "abnt")
-        retlist << KeyMap::addToList(12, &list);
+        retlist << KeyMap::addToList(13, &list);
     else if(layout == "jis")
-        retlist << KeyMap::addToList(9, &list);
+        retlist << KeyMap::addToList(10, &list);
     else
         for(int i = 0; i < list.count(); i++)
             retlist << KeyMap::addToList(i, &list);

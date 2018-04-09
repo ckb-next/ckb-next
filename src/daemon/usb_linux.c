@@ -345,20 +345,7 @@ void* os_inputmain(void* context){
     }
 
     udev_enumerate_unref(enumerate);
-
-    /// Allocate memory for the os_usbrecv() buffer and create the mutex
-    kb->interruptbuf = malloc(MSG_SIZE * sizeof(uchar));
-    if(!kb->interruptbuf)
-        ckb_fatal("Error allocating memory for usb_recv() %s\n", strerror(errno));
-    
-    int retval = pthread_mutex_init(&kb->interruptmutex, NULL);
-    if(retval)
-        ckb_fatal("Error initialising interrupt mutex %i\n", retval);
-
-    retval = pthread_cond_init(&kb->interruptcond, NULL);
-    if(retval)
-        ckb_fatal("Error initialising interrupt cond %i\n", retval);
-
+    int retval; 
     /// The userSpaceFS knows the URBs now, so start monitoring input
     while (1) {
         struct usbdevfs_urb* urb = 0;
@@ -472,16 +459,6 @@ void* os_inputmain(void* context){
         ioctl(fd, USBDEVFS_DISCARDURB, urbs + i);
         free(urbs[i].buffer);
     }
-    // Free the memory used for the os_usbrecv() buffer
-    free(kb->interruptbuf);
-    
-    retval = pthread_cond_destroy(&kb->interruptcond);
-    if(retval)
-        ckb_fatal("Error destroying interrupt cond %i\n", retval);
-
-    retval = pthread_mutex_destroy(&kb->interruptmutex);
-    if(retval)
-        ckb_fatal("Error destroying interrupt mutex %i\n", retval);
     return 0;
 }
 

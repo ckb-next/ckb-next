@@ -291,6 +291,19 @@ static void* _setupusb(void* context){
     if(IS_MONOCHROME(vendor, product)) kb->features |= FEAT_MONOCHROME;
     kb->usbdelay = USB_DELAY_DEFAULT;
 
+    /// Allocate memory for the os_usbrecv() buffer and create the mutex
+    kb->interruptbuf = malloc(MSG_SIZE * sizeof(uchar));
+    if(!kb->interruptbuf)
+        ckb_fatal("Error allocating memory for usb_recv() %s\n", strerror(errno));
+
+    int retval = pthread_mutex_init(&kb->interruptmutex, NULL);
+    if(retval)
+        ckb_fatal("Error initialising interrupt mutex %i\n", retval);
+
+    retval = pthread_cond_init(&kb->interruptcond, NULL);
+    if(retval)
+        ckb_fatal("Error initialising interrupt cond %i\n", retval);
+
     // Check if the device needs a patched keymap, and if so patch it.
     patchkeys(kb);
 
@@ -756,6 +769,17 @@ int closeusb(usbdevice* kb){
 
     // Free the device-specific keymap
     free(kb->keymap);
+
+    // Free the memory used for the os_usbrecv() buffer
+    free(kb->interruptbuf);
+
+    int retval = pthread_cond_destroy(&kb->interruptcond);
+    if(retval)
+        ckb_fatal("Error destroying interrupt cond %i\n", retval);
+
+    retval = pthread_mutex_destroy(&kb->interruptmutex);
+    if(retval)
+        ckb_fatal("Error destroying interrupt mutex %i\n", retval);
 
     // Delete the profile and the control path
     if(!kb->vtable)

@@ -297,11 +297,8 @@ static void* _setupusb(void* context){
     if(!kb->interruptbuf)
         ckb_fatal("Error allocating memory for usb_recv() %s\n", strerror(errno));
 
-    int retval = pthread_mutex_init(&kb->interruptmutex, NULL);
-    if(retval)
-        ckb_fatal("Error initialising interrupt mutex %i\n", retval);
-
-    retval = pthread_cond_init(&kb->interruptcond, NULL);
+    pthread_mutex_init(&kb->interruptmutex, NULL);
+    int retval = pthread_cond_init(&kb->interruptcond, NULL);
     if(retval)
         ckb_fatal("Error initialising interrupt cond %i\n", retval);
 

@@ -14,8 +14,7 @@
 
 Open a terminal and execute:
 ```
-curl -O https://github.com/ckb-next/ckb-next/blob/master/ckb-next-dev-detect
-./ckb-next-dev-detect
+curl https://raw.githubusercontent.com/ckb-next/ckb-next/master/ckb-next-dev-detect 2>/dev/null | bash
 ```
 
 Upload `ckb-next-dev-detect-report.gz` with this issue.

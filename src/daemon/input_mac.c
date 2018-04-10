@@ -30,8 +30,8 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
 
     IOGPoint location = {0, 0};
 
-    // Sierra or hgher doesn't need this
-    if(osx_ver >= 16){
+    // Sierra or higher doesn't need this
+    if(osx_ver < 16){
         if((options & kIOHIDSetRelativeCursorPosition) && type != NX_MOUSEMOVED){
             // Hack #2: IOHIDPostEvent will not accept relative mouse coordinates for any event other than NX_MOUSEMOVED
             // So we need to get the current absolute coordinates from CoreGraphics and then modify those...

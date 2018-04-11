@@ -133,7 +133,7 @@ const char* product_str(short product){
         return "katar";
     if(product == P_POLARIS)
         return "polaris";
-    if(product == P_DARK_CORE || product == P_DARK_CORE_WL || product == P_DARK_CORE_SE || product == DARK_CORE_SE_WL)
+    if(product == P_DARK_CORE || product == P_DARK_CORE_WL || product == P_DARK_CORE_SE || product == P_DARK_CORE_SE_WL)
         return "darkcore";
     return "";
 }

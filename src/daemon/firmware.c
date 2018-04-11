@@ -82,6 +82,8 @@ int getfwversion(usbdevice* kb){
             return -1;
         if(!usbrecv(kb, wireless_pkt[2], in_pkt))
             return -1;
+        /// !!! REMOVE THIS WHEN HARDWARE PROFILES ARE ADDED
+        kb->features &= ~FEAT_HWLOAD;
     }
 
     return 0;

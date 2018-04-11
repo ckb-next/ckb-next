@@ -45,9 +45,10 @@ ushort models[N_MODELS] = {
     P_SABRE_O2,
     P_HARPOON,
     P_KATAR,
-    // Mousepads
-    P_POLARIS,
     P_DARK_CORE,
+    P_DARK_CORE_SE,
+    // Mousepads
+    P_POLARIS
 };
 
 /// brief .
@@ -102,10 +103,10 @@ const char* vendor_str(short vendor){
 /// product_str() needs the \a product \a ID
 ///
 const char* product_str(short product){
-    if(product == P_K95 || product == P_K95_LEGACY)
-        return "k95";
     if(product == P_K95_PLATINUM)
         return "k95p";
+    if(product == P_K95 || product == P_K95_LEGACY)
+        return "k95";
     if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
     if(product == P_K68 || product == P_K68_NRGB)
@@ -132,7 +133,7 @@ const char* product_str(short product){
         return "katar";
     if(product == P_POLARIS)
         return "polaris";
-    if(product == P_DARK_CORE || product == P_DARK_CORE_WL)
+    if(product == P_DARK_CORE || product == P_DARK_CORE_WL || product == P_DARK_CORE_SE || product == DARK_CORE_SE_WL)
         return "darkcore";
     return "";
 }

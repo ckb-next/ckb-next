@@ -110,12 +110,14 @@
 
 #define P_DARK_CORE          0x1b35 /* wired */
 #define P_DARK_CORE_WL       0x1b64 /* wireless */
-#define IS_DARK_CORE(kb)     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_DARK_CORE || (kb)->product == P_DARK_CORE_WL))
+#define P_DARK_CORE_SE       0x1b4b /* wired */
+#define P_DARK_CORE_SE_WL    0x1b51 /* wireless */
+#define IS_DARK_CORE(kb)     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_DARK_CORE || (kb)->product == P_DARK_CORE_WL || (kb)->product == P_DARK_CORE_SE || (kb)->product == P_DARK_CORE_SE_WL))
 
 #define P_POLARIS            0x1b3b
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
-#define N_MODELS 35
+#define N_MODELS 36
 extern ushort models[];
 
 ///

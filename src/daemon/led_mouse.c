@@ -22,15 +22,22 @@ static int updatergb_darkcore(usbdevice* kb, lighting* lastlight, lighting* newl
     // 1: Front
     // 2: Thumb
     // 4: Rear
+
     // Dark Core commands:
     // 00: Colour Shift
     // 01: Colour Pulse
     // 03: Rainbow
     // 07: Static Colour
     // FF: No animation (black)
+    uchar opacity_pkt[MSG_SIZE] = {
+        CMD_SET, 0xad, 0x00, 0x00, 100, 0
+    };
+    if(!usbsend(kb, opacity_pkt, 1))
+        return -1;
+
     for (int zone = 0; zone < 3; zone++) {
         uchar data_pkt[MSG_SIZE] = {
-            0x07, 0xaa, 0
+            CMD_SET, 0xaa, 0
         };
         data_pkt[4]  = 1 << zone; // This is a bitmask, so we could later check and merge commands.
         data_pkt[5]  = 7;

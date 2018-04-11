@@ -81,10 +81,10 @@ void ColorButton::versionWarning(){
     CkbSettings settings("Program");
     if(!settings.value("QtWarningDismissed").toBool()){
         QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
-        QString qpaTheme = procEnv.value("QT_QPA_PLATFORMTHEME");
+        QString qpaTheme = procEnv.value("QT_QPA_PLATFORMTHEME", QString("")).toLower();
         // Whitelist
-        QStringList qpaThemeList = QStringList() << "qt5ct" << "kde";
-        if(!qpaThemeList.contains(qpaTheme)){
+        QStringList qpaThemeWhiteList = QStringList() << "qt5ct" << "kde" << "appmenu-qt5";
+        if(qpaTheme.isEmpty() || !qpaThemeWhiteList.contains(qpaTheme)){
             QMessageBox qtWarning(this);
             qtWarning.setTextFormat(Qt::RichText);
             qtWarning.setIcon(QMessageBox::Warning);

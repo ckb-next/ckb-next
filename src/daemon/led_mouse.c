@@ -42,6 +42,9 @@ static int updatergb_darkcore(usbdevice* kb, lighting* lastlight, lighting* newl
     for (int colour = 0; colour < 3; colour++) {
         int should_add = 1;
         for (int cmp_colour = 0; cmp_colour <= colour_count - 1; cmp_colour++) {
+            ckb_info("colours[colour]: %2hhx%2hhx%2hhx colours[cmp_colour]: %2hhx%2hhx%2hhx\n", 
+                    colours[colour][0], colours[colour][1], colours[colour][2],
+                    colours[cmp_colour][0], colours[cmp_colour][1], colours[cmp_colour][2]);
             if (colours[colour][0] == colours[cmp_colour][0] && // Red
                 colours[colour][1] == colours[cmp_colour][1] && // Green
                 colours[colour][2] == colours[cmp_colour][2]) { // Blue

@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *darkCoreOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -112,7 +112,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     if(keyMap.isMouse() || keyMap.isMousepad()){
-        // Draw mouse overlays
+        // Draw overlays
         const QImage* overlay = 0;
         float xpos = 0.f, ypos = 0.f;
         if(model == KeyMap::M65){
@@ -149,6 +149,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!katarOverlay)
                 katarOverlay = new QImage(":/img/overlay_katar.png");
             overlay = katarOverlay;
+            xpos = 3.5f;
+            ypos = -2.f;
+        } else if(model == KeyMap::DARKCORE){
+            if(!darkCoreOverlay)
+                darkCoreOverlay = new QImage(300, 300, QImage::Format_RGBA8888); // Stub
+            overlay = darkCoreOverlay;
             xpos = 3.5f;
             ypos = -2.f;
         } else if(model == KeyMap::POLARIS){

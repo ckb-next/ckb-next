@@ -5,7 +5,7 @@
 
 // Compare two light structures, ignore keys
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
-    return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES ||
+    return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES) ||
         memcmp(lhs->r, rhs->r, 3) || memcmp(lhs->g, rhs->g, 3) || memcmp(lhs->b, rhs->b, 3);
 }
 
@@ -30,11 +30,6 @@ static int updatergb_darkcore(usbdevice* kb, lighting* lastlight, lighting* newl
     // 03: Rainbow
     // 07: Static Colour
     // FF: No animation (black)
-    uchar opacity_pkt[MSG_SIZE] = {
-        CMD_SET, 0xad, 0x00, 0x00, 100, 0
-    };
-    if(!usbsend(kb, opacity_pkt, 1))
-        return -1;
 
     // Sending each zone individually doesn't work, so we have to check and merge colours.
     // TODO: clean this mess up.

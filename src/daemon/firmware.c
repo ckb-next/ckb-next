@@ -64,10 +64,12 @@ int getfwversion(usbdevice* kb){
     }
     // Wireless requires extra handshake packets.
     if(IS_WIRELESS(kb)){
-        uchar wireless_pkt[3][MSG_SIZE] = { 
+        uchar wireless_pkt[5][MSG_SIZE] = { 
             { CMD_GET, 0xae, 0 },
             { CMD_GET, 0x4a, 0 },
-            { CMD_GET, 0x50, 0 }
+            { CMD_GET, 0x50, 0 },
+            { CMD_SET, 0xad, 0x00, 0x00, 100 }, // Opacity packet.
+            { CMD_SET, 0xaa, 0 },               // Create blank colour profiles.
         };
         if(!usbrecv(kb, wireless_pkt[0], in_pkt))
             return -1;
@@ -78,10 +80,19 @@ int getfwversion(usbdevice* kb){
             ckb_warn("Got wireless vendor ID %04x (expected %04x)\n", vendor, kb->vendor);
         if(product != kb->product)
             ckb_warn("Got wireless product ID %04x (expected %04x)\n", product, kb->product);
-        if(!usbrecv(kb, wireless_pkt[1], in_pkt))
+        // More handshake packets.
+        for(int i = 1; i < 3; i++)
+            if(!usbrecv(kb, wireless_pkt[i], in_pkt))
+                return -1;
+        if(!usbsend(kb, wireless_pkt[3], 1))
             return -1;
-        if(!usbrecv(kb, wireless_pkt[2], in_pkt))
-            return -1;
+        // Generate blank colour profiles.
+        for(int profile = 1; profile < 6; profile++) {
+            wireless_pkt[4][5] = 0xff; // Blank profile command.
+            wireless_pkt[4][15] = profile;
+            if(!usbsend(kb, wireless_pkt[4], 1))
+                return -1;
+        }
         /// !!! REMOVE THIS WHEN HARDWARE PROFILES ARE ADDED
         kb->features &= ~FEAT_HWLOAD;
     }

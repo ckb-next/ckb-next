@@ -1029,6 +1029,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "glaive";
     case KATAR:
         return "katar";
+    case DARKCORE:
+        return "darkcore";
     case POLARIS:
         return "polaris";
     default:

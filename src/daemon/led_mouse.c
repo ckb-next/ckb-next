@@ -77,7 +77,7 @@ static int updatergb_darkcore(usbdevice* kb, lighting* lastlight, lighting* newl
         data_pkt[12] = colours[zone][0];
         data_pkt[13] = colours[zone][1];
         data_pkt[14] = colours[zone][2];
-        data_pkt[15] = 5; // Terminator byte?
+        data_pkt[15] = 5 - zone; // Profile byte?
         if(!usbsend(kb, data_pkt, 1))
             return -1;
     }

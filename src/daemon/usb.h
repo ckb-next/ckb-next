@@ -180,6 +180,9 @@ const char* product_str(short product);
 /// Used for devices that have a single IN endpoint, and no HID input
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb))
 
+/// Used for devices which are wireless.
+#define IS_WIRELESS(kb)                 (IS_K63_WL(kb) || IS_DARK_CORE(kb))
+
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.
 

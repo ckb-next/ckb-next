@@ -62,6 +62,28 @@ int getfwversion(usbdevice* kb){
             kb->layout = LAYOUT_UNKNOWN;
         }
     }
+    // Wireless requires extra handshake packets.
+    if(IS_WIRELESS(kb)){
+        uchar wireless_pkt[3][MSG_SIZE] = { 
+            { CMD_GET, 0xae, 0 },
+            { CMD_GET, 0x4a, 0 },
+            { CMD_GET, 0x50, 0 }
+        };
+        if(!usbrecv(kb, wireless_pkt[0], in_pkt))
+            return -1;
+        memcpy(&vendor, in_pkt + 4, 2);
+        memcpy(&product, in_pkt + 6, 2);
+        memcpy(&version, in_pkt + 8, 2);
+        if(vendor != kb->vendor)
+            ckb_warn("Got wireless vendor ID %04x (expected %04x)\n", vendor, kb->vendor);
+        if(product != kb->product)
+            ckb_warn("Got wireless product ID %04x (expected %04x)\n", product, kb->product);
+        if(!usbrecv(kb, wireless_pkt[1], in_pkt))
+            return -1;
+        if(!usbrecv(kb, wireless_pkt[2], in_pkt))
+            return -1;
+    }
+
     return 0;
 }
 

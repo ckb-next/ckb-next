@@ -45,9 +45,9 @@ static int updatergb_darkcore(usbdevice* kb, lighting* lastlight, lighting* newl
             ckb_info("colours[colour]: %2hhx%2hhx%2hhx colours[cmp_colour]: %2hhx%2hhx%2hhx\n", 
                     colours[colour][0], colours[colour][1], colours[colour][2],
                     colours[cmp_colour][0], colours[cmp_colour][1], colours[cmp_colour][2]);
-            if (colours[colour][0] == colours[cmp_colour][0] && // Red
-                colours[colour][1] == colours[cmp_colour][1] && // Green
-                colours[colour][2] == colours[cmp_colour][2]) { // Blue
+            if (newlight->r[colour] == colours[cmp_colour][0] && // Red
+                newlight->g[colour] == colours[cmp_colour][1] && // Green
+                newlight->b[colour] == colours[cmp_colour][2]) { // Blue
 
                 should_add = 0;
                 colours[cmp_colour][3] |= 1 << colour; // Add bit to bitmask.

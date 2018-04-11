@@ -31,46 +31,21 @@ static int updatergb_darkcore(usbdevice* kb, lighting* lastlight, lighting* newl
     // 07: Static Colour
     // FF: No animation (black)
 
-    // Sending each zone individually doesn't work, so we have to check and merge colours.
-    // TODO: clean this mess up.
-    int colour_count = 0;
-    int colours[3][4] = { { 0 }, { 0 }, { 0 } }; // { Red, Green, Blue, Bitmask }
-    for (int colour = 0; colour < 3; colour++) {
-        int should_add = 1;
-        for (int cmp_colour = 0; cmp_colour <= colour_count - 1; cmp_colour++) {
-            if (newlight->r[colour] == colours[cmp_colour][0] && // Red
-                newlight->g[colour] == colours[cmp_colour][1] && // Green
-                newlight->b[colour] == colours[cmp_colour][2]) { // Blue
-
-                should_add = 0;
-                colours[cmp_colour][3] |= 1 << colour; // Add bit to bitmask.
-                break;
-            }
-        }
-        if (should_add) {
-            colours[colour][0] = newlight->r[colour];
-            colours[colour][1] = newlight->g[colour];
-            colours[colour][2] = newlight->b[colour];
-            colours[colour][3] = 1 << colour;
-            colour_count++;
-        }
-    }
-
-    for (int zone = 0; zone < colour_count; zone++) {
+    for (int zone = 0; zone < 3; zone++) {
         uchar data_pkt[MSG_SIZE] = {
             CMD_SET, 0xaa, 0
         };
-        data_pkt[4]  = colours[zone][3]; // Bitmask.
+        data_pkt[4]  = 1 << zone;        // Bitmask.
         data_pkt[5]  = 7;                // Command (static colour).
         data_pkt[8]  = 100;              // Opacity (100%).
-        data_pkt[9]  = colours[zone][0];
-        data_pkt[10] = colours[zone][1];
-        data_pkt[11] = colours[zone][2];
+        data_pkt[9]  = newlight->r[zone];
+        data_pkt[10] = newlight->g[zone];
+        data_pkt[11] = newlight->b[zone];
         // Colour gets sent twice for some reason.
-        data_pkt[12] = colours[zone][0];
-        data_pkt[13] = colours[zone][1];
-        data_pkt[14] = colours[zone][2];
-        data_pkt[15] = 5 - zone; // Profile byte?
+        data_pkt[12] = newlight->r[zone];
+        data_pkt[13] = newlight->g[zone];
+        data_pkt[14] = newlight->b[zone];
+        data_pkt[15] = 5 - zone;         // Profile byte?
         if(!usbsend(kb, data_pkt, 1))
             return -1;
     }

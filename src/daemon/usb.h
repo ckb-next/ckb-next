@@ -114,7 +114,7 @@
 #define P_POLARIS            0x1b3b
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
-#define N_MODELS 33
+#define N_MODELS 34
 extern ushort models[];
 
 ///

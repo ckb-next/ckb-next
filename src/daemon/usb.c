@@ -46,6 +46,7 @@ ushort models[N_MODELS] = {
     P_KATAR,
     // Mousepads
     P_POLARIS,
+    P_DARK_CORE,
 };
 
 /// brief .

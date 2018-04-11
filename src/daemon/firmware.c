@@ -94,7 +94,7 @@ int getfwversion(usbdevice* kb){
                 return -1;
         }
         /// !!! REMOVE THIS WHEN HARDWARE PROFILES AND WIRELESS FW UPDATE ARE ADDED
-        kb->features &= ~(FEAT_HWLOAD | FEAT_FWUPDATE;
+        kb->features &= ~(FEAT_HWLOAD | FEAT_FWUPDATE);
     }
 
     return 0;

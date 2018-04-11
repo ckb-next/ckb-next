@@ -5,7 +5,8 @@
 
 // Compare two light structures, ignore keys
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
-    return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES);
+    return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES ||
+        memcmp(lhs->r, rhs->r, 3) || memcmp(lhs->g, rhs->g, 3) || memcmp(lhs->b, rhs->b, 3);
 }
 
 // Return true if all mouse zones are black
@@ -42,9 +43,6 @@ static int updatergb_darkcore(usbdevice* kb, lighting* lastlight, lighting* newl
     for (int colour = 0; colour < 3; colour++) {
         int should_add = 1;
         for (int cmp_colour = 0; cmp_colour <= colour_count - 1; cmp_colour++) {
-            ckb_info("colours[colour]: %2hhx%2hhx%2hhx colours[cmp_colour]: %2hhx%2hhx%2hhx\n", 
-                    colours[colour][0], colours[colour][1], colours[colour][2],
-                    colours[cmp_colour][0], colours[cmp_colour][1], colours[cmp_colour][2]);
             if (newlight->r[colour] == colours[cmp_colour][0] && // Red
                 newlight->g[colour] == colours[cmp_colour][1] && // Green
                 newlight->b[colour] == colours[cmp_colour][2]) { // Blue

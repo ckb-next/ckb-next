@@ -93,8 +93,8 @@ int getfwversion(usbdevice* kb){
             if(!usbsend(kb, wireless_pkt[4], 1))
                 return -1;
         }
-        /// !!! REMOVE THIS WHEN HARDWARE PROFILES ARE ADDED
-        kb->features &= ~FEAT_HWLOAD;
+        /// !!! REMOVE THIS WHEN HARDWARE PROFILES AND WIRELESS FW UPDATE ARE ADDED
+        kb->features &= ~(FEAT_HWLOAD | FEAT_FWUPDATE;
     }
 
     return 0;

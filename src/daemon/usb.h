@@ -22,7 +22,7 @@
 ///
 /// Block No. | contains | Devices are bundled via
 /// --------- | -------- | -----------------------
-/// 1 | The first block contains the K63 Non RGB Keyboard. No other K63 is known so far.
+/// 1 | The first block contains the K63 Non RGB Keyboard.
 /// 2 | the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
 /// 3 | K68 keyboards | IS_K68().
 /// 4 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
@@ -49,7 +49,10 @@
 #define IS_K55(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K55)
 
 #define P_K63_NRGB           0x1b40
-#define IS_K63(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K63_NRGB)
+#define P_K63_NRGB_WL        0x1b45 /* wireless, plugged in */
+#define P_K63_NRGB_WL2       0x1b50 /* wireless */
+#define IS_K63_WL(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB_WL || (kb)->product == P_K63_NRGB_WL2))
+#define IS_K63(kb)           (IS_K63_WL(kb) || ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB)))
 
 #define P_K65                0x1b17
 #define P_K65_LEGACY         0x1b07
@@ -85,9 +88,9 @@
 #define P_M65_PRO            0x1b2e
 #define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO))
 
-#define P_SABRE_O            0x1b14  /* optical */
-#define P_SABRE_L            0x1b19  /* laser */
-#define P_SABRE_N            0x1b2f  /* new? */
+#define P_SABRE_O            0x1b14 /* optical */
+#define P_SABRE_L            0x1b19 /* laser */
+#define P_SABRE_N            0x1b2f /* new? */
 #define P_SABRE_O2           0x1b32 /* Observed on a CH-9000111-EU model SABRE */
 
 #define IS_SABRE(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
@@ -106,15 +109,13 @@
 #define IS_KATAR(kb)         ((kb)->vendor == V_CORSAIR && (kb)->product == P_KATAR)
 
 #define P_DARK_CORE          0x1b35 /* wired */
-#define P_DARK_CORE_STR      "1b35"
 #define P_DARK_CORE_WL       0x1b64 /* wireless */
-#define P_DARK_CORE_WL_STR   "1b64"
 #define IS_DARK_CORE(kb)     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_DARK_CORE || (kb)->product == P_DARK_CORE_WL))
 
 #define P_POLARIS            0x1b3b
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
-#define N_MODELS 34
+#define N_MODELS 35
 extern ushort models[];
 
 ///
@@ -171,7 +172,7 @@ const char* product_str(short product);
 
 /// Used for new devices that come with V3 firmware endpoint configuration out of the factory, but have fwversion < 0x300.
 /// Note: only the RGB variant of the K68 needs a v3 override.
-#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || IS_DARK_CORE(kb))
+#define IS_V3_OVERRIDE(kb)              (IS_K63_WL(kb) || (kb)->product == P_K68 || IS_DARK_CORE(kb))
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
 #define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb))

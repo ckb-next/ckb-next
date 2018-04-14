@@ -3,6 +3,8 @@
 #include "input.h"
 #include "notify.h"
 #include "usb.h"
+#include "command.h"
+#include <IOKit/pwr_mgt/IOPMLib.h>
 
 #ifdef OS_MAC
 
@@ -908,6 +910,25 @@ release:
     }
     euid_guard_stop;
 }
+void powerEventCallback(void *refcon, io_service_t service, uint32_t type, void *arg) {
+    if(type != kIOMessageSystemHasPoweredOn)
+        return;
+    ckb_info("System has woken from sleep\n");
+    usbdevice *kb = NULL;
+    for(int i = 0; i < DEV_MAX; i++){
+        if(IS_CONNECTED(keyboard + i)){
+            kb = keyboard + i;
+            // If the device was active, mark it as disabled and re-enable it
+            pthread_mutex_lock(dmutex(kb));
+            if(kb->active){
+                kb->active = 0;
+                const devcmd* vt = kb->vtable;
+                vt->active(kb, 0, 0, 0, 0);
+            }
+            pthread_mutex_unlock(dmutex(kb));
+        }
+    }
+}
 
 int usbmain(){
     int vendor = V_CORSAIR;
@@ -982,6 +1003,10 @@ int usbmain(){
                                                       0, 0,
                                                       register_mouse_event_tap, &rmectx);
     CFRunLoopAddTimer(mainloop, (CFRunLoopTimerRef)rmetimer, kCFRunLoopCommonModes);
+
+    io_iterator_t iterator_syspower = 0;
+    IORegisterForSystemPower(NULL, &notify, powerEventCallback, &iterator_syspower);
+    CFRunLoopAddSource(mainloop, IONotificationPortGetRunLoopSource(notify), kCFRunLoopDefaultMode);
 
     // Enter loop to scan/connect new devices
     CFRunLoopRun();

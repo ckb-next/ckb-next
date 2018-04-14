@@ -30,13 +30,13 @@ int setactive_kb(usbdevice* kb, int active){
     pthread_mutex_unlock(imutex(kb));
 
     uchar msg[3][MSG_SIZE] = {
-        { CMD_SET, FIELD_SPECIAL, 0 },                // Disables or enables HW control for top row
-        { CMD_SET, FIELD_KEYINPUT, 0 },               // Selects key input
-        { CMD_SET, FIELD_LIGHTING, 2, 0, 0x03, 0x00 } // Commits key input selection
+        { CMD_SET, FIELD_SPECIAL, 0 },                         // Disables or enables HW control for top row
+        { CMD_SET, FIELD_KEYINPUT, 0 },                        // Selects key input
+        { CMD_SET, FIELD_LIGHTING, MODE_SOFTWARE, 0, 0x03, 0 } // Commits key input selection
     };
     if(active){
         // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
-        msg[0][2] = MODE_SOFTWARE;
+        //msg[0][2] = MODE_SOFTWARE;
         if(!usbsend(kb, msg[0], 1))
             return -1;
         DELAY_MEDIUM(kb);

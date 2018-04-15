@@ -93,6 +93,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     // Check against the actual device
     if(vendor != kb->vendor || product != kb->product){
         ckb_err("Firmware file %s doesn't match device (V: %04x P: %04x)\n", path, vendor, product);
+        free(fwdata);
         return FW_WRONGDEV;
     }
     ckb_info("Loading firmware version %04x from %s\n", version, path);
@@ -133,12 +134,14 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         if(index == 1){
             if(!usbsend(kb, data_pkt[0], 1)){
                 ckb_err("Firmware update failed\n");
+                free(fwdata);
                 return FW_USBFAIL;
             }
             // The above packet can take a lot longer to process, so wait for a while
             sleep(3);
             if(!usbsend(kb, data_pkt[2], npackets - 1)){
                 ckb_err("Firmware update failed\n");
+                free(fwdata);
                 return FW_USBFAIL;
             }
         } else {
@@ -147,6 +150,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
                 data_pkt[npackets][2] = length - last;
             if(!usbsend(kb, data_pkt[1], npackets)){
                 ckb_err("Firmware update failed\n");
+                free(fwdata);
                 return FW_USBFAIL;
             }
         }
@@ -165,6 +169,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     kb->fwversion = version;
     mkfwnode(kb);
     ckb_info("Firmware update complete\n");
+    free(fwdata);
     return FW_OK;
 }
 

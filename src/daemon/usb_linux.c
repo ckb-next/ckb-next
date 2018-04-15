@@ -315,6 +315,16 @@ void* os_inputmain(void* context){
         // Move to the next entry in the udev list (skipping the first one).
         struct udev_list_entry* nextentry = udev_list_entry_get_next(udeventry);
         const char* path = udev_list_entry_get_name(nextentry);
+        // If there's an underscore, that means we are dealing with udev iterating through endpoints
+        // usbX/X-X/X-X:1.0/ep_80
+        // ~~~~~~~~~~~~~~~~~~~^
+        if(path[strlen(path) - 3] == 95){
+            ckb_info("Applying udev endpoint workaround for %s\n", path);
+            // Skip the current entry
+            udeventry = nextentry;
+            nextentry = udev_list_entry_get_next(udeventry);
+            path = udev_list_entry_get_name(nextentry);
+        }
         // Create the path to the endpoint
         char finalpath[strlen(path)+7];
         // Copy the base path

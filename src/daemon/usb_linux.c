@@ -318,7 +318,7 @@ void* os_inputmain(void* context){
         // If there's an underscore, that means we are dealing with udev iterating through endpoints
         // usbX/X-X/X-X:1.0/ep_80
         // ~~~~~~~~~~~~~~~~~~~^
-        if(path[strlen(path) - 3] == 95){
+        if(path[strlen(path) - 3] == '_'){
             ckb_info("Applying udev endpoint workaround for %s\n", path);
             // Skip the current entry
             udeventry = nextentry;

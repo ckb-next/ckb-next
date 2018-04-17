@@ -19,12 +19,17 @@ RebindWidget::RebindWidget(QWidget *parent) :
 
     // Populate key lists
     modKeys << "caps" << "lshift" << "rshift" << "lctrl" << "rctrl" << "lwin" << "rwin" << "lalt" << "ralt" << "rmenu" << "fn";
-    fnKeys << "esc" << "f1" << "f2" << "f3" << "f4" << "f5" << "f6" << "f7" << "f8" << "f9" << "f10" << "f11" << "f12" << "prtscn" << "scroll" << "pause" << "f13" << "f14" << "f15" << "f16" << "f17" << "f18" << "f19" << "f20" << "f21" << "f22" << "f23" << "f24" << "ins" << "del" << "home" << "end" << "pgup" << "pgdn" << "power" << "lightup" << "lightdn" << "up" << "down" << "left" << "right";
+    fnKeys << "esc" << "f1" << "f2" << "f3" << "f4" << "f5" << "f6" << "f7" << "f8" << "f9" << "f10" << "f11" << "f12" << "prtscn" << "scroll" << "pause" << "f13" << "f14" << "f15" << "f16" << "f17" << "f18" << "f19" << "f20";
     numKeys << "numlock" << "num0" << "num1" << "num2" << "num3" << "num4" << "num5" << "num6" << "num7" << "num8" << "num9" << "numslash" << "numstar" << "numminus" << "numplus" << "numdot" << "numenter";
     mediaKeys << "stop" << "prev" << "play" << "next" << "volup" << "voldn" << "mute" << "eject";
     mouseKeys << "mouse1" << "mouse2" << "mouse3";
     mouseExtKeys << "mouse4" << "mouse5" << "mouse6" << "mouse7" << "mouse8";
     wheelKeys << "wheelup" << "wheeldn";
+#ifndef Q_OS_MACOS
+    fnKeys << "f21" << "f22" << "f23" << "f24";
+#endif
+    fnKeys << "ins" << "del" << "home" << "end" << "pgup" << "pgdn" << "power" << "lightup" << "lightdn" << "up" << "down" << "left" << "right";
+
     // Populate boxes
     foreach(const QString& key, modKeys)
         ui->modBox->addItem(KeyMap::friendlyName(key));

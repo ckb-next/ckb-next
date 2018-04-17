@@ -89,7 +89,6 @@
 #define P_SABRE_L            0x1b19  /* laser */
 #define P_SABRE_N            0x1b2f  /* new? */
 #define P_SABRE_O2           0x1b32 /* Observed on a CH-9000111-EU model SABRE */
-
 #define IS_SABRE(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
 
 #define P_SCIMITAR           0x1b1e

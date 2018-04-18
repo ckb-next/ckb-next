@@ -334,6 +334,12 @@ void* os_inputmain(void* context){
         // Access it
         struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
         const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
+        if(!sizehex){
+            ckb_err("Unable to read wMaxPacketSize for %s\n", finalpath);
+            udeventry = nextentry;
+            udev_device_unref(child);
+            continue;
+        }
         // Read its wMaxPacketSize
         ushort size = 64;
         if(sizehex)

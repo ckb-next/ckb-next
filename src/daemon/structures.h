@@ -264,9 +264,6 @@ typedef struct {
     uint delay;
     // Keymap that should be applied to this device
     key* keymap;
-    // Mutex to share data between the input thread and os_usbrecv()
-    pthread_mutex_t interruptmutex;
-    pthread_cond_t interruptcond;
     // Buffer used to store non-HID interrupt reads from the input thread.
     uchar* interruptbuf;
 } usbdevice;

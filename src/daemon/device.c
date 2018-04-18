@@ -62,6 +62,12 @@ int _start_dev(usbdevice* kb, int makeactive){
         kb->features &= ~FEAT_HWLOAD;
 
     ///
+    /// hwload isn't supported yet on the platinum.
+    ///
+    if(IS_PLATINUM(kb))
+        kb->features &= ~FEAT_HWLOAD;
+
+    ///
     /// - Now check if device needs a firmware update.
     /// If so, set it up and leave the function without error.
     ///

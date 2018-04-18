@@ -80,7 +80,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     if (kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
         // If we need to read a response, lock the interrupt mutex
         if(is_recv)
-            if(pthread_mutex_lock(&kb->interruptmutex))
+            if(pthread_mutex_lock(intmutex(kb)))
                 ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
 
         struct usbdevfs_bulktransfer transfer = {0};
@@ -149,9 +149,9 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         // Wait for 2s
         struct timespec condwait = {0};
         condwait.tv_sec = time(NULL) + 2;
-        int condret = pthread_cond_timedwait(&kb->interruptcond, &kb->interruptmutex, &condwait);
+        int condret = pthread_cond_timedwait(intcond(kb), intmutex(kb), &condwait);
         if(condret != 0){
-            if(pthread_mutex_unlock(&kb->interruptmutex))
+            if(pthread_mutex_unlock(intmutex(kb)))
                 ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
             ckb_warn_fn("Interrupt cond error %i\n", file, line, condret);
             return -1;
@@ -159,7 +159,7 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         memcpy(in_msg, kb->interruptbuf, MSG_SIZE);
         memset(kb->interruptbuf, 0, MSG_SIZE);
         res = MSG_SIZE;
-        if(pthread_mutex_unlock(&kb->interruptmutex))
+        if(pthread_mutex_unlock(intmutex(kb)))
             ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
     } else {
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
@@ -400,15 +400,15 @@ void* os_inputmain(void* context){
             #endif
             // If the response starts with 0x0e, that means it needs to go to os_usbrecv()
             if(urb->actual_length == MSG_SIZE && urb_buffer[0] == 0x0e){
-                retval = pthread_mutex_lock(&kb->interruptmutex);
+                retval = pthread_mutex_lock(intmutex(kb));
                 if(retval)
                     ckb_fatal("Error locking interrupt mutex %i\n", retval);
                 memcpy(kb->interruptbuf, urb->buffer, MSG_SIZE);
                 // Unlock the mutex, signaling os_usbrecv() that the data is ready.
-                retval = pthread_cond_broadcast(&kb->interruptcond);
+                retval = pthread_cond_broadcast(intcond(kb));
                 if(retval)
                     ckb_fatal("Error broadcasting pthread cond %i\n", retval);
-                retval = pthread_mutex_unlock(&kb->interruptmutex);
+                retval = pthread_mutex_unlock(intmutex(kb));
                 if(retval)
                     ckb_fatal("Error unlocking interrupt mutex %i\n", retval);
             } else {

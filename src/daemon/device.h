@@ -29,6 +29,13 @@ extern pthread_mutex_t macromutex2[DEV_MAX];
 extern pthread_cond_t macrovar[DEV_MAX];
 #define mvar(kb) (macrovar + INDEX_OF(kb, keyboard))
 
+// Mutex used for transfering URB Interrupt data between threads
+extern pthread_mutex_t interruptmutex[DEV_MAX];
+#define intmutex(kb) (interruptmutex + INDEX_OF(kb, keyboard))
+// Pthread cond for the above
+extern pthread_cond_t interruptcond[DEV_MAX];
+#define intcond(kb) (interruptcond + INDEX_OF(kb, keyboard))
+
 // Sets up device hardware, after software initialization is finished. Also used during resets
 // Should be called only from setupusb/resetusb
 int start_dev(usbdevice* kb, int makeactive);

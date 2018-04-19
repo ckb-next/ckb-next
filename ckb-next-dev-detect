@@ -27,7 +27,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     OUT="${OUT}${N}${N}OS Version:${N}`sw_vers`"
     OUT="${OUT}${N}${N}USB Devices:${N}`system_profiler SPUSBDataType -detailLevel mini | grep -i -B3 -A9 1b1c`"
     OUT="${OUT}${N}${N}IOReg:${N}`ioreg -lxrc IOUSBDevice | sed -n '/Corsair/,/^$/p'`"
-    OUT="${OUT}${N}${N}Daemon log:${N}`cat /var/log/ckb-next-daemon.log`"
+    OUT="${OUT}${N}${N}Daemon log:${N}`tail -n 100 /var/log/ckb-next-daemon.log`"
     OUT="${OUT}${N}${N}GUI log:${N}`cat /tmp/ckb-next.log`"
 else
     OUT="${OUT}${N}${N}OS Version:${N}`lsb_release -a 2>/dev/null`"

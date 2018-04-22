@@ -64,36 +64,48 @@ MainWindow::MainWindow(QWidget *parent) :
     closeAction = new QAction(tr("Quit"), this);
 
 #ifdef USE_LIBAPPINDICATOR
+    QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+
+    QString desktop = procEnv.value("XDG_CURRENT_DESKTOP", QString("")).toLower();
+    QString qpaTheme = procEnv.value("QT_QPA_PLATFORMTHEME", QString("")).toLower();
+    QString ckbnextAppindicator = procEnv.value("CKB-NEXT_USE_APPINDICATOR", QString("")).toLower();
+
+    useAppindicator = false;
     trayIcon = 0;
 
-    indicatorMenu = gtk_menu_new();
-    indicatorMenuRestoreItem = gtk_menu_item_new_with_label("Restore");
-    indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit");
+    if((desktop == "unity" && qpaTheme == "appmenu-qt5") || qpaTheme == "appmenu-qt5" || !ckbnextAppindicator.isEmpty()){
+        useAppindicator = true;
 
-    gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
-    gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
+        indicatorMenu = gtk_menu_new();
+        indicatorMenuRestoreItem = gtk_menu_item_new_with_label("Restore");
+        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit");
 
-    g_signal_connect(indicatorMenuQuitItem, "activate",
-        G_CALLBACK(quitIndicator), this);
-    g_signal_connect(indicatorMenuRestoreItem, "activate",
-        G_CALLBACK(restoreIndicator), this);
+        gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
+        gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
 
-    gtk_widget_show(indicatorMenuRestoreItem);
-    gtk_widget_show(indicatorMenuQuitItem);
+        g_signal_connect(indicatorMenuQuitItem, "activate",
+            G_CALLBACK(quitIndicator), this);
+        g_signal_connect(indicatorMenuRestoreItem, "activate",
+            G_CALLBACK(restoreIndicator), this);
 
-    indicator = app_indicator_new("ckb-next", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+        gtk_widget_show(indicatorMenuRestoreItem);
+        gtk_widget_show(indicatorMenuQuitItem);
 
-    app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
-    app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
-    app_indicator_set_icon(indicator, "ckb-next");
-#else
-    trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction(restoreAction);
-    trayIconMenu->addAction(closeAction);
-    trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
-    trayIcon->setContextMenu(trayIconMenu);
-    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
+        indicator = app_indicator_new("ckb-next", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+
+        app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
+        app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
+        app_indicator_set_icon(indicator, "ckb-next");
+    } else
 #endif
+    {
+        trayIconMenu = new QMenu(this);
+        trayIconMenu->addAction(restoreAction);
+        trayIconMenu->addAction(closeAction);
+        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
+        trayIcon->setContextMenu(trayIconMenu);
+        connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
+    }
     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
 #ifdef Q_OS_MACOS
@@ -143,10 +155,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::toggleTrayIcon(bool visible) {
 #ifdef USE_LIBAPPINDICATOR
-    app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
-#else
-    trayIcon->setVisible(visible);
+    if(useAppindicator)
+        app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
+    else
 #endif
+        trayIcon->setVisible(visible);
 }
 
 void MainWindow::addDevice(Kb* device){

@@ -44,7 +44,7 @@ private:
     QAction* closeAction;
 
 #ifdef USE_LIBAPPINDICATOR
-    bool                unityDesktop;
+    bool                useAppindicator;
     AppIndicator*       indicator;
     GtkWidget*          indicatorMenu;
     GtkWidget*          indicatorMenuQuitItem;

@@ -100,10 +100,13 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     if (res <= 0){
         int ioctlerrno = errno;
         ckb_err_fn(" %s, res = 0x%x\n", file, line, res ? strerror(ioctlerrno) : "No data written", res);
-        if(res == -1 && ioctlerrno == ETIMEDOUT)
+        if(res == -1 && ioctlerrno == ETIMEDOUT){
+            pthread_mutex_unlock(intmutex(kb));
             return -1;
-        else
+        } else {
+            pthread_mutex_unlock(intmutex(kb));
             return 0;
+        }
     } else if (res != MSG_SIZE)
         ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
 #ifdef DEBUG_USB_SEND

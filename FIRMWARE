@@ -5,6 +5,7 @@ Hash: SHA256
 # This document is signed to prevent tampering. Signature verification is enabled only when GnuPG is available.
 # Firmware versions listed may not necessarily reflect the latest on Corsair's site; new versions will not be added until ckb-next has been tested with them.
 # ckb-next does NOT read this file when flashing firmware manually. It will allow you to load any valid FW blob (at your own risk).
+# NOTE: K63WL IS A STUB
 #
 
 !BEGIN FW ENTRIES
@@ -12,6 +13,7 @@ Hash: SHA256
 # Vendor  Model            FW    URL                                                            Min.ckb File Name                       SHA256                                                              ProductID
   Corsair K55RGB           30.06 https://www3.corsair.com/software/CUE_V2/K55RGB.zip            0.2.9   K55_App_v3006.bin               e84aa88ec7f90ddac94f06f4f4e887ce06f013a18a22ece5f367f97899514748    0x1b3d
   Corsair K63               1.00 https://www3.corsair.com/software/CUE_V2/K63.zip               0.2.8   K63_APP_V100.bin                3bac95d6f605b33398714bf644a93cf137c4b0195c42e828e7d0bd87e9f8d3af    0x1b40
+  Corsair K63WL             0.00 https://www3.corsair.com/software/CUE_V2/K63WIRELESS.zip       0.2.9   00000000000000000.bin           0000000000000000000000000000000000000000000000000000000000000000    0x1b45
   Corsair K65RGB            2.05 https://www3.corsair.com/software/CUE_V2/CGK65RGB.zip          0.2.8   K65RGB_APP_V205.bin             832cbb0408399411ebc766697f79dc5bf9a88e55a661ea8db13e31d72044b896    0x1b17
   Corsair K65LUXRGB         2.05 https://www3.corsair.com/software/CUE_V2/K65LUXRGB.zip         0.2.8   K65LUXRGB_APP_V205.bin          b203dabbc56816b497fb6aa664ac0689d2d480117e99da9260176cb8a72acd5d    0x1b37
   Corsair K65RFIRERGB       2.05 https://www3.corsair.com/software/CUE_V2/K65RGBRAPIDFIRE.zip   0.2.8   K65RGBRAPIDFIRE_APP_V205.bin    9d2e933ab6c0102cba1a0af007a124c37b57766ea60b0d8935cb1b337e0b93e5    0x1b39
@@ -46,11 +48,11 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJappBpAAoJEN/iSOvc7y9fKawH/0/V0K0vvECh3AtqXqRgkozM
-TxpOYLuGorpWAVDmpZgrthBmnjJ/0ojwCLflkftklXke0SFw47cwkD2rwmMNPqh/
-m5WRUCcVLSnfguSayPqatLeqVGFr5EONHGm4x59R7+DGoITtSsiQ/5BN97l2ltav
-N3aCKTyCoWj9FRVDR4I+FTA1KmjpYVaNBEGK4npcvLVIx7bar7B9O7tcLOb2T2o8
-E/fpAtkqU0q4SARu1GmzrYEpFzN2ohH142GKORnWIwM3KyunJZGDBTVr/mX2gGkz
-R6bUJOvUab5pMA+G3tLZ2qyoA+8UoZf1ikfUew1tuzWVpCPQTetlaAvx7aCGq3c=
-=UezX
+iQEcBAEBCAAGBQJa2+7kAAoJEN/iSOvc7y9fQioH/jOYnLephN4/aENOVAYVWCJt
+4oYHSD//mHVtcbfndyCqvrGWzUcFrn8pk0OeOfXFMj2kT+en2MLvLydK8M8o2fxJ
+ZvYt+ZytklnpbJ/76WWcd2myFPh7NfL5DYGN3PC2FfD2YigA96+AuouEgzhaNxfw
+w+RtORSMT69avWHnil0UOjsxoqmLUmcXkPPz+WOZiyOLVb0SOY7lmGpq51ZLQeU+
+zDkC00tQb24kTY6tmOHlMeObxKR6r0+vf/XtIbRkuthQPbe4hrGFEFp4Lovry4Pm
+0tN3XAIPu5jShcms0PKHC9VgvrCqmDOaAMQ4vtqU8CKDQqzbxx2XQeHQqYgu6FU=
+=TvrQ
 -----END PGP SIGNATURE-----

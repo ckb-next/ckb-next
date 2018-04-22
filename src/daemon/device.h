@@ -9,7 +9,7 @@
 extern usbdevice keyboard[DEV_MAX];
 // Is a device active?
 #ifdef OS_LINUX
-#define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->uinput_kb && (kb)->uinput_mouse)
+#define IS_CONNECTED(kb) ((kb) && (kb)->handle && (((kb)->uinput_kb && (kb)->uinput_mouse) || IS_SINGLE_EP(kb)))
 #else
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
 #endif

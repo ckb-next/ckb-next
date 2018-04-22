@@ -106,7 +106,7 @@ int updatergb_kb(usbdevice* kb, int force){
             return -1;
     } else if(IS_FULLRANGE(kb)) {
         // Update strafe sidelights if necessary
-        if(lastlight->sidelight != newlight->sidelight) {
+        if(IS_STRAFE(kb) && (lastlight->sidelight != newlight->sidelight)) {
             uchar data_pkt[1][MSG_SIZE] = {
                 { CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0 },
             };

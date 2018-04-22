@@ -106,14 +106,15 @@ int updatergb_kb(usbdevice* kb, int force){
             return -1;
     } else if(IS_FULLRANGE(kb)) {
         // Update strafe sidelights if necessary
-        if((lastlight->sidelight != newlight->sidelight) && IS_STRAFE(kb)) {
-            uchar data_pkt[1][MSG_SIZE] = {
-                { CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0 },
-            };
-            if (newlight->sidelight)
-                data_pkt[0][4] = 1;    // turn on
-            if(!usbsend(kb, data_pkt[0], 1))
-                return -1;
+        if(lastlight->sidelight != newlight->sidelight) {
+            uchar data_pkt[2][MSG_SIZE] = {
+                 { CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0x00, 0x00 },
+                 { CMD_SET, FIELD_LIGHTING, MODE_SOFTWARE, 0, 0x03 }
+             };
+             if (newlight->sidelight)
+                 data_pkt[0][4] = 1;    // turn on
+             if(!usbsend(kb, data_pkt[0], 2))
+                 return -1;
         }
         // 16.8M color lighting works fine on strafe and is the only way it actually works
         uchar data_pkt[12][MSG_SIZE] = {

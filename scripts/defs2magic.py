@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import sys
 import re
+import os
 
 defs = "../src/daemon/protocol.h"
-defs_file = open(defs, "r")
+defspath = os.path.dirname(__file__) + "/" + defs
+defs_file = open(defspath, "r")
 defs_list = defs_file.readlines()
 
 cmds = []

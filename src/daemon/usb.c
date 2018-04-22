@@ -46,6 +46,7 @@ ushort models[N_MODELS] = {
     P_KATAR,
     // Mousepads
     P_POLARIS,
+    P_DARK_CORE,
 };
 
 /// brief .
@@ -130,6 +131,8 @@ const char* product_str(short product){
         return "katar";
     if(product == P_POLARIS)
         return "polaris";
+    if(product == P_DARK_CORE || product == P_DARK_CORE_WL)
+        return "darkcore";
     return "";
 }
 

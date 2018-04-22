@@ -104,10 +104,16 @@
 #define P_KATAR              0x1b22
 #define IS_KATAR(kb)         ((kb)->vendor == V_CORSAIR && (kb)->product == P_KATAR)
 
+#define P_DARK_CORE          0x1b35 /* wired */
+#define P_DARK_CORE_STR      "1b35"
+#define P_DARK_CORE_WL       0x1b64 /* wireless */
+#define P_DARK_CORE_WL_STR   "1b64"
+#define IS_DARK_CORE(kb)     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_DARK_CORE || (kb)->product == P_DARK_CORE_WL))
+
 #define P_POLARIS            0x1b3b
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
-#define N_MODELS 33
+#define N_MODELS 34
 extern ushort models[];
 
 ///
@@ -154,7 +160,7 @@ const char* product_str(short product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_KATAR)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_KATAR) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -164,7 +170,7 @@ const char* product_str(short product);
 
 /// Used for new devices that come with V3 firmware endpoint configuration out of the factory, but have fwversion < 0x300.
 /// Note: only the RGB variant of the K68 needs a v3 override.
-#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68)
+#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || IS_DARK_CORE(kb))
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
 #define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb))

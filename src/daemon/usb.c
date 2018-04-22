@@ -346,8 +346,10 @@ static void* _setupusb(void* context){
     /// which initially initializes all LED variables in kb to off and then starts the _ledthread() thread
     /// with kb as parameter and then detaches it.
     /// Here again only the generation of the thread can fail.
-    if(os_setupindicators(kb))
-        goto fail;
+    if(!(IS_MOUSE_DEV(kb) || IS_MOUSEPAD_DEV(kb))) {
+        if(os_setupindicators(kb))
+            goto fail;
+    }
 
     // Set up device
     ///

@@ -107,6 +107,7 @@ option(SAFE_UNINSTALL "Execute pre-uninstall tasks to ensure correct removal.
     Intended to be used with direct removals without package manager." OFF)
 
 option(WITH_SHIPPED_QUAZIP "Use shipped QuaZip5 instead of system package" OFF)
+option(USE_APPINDICATOR_OVERRIDE "Use gtk2 Appindicator for Qt > 5.7." OFF)
 
 if (NOT WITH_GUI)
     message(WARNING "Building without GUI. Proceed only if you know what you are doing.")

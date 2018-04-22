@@ -88,13 +88,15 @@ AudioToolbox: ${AUDIOTOOLBOX_LIBRARY}")
     endif ()
         mark_as_advanced(FOUNDATION_LIBRARY COREAUDIO_LIBRARY AUDIOTOOLBOX_LIBRARY)
 elseif (LINUX)
-    find_package(Appindicator)
-    if(Appindicator_FOUND)
-        target_compile_definitions(
-            ckb-next
-                PRIVATE
-                    USE_LIBAPPINDICATOR)
-    endif()
+    if ((Qt5Core_VERSION VERSION_LESS 5.7.0) OR USE_APPINDICATOR_OVERRIDE)
+        find_package(Appindicator)
+        if (Appindicator_FOUND)
+            target_compile_definitions(
+                ckb-next
+                    PRIVATE
+                        USE_LIBAPPINDICATOR)
+        endif ()
+    endif ()
     find_package(X11 REQUIRED)
 endif ()
 

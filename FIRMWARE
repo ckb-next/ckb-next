@@ -42,17 +42,17 @@ Hash: SHA256
   Corsair SABRE2            2.05 https://www3.corsair.com/software/CUE_V2/Sabre2.zip            0.2.9   Sabre2_APP_v205.bin             4f1dea6d8949952e7d26fbcc48c7ad1aa116f9b1bf1bf149af3213c269df9c64    0x1b19
   Corsair SABREPRORGB       2.04 https://www3.corsair.com/software/CUE_V2/SABRERGB.zip          0.2.9   SABREPRORGB_APP_V204.bin        6adf75dd813e11c6d4a2cdf58f878c2f7c38f14c2645895c4e0ce4380d46d868    0x1b2f
   Corsair POLARIS           1.02 https://www3.corsair.com/software/CUE_V2/MM800RGB.zip          0.2.9   SageApp_v1.02.50.bin            5917b0de570296ba2a80cf5aa67f5bf0ef3026685453eb070364f450c3ab65fa    0x1b3b
-  Corsair ST100RGB          1.02 https://www3.corsair.com/software/CUE_V2/ST100RGB.zip          0.2.9   ST100RGB%200.2.91.bin           baa64949b8ec21133789783d9687f9d20e0cb7d912df2f3ab7d7120280bdcd56    0x0a34
+  Corsair ST100RGB          0.02 https://www3.corsair.com/software/CUE_V2/ST100RGB.zip          0.2.9   ST100RGB%200.2.91.bin           baa64949b8ec21133789783d9687f9d20e0cb7d912df2f3ab7d7120280bdcd56    0x0a34
 
 !END FW ENTRIES
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJa2+7kAAoJEN/iSOvc7y9fQioH/jOYnLephN4/aENOVAYVWCJt
-4oYHSD//mHVtcbfndyCqvrGWzUcFrn8pk0OeOfXFMj2kT+en2MLvLydK8M8o2fxJ
-ZvYt+ZytklnpbJ/76WWcd2myFPh7NfL5DYGN3PC2FfD2YigA96+AuouEgzhaNxfw
-w+RtORSMT69avWHnil0UOjsxoqmLUmcXkPPz+WOZiyOLVb0SOY7lmGpq51ZLQeU+
-zDkC00tQb24kTY6tmOHlMeObxKR6r0+vf/XtIbRkuthQPbe4hrGFEFp4Lovry4Pm
-0tN3XAIPu5jShcms0PKHC9VgvrCqmDOaAMQ4vtqU8CKDQqzbxx2XQeHQqYgu6FU=
-=TvrQ
+iQEcBAEBCAAGBQJa3phhAAoJEN/iSOvc7y9fes0IAJl6gBcoRiyBQFNH/1gcZ1Og
+GtMgRu//PtUX6lSCxvqlZbIpqEUmdbgNMLUwn3DhgWFUCcqhuCfECDQMnxNj9rHc
+TooMyH7a3jNSoePVbqZPJGC3t37lUxk1lG7uvXfJri+bmM7lZd8tmxk8on2cSty5
+DwfdGl8WCeY2CVoDPwMh4M4W/BUMLMuHaGdhQvI43zVr4ReXLmsWeIVgdhVYU5uP
+MIPemEF0Y7E1TAT8SAN7TNVyW0NsyZpF7yYu9//vI7AxeT8j81bXrhGmxdu2aOJo
+uYRLc+KXVHmfNa3OC0E2wp833pZbRYtz/SPOfbr01UZrBzKtcnBsrp0IVLWf8lc=
+=vOqU
 -----END PGP SIGNATURE-----

@@ -40,6 +40,21 @@ include(MacroEnsureOutOfSourceBuild)
 macro_ensure_out_of_source_build("ckb-next requires an out of source build. \
 Please create a separate build directory and run 'cmake /path/to/ckb-next [options]' there.")
 
+# Make sure we don't install in anaconda
+if("$ENV{PATH}" MATCHES "anaconda")
+    string(REPLACE ":" ";" ENVLIST "$ENV{PATH}")
+
+    foreach(item ${ENVLIST})
+        if("${item}" MATCHES "anaconda")
+            list(REMOVE_ITEM ENVLIST "${item}")
+        endif()
+    endforeach()
+
+    string(REPLACE ";" ":" ENVSTR "${ENVLIST}")
+    set(ENV{PATH} ${ENVSTR})
+    message(STATUS "Temporarily removing anaconda from PATH:\n   $ENV{PATH}")
+endif()
+
 # Set platform-specific booleans
 include(CkbNextPlatform)
 

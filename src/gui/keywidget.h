@@ -79,6 +79,13 @@ private:
 
     // Get drawing scale/offset. drawX = (keymapX + offsetX) * scale
     void drawInfo(float& scale, float& offsetX, float& offsetY, int ratio = 1);
+
+    // Helper functions for rendering keys
+    void drawLogo(const Key* key, QPainter* decPainter, float offX, float offY, float scale);
+    void drawBottomRightCorner(QPainter* painter, float x, float y, float w, float h, float scale);
+    void drawBottomLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
+    void drawTopRightCorner(QPainter* painter, float x, float y, float w, float h, float scale);
+    void drawTopLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
 };
 
 #endif // RGBWIDGET_H

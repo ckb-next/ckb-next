@@ -361,13 +361,23 @@ static const Key K95PLbar[] = {
 #define POLARIS_H 14, 6
 
 static const Key PolarisZones[] = {
-    {0, "Zone 1", "zone1", 66, 4, POLARIS_V, true, false}, {0, "Zone 2", "zone2", 66, 16, POLARIS_V, true, false}, {0, "Zone 3", "zone3", 66, 28, POLARIS_V, true, false}, {0, "Zone 4", "zone4", 66, 40, POLARIS_V, true, false},
-    {0, "Zone 5", "zone5", 66, 52, POLARIS_V, true, false}, {0, "Zone 6", "zone6", 42, 62, POLARIS_H, true, false}, {0, "Zone 7", "zone7", 30, 62, POLARIS_H, true, false}, {0, "Zone 8", "zone8", 18, 62, POLARIS_H, true, false},
-    {0, "Zone 9", "zone9", 6, 62, POLARIS_H, true, false}, {0, "Zone 10", "zone10", -6, 62, POLARIS_H, true, false}, {0, "Zone 11", "zone11", -19, 52, POLARIS_V, true, false}, {0, "Zone 12", "zone12", -19, 40, POLARIS_V, true, false},
+    {0, "Zone 1", "zone1", 65, 4, POLARIS_V, true, false}, {0, "Zone 2", "zone2", 65, 16, POLARIS_V, true, false}, {0, "Zone 3", "zone3", 65, 28, POLARIS_V, true, false}, {0, "Zone 4", "zone4", 65, 40, POLARIS_V, true, false},
+    {0, "Zone 5", "zone5", 65, 52, POLARIS_V, true, false}, {0, "Zone 6", "zone6", 43, 62, POLARIS_H, true, false}, {0, "Zone 7", "zone7", 31, 62, POLARIS_H, true, false}, {0, "Zone 8", "zone8", 19, 62, POLARIS_H, true, false},
+    {0, "Zone 9", "zone9", 7, 62, POLARIS_H, true, false}, {0, "Zone 10", "zone10", -5, 62, POLARIS_H, true, false}, {0, "Zone 11", "zone11", -19, 52, POLARIS_V, true, false}, {0, "Zone 12", "zone12", -19, 40, POLARIS_V, true, false},
     {0, "Zone 13", "zone13", -19, 28, POLARIS_V, true, false}, {0, "Zone 14", "zone14", -19, 16, POLARIS_V, true, false}, {0, "Zone 15", "zone15", -19, 4, POLARIS_V, true, false}
 };
 #define KEYCOUNT_POLARIS   (sizeof(PolarisZones) / sizeof(Key))
 
+#define ST100_V 6,22
+#define ST100_H 22,6
+
+static const Key ST100Zones[] = {
+    {0, "Zone 1", "zone1", 16, 10, ST100_H, true, false}, {0, "Zone 2", "zone2", 36, 10, ST100_H, true, false}, {0, "Zone 3", "zone3", 52, 30, ST100_V, true, false}, {0, "Zone 4", "zone4", 52, 50, ST100_V, true, false},
+    {0, "Logo", "zone5", 21, -1, NS, true, false}, // Logo
+    {0, "Zone 6", "zone6", 16, 66, ST100_H, true, false}, {0, "Zone 7", "zone7", -4, 50, ST100_V, true, false}, {0, "Zone 8", "zone8", -4, 30, ST100_V, true, false},
+    {0, "Zone 9", "zone9", -4, 10, ST100_H, true, false},
+};
+#define KEYCOUNT_ST100     (sizeof(ST100Zones) / sizeof(Key))
 
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
@@ -747,6 +757,15 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::ST100:{
+        for(const Key* key = ST100Zones; key < ST100Zones + KEYCOUNT_ST100; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -969,6 +988,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return KATAR;
     if(lower == "polaris")
         return POLARIS;
+    if(lower == "st100")
+        return ST100;
     return NO_MODEL;
 }
 
@@ -1004,6 +1025,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "katar";
     case POLARIS:
         return "polaris";
+    case ST100:
+        return "st100";
     default:
         return "";
     }
@@ -1040,6 +1063,7 @@ int KeyMap::modelWidth(Model model){
     case GLAIVE:
     case KATAR:
     case POLARIS:
+    case ST100:
         return M65_WIDTH;
     default:
         return 0;
@@ -1065,6 +1089,7 @@ int KeyMap::modelHeight(Model model){
     case GLAIVE:
     case KATAR:
     case POLARIS:
+    case ST100:
         return M65_HEIGHT;
     default:
         return 0;

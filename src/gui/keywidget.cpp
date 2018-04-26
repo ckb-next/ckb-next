@@ -111,7 +111,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     painter.setPen(Qt::NoPen);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    if(keyMap.isMouse() || keyMap.isMousepad()){
+    if(!keyMap.isKeyboard()){
         // Draw mouse overlays
         const QImage* overlay = 0;
         float xpos = 0.f, ypos = 0.f;
@@ -155,20 +155,27 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!polarisOverlay)
                 polarisOverlay = new QImage(":/img/overlay_polaris.png");
             overlay = polarisOverlay;
-            xpos = -19.f;
+            xpos = -19.5;
+            ypos = -2.f;
+        } else if(model == KeyMap::ST100){
+            xpos = -18.5;
             ypos = -2.f;
         }
-        if(overlay){
-            painter.setBrush(palette().brush(QPalette::Window));
-            painter.drawRect(0, 0, width(), height());
-            float oXScale = scale / 9.f, oYScale = scale / 9.f;             // The overlay has a resolution of 9px per keymap unit
-            float x = (xpos + offX) * scale, y = (ypos + offY) * scale;
-            int w = overlay->width() * oXScale, h = overlay->height() * oYScale;
-            // We need to transform the image with QImage::scaled() because painter.drawImage() will butcher it, even with smoothing enabled
-            // However, the width/height need to be rounded to integers
-            int iW = round(w), iH = round(h);
-            painter.drawImage(QRectF((x - (iW - w) / 2.f) / ratio, (y - (iH - h) / 2.f) / ratio, iW / ratio, iH / ratio), overlay->scaled(iW, iH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+        if(!overlay){
+            QImage *blank = new QImage(810, 700, QImage::Format_ARGB32);
+            QColor newcol = QColor(bgColor);
+            newcol.setAlpha(35);
+            blank->fill(newcol);
+            overlay = blank;
         }
+        painter.drawRect(0, 0, width(), height());
+        float oXScale = scale / 9.f, oYScale = scale / 9.f;             // The overlay has a resolution of 9px per keymap unit
+        float x = (xpos + offX) * scale, y = (ypos + offY) * scale;
+        int w = overlay->width() * oXScale, h = overlay->height() * oYScale;
+        // We need to transform the image with QImage::scaled() because painter.drawImage() will butcher it, even with smoothing enabled
+        // However, the width/height need to be rounded to integers
+        int iW = round(w), iH = round(h);
+        painter.drawImage(QRectF((x - (iW - w) / 2.f) / ratio, (y - (iH - h) / 2.f) / ratio, iW / ratio, iH / ratio), overlay->scaled(iW, iH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     } else {
         // Otherwise, draw a solid background
         painter.setBrush(QBrush(bgColor));
@@ -242,40 +249,26 @@ void KeyWidget::paintEvent(QPaintEvent*){
             h *= 0.75f;
             bgPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
         } else if (model == KeyMap::POLARIS) {
-            /*float kx = key.x + offX - key.width / 2.f + 2.f;
-            float ky = key.y + offY - key.height / 2.f + 2.f;
-            float kw = key.width - 4.f;
-            float kh = key.height - 4.f;*/
-            float kh = h-2.5;
-            float kw = w-0.f;
-            float ky = y+0.5;
-            float kx = x+0.f;
-
             // Draw the edges as polygons
             if(!strcmp(key.name, "zone11")){
-                QPointF edgePoints[6] = {
-                    QPointF(kx*scale,             ky*scale),
-                    QPointF(kx*scale,            (ky + kh + kw)*scale),
-                    QPointF((kx + kw + kh)*scale,(ky + kh + kw)*scale),
-                    QPointF((kx + kw + kh)*scale,(ky + kh)*scale),
-                    QPointF((kx + kw)*scale,     (ky + kh)*scale),
-                    QPointF((kx + kw)*scale,      ky*scale),
-                };
-                bgPainter.drawPolygon(edgePoints, 6);
-
-             } else if(!strcmp(key.name, "zone5")){
-                QPointF edgePoints[6] = {
-                    QPointF(kx*scale,             ky*scale),
-                    QPointF(kx*scale,            (ky + kh)*scale),
-                    QPointF((kx - kw - kh)*scale,(ky + kh)*scale),
-                    QPointF((kx - kw - kh)*scale,(ky + kh + kw)*scale),
-                    QPointF((kx + kw)*scale,     (ky + kh + kw)*scale),
-                    QPointF((kx + kw)*scale,      ky*scale),
-                };
-                bgPainter.drawPolygon(edgePoints, 6);
+               drawBottomLeftCorner(&bgPainter, x, y, w, h+2.f, scale);
+            } else if(!strcmp(key.name, "zone5")){
+                drawBottomRightCorner(&bgPainter, x, y, w, h+2.f, scale);
             } else
                 bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
-         } else {
+        } else if(model == KeyMap::ST100){
+            // Draw the edges as polygons
+            if(!strcmp(key.name, "zone7")){
+                drawBottomLeftCorner(&bgPainter, x, y, w, h, scale);
+             } else if(!strcmp(key.name, "zone4")){
+                drawBottomRightCorner(&bgPainter, x, y, w, h, scale);
+            } else if (!strcmp(key.name, "zone2")){
+                drawTopRightCorner(&bgPainter, x, y, w, h, scale);
+            } else if (!strcmp(key.name, "zone9")){
+                drawTopLeftCorner(&bgPainter, x, y, w, h, scale);
+            } else
+                bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
+        } else {
             if(!strcmp(key.name, "enter")){
                 if(key.height == 24){
                     // ISO enter key isn't rectangular
@@ -348,17 +341,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 float kw = key.width - 2.f;
                 float kh = key.height - 2.f;
 
-                if(!strcmp(key.name, "logo")) { // stylized logo
-                    float lx = key.x + offX - key.width / 2.f + 2.f;
-                    float ly = key.y + offY - key.height / 2.f + 2.f;
-                    float lw = key.width - 4.f;
-                    float lh = key.height - 4.f;
-                    QPainterPath logo;
-                    logo.moveTo(lx*scale,(ly+lh)*scale);
-                    logo.quadTo((lx+2.f)*scale,(ly+lh/2.f)*scale,lx*scale,ly*scale);
-                    logo.quadTo((lx+lw)*scale,ly*scale,(lx+lw)*scale,(ly+lh)*scale);
-                    logo.quadTo((lx+lw/2.f)*scale,(ly+lh-4.f)*scale,lx*scale,(ly+lh)*scale);
-                    decPainter.drawPath(logo);
+                if(!strcmp(key.name, "logo")) {
+                    drawLogo(&key, &decPainter, offX, offY, scale);
                 } else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")) { // Strafe side lights (toggle lights with no animation)
                     QRadialGradient gradient(QPointF(wWidth/2.f * ratio, wHeight/2.f * ratio), wWidth/2.f * ratio);//,QPointF(10, 5));
                     gradient.setColorAt(0, color);
@@ -379,27 +363,30 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 decPainter.setPen(QPen(QColor(0,0,0,0), 1));
                 // Draw the edges as polygons
                 if(!strcmp(key.name, "zone11")){
-                    QPointF edgePoints[6] = {
-                        QPointF(kx*scale,             ky*scale),
-                        QPointF(kx*scale,            (ky + kh + kw)*scale),
-                        QPointF((kx + kw + kh)*scale,(ky + kh + kw)*scale),
-                        QPointF((kx + kw + kh)*scale,(ky + kh)*scale),
-                        QPointF((kx + kw)*scale,     (ky + kh)*scale),
-                        QPointF((kx + kw)*scale,      ky*scale),
-                    };
-                    decPainter.drawPolygon(edgePoints, 6);
-
+                    drawBottomLeftCorner(&decPainter, kx, ky, kw, kh+2.f, scale);
                  } else if(!strcmp(key.name, "zone5")){
-                    QPointF edgePoints[6] = {
-                        QPointF(kx*scale,             ky*scale),
-                        QPointF(kx*scale,            (ky + kh)*scale),
-                        QPointF((kx - kw - kh)*scale,(ky + kh)*scale),
-                        QPointF((kx - kw - kh)*scale,(ky + kh + kw)*scale),
-                        QPointF((kx + kw)*scale,     (ky + kh + kw)*scale),
-                        QPointF((kx + kw)*scale,      ky*scale),
-                    };
-                    decPainter.drawPolygon(edgePoints, 6);
+                    drawBottomRightCorner(&decPainter, kx, ky, kw, kh+2.f, scale);
                  } else
+                    decPainter.drawRect(QRectF(kx * scale, ky * scale, kw * scale, kh * scale));
+            } else if (model == KeyMap::ST100) {
+                float kx = key.x + offX - key.width / 2.f + 2.f;
+                float ky = key.y + offY - key.height / 2.f + 2.f;
+                float kw = key.width - 4.f;
+                float kh = key.height - 4.f;
+                // No border
+                decPainter.setPen(QPen(QColor(0,0,0,0), 1));
+                // Draw the edges as polygons
+                if(!strcmp(key.name, "zone2")){
+                    drawTopRightCorner(&decPainter, kx, ky, kw, kh, scale);
+                } else if(!strcmp(key.name, "zone4")){
+                    drawBottomRightCorner(&decPainter, kx, ky, kw, kh, scale);
+                } else if(!strcmp(key.name, "zone5")){
+                    drawLogo(&key, &decPainter, offX, offY, scale);
+                } else if(!strcmp(key.name, "zone7")){
+                    drawBottomLeftCorner(&decPainter, kx, ky, kw, kh, scale);
+                } else if(!strcmp(key.name, "zone9")){
+                    drawTopLeftCorner(&decPainter, kx, ky, kw, kh, scale);
+                } else
                     decPainter.drawRect(QRectF(kx * scale, ky * scale, kw * scale, kh * scale));
             } else if (model == KeyMap::K55)
                 decPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
@@ -726,4 +713,65 @@ void KeyWidget::setAnimationToSelection(){
 void KeyWidget::clearAnimation(){
     animation.fill(false);
     update();
+}
+
+void KeyWidget::drawLogo(const Key* key, QPainter* decPainter, float offX, float offY, float scale){
+    float lx = key->x + offX - key->width / 2.f + 2.f;
+    float ly = key->y + offY - key->height / 2.f + 2.f;
+    float lw = key->width - 4.f;
+    float lh = key->height - 4.f;
+    QPainterPath logo;
+    logo.moveTo(lx*scale,(ly+lh)*scale);
+    logo.quadTo((lx+2.f)*scale,(ly+lh/2.f)*scale,lx*scale,ly*scale);
+    logo.quadTo((lx+lw)*scale,ly*scale,(lx+lw)*scale,(ly+lh)*scale);
+    logo.quadTo((lx+lw/2.f)*scale,(ly+lh-4.f)*scale,lx*scale,(ly+lh)*scale);
+    decPainter->drawPath(logo);
+}
+
+void KeyWidget::drawBottomRightCorner(QPainter* painter, float x, float y, float w, float h, float scale){
+    QPointF edgePoints[6] = {
+        QPointF( x*scale,           y*scale),
+        QPointF((x + w)*scale,      y*scale),
+        QPointF((x + w)*scale,     (y + h)*scale),
+        QPointF((x - h + w)*scale, (y + h)*scale),
+        QPointF((x - h + w)*scale, (y + h - w)*scale),
+        QPointF( x*scale,          (y + h - w)*scale),
+    };
+    painter->drawPolygon(edgePoints, 6);
+}
+
+void KeyWidget::drawBottomLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale){
+    QPointF edgePoints[6] = {
+        QPointF( x*scale,            y*scale),
+        QPointF((x + w)*scale,      y*scale),
+        QPointF((x + w)*scale,     (y + h - w)*scale),
+        QPointF((x + h)*scale,     (y + h - w)*scale),
+        QPointF((x + h)*scale,     (y + h)*scale),
+        QPointF( x*scale,          (y + h)*scale),
+    };
+    painter->drawPolygon(edgePoints, 6);
+}
+
+void KeyWidget::drawTopRightCorner(QPainter* painter, float x, float y, float w, float h, float scale){
+    QPointF edgePoints[6] = {
+        QPointF( x*scale,           y*scale),
+        QPointF((x + w)*scale,      y*scale),
+        QPointF((x + w)*scale,     (y + w)*scale),
+        QPointF((x + w - h)*scale, (y + w)*scale),
+        QPointF((x + w - h)*scale, (y + h)*scale),
+        QPointF( x*scale,          (y + h)*scale),
+    };
+    painter->drawPolygon(edgePoints, 6);
+}
+
+void KeyWidget::drawTopLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale){
+    QPointF edgePoints[6] = {
+        QPointF( x*scale,           y*scale),
+        QPointF((x + w)*scale,      y*scale),
+        QPointF((x + w)*scale,     (y + h)*scale),
+        QPointF((x + h)*scale,     (y + h)*scale),
+        QPointF((x + h)*scale,     (y + w)*scale),
+        QPointF( x*scale,          (y + w)*scale),
+    };
+    painter->drawPolygon(edgePoints, 6);
 }

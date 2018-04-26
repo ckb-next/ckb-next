@@ -86,7 +86,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         struct usbdevfs_bulktransfer transfer = {0};
         // All firmware versions for normal HID devices have the OUT endpoint at the end
         // Devices with no input, such as the Polaris, have it at the start.
-        transfer.ep = kb->epcount - IS_SINGLE_EP(kb);
+        transfer.ep = (IS_SINGLE_EP(kb) ? 1 : kb->epcount);
         transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
@@ -284,7 +284,7 @@ void* os_inputmain(void* context){
     ///
     /// Monitor input transfers on all endpoints for non-RGB devices
     /// For RGB, monitor all but the last, as it's used for input/output
-    int urbcount = !IS_LEGACY(vendor, product) ? (kb->epcount - 1) : kb->epcount;
+    int urbcount = ((IS_LEGACY(vendor, product) || product == P_ST100) ? kb->epcount : (kb->epcount - 1));
     if (urbcount == 0) {
         ckb_err("urbcount = 0, so there is nothing to claim in os_inputmain()\n");
         return 0;
@@ -657,7 +657,7 @@ int os_setupusb(usbdevice* kb) {
     kb->epcount = 0;
     if(ep_str)
         sscanf(ep_str, "%d", &kb->epcount);
-    if(kb->epcount < 2){
+    if(kb->epcount < 2 && !IS_SINGLE_EP(kb)){
         // If we have an RGB KB with 1 endpoint, it will be in BIOS mode.
         if(kb->epcount == 1){
             ckb_info("Device is in BIOS mode\n");

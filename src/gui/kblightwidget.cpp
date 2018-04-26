@@ -91,9 +91,9 @@ void KbLightWidget::newSelection(QStringList selection){
         ui->selLabel->setText("Click to select");
         return;
     } else if(count == 1)
-        ui->selLabel->setText(tr("1 %1 selected").arg((light->map().isMouse() || light->map().model() == KeyMap::K55 ) ? "zone" : "key"));
+        ui->selLabel->setText(tr("1 %1 selected").arg((!light->map().isKeyboard() || light->map().model() == KeyMap::K55 ) ? "zone" : "key"));
     else
-        ui->selLabel->setText(tr("%1 %2 selected").arg(count).arg((light->map().isMouse() || light->map().model() == KeyMap::K55 ) ? "zones" : "keys"));
+        ui->selLabel->setText(tr("%1 %2 selected").arg(count).arg((!light->map().isKeyboard() || light->map().model() == KeyMap::K55 ) ? "zones" : "keys"));
 }
 
 void KbLightWidget::changeColor(QColor newColor){

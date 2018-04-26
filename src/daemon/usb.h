@@ -107,7 +107,10 @@
 #define P_POLARIS            0x1b3b
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
-#define N_MODELS 33
+#define P_ST100              0x0a34
+#define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
+
+#define N_MODELS 34
 extern ushort models[];
 
 ///
@@ -167,10 +170,10 @@ const char* product_str(short product);
 #define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68)
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
-#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb))
+#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb) || IS_ST100(kb))
 
 /// Used for devices that have a single IN endpoint, and no HID input
-#define IS_SINGLE_EP(kb)                (IS_POLARIS(kb))
+#define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb))
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

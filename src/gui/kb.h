@@ -25,6 +25,7 @@ public:
     bool                    isKeyboard() const                  { return KeyMap::isKeyboard(_model); }
     bool                    isMouse() const                     { return KeyMap::isMouse(_model); }
     bool                    isMousepad() const                  { return KeyMap::isMousepad(_model); }
+    bool                    isHeadsetStand() const              { return KeyMap::isHeadsetStand(_model); }
 
     // Frame rate (all devices). Also updates the event timer in KbManager.
     static inline int               frameRate()                         { return _frameRate; }

@@ -46,6 +46,8 @@ ushort models[N_MODELS] = {
     P_KATAR,
     // Mousepads
     P_POLARIS,
+    // Headset stands
+    P_ST100,
 };
 
 /// brief .
@@ -130,6 +132,8 @@ const char* product_str(short product){
         return "katar";
     if(product == P_POLARIS)
         return "polaris";
+    if(product == P_ST100)
+        return "st100";
     return "";
 }
 
@@ -151,7 +155,7 @@ static const devcmd* get_vtable(short vendor, short product){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
     if(IS_MOUSE(vendor, product))
         return &vtable_mouse;
-    else if(IS_MOUSEPAD(vendor, product))
+    else if(IS_MOUSEPAD(vendor, product) || product == P_ST100)
         return &vtable_mousepad;
     else {
         if(IS_LEGACY(vendor, product))

@@ -23,6 +23,7 @@
 // Unsigned char/short definition
 typedef unsigned char uchar;
 typedef unsigned short ushort;
+typedef unsigned int uint;
 // Gets the index of an object within an array
 #define INDEX_OF(entry, array) (int)(entry - array)
 

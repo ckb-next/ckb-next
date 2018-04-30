@@ -38,6 +38,7 @@ Important bugfixes:
 - Keymap patches for K68
 - Devices not being enabled on resume on macOS
 - Workaround for linux kernel out-of-bounds write
+- Memory leaks on firmware update
 
 ## [v0.2.9](https://github.com/ckb-next/ckb-next/tree/v0.2.9) (2018-01-21)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.2.8...v0.2.9)

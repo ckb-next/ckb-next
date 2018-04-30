@@ -75,12 +75,14 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     int fd = open(path, O_RDONLY);
     if(fd == -1){
         ckb_err("Failed to open firmware file %s: %s\n", path, strerror(errno));
+        free(fwdata);
         return FW_NOFILE;
     }
     ssize_t length = read(fd, fwdata, FW_MAXSIZE + 1);
     if(length <= 0x108 || length > FW_MAXSIZE){
         ckb_err("Failed to read firmware file %s: %s\n", path, length <= 0 ? strerror(errno) : "Wrong size");
         close(fd);
+        free(fwdata);
         return FW_NOFILE;
     }
     close(fd);
@@ -163,6 +165,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     };
     if(!usbsend(kb, data_pkt2[0], 2)){
         ckb_err("Firmware update failed\n");
+        free(fwdata);
         return FW_USBFAIL;
     }
     // Updated successfully

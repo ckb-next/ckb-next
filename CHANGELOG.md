@@ -1,5 +1,43 @@
 # Change Log
 
+## [v0.3.0](https://github.com/ckb-next/ckb-next/tree/v0.3.0) (2018-04-30)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.2.9...v0.3.0)
+
+Important news:
+
+- Binaries have been renamed from ckb to ckb-next and qmake has been replaced with CMake
+
+Support for new devices:
+
+- K55 RGB
+- K68 RGB
+- K90 Legacy
+- Katar RGB
+- Polaris RGB
+- ST100 RGB
+
+New major features:
+
+- Use URB Interrupts to read data from devices
+- Profile Import/Export
+- Keyboard Layout autodetection
+- CMake build system
+- Relocation of binaries
+- No single global layout for all devices in the GUI
+
+Important bugfixes:
+
+- Deadlock on daemon exit
+- Support for K95 Platinum profile switch key
+- Keymap corruption on the GUI
+- Pulseaudio GUI deadlock
+- macOS Sierra and higher mouse fixes
+- Use udev to detect the appropriate endpoint max packet size
+- Ignore devices in BIOS mode
+- Disable save to hardware for unsupported devices
+- Keymap patches for K68
+- Devices not being enabled on resume on macOS
+
 ## [v0.2.9](https://github.com/ckb-next/ckb-next/tree/v0.2.9) (2018-01-21)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.2.8...v0.2.9)
 

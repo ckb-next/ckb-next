@@ -101,10 +101,12 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         int ioctlerrno = errno;
         ckb_err_fn(" %s, res = 0x%x\n", file, line, res ? strerror(ioctlerrno) : "No data written", res);
         if(res == -1 && ioctlerrno == ETIMEDOUT){
-            pthread_mutex_unlock(intmutex(kb));
+            if(is_recv)
+                pthread_mutex_unlock(intmutex(kb));
             return -1;
         } else {
-            pthread_mutex_unlock(intmutex(kb));
+            if(is_recv)
+                pthread_mutex_unlock(intmutex(kb));
             return 0;
         }
     } else if (res != MSG_SIZE)

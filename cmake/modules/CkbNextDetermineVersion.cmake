@@ -53,7 +53,7 @@ function(determine_version source_dir git_command var_prefix)
     if (NOT ${${var_prefix}_VERSION_IS_RELEASE})
         if (EXISTS ${git_command})
             execute_process(
-                    COMMAND ${git_command} describe
+                    COMMAND ${git_command} describe --tags
                     WORKING_DIRECTORY ${source_dir}
                     RESULT_VARIABLE result
                     OUTPUT_VARIABLE output

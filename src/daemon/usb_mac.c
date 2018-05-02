@@ -381,7 +381,7 @@ void register_mouse_event_tap(CFRunLoopTimerRef timer, void* info) {
             // whenever a mouse event happens.
             mouse_event_tap = CGEventTapCreate(kCGHIDEventTap,
                                                kCGHeadInsertEventTap,
-                                               kCGEventTapOptionListenOnly,
+                                               kCGEventTapOptionDefault,
                                                mask,
                                                mouse_event_modifier_callback,
                                                NULL);

@@ -293,7 +293,7 @@ void Kb::save(){
     if(prefsPath.isEmpty())
         return;
     _needsSave = false;
-    CkbSettings settings(prefsPath);
+    CkbSettings settings(prefsPath, true);
     QString guids, currentGuid;
     foreach(KbProfile* profile, _profiles){
         guids.append(" " + profile->id().guidString());

@@ -211,6 +211,10 @@ typedef struct {
     kern_return_t lastresult;
     // Input handle
     io_connect_t event;
+    #ifndef OS_MAC_LEGACY
+    io_connect_t event_mouse;
+    #endif
+    //#ifdef OS_MAC_LEGACY //FIXME
     // Key-repeat info
     CFRunLoopRef input_loop;
     CFRunLoopTimerRef krtimer;
@@ -220,6 +224,7 @@ typedef struct {
     pthread_t indicthread;
     IOOptionBits modifiers;
     uchar mousestate;
+    //#endif
     char scroll_rate;
 #endif
     // Number of endpoints on the USB device

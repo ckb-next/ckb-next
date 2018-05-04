@@ -89,6 +89,7 @@ if (MACOS OR LINUX)
               firmware.h
               includes.h
               input.h
+              input_mac_vhid.h
               keymap.h
               keymap_patch.h
               led.h
@@ -105,7 +106,7 @@ if (MACOS)
             PRIVATE
               usb_mac.c
               input_mac.c
-              input_mac_mouse.c
+              input_mac_mouse_legacy.c
               extra_mac.c
               keymap_mac.h)
 elseif (LINUX)

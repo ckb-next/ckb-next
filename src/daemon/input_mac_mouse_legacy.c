@@ -1,6 +1,6 @@
 #include "includes.h"
 
-#ifdef OS_MAC
+#ifdef OS_MAC_LEGACY
 
 // Most of this code shamelessly stolen from:
 // http://www.opensource.apple.com/source/IOHIDFamily/IOHIDFamily-606.1.7/IOHIDSystem/IOHIPointing.cpp
@@ -1438,4 +1438,4 @@ void wheel_accel(io_connect_t event, int* deltaAxis1, SInt32* fixedDeltaAxis1, S
     pthread_mutex_unlock(&mutex);
 }
 
-#endif  // OS_MAC
+#endif  // OS_MAC_LEGACY

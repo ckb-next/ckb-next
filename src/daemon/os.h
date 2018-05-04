@@ -35,11 +35,6 @@
 #define UINPUT_VERSION 2
 #endif
 
-// The OSX process needs to change its EUID to post events, so thread safety must be ensured
-// On Linux the EUID is always root
-#define euid_guard_start
-#define euid_guard_stop
-
 #endif  // OS_LINUX
 
 #ifdef OS_MAC
@@ -61,12 +56,6 @@ typedef IOHIDDeviceDeviceInterface**    hid_dev_t;
 typedef IOUSBDeviceInterface182**       usb_dev_t;
 typedef IOUSBInterfaceInterface183**    usb_iface_t;
 
-// The OSX process needs to change its EUID to post events, so thread safety must be ensured
-// On Linux the EUID is always root
-extern pthread_mutex_t _euid_guard;
-#define euid_guard_start    pthread_mutex_lock(&_euid_guard)
-#define euid_guard_stop     pthread_mutex_unlock(&_euid_guard)
-
 // Various POSIX functions that aren't present on OSX
 
 void *memrchr(const void *s, int c, size_t n);
@@ -82,5 +71,20 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp);
 int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp, struct timespec *rmtp);
 
 #endif  // OS_MAC
+
+// The OSX process on legacy builds needs to change its EUID to post events, so thread safety must be ensured
+// Otherwise the EUID is always root
+#ifdef OS_MAC_LEGACY
+
+extern pthread_mutex_t _euid_guard;
+#define euid_guard_start    pthread_mutex_lock(&_euid_guard)
+#define euid_guard_stop     pthread_mutex_unlock(&_euid_guard)
+
+#else
+
+#define euid_guard_start
+#define euid_guard_stop
+
+#endif // OS_MAC_LEGACY
 
 #endif  // OS_H

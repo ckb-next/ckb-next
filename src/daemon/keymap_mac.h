@@ -4,162 +4,172 @@
 #include "os.h"
 #ifdef OS_MAC
 
-// Emulate Linux key constants for OSX
+#ifdef OS_MAC_LEGACY
 
-#define KEY_ESC             kVK_Escape
-#define KEY_F1              kVK_F1
-#define KEY_F2              kVK_F2
-#define KEY_F3              kVK_F3
-#define KEY_F4              kVK_F4
-#define KEY_F5              kVK_F5
-#define KEY_F6              kVK_F6
-#define KEY_F7              kVK_F7
-#define KEY_F8              kVK_F8
-#define KEY_F9              kVK_F9
-#define KEY_F10             kVK_F10
-#define KEY_F11             kVK_F11
-#define KEY_F12             kVK_F12
-#define KEY_F13             kVK_F13
-#define KEY_F14             kVK_F14
-#define KEY_F15             kVK_F15
-#define KEY_F16             kVK_F16
-#define KEY_F17             kVK_F17
-#define KEY_F18             kVK_F18
-#define KEY_F19             kVK_F19
-#define KEY_F20             kVK_F20
-#define KEY_F21             -1
-#define KEY_F22             -1
-#define KEY_F23             -1
-#define KEY_F24             -1
+#include "keymap_mac_legacy.h"
 
-#define KEY_1               kVK_ANSI_1
-#define KEY_2               kVK_ANSI_2
-#define KEY_3               kVK_ANSI_3
-#define KEY_4               kVK_ANSI_4
-#define KEY_5               kVK_ANSI_5
-#define KEY_6               kVK_ANSI_6
-#define KEY_7               kVK_ANSI_7
-#define KEY_8               kVK_ANSI_8
-#define KEY_9               kVK_ANSI_9
-#define KEY_0               kVK_ANSI_0
+#else
 
-#define KEY_A               kVK_ANSI_A
-#define KEY_B               kVK_ANSI_B
-#define KEY_C               kVK_ANSI_C
-#define KEY_D               kVK_ANSI_D
-#define KEY_E               kVK_ANSI_E
-#define KEY_F               kVK_ANSI_F
-#define KEY_G               kVK_ANSI_G
-#define KEY_H               kVK_ANSI_H
-#define KEY_I               kVK_ANSI_I
-#define KEY_J               kVK_ANSI_J
-#define KEY_K               kVK_ANSI_K
-#define KEY_L               kVK_ANSI_L
-#define KEY_M               kVK_ANSI_M
-#define KEY_N               kVK_ANSI_N
-#define KEY_O               kVK_ANSI_O
-#define KEY_P               kVK_ANSI_P
-#define KEY_Q               kVK_ANSI_Q
-#define KEY_R               kVK_ANSI_R
-#define KEY_S               kVK_ANSI_S
-#define KEY_T               kVK_ANSI_T
-#define KEY_U               kVK_ANSI_U
-#define KEY_V               kVK_ANSI_V
-#define KEY_W               kVK_ANSI_W
-#define KEY_X               kVK_ANSI_X
-#define KEY_Y               kVK_ANSI_Y
-#define KEY_Z               kVK_ANSI_Z
+// Replace Linux key constants with HID scancodes for macOS w/VirtualHIDDevice
 
-#define KEY_GRAVE           kVK_ANSI_Grave
-#define KEY_102ND           kVK_ISO_Section
-#define KEY_MINUS           kVK_ANSI_Minus
-#define KEY_EQUAL           kVK_ANSI_Equal
-#define KEY_BACKSPACE       kVK_Delete
-#define KEY_LEFTBRACE       kVK_ANSI_LeftBracket
-#define KEY_RIGHTBRACE      kVK_ANSI_RightBracket
-#define KEY_BACKSLASH       kVK_ANSI_Backslash
-#define KEY_SEMICOLON       kVK_ANSI_Semicolon
-#define KEY_APOSTROPHE      kVK_ANSI_Quote
-#define KEY_ENTER           kVK_Return
-#define KEY_COMMA           kVK_ANSI_Comma
-#define KEY_DOT             kVK_ANSI_Period
-#define KEY_SLASH           kVK_ANSI_Slash
-#define KEY_SPACE           kVK_Space
+#define KEY_ESC             kHIDUsage_KeyboardEscape
+#define KEY_F1              kHIDUsage_KeyboardF1
+#define KEY_F2              kHIDUsage_KeyboardF2
+#define KEY_F3              kHIDUsage_KeyboardF3
+#define KEY_F4              kHIDUsage_KeyboardF4
+#define KEY_F5              kHIDUsage_KeyboardF5
+#define KEY_F6              kHIDUsage_KeyboardF6
+#define KEY_F7              kHIDUsage_KeyboardF7
+#define KEY_F8              kHIDUsage_KeyboardF8
+#define KEY_F9              kHIDUsage_KeyboardF9
+#define KEY_F10             kHIDUsage_KeyboardF10
+#define KEY_F11             kHIDUsage_KeyboardF11
+#define KEY_F12             kHIDUsage_KeyboardF12
+#define KEY_F13             kHIDUsage_KeyboardF13
+#define KEY_F14             kHIDUsage_KeyboardF14
+#define KEY_F15             kHIDUsage_KeyboardF15
+#define KEY_F16             kHIDUsage_KeyboardF16
+#define KEY_F17             kHIDUsage_KeyboardF17
+#define KEY_F18             kHIDUsage_KeyboardF18
+#define KEY_F19             kHIDUsage_KeyboardF19
+#define KEY_F20             kHIDUsage_KeyboardF20
+#define KEY_F21             kHIDUsage_KeyboardF21
+#define KEY_F22             kHIDUsage_KeyboardF22
+#define KEY_F23             kHIDUsage_KeyboardF23
+#define KEY_F24             kHIDUsage_KeyboardF24
 
-#define KEY_TAB             kVK_Tab
-#define KEY_CAPSLOCK        kVK_CapsLock
-#define KEY_LEFTSHIFT       kVK_Shift
-#define KEY_RIGHTSHIFT      kVK_RightShift
-#define KEY_LEFTCTRL        kVK_Control
-#define KEY_RIGHTCTRL       kVK_RightControl
-#define KEY_LEFTMETA        kVK_Command
-#define KEY_RIGHTMETA       (kVK_Command - 1)   // This isn't listed as kVK_RightCommand for some reason?
-#define KEY_LEFTALT         kVK_Option
-#define KEY_RIGHTALT        kVK_RightOption
+#define KEY_1               kHIDUsage_Keyboard1
+#define KEY_2               kHIDUsage_Keyboard2
+#define KEY_3               kHIDUsage_Keyboard3
+#define KEY_4               kHIDUsage_Keyboard4
+#define KEY_5               kHIDUsage_Keyboard5
+#define KEY_6               kHIDUsage_Keyboard6
+#define KEY_7               kHIDUsage_Keyboard7
+#define KEY_8               kHIDUsage_Keyboard8
+#define KEY_9               kHIDUsage_Keyboard9
+#define KEY_0               kHIDUsage_Keyboard0
+
+#define KEY_A               kHIDUsage_KeyboardA
+#define KEY_B               kHIDUsage_KeyboardB
+#define KEY_C               kHIDUsage_KeyboardC
+#define KEY_D               kHIDUsage_KeyboardD
+#define KEY_E               kHIDUsage_KeyboardE
+#define KEY_F               kHIDUsage_KeyboardF
+#define KEY_G               kHIDUsage_KeyboardG
+#define KEY_H               kHIDUsage_KeyboardH
+#define KEY_I               kHIDUsage_KeyboardI
+#define KEY_J               kHIDUsage_KeyboardJ
+#define KEY_K               kHIDUsage_KeyboardK
+#define KEY_L               kHIDUsage_KeyboardL
+#define KEY_M               kHIDUsage_KeyboardM
+#define KEY_N               kHIDUsage_KeyboardN
+#define KEY_O               kHIDUsage_KeyboardO
+#define KEY_P               kHIDUsage_KeyboardP
+#define KEY_Q               kHIDUsage_KeyboardQ
+#define KEY_R               kHIDUsage_KeyboardR
+#define KEY_S               kHIDUsage_KeyboardS
+#define KEY_T               kHIDUsage_KeyboardT
+#define KEY_U               kHIDUsage_KeyboardU
+#define KEY_V               kHIDUsage_KeyboardV
+#define KEY_W               kHIDUsage_KeyboardW
+#define KEY_X               kHIDUsage_KeyboardX
+#define KEY_Y               kHIDUsage_KeyboardY
+#define KEY_Z               kHIDUsage_KeyboardZ
+
+#define KEY_GRAVE           kHIDUsage_KeyboardGraveAccentAndTilde
+#define KEY_102ND           kHIDUsage_KeyboardNonUSBackslash
+#define KEY_MINUS           kHIDUsage_KeyboardHyphen
+#define KEY_EQUAL           kHIDUsage_KeyboardEqualSign
+#define KEY_BACKSPACE       kHIDUsage_KeyboardDeleteOrBackspace
+#define KEY_LEFTBRACE       kHIDUsage_KeyboardOpenBracket
+#define KEY_RIGHTBRACE      kHIDUsage_KeyboardCloseBracket
+#define KEY_BACKSLASH       kHIDUsage_KeyboardBackslash
+#define KEY_SEMICOLON       kHIDUsage_KeyboardSemicolon
+#define KEY_APOSTROPHE      kHIDUsage_KeyboardQuote
+#define KEY_ENTER           kHIDUsage_KeyboardReturnOrEnter
+#define KEY_COMMA           kHIDUsage_KeyboardComma
+#define KEY_DOT             kHIDUsage_KeyboardPeriod
+#define KEY_SLASH           kHIDUsage_KeyboardSlash
+#define KEY_SPACE           kHIDUsage_KeyboardSpacebar
+
+#define KEY_TAB             kHIDUsage_KeyboardTab
+#define KEY_CAPSLOCK        kHIDUsage_KeyboardCapsLock
+#define KEY_LEFTSHIFT       kHIDUsage_KeyboardLeftShift
+#define KEY_RIGHTSHIFT      kHIDUsage_KeyboardRightShift
+#define KEY_LEFTCTRL        kHIDUsage_KeyboardLeftControl
+#define KEY_RIGHTCTRL       kHIDUsage_KeyboardRightControl
+#define KEY_LEFTMETA        kHIDUsage_KeyboardLeftGUI
+#define KEY_RIGHTMETA       kHIDUsage_KeyboardRightGUI   // This isn't listed as kVK_RightCommand for some reason?
+#define KEY_LEFTALT         kHIDUsage_KeyboardLeftAlt
+#define KEY_RIGHTALT        kHIDUsage_KeyboardRightAlt
 #define KEY_COMPOSE         -1                  // OSX has no context menu key
-#define KEY_FN              kVK_Function
+#define KEY_FN              0x03 //kHIDUsage_AV_TopCase_KeyboardFn
 
-#define KEY_SYSRQ           kVK_F13
-#define KEY_SCROLLLOCK      kVK_F14
-#define KEY_PAUSE           kVK_F15
-#define KEY_INSERT          kVK_Help
-#define KEY_HOME            kVK_Home
-#define KEY_PAGEUP          kVK_PageUp
-#define KEY_DELETE          kVK_ForwardDelete
-#define KEY_END             kVK_End
-#define KEY_PAGEDOWN        kVK_PageDown
+#define KEY_SYSRQ           kHIDUsage_KeyboardF13
+#define KEY_SCROLLLOCK      kHIDUsage_KeyboardF14
+#define KEY_PAUSE           kHIDUsage_KeyboardF15
+#define KEY_INSERT          kHIDUsage_KeyboardInsert
+#define KEY_HOME            kHIDUsage_KeyboardHome
+#define KEY_PAGEUP          kHIDUsage_KeyboardPageUp
+#define KEY_DELETE          kHIDUsage_KeyboardDeleteForward
+#define KEY_END             kHIDUsage_KeyboardEnd
+#define KEY_PAGEDOWN        kHIDUsage_KeyboardPageDown
 
-#define KEY_UP              kVK_UpArrow
-#define KEY_LEFT            kVK_LeftArrow
-#define KEY_DOWN            kVK_DownArrow
-#define KEY_RIGHT           kVK_RightArrow
+#define KEY_UP              kHIDUsage_KeyboardUpArrow
+#define KEY_LEFT            kHIDUsage_KeyboardLeftArrow
+#define KEY_DOWN            kHIDUsage_KeyboardDownArrow
+#define KEY_RIGHT           kHIDUsage_KeyboardRightArrow
 
-#define KEY_NUMLOCK         kVK_ANSI_KeypadClear
-#define KEY_KPSLASH         kVK_ANSI_KeypadDivide
-#define KEY_KPASTERISK      kVK_ANSI_KeypadMultiply
-#define KEY_KPMINUS         kVK_ANSI_KeypadMinus
-#define KEY_KPPLUS          kVK_ANSI_KeypadPlus
-#define KEY_KPENTER         kVK_ANSI_KeypadEnter
-#define KEY_KPDOT           kVK_ANSI_KeypadDecimal
-#define KEY_KP1             kVK_ANSI_Keypad1
-#define KEY_KP2             kVK_ANSI_Keypad2
-#define KEY_KP3             kVK_ANSI_Keypad3
-#define KEY_KP4             kVK_ANSI_Keypad4
-#define KEY_KP5             kVK_ANSI_Keypad5
-#define KEY_KP6             kVK_ANSI_Keypad6
-#define KEY_KP7             kVK_ANSI_Keypad7
-#define KEY_KP8             kVK_ANSI_Keypad8
-#define KEY_KP9             kVK_ANSI_Keypad9
-#define KEY_KP0             kVK_ANSI_Keypad0
+#define KEY_NUMLOCK         kHIDUsage_KeypadNumLock
+#define KEY_KPSLASH         kHIDUsage_KeypadSlash
+#define KEY_KPASTERISK      kHIDUsage_KeypadAsterisk
+#define KEY_KPMINUS         kHIDUsage_KeypadHyphen
+#define KEY_KPPLUS          kHIDUsage_KeypadPlus
+#define KEY_KPENTER         kHIDUsage_KeypadEnter
+#define KEY_KPDOT           kHIDUsage_KeypadPeriod
+#define KEY_KP1             kHIDUsage_Keypad1
+#define KEY_KP2             kHIDUsage_Keypad2
+#define KEY_KP3             kHIDUsage_Keypad3
+#define KEY_KP4             kHIDUsage_Keypad4
+#define KEY_KP5             kHIDUsage_Keypad5
+#define KEY_KP6             kHIDUsage_Keypad6
+#define KEY_KP7             kHIDUsage_Keypad7
+#define KEY_KP8             kHIDUsage_Keypad8
+#define KEY_KP9             kHIDUsage_Keypad9
+#define KEY_KP0             kHIDUsage_Keypad0
 
-#define KEY_YEN             kVK_JIS_Yen
-#define KEY_RO              kVK_JIS_Underscore
-#define KEY_KATAKANAHIRAGANA kVK_JIS_Kana
-#define KEY_HENKAN          -1
-#define KEY_MUHENKAN        -1
+#define KEY_YEN             kHIDUsage_KeyboardInternational3
+#define KEY_RO              kHIDUsage_KeyboardInternational1
+#define KEY_KATAKANAHIRAGANA kHIDUsage_KeyboardInternational2
+#define KEY_HENKAN          kHIDUsage_KeyboardInternational4
+#define KEY_MUHENKAN        kHIDUsage_KeyboardInternational5
 
-#define KEY_MEDIA           0x800
-#define IS_MEDIA(scancode)  ((scancode) >= KEY_MEDIA)
-#define KEY_MUTE            (KEY_MEDIA + NX_KEYTYPE_MUTE)
-#define KEY_VOLUMEUP        (KEY_MEDIA + NX_KEYTYPE_SOUND_UP)
-#define KEY_VOLUMEDOWN      (KEY_MEDIA + NX_KEYTYPE_SOUND_DOWN)
-#define KEY_STOPCD          -1                                  // OSX has no stop key
-#define KEY_PREVIOUSSONG    (KEY_MEDIA + NX_KEYTYPE_PREVIOUS)
-#define KEY_PLAYPAUSE       (KEY_MEDIA + NX_KEYTYPE_PLAY)
-#define KEY_NEXTSONG        (KEY_MEDIA + NX_KEYTYPE_NEXT)
-#define KEY_BRIGHTNESSUP    (KEY_MEDIA + NX_KEYTYPE_BRIGHTNESS_UP)
-#define KEY_BRIGHTNESSDOWN  (KEY_MEDIA + NX_KEYTYPE_BRIGHTNESS_DOWN)
-#define KEY_EJECTCD         (KEY_MEDIA + NX_KEYTYPE_EJECT)
-#define KEY_POWER           (KEY_MEDIA + NX_POWER_KEY)
+#define KEY_CONSUMER        0x800
+#define IS_CONSUMER(scan)   ((scan) >= KEY_CONSUMER)
+#define KEY_MUTE            (KEY_CONSUMER + kHIDUsage_Csmr_Mute)
+#define KEY_VOLUMEUP        (KEY_CONSUMER + kHIDUsage_Csmr_VolumeIncrement)
+#define KEY_VOLUMEDOWN      (KEY_CONSUMER + kHIDUsage_Csmr_VolumeDecrement)
+#define KEY_STOPCD          (KEY_CONSUMER + kHIDUsage_Csmr_Stop)
+#define KEY_PREVIOUSSONG    (KEY_CONSUMER + kHIDUsage_Csmr_ScanPreviousTrack)
+#define KEY_PLAYPAUSE       (KEY_CONSUMER + kHIDUsage_Csmr_PlayOrPause)
+#define KEY_NEXTSONG        (KEY_CONSUMER + kHIDUsage_Csmr_ScanNextTrack)
+#define KEY_BRIGHTNESSUP    (KEY_CONSUMER + 0x0020)
+#define KEY_BRIGHTNESSDOWN  (KEY_CONSUMER + 0x0021)
+#define KEY_EJECTCD         (KEY_CONSUMER + kHIDUsage_Csmr_Eject)
+#define KEY_POWER           (KEY_CONSUMER + 0x000c)
+#define IS_VENDOR(scan)     ((scan) >= KEY_CONSUMER && (scan) < KEY_CONSUMER + kHIDUsage_Csmr_ScanPreviousTrack)
 
-#define BTN_LEFT            0
-#define BTN_RIGHT           1
-#define BTN_MIDDLE          2
+
+#define BTN_LEFT            1
+#define BTN_RIGHT           2
+#define BTN_MIDDLE          3
 #define BTN_SIDE            4
 #define BTN_EXTRA           5
 #define BTN_FORWARD         6
 #define BTN_BACK            7
 #define BTN_TASK            8
+
+#endif //OS_MAC_LEGACY
 
 #endif // OS_MAC
 

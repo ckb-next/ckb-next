@@ -75,7 +75,7 @@ static void usbgetstr(usb_dev_t handle, uint8 string_index, char* output, int ou
 // Hacky way of trying something over and over again until it works. 100ms intervals, max 1s
 #define wait_loop(error, operation)  do {                                                                                   \
     int trial = 0;                                                                                                          \
-    while(((error) = (operation)) != kIOReturnSuccess &&  ((error) = (operation)) != kIOReturnNoResources){                 \
+    while(((error) = (operation)) != kIOReturnSuccess &&  operation != kIOReturnNoResources){                               \
         if(++trial == 10)                                                                                                   \
             break;                                                                                                          \
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL);                               \

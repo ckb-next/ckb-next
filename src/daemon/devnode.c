@@ -297,8 +297,12 @@ int rmdevpath(usbdevice* kb){
     euid_guard_start;
     int index = INDEX_OF(kb, keyboard);
     if(kb->infifo != 0){
-        write(kb->infifo - 1, "\n", 1); // hack to prevent the FIFO thread from perma-blocking
-        close(kb->infifo - 1);
+        int fd = kb->infifo - 1;
+#ifdef OS_MAC
+        fcntl(fd, F_SETFL, O_RDWR | O_NONBLOCK); // hack to prevent the following hack from blocking if the GUI was running
+#endif
+        write(fd, "\n", 1); // hack to prevent the FIFO thread from perma-blocking
+        close(fd);
         kb->infifo = 0;
     }
     for(int i = 0; i < OUTFIFO_MAX; i++)

@@ -20,8 +20,14 @@ vhid_mouseinput mouseinput = {{0}, 0, 0, 0, 0};
 int os_inputopen(usbdevice* kb){
     // Check if Karabiner VirtualHIDDevice is loaded
     io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(VIRTUAL_HID_ROOT_NAME));
-    if(!service)
-        ckb_fatal("Unable to open VirtualHIDDevice\n");
+    if(!service){
+        system("kextutil " VIRTUAL_HID_KEXT_PATH );
+        service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(VIRTUAL_HID_ROOT_NAME));
+        if(!service){
+            ckb_fatal("Unable to open VirtualHIDDevice\n");
+            return 1;
+        }
+    }
 
     kern_return_t kr;
     kr = IOServiceOpen(service, mach_task_self(), kIOHIDServerConnectType, &(kb->event));
@@ -33,32 +39,30 @@ int os_inputopen(usbdevice* kb){
         ckb_fatal("IOServiceOpen for VirtualHIDPointing error\n");
 
     vhid_properties properties = {0};
-    
+
     kr = IOConnectCallStructMethod(kb->event,
                                     initialize_virtual_hid_keyboard,
                                     &properties, sizeof(vhid_properties),
                                     NULL, 0);
-    if(kr != KERN_SUCCESS)
+    if(kr != KERN_SUCCESS){
         ckb_fatal("VirtualHIDKeyboard init error\n");
+    }
+
+    ckb_info("Waiting for VirtualHIDKeyboard...\n");
 
     while(1){
-        ckb_info("Waiting for VirtualHIDKeyboard...\n");
-
         bool ready = false;
         size_t readysize = sizeof(ready);
         kr = IOConnectCallStructMethod(kb->event,
                                     is_virtual_hid_keyboard_ready,
                                     NULL, 0,
                                     &ready, &readysize);
-        if (kr != KERN_SUCCESS) {
-            ckb_err("VirtualHIDKeyboard not ready yet\n");
-        } else {
-            if(ready){
-                ckb_info("VirtualHIDKeyboard ready\n");
-                break;
-            }
+        if (kr == KERN_SUCCESS && ready){
+            ckb_info("VirtualHIDKeyboard ready\n");
+            break;
         }
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 10000000}, NULL);
+
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 1}, NULL);
     }
     
 /* MOUSE */

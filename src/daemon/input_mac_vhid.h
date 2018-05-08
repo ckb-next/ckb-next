@@ -3,6 +3,7 @@
 // Based on https://github.com/tekezo/Karabiner-Elements/blob/master/src/vendor/Karabiner-VirtualHIDDevice/dist/include/karabiner_virtual_hid_device.hpp
 
 #define VIRTUAL_HID_ROOT_NAME "org_pqrs_driver_Karabiner_VirtualHIDDevice_VirtualHIDRoot_v060800"
+#define VIRTUAL_HID_KEXT_PATH "/Library/Extensions/org.pqrs.driver.Karabiner.VirtualHIDDevice.v060800.kext"
 // Kext constant. Don't modify unless you're absolutely sure you know what you're doing.
 #define VHID_KEYS_LEN 32
 

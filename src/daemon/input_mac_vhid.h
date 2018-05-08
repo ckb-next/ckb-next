@@ -57,15 +57,21 @@ typedef struct keyboard_input {
     vhid_keys keys;
 } vhid_kbinput;
 
-/*typedef struct consumer_input {
+typedef struct consumer_input {
     uint8_t report_id_;
     vhid_keys keys;
 } vhid_kbconsumerinput;
 
+typedef struct vendor_input {
+    uint8_t report_id_;
+    vhid_keys keys;
+} vhid_kbvendorinput;
+
 typedef struct avtopcase_input {
     uint8_t report_id_;
     vhid_keys keys;
-} vhid_kbavtopcaseinput;*/
+} vhid_kbavtopcaseinput;
+
 
 // Functions to add/remove keys from report
 void add_to_keys(int scan, vhid_keys* input){

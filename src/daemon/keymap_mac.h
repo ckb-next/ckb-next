@@ -99,10 +99,10 @@
 #define KEY_LEFTCTRL        kHIDUsage_KeyboardLeftControl
 #define KEY_RIGHTCTRL       kHIDUsage_KeyboardRightControl
 #define KEY_LEFTMETA        kHIDUsage_KeyboardLeftGUI
-#define KEY_RIGHTMETA       kHIDUsage_KeyboardRightGUI   // This isn't listed as kVK_RightCommand for some reason?
+#define KEY_RIGHTMETA       kHIDUsage_KeyboardRightGUI
 #define KEY_LEFTALT         kHIDUsage_KeyboardLeftAlt
 #define KEY_RIGHTALT        kHIDUsage_KeyboardRightAlt
-#define KEY_COMPOSE         -1                  // OSX has no context menu key
+#define KEY_COMPOSE         kHIDUsage_KeyboardMenu
 #define KEY_FN              0x03 //kHIDUsage_AV_TopCase_KeyboardFn
 
 #define KEY_SYSRQ           kHIDUsage_KeyboardF13
@@ -153,11 +153,11 @@
 #define KEY_PREVIOUSSONG    (KEY_CONSUMER + kHIDUsage_Csmr_ScanPreviousTrack)
 #define KEY_PLAYPAUSE       (KEY_CONSUMER + kHIDUsage_Csmr_PlayOrPause)
 #define KEY_NEXTSONG        (KEY_CONSUMER + kHIDUsage_Csmr_ScanNextTrack)
-#define KEY_BRIGHTNESSUP    (KEY_CONSUMER + 0x0020)
-#define KEY_BRIGHTNESSDOWN  (KEY_CONSUMER + 0x0021)
+#define KEY_BRIGHTNESSUP    (KEY_CONSUMER + 0x006f)
+#define KEY_BRIGHTNESSDOWN  (KEY_CONSUMER + 0x0070)
 #define KEY_EJECTCD         (KEY_CONSUMER + kHIDUsage_Csmr_Eject)
-#define KEY_POWER           (KEY_CONSUMER + 0x000c)
-#define IS_VENDOR(scan)     ((scan) >= KEY_CONSUMER && (scan) < KEY_CONSUMER + kHIDUsage_Csmr_ScanPreviousTrack)
+#define KEY_POWER           (KEY_CONSUMER + 0x0030)
+#define IS_VENDOR(scan)     ((scan) >= KEY_CONSUMER && (scan) < KEY_CONSUMER + kHIDUsage_Csmr_Play)
 
 
 #define BTN_LEFT            1

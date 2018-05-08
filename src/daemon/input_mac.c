@@ -8,14 +8,11 @@
 #include <sys/sysctl.h>
 #include "input_mac_vhid.h"
 
-int osx_ver = -1;
 // VirtualHIDKeyboard
 vhid_kbinput kbinput_key = {1, {0}, 0, {{0}}};
-vhid_kbinput kbinput_consumer = {2, {0}, 0, {{0}}};
-vhid_kbinput kbinput_avtopcase = {3, {0}, 0, {{0}}};
-vhid_kbinput kbinput_vendor = {4, {0}, 0, {{0}}};
-//vhid_kbconsumerinput kbinput_consumer = {2, {{0}}};
-//vhid_kbavtopcaseinput kbinput_avtopcase = {3, {{0}}};
+vhid_kbconsumerinput kbinput_consumer = {2, {{0}}};
+vhid_kbavtopcaseinput kbinput_avtopcase = {3, {{0}}};
+vhid_kbvendorinput kbinput_vendor = {4, {{0}}};
 
 // VirtualHIDPointing
 vhid_mouseinput mouseinput = {{0}, 0, 0, 0, 0};
@@ -120,20 +117,37 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         IOConnectCallStructMethod(kb->event_mouse, post_pointing_input_report, &mouseinput, sizeof(mouseinput), NULL, 0);
         return;
     }
-    ckb_info("scancode %x\n", scancode);
     // Pick the appropriate add or remove function
     add_remove_keys = down ? &add_to_keys : &remove_from_keys;
     
-    if(IS_VENDOR(scancode)) { // Fn
+    if(scancode == KEY_FN) {
+        (*add_remove_keys)(scancode, &(kbinput_avtopcase.keys));
+        IOConnectCallStructMethod(kb->event, post_apple_vendor_top_case_input_report, &kbinput_avtopcase, sizeof(kbinput_avtopcase), NULL, 0);
+    }/* else if(IS_VENDOR(scancode)) {
         scancode = scancode - KEY_CONSUMER;
+        ckb_info("Vendor %x\n", scancode);
         (*add_remove_keys)(scancode, &(kbinput_vendor.keys));
-        ckb_info("Vendor\n %i", scancode);
-        IOConnectCallStructMethod(kb->event, post_keyboard_input_report, &kbinput_vendor, sizeof(kbinput_vendor), NULL, 0);
-    } else if(IS_CONSUMER(scancode)){
+        kbinput_vendor.keys.keys_[0] = 0x10;
+        IOConnectCallStructMethod(kb->event, post_apple_vendor_keyboard_input_report, &kbinput_vendor, sizeof(kbinput_vendor), NULL, 0);
+    }*/ else if(IS_CONSUMER(scancode)){
         scancode = scancode - KEY_CONSUMER;
         (*add_remove_keys)(scancode, &(kbinput_consumer.keys));
-        IOConnectCallStructMethod(kb->event, post_keyboard_input_report, &kbinput_consumer, sizeof(kbinput_consumer), NULL, 0);
+        IOConnectCallStructMethod(kb->event, post_consumer_input_report, &kbinput_consumer, sizeof(kbinput_consumer), NULL, 0);
     } else {
+        if(scancode == KEY_CAPSLOCK){
+            if(down) {
+                kb->modifiers ^= NX_ALPHASHIFTMASK;
+
+                // Detach a thread to update the indicator state
+                if(!kb->indicthread){
+                    // The thread is only spawned if kb->indicthread is null.
+                    // Due to the logic inside the thread, this means that it could theoretically be spawned twice, but never a third time.
+                    // Moreover, if it is spawned more than once, the indicator state will remain correct due to dmutex staying locked.
+                    if(!pthread_create(&kb->indicthread, 0, indicator_update, kb))
+                        pthread_detach(kb->indicthread);
+                }
+            }
+        }
         (*add_remove_keys)(scancode, &(kbinput_key.keys));
         IOConnectCallStructMethod(kb->event, post_keyboard_input_report, &kbinput_key, sizeof(kbinput_key), NULL, 0);
     }

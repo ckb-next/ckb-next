@@ -77,8 +77,20 @@ int os_inputopen(usbdevice* kb){
 
 void os_inputclose(usbdevice* kb){
     if(kb->event){
+        ckb_info("Terminating VirtualHIDKeyboard\n");
+        IOConnectCallStructMethod(kb->event, reset_virtual_hid_keyboard, NULL, 0, NULL, 0);
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 10000000}, NULL);
+        IOConnectCallStructMethod(kb->event, terminate_virtual_hid_keyboard, NULL, 0, NULL, 0);
         IOServiceClose(kb->event);
         kb->event = 0;
+    }
+    if(kb->event_mouse){
+        ckb_info("Terminating VirtualHIDPointing\n");
+        IOConnectCallStructMethod(kb->event_mouse, reset_virtual_hid_pointing, NULL, 0, NULL, 0);
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 10000000}, NULL);
+        IOConnectCallStructMethod(kb->event_mouse, terminate_virtual_hid_pointing, NULL, 0, NULL, 0);
+        IOServiceClose(kb->event_mouse);
+        kb->event_mouse = 0;
     }
 }
 

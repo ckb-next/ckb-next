@@ -278,7 +278,7 @@ elseif (LINUX)
     endif ()
 
     # A way to check for systemd
-    if (EXISTS "/run/systemd/system")
+    if (EXISTS "/run/systemd/system" OR EXISTS "/run/systemd/users")
         message(STATUS "systemd detected")
         set(CKB_NEXT_INIT_SYSTEM "systemd" CACHE INTERNAL "")
 

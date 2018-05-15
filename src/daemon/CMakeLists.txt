@@ -325,12 +325,6 @@ elseif (LINUX)
             @ONLY)
 
         if (SAFE_INSTALL)
-            execute_process(
-                COMMAND rc-status -a
-                COMMAND egrep "started"
-                COMMAND egrep -o "ckb-daemon|ckb-next-daemon"
-                OUTPUT_VARIABLE daemons
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)
                 string(REPLACE "\n" ";" daemons_list "${daemons}")
                 foreach (daemon IN LISTS daemons_list)
@@ -354,6 +348,27 @@ elseif (LINUX)
             endif ()
         endif ()
 
+    endif ()
+
+    # A way to check for SysVinit
+    if (EXISTS "/etc/inittab")
+        message(STATUS "SysVinit detected")
+        set(CKB_NEXT_INIT_SYSTEM "SysVinit" CACHE INTERNAL "")
+
+        # Generate and import service
+        message(STATUS "Generating and importing ckb-next-daemon (${CKB_NEXT_INIT_SYSTEM})")
+        configure_file(
+            "${ckb-next_SOURCE_DIR}/linux/sysvinit/ckb-next-daemon.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.sh"
+            @ONLY)
+
+        if (SAFE_INSTALL)
+            if (EXISTS "/dev/input/ckb0/pid")
+                message(STATUS "Running ckb-next-daemon detected")
+                install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: stoppping ${daemon}\")")
+                install(CODE "execute_process(COMMAND sudo /etc/init.d/ckb-next-daemon.sh stop)")
+            endif ()
+        endif ()
     endif ()
 
 endif ()
@@ -402,9 +417,17 @@ elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "OpenRC")
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ             GROUP_EXECUTE
         WORLD_READ             WORLD_EXECUTE)
+elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "SysVinit")
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.sh"
+        DESTINATION "/etc/init.d"
+        PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ             GROUP_EXECUTE
+        WORLD_READ             WORLD_EXECUTE)
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "unknown")
     message(WARNING "No supported system service detected.
-    Supported services are: systemd, launchd, OpenRC, upstart.")
+    Supported services are: systemd, launchd, OpenRC, upstart, SysVinit.")
 endif ()
 
 if (LINUX)
@@ -442,5 +465,9 @@ if (SAFE_INSTALL)
         install(CODE "execute_process(COMMAND sudo rc-update add ckb-next-daemon default)")
         install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo rc-service ckb-next-daemon start)")
+    elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "SysVinit")
+        # Just running the script should be enough
+        install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
+        install(CODE "execute_process(COMMAND sudo /etc/init.d/ckb-next-daemon.sh start)")
     endif ()
 endif ()

@@ -599,9 +599,9 @@ static int seize_wait(long location){
         ckb_warn("Unable to open master port: 0x%08x\n", res);
         return -1;
     }
-    const int max_tries = 20;     // give up after ~2s
+    const int max_tries = 20;     // give up after ~6s
     for(int try = 0; try < max_tries; try++){
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL);
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 300000000}, NULL);
         // Iterate the whole IOService registry
         io_iterator_t child_iter;
         if((res = IORegistryCreateIterator(master, kIOServicePlane, kIORegistryIterateRecursively, &child_iter)) != kIOReturnSuccess)

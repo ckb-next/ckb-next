@@ -3,6 +3,9 @@
 
 #include "includes.h"
 #include "keymap.h"
+#ifdef OS_MAC
+#include "input_mac_vhid.h" // For the VirtualHIDDevice structs
+#endif
 
 // Profile ID structure
 typedef struct {
@@ -213,6 +216,11 @@ typedef struct {
     io_connect_t event;
     #ifndef OS_MAC_LEGACY
     io_connect_t event_mouse;
+    vhid_kbinput kbinput_key;
+    vhid_kbconsumerinput kbinput_consumer;
+    vhid_kbavtopcaseinput kbinput_avtopcase;
+    vhid_kbvendorinput kbinput_vendor;
+    vhid_mouseinput mouseinput;
     #endif
     //#ifdef OS_MAC_LEGACY //FIXME
     // Key-repeat info

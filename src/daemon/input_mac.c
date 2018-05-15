@@ -8,16 +8,53 @@
 #include <sys/sysctl.h>
 #include "input_mac_vhid.h"
 
-// VirtualHIDKeyboard
-vhid_kbinput kbinput_key = {1, {0}, 0, {{0}}};
-vhid_kbconsumerinput kbinput_consumer = {2, {{0}}};
-vhid_kbavtopcaseinput kbinput_avtopcase = {3, {{0}}};
-vhid_kbvendorinput kbinput_vendor = {4, {{0}}};
+// Functions to add/remove keys from report
+void add_to_keys(int scan, vhid_keys* input){
+    for(int i = 0; i < VHID_KEYS_LEN; i++){
+        if(input->keys_[i] == 0){
+            input->keys_[i] = scan;
+            return;
+        }
+    }
+    ckb_warn("Dropping excess keypress\n");
+}
 
-// VirtualHIDPointing
-vhid_mouseinput mouseinput = {{0}, 0, 0, 0, 0};
+void remove_from_keys(int scan, vhid_keys* input){
+    for(int i = 0; i < VHID_KEYS_LEN; i++){
+        if(input->keys_[i] == scan){
+            input->keys_[i] = 0;
+            return;
+        }
+    }
+    ckb_warn("Couldn't find key to release\n");
+}
+
+// Functions to add/remove buttons from report
+void add_to_buttons(int scan, vhid_mouseinput* input){
+    input->buttons.buttons_ |= (0x1 << (scan - 1));
+}
+
+void remove_from_buttons(int scan, vhid_mouseinput* input){
+    input->buttons.buttons_ &= ~(0x1 << (scan - 1));
+}
+
+void (*add_remove_keys)(int scan, vhid_keys* input);
 
 int os_inputopen(usbdevice* kb){
+    memset(&kb->kbinput_key, 0, sizeof(kb->kbinput_key));
+    kb->kbinput_key.report_id_ = 1;
+
+    memset(&kb->kbinput_consumer, 0, sizeof(kb->kbinput_consumer));
+    kb->kbinput_consumer.report_id_ = 2;
+
+    memset(&kb->kbinput_avtopcase, 0, sizeof(kb->kbinput_avtopcase));
+    kb->kbinput_avtopcase.report_id_ = 3;
+
+    memset(&kb->kbinput_vendor, 0, sizeof(kb->kbinput_vendor));
+    kb->kbinput_vendor.report_id_ = 4;
+
+    memset(&kb->mouseinput, 0, sizeof(kb->mouseinput));
+
     // Check if Karabiner VirtualHIDDevice is loaded
     io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(VIRTUAL_HID_ROOT_NAME));
     if(!service){
@@ -122,33 +159,33 @@ static void* indicator_update(void* context){
 void os_keypress(usbdevice* kb, int scancode, int down){
     if(scancode & SCAN_MOUSE){
         if(scancode == BTN_WHEELUP || scancode == BTN_WHEELDOWN) {
-            mouseinput.vertical_wheel = (down ? ((scancode == BTN_WHEELUP) ? 1 : -1) : 0);
+            kb->mouseinput.vertical_wheel = (down ? ((scancode == BTN_WHEELUP) ? 1 : -1) : 0);
         } else {
             int scan = (scancode & ~SCAN_MOUSE);
             if(down)
-                add_to_buttons(scan, &mouseinput);
+                add_to_buttons(scan, &kb->mouseinput);
             else
-                remove_from_buttons(scan, &mouseinput);
+                remove_from_buttons(scan, &kb->mouseinput);
         }
-        IOConnectCallStructMethod(kb->event_mouse, post_pointing_input_report, &mouseinput, sizeof(mouseinput), NULL, 0);
+        IOConnectCallStructMethod(kb->event_mouse, post_pointing_input_report, &kb->mouseinput, sizeof(kb->mouseinput), NULL, 0);
         return;
     }
     // Pick the appropriate add or remove function
     add_remove_keys = down ? &add_to_keys : &remove_from_keys;
     
     if(scancode == KEY_FN) {
-        (*add_remove_keys)(scancode, &(kbinput_avtopcase.keys));
-        IOConnectCallStructMethod(kb->event, post_apple_vendor_top_case_input_report, &kbinput_avtopcase, sizeof(kbinput_avtopcase), NULL, 0);
+        (*add_remove_keys)(scancode, &(kb->kbinput_avtopcase.keys));
+        IOConnectCallStructMethod(kb->event, post_apple_vendor_top_case_input_report, &kb->kbinput_avtopcase, sizeof(kb->kbinput_avtopcase), NULL, 0);
     }/* else if(IS_VENDOR(scancode)) {
         scancode = scancode - KEY_CONSUMER;
         ckb_info("Vendor %x\n", scancode);
-        (*add_remove_keys)(scancode, &(kbinput_vendor.keys));
-        kbinput_vendor.keys.keys_[0] = 0x10;
-        IOConnectCallStructMethod(kb->event, post_apple_vendor_keyboard_input_report, &kbinput_vendor, sizeof(kbinput_vendor), NULL, 0);
+        (*add_remove_keys)(scancode, &(kb->kbinput_vendor.keys));
+        kb->kbinput_vendor.keys.keys_[0] = 0x10;
+        IOConnectCallStructMethod(kb->event, post_apple_vendor_keyboard_input_report, &kb->kbinput_vendor, sizeof(kb->kbinput_vendor), NULL, 0);
     }*/ else if(IS_CONSUMER(scancode)){
         scancode = scancode - KEY_CONSUMER;
-        (*add_remove_keys)(scancode, &(kbinput_consumer.keys));
-        IOConnectCallStructMethod(kb->event, post_consumer_input_report, &kbinput_consumer, sizeof(kbinput_consumer), NULL, 0);
+        (*add_remove_keys)(scancode, &(kb->kbinput_consumer.keys));
+        IOConnectCallStructMethod(kb->event, post_consumer_input_report, &kb->kbinput_consumer, sizeof(kb->kbinput_consumer), NULL, 0);
     } else {
         if(scancode == KEY_CAPSLOCK){
             if(down) {
@@ -164,15 +201,15 @@ void os_keypress(usbdevice* kb, int scancode, int down){
                 }
             }
         }
-        (*add_remove_keys)(scancode, &(kbinput_key.keys));
-        IOConnectCallStructMethod(kb->event, post_keyboard_input_report, &kbinput_key, sizeof(kbinput_key), NULL, 0);
+        (*add_remove_keys)(scancode, &(kb->kbinput_key.keys));
+        IOConnectCallStructMethod(kb->event, post_keyboard_input_report, &kb->kbinput_key, sizeof(kb->kbinput_key), NULL, 0);
     }
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
-    mouseinput.x = x;
-    mouseinput.y = y;
-    IOConnectCallStructMethod(kb->event_mouse, post_pointing_input_report, &mouseinput, sizeof(mouseinput), NULL, 0);
+    kb->mouseinput.x = x;
+    kb->mouseinput.y = y;
+    IOConnectCallStructMethod(kb->event_mouse, post_pointing_input_report, &kb->mouseinput, sizeof(kb->mouseinput), NULL, 0);
 }
 
 int os_setupindicators(usbdevice* kb){

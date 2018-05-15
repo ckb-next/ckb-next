@@ -1,3 +1,5 @@
+#ifndef INPUT_MAC_VHID
+#define INPUT_MAC_VHID
 #ifndef OS_MAC_LEGACY
 
 // Based on https://github.com/tekezo/Karabiner-Elements/blob/master/src/vendor/Karabiner-VirtualHIDDevice/dist/include/karabiner_virtual_hid_device.hpp
@@ -73,28 +75,6 @@ typedef struct avtopcase_input {
     vhid_keys keys;
 } vhid_kbavtopcaseinput;
 
-
-// Functions to add/remove keys from report
-void add_to_keys(int scan, vhid_keys* input){
-    for(int i = 0; i < VHID_KEYS_LEN; i++){
-        if(input->keys_[i] == 0){
-            input->keys_[i] = scan;
-            return;
-        }
-    }
-    ckb_warn("Dropping excess keypress\n");
-}
-
-void remove_from_keys(int scan, vhid_keys* input){
-    for(int i = 0; i < VHID_KEYS_LEN; i++){
-        if(input->keys_[i] == scan){
-            input->keys_[i] = 0;
-            return;
-        }
-    }
-    ckb_warn("Couldn't find key to release\n");
-}
-
 // VirtualHIDPointing
 typedef struct buttons {
     uint32_t buttons_;
@@ -108,14 +88,5 @@ typedef struct pointing_input {
     uint8_t horizontal_wheel;
 } vhid_mouseinput;
 
-// Functions to add/remove buttons from report
-void add_to_buttons(int scan, vhid_mouseinput* input){
-    input->buttons.buttons_ |= (0x1 << (scan - 1));
-}
-
-void remove_from_buttons(int scan, vhid_mouseinput* input){
-    input->buttons.buttons_ &= ~(0x1 << (scan - 1));
-}
-
-void (*add_remove_keys)(int scan, vhid_keys* input);
-#endif
+#endif // OS_MAC_LEGACY
+#endif // INPUT_MAC_VHID

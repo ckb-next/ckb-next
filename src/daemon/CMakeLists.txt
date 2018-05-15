@@ -325,6 +325,12 @@ elseif (LINUX)
             @ONLY)
 
         if (SAFE_INSTALL)
+            execute_process(
+                COMMAND rc-status -a
+                COMMAND egrep "started"
+                COMMAND egrep -o "ckb-daemon|ckb-next-daemon"
+                OUTPUT_VARIABLE daemons
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (daemons)
                 string(REPLACE "\n" ";" daemons_list "${daemons}")
                 foreach (daemon IN LISTS daemons_list)

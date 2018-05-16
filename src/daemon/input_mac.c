@@ -210,6 +210,10 @@ void os_mousemove(usbdevice* kb, int x, int y){
     kb->mouseinput.x = x;
     kb->mouseinput.y = y;
     IOConnectCallStructMethod(kb->event_mouse, post_pointing_input_report, &kb->mouseinput, sizeof(kb->mouseinput), NULL, 0);
+    // If these aren't cleared, button events will also move the cursor
+    kb->mouseinput.x = 0;
+    kb->mouseinput.y = 0;
+
 }
 
 int os_setupindicators(usbdevice* kb){

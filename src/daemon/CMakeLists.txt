@@ -232,6 +232,9 @@ if (MACOS)
 elseif (LINUX)
     # Determine init system first
 
+    # Used to prevent false SysVinit detection on systems that have /etc/inittab with systemd
+    set(DISALLOW_SYSVINIT FALSE)
+
     # NOTE: upstart is checked first to correctly behave on systems which still have upstart
     # but it is not enabled by default and systemd is used instead. (Ubuntu 15.04+)
 
@@ -244,6 +247,7 @@ elseif (LINUX)
     if ("${initctl_output}" MATCHES "upstart")
         message(STATUS "upstart detected")
         set(CKB_NEXT_INIT_SYSTEM "upstart" CACHE INTERNAL "")
+        set(DISALLOW_SYSVINIT TRUE)
 
         # Generate and import service
         message(STATUS "Generating and importing ckb-next-daemon.conf (${CKB_NEXT_INIT_SYSTEM})")
@@ -281,6 +285,7 @@ elseif (LINUX)
     if (EXISTS "/run/systemd/system")
         message(STATUS "systemd detected")
         set(CKB_NEXT_INIT_SYSTEM "systemd" CACHE INTERNAL "")
+        set(DISALLOW_SYSVINIT TRUE)
 
         # Generate and import service
         message(STATUS "Generating and importing ckb-next-daemon.service (${CKB_NEXT_INIT_SYSTEM})")
@@ -316,6 +321,7 @@ elseif (LINUX)
     if (EXISTS "/run/openrc/softlevel")
         message(STATUS "OpenRC detected")
         set(CKB_NEXT_INIT_SYSTEM "OpenRC" CACHE INTERNAL "")
+        set(DISALLOW_SYSVINIT TRUE)
 
         # Generate and import service
         message(STATUS "Generating and importing ckb-next-daemon (${CKB_NEXT_INIT_SYSTEM})")
@@ -357,7 +363,8 @@ elseif (LINUX)
     endif ()
 
     # A way to check for SysVinit
-    if (EXISTS "/etc/inittab")
+    # Fall back to this only if any of the above haven't been found
+    if (EXISTS "/etc/inittab" AND EXISTS "/lib/lsb/init-functions" AND NOT DISALLOW_SYSVINIT)
         message(STATUS "SysVinit detected")
         set(CKB_NEXT_INIT_SYSTEM "SysVinit" CACHE INTERNAL "")
 

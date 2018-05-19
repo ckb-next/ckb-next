@@ -6,10 +6,6 @@
 /// \class MacroReader
 ///
 
-MacroReader::MacroReader() {
-    qDebug() << "Calling MacroReader without params is not allowed.";
-}
-
 MacroReader::MacroReader(int macroNumber, QString macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
     startWorkInAThread(macroNumber, macroPath, macBox, macText);
 }
@@ -29,7 +25,9 @@ void MacroReaderThread::readMacro(QString line) {
     ///
     /// Because it is possible to change the Focus via keyboard,
     /// we must set the focus on each call.
-    macroText->setFocus();
+    /// Only if we aren't trying to left click though, as that prevents clicking stop.
+    if(!line.contains("mouse1"))
+        macroText->setFocus();
     QTextCursor c = macroText->textCursor();
     c.setPosition(macroText->toPlainText().length());
     macroText->setTextCursor(c);

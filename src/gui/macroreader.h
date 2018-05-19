@@ -90,10 +90,6 @@ class MacroReader : public QThread
 
 public:
     //////////
-    /// \brief MacroReader Calling MacroReader without params is not allowed.
-    ///
-    MacroReader();
-    //////////
     /// \brief MacroReader This is the only allowed constructor.
     /// It only calls startWorkInAThread() with the four params.
     /// \param macroNumber

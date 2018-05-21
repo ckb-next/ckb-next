@@ -500,6 +500,12 @@ static int usbunclaim(usbdevice* kb, int resetting) {
     for (int i = 0; i < count; i++) {
         ioctl(handle, USBDEVFS_RELEASEINTERFACE, &i);
     }
+    // Intentional unclean exit workaround, because usbhid hangs while initialising these devices.
+    if (NEEDS_UNCLEAN_EXIT(kb)) {
+        ckb_warn("Your %s is being uncleanly removed to speed up shutdown times.\n", kb->name);
+        ckb_warn("If you still need the device, you will have to restart ckb-next-daemon.\n");
+        return 0;
+    }
     // For RGB keyboards, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
     // Reconnecting any of the others causes trouble.
     if (!resetting) {

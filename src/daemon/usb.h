@@ -165,6 +165,10 @@ const char* product_str(short product);
 /// Used to apply quirks and features to the PLATINUM devices.
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
+/// Some devices cause usbhid to spend a long time initialising it. To work around this, we intentionally uncleanly
+/// deinitialise the device, skipping the usbhid handover.
+#define NEEDS_UNCLEAN_EXIT(kb)          ((kb)->product == P_K65_RFIRE || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB)
+
 /// Used for new devices that come with V3 firmware endpoint configuration out of the factory, but have fwversion < 0x300.
 /// Note: only the RGB variant of the K68 needs a v3 override.
 #define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68)

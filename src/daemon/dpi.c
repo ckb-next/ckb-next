@@ -165,6 +165,9 @@ int updatedpi(usbdevice* kb, int force){
             continue;
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
         data_pkt[2] |= i;
+        // Set the independent X/Y bit if the X/Y values differ
+        if(newdpi->x[i] != newdpi->y[i])
+            data_pkt[4] = 0x01;
         data_pkt[5] = newdpi->x[i] & 0xFF;
         data_pkt[6] = (newdpi->x[i] >> 8) & 0xFF;
         data_pkt[7] = newdpi->y[i] & 0xFF;

@@ -16,6 +16,9 @@ for cmd in defs_list:
 #print(str(cmds))
 defs_file.close()
 
+# Sort the list by string len desc
+cmds.sort(key = lambda i: len(i[0]), reverse = True)
+
 stdin = sys.stdin.readlines()
 print()
 for stdline in stdin:

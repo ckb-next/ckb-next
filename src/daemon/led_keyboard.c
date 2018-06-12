@@ -116,6 +116,17 @@ int updatergb_kb(usbdevice* kb, int force){
              if(!usbsend(kb, data_pkt[0], 2))
                  return -1;
         }
+        if (kb->product == P_K68_NRGB) {
+            // The K68 NRGB doesn't support winlock setting through the
+            // normal packets, so we have to use a different packet to set it.
+            // 8 is the winlock ("lock") led position in keymap.c
+            uchar winlock_status = (newlight->r[8] || newlight->g[8] || newlight->b[8]);
+            uchar winlock_pkt[MSG_SIZE] = {
+                CMD_SET, FIELD_LIGHTING, MODE_WINLOCK, 0, winlock_status, 0
+            };
+            if (!usbsend(kb, winlock_pkt, 1))
+                return -1;
+        }
         // 16.8M color lighting works fine on strafe and is the only way it actually works
         uchar data_pkt[12][MSG_SIZE] = {
             // Red

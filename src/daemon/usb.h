@@ -77,8 +77,8 @@
 #define IS_K95(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K90_LEGACY || (kb)->product == P_K95 || (kb)->product == P_K95_LEGACY || (kb)->product == P_K95_PLATINUM))
 
 #define P_STRAFE             0x1b20
-#define P_STRAFE_NRGB        0x1b15
-#define P_STRAFE_NRGB_2      0x1b44
+#define P_STRAFE_NRGB        0x1b15 /* 3-bit lighting, 9-bit protocol */
+#define P_STRAFE_NRGB_2      0x1b44 /* 8-bit lighting, 24-bit protocol */
 #define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2))
 
 #define P_M65                0x1b12

@@ -45,6 +45,7 @@ else
     fi
     OUT="${OUT}${N}${N}Dev nodes:${N}`find /dev/input/ckb* -print -type f -exec cat {} \; 2>&1`"
     OUT="${OUT}${N}${N}Environment:${N}`printenv | grep "QT\|XDG.*DESKTOP" 2>&1`"
+    OUT="${OUT}${N}${N}Kernel command line:${N}`cat /proc/cmdline`"
 fi
 
 # Gzip and write output

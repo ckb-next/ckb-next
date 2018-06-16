@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "profile.h"
 #include "usb.h"
 #include "led.h"
@@ -210,6 +212,21 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
         if(!k95p_send_file(kb, filename, LIGHTRGB_SIZE, mode, data))
             return -1;
     }
+
+    uchar profile_map_magic[4] = {
+        65, 0, 0, 0
+    };
+
+    if(!k95p_send_file(kb, "PROFILE.MAP", 4, mode, profile_map_magic))
+        return -1;
+
+    uchar profile_dat_magic[4] = {
+        80, 1, 0, 0
+    };
+
+    if(!k95p_send_file(kb, "PROFILE.DAT", 4, mode, profile_dat_magic))
+        return -1;
+
     return 1;
 }
 

@@ -114,8 +114,8 @@ static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
         // No lighting profiles; keyboard is black.
         return 0;
     else if(lightcount > LAYER_COUNT){
-        ckb_warn("Profile %d appears to have multiple lighting layers, but this is currently unsupported.", mode);
-        ckb_warn("Will use the first lighting layer.");
+        ckb_warn("Profile %d appears to have multiple lighting layers, but this is currently unsupported.\n", mode);
+        ckb_warn("Will use the first lighting layer.\n");
         lightcount = 1;
     }
     for(int layer = 0; layer < lightcount; layer++){
@@ -153,14 +153,48 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
     data[0] = 0;
     char filename[16] = { 0 };
     for(int layer = 0; layer < LAYER_COUNT; layer++){
-        // light_XX.d - ???
-        // Will be added if needed.
+        // lght_XX.d - ???
+        uchar strange_cue_packet_must_investigate[37] = {
+            7, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 1, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0
+        };
 
-        // light_XX.k - ???
-        // Possibly a binary blob.
-        // Will be added if needed.
+        memset(filename, 0, 16);
+        snprintf(filename, 16, "lght_%02hhx.d", layer);
 
-        // light_XX.r - RGBA data.
+        if(!k95p_send_file(kb, filename, 37, mode, strange_cue_packet_must_investigate))
+            return -1;
+
+        // lght_XX.k - ???
+        // Possibly a binary blob
+        uchar possible_binary_blob[138] = {.
+            0x86, 0x00, 0x00, 0x00, 0x00, 0x48, 0x78, 0x80, 0x88, 0x64,
+            0x6c, 0x74, 0x7c, 0x84, 0x8c, 0x61, 0x50, 0x69, 0x71, 0x81,
+            0x89, 0x65, 0x6d, 0x75, 0x7d, 0x85, 0x58, 0x8d, 0x62, 0x6a,
+            0x72, 0x01, 0x7a, 0x09, 0x82, 0x8a, 0x11, 0x19, 0x21, 0x29,
+            0x31, 0x08, 0x39, 0x41, 0x49, 0x51, 0x59, 0x02, 0x0a, 0x90,
+            0x91, 0x92, 0x9e, 0xa0, 0x93, 0x94, 0x95, 0x96, 0x12, 0x97, 
+            0x98, 0x99, 0x9a, 0x9b, 0x9f, 0xa2, 0xa1, 0x9c, 0x9d, 0x1a,
+            0x22, 0x10, 0x2a, 0x32, 0x3a, 0x42, 0x4a, 0x52, 0x5a, 0x03,
+            0x0b, 0x13, 0x18, 0x1b, 0x23, 0x2b, 0x33, 0x3b, 0x43, 0x4b,
+            0x53, 0x5b, 0x04, 0x20, 0x14, 0x1c, 0x24, 0x2c, 0x34, 0x3c,
+            0x44, 0x4c, 0x54, 0x28, 0x5c, 0x05, 0x0d, 0x15, 0x25, 0x3d,
+            0x45, 0x30, 0x4d, 0x06, 0x0e, 0x16, 0x1e, 0x26, 0x2e, 0x36, 
+            0x38, 0x3e, 0x46, 0x56, 0x07, 0x17, 0x1f, 0x27, 0x40, 0x2f,
+            0x37, 0x3f, 0x47, 0x4f, 0x57, 0x5f, 0x68, 0x70, 0x00, 0x00,
+            0x00
+        };
+
+        memset(filename, 0, 16);
+        snprintf(filename, 16, "lght_%02hhx.k", layer);
+
+        if(!k95p_send_file(kb, filename, 138, mode, possible_binary_blob))
+            return -1;
+
+        // lght_XX.r - RGBA data.
         memset(data, 0, LIGHTRGB_SIZE);
         memset(filename, 0, 16);
         snprintf(filename, 16, "lght_%02hhx.r", layer);
@@ -173,7 +207,7 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
             data[4*key + 2] = light->b[key];
             data[4*key + 3] = 0xFF;
         }
-       
+
         if(!k95p_send_file(kb, filename, LIGHTRGB_SIZE, mode, data))
             return -1;
     }
@@ -189,12 +223,12 @@ int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const
     hwprofile* hw = calloc(1, sizeof(hwprofile));
     // Ask for profile metadata.
     uchar in_data[5*MSG_SIZE];
-    int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70); 
+    int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
     for(int mode = 0; mode < modes; mode++){
         // Profile metadata.
         if(!k95p_get_file(kb, "PROFILE.I", PROFILE_SIZE, mode, in_data))
             return -1;
-        // This file always seems to start with 0x49 0x00. 
+        // This file always seems to start with 0x49 0x00.
         // Maybe a magic number? A size?
 
         // Profile GUID.

@@ -46,7 +46,7 @@ static int k95p_get_file(usbdevice* kb, const char* filename, int size, int prof
     uchar eof_pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
     if(!usbsend(kb, eof_pkt, 1))
         return -1;
-    return 0;
+    return 1;
 }
 
 static int k95p_send_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
@@ -90,7 +90,7 @@ static int k95p_send_file(usbdevice* kb, const char* filename, int size, int pro
     uchar eof_pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
     if(!usbsend(kb, eof_pkt, 1))
         return -1;
-    return 0;
+    return 1;
 }
 
 static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
@@ -131,7 +131,7 @@ static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
             light->b[key] = b;
         }
     }
-    return 0;
+    return 1;
 }
 
 static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
@@ -167,7 +167,7 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
         if(!k95p_send_file(kb, filename, LIGHTRGB_SIZE, mode, data))
             return -1;
     }
-    return 0;
+    return 1;
 }
 
 int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3){
@@ -202,8 +202,8 @@ int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const
     free(kb->hw);
     kb->hw = hw;
     DELAY_LONG(kb);
-    return 0;
-}
+    return 1;
+},
 
 int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
     (void)dummy1;

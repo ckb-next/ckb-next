@@ -182,7 +182,7 @@ extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mousepad;
 
 // Structure for tracking keyboard/mouse devices
-#define KB_NAME_LEN 40
+#define KB_NAME_LEN 50
 #define SERIAL_LEN  34
 #define MSG_SIZE    64
 #define IFACE_MAX   4

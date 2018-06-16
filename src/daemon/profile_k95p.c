@@ -106,7 +106,7 @@ static int k95p_send_file(usbdevice* kb, const char* filename, int size, int pro
 static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
     uchar data[18*MSG_SIZE];
     // Profile RGB count.
-    if(!k95p_get_file(kb, "lightcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
+    if(!k95p_get_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
         return -1;
     memset(light, 0, sizeof(lighting));
     uchar lightcount = data[0];
@@ -120,7 +120,7 @@ static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
     }
     for(int layer = 0; layer < lightcount; layer++){
         char filename[16] = { 0 };
-        snprintf(filename, 16, "light_%02hhx.r", layer);
+        snprintf(filename, 16, "lght_%02hhx.r", layer);
         if(!k95p_get_file(kb, filename, LIGHTRGB_SIZE, mode, data))
             return -1;
         for(int key = 0; key < N_KEYS_HW; key++){
@@ -147,7 +147,7 @@ static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
 static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
     // Lighting count (currently one supported).
     uchar data[LIGHTRGB_SIZE] = { LAYER_COUNT, 0 };
-    if(!k95p_send_file(kb, "lightcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
+    if(!k95p_send_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
         return -1;
     // Zero out the buffer.
     data[0] = 0;
@@ -163,7 +163,7 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
         // light_XX.r - RGBA data.
         memset(data, 0, LIGHTRGB_SIZE);
         memset(filename, 0, 16);
-        snprintf(filename, 16, "light_%02hhx.r", layer);
+        snprintf(filename, 16, "lght_%02hhx.r", layer);
         for(int key = 0; key < N_KEYS_HW; key++){
             // The hardware profiles represent colours as RGBA,
             // but we represent them as RGB, so we just use a constant
@@ -213,7 +213,7 @@ int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const
     kb->hw = hw;
     DELAY_LONG(kb);
     return 1;
-},
+}
 
 int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
     (void)dummy1;

@@ -12,14 +12,14 @@
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
 /// Formats and writes the current urb buffer to the console
-void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function){
+void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum){
     char converted[actual_length * 3 + 1];
     for(int i = 0; i < actual_length; i++)
         sprintf(&converted[i * 3], "%02x ", buffer[i]);
     if(line == 0)
-        ckb_info("%s %s\n", prefix, converted);
+        ckb_info("ckb%i %s %s\n", devnum, prefix, converted);
     else
-        ckb_info("%s (via %s:%d) %s %s\n", function, file, line, prefix, converted);
+        ckb_info("ckb%i %s (via %s:%d) %s %s\n", devnum, function, file, line, prefix, converted);
 }
 
 ////
@@ -112,7 +112,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     } else if (res != MSG_SIZE)
         ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
 #ifdef DEBUG_USB_SEND
-    print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__);
+    print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
 #endif
 
     return res;
@@ -182,7 +182,7 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     }
 
 #ifdef DEBUG_USB_RECV
-    print_urb_buffer("Recv:", in_msg, MSG_SIZE, file, line, __func__);
+    print_urb_buffer("Recv:", in_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
 #endif
 
     return res;
@@ -401,7 +401,7 @@ void* os_inputmain(void* context){
             pthread_mutex_lock(imutex(kb));
             uchar* urb_buffer = (uchar*)urb->buffer;
             #ifdef DEBUG_USB_INPUT
-            print_urb_buffer("Input Recv:", urb_buffer, urb->actual_length, NULL, 0, NULL);
+            print_urb_buffer("Input Recv:", urb_buffer, urb->actual_length, NULL, 0, NULL, INDEX_OF(kb, keyboard));
             #endif
             // If the response starts with 0x0e, that means it needs to go to os_usbrecv()
             if(urb->actual_length == MSG_SIZE && urb_buffer[0] == 0x0e){

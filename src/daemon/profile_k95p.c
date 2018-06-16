@@ -190,7 +190,7 @@ int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const
     // Ask for profile metadata.
     uchar in_data[5*MSG_SIZE];
     int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70); 
-    for(int mode = 0; mode <= modes; mode++){
+    for(int mode = 0; mode < modes; mode++){
         // Profile metadata.
         if(!k95p_get_file(kb, "PROFILE.I", PROFILE_SIZE, mode, in_data))
             return -1;
@@ -228,7 +228,7 @@ int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
     int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
     nativetohw(kb->profile, hw, modes);
     // Save the profile metadata.
-    for(int mode = 0; mode <= modes; mode++){
+    for(int mode = 0; mode < modes; mode++){
         uchar data[5*MSG_SIZE] = { 0x49, 0x00, 0 };
         // Profile GUID.
         memcpy(data + 2, hw->id + mode, sizeof(usbid));

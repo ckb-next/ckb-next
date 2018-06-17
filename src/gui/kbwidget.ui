@@ -29,7 +29,7 @@
    <item row="0" column="0">
     <widget class="QComboBox" name="profileBox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
        <horstretch>18</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>

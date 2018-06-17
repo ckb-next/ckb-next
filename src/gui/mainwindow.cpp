@@ -11,11 +11,15 @@
 #include <QMenuBar>
 #include <unistd.h>
 #include <ckbnextconfig.h>
+#include <sys/socket.h>
+#include <signal.h>
 
 extern QSharedMemory appShare;
 extern QString devpath;
 
 static const QString configLabel = "Settings";
+
+int MainWindow::signalHandlerFd[2] = {0, 0};
 
 #ifndef Q_OS_MACOS
 QString daemonDialogText = QObject::tr("Start it once with:") +
@@ -136,6 +140,15 @@ MainWindow::MainWindow(QWidget *parent) :
     dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
     dialog.setInformativeText(daemonDialogText);
     dialog.setIcon(QMessageBox::Critical);
+
+    // Set up signal handler
+    socketpair(AF_UNIX, SOCK_STREAM, 0, MainWindow::signalHandlerFd);
+
+    sigNotifier = new QSocketNotifier(MainWindow::signalHandlerFd[1], QSocketNotifier::Read, this);
+    connect(sigNotifier, &QSocketNotifier::activated, this, &MainWindow::QSignalHandler);
+
+    signal(SIGINT, MainWindow::PosixSignalHandler);
+    signal(SIGTERM, MainWindow::PosixSignalHandler);
 
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it
@@ -347,4 +360,25 @@ void MainWindow::cleanup(){
 MainWindow::~MainWindow(){
     cleanup();
     delete ui;
+}
+
+void MainWindow::QSignalHandler(){
+    sigNotifier->setEnabled(false);
+    int sig = -1;
+    int ret = read(signalHandlerFd[1], &sig, sizeof(sig));
+
+    if(ret == -1){
+        qDebug() << "Error on QSignalHandler read";
+        return;
+    }
+
+    qDebug() << "\nSignal" << sig << "caught. Quitting...";
+    this->quitApp();
+    sigNotifier->setEnabled(true);
+}
+
+void MainWindow::PosixSignalHandler(int signal){
+    int ret = write(MainWindow::signalHandlerFd[0], &signal, sizeof(signal));
+    if(ret == -1)
+        qDebug() << "Error on PosixSignalHandler write";
 }

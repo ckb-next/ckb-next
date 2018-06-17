@@ -8,6 +8,7 @@
 #include <QTimer>
 #include "kbwidget.h"
 #include "settingswidget.h"
+#include <QSocketNotifier>
 
 #ifdef USE_LIBAPPINDICATOR
 // 'signals' has to be undefined as GTK has its own signal mechanism
@@ -35,6 +36,8 @@ public:
     static MainWindow* mainWindow;
 
     void toggleTrayIcon(bool visible);
+    static int signalHandlerFd[2];
+    static void PosixSignalHandler(int signal);
 
 private:
     SettingsWidget* settingsWidget;
@@ -72,8 +75,11 @@ private slots:
     void cleanup();
     void showFwUpdateNotification(QWidget* widget, float version);
 
+    void QSignalHandler();
+
 private:
     Ui::MainWindow *ui;
+    QSocketNotifier* sigNotifier;
 };
 
 #endif // MAINWINDOW_H

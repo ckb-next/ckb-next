@@ -6,6 +6,8 @@
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QDateTime>
 
 extern QString devpath;
 
@@ -13,7 +15,7 @@ extern QString devpath;
 static QStringList modKeys, modNames;
 
 SettingsWidget::SettingsWidget(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent), devDetect(nullptr),
     ui(new Ui::SettingsWidget)
 {
     ui->setupUi(this);
@@ -155,7 +157,66 @@ void SettingsWidget::on_extraButton_clicked(){
     extra->exec();
 }
 
-void SettingsWidget::on_aboutQt_clicked()
-{
+void SettingsWidget::on_aboutQt_clicked(){
     QMessageBox::aboutQt(this);
+}
+
+void SettingsWidget::on_generateReportButton_clicked(){
+    // Don't allow the script to run twice
+    if(devDetect)
+        return;
+
+    QMessageBox::information(this, tr("Generate report"), tr("This will collect software logs, as well as information about the Corsair devices in your system.\n\n"
+                                                             "Make sure they are plugged in and click OK."));
+    devDetect = new QProcess();
+    connect(devDetect, SIGNAL(finished(int)), this, SLOT(devDetectFinished(int)));
+    connect(devDetect, &QProcess::destroyed, this, &SettingsWidget::devDetectDestroyed);
+#if defined(Q_OS_LINUX)
+    QString devDetectPath("ckb-next-dev-detect");
+#elif defined(Q_OS_MACOS)
+    QString devDetectPath("/Applications/ckb-next.app/Contents/Resources/ckb-next-dev-detect");
+#endif
+    devDetect->start(devDetectPath, QStringList() << "--nouserinput");
+
+    // Check if it was started successfully
+    if(!devDetect->waitForStarted()){
+        QMessageBox::critical(this, tr("Error executing ckb-next-dev-detect"), tr("An error occured while trying to execute ckb-next-dev-detect.\n"
+                                                                                  "File not found or not executable."));
+        devDetect->deleteLater();
+    }
+}
+
+void SettingsWidget::devDetectFinished(int retVal){
+    QFile report("/tmp/ckb-next-dev-detect-report.gz");
+    if(retVal || !report.exists()){
+        QString errMsg(tr("An error occured while trying to execute ckb-next-dev-detect.\n\n"));
+        errMsg.append(devDetect->readAllStandardError());
+        errMsg.append("\n");
+        errMsg.append(QString(tr("Return code %1")).arg(retVal));
+        QMessageBox::critical(this, tr("Error executing ckb-next-dev-detect"), errMsg);
+        devDetect->deleteLater();
+        return;
+    }
+
+    QString newdir = QFileDialog::getExistingDirectory(this, tr("Select output directory"));
+    QString newfile(newdir + "/ckb-next-report-" + QString::number(QDateTime::currentMSecsSinceEpoch()/1000) + ".gz");
+    if(report.copy(newfile)){
+        QMessageBox::information(this, tr("Report generated successfully"), tr("The report has been generated successfully."));
+        // Try to show the newly generated file
+#if defined(Q_OS_LINUX)
+        if(QProcess::execute("sh", QStringList() << "-c" << "gtk-launch `xdg-mime query default inode/directory` '" + newfile + "'"))
+            QProcess::execute("xdg-open", QStringList() << newdir);
+#elif defined(Q_OS_MACOS)
+        QProcess::execute("open", QStringList() << "-R" << newfile);
+#endif
+    }
+    else
+        QMessageBox::critical(this, tr("Error writing report"), tr("Could not write report to the selected directory.\n"
+                                                                   "Please pick a different one and try again."));
+    report.remove();
+    devDetect->deleteLater();
+}
+
+void SettingsWidget::devDetectDestroyed(){
+    devDetect = nullptr;
 }

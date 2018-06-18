@@ -22,7 +22,7 @@ KbFirmware::KbFirmware() :
 }
 
 KbFirmware::~KbFirmware(){
-    delete networkManager;
+    networkManager->deleteLater();
 }
 
 bool KbFirmware::_checkUpdates(){

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "extrasettingswidget.h"
+#include <QProcess>
 
 namespace Ui {
 class SettingsWidget;
@@ -25,26 +26,24 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-
     void on_capsBox_activated(int index);
     void on_shiftBox_activated(int index);
     void on_ctrlBox_activated(int index);
     void on_altBox_activated(int index);
     void on_winBox_activated(int index);
-
     void on_autoFWBox_clicked(bool checked);
     void on_loginItemBox_clicked(bool checked);
-
     void on_extraButton_clicked();
-
     void on_aboutQt_clicked();
+    void on_generateReportButton_clicked();
+    void devDetectFinished(int retVal);
+    void devDetectDestroyed();
 
 private:
+    QProcess* devDetect;
     Ui::SettingsWidget *ui;
     friend class MainWindow;
-
     ExtraSettingsWidget* extra;
-
     void updateModifiers();
 };
 

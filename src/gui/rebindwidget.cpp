@@ -55,9 +55,9 @@ RebindWidget::RebindWidget(QWidget *parent) :
     ui->numBox->setItemText(numKeys.indexOf("numlock") + 1, "Clear");
 
     // Add tip label
-    ui->progTipLabel->setText("<p style=\"line-height:150%\">Tip: use the <font face=\"monospace\">open</font> command to launch a file, directory, or app. For instance, to start Safari:<br /><font face=\"monospace\">&nbsp;&nbsp;open /Applications/Safari.app</font></p>");
+    ui->progTipLabel->setText("Tip: use the open command to launch a file, directory, or app. For instance, to start Safari:\n  open /Applications/Safari.app");
 #else
-    ui->progTipLabel->setText("<p style=\"line-height:150%\">Tip: use <font face=\"monospace\">xdg-open</font> to launch a file or directory. For instance, to open your home folder:<br /><font face=\"monospace\">&nbsp;&nbsp;xdg-open " + QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "</font></p>");
+    ui->progTipLabel->setText("Tip: use xdg-open to launch a file or directory. For instance, to open your home folder:\n  xdg-open " + QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
 #endif
 }
 
@@ -193,11 +193,11 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     ui->programKrModeBox->setCurrentIndex(0);
     ui->programKpModeBox->setEnabled(false);
     ui->programKrModeBox->setEnabled(false);
-    // Clear neu UI elements in MacroTab
-    ui->pteMacroBox->setPlainText("");
-    ui->pteMacroText->setPlainText("");
-    ui->pteMacroComment->setPlainText("");
-    ui->txtBuffer->setText("");
+    // Clear new UI elements in MacroTab
+    ui->pteMacroBox->clear();
+    ui->pteMacroText->clear();
+    ui->pteMacroComment->clear();
+    ui->txtBuffer->clear();
     // Fill in field and select tab according to action type
     bool mouse = act.isMouse();
     if(mouse){
@@ -299,7 +299,7 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             if (act.isValidMacro()) {
                 ui->pteMacroBox->setPlainText(act.macroContent());
                 ui->pteMacroText->setPlainText(act.macroLine()[1].replace("&das_IST_31N_col0n;", ":"));
-                ui->pteMacroComment->setPlainText(act.macroLine()[2].replace("&das_IST_31N_col0n;", ":"));
+                ui->pteMacroComment->setText(act.macroLine()[2].replace("&das_IST_31N_col0n;", ":"));
                 // Set the invisible Buffer to the original timing information.
                 // For convenience / Migration from older versions:
                 // If the timing information is only "x", then ignore it by setting it to an empty QString.
@@ -400,7 +400,7 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         /// But anyhow, let's do more relevant things...
         QString mac;
         mac = ui->txtBuffer->text();
-        mac = ui->pteMacroComment->toPlainText().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
+        mac = ui->pteMacroComment->text().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
         mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
         mac = ui->pteMacroBox->toPlainText() + ":" + mac;
         bind->setAction(keys, KeyAction::macroAction(mac));
@@ -787,16 +787,16 @@ void RebindWidget::on_btnClearMacro_clicked() {
 void RebindWidget::helpStatus(int status) {
     switch (status) {
     case 1:
-        ui->lbl_macro->setText("Type in a macro name in the comment box and click start.");
+        ui->lbl_macro->setText(tr("Type in a macro name in the comment box and click start."));
         break;
     case 2:
-        ui->lbl_macro->setText("Type your macro and click stop when finished.");
+        ui->lbl_macro->setText(tr("Type your macro and click stop when finished."));
         break;
     case 3:
-        ui->lbl_macro->setText("Click Apply or change values in Macro Key Actions in advance.");
+        ui->lbl_macro->setText(tr("Click Apply or manually edit Macro Key Actions."));
         break;
     default:
-        ui->lbl_macro->setText(QString("Oops: Some magic in RebindWidget::helpStatus (%1)").arg(status));
+        ui->lbl_macro->setText(QString(tr("Oops: Some magic in RebindWidget::helpStatus (%1)")).arg(status));
     }
 }
 

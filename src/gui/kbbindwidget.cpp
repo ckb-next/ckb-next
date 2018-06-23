@@ -56,6 +56,9 @@ void KbBindWidget::newLayout(){
 void KbBindWidget::newSelection(QStringList selection){
     currentSelection = selection;
     ui->rbWidget->setSelection(selection, true);
+    // Throw a warning if the user is trying to bind a win key while winlock is on
+    if((selection.contains("rwin") || selection.contains("lwin")) && bind->winLock())
+        QMessageBox::warning(this, tr("Winlock Warning"), tr("Windows key lock is currently enabled.\n\nThe binding will not function until winlock has been disabled."));
     updateSelDisplay();
 }
 

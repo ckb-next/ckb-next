@@ -147,6 +147,13 @@ static bool isRunning(const char* command){
 }
 
 int main(int argc, char *argv[]){
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    // Explicitly request high dpi scaling
+    // Needs to be called before QApplication is constructed
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
     // Setup main application
     QApplication a(argc, argv);
 
@@ -179,10 +186,6 @@ int main(int argc, char *argv[]){
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     // Enable HiDPI support
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    // Explicitly request high dpi scaling
-    qApp->setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
     // Parse arguments

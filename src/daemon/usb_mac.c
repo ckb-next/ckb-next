@@ -782,8 +782,7 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
             ckb_warn("Got unknown V3 handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
             return 0;
         }
-    }
-    else if(IS_SINGLE_EP(&fakekb)) { // ST100 might be different 
+    } else if(IS_SINGLE_EP(&fakekb)) { // ST100 might be different
         if(feature == 64)
             handle_idx = 0;
         else if(input == 6)

@@ -316,8 +316,8 @@ void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort 
 
     // Get first byte of the response
     uchar firstbyte = buffer[0];
-    // If the response starts with 0x0e, that means it needs to go to os_usbrecv()
-    if(urblen == MSG_SIZE && firstbyte == 0x0e){
+    // If the response starts with CMD_GET (0x0e), that means it needs to go to os_usbrecv()
+    if(urblen == MSG_SIZE && firstbyte == CMD_GET){
         int retval = pthread_mutex_lock(intmutex(kb));
         if(retval)
             ckb_fatal("Error locking interrupt mutex %i\n", retval);
@@ -336,21 +336,21 @@ void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort 
         } else {
             if(IS_MOUSE_DEV(kb)) {
                 // HID Mouse Input
-                if(firstbyte <= 0x01)
+                if(firstbyte == MOUSE_IN)
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
                 // Corsair Mouse Input
-                else if(firstbyte == 0x03)
+                else if(firstbyte == CORSAIR_IN)
                     corsair_mousecopy(kb->input.keys, buffer);
                 else
                     ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x\n", firstbyte, ep);
             } else {
                 // Assume Keyboard for everything else for now
-                // Accept NKRO only if device is active. 0x02 == media keys
-                if(firstbyte == 0x01 || firstbyte == 0x02) {
+                // Accept NKRO only if device is active
+                if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
                     if(!kb->active)
                         hid_kb_translate(kb->input.keys, urblen, buffer, 0);
                 } else if(urblen == MSG_SIZE){
-                    if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == 0x03) // Ugly hack due to old FW 1.15 packets having no header
+                    if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
                         buffer++;
                     corsair_kbcopy(kb->input.keys, buffer);
                 } else
@@ -372,6 +372,7 @@ void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput
         else
             CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
     }
+
     int bytelen = (legacy ? 14 : 19);
     for(int byte = 0; byte < bytelen; byte++){
         char input = urbinput[start + byte + 1];

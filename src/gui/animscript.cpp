@@ -75,7 +75,7 @@ bool AnimScript::load(){
     // Run the process to get script info
     QProcess infoProcess;
     infoProcess.start(_path, QStringList("--ckb-info"));
-    qDebug() << "Scanning " << _path;
+    qDebug() << "Scanning" << _path;
     infoProcess.waitForFinished(1000);
     if(infoProcess.state() == QProcess::Running){
         // Kill the process if it takes more than 1s

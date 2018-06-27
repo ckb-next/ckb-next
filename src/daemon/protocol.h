@@ -51,7 +51,7 @@
 #define COLOR_GREEN    0x02 // The green channel of RGB.
 #define COLOR_BLUE     0x03 // The blue channel of RGB.
 
-// HID input commnads
+// HID input commands
 // Keyboards
 #define NKRO_KEY_IN    0x01 // NKRO key input
 #define NKRO_MEDIA_IN  0x02 // NKRO media key input

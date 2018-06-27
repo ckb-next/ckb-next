@@ -376,8 +376,8 @@ void* os_inputmain(void* context){
     usbdevice* kb = context;
 
     int index = INDEX_OF(kb, keyboard);
-    // Monitor input transfers on all endpoints for non-legacy devices
-    // For RGB, monitor all but the last, as it's used for input/output
+    // Monitor input transfers on all endpoints for legacy devices
+    // For non legacy ones, monitor all but the last, as it's used for input/output
     int count = IS_LEGACY_DEV(kb) ? kb->epcount : (kb->epcount - 1);
     // Schedule async events for the device on this thread
     CFRunLoopRef runloop = kb->input_loop = CFRunLoopGetCurrent();

@@ -176,13 +176,7 @@ int main(int argc, char *argv[]){
 
     // Seed the RNG for UsbIds
     qsrand(QDateTime::currentMSecsSinceEpoch());
-#ifdef Q_OS_MACOS
-    disableAppNap();
 
-    FILE *fp = fopen("/tmp/ckb", "w");
-    fprintf(fp, "%d", getpid());
-    fclose(fp);
-#endif
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     // Enable HiDPI support
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -219,6 +213,23 @@ int main(int argc, char *argv[]){
         background = 1;
         break;
     }
+
+    bool startDelay = false;
+    {
+        QSettings tmp;
+        startDelay = tmp.value("Program/StartDelay", false).toBool();
+    }
+
+    if(startDelay)
+        QThread::sleep(5);
+
+#ifdef Q_OS_MACOS
+    disableAppNap();
+
+    FILE *fp = fopen("/tmp/ckb", "w");
+    fprintf(fp, "%d", getpid());
+    fclose(fp);
+#endif
 
     // Launch in background if requested, or if re-launching a previous session
     if(qApp->isSessionRestored())

@@ -837,12 +837,12 @@ static void udev_enum(){
 ///
 int usbmain(){
     /// First check whether the uinput module is loaded by the kernel.
-    /// \todo Why isn't missing of uinput
-    /// a fatal error?
     ///
     // Load the uinput module (if it's not loaded already)
-    if(system("modprobe uinput") != 0)
-        ckb_warn("Failed to load uinput module\n");
+    if(system("modprobe uinput") != 0) {
+        ckb_fatal("Failed to load uinput module\n");
+        return -1;
+    }
 
     ///
     /// Create the udev object with udev_new() (is a function from libudev.h)

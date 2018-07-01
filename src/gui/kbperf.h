@@ -74,9 +74,9 @@ public:
 
     // Push/pop a DPI state onto the DPI stack. Used for sniper and custom DPIs,
     // which are only active while a key is held.
-    quint64         pushDpi(const QPoint& newDpi);
-    inline quint64  pushDpi(int newDpi)             { return pushDpi(QPoint(newDpi, newDpi)); }
-    inline quint64  pushSniper()                    { return pushDpi(sniperDpi()); }
+    quint64         pushDpi(const QPoint& newDpi, bool sniper);
+    inline quint64  pushDpi(int newDpi, bool sniper)        { return pushDpi(QPoint(newDpi, newDpi), sniper); }
+    inline quint64  pushSniper()                            { return pushDpi(sniperDpi(), true); }
     void            popDpi(quint64 pushIdx);
 
     // Indicator opacity [0, 1]
@@ -121,10 +121,12 @@ public:
 
     // Get indicator status to send to KbLight
     void applyIndicators(int modeIndex, const bool indicatorState[HW_I_COUNT]);
+    int getDpiIdx();
 
 signals:
     void didLoad();
     void settingsUpdated();
+    void dpiChanged(int index);
 
 private:
     // Related objects

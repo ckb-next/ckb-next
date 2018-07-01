@@ -386,10 +386,12 @@ void KbPerf::baseDpiIdx(int newIdx) {
     pushedDpis.clear();
     dpiBaseIdx = newIdx;
     _curDpi(dpi(dpiBaseIdx));
-    _needsUpdate = _needsSave = true; 
+    _needsUpdate = _needsSave = true;
+    emit dpiChanged(newIdx);
 }
 
-quint64 KbPerf::pushDpi(const QPoint& newDpi){
+quint64 KbPerf::pushDpi(const QPoint& newDpi, bool sniper){
+    emit dpiChanged((sniper ? 0 : 6));
     quint64 index = runningPushIdx++;
     pushedDpis[index] = newDpi;
     _curDpi(newDpi);
@@ -408,6 +410,7 @@ void KbPerf::popDpi(quint64 pushIdx){
         _curDpi(map_last(pushedDpis));
     } 
     _needsUpdate = _needsSave = true;
+    emit dpiChanged(dpiBaseIdx);
 }
 
 void KbPerf::dpiUp(){
@@ -620,3 +623,6 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
         lightIndicator("scroll", indicatorState[2] ? iColor[SCROLL][0].rgba() : iColor[SCROLL][1].rgba());
 }
 
+int KbPerf::getDpiIdx(){
+    return dpiBaseIdx;
+}

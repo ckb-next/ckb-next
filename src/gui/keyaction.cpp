@@ -320,7 +320,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
             if(xy.x() <= 0 || xy.y() <= 0)
                 break;
             if(down)
-                sniperValue = perf->pushDpi(xy);
+                sniperValue = perf->pushDpi(xy, false);
             else {
                 perf->popDpi(sniperValue);
                 sniperValue = 0;

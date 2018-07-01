@@ -7,6 +7,7 @@
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QSignalMapper>
+#include <QLabel>
 #include "kbperf.h"
 #include "kbprofile.h"
 #include "colorbutton.h"
@@ -39,6 +40,7 @@ private:
         QSlider* xSlider, *ySlider;
         QSpinBox* xBox, *yBox;
         QCheckBox* enableCheck;
+        QLabel* indicatorLabel;
     };
     DpiUi stages[DPI_COUNT];
     bool _xyLink;
@@ -60,13 +62,13 @@ private slots:
     void boxXChanged(int index);
     void boxYChanged(int index);
     void enableChanged(int index);
-
     void on_xyBox_clicked(bool checked);
     void on_indicBox_clicked(bool checked);
     void on_aSnapBox_clicked(bool checked);
     void on_lHeightBox_activated(int index);
     void on_copyButton_clicked();
     void on_spinBox_valueChanged(int arg1);
+    void highlightDpiBox(int index);
 };
 
 #endif // MPERFWIDGET_H

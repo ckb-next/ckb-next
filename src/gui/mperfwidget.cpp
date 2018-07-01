@@ -16,6 +16,13 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
     stages[3].indicator = ui->iButton3; stages[3].xSlider = ui->xSlider3; stages[3].ySlider = ui->ySlider3; stages[3].xBox = ui->xBox3; stages[3].yBox = ui->yBox3; stages[3].enableCheck = ui->eBox3;
     stages[4].indicator = ui->iButton4; stages[4].xSlider = ui->xSlider4; stages[4].ySlider = ui->ySlider4; stages[4].xBox = ui->xBox4; stages[4].yBox = ui->yBox4; stages[4].enableCheck = ui->eBox4;
     stages[5].indicator = ui->iButton5; stages[5].xSlider = ui->xSlider5; stages[5].ySlider = ui->ySlider5; stages[5].xBox = ui->xBox5; stages[5].yBox = ui->yBox5; stages[5].enableCheck = ui->eBox5;
+    stages[0].indicatorLabel = ui->iLabel0;
+    stages[1].indicatorLabel = ui->iLabel1;
+    stages[2].indicatorLabel = ui->iLabel2;
+    stages[3].indicatorLabel = ui->iLabel3;
+    stages[4].indicatorLabel = ui->iLabel4;
+    stages[5].indicatorLabel = ui->iLabel5;
+
     ui->iButtonO->setLabel(false);
     ui->iButtonO->bigIcons(true);
     ui->iButtonO->allowAlpha(true);
@@ -42,7 +49,11 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
         boxYMapper.setMapping(stages[i].yBox, i);
         if(stages[i].enableCheck)
             enableMapper.setMapping(stages[i].enableCheck, i);
+        // Hide indicator arrows
+        stages[i].indicatorLabel->setVisible(false);
     }
+    ui->iLabelO->setVisible(false);
+
     // Connect to slots
     connect(&buttonMapper1, SIGNAL(mapped(int)), this, SLOT(colorClicked(int)));
     connect(&buttonMapper2, SIGNAL(mapped(int)), this, SLOT(colorChanged(int)));
@@ -76,6 +87,8 @@ void MPerfWidget::setPerf(KbPerf *newPerf, KbProfile *newProfile){
     ui->aSnapBox->setChecked(perf->angleSnap());
     ui->lHeightBox->setCurrentIndex(perf->liftHeight() - 1);
     ui->indicBox->setChecked(perf->dpiIndicator());
+    highlightDpiBox(perf->getDpiIdx());
+    connect(perf, &KbPerf::dpiChanged, this, &MPerfWidget::highlightDpiBox);
 }
 
 void MPerfWidget::colorClicked(int index){
@@ -220,4 +233,18 @@ void MPerfWidget::on_spinBox_valueChanged(int arg1){
     if(!perf)
         return;
     perf->iOpacity(arg1 / 100.f);
+}
+
+void MPerfWidget::highlightDpiBox(int index){
+    for(int i = 0; i < DPI_COUNT; i++){
+        stages[i].indicatorLabel->setVisible(false);
+    }
+    ui->iLabelO->setVisible(false);
+
+    if(index > DPI_COUNT - 1){
+        ui->iLabelO->setVisible(true);
+        return;
+    }
+
+    stages[index].indicatorLabel->setVisible(true);
 }

@@ -364,4 +364,6 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 /// \return 0 on success, -1 otherwise
 int usb_tryreset(usbdevice* kb);
 
+void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum);
+
 #endif  // USB_H

@@ -11,17 +11,6 @@
 
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
-/// Formats and writes the current urb buffer to the console
-void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum){
-    char converted[actual_length * 3 + 1];
-    for(int i = 0; i < actual_length; i++)
-        sprintf(&converted[i * 3], "%02x ", buffer[i]);
-    if(line == 0)
-        ckb_info("ckb%i %s %s\n", devnum, prefix, converted);
-    else
-        ckb_info("ckb%i %s (via %s:%d) %s %s\n", devnum, function, file, line, prefix, converted);
-}
-
 ////
 /// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long
 ///
@@ -360,7 +349,6 @@ void* os_inputmain(void* context){
     }
 
     udev_enumerate_unref(enumerate);
-    int retval;
     /// The userSpaceFS knows the URBs now, so start monitoring input
     while (1) {
         struct usbdevfs_urb* urb = 0;
@@ -386,79 +374,7 @@ void* os_inputmain(void* context){
         /// Lock all following actions with imutex.
         ///
         if (urb) {
-
-            /// Process the input depending on type of device. Interpret the actual size of the URB buffer
-            ///
-            /// device | detect with macro combination | seems to be endpoint # | actual buffer-length | function called
-            /// ------ | ----------------------------- | ---------------------- | -------------------- | ---------------
-            /// mouse (RGB and non RGB) | IS_MOUSE | nA | 8, 10 or 11 | hid_mouse_translate()
-            /// mouse (RGB and non RGB) | IS_MOUSE | nA | MSG_SIZE (64) | corsair_mousecopy()
-            /// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 1 | 8 (BIOS Mode) | hid_kb_translate()
-            /// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 2 | 5 or 21, KB inactive! | hid_kb_translate()
-            /// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 3? | MSG_SIZE | corsair_kbcopy()
-            /// Legacy Keyboard | IS_LEGACY && !IS_MOUSE | nA | nA | hid_kb_translate()
-            ///
-            pthread_mutex_lock(imutex(kb));
-            uchar* urb_buffer = (uchar*)urb->buffer;
-            #ifdef DEBUG_USB_INPUT
-            print_urb_buffer("Input Recv:", urb_buffer, urb->actual_length, NULL, 0, NULL, INDEX_OF(kb, keyboard));
-            #endif
-            // If the response starts with 0x0e, that means it needs to go to os_usbrecv()
-            if(urb->actual_length == MSG_SIZE && urb_buffer[0] == 0x0e){
-                retval = pthread_mutex_lock(intmutex(kb));
-                if(retval)
-                    ckb_fatal("Error locking interrupt mutex %i\n", retval);
-                memcpy(kb->interruptbuf, urb->buffer, MSG_SIZE);
-                // Unlock the mutex, signaling os_usbrecv() that the data is ready.
-                retval = pthread_cond_broadcast(intcond(kb));
-                if(retval)
-                    ckb_fatal("Error broadcasting pthread cond %i\n", retval);
-                retval = pthread_mutex_unlock(intmutex(kb));
-                if(retval)
-                    ckb_fatal("Error unlocking interrupt mutex %i\n", retval);
-            } else {
-                // EP workaround for FWv3
-                // Corsair input comes through 0x81, but case 1 in keymap.c is used for 6KRO
-                uchar urbendpoint = ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : (urb->endpoint & 0xF));
-                if(IS_MOUSE(vendor, product)){
-                    switch(urb->actual_length){
-                    case 8:
-                    case 10:
-                    case 11:
-                        // HID mouse input
-                        hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, -urbendpoint, urb->actual_length, urb->buffer, kb);
-                        break;
-                    case MSG_SIZE:
-                        // Corsair mouse input
-                        corsair_mousecopy(kb->input.keys, -urbendpoint, urb->buffer);
-                        break;
-                    }
-                } else if(!IS_LEGACY(vendor, product)){
-                    switch(urb->actual_length){
-                    case 8:
-                        // RGB EP 1: 6KRO (BIOS mode) input
-                        hid_kb_translate(kb->input.keys, -1, urb->actual_length, urb->buffer);
-                        break;
-                    case 21:
-                    case 5:
-                        // RGB EP 2: NKRO (non-BIOS) input. Accept only if keyboard is inactive
-                        if(!kb->active)
-                            hid_kb_translate(kb->input.keys, -2, urb->actual_length, urb->buffer);
-                        break;
-                    case MSG_SIZE:
-                        // RGB EP 3: Corsair input
-                        corsair_kbcopy(kb->input.keys, -urbendpoint, urb->buffer);
-                        break;
-                    }
-                } else {
-                    // Non-RGB input
-                    hid_kb_translate(kb->input.keys, urb->endpoint & 0xF, urb->actual_length, urb->buffer);
-                }
-                ///
-                /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
-                inputupdate(kb);
-            }
-            pthread_mutex_unlock(imutex(kb));
+            process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
 
             /// Re-submit the URB for the next run.
             ioctl(fd, USBDEVFS_SUBMITURB, urb);

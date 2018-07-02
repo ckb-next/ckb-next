@@ -147,10 +147,7 @@ static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
 }
 
 static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
-    // Lighting count (currently one supported).
     uchar data[LIGHTRGB_SIZE] = { LAYER_COUNT, 0 };
-    if(!k95p_send_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
-        return -1;
     // Zero out the buffer.
     data[0] = 0;
     char filename[16] = { 0 };
@@ -213,6 +210,10 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
             return -1;
     }
 
+    // Lighting count (currently one supported).
+    if(!k95p_send_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
+        return -1;
+    
     uchar profile_map_magic[4] = {
         65, 0, 0, 0
     };
@@ -279,6 +280,10 @@ int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
     nativetohw(kb->profile, hw, modes);
     // Save the profile metadata.
     for(int mode = 0; mode < modes; mode++){
+        // Save RGB.
+        if(!savergb_k95p(kb, hw->light + mode, mode))
+            return -1;
+        
         uchar data[5*MSG_SIZE] = { 0x49, 0x00, 0 };
         // Profile GUID.
         memcpy(data + 2, hw->id + mode, sizeof(usbid));
@@ -286,9 +291,6 @@ int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
         memcpy(data + 22, hw->name + mode, MD_NAME_LEN * 2);
         // Send to the keyboard.
         if(!k95p_send_file(kb, "PROFILE.I", PROFILE_SIZE, mode, data))
-            return -1;
-        // Save RGB.
-        if(!savergb_k95p(kb, hw->light + mode, mode))
             return -1;
     }
     DELAY_LONG(kb);

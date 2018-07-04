@@ -314,6 +314,10 @@ static const short hid_codes[256] = {
 void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort ep){
     usbdevice* kb = context;
 
+#ifdef DEBUG_USB_INPUT
+    print_urb_buffer("Input Recv:", buffer, urblen, NULL, 0, NULL, INDEX_OF(kb, keyboard));
+#endif
+
     // Get first byte of the response
     uchar firstbyte = buffer[0];
     // If the response starts with CMD_GET (0x0e), that means it needs to go to os_usbrecv()

@@ -244,9 +244,6 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
 }
 
 static void intreport(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
-#ifdef DEBUG_USB_INPUT
-    print_urb_buffer("Input Recv:", data, length, NULL, 0, NULL);
-#endif
     process_input_urb(context, data, length, 0);
 }
 

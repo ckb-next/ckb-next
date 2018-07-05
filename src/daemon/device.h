@@ -50,12 +50,14 @@ int setactive_mouse(usbdevice* kb, int active);
 /// \n What function is called effectively is device dependent. Have a look at \a device_vtable.c for more information.
 #define setactive(kb, makeactive) ((makeactive) ? (kb)->vtable->active((kb), 0, 0, 0, 0) : (kb)->vtable->idle((kb), 0, 0, 0, 0))
 
-// Command: Activate a keyboard
+// Command: Activate a device
 int cmd_active_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_active_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
-// Command: Deactivate a keyboard
+int cmd_active_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
+// Command: Deactivate a device
 int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
+int cmd_idle_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 
 // Command: Set poll rate (mouse only)
 int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);

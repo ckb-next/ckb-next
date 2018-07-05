@@ -64,7 +64,7 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 /// If DEBUG_USB_SEND is set during compilation,
 /// the number of bytes sent and their representation are logged to the error channel.
 ///
-int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, size_t len, const char* file, int line) {
     int res;
     if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !IS_HEADSET_DEV(kb)){
         // If we need to read a response, lock the interrupt mutex
@@ -76,15 +76,22 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         // All firmware versions for normal HID devices have the OUT endpoint at the end
         // Devices with no input, such as the Polaris, have it at the start.
         transfer.ep = (IS_SINGLE_EP(kb) ? 1 : kb->epcount);
-        transfer.len = MSG_SIZE;
+        transfer.len = len;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
         res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     } else {
         // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
-        // FIXME: Headsets don't use MSG_SIZE
+        // FIXME: Headsets don't use len
         // FIXME: Use appropriate wValue for headsets
-        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, len, 5000, (void*)out_msg };
+        if(IS_HEADSET_DEV(kb)) {
+            // wValue0: first byte of packet
+            // wValue1: 0x02
+            transfer.wValue = (0x0200 | out_msg[0]);
+            transfer.wIndex = 0x0003;
+            //transfer.wLength = 20;
+        }
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     }
 
@@ -100,10 +107,10 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
                 pthread_mutex_unlock(intmutex(kb));
             return 0;
         }
-    } else if (res != MSG_SIZE)
-        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+    } else if (res != len)
+        ckb_warn_fn("Wrote %d bytes (expected %ld)\n", file, line, res, len);
 #ifdef DEBUG_USB_SEND
-    print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
+    print_urb_buffer("Sent:", out_msg, len, file, line, __func__, INDEX_OF(kb, keyboard));
 #endif
 
     return res;
@@ -335,7 +342,8 @@ void* os_inputmain(void* context){
         struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
         const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
         if(!sizehex){
-            ckb_err("Unable to read wMaxPacketSize for %s\n", finalpath);
+            if(!(IS_HEADSET_DEV(kb) && i < 3))
+                ckb_err("Unable to read wMaxPacketSize for %s\n", finalpath);
             udeventry = nextentry;
             udev_device_unref(child);
             continue;

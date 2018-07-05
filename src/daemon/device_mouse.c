@@ -27,11 +27,11 @@ int setactive_mouse(usbdevice* kb, int active){
     memset(&kb->input.keys, 0, sizeof(kb->input.keys));
     inputupdate(kb);
     pthread_mutex_unlock(imutex(kb));
-    if(!usbsend(kb, msg[0], 1))
+    if(!usbsend(kb, msg[0], 1, MSG_SIZE))
         return -1;
     if(active){
         // Set up key input
-        if(!usbsend(kb, msg[1], 1))
+        if(!usbsend(kb, msg[1], 1, MSG_SIZE))
             return -1;
         for(int i = 0; i < keycount; i++){
             msg[1][i * 2 + 4] = i + 1;
@@ -67,7 +67,7 @@ int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const cha
     uchar msg[MSG_SIZE] = {
         CMD_SET, FIELD_POLLRATE, 0, 0, (uchar)rate
     };
-    if(!usbsend(kb, msg, 1))
+    if(!usbsend(kb, msg, 1, MSG_SIZE))
         return -1;
     // Device should disconnect+reconnect, but update the poll rate field in case it doesn't
     kb->pollrate = rate;

@@ -45,17 +45,17 @@ int updatergb_mouse(usbdevice* kb, int force){
         *rgb_data++ = newlight->b[LED_MOUSE + i];
     }
     // Send RGB data
-    if(!usbsend(kb, data_pkt[0], 1))
+    if(!usbsend(kb, data_pkt[0], 1, MSG_SIZE))
         return -1;
     int was_black = isblack(kb, lastlight), is_black = isblack(kb, newlight);
     if(is_black){
         // If the lighting is black, send the deactivation packet (M65 only)
-        if(!usbsend(kb, data_pkt[1], 1))
+        if(!usbsend(kb, data_pkt[1], 1, MSG_SIZE))
             return -1;
     } else if(was_black || force){
         // If the lighting WAS black, or if we're on forced update, send the activation packet
         data_pkt[1][4] = MODE_HARDWARE;
-        if(!usbsend(kb, data_pkt[1], 1))
+        if(!usbsend(kb, data_pkt[1], 1, MSG_SIZE))
             return -1;
     }
 
@@ -76,7 +76,7 @@ int savergb_mouse(usbdevice* kb, lighting* light, int mode){
         data_pkt[4] = light->r[led];
         data_pkt[5] = light->g[led];
         data_pkt[6] = light->b[led];
-        if(!usbsend(kb, data_pkt, 1))
+        if(!usbsend(kb, data_pkt, 1, MSG_SIZE))
             return -1;
         // Set packet for next zone
         data_pkt[2]++;

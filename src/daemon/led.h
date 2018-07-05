@@ -10,6 +10,7 @@
 int updatergb_kb(usbdevice* kb, int force);
 int updatergb_mouse(usbdevice* kb, int force);
 int updatergb_mousepad(usbdevice* kb, int force);
+int updatergb_headset(usbdevice* kb, int force);
 // Saves RGB data to device memory. Returns 0 on success.
 int savergb_kb(usbdevice* kb, lighting* light, int mode);
 int savergb_mouse(usbdevice* kb, lighting* light, int mode);

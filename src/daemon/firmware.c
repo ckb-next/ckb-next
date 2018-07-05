@@ -20,7 +20,8 @@ int getfwversion(usbdevice* kb){
     } else {
         kb->layout = LAYOUT_UNKNOWN;
     }
-
+    if(IS_HEADSET_DEV(kb))
+        return -1;
     if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
     if(in_pkt[0] != CMD_GET || in_pkt[1] != FIELD_IDENT){
@@ -141,14 +142,14 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
             }
         }
         if(index == 1){
-            if(!usbsend(kb, data_pkt[0], 1)){
+            if(!usbsend(kb, data_pkt[0], 1, MSG_SIZE)){
                 ckb_err("Firmware update failed\n");
                 free(fwdata);
                 return FW_USBFAIL;
             }
             // The above packet can take a lot longer to process, so wait for a while
             sleep(3);
-            if(!usbsend(kb, data_pkt[2], npackets - 1)){
+            if(!usbsend(kb, data_pkt[2], npackets - 1, MSG_SIZE)){
                 ckb_err("Firmware update failed\n");
                 free(fwdata);
                 return FW_USBFAIL;
@@ -157,7 +158,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
             // If the output ends here, set the length byte appropriately
             if(output >= length)
                 data_pkt[npackets][2] = length - last;
-            if(!usbsend(kb, data_pkt[1], npackets)){
+            if(!usbsend(kb, data_pkt[1], npackets, MSG_SIZE)){
                 ckb_err("Firmware update failed\n");
                 free(fwdata);
                 return FW_USBFAIL;
@@ -170,7 +171,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         { CMD_SET, FIELD_FW_DATA, 0xf0, 0x00, 0x00, 0x00, index },
         { CMD_SET, FIELD_RESET, RESET_SLOW, 0 }
     };
-    if(!usbsend(kb, data_pkt2[0], 2)){
+    if(!usbsend(kb, data_pkt2[0], 2, MSG_SIZE)){
         ckb_err("Firmware update failed\n");
         free(fwdata);
         return FW_USBFAIL;

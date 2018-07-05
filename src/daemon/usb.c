@@ -615,14 +615,14 @@ extern int hwload_mode;
 /// \n This must be considered when reading the code;
 /// The "break" on successful block transfer leaves the inner while, not the for (...).
 ///
-int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line){
+int _usbsend(usbdevice* kb, const uchar* messages, int count, int len, const char* file, int line){
     int total_sent = 0;
     for(int i = 0; i < count; i++){
         // Send each message via the OS function
         while(1){
             pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
             DELAY_SHORT(kb);
-            int res = os_usbsend(kb, messages + i * MSG_SIZE, 0, file, line);
+            int res = os_usbsend(kb, messages + i * len, 0, len, file, line);
             pthread_mutex_unlock(mmutex(kb));
             if(res == 0)
                 return 0;
@@ -690,7 +690,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
         // Send the output message
         pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
         DELAY_SHORT(kb);
-        int res = os_usbsend(kb, out_msg, 1, file, line);
+        int res = os_usbsend(kb, out_msg, 1, MSG_SIZE, file, line);
         pthread_mutex_unlock(mmutex(kb));
         if (res == 0)
             return 0;

@@ -242,8 +242,8 @@ const devcmd vtable_headset = {
     .fwupdate = cmd_fwupdate,
     .pollrate = cmd_io_none,
 
-    .active = cmd_io_none,
-    .idle = cmd_io_none,
+    .active = cmd_active_void,
+    .idle = cmd_idle_void,
 
     .erase = cmd_erase,
     .eraseprofile = cmd_eraseprofile,
@@ -276,7 +276,7 @@ const devcmd vtable_headset = {
     .allocprofile = allocprofile,
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
-    .updatergb = int1_int_none,
+    .updatergb = updatergb_headset,
     .updateindicators = int1_void_none,
     .updatedpi = int1_int_none
 };

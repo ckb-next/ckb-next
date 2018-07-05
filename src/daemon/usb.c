@@ -215,13 +215,9 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
             return &vtable_mouse;
     } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
         return &vtable_mousepad;
-<<<<<<< HEAD
-    } else {
-=======
     else if(IS_HEADSET(vendor,product))
         return &vtable_headset;
     else {
->>>>>>> a23449f... Add Initial Void support
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;
         else
@@ -680,7 +676,7 @@ extern int hwload_mode;
 /// \n This must be considered when reading the code;
 /// The "break" on successful block transfer leaves the inner while, not the for (...).
 ///
-int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line){
+int _usbsend(usbdevice* kb, const uchar* messages, int count, int len, const char* file, int line){
     int total_sent = 0;
     for(int i = 0; i < count; i++){
         // Send each message via the OS function

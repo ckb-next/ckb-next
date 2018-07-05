@@ -313,18 +313,19 @@ int os_resetusb(usbdevice* kb, const char* file, int line);
 /// \brief _usbsend send a logical message completely to the given device
 /// \param kb THE usbdevice*
 /// \param[IN] messages a Pointer to the first byte of the logical message
-/// \param[IN] count how many MSG_SIZE buffers is the logical message long?
+/// \param[IN] count how many buffers is the logical message long?
+/// \param[IN] length of each packet
 /// \param[IN] file for debugging
 /// \param[IN] line for debugging
 /// \param[in] reset_stop global variable is read
 /// \return number of Bytes sent (ideal == count * MSG_SIZE);\n 0 if a block could not be sent and it was not a timeout OR \b reset_stop was required or \b hwload_mode is not set to "always"
-int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line);
+int _usbsend(usbdevice* kb, const uchar* messages, int count, int len, const char* file, int line);
 
 /// \brief usbsend macro is used to wrap _usbsend() with debugging information (file and lineno)
 /// \param kb THE usbdevice*
 /// \param[IN] messages a Pointer to the first byte of the logical message
 /// \param[IN] count how many MSG_SIZE buffers is the logical message long?
-#define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
+#define usbsend(kb, messages, count, len) _usbsend(kb, messages, count, len, __FILE_NOPATH__, __LINE__)
 
 ///
 /// \brief _usbrecv Request data from a USB device by first sending an output packet and then reading the response.
@@ -348,10 +349,11 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 /// \param kb THE usbdevice*
 /// \param out_msg the MSGSIZE char long buffer to send
 /// \param is_recv if true, just send an ioctl for further reading packets. If false, send the data at \b out_msg.
+/// \param len length of the packet
 /// \param file for debugging
 /// \param line for debugging
 /// \return -1 on timeout (try again), 0 on hard error, numer of bytes sent otherwise
-int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, size_t len, const char* file, int line);
 
 ///
 /// \brief os_usbrecv receives a max MSGSIZE long buffer from usb device

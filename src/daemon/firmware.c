@@ -20,7 +20,8 @@ int getfwversion(usbdevice* kb){
     } else {
         kb->layout = LAYOUT_UNKNOWN;
     }
-
+    if(IS_HEADSET_DEV(kb))
+        return -1;
     if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
     if(in_pkt[0] != CMD_GET || in_pkt[1] != FIELD_IDENT){

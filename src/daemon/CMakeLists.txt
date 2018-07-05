@@ -65,6 +65,7 @@ if (MACOS OR LINUX)
               device.c
               device_keyboard.c
               device_mouse.c
+              device_void.c
               device_vtable.c
               devnode.c
               dpi.c
@@ -74,6 +75,7 @@ if (MACOS OR LINUX)
               keymap.c
               keymap_patch.c
               led.c
+              led_headset.c
               led_keyboard.c
               led_mouse.c
               led_mousepad.c

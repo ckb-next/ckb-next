@@ -1,0 +1,6 @@
+#/bin/bash
+echo "restarting ckb-next-daemon"
+sudo systemctl daemon-reload
+sudo systemctl enable ckb-next-daemon.service
+sudo systemctl start ckb-next-daemon.service
+sudo service ckb-next-daemon restart

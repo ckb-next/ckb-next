@@ -39,7 +39,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/sanitizer
 include(MacroEnsureOutOfSourceBuild)
 macro_ensure_out_of_source_build("ckb-next requires an out of source build. \
 Please create a separate build directory and run 'cmake /path/to/ckb-next [options]' there.")
-
 # Make sure we don't install in anaconda
 if("$ENV{PATH}" MATCHES "anaconda")
     string(REPLACE ":" ";" ENVLIST "$ENV{PATH}")
@@ -181,3 +180,30 @@ if (MACOS AND WITH_GUI)
         USES_TERMINAL
         VERBATIM)
 endif ()
+
+if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(STATUS "*** Have SIZEOF void * = 8, so 64-bit")
+    set(IS_64_BIT 1)
+else ()
+    message(STATUS "*** SIZEOF void * != 8, so not 64-bit")
+endif ()
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME "ckb-next")
+set(CPACK_PACKAGE_VENDOR "K DeSouza")
+set(CPACK_PACKAGE_CONTACT "ckb-next@googlegroups.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ckb-next is an open-source driver for Corsair keyboards and mice. \
+It aims to bring the features of Corsair's proprietary CUE software to the Linux and Mac operating systems.")
+set(CPACK_PACKAGE_FILE_NAME "ckb-next")
+set(CPACK_PACKAGE_VERSION_MAJOR "${ckb-next_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${ckb-next_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${ckb-next_VERSION_PATCH}-${ckb-next_VERSION_PATCH_EXTRA}")
+set(CPACK_SOURCE_IGNORE_FILES "*.cmake")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/linux/debian/postinst;")
+if(IS_64_BIT)
+	set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
+else()
+	set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
+endif()
+include(CPack)

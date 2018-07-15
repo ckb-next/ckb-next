@@ -35,6 +35,19 @@ static uchar quantize8to3(int index, uchar value){
     return value >> 5;
 }
 
+static int update_sidelights(usbdevice* kb) {
+    lighting* lastlight = &kb->profile->lastlight;
+    lighting* newlight = &kb->profile->currentmode->light;
+    if (lastlight->sidelight == newlight->sidelight)
+        return 0;
+    uchar data_pkt[MSG_SIZE] = {
+        CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0, !!newlight->sidelight, 0x00
+    };
+    if(!usbsend(kb, data_pkt, 1))
+        return -1;
+    return 0;
+}
+
 static void makergb_512(const lighting* light, uchar data_pkt[5][MSG_SIZE],
                         uchar (*ditherfn)(int, uchar)){
     uchar r[N_KEYS_HW / 2], g[N_KEYS_HW / 2], b[N_KEYS_HW / 2];
@@ -106,16 +119,8 @@ int updatergb_kb(usbdevice* kb, int force){
             return -1;
     } else if(IS_FULLRANGE(kb)) {
         // Update strafe sidelights if necessary
-        if(lastlight->sidelight != newlight->sidelight) {
-            uchar data_pkt[2][MSG_SIZE] = {
-                 { CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0x00, 0x00 },
-                 { CMD_SET, FIELD_LIGHTING, MODE_SOFTWARE, 0, 0x03 }
-             };
-             if (newlight->sidelight)
-                 data_pkt[0][4] = 1;    // turn on
-             if(!usbsend(kb, data_pkt[0], 2))
-                 return -1;
-        }
+	if (IS_STRAFE(kb) && update_sidelights(kb))
+            return -1;
         if (kb->product == P_K68_NRGB) {
             // The K68 NRGB doesn't support winlock setting through the
             // normal packets, so we have to use a different packet to set it.
@@ -149,6 +154,9 @@ int updatergb_kb(usbdevice* kb, int force){
         if(!usbsend(kb, data_pkt[0], 12))
             return -1;
     } else {
+        // Update strafe sidelights if necessary
+	if (IS_STRAFE(kb) && update_sidelights(kb))
+            return -1;
         // On older keyboards it looks flickery and causes lighting glitches, so we don't use it.
         uchar data_pkt[5][MSG_SIZE] = {
             { CMD_WRITE_BULK, 0x01, 60, 0 },

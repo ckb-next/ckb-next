@@ -36,10 +36,7 @@ static uchar quantize8to3(int index, uchar value){
 }
 
 static int update_sidelights(usbdevice* kb) {
-    lighting* lastlight = &kb->profile->lastlight;
     lighting* newlight = &kb->profile->currentmode->light;
-    if (lastlight->sidelight == newlight->sidelight)
-        return 0;
     uchar data_pkt[MSG_SIZE] = {
         CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0, !!newlight->sidelight, 0x00
     };

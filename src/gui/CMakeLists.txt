@@ -485,7 +485,7 @@ if (MACOS)
 
     set(plugins "")
     # since Qt 5.10 'macintosh' widget style is a separate plugin
-    if (Qt5Core_VERSION VERSION_GREATER_EQUAL 5.10.0)
+    if ((Qt5Core_VERSION VERSION_GREATER 5.10.0) OR (Qt5Core_VERSION VERSION_EQUAL 5.10.0))
         list(APPEND plugins "${qt5_path}/plugins/styles/libqmacstyle.dylib")
     endif ()
 

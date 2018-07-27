@@ -67,7 +67,8 @@
 #define P_K70_LUX_NRGB	     0x1b36
 #define P_K70_RFIRE          0x1b38
 #define P_K70_RFIRE_NRGB     0x1b3a
-#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB))
+#define P_K70_MK2            0x1b49
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB || (kb)->product == P_K70_MK2))
 
 // The Legacy K90 behaves like a Legacy K95.
 #define P_K90_LEGACY         0x1b02
@@ -110,7 +111,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 34
+#define N_MODELS 35
 extern ushort models[];
 
 ///
@@ -171,7 +172,8 @@ const char* product_str(short product);
 
 /// Used for new devices that come with V3 firmware endpoint configuration out of the factory, but have fwversion < 0x300.
 /// Note: only the RGB variant of the K68 needs a v3 override.
-#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || (kb)->product == P_STRAFE_NRGB_2)
+/// Note: P_K70_MK2 doesn't seem to require this, but it was added as a precaution
+#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_K70_MK2)
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
 #define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb) || IS_ST100(kb))

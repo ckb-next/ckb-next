@@ -64,7 +64,7 @@
 #define P_K70                0x1b13
 #define P_K70_LEGACY         0x1b09
 #define P_K70_LUX            0x1b33
-#define P_K70_LUX_NRGB	     0x1b36
+#define P_K70_LUX_NRGB       0x1b36
 #define P_K70_RFIRE          0x1b38
 #define P_K70_RFIRE_NRGB     0x1b3a
 #define P_K70_MK2            0x1b49

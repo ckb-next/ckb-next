@@ -69,6 +69,7 @@ public:
         // Mousepads
         POLARIS,
         ST100,
+        K70MK2,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

@@ -68,7 +68,8 @@
 #define P_K70_RFIRE          0x1b38
 #define P_K70_RFIRE_NRGB     0x1b3a
 #define P_K70_MK2            0x1b49
-#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB || (kb)->product == P_K70_MK2))
+#define P_K70_MK2SE          0x1b6b
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE))
 
 // The Legacy K90 behaves like a Legacy K95.
 #define P_K90_LEGACY         0x1b02
@@ -111,7 +112,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 35
+#define N_MODELS 36
 extern ushort models[];
 
 ///

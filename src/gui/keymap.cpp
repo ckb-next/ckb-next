@@ -542,7 +542,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     case KeyMap::K70MK2:{
-        // Same as K70 but buttons moved to the left, profswitch, and a logo (using m3)
+        // Same as K70 but buttons moved to the left, profswitch, and two logo lights (using m3, g11)
         map = getMap(KeyMap::K70, layout);
         // Starting from the right of F2
         // Add profswitch
@@ -556,8 +556,10 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["lock"].width = 10;
         map["lock"].height = 8;
 
-        // Add logo (m3)
-        map["logo"] = {0, "Logo", "m3", 122, 0, NS, true, false};
+        // Add logo1 (m3)
+        map["logo"] = {0, "Logo 1", "m3", 118, 0, NS, true, false};
+        // Add logo2 (g11)
+        map["logo2"] = {0, "Logo 2", "g11", 138, 0, NS, true, false};
 
         // Move mute and volup/dn one block to the left
         map["mute"].x -= 10;

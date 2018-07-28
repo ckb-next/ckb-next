@@ -268,6 +268,10 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 drawTopLeftCorner(&bgPainter, x, y, w, h, scale);
             } else
                 bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
+        } else if (model == KeyMap::K70MK2 && key.friendlyName().startsWith("Logo")) {
+            w += 10.f;
+            x -= 5.f;
+            bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
         } else {
             if(!strcmp(key.name, "enter")){
                 if(key.height == 24){
@@ -390,8 +394,10 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     decPainter.drawRect(QRectF(kx * scale, ky * scale, kw * scale, kh * scale));
             } else if (model == KeyMap::K55)
                 decPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
-            else if (model == KeyMap::K70MK2 && key.friendlyName() == "Logo")
+            else if (model == KeyMap::K70MK2 && key.friendlyName() == "Logo 1")
                     drawLogo(&key, &decPainter, offX , offY, scale);
+            else if (model == KeyMap::K70MK2 && key.friendlyName() == "Logo 2")
+                    decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
             else
                 decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
         }

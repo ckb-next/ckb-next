@@ -26,7 +26,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>5</number>
      </property>
      <property name="usesScrollButtons">
       <bool>false</bool>
@@ -1442,7 +1442,7 @@
            <item>
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Macro Label</string>
+              <string>Macro Sequence</string>
              </property>
             </widget>
            </item>

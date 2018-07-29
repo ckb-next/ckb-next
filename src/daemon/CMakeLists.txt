@@ -106,6 +106,7 @@ if (MACOS)
             PRIVATE
               usb_mac.c
               input_mac.c
+              input_mac_legacy.c
               input_mac_mouse_legacy.c
               extra_mac.c
               keymap_mac.h)
@@ -167,6 +168,14 @@ target_compile_options(
     ckb-next-daemon
       PRIVATE
         "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
+
+if (MAC_LEGACY)
+    message(WARNING "Building a legacy daemon")
+    target_compile_definitions(
+        ckb-next-daemon
+            PRIVATE
+                OS_MAC_LEGACY)
+endif ()
 
 # Add sanitizers after all target information is known
 add_sanitizers(ckb-next-daemon)
@@ -452,6 +461,17 @@ if (LINUX)
     OWNER_READ OWNER_WRITE
     GROUP_READ
     WORLD_READ)
+endif ()
+
+if (MACOS AND NOT MAC_LEGACY)
+  install(
+    DIRECTORY "${ckb-next_SOURCE_DIR}/macos/org.pqrs.driver.Karabiner.VirtualHIDDevice.v060800.kext"
+    DESTINATION "/Library/Extensions"
+    PATTERN "*"
+    PERMISSIONS
+    OWNER_READ OWNER_WRITE OWNER_EXECUTE
+    GROUP_READ GROUP_EXECUTE
+    WORLD_READ WORLD_EXECUTE)
 endif ()
 
 # Now, we should start and enable new services

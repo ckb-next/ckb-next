@@ -3,6 +3,7 @@
 #include "input.h"
 
 #ifdef OS_MAC
+#ifdef OS_MAC_LEGACY
 #include <errno.h>
 #include <sys/sysctl.h>
 
@@ -430,4 +431,5 @@ int os_setupindicators(usbdevice* kb){
     return 0;
 }
 
+#endif
 #endif

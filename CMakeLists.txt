@@ -78,6 +78,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE STRING "Where
 if (MACOS)
     option(USE_BREW_QT5 "Use Homebrew package for Qt5." ON)
     option(USE_BREW_QUAZIP "Use Homebrew package for QuaZip." ON)
+    option(MAC_LEGACY "Build a legacy version without the karabiner kext." OFF)
 elseif (LINUX)
     option(WITH_MVIZ "Build with music visualizer." ON)
 endif ()

@@ -461,7 +461,9 @@ void* os_inputmain(void* context){
 }
 
 int os_setupusb(usbdevice* kb){
+#ifdef OS_MAC_LEGACY
     kb->lastkeypress = KEY_NONE;
+#endif
     // Get the device firmware version
     (*kb->handle)->GetDeviceReleaseNumber(kb->handle, &kb->fwversion);
 #ifdef DEBUG

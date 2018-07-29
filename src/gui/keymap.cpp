@@ -541,6 +541,32 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Done!
         break;
     }
+    case KeyMap::K70MK2:{
+        // Same as K70 but buttons moved to the left, profswitch, and two logo lights (using m3, g11)
+        map = getMap(KeyMap::K70, layout);
+        // Starting from the right of F2
+        // Add profswitch
+        map["profswitch"] = {0, "Profile Switch", "profswitch", 40, 0, 10, 8, true, true};
+
+        map["light"].x = 49;
+        map["light"].width = 10;
+        map["light"].height = 8;
+
+        map["lock"].x = 58;
+        map["lock"].width = 10;
+        map["lock"].height = 8;
+
+        // Add logo1 (m3)
+        map["logo"] = {0, "Logo 1", "m3", 118, 0, NS, true, false};
+        // Add logo2 (g11)
+        map["logo2"] = {0, "Logo 2", "g11", 138, 0, NS, true, false};
+
+        // Move mute and volup/dn one block to the left
+        map["mute"].x -= 10;
+        map["volup"].x -= 10;
+        map["voldn"].x -= 10;
+        break;
+    }
     case KeyMap::K68:{
         // Same as the K70, except volume up and down keys
         map = getMap(KeyMap::K70, layout);
@@ -990,6 +1016,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return POLARIS;
     if(lower == "st100")
         return ST100;
+    if(lower == "k70mk2")
+        return K70MK2;
     return NO_MODEL;
 }
 
@@ -1027,6 +1055,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "polaris";
     case ST100:
         return "st100";
+    case K70MK2:
+        return "k70mk2";
     default:
         return "";
     }
@@ -1048,6 +1078,7 @@ int KeyMap::modelWidth(Model model){
     case K68:
         return K68_WIDTH;
     case K70:
+    case K70MK2:
         return K70_WIDTH;
     case K95:
          return K95_WIDTH;
@@ -1077,6 +1108,7 @@ int KeyMap::modelHeight(Model model){
     case K65:
     case K68:
     case K70:
+    case K70MK2:
     case K95:
     case STRAFE:
         return K95_HEIGHT;

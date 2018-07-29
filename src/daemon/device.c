@@ -62,9 +62,9 @@ int _start_dev(usbdevice* kb, int makeactive){
         kb->features &= ~FEAT_HWLOAD;
 
     ///
-    /// hwload isn't supported yet on the platinum.
+    /// hwload isn't supported yet on the platinum, or the mk2 devices
     ///
-    if(IS_PLATINUM(kb))
+    if(IS_PLATINUM(kb) || kb->product == P_K70_MK2)
         kb->features &= ~FEAT_HWLOAD;
 
     ///

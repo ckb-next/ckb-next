@@ -398,7 +398,8 @@ void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){
     if(mr) *mr = 0;
     if(m1) *m1 = 0;
     if(m2) *m2 = 0;
-    if(m3) *m3 = 0;
+    // The MK2 uses m3 for the logo
+    if(m3 && _map.model() != KeyMap::K70MK2) *m3 = 0;
     if(lock) *lock = 0;
     // Send to driver
     cmd.write("rgb");

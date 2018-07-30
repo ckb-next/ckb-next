@@ -557,9 +557,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["lock"].height = 8;
 
         // Add logo1 (m3)
-        map["logo"] = {0, "Logo 1", "m3", 118, 0, NS, true, false};
+        map["m3"] = {0, "Logo 1", "m3", 118, 0, NS, true, false};
         // Add logo2 (g11)
-        map["logo2"] = {0, "Logo 2", "g11", 138, 0, NS, true, false};
+        map["g11"] = {0, "Logo 2", "g11", 138, 0, NS, true, false};
 
         // Move mute and volup/dn one block to the left
         map["mute"].x -= 10;

@@ -59,7 +59,7 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
     if(key == "m2")
         return "$mode:1";
     if(key == "m3")
-        return "$mode:2";
+        return ((model == KeyMap::K70MK2) ? "" : "$mode:2");
     // Brightness and Win Lock are their own functions
     if(key == "light")
         return "$light:2";
@@ -75,6 +75,8 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
         return "$dpi:-1";
     if(key == "sniper")
         return "$dpi:0";
+    if(key == "profswitch")
+        return "$mode:-3";
     // Everything else is a standard keypress
     return key;
 }

@@ -312,6 +312,9 @@ static const short hid_codes[256] = {
 ///
 
 void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort ep){
+    if(!urblen)
+        return;
+
     usbdevice* kb = context;
 
 #ifdef DEBUG_USB_INPUT

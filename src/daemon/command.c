@@ -149,7 +149,7 @@ int readcmd(usbdevice* kb, const char* line){
             else if(!strcmp(word, "iso"))
                 kb->features = (kb->features & ~FEAT_LMASK) | FEAT_ISO;
             continue;
-#ifdef OS_MAC
+#ifdef OS_MAC_LEGACY
         case ACCEL:
             // OSX mouse acceleration on/off
             if(!strcmp(word, "on"))

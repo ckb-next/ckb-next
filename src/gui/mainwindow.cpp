@@ -13,6 +13,7 @@
 #include <ckbnextconfig.h>
 #include <sys/socket.h>
 #include <signal.h>
+#include <QProcess>
 
 extern QSharedMemory appShare;
 extern QString devpath;
@@ -210,7 +211,7 @@ void MainWindow::removeDevice(Kb* device){
 void MainWindow::updateVersion(){
     QString daemonVersion = KbManager::ckbDaemonVersion();
     if(daemonVersion == DAEMON_UNAVAILABLE_STR){
-        settingsWidget->setStatus("Driver inactive");
+        settingsWidget->setStatus(tr("Driver inactive"));
         return;
     }
     int count = kbWidgets.count();
@@ -218,12 +219,24 @@ void MainWindow::updateVersion(){
     QString daemonWarning;
     if(daemonVersion != CKB_NEXT_VERSION_STR)
         daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVersion + "). Please upgrade ckb-next" + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + ". If the problem persists, try rebooting.";
-    if(count == 0)
-        settingsWidget->setStatus("No devices connected" + daemonWarning);
+    if(count == 0){
+#if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
+        QProcess kextstat;
+        kextstat.start("kextstat", QStringList() << "-l" << "-b" << "org.pqrs.driver.Karabiner.VirtualHIDDevice.v060800");
+
+        if(!kextstat.waitForFinished())
+            qDebug() << "Kextstat error";
+
+        QString kextstatOut(kextstat.readAll());
+        if(kextstatOut.isEmpty())
+            daemonWarning.append(tr("<br /><b>Warning:</b> System Extension by \"Fumihiko Takayama\" is not allowed in Security & Privacy. Please allow it and then unplug and replug your devices."));
+#endif
+        settingsWidget->setStatus(tr("No devices connected") + daemonWarning);
+    }
     else if(count == 1)
-        settingsWidget->setStatus("1 device connected" + daemonWarning);
+        settingsWidget->setStatus(tr("1 device connected") + daemonWarning);
     else
-        settingsWidget->setStatus(QString("%1 devices connected").arg(count) + daemonWarning);
+        settingsWidget->setStatus(QString(tr("%1 devices connected")).arg(count) + daemonWarning);
 }
 
 void MainWindow::checkFwUpdates(){

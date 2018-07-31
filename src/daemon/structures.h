@@ -3,6 +3,9 @@
 
 #include "includes.h"
 #include "keymap.h"
+#ifdef OS_MAC
+#include "input_mac_vhid.h" // For the VirtualHIDDevice structs
+#endif
 
 // Profile ID structure
 typedef struct {
@@ -211,16 +214,29 @@ typedef struct {
     kern_return_t lastresult;
     // Input handle
     io_connect_t event;
+#ifndef OS_MAC_LEGACY
+    io_connect_t event_mouse;
+    vhid_kbinput kbinput_key;
+    vhid_kbconsumerinput kbinput_consumer;
+    vhid_kbavtopcaseinput kbinput_avtopcase;
+    vhid_kbvendorinput kbinput_vendor;
+    vhid_mouseinput mouseinput;
+#endif
+    // FIXME: Find out if input_loop can be removed from vhid builds
     // Key-repeat info
     CFRunLoopRef input_loop;
+#ifdef OS_MAC_LEGACY
     CFRunLoopTimerRef krtimer;
     struct timespec keyrepeat;
     short lastkeypress;
+#endif
     // Modifier/mouse button state
     pthread_t indicthread;
     IOOptionBits modifiers;
+#ifdef OS_MAC_LEGACY
     uchar mousestate;
     char scroll_rate;
+#endif
 #endif
     // Number of endpoints on the USB device
     int epcount;

@@ -78,6 +78,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE STRING "Where
 if (MACOS)
     option(USE_BREW_QT5 "Use Homebrew package for Qt5." ON)
     option(USE_BREW_QUAZIP "Use Homebrew package for QuaZip." ON)
+    option(MAC_LEGACY "Build a legacy version without the karabiner kext." OFF)
+    if (MAC_LEGACY)
+        set(ckb-next_VERSION "${ckb-next_VERSION}-l")
+    endif ()
 elseif (LINUX)
     option(WITH_MVIZ "Build with music visualizer." ON)
 endif ()
@@ -154,6 +158,12 @@ if (MACOS AND WITH_GUI)
         message(STATUS "Number of cores: ${cores}")
     endif ()
 
+    if (MAC_LEGACY)
+        set(PKGPROJ_FILE "ckb-next-legacy.pkgproj")
+    else ()
+        set(PKGPROJ_FILE "ckb-next.pkgproj")
+    endif ()
+
     add_custom_target(
         macos-package
         COMMAND
@@ -161,7 +171,7 @@ if (MACOS AND WITH_GUI)
         COMMAND
           sudo ${CMAKE_MAKE_PROGRAM} install
         COMMAND
-          packagesbuild ${ckb-next_SOURCE_DIR}/macos/pkgproj/ckb-next.pkgproj
+          packagesbuild ${ckb-next_SOURCE_DIR}/macos/pkgproj/${PKGPROJ_FILE}
         COMMAND
           appdmg ${ckb-next_SOURCE_DIR}/macos/pkgproj/appdmg.json ckb-next_v${ckb-next_VERSION}_${CMAKE_OSX_DEPLOYMENT_TARGET}-SDK.dmg
         WORKING_DIRECTORY

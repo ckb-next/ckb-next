@@ -229,6 +229,14 @@ elseif (LINUX)
               media_linux.cpp)
 endif ()
 
+if (MAC_LEGACY)
+    message(WARNING "Building a legacy GUI")
+    target_compile_definitions(
+        ckb-next
+            PRIVATE
+                OS_MAC_LEGACY)
+endif ()
+
 # Manipulate auxiliary files
 
 # Generate binary.qrc

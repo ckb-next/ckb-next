@@ -11,6 +11,8 @@
 static CFRunLoopRef mainloop = 0;
 static IONotificationPortRef notify = 0;
 
+#ifdef OS_MAC_LEGACY
+
 // Pointer to the mouse event tap. This tap lets the daemon re-insert modifier keys into
 // the event stream using CoreGraphics. This is necessary because mouse events are processed
 // before IOHID events according to this document: https://github.com/tekezo/Karabiner-Elements/blob/master/DEVELOPMENT.md
@@ -31,6 +33,8 @@ static IONotificationPortRef notify = 0;
 static CFMachPortRef mouse_event_tap;
 static char current_ckb_pid;
 static char mouse_event_tap_pid;
+
+#endif
 
 static long hidgetlong(hid_dev_t handle, CFStringRef key){
     long raw = 0;
@@ -269,6 +273,7 @@ static void pipecomplete(void* refcon, IOReturn result, void* arg0){
     (*handle)->ReadPipeAsync(handle, ctx->pipe, buffer, ctx->maxsize, pipecomplete, ctx);
 }
 
+#ifdef OS_MAC_LEGACY
 // Callback for adding modifier keys to mouse events. Every time a mouse event happens on the system
 // this callback will be called and the modifier keys from the keyboard will be added to the mouse event.
 CGEventRef mouse_event_modifier_callback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon) {
@@ -298,7 +303,6 @@ CGEventRef mouse_event_modifier_callback(CGEventTapProxy proxy, CGEventType type
     }
     return event;
 }
-
 // Get the current ckb.app instance pid if it's open.
 void update_ckb_pid() {
     char str[10] = {0};
@@ -366,9 +370,9 @@ void register_mouse_event_tap(CFRunLoopTimerRef timer, void* info) {
     }
 }
 
-// input_mac.c
+// input_mac_legacy.c
 extern void keyretrigger(CFRunLoopTimerRef timer, void* info);
-
+#endif
 void* os_inputmain(void* context){
     usbdevice* kb = context;
 
@@ -426,6 +430,7 @@ void* os_inputmain(void* context){
         }
     }
 
+#ifdef OS_MAC_LEGACY
     // Start a timer for key repeat broadcasts
     CFRunLoopTimerContext krctx = { 0, kb, NULL, NULL, NULL };
     CFRunLoopTimerRef krtimer = kb->krtimer = CFRunLoopTimerCreate(kCFAllocatorDefault,
@@ -435,7 +440,7 @@ void* os_inputmain(void* context){
     CFRunLoopTimerSetTolerance(krtimer, 0.015);         // Set a maximum tolerance of 15ms
     // We don't actually add the timer to the run loop yet. There's no need to run the function until a key is actually pressed,
     // so the timer is added and removed dynamically.
-
+#endif
     // Start the run loop
     while(1){
         CFRunLoopRun();
@@ -456,7 +461,9 @@ void* os_inputmain(void* context){
 }
 
 int os_setupusb(usbdevice* kb){
+#ifdef OS_MAC_LEGACY
     kb->lastkeypress = KEY_NONE;
+#endif
     // Get the device firmware version
     (*kb->handle)->GetDeviceReleaseNumber(kb->handle, &kb->fwversion);
 #ifdef DEBUG
@@ -987,6 +994,8 @@ int usbmain(){
     if(iterator_hid)
         iterate_devices_hid(0, iterator_hid);
 
+#ifdef OS_MAC_LEGACY
+
     // Create a timer for register mouse event tap
     CFRunLoopTimerContext rmectx = { 0, mainloop, NULL, NULL, NULL };
     CFRunLoopTimerRef rmetimer = CFRunLoopTimerCreate(kCFAllocatorDefault,
@@ -994,6 +1003,8 @@ int usbmain(){
                                                       0, 0,
                                                       register_mouse_event_tap, &rmectx);
     CFRunLoopAddTimer(mainloop, (CFRunLoopTimerRef)rmetimer, kCFRunLoopCommonModes);
+
+#endif
 
     io_iterator_t iterator_syspower = 0;
     IORegisterForSystemPower(NULL, &notify, powerEventCallback, &iterator_syspower);

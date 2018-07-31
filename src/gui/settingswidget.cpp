@@ -79,6 +79,14 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 
     // Prepare extra settings
     extra = new ExtraSettingsWidget(this);
+
+#ifndef OS_MAC_LEGACY
+#ifdef Q_OS_MACOS
+    QString labelText = ui->label_2->text();
+    labelText.append("<br/>Special thanks to <a href=\"https://github.com/tekezo\" style=\"text-decoration:none;\">tekezo</a> for <a href=\"https://github.com/tekezo/Karabiner-VirtualHIDDevice\" style=\"text-decoration:none;\">VirtualHIDDevice</a>.");
+    ui->label_2->setText(labelText);
+#endif
+#endif
 }
 
 SettingsWidget::~SettingsWidget(){

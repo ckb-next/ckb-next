@@ -12,9 +12,9 @@
 #define BTN_WHEELUP     0x1f01
 #define BTN_WHEELDOWN   0x1f02
 
-#ifdef OS_MAC
+#ifdef OS_MAC_LEGACY
 // On Linux there's no meaningful distinction between these keys
-// On OSX this is used for layout auto-detection (see input_mac.c)
+// On the OSX legacy build this is used for layout auto-detection (see input_mac_legacy.c)
 #define KEY_BACKSLASH_ISO 0xfff
 #else
 #define KEY_BACKSLASH_ISO KEY_BACKSLASH

@@ -1,5 +1,36 @@
 # Change Log
 
+## [v0.3.1](https://github.com/ckb-next/ckb-next/tree/v0.3.1) (2018-07-31)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.3.0...v0.3.1)
+
+Important news:
+
+- macOS now uses Karabiner Elements as a backend. You will need to enable the kext for ckb-next to function.
+
+Support for new devices:
+
+- K70 RGB MK.2
+- K70 RGB MK.2 SE
+
+New major features:
+
+- macOS 10.14 Mojave support
+- Karabiner Elements is used as an input backend
+- The GUI now has a generate ckb-next-dev-detect report button
+
+Important bugfixes:
+
+- Rapidfire keyboards have a workaround on shutdown
+- Bugfix for independent X/Y DPI
+- The new Strafe NRGB has firmware updates now
+- The GUI pops up a warning when trying to bind the Windows key with Winlock enabled
+- The GUI now has a DPI indicator
+- The K68 NRGB winlock light now lights up
+- The GUI handles SIGINT/SIGTERM cleanly, avoiding stalled devices
+- Strafe sidelights now save state on GUI start
+- Original Strafe NRGB's sidelights now toggle correctly
+- ckb-next-dev-detect is now installed to the system and added to PATH
+
 ## [v0.3.0](https://github.com/ckb-next/ckb-next/tree/v0.3.0) (2018-04-30)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.2.9...v0.3.0)
 

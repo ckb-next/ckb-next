@@ -569,8 +569,10 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
         lightIndicator("dpi", dpiClr[index].rgba());
     }
     // KB indicators
-    if(iEnable[MODE]){
-        for(int i = 0; i < Kb::HWMODE_MAX; i++){
+    // Disable the M indicators for the K70MK2.
+    // FIXME: Only enable them for devices that need them instead
+    if(iEnable[MODE] && this->modeParent()->bind()->map().model() != KeyMap::K70MK2){
+        for(uchar i = 0; i < Kb::HWMODE_MAX; i++){
             char name[4];
             snprintf(name, sizeof(name), "m%d", i + 1);
             if(modeIndex == i)

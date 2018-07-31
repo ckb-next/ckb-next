@@ -679,7 +679,8 @@ void Kb::readNotify(QString line){
                 light->color("mr", lightColor);
                 light->color("m1", lightColor);
                 light->color("m2", lightColor);
-                light->color("m3", lightColor);
+                if(this->model() != KeyMap::K70MK2)
+                    light->color("m3", lightColor);
                 light->color("lock", lightColor);
             }
         } else if(components[2] == "hwdpi"){

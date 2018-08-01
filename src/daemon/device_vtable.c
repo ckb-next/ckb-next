@@ -231,6 +231,6 @@ const devcmd vtable_mousepad = {
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_mousepad,
-    .updateindicators = updateindicators_kb,
+    .updateindicators = int1_void_none,
     .updatedpi = int1_int_none
 };

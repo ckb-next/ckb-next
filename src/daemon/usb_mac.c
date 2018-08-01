@@ -220,7 +220,7 @@ void os_sendindicators(usbdevice* kb){
         CFArrayRef leds;
         res = (*handle)->copyMatchingElements(handle, matching, &leds, 0);
         CFRelease(matching);
-        if(res != kIOReturnSuccess)
+        if(res != kIOReturnSuccess || !leds)
             return;
         // Iterate through them and update the LEDs which have changed
         CFIndex count = CFArrayGetCount(leds);

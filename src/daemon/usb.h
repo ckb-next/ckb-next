@@ -81,6 +81,7 @@
 #define P_STRAFE             0x1b20
 #define P_STRAFE_NRGB        0x1b15 /* 3-bit lighting, 9-bit protocol */
 #define P_STRAFE_NRGB_2      0x1b44 /* 8-bit lighting, 24-bit protocol */
+#define P_STRAFE_MK2         0x1b48
 #define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2))
 
 #define P_M65                0x1b12
@@ -112,7 +113,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 36
+#define N_MODELS 37
 extern ushort models[];
 
 ///

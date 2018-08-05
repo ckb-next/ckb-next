@@ -82,15 +82,15 @@
 #define P_STRAFE_NRGB        0x1b15 /* 3-bit lighting, 9-bit protocol */
 #define P_STRAFE_NRGB_2      0x1b44 /* 8-bit lighting, 24-bit protocol */
 #define P_STRAFE_MK2         0x1b48
-#define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2))
+#define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2))
 
 #define P_M65                0x1b12
 #define P_M65_PRO            0x1b2e
 #define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO))
 
-#define P_SABRE_O            0x1b14  /* optical */
-#define P_SABRE_L            0x1b19  /* laser */
-#define P_SABRE_N            0x1b2f  /* new? */
+#define P_SABRE_O            0x1b14 /* optical */
+#define P_SABRE_L            0x1b19 /* laser */
+#define P_SABRE_N            0x1b2f /* new? */
 #define P_SABRE_O2           0x1b32 /* Observed on a CH-9000111-EU model SABRE */
 #define IS_SABRE(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
 

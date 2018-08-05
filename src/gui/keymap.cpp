@@ -567,6 +567,18 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["voldn"].x -= 10;
         break;
     }
+    case KeyMap::STRAFE_MK2:{
+        map = getMap(KeyMap::K70MK2, layout);
+        // move everything right to make the space for the left sidelight
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            i.value().x += KSTRAFE_X_START;
+        }
+        map["lsidel"] = KStrafeKeys[0];
+        map["rsidel"] = KStrafeKeys[1];
+        break;
+    }
     case KeyMap::K68:{
         // Same as the K70, except volume up and down keys
         map = getMap(KeyMap::K70, layout);
@@ -1018,6 +1030,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return ST100;
     if(lower == "k70mk2")
         return K70MK2;
+    if(lower == "strafe_mk2")
+        return STRAFE_MK2;
     return NO_MODEL;
 }
 
@@ -1057,6 +1071,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "st100";
     case K70MK2:
         return "k70mk2";
+    case STRAFE_MK2:
+        return "strafe_mk2";
     default:
         return "";
     }
@@ -1086,6 +1102,7 @@ int KeyMap::modelWidth(Model model){
     case K55:
         return K95P_WIDTH;
     case STRAFE:
+    case STRAFE_MK2:
         return KSTRAFE_WIDTH;
     case M65:
     case SABRE:
@@ -1111,6 +1128,7 @@ int KeyMap::modelHeight(Model model){
     case K70MK2:
     case K95:
     case STRAFE:
+    case STRAFE_MK2:
         return K95_HEIGHT;
     case K95P:
         return K95P_HEIGHT;

@@ -240,7 +240,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     bgPainter.setOpacity(0.7);
             }
         }
-        if((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K70MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+        if((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
             // Not all devices have circular buttons
             x += w / 8.f;
@@ -268,7 +268,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 drawTopLeftCorner(&bgPainter, x, y, w, h, scale);
             } else
                 bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
-        } else if (model == KeyMap::K70MK2 && key.friendlyName().startsWith("Logo")) {
+        } else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName().startsWith("Logo")) {
             w += 10.f;
             x -= 5.f;
             bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
@@ -338,24 +338,13 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     color = monoRgb(qRed(color), qGreen(color), qBlue(color));
             }
             decPainter.setBrush(QBrush(color));
-
-            if (model == KeyMap::STRAFE) {
-                float kx = key.x + offX - key.width / 2.f + 1.f;
-                float ky = key.y + offY - key.height / 2.f + 1.f;
-                float kw = key.width - 2.f;
-                float kh = key.height - 2.f;
-
+            if(model == KeyMap::STRAFE_MK2 && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel"))) {
+                drawStrafeSidelights(&key, &decPainter, offX, offY, scale, keyColor, color, bgColor, ratio);
+            } else if (model == KeyMap::STRAFE) {
                 if(!strcmp(key.name, "logo")) {
                     drawLogo(&key, &decPainter, offX, offY, scale);
                 } else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")) { // Strafe side lights (toggle lights with no animation)
-                    QRadialGradient gradient(QPointF(wWidth/2.f * ratio, wHeight/2.f * ratio), wWidth/2.f * ratio);//,QPointF(10, 5));
-                    gradient.setColorAt(0, color);
-                    gradient.setColorAt(0.9, color); // bring up intensity
-                    gradient.setColorAt(1, bgColor);
-                    decPainter.setBrush(QBrush(gradient));
-                    decPainter.setPen(QPen(keyColor, 1.2)); //QColor(125,125,125)
-                    decPainter.drawRect(QRectF(kx * scale, ky * scale - 12 , kw * scale, kh * scale+24)); // don't really know why the 12 and 24 make it work here, but they do
-                    decPainter.setPen(QPen(QColor(0,0,0,0), 1));
+                    drawStrafeSidelights(&key, &decPainter, offX, offY, scale, keyColor, color, bgColor, ratio);
                 } else
                     decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
             } else if (model == KeyMap::POLARIS) {
@@ -394,9 +383,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     decPainter.drawRect(QRectF(kx * scale, ky * scale, kw * scale, kh * scale));
             } else if (model == KeyMap::K55)
                 decPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
-            else if (model == KeyMap::K70MK2 && key.friendlyName() == "Logo 1")
+            else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 1")
                     drawLogo(&key, &decPainter, offX , offY, scale);
-            else if (model == KeyMap::K70MK2 && key.friendlyName() == "Logo 2")
+            else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                     decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
             else
                 decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
@@ -604,7 +593,7 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
                 && tooltip.isEmpty())
             tooltip = key.friendlyName(false);
         // on STRAFE Sidelights and indicators can't be assigned color the way other keys are colored
-        if(keyMap.model() == KeyMap::STRAFE && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel") || _indicators.contains(key.name))) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
+        if((keyMap.model() == KeyMap::STRAFE || keyMap.model() == KeyMap::STRAFE_MK2) && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel") || _indicators.contains(key.name))) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
             continue;
         float kx1 = key.x - key.width / 2.f + 1.f;
         float ky1 = key.y - key.height / 2.f + 1.f;
@@ -782,4 +771,22 @@ void KeyWidget::drawTopLeftCorner(QPainter* painter, float x, float y, float w, 
         QPointF( x*scale,          (y + w)*scale),
     };
     painter->drawPolygon(edgePoints, 6);
+}
+
+void KeyWidget::drawStrafeSidelights(const Key* key, QPainter* decPainter, float offX, float offY, float scale, QColor keyColor, QColor color, QColor bgColor, int ratio){
+    float kx = key->x + offX - key->width / 2.f + 1.f;
+    float ky = key->y + offY - key->height / 2.f + 1.f;
+    float kw = key->width - 2.f;
+    float kh = key->height - 2.f;
+    int wWidth = width(), wHeight = height();
+
+    QRadialGradient gradient(QPointF(wWidth/2.f * ratio, wHeight/2.f * ratio), wWidth/2.f * ratio);//,QPointF(10, 5));
+    gradient.setColorAt(0, color);
+    gradient.setColorAt(0.9, color); // bring up intensity
+    gradient.setColorAt(1, bgColor);
+    decPainter->setBrush(QBrush(gradient));
+    decPainter->setPen(QPen(keyColor, 1.2)); //QColor(125,125,125)
+    decPainter->drawRect(QRectF(kx * scale, ky * scale - 12 , kw * scale, kh * scale+24)); // don't really know why the 12 and 24 make it work here, but they do
+    decPainter->setPen(QPen(QColor(0,0,0,0), 1));
+
 }

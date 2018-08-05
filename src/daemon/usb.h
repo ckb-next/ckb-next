@@ -81,15 +81,16 @@
 #define P_STRAFE             0x1b20
 #define P_STRAFE_NRGB        0x1b15 /* 3-bit lighting, 9-bit protocol */
 #define P_STRAFE_NRGB_2      0x1b44 /* 8-bit lighting, 24-bit protocol */
-#define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2))
+#define P_STRAFE_MK2         0x1b48
+#define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2))
 
 #define P_M65                0x1b12
 #define P_M65_PRO            0x1b2e
 #define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO))
 
-#define P_SABRE_O            0x1b14  /* optical */
-#define P_SABRE_L            0x1b19  /* laser */
-#define P_SABRE_N            0x1b2f  /* new? */
+#define P_SABRE_O            0x1b14 /* optical */
+#define P_SABRE_L            0x1b19 /* laser */
+#define P_SABRE_N            0x1b2f /* new? */
 #define P_SABRE_O2           0x1b32 /* Observed on a CH-9000111-EU model SABRE */
 #define IS_SABRE(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2))
 
@@ -112,7 +113,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 36
+#define N_MODELS 37
 extern ushort models[];
 
 ///
@@ -174,13 +175,16 @@ const char* product_str(short product);
 /// Used for new devices that come with V3 firmware endpoint configuration out of the factory, but have fwversion < 0x300.
 /// Note: only the RGB variant of the K68 needs a v3 override.
 /// Note: P_K70_MK2 doesn't seem to require this, but it was added as a precaution
-#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_K70_MK2)
+#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2)
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
 #define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb) || IS_ST100(kb))
 
 /// Used for devices that have a single IN endpoint, and no HID input
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb))
+
+/// Used for devices that use a file-based hardware animation system.
+#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_STRAFE_MK2)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

@@ -36,6 +36,31 @@ int rm_recursive(const char* path){
     return remove(path);
 }
 
+void check_chown(const char *pathname, uid_t owner, long group){
+    if (group >= 0) {
+        if (chown(pathname, owner, group) < 0) {
+            ckb_warn("Chown call failed %s: %s\n", pathname, strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
+void check_fchown(int fd, uid_t owner, long group){
+    if (group >= 0) {
+        if (fchown(fd, owner, group) < 0) {
+            ckb_warn("FChown call failed: %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
+void check_chmod(const char *pathname, mode_t mode){
+    if(chmod(pathname, mode) < 0) {
+        ckb_warn("Chmod call failed %s: %s\n", pathname, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+}
+
 ///
 /// \brief _updateconnected Update the list of connected devices.
 ///
@@ -73,9 +98,10 @@ void _updateconnected(){
     if(!written)
         fputc('\n', cfile);
     fclose(cfile);
-    chmod(cpath, S_GID_READ);
-    if(gid >= 0)
-        chown(cpath, 0, gid);
+    
+    check_chmod(cpath, S_GID_READ);
+    check_chown(cpath, 0, gid);
+
     pthread_mutex_unlock(devmutex);
 }
 
@@ -91,9 +117,10 @@ int _mknotifynode(usbdevice* kb, int notify){
     if(kb->outfifo[notify] != 0)
         return 0;
     // Create the notification node
-    int index = INDEX_OF(kb, keyboard);
-    char outpath[strlen(devpath) + 10];
-    snprintf(outpath, sizeof(outpath), "%s%d/notify%d", devpath, index, notify);
+    char index = (INDEX_OF(kb, keyboard) % 10) + '0';
+    char notify_char = (notify % 10) + '0';
+    char outpath[strlen(devpath) + 10 * sizeof(char)];
+    snprintf(outpath, sizeof(outpath), "%s%c/notify%c", devpath, index, notify_char);
     if(mkfifo(outpath, S_GID_READ) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK) + 1) == 0){
         // Add one to the FD because 0 is a valid descriptor, but ckb uses 0 for uninitialized devices
         ckb_warn("Unable to create %s: %s\n", outpath, strerror(errno));
@@ -101,8 +128,7 @@ int _mknotifynode(usbdevice* kb, int notify){
         remove(outpath);
         return -1;
     }
-    if(gid >= 0)
-        fchown(kb->outfifo[notify] - 1, 0, gid);
+    check_fchown(kb->outfifo[notify] - 1, 0, gid);
     return 0;
 }
 
@@ -116,9 +142,10 @@ int mknotifynode(usbdevice* kb, int notify){
 int _rmnotifynode(usbdevice* kb, int notify){
     if(notify < 0 || notify >= OUTFIFO_MAX || !kb->outfifo[notify])
         return -1;
-    int index = INDEX_OF(kb, keyboard);
-    char outpath[strlen(devpath) + 10];
-    snprintf(outpath, sizeof(outpath), "%s%d/notify%d", devpath, index, notify);
+    char index = (INDEX_OF(kb, keyboard) % 10) + '0';
+    char notify_char = (notify % 10) + '0';
+    char outpath[strlen(devpath) + 10 * sizeof(char)];
+    snprintf(outpath, sizeof(outpath), "%s%c/notify%c", devpath, index, notify_char);
     // Close FIFO
     close(kb->outfifo[notify] - 1);
     kb->outfifo[notify] = 0;
@@ -140,9 +167,8 @@ static void printnode(const char* path, const char* str){
         fputs(str, file);
         fputc('\n', file);
         fclose(file);
-        chmod(path, S_GID_READ);
-        if(gid >= 0)
-            chown(path, 0, gid);
+        check_chmod(path, S_GID_READ);
+        check_chown(path, 0, gid);
     } else {
         ckb_warn("Unable to create %s: %s\n", path, strerror(errno));
         remove(path);
@@ -179,8 +205,8 @@ static int _mkdevpath(usbdevice* kb){
         rm_recursive(path);
         return -1;
     }
-    if(gid >= 0)
-        chown(path, 0, gid);
+
+    check_chown(path, 0, gid);
 
     if(kb == keyboard + 0){
         // Root keyboard: write a list of devices
@@ -192,9 +218,8 @@ static int _mkdevpath(usbdevice* kb){
         if(vfile){
             fprintf(vfile, "%s\n", CKB_NEXT_VERSION_STR);
             fclose(vfile);
-            chmod(vpath, S_GID_READ);
-            if(gid >= 0)
-                chown(vpath, 0, gid);
+            check_chmod(vpath, S_GID_READ);
+            check_chown(vpath, 0, gid);
         } else {
             ckb_warn("Unable to create %s: %s\n", vpath, strerror(errno));
             remove(vpath);
@@ -206,9 +231,8 @@ static int _mkdevpath(usbdevice* kb){
         if(pfile){
             fprintf(pfile, "%u\n", getpid());
             fclose(pfile);
-            chmod(ppath, S_READ);
-            if(gid >= 0)
-                chown(vpath, 0, gid);
+            check_chmod(ppath, S_READ);
+            check_chown(vpath, 0, gid);
         } else {
             ckb_warn("Unable to create %s: %s\n", ppath, strerror(errno));
             remove(ppath);
@@ -226,8 +250,8 @@ static int _mkdevpath(usbdevice* kb){
             kb->infifo = 0;
             return -1;
         }
-        if(gid >= 0)
-            fchown(kb->infifo - 1, 0, gid);
+
+        check_fchown(kb->infifo - 1, 0, gid);
 
         // Create notification FIFO
         _mknotifynode(kb, 0);
@@ -273,9 +297,8 @@ static int _mkdevpath(usbdevice* kb){
                 fputs(" hwload", ffile);
             fputc('\n', ffile);
             fclose(ffile);
-            chmod(fpath, S_GID_READ);
-            if(gid >= 0)
-                chown(fpath, 0, gid);
+            check_chmod(fpath, S_GID_READ);
+            check_chown(fpath, 0, gid);
         } else {
             ckb_warn("Unable to create %s: %s\n", fpath, strerror(errno));
             remove(fpath);
@@ -301,7 +324,8 @@ int rmdevpath(usbdevice* kb){
 #ifdef OS_MAC
         fcntl(fd, F_SETFL, O_RDWR | O_NONBLOCK); // hack to prevent the following hack from blocking if the GUI was running
 #endif
-        write(fd, "\n", 1); // hack to prevent the FIFO thread from perma-blocking
+        if (write(fd, "\n", 1) < 0)
+            ckb_warn("Unable to write to filedescriptor %d: %s\n", fd, strerror(errno));
         close(fd);
         kb->infifo = 0;
     }
@@ -328,9 +352,8 @@ int mkfwnode(usbdevice* kb){
         fprintf(fwfile, "%04x", kb->fwversion);
         fputc('\n', fwfile);
         fclose(fwfile);
-        chmod(fwpath, S_GID_READ);
-        if(gid >= 0)
-            chown(fwpath, 0, gid);
+        check_chmod(fwpath, S_GID_READ);
+        check_chown(fwpath, 0, gid);
     } else {
         ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
         remove(fwpath);
@@ -343,9 +366,8 @@ int mkfwnode(usbdevice* kb){
         fprintf(pfile, "%d ms", kb->pollrate);
         fputc('\n', pfile);
         fclose(pfile);
-        chmod(ppath, S_GID_READ);
-        if(gid >= 0)
-            chown(ppath, 0, gid);
+        check_chmod(ppath, S_GID_READ);
+        check_chown(ppath, 0, gid);
     } else {
         ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
         remove(ppath);

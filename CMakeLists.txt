@@ -97,6 +97,7 @@ cmake_dependent_option(WITH_RANDOM   "Build with 'Random' animation."   ON "WITH
 cmake_dependent_option(WITH_PINWHEEL "Build with 'Pinwheel' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_RIPPLE   "Build with 'Ripple' animation."   ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_WAVE     "Build with 'Wave' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
+cmake_dependent_option(WITH_INVADERS "Build with 'Invaders' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 
 # Options: daemon
 option(DEBUG_USB_SEND  "Show the contents of USB packets being sent to device."                                OFF)

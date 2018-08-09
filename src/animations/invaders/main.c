@@ -1,5 +1,6 @@
 #include <ckb-next/animation.h>
 #include <math.h>
+#include <time.h>
 #include <string.h>
 
 void ckb_info(){
@@ -38,6 +39,14 @@ float enemy_position = 12;
 int fire = 0;
 int enemies = 0;
 int level = 0;
+
+void restart() {
+    enemy_row = 1;
+    bullet_row = 1;
+    fire = 0;
+    enemy_position = 12;
+    bullet_position = 0;
+}
 
 char* row1[14] = { "grave",  "1", "2", "3", "4", "5", "6", "7", "8",     "9",   "0",     "minus",  "equal",  "back" };
 char* row2[14] = { "tab",    "q", "w", "e", "r", "t", "y", "u", "i",     "o",   "p",     "lbrace", "rbrace", "bslash" };
@@ -112,14 +121,6 @@ char* get_enemy_key_name() {
         return row4[ep];
     }
     return "esc";
-}
-
-void restart() {
-    enemy_row = 1;
-    bullet_row = 1;
-    fire = 0;
-    enemy_position = 12;
-    bullet_position = 0;
 }
 
 void explode_enemy(){
@@ -277,7 +278,5 @@ void ckb_time(ckb_runctx* context, double delta){
 }
 
 int ckb_frame(ckb_runctx* context){
-    // Draw key colors
-    unsigned count = context->keycount;
     return 0;
 }

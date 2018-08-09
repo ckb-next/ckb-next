@@ -360,8 +360,8 @@ if (MACOS)
 elseif (LINUX)
     target_include_directories(
         ckb-next
-            PRIVATE
             SYSTEM
+            PRIVATE
               "${X11_INCLUDE_DIR}"
               "${Appindicator_INCLUDE_DIRS}")
 endif ()

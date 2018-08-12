@@ -1,4 +1,4 @@
-# Create base ckb-next devices
+# Mark ckb devices as not a joystick
 ACTION=="add|change", SUBSYSTEM=="input", ATTRS{name}=="ckb[0-9]: [A-Za-z0-9]*", ENV{ID_INPUT_JOYSTICK}=""
 
 # If the device isn't an event input device with a recognised

@@ -1,26 +1,2 @@
 # Mark ckb devices as not a joystick
-ACTION=="add|change", SUBSYSTEM=="input", ATTRS{name}=="ckb[0-9]: [A-Za-z0-9]*", ENV{ID_INPUT_JOYSTICK}=""
-
-# If the device isn't an event input device with a recognised
-# class, do nothing
-KERNEL!="event*", GOTO="input_ckb_ids_end"
-SUBSYSTEM!="input", GOTO="input_ckb_ids_end"
-ENV{.INPUT_CLASS}!="?*", GOTO="input_ckb_ids_end"
-
-# Store name in .INPUT_NAME, replace spaces with underscores and remove the digit and colon following ckb
-PROGRAM="/usr/bin/sed 's/ /_/g;s/.//6;s/./-/5;s/.//4' /sys/class/input/%k/device/name", ENV{.INPUT_NAME}="%c"
-# Separate into both emulated devices
-PROGRAM="/usr/bin/cat /sys/class/input/%k/device/capabilities/ev", ENV{.INPUT_EMUNUM}="%c"
-# Filter to only match ckb-next supported devices
-ENV{.INPUT_NAME}!="ckb*", GOTO="input_ckb_ids_end"
-
-# Add a by-id symlink, with EV value to separate type:
-SYMLINK+="input/by-id/%E{.INPUT_NAME}-event-%E{.INPUT_EMUNUM}"
-
-# Add a systemd .device service unit:
-TAG+="systemd"
-# Alternatively we can add additional paths for the .device units
-# ENV{SYSTEMD_ALIAS}+="/input/by-name/%E{.INPUT_NAME}"
-
-# Exit
-LABEL="input_ckb_ids_end"
+ACTION=="add|change", SUBSYSTEM=="input", ATTRS{name}=="ckb[0-9]: [A-Za-z0-9]*", ENV{ID_INPUT_JOYSTICK}="", PROGRAM="/usr/bin/sed 's/[0-9]: /-/' /sys/class/input/%k/device/name", ENV{.INPUT_NAME}="%c, "SYMLINK+="input/by-id/%E{.INPUT_NAME}-event"

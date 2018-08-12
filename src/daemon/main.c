@@ -137,7 +137,8 @@ int main(int argc, char** argv){
     FILE* pidfile = fopen(pidpath, "r");
     if(pidfile){
         pid_t pid;
-        fscanf(pidfile, "%d", &pid);
+        if(fscanf(pidfile, "%d", &pid) == EOF)
+            ckb_err("PID fscanf returned EOF (%s)\n", strerror(errno));
         fclose(pidfile);
         if(pid > 0){
             // kill -s 0 checks if the PID is active but doesn't send a signal

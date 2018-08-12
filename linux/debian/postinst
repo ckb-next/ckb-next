@@ -1,4 +1,4 @@
-#/bin/bash
+#!/usr/bin/env bash
 echo "restarting ckb-next-daemon"
 sudo systemctl daemon-reload
 sudo systemctl enable ckb-next-daemon.service

@@ -98,7 +98,7 @@ int main(int argc, char** argv){
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i], "--help")){
             printf(
-#ifdef OS_MAC
+#ifdef OS_MAC_LEGACY
                         "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
 #else
                         "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
@@ -119,7 +119,7 @@ int main(int argc, char** argv){
                         "        Note that this makes reactive lighting impossible.\n"
                         "    --nobind\n"
                         "        Disables all key rebinding, macros, and notifications. Implies --nonotify.\n"
-#ifdef OS_MAC
+#ifdef OS_MAC_LEGACY
                         "    --nomouseaccel\n"
                         "        Disables mouse acceleration, even if the system preferences enable it.\n"
 #endif
@@ -183,7 +183,7 @@ int main(int argc, char** argv){
             // Allow running as a non-root user
             forceroot = 0;
         }
-#ifdef OS_MAC
+#ifdef OS_MAC_LEGACY
         else if(!strcmp(argument, "--nomouseaccel")){
             // On OSX, provide an option to disable mouse acceleration
             features_mask &= ~FEAT_MOUSEACCEL;

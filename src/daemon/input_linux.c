@@ -64,7 +64,8 @@ int os_inputopen(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
     struct uinput_user_dev indev;
     memset(&indev, 0, sizeof(indev));
-    snprintf(indev.name, UINPUT_MAX_NAME_SIZE, "ckb%d: %s", index, kb->name);
+    snprintf(indev.name, UINPUT_MAX_NAME_SIZE - 5, "ckb%d: %s", index, kb->name);
+    strcat(indev.name, " vKB");
     indev.id.bustype = BUS_USB;
     indev.id.vendor = kb->vendor;
     indev.id.product = kb->product;
@@ -75,6 +76,8 @@ int os_inputopen(usbdevice* kb){
     if(fd <= 0)
         return 0;
     // Open mouse
+    snprintf(indev.name, UINPUT_MAX_NAME_SIZE - 5, "ckb%d: %s", index, kb->name);
+    strcat(indev.name, " vM");
     fd = uinputopen(&indev, 1);
     kb->uinput_mouse = fd;
     return fd <= 0;

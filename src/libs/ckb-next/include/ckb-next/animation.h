@@ -238,7 +238,7 @@ void urldecode(char *dst, const char *src){
 #define CKB_MAX_WORD    (4 * 1024)
 void ckb_getline(char word1[CKB_MAX_WORD], char word2[CKB_MAX_WORD], char word3[CKB_MAX_WORD]){
     char line[CKB_MAX_WORD * 3 + 3];
-    fgets(line, sizeof(line), stdin);
+    if (fgets(line, sizeof(line), stdin) == NULL) return;
     word1[0] = word1[1] = word1[2] = 0;
     int res = sscanf(line, "%s %s %s", word1, word2, word3);
     if(res >= 1)
@@ -248,6 +248,7 @@ void ckb_getline(char word1[CKB_MAX_WORD], char word2[CKB_MAX_WORD], char word3[
     if(res >= 3)
         urldecode(word3, word3);
     line[strlen(line) - 1] = 0;
+
 }
 
 // Gradient interpolation

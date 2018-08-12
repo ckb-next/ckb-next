@@ -67,8 +67,8 @@ void ckb_init(ckb_runctx* context){
 }
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
-    CKB_PARSE_AGRADIENT("color", &animcolor){}
-	CKB_PARSE_BOOL("power", &power);
+    CKB_PARSE_AGRADIENT("color", &animcolor){};
+    CKB_PARSE_BOOL("power", &power){};
 }
 
 void anim_add(ckb_key* press, float x, float y){
@@ -137,8 +137,8 @@ int ckb_frame(ckb_runctx* context){
 		highi= min(highi, (int)sizeof(powers)/sizeof(double)-1); 
 		lowi = max(lowi, 0);
 		double total = 0;
-		unsigned int height = context->height;
-		for(unsigned int i = lowi; i <= highi; i++)
+		//unsigned int height = context->height;
+		for(int i = lowi; i <= highi; i++)
 			total += powers[i];
 		total /= highi - lowi + 1;
 		float a, r, g, b;

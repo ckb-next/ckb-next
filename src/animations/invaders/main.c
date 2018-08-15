@@ -111,6 +111,7 @@ char* get_bullet_key_name() {
 
 char* get_enemy_key_name() {
     int ep = round(enemy_position);
+    DBG("Pos %i", ep);
     if(enemy_row == 1) {
         return row1[ep];
     } else if (enemy_row == 2) {
@@ -131,87 +132,77 @@ void explode_enemy(){
 }
 
 void game_over(){
-
+    DBG("GAME OVER!");
 }
 
-void draw_level(ckb_runctx* context, int level) {
-    unsigned count = context->keycount;
-    for (unsigned i = 0; i < count; i++) {
-        ckb_key *key = context->keys + i;
-        char *key_name = key->name;
-        if (strcmp(key_name, "f1") == 0 && level > 0) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f2") == 0 && level > 1) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f3") == 0 && level > 2) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f4") == 0 && level > 3) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f5") == 0 && level > 4) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f6") == 0 && level > 5) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f7") == 0 && level > 6) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f8") == 0 && level > 7) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f9") == 0 && level > 8) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f10") == 0 && level > 9) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f11") == 0 && level > 10) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-        if (strcmp(key_name, "f12") == 0 && level > 11) {
-            key->a = 255;
-            key->r = 0;
-            key->g = 0;
-            key->b = 255;
-        }
-    }
+int draw_level(ckb_key *key, int level) {
+    int ret = 1;
+    char *key_name = key->name;
+
+    if (strcmp(key_name, "f1") == 0 && level > 0) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f2") == 0 && level > 1) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f3") == 0 && level > 2) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f4") == 0 && level > 3) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f5") == 0 && level > 4) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f6") == 0 && level > 5) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f7") == 0 && level > 6) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f8") == 0 && level > 7) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f9") == 0 && level > 8) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f10") == 0 && level > 9) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f11") == 0 && level > 10) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else if (strcmp(key_name, "f12") == 0 && level > 11) {
+        key->a = 255;
+        key->r = 0;
+        key->g = 0;
+        key->b = 255;
+    } else 
+        ret = 0;
+
+    return ret;
 }
 
 void ckb_time(ckb_runctx* context, double delta){
@@ -223,8 +214,12 @@ void ckb_time(ckb_runctx* context, double delta){
         bullet_position = 0;
     }
     enemy_position -= (0.08 + level * 0.02);
-    if(enemy_position == 0) {
+    if(enemy_position < 0)
+        enemy_position = -1;
+
+    if(enemy_position == -1){
         game_over();
+        return;
     } else if (round(enemy_position) == round(bullet_position) && bullet_row == enemy_row) {
         explode_enemy();
         enemies++;
@@ -268,13 +263,14 @@ void ckb_time(ckb_runctx* context, double delta){
             key->r = 255;
             key->g = 0;
             key->b = 0;
+        } else if (draw_level(key, level)){
+            continue;
         } else {
             key->r = 0;
             key->g = 0;
             key->b = 0;
         }
     }
-    draw_level(context, level);
 }
 
 int ckb_frame(ckb_runctx* context){

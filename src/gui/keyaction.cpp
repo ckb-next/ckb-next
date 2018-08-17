@@ -77,6 +77,15 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
         return "$dpi:0";
     if(key == "profswitch")
         return "$mode:-3";
+
+#ifdef Q_OS_MACOS
+    // macOS has no forwards and backwards, so we bind them to macros that simulate that action
+    if(key == "mouse4")
+        return "$macro:+lwin,+lbrace,-lbrace,-lwin:⌘[::key +lwin\n=268957\nkey +lbrace\n=113103\nkey -lbrace\n=208898\nkey -lwin";
+    if(key == "mouse5")
+        return "$macro:+lwin,+rbrace,-rbrace,-lwin:⌘]::key +lwin\n=268957\nkey +rbrace\n=113103\nkey -rbrace\n=208898\nkey -lwin";
+#endif
+
     // Everything else is a standard keypress
     return key;
 }

@@ -356,7 +356,7 @@ void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort 
                 if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
                     if(!kb->active)
                         hid_kb_translate(kb->input.keys, urblen, buffer, 0);
-                } else if(urblen == MSG_SIZE){
+                } else if(urblen == MSG_SIZE) {
                     if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
                         buffer++;
                     corsair_kbcopy(kb->input.keys, buffer);
@@ -396,6 +396,7 @@ void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput
         }
     }
 }
+
 void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinput, int length){
     // Media keys
     CLEAR_KEYBIT(kbinput, 97);          // mute
@@ -432,21 +433,54 @@ void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinpu
     }
 }
 
+void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
+    // Clear previous input
+    for(int i = 0; i < 256; i++){
+        if(hid_codes[i] >= 0)
+            CLEAR_KEYBIT(kbinput, hid_codes[i]);
+    }
+    // Set new input
+    for(int i = 0; i < 8; i++){
+        if((urbinput[0] >> i) & 1)
+            SET_KEYBIT(kbinput, hid_codes[i + 224]);
+    }
+    for(int i = 2; i < length; i++){
+        if(urbinput[i] > 3){
+            int scan = hid_codes[urbinput[i]];
+            if(scan >= 0)
+                SET_KEYBIT(kbinput, scan);
+            else
+                ckb_warn("Got unknown legacy 6kro key press %d\n", urbinput[i]);
+        }
+    }
+}
+
 void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy){
     if(legacy) {
-        if(length == 4) // Media Keys
-            handle_nkro_media_keys(kbinput, urbinput, length);
-        else if(length == 15) // NKRO Input
-            handle_nkro_key_input(kbinput, urbinput, length, legacy);
-        else
-            ckb_warn("Got unknown legacy data\n");
+        switch(length) {
+            case 4: // Media Keys
+                handle_nkro_media_keys(kbinput, urbinput, length);
+                break;
+            case 8: // G/MR Keys
+                handle_legacy_6kro_input(kbinput, urbinput, length);
+                break;
+            case 15: // NKRO Input
+                handle_nkro_key_input(kbinput, urbinput, length, legacy);
+                break;
+            default:
+                ckb_warn("Got unknown legacy data\n");
+        }
     } else {
-        if(urbinput[0] == 0x01)
-            handle_nkro_key_input(kbinput, urbinput, length, legacy);
-         else if (urbinput[0] == 0x02)
-            handle_nkro_media_keys(kbinput, urbinput, length);
-        else
-            ckb_warn("Got unknown data\n");
+        switch(urbinput[0]) {
+            case 0x01:
+                handle_nkro_key_input(kbinput, urbinput, length, legacy);
+                break;
+            case 0x02:
+                handle_nkro_media_keys(kbinput, urbinput, length);
+                break;
+            default:
+                ckb_warn("Got unknown data\n");
+        }
     }
 }
 

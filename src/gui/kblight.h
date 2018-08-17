@@ -84,6 +84,10 @@ public:
     void lightExport(QSettings* settings);
     void lightImport(QSettings* settings);
 
+    // Used to force a frame to be sent to the daemon
+    // Needed for when switching profiles as the daemon wipes the old data on switch
+    void forceFrameUpdate();
+
 signals:
     void didLoad();
     void updated();
@@ -99,7 +103,7 @@ private:
     quint64         lastFrameSignal;
     int             _dimming, _lastFrameDimming;
     bool            _start;
-    bool            _needsSave, _needsMapRefresh;
+    bool            _needsSave, _needsMapRefresh, _forceFrame;
 
     // Rebuild base ColorMap (if needed)
     void rebuildBaseMap();

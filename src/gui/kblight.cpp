@@ -8,13 +8,13 @@ static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
-    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true)
+    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap), lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _start(false), _needsSave(true), _needsMapRefresh(true)
+    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap), lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
 {
     map(keyMap);
     // Duplicate animations
@@ -293,6 +293,10 @@ QRgb monoRgb(float r, float g, float b){
     return qRgb(value, value, value);
 }
 
+void KbLight::forceFrameUpdate(){
+    _forceFrame = true;
+}
+
 void KbLight::frameUpdate(QFile& cmd, bool monochrome){
     rebuildBaseMap();
     _animMap = _colorMap;
@@ -304,8 +308,11 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
         _previewAnim->blend(_animMap, timestamp);
 
     // Avoid expensive processing if nothing has changed from the last frame.
-    if(_animMap == _lastFrameAnimMap && _indicatorMap == _lastFrameIndicatorMap && _lastFrameDimming == _dimming)
+    if(_animMap == _lastFrameAnimMap && _indicatorMap == _lastFrameIndicatorMap && _lastFrameDimming == _dimming && !_forceFrame)
         return;
+
+     _forceFrame = false;
+
     _lastFrameAnimMap = _animMap;
     _lastFrameIndicatorMap = _indicatorMap;
     _lastFrameDimming = _dimming;

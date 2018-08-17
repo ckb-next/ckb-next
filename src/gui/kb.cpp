@@ -797,6 +797,7 @@ void Kb::setCurrentMode(KbProfile* profile, KbMode* mode, bool spontaneous){
         _needsSave = true;
         emit modeChanged(spontaneous);
     }
+    mode->light()->forceFrameUpdate();
 }
 
 ////

@@ -24,6 +24,12 @@ public:
     // Poll for setting updates and save (if necessary)
     void pollUpdates();
 
+    void enableUpdateButton();
+    void setUpdateButtonText(QString text);
+
+signals:
+    void checkForUpdates();
+
 private slots:
     void on_pushButton_clicked();
     void on_capsBox_activated(int index);
@@ -38,6 +44,8 @@ private slots:
     void on_generateReportButton_clicked();
     void devDetectFinished(int retVal);
     void devDetectDestroyed();
+    void on_autoUpdBox_clicked(bool checked);
+    void on_pushButton_2_clicked();
 
 private:
     QProcess* devDetect;

@@ -8,11 +8,14 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDateTime>
+#include "mainwindow.h"
+#include <ckbnextconfig.h>
 
 extern QString devpath;
 
 // Modifier keys (OS-dependent)
 static QStringList modKeys, modNames;
+static bool updateRequestedByUser = false;
 
 SettingsWidget::SettingsWidget(QWidget *parent) :
     QWidget(parent), devDetect(nullptr),
@@ -86,6 +89,13 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     labelText.append("<br/>Special thanks to <a href=\"https://github.com/tekezo\" style=\"text-decoration:none;\">tekezo</a> for <a href=\"https://github.com/tekezo/Karabiner-VirtualHIDDevice\" style=\"text-decoration:none;\">VirtualHIDDevice</a>.");
     ui->label_2->setText(labelText);
 #endif
+#endif
+
+#ifdef DISABLE_UPDATER
+    ui->autoUpdBox->hide();
+    ui->pushButton_2->hide();
+#else
+    ui->autoUpdBox->setChecked(!settings.value("DisableAutoUpdCheck", false).toBool());
 #endif
 }
 
@@ -227,4 +237,28 @@ void SettingsWidget::devDetectFinished(int retVal){
 
 void SettingsWidget::devDetectDestroyed(){
     devDetect = nullptr;
+}
+
+void SettingsWidget::on_autoUpdBox_clicked(bool checked)
+{
+    CkbSettings::set("Program/DisableAutoUpdCheck", !checked);
+}
+
+void SettingsWidget::on_pushButton_2_clicked()
+{
+    emit checkForUpdates();
+    ui->pushButton_2->setEnabled(false);
+    ui->pushButton_2->setText("Checking...");
+    updateRequestedByUser = true;
+}
+
+void SettingsWidget::enableUpdateButton(){
+    ui->pushButton_2->setEnabled(true);
+}
+
+void SettingsWidget::setUpdateButtonText(QString text){
+    if(updateRequestedByUser) {
+        ui->pushButton_2->setText(text);
+        updateRequestedByUser = false;
+    }
 }

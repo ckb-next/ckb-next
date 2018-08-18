@@ -120,6 +120,8 @@ if (MACOS OR LINUX)
               autorun.cpp
               ckbsettings.cpp
               ckbsettingswriter.cpp
+              ckbupdater.cpp
+              ckbupdaterwidget.cpp
               colorbutton.cpp
               colormap.cpp
               extrasettingswidget.cpp
@@ -159,6 +161,8 @@ if (MACOS OR LINUX)
               autorun.h
               ckbsettings.h
               ckbsettingswriter.h
+              ckbupdater.h
+              ckbupdaterwidget.h
               colorbutton.h
               colormap.h
               extrasettingswidget.h
@@ -194,6 +198,7 @@ if (MACOS OR LINUX)
               settingswidget.h
               animadddialog.ui
               animsettingdialog.ui
+              ckbupdaterwidget.ui
               extrasettingswidget.ui
               fwupgradedialog.ui
               gradientdialog.ui

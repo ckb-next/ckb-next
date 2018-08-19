@@ -45,7 +45,7 @@ void GradientButton::fromString(const QString& string){
     uchar a, r, g, b;
     while(1){
         int scanned = 0;
-        char newpos;
+        signed char newpos;
         if(sscanf(data, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
         data += scanned;

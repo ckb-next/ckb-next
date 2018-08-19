@@ -3,6 +3,7 @@
 #include "input.h"
 #include "led.h"
 #include "profile.h"
+#include "stdint.h"
 
 // Percent-enconding conversions
 void urldecode2(char* dst, const char* src){
@@ -62,9 +63,9 @@ void urlencode2(char* dst, const char* src){
 
 // GUID conversions
 int setid(usbid* id, const char* guid){
-    int32_t data1;
-    int16_t data2, data3, data4a;
-    char data4b[6];
+    uint data1;
+    ushort data2, data3, data4a;
+    uchar data4b[6];
     if(sscanf(guid, "{%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}",
               &data1, &data2, &data3, &data4a, data4b, data4b + 1, data4b + 2, data4b + 3, data4b + 4, data4b + 5) != 10)
         return 0;
@@ -77,9 +78,9 @@ int setid(usbid* id, const char* guid){
 }
 
 char* getid(usbid* id){
-    int32_t data1;
-    int16_t data2, data3, data4a;
-    char data4b[6];
+    uint data1;
+    ushort data2, data3, data4a;
+    uchar data4b[6];
     memcpy(&data1, id->guid + 0x0, 4);
     memcpy(&data2, id->guid + 0x4, 2);
     memcpy(&data3, id->guid + 0x6, 2);
@@ -171,7 +172,7 @@ void cmd_id(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* id
     (void)dummy2;
 
     // ID is either a GUID or an 8-digit hex number
-    int newmodified;
+    uint newmodified;
     if(!setid(&mode->id, id) && sscanf(id, "%08x", &newmodified) == 1)
         memcpy(mode->id.modified, &newmodified, sizeof(newmodified));
 }
@@ -182,7 +183,7 @@ void cmd_profileid(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const c
     (void)dummy2;
 
     usbprofile* profile = kb->profile;
-    int newmodified;
+    uint newmodified;
     if(!setid(&profile->id, id) && sscanf(id, "%08x", &newmodified) == 1)
         memcpy(profile->id.modified, &newmodified, sizeof(newmodified));
 

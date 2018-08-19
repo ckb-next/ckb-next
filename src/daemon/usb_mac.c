@@ -780,7 +780,8 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     if(IS_V3_OVERRIDE(&fakekb) || fwversion >= 0x300) {
         if(feature == 64)
             handle_idx = 1;
-        else if(input == 64 && output <= 2 && feature == 1)
+        else if((input == 64 && output <= 2 && feature == 1) ||
+            (input == 8 && output == 1 && feature == 0)) // K55 v3 is (I: 8, O: 1, F: 0)
             handle_idx = 0;
         else {
             ckb_warn("Got unknown V3 handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);

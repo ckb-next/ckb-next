@@ -10,7 +10,7 @@
 
 #define LAYER_COUNT        1
 
-static int k95p_get_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
+static int fs_get_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
     ckb_info("Receiving %s\n", filename);
     // Prepare to load the file.
     uchar switch_pkt[2][MSG_SIZE] = {
@@ -56,7 +56,7 @@ static int k95p_get_file(usbdevice* kb, const char* filename, int size, int prof
     return 1;
 }
 
-static int k95p_send_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
+static int fs_send_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
     ckb_info("Sending %s\n", filename);
     // Prepare to send the file.
     uchar switch_pkt[2][MSG_SIZE] = {
@@ -105,10 +105,10 @@ static int k95p_send_file(usbdevice* kb, const char* filename, int size, int pro
     return 1;
 }
 
-static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
+static int loadrgb_fs(usbdevice* kb, lighting* light, int mode){
     uchar data[18*MSG_SIZE];
     // Profile RGB count.
-    if(!k95p_get_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
+    if(!fs_get_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
         return -1;
     memset(light, 0, sizeof(lighting));
     uchar lightcount = data[0];
@@ -123,7 +123,7 @@ static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
     for(int layer = 0; layer < lightcount; layer++){
         char filename[16] = { 0 };
         snprintf(filename, 16, "lght_%02hhx.r", layer);
-        if(!k95p_get_file(kb, filename, LIGHTRGB_SIZE, mode, data))
+        if(!fs_get_file(kb, filename, LIGHTRGB_SIZE, mode, data))
             return -1;
         for(int key = 0; key < N_KEYS_HW; key++){
             // The hardware profiles represent colours as RGBA,
@@ -146,7 +146,7 @@ static int loadrgb_k95p(usbdevice* kb, lighting* light, int mode){
     return 1;
 }
 
-static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
+static int savergb_fs(usbdevice* kb, lighting* light, int mode){
     uchar data[LIGHTRGB_SIZE] = { LAYER_COUNT, 0 };
     // Zero out the buffer.
     data[0] = 0;
@@ -164,7 +164,7 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
         memset(filename, 0, 16);
         snprintf(filename, 16, "lght_%02hhx.d", layer);
 
-        if(!k95p_send_file(kb, filename, 37, mode, strange_cue_packet_must_investigate))
+        if(!fs_send_file(kb, filename, 37, mode, strange_cue_packet_must_investigate))
             return -1;
 
         // lght_XX.k - ???
@@ -189,7 +189,7 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
         memset(filename, 0, 16);
         snprintf(filename, 16, "lght_%02hhx.k", layer);
 
-        if(!k95p_send_file(kb, filename, 138, mode, possible_binary_blob))
+        if(!fs_send_file(kb, filename, 138, mode, possible_binary_blob))
             return -1;
 
         // lght_XX.r - RGBA data.
@@ -206,32 +206,32 @@ static int savergb_k95p(usbdevice* kb, lighting* light, int mode){
             data[4*key + 3] = 0xFF;
         }
 
-        if(!k95p_send_file(kb, filename, LIGHTRGB_SIZE, mode, data))
+        if(!fs_send_file(kb, filename, LIGHTRGB_SIZE, mode, data))
             return -1;
     }
 
     // Lighting count (currently one supported).
-    if(!k95p_send_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
+    if(!fs_send_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
         return -1;
     
     uchar profile_map_magic[4] = {
         65, 0, 0, 0
     };
 
-    if(!k95p_send_file(kb, "PROFILE.MAP", 4, mode, profile_map_magic))
+    if(!fs_send_file(kb, "PROFILE.MAP", 4, mode, profile_map_magic))
         return -1;
 
     uchar profile_dat_magic[4] = {
         80, 1, 0, 0
     };
 
-    if(!k95p_send_file(kb, "PROFILE.DAT", 4, mode, profile_dat_magic))
+    if(!fs_send_file(kb, "PROFILE.DAT", 4, mode, profile_dat_magic))
         return -1;
 
     return 1;
 }
 
-int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3){
+int cmd_hwload_fs(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3){
     (void)dummy1;
     (void)dummy2;
     (void)dummy3;
@@ -243,7 +243,7 @@ int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const
     int modes = (IS_K95(kb) ? HWMODE_K95 : HWMODE_K70);
     for(int mode = 0; mode < modes; mode++){
         // Profile metadata.
-        if(!k95p_get_file(kb, "PROFILE.I", PROFILE_SIZE, mode, in_data))
+        if(!fs_get_file(kb, "PROFILE.I", PROFILE_SIZE, mode, in_data))
             return -1;
         // This file always seems to start with 0x49 0x00.
         // Maybe a magic number? A size?
@@ -253,7 +253,7 @@ int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const
         // Profile name.
         memcpy(hw->name + mode, in_data + 22, PR_NAME_LEN * 2);
         // Load RGB.
-        if(!loadrgb_k95p(kb, hw->light + mode, mode))
+        if(!loadrgb_fs(kb, hw->light + mode, mode))
             return -1;
     }
     // Make the profile active (if requested).
@@ -266,7 +266,7 @@ int cmd_hwload_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const
     return 1;
 }
 
-int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+int cmd_hwsave_fs(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
     (void)dummy1;
     (void)dummy2;
     (void)dummy3;
@@ -281,7 +281,7 @@ int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
     // Save the profile metadata.
     for(int mode = 0; mode < modes; mode++){
         // Save RGB.
-        if(!savergb_k95p(kb, hw->light + mode, mode))
+        if(!savergb_fs(kb, hw->light + mode, mode))
             return -1;
         
         uchar data[5*MSG_SIZE] = { 0x49, 0x00, 0 };
@@ -290,7 +290,7 @@ int cmd_hwsave_k95p(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
         // Profile name.
         memcpy(data + 22, hw->name + mode, MD_NAME_LEN * 2);
         // Send to the keyboard.
-        if(!k95p_send_file(kb, "PROFILE.I", PROFILE_SIZE, mode, data))
+        if(!fs_send_file(kb, "PROFILE.I", PROFILE_SIZE, mode, data))
             return -1;
     }
     DELAY_LONG(kb);

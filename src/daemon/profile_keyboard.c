@@ -15,8 +15,8 @@ static int hwloadmode(usbdevice* kb, hwprofile* hw, int mode){
 
 int cmd_hwload_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3){
 
-    if(IS_K95_PLATINUM(kb))
-        return cmd_hwload_k95p(kb, dummy1, dummy2, apply, dummy3);
+    if(USES_FILE_HWSAVE(kb))
+        return cmd_hwload_fs(kb, dummy1, dummy2, apply, dummy3);
 
     DELAY_LONG(kb);
     hwprofile* hw = calloc(1, sizeof(hwprofile));
@@ -60,8 +60,8 @@ int cmd_hwload_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const c
 
 int cmd_hwsave_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
 
-    if(IS_K95_PLATINUM(kb))
-        return cmd_hwsave_k95p(kb, dummy1, dummy2, dummy3, dummy4);
+    if(USES_FILE_HWSAVE(kb))
+        return cmd_hwsave_fs(kb, dummy1, dummy2, dummy3, dummy4);
 
     DELAY_LONG(kb);
     hwprofile* hw = kb->hw;

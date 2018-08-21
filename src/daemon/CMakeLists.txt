@@ -87,7 +87,7 @@ if (MACOS OR LINUX)
               profile.c
               profile_keyboard.c
               profile_mouse.c
-              profile_k95p.c
+              profile_fs.c
               usb.c
               usb_nxp.c
               usb_legacy.c

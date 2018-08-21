@@ -170,6 +170,8 @@ private:
     bool _angleSnap;
     // Misc
     bool _needsUpdate, _needsSave;
+    // Helper to tell if the active DPI is a sniper one or not
+    bool _sniper;
 };
 
 #endif // KBPERF_H

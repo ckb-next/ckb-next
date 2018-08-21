@@ -391,6 +391,7 @@ void KbPerf::baseDpiIdx(int newIdx) {
 }
 
 quint64 KbPerf::pushDpi(const QPoint& newDpi, bool sniper){
+    _sniper = sniper;
     emit dpiChanged((sniper ? 0 : 6));
     quint64 index = runningPushIdx++;
     pushedDpis[index] = newDpi;
@@ -563,7 +564,7 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
         return;
     if(_dpiIndicator){
         // Set DPI indicator according to index
-        int index = baseDpiIdx();
+        int index = pushedDpis.isEmpty() ? baseDpiIdx() : _sniper - 1;
         if(index == -1 || index > OTHER)
             index = OTHER;
         lightIndicator("dpi", dpiClr[index].rgba());

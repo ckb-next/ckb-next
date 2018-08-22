@@ -85,6 +85,7 @@ device_desc models[] = {
     // Headsets
     { V_CORSAIR, P_VOID_USB_1, },
     { V_CORSAIR, P_VOID_USB_2, },
+    { V_CORSAIR, P_VOID_WIRELESS_1, },
 };
 
 size_t N_MODELS = sizeof(models) / sizeof(device_desc);
@@ -187,7 +188,7 @@ const char* product_str(ushort product){
         return "polaris";
     if(product == P_ST100)
         return "st100";
-    if(product == P_VOID_USB_1 || product == P_VOID_USB_2)
+    if(product == P_VOID_USB_1 || product == P_VOID_USB_2 || product == P_VOID_WIRELESS_1)
         return "void";
     return "";
 }

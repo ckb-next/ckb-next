@@ -115,9 +115,10 @@
 
 #define P_VOID_USB_1         0x1b29
 #define P_VOID_USB_2         0x1b2a
-#define IS_VOID(kb)((kb)->vendor == V_CORSAIR && ((kb)->product == P_VOID_USB_1 || (kb)->product == P_VOID_USB_2))
+#define P_VOID_WIRELESS_1    0x1b27
+#define IS_VOID(kb)          ((kb)->vendor == V_CORSAIR && ((kb)->product == P_VOID_USB_1 || (kb)->product == P_VOID_USB_2 || (kb)->product == P_VOID_WIRELESS_1))
 
-#define N_MODELS 39
+#define N_MODELS 40
 extern ushort models[];
 
 ///

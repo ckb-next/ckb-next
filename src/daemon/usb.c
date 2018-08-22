@@ -54,6 +54,7 @@ ushort models[N_MODELS] = {
     // Headsets
     P_VOID_USB_1,
     P_VOID_USB_2,
+    P_VOID_WIRELESS_1,
 };
 
 /// brief .
@@ -144,7 +145,7 @@ const char* product_str(short product){
         return "polaris";
     if(product == P_ST100)
         return "st100";
-    if(product == P_VOID_USB_1 || product == P_VOID_USB_2)
+    if(product == P_VOID_USB_1 || product == P_VOID_USB_2 || product == P_VOID_WIRELESS_1)
         return "void";
     return "";
 }

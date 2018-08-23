@@ -215,7 +215,7 @@ const char* product_str(short product);
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 // Headset test
-#define IS_HEADSET(vendor, product)     ((vendor) == (V_CORSAIR) && (product == P_VOID_USB_1 || product == P_VOID_USB_2))
+#define IS_HEADSET(vendor, product)     ((vendor) == (V_CORSAIR) && (product == P_VOID_USB_1 || product == P_VOID_USB_2 || product == P_VOID_WIRELESS_1))
 #define IS_HEADSET_DEV(kb)              IS_HEADSET((kb)->vendor, (kb)->product)
 
 #define USB_DELAY_DEFAULT   5

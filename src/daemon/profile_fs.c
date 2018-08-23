@@ -10,6 +10,113 @@
 
 #define LAYER_COUNT        1
 
+static int fs_get_buffer_size(usbdevice* kb){
+    uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x01, 0x00, 0 };
+    uchar reply[MSG_SIZE] = {0};
+    if(!usbrecv(kb, pkt, reply))
+        return -1;
+    // Buffer size is a 16-bit number at a fairly strange offset.
+    int bufsize = (reply[15] << 8) | reply[14];
+    return bufsize;
+}
+
+static size_t fs_get_current_file_size(usbdevice* kb){
+    uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x03, 0x00, 0 };
+    uchar reply[MSG_SIZE] = {0};
+    if(!usbrecv(kb, pkt, reply))
+        return -1;
+    // Size is an unsigned 32-bit int.
+    size_t size = (reply[7] << 24) | (reply[6] << 16) | (reply[5] << 8) | reply[4];
+    return size;
+}
+
+static int fs_get_file_list(usbdevice* kb, uchar* data[], int count){
+    uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x04, 0x00, 0 };
+    uchar reply[MSG_SIZE] = {0};
+    if(!usbrecv(kb, pkt, reply))
+        return -1;
+    for (int i = 0; i < count; i++) {
+        // Format: 16-byte GUID, then 4 bytes of something.
+        memcpy(data + i, reply + (i * 20) + 4, 20);
+    }
+    return 0;
+}
+
+static int fs_set_write_filename(usbdevice* kb, char* filename){
+    uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x05, 0x00, 0 };
+    memcpy(pkt + 4, filename, 12);
+    if(!usbsend(kb, pkt, 1))
+        return -1;
+    return 0;
+}
+
+static int fs_set_read_filename(usbdevice* kb, char* filename){
+    uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x07, 0x00, 0 };
+    memcpy(pkt + 4, filename, 12);
+    if(!usbsend(kb, pkt, 1))
+        return -1;
+    return 0;
+}
+
+static int fs_set_eof(usbdevice* kb){
+    uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
+    if(!usbsend(kb, pkt, 1))
+        return -1;
+    return 0;
+}
+
+// No idea about this one.
+static int fs_mysterious_09(usbdevice* kb){
+    uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x09, 0x00, 0 };
+    if(!usbsend(kb, pkt, 1))
+        return -1;
+    return 0;
+}
+
+// We're still not sure about this, but it happens only on reads.
+static int fs_begin_read(usbdevice* kb){
+    uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x0a, 0x00, 0 };
+    if(!usbsend(kb, pkt, 1))
+        return -1;
+    return 0;
+}
+
+// We're still not sure about this, but it happens only on writes.
+static int fs_begin_write(usbdevice* kb){
+    uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x0b, 0x00, 0 };
+    if(!usbsend(kb, pkt, 1))
+        return -1;
+    return 0;
+}
+
+static int fs_switch_profile(usbdevice* kb, int profile){
+    uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x0c, 0x00, 0 };
+    pkt[3] = profile;
+    if(!usbsend(kb, pkt, 1))
+        return -1;
+    return 0;
+}
+
+// Command statuses we've seen so far are:
+// - 0 - operation was OK.
+// - 4 - occurs when a file does not exist.
+// - 13 - no idea why this happens.
+static int fs_get_command_status(usbdevice* kb){
+    uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x0d, 0x00, 0 };
+    uchar reply[MSG_SIZE] = {0};
+    if(!usbrecv(kb, pkt, reply))
+        return -1;
+    return reply[4];
+}
+
+// No idea what this does.
+static int fs_mysterious_0e(usbdevice* kb){
+    uchar pkt[MSG_SIZE] = {0x07, 0x17, 0x0e, 0x00, 0 };
+    if(!usbsend(kb, pkt, 1))
+        return -1;
+    return 0;
+}
+
 static int fs_get_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
     ckb_info("Receiving %s\n", filename);
     // Prepare to load the file.

@@ -587,6 +587,13 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
         break;
     }
+    case KeyMap::K66:{
+        // Same as the K68, except there's no brightness button
+        map = getMap(KeyMap::K68, layout);
+        map.remove("light");
+
+        break;
+    }
     case KeyMap::K65:{
         // The K65 maps additionally remove the numpad and have a modified top row
         map = getMap(KeyMap::K70, layout);
@@ -1002,6 +1009,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K63;
     if(lower == "k65")
         return K65;
+    if(lower == "k66")
+        return K66;
     if(lower == "k68")
         return K68;
     if(lower == "k70")
@@ -1045,6 +1054,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k65";
     case K68:
         return "k68";
+    case K66:
+        return "k66";
     case K70:
         return "k70";
     case K95:
@@ -1091,6 +1102,7 @@ int KeyMap::modelWidth(Model model){
         return K63_WIDTH;
     case K65:
         return K65_WIDTH;
+    case K66:
     case K68:
         return K68_WIDTH;
     case K70:
@@ -1123,6 +1135,7 @@ int KeyMap::modelHeight(Model model){
     case K55:
     case K63:
     case K65:
+    case K66:
     case K68:
     case K70:
     case K70MK2:

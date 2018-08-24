@@ -17,6 +17,7 @@ ushort models[N_MODELS] = {
     P_K65_LEGACY,
     P_K65_LUX,
     P_K65_RFIRE,
+    P_K66,
     P_K68,
     P_K68_NRGB,
     P_K70,
@@ -117,6 +118,8 @@ const char* product_str(short product){
         return "k68";
     if(product == P_K65 || product == P_K65_LEGACY || product == P_K65_LUX || product == P_K65_RFIRE)
         return "k65";
+    if(product == P_K66)
+        return "k66";
     if(product == P_K63_NRGB)
         return "k63";
     if(product == P_K55)

@@ -282,6 +282,8 @@ typedef struct {
     key* keymap;
     // Buffer used to store non-HID interrupt reads from the input thread.
     uchar* interruptbuf;
+    // Protocol version
+    uchar protocolver;
 } usbdevice;
 
 #endif  // STRUCTURES_H

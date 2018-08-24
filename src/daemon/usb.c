@@ -317,6 +317,12 @@ static void* _setupusb(void* context){
     /// <b>Although the DELAY_LONG macro is given a parameter, it is ignored. Occasionally refactor it.</b>
     DELAY_LONG(kb);
 
+    // Try to get the protocol version from the device.
+    if(os_getprotover(kb)) {
+        ckb_warn("Could not get protocol version for ckb%d\n", INDEX_OF(kb, keyboard));
+        kb->protocolver = 0;
+    }
+
     ///
     /// - The first relevant point is the operating system-specific opening of the interface in os_setupusb().
     /// As a result, some parameters should be set in kb (name, serial, fwversion, epcount = number of usb endpoints),

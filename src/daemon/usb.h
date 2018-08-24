@@ -373,4 +373,6 @@ int usb_tryreset(usbdevice* kb);
 
 void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum);
 
+int os_getprotover(usbdevice* kb);
+
 #endif  // USB_H

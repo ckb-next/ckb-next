@@ -1019,4 +1019,21 @@ void usbkill(){
     CFRunLoopStop(mainloop);
 }
 
+int os_getprotover(usbdevice* kb){
+    char data[8] = {0};
+
+    usbgetstr(kb->handle, 0x04, data, 8);
+
+    if(data[1] < '0' || data[1] > '9' || data[2] < '0' || data[2] > '9')
+        return 1;
+
+    // Rework string
+    if(sscanf(data, "P%hhu", &kb->protocolver) != 1)
+        return 1;
+
+    ckb_info("ckb%d: Protocol version P%02hhu\n", INDEX_OF(kb, keyboard), kb->protocolver);
+
+    return 0;
+}
+
 #endif

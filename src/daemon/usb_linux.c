@@ -819,4 +819,26 @@ void usbkill(){
     udev = 0;
 }
 
+int os_getprotover(usbdevice* kb){
+    char data[8] = {0};
+    struct usbdevfs_ctrltransfer transfer = { 0x80, 0x06, 0x304, 0x0409, 8, 5000,  data};
+    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    if(res <= 0) {
+//        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
+        return 1;
+    }
+
+    if(data[4] < '0' || data[4] > '9' || data[6] < '0' || data[6] > '9')
+        return 1;
+
+    // Rework string
+    char verstr[3] = {data[4], data[6], 0};
+    if(sscanf(verstr, "%hhu", &kb->protocolver) != 1)
+        return 1;
+
+    ckb_info("ckb%d: Protocol version P%02hhu\n", INDEX_OF(kb, keyboard), kb->protocolver);
+
+    return 0;
+}
+
 #endif

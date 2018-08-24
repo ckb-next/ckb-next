@@ -57,6 +57,9 @@
 #define P_K65_RFIRE          0x1b39
 #define IS_K65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K65 || (kb)->product == P_K65_LEGACY || (kb)->product == P_K65_LUX || (kb)->product == P_K65_RFIRE))
 
+#define P_K66                0x1b41
+#define IS_K66(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K66))
+
 #define P_K68                0x1b4f
 #define P_K68_NRGB           0x1b3f
 #define IS_K68(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K68 || (kb)->product == P_K68_NRGB))
@@ -113,7 +116,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 37
+#define N_MODELS 38
 extern ushort models[];
 
 ///
@@ -139,6 +142,9 @@ const char* vendor_str(short vendor);
 /// \param product is the \a short USB device product ID
 /// \return string to identify a type of device (see below)
 const char* product_str(short product);
+
+// Used for devices that use the CUE protocol but have no backlight
+#define HAS_NO_LIGHTS(kb)               (IS_K66(kb))
 
 /// RGB vs non-RGB test
 /// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol.
@@ -178,7 +184,7 @@ const char* product_str(short product);
 #define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2)
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
-#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb) || IS_ST100(kb) || (kb)->product == P_SCIMITAR_PRO)
+#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb) || IS_ST100(kb) || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K66)
 
 /// Used for devices that have a single IN endpoint, and no HID input
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb))

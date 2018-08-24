@@ -48,9 +48,10 @@ struct Key {
 // Key layout/device info class
 class KeyMap {
 public:
+    // Do not reorder these.
+    // Doing so will break the profile import/export
     enum Model {
         NO_MODEL = -1,
-        // Keyboard models
         K55,
         K63,
         K65,
@@ -59,18 +60,17 @@ public:
         K95,
         K95P,
         STRAFE,
-        // Mouse models
         M65,
         SABRE,
         SCIMITAR,
         HARPOON,
         GLAIVE,
         KATAR,
-        // Mousepads
         POLARIS,
         ST100,
         K70MK2,
         STRAFE_MK2,
+        K66,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

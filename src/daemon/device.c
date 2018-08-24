@@ -70,8 +70,10 @@ int _start_dev(usbdevice* kb, int makeactive){
     ///
     /// K66 has no backlight
     ///
-    if(HAS_NO_LIGHTS(kb))
+    if(HAS_NO_LIGHTS(kb)) {
         kb->features &= ~FEAT_RGB;
+        kb->features &= ~FEAT_HWLOAD; // no LED data to read
+    }
 
     ///
     /// - Now check if device needs a firmware update.

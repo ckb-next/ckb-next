@@ -5,10 +5,10 @@
 #include "ckbsettings.h"
 #include "kbanim.h"
 
-KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, CkbSettings& settings) :
+KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, CkbSettings& settings, bool disable_anim) :
     QObject(parent), _script(0), _map(map),
     repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
-    _guid(id), _isActive(false), _isActiveKp(false), _needsSave(false)
+    _guid(id), _isActive(false), _isActiveKp(false), _needsSave(false), _disable_anim(disable_anim)
 {
     SGroup group(settings, _guid.toString().toUpper());
     _keys = settings.value("Keys").toStringList();
@@ -39,6 +39,9 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, CkbSettings& 
             _parameters[param.toLower()] = settings.value(param);
     }
 
+    if(_disable_anim)
+        return;
+
     if(!_scriptGuid.isNull()){
         _script = AnimScript::copy(this, _scriptGuid);
         if(_script){
@@ -61,10 +64,10 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, CkbSettings& 
     }
 }
 
-KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings* settings) :
+KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings* settings, bool disable_anim) :
     QObject(parent), _script(0), _map(map),
     repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
-    _guid(id), _isActive(false), _isActiveKp(false), _needsSave(false)
+    _guid(id), _isActive(false), _isActiveKp(false), _needsSave(false), _disable_anim(disable_anim)
 {
     settings->beginGroup(_guid.toString().toUpper());
     _keys = settings->value("Keys").toStringList();
@@ -96,7 +99,7 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings* se
         settings->endGroup();
     }
 
-    if(!_scriptGuid.isNull()){
+    if(!(_scriptGuid.isNull() || _disable_anim)){
         _script = AnimScript::copy(this, _scriptGuid);
         if(_script){
             // Remove nonexistant parameters
@@ -117,6 +120,36 @@ KbAnim::KbAnim(QObject *parent, const KeyMap& map, const QUuid id, QSettings* se
         }
     }
     settings->endGroup();
+}
+
+KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script, bool disable_anim) :
+    QObject(parent),
+    _script(AnimScript::copy(this, script->guid())), _map(map), _keys(keys),
+    repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
+    _guid(QUuid::createUuid()), _name(name), _opacity(1.), _mode(Normal), _isActive(false), _isActiveKp(false), _needsSave(true), _disable_anim(disable_anim)
+{
+    if(_script){
+        // Set default parameters
+        QListIterator<AnimScript::Param> i = _script->paramIterator();
+        while(i.hasNext()){
+            AnimScript::Param param = i.next();
+            if(param.type != AnimScript::Param::LABEL)
+                _parameters[param.name] = param.defaultValue;
+        }
+        _scriptGuid = script->guid();
+        _scriptName = script->name();
+        reInit();
+    }
+}
+
+KbAnim::KbAnim(QObject* parent, const KeyMap& map, const KbAnim& other, bool disable_anim) :
+    QObject(parent),
+    _script(AnimScript::copy(this, other.script()->guid())), _scriptGuid(_script->guid()), _scriptName(_script->name()),
+    _map(map), _keys(other._keys), _parameters(other._parameters),
+    repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
+    _guid(other._guid), _name(other._name), _opacity(other._opacity), _mode(other._mode), _isActive(false), _isActiveKp(false), _needsSave(true), _disable_anim(disable_anim)
+{
+    reInit();
 }
 
 void KbAnim::save(CkbSettings& settings){
@@ -158,36 +191,6 @@ void KbAnim::animExport(QSettings* settings){
     settings->endGroup();
 }
 
-KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script) :
-    QObject(parent),
-    _script(AnimScript::copy(this, script->guid())), _map(map), _keys(keys),
-    repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
-    _guid(QUuid::createUuid()), _name(name), _opacity(1.), _mode(Normal), _isActive(false), _isActiveKp(false), _needsSave(true)
-{
-    if(_script){
-        // Set default parameters
-        QListIterator<AnimScript::Param> i = _script->paramIterator();
-        while(i.hasNext()){
-            AnimScript::Param param = i.next();
-            if(param.type != AnimScript::Param::LABEL)
-                _parameters[param.name] = param.defaultValue;
-        }
-        _scriptGuid = script->guid();
-        _scriptName = script->name();
-        reInit();
-    }
-}
-
-KbAnim::KbAnim(QObject* parent, const KeyMap& map, const KbAnim& other) :
-    QObject(parent),
-    _script(AnimScript::copy(this, other.script()->guid())), _scriptGuid(_script->guid()), _scriptName(_script->name()),
-    _map(map), _keys(other._keys), _parameters(other._parameters),
-    repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
-    _guid(other._guid), _name(other._name), _opacity(other._opacity), _mode(other._mode), _isActive(false), _isActiveKp(false), _needsSave(true)
-{
-    reInit();
-}
-
 void KbAnim::parameter(const QString& name, const QVariant& value){
     if(!_script->hasParam(name))
         return;
@@ -224,6 +227,8 @@ QMap<QString, QVariant> KbAnim::effectiveParams(){
 }
 
 void KbAnim::reInit(){
+    if(_disable_anim)
+        return;
     if(_script)
         _script->init(_map, _keys, effectiveParams());
     repeatKey = "";

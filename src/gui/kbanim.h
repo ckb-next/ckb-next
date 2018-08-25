@@ -23,9 +23,9 @@ public:
     };
 
     // Load an animation from settings
-    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettings& settings);
+    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettings& settings, bool disable_anim);
     // Load an animation from exported profile
-    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings* settings);
+    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings* settings, bool disable_anim);
     // Save an animation to settings
     void save(CkbSettings& settings);
     inline bool needsSave() const { return _needsSave; }
@@ -33,9 +33,9 @@ public:
     // Import/Export
     void animExport(QSettings* settings);
     // Create a new animation
-    KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script);
+    KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script, bool disable_anim);
     // Copy an existing animation
-    KbAnim(QObject *parent, const KeyMap& map, const KbAnim& other);
+    KbAnim(QObject *parent, const KeyMap& map, const KbAnim& other, bool disable_anim);
 
     // Key map
     inline const KeyMap&        map()                               { return _map; }
@@ -115,8 +115,7 @@ private:
     QString _name;
     float _opacity;
     Mode _mode;
-    bool _isActive, _isActiveKp;
-    bool _needsSave;
+    bool _isActive, _isActiveKp, _needsSave, _disable_anim;
 };
 
 #endif // KBANIM_H

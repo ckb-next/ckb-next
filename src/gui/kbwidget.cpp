@@ -34,6 +34,8 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
+        // Disable animations
+        //ui->lightWidget->setNoBacklight();
     } else {
         // Remove mouse Performance tab from non-mice
         if(!device->isMouse())

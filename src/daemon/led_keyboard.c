@@ -108,6 +108,18 @@ int updatergb_kb(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
+    if (kb->product == P_K66 || kb->product == P_K68_NRGB) {
+        // The K68 NRGB doesn't support winlock setting through the
+        // normal packets, so we have to use a different packet to set it.
+        // 8 is the winlock ("lock") led position in keymap.c
+        uchar winlock_status = (newlight->r[8] || newlight->g[8] || newlight->b[8]);
+        uchar winlock_pkt[MSG_SIZE] = {
+            CMD_SET, FIELD_LIGHTING, MODE_WINLOCK, 0, winlock_status, 0
+        };
+        if (!usbsend(kb, winlock_pkt, 1))
+            return -1;
+    }
+    
     if (IS_K55(kb)) {
         // The K55 has its own packet type, because it only has three lighting zones.
         uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };
@@ -118,17 +130,7 @@ int updatergb_kb(usbdevice* kb, int force){
         // Update strafe sidelights if necessary
 	if (IS_STRAFE(kb) && update_sidelights(kb))
             return -1;
-        if (kb->product == P_K68_NRGB) {
-            // The K68 NRGB doesn't support winlock setting through the
-            // normal packets, so we have to use a different packet to set it.
-            // 8 is the winlock ("lock") led position in keymap.c
-            uchar winlock_status = (newlight->r[8] || newlight->g[8] || newlight->b[8]);
-            uchar winlock_pkt[MSG_SIZE] = {
-                CMD_SET, FIELD_LIGHTING, MODE_WINLOCK, 0, winlock_status, 0
-            };
-            if (!usbsend(kb, winlock_pkt, 1))
-                return -1;
-        }
+        
         // 16.8M color lighting works fine on strafe and is the only way it actually works
         uchar data_pkt[12][MSG_SIZE] = {
             // Red

@@ -119,7 +119,11 @@ int updatergb_kb(usbdevice* kb, int force){
         if (!usbsend(kb, winlock_pkt, 1))
             return -1;
     }
-    
+   
+    // Don't send data if the keyboard has no lighting.
+    if (!HAS_FEATURES(kb, FEAT_RGB))
+        return 0;
+
     if (IS_K55(kb)) {
         // The K55 has its own packet type, because it only has three lighting zones.
         uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };

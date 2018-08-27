@@ -55,6 +55,14 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
 ///
 /// Some tips on using [uinput_user_dev in](http://thiemonge.org/getting-started-with-uinput)
 int os_inputopen(usbdevice* kb){
+    /// First check whether the uinput module is loaded by the kernel.
+    ///
+    // Load the uinput module (if it's not loaded already)
+    if(system("modprobe uinput") != 0) {
+        ckb_fatal("Failed to load uinput module\n");
+        return 1;
+    }
+
     if(IS_SINGLE_EP(kb)) {
         kb->uinput_kb = 0;
         kb->uinput_mouse = 0;

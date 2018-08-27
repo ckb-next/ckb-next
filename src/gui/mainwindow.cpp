@@ -230,6 +230,15 @@ void MainWindow::updateVersion(){
         QString kextstatOut(kextstat.readAll());
         if(kextstatOut.isEmpty())
             daemonWarning.append(tr("<br /><b>Warning:</b> System Extension by \"Fumihiko Takayama\" is not allowed in Security & Privacy. Please allow it and then unplug and replug your devices."));
+#elif defined(Q_OS_LINUX)
+            QProcess modprobe;
+            modprobe.start("modprobe", QStringList("uinput"));
+
+            if(!modprobe.waitForFinished())
+                qDebug() << "Modprobe error";
+
+            if(modprobe.exitCode())
+                daemonWarning.append(tr("<br /><b>Warning:</b> The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y."));
 #endif
         settingsWidget->setStatus(tr("No devices connected") + daemonWarning);
     }

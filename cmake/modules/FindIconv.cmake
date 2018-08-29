@@ -78,7 +78,7 @@ IF(ICONV_FOUND)
   #include <iconv.h>
   int main(){
     iconv_t conv = 0;
-    const char* in = 0;
+    char* in = 0;
     size_t ilen = 0;
     char* out = 0;
     size_t olen = 0;

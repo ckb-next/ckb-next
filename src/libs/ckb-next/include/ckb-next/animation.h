@@ -174,6 +174,12 @@ void ckb_alpha_blend(ckb_key* key, float a, float r, float g, float b);
 
 #ifndef CKB_NO_MAIN
 
+#ifdef DEBUG
+#define DBG(str, args...) fprintf(stderr, str"\n", ## args);
+#else
+#define DBG(str, args...) do {} while(0)
+#endif
+
 // URL-encoded string printer
 void printurl(const char* src){
     char out[strlen(src) * 3 + 1];

@@ -307,7 +307,9 @@ void AnimScript::begin(quint64 timestamp){
         return;
     }
     process = new QProcess(this);
-    connect(process, SIGNAL(readyRead()), this, SLOT(readProcess()));
+    process->setReadChannel(QProcess::StandardOutput);
+    connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readProcess()));
+    connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readProcessErr()));
     process->start(_path, QStringList("--ckb-run"));
     qDebug() << "Starting " << _path;
     // Write the keymap to the process
@@ -386,8 +388,18 @@ void AnimScript::end(){
     if(process){
         process->kill();
         connect(process, SIGNAL(finished(int)), process, SLOT(deleteLater()));
-        disconnect(process, SIGNAL(readyRead()), this, SLOT(readProcess()));
+        disconnect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readProcess()));
         process = 0;
+    }
+}
+void AnimScript::readProcessErr(){
+    QList<QByteArray> data = process->readAllStandardError().split('\n');
+    QString out = _info.name + " (" + QString::number(process->processId()) + ")";
+    for(int i = 0; i < data.length(); i++){
+        QString str(data.at(i));
+        if(str.isEmpty())
+            continue;
+        qDebug() << out << str;
     }
 }
 

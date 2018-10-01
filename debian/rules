@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+export QT_SELECT=qt5
+PREFIX = debian/ckb-next/usr
+
+%:
+	dh $@ --with systemd
+
+override_dh_auto_clean:
+override_dh_auto_test:
+override_dh_auto_build:
+override_dh_auto_install:
+	qmake
+	make
+	mkdir -p $(PREFIX)/bin
+	mkdir -p $(PREFIX)/lib
+	mkdir -p $(PREFIX)/lib/ckb-animations
+	cp bin/ckb $(PREFIX)/bin/ckb
+	cp bin/ckb-daemon $(PREFIX)/bin/ckb-daemon
+	cp bin/ckb-animations/* $(PREFIX)/lib/ckb-animations
+

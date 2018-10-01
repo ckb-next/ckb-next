@@ -1,0 +1,13 @@
+ckb-next (0.3.1-snapshot) zesty; urgency=low
+
+  * Updated to ckb-next 0.3.1 development stream
+
+ -- David Meikle <david@meikle.io>  Tue, 21 Nov 2017 21:29:30 +0000
+
+
+ckb-next (0.2.9-snapshot) zesty; urgency=low
+
+  * Initial package for the master branch from GitHub
+
+ -- David Meikle <david@meikle.io>  Tue, 21 Nov 2017 21:29:30 +0000
+

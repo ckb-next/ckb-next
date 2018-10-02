@@ -9,12 +9,19 @@ override_dh_auto_clean:
 override_dh_auto_test:
 override_dh_auto_build:
 override_dh_auto_install:
-	qmake
-	make
+	cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSAFE_INSTALL=ON -DSAFE_UNINSTALL=ON
+	cmake --build build --target all -- -j 2
 	mkdir -p $(PREFIX)/bin
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/lib/ckb-animations
 	cp bin/ckb $(PREFIX)/bin/ckb
 	cp bin/ckb-daemon $(PREFIX)/bin/ckb-daemon
-	cp bin/ckb-animations/* $(PREFIX)/lib/ckb-animations
+	cp bin/ckb-animations/gradient $(PREFIX)/lib/ckb-animations/gradient
+	cp bin/ckb-animations/heat $(PREFIX)/lib/ckb-animations/heat
+	cp bin/ckb-animations/invaders $(PREFIX)/lib/ckb-animations/invaders
+	cp bin/ckb-animations/pinwheel $(PREFIX)/lib/ckb-animations/pinwheel
+	cp bin/ckb-animations/rain $(PREFIX)/lib/ckb-animations/rain
+	cp bin/ckb-animations/random $(PREFIX)/lib/ckb-animations/random
+	cp bin/ckb-animations/ripple $(PREFIX)/lib/ckb-animations/ripple
+	cp bin/ckb-animations/wave $(PREFIX)/lib/ckb-animations/wave
 

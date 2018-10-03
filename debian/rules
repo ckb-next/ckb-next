@@ -14,8 +14,8 @@ override_dh_auto_install:
 	mkdir -p $(PREFIX)/bin
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/lib/ckb-animations
-	cp bin/ckb $(PREFIX)/bin/ckb
-	cp bin/ckb-daemon $(PREFIX)/bin/ckb-daemon
+	cp bin/ckb $(PREFIX)/bin/ckb-next
+	cp bin/ckb-daemon $(PREFIX)/bin/ckb-next-daemon
 	cp bin/ckb-animations/gradient $(PREFIX)/lib/ckb-animations/gradient
 	cp bin/ckb-animations/heat $(PREFIX)/lib/ckb-animations/heat
 	cp bin/ckb-animations/invaders $(PREFIX)/lib/ckb-animations/invaders

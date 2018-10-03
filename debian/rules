@@ -14,14 +14,14 @@ override_dh_auto_install:
 	mkdir -p $(PREFIX)/bin
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/lib/ckb-animations
-	cp bin/ckb $(PREFIX)/bin/ckb-next
-	cp bin/ckb-daemon $(PREFIX)/bin/ckb-next-daemon
-	cp bin/ckb-animations/gradient $(PREFIX)/lib/ckb-animations/gradient
-	cp bin/ckb-animations/heat $(PREFIX)/lib/ckb-animations/heat
-	cp bin/ckb-animations/invaders $(PREFIX)/lib/ckb-animations/invaders
-	cp bin/ckb-animations/pinwheel $(PREFIX)/lib/ckb-animations/pinwheel
-	cp bin/ckb-animations/rain $(PREFIX)/lib/ckb-animations/rain
-	cp bin/ckb-animations/random $(PREFIX)/lib/ckb-animations/random
-	cp bin/ckb-animations/ripple $(PREFIX)/lib/ckb-animations/ripple
-	cp bin/ckb-animations/wave $(PREFIX)/lib/ckb-animations/wave
+	cp build/bin/ckb-next $(PREFIX)/bin/ckb-next
+	cp build/bin/ckb-next-daemon $(PREFIX)/bin/ckb-next-daemon
+	cp build/bin/gradient $(PREFIX)/lib/ckb-animations/gradient
+	cp build/bin/heat $(PREFIX)/lib/ckb-animations/heat
+	cp build/bin/invaders $(PREFIX)/lib/ckb-animations/invaders
+	cp build/bin/pinwheel $(PREFIX)/lib/ckb-animations/pinwheel
+	cp build/bin/rain $(PREFIX)/lib/ckb-animations/rain
+	cp build/bin/random $(PREFIX)/lib/ckb-animations/random
+	cp build/bin/ripple $(PREFIX)/lib/ckb-animations/ripple
+	cp build/bin/wave $(PREFIX)/lib/ckb-animations/wave
 

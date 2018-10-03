@@ -1,2 +1,2 @@
-usr/ckb.desktop usr/share/applications
-usr/ckb.png usr/share/pixmaps
+build/src/gui/ckb-next.desktop usr/share/applications
+build/src/gui/ckb-next.png usr/share/pixmaps

@@ -2,7 +2,7 @@
 Description=Corsair Keyboard Daemon
 
 [Service]
-ExecStart=/usr/bin/ckb-daemon
+ExecStart=/usr/bin/ckb-next-daemon
 Restart=always
 StandardOutput=syslog
 StandardError=inherit

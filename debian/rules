@@ -9,19 +9,19 @@ override_dh_auto_clean:
 override_dh_auto_test:
 override_dh_auto_build:
 override_dh_auto_install:
-	cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSAFE_INSTALL=ON -DSAFE_UNINSTALL=ON
+	cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSAFE_INSTALL=ON -DSAFE_UNINSTALL=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBEXECDIR=lib
 	cmake --build build --target all -- -j 2
 	mkdir -p $(PREFIX)/bin
 	mkdir -p $(PREFIX)/lib
-	mkdir -p $(PREFIX)/lib/ckb-animations
+	mkdir -p $(PREFIX)/lib/ckb-next-animations
 	cp build/bin/ckb-next $(PREFIX)/bin/ckb-next
 	cp build/bin/ckb-next-daemon $(PREFIX)/bin/ckb-next-daemon
-	cp build/bin/gradient $(PREFIX)/lib/ckb-animations/gradient
-	cp build/bin/heat $(PREFIX)/lib/ckb-animations/heat
-	cp build/bin/invaders $(PREFIX)/lib/ckb-animations/invaders
-	cp build/bin/pinwheel $(PREFIX)/lib/ckb-animations/pinwheel
-	cp build/bin/rain $(PREFIX)/lib/ckb-animations/rain
-	cp build/bin/random $(PREFIX)/lib/ckb-animations/random
-	cp build/bin/ripple $(PREFIX)/lib/ckb-animations/ripple
-	cp build/bin/wave $(PREFIX)/lib/ckb-animations/wave
+	cp build/bin/gradient $(PREFIX)/lib/ckb-next-animations/gradient
+	cp build/bin/heat $(PREFIX)/lib/ckb-next-animations/heat
+	cp build/bin/invaders $(PREFIX)/lib/ckb-next-animations/invaders
+	cp build/bin/pinwheel $(PREFIX)/lib/ckb-next-animations/pinwheel
+	cp build/bin/rain $(PREFIX)/lib/ckb-next-animations/rain
+	cp build/bin/random $(PREFIX)/lib/ckb-next-animations/random
+	cp build/bin/ripple $(PREFIX)/lib/ckb-next-animations/ripple
+	cp build/bin/wave $(PREFIX)/lib/ckb-next-animations/wave
 

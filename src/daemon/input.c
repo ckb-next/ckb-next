@@ -203,16 +203,20 @@ static void inputupdate_keys(usbdevice* kb){
                         for(int i = rmodcount; i > 0; i--)
                             events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                         events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
-                        // The volume wheel and the mouse wheel don't generate keyups, so create them automatically
-#define IS_WHEEL(scan, kb)  (((scan) == KEY_VOLUMEUP || (scan) == KEY_VOLUMEDOWN || (scan) == BTN_WHEELUP || (scan) == BTN_WHEELDOWN) && (!IS_K65(kb) && !IS_K63(kb)))
-                        if(new && IS_WHEEL(map->scan, kb)){
-                            for(int i = rmodcount; i > 0; i--)
-                                events[modcount + keycount + i] = events[modcount + keycount + i - 1];
-                            events[modcount + keycount++] = -(scancode + 1);
-                            input->keys[byte] &= ~mask;
-                        }
                     }
                 }
+
+                // The volume wheel and the mouse wheel don't generate keyups, so create them automatically
+#define IS_WHEEL(scan, kb)  (((scan) == KEY_VOLUMEUP || (scan) == KEY_VOLUMEDOWN || (scan) == BTN_WHEELUP || (scan) == BTN_WHEELDOWN) && (!IS_K65(kb) && !IS_K63(kb)))
+                if(new && IS_WHEEL(map->scan, kb)){
+                    for(int i = rmodcount; i > 0; i--)
+                        events[modcount + keycount + i] = events[modcount + keycount + i - 1];
+                    if(scancode == KEY_UNBOUND)
+                        scancode = map->scan;
+                    events[modcount + keycount++] = -(scancode + 1);
+                    input->keys[byte] &= ~mask;
+                }
+
                 // Print notifications if desired
                 if(kb->active){
                     for(int notify = 0; notify < OUTFIFO_MAX; notify++){

@@ -30,7 +30,8 @@
 # Upstream version from https://sourceforge.net/projects/kissfft/
 project(KissFFT LANGUAGES C VERSION 1.3.0)
 
-add_library(KissFFT kiss_fft.c)
+add_library(KissFFT STATIC
+            kiss_fft.c)
 add_library(KissFFT::KissFFT ALIAS KissFFT)
 
 target_sources(

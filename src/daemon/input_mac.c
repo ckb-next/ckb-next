@@ -57,9 +57,22 @@ int os_inputopen(usbdevice* kb){
 
     // Check if Karabiner VirtualHIDDevice is loaded
     io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(VIRTUAL_HID_ROOT_NAME));
+
     if(!service){
+        ckb_info("Attempting to load kext\n");
         system("kextutil " VIRTUAL_HID_KEXT_PATH );
-        service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(VIRTUAL_HID_ROOT_NAME));
+        ckb_info("Waiting for kext...\n");
+
+        // Check every half a second if the kext is initialised, with a max of 10 seconds.
+        for(int i = 0; i < 20; i++){
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 500000000}, NULL);
+            service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(VIRTUAL_HID_ROOT_NAME));
+            // Break out of the loop if we matched a service
+            if(service)
+                break;
+        }
+
+        // If the loop finished and the VHIDDevice is still not available, abort
         if(!service){
             ckb_fatal("Unable to open VirtualHIDDevice\n");
             return 1;
@@ -101,9 +114,9 @@ int os_inputopen(usbdevice* kb){
 
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 1}, NULL);
     }
-    
-/* MOUSE */
-    
+
+    /* MOUSE */
+
     kr = IOConnectCallStructMethod(kb->event_mouse,
                                     initialize_virtual_hid_pointing,
                                     NULL, 0,

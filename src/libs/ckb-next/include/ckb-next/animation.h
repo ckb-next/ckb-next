@@ -114,7 +114,7 @@
 
 #define CKB_PARSE_LONG(param_name, value_ptr)                       if(!strcmp(name, param_name) && sscanf(value, "%ld", value_ptr) == 1)
 #define CKB_PARSE_DOUBLE(param_name, value_ptr)                     if(!strcmp(name, param_name) && sscanf(value, "%lf", value_ptr) == 1)
-#define CKB_PARSE_BOOL(param_name, value_ptr)                       if(!strcmp(name, param_name) && sscanf(value, "%u", value_ptr) == 1)
+#define CKB_PARSE_BOOL(param_name, value_ptr)                       if(!strcmp(name, param_name) && sscanf(value, "%d", value_ptr) == 1)
 #define CKB_PARSE_RGB(param_name, r_ptr, g_ptr, b_ptr)              if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx", r_ptr, g_ptr, b_ptr) == 3)
 #define CKB_PARSE_ARGB(param_name, a_ptr, r_ptr, g_ptr, b_ptr)      if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx%2hhx", a_ptr, r_ptr, g_ptr, b_ptr) == 4)
 #define CKB_PARSE_GRADIENT(param_name, gradient_ptr)                if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 0))
@@ -308,7 +308,7 @@ int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
     int count = 0;
     while(1){
         int scanned = 0;
-        char newpos;
+        signed char newpos;
         if(sscanf(string, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
         string += scanned;

@@ -15,6 +15,11 @@
 #include <signal.h>
 #include <QProcess>
 
+#ifndef DISABLE_UPDATER
+#include "ckbupdater.h"
+#include "ckbupdaterwidget.h"
+#endif
+
 extern QSharedMemory appShare;
 extern QString devpath;
 
@@ -165,9 +170,23 @@ MainWindow::MainWindow(QWidget *parent) :
         showWindow();
         dialog.exec();
     }
+#ifndef DISABLE_UPDATER
+    if(!CkbSettings::get("Program/DisableAutoUpdCheck", false).toBool())
+        checkForCkbUpdates();
+
+    connect(settingsWidget, &SettingsWidget::checkForUpdates, this, &MainWindow::checkForCkbUpdates);
+#endif
 }
 
-void MainWindow::toggleTrayIcon(bool visible) {
+void MainWindow::checkForCkbUpdates(){
+#ifndef DISABLE_UPDATER
+    updater = new CkbUpdater(this);
+    connect(updater, &CkbUpdater::checkedForNewVer, this, &MainWindow::checkedForNewVer);
+    updater->checkForNewVersion();
+#endif
+}
+
+void MainWindow::toggleTrayIcon(bool visible){
 #ifdef USE_LIBAPPINDICATOR
     if(useAppindicator)
         app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
@@ -403,4 +422,19 @@ void MainWindow::PosixSignalHandler(int signal){
     int ret = write(MainWindow::signalHandlerFd[0], &signal, sizeof(signal));
     if(ret == -1)
         qDebug() << "Error on PosixSignalHandler write";
+}
+
+void MainWindow::checkedForNewVer(QString ver, QString changelog){
+#ifndef DISABLE_UPDATER
+    if(!ver.isEmpty()) {
+        settingsWidget->setUpdateButtonText("Update to v" + ver);
+        showWindow();
+        CkbUpdaterDialog updDialog(ver, changelog, this);
+        updDialog.exec();
+    } else {
+        settingsWidget->setUpdateButtonText("Up to date");
+    }
+    updater->deleteLater();
+    settingsWidget->enableUpdateButton();
+#endif
 }

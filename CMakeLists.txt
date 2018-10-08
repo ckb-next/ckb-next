@@ -100,6 +100,7 @@ cmake_dependent_option(WITH_WAVE     "Build with 'Wave' animation."     ON "WITH
 cmake_dependent_option(WITH_INVADERS "Build with 'Invaders' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 
 # Options: daemon
+option(DISABLE_UPDATER "Disable the ckb-next updater. This option should only be enabled during packaging."    OFF)
 option(DEBUG_USB_SEND  "Show the contents of USB packets being sent to device."                                OFF)
 option(DEBUG_USB_RECV  "Show the contents of USB packets being received from device through usbrecv()."        OFF)
 option(DEBUG_USB_INPUT "Show the contents of USB packets being received from device through the input thread." OFF)

@@ -108,6 +108,9 @@ int updatergb_kb(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
+    if(IS_K63_WL(kb))
+        return updatergb_wireless(kb, lastlight, newlight);
+
     if (kb->product == P_K66 || kb->product == P_K68_NRGB) {
         // The K68 NRGB doesn't support winlock setting through the
         // normal packets, so we have to use a different packet to set it.

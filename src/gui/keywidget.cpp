@@ -150,7 +150,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!darkCoreOverlay)
                 darkCoreOverlay = new QImage(":/img/overlay_darkcore.png");
             overlay = darkCoreOverlay;
-            xpos = 3.5f;
+            xpos = -5.f;
             ypos = -2.f;
         } else if(model == KeyMap::POLARIS){
             if(!polarisOverlay)

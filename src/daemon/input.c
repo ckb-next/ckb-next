@@ -203,16 +203,20 @@ static void inputupdate_keys(usbdevice* kb){
                         for(int i = rmodcount; i > 0; i--)
                             events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                         events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
-                        // The volume wheel and the mouse wheel don't generate keyups, so create them automatically
-#define IS_WHEEL(scan, kb)  (((scan) == KEY_VOLUMEUP || (scan) == KEY_VOLUMEDOWN || (scan) == BTN_WHEELUP || (scan) == BTN_WHEELDOWN) && (!IS_K65(kb) && !IS_K63(kb)))
-                        if(new && IS_WHEEL(map->scan, kb)){
-                            for(int i = rmodcount; i > 0; i--)
-                                events[modcount + keycount + i] = events[modcount + keycount + i - 1];
-                            events[modcount + keycount++] = -(scancode + 1);
-                            input->keys[byte] &= ~mask;
-                        }
                     }
                 }
+
+                // The volume wheel and the mouse wheel don't generate keyups, so create them automatically
+#define IS_WHEEL(scan, kb)  (((scan) == KEY_VOLUMEUP || (scan) == KEY_VOLUMEDOWN || (scan) == BTN_WHEELUP || (scan) == BTN_WHEELDOWN) && (!IS_K65(kb) && !IS_K63(kb)))
+                if(new && IS_WHEEL(map->scan, kb)){
+                    for(int i = rmodcount; i > 0; i--)
+                        events[modcount + keycount + i] = events[modcount + keycount + i - 1];
+                    if(scancode == KEY_UNBOUND)
+                        scancode = map->scan;
+                    events[modcount + keycount++] = -(scancode + 1);
+                    input->keys[byte] &= ~mask;
+                }
+
                 // Print notifications if desired
                 if(kb->active){
                     for(int notify = 0; notify < OUTFIFO_MAX; notify++){
@@ -310,7 +314,7 @@ void cmd_bind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char*
     if(keyindex >= N_KEYS_INPUT)
         return;
     // Find the key to bind to
-    int tocode = 0;
+    uint tocode = 0;
     if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1 && tocode < N_KEYS_INPUT){
         pthread_mutex_lock(imutex(kb));
         mode->bind.base[keyindex] = tocode;
@@ -370,9 +374,9 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     int position = 0, field = 0;
     char keyname[24];
     while(position < left && sscanf(keys + position, "%10[^+]%n", keyname, &field) == 1){
-        int keycode;
-        if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)
-                  || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)){
+        uint keycode;
+        if((sscanf(keyname, "#%u", &keycode) && keycode < N_KEYS_INPUT)
+                  || (sscanf(keyname, "#x%x", &keycode) && keycode < N_KEYS_INPUT)){
             // Set a key numerically
             SET_KEYBIT(macro.combo, keycode);
             empty = 0;
@@ -422,9 +426,9 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
 
         int down = (keyname[0] == '+');
         if(down || keyname[0] == '-'){
-            int keycode;
-            if((sscanf(keyname + 1, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)
-                      || (sscanf(keyname + 1, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS_INPUT)){
+            uint keycode;
+            if((sscanf(keyname + 1, "#%u", &keycode) && keycode < N_KEYS_INPUT)
+                      || (sscanf(keyname + 1, "#x%x", &keycode) && keycode < N_KEYS_INPUT)){
                 // Set a key numerically
                 macro.actions[macro.actioncount].scan = kb->keymap[keycode].scan;
                 macro.actions[macro.actioncount].down = down;

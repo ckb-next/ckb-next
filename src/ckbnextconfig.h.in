@@ -3,6 +3,8 @@
 
 #define CKB_NEXT_PROFILE_VER ${ckb-next_PROFILE_VER}
 
+#cmakedefine DISABLE_UPDATER
+
 #cmakedefine DEBUG_USB_SEND
 #cmakedefine DEBUG_USB_RECV
 #cmakedefine DEBUG_USB_INPUT

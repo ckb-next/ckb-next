@@ -1,5 +1,39 @@
 # Change Log
 
+## [v0.3.2](https://github.com/ckb-next/ckb-next/tree/v0.3.2) (2018-10-07)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.3.1...v0.3.2)
+
+Important news:
+
+- This version fixes a major bug for the Scimitar Pro, causing the daemon to not properly interface with the mouse. This could require manually reflashing the mouse firmware if a firmware update was performed with 0.3.1 or earlier.
+- An updater has been created to more quickly push bugfixes to users, especially for those on macOS.
+- There is a new Space Invaders-like minigame that can be played as an animation, thanks to @mvladimirovich.
+
+Support for new devices:
+
+- Strafe RGB MK.2; by accidental omission from the previous release.
+- K66
+
+Important bugfixes:
+
+- The Scimitar Pro now defaults to v2.xx endpoints
+- The DPI LED on mice now changes in sniper mode
+- The GUI will warn if uinput cannot be loaded on Linux
+- The "Save to Hardware" button on the Scimitar and Glaive has been greyed out due to a current lack of support
+- Thanks to the efforts of @Kedstar99, the codebase compiles with much fewer warnings
+- The daemon will retry talking to the Karabiner kext in case it runs before the kext is ready
+- Binding commands to wheels will now repeat properly
+- QuaZip is no longer required for daemon-only builds
+- KissFFT is now built as a static library
+- Symbolic links are now created in /dev/input/by-id for evdev users
+- Fixed a regression for devices using the legacy protocol
+- The forwards and backwards keys are now bound by default on Mac
+- Workaround for using the Polaris on macOS
+
+Note for packagers:
+
+- If ckb-next is updated through a package management system, `-DDISABLE_UPDATER=1` should be passed to CMake
+
 ## [v0.3.1](https://github.com/ckb-next/ckb-next/tree/v0.3.1) (2018-07-31)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.3.0...v0.3.1)
 

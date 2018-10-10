@@ -108,7 +108,7 @@ int readcmd(usbdevice* kb, const char* line){
 
         // Set current notification node when given @number
         int newnotify;
-        if(sscanf(word, "@%u", &newnotify) == 1 && newnotify < OUTFIFO_MAX){
+        if(sscanf(word, "@%d", &newnotify) == 1 && newnotify < OUTFIFO_MAX){
             notifynumber = newnotify;
             continue;
         }
@@ -129,13 +129,13 @@ int readcmd(usbdevice* kb, const char* line){
         case NOTIFYON: {
             // Notification node on
             int notify;
-            if(sscanf(word, "%u", &notify) == 1)
+            if(sscanf(word, "%d", &notify) == 1)
                 mknotifynode(kb, notify);
             continue;
         } case NOTIFYOFF: {
             // Notification node off
             int notify;
-            if(sscanf(word, "%u", &notify) == 1 && notify != 0) // notify0 can't be removed
+            if(sscanf(word, "%d", &notify) == 1 && notify != 0) // notify0 can't be removed
                 rmnotifynode(kb, notify);
             continue;
         } case GET:
@@ -172,7 +172,7 @@ int readcmd(usbdevice* kb, const char* line){
         case MODE: {
             // Select a mode number (1 - 6)
             int newmode;
-            if(sscanf(word, "%u", &newmode) == 1 && newmode > 0 && newmode <= MODE_COUNT)
+            if(sscanf(word, "%d", &newmode) == 1 && newmode > 0 && newmode <= MODE_COUNT)
                 mode = profile->mode + newmode - 1;
             continue;
         }
@@ -283,7 +283,7 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
         case RGB: {
             // RGB command has a special response for a single hex constant
-            int r, g, b;
+            uint r, g, b;
             if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
                 // Set all keys
                 for(int i = 0; i < N_KEYS_EXTENDED; i++)
@@ -319,13 +319,13 @@ int readcmd(usbdevice* kb, const char* line){
         int position = 0, field = 0;
         char keyname[11] = { 0 };
         while(position < left && sscanf(word + position, "%10[^:,]%n", keyname, &field) == 1){
-            int keycode;
+            uint keycode;
             if(!strcmp(keyname, "all")){
                 // Set all keys
                 for(int i = 0; i < N_KEYS_EXTENDED; i++)
                     vt->do_cmd[command](kb, mode, notifynumber, i, right);
-            } else if((sscanf(keyname, "#%d", &keycode) && keycode >= 0 && keycode < N_KEYS_EXTENDED)
-                      || (sscanf(keyname, "#x%x", &keycode) && keycode >= 0 && keycode < N_KEYS_EXTENDED)){
+            } else if((sscanf(keyname, "#%u", &keycode) && keycode < N_KEYS_EXTENDED)
+                      || (sscanf(keyname, "#x%x", &keycode) && keycode < N_KEYS_EXTENDED)){
                 // Set a key numerically
                 vt->do_cmd[command](kb, mode, notifynumber, keycode, right);
             } else {

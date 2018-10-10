@@ -108,10 +108,10 @@ static const KeyPatch patchSE[] = {
     {"angle", "<", "bslash_iso"}, {"minus", "-", "slash"},
 };
 
-static const KeyPatch patchJP[] = {
-    /*{"lbrace", "[", "rbrace"},
-    {"rbrace", "]", "hash"},*/
-};
+/*static const KeyPatch patchJP[] = {
+    {"lbrace", "[", "rbrace"},
+    {"rbrace", "]", "hash"},
+};*/
 
 static const KeyPatch patchDvorak[] = {
     {0, "[", "minus"}, {0, "]", "equal"},

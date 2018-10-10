@@ -194,12 +194,12 @@ void* _ledthread(void* ctx){
                 ileds &= ~which;
         }
         // Update them if needed
-        pthread_mutex_lock(dmutex(kb));
+        pthread_mutex_lock(imutex(kb));
         if(kb->hw_ileds != ileds){
             kb->hw_ileds = ileds;
             kb->vtable->updateindicators(kb, 0);
         }
-        pthread_mutex_unlock(dmutex(kb));
+        pthread_mutex_unlock(imutex(kb));
     }
     return 0;
 }

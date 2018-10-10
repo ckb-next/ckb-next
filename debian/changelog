@@ -1,8 +1,14 @@
+ckb-next (0.3.2-snapshot) zesty; urgency=low
+
+  * Updated to ckb-next 0.3.2 development stream
+
+ -- David Meikle <david@meikle.io>  Wed, 10 Oct 2018 13:54:30 +0000
+
 ckb-next (0.3.1-snapshot) zesty; urgency=low
 
   * Updated to ckb-next 0.3.1 development stream
 
- -- David Meikle <david@meikle.io>  Tue, 21 Nov 2017 21:29:30 +0000
+ -- David Meikle <david@meikle.io>  Wed, 3 Oct 2018 21:29:30 +0000
 
 
 ckb-next (0.2.9-snapshot) zesty; urgency=low

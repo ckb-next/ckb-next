@@ -357,6 +357,9 @@
      <property name="text">
       <string>ckb-next</string>
      </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+     </property>
     </widget>
    </item>
    <item row="18" column="0">

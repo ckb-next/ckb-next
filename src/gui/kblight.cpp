@@ -89,8 +89,8 @@ void KbLight::shareDimming(int newShareDimming){
     }
 }
 
-void KbLight::dimming(int newDimming){
-    if(_shareDimming != -1)
+void KbLight::dimming(int newDimming, bool overrideShare){
+    if(!(_shareDimming == -1 || overrideShare))
         shareDimming(newDimming);
     _needsSave = true;
     _dimming = newDimming;

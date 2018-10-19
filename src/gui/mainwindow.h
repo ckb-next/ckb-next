@@ -9,6 +9,7 @@
 #include "kbwidget.h"
 #include "settingswidget.h"
 #include <QSocketNotifier>
+#include "ckbsystemtrayicon.h"
 
 #ifndef DISABLE_UPDATER
 #include "ckbupdater.h"
@@ -60,7 +61,7 @@ private:
 #endif
 
     QMenu*              trayIconMenu;
-    QSystemTrayIcon*    trayIcon;
+    CkbSystemTrayIcon*  trayIcon;
 
     void closeEvent(QCloseEvent *event);
 
@@ -71,7 +72,7 @@ public slots:
     void checkForCkbUpdates();
     void changeTrayIconToMonochrome();
     void changeTrayIconToRGB();
-
+    void handleTrayScrollEvt(bool up);
 
 private slots:
     void addDevice(Kb* device);
@@ -91,6 +92,9 @@ private:
 #ifndef DISABLE_UPDATER
     CkbUpdater* updater;
 #endif
+
+signals:
+    void trayIconScrolled(bool up);
 };
 
 #endif // MAINWINDOW_H

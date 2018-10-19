@@ -120,6 +120,7 @@ if (MACOS OR LINUX)
               autorun.cpp
               ckbsettings.cpp
               ckbsettingswriter.cpp
+              ckbsystemtrayicon.cpp
               ckbupdater.cpp
               ckbupdaterwidget.cpp
               colorbutton.cpp
@@ -161,6 +162,7 @@ if (MACOS OR LINUX)
               autorun.h
               ckbsettings.h
               ckbsettingswriter.h
+              ckbsystemtrayicon.h
               ckbupdater.h
               ckbupdaterwidget.h
               colorbutton.h

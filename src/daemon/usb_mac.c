@@ -786,8 +786,10 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
             ckb_warn("Got unknown V3 handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
             return 0;
         }
-    } else if(IS_SINGLE_EP(&fakekb)) { // ST100 might be different
-        if(feature == 64)
+    } else if(IS_SINGLE_EP(&fakekb)) {
+        if(feature == 64) // Polaris (currently)
+            handle_idx = 0;
+        else if (idproduct == 0x0a34 && input == 64 && output == 64) // ST100
             handle_idx = 0;
         else if(input == 6)
             handle_idx = 1; // This one is most likely useless

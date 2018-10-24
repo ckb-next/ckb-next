@@ -159,7 +159,10 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         if(condret != 0){
             if(pthread_mutex_unlock(intmutex(kb)))
                 ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
-            ckb_warn_fn("Interrupt cond error %i\n", file, line, condret);
+            if(condret == ETIMEDOUT)
+                ckb_warn_fn("ckb%d: Timeout while waiting for response\n", file, line, INDEX_OF(kb, keyboard));
+            else
+                ckb_warn_fn("Interrupt cond error %i\n", file, line, condret);
             return -1;
         }
         memcpy(in_msg, kb->interruptbuf, MSG_SIZE);

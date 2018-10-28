@@ -8,7 +8,7 @@
 ColorButton::ColorButton(QWidget* parent, bool allowAlpha) :
     QPushButton(parent), _alpha(allowAlpha), _setLabel(true), _bigIcons(false)
 {
-#if QT_VERSION >= 0x050700
+#if QT_VERSION >= 0x050700 && defined Q_OS_LINUX
     // Make sure the version warning function is called before there is any attempt to draw the colour picker.
     connect(this, SIGNAL(clicked()), this, SLOT(versionWarning()), Qt::DirectConnection);
 #endif
@@ -17,7 +17,7 @@ ColorButton::ColorButton(QWidget* parent, bool allowAlpha) :
     updateImage();
     // Pick color on click (use queued connection so that any on_*_clicked() events can be processed first)
     connect(this, SIGNAL(clicked()), this, SLOT(pickColor()), Qt::QueuedConnection);
-#if QT_VERSION >= 0x050700
+#if QT_VERSION >= 0x050700 && defined Q_OS_LINUX
     // If the widget was drawn, mark as dismissed.
     connect(this, SIGNAL(clicked()), this, SLOT(versionWarningDismissed()), Qt::QueuedConnection);
 #endif

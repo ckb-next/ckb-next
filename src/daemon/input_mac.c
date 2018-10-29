@@ -186,17 +186,16 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     // Pick the appropriate add or remove function
     add_remove_keys = down ? &add_to_keys : &remove_from_keys;
     
-    if(scancode == KEY_FN) {
+    if(IS_AVTOPCASE(scancode)) {
+        scancode -= KEY_AVTOPCASE;
         (*add_remove_keys)(scancode, &(kb->kbinput_avtopcase.keys));
         IOConnectCallStructMethod(kb->event, post_apple_vendor_top_case_input_report, &kb->kbinput_avtopcase, sizeof(kb->kbinput_avtopcase), NULL, 0);
-    }/* else if(IS_VENDOR(scancode)) {
-        scancode = scancode - KEY_CONSUMER;
-        ckb_info("Vendor %x\n", scancode);
+    } else if(IS_VENDOR(scancode)) {
+        scancode -= KEY_APPLE_VENDOR;
         (*add_remove_keys)(scancode, &(kb->kbinput_vendor.keys));
-        kb->kbinput_vendor.keys.keys_[0] = 0x10;
         IOConnectCallStructMethod(kb->event, post_apple_vendor_keyboard_input_report, &kb->kbinput_vendor, sizeof(kb->kbinput_vendor), NULL, 0);
-    }*/ else if(IS_CONSUMER(scancode)){
-        scancode = scancode - KEY_CONSUMER;
+    } else if(IS_CONSUMER(scancode)){
+        scancode -= KEY_CONSUMER;
         (*add_remove_keys)(scancode, &(kb->kbinput_consumer.keys));
         IOConnectCallStructMethod(kb->event, post_consumer_input_report, &kb->kbinput_consumer, sizeof(kb->kbinput_consumer), NULL, 0);
     } else {

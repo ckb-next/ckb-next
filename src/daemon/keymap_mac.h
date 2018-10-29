@@ -103,7 +103,6 @@
 #define KEY_LEFTALT         kHIDUsage_KeyboardLeftAlt
 #define KEY_RIGHTALT        kHIDUsage_KeyboardRightAlt
 #define KEY_COMPOSE         kHIDUsage_KeyboardMenu
-#define KEY_FN              0x03 //kHIDUsage_AV_TopCase_KeyboardFn
 
 #define KEY_SYSRQ           kHIDUsage_KeyboardF13
 #define KEY_SCROLLLOCK      kHIDUsage_KeyboardF14
@@ -145,20 +144,48 @@
 #define KEY_MUHENKAN        kHIDUsage_KeyboardInternational5
 
 #define KEY_CONSUMER        0x800
-#define IS_CONSUMER(scan)   ((scan) >= KEY_CONSUMER)
 #define KEY_MUTE            (KEY_CONSUMER + kHIDUsage_Csmr_Mute)
 #define KEY_VOLUMEUP        (KEY_CONSUMER + kHIDUsage_Csmr_VolumeIncrement)
 #define KEY_VOLUMEDOWN      (KEY_CONSUMER + kHIDUsage_Csmr_VolumeDecrement)
-#define KEY_STOPCD          (KEY_CONSUMER + kHIDUsage_Csmr_Stop)
+#define KEY_STOPCD          (KEY_CONSUMER + kHIDUsage_Csmr_Stop) // macOS doesn't know what this is
 #define KEY_PREVIOUSSONG    (KEY_CONSUMER + kHIDUsage_Csmr_ScanPreviousTrack)
 #define KEY_PLAYPAUSE       (KEY_CONSUMER + kHIDUsage_Csmr_PlayOrPause)
 #define KEY_NEXTSONG        (KEY_CONSUMER + kHIDUsage_Csmr_ScanNextTrack)
-#define KEY_BRIGHTNESSUP    (KEY_CONSUMER + 0x006f)
-#define KEY_BRIGHTNESSDOWN  (KEY_CONSUMER + 0x0070)
+#define KEY_BRIGHTNESSUP_CSMR    (KEY_CONSUMER + 0x6f)
+#define KEY_BRIGHTNESSDOWN_CSMR  (KEY_CONSUMER + 0x70)
 #define KEY_EJECTCD         (KEY_CONSUMER + kHIDUsage_Csmr_Eject)
-#define KEY_POWER           (KEY_CONSUMER + 0x0030)
-#define IS_VENDOR(scan)     ((scan) >= KEY_CONSUMER && (scan) < KEY_CONSUMER + kHIDUsage_Csmr_Play)
+#define KEY_POWER           (KEY_CONSUMER + 0x30)
+#define KEY_CONSUMER_MAX    KEY_VOLUMEDOWN
+#define IS_CONSUMER(scan)   ((scan) > KEY_CONSUMER && (scan) <= KEY_CONSUMER_MAX)
 
+#define KEY_APPLE_VENDOR    KEY_CONSUMER_MAX + 1
+#define KEY_APPLE_VENDOR_MAX KEY_APPLE_VENDOR + 0x30 // kHIDUsage_AppleVendorKeyboard_Language
+#define KEY_FN              (KEY_APPLE_VENDOR + 0x03) // kHIDUsage_AppleVendorKeyboard_Function
+#define IS_VENDOR(scan)     ((scan) > KEY_CONSUMER_MAX && (scan) <= KEY_APPLE_VENDOR_MAX)
+
+#define KEY_AVTOPCASE       KEY_APPLE_VENDOR_MAX + 1
+//#define KEY_AVTOPCASE_MAX   (KEY_AVTOPCASE + 0x09) // kHIDUsage_AV_TopCase_Reserved_MouseData
+//#define KEY_FN              (KEY_AVTOPCASE + 0x03) // kHIDUsage_AV_TopCase_KeyboardFn
+#define KEY_BRIGHTNESSUP    (KEY_AVTOPCASE + 0x04) // kHIDUsage_AV_TopCase_BrightnessUp
+#define KEY_BRIGHTNESSDOWN  (KEY_AVTOPCASE + 0x05) // kHIDUsage_AV_TopCase_BrightnessDown
+#define KEY_APPL_ILLUM_UP   (KEY_AVTOPCASE + 0x08) // kHIDUsage_AV_TopCase_IlluminationUp
+#define KEY_APPL_ILLUM_DN   (KEY_AVTOPCASE + 0x09) // kHIDUsage_AV_TopCase_IlluminationDown
+#define IS_AVTOPCASE(scan)  ((scan) > KEY_AVTOPCASE)
+
+/*
+enum
+{
+    kHIDUsage_AV_TopCase_KeyboardFn            = 0x0003,
+    kHIDUsage_AV_TopCase_BrightnessUp          = 0x0004,
+    kHIDUsage_AV_TopCase_BrightnessDown        = 0x0005,
+    kHIDUsage_AV_TopCase_VideoMirror           = 0x0006,
+    kHIDUsage_AV_TopCase_IlluminationToggle    = 0x0007,
+    kHIDUsage_AV_TopCase_IlluminationUp        = 0x0008,
+    kHIDUsage_AV_TopCase_IlluminationDown      = 0x0009,
+    kHIDUsage_AV_TopCase_ClamshellLatched      = 0x000a,
+    kHIDUsage_AV_TopCase_Reserved_MouseData    = 0x00c0
+};
+*/
 
 #define BTN_LEFT            1
 #define BTN_RIGHT           2

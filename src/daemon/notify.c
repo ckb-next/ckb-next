@@ -171,10 +171,12 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
                 nprintkey(kb, nnumber, i, 1);
         }
     } else if(!strcmp(setting, ":i")){
+        pthread_mutex_lock(iledmutex(kb));
         // Get the current state of all indicator LEDs
         if(kb->hw_ileds & I_NUM) nprintind(kb, nnumber, I_NUM, 1);
         if(kb->hw_ileds & I_CAPS) nprintind(kb, nnumber, I_CAPS, 1);
         if(kb->hw_ileds & I_SCROLL) nprintind(kb, nnumber, I_SCROLL, 1);
+        pthread_mutex_unlock(iledmutex(kb));
     } else if(!strcmp(setting, ":dpi")){
         // Get the current DPI levels
         char* dpi = printdpi(&mode->dpi, kb);

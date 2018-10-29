@@ -37,6 +37,14 @@ extern pthread_mutex_t interruptmutex[DEV_MAX];
 extern pthread_cond_t interruptcond[DEV_MAX];
 #define intcond(kb) (interruptcond + INDEX_OF(kb, keyboard))
 
+// Mutex used for indicator LEDs
+extern pthread_mutex_t indledmutex[DEV_MAX];
+#define iledmutex(kb) (indledmutex + INDEX_OF(kb, keyboard))
+
+// Mutex used for inotify indicators
+extern pthread_mutex_t inotifymutex[DEV_MAX];
+#define infmutex(kb) (inotifymutex + INDEX_OF(kb, keyboard))
+
 // Sets up device hardware, after software initialization is finished. Also used during resets
 // Should be called only from setupusb/resetusb
 int start_dev(usbdevice* kb, int makeactive);

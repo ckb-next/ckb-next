@@ -275,13 +275,17 @@ void inputupdate(usbdevice* kb){
 }
 
 void updateindicators_kb(usbdevice* kb, int force){
+    // iledmutex must be locked when entering this.
+
     // Read current hardware indicator state (set externally)
     uchar old = kb->ileds, hw_old = kb->hw_ileds_old;
     uchar new = kb->hw_ileds, hw_new = new;
     // Update them if needed
     if(kb->active){
+        pthread_mutex_lock(infmutex(kb));
         usbmode* mode = kb->profile->currentmode;
         new = (new & ~mode->ioff) | mode->ion;
+        pthread_mutex_unlock(infmutex(kb));
     }
     kb->ileds = new;
     kb->hw_ileds_old = hw_new;

@@ -75,6 +75,7 @@ void cmd_inotify(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const cha
     (void)kb;
     (void)dummy;
 
+    pthread_mutex_lock(infmutex(kb));
     uchar bits = iselect(led);
     if(strstr(led, ":off"))
         // Turn notifications for these bits off
@@ -82,6 +83,7 @@ void cmd_inotify(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const cha
     else
         // Turn notifications for these bits on
         mode->inotify[nnumber] |= bits;
+    pthread_mutex_unlock(infmutex(kb));
 }
 
 // Does a key exist in the current LED layout?

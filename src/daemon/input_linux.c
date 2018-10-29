@@ -194,19 +194,21 @@ void* _ledthread(void* ctx){
                 ileds &= ~which;
         }
         // Update them if needed
-        pthread_mutex_lock(dmutex(kb));
+        pthread_mutex_lock(iledmutex(kb));
         if(kb->hw_ileds != ileds){
             kb->hw_ileds = ileds;
             kb->vtable->updateindicators(kb, 0);
         }
-        pthread_mutex_unlock(dmutex(kb));
+        pthread_mutex_unlock(iledmutex(kb));
     }
     return 0;
 }
 
 int os_setupindicators(usbdevice* kb){
     // Initialize LEDs to all off
+    pthread_mutex_lock(iledmutex(kb));
     kb->hw_ileds = kb->hw_ileds_old = kb->ileds = 0;
+    pthread_mutex_unlock(iledmutex(kb));
     // Create and detach thread to read LED events
     pthread_t thread;
     // Give the thread a reasonable name

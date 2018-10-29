@@ -155,10 +155,11 @@ static void* indicator_update(void* context){
     char indicthread_name[THREAD_NAME_MAX] = "ckbX indicator";
     usbdevice* kb = context;
 
+
     indicthread_name[3] = INDEX_OF(kb, keyboard) + '0';
     pthread_setname_np(indicthread_name);
 
-    pthread_mutex_lock(dmutex(kb));
+    pthread_mutex_lock(iledmutex(kb));
     {
         pthread_mutex_lock(imutex(kb));
         IOOptionBits modifiers = kb->modifiers;
@@ -170,7 +171,7 @@ static void* indicator_update(void* context){
         kb->hw_ileds = ileds;
         kb->vtable->updateindicators(kb, 0);
     }
-    pthread_mutex_unlock(dmutex(kb));
+    pthread_mutex_unlock(iledmutex(kb));
     return 0;
 }
 
@@ -236,7 +237,9 @@ void os_mousemove(usbdevice* kb, int x, int y){
 
 int os_setupindicators(usbdevice* kb){
     // Set NumLock on permanently
+    pthread_mutex_lock(iledmutex(kb));
     kb->hw_ileds = kb->hw_ileds_old = kb->ileds = 1;
+    pthread_mutex_unlock(iledmutex(kb));
     return 0;
 }
 

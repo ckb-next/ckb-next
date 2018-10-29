@@ -5,6 +5,11 @@ PREFIX = debian/ckb-next/usr
 %:
 	dh $@ --with systemd
 
+override_dh_installinit:
+	dh_systemd_enable -pckb-next --name=ckb-next-daemon ckb-next-daemon.service
+	dh_installinit -pckb-next --no-start --noscripts
+	dh_systemd_start -pckb-next --restart-after-upgrade
+
 override_dh_auto_clean:
 override_dh_auto_test:
 override_dh_auto_build:

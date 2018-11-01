@@ -311,7 +311,7 @@ void AnimScript::begin(quint64 timestamp){
     connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readProcess()));
     connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readProcessErr()));
     process->start(_path, QStringList("--ckb-run"));
-    qDebug() << "Starting " << _path;
+    qDebug() << "Starting" << _path;
     // Write the keymap to the process
     process->write("begin keymap\n");
     process->write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());

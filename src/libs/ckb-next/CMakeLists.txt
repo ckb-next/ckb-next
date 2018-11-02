@@ -75,12 +75,12 @@ if(NOT MACOS)
         NAMESPACE
           ${CMAKE_PROJECT_NAME}::
         DESTINATION
-          "/usr/lib/cmake/${CMAKE_PROJECT_NAME}/${PROJECT_NAME}")
+          "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}/${PROJECT_NAME}")
 
     install(
         FILES
           "cmake/${PROJECT_NAME}Config.cmake"
           "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake"
         DESTINATION
-          "/usr/lib/cmake/${CMAKE_PROJECT_NAME}/${PROJECT_NAME}")
+          "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}/${PROJECT_NAME}")
 endif()

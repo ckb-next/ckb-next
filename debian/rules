@@ -1,7 +1,4 @@
 #!/usr/bin/make -f
-export QT_SELECT=qt5
-PREFIX = debian/ckb-next
-
 %:
 	dh $@ --with systemd
 

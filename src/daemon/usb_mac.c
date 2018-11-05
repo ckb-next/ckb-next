@@ -5,6 +5,7 @@
 #include "usb.h"
 #include "command.h"
 #include <IOKit/pwr_mgt/IOPMLib.h>
+#include <iconv.h>
 
 #ifdef OS_MAC
 
@@ -56,8 +57,25 @@ static void hidgetstr(hid_dev_t handle, CFStringRef key, char* output, int out_l
         output[0] = 0;
 }
 
-// profile.c
-void u16dec(ushort* in, char* out, size_t* srclen, size_t* dstlen);
+static void u16dec_char(char* in, char* out, size_t* srclen, size_t* dstlen){
+    iconv_t utf16to8 = iconv_open("UTF-8", "UTF-16LE");
+    if((*srclen % 2) || (utf16to8 == (iconv_t) -1)) {
+        out[0] = 0;
+        return;
+    }
+
+    size_t srclen2 = 0;
+    for(; srclen2 < *srclen; srclen2 += 2){
+        // Since it's UTF16 we need to check both
+        if(!(in[srclen2] || in[srclen2 + 1]))
+            break;
+    }
+
+    if(iconv(utf16to8, &in, &srclen2, &out, dstlen) == (size_t) -1)
+        out[0] = 0;
+
+    iconv_close(utf16to8);
+}
 
 static void usbgetstr(usb_dev_t handle, uint8 string_index, char* output, int out_len){
     // Make a temporary buffer so the request won't fail if too large
@@ -68,8 +86,8 @@ static void usbgetstr(usb_dev_t handle, uint8 string_index, char* output, int ou
         output[0] = 0;
         return;
     }
-    size_t inl = sizeof(buffer) / 2, outl = out_len;
-    u16dec((ushort*)buffer + 1, output, &inl, &outl);
+    size_t inl = sizeof(buffer), outl = out_len;
+    u16dec_char(buffer + 2, output, &inl, &outl);
     output[out_len - 1] = 0;
 }
 

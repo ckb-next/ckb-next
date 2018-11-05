@@ -64,7 +64,7 @@ set(UDEV_RULES_PATH
 )
 
 set(SYSTEMD_SERVICE_PATH
-    "/usr/lib/systemd/system"
+    "${CMAKE_INSTALL_LIBDIR}/systemd/system"
     CACHE STRING
     "Target directory for systemd service file. Ensure you have permissions to write to this directory."
 )

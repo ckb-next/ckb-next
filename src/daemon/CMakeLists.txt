@@ -56,6 +56,19 @@ elseif (LINUX)
     find_package(UDEV REQUIRED)
 endif ()
 
+# Declare options with defaults to allow overrides in debian packaging
+set(UDEV_RULES_PATH
+    "/etc/udev/rules.d"
+    CACHE STRING
+    "Target directory for udev rule installation. Ensure you have permissions to write to this directory."
+)
+
+set(SYSTEMD_SERVICE_PATH
+    "/usr/lib/systemd/system"
+    CACHE STRING
+    "Target directory for systemd service file. Ensure you have permissions to write to this directory."
+)
+
 # Declare target's source files
 if (MACOS OR LINUX)
     target_sources(
@@ -419,7 +432,7 @@ if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
-        DESTINATION "/usr/lib/systemd/system"
+        DESTINATION "${SYSTEMD_SERVICE_PATH}"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ
@@ -456,7 +469,7 @@ endif ()
 if (LINUX)
   install(
     FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-daemon.rules"
-    DESTINATION "/etc/udev/rules.d"
+    DESTINATION "${UDEV_RULES_PATH}"
     PERMISSIONS
     OWNER_READ OWNER_WRITE
     GROUP_READ

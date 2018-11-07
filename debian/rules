@@ -1,16 +1,11 @@
 #!/usr/bin/make -f
 %:
-	dh $@ --with systemd
-
-override_dh_installinit:
-	dh_systemd_enable -pckb-next --name=ckb-next-daemon debian/ckb-next/lib/systemd/system/ckb-next-daemon.service
-	dh_installinit -pckb-next --no-start --noscripts
-	dh_systemd_start -pckb-next --restart-after-upgrade
+	dh $@
 
 override_dh_auto_clean:
 override_dh_auto_test:
 override_dh_auto_build:
 override_dh_auto_install:
-	cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBEXECDIR=lib -DDISABLE_UPDATER=1 -DCKB_NEXT_INIT_SYSTEM=systemd -DUDEV_RULES_PATH=/lib/udev/rules.d -DSYSTEMD_SERVICE_PATH=/lib/systemd/system
+	cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBEXECDIR=lib -DDISABLE_UPDATER=1 -DPACKAGING=1 -DUDEV_RULES_PATH=/lib/udev/rules.d -DSYSTEMD_SERVICE_PATH=/lib/systemd/system
 	cmake --build build --target all
 	DESTDIR=$(CURDIR)/debian/ckb-next cmake --build build --target install

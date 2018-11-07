@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+if [ $(ps --no-headers -o comm 1) = 'systemd' ]
+then
+    deb-systemd-invoke stop ckb-next-daemon
+    deb-systemd-invoke disable ckb-next-daemon
+elif [ $(ps --no-headers -o comm 1) = 'init' ]
+then
+    invoke-rc.d ckb-next-daemon stop
+    rm /etc/init.d/ckb-next-daemon.conf
+fi
+
+exit 0

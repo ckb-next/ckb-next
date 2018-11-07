@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+
+  configure)
+
+    # Setup the service file based on which service manager is running
+    if [ $(ps --no-headers -o comm 1) = 'systemd' ]
+    then
+      cp /usr/share/ckb-next/service/ckb-next-daemon.service /lib/systemd/system/ckb-next-daemon.service
+      deb-systemd-invoke reenable ckb-next-daemon
+      deb-systemd-invoke start ckb-next-daemon
+    elif [ $(ps --no-headers -o comm 1) = 'init' ]
+    then
+      cp /usr/share/ckb-next/service/ckb-next-daemon.conf /etc/init.d/ckb-next-daemon.conf
+      invoke-rc.d ckb-next-daemon start
+    fi
+
+  ;;
+
+  abort-upgrade|abort-remove|abort-deconfigure)
+    exit 0
+  ;;
+
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+  ;;
+
+esac
+
+exit 0

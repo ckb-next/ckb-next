@@ -69,6 +69,9 @@ set(SYSTEMD_SERVICE_PATH
     "Target directory for systemd service file. Ensure you have permissions to write to this directory."
 )
 
+option (PACKAGING
+        "Are we building a package" OFF)
+
 # Declare target's source files
 if (MACOS OR LINUX)
     target_sources(
@@ -305,7 +308,7 @@ elseif (LINUX)
     endif ()
 
     # A way to check for systemd
-    if (EXISTS "/run/systemd/system" OR ${CKB_NEXT_INIT_SYSTEM} STREQUAL "systemd")
+    if (EXISTS "/run/systemd/system")
         message(STATUS "systemd detected")
         set(CKB_NEXT_INIT_SYSTEM "systemd" CACHE INTERNAL "")
         set(DISALLOW_SYSVINIT TRUE)
@@ -406,6 +409,23 @@ elseif (LINUX)
             endif ()
         endif ()
     endif ()
+
+    # If packaging, emit the the system manager configuration files so they can be setup post-install
+    if (PACKAGING)
+        message(STATUS "Generating system files for packaging")
+
+        # upstart
+        configure_file(
+                "${ckb-next_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.conf"
+                @ONLY)
+
+        # systemd
+        configure_file(
+                "${ckb-next_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
+                @ONLY)
+    endif()
 
 endif ()
 

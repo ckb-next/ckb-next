@@ -1,2 +1,4 @@
 build/src/gui/ckb-next.desktop usr/share/applications
 build/src/gui/ckb-next.png usr/share/pixmaps
+build/src/daemon/service/ckb-next-daemon.conf usr/share/ckb-next/service
+build/src/daemon/service/ckb-next-daemon.service usr/share/ckb-next/service

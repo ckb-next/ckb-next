@@ -679,7 +679,7 @@ void Kb::readNotify(QString line){
                 light->color("mr", lightColor);
                 light->color("m1", lightColor);
                 light->color("m2", lightColor);
-                if(this->model() != KeyMap::K70MK2)
+                if(!(this->model() == KeyMap::K70MK2 || this->model() == KeyMap::STRAFE_MK2))
                     light->color("m3", lightColor);
                 light->color("lock", lightColor);
             }

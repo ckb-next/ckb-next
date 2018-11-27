@@ -30,7 +30,7 @@ Hash: SHA256
   Corsair K70RGBMK2SE       3.12 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2SE.zip          0.3.0   Julius_Alba_App_v3.12.9.bin     678ccfc244eb9b0fa70ce0db1290363433e5b36f62c8f680fedd78bdb3609302    0x1b6b
   Corsair K70RGBMK2LP       3.24 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2LP.zip          0.3.2   Nero_App_v3.24.22.bin           257f5d3d8164e6deb8eab8f2ce0070b9030f586159e362b7f0d339ad71e20402    0x1b55
   Corsair K95RGB            2.05 https://www3.corsair.com/software/CUE_V3/K95RGB.zip                0.2.7   K95RGB_APP_V205.bin             8d0680dd033d6020a53bc9bfa83e761143699d1122f1d0133e95ad3056d63a15    0x1b11
-  Corsair K95PLATINUMRGB    1.07 https://www3.corsair.com/software/CUE_V3/K95RGBPLATINUM.zip        0.2.7   FREYA_App_v1.07.123.bin         6d06b443cd85f4256d2b518b66b5c2d490d8089b678f9e34aecea97b13c5f5d4    0x1b2d
+  Corsair K95PLATINUMRGB    3.21 https://www3.corsair.com/software/CUE_V3/K95RGBPLATINUM.zip        0.3.2   Freya_App_v3.21.28.bin          5fdce6059d7ef0f044a89cb6693665cb0bfec807fb7b0579f1110cac0e3ee079    0x1b2d
   Corsair STRAFE            2.05 https://www3.corsair.com/software/CUE_V3/STRAFE.zip                0.2.7   STRAFE_APP_V205.bin             c03e6b2e3f5e3269f49d74e158fa9b65a4752dd7c888f0a9e96147033e18d243    0x1b15
   Corsair STRAFERGB         2.05 https://www3.corsair.com/software/CUE_V3/STRAFERGB.zip             0.2.7   STRAFERGB_APP_V205.bin          dff16fec9a0ae0d33aad0482f9ea02e3e55e231706b8c4e7fb66820aba98adc5    0x1b20
   Corsair STRAFERGBMK2      1.06 https://www3.corsair.com/software/CUE_V3/STRAFERGBMK.2.zip         0.3.0   Strafe_II_RGB_App_v1.06.bin     f6208966126ff1cf885995ac95a9c000056590d4325178731e06e224d3b0558b    0x1b48
@@ -53,11 +53,11 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJb+EbxAAoJEN/iSOvc7y9fH0cH/RTKdXPIBMgDKx2GsaWtkMHI
-hvf7LXigh65qTW/MwwbJ9GXg0vMwMsGSEo40DGUUoydMA95TgA4Rg5qKMxIRO08s
-XXHT0QPhsHO7OCCfYoaCyz1mB18BisbGTbQpwRsZjd+iy1R9VO1MUBkYpIdoIphT
-B2exB6II5Vl/iz3CRjDE7hEUGag9wPzu5050SJzEmBo9lnyUrCg1wJ8rIpeL3KSI
-qG2PfGVVFFrwCLUOBFQWvd+QCjvQdIM30umDKCfnUErK9MgaS3MbBWB+xt1XrVRE
-c1P7DrXq1xE2ykR+mNvvMr2sangVLbLcLa056TCauYAPJX0JztAB8S3choJ8AUY=
-=lseW
+iQEcBAEBCAAGBQJb/K1pAAoJEN/iSOvc7y9fQp8H/1MNeYBXMEV3HMTDH4rGqiiD
+tfZTcpSxOZYsuv41VTlzCx7q8eY2eahI/5hth3V43CbM02QQFVB1h0FYjbLaCD/E
+PeVCpkFGHzXqaOWb1STQeEy69hyLv8sM9+brXmtynsddF4w8BQoFC5A8/AQDu307
+FnSa9C8ErB5lx2Xff2Idv1cVLYdqIYzblGh1/y8WySqaaqaFiUXEL+uAnS+vAHmu
+RRQudr7JOl6ZvhYYKXkEYRoaMYMUperKCpou/93smk388UjInMHX1AyZgaoW1C2I
+JnqRuugyxBtPE0hXdNf9PUY0PkuTBdYAMLQbOMpl3t5dxP6p82bweoh7cMFWcBk=
+=qQGR
 -----END PGP SIGNATURE-----

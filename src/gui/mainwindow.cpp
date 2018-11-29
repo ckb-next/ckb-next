@@ -365,13 +365,17 @@ void MainWindow::timerTick(){
                 showWindow();
             if(line.startsWith("Option ")){
                 // New ckb option line
-                QString option = line.split(" ")[1];
+                QString option = line.section(' ', 1);
                 if(option == "Open")
                     // Bring to foreground
                     showWindow();
                 else if(option == "Close")
                     // Quit application
                     qApp->quit();
+                else if(option.startsWith("SwitchToProfile"))
+                    emit switchToProfileCLI(option.section(' ', 1));
+                else if(option.startsWith("SwitchToMode: "))
+                    emit switchToModeCLI(option.section(' ', 1));
             }
         }
     }

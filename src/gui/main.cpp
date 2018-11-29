@@ -28,7 +28,9 @@ enum CommandLineParseResults {
     CommandLineVersionRequested,
     CommandLineHelpRequested,
     CommandLineClose,
-    CommandLineBackground
+    CommandLineBackground,
+    CommandLineSwitchToProfile,
+    CommandLineSwitchToMode,
 };
 
 /**
@@ -57,6 +59,12 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
                                          "Causes already running instance (if any) to exit.");
     parser.addOption(closeOption);
 
+    const QCommandLineOption switchToProfileOption(QStringList() << "p" << "profile", "Switches to the profile with the specified name on all devices.", "profile-name");
+    parser.addOption(switchToProfileOption);
+
+    const QCommandLineOption switchToModeOption(QStringList() << "m" << "mode", "Switches to the mode either in the current profile, or in the one specified by --profile", "mode-name");
+    parser.addOption(switchToModeOption);
+
     /* parse arguments */
     if (!parser.parse(QCoreApplication::arguments())) {
         // set error, if there already are some
@@ -83,6 +91,14 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     if (parser.isSet(closeOption)) {
         // close already running application instances, if any
         return CommandLineClose;
+    }
+
+    if(parser.isSet(switchToProfileOption)) {
+        return CommandLineSwitchToProfile;
+    }
+
+    if(parser.isSet(switchToModeOption)) {
+        return CommandLineSwitchToMode;
     }
 
     /* no explicit argument was passed */
@@ -208,6 +224,29 @@ int main(int argc, char *argv[]){
         else
             printf("ckb-next is not running.\n");
         return 0;
+    case CommandLineSwitchToMode:
+    case CommandLineSwitchToProfile:
+    {
+        QString profileName = parser.value("profile").left(30);
+        QString modeName = parser.value("mode").left(30);
+
+        if(profileName.isEmpty() && modeName.isEmpty()) {
+            printf("No valid profile or mode specified.\n");
+            return 0;
+        }
+
+        QString switchStr;
+
+        if(!profileName.isEmpty())
+            switchStr.append("SwitchToProfile: ").append(profileName).append("\nOption ");
+        if(!modeName.isEmpty())
+            switchStr.append("SwitchToMode: ").append(modeName);
+
+        if (!isRunning(switchStr.toUtf8().constData()))
+            printf("ckb-next is not running.\n");
+
+        return 0;
+    }
     case CommandLineBackground:
         // If launched with --background, launch in background
         background = 1;

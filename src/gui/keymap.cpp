@@ -575,6 +575,12 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             i.next();
             i.value().x += KSTRAFE_X_START;
         }
+
+        // Move profswitch, light and lwin two blocks to the left
+        map["profswitch"].x -=20;
+        map["light"].x -= 20;
+        map["lock"].x -= 20;
+
         map["lsidel"] = KStrafeKeys[0];
         map["rsidel"] = KStrafeKeys[1];
         break;

@@ -78,12 +78,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QString desktop = procEnv.value("XDG_CURRENT_DESKTOP", QString("")).toLower();
     QString qpaTheme = procEnv.value("QT_QPA_PLATFORMTHEME", QString("")).toLower();
-    QString ckbnextAppindicator = procEnv.value("CKB-NEXT_USE_APPINDICATOR", QString("")).toLower();
+    QString ckbnextAppindicator = procEnv.value("CKB_NEXT_USE_APPINDICATOR", QString("")).toLower();
+    QStringList appIndicatorOn = QStringList() << "yes" << "on" << "1";
+    QStringList appIndicatorOff = QStringList() << "no" << "off" << "0";
 
     useAppindicator = false;
     trayIcon = 0;
 
-    if((desktop == "unity" && qpaTheme == "appmenu-qt5") || qpaTheme == "appmenu-qt5" || !ckbnextAppindicator.isEmpty()){
+    if(((desktop == "unity" || qpaTheme == "appmenu-qt5") && !appIndicatorOff.contains(ckbnextAppindicator)) || appIndicatorOn.contains(ckbnextAppindicator)){
+        qDebug() << "Using AppIndicator";
         useAppindicator = true;
 
         indicatorMenu = gtk_menu_new();
@@ -109,6 +112,7 @@ MainWindow::MainWindow(QWidget *parent) :
     } else
 #endif
     {
+        qDebug() << "Using QSytemTrayIcon";
         trayIconMenu = new QMenu(this);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);

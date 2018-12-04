@@ -27,29 +27,12 @@
 
 # Compiler-related stuff specific to ckb-next
 
-# CMAKE_CXX_FLAGS_DEBUG is -g
+# CMAKE_CXX_FLAGS_DEBUG is -g -O0
 # CMAKE_CXX_FLAGS_RELEASE is -O3 -DNDEBUG
 # CMAKE_CXX_FLAGS_RELWITHDEBINFO is -O2 -g -DNDEBUG
 # CMAKE_CXX_FLAGS_MINSIZEREL is -Os -DNDEBUG
 
-# Check for -Og for better debugging
-
-# GCC supports it since 4.8.0
-# clang supports it since 4.0.0
-# Apple's Clang supports it since 9.0.0
-
-include(CheckCCompilerFlag)
-check_c_compiler_flag("-Og" C_COMPILER_SUPPORTS_-Og)
-
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-Og" CXX_COMPILER_SUPPORTS_-Og)
-
-if (C_COMPILER_SUPPORTS_-Og)
-    set(opt_lvl "-Og")
-else ()
-    set(opt_lvl "-O0")
-endif ()
-
+set(opt_lvl "-O0")
 set(CKB_NEXT_COMMON_COMPILE_FLAGS "")
 list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
         -fsigned-char

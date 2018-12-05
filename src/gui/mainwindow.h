@@ -48,6 +48,7 @@ private:
     QList<KbWidget*> kbWidgets;
     QAction* restoreAction;
     QAction* closeAction;
+    QAction* changeTrayIconAction;
 
 #ifdef USE_LIBAPPINDICATOR
     bool                useAppindicator;
@@ -67,6 +68,8 @@ public slots:
     void stateChange(Qt::ApplicationState state);
     void quitApp();
     void checkForCkbUpdates();
+    void changeTrayIconToMonochrome();
+    void changeTrayIconToRGB();
 
 
 private slots:

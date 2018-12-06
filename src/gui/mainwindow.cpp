@@ -111,9 +111,9 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
     {
         trayIconMenu = new QMenu(this);
+        trayIconMenu->addAction(changeTrayIconAction);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIconMenu->addAction(changeTrayIconAction);
         trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
         trayIcon->setContextMenu(trayIconMenu);
         trayIcon->show();
@@ -406,9 +406,9 @@ void MainWindow::changeTrayIconToMonochrome(){
     changeTrayIconAction = new QAction(tr("RGB Tray Icon"), this);
 
     trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(changeTrayIconAction);
     trayIconMenu->addAction(restoreAction);
     trayIconMenu->addAction(closeAction);
-    trayIconMenu->addAction(changeTrayIconAction);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
     
@@ -429,9 +429,9 @@ void MainWindow::changeTrayIconToRGB(){
     changeTrayIconAction = new QAction(tr("Monochrome Tray Icon"), this);
 
     trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(changeTrayIconAction);
     trayIconMenu->addAction(restoreAction);
     trayIconMenu->addAction(closeAction);
-    trayIconMenu->addAction(changeTrayIconAction);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
     

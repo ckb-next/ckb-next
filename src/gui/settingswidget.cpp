@@ -193,6 +193,8 @@ void SettingsWidget::on_generateReportButton_clicked(){
     QString devDetectPath("ckb-next-dev-detect");
 #elif defined(Q_OS_MACOS)
     QString devDetectPath("/Applications/ckb-next.app/Contents/Resources/ckb-next-dev-detect");
+#else
+    QString devDetectPath("");
 #endif
     devDetect->start(devDetectPath, QStringList() << "--nouserinput");
 

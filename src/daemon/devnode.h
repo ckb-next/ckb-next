@@ -10,12 +10,14 @@ const char *const devpath;
 /// Group ID for the control nodes. -1 to give read/write access to everybody
 extern long gid;
 
+//#ifndef OS_WINDOWS
 // Simple file permissions
 #define S_READDIR (S_IRWXU | S_IRGRP | S_IROTH | S_IXGRP | S_IXOTH)
 #define S_READ (S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR)
 #define S_READWRITE (S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH)
 #define S_CUSTOM (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
 #define S_CUSTOM_R (S_IRUSR | S_IWUSR | S_IRGRP)
+//#endif
 
 /// Update the list of connected devices.
 void updateconnected();

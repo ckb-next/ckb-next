@@ -257,8 +257,11 @@ static void inputupdate_keys(usbdevice* kb){
 void inputupdate(usbdevice* kb){
 #ifdef OS_LINUX
     if((!kb->uinput_kb || !kb->uinput_mouse)
-#else
+#elif defined(OS_MAC)
     if(!kb->event
+#elif defined(OS_WINDOWS)
+#warning STUB
+    if(0
 #endif
             || !kb->profile)
         return;

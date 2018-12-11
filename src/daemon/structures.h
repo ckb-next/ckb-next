@@ -3,8 +3,13 @@
 
 #include "includes.h"
 #include "keymap.h"
+
 #ifdef OS_MAC
 #include "input_mac_vhid.h" // For the VirtualHIDDevice structs
+#endif
+
+#ifdef OS_WINDOWS
+typedef void* KUSB_HANDLE;
 #endif
 
 // Profile ID structure
@@ -202,7 +207,11 @@ typedef struct {
     int handle;
     // uinput handles
     int uinput_kb, uinput_mouse;
-#else
+#elif defined(OS_WINDOWS)
+    KUSB_HANDLE handle[IFACE_MAX];
+    int handlecount; // Number of handles found
+    int ifcount; // Total number of interfaces
+#elif defined(OS_MAC)
     // USB identifier
     uint32_t location_id[IFACE_MAX + 1];
     // Device handles
@@ -249,10 +258,15 @@ typedef struct {
     usbprofile* profile;
     // Hardware modes. Null if not read yet
     hwprofile* hw;
+#ifdef OS_WINDOWS
+    HANDLE infifo;
+    HANDLE outfifo[OUTFIFO_MAX];
+#else
     // Command FIFO
     int infifo;
     // Notification FIFOs, or zero if a FIFO is closed
     int outfifo[OUTFIFO_MAX];
+#endif
     // Features (see F_ macros)
     ushort features;
     // Whether the keyboard is being actively controlled by the driver

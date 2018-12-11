@@ -11,8 +11,12 @@ extern usbdevice keyboard[DEV_MAX];
 // Is a device active?
 #ifdef OS_LINUX
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (((kb)->uinput_kb && (kb)->uinput_mouse) || IS_SINGLE_EP(kb)))
-#else
+#elif defined(OS_MAC)
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
+#elif defined(OS_WINDOWS)
+// Make sure we have at least one handle
+#define IS_CONNECTED(kb) ((kb) && (kb)->handle[0])
+#warning FIXME
 #endif
 // A mutex used for USB controls. Needs to be locked before reading or writing the device handle or accessing its profile
 extern pthread_mutex_t devmutex[DEV_MAX];

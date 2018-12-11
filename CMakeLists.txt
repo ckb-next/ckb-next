@@ -127,6 +127,9 @@ if (MACOS)
 elseif (LINUX)
     set(INSTALL_DIR_ANIMATIONS "${CMAKE_INSTALL_LIBEXECDIR}/${ANIMATIONS_DIR_NAME}"
         CACHE STRING "Where to install animations.")
+elseif (WINDOWS)
+    set(INSTALL_DIR_ANIMATIONS "${CMAKE_INSTALL_DIR}/${ANIMATIONS_DIR_NAME}"
+        CACHE STRING "Where to install animations.")
 endif ()
 
 # Options: other

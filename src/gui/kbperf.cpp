@@ -558,6 +558,14 @@ void KbPerf::lightIndicator(const char* name, QRgb rgba){
     light()->setIndicator(name, qRgba(qRed(rgba), qGreen(rgba), qBlue(rgba), a));
 }
 
+#ifdef Q_OS_WIN
+EXTERN_C {
+muteState getMuteState(){
+return (muteState)-1;
+}
+}
+#endif
+
 void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
     light()->resetIndicators();
     if(_iOpacity <= 0.f)

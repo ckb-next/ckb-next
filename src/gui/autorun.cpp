@@ -13,6 +13,10 @@ static const QString internalFile(":/txt/ckb-next.autostart.desktop");
 static QDir path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/LaunchAgents");
 static const QString file = "org.ckb-next.plist";
 static const QString internalFile(":/txt/org.ckb-next.plist");
+#else
+static QDir path("");
+static const QString file = "";
+static const QString internalFile("");
 #endif
 
 static const QString settingPath = "Program/NewDidLoginItem";
@@ -22,6 +26,8 @@ static const QString settingPath = "Program/NewDidLoginItem";
 static const QString oldFile = "ckb.desktop";
 #elif defined(Q_OS_MACX)
 static const QString oldFile = "com.ckb.ckb.plist";
+#else
+static const QString oldFile = "";
 #endif
 
 static const QString oldSettingPath = "Program/DidLoginItem";
@@ -32,6 +38,9 @@ bool AutoRun::available() {
     return QDir::root().absoluteFilePath(QStandardPaths::findExecutable("ckb-next")) == qApp->applicationFilePath();
 #elif defined(Q_OS_MACOS)
     return qApp->applicationFilePath().startsWith("/Applications/ckb-next.app", Qt::CaseInsensitive);
+//#elif defined(Q_OS_WINDOWS)
+#else
+    return false;
 #endif
 }
 

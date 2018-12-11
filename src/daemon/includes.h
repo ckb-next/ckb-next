@@ -14,6 +14,13 @@
 #include <time.h>
 #include <unistd.h>
 
+#ifdef OS_WINDOWS
+#include <errno.h>
+#include <signal.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#else
 #include <sys/errno.h>
 #include <sys/ioctl.h>
 #include <sys/signal.h>
@@ -21,6 +28,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#endif
 
 // Unsigned char/short definition
 typedef unsigned char uchar;

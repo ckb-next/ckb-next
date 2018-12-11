@@ -11,7 +11,9 @@
 #include <QMenuBar>
 #include <unistd.h>
 #include <ckbnextconfig.h>
+#ifndef Q_OS_WIN
 #include <sys/socket.h>
+#endif
 #include <signal.h>
 #include <QProcess>
 
@@ -174,7 +176,7 @@ MainWindow::MainWindow(QWidget *parent) :
     dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
     dialog.setInformativeText(daemonDialogText);
     dialog.setIcon(QMessageBox::Critical);
-
+#ifndef Q_OS_WIN32
     // Set up signal handler
     socketpair(AF_UNIX, SOCK_STREAM, 0, MainWindow::signalHandlerFd);
 
@@ -183,7 +185,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     signal(SIGINT, MainWindow::PosixSignalHandler);
     signal(SIGTERM, MainWindow::PosixSignalHandler);
-
+#endif
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it
     // can be assumed, that the daemon is not running if doesn't exist

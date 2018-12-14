@@ -187,6 +187,37 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
 
 #ifdef OS_WINDOWS
 static void* devmain(usbdevice* kb){
+    readlines_ctx linectx;
+    readlines_ctx_init(&linectx);
+    int flag = 1;
+    while(flag){
+        ConnectNamedPipe(kb->infifo, NULL);
+        while(1){
+            pthread_mutex_unlock(dmutex(kb));
+            const char* line;
+            int lines = readlines(kb->infifo, linectx, &line);
+            pthread_mutex_lock(dmutex(kb));
+            if(lines == -1)
+                break;
+            // End thread when the handle is removed
+            if(!IS_CONNECTED(kb)){
+                flag = 0;
+                break;
+            }
+            if(lines){
+                if(readcmd(kb, line)){
+                    // USB transfer failed; destroy device
+                    closeusb(kb);
+                    flag = 0;
+                    break;
+                }
+            }
+        }
+        DisconnectNamedPipe(kb->infifo);
+    }
+    pthread_mutex_unlock(dmutex(kb));
+    readlines_ctx_free(linectx);
+    return 0;
 }
 #else
 // USB device main loop

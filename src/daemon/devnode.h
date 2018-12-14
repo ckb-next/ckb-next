@@ -41,6 +41,10 @@ int mkfwnode(usbdevice* kb);
 typedef struct _readlines_ctx* readlines_ctx;
 void readlines_ctx_init(readlines_ctx* ctx);
 void readlines_ctx_free(readlines_ctx ctx);
+#ifdef OS_WINDOWS
+unsigned readlines(HANDLE fd, readlines_ctx ctx, const char** input);
+#else
 unsigned readlines(int fd, readlines_ctx ctx, const char** input);
+#endif
 
 #endif  // DEVNODE_H

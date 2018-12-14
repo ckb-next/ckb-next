@@ -337,17 +337,32 @@ void readlines_ctx_free(readlines_ctx ctx){
     free(ctx);
 }
 
-unsigned readlines(int fd, readlines_ctx ctx, const char** input){
+// FIXME: Dedup this. It's in extra_mac.c
+void *memrchr(const void *s, int c, size_t n){
+    const char* cs = s;
+    for(size_t i = n; i > 0; i--){
+        if(cs[i - 1] == c)
+            return (void*)(cs + i - 1);
+    }
+    return 0;
+}
+
+unsigned readlines(HANDLE fd, readlines_ctx ctx, const char** input){
     // Move any data left over from a previous read to the start of the buffer
     char* buffer = ctx->buffer;
     int buffersize = ctx->buffersize;
     int leftover = ctx->leftover, leftoverlen = ctx->leftoverlen;
     memcpy(buffer, buffer + leftover, leftoverlen);
-    // Read data from the file
-    ssize_t length = read(fd, buffer + leftoverlen, buffersize - leftoverlen);
-    length = (length < 0 ? 0 : length) + leftoverlen;
+    // Read data from the pipe
+    DWORD length = 0;
+    BOOL success = ReadFile(fd, buffer + leftoverlen, buffersize - leftoverlen, &length, NULL);
+    length = (success ? length : 0) + leftoverlen;
     leftover = ctx->leftover = leftoverlen = ctx->leftoverlen = 0;
-    if(length <= 0){
+    if(!success){
+        *input = 0;
+        return -1;
+    }
+    if(!length){
         *input = 0;
         return 0;
     }
@@ -359,13 +374,14 @@ unsigned readlines(int fd, readlines_ctx ctx, const char** input){
         buffersize += 4096;
         ctx->buffersize = buffersize;
         buffer = ctx->buffer = realloc(buffer, buffersize + 1);
-        ssize_t length2 = read(fd, buffer + oldsize, buffersize - oldsize);
-        if(length2 <= 0)
+        DWORD length2 = 0;
+        if(!ReadFile(fd, buffer + oldsize, buffersize - oldsize, &length2, NULL))
             break;
         length += length2;
     }
     buffer[length] = 0;
     // Input should be issued one line at a time and should end with a newline.
+    //char* lastline = memrchr(buffer, '\n', length);
     char* lastline = memrchr(buffer, '\n', length);
     if(lastline == buffer + length - 1){
         // If the buffer ends in a newline, process the whole string

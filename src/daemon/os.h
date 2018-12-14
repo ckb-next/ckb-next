@@ -91,7 +91,7 @@ extern pthread_mutex_t _euid_guard;
 #endif // OS_MAC_LEGACY
 
 #ifdef OS_WINDOWS
-//#include <stdint.h>
+
 typedef int uid_t;
 #define O_NONBLOCK 0
 
@@ -99,7 +99,6 @@ typedef int uid_t;
 #define chown(a, b, c) 0
 #define fchown(a, b, c) 0
 #define mkfifo(a, b) 0
-#define memrchr(a, b, c) 0
 #define setlinebuf(a) 0
 #define kill(a, b) 0
 #define getuid(a) 0

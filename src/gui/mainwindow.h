@@ -42,6 +42,7 @@ public:
     void toggleTrayIcon(bool visible);
     static int signalHandlerFd[2];
     static void PosixSignalHandler(int signal);
+    QIcon getIcon();
 
 private:
     SettingsWidget* settingsWidget;

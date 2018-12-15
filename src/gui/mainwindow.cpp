@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent) :
         trayIconMenu->addAction(changeTrayIconAction);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
+        trayIcon = new QSystemTrayIcon(getIcon()/*QIcon(":/img/ckb-next.png")*/, this);
         trayIcon->setContextMenu(trayIconMenu);
         trayIcon->show();
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
@@ -134,7 +134,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(closeAction, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
-    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
@@ -394,50 +393,29 @@ void MainWindow::quitApp(){
     qApp->quit();
 }
 
+QIcon MainWindow::getIcon() {
+  if ( CkbSettings::get("RGBIcon").toBool() ){
+    changeTrayIconAction->setText("Monochrome Tray Icon");
+    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
+    return QIcon(":/img/ckb-next.png");
+  }
+  changeTrayIconAction->setText("RGB Tray Icon");
+  connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
+  return QIcon(":/img/ckb-next-monochrome.png");
+}
+
 void MainWindow::changeTrayIconToMonochrome(){
-    trayIcon->hide();
-
-    trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next-monochrome.png"), this);
-    trayIconMenu->removeAction(restoreAction);
-    trayIconMenu->removeAction(closeAction);
-    trayIconMenu->removeAction(changeTrayIconAction);
-    restoreAction = new QAction(tr("Restore"), this);
-    closeAction = new QAction(tr("Quit"), this);
-    changeTrayIconAction = new QAction(tr("RGB Tray Icon"), this);
-
-    trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction(changeTrayIconAction);
-    trayIconMenu->addAction(restoreAction);
-    trayIconMenu->addAction(closeAction);
-    trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->show();
-    
-    connect(closeAction, SIGNAL(triggered()), this, SLOT(quitApp()));
-    connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
+    trayIcon->setIcon(QIcon(":/img/ckb-next-monochrome.png"));
+    changeTrayIconAction->setText("RGB Tray Icon");
     connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
+    CkbSettings::set("RGBIcon",false);
 }
 
 void MainWindow::changeTrayIconToRGB(){
-    trayIcon->hide();
-
-    trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
-    trayIconMenu->removeAction(restoreAction);
-    trayIconMenu->removeAction(closeAction);
-    trayIconMenu->removeAction(changeTrayIconAction);
-    restoreAction = new QAction(tr("Restore"), this);
-    closeAction = new QAction(tr("Quit"), this);
-    changeTrayIconAction = new QAction(tr("Monochrome Tray Icon"), this);
-
-    trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction(changeTrayIconAction);
-    trayIconMenu->addAction(restoreAction);
-    trayIconMenu->addAction(closeAction);
-    trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->show();
-    
-    connect(closeAction, SIGNAL(triggered()), this, SLOT(quitApp()));
-    connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
+    trayIcon->setIcon(QIcon(":/img/ckb-next.png"));
+    changeTrayIconAction->setText("Monochrome Tray Icon");
     connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
+    CkbSettings::set("RGBIcon",true);
 }
 
 void MainWindow::cleanup(){

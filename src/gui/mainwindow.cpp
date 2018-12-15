@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent) :
         trayIconMenu->addAction(changeTrayIconAction);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(getIcon()/*QIcon(":/img/ckb-next.png")*/, this);
+        trayIcon = new QSystemTrayIcon(getIcon(), this);
         trayIcon->setContextMenu(trayIconMenu);
         trayIcon->show();
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
@@ -394,11 +394,16 @@ void MainWindow::quitApp(){
 }
 
 QIcon MainWindow::getIcon() {
+  // on initial launch (first time using ckb) this association checked
+  // will not be present therefore it will be created w/ default value of false
+
+  // If the icon is RGB then the menu should present a monochrome option
   if ( CkbSettings::get("RGBIcon").toBool() ){
     changeTrayIconAction->setText("Monochrome Tray Icon");
     connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
     return QIcon(":/img/ckb-next.png");
   }
+  // If the icon is monochrome then the menu should present an RGB option
   changeTrayIconAction->setText("RGB Tray Icon");
   connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
   return QIcon(":/img/ckb-next-monochrome.png");

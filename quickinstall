@@ -1,6 +1,29 @@
 #!/usr/bin/env bash
 
-export LC_ALL=C
+# We want to see the logs in English
+if [[ -z "$LC_ALL" && -z "$LANG" ]]; then
+	echo "* Weird, neither LC_ALL nor LANG is set:"
+	locale
+	echo "* Trying LANG=en_US.UTF-8 anyway"
+	export LANG="en_US.UTF-8"
+else
+	# don't let LC_ALL to be set because it always overrides all LC_*,
+	# while LANG only sets LC_* once
+	if [[ ! -z "$LC_ALL" ]]; then
+		export LC_ALL=
+	fi
+fi
+
+export LC_NUMERIC=C
+export LC_TIME=C
+export LC_MONETARY=C
+export LC_MESSAGES=C
+export LC_PAPER=C
+export LC_NAME=C
+export LC_ADDRESS=C
+export LC_TELEPHONE=C
+export LC_MEASUREMENT=C
+export LC_IDENTIFICATION=C
 
 function checkfail {
     if [[ $1 -ne 0 ]]; then

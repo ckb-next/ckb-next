@@ -3,6 +3,7 @@
 #include "kb.h"
 #include "media.h"
 #include <cmath>
+#include "daemonpipe.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
 #define map_last(map) ((map).last())
@@ -504,7 +505,7 @@ void KbPerf::angleSnap(bool newAngleSnap){
     _needsUpdate = _needsSave = true;
 }
 
-void KbPerf::update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi){
+void KbPerf::update(DaemonPipe& cmd, int notifyNumber, bool force, bool saveCustomDpi){
     if(!force && !_needsUpdate)
         return;
     emit settingsUpdated();

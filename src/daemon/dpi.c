@@ -1,5 +1,6 @@
 #include "dpi.h"
 #include "usb.h"
+#include <inttypes.h>
 
 void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const char* values){
     (void)kb;
@@ -26,8 +27,13 @@ void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const 
     int position = 0, field = 0;
     char stagename[3];
     while(position < left && sscanf(stages + position, "%2[^,]%n", stagename, &field) == 1){
+#ifdef OS_WINDOWS
+        uint stagenum;
+        if(sscanf(stagename, "%u", &stagenum) && stagenum < DPI_COUNT){
+#else
         uchar stagenum;
         if(sscanf(stagename, "%hhu", &stagenum) && stagenum < DPI_COUNT){
+#endif
             // Set DPI for this stage
             if(disable){
                 mode->dpi.enabled &= ~(1 << stagenum);
@@ -45,13 +51,21 @@ void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const 
 }
 
 void cmd_dpisel(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* stage){
+    mode->dpi.current = 1;
+    return;
     (void)kb;
     (void)dummy1;
     (void)dummy2;
 
-    uchar stagenum;
-    if(sscanf(stage, "%hhu", &stagenum) != 1)
+#ifdef OS_WINDOWS
+    uint stagenum;
+    if(sscanf(stage, "%u", &stagenum) != 1)
         return;
+#else
+    uchar stagenum;
+    if(sscanf(stage, "%u", &stagenum) != 1)
+        return;
+#endif
     if(stagenum > DPI_COUNT)
         return;
     mode->dpi.current = stagenum;
@@ -62,9 +76,15 @@ void cmd_lift(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
     (void)dummy1;
     (void)dummy2;
 
+#ifdef OS_WINDOWS
+    uint heightnum;
+    if(sscanf(height, "%u", &heightnum) != 1)
+        return;
+#else
     uchar heightnum;
     if(sscanf(height, "%hhu", &heightnum) != 1)
         return;
+#endif
     if(heightnum > LIFT_MAX || heightnum < LIFT_MIN)
         return;
     mode->dpi.lift = heightnum;

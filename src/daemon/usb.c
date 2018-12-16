@@ -901,3 +901,23 @@ void reactivate_devices()
         }
     }
 }
+// UTF-16 (USB descriptor strings) to UTF-8
+void u16dec_char(char* in, char* out, size_t* srclen, size_t* dstlen){
+    iconv_t utf16to8 = iconv_open("UTF-8", "UTF-16LE");
+    if((*srclen % 2) || (utf16to8 == (iconv_t) -1)) {
+        out[0] = 0;
+        return;
+    }
+
+    size_t srclen2 = 0;
+    for(; srclen2 < *srclen; srclen2 += 2){
+        // Since it's UTF16 we need to check both
+        if(!(in[srclen2] || in[srclen2 + 1]))
+            break;
+    }
+
+    if(iconv(utf16to8, &in, &srclen2, &out, dstlen) == (size_t) -1)
+        out[0] = 0;
+
+    iconv_close(utf16to8);
+}

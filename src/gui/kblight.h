@@ -1,7 +1,6 @@
 #ifndef KBLIGHT_H
 #define KBLIGHT_H
 
-#include <QFile>
 #include <QObject>
 #include <QSet>
 #include <QSettings>
@@ -9,6 +8,7 @@
 #include "kbanim.h"
 #include "keymap.h"
 #include "colormap.h"
+#include "daemonpipe.h"
 
 class KbMode;
 
@@ -71,9 +71,9 @@ public:
     void setIndicator(const char* name, QRgb argb);
 
     // Write a new frame to the keyboard. Write "mode %d" first. Optionally provide a list of keys to use as indicators and overwrite the lighting
-    void frameUpdate(QFile& cmd, bool monochrome = false);
+    void frameUpdate(DaemonPipe &cmd, bool monochrome = false);
     // Write the mode's base colors without any animation
-    void base(QFile& cmd, bool ignoreDim = false, bool monochrome = false);
+    void base(DaemonPipe &cmd, bool ignoreDim = false, bool monochrome = false);
 
     // Load and save from stored settings
     void load(CkbSettings& settings);
@@ -108,7 +108,7 @@ private:
     // Rebuild base ColorMap (if needed)
     void rebuildBaseMap();
     // Print RGB values to cmd node
-    void printRGB(QFile& cmd, const ColorMap& animMap);
+    void printRGB(DaemonPipe &cmd, const ColorMap& animMap);
 };
 
 #endif // KBLIGHT_H

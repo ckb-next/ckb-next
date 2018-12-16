@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QThread>
 #include "kbprofile.h"
+#include "daemonpipe.h"
 
 // Class for managing devices
 
@@ -197,7 +198,7 @@ private:
     void writeProfileHeader();
 
     // cmd and notify file handles
-    QFile cmd;
+    DaemonPipe cmd;
 
     /// \brief notifyNumber is the trailing number in the device path.
     int notifyNumber;

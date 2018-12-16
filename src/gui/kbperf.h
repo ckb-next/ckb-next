@@ -1,6 +1,6 @@
 #ifndef KBPERF_H
 #define KBPERF_H
-#include <QFile>
+#include "daemonpipe.h"
 #include <QMap>
 #include <QPoint>
 #include "ckbsettings.h"
@@ -116,7 +116,7 @@ public:
 
     // Updates settings to the driver. Write "mode %d" first. Disable saveCustomDpi when writing a hardware profile or other permanent storage.
     // By default, nothing will be written unless the settings have changed. Use force = true or call setNeedsUpdate() to override.
-    void        update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi);
+    void        update(DaemonPipe &cmd, int notifyNumber, bool force, bool saveCustomDpi);
     inline void setNeedsUpdate()        { _needsUpdate = true; }
 
     // Get indicator status to send to KbLight

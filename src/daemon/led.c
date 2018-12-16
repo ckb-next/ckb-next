@@ -10,14 +10,24 @@ void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* 
     int index = kb->keymap[keyindex].led;
     if(index < 0) {
         if (index == -2){     // Process strafe sidelights
+#ifdef OS_WINDOWS
+            uint sideshine;
+            if (sscanf(code, "%2x",&sideshine)) // monochromatic
+#else
             uchar sideshine;
             if (sscanf(code, "%2hhx",&sideshine)) // monochromatic
+#endif
                 mode->light.sidelight = sideshine;
         }
         return;
     }
+#ifdef OS_WINDOWS
+    uint r, g, b;
+    if(sscanf(code, "%2x%2x%2x", &r, &g, &b) == 3){
+#else
     uchar r, g, b;
     if(sscanf(code, "%2hhx%2hhx%2hhx", &r, &g, &b) == 3){
+#endif
         mode->light.r[index] = r;
         mode->light.g[index] = g;
         mode->light.b[index] = b;

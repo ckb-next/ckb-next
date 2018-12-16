@@ -94,13 +94,13 @@ Kb::Kb(QObject *parent, const QString& path) :
     // Open cmd in non-blocking mode so that it doesn't lock up if nothing is reading
     // (e.g. if the daemon crashed and didn't clean up the node)
 #ifdef Q_OS_WIN
-#define O_NONBLOCK 0
-#warning "O_NONBLOCK STUB"
-#endif
+    if(!cmd.open(0, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle))
+        return;
+#else
     int fd = open(cmdpath.toLatin1().constData(), O_WRONLY | O_NONBLOCK);
     if(!cmd.open(fd, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle))
         return;
-
+#endif
     // Find an available notification node (if none is found, take notify1)
     {
         QMutexLocker locker(&notifyPathMutex);

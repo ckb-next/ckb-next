@@ -390,5 +390,6 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, u
 // receive message from initial sighandler socketpair communication
 extern int sighandler_pipe[2];
 extern void exithandler(int type);
+void u16dec_char(char* in, char* out, size_t* srclen, size_t* dstlen);
 
 #endif  // USB_H

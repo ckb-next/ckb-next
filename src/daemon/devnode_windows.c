@@ -74,7 +74,7 @@ void updateconnected(){
     for(int i = 1; i < DEV_MAX; i++){
         if(IS_CONNECTED(keyboard + i)){
             written = 1;
-            fprintf(cfile, "%s%d %s %s\n", pipepath, i, keyboard[i].serial, keyboard[i].name);
+            fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].serial, keyboard[i].name);
         }
     }
     if(!written)
@@ -380,8 +380,8 @@ unsigned readlines(HANDLE fd, readlines_ctx ctx, const char** input){
         length += length2;
     }
     buffer[length] = 0;
+    //printf("In: %s\n", buffer);
     // Input should be issued one line at a time and should end with a newline.
-    //char* lastline = memrchr(buffer, '\n', length);
     char* lastline = memrchr(buffer, '\n', length);
     if(lastline == buffer + length - 1){
         // If the buffer ends in a newline, process the whole string

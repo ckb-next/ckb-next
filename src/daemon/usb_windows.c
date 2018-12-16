@@ -49,8 +49,38 @@ BOOL InitDescriptorIterator(PDESCRIPTOR_ITERATOR descIterator, BYTE* configDescr
 }
 
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
-    ULONG len;
-    kUSB.WritePipe(kb->handle[kb->ifcount - 1], kb->ifcount, out_msg, MSG_SIZE, &len, NULL);
+    BOOL success = 1;
+    UINT len = 0;
+    if (kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
+        // If we need to read a response, lock the interrupt mutex
+        if(is_recv)
+            if(pthread_mutex_lock(intmutex(kb)))
+                ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
+        success = kUSB.WritePipe(kb->handle[kb->ifcount - 1], kb->ifcount, out_msg, MSG_SIZE, &len, NULL);
+    } else {
+        // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
+        /*struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
+        res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);*/
+    }
+
+    if (!success){
+        int ioctlerrno = GetLastError();
+        ckb_err_fn(" %s, res = 0x%x\n", file, line, len ? strerror(ioctlerrno) : "No data written", len);
+        /*if(res == -1 && ioctlerrno == ETIMEDOUT){
+            if(is_recv)
+                pthread_mutex_unlock(intmutex(kb));
+            return -1;
+        } else {
+            if(is_recv)
+                pthread_mutex_unlock(intmutex(kb));
+            return 0;
+        }*/
+    } else if (len != MSG_SIZE)
+        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, len, MSG_SIZE);
+#ifdef DEBUG_USB_SEND
+    print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
+#endif
+
     return len;
 }
 
@@ -109,9 +139,12 @@ void* os_inputmain(void* context){
     usbdevice* kb = context;
     uchar buffer[64];
     int len;
-    //BOOL success;
+    BOOL success = 1;
     while(1) {
-        printf("Success: %d\n", kUSB.ReadPipe(kb->handle[0], 0x81, buffer, sizeof(buffer), &len, NULL));
+        success = kUSB.ReadPipe(kb->handle[0], 0x81, buffer, sizeof(buffer), &len, NULL);
+        printf("Success: %d\n", success);
+        if(!success)
+            break;
         process_input_urb(kb, buffer, len, 0x81);
     }
     return 0;
@@ -129,6 +162,31 @@ int os_setupusb(usbdevice* kb) {
     return 0;
 }
 
+static int get_UTF8_string_desc(HANDLE* handle, UCHAR iString, char* out, size_t out_len){
+    WINUSB_SETUP_PACKET Pkt;
+    KUSB_SETUP_PACKET* kPkt = (KUSB_SETUP_PACKET*)&Pkt;
+    BYTE buffer[128];
+    memset(&buffer, 0, sizeof(buffer));
+    memset(&Pkt, 0, sizeof(Pkt));
+    kPkt->BmRequest.Dir = BMREQUEST_DIR_DEVICE_TO_HOST;
+    kPkt->Request = USB_REQUEST_GET_DESCRIPTOR;
+    kPkt->ValueHi = USB_DESCRIPTOR_TYPE_STRING;
+    kPkt->ValueLo = iString;
+    kPkt->Length = (USHORT)sizeof(buffer);
+    UINT lengthTransferred;
+    if (!kUSB.ControlTransfer(handle, Pkt, buffer, sizeof(buffer), &lengthTransferred, NULL))
+        ckb_err("Something elsest happened %d\n", GetLastError());
+
+    // Sanity check:
+    // 0x01 is bDescriptorType, which should be 0x03 for string descriptor
+    if(buffer[0x01] == 0x03) {
+        size_t outlen = out_len;
+        size_t srclen = buffer[0] - 2;
+        u16dec_char((char*)(buffer + 2), out, &srclen, &outlen);
+    }
+    return 1;
+}
+
 int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
 #ifdef DEBUG
     ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s\n", vendor, product, path, syspath);
@@ -136,8 +194,7 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
 
     // Search for a matching address and bus number
     for(int index = 1; index < DEV_MAX; index++){
-        if(kbbusnumber[index] == deviceInfo->BusNumber && kbdevaddress[index] == deviceInfo->DeviceAddress)
-        {
+        if(kbbusnumber[index] == deviceInfo->BusNumber && kbdevaddress[index] == deviceInfo->DeviceAddress){
             usbdevice* kb = keyboard + index;
             if(pthread_mutex_trylock(dmutex(kb)))
                 continue;
@@ -206,12 +263,21 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
             kPkt->Request = USB_REQUEST_GET_DESCRIPTOR;
             kPkt->ValueHi = USB_DESCRIPTOR_TYPE_DEVICE;
             kPkt->Length = (USHORT)sizeof(devDescrBuf);
-            if (!kUSB.ControlTransfer(kb->handle[0], Pkt, &devDescrBuf, sizeof(devDescrBuf), &lengthTransferred, NULL))
+            if (!kUSB.ControlTransfer(kb->handle[0], Pkt, devDescrBuf, sizeof(devDescrBuf), &lengthTransferred, NULL))
                 ckb_err("Something elser happened %d\n", GetLastError());
             USB_DEVICE_DESCRIPTOR devDescr;
             memcpy(&devDescr, devDescrBuf, sizeof(devDescr));
             kb->fwversion = devDescr.bcdDevice;
             ckb_info("bcdDevice %x\n", kb->fwversion);
+
+            // Get strings (serial/dev name)
+            /*devDescr.iSerialNumber;
+            devDescr.iManufacturer;
+            */
+
+            get_UTF8_string_desc(kb->handle[0], devDescr.iSerialNumber, kb->serial, SERIAL_LEN - 1);
+            get_UTF8_string_desc(kb->handle[0], devDescr.iProduct, kb->name, KB_NAME_LEN);
+
             pthread_mutex_unlock(dmutex(kb));
             return 0;
         }

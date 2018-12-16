@@ -305,12 +305,25 @@ void ckb_alpha_blend(ckb_key* key, float a, float r, float g, float b){
 int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
     char pos = -1;
     unsigned char a = 255, r, g, b;
+#ifdef __WIN32
+    unsigned int a_i = 255, r_i, g_i, b_i;
+#endif
     int count = 0;
     while(1){
         int scanned = 0;
+#ifdef __WIN32
+        int newpos;
+        if(sscanf(string, "%d:%2x%2x%2x%2x%n", &newpos, &a_i, &r_i, &g_i, &b_i, &scanned) != 5)
+            break;
+        a = a_i;
+        r = r_i;
+        g = g_i;
+        b = b_i;
+#else
         signed char newpos;
         if(sscanf(string, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
+#endif
         string += scanned;
         // Don't allow stops out-of-order or past 100
         if(newpos <= pos || newpos > 100)

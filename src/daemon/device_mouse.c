@@ -6,6 +6,17 @@
 #include "profile.h"
 #include "usb.h"
 
+int start_mouse_legacy(usbdevice* kb, int makeactive){
+    (void)makeactive;
+
+    // Put the legacy M95 into software mode. Nothing else needs to be done hardware wise
+    
+    // Fill out RGB features for consistency, even though the mouse doesn't have them
+    kb->active = 1;
+    kb->pollrate = -1;
+    return 0;
+}
+
 int setactive_mouse(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;

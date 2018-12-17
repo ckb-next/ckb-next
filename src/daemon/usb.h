@@ -92,6 +92,8 @@
 #define P_M65_RGB_ELITE      0x1b5a
 #define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE))
 
+#define P_M95                0x1b06
+
 #define P_SABRE_O            0x1b14 /* optical */
 #define P_SABRE_L            0x1b19 /* laser */
 #define P_SABRE_N            0x1b2f /* new? */
@@ -117,7 +119,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 40
+#define N_MODELS 41
 extern ushort models[];
 
 ///
@@ -150,7 +152,7 @@ const char* product_str(ushort product);
 /// RGB vs non-RGB test
 /// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol.
 /// The difference is denoted with the "monochrome" feature).
-#define IS_LEGACY(vendor, product)      ((vendor) == (V_CORSAIR) && ((product) == (P_K65_LEGACY) || (product) == (P_K70_LEGACY) || (product) == P_K90_LEGACY || (product) == (P_K95_LEGACY)))
+#define IS_LEGACY(vendor, product)      ((vendor) == (V_CORSAIR) && ((product) == (P_K65_LEGACY) || (product) == (P_K70_LEGACY) || (product) == P_K90_LEGACY || (product) == (P_K95_LEGACY) || (product) == (P_M95)))
 
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
@@ -167,7 +169,7 @@ const char* product_str(ushort product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_KATAR)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_KATAR)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)

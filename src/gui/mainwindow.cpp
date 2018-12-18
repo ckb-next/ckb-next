@@ -412,6 +412,7 @@ QIcon MainWindow::getIcon() {
 void MainWindow::changeTrayIconToMonochrome(){
     trayIcon->setIcon(QIcon(":/img/ckb-next-monochrome.png"));
     changeTrayIconAction->setText("RGB Tray Icon");
+    changeTrayIconAction->disconnect();
     connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
     CkbSettings::set("RGBIcon",false);
 }
@@ -419,6 +420,7 @@ void MainWindow::changeTrayIconToMonochrome(){
 void MainWindow::changeTrayIconToRGB(){
     trayIcon->setIcon(QIcon(":/img/ckb-next.png"));
     changeTrayIconAction->setText("Monochrome Tray Icon");
+    changeTrayIconAction->disconnect();
     connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
     CkbSettings::set("RGBIcon",true);
 }

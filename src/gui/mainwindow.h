@@ -42,12 +42,14 @@ public:
     void toggleTrayIcon(bool visible);
     static int signalHandlerFd[2];
     static void PosixSignalHandler(int signal);
+    QIcon getIcon();
 
 private:
     SettingsWidget* settingsWidget;
     QList<KbWidget*> kbWidgets;
     QAction* restoreAction;
     QAction* closeAction;
+    QAction* changeTrayIconAction;
 
 #ifdef USE_LIBAPPINDICATOR
     bool                useAppindicator;
@@ -67,6 +69,8 @@ public slots:
     void stateChange(Qt::ApplicationState state);
     void quitApp();
     void checkForCkbUpdates();
+    void changeTrayIconToMonochrome();
+    void changeTrayIconToRGB();
 
 
 private slots:

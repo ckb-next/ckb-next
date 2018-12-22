@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
     closeAction = new QAction(tr("Quit"), this);
+    changeTrayIconAction = new QAction(tr("Monochrome Tray Icon"), this);
 
 #ifdef USE_LIBAPPINDICATOR
     QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
@@ -114,10 +115,12 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         qDebug() << "Using QSytemTrayIcon";
         trayIconMenu = new QMenu(this);
+        trayIconMenu->addAction(changeTrayIconAction);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
+        trayIcon = new QSystemTrayIcon(getIcon(), this);
         trayIcon->setContextMenu(trayIconMenu);
+        trayIcon->show();
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
     }
     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
@@ -392,6 +395,38 @@ void MainWindow::stateChange(Qt::ApplicationState state){
 
 void MainWindow::quitApp(){
     qApp->quit();
+}
+
+QIcon MainWindow::getIcon() {
+  // on initial launch (first time using ckb) this association checked
+  // will not be present, so force it to true, as we do not want to break default behaviour
+
+  // If the icon is RGB then the menu should present a monochrome option
+  if (CkbSettings::get("Program/RGBIcon", QVariant(true)).toBool()){
+    changeTrayIconAction->setText("Monochrome Tray Icon");
+    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
+    return QIcon(":/img/ckb-next.png");
+  }
+  // If the icon is monochrome then the menu should present an RGB option
+  changeTrayIconAction->setText("RGB Tray Icon");
+  connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
+  return QIcon(":/img/ckb-next-monochrome.png");
+}
+
+void MainWindow::changeTrayIconToMonochrome(){
+    trayIcon->setIcon(QIcon(":/img/ckb-next-monochrome.png"));
+    changeTrayIconAction->setText("RGB Tray Icon");
+    changeTrayIconAction->disconnect();
+    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
+    CkbSettings::set("Program/RGBIcon", false);
+}
+
+void MainWindow::changeTrayIconToRGB(){
+    trayIcon->setIcon(QIcon(":/img/ckb-next.png"));
+    changeTrayIconAction->setText("Monochrome Tray Icon");
+    changeTrayIconAction->disconnect();
+    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
+    CkbSettings::set("Program/RGBIcon", true);
 }
 
 void MainWindow::cleanup(){

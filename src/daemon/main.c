@@ -93,20 +93,22 @@ int main(int argc, char** argv){
     main_ac = argc;
     main_av = argv;
 
-    printf("    ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
+    printf("ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i], "--help")){
             printf(
 #ifdef OS_MAC_LEGACY
-                        "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
+                        "Usage: ckb-next-daemon [--version] [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
 #else
-                        "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
+                        "Usage: ckb-next-daemon [--version] [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
 #endif
                         "\n"
-                        "See https://github.com/ckb-next/ckb-next/blob/master/DAEMON.md for full instructions.\n"
+                        "See https://github.com/ckb-next/ckb-next/wiki/CKB-Daemon-Manual for full instructions.\n"
                         "\n"
                         "Command-line parameters:\n"
+                        "    --version\n"
+                        "        Print version string to stdout and quit.\n"
                         "    --gid=<gid>\n"
                         "        Restrict access to %s* nodes to users in group <gid>.\n"
                         "        (Ordinarily they are accessible to anyone)\n"
@@ -128,6 +130,8 @@ int main(int argc, char** argv){
                         "        This will almost certainly not work. Use only if you know what you're doing.\n"
                         "\n", devpath);
             exit(0);
+        } else if (!strcmp(argv[i], "--version")){
+            return 0;
         }
     }
 

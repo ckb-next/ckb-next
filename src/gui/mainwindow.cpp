@@ -20,6 +20,9 @@
 #include "ckbupdaterwidget.h"
 #endif
 
+#include "ckbsystemtrayicon.h"
+
+
 extern QSharedMemory appShare;
 extern QString devpath;
 
@@ -51,6 +54,20 @@ extern "C" {
         Q_UNUSED(menu);
         MainWindow* window = static_cast<MainWindow*>(data);
         window->showWindow();
+    }
+
+    void indicatorScroll(AppIndicator* indicator, guint steps, GdkScrollDirection direction, gpointer data) {
+        MainWindow* window = static_cast<MainWindow*>(data);
+        switch(direction) {
+            case GDK_SCROLL_UP:
+                emit window->trayIconScrolled(true);
+                break;
+            case GDK_SCROLL_DOWN:
+                emit window->trayIconScrolled(false);
+                break;
+            default:
+                break;
+        }
     }
 }
 #endif
@@ -110,6 +127,9 @@ MainWindow::MainWindow(QWidget *parent) :
         app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
         app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
         app_indicator_set_icon(indicator, "ckb-next");
+
+        // Catch scroll events
+        g_signal_connect(indicator, "scroll-event", G_CALLBACK(indicatorScroll), this);
     } else
 #endif
     {
@@ -118,10 +138,11 @@ MainWindow::MainWindow(QWidget *parent) :
         trayIconMenu->addAction(changeTrayIconAction);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(getIcon(), this);
+        trayIcon = new CkbSystemTrayIcon(getIcon(), this);
         trayIcon->setContextMenu(trayIconMenu);
         trayIcon->show();
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
+        connect(trayIcon, &CkbSystemTrayIcon::wheelScrolled, this, &MainWindow::handleTrayScrollEvt);
     }
     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
@@ -183,6 +204,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(settingsWidget, &SettingsWidget::checkForUpdates, this, &MainWindow::checkForCkbUpdates);
 #endif
+}
+
+void MainWindow::handleTrayScrollEvt(bool up){
+    emit trayIconScrolled(up);
 }
 
 void MainWindow::checkForCkbUpdates(){

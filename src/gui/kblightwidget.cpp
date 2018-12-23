@@ -2,6 +2,7 @@
 #include "ckbsettings.h"
 #include "kblightwidget.h"
 #include "ui_kblightwidget.h"
+#include "mainwindow.h"
 
 KbLightWidget::KbLightWidget(QWidget *parent) :
     QWidget(parent), light(0),
@@ -16,6 +17,19 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     connect(ui->keyWidget, SIGNAL(sidelightToggled()), this, SLOT(toggleSidelight())); // click on a toggle button, like sidelight
     connect(ui->animWidget, SIGNAL(animChanged(KbAnim*)), this, SLOT(changeAnim(KbAnim*)));
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
+
+    MainWindow* mainWindow = nullptr;
+    foreach(QWidget* widget, qApp->topLevelWidgets()){
+       if(widget->inherits("QMainWindow")) {
+           mainWindow = static_cast<MainWindow*>(widget);
+           break;
+       }
+    }
+
+    if(mainWindow == nullptr)
+        qDebug() << "Couldn't find MainWindow in kblightwidget.cpp";
+    else
+        connect(mainWindow, &MainWindow::trayIconScrolled, this, &KbLightWidget::brightnessScroll);
 
     // Restore "show animated" setting
     ui->showAnimBox->setChecked(!CkbSettings::get("UI/Light/ShowBaseOnly").toBool());
@@ -153,4 +167,20 @@ void KbLightWidget::on_animButton_clicked(){
     int presetId = dialog.chosenPreset();
     ui->animWidget->addAnim(script, currentSelection, script->presets()[presetId], script->preset(presetId));
     light->restartAnimation();
+}
+
+void KbLightWidget::brightnessScroll(bool up){
+    // Only run this if shared dimming is enabled
+    if(!light || KbLight::shareDimming() == -1)
+        return;
+
+    int dimming = light->dimming();
+    dimming += (up ? -1 : 1);
+
+    if(dimming < 0)
+        dimming = 0;
+    if(dimming > KbLight::MAX_DIM)
+        dimming = KbLight::MAX_DIM;
+
+    light->dimming(dimming, true);
 }

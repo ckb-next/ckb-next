@@ -38,6 +38,7 @@ private slots:
     void on_showAnimBox_clicked(bool checked);
 
     void toggleSidelight(); //strafe
+    void brightnessScroll(bool up);
 
 private:
     KbLight* light;

@@ -67,6 +67,8 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();
     void on_layoutBox_activated(int index);
+    void switchToProfile(QString profile);
+    void switchToMode(QString mode);
 };
 
 #endif // KBWIDGET_H

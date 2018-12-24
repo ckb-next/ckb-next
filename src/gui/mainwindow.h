@@ -74,6 +74,10 @@ public slots:
     void changeTrayIconToRGB();
     void handleTrayScrollEvt(bool up);
 
+signals:
+    void switchToProfileCLI(QString profile);
+    void switchToModeCLI(QString mode);
+
 private slots:
     void addDevice(Kb* device);
     void removeDevice(Kb* device);

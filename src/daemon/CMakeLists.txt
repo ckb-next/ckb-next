@@ -419,7 +419,7 @@ if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/systemd/system"
+        DESTINATION "/usr/lib/systemd/system"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ

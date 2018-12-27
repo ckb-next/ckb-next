@@ -35,24 +35,6 @@ int rm_recursive(const char* path){
     return remove("C:\\ProgramData\\ckb-next\\ckb0\\");
 }
 
-void check_chown(const char *pathname, uid_t owner, long group){
-    if (group >= 0) {
-        if (chown(pathname, owner, group) < 0) {
-            ckb_warn("Chown call failed %s: %s\n", pathname, strerror(errno));
-            exit(EXIT_FAILURE);
-        }
-    }
-}
-
-void check_fchown(int fd, uid_t owner, long group){
-    if (group >= 0) {
-        if (fchown(fd, owner, group) < 0) {
-            ckb_warn("FChown call failed: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
-        }
-    }
-}
-
 void check_chmod(const char *pathname, mode_t mode){
     if(chmod(pathname, mode) < 0) {
         ckb_warn("Chmod call failed %s: %s\n", pathname, strerror(errno));
@@ -82,7 +64,6 @@ void updateconnected(){
     fclose(cfile);
 
     check_chmod(cpath, S_GID_READ);
-    check_chown(cpath, 0, gid);
 
     pthread_mutex_unlock(devmutex);
 }
@@ -97,7 +78,7 @@ int mknotifynode(usbdevice* kb, int notify){
     char notify_char = (notify % 10) + '0';
     char outpath[strlen(pipepath) + 10 * sizeof(char)];
     snprintf(outpath, sizeof(outpath), "%s%c\\notify%c", pipepath, index, notify_char);
-    kb->outfifo[notify] = CreateNamedPipe(TEXT(outpath), PIPE_ACCESS_INBOUND | PIPE_ACCESS_OUTBOUND , PIPE_WAIT, 1, 1024, 1024, 120 * 1000, NULL);
+    kb->outfifo[notify] = CreateNamedPipe(TEXT(outpath), PIPE_ACCESS_OUTBOUND , PIPE_WAIT, 1, 1024, 1024, 120 * 1000, NULL);
     if(kb->outfifo[notify] == INVALID_HANDLE_VALUE){
         ckb_warn("Unable to create %s: %d\n", outpath, GetLastError());
         kb->outfifo[notify] = 0;
@@ -121,7 +102,6 @@ static void printnode(const char* path, const char* str){
         fputc('\n', file);
         fclose(file);
         check_chmod(path, S_GID_READ);
-        check_chown(path, 0, gid);
     } else {
         ckb_warn("Unable to create %s: %s\n", path, strerror(errno));
         remove(path);
@@ -160,8 +140,6 @@ static int _mkdevpath(usbdevice* kb){
         return -1;
     }
 
-    check_chown(path, 0, gid);
-
     if(kb == keyboard + 0){
         // Root keyboard: write a list of devices
         updateconnected();
@@ -173,7 +151,6 @@ static int _mkdevpath(usbdevice* kb){
             fprintf(vfile, "%s\n", CKB_NEXT_VERSION_STR);
             fclose(vfile);
             check_chmod(vpath, S_GID_READ);
-            check_chown(vpath, 0, gid);
         } else {
             ckb_warn("Unable to create %s: %s\n", vpath, strerror(errno));
             remove(vpath);
@@ -186,7 +163,6 @@ static int _mkdevpath(usbdevice* kb){
             fprintf(pfile, "%u\n", getpid());
             fclose(pfile);
             check_chmod(ppath, S_READ);
-            check_chown(vpath, 0, gid);
         } else {
             ckb_warn("Unable to create %s: %s\n", ppath, strerror(errno));
             remove(ppath);
@@ -195,7 +171,7 @@ static int _mkdevpath(usbdevice* kb){
         // Create command FIFO
         char inpath[strlen(pipepath) + 6];
         snprintf(inpath, sizeof(inpath), "%s%d\\cmd", pipepath, index);
-        kb->infifo = CreateNamedPipe(TEXT(inpath), PIPE_ACCESS_INBOUND | PIPE_ACCESS_OUTBOUND , PIPE_WAIT, 1, 1024, 1024, 120 * 1000, NULL);
+        kb->infifo = CreateNamedPipe(TEXT(inpath), PIPE_ACCESS_INBOUND, PIPE_WAIT, 1, 1024, 1024, 120 * 1000, NULL);
         if(kb->infifo == INVALID_HANDLE_VALUE){
             ckb_err("Unable to create %s: %d\n", inpath, GetLastError());
             rm_recursive(path);
@@ -248,7 +224,6 @@ static int _mkdevpath(usbdevice* kb){
             fputc('\n', ffile);
             fclose(ffile);
             check_chmod(fpath, S_GID_READ);
-            check_chown(fpath, 0, gid);
         } else {
             ckb_warn("Unable to create %s: %s\n", fpath, strerror(errno));
             remove(fpath);
@@ -295,7 +270,6 @@ int mkfwnode(usbdevice* kb){
         fputc('\n', fwfile);
         fclose(fwfile);
         check_chmod(fwpath, S_GID_READ);
-        check_chown(fwpath, 0, gid);
     } else {
         ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
         remove(fwpath);
@@ -309,7 +283,6 @@ int mkfwnode(usbdevice* kb){
         fputc('\n', pfile);
         fclose(pfile);
         check_chmod(ppath, S_GID_READ);
-        check_chown(ppath, 0, gid);
     } else {
         ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
         remove(ppath);

@@ -4,7 +4,68 @@
 #include "led.h"
 #include "notify.h"
 #include "profile.h"
+#include <windows.h>
 
+#ifdef OS_WINDOWS
+void _vnprintf(HANDLE fifo, const char* format, va_list va_args){
+    va_list va_args_copy;
+
+    va_copy(va_args_copy, va_args);
+
+    // Get length of formatted string.
+    int len = vsnprintf(NULL, 0, format, va_args_copy) + 1;
+
+    char* buf = malloc(len);
+    memset(buf, 0, len);
+
+    vsnprintf(buf, len, format, va_args);
+    DWORD written = 0;
+
+    //ConnectNamedPipe(fifo, NULL);
+
+    // We must not write the \0 to the pipe
+    BOOL success = WriteFile(fifo, buf, len - 1, &written, NULL);
+    int error = GetLastError();
+    printf("Success: %d, writen %ld, out: %s, err %d\n", success, written, buf, error);
+
+    free(buf);
+}
+
+void _nprintf(HANDLE fifo, const char* format, ...){
+    va_list va;
+    va_start(va, format);
+    _vnprintf(fifo, format, va);
+}
+
+void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, ...){
+    if(!kb)
+        return;
+    usbprofile* profile = kb->profile;
+    va_list va;
+
+    HANDLE fifo;
+    if(nodenumber >= 0){
+        // If node number was given, print to that node (if open)
+        if((fifo = kb->outfifo[nodenumber]) != INVALID_HANDLE_VALUE){
+            va_start(va, format);
+            if(mode){
+                _nprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
+            }
+            _vnprintf(fifo, format, va);
+        }
+        return;
+    }
+    // Otherwise, print to all nodes
+    for(int i = 0; i < OUTFIFO_MAX; i++){
+        if((fifo = kb->outfifo[i]) != INVALID_HANDLE_VALUE){
+            va_start(va, format);
+            if(mode)
+                _nprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
+            _vnprintf(fifo, format, va);
+        }
+    }
+}
+#else
 void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, ...){
     if(!kb)
         return;
@@ -31,7 +92,7 @@ void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, .
         }
     }
 }
-
+#endif
 void nprintkey(usbdevice* kb, int nnumber, int keyindex, int down){
     const key* map = kb->keymap + keyindex;
     if(map->name)

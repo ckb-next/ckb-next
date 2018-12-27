@@ -11,7 +11,9 @@
 #include <QMenuBar>
 #include <unistd.h>
 #include <ckbnextconfig.h>
-#ifndef Q_OS_WIN
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#else
 #include <sys/socket.h>
 #endif
 #include <signal.h>
@@ -176,8 +178,10 @@ MainWindow::MainWindow(QWidget *parent) :
     dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
     dialog.setInformativeText(daemonDialogText);
     dialog.setIcon(QMessageBox::Critical);
-#ifndef Q_OS_WIN32
     // Set up signal handler
+#ifdef Q_OS_WIN32
+//SetConsoleCtrlHandler();
+#else
     socketpair(AF_UNIX, SOCK_STREAM, 0, MainWindow::signalHandlerFd);
 
     sigNotifier = new QSocketNotifier(MainWindow::signalHandlerFd[1], QSocketNotifier::Read, this);
@@ -472,7 +476,6 @@ MainWindow::~MainWindow(){
     cleanup();
     delete ui;
 }
-
 void MainWindow::QSignalHandler(){
     sigNotifier->setEnabled(false);
     int sig = -1;
@@ -487,13 +490,13 @@ void MainWindow::QSignalHandler(){
     this->quitApp();
     sigNotifier->setEnabled(true);
 }
-
+#ifndef Q_OS_WIN32
 void MainWindow::PosixSignalHandler(int signal){
     int ret = write(MainWindow::signalHandlerFd[0], &signal, sizeof(signal));
     if(ret == -1)
         qDebug() << "Error on PosixSignalHandler write";
 }
-
+#endif
 void MainWindow::checkedForNewVer(QString ver, QString changelog){
 #ifndef DISABLE_UPDATER
     if(!ver.isEmpty()) {

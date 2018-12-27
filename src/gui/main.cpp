@@ -10,6 +10,7 @@
 #include <errno.h>
 #ifdef Q_OS_WIN32
 #include <windows.h>
+// wincon.h for signal handler
 #endif
 
 QSharedMemory appShare("ckb-next");
@@ -124,6 +125,7 @@ static bool pidActive(const QStringList& lines){
 
                 DWORD exitCode = 0;
                 bool isActive = (GetExitCodeProcess(pidHandle, &exitCode) || exitCode == STILL_ACTIVE);
+#warning "Add error handling"
                 int error = GetLastError();
 
                 CloseHandle(pidHandle);

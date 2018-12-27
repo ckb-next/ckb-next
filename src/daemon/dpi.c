@@ -111,13 +111,13 @@ char* printdpi(const dpiset* dpi, const usbdevice* kb){
     for(int i = 0; i < DPI_COUNT; i++){
         // Print the stage number
         int newlen = 0;
-        snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%d%n" : " %d%n", i, &newlen);
+        newlen = snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%d" : " %d", i);
         length += newlen;
         // Print the DPI settings
         if(!(dpi->enabled & (1 << i)))
-            snprintf(buffer + length, BUFFER_LEN - length, ":off%n", &newlen);
+            newlen = snprintf(buffer + length, BUFFER_LEN - length, ":off");
         else
-            snprintf(buffer + length, BUFFER_LEN - length, ":%u,%u%n", dpi->x[i], dpi->y[i], &newlen);
+            newlen = snprintf(buffer + length, BUFFER_LEN - length, ":%u,%u", dpi->x[i], dpi->y[i]);
         length += newlen;
     }
     return buffer;

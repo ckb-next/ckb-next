@@ -142,7 +142,7 @@ void* os_inputmain(void* context){
     BOOL success = 1;
     while(1) {
         success = kUSB.ReadPipe(kb->handle[0], 0x81, buffer, sizeof(buffer), &len, NULL);
-        printf("Success: %d\n", success);
+        //printf("Success: %d\n", success);
         if(!success)
             break;
         process_input_urb(kb, buffer, len, 0x81);

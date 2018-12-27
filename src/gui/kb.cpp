@@ -106,7 +106,12 @@ Kb::Kb(QObject *parent, const QString& path) :
         QMutexLocker locker(&notifyPathMutex);
         for(int i = 1; i < 10; i++){
             QString notify = QString(path + "/notify%1").arg(i);
+#ifdef Q_OS_WIN32
+#warning "Notify exists stub"
+            if(!notifyPaths.contains(notify)){
+#else
             if(!QFile::exists(notify) && !notifyPaths.contains(notify)){
+#endif
                 notifyNumber = i;
                 notifyPath = notify;
                 break;
@@ -123,7 +128,12 @@ Kb::Kb(QObject *parent, const QString& path) :
         QMutexLocker locker(&notifyPathMutex);
         for(int i = 1; i < 10; i++){
             QString notify = QString(path + "/notify%1").arg(i);
+#ifdef Q_OS_WIN32
+#warning "Notify exists stub"
+            if(!notifyPaths.contains(notify)){
+#else
             if(!QFile::exists(notify) && !notifyPaths.contains(notify)){
+#endif
                 macroNumber = i;
                 macroPath = notify;
                 break;
@@ -478,7 +488,7 @@ void Kb::deleteHw(){
 }
 
 void Kb::run(){
-    QFile notify(notifyPath);
+    DaemonPipe notify(notifyPath);
     // Wait a small amount of time for the node to open (100ms)
     QThread::usleep(100000);
     if(!notify.open(QIODevice::ReadOnly)){

@@ -122,9 +122,11 @@ void localecase(char* dst, size_t length, const char* src){
 }
 
 int main(int argc, char** argv){
+#ifndef OS_WINDOWS
     // Set output pipes to buffer on newlines, if they weren't set that way already
     setlinebuf(stdout);
     setlinebuf(stderr);
+#endif
 
     printf("ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
@@ -232,6 +234,7 @@ int main(int argc, char** argv){
 #endif
     }
 
+#ifndef OS_WINDOWS
     // Check UID
     if(getuid() != 0){
         if(forceroot){
@@ -240,7 +243,7 @@ int main(int argc, char** argv){
         } else
             ckb_warn_nofile("Warning: not running as root, allowing anyway per command-line parameter...\n");
     }
-
+#endif
     // Make root keyboard
     umask(0);
     memset(keyboard, 0, sizeof(keyboard));

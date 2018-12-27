@@ -2,6 +2,7 @@
 #define DAEMONPIPE_H
 #include <QFile>
 #include <QLocalSocket>
+#include <QByteArray>
 
 #ifdef Q_OS_WIN
 class DaemonPipe : public QLocalSocket {
@@ -16,7 +17,9 @@ public:
         pipeName.prepend("\\\\.\\pipe\\ckb-next\\");
         qDebug() << pipeName;
     }
+    inline bool open(QIODevice::OpenMode mode) { return open(0, mode, 0); }
     bool open(int fd, QIODevice::OpenMode mode, QFileDevice::FileHandleFlags handleFlags);
+    QByteArray readLine(qint64 maxSize = 0);
 
 private:
     //void initPipe(QString str);

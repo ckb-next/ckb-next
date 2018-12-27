@@ -1,4 +1,5 @@
-#include <qdebug.h>
+#include <QDebug>
+#include "daemonpipe.h"
 #include "macroreader.h"
 #include <sys/time.h>
 
@@ -45,7 +46,7 @@ void MacroReaderThread::readMacro(QString line) {
 void MacroReaderThread::run() {
     qDebug() << "MacroReader::run() started with" << macroNumber << "and" << macroPath << "and" << macroBox << "and" << macroText;
 
-    QFile macroFile(macroPath);
+    DaemonPipe macroFile(macroPath);
     // Wait a small amount of time for the node to open (100ms) (code reused from kb.cpp)
     QThread::usleep(100000);
     if(!macroFile.open(QIODevice::ReadOnly)){
@@ -84,6 +85,7 @@ void MacroReaderThread::run() {
 
         metaObject()->invokeMethod(this, "readMacro", Qt::QueuedConnection, Q_ARG(QString, text));
     }
+
     qDebug() << "MacroReader::run() ends.";
     macroFile.close();
     QThread::exit ();

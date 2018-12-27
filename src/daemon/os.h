@@ -93,18 +93,7 @@ extern pthread_mutex_t _euid_guard;
 #ifdef OS_WINDOWS
 
 typedef int uid_t;
-#define O_NONBLOCK 0
-
-#warning STUBS
-#define chown(a, b, c) 0
-#define fchown(a, b, c) 0
-#define mkfifo(a, b) 0
-#define setlinebuf(a) 0
-#define kill(a, b) 0
-#define getuid(a) 0
-#define va_start(a, b) 0
-#define dprintf(a, b, c) 0
-#define vdprintf(a, b, c) 0
+#include <stdarg.h>
 
 typedef void *PVOID;
 typedef PVOID HANDLE;

@@ -113,7 +113,7 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     QList<KbProfile*> profiles = device->profiles();
 
     QMenu menu(this);
-    QAction* rename = new QAction("Rename...", this);
+    QAction* rename = new QAction("Rename", this);
     QAction* duplicate = new QAction("Duplicate", this);
     QAction* del = new QAction("Delete", this);
     bool canDelete = (profiles.count() > 1);
@@ -138,6 +138,8 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     QAction* result = menu.exec(QCursor::pos());
     if(result == rename){
         ui->profileList->editItem(item);
+        // We need to return otherwise repopulate() gets called and the item is destroyed
+        return;
     } else if(result == duplicate){
         KbProfile* newProfile = device->newProfile(currentProfile);
         newProfile->newId();
@@ -166,6 +168,8 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
             KbProfile* profile = device->find(item->data(GUID).toUuid());
             item->setIcon(QIcon((profile == device->hwProfile()) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"));
         }
+        // No need to repopulate here either
+        return;
     } else if(result == moveup){
         profiles.removeAll(currentProfile);
         profiles.insert(index - 1, currentProfile);

@@ -83,6 +83,10 @@ static void* play_macro(void* param) {
     usbdevice* kb = ptr->kb;
     keymacro* macro = ptr->macro;
 
+#ifdef OS_MAC
+    pthread_setname_np("ckb macro");
+#endif // OS_MAC
+
     /// First have a look if we are the first and only macro-thread to run. If not, wait.
     /// So enqueue our thread first, so it is remembered for us and can be seen by all others.
     pthread_mutex_lock(mmutex2(kb));
@@ -160,8 +164,11 @@ static void inputupdate_keys(usbdevice* kb){
                         } else {
                             macro->triggered = 1;
 
-                            // name thread if it was created, ignore the result
+#ifndef OS_MAC
+                            // name thread externally if it was created on non-mac systems
+                            // ignore the result
                             pthread_setname_np(thread, "ckb macro");
+#endif // OS_MAC
                         }
                     }
                 }

@@ -152,7 +152,12 @@ void os_inputclose(usbdevice* kb){
 // However, updating indicator state requires locking dmutex and we never want to do that in the input thread.
 // Instead, we launch a single-shot thread to update the state.
 static void* indicator_update(void* context){
+    char indicthread_name[THREAD_NAME_MAX] = "ckbX indicator";
     usbdevice* kb = context;
+
+    indicthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+    pthread_setname_np(indicthread_name);
+
     pthread_mutex_lock(dmutex(kb));
     {
         pthread_mutex_lock(imutex(kb));
@@ -209,13 +214,8 @@ void os_keypress(usbdevice* kb, int scancode, int down){
                     // The thread is only spawned if kb->indicthread is null.
                     // Due to the logic inside the thread, this means that it could theoretically be spawned twice, but never a third time.
                     // Moreover, if it is spawned more than once, the indicator state will remain correct due to dmutex staying locked.
-                    if(!pthread_create(&kb->indicthread, 0, indicator_update, kb)) {
-                        char indicthread_name[THREAD_NAME_MAX] = "ckbX indicator";
-                        indicthread_name[3] = INDEX_OF(kb, keyboard) + '0';
-                        pthread_setname_np(kb->indicthread, indicthread_name);
-
+                    if(!pthread_create(&kb->indicthread, 0, indicator_update, kb))
                         pthread_detach(kb->indicthread);
-                    }
                 }
             }
         }

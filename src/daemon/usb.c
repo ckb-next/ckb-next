@@ -353,13 +353,18 @@ static void* _setupusb(void* context){
     ///
     /// - The next action is to create a separate thread, which gets as parameter kb and starts with os_inputmain().
     /// The thread is immediately detached so that it can return its resource completely independently if it should terminate.
-    /// Also name the thread appropriately to help debugging/inspecting.
-    char inputthread_name[THREAD_NAME_MAX] = "ckbX input";
     if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
         goto fail;
+
+#ifndef OS_MAC
+    // name this thread externally if not on mac,
+    // on mac `pthread_setname_np` is only naming the current thread
+    char inputthread_name[THREAD_NAME_MAX] = "ckbX input";
     inputthread_name[3] = INDEX_OF(kb, keyboard) + '0';
     pthread_setname_np(kb->inputthread, inputthread_name);
+#endif // OS_MAC
     pthread_detach(kb->inputthread);
+
     ///
     /// - The same happens with os_setupindicators(),
     /// which initially initializes all LED variables in kb to off and then starts the _ledthread() thread
@@ -472,16 +477,19 @@ static void* _setupusb(void* context){
 /// In kb->thread the thread id is mentioned, because closeusb() needs this info for joining that thread again.
 ///
 void setupusb(usbdevice* kb){
-    char usbthread_name[THREAD_NAME_MAX] = "ckbX usb";
 
     if(pthread_create(&kb->thread, 0, _setupusb, kb)) {
         ckb_err("Failed to create USB thread\n");
         return;
     }
 
-    // set thread name ignoring the result
+#ifndef OS_MAC
+    // name this thread externally if not on mac,
+    // on mac `pthread_setname_np` is only naming the current thread
+    char usbthread_name[THREAD_NAME_MAX] = "ckbX usb";
     usbthread_name[3] = INDEX_OF(kb, keyboard) + '0';
     pthread_setname_np(kb->thread, usbthread_name);
+#endif // OS_MAC
 }
 
 /// \brief .

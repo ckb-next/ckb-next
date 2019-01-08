@@ -38,10 +38,13 @@ void AnimScript::scan(){
     scripts.clear();
     foreach(QString file, dir.entryList(QDir::Files | QDir::Executable)){
         AnimScript* script = new AnimScript(qApp, dir.absoluteFilePath(file));
-        if(script->load() && !scripts.contains(script->_info.guid))
+        if(script->load() && !scripts.contains(script->_info.guid) && script->presets().count()){
             scripts[script->_info.guid] = script;
-        else
-            delete script;
+            continue;
+        }
+        if(!script->presets().count())
+            qWarning() << script->name() << "has no default preset and will not be loaded.";
+        delete script;
     }
 }
 

@@ -353,8 +353,12 @@ static void* _setupusb(void* context){
     ///
     /// - The next action is to create a separate thread, which gets as parameter kb and starts with os_inputmain().
     /// The thread is immediately detached so that it can return its resource completely independently if it should terminate.
+    /// Also name the thread appropriately to help debugging/inspecting.
+    char inputthread_name[THREAD_NAME_MAX] = "ckbX input";
     if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
         goto fail;
+    inputthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+    pthread_setname_np(kb->inputthread, inputthread_name);
     pthread_detach(kb->inputthread);
     ///
     /// - The same happens with os_setupindicators(),
@@ -468,8 +472,16 @@ static void* _setupusb(void* context){
 /// In kb->thread the thread id is mentioned, because closeusb() needs this info for joining that thread again.
 ///
 void setupusb(usbdevice* kb){
-    if(pthread_create(&kb->thread, 0, _setupusb, kb))
+    char usbthread_name[THREAD_NAME_MAX] = "ckbX usb";
+
+    if(pthread_create(&kb->thread, 0, _setupusb, kb)) {
         ckb_err("Failed to create USB thread\n");
+        return;
+    }
+
+    // set thread name ignoring the result
+    usbthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+    pthread_setname_np(kb->thread, usbthread_name);
 }
 
 /// \brief .

@@ -185,7 +185,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     }
     // Pick the appropriate add or remove function
     add_remove_keys = down ? &add_to_keys : &remove_from_keys;
-    
+
     if(scancode == KEY_FN) {
         (*add_remove_keys)(scancode, &(kb->kbinput_avtopcase.keys));
         IOConnectCallStructMethod(kb->event, post_apple_vendor_top_case_input_report, &kb->kbinput_avtopcase, sizeof(kb->kbinput_avtopcase), NULL, 0);
@@ -209,8 +209,13 @@ void os_keypress(usbdevice* kb, int scancode, int down){
                     // The thread is only spawned if kb->indicthread is null.
                     // Due to the logic inside the thread, this means that it could theoretically be spawned twice, but never a third time.
                     // Moreover, if it is spawned more than once, the indicator state will remain correct due to dmutex staying locked.
-                    if(!pthread_create(&kb->indicthread, 0, indicator_update, kb))
+                    if(!pthread_create(&kb->indicthread, 0, indicator_update, kb)) {
+                        char indicthread_name[THREAD_NAME_MAX] = "ckbX indicator";
+                        indicthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+                        pthread_setname_np(kb->indicthread, indicthread_name);
+
                         pthread_detach(kb->indicthread);
+                    }
                 }
             }
         }

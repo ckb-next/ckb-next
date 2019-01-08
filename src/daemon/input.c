@@ -1,3 +1,5 @@
+#include "os.h"
+
 #include <limits.h>
 #include "device.h"
 #include "input.h"
@@ -157,6 +159,9 @@ static void inputupdate_keys(usbdevice* kb){
                             perror("inputupdate_keys: Creating thread returned not null");
                         } else {
                             macro->triggered = 1;
+
+                            // name thread if it was created, ignore the result
+                            pthread_setname_np(thread, "ckb macro");
                         }
                     }
                 }

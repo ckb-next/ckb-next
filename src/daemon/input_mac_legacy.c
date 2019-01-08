@@ -378,6 +378,10 @@ void os_keypress(usbdevice* kb, int scancode, int down){
             // Due to the logic inside the thread, this means that it could theoretically be spawned twice, but never a third time.
             // Moreover, if it is spawned more than once, the indicator state will remain correct due to dmutex staying locked.
             if(!pthread_create(&kb->indicthread, 0, indicator_update, kb))
+                char indicthread_name[THREAD_NAME_MAX] = "ckbX indicator";
+                indicthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+                pthread_setname_np(kb->indicthread, indicthread_name);
+
                 pthread_detach(kb->indicthread);
         }
     }

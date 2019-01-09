@@ -10,8 +10,15 @@ int start_mouse_legacy(usbdevice* kb, int makeactive){
     (void)makeactive;
 
     // Put the legacy M95 into software mode. Nothing else needs to be done hardware wise
-    
-    // Fill out RGB features for consistency, even though the mouse doesn't have them
+    // kb, ptr, len, bRequest, wValue
+    legacy_m95_send(kb, NULL, 0, 2, 0x0002);
+    unsigned char pkt1[] = {0x04, 0x02, 0x10, 0x10, 0x30, 0x30, 0x78, 0x78, 0x08, 0x08};
+    legacy_m95_send(kb, pkt1, 10, 174, 0x0000);
+    unsigned char pkt2[] = {0x02, 0x02, 0x03, 0x02, 0xff, 0x3c, 0x00, 0x00, 0x00, 0x06};
+    legacy_m95_send(kb, pkt2, 10, 3, 0x0000);
+    unsigned char pkt3[] = {0x01};
+    legacy_m95_send(kb, pkt3, 1, 100, 0x0000);
+
     kb->active = 1;
     kb->pollrate = -1;
     return 0;

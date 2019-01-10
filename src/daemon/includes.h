@@ -66,4 +66,6 @@ void timespec_add(struct timespec* timespec, long nanoseconds);
 // Common structs
 #include "structures.h"
 
+#define THREAD_NAME_MAX 16
+
 #endif  // INCLUDES_H

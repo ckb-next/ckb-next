@@ -209,9 +209,15 @@ int os_setupindicators(usbdevice* kb){
     kb->hw_ileds = kb->hw_ileds_old = kb->ileds = 0;
     // Create and detach thread to read LED events
     pthread_t thread;
+    // Give the thread a reasonable name
+    char ledthread_name[THREAD_NAME_MAX] = "ckbX led";
+
     int err = pthread_create(&thread, 0, _ledthread, kb);
     if(err != 0)
         return err;
+
+    ledthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+    pthread_setname_np(thread, ledthread_name);
     pthread_detach(thread);
     return 0;
 }

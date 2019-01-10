@@ -395,9 +395,15 @@ void register_mouse_event_tap(CFRunLoopTimerRef timer, void* info) {
 extern void keyretrigger(CFRunLoopTimerRef timer, void* info);
 #endif
 void* os_inputmain(void* context){
+    char inputthread_name[THREAD_NAME_MAX] = "ckbX input";
     usbdevice* kb = context;
 
     int index = INDEX_OF(kb, keyboard);
+
+    // name thread for debugging purposes
+    inputthread_name[3] = index + '0';
+    pthread_setname_np(inputthread_name);
+
     // Monitor input transfers on all endpoints for legacy devices
     // For non legacy ones, monitor all but the last, as it's used for input/output
     int count = IS_LEGACY_DEV(kb) ? kb->epcount : (kb->epcount - 1);

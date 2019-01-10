@@ -5,6 +5,7 @@
 #include "keymap.h"
 
 // Connected devices
+// If this gets raised to a double digit number, the changes introduced by commit f24988ab68a94 will need to be modified to accommodate for that
 #define DEV_MAX     9
 extern usbdevice keyboard[DEV_MAX];
 // Is a device active?

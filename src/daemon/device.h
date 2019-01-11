@@ -60,6 +60,7 @@ int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const ch
 int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 // Command: Set poll rate
 int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
+int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 
 // Sets a device's current mode index. This is only used on the legacy K95; the RGB keyboards have no gettable HW index.
 void setmodeindex_legacy(usbdevice* kb, int index);

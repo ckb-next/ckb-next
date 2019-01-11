@@ -24,6 +24,21 @@ int start_mouse_legacy(usbdevice* kb, int makeactive){
     return 0;
 }
 
+int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+
+    if(rate > 1 && (rate % 2 || rate > 8))
+        return 0;
+
+    legacy_m95_send(kb, NULL, 0, 10, rate);
+
+    // Device should disconnect+reconnect, but update the poll rate field in case it doesn't
+    kb->pollrate = rate;
+    return 0;
+}
+
 int setactive_mouse(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;

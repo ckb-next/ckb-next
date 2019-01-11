@@ -237,7 +237,7 @@ const devcmd vtable_mouse_legacy = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
     .fwupdate = cmd_io_none,
-    .pollrate = cmd_io_none,
+    .pollrate = cmd_pollrate_legacy,
 
     .active = cmd_io_none,
     .idle = cmd_io_none,

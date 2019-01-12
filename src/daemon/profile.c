@@ -66,9 +66,15 @@ int setid(usbid* id, const char* guid){
     uint data1;
     ushort data2, data3, data4a;
     uchar data4b[6];
+#ifdef OS_WINDOWS
+    if(__mingw_sscanf(guid, "{%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}",
+              &data1, &data2, &data3, &data4a, data4b, data4b + 1, data4b + 2, data4b + 3, data4b + 4, data4b + 5) != 10)
+        return 0;
+#else
     if(sscanf(guid, "{%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}",
               &data1, &data2, &data3, &data4a, data4b, data4b + 1, data4b + 2, data4b + 3, data4b + 4, data4b + 5) != 10)
         return 0;
+#endif
     memcpy(id->guid + 0x0, &data1, 4);
     memcpy(id->guid + 0x4, &data2, 2);
     memcpy(id->guid + 0x6, &data3, 2);
@@ -87,8 +93,13 @@ char* getid(usbid* id){
     memcpy(&data4a, id->guid + 0x8, 2);
     memcpy(data4b, id->guid + 0xA, 6);
     char* guid = malloc(39);
+#ifdef OS_WINDOWS
+    __mingw_snprintf(guid, 39, "{%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}",
+             data1, data2, data3, data4a, data4b[0], data4b[1], data4b[2], data4b[3], data4b[4], data4b[5]);
+#else
     snprintf(guid, 39, "{%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}",
              data1, data2, data3, data4a, data4b[0], data4b[1], data4b[2], data4b[3], data4b[4], data4b[5]);
+#endif
     return guid;
 }
 

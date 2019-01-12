@@ -42,19 +42,14 @@ void GradientButton::fromString(const QString& string){
     QByteArray cString = string.toLatin1();
     const char* data = cString.data();
     char pos = -1;
-#ifdef Q_OS_WIN32
-    int a, r, g, b;
-#else
     uchar a, r, g, b;
-#endif
     while(1){
         int scanned = 0;
+        signed char newpos;
 #ifdef Q_OS_WIN32
-        int newpos;
-        if(sscanf(data, "%d:%2x%2x%2x%2x%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
+        if(__mingw_sscanf(data, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
 #else
-        signed char newpos;
         if(sscanf(data, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
 #endif
@@ -70,7 +65,7 @@ void GradientButton::fromString(const QString& string){
     if(_stops.count() == 0){
         // If nothing was read, try a single ARGB constant.
 #ifdef Q_OS_WIN32
-        if(sscanf(data, "%2x%2x%2x%2x", &a, &r, &g, &b) == 4){
+        if(__mingw_sscanf(data, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
 #else
         if(sscanf(data, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
 #endif

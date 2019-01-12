@@ -30,7 +30,11 @@ int getfwversion(usbdevice* kb){
     char ident_str[3*MSG_SIZE+1] = "";
     memset(ident_str, 0, 3 * MSG_SIZE + 1);
     for (int i = 0; i < MSG_SIZE; i++) {
+#ifdef OS_WINDOWS
+        __mingw_sprintf(ident_str + (3 * i), "%02hhx ", in_pkt[i]);
+#else
         sprintf(ident_str + (3 * i), "%02hhx ", in_pkt[i]);
+#endif
     }
     ckb_info("Received identification packet: %s\n", ident_str);
     ushort vendor, product, version, bootloader;

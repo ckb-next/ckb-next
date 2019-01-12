@@ -13,9 +13,10 @@ bool DaemonPipe::open(int fd, QIODevice::OpenMode mode, QFileDevice::FileHandleF
 
 QByteArray DaemonPipe::readLine(qint64 maxSize)
 {
-    while(!this->waitForReadyRead() && !this->isOpen());
+    while(!this->waitForReadyRead());
     if(!this->isOpen())
         return QByteArray();
+
     return QLocalSocket::readLine(maxSize);
 }
 

@@ -115,8 +115,13 @@
 #define CKB_PARSE_LONG(param_name, value_ptr)                       if(!strcmp(name, param_name) && sscanf(value, "%ld", value_ptr) == 1)
 #define CKB_PARSE_DOUBLE(param_name, value_ptr)                     if(!strcmp(name, param_name) && sscanf(value, "%lf", value_ptr) == 1)
 #define CKB_PARSE_BOOL(param_name, value_ptr)                       if(!strcmp(name, param_name) && sscanf(value, "%d", value_ptr) == 1)
+#ifdef __WIN32
+#define CKB_PARSE_RGB(param_name, r_ptr, g_ptr, b_ptr)              if(!strcmp(name, param_name) && __mingw_sscanf(value, "%2hhx%2hhx%2hhx", r_ptr, g_ptr, b_ptr) == 3)
+#define CKB_PARSE_ARGB(param_name, a_ptr, r_ptr, g_ptr, b_ptr)      if(!strcmp(name, param_name) && __mingw_sscanf(value, "%2hhx%2hhx%2hhx%2hhx", a_ptr, r_ptr, g_ptr, b_ptr) == 4)
+#else
 #define CKB_PARSE_RGB(param_name, r_ptr, g_ptr, b_ptr)              if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx", r_ptr, g_ptr, b_ptr) == 3)
 #define CKB_PARSE_ARGB(param_name, a_ptr, r_ptr, g_ptr, b_ptr)      if(!strcmp(name, param_name) && sscanf(value, "%2hhx%2hhx%2hhx%2hhx", a_ptr, r_ptr, g_ptr, b_ptr) == 4)
+#endif
 #define CKB_PARSE_GRADIENT(param_name, gradient_ptr)                if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 0))
 #define CKB_PARSE_AGRADIENT(param_name, gradient_ptr)               if(!strcmp(name, param_name) && ckb_scan_grad(value, gradient_ptr, 1))
 #define CKB_PARSE_ANGLE(param_name, value_ptr)                      if(!strcmp(name, param_name) && sscanf(value, "%ld", value_ptr) == 1)
@@ -305,22 +310,14 @@ void ckb_alpha_blend(ckb_key* key, float a, float r, float g, float b){
 int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
     char pos = -1;
     unsigned char a = 255, r, g, b;
-#ifdef __WIN32
-    unsigned int a_i = 255, r_i, g_i, b_i;
-#endif
     int count = 0;
     while(1){
         int scanned = 0;
-#ifdef __WIN32
-        int newpos;
-        if(sscanf(string, "%d:%2x%2x%2x%2x%n", &newpos, &a_i, &r_i, &g_i, &b_i, &scanned) != 5)
-            break;
-        a = a_i;
-        r = r_i;
-        g = g_i;
-        b = b_i;
-#else
         signed char newpos;
+#ifdef __WIN32
+        if(__mingw_sscanf(string, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
+            break;
+#else
         if(sscanf(string, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
 #endif
@@ -340,8 +337,13 @@ int ckb_scan_grad(const char* string, ckb_gradient* gradient, int alpha){
     }
     if(count == 0){
         // If nothing was read, try a single ARGB constant.
+#ifdef __WIN32
+        if(__mingw_sscanf(string, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) != 4)
+            return 0;
+#else
         if(sscanf(string, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) != 4)
             return 0;
+#endif
         count = 2;
         gradient->pts[0] = 0;
         gradient->pts[1] = 100;
@@ -505,7 +507,11 @@ int main(int argc, char *argv[]){
                     printf("begin frame\n");
                     for(i = 0; i < ctx.keycount; i++){
                         ckb_key* key = ctx.keys + i;
+#ifdef __WIN32
+                        __mingw_printf("argb %s %02hhx%02hhx%02hhx%02hhx\n", key->name, key->a, key->r, key->g, key->b);
+#else
                         printf("argb %s %02hhx%02hhx%02hhx%02hhx\n", key->name, key->a, key->r, key->g, key->b);
+#endif
                     }
                     printf("end frame\n");
                     if(end)

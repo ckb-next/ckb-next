@@ -16,7 +16,7 @@ extern usbdevice keyboard[DEV_MAX];
 #elif defined(OS_WINDOWS)
 // Make sure we have at least one handle
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle[0])
-#warning FIXME
+//#warning FIXME
 #endif
 // A mutex used for USB controls. Needs to be locked before reading or writing the device handle or accessing its profile
 extern pthread_mutex_t devmutex[DEV_MAX];

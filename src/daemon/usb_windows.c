@@ -5,7 +5,6 @@
 #include "usb.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
 #include <libusbk.h>
 #include <windows.h>
 
@@ -56,7 +55,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         if(is_recv)
             if(pthread_mutex_lock(intmutex(kb)))
                 ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
-        success = kUSB.WritePipe(kb->handle[kb->ifcount - 1], kb->ifcount, out_msg, MSG_SIZE, &len, NULL);
+        success = kUSB.WritePipe(kb->handle[kb->ifcount - 1], kb->ifcount, (uchar*)out_msg, MSG_SIZE, &len, NULL);
     } else {
         // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
         /*struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
@@ -138,7 +137,7 @@ void os_sendindicators(usbdevice* kb) {
 void* os_inputmain(void* context){
     usbdevice* kb = context;
     uchar buffer[64];
-    int len;
+    unsigned int len;
     BOOL success = 1;
     while(1) {
         success = kUSB.ReadPipe(kb->handle[0], 0x81, buffer, sizeof(buffer), &len, NULL);
@@ -175,7 +174,7 @@ static int get_UTF8_string_desc(HANDLE* handle, UCHAR iString, char* out, size_t
     kPkt->Length = (USHORT)sizeof(buffer);
     UINT lengthTransferred;
     if (!kUSB.ControlTransfer(handle, Pkt, buffer, sizeof(buffer), &lengthTransferred, NULL))
-        ckb_err("Something elsest happened %d\n", GetLastError());
+        ckb_err("Something elsest happened %ld\n", GetLastError());
 
     // Sanity check:
     // 0x01 is bDescriptorType, which should be 0x03 for string descriptor
@@ -246,11 +245,11 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
             kPkt->Length = (USHORT)sizeof(configDescriptorBuffer);
 
             if (!kUSB.ControlTransfer(kb->handle[0], Pkt, configDescriptorBuffer, sizeof(configDescriptorBuffer), &lengthTransferred, NULL))
-                ckb_err("Something happened %d\n", GetLastError());
+                ckb_err("Something happened %ld\n", GetLastError());
             // Iterate
             DESCRIPTOR_ITERATOR descIterator;
             if (!InitDescriptorIterator(&descIterator, configDescriptorBuffer, lengthTransferred))
-                ckb_err("Something else happened %d\n", GetLastError());
+                ckb_err("Something else happened %ld\n", GetLastError());
 
             ckb_info("ckb%d is supposed to have %d interfaces\n", index, descIterator.Ptr.Config->bNumInterfaces);
             kb->ifcount = (descIterator.Ptr.Config->bNumInterfaces ? descIterator.Ptr.Config->bNumInterfaces : 2);
@@ -264,7 +263,7 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
             kPkt->ValueHi = USB_DESCRIPTOR_TYPE_DEVICE;
             kPkt->Length = (USHORT)sizeof(devDescrBuf);
             if (!kUSB.ControlTransfer(kb->handle[0], Pkt, devDescrBuf, sizeof(devDescrBuf), &lengthTransferred, NULL))
-                ckb_err("Something elser happened %d\n", GetLastError());
+                ckb_err("Something elser happened %ld\n", GetLastError());
             USB_DEVICE_DESCRIPTOR devDescr;
             memcpy(&devDescr, devDescrBuf, sizeof(devDescr));
             kb->fwversion = devDescr.bcdDevice;

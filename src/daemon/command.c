@@ -91,7 +91,7 @@ int readcmd(usbdevice* kb, const char* line){
                 command = i + CMD_FIRST;
 #ifndef OS_MAC
                 // Layout and mouse acceleration aren't used on Linux; ignore
-                if(command == LAYOUT || command == ACCEL || command == SCROLLSPEED)
+                if(command == LAYOUT || command == M_ACCEL || command == SCROLLSPEED)
                     command = NONE;
 #endif
                 // Most commands require parameters, but a few are actions in and of themselves

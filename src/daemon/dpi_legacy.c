@@ -13,7 +13,7 @@ void cmd_lift_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const
         return;
     mode->dpi.lift = heightnum;
 
-    legacy_m95_send(kb, NULL, 0, 13, heightnum);
+    legacy_m95_send(kb, NULL, 0, 13, heightnum - 1);
 }
 
 void cmd_snap_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* enable){

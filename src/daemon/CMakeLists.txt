@@ -455,8 +455,17 @@ endif ()
 
 if (LINUX)
   if (SAFE_INSTALL)
-    file(SHA256 "/etc/udev/rules.d/99-ckb-daemon.rules" SHASUM)
-    install(CODE "file(REMOVE \"/etc/udev/rules.d/99-ckb-daemon.rules\")")
+    install(CODE "
+    if (EXISTS \"/etc/udev/rules.d/99-ckb-daemon.rules\")
+        file(SHA256 \"/etc/udev/rules.d/99-ckb-daemon.rules\" SHASUM)
+        if(\"\${SHASUM}\" STREQUAL \"956c99d14effd3292a9575b1a918a598129121babd1296bc8772fcf809b7038a\"
+            OR \"\${SHASUM}\" STREQUAL \"b135705d4709ae39e6e2c736c2bc80b88255ed11c582e86fae5086e90f256913\")
+            message(\"-- Removing old 99-ckb-daemon.rules\")
+            file(REMOVE \"/etc/udev/rules.d/99-ckb-daemon.rules\")
+        else()
+            message(\"-- Not removing old 99-ckb-daemon.rules because it has been modified.\")
+        endif()
+    endif() ")
   endif ()
   install(
     FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-next-daemon.rules"

@@ -259,10 +259,10 @@ const devcmd vtable_mouse_legacy = {
     .rebind = cmd_rebind,
     .macro = cmd_macro,
 
-    .dpi = cmd_macro_none,
-    .dpisel = cmd_none,
-    .lift = cmd_none,
-    .snap = cmd_none,
+    .dpi = cmd_dpi,
+    .dpisel = cmd_dpisel,
+    .lift = cmd_lift_legacy,
+    .snap = cmd_snap_legacy,
 
     .notify = cmd_notify,
     .inotify = cmd_inotify,
@@ -276,5 +276,5 @@ const devcmd vtable_mouse_legacy = {
     .freeprofile = freeprofile,
     .updatergb = int1_int_none,
     .updateindicators = int1_void_none,
-    .updatedpi = int1_int_none  
+    .updatedpi = updatedpi_legacy
 };

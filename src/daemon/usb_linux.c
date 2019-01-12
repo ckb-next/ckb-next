@@ -13,7 +13,7 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
 int legacy_m95_send(usbdevice* kb, unsigned char* data, unsigned short len, unsigned char bRequest, unsigned short wValue) {
     struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, len, 5000, data };
-    return !ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    return ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
 }
 
 ////

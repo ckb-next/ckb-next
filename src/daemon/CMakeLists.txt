@@ -454,8 +454,12 @@ elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "unknown")
 endif ()
 
 if (LINUX)
+  if (SAFE_INSTALL)
+    file(SHA256 "/etc/udev/rules.d/99-ckb-daemon.rules" SHASUM)
+    install(CODE "file(REMOVE \"/etc/udev/rules.d/99-ckb-daemon.rules\")")
+  endif ()
   install(
-    FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-daemon.rules"
+    FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-next-daemon.rules"
     DESTINATION "/usr/lib/udev/rules.d"
     PERMISSIONS
     OWNER_READ OWNER_WRITE

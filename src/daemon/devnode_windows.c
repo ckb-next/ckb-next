@@ -80,7 +80,7 @@ int mknotifynode(usbdevice* kb, int notify){
     snprintf(outpath, sizeof(outpath), "%s%c\\notify%c", pipepath, index, notify_char);
     kb->outfifo[notify] = CreateNamedPipe(TEXT(outpath), PIPE_ACCESS_OUTBOUND , PIPE_WAIT, 1, 1024, 1024, 120 * 1000, NULL);
     if(kb->outfifo[notify] == INVALID_HANDLE_VALUE){
-        ckb_warn("Unable to create %s: %d\n", outpath, GetLastError());
+        ckb_warn("Unable to create %s: %ld\n", outpath, GetLastError());
         kb->outfifo[notify] = 0;
         return -1;
     }

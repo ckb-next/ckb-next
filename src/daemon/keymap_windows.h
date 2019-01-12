@@ -5,7 +5,7 @@
 #ifdef OS_WINDOWS
 
 // Replace Linux key constants with HID scancodes for Windows
-#warning "KEYMAP STUB"
+//#warning "KEYMAP STUB"
 
 #define KEY_ESC             0x0000
 #define KEY_F1              0x0000

@@ -21,9 +21,11 @@ void _vnprintf(HANDLE fifo, const char* format, va_list va_args){
     vsnprintf(buf, len, format, va_args);
     DWORD written = 0;
 
-    //ConnectNamedPipe(fifo, NULL);
+    //ConnectNamedPipe(fifo, NULL);Td.
+
 
     // We must not write the \0 to the pipe
+    ConnectNamedPipe(fifo, NULL);
     BOOL success = WriteFile(fifo, buf, len - 1, &written, NULL);
     int error = GetLastError();
     printf("Success: %d, writen %ld, out: %s, err %d\n", success, written, buf, error);

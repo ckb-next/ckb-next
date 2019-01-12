@@ -260,7 +260,7 @@ void inputupdate(usbdevice* kb){
 #elif defined(OS_MAC)
     if(!kb->event
 #elif defined(OS_WINDOWS)
-#warning STUB
+    // vmulti handle is sadly global for all devices
     if(0
 #endif
             || !kb->profile)

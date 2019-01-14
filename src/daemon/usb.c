@@ -84,6 +84,8 @@ device_desc models[] = {
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
     { V_CORSAIR, P_ST100, },
+    // Laptops,
+    { V_ITE, P_Y730, },
 };
 
 size_t N_MODELS = sizeof(models) / sizeof(device_desc);
@@ -117,6 +119,8 @@ int features_mask = -1;
 const char* vendor_str(ushort vendor){
     if(vendor == V_CORSAIR)
         return "corsair";
+    if(vendor == V_ITE)
+        return "ite";
     return "";
 }
 
@@ -188,6 +192,8 @@ const char* product_str(ushort product){
         return "polaris";
     if(product == P_ST100)
         return "st100";
+    if(product == P_Y730)
+        return "y730";
     return "";
 }
 
@@ -207,6 +213,8 @@ const char* product_str(ushort product){
 ///
 static const devcmd* get_vtable(ushort vendor, ushort product){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
+    if(vendor == V_ITE && product == P_Y730)
+        return &vtable_laptop_kb;
     if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;

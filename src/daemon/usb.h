@@ -42,7 +42,7 @@
 /// Currently known for this are \b usb_linux.c and \b usb_mac.c
 ///
 #define V_CORSAIR            0x1b1c
-#define V_CORSAIR_STR        "1b1c"
+#define V_ITE                0x048d
 
 #define P_K55                0x1b3d
 #define IS_K55(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K55)
@@ -119,8 +119,16 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 41
-extern ushort models[];
+#define P_Y730               0xc935
+
+extern size_t N_MODELS;
+
+typedef struct _device_desc {
+    ushort iVendor;
+    ushort iProduct;
+} device_desc;
+
+extern device_desc models[];
 
 ///
 /// Uncomment to see USB packets sent to the device

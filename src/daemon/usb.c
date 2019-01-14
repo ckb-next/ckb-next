@@ -9,53 +9,57 @@
 #include "usb.h"
 #include "keymap_patch.h"
 
-ushort models[N_MODELS] = {
+device_desc models[] = {
     // Keyboards
-    P_K55,
-    P_K63_NRGB,
-    P_K65,
-    P_K65_LEGACY,
-    P_K65_LUX,
-    P_K65_RFIRE,
-    P_K66,
-    P_K68,
-    P_K68_NRGB,
-    P_K70,
-    P_K70_LEGACY,
-    P_K70_LUX,
-    P_K70_LUX_NRGB,
-    P_K70_RFIRE,
-    P_K70_RFIRE_NRGB,
-    P_K70_MK2,
-    P_K70_MK2SE,
-    P_K70_MK2LP,
-    P_K90_LEGACY,
-    P_K95,
-    P_K95_LEGACY,
-    P_K95_PLATINUM,
-    P_STRAFE,
-    P_STRAFE_NRGB,
-    P_STRAFE_NRGB_2,
-    P_STRAFE_MK2,
+    { V_CORSAIR, P_K55, },
+    { V_CORSAIR, P_K63_NRGB, },
+    { V_CORSAIR, P_K65, },
+    { V_CORSAIR, P_K65_LEGACY, },
+    { V_CORSAIR, P_K65_LUX, },
+    { V_CORSAIR, P_K65_RFIRE, },
+    { V_CORSAIR, P_K66, },
+    { V_CORSAIR, P_K68, },
+    { V_CORSAIR, P_K68_NRGB, },
+    { V_CORSAIR, P_K70, },
+    { V_CORSAIR, P_K70_LEGACY, },
+    { V_CORSAIR, P_K70_LUX, },
+    { V_CORSAIR, P_K70_LUX_NRGB, },
+    { V_CORSAIR, P_K70_RFIRE, },
+    { V_CORSAIR, P_K70_RFIRE_NRGB, },
+    { V_CORSAIR, P_K70_MK2, },
+    { V_CORSAIR, P_K70_MK2SE, },
+    { V_CORSAIR, P_K70_MK2LP, },
+    { V_CORSAIR, P_K90_LEGACY, },
+    { V_CORSAIR, P_K95, },
+    { V_CORSAIR, P_K95_LEGACY, },
+    { V_CORSAIR, P_K95_PLATINUM, },
+    { V_CORSAIR, P_STRAFE, },
+    { V_CORSAIR, P_STRAFE_NRGB, },
+    { V_CORSAIR, P_STRAFE_NRGB_2, },
+    { V_CORSAIR, P_STRAFE_MK2, },
     // Mice
-    P_M65,
-    P_M65_PRO,
-    P_M65_RGB_ELITE,
-    P_M95,
-    P_GLAIVE,
-    P_SABRE_O,
-    P_SABRE_L,
-    P_SABRE_N,
-    P_SCIMITAR,
-    P_SCIMITAR_PRO,
-    P_SABRE_O2,
-    P_HARPOON,
-    P_KATAR,
+    { V_CORSAIR, P_M65, },
+    { V_CORSAIR, P_M65_PRO, },
+    { V_CORSAIR, P_M65_RGB_ELITE, },
+    { V_CORSAIR, P_M95, },
+    { V_CORSAIR, P_GLAIVE, },
+    { V_CORSAIR, P_SABRE_O, },
+    { V_CORSAIR, P_SABRE_L, },
+    { V_CORSAIR, P_SABRE_N, },
+    { V_CORSAIR, P_SCIMITAR, },
+    { V_CORSAIR, P_SCIMITAR_PRO, },
+    { V_CORSAIR, P_SABRE_O2, },
+    { V_CORSAIR, P_HARPOON, },
+    { V_CORSAIR, P_KATAR, },
     // Mousepads
-    P_POLARIS,
+    { V_CORSAIR, P_POLARIS, },
     // Headset stands
-    P_ST100,
+    { V_CORSAIR, P_ST100, },
+    // Laptops,
+    { V_ITE, P_Y730, },
 };
+
+size_t N_MODELS = sizeof(models) / sizeof(device_desc);
 
 /// brief .
 ///
@@ -84,6 +88,8 @@ int features_mask = -1;
 const char* vendor_str(ushort vendor){
     if(vendor == V_CORSAIR)
         return "corsair";
+    if(vendor == V_ITE)
+        return "ite";
     return "";
 }
 
@@ -151,6 +157,8 @@ const char* product_str(ushort product){
         return "polaris";
     if(product == P_ST100)
         return "st100";
+    if(product == P_Y730)
+        return "y730";
     return "";
 }
 
@@ -170,6 +178,8 @@ const char* product_str(ushort product){
 ///
 static const devcmd* get_vtable(ushort vendor, ushort product){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
+    if(vendor == V_ITE && product == P_Y730)
+        return &vtable_laptop_kb;
     if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;

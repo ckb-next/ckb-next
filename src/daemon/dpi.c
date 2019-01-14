@@ -50,19 +50,17 @@ void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const 
 }
 
 void cmd_dpisel(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* stage){
-    mode->dpi.current = 1;
-    return;
     (void)kb;
     (void)dummy1;
     (void)dummy2;
 
+    uchar stagenum;
 #ifdef OS_WINDOWS
-    uint stagenum;
-    if(sscanf(stage, "%u", &stagenum) != 1)
+    if(__mingw_sscanf(stage, "%hhu", &stagenum) != 1)
         return;
 #else
-    uchar stagenum;
-    if(sscanf(stage, "%u", &stagenum) != 1)
+
+    if(sscanf(stage, "%hhu", &stagenum) != 1)
         return;
 #endif
     if(stagenum > DPI_COUNT)

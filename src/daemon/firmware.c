@@ -33,7 +33,7 @@ int getfwversion(usbdevice* kb){
         sprintf(ident_str + (3 * i), "%02hhx ", in_pkt[i]);
     }
     ckb_info("Received identification packet: %s\n", ident_str);
-    short vendor, product, version, bootloader;
+    ushort vendor, product, version, bootloader;
     // Copy the vendor ID, product ID, version, and poll rate from the firmware data
     memcpy(&version, in_pkt + 8, 2);
     memcpy(&bootloader, in_pkt + 10, 2);

@@ -19,10 +19,10 @@ public:
 
     // Latest firmware version for a keyboard model. Will check for updates automatically and return the latest known version.
     // Zero if version unknown, -1.0 if ckb needs to be upgraded.
-    static inline float         versionForBoard(const short productID, bool waitForComplete = false)  { return instance._latestForBoard(productID, waitForComplete); }
+    static inline float         versionForBoard(const ushort productID, bool waitForComplete = false)  { return instance._latestForBoard(productID, waitForComplete); }
 
     // Downloads and extracts the latest firmware for a keyboard. Returns an empty array on failure.
-    static inline QByteArray    dataForBoard(const short productID)                                   { return instance._fileForBoard(productID); }
+    static inline QByteArray    dataForBoard(const ushort productID)                                   { return instance._fileForBoard(productID); }
 
     // Network manager object to use with QtNetwork
     QNetworkAccessManager* 	networkManager;
@@ -38,7 +38,7 @@ private:
         QString     url, fileName;
         QByteArray  hash;
         float       fwVersion, ckbVersion;
-        short       productID;
+        ushort       productID;
         FW();
     };
     QMap<QString, FW>   fwTable;
@@ -53,8 +53,8 @@ private:
 
     // Singleton instance
     bool                _checkUpdates();
-    float               _latestForBoard(const short productID, bool waitForComplete);
-    QByteArray          _fileForBoard(const short productID);
+    float               _latestForBoard(const ushort productID, bool waitForComplete);
+    QByteArray          _fileForBoard(const ushort productID);
     static KbFirmware   instance;
 
 signals:

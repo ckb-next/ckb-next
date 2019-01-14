@@ -14,9 +14,8 @@
 ///
 /// The list of defines in the first part of the file describes the various types of equipment from Corsair
 /// and summarizes them according to specific characteristics.
-/// \n Each device type is described with two defines:
-/// - On the one hand the device ID with which the device can be recognized on the USB as a short
-/// - and on the other hand the same representation as a string, but without leading "0x".
+/// \n Each device type is described with a define:
+///  - The device ID with which the device can be recognized on the USB as a ushort
 ///
 /// First entry-pair is the Provider ID (vendorID) from Corsair.
 ///
@@ -134,15 +133,15 @@ extern ushort models[];
 
 ///
 /// \brief vendor_str Vendor/product string representations
-/// \param vendor \a short vendor ID
+/// \param vendor \a ushort vendor ID
 /// \return a string: either "" or "corsair"
-const char* vendor_str(short vendor);
+const char* vendor_str(ushort vendor);
 
 ///
 /// \brief product_str returns a condensed view on what type of device we have.
-/// \param product is the \a short USB device product ID
+/// \param product is the \a ushort USB device product ID
 /// \return string to identify a type of device (see below)
-const char* product_str(short product);
+const char* product_str(ushort product);
 
 // Used for devices that use the CUE protocol but have no backlight
 #define HAS_NO_LIGHTS(kb)               (IS_K66(kb))

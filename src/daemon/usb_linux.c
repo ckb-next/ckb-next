@@ -11,9 +11,24 @@
 
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
-int legacy_m95_send(usbdevice* kb, unsigned char* data, unsigned short len, unsigned char bRequest, unsigned short wValue) {
-    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, len, 5000, data };
-    return ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
+    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, wIndex, len, 5000, data };
+    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    if (res <= 0){
+        int ioctlerrno = errno;
+        ckb_err_fn(" %s, res = 0x%x\n", file, line, res ? strerror(ioctlerrno) : "No data written", res);
+        if(res == -1 && ioctlerrno == ETIMEDOUT)
+            return -1;
+        else
+            return 0;
+
+    } else if (res != len)
+        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+
+#ifdef DEBUG_USB_SEND
+    print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
+#endif
+    return res;
 }
 
 ////

@@ -249,7 +249,7 @@ const devcmd vtable_mouse_legacy = {
     .id = cmd_id,
     .profileid = cmd_profileid,
 
-    .rgb = cmd_none,
+    .rgb = cmd_rgb,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,
@@ -274,7 +274,7 @@ const devcmd vtable_mouse_legacy = {
     .allocprofile = allocprofile,
     .loadprofile = loadprofile_none,
     .freeprofile = freeprofile,
-    .updatergb = int1_int_none,
+    .updatergb = updatergb_mouse_legacy,
     .updateindicators = int1_void_none,
     .updatedpi = updatedpi_legacy
 };

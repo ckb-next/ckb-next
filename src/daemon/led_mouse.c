@@ -97,14 +97,17 @@ int updatergb_mouse_legacy(usbdevice* kb, int force){
     // We only use "back" on the legacy M95 for consistency
     // 0x00 on R, G and B channels is off
     // Anything else is on
-    if(!force && !lastlight->forceupdate && !newlight->forceupdate
-            && lastlight->b[MOUSE_BACK_LED] == newlight->b[MOUSE_BACK_LED]
-            && lastlight->b[MOUSE_BACK_LED] == newlight->b[MOUSE_BACK_LED]
-            && lastlight->b[MOUSE_BACK_LED] == newlight->b[MOUSE_BACK_LED])
+    ushort lastwValue = !!(lastlight->r[MOUSE_BACK_LED] + lastlight->g[MOUSE_BACK_LED] + lastlight->b[MOUSE_BACK_LED]);
+    ushort newwValue = !!(newlight->r[MOUSE_BACK_LED] + newlight->g[MOUSE_BACK_LED] + newlight->b[MOUSE_BACK_LED]);
+    ckb_info("last w %u, neww %u\n", lastwValue, newwValue);
+    if(!force && !lastlight->forceupdate && !newlight->forceupdate && lastwValue == newwValue)
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
     
-    ushort wValue = !!(newlight->r[MOUSE_BACK_LED] + newlight->g[MOUSE_BACK_LED] + newlight->b[MOUSE_BACK_LED]);
-    usbsend_control(kb, NULL, 0, 49, wValue, 0);
+    lastlight->r[MOUSE_BACK_LED] = newlight->r[MOUSE_BACK_LED];
+    lastlight->g[MOUSE_BACK_LED] = newlight->g[MOUSE_BACK_LED];
+    lastlight->b[MOUSE_BACK_LED] = newlight->b[MOUSE_BACK_LED];
+
+    usbsend_control(kb, NULL, 0, 49, newwValue, 0);
     return 0;
 }

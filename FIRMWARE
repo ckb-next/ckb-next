@@ -19,7 +19,7 @@ Hash: SHA256
   Corsair K65RFIRERGB       2.05 https://www3.corsair.com/software/CUE_V3/K65RGBRAPIDFIRE.zip       0.2.8   K65RGBRAPIDFIRE_APP_V205.bin         9d2e933ab6c0102cba1a0af007a124c37b57766ea60b0d8935cb1b337e0b93e5    0x1b39
   Corsair K66               1.01 https://www3.corsair.com/software/CUE_V3/K66.zip                   0.2.9   K66_APP_V101.bin                     c98dc1eb9de45cb70e20552f141370bbd2c3148043e0684424bfd45a6ea8bb20    0x1b41
   Corsair K68               1.00 https://www3.corsair.com/software/CUE_V3/K68.zip                   0.2.9   K68_APP_V100.bin                     e743ba6fcb71ef48c6d80ffd2b28eb1d7ee30cb1d78189877c2f4449cd440def    0x1b3f
-  Corsair K68RGB            1.05 https://www3.corsair.com/software/CUE_V3/K68RGB.zip                0.2.9   K68_RGB_App_v1.05.bin                543f38cf7e6ecac671bd78abab60e3e32a6184d3e1b5153e05847a85801c2a81    0x1b4f
+  Corsair K68RGB            3.24 https://www3.corsair.com/software/CUE_V3/K68RGB.zip                0.3.2   Vlad_App_v3.24.2.bin                 64ee24ef1e769e5237fa116935bd55036f6ab925e79d527d0e847eaf41b602d9    0x1b4f
   Corsair K70RGB            2.05 https://www3.corsair.com/software/CUE_V3/K70RGB.zip                0.2.7   K70RGB_APP_V205.bin                  3e43bdcc5077dc413fbdee7ff6e57a978f758599142eef6979a96e3b8c3a566a    0x1b13
   Corsair K70LUX            2.04 https://www3.corsair.com/software/CUE_V3/K70LUX.zip                0.2.7   K70LUX_APP_V204.bin                  c2b5411e1dce391788eca294563801b32a14bf7802eb29688213f8f07e112966    0x1b36
   Corsair K70LUXRGB         3.08 https://www3.corsair.com/software/CUE_V3/K70LUXRGB.zip             0.3.2   K70%20LUX%20RGB_App_v308.bin         fba209ecf67735dd1eac6f0cc04432f423677ccf6518a0fcf6dae65efb6816aa    0x1b33
@@ -33,7 +33,7 @@ Hash: SHA256
   Corsair K95PLATINUMRGB    3.21 https://www3.corsair.com/software/CUE_V3/K95RGBPLATINUM.zip        0.3.2   Freya_App_v3.21.28.bin               5fdce6059d7ef0f044a89cb6693665cb0bfec807fb7b0579f1110cac0e3ee079    0x1b2d
   Corsair STRAFE            2.05 https://www3.corsair.com/software/CUE_V3/STRAFE.zip                0.2.7   STRAFE_APP_V205.bin                  c03e6b2e3f5e3269f49d74e158fa9b65a4752dd7c888f0a9e96147033e18d243    0x1b15
   Corsair STRAFERGB         3.08 https://www3.corsair.com/software/CUE_V3/STRAFERGB.zip             0.3.2   Strafe%20RGB_App_v308.bin            aeed03739338e58b06431dd006e0f5461132c12af66994b296d26df5aca905cb    0x1b20
-  Corsair STRAFERGBMK2      1.06 https://www3.corsair.com/software/CUE_V3/STRAFERGBMK.2.zip         0.3.0   Strafe_II_RGB_App_v1.06.bin          f6208966126ff1cf885995ac95a9c000056590d4325178731e06e224d3b0558b    0x1b48
+  Corsair STRAFERGBMK2      3.24 https://www3.corsair.com/software/CUE_V3/STRAFERGBMK.2.zip         0.3.2   Leonidas_App_v3.24.5.bin             be8f91edfd657bdb2ddcdf8058e54d74e9d8633f7c21c26334f756c2fad043e3    0x1b48
   Corsair STRAFE1B44        1.00 https://www3.corsair.com/software/CUE_V3/STRAFE_v1b1c-p1b44.zip    0.3.2   STRAFE_ISSI_APP_V100.bin             d292d90eeb17558dada5dfb664f293ed2a84e343aa74b529668ae12f1662ff93    0x1b44
   Corsair M65RGB            2.04 https://www3.corsair.com/software/CUE_V3/M65RGB.zip                0.2.7   M65RGB_App_v204.bin                  e1f09ce462f77071f91d92951410c14fb18061dd9760b3de89e45d1ca8b6b46c    0x1b12
   Corsair M65PRORGB         3.06 https://www3.corsair.com/software/CUE_V3/M65PRORGB.zip             0.3.2   M65Pro_App_v3.06.2.bin               9f78ef423dc2165ea8db2404f5d38e1215f633c4e554f08216526676153f1d01    0x1b2e
@@ -53,11 +53,11 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJcDtKIAAoJEN/iSOvc7y9fYU8H/3ZAX4MjYgUtWwn7bRfAJM21
-mTEF5DsNMWg6toiakqypkDeYAeex4woGkkGF+SGNTbcstHdUDHxk28gatNkJl6kX
-3RKz7fRVjRtD3y8doBa6r3qlwZulHP2UQbVK69beKPtAx7GzcvMkz0BvOJrJE2Z9
-iFjAgJJGUdd1TihxV94lJeY7np7RwJI0H9siQOvTyWHKmvtlBpDSJ7Kqenvv6NRx
-S1khERfTh/2PT8ix7WoMeSQpvGSzq8DLLjXcpLicg7fgyZN+r/d7bp9qmuM8VPZy
-2iuVMyadaxbDGU/tXFpD+osomg5Jz1ow2l1XuPtaFQ4Luk/SqJqFcFjIOQyz+oQ=
-=FZGL
+iQEcBAEBCAAGBQJcQkHvAAoJEN/iSOvc7y9fsqUIAJi55ATIVqHRrYXwjBhBoaZa
+TPcsjSEhF7G6YL+f9d6GkmcEoPX7v+EU3TXD7pwXffWzNEEwIyL0DsrEuM48OUAz
+EokTYE4+RTZES7+JV6/fDd8UFEdECa5UBcErWvSyp2ECODnZjpyp94G9dYcDHiRn
+C2iY8zQBXmZkAur4CJC0wsGZUVB/VmT0klMzSNAvshtf1bEM91slTMZjs4plzb0V
+tVLM2qD7ZsjTZCPmNSo2vfgXXB9flBaQPOv7WOLtcEp3opupunPcdQrAYnO65n3l
+2Xl9Lcbj3dG1S2h6UScb5xc2fqdTlAI0tkiivtu+tuZ56EdFhTMOT9O3RWqRd0Y=
+=ctpQ
 -----END PGP SIGNATURE-----

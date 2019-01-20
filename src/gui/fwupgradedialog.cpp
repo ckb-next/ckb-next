@@ -6,8 +6,8 @@
 
 // IDs for verifying firmware suitability
 struct KbId {
-    short vendor;
-    short product;
+    ushort vendor;
+    ushort product;
     const char* feature;
 };
 
@@ -68,8 +68,8 @@ void FwUpgradeDialog::cleanBlob(){
 }
 
 // Returns firmware version if valid for device, 0 if invalid
-static float verifyFw(const QByteArray& blob, const short productID) {
-    short vendor = 0x1b1c;      ///< Corsair has at the moment just one vendorID
+static float verifyFw(const QByteArray& blob, const ushort productID) {
+    ushort vendor = 0x1b1c;      ///< Corsair has at the moment just one vendorID
     if(blob.length() < 0x0108)
         return 0.f;
     const char* bData = blob.data();
@@ -88,7 +88,7 @@ static float verifyFw(const QByteArray& blob, const short productID) {
 }
 
 int FwUpgradeDialog::exec(){
-    short productID = kb->productID;
+    ushort productID = kb->productID;
 
     if(!blob.isEmpty()){
         // If a blob was already specified, check its version and validity

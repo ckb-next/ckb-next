@@ -270,7 +270,7 @@ void os_sendindicators(usbdevice* kb) {
 void* os_inputmain(void* context){
     usbdevice* kb = context;
     int fd = kb->handle - 1;
-    short vendor = kb->vendor, product = kb->product;
+    ushort vendor = kb->vendor, product = kb->product;
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Starting input thread for %s%d\n", devpath, index);
 
@@ -614,7 +614,7 @@ int os_setupusb(usbdevice* kb) {
     return 0;
 }
 
-int usbadd(struct udev_device* dev, short vendor, short product) {
+int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
     const char* path = udev_device_get_devnode(dev);
     const char* syspath = udev_device_get_syspath(dev);
     if(!path || !syspath || path[0] == 0 || syspath[0] == 0){

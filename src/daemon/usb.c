@@ -79,7 +79,7 @@ int features_mask = -1;
 /// else it returns ""
 ///
 /// \attention There is also a string defined V_CORSAIR_STR, which returns the device number as string in hex "1b1c".
-const char* vendor_str(short vendor){
+const char* vendor_str(ushort vendor){
     if(vendor == V_CORSAIR)
         return "corsair";
     return "";
@@ -106,7 +106,7 @@ const char* vendor_str(short vendor){
 /// The macros need the \a kb*,
 /// product_str() needs the \a product \a ID
 ///
-const char* product_str(short product){
+const char* product_str(ushort product){
     if(product == P_K95 || product == P_K95_LEGACY)
         return "k95";
     if(product == P_K95_PLATINUM)
@@ -162,7 +162,7 @@ const char* product_str(short product){
 ///
 /// \todo Is the last point really a good decision and always correct?
 ///
-static const devcmd* get_vtable(short vendor, short product){
+static const devcmd* get_vtable(ushort vendor, ushort product){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
     if(IS_MOUSE(vendor, product))
         return &vtable_mouse;
@@ -301,7 +301,7 @@ static void* _setupusb(void* context){
     pthread_mutex_lock(dmutex(kb));
     pthread_mutex_lock(imutex(kb));
     // Set standard fields
-    short vendor = kb->vendor, product = kb->product;
+    ushort vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
     kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(IS_MOUSE(vendor, product)) kb->features |= FEAT_ADJRATE;

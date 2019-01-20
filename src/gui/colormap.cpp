@@ -17,6 +17,8 @@ ColorMap::ColorMap(const ColorMap& rhs) :
 
 const ColorMap& ColorMap::operator=(const ColorMap& rhs){
     alloc(rhs._count);
+    if(!rhs._count)
+        return rhs;
     // Copy key names and colors
     // (Note: it's safe to copy the const char*'s because key names are constants and will never move or be deleted)
     memcpy(_keyNames, rhs._keyNames, sizeof(const char*) * _count);
@@ -59,6 +61,8 @@ void ColorMap::deAlloc(){
 }
 
 void ColorMap::clear(){
+    if(_colors == nullptr)
+        return;
     memset(_colors, 0, _count * sizeof(QRgb));
 }
 

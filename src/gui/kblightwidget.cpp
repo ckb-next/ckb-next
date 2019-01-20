@@ -85,6 +85,8 @@ void KbLightWidget::updateLight(){
 }
 
 void KbLightWidget::newSelection(QStringList selection){
+    if(light == nullptr)
+        return;
     // Determine selected color (invalid color if no selection or if they're not all the same)
     QColor selectedColor;
     const QColorMap& colorMap = light->colorMap();

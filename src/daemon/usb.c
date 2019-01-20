@@ -298,6 +298,7 @@ static void* _setupusb(void* context){
     /// - the standard delay time is initialized in kb->usbdelay
     ///
     usbdevice* kb = context;
+    pthread_mutex_lock(dmutex(kb));
     pthread_mutex_lock(imutex(kb));
     // Set standard fields
     short vendor = kb->vendor, product = kb->product;

@@ -397,7 +397,11 @@ void AnimScript::end(){
 }
 void AnimScript::readProcessErr(){
     QList<QByteArray> data = process->readAllStandardError().split('\n');
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     QString out = _info.name + " (" + QString::number(process->processId()) + ")";
+#else
+    QString out = _info.name;
+#endif
     for(int i = 0; i < data.length(); i++){
         QString str(data.at(i));
         if(str.isEmpty())

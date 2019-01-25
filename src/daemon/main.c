@@ -10,7 +10,6 @@ extern volatile int reset_stop;
 extern int features_mask;
 // device.c
 extern int hwload_mode;
-static void quitWithLock(char mut);
 
 // Timespec utility function
 void timespec_add(struct timespec* timespec, long nanoseconds){
@@ -24,22 +23,12 @@ void timespec_add(struct timespec* timespec, long nanoseconds){
 /// Stop working the daemon.
 /// function is called if the daemon received a sigterm
 /// In this case, locking the device-mutex is ok.
-static void quit(){
-    quitWithLock(1);
-}
-
-///
-/// \brief quitWithLock
-/// \param mut
-/// try to close files maybe without locking the mutex
-/// if mut == true then lock
-
-void quitWithLock(char mut) {
+static void quit() {
     // Abort any USB resets in progress
     reset_stop = 1;
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
-        if (mut) pthread_mutex_lock(devmutex + i);
+        pthread_mutex_lock(devmutex + i);
         if(IS_CONNECTED(keyboard + i)){
             revertusb(keyboard + i);
             closeusb(keyboard + i);

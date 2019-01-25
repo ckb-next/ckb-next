@@ -5,16 +5,12 @@
 #include "notify.h"
 #include <ckbnextconfig.h>
 
-static int main_ac;
-static char **main_av;
-
 // usb.c
 extern volatile int reset_stop;
 extern int features_mask;
 // device.c
 extern int hwload_mode;
 static void quitWithLock(char mut);
-extern int restart();
 
 // Timespec utility function
 void timespec_add(struct timespec* timespec, long nanoseconds){
@@ -90,8 +86,6 @@ int main(int argc, char** argv){
     // Set output pipes to buffer on newlines, if they weren't set that way already
     setlinebuf(stdout);
     setlinebuf(stderr);
-    main_ac = argc;
-    main_av = argv;
 
     printf("ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
@@ -217,22 +211,14 @@ int main(int argc, char** argv){
     sigdelset(&signals, SIGTERM);
     sigdelset(&signals, SIGINT);
     sigdelset(&signals, SIGQUIT);
-    sigdelset(&signals, SIGUSR1);
     // Set up signal handlers for quitting the service.
     sigprocmask(SIG_SETMASK, &signals, 0);
     signal(SIGTERM, sighandler);
     signal(SIGINT, sighandler);
     signal(SIGQUIT, sighandler);
-    signal(SIGUSR1, (void (*)())restart);
 
     // Start the USB system
     int result = usbmain();
     quit();
     return result;
-}
-
-int restart() {
-    ckb_err("restart called, running quit without mutex-lock.\n");
-    quitWithLock(0);
-    return main(main_ac, main_av);
 }

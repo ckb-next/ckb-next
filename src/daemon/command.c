@@ -52,8 +52,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 
     "notify",
     "inotify",
-    "get",
-    "restart"
+    "get"
 };
 
 #define TRY_WITH_RESET(action)  \
@@ -99,8 +98,7 @@ int readcmd(usbdevice* kb, const char* line){
                 if(command != SWITCH
                         && command != HWLOAD && command != HWSAVE
                         && command != ACTIVE && command != IDLE
-                        && command != ERASE && command != ERASEPROFILE
-                        && command != RESTART)
+                        && command != ERASE && command != ERASEPROFILE)
                     goto next_loop;
                 break;
             }
@@ -213,14 +211,6 @@ int readcmd(usbdevice* kb, const char* line){
                 // bad parameter to handle false commands like "delay off"
                 kb->delay = 0; // No delay.
             }
-            continue;
-        }
-        case RESTART: {
-            char mybuffer[] = "no reason specified";
-            if (sscanf(line, " %[^\n]", word) == -1) { ///< Because length of word is length of line + 1, there should be no problem with buffer overflow.
-                word = mybuffer;
-            }
-            vt->do_cmd[command](kb, mode, notifynumber, 0, word);
             continue;
         }
         default:;

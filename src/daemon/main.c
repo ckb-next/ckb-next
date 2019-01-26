@@ -11,6 +11,8 @@ extern int features_mask;
 // device.c
 extern int hwload_mode;
 
+int sighandler_pipe[2] = { 0, 0 };
+
 // Timespec utility function
 void timespec_add(struct timespec* timespec, long nanoseconds){
     nanoseconds += timespec->tv_nsec;
@@ -40,18 +42,54 @@ static void quit() {
     usbkill();
 }
 
-void sighandler2(int type){
-    // Don't use ckb_warn, we want an extra \n at the beginning
-    printf("\n[W] Ignoring signal %d (already shutting down)\n", type);
+///
+/// \brief ignore_signal
+/// Nested signal handler for previously received signals.
+/// \param type received signal type
+void ignore_signal(int type){
+    // Use signal-safe(7) write(3) call to print warning
+    write(1, "\n[W] Ignoring signal ", 22);
+    switch (type) {
+        case SIGTERM:
+            write(1, "SIGTERM", 7);
+            break;
+        case SIGINT:
+            write(1, "SIGINT", 6);
+            break;
+        case SIGQUIT:
+            write(1, "SIGQUIT", 7);
+            break;
+        default:
+            write(1, "UNKNOWN", 7);
+            break;
+    }
+    write(1, " (already shutting down)\n", 27);
 }
 
-void sighandler(int type){
-    signal(SIGTERM, sighandler2);
-    signal(SIGINT, sighandler2);
-    signal(SIGQUIT, sighandler2);
+///
+/// \brief exithandler
+/// Main signal handler to catch further signals and call shutdown
+/// sequence of daemon. This function is allowed to call unsafe
+/// (signal-safe(7)) function calls, as it is itself executed in another
+/// process via the socket handler.
+/// \param type received signal type
+void exithandler(int type){
+    signal(SIGTERM, ignore_signal);
+    signal(SIGINT, ignore_signal);
+    signal(SIGQUIT, ignore_signal);
+
     printf("\n[I] Caught signal %d\n", type);
     quit();
     exit(0);
+}
+
+///
+/// \brief signalhandler
+/// Write the received signal type to the socketpair for signal-safe(7)
+/// signal handling.
+/// \param type received signal type
+void sighandler(int type){
+    write(sighandler_pipe[SIGHANDLER_SENDER], &type, sizeof(int));
 }
 
 void localecase(char* dst, size_t length, const char* src){
@@ -194,17 +232,21 @@ int main(int argc, char** argv){
     if(!mkdevpath(keyboard))
         ckb_info("Root controller ready at %s0\n", devpath);
 
-    // Set signals
-    sigset_t signals;
-    sigfillset(&signals);
-    sigdelset(&signals, SIGTERM);
-    sigdelset(&signals, SIGINT);
-    sigdelset(&signals, SIGQUIT);
-    // Set up signal handlers for quitting the service.
-    sigprocmask(SIG_SETMASK, &signals, 0);
-    signal(SIGTERM, sighandler);
-    signal(SIGINT, sighandler);
-    signal(SIGQUIT, sighandler);
+    // Attempt to setup signal-safe signal handlers using socketpair(2)
+    if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sighandler_pipe) != -1){
+        sigset_t signals;
+        sigfillset(&signals);
+        sigdelset(&signals, SIGTERM);
+        sigdelset(&signals, SIGINT);
+        sigdelset(&signals, SIGQUIT);
+        // Set up signal handlers for quitting the service.
+        sigprocmask(SIG_SETMASK, &signals, 0);
+        signal(SIGTERM, sighandler);
+        signal(SIGINT, sighandler);
+        signal(SIGQUIT, sighandler);
+    } else
+        ckb_warn_nofile("Unable to setup signal handlers\n");
+
 
     // Start the USB system
     int result = usbmain();

@@ -217,7 +217,7 @@ const char* product_str(ushort product);
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 #define USB_DELAY_DEFAULT   5
-        
+
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();
 
@@ -379,5 +379,9 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 int usb_tryreset(usbdevice* kb);
 
 void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum);
+
+// receive message from initial sighandler socketpair communication
+extern int sighandler_pipe[2];
+extern void exithandler(int type);
 
 #endif  // USB_H

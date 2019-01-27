@@ -267,7 +267,6 @@ const devcmd vtable_mouse_legacy = {
     .notify = cmd_notify,
     .inotify = cmd_inotify,
     .get = cmd_get,
-    .restart = cmd_restart,
 
     .start = start_mouse_legacy, //
     .setmodeindex = int1_void_none,

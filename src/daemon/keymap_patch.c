@@ -17,10 +17,13 @@ keypatch k63patch[] = {
 #define K63PATCH_LEN sizeof(k63patch)/sizeof(*k63patch)
 
 keypatch m95patch[] = {
-    { 211 , "dpiup", -1, KEY_CORSAIR },
-    { 212 , "dpidn", -1, KEY_CORSAIR },
-    { 212 , "dpidn", -1, KEY_CORSAIR },
-    { 218,  "sniper", -1, KEY_CORSAIR },
+    { 208, "mouse7", -1, SCAN_MOUSE | BTN_BACK },
+    { 209, "mouse6", -1, SCAN_MOUSE | BTN_FORWARD },
+    { 210, "thumb6", -1, KEY_CORSAIR },
+    { 211, "dpiup",  -1, KEY_CORSAIR },
+    { 212, "dpidn",  -1, KEY_CORSAIR },
+    { 218, "sniper", -1, KEY_CORSAIR },
+
 };
 #define M95PATCH_LEN sizeof(m95patch)/sizeof(*m95patch)
 

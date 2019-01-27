@@ -83,7 +83,6 @@ const devcmd vtable_keyboard = {
     .notify = cmd_notify,
     .inotify = cmd_inotify,
     .get = cmd_get,
-    .restart = cmd_restart,
 
     .start = start_dev,
     .setmodeindex = int1_void_none,             ///< is just for non rgb keyboards
@@ -130,7 +129,6 @@ const devcmd vtable_keyboard_legacy = {
     .notify = cmd_notify,
     .inotify = cmd_inotify,
     .get = cmd_get,
-    .restart = cmd_restart,
 
     .start = start_kb_legacy,
     .setmodeindex = setmodeindex_legacy,        ///< This is special for legacy keyboards
@@ -177,7 +175,6 @@ const devcmd vtable_mouse = {
     .notify = cmd_notify,
     .inotify = cmd_none,
     .get = cmd_get,
-    .restart = cmd_restart,
 
     .start = start_dev,
     .setmodeindex = int1_void_none,         ///< Mice do not have different modes

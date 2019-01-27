@@ -5,16 +5,11 @@
 #include "notify.h"
 #include <ckbnextconfig.h>
 
-static int main_ac;
-static char **main_av;
-
 // usb.c
 extern volatile int reset_stop;
 extern int features_mask;
 // device.c
 extern int hwload_mode;
-static void quitWithLock(char mut);
-extern int restart();
 
 // Timespec utility function
 void timespec_add(struct timespec* timespec, long nanoseconds){
@@ -28,22 +23,12 @@ void timespec_add(struct timespec* timespec, long nanoseconds){
 /// Stop working the daemon.
 /// function is called if the daemon received a sigterm
 /// In this case, locking the device-mutex is ok.
-static void quit(){
-    quitWithLock(1);
-}
-
-///
-/// \brief quitWithLock
-/// \param mut
-/// try to close files maybe without locking the mutex
-/// if mut == true then lock
-
-void quitWithLock(char mut) {
+static void quit() {
     // Abort any USB resets in progress
     reset_stop = 1;
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
-        if (mut) pthread_mutex_lock(devmutex + i);
+        pthread_mutex_lock(devmutex + i);
         if(IS_CONNECTED(keyboard + i)){
             revertusb(keyboard + i);
             closeusb(keyboard + i);
@@ -90,8 +75,6 @@ int main(int argc, char** argv){
     // Set output pipes to buffer on newlines, if they weren't set that way already
     setlinebuf(stdout);
     setlinebuf(stderr);
-    main_ac = argc;
-    main_av = argv;
 
     printf("ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
@@ -217,22 +200,14 @@ int main(int argc, char** argv){
     sigdelset(&signals, SIGTERM);
     sigdelset(&signals, SIGINT);
     sigdelset(&signals, SIGQUIT);
-    sigdelset(&signals, SIGUSR1);
     // Set up signal handlers for quitting the service.
     sigprocmask(SIG_SETMASK, &signals, 0);
     signal(SIGTERM, sighandler);
     signal(SIGINT, sighandler);
     signal(SIGQUIT, sighandler);
-    signal(SIGUSR1, (void (*)())restart);
 
     // Start the USB system
     int result = usbmain();
     quit();
     return result;
-}
-
-int restart() {
-    ckb_err("restart called, running quit without mutex-lock.\n");
-    quitWithLock(0);
-    return main(main_ac, main_av);
 }

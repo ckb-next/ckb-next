@@ -58,9 +58,8 @@ typedef enum {
     NOTIFY,
     INOTIFY,
     GET,
-    RESTART,
 
-    CMD_LAST = RESTART
+    CMD_LAST = GET
 } cmd;
 #define CMD_COUNT       (CMD_LAST - CMD_FIRST + 2)
 #define CMD_DEV_COUNT   (CMD_LAST - CMD_VT_FIRST + 1)
@@ -118,7 +117,6 @@ typedef union devcmd {
         cmdhandler notify;
         cmdhandler inotify;
         cmdhandler get;
-        cmdhandler restart;
 
         // Extra functions not command-related
         // device.h

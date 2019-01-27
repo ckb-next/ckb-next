@@ -654,7 +654,6 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
                 strncpy(kbsyspath[index], syspath, FILENAME_MAX);
                 // Mutex remains locked
                 setupusb(kb);
-                pthread_mutex_unlock(dmutex(kb));
                 return 0;
             }
         }

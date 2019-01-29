@@ -493,11 +493,9 @@ int os_setupusb(usbdevice* kb){
 #endif
     // Get the device firmware version
     (*kb->handle)->GetDeviceReleaseNumber(kb->handle, &kb->fwversion);
-#ifdef DEBUG
     int devnode = INDEX_OF(kb, keyboard);
     ckb_info("ckb%i USB handles: 0: %p, 1: %p, 2:%p, 3: %p\n", devnode, kb->ifusb[0], kb->ifusb[1], kb->ifusb[2], kb->ifusb[3]);
     ckb_info("ckb%i HID handles: 0: %p, 1: %p, 2:%p, 3: %p\n", devnode, kb->ifhid[0], kb->ifhid[1], kb->ifhid[2], kb->ifhid[3]);
-#endif
     return 0;
 }
 
@@ -703,9 +701,7 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
         err = (*if_handle)->USBInterfaceOpenSeize(if_handle);   // no wait_loop here because this is expected to fail
         if(err == kIOReturnSuccess){
             kb->ifusb[iface_count] = if_handle;
-#ifdef DEBUG
-            ckb_info("Adding USB handle with id %i\n", iface_count);
-#endif
+            ckb_info("ckb%d: Adding USB handle with id %i\n", index, iface_count);
             iface_success++;
             // Register for removal notification
             IOServiceAddInterestNotification(notify, iface, kIOGeneralInterest, remove_device, kb, kb->rm_notify + 1 + iface_count);
@@ -851,9 +847,6 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
             return 0;
         }
     }
-#ifdef DEBUG
-        ckb_info("Adding HID handle with id %i\n", handle_idx);
-#endif
     // Use the location ID key to group the handles together
     uint32_t location = hidgetlong(handle, CFSTR(kIOHIDLocationIDKey));
     int index = find_device(idvendor, idproduct, location, handle_idx + 1);
@@ -862,6 +855,8 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         return 0;
     }
     usbdevice* kb = keyboard + index;
+
+    ckb_info("ckb%d: Adding HID handle with id %i\n", index, handle_idx);
 
     // Read the serial number and name (if not done yet)
     if(!keyboard[index].serial[0] && !keyboard[index].name[0]){

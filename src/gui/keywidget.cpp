@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -114,53 +114,51 @@ void KeyWidget::paintEvent(QPaintEvent*){
     if(!keyMap.isKeyboard()){
         // Draw mouse overlays
         const QImage* overlay = 0;
-        float xpos = 0.f, ypos = 0.f;
+        float xpos = 0.f, ypos = -2.f;
         if(model == KeyMap::M65 || model == KeyMap::M65E){
             if(!m65Overlay)
                 m65Overlay = new QImage(":/img/overlay_m65.png");
             overlay = m65Overlay;
             xpos = 2.f;
-            ypos = -2.f;
         } else if(model == KeyMap::SABRE){
             if(!sabOverlay)
                 sabOverlay = new QImage(":/img/overlay_sabre.png");
             overlay = sabOverlay;
             xpos = 1.f;
-            ypos = -2.f;
         } else if(model == KeyMap::SCIMITAR){
             if(!scimOverlay)
                 scimOverlay = new QImage(":/img/overlay_scimitar.png");
             overlay = scimOverlay;
             xpos = 3.5f;
-            ypos = -2.f;
         } else if(model == KeyMap::HARPOON){
             if(!harpOverlay)
                 harpOverlay = new QImage(":/img/overlay_harpoon.png");
             overlay = harpOverlay;
             xpos = 3.5f;
-            ypos = -2.f;
         } else if(model == KeyMap::GLAIVE){
             if(!glaiveOverlay)
                 glaiveOverlay = new QImage(":/img/overlay_glaive.png");
             overlay = glaiveOverlay;
             xpos = 3.5f;
-            ypos = -2.f;
         } else if(model == KeyMap::KATAR){
             if(!katarOverlay)
                 katarOverlay = new QImage(":/img/overlay_katar.png");
             overlay = katarOverlay;
             xpos = 3.5f;
-            ypos = -2.f;
         } else if(model == KeyMap::POLARIS){
             if(!polarisOverlay)
                 polarisOverlay = new QImage(":/img/overlay_polaris.png");
             overlay = polarisOverlay;
-            xpos = -19.5;
-            ypos = -2.f;
+            xpos = -19.5f;
         } else if(model == KeyMap::ST100){
             xpos = -18.5;
-            ypos = -2.f;
+        } else if(model == KeyMap::M95){
+            if(!m95Overlay)
+                m95Overlay = new QImage(":/img/overlay_m95.png");
+            overlay = m95Overlay;
+            xpos = 2.f;
         }
+
         if(!overlay){
             QImage *blank = new QImage(810, 700, QImage::Format_ARGB32);
             QColor newcol = QColor(bgColor);
@@ -271,6 +269,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
         } else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName().startsWith("Logo")) {
             w += 10.f;
             x -= 5.f;
+            bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
+        } else if (model == KeyMap::M95) {
             bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
         } else {
             if(!strcmp(key.name, "enter")){

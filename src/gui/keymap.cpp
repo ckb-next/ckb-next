@@ -349,10 +349,13 @@ static const Key ScimKeys[] = {
 
 // M95
 static const Key M95Keys[] = {
-    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
-    {0, "Mouse 4", "thumb6", 0, 25, 5, 15, false, true},
-    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "DPI Up (5)", "dpiup", 0, 19, 4, 6, false, true}, {0, "DPI Down (6)", "dpidn", 0, 31, 4, 6, false, true},
-    {0, "Forward (6)", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back (5)", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper (14)", "sniper", 0, 45, 5, 15, false, true},
+    {0, "Left Mouse", "mouse1", 9, 6, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 30, 6, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
+    {0, "4", "thumb6", 23, 28, 7, 12, false, true},
+    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "DPI Up (5)", "dpiup", 5, -1, 6, 9, false, true}, {0, "DPI Down (6)", "dpidn", 5, 6, 6, 9, false, true},
+    {0, "Forward (7)", "mouse6", -42, 14, 14, 8, false, true}, {0, "Back (8)", "mouse7", -30, 14, 14, 8, false, true}, {0, "Sniper (14)", "sniper", -40, 20, 8, 14, false, true},
+    {0, "9", "thumb1", -18, 14, 18, 8, false, true}, {0, "15", "thumb7", -18, 20, 10, 20, false, true},
+    {0, "10", "thumb2", -10, 21, 10, 11, false, true},{0, "11", "thumb3", -10, 30, 10, 11, false, true},
+    {0, "12", "thumb4", -18, 38, 18, 8, false, true}, {0, "13", "thumb5", -34, 38, 18, 8, false, true},
 
 };
 #define KEYCOUNT_M95    (sizeof(M95Keys) / sizeof(Key))

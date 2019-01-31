@@ -37,7 +37,8 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     if(!device->features.contains("rgb")){
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
-        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
+        if(device->model() != KeyMap::M95)
+            ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
     } else {
         // Remove mouse Performance tab from non-mice
         if(!device->isMouse())
@@ -46,6 +47,11 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         if(!device->isKeyboard())
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
     }
+
+    // If we have an M95, set the performance tab as such
+    if(device->model() == KeyMap::M95)
+        ui->mPerfWidget->setLegacyM95();
+
     // Hide poll rate and FW update as appropriate
     if(!device->features.contains("pollrate")){
         ui->pollLabel->hide();

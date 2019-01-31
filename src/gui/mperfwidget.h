@@ -28,6 +28,8 @@ public:
 
     static const int DPI_COUNT = KbPerf::DPI_COUNT;
     static const int DPI_MIN = KbPerf::DPI_MIN, DPI_MAX = KbPerf::DPI_MAX;
+    void setLegacyM95();
+
 
 private:
     Ui::MPerfWidget *ui;
@@ -53,6 +55,8 @@ private:
 
     // Hack: prevent recursive slot calls
     bool isSetting;
+
+    void hideItemsInLayout(QLayout* layout);
 
 private slots:
     void colorClicked(int index);

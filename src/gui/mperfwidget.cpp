@@ -2,6 +2,7 @@
 #include "ui_mperfwidget.h"
 #include "modeselectdialog.h"
 #include <cmath>
+#include <QDebug>
 
 const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 
@@ -165,6 +166,61 @@ void MPerfWidget::sliderYMoved(int index){
     if(!ui->xyBox->isChecked())
         // X/Y linked?
         stages[index].xSlider->setValue(slider->value());
+}
+
+void MPerfWidget::hideItemsInLayout(QLayout* layout)
+{
+    int cnt = layout->count();
+    for(int i = 0; i < cnt; i++)
+    {
+        qDebug() << layout->itemAt(i);
+        if(layout->itemAt(i)->widget() != nullptr)
+            layout->itemAt(i)->widget()->deleteLater();
+    }
+}
+
+void MPerfWidget::setLegacyM95(){
+    // FIXME: it still shows 5 stages
+    ui->eBox4->setChecked(false);
+    ui->eBox5->setChecked(false);
+    QWidget* w[] =  {
+        ui->indicBox,
+        ui->spinBox,
+        //hideItemsInLayout();
+        //ui->horizontalLayout_4->deleteLater();
+
+        // Hide colour buttons
+        ui->iButton0,
+        ui->iButton1,
+        ui->iButton2,
+        ui->iButton3,
+        ui->iButton4,
+        ui->iButton5,
+        ui->iButtonO,
+
+        // Hide stages 4, 5, and other completely
+        ui->label_3,
+        ui->label_15,
+
+        // Hide checkboxes as we can't disable DPI stages
+        ui->eBox1,
+        ui->eBox2,
+        ui->eBox3,
+        ui->eBox4,
+        ui->eBox5,
+        ui->label_13,
+        ui->label_8,
+        ui->xSlider4,
+        ui->xSlider5,
+        ui->ySlider4,
+        ui->ySlider5,
+        ui->xBox4,
+        ui->xBox5,
+        ui->yBox5,
+        ui->yBox4
+    };
+    for(size_t i = 0; i < sizeof(w) / sizeof(QWidget*); i++)
+        w[i]->hide();
 }
 
 void MPerfWidget::boxXChanged(int index){

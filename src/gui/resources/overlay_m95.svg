@@ -16,7 +16,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="overlay_m95.svg">
+   sodipodi:docname="overlay_m95.svg"
+   inkscape:export-filename="/home/tatokis/ckb-next/newrepo/ckb-next/src/gui/resources/overlay_m95.png"
+   inkscape:export-xdpi="72.999077"
+   inkscape:export-ydpi="72.999077">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -26,11 +29,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.64189453"
-     inkscape:cx="159.81286"
-     inkscape:cy="613.68013"
+     inkscape:zoom="1.1772245"
+     inkscape:cx="201.42227"
+     inkscape:cy="596.34258"
      inkscape:document-units="px"
-     inkscape:current-layer="layer7"
+     inkscape:current-layer="layer3"
      showgrid="false"
      fit-margin-top="1"
      fit-margin-left="1"
@@ -38,7 +41,7 @@
      fit-margin-bottom="1"
      inkscape:window-width="1920"
      inkscape:window-height="1056"
-     inkscape:window-x="1680"
+     inkscape:window-x="3600"
      inkscape:window-y="24"
      inkscape:window-maximized="1" />
   <metadata
@@ -49,7 +52,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -87,10 +90,12 @@
      transform="translate(-128.57407,-208.98898)">
     <path
        style="display:inline;opacity:1;fill:#414045;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 242.64111,213.04987 -24.14727,166.30458 -34.46828,0 -50.04716,362.98798 c -12.22935,82.7485 60.1598,166.98904 129.30473,232.9043 C 417.61772,1078.5397 478.4668,1033.48 532.79781,977.58357 596.71094,895.19222 641.68057,799.2698 633.28161,665.22695 623.6563,599.57237 604.36125,522.21857 592.24138,463.43786 580.24349,405.24871 579.0035,349.1554 570.18713,288.99692 529.94168,271.43332 485.28986,249.70858 445.04441,239.4199 L 423.74563,658.9954 372.33531,658.60593 349.8681,219.50956 c -47.06871,-5.44317 -70.79111,-5.00383 -107.22699,-6.45969 z"
+       d="m 220.19274,216.35348 -1.6989,163.00097 -34.46828,0 -50.04716,362.98798 c -12.22935,82.7485 60.1598,166.98904 129.30473,232.9043 C 417.61772,1078.5397 478.4668,1033.48 532.79781,977.58357 596.71094,895.19222 641.68057,799.2698 633.28161,665.22695 623.6563,599.57237 604.36125,522.21857 592.24138,463.43786 580.24349,405.24871 579.0035,349.1554 570.18713,288.99692 529.94168,271.43332 485.28986,249.70858 445.04441,239.4199 L 423.74563,658.9954 372.33531,658.60593 349.8681,219.50956 c -47.06871,-5.44317 -93.23948,-1.70022 -129.67536,-3.15608 z"
        id="path4172"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccccscccccc" />
+       sodipodi:nodetypes="cccccccscccccc"
+       inkscape:export-xdpi="74.1408"
+       inkscape:export-ydpi="74.1408" />
   </g>
   <g
      inkscape:groupmode="layer"

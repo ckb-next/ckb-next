@@ -263,6 +263,9 @@ int main(int argc, char *argv[]){
         QThread::sleep(5);
 
 #ifdef Q_OS_MACOS
+    // Force ini on mac, as there is data loss with the native format
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+
     disableAppNap();
 
     FILE *fp = fopen("/tmp/ckb", "w");

@@ -31,8 +31,20 @@ static QSettings* globalSettings(){
             _globalSettings = new QSettings;
             qInfo() << "Path to settings:" << _globalSettings->fileName();
             // Check if a config migration attempt needs to be made.
+            // On mac, first check if we need to migrate from plist to ini
+            // If we copy nothing from this, we can go and try to migrate straight from the old ckb namespace
+            if(!_globalSettings->value("Program/CkbNextIniMigrationChecked", false).toBool()) {
+#ifdef Q_OS_MAC
+                CkbSettings::migrateSettings(true);
+#endif
+                // on other platforms, just mark it as true so that if someone migrates settings from linux to mac, it will not try to migrate
+                _globalSettings->setValue("Program/CkbNextIniMigrationChecked", true);
+            }
             if(!_globalSettings->value("Program/CkbMigrationChecked", false).toBool()){
-                CkbSettings::migrateSettings();
+                CkbSettings::migrateSettings(false);
+                // Mark settings as migrated
+                _globalSettings->setValue("Program/CkbMigrationChecked", true);
+
             }
             // Put the settings object in a separate thread so that it won't lock up the GUI when it syncs
             globalThread = new QThread;
@@ -47,8 +59,13 @@ bool CkbSettings::isBusy(){
     return cacheWritesInProgress.load() > 0;
 }
 
-void CkbSettings::migrateSettings(){
-    QSettings* oldSettings = new QSettings("ckb", "ckb");
+void CkbSettings::migrateSettings(bool macFormat){
+    QSettings* oldSettings;
+    if(macFormat)
+        oldSettings = new QSettings(QSettings::NativeFormat, QSettings::UserScope, "ckb-next", "ckb-next");
+    else
+        oldSettings = new QSettings("ckb", "ckb");
+
     // On macOS and iOS, allKeys() will return some extra keys for global settings that apply to all applications.
     // These keys can be read using value() but cannot be changed, only shadowed. Calling setFallbacksEnabled(false) will hide these global settings.
     // https://doc.qt.io/qt-5/qsettings.html
@@ -62,8 +79,6 @@ void CkbSettings::migrateSettings(){
             QVariant value = oldSettings->value(key);
             _globalSettings->setValue(key, value);
         }
-        // Mark settings as migrated
-        _globalSettings->setValue("Program/CkbMigrationChecked", true);
         qInfo() << oldKeys.count() << "keys migrated.";
     }
     delete oldSettings;

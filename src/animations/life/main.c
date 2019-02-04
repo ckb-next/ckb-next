@@ -28,6 +28,7 @@ void ckb_info() {
     CKB_PRESET_END;
 }
 
+ckb_gradient animcolor = { 0 };
 long tng = 120;
 long delay = 120;
 int keystate[108] = { [0 ... 107] = 1 };
@@ -58,6 +59,7 @@ adjacencynode adjacencygraph[108] = {
 };
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
+    CKB_PARSE_AGRADIENT("color", &animcolor){}
     CKB_PARSE_LONG("delay", &delay) {}
     tng = delay;
 }
@@ -70,10 +72,14 @@ void draw_key(ckb_key *key, int r, int g, int b) {
 }
 
 void draw_key_state(ckb_key *key, int s) {
-    key->a = 255;
-    key->r = 255*s;
-    key->g = 255*s;
-    key->b = 255*s;
+    if (s > 0) {
+        key->a = 255;
+    } else {
+        key->a = 0;
+    }
+    key->r = 255;
+    key->g = 255;
+    key->b = 255;
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {

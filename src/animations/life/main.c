@@ -76,7 +76,7 @@ void draw_key_state(ckb_key *key, int s) {
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
-    for (unsigned i = 0; i < 108; i++) {
+    for (int i = 0; i < 108; i++) {
         if (!strcmp(key->name, adjacencygraph[i].name)) {
             //flip the designated key
             keypressed[i]++;
@@ -91,7 +91,7 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
 
 void ckb_time(ckb_runctx* context, double delta) {
     //This is the game loop
-    unsigned count = context->keycount;
+    int count = context->keycount;
     //Will require a clock speed
     tng -= delta;
     if (tng == 0) {
@@ -99,14 +99,14 @@ void ckb_time(ckb_runctx* context, double delta) {
         tng += delay;
         //record the current living cells
         int livmap[108];
-        for (unsigned i = 0; i < 108; i++) { livmap[i] = keystate[i]; }
+        for (int i = 0; i < 108; i++) { livmap[i] = keystate[i]; }
         //compute changes before ticking
-        for (unsigned i = 0; i < 108; i++) {
+        for (int i = 0; i < 108; i++) {
             int neighborhood = 0;
             //count the active keys near this key
-            for (unsigned j = 0; j < 10; j++) {
+            for (int j = 0; j < 10; j++) {
                 //match neighbors
-                for (unsigned k = 0; k < count; k++) {
+                for (int k = 0; k < count; k++) {
                     if (!strcmp(adjacencygraph[mapkey[k]].name, adjacencygraph[i].neighbors[j])) {
                         if (keystate[mapkey[k]]) {
                             neighborhood++;
@@ -123,12 +123,12 @@ void ckb_time(ckb_runctx* context, double delta) {
             }
         }
         //tick changes
-        for (unsigned i = 0; i < 108; i++) {
+        for (int i = 0; i < 108; i++) {
             keystate[i] = livmap[i];
         }
     }
     //render
-    for (unsigned i = 0; i < 108; i++) {
+    for (int i = 0; i < 108; i++) {
         ckb_key* key = context->keys + keymap[i];
         if (keystate[i] > 0) {
             draw_key_state(key, 1);
@@ -139,10 +139,10 @@ void ckb_time(ckb_runctx* context, double delta) {
 }
 
 void ckb_init(ckb_runctx* context) {
-    unsigned count = context->keycount;
-    for (unsigned i = 0; i < count; i++) {
+    int count = context->keycount;
+    for (int i = 0; i < count; i++) {
         ckb_key* key = context->keys + i;
-        for (unsigned j = 0; j < 108; j++) {
+        for (int j = 0; j < 108; j++) {
             if (!strcmp(key->name, adjacencygraph[j].name)) {
                 keymap[j] = (int) i;
                 mapkey[i] = (int) j;

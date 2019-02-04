@@ -66,6 +66,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
 
 void draw_key_state(ckb_key *key, int s) {
     float a, r, g, b;
+    //tng = delay causes keys to go dark for a second here, I like it.
     ckb_grad_color(&a, &r, &g, &b, &animcolor, tng*100.f/delay);
     a = s>0? 255: 0;
     key->a = a;

@@ -12,7 +12,8 @@ void ckb_info() {
 
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
-	CKB_PARAM_LONG("delay", "Frames to next generation", "frames", 120, 10, 1000);
+	CKB_PARAM_LONG("growdelay", "Frames to next generation", "frames", 120, 10, 1000);
+    CKB_PARAM_BOOL("refresh", "Refresh living cells on keypress", 0);
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NAME);
@@ -22,7 +23,6 @@ void ckb_info() {
     
     // Presets
     CKB_PRESET_START("Default");
-    CKB_PRESET_PARAM("delay", "120");
     CKB_PRESET_PARAM("trigger", "0");
     CKB_PRESET_PARAM("kptrigger", "1");
     CKB_PRESET_END;
@@ -30,7 +30,8 @@ void ckb_info() {
 
 ckb_gradient animcolor = { 0 };
 long tng = 120;
-long delay = 120;
+long growdelay = 120;
+int refreshing = 0;
 int keystate[108] = { [0 ... 107] = 1 };
 int keypressed[108] = { 0 };
 //translate keycontext to adjacencygraph
@@ -59,15 +60,16 @@ adjacencynode adjacencygraph[108] = {
 };
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
-    CKB_PARSE_AGRADIENT("color", &animcolor){}
-    CKB_PARSE_LONG("delay", &delay) {}
-    tng = delay;
+    CKB_PARSE_AGRADIENT("color", &animcolor) {}
+    CKB_PARSE_LONG("growdelay", &growdelay) {}
+    CKB_PARSE_BOOL("refresh", &refreshing) {}
+    tng = growdelay;
 }
 
 void draw_key_state(ckb_key *key, int s) {
     float a, r, g, b;
-    //tng = delay causes keys to go dark for a second here, I like it.
-    ckb_grad_color(&a, &r, &g, &b, &animcolor, tng*100.f/delay);
+    //tng = growdelay causes keys to go dark for a second here, I like it.
+    ckb_grad_color(&a, &r, &g, &b, &animcolor, tng*100.f/growdelay);
     a = s>0? 255: 0;
     key->a = a;
     key->r = r;
@@ -76,6 +78,8 @@ void draw_key_state(ckb_key *key, int s) {
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
+    //give the user more time to edit their board
+    if (refreshing > 0) { tng = growdelay; }
     for (int i = 0; i < 108; i++) {
         if (!strcmp(key->name, adjacencygraph[i].name)) {
             //flip the designated key
@@ -96,7 +100,7 @@ void ckb_time(ckb_runctx* context, double delta) {
     tng -= delta;
     if (tng == 0) {
         //Grow/Die each cell this tick
-        tng += delay;
+        tng += growdelay;
         //record the current living cells
         int livmap[108];
         for (int i = 0; i < 108; i++) { livmap[i] = keystate[i]; }

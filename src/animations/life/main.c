@@ -64,22 +64,14 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     tng = delay;
 }
 
-void draw_key(ckb_key *key, int r, int g, int b) {
-    key->a = 255;
+void draw_key_state(ckb_key *key, int s) {
+    float a, r, g, b;
+    ckb_grad_color(&a, &r, &g, &b, &animcolor, tng*100.f/delay);
+    a = s>0? 255: 0;
+    key->a = a;
     key->r = r;
     key->g = g;
     key->b = b;
-}
-
-void draw_key_state(ckb_key *key, int s) {
-    if (s > 0) {
-        key->a = 255;
-    } else {
-        key->a = 0;
-    }
-    key->r = 255;
-    key->g = 255;
-    key->b = 255;
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {

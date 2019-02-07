@@ -290,7 +290,7 @@ void KbProfileDialog::on_exportButton_clicked(){
     bool compress = JlCompress::compressFiles(filename, tmpExported);
 
     if(!compress)
-        QMessageBox::warning(this, tr("Error"), tr("An error occured while exporting the selected profiles."), QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Error"), tr("An error occurred while exporting the selected profiles."), QMessageBox::Ok);
 
     extractedFileCleanup(tmpExported);
 

@@ -1,5 +1,4 @@
 #include <ckb-next/animation.h>
-#include <stdio.h>
 
 void ckb_info() {
     // Plugin info
@@ -12,8 +11,8 @@ void ckb_info() {
 
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
-	CKB_PARAM_LONG("growdelay", "Frames to next generation", "frames", 120, 10, 1000);
-    CKB_PARAM_BOOL("refresh", "Refresh living cells on keypress", 0);
+	CKB_PARAM_LONG("growdelay", "Frames to next generation", "frames", 60, 10, 1000);
+    CKB_PARAM_BOOL("refresh", "Refresh living cells on keypress", 1);
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NAME);
@@ -28,27 +27,34 @@ void ckb_info() {
     CKB_PRESET_END;
 }
 
+// user parameter variables
 ckb_gradient animcolor = { 0 };
 long tng = 120;
 long growdelay = 120;
 int refreshing = 0;
+
+// main memory
 int keystate[108] = { [0 ... 107] = 1 };
 int keypressed[108] = { 0 };
-//translate keycontext to adjacencygraph
-int keymap[108];
-int mapkey[108];
-
 
 typedef struct {
     char* name;
     char* neighbors[10];
 } adjacencynode;
 
-//kissing connectivity
+typedef struct {
+    int address[10];
+} addressbook;
+
+// translate keycontext to adjacencygraph
+int keymap[108];
+// translate keynames to adjacencygraph
+addressbook neighbors[108];
+// editable adjacencygraph using kissing connectivity
 adjacencynode adjacencygraph[108] = {
     {"esc", {"f1", "grave", "1", "", "", "", "", "", "", ""}}, {"f1", {"esc", "f2", "grave", "1", "2", "", "", "", "", ""}}, {"f2", {"f1", "f3", "2", "3", "", "", "", "", "", ""}}, {"f3", {"f2", "f4", "3", "4", "", "", "", "", "", ""}}, {"f4", {"f3", "f5", "4", "5", "6", "", "", "", "", ""}}, {"f5", {"f4", "f6", "5", "6", "7", "", "", "", "", ""}}, {"f6", {"f5", "f7", "7", "8", "", "", "", "", "", ""}}, {"f7", {"f6", "f8", "8", "9", "", "", "", "", "", ""}}, {"f8", {"f7", "f9", "9", "0", "minus", "", "", "", "", ""}}, {"f9", {"f8", "f10", "0", "minus", "equal", "", "", "", "", ""}}, {"f10", {"f9", "f11", "minus", "equal", "bspace", "", "", "", "", ""}}, {"f11", {"f10", "f12", "equal", "bspace", "", "", "", "", "", ""}}, {"f12", {"f11", "prtscn", "bspace", "", "", "", "", "", "", ""}}, {"prtscn", {"f12", "scroll", "bspace", "ins", "home", "", "", "", "", ""}}, {"scroll", {"prtscn", "pause", "ins", "home", "pgup", "", "", "", "", ""}}, {"pause", {"scroll", "stop", "home", "pgup", "numlock", "", "", "", "", ""}}, {"stop", {"pause", "prev", "pgup", "numlock", "numslash", "", "", "", "", ""}}, {"prev", {"stop", "play", "numlock", "numslash", "numstar", "", "", "", "", ""}}, {"play", {"prev", "next", "numslash", "numstar", "numminus", "", "", "", "", ""}}, {"next", {"play", "numstar", "numminus", "", "", "", "", "", "", ""}},
     
-    {"grave", {"esc", "f1", "1", "tab", "", "", "", "", "", ""}}, {"1", {"esc", "f1", "grave", "2", "tab", "q", "", "", "", ""}}, {"2", {"f1", "f2", "1", "3", "q", "w", "", "", "", ""}}, {"3", {"f2", "f3", "2", "4", "w", "e", "", "", "", ""}}, {"4", {"f3", "f4", "3", "5", "e", "r", "", "", "", ""}}, {"5", {"f4", "f5", "4", "6", "r", "t", "", "", "", ""}}, {"6", {"f4", "f5", "5", "7", "t", "y", "", "", "", ""}}, {"7", {"f5", "f6", "6", "8", "y", "u", "", "", "", ""}}, {"8", {"f6", "f7", "7", "9", "u", "i", "", "", "", ""}}, {"9", {"f7", "f8", "8", "0", "i", "o", "", "", "", ""}}, {"0", {"f8", "f9", "9", "minus", "o", "p", "", "", "", ""}}, {"minus", {"f8", "f9", "f10", "0", "equal", "p", "lbrace", "", "", ""}}, {"equal", {"f9", "f10", "f11", "minus", "bspace", "lbrace", "rbrace", "", "", ""}}, {"bspace", {"f10", "f11", "f12", "prtscn", "equal", "ins", "rbrace", "bslash", "del", ""}}, {"ins", {"f12", "prtscn", "scroll", "bspace", "home", "bslash", "del", "end", "", ""}}, {"home", {"prtsscn", "scroll", "pause", "ins", "pgup", "del", "end", "pgdn", "", ""}}, {"pgup", {"scroll", "pause", "stop", "home", "pgup", "numlock", "end", "pgdn", "num7", ""}}, {"numlock", {"pause", "stop", "prev", "pgup", "numslash", "pgdn", "num7", "num8", "", ""}}, {"numslash", {"stop", "prev", "play", "numlock", "numstar", "num7", "num8", "num9", "", ""}}, {"numstar", {"prev", "play", "next", "numslash", "numminus", "num8", "num9", "numplus", "", ""}}, {"numminus", {"play", "next", "num9", "numplus", "", "", "", "", "", ""}},
+    {"grave", {"esc", "f1", "1", "tab", "", "", "", "", "", ""}}, {"1", {"esc", "f1", "grave", "2", "tab", "q", "", "", "", ""}}, {"2", {"f1", "f2", "1", "3", "q", "w", "", "", "", ""}}, {"3", {"f2", "f3", "2", "4", "w", "e", "", "", "", ""}}, {"4", {"f3", "f4", "3", "5", "e", "r", "", "", "", ""}}, {"5", {"f4", "f5", "4", "6", "r", "t", "", "", "", ""}}, {"6", {"f4", "f5", "5", "7", "t", "y", "", "", "", ""}}, {"7", {"f5", "f6", "6", "8", "y", "u", "", "", "", ""}}, {"8", {"f6", "f7", "7", "9", "u", "i", "", "", "", ""}}, {"9", {"f7", "f8", "8", "0", "i", "o", "", "", "", ""}}, {"0", {"f8", "f9", "9", "minus", "o", "p", "", "", "", ""}}, {"minus", {"f8", "f9", "f10", "0", "equal", "p", "lbrace", "", "", ""}}, {"equal", {"f9", "f10", "f11", "minus", "bspace", "lbrace", "rbrace", "", "", ""}}, {"bspace", {"f10", "f11", "f12", "prtscn", "equal", "ins", "rbrace", "bslash", "del", ""}}, {"ins", {"f12", "prtscn", "scroll", "bspace", "home", "bslash", "del", "end", "", ""}}, {"home", {"prtscn", "scroll", "pause", "ins", "pgup", "del", "end", "pgdn", "", ""}}, {"pgup", {"scroll", "pause", "stop", "home", "pgup", "numlock", "end", "pgdn", "num7", ""}}, {"numlock", {"pause", "stop", "prev", "pgup", "numslash", "pgdn", "num7", "num8", "", ""}}, {"numslash", {"stop", "prev", "play", "numlock", "numstar", "num7", "num8", "num9", "", ""}}, {"numstar", {"prev", "play", "next", "numslash", "numminus", "num8", "num9", "numplus", "", ""}}, {"numminus", {"play", "next", "num9", "numplus", "", "", "", "", "", ""}},
 
     {"tab", {"grave", "1", "q", "caps", "", "", "", "", "", ""}}, {"q", {"tab", "1", "2", "w", "a", "caps", "", "", "", ""}}, {"w", {"q", "2", "3", "e", "s", "a", "", "", "", ""}}, {"e", {"w", "3", "4", "r", "d", "s", "", "", "", ""}}, {"r", {"e", "4", "5", "t", "f", "d", "", "", "", ""}}, {"t", {"r", "5", "6", "y", "g", "f", "", "", "", ""}}, {"y", {"t", "6", "7", "u", "h", "g", "", "", "", ""}}, {"u", {"y", "7", "8", "i", "j", "h", "", "", "", ""}}, {"i", {"u", "8", "9", "o", "k", "j", "", "", "", ""}}, {"o", {"i", "9", "0", "p", "l", "k", "", "", "", ""}}, {"p", {"o", "0", "minus", "lbrace", "colon", "l", "", "", "", ""}}, {"lbrace", {"p", "minus", "equal", "rbrace", "quote", "colon", "", "", "", ""}}, {"rbrace", {"lbrace", "equal", "bspace", "bslash", "enter", "quote", "", "", "", ""}}, {"bslash", {"rbrace", "bspace", "ins", "del", "enter", "", "", "", "", ""}}, {"del", {"bslash", "bspace", "ins", "home", "end", "enter", "", "", "", ""}}, {"end", {"del", "ins", "home", "pgup", "pgdn", "", "", "", "", ""}}, {"pgdn", {"end", "home", "pgup", "numlock", "num7", "num4", "", "", "", ""}}, {"num7", {"pgdn", "pgup", "numlock", "numslash", "num8", "num5", "num4", "", "", ""}}, {"num8", {"numlock", "numslash", "numstar", "num9", "num6", "num5", "num4", "", "", ""}}, {"num9", {"num8", "numslash", "numstar", "numminus", "numplus", "num6", "num5", "", "", ""}}, {"numplus", {"num9", "numstar", "numminus", "numenter", "num3", "num6", "", "", "", ""}},
 
@@ -59,6 +65,7 @@ adjacencynode adjacencygraph[108] = {
     {"lctrl", {"lshift", "lwin", "", "", "", "", "", "", "", ""}}, {"lwin", {"lctrl", "lshift", "z", "lalt", "", "", "", "", "", ""}}, {"lalt", {"lwin", "z", "x", "space", "", "", "", "", "", ""}}, {"space", {"lalt", "x", "c", "v", "b", "n", "m", "comma", "dot", "ralt"}}, {"ralt", {"space", "comma", "dot", "slash", "rwin", "", "", "", "", ""}}, {"rwin", {"ralt", "slash", "rshift", "rmenu", "", "", "", "", "", ""}}, {"rmenu", {"rwin", "rshift", "rctrl", "", "", "", "", "", "", ""}}, {"rctrl", {"rmenu", "rshift", "left", "", "", "", "", "", "", ""}}, {"left", {"rctrl", "rshift", "up", "down", "", "", "", "", "", ""}}, {"down", {"left", "up", "down", "right", "", "", "", "", "", ""}}, {"right", {"down", "up", "num1", "num0", "", "", "", "", "", ""}}, {"num0", {"right", "num1", "num2", "num3", "numdot", "", "", "", "", ""}}, {"numdot", {"num0", "num1", "num2", "num3", "numenter", "", "", "", "", ""}}
 };
 
+// load user settings
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     CKB_PARSE_AGRADIENT("color", &animcolor) {}
     CKB_PARSE_LONG("growdelay", &growdelay) {}
@@ -66,9 +73,10 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     tng = growdelay;
 }
 
+// render a single key
 void draw_key_state(ckb_key *key, int s) {
     float a, r, g, b;
-    //tng = growdelay causes keys to go dark for a second here, I like it.
+    // tng = growdelay causes keys to go dark for a second here, I like it.
     ckb_grad_color(&a, &r, &g, &b, &animcolor, tng*100.f/growdelay);
     a = s>0? 255: 0;
     key->a = a;
@@ -77,12 +85,13 @@ void draw_key_state(ckb_key *key, int s) {
     key->b = b;
 }
 
+// update the board for user input
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
-    //give the user more time to edit their board
+    // optionally give the user more time to edit their board
     if (refreshing > 0) { tng = growdelay; }
     for (int i = 0; i < 108; i++) {
         if (!strcmp(key->name, adjacencygraph[i].name)) {
-            //flip the designated key
+            // ignore keyups
             keypressed[i]++;
             if (keypressed[i] > 1) { keypressed[i] = 0; }
             else {
@@ -93,29 +102,24 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
     }
 }
 
+// This is the game loop
 void ckb_time(ckb_runctx* context, double delta) {
-    //This is the game loop
-    int count = context->keycount;
-    //Will require a clock speed
+    // track clock speed
     tng -= delta;
     if (tng == 0) {
-        //Grow/Die each cell this tick
+        // Grow/Die each cell this tick
         tng += growdelay;
-        //record the current living cells
+        // record the current living cells
         int livmap[108];
         for (int i = 0; i < 108; i++) { livmap[i] = keystate[i]; }
-        //compute changes before ticking
+        // compute changes before ticking
         for (int i = 0; i < 108; i++) {
             int neighborhood = 0;
-            //count the active keys near this key
+            // count the active keys near this key
             for (int j = 0; j < 10; j++) {
-                //match neighbors
-                for (int k = 0; k < count; k++) {
-                    if (!strcmp(adjacencygraph[mapkey[k]].name, adjacencygraph[i].neighbors[j])) {
-                        if (keystate[mapkey[k]]) {
-                            neighborhood++;
-                        }
-                    }
+                // finally use the precompute to make the game loop less soupy
+                if (keystate[neighbors[i].address[j]]) {
+                    neighborhood++;
                 }
             }
             if (neighborhood < 2) {
@@ -126,12 +130,12 @@ void ckb_time(ckb_runctx* context, double delta) {
                 livmap[i] = 0;
             }
         }
-        //tick changes
+        // tick changes
         for (int i = 0; i < 108; i++) {
             keystate[i] = livmap[i];
         }
     }
-    //render
+    // render
     for (int i = 0; i < 108; i++) {
         ckb_key* key = context->keys + keymap[i];
         if (keystate[i] > 0) {
@@ -142,6 +146,14 @@ void ckb_time(ckb_runctx* context, double delta) {
     }
 }
 
+// translate a keyname to an adjacencygraph index
+int name2num(char* keyname){
+    int i = -1;
+    do { i++; } while(i < 108 && !!strcmp(keyname, adjacencygraph[i].name));
+    return i;
+}
+
+// messy precompute instead of messier preset data
 void ckb_init(ckb_runctx* context) {
     int count = context->keycount;
     for (int i = 0; i < count; i++) {
@@ -149,12 +161,19 @@ void ckb_init(ckb_runctx* context) {
         for (int j = 0; j < 108; j++) {
             if (!strcmp(key->name, adjacencygraph[j].name)) {
                 keymap[j] = (int) i;
-                mapkey[i] = (int) j;
+                for (int k =0; k < 10; k++) {
+                    if (!!strcmp(adjacencygraph[j].neighbors[k], "")) {
+                        neighbors[j].address[k] = name2num(adjacencygraph[j].neighbors[k]);
+                    }
+                }
             }
         }
     }
 }
- 
+
+
+
+// define unused builtins
 void ckb_start(ckb_runctx* context, int state) {
     
 }

@@ -116,7 +116,13 @@ if (MACOS)
     set(INSTALL_DIR_ANIMATIONS "ckb-next.app/Contents/Resources/${ANIMATIONS_DIR_NAME}"
         CACHE STRING "Where to install animations.")
 elseif (LINUX)
-    set(INSTALL_DIR_ANIMATIONS "${CMAKE_INSTALL_LIBEXECDIR}/${ANIMATIONS_DIR_NAME}"
+    option(DEBIANIZE_INSTALL_PATHS "Install files according to Debian and FreeDesktop.org policy" OFF)
+    if (${DEBIANIZE_INSTALL_PATHS})
+        set(_ANIMATION_PREFIX ${CMAKE_INSTALL_LIBDIR})
+    else()
+        set(_ANIMATION_PREFIX ${CMAKE_INSTALL_LIBEXECDIR})
+    endif()
+    set(INSTALL_DIR_ANIMATIONS "${_ANIMATION_PREFIX}/${ANIMATIONS_DIR_NAME}"
         CACHE STRING "Where to install animations.")
 endif ()
 

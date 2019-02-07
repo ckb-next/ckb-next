@@ -417,9 +417,14 @@ if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
         GROUP_READ
         WORLD_READ)
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
+    if(${DEBIANIZE_INSTALL_PATHS})
+        set(_SYSTEMD_PATH "/lib/systemd/system")
+    else()
+        set(_SYSTEMD_PATH "/usr/lib/systemd/system")
+    endif()
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
-        DESTINATION "/usr/lib/systemd/system"
+        DESTINATION ${_SYSTEMD_PATH}
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ
@@ -467,9 +472,14 @@ if (LINUX)
         endif()
     endif() ")
   endif ()
+  if (${DEBIANIZE_INSTALL_PATHS})
+    set(_UDEV_PATH "/lib/udev/rules.d")
+  else()
+    set(_UDEV_PATH "/usr/lib/udev/rules.d")
+  endif()
   install(
     FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-next-daemon.rules"
-    DESTINATION "/usr/lib/udev/rules.d"
+    DESTINATION ${_UDEV_PATH}
     PERMISSIONS
     OWNER_READ OWNER_WRITE
     GROUP_READ

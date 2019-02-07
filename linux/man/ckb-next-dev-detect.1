@@ -1,0 +1,18 @@
+.TH CKB-NEXT-DEV-DETECT 1
+.SH NAME
+ckb-next-dev-detect \- generate a ckb device summary for bug reports
+.SH SYNOPSIS
+.B ckb-next-dev-detect
+[\fB\-\-nouserinput\fR]
+.SH DESCRIPTION
+.B ckb-next-dev-detect
+generates a report of the current platofrm including kernel, qt, and xdg
+version, journalctl output, and the date. The report is output to
+ckb-next-dev-detect-report.gz in the current/working directory.
+.PP
+Submit the bug and report to \fIhttps://github.com/ckb-next/ckb-next/issues\fR
+.SH OPTIONS
+.TP
+.BR \-\-nouserinput\fR
+Changes the output directory to /tmp instead of the current/working directory
+and inhibits some messages to stdout.

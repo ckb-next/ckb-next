@@ -1,0 +1,38 @@
+.TH CKB-NEXT-DAEMON 8
+.SH NAME
+ckb-next-daemon \- Corsair RGB driver daemon
+.SH SYNOPSIS
+.B ckb-next-daemon
+[\fB\-\-gid\fR=\fI<gid>\fR]
+[\fB\-\-hwload\fR=\fI<always|\f[BI]try\fI|never>\fR]
+[\fB\-\-nonotify\fR]
+[\fB\-\-nobind\fR]
+[\fB\-\-nonroot\fR]
+.SH DESCRIPTION
+See \fIhttps://github.com/ckb-next/ckb-next/blob/master/DAEMON.md\fR
+for full instructions.
+.SH OPTIONS
+.TP
+.BR \-\-gid =\fI<gid>\fR
+Restrict access to /dev/input/ckb* nodes to users in group \fI<gid>\fR.
+.TP
+.BR \-\-hwload =\fI<always|\f[BI]try\fI|never>\fR
+\-\-hwload=\fIalways\fR will force loading of stored hardware profiles on
+compatible devices. May result in long startup times.
+.br
+\-\-hwload=\fItry\fR will try to load the profiles, but give up if not
+immediately successful (default).
+.br
+\-\-hwload=\fInever\fR will ignore hardware profiles completely.
+.TP
+.BR \-\-nonotify
+Disables key monitoring/notifications. Note that this makes reactive lighting
+impossible.
+.TP
+.BR \-\-nobind
+Disables all key rebinding, macros, and notifications. Implies
+\fB\-\-nonotify\fR.
+.TP
+.BR \-\-nonroot
+Allows running \fBckb-next-daemon\fR as a non root user. This will almost
+certainly not work. Use only if you know what you're doing.

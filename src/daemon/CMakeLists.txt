@@ -474,6 +474,36 @@ if (LINUX)
     OWNER_READ OWNER_WRITE
     GROUP_READ
     WORLD_READ)
+
+  add_custom_command(
+    OUTPUT 
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-dev-detect.1.gz"
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.1.gz"
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-daemon.8.gz"
+    COMMAND gzip -c "${CMAKE_SOURCE_DIR}/linux/man/ckb-next-dev-detect.1" > "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-dev-detect.1.gz"
+    COMMAND gzip -c "${CMAKE_SOURCE_DIR}/linux/man/ckb-next.1" > "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.1.gz"
+    COMMAND gzip -c "${CMAKE_SOURCE_DIR}/linux/man/ckb-next-daemon.8" > "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-daemon.8.gz"
+    DEPENDS 
+      "${CMAKE_SOURCE_DIR}/linux/man/ckb-next-dev-detect.1"
+      "${CMAKE_SOURCE_DIR}/linux/man/ckb-next.1"
+      "${CMAKE_SOURCE_DIR}/linux/man/ckb-next-daemon.8"
+    COMMENT "Generating man pages")
+
+  add_custom_target(man ALL
+    DEPENDS 
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-dev-detect.1.gz"
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.1.gz"
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-daemon.8.gz"
+  )
+
+  install(
+    FILES 
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-dev-detect.1.gz"
+      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.1.gz"
+    DESTINATION "${CMAKE_INSTALL_FULL_MANDIR}/man1/")
+  install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-daemon.8.gz"
+    DESTINATION "${CMAKE_INSTALL_FULL_MANDIR}/man8/")
 endif ()
 
 if (MACOS AND NOT MAC_LEGACY)

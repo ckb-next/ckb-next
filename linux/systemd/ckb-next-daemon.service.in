@@ -3,6 +3,7 @@
 
 [Unit]
 Description=Corsair Keyboards and Mice Daemon
+Documentation=man:ckb-next-daemon
 
 [Service]
 ExecStart=@CMAKE_INSTALL_PREFIX@/bin/ckb-next-daemon

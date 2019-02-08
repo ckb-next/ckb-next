@@ -356,13 +356,15 @@ void* os_inputmain(void* context){
 
     udev_enumerate_unref(enumerate);
     /// The userSpaceFS knows the URBs now, so start monitoring input
+    int err_no = 0;
     while (1) {
         struct usbdevfs_urb* urb = 0;
 
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
         if (ioctl(fd, USBDEVFS_REAPURB, &urb)) {
-            if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN || errno == EBADF)
+            err_no = errno;
+            if (errno == ENODEV || errno == ENOENT || errno == EBADF)
                 // Stop the thread if the handle closes
                 break;
             else if(errno == EPIPE && urb){
@@ -381,8 +383,9 @@ void* os_inputmain(void* context){
         ///
         if (urb) {
             // If we're shutting down, don't submit another urb, or try to process the data on this one
-            if(urb->status == -ESHUTDOWN)
+            if(urb->status == -ESHUTDOWN && err_no != EINTR)
                 break;
+
             process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
 
             /// Re-submit the URB for the next run.

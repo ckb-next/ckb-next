@@ -37,6 +37,7 @@ Hash: SHA256
   Corsair STRAFE1B44        3.08 https://www3.corsair.com/software/CUE_V3/STRAFE_v1b1c-p1b44.zip    0.3.2   Strafe%20ISSI_App_v308.bin           e6fc6e5bbd9bb54e1a53d9fd35fe6b17133ed43ccaaa7bc4c7df2dad48c6fe84    0x1b44
   Corsair M65RGB            3.02 https://www3.corsair.com/software/CUE_V3/M65RGB.zip                0.3.2   M65RGB_APP_v302RC.bin                a99cca31dfc801be73a5ff540d9edf291f242bc187c8c624c04b25d903b13098    0x1b12
   Corsair M65PRORGB         3.06 https://www3.corsair.com/software/CUE_V3/M65PRORGB.zip             0.3.2   M65Pro_App_v3.06.2.bin               9f78ef423dc2165ea8db2404f5d38e1215f633c4e554f08216526676153f1d01    0x1b2e
+  Corsair M65RGBELITE       3.24 https://www3.corsair.com/software/CUE_V3/M65RGBELITE.zip           0.3.2   BlackHeart_App_v3.24.4.bin           3181c9162bd4ff01d2637028144a319041104fc0c8ba4ebba36460103b92e067    0x1b5a
   Corsair SCIMITARRGB       3.04 https://www3.corsair.com/software/CUE_V3/Scimitar.zip              0.3.2   Scimitar_APP_v304RC.bin              4d8d17b969ebddffc54ffc50adf1d39231f77a89aafb85e5264832bb93cd42d3    0x1b1e
   Corsair SCIMITARPRO       3.14 https://www3.corsair.com/software/CUE_V3/ScimitarPRORGB.zip        0.3.2   ScimitarPro_App_v3.14.3.bin          34a9583517e3fd3a099782adbc91aceeffc0af63ac70cc14ca7c24eb74bf1515    0x1b3e
   Corsair SABRE2ND          2.04 https://www3.corsair.com/software/CUE_V3/SABRE.zip                 0.2.8   SABRE2nd_APP_V204.bin                7ba48718d27a534adbef6979c30d5e96ff865bca81fd1869b58327b2743a06bf    0x1b32
@@ -53,11 +54,11 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJcXPoVAAoJEN/iSOvc7y9fsm8H+QH/OKNhK8T4vH0IjKgylbfy
-1LyQgTytWuxMvbMjlyE7UmW3GXP2iLYcVSEuJhynem0u6/6pRdsTWaLr+vkIyaWn
-CONILzHAR7iDVE5i781n2r+lifh1XbyyNwLkWIxwQincQ1c9zDZ2pSdIw9REMQQu
-ge0yRUmwNAXWfXbcidMZPLc8mBN8/RpM06XFJ9hjghFKzPostWsUzDW+2uy8zfRg
-WasMimi/9URnBzc5nCOTrEXTs6TC7IXwHoiaC8+EwwE/NGV8oTED5AbTQXnSnQTH
-MIEIgyaqw2MyGIo9LZKu+4F24E7fnnARJRRLFddX4rUA6Z8sd9UDDAakBlDetE4=
-=9ZY3
+iQEcBAEBCAAGBQJcXP/lAAoJEN/iSOvc7y9fWIUH/1v8W8CSinxkgVNjmDpwbyGA
+pfYxv3FdwblsKDhgF83Dd/8KxcEgAhUt+heZLdvutTFaWNcxXFXWM9FNkn1Lq4p0
+Vz5tTQ3/wS5FUgyGS2gJ2sJrq3hMuQN97X/SwFhlVO942rdfy0lhJPRlPNJcyHON
+UlSW/8OhHe1nyL8hVMbD80kVW9D7zqFF/ylTw0cepbpQ2vylJrUGcpwPmLB73/Ti
+kuEAwdGuRSBWVDHDeL+a2C4SimHQkDIAMll/0M5B1liBoe4QEgqAGaIzG3++bj2V
+6V6M6a+sJWhfM5w+HT9rrsrROnAIkXz75fDdxULDpKfN1yd2VkFgmmA9pgQnSd8=
+=d6PA
 -----END PGP SIGNATURE-----

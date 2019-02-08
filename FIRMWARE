@@ -12,37 +12,37 @@ Hash: SHA256
 
 # Vendor  Model            FW    URL                                                                Min.ckb File Name                            SHA256                                                              ProductID
   Corsair K55RGB           30.06 https://www3.corsair.com/software/CUE_V3/K55RGB.zip                0.2.9   K55_App_v3006.bin                    e84aa88ec7f90ddac94f06f4f4e887ce06f013a18a22ece5f367f97899514748    0x1b3d
-  Corsair K63               1.00 https://www3.corsair.com/software/CUE_V3/K63.zip                   0.2.8   K63_APP_V100.bin                     3bac95d6f605b33398714bf644a93cf137c4b0195c42e828e7d0bd87e9f8d3af    0x1b40
+  Corsair K63               3.08 https://www3.corsair.com/software/CUE_V3/K63.zip                   0.3.2   K63_App_v308.bin                     1b28b50d7338b9e2cf44ebf6130adb973c6aa5770ba7afa255a61ff096850e61    0x1b40
   Corsair K63WL             0.00 https://www3.corsair.com/software/CUE_V3/K63WIRELESS.zip           0.2.9   00000000000000000.bin                0000000000000000000000000000000000000000000000000000000000000000    0x1b45
-  Corsair K65RGB            2.05 https://www3.corsair.com/software/CUE_V3/CGK65RGB.zip              0.2.8   K65RGB_APP_V205.bin                  832cbb0408399411ebc766697f79dc5bf9a88e55a661ea8db13e31d72044b896    0x1b17
-  Corsair K65LUXRGB         2.05 https://www3.corsair.com/software/CUE_V3/K65LUXRGB.zip             0.2.8   K65LUXRGB_APP_V205.bin               b203dabbc56816b497fb6aa664ac0689d2d480117e99da9260176cb8a72acd5d    0x1b37
-  Corsair K65RFIRERGB       2.05 https://www3.corsair.com/software/CUE_V3/K65RGBRAPIDFIRE.zip       0.2.8   K65RGBRAPIDFIRE_APP_V205.bin         9d2e933ab6c0102cba1a0af007a124c37b57766ea60b0d8935cb1b337e0b93e5    0x1b39
-  Corsair K66               1.01 https://www3.corsair.com/software/CUE_V3/K66.zip                   0.2.9   K66_APP_V101.bin                     c98dc1eb9de45cb70e20552f141370bbd2c3148043e0684424bfd45a6ea8bb20    0x1b41
-  Corsair K68               1.00 https://www3.corsair.com/software/CUE_V3/K68.zip                   0.2.9   K68_APP_V100.bin                     e743ba6fcb71ef48c6d80ffd2b28eb1d7ee30cb1d78189877c2f4449cd440def    0x1b3f
+  Corsair K65RGB            3.08 https://www3.corsair.com/software/CUE_V3/CGK65RGB.zip              0.3.2   K65%20RGB_App_v308.bin               5173de835e2614981a43184f4cca72f96361160a343d17e016f41372ba2ba1bd    0x1b17
+  Corsair K65LUXRGB         3.08 https://www3.corsair.com/software/CUE_V3/K65LUXRGB.zip             0.3.2   K65%20LUX%20RGB_App_v308.bin         779bbfdc9152168ea1fd0ac6e35c93f691ffb3affafedf88e1f8b4c2682ec822    0x1b37
+  Corsair K65RFIRERGB       3.08 https://www3.corsair.com/software/CUE_V3/K65RGBRAPIDFIRE.zip       0.3.2   K65%20RGB%20Rapidfire_App_v308.bin   56428d5b330a81649b2cc6ebb685d17e53120033db5803a3dbee9120eca8d75b    0x1b39
+  Corsair K66               3.08 https://www3.corsair.com/software/CUE_V3/K66.zip                   0.3.2   K66_App_v308.bin                     832c917ff850bcad2a7a0a79c8e603cdce8732d463a567481ce60d6b8468123c    0x1b41
+  Corsair K68               3.08 https://www3.corsair.com/software/CUE_V3/K68.zip                   0.3.2   K68_App_v308.bin                     387f02230945df7a73b51e56ba490a39b2172aad7f99d6ac65bc7ed17bc6b78b    0x1b3f
   Corsair K68RGB            3.24 https://www3.corsair.com/software/CUE_V3/K68RGB.zip                0.3.2   Vlad_App_v3.24.2.bin                 64ee24ef1e769e5237fa116935bd55036f6ab925e79d527d0e847eaf41b602d9    0x1b4f
-  Corsair K70RGB            2.05 https://www3.corsair.com/software/CUE_V3/K70RGB.zip                0.2.7   K70RGB_APP_V205.bin                  3e43bdcc5077dc413fbdee7ff6e57a978f758599142eef6979a96e3b8c3a566a    0x1b13
-  Corsair K70LUX            2.04 https://www3.corsair.com/software/CUE_V3/K70LUX.zip                0.2.7   K70LUX_APP_V204.bin                  c2b5411e1dce391788eca294563801b32a14bf7802eb29688213f8f07e112966    0x1b36
+  Corsair K70RGB            3.08 https://www3.corsair.com/software/CUE_V3/K70RGB.zip                0.3.2   K70%20RGB_App_v308.bin               055822b90c5599a5cbceab9019c717a36eedad1bc849d05a28806cf940f7cd2e    0x1b13
+  Corsair K70LUX            3.08 https://www3.corsair.com/software/CUE_V3/K70LUX.zip                0.3.2   K70%20LUX_App_v308.bin               89323b060448c2b787a538cf41ca272cdb3b10fec75eda53a3b1c630566ecec8    0x1b36
   Corsair K70LUXRGB         3.08 https://www3.corsair.com/software/CUE_V3/K70LUXRGB.zip             0.3.2   K70%20LUX%20RGB_App_v308.bin         fba209ecf67735dd1eac6f0cc04432f423677ccf6518a0fcf6dae65efb6816aa    0x1b33
-  Corsair K70RFIRE          2.05 https://www3.corsair.com/software/CUE_V3/K70RAPIDFIRE.zip          0.2.7   K70RAPIDFIRE_APP_V205.bin            6b1d2bb962ffd987ce5eb25c46b02a9069c5f79ca05d7b2cc71c749fe9813536    0x1b3a
+  Corsair K70RFIRE          3.08 https://www3.corsair.com/software/CUE_V3/K70RAPIDFIRE.zip          0.3.2   K70%20Rapidfire_App_v308.bin         c40ef86ff561777295bca1743c16afc787d22832f052d4687be58b1bfa559108    0x1b3a
   Corsair K70RFIRERGB       3.08 https://www3.corsair.com/software/CUE_V3/K70RGBRAPIDFIRE.zip       0.3.2   K70%20RGB%20Rapidfire_App_v308.bin   415aaeaf49f2d28cb28459fd7828e49440846ae762245214c2b7b0efffab9f3a    0x1b38
   Corsair K70SERFIRERGB     2.06 https://www3.corsair.com/software/CUE_V3/K70RGBSERAPIDFIRE.zip     0.2.9   K70RGBSERAPIDFIRE_APP_V206.bin       7e1b81b9356075331fa25d2bd1fc5fbb68b92ef81bede1c35887521a2fdbba75    0x1b59
-  Corsair K70RGBMK2         3.12 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2.zip            0.3.0   Julius_App_v3.12.20.bin              cc88d8abb72f61e3ac9579404ccc8aa505c696484cabb35514afc1f215edcca1    0x1b49
-  Corsair K70RGBMK2SE       3.12 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2SE.zip          0.3.0   Julius_Alba_App_v3.12.9.bin          678ccfc244eb9b0fa70ce0db1290363433e5b36f62c8f680fedd78bdb3609302    0x1b6b
+  Corsair K70RGBMK2         3.24 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2.zip            0.3.2   Julius_App_v3.24.26.bin              1324fbf740948fa42e4e5edd48248c94cd02d3d0af123ed5832f9f9e3732330d    0x1b49
+  Corsair K70RGBMK2SE       3.24 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2SE.zip          0.3.2   Julius_Alba_App_v3.24.13.bin         1942d60a9e63649583dd5609ba8aaffaf1cd242555639a8bb5e506bd996a0ed1    0x1b6b
   Corsair K70RGBMK2LP       3.24 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2LP.zip          0.3.2   Nero_App_v3.24.22.bin                257f5d3d8164e6deb8eab8f2ce0070b9030f586159e362b7f0d339ad71e20402    0x1b55
   Corsair K95RGB            2.05 https://www3.corsair.com/software/CUE_V3/K95RGB.zip                0.2.7   K95RGB_APP_V205.bin                  8d0680dd033d6020a53bc9bfa83e761143699d1122f1d0133e95ad3056d63a15    0x1b11
   Corsair K95PLATINUMRGB    3.21 https://www3.corsair.com/software/CUE_V3/K95RGBPLATINUM.zip        0.3.2   Freya_App_v3.21.28.bin               5fdce6059d7ef0f044a89cb6693665cb0bfec807fb7b0579f1110cac0e3ee079    0x1b2d
-  Corsair STRAFE            2.05 https://www3.corsair.com/software/CUE_V3/STRAFE.zip                0.2.7   STRAFE_APP_V205.bin                  c03e6b2e3f5e3269f49d74e158fa9b65a4752dd7c888f0a9e96147033e18d243    0x1b15
+  Corsair STRAFE            3.08 https://www3.corsair.com/software/CUE_V3/STRAFE.zip                0.3.2   Strafe_App_v308.bin                  f33840c3d3687d846efa8b8bc11896ebedad44a5a9a9693755d294ae457fa49a    0x1b15
   Corsair STRAFERGB         3.08 https://www3.corsair.com/software/CUE_V3/STRAFERGB.zip             0.3.2   Strafe%20RGB_App_v308.bin            aeed03739338e58b06431dd006e0f5461132c12af66994b296d26df5aca905cb    0x1b20
   Corsair STRAFERGBMK2      3.24 https://www3.corsair.com/software/CUE_V3/STRAFERGBMK.2.zip         0.3.2   Leonidas_App_v3.24.5.bin             be8f91edfd657bdb2ddcdf8058e54d74e9d8633f7c21c26334f756c2fad043e3    0x1b48
-  Corsair STRAFE1B44        1.00 https://www3.corsair.com/software/CUE_V3/STRAFE_v1b1c-p1b44.zip    0.3.2   STRAFE_ISSI_APP_V100.bin             d292d90eeb17558dada5dfb664f293ed2a84e343aa74b529668ae12f1662ff93    0x1b44
-  Corsair M65RGB            2.04 https://www3.corsair.com/software/CUE_V3/M65RGB.zip                0.2.7   M65RGB_App_v204.bin                  e1f09ce462f77071f91d92951410c14fb18061dd9760b3de89e45d1ca8b6b46c    0x1b12
+  Corsair STRAFE1B44        3.08 https://www3.corsair.com/software/CUE_V3/STRAFE_v1b1c-p1b44.zip    0.3.2   Strafe%20ISSI_App_v308.bin           e6fc6e5bbd9bb54e1a53d9fd35fe6b17133ed43ccaaa7bc4c7df2dad48c6fe84    0x1b44
+  Corsair M65RGB            3.02 https://www3.corsair.com/software/CUE_V3/M65RGB.zip                0.3.2   M65RGB_APP_v302RC.bin                a99cca31dfc801be73a5ff540d9edf291f242bc187c8c624c04b25d903b13098    0x1b12
   Corsair M65PRORGB         3.06 https://www3.corsair.com/software/CUE_V3/M65PRORGB.zip             0.3.2   M65Pro_App_v3.06.2.bin               9f78ef423dc2165ea8db2404f5d38e1215f633c4e554f08216526676153f1d01    0x1b2e
   Corsair SCIMITARRGB       3.04 https://www3.corsair.com/software/CUE_V3/Scimitar.zip              0.3.2   Scimitar_APP_v304RC.bin              4d8d17b969ebddffc54ffc50adf1d39231f77a89aafb85e5264832bb93cd42d3    0x1b1e
-  Corsair SCIMITARPRO       1.10 https://www3.corsair.com/software/CUE_V3/ScimitarPRORGB.zip        0.3.2   ScimitarPro_APP_v110.bin             7ec4d1ed5a744c42e4bdf09960b92d38a3a59e92e31dd3dd852cdf0f3045f929    0x1b3e
+  Corsair SCIMITARPRO       3.14 https://www3.corsair.com/software/CUE_V3/ScimitarPRORGB.zip        0.3.2   ScimitarPro_App_v3.14.3.bin          34a9583517e3fd3a099782adbc91aceeffc0af63ac70cc14ca7c24eb74bf1515    0x1b3e
   Corsair SABRE2ND          2.04 https://www3.corsair.com/software/CUE_V3/SABRE.zip                 0.2.8   SABRE2nd_APP_V204.bin                7ba48718d27a534adbef6979c30d5e96ff865bca81fd1869b58327b2743a06bf    0x1b32
   Corsair HARPOONRGB        3.08 https://www3.corsair.com/software/CUE_V3/HARPOONRGB.zip            0.3.2   Harpoon_App_v3.08.3.bin              08c1e1ec7c30a4bdf32c37a50a25fa6f81104043434750e724898a148f8dd652    0x1b3c
-  Corsair GLAIVERGB         1.04 https://www3.corsair.com/software/CUE_V3/GLAIVERGB.zip             0.2.8   Glaive_APP_v104.bin                  66a41ff1f7eb4314a02742b483809fbc15836a868e44169f8cf111b3ff50adad    0x1b34
-  Corsair KATAR             2.09 https://www3.corsair.com/software/CUE_V3/KATAR.zip                 0.2.9   Katar_APP_v209.bin                   99f33fc9ccc5d3ffa2f605d391263d7587de3253da78657dc77d55ce021f67cf    0x1b22
+  Corsair GLAIVERGB         3.14 https://www3.corsair.com/software/CUE_V3/GLAIVERGB.zip             0.3.2   Glaive_App_v3.14.3.bin               83af8567748153504157a062c802d304e4612819319c4674e904ff0d83ba1486    0x1b34
+  Corsair KATAR             3.04 https://www3.corsair.com/software/CUE_V3/KATAR.zip                 0.3.2   Katar_APP_v304RC.bin                 da09d2aebfcac471a0aa076a84a5d0e999c0217b479b95822ed43f59cb818ff0    0x1b22
   Corsair SABRE1            2.04 https://www3.corsair.com/software/CUE_V3/Sabre1.zip                0.2.9   Sabre1_APP_v204.bin                  91fa33c85cd847b7779551e6d29d0fdbb9a9a7ede3a2b35ed65cab6b2fec2793    0x1b14
   Corsair SABRE2            2.05 https://www3.corsair.com/software/CUE_V3/Sabre2.zip                0.2.9   Sabre2_APP_v205.bin                  4f1dea6d8949952e7d26fbcc48c7ad1aa116f9b1bf1bf149af3213c269df9c64    0x1b19
   Corsair SABREPRORGB       2.04 https://www3.corsair.com/software/CUE_V3/SABRERGB.zip              0.2.9   SABREPRORGB_APP_V204.bin             6adf75dd813e11c6d4a2cdf58f878c2f7c38f14c2645895c4e0ce4380d46d868    0x1b2f
@@ -53,11 +53,11 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJcQkHvAAoJEN/iSOvc7y9fsqUIAJi55ATIVqHRrYXwjBhBoaZa
-TPcsjSEhF7G6YL+f9d6GkmcEoPX7v+EU3TXD7pwXffWzNEEwIyL0DsrEuM48OUAz
-EokTYE4+RTZES7+JV6/fDd8UFEdECa5UBcErWvSyp2ECODnZjpyp94G9dYcDHiRn
-C2iY8zQBXmZkAur4CJC0wsGZUVB/VmT0klMzSNAvshtf1bEM91slTMZjs4plzb0V
-tVLM2qD7ZsjTZCPmNSo2vfgXXB9flBaQPOv7WOLtcEp3opupunPcdQrAYnO65n3l
-2Xl9Lcbj3dG1S2h6UScb5xc2fqdTlAI0tkiivtu+tuZ56EdFhTMOT9O3RWqRd0Y=
-=ctpQ
+iQEcBAEBCAAGBQJcXPoVAAoJEN/iSOvc7y9fsm8H+QH/OKNhK8T4vH0IjKgylbfy
+1LyQgTytWuxMvbMjlyE7UmW3GXP2iLYcVSEuJhynem0u6/6pRdsTWaLr+vkIyaWn
+CONILzHAR7iDVE5i781n2r+lifh1XbyyNwLkWIxwQincQ1c9zDZ2pSdIw9REMQQu
+ge0yRUmwNAXWfXbcidMZPLc8mBN8/RpM06XFJ9hjghFKzPostWsUzDW+2uy8zfRg
+WasMimi/9URnBzc5nCOTrEXTs6TC7IXwHoiaC8+EwwE/NGV8oTED5AbTQXnSnQTH
+MIEIgyaqw2MyGIo9LZKu+4F24E7fnnARJRRLFddX4rUA6Z8sd9UDDAakBlDetE4=
+=9ZY3
 -----END PGP SIGNATURE-----

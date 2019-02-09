@@ -44,7 +44,8 @@ target_link_libraries(
           m
           KissFFT::KissFFT
           ${CMAKE_PROJECT_NAME}::Animation
-          "${PULSEAUDIOSIMPLE_LIBRARIES}")
+          "${PULSEAUDIOSIMPLE_LIBRARIES}"
+          )
 
 set_target_properties(
     mviz

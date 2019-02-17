@@ -15,8 +15,8 @@ void ckb_info() {
     CKB_PARAM_BOOL("refresh", "Refresh living cells on keypress", 1);
 
     // Timing/input parameters
-    CKB_KPMODE(CKB_KP_NAME);
-    CKB_TIMEMODE(CKB_TIME_DURATION);
+    CKB_KPMODE(CKB_KP_POSITION);
+    CKB_TIMEMODE(CKB_TIME_ABSOLUTE);
     CKB_REPEAT(FALSE);
     CKB_LIVEPARAMS(TRUE);
     
@@ -60,7 +60,7 @@ adjacencynode adjacencygraph[108] = {
 
     {"caps", {"tab", "q", "a", "lshift", "", "", "", "", "", ""}}, {"a", {"caps", "q", "w", "s", "z", "lshift", "", "", "", ""}}, {"s", {"a", "w", "e", "d", "x", "z", "", "", "", ""}}, {"d", {"s", "e", "r", "f", "c", "x", "", "", "", ""}}, {"f", {"d", "r", "t", "g", "v", "c", "", "", "", ""}}, {"g", {"f", "t", "y", "h", "b", "v", "", "", "", ""}}, {"h", {"g", "y", "u", "j", "n", "b", "", "", "", ""}}, {"j", {"h", "u", "i", "k", "m", "n", "", "", "", ""}}, {"k", {"j", "i", "o", "l", "comma", "m", "", "", "", ""}}, {"l", {"k", "o", "p", "colon", "dot", "comma", "", "", "", ""}}, {"colon", {"l", "p", "lbrace", "quote", "slash", "dot", "", "", "", ""}}, {"quote", {"colon", "lbrace", "rbrace", "enter", "rshift", "slash", "", "", "", ""}}, {"enter", {"quote", "rbrace", "bslash", "del", "rshift", "", "", "", "", ""}}, {"num4", {"pgdn", "num7", "num8", "num5", "num2", "num1", "", "", "", ""}}, {"num5", {"num4", "num7", "num8", "num9", "num6", "num3", "num2", "num1", "", ""}}, {"num6", {"num5", "num8", "num9", "numplus", "numenter", "num3", "num2", "", "", ""}},
 
-    {"lshift", {"caps", "a", "z", "lctrl", "lwin", "", "", "", "", ""}}, {"z", {"lshift", "a", "s", "x", "lalt", "lwin", "", "", "", ""}}, {"x", {"z", "s", "d", "c", "space", "lalt", "", "", "", ""}}, {"c", {"x", "d", "f", "v", "space", "", "", "", "", ""}}, {"v", {"c", "f", "g", "b", "space", "", "", "", "", ""}}, {"b", {"v", "g", "h", "n", "space", "", "", "", "", ""}}, {"n", {"b", "h", "j", "m", "space", "", "", "", "", ""}}, {"m", {"n", "j", "k", "comma", "space", "", "", "", "", ""}}, {"comma", {"m", "k", "l", "dot", "ralt", "space", "", "", "", ""}}, {"dot", {"comma", "l", "colon", "slash", "ralt", "space", "", "", "", ""}}, {"slash", {"dot", "colon", "quote", "rshift", "rwin", "ralt", "", "", "", ""}}, {"rshift", {"slash", "quote", "enter", "left", "rctrl", "rmenu", "rwin", "", "", ""}}, {"up", {"left", "down", "right", "", "", "", "", "", "", ""}}, {"num1", {"num4", "num5", "num2", "num0", "", "", "", "", "", ""}}, {"num2", {"num1", "num4", "num5", "num6", "num3", "numdot", "num0", "", "", ""}}, {"num3", {"num2", "num5", "num6", "numpluss", "numenter", "numdot", "num0", "", "", ""}}, {"numenter", {"num3", "num6", "numplus", "numdot", "", "", "", "", "", ""}}, 
+    {"lshift", {"caps", "a", "z", "lctrl", "lwin", "", "", "", "", ""}}, {"z", {"lshift", "a", "s", "x", "lalt", "lwin", "", "", "", ""}}, {"x", {"z", "s", "d", "c", "space", "lalt", "", "", "", ""}}, {"c", {"x", "d", "f", "v", "space", "", "", "", "", ""}}, {"v", {"c", "f", "g", "b", "space", "", "", "", "", ""}}, {"b", {"v", "g", "h", "n", "space", "", "", "", "", ""}}, {"n", {"b", "h", "j", "m", "space", "", "", "", "", ""}}, {"m", {"n", "j", "k", "comma", "space", "", "", "", "", ""}}, {"comma", {"m", "k", "l", "dot", "ralt", "space", "", "", "", ""}}, {"dot", {"comma", "l", "colon", "slash", "ralt", "space", "", "", "", ""}}, {"slash", {"dot", "colon", "quote", "rshift", "rwin", "ralt", "", "", "", ""}}, {"rshift", {"slash", "quote", "enter", "left", "rctrl", "rmenu", "rwin", "", "", ""}}, {"up", {"left", "down", "right", "", "", "", "", "", "", ""}}, {"num1", {"num4", "num5", "num2", "num0", "", "", "", "", "", ""}}, {"num2", {"num1", "num4", "num5", "num6", "num3", "numdot", "num0", "", "", ""}}, {"num3", {"num2", "num5", "num6", "numplus", "numenter", "numdot", "num0", "", "", ""}}, {"numenter", {"num3", "num6", "numplus", "numdot", "", "", "", "", "", ""}}, 
     
     {"lctrl", {"lshift", "lwin", "", "", "", "", "", "", "", ""}}, {"lwin", {"lctrl", "lshift", "z", "lalt", "", "", "", "", "", ""}}, {"lalt", {"lwin", "z", "x", "space", "", "", "", "", "", ""}}, {"space", {"lalt", "x", "c", "v", "b", "n", "m", "comma", "dot", "ralt"}}, {"ralt", {"space", "comma", "dot", "slash", "rwin", "", "", "", "", ""}}, {"rwin", {"ralt", "slash", "rshift", "rmenu", "", "", "", "", "", ""}}, {"rmenu", {"rwin", "rshift", "rctrl", "", "", "", "", "", "", ""}}, {"rctrl", {"rmenu", "rshift", "left", "", "", "", "", "", "", ""}}, {"left", {"rctrl", "rshift", "up", "down", "", "", "", "", "", ""}}, {"down", {"left", "up", "down", "right", "", "", "", "", "", ""}}, {"right", {"down", "up", "num1", "num0", "", "", "", "", "", ""}}, {"num0", {"right", "num1", "num2", "num3", "numdot", "", "", "", "", ""}}, {"numdot", {"num0", "num1", "num2", "num3", "numenter", "", "", "", "", ""}}
 };
@@ -105,8 +105,8 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
 // This is the game loop
 void ckb_time(ckb_runctx* context, double delta) {
     // track clock speed
-    tng -= delta;
-    if (tng <= 0) {
+    tng--;
+    if (tng == 0) {
         // Grow/Die each cell this tick
         tng = growdelay;
         // record the current living cells
@@ -147,9 +147,14 @@ void ckb_time(ckb_runctx* context, double delta) {
 }
 
 // translate a keyname to an adjacencygraph index
+// returns 108 if fails to find
 int name2num(char* keyname){
     int i = -1;
     do { i++; } while(i < 108 && !!strcmp(keyname, adjacencygraph[i].name));
+    if (i == 108) {
+        //this key wasn't named correctly
+        fprintf(stderr, "Recheck the key graph, something wasn't named right: %s", keyname);
+    }
     return i;
 }
 
@@ -161,7 +166,7 @@ void ckb_init(ckb_runctx* context) {
         for (int j = 0; j < 108; j++) {
             if (!strcmp(key->name, adjacencygraph[j].name)) {
                 keymap[j] = (int) i;
-                for (int k =0; k < 10; k++) {
+                for (int k = 0; k < 10; k++) {
                     if (!!strcmp(adjacencygraph[j].neighbors[k], "")) {
                         neighbors[j].address[k] = name2num(adjacencygraph[j].neighbors[k]);
                     }

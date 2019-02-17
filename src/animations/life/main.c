@@ -10,7 +10,8 @@ void ckb_info() {
     CKB_DESCRIPTION("Conway's Game of Life on your keyboard.");
 
     // Effect parameters
-    CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
+    CKB_PARAM_AGRADIENT("lcolor", "Live color:", "", "ffffffff");
+    CKB_PARAM_AGRADIENT("dcolor", "Dead color:", "", "00000000");
 	CKB_PARAM_DOUBLE("growdelay", "Frames to next generation", "frames", 60, 10, 1000);
     CKB_PARAM_BOOL("refresh", "Refresh living cells on keypress", 1);
 
@@ -28,7 +29,8 @@ void ckb_info() {
 }
 
 // user parameter variables
-ckb_gradient animcolor = { 0 };
+ckb_gradient lcolor = { 0 };
+ckb_gradient dcolor = { 0 };
 double tng = 60;
 double growdelay = 60;
 int refreshing = 0;
@@ -67,7 +69,8 @@ adjacencynode adjacencygraph[108] = {
 
 // load user settings
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
-    CKB_PARSE_AGRADIENT("color", &animcolor) {}
+    CKB_PARSE_AGRADIENT("color", &lcolor) {}
+    CKB_PARSE_AGRADIENT("color", &dcolor) {}
     CKB_PARSE_DOUBLE("growdelay", &growdelay) {}
     CKB_PARSE_BOOL("refresh", &refreshing) {}
     tng = growdelay;
@@ -76,9 +79,11 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
 // render a single key
 void draw_key_state(ckb_key *key, int s) {
     float a, r, g, b;
-    // tng = growdelay causes keys to go dark for a second here, I like it.
-    ckb_grad_color(&a, &r, &g, &b, &animcolor, tng*100.f/growdelay);
-    a = s>0? 255: 0;
+    if (s) {
+        ckb_grad_color(&a, &r, &g, &b, &lcolor, roundf(tng*100.f/growdelay));
+    } else {
+        ckb_grad_color(&a, &r, &g, &b, &dcolor, roundf(tng*100.f/growdelay));
+    }
     key->a = a;
     key->r = r;
     key->g = g;

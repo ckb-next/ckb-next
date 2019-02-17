@@ -191,7 +191,7 @@ const char* product_str(ushort product);
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb))
 
 /// Used for devices that use a file-based hardware animation system.
-#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K70_MK2LP)
+#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

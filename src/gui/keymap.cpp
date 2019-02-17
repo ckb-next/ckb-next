@@ -822,6 +822,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map = getMap(KeyMap::M65, layout);
         map["wheel"] = {0, "Wheel Light", "wheel", map["front"].x, map["front"].y, map["front"].width, map["front"].height, true, false};
         map.remove("front");
+        break;
     }
     default:;    // <- stop GCC from complaining
     }

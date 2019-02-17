@@ -40,6 +40,7 @@ ushort models[N_MODELS] = {
     // Mice
     P_M65,
     P_M65_PRO,
+    P_M65_RGB_ELITE,
     P_GLAIVE,
     P_SABRE_O,
     P_SABRE_L,
@@ -131,6 +132,8 @@ const char* product_str(ushort product){
         return "strafe_mk2";
     if(product == P_M65 || product == P_M65_PRO)
         return "m65";
+    if(product == P_M65_RGB_ELITE)
+        return "m65e";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)

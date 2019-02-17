@@ -115,7 +115,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
         // Draw mouse overlays
         const QImage* overlay = 0;
         float xpos = 0.f, ypos = 0.f;
-        if(model == KeyMap::M65){
+        if(model == KeyMap::M65 || model == KeyMap::M65E){
             if(!m65Overlay)
                 m65Overlay = new QImage(":/img/overlay_m65.png");
             overlay = m65Overlay;

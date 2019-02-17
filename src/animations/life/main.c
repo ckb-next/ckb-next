@@ -107,7 +107,6 @@ void ckb_time(ckb_runctx* context, double delta) {
     // track clock speed
     tng--;
     if (tng == 0) {
-    if (tng <= 0) {
         // Grow/Die each cell this tick
         tng = growdelay;
         // record the current living cells

@@ -105,7 +105,7 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
 // This is the game loop
 void ckb_time(ckb_runctx* context, double delta) {
     // track clock speed
-    tng -= ceil(delta);
+    tng--;
     if (tng <= 0) {
         // Grow/Die each cell this tick
         tng = growdelay;

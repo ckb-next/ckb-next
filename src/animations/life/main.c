@@ -29,8 +29,8 @@ void ckb_info() {
 
 // user parameter variables
 ckb_gradient animcolor = { 0 };
-long tng = 120;
-long growdelay = 120;
+long tng = 60;
+long growdelay = 60;
 int refreshing = 0;
 
 // main memory
@@ -106,7 +106,7 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
 void ckb_time(ckb_runctx* context, double delta) {
     // track clock speed
     tng -= delta;
-    if (tng < 0) {
+    if (tng <= 0) {
         // Grow/Die each cell this tick
         tng = growdelay;
         // record the current living cells

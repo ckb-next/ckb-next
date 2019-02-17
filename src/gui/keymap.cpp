@@ -817,6 +817,12 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    // Same as M65 but with the wheel zone instead of the front one
+    case KeyMap::M65E:{
+        map = getMap(KeyMap::M65, layout);
+        map["wheel"] = {0, "Wheel Light", "wheel", map["front"].x, map["front"].y, map["front"].width, map["front"].height, true, false};
+        map.remove("front");
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -1047,6 +1053,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70MK2;
     if(lower == "strafe_mk2")
         return STRAFE_MK2;
+    if(lower == "m65e")
+        return M65E;
     return NO_MODEL;
 }
 
@@ -1090,6 +1098,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70mk2";
     case STRAFE_MK2:
         return "strafe_mk2";
+    case M65E:
+        return "m65e";
     default:
         return "";
     }
@@ -1123,6 +1133,7 @@ int KeyMap::modelWidth(Model model){
     case STRAFE_MK2:
         return KSTRAFE_WIDTH;
     case M65:
+    case M65E:
     case SABRE:
     case SCIMITAR:
     case HARPOON:
@@ -1152,6 +1163,7 @@ int KeyMap::modelHeight(Model model){
     case K95P:
         return K95P_HEIGHT;
     case M65:
+    case M65E:
     case SABRE:
     case SCIMITAR:
     case HARPOON:

@@ -106,9 +106,9 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
 void ckb_time(ckb_runctx* context, double delta) {
     // track clock speed
     tng -= delta;
-    if (tng == 0) {
+    if (tng < 0) {
         // Grow/Die each cell this tick
-        tng += growdelay;
+        tng = growdelay;
         // record the current living cells
         int livmap[108];
         for (int i = 0; i < 108; i++) { livmap[i] = keystate[i]; }

@@ -1,6 +1,4 @@
 #include <ckb-next/animation.h>
-#include <math.h>
-#include <stdio.h>
 
 void ckb_info() {
     // Plugin info
@@ -71,8 +69,8 @@ adjacencynode adjacencygraph[108] = {
 
 // load user settings
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
-    CKB_PARSE_AGRADIENT("color", &lcolor) {}
-    CKB_PARSE_AGRADIENT("color", &dcolor) {}
+    CKB_PARSE_AGRADIENT("lcolor", &lcolor) {}
+    CKB_PARSE_AGRADIENT("dcolor", &dcolor) {}
     CKB_PARSE_DOUBLE("growdelay", &growdelay) {}
     CKB_PARSE_BOOL("refresh", &refreshing) {}
     tng = growdelay;
@@ -81,25 +79,15 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
 // render a single key
 void draw_key_state(ckb_key *key, int s) {
     float a, r, g, b;
-<<<<<<< HEAD
     if (s) {
         ckb_grad_color(&a, &r, &g, &b, &lcolor, roundf(tng*100.f/growdelay));
     } else {
         ckb_grad_color(&a, &r, &g, &b, &dcolor, roundf(tng*100.f/growdelay));
     }
-    key->a = a;
-    key->r = r;
-    key->g = g;
-    key->b = b;
-=======
-    // tng = growdelay causes keys to go dark for a second here, I like it.
-    ckb_grad_color(&a, &r, &g, &b, &animcolor, roundf(tng*100.f/growdelay));
-    a = s > 0 ? a : 0;
     key->a = roundf(a);
     key->r = roundf(r);
     key->g = roundf(g);
     key->b = roundf(b);
->>>>>>> 88c958eac419f92adc6239844bbb498542194ac8
 }
 
 // update the board for user input

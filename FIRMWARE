@@ -40,13 +40,13 @@ Hash: SHA256
   Corsair M65RGBELITE       3.24 https://www3.corsair.com/software/CUE_V3/M65RGBELITE.zip           0.3.2   BlackHeart_App_v3.24.4.bin           3181c9162bd4ff01d2637028144a319041104fc0c8ba4ebba36460103b92e067    0x1b5a
   Corsair SCIMITARRGB       3.04 https://www3.corsair.com/software/CUE_V3/Scimitar.zip              0.3.2   Scimitar_APP_v304RC.bin              4d8d17b969ebddffc54ffc50adf1d39231f77a89aafb85e5264832bb93cd42d3    0x1b1e
   Corsair SCIMITARPRO       3.14 https://www3.corsair.com/software/CUE_V3/ScimitarPRORGB.zip        0.3.2   ScimitarPro_App_v3.14.3.bin          34a9583517e3fd3a099782adbc91aceeffc0af63ac70cc14ca7c24eb74bf1515    0x1b3e
-  Corsair SABRE2ND          2.04 https://www3.corsair.com/software/CUE_V3/SABRE.zip                 0.2.8   SABRE2nd_APP_V204.bin                7ba48718d27a534adbef6979c30d5e96ff865bca81fd1869b58327b2743a06bf    0x1b32
+  Corsair SABRE2ND          3.04 https://www3.corsair.com/software/CUE_V3/SABRE.zip                 0.3.2   Sabre2nd_APP_v304RC.bin              62bbaa804ab9cba6452f715b9d1298c9d3a6dfd05dbebefb9162cd6f5367fb04    0x1b32
   Corsair HARPOONRGB        3.08 https://www3.corsair.com/software/CUE_V3/HARPOONRGB.zip            0.3.2   Harpoon_App_v3.08.3.bin              08c1e1ec7c30a4bdf32c37a50a25fa6f81104043434750e724898a148f8dd652    0x1b3c
   Corsair GLAIVERGB         3.14 https://www3.corsair.com/software/CUE_V3/GLAIVERGB.zip             0.3.2   Glaive_App_v3.14.3.bin               83af8567748153504157a062c802d304e4612819319c4674e904ff0d83ba1486    0x1b34
   Corsair KATAR             3.04 https://www3.corsair.com/software/CUE_V3/KATAR.zip                 0.3.2   Katar_APP_v304RC.bin                 da09d2aebfcac471a0aa076a84a5d0e999c0217b479b95822ed43f59cb818ff0    0x1b22
-  Corsair SABRE1            2.04 https://www3.corsair.com/software/CUE_V3/Sabre1.zip                0.2.9   Sabre1_APP_v204.bin                  91fa33c85cd847b7779551e6d29d0fdbb9a9a7ede3a2b35ed65cab6b2fec2793    0x1b14
-  Corsair SABRE2            2.05 https://www3.corsair.com/software/CUE_V3/Sabre2.zip                0.2.9   Sabre2_APP_v205.bin                  4f1dea6d8949952e7d26fbcc48c7ad1aa116f9b1bf1bf149af3213c269df9c64    0x1b19
-  Corsair SABREPRORGB       2.04 https://www3.corsair.com/software/CUE_V3/SABRERGB.zip              0.2.9   SABREPRORGB_APP_V204.bin             6adf75dd813e11c6d4a2cdf58f878c2f7c38f14c2645895c4e0ce4380d46d868    0x1b2f
+  Corsair SABRE1            3.02 https://www3.corsair.com/software/CUE_V3/Sabre1.zip                0.3.2   Sabre1_APP_v302RC.bin                51c087dbfc7575a6b70cbcee44d6bd320fdded67c4b9c6f09f6589a80fb6535b    0x1b14
+  Corsair SABRE2            3.02 https://www3.corsair.com/software/CUE_V3/Sabre2.zip                0.3.2   Sabre2_APP_v302RC.bin                2e76fc909ef1c829e57d8ae0b0f538c2102a72471348156a09af3af344954bb1    0x1b19
+  Corsair SABREPRORGB       3.04 https://www3.corsair.com/software/CUE_V3/SABRERGB.zip              0.3.2   SabrePro_APP_v304RC.bin              5854a79cab22f2c8717a2e1866dab55628783468a0e069e9a43ecc004b71da8c    0x1b2f
   Corsair POLARIS           1.02 https://www3.corsair.com/software/CUE_V3/MM800RGB.zip              0.2.9   SageApp_v1.02.50.bin                 5917b0de570296ba2a80cf5aa67f5bf0ef3026685453eb070364f450c3ab65fa    0x1b3b
   Corsair ST100RGB          0.02 https://www3.corsair.com/software/CUE_V3/ST100RGB.zip              0.2.9   ST100RGB%200.2.91.bin                baa64949b8ec21133789783d9687f9d20e0cb7d912df2f3ab7d7120280bdcd56    0x0a34
 
@@ -54,11 +54,11 @@ Hash: SHA256
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEcBAEBCAAGBQJcXP/lAAoJEN/iSOvc7y9fWIUH/1v8W8CSinxkgVNjmDpwbyGA
-pfYxv3FdwblsKDhgF83Dd/8KxcEgAhUt+heZLdvutTFaWNcxXFXWM9FNkn1Lq4p0
-Vz5tTQ3/wS5FUgyGS2gJ2sJrq3hMuQN97X/SwFhlVO942rdfy0lhJPRlPNJcyHON
-UlSW/8OhHe1nyL8hVMbD80kVW9D7zqFF/ylTw0cepbpQ2vylJrUGcpwPmLB73/Ti
-kuEAwdGuRSBWVDHDeL+a2C4SimHQkDIAMll/0M5B1liBoe4QEgqAGaIzG3++bj2V
-6V6M6a+sJWhfM5w+HT9rrsrROnAIkXz75fDdxULDpKfN1yd2VkFgmmA9pgQnSd8=
-=d6PA
+iQEcBAEBCAAGBQJcaalbAAoJEN/iSOvc7y9fDvgH/1+9mqXbgg+/t/WDh1XxCQNj
+NAJ+aKTdXTjv81+N19Okg5nW7o+xFPFe2Qqyn+autHUr2RDPvfv6Lnq58sgztRr2
+/TtBKGSSFMaF3G1boqUChWXQOC+nYWMJDv3ruVJRu+jen7d4gmml38XS45QgSVSF
+afFa5v0MXYO0isHNQ81XluwcdThNutKpQD5JjWdL34vyoTJJN9gN53NdFGGjMG0E
+XCpgCHIZHNI3YEXF+/SqVRqd0B2rCz6WvUZGiAg4YQM24pbUyl6+HVAUYoAuausD
+MIWfOC10BNnSDr+SDme8q86VlwnzN7+WHhHckLTHLLqsI9AuDfkJ/E8PIq59W08=
+=hLV7
 -----END PGP SIGNATURE-----

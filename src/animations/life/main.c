@@ -106,11 +106,8 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
 void ckb_time(ckb_runctx* context, double delta) {
     // track clock speed
     tng--;
-<<<<<<< HEAD
     if (tng == 0) {
-=======
     if (tng <= 0) {
->>>>>>> 3e6ff926ffaff6681b5205fc348096b1f5403238
         // Grow/Die each cell this tick
         tng = growdelay;
         // record the current living cells

@@ -1,4 +1,6 @@
 #include <ckb-next/animation.h>
+#include <math.h>
+#include <stdio.h>
 
 void ckb_info() {
     // Plugin info
@@ -49,9 +51,9 @@ typedef struct {
 } addressbook;
 
 // translate keycontext to adjacencygraph
-int keymap[108];
+int keymap[108] = { 0 };
 // translate keynames to adjacencygraph
-addressbook neighbors[108];
+addressbook neighbors[108] = { 0 };
 // editable adjacencygraph using kissing connectivity
 adjacencynode adjacencygraph[108] = {
     {"esc", {"f1", "grave", "1", "", "", "", "", "", "", ""}}, {"f1", {"esc", "f2", "grave", "1", "2", "", "", "", "", ""}}, {"f2", {"f1", "f3", "2", "3", "", "", "", "", "", ""}}, {"f3", {"f2", "f4", "3", "4", "", "", "", "", "", ""}}, {"f4", {"f3", "f5", "4", "5", "6", "", "", "", "", ""}}, {"f5", {"f4", "f6", "5", "6", "7", "", "", "", "", ""}}, {"f6", {"f5", "f7", "7", "8", "", "", "", "", "", ""}}, {"f7", {"f6", "f8", "8", "9", "", "", "", "", "", ""}}, {"f8", {"f7", "f9", "9", "0", "minus", "", "", "", "", ""}}, {"f9", {"f8", "f10", "0", "minus", "equal", "", "", "", "", ""}}, {"f10", {"f9", "f11", "minus", "equal", "bspace", "", "", "", "", ""}}, {"f11", {"f10", "f12", "equal", "bspace", "", "", "", "", "", ""}}, {"f12", {"f11", "prtscn", "bspace", "", "", "", "", "", "", ""}}, {"prtscn", {"f12", "scroll", "bspace", "ins", "home", "", "", "", "", ""}}, {"scroll", {"prtscn", "pause", "ins", "home", "pgup", "", "", "", "", ""}}, {"pause", {"scroll", "stop", "home", "pgup", "numlock", "", "", "", "", ""}}, {"stop", {"pause", "prev", "pgup", "numlock", "numslash", "", "", "", "", ""}}, {"prev", {"stop", "play", "numlock", "numslash", "numstar", "", "", "", "", ""}}, {"play", {"prev", "next", "numslash", "numstar", "numminus", "", "", "", "", ""}}, {"next", {"play", "numstar", "numminus", "", "", "", "", "", "", ""}},
@@ -79,6 +81,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
 // render a single key
 void draw_key_state(ckb_key *key, int s) {
     float a, r, g, b;
+<<<<<<< HEAD
     if (s) {
         ckb_grad_color(&a, &r, &g, &b, &lcolor, roundf(tng*100.f/growdelay));
     } else {
@@ -88,6 +91,15 @@ void draw_key_state(ckb_key *key, int s) {
     key->r = r;
     key->g = g;
     key->b = b;
+=======
+    // tng = growdelay causes keys to go dark for a second here, I like it.
+    ckb_grad_color(&a, &r, &g, &b, &animcolor, roundf(tng*100.f/growdelay));
+    a = s > 0 ? a : 0;
+    key->a = roundf(a);
+    key->r = roundf(r);
+    key->g = roundf(g);
+    key->b = roundf(b);
+>>>>>>> 88c958eac419f92adc6239844bbb498542194ac8
 }
 
 // update the board for user input

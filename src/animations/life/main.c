@@ -11,7 +11,7 @@ void ckb_info() {
 
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
-	CKB_PARAM_LONG("growdelay", "Frames to next generation", "frames", 60, 10, 1000);
+	CKB_PARAM_DOUBLE("growdelay", "Frames to next generation", "frames", 60, 10, 1000);
     CKB_PARAM_BOOL("refresh", "Refresh living cells on keypress", 1);
 
     // Timing/input parameters
@@ -29,8 +29,8 @@ void ckb_info() {
 
 // user parameter variables
 ckb_gradient animcolor = { 0 };
-long tng = 60;
-long growdelay = 60;
+double tng = 60;
+double growdelay = 60;
 int refreshing = 0;
 
 // main memory
@@ -68,7 +68,7 @@ adjacencynode adjacencygraph[108] = {
 // load user settings
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     CKB_PARSE_AGRADIENT("color", &animcolor) {}
-    CKB_PARSE_LONG("growdelay", &growdelay) {}
+    CKB_PARSE_DOUBLE("growdelay", &growdelay) {}
     CKB_PARSE_BOOL("refresh", &refreshing) {}
     tng = growdelay;
 }
@@ -106,11 +106,7 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
 void ckb_time(ckb_runctx* context, double delta) {
     // track clock speed
     tng--;
-<<<<<<< HEAD
-    if (tng == 0) {
-=======
     if (tng <= 0) {
->>>>>>> 3e6ff926ffaff6681b5205fc348096b1f5403238
         // Grow/Die each cell this tick
         tng = growdelay;
         // record the current living cells
@@ -154,7 +150,7 @@ void ckb_time(ckb_runctx* context, double delta) {
 // returns 108 if fails to find
 int name2num(char* keyname){
     int i = -1;
-    do { i++; } while(i < 108 && !!strcmp(keyname, adjacencygraph[i].name));
+    do { i++; } while(i < 108 && strcmp(keyname, adjacencygraph[i].name));
     if (i == 108) {
         //this key wasn't named correctly
         fprintf(stderr, "Recheck the key graph, something wasn't named right: %s", keyname);
@@ -171,7 +167,7 @@ void ckb_init(ckb_runctx* context) {
             if (!strcmp(key->name, adjacencygraph[j].name)) {
                 keymap[j] = (int) i;
                 for (int k = 0; k < 10; k++) {
-                    if (!!strcmp(adjacencygraph[j].neighbors[k], "")) {
+                    if (strcmp(adjacencygraph[j].neighbors[k], "")) {
                         neighbors[j].address[k] = name2num(adjacencygraph[j].neighbors[k]);
                     }
                 }

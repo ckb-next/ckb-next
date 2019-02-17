@@ -362,7 +362,7 @@ void* os_inputmain(void* context){
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
         if (ioctl(fd, USBDEVFS_REAPURB, &urb)) {
-            if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN || errno == EBADF)
+            if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
             else if(errno == EPIPE && urb){
@@ -380,9 +380,6 @@ void* os_inputmain(void* context){
         /// Lock all following actions with imutex.
         ///
         if (urb) {
-            // If we're shutting down, don't submit another urb, or try to process the data on this one
-            if(urb->status == -ESHUTDOWN)
-                break;
             process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
 
             /// Re-submit the URB for the next run.

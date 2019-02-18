@@ -14,7 +14,7 @@ void ckb_info() {
     CKB_PARAM_AGRADIENT("dcolor", "Dead color:", "", "00000000");
 	CKB_PARAM_DOUBLE("growdelay", "Frames to next generation", "frames", 60, 10, 1000);
     CKB_PARAM_BOOL("refresh", "Refresh living cells on keypress", 1);
-    CKB_PARAM_BOOL("gridy", "Gridy mapping", 0);
+    CKB_PARAM_BOOL("gridy", "Gridy mapping", 1);
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_POSITION);
@@ -35,7 +35,7 @@ ckb_gradient dcolor = { 0 };
 double tng = 60;
 double growdelay = 60;
 int refreshing = 0;
-int gridymap = 0;
+int gridymap = 1;
 int init = 0;
 
 // main memory
@@ -70,7 +70,7 @@ adjacencynode adjacencygraph[108] = {
     {"lctrl", {"lshift", "lwin", "", "", "", "", "", "", "", ""}}, {"lwin", {"lctrl", "lshift", "z", "lalt", "", "", "", "", "", ""}}, {"lalt", {"lwin", "z", "x", "space", "", "", "", "", "", ""}}, {"space", {"lalt", "x", "c", "v", "b", "n", "m", "comma", "dot", "ralt"}}, {"ralt", {"space", "comma", "dot", "slash", "rwin", "", "", "", "", ""}}, {"rwin", {"ralt", "slash", "rshift", "rmenu", "", "", "", "", "", ""}}, {"rmenu", {"rwin", "rshift", "rctrl", "", "", "", "", "", "", ""}}, {"rctrl", {"rmenu", "rshift", "left", "", "", "", "", "", "", ""}}, {"left", {"rctrl", "rshift", "up", "down", "", "", "", "", "", ""}}, {"down", {"left", "up", "down", "right", "", "", "", "", "", ""}}, {"right", {"down", "up", "num1", "num0", "", "", "", "", "", ""}}, {"num0", {"right", "num1", "num2", "num3", "numdot", "", "", "", "", ""}}, {"numdot", {"num0", "num1", "num2", "num3", "numenter", "", "", "", "", ""}}
 };
 
-//adjacencygraph using gridy43 mapping
+//adjacencygraph using gridy mapping
 adjacencynode gridygraph[108] = {
     {"esc", {"f1", "grave", "1", "2", "", "", "", "", "", ""}}, {"f1", {"esc", "f2", "grave", "1", "2", "3", "", "", "", ""}}, {"f2", {"f1", "f3", "2", "3", "4", "1", "", "", "", ""}}, {"f3", {"f2", "f4", "3", "4", "5", "", "", "", "", ""}}, {"f4", {"f3", "f5", "4", "5", "6", "", "", "", "", ""}}, {"f5", {"f4", "f6", "5", "6", "7", "", "", "", "", ""}}, {"f6", {"f5", "f7", "7", "8", "6", "", "", "", "", ""}}, {"f7", {"f6", "f8", "8", "9", "7", "", "", "", "", ""}}, {"f8", {"f7", "f9", "9", "0", "minus", "8", "", "", "", ""}}, {"f9", {"f8", "f10", "0", "minus", "equal", "9", "", "", "", ""}}, {"f10", {"f9", "f11", "minus", "equal", "bspace", "", "", "", "", ""}}, {"f11", {"f10", "f12", "equal", "bspace", "", "", "", "", "", ""}}, {"f12", {"f11", "prtscn", "bspace", "", "", "", "", "", "", ""}}, {"prtscn", {"f12", "scroll", "bspace", "ins", "home", "", "", "", "", ""}}, {"scroll", {"prtscn", "pause", "ins", "home", "pgup", "", "", "", "", ""}}, {"pause", {"scroll", "stop", "home", "pgup", "numlock", "", "", "", "", ""}}, {"stop", {"pause", "prev", "pgup", "numlock", "numslash", "", "", "", "", ""}}, {"prev", {"stop", "play", "numlock", "numslash", "numstar", "", "", "", "", ""}}, {"play", {"prev", "next", "numslash", "numstar", "numminus", "", "", "", "", ""}}, {"next", {"play", "numstar", "numminus", "", "", "", "", "", "", ""}},
     

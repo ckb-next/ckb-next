@@ -234,13 +234,6 @@ int main(int argc, char** argv){
 
     // Attempt to setup signal-safe signal handlers using socketpair(2)
     if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sighandler_pipe) != -1){
-        sigset_t signals;
-        sigfillset(&signals);
-        sigdelset(&signals, SIGTERM);
-        sigdelset(&signals, SIGINT);
-        sigdelset(&signals, SIGQUIT);
-        // Set up signal handlers for quitting the service.
-        sigprocmask(SIG_SETMASK, &signals, 0);
         signal(SIGTERM, sighandler);
         signal(SIGINT, sighandler);
         signal(SIGQUIT, sighandler);

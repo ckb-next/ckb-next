@@ -29,13 +29,19 @@ pa_simple *pas = NULL;
 #include <kissfft/kiss_fftr.h>
 #include <ckb-next/animation.h>
 
-//#define RANGE 768 // ~15KHz
-#define RANGE 512
-//#define RANGE (256 + 128)
-#define DIV_FACT 2000000.0
-//#define DIV_FACT 900000000000.0
-#define NORM_F 0.06
-#define V_OFFSET 0
+//#define range 768 // ~15KHz
+//#define range 512
+int range = 512;
+//#define range (256 + 128)
+double div_fact = 2000000.0;
+//#define div_fact 2000000.0
+//#define div_fact 900000000000.0
+// Normalisation factor * 100
+double norm_f = 0.06;
+//#define norm_f 0.06
+//#define V_OFFSET 0
+long int v_offset = 0;
+int linear = 0;
 
 void ckb_info(){
     // Plugin info
@@ -48,6 +54,10 @@ void ckb_info(){
 
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
+    CKB_PARAM_DOUBLE("norm_f", "Normalisation:", "", 6.0, 1.0, 10.0);
+    CKB_PARAM_DOUBLE("div_fact", "Sensitivity:", "", 20.0, 1.0, 100.0);
+    CKB_PARAM_LONG("v_offset", "Vertical Offset:", "", 0, 0, 100);
+    CKB_PARAM_BOOL("linear", "Use linear scale", "0");
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NONE);
@@ -57,8 +67,11 @@ void ckb_info(){
     
     // Presets
     CKB_PRESET_START("Default");
-	CKB_PRESET_PARAM("trigger", "0");
+    CKB_PRESET_PARAM("trigger", "0");
     CKB_PRESET_PARAM("kptrigger", "1");
+    CKB_PRESET_PARAM("norm_f", "6.0");
+    CKB_PRESET_PARAM("v_offset", "0");
+    CKB_PRESET_PARAM("linear", "0");
     CKB_PRESET_END;
 }
 
@@ -71,7 +84,9 @@ int* translated_frame;
 
 void ckb_init(ckb_runctx* context){
 #ifdef USE_PORTAUDIO
+#ifdef __linux__
     putenv("PULSE_LATENCY_MSEC=90");
+#endif
 
     PaStreamParameters inputParams;
     PaError err;
@@ -110,7 +125,7 @@ void ckb_init(ckb_runctx* context){
 
 	inbuf = malloc(2048*sizeof(kiss_fft_cpx));
 	outbuf = malloc(2048*sizeof(kiss_fft_cpx));
-    translated_frame = malloc(RANGE * sizeof(int));
+    translated_frame = malloc(range * sizeof(int));
     
     for (int i = 0; i < 2048; i++)
         hann_res[i] = (1 - cos(2 * M_PI * i / 2048)) * 0.5;
@@ -118,6 +133,14 @@ void ckb_init(ckb_runctx* context){
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_AGRADIENT("color", &animcolor){};
+    CKB_PARSE_LONG("v_offset", &v_offset){};
+    CKB_PARSE_DOUBLE("norm_f", &norm_f){
+        norm_f /= 100;
+    };
+    CKB_PARSE_DOUBLE("div_fact", &div_fact){
+        div_fact *= 100000.0;
+    };
+    CKB_PARSE_BOOL("linear", &linear){};
 }
 
 
@@ -160,14 +183,16 @@ void getFreqDec(){
 }
 
 void translate_frame_vertically(int height){
-    for(int i = 0; i < RANGE; i++)
-        translated_frame[i] = round(height * (powers[i]/(DIV_FACT * 3)) * (NORM_F * (i + 1) + 2));
+    for(int i = 0; i < range; i++)
+        translated_frame[i] = round(height * (powers[i]/(div_fact * 3)) * (norm_f * (i + 1) + 2));
 }
 
 int get_key_value(int width, int x){
-    int cur_pos = RANGE * x / width;
-    cur_pos = (cur_pos > RANGE - 1 ? RANGE - 1 : cur_pos);
+    int cur_pos = range * x / width;
+    cur_pos = (cur_pos > range - 1 ? range - 1 : cur_pos);
     int newval = translated_frame[cur_pos];
+    // Each key takes 18 values from an array
+    // Pick the highest one for this key.
     if(cur_pos > 17){
         for(int i = 0; i < 18; i++)
             if(translated_frame[cur_pos - i] > newval)
@@ -185,7 +210,7 @@ int ckb_frame(ckb_runctx* context){
 	for(ckb_key* key = keys; key < maxkey; key++){
 
         int key_y = context->height - key->y;
-        unsigned char col = 0 - (key_y + V_OFFSET <= get_key_value(context->width, key->x));
+        unsigned char col = 0 - (key_y + v_offset <= get_key_value(context->width, key->x));
         key->r = key->g = key->b = 0xFF;
         key->a = col;
 	}

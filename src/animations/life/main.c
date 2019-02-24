@@ -85,6 +85,18 @@ adjacencynode gridygraph[108] = {
     {"lctrl", {"lshift", "lwin", "", "", "", "", "", "", "", ""}}, {"lwin", {"lctrl", "lshift", "z", "lalt", "", "", "", "", "", ""}}, {"lalt", {"lwin", "z", "x", "space", "", "", "", "", "", ""}}, {"space", {"lalt", "x", "c", "v", "b", "n", "m", "comma", "dot", "ralt"}}, {"ralt", {"space", "comma", "dot", "slash", "rwin", "", "", "", "", ""}}, {"rwin", {"ralt", "slash", "rshift", "rmenu", "", "", "", "", "", ""}}, {"rmenu", {"rwin", "rshift", "rctrl", "", "", "", "", "", "", ""}}, {"rctrl", {"rmenu", "rshift", "left", "", "", "", "", "", "", ""}}, {"left", {"rctrl", "rshift", "up", "down", "", "", "", "", "", ""}}, {"down", {"left", "up", "down", "right", "", "", "", "", "", ""}}, {"right", {"down", "up", "num1", "num0", "", "", "", "", "", ""}}, {"num0", {"right", "num1", "num2", "num3", "numdot", "", "", "", "", ""}}, {"numdot", {"num0", "num1", "num2", "num3", "numenter", "", "", "", "", ""}}
 };
 
+// translate a keyname to an adjacencygraph index
+// returns 108 if fails to find
+int name2num(char* keyname){
+    int i = -1;
+    do { i++; } while(i < 108 && strcmp(keyname, adjacencygraph[i].name));
+    if (i == 108) {
+        //this key wasn't named correctly
+        fprintf(stderr, "Recheck the key graph, something wasn't named right: %s", keyname);
+    }
+    return i;
+}
+
 // messy precompute instead of messier preset data
 void choosemap(ckb_runctx* context) {
     int count = context->keycount;
@@ -198,18 +210,6 @@ void ckb_time(ckb_runctx* context, double delta) {
             draw_key_state(key, 0);
         }
     }
-}
-
-// translate a keyname to an adjacencygraph index
-// returns 108 if fails to find
-int name2num(char* keyname){
-    int i = -1;
-    do { i++; } while(i < 108 && strcmp(keyname, adjacencygraph[i].name));
-    if (i == 108) {
-        //this key wasn't named correctly
-        fprintf(stderr, "Recheck the key graph, something wasn't named right: %s", keyname);
-    }
-    return i;
 }
 
 // need params to decide which graph to initialize

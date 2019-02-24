@@ -181,6 +181,8 @@ void ckb_time(ckb_runctx* context, double delta) {
             int neighborhood = 0;
             // count the active keys near this key
             for (int j = 0; j < 10; j++) {
+                //skip counting keys with invalid keynames
+                if(neighbors[i].address[j] < 0) break;
                 // finally use the precompute to make the game loop less soupy
                 if (keystate[neighbors[i].address[j]]) {
                     neighborhood++;

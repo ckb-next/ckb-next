@@ -85,6 +85,26 @@ adjacencynode gridygraph[108] = {
     {"lctrl", {"lshift", "lwin", "", "", "", "", "", "", "", ""}}, {"lwin", {"lctrl", "lshift", "z", "lalt", "", "", "", "", "", ""}}, {"lalt", {"lwin", "z", "x", "space", "", "", "", "", "", ""}}, {"space", {"lalt", "x", "c", "v", "b", "n", "m", "comma", "dot", "ralt"}}, {"ralt", {"space", "comma", "dot", "slash", "rwin", "", "", "", "", ""}}, {"rwin", {"ralt", "slash", "rshift", "rmenu", "", "", "", "", "", ""}}, {"rmenu", {"rwin", "rshift", "rctrl", "", "", "", "", "", "", ""}}, {"rctrl", {"rmenu", "rshift", "left", "", "", "", "", "", "", ""}}, {"left", {"rctrl", "rshift", "up", "down", "", "", "", "", "", ""}}, {"down", {"left", "up", "down", "right", "", "", "", "", "", ""}}, {"right", {"down", "up", "num1", "num0", "", "", "", "", "", ""}}, {"num0", {"right", "num1", "num2", "num3", "numdot", "", "", "", "", ""}}, {"numdot", {"num0", "num1", "num2", "num3", "numenter", "", "", "", "", ""}}
 };
 
+// messy precompute instead of messier preset data
+void choosemap(ckb_runctx* context) {
+    int count = context->keycount;
+    for (int i = 0; i < count; i++) {
+        ckb_key* key = context->keys + i;
+        for (int j = 0; j < 108; j++) {
+            if (!strcmp(key->name, adjacencygraph[j].name)) {
+                keymap[j] = (int) i;
+                for (int k = 0; k < 10; k++) {
+                    if (strcmp(adjacencygraph[j].neighbors[k], "")) {
+                        neighbors[j].address[k] = name2num(adjacencygraph[j].neighbors[k]);
+                    } else {
+                        neighbors[j].address[k] = -1;
+                    }
+                }
+            }
+        }
+    }
+}
+
 // load user settings
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     CKB_PARSE_AGRADIENT("lcolor", &lcolor) {}
@@ -192,33 +212,10 @@ int name2num(char* keyname){
     return i;
 }
 
-// messy precompute instead of messier preset data
-void choosemap(ckb_runctx* context) {
-    int count = context->keycount;
-    for (int i = 0; i < count; i++) {
-        ckb_key* key = context->keys + i;
-        for (int j = 0; j < 108; j++) {
-            if (!strcmp(key->name, adjacencygraph[j].name)) {
-                keymap[j] = (int) i;
-                for (int k = 0; k < 10; k++) {
-                    if (strcmp(adjacencygraph[j].neighbors[k], "")) {
-                        neighbors[j].address[k] = name2num(adjacencygraph[j].neighbors[k]);
-                    } else {
-                        neighbors[j].address[k] = -1;
-                    }
-                }
-            }
-        }
-    }
-}
-
-
 // need params to decide which graph to initialize
 void ckb_init(ckb_runctx* context) {
         
 }
-
-
 
 // define unused builtins
 void ckb_start(ckb_runctx* context, int state) {

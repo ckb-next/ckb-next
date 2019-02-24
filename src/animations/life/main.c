@@ -39,7 +39,7 @@ int gridymap = 1;
 int init = 0;
 
 // main memory
-int keystate[108] = { [0 ... 107] = 1 };
+int keystate[108] = { 0 };
 int keypressed[108] = { 0 };
 
 typedef struct {
@@ -109,6 +109,7 @@ void choosemap(ckb_runctx* context) {
                     if (strcmp(adjacencygraph[j].neighbors[k], "")) {
                         neighbors[j].address[k] = name2num(adjacencygraph[j].neighbors[k]);
                     } else {
+                        //Don't map blank keynames to Esc
                         neighbors[j].address[k] = -1;
                     }
                 }
@@ -181,7 +182,7 @@ void ckb_time(ckb_runctx* context, double delta) {
             int neighborhood = 0;
             // count the active keys near this key
             for (int j = 0; j < 10; j++) {
-                //skip counting keys with invalid keynames
+                //skip vacant neighbors
                 if(neighbors[i].address[j] < 0) break;
                 // finally use the precompute to make the game loop less soupy
                 if (keystate[neighbors[i].address[j]]) {

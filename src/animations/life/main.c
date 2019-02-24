@@ -128,9 +128,8 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     //choose keymap
     if (!strcmp(name,"gridy")) { 
         if (gridymap) {
-            for (int i = 0; i < 108; i++) {
-                adjacencygraph[i] = gridygraph[i];
-            }
+            memcpy(adjacencygraph, gridygraph, 
+sizeof(gridygraph));
         }
         //params come after initial init unfortunately
         choosemap(context);

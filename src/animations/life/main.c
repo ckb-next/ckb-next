@@ -1,4 +1,6 @@
 #include <ckb-next/animation.h>
+#include <math.h>
+#include <string.h>
 
 void ckb_info() {
     // Plugin info
@@ -155,15 +157,8 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {
     // optionally give the user more time to edit their board
     if (refreshing > 0) { tng = growdelay; }
     for (int i = 0; i < 108; i++) {
-        if (!strcmp(key->name, adjacencygraph[i].name)) {
-            // ignore keyups
-            keypressed[i]++;
-            if (keypressed[i] > 1) { keypressed[i] = 0; }
-            else {
-                keystate[i]++;
-                if (keystate[i] > 1) { keystate[i] = 0; }
-            }
-        }
+        if (!strcmp(key->name, adjacencygraph[i].name) && state)
+            keystate[i] = !keystate[i];
     }
 }
 
@@ -189,27 +184,19 @@ void ckb_time(ckb_runctx* context, double delta) {
                     neighborhood++;
                 }
             }
-            if (neighborhood < 2) {
-                livmap[i] = 0;
-            } else if (neighborhood == 3) {
-                livmap[i] = 1;
-            } else if (neighborhood > 3) {
-                livmap[i] = 0;
-            }
+
+            if (neighborhood == 2)
+                continue;
+
+            livmap[i] = (neighborhood == 3);
         }
         // tick changes
-        for (int i = 0; i < 108; i++) {
-            keystate[i] = livmap[i];
-        }
+        memcpy(keystate, livmap, sizeof(keystate));
     }
     // render
     for (int i = 0; i < 108; i++) {
         ckb_key* key = context->keys + keymap[i];
-        if (keystate[i] > 0) {
-            draw_key_state(key, 1);
-        } else {
-            draw_key_state(key, 0);
-        }
+        draw_key_state(key, keystate[i]);
     }
 }
 

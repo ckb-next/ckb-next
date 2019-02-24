@@ -127,7 +127,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     //choose keymap
     if (!strcmp(name,"gridy")) { 
         if (gridymap) {
-            memcpy(adjacencygraph, gridygraph, sizeof(gridygraph)); 
+            memcpy(adjacencygraph, gridygraph, sizeof(gridygraph));
         }
         //params come after initial init unfortunately
         choosemap(context);
@@ -137,11 +137,8 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
 // render a single key
 void draw_key_state(ckb_key *key, int s) {
     float a, r, g, b;
-    if (s) {
-        ckb_grad_color(&a, &r, &g, &b, &lcolor, roundf(tng*100.f/growdelay));
-    } else {
-        ckb_grad_color(&a, &r, &g, &b, "00000000", 100.f);
-    }
+    ckb_grad_color(&a, &r, &g, &b, &lcolor, roundf(tng*100.f/growdelay));
+    if (!s) { a=r=g=b=0; }
     key->a = roundf(a);
     key->r = roundf(r);
     key->g = roundf(g);

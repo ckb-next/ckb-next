@@ -12,8 +12,7 @@ void ckb_info() {
     CKB_DESCRIPTION("Conway's Game of Life on your keyboard.");
 
     // Effect parameters
-    CKB_PARAM_AGRADIENT("lcolor", "Live color:", "", "ffffffff");
-    CKB_PARAM_AGRADIENT("dcolor", "Dead color:", "", "00000000");
+    CKB_PARAM_AGRADIENT("lcolor", "Live color:", "color", "0:ffff0000 50:ff00ff00 100:ff00ff00");
 	CKB_PARAM_DOUBLE("growdelay", "Frames to next generation", "frames", 60, 10, 1000);
     CKB_PARAM_BOOL("refresh", "Refresh living cells on keypress", 1);
     CKB_PARAM_BOOL("gridy", "Gridy mapping", 1);
@@ -33,7 +32,6 @@ void ckb_info() {
 
 // user parameter variables
 ckb_gradient lcolor = { 0 };
-ckb_gradient dcolor = { 0 };
 double tng = 60;
 double growdelay = 60;
 int refreshing = 0;
@@ -42,7 +40,6 @@ int init = 0;
 
 // main memory
 int keystate[108] = { 0 };
-int keypressed[108] = { 0 };
 
 typedef struct {
     char* name;
@@ -123,7 +120,6 @@ void choosemap(ckb_runctx* context) {
 // load user settings
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     CKB_PARSE_AGRADIENT("lcolor", &lcolor) {}
-    CKB_PARSE_AGRADIENT("dcolor", &dcolor) {}
     CKB_PARSE_DOUBLE("growdelay", &growdelay) {}
     CKB_PARSE_BOOL("refresh", &refreshing) {}
     CKB_PARSE_BOOL("gridy", &gridymap) {}
@@ -131,7 +127,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value) {
     //choose keymap
     if (!strcmp(name,"gridy")) { 
         if (gridymap) {
-            memcpy(adjacencygraph, gridygraph, sizeof(gridygraph));
+            memcpy(adjacencygraph, gridygraph, sizeof(gridygraph)); 
         }
         //params come after initial init unfortunately
         choosemap(context);
@@ -144,7 +140,7 @@ void draw_key_state(ckb_key *key, int s) {
     if (s) {
         ckb_grad_color(&a, &r, &g, &b, &lcolor, roundf(tng*100.f/growdelay));
     } else {
-        ckb_grad_color(&a, &r, &g, &b, &dcolor, roundf(tng*100.f/growdelay));
+        ckb_grad_color(&a, &r, &g, &b, "00000000", 100.f);
     }
     key->a = roundf(a);
     key->r = roundf(r);
@@ -171,7 +167,7 @@ void ckb_time(ckb_runctx* context, double delta) {
         tng = growdelay;
         // record the current living cells
         int livmap[108];
-        for (int i = 0; i < 108; i++) { livmap[i] = keystate[i]; }
+        memcpy(livmap, keystate, sizeof(keystate));
         // compute changes before ticking
         for (int i = 0; i < 108; i++) {
             int neighborhood = 0;
@@ -184,10 +180,7 @@ void ckb_time(ckb_runctx* context, double delta) {
                     neighborhood++;
                 }
             }
-
-            if (neighborhood == 2)
-                continue;
-
+            if (neighborhood == 2) continue;
             livmap[i] = (neighborhood == 3);
         }
         // tick changes

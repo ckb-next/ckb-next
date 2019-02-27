@@ -1,5 +1,5 @@
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: SHA512
 
 # The GPG key: DCEF2F5F - A full copy of it can also be found in src/ckb/ckb-next-key.gpg
 # This document is signed to prevent tampering. Signature verification is enabled only when GnuPG is available.
@@ -29,7 +29,7 @@ Hash: SHA256
   Corsair K70RGBMK2         3.24 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2.zip            0.3.2   Julius_App_v3.24.26.bin              1324fbf740948fa42e4e5edd48248c94cd02d3d0af123ed5832f9f9e3732330d    0x1b49
   Corsair K70RGBMK2SE       3.24 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2SE.zip          0.3.2   Julius_Alba_App_v3.24.13.bin         1942d60a9e63649583dd5609ba8aaffaf1cd242555639a8bb5e506bd996a0ed1    0x1b6b
   Corsair K70RGBMK2LP       3.24 https://www3.corsair.com/software/CUE_V3/K70RGBMK.2LP.zip          0.3.2   Nero_App_v3.24.22.bin                257f5d3d8164e6deb8eab8f2ce0070b9030f586159e362b7f0d339ad71e20402    0x1b55
-  Corsair K95RGB            2.05 https://www3.corsair.com/software/CUE_V3/K95RGB.zip                0.2.7   K95RGB_APP_V205.bin                  8d0680dd033d6020a53bc9bfa83e761143699d1122f1d0133e95ad3056d63a15    0x1b11
+  Corsair K95RGB            3.08 https://www3.corsair.com/software/CUE_V3/K95RGB.zip                0.3.2   K95%20RGB_App_v308.bin               15ff062f7d70c32f08c3d3211fd47a20a7c416d1d89e94a3ee5f36ec8eb790ff    0x1b11
   Corsair K95PLATINUMRGB    3.21 https://www3.corsair.com/software/CUE_V3/K95RGBPLATINUM.zip        0.3.2   Freya_App_v3.21.28.bin               5fdce6059d7ef0f044a89cb6693665cb0bfec807fb7b0579f1110cac0e3ee079    0x1b2d
   Corsair STRAFE            3.08 https://www3.corsair.com/software/CUE_V3/STRAFE.zip                0.3.2   Strafe_App_v308.bin                  f33840c3d3687d846efa8b8bc11896ebedad44a5a9a9693755d294ae457fa49a    0x1b15
   Corsair STRAFERGB         3.08 https://www3.corsair.com/software/CUE_V3/STRAFERGB.zip             0.3.2   Strafe%20RGB_App_v308.bin            aeed03739338e58b06431dd006e0f5461132c12af66994b296d26df5aca905cb    0x1b20
@@ -52,13 +52,13 @@ Hash: SHA256
 
 !END FW ENTRIES
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQEcBAEBCAAGBQJcaalbAAoJEN/iSOvc7y9fDvgH/1+9mqXbgg+/t/WDh1XxCQNj
-NAJ+aKTdXTjv81+N19Okg5nW7o+xFPFe2Qqyn+autHUr2RDPvfv6Lnq58sgztRr2
-/TtBKGSSFMaF3G1boqUChWXQOC+nYWMJDv3ruVJRu+jen7d4gmml38XS45QgSVSF
-afFa5v0MXYO0isHNQ81XluwcdThNutKpQD5JjWdL34vyoTJJN9gN53NdFGGjMG0E
-XCpgCHIZHNI3YEXF+/SqVRqd0B2rCz6WvUZGiAg4YQM24pbUyl6+HVAUYoAuausD
-MIWfOC10BNnSDr+SDme8q86VlwnzN7+WHhHckLTHLLqsI9AuDfkJ/E8PIq59W08=
-=hLV7
+iQEzBAEBCgAdFiEE2efsyk0ijiZmMKgW3+JI69zvL18FAlx25ksACgkQ3+JI69zv
+L1/CEgf/RtxqFrUrkzMzlXUAB5IQGvHhreUQvF00lENeq8G8khE3oTu1gYtrLEVY
+o4WCGD7Nmhy6HPk8j9R0IPxuWSP2kx4F+CbH78UIsO7WbtPFFdeqzhSHf8ByIbnv
+PJz/g6yc75Tnyp82jP/kvPjZlJ7otZ24qV3r56gwRyr7nZwecwLD8U7nODok+963
+FsTYEWJ5hBiJZSC8LnOdMis1HlPR+QNJpCrOn1u1mtDzX1gqy9jeIH7fNOaeIIci
+a5feM6nOgT9xQ15rFxPf0mjPBBIltcTRft6GA/4rSrz6zQ1GQfM5o3v25t6TtJJD
+ZRU17Mfgn5b5YVK3yzWqTTYCeXNqLA==
+=Z1Ym
 -----END PGP SIGNATURE-----

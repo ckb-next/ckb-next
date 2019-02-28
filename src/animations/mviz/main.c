@@ -13,7 +13,6 @@
  * You should have received a copy of the GNU General Public License
  * along with mviz.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -23,11 +22,13 @@
 PaStream *stream = NULL;
 #else
 #include <pulse/simple.h>
-pa_simple *pas = NULL;
+pa_simple *stream = NULL;
 #endif
 
 #include <kissfft/kiss_fftr.h>
 #include <ckb-next/animation.h>
+
+long int devid = 0;
 
 //#define range 768 // ~15KHz
 //#define range 512
@@ -56,6 +57,7 @@ void ckb_info(){
     CKB_PARAM_AGRADIENT("color", "Fade color:", "", "ffffffff");
     CKB_PARAM_DOUBLE("norm_f", "Normalisation:", "", 6.0, 1.0, 10.0);
     CKB_PARAM_DOUBLE("div_fact", "Sensitivity:", "", 20.0, 1.0, 100.0);
+    CKB_PARAM_LONG("devid", "Device:\n(See About)", "", 0, 0, 100);
     CKB_PARAM_LONG("v_offset", "Vertical Offset:", "", 0, 0, 100);
     CKB_PARAM_BOOL("linear", "Use linear scale", "0");
 
@@ -82,32 +84,39 @@ kiss_fft_cpx* outbuf;
 ckb_gradient animcolor = { 0 };
 int* translated_frame;
 
-void ckb_init(ckb_runctx* context){
+void destroyCapture(){
+    if(stream == NULL)
+        return;
 #ifdef USE_PORTAUDIO
-#ifdef __linux__
-    putenv("PULSE_LATENCY_MSEC=90");
+    Pa_CloseStream(stream);
+#else
+    pa_simple_free(stream);
 #endif
+    stream = NULL;
+}
 
+void initCapture(){
+    if(stream != NULL)
+        return;
+#ifdef USE_PORTAUDIO
     PaStreamParameters inputParams;
     PaError err;
-    const PaDeviceInfo* inputInfo;
-    err = Pa_Initialize();
-    if(err != paNoError){
-        fprintf(stderr, "Error initialising PortAudio %d\n", err);
-        // TODO: Handle this somehow
-    }
-    
-    inputParams.device = Pa_GetDefaultInputDevice();
+
+    if(devid > -1 && devid < Pa_GetDeviceCount())
+        inputParams.device = devid;
+    else
+        inputParams.device = Pa_GetDefaultInputDevice();
+
     DBG("Dev id %d", inputParams.device);
-    inputInfo = Pa_GetDeviceInfo(inputParams.device);
-    DBG("Recording from %s", inputInfo->name);
+    const PaDeviceInfo* inputInfo = Pa_GetDeviceInfo(inputParams.device);
+    fprintf(stderr, "Recording from %s", inputInfo->name);
     
     inputParams.channelCount = 1;
     inputParams.sampleFormat = paInt16;
     inputParams.suggestedLatency = inputInfo->defaultLowInputLatency;
     inputParams.hostApiSpecificStreamInfo = NULL;
     
-    err = Pa_OpenStream(&stream, &inputParams, NULL, 44100, 512, paNoFlag, NULL, NULL );
+    err = Pa_OpenStream(&stream, &inputParams, NULL, 44100, 2048, paNoFlag, NULL, NULL);
     if(err != paNoError)
         fprintf(stderr, "Error opening PortAudio stream %d\n", err);
     
@@ -120,9 +129,23 @@ void ckb_init(ckb_runctx* context){
 		.rate = 44100,
 		.channels = 1
 	};
-	pas = pa_simple_new(NULL, "CKB Music Viz", PA_STREAM_RECORD, NULL, "CKB Music Viz", &ss, NULL, NULL, NULL);
+	stream = pa_simple_new(NULL, "CKB Music Viz", PA_STREAM_RECORD, NULL, "CKB Music Viz", &ss, NULL, NULL, NULL);
 #endif
+}
+kiss_fft_cfg config;
+void ckb_init(ckb_runctx* context){
+	config = kiss_fft_alloc(2048, 0, NULL, NULL);
 
+#ifdef USE_PORTAUDIO
+#ifdef __linux__
+    putenv("PULSE_LATENCY_MSEC=90");
+#endif
+    PaError err = Pa_Initialize();
+    if(err != paNoError){
+        fprintf(stderr, "Error initialising PortAudio %d\n", err);
+        // TODO: Handle this somehow
+    }
+#endif
 	inbuf = malloc(2048*sizeof(kiss_fft_cpx));
 	outbuf = malloc(2048*sizeof(kiss_fft_cpx));
     translated_frame = malloc(range * sizeof(int));
@@ -141,6 +164,14 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
         div_fact *= 100000.0;
     };
     CKB_PARSE_BOOL("linear", &linear){};
+    CKB_PARSE_LONG("devid", &devid){
+        // 0 is considered a valid value for portaudio, we use 0 for default
+        devid -= 1;
+        // If we were already running, close the previous stream
+        destroyCapture();
+        // Create a new stream
+        initCapture();
+    };
 }
 
 
@@ -161,24 +192,26 @@ int gcounter = 0;
 void getFreqDec(){
 	int16_t data[2048] = { 0 };
 
+    if(stream == NULL)
+        return;
+
 #ifdef USE_PORTAUDIO
-    Pa_ReadStream(stream, data, 512);
+    Pa_ReadStream(stream, data, 2048);
 #else
-	pa_simple_read(pas, data, sizeof(data), NULL);
+	pa_simple_read(stream, data, sizeof(data), NULL);
 #endif
 
 	for(int i = 0; i < 2048; i++){
 		inbuf[i].r = data[i] * hann_res[i];
 		inbuf[i].i = 0;
 	}
-	kiss_fft_cfg config = kiss_fft_alloc(2048, 0, NULL, NULL);
 	kiss_fft(config, inbuf, outbuf);
 
 	for(int j = 0; j < 1024; j++)
         powers[j] = sqrt(outbuf[j].r*outbuf[j].r + outbuf[j].i*outbuf[j].i);
 
-	kiss_fft_free(config);
-	kiss_fft_cleanup();
+//	kiss_fft_free(config);
+//	kiss_fft_cleanup();
 
 }
 

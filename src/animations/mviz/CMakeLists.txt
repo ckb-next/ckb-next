@@ -25,27 +25,71 @@
 #   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #   POSSIBILITY OF SUCH DAMAGE.
 
-find_package(PulseAudio)
-if (NOT ${PULSEAUDIOSIMPLE_FOUND})
-    message(WARNING "Missing PulseAudio Simple API. Not building mviz.")
-    return()
+if (NOT USE_PORTAUDIO)
+    find_package(PulseAudio)
+    if (NOT ${PULSEAUDIOSIMPLE_FOUND})
+        message(WARNING "Missing PulseAudio Simple API. Not building mviz.")
+        return()
+    endif ()
 endif ()
 
 add_executable(mviz main.c)
 
-target_include_directories(
-    mviz
-        PRIVATE
-          "${PULSEAUDIOSIMPLE_INCLUDE_DIRS}")
+if (USE_PORTAUDIO)
+    set_target_properties(mviz PROPERTIES COMPILE_DEFINITIONS "USE_PORTAUDIO=1")
 
-target_link_libraries(
-    mviz
-        PRIVATE
-          m
-          KissFFT::KissFFT
-          ${CMAKE_PROJECT_NAME}::Animation
-          "${PULSEAUDIOSIMPLE_LIBRARIES}"
-          )
+    if (LINUX)
+        set(AUDIO_LIBRARIES portaudio)
+        set(PORTAUDIO_INCLUDE_DIRS "/usr/include/")
+    elseif (MACOS)
+        find_library(CORESERVICES_LIBRARY CoreServices)
+        find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+        find_library(COREAUDIO_LIBRARY CoreAudio)
+        find_library(AUDIOUNIT_LIBRARY AudioUnit)
+        find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+        set(PORTAUDIO_INCLUDE_DIRS "/usr/local/opt/portaudio/include/")
+    else ()
+        message(WARNING "Include path for PortAudio has not been specified for this OS.")
+    endif ()
+
+    target_include_directories(
+        mviz
+            PRIVATE
+              "${PORTAUDIO_INCLUDE_DIRS}")
+
+else ()
+    target_include_directories(
+        mviz
+            PRIVATE
+              "${PULSEAUDIOSIMPLE_INCLUDE_DIRS}")
+
+    set(AUDIO_LIBRARIES "${PULSEAUDIOSIMPLE_LIBRARIES}")
+endif ()
+
+if (MACOS)
+    target_link_libraries(
+        mviz
+            PRIVATE
+              m
+              KissFFT::KissFFT
+              ${CMAKE_PROJECT_NAME}::Animation
+              ${CORESERVICES_LIBRARY}
+              ${COREFOUNDATION_LIBRARY}
+              ${AUDIOUNIT_LIBRARY}
+              ${AUDIOTOOLBOX_LIBRARY}
+              ${COREAUDIO_LIBRARY}
+              "/usr/local/opt/portaudio/lib/libportaudio.a")
+elseif (LINUX)
+        target_link_libraries(
+        mviz
+            PRIVATE
+              m
+              KissFFT::KissFFT
+              ${CMAKE_PROJECT_NAME}::Animation
+              "${AUDIO_LIBRARIES}")
+else()
+    message(WARNING "PortAudio link library has not been specified for this OS.")
+endif()
 
 set_target_properties(
     mviz

@@ -99,6 +99,7 @@ cmake_dependent_option(WITH_RIPPLE   "Build with 'Ripple' animation."   ON "WITH
 cmake_dependent_option(WITH_WAVE     "Build with 'Wave' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_INVADERS "Build with 'Invaders' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_LIFE     "Build with 'Life' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
+cmake_dependent_option(WITH_SNAKE    "Build with 'Snake' animation."    ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 
 # Options: daemon
 option(DISABLE_UPDATER "Disable the ckb-next updater. This option should only be enabled during packaging."    OFF)

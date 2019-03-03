@@ -41,7 +41,7 @@ long int v_offset = 0;
 
 // int linear = 0;
 
-// int single_colour = 0;
+int single_colour = 0;
 
 void ckb_info(){
     CKB_NAME("Music Visualization");
@@ -64,7 +64,7 @@ void ckb_info(){
 
 //    CKB_PARAM_BOOL("linear", "Use linear scale", "0");
 
-//    CKB_PARAM_BOOL("singlecol", "Single Colour", "0");
+    CKB_PARAM_BOOL("singlecol", "Single Colour", "0");
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NONE);
@@ -76,20 +76,23 @@ void ckb_info(){
     CKB_PRESET_START("Default");
     CKB_PRESET_PARAM("trigger", "0");
     CKB_PRESET_PARAM("kptrigger", "1");
-    CKB_PRESET_PARAM("norm_f", "6.0");
+    CKB_PRESET_PARAM("norm_f", "7.5");
     CKB_PRESET_PARAM("v_offset", "0");
+    CKB_PRESET_PARAM("singlecol", "0");
 
 //    CKB_PRESET_PARAM("linear", "0");
 
     CKB_PRESET_END;
 
-/*
+
     CKB_PRESET_START("Single Colour");
     CKB_PRESET_PARAM("trigger", "0");
     CKB_PRESET_PARAM("kptrigger", "1");
+    CKB_PRESET_PARAM("norm_f", "7.5");
+    CKB_PRESET_PARAM("v_offset", "0");
     CKB_PRESET_PARAM("singlecol", "1");
     CKB_PRESET_END;
-*/
+
 }
 
 double powers[1024] = { 0.0 };
@@ -182,7 +185,7 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_ARGB("bgcolour", &bg_a, &bg_r, &bg_g, &bg_b){};
     CKB_PARSE_LONG("range", &range){};
 
-//    CKB_PARSE_BOOL("singlecol", &single_colour){};
+    CKB_PARSE_BOOL("singlecol", &single_colour){};
 
 //    CKB_PARSE_BOOL("linear", &linear){};
 
@@ -269,7 +272,7 @@ int ckb_frame(ckb_runctx* context){
     ckb_key* keys = context->keys;
     ckb_key* maxkey = keys + context->keycount;
     getFreqDec();
-/*
+
     if(single_colour){
         translate_frame_vertically(100);
         // Find the max value
@@ -290,7 +293,7 @@ int ckb_frame(ckb_runctx* context){
 
         return 0;
     }
-*/
+
     for(ckb_key* key = keys; key < maxkey; key++){
         translate_frame_vertically(context->height);
         int key_y = context->height - key->y;

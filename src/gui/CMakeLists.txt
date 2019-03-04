@@ -88,7 +88,7 @@ AudioToolbox: ${AUDIOTOOLBOX_LIBRARY}")
     endif ()
         mark_as_advanced(FOUNDATION_LIBRARY COREAUDIO_LIBRARY AUDIOTOOLBOX_LIBRARY)
 elseif (LINUX)
-    if ((Qt5Core_VERSION VERSION_LESS 5.7.0) OR USE_APPINDICATOR_OVERRIDE)
+    if ((Qt5Core_VERSION VERSION_LESS 5.7.0) OR USE_APPINDICATOR_OVERRIDE OR "$ENV{QT_QPA_PLATFORMTHEME}" STREQUAL "gtk2" )
         find_package(Appindicator)
         if (Appindicator_FOUND)
             target_compile_definitions(

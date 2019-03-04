@@ -103,7 +103,7 @@ MainWindow::MainWindow(QWidget *parent) :
     useAppindicator = false;
     trayIcon = 0;
 
-    if(((desktop == "unity" || qpaTheme == "appmenu-qt5") && !appIndicatorOff.contains(ckbnextAppindicator)) || appIndicatorOn.contains(ckbnextAppindicator)){
+    if(((desktop == "unity" || qpaTheme == "appmenu-qt5" || qpaTheme == "gtk2") && !appIndicatorOff.contains(ckbnextAppindicator)) || appIndicatorOn.contains(ckbnextAppindicator)){
         qDebug() << "Using AppIndicator";
         useAppindicator = true;
 

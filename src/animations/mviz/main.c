@@ -45,11 +45,11 @@ int single_colour = 0;
 
 void ckb_info(){
     CKB_NAME("Music Visualization");
-    CKB_VERSION("0.3");
+    CKB_VERSION("1.0");
     CKB_COPYRIGHT("2017-2019", "RULER501 & TasosSah");
     CKB_LICENSE("GPLv2+");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25CA1DB0D92C}");
-    CKB_DESCRIPTION("A collection of music visualization effects");
+    CKB_DESCRIPTION("A collection of music visualization effects.<br><a href=\"https://github.com/ckb-next/ckb-next/wiki/Animations#mviz-music-visualizer\">Set-up instructions</a>");
 
     // Effect parameters
     CKB_PARAM_AGRADIENT("color", "Colour:", "", "0:ff00ff00 30:ffffff00 60:ffffa500 77:ffff0000 100:ffff0000");

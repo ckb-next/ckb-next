@@ -28,7 +28,7 @@
 #   See COPYING regarding the distribution of kissfft library and not this file.
 
 # Upstream version from https://sourceforge.net/projects/kissfft/
-project(KissFFT LANGUAGES C VERSION 1.3.0)
+project(KissFFT LANGUAGES C VERSION 1.3.1)
 
 add_library(KissFFT STATIC
             kiss_fft.c)

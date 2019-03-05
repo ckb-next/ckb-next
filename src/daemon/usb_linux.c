@@ -778,6 +778,7 @@ int usbmain(){
     udev_monitor_enable_receiving(monitor);
     // Get an fd for the monitor
     int fd = udev_monitor_get_fd(monitor);
+
     fd_set fds;
     while(udev){
         FD_ZERO(&fds);
@@ -803,6 +804,18 @@ int usbmain(){
             } else if(!strcmp(action, "remove"))
                 usb_rm_device(dev);
             udev_device_unref(dev);
+        } else {
+            // if select returns -1 there is a chance that the waiting
+            // was interrupted by a signal
+            // check whether there is data available in the
+            // sighandler_pipe, read if there is and manually call the
+            // signal-handling routine
+            int sighandler_msg;
+            ioctl(sighandler_pipe[SIGHANDLER_RECEIVER], FIONREAD, &sighandler_msg);
+            if (sighandler_msg > 0){
+                read(sighandler_pipe[SIGHANDLER_RECEIVER], &sighandler_msg, sizeof(int));
+                exithandler(sighandler_msg);
+            }
         }
     }
     udev_monitor_unref(monitor);

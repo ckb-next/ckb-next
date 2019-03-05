@@ -952,6 +952,17 @@ void powerEventCallback(void *refcon, io_service_t service, uint32_t type, void 
     }
 }
 
+///
+/// \brief mac_exithandler
+/// Thin layer to deconstruct the CFSocket object into a native one,
+/// reading the received data from that, and passing it on to the main
+/// exithandler function.
+void mac_exithandler(CFSocketRef s, CFSocketCallBackType t, CFDataRef a, const void *data, void *info) {
+    int type;
+    read(CFSocketGetNative(s), &type, sizeof(int));
+    exithandler(type);
+}
+
 int usbmain(){
     int vendor = V_CORSAIR;
 
@@ -1033,6 +1044,18 @@ int usbmain(){
     io_iterator_t iterator_syspower = 0;
     IORegisterForSystemPower(NULL, &notify, powerEventCallback, &iterator_syspower);
     CFRunLoopAddSource(mainloop, IONotificationPortGetRunLoopSource(notify), kCFRunLoopDefaultMode);
+
+    // setup signal handling via CoreFoundation socket callout mechanism
+    // see mac_exithandler for the reading side of this setup
+    CFSocketRef cf_socket = CFSocketCreateWithNative(
+            NULL,
+            sighandler_pipe[SIGHANDLER_RECEIVER],
+            kCFSocketReadCallBack,
+            mac_exithandler,
+            NULL);
+    CFRunLoopSourceRef socket_source = CFSocketCreateRunLoopSource(NULL, cf_socket, 0);
+
+    CFRunLoopAddSource(mainloop, socket_source, kCFRunLoopCommonModes);
 
     // Enter loop to scan/connect new devices
     CFRunLoopRun();

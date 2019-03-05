@@ -165,7 +165,17 @@ void KbLightWidget::on_animButton_clicked(){
         return;
     const AnimScript* script = dialog.chosenScript();
     int presetId = dialog.chosenPreset();
-    ui->animWidget->addAnim(script, currentSelection, script->presets()[presetId], script->preset(presetId));
+    QString animName = script->presets()[presetId];
+    // If the preset is named "Default", then just use the script name
+    if(!animName.compare("Default", Qt::CaseInsensitive))
+        animName = script->name();
+    else if(animName.compare(script->name(), Qt::CaseInsensitive)){
+        // Append the animation script name otherwise, and only if preset and script name are not identical
+        animName.append(" (");
+        animName.append(script->name());
+        animName.append(")");
+    }
+    ui->animWidget->addAnim(script, currentSelection, animName, script->preset(presetId));
     light->restartAnimation();
 }
 

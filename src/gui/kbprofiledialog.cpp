@@ -121,6 +121,11 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
         // Can't delete the last profile on the device
         del->setEnabled(false);
     QAction* hwsave = new QAction("Save to Hardware", this);
+    // Disable Save to hardware button for unsupported devices
+    if(!device->hwload){
+        hwsave->setDisabled(true);
+        hwsave->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
+    }
     QAction* moveup = new QAction("Move Up", this);
     if(index == 0)
         moveup->setEnabled(false);

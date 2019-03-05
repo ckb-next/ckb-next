@@ -28,7 +28,7 @@
 # No need to check for WITH_ANIMATIONS, because all the options below
 # already depend on it through cmake_dependent_option()
 
-foreach (animation IN ITEMS GRADIENT HEAT PINWHEEL RAIN RANDOM RIPPLE WAVE INVADERS LIFE SNAKE)
+foreach (animation IN ITEMS GRADIENT HEAT PINWHEEL RAIN RANDOM RIPPLE WAVE INVADERS LIFE SNAKE PIPE)
   if (WITH_${animation})
     string(TOLOWER ${animation} animation)
     add_executable(${animation} ${animation}/main.c)

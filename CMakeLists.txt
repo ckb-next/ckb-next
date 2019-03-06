@@ -99,11 +99,12 @@ cmake_dependent_option(WITH_INVADERS "Build with 'Invaders' animation." ON "WITH
 cmake_dependent_option(WITH_LIFE     "Build with 'Life' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_SNAKE    "Build with 'Snake' animation."    ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_PIPE     "Build with 'Pipe' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
-cmake_dependent_option(WITH_MVIZ     "Build with music visualizer."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 
 if (LINUX)
+    cmake_dependent_option(WITH_MVIZ     "Build with music visualizer."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
     option(USE_PORTAUDIO "Use portaudio for music visualizer." OFF)
 else ()
+    cmake_dependent_option(WITH_MVIZ     "Build with music visualizer."     OFF "WITH_ANIMATIONS;WITH_GUI" OFF)
     set(USE_PORTAUDIO ON)
 endif ()
 # Options: daemon

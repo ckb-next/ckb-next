@@ -813,8 +813,13 @@ int usbmain(){
             int sighandler_msg;
             ioctl(sighandler_pipe[SIGHANDLER_RECEIVER], FIONREAD, &sighandler_msg);
             if (sighandler_msg > 0){
-                read(sighandler_pipe[SIGHANDLER_RECEIVER], &sighandler_msg, sizeof(int));
+                int unused_result = read(sighandler_pipe[SIGHANDLER_RECEIVER], &sighandler_msg, sizeof(int));
                 exithandler(sighandler_msg);
+
+                // cast unused result to void to silence over-eager
+                // warning about unused variables:
+                // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
+                (void) unused_result;
             }
         }
     }

@@ -48,22 +48,27 @@ static void quit() {
 /// \param type received signal type
 void ignore_signal(int type){
     // Use signal-safe(7) write(3) call to print warning
-    write(1, "\n[W] Ignoring signal ", 22);
+    int unused_result = write(1, "\n[W] Ignoring signal ", 22);
     switch (type) {
         case SIGTERM:
-            write(1, "SIGTERM", 7);
+            unused_result = write(1, "SIGTERM", 7);
             break;
         case SIGINT:
-            write(1, "SIGINT", 6);
+            unused_result = write(1, "SIGINT", 6);
             break;
         case SIGQUIT:
-            write(1, "SIGQUIT", 7);
+            unused_result = write(1, "SIGQUIT", 7);
             break;
         default:
-            write(1, "UNKNOWN", 7);
+            unused_result = write(1, "UNKNOWN", 7);
             break;
     }
-    write(1, " (already shutting down)\n", 27);
+    unused_result = write(1, " (already shutting down)\n", 27);
+
+    // cast unused result to void to silence over-eager
+    // warning about unused variables:
+    // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
+    (void) unused_result;
 }
 
 ///
@@ -89,7 +94,12 @@ void exithandler(int type){
 /// signal handling.
 /// \param type received signal type
 void sighandler(int type){
-    write(sighandler_pipe[SIGHANDLER_SENDER], &type, sizeof(int));
+    int unused_result = write(sighandler_pipe[SIGHANDLER_SENDER], &type, sizeof(int));
+
+    // cast unused result to void to silence over-eager
+    // warning about unused variables:
+    // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
+    (void) unused_result;
 }
 
 void localecase(char* dst, size_t length, const char* src){

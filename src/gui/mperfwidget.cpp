@@ -2,7 +2,6 @@
 #include "ui_mperfwidget.h"
 #include "modeselectdialog.h"
 #include <cmath>
-#include <QDebug>
 
 const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 
@@ -168,26 +167,12 @@ void MPerfWidget::sliderYMoved(int index){
         stages[index].xSlider->setValue(slider->value());
 }
 
-void MPerfWidget::hideItemsInLayout(QLayout* layout)
-{
-    int cnt = layout->count();
-    for(int i = 0; i < cnt; i++)
-    {
-        qDebug() << layout->itemAt(i);
-        if(layout->itemAt(i)->widget() != nullptr)
-            layout->itemAt(i)->widget()->deleteLater();
-    }
-}
-
 void MPerfWidget::setLegacyM95(){
-    // FIXME: it still shows 5 stages
     ui->eBox4->setChecked(false);
     ui->eBox5->setChecked(false);
     QWidget* w[] =  {
         ui->indicBox,
         ui->spinBox,
-        //hideItemsInLayout();
-        //ui->horizontalLayout_4->deleteLater();
 
         // Hide colour buttons
         ui->iButton0,

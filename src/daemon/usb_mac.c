@@ -12,6 +12,7 @@
 static CFRunLoopRef mainloop = 0;
 static IONotificationPortRef notify = 0;
 
+// Note: this is untested
 int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
 #ifdef DEBUG_USB_SEND
     int ckb = INDEX_OF(kb, keyboard);
@@ -22,7 +23,9 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, u
 
     IOUSBDevRequestTO rq = { 0x40, bRequest, wValue, wIndex, len, (void*)data, 0, 5000, 5000 };
     int res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
-    return res;
+    if(res == kIOReturnSuccess)
+        return len;
+    return 0;
 }
 
 #ifdef OS_MAC_LEGACY

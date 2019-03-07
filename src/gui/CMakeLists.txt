@@ -333,19 +333,14 @@ endif ()
 # Generate text.qrc
 if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
     # Import demo profile
-    message(STATUS "Importing demo profiles")
-    configure_file(
-      "${CMAKE_CURRENT_LIST_DIR}/resources/demoprofile.conf"
-      "${CMAKE_CURRENT_BINARY_DIR}/demoprofile.conf"
-        COPYONLY)
-    configure_file(
-      "${CMAKE_CURRENT_LIST_DIR}/resources/demoprofile_m95.ini"
-      "${CMAKE_CURRENT_BINARY_DIR}/demoprofile_m95.ini"
-        COPYONLY)
-    message(STATUS "Generating text.qrc")
+    message(STATUS "Importing demo profiles and generating text.qrc")
+    file(GLOB gui_demos RELATIVE "${CMAKE_CURRENT_LIST_DIR}/resources/demos" "${CMAKE_CURRENT_LIST_DIR}/resources/demos/*")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<RCC>\n<qresource prefix=\"/txt\">\n")
-    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>demoprofile.conf</file>\n")
-    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>demoprofile_m95.ini</file>\n")
+    foreach (gui_demo IN LISTS gui_demos)
+        message(STATUS "Importing ${gui_demo}")
+        file(COPY "${CMAKE_CURRENT_LIST_DIR}/resources/demos/${gui_demo}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>${gui_demo}</file>\n")
+    endforeach ()
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "${TEXT_QRC_STRING}")
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
 endif ()

@@ -387,7 +387,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     drawLogo(&key, &decPainter, offX , offY, scale);
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                     decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
-            else if((model == KeyMap::M95))
+            else if(model == KeyMap::M95)
                 drawLogo(&key, &decPainter, offX , offY, scale);
             else
                 decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
@@ -601,7 +601,9 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
                 && tooltip.isEmpty())
             tooltip = key.friendlyName(false);
         // on STRAFE Sidelights and indicators can't be assigned color the way other keys are colored
-        if((keyMap.model() == KeyMap::STRAFE || keyMap.model() == KeyMap::STRAFE_MK2) && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel") || (keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back")) || _indicators.contains(key.name))) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
+        if(((keyMap.model() == KeyMap::STRAFE || keyMap.model() == KeyMap::STRAFE_MK2) && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")))
+                || (keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back"))
+                || _indicators.contains(key.name)) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
             continue;
         float kx1 = key.x - key.width / 2.f + 1.f;
         float ky1 = key.y - key.height / 2.f + 1.f;
@@ -674,7 +676,7 @@ void KeyWidget::selectAll(){
     QStringList selectedNames;
     foreach(const Key& key, keyMap.positions()){
         // Sidelights can't be selected, neither can the back LED for the M95
-        if(strcmp(key.name, "lsidel") && strcmp(key.name, "rsidel") && !(keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back"))
+        if(strcmp(key.name, "lsidel") && strcmp(key.name, "rsidel") && keyMap.model() != KeyMap::M95
            && ((_rgbMode && key.hasLed) || !(_rgbMode && key.hasScan))){
             selection.setBit(i);
             selectedNames << key.name;
@@ -701,7 +703,7 @@ void KeyWidget::setAnimation(const QStringList& keys){
     QStringList allNames = keyMap.keys();
     foreach(const QString& key, keys){
         // Sidelights can't be selected
-        if(!strcmp(key.toLatin1(), "lsidel") || !strcmp(key.toLatin1(), "rsidel") || (keyMap.model() == KeyMap::M95 && !strcmp(key.toLatin1(), "back")))
+        if(!strcmp(key.toLatin1(), "lsidel") || !strcmp(key.toLatin1(), "rsidel") || keyMap.model() == KeyMap::M95)
             continue;
         int index = allNames.indexOf(key);
         if(index >= 0)

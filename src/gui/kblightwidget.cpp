@@ -136,9 +136,9 @@ void KbLightWidget::toggleSidelight(){
 void KbLightWidget::toggleM95Light(){
     if(light){
         if (light->colorMap()["back"] == 0xFF000000)
-                light->color("back",QRgb(0xFFFFFFFF));
+            light->color("back",QRgb(0xFFFFFFFF));
         else
-                light->color("back", QRgb(0xFF000000));
+            light->color("back", QRgb(0xFF000000));
         ui->keyWidget->colorMap(light->colorMap());
     }
 }

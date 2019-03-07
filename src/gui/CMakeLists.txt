@@ -333,14 +333,19 @@ endif ()
 # Generate text.qrc
 if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
     # Import demo profile
-    message(STATUS "Importing demoprofile.conf")
+    message(STATUS "Importing demo profiles")
     configure_file(
       "${CMAKE_CURRENT_LIST_DIR}/resources/demoprofile.conf"
       "${CMAKE_CURRENT_BINARY_DIR}/demoprofile.conf"
         COPYONLY)
+    configure_file(
+      "${CMAKE_CURRENT_LIST_DIR}/resources/demoprofile_m95.ini"
+      "${CMAKE_CURRENT_BINARY_DIR}/demoprofile_m95.ini"
+        COPYONLY)
     message(STATUS "Generating text.qrc")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<RCC>\n<qresource prefix=\"/txt\">\n")
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>demoprofile.conf</file>\n")
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "<file>demoprofile_m95.ini</file>\n")
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "${TEXT_QRC_STRING}")
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/text.qrc" "</qresource>\n</RCC>\n")
 endif ()

@@ -356,6 +356,7 @@ static const Key M95Keys[] = {
     {0, "9", "thumb1", -18, 14, 18, 8, false, true}, {0, "15", "thumb7", -18, 20, 10, 20, false, true},
     {0, "10", "thumb2", -10, 21, 10, 11, false, true},{0, "11", "thumb3", -10, 30, 10, 11, false, true},
     {0, "12", "thumb4", -18, 38, 18, 8, false, true}, {0, "13", "thumb5", -34, 38, 18, 8, false, true},
+    {0, "Logo", "back", 20, 55, 12, 12, true, false}
 
 };
 #define KEYCOUNT_M95    (sizeof(M95Keys) / sizeof(Key))

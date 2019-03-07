@@ -3,6 +3,7 @@
 
 #include "includes.h"
 #include "device.h"
+#include "dpi_legacy.h"
 
 // DPI functions are mouse-only; do not use them with keyboards.
 // Lock dmutex before using commands (see device.h)

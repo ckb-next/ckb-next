@@ -22,6 +22,7 @@ public:
 
     void setLight(KbLight* newLight);
     void setMonochrome();
+    void setLegacyM95();
 
 private slots:
     void updateLight();
@@ -39,6 +40,7 @@ private slots:
 
     void toggleSidelight(); //strafe
     void brightnessScroll(bool up);
+    void toggleM95Light();
 
 private:
     KbLight* light;

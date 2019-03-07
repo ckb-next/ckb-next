@@ -277,10 +277,14 @@ void Kb::load(){
     if(newCurrentProfile)
         setCurrentProfile(newCurrentProfile);
     else {
-        // If nothing was loaded, load the demo profile
-        QSettings demoSettings(":/txt/demoprofile.conf", QSettings::IniFormat, this);
+        KeyMap map = getKeyMap();
+        // If nothing was loaded, load the appropriate demo profile for each device
+        QString demoProfile(":/txt/demoprofile.conf");
+        if(map.model() == KeyMap::M95)
+            demoProfile = ":/txt/demoprofile_m95.ini";
+        QSettings demoSettings(demoProfile, QSettings::IniFormat, this);
         CkbSettings cSettings(demoSettings);
-        KbProfile* demo = new KbProfile(this, getKeyMap(), cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
+        KbProfile* demo = new KbProfile(this, map, cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
         _profiles.append(demo);
         setCurrentProfile(demo);
     }

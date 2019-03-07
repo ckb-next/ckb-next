@@ -41,6 +41,7 @@ ushort models[N_MODELS] = {
     P_M65,
     P_M65_PRO,
     P_M65_RGB_ELITE,
+    P_M95,
     P_GLAIVE,
     P_SABRE_O,
     P_SABRE_L,
@@ -130,6 +131,8 @@ const char* product_str(ushort product){
         return "strafe";
     if(product == P_STRAFE_MK2)
         return "strafe_mk2";
+    if(product == P_M95)
+        return "m95";
     if(product == P_M65 || product == P_M65_PRO)
         return "m65";
     if(product == P_M65_RGB_ELITE)
@@ -167,11 +170,14 @@ const char* product_str(ushort product){
 ///
 static const devcmd* get_vtable(ushort vendor, ushort product){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
-    if(IS_MOUSE(vendor, product))
-        return &vtable_mouse;
-    else if(IS_MOUSEPAD(vendor, product) || product == P_ST100)
+    if(IS_MOUSE(vendor, product)) {
+        if(IS_LEGACY(vendor, product))
+            return &vtable_mouse_legacy;
+        else
+            return &vtable_mouse;
+    } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
         return &vtable_mousepad;
-    else {
+    } else {
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;
         else
@@ -658,6 +664,24 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
         }
     }
     return total_sent;
+}
+
+int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
+    while(1){
+        pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
+        int res = os_usbsend_control(kb, data, len, bRequest, wValue, wIndex, file, line);
+        pthread_mutex_unlock(mmutex(kb));
+
+        if(res != -1)
+            return res;
+
+        // Stop immediately if the program is shutting down or hardware load is set to tryonce
+        if(reset_stop || hwload_mode != 2)
+            return 0;
+
+        // Retry as long as the result is temporary failure
+        DELAY_LONG(kb);
+    }
 }
 
 /// \brief .

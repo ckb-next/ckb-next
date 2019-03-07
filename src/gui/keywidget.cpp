@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -114,53 +114,51 @@ void KeyWidget::paintEvent(QPaintEvent*){
     if(!keyMap.isKeyboard()){
         // Draw mouse overlays
         const QImage* overlay = 0;
-        float xpos = 0.f, ypos = 0.f;
+        float xpos = 0.f, ypos = -2.f;
         if(model == KeyMap::M65 || model == KeyMap::M65E){
             if(!m65Overlay)
                 m65Overlay = new QImage(":/img/overlay_m65.png");
             overlay = m65Overlay;
             xpos = 2.f;
-            ypos = -2.f;
         } else if(model == KeyMap::SABRE){
             if(!sabOverlay)
                 sabOverlay = new QImage(":/img/overlay_sabre.png");
             overlay = sabOverlay;
             xpos = 1.f;
-            ypos = -2.f;
         } else if(model == KeyMap::SCIMITAR){
             if(!scimOverlay)
                 scimOverlay = new QImage(":/img/overlay_scimitar.png");
             overlay = scimOverlay;
             xpos = 3.5f;
-            ypos = -2.f;
         } else if(model == KeyMap::HARPOON){
             if(!harpOverlay)
                 harpOverlay = new QImage(":/img/overlay_harpoon.png");
             overlay = harpOverlay;
             xpos = 3.5f;
-            ypos = -2.f;
         } else if(model == KeyMap::GLAIVE){
             if(!glaiveOverlay)
                 glaiveOverlay = new QImage(":/img/overlay_glaive.png");
             overlay = glaiveOverlay;
             xpos = 3.5f;
-            ypos = -2.f;
         } else if(model == KeyMap::KATAR){
             if(!katarOverlay)
                 katarOverlay = new QImage(":/img/overlay_katar.png");
             overlay = katarOverlay;
             xpos = 3.5f;
-            ypos = -2.f;
         } else if(model == KeyMap::POLARIS){
             if(!polarisOverlay)
                 polarisOverlay = new QImage(":/img/overlay_polaris.png");
             overlay = polarisOverlay;
-            xpos = -19.5;
-            ypos = -2.f;
+            xpos = -19.5f;
         } else if(model == KeyMap::ST100){
             xpos = -18.5;
-            ypos = -2.f;
+        } else if(model == KeyMap::M95){
+            if(!m95Overlay)
+                m95Overlay = new QImage(":/img/overlay_m95.png");
+            overlay = m95Overlay;
+            xpos = 2.f;
         }
+
         if(!overlay){
             QImage *blank = new QImage(810, 700, QImage::Format_ARGB32);
             QColor newcol = QColor(bgColor);
@@ -271,6 +269,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
         } else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName().startsWith("Logo")) {
             w += 10.f;
             x -= 5.f;
+            bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
+        } else if (model == KeyMap::M95) {
             bgPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
         } else {
             if(!strcmp(key.name, "enter")){
@@ -387,6 +387,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     drawLogo(&key, &decPainter, offX , offY, scale);
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                     decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
+            else if(model == KeyMap::M95)
+                drawLogo(&key, &decPainter, offX , offY, scale);
             else
                 decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));
         }
@@ -543,6 +545,12 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
                 update();
                 break;
             }
+            // TODO: Merge with the above
+            if(keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back")){
+                emit M95LightToggled();
+                update();
+                break;
+            }
             newSelection.setBit(i);
             update();
             break;
@@ -593,7 +601,9 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
                 && tooltip.isEmpty())
             tooltip = key.friendlyName(false);
         // on STRAFE Sidelights and indicators can't be assigned color the way other keys are colored
-        if((keyMap.model() == KeyMap::STRAFE || keyMap.model() == KeyMap::STRAFE_MK2) && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel") || _indicators.contains(key.name))) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
+        if(((keyMap.model() == KeyMap::STRAFE || keyMap.model() == KeyMap::STRAFE_MK2) && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")))
+                || (keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back"))
+                || _indicators.contains(key.name)) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
             continue;
         float kx1 = key.x - key.width / 2.f + 1.f;
         float ky1 = key.y - key.height / 2.f + 1.f;
@@ -665,8 +675,8 @@ void KeyWidget::selectAll(){
     int i = 0;
     QStringList selectedNames;
     foreach(const Key& key, keyMap.positions()){
-        // Sidelights can't be selected
-        if(strcmp(key.name, "lsidel") && strcmp(key.name, "rsidel")
+        // Sidelights can't be selected, neither can the back LED for the M95
+        if(strcmp(key.name, "lsidel") && strcmp(key.name, "rsidel") && keyMap.model() != KeyMap::M95
            && ((_rgbMode && key.hasLed) || !(_rgbMode && key.hasScan))){
             selection.setBit(i);
             selectedNames << key.name;
@@ -693,7 +703,7 @@ void KeyWidget::setAnimation(const QStringList& keys){
     QStringList allNames = keyMap.keys();
     foreach(const QString& key, keys){
         // Sidelights can't be selected
-        if(!strcmp(key.toLatin1(), "lsidel") || !strcmp(key.toLatin1(), "rsidel"))
+        if(!strcmp(key.toLatin1(), "lsidel") || !strcmp(key.toLatin1(), "rsidel") || keyMap.model() == KeyMap::M95)
             continue;
         int index = allNames.indexOf(key);
         if(index >= 0)

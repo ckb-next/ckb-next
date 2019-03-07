@@ -12,6 +12,22 @@
 static CFRunLoopRef mainloop = 0;
 static IONotificationPortRef notify = 0;
 
+// Note: this is untested
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
+#ifdef DEBUG_USB_SEND
+    int ckb = INDEX_OF(kb, keyboard);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
+    if(len)
+        print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
+#endif
+
+    IOUSBDevRequestTO rq = { 0x40, bRequest, wValue, wIndex, len, (void*)data, 0, 5000, 5000 };
+    int res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
+    if(res == kIOReturnSuccess)
+        return len;
+    return 0;
+}
+
 #ifdef OS_MAC_LEGACY
 
 // Pointer to the mouse event tap. This tap lets the daemon re-insert modifier keys into

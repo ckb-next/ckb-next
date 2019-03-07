@@ -17,6 +17,7 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     connect(ui->keyWidget, SIGNAL(sidelightToggled()), this, SLOT(toggleSidelight())); // click on a toggle button, like sidelight
     connect(ui->animWidget, SIGNAL(animChanged(KbAnim*)), this, SLOT(changeAnim(KbAnim*)));
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
+    connect(ui->keyWidget, SIGNAL(M95LightToggled()), this, SLOT(toggleM95Light()));
 
     MainWindow* mainWindow = nullptr;
     foreach(QWidget* widget, qApp->topLevelWidgets()){
@@ -131,7 +132,16 @@ void KbLightWidget::toggleSidelight(){
     }
 }
 
-
+// TODO: Merge with above
+void KbLightWidget::toggleM95Light(){
+    if(light){
+        if (light->colorMap()["back"] == 0xFF000000)
+            light->color("back",QRgb(0xFFFFFFFF));
+        else
+            light->color("back", QRgb(0xFF000000));
+        ui->keyWidget->colorMap(light->colorMap());
+    }
+}
 void KbLightWidget::changeAnim(KbAnim *newAnim){
     if(newAnim)
         ui->keyWidget->setSelection(newAnim->keys());
@@ -193,4 +203,9 @@ void KbLightWidget::brightnessScroll(bool up){
         dimming = KbLight::MAX_DIM;
 
     light->dimming(dimming, true);
+}
+
+void KbLightWidget::setLegacyM95(){
+    ui->animButton->setEnabled(false);
+    ui->bgButton->setEnabled(false);
 }

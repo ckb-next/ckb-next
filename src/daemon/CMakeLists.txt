@@ -68,6 +68,7 @@ if (MACOS OR LINUX)
               device_vtable.c
               devnode.c
               dpi.c
+              dpi_legacy.c
               firmware.c
               input.c
               keymap.c
@@ -86,6 +87,7 @@ if (MACOS OR LINUX)
               device.h
               devnode.h
               dpi.h
+              dpi_legacy.h
               firmware.h
               includes.h
               input.h

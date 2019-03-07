@@ -50,6 +50,7 @@ signals:
     // Emitted when the selection is changed.
     void selectionChanged(QStringList selected);
     void sidelightToggled();
+    void M95LightToggled();
 
 private:
     KeyMap keyMap;

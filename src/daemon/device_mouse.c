@@ -6,6 +6,43 @@
 #include "profile.h"
 #include "usb.h"
 
+int start_mouse_legacy(usbdevice* kb, int makeactive){
+    (void)makeactive;
+
+    // kb, ptr, len, bRequest, wValue, wIndex
+    // 0x00002 == HW Playback off
+    // 0x00001 == HW Playback on
+    usbsend_control(kb, NULL, 0, 2, 0x0002, 0);
+    // Send initial DPI settings
+    unsigned char pkt1[] = {0x04, 0x02, 0x10, 0x10, 0x30, 0x30, 0x78, 0x78, 0x08, 0x08};
+    usbsend_control(kb, pkt1, 10, 174, 0x0000, 0);
+    // ????
+    unsigned char pkt2[] = {0x02, 0x02, 0x03, 0x02, 0xff, 0x3c, 0x00, 0x00, 0x00, 0x06};
+    usbsend_control(kb, pkt2, 10, 3, 0x0000, 0);
+    // Angle snap ON
+    unsigned char pkt3[] = {0x01};
+    usbsend_control(kb, pkt3, 1, 100, 0x0000, 0);
+
+    kb->active = 1;
+    kb->pollrate = -1;
+    return 0;
+}
+
+int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3){
+    (void)dummy1;
+    (void)dummy2;
+    (void)dummy3;
+
+    if(rate > 1 && (rate % 2 || rate > 8))
+        return 0;
+
+    usbsend_control(kb, NULL, 0, 10, rate, 0);
+
+    // Device should disconnect+reconnect, but update the poll rate field in case it doesn't
+    kb->pollrate = rate;
+    return 0;
+}
+
 int setactive_mouse(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;

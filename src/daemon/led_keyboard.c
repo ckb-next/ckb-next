@@ -154,7 +154,13 @@ int updatergb_kb(usbdevice* kb, int force){
             { CMD_SET, FIELD_KB_COLOR, COLOR_BLUE, 0x03, 0x02, 0}
         };
         makergb_full(newlight, data_pkt);
-        if(!usbsend(kb, data_pkt[0], 12))
+
+        // Monochrome devices only use the red channel, so only send the first four packets
+        int data_pkt_count = 12;
+        if(IS_MONOCHROME_DEV(kb))
+            data_pkt_count = 4;
+
+        if(!usbsend(kb, data_pkt[0], data_pkt_count))
             return -1;
     } else {
         // Update strafe sidelights if necessary

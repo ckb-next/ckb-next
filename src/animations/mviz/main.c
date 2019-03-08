@@ -64,7 +64,7 @@ void ckb_info(){
 
 //    CKB_PARAM_BOOL("linear", "Use linear scale", "0");
 
-    CKB_PARAM_BOOL("singlecol", "Single Colour", "0");
+    CKB_PARAM_BOOL("singlecol", "Single Colour", 0);
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NONE);

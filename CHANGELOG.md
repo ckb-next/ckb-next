@@ -1,5 +1,50 @@
 # Change Log
 
+## [v0.4.0](https://github.com/ckb-next/ckb-next/tree/v0.4.0) (2019-03-09)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.3.2...v0.4.0)
+
+NOTICE FOR MAC USERS: ckb-next 0.4.0 stores its data using a different backend. If you upgrade, your settings and profiles will be migrated. In case of a downgrade, any changes will not propagate to newer versions of the software.
+
+Support for new devices:
+- K70 RGB MK.2 LP
+- M65 RGB Elite
+- M95 Legacy
+
+Important bugfixes:
+- ST100 now works on macOS properly
+- Strafe RGB MK.2 logo is mapped to the right LEDs, and media buttons are positioned correctly
+- A buffer overflow causing the daemon to crash or hang has been fixed
+- quickinstall can now run correctly with multibyte characters in the path
+- Rename now works correctly in the Profile Manager context menu
+- Animations with no presets no longer get loaded to prevent crashes
+- K70 Lux is now marked correctly as monochrome
+- ckb-next can be built again with Qt 5.2
+- Save to hardware now gets disabled in the context menu for unsupported devices
+- Settings backend has been changed to ini for macOS, preventing silent configuration data corruption
+- The K55, the ST100 and the Polaris now have working default profiles
+- A few cases that may cause the GUI to crash have been found and fixed
+- Blank animation names are no longer allowed
+
+New features:
+- GUI has gained a monochrome tray icon option (QSystemTrayIcon only)
+- Device brightness can be controlled by scrolling on the tray icon on Linux systems that support it (AppIndicator or KDE)
+- Profiles and modes can now be changed with the --profile and --mode arguments passed to the GUI binary
+- New Conway's Game of Life animation
+- New 'snake' animation
+- New 'pipe' animation, allowing the user to send rgb data from external applications
+- Music Visualizer (mviz) is now supported on macOS, and has been reworked to function correctly
+- A --version argument has been added to the daemon
+
+Notes:
+- On Linux, the udev rule has been renamed and moved
+- On Linux, for builds with libappindicator, it can be force enabled/disabled by setting the CKB_NEXT_USE_APPINDICATOR environment variable
+- On Linux, libappindicator support is also enabled if the Qt platform theme is gtk2 (Useful for Unity on Ubuntu 19.04)
+- The restart command has been removed from the daemon
+- Threads are now named for easier debugging
+- Signal handler has been rewritten
+- A few unneeded packets are no longer being sent to M65 mice
+- Only Red channel data is being sent to monochrome devices
+
 ## [v0.3.2](https://github.com/ckb-next/ckb-next/tree/v0.3.2) (2018-10-07)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.3.1...v0.3.2)
 

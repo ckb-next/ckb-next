@@ -6,6 +6,9 @@
 
 #ifdef OS_LINUX
 
+// usb.c
+extern _Atomic int reset_stop;
+
 /// \details
 /// \brief all open usb devices have their system path names here in this array.
 
@@ -404,6 +407,10 @@ void* os_inputmain(void* context){
         /// Lock all following actions with imutex.
         ///
         if (urb) {
+            // If we're shutting down, don't submit another urb, or try to process the data on this one
+            if(urb->status == -ESHUTDOWN && reset_stop)
+                break;
+
             process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
 
             /// Re-submit the URB for the next run.

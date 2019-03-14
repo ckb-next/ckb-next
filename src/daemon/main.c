@@ -6,7 +6,7 @@
 #include <ckbnextconfig.h>
 
 // usb.c
-extern volatile int reset_stop;
+extern _Atomic int reset_stop;
 extern int features_mask;
 // device.c
 extern int hwload_mode;

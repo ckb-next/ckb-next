@@ -8,6 +8,9 @@
 #include "profile.h"
 #include "usb.h"
 #include "keymap_patch.h"
+#ifdef OS_WINDOWS
+#include <windows.h>
+#endif
 
 ushort models[N_MODELS] = {
     // Keyboards

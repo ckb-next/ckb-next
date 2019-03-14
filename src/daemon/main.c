@@ -214,7 +214,9 @@ int main(int argc, char** argv){
     }
 
     // Read parameters
+#ifndef OS_WINDOWS
     int forceroot = 1;
+#endif
     for(int i = 1; i < argc; i++){
         char* argument = argv[i];
         unsigned newgid;
@@ -242,9 +244,11 @@ int main(int argc, char** argv){
                 hwload_mode = 0;
                 ckb_info_nofile("Setting hardware load: never\n");
             }
+#ifndef OS_WINDOWS
         } else if(!strcmp(argument, "--nonroot")){
             // Allow running as a non-root user
             forceroot = 0;
+#endif
         }
 #ifdef OS_MAC_LEGACY
         else if(!strcmp(argument, "--nomouseaccel")){

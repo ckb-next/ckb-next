@@ -29,8 +29,8 @@ AnimScript::~AnimScript(){
 
 QString AnimScript::path(){
 #ifdef Q_OS_WIN
-#warning "ANIM DIR STUB"
-    return(QString("T:\\build-ckb-next-Desktop_Qt_MinGW_w64_64bit_MSYS2-Debug\\bin\\animations"));
+    // On Windows the animations are in the same path as the executable, under the animations subdirectory
+    return(qApp->applicationDirPath() + QString("/animations"));
 #else
     return QString(CKB_NEXT_ANIMATIONS_PATH);
 #endif

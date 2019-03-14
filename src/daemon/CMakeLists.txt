@@ -153,6 +153,7 @@ elseif (WINDOWS)
           # TODO: implement this hack properly
           target_include_directories(
               ckb-next-daemon
+                  SYSTEM
                   PRIVATE
                     "C:\\libusbK-dev-kit\\includes")
 endif ()

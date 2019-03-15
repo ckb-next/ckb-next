@@ -393,6 +393,36 @@ static const Key ST100Zones[] = {
 };
 #define KEYCOUNT_ST100     (sizeof(ST100Zones) / sizeof(Key))
 
+// Mouse map - Ironclaw
+static const Key IronclawKeys[] = {
+    // primary keys
+    {0, "Left Mouse",    "mouse1",      8,  0, 14, 32, false, true  },
+    {0, "Right Mouse",   "mouse2",     30,  0, 14, 32, false, true  },
+    
+    // center column keys
+    {0, "Wheel Up",      "wheelup",    22,  5,  8,  7, false, true  },
+    {0, "Middle Mouse",  "mouse3",     22, 13,  8,  7, false, true  },
+    {0, "Wheel Down",    "wheeldn",    22, 21,  8,  7, false, true  },
+    {0, "Profile Cycle", "profswitch", 22, 29,  8, 10, false, true  }, // does not work yet, key is not recognized by daemon
+    {0, "DPI Cycle",     "dpiup",      22, 40,  8, 10, false, true  },
+    
+    // left side forward/back keys
+    {0, "Forward",       "mouse4",      5, 24,  5,  9, false, true  },
+    {0, "Back",          "mouse5",      5, 33,  5, 10, false, true  },
+
+    // zones for LEDs
+    {0, "Logo",          "back",       22, 30,  8, 28, true,  false },
+    {0, "Wheel",         "wheel",      22, 10,  8,  8, true,  false },
+    
+    // need to add DPI LED, even if not directly configurable for indicator to work
+    {0, "DPI",           "dpi",        10, 10,  5,  5, true,  false }
+
+};
+#define KEYCOUNT_IRONCLAW    (sizeof(IronclawKeys) / sizeof(Key))
+
+#define IRONCLAW_WIDTH       52
+#define IRONCLAW_HEIGHT      67
+
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
 #define N_LAYOUTS   KeyMap::_LAYOUT_MAX
@@ -847,6 +877,19 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::IRONCLAW:{
+        // M65 isn't a keyboard; all mouse maps are unique.
+        for(const Key* key = IronclawKeys; key < IronclawKeys + KEYCOUNT_IRONCLAW; key++){
+            // Keyboard keys are written from the center because that's where the LEDs are, but the mouse buttons are odd shapes so they're
+            // written from the upper left
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        // Mice also have no layout patches - no other changes necessary
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -1081,6 +1124,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return M65E;
     if(lower == "m95")
         return M95;
+    if(lower == "ironclaw")
+        return IRONCLAW;
     return NO_MODEL;
 }
 
@@ -1128,6 +1173,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "m65e";
     case M95:
         return "m95";
+    case IRONCLAW:
+        return "ironclaw";
     default:
         return "";
     }
@@ -1170,6 +1217,7 @@ int KeyMap::modelWidth(Model model){
     case POLARIS:
     case ST100:
     case M95:
+    case IRONCLAW:
         return M65_WIDTH;
     default:
         return 0;
@@ -1201,6 +1249,7 @@ int KeyMap::modelHeight(Model model){
     case POLARIS:
     case ST100:
     case M95:
+    case IRONCLAW:
         return M65_HEIGHT;
     default:
         return 0;
@@ -1273,6 +1322,9 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     if(map.contains(key))
         return map[key].friendlyName();
     map = KeyMap(HARPOON, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+    map = KeyMap(IRONCLAW, layout);
     if(map.contains(key))
         return map[key].friendlyName();
 

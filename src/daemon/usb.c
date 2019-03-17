@@ -63,7 +63,7 @@ ushort models[N_MODELS] = {
 ///
 /// Is set only by \a quit() to true (1)
 /// to inform several usb_* functions to end their loops and tries.
-volatile int reset_stop = 0;
+_Atomic int reset_stop = 0;
 
 /// brief .
 ///

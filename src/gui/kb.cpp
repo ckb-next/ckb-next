@@ -313,6 +313,7 @@ void Kb::save(){
     }
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
+    settings.setValue("hwLayout", KeyMap::getLayout(_layout));
 }
 
 void Kb::autoSave(){

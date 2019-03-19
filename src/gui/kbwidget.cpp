@@ -128,8 +128,6 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
 
         // Set the layout and save it
         device->layout(layout, false);
-        if(layout != settingsLayout)
-            settings.setValue("hwLayout", KeyMap::getLayout(layout));
     }
     else
         device->layout(KeyMap::GB, false);

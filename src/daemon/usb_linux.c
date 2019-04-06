@@ -14,15 +14,15 @@ extern _Atomic int reset_stop;
 
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
-int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
 #ifdef DEBUG_USB_SEND
     int ckb = INDEX_OF(kb, keyboard);
-    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, bmRequestType, bRequest, wValue, wIndex, len);
     if(len)
         print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
 #endif
 
-    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, wIndex, len, 5000, data };
+    struct usbdevfs_ctrltransfer transfer = { bmRequestType, bRequest, wValue, wIndex, len, 5000, data };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     if (res == -1){
         int ioctlerrno = errno;

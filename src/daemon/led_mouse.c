@@ -108,6 +108,6 @@ int updatergb_mouse_legacy(usbdevice* kb, int force){
     lastlight->g[MOUSE_BACK_LED] = newlight->g[MOUSE_BACK_LED];
     lastlight->b[MOUSE_BACK_LED] = newlight->b[MOUSE_BACK_LED];
 
-    usbsend_control(kb, NULL, 0, 49, newwValue, 0);
+    usbsend_control(kb, NULL, 0, 0x40, 49, newwValue, 0);
     return 0;
 }

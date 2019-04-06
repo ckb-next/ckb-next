@@ -390,9 +390,9 @@ int usb_tryreset(usbdevice* kb);
 
 void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum);
 
-int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
-#define usbsend_control(kb, message, len, bRequest, wValue, wIndex) _usbsend_control(kb, message, len, bRequest, wValue, wIndex, __FILE_NOPATH__, __LINE__)
-int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
+int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
+#define usbsend_control(kb, message, len, bmRequestType, bRequest, wValue, wIndex) _usbsend_control(kb, message, len, bmRequestType, bRequest, wValue, wIndex, __FILE_NOPATH__, __LINE__)
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
 
 
 // receive message from initial sighandler socketpair communication

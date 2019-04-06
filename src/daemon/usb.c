@@ -676,10 +676,10 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
     return total_sent;
 }
 
-int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
+int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
     while(1){
         pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
-        int res = os_usbsend_control(kb, data, len, bRequest, wValue, wIndex, file, line);
+        int res = os_usbsend_control(kb, data, len, bmRequestType, bRequest, wValue, wIndex, file, line);
         pthread_mutex_unlock(mmutex(kb));
 
         if(res != -1)

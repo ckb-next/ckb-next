@@ -706,7 +706,7 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
     return total_sent;
 }
 
-int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
+int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
     while(1){
         DELAY_SHORT(kb);
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information

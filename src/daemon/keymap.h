@@ -48,6 +48,8 @@
 // Index of DPI light
 #define LED_DPI                 (LED_MOUSE + 2)
 // Total number of keys recognized by software
+// Max for legion seems to be 0xc6, so N_KEYS_EXTENDED must always be > 0xc6
+// At the moment it is 0xf2
 #define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED)
 #define N_KEYBYTES_EXTENDED     ((N_KEYS_EXTENDED + 7) / 8)
 

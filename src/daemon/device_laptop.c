@@ -14,7 +14,7 @@ int cmd_active_laptop(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, co
         return 0;
 
     uchar pkt[192] = { 0x07, 0x01, 0x00 };
-    usbsend_control(kb, pkt, 192, 0x09, 0x0307, 0);
+    usbsend_control(kb, pkt, 192, 0x21, 0x09, 0x0307, 0);
     kb->active = 1;
 
     return 0;
@@ -30,7 +30,7 @@ int cmd_idle_laptop(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
         return 0;
 
     uchar pkt[192] = { 0x07, 0xB1, 0x01, 0x00 };
-    usbsend_control(kb, pkt, 192, 0x09, 0x0307, 0);
+    usbsend_control(kb, pkt, 192, 0x21, 0x09, 0x0307, 0);
     kb->active = 0;
 
     return 0;
@@ -107,7 +107,7 @@ int updatergb_laptop(usbdevice* kb, int force){
             *ptr++ = newlight->g[index];
             *ptr = newlight->b[index];
         }
-        usbsend_control(kb, pkts[i], 192, 0x09, 0x0307, 0);
+        usbsend_control(kb, pkts[i], 192, 0x21, 0x09, 0x0307, 0);
     }
 
     return 0;

@@ -1,12 +1,11 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: ckb-next
-Source: https://github.com/mattanger/ckb-next
+Source: https://github.com/ckb-next/ckb-next
 
 Files: *
 Copyright: 2014-2016 https://github.com/ccMSC/
-           2017 https://github.com/mattanger/ckb-next/graphs/contributors
-
-License: GNU General Public License v2.0
+           2017-2018 https://github.com/ckb-next/ckb-next/graphs/contributors
+License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or

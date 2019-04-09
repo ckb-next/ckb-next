@@ -56,6 +56,22 @@ elseif (LINUX)
     find_package(UDEV REQUIRED)
 endif ()
 
+# Declare options with defaults to allow overrides in debian packaging
+set(UDEV_RULES_PATH
+    "/etc/udev/rules.d"
+    CACHE STRING
+    "Target directory for udev rule installation. Ensure you have permissions to write to this directory."
+)
+
+set(SYSTEMD_SERVICE_PATH
+    "${CMAKE_INSTALL_LIBDIR}/systemd/system"
+    CACHE STRING
+    "Target directory for systemd service file. Ensure you have permissions to write to this directory."
+)
+
+option (PACKAGING
+        "Are we building a package" OFF)
+
 # Declare target's source files
 if (MACOS OR LINUX)
     target_sources(
@@ -396,6 +412,23 @@ elseif (LINUX)
         endif ()
     endif ()
 
+    # If packaging, emit the the system manager configuration files so they can be setup post-install
+    if (PACKAGING)
+        message(STATUS "Generating system files for packaging")
+
+        # upstart
+        configure_file(
+                "${ckb-next_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.conf"
+                @ONLY)
+
+        # systemd
+        configure_file(
+                "${ckb-next_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
+                @ONLY)
+    endif()
+
 endif ()
 
 # Declare target's installation paths
@@ -421,7 +454,7 @@ if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
-        DESTINATION "/usr/lib/systemd/system"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/systemd/system"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ
@@ -470,8 +503,8 @@ if (LINUX)
     endif() ")
   endif ()
   install(
-    FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-next-daemon.rules"
-    DESTINATION "/usr/lib/udev/rules.d"
+    FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-daemon.rules"
+    DESTINATION "${UDEV_RULES_PATH}"
     PERMISSIONS
     OWNER_READ OWNER_WRITE
     GROUP_READ

@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: David Meikle <david@meikle.io>
 Build-Depends: debhelper (>= 9), libudev-dev, qtbase5-dev, qt5-qmake, cmake, zlib1g-dev, libappindicator-dev, libpulse-dev, dh-systemd
 Standards-Version: 3.9.8
-Homepage: https://github.com/mattanger/ckb-next
+Homepage: https://github.com/ckb-next/ckb-next
 
 Package: ckb-next
 Architecture: any

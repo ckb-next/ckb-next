@@ -2,6 +2,7 @@
 #include "ckbsettings.h"
 #include "kblightwidget.h"
 #include "ui_kblightwidget.h"
+#include "mainwindow.h"
 
 KbLightWidget::KbLightWidget(QWidget *parent) :
     QWidget(parent), light(0),
@@ -16,6 +17,20 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     connect(ui->keyWidget, SIGNAL(sidelightToggled()), this, SLOT(toggleSidelight())); // click on a toggle button, like sidelight
     connect(ui->animWidget, SIGNAL(animChanged(KbAnim*)), this, SLOT(changeAnim(KbAnim*)));
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
+    connect(ui->keyWidget, SIGNAL(M95LightToggled()), this, SLOT(toggleM95Light()));
+
+    MainWindow* mainWindow = nullptr;
+    foreach(QWidget* widget, qApp->topLevelWidgets()){
+       if(widget->inherits("QMainWindow")) {
+           mainWindow = static_cast<MainWindow*>(widget);
+           break;
+       }
+    }
+
+    if(mainWindow == nullptr)
+        qDebug() << "Couldn't find MainWindow in kblightwidget.cpp";
+    else
+        connect(mainWindow, &MainWindow::trayIconScrolled, this, &KbLightWidget::brightnessScroll);
 
     // Restore "show animated" setting
     ui->showAnimBox->setChecked(!CkbSettings::get("UI/Light/ShowBaseOnly").toBool());
@@ -70,6 +85,8 @@ void KbLightWidget::updateLight(){
 }
 
 void KbLightWidget::newSelection(QStringList selection){
+    if(light == nullptr)
+        return;
     // Determine selected color (invalid color if no selection or if they're not all the same)
     QColor selectedColor;
     const QColorMap& colorMap = light->colorMap();
@@ -117,7 +134,16 @@ void KbLightWidget::toggleSidelight(){
     }
 }
 
-
+// TODO: Merge with above
+void KbLightWidget::toggleM95Light(){
+    if(light){
+        if (light->colorMap()["back"] == 0xFF000000)
+            light->color("back",QRgb(0xFFFFFFFF));
+        else
+            light->color("back", QRgb(0xFF000000));
+        ui->keyWidget->colorMap(light->colorMap());
+    }
+}
 void KbLightWidget::changeAnim(KbAnim *newAnim){
     if(newAnim)
         ui->keyWidget->setSelection(newAnim->keys());
@@ -151,6 +177,37 @@ void KbLightWidget::on_animButton_clicked(){
         return;
     const AnimScript* script = dialog.chosenScript();
     int presetId = dialog.chosenPreset();
-    ui->animWidget->addAnim(script, currentSelection, script->presets()[presetId], script->preset(presetId));
+    QString animName = script->presets()[presetId];
+    // If the preset is named "Default", then just use the script name
+    if(!animName.compare("Default", Qt::CaseInsensitive))
+        animName = script->name();
+    else if(animName.compare(script->name(), Qt::CaseInsensitive)){
+        // Append the animation script name otherwise, and only if preset and script name are not identical
+        animName.append(" (");
+        animName.append(script->name());
+        animName.append(")");
+    }
+    ui->animWidget->addAnim(script, currentSelection, animName, script->preset(presetId));
     light->restartAnimation();
+}
+
+void KbLightWidget::brightnessScroll(bool up){
+    // Only run this if shared dimming is enabled
+    if(!light || KbLight::shareDimming() == -1)
+        return;
+
+    int dimming = light->dimming();
+    dimming += (up ? -1 : 1);
+
+    if(dimming < 0)
+        dimming = 0;
+    if(dimming > KbLight::MAX_DIM)
+        dimming = KbLight::MAX_DIM;
+
+    light->dimming(dimming, true);
+}
+
+void KbLightWidget::setLegacyM95(){
+    ui->animButton->setEnabled(false);
+    ui->bgButton->setEnabled(false);
 }

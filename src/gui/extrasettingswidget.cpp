@@ -71,6 +71,10 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
 
     // Read start delay
     ui->startDelayBox->setChecked(settings.value("StartDelay").toBool());
+
+#ifndef Q_OS_LINUX
+    ui->scrollWarningLabel->hide();
+#endif
 }
 
 ExtraSettingsWidget::~ExtraSettingsWidget(){

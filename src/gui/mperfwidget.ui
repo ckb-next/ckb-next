@@ -54,16 +54,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="16" column="5" colspan="2">
-      <widget class="QLabel" name="label_25">
-       <property name="text">
-        <string>Lift height:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
      <item row="16" column="8" colspan="3">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
@@ -365,6 +355,16 @@
        </property>
       </widget>
      </item>
+     <item row="10" column="1">
+      <widget class="QCheckBox" name="eBox5">
+       <property name="toolTip">
+        <string>Uncheck this box to skip the stage while moving up or down.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
      <item row="10" column="9">
       <widget class="QSpinBox" name="yBox5">
        <property name="minimum">
@@ -375,16 +375,6 @@
        </property>
        <property name="singleStep">
         <number>50</number>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="1">
-      <widget class="QCheckBox" name="eBox5">
-       <property name="toolTip">
-        <string>Uncheck this box to skip the stage while moving up or down.</string>
-       </property>
-       <property name="text">
-        <string/>
        </property>
       </widget>
      </item>
@@ -490,6 +480,13 @@
        </property>
       </widget>
      </item>
+     <item row="5" column="0" colspan="11">
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
      <item row="11" column="5">
       <widget class="QSlider" name="xSlider0">
        <property name="minimum">
@@ -534,13 +531,6 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0" colspan="11">
-      <widget class="Line" name="line_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
      <item row="12" column="2">
       <widget class="ColorButton" name="iButtonO">
        <property name="sizePolicy">
@@ -582,8 +572,46 @@
        </property>
       </widget>
      </item>
+     <item row="16" column="5" colspan="2">
+      <widget class="QLabel" name="label_25">
+       <property name="text">
+        <string>Lift height:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
      <item row="7" column="8">
       <widget class="QSlider" name="ySlider2">
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>50</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="5">
+      <widget class="QSlider" name="xSlider1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimum">
         <number>0</number>
        </property>
@@ -617,34 +645,6 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="5">
-      <widget class="QSlider" name="xSlider1">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimum">
-        <number>0</number>
-       </property>
-       <property name="maximum">
-        <number>1000</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>50</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -661,6 +661,28 @@
        </property>
       </spacer>
      </item>
+     <item row="6" column="2">
+      <widget class="ColorButton" name="iButton1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Tip: alt+click to set all colors at once</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
      <item row="9" column="9">
       <widget class="QSpinBox" name="yBox4">
        <property name="minimum">
@@ -674,8 +696,8 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="2">
-      <widget class="ColorButton" name="iButton1">
+     <item row="11" column="2">
+      <widget class="ColorButton" name="iButton0">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -740,25 +762,10 @@
        </property>
       </widget>
      </item>
-     <item row="11" column="2">
-      <widget class="ColorButton" name="iButton0">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Tip: alt+click to set all colors at once</string>
-       </property>
+     <item row="12" column="5" colspan="5">
+      <widget class="QLabel" name="label_3">
        <property name="text">
-        <string/>
+        <string>You can assign other DPIs in the Binding tab.</string>
        </property>
       </widget>
      </item>
@@ -784,6 +791,13 @@
        </property>
       </widget>
      </item>
+     <item row="7" column="3">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>2:</string>
+       </property>
+      </widget>
+     </item>
      <item row="10" column="6">
       <widget class="QSpinBox" name="xBox5">
        <property name="minimum">
@@ -797,17 +811,17 @@
        </property>
       </widget>
      </item>
-     <item row="12" column="5" colspan="5">
-      <widget class="QLabel" name="label_3">
+     <item row="8" column="3">
+      <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>You can assign other DPIs in the Binding tab.</string>
+        <string>3:</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="3">
-      <widget class="QLabel" name="label_6">
+     <item row="9" column="3">
+      <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>2:</string>
+        <string>4:</string>
        </property>
       </widget>
      </item>
@@ -830,20 +844,6 @@
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="3">
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>3:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="3">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>4:</string>
        </property>
       </widget>
      </item>
@@ -912,6 +912,20 @@
        </property>
       </widget>
      </item>
+     <item row="16" column="1" colspan="4">
+      <widget class="QCheckBox" name="aSnapBox">
+       <property name="text">
+        <string>Angle snap</string>
+       </property>
+      </widget>
+     </item>
+     <item row="15" column="0" colspan="10">
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
      <item row="14" column="0" colspan="10">
       <widget class="QLabel" name="label_2">
        <property name="font">
@@ -941,17 +955,10 @@
        </property>
       </spacer>
      </item>
-     <item row="16" column="1" colspan="4">
-      <widget class="QCheckBox" name="aSnapBox">
+     <item row="6" column="0">
+      <widget class="QLabel" name="iLabel1">
        <property name="text">
-        <string>Angle snap</string>
-       </property>
-      </widget>
-     </item>
-     <item row="15" column="0" colspan="10">
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <string>→</string>
        </property>
       </widget>
      </item>
@@ -1011,24 +1018,17 @@
        </item>
       </layout>
      </item>
-     <item row="2" column="1" colspan="9">
-      <widget class="QCheckBox" name="xyBox">
-       <property name="text">
-        <string>Independent X/Y states</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="iLabel1">
-       <property name="text">
-        <string>→</string>
-       </property>
-      </widget>
-     </item>
      <item row="7" column="0">
       <widget class="QLabel" name="iLabel2">
        <property name="text">
         <string>→</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1" colspan="9">
+      <widget class="QCheckBox" name="xyBox">
+       <property name="text">
+        <string>Independent X/Y states</string>
        </property>
       </widget>
      </item>

@@ -277,10 +277,20 @@ void Kb::load(){
     if(newCurrentProfile)
         setCurrentProfile(newCurrentProfile);
     else {
-        // If nothing was loaded, load the demo profile
-        QSettings demoSettings(":/txt/demoprofile.conf", QSettings::IniFormat, this);
+        KeyMap map = getKeyMap();
+        // If nothing was loaded, load the appropriate demo profile for each device
+        QString demoProfile(":/txt/demoprofile.conf");
+        if(map.model() == KeyMap::M95)
+            demoProfile = ":/txt/demoprofile_m95.ini";
+        else if(map.model() == KeyMap::K55)
+            demoProfile = ":/txt/demoprofile_k55.ini";
+        else if(map.model() == KeyMap::POLARIS)
+            demoProfile = ":/txt/demoprofile_polaris.ini";
+        else if(map.model() == KeyMap::ST100)
+            demoProfile = ":/txt/demoprofile_st100.ini";
+        QSettings demoSettings(demoProfile, QSettings::IniFormat, this);
         CkbSettings cSettings(demoSettings);
-        KbProfile* demo = new KbProfile(this, getKeyMap(), cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
+        KbProfile* demo = new KbProfile(this, map, cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
         _profiles.append(demo);
         setCurrentProfile(demo);
     }
@@ -303,6 +313,7 @@ void Kb::save(){
     }
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
+    settings.setValue("hwLayout", KeyMap::getLayout(_layout));
 }
 
 void Kb::autoSave(){
@@ -679,7 +690,7 @@ void Kb::readNotify(QString line){
                 light->color("mr", lightColor);
                 light->color("m1", lightColor);
                 light->color("m2", lightColor);
-                if(this->model() != KeyMap::K70MK2)
+                if(!(this->model() == KeyMap::K70MK2 || this->model() == KeyMap::STRAFE_MK2))
                     light->color("m3", lightColor);
                 light->color("lock", lightColor);
             }

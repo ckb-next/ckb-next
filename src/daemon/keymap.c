@@ -339,7 +339,10 @@ void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort 
     } else {
         pthread_mutex_lock(imutex(kb));
         if(IS_LEGACY_DEV(kb)) {
-            hid_kb_translate(kb->input.keys, urblen, buffer, 1);
+            if(IS_MOUSE_DEV(kb))
+                m95_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+            else
+                hid_kb_translate(kb->input.keys, urblen, buffer, 1);
         } else {
             if(IS_MOUSE_DEV(kb)) {
                 // HID Mouse Input
@@ -523,4 +526,30 @@ void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
         else
             CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
     }
+}
+
+void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
+    if(length != 7)
+        return;
+    unsigned short input = (((unsigned short)urbinput[1]) << 8) | urbinput[0];
+    for(int bit = 0; bit < 16; bit++){
+        unsigned char current_bit = (input >> bit) & 1;
+        if(current_bit)
+            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+        else
+            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+    }
+
+    *xaxis += (urbinput[3] << 8) | urbinput[2];
+    *yaxis += (urbinput[5] << 8) | urbinput[4];
+
+    char wheel = urbinput[6];
+    if(wheel > 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    if(wheel < 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
 }

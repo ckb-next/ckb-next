@@ -20,6 +20,9 @@
 #include "ckbupdaterwidget.h"
 #endif
 
+#include "ckbsystemtrayicon.h"
+
+
 extern QSharedMemory appShare;
 extern QString devpath;
 
@@ -52,6 +55,20 @@ extern "C" {
         MainWindow* window = static_cast<MainWindow*>(data);
         window->showWindow();
     }
+
+    void indicatorScroll(AppIndicator* indicator, guint steps, GdkScrollDirection direction, gpointer data) {
+        MainWindow* window = static_cast<MainWindow*>(data);
+        switch(direction) {
+            case GDK_SCROLL_UP:
+                emit window->trayIconScrolled(true);
+                break;
+            case GDK_SCROLL_DOWN:
+                emit window->trayIconScrolled(false);
+                break;
+            default:
+                break;
+        }
+    }
 }
 #endif
 
@@ -72,18 +89,22 @@ MainWindow::MainWindow(QWidget *parent) :
     // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
     closeAction = new QAction(tr("Quit"), this);
+    changeTrayIconAction = new QAction(tr("Monochrome Tray Icon"), this);
 
 #ifdef USE_LIBAPPINDICATOR
     QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
 
     QString desktop = procEnv.value("XDG_CURRENT_DESKTOP", QString("")).toLower();
     QString qpaTheme = procEnv.value("QT_QPA_PLATFORMTHEME", QString("")).toLower();
-    QString ckbnextAppindicator = procEnv.value("CKB-NEXT_USE_APPINDICATOR", QString("")).toLower();
+    QString ckbnextAppindicator = procEnv.value("CKB_NEXT_USE_APPINDICATOR", QString("")).toLower();
+    QStringList appIndicatorOn = QStringList() << "yes" << "on" << "1";
+    QStringList appIndicatorOff = QStringList() << "no" << "off" << "0";
 
     useAppindicator = false;
     trayIcon = 0;
 
-    if((desktop == "unity" && qpaTheme == "appmenu-qt5") || qpaTheme == "appmenu-qt5" || !ckbnextAppindicator.isEmpty()){
+    if(((desktop == "unity" || qpaTheme == "appmenu-qt5" || qpaTheme == "gtk2") && !appIndicatorOff.contains(ckbnextAppindicator)) || appIndicatorOn.contains(ckbnextAppindicator)){
+        qDebug() << "Using AppIndicator";
         useAppindicator = true;
 
         indicatorMenu = gtk_menu_new();
@@ -106,15 +127,22 @@ MainWindow::MainWindow(QWidget *parent) :
         app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
         app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
         app_indicator_set_icon(indicator, "ckb-next");
+
+        // Catch scroll events
+        g_signal_connect(indicator, "scroll-event", G_CALLBACK(indicatorScroll), this);
     } else
 #endif
     {
+        qDebug() << "Using QSytemTrayIcon";
         trayIconMenu = new QMenu(this);
+        trayIconMenu->addAction(changeTrayIconAction);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addAction(closeAction);
-        trayIcon = new QSystemTrayIcon(QIcon(":/img/ckb-next.png"), this);
+        trayIcon = new CkbSystemTrayIcon(getIcon(), this);
         trayIcon->setContextMenu(trayIconMenu);
+        trayIcon->show();
         connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
+        connect(trayIcon, &CkbSystemTrayIcon::wheelScrolled, this, &MainWindow::handleTrayScrollEvt);
     }
     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
@@ -176,6 +204,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(settingsWidget, &SettingsWidget::checkForUpdates, this, &MainWindow::checkForCkbUpdates);
 #endif
+}
+
+void MainWindow::handleTrayScrollEvt(bool up){
+    emit trayIconScrolled(up);
 }
 
 void MainWindow::checkForCkbUpdates(){
@@ -333,13 +365,17 @@ void MainWindow::timerTick(){
                 showWindow();
             if(line.startsWith("Option ")){
                 // New ckb option line
-                QString option = line.split(" ")[1];
+                QString option = line.section(' ', 1);
                 if(option == "Open")
                     // Bring to foreground
                     showWindow();
                 else if(option == "Close")
                     // Quit application
                     qApp->quit();
+                else if(option.startsWith("SwitchToProfile"))
+                    emit switchToProfileCLI(option.section(' ', 1));
+                else if(option.startsWith("SwitchToMode: "))
+                    emit switchToModeCLI(option.section(' ', 1));
             }
         }
     }
@@ -388,6 +424,38 @@ void MainWindow::stateChange(Qt::ApplicationState state){
 
 void MainWindow::quitApp(){
     qApp->quit();
+}
+
+QIcon MainWindow::getIcon() {
+  // on initial launch (first time using ckb) this association checked
+  // will not be present, so force it to true, as we do not want to break default behaviour
+
+  // If the icon is RGB then the menu should present a monochrome option
+  if (CkbSettings::get("Program/RGBIcon", QVariant(true)).toBool()){
+    changeTrayIconAction->setText("Monochrome Tray Icon");
+    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
+    return QIcon(":/img/ckb-next.png");
+  }
+  // If the icon is monochrome then the menu should present an RGB option
+  changeTrayIconAction->setText("RGB Tray Icon");
+  connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
+  return QIcon(":/img/ckb-next-monochrome.png");
+}
+
+void MainWindow::changeTrayIconToMonochrome(){
+    trayIcon->setIcon(QIcon(":/img/ckb-next-monochrome.png"));
+    changeTrayIconAction->setText("RGB Tray Icon");
+    changeTrayIconAction->disconnect();
+    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
+    CkbSettings::set("Program/RGBIcon", false);
+}
+
+void MainWindow::changeTrayIconToRGB(){
+    trayIcon->setIcon(QIcon(":/img/ckb-next.png"));
+    changeTrayIconAction->setText("Monochrome Tray Icon");
+    changeTrayIconAction->disconnect();
+    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
+    CkbSettings::set("Program/RGBIcon", true);
 }
 
 void MainWindow::cleanup(){

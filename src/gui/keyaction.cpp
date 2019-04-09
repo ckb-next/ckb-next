@@ -466,7 +466,7 @@ void KeyAction::macroDisplay() {
     qDebug() << "isMacro returns" << (isMacro() ? "true" : "false");
     qDebug() << "isValidMacro returns" << (isValidMacro() ? "true" : "false");
     QStringList ret =_value.split(":");
-    qDebug() << "Macro definition conains" << ret.count() << "elements";
+    qDebug() << "Macro definition contains" << ret.count() << "elements";
     qDebug() << "Macro definition is" << _value;
 }
 

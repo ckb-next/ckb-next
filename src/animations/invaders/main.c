@@ -10,7 +10,7 @@ void ckb_info(){
     CKB_COPYRIGHT("2017-8", "Maksim Vladimirovich <edush.maxim@gmail.com>\nTasos Sahanidis <code@tasossah.com>");
     CKB_LICENSE("GPLv2");
     CKB_GUID("{54DD2975-E192-457D-BCFC-D912A24E33B9}");
-    CKB_DESCRIPTION("Space invaders - like game.\n\nFire projectiles using the higlighted keys on the left column.\nF1-F12 indicate the level.\nThe \"prtscn\", \"scroll\", and \"pause\" columns indicate continues.\nEsc resets the game.");
+    CKB_DESCRIPTION("Space invaders - like game.\n\nFire projectiles using the highlighted keys on the left column.\nF1-F12 indicate the level.\nThe \"prtscn\", \"scroll\", and \"pause\" columns indicate continues.\nEsc resets the game.");
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NAME);

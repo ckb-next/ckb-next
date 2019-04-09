@@ -167,6 +167,47 @@ void MPerfWidget::sliderYMoved(int index){
         stages[index].xSlider->setValue(slider->value());
 }
 
+void MPerfWidget::setLegacyM95(){
+    ui->eBox4->setChecked(false);
+    ui->eBox5->setChecked(false);
+    QWidget* w[] =  {
+        ui->indicBox,
+        ui->spinBox,
+
+        // Hide colour buttons
+        ui->iButton0,
+        ui->iButton1,
+        ui->iButton2,
+        ui->iButton3,
+        ui->iButton4,
+        ui->iButton5,
+        ui->iButtonO,
+
+        // Hide stages 4, 5, and other completely
+        ui->label_3,
+        ui->label_15,
+
+        // Hide checkboxes as we can't disable DPI stages
+        ui->eBox1,
+        ui->eBox2,
+        ui->eBox3,
+        ui->eBox4,
+        ui->eBox5,
+        ui->label_13,
+        ui->label_8,
+        ui->xSlider4,
+        ui->xSlider5,
+        ui->ySlider4,
+        ui->ySlider5,
+        ui->xBox4,
+        ui->xBox5,
+        ui->yBox5,
+        ui->yBox4
+    };
+    for(size_t i = 0; i < sizeof(w) / sizeof(QWidget*); i++)
+        w[i]->hide();
+}
+
 void MPerfWidget::boxXChanged(int index){
     SET_START;
     QSpinBox* box = stages[index].xBox;

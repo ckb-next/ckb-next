@@ -28,6 +28,7 @@ ushort models[N_MODELS] = {
     P_K70_RFIRE_NRGB,
     P_K70_MK2,
     P_K70_MK2SE,
+    P_K70_MK2LP,
     P_K90_LEGACY,
     P_K95,
     P_K95_LEGACY,
@@ -39,6 +40,8 @@ ushort models[N_MODELS] = {
     // Mice
     P_M65,
     P_M65_PRO,
+    P_M65_RGB_ELITE,
+    P_M95,
     P_GLAIVE,
     P_SABRE_O,
     P_SABRE_L,
@@ -60,7 +63,7 @@ ushort models[N_MODELS] = {
 ///
 /// Is set only by \a quit() to true (1)
 /// to inform several usb_* functions to end their loops and tries.
-volatile int reset_stop = 0;
+_Atomic int reset_stop = 0;
 
 /// brief .
 ///
@@ -78,7 +81,7 @@ int features_mask = -1;
 /// else it returns ""
 ///
 /// \attention There is also a string defined V_CORSAIR_STR, which returns the device number as string in hex "1b1c".
-const char* vendor_str(short vendor){
+const char* vendor_str(ushort vendor){
     if(vendor == V_CORSAIR)
         return "corsair";
     return "";
@@ -105,14 +108,14 @@ const char* vendor_str(short vendor){
 /// The macros need the \a kb*,
 /// product_str() needs the \a product \a ID
 ///
-const char* product_str(short product){
+const char* product_str(ushort product){
     if(product == P_K95 || product == P_K95_LEGACY)
         return "k95";
     if(product == P_K95_PLATINUM)
         return "k95p";
     if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
-    if(product == P_K70_MK2 || product == P_K70_MK2SE)
+    if(product == P_K70_MK2 || product == P_K70_MK2SE || product == P_K70_MK2LP)
         return "k70mk2";
     if(product == P_K68 || product == P_K68_NRGB)
         return "k68";
@@ -128,8 +131,12 @@ const char* product_str(short product){
         return "strafe";
     if(product == P_STRAFE_MK2)
         return "strafe_mk2";
+    if(product == P_M95)
+        return "m95";
     if(product == P_M65 || product == P_M65_PRO)
         return "m65";
+    if(product == P_M65_RGB_ELITE)
+        return "m65e";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)
@@ -161,13 +168,16 @@ const char* product_str(short product){
 ///
 /// \todo Is the last point really a good decision and always correct?
 ///
-static const devcmd* get_vtable(short vendor, short product){
+static const devcmd* get_vtable(ushort vendor, ushort product){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
-    if(IS_MOUSE(vendor, product))
-        return &vtable_mouse;
-    else if(IS_MOUSEPAD(vendor, product) || product == P_ST100)
+    if(IS_MOUSE(vendor, product)) {
+        if(IS_LEGACY(vendor, product))
+            return &vtable_mouse_legacy;
+        else
+            return &vtable_mouse;
+    } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
         return &vtable_mousepad;
-    else {
+    } else {
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;
         else
@@ -299,7 +309,7 @@ static void* _setupusb(void* context){
     usbdevice* kb = context;
     pthread_mutex_lock(imutex(kb));
     // Set standard fields
-    short vendor = kb->vendor, product = kb->product;
+    ushort vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
     kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(IS_MOUSE(vendor, product)) kb->features |= FEAT_ADJRATE;
@@ -354,7 +364,16 @@ static void* _setupusb(void* context){
     /// The thread is immediately detached so that it can return its resource completely independently if it should terminate.
     if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
         goto fail;
+
+#ifndef OS_MAC
+    // name this thread externally if not on mac,
+    // on mac `pthread_setname_np` is only naming the current thread
+    char inputthread_name[THREAD_NAME_MAX] = "ckbX input";
+    inputthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+    pthread_setname_np(kb->inputthread, inputthread_name);
+#endif // OS_MAC
     pthread_detach(kb->inputthread);
+
     ///
     /// - The same happens with os_setupindicators(),
     /// which initially initializes all LED variables in kb to off and then starts the _ledthread() thread
@@ -467,8 +486,19 @@ static void* _setupusb(void* context){
 /// In kb->thread the thread id is mentioned, because closeusb() needs this info for joining that thread again.
 ///
 void setupusb(usbdevice* kb){
-    if(pthread_create(&kb->thread, 0, _setupusb, kb))
+
+    if(pthread_create(&kb->thread, 0, _setupusb, kb)) {
         ckb_err("Failed to create USB thread\n");
+        return;
+    }
+
+#ifndef OS_MAC
+    // name this thread externally if not on mac,
+    // on mac `pthread_setname_np` is only naming the current thread
+    char usbthread_name[THREAD_NAME_MAX] = "ckbX usb";
+    usbthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+    pthread_setname_np(kb->thread, usbthread_name);
+#endif // OS_MAC
 }
 
 /// \brief .
@@ -634,6 +664,24 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
         }
     }
     return total_sent;
+}
+
+int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
+    while(1){
+        pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
+        int res = os_usbsend_control(kb, data, len, bRequest, wValue, wIndex, file, line);
+        pthread_mutex_unlock(mmutex(kb));
+
+        if(res != -1)
+            return res;
+
+        // Stop immediately if the program is shutting down or hardware load is set to tryonce
+        if(reset_stop || hwload_mode != 2)
+            return 0;
+
+        // Retry as long as the result is temporary failure
+        DELAY_LONG(kb);
+    }
 }
 
 /// \brief .

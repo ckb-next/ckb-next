@@ -17,7 +17,7 @@ public:
     // Device information
     QString features, firmware, pollrate;
     bool monochrome;
-    short productID;
+    ushort productID;
     bool hwload;
 
     // Keyboard model

@@ -11,6 +11,7 @@
 #include "kbprofiledialog.h"
 #include "ui_kbwidget.h"
 #include "ui_kblightwidget.h"
+#include "mainwindow.h"
 
 KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     QWidget(parent),
@@ -29,11 +30,16 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     connect(device, SIGNAL(modeRenamed()), this, SLOT(modeChanged()));
     connect(device, SIGNAL(modeChanged(bool)), this, SLOT(modeChanged(bool)));
 
+    connect(static_cast<MainWindow*>(parent), &MainWindow::switchToProfileCLI, this, &KbWidget::switchToProfile);
+    connect(static_cast<MainWindow*>(parent), &MainWindow::switchToModeCLI, this, &KbWidget::switchToMode);
+
     // Remove the Lighting and Performance tabs from non-RGB keyboards
     if(!device->features.contains("rgb")){
-        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
+        if(device->model() != KeyMap::M95){
+            ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
+            ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
+        }
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
-        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
     } else {
         // Remove mouse Performance tab from non-mice
         if(!device->isMouse())
@@ -42,6 +48,13 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         if(!device->isKeyboard())
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
     }
+
+    // If we have an M95, set the performance and lighting tabs as such
+    if(device->model() == KeyMap::M95){
+        ui->mPerfWidget->setLegacyM95();
+        ui->lightWidget->setLegacyM95();
+    }
+
     // Hide poll rate and FW update as appropriate
     if(!device->features.contains("pollrate")){
         ui->pollLabel->hide();
@@ -115,8 +128,6 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
 
         // Set the layout and save it
         device->layout(layout, false);
-        if(layout != settingsLayout)
-            settings.setValue("hwLayout", KeyMap::getLayout(layout));
     }
     else
         device->layout(KeyMap::GB, false);
@@ -447,8 +458,7 @@ void KbWidget::on_fwUpdButton_clicked(){
     dialog.exec();
 }
 
-void KbWidget::on_layoutBox_activated(int index)
-{
+void KbWidget::on_layoutBox_activated(int index){
     // Can't use currentIndexChanged as it fires when the GUI is first drawn
     // before the layout has been initialised
     int idxLayout = ui->layoutBox->itemData(index).toInt();
@@ -459,4 +469,38 @@ void KbWidget::on_layoutBox_activated(int index)
     QString layoutSettingsPath("Devices/%1/hwLayout");
     CkbSettings::set(layoutSettingsPath.arg(device->usbSerial), KeyMap::getLayout(layout));
     device->layout(layout, true);
+}
+
+void KbWidget::switchToProfile(QString profile){
+    int len = device->profiles().length();
+    for(int i = 0; i < len; i++){
+        KbProfile* loopProfile = device->profiles().at(i);
+        if(loopProfile->name() != profile)
+            continue;
+
+        qDebug() << "Switching" << this->name() << "to" << profile;
+        device->setCurrentProfile(loopProfile);
+
+        // Also update the dropdown
+        ui->profileBox->setCurrentIndex(i);
+        return;
+    }
+}
+
+void KbWidget::switchToMode(QString mode){
+    KbProfile* currentProfile = device->currentProfile();
+    int len = currentProfile->modes().length();
+
+    for(int i = 0; i < len; i++){
+        KbMode* loopMode = currentProfile->modes().at(i);
+        if(loopMode->name() != mode)
+            continue;
+
+        qDebug() << "Switching" << this->name() << "to mode" << mode << "in" << currentProfile->name();
+        device->setCurrentMode(loopMode);
+
+        // Also update the list
+        ui->modesList->setCurrentRow(i);
+        return;
+    }
 }

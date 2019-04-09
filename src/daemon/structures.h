@@ -183,6 +183,7 @@ extern const union devcmd vtable_keyboard;
 extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mousepad;
+extern const union devcmd vtable_mouse_legacy;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN 50
@@ -261,7 +262,7 @@ typedef struct {
     // Device serial number
     char serial[SERIAL_LEN];
     // USB vendor and product IDs
-    short vendor, product;
+    ushort vendor, product;
     // Firmware version
     ushort fwversion;
     // Poll rate (ms), or -1 if unsupported

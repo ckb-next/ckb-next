@@ -134,7 +134,7 @@ void KbFirmware::processDownload(QNetworkReply* reply){
         fw.ckbVersion = KbManager::parseVersionString(components[4]);       // Minimum ckb version
         fw.fileName = QUrl::fromPercentEncoding(components[5].toLatin1());  // Name of file inside zip
         fw.hash = QByteArray::fromHex(components[6].toLatin1());            // SHA256 of file inside zip
-        fw.productID = components[7].toShort(&ok, 16);                      // Hex productID assigned to this FW
+        fw.productID = components[7].toUShort(&ok, 16);                      // Hex productID assigned to this FW
         // Update entry
         fwTable[QString::number(fw.productID)] = fw;
         // qDebug() << "saving fwTabel entry[" << QString::number(fw.productID) << "] for device" << device
@@ -152,7 +152,7 @@ void KbFirmware::downloadFinished(){
     emit downloaded();
 }
 
-float KbFirmware::_latestForBoard(const short productID, bool waitForComplete) {
+float KbFirmware::_latestForBoard(const ushort productID, bool waitForComplete) {
     if((tableDownload || checkUpdates()) && waitForComplete){
         // If waiting is desired, enter an event loop and stay here until the download is finished
         QEventLoop loop(this);
@@ -173,7 +173,7 @@ float KbFirmware::_latestForBoard(const short productID, bool waitForComplete) {
     return info.fwVersion;
 }
 
-QByteArray KbFirmware::_fileForBoard(const short productID){
+QByteArray KbFirmware::_fileForBoard(const ushort productID){
     FW info = fwTable.value(QString::number(productID));
     if(info.hash.isEmpty())
         return "";

@@ -113,7 +113,7 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     QList<KbProfile*> profiles = device->profiles();
 
     QMenu menu(this);
-    QAction* rename = new QAction("Rename...", this);
+    QAction* rename = new QAction("Rename", this);
     QAction* duplicate = new QAction("Duplicate", this);
     QAction* del = new QAction("Delete", this);
     bool canDelete = (profiles.count() > 1);
@@ -121,6 +121,11 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
         // Can't delete the last profile on the device
         del->setEnabled(false);
     QAction* hwsave = new QAction("Save to Hardware", this);
+    // Disable Save to hardware button for unsupported devices
+    if(!device->hwload){
+        hwsave->setDisabled(true);
+        hwsave->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
+    }
     QAction* moveup = new QAction("Move Up", this);
     if(index == 0)
         moveup->setEnabled(false);
@@ -138,6 +143,8 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     QAction* result = menu.exec(QCursor::pos());
     if(result == rename){
         ui->profileList->editItem(item);
+        // We need to return otherwise repopulate() gets called and the item is destroyed
+        return;
     } else if(result == duplicate){
         KbProfile* newProfile = device->newProfile(currentProfile);
         newProfile->newId();
@@ -166,6 +173,8 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
             KbProfile* profile = device->find(item->data(GUID).toUuid());
             item->setIcon(QIcon((profile == device->hwProfile()) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"));
         }
+        // No need to repopulate here either
+        return;
     } else if(result == moveup){
         profiles.removeAll(currentProfile);
         profiles.insert(index - 1, currentProfile);
@@ -281,7 +290,7 @@ void KbProfileDialog::on_exportButton_clicked(){
     bool compress = JlCompress::compressFiles(filename, tmpExported);
 
     if(!compress)
-        QMessageBox::warning(this, tr("Error"), tr("An error occured while exporting the selected profiles."), QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Error"), tr("An error occurred while exporting the selected profiles."), QMessageBox::Ok);
 
     extractedFileCleanup(tmpExported);
 

@@ -14,9 +14,8 @@
 ///
 /// The list of defines in the first part of the file describes the various types of equipment from Corsair
 /// and summarizes them according to specific characteristics.
-/// \n Each device type is described with two defines:
-/// - On the one hand the device ID with which the device can be recognized on the USB as a short
-/// - and on the other hand the same representation as a string, but without leading "0x".
+/// \n Each device type is described with a define:
+///  - The device ID with which the device can be recognized on the USB as a ushort
 ///
 /// First entry-pair is the Provider ID (vendorID) from Corsair.
 ///
@@ -72,7 +71,8 @@
 #define P_K70_RFIRE_NRGB     0x1b3a
 #define P_K70_MK2            0x1b49
 #define P_K70_MK2SE          0x1b6b
-#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE))
+#define P_K70_MK2LP          0x1b55
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP))
 
 // The Legacy K90 behaves like a Legacy K95.
 #define P_K90_LEGACY         0x1b02
@@ -89,7 +89,10 @@
 
 #define P_M65                0x1b12
 #define P_M65_PRO            0x1b2e
-#define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO))
+#define P_M65_RGB_ELITE      0x1b5a
+#define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE))
+
+#define P_M95                0x1b06
 
 #define P_SABRE_O            0x1b14 /* optical */
 #define P_SABRE_L            0x1b19 /* laser */
@@ -116,7 +119,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 38
+#define N_MODELS 41
 extern ushort models[];
 
 ///
@@ -133,15 +136,15 @@ extern ushort models[];
 
 ///
 /// \brief vendor_str Vendor/product string representations
-/// \param vendor \a short vendor ID
+/// \param vendor \a ushort vendor ID
 /// \return a string: either "" or "corsair"
-const char* vendor_str(short vendor);
+const char* vendor_str(ushort vendor);
 
 ///
 /// \brief product_str returns a condensed view on what type of device we have.
-/// \param product is the \a short USB device product ID
+/// \param product is the \a ushort USB device product ID
 /// \return string to identify a type of device (see below)
-const char* product_str(short product);
+const char* product_str(ushort product);
 
 // Used for devices that use the CUE protocol but have no backlight
 #define HAS_NO_LIGHTS(kb)               (IS_K66(kb))
@@ -149,12 +152,12 @@ const char* product_str(short product);
 /// RGB vs non-RGB test
 /// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol.
 /// The difference is denoted with the "monochrome" feature).
-#define IS_LEGACY(vendor, product)      ((vendor) == (V_CORSAIR) && ((product) == (P_K65_LEGACY) || (product) == (P_K70_LEGACY) || (product) == P_K90_LEGACY || (product) == (P_K95_LEGACY)))
+#define IS_LEGACY(vendor, product)      ((vendor) == (V_CORSAIR) && ((product) == (P_K65_LEGACY) || (product) == (P_K70_LEGACY) || (product) == P_K90_LEGACY || (product) == (P_K95_LEGACY) || (product) == (P_M95)))
 
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
 /// Change this if new \b monochrome devices are added
-#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K63_NRGB) || (product) == (P_K68_NRGB) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
+#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K63_NRGB) || (product) == (P_K68_NRGB) || (product) == (P_K70_LUX_NRGB) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_LEGACY() is returned.
 #define IS_LEGACY_DEV(kb)               IS_LEGACY((kb)->vendor, (kb)->product)
@@ -166,7 +169,7 @@ const char* product_str(short product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_KATAR)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_KATAR)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -190,7 +193,7 @@ const char* product_str(short product);
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb))
 
 /// Used for devices that use a file-based hardware animation system.
-#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO)
+#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.
@@ -216,7 +219,7 @@ const char* product_str(short product);
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 #define USB_DELAY_DEFAULT   5
-        
+
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();
 
@@ -378,5 +381,14 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
 int usb_tryreset(usbdevice* kb);
 
 void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum);
+
+int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
+#define usbsend_control(kb, message, len, bRequest, wValue, wIndex) _usbsend_control(kb, message, len, bRequest, wValue, wIndex, __FILE_NOPATH__, __LINE__)
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
+
+
+// receive message from initial sighandler socketpair communication
+extern int sighandler_pipe[2];
+extern void exithandler(int type);
 
 #endif  // USB_H

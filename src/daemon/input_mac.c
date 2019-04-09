@@ -152,7 +152,12 @@ void os_inputclose(usbdevice* kb){
 // However, updating indicator state requires locking dmutex and we never want to do that in the input thread.
 // Instead, we launch a single-shot thread to update the state.
 static void* indicator_update(void* context){
+    char indicthread_name[THREAD_NAME_MAX] = "ckbX indicator";
     usbdevice* kb = context;
+
+    indicthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+    pthread_setname_np(indicthread_name);
+
     pthread_mutex_lock(dmutex(kb));
     {
         pthread_mutex_lock(imutex(kb));
@@ -185,7 +190,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     }
     // Pick the appropriate add or remove function
     add_remove_keys = down ? &add_to_keys : &remove_from_keys;
-    
+
     if(scancode == KEY_FN) {
         (*add_remove_keys)(scancode, &(kb->kbinput_avtopcase.keys));
         IOConnectCallStructMethod(kb->event, post_apple_vendor_top_case_input_report, &kb->kbinput_avtopcase, sizeof(kb->kbinput_avtopcase), NULL, 0);

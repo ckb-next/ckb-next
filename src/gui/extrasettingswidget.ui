@@ -14,7 +14,23 @@
    <string>Application Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="14" column="5">
+   <item row="2" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>28</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="16" column="5">
     <widget class="QLabel" name="fpsWarnLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -27,14 +43,14 @@
      </property>
     </widget>
    </item>
-   <item row="19" column="0" colspan="7">
+   <item row="21" column="0" colspan="7">
     <widget class="Line" name="osxLine">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="16" column="1" colspan="6">
+   <item row="18" column="1" colspan="6">
     <widget class="QCheckBox" name="delayBox">
      <property name="toolTip">
       <string>When using macros with strings longer than 25 chars, some OS may lose characters (e.g. Mint 17.2). Select to prevent that bug.</string>
@@ -44,7 +60,7 @@
      </property>
     </widget>
    </item>
-   <item row="14" column="6">
+   <item row="16" column="6">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -57,7 +73,7 @@
      </property>
     </spacer>
    </item>
-   <item row="10" column="1">
+   <item row="12" column="1">
     <spacer name="verticalSpacer_6">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -73,7 +89,7 @@
      </property>
     </spacer>
    </item>
-   <item row="6" column="1">
+   <item row="8" column="1">
     <spacer name="verticalSpacer_5">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -89,7 +105,7 @@
      </property>
     </spacer>
    </item>
-   <item row="21" column="0">
+   <item row="23" column="0">
     <spacer name="verticalSpacer_11">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -105,7 +121,7 @@
      </property>
     </spacer>
    </item>
-   <item row="14" column="2">
+   <item row="16" column="2">
     <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -121,14 +137,14 @@
      </property>
     </spacer>
    </item>
-   <item row="12" column="0" colspan="7">
+   <item row="14" column="0" colspan="7">
     <widget class="Line" name="line_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="22" column="5">
+   <item row="24" column="5">
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -141,7 +157,7 @@
      </property>
     </spacer>
    </item>
-   <item row="7" column="0" colspan="7">
+   <item row="9" column="0" colspan="7">
     <widget class="QLabel" name="label_5">
      <property name="font">
       <font>
@@ -154,7 +170,7 @@
      </property>
     </widget>
    </item>
-   <item row="18" column="0" colspan="7">
+   <item row="20" column="0" colspan="7">
     <widget class="QLabel" name="osxLabel">
      <property name="font">
       <font>
@@ -167,7 +183,7 @@
      </property>
     </widget>
    </item>
-   <item row="14" column="4">
+   <item row="16" column="4">
     <spacer name="horizontalSpacer_3">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -183,14 +199,14 @@
      </property>
     </spacer>
    </item>
-   <item row="9" column="1">
+   <item row="11" column="1">
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>Location:</string>
      </property>
     </widget>
    </item>
-   <item row="14" column="3">
+   <item row="16" column="3">
     <widget class="QSpinBox" name="fpsBox">
      <property name="minimum">
       <number>5</number>
@@ -243,7 +259,7 @@
      </property>
     </widget>
    </item>
-   <item row="14" column="0">
+   <item row="16" column="0">
     <spacer name="verticalSpacer_9">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -275,14 +291,14 @@
      </property>
     </spacer>
    </item>
-   <item row="14" column="1">
+   <item row="16" column="1">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Frame rate (FPS):</string>
      </property>
     </widget>
    </item>
-   <item row="15" column="0">
+   <item row="17" column="0">
     <spacer name="verticalSpacer_8">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -298,7 +314,7 @@
      </property>
     </spacer>
    </item>
-   <item row="9" column="0">
+   <item row="11" column="0">
     <spacer name="verticalSpacer_4">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -314,7 +330,7 @@
      </property>
     </spacer>
    </item>
-   <item row="21" column="5" colspan="2">
+   <item row="23" column="5" colspan="2">
     <widget class="QWidget" name="sSpeedWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -371,7 +387,14 @@
      </layout>
     </widget>
    </item>
-   <item row="15" column="1" colspan="6">
+   <item row="10" column="0" colspan="7">
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="17" column="1" colspan="6">
     <widget class="QCheckBox" name="ditherBox">
      <property name="toolTip">
       <string>May improve appearance on some keyboards.</string>
@@ -381,7 +404,7 @@
      </property>
     </widget>
    </item>
-   <item row="21" column="1" colspan="4">
+   <item row="23" column="1" colspan="4">
     <widget class="QCheckBox" name="sAccelBox">
      <property name="toolTip">
       <string>Try this if you're having problems with the scroll wheel.</string>
@@ -391,30 +414,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>28</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="8" column="0" colspan="7">
-    <widget class="Line" name="line_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="16" column="1">
+   <item row="18" column="1">
     <spacer name="verticalSpacer_7">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -430,7 +430,7 @@
      </property>
     </spacer>
    </item>
-   <item row="9" column="3" colspan="4">
+   <item row="11" column="3" colspan="4">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="animPathLabel">
@@ -464,7 +464,7 @@
      </item>
     </layout>
    </item>
-   <item row="23" column="0" colspan="7">
+   <item row="25" column="0" colspan="7">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -474,7 +474,7 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="0" colspan="7">
+   <item row="13" column="0" colspan="7">
     <widget class="QLabel" name="label_2">
      <property name="font">
       <font>
@@ -487,7 +487,7 @@
      </property>
     </widget>
    </item>
-   <item row="20" column="0">
+   <item row="22" column="0">
     <spacer name="verticalSpacer_10">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -503,7 +503,7 @@
      </property>
     </spacer>
    </item>
-   <item row="20" column="1" colspan="6">
+   <item row="22" column="1" colspan="6">
     <widget class="QCheckBox" name="mAccelBox">
      <property name="toolTip">
       <string>Try this if you're having problems with mouse movement.</string>
@@ -513,10 +513,26 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1" colspan="6">
+   <item row="7" column="1" colspan="6">
     <widget class="QCheckBox" name="startDelayBox">
      <property name="text">
       <string>Delay application start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="6">
+    <widget class="QLabel" name="scrollWarningLabel">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+       <italic>true</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>Enabling per-mode brightness will disable scrolling on the tray icon to change the brightness level</string>
      </property>
     </widget>
    </item>

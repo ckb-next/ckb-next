@@ -80,9 +80,7 @@ if (MACOS)
     option(MAC_LEGACY "Build a legacy version without the karabiner kext." OFF)
     if (MAC_LEGACY)
         set(ckb-next_VERSION "${ckb-next_VERSION}-l")
-    endif ()
-elseif (LINUX)
-    option(WITH_MVIZ "Build with music visualizer." ON)
+    endif ()    
 endif ()
 
 # Options: GUI
@@ -98,7 +96,17 @@ cmake_dependent_option(WITH_PINWHEEL "Build with 'Pinwheel' animation." ON "WITH
 cmake_dependent_option(WITH_RIPPLE   "Build with 'Ripple' animation."   ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_WAVE     "Build with 'Wave' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 cmake_dependent_option(WITH_INVADERS "Build with 'Invaders' animation." ON "WITH_ANIMATIONS;WITH_GUI" OFF)
+cmake_dependent_option(WITH_LIFE     "Build with 'Life' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
+cmake_dependent_option(WITH_SNAKE    "Build with 'Snake' animation."    ON "WITH_ANIMATIONS;WITH_GUI" OFF)
+cmake_dependent_option(WITH_PIPE     "Build with 'Pipe' animation."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
 
+if (LINUX)
+    cmake_dependent_option(WITH_MVIZ     "Build with music visualizer."     ON "WITH_ANIMATIONS;WITH_GUI" OFF)
+    option(USE_PORTAUDIO "Use portaudio for music visualizer." OFF)
+else ()
+    cmake_dependent_option(WITH_MVIZ     "Build with music visualizer."     OFF "WITH_ANIMATIONS;WITH_GUI" OFF)
+    set(USE_PORTAUDIO ON)
+endif ()
 # Options: daemon
 option(DISABLE_UPDATER "Disable the ckb-next updater. This option should only be enabled during packaging."    OFF)
 option(DEBUG_USB_SEND  "Show the contents of USB packets being sent to device."                                OFF)

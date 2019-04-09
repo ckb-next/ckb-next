@@ -38,10 +38,13 @@ void AnimScript::scan(){
     scripts.clear();
     foreach(QString file, dir.entryList(QDir::Files | QDir::Executable)){
         AnimScript* script = new AnimScript(qApp, dir.absoluteFilePath(file));
-        if(script->load() && !scripts.contains(script->_info.guid))
+        if(script->load() && !scripts.contains(script->_info.guid) && script->presets().count()){
             scripts[script->_info.guid] = script;
-        else
-            delete script;
+            continue;
+        }
+        if(!script->presets().count())
+            qWarning() << script->name() << "has no default preset and will not be loaded.";
+        delete script;
     }
 }
 
@@ -311,7 +314,7 @@ void AnimScript::begin(quint64 timestamp){
     connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readProcess()));
     connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readProcessErr()));
     process->start(_path, QStringList("--ckb-run"));
-    qDebug() << "Starting " << _path;
+    qDebug() << "Starting" << _path;
     // Write the keymap to the process
     process->write("begin keymap\n");
     process->write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());
@@ -394,7 +397,11 @@ void AnimScript::end(){
 }
 void AnimScript::readProcessErr(){
     QList<QByteArray> data = process->readAllStandardError().split('\n');
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     QString out = _info.name + " (" + QString::number(process->processId()) + ")";
+#else
+    QString out = _info.name;
+#endif
     for(int i = 0; i < data.length(); i++){
         QString str(data.at(i));
         if(str.isEmpty())

@@ -5,11 +5,28 @@
 #include "usb.h"
 #include "command.h"
 #include <IOKit/pwr_mgt/IOPMLib.h>
+#include <iconv.h>
 
 #ifdef OS_MAC
 
 static CFRunLoopRef mainloop = 0;
 static IONotificationPortRef notify = 0;
+
+// Note: this is untested
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
+#ifdef DEBUG_USB_SEND
+    int ckb = INDEX_OF(kb, keyboard);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
+    if(len)
+        print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
+#endif
+
+    IOUSBDevRequestTO rq = { 0x40, bRequest, wValue, wIndex, len, (void*)data, 0, 5000, 5000 };
+    int res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
+    if(res == kIOReturnSuccess)
+        return len;
+    return 0;
+}
 
 #ifdef OS_MAC_LEGACY
 
@@ -56,8 +73,25 @@ static void hidgetstr(hid_dev_t handle, CFStringRef key, char* output, int out_l
         output[0] = 0;
 }
 
-// profile.c
-void u16dec(ushort* in, char* out, size_t* srclen, size_t* dstlen);
+static void u16dec_char(char* in, char* out, size_t* srclen, size_t* dstlen){
+    iconv_t utf16to8 = iconv_open("UTF-8", "UTF-16LE");
+    if((*srclen % 2) || (utf16to8 == (iconv_t) -1)) {
+        out[0] = 0;
+        return;
+    }
+
+    size_t srclen2 = 0;
+    for(; srclen2 < *srclen; srclen2 += 2){
+        // Since it's UTF16 we need to check both
+        if(!(in[srclen2] || in[srclen2 + 1]))
+            break;
+    }
+
+    if(iconv(utf16to8, &in, &srclen2, &out, dstlen) == (size_t) -1)
+        out[0] = 0;
+
+    iconv_close(utf16to8);
+}
 
 static void usbgetstr(usb_dev_t handle, uint8 string_index, char* output, int out_len){
     // Make a temporary buffer so the request won't fail if too large
@@ -68,8 +102,8 @@ static void usbgetstr(usb_dev_t handle, uint8 string_index, char* output, int ou
         output[0] = 0;
         return;
     }
-    size_t inl = sizeof(buffer) / 2, outl = out_len;
-    u16dec((ushort*)buffer + 1, output, &inl, &outl);
+    size_t inl = sizeof(buffer), outl = out_len;
+    u16dec_char(buffer + 2, output, &inl, &outl);
     output[out_len - 1] = 0;
 }
 
@@ -377,9 +411,15 @@ void register_mouse_event_tap(CFRunLoopTimerRef timer, void* info) {
 extern void keyretrigger(CFRunLoopTimerRef timer, void* info);
 #endif
 void* os_inputmain(void* context){
+    char inputthread_name[THREAD_NAME_MAX] = "ckbX input";
     usbdevice* kb = context;
 
     int index = INDEX_OF(kb, keyboard);
+
+    // name thread for debugging purposes
+    inputthread_name[3] = index + '0';
+    pthread_setname_np(inputthread_name);
+
     // Monitor input transfers on all endpoints for legacy devices
     // For non legacy ones, monitor all but the last, as it's used for input/output
     int count = IS_LEGACY_DEV(kb) ? kb->epcount : (kb->epcount - 1);
@@ -469,11 +509,9 @@ int os_setupusb(usbdevice* kb){
 #endif
     // Get the device firmware version
     (*kb->handle)->GetDeviceReleaseNumber(kb->handle, &kb->fwversion);
-#ifdef DEBUG
     int devnode = INDEX_OF(kb, keyboard);
     ckb_info("ckb%i USB handles: 0: %p, 1: %p, 2:%p, 3: %p\n", devnode, kb->ifusb[0], kb->ifusb[1], kb->ifusb[2], kb->ifusb[3]);
     ckb_info("ckb%i HID handles: 0: %p, 1: %p, 2:%p, 3: %p\n", devnode, kb->ifhid[0], kb->ifhid[1], kb->ifhid[2], kb->ifhid[3]);
-#endif
     return 0;
 }
 
@@ -679,9 +717,7 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
         err = (*if_handle)->USBInterfaceOpenSeize(if_handle);   // no wait_loop here because this is expected to fail
         if(err == kIOReturnSuccess){
             kb->ifusb[iface_count] = if_handle;
-#ifdef DEBUG
-            ckb_info("Adding USB handle with id %i\n", iface_count);
-#endif
+            ckb_info("ckb%d: Adding USB handle with id %i\n", index, iface_count);
             iface_success++;
             // Register for removal notification
             IOServiceAddInterestNotification(notify, iface, kIOGeneralInterest, remove_device, kb, kb->rm_notify + 1 + iface_count);
@@ -827,9 +863,6 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
             return 0;
         }
     }
-#ifdef DEBUG
-        ckb_info("Adding HID handle with id %i\n", handle_idx);
-#endif
     // Use the location ID key to group the handles together
     uint32_t location = hidgetlong(handle, CFSTR(kIOHIDLocationIDKey));
     int index = find_device(idvendor, idproduct, location, handle_idx + 1);
@@ -838,6 +871,8 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         return 0;
     }
     usbdevice* kb = keyboard + index;
+
+    ckb_info("ckb%d: Adding HID handle with id %i\n", index, handle_idx);
 
     // Read the serial number and name (if not done yet)
     if(!keyboard[index].serial[0] && !keyboard[index].name[0]){
@@ -933,6 +968,17 @@ void powerEventCallback(void *refcon, io_service_t service, uint32_t type, void 
     }
 }
 
+///
+/// \brief mac_exithandler
+/// Thin layer to deconstruct the CFSocket object into a native one,
+/// reading the received data from that, and passing it on to the main
+/// exithandler function.
+void mac_exithandler(CFSocketRef s, CFSocketCallBackType t, CFDataRef a, const void *data, void *info) {
+    int type;
+    read(CFSocketGetNative(s), &type, sizeof(int));
+    exithandler(type);
+}
+
 int usbmain(){
     int vendor = V_CORSAIR;
 
@@ -1014,6 +1060,18 @@ int usbmain(){
     io_iterator_t iterator_syspower = 0;
     IORegisterForSystemPower(NULL, &notify, powerEventCallback, &iterator_syspower);
     CFRunLoopAddSource(mainloop, IONotificationPortGetRunLoopSource(notify), kCFRunLoopDefaultMode);
+
+    // setup signal handling via CoreFoundation socket callout mechanism
+    // see mac_exithandler for the reading side of this setup
+    CFSocketRef cf_socket = CFSocketCreateWithNative(
+            NULL,
+            sighandler_pipe[SIGHANDLER_RECEIVER],
+            kCFSocketReadCallBack,
+            mac_exithandler,
+            NULL);
+    CFRunLoopSourceRef socket_source = CFSocketCreateRunLoopSource(NULL, cf_socket, 0);
+
+    CFRunLoopAddSource(mainloop, socket_source, kCFRunLoopCommonModes);
 
     // Enter loop to scan/connect new devices
     CFRunLoopRun();

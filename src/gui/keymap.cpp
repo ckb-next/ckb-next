@@ -347,6 +347,20 @@ static const Key ScimKeys[] = {
 #define SCIM_WIDTH      M65_WIDTH
 #define SCIM_HEIGHT     M65_HEIGHT
 
+// M95
+static const Key M95Keys[] = {
+    {0, "Left Mouse", "mouse1", 9, 6, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 30, 6, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
+    {0, "4", "thumb6", 23, 28, 7, 12, false, true},
+    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "DPI Up (5)", "dpiup", 5, -1, 6, 9, false, true}, {0, "DPI Down (6)", "dpidn", 5, 6, 6, 9, false, true},
+    {0, "Forward (7)", "mouse6", -42, 14, 14, 8, false, true}, {0, "Back (8)", "mouse7", -30, 14, 14, 8, false, true}, {0, "Sniper (14)", "sniper", -40, 20, 8, 14, false, true},
+    {0, "9", "thumb1", -18, 14, 18, 8, false, true}, {0, "15", "thumb7", -18, 20, 10, 20, false, true},
+    {0, "10", "thumb2", -10, 21, 10, 11, false, true},{0, "11", "thumb3", -10, 30, 10, 11, false, true},
+    {0, "12", "thumb4", -18, 38, 18, 8, false, true}, {0, "13", "thumb5", -34, 38, 18, 8, false, true},
+    {0, "Logo", "back", 20, 55, 12, 12, true, false}
+
+};
+#define KEYCOUNT_M95    (sizeof(M95Keys) / sizeof(Key))
+
 // K95 Platinum lightbar
 static const Key K95PLbar[] = {
     {0, 0, "topbar1", 4, -3, LBS, true, false}, {0, 0, "topbar2", 19, -3, LBS, true, false}, {0, 0, "topbar3", 34, -3, LBS, true, false}, {0, 0, "topbar4", 49, -3, LBS, true, false}, {0, 0, "topbar5", 64, -3, LBS, true, false}, {0, 0, "topbar6", 79, -3, LBS, true, false},
@@ -575,6 +589,12 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             i.next();
             i.value().x += KSTRAFE_X_START;
         }
+
+        // Move profswitch, light and lwin two blocks to the left
+        map["profswitch"].x -=20;
+        map["light"].x -= 20;
+        map["lock"].x -= 20;
+
         map["lsidel"] = KStrafeKeys[0];
         map["rsidel"] = KStrafeKeys[1];
         break;
@@ -804,6 +824,22 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     }
     case KeyMap::ST100:{
         for(const Key* key = ST100Zones; key < ST100Zones + KEYCOUNT_ST100; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
+    // Same as M65 but with the wheel zone instead of the front one
+    case KeyMap::M65E:{
+        map = getMap(KeyMap::M65, layout);
+        map["wheel"] = {0, "Wheel Light", "wheel", map["front"].x, map["front"].y, map["front"].width, map["front"].height, true, false};
+        map.remove("front");
+        break;
+    }
+    case KeyMap::M95:{
+        for(const Key* key = M95Keys; key < M95Keys + KEYCOUNT_M95; key++){
             Key translatedKey = *key;
             translatedKey.x += translatedKey.width / 2;
             translatedKey.y += translatedKey.height / 2;
@@ -1041,6 +1077,10 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70MK2;
     if(lower == "strafe_mk2")
         return STRAFE_MK2;
+    if(lower == "m65e")
+        return M65E;
+    if(lower == "m95")
+        return M95;
     return NO_MODEL;
 }
 
@@ -1084,6 +1124,10 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70mk2";
     case STRAFE_MK2:
         return "strafe_mk2";
+    case M65E:
+        return "m65e";
+    case M95:
+        return "m95";
     default:
         return "";
     }
@@ -1117,6 +1161,7 @@ int KeyMap::modelWidth(Model model){
     case STRAFE_MK2:
         return KSTRAFE_WIDTH;
     case M65:
+    case M65E:
     case SABRE:
     case SCIMITAR:
     case HARPOON:
@@ -1124,6 +1169,7 @@ int KeyMap::modelWidth(Model model){
     case KATAR:
     case POLARIS:
     case ST100:
+    case M95:
         return M65_WIDTH;
     default:
         return 0;
@@ -1146,6 +1192,7 @@ int KeyMap::modelHeight(Model model){
     case K95P:
         return K95P_HEIGHT;
     case M65:
+    case M65E:
     case SABRE:
     case SCIMITAR:
     case HARPOON:
@@ -1153,6 +1200,7 @@ int KeyMap::modelHeight(Model model){
     case KATAR:
     case POLARIS:
     case ST100:
+    case M95:
         return M65_HEIGHT;
     default:
         return 0;

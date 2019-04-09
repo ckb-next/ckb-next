@@ -17,8 +17,10 @@
 #include <sys/errno.h>
 #include <sys/ioctl.h>
 #include <sys/signal.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
 
 // Unsigned char/short definition
 typedef unsigned char uchar;
@@ -65,5 +67,9 @@ void timespec_add(struct timespec* timespec, long nanoseconds);
 
 // Common structs
 #include "structures.h"
+
+#define THREAD_NAME_MAX 16
+#define SIGHANDLER_SENDER   0
+#define SIGHANDLER_RECEIVER 1
 
 #endif  // INCLUDES_H

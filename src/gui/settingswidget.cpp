@@ -198,7 +198,7 @@ void SettingsWidget::on_generateReportButton_clicked(){
 
     // Check if it was started successfully
     if(!devDetect->waitForStarted()){
-        QMessageBox::critical(this, tr("Error executing ckb-next-dev-detect"), tr("An error occured while trying to execute ckb-next-dev-detect.\n"
+        QMessageBox::critical(this, tr("Error executing ckb-next-dev-detect"), tr("An error occurred while trying to execute ckb-next-dev-detect.\n"
                                                                                   "File not found or not executable."));
         devDetect->deleteLater();
     }
@@ -207,7 +207,7 @@ void SettingsWidget::on_generateReportButton_clicked(){
 void SettingsWidget::devDetectFinished(int retVal){
     QFile report("/tmp/ckb-next-dev-detect-report.gz");
     if(retVal || !report.exists()){
-        QString errMsg(tr("An error occured while trying to execute ckb-next-dev-detect.\n\n"));
+        QString errMsg(tr("An error occurred while trying to execute ckb-next-dev-detect.\n\n"));
         errMsg.append(devDetect->readAllStandardError());
         errMsg.append("\n");
         errMsg.append(QString(tr("Return code %1")).arg(retVal));

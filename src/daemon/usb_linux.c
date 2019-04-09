@@ -6,10 +6,37 @@
 
 #ifdef OS_LINUX
 
+// usb.c
+extern _Atomic int reset_stop;
+
 /// \details
 /// \brief all open usb devices have their system path names here in this array.
 
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
+
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
+#ifdef DEBUG_USB_SEND
+    int ckb = INDEX_OF(kb, keyboard);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
+    if(len)
+        print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
+#endif
+
+    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, wIndex, len, 5000, data };
+    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    if (res == -1){
+        int ioctlerrno = errno;
+        ckb_err_fn(" %s, res = 0x%x\n", file, line, strerror(ioctlerrno), res);
+        if(ioctlerrno == ETIMEDOUT)
+            return -1;
+        else
+            return 0;
+
+    } else if (res != len)
+        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+
+    return res;
+}
 
 ////
 /// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long
@@ -270,7 +297,7 @@ void os_sendindicators(usbdevice* kb) {
 void* os_inputmain(void* context){
     usbdevice* kb = context;
     int fd = kb->handle - 1;
-    short vendor = kb->vendor, product = kb->product;
+    ushort vendor = kb->vendor, product = kb->product;
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Starting input thread for %s%d\n", devpath, index);
 
@@ -380,6 +407,10 @@ void* os_inputmain(void* context){
         /// Lock all following actions with imutex.
         ///
         if (urb) {
+            // If we're shutting down, don't submit another urb, or try to process the data on this one
+            if(urb->status == -ESHUTDOWN && reset_stop)
+                break;
+
             process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
 
             /// Re-submit the URB for the next run.
@@ -614,7 +645,7 @@ int os_setupusb(usbdevice* kb) {
     return 0;
 }
 
-int usbadd(struct udev_device* dev, short vendor, short product) {
+int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
     const char* path = udev_device_get_devnode(dev);
     const char* syspath = udev_device_get_syspath(dev);
     if(!path || !syspath || path[0] == 0 || syspath[0] == 0){
@@ -778,6 +809,7 @@ int usbmain(){
     udev_monitor_enable_receiving(monitor);
     // Get an fd for the monitor
     int fd = udev_monitor_get_fd(monitor);
+
     fd_set fds;
     while(udev){
         FD_ZERO(&fds);
@@ -803,6 +835,23 @@ int usbmain(){
             } else if(!strcmp(action, "remove"))
                 usb_rm_device(dev);
             udev_device_unref(dev);
+        } else {
+            // if select returns -1 there is a chance that the waiting
+            // was interrupted by a signal
+            // check whether there is data available in the
+            // sighandler_pipe, read if there is and manually call the
+            // signal-handling routine
+            int sighandler_msg;
+            ioctl(sighandler_pipe[SIGHANDLER_RECEIVER], FIONREAD, &sighandler_msg);
+            if (sighandler_msg > 0){
+                int unused_result = read(sighandler_pipe[SIGHANDLER_RECEIVER], &sighandler_msg, sizeof(int));
+                exithandler(sighandler_msg);
+
+                // cast unused result to void to silence over-eager
+                // warning about unused variables:
+                // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
+                (void) unused_result;
+            }
         }
     }
     udev_monitor_unref(monitor);

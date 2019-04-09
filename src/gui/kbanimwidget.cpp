@@ -159,7 +159,14 @@ void KbAnimWidget::on_animList_itemChanged(QListWidgetItem *item){
     if(item){
         KbAnim* anim = animations[item->data(Qt::UserRole).toUuid()];
         if(anim){
+            // Don't allow empty names
+            if(item->text().isEmpty()){
+                item->setText(anim->name());
+                return;
+            }
+
             anim->name(item->text().trimmed());
+
             if(anim == current && !noReorder)
                 ui->nameBox->setText(anim->name());
         }
@@ -189,6 +196,10 @@ void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint &pos){
 }
 
 void KbAnimWidget::on_nameBox_textEdited(const QString &arg1){
+    // Don't apply name change if left blank
+    if(arg1.isEmpty())
+        return;
+
     if(current){
         noReorder = true;
         current->name(arg1.trimmed());
@@ -257,4 +268,9 @@ void KbAnimWidget::on_propertyButton_clicked(){
     // Update name
     ui->nameBox->setText(dialog.name());
     on_nameBox_textEdited(dialog.name());
+}
+
+void KbAnimWidget::on_nameBox_editingFinished(){
+    if(ui->nameBox->text().isEmpty() && current)
+        ui->nameBox->setText(current->name());
 }

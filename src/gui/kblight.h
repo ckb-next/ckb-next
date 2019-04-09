@@ -37,7 +37,7 @@ public:
     // Overall dimming. 0 = max brightness, 3 = off
     static const int    MAX_DIM = 3;
     inline int          dimming()               { return _dimming; }
-    void                dimming(int newDimming);
+    void                dimming(int newDimming, bool overrideShare = false);
     // Shared brightness between all modes (-1 for sharing disabled)
     static int          shareDimming();
     static void         shareDimming(int newShareDimming);

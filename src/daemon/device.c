@@ -75,6 +75,8 @@ int _start_dev(usbdevice* kb, int makeactive){
         kb->features &= ~FEAT_HWLOAD; // no LED data to read
     }
 
+    if(kb->product == P_M95)
+        kb->features &= ~FEAT_POLLRATE; // M95 doesn't support reading the pollrate through the protocol
     ///
     /// - Now check if device needs a firmware update.
     /// If so, set it up and leave the function without error.

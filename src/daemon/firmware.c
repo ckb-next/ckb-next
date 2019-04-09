@@ -27,14 +27,13 @@ int getfwversion(usbdevice* kb){
         ckb_err("Bad input header\n");
         return -1;
     }
-    char ident_str[3*MSG_SIZE] = "";
-    memset(ident_str, 0, 3 * MSG_SIZE);
+    char ident_str[3*MSG_SIZE+1] = "";
+    memset(ident_str, 0, 3 * MSG_SIZE + 1);
     for (int i = 0; i < MSG_SIZE; i++) {
         sprintf(ident_str + (3 * i), "%02hhx ", in_pkt[i]);
     }
-    ident_str[3*MSG_SIZE - 1] = '\0';
     ckb_info("Received identification packet: %s\n", ident_str);
-    short vendor, product, version, bootloader;
+    ushort vendor, product, version, bootloader;
     // Copy the vendor ID, product ID, version, and poll rate from the firmware data
     memcpy(&version, in_pkt + 8, 2);
     memcpy(&bootloader, in_pkt + 10, 2);

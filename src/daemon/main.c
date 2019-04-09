@@ -5,16 +5,13 @@
 #include "notify.h"
 #include <ckbnextconfig.h>
 
-static int main_ac;
-static char **main_av;
-
 // usb.c
-extern volatile int reset_stop;
+extern _Atomic int reset_stop;
 extern int features_mask;
 // device.c
 extern int hwload_mode;
-static void quitWithLock(char mut);
-extern int restart();
+
+int sighandler_pipe[2] = { 0, 0 };
 
 // Timespec utility function
 void timespec_add(struct timespec* timespec, long nanoseconds){
@@ -28,22 +25,12 @@ void timespec_add(struct timespec* timespec, long nanoseconds){
 /// Stop working the daemon.
 /// function is called if the daemon received a sigterm
 /// In this case, locking the device-mutex is ok.
-static void quit(){
-    quitWithLock(1);
-}
-
-///
-/// \brief quitWithLock
-/// \param mut
-/// try to close files maybe without locking the mutex
-/// if mut == true then lock
-
-void quitWithLock(char mut) {
+static void quit() {
     // Abort any USB resets in progress
     reset_stop = 1;
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
-        if (mut) pthread_mutex_lock(devmutex + i);
+        pthread_mutex_lock(devmutex + i);
         if(IS_CONNECTED(keyboard + i)){
             revertusb(keyboard + i);
             closeusb(keyboard + i);
@@ -55,18 +42,64 @@ void quitWithLock(char mut) {
     usbkill();
 }
 
-void sighandler2(int type){
-    // Don't use ckb_warn, we want an extra \n at the beginning
-    printf("\n[W] Ignoring signal %d (already shutting down)\n", type);
+///
+/// \brief ignore_signal
+/// Nested signal handler for previously received signals.
+/// \param type received signal type
+void ignore_signal(int type){
+    // Use signal-safe(7) write(3) call to print warning
+    int unused_result = write(1, "\n[W] Ignoring signal ", 22);
+    switch (type) {
+        case SIGTERM:
+            unused_result = write(1, "SIGTERM", 7);
+            break;
+        case SIGINT:
+            unused_result = write(1, "SIGINT", 6);
+            break;
+        case SIGQUIT:
+            unused_result = write(1, "SIGQUIT", 7);
+            break;
+        default:
+            unused_result = write(1, "UNKNOWN", 7);
+            break;
+    }
+    unused_result = write(1, " (already shutting down)\n", 27);
+
+    // cast unused result to void to silence over-eager
+    // warning about unused variables:
+    // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
+    (void) unused_result;
 }
 
-void sighandler(int type){
-    signal(SIGTERM, sighandler2);
-    signal(SIGINT, sighandler2);
-    signal(SIGQUIT, sighandler2);
+///
+/// \brief exithandler
+/// Main signal handler to catch further signals and call shutdown
+/// sequence of daemon. This function is allowed to call unsafe
+/// (signal-safe(7)) function calls, as it is itself executed in another
+/// process via the socket handler.
+/// \param type received signal type
+void exithandler(int type){
+    signal(SIGTERM, ignore_signal);
+    signal(SIGINT, ignore_signal);
+    signal(SIGQUIT, ignore_signal);
+
     printf("\n[I] Caught signal %d\n", type);
     quit();
     exit(0);
+}
+
+///
+/// \brief signalhandler
+/// Write the received signal type to the socketpair for signal-safe(7)
+/// signal handling.
+/// \param type received signal type
+void sighandler(int type){
+    int unused_result = write(sighandler_pipe[SIGHANDLER_SENDER], &type, sizeof(int));
+
+    // cast unused result to void to silence over-eager
+    // warning about unused variables:
+    // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
+    (void) unused_result;
 }
 
 void localecase(char* dst, size_t length, const char* src){
@@ -90,23 +123,23 @@ int main(int argc, char** argv){
     // Set output pipes to buffer on newlines, if they weren't set that way already
     setlinebuf(stdout);
     setlinebuf(stderr);
-    main_ac = argc;
-    main_av = argv;
 
-    printf("    ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
+    printf("ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i], "--help")){
             printf(
 #ifdef OS_MAC_LEGACY
-                        "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
+                        "Usage: ckb-next-daemon [--version] [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nomouseaccel] [--nonroot]\n"
 #else
-                        "Usage: ckb-next-daemon [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
+                        "Usage: ckb-next-daemon [--version] [--gid=<gid>] [--hwload=<always|try|never>] [--nonotify] [--nobind] [--nonroot]\n"
 #endif
                         "\n"
-                        "See https://github.com/ckb-next/ckb-next/blob/master/DAEMON.md for full instructions.\n"
+                        "See https://github.com/ckb-next/ckb-next/wiki/CKB-Daemon-Manual for full instructions.\n"
                         "\n"
                         "Command-line parameters:\n"
+                        "    --version\n"
+                        "        Print version string to stdout and quit.\n"
                         "    --gid=<gid>\n"
                         "        Restrict access to %s* nodes to users in group <gid>.\n"
                         "        (Ordinarily they are accessible to anyone)\n"
@@ -128,6 +161,8 @@ int main(int argc, char** argv){
                         "        This will almost certainly not work. Use only if you know what you're doing.\n"
                         "\n", devpath);
             exit(0);
+        } else if (!strcmp(argv[i], "--version")){
+            return 0;
         }
     }
 
@@ -207,28 +242,17 @@ int main(int argc, char** argv){
     if(!mkdevpath(keyboard))
         ckb_info("Root controller ready at %s0\n", devpath);
 
-    // Set signals
-    sigset_t signals;
-    sigfillset(&signals);
-    sigdelset(&signals, SIGTERM);
-    sigdelset(&signals, SIGINT);
-    sigdelset(&signals, SIGQUIT);
-    sigdelset(&signals, SIGUSR1);
-    // Set up signal handlers for quitting the service.
-    sigprocmask(SIG_SETMASK, &signals, 0);
-    signal(SIGTERM, sighandler);
-    signal(SIGINT, sighandler);
-    signal(SIGQUIT, sighandler);
-    signal(SIGUSR1, (void (*)())restart);
+    // Attempt to setup signal-safe signal handlers using socketpair(2)
+    if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sighandler_pipe) != -1){
+        signal(SIGTERM, sighandler);
+        signal(SIGINT, sighandler);
+        signal(SIGQUIT, sighandler);
+    } else
+        ckb_warn_nofile("Unable to setup signal handlers\n");
+
 
     // Start the USB system
     int result = usbmain();
     quit();
     return result;
-}
-
-int restart() {
-    ckb_err("restart called, running quit without mutex-lock.\n");
-    quitWithLock(0);
-    return main(main_ac, main_av);
 }

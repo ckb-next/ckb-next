@@ -48,6 +48,8 @@ private slots:
 
     void on_propertyButton_clicked();
 
+    void on_nameBox_editingFinished();
+
 private:
     KbLight* light;
     QHash<QUuid, KbAnim*> animations;

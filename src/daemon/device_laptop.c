@@ -37,8 +37,8 @@ int cmd_idle_laptop(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
 }
 
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
-    // Compare two light structures, up until the first three generic zones
-    return memcmp(lhs->r, rhs->r, LED_GENERIC_FIRST + 3) || memcmp(lhs->g, rhs->g, LED_GENERIC_FIRST + 3) || memcmp(lhs->b, rhs->b, LED_GENERIC_FIRST + 3);
+    // Compare two light structures, up until 0xc6 (M key)
+    return memcmp(lhs->r, rhs->r, 0xc6) || memcmp(lhs->g, rhs->g, 0xc6) || memcmp(lhs->b, rhs->b, 0xc6);
 }
 
 int updatergb_laptop(usbdevice* kb, int force){

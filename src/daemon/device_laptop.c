@@ -38,7 +38,7 @@ int cmd_idle_laptop(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
 
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
     // Compare two light structures, up until 0xc6 (M key)
-    return memcmp(lhs->r, rhs->r, 0xc6) || memcmp(lhs->g, rhs->g, 0xc6) || memcmp(lhs->b, rhs->b, 0xc6);
+    return memcmp(lhs->r, rhs->r, 0xc7) || memcmp(lhs->g, rhs->g, 0xc7) || memcmp(lhs->b, rhs->b, 0xc7);
 }
 
 int updatergb_laptop(usbdevice* kb, int force){
@@ -110,6 +110,7 @@ int updatergb_laptop(usbdevice* kb, int force){
         usbsend_control(kb, pkts[i], 192, 0x21, 0x09, 0x0307, 0);
     }
 
+    memcpy(lastlight, newlight, sizeof(lighting));
     return 0;
 }
 

@@ -13,7 +13,7 @@ void cmd_lift_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const
         return;
     mode->dpi.lift = heightnum;
 
-    usbsend_control(kb, NULL, 0, 13, heightnum - 1, 0);
+    usbsend_control(kb, NULL, 0, 13, heightnum - 1, 0, 1);
 }
 
 void cmd_snap_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* enable){
@@ -23,11 +23,11 @@ void cmd_snap_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const
 
     if(!strcmp(enable, "on")) {
         mode->dpi.snap = 1;
-        usbsend_control(kb, &mode->dpi.snap, 1, 100, 0, 0);
+        usbsend_control(kb, &mode->dpi.snap, 1, 100, 0, 0, 1);
     }
     if(!strcmp(enable, "off")) {
         mode->dpi.snap = 0;
-        usbsend_control(kb, NULL, 0, 100, 0, 0);
+        usbsend_control(kb, NULL, 0, 100, 0, 0, 1);
     }
 }
 
@@ -51,16 +51,16 @@ int updatedpi_legacy(usbdevice* kb, int force){
     for(int i = 1; i < 4; i++){
         // Offset to skip the header, Y is first
         // Round to the next DPI
-        dpi_pkt[i - 1 + pos] = newdpi->y[i] / 50;
+        dpi_pkt[i - 1 + pos] = (newdpi->y[i] > 8200 ? 8200 : newdpi->y[i]) / 50;
         pos++;
-        dpi_pkt[i - 1 + pos] = newdpi->x[i] / 50;
+        dpi_pkt[i - 1 + pos] = (newdpi->x[i] > 8200 ? 8200 : newdpi->x[i]) / 50;
     }
 
     // Add sniper
-    dpi_pkt[8] = newdpi->y[0] / 50;
-    dpi_pkt[9] = newdpi->x[0] / 50;
+    dpi_pkt[8] = (newdpi->y[0] > 8200 ? 8200 : newdpi->y[0]) / 50;
+    dpi_pkt[9] = (newdpi->x[0] > 8200 ? 8200 : newdpi->x[0]) / 50;
     
-    usbsend_control(kb, dpi_pkt, 10, 174, 0x0000, 0);
+    usbsend_control(kb, dpi_pkt, 10, 174, 0x0000, 0, 1);
     
     memcpy(lastdpi, newdpi, sizeof(dpiset));
     return 0;

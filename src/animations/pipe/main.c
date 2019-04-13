@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <errno.h>
 
 void ckb_info(){
     // Plugin info
@@ -64,8 +65,21 @@ int ckb_frame(ckb_runctx* context){
     char input[MAX_INPUT] = { 0 };
 
     ssize_t ret = read(fd, input, MAX_INPUT);
-    if(ret < 1)
+
+    // read() read 0 bytes
+    if(!ret)
+        return 0;
+    
+    // Something may have gone wrong
+    if(ret == -1){
+        // This is expected and should not be treated as failure
+        if(errno == EWOULDBLOCK)
+            return 0;
+
+        int err = errno;
+        fprintf(stderr, "read failed with %d (%s)\n", err, strerror(err));
         return -ret;
+    }
 
     size_t len = strlen(input);
     unsigned char r = 0, g = 0, b = 0, a = 0;

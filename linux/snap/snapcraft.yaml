@@ -1,0 +1,50 @@
+name: ckb-next
+base: core18
+version: git
+summary: |
+    ckb-next is an open-source driver for Corsair keyboards and mice.
+description:
+    It aims to bring the features of Corsair's proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+grade: stable
+confinement: strict
+icon: ckb-next.png
+
+apps:
+    ckb-next-daemon:
+        command: ckb-next-daemon
+        daemon: simple
+        plugs:
+            - raw-usb
+
+    ckb-next:
+        command: desktop-launch ckb-next
+        desktop: share/applications/ckb-next.desktop
+        plugs:
+           - unity7
+           - home
+           - desktop
+           - desktop-legacy
+           - raw-usb
+           - x11
+           - opengl
+           - pulseaudio
+
+parts:
+    ckbbuild:
+        source: https://github.com/ckb-next/ckb-next.git
+        plugin: cmake
+        stage-packages:
+            [qt5-default, libquazip5-1, libudev1, zlib1g, libappindicator1, libpulse0]
+        configflags:
+            - -DCMAKE_INSTALL_PREFIX=/snap/ckb-next/current/
+            - -DCMAKE_BUILD_TYPE=Release
+            - -DDISABLE_UPDATER=1
+        override-build: |
+            snapcraftctl build
+            mkdir --parents $SNAPCRAFT_PART_INSTALL/libexec
+            mkdir --parents $SNAPCRAFT_PART_INSTALL/bin
+            mkdir --parents $SNAPCRAFT_PART_INSTALL/share
+            mv $SNAPCRAFT_PART_INSTALL/snap/ckb-next/current/bin/* $SNAPCRAFT_PART_INSTALL/bin/
+            mv $SNAPCRAFT_PART_INSTALL/snap/ckb-next/current/libexec/* $SNAPCRAFT_PART_INSTALL/libexec/
+            mv $SNAPCRAFT_PART_INSTALL/snap/ckb-next/current/share/* $SNAPCRAFT_PART_INSTALL/share/
+        after: [desktop-qt5]

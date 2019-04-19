@@ -22,6 +22,11 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     ui(new Ui::SettingsWidget)
 {
     ui->setupUi(this);
+
+#ifndef Q_OS_MACOS
+    ui->uninstallButton->hide();
+#endif
+
     CkbSettings settings("Program");
 
     // Load modifier remap
@@ -261,4 +266,16 @@ void SettingsWidget::setUpdateButtonText(QString text){
         ui->pushButton_2->setText(text);
         updateRequestedByUser = false;
     }
+}
+
+void SettingsWidget::on_uninstallButton_clicked()
+{
+#ifdef Q_OS_MACOS
+    if(QMessageBox::warning(this, tr("Uninstall ckb-next"), tr("WARNING: Clicking OK will uninstall ckb-next and any older versions of the software from your system.\n\n"
+                                                             "Your settings and lighting profiles will be preserved."), QMessageBox::Cancel, QMessageBox::Ok) != QMessageBox::Ok)
+        return;
+
+    // Open a terminal and run the uninstall script
+    QProcess::execute("open", QStringList() << "-a" << "Terminal" << "/Applications/ckb-next.app/Contents/Resources/uninstall.sh");
+#endif
 }

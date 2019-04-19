@@ -483,6 +483,13 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="uninstallButton">
+           <property name="text">
+            <string>Uninstall ckb-next</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

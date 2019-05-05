@@ -461,6 +461,9 @@ void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbin
 void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy){
     if(legacy) {
         switch(length) {
+            case 2: // K65 Media keys
+                length = 1;
+                // fall through
             case 4: // Media Keys
                 handle_nkro_media_keys(kbinput, urbinput, length);
                 break;

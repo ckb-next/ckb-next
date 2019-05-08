@@ -56,6 +56,22 @@ elseif (LINUX)
     find_package(UDEV REQUIRED)
 endif ()
 
+# Declare options with defaults to allow overrides in debian packaging
+set(UDEV_RULES_PATH
+    "/etc/udev/rules.d"
+    CACHE STRING
+    "Target directory for udev rule installation. Ensure you have permissions to write to this directory."
+)
+
+set(SYSTEMD_SERVICE_PATH
+    "${CMAKE_INSTALL_LIBDIR}/systemd/system"
+    CACHE STRING
+    "Target directory for systemd service file. Ensure you have permissions to write to this directory."
+)
+
+option (PACKAGING
+        "Are we building a package" OFF)
+
 # Declare target's source files
 if (MACOS OR LINUX)
     target_sources(
@@ -396,6 +412,23 @@ elseif (LINUX)
         endif ()
     endif ()
 
+    # If packaging, emit the the system manager configuration files so they can be setup post-install
+    if (PACKAGING)
+        message(STATUS "Generating system files for packaging")
+
+        # upstart
+        configure_file(
+                "${ckb-next_SOURCE_DIR}/linux/upstart/ckb-next-daemon.conf.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.conf"
+                @ONLY)
+
+        # systemd
+        configure_file(
+                "${ckb-next_SOURCE_DIR}/linux/systemd/ckb-next-daemon.service.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
+                @ONLY)
+    endif()
+
 endif ()
 
 # Declare target's installation paths
@@ -421,7 +454,7 @@ if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
-        DESTINATION "/usr/lib/systemd/system"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/systemd/system"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ
@@ -456,22 +489,9 @@ elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "unknown")
 endif ()
 
 if (LINUX)
-  if (SAFE_INSTALL)
-    install(CODE "
-    if (EXISTS \"/etc/udev/rules.d/99-ckb-daemon.rules\")
-        file(SHA256 \"/etc/udev/rules.d/99-ckb-daemon.rules\" SHASUM)
-        if(\"\${SHASUM}\" STREQUAL \"956c99d14effd3292a9575b1a918a598129121babd1296bc8772fcf809b7038a\"
-            OR \"\${SHASUM}\" STREQUAL \"b135705d4709ae39e6e2c736c2bc80b88255ed11c582e86fae5086e90f256913\")
-            message(\"-- Removing old 99-ckb-daemon.rules\")
-            file(REMOVE \"/etc/udev/rules.d/99-ckb-daemon.rules\")
-        else()
-            message(\"-- Not removing old 99-ckb-daemon.rules because it has been modified.\")
-        endif()
-    endif() ")
-  endif ()
   install(
     FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-next-daemon.rules"
-    DESTINATION "/usr/lib/udev/rules.d"
+    DESTINATION "${UDEV_RULES_PATH}"
     PERMISSIONS
     OWNER_READ OWNER_WRITE
     GROUP_READ

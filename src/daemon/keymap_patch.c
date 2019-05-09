@@ -114,7 +114,7 @@ keypatch legionpatch[] = {
     { 87,     "del", 0x4c, KEY_DELETE },
     // [..]
     { 90,  "rshift", 0x39, KEY_RIGHTSHIFT },
-    { 91,   "rctrl", 0x39, KEY_RIGHTCTRL },
+    { 91,   "rctrl", 0x40, KEY_RIGHTCTRL },
     { 92,      "up", 0x53, KEY_UP },
     { 93,    "left", 0x4f, KEY_LEFT },
     { 94,    "down", 0x54, KEY_DOWN },

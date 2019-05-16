@@ -467,11 +467,15 @@ if (LINUX)
         else()
             message(\"-- Not removing old 99-ckb-daemon.rules because it has been modified.\")
         endif()
+    endif()
+    if (EXISTS \"/usr/lib/udev/rules.d/99-ckb-next-daemon.rules\" AND NOT IS_SYMLINK \"/lib\")
+        message(\"-- Removing /usr/lib/udev/rules.d/99-ckb-next-daemon.rules\")
+        file(REMOVE \"/usr/lib/udev/rules.d/99-ckb-next-daemon.rules\")
     endif() ")
   endif ()
   install(
     FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-next-daemon.rules"
-    DESTINATION "/usr/lib/udev/rules.d"
+    DESTINATION "/lib/udev/rules.d"
     PERMISSIONS
     OWNER_READ OWNER_WRITE
     GROUP_READ

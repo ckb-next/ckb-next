@@ -282,10 +282,8 @@ void MainWindow::updateVersion(){
         if(kextstatOut.isEmpty())
             daemonWarning.append(tr("<br /><b>Warning:</b> System Extension by \"Fumihiko Takayama\" is not allowed in Security & Privacy. Please allow it and then unplug and replug your devices."));
 #elif defined(Q_OS_LINUX)
-            QFileInfo uinput("/dev/uinput");
-            if (!uinput.exists()){
-                QFileInfo uinput2("/dev/input/uinput");
-                if (!uinput2.exists()){
+            if (!QFileInfo("/dev/uinput").exists()){
+                if (!QFileInfo("/dev/input/uinput").exists()){
                     QProcess modprobe;
                     modprobe.start("modprobe", QStringList("uinput"));
 

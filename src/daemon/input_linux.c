@@ -55,13 +55,20 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
 ///
 /// Some tips on using [uinput_user_dev in](http://thiemonge.org/getting-started-with-uinput)
 int os_inputopen(usbdevice* kb){
-    /// First check whether the uinput module is loaded by the kernel.
-    ///
-    // Load the uinput module (if it's not loaded already)
-    if(system("modprobe uinput") != 0) {
-        ckb_fatal("Failed to load uinput module\n");
-        return 1;
+    /// Let's see if uinput is already available
+    int fd = open("/dev/uinput", O_RDWR);
+    if(fd < 0){
+        fd = open("/dev/input/uinput", O_RDWR);
     }
+
+    // If not available, load the module
+    if(fd < 0){
+        if(system("modprobe uinput") != 0) {
+            ckb_fatal("Failed to load uinput module\n");
+            return 1;
+        }
+    }
+    close(fd);
 
     if(IS_SINGLE_EP(kb)) {
         kb->uinput_kb = 0;
@@ -79,7 +86,7 @@ int os_inputopen(usbdevice* kb){
     indev.id.product = kb->product;
     indev.id.version = kb->fwversion;
     // Open keyboard
-    int fd = uinputopen(&indev, 0);
+    fd = uinputopen(&indev, 0);
     kb->uinput_kb = fd;
     if(fd <= 0)
         return 0;

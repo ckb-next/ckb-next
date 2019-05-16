@@ -15,6 +15,29 @@ extern _Atomic int reset_stop;
 
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
+int os_usbrecv_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line)
+{
+#ifdef DEBUG_USB_SEND
+    int ckb = INDEX_OF(kb, keyboard);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, bmRequestType, bRequest, wValue, wIndex, len);
+    if(len)
+        print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
+#endif
+    struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, data };
+    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    if(res <= 0){
+        // This is done because ckb_err_fn can set errno itself
+        int ioctlerrno = errno;
+        ckb_err_fn("%s\n", file, line, res ? strerror(ioctlerrno) : "No data read");
+        if(res == -1 && ioctlerrno == ETIMEDOUT)
+            return -1;
+        else
+            return 0;
+    } else if(res != MSG_SIZE)
+        ckb_warn_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+    return res;
+}
+
 int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
 #ifdef DEBUG_USB_SEND
     int ckb = INDEX_OF(kb, keyboard);

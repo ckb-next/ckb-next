@@ -65,7 +65,6 @@ int os_inputopen(usbdevice* kb){
     if(fd < 0){
         if(system("modprobe uinput") != 0) {
             ckb_fatal("Failed to load uinput module\n");
-            close(fd);
             return 1;
         }
     }

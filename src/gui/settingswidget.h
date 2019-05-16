@@ -46,6 +46,7 @@ private slots:
     void devDetectDestroyed();
     void on_autoUpdBox_clicked(bool checked);
     void on_pushButton_2_clicked();
+    void on_uninstallButton_clicked();
 
 private:
     QProcess* devDetect;

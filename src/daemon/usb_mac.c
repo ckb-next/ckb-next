@@ -948,6 +948,7 @@ release:
     }
     euid_guard_stop;
 }
+
 void powerEventCallback(void *refcon, io_service_t service, uint32_t type, void *arg) {
     if(type != kIOMessageSystemHasPoweredOn)
         return;
@@ -978,6 +979,100 @@ void mac_exithandler(CFSocketRef s, CFSocketCallBackType t, CFDataRef a, const v
     read(CFSocketGetNative(s), &type, sizeof(int));
     exithandler(type);
 }
+
+#ifndef OS_MAC_LEGACY
+
+static void karabinerreport(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
+    ckb_info("Read %ld data\n", length);
+}
+
+void karabiner_led_cb(void* inContext, IOReturn inResult, void* inSender, IOHIDValueRef value) {
+        //IOHIDElementRef element = IOHIDValueGetElement(value);
+        //IOHIDDeviceRef device = IOHIDElementGetDevice(element);
+        long int thevalue = IOHIDValueGetIntegerValue(value);
+        ckb_info("We got %ld\n", thevalue);
+}
+
+static void iterate_devices_karabiner(void* context, io_iterator_t iterator){
+    io_service_t device;
+    unsigned int devint = 0;
+    while((device = IOIteratorNext(iterator)) != 0){
+        ckb_info("Karabiner device matched\n");
+        
+        IOHIDDeviceRef karabinerdev = NULL;
+        IOHIDDeviceRef hiddev = IOHIDDeviceCreate(kCFAllocatorDefault, device);
+        ckb_info("Open returned %d\n", IOHIDDeviceOpen(hiddev, kIOHIDOptionsTypeNone));
+
+            void* buffer = malloc(128);
+            int maxsize = 128;
+            IOHIDDeviceRegisterInputReportCallback(hiddev, buffer, maxsize, karabinerreport, hiddev);
+
+        
+        // Get elements
+        CFArrayRef elements = IOHIDDeviceCopyMatchingElements(hiddev, NULL, kIOHIDOptionsTypeNone);
+
+        CFIndex elementsLen = CFArrayGetCount(elements);
+        ckb_info("Elements %ld\n", elementsLen);
+        for(CFIndex i = 0; i < elementsLen; i++)
+        {
+            IOHIDElementRef element = (IOHIDElementRef)CFArrayGetValueAtIndex(elements, i);
+            if(element)
+            {
+                uint32_t usagePage = IOHIDElementGetUsagePage(element);
+                if(usagePage == kHIDPage_LEDs)
+                {
+                    uint32_t usage = IOHIDElementGetUsage(element);
+                    ckb_info("dev %u has usagePage %u and usage %u\n", devint, usagePage, usage);
+                    if(usage == kHIDUsage_LED_CapsLock)
+                    {
+                        ckb_info("Found caps lock\n");
+                        karabinerdev = hiddev;
+                        break;
+                    }
+                }
+            }
+        }
+
+        CFRelease(elements);
+
+        // Do things
+        if(karabinerdev != NULL)
+        {
+            ckb_info("We did a thing\n");
+            // Create C arrays for matching dict
+            /*const void *keys[2] = {
+                CFSTR(kIOHIDElementUsagePageKey),
+                CFSTR(kIOHIDElementUsageKey)
+            };
+            int32_t usage = kHIDUsage_LED_CapsLock;
+            int32_t usagepage = kHIDPage_LEDs;
+            const void *values[2] = {
+                CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usagepage),
+                CFNumberCreate(kCFAllocatorDefault,  kCFNumberSInt32Type, &usage),
+            };
+            // Create matching dictionary
+            CFDictionaryRef matchDict = CFDictionaryCreate(kCFAllocatorDefault, keys, values, 2, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+            
+            IOHIDDeviceSetInputValueMatching(karabinerdev, matchDict);
+            
+            // Finally set up callback
+            IOHIDDeviceRegisterInputValueCallback(karabinerdev, &karabiner_led_cb, karabinerdev);
+            
+            CFRelease(matchDict);
+            CFRelease(values[0]);
+            CFRelease(values[1]);*/
+            /*void* buffer = malloc(128);
+            int maxsize = 128;
+            IOHIDDeviceRegisterInputReportCallback(karabinerdev, buffer, maxsize, karabinerreport, karabinerdev);*/
+        }
+        //IOHIDDeviceClose(hiddev, 0);
+        ckb_info("GOT TO END\n");
+
+        IOObjectRelease(device);
+        devint++;
+    }
+}
+#endif
 
 int usbmain(){
     int vendor = V_CORSAIR;
@@ -1060,7 +1155,19 @@ int usbmain(){
     io_iterator_t iterator_syspower = 0;
     IORegisterForSystemPower(NULL, &notify, powerEventCallback, &iterator_syspower);
     CFRunLoopAddSource(mainloop, IONotificationPortGetRunLoopSource(notify), kCFRunLoopDefaultMode);
+#ifndef OS_MAC_LEGACY
+    // Listen for Karabiner devices to get their LED states
+    CFMutableDictionaryRef karabiner_match = IOServiceMatching(kIOHIDDeviceKey);
+    CFDictionarySetValue(karabiner_match, CFSTR(kIOHIDManufacturerKey), CFSTR("pqrs.org"));
 
+    io_iterator_t iterator_karabiner = 0;
+    res = IOServiceAddMatchingNotification(notify, kIOMatchedNotification, karabiner_match, iterate_devices_karabiner, 0, &iterator_karabiner);
+    if(res != kIOReturnSuccess)
+        ckb_err("Couldn't set up VHID notifications: %x. Indicator LEDs will not function\n", res);
+    if(iterator_karabiner)
+        iterate_devices_karabiner(0, iterator_karabiner);
+#endif
+    
     // setup signal handling via CoreFoundation socket callout mechanism
     // see mac_exithandler for the reading side of this setup
     CFSocketRef cf_socket = CFSocketCreateWithNative(

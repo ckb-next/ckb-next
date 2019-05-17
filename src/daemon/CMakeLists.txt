@@ -484,7 +484,7 @@ endif ()
 
 if (MACOS AND NOT MAC_LEGACY)
   install(
-    DIRECTORY "${ckb-next_SOURCE_DIR}/macos/org.pqrs.driver.Karabiner.VirtualHIDDevice.v060800.kext"
+    DIRECTORY "${ckb-next_SOURCE_DIR}/macos/org.pqrs.driver.Karabiner.VirtualHIDDevice.v061000.kext"
     DESTINATION "/Library/Extensions"
     PATTERN "*"
     PERMISSIONS

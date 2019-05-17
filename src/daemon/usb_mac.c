@@ -1003,11 +1003,11 @@ static void iterate_devices_karabiner(void* context, io_iterator_t iterator){
         IOHIDDeviceRef hiddev = IOHIDDeviceCreate(kCFAllocatorDefault, device);
         ckb_info("Open returned %d\n", IOHIDDeviceOpen(hiddev, kIOHIDOptionsTypeNone));
 
-            void* buffer = malloc(128);
+            /*void* buffer = malloc(128);
             int maxsize = 128;
-            IOHIDDeviceRegisterInputReportCallback(hiddev, buffer, maxsize, karabinerreport, hiddev);
+            IOHIDDeviceRegisterInputReportCallback(hiddev, buffer, maxsize, karabinerreport, hiddev);*/
 
-        
+
         // Get elements
         CFArrayRef elements = IOHIDDeviceCopyMatchingElements(hiddev, NULL, kIOHIDOptionsTypeNone);
 
@@ -1040,7 +1040,7 @@ static void iterate_devices_karabiner(void* context, io_iterator_t iterator){
         {
             ckb_info("We did a thing\n");
             // Create C arrays for matching dict
-            /*const void *keys[2] = {
+            const void *keys[2] = {
                 CFSTR(kIOHIDElementUsagePageKey),
                 CFSTR(kIOHIDElementUsageKey)
             };
@@ -1052,15 +1052,16 @@ static void iterate_devices_karabiner(void* context, io_iterator_t iterator){
             };
             // Create matching dictionary
             CFDictionaryRef matchDict = CFDictionaryCreate(kCFAllocatorDefault, keys, values, 2, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-            
+
             IOHIDDeviceSetInputValueMatching(karabinerdev, matchDict);
-            
+
             // Finally set up callback
             IOHIDDeviceRegisterInputValueCallback(karabinerdev, &karabiner_led_cb, karabinerdev);
-            
+            IOHIDDeviceScheduleWithRunLoop(karabinerdev, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
+
             CFRelease(matchDict);
             CFRelease(values[0]);
-            CFRelease(values[1]);*/
+            CFRelease(values[1]);
             /*void* buffer = malloc(128);
             int maxsize = 128;
             IOHIDDeviceRegisterInputReportCallback(karabinerdev, buffer, maxsize, karabinerreport, karabinerdev);*/

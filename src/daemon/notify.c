@@ -18,6 +18,7 @@ void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, .
             if(mode)
                 dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
             vdprintf(fifo, format, va_args);
+	    va_end(va_args);
         }
         return;
     }
@@ -28,6 +29,7 @@ void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, .
             if(mode)
                 dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
             vdprintf(fifo, format, va_args);
+	    va_end(va_args);
         }
     }
 }

@@ -42,11 +42,16 @@ private slots:
     void brightnessScroll(bool up);
     void toggleM95Light();
 
+    void stateChange(Qt::ApplicationState state);
+
 private:
     KbLight* light;
     QStringList currentSelection;
 
     Ui::KbLightWidget *ui;
+
+    void startAnimationPreview();
+    void stopAnimationPreview();
 };
 
 #endif // KBLIGHTWIDGET_H

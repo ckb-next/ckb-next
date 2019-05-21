@@ -36,6 +36,25 @@ int updatergb_wireless(usbdevice* kb, lighting* lastlight, lighting* newlight){
             if(!usbsend(kb, data_pkt, 1))
                 return -1;
         }
+    } else if (IS_K63_WL(kb)) {
+        uchar data_pkt[MSG_SIZE] = {
+            CMD_SET, 0xaa, 0
+        };
+
+        data_pkt[4]  = 0;
+        data_pkt[5]  = 7;
+        data_pkt[8]  = 100;
+        data_pkt[9]  = newlight->r[0];
+        data_pkt[10] = newlight->g[0];
+        data_pkt[11] = newlight->b[0];
+        // Colour gets sent twice for some reason.
+        data_pkt[12] = newlight->r[0];
+        data_pkt[13] = newlight->g[0];
+        data_pkt[14] = newlight->b[0];
+        data_pkt[15] = 0;
+
+        if(!usbsend(kb, data_pkt, 1))
+            return -1;
     }
 
     memcpy(lastlight, newlight, sizeof(lighting));

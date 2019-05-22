@@ -68,10 +68,10 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>If enabled, the same colors will be displayed here as on the keyboard. If disabled, the base colors will be shown.</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If enabled, the same colors will be displayed here as on the keyboard. If disabled, the base colors will be shown.&lt;/p&gt;&lt;p&gt;Note: The animation preview will be disabled when the window loses focus to preserve computation resources.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Show animated</string>
+        <string>Show animated (if window is in focus)</string>
        </property>
        <property name="checked">
         <bool>true</bool>

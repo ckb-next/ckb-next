@@ -143,6 +143,8 @@
 #define KEY_KATAKANAHIRAGANA kHIDUsage_KeyboardInternational2
 #define KEY_HENKAN          kHIDUsage_KeyboardInternational4
 #define KEY_MUHENKAN        kHIDUsage_KeyboardInternational5
+#define KEY_HANJA           -1
+#define KEY_HANGEUL         -1
 
 #define KEY_CONSUMER        0x800
 #define IS_CONSUMER(scan)   ((scan) >= KEY_CONSUMER)

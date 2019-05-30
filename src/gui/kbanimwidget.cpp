@@ -3,6 +3,7 @@
 #include "animsettingdialog.h"
 #include "kbanimwidget.h"
 #include "ui_kbanimwidget.h"
+#include <QMessageBox>
 
 KbAnimWidget::KbAnimWidget(QWidget* parent) :
     QWidget(parent), light(0), current(0), noReorder(false),
@@ -236,6 +237,8 @@ void KbAnimWidget::on_keyButton_clicked(){
 
 void KbAnimWidget::on_deleteButton_clicked(){
     if(current){
+        if(QMessageBox::question(this, tr("Delete animation"), "Are you sure you want to delete this animation?") != QMessageBox::Yes)
+            return;
         animations.remove(current->guid());
         QList<KbAnim*> animList = light->animList();
         animList.removeAll(current);

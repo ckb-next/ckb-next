@@ -154,6 +154,8 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     } else if(result == del){
         if(!canDelete)
             return;
+        if(QMessageBox::question(this, tr("Delete profile"), tr("Are you sure you want to delete this profile?")) != QMessageBox::Yes)
+            return;
         profiles.removeAll(currentProfile);
         device->profiles(profiles);
         currentProfile->deleteLater();

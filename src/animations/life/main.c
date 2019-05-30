@@ -35,6 +35,12 @@ void ckb_info() {
     CKB_PRESET_PARAM("lcolor", "0:ffff0000 50:ff00ff00 100:ff00ff00");
     CKB_PRESET_END;
 
+    CKB_PRESET_START("Red/Green Transparent");
+    CKB_PRESET_PARAM("trigger", "0");
+    CKB_PRESET_PARAM("kptrigger", "1");
+    CKB_PRESET_PARAM("lcolor", "0:00000000 1:ffff0000 50:ff00ff00 100:ff00ff00");
+    CKB_PRESET_END;
+
     CKB_PRESET_START("Transparent");
     CKB_PRESET_PARAM("trigger", "0");
     CKB_PRESET_PARAM("kptrigger", "1");

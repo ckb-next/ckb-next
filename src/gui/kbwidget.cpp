@@ -349,6 +349,8 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     } else if(result == del){
         if(!canDelete)
             return;
+        if(QMessageBox::question(this, tr("Delete mode"), tr("Are you sure you want to delete this mode?")) != QMessageBox::Yes)
+            return;
         currentProfile->removeAll(currentMode);
         currentMode->deleteLater();
         currentMode = 0;

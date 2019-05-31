@@ -982,15 +982,34 @@ void mac_exithandler(CFSocketRef s, CFSocketCallBackType t, CFDataRef a, const v
 
 #ifndef OS_MAC_LEGACY
 
-static void karabinerreport(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
-    ckb_info("Read %ld data\n", length);
-}
-
 void karabiner_led_cb(void* inContext, IOReturn inResult, void* inSender, IOHIDValueRef value) {
-        //IOHIDElementRef element = IOHIDValueGetElement(value);
-        //IOHIDDeviceRef device = IOHIDElementGetDevice(element);
-        long int thevalue = IOHIDValueGetIntegerValue(value);
-        ckb_info("We got %ld\n", thevalue);
+    long int caps_lock_led_value = IOHIDValueGetIntegerValue(value);
+
+    // create auto-detached thread attributes
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    // iterate through attached keyboards, set caps_lock led modifiers to the registered value, and run the indicator update thread detached
+    usbdevice *kb;
+    for(int i = 1; i < DEV_MAX; i++){
+        if(IS_CONNECTED(keyboard + i)){
+            kb = keyboard + i;
+
+            if (!IS_MOUSE_DEV(kb)) {
+                if (caps_lock_led_value)
+                    kb->modifiers = NX_ALPHASHIFTMASK;
+                else
+                    kb->modifiers = 0;
+
+                if(!kb->indicthread){
+                    pthread_create(&kb->indicthread, &attr, indicator_update, kb);
+                }
+            }
+        }
+    }
+
+    pthread_attr_destroy(&attr);
 }
 
 static void iterate_devices_karabiner(void* context, io_iterator_t iterator){
@@ -998,15 +1017,10 @@ static void iterate_devices_karabiner(void* context, io_iterator_t iterator){
     unsigned int devint = 0;
     while((device = IOIteratorNext(iterator)) != 0){
         ckb_info("Karabiner device matched\n");
-        
+
         IOHIDDeviceRef karabinerdev = NULL;
         IOHIDDeviceRef hiddev = IOHIDDeviceCreate(kCFAllocatorDefault, device);
         ckb_info("Open returned %d\n", IOHIDDeviceOpen(hiddev, kIOHIDOptionsTypeNone));
-
-            /*void* buffer = malloc(128);
-            int maxsize = 128;
-            IOHIDDeviceRegisterInputReportCallback(hiddev, buffer, maxsize, karabinerreport, hiddev);*/
-
 
         // Get elements
         CFArrayRef elements = IOHIDDeviceCopyMatchingElements(hiddev, NULL, kIOHIDOptionsTypeNone);
@@ -1035,10 +1049,9 @@ static void iterate_devices_karabiner(void* context, io_iterator_t iterator){
 
         CFRelease(elements);
 
-        // Do things
+        // register callback for caps_lock led toggle event
         if(karabinerdev != NULL)
         {
-            ckb_info("We did a thing\n");
             // Create C arrays for matching dict
             const void *keys[2] = {
                 CFSTR(kIOHIDElementUsagePageKey),
@@ -1062,12 +1075,7 @@ static void iterate_devices_karabiner(void* context, io_iterator_t iterator){
             CFRelease(matchDict);
             CFRelease(values[0]);
             CFRelease(values[1]);
-            /*void* buffer = malloc(128);
-            int maxsize = 128;
-            IOHIDDeviceRegisterInputReportCallback(karabinerdev, buffer, maxsize, karabinerreport, karabinerdev);*/
         }
-        //IOHIDDeviceClose(hiddev, 0);
-        ckb_info("GOT TO END\n");
 
         IOObjectRelease(device);
         devint++;
@@ -1168,7 +1176,7 @@ int usbmain(){
     if(iterator_karabiner)
         iterate_devices_karabiner(0, iterator_karabiner);
 #endif
-    
+
     // setup signal handling via CoreFoundation socket callout mechanism
     // see mac_exithandler for the reading side of this setup
     CFSocketRef cf_socket = CFSocketCreateWithNative(

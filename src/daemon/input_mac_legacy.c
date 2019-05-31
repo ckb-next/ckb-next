@@ -300,7 +300,7 @@ void keyretrigger(CFRunLoopTimerRef timer, void* info){
 // Unlike Linux, OSX keyboards have independent caps lock states. This means they're set by the driver itself so we don't poll for external events.
 // However, updating indicator state requires locking dmutex and we never want to do that in the input thread.
 // Instead, we launch a single-shot thread to update the state.
-static void* indicator_update(void* context){
+void* indicator_update(void* context){
     char indicthread_name[THREAD_NAME_MAX] = "ckbX indicator";
     usbdevice* kb = context;
 

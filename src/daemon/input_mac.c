@@ -151,7 +151,7 @@ void os_inputclose(usbdevice* kb){
 // Unlike Linux, OSX keyboards have independent caps lock states. This means they're set by the driver itself so we don't poll for external events.
 // However, updating indicator state requires locking dmutex and we never want to do that in the input thread.
 // Instead, we launch a single-shot thread to update the state.
-static void* indicator_update(void* context){
+void* indicator_update(void* context){
     char indicthread_name[THREAD_NAME_MAX] = "ckbX indicator";
     usbdevice* kb = context;
 
@@ -205,20 +205,6 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         (*add_remove_keys)(scancode, &(kb->kbinput_consumer.keys));
         IOConnectCallStructMethod(kb->event, post_consumer_input_report, &kb->kbinput_consumer, sizeof(kb->kbinput_consumer), NULL, 0);
     } else {
-        if(scancode == KEY_CAPSLOCK){
-            if(down) {
-                kb->modifiers ^= NX_ALPHASHIFTMASK;
-
-                // Detach a thread to update the indicator state
-                if(!kb->indicthread){
-                    // The thread is only spawned if kb->indicthread is null.
-                    // Due to the logic inside the thread, this means that it could theoretically be spawned twice, but never a third time.
-                    // Moreover, if it is spawned more than once, the indicator state will remain correct due to dmutex staying locked.
-                    if(!pthread_create(&kb->indicthread, 0, indicator_update, kb))
-                        pthread_detach(kb->indicthread);
-                }
-            }
-        }
         (*add_remove_keys)(scancode, &(kb->kbinput_key.keys));
         IOConnectCallStructMethod(kb->event, post_keyboard_input_report, &kb->kbinput_key, sizeof(kb->kbinput_key), NULL, 0);
     }

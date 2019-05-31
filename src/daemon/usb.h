@@ -391,4 +391,6 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, u
 extern int sighandler_pipe[2];
 extern void exithandler(int type);
 
+extern void* indicator_update(void* context);
+
 #endif  // USB_H

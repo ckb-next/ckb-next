@@ -9,6 +9,9 @@
 
 #ifdef OS_MAC
 
+// usb.c
+extern _Atomic int reset_stop;
+
 static CFRunLoopRef mainloop = 0;
 static IONotificationPortRef notify = 0;
 
@@ -285,7 +288,9 @@ int os_resetusb(usbdevice* kb, const char* file, int line){
 }
 
 static void intreport(void* context, IOReturn result, void* sender, IOHIDReportType reporttype, uint32_t reportid, uint8_t* data, CFIndex length){
-    process_input_urb(context, data, length, 0);
+    // process input as long as the program isn't shutting down
+    if (!reset_stop)
+        process_input_urb(context, data, length, 0);
 }
 
 typedef struct {

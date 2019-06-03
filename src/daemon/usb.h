@@ -386,9 +386,10 @@ int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ush
 #define usbsend_control(kb, message, len, bRequest, wValue, wIndex) _usbsend_control(kb, message, len, bRequest, wValue, wIndex, __FILE_NOPATH__, __LINE__)
 int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
 
-
 // receive message from initial sighandler socketpair communication
 extern int sighandler_pipe[2];
 extern void exithandler(int type);
+
+void reactivate_devices();
 
 #endif  // USB_H

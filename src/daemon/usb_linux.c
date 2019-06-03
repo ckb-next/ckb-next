@@ -5,6 +5,7 @@
 #include "usb.h"
 
 #ifdef OS_LINUX
+#include <time.h>
 
 // usb.c
 extern _Atomic int reset_stop;
@@ -783,6 +784,44 @@ static void udev_enum(){
     udev_enumerate_unref(enumerator);
 }
 
+_Atomic int suspend_run = 1;
+
+// While POSIX says we may need a runtime test, on Linux the clock
+// was added immediately after the define was introduced, so a
+// compile time check should be enough
+
+// https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=70a08cca1227dc31c784ec930099a4417a06e7d0
+// https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7fdd7f89006dd5a4c702fa0ce0c272345fa44ae0
+
+#ifndef CLOCK_BOOTTIME
+#define CLOCK_BOOTTIME CLOCK_REALTIME
+#endif
+
+static time_t get_clock_monotonic_seconds() {
+    struct timespec timespec_var = {0};
+
+    if(clock_gettime(CLOCK_BOOTTIME, &timespec_var))
+        ckb_err("Error in clock_gettime()\n");
+
+    return timespec_var.tv_sec;
+}
+
+void* suspend_check() {
+    time_t prev_time = get_clock_monotonic_seconds();
+    if(!prev_time)
+        return NULL;
+    while(suspend_run){
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 2}, NULL);
+        time_t current_time = get_clock_monotonic_seconds(NULL);
+
+        if(prev_time + 4 < current_time)
+            reactivate_devices();
+
+        prev_time = current_time;
+    }
+    return NULL;
+}
+
 /// \brief .
 ///
 /// \brief usbmain is called by main() after setting up all other stuff.
@@ -796,7 +835,12 @@ int usbmain(){
         ckb_fatal("Failed to initialize udev in usbmain(), usb_linux.c\n");
         return -1;
     }
-
+    
+    // Create thread that detects system suspend
+    pthread_t suspend_thread;
+    pthread_create(&suspend_thread, NULL, suspend_check, NULL);
+    pthread_setname_np(suspend_thread, "suspend");
+    
     ///
     /// Enumerate all currently connected devices
     udev_enum();
@@ -809,8 +853,8 @@ int usbmain(){
     udev_monitor_enable_receiving(monitor);
     // Get an fd for the monitor
     int fd = udev_monitor_get_fd(monitor);
-
     fd_set fds;
+    
     while(udev){
         FD_ZERO(&fds);
         FD_SET(fd, &fds);
@@ -855,6 +899,9 @@ int usbmain(){
         }
     }
     udev_monitor_unref(monitor);
+    suspend_run = 0;
+    pthread_join(suspend_thread, NULL);
+    
     return 0;
 }
 

@@ -847,3 +847,22 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
     else
         ckb_info("ckb%i %s (via %s:%d) %s %s\n", devnum, function, file, line, prefix, converted);
 }
+
+void reactivate_devices()
+{
+    ckb_info("System has woken from sleep\n");
+    usbdevice *kb = NULL;
+    for(int i = 0; i < DEV_MAX; i++){
+        if(IS_CONNECTED(keyboard + i)){
+            kb = keyboard + i;
+            // If the device was active, mark it as disabled and re-enable it
+            pthread_mutex_lock(dmutex(kb));
+            if(kb->active){
+                kb->active = 0;
+                const devcmd* vt = kb->vtable;
+                vt->active(kb, 0, 0, 0, 0);
+            }
+            pthread_mutex_unlock(dmutex(kb));
+        }
+    }
+}

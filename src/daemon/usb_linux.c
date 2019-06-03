@@ -876,7 +876,6 @@ int usbmain(){
             }
         }
     }
-    ckb_info("CHADDING\n");
     udev_monitor_unref(monitor);
     suspend_run = 0;
     pthread_join(suspend_thread, NULL);

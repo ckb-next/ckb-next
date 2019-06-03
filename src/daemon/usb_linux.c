@@ -5,6 +5,7 @@
 #include "usb.h"
 
 #ifdef OS_LINUX
+#include <time.h>
 
 // usb.c
 extern _Atomic int reset_stop;
@@ -783,6 +784,22 @@ static void udev_enum(){
     udev_enumerate_unref(enumerator);
 }
 
+_Atomic int suspend_run = 1;
+
+void* suspend_check() {
+    time_t prev_time = time(NULL);
+    while(suspend_run){
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 2}, NULL);
+        time_t current_time = time(NULL);
+
+        if(prev_time + 4 < current_time)
+            reactivate_devices();
+
+        prev_time = current_time;
+    }
+    return NULL;
+}
+
 /// \brief .
 ///
 /// \brief usbmain is called by main() after setting up all other stuff.
@@ -796,7 +813,12 @@ int usbmain(){
         ckb_fatal("Failed to initialize udev in usbmain(), usb_linux.c\n");
         return -1;
     }
-
+    
+    // Create thread that detects system suspend
+    pthread_t suspend_thread;
+    pthread_create(&suspend_thread, NULL, suspend_check, NULL);
+    pthread_setname_np(suspend_thread, "suspend");
+    
     ///
     /// Enumerate all currently connected devices
     udev_enum();
@@ -809,8 +831,8 @@ int usbmain(){
     udev_monitor_enable_receiving(monitor);
     // Get an fd for the monitor
     int fd = udev_monitor_get_fd(monitor);
-
     fd_set fds;
+    
     while(udev){
         FD_ZERO(&fds);
         FD_SET(fd, &fds);
@@ -854,7 +876,11 @@ int usbmain(){
             }
         }
     }
+    ckb_info("CHADDING\n");
     udev_monitor_unref(monitor);
+    suspend_run = 0;
+    pthread_join(suspend_thread, NULL);
+    
     return 0;
 }
 

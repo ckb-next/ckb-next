@@ -473,16 +473,24 @@ if (MACOS)
         WORLD_READ)
 elseif (LINUX)
     install(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop"
-        DESTINATION "share/applications"
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.png"
+        DESTINATION "share/icons/hicolor/512x512/apps"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
 
+    # We need to use file(WRITE) because TOUCH was added way too late
+    # xdg-icon-resource does this to force a cache update
+    # Should be enough for all modern desktops
     install(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.png"
-        DESTINATION "share/icons/hicolor/512x512/apps"
+        CODE
+        "file(WRITE \"${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/.xdg-icon-resource-dummy\" \"\")
+        file(REMOVE \"${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/.xdg-icon-resource-dummy\")")
+
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop"
+        DESTINATION "share/applications"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ

@@ -480,13 +480,15 @@ elseif (LINUX)
         GROUP_READ
         WORLD_READ)
 
-    # We need to use file(WRITE) because TOUCH was added way too late
-    # xdg-icon-resource does this to force a cache update
-    # Should be enough for all modern desktops
-    install(
-        CODE
-        "file(WRITE \"${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/.xdg-icon-resource-dummy\" \"\")
-        file(REMOVE \"${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/.xdg-icon-resource-dummy\")")
+    if (SAFE_INSTALL)
+        # We need to use file(WRITE) because TOUCH was added way too late
+        # xdg-icon-resource does this to force a cache update
+        # Should be enough for all modern desktops
+        install(
+            CODE
+            "file(WRITE \"${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/.xdg-icon-resource-dummy\" \"\")
+            file(REMOVE \"${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/.xdg-icon-resource-dummy\")")
+    endif ()
 
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop"

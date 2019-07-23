@@ -153,10 +153,11 @@ int ckb_frame(ckb_runctx* context){
             thisGradient = animcolor;
         }
         ckb_grad_color(&a, &r, &g, &b, &thisGradient, phase * 100.);
-        key->a = a;
-        key->r = r;
-        key->g = g;
-        key->b = b;
+
+        key->a = roundf(a);
+        key->r = roundf(r);
+        key->g = roundf(g);
+        key->b = roundf(b);
     }
     return 0;
 }

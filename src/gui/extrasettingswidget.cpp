@@ -72,6 +72,8 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
     // Read start delay
     ui->startDelayBox->setChecked(settings.value("StartDelay").toBool());
 
+    ui->previewBox->setChecked(settings.value("DisablePreviewOnFocusLoss", true).toBool());
+
 #ifndef Q_OS_LINUX
     ui->scrollWarningLabel->hide();
 #endif
@@ -154,4 +156,9 @@ void ExtraSettingsWidget::on_delayBox_clicked(bool checked){
 
 void ExtraSettingsWidget::on_startDelayBox_clicked(bool checked){
     CkbSettings::set("Program/StartDelay", checked);
+}
+
+void ExtraSettingsWidget::on_previewBox_clicked(bool checked)
+{
+    CkbSettings::set("Program/DisablePreviewOnFocusLoss", checked);
 }

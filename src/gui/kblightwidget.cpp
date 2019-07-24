@@ -158,6 +158,8 @@ void KbLightWidget::changeAnimKeys(QStringList keys){
 }
 
 void KbLightWidget::stateChange(Qt::ApplicationState state){
+    if(!CkbSettings::get("Program/DisablePreviewOnFocusLoss", true).toBool())
+        return;
     if (state == Qt::ApplicationActive) {
         if(light && ui->showAnimBox->isChecked())
             startAnimationPreview();

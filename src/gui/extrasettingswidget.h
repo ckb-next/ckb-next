@@ -28,6 +28,7 @@ private slots:
     void on_sSpeedBox_valueChanged(int arg1);
     void on_delayBox_clicked(bool checked);
     void on_startDelayBox_clicked(bool checked);
+    void on_previewBox_clicked(bool checked);
 
 private:
     Ui::ExtraSettingsWidget *ui;

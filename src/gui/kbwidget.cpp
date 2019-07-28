@@ -77,8 +77,8 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->hwSaveButton->setDisabled(true);
         ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
     }
-    // Read keyboard layout
-    if(device->isKeyboard()){
+    // Read device layout
+    if(device->features.contains("bind")){
         // Clear the "Default" value
         ui->layoutBox->clear();
 
@@ -99,7 +99,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         KeyMap::Layout layout = settingsLayout = KeyMap::getLayout(settings.value("hwLayout").toString());
         if(layout == KeyMap::NO_LAYOUT){
             // If the layout hasn't been set yet, first check if one was set globally from a previous version
-            // If not, try and pick an appropriate one that's supported by the hardware
+            // If not, try to pick an appropriate one that's supported by the hardware
             KeyMap::Layout oldLayout = KeyMap::getLayout(CkbSettings::get("Program/KbdLayout").toString());
             if(oldLayout == KeyMap::NO_LAYOUT){
                 layout = KeyMap::locale(&layoutnames);

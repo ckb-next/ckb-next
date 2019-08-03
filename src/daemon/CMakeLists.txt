@@ -29,7 +29,7 @@
 # TODO: use COMPONENT-wise installation instead of ifs()
 
 if (WINDOWS)
-    link_directories("C:\\libusbK-dev-kit\\bin\\dll\\amd64")
+    link_directories("D:\\libusbK-dev-kit\\bin\\dll\\amd64")
 endif ()
 
 add_executable(ckb-next-daemon "")
@@ -70,6 +70,7 @@ if (MACOS OR LINUX OR WINDOWS)
               device_keyboard.c
               device_mouse.c
               device_vtable.c
+	      devnode.c
               dpi.c
               dpi_legacy.c
               firmware.c
@@ -98,6 +99,7 @@ if (MACOS OR LINUX OR WINDOWS)
               input_windows_vmulti.h
               keymap.h
               keymap_patch.h
+              keymap_windows.h
               led.h
               notify.h
               os.h
@@ -110,7 +112,6 @@ if (MACOS)
     target_sources(
         ckb-next-daemon
             PRIVATE
-              devnode_unix.c
               usb_mac.c
               input_mac.c
               input_mac_legacy.c
@@ -121,14 +122,12 @@ elseif (LINUX)
     target_sources(
         ckb-next-daemon
             PRIVATE
-              devnode_unix.c
               usb_linux.c
               input_linux.c)
 elseif (WINDOWS)
   target_sources(
       ckb-next-daemon
           PRIVATE
-            devnode_windows.c
             usb_windows.c
             input_windows.c)
 endif ()
@@ -155,7 +154,7 @@ elseif (WINDOWS)
               ckb-next-daemon
                   SYSTEM
                   PRIVATE
-                    "C:\\libusbK-dev-kit\\includes")
+                    "D:\\libusbK-dev-kit\\includes")
 endif ()
 
 # Declare target's link dependencies

@@ -188,8 +188,8 @@ void KPerfWidget::uiUpdated(int index){
     if(!perf)
         return;
     // Read HW/SW enable state
-    bool software;
-    i_hw hardware;
+    bool software = false;
+    i_hw hardware = i_hw::NONE;
     if(indicators[index].enable){
         software = indicators[index].enable->isChecked();
         hardware = KbPerf::NONE;

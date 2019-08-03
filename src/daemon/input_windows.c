@@ -230,7 +230,7 @@ HidOutput(
 
         if (!HidD_SetOutputReport(file, buffer, bufferSize))
         {
-            printf("failed HidD_SetOutputReport %d\n", GetLastError());
+            printf("failed HidD_SetOutputReport %ld\n", GetLastError());
             return FALSE;
         }
     }
@@ -238,7 +238,7 @@ HidOutput(
     {
         if (!WriteFile(file, buffer, bufferSize, &bytesWritten, NULL))
         {
-            printf("failed WriteFile %d\n", GetLastError());
+            printf("failed WriteFile %ld\n", GetLastError());
             return FALSE;
         }
     }
@@ -273,6 +273,9 @@ void os_inputclose(usbdevice* kb){
 
 }
 
+static BYTE mouseButtonState;
+static BYTE mouseScrollState;
+
 void os_keypress(usbdevice* kb, int scancode, int down){
     if(scancode & SCAN_MOUSE){
        VMultiControlReportHeader* pReport = NULL;
@@ -292,24 +295,31 @@ void os_keypress(usbdevice* kb, int scancode, int down){
 
        pMouseReport = (VMultiRelativeMouseReport*)(vmulti.controlReport + sizeof(VMultiControlReportHeader));
        pMouseReport->ReportID = REPORTID_RELATIVE_MOUSE;
-       //pMouseReport->Button = 0;
+       pMouseReport->Button = mouseButtonState;
        pMouseReport->XValue = 0;
        pMouseReport->YValue = 0;
        if(scancode == BTN_WHEELUP || scancode == BTN_WHEELDOWN) {
-           pMouseReport->WheelPosition = (down ? ((scancode == BTN_WHEELUP) ? 1 : -1) : 0);
+           mouseScrollState = pMouseReport->WheelPosition = (down ? ((scancode == BTN_WHEELUP) ? 1 : -1) : 0);
        } else {
-           pMouseReport->Button = scancode;
-          /* int scan = (scancode & ~SCAN_MOUSE);
+           // Ignore mouse down if another button is pressed
+           if(mouseButtonState && down)
+               return;
+           int scan = scancode - SCAN_MOUSE;
+           //ckb_info("%d\n", scan);
            if(down)
-               add_to_buttons(scan, &kb->mouseinput);
+               mouseButtonState = scan;
            else
-               remove_from_buttons(scan, &kb->mouseinput);*/
+               mouseButtonState = 0; //^= ~scan;
+           pMouseReport->Button = mouseButtonState;
+
        }
        // Send the report
        HidOutput(FALSE, vmulti.hControl, (PCHAR)vmulti.controlReport, CONTROL_REPORT_SIZE);
 
        return;
    }
+
+    // Keyboard report
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
@@ -330,10 +340,10 @@ void os_mousemove(usbdevice* kb, int x, int y){
 
     pMouseReport = (VMultiRelativeMouseReport*)(vmulti.controlReport + sizeof(VMultiControlReportHeader));
     pMouseReport->ReportID = REPORTID_RELATIVE_MOUSE;
-    pMouseReport->Button = 0;
+    pMouseReport->Button = mouseButtonState;
     pMouseReport->XValue = x;
     pMouseReport->YValue = y;
-    pMouseReport->WheelPosition = 0;//wheelPosition;
+    pMouseReport->WheelPosition = mouseScrollState;
 
     // Send the report
     HidOutput(FALSE, vmulti.hControl, (PCHAR)vmulti.controlReport, CONTROL_REPORT_SIZE);

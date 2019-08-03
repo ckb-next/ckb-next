@@ -154,12 +154,12 @@
 
 #define BTN_LEFT            1
 #define BTN_RIGHT           2
-#define BTN_MIDDLE          3
-#define BTN_SIDE            4
-#define BTN_EXTRA           5
-#define BTN_FORWARD         6
-#define BTN_BACK            7
-#define BTN_TASK            8
+#define BTN_MIDDLE          4
+#define BTN_SIDE            0
+#define BTN_EXTRA           0
+#define BTN_FORWARD         0
+#define BTN_BACK            0
+#define BTN_TASK            0
 
 #endif // OS_WINDOWS
 

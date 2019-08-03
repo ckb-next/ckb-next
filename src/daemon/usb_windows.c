@@ -10,7 +10,6 @@
 
 #ifdef OS_WINDOWS
 
-static int kbdevaddress[DEV_MAX] = {[0 ... DEV_MAX-1] = -1};
 static int kbbusnumber[DEV_MAX] = {[0 ... DEV_MAX-1] = -1};
 #define HAS_ALL_HANDLES(kb) ((kb)->ifcount && (kb)->handlecount == (kb)->ifcount)
 static int HotKRunning = 1;
@@ -80,6 +79,10 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
 #endif
 
+    return len;
+}
+
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
     return len;
 }
 
@@ -187,13 +190,12 @@ static int get_UTF8_string_desc(HANDLE* handle, UCHAR iString, char* out, size_t
 }
 
 int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
-#ifdef DEBUG
-    ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s\n", vendor, product, path, syspath);
-#endif // DEDBUG
+    ckb_info("0x%x:0x%x @ %d,%d ins %s\n", vendor, product, deviceInfo->BusNumber, deviceInfo->DeviceAddress, deviceInfo->Common.InstanceID);
 
     // Search for a matching address and bus number
     for(int index = 1; index < DEV_MAX; index++){
-        if(kbbusnumber[index] == deviceInfo->BusNumber && kbdevaddress[index] == deviceInfo->DeviceAddress){
+        // TODO: Be sure BusNumber is enough
+        if(kbbusnumber[index] == deviceInfo->BusNumber){
             usbdevice* kb = keyboard + index;
             if(pthread_mutex_trylock(dmutex(kb)))
                 continue;
@@ -229,7 +231,6 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
             kb->vendor = vendor;
             kb->product = product;
             kbbusnumber[index] = deviceInfo->BusNumber;
-            kbdevaddress[index] = deviceInfo->DeviceAddress;
             kb->handlecount = 1;
             kUSB.Init(kb->handle + 0, deviceInfo);
             // Get descriptor

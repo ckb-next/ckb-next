@@ -6,12 +6,22 @@
 #include "notify.h"
 #include "profile.h"
 #include <ckbnextconfig.h>
+
+#ifdef OS_WINDOWS
 #include <windows.h>
 #define BUFSIZE 512
+#endif
 
-const char *const devpath = "C:\\ProgramData\\ckb-next\\ckb";
+// OSX doesn't like putting FIFOs in /dev for some reason
+#if defined(OS_MAC)
+const char *const devpath = "/dev/input/ckb";
+#elif defined(OS_LINUX)
+const char *const devpath = "/var/run/ckb";
+#else //OS_WINDOWS
+#define CKB_PROGRAMDATA_BASE "C:\\ProgramData\\ckb-next\\"
+const char *const devpath = CKB_PROGRAMDATA_BASE "ckb";
 const char *const pipepath = "\\\\.\\pipe\\ckb-next\\ckb";
-
+#endif
 
 long gid = -1;
 #define S_GID_READ  (gid >= 0 ? S_CUSTOM_R : S_READ)
@@ -19,7 +29,7 @@ long gid = -1;
 int rm_recursive(const char* path){
     DIR* dir = opendir(path);
     if(!dir)
-        return remove(path);
+        return unlink(path);
     struct dirent* file;
     while((file = readdir(dir)))
     {
@@ -32,8 +42,33 @@ int rm_recursive(const char* path){
             return stat;
     }
     closedir(dir);
-    return remove("C:\\ProgramData\\ckb-next\\ckb0\\");
+    return rmdir(path);
 }
+
+void check_chown(const char *pathname, uid_t owner, long group){
+#ifndef OS_WINDOWS
+    if (group >= 0) {
+        if (chown(pathname, owner, group) < 0) {
+            ckb_warn("Chown call failed %s: %s\n", pathname, strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+    }
+#endif
+}
+
+#ifdef OS_WINDOWS
+void check_fchown(HANDLE fd, uid_t owner, long group){
+#else
+void check_fchown(int fd, uid_t owner, long group){
+    if (group >= 0) {
+        if (fchown(fd, owner, group) < 0) {
+            ckb_warn("FChown call failed: %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+    }
+#endif
+}
+
 
 void check_chmod(const char *pathname, mode_t mode){
     if(chmod(pathname, mode) < 0) {
@@ -42,7 +77,24 @@ void check_chmod(const char *pathname, mode_t mode){
     }
 }
 
-void updateconnected(){
+///
+/// \brief _updateconnected Update the list of connected devices.
+///
+/// \<devicepath\> normally is /dev/input/ckb or /input/ckb.
+/// \n Open the normal file under \<devicepath\>0/connected for writing.
+/// For each device connected, print its devicepath+number,
+/// the serial number of the usb device and the usb name of the device connected to that usb interface.
+/// \n eg:
+/// \n /dev/input/ckb1 0F022014ABABABABABABABABABABA999 Corsair K95 RGB Gaming Keyboard
+/// \n /dev/input/ckb2 0D02303DBACBACBACBACBACBACBAC998 Corsair M65 RGB Gaming Mouse
+///
+/// Set the file ownership to root.
+/// If the glob var gid is explicitly set to something different from -1 (the initial value), set file permission to 640, else to 644.
+/// This is used if you start the daemon with --gid=\<GID\> Parameter.
+///
+/// Because several independent threads may call updateconnected(), protect that procedure with locking/unlocking of \b devmutex.
+///
+void _updateconnected(){
     pthread_mutex_lock(devmutex);
     char cpath[strlen(devpath) + 12];
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
@@ -65,10 +117,19 @@ void updateconnected(){
 
     check_chmod(cpath, S_GID_READ);
 
+    check_chown(cpath, 0, gid);
+
+
     pthread_mutex_unlock(devmutex);
 }
 
-int mknotifynode(usbdevice* kb, int notify){
+void updateconnected(){
+    euid_guard_start;
+    _updateconnected();
+    euid_guard_stop;
+}
+
+int _mknotifynode(usbdevice* kb, int notify){
     if(notify < 0 || notify >= OUTFIFO_MAX)
         return -1;
     if(kb->outfifo[notify] != 0)
@@ -76,23 +137,66 @@ int mknotifynode(usbdevice* kb, int notify){
     // Create the notification node
     char index = (INDEX_OF(kb, keyboard) % 10) + '0';
     char notify_char = (notify % 10) + '0';
+#ifdef OS_WINDOWS
     char outpath[strlen(pipepath) + 10 * sizeof(char)];
     snprintf(outpath, sizeof(outpath), "%s%c\\notify%c", pipepath, index, notify_char);
     kb->outfifo[notify] = CreateNamedPipe(TEXT(outpath), PIPE_ACCESS_OUTBOUND , PIPE_WAIT, 1, 1024, 1024, 120 * 1000, NULL);
     if(kb->outfifo[notify] == INVALID_HANDLE_VALUE){
         ckb_warn("Unable to create %s: %ld\n", outpath, GetLastError());
+#else
+
+    char outpath[strlen(devpath) + 10 * sizeof(char)];
+    snprintf(outpath, sizeof(outpath), "%s%c/notify%c", devpath, index, notify_char);
+    if(mkfifo(outpath, S_GID_READ) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK) + 1) == 0){
+        // Add one to the FD because 0 is a valid descriptor, but ckb uses 0 for uninitialized devices
+        ckb_warn("Unable to create %s: %s\n", outpath, strerror(errno));
+#endif
         kb->outfifo[notify] = 0;
+#ifndef OS_WINDOWS
+        remove(outpath);
+#endif
         return -1;
     }
+
+    check_fchown(kb->outfifo[notify] - 1, 0, gid);
+
     return 0;
 }
 
-int rmnotifynode(usbdevice* kb, int notify){
+int mknotifynode(usbdevice* kb, int notify){
+    euid_guard_start;
+    int res = _mknotifynode(kb, notify);
+    euid_guard_stop;
+    return res;
+}
+
+int _rmnotifynode(usbdevice* kb, int notify){
     if(notify < 0 || notify >= OUTFIFO_MAX || !kb->outfifo[notify])
         return -1;
+#ifdef OS_WINDOWS
     CloseHandle(kb->outfifo[notify]);
     kb->outfifo[notify] = 0;
     return 0;
+#else
+
+    char index = (INDEX_OF(kb, keyboard) % 10) + '0';
+    char notify_char = (notify % 10) + '0';
+    char outpath[strlen(devpath) + 10 * sizeof(char)];
+    snprintf(outpath, sizeof(outpath), "%s%c/notify%c", devpath, index, notify_char);
+    // Close FIFO
+    close(kb->outfifo[notify] - 1);
+    kb->outfifo[notify] = 0;
+    // Delete node
+    int res = remove(outpath);
+    return res;
+#endif
+}
+
+int rmnotifynode(usbdevice* kb, int notify){
+    euid_guard_start;
+    int res = _rmnotifynode(kb, notify);
+    euid_guard_stop;
+    return res;
 }
 
 static void printnode(const char* path, const char* str){
@@ -102,6 +206,10 @@ static void printnode(const char* path, const char* str){
         fputc('\n', file);
         fclose(file);
         check_chmod(path, S_GID_READ);
+
+
+        check_chown(path, 0, gid);
+
     } else {
         ckb_warn("Unable to create %s: %s\n", path, strerror(errno));
         remove(path);
@@ -129,20 +237,30 @@ static int _mkdevpath(usbdevice* kb){
     // Create the control path
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
-    /*if(rm_recursive(path) != 0 && errno != ENOENT){
+    if(rm_recursive(path) != 0 && errno != ENOENT){
         ckb_err("Unable to delete %s: %s\n", path, strerror(errno));
         return -1;
-    }*/
+    }
+#ifdef OS_WINDOWS
+    mkdir(CKB_PROGRAMDATA_BASE);
 
     if(mkdir(path) != 0 && errno != EEXIST){
+#else
+
+    if(mkdir(path, S_READDIR) != 0){
+#endif
         ckb_err("Unable to create %s: %s\n", path, strerror(errno));
         rm_recursive(path);
         return -1;
     }
 
+
+    check_chown(path, 0, gid);
+
+
     if(kb == keyboard + 0){
         // Root keyboard: write a list of devices
-        updateconnected();
+        _updateconnected();
         // Write version number
         char vpath[sizeof(path) + 8];
         snprintf(vpath, sizeof(vpath), "%s/version", path);
@@ -151,6 +269,11 @@ static int _mkdevpath(usbdevice* kb){
             fprintf(vfile, "%s\n", CKB_NEXT_VERSION_STR);
             fclose(vfile);
             check_chmod(vpath, S_GID_READ);
+
+
+            check_chown(vpath, 0, gid);
+
+
         } else {
             ckb_warn("Unable to create %s: %s\n", vpath, strerror(errno));
             remove(vpath);
@@ -163,24 +286,41 @@ static int _mkdevpath(usbdevice* kb){
             fprintf(pfile, "%u\n", getpid());
             fclose(pfile);
             check_chmod(ppath, S_READ);
+
+            check_chown(vpath, 0, gid);
+
         } else {
             ckb_warn("Unable to create %s: %s\n", ppath, strerror(errno));
             remove(ppath);
         }
     } else {
         // Create command FIFO
+#ifdef OS_WINDOWS
         char inpath[strlen(pipepath) + 6];
         snprintf(inpath, sizeof(inpath), "%s%d\\cmd", pipepath, index);
         kb->infifo = CreateNamedPipe(TEXT(inpath), PIPE_ACCESS_INBOUND, PIPE_WAIT, 1, 1024, 1024, 120 * 1000, NULL);
         if(kb->infifo == INVALID_HANDLE_VALUE){
-            ckb_err("Unable to create %s: %d\n", inpath, GetLastError());
+            ckb_err("Unable to create %s: %ld\n", inpath, GetLastError());
+#else
+        char inpath[sizeof(path) + 4];
+        snprintf(inpath, sizeof(inpath), "%s/cmd", path);
+        if(mkfifo(inpath, gid >= 0 ? S_CUSTOM : S_READWRITE) != 0
+                // Open the node in RDWR mode because RDONLY will lock the thread
+                || (kb->infifo = open(inpath, O_RDWR) + 1) == 0){
+            // Add one to the FD because 0 is a valid descriptor, but ckb uses 0 for uninitialized devices
+            ckb_err("Unable to create %s: %s\n", inpath, strerror(errno));
+#endif
             rm_recursive(path);
             kb->infifo = 0;
             return -1;
         }
 
+
+        check_fchown(kb->infifo - 1, 0, gid);
+
+
         // Create notification FIFO
-        mknotifynode(kb, 0);
+        _mknotifynode(kb, 0);
 
         // Write the model and serial to files
         char mpath[sizeof(path) + 6], spath[sizeof(path) + 7], ipath[sizeof(path) + 10], lpath[sizeof(path) + 7];
@@ -224,6 +364,11 @@ static int _mkdevpath(usbdevice* kb){
             fputc('\n', ffile);
             fclose(ffile);
             check_chmod(fpath, S_GID_READ);
+
+
+            check_chown(fpath, 0, gid);
+
+
         } else {
             ckb_warn("Unable to create %s: %s\n", fpath, strerror(errno));
             remove(fpath);
@@ -242,13 +387,24 @@ int mkdevpath(usbdevice* kb){
 }
 
 int rmdevpath(usbdevice* kb){
+    euid_guard_start;
     int index = INDEX_OF(kb, keyboard);
     if(kb->infifo != 0){
+#ifdef OS_WINDOWS
         CloseHandle(kb->infifo);
+#else
+        int fd = kb->infifo - 1;
+#ifdef OS_MAC
+        fcntl(fd, F_SETFL, O_RDWR | O_NONBLOCK); // hack to prevent the following hack from blocking if the GUI was running
+#endif
+        if (write(fd, "\n", 1) < 0)
+            ckb_warn("Unable to write to filedescriptor %d: %s\n", fd, strerror(errno));
+        close(fd);
+#endif
         kb->infifo = 0;
     }
     for(int i = 0; i < OUTFIFO_MAX; i++)
-        rmnotifynode(kb, i);
+        _rmnotifynode(kb, i);
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
     if(rm_recursive(path) != 0 && errno != ENOENT){
@@ -257,6 +413,7 @@ int rmdevpath(usbdevice* kb){
         return -1;
     }
     ckb_info("Removed device path %s\n", path);
+    euid_guard_stop;
     return 0;
 }
 
@@ -270,6 +427,7 @@ int mkfwnode(usbdevice* kb){
         fputc('\n', fwfile);
         fclose(fwfile);
         check_chmod(fwpath, S_GID_READ);
+        check_chown(fwpath, 0, gid);
     } else {
         ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
         remove(fwpath);
@@ -283,6 +441,7 @@ int mkfwnode(usbdevice* kb){
         fputc('\n', pfile);
         fclose(pfile);
         check_chmod(ppath, S_GID_READ);
+        check_chown(ppath, 0, gid);
     } else {
         ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
         remove(ppath);
@@ -309,6 +468,7 @@ void readlines_ctx_free(readlines_ctx ctx){
     free(ctx->buffer);
     free(ctx);
 }
+#ifdef OS_WINDOWS
 
 // FIXME: Dedup this. It's in extra_mac.c
 void *memrchr(const void *s, int c, size_t n){
@@ -321,39 +481,61 @@ void *memrchr(const void *s, int c, size_t n){
 }
 
 unsigned readlines(HANDLE fd, readlines_ctx ctx, const char** input){
+#else
+unsigned readlines(int fd, readlines_ctx ctx, const char** input){
+#endif
     // Move any data left over from a previous read to the start of the buffer
     char* buffer = ctx->buffer;
     int buffersize = ctx->buffersize;
     int leftover = ctx->leftover, leftoverlen = ctx->leftoverlen;
     memcpy(buffer, buffer + leftover, leftoverlen);
+#ifdef OS_WINDOWS
+
     // Read data from the pipe
     DWORD length = 0;
     BOOL success = ReadFile(fd, buffer + leftoverlen, buffersize - leftoverlen, &length, NULL);
     length = (success ? length : 0) + leftoverlen;
+#else
+    // Read data from the file
+    ssize_t length = read(fd, buffer + leftoverlen, buffersize - leftoverlen);
+    length = (length < 0 ? 0 : length) + leftoverlen;
+#endif
     leftover = ctx->leftover = leftoverlen = ctx->leftoverlen = 0;
+#ifdef OS_WINDOWS
     if(!success){
         *input = 0;
         return -1;
     }
-    if(!length){
+#endif
+    if(length <= 0){
         *input = 0;
         return 0;
     }
     // Continue buffering until all available input is read or there's no room left
+#ifdef OS_WINDOWS
+    // TODO see if buffersize can be negative. If not, cast it to unsigned instead
+    while((INT64)length == buffersize){
+#else
     while(length == buffersize){
+#endif
         if(buffersize == MAX_BUFFER)
             break;
         int oldsize = buffersize;
         buffersize += 4096;
         ctx->buffersize = buffersize;
         buffer = ctx->buffer = realloc(buffer, buffersize + 1);
+#ifdef OS_WINDOWS
         DWORD length2 = 0;
         if(!ReadFile(fd, buffer + oldsize, buffersize - oldsize, &length2, NULL))
+#else
+
+        ssize_t length2 = read(fd, buffer + oldsize, buffersize - oldsize);
+        if(length2 <= 0)
+#endif
             break;
         length += length2;
     }
     buffer[length] = 0;
-    //printf("In: %s\n", buffer);
     // Input should be issued one line at a time and should end with a newline.
     char* lastline = memrchr(buffer, '\n', length);
     if(lastline == buffer + length - 1){

@@ -59,9 +59,11 @@ void ignore_signal(int type){
         case SIGINT:
             unused_result = write(1, "SIGINT", 6);
             break;
+#ifndef OS_WINDOWS
         case SIGQUIT:
             unused_result = write(1, "SIGQUIT", 7);
             break;
+#endif
         default:
             unused_result = write(1, "UNKNOWN", 7);
             break;

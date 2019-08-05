@@ -44,6 +44,9 @@
 #define V_CORSAIR            0x1b1c
 #define V_CORSAIR_STR        "1b1c"
 
+#define P_LIGHTNING_NODE_PRO 0x0c0b
+#define IS_LIGHTNING_NODE(vendor, product) ((vendor) == V_CORSAIR && (product) == P_LIGHTNING_NODE_PRO)
+
 #define P_K55                0x1b3d
 #define IS_K55(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K55)
 
@@ -119,7 +122,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 41
+#define N_MODELS 42
 extern ushort models[];
 
 ///

@@ -140,6 +140,7 @@ typedef struct {
 #define FEAT_MONOCHROME 0x002   // RGB protocol but single-color only?
 #define FEAT_POLLRATE   0x004   // Known poll rate?
 #define FEAT_ADJRATE    0x008   // Adjustable poll rate?
+#define FEAT_FAN        0x00f   // Dynamic Fan number? [TODO] Check conflict
 #define FEAT_BIND       0x010   // Rebindable keys?
 #define FEAT_NOTIFY     0x020   // Key notifications?
 #define FEAT_FWVERSION  0x040   // Has firmware version?
@@ -184,6 +185,7 @@ extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
+extern const union devcmd vtable_lightning_node;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN 50

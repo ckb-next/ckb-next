@@ -77,6 +77,17 @@ int _start_dev(usbdevice* kb, int makeactive){
 
     if(kb->product == P_M95)
         kb->features &= ~FEAT_POLLRATE; // M95 doesn't support reading the pollrate through the protocol
+
+
+    ///
+    /// Lightnode no support reading pollrate and hwload
+    ///
+    if (IS_LIGHTNING_NODE(kb->vendor, kb->product)) {
+        kb->features &= ~FEAT_POLLRATE;
+        kb->features &= ~FEAT_HWLOAD;
+        kb->features &= ~FEAT_FAN;
+    }
+
     ///
     /// - Now check if device needs a firmware update.
     /// If so, set it up and leave the function without error.

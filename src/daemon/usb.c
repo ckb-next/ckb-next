@@ -55,6 +55,8 @@ ushort models[N_MODELS] = {
     P_POLARIS,
     // Headset stands
     P_ST100,
+    // Lightning Nodes
+    P_LIGHTNING_NODE_PRO,
 };
 
 /// brief .
@@ -151,6 +153,8 @@ const char* product_str(ushort product){
         return "polaris";
     if(product == P_ST100)
         return "st100";
+    if(product == P_LIGHTNING_NODE_PRO)
+        return "lightning_node_pro";
     return "";
 }
 
@@ -177,6 +181,8 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
             return &vtable_mouse;
     } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
         return &vtable_mousepad;
+    } else if (IS_LIGHTNING_NODE(vendor, product)) { 
+        return &vtable_lightning_node;
     } else {
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;

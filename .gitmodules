@@ -1,0 +1,3 @@
+[submodule "windows/libwdi"]
+	path = windows/libwdi
+	url = https://github.com/pbatard/libwdi.git

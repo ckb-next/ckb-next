@@ -13,16 +13,16 @@ Q_OBJECT
 public:
 #ifdef Q_OS_WIN
     DaemonPipe(const QString &name) : QLocalSocket() {
-        pipeName = name.mid(name.lastIndexOf("ckb")).replace(QChar('/'),QChar('\\'));
-        pipeName.prepend("\\\\.\\pipe\\ckb-next\\");
-        qDebug() << pipeName;
+        pipeName = fixPathForWin32(name);
+        qDebug() << "Opening" << pipeName;
     }
     inline bool open(QIODevice::OpenMode mode) { return open(0, mode, 0); }
     bool open(int fd, QIODevice::OpenMode mode, QFileDevice::FileHandleFlags handleFlags);
     QByteArray readLine(qint64 maxSize = 0);
+    static bool pipeExists(QString pipe);
+    static QString fixPathForWin32(QString name);
 
 private:
-    //void initPipe(QString str);
     QString pipeName;
 #else
     DaemonPipe(const QString &name) : QFile(name) {}

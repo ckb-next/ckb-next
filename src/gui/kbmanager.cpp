@@ -4,7 +4,6 @@
 QString devpath = "/var/run/ckb%1";
 #elif defined(Q_OS_WIN)
 QString devpath = "C:\\ProgramData\\ckb-next\\ckb%1";
-//QString pipepath = "\\\\.\\pipe\\ckb-next\\ckb%1";
 #elif defined(Q_OS_LINUX)
 QString devpath = "/dev/input/ckb%1";
 #else

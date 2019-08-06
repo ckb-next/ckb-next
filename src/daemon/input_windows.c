@@ -25,27 +25,27 @@ CheckIfOurDevice(
 
     if (!HidD_GetPreparsedData (file, &Ppd))
     {
-        printf("Error: HidD_GetPreparsedData failed \n");
+        ckb_err("Error: HidD_GetPreparsedData failed \n");
         goto cleanup;
     }
 
     if (!HidD_GetAttributes(file, &Attributes))
     {
-        printf("Error: HidD_GetAttributes failed \n");
+        ckb_err("Error: HidD_GetAttributes failed \n");
         goto cleanup;
     }
-    printf("Ven: %d Dev: %d, \n", Attributes.VendorID, Attributes.ProductID);
+    ckb_info("Ven: %d Dev: %d, \n", Attributes.VendorID, Attributes.ProductID);
     if (Attributes.VendorID == VMULTI_VID && Attributes.ProductID == VMULTI_PID)
     {
         if (!HidP_GetCaps (Ppd, &Caps))
         {
-            printf("Error: HidP_GetCaps failed \n");
+            ckb_err("Error: HidP_GetCaps failed \n");
             goto cleanup;
         }
-        printf("UsagePage %d Usage %d\n", Caps.UsagePage, Caps.Usage);
+        ckb_info("UsagePage %d Usage %d\n", Caps.UsagePage, Caps.Usage);
         if ((Caps.UsagePage == myUsagePage) && (Caps.Usage == myUsage))
         {
-            printf("Success: Found my device.. \n");
+            ckb_info("Success: Found my device.. \n");
             result = TRUE;
         }
     }
@@ -91,7 +91,7 @@ OpenDeviceInterface (
 
     if (!deviceInterfaceDetailData)
     {
-        printf("Error: OpenDeviceInterface: malloc failed\n");
+        ckb_err("Error: OpenDeviceInterface: malloc failed\n");
         goto cleanup;
     }
 
@@ -106,7 +106,7 @@ OpenDeviceInterface (
                             &requiredLength,
                             NULL))
     {
-        printf("Error: SetupDiGetInterfaceDeviceDetail failed\n");
+        ckb_err("Error: SetupDiGetInterfaceDeviceDetail failed\n");
         free (deviceInterfaceDetailData);
         goto cleanup;
     }
@@ -120,7 +120,7 @@ OpenDeviceInterface (
                             NULL); // No template file
 
     if (INVALID_HANDLE_VALUE == file) {
-        printf("Error: CreateFile failed: %ld\n", GetLastError());
+        ckb_err("Error: CreateFile failed: %ld\n", GetLastError());
         goto cleanup;
     }
 
@@ -159,7 +159,7 @@ HANDLE SearchMatchingHwID (USAGE myUsagePage, USAGE myUsage){
 
     if (INVALID_HANDLE_VALUE == hardwareDeviceInfo)
     {
-        printf("SetupDiGetClassDevs failed: %lx\n", GetLastError());
+        ckb_info("SetupDiGetClassDevs failed: %lx\n", GetLastError());
         return INVALID_HANDLE_VALUE;
     }
 
@@ -169,7 +169,7 @@ HANDLE SearchMatchingHwID (USAGE myUsagePage, USAGE myUsage){
     // Enumerate devices of this interface class
     //
 
-    printf("\n....looking for our HID device (with UP=0x%x "
+    ckb_info("\n....looking for our HID device (with UP=0x%x "
                 "and Usage=0x%x)\n", myUsagePage, myUsage);
 
     for (i = 0; SetupDiEnumDeviceInterfaces (hardwareDeviceInfo,
@@ -200,7 +200,7 @@ HANDLE SearchMatchingHwID (USAGE myUsagePage, USAGE myUsage){
 
     }
 
-    printf("Failure: Could not find our HID device \n");
+    ckb_info("Failure: Could not find our HID device \n");
 
     SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
 
@@ -230,7 +230,7 @@ HidOutput(
 
         if (!HidD_SetOutputReport(file, buffer, bufferSize))
         {
-            printf("failed HidD_SetOutputReport %ld\n", GetLastError());
+            ckb_info("failed HidD_SetOutputReport %ld\n", GetLastError());
             return FALSE;
         }
     }
@@ -238,7 +238,7 @@ HidOutput(
     {
         if (!WriteFile(file, buffer, bufferSize, &bytesWritten, NULL))
         {
-            printf("failed WriteFile %ld\n", GetLastError());
+            ckb_info("failed WriteFile %ld\n", GetLastError());
             return FALSE;
         }
     }
@@ -275,8 +275,39 @@ void os_inputclose(usbdevice* kb){
 
 static BYTE mouseButtonState;
 static BYTE mouseScrollState;
+static BYTE keyboardKeys[KBD_KEY_CODES];
+static BYTE keyboardModifiers;
+
+static void add_to_keys(int scan){
+    for(int i = 0; i < KBD_KEY_CODES; i++){
+        if(keyboardKeys[i] == 0){
+            keyboardKeys[i] = scan;
+            return;
+        }
+    }
+    ckb_warn("Dropping excess keypress\n");
+}
+
+static void remove_from_keys(int scan){
+    for(int i = 0; i < KBD_KEY_CODES; i++){
+        if(keyboardKeys[i] == scan){
+            keyboardKeys[i] = 0;
+            return;
+        }
+    }
+    ckb_warn("Couldn't find key to release\n");
+}
+
+void printchar(uchar a)
+{
+    for (int i = 0; i < 8; i++)
+        printf("%d", !!((a << i) & 0x80));
+
+    puts("");
+}
 
 void os_keypress(usbdevice* kb, int scancode, int down){
+    printf("Raw scancode: 0x%x\n", scancode);
     if(scancode & SCAN_MOUSE){
        VMultiControlReportHeader* pReport = NULL;
        VMultiRelativeMouseReport* pMouseReport = NULL;
@@ -301,25 +332,68 @@ void os_keypress(usbdevice* kb, int scancode, int down){
        if(scancode == BTN_WHEELUP || scancode == BTN_WHEELDOWN) {
            mouseScrollState = pMouseReport->WheelPosition = (down ? ((scancode == BTN_WHEELUP) ? 1 : -1) : 0);
        } else {
-           // Ignore mouse down if another button is pressed
-           if(mouseButtonState && down)
-               return;
            int scan = scancode - SCAN_MOUSE;
-           //ckb_info("%d\n", scan);
            if(down)
-               mouseButtonState = scan;
+               mouseButtonState |= scan;
            else
-               mouseButtonState = 0; //^= ~scan;
+               mouseButtonState &= ~scan;
            pMouseReport->Button = mouseButtonState;
 
        }
+       printf("Mouse button state: ");
+       printchar(mouseButtonState);
+       __mingw_printf("Mouse scroll state: 0x%hhx\n", mouseScrollState);
        // Send the report
        HidOutput(FALSE, vmulti.hControl, (PCHAR)vmulti.controlReport, CONTROL_REPORT_SIZE);
-
        return;
    }
 
     // Keyboard report
+    VMultiControlReportHeader* pReport = (VMultiControlReportHeader*)vmulti.controlReport;
+    VMultiKeyboardReport* pKeyboardReport = (VMultiKeyboardReport*)(vmulti.controlReport + sizeof(VMultiControlReportHeader));
+
+    //
+    // Set the report header
+    //
+
+
+    pReport->ReportID = REPORTID_CONTROL;
+    pReport->ReportLength = sizeof(VMultiKeyboardReport);
+
+    // Handle key press
+    if(scancode & SCAN_MODIFIER)
+    {
+       int scan = scancode - SCAN_MODIFIER;
+       if(down)
+           keyboardModifiers |= scan;
+       else
+           keyboardModifiers &= ~scan;
+    }
+    else
+    {
+        if(down)
+            add_to_keys(scancode);
+        else
+            remove_from_keys(scancode);
+    }
+    //
+    // Set the input report
+    //
+
+
+    pKeyboardReport->ReportID = REPORTID_KEYBOARD;
+    pKeyboardReport->ShiftKeyFlags = keyboardModifiers;
+    memcpy(pKeyboardReport->KeyCodes, keyboardKeys, KBD_KEY_CODES);
+    printf("KB Modifiers: ");
+    printchar(keyboardModifiers);
+
+    printf("Keys: ");
+    for(int i = 0; i < 6; i++)
+        __mingw_printf("0x%hhx ", keyboardKeys[i]);
+    puts("");
+
+    // Send the report
+    HidOutput(FALSE, vmulti.hControl, (PCHAR)vmulti.controlReport, CONTROL_REPORT_SIZE);
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){

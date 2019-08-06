@@ -107,8 +107,7 @@ Kb::Kb(QObject *parent, const QString& path) :
         for(int i = 1; i < 10; i++){
             QString notify = QString(path + "/notify%1").arg(i);
 #ifdef Q_OS_WIN32
-#warning "Notify exists stub"
-            if(!notifyPaths.contains(notify)){
+            if(!DaemonPipe::pipeExists(notify) && !notifyPaths.contains(notify)){
 #else
             if(!QFile::exists(notify) && !notifyPaths.contains(notify)){
 #endif
@@ -129,8 +128,7 @@ Kb::Kb(QObject *parent, const QString& path) :
         for(int i = 1; i < 10; i++){
             QString notify = QString(path + "/notify%1").arg(i);
 #ifdef Q_OS_WIN32
-#warning "Notify exists stub"
-            if(!notifyPaths.contains(notify)){
+            if(!DaemonPipe::pipeExists(notify) && !notifyPaths.contains(notify)){
 #else
             if(!QFile::exists(notify) && !notifyPaths.contains(notify)){
 #endif

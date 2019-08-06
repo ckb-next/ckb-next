@@ -153,7 +153,7 @@ void* os_inputmain(void* context){
 }
 
 void os_closeusb(usbdevice* kb){
-
+    kbbusnumber[INDEX_OF(kb, keyboard)] = -1;
 }
 
 int os_resetusb(usbdevice* kb, const char* file, int line) {
@@ -189,7 +189,7 @@ static int get_UTF8_string_desc(HANDLE* handle, UCHAR iString, char* out, size_t
     return 1;
 }
 
-int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
+int usbadd(KLST_DEVINFO_HANDLE deviceInfo, ushort vendor, ushort product) {
     ckb_info("0x%x:0x%x @ %d,%d ins %s\n", vendor, product, deviceInfo->BusNumber, deviceInfo->DeviceAddress, deviceInfo->Common.InstanceID);
 
     // Search for a matching address and bus number
@@ -264,7 +264,7 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
             kPkt->ValueHi = USB_DESCRIPTOR_TYPE_DEVICE;
             kPkt->Length = (USHORT)sizeof(devDescrBuf);
             if (!kUSB.ControlTransfer(kb->handle[0], Pkt, devDescrBuf, sizeof(devDescrBuf), &lengthTransferred, NULL))
-                ckb_err("Something elser happened %ld\n", GetLastError());
+                ckb_err("Control transfer failed with %ld\n", GetLastError());
             USB_DEVICE_DESCRIPTOR devDescr;
             memcpy(&devDescr, devDescrBuf, sizeof(devDescr));
             kb->fwversion = devDescr.bcdDevice;
@@ -304,7 +304,24 @@ void KUSB_API OnHotPlug(KHOT_HANDLE Handle, KLST_DEVINFO_HANDLE deviceInfo, KLST
     if(NotificationType == KLST_SYNC_FLAG_ADDED)
         usb_add_device(deviceInfo);
     else
-        ckb_fatal("FIXME: Device removed. Things will break\n");
+    {
+        ckb_fatal("FIXME: Device %d removed. Things will break\n", deviceInfo->BusNumber);
+        // Search for a matching address and bus number
+        for(int index = 1; index < DEV_MAX; index++){
+            if(kbbusnumber[index] == deviceInfo->BusNumber){
+                usbdevice* kb = keyboard + index;
+                if(pthread_mutex_trylock(dmutex(kb)))
+                    continue;
+                closeusb(kb);
+                pthread_mutex_unlock(dmutex(kb));
+           }
+        }
+    }
+}
+
+void KUSB_API OnPowerBroadcast(KHOT_HANDLE Handle, KLST_DEVINFO_HANDLE deviceInfo, UINT evt)
+{
+    ckb_info("Sleep event %u\n", evt);
 }
 
 int usbmain(){
@@ -314,6 +331,7 @@ int usbmain(){
 
     memset(&hotParams, 0, sizeof(hotParams));
     hotParams.OnHotPlug = OnHotPlug;
+    hotParams.OnPowerBroadcast = OnPowerBroadcast;
     hotParams.Flags |= KHOT_FLAG_PLUG_ALL_ON_INIT;
 
     strcpy(hotParams.PatternMatch.DeviceInterfaceGUID, "*");

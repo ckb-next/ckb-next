@@ -28,6 +28,10 @@
 # No need to check for WITH_ANIMATIONS, because all the options below
 # already depend on it through cmake_dependent_option()
 
+if(${WINDOWS})
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../bin/animations")
+endif()
+
 foreach (animation IN ITEMS GRADIENT HEAT PINWHEEL RAIN RANDOM RIPPLE WAVE INVADERS LIFE SNAKE PIPE)
   if (WITH_${animation})
     string(TOLOWER ${animation} animation)
@@ -51,6 +55,13 @@ foreach (animation IN ITEMS GRADIENT HEAT PINWHEEL RAIN RANDOM RIPPLE WAVE INVAD
 
     add_sanitizers(${animation})
 
+if(${WINDOWS})
+    # Can't get bloody symlinks working
+    add_custom_command(TARGET ${animation} POST_BUILD
+        COMMAND "cp" ARGS "${animation}.exe" "animations/${animation}.exe"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../bin"
+    )
+endif()
     install(
       TARGETS ${animation}
       DESTINATION "${INSTALL_DIR_ANIMATIONS}")

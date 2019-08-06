@@ -46,6 +46,10 @@ void KbFirmware::processDownload(QNetworkReply* reply){
     if(hash == fwTableHash)
         return;
     fwTableHash = hash;
+#ifdef Q_OS_WINDOWS
+    hasGPG = NO;
+    // gpg under msys can't take windows paths
+#endif
     if(hasGPG == UNKNOWN){
         // Check for a GPG installation
         QProcess gpg;

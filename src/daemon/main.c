@@ -127,7 +127,11 @@ void localecase(char* dst, size_t length, const char* src){
 }
 
 int main(int argc, char** argv){
-#ifndef OS_WINDOWS
+#ifdef OS_WINDOWS
+    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+#else
     // Set output pipes to buffer on newlines, if they weren't set that way already
     setlinebuf(stdout);
     setlinebuf(stderr);

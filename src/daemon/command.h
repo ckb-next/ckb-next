@@ -61,7 +61,7 @@ typedef enum {
 
     PREAMBULE_FAN,
 
-    CMD_LAST = GET
+    CMD_LAST = PREAMBULE_FAN
 } cmd;
 #define CMD_COUNT       (CMD_LAST - CMD_FIRST + 2)
 #define CMD_DEV_COUNT   (CMD_LAST - CMD_VT_FIRST + 1)

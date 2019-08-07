@@ -291,13 +291,14 @@ int readcmd(usbdevice* kb, const char* line){
                 continue;
             }
             break;
-        case PREAMBULE_FAN:
+        case PREAMBULE_FAN: {
             uchar numberOfFans;
             if(sscanf(word, "%hhu", &numberOfFans) == 1){
                 vt->preambulefan(kb, numberOfFans);
                 continue;
             }
             break;
+        }
         default:;
         }
         // For anything else, split the parameter at the colon

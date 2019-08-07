@@ -39,15 +39,15 @@ int updatergb_lightning_node(usbdevice* kb, int force){
         // For blue color the fifth Bytes must be equals to 0x02
         if (i == 1 || i == 4) {
             pktcolor[4] = 0x00; // red color
-            color_array_ptr = &newlight->r;
+            color_array_ptr = &newlight->r[0];
         }
         if (i == 2 || i == 5) {
             pktcolor[4] = 0x01; // green color
-            color_array_ptr = &newlight->g;
+            color_array_ptr = &newlight->g[0];
         }
         if (i == 3 || i == 6) {
             pktcolor[4] = 0x02; // blue color
-            color_array_ptr = &newlight->b;
+            color_array_ptr = &newlight->b[0];
         }
 
         uchar* rgb_data = &pktcolor[5];

@@ -33,6 +33,8 @@
 #define LED_GENERIC_FIRST       (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA)
 // Mousepad zone count
 #define N_MOUSEPAD_ZONES        15
+// Lightnode | Number of Zones per Fan | LL120
+#define N_LL120_ZONES_PER_FAN   16
 // Mouse buttons
 #define N_BUTTONS_HW            20
 #define N_BUTTONS_EXTENDED      25

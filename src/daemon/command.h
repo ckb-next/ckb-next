@@ -135,6 +135,9 @@ typedef union devcmd {
         void (*updateindicators)(usbdevice* kb, int force);
         // dpi.h
         int (*updatedpi)(usbdevice* kb, int force);
+
+        // It's call everytime | it's necessary for lightnode because we have to send a packet to keep color everytime
+        void (*onframe)(usbdevice* kb);
     };
 } devcmd;
 

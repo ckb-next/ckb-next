@@ -15,6 +15,7 @@ int updatergb_mouse_legacy(usbdevice* kb, int force);
 // Lightning Node
 int updatergb_lightning_node(usbdevice* kb, int force);
 int preambule_fan_lightning_node(usbdevice* kb, uchar numberOfFans);
+void onframe_lightning_node(usbdevice* kb);
 
 // Saves RGB data to device memory. Returns 0 on success.
 int savergb_kb(usbdevice* kb, lighting* light, int mode);

@@ -191,6 +191,24 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
     }
 }
 
+/// USB device update loop
+///
+/// This function is used by some device like lightning node pro to send every N time a packet to keep data active
+void* onframe(void* context) {
+    usbdevice* kb = context;
+    while (1) {
+        // End thread when the handle is removed
+        if(!IS_CONNECTED(kb))
+            break;
+
+        /// Update device
+        kb->vtable->onframe(kb);
+
+        usleep(kb->usbdelay * 1000);
+    }
+    return 0;
+}
+
 // USB device main loop
 /// brief .
 ///
@@ -221,6 +239,9 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
 /// \n Should this function be declared as pthread_t* function, because of the defintion of pthread-create? But void* works also...
 ///
 static void* devmain(usbdevice* kb){
+    pthread_t onframe_thread;
+    pthread_create(&onframe_thread, NULL, onframe, kb);
+    pthread_setname_np(onframe_thread, kb->vendor + '_' + kb->product + "_onframe");
     /// \attention dmutex should still be locked when this is called
     int kbfifo = kb->infifo - 1;
     ///

@@ -8,6 +8,11 @@ static int rgbcmp(const lighting* lhs, const lighting* rhs, uchar fan_number){
     return memcmp(lhs->r, rhs->r, N_LL120_ZONES_PER_FAN * fan_number) || memcmp(lhs->g, rhs->g, N_LL120_ZONES_PER_FAN * fan_number) || memcmp(lhs->b, rhs->b, N_LL120_ZONES_PER_FAN * fan_number);
 }
 
+void onframe_lightning_node(usbdevice* kb) {
+    uchar pktend[MSG_SIZE] = {0x33, 0xff}; // Must be send everytime to keep modification
+    if(!usbsend(kb, pktend, 1)) return;
+}
+
 int updatergb_lightning_node(usbdevice* kb, int force){
     if(!kb->active)
         return 0;

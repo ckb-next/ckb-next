@@ -59,6 +59,8 @@ typedef enum {
     INOTIFY,
     GET,
 
+    PREAMBULE_FAN,
+
     CMD_LAST = GET
 } cmd;
 #define CMD_COUNT       (CMD_LAST - CMD_FIRST + 2)
@@ -128,6 +130,7 @@ typedef union devcmd {
         void (*freeprofile)(usbdevice* kb);
         // led.h
         int (*updatergb)(usbdevice* kb, int force);
+        int (*preambulefan)(usbdevice* kb, uchar numberOfFans);
         // input.h
         void (*updateindicators)(usbdevice* kb, int force);
         // dpi.h

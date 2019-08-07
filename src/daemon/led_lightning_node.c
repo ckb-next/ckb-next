@@ -8,7 +8,7 @@ int updatergb_lightning_node(usbdevice* kb, int force){
     return 0;
 }
 
-int init_lightning_node(usbdevice* kb,uchar numberOfFans) {
+int preambule_fan_lightning_node(usbdevice* kb,uchar numberOfFans) {
     uchar pkt1[MSG_SIZE] = {0x37};
 
     // 0x35 - Init
@@ -29,5 +29,8 @@ int init_lightning_node(usbdevice* kb,uchar numberOfFans) {
     if(!usbsend(kb, pkt7, 1)) return -1;
     if(!usbsend(kb, pkt8, 1)) return -1;
     if(!usbsend(kb, pkt9, 1)) return -1;
+
+    kb->number_of_fans = numberOfFans;
+
     return 0;
 }

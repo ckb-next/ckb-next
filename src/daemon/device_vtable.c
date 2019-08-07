@@ -36,6 +36,11 @@ static int loadprofile_none(usbdevice* kb){
 
     return 0;
 }
+static int preambule_fan_none(usbdevice* kb, uchar numberOfFans) {
+    (void)kb;
+
+    return 0;
+}
 static void int1_void_none(usbdevice* kb, int dummy){
     (void)kb;
     (void)dummy;
@@ -91,6 +96,7 @@ const devcmd vtable_keyboard = {
     .freeprofile = freeprofile,
     .updatergb = updatergb_kb,
     .updateindicators = updateindicators_kb,
+    .preambulefan = preambule_fan_none,
     .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
@@ -137,6 +143,7 @@ const devcmd vtable_keyboard_legacy = {
     .freeprofile = freeprofile,
     .updatergb = int1_int_none,                 ///< Legacy keyboards do not have an rgb update function
     .updateindicators = updateindicators_kb,
+    .preambulefan = preambule_fan_none,
     .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
@@ -182,6 +189,7 @@ const devcmd vtable_mouse = {
     .loadprofile = loadprofile,             ///< same for all keyboards and mice
     .freeprofile = freeprofile,             ///< same for all keyboards and mice
     .updatergb = updatergb_mouse,           ///< special for mice
+    .preambulefan = preambule_fan_none,
     .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
     .updatedpi = updatedpi                  ///< special for mice
 };
@@ -228,6 +236,7 @@ const devcmd vtable_mousepad = {
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_mousepad,
+    .preambulefan = preambule_fan_none,
     .updateindicators = int1_void_none,
     .updatedpi = int1_int_none
 };
@@ -274,6 +283,7 @@ const devcmd vtable_lightning_node = {
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_lightning_node,
+    .preambulefan = preambule_fan_lightning_node,
     .updateindicators = int1_void_none,
     .updatedpi = int1_int_none
 };
@@ -320,6 +330,7 @@ const devcmd vtable_mouse_legacy = {
     .loadprofile = loadprofile_none,
     .freeprofile = freeprofile,
     .updatergb = updatergb_mouse_legacy,
+    .preambulefan = preambule_fan_none,
     .updateindicators = int1_void_none,
     .updatedpi = updatedpi_legacy
 };

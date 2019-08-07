@@ -52,7 +52,9 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 
     "notify",
     "inotify",
-    "get"
+    "get",
+
+    "preambule_fan"
 };
 
 #define TRY_WITH_RESET(action)  \
@@ -286,6 +288,13 @@ int readcmd(usbdevice* kb, const char* line){
             if(!strcmp(word, "clear")){
                 // Macro has a special clear command
                 vt->macro(kb, mode, notifynumber, 0, 0);
+                continue;
+            }
+            break;
+        case PREAMBULE_FAN:
+            uchar numberOfFans;
+            if(sscanf(word, "%u", &numberOfFans) == 1){
+                vt->preambulefan(kb, numberOfFans);
                 continue;
             }
             break;

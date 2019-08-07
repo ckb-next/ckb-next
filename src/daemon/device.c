@@ -80,11 +80,9 @@ int _start_dev(usbdevice* kb, int makeactive){
 
 
     ///
-    /// Lightnode no support reading pollrate and hwload
+    /// Only lightnode support fan features
     ///
-    if (IS_LIGHTNING_NODE(kb->vendor, kb->product)) {
-        kb->features &= ~FEAT_POLLRATE;
-        kb->features &= ~FEAT_HWLOAD;
+    if (!IS_LIGHTNING_NODE(kb->vendor, kb->product)) {
         kb->features &= ~FEAT_FAN;
     }
 

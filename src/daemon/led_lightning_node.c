@@ -12,7 +12,7 @@ int init_lightning_node(usbdevice* kb,uchar numberOfFans) {
     uchar pkt1[MSG_SIZE] = {0x37};
 
     // 0x35 - Init
-    uchar pkt2[MSG_SIZE] = {0x35, 0x00, 0x00, numberOfFans, 0x00, 0x01, 0x01};
+    uchar pkt2[MSG_SIZE] = {0x35, 0x00, 0x00, numberOfFans << 4, 0x00, 0x01, 0x01};
     uchar pkt3[MSG_SIZE] = {0x3b, 0x00, 0x01};
     uchar pkt4[MSG_SIZE] = {0x38, 0x00, 0x02};
     uchar pkt5[MSG_SIZE] = {0x34};

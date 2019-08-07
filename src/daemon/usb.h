@@ -122,7 +122,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 42
+#define N_MODELS 43
 extern ushort models[];
 
 ///

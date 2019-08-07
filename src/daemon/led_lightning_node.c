@@ -87,6 +87,7 @@ int updatergb_lightning_node(usbdevice* kb, int force){
 }
 
 int preambule_fan_lightning_node(usbdevice* kb,uchar numberOfFans) {
+    ckb_info("PReambule begin send\n");
     uchar pkt1[MSG_SIZE] = {0x37};
 
     // 0x35 - Init
@@ -110,5 +111,6 @@ int preambule_fan_lightning_node(usbdevice* kb,uchar numberOfFans) {
 
     kb->number_of_fans = numberOfFans;
 
+    ckb_info("PReambule sended\n");
     return 0;
 }

@@ -122,7 +122,7 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-#define N_MODELS 43
+#define N_MODELS 42
 extern ushort models[];
 
 ///
@@ -190,10 +190,10 @@ const char* product_str(ushort product);
 #define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2)
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
-#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb) || IS_ST100(kb) || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K66)
+#define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb) || IS_ST100(kb) || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K66 || IS_LIGHTNING_NODE((kb)->vendor, (kb)->product))
 
 /// Used for devices that have a single IN endpoint, and no HID input
-#define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb))
+#define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb) || IS_LIGHTNING_NODE((kb)->vendor, (kb)->product))
 
 /// Used for devices that use a file-based hardware animation system.
 #define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE)

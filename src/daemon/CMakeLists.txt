@@ -65,6 +65,7 @@ if (MACOS OR LINUX)
               device.c
               device_keyboard.c
               device_mouse.c
+              device_lightning_node.c
               device_vtable.c
               devnode.c
               dpi.c

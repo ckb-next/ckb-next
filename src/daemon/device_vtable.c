@@ -245,11 +245,11 @@ const devcmd vtable_mousepad = {
 const devcmd vtable_lightning_node = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
-    .fwupdate = cmd_fwupdate,
+    .fwupdate = cmd_io_none,
     .pollrate = cmd_io_none,
 
-    .active = cmd_active_mouse,
-    .idle = cmd_idle_mouse,
+    .active = cmd_active_lightning_node,
+    .idle = cmd_idle_lightning_node,
 
     .erase = cmd_erase,
     .eraseprofile = cmd_eraseprofile,

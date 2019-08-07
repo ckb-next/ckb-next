@@ -51,7 +51,7 @@ int updatergb_lightning_node(usbdevice* kb, int force){
         }
 
         uchar* rgb_data = &pktcolor[5];
-        const int PTR_FAN_4 = N_LL120_ZONES_PER_FAN * 4;
+        const int PTR_FAN_4 = N_LL120_ZONES_PER_FAN * 4; // Fourth Fan
         if (i < 4) { // For Fans [1-3]
             for (uint j = 0; j < N_LL120_ZONES_PER_FAN * (kb->number_of_fans > 3 ? 3 : kb->number_of_fans); j++) {
                 *rgb_data++ = *(color_array_ptr + j);
@@ -71,7 +71,7 @@ int updatergb_lightning_node(usbdevice* kb, int force){
                     *rgb_data++ = *(color_array_ptr + (PTR_FAN_4 + j));
                 }
 
-                for (uint j = 3; j < N_LL120_ZONES_PER_FAN * kb->number_of_fans; j++) {
+                for (int j = PTR_FAN_4; j < N_LL120_ZONES_PER_FAN * kb->number_of_fans; j++) {
                     *rgb_data++ = *(color_array_ptr + j);
                 }
             }
@@ -87,7 +87,6 @@ int updatergb_lightning_node(usbdevice* kb, int force){
 }
 
 int preambule_fan_lightning_node(usbdevice* kb,uchar numberOfFans) {
-    ckb_info("PReambule begin send\n");
     uchar pkt1[MSG_SIZE] = {0x37};
 
     // 0x35 - Init
@@ -110,7 +109,5 @@ int preambule_fan_lightning_node(usbdevice* kb,uchar numberOfFans) {
     if(!usbsend(kb, pkt9, 1)) return -1;
 
     kb->number_of_fans = numberOfFans;
-
-    ckb_info("PReambule sended\n");
     return 0;
 }

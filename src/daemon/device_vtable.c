@@ -248,8 +248,8 @@ const devcmd vtable_lightning_node = {
     .fwupdate = cmd_io_none,
     .pollrate = cmd_io_none,
 
-    .active = cmd_active_lightning_node,
-    .idle = cmd_idle_lightning_node,
+    .active = cmd_io_none,
+    .idle = cmd_io_none,
 
     .erase = cmd_erase,
     .eraseprofile = cmd_eraseprofile,

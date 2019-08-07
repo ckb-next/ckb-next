@@ -82,6 +82,7 @@ int _start_dev(usbdevice* kb, int makeactive){
         kb->features &= ~FEAT_POLLRATE; // Lightning node pro doesn't support reading the pollrate through the protocol
         kb->features &= ~FEAT_HWLOAD; // no LED data to read
         kb->features &= ~(FEAT_FWVERSION | FEAT_FWUPDATE);
+        kb->active = 1;
     }
     ///
     /// - Now check if device needs a firmware update.

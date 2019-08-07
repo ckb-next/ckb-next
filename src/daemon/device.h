@@ -55,11 +55,9 @@ int setactive_mouse(usbdevice* kb, int active);
 // Command: Activate a device
 int cmd_active_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_active_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
-int cmd_active_lightning_node(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 // Command: Deactivate a device
 int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
-int cmd_idle_lightning_node(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 // Command: Set poll rate
 int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);

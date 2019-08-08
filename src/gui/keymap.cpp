@@ -382,6 +382,137 @@ static const Key PolarisZones[] = {
 };
 #define KEYCOUNT_POLARIS   (sizeof(PolarisZones) / sizeof(Key))
 
+// Lightning node pro
+#define LIGHTNING_NODE_PRO_HEIGHT 100
+#define LIGHTNING_NODE_PRO_WIDTH 60
+#define LIGHTNODE_PRO_SIZE_X 6
+#define LIGHTNODE_PRO_SIZE_Y 6
+#define LIGHTNODE_PRO_SIZE LIGHTNODE_PRO_SIZE_X, LIGHTNODE_PRO_SIZE_Y
+#define FAN1_OFFSET_X -36
+#define FAN1_OFFSET_Y 20
+#define FAN2_OFFSET_X 12
+#define FAN2_OFFSET_Y 20
+#define FAN3_OFFSET_X 60
+#define FAN3_OFFSET_Y 20
+#define FAN4_OFFSET_X -36
+#define FAN4_OFFSET_Y 72
+#define FAN5_OFFSET_X 12
+#define FAN5_OFFSET_Y 72
+#define FAN6_OFFSET_X 60
+#define FAN6_OFFSET_Y 72
+
+static const Key LightningNodeProZones[] = {
+    // Fan 1
+    {0, "Fan 1 Bottom Inner", "zone1", FAN1_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 1 Left Inner", "zone2", -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 1 Top Inner", "zone3", FAN1_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 1 Right Inner", "zone4", LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Ten O Clock", "zone5", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Nine O Clock", "zone6", 3 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Eight O Clock", "zone7", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Seven O Clock", "zone8", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Six O Clock", "zone9", FAN1_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Five O Clock", "zone10", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Four O Clock", "zone11", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Three O Clock", "zone12", 3 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Two O Clock", "zone13", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 One O Clock", "zone14", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Twelve O Clock", "zone15", FAN1_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Eleven O Clock", "zone16", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 2
+    {0, "Fan 2 Bottom Inner", "zone21", FAN2_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 2 Left Inner", "zone22", -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X, FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 2 Top Inner", "zone23", FAN2_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 2 Right Inner", "zone24", LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X, FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Ten O Clock", "zone25", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Nine O Clock", "zone26", 3 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X, FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Eight O Clock", "zone27", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Seven O Clock", "zone28", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Six O Clock", "zone29", FAN2_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Five O Clock", "zone210", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Four O Clock", "zone211", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Three O Clock", "zone212", 3 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X, FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Two O Clock", "zone213", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 One O Clock", "zone214", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Twelve O Clock", "zone215", FAN2_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Eleven O Clock", "zone216", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 3
+    {0, "Fan 3 Bottom Inner", "zone31", FAN3_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 3 Left Inner", "zone32", -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X, FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 3 Top Inner", "zone33", FAN3_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 3 Right Inner", "zone34", LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X, FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Ten O Clock", "zone35", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Nine O Clock", "zone36", 3 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X, FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Eight O Clock", "zone37", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Seven O Clock", "zone38", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Six O Clock", "zone39", FAN3_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Five O Clock", "zone310", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Four O Clock", "zone311", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Three O Clock", "zone312", 3 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X, FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Two O Clock", "zone313", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 One O Clock", "zone314", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Twelve O Clock", "zone315", FAN3_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Eleven O Clock", "zone316", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 4
+    {0, "Fan 4 Bottom Inner", "zone41", FAN4_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 4 Left Inner", "zone42", -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X, FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 4 Top Inner", "zone43", FAN4_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 4 Right Inner", "zone44", LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X, FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Ten O Clock", "zone45", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Nine O Clock", "zone46", 3 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X, FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Eight O Clock", "zone47", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Seven O Clock", "zone48", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Six O Clock", "zone49", FAN4_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Five O Clock", "zone410", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Four O Clock", "zone411", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Three O Clock", "zone412", 3 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X, FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Two O Clock", "zone413", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 One O Clock", "zone414", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Twelve O Clock", "zone415", FAN4_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Eleven O Clock", "zone416", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 5
+    {0, "Fan 5 Bottom Inner", "zone51", FAN5_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 5 Left Inner", "zone52", -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X, FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 5 Top Inner", "zone53", FAN5_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 5 Right Inner", "zone54", LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X, FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Ten O Clock", "zone55", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Nine O Clock", "zone56", 3 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X, FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Eight O Clock", "zone57", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Seven O Clock", "zone58", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Six O Clock", "zone59", FAN5_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Five O Clock", "zone510", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Four O Clock", "zone511", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Three O Clock", "zone512", 3 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X, FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Two O Clock", "zone513", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 One O Clock", "zone514", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Twelve O Clock", "zone515", FAN5_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Eleven O Clock", "zone516", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 6
+    {0, "Fan 6 Bottom Inner", "zone61", FAN6_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 6 Left Inner", "zone62", -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X, FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 6 Top Inner", "zone63", FAN6_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 6 Right Inner", "zone64", LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X, FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Ten O Clock", "zone65", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Nine O Clock", "zone66", 3 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X, FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Eight O Clock", "zone67", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Seven O Clock", "zone68", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Six O Clock", "zone69", FAN6_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Five O Clock", "zone610", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Four O Clock", "zone611", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Three O Clock", "zone612", 3 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X, FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Two O Clock", "zone613", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 One O Clock", "zone614", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Twelve O Clock", "zone615", FAN6_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Eleven O Clock", "zone616", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+};
+#define KEYCOUNT_LIGHTNING_NODE_PRO   (sizeof(LightningNodeProZones) / sizeof(Key))
+
+// ST100
 #define ST100_V 6,22
 #define ST100_H 22,6
 
@@ -822,6 +953,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::LIGHTNING_NODE_PRO:{
+        // Lightning node pro
+        for(const Key* key = LightningNodeProZones; key < LightningNodeProZones + KEYCOUNT_LIGHTNING_NODE_PRO; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     case KeyMap::ST100:{
         for(const Key* key = ST100Zones; key < ST100Zones + KEYCOUNT_ST100; key++){
             Key translatedKey = *key;
@@ -1081,6 +1222,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return M65E;
     if(lower == "m95")
         return M95;
+    if(lower == "lightning_node_pro")
+        return LIGHTNING_NODE_PRO;
     return NO_MODEL;
 }
 
@@ -1128,6 +1271,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "m65e";
     case M95:
         return "m95";
+    case LIGHTNING_NODE_PRO:
+        return "lightning_node_pro";
     default:
         return "";
     }
@@ -1171,6 +1316,8 @@ int KeyMap::modelWidth(Model model){
     case ST100:
     case M95:
         return M65_WIDTH;
+    case LIGHTNING_NODE_PRO:
+        return LIGHTNING_NODE_PRO_WIDTH;
     default:
         return 0;
     }
@@ -1202,6 +1349,8 @@ int KeyMap::modelHeight(Model model){
     case ST100:
     case M95:
         return M65_HEIGHT;
+    case LIGHTNING_NODE_PRO:
+        return LIGHTNING_NODE_PRO_HEIGHT;
     default:
         return 0;
     }

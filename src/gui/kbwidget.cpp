@@ -29,6 +29,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     connect(device, SIGNAL(modeRenamed()), this, SLOT(profileChanged()));
     connect(device, SIGNAL(modeRenamed()), this, SLOT(modeChanged()));
     connect(device, SIGNAL(modeChanged(bool)), this, SLOT(modeChanged(bool)));
+    connect(ui->lightSpin, SIGNAL(valueChanged(int)), this, SLOT(on_lightSpin_valueChanged(int)));
 
     connect(static_cast<MainWindow*>(parent), &MainWindow::switchToProfileCLI, this, &KbWidget::switchToProfile);
     connect(static_cast<MainWindow*>(parent), &MainWindow::switchToModeCLI, this, &KbWidget::switchToMode);
@@ -47,6 +48,11 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         // Remove keyboard Performance tab from non-keyboards
         if(!device->isKeyboard())
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
+
+        if (device->isLightningNode()){
+            ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
+            ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
+        }
     }
 
     // If we have an M95, set the performance and lighting tabs as such
@@ -77,6 +83,11 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->hwSaveButton->setDisabled(true);
         ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
     }
+
+    if(!device->isLightningNode()) {
+       ui->lightnodeLayout->setEnabled(false);
+    }
+
     // Read device layout
     if(device->features.contains("bind")){
         // Clear the "Default" value
@@ -392,6 +403,13 @@ void KbWidget::on_hwSaveButton_clicked(){
     updateProfileList();
     profileChanged();
 }
+
+void KbWidget::on_lightSpin_valueChanged(int number_of_fan){
+    if (!device) return;
+    device->sendPreambule(number_of_fan);
+    device->currentLight()->forceFrameUpdate();
+}
+
 
 void KbWidget::on_tabWidget_currentChanged(int index){
     if(!device)

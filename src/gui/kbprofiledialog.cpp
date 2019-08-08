@@ -236,6 +236,7 @@ void KbProfileDialog::on_exportButton_clicked(){
         metadata.setValue("isMouse", device->isMouse());
         metadata.setValue("isMousepad", device->isMousepad());
         metadata.setValue("isHeadsetStand", device->isHeadsetStand());
+        metadata.setValue("isLightningNode", device->isLightningNode());
         metadata.setValue("model", KeyMap::getModel(device->model()));
         metadata.setValue("layout", device->getCurrentLayout());
         metadata.setValue("monochrome", device->monochrome);
@@ -376,7 +377,8 @@ void KbProfileDialog::on_importButton_clicked(){
         if(device->isKeyboard() != metadata.value("isKeyboard").toBool() ||
            device->isMouse() != metadata.value("isMouse").toBool() ||
            device->isMousepad() != metadata.value("isMousepad").toBool() ||
-           device->isHeadsetStand() != metadata.value("isHeadsetStand").toBool()){
+           device->isHeadsetStand() != metadata.value("isHeadsetStand").toBool() ||
+           device->isLightningNode() != metadata.value("isLightningNode").toBool()){
             QMessageBox::warning(this, tr("Error"), tr("This profile was not created for the current device type."), QMessageBox::Ok);
             extractedFileCleanup(extracted);
             return;

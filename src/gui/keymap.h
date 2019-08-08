@@ -73,6 +73,7 @@ public:
         K66,
         M65E,
         M95,
+        LIGHTNING_NODE_PRO,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)
@@ -123,6 +124,8 @@ public:
     inline bool         isMousepad() const          { return isMousepad(keyModel); }
     inline static bool  isHeadsetStand(Model model) { return model == ST100; }
     inline bool         isHeadsetStand() const      { return isHeadsetStand(keyModel); }
+    inline static bool  isLightningNode(Model model) { return model == LIGHTNING_NODE_PRO; }
+    inline bool         isLightningNode() const      { return isLightningNode(keyModel); }
 
     inline static bool hasLights(Model model)       { return !(model == M95 || model == K66); }
     inline bool        hasLights() const            { return hasLights(keyModel); }

@@ -26,6 +26,7 @@ public:
     bool                    isMouse() const                     { return KeyMap::isMouse(_model); }
     bool                    isMousepad() const                  { return KeyMap::isMousepad(_model); }
     bool                    isHeadsetStand() const              { return KeyMap::isHeadsetStand(_model); }
+    bool                    isLightningNode() const             { return KeyMap::isLightningNode(_model); }
 
     // Frame rate (all devices). Also updates the event timer in KbManager.
     static inline int               frameRate()                         { return _frameRate; }
@@ -92,6 +93,9 @@ public:
     bool needsSave() const;
 
     void hwSave();
+
+    // Lightnode preambule
+    void sendPreambule(int number_of_fans);
 
     KeyMap::Layout getCurrentLayout();
 

@@ -56,27 +56,28 @@ int updatergb_lightning_node(usbdevice* kb, int force){
         }
 
         uchar* rgb_data = &pktcolor[5];
-        const int PTR_FAN_4 = N_LL120_ZONES_PER_FAN * 4; // Fourth Fan
+        const int PTR_FAN_4 = N_LL120_ZONES_PER_FAN * 3; // Fourth Fan
+        const int PTR_FAN_5 = N_LL120_ZONES_PER_FAN * 4; // Fifth Fan
         if (i < 4) { // For Fans [1-3]
             for (uint j = 0; j < N_LL120_ZONES_PER_FAN * (kb->number_of_fans > 3 ? 3 : kb->number_of_fans); j++) {
                 *rgb_data++ = *(color_array_ptr + j);
             }
 
-            // If we have 4 or more fans, we need to take 3 bytes from the 4th fan and put
+            // If we have 4 or more fans, we need to take 2 bytes from the 4th fan and put
             // it on this message.
             if (kb->number_of_fans > 3) {
-                for (int j = 0; j < 3; j++) {
+                for (int j = 0; j < 2; j++) {
                     *rgb_data++ = *(color_array_ptr + (PTR_FAN_4 + j));
                 }
             }
         } else { // For Fans [4-6]
             if (kb->number_of_fans > 3) {
                 // Continuation of 4th fan from r/g/b runs
-                for (int j = 3; j < N_LL120_ZONES_PER_FAN; j++) {
+                for (int j = 2; j < N_LL120_ZONES_PER_FAN; j++) {
                     *rgb_data++ = *(color_array_ptr + (PTR_FAN_4 + j));
                 }
 
-                for (int j = PTR_FAN_4; j < N_LL120_ZONES_PER_FAN * kb->number_of_fans; j++) {
+                for (int j = PTR_FAN_5; j < N_LL120_ZONES_PER_FAN * kb->number_of_fans; j++) {
                     *rgb_data++ = *(color_array_ptr + j);
                 }
             }

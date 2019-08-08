@@ -424,14 +424,14 @@
        <item row="9" column="2">
         <layout class="QHBoxLayout" name="lightnodeLayout">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lightnodeLabel">
            <property name="text">
             <string>Fan Number</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox">
+          <widget class="QSpinBox" name="lightnodeSpin">
            <property name="maximum">
             <number>6</number>
            </property>

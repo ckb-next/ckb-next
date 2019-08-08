@@ -35,6 +35,7 @@
 #define N_MOUSEPAD_ZONES        15
 // Lightnode | Number of Zones per Fan | LL120
 #define N_LL120_ZONES_PER_FAN   16
+#define LIGHTNODE_PRO_MAX_FAN   6
 // Mouse buttons
 #define N_BUTTONS_HW            20
 #define N_BUTTONS_EXTENDED      25
@@ -50,7 +51,7 @@
 // Index of DPI light
 #define LED_DPI                 (LED_MOUSE + 2)
 // Total number of keys recognized by software
-#define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED)
+#define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED + N_LL120_ZONES_PER_FAN * LIGHTNODE_PRO_MAX_FAN)
 #define N_KEYBYTES_EXTENDED     ((N_KEYS_EXTENDED + 7) / 8)
 
 // Map from key name to LED code and USB scan code

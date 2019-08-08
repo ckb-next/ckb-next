@@ -69,6 +69,9 @@ public:
     inline void setNeedsSave()          { _needsSave = true; }
     inline void setNeedsUpdate()        { _bind->setNeedsUpdate(); _perf->setNeedsUpdate(); }
 
+    inline void             setNumberOfFans(int number_of_fans)             { _number_of_fans = number_of_fans; }
+    inline int              getNumberOfFans()                               { return _number_of_fans; }
+
     // Import/export
     void modeExport(QSettings *settings);
     void modeImport(QSettings *settings);
@@ -83,7 +86,7 @@ private:
     KbLight* _light;
     KbBind* _bind;
     KbPerf* _perf;
-
+    int _number_of_fans;
     bool _needsSave;
 
 private slots:

@@ -115,5 +115,6 @@ int preambule_fan_lightning_node(usbdevice* kb,uchar numberOfFans) {
     if(!usbsend(kb, pkt9, 1)) return -1;
 
     kb->number_of_fans = numberOfFans;
+    (&kb->profile->currentmode->light)->forceupdate = 1;
     return 0;
 }

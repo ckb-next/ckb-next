@@ -250,27 +250,45 @@ static vmulti_client_t vmulti;
 
 int os_inputopen(usbdevice* kb){
 
-    vmulti.hControl = SearchMatchingHwID(0xff00, 0x0001);
-    if (vmulti.hControl == INVALID_HANDLE_VALUE || vmulti.hControl == NULL)
-        return 1;
+    if(!vmulti.hControl)
+    {
+        vmulti.hControl = SearchMatchingHwID(0xff00, 0x0001);
+        if (vmulti.hControl == INVALID_HANDLE_VALUE || vmulti.hControl == NULL)
+            return 1;
 
-    vmulti.hMessage = SearchMatchingHwID(0xff00, 0x0002);
-    if (vmulti.hMessage == INVALID_HANDLE_VALUE || vmulti.hMessage == NULL) {
-        //vmulti_disconnect(vmulti);
-        return FALSE;
+        vmulti.hMessage = SearchMatchingHwID(0xff00, 0x0002);
+        if (vmulti.hMessage == INVALID_HANDLE_VALUE || vmulti.hMessage == NULL) {
+            //vmulti_disconnect(vmulti);
+            return FALSE;
+        }
+
+        if (!HidD_SetNumInputBuffers(vmulti.hMessage, 10)){
+            ckb_fatal("failed HidD_SetNumInputBuffers %ld\n", GetLastError());
+            //vmulti_disconnect(vmulti);
+            return 1;
+        }
     }
-
-    if (!HidD_SetNumInputBuffers(vmulti.hMessage, 10)){
-        ckb_fatal("failed HidD_SetNumInputBuffers %ld\n", GetLastError());
-        //vmulti_disconnect(vmulti);
-        return 1;
+    else
+    {
+        ckb_info("Vmulti already open\n");
     }
-
     return 0;
 }
 
 void os_inputclose(usbdevice* kb){
+#warning "Figure out how to close vmulti properly"
+    // Don't do anything here.
+    // Input gets closed on shutdown
+    // Alternatively
+    // If this was the last device, close the handles
+    ckb_info("Input close called\n");
+    if(vmulti.hControl)
+        CloseHandle(vmulti.hControl);
+    vmulti.hControl = NULL;
 
+    if(vmulti.hMessage)
+        CloseHandle(vmulti.hMessage);
+    vmulti.hMessage = NULL;
 }
 
 static BYTE mouseButtonState;

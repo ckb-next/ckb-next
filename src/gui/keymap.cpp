@@ -383,23 +383,23 @@ static const Key PolarisZones[] = {
 #define KEYCOUNT_POLARIS   (sizeof(PolarisZones) / sizeof(Key))
 
 // Lightning node pro
-#define LIGHTNING_NODE_PRO_HEIGHT 100
-#define LIGHTNING_NODE_PRO_WIDTH 60
+#define LIGHTNING_NODE_PRO_HEIGHT 50
+#define LIGHTNING_NODE_PRO_WIDTH 300
 #define LIGHTNODE_PRO_SIZE_X 6
 #define LIGHTNODE_PRO_SIZE_Y 6
 #define LIGHTNODE_PRO_SIZE LIGHTNODE_PRO_SIZE_X, LIGHTNODE_PRO_SIZE_Y
-#define FAN1_OFFSET_X -36
-#define FAN1_OFFSET_Y 20
-#define FAN2_OFFSET_X 12
-#define FAN2_OFFSET_Y 20
-#define FAN3_OFFSET_X 60
-#define FAN3_OFFSET_Y 20
-#define FAN4_OFFSET_X -36
-#define FAN4_OFFSET_Y 72
-#define FAN5_OFFSET_X 12
-#define FAN5_OFFSET_Y 72
-#define FAN6_OFFSET_X 60
-#define FAN6_OFFSET_Y 72
+#define FAN1_OFFSET_X 27
+#define FAN1_OFFSET_Y 22
+#define FAN2_OFFSET_X 75
+#define FAN2_OFFSET_Y 22
+#define FAN3_OFFSET_X 123
+#define FAN3_OFFSET_Y 22
+#define FAN4_OFFSET_X 171
+#define FAN4_OFFSET_Y 22
+#define FAN5_OFFSET_X 219
+#define FAN5_OFFSET_Y 22
+#define FAN6_OFFSET_X 267
+#define FAN6_OFFSET_Y 22
 
 // Name structure
 // f[fan number]l[led number]

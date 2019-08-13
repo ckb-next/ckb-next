@@ -189,6 +189,31 @@ static int get_UTF8_string_desc(HANDLE* handle, UCHAR iString, char* out, size_t
     return 1;
 }
 
+int ifclaim(usbdevice* kb, KLST_DEVINFO_HANDLE deviceInfo)
+{
+    if(deviceInfo->Common.MI > IFACE_MAX - 1)
+    {
+        ckb_fatal("Received handle with MI %d > IFACE_MAX - 1\n", deviceInfo->Common.MI);
+        return -1;
+    }
+
+    KUSB_HANDLE handle = kb->handle + deviceInfo->Common.MI;
+    ckb_info("Handle %p\n", handle);
+    //if(handle)
+    {
+        ckb_fatal("Received duplicate handle for MI %d\n", deviceInfo->Common.MI);
+    //    return -1;
+    }
+    kb->handlecount++;
+
+    kUSB.Init(handle, deviceInfo);
+    ckb_info("Handle after %p\n", handle);
+#warning "IF Claim also doesn't work"
+    ckb_info("Claim for %d returned %d\n", deviceInfo->Common.MI, UsbK_ClaimInterface(kb->handle, deviceInfo->Common.MI, FALSE));
+    ckb_err("GetLastEndMePls() %lu\n", GetLastError());
+    return 0;
+}
+
 int usbadd(KLST_DEVINFO_HANDLE deviceInfo, ushort vendor, ushort product) {
     ckb_info("0x%x:0x%x @ %d,%d ins %s\n", vendor, product, deviceInfo->BusNumber, deviceInfo->DeviceAddress, deviceInfo->Common.InstanceID);
 
@@ -206,8 +231,8 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, ushort vendor, ushort product) {
                 pthread_mutex_unlock(dmutex(kb));
                 return 0;
             }
-            kUSB.Init(kb->handle + deviceInfo->Common.MI, deviceInfo);
-            kb->handlecount++;
+            if(ifclaim(kb, deviceInfo))
+                return -1;
             // Check if we now have all the handles
             if(HAS_ALL_HANDLES(kb)){
                 ckb_info("We now have all the handles for ckb%d! Setting up the device...\n", index);
@@ -231,8 +256,10 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, ushort vendor, ushort product) {
             kb->vendor = vendor;
             kb->product = product;
             kbbusnumber[index] = deviceInfo->BusNumber;
-            kb->handlecount = 1;
-            kUSB.Init(kb->handle + 0, deviceInfo);
+
+            if(ifclaim(kb, deviceInfo))
+                return -1;
+
             // Get descriptor
             BYTE configDescriptorBuffer[4096];
             UINT lengthTransferred;
@@ -246,11 +273,11 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, ushort vendor, ushort product) {
             kPkt->Length = (USHORT)sizeof(configDescriptorBuffer);
 
             if (!kUSB.ControlTransfer(kb->handle[0], Pkt, configDescriptorBuffer, sizeof(configDescriptorBuffer), &lengthTransferred, NULL))
-                ckb_err("Something happened %ld\n", GetLastError());
+                ckb_err("Config Descriptor request failed with %lu\n", GetLastError());
             // Iterate
             DESCRIPTOR_ITERATOR descIterator;
             if (!InitDescriptorIterator(&descIterator, configDescriptorBuffer, lengthTransferred))
-                ckb_err("Something else happened %ld\n", GetLastError());
+                ckb_err("Could not init descriptor iterator %lu\n", GetLastError());
 
             ckb_info("ckb%d is supposed to have %d interfaces\n", index, descIterator.Ptr.Config->bNumInterfaces);
             kb->ifcount = (descIterator.Ptr.Config->bNumInterfaces ? descIterator.Ptr.Config->bNumInterfaces : 2);
@@ -264,16 +291,15 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, ushort vendor, ushort product) {
             kPkt->ValueHi = USB_DESCRIPTOR_TYPE_DEVICE;
             kPkt->Length = (USHORT)sizeof(devDescrBuf);
             if (!kUSB.ControlTransfer(kb->handle[0], Pkt, devDescrBuf, sizeof(devDescrBuf), &lengthTransferred, NULL))
-                ckb_err("Control transfer failed with %ld\n", GetLastError());
+                ckb_err("Control transfer for get bcdDevice failed with %ld\n", GetLastError());
             USB_DEVICE_DESCRIPTOR devDescr;
             memcpy(&devDescr, devDescrBuf, sizeof(devDescr));
             kb->fwversion = devDescr.bcdDevice;
             ckb_info("bcdDevice %x\n", kb->fwversion);
 
             // Get strings (serial/dev name)
-            /*devDescr.iSerialNumber;
-            devDescr.iManufacturer;
-            */
+            // TODO?
+            //devDescr.iManufacturer;
 
             get_UTF8_string_desc(kb->handle[0], devDescr.iSerialNumber, kb->serial, SERIAL_LEN - 1);
             get_UTF8_string_desc(kb->handle[0], devDescr.iProduct, kb->name, KB_NAME_LEN);
@@ -319,9 +345,25 @@ void KUSB_API OnHotPlug(KHOT_HANDLE Handle, KLST_DEVINFO_HANDLE deviceInfo, KLST
     }
 }
 
-void KUSB_API OnPowerBroadcast(KHOT_HANDLE Handle, KLST_DEVINFO_HANDLE deviceInfo, UINT evt)
+void KUSB_API OnPowerBroadcast(KHOT_HANDLE handle, KLST_DEVINFO_HANDLE deviceInfo, UINT evt)
 {
-    ckb_info("Sleep event %u\n", evt);
+    // Only reset once, when we receive an event for interface 0
+    if(deviceInfo->Common.MI == 0)
+    {
+        ckb_info("Sleep event %u received for %s\n", evt, deviceInfo->ClassGUID);
+        if(evt == PBT_APMRESUMEAUTOMATIC)
+        {
+            // Do reset
+            for(int index = 1; index < DEV_MAX; index++){
+                if(kbbusnumber[index] == deviceInfo->BusNumber){
+                    usbdevice* kb = keyboard + index;
+                    printf("Imm ret %d\n", UsbK_ResetDevice(kb->handle));
+                    printf("Reset ret %lu\n", GetLastError());
+#warning "THIS FAILS"
+                }
+            }
+        }
+    }
 }
 
 int usbmain(){

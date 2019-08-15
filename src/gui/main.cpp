@@ -162,6 +162,20 @@ static bool isRunning(const char* command){
     return false;
 }
 
+bool checkIfQtCreator(){
+    QString file = QString("/proc/%1/cmdline").arg(QString::number((long)getppid()));
+
+    QFile f(file);
+    if(!f.open(QFile::ReadOnly | QFile::Text))
+        return false;
+
+    QString contents(f.readAll());
+    if(contents.endsWith("/qtcreator"))
+        return true;
+
+    return false;
+}
+
 int main(int argc, char *argv[]){
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
@@ -274,12 +288,26 @@ int main(int argc, char *argv[]){
 #endif
 
     // Launch in background if requested, or if re-launching a previous session
+    const char* shm_str = "Open";
     if(qApp->isSessionRestored())
-            background = 1;
-    if(isRunning(background ? 0 : "Open")){
+    {
+        background = 1;
+        shm_str = nullptr;
+    }
+    // Check if the parent was Qt Creator.
+    // If so, send a close command, wait, then run.
+    bool QtCreator = checkIfQtCreator();
+    if(QtCreator)
+        shm_str = "Close";
+
+    if(isRunning(shm_str) && !QtCreator){
         printf("ckb-next is already running. Exiting.\n");
         return 0;
     }
+
+    if(QtCreator)
+        QThread::sleep(1);
+
     MainWindow w;
     if(!background)
         w.show();

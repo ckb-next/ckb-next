@@ -153,6 +153,7 @@ if (MACOS OR LINUX)
               mainwindow.cpp
               modeselectdialog.cpp
               mperfwidget.cpp
+              nowheelcombobox.cpp
               rebindwidget.cpp
               rlistwidget.cpp
               settingswidget.cpp
@@ -195,6 +196,7 @@ if (MACOS OR LINUX)
               media.h
               modeselectdialog.h
               mperfwidget.h
+              nowheelcombobox.h
               rebindwidget.h
               rlistwidget.h
               settingswidget.h

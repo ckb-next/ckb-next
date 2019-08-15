@@ -158,12 +158,15 @@
             </widget>
            </item>
            <item row="1" column="4">
-            <widget class="QComboBox" name="winBox">
+            <widget class="NoWheelComboBox" name="winBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
              </property>
             </widget>
            </item>
@@ -178,12 +181,15 @@
             </widget>
            </item>
            <item row="1" column="6">
-            <widget class="QComboBox" name="altBox">
+            <widget class="NoWheelComboBox" name="altBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
              </property>
             </widget>
            </item>
@@ -220,27 +226,37 @@
             </widget>
            </item>
            <item row="0" column="4">
-            <widget class="QComboBox" name="shiftBox">
+            <widget class="NoWheelComboBox" name="shiftBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="QComboBox" name="capsBox">
+            <widget class="NoWheelComboBox" name="capsBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QComboBox" name="ctrlBox"/>
+            <widget class="NoWheelComboBox" name="ctrlBox">
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
+            </widget>
            </item>
            <item row="0" column="1">
             <widget class="QLabel" name="capsLabel">
@@ -547,6 +563,11 @@
    <extends>QWidget</extends>
    <header>extrasettingswidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>NoWheelComboBox</class>
+   <extends>QComboBox</extends>
+   <header>nowheelcombobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

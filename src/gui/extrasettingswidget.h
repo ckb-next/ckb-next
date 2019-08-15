@@ -1,13 +1,13 @@
 #ifndef EXTRASETTINGSWIDGET_H
 #define EXTRASETTINGSWIDGET_H
 
-#include <QDialog>
+#include <QWidget>
 
 namespace Ui {
 class ExtraSettingsWidget;
 }
 
-class ExtraSettingsWidget : public QDialog
+class ExtraSettingsWidget : public QWidget
 {
     Q_OBJECT
 

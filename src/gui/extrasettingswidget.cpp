@@ -8,7 +8,7 @@
 static int lastSharedDimming = -2;
 
 ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::ExtraSettingsWidget)
 {
     ui->setupUi(this);

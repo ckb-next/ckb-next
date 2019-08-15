@@ -365,6 +365,16 @@
           </widget>
          </item>
          <item>
+          <widget class="QCheckBox" name="hiDPIBox">
+           <property name="toolTip">
+            <string>Enable this only if you have a high DPI monitor and the ckb-next window shows up too small.</string>
+           </property>
+           <property name="text">
+            <string>Enable HiDPI Scaling</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2">

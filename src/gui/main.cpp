@@ -179,9 +179,13 @@ bool checkIfQtCreator(){
 int main(int argc, char *argv[]){
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    // Explicitly request high dpi scaling
+    // Explicitly request high dpi scaling if desired
     // Needs to be called before QApplication is constructed
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    {
+        QSettings tmp("ckb-next", "ckb-next");
+        if(tmp.value("Program/HiDPI", false).toBool())
+            QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    }
 #endif
 
     // Setup main application

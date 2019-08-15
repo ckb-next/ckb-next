@@ -46,6 +46,7 @@ private slots:
     void on_autoUpdBox_clicked(bool checked);
     void on_pushButton_2_clicked();
     void on_uninstallButton_clicked();
+    void on_hiDPIBox_clicked(bool checked);
 
 private:
     QProcess* devDetect;

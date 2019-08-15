@@ -23,6 +23,9 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Prepare extra settings
+    extra = ui->extraWidget;
+
 #ifndef Q_OS_MACOS
     ui->uninstallButton->hide();
 #endif
@@ -84,9 +87,6 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
             AutoRun::enable();
         ui->loginItemBox->setChecked(AutoRun::isEnabled());
     }
-
-    // Prepare extra settings
-    extra = new ExtraSettingsWidget(this);
 
 #ifndef OS_MAC_LEGACY
 #ifdef Q_OS_MACOS
@@ -174,10 +174,6 @@ void SettingsWidget::on_loginItemBox_clicked(bool checked){
         AutoRun::enable();
     else
         AutoRun::disable();
-}
-
-void SettingsWidget::on_extraButton_clicked(){
-    extra->exec();
 }
 
 void SettingsWidget::on_aboutQt_clicked(){

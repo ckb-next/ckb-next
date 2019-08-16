@@ -256,7 +256,7 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
         case POLLRATE: {
             uint rate;
-            if(sscanf(word, "%u", &rate) == 1 && (rate == 1 || rate == 2 || rate == 4 || rate == 8))
+            if(HAS_FEATURES(kb, FEAT_ADJRATE) && sscanf(word, "%u", &rate) == 1 && (rate == 1 || rate == 2 || rate == 4 || rate == 8))
                 TRY_WITH_RESET(vt->pollrate(kb, mode, notifynumber, rate, 0));
             continue;
         }

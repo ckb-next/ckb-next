@@ -312,8 +312,10 @@ static void* _setupusb(void* context){
     ushort vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
     kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
-    if(IS_MOUSE(vendor, product)) kb->features |= FEAT_ADJRATE;
-    if(IS_MONOCHROME(vendor, product)) kb->features |= FEAT_MONOCHROME;
+    if(SUPPORTS_ADJRATE(kb))
+        kb->features |= FEAT_ADJRATE;
+    if(IS_MONOCHROME(vendor, product))
+        kb->features |= FEAT_MONOCHROME;
     kb->usbdelay = USB_DELAY_DEFAULT;
 
     /// Allocate memory for the os_usbrecv() buffer

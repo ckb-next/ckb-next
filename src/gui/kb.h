@@ -19,6 +19,7 @@ public:
     bool monochrome;
     ushort productID;
     bool hwload;
+    bool adjrate;
 
     // Keyboard model
     inline KeyMap::Model    model() const                       { return _model; }
@@ -113,6 +114,8 @@ public:
     /// \return The absolute path as String
     ///
     inline QString getMacroPath () { return macroPath; }
+
+    void setPollRate(QString poll);
 
     ~Kb();
 

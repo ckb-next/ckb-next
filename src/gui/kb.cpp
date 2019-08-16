@@ -22,13 +22,13 @@ Kb::Kb(QObject *parent, const QString& path) :
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
-    cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT)
+    cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT), _maxDpi(0)
 {
     memset(iState, 0, sizeof(iState));
     memset(hwLoading, 0, sizeof(hwLoading));
 
     // Get the features, model, serial number, FW version (if available), poll rate (if available), and layout from /dev nodes
-    QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate"), prodpath(path + "/productid"), hwlayoutPath(path + "/layout");
+    QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate"), prodpath(path + "/productid"), hwlayoutPath(path + "/layout"), dpiPath(path + "/dpi");
     if (ftpath.open(QIODevice::ReadOnly)){
         features = ftpath.read(1000);
         features = features.trimmed();
@@ -87,6 +87,13 @@ Kb::Kb(QObject *parent, const QString& path) :
         hwlayout = hwlayout.trimmed();
         hwlayoutPath.close();
     }
+
+    if(dpiPath.open(QIODevice::ReadOnly)){
+        _maxDpi = dpiPath.read(6).trimmed().toUShort();
+        dpiPath.close();
+    }
+    if(!_maxDpi)
+        _maxDpi = 12000;
 
     prefsPath = "Devices/" + usbSerial;
 

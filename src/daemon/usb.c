@@ -51,6 +51,7 @@ ushort models[N_MODELS] = {
     P_SABRE_O2,
     P_HARPOON,
     P_KATAR,
+    P_GLAIVE_PRO,
     // Mousepads
     P_POLARIS,
     // Headset stands
@@ -143,7 +144,7 @@ const char* product_str(ushort product){
         return "scimitar";
     if(product == P_HARPOON)
         return "harpoon";
-    if(product == P_GLAIVE)
+    if(product == P_GLAIVE || product == P_GLAIVE_PRO)
         return "glaive";
     if(product == P_KATAR)
         return "katar";

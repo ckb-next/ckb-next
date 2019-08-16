@@ -257,21 +257,31 @@ static int _mkdevpath(usbdevice* kb){
         _mknotifynode(kb, 0);
 
         // Write the model and serial to files
-        char mpath[sizeof(path) + 6], spath[sizeof(path) + 7], ipath[sizeof(path) + 10], lpath[sizeof(path) + 7];
+        char mpath[sizeof(path) + 6], spath[sizeof(path) + 7], ipath[sizeof(path) + 10], lpath[sizeof(path) + 7], dpath[sizeof(path) + 4];
         snprintf(mpath, sizeof(mpath), "%s/model", path);
         snprintf(spath, sizeof(spath), "%s/serial", path);
         snprintf(ipath, sizeof(ipath), "%s/productid", path);
         snprintf(lpath, sizeof(lpath), "%s/layout", path);
+        snprintf(dpath, sizeof(dpath), "%s/dpi", path);
 
         char productid[5];
         snprintf(productid, 5, "%04x", kb->product);
+
+        char dpistr[6] = ""; // ushort max
+        for(int i = 0; mouse_dpi_list[i].dev; i++){
+            if(mouse_dpi_list[i].dev == kb->product){
+                snprintf(dpistr, 6, "%hu", mouse_dpi_list[i].dpi);
+                break;
+            }
+        }
 
         printnode(mpath, kb->name);
         printnode(spath, kb->serial);
         printnode(ipath, productid);
         printnode(lpath, layoutstr(kb->layout));
+        printnode(dpath, dpistr);
 
-        // Write the keyboard's features
+        // Write the device's features
         char fpath[sizeof(path) + 9];
         snprintf(fpath, sizeof(fpath), "%s/features", path);
         FILE* ffile = fopen(fpath, "w");

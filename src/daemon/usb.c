@@ -9,6 +9,25 @@
 #include "usb.h"
 #include "keymap_patch.h"
 
+// Values taken from the official website
+// Mice not in the list default to 12000 in the GUI
+dpi_list mouse_dpi_list[] = {
+    { P_M65, 8200 },
+    { P_M65_PRO, 12000 },
+    { P_M65_RGB_ELITE, 18000 },
+    { P_M95, 8200 },
+    { P_GLAIVE, 16000 },
+    { P_SABRE_O, 6400 },
+    { P_SABRE_L, 8200 },
+    { P_SABRE_N, 10000 },
+    { P_SCIMITAR, 12000 },
+    { P_SCIMITAR_PRO, 16000 },
+    { P_SABRE_O2, 6400 },
+    { P_HARPOON, 6000 },
+    { P_KATAR, 8000 },
+    { 0, 0 }, // Keep last and do not remove
+};
+
 ushort models[N_MODELS] = {
     // Keyboards
     P_K55,

@@ -3,6 +3,7 @@
 #include "kb.h"
 #include "mainwindow.h"
 #include "ckbsettings.h"
+#include "animdetailsdialog.h"
 
 // KbLight
 static int lastSharedDimming = -2;
@@ -61,7 +62,7 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
     ui->trayBox->setChecked(settings.value("SuppressTrayIcon").toBool());
 
     // Update animation info
-    ui->animPathLabel->setText(AnimScript::path());
+    ui->animPathLabel->setText(AnimScript::paths().join('\n'));
     on_animScanButton_clicked();
 
     /// Read Macro Delay setting, update UI and Kb-internal flag
@@ -161,4 +162,11 @@ void ExtraSettingsWidget::on_startDelayBox_clicked(bool checked){
 void ExtraSettingsWidget::on_previewBox_clicked(bool checked)
 {
     CkbSettings::set("Program/DisablePreviewOnFocusLoss", checked);
+}
+
+void ExtraSettingsWidget::on_detailsBtn_clicked()
+{
+    AnimDetailsDialog* dlg = new AnimDetailsDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+    dlg->exec();
 }

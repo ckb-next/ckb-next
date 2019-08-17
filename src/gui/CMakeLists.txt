@@ -115,6 +115,7 @@ if (MACOS OR LINUX)
         ckb-next
             PRIVATE
               animadddialog.cpp
+              animdetailsdialog.cpp
               animscript.cpp
               animsettingdialog.cpp
               autorun.cpp
@@ -158,6 +159,7 @@ if (MACOS OR LINUX)
               rlistwidget.cpp
               settingswidget.cpp
               animadddialog.h
+              animdetailsdialog.h
               animscript.h
               animsettingdialog.h
               autorun.h
@@ -201,6 +203,7 @@ if (MACOS OR LINUX)
               rlistwidget.h
               settingswidget.h
               animadddialog.ui
+              animdetailsdialog.ui
               animsettingdialog.ui
               ckbupdaterwidget.ui
               extrasettingswidget.ui

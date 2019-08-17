@@ -47,7 +47,7 @@ public:
     };
 
     // Global animation path
-    static QString      path();
+    static QStringList paths();
     // Scan the animation path for scripts
     static void         scan();
     // Loaded script count and alphabetical list
@@ -67,6 +67,7 @@ public:
     inline bool                 hasKeypress() const     { return _info.kpMode != KP_NONE; }
     inline const QStringList&   presets() const         { return _presets; }
     inline const PresetValue&   preset(int index) const { return _presetValues[index]; }
+    inline const QString&       path() const             { return _path; }
 
     // Parameters, in the order they were given
     inline QListIterator<Param> paramIterator() const               { return _info.params; }

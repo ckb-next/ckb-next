@@ -30,6 +30,8 @@ private slots:
     void on_startDelayBox_clicked(bool checked);
     void on_previewBox_clicked(bool checked);
 
+    void on_detailsBtn_clicked();
+
 private:
     Ui::ExtraSettingsWidget *ui;
 };

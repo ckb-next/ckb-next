@@ -6,6 +6,7 @@
 #include <QUrl>
 #include <ckbnextconfig.h>
 #include "animscript.h"
+#include <QStandardPaths>
 
 QHash<QUuid, AnimScript*> AnimScript::scripts;
 
@@ -27,24 +28,47 @@ AnimScript::~AnimScript(){
     }
 }
 
-QString AnimScript::path(){
-    return QString(CKB_NEXT_ANIMATIONS_PATH);
+QStringList AnimScript::paths(){
+    QStringList list(CKB_NEXT_ANIMATIONS_PATH);
+    // Path for when running the GUI from the build dir
+#ifdef Q_OS_LINUX
+    QString appDirPath =  QCoreApplication::applicationDirPath();
+    if(!appDirPath.startsWith("/usr"))
+        list << appDirPath;
+#endif
+    list << QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation).append("/ckb-next/animations"));
+    return list;
 }
 
 void AnimScript::scan(){
-    QDir dir(path());
+    // Clear old animations
     foreach(AnimScript* script, scripts)
         delete script;
     scripts.clear();
-    foreach(QString file, dir.entryList(QDir::Files | QDir::Executable)){
-        AnimScript* script = new AnimScript(qApp, dir.absoluteFilePath(file));
-        if(script->load() && !scripts.contains(script->_info.guid) && script->presets().count()){
-            scripts[script->_info.guid] = script;
+
+    // Search for animations in all directories, in reverse
+    // This is done so that the user animation dir takes priority over the system one
+    for(int i = paths().length() - 1; i >= 0; i--){
+        QDir dir(paths().at(i));
+
+        if(!dir.exists())
             continue;
+
+        foreach(QString file, dir.entryList(QDir::Files | QDir::Executable)){
+#ifdef Q_OS_LINUX
+            // Ignore the GUI and daemon binaries if loading animations from the build dir
+            if(file.endsWith("ckb-next") || file.endsWith("ckb-next-daemon"))
+                continue;
+#endif
+            AnimScript* script = new AnimScript(qApp, dir.absoluteFilePath(file));
+            if(script->load() && !scripts.contains(script->_info.guid) && script->presets().count()){
+                scripts[script->_info.guid] = script;
+                continue;
+            }
+            if(!script->presets().count())
+                qWarning() << script->name() << "has no default preset and will not be loaded.";
+            delete script;
         }
-        if(!script->presets().count())
-            qWarning() << script->name() << "has no default preset and will not be loaded.";
-        delete script;
     }
 }
 

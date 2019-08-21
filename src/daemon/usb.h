@@ -392,4 +392,11 @@ extern void exithandler(int type);
 
 void reactivate_devices();
 
+typedef struct _dpi_list {
+    ushort dev;
+    ushort dpi; // 0 for device-specific way to query (currently unused)
+} dpi_list;
+
+extern dpi_list mouse_dpi_list[];
+
 #endif  // USB_H

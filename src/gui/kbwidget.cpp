@@ -131,6 +131,10 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     }
     else
         device->layout(KeyMap::GB, false);
+
+    // Set max DPI for mice
+    if(device->isMouse())
+        ui->mPerfWidget->setMaxDpi(device->getMaxDpi());
 }
 
 KbWidget::~KbWidget(){

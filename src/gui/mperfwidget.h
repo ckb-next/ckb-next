@@ -27,10 +27,8 @@ public:
     void setPerf(KbPerf* newPerf, KbProfile* newProfile);
 
     static const int DPI_COUNT = KbPerf::DPI_COUNT;
-    static const int DPI_MIN = KbPerf::DPI_MIN, DPI_MAX = KbPerf::DPI_MAX;
     void setLegacyM95();
-
-
+    void setMaxDpi(ushort dpi);
 private:
     Ui::MPerfWidget *ui;
 

@@ -19,10 +19,40 @@ KbFirmware::KbFirmware() :
     // https://lostdomain.org/2017/06/17/qt-qnetworkaccessmanager-causing-latency-spikes-on-wifi/
     qputenv("QT_BEARER_POLL_TIMEOUT", QByteArray::number(-1));
     networkManager = new QNetworkAccessManager();
+    // Try to find GPG. gpg2 first
+    _gpg = new QProcess();
+    _gpg->setProgram("gpg2");
+    _gpg->setArguments(QStringList("--version"));
+    _gpg->start();
+    _gpg->waitForFinished();
+    if(_gpg->error() == QProcess::FailedToStart){
+        // Try gpg now
+        _gpg->setProgram("gpg");
+        _gpg->start();
+        _gpg->waitForFinished();
+        if(_gpg->error() == QProcess::FailedToStart){
+            hasGPG = NO;
+            qDebug() << "No GPG2 or GPG detected. Signature verification disabled.";
+        }
+    }
+
+    // If set to NO it means there was no binary found
+    // So don't bother checking capabilities
+    if(hasGPG == UNKNOWN){
+        QString output = QString::fromUtf8(_gpg->readAll());
+        // Must support RSA keys and SHA256
+        if(output.contains("RSA", Qt::CaseInsensitive) && output.contains("SHA256", Qt::CaseInsensitive)){
+            hasGPG = YES;
+        } else {
+            hasGPG = NO;
+            qDebug() << _gpg->program() << "does not support RSA and SHA256. Signature verification disabled.";
+        }
+    }
 }
 
 KbFirmware::~KbFirmware(){
     networkManager->deleteLater();
+    _gpg->deleteLater();
 }
 
 bool KbFirmware::_checkUpdates(){
@@ -46,27 +76,9 @@ void KbFirmware::processDownload(QNetworkReply* reply){
     if(hash == fwTableHash)
         return;
     fwTableHash = hash;
-    if(hasGPG == UNKNOWN){
-        // Check for a GPG installation
-        QProcess gpg;
-        gpg.start("gpg", QStringList("--version"));
-        gpg.waitForFinished();
-        if(gpg.error() == QProcess::FailedToStart)
-            // No GPG install
-            hasGPG = NO;
-        else {
-            QString output = QString::fromUtf8(gpg.readAll());
-            // Must support RSA keys and SHA256
-            if(output.contains("RSA", Qt::CaseInsensitive) && output.contains("SHA256", Qt::CaseInsensitive))
-                hasGPG = YES;
-            else
-                hasGPG = NO;
-        }
-        if(!hasGPG)
-            qDebug() << "No GPG detected, signature verification disabled";
-    }
+
+    // If GPG is available, check the signature on the file before proceeding.
     if(hasGPG){
-        // If GPG is available, check the signature on the file before proceeding.
         QDir tmp = QDir::temp();
         // Save file to a temporary path. Include PID to avoid conflicts
         qint64 pid = QCoreApplication::applicationPid();
@@ -86,16 +98,16 @@ void KbFirmware::processDownload(QNetworkReply* reply){
             return;
         }
         // Check signature
-        QProcess gpg;
-        gpg.start("gpg", QStringList("--no-default-keyring") << "--keyring" << keyPath << "--verify" << fwPath);
-        gpg.waitForFinished();
+        _gpg->setArguments(QStringList("--no-default-keyring") << "--keyring" << keyPath << "--verify" << fwPath);
+        _gpg->start();
+        _gpg->waitForFinished();
         // Clean up temp files
         tmp.remove(fwPath);
         tmp.remove(keyPath);
-        if(gpg.error() != QProcess::UnknownError || gpg.exitCode() != 0){
+        if(_gpg->error() != QProcess::UnknownError || _gpg->exitCode() != 0){
             qDebug() << "GPG couldn't verify firmware signature:";
-            qDebug() << gpg.readAllStandardOutput();
-            qDebug() << gpg.readAllStandardError();
+            qDebug() << _gpg->readAllStandardOutput();
+            qDebug() << _gpg->readAllStandardError();
             return;
         }
         // Signature good, proceed to update database

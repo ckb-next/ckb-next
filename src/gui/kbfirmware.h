@@ -57,6 +57,8 @@ private:
     QByteArray          _fileForBoard(const ushort productID);
     static KbFirmware   instance;
 
+    QProcess*    _gpg;
+
 signals:
     void downloaded();
 

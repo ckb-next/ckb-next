@@ -17,7 +17,7 @@ int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
 bool Kb::_dither = false, Kb::_mouseAccel = true, Kb::_delay = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
-    QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false),
+    QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
     devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
@@ -80,6 +80,8 @@ Kb::Kb(QObject *parent, const QString& path) :
         pollrate = ppath.read(100);
         pollrate = pollrate.trimmed();
         ppath.close();
+        if(features.contains("adjrate"))
+            adjrate = true;
     }
 
     if(hwlayoutPath.open(QIODevice::ReadOnly)){
@@ -833,4 +835,9 @@ void Kb::macroDelay(bool flag) {
 
 KeyMap::Layout Kb::getCurrentLayout(){
     return _layout;
+}
+
+void Kb::setPollRate(QString poll)
+{
+    cmd.write(QString("\npollrate %1\n").arg(poll).toLatin1());
 }

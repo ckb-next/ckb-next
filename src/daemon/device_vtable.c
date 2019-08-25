@@ -53,7 +53,7 @@ const devcmd vtable_keyboard = {
     .hwload = cmd_hwload_kb,
     .hwsave = cmd_hwsave_kb,
     .fwupdate = cmd_fwupdate,
-    .pollrate = cmd_io_none,
+    .pollrate = cmd_pollrate,
 
     .active = cmd_active_kb,
     .idle = cmd_idle_kb,

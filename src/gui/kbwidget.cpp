@@ -57,7 +57,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
 
     // Hide poll rate and FW update as appropriate
     if(!device->features.contains("pollrate")){
-        ui->pollLabel->hide();
+        ui->pollRateBox->hide();
         ui->pollLabel2->hide();
     }
     if(!device->features.contains("fwupdate")){
@@ -135,6 +135,11 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     // Set max DPI for mice
     if(device->isMouse())
         ui->mPerfWidget->setMaxDpi(device->getMaxDpi());
+
+    if(!device->adjrate){
+        ui->pollRateBox->setEnabled(false);
+        ui->pollRateBox->setToolTip(tr("This device does not support setting the poll rate through software."));
+    }
 }
 
 KbWidget::~KbWidget(){
@@ -379,12 +384,29 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     }
 }
 
+inline int KbWidget::getPollRateBoxIdx(QString poll){
+    switch(poll.leftRef(1).toInt()){
+        case 1:
+            return 0;
+        case 2:
+            return 1;
+        case 4:
+            return 2;
+        default: // Includes case 8
+            return 3;
+    }
+}
+
 void KbWidget::devUpdate(){
     // Update device tab
     ui->devLabel->setText(device->usbModel);
     ui->serialLabel->setText(device->usbSerial);
     ui->fwLabel->setText(device->firmware);
-    ui->pollLabel->setText(device->pollrate);
+    // This is needed so that the currentIndexChanged event doesn't fire
+    // If it does, we'll end up with an always greyed out box when pollrate != 1
+    bool block = ui->pollRateBox->blockSignals(true);
+    ui->pollRateBox->setCurrentIndex(getPollRateBoxIdx(device->pollrate));
+    ui->pollRateBox->blockSignals(block);
 }
 
 void KbWidget::modeUpdate(){
@@ -509,4 +531,10 @@ void KbWidget::switchToMode(QString mode){
         ui->modesList->setCurrentRow(i);
         return;
     }
+}
+
+void KbWidget::on_pollRateBox_currentIndexChanged(const QString &arg1)
+{
+    ui->pollRateBox->setEnabled(false);
+    device->setPollRate(arg1.left(1));
 }

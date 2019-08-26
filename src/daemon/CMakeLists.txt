@@ -256,7 +256,7 @@ elseif (LINUX)
         OUTPUT_VARIABLE initctl_output
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    if ("${initctl_output}" MATCHES "upstart")
+    if ("${initctl_output}" MATCHES "upstart" OR "upstart" IN_LIST FORCE_INIT_SYSTEM)
         message(STATUS "upstart detected")
         set(CKB_NEXT_INIT_SYSTEM "upstart" CACHE INTERNAL "")
         set(DISALLOW_SYSVINIT TRUE)
@@ -294,7 +294,7 @@ elseif (LINUX)
     endif ()
 
     # A way to check for systemd
-    if (EXISTS "/run/systemd/system")
+    if (EXISTS "/run/systemd/system" OR "systemd" IN_LIST FORCE_INIT_SYSTEM)
         message(STATUS "systemd detected")
         set(CKB_NEXT_INIT_SYSTEM "systemd" CACHE INTERNAL "")
         set(DISALLOW_SYSVINIT TRUE)
@@ -330,7 +330,7 @@ elseif (LINUX)
     endif ()
 
     # A way to check for OpenRC
-    if (EXISTS "/run/openrc/softlevel")
+    if (EXISTS "/run/openrc/softlevel" OR "openrc" IN_LIST FORCE_INIT_SYSTEM)
         message(STATUS "OpenRC detected")
         set(CKB_NEXT_INIT_SYSTEM "OpenRC" CACHE INTERNAL "")
         set(DISALLOW_SYSVINIT TRUE)
@@ -376,7 +376,7 @@ elseif (LINUX)
 
     # A way to check for SysVinit
     # Fall back to this only if any of the above haven't been found
-    if (EXISTS "/etc/inittab" AND EXISTS "/lib/lsb/init-functions" AND NOT DISALLOW_SYSVINIT)
+    if ((EXISTS "/etc/inittab" AND EXISTS "/lib/lsb/init-functions" AND NOT DISALLOW_SYSVINIT) OR "sysvinit" IN_LIST FORCE_INIT_SYSTEM)
         message(STATUS "SysVinit detected")
         set(CKB_NEXT_INIT_SYSTEM "SysVinit" CACHE INTERNAL "")
 

@@ -1,5 +1,36 @@
 # Change Log
 
+## [v0.4.1](https://github.com/ckb-next/ckb-next/tree/v0.4.1) (2019-08-27)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.0...v0.4.1)
+
+Important bugfixes:
+
+- Specified keyboard layout is no longer being reverted on restart
+- Pipe animation no longer quits if it can't read data
+- Media keys work again on the legacy K65
+- Daemon no longer crashes on quit on macOS
+- Devices are now re-activated after resume on Linux
+- Gradient animation no longer flickers with dithering enabled
+- HiDPI has been disabled by default due to screen resolution misdetection
+- Max DPI is now per-device
+- Extra words are now filtered from the device name
+- gpg2 is preferred over gpg for signature verification
+
+New features:
+
+- An uninstall button has been added for macOS users that allows complete uninstallation, including older versions
+- Life animation has a new transparent preset
+- Confirmation dialog boxes have been added when deleting profiles, modes, and animations
+- Animation preview now gets temporarily disabled while ckb-next is out of focus
+- Support for multiple animation paths has been added
+- Pollrate can now be changed through the GUI
+
+Notes for packagers:
+
+- Udev rules are now installed by default in /lib/udev/rules.d.
+- Udev rule installation path can be changed with UDEV_RULE_DIRECTORY in cmake
+- Init systems can manually be force-enabled with FORCE_INIT_SYSTEM in cmake
+
 ## [v0.4.0](https://github.com/ckb-next/ckb-next/tree/v0.4.0) (2019-03-09)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.3.2...v0.4.0)
 

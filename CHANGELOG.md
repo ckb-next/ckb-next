@@ -3,6 +3,9 @@
 ## [v0.4.1](https://github.com/ckb-next/ckb-next/tree/v0.4.1) (2019-08-27)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.0...v0.4.1)
 
+NOTICE FOR MAC USERS: Due to an unfortunate event, the macOS updates for 0.4.1 have been temporarily removed.
+This message will be removed once the issue has been corrected.
+
 Important bugfixes:
 
 - Specified keyboard layout is no longer being reverted on restart

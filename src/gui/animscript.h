@@ -147,7 +147,7 @@ private:
     // Helper functions
     void setDuration();
     void printParams();
-    void begin(quint64 timestamp);
+    int begin(quint64 timestamp);
     void advance(quint64 timestamp);
 
     // Global script list

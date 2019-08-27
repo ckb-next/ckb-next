@@ -308,9 +308,9 @@ void AnimScript::printParams(){
     process->write("end params\n");
 }
 
-void AnimScript::begin(quint64 timestamp){
+int AnimScript::begin(quint64 timestamp){
     if(!initialized)
-        return;
+        return 1;
     end();
     stopped = firstFrame = readFrame = readAnyFrame = inFrame = false;
     // Determine the upper left corner of the given keys
@@ -331,7 +331,7 @@ void AnimScript::begin(quint64 timestamp){
     if(keysCopy.isEmpty()){
         // If the key list is empty, don't actually start the animation but pretend it's running anyway
         firstFrame = readFrame = readAnyFrame = true;
-        return;
+        return 1;
     }
     process = new QProcess(this);
     process->setReadChannel(QProcess::StandardOutput);
@@ -352,6 +352,7 @@ void AnimScript::begin(quint64 timestamp){
     // Begin animating
     process->write("begin run\n");
     lastFrame = timestamp;
+    return 0;
 }
 
 void AnimScript::retrigger(quint64 timestamp, bool allowPreempt){
@@ -360,28 +361,26 @@ void AnimScript::retrigger(quint64 timestamp, bool allowPreempt){
     if(allowPreempt && _info.preempt && repeatMsec > 0)
         // If preemption is wanted, trigger the animation 1 duration in the past first
         retrigger(timestamp - repeatMsec);
-    if(!process)
-        begin(timestamp);
+    if(!process && begin(timestamp))
+        return;
     advance(timestamp);
-    if(process)
-        process->write("start\n");
+    process->write("start\n");
 }
 
 void AnimScript::stop(quint64 timestamp){
     if(!initialized)
         return;
-    if(!process)
-        begin(timestamp);
+    if(!process && begin(timestamp))
+        return;
     advance(timestamp);
-    if(process)
-        process->write("stop\n");
+    process->write("stop\n");
 }
 
 void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
     if(!initialized)
         return;
-    if(!process)
-        begin(timestamp);
+    if(!process && begin(timestamp))
+        return;
     int kpMode = _info.kpMode;
     if(_paramValues.value("kpmode", 0).toInt() != 0)
         // Disable KP mode according to user preferences
@@ -474,17 +473,20 @@ void AnimScript::frame(quint64 timestamp){
     if(!process)
         begin(timestamp);
 
-    advance(timestamp);
-    if((readFrame || !firstFrame) && process)
+    if(process){
+        advance(timestamp);
+
         // Don't ask for a new frame if the animation hasn't delivered the last one yet
-        process->write("frame\n");
+        if(readFrame || !firstFrame)
+            process->write("frame\n");
+    }
     firstFrame = true;
     readFrame = false;
 }
 
 void AnimScript::advance(quint64 timestamp){
-    if(timestamp <= lastFrame || !process)
-        // Don't do anything if the time hasn't actually advanced.
+    // Don't do anything if the time hasn't actually advanced.
+    if(timestamp <= lastFrame)
         return;
     double delta = (timestamp - lastFrame) / (double)durationMsec;
     if(!_info.absoluteTime){

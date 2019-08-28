@@ -878,6 +878,13 @@ void reactivate_devices()
             kb = keyboard + i;
             // If the device was active, mark it as disabled and re-enable it
             pthread_mutex_lock(dmutex(kb));
+#ifdef OS_LINUX
+            for(int i = 0; i < kb->epcount; i++){
+                if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {
+                    ckb_err("Failed to claim interface %d: %s\n", i, strerror(errno));
+                }
+            }
+#endif
             if(kb->active){
                 kb->active = 0;
                 const devcmd* vt = kb->vtable;

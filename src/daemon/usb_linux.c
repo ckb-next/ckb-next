@@ -709,18 +709,24 @@ pthread_t usbthread, udevthread;
 /// call usbadd() with the model number.
 static int usb_add_device(struct udev_device* dev){
     const char* vendor = udev_device_get_sysattr_value(dev, "idVendor");
-    if(vendor && !strcmp(vendor, V_CORSAIR_STR)){
-        const char* product = udev_device_get_sysattr_value(dev, "idProduct");
-        if(product){
-            ushort pid;
-            if(sscanf(product, "%04hx", &pid) && pid){
-                for(size_t c = 0; c < N_MODELS; c++){
-                    if(models[c] == pid)
-                        return usbadd(dev, V_CORSAIR, models[c]);
-                }
-            }
-        }
+    const char* product = udev_device_get_sysattr_value(dev, "idProduct");
+    if(vendor == NULL || product == NULL)
+        return 1;
+
+    ushort pid, vid;
+    pid = vid = 0;
+
+    if(!(sscanf(vendor, "%04hx", &vid) == 1 && vid))
+        return 1;
+
+    if(!(sscanf(product, "%04hx", &pid) == 1 && pid))
+        return 1;
+
+    for(size_t c = 0; c < N_MODELS; c++){
+        if(models[c].idVendor == vid && models[c].idProduct == pid)
+            return usbadd(dev, models[c].idVendor, models[c].idProduct);
     }
+
     return 1;
 }
 
@@ -764,7 +770,6 @@ static void usb_rm_device(struct udev_device* dev){
 static void udev_enum(){
     struct udev_enumerate* enumerator = udev_enumerate_new(udev);
     udev_enumerate_add_match_subsystem(enumerator, "usb");
-    udev_enumerate_add_match_sysattr(enumerator, "idVendor", V_CORSAIR_STR);
     udev_enumerate_scan_devices(enumerator);
     struct udev_list_entry* devices, *dev_list_entry;
     devices = udev_enumerate_get_list_entry(enumerator);

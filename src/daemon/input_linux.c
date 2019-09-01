@@ -180,7 +180,7 @@ void os_mousemove(usbdevice* kb, int x, int y){
      if(write(fd, &event, sizeof(event)) <= 0)
          ckb_warn("uinput write failed: %s\n", strerror(errno));
     //send SYN
-     isync_mouse(fd);
+     isync(fd);
 }
 
 void* _ledthread(void* ctx){

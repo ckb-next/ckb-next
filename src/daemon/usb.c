@@ -81,6 +81,8 @@ device_desc models[] = {
     { V_CORSAIR, P_IRONCLAW, },
     { V_CORSAIR, P_DARK_CORE, },
     { V_CORSAIR, P_DARK_CORE_SE, },
+    { V_CORSAIR, P_DARK_CORE_WL, },
+    { V_CORSAIR, P_DARK_CORE_SE_WL, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     // Headset stands

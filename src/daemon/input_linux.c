@@ -170,17 +170,21 @@ void os_mousemove(usbdevice* kb, int x, int y){
     event.type = EV_REL;
     int fd=kb->uinput_mouse - 1;
     //send X
-     event.code = REL_X;
-     event.value = x;
-     if(write(fd, &event, sizeof(event)) <= 0)
-         ckb_warn("uinput write failed: %s\n", strerror(errno));
+    if(x!=0){
+        event.code = REL_X;
+        event.value = x;
+        if(write(fd, &event, sizeof(event)) <= 0)
+            ckb_warn("uinput write failed: %s\n", strerror(errno));
+    }
     //send Y
-     event.code = REL_Y;
-     event.value = y;
-     if(write(fd, &event, sizeof(event)) <= 0)
-         ckb_warn("uinput write failed: %s\n", strerror(errno));
+    if(y!=0){
+        event.code = REL_Y;
+        event.value = y;
+        if(write(fd, &event, sizeof(event)) <= 0)
+            ckb_warn("uinput write failed: %s\n", strerror(errno));
+    }
     //send SYN
-     isync(fd);
+    isync(fd);
 }
 
 void* _ledthread(void* ctx){

@@ -91,3 +91,9 @@ set_target_properties(
         PROPERTIES
           CXX_STANDARD 11)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(
+        quazip
+            PRIVATE
+              "-DQT_DEPRECATED_WARNINGS")
+endif ()

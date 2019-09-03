@@ -446,6 +446,13 @@ target_compile_options(
           "${Appindicator_DEFINITIONS}"
           "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(
+        ckb-next
+            PRIVATE
+              "-DQT_DEPRECATED_WARNINGS")
+endif ()
+
 # Add sanitizers after all target information is known
 add_sanitizers(ckb-next)
 

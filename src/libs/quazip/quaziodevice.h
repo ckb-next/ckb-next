@@ -39,6 +39,7 @@ class QuaZIODevicePrivate;
   example.
   */
 class QUAZIP_EXPORT QuaZIODevice: public QIODevice {
+  friend class QuaZIODevicePrivate;
   Q_OBJECT
 public:
   /// Constructor.

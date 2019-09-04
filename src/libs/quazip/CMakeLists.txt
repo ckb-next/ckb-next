@@ -59,7 +59,6 @@ target_sources(
           quazipfileinfo.cpp
           quazipnewinfo.cpp
           JlCompress.h
-          crypt.h
           ioapi.h
           quaadler32.h
           quachecksum32.h

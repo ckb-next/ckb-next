@@ -121,7 +121,7 @@ void QuaZipNewInfo::setFilePermissions(const QString &file)
 
 void QuaZipNewInfo::setPermissions(QFile::Permissions permissions)
 {
-    QuaZipNewInfo_setPermissions(this, permissions, name.endsWith('/'));
+    QuaZipNewInfo_setPermissions(this, permissions, name.endsWith(QLatin1String("/")));
 }
 
 void QuaZipNewInfo::setFileNTFSTimes(const QString &fileName)
@@ -134,7 +134,11 @@ void QuaZipNewInfo::setFileNTFSTimes(const QString &fileName)
     }
     setFileNTFSmTime(fi.lastModified());
     setFileNTFSaTime(fi.lastRead());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+    setFileNTFScTime(fi.birthTime());
+#else
     setFileNTFScTime(fi.created());
+#endif
 }
 
 static void setNTFSTime(QByteArray &extra, const QDateTime &time, int position,

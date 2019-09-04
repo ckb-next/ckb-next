@@ -227,6 +227,14 @@ class QUAZIP_EXPORT QuaZip {
      * Equivalent to calling setFileNameCodec(QTextCodec::codecForName(codecName));
      **/
     void setFileNameCodec(const char *fileNameCodecName);
+    /// Sets the OS code (highest 8 bits of the “version made by” field) for new files.
+    /** There is currently no way to specify this for each file individually,
+        except by calling this function before opening each file. If this function is not called,
+        then the default OS code will be used. The default code is set by calling
+        setDefaultOsCode(). The default value at the moment of QuaZip creation will be used. */
+    void setOsCode(uint osCode);
+    /// Returns the OS code for new files.
+    uint getOsCode() const;
     /// Returns the codec used to encode/decode comments inside archive.
     QTextCodec* getFileNameCodec() const;
     /// Sets the codec used to encode/decode comments inside archive.
@@ -502,6 +510,28 @@ class QUAZIP_EXPORT QuaZip {
      * \sa setZip64Enabled()
      */
     bool isZip64Enabled() const;
+    /// Enables the use of UTF-8 encoding for file names and comments text.
+    /**
+     * @param utf8 If \c true, the UTF-8 mode is enabled, disabled otherwise.
+     *
+     * Once this is enabled, the names of all new files and comments text (until
+     * the mode is disabled again) will be encoded in UTF-8 encoding, and the
+     * version to extract will be set to 6.3 (63) in ZIP header. By default,
+     * the UTF-8 mode is off due to compatibility reasons.
+     *
+     * Note that when extracting ZIP archives, the UTF-8 mode is determined from
+     * ZIP file header, not from this flag.
+     *
+     * \sa isUtf8Enabled()
+     */
+    void setUtf8Enabled(bool utf8);
+    /// Returns whether the UTF-8 encoding mode is enabled.
+    /**
+     * @return \c true if and only if the UTF-8 mode is enabled.
+     *
+     * \sa setUtf8Enabled()
+     */
+    bool isUtf8Enabled() const;
     /// Returns the auto-close flag.
     /**
       @sa setAutoClose()
@@ -563,9 +593,19 @@ class QUAZIP_EXPORT QuaZip {
     /**
      * @overload
      * Equivalent to calling
-     * setDefltFileNameCodec(QTextCodec::codecForName(codecName)).
+     * setDefaultFileNameCodec(QTextCodec::codecForName(codecName)).
      */
     static void setDefaultFileNameCodec(const char *codecName);
+    /// Sets default OS code.
+    /**
+     * @sa setOsCode()
+     */
+    static void setDefaultOsCode(uint osCode);
+    /// Returns default OS code.
+    /**
+     * @sa getOsCode()
+     */
+    static uint getDefaultOsCode();
 };
 
 #endif

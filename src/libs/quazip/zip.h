@@ -53,7 +53,7 @@ extern "C" {
 //#define HAVE_BZIP2
 
 #ifndef _ZLIB_H
-#include "zlib.h"
+#include <zlib.h>
 #endif
 
 #ifndef _ZLIBIOAPI_H
@@ -85,6 +85,7 @@ typedef voidp zipFile;
 #define ZIP_WRITE_DATA_DESCRIPTOR 0x8u
 #define ZIP_AUTO_CLOSE 0x1u
 #define ZIP_SEQUENTIAL 0x2u
+#define ZIP_ENCODING_UTF8 0x0800u
 #define ZIP_DEFAULT_FLAGS (ZIP_AUTO_CLOSE | ZIP_WRITE_DATA_DESCRIPTOR)
 
 #ifndef DEF_MEM_LEVEL

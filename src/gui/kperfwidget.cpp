@@ -35,23 +35,27 @@ KPerfWidget::KPerfWidget(QWidget *parent) :
         }
         // Map signals
         if(indicators[i].enable){
-            connect(indicators[i].enable, SIGNAL(clicked(bool)), &updateMapper, SLOT(map()));
-            updateMapper.setMapping(indicators[i].enable, i);
+            connect(indicators[i].enable, &QCheckBox::clicked, [=] () {
+                emit uiUpdated(i);
+            });
         }
         if(indicators[i].hwEnable){
-            connect(indicators[i].hwEnable, SIGNAL(activated(int)), &updateMapper, SLOT(map()));
-            updateMapper.setMapping(indicators[i].hwEnable, i);
+            connect(indicators[i].hwEnable, QOverload<int>::of(&QComboBox::activated), [=] () {
+                emit uiUpdated(i);
+            });
         }
-        connect(indicators[i].color1, SIGNAL(colorChanged(QColor)), &updateMapper, SLOT(map()));
-        updateMapper.setMapping(indicators[i].color1, i);
-        connect(indicators[i].color2, SIGNAL(colorChanged(QColor)), &updateMapper, SLOT(map()));
-        updateMapper.setMapping(indicators[i].color2, i);
+        connect(indicators[i].color1, &ColorButton::colorChanged, [=] () {
+            emit uiUpdated(i);
+        });
+        connect(indicators[i].color2, &ColorButton::colorChanged, [=] () {
+            emit uiUpdated(i);
+        });
         if(indicators[i].color3){
-            connect(indicators[i].color3, SIGNAL(colorChanged(QColor)), &updateMapper, SLOT(map()));
-            updateMapper.setMapping(indicators[i].color3, i);
+            connect(indicators[i].color3, &ColorButton::colorChanged, [=] () {
+                emit uiUpdated(i);
+            });
         }
     }
-    connect(&updateMapper, SIGNAL(mapped(int)), this, SLOT(uiUpdated(int)));
     k95Widgets << ui->modeBox << ui->modeColorOn << ui->modeColorOff << ui->macroBox << ui->macroColorOn << ui->macroColorOff << ui->k95Label1 << ui->k95Label2 << ui->k95Label3 << ui->k95Label4 << ui->k95Label5 << ui->k95Label6 << ui->k95Line << ui->k95Spacer;
 }
 

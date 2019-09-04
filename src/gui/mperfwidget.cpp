@@ -32,37 +32,33 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
         stages[i].indicator->bigIcons(true);
         stages[i].indicator->allowAlpha(true);
         // Map signals
-        connect(stages[i].indicator, SIGNAL(clicked(bool)), &buttonMapper1, SLOT(map()));
-        connect(stages[i].indicator, SIGNAL(colorChanged(QColor)), &buttonMapper2, SLOT(map()));
-        connect(stages[i].xSlider, SIGNAL(valueChanged(int)), &sliderXMapper, SLOT(map()));
-        connect(stages[i].ySlider, SIGNAL(valueChanged(int)), &sliderYMapper, SLOT(map()));
-        connect(stages[i].xBox, SIGNAL(valueChanged(int)), &boxXMapper, SLOT(map()));
-        connect(stages[i].yBox, SIGNAL(valueChanged(int)), &boxYMapper, SLOT(map()));
+        connect(stages[i].indicator, &ColorButton::clicked, [=] (){
+            emit colorClicked(i);
+        });
+        connect(stages[i].indicator, &ColorButton::colorChanged, [=] () {
+            emit colorChanged(i);
+        });
+        connect(stages[i].xSlider, &QSlider::valueChanged, [=] () {
+            emit sliderXMoved(i);
+        });
+        connect(stages[i].ySlider, &QSlider::valueChanged, [=] () {
+            emit sliderYMoved(i);
+        });
+        connect(stages[i].xBox, QOverload<int>::of(&QSpinBox::valueChanged), [=] () {
+            emit boxXChanged(i);
+        });
+        connect(stages[i].yBox, QOverload<int>::of(&QSpinBox::valueChanged), [=] () {
+            emit boxYChanged(i);
+        });
         if(stages[i].enableCheck)
             // Sniper has no enable
-            connect(stages[i].enableCheck, SIGNAL(stateChanged(int)), &enableMapper, SLOT(map()));
-        // Set names
-        buttonMapper1.setMapping(stages[i].indicator, i);
-        buttonMapper2.setMapping(stages[i].indicator, i);
-        sliderXMapper.setMapping(stages[i].xSlider, i);
-        sliderYMapper.setMapping(stages[i].ySlider, i);
-        boxXMapper.setMapping(stages[i].xBox, i);
-        boxYMapper.setMapping(stages[i].yBox, i);
-        if(stages[i].enableCheck)
-            enableMapper.setMapping(stages[i].enableCheck, i);
+            connect(stages[i].enableCheck, &QCheckBox::stateChanged, [=] () {
+                emit enableChanged(i);
+            });
         // Hide indicator arrows
         stages[i].indicatorLabel->setVisible(false);
     }
     ui->iLabelO->setVisible(false);
-
-    // Connect to slots
-    connect(&buttonMapper1, SIGNAL(mapped(int)), this, SLOT(colorClicked(int)));
-    connect(&buttonMapper2, SIGNAL(mapped(int)), this, SLOT(colorChanged(int)));
-    connect(&sliderXMapper, SIGNAL(mapped(int)), this, SLOT(sliderXMoved(int)));
-    connect(&sliderYMapper, SIGNAL(mapped(int)), this, SLOT(sliderYMoved(int)));
-    connect(&boxXMapper, SIGNAL(mapped(int)), this, SLOT(boxXChanged(int)));
-    connect(&boxYMapper, SIGNAL(mapped(int)), this, SLOT(boxYChanged(int)));
-    connect(&enableMapper, SIGNAL(mapped(int)), this, SLOT(enableChanged(int)));
 }
 
 MPerfWidget::~MPerfWidget(){

@@ -4,9 +4,9 @@
 #include <QCheckBox>
 #include <QDialog>
 #include <QFrame>
-#include <QSignalMapper>
 #include <QSpinBox>
 #include "kbanim.h"
+#include <QComboBox>
 
 namespace Ui {
 class AnimSettingDialog;
@@ -32,10 +32,8 @@ private:
     KbAnim* _anim;
     double  lastDuration;
     QMap<QString, QWidget*> settingWidgets;
-    QSignalMapper           updateMapper;
 
     QMap<QString, QSpinBox*>    angleSpinners;
-    QSignalMapper               angleDialMapper, angleSpinnerMapper;
 
     QFrame* hLine();
 

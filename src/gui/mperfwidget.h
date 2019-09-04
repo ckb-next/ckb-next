@@ -6,7 +6,6 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QRadioButton>
-#include <QSignalMapper>
 #include <QLabel>
 #include "kbperf.h"
 #include "kbprofile.h"
@@ -45,11 +44,6 @@ private:
     DpiUi stages[DPI_COUNT];
     bool _xyLink;
     bool colorLink;
-
-    QSignalMapper buttonMapper1, buttonMapper2;
-    QSignalMapper sliderXMapper, sliderYMapper;
-    QSignalMapper boxXMapper, boxYMapper;
-    QSignalMapper enableMapper;
 
     // Hack: prevent recursive slot calls
     bool isSetting;

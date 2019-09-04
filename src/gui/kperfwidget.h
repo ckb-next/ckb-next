@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QSignalMapper>
 #include "kbperf.h"
 #include "kbprofile.h"
 #include "colorbutton.h"
@@ -58,8 +57,6 @@ private:
     };
     IndicatorUi indicators[I_COUNT];
     QList<QWidget*> k95Widgets;
-
-    QSignalMapper updateMapper;
 
 private slots:
     void uiUpdated(int index);

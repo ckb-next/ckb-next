@@ -1478,9 +1478,6 @@
              <property name="plainText">
               <string/>
              </property>
-             <property name="tabStopWidth">
-              <number>1</number>
-             </property>
             </widget>
            </item>
            <item>

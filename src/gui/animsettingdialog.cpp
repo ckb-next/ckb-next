@@ -7,6 +7,7 @@
 #include "ui_animsettingdialog.h"
 #include "colorbutton.h"
 #include "gradientbutton.h"
+#include "qoverloadlegacy.h"
 
 // QDial shows angles upside down (180° = top, 0° = bottom), so flip it
 static inline int angleFlip(int angle){
@@ -70,7 +71,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 ((QSpinBox*)widget)->setSuffix(postfix);
                 postfix = "";
             }
-            connect((QSpinBox*)widget, QOverload<int>::of(&QSpinBox::valueChanged), [=] () {
+            connect((QSpinBox*)widget, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
                 emit updateParam(param.name);
             });
             break;
@@ -84,7 +85,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 ((QDoubleSpinBox*)widget)->setSuffix(postfix);
                 postfix = "";
             }
-            connect((QDoubleSpinBox*)widget, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=] () {
+            connect((QDoubleSpinBox*)widget, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
                 emit updateParam(param.name);
             });
             break;
@@ -181,7 +182,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 spinner->setSuffix("°");
                 spinner->setValue(value.toInt());
                 angleSpinners[param.name] = spinner;
-                connect(spinner, QOverload<int>::of(&QSpinBox::valueChanged), [=] () {
+                connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
                     emit angleSpinnerChanged(param.name);
                 });
                 ui->settingsGrid->addWidget(spinner, row, 4);
@@ -250,7 +251,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     combo->setCurrentIndex(selected);
     ui->settingsGrid->addWidget(combo, row, 5, 1, 2);
     settingWidgets["kpmode"] = combo;
-    connect(combo, QOverload<int>::of(&QComboBox::activated), [=] () {
+    connect(combo, OVERLOAD_PTR(int, QComboBox, activated), [=] () {
         emit updateParam("kpmode");
     });
     row++;
@@ -287,7 +288,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         spinner->setMaximum(1000000);
         spinner->setValue(anim->parameter("stop").toInt());
         settingWidgets["stop"] = spinner;
-        connect(spinner, QOverload<int>::of(&QSpinBox::valueChanged), [=] () {
+        connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
             emit updateParam("stop");
         });
         ui->timeGrid->addWidget(spinner, 4, 3);
@@ -299,7 +300,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         spinner->setMaximum(1000000);
         spinner->setValue(anim->parameter("kpstop").toInt());
         settingWidgets["kpstop"] = spinner;
-        connect(spinner, QOverload<int>::of(&QSpinBox::valueChanged), [=] () {
+        connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
             emit updateParam("kpstop");
         });
         ui->timeGrid->addWidget(spinner, 12, 3);
@@ -334,7 +335,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         else
             spinner->setValue(stop);
         settingWidgets["stop"] = spinner;
-        connect(spinner, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=] () {
+        connect(spinner, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
             emit updateParam("stop");
         });
         ui->timeGrid->addWidget(spinner, 4, 3);
@@ -350,7 +351,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         else
             spinner->setValue(kpstop);
         settingWidgets["kpstop"] = spinner;
-        connect(spinner, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=] () {
+        connect(spinner, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
             emit updateParam("kpstop");
         });
         ui->timeGrid->addWidget(spinner, 12, 3);

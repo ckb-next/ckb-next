@@ -199,6 +199,7 @@ if (MACOS OR LINUX)
               modeselectdialog.h
               mperfwidget.h
               nowheelcombobox.h
+              qoverloadlegacy.h
               rebindwidget.h
               rlistwidget.h
               settingswidget.h

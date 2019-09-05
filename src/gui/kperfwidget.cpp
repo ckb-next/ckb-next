@@ -2,6 +2,7 @@
 #include "ui_kperfwidget.h"
 #include "modeselectdialog.h"
 #include <cmath>
+#include "qoverloadlegacy.h"
 
 ///
 /// \brief KPerfWidget::KPerfWidget sets up the UI for Keyboard Performace panel
@@ -40,7 +41,7 @@ KPerfWidget::KPerfWidget(QWidget *parent) :
             });
         }
         if(indicators[i].hwEnable){
-            connect(indicators[i].hwEnable, QOverload<int>::of(&QComboBox::activated), [=] () {
+            connect(indicators[i].hwEnable, OVERLOAD_PTR(int, QComboBox, activated), [=] () {
                 emit uiUpdated(i);
             });
         }

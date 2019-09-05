@@ -2,6 +2,7 @@
 #include "ui_mperfwidget.h"
 #include "modeselectdialog.h"
 #include <cmath>
+#include "qoverloadlegacy.h"
 
 const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 
@@ -44,10 +45,10 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
         connect(stages[i].ySlider, &QSlider::valueChanged, [=] () {
             emit sliderYMoved(i);
         });
-        connect(stages[i].xBox, QOverload<int>::of(&QSpinBox::valueChanged), [=] () {
+        connect(stages[i].xBox, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
             emit boxXChanged(i);
         });
-        connect(stages[i].yBox, QOverload<int>::of(&QSpinBox::valueChanged), [=] () {
+        connect(stages[i].yBox, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
             emit boxYChanged(i);
         });
         if(stages[i].enableCheck)

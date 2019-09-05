@@ -58,6 +58,7 @@ target_sources(
           quazipfile.cpp
           quazipfileinfo.cpp
           quazipnewinfo.cpp
+          minizip_crypt.h
           JlCompress.h
           ioapi.h
           quaadler32.h

@@ -202,7 +202,9 @@ void* onframe(void* context) {
             break;
 
         /// Update device
+        pthread_mutex_lock(dmutex(kb));
         kb->vtable->onframe(kb);
+        pthread_mutex_unlock(dmutex(kb));
 
         usleep(kb->usbdelay * 1000);
     }
@@ -240,8 +242,16 @@ void* onframe(void* context) {
 ///
 static void* devmain(usbdevice* kb){
     pthread_t onframe_thread;
-    pthread_create(&onframe_thread, NULL, onframe, kb);
-    pthread_setname_np(onframe_thread, kb->vendor + '_' + kb->product + "_onframe");
+    int err = pthread_create(&onframe_thread, NULL, onframe, kb);
+    if (err == 0) {
+        #ifdef OS_LINUX
+        char onframe_thread_name[THREAD_NAME_MAX] = "ckbX frame";
+        onframe_thread_name[3] = INDEX_OF(kb, keyboard) + '0';
+        pthread_setname_np(onframe_thread, onframe_thread_name);
+        #endif
+        pthread_detach(onframe_thread);
+    }
+    
     /// \attention dmutex should still be locked when this is called
     int kbfifo = kb->infifo - 1;
     ///

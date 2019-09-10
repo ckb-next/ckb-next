@@ -85,7 +85,6 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     } else {
         ui->fancountSpin->hide();
         ui->fancountLabel->hide();
-        ui->fancountSpacer->hide();
     }
 
     // Read device layout

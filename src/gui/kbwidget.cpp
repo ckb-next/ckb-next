@@ -79,7 +79,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
     }
 
-    if (device->isLightningNode()){
+    if (device->isLightingNode()){
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
     } else {
@@ -395,7 +395,7 @@ void KbWidget::devUpdate(){
 
 void KbWidget::modeUpdate(){
     ui->lightnodeSpin->setValue(device->currentMode()->getNumberOfFans());
-    device->sendPreambule(device->currentMode()->getNumberOfFans());
+    device->sendFancount(device->currentMode()->getNumberOfFans());
 }
 
 void KbWidget::on_hwSaveButton_clicked(){
@@ -407,7 +407,7 @@ void KbWidget::on_hwSaveButton_clicked(){
 
 void KbWidget::on_lightnodeSpin_valueChanged(int number_of_fan){
     if (!device) return;
-    device->sendPreambule(number_of_fan);
+    device->sendFancount(number_of_fan);
     device->currentMode()->setNumberOfFans(number_of_fan);
     device->currentLight()->forceFrameUpdate();
 }

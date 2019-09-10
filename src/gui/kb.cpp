@@ -324,8 +324,8 @@ void Kb::autoSave(){
     }
 }
 
-void Kb::sendPreambule(int number_of_fans){
-    cmd.write(QString("preambule_fan %1\n").arg(number_of_fans).toLatin1());
+void Kb::sendFancount(int number_of_fans){
+    cmd.write(QString("fancount %1\n").arg(number_of_fans).toLatin1());
     cmd.flush();
 }
 

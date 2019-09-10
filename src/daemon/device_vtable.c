@@ -39,7 +39,7 @@ static int loadprofile_none(usbdevice* kb){
 
     return 0;
 }
-static int preambule_fan_none(usbdevice* kb, uchar numberOfFans) {
+static int fancount_none(usbdevice* kb, uchar numberOfFans) {
     (void)kb;
 
     return 0;
@@ -100,7 +100,7 @@ const devcmd vtable_keyboard = {
     .updatergb = updatergb_kb,
     .onframe = onframe_none,
     .updateindicators = updateindicators_kb,
-    .preambulefan = preambule_fan_none,
+    .fancount = fancount_none,
     .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
@@ -148,7 +148,7 @@ const devcmd vtable_keyboard_legacy = {
     .updatergb = int1_int_none,                 ///< Legacy keyboards do not have an rgb update function
     .onframe = onframe_none,
     .updateindicators = updateindicators_kb,
-    .preambulefan = preambule_fan_none,
+    .fancount = fancount_none,
     .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
@@ -195,7 +195,7 @@ const devcmd vtable_mouse = {
     .freeprofile = freeprofile,             ///< same for all keyboards and mice
     .updatergb = updatergb_mouse,           ///< special for mice
     .onframe = onframe_none,
-    .preambulefan = preambule_fan_none,
+    .fancount = fancount_none,
     .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
     .updatedpi = updatedpi                  ///< special for mice
 };
@@ -243,13 +243,13 @@ const devcmd vtable_mousepad = {
     .freeprofile = freeprofile,
     .updatergb = updatergb_mousepad,
     .onframe = onframe_none,
-    .preambulefan = preambule_fan_none,
+    .fancount = fancount_none,
     .updateindicators = int1_void_none,
     .updatedpi = int1_int_none
 };
 
-// Lightning node
-const devcmd vtable_lightning_node = {
+// Lighting node
+const devcmd vtable_lighting_node = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
     .fwupdate = cmd_io_none,
@@ -289,9 +289,9 @@ const devcmd vtable_lightning_node = {
     .allocprofile = allocprofile,
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
-    .updatergb = updatergb_lightning_node,
-    .onframe = onframe_lightning_node,
-    .preambulefan = preambule_fan_lightning_node,
+    .updatergb = updatergb_lighting_node,
+    .onframe = onframe_lighting_node,
+    .fancount = fancount_lighting_node,
     .updateindicators = int1_void_none,
     .updatedpi = int1_int_none
 };
@@ -339,7 +339,7 @@ const devcmd vtable_mouse_legacy = {
     .freeprofile = freeprofile,
     .updatergb = updatergb_mouse_legacy,
     .onframe = onframe_none,
-    .preambulefan = preambule_fan_none,
+    .fancount = fancount_none,
     .updateindicators = int1_void_none,
     .updatedpi = updatedpi_legacy
 };

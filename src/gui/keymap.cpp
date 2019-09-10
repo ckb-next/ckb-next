@@ -382,9 +382,9 @@ static const Key PolarisZones[] = {
 };
 #define KEYCOUNT_POLARIS   (sizeof(PolarisZones) / sizeof(Key))
 
-// Lightning node pro
-#define LIGHTNING_NODE_PRO_HEIGHT 50
-#define LIGHTNING_NODE_PRO_WIDTH 300
+// Lighting node pro
+#define LIGHTING_NODE_PRO_HEIGHT 50
+#define LIGHTING_NODE_PRO_WIDTH 300
 #define LIGHTNODE_PRO_SIZE_X 6
 #define LIGHTNODE_PRO_SIZE_Y 6
 #define LIGHTNODE_PRO_SIZE LIGHTNODE_PRO_SIZE_X, LIGHTNODE_PRO_SIZE_Y
@@ -420,7 +420,7 @@ static const Key PolarisZones[] = {
     //  - 13 = One O Clock
     //  - 14 = Twelve O Clock
     //  - 15 = Eleven O Clock
-static const Key LightningNodeProZones[] = {
+static const Key LightingNodeProZones[] = {
     // Fan 1
     {0, "Fan 1 Bottom Inner", "f1l00", FAN1_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
     {0, "Fan 1 Left Inner", "f1l01", -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
@@ -529,7 +529,7 @@ static const Key LightningNodeProZones[] = {
     {0, "Fan 6 Twelve O Clock", "f6l14", FAN6_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
     {0, "Fan 6 Eleven O Clock", "f6l15", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
 };
-#define KEYCOUNT_LIGHTNING_NODE_PRO   (sizeof(LightningNodeProZones) / sizeof(Key))
+#define KEYCOUNT_LIGHTING_NODE_PRO   (sizeof(LightingNodeProZones) / sizeof(Key))
 
 // ST100
 #define ST100_V 6,22
@@ -972,9 +972,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
-    case KeyMap::LIGHTNING_NODE_PRO:{
-        // Lightning node pro
-        for(const Key* key = LightningNodeProZones; key < LightningNodeProZones + KEYCOUNT_LIGHTNING_NODE_PRO; key++){
+    case KeyMap::LIGHTING_NODE_PRO:{
+        // Lighting node pro
+        for(const Key* key = LightingNodeProZones; key < LightingNodeProZones + KEYCOUNT_LIGHTING_NODE_PRO; key++){
             Key translatedKey = *key;
             translatedKey.x += translatedKey.width / 2;
             translatedKey.y += translatedKey.height / 2;
@@ -1241,8 +1241,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return M65E;
     if(lower == "m95")
         return M95;
-    if(lower == "lightning_node_pro")
-        return LIGHTNING_NODE_PRO;
+    if(lower == "lighting_node_pro")
+        return LIGHTING_NODE_PRO;
     return NO_MODEL;
 }
 
@@ -1290,8 +1290,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "m65e";
     case M95:
         return "m95";
-    case LIGHTNING_NODE_PRO:
-        return "lightning_node_pro";
+    case LIGHTING_NODE_PRO:
+        return "lighting_node_pro";
     default:
         return "";
     }
@@ -1335,8 +1335,8 @@ int KeyMap::modelWidth(Model model){
     case ST100:
     case M95:
         return M65_WIDTH;
-    case LIGHTNING_NODE_PRO:
-        return LIGHTNING_NODE_PRO_WIDTH;
+    case LIGHTING_NODE_PRO:
+        return LIGHTING_NODE_PRO_WIDTH;
     default:
         return 0;
     }
@@ -1368,8 +1368,8 @@ int KeyMap::modelHeight(Model model){
     case ST100:
     case M95:
         return M65_HEIGHT;
-    case LIGHTNING_NODE_PRO:
-        return LIGHTNING_NODE_PRO_HEIGHT;
+    case LIGHTING_NODE_PRO:
+        return LIGHTING_NODE_PRO_HEIGHT;
     default:
         return 0;
     }

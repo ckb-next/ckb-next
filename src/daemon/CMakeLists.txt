@@ -77,7 +77,7 @@ if (MACOS OR LINUX)
               led_keyboard.c
               led_mouse.c
               led_mousepad.c
-              led_lightning_node.c
+              led_lighting_node.c
               main.c
               notify.c
               profile.c

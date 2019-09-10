@@ -184,7 +184,7 @@ extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
-extern const union devcmd vtable_lightning_node;
+extern const union devcmd vtable_lighting_node;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN 50
@@ -284,7 +284,7 @@ typedef struct {
     key* keymap;
     // Buffer used to store non-HID interrupt reads from the input thread.
     uchar* interruptbuf;
-    // The number of Fan | Use for Lightning node pro
+    // The number of Fan | Use for Lighting node pro
     uchar number_of_fans;
 } usbdevice;
 

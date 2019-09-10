@@ -129,14 +129,12 @@ void os_inputclose(usbdevice* kb){
 }
 
 // Generate SYN reports to synchronize device
-static void isync(usbdevice* kb){
+static void isync(int fd){
     struct input_event event;
     memset(&event, 0, sizeof(event));
     event.type = EV_SYN;
     event.code = SYN_REPORT;
-    if(write(kb->uinput_kb - 1, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
-    if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
+    if(write(fd, &event, sizeof(event)) <= 0)
         ckb_warn("uinput write failed: %s\n", strerror(errno));
 }
 
@@ -159,32 +157,34 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         event.value = down;
         is_mouse = !!(scancode & SCAN_MOUSE);
     }
-    if(write((is_mouse ? kb->uinput_mouse : kb->uinput_kb) - 1, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+    int fd = (is_mouse ? kb->uinput_mouse : kb->uinput_kb) - 1;
+    if(write(fd, &event, sizeof(event)) > 0)
+        isync(fd);
     else
-        isync(kb);
+        ckb_warn("uinput write failed: %s\n", strerror(errno));
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
     struct input_event event;
     memset(&event, 0, sizeof(event));
     event.type = EV_REL;
-    if(x != 0){
+    int fd=kb->uinput_mouse - 1;
+    //send X
+    if(x!=0){
         event.code = REL_X;
         event.value = x;
-        if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
+        if(write(fd, &event, sizeof(event)) <= 0)
             ckb_warn("uinput write failed: %s\n", strerror(errno));
-        else
-            isync(kb);
     }
-    if(y != 0){
+    //send Y
+    if(y!=0){
         event.code = REL_Y;
         event.value = y;
-        if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
+        if(write(fd, &event, sizeof(event)) <= 0)
             ckb_warn("uinput write failed: %s\n", strerror(errno));
-        else
-            isync(kb);
     }
+    //send SYN
+    isync(fd);
 }
 
 void* _ledthread(void* ctx){

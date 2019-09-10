@@ -115,6 +115,7 @@ if (MACOS OR LINUX)
         ckb-next
             PRIVATE
               animadddialog.cpp
+              animdetailsdialog.cpp
               animscript.cpp
               animsettingdialog.cpp
               autorun.cpp
@@ -153,10 +154,12 @@ if (MACOS OR LINUX)
               mainwindow.cpp
               modeselectdialog.cpp
               mperfwidget.cpp
+              nowheelcombobox.cpp
               rebindwidget.cpp
               rlistwidget.cpp
               settingswidget.cpp
               animadddialog.h
+              animdetailsdialog.h
               animscript.h
               animsettingdialog.h
               autorun.h
@@ -195,10 +198,13 @@ if (MACOS OR LINUX)
               media.h
               modeselectdialog.h
               mperfwidget.h
+              nowheelcombobox.h
+              qoverloadlegacy.h
               rebindwidget.h
               rlistwidget.h
               settingswidget.h
               animadddialog.ui
+              animdetailsdialog.ui
               animsettingdialog.ui
               ckbupdaterwidget.ui
               extrasettingswidget.ui
@@ -440,6 +446,13 @@ target_compile_options(
         PRIVATE
           "${Appindicator_DEFINITIONS}"
           "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(
+        ckb-next
+            PRIVATE
+              "-DQT_DEPRECATED_WARNINGS")
+endif ()
 
 # Add sanitizers after all target information is known
 add_sanitizers(ckb-next)

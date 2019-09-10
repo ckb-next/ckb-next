@@ -6,7 +6,6 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QRadioButton>
-#include <QSignalMapper>
 #include <QLabel>
 #include "kbperf.h"
 #include "kbprofile.h"
@@ -27,10 +26,8 @@ public:
     void setPerf(KbPerf* newPerf, KbProfile* newProfile);
 
     static const int DPI_COUNT = KbPerf::DPI_COUNT;
-    static const int DPI_MIN = KbPerf::DPI_MIN, DPI_MAX = KbPerf::DPI_MAX;
     void setLegacyM95();
-
-
+    void setMaxDpi(ushort dpi);
 private:
     Ui::MPerfWidget *ui;
 
@@ -47,11 +44,6 @@ private:
     DpiUi stages[DPI_COUNT];
     bool _xyLink;
     bool colorLink;
-
-    QSignalMapper buttonMapper1, buttonMapper2;
-    QSignalMapper sliderXMapper, sliderYMapper;
-    QSignalMapper boxXMapper, boxYMapper;
-    QSignalMapper enableMapper;
 
     // Hack: prevent recursive slot calls
     bool isSetting;

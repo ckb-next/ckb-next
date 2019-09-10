@@ -19,6 +19,7 @@ public:
     bool monochrome;
     ushort productID;
     bool hwload;
+    bool adjrate;
 
     // Keyboard model
     inline KeyMap::Model    model() const                       { return _model; }
@@ -118,6 +119,9 @@ public:
     ///
     inline QString getMacroPath () { return macroPath; }
 
+    inline ushort getMaxDpi () {return _maxDpi; }
+    void setPollRate(QString poll);
+
     ~Kb();
 
 signals:
@@ -214,6 +218,8 @@ private:
     bool _needsSave;
 
     KeyMap::Layout _layout;
+
+    ushort _maxDpi;
 
     // Whether or not the hardware profile is being loaded
     // (0 = profile, 1...3 = modes)

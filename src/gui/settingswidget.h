@@ -39,7 +39,6 @@ private slots:
     void on_winBox_activated(int index);
     void on_autoFWBox_clicked(bool checked);
     void on_loginItemBox_clicked(bool checked);
-    void on_extraButton_clicked();
     void on_aboutQt_clicked();
     void on_generateReportButton_clicked();
     void devDetectFinished(int retVal);
@@ -47,6 +46,7 @@ private slots:
     void on_autoUpdBox_clicked(bool checked);
     void on_pushButton_2_clicked();
     void on_uninstallButton_clicked();
+    void on_hiDPIBox_clicked(bool checked);
 
 private:
     QProcess* devDetect;

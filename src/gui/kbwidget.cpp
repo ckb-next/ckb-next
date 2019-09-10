@@ -29,7 +29,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     connect(device, SIGNAL(modeRenamed()), this, SLOT(profileChanged()));
     connect(device, SIGNAL(modeRenamed()), this, SLOT(modeChanged()));
     connect(device, SIGNAL(modeChanged(bool)), this, SLOT(modeChanged(bool)));
-    connect(ui->lightnodeSpin, SIGNAL(valueChanged(int)), this, SLOT(on_lightnodeSpin_valueChanged(int)));
+    connect(ui->fancountSpin, SIGNAL(valueChanged(int)), this, SLOT(on_fancountSpin_valueChanged(int)));
 
     connect(static_cast<MainWindow*>(parent), &MainWindow::switchToProfileCLI, this, &KbWidget::switchToProfile);
     connect(static_cast<MainWindow*>(parent), &MainWindow::switchToModeCLI, this, &KbWidget::switchToMode);
@@ -58,7 +58,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
 
     // Hide poll rate and FW update as appropriate
     if(!device->features.contains("pollrate")){
-        ui->pollLabel->hide();
+        ui->pollRateBox->hide();
         ui->pollLabel2->hide();
     }
     if(!device->features.contains("fwupdate")){
@@ -83,8 +83,9 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
     } else {
-        ui->lightnodeSpin->hide();
-        ui->lightnodeLabel->hide();
+        ui->fancountSpin->hide();
+        ui->fancountLabel->hide();
+        ui->fancountSpacer->hide();
     }
 
     // Read device layout
@@ -141,6 +142,15 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     }
     else
         device->layout(KeyMap::GB, false);
+
+    // Set max DPI for mice
+    if(device->isMouse())
+        ui->mPerfWidget->setMaxDpi(device->getMaxDpi());
+
+    if(!device->adjrate){
+        ui->pollRateBox->setEnabled(false);
+        ui->pollRateBox->setToolTip(tr("This device does not support setting the poll rate through software."));
+    }
 }
 
 KbWidget::~KbWidget(){
@@ -385,16 +395,33 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     }
 }
 
+inline int KbWidget::getPollRateBoxIdx(QString poll){
+    switch(poll.leftRef(1).toInt()){
+        case 1:
+            return 0;
+        case 2:
+            return 1;
+        case 4:
+            return 2;
+        default: // Includes case 8
+            return 3;
+    }
+}
+
 void KbWidget::devUpdate(){
     // Update device tab
     ui->devLabel->setText(device->usbModel);
     ui->serialLabel->setText(device->usbSerial);
     ui->fwLabel->setText(device->firmware);
-    ui->pollLabel->setText(device->pollrate);
+    // This is needed so that the currentIndexChanged event doesn't fire
+    // If it does, we'll end up with an always greyed out box when pollrate != 1
+    bool block = ui->pollRateBox->blockSignals(true);
+    ui->pollRateBox->setCurrentIndex(getPollRateBoxIdx(device->pollrate));
+    ui->pollRateBox->blockSignals(block);
 }
 
 void KbWidget::modeUpdate(){
-    ui->lightnodeSpin->setValue(device->currentMode()->getNumberOfFans());
+    ui->fancountSpin->setValue(device->currentMode()->getNumberOfFans());
     device->sendFancount(device->currentMode()->getNumberOfFans());
 }
 
@@ -405,7 +432,7 @@ void KbWidget::on_hwSaveButton_clicked(){
     profileChanged();
 }
 
-void KbWidget::on_lightnodeSpin_valueChanged(int number_of_fan){
+void KbWidget::on_fancountSpin_valueChanged(int number_of_fan){
     if (!device) return;
     device->sendFancount(number_of_fan);
     device->currentMode()->setNumberOfFans(number_of_fan);
@@ -525,4 +552,10 @@ void KbWidget::switchToMode(QString mode){
         ui->modesList->setCurrentRow(i);
         return;
     }
+}
+
+void KbWidget::on_pollRateBox_currentIndexChanged(const QString &arg1)
+{
+    ui->pollRateBox->setEnabled(false);
+    device->setPollRate(arg1.left(1));
 }

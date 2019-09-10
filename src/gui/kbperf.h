@@ -48,7 +48,7 @@ public:
 
     // Stored DPI settings (X/Y)
     const static int DPI_COUNT = 6, SNIPER = 0;
-    const static int DPI_MIN = 100, DPI_MAX = 12000;
+    const static int DPI_MIN = 100;
 
     // Functions for acessing the DPI table.
     inline QPoint   dpi(int index) const                    { if(index < 0 || index >= DPI_COUNT) return QPoint(); return QPoint(dpiX[index], dpiY[index]); }

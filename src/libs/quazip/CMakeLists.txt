@@ -58,8 +58,8 @@ target_sources(
           quazipfile.cpp
           quazipfileinfo.cpp
           quazipnewinfo.cpp
+          minizip_crypt.h
           JlCompress.h
-          crypt.h
           ioapi.h
           quaadler32.h
           quachecksum32.h
@@ -91,3 +91,9 @@ set_target_properties(
         PROPERTIES
           CXX_STANDARD 11)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(
+        quazip
+            PRIVATE
+              "-DQT_DEPRECATED_WARNINGS")
+endif ()

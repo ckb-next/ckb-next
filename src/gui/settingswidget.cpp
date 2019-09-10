@@ -23,6 +23,9 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Prepare extra settings
+    extra = ui->extraWidget;
+
 #ifndef Q_OS_MACOS
     ui->uninstallButton->hide();
 #endif
@@ -85,9 +88,6 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
         ui->loginItemBox->setChecked(AutoRun::isEnabled());
     }
 
-    // Prepare extra settings
-    extra = new ExtraSettingsWidget(this);
-
 #ifndef OS_MAC_LEGACY
 #ifdef Q_OS_MACOS
     QString labelText = ui->label_2->text();
@@ -101,6 +101,12 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     ui->pushButton_2->hide();
 #else
     ui->autoUpdBox->setChecked(!settings.value("DisableAutoUpdCheck", false).toBool());
+#endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    ui->hiDPIBox->setChecked(settings.value("HiDPI", false).toBool());
+#else
+    ui->hiDPIBox->hide();
 #endif
 }
 
@@ -174,10 +180,6 @@ void SettingsWidget::on_loginItemBox_clicked(bool checked){
         AutoRun::enable();
     else
         AutoRun::disable();
-}
-
-void SettingsWidget::on_extraButton_clicked(){
-    extra->exec();
 }
 
 void SettingsWidget::on_aboutQt_clicked(){
@@ -278,4 +280,10 @@ void SettingsWidget::on_uninstallButton_clicked()
     // Open a terminal and run the uninstall script
     QProcess::execute("open", QStringList() << "-a" << "Terminal" << "/Applications/ckb-next.app/Contents/Resources/uninstall.sh");
 #endif
+}
+
+void SettingsWidget::on_hiDPIBox_clicked(bool checked)
+{
+    CkbSettings::set("Program/HiDPI", checked);
+    QMessageBox::warning(this, tr("Please restart ckb-next"), tr("Please click the Quit button and restart ckb-next for the changes to take effect."), QMessageBox::Ok);
 }

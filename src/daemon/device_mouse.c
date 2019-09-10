@@ -33,9 +33,6 @@ int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, co
     (void)dummy2;
     (void)dummy3;
 
-    if(rate > 1 && (rate % 2 || rate > 8))
-        return 0;
-
     usbsend_control(kb, NULL, 0, 10, rate, 0);
 
     // Device should disconnect+reconnect, but update the poll rate field in case it doesn't

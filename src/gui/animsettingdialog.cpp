@@ -7,6 +7,7 @@
 #include "ui_animsettingdialog.h"
 #include "colorbutton.h"
 #include "gradientbutton.h"
+#include "qoverloadlegacy.h"
 
 // QDial shows angles upside down (180° = top, 0° = bottom), so flip it
 static inline int angleFlip(int angle){
@@ -25,10 +26,6 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     setWindowTitle(anim->scriptName() + " Animation");
     ui->animName->setText(anim->name());
     const AnimScript* script = anim->script();
-
-    connect(&updateMapper, SIGNAL(mapped(QString)), this, SLOT(updateParam(QString)));
-    connect(&angleDialMapper, SIGNAL(mapped(QString)), this, SLOT(angleDialChanged(QString)));
-    connect(&angleSpinnerMapper, SIGNAL(mapped(QString)), this, SLOT(angleSpinnerChanged(QString)));
 
     // Build settings UI
     int row = 1;
@@ -61,7 +58,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             widget = new QCheckBox(param.prefix, this);
             ((QCheckBox*)widget)->setChecked(value.toBool());
             colSpan = 4;
-            connect(widget, SIGNAL(stateChanged(int)), &updateMapper, SLOT(map()));
+            connect((QCheckBox*)widget, &QCheckBox::stateChanged, [=] () {
+                emit updateParam(param.name);
+            });
             break;
         case AnimScript::Param::LONG:
             widget = new QSpinBox(this);
@@ -72,7 +71,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 ((QSpinBox*)widget)->setSuffix(postfix);
                 postfix = "";
             }
-            connect(widget, SIGNAL(valueChanged(int)), &updateMapper, SLOT(map()));
+            connect((QSpinBox*)widget, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
+                emit updateParam(param.name);
+            });
             break;
         case AnimScript::Param::DOUBLE:
             widget = new QDoubleSpinBox(this);
@@ -84,13 +85,17 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 ((QDoubleSpinBox*)widget)->setSuffix(postfix);
                 postfix = "";
             }
-            connect(widget, SIGNAL(valueChanged(double)), &updateMapper, SLOT(map()));
+            connect((QDoubleSpinBox*)widget, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
+                emit updateParam(param.name);
+            });
             break;
         case AnimScript::Param::RGB:
             widget = new ColorButton(this);
             ((ColorButton*)widget)->color(QColor("#" + value.toString()));
             colSpan = 3;
-            connect(widget, SIGNAL(colorChanged(QColor)), &updateMapper, SLOT(map()));
+            connect((ColorButton*)widget, &ColorButton::colorChanged, [=] () {
+                emit updateParam(param.name);
+            });
             break;
         case AnimScript::Param::ARGB:{
             widget = new ColorButton(this, true);
@@ -103,20 +108,26 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 color = "#" + val;
             ((ColorButton*)widget)->color(color);
             colSpan = 3;
-            connect(widget, SIGNAL(colorChanged(QColor)), &updateMapper, SLOT(map()));
+            connect((ColorButton*)widget, &ColorButton::colorChanged, [=] () {
+                emit updateParam(param.name);
+            });
             break;
         }
         case AnimScript::Param::GRADIENT:
             widget = new GradientButton(this);
             ((GradientButton*)widget)->fromString(value.toString());
             colSpan = 3;
-            connect(widget, SIGNAL(gradientChanged()), &updateMapper, SLOT(map()));
+            connect((GradientButton*)widget, &GradientButton::gradientChanged, [=] () {
+                emit updateParam(param.name);
+            });
             break;
         case AnimScript::Param::AGRADIENT:
             widget = new GradientButton(this, true);
             ((GradientButton*)widget)->fromString(value.toString());
             colSpan = 3;
-            connect(widget, SIGNAL(gradientChanged()), &updateMapper, SLOT(map()));
+            connect((GradientButton*)widget, &GradientButton::gradientChanged, [=] () {
+                emit updateParam(param.name);
+            });
             break;
         case AnimScript::Param::ANGLE:
             widget = new QDial(this);
@@ -132,14 +143,17 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((QDial*)widget)->setWrapping(true);
             ((QDial*)widget)->setInvertedAppearance(true);
             ((QDial*)widget)->setValue(angleFlip(value.toInt()));
-            angleDialMapper.setMapping(widget, param.name);
-            connect(widget, SIGNAL(valueChanged(int)), &angleDialMapper, SLOT(map()));
+            connect((QDial*)widget, &QDial::valueChanged, [=] () {
+                emit angleDialChanged(param.name);
+            });
             break;
         case AnimScript::Param::STRING:
             widget = new QLineEdit(this);
             ((QLineEdit*)widget)->setText(value.toString());
             colSpan = 3;
-            connect(widget, SIGNAL(textEdited(const QString&)), &updateMapper, SLOT(map()));
+            connect((QLineEdit*)widget, &QLineEdit::textEdited, [=] () {
+                emit updateParam(param.name);
+            });
             break;
         case AnimScript::Param::LABEL:
             widget = new QLabel(this);
@@ -149,8 +163,6 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         default:
             break;
         }
-        if(widget)
-            updateMapper.setMapping(widget, param.name);
         if(param.type == AnimScript::Param::BOOL || param.type == AnimScript::Param::LABEL){
             // Boolean values are placed on the left with no prefix or postfix
             settingWidgets[param.name] = widget;
@@ -170,8 +182,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 spinner->setSuffix("°");
                 spinner->setValue(value.toInt());
                 angleSpinners[param.name] = spinner;
-                angleSpinnerMapper.setMapping(spinner, param.name);
-                connect(spinner, SIGNAL(valueChanged(int)), &angleSpinnerMapper, SLOT(map()));
+                connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
+                    emit angleSpinnerChanged(param.name);
+                });
                 ui->settingsGrid->addWidget(spinner, row, 4);
                 colSpan = 2;
             }
@@ -208,15 +221,17 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     check->setChecked(anim->parameter("trigger").toBool());
     ui->settingsGrid->addWidget(check, row, 3, 1, 4);
     settingWidgets["trigger"] = check;
-    connect(check, SIGNAL(stateChanged(int)), &updateMapper, SLOT(map()));
-    updateMapper.setMapping(check, "trigger");
+    connect(check, &QCheckBox::stateChanged, [=] () {
+        emit updateParam("trigger");
+    });
     row++;
     check = new QCheckBox("Start with key press", this);
     check->setChecked(anim->parameter("kptrigger").toBool());
     ui->settingsGrid->addWidget(check, row, 3, 1, 2);
     settingWidgets["kptrigger"] = check;
-    connect(check, SIGNAL(stateChanged(int)), &updateMapper, SLOT(map()));
-    updateMapper.setMapping(check, "kptrigger");
+    connect(check, &QCheckBox::stateChanged, [=] () {
+        emit updateParam("kptrigger");
+    });
     // Add an option allowing the user to select keypress mode
     QComboBox* combo = new QComboBox(this);
     int selected = anim->parameter("kpmode").toInt();
@@ -236,8 +251,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     combo->setCurrentIndex(selected);
     ui->settingsGrid->addWidget(combo, row, 5, 1, 2);
     settingWidgets["kpmode"] = combo;
-    connect(combo, SIGNAL(activated(int)), &updateMapper, SLOT(map()));
-    updateMapper.setMapping(combo, "kpmode");
+    connect(combo, OVERLOAD_PTR(int, QComboBox, activated), [=] () {
+        emit updateParam("kpmode");
+    });
     row++;
 
     // Add horizontal spacer to compress content to left
@@ -252,8 +268,10 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->kpDelayBox->setValue(anim->parameter("kpdelay").toDouble());
     settingWidgets["kpmodestop"] = ui->kpModeStopBox;
     ui->kpModeStopBox->setChecked(anim->parameter("kpmodestop").toBool());
-    connect(ui->kpModeStopBox, SIGNAL(clicked(bool)), &updateMapper, SLOT(map()));
-    updateMapper.setMapping(ui->kpModeStopBox, "kpmodestop");
+    connect(ui->kpModeStopBox, &QCheckBox::clicked, [=] () {
+        emit updateParam("kpmodestop");
+    });
+
     settingWidgets["kprelease"] = ui->kpReleaseBox;
     ui->kpReleaseBox->setChecked(anim->parameter("kprelease").toBool());
     if(anim->hasParameter("repeat")){
@@ -270,8 +288,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         spinner->setMaximum(1000000);
         spinner->setValue(anim->parameter("stop").toInt());
         settingWidgets["stop"] = spinner;
-        connect(spinner, SIGNAL(valueChanged(int)), &updateMapper, SLOT(map()));
-        updateMapper.setMapping(spinner, "stop");
+        connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
+            emit updateParam("stop");
+        });
         ui->timeGrid->addWidget(spinner, 4, 3);
         ui->timeGrid->addWidget(new QLabel("times", this), 4, 4);
         // KP repeat
@@ -281,8 +300,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         spinner->setMaximum(1000000);
         spinner->setValue(anim->parameter("kpstop").toInt());
         settingWidgets["kpstop"] = spinner;
-        connect(spinner, SIGNAL(valueChanged(int)), &updateMapper, SLOT(map()));
-        updateMapper.setMapping(spinner, "kpstop");
+        connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
+            emit updateParam("kpstop");
+        });
         ui->timeGrid->addWidget(spinner, 12, 3);
         ui->timeGrid->addWidget(new QLabel("times", this), 12, 4);
         // Infinite repeat toggles
@@ -315,8 +335,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         else
             spinner->setValue(stop);
         settingWidgets["stop"] = spinner;
-        connect(spinner, SIGNAL(valueChanged(double)), &updateMapper, SLOT(map()));
-        updateMapper.setMapping(spinner, "stop");
+        connect(spinner, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
+            emit updateParam("stop");
+        });
         ui->timeGrid->addWidget(spinner, 4, 3);
         ui->timeGrid->addWidget(new QLabel("seconds", this), 4, 4);
         // KP stop time
@@ -330,8 +351,9 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         else
             spinner->setValue(kpstop);
         settingWidgets["kpstop"] = spinner;
-        connect(spinner, SIGNAL(valueChanged(double)), &updateMapper, SLOT(map()));
-        updateMapper.setMapping(spinner, "kpstop");
+        connect(spinner, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
+            emit updateParam("kpstop");
+        });
         ui->timeGrid->addWidget(spinner, 12, 3);
         ui->timeGrid->addWidget(new QLabel("seconds", this), 12, 4);
         // Infinite run toggles

@@ -34,7 +34,7 @@
 /***********************************************************************
  * Return the next byte in the pseudo-random sequence
  */
-static int decrypt_byte(unsigned long* pkeys, const z_crc_t FAR * pcrc_32_tab UNUSED)
+static int decrypt_byte(unsigned long* pkeys, const z_crc_t FAR * pcrc_32_tab QUAZIP_UNUSED)
 {
     //(void) pcrc_32_tab; /* avoid "unused parameter" warning */
     unsigned temp;  /* POTENTIAL BUG:  temp*(temp^1) may overflow in an

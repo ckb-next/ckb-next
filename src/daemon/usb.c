@@ -9,6 +9,25 @@
 #include "usb.h"
 #include "keymap_patch.h"
 
+// Values taken from the official website
+// Mice not in the list default to 12000 in the GUI
+dpi_list mouse_dpi_list[] = {
+    { P_M65, 8200 },
+    { P_M65_PRO, 12000 },
+    { P_M65_RGB_ELITE, 18000 },
+    { P_M95, 8200 },
+    { P_GLAIVE, 16000 },
+    { P_SABRE_O, 6400 },
+    { P_SABRE_L, 8200 },
+    { P_SABRE_N, 10000 },
+    { P_SCIMITAR, 12000 },
+    { P_SCIMITAR_PRO, 16000 },
+    { P_SABRE_O2, 6400 },
+    { P_HARPOON, 6000 },
+    { P_KATAR, 8000 },
+    { 0, 0 }, // Keep last and do not remove
+};
+
 ushort models[N_MODELS] = {
     // Keyboards
     P_K55,
@@ -349,8 +368,10 @@ static void* _setupusb(void* context){
     ushort vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
     kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
-    if(IS_MOUSE(vendor, product)) kb->features |= FEAT_ADJRATE;
-    if(IS_MONOCHROME(vendor, product)) kb->features |= FEAT_MONOCHROME;
+    if(SUPPORTS_ADJRATE(kb))
+        kb->features |= FEAT_ADJRATE;
+    if(IS_MONOCHROME(vendor, product))
+        kb->features |= FEAT_MONOCHROME;
     kb->usbdelay = USB_DELAY_DEFAULT;
 
     /// Allocate memory for the os_usbrecv() buffer

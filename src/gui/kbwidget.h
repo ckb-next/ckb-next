@@ -45,6 +45,7 @@ private:
 
     const static int GUID = Qt::UserRole;
     const static int NEW_FLAG = Qt::UserRole + 1;
+    int getPollRateBoxIdx(QString poll);
 
 private slots:
     void updateProfileList();
@@ -67,9 +68,10 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();
     void on_layoutBox_activated(int index);
-    void on_lightnodeSpin_valueChanged(int number_of_fans);
+    void on_fancountSpin_valueChanged(int number_of_fans);
     void switchToProfile(QString profile);
     void switchToMode(QString mode);
+    void on_pollRateBox_currentIndexChanged(const QString &arg1);
 };
 
 #endif // KBWIDGET_H

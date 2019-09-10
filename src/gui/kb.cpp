@@ -17,18 +17,18 @@ int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
 bool Kb::_dither = false, Kb::_mouseAccel = true, Kb::_delay = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
-    QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false),
+    QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
     devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
-    cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT)
+    cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT), _maxDpi(0)
 {
     memset(iState, 0, sizeof(iState));
     memset(hwLoading, 0, sizeof(hwLoading));
 
     // Get the features, model, serial number, FW version (if available), poll rate (if available), and layout from /dev nodes
-    QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate"), prodpath(path + "/productid"), hwlayoutPath(path + "/layout");
+    QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate"), prodpath(path + "/productid"), hwlayoutPath(path + "/layout"), dpiPath(path + "/dpi");
     if (ftpath.open(QIODevice::ReadOnly)){
         features = ftpath.read(1000);
         features = features.trimmed();
@@ -53,7 +53,7 @@ Kb::Kb(QObject *parent, const QString& path) :
         hwload = true;
     if (mpath.open(QIODevice::ReadOnly)){
         usbModel = mpath.read(100);
-        usbModel = usbModel.remove("Corsair").remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").trimmed();
+        usbModel = usbModel.remove("Corsair", Qt::CaseInsensitive).remove("Gaming").remove("Keyboard").remove("Mouse").remove("Bootloader").remove("Mechanical").replace("LOW PROFILE", "LP").trimmed();
         mpath.close();
     }
     if (usbModel == "")
@@ -80,6 +80,8 @@ Kb::Kb(QObject *parent, const QString& path) :
         pollrate = ppath.read(100);
         pollrate = pollrate.trimmed();
         ppath.close();
+        if(features.contains("adjrate"))
+            adjrate = true;
     }
 
     if(hwlayoutPath.open(QIODevice::ReadOnly)){
@@ -87,6 +89,13 @@ Kb::Kb(QObject *parent, const QString& path) :
         hwlayout = hwlayout.trimmed();
         hwlayoutPath.close();
     }
+
+    if(dpiPath.open(QIODevice::ReadOnly)){
+        _maxDpi = dpiPath.read(6).trimmed().toUShort();
+        dpiPath.close();
+    }
+    if(!_maxDpi)
+        _maxDpi = 12000;
 
     prefsPath = "Devices/" + usbSerial;
 
@@ -831,4 +840,9 @@ void Kb::macroDelay(bool flag) {
 
 KeyMap::Layout Kb::getCurrentLayout(){
     return _layout;
+}
+
+void Kb::setPollRate(QString poll)
+{
+    cmd.write(QString("\npollrate %1\n").arg(poll).toLatin1());
 }

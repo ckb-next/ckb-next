@@ -1,13 +1,13 @@
 #ifndef EXTRASETTINGSWIDGET_H
 #define EXTRASETTINGSWIDGET_H
 
-#include <QDialog>
+#include <QWidget>
 
 namespace Ui {
 class ExtraSettingsWidget;
 }
 
-class ExtraSettingsWidget : public QDialog
+class ExtraSettingsWidget : public QWidget
 {
     Q_OBJECT
 
@@ -29,6 +29,8 @@ private slots:
     void on_delayBox_clicked(bool checked);
     void on_startDelayBox_clicked(bool checked);
     void on_previewBox_clicked(bool checked);
+
+    void on_detailsBtn_clicked();
 
 private:
     Ui::ExtraSettingsWidget *ui;

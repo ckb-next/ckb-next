@@ -6,6 +6,7 @@
 #include <QUrl>
 #include <ckbnextconfig.h>
 #include "animscript.h"
+#include <QStandardPaths>
 
 QHash<QUuid, AnimScript*> AnimScript::scripts;
 
@@ -27,24 +28,47 @@ AnimScript::~AnimScript(){
     }
 }
 
-QString AnimScript::path(){
-    return QString(CKB_NEXT_ANIMATIONS_PATH);
+QStringList AnimScript::paths(){
+    QStringList list(CKB_NEXT_ANIMATIONS_PATH);
+    // Path for when running the GUI from the build dir
+#ifdef Q_OS_LINUX
+    QString appDirPath =  QCoreApplication::applicationDirPath();
+    if(!appDirPath.startsWith("/usr"))
+        list << appDirPath;
+#endif
+    list << QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation).append("/ckb-next/animations"));
+    return list;
 }
 
 void AnimScript::scan(){
-    QDir dir(path());
+    // Clear old animations
     foreach(AnimScript* script, scripts)
         delete script;
     scripts.clear();
-    foreach(QString file, dir.entryList(QDir::Files | QDir::Executable)){
-        AnimScript* script = new AnimScript(qApp, dir.absoluteFilePath(file));
-        if(script->load() && !scripts.contains(script->_info.guid) && script->presets().count()){
-            scripts[script->_info.guid] = script;
+
+    // Search for animations in all directories, in reverse
+    // This is done so that the user animation dir takes priority over the system one
+    for(int i = paths().length() - 1; i >= 0; i--){
+        QDir dir(paths().at(i));
+
+        if(!dir.exists())
             continue;
+
+        foreach(QString file, dir.entryList(QDir::Files | QDir::Executable)){
+#ifdef Q_OS_LINUX
+            // Ignore the GUI and daemon binaries if loading animations from the build dir
+            if(file.endsWith("ckb-next") || file.endsWith("ckb-next-daemon"))
+                continue;
+#endif
+            AnimScript* script = new AnimScript(qApp, dir.absoluteFilePath(file));
+            if(script->load() && !scripts.contains(script->_info.guid) && script->presets().count()){
+                scripts[script->_info.guid] = script;
+                continue;
+            }
+            if(!script->presets().count())
+                qWarning() << script->name() << "has no default preset and will not be loaded.";
+            delete script;
         }
-        if(!script->presets().count())
-            qWarning() << script->name() << "has no default preset and will not be loaded.";
-        delete script;
     }
 }
 
@@ -284,9 +308,9 @@ void AnimScript::printParams(){
     process->write("end params\n");
 }
 
-void AnimScript::begin(quint64 timestamp){
+int AnimScript::begin(quint64 timestamp){
     if(!initialized)
-        return;
+        return 1;
     end();
     stopped = firstFrame = readFrame = readAnyFrame = inFrame = false;
     // Determine the upper left corner of the given keys
@@ -307,7 +331,7 @@ void AnimScript::begin(quint64 timestamp){
     if(keysCopy.isEmpty()){
         // If the key list is empty, don't actually start the animation but pretend it's running anyway
         firstFrame = readFrame = readAnyFrame = true;
-        return;
+        return 1;
     }
     process = new QProcess(this);
     process->setReadChannel(QProcess::StandardOutput);
@@ -328,6 +352,7 @@ void AnimScript::begin(quint64 timestamp){
     // Begin animating
     process->write("begin run\n");
     lastFrame = timestamp;
+    return 0;
 }
 
 void AnimScript::retrigger(quint64 timestamp, bool allowPreempt){
@@ -336,28 +361,26 @@ void AnimScript::retrigger(quint64 timestamp, bool allowPreempt){
     if(allowPreempt && _info.preempt && repeatMsec > 0)
         // If preemption is wanted, trigger the animation 1 duration in the past first
         retrigger(timestamp - repeatMsec);
-    if(!process)
-        begin(timestamp);
+    if(!process && begin(timestamp))
+        return;
     advance(timestamp);
-    if(process)
-        process->write("start\n");
+    process->write("start\n");
 }
 
 void AnimScript::stop(quint64 timestamp){
     if(!initialized)
         return;
-    if(!process)
-        begin(timestamp);
+    if(!process && begin(timestamp))
+        return;
     advance(timestamp);
-    if(process)
-        process->write("stop\n");
+    process->write("stop\n");
 }
 
 void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
     if(!initialized)
         return;
-    if(!process)
-        begin(timestamp);
+    if(!process && begin(timestamp))
+        return;
     int kpMode = _info.kpMode;
     if(_paramValues.value("kpmode", 0).toInt() != 0)
         // Disable KP mode according to user preferences
@@ -450,17 +473,20 @@ void AnimScript::frame(quint64 timestamp){
     if(!process)
         begin(timestamp);
 
-    advance(timestamp);
-    if((readFrame || !firstFrame) && process)
+    if(process){
+        advance(timestamp);
+
         // Don't ask for a new frame if the animation hasn't delivered the last one yet
-        process->write("frame\n");
+        if(readFrame || !firstFrame)
+            process->write("frame\n");
+    }
     firstFrame = true;
     readFrame = false;
 }
 
 void AnimScript::advance(quint64 timestamp){
-    if(timestamp <= lastFrame || !process)
-        // Don't do anything if the time hasn't actually advanced.
+    // Don't do anything if the time hasn't actually advanced.
+    if(timestamp <= lastFrame)
         return;
     double delta = (timestamp - lastFrame) / (double)durationMsec;
     if(!_info.absoluteTime){

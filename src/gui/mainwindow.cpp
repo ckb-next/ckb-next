@@ -22,6 +22,7 @@
 
 #include "ckbsystemtrayicon.h"
 
+#define MACOS_CATALINA_VERSION_STRING "10.15"
 
 extern QSharedMemory appShare;
 extern QString devpath;
@@ -38,6 +39,9 @@ QString daemonDialogText = QObject::tr("Start it once with:") +
 #else
 QString daemonDialogText = QObject::tr("Start and enable it with:") +
     "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist</code></blockquote>";
+QString catalinaDialogText = QObject::tr("Add:") +
+    "<br /><code>/Library/Application Support/ckb-next-daemon</code><br />" +
+    QObject::tr("to the list of applications in the macOS settings under <b>Security & Privacy &gt; Input Monitoring</b>.<br /><br />Afterwards unplug/replug your devices, and restart the daemon.");
 #endif
 
 MainWindow* MainWindow::mainWindow = 0;
@@ -165,6 +169,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
     settingsWidget->setVersion("ckb-next " CKB_NEXT_VERSION_STR);
+
+#ifdef Q_OS_MACOS
+    // check macos version for catalina
+    QString macOS_version = QSysInfo::productVersion();
+    if (macOS_version == MACOS_CATALINA_VERSION_STRING) {
+        QMessageBox catalinaDialog;
+        catalinaDialog.setText(tr("Special instructions for MacOS Catalina"));
+        catalinaDialog.setInformativeText(catalinaDialogText);
+        catalinaDialog.setIcon(QMessageBox::Information);
+        catalinaDialog.exec();
+    }
+#endif // Q_OS_MACOS
 
     // create daemon dialog as a QMessageBox
     // this will create a focussed dialog, that has to be interacted with,

@@ -282,6 +282,14 @@ void SettingsWidget::on_uninstallButton_clicked()
 #endif
 }
 
+void SettingsWidget::on_restartDaemonButton_clicked()
+{
+#ifdef Q_OS_MACOS
+    // open a terminal to restart the terminal
+    QProcess::execute("open", QStringList() << "-a" << "Terminal" << "/Applications/ckb-next.app/Contents/Resources/daemon-restart.sh");
+#endif // Q_OS_MACOS
+}
+
 void SettingsWidget::on_hiDPIBox_clicked(bool checked)
 {
     CkbSettings::set("Program/HiDPI", checked);

@@ -484,6 +484,15 @@ if (MACOS)
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
+
+    # Install daemon restart script
+    install(
+      PROGRAMS "${PROJECT_SOURCE_DIR}/macos/daemon-restart.sh"
+      DESTINATION "ckb-next.app/Contents/Resources"
+      PERMISSIONS
+      OWNER_READ OWNER_WRITE OWNER_EXECUTE
+      GROUP_READ GROUP_EXECUTE
+      WORLD_READ GROUP_EXECUTE)
 elseif (LINUX)
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.png"

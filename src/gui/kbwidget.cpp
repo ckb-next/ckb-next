@@ -132,6 +132,10 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     else
         device->layout(KeyMap::GB, false);
 
+    // Set max DPI for mice
+    if(device->isMouse())
+        ui->mPerfWidget->setMaxDpi(device->getMaxDpi());
+
     if(!device->adjrate){
         ui->pollRateBox->setEnabled(false);
         ui->pollRateBox->setToolTip(tr("This device does not support setting the poll rate through software."));

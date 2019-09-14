@@ -115,6 +115,8 @@ public:
     ///
     inline QString getMacroPath () { return macroPath; }
 
+    inline ushort getMaxDpi () {return _maxDpi; }
+    
     void setPollRate(QString poll);
 
     ~Kb();

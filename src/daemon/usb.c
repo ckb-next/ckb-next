@@ -28,7 +28,7 @@ dpi_list mouse_dpi_list[] = {
     { 0, 0 }, // Keep last and do not remove
 };
 
-ushort models[N_MODELS] = {
+device_desc models[] = {
     // Keyboards
     { V_CORSAIR, P_K55, },
     { V_CORSAIR, P_K63_NRGB, },

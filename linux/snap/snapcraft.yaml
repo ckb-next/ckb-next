@@ -30,11 +30,65 @@ apps:
            - pulseaudio
 
 parts:
+    desktop-qt5:
+        build-packages:
+            - build-essential
+            - qtbase5-dev
+            - dpkg-dev
+        make-parameters:
+            - FLAVOR=qt5
+        plugin: make
+        source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+        source-subdir: qt
+        stage-packages:
+            - libxkbcommon0
+            - ttf-ubuntu-font-family
+            - dmz-cursor-theme
+            - light-themes
+            - adwaita-icon-theme
+            - gnome-themes-standard
+            - shared-mime-info
+            - libqt5gui5
+            - libgdk-pixbuf2.0-0
+            - libqt5svg5
+            - try: 
+                - appmenu-qt5
+            - locales-all
+            - xdg-user-dirs
+            - fcitx-frontend-qt5
     ckbbuild:
         source: https://github.com/ckb-next/ckb-next.git
         plugin: cmake
+        build-packages:
+            - build-essential
+            - libudev-dev
+            - qt5-default
+            - zlib1g-dev
+            - libappindicator-dev
+            - libpulse-dev
+            - libquazip5-dev
         stage-packages:
-            [qt5-default, libquazip5-1, libudev1, zlib1g, libappindicator1, libpulse0]
+            - libquazip5-1
+            - libudev1
+            - zlib1g
+            - libappindicator1
+            - libpulse0
+            - libblkid1
+            - libbz2-1.0
+            - libc6
+            - libdb5.3
+            - libgcc1
+            - libgcrypt20
+            - libgpg-error0
+            - liblz4-1
+            - liblzma5
+            - libmount1
+            - libpcre3
+            - libselinux1
+            - libstdc++6
+            - libsystemd0
+            - libtinfo5
+            - libuuid1
         configflags:
             - -DCMAKE_INSTALL_PREFIX=/snap/ckb-next/current/
             - -DCMAKE_BUILD_TYPE=Release

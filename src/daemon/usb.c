@@ -25,6 +25,7 @@ dpi_list mouse_dpi_list[] = {
     { P_SABRE_O2, 6400 },
     { P_HARPOON, 6000 },
     { P_KATAR, 8000 },
+    { P_IRONCLAW, 18000 },
     { 0, 0 }, // Keep last and do not remove
 };
 

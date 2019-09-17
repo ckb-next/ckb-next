@@ -24,6 +24,7 @@ dpi_list mouse_dpi_list[] = {
     { P_SCIMITAR_PRO, 16000 },
     { P_SABRE_O2, 6400 },
     { P_HARPOON, 6000 },
+    { P_HARPOON_PRO, 12000 },
     { P_KATAR, 8000 },
     { P_IRONCLAW, 18000 },
     { 0, 0 }, // Keep last and do not remove
@@ -70,6 +71,7 @@ ushort models[N_MODELS] = {
     P_SCIMITAR_PRO,
     P_SABRE_O2,
     P_HARPOON,
+    P_HARPOON_PRO,
     P_KATAR,
     P_IRONCLAW,
     // Mousepads
@@ -162,7 +164,7 @@ const char* product_str(ushort product){
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)
         return "scimitar";
-    if(product == P_HARPOON)
+    if(product == P_HARPOON || product == P_HARPOON_PRO)
         return "harpoon";
     if(product == P_GLAIVE)
         return "glaive";

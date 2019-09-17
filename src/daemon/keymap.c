@@ -242,6 +242,11 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "thumb10",    -1, KEY_CORSAIR },
     { "thumb11",    -1, KEY_CORSAIR },
     { "thumb12",    -1, KEY_CORSAIR },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { "profswitch", -1, KEY_CORSAIR },
 
     // Extended mouse buttons (wheel is an axis in HW, 6-8 are recognized by the OS but not present in HW)
     { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },
@@ -351,6 +356,8 @@ void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort 
                 // Corsair Mouse Input
                 else if(firstbyte == CORSAIR_IN)
                     corsair_mousecopy(kb->input.keys, buffer);
+                else if(firstbyte == 0x05 && urblen == 21) // Seems to be on the Ironclaw RGB only
+                    corsair_extended_mousecopy(kb->input.keys, buffer);
                 else
                     ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x\n", firstbyte, ep);
             } else {
@@ -529,6 +536,22 @@ void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
         else
             CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
     }
+}
+
+void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
+    // This handles the ironclaw 0x05 packets.
+    // So far only two possible values exist. In the future this may need to be rewritten
+    // in a similar fashion as corsair_mousecopy but we currently do not have enough data to do so.
+
+    if(urbinput[6] & 0b01)
+        SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 4);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 4);
+
+    if(urbinput[6] & 0b10)
+        SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 3);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 3);
 }
 
 void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){

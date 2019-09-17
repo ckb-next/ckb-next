@@ -9,16 +9,16 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
-   sodipodi:docname="ironclaw.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="overlay_ironclaw.svg"
    id="svg8"
    version="1.1"
-   viewBox="0 0 210 297"
-   height="297mm"
-   width="210mm"
+   viewBox="0 0 147.13323 235.91566"
+   height="891.64972"
+   width="556.09412"
    inkscape:export-filename="C:\Users\matth\ironclaw.png"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96">
+   inkscape:export-xdpi="68.609283"
+   inkscape:export-ydpi="68.609283">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -28,17 +28,22 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.86"
-     inkscape:cx="418.61625"
-     inkscape:cy="525.89547"
+     inkscape:zoom="0.43"
+     inkscape:cx="156.44519"
+     inkscape:cy="468.3679"
      inkscape:document-units="mm"
      inkscape:current-layer="layer2"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1001"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1024"
+     inkscape:window-height="706"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     fit-margin-top="1"
+     units="px"
+     fit-margin-left="1"
+     fit-margin-bottom="1"
+     fit-margin-right="1" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -53,7 +58,7 @@
   </metadata>
   <path
      style="fill:#4d4d4d;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     d="m 97.687012,50.310216 h 30.001008 l 1.29635,77.450944 -8.50446,4.44122 c 1.46136,5.15322 -0.43072,23.41035 -0.43072,23.41035 l -13.74339,0.21316 0.18899,-23.43452 -9.825802,-6.13893 z"
+     d="m 67.090043,13.113609 h 30.001008 l 1.29635,77.450944 -8.50446,4.44122 c 1.46136,5.153217 -0.43072,23.410347 -0.43072,23.410347 l -13.74339,0.21316 0.18899,-23.434517 -9.825802,-6.13893 z"
      id="path4656"
      inkscape:connector-curvature="0"
      sodipodi:nodetypes="ccccccccc" />
@@ -61,7 +66,8 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Ironclaw"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(-30.596969,-37.196607)">
     <path
        style="fill:#666666;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 67.752232,47.252231 28.159225,-9.638393 1.795386,1.889882 -0.850445,86.46205 9.638392,6.4256 -0.18899,23.43452 13.74339,-0.21316 c 0,0 -0.41533,-23.10269 0.43072,-23.41035 l 8.50446,-4.44122 -1.5119,-88.824405 1.79539,-0.944941 27.97023,10.299851 3.77977,53.389135 -1.03944,33.16741 -2.83482,27.78125 -1.03944,10.86682 -0.28348,14.83556 1.32292,8.69345 2.07887,5.85864 4.06324,7.08705 9.73289,14.93006 -1.88988,4.34673 -2.74033,5.48065 -3.02381,5.19717 -4.25223,5.85863 -6.04762,6.52009 -7.9375,6.80357 -9.92187,6.33111 -10.01637,4.44122 -8.31548,1.98437 -6.89806,0.85045 -6.52009,-0.2835 -6.992563,-1.13392 -9.260416,-2.26785 -11.055805,-4.63021 -9.35491,-4.91369 -8.976934,-6.14211 4.535715,-9.73289 3.874254,-12.18973 2.929316,-13.04018 1.606399,-9.26042 -0.09449,-6.52009 -3.968749,-29.19866 -2.645834,-32.97842 -1.13393,-22.30059 -0.09449,-25.135419 0.944941,-28.820686 1.228423,-15.875 z"

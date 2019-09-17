@@ -396,26 +396,26 @@ static const Key ST100Zones[] = {
 // Mouse map - Ironclaw
 static const Key IronclawKeys[] = {
     // primary keys
-    {0, "Left Mouse",    "mouse1",      8,  0, 14, 32, false, true  },
-    {0, "Right Mouse",   "mouse2",     30,  0, 14, 32, false, true  },
+    {0, "Left Mouse",    "mouse1",     12,  0, 12, 28, false, true  },
+    {0, "Right Mouse",   "mouse2",     31,  0, 12, 28, false, true  },
     
     // center column keys
-    {0, "Wheel Up",      "wheelup",    22,  5,  8,  7, false, true  },
-    {0, "Middle Mouse",  "mouse3",     22, 13,  8,  7, false, true  },
-    {0, "Wheel Down",    "wheeldn",    22, 21,  8,  7, false, true  },
-    {0, "Profile Cycle", "profswitch", 22, 29,  8, 10, false, true  }, // does not work yet, key is not recognized by daemon
-    {0, "DPI Cycle",     "dpiup",      22, 40,  8, 10, false, true  },
+    {0, "Wheel Up",      "wheelup",    23,  3,  8,  7, false, true  },
+    {0, "Middle Mouse",  "mouse3",     23,  7,  8,  6, false, true  },
+    {0, "Wheel Down",    "wheeldn",    23, 12,  8,  7, false, true  },
+    {0, "Profile Cycle", "profswitch", 23, 18,  9,  9, false, true  },
+    {0, "DPI Cycle",     "dpiup",      23, 26,  8,  9, false, true  },
     
     // left side forward/back keys
-    {0, "Forward",       "mouse4",      5, 24,  5,  9, false, true  },
-    {0, "Back",          "mouse5",      5, 33,  5, 10, false, true  },
+    {0, "Forward",    "mouse5",      6, 20,  5, 12, false, true  },
+    {0, "Back",       "mouse4",      7, 32,  5, 12, false, true  },
 
     // zones for LEDs
-    {0, "Logo",          "back",       22, 30,  8, 28, true,  false },
-    {0, "Wheel",         "wheel",      22, 10,  8,  8, true,  false },
+    {0, "Logo",          "back",       21, 50,  NS,    true,  false },
+    {0, "Wheel",         "wheel",      23, 3,  8,  14, true,  false },
     
     // need to add DPI LED, even if not directly configurable for indicator to work
-    {0, "DPI",           "dpi",        10, 10,  5,  5, true,  false }
+    {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
 
 };
 #define KEYCOUNT_IRONCLAW    (sizeof(IronclawKeys) / sizeof(Key))

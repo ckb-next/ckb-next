@@ -376,7 +376,7 @@ void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort 
         }
         ///
         /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
-        inputupdate(kb);
+        inputupdate(kb, 1);
         pthread_mutex_unlock(imutex(kb));
     }
 }

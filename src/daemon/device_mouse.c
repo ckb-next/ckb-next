@@ -59,7 +59,7 @@ int setactive_mouse(usbdevice* kb, int active){
     kb->profile->lastlight.forceupdate = 1;
     // Clear input
     memset(&kb->input.keys, 0, sizeof(kb->input.keys));
-    inputupdate(kb);
+    inputupdate(kb, 0);
     pthread_mutex_unlock(imutex(kb));
     if(!usbsend(kb, msg[0], 1))
         return -1;

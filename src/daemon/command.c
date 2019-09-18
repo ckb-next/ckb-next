@@ -9,6 +9,7 @@
 
 static const char* const cmd_strings[CMD_COUNT - 1] = {
     // NONE is implicit
+    "sharemodf",
     "delay",
     "mode",
     "switch",
@@ -211,6 +212,12 @@ int readcmd(usbdevice* kb, const char* line){
                 // bad parameter to handle false commands like "delay off"
                 kb->delay = 0; // No delay.
             }
+            continue;
+        }
+        case SHAREMODF: {
+            uchar sharemodifiers;
+            if(sscanf(word, "%hhu", &sharemodifiers) == 1 && sharemodifiers <= 1)
+                kb->sharedmodifiers = sharemodifiers;
             continue;
         }
         default:;

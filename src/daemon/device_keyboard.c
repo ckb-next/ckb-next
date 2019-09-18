@@ -26,7 +26,7 @@ int setactive_kb(usbdevice* kb, int active){
     kb->profile->lastlight.forceupdate = 1;
     // Clear input
     memset(&kb->input.keys, 0, sizeof(kb->input.keys));
-    inputupdate(kb);
+    inputupdate(kb, 0);
     pthread_mutex_unlock(imutex(kb));
 
     uchar msg[3][MSG_SIZE] = {

@@ -48,6 +48,9 @@ public:
     // OSX: scroll speed (-1 = use acceleration)
     static inline int               scrollSpeed()                       { return _scrollSpeed; }
     static void                     scrollSpeed(int newSpeed);
+    // Shared modifiers
+    static inline int               shareModifiers()                       { return _shareModifiers; }
+    static void                     shareModifiers(bool flag);
 
     // Profile saved to hardware
     inline KbProfile*   hwProfile() { return _hwProfile; }
@@ -227,6 +230,8 @@ private:
     // Notification reader, launches as a separate thread and reads from file.
     // (QFile doesn't have readyRead() so there's no other way to do this asynchronously)
     void run();
+
+    static bool _shareModifiers;
 };
 
 #endif // KB_H

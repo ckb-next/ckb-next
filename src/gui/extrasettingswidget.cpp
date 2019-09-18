@@ -67,13 +67,17 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
 
     /// Read Macro Delay setting, update UI and Kb-internal flag
     bool macroDelay = settings.value("MacroDelay").toBool();
-    Kb::macroDelay(macroDelay);
+    Kb::macroDelay(macroDelay); // TODO: Try to read the config in kb.cpp and then read it from there
     ui->delayBox->setChecked(macroDelay);
 
     // Read start delay
     ui->startDelayBox->setChecked(settings.value("StartDelay").toBool());
 
     ui->previewBox->setChecked(settings.value("DisablePreviewOnFocusLoss", true).toBool());
+
+    bool sharemodf = settings.value("SharedModifiers", false).toBool();
+    ui->sharedModifierBox->setChecked(sharemodf);
+    Kb::shareModifiers(sharemodf);
 
 #ifndef Q_OS_LINUX
     ui->scrollWarningLabel->hide();
@@ -159,14 +163,17 @@ void ExtraSettingsWidget::on_startDelayBox_clicked(bool checked){
     CkbSettings::set("Program/StartDelay", checked);
 }
 
-void ExtraSettingsWidget::on_previewBox_clicked(bool checked)
-{
+void ExtraSettingsWidget::on_previewBox_clicked(bool checked){
     CkbSettings::set("Program/DisablePreviewOnFocusLoss", checked);
 }
 
-void ExtraSettingsWidget::on_detailsBtn_clicked()
-{
+void ExtraSettingsWidget::on_detailsBtn_clicked(){
     AnimDetailsDialog* dlg = new AnimDetailsDialog(this);
     dlg->setAttribute(Qt::WA_DeleteOnClose, true);
     dlg->exec();
+}
+
+void ExtraSettingsWidget::on_sharedModifierBox_clicked(bool checked){
+    CkbSettings::set("Program/SharedModifiers", checked);
+    Kb::shareModifiers(checked);
 }

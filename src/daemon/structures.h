@@ -283,6 +283,8 @@ typedef struct {
     key* keymap;
     // Buffer used to store non-HID interrupt reads from the input thread.
     uchar* interruptbuf;
+    // Set if the modifiers should be shared
+    uchar sharedmodifiers;
 } usbdevice;
 
 #endif  // STRUCTURES_H

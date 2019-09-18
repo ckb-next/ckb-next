@@ -10,7 +10,7 @@ int os_inputopen(usbdevice* kb);
 void os_inputclose(usbdevice* kb);
 
 // Updates keypresses on input device. Lock imutex first (see device.h).
-void inputupdate(usbdevice* kb);
+void inputupdate(usbdevice* kb, char share);
 // Read indicator LED state and send it back to the keyboard if needed. Lock dmutex first.
 void updateindicators_kb(usbdevice* kb, int force);
 

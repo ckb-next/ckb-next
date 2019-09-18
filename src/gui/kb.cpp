@@ -14,7 +14,7 @@ static QSet<QString> notifyPaths;
 static QMutex notifyPathMutex;
 
 int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
-bool Kb::_dither = false, Kb::_mouseAccel = true, Kb::_delay = false;
+bool Kb::_dither = false, Kb::_mouseAccel = true, Kb::_delay = false, Kb::_shareModifiers = false;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
@@ -140,6 +140,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
     cmd.write(QString("dither %1\n").arg(static_cast<int>(_dither)).toLatin1());
     cmd.write(QString("\ndelay %1\n").arg(_delay? "on" : "off").toLatin1());
+    cmd.write(QString("\nsharemodf %1\n").arg(static_cast<int>(_shareModifiers)).toLatin1());
 #ifdef Q_OS_MACOS
     // Write ANSI/ISO flag to daemon (OSX only)
     cmd.write("layout ");
@@ -830,6 +831,14 @@ void Kb::macroDelay(bool flag) {
 
    foreach(Kb* kb, activeDevices){
        kb->cmd.write(QString("\ndelay %1\n").arg(flag? "on" : "off").toLatin1());
+   }
+}
+
+void Kb::shareModifiers(bool flag) {
+   _shareModifiers = flag;
+
+   foreach(Kb* kb, activeDevices){
+       kb->cmd.write(QString("\nsharemodf %1\n").arg(static_cast<int>(_shareModifiers)).toLatin1());
    }
 }
 

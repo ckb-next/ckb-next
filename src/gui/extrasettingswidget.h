@@ -29,8 +29,8 @@ private slots:
     void on_delayBox_clicked(bool checked);
     void on_startDelayBox_clicked(bool checked);
     void on_previewBox_clicked(bool checked);
-
     void on_detailsBtn_clicked();
+    void on_sharedModifierBox_clicked(bool checked);
 
 private:
     Ui::ExtraSettingsWidget *ui;

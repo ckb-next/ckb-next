@@ -133,11 +133,29 @@ static void* play_macro(void* param) {
     return 0;
 }
 
+static inline void share_modifier(usbdevice* kb, int scan, char n){
+    if(!(kb->sharedmodifiers && kb->active))
+        return;
+    for(int i = 0; i < DEV_MAX; i++){
+        usbdevice* altkb = keyboard + i;
+        if(IS_CONNECTED(altkb) && altkb != kb){
+            pthread_mutex_lock(imutex(altkb));
+            if(n)
+                SET_KEYBIT(altkb->input.keys, scan);
+            else
+                CLEAR_KEYBIT(altkb->input.keys, scan);
+
+            inputupdate(altkb, 0);
+            pthread_mutex_unlock(imutex(altkb));
+        }
+    }
+}
+
 ///
 /// \brief inputupdate_keys Handle input from Keyboard or mouse; start Macrof if detected.
 /// \param kb
 ///
-static void inputupdate_keys(usbdevice* kb){
+static inline void inputupdate_keys(usbdevice* kb, char share){
     usbmode* mode = kb->profile->currentmode;
     binding* bind = &mode->bind;
     usbinput* input = &kb->input;
@@ -199,6 +217,8 @@ static void inputupdate_keys(usbdevice* kb){
                 // Don't echo a key press if there's no scancode associated
                 if(!(scancode & SCAN_SILENT)){
                     if(IS_MOD(scancode)){
+                        if(share)
+                            share_modifier(kb, keyindex, new);
                         if(new){
                             // Modifier down: Add to the end of modifier keys
                             for(int i = keycount + rmodcount; i > 0; i--)
@@ -254,7 +274,7 @@ static void inputupdate_keys(usbdevice* kb){
     }
 }
 
-void inputupdate(usbdevice* kb){
+void inputupdate(usbdevice* kb, char share){
 #ifdef OS_LINUX
     if((!kb->uinput_kb || !kb->uinput_mouse)
 #else
@@ -263,7 +283,7 @@ void inputupdate(usbdevice* kb){
             || !kb->profile)
         return;
     // Process key/button input
-    inputupdate_keys(kb);
+    inputupdate_keys(kb, share);
     // Process mouse movement
     usbinput* input = &kb->input;
     if(input->rel_x != 0 || input->rel_y != 0){

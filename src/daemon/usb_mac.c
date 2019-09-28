@@ -970,6 +970,23 @@ void mac_exithandler(CFSocketRef s, CFSocketCallBackType t, CFDataRef a, const v
     exithandler(type);
 }
 
+CFMutableDictionaryRef create_hid_device_dict(){
+    int vendor = V_CORSAIR;
+    CFMutableDictionaryRef match = IOServiceMatching(kIOHIDDeviceKey);
+    CFNumberRef cfvendor = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor);
+    CFDictionarySetValue(match, CFSTR(kIOHIDVendorIDKey), cfvendor);
+    CFRelease(cfvendor);
+    cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+    for(size_t c = 0; c < N_MODELS; c++){
+        int product = models[c].idProduct;
+        CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
+        CFArrayAppendValue(cfproducts, cfproduct);
+        CFRelease(cfproduct);
+    }
+    CFDictionarySetValue(match, CFSTR(kIOHIDProductIDArrayKey), cfproducts);
+    CFRelease(cfproducts);
+}
+
 int usbmain(){
     int vendor = V_CORSAIR;
 
@@ -1012,19 +1029,7 @@ int usbmain(){
 
     // Now move on to HID devices
     // It is in fact necessary to recreate the matching dictionary, as the keys are different
-    match = IOServiceMatching(kIOHIDDeviceKey);
-    cfvendor = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor);
-    CFDictionarySetValue(match, CFSTR(kIOHIDVendorIDKey), cfvendor);
-    CFRelease(cfvendor);
-    cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
-    for(size_t c = 0; c < N_MODELS; c++){
-        int product = models[c].idProduct;
-        CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
-        CFArrayAppendValue(cfproducts, cfproduct);
-        CFRelease(cfproduct);
-    }
-    CFDictionarySetValue(match, CFSTR(kIOHIDProductIDArrayKey), cfproducts);
-    CFRelease(cfproducts);
+    CFMutableDictionaryRef match = create_hid_device_dict();
 
     io_iterator_t iterator_hid = 0;
     res = IOServiceAddMatchingNotification(notify, kIOMatchedNotification, match, iterate_devices_hid, 0, &iterator_hid);

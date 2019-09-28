@@ -99,6 +99,7 @@ if (MACOS OR LINUX)
               os.h
               profile.h
               protocol.h
+              request_hid_mac.h
               structures.h
               usb.h)
 endif ()
@@ -111,6 +112,7 @@ if (MACOS)
               input_mac_legacy.c
               input_mac_mouse_legacy.c
               extra_mac.c
+              request_hid_mac.c
               keymap_mac.h)
 elseif (LINUX)
     target_sources(

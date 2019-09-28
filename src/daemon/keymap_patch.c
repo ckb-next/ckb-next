@@ -28,12 +28,12 @@ keypatch m95patch[] = {
 #define M95PATCH_LEN sizeof(m95patch)/sizeof(*m95patch)
 
 keypatches mappatches[] = {
-    { P_K68,        k63patch, K63PATCH_LEN },
-    { P_K68_NRGB,   k63patch, K63PATCH_LEN },
-    { P_K65,        k65patch, K65PATCH_LEN },
-    { P_K65_LEGACY, k65patch, K65PATCH_LEN },
-    { P_K63_NRGB,   k63patch, K63PATCH_LEN },
-    { P_M95,        m95patch, M95PATCH_LEN },
+    { V_CORSAIR, P_K68,        k63patch, K63PATCH_LEN },
+    { V_CORSAIR, P_K68_NRGB,   k63patch, K63PATCH_LEN },
+    { V_CORSAIR, P_K65,        k65patch, K65PATCH_LEN },
+    { V_CORSAIR, P_K65_LEGACY, k65patch, K65PATCH_LEN },
+    { V_CORSAIR, P_K63_NRGB,   k63patch, K63PATCH_LEN },
+    { V_CORSAIR, P_M95,        m95patch, M95PATCH_LEN },
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 
@@ -47,7 +47,7 @@ void patchkeys(usbdevice* kb){
     memcpy(kb->keymap, keymap, sizeof(keymap));
     // Iterate through the patches for all devices
     for(size_t pos = 0; pos < KEYPATCHES_LEN; pos++){
-        if(mappatches[pos].product == kb->product){
+        if(mappatches[pos].vendor == kb->vendor && mappatches[pos].product == kb->product){
             // Iterate through the keys in the selected patch
             for(size_t i = 0; i < mappatches[pos].patchlen; i++){
                 keypatch* curpatch = mappatches[pos].patch;

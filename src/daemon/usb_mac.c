@@ -992,7 +992,7 @@ int usbmain(){
     CFRelease(cfvendor);
     CFMutableArrayRef cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     for(size_t c = 0; c < N_MODELS; c++){
-        int product = models[c];
+        int product = models[c].idProduct;
         CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
         CFArrayAppendValue(cfproducts, cfproduct);
         CFRelease(cfproduct);
@@ -1018,7 +1018,7 @@ int usbmain(){
     CFRelease(cfvendor);
     cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     for(size_t c = 0; c < N_MODELS; c++){
-        int product = models[c];
+        int product = models[c].idProduct;
         CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
         CFArrayAppendValue(cfproducts, cfproduct);
         CFRelease(cfproduct);

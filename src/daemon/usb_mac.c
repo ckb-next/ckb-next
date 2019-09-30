@@ -985,6 +985,7 @@ CFMutableDictionaryRef create_hid_device_dict(){
     }
     CFDictionarySetValue(match, CFSTR(kIOHIDProductIDArrayKey), cfproducts);
     CFRelease(cfproducts);
+    return match;
 }
 
 int usbmain(){

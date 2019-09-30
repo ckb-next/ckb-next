@@ -976,7 +976,7 @@ CFMutableDictionaryRef create_hid_device_dict(){
     CFNumberRef cfvendor = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor);
     CFDictionarySetValue(match, CFSTR(kIOHIDVendorIDKey), cfvendor);
     CFRelease(cfvendor);
-    cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+    CFMutableArrayRef cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     for(size_t c = 0; c < N_MODELS; c++){
         int product = models[c].idProduct;
         CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
@@ -1029,7 +1029,7 @@ int usbmain(){
 
     // Now move on to HID devices
     // It is in fact necessary to recreate the matching dictionary, as the keys are different
-    CFMutableDictionaryRef match = create_hid_device_dict();
+    match = create_hid_device_dict();
 
     io_iterator_t iterator_hid = 0;
     res = IOServiceAddMatchingNotification(notify, kIOMatchedNotification, match, iterate_devices_hid, 0, &iterator_hid);

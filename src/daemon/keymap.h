@@ -37,8 +37,8 @@
 #define N_LL120_ZONES_PER_FAN   16
 #define LIGHTNODE_PRO_MAX_FAN   6
 // Mouse buttons
-#define N_BUTTONS_HW            20
-#define N_BUTTONS_EXTENDED      25
+#define N_BUTTONS_HW            25
+#define N_BUTTONS_EXTENDED      30
 #define MOUSE_BUTTON_FIRST      (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA + N_GENERIC_ZONES)
 #define MOUSE_EXTRA_FIRST       (MOUSE_BUTTON_FIRST + N_BUTTONS_HW)
 // Number of keys that generate input
@@ -80,6 +80,7 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
 // Copies input from Corsair reports
 void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput);
 void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
+void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
 
 void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput);
 #endif // KEYMAP_H

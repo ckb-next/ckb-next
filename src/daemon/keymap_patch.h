@@ -8,7 +8,8 @@ typedef struct {
 
 // Collection of keypatches
 typedef struct {
-    short product;
+    ushort product;
+    ushort vendor;
     keypatch* patch;
     unsigned patchlen;
 } keypatches;

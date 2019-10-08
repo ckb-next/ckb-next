@@ -101,9 +101,10 @@ private slots:
     void showFwUpdateNotification(QWidget* widget, float version);
     void QSignalHandler();
     void checkedForNewVer(QString ver, QString changelog);
-
+#if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
     void appleRequestHidTimer();
-    
+#endif
+
 private:
     Ui::MainWindow *ui;
     QSocketNotifier* sigNotifier;

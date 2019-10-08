@@ -5,6 +5,9 @@
 
 This update fixes ckb-next for macOS Catalina
 
+Note for Ubuntu PPA users: Please cancel this update.
+An update will be released shortly through the PPA that also disables this prompt in the future.
+
 Support for new devices:
 - Harpoon RGB Pro
 - Ironclaw RGB

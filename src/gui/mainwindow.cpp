@@ -1,3 +1,4 @@
+
 #include "ckbsettings.h"
 #include "kbmanager.h"
 #include "kbfirmware.h"
@@ -67,6 +68,79 @@ extern "C" {
                 break;
             default:
                 break;
+        }
+    }
+}
+#endif
+
+#if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
+void MainWindow::appleRequestHidTimer(){
+    // Destroy the timer immediately if we have devices connected
+    if(KbManager::devices().count()){
+        catalinaTimer->stop();
+        catalinaTimer->deleteLater();
+        catalinaTimer = nullptr;
+        return;
+    }
+
+    QProcess launchctl;
+    launchctl.setProgram("launchctl");
+    // Start the agent only if the state on the previous run wasn't "running" or pre exec
+    if(!catalinaAgentStarted){
+        // Start the service
+        launchctl.setArguments(QStringList() << "start" << "org.ckb-next.daemon");
+        launchctl.start();
+        launchctl.waitForFinished();
+        qDebug() << "Launchctl start returned" << launchctl.exitCode();
+        catalinaAgentStarted = true;
+    }
+
+    // Get EUID
+    uid_t euid = geteuid();
+
+    // This will most likely block the UI thread, but hopefully it won't be too bad
+    QThread::msleep(1500);
+
+    // Call launchctl
+    launchctl.setArguments(QStringList() << "print" << QString("gui/%1/org.ckb-next.daemon").arg(euid));
+    launchctl.start();
+    launchctl.waitForFinished();
+    if(launchctl.exitCode() == 0){
+        QString str(launchctl.readAllStandardOutput());
+
+        int statestart = str.indexOf("state = ") + 8;
+        int statelen = str.indexOf('\n', statestart) - statestart;
+        if(statelen > 20)
+            return;
+
+        // Extract the state from the output
+        QStringRef agentState(&str, statestart, statelen);
+        if(agentState == QString("running") || agentState == QString("spawned (pre-exec)")){
+            catalinaAgentStarted = true;
+            return;
+        }
+        catalinaAgentStarted = false;
+
+        // Extract the daemon's return code
+        int statusstart = str.lastIndexOf("last exit code = ") + 17;
+        int statuslen = str.indexOf('\n', statusstart) - statusstart;
+        if(statuslen < 3 && statuslen > 0){
+            hid_req_ret status = (hid_req_ret)QStringRef(&str, statusstart, statuslen).toInt();
+            // We do not need to do anything if the request succeeds, other than wait for the loop to run again
+            if(status == REQUEST_ALREADY_ALLOWED){
+                qDebug() << "We have HID access!";
+                catalinaTimer->stop();
+                catalinaTimer->deleteLater();
+                catalinaTimer = nullptr;
+                // Ask user to restart daemon only if we first had to request permission
+                if(prevHidRet == REQUEST_SUCCEEDED)
+                    QProcess::execute("open", QStringList() << "-a" << "Terminal" << "/Applications/ckb-next.app/Contents/Resources/daemon-restart.sh");
+            }
+            else
+                qDebug() << "HID agent encountered an unknown error";
+            prevHidRet = status;
+        } else if (statuslen == 14) {
+            qDebug() << "Agent was never started. Something went wrong.";
         }
     }
 }
@@ -203,6 +277,32 @@ MainWindow::MainWindow(QWidget *parent) :
         checkForCkbUpdates();
 
     connect(settingsWidget, &SettingsWidget::checkForUpdates, this, &MainWindow::checkForCkbUpdates);
+#endif
+
+#if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
+    // Get macOS version. If Catalina or higher, start the daemon agent as the current user to request for HID permission.
+    QString macOSver = QSysInfo::productVersion();
+    // Split major/minor
+    QVector<QStringRef> verVector = macOSver.splitRef('.');
+    // Check if Catalina or greater
+    if(verVector.count() == 2 && verVector.at(0) == QString("10") && verVector.at(1).toInt() >= 15){
+        // Load the agent as it'll be unloaded on first installation
+        {
+            QProcess launchctl;
+            launchctl.setProgram("launchctl");
+            launchctl.setArguments(QStringList() << "load" << "/Library/LaunchAgents/org.ckb-next.daemon_agent.plist");
+            launchctl.start();
+            launchctl.waitForFinished();
+            qDebug() << "Launchctl load returned" << launchctl.exitCode();
+        }
+
+        // Start it
+        catalinaTimer = new QTimer(this);
+        connect(catalinaTimer, &QTimer::timeout, this, &MainWindow::appleRequestHidTimer);
+        catalinaTimer->setInterval(11000);
+        catalinaTimer->start();
+        QTimer::singleShot(2000, this, &MainWindow::appleRequestHidTimer);
+    }
 #endif
 }
 

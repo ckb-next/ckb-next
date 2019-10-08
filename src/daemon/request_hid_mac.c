@@ -18,7 +18,7 @@ hid_req_ret request_hid_access_mac(){
     if(ret == kIOReturnNotPermitted){
         // Is there a way to check if our request even succeeded?
         return REQUEST_SUCCEEDED;
-    } else if(ret == kIOReturnSuccess) {
+    } else if(ret == kIOReturnSuccess || ret == kIOReturnExclusiveAccess) {
         IOHIDDeviceClose(ref, kIOHIDOptionsTypeNone);
         return REQUEST_ALREADY_ALLOWED;
     }

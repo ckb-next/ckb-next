@@ -74,6 +74,15 @@ extern "C" {
 #endif
 
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
+bool is_catalina_or_higher(){
+    // Get macOS version. If Catalina or higher, start the daemon agent as the current user to request for HID permission.
+    QString macOSver = QSysInfo::productVersion();
+    // Split major/minor
+    QVector<QStringRef> verVector = macOSver.splitRef('.');
+    // Check if Catalina or greater
+    return (verVector.count() == 2 && verVector.at(0) == QString("10") && verVector.at(1).toInt() >= 15);
+}
+
 void MainWindow::appleRequestHidTimer(){
     // Destroy the timer immediately if we have devices connected
     if(KbManager::devices().count()){
@@ -280,12 +289,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
-    // Get macOS version. If Catalina or higher, start the daemon agent as the current user to request for HID permission.
-    QString macOSver = QSysInfo::productVersion();
-    // Split major/minor
-    QVector<QStringRef> verVector = macOSver.splitRef('.');
-    // Check if Catalina or greater
-    if(verVector.count() == 2 && verVector.at(0) == QString("10") && verVector.at(1).toInt() >= 15){
+    if(is_catalina_or_higher()){
         // Load the agent as it'll be unloaded on first installation
         {
             QProcess launchctl;
@@ -381,6 +385,8 @@ void MainWindow::updateVersion(){
         QString kextstatOut(kextstat.readAll());
         if(kextstatOut.isEmpty())
             daemonWarning.append(tr("<br /><b>Warning:</b> System Extension by \"Fumihiko Takayama\" is not allowed in Security & Privacy. Please allow it and then unplug and replug your devices."));
+        if(is_catalina_or_higher())
+            daemonWarning.append(tr("<br /><b>Warning:</b> Make sure ckb-next-daemon is allowed in Security & Privacy -> Input monitoring.<br />Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring."));
 #elif defined(Q_OS_LINUX)
             if(!(QFileInfo("/dev/uinput").exists() || QFileInfo("/dev/input/uinput").exists())){
                 QProcess modprobe;

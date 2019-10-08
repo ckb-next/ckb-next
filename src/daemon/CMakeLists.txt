@@ -99,6 +99,7 @@ if (MACOS OR LINUX)
               os.h
               profile.h
               protocol.h
+              request_hid_mac.h
               structures.h
               usb.h)
 endif ()
@@ -111,6 +112,7 @@ if (MACOS)
               input_mac_legacy.c
               input_mac_mouse_legacy.c
               extra_mac.c
+              request_hid_mac.c
               keymap_mac.h)
 elseif (LINUX)
     target_sources(
@@ -220,11 +222,16 @@ if (MACOS)
     message(STATUS "launchd detected")
     set(CKB_NEXT_INIT_SYSTEM "launchd" CACHE INTERNAL "")
 
-    # Import plist
+    # Import plists
     message(STATUS "Importing org.ckb-next.daemon.plist (${CKB_NEXT_INIT_SYSTEM})")
     configure_file(
         "${ckb-next_SOURCE_DIR}/macos/org.ckb-next.daemon.plist"
         "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon.plist"
+        COPYONLY)
+
+    configure_file(
+        "${ckb-next_SOURCE_DIR}/macos/org.ckb-next.daemon_agent.plist"
+        "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon_agent.plist"
         COPYONLY)
 
     if (SAFE_INSTALL)
@@ -414,6 +421,13 @@ if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon.plist"
         DESTINATION "/Library/LaunchDaemons"
+        PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ)
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon_agent.plist"
+        DESTINATION "/Library/LaunchAgents"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ

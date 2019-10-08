@@ -3,6 +3,7 @@
 #include "input.h"
 #include "led.h"
 #include "notify.h"
+#include "request_hid_mac.h"
 #include <ckbnextconfig.h>
 
 // usb.c
@@ -165,6 +166,11 @@ int main(int argc, char** argv){
             return 0;
         }
     }
+
+#ifdef OS_MAC
+    if(argc == 2 && getuid() != 0 && !(strcmp(argv[1], "--request-hid-permission-because-it-doesnt-work-as-root-thanks-apple")))
+        return request_hid_access_mac();
+#endif
 
     // Check PID, quit if already running
     char pidpath[strlen(devpath) + 6];

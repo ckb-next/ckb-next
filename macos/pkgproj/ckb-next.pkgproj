@@ -436,6 +436,8 @@
 				</dict>
 				<key>PAYLOAD_TYPE</key>
 				<integer>0</integer>
+				<key>PRESERVE_EXTENDED_ATTRIBUTES</key>
+				<false/>
 				<key>SHOW_INVISIBLE</key>
 				<false/>
 				<key>SPLIT_FORKS</key>
@@ -478,7 +480,7 @@
 				<key>REFERENCE_PATH</key>
 				<string></string>
 				<key>RELOCATABLE</key>
-				<true/>
+				<false/>
 				<key>USE_HFS+_COMPRESSION</key>
 				<false/>
 				<key>VERSION</key>
@@ -697,7 +699,24 @@
 								</dict>
 								<dict>
 									<key>CHILDREN</key>
-									<array/>
+									<array>
+										<dict>
+											<key>CHILDREN</key>
+											<array/>
+											<key>GID</key>
+											<integer>0</integer>
+											<key>PATH</key>
+											<string>/Library/LaunchAgents/org.ckb-next.daemon_agent.plist</string>
+											<key>PATH_TYPE</key>
+											<integer>0</integer>
+											<key>PERMISSIONS</key>
+											<integer>420</integer>
+											<key>TYPE</key>
+											<integer>3</integer>
+											<key>UID</key>
+											<integer>0</integer>
+										</dict>
+									</array>
 									<key>GID</key>
 									<integer>0</integer>
 									<key>PATH</key>
@@ -967,6 +986,8 @@
 				</dict>
 				<key>PAYLOAD_TYPE</key>
 				<integer>0</integer>
+				<key>PRESERVE_EXTENDED_ATTRIBUTES</key>
+				<false/>
 				<key>SHOW_INVISIBLE</key>
 				<false/>
 				<key>SPLIT_FORKS</key>
@@ -1016,7 +1037,7 @@
 				<key>REFERENCE_PATH</key>
 				<string></string>
 				<key>RELOCATABLE</key>
-				<true/>
+				<false/>
 				<key>USE_HFS+_COMPRESSION</key>
 				<false/>
 				<key>VERSION</key>
@@ -1050,7 +1071,17 @@
 		<key>PROJECT_PRESENTATION</key>
 		<dict>
 			<key>BACKGROUND</key>
-			<dict/>
+			<dict>
+				<key>APPAREANCES</key>
+				<dict>
+					<key>DARK_AQUA</key>
+					<dict/>
+					<key>LIGHT_AQUA</key>
+					<dict/>
+				</dict>
+				<key>SHARED_SETTINGS_FOR_ALL_APPAREANCES</key>
+				<true/>
+			</dict>
 			<key>INSTALLATION TYPE</key>
 			<dict>
 				<key>HIERARCHIES</key>
@@ -1060,6 +1091,8 @@
 						<key>LIST</key>
 						<array>
 							<dict>
+								<key>CHILDREN</key>
+								<array/>
 								<key>DESCRIPTION</key>
 								<array/>
 								<key>OPTIONS</key>
@@ -1071,11 +1104,7 @@
 								</dict>
 								<key>PACKAGE_UUID</key>
 								<string>32EBDDCD-400C-4E72-BA5F-AA4CD941B262</string>
-								<key>REQUIREMENTS</key>
-								<array/>
 								<key>TITLE</key>
-								<array/>
-								<key>TOOLTIP</key>
 								<array/>
 								<key>TYPE</key>
 								<integer>0</integer>
@@ -1083,6 +1112,8 @@
 								<string>90CC6C15-D584-4F5C-B27F-46B549D316EC</string>
 							</dict>
 							<dict>
+								<key>CHILDREN</key>
+								<array/>
 								<key>DESCRIPTION</key>
 								<array/>
 								<key>OPTIONS</key>
@@ -1094,11 +1125,7 @@
 								</dict>
 								<key>PACKAGE_UUID</key>
 								<string>9B1AB7CE-075D-4AE0-B1B3-E87B644E9F9C</string>
-								<key>REQUIREMENTS</key>
-								<array/>
 								<key>TITLE</key>
-								<array/>
-								<key>TOOLTIP</key>
 								<array/>
 								<key>TYPE</key>
 								<integer>0</integer>

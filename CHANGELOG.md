@@ -1,5 +1,24 @@
 # Change Log
 
+## [v0.4.2](https://github.com/ckb-next/ckb-next/tree/v0.4.2) (2019-10-08)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.1...v0.4.2)
+
+This update fixes ckb-next for macOS Catalina
+
+Support for new devices:
+- Harpoon RGB Pro
+- Ironclaw RGB
+
+Important bugfixes:
+
+- ckb-next-daemon now correctly requests permission on macOS Catalina
+- Music visualiser is now included again in macOS packages
+- GUI no longer crashes if an animation has no keys set
+
+Notes:
+
+- Included quazip was updated to fix deprecation warnings
+
 ## [v0.4.1](https://github.com/ckb-next/ckb-next/tree/v0.4.1) (2019-08-27)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.0...v0.4.1)
 

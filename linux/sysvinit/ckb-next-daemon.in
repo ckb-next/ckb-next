@@ -52,7 +52,7 @@ case "$1" in
         log_end_msg $?
         ;;
     status)
-        status_of_proc -p $PID $DAEMON "CKB daemon"
+        status_of_proc -p $PID $DAEMON $NAME
         ;;
     *)
         echo "Usage: $0 {start|stop|restart|reload|status}" >&2

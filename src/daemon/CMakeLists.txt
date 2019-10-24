@@ -533,6 +533,7 @@ if (SAFE_INSTALL)
         install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo rc-service ckb-next-daemon start)")
     elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "SysVinit")
+        install(CODE "execute_process(COMMAND sudo update-rc.d ckb-next-daemon.sh defaults)")
         # Just running the script should be enough
         install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo /etc/init.d/ckb-next-daemon.sh start)")

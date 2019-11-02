@@ -1,6 +1,6 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:         ckb
+# Provides:         ckb-next
 # Required-Start:   $local_fs $remote_fs
 # Required-Stop:    $local_fs $remote_fs
 # Default-Start:    2 3 4 5

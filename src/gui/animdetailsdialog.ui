@@ -75,7 +75,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Descripton</string>
+       <string>Description</string>
       </property>
      </column>
     </widget>

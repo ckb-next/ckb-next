@@ -54,6 +54,9 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     const QCommandLineOption backgroundOption(QStringList() << "b" << "background",
                                               "Starts in background, without displaying the main window.");
     parser.addOption(backgroundOption);
+
+    const QCommandLineOption sessionOption("session", "Same as background.");
+    parser.addOption(sessionOption);
     // add -c, --close
     const QCommandLineOption closeOption(QStringList() << "c" << "close",
                                          "Causes already running instance (if any) to exit.");
@@ -83,7 +86,7 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
         return CommandLineHelpRequested;
     }
 
-    if (parser.isSet(backgroundOption)) {
+    if (parser.isSet(backgroundOption) || parser.isSet(sessionOption)) {
         // open application in background
         return CommandLineBackground;
     }

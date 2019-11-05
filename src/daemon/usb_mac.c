@@ -950,6 +950,8 @@ static void iterate_devices_hid(void* context, io_iterator_t iterator){
             (*handle)->close(handle, kIOHIDOptionsTypeSeizeDevice);
 release:
         IOObjectRelease(device);
+        if(err == kIOReturnNotPermitted)
+            return;
     }
     euid_guard_stop;
 }

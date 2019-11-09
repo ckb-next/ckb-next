@@ -3,6 +3,7 @@
 #include <QStandardPaths>
 #include "autorun.h"
 #include "ckbsettings.h"
+#include <QDebug>
 
 // >=0.3.0 (new) paths
 #ifdef Q_OS_LINUX
@@ -43,6 +44,27 @@ bool AutoRun::isEnabled() {
     // Check if the file exists. If not, autostart is disabled.
     if (!path.exists() || !path.exists(file))
         return false;
+    // Check if the existing autostart file matches the one bundled with the binary
+    QFile internal(internalFile), sysfile(path.absoluteFilePath(file));
+
+    internal.open(QIODevice::ReadOnly);
+    // We can't open this RW because default permissions are -r--r--r--
+    sysfile.open(QIODevice::ReadOnly);
+
+    QByteArray internalData = internal.readAll();
+    // Only load internalData size bytes at most from the file on disk
+    QByteArray sysfileData = sysfile.read(internalData.length());
+
+    internal.close();
+    sysfile.close();
+
+    if(internalData != sysfileData){
+        sysfile.remove();
+        qDebug() << "Autostart files differ. Replacing with new one.";
+        enable();
+        return true;
+    }
+
     // If autostart is enabled, set the flag from once() (in case it hasn't been done yet)
     CkbSettings::set(settingPath, true);
     return true;

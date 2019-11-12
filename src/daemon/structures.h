@@ -260,7 +260,7 @@ typedef struct {
     // Device name
     char name[KB_NAME_LEN+1]; // increase by 1 for the trailing \0 for names that are exactly KB_NAME_LEN, e.g. "Corsair STRAFE RGB Gaming Keyboard"
     // Device serial number
-    char serial[SERIAL_LEN];
+    char serial[SERIAL_LEN+1];
     // USB vendor and product IDs
     ushort vendor, product;
     // Firmware version

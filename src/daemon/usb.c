@@ -30,7 +30,7 @@ dpi_list mouse_dpi_list[] = {
     { 0, 0 }, // Keep last and do not remove
 };
 
-// WARNING: macOS doesn't support iVendor != 0x1b1c at the moment
+// WARNING: macOS doesn't support idVendor != 0x1b1c at the moment
 device_desc models[] = {
     // Keyboards
     { V_CORSAIR, P_K55, },

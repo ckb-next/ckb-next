@@ -10,7 +10,7 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     if(AnimScript::count() == 0)
-        ui->animButton->setVisible(false);
+        ui->animButton->setEnabled(false);
 
     connect(ui->bgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeColor(QColor)));
     connect(ui->keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));

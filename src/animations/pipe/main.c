@@ -43,6 +43,7 @@ void ckb_init(ckb_runctx* context){
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_LONG("fifonum", &fifonum){
         sprintf(fifoname, "/tmp/ckbpipe%03hhu", (unsigned char)fifonum);
+        unlink(fifoname);
         // Create named pipe in tmp
         mkfifo(fifoname, 0600);
         fd = open(fifoname, O_RDONLY | O_NONBLOCK);

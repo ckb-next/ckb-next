@@ -63,7 +63,7 @@ void KbProfileDialog::repopulate(){
 
 void KbProfileDialog::addNewProfileItem(){
     // Add an item for creating a new profile. Make it editable but not dragable.
-    QListWidgetItem* item = new QListWidgetItem("New profile...", ui->profileList);
+    QListWidgetItem* item = new QListWidgetItem(tr("New profile..."), ui->profileList);
     item->setFlags((item->flags() | Qt::ItemIsEditable) & ~Qt::ItemIsDragEnabled & ~Qt::ItemIsDropEnabled);
     item->setData(NEW_FLAG, 1);
     QFont font = item->font();
@@ -113,23 +113,23 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     QList<KbProfile*> profiles = device->profiles();
 
     QMenu menu(this);
-    QAction* rename = new QAction("Rename", this);
-    QAction* duplicate = new QAction("Duplicate", this);
-    QAction* del = new QAction("Delete", this);
+    QAction* rename = new QAction(tr("Rename"), this);
+    QAction* duplicate = new QAction(tr("Duplicate"), this);
+    QAction* del = new QAction(tr("Delete"), this);
     bool canDelete = (profiles.count() > 1);
     if(!canDelete)
         // Can't delete the last profile on the device
         del->setEnabled(false);
-    QAction* hwsave = new QAction("Save to Hardware", this);
+    QAction* hwsave = new QAction(tr("Save to Hardware"), this);
     // Disable Save to hardware button for unsupported devices
     if(!device->hwload){
         hwsave->setDisabled(true);
-        hwsave->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
+        hwsave->setToolTip(tr("Saving to hardware is not supported on this device."));
     }
-    QAction* moveup = new QAction("Move Up", this);
+    QAction* moveup = new QAction(tr("Move Up"), this);
     if(index == 0)
         moveup->setEnabled(false);
-    QAction* movedown = new QAction("Move Down", this);
+    QAction* movedown = new QAction(tr("Move Down"), this);
     if(index >= profiles.count() - 1)
         movedown->setEnabled(false);
     menu.addAction(rename);
@@ -350,7 +350,7 @@ void KbProfileDialog::on_importButton_clicked(){
     QStringList extracted = JlCompress::extractDir(filename, QString("/tmp/"));
 
     if(extracted.empty()){
-        QMessageBox::warning(this, tr("Error"), QString(tr("Could not read %1.")).arg(filename), QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Error"), tr("Could not read %1.").arg(filename), QMessageBox::Ok);
         return;
     }
 
@@ -399,9 +399,9 @@ void KbProfileDialog::on_importButton_clicked(){
 
             // Only identical devices are supported for now, but let the user override this if they want
             int ret = QMessageBox::question(this, tr("Profile Import"),
-                                            QString(tr("This profile was created for a %1 (%2)\nbut it is going to be imported to a %3 (%4).\n\n"
+                                                  tr("This profile was created for a %1 (%2)\nbut it is going to be imported to a %3 (%4).\n\n"
                                                        "You may need to manually add some keys to the appropriate animations.\n\n"
-                                                       "Import Anyway?")).arg(metadataDevModel, metadataDevLayoutStr, currentDevModel, currentDevLayoutStr),
+                                                       "Import Anyway?").arg(metadataDevModel, metadataDevLayoutStr, currentDevModel, currentDevLayoutStr),
                                             QMessageBox::Yes,
                                             QMessageBox::No);
 
@@ -448,7 +448,7 @@ void KbProfileDialog::on_importButton_clicked(){
 
     QString profilestrf(profilestr.join("\n• "));
     int ret = QMessageBox::information(this, tr("Profile Import"),
-                                   QString(tr("The following profiles will be imported.\n\n• ")).append(profilestrf),
+                                   tr("The following profiles will be imported.\n\n• ").append(profilestrf),
                                    QMessageBox::Ok,
                                    QMessageBox::Cancel);
     if(ret == QMessageBox::Cancel){

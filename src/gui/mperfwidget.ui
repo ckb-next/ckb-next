@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -794,7 +794,7 @@
      <item row="7" column="3">
       <widget class="QLabel" name="label_6">
        <property name="text">
-        <string>2:</string>
+        <string notr="true">2:</string>
        </property>
       </widget>
      </item>
@@ -814,14 +814,14 @@
      <item row="8" column="3">
       <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>3:</string>
+        <string notr="true">3:</string>
        </property>
       </widget>
      </item>
      <item row="9" column="3">
       <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>4:</string>
+        <string notr="true">4:</string>
        </property>
       </widget>
      </item>
@@ -849,8 +849,11 @@
      </item>
      <item row="6" column="3">
       <widget class="QLabel" name="label_5">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
-        <string>1:</string>
+        <string notr="true">1:</string>
        </property>
       </widget>
      </item>
@@ -864,7 +867,7 @@
      <item row="10" column="3">
       <widget class="QLabel" name="label_13">
        <property name="text">
-        <string>5:</string>
+        <string notr="true">5:</string>
        </property>
       </widget>
      </item>
@@ -958,7 +961,7 @@
      <item row="6" column="0">
       <widget class="QLabel" name="iLabel1">
        <property name="text">
-        <string>→</string>
+        <string notr="true">→</string>
        </property>
       </widget>
      </item>
@@ -993,7 +996,7 @@
           <string>Indicator intensity</string>
          </property>
          <property name="suffix">
-          <string>%</string>
+          <string notr="true">%</string>
          </property>
          <property name="maximum">
           <number>100</number>
@@ -1021,7 +1024,7 @@
      <item row="7" column="0">
       <widget class="QLabel" name="iLabel2">
        <property name="text">
-        <string>→</string>
+        <string notr="true">→</string>
        </property>
       </widget>
      </item>
@@ -1035,35 +1038,35 @@
      <item row="8" column="0">
       <widget class="QLabel" name="iLabel3">
        <property name="text">
-        <string>→</string>
+        <string notr="true">→</string>
        </property>
       </widget>
      </item>
      <item row="9" column="0">
       <widget class="QLabel" name="iLabel4">
        <property name="text">
-        <string>→</string>
+        <string notr="true">→</string>
        </property>
       </widget>
      </item>
      <item row="10" column="0">
       <widget class="QLabel" name="iLabel5">
        <property name="text">
-        <string>→</string>
+        <string notr="true">→</string>
        </property>
       </widget>
      </item>
      <item row="11" column="0">
       <widget class="QLabel" name="iLabel0">
        <property name="text">
-        <string>→</string>
+        <string notr="true">→</string>
        </property>
       </widget>
      </item>
      <item row="12" column="0">
       <widget class="QLabel" name="iLabelO">
        <property name="text">
-        <string>→</string>
+        <string notr="true">→</string>
        </property>
       </widget>
      </item>

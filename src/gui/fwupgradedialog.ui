@@ -90,14 +90,14 @@
      <item row="1" column="2">
       <widget class="QLabel" name="curLabel">
        <property name="text">
-        <string>0.00</string>
+        <string notr="true">0.00</string>
        </property>
       </widget>
      </item>
      <item row="1" column="5">
       <widget class="QLabel" name="newLabel">
        <property name="text">
-        <string>0.00</string>
+        <string notr="true">0.00</string>
        </property>
       </widget>
      </item>

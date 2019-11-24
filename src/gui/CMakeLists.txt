@@ -3,7 +3,7 @@
 #
 #   Redistribution and use in source and binary forms, with or without
 #   modification, are permitted provided that the following conditions are met:
-#   
+#
 #   1. Redistributions of source code must retain the above copyright notice,
 #   this list of conditions and the following disclaimer.
 #   2. Redistributions in binary form must reproduce the above copyright
@@ -11,8 +11,8 @@
 #   documentation and/or other materials provided with the distribution.
 #   3. Neither the name of the copyright holder nor the names of its
 #   contributors may be used to endorse or promote products derived from this
-#   software without specific prior written permission. 
-#   
+#   software without specific prior written permission.
+#
 #   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 #   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 #   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -279,6 +279,31 @@ if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/image.qrc")
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "</qresource>\n</RCC>\n")
 endif ()
 
+find_package(Qt5LinguistTools CONFIG REQUIRED)
+
+# Generate translation.qrc
+# Note that the qm files haven't been generated yet
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc")
+    file(GLOB qt_translations RELATIVE "${CMAKE_CURRENT_LIST_DIR}/resources/translations" "${CMAKE_CURRENT_LIST_DIR}/resources/translations/*.ts")
+    message(STATUS "Generating translation.qrc")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc" "<RCC>\n<qresource prefix=\"/translations\">\n")
+    foreach (qt_ts_translation IN LISTS qt_translations)
+        string(REPLACE ".ts" ".qm" qt_qm_translation ${qt_ts_translation})
+        message(STATUS "Importing ${qt_qm_translation}")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc" "<file>${qt_qm_translation}</file>\n")
+    endforeach ()
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc" "</qresource>\n</RCC>\n")
+endif ()
+
+# Generate binary translations and update ts files if needed
+file(GLOB qt_translations_rel RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/resources/translations/*.ts")
+qt5_add_translation(QM_FILES "${qt_translations_rel}")
+
+# Simple target to call lupdate on demand
+add_custom_target(lupdate
+    COMMAND Qt5::lupdate "." "-ts" ${qt_translations_rel}
+    WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+
 if (MACOS)
     # Import macOS icon
     if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.icns")
@@ -358,7 +383,9 @@ if (MACOS OR LINUX)
             PRIVATE
               "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc"
               "${CMAKE_CURRENT_BINARY_DIR}/text.qrc"
-              "${CMAKE_CURRENT_BINARY_DIR}/image.qrc")
+              "${CMAKE_CURRENT_BINARY_DIR}/image.qrc"
+              "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc"
+              "${QM_FILES}")
 endif ()
 
 # Declare target's include paths

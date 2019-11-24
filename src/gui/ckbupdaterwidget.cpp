@@ -52,7 +52,7 @@ void CkbUpdaterDialog::on_remindMeLaterButton_clicked(){
 void CkbUpdaterDialog::on_updateButton_clicked(){
     ui->remindMeLaterButton->setEnabled(false);
     ui->updateButton->setEnabled(false);
-    ui->updateButton->setText("Downloading");
+    ui->updateButton->setText(tr("Downloading"));
     if(_manager != nullptr)
         return;
 
@@ -99,14 +99,14 @@ void CkbUpdaterDialog::downloadFinished(QNetworkReply* reply){
         }
         reply->deleteLater();
 
-        QMessageBox::information(this, "Download Complete", QString(tr("Update has been downloaded to /tmp/ckb-next/v")
+        QMessageBox::information(this, tr("Download Complete"),     tr("Update has been downloaded to /tmp/ckb-next/v")
                                                                     + _version + suffix
 #ifndef Q_OS_MAC
                                                                     + tr("<br />You will need to manually compile the source code.")
 #endif
                                                                     + tr("<br /><br />Optionally, for added security, please check that the following value exists at the bottom of <a href=\"https://github.com/ckb-next/ckb-next/releases/tag/v")
                                                                     + _version
-                                                                    + tr("\">this page</a>.<br /><pre>%1</pre><br />Press OK to continue.")).arg(QString(hash.result().toHex())));
+                                                                    + tr("\">this page</a>.<br /><pre>%1</pre><br />Press OK to continue.").arg(QString(hash.result().toHex())));
         QProcess process;
 #if defined(Q_OS_MAC)
         // Unmount any old ckb-next volume that might exist

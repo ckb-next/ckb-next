@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -89,14 +89,14 @@
             </font>
            </property>
            <property name="text">
-            <string>Animation name</string>
+            <string notr="true">Animation name</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="aVerLabel">
            <property name="text">
-            <string>v0.0</string>
+            <string notr="true">v0.0</string>
            </property>
           </widget>
          </item>
@@ -116,7 +116,7 @@
          <item>
           <widget class="QLabel" name="aCopyLabel">
            <property name="text">
-            <string>Copyright ©</string>
+            <string notr="true">Copyright ©</string>
            </property>
           </widget>
          </item>
@@ -159,7 +159,7 @@
          <item row="1" column="3">
           <widget class="QDoubleSpinBox" name="opacityBox">
            <property name="suffix">
-            <string>%</string>
+            <string notr="true">%</string>
            </property>
            <property name="decimals">
             <number>1</number>
@@ -329,7 +329,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Mising animation</string>
+          <string notr="true">Missing animation</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

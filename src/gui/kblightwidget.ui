@@ -14,7 +14,7 @@
    <enum>Qt::ClickFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -235,17 +235,17 @@
        </property>
        <item>
         <property name="text">
-         <string>100%</string>
+         <string notr="true">100%</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>67%</string>
+         <string notr="true">67%</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>33%</string>
+         <string notr="true">33%</string>
         </property>
        </item>
        <item>
@@ -263,7 +263,7 @@
         </font>
        </property>
        <property name="text">
-        <string>☼</string>
+        <string notr="true">☼</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -359,15 +359,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>ColorButton</class>
+   <extends>QPushButton</extends>
+   <header>colorbutton.h</header>
+  </customwidget>
+  <customwidget>
    <class>KeyWidget</class>
    <extends>QWidget</extends>
    <header>keywidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ColorButton</class>
-   <extends>QPushButton</extends>
-   <header>colorbutton.h</header>
   </customwidget>
   <customwidget>
    <class>KbAnimWidget</class>

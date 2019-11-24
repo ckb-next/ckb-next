@@ -91,7 +91,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 #ifndef OS_MAC_LEGACY
 #ifdef Q_OS_MACOS
     QString labelText = ui->label_2->text();
-    labelText.append("<br/>Special thanks to <a href=\"https://github.com/tekezo\" style=\"text-decoration:none;\">tekezo</a> for <a href=\"https://github.com/tekezo/Karabiner-VirtualHIDDevice\" style=\"text-decoration:none;\">VirtualHIDDevice</a>.");
+    labelText.append(tr("<br/>Special thanks to <a href=\"https://github.com/tekezo\" style=\"text-decoration:none;\">tekezo</a> for <a href=\"https://github.com/tekezo/Karabiner-VirtualHIDDevice\" style=\"text-decoration:none;\">VirtualHIDDevice</a>."));
     ui->label_2->setText(labelText);
 #endif
 #endif
@@ -255,7 +255,7 @@ void SettingsWidget::on_pushButton_2_clicked()
 {
     emit checkForUpdates();
     ui->pushButton_2->setEnabled(false);
-    ui->pushButton_2->setText("Checking...");
+    ui->pushButton_2->setText(tr("Checking..."));
     updateRequestedByUser = true;
 }
 

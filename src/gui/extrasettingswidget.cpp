@@ -98,11 +98,11 @@ void ExtraSettingsWidget::on_animScanButton_clicked(){
     AnimScript::scan();
     int count = AnimScript::count();
     if(count == 0)
-        ui->animCountLabel->setText("No animations found");
+        ui->animCountLabel->setText(tr("No animations found"));
     else if(count == 1)
-        ui->animCountLabel->setText("1 animation found");
+        ui->animCountLabel->setText(tr("1 animation found"));
     else
-        ui->animCountLabel->setText(QString("%1 animations found").arg(count));
+        ui->animCountLabel->setText(tr("%1 animations found").arg(count));
 }
 
 void ExtraSettingsWidget::on_fpsBox_valueChanged(int arg1){

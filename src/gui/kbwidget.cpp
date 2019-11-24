@@ -167,7 +167,7 @@ void KbWidget::updateProfileList(){
             ui->profileBox->setCurrentIndex(i);
         i++;
     }
-    ui->profileBox->addItem(QIcon(":/img/icon_blank.png"), "Manage profiles...");
+    ui->profileBox->addItem(QIcon(":/img/icon_blank.png"), tr("Manage profiles..."));
     QFont font = ui->profileBox->font();
     font.setItalic(true);
     ui->profileBox->setItemData(ui->profileBox->count() - 1, font, Qt::FontRole);
@@ -220,7 +220,7 @@ QIcon KbWidget::modeIcon(int i){
 
 void KbWidget::addNewModeItem(){
     // Add an item for creating a new mode. Make it editable but not dragable.
-    QListWidgetItem* item = new QListWidgetItem("New mode...", ui->modesList);
+    QListWidgetItem* item = new QListWidgetItem(tr("New mode..."), ui->modesList);
     item->setFlags((item->flags() | Qt::ItemIsEditable) & ~Qt::ItemIsDragEnabled & ~Qt::ItemIsDropEnabled);
     item->setData(NEW_FLAG, 1);
     QFont font = item->font();
@@ -326,17 +326,17 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     int index = currentProfile->indexOf(currentMode);
 
     QMenu menu(this);
-    QAction* rename = new QAction("Rename...", this);
-    QAction* duplicate = new QAction("Duplicate", this);
-    QAction* del = new QAction("Delete", this);
+    QAction* rename = new QAction(tr("Rename..."), this);
+    QAction* duplicate = new QAction(tr("Duplicate"), this);
+    QAction* del = new QAction(tr("Delete"), this);
     bool canDelete = (device->currentProfile()->modeCount() > device->hwModeCount);
     if(!canDelete)
         // Can't delete modes if they're required by hardware
         del->setEnabled(false);
-    QAction* moveup = new QAction("Move Up", this);
+    QAction* moveup = new QAction(tr("Move Up"), this);
     if(index == 0)
         moveup->setEnabled(false);
-    QAction* movedown = new QAction("Move Down", this);
+    QAction* movedown = new QAction(tr("Move Down"), this);
     if(index >= currentProfile->modeCount() - 1)
         movedown->setEnabled(false);
     menu.addAction(rename);
@@ -430,12 +430,12 @@ void KbWidget::on_tabWidget_currentChanged(int index){
 
 void KbWidget::updateFwButton(){
     if(!KbFirmware::hasDownloaded())
-        ui->fwUpdButton->setText("Check for updates");
+        ui->fwUpdButton->setText(tr("Check for updates"));
     else {
         float newVersion = KbFirmware::versionForBoard(device->productID);
         float oldVersion = device->firmware.toFloat();
         if(newVersion <= 0.f || newVersion <= oldVersion)
-            ui->fwUpdButton->setText("Up to date");
+            ui->fwUpdButton->setText(tr("Up to date"));
         else
             ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(QString::number(newVersion, 'f', 2)));
     }
@@ -446,7 +446,7 @@ void KbWidget::on_fwUpdButton_clicked(){
     if(!(qApp->keyboardModifiers() & Qt::AltModifier)){
         // Check version numbers
         if(!KbFirmware::hasDownloaded()){
-            ui->fwUpdButton->setText("Checking...");
+            ui->fwUpdButton->setText(tr("Checking..."));
             ui->fwUpdButton->setEnabled(false);
         }
         float newVersion = KbFirmware::versionForBoard(device->productID, true);
@@ -454,14 +454,14 @@ void KbWidget::on_fwUpdButton_clicked(){
         ui->fwUpdButton->setEnabled(true);
         updateFwButton();
         if(newVersion == -1.f){
-            QMessageBox::information(this, "Firmware update", "<center>There is a new firmware available for this device.<br />However, it requires a newer version of ckb-next.<br />Please upgrade ckb-next and try again.</center>");
+            QMessageBox::information(this, tr("Firmware update"), tr("<center>There is a new firmware available for this device.<br />However, it requires a newer version of ckb-next.<br />Please upgrade ckb-next and try again.</center>"));
             return;
         } else if(newVersion == 0.f){
-            if(QMessageBox::question(this, "Firmware update", "<center>There was a problem getting the status for this device.<br />Would you like to select a file manually?</center>") != QMessageBox::Yes)
+            if(QMessageBox::question(this, tr("Firmware update"), tr("<center>There was a problem getting the status for this device.<br />Would you like to select a file manually?</center>")) != QMessageBox::Yes)
                 return;
             // "Yes" -> fall through to browse file
         } else if(newVersion <= oldVersion){
-            if(QMessageBox::question(this, "Firmware update", "<center>Your firmware is already up to date.<br />Would you like to select a file manually?</center>") != QMessageBox::Yes)
+            if(QMessageBox::question(this, tr("Firmware update"), tr("<center>Your firmware is already up to date.<br />Would you like to select a file manually?</center>")) != QMessageBox::Yes)
                 return;
             // "Yes" -> fall through to browse file
         } else {
@@ -473,12 +473,12 @@ void KbWidget::on_fwUpdButton_clicked(){
         }
     }
     // Browse for file
-    QString path = QFileDialog::getOpenFileName(this, "Select firmware file", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), "Firmware blobs (*.bin)");
+    QString path = QFileDialog::getOpenFileName(this, tr("Select firmware file"), QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), tr("Firmware blobs (*.bin)"));
     if(path.isEmpty())
         return;
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly)){
-        QMessageBox::warning(parentWidget(), "Error", "<center>File could not be read.</center>");
+        QMessageBox::warning(parentWidget(), tr("Error"), tr("<center>File could not be read.</center>"));
         return;
     }
     QByteArray blob = file.readAll();

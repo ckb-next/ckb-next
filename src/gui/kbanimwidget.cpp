@@ -181,9 +181,9 @@ void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint &pos){
     setCurrent(animations[item->data(Qt::UserRole).toUuid()]);
 
     QMenu menu(this);
-    QAction* rename = new QAction("Rename...", this);
-    QAction* duplicate = new QAction("Duplicate", this);
-    QAction* del = new QAction("Delete", this);
+    QAction* rename = new QAction(tr("Rename..."), this);
+    QAction* duplicate = new QAction(tr("Duplicate"), this);
+    QAction* del = new QAction(tr("Delete"), this);
     menu.addAction(rename);
     menu.addAction(duplicate);
     menu.addAction(del);
@@ -237,7 +237,7 @@ void KbAnimWidget::on_keyButton_clicked(){
 
 void KbAnimWidget::on_deleteButton_clicked(){
     if(current){
-        if(QMessageBox::question(this, tr("Delete animation"), "Are you sure you want to delete this animation?") != QMessageBox::Yes)
+        if(QMessageBox::question(this, tr("Delete animation"), tr("Are you sure you want to delete this animation?")) != QMessageBox::Yes)
             return;
         animations.remove(current->guid());
         QList<KbAnim*> animList = light->animList();

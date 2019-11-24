@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Application Settings</string>
+   <string notr="true">Application Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -146,7 +146,7 @@
      <item>
       <widget class="QLabel" name="animPathLabel">
        <property name="text">
-        <string>/path/to/animations</string>
+        <string notr="true">/path/to/animations</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

@@ -94,7 +94,7 @@ int FwUpgradeDialog::exec(){
         // If a blob was already specified, check its version and validity
         float newV = verifyFw(blob, productID);
         if(newV == 0.f){
-            QMessageBox::warning(parentWidget(), "Error", "<center>Not a valid firmware for this device.</center>");
+            QMessageBox::warning(parentWidget(), tr("Error"), tr("<center>Not a valid firmware for this device.</center>"));
             return QDialog::Rejected;
         }
         ui->newLabel->setText(QString::number(newV, 'f', 2));
@@ -110,21 +110,21 @@ int FwUpgradeDialog::exec(){
         float newV = verifyFw(blob, productID);
         if(newV == 0.f){
             hide();
-            QMessageBox::warning(parentWidget(), "Error", "<center>There was a problem with the downloaded file.<br />Please try again later.</center>");
+            QMessageBox::warning(parentWidget(), tr("Error"), tr("<center>There was a problem with the downloaded file.<br />Please try again later.</center>"));
             return QDialog::Rejected;
         }
     }
     // Save temporary file
     if(saveBlob().isEmpty()){
         hide();
-        QMessageBox::warning(parentWidget(), "Error", "<center>Unable to save temporary file.</center>");
+        QMessageBox::warning(parentWidget(), tr("Error"), tr("<center>Unable to save temporary file.</center>"));
         return QDialog::Rejected;
     }
     // Set up UI
     ui->progressBar->setValue(0);
     ui->progressBar->setMaximum(1);
     ui->progressBar->setTextVisible(false);
-    ui->statusLabel->setText("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb-next is not endorsed by Corsair.<br />This is <i>unlikely</i> to cause any damage, however the developers of this software do not accept any responsibility in such an event.");
+    ui->statusLabel->setText(tr("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb-next is not endorsed by Corsair.<br />This is <i>unlikely</i> to cause any damage, however the developers of this software do not accept any responsibility in such an event."));
     ui->cancelButton->setEnabled(true);
     ui->actionButton->setEnabled(true);
     setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MAX);
@@ -154,10 +154,10 @@ void FwUpgradeDialog::fwUpdateProgress(int current, int total){
 void FwUpgradeDialog::fwUpdateFinished(bool succeeded){
     cleanBlob();
     if(succeeded)
-        ui->statusLabel->setText("Update successful!");
+        ui->statusLabel->setText(tr("Update successful!"));
     else
-        ui->statusLabel->setText("Update failed.");
-    ui->actionButton->setText("OK");
+        ui->statusLabel->setText(tr("Update failed."));
+    ui->actionButton->setText(tr("OK"));
     ui->actionButton->setEnabled(true);
     ui->progressBar->setMaximum(1);
     ui->progressBar->setValue(1);
@@ -182,8 +182,8 @@ void FwUpgradeDialog::on_actionButton_clicked(){
         ui->progressBar->setTextVisible(true);
         ui->cancelButton->hide();
         ui->actionButton->setEnabled(false);
-        ui->actionButton->setText("Please wait");
-        ui->statusLabel->setText("Installing firmware...");
+        ui->actionButton->setText(tr("Please wait"));
+        ui->statusLabel->setText(tr("Installing firmware..."));
         kb->fwUpdate(savePath);
     } else {
         // Finished, close dialog.

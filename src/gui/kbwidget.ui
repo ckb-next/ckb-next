@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -429,22 +429,22 @@
            </property>
            <item>
             <property name="text">
-             <string>1 ms</string>
+             <string notr="true">1 ms</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>2 ms</string>
+             <string notr="true">2 ms</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>4 ms</string>
+             <string notr="true">4 ms</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>8 ms</string>
+             <string notr="true">8 ms</string>
             </property>
            </item>
           </widget>

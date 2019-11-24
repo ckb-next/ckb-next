@@ -27,19 +27,7 @@
 extern QSharedMemory appShare;
 extern QString devpath;
 
-static const QString configLabel = "Settings";
-
 int MainWindow::signalHandlerFd[2] = {0, 0};
-
-#ifndef Q_OS_MACOS
-QString daemonDialogText = QObject::tr("Start it once with:") +
-    "<blockquote><code>sudo systemctl start ckb-next-daemon</code></blockquote>" +
-    QObject::tr("Enable it for every boot:") +
-    "<blockquote><code>sudo systemctl enable ckb-next-daemon</code></blockquote>";
-#else
-QString daemonDialogText = QObject::tr("Start and enable it with:") +
-    "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist</code></blockquote>";
-#endif
 
 MainWindow* MainWindow::mainWindow = 0;
 
@@ -246,7 +234,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
-    ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), configLabel);
+    ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), QString(tr("Settings")));
     settingsWidget->setVersion("ckb-next " CKB_NEXT_VERSION_STR);
 
     // create daemon dialog as a QMessageBox
@@ -255,6 +243,15 @@ MainWindow::MainWindow(QWidget *parent) :
     // set the main and informative text to tell the user about the issue
     QMessageBox dialog;
     dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
+#ifndef Q_OS_MACOS
+    QString daemonDialogText = QString(tr("Start it once with:")) +
+    "<blockquote><code>sudo systemctl start ckb-next-daemon</code></blockquote>" +
+    tr("Enable it for every boot:") +
+    "<blockquote><code>sudo systemctl enable ckb-next-daemon</code></blockquote>";
+#else
+    QString daemonDialogText = QString(tr("Start and enable it with:")) +
+    "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist</code></blockquote>";
+#endif
     dialog.setInformativeText(daemonDialogText);
     dialog.setIcon(QMessageBox::Critical);
 
@@ -373,7 +370,7 @@ void MainWindow::updateVersion(){
     // Warn if the daemon version doesn't match the GUI
     QString daemonWarning;
     if(daemonVersion != CKB_NEXT_VERSION_STR)
-        daemonWarning = "<br /><br /><b>Warning:</b> Driver version mismatch (" + daemonVersion + "). Please upgrade ckb-next" + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + ". If the problem persists, try rebooting.";
+        daemonWarning = tr("<br /><br /><b>Warning:</b> Driver version mismatch (") + daemonVersion + tr("). Please upgrade ckb-next") + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + tr(". If the problem persists, try rebooting.");
     if(count == 0){
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
         QProcess kextstat;
@@ -451,7 +448,7 @@ void MainWindow::closeEvent(QCloseEvent *event){
         return;
     }
     if(!CkbSettings::get("Popups/BGWarning").toBool()){
-        QMessageBox::information(this, "ckb-next", "ckb-next will still run in the background.\nTo close it, choose Quit from the tray menu\nor click \"Quit\" on the Settings screen.");
+        QMessageBox::information(this, "ckb-next", tr("ckb-next will still run in the background.\nTo close it, choose Quit from the tray menu\nor click \"Quit\" on the Settings screen."));
         CkbSettings::set("Popups/BGWarning", true);
     }
     hide();
@@ -603,12 +600,12 @@ void MainWindow::PosixSignalHandler(int signal){
 void MainWindow::checkedForNewVer(QString ver, QString changelog){
 #ifndef DISABLE_UPDATER
     if(!ver.isEmpty()) {
-        settingsWidget->setUpdateButtonText("Update to v" + ver);
+        settingsWidget->setUpdateButtonText(tr("Update to v") + ver);
         showWindow();
         CkbUpdaterDialog updDialog(ver, changelog, this);
         updDialog.exec();
     } else {
-        settingsWidget->setUpdateButtonText("Up to date");
+        settingsWidget->setUpdateButtonText(tr("Up to date"));
     }
     updater->deleteLater();
     settingsWidget->enableUpdateButton();

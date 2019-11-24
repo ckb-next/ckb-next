@@ -26,7 +26,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>5</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>false</bool>
@@ -389,17 +389,17 @@
          </item>
          <item>
           <property name="text">
-           <string>6</string>
+           <string notr="true">6</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>7</string>
+           <string notr="true">7</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>8</string>
+           <string notr="true">8</string>
           </property>
          </item>
         </widget>
@@ -438,27 +438,27 @@
          </item>
          <item>
           <property name="text">
-           <string>1:</string>
+           <string notr="true">1:</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>2:</string>
+           <string notr="true">2:</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>3:</string>
+           <string notr="true">3:</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>4:</string>
+           <string notr="true">4:</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>5:</string>
+           <string notr="true">5:</string>
           </property>
          </item>
          <item>
@@ -602,7 +602,7 @@
        <item row="4" column="6">
         <widget class="QLabel" name="dpiCustLabel">
          <property name="text">
-          <string>x</string>
+          <string notr="true">x</string>
          </property>
         </widget>
        </item>
@@ -1314,7 +1314,7 @@
            <item>
             <widget class="QRadioButton" name="rb_delay_no">
              <property name="whatsThis">
-              <string>configure delays between keystrokes: Disable delay</string>
+              <string>Disable delay</string>
              </property>
              <property name="text">
               <string>No &amp;delay</string>
@@ -1324,7 +1324,7 @@
            <item>
             <widget class="QRadioButton" name="rb_delay_default">
              <property name="whatsThis">
-              <string>configure delays between keystrokes: Set delay to default values: 20us up to 15 chars, 200us above</string>
+              <string>Set delay to default values: 20us up to 15 chars, 200us above</string>
              </property>
              <property name="text">
               <string>de&amp;fault</string>
@@ -1340,7 +1340,7 @@
            <item>
             <widget class="QRadioButton" name="rb_delay_asTyped">
              <property name="whatsThis">
-              <string>configure delays between keystrokes: Remember delays as they had been typed while the macro definition process</string>
+              <string>Delay will be the same as it was recorded</string>
              </property>
              <property name="text">
               <string>as t&amp;yped</string>
@@ -1483,7 +1483,7 @@
            <item>
             <widget class="QLabel" name="lbl_macro">
              <property name="text">
-              <string>Placeholder</string>
+              <string notr="true">Placeholder</string>
              </property>
             </widget>
            </item>
@@ -1492,7 +1492,7 @@
              <item>
               <widget class="QLabel" name="label">
                <property name="text">
-                <string>Record macro </string>
+                <string>Record macro</string>
                </property>
               </widget>
              </item>

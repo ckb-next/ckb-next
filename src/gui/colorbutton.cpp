@@ -44,7 +44,7 @@ void ColorButton::updateImage(){
     if(!_color.isValid()){
         setIcon(QIcon());
         if(_setLabel)
-            setText("Change color...");
+            setText(tr("Change color..."));
         return;
     }
     const int w = 24, h = _bigIcons ? 24 : 12;

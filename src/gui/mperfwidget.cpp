@@ -259,7 +259,7 @@ void MPerfWidget::on_lHeightBox_activated(int index){
 }
 
 void MPerfWidget::on_copyButton_clicked(){
-    ModeSelectDialog dialog(this, profile->currentMode(), profile->modes(), "Copy performance settings to:");
+    ModeSelectDialog dialog(this, profile->currentMode(), profile->modes(), tr("Copy performance settings to:"));
     if(dialog.exec() != QDialog::Accepted)
         return;
     QList<KbMode*> selectedModes = dialog.selection();

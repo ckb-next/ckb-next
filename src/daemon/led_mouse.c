@@ -3,9 +3,34 @@
 #include "profile.h"
 #include "usb.h"
 
+#include <math.h>
+
 // Compare two light structures, ignore keys
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
     return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES);
+}
+
+// uchar [0 .. 255] -> float [0.0 .. 1.0]
+static float toFloat(uchar x)
+{
+    return (float)x / 255.0f;
+}
+
+// for now assume 256 steps
+static float quantize(float x)
+{
+    return roundf(x * 255.0f) / 255.0f;;
+}
+
+// float [0.0 .. 1.0] -> uchar [0 .. 255]
+//  Values outside [0.0 .. 1.0] are clipped
+//  (But for dithering this shouldn't happen.)
+static uchar toUchar(float x)
+{
+    int i = (int)(x * 255.0f);
+    if (i < 0) return 0;
+    if (i > 255) return 255;
+    return i;
 }
 
 int updatergb_mouse(usbdevice* kb, int force){
@@ -17,7 +42,7 @@ int updatergb_mouse(usbdevice* kb, int force){
     if(!force && !lastlight->forceupdate && !newlight->forceupdate
             && !rgbcmp(lastlight, newlight))
         return 0;
-    lastlight->forceupdate = newlight->forceupdate = 0;
+    lastlight->forceupdate = newlight->forceupdate = 1;
 
     // Prevent writing to DPI LEDs or non-existent LED zones for the Glaive.
     int num_zones = IS_GLAIVE(kb) ? 3 : N_MOUSE_ZONES;
@@ -28,9 +53,27 @@ int updatergb_mouse(usbdevice* kb, int force){
         if (IS_GLAIVE(kb) && i != 0 && i != 1 && i != 5)
             continue;
         *rgb_data++ = i + 1;
-        *rgb_data++ = newlight->r[LED_MOUSE + i];
-        *rgb_data++ = newlight->g[LED_MOUSE + i];
-        *rgb_data++ = newlight->b[LED_MOUSE + i];
+        // !!! HACK !!!
+        // Arbitrarily divide by 10 to emulate a range 0..25 with precision 0.1
+        float desiredR = toFloat(newlight->r[LED_MOUSE + 1]) / 10.0f;
+        float desiredG = toFloat(newlight->g[LED_MOUSE + 1]) / 10.0f;
+        float desiredB = toFloat(newlight->b[LED_MOUSE + 1]) / 10.0f;
+        // Compensate for the error we made in the previous step.
+        float outputR = desiredR - lastlight->errorR[LED_MOUSE + 1];
+        float outputG = desiredG - lastlight->errorG[LED_MOUSE + 1];
+        float outputB = desiredB - lastlight->errorB[LED_MOUSE + 1];
+        // We can't use this ideal ouput because hardware only handles (256) discrete steps.
+        float actualR = quantize(outputR);
+        float actualG = quantize(outputG);
+        float actualB = quantize(outputB);
+        // So send quantized values to the hardware.
+        *rgb_data++ = toUchar(actualR);
+        *rgb_data++ = toUchar(actualG);
+        *rgb_data++ = toUchar(actualB);
+        // But because of this quantization we made a new error.
+        newlight->errorR[LED_MOUSE + 1] = actualR - outputR;
+        newlight->errorG[LED_MOUSE + 1] = actualG - outputG;
+        newlight->errorB[LED_MOUSE + 1] = actualB - outputB;
     }
     // Send RGB data
     if(!usbsend(kb, data_pkt, 1))

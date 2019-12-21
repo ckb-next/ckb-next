@@ -74,9 +74,12 @@ typedef struct {
 
 // Lighting structure for a mode
 typedef struct {
-    uchar r[N_KEYS_EXTENDED];
+    uchar r[N_KEYS_EXTENDED]; // the desired value
     uchar g[N_KEYS_EXTENDED];
     uchar b[N_KEYS_EXTENDED];
+    float errorR[N_KEYS_EXTENDED]; // the (accumulated) error
+    float errorG[N_KEYS_EXTENDED];
+    float errorB[N_KEYS_EXTENDED];
     uchar forceupdate;
     uchar sidelight; // strafe sidelight
 } lighting;

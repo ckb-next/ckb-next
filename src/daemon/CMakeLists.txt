@@ -146,7 +146,8 @@ if (MACOS OR LINUX)
         ckb-next-daemon
             PRIVATE
               Threads::Threads
-              "${ICONV_LIBRARIES}")
+              "${ICONV_LIBRARIES}"
+              m)
 endif ()
 if (MACOS)
     target_link_libraries(

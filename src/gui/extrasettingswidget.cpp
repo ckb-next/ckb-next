@@ -17,7 +17,7 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
 
     // Read frame rate from settings
     int rate = settings.value("framerate").toInt();
-    if(rate <= 0 || rate > 60)
+    if(rate <= 0 || rate > 120)
         rate = 30;
     ui->fpsBox->setValue(rate);
     Kb::frameRate(rate);

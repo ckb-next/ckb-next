@@ -4,9 +4,10 @@
 #include "mainwindow.h"
 #include "ckbsettings.h"
 #include "animdetailsdialog.h"
+#ifdef USE_XCB_SCREENSAVER
 #include "kbmanager.h"
 #include "idletimer.h"
-
+#endif
 // KbLight
 static int lastSharedDimming = -2;
 
@@ -191,13 +192,17 @@ void ExtraSettingsWidget::on_detailsBtn_clicked(){
 }
 
 void ExtraSettingsWidget::on_timerBox_clicked(bool checked){
+#ifdef USE_XCB_SCREENSAVER
     ui->timerMinBox->setEnabled(checked);
     CkbSettings::set("Program/IdleTimerEnable", checked);
     KbManager::setIdleTimer(checked);
+#endif
 }
 
 void ExtraSettingsWidget::on_timerMinBox_editingFinished(){
+#ifdef USE_XCB_SCREENSAVER
     CkbSettings::set("Program/IdleTimerDuration", ui->timerMinBox->value());
     KbManager::setIdleTimer(false);
     KbManager::setIdleTimer(true);
+#endif
 }

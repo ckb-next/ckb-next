@@ -78,6 +78,9 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
     ui->previewBox->setChecked(settings.value("DisablePreviewOnFocusLoss", true).toBool());
 
 #if defined(Q_OS_LINUX) && defined(USE_XCB_SCREENSAVER)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+    ui->timerMinBox->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
+#endif
     // We need to explicitly disable this if there's a wayland session.
     // If not, the idle timer will only count when there's activity inside XWayland windows.
     if(IdleTimer::isWayland()){

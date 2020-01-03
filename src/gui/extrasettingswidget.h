@@ -32,6 +32,10 @@ private slots:
 
     void on_detailsBtn_clicked();
 
+    void on_timerBox_clicked(bool checked);
+
+    void on_timerMinBox_editingFinished();
+
 private:
     Ui::ExtraSettingsWidget *ui;
 };

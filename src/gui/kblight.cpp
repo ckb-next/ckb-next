@@ -8,13 +8,13 @@ static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
-    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
+    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0), _timerOrigDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap), lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
+    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap), lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _timerOrigDimming(_dimming), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
 {
     map(keyMap);
     // Duplicate animations
@@ -89,10 +89,11 @@ void KbLight::shareDimming(int newShareDimming){
     }
 }
 
-void KbLight::dimming(int newDimming, bool overrideShare){
+void KbLight::dimming(int newDimming, bool overrideShare, bool noSave){
     if(!(_shareDimming == -1 || overrideShare))
         shareDimming(newDimming);
-    _needsSave = true;
+    if(!noSave)
+        _needsSave = true;
     _dimming = newDimming;
     emit updated();
 }
@@ -558,4 +559,18 @@ bool KbLight::needsSave() const {
             return true;
     }
     return false;
+}
+
+void KbLight::timerDim() {
+    // Ignore if the lights are already off
+    if(_dimming == 3)
+        return;
+    _timerOrigDimming = _dimming;
+    dimming(3, true, true);
+}
+void KbLight::timerDimRestore() {
+    // Don't try to restore the state if the user changed it
+    if(_timerOrigDimming == _dimming || _dimming != 3)
+        return;
+    dimming(_timerOrigDimming, true, true);
 }

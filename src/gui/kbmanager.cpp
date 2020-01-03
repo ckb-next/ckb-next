@@ -1,4 +1,5 @@
 #include "kbmanager.h"
+#include "idletimer.h"
 
 #ifndef Q_OS_MACOS
 QString devpath = "/dev/input/ckb%1";
@@ -9,18 +10,66 @@ QString devpath = "/var/run/ckb%1";
 QString KbManager::_guiVersion, KbManager::_daemonVersion = DAEMON_UNAVAILABLE_STR;
 KbManager* KbManager::_kbManager = 0;
 
+#ifdef USE_XCB_SCREENSAVER
+QTimer* KbManager::_idleTimer = nullptr;
+void KbManager::setIdleTimer(bool enable){
+    if(!_idleTimer){
+        // This won't go well if there are multiple instances of KbManager since the pointer is static.
+        // The rest of the code seems to only be able to handle only one instance too, so it should be fine.
+        _idleTimer = new QTimer(_kbManager);
+        connect(_idleTimer, &QTimer::timeout, _kbManager, &KbManager::idleTimerTick);
+    }
+    if(enable)
+        _idleTimer->start(CkbSettings::get("Program/IdleTimerDuration", 5).toInt() * 60000);
+    else
+        _idleTimer->stop();
+}
+void KbManager::idleTimerTick(){
+    // Get user idle time
+    int idle = IdleTimer::getIdleTime();
+    int settingsidle = CkbSettings::get("Program/IdleTimerDuration", 5).toInt() * 60000;
+    int res = settingsidle - idle;
+    if(res > 0)
+    {
+        // Turn the lights back on (if applicable)
+        foreach(Kb* kb, _devices){
+            kb->currentLight()->timerDimRestore();
+            if(KbLight::shareDimming() == -1)
+                break;
+        }
+
+        // Reschedule the timer if there's still time left
+        _idleTimer->start(res);
+        return;
+    }
+    // Turn off all the lights
+    foreach(Kb* kb, _devices){
+        kb->currentLight()->timerDim();
+        if(KbLight::shareDimming() == -1)
+            break;
+    }
+    // Start checking for activity every half a second
+    _idleTimer->start(500);
+}
+#endif
+
 void KbManager::init(QString guiVersion){
     _guiVersion = guiVersion;
     if(_kbManager)
         return;
     _kbManager = new KbManager();
+#ifdef USE_XCB_SCREENSAVER
+    if(!IdleTimer::isWayland() && CkbSettings::get("Program/IdleTimerEnable", true).toBool()){
+        setIdleTimer(true);
+    }
+#endif
 }
 
 void KbManager::stop(){
     if(!_kbManager)
         return;
     delete _kbManager;
-    _kbManager = 0;
+    _kbManager = nullptr;
 }
 
 KbManager::KbManager(QObject *parent) : QObject(parent){
@@ -147,4 +196,3 @@ void KbManager::scanKeyboards(){
         connect(_scanTimer, SIGNAL(timeout()), kb, SLOT(autoSave()));
     }
 }
-

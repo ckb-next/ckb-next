@@ -98,6 +98,7 @@ elseif (LINUX)
         endif ()
     endif ()
     find_package(X11 REQUIRED)
+    find_package(Qt5 5.2.0 COMPONENTS X11Extras)
 endif ()
 
 # Automatically handle MOC, UIC and RCC
@@ -131,6 +132,7 @@ if (MACOS OR LINUX)
               gradientbutton.cpp
               gradientdialog.cpp
               gradientdialogwidget.cpp
+              idletimer.cpp
               kbanim.cpp
               kbanimwidget.cpp
               kbbind.cpp
@@ -175,6 +177,7 @@ if (MACOS OR LINUX)
               gradientbutton.h
               gradientdialog.h
               gradientdialogwidget.h
+              idletimer.h
               kbanim.h
               kbanimwidget.h
               kbbind.h
@@ -229,13 +232,36 @@ if (MACOS)
               media_mac.m)
 elseif (LINUX)
     find_package(PulseAudio)
-    if (${PULSEAUDIO_FOUND})
+    if (PULSEAUDIO_FOUND)
         target_compile_definitions(
             ckb-next
                 PRIVATE
                     USE_LIBPULSE)
     endif ()
 
+    if (USE_XCB)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(XCB xcb)
+        pkg_check_modules(XCB_EWMH xcb-ewmh)
+        pkg_check_modules(XCB_SCREENSAVER xcb-screensaver)
+
+        if(XCB_SCREENSAVER_FOUND AND Qt5X11Extras_FOUND)
+            target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_XCB_SCREENSAVER)
+        else()
+            message(FATAL_ERROR "XCB-Screensaver or Qt5 X11Extras was not found. Either install them or pass -DUSE_XCB=0 to disable idle detection.")
+        endif()
+        if(XCB_EWMH_FOUND)
+            target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_XCB_EWMH)
+            else()
+                message(FATAL_ERROR "XCB-EWMH was not found. Either install it or pass -DUSE_XCB=0 to disable active window detection.")
+        endif()
+    endif()
     target_sources(
         ckb-next
             PRIVATE
@@ -434,20 +460,15 @@ if(MACOS)
               "${FOUNDATION_LIBRARY}"
               "${AUDIOTOOLBOX_LIBRARY}")
 elseif (LINUX)
-    if(${PULSEAUDIO_FOUND})
-        target_link_libraries(
-            ckb-next
-                PRIVATE
-                  "${X11_LIBRARIES}"
-                  "${Appindicator_LIBRARIES}"
-                  "${PULSEAUDIO_LIBRARIES}")
-    else()
-        target_link_libraries(
-            ckb-next
-                PRIVATE
-                  "${X11_LIBRARIES}"
-                  "${Appindicator_LIBRARIES}")
-    endif()
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+              "${X11_LIBRARIES}"
+              "${Appindicator_LIBRARIES}"
+              "${PULSEAUDIO_LIBRARIES}"
+              "${XCB_EWMH_LIBRARIES}"
+              "${XCB_SCREENSAVER_LIBRARIES}"
+              Qt5::X11Extras)
 endif()
 
 if (WITH_SHIPPED_QUAZIP)

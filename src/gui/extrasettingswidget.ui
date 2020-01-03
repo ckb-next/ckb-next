@@ -10,6 +10,12 @@
     <height>554</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string notr="true">Application Settings</string>
   </property>
@@ -29,18 +35,35 @@
    <property name="horizontalSpacing">
     <number>6</number>
    </property>
-   <item row="3" column="1" colspan="6">
-    <widget class="QCheckBox" name="brightnessBox">
+   <item row="19" column="1" colspan="6">
+    <widget class="QCheckBox" name="ditherBox">
      <property name="toolTip">
-      <string>By default, the same brightness level will be applied to all profiles and all devices. Enable this to store it with the lighting mode instead.</string>
+      <string>May improve appearance on some keyboards.</string>
      </property>
      <property name="text">
-      <string>Set brightness per-mode</string>
+      <string>Use spatial dithering to simulate extra color resolution</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="7">
-    <widget class="QLabel" name="label">
+   <item row="2" column="1" colspan="6">
+    <widget class="QCheckBox" name="trayBox">
+     <property name="toolTip">
+      <string>The tray icon will not be displayed. The application will still run in the background; re-launch the app to see the GUI again.</string>
+     </property>
+     <property name="text">
+      <string>Hide tray icon</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="0" colspan="7">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="0" colspan="7">
+    <widget class="QLabel" name="label_2">
      <property name="font">
       <font>
        <weight>75</weight>
@@ -48,20 +71,30 @@
       </font>
      </property>
      <property name="text">
-      <string>Behavior</string>
+      <string>Hardware</string>
      </property>
     </widget>
    </item>
-   <item row="22" column="0" colspan="7">
-    <widget class="QLabel" name="osxLabel">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
+   <item row="25" column="1" colspan="4">
+    <widget class="QCheckBox" name="sAccelBox">
+     <property name="toolTip">
+      <string>Try this if you're having problems with the scroll wheel.</string>
      </property>
      <property name="text">
-      <string>OS X tweaks</string>
+      <string>Disable scroll acceleration</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="1">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Location:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="margin">
+      <number>0</number>
      </property>
     </widget>
    </item>
@@ -78,53 +111,6 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1" colspan="6">
-    <widget class="QCheckBox" name="trayBox">
-     <property name="toolTip">
-      <string>The tray icon will not be displayed. The application will still run in the background; re-launch the app to see the GUI again.</string>
-     </property>
-     <property name="text">
-      <string>Hide tray icon</string>
-     </property>
-    </widget>
-   </item>
-   <item row="23" column="0" colspan="7">
-    <widget class="Line" name="osxLine">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="16" column="0" colspan="7">
-    <widget class="Line" name="line_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="18" column="4">
-    <spacer name="horizontalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="18" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Frame rate (FPS):</string>
-     </property>
-    </widget>
-   </item>
    <item row="14" column="1">
     <spacer name="verticalSpacer_6">
      <property name="orientation">
@@ -140,6 +126,52 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="0" column="0" colspan="7">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Behavior</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1" colspan="6">
+    <widget class="QCheckBox" name="startDelayBox">
+     <property name="text">
+      <string>Delay application start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="3">
+    <widget class="QSpinBox" name="fpsBox">
+     <property name="minimum">
+      <number>5</number>
+     </property>
+     <property name="maximum">
+      <number>60</number>
+     </property>
+     <property name="value">
+      <number>30</number>
+     </property>
+    </widget>
+   </item>
+   <item row="22" column="0" colspan="7">
+    <widget class="QLabel" name="osxLabel">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>OS X tweaks</string>
+     </property>
+    </widget>
    </item>
    <item row="13" column="3" colspan="4">
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
@@ -215,26 +247,13 @@
      </item>
     </layout>
    </item>
-   <item row="13" column="1">
-    <widget class="QLabel" name="label_6">
+   <item row="8" column="1" colspan="6">
+    <widget class="QCheckBox" name="previewBox">
      <property name="text">
-      <string>Location:</string>
+      <string>Disable animated preview when ckb-next is not in focus</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
-    </widget>
-   </item>
-   <item row="24" column="1" colspan="6">
-    <widget class="QCheckBox" name="mAccelBox">
-     <property name="toolTip">
-      <string>Try this if you're having problems with mouse movement.</string>
-     </property>
-     <property name="text">
-      <string>Disable mouse acceleration</string>
+     <property name="checked">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -254,31 +273,21 @@
      </property>
     </spacer>
    </item>
-   <item row="15" column="0" colspan="7">
-    <widget class="QLabel" name="label_2">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
+   <item row="10" column="1">
+    <spacer name="verticalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="text">
-      <string>Hardware</string>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
      </property>
-    </widget>
-   </item>
-   <item row="18" column="5">
-    <widget class="QLabel" name="fpsWarnLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
      </property>
-     <property name="text">
-      <string>Warning: high frame rates may cause stability issues</string>
-     </property>
-    </widget>
+    </spacer>
    </item>
    <item row="25" column="5" colspan="2">
     <widget class="QWidget" name="sSpeedWidget" native="true">
@@ -337,71 +346,38 @@
      </layout>
     </widget>
    </item>
-   <item row="9" column="1" colspan="6">
-    <widget class="QCheckBox" name="previewBox">
-     <property name="text">
-      <string>Disable animated preview when ckb-next is not in focus</string>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="20" column="1" colspan="6">
-    <widget class="QCheckBox" name="delayBox">
-     <property name="toolTip">
-      <string>When using macros with strings longer than 25 chars, some OS may lose characters (e.g. Mint 17.2). Select to prevent that bug.</string>
-     </property>
-     <property name="text">
-      <string>Use delay for very long macros</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="1">
-    <spacer name="verticalSpacer_5">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0" colspan="7">
-    <widget class="Line" name="line">
+   <item row="12" column="0" colspan="7">
+    <widget class="Line" name="line_3">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="19" column="1" colspan="6">
-    <widget class="QCheckBox" name="ditherBox">
-     <property name="toolTip">
-      <string>May improve appearance on some keyboards.</string>
+   <item row="18" column="5">
+    <widget class="QLabel" name="fpsWarnLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="text">
-      <string>Use spatial dithering to simulate extra color resolution</string>
+      <string>Warning: high frame rates may cause stability issues</string>
      </property>
     </widget>
    </item>
-   <item row="25" column="1" colspan="4">
-    <widget class="QCheckBox" name="sAccelBox">
+   <item row="3" column="1" colspan="6">
+    <widget class="QCheckBox" name="brightnessBox">
      <property name="toolTip">
-      <string>Try this if you're having problems with the scroll wheel.</string>
+      <string>By default, the same brightness level will be applied to all profiles and all devices. Enable this to store it with the lighting mode instead.</string>
      </property>
      <property name="text">
-      <string>Disable scroll acceleration</string>
+      <string>Set brightness per-mode</string>
      </property>
     </widget>
    </item>
-   <item row="12" column="0" colspan="7">
-    <widget class="Line" name="line_3">
+   <item row="23" column="0" colspan="7">
+    <widget class="Line" name="osxLine">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -420,23 +396,36 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="1" colspan="6">
-    <widget class="QCheckBox" name="startDelayBox">
+   <item row="20" column="1" colspan="6">
+    <widget class="QCheckBox" name="delayBox">
+     <property name="toolTip">
+      <string>When using macros with strings longer than 25 chars, some OS may lose characters (e.g. Mint 17.2). Select to prevent that bug.</string>
+     </property>
      <property name="text">
-      <string>Delay application start</string>
+      <string>Use delay for very long macros</string>
      </property>
     </widget>
    </item>
-   <item row="18" column="3">
-    <widget class="QSpinBox" name="fpsBox">
-     <property name="minimum">
-      <number>5</number>
+   <item row="18" column="4">
+    <spacer name="horizontalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="maximum">
-      <number>60</number>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="value">
-      <number>30</number>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" colspan="7">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -455,6 +444,103 @@
       <string>Enabling per-mode brightness will disable scrolling on the tray icon to change the brightness level</string>
      </property>
     </widget>
+   </item>
+   <item row="24" column="1" colspan="6">
+    <widget class="QCheckBox" name="mAccelBox">
+     <property name="toolTip">
+      <string>Try this if you're having problems with mouse movement.</string>
+     </property>
+     <property name="text">
+      <string>Disable mouse acceleration</string>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Frame rate (FPS):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1" colspan="6">
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,0">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="timerBox">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Turn lights off when idle for</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>15</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="timerMinBox">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="suffix">
+        <string comment="minutes">m</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+       </property>
+       <property name="value">
+        <number>5</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

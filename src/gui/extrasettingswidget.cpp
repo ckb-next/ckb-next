@@ -4,6 +4,8 @@
 #include "mainwindow.h"
 #include "ckbsettings.h"
 #include "animdetailsdialog.h"
+#include "kbmanager.h"
+#include "idletimer.h"
 
 // KbLight
 static int lastSharedDimming = -2;
@@ -75,8 +77,24 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
 
     ui->previewBox->setChecked(settings.value("DisablePreviewOnFocusLoss", true).toBool());
 
-#ifndef Q_OS_LINUX
+#if defined(Q_OS_LINUX) && defined(USE_XCB_SCREENSAVER)
+    // We need to explicitly disable this if there's a wayland session.
+    // If not, the idle timer will only count when there's activity inside XWayland windows.
+    if(IdleTimer::isWayland()){
+        QString notSupported(tr("This feature is not supported under Wayland"));
+        ui->timerBox->setToolTip(notSupported);
+        ui->timerMinBox->setToolTip(notSupported);
+        ui->timerBox->setEnabled(false);
+        ui->timerMinBox->setEnabled(false);
+    } else {
+        ui->timerBox->setChecked(settings.value("IdleTimerEnable", true).toBool());
+        ui->timerMinBox->setEnabled(ui->timerBox->isChecked());
+    }
+    ui->timerMinBox->setValue(settings.value("IdleTimerDuration", 5).toInt());
+#else
     ui->scrollWarningLabel->hide();
+    ui->timerBox->hide();
+    ui->timerMinBox->hide();
 #endif
 }
 
@@ -159,14 +177,24 @@ void ExtraSettingsWidget::on_startDelayBox_clicked(bool checked){
     CkbSettings::set("Program/StartDelay", checked);
 }
 
-void ExtraSettingsWidget::on_previewBox_clicked(bool checked)
-{
+void ExtraSettingsWidget::on_previewBox_clicked(bool checked){
     CkbSettings::set("Program/DisablePreviewOnFocusLoss", checked);
 }
 
-void ExtraSettingsWidget::on_detailsBtn_clicked()
-{
+void ExtraSettingsWidget::on_detailsBtn_clicked(){
     AnimDetailsDialog* dlg = new AnimDetailsDialog(this);
     dlg->setAttribute(Qt::WA_DeleteOnClose, true);
     dlg->exec();
+}
+
+void ExtraSettingsWidget::on_timerBox_clicked(bool checked){
+    ui->timerMinBox->setEnabled(checked);
+    CkbSettings::set("Program/IdleTimerEnable", checked);
+    KbManager::setIdleTimer(checked);
+}
+
+void ExtraSettingsWidget::on_timerMinBox_editingFinished(){
+    CkbSettings::set("Program/IdleTimerDuration", ui->timerMinBox->value());
+    KbManager::setIdleTimer(false);
+    KbManager::setIdleTimer(true);
 }

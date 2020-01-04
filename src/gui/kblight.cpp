@@ -6,6 +6,7 @@
 
 static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
+static bool _timerDimmed = false;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
     QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0), _timerOrigDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
@@ -566,11 +567,14 @@ void KbLight::timerDim() {
     if(_dimming == 3)
         return;
     _timerOrigDimming = _dimming;
+    _timerDimmed = true;
     dimming(3, true, true);
 }
+
 void KbLight::timerDimRestore() {
     // Don't try to restore the state if the user changed it
-    if(_timerOrigDimming == _dimming || _dimming != 3)
+    if(_timerOrigDimming == _dimming || _dimming != 3 || !_timerDimmed)
         return;
+    _timerDimmed = false;
     dimming(_timerOrigDimming, true, true);
 }

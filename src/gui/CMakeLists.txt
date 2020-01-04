@@ -26,6 +26,7 @@
 #   POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(ckb-next "")
+add_dependencies(ckb-next ckb-next-lrelease)
 add_custom_target(gui DEPENDS ckb-next)
 
 # Declare we want macOS Bundle
@@ -324,6 +325,7 @@ endif ()
 # Generate binary translations and update ts files if needed
 file(GLOB qt_translations_rel RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/resources/translations/*.ts")
 qt5_add_translation(QM_FILES "${qt_translations_rel}")
+add_custom_target(ckb-next-lrelease SOURCES "${QM_FILES}")
 
 # Simple target to call lupdate on demand
 add_custom_target(lupdate
@@ -410,8 +412,7 @@ if (MACOS OR LINUX)
               "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc"
               "${CMAKE_CURRENT_BINARY_DIR}/text.qrc"
               "${CMAKE_CURRENT_BINARY_DIR}/image.qrc"
-              "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc"
-              "${QM_FILES}")
+              "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc")
 endif ()
 
 # Declare target's include paths

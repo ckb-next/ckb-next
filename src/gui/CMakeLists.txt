@@ -26,7 +26,7 @@
 #   POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(ckb-next "")
-add_dependencies(ckb-next ckb-next-lrelease)
+set_property(TARGET ckb-next PROPERTY AUTOGEN_TARGET_DEPENDS ckb-next-lrelease)
 add_custom_target(gui DEPENDS ckb-next)
 
 # Declare we want macOS Bundle

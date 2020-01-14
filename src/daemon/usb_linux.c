@@ -111,6 +111,14 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     } else {
         // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
         struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
+        if(IS_HEADSET_DEV(kb)) {
+            // FIXME: Use appropriate wValue for headsets
+            // wValue0: first byte of packet
+            // wValue1: 0x02
+            transfer.wValue = (0x0200 | out_msg[0]);
+            transfer.wIndex = 0x0003;
+            //transfer.wLength = 20;
+        }
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     }
 
@@ -167,7 +175,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 ///
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     int res;
-    if(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
+    if((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !IS_HEADSET_DEV(kb)){
         // Wait for 2s
         struct timespec condwait = {0};
         condwait.tv_sec = time(NULL) + 2;
@@ -187,6 +195,8 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         if(pthread_mutex_unlock(intmutex(kb)))
             ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
     } else {
+        // FIXME: Headsets don't use MSG_SIZE
+        // FIXME: Use appropriate wValue for headsets
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
         if(res <= 0){
@@ -363,6 +373,13 @@ void* os_inputmain(void* context){
         // Access it
         struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
         const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
+        if(!sizehex){
+            if(!(IS_HEADSET_DEV(kb) && i < 3))
+                ckb_err("Unable to read wMaxPacketSize for %s\n", finalpath);
+            udeventry = nextentry;
+            udev_device_unref(child);
+            continue;
+        }
         // Read its wMaxPacketSize
         ushort size = 64;
         if(sizehex)
@@ -454,6 +471,9 @@ static int usbunclaim(usbdevice* kb, int resetting) {
     int handle = kb->handle - 1;
     int count = kb->epcount;
     for (int i = 0; i < count; i++) {
+        // Unclaim only the last IF for headsets
+        if(IS_HEADSET_DEV(kb) && i < count - 1)
+            continue;
         ioctl(handle, USBDEVFS_RELEASEINTERFACE, &i);
     }
     // Intentional unclean exit workaround, because usbhid hangs while initialising these devices.
@@ -466,6 +486,11 @@ static int usbunclaim(usbdevice* kb, int resetting) {
     // Reconnecting any of the others causes trouble.
     if (!resetting) {
         struct usbdevfs_ioctl ctl = { 0, USBDEVFS_CONNECT, 0 };
+        if(IS_HEADSET_DEV(kb)){
+            ctl.ifno = count - 1;
+            ioctl(handle, USBDEVFS_IOCTL, &ctl);
+            return 0;
+        }
         ioctl(handle, USBDEVFS_IOCTL, &ctl);
         ctl.ifno = 1;
         ioctl(handle, USBDEVFS_IOCTL, &ctl);
@@ -516,6 +541,9 @@ static int usbclaim(usbdevice* kb){
 #endif // DEBUG
 
     for(int i = 0; i < count; i++){
+        // Claim only the last IF for headsets
+        if(IS_HEADSET_DEV(kb) && i < count - 1)
+            continue;
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
         ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
         if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {

@@ -122,6 +122,11 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
+#define P_VOID_USB_1         0x1b29
+#define P_VOID_USB_2         0x1b2a
+#define P_VOID_WIRELESS_1    0x1b27
+#define IS_VOID(kb)          ((kb)->vendor == V_CORSAIR && ((kb)->product == P_VOID_USB_1 || (kb)->product == P_VOID_USB_2 || (kb)->product == P_VOID_WIRELESS_1))
+
 extern size_t N_MODELS;
 
 typedef struct _device_desc {
@@ -229,6 +234,9 @@ const char* product_str(ushort product);
 // Mousepad test
 #define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_POLARIS))
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
+
+#define IS_HEADSET(vendor, product)    ((vendor) == (V_CORSAIR) && (product == P_VOID_USB_1 || product == P_VOID_USB_2 || product == P_VOID_WIRELESS_1))
+#define IS_HEADSET_DEV(kb)             IS_HEADSET((kb)->vendor, (kb)->product)
 
 #define USB_DELAY_DEFAULT   5
 

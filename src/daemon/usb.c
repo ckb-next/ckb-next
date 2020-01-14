@@ -79,6 +79,10 @@ device_desc models[] = {
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
     { V_CORSAIR, P_ST100, },
+    // Headset
+    { V_CORSAIR, P_VOID_USB_1, },
+    { V_CORSAIR, P_VOID_USB_2, },
+    { V_CORSAIR, P_VOID_WIRELESS_1, },
 };
 
 size_t N_MODELS = sizeof(models) / sizeof(device_desc);
@@ -180,6 +184,8 @@ const char* product_str(ushort product){
         return "polaris";
     if(product == P_ST100)
         return "st100";
+    if(product == P_VOID_USB_1 || product == P_VOID_USB_2 || product == P_VOID_WIRELESS_1)
+        return "void";
     return "";
 }
 
@@ -206,6 +212,8 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
             return &vtable_mouse;
     } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
         return &vtable_mousepad;
+    } else if(IS_HEADSET(vendor, product)) {
+        return &vtable_headset;
     } else {
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;

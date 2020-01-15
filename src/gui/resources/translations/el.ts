@@ -348,152 +348,168 @@
         <translation type="vanished">Ρυθμίσεις Εφαρμογής</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="279"/>
+        <location filename="../../extrasettingswidget.ui" line="365"/>
         <source>Warning: high frame rates may cause stability issues</source>
         <translation>Προσοχή: υψηλός ρυθμός καρέ μπορεί να οδηγήσει σε αστάθεια</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="353"/>
+        <location filename="../../extrasettingswidget.ui" line="402"/>
         <source>When using macros with strings longer than 25 chars, some OS may lose characters (e.g. Mint 17.2). Select to prevent that bug.</source>
         <translation>Οταν χρησιμποιείτε μακροεντολή μεγαλύτερη από 25 χαρακτήρες, το Λειτουργικό Σύστημα μπορεί να παραλείψει κάποιους χαρακτήρες. Επιλέξτε αυτό για να λυθεί το πρόβλημα.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="356"/>
+        <location filename="../../extrasettingswidget.ui" line="405"/>
         <source>Use delay for very long macros</source>
         <translation>Χρήση καθυστέρησης για μεγάλες μακροεντολές</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="419"/>
+        <location filename="../../extrasettingswidget.ui" line="395"/>
         <source>Animation scripts</source>
         <translation>Προγράμματα animation</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="64"/>
+        <location filename="../../extrasettingswidget.ui" line="172"/>
         <source>OS X tweaks</source>
         <translation>Διορθώσεις για OS X</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="221"/>
+        <location filename="../../extrasettingswidget.ui" line="91"/>
         <source>Location:</source>
         <translation>Τοποθεσία:</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="84"/>
+        <location filename="../../extrasettingswidget.ui" line="51"/>
         <source>The tray icon will not be displayed. The application will still run in the background; re-launch the app to see the GUI again.</source>
         <translation>Το εικονίδιο περιοχής ειδοποιήσεων δεν θα εμφανιστεί. Η εφαρμογή θα τρέχει στο παρασκήνιο. Επανεκκινήστε την για να ξαναεμφανιστεί το παράθυρο.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="87"/>
+        <location filename="../../extrasettingswidget.ui" line="54"/>
         <source>Hide tray icon</source>
         <translation>Απόκρυψη εικονιδίου περιοχής ειδοποιήσεων</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="51"/>
+        <location filename="../../extrasettingswidget.ui" line="139"/>
         <source>Behavior</source>
         <translation>Συμπεριφορά</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="35"/>
+        <location filename="../../extrasettingswidget.ui" line="372"/>
         <source>By default, the same brightness level will be applied to all profiles and all devices. Enable this to store it with the lighting mode instead.</source>
         <translation>Από προεπιλογή, το ίδιο επίπεδο φωτεινότητας θα εφαρμόζεται σε όλα τα προφίλ και όλες τις συσκευές. Ενεργοποιήστε αυτό ώστε το επίπεδο να αποθηκέυεται ανά mode.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="38"/>
+        <location filename="../../extrasettingswidget.ui" line="375"/>
         <source>Set brightness per-mode</source>
         <translation>Επίπεδο φωτεινότητας ανά mode</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="124"/>
+        <location filename="../../extrasettingswidget.ui" line="461"/>
         <source>Frame rate (FPS):</source>
         <translation>Ρυθμός καρέ (FPS):</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="208"/>
+        <location filename="../../extrasettingswidget.ui" line="485"/>
+        <source>Turn lights off when idle for</source>
+        <translation>Απενεργοποίηση φωτισμού όταν το σύστημα είναι αδρανές γιά</translation>
+    </message>
+    <message>
+        <location filename="../../extrasettingswidget.ui" line="517"/>
+        <source>m</source>
+        <comment>minutes</comment>
+        <translation>λ</translation>
+    </message>
+    <message>
+        <location filename="../../extrasettingswidget.ui" line="240"/>
         <source>Details</source>
         <translation>Λεπτομέρειες</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="307"/>
+        <location filename="../../extrasettingswidget.ui" line="316"/>
         <source>Scroll</source>
         <translation>Κύλιση</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="333"/>
+        <location filename="../../extrasettingswidget.ui" line="342"/>
         <source>line(s) at a time</source>
         <translation>γραμμή/ες ανά φορά</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="343"/>
+        <location filename="../../extrasettingswidget.ui" line="253"/>
         <source>Disable animated preview when ckb-next is not in focus</source>
         <translation>Απενεργοποίηση πλήρης προεπισκόπησης όταν το ckb-next δεν είναι εστιασμένο</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="386"/>
+        <location filename="../../extrasettingswidget.ui" line="41"/>
         <source>May improve appearance on some keyboards.</source>
         <translation>Ίσως βελτιώσει την εμφάνιση σε κάποια πληκτρολόγια.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="389"/>
+        <location filename="../../extrasettingswidget.ui" line="44"/>
         <source>Use spatial dithering to simulate extra color resolution</source>
         <translation>Χρήση dithering για προσομοίωση εκτεταμένης χρωματικής ανάλυσης</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="396"/>
+        <location filename="../../extrasettingswidget.ui" line="81"/>
         <source>Try this if you&apos;re having problems with the scroll wheel.</source>
         <translation>Δοκιμάστε το αν έχετε πρόβλημα κατά την κύλιση με τη ροδέλα.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="399"/>
+        <location filename="../../extrasettingswidget.ui" line="84"/>
         <source>Disable scroll acceleration</source>
         <translation>Απενεργοποίηση επιτάχυνσης κύλισης</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="455"/>
+        <location filename="../../extrasettingswidget.ui" line="444"/>
         <source>Enabling per-mode brightness will disable scrolling on the tray icon to change the brightness level</source>
         <translation>Ενεργοποιώντας το επίπεδο φωτεινότητας ανά mode θα απενεργοποιήσει τη δυνατότητα κύλισης στο εικονίδιο περιοχής ειδοποιήσεων για αλλαγή φωτεινότητας</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="189"/>
+        <location filename="../../extrasettingswidget.ui" line="221"/>
         <source>0 animations found</source>
         <translation>Βρέθηκαν 0 animations</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="201"/>
+        <location filename="../../extrasettingswidget.ui" line="233"/>
         <source>Re-scan</source>
         <translation>Ανίχνευση</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="266"/>
+        <location filename="../../extrasettingswidget.ui" line="74"/>
         <source>Hardware</source>
         <translation>Υλικό</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="234"/>
+        <location filename="../../extrasettingswidget.ui" line="451"/>
         <source>Try this if you&apos;re having problems with mouse movement.</source>
         <translation>Δοκιμάστε αυτό αν έχετε προβλήματα με την κίνηση του ποντικιού.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="237"/>
+        <location filename="../../extrasettingswidget.ui" line="454"/>
         <source>Disable mouse acceleration</source>
         <translation>Απενεργοποίηση επιτάχυνσης ποντικιού</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="426"/>
+        <location filename="../../extrasettingswidget.ui" line="146"/>
         <source>Delay application start</source>
         <translation>Καθυστέρηση εκκίνησης προγράμματος</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="101"/>
+        <location filename="../../extrasettingswidget.cpp" line="88"/>
+        <source>This feature is not supported under Wayland</source>
+        <translation>Αυτό δεν υποστηρίζεται στο Wayland</translation>
+    </message>
+    <message>
+        <location filename="../../extrasettingswidget.cpp" line="123"/>
         <source>No animations found</source>
         <translation>Δεν βρέθηκαν animations</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="103"/>
+        <location filename="../../extrasettingswidget.cpp" line="125"/>
         <source>1 animation found</source>
         <translation>Βρέθηκε 1 animation</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="105"/>
+        <location filename="../../extrasettingswidget.cpp" line="127"/>
         <source>%1 animations found</source>
         <translation>Βρέθηκαν %1 animations</translation>
     </message>

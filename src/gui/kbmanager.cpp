@@ -34,7 +34,7 @@ void KbManager::idleTimerTick(){
         // Turn the lights back on (if applicable)
         foreach(Kb* kb, _devices){
             kb->currentLight()->timerDimRestore();
-            if(KbLight::shareDimming() == -1)
+            if(KbLight::shareDimming() != -1)
                 break;
         }
 
@@ -45,7 +45,7 @@ void KbManager::idleTimerTick(){
     // Turn off all the lights
     foreach(Kb* kb, _devices){
         kb->currentLight()->timerDim();
-        if(KbLight::shareDimming() == -1)
+        if(KbLight::shareDimming() != -1)
             break;
     }
     // Start checking for activity every half a second

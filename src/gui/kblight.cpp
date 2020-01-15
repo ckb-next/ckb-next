@@ -568,7 +568,7 @@ void KbLight::timerDim() {
         return;
     _timerOrigDimming = _dimming;
     _timerDimmed = true;
-    dimming(3, true, true);
+    dimming(3, false, true);
 }
 
 void KbLight::timerDimRestore() {
@@ -576,5 +576,5 @@ void KbLight::timerDimRestore() {
     if(_timerOrigDimming == _dimming || _dimming != 3 || !_timerDimmed)
         return;
     _timerDimmed = false;
-    dimming(_timerOrigDimming, true, true);
+    dimming(_timerOrigDimming, false, true);
 }

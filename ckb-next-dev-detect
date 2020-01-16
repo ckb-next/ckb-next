@@ -24,9 +24,10 @@ if [ $TOUCHRET -ne 0 ]; then
 fi
 
 OUT="ckb-next-dev-detect - $(date)"
+OUT="${OUT}${N}${N}\`\`\`"
 
 # Applies to both
-OUT="${OUT}${N}${N}Kernel: `uname -a`"
+OUT="${OUT}${N}Kernel: `uname -a`"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     OUT="${OUT}${N}${N}OS Version:${N}`sw_vers`"
@@ -54,6 +55,8 @@ else
     GUIPATH="$(which ckb-next)"
     OUT="${OUT}${N}${N}GUI ldd:${N}`ldd ${GUIPATH}`"
 fi
+
+OUT="${OUT}${N}\`\`\`${N}"
 
 # Gzip and write output
 echo "$OUT" | gzip > "${OUTPATH}ckb-next-dev-detect-report.gz"

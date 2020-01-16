@@ -167,16 +167,17 @@ static bool isRunning(const char* command){
 }
 
 bool checkIfQtCreator(){
-    QString file = QString("/proc/%1/cmdline").arg(QString::number((long)getppid()));
+#ifdef Q_OS_LINUX
+    QString file = QString("/proc/%1/exe").arg(QString::number((long)getppid()));
 
-    QFile f(file);
-    if(!f.open(QFile::ReadOnly | QFile::Text))
+    QFileInfo f(file);
+    if(!f.exists())
         return false;
 
-    QString contents(f.readAll());
-    if(contents.endsWith("/qtcreator"))
+    QString exepath = f.canonicalFilePath();
+    if(exepath.endsWith("/qtcreator"))
         return true;
-
+#endif
     return false;
 }
 

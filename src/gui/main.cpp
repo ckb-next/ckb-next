@@ -56,8 +56,6 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
                                               QObject::tr("Starts in background, without displaying the main window."));
     parser.addOption(backgroundOption);
 
-    const QCommandLineOption sessionOption("session", QObject::tr("Same as background."));
-    parser.addOption(sessionOption);
     // add -c, --close
     const QCommandLineOption closeOption(QStringList() << "c" << "close",
                                          QObject::tr("Causes already running instance (if any) to exit."));
@@ -87,7 +85,7 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
         return CommandLineHelpRequested;
     }
 
-    if (parser.isSet(backgroundOption) || parser.isSet(sessionOption)) {
+    if (parser.isSet(backgroundOption)) {
         // open application in background
         return CommandLineBackground;
     }
@@ -181,6 +179,18 @@ bool checkIfQtCreator(){
 }
 
 int main(int argc, char *argv[]){
+#ifdef Q_OS_LINUX
+    // Get rid of "-session" before Qt parses the arguments
+    for(int i = 0; i < argc; i++){
+        if(!strcmp(argv[i], "-session")){
+            argv[i][1] = 'b';
+            argv[i][2] = '\0';
+            if(i + 1 < argc)
+                argv[i + 1][0] = '\0';
+            break;
+        }
+    }
+#endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     // Explicitly request high dpi scaling if desired

@@ -36,15 +36,15 @@ do_stop () {
 
 case "$1" in
     start)
-        do_start()
+        do_start
         ;;
     stop)
-        do_stop()
+        do_stop
         ;;
     restart)
         log_daemon_msg "Restarting $DESC" "$NAME"
-        do_stop()
-        do_start()
+        do_stop
+        do_start
         ;;
     reload)
         log_daemon_msg "Reloading $NAME" "$NAME"

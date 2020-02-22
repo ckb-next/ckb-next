@@ -387,7 +387,7 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
 void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){
     close();
     if(_dimming == MAX_DIM && !ignoreDim){
-        cmd.write(QString().sprintf("rgb 000000").toLatin1());
+        cmd.write("rgb 000000");
         return;
     }
     // Set just the background color, ignoring any animation

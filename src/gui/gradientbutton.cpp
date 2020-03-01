@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstdio>
 #include <QPainter>
+#include <QTextStream>
 #include "gradientbutton.h"
 #include "gradientdialog.h"
 
@@ -81,8 +82,12 @@ QString GradientButton::toString() const {
     QStringList result;
     foreach(const QGradientStop& stop, _stops){
         QString string;
+        QTextStream out(&string);
         const QColor& color = stop.second;
-        result << string.sprintf("%d:%02x%02x%02x%02x", (int)round(stop.first * 100.f), color.alpha(), color.red(), color.green(), color.blue());
+        out << static_cast<int>(round(stop.first * 100.f)) << ':'
+            << qSetFieldWidth(2) << qSetPadChar('0') << hex
+            << color.alpha() << color.red() << color.green() << color.blue();
+        result << string;
     }
     return result.join(" ");
 }

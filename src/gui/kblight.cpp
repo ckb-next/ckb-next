@@ -279,13 +279,13 @@ static float sToL(float srgb){
     srgb /= 255.f;
     if(srgb <= 0.04045f)
         return srgb / 12.92f;
-    return pow((srgb + 0.055f) / 1.055f, 2.4f);
+    return std::pow((srgb + 0.055f) / 1.055f, 2.4f);
 }
 
 static float lToS(float linear){
     if(linear <= 0.0031308f)
         return 12.92f * linear * 255.f;
-    return (1.055f * pow(linear, 1.f / 2.4f) - 0.055f) * 255.f;
+    return (1.055f * std::pow(linear, 1.f / 2.4f) - 0.055f) * 255.f;
 }
 
 // Convert RGB to monochrome
@@ -297,7 +297,7 @@ QRgb monoRgb(float r, float g, float b){
     r = sToL(r);
     g = sToL(g);
     b = sToL(b);
-    int value = round(lToS((r + g + b) / 3.f));
+    int value = std::round(lToS((r + g + b) / 3.f));
     return qRgb(value, value, value);
 }
 
@@ -342,9 +342,9 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
                 float g2 = qGreen(rgb2);
                 float b2 = qBlue(rgb2);
                 float a2 = qAlpha(rgb2) / 255.f;
-                r = round(r2 * a2 + r * (1.f - a2));
-                g = round(g2 * a2 + g * (1.f - a2));
-                b = round(b2 * a2 + b * (1.f - a2));
+                r = std::round(r2 * a2 + r * (1.f - a2));
+                g = std::round(g2 * a2 + g * (1.f - a2));
+                b = std::round(b2 * a2 + b * (1.f - a2));
             }
             // If monochrome mode is active, average the channels to get a grayscale image
             if(monochrome)
@@ -378,9 +378,9 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
             r *= light;
             g *= light;
             b *= light;
-            r = round(lToS(r));
-            g = round(lToS(g));
-            b = round(lToS(b));
+            r = std::round(lToS(r));
+            g = std::round(lToS(g));
+            b = std::round(lToS(b));
             rgb = qRgb(r, g, b);
         }
     }

@@ -44,7 +44,7 @@ void KeyWidget::drawInfo(float& scale, float& offsetX, float& offsetY, int ratio
     int w = width() * ratio, h = height() * ratio;
     float xScale = (float)w / (keyMap.width() + KEY_SIZE);
     float yScale = (float)h / (keyMap.height() + KEY_SIZE);
-    scale = fmin(xScale, yScale);
+    scale = std::fmin(xScale, yScale);
     offsetX = (w / scale - keyMap.width()) / 2.f;
     offsetY = (h / scale - keyMap.height()) / 2.f;
 }
@@ -562,7 +562,7 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
         if((_rgbMode && !key.hasLed)
                 || (!_rgbMode && !key.hasScan))
             continue;
-        if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f){
+        if(std::fabs(key.x - mx) <= key.width / 2.f - 1.f && std::fabs(key.y - my) <= key.height / 2.f - 1.f){
             // Sidelights can't have a color, but they can be toggled
             if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")){
                 emit sidelightToggled(); // get the kblightwidget to record it
@@ -621,7 +621,7 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
                 || (!_rgbMode && !key.hasScan))
             continue;
         // Update tooltip with the mouse hover (if any), even if it's not selectable
-        if(fabs(key.x - mx) <= key.width / 2.f - 1.f && fabs(key.y - my) <= key.height / 2.f - 1.f
+        if(std::fabs(key.x - mx) <= key.width / 2.f - 1.f && std::fabs(key.y - my) <= key.height / 2.f - 1.f
                 && tooltip.isEmpty())
             tooltip = key.friendlyName(false);
         // on STRAFE Sidelights and indicators can't be assigned color the way other keys are colored

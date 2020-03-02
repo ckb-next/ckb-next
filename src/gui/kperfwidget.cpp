@@ -131,7 +131,7 @@ void KPerfWidget::setPerf(KbPerf* newPerf, KbProfile* newProfile){
     perf = newPerf;
     profile = newProfile;
     // Set intensity
-    ui->intensityBox->setValue(round(perf->iOpacity() * 100.f));
+    ui->intensityBox->setValue(std::round(perf->iOpacity() * 100.f));
     // Set hardware indicator values
     for(int i = 0; i < HW_I_COUNT; i++){
         QColor c1, c2, c3;

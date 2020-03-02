@@ -80,7 +80,7 @@ MPerfWidget::~MPerfWidget(){
 void MPerfWidget::setPerf(KbPerf *newPerf, KbProfile *newProfile){
     perf = newPerf;
     profile = newProfile;
-    ui->spinBox->setValue(round(perf->iOpacity() * 100.f));
+    ui->spinBox->setValue(std::round(perf->iOpacity() * 100.f));
     for(int i = 0; i < DPI_COUNT; i++){
         stages[i].indicator->color(perf->dpiColor(i));
         bool oldLink = _xyLink;

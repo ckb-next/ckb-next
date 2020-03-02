@@ -403,7 +403,7 @@ void KbAnim::blend(ColorMap& animMap, quint64 timestamp){
                 r = r * (1.f - a) + qRed(fg) * a;
                 g = g * (1.f - a) + qGreen(fg) * a;
                 b = b * (1.f - a) + qBlue(fg) * a;
-                bg = qRgb(round(r), round(g), round(b));
+                bg = qRgb(std::round(r), std::round(g), std::round(b));
             }
         } else {
             // Use blend function
@@ -412,7 +412,7 @@ void KbAnim::blend(ColorMap& animMap, quint64 timestamp){
             r = r * (1.f - a) + blendF(r, qRed(fg) / 255.f) * a;
             g = g * (1.f - a) + blendF(g, qGreen(fg) / 255.f) * a;
             b = b * (1.f - a) + blendF(b, qBlue(fg) / 255.f) * a;
-            bg = qRgb(round(r * 255.f), round(g * 255.f), round(b * 255.f));
+            bg = qRgb(std::round(r * 255.f), std::round(g * 255.f), std::round(b * 255.f));
         }
     }
 }

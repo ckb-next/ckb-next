@@ -470,7 +470,7 @@ void KbPerf::update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi
 }
 
 void KbPerf::lightIndicator(const char* name, QRgb rgba){
-    int a = round(qAlpha(rgba) * _iOpacity);
+    int a = std::round(qAlpha(rgba) * _iOpacity);
     if(a <= 0)
         return;
     light()->setIndicator(name, qRgba(qRed(rgba), qGreen(rgba), qBlue(rgba), a));

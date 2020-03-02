@@ -56,7 +56,11 @@ static QSettings* globalSettings(){
 }
 
 bool CkbSettings::isBusy(){
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    return cacheWritesInProgress.loadRelaxed() > 0;
+#else
     return cacheWritesInProgress.load() > 0;
+#endif
 }
 
 void CkbSettings::migrateSettings(bool macFormat){
@@ -88,7 +92,11 @@ void CkbSettings::cleanUp(){
     if(!_globalSettings)
         return;
     // Wait for all writers to finish
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    while(cacheWritesInProgress.loadRelaxed() > 0)
+#else
     while(cacheWritesInProgress.load() > 0)
+#endif
         QThread::yieldCurrentThread();
     // Stop thread and delete objects
     globalThread->quit();

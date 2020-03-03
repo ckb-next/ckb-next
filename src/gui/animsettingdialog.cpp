@@ -456,7 +456,7 @@ void AnimSettingDialog::updateParam(QString name){
     }
     case AnimScript::Param::RGB:{
         ColorButton* widget = (ColorButton*)settingWidgets[name];
-        QColor color = widget->color();
+        const QColor& color = widget->color();
         char hex[7];
         snprintf(hex, sizeof(hex), "%02x%02x%02x", color.red(), color.green(), color.blue());
         _anim->parameter(name, QString(hex));
@@ -464,7 +464,7 @@ void AnimSettingDialog::updateParam(QString name){
     }
     case AnimScript::Param::ARGB:{
         ColorButton* widget = (ColorButton*)settingWidgets[name];
-        QColor color = widget->color();
+        const QColor& color = widget->color();
         char hex[9];
         snprintf(hex, sizeof(hex), "%02x%02x%02x%02x", color.alpha(), color.red(), color.green(), color.blue());
         _anim->parameter(name, QString(hex));

@@ -194,7 +194,7 @@ bool AnimScript::load(){
             QMap<QString, QVariant> preset;
             for(int i = 2; i < count; i++){
                 // Scan name/value setting pairs
-                QString setting = components.at(i);
+                const QString& setting = components.at(i);
                 QStringList sComponents = setting.split("=");
                 if(sComponents.count() != 2)
                     continue;

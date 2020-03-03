@@ -529,6 +529,6 @@ void KeyAction::adjustDisplay(){
 /// \param macroDef holds the String containing parts 2-5 of a complete macro definition.
 /// \return QString holding the complete G-Key macro definition (parts 1-5)
 ///
-QString KeyAction::macroAction(QString macroDef) {
+QString KeyAction::macroAction(const QString& macroDef) {
     return QString ("$macro:%1").arg(macroDef);
 }

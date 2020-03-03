@@ -52,7 +52,7 @@ public:
     /// \param macBox
     /// \param macText
     ///
-    MacroReaderThread(int macNum, QString macPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
+    MacroReaderThread(int macNum, const QString& macPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
         macroNumber = macNum;
         macroPath = macPath;
         macroBox = macBox;
@@ -77,7 +77,7 @@ private slots:
     ///
     /// \param line holds the line just got from keyboard
 
-    void readMacro(QString line);
+    void readMacro(const QString& line);
 };
 
 //////////
@@ -97,7 +97,7 @@ public:
     /// \param macBox
     /// \param macText
     ///
-    MacroReader(int macroNumber, QString macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText);
+    MacroReader(int macroNumber, const QString& macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText);
     ~MacroReader();
 
     //////////
@@ -107,7 +107,7 @@ public:
     /// \param macBox
     /// \param macText
     ///
-    void startWorkInAThread(int macroNumber, QString macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText);
+    void startWorkInAThread(int macroNumber, const QString& macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText);
 
 signals:
 

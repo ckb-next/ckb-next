@@ -40,9 +40,9 @@ private:
 private slots:
     void newDuration(double duration);
     void updateStops();
-    void angleDialChanged(QString name);
-    void angleSpinnerChanged(QString name);
-    void updateParam(QString name);
+    void angleDialChanged(const QString& name);
+    void angleSpinnerChanged(const QString& name);
+    void updateParam(const QString& name);
     void on_delayBox_valueChanged(double arg1);
     void on_repeatBox_valueChanged(double arg1);
     void on_kpDelayBox_valueChanged(double arg1);

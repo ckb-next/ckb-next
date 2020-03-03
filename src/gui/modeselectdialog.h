@@ -16,7 +16,7 @@ class ModeSelectDialog : public QDialog
 
 public:
     // Mode dialog with a list of modes and a custom text label. Use exec() to display. currentMode will not be displayed.
-    ModeSelectDialog(QWidget* parent, KbMode* currentMode, QList<KbMode*> modeList, const QString& textLabel);
+    ModeSelectDialog(QWidget* parent, KbMode* currentMode, const QList<KbMode*>& modeList, const QString& textLabel);
     ~ModeSelectDialog();
 
     // Mode(s) selected by the user

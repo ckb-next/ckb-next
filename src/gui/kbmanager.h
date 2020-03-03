@@ -16,7 +16,7 @@ class KbManager : public QObject
     Q_OBJECT
 public:
     // Call at startup
-    static void init(QString guiVersion);
+    static void init(const QString& guiVersion);
     // Call at shutdown
     static void stop();
     // Singleton instance. Signals are emitted from here. Created when init() is called.

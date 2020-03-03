@@ -6,12 +6,12 @@
 /// \class MacroReader
 ///
 
-MacroReader::MacroReader(int macroNumber, QString macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
+MacroReader::MacroReader(int macroNumber, const QString& macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
     startWorkInAThread(macroNumber, macroPath, macBox, macText);
 }
 MacroReader::~MacroReader() {}
 
-void MacroReader::startWorkInAThread(int macroNumber, QString macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
+void MacroReader::startWorkInAThread(int macroNumber, const QString& macroPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
     macroReaderThread = new MacroReaderThread(macroNumber, macroPath, macBox, macText);
     connect(macroReaderThread, &MacroReaderThread::finished, macroReaderThread, &QObject::deleteLater);
     macroReaderThread->start();
@@ -20,7 +20,7 @@ void MacroReader::startWorkInAThread(int macroNumber, QString macroPath, QPlainT
 //////////
 /// \class MacroReaderThread
 ///
-void MacroReaderThread::readMacro(QString line) {
+void MacroReaderThread::readMacro(const QString& line) {
     /// \details We want to see the keys as they appear in the macroText Widget.
     ///
     /// Because it is possible to change the Focus via keyboard,

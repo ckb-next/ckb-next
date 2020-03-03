@@ -889,7 +889,7 @@ void RebindWidget::on_rb_delay_default_toggled(bool checked)
 /// If "=" can be found and numbers with more than one digit (means: > 9), it is the "asTyped" button
 /// Otherwise it is the "no" button.
 ///
-void RebindWidget::setCorrectRadioButton (QString macdef) {
+void RebindWidget::setCorrectRadioButton (const QString& macdef) {
     if (!macdef.contains(QRegExp("=\\d+,"))) {
         ui->rb_delay_default->setChecked(true);
         return;

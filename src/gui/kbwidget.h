@@ -45,7 +45,7 @@ private:
 
     const static int GUID = Qt::UserRole;
     const static int NEW_FLAG = Qt::UserRole + 1;
-    int getPollRateBoxIdx(QString poll);
+    int getPollRateBoxIdx(const QString& poll);
 
 private slots:
     void updateProfileList();
@@ -68,8 +68,8 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();
     void on_layoutBox_activated(int index);
-    void switchToProfile(QString profile);
-    void switchToMode(QString mode);
+    void switchToProfile(const QString& profile);
+    void switchToMode(const QString& mode);
     void on_pollRateBox_currentIndexChanged(const QString &arg1);
 };
 

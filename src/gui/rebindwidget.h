@@ -89,7 +89,7 @@ private:
     // Show some help info
     void helpStatus(int status);
 
-    void setCorrectRadioButton (QString macdef);
+    void setCorrectRadioButton (const QString& macdef);
 
     KbBind* bind;
     KbProfile* profile;

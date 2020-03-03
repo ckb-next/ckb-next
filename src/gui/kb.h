@@ -116,7 +116,7 @@ public:
     inline QString getMacroPath () { return macroPath; }
 
     inline ushort getMaxDpi () {return _maxDpi; }
-    void setPollRate(QString poll);
+    void setPollRate(const QString& poll);
 
     ~Kb();
 
@@ -145,7 +145,7 @@ public slots:
 
 private slots:
     // Processes lines read from the notification node
-    void readNotify(QString line);
+    void readNotify(const QString& line);
 
     void deleteHw();
     void deletePrevious();

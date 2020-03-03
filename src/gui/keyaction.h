@@ -140,7 +140,7 @@ public:
     static QString  programAction(const QString& onPress, const QString& onRelease, int stop);
     // Key to start an animation
     static QString animAction(const QUuid& guid, bool onlyOnce, bool stopOnRelease);
-    static QString macroAction(QString macroDef);   ///< \brief well documented in cpp file
+    static QString macroAction(const QString& macroDef);   ///< \brief well documented in cpp file
 
     // Action type
     enum Type {

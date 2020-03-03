@@ -189,7 +189,7 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
     repopulate();
 }
 
-void KbProfileDialog::extractedFileCleanup(QStringList extracted){
+void KbProfileDialog::extractedFileCleanup(const QStringList& extracted){
     for(int i = 0; i < extracted.count(); i++){
         // Delete extracted files
         QFile fdel(extracted.at(i));
@@ -300,7 +300,7 @@ void KbProfileDialog::on_exportButton_clicked(){
         QMessageBox::information(this, tr("Export Successful"), tr("Selected profiles have been exported successfully."), QMessageBox::Ok);
 }
 
-bool KbProfileDialog::verifyHash(QString file){
+bool KbProfileDialog::verifyHash(const QString& file){
     QFile iniFile(file);
     QFile hashFile(file + ".s256");
     if(iniFile.open(QFile::ReadOnly) && hashFile.open(QFile::ReadOnly)){
@@ -318,7 +318,7 @@ bool KbProfileDialog::verifyHash(QString file){
     return false;
 }
 
-void KbProfileDialog::importCleanup(QStringList extracted, QList<QPair<QSettings*, QString>> profileptrs){
+void KbProfileDialog::importCleanup(const QStringList& extracted, const QList<QPair<QSettings*, QString>>& profileptrs){
     // Destroy the open QSettings objects
     for(int i = 0; i < profileptrs.count(); i++)
         delete profileptrs.at(i).first;

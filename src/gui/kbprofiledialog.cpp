@@ -356,7 +356,7 @@ void KbProfileDialog::on_importButton_clicked(){
     QStringList filenames = dialog.selectedFiles();
 
     // Pick only the first filename
-    QString filename = filenames.at(0);
+    const QString& filename = filenames.at(0);
     if(!filename.endsWith(".ckb")){
         QMessageBox::warning(this, tr("Error"), tr("Selected file is not a valid profile."), QMessageBox::Ok);
         return;
@@ -438,7 +438,7 @@ void KbProfileDialog::on_importButton_clicked(){
     int pkgVerifiedCount = 0;
 
     for(int i = 0; i < extracted.count(); i++){
-        QString tmpFile = extracted.at(i);
+        const QString& tmpFile = extracted.at(i);
         if(tmpFile.endsWith("ini")){
             pkgProfileCount++;
             if(verifyHash(tmpFile)){
@@ -482,7 +482,7 @@ void KbProfileDialog::on_importButton_clicked(){
         //QUuid current = guid.trimmed();
         QUuid guid = sptr->childGroups().first().trimmed();
         // Messy, shhhh
-        QString profname = profilestr.at(i);
+        const QString& profname = profilestr.at(i);
         KbProfile* profilematch = nullptr;
         foreach(KbProfile* profile, device->profiles()){
 

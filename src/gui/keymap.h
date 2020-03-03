@@ -103,7 +103,7 @@ public:
         _LAYOUT_MAX
     };
     // Human-readable names of each layout
-    static QList<QPair<int, QString> > layoutNames(QString layout);
+    static QList<QPair<int, QString> > layoutNames(const QString& layout);
     // ISO (105-key) or ANSI (104-key)?
     inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK && layout != PL; }
     inline bool         isISO() const           { return isISO(keyLayout); }

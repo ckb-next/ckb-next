@@ -26,10 +26,10 @@ public:
 
 private slots:
     void updateLight();
-    void newSelection(QStringList selection);
-    void changeColor(QColor newColor);
+    void newSelection(const QStringList& selection);
+    void changeColor(const QColor& newColor);
     void changeAnim(KbAnim* newAnim);
-    void changeAnimKeys(QStringList keys);
+    void changeAnimKeys(const QStringList& keys);
 
     void on_brightnessBox_activated(int index);
     void on_animButton_clicked();

@@ -529,7 +529,7 @@ void Kb::run(){
     notifyPaths.remove(notifyPath);
 }
 
-void Kb::readNotify(QString line){
+void Kb::readNotify(const QString& line){
     QStringList components = line.trimmed().split(" ");
     if(components.count() < 2)
         return;
@@ -855,7 +855,7 @@ KeyMap::Layout Kb::getCurrentLayout(){
     return _layout;
 }
 
-void Kb::setPollRate(QString poll)
+void Kb::setPollRate(const QString& poll)
 {
     cmd.write(QString("\npollrate %1\n").arg(poll).toLatin1());
 }

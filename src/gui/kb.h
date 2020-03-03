@@ -125,7 +125,7 @@ public:
     inline QString getMacroPath () { return macroPath; }
 
     inline ushort getMaxDpi () {return _maxDpi; }
-    void setPollRate(QString poll);
+    void setPollRate(const QString& poll);
 
     // The valid check is done because we don't start the timer on purpose in the constructor.
     // This is done so that when a new device is plugged in while the lights are off, it doesn't suddenly return a really low value and wake everything up.
@@ -159,7 +159,7 @@ public slots:
 
 private slots:
     // Processes lines read from the notification node
-    void readNotify(QString line);
+    void readNotify(const QString& line);
 
     void deleteHw();
     void deletePrevious();

@@ -72,7 +72,7 @@ void KbLightWidget::updateLight(){
     ui->brightnessBox->setCurrentIndex(light->dimming());
 }
 
-void KbLightWidget::newSelection(QStringList selection){
+void KbLightWidget::newSelection(const QStringList& selection){
     if(light == nullptr)
         return;
     // Determine selected color (invalid color if no selection or if they're not all the same)
@@ -108,7 +108,7 @@ void KbLightWidget::newSelection(QStringList selection){
     }
 }
 
-void KbLightWidget::changeColor(QColor newColor){
+void KbLightWidget::changeColor(const QColor& newColor){
     if(light){
         foreach(QString key, currentSelection)
             light->color(key, newColor);
@@ -147,7 +147,7 @@ void KbLightWidget::changeAnim(KbAnim *newAnim){
     ui->keyWidget->setAnimationToSelection();
 }
 
-void KbLightWidget::changeAnimKeys(QStringList keys){
+void KbLightWidget::changeAnimKeys(const QStringList& keys){
     ui->keyWidget->setAnimation(keys);
 }
 

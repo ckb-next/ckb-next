@@ -807,7 +807,7 @@ void KeyWidget::drawTopLeftCorner(QPainter* painter, float x, float y, float w, 
     painter->drawPolygon(edgePoints, 6);
 }
 
-void KeyWidget::drawStrafeSidelights(const Key* key, QPainter* decPainter, float offX, float offY, float scale, QColor keyColor, QColor color, QColor bgColor, int ratio){
+void KeyWidget::drawStrafeSidelights(const Key* key, QPainter* decPainter, float offX, float offY, float scale, const QColor& keyColor, const QColor& color, const QColor& bgColor, int ratio){
     float kx = key->x + offX - key->width / 2.f + 1.f;
     float ky = key->y + offY - key->height / 2.f + 1.f;
     float kw = key->width - 2.f;

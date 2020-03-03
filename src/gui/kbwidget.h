@@ -49,7 +49,7 @@ private:
 
     const static int GUID = Qt::UserRole;
     const static int NEW_FLAG = Qt::UserRole + 1;
-    int getPollRateBoxIdx(QString poll);
+    int getPollRateBoxIdx(const QString& poll);
 
     KbMode* prevmode;
     void openEventMgr(KbMode* mode);
@@ -74,8 +74,8 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();
     void on_layoutBox_activated(int index);
-    void switchToProfile(QString profile);
-    void switchToMode(QString mode);
+    void switchToProfile(const QString& profile);
+    void switchToMode(const QString& mode);
     void on_pollRateBox_currentIndexChanged(const QString& arg1);
     void switchToModeByFocus(XWindowInfo win);
     void on_modesList_doubleClicked(const QModelIndex& index);

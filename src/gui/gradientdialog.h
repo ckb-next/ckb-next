@@ -39,7 +39,7 @@ private:
     Ui::GradientDialog *ui;
 
 private slots:
-    void currentChanged(QColor color, bool spontaneous, int position);
+    void currentChanged(const QColor& color, bool spontaneous, int position);
     void colorChanged(QColor color);
 
     void on_presetList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);

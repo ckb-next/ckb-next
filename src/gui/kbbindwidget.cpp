@@ -58,7 +58,7 @@ void KbBindWidget::newLayout(){
     updateSelDisplay();
 }
 
-void KbBindWidget::newSelection(QStringList selection){
+void KbBindWidget::newSelection(const QStringList& selection){
     currentSelection = selection;
     ui->rbWidget->setSelection(selection, true);
     // Throw a warning if the user is trying to bind a win key while winlock is on

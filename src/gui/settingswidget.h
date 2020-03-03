@@ -26,7 +26,7 @@ public:
     void pollUpdates();
 
     void enableUpdateButton();
-    void setUpdateButtonText(QString text);
+    void setUpdateButtonText(const QString& text);
 
 signals:
     void checkForUpdates();

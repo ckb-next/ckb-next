@@ -526,7 +526,7 @@ void MainWindow::PosixSignalHandler(int signal){
         qDebug() << "Error on PosixSignalHandler write";
 }
 
-void MainWindow::checkedForNewVer(QString ver, QString changelog){
+void MainWindow::checkedForNewVer(const QString& ver, const QString& changelog){
 #ifndef DISABLE_UPDATER
     if(!ver.isEmpty()) {
         settingsWidget->setUpdateButtonText(tr("Update to v") + ver);

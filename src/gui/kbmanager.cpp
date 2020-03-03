@@ -67,7 +67,7 @@ void KbManager::idleTimerTick(){
 }
 #endif
 
-void KbManager::init(QString guiVersion){
+void KbManager::init(const QString& guiVersion){
     _guiVersion = guiVersion;
     if(_kbManager)
         return;

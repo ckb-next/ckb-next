@@ -37,9 +37,9 @@ private:
     void repopulate();
     void addNewProfileItem();
 
-    bool verifyHash(QString file);
-    void importCleanup(QStringList extracted, QList<QPair<CkbExternalSettings*, QString> > profileptrs);
-    void extractedFileCleanup(QStringList extracted);
+    bool verifyHash(const QString& file);
+    void importCleanup(const QStringList& extracted, const QList<QPair<CkbExternalSettings*, QString> >& profileptrs);
+    void extractedFileCleanup(const QStringList& extracted);
 
 };
 

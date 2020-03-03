@@ -87,7 +87,7 @@ private:
     void drawBottomLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawTopRightCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawTopLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
-    void drawStrafeSidelights(const Key* key, QPainter* decPainter, float offX, float offY, float scale, QColor keyColor, QColor color, QColor bgColor, int ratio);
+    void drawStrafeSidelights(const Key* key, QPainter* decPainter, float offX, float offY, float scale, const QColor& keyColor, const QColor& color, const QColor& bgColor, int ratio);
 };
 
 #endif // RGBWIDGET_H

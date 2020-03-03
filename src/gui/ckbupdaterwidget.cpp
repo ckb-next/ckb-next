@@ -8,7 +8,7 @@
 #include <QCryptographicHash>
 #include <QMessageBox>
 
-CkbUpdaterDialog::CkbUpdaterDialog(QString ver, QString changelog, QWidget *parent) :
+CkbUpdaterDialog::CkbUpdaterDialog(const QString& ver, const QString& changelog, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CkbUpdaterWidget), _version(ver), _changelog(changelog), _manager(nullptr), _redirectCount(0), _url(QString("https://github.com/ckb-next/ckb-next/")), _quitApp(false){
     ui->setupUi(this);

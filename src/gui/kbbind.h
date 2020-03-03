@@ -50,7 +50,7 @@ public:
     // Global key remap (changes modifiers per Settings widget)
     // Use only when iterating the map manually; all KbBind functions already take this into account
     static QString  globalRemap(const QString& key);
-    static void     setGlobalRemap(const QHash<QString, QString> keyToActual);
+    static void     setGlobalRemap(const QHash<QString, QString>& keyToActual);
     static void     loadGlobalRemap();
     static void     saveGlobalRemap();
 

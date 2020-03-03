@@ -1140,7 +1140,7 @@ QPair<int, QString> KeyMap::addToList(int i, QStringList* list){
     return QPair<int, QString>(i, list->at(i));
 }
 
-QList<QPair<int, QString>> KeyMap::layoutNames(QString layout){
+QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
     QStringList list;
     list << "Danish"
          << "English (ISO/European)"

@@ -408,19 +408,19 @@ void AnimSettingDialog::updateStops(){
     updateParam("kpstop");
 }
 
-void AnimSettingDialog::angleDialChanged(QString name){
+void AnimSettingDialog::angleDialChanged(const QString& name){
     // Dial changed; update spinner value
     angleSpinners[name]->setValue(angleFlip(((QDial*)settingWidgets[name])->value()));
     updateParam(name);
 }
 
-void AnimSettingDialog::angleSpinnerChanged(QString name){
+void AnimSettingDialog::angleSpinnerChanged(const QString& name){
     // Spinner changed; update dial value
     ((QDial*)settingWidgets[name])->setValue(angleFlip(angleSpinners[name]->value()));
     updateParam(name);
 }
 
-void AnimSettingDialog::updateParam(QString name){
+void AnimSettingDialog::updateParam(const QString& name){
     if(!settingWidgets.contains(name))
         return;
     // stop and kpstop have defeat switches

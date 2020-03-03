@@ -125,7 +125,7 @@ void GradientDialog::updatePresets(){
     }
 }
 
-void GradientDialog::currentChanged(QColor color, bool spontaneous, int position){
+void GradientDialog::currentChanged(const QColor& color, bool spontaneous, int position){
     int pCount = ui->widget->stopCount();
     if(pCount == 1)
         ui->stopBox->setTitle(tr("1 point"));

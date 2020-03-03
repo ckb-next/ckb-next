@@ -23,7 +23,7 @@ public:
 private slots:
     void updateBind();
     void newLayout();
-    void newSelection(QStringList selection);
+    void newSelection(const QStringList& selection);
     void updateSelDisplay();
 
     void on_resetButton_clicked();

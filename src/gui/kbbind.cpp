@@ -103,7 +103,7 @@ QString KbBind::globalRemap(const QString& key){
     return _globalRemap.value(key);
 }
 
-void KbBind::setGlobalRemap(const QHash<QString, QString> keyToActual){
+void KbBind::setGlobalRemap(const QHash<QString, QString>& keyToActual){
     _globalRemap.clear();
     // Ignore any keys with the standard binding
     QHashIterator<QString, QString> i(keyToActual);

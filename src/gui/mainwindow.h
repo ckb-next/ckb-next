@@ -79,7 +79,7 @@ private slots:
     void timerTick();
     void showFwUpdateNotification(QWidget* widget, float version);
     void QSignalHandler();
-    void checkedForNewVer(QString ver, QString changelog);
+    void checkedForNewVer(const QString& ver, const QString& changelog);
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
     void appleRequestHidTimer();
 #endif

@@ -330,7 +330,7 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint& pos){
 #endif
 }
 
-inline int KbWidget::getPollRateBoxIdx(QString poll){
+inline int KbWidget::getPollRateBoxIdx(const QString& poll){
     switch(poll.leftRef(1).toInt()){
         case 1:
             return 0;
@@ -459,7 +459,7 @@ void KbWidget::on_layoutBox_activated(int index){
     device->layout(layout, true);
 }
 
-void KbWidget::switchToProfile(QString profile){
+void KbWidget::switchToProfile(const QString& profile){
     int len = device->profiles().length();
     for(int i = 0; i < len; i++){
         KbProfile* loopProfile = device->profiles().at(i);
@@ -475,7 +475,7 @@ void KbWidget::switchToProfile(QString profile){
     }
 }
 
-void KbWidget::switchToMode(QString mode){
+void KbWidget::switchToMode(const QString& mode){
     KbProfile* currentProfile = device->currentProfile();
     int len = currentProfile->modes().length();
 

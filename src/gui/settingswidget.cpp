@@ -273,7 +273,7 @@ void SettingsWidget::enableUpdateButton(){
     ui->pushButton_2->setEnabled(true);
 }
 
-void SettingsWidget::setUpdateButtonText(QString text){
+void SettingsWidget::setUpdateButtonText(const QString& text){
     if(updateRequestedByUser) {
         ui->pushButton_2->setText(text);
         updateRequestedByUser = false;

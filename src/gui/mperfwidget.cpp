@@ -32,6 +32,9 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
         stages[i].indicator->setLabel(false);
         stages[i].indicator->bigIcons(true);
         stages[i].indicator->allowAlpha(true);
+        // Disable tracking so that the slider only sends the value when the user has stopped moving it
+        stages[i].xSlider->setTracking(false);
+        stages[i].ySlider->setTracking(false);
         // Map signals
         connect(stages[i].indicator, &ColorButton::clicked, [=] (){
             emit colorClicked(i);
@@ -39,10 +42,18 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
         connect(stages[i].indicator, &ColorButton::colorChanged, [=] () {
             emit colorChanged(i);
         });
+        // valueChanged is used to update the settings
+        // sliderMoved is used to update the spinbox in realtime
         connect(stages[i].xSlider, &QSlider::valueChanged, [=] () {
-            emit sliderXMoved(i);
+            emit sliderXValueChanged(i);
         });
         connect(stages[i].ySlider, &QSlider::valueChanged, [=] () {
+            emit sliderYValueChanged(i);
+        });
+        connect(stages[i].xSlider, &QSlider::sliderMoved, [=] () {
+            emit sliderXMoved(i);
+        });
+        connect(stages[i].ySlider, &QSlider::sliderMoved, [=] () {
             emit sliderYMoved(i);
         });
         connect(stages[i].xBox, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
@@ -111,58 +122,82 @@ void MPerfWidget::colorChanged(int index){
     colorLink = false;
 }
 
-inline int dpiExp(int value, int min, int max){
+static inline int dpiExp(int value, int min, int max){
     const double DPI_BASE = (double)max / (double)KbPerf::DPI_MIN;
     double val = (value - min) / (double)(max - min);
     val = pow(DPI_BASE, val);
     return round(KbPerf::DPI_MIN * val);
 }
 
-inline int dpiLog(int value, int min, int max){
+static inline int dpiLog(int value, int min, int max){
     const double DPI_BASE = (double)max / (double)KbPerf::DPI_MIN;
     double val = value / (double)KbPerf::DPI_MIN;
     val = log(val) / log(DPI_BASE);
     return round(val * (max - min) + min);
 }
 
-inline int dpiRound(int value){
+static inline int dpiRound(int value){
     if(value > 1000)
         return round(value / 100.) * 100;
     else
         return round(value / 50.) * 50;
 }
 
+static inline int calculateSliderDpi(QSlider* slider){
+    return dpiRound(dpiExp(slider->sliderPosition(), slider->minimum(), slider->maximum()));
+}
+
+
 // Potential recursion in sliderMoved/boxMoved due to rounding
 #define SET_START   if(isSetting) return; isSetting = true
 #define SET_END     isSetting = false
 
-void MPerfWidget::sliderXMoved(int index){
+
+
+void MPerfWidget::sliderXValueChanged(int index){
     SET_START;
     QSlider* slider = stages[index].xSlider;
-    int value = dpiRound(dpiExp(slider->value(), slider->minimum(), slider->maximum()));
-    stages[index].xBox->setValue(value);
+    int value = calculateSliderDpi(slider);
     if(_xyLink)
         perf->dpi(index, value);
     else
         perf->dpi(index, QPoint(value, perf->dpi(index).y()));
     SET_END;
-    if(_xyLink)
-        stages[index].ySlider->setValue(slider->value());
 }
 
-void MPerfWidget::sliderYMoved(int index){
+void MPerfWidget::sliderXMoved(int index){
+    SET_START;
+    QSlider* slider = stages[index].xSlider;
+    int value = calculateSliderDpi(slider);
+    stages[index].xBox->setValue(value);
+    if(_xyLink){
+        stages[index].ySlider->setValue(slider->sliderPosition());
+        stages[index].yBox->setValue(value);
+    }
+    SET_END;
+}
+
+void MPerfWidget::sliderYValueChanged(int index){
     SET_START;
     QSlider* slider = stages[index].ySlider;
-    int value = dpiRound(dpiExp(slider->value(), slider->minimum(), slider->maximum()));
-    stages[index].yBox->setValue(value);
+    int value = calculateSliderDpi(slider);
     if(_xyLink)
         perf->dpi(index, value);
     else
         perf->dpi(index, QPoint(perf->dpi(index).x(), value));
     SET_END;
-    if(!ui->xyBox->isChecked())
-        // X/Y linked?
-        stages[index].xSlider->setValue(slider->value());
+}
+
+void MPerfWidget::sliderYMoved(int index){
+    SET_START;
+    QSlider* slider = stages[index].ySlider;
+    int value = calculateSliderDpi(slider);
+    stages[index].yBox->setValue(value);
+    if(_xyLink){
+        stages[index].xSlider->setValue(slider->sliderPosition());
+        stages[index].xBox->setValue(value);
+    }
+    SET_END;
 }
 
 void MPerfWidget::setLegacyM95(){

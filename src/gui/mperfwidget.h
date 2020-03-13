@@ -53,7 +53,9 @@ private:
 private slots:
     void colorClicked(int index);
     void colorChanged(int index);
+    void sliderXValueChanged(int index);
     void sliderXMoved(int index);
+    void sliderYValueChanged(int index);
     void sliderYMoved(int index);
     void boxXChanged(int index);
     void boxYChanged(int index);

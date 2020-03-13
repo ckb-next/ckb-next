@@ -256,24 +256,9 @@ int main(int argc, char** argv){
     } else
         ckb_warn_nofile("Unable to setup signal handlers\n");
 
-    pthread_mutexattr_t mutexattr;
-    pthread_mutexattr_init(&mutexattr);
-    int result = pthread_mutexattr_setprotocol(&mutexattr, PTHREAD_PRIO_PROTECT);
-    if(result)
-        ckb_err("Unable to set dmutex protocol: %d\n", result);
-
-    // Create dmutex dynamically
-    for(int i = 0; i < DEV_MAX; i++){
-        result = pthread_mutex_init(devmutex + i, &mutexattr);
-        if(result)
-            ckb_fatal("Unable to initialise dmutex i: %d\n", result);
-    }
 
     // Start the USB system
-    result = usbmain();
+    int result = usbmain();
     quit();
-    for(int i = 0; i < DEV_MAX; i++)
-        pthread_mutex_destroy(devmutex + i);
-    pthread_mutexattr_destroy(&mutexattr);
     return result;
 }

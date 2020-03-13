@@ -155,6 +155,15 @@ elseif ("${init_system}" STREQUAL "OpenRC")
         endforeach()
     endif()
 
+elseif ("${init_system}" STREQUAL "SysVinit")
+
+    message(STATUS "${init_system}: stopping and disabling ${daemon}")
+    execute_process(COMMAND sudo service ckb-next-daemon.sh stop)
+    find_program(UPDATE_RC_EXISTS "update-rc.d")
+    if (UPDATE_RC_EXISTS)
+        execute_process(COMMAND sudo update-rc.d ckb-next-daemon.sh remove)
+    endif ()
+
 else ()
     message(WARNING "Init system was not detected.
     Either there's a bug, or your init system is not supported.")

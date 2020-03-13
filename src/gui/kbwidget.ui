@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -513,6 +513,29 @@
            <property name="maximum">
             <number>6</number>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <item>
+            <property name="text">
+             <string notr="true">1 ms</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">2 ms</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">4 ms</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">8 ms</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item>

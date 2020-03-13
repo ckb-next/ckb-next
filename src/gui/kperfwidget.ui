@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -187,7 +187,7 @@
    <item row="23" column="1">
     <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>Scroll lock:</string>
+      <string notr="true">Scroll lock:</string>
      </property>
     </widget>
    </item>
@@ -352,14 +352,14 @@
    <item row="15" column="11">
     <widget class="QLabel" name="label_18">
      <property name="text">
-      <string>33%</string>
+      <string notr="true">33%</string>
      </property>
     </widget>
    </item>
    <item row="15" column="8">
     <widget class="QLabel" name="label_16">
      <property name="text">
-      <string>67%</string>
+      <string notr="true">67%</string>
      </property>
     </widget>
    </item>
@@ -480,7 +480,7 @@
    <item row="21" column="1">
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Num lock:</string>
+      <string notr="true">Num lock:</string>
      </property>
     </widget>
    </item>
@@ -741,7 +741,7 @@
    <item row="22" column="1">
     <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Caps lock:</string>
+      <string notr="true">Caps lock:</string>
      </property>
     </widget>
    </item>
@@ -892,7 +892,7 @@
    <item row="15" column="5">
     <widget class="QLabel" name="label_10">
      <property name="text">
-      <string>100%</string>
+      <string notr="true">100%</string>
      </property>
     </widget>
    </item>
@@ -1054,7 +1054,7 @@
      <item>
       <widget class="QSpinBox" name="intensityBox">
        <property name="suffix">
-        <string>%</string>
+        <string notr="true">%</string>
        </property>
        <property name="maximum">
         <number>100</number>

@@ -14,7 +14,7 @@
    <enum>Qt::ClickFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>Keyboard Profiles</string>
+   <string>Device Profiles</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

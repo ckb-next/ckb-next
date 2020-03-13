@@ -3,7 +3,7 @@
 #
 #   Redistribution and use in source and binary forms, with or without
 #   modification, are permitted provided that the following conditions are met:
-#   
+#
 #   1. Redistributions of source code must retain the above copyright notice,
 #   this list of conditions and the following disclaimer.
 #   2. Redistributions in binary form must reproduce the above copyright
@@ -11,8 +11,8 @@
 #   documentation and/or other materials provided with the distribution.
 #   3. Neither the name of the copyright holder nor the names of its
 #   contributors may be used to endorse or promote products derived from this
-#   software without specific prior written permission. 
-#   
+#   software without specific prior written permission.
+#
 #   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 #   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 #   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,6 +26,7 @@
 #   POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(ckb-next "")
+set_property(TARGET ckb-next PROPERTY AUTOGEN_TARGET_DEPENDS ckb-next-lrelease)
 add_custom_target(gui DEPENDS ckb-next)
 
 # Declare we want macOS Bundle
@@ -98,6 +99,7 @@ elseif (LINUX)
         endif ()
     endif ()
     find_package(X11 REQUIRED)
+    find_package(Qt5 5.2.0 COMPONENTS X11Extras)
 endif ()
 
 # Automatically handle MOC, UIC and RCC
@@ -131,6 +133,7 @@ if (MACOS OR LINUX)
               gradientbutton.cpp
               gradientdialog.cpp
               gradientdialogwidget.cpp
+              idletimer.cpp
               kbanim.cpp
               kbanimwidget.cpp
               kbbind.cpp
@@ -175,6 +178,7 @@ if (MACOS OR LINUX)
               gradientbutton.h
               gradientdialog.h
               gradientdialogwidget.h
+              idletimer.h
               kbanim.h
               kbanimwidget.h
               kbbind.h
@@ -229,13 +233,36 @@ if (MACOS)
               media_mac.m)
 elseif (LINUX)
     find_package(PulseAudio)
-    if (${PULSEAUDIO_FOUND})
+    if (PULSEAUDIO_FOUND)
         target_compile_definitions(
             ckb-next
                 PRIVATE
                     USE_LIBPULSE)
     endif ()
 
+    if (USE_XCB)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(XCB xcb)
+        pkg_check_modules(XCB_EWMH xcb-ewmh)
+        pkg_check_modules(XCB_SCREENSAVER xcb-screensaver)
+
+        if(XCB_SCREENSAVER_FOUND AND Qt5X11Extras_FOUND)
+            target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_XCB_SCREENSAVER)
+        else()
+            message(FATAL_ERROR "XCB-Screensaver or Qt5 X11Extras was not found. Either install them or pass -DUSE_XCB=0 to disable idle detection.")
+        endif()
+        if(XCB_EWMH_FOUND)
+            target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_XCB_EWMH)
+            else()
+                message(FATAL_ERROR "XCB-EWMH was not found. Either install it or pass -DUSE_XCB=0 to disable active window detection.")
+        endif()
+    endif()
     target_sources(
         ckb-next
             PRIVATE
@@ -278,6 +305,32 @@ if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/image.qrc")
     endforeach ()
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/image.qrc" "</qresource>\n</RCC>\n")
 endif ()
+
+find_package(Qt5LinguistTools CONFIG REQUIRED)
+
+# Generate translation.qrc
+# Note that the qm files haven't been generated yet
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc")
+    file(GLOB qt_translations RELATIVE "${CMAKE_CURRENT_LIST_DIR}/resources/translations" "${CMAKE_CURRENT_LIST_DIR}/resources/translations/*.ts")
+    message(STATUS "Generating translation.qrc")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc" "<RCC>\n<qresource prefix=\"/translations\">\n")
+    foreach (qt_ts_translation IN LISTS qt_translations)
+        string(REPLACE ".ts" ".qm" qt_qm_translation ${qt_ts_translation})
+        message(STATUS "Importing ${qt_qm_translation}")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc" "<file>${qt_qm_translation}</file>\n")
+    endforeach ()
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc" "</qresource>\n</RCC>\n")
+endif ()
+
+# Generate binary translations and update ts files if needed
+file(GLOB qt_translations_rel RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/resources/translations/*.ts")
+qt5_add_translation(QM_FILES "${qt_translations_rel}")
+add_custom_target(ckb-next-lrelease SOURCES "${QM_FILES}")
+
+# Simple target to call lupdate on demand
+add_custom_target(lupdate
+    COMMAND Qt5::lupdate "." "-ts" ${qt_translations_rel}
+    WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
 
 if (MACOS)
     # Import macOS icon
@@ -358,7 +411,8 @@ if (MACOS OR LINUX)
             PRIVATE
               "${CMAKE_CURRENT_BINARY_DIR}/binary.qrc"
               "${CMAKE_CURRENT_BINARY_DIR}/text.qrc"
-              "${CMAKE_CURRENT_BINARY_DIR}/image.qrc")
+              "${CMAKE_CURRENT_BINARY_DIR}/image.qrc"
+              "${CMAKE_CURRENT_BINARY_DIR}/translation.qrc")
 endif ()
 
 # Declare target's include paths
@@ -407,20 +461,15 @@ if(MACOS)
               "${FOUNDATION_LIBRARY}"
               "${AUDIOTOOLBOX_LIBRARY}")
 elseif (LINUX)
-    if(${PULSEAUDIO_FOUND})
-        target_link_libraries(
-            ckb-next
-                PRIVATE
-                  "${X11_LIBRARIES}"
-                  "${Appindicator_LIBRARIES}"
-                  "${PULSEAUDIO_LIBRARIES}")
-    else()
-        target_link_libraries(
-            ckb-next
-                PRIVATE
-                  "${X11_LIBRARIES}"
-                  "${Appindicator_LIBRARIES}")
-    endif()
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+              "${X11_LIBRARIES}"
+              "${Appindicator_LIBRARIES}"
+              "${PULSEAUDIO_LIBRARIES}"
+              "${XCB_EWMH_LIBRARIES}"
+              "${XCB_SCREENSAVER_LIBRARIES}"
+              Qt5::X11Extras)
 endif()
 
 if (WITH_SHIPPED_QUAZIP)
@@ -484,6 +533,15 @@ if (MACOS)
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
+
+    # Install daemon restart script
+    install(
+      PROGRAMS "${PROJECT_SOURCE_DIR}/macos/daemon-restart.sh"
+      DESTINATION "ckb-next.app/Contents/Resources"
+      PERMISSIONS
+      OWNER_READ OWNER_WRITE OWNER_EXECUTE
+      GROUP_READ GROUP_EXECUTE
+      WORLD_READ WORLD_EXECUTE)
 elseif (LINUX)
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.png"

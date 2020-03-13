@@ -72,7 +72,7 @@
       </font>
      </property>
      <property name="text">
-      <string>ckb-next v</string>
+      <string notr="true">ckb-next v</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignBottom|Qt::AlignHCenter</set>
@@ -118,7 +118,7 @@
    <item>
     <widget class="QLabel" name="changelogLabel">
      <property name="text">
-      <string>&lt;a href=&quot;#&quot; style=&quot;text-decoration: none;&quot;&gt;v0.3.2 changelog&lt;/a&gt;&lt;br /&gt;&lt;a href=&quot;#&quot; style=&quot;text-decoration: none;&quot;&gt;v0.3.2 manual download&lt;/a&gt;</string>
+      <string notr="true">&lt;a href=&quot;#&quot; style=&quot;text-decoration: none;&quot;&gt;v0.3.2 changelog&lt;/a&gt;&lt;br /&gt;&lt;a href=&quot;#&quot; style=&quot;text-decoration: none;&quot;&gt;v0.3.2 manual download&lt;/a&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>

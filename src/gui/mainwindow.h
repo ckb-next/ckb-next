@@ -62,8 +62,20 @@ private:
 
     QMenu*              trayIconMenu;
     CkbSystemTrayIcon*  trayIcon;
-
     void closeEvent(QCloseEvent *event);
+
+#if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
+    QTimer*             catalinaTimer;
+    typedef enum {
+       REQUEST_STATE_NOT_SET = -1,
+       REQUEST_SUCCEEDED = 0,
+       REQUEST_ALREADY_ALLOWED,
+       REQUEST_ERROR
+    } hid_req_ret;
+    hid_req_ret prevHidRet = REQUEST_STATE_NOT_SET;
+    bool catalinaAgentStarted = false;
+
+#endif
 
 public slots:
     void showWindow();
@@ -89,6 +101,9 @@ private slots:
     void showFwUpdateNotification(QWidget* widget, float version);
     void QSignalHandler();
     void checkedForNewVer(QString ver, QString changelog);
+#if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
+    void appleRequestHidTimer();
+#endif
 
 private:
     Ui::MainWindow *ui;

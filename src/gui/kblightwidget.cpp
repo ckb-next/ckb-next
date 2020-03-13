@@ -10,7 +10,7 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     if(AnimScript::count() == 0)
-        ui->animButton->setVisible(false);
+        ui->animButton->setEnabled(false);
 
     connect(ui->bgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeColor(QColor)));
     connect(ui->keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
@@ -106,12 +106,19 @@ void KbLightWidget::newSelection(QStringList selection){
     ui->bgButton->color(selectedColor);
     int count = selection.count();
     if(count == 0){
-        ui->selLabel->setText("Click to select");
-        return;
-    } else if(count == 1)
-        ui->selLabel->setText(tr("1 %1 selected").arg((!light->map().isKeyboard() || light->map().model() == KeyMap::K55 ) ? "zone" : "key"));
-    else
-        ui->selLabel->setText(tr("%1 %2 selected").arg(count).arg((!light->map().isKeyboard() || light->map().model() == KeyMap::K55 ) ? "zones" : "keys"));
+        ui->selLabel->setText(tr("Click to select"));
+    } else if(count == 1) {
+        // This is done this way to aid translation
+        if(!light->map().isKeyboard() || light->map().model() == KeyMap::K55)
+            ui->selLabel->setText(tr("1 zone selected"));
+        else
+            ui->selLabel->setText(tr("1 key selected"));
+    } else {
+        if(!light->map().isKeyboard() || light->map().model() == KeyMap::K55)
+            ui->selLabel->setText(tr("%1 zones selected").arg(count));
+        else
+            ui->selLabel->setText(tr("%1 keys selected").arg(count));
+    }
 }
 
 void KbLightWidget::changeColor(QColor newColor){

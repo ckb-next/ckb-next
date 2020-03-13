@@ -92,14 +92,14 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
 
 QString KeyAction::friendlyName(const KeyMap& map) const {
     if(_value.isEmpty())
-        return "Unbound";
+        return tr("Unbound");
     QStringList parts = _value.split(":");
     QString prefix = parts[0];
     if(parts.length() < 2){
         KeyMap::Layout layout = map.layout();
         QString name = KeyMap::friendlyName(_value, layout);
         if(name.isEmpty())
-            return "(Unknown)";
+            return tr("(Unknown)");
         return name;
     }
     int suffix = parts[1].toInt();
@@ -107,10 +107,10 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         switch(suffix){
         case MODE_PREV:
         case MODE_PREV_WRAP:
-            return "Switch to previous mode";
+            return tr("Switch to previous mode");
         case MODE_NEXT:
         case MODE_NEXT_WRAP:
-            return "Switch to next mode";
+            return tr("Switch to next mode");
         default:
             return tr("Switch to mode %1").arg(suffix + 1);
         }
@@ -119,15 +119,15 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         int level = parts[1].split("+")[0].toInt();
         switch(level){
         case DPI_CYCLE_UP:
-            return "DPI cycle up";
+            return tr("DPI cycle up");
         case DPI_CYCLE_DOWN:
-            return "DPI cycle down";
+            return tr("DPI cycle down");
         case DPI_UP:
-            return "DPI up";
+            return tr("DPI up");
         case DPI_DOWN:
-            return "DPI down";
+            return tr("DPI down");
         case DPI_SNIPER:
-            return "Sniper";
+            return tr("Sniper");
         case DPI_CUSTOM:{
             QPoint xy;
             dpiInfo(xy);
@@ -169,9 +169,9 @@ QString KeyAction::modeAction(int mode){
 }
 
 QString KeyAction::dpiAction(int level, int customX, int customY){
-    QString action = tr("$dpi:%1").arg(level);
+    QString action = QString("$dpi:%1").arg(level);
     if(level == DPI_CUSTOM)
-        action += tr("+%1+%2").arg(customX).arg(customY);
+        action += QString("+%1+%2").arg(customX).arg(customY);
     return action;
 }
 

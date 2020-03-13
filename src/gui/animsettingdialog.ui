@@ -20,7 +20,7 @@
    <enum>Qt::ClickFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string notr="true">Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="0">

@@ -37,7 +37,7 @@ public:
     // Overall dimming. 0 = max brightness, 3 = off
     static const int    MAX_DIM = 3;
     inline int          dimming()               { return _dimming; }
-    void                dimming(int newDimming, bool overrideShare = false);
+    void                dimming(int newDimming, bool overrideShare = false, bool noSave = false);
     // Shared brightness between all modes (-1 for sharing disabled)
     static int          shareDimming();
     static void         shareDimming(int newShareDimming);
@@ -88,6 +88,8 @@ public:
     // Needed for when switching profiles as the daemon wipes the old data on switch
     void forceFrameUpdate();
 
+    void timerDimRestore();
+    void timerDim();
 signals:
     void didLoad();
     void updated();
@@ -101,7 +103,7 @@ private:
     ColorMap        _colorMap, _animMap, _lastFrameAnimMap, _indicatorMap, _lastFrameIndicatorMap;
     QSet<QString>   _indicatorList;
     quint64         lastFrameSignal;
-    int             _dimming, _lastFrameDimming;
+    int             _dimming, _lastFrameDimming, _timerOrigDimming;
     bool            _start;
     bool            _needsSave, _needsMapRefresh, _forceFrame;
 

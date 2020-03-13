@@ -273,7 +273,9 @@ void os_sendindicators(usbdevice* kb) {
         ileds = &kb->ileds;
     }
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : 1), 500, ileds };
+    pthread_mutex_unlock(dmutex(kb));
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    pthread_mutex_lock(dmutex(kb));
     if(res <= 0) {
         ckb_err("%s\n", res ? strerror(errno) : "No data written");
         if (usb_tryreset(kb) == 0 && countForReset++ < 3) {

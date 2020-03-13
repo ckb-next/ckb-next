@@ -6,15 +6,16 @@
 
 static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
+static bool _timerDimmed = false;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
-    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
+    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0), _timerOrigDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap), lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
+    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap), lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _timerOrigDimming(_dimming), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
 {
     map(keyMap);
     // Duplicate animations
@@ -89,10 +90,11 @@ void KbLight::shareDimming(int newShareDimming){
     }
 }
 
-void KbLight::dimming(int newDimming, bool overrideShare){
+void KbLight::dimming(int newDimming, bool overrideShare, bool noSave){
     if(!(_shareDimming == -1 || overrideShare))
         shareDimming(newDimming);
-    _needsSave = true;
+    if(!noSave)
+        _needsSave = true;
     _dimming = newDimming;
     emit updated();
 }
@@ -385,7 +387,7 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
 void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){
     close();
     if(_dimming == MAX_DIM && !ignoreDim){
-        cmd.write(QString().sprintf("rgb 000000").toLatin1());
+        cmd.write("rgb 000000");
         return;
     }
     // Set just the background color, ignoring any animation
@@ -558,4 +560,21 @@ bool KbLight::needsSave() const {
             return true;
     }
     return false;
+}
+
+void KbLight::timerDim() {
+    // Ignore if the lights are already off
+    if(_dimming == 3)
+        return;
+    _timerOrigDimming = _dimming;
+    _timerDimmed = true;
+    dimming(3, false, true);
+}
+
+void KbLight::timerDimRestore() {
+    // Don't try to restore the state if the user changed it
+    if(_timerOrigDimming == _dimming || _dimming != 3 || !_timerDimmed)
+        return;
+    _timerDimmed = false;
+    dimming(_timerOrigDimming, false, true);
 }

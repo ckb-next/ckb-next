@@ -102,7 +102,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Point X of Y</string>
+      <string notr="true">Point X of Y</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="1" column="2">
@@ -117,7 +117,7 @@
         <item>
          <widget class="QSpinBox" name="stopOpacity">
           <property name="suffix">
-           <string>%</string>
+           <string notr="true">%</string>
           </property>
           <property name="maximum">
            <number>100</number>
@@ -151,7 +151,7 @@
         <item>
          <widget class="QSpinBox" name="stopPos">
           <property name="suffix">
-           <string>%</string>
+           <string notr="true">%</string>
           </property>
           <property name="maximum">
            <number>100</number>

@@ -128,9 +128,9 @@ void GradientDialog::updatePresets(){
 void GradientDialog::currentChanged(QColor color, bool spontaneous, int position){
     int pCount = ui->widget->stopCount();
     if(pCount == 1)
-        ui->stopBox->setTitle("1 point");
+        ui->stopBox->setTitle(tr("1 point"));
     else
-        ui->stopBox->setTitle(QString("%1 points").arg(pCount));
+        ui->stopBox->setTitle(tr("%1 points").arg(pCount));
     if(!color.isValid()){
         ui->stopBox->setEnabled(false);
         ui->stopPos->setValue(0);
@@ -157,7 +157,7 @@ void GradientDialog::setPreset(const QString &newPreset){
         Preset current = presets.value(currentPreset);
         QString curName = ui->presetName->text().trimmed();
         if(curName == "" || (curName == current.name && current.builtIn))
-            ui->presetName->setText("Custom");
+            ui->presetName->setText(tr("Custom"));
         ui->presetDelete->setEnabled(false);
         ui->presetSave->setEnabled(true);
     } else {
@@ -185,17 +185,17 @@ void GradientDialog::on_presetSave_clicked(){
         return;
     QString name = ui->presetName->text().trimmed();
     if(name == "")
-        ui->presetName->setText(name = "Custom");
+        ui->presetName->setText(name = tr("Custom"));
     QString pName = name.toLower();
     // Make sure not to overwrite a built-in preset
     Preset previous = presets[pName];
     if(previous.builtIn){
-        QMessageBox::warning(this, "Error", "Can't overwrite a built-in preset. Please choose a different name.");
+        QMessageBox::warning(this, tr("Error"), tr("Can't overwrite a built-in preset. Please choose a different name."));
         setFocus();
         return;
     } else if(previous.name != ""){
         // Warn when overwriting an existing preset
-        if(QMessageBox::warning(this, "Warning", QString("Preset \"%1\" already exists. Replace?").arg(name), QMessageBox::StandardButtons(QMessageBox::Save | QMessageBox::Cancel)) != QMessageBox::Save){
+        if(QMessageBox::warning(this, tr("Warning"), tr("Preset \"%1\" already exists. Replace?").arg(name), QMessageBox::StandardButtons(QMessageBox::Save | QMessageBox::Cancel)) != QMessageBox::Save){
             setFocus();
             return;
         }
@@ -212,7 +212,7 @@ void GradientDialog::on_presetDelete_clicked(){
     Preset current = presets.value(currentPreset);
     if(current.name == "" || current.builtIn)
         return;
-    if(QMessageBox::warning(this, "Warning", QString("Delete preset \"%1\"?").arg(current.name), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No)) != QMessageBox::Yes){
+    if(QMessageBox::warning(this, tr("Warning"), tr("Delete preset \"%1\"?").arg(current.name), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No)) != QMessageBox::Yes){
         setFocus();
         return;
     }

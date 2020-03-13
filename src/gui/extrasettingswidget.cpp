@@ -4,7 +4,10 @@
 #include "mainwindow.h"
 #include "ckbsettings.h"
 #include "animdetailsdialog.h"
-
+#ifdef USE_XCB_SCREENSAVER
+#include "kbmanager.h"
+#include "idletimer.h"
+#endif
 // KbLight
 static int lastSharedDimming = -2;
 
@@ -75,8 +78,27 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
 
     ui->previewBox->setChecked(settings.value("DisablePreviewOnFocusLoss", true).toBool());
 
-#ifndef Q_OS_LINUX
+#if defined(Q_OS_LINUX) && defined(USE_XCB_SCREENSAVER)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+    ui->timerMinBox->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
+#endif
+    // We need to explicitly disable this if there's a wayland session.
+    // If not, the idle timer will only count when there's activity inside XWayland windows.
+    if(IdleTimer::isWayland()){
+        QString notSupported(tr("This feature is not supported under Wayland"));
+        ui->timerBox->setToolTip(notSupported);
+        ui->timerMinBox->setToolTip(notSupported);
+        ui->timerBox->setEnabled(false);
+        ui->timerMinBox->setEnabled(false);
+    } else {
+        ui->timerBox->setChecked(settings.value("IdleTimerEnable", true).toBool());
+        ui->timerMinBox->setEnabled(ui->timerBox->isChecked());
+    }
+    ui->timerMinBox->setValue(settings.value("IdleTimerDuration", 5).toInt());
+#else
     ui->scrollWarningLabel->hide();
+    ui->timerBox->hide();
+    ui->timerMinBox->hide();
 #endif
 }
 
@@ -98,11 +120,11 @@ void ExtraSettingsWidget::on_animScanButton_clicked(){
     AnimScript::scan();
     int count = AnimScript::count();
     if(count == 0)
-        ui->animCountLabel->setText("No animations found");
+        ui->animCountLabel->setText(tr("No animations found"));
     else if(count == 1)
-        ui->animCountLabel->setText("1 animation found");
+        ui->animCountLabel->setText(tr("1 animation found"));
     else
-        ui->animCountLabel->setText(QString("%1 animations found").arg(count));
+        ui->animCountLabel->setText(tr("%1 animations found").arg(count));
 }
 
 void ExtraSettingsWidget::on_fpsBox_valueChanged(int arg1){
@@ -159,14 +181,28 @@ void ExtraSettingsWidget::on_startDelayBox_clicked(bool checked){
     CkbSettings::set("Program/StartDelay", checked);
 }
 
-void ExtraSettingsWidget::on_previewBox_clicked(bool checked)
-{
+void ExtraSettingsWidget::on_previewBox_clicked(bool checked){
     CkbSettings::set("Program/DisablePreviewOnFocusLoss", checked);
 }
 
-void ExtraSettingsWidget::on_detailsBtn_clicked()
-{
+void ExtraSettingsWidget::on_detailsBtn_clicked(){
     AnimDetailsDialog* dlg = new AnimDetailsDialog(this);
     dlg->setAttribute(Qt::WA_DeleteOnClose, true);
     dlg->exec();
+}
+
+void ExtraSettingsWidget::on_timerBox_clicked(bool checked){
+#ifdef USE_XCB_SCREENSAVER
+    ui->timerMinBox->setEnabled(checked);
+    CkbSettings::set("Program/IdleTimerEnable", checked);
+    KbManager::setIdleTimer(checked);
+#endif
+}
+
+void ExtraSettingsWidget::on_timerMinBox_editingFinished(){
+#ifdef USE_XCB_SCREENSAVER
+    CkbSettings::set("Program/IdleTimerDuration", ui->timerMinBox->value());
+    KbManager::setIdleTimer(false);
+    KbManager::setIdleTimer(true);
+#endif
 }

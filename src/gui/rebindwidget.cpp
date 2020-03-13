@@ -796,7 +796,7 @@ void RebindWidget::helpStatus(int status) {
         ui->lbl_macro->setText(tr("Click Apply or manually edit Macro Key Actions."));
         break;
     default:
-        ui->lbl_macro->setText(QString(tr("Oops: Some magic in RebindWidget::helpStatus (%1)")).arg(status));
+        ui->lbl_macro->setText(tr("Invalid status in RebindWidget::helpStatus (%1)").arg(status));
     }
 }
 

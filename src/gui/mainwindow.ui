@@ -23,10 +23,10 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>ckb-next</string>
+   <string notr="true">ckb-next</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="image.qrc">
+   <iconset resource="../../../build-ckb-next-Desktop-Debug/src/gui/image.qrc">
     <normaloff>:/img/ckb-next.png</normaloff>:/img/ckb-next.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
@@ -48,7 +48,7 @@
     <string>Exit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Q</string>
+    <string notr="true">Ctrl+Q</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -62,7 +62,7 @@
   <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>
-  <include location="image.qrc"/>
+  <include location="../../../build-ckb-next-Desktop-Debug/src/gui/image.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -100,6 +100,7 @@ if (MACOS OR LINUX)
               os.h
               profile.h
               protocol.h
+              request_hid_mac.h
               structures.h
               usb.h)
 endif ()
@@ -112,6 +113,7 @@ if (MACOS)
               input_mac_legacy.c
               input_mac_mouse_legacy.c
               extra_mac.c
+              request_hid_mac.c
               keymap_mac.h)
 elseif (LINUX)
     target_sources(
@@ -221,11 +223,16 @@ if (MACOS)
     message(STATUS "launchd detected")
     set(CKB_NEXT_INIT_SYSTEM "launchd" CACHE INTERNAL "")
 
-    # Import plist
+    # Import plists
     message(STATUS "Importing org.ckb-next.daemon.plist (${CKB_NEXT_INIT_SYSTEM})")
     configure_file(
         "${ckb-next_SOURCE_DIR}/macos/org.ckb-next.daemon.plist"
         "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon.plist"
+        COPYONLY)
+
+    configure_file(
+        "${ckb-next_SOURCE_DIR}/macos/org.ckb-next.daemon_agent.plist"
+        "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon_agent.plist"
         COPYONLY)
 
     if (SAFE_INSTALL)
@@ -419,6 +426,13 @@ if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
         OWNER_READ OWNER_WRITE
         GROUP_READ
         WORLD_READ)
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/service/org.ckb-next.daemon_agent.plist"
+        DESTINATION "/Library/LaunchAgents"
+        PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ)
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
@@ -520,6 +534,11 @@ if (SAFE_INSTALL)
         install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo rc-service ckb-next-daemon start)")
     elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "SysVinit")
+        # update-rc.d is a debian utility to handle sysvinit links
+        find_program(UPDATE_RC_EXISTS "update-rc.d")
+        if (UPDATE_RC_EXISTS)
+            install(CODE "execute_process(COMMAND sudo update-rc.d ckb-next-daemon.sh defaults)")
+        endif ()
         # Just running the script should be enough
         install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: starting ckb-next-daemon\")")
         install(CODE "execute_process(COMMAND sudo /etc/init.d/ckb-next-daemon.sh start)")

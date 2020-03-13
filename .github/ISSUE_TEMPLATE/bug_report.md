@@ -11,6 +11,8 @@ assignees: ''
 - If possible, try the latest code by building the software manually.
 - File unrelated issues separately.
 
+**Click the `Generate Report` button in the `Settings` tab of the ckb-next user interface and attach the generated report to this issue.**
+
 ## General information
 
 ### Source

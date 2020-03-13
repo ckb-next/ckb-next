@@ -950,6 +950,8 @@ static void iterate_devices_hid(void* context, io_iterator_t iterator){
             (*handle)->close(handle, kIOHIDOptionsTypeSeizeDevice);
 release:
         IOObjectRelease(device);
+        if(err == kIOReturnNotPermitted)
+            return;
     }
     euid_guard_stop;
 }
@@ -968,6 +970,24 @@ void mac_exithandler(CFSocketRef s, CFSocketCallBackType t, CFDataRef a, const v
     int type;
     read(CFSocketGetNative(s), &type, sizeof(int));
     exithandler(type);
+}
+
+CFMutableDictionaryRef create_hid_device_dict(){
+    int vendor = V_CORSAIR;
+    CFMutableDictionaryRef match = IOServiceMatching(kIOHIDDeviceKey);
+    CFNumberRef cfvendor = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor);
+    CFDictionarySetValue(match, CFSTR(kIOHIDVendorIDKey), cfvendor);
+    CFRelease(cfvendor);
+    CFMutableArrayRef cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+    for(size_t c = 0; c < N_MODELS; c++){
+        int product = models[c].idProduct;
+        CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
+        CFArrayAppendValue(cfproducts, cfproduct);
+        CFRelease(cfproduct);
+    }
+    CFDictionarySetValue(match, CFSTR(kIOHIDProductIDArrayKey), cfproducts);
+    CFRelease(cfproducts);
+    return match;
 }
 
 int usbmain(){
@@ -1012,19 +1032,7 @@ int usbmain(){
 
     // Now move on to HID devices
     // It is in fact necessary to recreate the matching dictionary, as the keys are different
-    match = IOServiceMatching(kIOHIDDeviceKey);
-    cfvendor = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vendor);
-    CFDictionarySetValue(match, CFSTR(kIOHIDVendorIDKey), cfvendor);
-    CFRelease(cfvendor);
-    cfproducts = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
-    for(size_t c = 0; c < N_MODELS; c++){
-        int product = models[c].idProduct;
-        CFNumberRef cfproduct = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &product);
-        CFArrayAppendValue(cfproducts, cfproduct);
-        CFRelease(cfproduct);
-    }
-    CFDictionarySetValue(match, CFSTR(kIOHIDProductIDArrayKey), cfproducts);
-    CFRelease(cfproducts);
+    match = create_hid_device_dict();
 
     io_iterator_t iterator_hid = 0;
     res = IOServiceAddMatchingNotification(notify, kIOMatchedNotification, match, iterate_devices_hid, 0, &iterator_hid);

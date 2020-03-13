@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
+#include <QTranslator>
 
 QSharedMemory appShare("ckb-next");
 
@@ -52,17 +53,18 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     const QCommandLineOption helpOption = parser.addHelpOption();
     // add -b, --background
     const QCommandLineOption backgroundOption(QStringList() << "b" << "background",
-                                              "Starts in background, without displaying the main window.");
+                                              QObject::tr("Starts in background, without displaying the main window."));
     parser.addOption(backgroundOption);
+
     // add -c, --close
     const QCommandLineOption closeOption(QStringList() << "c" << "close",
-                                         "Causes already running instance (if any) to exit.");
+                                         QObject::tr("Causes already running instance (if any) to exit."));
     parser.addOption(closeOption);
 
-    const QCommandLineOption switchToProfileOption(QStringList() << "p" << "profile", "Switches to the profile with the specified name on all devices.", "profile-name");
+    const QCommandLineOption switchToProfileOption(QStringList() << "p" << "profile", QObject::tr("Switches to the profile with the specified name on all devices."), "profile-name");
     parser.addOption(switchToProfileOption);
 
-    const QCommandLineOption switchToModeOption(QStringList() << "m" << "mode", "Switches to the mode either in the current profile, or in the one specified by --profile", "mode-name");
+    const QCommandLineOption switchToModeOption(QStringList() << "m" << "mode", QObject::tr("Switches to the mode either in the current profile, or in the one specified by --profile"), "mode-name");
     parser.addOption(switchToModeOption);
 
     /* parse arguments */
@@ -163,20 +165,33 @@ static bool isRunning(const char* command){
 }
 
 bool checkIfQtCreator(){
-    QString file = QString("/proc/%1/cmdline").arg(QString::number((long)getppid()));
+#ifdef Q_OS_LINUX
+    QString file = QString("/proc/%1/exe").arg(QString::number((long)getppid()));
 
-    QFile f(file);
-    if(!f.open(QFile::ReadOnly | QFile::Text))
+    QFileInfo f(file);
+    if(!f.exists())
         return false;
 
-    QString contents(f.readAll());
-    if(contents.endsWith("/qtcreator"))
+    QString exepath = f.canonicalFilePath();
+    if(exepath.endsWith("/qtcreator"))
         return true;
-
+#endif
     return false;
 }
 
 int main(int argc, char *argv[]){
+#ifdef Q_OS_LINUX
+    // Get rid of "-session" before Qt parses the arguments
+    for(int i = 0; i < argc; i++){
+        if(!strcmp(argv[i], "-session")){
+            argv[i][1] = 'b';
+            argv[i][2] = '\0';
+            if(i + 1 < argc)
+                argv[i + 1][0] = '\0';
+            break;
+        }
+    }
+#endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     // Explicitly request high dpi scaling if desired
@@ -190,6 +205,11 @@ int main(int argc, char *argv[]){
 
     // Setup main application
     QApplication a(argc, argv);
+
+    // Setup translations
+    QTranslator translator;
+    if(translator.load(QLocale(), "", "", ":/translations"))
+        a.installTranslator(&translator);
 
     // Setup names and versions
     QCoreApplication::setOrganizationName("ckb-next");

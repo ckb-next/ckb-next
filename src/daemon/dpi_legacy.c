@@ -44,7 +44,8 @@ int updatedpi_legacy(usbdevice* kb, int force){
     dpiset* newdpi = &kb->profile->currentmode->dpi;
     // Don't do anything if the settings haven't changed
     if(!force && !lastdpi->forceupdate && !newdpi->forceupdate
-            && !memcmp(lastdpi, newdpi, sizeof(dpiset)))
+            && !memcmp(lastdpi->x, newdpi->x, sizeof(ushort) * DPI_COUNT)
+            && !memcmp(lastdpi->y, newdpi->y, sizeof(ushort) * DPI_COUNT))
         return 0;
     lastdpi->forceupdate = newdpi->forceupdate = 0;
 

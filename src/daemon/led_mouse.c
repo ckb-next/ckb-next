@@ -108,6 +108,7 @@ int updatergb_mouse_legacy(usbdevice* kb, int force){
     lastlight->g[MOUSE_BACK_LED] = newlight->g[MOUSE_BACK_LED];
     lastlight->b[MOUSE_BACK_LED] = newlight->b[MOUSE_BACK_LED];
 
-    usbsend_control(kb, NULL, 0, 49, newwValue, 0);
+    // M45 uses bRequest 50 for the LED
+    usbsend_control(kb, NULL, 0, (kb->product == P_M45 ? 50 : 49), newwValue, 0);
     return 0;
 }

@@ -11,6 +11,8 @@ void cmd_lift_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const
         return;
     if(heightnum > LIFT_MAX || heightnum < LIFT_MIN)
         return;
+    if(mode->dpi.lift == heightnum)
+        return;
     mode->dpi.lift = heightnum;
 
     usbsend_control(kb, NULL, 0, 13, heightnum - 1, 0);
@@ -22,10 +24,14 @@ void cmd_snap_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const
     (void)dummy2;
 
     if(!strcmp(enable, "on")) {
+        if(mode->dpi.snap)
+            return;
         mode->dpi.snap = 1;
         usbsend_control(kb, &mode->dpi.snap, 1, 100, 0, 0);
     }
     if(!strcmp(enable, "off")) {
+        if(!mode->dpi.snap)
+            return;
         mode->dpi.snap = 0;
         usbsend_control(kb, NULL, 0, 100, 0, 0);
     }

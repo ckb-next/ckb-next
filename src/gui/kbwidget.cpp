@@ -35,7 +35,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
 
     // Remove the Lighting and Performance tabs from non-RGB keyboards
     if(!device->features.contains("rgb")){
-        if(device->model() != KeyMap::M95){
+        if(device->model() != KeyMap::M95 && device->model() != KeyMap::M45){
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
         }
@@ -50,7 +50,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     }
 
     // If we have an M95, set the performance and lighting tabs as such
-    if(device->model() == KeyMap::M95){
+    if(device->model() == KeyMap::M95 || device->model() == KeyMap::M45){
         ui->mPerfWidget->setLegacyM95();
         ui->lightWidget->setLegacyM95();
     }

@@ -289,7 +289,7 @@ void Kb::load(){
         KeyMap map = getKeyMap();
         // If nothing was loaded, load the appropriate demo profile for each device
         QString demoProfile(":/txt/demoprofile.conf");
-        if(map.model() == KeyMap::M95)
+        if(map.model() == KeyMap::M95 || map.model() == KeyMap::M45)
             demoProfile = ":/txt/demoprofile_m95.ini";
         else if(map.model() == KeyMap::K55)
             demoProfile = ":/txt/demoprofile_k55.ini";

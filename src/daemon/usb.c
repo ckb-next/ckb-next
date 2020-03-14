@@ -160,8 +160,10 @@ const char* product_str(ushort product){
         return "strafe";
     if(product == P_STRAFE_MK2)
         return "strafe_mk2";
-    if(product == P_M95 || product == P_M45)
+    if(product == P_M95)
         return "m95";
+    if(product == P_M45)
+        return "m45";
     if(product == P_M65 || product == P_M65_PRO)
         return "m65";
     if(product == P_M65_RGB_ELITE)

@@ -877,6 +877,14 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::M45:{
+        map = getMap(KeyMap::M65, layout);
+        map.remove("sniper");
+        map.remove("front");
+        map.remove("dpi");
+        map["back"].width = map["back"].height = 12;
+        break;
+    }
     case KeyMap::IRONCLAW:{
         // M65 isn't a keyboard; all mouse maps are unique.
         for(const Key* key = IronclawKeys; key < IronclawKeys + KEYCOUNT_IRONCLAW; key++){
@@ -1126,6 +1134,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return M95;
     if(lower == "ironclaw")
         return IRONCLAW;
+    if(lower == "m45")
+        return M45;
     return NO_MODEL;
 }
 
@@ -1175,6 +1185,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "m95";
     case IRONCLAW:
         return "ironclaw";
+    case M45:
+        return "m45";
     default:
         return "";
     }
@@ -1218,6 +1230,7 @@ int KeyMap::modelWidth(Model model){
     case ST100:
     case M95:
     case IRONCLAW:
+    case M45:
         return M65_WIDTH;
     default:
         return 0;
@@ -1250,6 +1263,7 @@ int KeyMap::modelHeight(Model model){
     case ST100:
     case M95:
     case IRONCLAW:
+    case M45:
         return M65_HEIGHT;
     default:
         return 0;

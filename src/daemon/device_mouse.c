@@ -11,6 +11,7 @@ int start_mouse_legacy(usbdevice* kb, int makeactive){
     
     kb->usbdelay = 100;
     kb->pollrate = -1;
+    kb->features &= ~FEAT_HWLOAD;
 
     if(kb->product == P_M45){
         // Get configuration descriptor

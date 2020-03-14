@@ -162,6 +162,11 @@ void MPerfWidget::sliderXValueChanged(int index){
         perf->dpi(index, value);
     else
         perf->dpi(index, QPoint(value, perf->dpi(index).y()));
+    stages[index].xBox->setValue(value);
+    if(_xyLink){
+        stages[index].ySlider->setValue(slider->sliderPosition());
+        stages[index].yBox->setValue(value);
+    }
     SET_END;
 }
 
@@ -185,6 +190,11 @@ void MPerfWidget::sliderYValueChanged(int index){
         perf->dpi(index, value);
     else
         perf->dpi(index, QPoint(perf->dpi(index).x(), value));
+    stages[index].yBox->setValue(value);
+    if(_xyLink){
+        stages[index].xSlider->setValue(slider->sliderPosition());
+        stages[index].xBox->setValue(value);
+    }
     SET_END;
 }
 

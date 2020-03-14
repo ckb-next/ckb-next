@@ -73,7 +73,7 @@ int updatedpi_legacy(usbdevice* kb, int force){
     if(newdpi->current != lastdpi->current)
     {
         // Sniper is 4 instead of 0. Everything else remains the same.
-        uchar dpistage = (newdpi->current ? newdpi->current : 0x04);
+        uchar dpistage = (newdpi->current && newdpi->current < 5 ? newdpi->current : 0x04);
         uchar dpisetpkt[] = {0x01, dpistage, 0x04, 0x03, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01};
         usbsend_control(kb, dpisetpkt, 10, 3, 0x0000, 0);
     }

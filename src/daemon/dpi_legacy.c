@@ -51,9 +51,8 @@ int updatedpi_legacy(usbdevice* kb, int force){
     for(int i = 1; i < 4; i++){
         // Offset to skip the header, Y is first
         // Round to the next DPI
-        dpi_pkt[i - 1 + pos] = newdpi->y[i] / 50;
-        pos++;
-        dpi_pkt[i - 1 + pos] = newdpi->x[i] / 50;
+        dpi_pkt[pos++] = newdpi->y[i] / 50;
+        dpi_pkt[pos++] = newdpi->x[i] / 50;
     }
 
     // Add sniper

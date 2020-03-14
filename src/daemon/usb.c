@@ -12,6 +12,7 @@
 // Values taken from the official website
 // Mice not in the list default to 12000 in the GUI
 dpi_list mouse_dpi_list[] = {
+    { P_M45, 5000 },
     { P_M65, 8200 },
     { P_M65_PRO, 12000 },
     { P_M65_RGB_ELITE, 18000 },
@@ -60,6 +61,7 @@ device_desc models[] = {
     { V_CORSAIR, P_STRAFE_NRGB_2, },
     { V_CORSAIR, P_STRAFE_MK2, },
     // Mice
+    { V_CORSAIR, P_M45, },
     { V_CORSAIR, P_M65, },
     { V_CORSAIR, P_M65_PRO, },
     { V_CORSAIR, P_M65_RGB_ELITE, },
@@ -158,7 +160,7 @@ const char* product_str(ushort product){
         return "strafe";
     if(product == P_STRAFE_MK2)
         return "strafe_mk2";
-    if(product == P_M95)
+    if(product == P_M95 || product == P_M45)
         return "m95";
     if(product == P_M65 || product == P_M65_PRO)
         return "m65";

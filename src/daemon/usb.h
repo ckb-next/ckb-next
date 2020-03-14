@@ -92,6 +92,7 @@
 #define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE))
 
 #define P_M95                0x1b06
+#define P_M45                0x1b0f
 
 #define P_SABRE_O            0x1b14 /* optical */
 #define P_SABRE_L            0x1b19 /* laser */
@@ -161,7 +162,7 @@ const char* product_str(ushort product);
 /// RGB vs non-RGB test
 /// (note: non-RGB Strafe is still considered "RGB" in that it shares the same protocol.
 /// The difference is denoted with the "monochrome" feature).
-#define IS_LEGACY(vendor, product)      ((vendor) == (V_CORSAIR) && ((product) == (P_K65_LEGACY) || (product) == (P_K70_LEGACY) || (product) == P_K90_LEGACY || (product) == (P_K95_LEGACY) || (product) == (P_M95)))
+#define IS_LEGACY(vendor, product)      ((vendor) == (V_CORSAIR) && ((product) == (P_K65_LEGACY) || (product) == (P_K70_LEGACY) || (product) == P_K90_LEGACY || (product) == (P_K95_LEGACY) || (product) == (P_M95) || (product) == (P_M45)))
 
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
@@ -178,7 +179,7 @@ const char* product_str(ushort product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_IRONCLAW)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_M45) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_IRONCLAW)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -205,7 +206,7 @@ const char* product_str(ushort product);
 #define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_IRONCLAW || (kb)->product == P_HARPOON_PRO)
 
 /// Devices here support setting the pollrate through software
-#define SUPPORTS_ADJRATE(kb)            ((kb)->product == P_K63_NRGB || (kb)->product == P_K66 || (kb)->product == P_K68 || (kb)->product == P_K68_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K95_PLATINUM || (kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_M95 || (kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_HARPOON || (kb)->product == P_HARPOON_PRO || (kb)->product == P_GLAIVE || (kb)->product == P_KATAR)
+#define SUPPORTS_ADJRATE(kb)            ((kb)->product == P_K63_NRGB || (kb)->product == P_K66 || (kb)->product == P_K68 || (kb)->product == P_K68_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K95_PLATINUM || (kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_M95 || (kb)->product == P_M45 || (kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_HARPOON || (kb)->product == P_HARPOON_PRO || (kb)->product == P_GLAIVE || (kb)->product == P_KATAR)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.

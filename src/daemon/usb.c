@@ -718,6 +718,25 @@ int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ush
     }
 }
 
+int _usbrecv_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, uchar bmRequestType, const char* file, int line){
+    while(1){
+        DELAY_SHORT(kb);
+        pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
+        int res = os_usbrecv_control(kb, data, len, bRequest, wValue, wIndex, bmRequestType, file, line);
+        pthread_mutex_unlock(mmutex(kb));
+
+        if(res != -1)
+            return res;
+
+        // Stop immediately if the program is shutting down or hardware load is set to tryonce
+        if(reset_stop || hwload_mode != 2)
+            return 0;
+
+        // Retry as long as the result is temporary failure
+        DELAY_LONG(kb);
+    }
+}
+
 /// \brief .
 ///
 /// To fully understand this, you need to know about usb:

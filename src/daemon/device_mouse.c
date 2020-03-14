@@ -10,6 +10,24 @@ int start_mouse_legacy(usbdevice* kb, int makeactive){
     (void)makeactive;
     
     kb->usbdelay = 100;
+    kb->pollrate = -1;
+
+    if(kb->product == P_M45){
+        // Get configuration descriptor
+        uchar conf_descr[84];
+        if(usbrecv_descriptor(kb, conf_descr, 84, 6, 0x0200, 0) == 84){
+            uchar binterval = conf_descr[33];
+            if(binterval == 1 ||  binterval == 2 || binterval == 4 || binterval == 8)
+            {
+                kb->pollrate = binterval;
+                kb->features |= FEAT_POLLRATE;
+            }
+            else
+                ckb_err("Invalid interval value 0x%hhx\n", binterval);
+        } else {
+            ckb_err("Failed to read pollrate\n");
+        }
+    }
 
     // kb, ptr, len, bRequest, wValue, wIndex
     // 0x00002 == HW Playback off
@@ -44,7 +62,6 @@ int start_mouse_legacy(usbdevice* kb, int makeactive){
     }
 
     kb->active = 1;
-    kb->pollrate = -1;
     return 0;
 }
 

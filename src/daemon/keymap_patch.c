@@ -27,6 +27,12 @@ keypatch m95patch[] = {
 };
 #define M95PATCH_LEN sizeof(m95patch)/sizeof(*m95patch)
 
+keypatch m45patch[] = {
+    { 211, "dpiup",  -1, KEY_CORSAIR },
+    { 212, "dpidn",  -1, KEY_CORSAIR },
+};
+#define M45PATCH_LEN sizeof(m45patch)/sizeof(*m45patch)
+
 keypatches mappatches[] = {
     { V_CORSAIR, P_K68,        k63patch, K63PATCH_LEN },
     { V_CORSAIR, P_K68_NRGB,   k63patch, K63PATCH_LEN },
@@ -34,6 +40,7 @@ keypatches mappatches[] = {
     { V_CORSAIR, P_K65_LEGACY, k65patch, K65PATCH_LEN },
     { V_CORSAIR, P_K63_NRGB,   k63patch, K63PATCH_LEN },
     { V_CORSAIR, P_M95,        m95patch, M95PATCH_LEN },
+    { V_CORSAIR, P_M45,        m45patch, M45PATCH_LEN },
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 

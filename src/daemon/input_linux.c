@@ -16,16 +16,21 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
             return 0;
         }
     }
-    // Enable all keys and mouse buttons
+
     ioctl(fd, UI_SET_EVBIT, EV_KEY);
-    for(int i = 0; i < KEY_CNT; i++)
-        ioctl(fd, UI_SET_KEYBIT, i);
     if(mouse){
+        // Enable only the mouse buttons as a workaround for libgdx crashing
+        // https://github.com/libgdx/libgdx/issues/5857
+        for(int i = BTN_LEFT; i <= BTN_TASK; i++)
+            ioctl(fd, UI_SET_KEYBIT, i);
         // Enable mouse axes
         ioctl(fd, UI_SET_EVBIT, EV_REL);
         for(int i = 0; i < REL_CNT; i++)
             ioctl(fd, UI_SET_RELBIT, i);
     } else {
+        // Enable all possible keys
+        for(int i = 0; i < KEY_CNT; i++)
+            ioctl(fd, UI_SET_KEYBIT, i);
         // Enable LEDs
         ioctl(fd, UI_SET_EVBIT, EV_LED);
         //for(int i = 0; i < LED_CNT; i++)

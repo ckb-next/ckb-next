@@ -304,6 +304,7 @@ elseif (LINUX)
     if (EXISTS "/run/systemd/system" OR "systemd" IN_LIST FORCE_INIT_SYSTEM)
         message(STATUS "systemd detected")
         set(CKB_NEXT_INIT_SYSTEM "systemd" CACHE INTERNAL "")
+        set(SYSTEMD_UNIT_INSTALL_DIR "/usr/lib/systemd/system" CACHE STRING "Where to install systemd unit files.")
         set(DISALLOW_SYSVINIT TRUE)
 
         # Generate and import service
@@ -435,7 +436,7 @@ if ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "launchd")
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "systemd")
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.service"
-        DESTINATION "/usr/lib/systemd/system"
+        DESTINATION "${SYSTEMD_UNIT_INSTALL_DIR}"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ

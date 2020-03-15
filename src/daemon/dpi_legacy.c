@@ -67,6 +67,10 @@ int updatedpi_legacy(usbdevice* kb, int force){
         dpi_pkt[9] = newdpi->x[0] / 50;
 
         usbsend_control(kb, dpi_pkt, 10, 174, 0x0000, 0);
+
+        // Maybe these are needed for the next command not to fail
+        usbrecv_control(kb, dpi_pkt, 2, 5, 0, 0);
+        usbrecv_control(kb, dpi_pkt, 10, 4, 0, 0);
     }
 
     // If the DPI stage differs, set the new one

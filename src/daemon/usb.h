@@ -223,6 +223,9 @@ const char* product_str(ushort product);
 #define DELAY_LONG(kb)       \
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL)  // long, fixed 100ms
 
+#define DELAY_CUSTOM(dly)       \
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = (dly) * 1000000}, NULL)  // custom delay, argument is in ms
+
 /// This constant is used to initialize \b kb->usbdelay.
 /// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
 /// Pure Hacker code.

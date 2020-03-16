@@ -47,6 +47,7 @@ int start_mouse_legacy(usbdevice* kb, int makeactive){
 
         // DPI
         usbsend_control(kb, pkt1, 10, 174, 0x0000, 0);
+        DELAY_CUSTOM(400);
 
         // Maybe this is needed for the next command not to fail
         //usbrecv_control(kb, pkt1, 2, 5, 0, 0);

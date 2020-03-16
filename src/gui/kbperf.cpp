@@ -509,6 +509,7 @@ void KbPerf::update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi
         return;
     emit settingsUpdated();
     _needsUpdate = false;
+    cmd.write(" ");
     // Save DPI stage 0 (sniper)
     // If the mouse is set to a custom DPI, save it in stage 0
     int stage = pushedDpis.isEmpty() ? dpiBaseIdx : 0;
@@ -549,6 +550,7 @@ void KbPerf::update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi
             cmd.write(" iauto ");
         cmd.write(iNames[i]);
     }
+    cmd.write("\n");
 }
 
 void KbPerf::lightIndicator(const char* name, QRgb rgba){

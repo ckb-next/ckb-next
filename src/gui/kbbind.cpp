@@ -237,14 +237,14 @@ void KbBind::setAction(const QString& key, const QString& action){
     _bind[rKey] = new KeyAction(action, this);
 }
 
-void KbBind::update(QFile& cmd, bool force){
+void KbBind::update(QFile& cmd, int notify, bool force){
     if(!force && !_needsUpdate && lastGlobalRemapTime == globalRemapTime)
         return;
     lastGlobalRemapTime = globalRemapTime;
     emit updated();
     _needsUpdate = false;
     // Reset all keys and enable notifications for all
-    cmd.write("rebind all notify all");
+    cmd.write(QString("\n@%1 rebind all notify all").arg(notify).toLatin1());
     // Make sure modifier keys are included as they may be remapped globally
     QHash<QString, KeyAction*> bind(_bind);
     if(!_bind.contains("caps")) bind["caps"] = 0;
@@ -299,6 +299,7 @@ void KbBind::update(QFile& cmd, bool force){
     // At last, send Macro definitions if available.
     // If no definitions are made, clear macro will be sent only to reset all macros,
     cmd.write(macros.toLatin1());
+    cmd.write("\n");
     lastCmd = &cmd;
 }
 

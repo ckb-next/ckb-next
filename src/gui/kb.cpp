@@ -451,14 +451,12 @@ void Kb::frameUpdate(){
         index = 3 + index % 3;
 
     // Send lighting/binding to driver
-    cmd.write(QString("mode %1 switch ").arg(index + 1).toLatin1());
+    if(prevMode != _currentMode || changed)
+        cmd.write(QString("mode %1 switch ").arg(index + 1).toLatin1());
     perf->applyIndicators(index, iState);
     light->frameUpdate(cmd, monochrome);
-    cmd.write(QString("\n@%1 ").arg(notifyNumber).toLatin1());
-    bind->update(cmd, changed);
-    cmd.write(" ");
+    bind->update(cmd, notifyNumber, changed);
     perf->update(cmd, notifyNumber, changed, true);
-    cmd.write("\n");
     cmd.flush();
 }
 

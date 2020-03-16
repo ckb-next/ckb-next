@@ -356,7 +356,7 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
 
     // If brightness is at 0%, turn off lighting entirely
     if(_dimming == 3){
-        cmd.write("rgb 000000");
+        cmd.write("rgb 000000\n");
         return;
     }
 
@@ -382,6 +382,7 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
     // Apply light
     cmd.write("rgb");
     printRGB(cmd, _animMap);
+    cmd.write("\n");
 }
 
 void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){

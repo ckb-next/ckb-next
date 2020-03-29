@@ -18,7 +18,7 @@ extern long gid;
 #define S_CUSTOM_R (S_IRUSR | S_IWUSR | S_IRGRP)
 
 /// Update the list of connected devices.
-void updateconnected();
+void updateconnected(usbdevice* kb);
 
 /// Create a dev path for the keyboard at index. Returns 0 on success.
 int mkdevpath(usbdevice* kb);

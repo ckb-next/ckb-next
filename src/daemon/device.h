@@ -14,13 +14,15 @@ extern usbdevice keyboard[DEV_MAX];
 #else
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
 #endif
+//#define MUTEX_DBG(str, kb, mutexarray) (ckb_info(str " %s:%d (%s) at ckb%d, TID 0x%lx, MID %p\n", __FILE__, __LINE__, __func__, INDEX_OF(kb, keyboard), pthread_self(), mutexarray + INDEX_OF(kb, keyboard)) & 0)
+#define MUTEX_DBG(a, b, c) 0
 // A mutex used for USB controls. Needs to be locked before reading or writing the device handle or accessing its profile
 extern pthread_mutex_t devmutex[DEV_MAX];
-#define dmutex(kb) (devmutex + INDEX_OF(kb, keyboard))
+#define dmutex(kb) (devmutex + INDEX_OF(kb, keyboard) + MUTEX_DBG("DMUTEX", kb, devmutex))
 // Similar, but for key input. Also needs to be locked before accessing output FIFOs.
 // When adding or removing a device you must lock BOTH mutexes, dmutex first.
 extern pthread_mutex_t inputmutex[DEV_MAX];
-#define imutex(kb) (inputmutex + INDEX_OF(kb, keyboard))
+#define imutex(kb) (inputmutex + INDEX_OF(kb, keyboard) + MUTEX_DBG("IMUTEX", kb, inputmutex))
 
 // Needed to synchronize sending macro-keys to the os and sending color info to the device
 extern pthread_mutex_t macromutex[DEV_MAX];

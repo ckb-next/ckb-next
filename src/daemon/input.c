@@ -284,6 +284,7 @@ void updateindicators_kb(usbdevice* kb, int force){
     kb->hw_ileds_old = hw_new;
     if(old != new || force){
         DELAY_SHORT(kb);
+        ckb_info("updateind");
         os_sendindicators(kb);
     }
     // Print notifications if desired

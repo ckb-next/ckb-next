@@ -220,7 +220,7 @@ int main(int argc, char *argv[]){
     QCommandLineParser parser;
     QString errorMessage;
     parser.setApplicationDescription("Open Source Corsair Input Device Driver for Linux and OSX.");
-    bool background = 0;
+    bool background = false;
 
     // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
     if(getuid() == 0){
@@ -287,7 +287,7 @@ int main(int argc, char *argv[]){
     }
     case CommandLineBackground:
         // If launched with --background, launch in background
-        background = 1;
+        background = true;
         break;
     }
 
@@ -323,6 +323,9 @@ int main(int argc, char *argv[]){
     bool QtCreator = checkIfQtCreator();
     if(QtCreator)
         shm_str = "Close";
+
+    if(background)
+        shm_str = nullptr;
 
     if(isRunning(shm_str) && !QtCreator){
         printf("ckb-next is already running. Exiting.\n");

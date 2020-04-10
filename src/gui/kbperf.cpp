@@ -523,7 +523,7 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
             lightIndicator("lock", iColor[LOCK][1].rgba());
     }
     if(iEnable[MUTE]){
-        switch(getMuteState()){
+        switch(getMuteState(iMuteDev)){
         case MUTED:
             lightIndicator("mute", iColor[MUTE][0].rgba());
             break;

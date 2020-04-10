@@ -10,12 +10,14 @@
 #endif
 #include "media.h"
 
-static muteState lastKnown = UNKNOWN;
+static muteState lastKnownSink = UNKNOWN;
+static muteState lastKnownSource = UNKNOWN;
 
 #ifdef USE_LIBPULSE
 static pa_context* paContext = nullptr; //Context for communicating with Pulse Audio.
 static qint64 reconnectTime = 0; //Time (in MSecs since epoch) to attempt reconnect.
 static QString defaultSink; //Name of sink being checked if muted.
+static QString defaultSource; //Name of source being checked if muted.
 static QMutex mutex;
 static int failCount = 0;
 
@@ -33,16 +35,26 @@ static void SinkCallback(pa_context* context, const pa_sink_info* info, int eol,
     if(info == nullptr || info->name != defaultSink)
         return;
 
-    lastKnown = info->mute ? MUTED : UNMUTED;
+    lastKnownSink = info->mute ? MUTED : UNMUTED;
+}
+
+static void SourceCallback(pa_context* context, const pa_source_info* info, int eol, void* data){
+    QMutexLocker locker(&mutex);
+
+    if(info == nullptr || info->name != defaultSource)
+        return;
+
+    lastKnownSource = info->mute ? MUTED : UNMUTED;
 }
 
 static void ServerCallback(pa_context* context, const pa_server_info* info, void* data){
     QMutexLocker locker(&mutex);
 
-    //Keep track of the default sink. This is the only one checked if muted. If
-    //the user changes this, SinkCallback will be called afterwards
-    //automatically. This will then check if the new default sink is muted.
+    //Keep track of the default source and sink. Only these are checked. If
+    //the user changes this, SourceCallback or SinkCallback will be called afterwards
+    //automatically. This will then check if the new default source and sink are muted.
     defaultSink = info->default_sink_name;
+    defaultSource = info->default_source_name;
 }
 
 static void SubscribeCallback(pa_context* context, pa_subscription_event_type_t type, uint32_t index, void* data){
@@ -52,6 +64,10 @@ static void SubscribeCallback(pa_context* context, pa_subscription_event_type_t 
         //was muted.
         if(!CheckPAOperation(pa_context_get_sink_info_by_index(context, index, SinkCallback, nullptr)))
             qWarning("getMuteState(): pa_context_get_sink_info_by_index() error");
+    }
+    else if (eventFacility == PA_SUBSCRIPTION_EVENT_SOURCE) {
+        if (!CheckPAOperation(pa_context_get_source_info_by_index(context, index, SourceCallback, nullptr)))
+            qWarning("getMuteState(): pa_context_get_source_info_by_index() error");
     }
     else if(eventFacility == PA_SUBSCRIPTION_EVENT_SERVER){
         //Server settings were modified. Get new info to see if default sink
@@ -71,18 +87,24 @@ static void ContextStateCallback(pa_context* context, void* data){
         pa_context_set_subscribe_callback(context, SubscribeCallback, nullptr);
         if(!CheckPAOperation(pa_context_subscribe(context,
                                                   static_cast<pa_subscription_mask_t>(PA_SUBSCRIPTION_MASK_SINK |
+                                                                                      PA_SUBSCRIPTION_MASK_SOURCE |
                                                                                       PA_SUBSCRIPTION_MASK_SERVER),
                                                   nullptr,
                                                   nullptr)))
             qWarning("getMuteState(): pa_context_subscribe() error");
 
-        //Find initial default device.
+        //Find initial server state.
         if(!CheckPAOperation(pa_context_get_server_info(context, ServerCallback, nullptr)))
             qWarning("getMuteState(): pa_context_get_server_info() error");
 
-        //Find initial mute state.
+        //Find initial sink mute state.
         if(!CheckPAOperation(pa_context_get_sink_info_list(context, SinkCallback, nullptr)))
             qWarning("getMuteState(): pa_context_get_sink_info_list() error");
+
+        //Find initial source mute state.
+        if(!CheckPAOperation(pa_context_get_source_info_list(context, SourceCallback, nullptr)))
+            qWarning("getMuteState(): pa_context_get_source_info_list() error");
+
     }
     else if(state == PA_CONTEXT_FAILED || state == PA_CONTEXT_TERMINATED){
         //QMutexLocker locker(&mutex); <-- Deadlocks
@@ -102,7 +124,15 @@ static void ContextStateCallback(pa_context* context, void* data){
 
 #endif
 
-muteState getMuteState(){
+bool isMuteDeviceSupported() {
+    return true;
+}
+
+muteState mute_state(const muteDevice muteDev) {
+    return (muteDev == SINK) ? lastKnownSink : lastKnownSource;
+}
+
+muteState getMuteState(const muteDevice muteDev){
 #ifdef USE_LIBPULSE
     if(failCount < 10){
         static pa_threaded_mainloop* mainLoop = nullptr;
@@ -114,12 +144,12 @@ muteState getMuteState(){
         if(mainLoop == nullptr){
             mainLoop = pa_threaded_mainloop_new();
             if(mainLoop == nullptr)
-                return lastKnown;
+                return mute_state(muteDev);
 
             if(pa_threaded_mainloop_start(mainLoop) != 0){
                 pa_threaded_mainloop_free(mainLoop);
                 mainLoop = nullptr;
-                return lastKnown;
+                return mute_state(muteDev);
             }
         }
 
@@ -142,7 +172,7 @@ muteState getMuteState(){
     }
 #endif
 
-    return lastKnown;
+    return mute_state(muteDev);
 }
 
 #endif

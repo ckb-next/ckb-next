@@ -2,7 +2,11 @@
 #import <Foundation/Foundation.h>
 #include "media.h"
 
-muteState getMuteState(){
+bool isMuteDeviceSupported() {
+    return false;
+}
+
+muteState getMuteState(const muteDevice muteDev){
     // Get the system's default audio device
     AudioObjectPropertyAddress propertyAddress = {
         kAudioHardwarePropertyDefaultOutputDevice,

@@ -5,11 +5,10 @@
 #include "input.h"
 #include "notify.h"
 
-int macromask(const uchar* key1, const uchar* key2){
+int macromask(const uchar* keys, const uchar* macro){
     // Scan a macro against key input. Return 0 if any of them don't match
     for(int i = 0; i < N_KEYBYTES_INPUT; i++){
-        // if((key1[i] & key2[i]) != key2[i])
-        if(key1[i] != key2[i])  // Changed to detect G-keys + modifiers
+        if((keys[i] & macro[i]) != macro[i])
             return 0;
     }
     return 1;
@@ -162,6 +161,7 @@ static void inputupdate_keys(usbdevice* kb){
                         if (retval) {
                             perror("inputupdate_keys: Creating thread returned not null");
                         } else {
+                            pthread_detach(thread);
                             macro->triggered = 1;
 
 #ifndef OS_MAC
@@ -243,14 +243,11 @@ static void inputupdate_keys(usbdevice* kb){
             }
         }
     }
-    /// Process all queued keypresses if no macro is running yet.
-    /// \todo If we want to get all keys typed while a macro is played, add the code for it here.
-    if (!macro_pt_first()) {
-        int totalkeys = modcount + keycount + rmodcount;
-        for(int i = 0; i < totalkeys; i++){
-            int scancode = events[i];
-            os_keypress(kb, (scancode < 0 ? -scancode : scancode) - 1, scancode > 0);
-        }
+    /// Process all queued keypresses
+    int totalkeys = modcount + keycount + rmodcount;
+    for(int i = 0; i < totalkeys; i++){
+        int scancode = events[i];
+        os_keypress(kb, (scancode < 0 ? -scancode : scancode) - 1, scancode > 0);
     }
 }
 

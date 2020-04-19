@@ -316,7 +316,7 @@ static const short hid_codes[256] = {
 /// Legacy Keyboard | IS_LEGACY && !IS_MOUSE | nA | nA | hid_kb_translate()
 ///
 
-void process_input_urb(void* context, unsigned char *buffer, int urblen, ushort ep){
+void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep){
     if(!urblen)
         return;
 

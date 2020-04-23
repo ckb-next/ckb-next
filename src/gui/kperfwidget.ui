@@ -98,12 +98,12 @@
     <widget class="QComboBox" name="muteDev">
      <item>
       <property name="text">
-       <string>Use default sink (Audio)</string>
+       <string>Use default audio output</string>
       </property>
      </item>
      <item>
        <property name="text">
-        <string>Use default source (Microphone)</string>
+        <string>Use default audio input</string>
        </property>
      </item>
     </widget>

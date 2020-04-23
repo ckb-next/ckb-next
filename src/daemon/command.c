@@ -7,7 +7,9 @@
 #include "profile.h"
 #include "usb.h"
 
-static const char* const cmd_strings[CMD_COUNT - 1] = {
+// clang-format off
+static const char* const cmd_strings[CMD_COUNT - 1] =
+{
     // NONE is implicit
     "delay",
     "mode",
@@ -63,6 +65,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
         }                       \
     }
 
+// clang-format on
 
 int readcmd(usbdevice* kb, const char* line){
     char* word = malloc(strlen(line) + 1);

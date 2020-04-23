@@ -13,7 +13,9 @@
 
 // Key positions (K95 - English)
 // This is the master key map that includes ANSI, ISO and JP-106 layouts - use patchANSI(), patchISO() or patchJP106() to finalize it
-static const Key K95Keys[] = {
+// clang-format off
+static const Key K95Keys[] =
+{
     {0, 0, "mr", 38, 0, NS, true, true}, {0, 0, "m1", 50, 0, NS, true, true}, {0, 0, "m2", 62, 0, NS, true, true}, {0, 0, "m3", 74, 0, NS, true, true}, {0, "Brightness", "light", 222, 0, NS, true, true}, {0, "Windows Lock", "lock", 234, 0, NS, true, true}, {0, "Mute", "mute", 273, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 290, -2, 18, 6, false, true}, {0, "Volume down", "voldn", 290, 2, 18, 6, false, true},
     {0, 0, "g1", 0, 14, NS, true, true}, {0, 0, "g2", 11, 14, NS, true, true}, {0, 0, "g3", 22, 14, NS, true, true}, {0, "Esc", "esc", 38, 14, NS, true, true}, {0, 0, "f1", 58, 14, NS, true, true}, {0, 0, "f2", 70, 14, NS, true, true}, {0, 0, "f3", 82, 14, NS, true, true}, {0, 0, "f4", 94, 14, NS, true, true}, {0, 0, "f5", 114, 14, NS, true, true}, {0, 0, "f6", 126, 14, NS, true, true}, {0, 0, "f7", 138, 14, NS, true, true}, {0, 0, "f8", 150, 14, NS, true, true}, {0, 0, "f9", 170, 14, NS, true, true}, {0, 0, "f10", 182, 14, NS, true, true}, {0, 0, "f11", 194, 14, NS, true, true}, {0, 0, "f12", 206, 14, NS, true, true}, {0, "Print Screen\nSysRq", "prtscn", 222, 14, NS, true, true}, {0, "Scroll Lock", "scroll", 234, 14, NS, true, true}, {0, "Pause\nBreak", "pause", 246, 14, NS, true, true}, {0, "Stop", "stop", 262, 14, 12, 8, true, true}, {0, "Previous", "prev", 273, 14, 13, 8, true, true}, {0, "Play/Pause", "play", 285, 14, 13, 8, true, true}, {0, "Next", "next", 296, 14, 12, 8, true, true},
     {0, 0, "g4", 0, 25, NS, true, true}, {0, 0, "g5", 11, 25, NS, true, true}, {0, 0, "g6", 22, 25, NS, true, true}, {0, "`", "grave", 38, 27, NS, true, true}, {0, 0, "1", 50, 27, NS, true, true}, {0, 0, "2", 62, 27, NS, true, true}, {0, 0, "3", 74, 27, NS, true, true}, {0, 0, "4", 86, 27, NS, true, true}, {0, 0, "5", 98, 27, NS, true, true}, {0, 0, "6", 110, 27, NS, true, true}, {0, 0, "7", 122, 27, NS, true, true}, {0, 0, "8", 134, 27, NS, true, true}, {0, 0, "9", 146, 27, NS, true, true}, {0, 0, "0", 158, 27, NS, true, true}, {0, "-", "minus", 170, 27, NS, true, true}, {0, "=", "equal", 182, 27, NS, true, true}, {0, "¥", "yen", 194, 27, NS, true, true}, {0, "Backspace", "bspace", 200, 27, 24, 12, true, true}, {0, "Insert", "ins", 222, 27, NS, true, true}, {0, "Home", "home", 234, 27, NS, true, true}, {0, "Page Up", "pgup", 246, 27, NS, true, true}, {0, "Num Lock", "numlock", 261, 27, NS, true, true}, {0, "NumPad /", "numslash", 273, 27, NS, true, true}, {0, "NumPad *", "numstar", 285, 27, NS, true, true}, {0, "NumPad -", "numminus", 297, 27, NS, true, true},
@@ -22,6 +24,7 @@ static const Key K95Keys[] = {
     {0, 0, "g13", 0, 64, NS, true, true}, {0, 0, "g14", 11, 64, NS, true, true}, {0, 0, "g15", 22, 64, NS, true, true}, {0, "Left Shift", "lshift", 39, 63, 14, 12, true, true}, {"bslash", "\\", "bslash_iso", 53, 63, NS, true, true}, {0, 0, "z", 65, 63, NS, true, true}, {0, 0, "x", 77, 63, NS, true, true}, {0, 0, "c", 89, 63, NS, true, true}, {0, 0, "v", 101, 63, NS, true, true}, {0, 0, "b", 113, 63, NS, true, true}, {0, 0, "n", 125, 63, NS, true, true}, {0, 0, "m", 137, 63, NS, true, true}, {0, ",", "comma", 149, 63, NS, true, true}, {0, ".", "dot", 161, 63, NS, true, true}, {0, "/", "slash", 173, 63, NS, true, true}, {0, "_", "ro", 185, 63, NS, true, true}, {0, "Right Shift", "rshift", 196, 63, 32, 12, true, true}, {0, "Up", "up", 234, 63, NS, true, true}, {0, "NumPad 1", "num1", 261, 63, NS, true, true}, {0, "NumPad 2", "num2", 273, 63, NS, true, true}, {0, "NumPad 3", "num3", 285, 63, NS, true, true}, {0, "NumPad Enter", "numenter", 297, 69, 12, 24, true, true},
     {0, 0, "g16", 0, 75, NS, true, true}, {0, 0, "g17", 11, 75, NS, true, true}, {0, 0, "g18", 22, 75, NS, true, true}, {0, "Left Ctrl", "lctrl", 40, 75, 16, 12, true, true}, {0, "Left Windows", "lwin", 54, 75, NS, true, true}, {0, "Left Alt", "lalt", 67, 75, 14, 12, true, true}, {0, "無変換", "muhenkan", 80, 75, NS, true, true}, {0, "Space", "space", 116, 75, 84, 12, true, true}, {0, "変換", "henkan", 150, 75, NS, true, true}, {0, "ひらがな カタカナ ローマ字", "katahira", 162, 75, NS, true, true}, {0, "Right Alt", "ralt", 165, 75, 14, 12, true, true}, {0, "Right Windows", "rwin", 178, 75, NS, true, true}, {0, "Menu", "rmenu", 190, 75, NS, true, true}, {0, "Right Ctrl", "rctrl", 204, 75, 16, 12, true, true}, {0, "Left", "left", 222, 75, NS, true, true}, {0, "Down", "down", 234, 75, NS, true, true}, {0, "Right", "right", 246, 75, NS, true, true}, {0, "NumPad 0", "num0", 267, 75, 24, 12, true, true}, {0, "NumPad .", "numdot", 285, 75, NS, true, true}
 };
+// clang-format on
 #define KEYCOUNT_K95 (sizeof(K95Keys) / sizeof(Key))
 
 
@@ -40,85 +43,99 @@ struct KeyPatch {
     const char* name;
 };
 
-static const KeyPatch patchDK[] = {
+// clang-format off
+static const KeyPatch patchDK[] =
+{
     {0, "§", "grave"}, {0, "+", "minus"}, {0, "´", "equal"},
     {0, "Å", "lbrace"}, {0, "¨", "rbrace"},
     {0, "Æ", "colon"}, {0, "Ø", "quote"}, {0, "'", "hash"},
     {0, "<", "bslash_iso"}, {0, "-", "slash"},
 };
 
-static const KeyPatch patchEU[] = {
+static const KeyPatch patchEU[] =
+{
     {0, "\\ (R)", "hash"},
     {0, "\\ (L)", "bslash_iso"},
 };
 
-static const KeyPatch patchFR[] = {
+static const KeyPatch patchFR[] =
+{
     {"sup2", "²", "grave"}, {0, "&", "1"}, {0, "É", "2"}, {0, "\"", "3"}, {0, "'", "4"}, {0, "(", "5"}, {0, "-", "6"}, {0, "È", "7"}, {0, "_", "8"}, {0, "Ç", "9"}, {0, "À", "0"}, {"rparen", ")", "minus"},
     {"a", "A", "q"}, {"z", "Z", "w"}, {"caret", "^", "lbrace"}, {"dollar", "$", "rbrace"},
     {"q", "Q", "a"}, {"m", "M", "colon"}, {"percent", "Ù", "quote"}, {"star", "*", "hash"},
     {"angle", "<", "bslash_iso"}, {"w", "W", "z"}, {"comma", ",", "m"}, {"semicolon", ";", "comma"}, {"colon", ":", "dot"}, {"exclam", "!", "slash"},
 };
 
-static const KeyPatch patchDE[] = {
+static const KeyPatch patchDE[] =
+{
     {"caret", "^", "grave"}, {"ss", "ß", "minus"}, {"grave", "´", "equal"},
     {"z", "Z", "y"}, {"ue", "Ü", "lbrace"}, {"plus", "+", "rbrace"},
     {"oe", "Ö", "colon"}, {"ae", "Ä", "quote"},
     {"angle", "<", "bslash_iso"}, {"y", "Y", "z"}, {"minus", "-", "slash"}
 };
 
-static const KeyPatch patchIT[] = {
+static const KeyPatch patchIT[] =
+{
     {0, "\\", "grave"}, {0, "'", "minus"}, {0, "Ì", "equal"},
     {0, "È", "lbrace"}, {0, "+", "rbrace"},
     {0, "Ò", "colon"}, {0, "À", "quote"}, {0, "Ù", "hash"},
     {0, "<", "bslash_iso"}, {0, "-", "slash"},
 };
 
-static const KeyPatch patchNO[] = {
+static const KeyPatch patchNO[] =
+{
     {0, "§", "grave"}, {0, "+", "minus"}, {0, "´", "equal"},
     {0, "Å", "lbrace"}, {0, "¨", "rbrace"},
     {0, "Ø", "colon"}, {0, "Æ", "quote"}, {0, "'", "hash"},
     {0, "<", "bslash_iso"}, {0, "-", "slash"},
 };
 
-static const KeyPatch patchMX[] = {
+static const KeyPatch patchMX[] =
+{
     {0, "|", "grave"}, {0, "'", "minus"}, {0, "¿", "equal"},
     {0, "´", "lbrace"}, {0, "+", "rbrace"},
     {0, "Ñ", "colon"}, {0, "{", "quote"}, {0, "}", "hash"},
     {0, "<", "bslash_iso"}, {0, "-", "slash"},
 };
 
-static const KeyPatch patchPTBR[] = {
+static const KeyPatch patchPTBR[] =
+{
     {"quote", "'", "grave"},
     {"accent", "´", "lbrace"}, {"lbrace", "[", "rbrace"},
     {"cc", "Ç", "colon"}, {"tilde", "~", "quote"}, {"rbrace", "]", "hash"},
     {"colon", ";", "slash"}, {"slash", "/", "ro"}, {"numcomma", ",", "numdot"},
 };
 
-static const KeyPatch patchES[] = {
+static const KeyPatch patchES[] =
+{
     {"oa", "º", "grave"}, {"quote", "'", "minus"}, {"lexclam", "¡", "equal"},
     {"grave", "`", "lbrace"}, {"plus", "+", "rbrace"},
     {"nn", "Ñ", "colon"}, {"accent", "´", "quote"}, {"cc", "Ç", "hash"},
     {"angle", "<", "bslash_iso"}, {"minus", "-", "slash"},
 };
 
-static const KeyPatch patchSE[] = {
+static const KeyPatch patchSE[] =
+{
     {"section", "§", "grave"}, {"plus", "+", "minus"}, {"grave", "´", "equal"},
     {"aa", "Å", "lbrace"}, {"umlaut", "¨", "rbrace"},
     {"oe", "Ö", "colon"}, {"ae", "Ä", "quote"}, {"quote", "'", "hash"},
     {"angle", "<", "bslash_iso"}, {"minus", "-", "slash"},
 };
 
-/*static const KeyPatch patchJP[] = {
+/*static const KeyPatch patchJP[] =
+{
     {"lbrace", "[", "rbrace"},
     {"rbrace", "]", "hash"},
 };*/
 
-static const KeyPatch patchDvorak[] = {
+static const KeyPatch patchDvorak[] =
+{
     {0, "[", "minus"}, {0, "]", "equal"},
     {0, "'", "q"}, {0, ",", "w"}, {0, ".", "e"}, {0, "P", "r"}, {0, "Y", "t"}, {0, "F", "y"}, {0, "G", "u"}, {0, "C", "i"}, {0, "R", "o"}, {0, "L", "p"}, {0, "/", "lbrace"}, {0, "=", "rbrace"},
     {0, "O", "s"}, {0, "E", "d"}, {0, "U", "f"}, {0, "I", "g"}, {0, "D", "h"}, {0, "H", "j"}, {0, "T", "k"}, {0, "N", "l"}, {0, "S", "colon"}, {0, "-", "quote"},
     {0, ";", "z"}, {0, "Q", "x"}, {0, "J", "c"}, {0, "K", "v"}, {0, "X", "b"}, {0, "B", "n"}, {0, "W", "comma"}, {0, "V", "dot"}, {0, "Z", "slash"},
 };
+// clang-format on
 
 // Apply a patch to a key map
 #define PATCH_COUNT(patch) (sizeof(patch) / sizeof(KeyPatch))
@@ -273,65 +290,82 @@ static const Key KStrafeKeys[] = {
 };
 
 // Mouse map - M65
-static const Key M65Keys[] = {
+// clang-format off
+static const Key M65Keys[] =
+{
     {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
     {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "Wheel Light", "front", 22, 15, 8, 8, true, false},
     {0, "DPI Up", "dpiup", 22, 19, 8, 6, false, true}, {0, "DPI Light", "dpi", 22, 24, 8, 8, true, false}, {0, "DPI Down", "dpidn", 22, 31, 8, 6, false, true},
     {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper", "sniper", 0, 25, 5, 15, false, true},
     {0, "Logo", "back", 14, 55, 24, 12, true, false}
 };
+// clang-format on
 #define KEYCOUNT_M65    (sizeof(M65Keys) / sizeof(Key))
 
 #define M65_WIDTH       52
 #define M65_HEIGHT      67
 
 // Sabre
-static const Key SabreKeys[] = {
+// clang-format off
+static const Key SabreKeys[] =
+{
     {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 8, 7, false, true}, {0, "Front light", "front", 8, -2, 14, 8, true, false },
     {0, "Wheel Up", "wheelup", 22, 5, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 15, 8, 5, false, true}, {0, "Wheel Light", "wheel", 22, 5, 8, 15, true, false}, {0, "Extra button", "thumb1", 22, 20, 8, 18, false, true},
     {0, "DPI Up", "dpiup", 5, 3, 5, 7, false, true}, {0, "DPI Down", "dpidn", 5, 10, 5, 7, false, true}, {0, "DPI Light", "dpi", 5, 4, 5, 12, true, false},
     {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true},
     {0, "Logo", "back", 14, 50, 24, 12, true, false}
 };
+// clang-format on
 #define KEYCOUNT_SABRE  (sizeof(SabreKeys) / sizeof(Key))
 
 #define SABRE_WIDTH     M65_WIDTH
 #define SABRE_HEIGHT    M65_HEIGHT
 
 // Harpoon
-static const Key HarpoonKeys[] = {
+// clang-format off
+static const Key HarpoonKeys[] =
+{
     {0, "Left Mouse", "mouse1", 10, 5, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 30, 5, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 25, 11, 6, 7, false, true},
     {0, "Wheel Up", "wheelup", 25, 7, 6, 5, false, true}, {0, "Wheel Down", "wheeldn", 25, 17, 6, 5, false, true},
     {0, "DPI Cycle", "dpiup", 25, 23, 6, 10, false, true}, {0, "Logo Light", "dpi", 17, 40, 20, 20, true, false},
     {0, "Forward", "mouse5", 3, 24, 5, 10, false, true}, {0, "Back", "mouse4", 3, 33, 5, 10, false, true}
 };
+// clang-format on
 #define KEYCOUNT_HARPOON  (sizeof(HarpoonKeys) / sizeof(Key))
 
 #define HARPOON_WIDTH     M65_WIDTH
 #define HARPOON_HEIGHT    M65_HEIGHT
 
 // Glaive
-static const Key GlaiveKeys[] = {
+// clang-format off
+static const Key GlaiveKeys[] =
+{
     {0, "Left Mouse", "mouse1", 17, 3, 14, 18, false, true}, {0, "Right Mouse", "mouse2", 37, 3, 14, 18, false, true}, {0, "Middle Mouse", "mouse3", 31, 9, 7, 7, false, true}, {0, "Front light", "front", 16, -5, 36, 8, true, false },
     {0, "Wheel Up", "wheelup", 31, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 31, 15, 7, 5, false, true}, {0, "Side Lights", "side", 22, 24, 7, 20, true, false},
     {0, "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {0, "Logo Light", "back", 24, 43, 20, 20, true, false},
     {0, "Forward", "mouse5", 15, 22, 5, 11, false, true}, {0, "Back", "mouse4", 15, 32, 5, 11, false, true}
 };
+// clang-format on
 #define KEYCOUNT_GLAIVE  (sizeof(GlaiveKeys) / sizeof(Key))
 
 #define GLAIVE_WIDTH     M65_WIDTH
 #define GLAIVE_HEIGHT    M65_HEIGHT
 
 // Katar
-static const Key KatarKeys[] = {
+// clang-format off
+static const Key KatarKeys[] =
+{
     {0, "Left Mouse", "mouse1", 7, 4, 14, 18, false, true}, {0, "Right Mouse", "mouse2", 28, 4, 14, 18, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 7, 7, false, true},
     {0, "Wheel Up", "wheelup", 22, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 15, 7, 5, false, true}, 
     {0, "DPI Cycle", "dpiup", 22, 19, 6, 12, false, true}, {0, "Logo Light", "front", 15, 43, 20, 20, true, false},
 };
+// clang-format on
 #define KEYCOUNT_KATAR  (sizeof(KatarKeys) / sizeof(Key))
 
 // Scimitar
-static const Key ScimKeys[] = {
+// clang-format off
+static const Key ScimKeys[] =
+{
     {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 12, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 8, 6, false, true}, {0, "Front light", "front", 30, 0, 12, 8, true, false },
     {0, "Wheel Up", "wheelup", 22, 3, 8, 6, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 6, false, true}, {0, "Wheel Light", "wheel", 22, 3, 8, 17, true, false},
     {0, "DPI Up", "dpiup", 22, 19, 8, 9, false, true}, {0, "DPI Light", "dpi", 1, 12, 8, 4, true, false}, {0, "DPI Down", "dpidn", 22, 28, 8, 9, false, true},
@@ -342,13 +376,16 @@ static const Key ScimKeys[] = {
     {0, "10", "thumb10", -13, 39, 7, 7, false, true}, {0, "11", "thumb11", -6, 39, 7, 7, false, true}, {0, "12", "thumb12", 1, 39, 7, 7, false, true},
     {0, "Logo", "back", 14, 50, 24, 16, true, false}
 };
+// clang-format on
 #define KEYCOUNT_SCIM   (sizeof(ScimKeys) / sizeof(Key))
 
 #define SCIM_WIDTH      M65_WIDTH
 #define SCIM_HEIGHT     M65_HEIGHT
 
 // M95
-static const Key M95Keys[] = {
+// clang-format off
+static const Key M95Keys[] =
+{
     {0, "Left Mouse", "mouse1", 9, 6, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 30, 6, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
     {0, "4", "thumb6", 23, 28, 7, 12, false, true},
     {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "DPI Up (5)", "dpiup", 5, -1, 6, 9, false, true}, {0, "DPI Down (6)", "dpidn", 5, 6, 6, 9, false, true},
@@ -357,8 +394,8 @@ static const Key M95Keys[] = {
     {0, "10", "thumb2", -10, 21, 10, 11, false, true},{0, "11", "thumb3", -10, 30, 10, 11, false, true},
     {0, "12", "thumb4", -18, 38, 18, 8, false, true}, {0, "13", "thumb5", -34, 38, 18, 8, false, true},
     {0, "Logo", "back", 20, 55, 12, 12, true, false}
-
 };
+// clang-format on
 #define KEYCOUNT_M95    (sizeof(M95Keys) / sizeof(Key))
 
 // K95 Platinum lightbar

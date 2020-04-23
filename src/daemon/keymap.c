@@ -4,6 +4,7 @@
 #include "usb.h"
 #include "input.h"
 
+// clang-format off
 const key keymap[N_KEYS_EXTENDED] = {
     // Keyboard keys
     { "esc",        0x00, KEY_ESC },
@@ -291,6 +292,7 @@ static const short hid_codes[256] = {
      60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97,
      -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
 };
+// clang-format on
 
 // There are three types of keyboard input. 6KRO, NKRO and Corsair.
 //

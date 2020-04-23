@@ -9,6 +9,7 @@
 #include "usb.h"
 #include "keymap_patch.h"
 
+// clang-format off
 // Values taken from the official website
 // Mice not in the list default to 12000 in the GUI
 dpi_list mouse_dpi_list[] = {
@@ -80,6 +81,7 @@ device_desc models[] = {
     // Headset stands
     { V_CORSAIR, P_ST100, },
 };
+// clang-format on
 
 size_t N_MODELS = sizeof(models) / sizeof(device_desc);
 

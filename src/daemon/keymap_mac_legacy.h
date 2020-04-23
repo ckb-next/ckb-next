@@ -1,5 +1,6 @@
 // This should only be included when needed by keymap_mac.h
 // Emulate Linux key constants for OSX
+// clang-format off
 
 #define KEY_ESC             kVK_Escape
 #define KEY_F1              kVK_F1
@@ -157,3 +158,5 @@
 #define BTN_FORWARD         6
 #define BTN_BACK            7
 #define BTN_TASK            8
+
+// clang-format on

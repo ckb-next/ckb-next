@@ -6,6 +6,7 @@ cmake-build*/
 *.pkg
 .DS_Store
 .*
+!.clang-format
 !.gitignore
 !.github
 *.o

@@ -11,6 +11,7 @@
 #else
 
 // Replace Linux key constants with HID scancodes for macOS w/VirtualHIDDevice
+// clang-format off
 
 #define KEY_ESC             kHIDUsage_KeyboardEscape
 #define KEY_F1              kHIDUsage_KeyboardF1
@@ -170,6 +171,8 @@
 #define BTN_FORWARD         6
 #define BTN_BACK            7
 #define BTN_TASK            8
+
+// clang-format on
 
 #endif //OS_MAC_LEGACY
 

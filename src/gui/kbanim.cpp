@@ -383,12 +383,15 @@ void KbAnim::blend(ColorMap& animMap, quint64 timestamp){
         qDebug() << "Script map didn't match base map (" << count << " vs " << scriptMap.count() << "). This should never happen.";
         return;
     }
-    QRgb* background = animMap.colors();
-    const QRgb* foreground = scriptMap.colors();
-    for(int i = 0; i < count; i++){
+    auto bg_it = animMap._colors.begin()
+      , last_it = animMap._colors.end();
+    auto fg_it = scriptMap._colors.begin();
+    assert (animMap.count() == scriptMap.count());
+    for(;bg_it != last_it; ++bg_it, ++fg_it)
+    {
         // Mix the colors in with the color map according to blend mode and alpha
-        QRgb& bg = background[i];
-        QRgb fg = foreground[i];
+        QRgb& bg = bg_it->second;
+        QRgb fg = fg_it->second;
         int alpha = qAlpha(fg);
         if(alpha == 0)
             continue;

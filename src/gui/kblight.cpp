@@ -73,10 +73,6 @@ void KbLight::color(const QColor& newColor){
     _needsSave = true;
     // Reset flat map
     _needsMapRefresh = false;
-    int mapCount = _colorMap.count();
-    QRgb* flat = _colorMap.colors();
-    for(int i = 0; i < mapCount; i++)
-        flat[i] = mapCount;
 }
 
 int KbLight::shareDimming(){
@@ -226,15 +222,13 @@ void KbLight::close(){
 }
 
 void KbLight::printRGB(QFile& cmd, const ColorMap &animMap){
-    int count = animMap.count();
-    const char* const* names = animMap.keyNames();
-    const QRgb* colors = animMap.colors();
     // Print each color and the corresponding RGB value
-    for(int i = 0; i < count; i++){
+    for(auto && pair : animMap._colors)
+    {
         cmd.write(" ");
-        cmd.write(names[i]);
+        cmd.write(pair.first.c_str());
         char output[8];
-        QRgb color = colors[i];
+        QRgb color = pair.second;
         snprintf(output, sizeof(output), ":%02x%02x%02x", qRed(color), qGreen(color), qBlue(color));
         cmd.write(output);
     }
@@ -322,18 +316,18 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
     _lastFrameIndicatorMap = _indicatorMap;
     _lastFrameDimming = _dimming;
 
-    int count = _animMap.count();
-    QRgb* colors = _animMap.colors();
     // Apply active indicators and/or perform monochrome conversion
     if(monochrome || !_indicatorList.isEmpty()){
-        QRgb* indicators = _indicatorMap.colors();
-        for(int i = 0; i < count; i++){
-            QRgb& rgb = colors[i];
+        auto animMap_it = _animMap._colors.begin(), animMap_last = _animMap._colors.end();
+        auto indicatorMap_it = _indicatorMap._colors.end();
+        assert (_animMap.count() == _indicatorMap.count());
+        for(;animMap_it != animMap_last; ++animMap_it, ++indicatorMap_it) {
+            QRgb& rgb = animMap_it->second;
             float r = qRed(rgb);
             float g = qGreen(rgb);
             float b = qBlue(rgb);
             // Apply indicators
-            QRgb rgb2 = indicators[i];
+            QRgb rgb2 = indicatorMap_it->second;
             if(qAlpha(rgb2) != 0){
                 float r2 = qRed(rgb2);
                 float g2 = qGreen(rgb2);
@@ -366,8 +360,9 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
     float light = (3 - _dimming) / 3.f;
     // Apply global dimming
     if(light != 1.f || monochrome){
-        for(int i = 0; i < count; i++){
-            QRgb& rgb = colors[i];
+        for(auto iterator = _animMap._colors.begin(), last = _animMap._colors.end()
+              ; iterator != last; ++iterator){
+            QRgb& rgb = iterator->second;
             // Like the monochrome conversion, this should be done in a linear colorspace
             float r = sToL(qRed(rgb));
             float g = sToL(qGreen(rgb));
@@ -399,10 +394,10 @@ void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){
     _animMap = _colorMap;
     // If monochrome is active, create grayscale
     if(monochrome){
-        int count = _animMap.count();
-        QRgb* colors = _animMap.colors();
-        for(int i = 0; i < count; i++){
-            QRgb& rgb = colors[i];
+        auto iterator = _animMap._colors.begin();
+        for(; iterator != _animMap._colors.end(); ++iterator)
+        {
+            QRgb& rgb = iterator->second;
             rgb = monoRgb(qRed(rgb), qGreen(rgb), qBlue(rgb));
         }
     }

@@ -459,7 +459,7 @@ void AnimScript::readProcess(){
         }
         if(line == "end frame"){
             // Frame is finished. Copy color buffer back to the atomic map
-            memcpy(_colors.colors(), _colorBuffer.colors(), sizeof(QRgb) * _colors.count());
+            _colors = _colorBuffer;
             inFrame = false;
             readFrame = readAnyFrame = true;
         }

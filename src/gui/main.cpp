@@ -357,7 +357,7 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     if(background)
         shm_str = nullptr;
 
-    if(isRunning(shm_str) && !QtCreator){
+    if(!background && isRunning(shm_str) && !QtCreator){
         printf("ckb-next is already running. Exiting.\n");
         return 0;
     }

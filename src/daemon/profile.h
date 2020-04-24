@@ -54,4 +54,4 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
 int cmd_hwsave_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_hwsave_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 
-#endif  // PROFILE_H
+#endif // PROFILE_H

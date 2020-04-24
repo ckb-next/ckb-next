@@ -27,27 +27,32 @@
 extern QSharedMemory appShare;
 extern QString devpath;
 
-int MainWindow::signalHandlerFd[2] = {0, 0};
+int MainWindow::signalHandlerFd[2] = { 0, 0 };
 
 MainWindow* MainWindow::mainWindow = 0;
 
 #ifdef USE_LIBAPPINDICATOR
-extern "C" {
-    void quitIndicator(GtkMenu* menu, gpointer data) {
+extern "C"
+{
+    void quitIndicator(GtkMenu* menu, gpointer data)
+    {
         Q_UNUSED(menu);
         MainWindow* window = static_cast<MainWindow*>(data);
         window->quitApp();
     }
 
-    void restoreIndicator(GtkMenu* menu, gpointer data) {
+    void restoreIndicator(GtkMenu* menu, gpointer data)
+    {
         Q_UNUSED(menu);
         MainWindow* window = static_cast<MainWindow*>(data);
         window->showWindow();
     }
 
-    void indicatorScroll(AppIndicator* indicator, guint steps, GdkScrollDirection direction, gpointer data) {
+    void indicatorScroll(AppIndicator* indicator, guint steps, GdkScrollDirection direction, gpointer data)
+    {
         MainWindow* window = static_cast<MainWindow*>(data);
-        switch(direction) {
+        switch (direction)
+        {
             case GDK_SCROLL_UP:
                 emit window->trayIconScrolled(true);
                 break;
@@ -62,7 +67,8 @@ extern "C" {
 #endif
 
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
-bool is_catalina_or_higher(){
+bool is_catalina_or_higher()
+{
     // Get macOS version. If Catalina or higher, start the daemon agent as the current user to request for HID permission.
     QString macOSver = QSysInfo::productVersion();
     // Split major/minor
@@ -71,9 +77,11 @@ bool is_catalina_or_higher(){
     return (verVector.count() == 2 && verVector.at(0) == QString("10") && verVector.at(1).toInt() >= 15);
 }
 
-void MainWindow::appleRequestHidTimer(){
+void MainWindow::appleRequestHidTimer()
+{
     // Destroy the timer immediately if we have devices connected
-    if(KbManager::devices().count()){
+    if (KbManager::devices().count())
+    {
         catalinaTimer->stop();
         catalinaTimer->deleteLater();
         catalinaTimer = nullptr;
@@ -83,9 +91,11 @@ void MainWindow::appleRequestHidTimer(){
     QProcess launchctl;
     launchctl.setProgram("launchctl");
     // Start the agent only if the state on the previous run wasn't "running" or pre exec
-    if(!catalinaAgentStarted){
+    if (!catalinaAgentStarted)
+    {
         // Start the service
-        launchctl.setArguments(QStringList() << "start" << "org.ckb-next.daemon");
+        launchctl.setArguments(QStringList() << "start"
+                                             << "org.ckb-next.daemon");
         launchctl.start();
         launchctl.waitForFinished();
         qDebug() << "Launchctl start returned" << launchctl.exitCode();
@@ -102,17 +112,19 @@ void MainWindow::appleRequestHidTimer(){
     launchctl.setArguments(QStringList() << "print" << QString("gui/%1/org.ckb-next.daemon").arg(euid));
     launchctl.start();
     launchctl.waitForFinished();
-    if(launchctl.exitCode() == 0){
+    if (launchctl.exitCode() == 0)
+    {
         QString str(launchctl.readAllStandardOutput());
 
         int statestart = str.indexOf("state = ") + 8;
         int statelen = str.indexOf('\n', statestart) - statestart;
-        if(statelen > 20)
+        if (statelen > 20)
             return;
 
         // Extract the state from the output
         QStringRef agentState(&str, statestart, statelen);
-        if(agentState == QString("running") || agentState == QString("spawned (pre-exec)")){
+        if (agentState == QString("running") || agentState == QString("spawned (pre-exec)"))
+        {
             catalinaAgentStarted = true;
             return;
         }
@@ -121,31 +133,35 @@ void MainWindow::appleRequestHidTimer(){
         // Extract the daemon's return code
         int statusstart = str.lastIndexOf("last exit code = ") + 17;
         int statuslen = str.indexOf('\n', statusstart) - statusstart;
-        if(statuslen < 3 && statuslen > 0){
+        if (statuslen < 3 && statuslen > 0)
+        {
             hid_req_ret status = (hid_req_ret)QStringRef(&str, statusstart, statuslen).toInt();
             // We do not need to do anything if the request succeeds, other than wait for the loop to run again
-            if(status == REQUEST_ALREADY_ALLOWED){
+            if (status == REQUEST_ALREADY_ALLOWED)
+            {
                 qDebug() << "We have HID access!";
                 catalinaTimer->stop();
                 catalinaTimer->deleteLater();
                 catalinaTimer = nullptr;
                 // Ask user to restart daemon only if we first had to request permission
-                if(prevHidRet == REQUEST_SUCCEEDED)
-                    QProcess::execute("open", QStringList() << "-a" << "Terminal" << "/Applications/ckb-next.app/Contents/Resources/daemon-restart.sh");
+                if (prevHidRet == REQUEST_SUCCEEDED)
+                    QProcess::execute("open", QStringList() << "-a"
+                                                            << "Terminal"
+                                                            << "/Applications/ckb-next.app/Contents/Resources/daemon-restart.sh");
             }
             else
                 qDebug() << "HID agent encountered an unknown error";
             prevHidRet = status;
-        } else if (statuslen == 14) {
+        }
+        else if (statuslen == 14)
+        {
             qDebug() << "Agent was never started. Something went wrong.";
         }
     }
 }
 #endif
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     mainWindow = this;
@@ -168,13 +184,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QString desktop = procEnv.value("XDG_CURRENT_DESKTOP", QString("")).toLower();
     QString qpaTheme = procEnv.value("QT_QPA_PLATFORMTHEME", QString("")).toLower();
     QString ckbnextAppindicator = procEnv.value("CKB_NEXT_USE_APPINDICATOR", QString("")).toLower();
-    QStringList appIndicatorOn = QStringList() << "yes" << "on" << "1";
-    QStringList appIndicatorOff = QStringList() << "no" << "off" << "0";
+    QStringList appIndicatorOn = QStringList() << "yes"
+                                               << "on"
+                                               << "1";
+    QStringList appIndicatorOff = QStringList() << "no"
+                                                << "off"
+                                                << "0";
 
     useAppindicator = false;
     trayIcon = 0;
 
-    if(((desktop == "unity" || qpaTheme == "appmenu-qt5" || qpaTheme == "gtk2") && !appIndicatorOff.contains(ckbnextAppindicator)) || appIndicatorOn.contains(ckbnextAppindicator)){
+    if (((desktop == "unity" || qpaTheme == "appmenu-qt5" || qpaTheme == "gtk2") && !appIndicatorOff.contains(ckbnextAppindicator)) || appIndicatorOn.contains(ckbnextAppindicator))
+    {
         qDebug() << "Using AppIndicator";
         useAppindicator = true;
 
@@ -185,10 +206,8 @@ MainWindow::MainWindow(QWidget *parent) :
         gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
         gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
 
-        g_signal_connect(indicatorMenuQuitItem, "activate",
-            G_CALLBACK(quitIndicator), this);
-        g_signal_connect(indicatorMenuRestoreItem, "activate",
-            G_CALLBACK(restoreIndicator), this);
+        g_signal_connect(indicatorMenuQuitItem, "activate", G_CALLBACK(quitIndicator), this);
+        g_signal_connect(indicatorMenuRestoreItem, "activate", G_CALLBACK(restoreIndicator), this);
 
         gtk_widget_show(indicatorMenuRestoreItem);
         gtk_widget_show(indicatorMenuQuitItem);
@@ -201,7 +220,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
         // Catch scroll events
         g_signal_connect(indicator, "scroll-event", G_CALLBACK(indicatorScroll), this);
-    } else
+    }
+    else
 #endif
     {
         qDebug() << "Using QSytemTrayIcon";
@@ -244,13 +264,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMessageBox dialog;
     dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
 #ifndef Q_OS_MACOS
-    QString daemonDialogText = QString(tr("Start it once with:")) +
-    "<blockquote><code>sudo systemctl start ckb-next-daemon</code></blockquote>" +
-    tr("Enable it for every boot:") +
-    "<blockquote><code>sudo systemctl enable ckb-next-daemon</code></blockquote>";
+    QString daemonDialogText = QString(tr("Start it once with:")) + "<blockquote><code>sudo systemctl start ckb-next-daemon</code></blockquote>" + tr("Enable it for every boot:") + "<blockquote><code>sudo systemctl enable ckb-next-daemon</code></blockquote>";
 #else
-    QString daemonDialogText = QString(tr("Start and enable it with:")) +
-    "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist</code></blockquote>";
+    QString daemonDialogText = QString(tr("Start and enable it with:")) + "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist</code></blockquote>";
 #endif
     dialog.setInformativeText(daemonDialogText);
     dialog.setIcon(QMessageBox::Critical);
@@ -270,7 +286,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // `.arg(0)` is necessary to interpolate the correct suffix into the path
     // see `./kbmanager.cpp` for details
     QFileInfo rootDevPath(devpath.arg(0));
-    if (!rootDevPath.exists()) {
+    if (!rootDevPath.exists())
+    {
         // set settings widget's status
         // show the main window (otherwise only the dialog will be visible)
         // finally show the dialog
@@ -279,19 +296,21 @@ MainWindow::MainWindow(QWidget *parent) :
         dialog.exec();
     }
 #ifndef DISABLE_UPDATER
-    if(!CkbSettings::get("Program/DisableAutoUpdCheck", false).toBool())
+    if (!CkbSettings::get("Program/DisableAutoUpdCheck", false).toBool())
         checkForCkbUpdates();
 
     connect(settingsWidget, &SettingsWidget::checkForUpdates, this, &MainWindow::checkForCkbUpdates);
 #endif
 
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
-    if(is_catalina_or_higher()){
+    if (is_catalina_or_higher())
+    {
         // Load the agent as it'll be unloaded on first installation
         {
             QProcess launchctl;
             launchctl.setProgram("launchctl");
-            launchctl.setArguments(QStringList() << "load" << "/Library/LaunchAgents/org.ckb-next.daemon_agent.plist");
+            launchctl.setArguments(QStringList() << "load"
+                                                 << "/Library/LaunchAgents/org.ckb-next.daemon_agent.plist");
             launchctl.start();
             launchctl.waitForFinished();
             qDebug() << "Launchctl load returned" << launchctl.exitCode();
@@ -307,11 +326,13 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 }
 
-void MainWindow::handleTrayScrollEvt(bool up){
+void MainWindow::handleTrayScrollEvt(bool up)
+{
     emit trayIconScrolled(up);
 }
 
-void MainWindow::checkForCkbUpdates(){
+void MainWindow::checkForCkbUpdates()
+{
 #ifndef DISABLE_UPDATER
     updater = new CkbUpdater(this);
     connect(updater, &CkbUpdater::checkedForNewVer, this, &MainWindow::checkedForNewVer);
@@ -319,19 +340,22 @@ void MainWindow::checkForCkbUpdates(){
 #endif
 }
 
-void MainWindow::toggleTrayIcon(bool visible){
+void MainWindow::toggleTrayIcon(bool visible)
+{
 #ifdef USE_LIBAPPINDICATOR
-    if(useAppindicator)
+    if (useAppindicator)
         app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
     else
 #endif
         trayIcon->setVisible(visible);
 }
 
-void MainWindow::addDevice(Kb* device){
+void MainWindow::addDevice(Kb* device)
+{
     // Connected already?
-    foreach(KbWidget* w, kbWidgets){
-        if(w->device == device)
+    foreach (KbWidget* w, kbWidgets)
+    {
+        if (w->device == device)
             return;
     }
     // Add the keyboard
@@ -340,16 +364,19 @@ void MainWindow::addDevice(Kb* device){
     // Add to tabber; switch to this device if the user is on the settings screen
     int count = ui->tabWidget->count();
     ui->tabWidget->insertTab(count - 1, widget, widget->name());
-    if(ui->tabWidget->currentIndex() == count)
+    if (ui->tabWidget->currentIndex() == count)
         ui->tabWidget->setCurrentIndex(count - 1);
     // Update connected device count
     updateVersion();
 }
 
-void MainWindow::removeDevice(Kb* device){
-    foreach(KbWidget* w, kbWidgets){
+void MainWindow::removeDevice(Kb* device)
+{
+    foreach (KbWidget* w, kbWidgets)
+    {
         // Remove this device from the UI
-        if(w->device == device){
+        if (w->device == device)
+        {
             int i = kbWidgets.indexOf(w);
             ui->tabWidget->removeTab(i);
             kbWidgets.removeAt(i);
@@ -360,58 +387,70 @@ void MainWindow::removeDevice(Kb* device){
     updateVersion();
 }
 
-void MainWindow::updateVersion(){
+void MainWindow::updateVersion()
+{
     QString daemonVersion = KbManager::ckbDaemonVersion();
-    if(daemonVersion == DAEMON_UNAVAILABLE_STR){
+    if (daemonVersion == DAEMON_UNAVAILABLE_STR)
+    {
         settingsWidget->setStatus(tr("Driver inactive"));
         return;
     }
     int count = kbWidgets.count();
     // Warn if the daemon version doesn't match the GUI
     QString daemonWarning;
-    if(daemonVersion != CKB_NEXT_VERSION_STR)
+    if (daemonVersion != CKB_NEXT_VERSION_STR)
         daemonWarning = tr("<br /><br /><b>Warning:</b> Driver version mismatch (") + daemonVersion + tr("). Please upgrade ckb-next") + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + tr(". If the problem persists, try rebooting.");
-    if(count == 0){
+    if (count == 0)
+    {
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
         QProcess kextstat;
-        kextstat.start("kextstat", QStringList() << "-l" << "-b" << "org.pqrs.driver.Karabiner.VirtualHIDDevice.v060800");
+        kextstat.start("kextstat", QStringList() << "-l"
+                                                 << "-b"
+                                                 << "org.pqrs.driver.Karabiner.VirtualHIDDevice.v060800");
 
-        if(!kextstat.waitForFinished())
+        if (!kextstat.waitForFinished())
             qDebug() << "Kextstat error";
 
         QString kextstatOut(kextstat.readAll());
-        if(kextstatOut.isEmpty())
-            daemonWarning.append(tr("<br /><b>Warning:</b> System Extension by \"Fumihiko Takayama\" is not allowed in Security & Privacy. Please allow it and then unplug and replug your devices."));
-        if(is_catalina_or_higher())
-            daemonWarning.append(tr("<br /><b>Warning:</b> Make sure ckb-next-daemon is allowed in Security & Privacy -> Input monitoring.<br />Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring."));
+        if (kextstatOut.isEmpty())
+            daemonWarning.append(tr("<br /><b>Warning:</b> System Extension by \"Fumihiko Takayama\" is not allowed in Security & Privacy. Please "
+                                    "allow it and then unplug and replug your devices."));
+        if (is_catalina_or_higher())
+            daemonWarning.append(tr("<br /><b>Warning:</b> Make sure ckb-next-daemon is allowed in Security & Privacy -> Input monitoring.<br "
+                                    "/>Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring."));
 #elif defined(Q_OS_LINUX)
-            if(!(QFileInfo("/dev/uinput").exists() || QFileInfo("/dev/input/uinput").exists())){
-                QProcess modprobe;
-                modprobe.start("modprobe", QStringList("uinput"));
+        if (!(QFileInfo("/dev/uinput").exists() || QFileInfo("/dev/input/uinput").exists()))
+        {
+            QProcess modprobe;
+            modprobe.start("modprobe", QStringList("uinput"));
 
-                if(!modprobe.waitForFinished())
-                    qDebug() << "Modprobe error";
+            if (!modprobe.waitForFinished())
+                qDebug() << "Modprobe error";
 
-                if(modprobe.exitCode())
-                    daemonWarning.append(tr("<br /><b>Warning:</b> The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y."));
-            }
+            if (modprobe.exitCode())
+                daemonWarning.append(tr("<br /><b>Warning:</b> The uinput module could not be loaded. If this issue persists after rebooting, "
+                                        "compile a kernel with CONFIG_INPUT_UINPUT=y."));
+        }
 #endif
         settingsWidget->setStatus(tr("No devices connected") + daemonWarning);
     }
-    else if(count == 1)
+    else if (count == 1)
         settingsWidget->setStatus(tr("1 device connected") + daemonWarning);
     else
         settingsWidget->setStatus(QString(tr("%1 devices connected")).arg(count) + daemonWarning);
 }
 
-void MainWindow::checkFwUpdates(){
-    if(!mainWindow->isVisible())
+void MainWindow::checkFwUpdates()
+{
+    if (!mainWindow->isVisible())
         return;
-    foreach(KbWidget* w, kbWidgets){
+    foreach (KbWidget* w, kbWidgets)
+    {
         // Display firmware upgrade notification if a new version is available
         float version = KbFirmware::versionForBoard(w->device->productID);
-        if(version > w->device->firmware.toFloat()){
-            if(w->hasShownNewFW)
+        if (version > w->device->firmware.toFloat())
+        {
+            if (w->hasShownNewFW)
                 continue;
             w->hasShownNewFW = true;
             w->updateFwButton();
@@ -424,15 +463,19 @@ void MainWindow::checkFwUpdates(){
     }
 }
 
-void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
+void MainWindow::showFwUpdateNotification(QWidget* widget, float version)
+{
     static bool isShowing = false;
-    if(isShowing)
+    if (isShowing)
         return;
     isShowing = true;
     showWindow();
     KbWidget* w = (KbWidget*)widget;
     // Ask for update
-    if(QMessageBox::information(this, "Firmware update", tr("A new firmware is available for your %1 (v%2)\nWould you like to install it now?").arg(w->device->usbModel, QString::number(version, 'f', 2)), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), QMessageBox::Yes) == QMessageBox::Yes){
+    if (QMessageBox::information(this, "Firmware update",
+                                 tr("A new firmware is available for your %1 (v%2)\nWould you like to install it now?").arg(w->device->usbModel, QString::number(version, 'f', 2)), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), QMessageBox::Yes)
+        == QMessageBox::Yes)
+    {
         // If accepted, switch to the firmware tab and bring up the update window
         w->showLastTab();
         ui->tabWidget->setCurrentIndex(kbWidgets.indexOf(w));
@@ -441,13 +484,16 @@ void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
     isShowing = false;
 }
 
-void MainWindow::closeEvent(QCloseEvent *event){
+void MainWindow::closeEvent(QCloseEvent* event)
+{
     // If the window is hidden already or the event is non-spontaneous (can happen on OSX when using the Quit menu), accept it and close
-    if(!event->spontaneous() || isHidden()){
+    if (!event->spontaneous() || isHidden())
+    {
         event->accept();
         return;
     }
-    if(!CkbSettings::get("Popups/BGWarning").toBool()){
+    if (!CkbSettings::get("Popups/BGWarning").toBool())
+    {
         QMessageBox::information(this, "ckb-next", tr("ckb-next will still run in the background.\nTo close it, choose Quit from the tray menu\nor click \"Quit\" on the Settings screen."));
         CkbSettings::set("Popups/BGWarning", true);
     }
@@ -455,37 +501,42 @@ void MainWindow::closeEvent(QCloseEvent *event){
     event->ignore();
 }
 
-void MainWindow::timerTick(){
+void MainWindow::timerTick()
+{
     // Check shared memory for changes
-    if(appShare.lock()){
+    if (appShare.lock())
+    {
         void* data = appShare.data();
         QStringList commands = QString((const char*)data).split("\n");
         // Restore PID, remove all other data
         snprintf((char*)appShare.data(), appShare.size(), "PID %ld", (long)getpid());
         appShare.unlock();
         // Parse commands
-        foreach(const QString& line, commands){
+        foreach (const QString& line, commands)
+        {
             // Old ckb option line - bring application to foreground
-            if(line == "Open")
+            if (line == "Open")
                 showWindow();
-            if(line.startsWith("Option ")){
+            if (line.startsWith("Option "))
+            {
                 // New ckb option line
                 QString option = line.section(' ', 1);
-                if(option == "Open")
+                if (option == "Open")
                     // Bring to foreground
                     showWindow();
-                else if(option == "Close")
+                else if (option == "Close")
                     // Quit application
                     qApp->quit();
-                else if(option.startsWith("SwitchToProfile"))
+                else if (option.startsWith("SwitchToProfile"))
                     emit switchToProfileCLI(option.section(' ', 1));
-                else if(option.startsWith("SwitchToMode: "))
+                else if (option.startsWith("SwitchToMode: "))
                     emit switchToModeCLI(option.section(' ', 1));
             }
         }
     }
     // Check for firmware updates (when appropriate)
-    if(!CkbSettings::get("Program/DisableAutoFWCheck").toBool()){
+    if (!CkbSettings::get("Program/DisableAutoFWCheck").toBool())
+    {
         KbFirmware::checkUpdates();
         checkFwUpdates();
     }
@@ -493,12 +544,14 @@ void MainWindow::timerTick(){
     settingsWidget->pollUpdates();
 }
 
-void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason){
+void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason)
+{
     // On Linux, hide/show the app when the tray icon is clicked
     // On OSX this just shows the menu
 #ifndef Q_OS_MACOS
-    if(reason == QSystemTrayIcon::DoubleClick || reason == QSystemTrayIcon::Trigger){
-        if(isVisible())
+    if (reason == QSystemTrayIcon::DoubleClick || reason == QSystemTrayIcon::Trigger)
+    {
+        if (isVisible())
             hide();
         else
             showWindow();
@@ -506,48 +559,55 @@ void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason){
 #endif
 }
 
-void MainWindow::showWindow(){
+void MainWindow::showWindow()
+{
     showNormal();
     raise();
     activateWindow();
 }
 
-void MainWindow::stateChange(Qt::ApplicationState state){
+void MainWindow::stateChange(Qt::ApplicationState state)
+{
     // On OSX it's possible for the app to be brought to the foreground without the window actually reappearing.
     // We want to make sure it's shown when this happens.
 #ifdef Q_OS_MAC
     static quint64 lastStateChange = 0;
     quint64 now = QDateTime::currentMSecsSinceEpoch();
-    if(state == Qt::ApplicationActive){
+    if (state == Qt::ApplicationActive)
+    {
         // This happens once at startup so ignore it. Also don't allow it to be called more than once every 2s.
-        if(lastStateChange != 0 && now >= lastStateChange + 2 * 1000)
+        if (lastStateChange != 0 && now >= lastStateChange + 2 * 1000)
             showWindow();
         lastStateChange = now;
     }
 #endif
 }
 
-void MainWindow::quitApp(){
+void MainWindow::quitApp()
+{
     qApp->quit();
 }
 
-QIcon MainWindow::getIcon() {
-  // on initial launch (first time using ckb) this association checked
-  // will not be present, so force it to true, as we do not want to break default behaviour
+QIcon MainWindow::getIcon()
+{
+    // on initial launch (first time using ckb) this association checked
+    // will not be present, so force it to true, as we do not want to break default behaviour
 
-  // If the icon is RGB then the menu should present a monochrome option
-  if (CkbSettings::get("Program/RGBIcon", QVariant(true)).toBool()){
-    changeTrayIconAction->setText("Monochrome Tray Icon");
-    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
-    return QIcon(":/img/ckb-next.png");
-  }
-  // If the icon is monochrome then the menu should present an RGB option
-  changeTrayIconAction->setText("RGB Tray Icon");
-  connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
-  return QIcon(":/img/ckb-next-monochrome.png");
+    // If the icon is RGB then the menu should present a monochrome option
+    if (CkbSettings::get("Program/RGBIcon", QVariant(true)).toBool())
+    {
+        changeTrayIconAction->setText("Monochrome Tray Icon");
+        connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
+        return QIcon(":/img/ckb-next.png");
+    }
+    // If the icon is monochrome then the menu should present an RGB option
+    changeTrayIconAction->setText("RGB Tray Icon");
+    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
+    return QIcon(":/img/ckb-next-monochrome.png");
 }
 
-void MainWindow::changeTrayIconToMonochrome(){
+void MainWindow::changeTrayIconToMonochrome()
+{
     trayIcon->setIcon(QIcon(":/img/ckb-next-monochrome.png"));
     changeTrayIconAction->setText("RGB Tray Icon");
     changeTrayIconAction->disconnect();
@@ -555,7 +615,8 @@ void MainWindow::changeTrayIconToMonochrome(){
     CkbSettings::set("Program/RGBIcon", false);
 }
 
-void MainWindow::changeTrayIconToRGB(){
+void MainWindow::changeTrayIconToRGB()
+{
     trayIcon->setIcon(QIcon(":/img/ckb-next.png"));
     changeTrayIconAction->setText("Monochrome Tray Icon");
     changeTrayIconAction->disconnect();
@@ -563,25 +624,29 @@ void MainWindow::changeTrayIconToRGB(){
     CkbSettings::set("Program/RGBIcon", true);
 }
 
-void MainWindow::cleanup(){
-    foreach(KbWidget* w, kbWidgets)
+void MainWindow::cleanup()
+{
+    foreach (KbWidget* w, kbWidgets)
         delete w;
     kbWidgets.clear();
     KbManager::stop();
     CkbSettings::cleanUp();
 }
 
-MainWindow::~MainWindow(){
+MainWindow::~MainWindow()
+{
     cleanup();
     delete ui;
 }
 
-void MainWindow::QSignalHandler(){
+void MainWindow::QSignalHandler()
+{
     sigNotifier->setEnabled(false);
     int sig = -1;
     int ret = read(signalHandlerFd[1], &sig, sizeof(sig));
 
-    if(ret == -1){
+    if (ret == -1)
+    {
         qDebug() << "Error on QSignalHandler read";
         return;
     }
@@ -591,20 +656,25 @@ void MainWindow::QSignalHandler(){
     sigNotifier->setEnabled(true);
 }
 
-void MainWindow::PosixSignalHandler(int signal){
+void MainWindow::PosixSignalHandler(int signal)
+{
     int ret = write(MainWindow::signalHandlerFd[0], &signal, sizeof(signal));
-    if(ret == -1)
+    if (ret == -1)
         qDebug() << "Error on PosixSignalHandler write";
 }
 
-void MainWindow::checkedForNewVer(QString ver, QString changelog){
+void MainWindow::checkedForNewVer(QString ver, QString changelog)
+{
 #ifndef DISABLE_UPDATER
-    if(!ver.isEmpty()) {
+    if (!ver.isEmpty())
+    {
         settingsWidget->setUpdateButtonText(tr("Update to v") + ver);
         showWindow();
         CkbUpdaterDialog updDialog(ver, changelog, this);
         updDialog.exec();
-    } else {
+    }
+    else
+    {
         settingsWidget->setUpdateButtonText(tr("Up to date"));
     }
     updater->deleteLater();

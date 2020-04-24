@@ -31,10 +31,12 @@ void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char*
 
 #ifdef OS_LINUX
 // Is a key a modifier?
-#define IS_MOD(s) ((s) == KEY_CAPSLOCK || (s) == KEY_NUMLOCK || (s) == KEY_SCROLLLOCK || (s) == KEY_LEFTSHIFT || (s) == KEY_RIGHTSHIFT || (s) == KEY_LEFTCTRL || (s) == KEY_RIGHTCTRL || (s) == KEY_LEFTMETA || (s) == KEY_RIGHTMETA || (s) == KEY_LEFTALT || (s) == KEY_RIGHTALT || (s) == KEY_FN)
+#define IS_MOD(s) \
+    ((s) == KEY_CAPSLOCK || (s) == KEY_NUMLOCK || (s) == KEY_SCROLLLOCK || (s) == KEY_LEFTSHIFT || (s) == KEY_RIGHTSHIFT || (s) == KEY_LEFTCTRL || (s) == KEY_RIGHTCTRL || (s) == KEY_LEFTMETA || (s) == KEY_RIGHTMETA || (s) == KEY_LEFTALT || (s) == KEY_RIGHTALT || (s) == KEY_FN)
 #else
 // Scroll Lock and Num Lock aren't modifiers on OSX
-#define IS_MOD(s) ((s) == KEY_CAPSLOCK || (s) == KEY_LEFTSHIFT || (s) == KEY_RIGHTSHIFT || (s) == KEY_LEFTCTRL || (s) == KEY_RIGHTCTRL || (s) == KEY_LEFTMETA || (s) == KEY_RIGHTMETA || (s) == KEY_LEFTALT || (s) == KEY_RIGHTALT || (s) == KEY_FN)
+#define IS_MOD(s) \
+    ((s) == KEY_CAPSLOCK || (s) == KEY_LEFTSHIFT || (s) == KEY_RIGHTSHIFT || (s) == KEY_LEFTCTRL || (s) == KEY_RIGHTCTRL || (s) == KEY_LEFTMETA || (s) == KEY_RIGHTMETA || (s) == KEY_LEFTALT || (s) == KEY_RIGHTALT || (s) == KEY_FN)
 #endif
 
 // OS-specific event handlers. Should only be called within the above functions.
@@ -51,7 +53,8 @@ int os_setupindicators(usbdevice* kb);
 /// \brief struct parameter contains the values for a fresh started macro_play thread.
 /// \a parameter_t is the typedef for it.
 ///
-typedef struct parameter {
+typedef struct parameter
+{
     usbdevice* kb;
     keymacro* macro;
 } parameter_t;
@@ -59,9 +62,10 @@ typedef struct parameter {
 /// \brief struct ptlist is one element in the single linked list to store  macro_play threads waiting for their execution
 /// \a ptlist_t is the typedef for it.
 ///
-typedef struct ptlist {
+typedef struct ptlist
+{
     struct ptlist* next;
     pthread_t thread_id;
 } ptlist_t;
 
-#endif  // INPUT_H
+#endif // INPUT_H

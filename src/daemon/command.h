@@ -4,22 +4,25 @@
 #include "includes.h"
 
 // Command operations
-typedef enum {
+typedef enum
+{
     // Special - handled by readcmd, no device functions
-    NONE        = -11,
-    DELAY       = -10,   CMD_FIRST = DELAY,
-    MODE        = -9,
-    SWITCH      = -8,
-    LAYOUT      = -7,
-    ACCEL       = -6,
+    NONE = -11,
+    DELAY = -10,
+    CMD_FIRST = DELAY,
+    MODE = -9,
+    SWITCH = -8,
+    LAYOUT = -7,
+    ACCEL = -6,
     SCROLLSPEED = -5,
-    NOTIFYON    = -4,
-    NOTIFYOFF   = -3,
-    FPS         = -2,
-    DITHER      = -1,
+    NOTIFYON = -4,
+    NOTIFYOFF = -3,
+    FPS = -2,
+    DITHER = -1,
 
     // Hardware data
-    HWLOAD      = 0,    CMD_VT_FIRST = 0,
+    HWLOAD = 0,
+    CMD_VT_FIRST = 0,
     HWSAVE,
     FWUPDATE,
     POLLRATE,
@@ -61,20 +64,22 @@ typedef enum {
 
     CMD_LAST = GET
 } cmd;
-#define CMD_COUNT       (CMD_LAST - CMD_FIRST + 2)
-#define CMD_DEV_COUNT   (CMD_LAST - CMD_VT_FIRST + 1)
+#define CMD_COUNT     (CMD_LAST - CMD_FIRST + 2)
+#define CMD_DEV_COUNT (CMD_LAST - CMD_VT_FIRST + 1)
 
 // Device command vtable. Most have a standard prototype, but a few are exceptions.
 // Not all parameters are used by all commands - they are sometimes repurposed or used as dummy arguments. See relevant headers.
-typedef void (*cmdhandler)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter);    // Normal command
-typedef int (*cmdhandler_io)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter);  // Command with hardware I/O - returns zero on success
+typedef void (*cmdhandler)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter); // Normal command
+typedef int (*cmdhandler_io)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter); // Command with hardware I/O - returns zero on success
 typedef void (*cmdhandler_mac)(usbdevice* kb, usbmode* modeidx, int notifyidx, const char* keys, const char* assignment); // Macro command has a different left-side handler
-typedef union devcmd {
+typedef union devcmd
+{
     // Commands can be accessed by name or by position
-    cmdhandler      do_cmd[CMD_DEV_COUNT];
-    cmdhandler_io   do_io[CMD_DEV_COUNT];
-    cmdhandler_mac  do_macro[CMD_DEV_COUNT];
-    struct {
+    cmdhandler do_cmd[CMD_DEV_COUNT];
+    cmdhandler_io do_io[CMD_DEV_COUNT];
+    cmdhandler_mac do_macro[CMD_DEV_COUNT];
+    struct
+    {
         // profile.h
         cmdhandler_io hwload;
         cmdhandler_io hwsave;
@@ -139,5 +144,4 @@ typedef union devcmd {
 // This function is also responsible for calling all of the cmd_ functions. They should not be invoked elsewhere.
 int readcmd(usbdevice* kb, const char* line);
 
-#endif  // COMMAND_H
-
+#endif // COMMAND_H

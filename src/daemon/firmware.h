@@ -10,4 +10,4 @@ int getfwversion(usbdevice* kb);
 // Returns 0 if the device is ok or -1 if it needs to be removed.
 int cmd_fwupdate(usbdevice* kb, usbmode* dummy1, int nnumber, int dummy2, const char* path);
 
-#endif  // FIRMWARE_H
+#endif // FIRMWARE_H

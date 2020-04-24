@@ -29,4 +29,3 @@ void cmd_lift(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
 void cmd_snap(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* enable);
 
 #endif // DPI_H
-

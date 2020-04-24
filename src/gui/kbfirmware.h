@@ -12,20 +12,23 @@ class KbFirmware : public QObject
     Q_OBJECT
 public:
     // Checks for firmware updates. Maximum of once per hour. Returns true if it actually checked or false if not.
-    static inline bool          checkUpdates()                                                          { return instance._checkUpdates(); }
+    static inline bool checkUpdates() { return instance._checkUpdates(); }
 
     // Whether or not the firmware table has been downloaded at all.
-    static inline bool          hasDownloaded()                                                         { return instance.lastFinished != 0; }
+    static inline bool hasDownloaded() { return instance.lastFinished != 0; }
 
     // Latest firmware version for a keyboard model. Will check for updates automatically and return the latest known version.
     // Zero if version unknown, -1.0 if ckb needs to be upgraded.
-    static inline float         versionForBoard(const ushort productID, bool waitForComplete = false)  { return instance._latestForBoard(productID, waitForComplete); }
+    static inline float versionForBoard(const ushort productID, bool waitForComplete = false)
+    {
+        return instance._latestForBoard(productID, waitForComplete);
+    }
 
     // Downloads and extracts the latest firmware for a keyboard. Returns an empty array on failure.
-    static inline QByteArray    dataForBoard(const ushort productID)                                   { return instance._fileForBoard(productID); }
+    static inline QByteArray dataForBoard(const ushort productID) { return instance._fileForBoard(productID); }
 
     // Network manager object to use with QtNetwork
-    QNetworkAccessManager* 	networkManager;
+    QNetworkAccessManager* networkManager;
 
 private:
     KbFirmware();
@@ -34,30 +37,36 @@ private:
     // Time initiated
     quint64 lastCheck, lastFinished;
     // Model -> firmware table
-    struct FW {
-        QString     url, fileName;
-        QByteArray  hash;
-        float       fwVersion, ckbVersion;
-        ushort       productID;
+    struct FW
+    {
+        QString url, fileName;
+        QByteArray hash;
+        float fwVersion, ckbVersion;
+        ushort productID;
         FW();
     };
-    QMap<QString, FW>   fwTable;
+    QMap<QString, FW> fwTable;
     // SHA256 of last downloaded table (redundancy check)
-    QByteArray          fwTableHash;
+    QByteArray fwTableHash;
 
     // Current FW table download (null if nothing downloading)
     QNetworkReply* tableDownload;
 
     // Can GPG be used to verify signatures?
-    enum { UNKNOWN = -1, NO, YES } hasGPG :2;
+    enum
+    {
+        UNKNOWN = -1,
+        NO,
+        YES
+    } hasGPG : 2;
 
     // Singleton instance
-    bool                _checkUpdates();
-    float               _latestForBoard(const ushort productID, bool waitForComplete);
-    QByteArray          _fileForBoard(const ushort productID);
-    static KbFirmware   instance;
+    bool _checkUpdates();
+    float _latestForBoard(const ushort productID, bool waitForComplete);
+    QByteArray _fileForBoard(const ushort productID);
+    static KbFirmware instance;
 
-    QProcess*    _gpg;
+    QProcess* _gpg;
 
 signals:
     void downloaded();

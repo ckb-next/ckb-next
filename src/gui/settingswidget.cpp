@@ -17,9 +17,7 @@ extern QString devpath;
 static QStringList modKeys, modNames;
 static bool updateRequestedByUser = false;
 
-SettingsWidget::SettingsWidget(QWidget *parent) :
-    QWidget(parent), devDetect(nullptr),
-    ui(new Ui::SettingsWidget)
+SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent), devDetect(nullptr), ui(new Ui::SettingsWidget)
 {
     ui->setupUi(this);
 
@@ -34,15 +32,29 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 
     // Load modifier remap
     KbBind::loadGlobalRemap();
-    if(modKeys.isEmpty()){
-        modKeys << "caps" << "lshift" << "lctrl" << "lalt" << "lwin";
+    if (modKeys.isEmpty())
+    {
+        modKeys << "caps"
+                << "lshift"
+                << "lctrl"
+                << "lalt"
+                << "lwin";
 #ifdef Q_OS_MACOS
-        modNames << "Caps Lock" << "Shift" << "Control (⌃)" << "Option (⌥)" << "Command (⌘)";
+        modNames << "Caps Lock"
+                 << "Shift"
+                 << "Control (⌃)"
+                 << "Option (⌥)"
+                 << "Command (⌘)";
 #else
-        modNames << "Caps Lock" << "Shift" << "Control" << "Alt" << "Super";
+        modNames << "Caps Lock"
+                 << "Shift"
+                 << "Control"
+                 << "Alt"
+                 << "Super";
 #endif
     }
-    foreach(const QString& name, modNames){
+    foreach (const QString& name, modNames)
+    {
         ui->capsBox->addItem(name);
         ui->shiftBox->addItem(name);
         ui->ctrlBox->addItem(name);
@@ -51,22 +63,23 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     }
 
     int idx = modKeys.indexOf(KbBind::globalRemap("caps"));
-    if(idx >= 0)
+    if (idx >= 0)
         ui->capsBox->setCurrentIndex(idx);
     idx = modKeys.indexOf(KbBind::globalRemap("lshift"));
-    if(idx >= 0)
+    if (idx >= 0)
         ui->shiftBox->setCurrentIndex(idx);
     idx = modKeys.indexOf(KbBind::globalRemap("lctrl"));
-    if(idx >= 0)
+    if (idx >= 0)
         ui->ctrlBox->setCurrentIndex(idx);
     idx = modKeys.indexOf(KbBind::globalRemap("lwin"));
-    if(idx >= 0)
+    if (idx >= 0)
         ui->winBox->setCurrentIndex(idx);
     idx = modKeys.indexOf(KbBind::globalRemap("lalt"));
-    if(idx >= 0)
+    if (idx >= 0)
         ui->altBox->setCurrentIndex(idx);
 #ifdef Q_OS_MACOS
-    if(settings.value("osxCmdSwap").toBool()){
+    if (settings.value("osxCmdSwap").toBool())
+    {
         // ckb <0.0.41
         settings.remove("osxCmdSwap");
         ui->ctrlBox->setCurrentIndex(modKeys.indexOf("lwin"));
@@ -79,10 +92,11 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     ui->autoFWBox->setChecked(!settings.value("DisableAutoFWCheck").toBool());
 
     // Read auto run settings
-    if(!AutoRun::available())
+    if (!AutoRun::available())
         ui->loginItemBox->hide();
-    else {
-        if(!AutoRun::once())
+    else
+    {
+        if (!AutoRun::once())
             // If this is the first time running the app, enable auto run by default
             AutoRun::enable();
         ui->loginItemBox->setChecked(AutoRun::isEnabled());
@@ -91,7 +105,8 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 #ifndef OS_MAC_LEGACY
 #ifdef Q_OS_MACOS
     QString labelText = ui->label_2->text();
-    labelText.append(tr("<br/>Special thanks to <a href=\"https://github.com/tekezo\" style=\"text-decoration:none;\">tekezo</a> for <a href=\"https://github.com/tekezo/Karabiner-VirtualHIDDevice\" style=\"text-decoration:none;\">VirtualHIDDevice</a>."));
+    labelText.append(tr("<br/>Special thanks to <a href=\"https://github.com/tekezo\" style=\"text-decoration:none;\">tekezo</a> for <a "
+                        "href=\"https://github.com/tekezo/Karabiner-VirtualHIDDevice\" style=\"text-decoration:none;\">VirtualHIDDevice</a>."));
     ui->label_2->setText(labelText);
 #endif
 #endif
@@ -110,29 +125,35 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
 #endif
 }
 
-SettingsWidget::~SettingsWidget(){
+SettingsWidget::~SettingsWidget()
+{
     delete ui;
 }
 
-void SettingsWidget::pollUpdates(){
+void SettingsWidget::pollUpdates()
+{
     extra->pollUpdates();
 }
 
-void SettingsWidget::setStatus(const QString& text){
+void SettingsWidget::setStatus(const QString& text)
+{
     ui->devicesLabel->setText(text);
 }
 
-void SettingsWidget::setVersion(const QString& version){
+void SettingsWidget::setVersion(const QString& version)
+{
     ui->versionLabel->setText(version);
 }
 
-static inline QString right(const QString& left){
-    if(left[0] != 'l')
+static inline QString right(const QString& left)
+{
+    if (left[0] != 'l')
         return left;
     return "r" + left.mid(1);
 }
 
-void SettingsWidget::updateModifiers(){
+void SettingsWidget::updateModifiers()
+{
     QHash<QString, QString> newMods;
     newMods["caps"] = modKeys[ui->capsBox->currentIndex()];
     newMods["lshift"] = modKeys[ui->shiftBox->currentIndex()];
@@ -147,52 +168,63 @@ void SettingsWidget::updateModifiers(){
     KbBind::saveGlobalRemap();
 }
 
-void SettingsWidget::on_pushButton_clicked(){
+void SettingsWidget::on_pushButton_clicked()
+{
     qApp->quit();
 }
 
-void SettingsWidget::on_capsBox_activated(int index){
+void SettingsWidget::on_capsBox_activated(int index)
+{
     updateModifiers();
 }
 
-void SettingsWidget::on_shiftBox_activated(int index){
+void SettingsWidget::on_shiftBox_activated(int index)
+{
     updateModifiers();
 }
 
-void SettingsWidget::on_ctrlBox_activated(int index){
+void SettingsWidget::on_ctrlBox_activated(int index)
+{
     updateModifiers();
 }
 
-void SettingsWidget::on_altBox_activated(int index){
+void SettingsWidget::on_altBox_activated(int index)
+{
     updateModifiers();
 }
 
-void SettingsWidget::on_winBox_activated(int index){
+void SettingsWidget::on_winBox_activated(int index)
+{
     updateModifiers();
 }
 
-void SettingsWidget::on_autoFWBox_clicked(bool checked){
+void SettingsWidget::on_autoFWBox_clicked(bool checked)
+{
     CkbSettings::set("Program/DisableAutoFWCheck", !checked);
 }
 
-void SettingsWidget::on_loginItemBox_clicked(bool checked){
-    if(checked)
+void SettingsWidget::on_loginItemBox_clicked(bool checked)
+{
+    if (checked)
         AutoRun::enable();
     else
         AutoRun::disable();
 }
 
-void SettingsWidget::on_aboutQt_clicked(){
+void SettingsWidget::on_aboutQt_clicked()
+{
     QMessageBox::aboutQt(this);
 }
 
-void SettingsWidget::on_generateReportButton_clicked(){
+void SettingsWidget::on_generateReportButton_clicked()
+{
     // Don't allow the script to run twice
-    if(devDetect)
+    if (devDetect)
         return;
 
-    QMessageBox::information(this, tr("Generate report"), tr("This will collect software logs, as well as information about the Corsair devices in your system.\n\n"
-                                                             "Make sure they are plugged in and click OK."));
+    QMessageBox::information(this, tr("Generate report"),
+                             tr("This will collect software logs, as well as information about the Corsair devices in your system.\n\n"
+                                "Make sure they are plugged in and click OK."));
     devDetect = new QProcess();
     connect(devDetect, SIGNAL(finished(int)), this, SLOT(devDetectFinished(int)));
     connect(devDetect, &QProcess::destroyed, this, &SettingsWidget::devDetectDestroyed);
@@ -204,16 +236,20 @@ void SettingsWidget::on_generateReportButton_clicked(){
     devDetect->start(devDetectPath, QStringList() << "--nouserinput");
 
     // Check if it was started successfully
-    if(!devDetect->waitForStarted()){
-        QMessageBox::critical(this, tr("Error executing ckb-next-dev-detect"), tr("An error occurred while trying to execute ckb-next-dev-detect.\n"
-                                                                                  "File not found or not executable."));
+    if (!devDetect->waitForStarted())
+    {
+        QMessageBox::critical(this, tr("Error executing ckb-next-dev-detect"),
+                              tr("An error occurred while trying to execute ckb-next-dev-detect.\n"
+                                 "File not found or not executable."));
         devDetect->deleteLater();
     }
 }
 
-void SettingsWidget::devDetectFinished(int retVal){
+void SettingsWidget::devDetectFinished(int retVal)
+{
     QFile report("/tmp/ckb-next-dev-detect-report.gz");
-    if(retVal || !report.exists()){
+    if (retVal || !report.exists())
+    {
         QString errMsg(tr("An error occurred while trying to execute ckb-next-dev-detect.\n\n"));
         errMsg.append(devDetect->readAllStandardError());
         errMsg.append("\n");
@@ -224,25 +260,29 @@ void SettingsWidget::devDetectFinished(int retVal){
     }
 
     QString newdir = QFileDialog::getExistingDirectory(this, tr("Select output directory"));
-    QString newfile(newdir + "/ckb-next-report-" + QString::number(QDateTime::currentMSecsSinceEpoch()/1000) + ".gz");
-    if(report.copy(newfile)){
+    QString newfile(newdir + "/ckb-next-report-" + QString::number(QDateTime::currentMSecsSinceEpoch() / 1000) + ".gz");
+    if (report.copy(newfile))
+    {
         QMessageBox::information(this, tr("Report generated successfully"), tr("The report has been generated successfully."));
         // Try to show the newly generated file
 #if defined(Q_OS_LINUX)
-        if(QProcess::execute("sh", QStringList() << "-c" << "gtk-launch `xdg-mime query default inode/directory` '" + newfile + "'"))
+        if (QProcess::execute("sh", QStringList() << "-c"
+                                                  << "gtk-launch `xdg-mime query default inode/directory` '" + newfile + "'"))
             QProcess::execute("xdg-open", QStringList() << newdir);
 #elif defined(Q_OS_MACOS)
         QProcess::execute("open", QStringList() << "-R" << newfile);
 #endif
     }
     else
-        QMessageBox::critical(this, tr("Error writing report"), tr("Could not write report to the selected directory.\n"
-                                                                   "Please pick a different one and try again."));
+        QMessageBox::critical(this, tr("Error writing report"),
+                              tr("Could not write report to the selected directory.\n"
+                                 "Please pick a different one and try again."));
     report.remove();
     devDetect->deleteLater();
 }
 
-void SettingsWidget::devDetectDestroyed(){
+void SettingsWidget::devDetectDestroyed()
+{
     devDetect = nullptr;
 }
 
@@ -259,12 +299,15 @@ void SettingsWidget::on_pushButton_2_clicked()
     updateRequestedByUser = true;
 }
 
-void SettingsWidget::enableUpdateButton(){
+void SettingsWidget::enableUpdateButton()
+{
     ui->pushButton_2->setEnabled(true);
 }
 
-void SettingsWidget::setUpdateButtonText(QString text){
-    if(updateRequestedByUser) {
+void SettingsWidget::setUpdateButtonText(QString text)
+{
+    if (updateRequestedByUser)
+    {
         ui->pushButton_2->setText(text);
         updateRequestedByUser = false;
     }
@@ -273,12 +316,17 @@ void SettingsWidget::setUpdateButtonText(QString text){
 void SettingsWidget::on_uninstallButton_clicked()
 {
 #ifdef Q_OS_MACOS
-    if(QMessageBox::warning(this, tr("Uninstall ckb-next"), tr("WARNING: Clicking OK will uninstall ckb-next and any older versions of the software from your system.\n\n"
-                                                             "Your settings and lighting profiles will be preserved."), QMessageBox::Cancel, QMessageBox::Ok) != QMessageBox::Ok)
+    if (QMessageBox::warning(this, tr("Uninstall ckb-next"),
+                             tr("WARNING: Clicking OK will uninstall ckb-next and any older versions of the software from your system.\n\n"
+                                "Your settings and lighting profiles will be preserved."),
+                             QMessageBox::Cancel, QMessageBox::Ok)
+        != QMessageBox::Ok)
         return;
 
     // Open a terminal and run the uninstall script
-    QProcess::execute("open", QStringList() << "-a" << "Terminal" << "/Applications/ckb-next.app/Contents/Resources/uninstall.sh");
+    QProcess::execute("open", QStringList() << "-a"
+                                            << "Terminal"
+                                            << "/Applications/ckb-next.app/Contents/Resources/uninstall.sh");
 #endif
 }
 

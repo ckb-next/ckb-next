@@ -318,8 +318,9 @@ static const short hid_codes[256] = {
 /// Legacy Keyboard | IS_LEGACY && !IS_MOUSE | nA | nA | hid_kb_translate()
 ///
 
-void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep){
-    if(!urblen)
+void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep)
+{
+    if (!urblen)
         return;
 
     usbdevice* kb = context;
@@ -331,48 +332,61 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     // Get first byte of the response
     uchar firstbyte = buffer[0];
     // If the response starts with CMD_GET (0x0e), that means it needs to go to os_usbrecv()
-    if(urblen == MSG_SIZE && firstbyte == CMD_GET){
+    if (urblen == MSG_SIZE && firstbyte == CMD_GET)
+    {
         int retval = pthread_mutex_lock(intmutex(kb));
-        if(retval)
+        if (retval)
             ckb_fatal("Error locking interrupt mutex %i\n", retval);
         memcpy(kb->interruptbuf, buffer, MSG_SIZE);
         // signal os_usbrecv() that the data is ready.
         retval = pthread_cond_broadcast(intcond(kb));
-        if(retval)
+        if (retval)
             ckb_fatal("Error broadcasting pthread cond %i\n", retval);
         retval = pthread_mutex_unlock(intmutex(kb));
-        if(retval)
+        if (retval)
             ckb_fatal("Error unlocking interrupt mutex %i\n", retval);
-    } else {
+    }
+    else
+    {
         pthread_mutex_lock(imutex(kb));
-        if(IS_LEGACY_DEV(kb)) {
-            if(IS_MOUSE_DEV(kb))
+        if (IS_LEGACY_DEV(kb))
+        {
+            if (IS_MOUSE_DEV(kb))
                 m95_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
             else
                 hid_kb_translate(kb->input.keys, urblen, buffer, 1);
-        } else {
-            if(IS_MOUSE_DEV(kb)) {
+        }
+        else
+        {
+            if (IS_MOUSE_DEV(kb))
+            {
                 // HID Mouse Input
-                if(firstbyte == MOUSE_IN)
+                if (firstbyte == MOUSE_IN)
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
                 // Corsair Mouse Input
-                else if(firstbyte == CORSAIR_IN)
+                else if (firstbyte == CORSAIR_IN)
                     corsair_mousecopy(kb->input.keys, buffer);
-                else if(firstbyte == 0x05 && urblen == 21) // Seems to be on the Ironclaw RGB only
+                else if (firstbyte == 0x05 && urblen == 21) // Seems to be on the Ironclaw RGB only
                     corsair_extended_mousecopy(kb->input.keys, buffer);
                 else
                     ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x\n", firstbyte, ep);
-            } else {
+            }
+            else
+            {
                 // Assume Keyboard for everything else for now
                 // Accept NKRO only if device is active
-                if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
-                    if(!kb->active)
+                if (firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN)
+                {
+                    if (!kb->active)
                         hid_kb_translate(kb->input.keys, urblen, buffer, 0);
-                } else if(urblen == MSG_SIZE) {
-                    if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
+                }
+                else if (urblen == MSG_SIZE)
+                {
+                    if ((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
                         buffer++;
                     corsair_kbcopy(kb->input.keys, buffer);
-                } else
+                }
+                else
                     ckb_err("Unknown data received in input thread %02x from endpoint %02x\n", firstbyte, ep);
             }
         }
@@ -383,83 +397,97 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     }
 }
 
-void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length, int legacy){
+void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length, int legacy)
+{
     int start = !legacy; // Legacy packets start from 0x00, other ones start from 0x01
-    for(int bit = 0; bit < 8; bit++){
-        if((urbinput[start] >> bit) & 1)
+    for (int bit = 0; bit < 8; bit++)
+    {
+        if ((urbinput[start] >> bit) & 1)
             SET_KEYBIT(kbinput, hid_codes[bit + 224]);
         else
             CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
     }
 
     int bytelen = (legacy ? 14 : 19);
-    for(int byte = 0; byte < bytelen; byte++){
+    for (int byte = 0; byte < bytelen; byte++)
+    {
         char input = urbinput[start + byte + 1];
-        for(int bit = 0; bit < 8; bit++){
+        for (int bit = 0; bit < 8; bit++)
+        {
             int keybit = byte * 8 + bit;
             int scan = hid_codes[keybit];
-            if((input >> bit) & 1){
-                if(scan >= 0)
+            if ((input >> bit) & 1)
+            {
+                if (scan >= 0)
                     SET_KEYBIT(kbinput, hid_codes[keybit]);
                 else
                     ckb_warn("Got unknown NKRO key press %d\n", keybit);
-            } else if(scan >= 0)
+            }
+            else if (scan >= 0)
                 CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
         }
     }
 }
 
-void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinput, int length){
+void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinput, int length)
+{
     // Media keys
-    CLEAR_KEYBIT(kbinput, 97);          // mute
-    CLEAR_KEYBIT(kbinput, 98);          // stop
-    CLEAR_KEYBIT(kbinput, 99);          // prev
-    CLEAR_KEYBIT(kbinput, 100);         // play
-    CLEAR_KEYBIT(kbinput, 101);         // next
-    CLEAR_KEYBIT(kbinput, 130);         // volup
-    CLEAR_KEYBIT(kbinput, 131);         // voldn
-    for(int i = 0; i < length; i++){
-        switch(urbinput[i]){
-        case 181:
-            SET_KEYBIT(kbinput, 101);   // next
-            break;
-        case 182:
-            SET_KEYBIT(kbinput, 99);    // prev
-            break;
-        case 183:
-            SET_KEYBIT(kbinput, 98);    // stop
-            break;
-        case 205:
-            SET_KEYBIT(kbinput, 100);   // play
-            break;
-        case 226:
-            SET_KEYBIT(kbinput, 97);    // mute
-            break;
-        case 233:
-            SET_KEYBIT(kbinput, 130);   // volup
-            break;
-        case 234:
-            SET_KEYBIT(kbinput, 131);   // voldn
-            break;
+    CLEAR_KEYBIT(kbinput, 97);  // mute
+    CLEAR_KEYBIT(kbinput, 98);  // stop
+    CLEAR_KEYBIT(kbinput, 99);  // prev
+    CLEAR_KEYBIT(kbinput, 100); // play
+    CLEAR_KEYBIT(kbinput, 101); // next
+    CLEAR_KEYBIT(kbinput, 130); // volup
+    CLEAR_KEYBIT(kbinput, 131); // voldn
+    for (int i = 0; i < length; i++)
+    {
+        switch (urbinput[i])
+        {
+            case 181:
+                SET_KEYBIT(kbinput, 101); // next
+                break;
+            case 182:
+                SET_KEYBIT(kbinput, 99); // prev
+                break;
+            case 183:
+                SET_KEYBIT(kbinput, 98); // stop
+                break;
+            case 205:
+                SET_KEYBIT(kbinput, 100); // play
+                break;
+            case 226:
+                SET_KEYBIT(kbinput, 97); // mute
+                break;
+            case 233:
+                SET_KEYBIT(kbinput, 130); // volup
+                break;
+            case 234:
+                SET_KEYBIT(kbinput, 131); // voldn
+                break;
         }
     }
 }
 
-void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
+void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbinput, int length)
+{
     // Clear previous input
-    for(int i = 0; i < 256; i++){
-        if(hid_codes[i] >= 0)
+    for (int i = 0; i < 256; i++)
+    {
+        if (hid_codes[i] >= 0)
             CLEAR_KEYBIT(kbinput, hid_codes[i]);
     }
     // Set new input
-    for(int i = 0; i < 8; i++){
-        if((urbinput[0] >> i) & 1)
+    for (int i = 0; i < 8; i++)
+    {
+        if ((urbinput[0] >> i) & 1)
             SET_KEYBIT(kbinput, hid_codes[i + 224]);
     }
-    for(int i = 2; i < length; i++){
-        if(urbinput[i] > 3){
+    for (int i = 2; i < length; i++)
+    {
+        if (urbinput[i] > 3)
+        {
             int scan = hid_codes[urbinput[i]];
-            if(scan >= 0)
+            if (scan >= 0)
                 SET_KEYBIT(kbinput, scan);
             else
                 ckb_warn("Got unknown legacy 6kro key press %d\n", urbinput[i]);
@@ -467,9 +495,12 @@ void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbin
     }
 }
 
-void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy){
-    if(legacy) {
-        switch(length) {
+void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy)
+{
+    if (legacy)
+    {
+        switch (length)
+        {
             case 2: // K65 Media keys
                 length = 1;
                 // fall through
@@ -485,8 +516,11 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
             default:
                 ckb_warn("Got unknown legacy data\n");
         }
-    } else {
-        switch(urbinput[0]) {
+    }
+    else
+    {
+        switch (urbinput[0])
+        {
             case 0x01:
                 handle_nkro_key_input(kbinput, urbinput, length, legacy);
                 break;
@@ -499,12 +533,14 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
     }
 }
 
-#define BUTTON_HID_COUNT    5
+#define BUTTON_HID_COUNT 5
 
-void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
+void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput)
+{
     // Byte 1 = mouse buttons (bitfield)
-    for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
-        if(urbinput[1] & (1 << bit))
+    for (int bit = 0; bit < BUTTON_HID_COUNT; bit++)
+    {
+        if (urbinput[1] & (1 << bit))
             SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
         else
             CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
@@ -514,55 +550,61 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     *yaxis += (urbinput[8] << 8) | urbinput[7];
     // Byte 9: wheel
     char wheel = urbinput[9];
-    if(wheel > 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);         // wheelup
+    if (wheel > 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST); // wheelup
     else
         CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
-    if(wheel < 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);     // wheeldn
+    if (wheel < 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1); // wheeldn
     else
         CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
 }
 
-void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput){
+void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput)
+{
     memcpy(kbinput, urbinput, N_KEYBYTES_HW);
 }
 
-void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
+void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput)
+{
     urbinput++;
-    for(int bit = BUTTON_HID_COUNT; bit < N_BUTTONS_HW; bit++){
+    for (int bit = BUTTON_HID_COUNT; bit < N_BUTTONS_HW; bit++)
+    {
         int byte = bit / 8;
         uchar test = 1 << (bit % 8);
-        if(urbinput[byte] & test)
+        if (urbinput[byte] & test)
             SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
         else
             CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
     }
 }
 
-void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
+void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput)
+{
     // This handles the ironclaw 0x05 packets.
     // So far only two possible values exist. In the future this may need to be rewritten
     // in a similar fashion as corsair_mousecopy but we currently do not have enough data to do so.
 
-    if(urbinput[6] & 0b01)
+    if (urbinput[6] & 0b01)
         SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 4);
     else
         CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 4);
 
-    if(urbinput[6] & 0b10)
+    if (urbinput[6] & 0b10)
         SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 3);
     else
         CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 3);
 }
 
-void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
-    if(length != 7)
+void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput)
+{
+    if (length != 7)
         return;
     unsigned short input = (((unsigned short)urbinput[1]) << 8) | urbinput[0];
-    for(int bit = 0; bit < 16; bit++){
+    for (int bit = 0; bit < 16; bit++)
+    {
         unsigned char current_bit = (input >> bit) & 1;
-        if(current_bit)
+        if (current_bit)
             SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
         else
             CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
@@ -572,11 +614,11 @@ void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     *yaxis += (urbinput[5] << 8) | urbinput[4];
 
     char wheel = urbinput[6];
-    if(wheel > 0)
+    if (wheel > 0)
         SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
     else
         CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
-    if(wheel < 0)
+    if (wheel < 0)
         SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
     else
         CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);

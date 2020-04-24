@@ -6,8 +6,9 @@
 
 // Dialog box that allows selection of modes
 
-namespace Ui {
-class ModeSelectDialog;
+namespace Ui
+{
+    class ModeSelectDialog;
 }
 
 class ModeSelectDialog : public QDialog
@@ -27,7 +28,7 @@ private slots:
     void on_selNoneButton_clicked();
 
 private:
-    Ui::ModeSelectDialog *ui;
+    Ui::ModeSelectDialog* ui;
     QList<KbMode*> _modeList;
 };
 

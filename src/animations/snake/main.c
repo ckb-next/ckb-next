@@ -3,7 +3,8 @@
 #include <time.h>
 #include <string.h>
 
-int compare_key_y(const void* a, const void* b){
+int compare_key_y(const void* a, const void* b)
+{
     ckb_key* key_a = *(ckb_key**)a;
     ckb_key* key_b = *(ckb_key**)b;
 
@@ -20,7 +21,8 @@ int compare_key_y(const void* a, const void* b){
     return 0;
 }
 
-void ckb_info(){
+void ckb_info()
+{
     // Plugin info
     CKB_NAME("Snake");
     CKB_VERSION("0.9");
@@ -57,7 +59,8 @@ ckb_key** snake_keys = 0;
 
 double timer = 0;
 double timer_tick = 0.0;
-void ckb_init(ckb_runctx* context){
+void ckb_init(ckb_runctx* context)
+{
     // Set  the timer to 1.1 (> max timer_tick) initially so that the first frame gets sent immediately
     timer = 1.1;
 
@@ -66,36 +69,37 @@ void ckb_init(ckb_runctx* context){
 
     // Allocate the array and copy the pointers to it. * 2 for the reverse sequence
     snake_keys = malloc(sizeof(ckb_key*) * context->keycount * 2);
-    for(unsigned i = 0; i < context->keycount; i++)
+    for (unsigned i = 0; i < context->keycount; i++)
         snake_keys[i] = context->keys + i;
 
     // Sort the first part of the array accordingly
     qsort(snake_keys, context->keycount, sizeof(ckb_key*), compare_key_y);
 
     // Mirror the first part to the second half
-    for(unsigned i = 0; i < context->keycount; i++)
+    for (unsigned i = 0; i < context->keycount; i++)
         snake_keys[context->keycount + i] = snake_keys[context->keycount - i - 1];
 }
 
-void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
-    CKB_PARSE_ARGB("firstcol", &s_a, &s_r, &s_g, &s_b){}
-    CKB_PARSE_ARGB("secondcol", &e_a, &e_r, &e_g, &e_b){}
+void ckb_parameter(ckb_runctx* context, const char* name, const char* value)
+{
+    CKB_PARSE_ARGB("firstcol", &s_a, &s_r, &s_g, &s_b) {}
+    CKB_PARSE_ARGB("secondcol", &e_a, &e_r, &e_g, &e_b) {}
 }
 
-void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
-}
+void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state) {}
 
-void ckb_start(ckb_runctx* context, int state){
-}
+void ckb_start(ckb_runctx* context, int state) {}
 
-void ckb_time(ckb_runctx* context, double delta){
+void ckb_time(ckb_runctx* context, double delta)
+{
     timer += delta;
 }
 
 unsigned int pos = 0;
-int ckb_frame(ckb_runctx* context){
+int ckb_frame(ckb_runctx* context)
+{
     // Don't calculate a new frame unless we need to udpate it
-    if(timer < timer_tick)
+    if (timer < timer_tick)
         return 0;
     timer = 0.0;
 
@@ -104,12 +108,15 @@ int ckb_frame(ckb_runctx* context){
     unsigned count = context->keycount;
 
     // Pick the appropriate colour
-    if(pos > count - 1){
+    if (pos > count - 1)
+    {
         snake_keys[pos]->a = e_a;
         snake_keys[pos]->r = e_r;
         snake_keys[pos]->g = e_g;
         snake_keys[pos]->b = e_b;
-    } else {
+    }
+    else
+    {
         snake_keys[pos]->a = s_a;
         snake_keys[pos]->r = s_r;
         snake_keys[pos]->g = s_g;
@@ -118,7 +125,7 @@ int ckb_frame(ckb_runctx* context){
 
     // Increment the key position
     pos++;
-    if(pos > count * 2 - 1)
+    if (pos > count * 2 - 1)
         pos = 0;
 
     return 0;

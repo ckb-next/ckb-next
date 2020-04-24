@@ -10,74 +10,80 @@
 
 QHash<QUuid, AnimScript*> AnimScript::scripts;
 
-AnimScript::AnimScript(QObject* parent, const QString& path) :
-    QObject(parent), _path(path), initialized(false), process(0)
-{
-}
+AnimScript::AnimScript(QObject* parent, const QString& path) : QObject(parent), _path(path), initialized(false), process(0) {}
 
-AnimScript::AnimScript(QObject* parent, const AnimScript& base) :
-    QObject(parent), _info(base._info), _path(base._path), initialized(false), process(0)
-{
-}
+AnimScript::AnimScript(QObject* parent, const AnimScript& base)
+    : QObject(parent), _info(base._info), _path(base._path), initialized(false), process(0)
+{}
 
-AnimScript::~AnimScript(){
-    if(process){
+AnimScript::~AnimScript()
+{
+    if (process)
+    {
         process->kill();
         process->waitForFinished(1000);
         delete process;
     }
 }
 
-QStringList AnimScript::paths(){
+QStringList AnimScript::paths()
+{
     QStringList list(CKB_NEXT_ANIMATIONS_PATH);
     // Path for when running the GUI from the build dir
 #ifdef Q_OS_LINUX
-    QString appDirPath =  QCoreApplication::applicationDirPath();
-    if(!appDirPath.startsWith("/usr"))
+    QString appDirPath = QCoreApplication::applicationDirPath();
+    if (!appDirPath.startsWith("/usr"))
         list << appDirPath;
 #endif
     list << QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation).append("/ckb-next/animations"));
     return list;
 }
 
-void AnimScript::scan(){
+void AnimScript::scan()
+{
     // Clear old animations
-    foreach(AnimScript* script, scripts)
+    foreach (AnimScript* script, scripts)
         delete script;
     scripts.clear();
 
     // Search for animations in all directories, in reverse
     // This is done so that the user animation dir takes priority over the system one
-    for(int i = paths().length() - 1; i >= 0; i--){
+    for (int i = paths().length() - 1; i >= 0; i--)
+    {
         QDir dir(paths().at(i));
 
-        if(!dir.exists())
+        if (!dir.exists())
             continue;
 
-        foreach(QString file, dir.entryList(QDir::Files | QDir::Executable)){
+        foreach (QString file, dir.entryList(QDir::Files | QDir::Executable))
+        {
 #ifdef Q_OS_LINUX
             // Ignore the GUI and daemon binaries if loading animations from the build dir
-            if(file.endsWith("ckb-next") || file.endsWith("ckb-next-daemon"))
+            if (file.endsWith("ckb-next") || file.endsWith("ckb-next-daemon"))
                 continue;
 #endif
             AnimScript* script = new AnimScript(qApp, dir.absoluteFilePath(file));
-            if(script->load() && !scripts.contains(script->_info.guid) && script->presets().count()){
+            if (script->load() && !scripts.contains(script->_info.guid) && script->presets().count())
+            {
                 scripts[script->_info.guid] = script;
                 continue;
             }
-            if(!script->presets().count())
+            if (!script->presets().count())
                 qWarning() << script->name() << "has no default preset and will not be loaded.";
             delete script;
         }
     }
 }
 
-QList<const AnimScript*> AnimScript::list(){
+QList<const AnimScript*> AnimScript::list()
+{
     // Gather the animations into an alphabetically-sorted list
     QMap<QString, const AnimScript*> result;
-    foreach(AnimScript* script, scripts.values()){
+    foreach (AnimScript* script, scripts.values())
+    {
         QString name = script->name();
-        if(result.contains(name)){
+        if (result.contains(name))
+        {
             // If duplicate names exist, make them unique by including their GUIDs
             AnimScript* last = (AnimScript*)result[name];
             last->_info.name += " " + last->guid().toString().toUpper();
@@ -88,23 +94,27 @@ QList<const AnimScript*> AnimScript::list(){
     return result.values();
 }
 
-AnimScript* AnimScript::copy(QObject* parent, const QUuid& id){
-     return scripts.contains(id) ? new AnimScript(parent, *scripts.value(id)) : 0;
+AnimScript* AnimScript::copy(QObject* parent, const QUuid& id)
+{
+    return scripts.contains(id) ? new AnimScript(parent, *scripts.value(id)) : 0;
 }
 
-inline QString urlParam(const QString& param){
+inline QString urlParam(const QString& param)
+{
     return QUrl::fromPercentEncoding(param.trimmed().toLatin1()).trimmed();
 }
 
 const static double ONE_DAY = 24. * 60. * 60.;
 
-bool AnimScript::load(){
+bool AnimScript::load()
+{
     // Run the process to get script info
     QProcess infoProcess;
     infoProcess.start(_path, QStringList("--ckb-info"));
     qDebug() << "Scanning" << _path;
     infoProcess.waitForFinished(1000);
-    if(infoProcess.state() == QProcess::Running){
+    if (infoProcess.state() == QProcess::Running)
+    {
         // Kill the process if it takes more than 1s
         infoProcess.kill();
         return false;
@@ -115,95 +125,101 @@ bool AnimScript::load(){
     _info.repeat = true;
     // Read output
     QString line;
-    while((line = infoProcess.readLine()) != ""){
+    while ((line = infoProcess.readLine()) != "")
+    {
         line = line.trimmed();
         QStringList components = line.split(" ");
         int count = components.count();
-        if(count < 2)
+        if (count < 2)
             continue;
         QString param = components[0].trimmed();
-        if(param == "guid")
+        if (param == "guid")
             _info.guid = QUuid(urlParam(components[1]));
-        else if(param == "name")
+        else if (param == "name")
             _info.name = urlParam(components[1]);
-        else if(param == "version")
+        else if (param == "version")
             _info.version = urlParam(components[1]);
-        else if(param == "year")
+        else if (param == "year")
             _info.year = urlParam(components[1]);
-        else if(param == "author")
+        else if (param == "author")
             _info.author = urlParam(components[1]);
-        else if(param == "license")
+        else if (param == "license")
             _info.license = urlParam(components[1]);
-        else if(param == "description")
+        else if (param == "description")
             _info.description = urlParam(components[1]);
-        else if(param == "kpmode")
+        else if (param == "kpmode")
             _info.kpMode = (components[1] == "position") ? KP_POSITION : (components[1] == "name") ? KP_NAME : KP_NONE;
-        else if(param == "time")
+        else if (param == "time")
             _info.absoluteTime = (components[1] == "absolute");
-        else if(param == "repeat")
+        else if (param == "repeat")
             _info.repeat = (components[1] == "on");
-        else if(param == "preempt")
+        else if (param == "preempt")
             _info.preempt = (components[1] == "on");
-        else if(param == "parammode")
+        else if (param == "parammode")
             _info.liveParams = (components[1] == "live");
-        else if(param == "param"){
+        else if (param == "param")
+        {
             // Read parameter
-            if(count < 3)
+            if (count < 3)
                 continue;
-            while(components.count() < 8)
+            while (components.count() < 8)
                 components.append("");
             Param::Type type = Param::INVALID;
             QString sType = components[1].toLower();
-            if(sType == "long")
+            if (sType == "long")
                 type = Param::LONG;
-            else if(sType == "double")
+            else if (sType == "double")
                 type = Param::DOUBLE;
-            else if(sType == "bool")
+            else if (sType == "bool")
                 type = Param::BOOL;
-            else if(sType == "rgb")
+            else if (sType == "rgb")
                 type = Param::RGB;
-            else if(sType == "argb")
+            else if (sType == "argb")
                 type = Param::ARGB;
-            else if(sType == "gradient")
+            else if (sType == "gradient")
                 type = Param::GRADIENT;
-            else if(sType == "agradient")
+            else if (sType == "agradient")
                 type = Param::AGRADIENT;
-            else if(sType == "angle")
+            else if (sType == "angle")
                 type = Param::ANGLE;
-            else if(sType == "string")
+            else if (sType == "string")
                 type = Param::STRING;
-            else if(sType == "label")
+            else if (sType == "label")
                 type = Param::LABEL;
             else
                 continue;
             // "param <type> <name> <prefix> <postfix> <default>"
             QString name = components[2].toLower();
             // Make sure it's not present already
-            if(hasParam(name))
+            if (hasParam(name))
                 continue;
             QString prefix = urlParam(components[3]), postfix = urlParam(components[4]);
             QVariant def = urlParam(components[5]), minimum = urlParam(components[6]), maximum = urlParam(components[7]);
             // Don't allow predefined params
-            if(name == "trigger" || name == "kptrigger" || name == "kpmode" || name == "duration" || name == "delay" || name == "kpdelay" || name == "repeat" || name == "kprepeat" || name == "stop" || name == "kpstop" || name == "kpmodestop" || name == "kprelease")
+            if (name == "trigger" || name == "kptrigger" || name == "kpmode" || name == "duration" || name == "delay" || name == "kpdelay" || name == "repeat" || name == "kprepeat" || name == "stop" || name == "kpstop" || name == "kpmodestop" || name == "kprelease")
                 continue;
             Param param = { type, name, prefix, postfix, def, minimum, maximum };
             _info.params.append(param);
-        } else if(param == "preset"){
+        }
+        else if (param == "preset")
+        {
             // Add preset
             QString name = urlParam(components.at(1));
             QMap<QString, QVariant> preset;
-            for(int i = 2; i < count; i++){
+            for (int i = 2; i < count; i++)
+            {
                 // Scan name/value setting pairs
                 QString setting = components.at(i);
                 QStringList sComponents = setting.split("=");
-                if(sComponents.count() != 2)
+                if (sComponents.count() != 2)
                     continue;
                 QString param = sComponents.first().trimmed();
                 QString value = urlParam(sComponents.last());
                 preset[param] = value;
             }
             // If the preset contains a duration, set the repeat time to the same value
-            if(preset.contains("duration")){
+            if (preset.contains("duration"))
+            {
                 QVariant duration = preset.value("duration");
                 preset["repeat"] = duration;
                 preset["kprepeat"] = duration;
@@ -213,11 +229,12 @@ bool AnimScript::load(){
         }
     }
     // Make sure the required parameters are filled out
-    if(_info.guid.isNull() || _info.name == "" || _info.version == "" || _info.year == "" || _info.author == "" || _info.license == "")
+    if (_info.guid.isNull() || _info.name == "" || _info.version == "" || _info.year == "" || _info.author == "" || _info.license == "")
         return false;
     // Add timing parameters
     double defaultDuration = -1.;
-    if(!_info.absoluteTime){
+    if (!_info.absoluteTime)
+    {
         defaultDuration = 1.;
         Param duration = { Param::DOUBLE, "duration", "", "", defaultDuration, 0.1, ONE_DAY };
         _info.params.append(duration);
@@ -226,10 +243,10 @@ bool AnimScript::load(){
     _info.params.append(trigger);
     Param kptrigger = { Param::BOOL, "kptrigger", "", "", false, 0, 0 };
     _info.params.append(kptrigger);
-    if(_info.absoluteTime || !_info.repeat)
+    if (_info.absoluteTime || !_info.repeat)
         _info.preempt = false;
     Param kpmode = { Param::LONG, "kpmode", "", "", 1, 0, 0 };
-    if(_info.kpMode)
+    if (_info.kpMode)
         kpmode.defaultValue = 0;
     _info.params.append(kpmode);
     Param delay = { Param::DOUBLE, "delay", "", "", 0., 0., ONE_DAY };
@@ -240,7 +257,8 @@ bool AnimScript::load(){
     Param kprelease = { Param::BOOL, "kprelease", "", "", false, 0, 0 };
     _info.params.append(kpmodestop);
     _info.params.append(kprelease);
-    if(_info.repeat){
+    if (_info.repeat)
+    {
         Param repeat = { Param::DOUBLE, "repeat", "", "", defaultDuration, 0.1, ONE_DAY };
         Param kprepeat = { Param::DOUBLE, "kprepeat", "", "", defaultDuration, 0.1, ONE_DAY };
         // When repeats are enabled, stop and kpstop are LONG values (number of repeats)
@@ -250,7 +268,9 @@ bool AnimScript::load(){
         _info.params.append(kprepeat);
         _info.params.append(stop);
         _info.params.append(kpstop);
-    } else {
+    }
+    else
+    {
         // When repeats are disabled, stop and kpstop are DOUBLE values (seconds)
         Param stop = { Param::DOUBLE, "stop", "", "", -1., 0.1, ONE_DAY };
         Param kpstop = { Param::DOUBLE, "kpstop", "", "", -1., 0.1, ONE_DAY };
@@ -260,8 +280,9 @@ bool AnimScript::load(){
     return true;
 }
 
-void AnimScript::init(const KeyMap& map, const QStringList& keys, const QMap<QString, QVariant>& paramValues){
-    if(_path == "")
+void AnimScript::init(const KeyMap& map, const QStringList& keys, const QMap<QString, QVariant>& paramValues)
+{
+    if (_path == "")
         return;
     end();
     _map = map;
@@ -274,30 +295,37 @@ void AnimScript::init(const KeyMap& map, const QStringList& keys, const QMap<QSt
     initialized = true;
 }
 
-void AnimScript::setDuration(){
-    if(_info.absoluteTime){
+void AnimScript::setDuration()
+{
+    if (_info.absoluteTime)
+    {
         durationMsec = 1000;
         repeatMsec = 0;
-    } else {
+    }
+    else
+    {
         durationMsec = round(_paramValues.value("duration").toDouble() * 1000.);
-        if(durationMsec <= 0)
+        if (durationMsec <= 0)
             durationMsec = -1;
         repeatMsec = round(_paramValues.value("repeat").toDouble() * 1000.);
     }
 }
 
-void AnimScript::parameters(const QMap<QString, QVariant>& paramValues){
-    if(!initialized || !process || !_info.liveParams)
+void AnimScript::parameters(const QMap<QString, QVariant>& paramValues)
+{
+    if (!initialized || !process || !_info.liveParams)
         return;
     _paramValues = paramValues;
     setDuration();
     printParams();
 }
 
-void AnimScript::printParams(){
+void AnimScript::printParams()
+{
     process->write("begin params\n");
     QMapIterator<QString, QVariant> i(_paramValues);
-    while(i.hasNext()){
+    while (i.hasNext())
+    {
         i.next();
         process->write("param ");
         process->write(i.key().toLatin1());
@@ -308,8 +336,9 @@ void AnimScript::printParams(){
     process->write("end params\n");
 }
 
-int AnimScript::begin(quint64 timestamp){
-    if(!initialized)
+int AnimScript::begin(quint64 timestamp)
+{
+    if (!initialized)
         return 1;
     end();
     stopped = firstFrame = readFrame = readAnyFrame = inFrame = false;
@@ -317,18 +346,21 @@ int AnimScript::begin(quint64 timestamp){
     QStringList keysCopy = _keys;
     minX = INT_MAX;
     minY = INT_MAX;
-    foreach(const QString& key, keysCopy){
+    foreach (const QString& key, keysCopy)
+    {
         const Key& pos = _map.key(key);
-        if(!pos){
+        if (!pos)
+        {
             keysCopy.removeAll(key);
             continue;
         }
-        if(pos.x < minX)
+        if (pos.x < minX)
             minX = pos.x;
-        if(pos.y < minY)
+        if (pos.y < minY)
             minY = pos.y;
     }
-    if(keysCopy.isEmpty()){
+    if (keysCopy.isEmpty())
+    {
         // If the key list is empty, don't actually start the animation but pretend it's running anyway
         firstFrame = readFrame = readAnyFrame = true;
         return 1;
@@ -342,7 +374,8 @@ int AnimScript::begin(quint64 timestamp){
     // Write the keymap to the process
     process->write("begin keymap\n");
     process->write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());
-    foreach(const QString& key, keysCopy){
+    foreach (const QString& key, keysCopy)
+    {
         const Key& pos = _map.key(key);
         process->write(QString("key %1 %2,%3\n").arg(key).arg(pos.x - minX).arg(pos.y - minY).toLatin1());
     }
@@ -355,109 +388,123 @@ int AnimScript::begin(quint64 timestamp){
     return 0;
 }
 
-void AnimScript::retrigger(quint64 timestamp, bool allowPreempt){
-    if(!initialized)
+void AnimScript::retrigger(quint64 timestamp, bool allowPreempt)
+{
+    if (!initialized)
         return;
-    if(allowPreempt && _info.preempt && repeatMsec > 0)
+    if (allowPreempt && _info.preempt && repeatMsec > 0)
         // If preemption is wanted, trigger the animation 1 duration in the past first
         retrigger(timestamp - repeatMsec);
-    if(!process && begin(timestamp))
+    if (!process && begin(timestamp))
         return;
     advance(timestamp);
     process->write("start\n");
 }
 
-void AnimScript::stop(quint64 timestamp){
-    if(!initialized)
+void AnimScript::stop(quint64 timestamp)
+{
+    if (!initialized)
         return;
-    if(!process && begin(timestamp))
+    if (!process && begin(timestamp))
         return;
     advance(timestamp);
     process->write("stop\n");
 }
 
-void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
-    if(!initialized)
+void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp)
+{
+    if (!initialized)
         return;
-    if(!process && begin(timestamp))
+    if (!process && begin(timestamp))
         return;
     int kpMode = _info.kpMode;
-    if(_paramValues.value("kpmode", 0).toInt() != 0)
+    if (_paramValues.value("kpmode", 0).toInt() != 0)
         // Disable KP mode according to user preferences
         kpMode = KP_NONE;
-    switch(kpMode){
-    case KP_NONE:
-        // If KPs aren't allowed, call retrigger/stop instead
-        if(pressed)
-            retrigger(timestamp);
-        else if(_paramValues.value("kprelease", false).toBool())
-            stop(timestamp);
-        break;
-    case KP_NAME:
-        // Print keypress by name
-        advance(timestamp);
-        process->write(("key " + key + (pressed ? " down\n" : " up\n")).toLatin1());
-        break;
-    case KP_POSITION:
-        // Print keypress by position
-        const Key& kp = _map.key(key);
-        if(!kp)
-            return;
-        advance(timestamp);
-        process->write(("key " + QString("%1,%2").arg(kp.x - minX).arg(kp.y - minY) + (pressed ? " down\n" : " up\n")).toLatin1());
-        break;
+    switch (kpMode)
+    {
+        case KP_NONE:
+            // If KPs aren't allowed, call retrigger/stop instead
+            if (pressed)
+                retrigger(timestamp);
+            else if (_paramValues.value("kprelease", false).toBool())
+                stop(timestamp);
+            break;
+        case KP_NAME:
+            // Print keypress by name
+            advance(timestamp);
+            process->write(("key " + key + (pressed ? " down\n" : " up\n")).toLatin1());
+            break;
+        case KP_POSITION:
+            // Print keypress by position
+            const Key& kp = _map.key(key);
+            if (!kp)
+                return;
+            advance(timestamp);
+            process->write(("key " + QString("%1,%2").arg(kp.x - minX).arg(kp.y - minY) + (pressed ? " down\n" : " up\n")).toLatin1());
+            break;
     }
 }
 
-void AnimScript::end(){
+void AnimScript::end()
+{
     _colors.clear();
-    if(process){
+    if (process)
+    {
         process->kill();
         connect(process, SIGNAL(finished(int)), process, SLOT(deleteLater()));
         disconnect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readProcess()));
         process = 0;
     }
 }
-void AnimScript::readProcessErr(){
+void AnimScript::readProcessErr()
+{
     QList<QByteArray> data = process->readAllStandardError().split('\n');
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     QString out = _info.name + " (" + QString::number(process->processId()) + ")";
 #else
     QString out = _info.name;
 #endif
-    for(int i = 0; i < data.length(); i++){
+    for (int i = 0; i < data.length(); i++)
+    {
         QString str(data.at(i));
-        if(str.isEmpty())
+        if (str.isEmpty())
             continue;
         qDebug() << out << str;
     }
 }
 
-void AnimScript::readProcess(){
-    while(process->canReadLine()){
+void AnimScript::readProcess()
+{
+    while (process->canReadLine())
+    {
         QByteArray line = process->readLine().trimmed();
-        if(!inFrame){
+        if (!inFrame)
+        {
             // Ignore anything not between "begin frame" and "end frame", except for "end run", which indicates that the program is done.
-            if(line == "begin frame")
+            if (line == "begin frame")
                 inFrame = true;
-            else if(line == "end run"){
+            else if (line == "end run")
+            {
                 stopped = true;
                 return;
             }
             continue;
         }
-        if(line.startsWith("argb ")){
+        if (line.startsWith("argb "))
+        {
             // Add a color to the buffer
             char keyName[31];
             QRgb keyColor = 0;
-            if(sscanf(line, "argb %30s %x", keyName, &keyColor) != 2)
+            if (sscanf(line, "argb %30s %x", keyName, &keyColor) != 2)
                 continue;
             QRgb* inMap = _colorBuffer.colorForName(keyName);
-            if(!inMap)
+            if (!inMap)
                 continue;
             *inMap = keyColor;
         }
-        if(line == "end frame"){
+        if (line == "end frame")
+        {
             // Frame is finished. Copy color buffer back to the atomic map
             memcpy(_colors.colors(), _colorBuffer.colors(), sizeof(QRgb) * _colors.count());
             inFrame = false;
@@ -466,32 +513,37 @@ void AnimScript::readProcess(){
     }
 }
 
-void AnimScript::frame(quint64 timestamp){
-    if(!initialized || stopped)
+void AnimScript::frame(quint64 timestamp)
+{
+    if (!initialized || stopped)
         return;
     // Start the animation if it's not running yet
-    if(!process)
+    if (!process)
         begin(timestamp);
 
-    if(process){
+    if (process)
+    {
         advance(timestamp);
 
         // Don't ask for a new frame if the animation hasn't delivered the last one yet
-        if(readFrame || !firstFrame)
+        if (readFrame || !firstFrame)
             process->write("frame\n");
     }
     firstFrame = true;
     readFrame = false;
 }
 
-void AnimScript::advance(quint64 timestamp){
+void AnimScript::advance(quint64 timestamp)
+{
     // Don't do anything if the time hasn't actually advanced.
-    if(timestamp <= lastFrame)
+    if (timestamp <= lastFrame)
         return;
     double delta = (timestamp - lastFrame) / (double)durationMsec;
-    if(!_info.absoluteTime){
+    if (!_info.absoluteTime)
+    {
         // Skip any complete durations
-        while(delta > 1.){
+        while (delta > 1.)
+        {
             process->write("time 1\n");
             delta--;
         }

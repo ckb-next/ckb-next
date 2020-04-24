@@ -9,27 +9,27 @@ class GradientDialogWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit GradientDialogWidget(QWidget *parent = 0);
+    explicit GradientDialogWidget(QWidget* parent = 0);
 
-    void                    setStops(const QGradientStops& stops);
-    inline QGradientStops   stops()                                 { return _stops; }
-    inline int              stopCount()                             { return _stops.count(); }
+    void setStops(const QGradientStops& stops);
+    inline QGradientStops stops() { return _stops; }
+    inline int stopCount() { return _stops.count(); }
 
     QColor colorAt(int position);
 
-    inline int  current()                           { return _current; }
-    int         moveCurrent(int to);
-    void        setCurrentColor(const QColor& color);
+    inline int current() { return _current; }
+    int moveCurrent(int to);
+    void setCurrentColor(const QColor& color);
 
 signals:
     void currentChanged(QColor color, bool spontaneous, int position);
 
 private:
-    QColor  selected;
-    int     selectedPos, selectedOffset;
-    int     _current;
-    QMap<int, QColor>   _colors;
-    QGradientStops      _stops;
+    QColor selected;
+    int selectedPos, selectedOffset;
+    int _current;
+    QMap<int, QColor> _colors;
+    QGradientStops _stops;
 
     QRect fillRect();
     QRect stopRect(int pos);

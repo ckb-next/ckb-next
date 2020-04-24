@@ -9,7 +9,8 @@
 // Setting de-cacher for CkbSettings
 // It has to be declared in its own header or else Q_OBJECT doesn't work
 
-class CkbSettingsWriter : public QObject {
+class CkbSettingsWriter : public QObject
+{
     Q_OBJECT
 public:
     CkbSettingsWriter(QSettings* backing, const QStringList& removals, const QMap<QString, QVariant>& updates);

@@ -8,8 +8,9 @@
 #include "kblight.h"
 #include "keywidget.h"
 
-namespace Ui {
-class KbLightWidget;
+namespace Ui
+{
+    class KbLightWidget;
 }
 
 class KbLightWidget : public QWidget
@@ -17,7 +18,7 @@ class KbLightWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit KbLightWidget(QWidget *parent = 0);
+    explicit KbLightWidget(QWidget* parent = 0);
     ~KbLightWidget();
 
     void setLight(KbLight* newLight);
@@ -38,7 +39,7 @@ private slots:
 
     void on_showAnimBox_clicked(bool checked);
 
-    void toggleSidelight(); //strafe
+    void toggleSidelight(); // strafe
     void brightnessScroll(bool up);
     void toggleM95Light();
 
@@ -48,7 +49,7 @@ private:
     KbLight* light;
     QStringList currentSelection;
 
-    Ui::KbLightWidget *ui;
+    Ui::KbLightWidget* ui;
 
     void startAnimationPreview();
     void stopAnimationPreview();

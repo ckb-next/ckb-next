@@ -18,16 +18,18 @@
 #ifdef USE_LIBAPPINDICATOR
 // 'signals' has to be undefined as GTK has its own signal mechanism
 #undef signals
-extern "C" {
-  #include <libappindicator/app-indicator.h>
-  #include <gtk/gtk.h>
+extern "C"
+{
+#include <libappindicator/app-indicator.h>
+#include <gtk/gtk.h>
 }
 // Redefine QT signals as per qtbase/src/corelib/kernel/qobjectdefs.h
 #define signals Q_SIGNALS
 #endif
 
-namespace Ui {
-class MainWindow;
+namespace Ui
+{
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -35,7 +37,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget* parent = 0);
     ~MainWindow();
 
     static MainWindow* mainWindow;
@@ -53,24 +55,25 @@ private:
     QAction* changeTrayIconAction;
 
 #ifdef USE_LIBAPPINDICATOR
-    bool                useAppindicator;
-    AppIndicator*       indicator;
-    GtkWidget*          indicatorMenu;
-    GtkWidget*          indicatorMenuQuitItem;
-    GtkWidget*          indicatorMenuRestoreItem;
+    bool useAppindicator;
+    AppIndicator* indicator;
+    GtkWidget* indicatorMenu;
+    GtkWidget* indicatorMenuQuitItem;
+    GtkWidget* indicatorMenuRestoreItem;
 #endif
 
-    QMenu*              trayIconMenu;
-    CkbSystemTrayIcon*  trayIcon;
-    void closeEvent(QCloseEvent *event);
+    QMenu* trayIconMenu;
+    CkbSystemTrayIcon* trayIcon;
+    void closeEvent(QCloseEvent* event);
 
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
-    QTimer*             catalinaTimer;
-    typedef enum {
-       REQUEST_STATE_NOT_SET = -1,
-       REQUEST_SUCCEEDED = 0,
-       REQUEST_ALREADY_ALLOWED,
-       REQUEST_ERROR
+    QTimer* catalinaTimer;
+    typedef enum
+    {
+        REQUEST_STATE_NOT_SET = -1,
+        REQUEST_SUCCEEDED = 0,
+        REQUEST_ALREADY_ALLOWED,
+        REQUEST_ERROR
     } hid_req_ret;
     hid_req_ret prevHidRet = REQUEST_STATE_NOT_SET;
     bool catalinaAgentStarted = false;
@@ -106,7 +109,7 @@ private slots:
 #endif
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
     QSocketNotifier* sigNotifier;
 #ifndef DISABLE_UPDATER
     CkbUpdater* updater;

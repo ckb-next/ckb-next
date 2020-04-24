@@ -3,18 +3,19 @@
 #include <QPropertyAnimation>
 #include "gradientdialogwidget.h"
 
-GradientDialogWidget::GradientDialogWidget(QWidget *parent) :
-    QWidget(parent), selectedPos(-1), _current(-1)
+GradientDialogWidget::GradientDialogWidget(QWidget* parent) : QWidget(parent), selectedPos(-1), _current(-1)
 {
     setMouseTracking(true);
 }
 
-void GradientDialogWidget::setStops(const QGradientStops& stops){
+void GradientDialogWidget::setStops(const QGradientStops& stops)
+{
     _stops = stops;
     _colors.clear();
-    foreach(const QGradientStop& stop, stops){
+    foreach (const QGradientStop& stop, stops)
+    {
         double pos = stop.first;
-        if(pos < 0. || pos > 1.)
+        if (pos < 0. || pos > 1.)
             continue;
         _colors[round(pos * 100.)] = stop.second;
     }
@@ -27,11 +28,13 @@ void GradientDialogWidget::setStops(const QGradientStops& stops){
     update();
 }
 
-void GradientDialogWidget::makeStops(){
+void GradientDialogWidget::makeStops()
+{
     _stops.clear();
     QMap<int, QColor> colors = selectionColors();
     // If there's only a single color, put it at the beginning and end
-    if(colors.count() == 1){
+    if (colors.count() == 1)
+    {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
         QColor color = colors.first();
 #else
@@ -44,32 +47,36 @@ void GradientDialogWidget::makeStops(){
     }
     // Add colors at 0 and 100 if needed
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-    if(!colors.contains(0))
+    if (!colors.contains(0))
         colors[0] = colors.first();
-    if(!colors.contains(100))
+    if (!colors.contains(100))
         colors[100] = colors.last();
 #else
-    if(!colors.contains(0))
+    if (!colors.contains(0))
         colors[0] = colors.value(colors.keys().first());
-    if(!colors.contains(100))
+    if (!colors.contains(100))
         colors[100] = colors.value(colors.keys().last());
 #endif
     QMapIterator<int, QColor> i(colors);
-    while(i.hasNext()){
+    while (i.hasNext())
+    {
         i.next();
         _stops.append(QGradientStop(i.key() / 100., i.value()));
     }
     update();
 }
 
-QColor GradientDialogWidget::colorAt(int position){
+QColor GradientDialogWidget::colorAt(int position)
+{
     // Find which stops the position is between
     qreal pos = position / 100.;
     QVectorIterator<QGradientStop> i(_stops);
     QGradientStop previous = i.next();
-    while(i.hasNext()){
+    while (i.hasNext())
+    {
         QGradientStop next = i.next();
-        if(next.first >= pos){
+        if (next.first >= pos)
+        {
             // Get color by linear interpolation. Premultiply the alpha value so that it returns the expected color
             // (i.e. stops with zero opacity won't contribute to color)
             QColor c1 = next.second, c2 = previous.second;
@@ -77,7 +84,8 @@ QColor GradientDialogWidget::colorAt(int position){
             qreal dx = (pos - previous.first) / distance;
             qreal a1 = c1.alphaF(), a2 = c2.alphaF();
             qreal a3 = a1 * dx + a2 * (1.f - dx);
-            if(a3 == 0.){
+            if (a3 == 0.)
+            {
                 c2.setAlpha(0);
                 return c2;
             }
@@ -91,20 +99,26 @@ QColor GradientDialogWidget::colorAt(int position){
     return QColor();
 }
 
-int GradientDialogWidget::moveCurrent(int to){
-    if(_current < 0 || to == _current || selected.isValid())
+int GradientDialogWidget::moveCurrent(int to)
+{
+    if (_current < 0 || to == _current || selected.isValid())
         return _current;
     // If there's a point in the way, skip past it by continuing in the current direction
-    if(_current < to){
-        while(_colors.contains(to)){
+    if (_current < to)
+    {
+        while (_colors.contains(to))
+        {
             to++;
-            if(to > 100)
+            if (to > 100)
                 return _current;
         }
-    } else {
-        while(_colors.contains(to)){
+    }
+    else
+    {
+        while (_colors.contains(to))
+        {
             to--;
-            if(to < 0)
+            if (to < 0)
                 return _current;
         }
     }
@@ -114,19 +128,21 @@ int GradientDialogWidget::moveCurrent(int to){
     return to;
 }
 
-void GradientDialogWidget::setCurrentColor(const QColor& color){
-    if(_current < 0 || selected.isValid())
+void GradientDialogWidget::setCurrentColor(const QColor& color)
+{
+    if (_current < 0 || selected.isValid())
         return;
     QRgb rgb = _colors.value(_current).rgb();
     _colors[_current] = color;
     // If any points follow with the same color but different opacity, change them to match
     QMutableMapIterator<int, QColor> i(_colors);
-    while(i.hasNext()){
+    while (i.hasNext())
+    {
         i.next();
-        if(i.key() <= _current)
+        if (i.key() <= _current)
             continue;
         QColor& value = i.value();
-        if(value.rgb() != rgb)
+        if (value.rgb() != rgb)
             break;
         int alpha = value.alpha();
         value = color;
@@ -135,13 +151,15 @@ void GradientDialogWidget::setCurrentColor(const QColor& color){
     makeStops();
 }
 
-QRect GradientDialogWidget::fillRect(){
+QRect GradientDialogWidget::fillRect()
+{
     int x = 8, y = 1;
     int w = (width() - x * 2) / 16 * 16, h = (height() - 24) / 16 * 16;
     return QRect(x, y, w, h);
 }
 
-QRect GradientDialogWidget::stopRect(int pos){
+QRect GradientDialogWidget::stopRect(int pos)
+{
     QRect fill = fillRect();
     int sx = round(pos / 100. * fill.width()) + fill.x() - 6;
     int sw = 12, sh = 18;
@@ -149,27 +167,30 @@ QRect GradientDialogWidget::stopRect(int pos){
     return QRect(sx, sy, sw, sh);
 }
 
-int GradientDialogWidget::selectedStop(){
+int GradientDialogWidget::selectedStop()
+{
     QRect rect = fillRect();
     int res = round((selectedPos - rect.x()) * 100. / rect.width());
-    if(res < 0 || res > 100)
+    if (res < 0 || res > 100)
         return -1;
     return res;
 }
 
-QMap<int, QColor> GradientDialogWidget::selectionColors(){
-    if(!selected.isValid())
+QMap<int, QColor> GradientDialogWidget::selectionColors()
+{
+    if (!selected.isValid())
         return _colors;
     // Determine selected stop position
     int selPos = selectedStop();
     // Re-add if in range
     QMap<int, QColor> res = _colors;
-    if(selPos >= 0 && selPos <= 100)
+    if (selPos >= 0 && selPos <= 100)
         res[selPos] = selected;
     return res;
 }
 
-void GradientDialogWidget::paintEvent(QPaintEvent*){
+void GradientDialogWidget::paintEvent(QPaintEvent*)
+{
     QPainter painter(this);
     QRect fill = fillRect();
     int x = fill.x(), y = fill.y(), w = fill.width(), h = fill.height();
@@ -182,9 +203,11 @@ void GradientDialogWidget::paintEvent(QPaintEvent*){
     painter.drawLine(x - 1, y + h, x + w, y + h);
     painter.drawLine(x + w, y - 1, x + w, y + h);
     // Draw background grid
-    for(int i = 0; i < w; i += 16){
-        for(int iy = 0; iy < h; iy += 16){
-            if(i % 32 != iy % 32)
+    for (int i = 0; i < w; i += 16)
+    {
+        for (int iy = 0; iy < h; iy += 16)
+        {
+            if (i % 32 != iy % 32)
                 painter.fillRect(x + i, y + iy, 16, 16, QColor(192, 192, 192));
             else
                 painter.fillRect(x + i, y + iy, 16, 16, QColor(255, 255, 255));
@@ -199,52 +222,62 @@ void GradientDialogWidget::paintEvent(QPaintEvent*){
     // Draw stops
     QMapIterator<int, QColor> i(_colors);
     painter.setPen(palette().color(QPalette::Shadow));
-    while(i.hasNext()){
+    while (i.hasNext())
+    {
         i.next();
         painter.setBrush(QBrush(i.value()));
         int index = i.key();
-        if(index == _current){
+        if (index == _current)
+        {
             // Highlight currently-edited stop
             painter.setPen(QPen(palette().color(QPalette::Highlight), 2));
             painter.drawRoundedRect(stopRect(index), 4, 4);
             painter.setPen(palette().color(QPalette::Shadow));
-        } else
+        }
+        else
             painter.drawRoundedRect(stopRect(index), 4, 4);
     }
     // Draw selection (if any)
-    if(selected.isValid() && selectedPos >= x && selectedPos <= x + w){
+    if (selected.isValid() && selectedPos >= x && selectedPos <= x + w)
+    {
         painter.setPen(QPen(palette().color(QPalette::Highlight), 2.5));
         painter.setBrush(selected);
         painter.drawRoundedRect(selectedPos - 6, height() - 18 - 2, 12, 18, 4, 4);
     }
 }
 
-void GradientDialogWidget::mousePressEvent(QMouseEvent* event){
+void GradientDialogWidget::mousePressEvent(QMouseEvent* event)
+{
     int x = event->x(), y = event->y();
-    if(y < height() - 24)
+    if (y < height() - 24)
         return;
     QMapIterator<int, QColor> i(_colors);
-    while(i.hasNext()){
+    while (i.hasNext())
+    {
         i.next();
         // If a point was selected, remove it from the color map and set it as the selected point
         QRect stop = stopRect(i.key());
-        if(x >= stop.left() - 1 && x <= stop.right() + 1){
+        if (x >= stop.left() - 1 && x <= stop.right() + 1)
+        {
             selected = i.value();
             selectedPos = stop.x() + stop.width() / 2;
             selectedOffset = selectedPos - x;
             _colors.remove(i.key());
             // On right click, delete the point
-            if(event->button() == Qt::RightButton && _colors.count() > 1){
+            if (event->button() == Qt::RightButton && _colors.count() > 1)
+            {
                 selectedPos = -1;
                 mouseReleaseEvent(event);
-            } else
+            }
+            else
                 update();
             return;
         }
     }
     // If nothing was selected, create a new point
     QRect fill = fillRect();
-    if(x > fill.left() && x < fill.right() && event->button() != Qt::RightButton){
+    if (x > fill.left() && x < fill.right() && event->button() != Qt::RightButton)
+    {
         selectedPos = x;
         selectedOffset = 0;
         selected = colorAt(selectedStop());
@@ -252,9 +285,11 @@ void GradientDialogWidget::mousePressEvent(QMouseEvent* event){
     }
 }
 
-void GradientDialogWidget::mouseMoveEvent(QMouseEvent* event){
-    if(!selected.isValid()){
-        if(event->y() >= height() - 24)
+void GradientDialogWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if (!selected.isValid())
+    {
+        if (event->y() >= height() - 24)
             setCursor(QCursor(Qt::PointingHandCursor));
         else
             setCursor(QCursor(Qt::ArrowCursor));
@@ -268,19 +303,21 @@ void GradientDialogWidget::mouseMoveEvent(QMouseEvent* event){
     // Hug the left/right edges
     QRect rect = fillRect();
     int left = rect.left(), right = rect.right();
-    if(selectedPos < left && (last || selectedPos >= left - 30))
+    if (selectedPos < left && (last || selectedPos >= left - 30))
         selectedPos = left;
-    else if(selectedPos > right && (last || selectedPos <= right + 30))
+    else if (selectedPos > right && (last || selectedPos <= right + 30))
         selectedPos = right;
     // Remove point if it's too far above/below the widget
     int top = -30, bottom = height() + 30;
-    if(!last && (event->y() < top || event->y() > bottom))
+    if (!last && (event->y() < top || event->y() > bottom))
         selectedPos = -1;
     makeStops();
 }
 
-void GradientDialogWidget::mouseReleaseEvent(QMouseEvent* event){
-    if(selected.isValid()){
+void GradientDialogWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (selected.isValid())
+    {
         // Rejoin selection with gradient
         _current = selectedStop();
         _colors = selectionColors();
@@ -289,7 +326,7 @@ void GradientDialogWidget::mouseReleaseEvent(QMouseEvent* event){
         selected = QColor();
         makeStops();
     }
-    if(event->y() >= height() - 24)
+    if (event->y() >= height() - 24)
         setCursor(QCursor(Qt::PointingHandCursor));
     else
         setCursor(QCursor(Qt::ArrowCursor));

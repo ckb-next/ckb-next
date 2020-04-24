@@ -11,8 +11,9 @@
 #include "kbprofile.h"
 #include "colorbutton.h"
 
-namespace Ui {
-class MPerfWidget;
+namespace Ui
+{
+    class MPerfWidget;
 }
 
 class MPerfWidget : public QWidget
@@ -20,7 +21,7 @@ class MPerfWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit MPerfWidget(QWidget *parent = 0);
+    explicit MPerfWidget(QWidget* parent = 0);
     ~MPerfWidget();
 
     void setPerf(KbPerf* newPerf, KbProfile* newProfile);
@@ -28,16 +29,18 @@ public:
     static const int DPI_COUNT = KbPerf::DPI_COUNT;
     void setLegacyM95();
     void setMaxDpi(ushort dpi);
+
 private:
-    Ui::MPerfWidget *ui;
+    Ui::MPerfWidget* ui;
 
     KbPerf* perf;
     KbProfile* profile;
 
-    struct DpiUi {
+    struct DpiUi
+    {
         ColorButton* indicator;
-        QSlider* xSlider, *ySlider;
-        QSpinBox* xBox, *yBox;
+        QSlider *xSlider, *ySlider;
+        QSpinBox *xBox, *yBox;
         QCheckBox* enableCheck;
         QLabel* indicatorLabel;
     };

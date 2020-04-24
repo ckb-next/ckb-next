@@ -5,9 +5,7 @@
 #include "ui_kbanimwidget.h"
 #include <QMessageBox>
 
-KbAnimWidget::KbAnimWidget(QWidget* parent) :
-    QWidget(parent), light(0), current(0), noReorder(false),
-    ui(new Ui::KbAnimWidget)
+KbAnimWidget::KbAnimWidget(QWidget* parent) : QWidget(parent), light(0), current(0), noReorder(false), ui(new Ui::KbAnimWidget)
 {
     ui->setupUi(this);
     ui->animList->setVisible(false);
@@ -15,40 +13,47 @@ KbAnimWidget::KbAnimWidget(QWidget* parent) :
     connect(ui->animList, SIGNAL(orderChanged()), this, SLOT(reorderAnims()));
 }
 
-KbAnimWidget::~KbAnimWidget(){
+KbAnimWidget::~KbAnimWidget()
+{
     delete ui;
 }
 
-void KbAnimWidget::setLight(KbLight* newLight){
-    if(light != newLight){
-        if(light)
+void KbAnimWidget::setLight(KbLight* newLight)
+{
+    if (light != newLight)
+    {
+        if (light)
             disconnect(light, SIGNAL(didLoad()), this, SLOT(refreshList()));
-        if(newLight)
+        if (newLight)
             connect(newLight, SIGNAL(didLoad()), this, SLOT(refreshList()));
         light = newLight;
     }
     refreshList();
 }
 
-void KbAnimWidget::refreshList(){
+void KbAnimWidget::refreshList()
+{
     noReorder = true;
     setCurrent(0);
     ui->animList->clear();
     animations.clear();
     // Add the animations from the new lighting mode
-    if(!light){
+    if (!light)
+    {
         ui->animList->setVisible(false);
         ui->noAnimLabel->setVisible(true);
         return;
     }
     QList<KbAnim*> newAnimations = light->animList();
-    if(newAnimations.count() == 0){
+    if (newAnimations.count() == 0)
+    {
         ui->animList->setVisible(false);
         ui->noAnimLabel->setVisible(true);
         return;
     }
     ui->animList->setVisible(true);
-    foreach(KbAnim* anim, newAnimations){
+    foreach (KbAnim* anim, newAnimations)
+    {
         QListWidgetItem* item = new QListWidgetItem(anim->name(), ui->animList);
         item->setData(Qt::UserRole, anim->guid());
         item->setFlags(item->flags() | Qt::ItemIsEditable);
@@ -59,15 +64,18 @@ void KbAnimWidget::refreshList(){
     noReorder = false;
 }
 
-void KbAnimWidget::reorderAnims(){
-    if(light && !noReorder){
+void KbAnimWidget::reorderAnims()
+{
+    if (light && !noReorder)
+    {
         // Clear and rebuild the list of animations in case the animation moved
         int count = ui->animList->count();
         QList<KbAnim*> animList;
-        for(int i = 0; i < count; i++){
+        for (int i = 0; i < count; i++)
+        {
             QListWidgetItem* item = ui->animList->item(i);
             KbAnim* anim = animations[item->data(Qt::UserRole).toUuid()];
-            if(anim && !animList.contains(anim))
+            if (anim && !animList.contains(anim))
                 animList.append(anim);
             item->setFlags(item->flags() | Qt::ItemIsEditable);
         }
@@ -75,13 +83,15 @@ void KbAnimWidget::reorderAnims(){
     }
 }
 
-void KbAnimWidget::clearSelection(){
+void KbAnimWidget::clearSelection()
+{
     ui->animList->setCurrentItem(0);
     setCurrent(0);
 }
 
-void KbAnimWidget::addAnim(const AnimScript* base, const QStringList& keyList, const QString& name, const QMap<QString, QVariant>& preset){
-    if(!light)
+void KbAnimWidget::addAnim(const AnimScript* base, const QStringList& keyList, const QString& name, const QMap<QString, QVariant>& preset)
+{
+    if (!light)
         return;
     noReorder = true;
     KbAnim* animation = light->addAnim(base, keyList, name, preset);
@@ -101,8 +111,9 @@ void KbAnimWidget::addAnim(const AnimScript* base, const QStringList& keyList, c
     on_propertyButton_clicked();
 }
 
-void KbAnimWidget::duplicateAnim(KbAnim* old){
-    if(!light)
+void KbAnimWidget::duplicateAnim(KbAnim* old)
+{
+    if (!light)
         return;
     noReorder = true;
     KbAnim* animation = light->duplicateAnim(old);
@@ -116,17 +127,20 @@ void KbAnimWidget::duplicateAnim(KbAnim* old){
     noReorder = false;
 }
 
-void KbAnimWidget::setCurrent(KbAnim* newCurrent){
-    if(newCurrent != current)
+void KbAnimWidget::setCurrent(KbAnim* newCurrent)
+{
+    if (newCurrent != current)
         emit animChanged(current = newCurrent);
-    if(!current){
+    if (!current)
+    {
         selectedKeys.clear();
         ui->selectionStack->setCurrentIndex(0);
         return;
     }
     selectedKeys = current->keys();
     const AnimScript* script = current->script();
-    if(!script){
+    if (!script)
+    {
         ui->selectionStack->setCurrentIndex(2);
         ui->aMissingLabel->setText("The \"" + current->scriptName() + "\" script could not be loaded. Please check your animation directory.");
         return;
@@ -141,42 +155,49 @@ void KbAnimWidget::setCurrent(KbAnim* newCurrent){
     ui->blendBox->setCurrentIndex((int)current->mode());
 }
 
-void KbAnimWidget::setSelectedKeys(const QStringList& keys){
+void KbAnimWidget::setSelectedKeys(const QStringList& keys)
+{
     selectedKeys = keys;
-    if(keys.count() == 0)
+    if (keys.count() == 0)
         ui->keyButton->setVisible(false);
     else
         ui->keyButton->setVisible(true);
 }
 
-void KbAnimWidget::on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous){
-    if(!current)
+void KbAnimWidget::on_animList_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous)
+{
+    if (!current)
         setCurrent(0);
     else
         setCurrent(animations[current->data(Qt::UserRole).toUuid()]);
 }
 
-void KbAnimWidget::on_animList_itemChanged(QListWidgetItem *item){
-    if(item){
+void KbAnimWidget::on_animList_itemChanged(QListWidgetItem* item)
+{
+    if (item)
+    {
         KbAnim* anim = animations[item->data(Qt::UserRole).toUuid()];
-        if(anim){
+        if (anim)
+        {
             // Don't allow empty names
-            if(item->text().isEmpty()){
+            if (item->text().isEmpty())
+            {
                 item->setText(anim->name());
                 return;
             }
 
             anim->name(item->text().trimmed());
 
-            if(anim == current && !noReorder)
+            if (anim == current && !noReorder)
                 ui->nameBox->setText(anim->name());
         }
     }
 }
 
-void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint &pos){
+void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint& pos)
+{
     QListWidgetItem* item = ui->animList->itemAt(pos);
-    if(!item)
+    if (!item)
         return;
     setCurrent(animations[item->data(Qt::UserRole).toUuid()]);
 
@@ -188,20 +209,22 @@ void KbAnimWidget::on_animList_customContextMenuRequested(const QPoint &pos){
     menu.addAction(duplicate);
     menu.addAction(del);
     QAction* result = menu.exec(QCursor::pos());
-    if(result == rename)
+    if (result == rename)
         ui->animList->editItem(item);
-    else if(result == duplicate)
+    else if (result == duplicate)
         duplicateAnim(current);
-    else if(result == del)
+    else if (result == del)
         on_deleteButton_clicked();
 }
 
-void KbAnimWidget::on_nameBox_textEdited(const QString &arg1){
+void KbAnimWidget::on_nameBox_textEdited(const QString& arg1)
+{
     // Don't apply name change if left blank
-    if(arg1.isEmpty())
+    if (arg1.isEmpty())
         return;
 
-    if(current){
+    if (current)
+    {
         noReorder = true;
         current->name(arg1.trimmed());
         ui->animList->currentItem()->setText(current->name());
@@ -209,24 +232,29 @@ void KbAnimWidget::on_nameBox_textEdited(const QString &arg1){
     }
 }
 
-void KbAnimWidget::on_opacityBox_valueChanged(double arg1){
-    if(current)
+void KbAnimWidget::on_opacityBox_valueChanged(double arg1)
+{
+    if (current)
         current->opacity(arg1 / 100.);
 }
 
-void KbAnimWidget::on_blendBox_activated(int index){
-    if(current)
+void KbAnimWidget::on_blendBox_activated(int index)
+{
+    if (current)
         current->mode((KbAnim::Mode)index);
 }
 
-void KbAnimWidget::on_keyButton_clicked(){
-    if(current){
+void KbAnimWidget::on_keyButton_clicked()
+{
+    if (current)
+    {
         QStringList keys = selectedKeys;
         // If any keys were selected previously that aren't in the keymap now, leave them in
         // This is important for layout compatibility - e.g. being able to select both bslash_iso and bslash, because no single layout contains both
         const KeyMap& map = light->map();
-        foreach(const QString& key, current->keys()){
-            if(!map.contains(key))
+        foreach (const QString& key, current->keys())
+        {
+            if (!map.contains(key))
                 keys << key;
         }
         current->keys(keys);
@@ -235,9 +263,11 @@ void KbAnimWidget::on_keyButton_clicked(){
     light->restartAnimation();
 }
 
-void KbAnimWidget::on_deleteButton_clicked(){
-    if(current){
-        if(QMessageBox::question(this, tr("Delete animation"), tr("Are you sure you want to delete this animation?")) != QMessageBox::Yes)
+void KbAnimWidget::on_deleteButton_clicked()
+{
+    if (current)
+    {
+        if (QMessageBox::question(this, tr("Delete animation"), tr("Are you sure you want to delete this animation?")) != QMessageBox::Yes)
             return;
         animations.remove(current->guid());
         QList<KbAnim*> animList = light->animList();
@@ -246,7 +276,8 @@ void KbAnimWidget::on_deleteButton_clicked(){
         current->deleteLater();
         setCurrent(0);
         delete ui->animList->currentItem();
-        if(animations.count() == 0){
+        if (animations.count() == 0)
+        {
             ui->animList->setVisible(false);
             ui->noAnimLabel->setVisible(true);
         }
@@ -254,13 +285,15 @@ void KbAnimWidget::on_deleteButton_clicked(){
     light->restartAnimation();
 }
 
-void KbAnimWidget::on_propertyButton_clicked(){
-    if(!current)
+void KbAnimWidget::on_propertyButton_clicked()
+{
+    if (!current)
         return;
     // Present animation property popup
     AnimSettingDialog dialog(this, current);
     dialog.exec();
-    if(dialog.result() != QDialog::Accepted){
+    if (dialog.result() != QDialog::Accepted)
+    {
         current->resetParams();
         return;
     }
@@ -273,7 +306,8 @@ void KbAnimWidget::on_propertyButton_clicked(){
     on_nameBox_textEdited(dialog.name());
 }
 
-void KbAnimWidget::on_nameBox_editingFinished(){
-    if(ui->nameBox->text().isEmpty() && current)
+void KbAnimWidget::on_nameBox_editingFinished()
+{
+    if (ui->nameBox->text().isEmpty() && current)
         ui->nameBox->setText(current->name());
 }

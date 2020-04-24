@@ -13,23 +13,31 @@ class KeyWidget : public QWidget
     Q_OBJECT
 public:
     // New key widget. rgbMode = true to display colors, false to display key names
-    explicit KeyWidget(QWidget *parent = 0, bool rgbMode = true);
-    inline bool     rgbMode()                   { return _rgbMode; }
-    inline void     rgbMode(bool newRgbMode)    { _rgbMode = newRgbMode; update(); }
+    explicit KeyWidget(QWidget* parent = 0, bool rgbMode = true);
+    inline bool rgbMode() { return _rgbMode; }
+    inline void rgbMode(bool newRgbMode)
+    {
+        _rgbMode = newRgbMode;
+        update();
+    }
     // For RGB maps, monochrome = true to covert everything to grayscale
-    inline bool     monochrome()                { return _monochrome; }
-    inline void     monochrome(bool newMono)    { _monochrome = newMono; update(); }
+    inline bool monochrome() { return _monochrome; }
+    inline void monochrome(bool newMono)
+    {
+        _monochrome = newMono;
+        update();
+    }
 
     // Key map
-    const KeyMap&       map() const                         { return keyMap; }
-    void                map(const KeyMap& newMap);
+    const KeyMap& map() const { return keyMap; }
+    void map(const KeyMap& newMap);
     // Key -> color map (must contain exactly the keys in the key map)
-    const QColorMap&    colorMap() const                    { return _colorMap; }
-    void                colorMap(const QColorMap& newColorMap);
+    const QColorMap& colorMap() const { return _colorMap; }
+    void colorMap(const QColorMap& newColorMap);
     // Key -> binding map
     typedef QHash<QString, QString> BindMap;
-    const BindMap&      bindMap() const                     { return _bindMap; }
-    void                bindMap(const BindMap& newBindMap);
+    const BindMap& bindMap() const { return _bindMap; }
+    void bindMap(const BindMap& newBindMap);
 
     // Set current selection (highlighted in blue)
     void setSelection(const QStringList& keys);
@@ -64,7 +72,8 @@ private:
     QBitArray animation;
     int mouseDownX, mouseDownY;
     int mouseCurrentX, mouseCurrentY;
-    enum {
+    enum
+    {
         NONE,
         SET,
         ADD,

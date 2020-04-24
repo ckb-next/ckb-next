@@ -2,23 +2,28 @@
 
 extern CFMutableDictionaryRef create_hid_device_dict();
 
-hid_req_ret request_hid_access_mac(){
+hid_req_ret request_hid_access_mac()
+{
     CFMutableDictionaryRef match_dict = create_hid_device_dict();
-    
+
     io_service_t device = IOServiceGetMatchingService(kIOMasterPortDefault, match_dict);
-    if(!device){
+    if (!device)
+    {
         // Free?
         return REQUEST_ERROR;
     }
-    
+
     IOHIDDeviceRef ref = IOHIDDeviceCreate(kCFAllocatorDefault, device);
-    
+
     // Try to open the device
     IOReturn ret = IOHIDDeviceOpen(ref, kIOHIDOptionsTypeNone);
-    if(ret == kIOReturnNotPermitted){
+    if (ret == kIOReturnNotPermitted)
+    {
         // Is there a way to check if our request even succeeded?
         return REQUEST_SUCCEEDED;
-    } else if(ret == kIOReturnSuccess || ret == kIOReturnExclusiveAccess) {
+    }
+    else if (ret == kIOReturnSuccess || ret == kIOReturnExclusiveAccess)
+    {
         IOHIDDeviceClose(ref, kIOHIDOptionsTypeNone);
         return REQUEST_ALREADY_ALLOWED;
     }

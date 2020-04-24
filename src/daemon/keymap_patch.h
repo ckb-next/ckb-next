@@ -1,5 +1,6 @@
 // Keymap patches for specific devices
-typedef struct {
+typedef struct
+{
     int idx; // Index of key to patch in keymap
     const char* name;
     short led;
@@ -7,7 +8,8 @@ typedef struct {
 } keypatch;
 
 // Collection of keypatches
-typedef struct {
+typedef struct
+{
     ushort vendor;
     ushort product;
     keypatch* patch;

@@ -174,7 +174,7 @@
 
 // clang-format on
 
-#endif //OS_MAC_LEGACY
+#endif // OS_MAC_LEGACY
 
 #endif // OS_MAC
 

@@ -10,7 +10,7 @@ class RListWidget : public QListWidget
 {
     Q_OBJECT
 public:
-    explicit RListWidget(QWidget *parent = 0);
+    explicit RListWidget(QWidget* parent = 0);
 
 signals:
     void orderChanged();
@@ -21,10 +21,10 @@ private slots:
     void change(QListWidgetItem* item);
 
 private:
-    QVariant        currentData;
+    QVariant currentData;
     QList<QVariant> previousItems;
-    QVariant        dragged;
-    QTimer          reorderTimer;
+    QVariant dragged;
+    QTimer reorderTimer;
 
     const static int DATA_ROLE = Qt::UserRole + 100;
 

@@ -27,7 +27,8 @@ static const QString oldFile = "com.ckb.ckb.plist";
 
 static const QString oldSettingPath = "Program/DidLoginItem";
 
-bool AutoRun::available() {
+bool AutoRun::available()
+{
     // Allow autostart if the program is located in a system path
 #ifdef Q_OS_LINUX
     return QDir::root().absoluteFilePath(QStandardPaths::findExecutable("ckb-next")) == qApp->applicationFilePath();
@@ -36,11 +37,13 @@ bool AutoRun::available() {
 #endif
 }
 
-bool AutoRun::once() {
+bool AutoRun::once()
+{
     return CkbSettings::get(settingPath).toBool();
 }
 
-bool AutoRun::isEnabled() {
+bool AutoRun::isEnabled()
+{
     // Check if the file exists. If not, autostart is disabled.
     if (!path.exists() || !path.exists(file))
         return false;
@@ -58,7 +61,8 @@ bool AutoRun::isEnabled() {
     internal.close();
     sysfile.close();
 
-    if(internalData != sysfileData){
+    if (internalData != sysfileData)
+    {
         sysfile.remove();
         qDebug() << "Autostart files differ. Replacing with new one.";
         enable();
@@ -70,7 +74,8 @@ bool AutoRun::isEnabled() {
     return true;
 }
 
-void AutoRun::enable() {
+void AutoRun::enable()
+{
     if (!available())
         return;
 
@@ -82,13 +87,15 @@ void AutoRun::enable() {
     CkbSettings::set(settingPath, true);
 
     // If an old autostart was enabled, disable it and remove
-    if (CkbSettings::get(oldSettingPath).toBool()) {
+    if (CkbSettings::get(oldSettingPath).toBool())
+    {
         CkbSettings::set(oldSettingPath, false);
         QFile::remove(path.absoluteFilePath(oldFile));
     }
 }
 
-void AutoRun::disable() {
+void AutoRun::disable()
+{
     if (!available())
         return;
     // Remove file

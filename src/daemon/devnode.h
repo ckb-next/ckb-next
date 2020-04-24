@@ -5,17 +5,17 @@
 #include "usb.h"
 
 /// Device path base ("/dev/input/ckb" or "/var/run/ckb")
-const char *const devpath;
+const char* const devpath;
 
 /// Group ID for the control nodes. -1 to give read/write access to everybody
 extern long gid;
 
 // Simple file permissions
-#define S_READDIR (S_IRWXU | S_IRGRP | S_IROTH | S_IXGRP | S_IXOTH)
-#define S_READ (S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR)
+#define S_READDIR   (S_IRWXU | S_IRGRP | S_IROTH | S_IXGRP | S_IXOTH)
+#define S_READ      (S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR)
 #define S_READWRITE (S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH)
-#define S_CUSTOM (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
-#define S_CUSTOM_R (S_IRUSR | S_IWUSR | S_IRGRP)
+#define S_CUSTOM    (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
+#define S_CUSTOM_R  (S_IRUSR | S_IWUSR | S_IRGRP)
 
 /// Update the list of connected devices.
 void updateconnected();
@@ -41,4 +41,4 @@ void readlines_ctx_init(readlines_ctx* ctx);
 void readlines_ctx_free(readlines_ctx ctx);
 unsigned readlines(int fd, readlines_ctx ctx, const char** input);
 
-#endif  // DEVNODE_H
+#endif // DEVNODE_H

@@ -8,8 +8,9 @@
 #include "kbanim.h"
 #include <QComboBox>
 
-namespace Ui {
-class AnimSettingDialog;
+namespace Ui
+{
+    class AnimSettingDialog;
 }
 
 class AnimSettingDialog : public QDialog
@@ -26,14 +27,14 @@ public:
 
 private:
     Ui::AnimSettingDialog* ui;
-    QCheckBox*  stopCheck, *kpStopCheck;
-    bool        hasRepeat;
+    QCheckBox *stopCheck, *kpStopCheck;
+    bool hasRepeat;
 
     KbAnim* _anim;
-    double  lastDuration;
+    double lastDuration;
     QMap<QString, QWidget*> settingWidgets;
 
-    QMap<QString, QSpinBox*>    angleSpinners;
+    QMap<QString, QSpinBox*> angleSpinners;
 
     QFrame* hLine();
 

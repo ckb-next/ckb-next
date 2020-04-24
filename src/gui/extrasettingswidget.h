@@ -3,8 +3,9 @@
 
 #include <QWidget>
 
-namespace Ui {
-class ExtraSettingsWidget;
+namespace Ui
+{
+    class ExtraSettingsWidget;
 }
 
 class ExtraSettingsWidget : public QWidget
@@ -12,7 +13,7 @@ class ExtraSettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ExtraSettingsWidget(QWidget *parent = 0);
+    explicit ExtraSettingsWidget(QWidget* parent = 0);
     ~ExtraSettingsWidget();
 
     void pollUpdates();
@@ -37,7 +38,7 @@ private slots:
     void on_timerMinBox_editingFinished();
 
 private:
-    Ui::ExtraSettingsWidget *ui;
+    Ui::ExtraSettingsWidget* ui;
 };
 
 #endif // EXTRASETTINGSWIDGET_H

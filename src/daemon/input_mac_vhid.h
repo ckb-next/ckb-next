@@ -9,7 +9,8 @@
 // Kext constant. Don't modify unless you're absolutely sure you know what you're doing.
 #define VHID_KEYS_LEN 32
 
-enum user_client_method {
+enum user_client_method
+{
     // VirtualHIDKeyboard
     initialize_virtual_hid_keyboard,
     terminate_virtual_hid_keyboard,
@@ -29,7 +30,8 @@ enum user_client_method {
     end_,
 };
 
-enum modifier {
+enum modifier
+{
     left_control = 0x1 << 0,
     left_shift = 0x1 << 1,
     left_option = 0x1 << 2,
@@ -41,46 +43,55 @@ enum modifier {
 };
 
 // VirtualHIDKeyboard
-typedef struct keyboard_initialization {
+typedef struct keyboard_initialization
+{
     uint8_t country_code;
 } vhid_properties;
 
-typedef struct keys {
+typedef struct keys
+{
     uint8_t keys_[VHID_KEYS_LEN];
 } vhid_keys;
 
-typedef struct modifiers {
+typedef struct modifiers
+{
     uint8_t modifiers_;
 } vhid_modifiers;
 
-typedef struct keyboard_input {
+typedef struct keyboard_input
+{
     uint8_t report_id_;
     vhid_modifiers modifiers;
     uint8_t reserved;
     vhid_keys keys;
 } vhid_kbinput;
 
-typedef struct consumer_input {
+typedef struct consumer_input
+{
     uint8_t report_id_;
     vhid_keys keys;
 } vhid_kbconsumerinput;
 
-typedef struct vendor_input {
+typedef struct vendor_input
+{
     uint8_t report_id_;
     vhid_keys keys;
 } vhid_kbvendorinput;
 
-typedef struct avtopcase_input {
+typedef struct avtopcase_input
+{
     uint8_t report_id_;
     vhid_keys keys;
 } vhid_kbavtopcaseinput;
 
 // VirtualHIDPointing
-typedef struct buttons {
+typedef struct buttons
+{
     uint32_t buttons_;
 } vhid_buttons;
 
-typedef struct pointing_input {
+typedef struct pointing_input
+{
     vhid_buttons buttons;
     uint8_t x;
     uint8_t y;

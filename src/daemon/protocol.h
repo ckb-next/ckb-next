@@ -2,8 +2,8 @@
 // For more detail, please see https://github.com/ckb-next/corsair-protocol.
 
 // Corsair protocol commands.
-#define CMD_SET        0x07 // Write a single field.
-#define CMD_GET        0x0e // Read a single field.
+#define CMD_SET 0x07 // Write a single field.
+#define CMD_GET 0x0e // Read a single field.
 
 #define CMD_WRITE_BULK 0x7f // Write a stream of up to 5 packets at a time.
 #define CMD_READ_BULK  0xff // Read a stream of up to 5 packets at a time.
@@ -28,10 +28,10 @@
 #define FIELD_KEYINPUT 0x40 // Key input mode; whether an event should trigger a HID or Corsair event (or both). Write only.
 
 // Used for FIELD_RESET.
-#define RESET_NORMAL   0x00 // A medium-speed reset.
-#define RESET_FAST     0x01 // A faster reset.
-#define RESET_BLD      0xaa // Reboot to bootloader; mounting as a virtual FAT12 device.
-#define RESET_SLOW     0xf0 // A slow reset sent after firmware update.
+#define RESET_NORMAL 0x00 // A medium-speed reset.
+#define RESET_FAST   0x01 // A faster reset.
+#define RESET_BLD    0xaa // Reboot to bootloader; mounting as a virtual FAT12 device.
+#define RESET_SLOW   0xf0 // A slow reset sent after firmware update.
 
 // Used for FIELD_SPECIAL and FIELD_LIGHTING.
 #define MODE_HARDWARE  0x01 // This should be hardware controlled and not generate an event.
@@ -40,23 +40,23 @@
 #define MODE_WINLOCK   0x09 // K68 winlock control.
 
 // Used for FIELD_MOUSE. All subcommands are read/write.
-#define MOUSE_DPI      0x02 // Mouse DPI mode.
-#define MOUSE_LIFT     0x03 // Mouse lift height.
-#define MOUSE_SNAP     0x04 // Mouse angle snap.
-#define MOUSE_DPIMASK  0x05 // Mouse DPI enabled mask.
-#define MOUSE_HWCOLOR  0x10 // Mouse hardware colour base (0x10-0x15).
-#define MOUSE_DPIPROF  0xd0 // Mouse DPI profile info.
+#define MOUSE_DPI     0x02 // Mouse DPI mode.
+#define MOUSE_LIFT    0x03 // Mouse lift height.
+#define MOUSE_SNAP    0x04 // Mouse angle snap.
+#define MOUSE_DPIMASK 0x05 // Mouse DPI enabled mask.
+#define MOUSE_HWCOLOR 0x10 // Mouse hardware colour base (0x10-0x15).
+#define MOUSE_DPIPROF 0xd0 // Mouse DPI profile info.
 
 // Used for FIELD_KB_COLOR.
-#define COLOR_RED      0x01 // The red channel of RGB.
-#define COLOR_GREEN    0x02 // The green channel of RGB.
-#define COLOR_BLUE     0x03 // The blue channel of RGB.
+#define COLOR_RED   0x01 // The red channel of RGB.
+#define COLOR_GREEN 0x02 // The green channel of RGB.
+#define COLOR_BLUE  0x03 // The blue channel of RGB.
 
 // HID input commands
 // Keyboards
-#define NKRO_KEY_IN    0x01 // NKRO key input
-#define NKRO_MEDIA_IN  0x02 // NKRO media key input
+#define NKRO_KEY_IN   0x01 // NKRO key input
+#define NKRO_MEDIA_IN 0x02 // NKRO media key input
 // Mice
-#define MOUSE_IN       0x01 // Standard HID mouse input (Position/Buttons)
+#define MOUSE_IN 0x01 // Standard HID mouse input (Position/Buttons)
 // Common
-#define CORSAIR_IN     0x03 // Corsair input. Doesn't apply to FW v1.15 on first gen devices.
+#define CORSAIR_IN 0x03 // Corsair input. Doesn't apply to FW v1.15 on first gen devices.

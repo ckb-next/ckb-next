@@ -11,4 +11,3 @@ void cmd_snap_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const
 int updatedpi_legacy(usbdevice* kb, int force);
 
 #endif // DPI_LEGACY_H
-

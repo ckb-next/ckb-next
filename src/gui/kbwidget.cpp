@@ -13,11 +13,7 @@
 #include "ui_kblightwidget.h"
 #include "mainwindow.h"
 
-KbWidget::KbWidget(QWidget *parent, Kb *_device) :
-    QWidget(parent),
-    device(_device), hasShownNewFW(false),
-    ui(new Ui::KbWidget),
-    currentMode(0)
+KbWidget::KbWidget(QWidget* parent, Kb* _device) : QWidget(parent), device(_device), hasShownNewFW(false), ui(new Ui::KbWidget), currentMode(0)
 {
     ui->setupUi(this);
     connect(ui->modesList, SIGNAL(orderChanged()), this, SLOT(modesList_reordered()));
@@ -34,51 +30,61 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     connect(static_cast<MainWindow*>(parent), &MainWindow::switchToModeCLI, this, &KbWidget::switchToMode);
 
     // Remove the Lighting and Performance tabs from non-RGB keyboards
-    if(!device->features.contains("rgb")){
-        if(device->model() != KeyMap::M95){
+    if (!device->features.contains("rgb"))
+    {
+        if (device->model() != KeyMap::M95)
+        {
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->lightTab));
         }
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
-    } else {
+    }
+    else
+    {
         // Remove mouse Performance tab from non-mice
-        if(!device->isMouse())
+        if (!device->isMouse())
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
         // Remove keyboard Performance tab from non-keyboards
-        if(!device->isKeyboard())
+        if (!device->isKeyboard())
             ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
     }
 
     // If we have an M95, set the performance and lighting tabs as such
-    if(device->model() == KeyMap::M95){
+    if (device->model() == KeyMap::M95)
+    {
         ui->mPerfWidget->setLegacyM95();
         ui->lightWidget->setLegacyM95();
     }
 
     // Hide poll rate and FW update as appropriate
-    if(!device->features.contains("pollrate")){
+    if (!device->features.contains("pollrate"))
+    {
         ui->pollRateBox->hide();
         ui->pollLabel2->hide();
     }
-    if(!device->features.contains("fwupdate")){
+    if (!device->features.contains("fwupdate"))
+    {
         ui->fwUpdButton->hide();
         ui->fwUpdLabel->hide();
         ui->fwUpdLayout->removeItem(ui->fwUpdLayout->itemAt(1));
     }
     // Remove binding tab if the device doesn't support it
-    if(!device->features.contains("bind")){
+    if (!device->features.contains("bind"))
+    {
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->bindTab));
     }
     // Set monochrome mode according to hardware
-    if(device->monochrome)
+    if (device->monochrome)
         ui->lightWidget->setMonochrome();
     // Disable Save to hardware button for unsupported devices
-    if(!device->hwload){
+    if (!device->hwload)
+    {
         ui->hwSaveButton->setDisabled(true);
         ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
     }
     // Read device layout
-    if(device->features.contains("bind")){
+    if (device->features.contains("bind"))
+    {
         // Clear the "Default" value
         ui->layoutBox->clear();
 
@@ -89,37 +95,45 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         QList<QPair<int, QString>> layoutnames = KeyMap::layoutNames(device->hwlayout);
 
         // Enable the ComboBox only if there is more than one supported layout
-        if(layoutnames.count() > 1)
+        if (layoutnames.count() > 1)
             ui->layoutBox->setEnabled(true);
 
-        for(int i = 0; i < layoutnames.count(); i++)
+        for (int i = 0; i < layoutnames.count(); i++)
             ui->layoutBox->addItem(layoutnames[i].second, layoutnames[i].first);
 
         KeyMap::Layout settingsLayout;
         KeyMap::Layout layout = settingsLayout = KeyMap::getLayout(settings.value("hwLayout").toString());
-        if(layout == KeyMap::NO_LAYOUT){
+        if (layout == KeyMap::NO_LAYOUT)
+        {
             // If the layout hasn't been set yet, first check if one was set globally from a previous version
             // If not, try to pick an appropriate one that's supported by the hardware
             KeyMap::Layout oldLayout = KeyMap::getLayout(CkbSettings::get("Program/KbdLayout").toString());
-            if(oldLayout == KeyMap::NO_LAYOUT){
+            if (oldLayout == KeyMap::NO_LAYOUT)
+            {
                 layout = KeyMap::locale(&layoutnames);
-            } else {
+            }
+            else
+            {
                 CkbSettings::set("Program/KbdLayout", "");
                 layout = oldLayout;
             }
         }
         // Find the position of the layout in the QComboBox and set it
         int layoutpos = -1;
-        if(layout != KeyMap::NO_LAYOUT){
-            for(int i = 0; i < layoutnames.count(); i++){
-                if(layoutnames.at(i).first == (int)layout){
+        if (layout != KeyMap::NO_LAYOUT)
+        {
+            for (int i = 0; i < layoutnames.count(); i++)
+            {
+                if (layoutnames.at(i).first == (int)layout)
+                {
                     layoutpos = i;
                     break;
                 }
             }
         }
         // If no layout was found, pick the first one from the list
-        if(layoutpos == -1){
+        if (layoutpos == -1)
+        {
             layout = (KeyMap::Layout)layoutnames.at(0).first;
             layoutpos = 0;
         }
@@ -133,37 +147,42 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         device->layout(KeyMap::GB, false);
 
     // Set max DPI for mice
-    if(device->isMouse())
+    if (device->isMouse())
         ui->mPerfWidget->setMaxDpi(device->getMaxDpi());
 
-    if(!device->adjrate){
+    if (!device->adjrate)
+    {
         ui->pollRateBox->setEnabled(false);
         ui->pollRateBox->setToolTip(tr("This device does not support setting the poll rate through software."));
     }
 }
 
-KbWidget::~KbWidget(){
+KbWidget::~KbWidget()
+{
     delete ui;
 }
 
-void KbWidget::showFirstTab(){
+void KbWidget::showFirstTab()
+{
     ui->tabWidget->setCurrentIndex(0);
 }
 
-void KbWidget::showLastTab(){
+void KbWidget::showLastTab()
+{
     ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 }
 
 
-void KbWidget::updateProfileList(){
+void KbWidget::updateProfileList()
+{
     // Clear profile list and rebuild
-    KbProfile* hwProfile = device->hwProfile(), *currentProfile = device->currentProfile();
+    KbProfile *hwProfile = device->hwProfile(), *currentProfile = device->currentProfile();
     ui->profileBox->clear();
     int i = 0;
-    foreach(KbProfile* profile, device->profiles()){
-        ui->profileBox->addItem((profile == hwProfile) ? QIcon(":/img/icon_profile_hardware.png") : QIcon(":/img/icon_profile.png"),
-                                profile->name());
-        if(profile == currentProfile)
+    foreach (KbProfile* profile, device->profiles())
+    {
+        ui->profileBox->addItem((profile == hwProfile) ? QIcon(":/img/icon_profile_hardware.png") : QIcon(":/img/icon_profile.png"), profile->name());
+        if (profile == currentProfile)
             ui->profileBox->setCurrentIndex(i);
         i++;
     }
@@ -173,32 +192,37 @@ void KbWidget::updateProfileList(){
     ui->profileBox->setItemData(ui->profileBox->count() - 1, font, Qt::FontRole);
 }
 
-void KbWidget::profileChanged(){
+void KbWidget::profileChanged()
+{
     // Rebuild mode list
     ui->modesList->clear();
     int i = 0;
     QListWidgetItem* current = 0;
-    foreach(KbMode* mode, device->currentProfile()->modes()){
+    foreach (KbMode* mode, device->currentProfile()->modes())
+    {
         QListWidgetItem* item = new QListWidgetItem(modeIcon(i), mode->name(), ui->modesList);
         item->setData(GUID, mode->id().guid);
         item->setFlags(item->flags() | Qt::ItemIsEditable);
-        if(mode == currentMode){
+        if (mode == currentMode)
+        {
             item->setSelected(true);
             current = item;
         }
         ui->modesList->addItem(item);
         i++;
     }
-    if(current)
+    if (current)
         ui->modesList->setCurrentItem(current);
     addNewModeItem();
     // Wait for modeChanged() to refresh the rest of the UI
 }
 
-void KbWidget::on_profileBox_activated(int index){
-    if(index < 0)
+void KbWidget::on_profileBox_activated(int index)
+{
+    if (index < 0)
         return;
-    if(index >= device->profiles().count()){
+    if (index >= device->profiles().count())
+    {
         // "Manage profiles" option
         KbProfileDialog dialog(this);
         dialog.exec();
@@ -209,16 +233,18 @@ void KbWidget::on_profileBox_activated(int index){
     // Device will emit profileChanged() and modeChanged() signals to update UI
 }
 
-QIcon KbWidget::modeIcon(int i){
-    KbProfile* currentProfile = device->currentProfile(), *hwProfile = device->hwProfile();
+QIcon KbWidget::modeIcon(int i)
+{
+    KbProfile *currentProfile = device->currentProfile(), *hwProfile = device->hwProfile();
     int hwModeCount = device->hwModeCount;
-    if(i >= hwModeCount)
+    if (i >= hwModeCount)
         return QIcon(":/img/icon_mode.png");
     else
         return QIcon(QString(currentProfile == hwProfile ? ":/img/icon_mode%1_hardware.png" : ":/img/icon_mode%1.png").arg(i + 1));
 }
 
-void KbWidget::addNewModeItem(){
+void KbWidget::addNewModeItem()
+{
     // Add an item for creating a new mode. Make it editable but not dragable.
     QListWidgetItem* item = new QListWidgetItem(tr("New mode..."), ui->modesList);
     item->setFlags((item->flags() | Qt::ItemIsEditable) & ~Qt::ItemIsDragEnabled & ~Qt::ItemIsDropEnabled);
@@ -230,9 +256,10 @@ void KbWidget::addNewModeItem(){
     ui->modesList->addItem(item);
 }
 
-void KbWidget::modeChanged(bool spontaneous){
+void KbWidget::modeChanged(bool spontaneous)
+{
     int index = device->currentProfile()->indexOf(device->currentMode());
-    if(index < 0)
+    if (index < 0)
         return;
     // Update tabs
     ui->lightWidget->setLight(device->currentLight());
@@ -240,58 +267,65 @@ void KbWidget::modeChanged(bool spontaneous){
     ui->kPerfWidget->setPerf(device->currentPerf(), device->currentProfile());
     ui->mPerfWidget->setPerf(device->currentPerf(), device->currentProfile());
     // Update selection
-    if(spontaneous)
+    if (spontaneous)
         ui->modesList->setCurrentRow(index);
     // Connect signals
-    if(currentMode)
+    if (currentMode)
         disconnect(currentMode, SIGNAL(updated()), this, SLOT(modeUpdate()));
     currentMode = device->currentMode();
     connect(currentMode, SIGNAL(updated()), this, SLOT(modeUpdate()));
     modeUpdate();
 }
 
-void KbWidget::on_modesList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous){
-    if(!current)
+void KbWidget::on_modesList_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous)
+{
+    if (!current)
         return;
     KbMode* mode = device->currentProfile()->find(current->data(GUID).toUuid());
-    if(!mode)
+    if (!mode)
         return;
     device->setCurrentMode(mode, false);
 }
 
-void KbWidget::modesList_reordered(){
+void KbWidget::modesList_reordered()
+{
     KbProfile* currentProfile = device->currentProfile();
     // Rebuild mode list from items
     QList<KbMode*> newModes;
     int count = ui->modesList->count();
-    for(int i = 0; i < count; i++){
+    for (int i = 0; i < count; i++)
+    {
         QListWidgetItem* item = ui->modesList->item(i);
         KbMode* mode = currentProfile->find(item->data(GUID).toUuid());
-        if(mode && !newModes.contains(mode))
+        if (mode && !newModes.contains(mode))
             newModes.append(mode);
-        if(item->data(NEW_FLAG).toInt() != 1)
+        if (item->data(NEW_FLAG).toInt() != 1)
             item->setIcon(modeIcon(i));
         item->setFlags(item->flags() | Qt::ItemIsEditable);
     }
     // Add any missing modes at the end of the list
-    foreach(KbMode* mode, currentProfile->modes()){
-        if(!newModes.contains(mode))
+    foreach (KbMode* mode, currentProfile->modes())
+    {
+        if (!newModes.contains(mode))
             newModes.append(mode);
     }
     currentProfile->modes(newModes);
 }
 
-void KbWidget::on_modesList_itemChanged(QListWidgetItem *item){
-    if(!item || !currentMode || item->data(GUID).toUuid() != currentMode->id().guid)
+void KbWidget::on_modesList_itemChanged(QListWidgetItem* item)
+{
+    if (!item || !currentMode || item->data(GUID).toUuid() != currentMode->id().guid)
         return;
     currentMode->name(item->text());
     // Set the text to the actual name (trimmed, "" replaced with "Unnamed")
     item->setText(currentMode->name());
 }
 
-void KbWidget::on_modesList_itemClicked(QListWidgetItem* item){
+void KbWidget::on_modesList_itemClicked(QListWidgetItem* item)
+{
     QUuid guid = item->data(GUID).toUuid();
-    if(guid.isNull() && item->data(NEW_FLAG).toInt() == 1){
+    if (guid.isNull() && item->data(NEW_FLAG).toInt() == 1)
+    {
         // "New mode" item. Clear text and start editing
         item->setText("");
         ui->modesList->editItem(item);
@@ -318,9 +352,10 @@ void KbWidget::on_modesList_itemClicked(QListWidgetItem* item){
 /// at position pos.
 ///
 /// When clicking on a command it is located and executed.
-void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
+void KbWidget::on_modesList_customContextMenuRequested(const QPoint& pos)
+{
     QListWidgetItem* item = ui->modesList->itemAt(pos);
-    if(!item || !currentMode || item->data(GUID).toUuid() != currentMode->id().guid)
+    if (!item || !currentMode || item->data(GUID).toUuid() != currentMode->id().guid)
         return;
     KbProfile* currentProfile = device->currentProfile();
     int index = currentProfile->indexOf(currentMode);
@@ -330,14 +365,14 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     QAction* duplicate = new QAction(tr("Duplicate"), this);
     QAction* del = new QAction(tr("Delete"), this);
     bool canDelete = (device->currentProfile()->modeCount() > device->hwModeCount);
-    if(!canDelete)
+    if (!canDelete)
         // Can't delete modes if they're required by hardware
         del->setEnabled(false);
     QAction* moveup = new QAction(tr("Move Up"), this);
-    if(index == 0)
+    if (index == 0)
         moveup->setEnabled(false);
     QAction* movedown = new QAction(tr("Move Down"), this);
-    if(index >= currentProfile->modeCount() - 1)
+    if (index >= currentProfile->modeCount() - 1)
         movedown->setEnabled(false);
     menu.addAction(rename);
     menu.addAction(duplicate);
@@ -346,36 +381,45 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     menu.addAction(moveup);
     menu.addAction(movedown);
     QAction* result = menu.exec(QCursor::pos());
-    if(result == rename){
+    if (result == rename)
+    {
         ui->modesList->editItem(item);
-    } else if(result == duplicate){
+    }
+    else if (result == duplicate)
+    {
         KbMode* newMode = device->newMode(currentMode);
         newMode->newId();
         currentProfile->insert(index + 1, newMode);
         // Update UI
         profileChanged();
         device->setCurrentMode(newMode);
-    } else if(result == del){
-        if(!canDelete)
+    }
+    else if (result == del)
+    {
+        if (!canDelete)
             return;
-        if(QMessageBox::question(this, tr("Delete mode"), tr("Are you sure you want to delete this mode?")) != QMessageBox::Yes)
+        if (QMessageBox::question(this, tr("Delete mode"), tr("Are you sure you want to delete this mode?")) != QMessageBox::Yes)
             return;
         currentProfile->removeAll(currentMode);
         currentMode->deleteLater();
         currentMode = 0;
         // Select next mode
         profileChanged();
-        if(index < currentProfile->modeCount())
+        if (index < currentProfile->modeCount())
             device->setCurrentMode(currentProfile->modes()[index]);
         else
             device->setCurrentMode(currentProfile->modes().last());
-    } else if(result == moveup){
+    }
+    else if (result == moveup)
+    {
         currentProfile->removeAll(currentMode);
         currentProfile->insert(index - 1, currentMode);
         // Update UI
         profileChanged();
         modeChanged(true);
-    } else if(result == movedown){
+    }
+    else if (result == movedown)
+    {
         currentProfile->removeAll(currentMode);
         currentProfile->insert(index + 1, currentMode);
         // Update UI
@@ -384,8 +428,10 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint &pos){
     }
 }
 
-inline int KbWidget::getPollRateBoxIdx(QString poll){
-    switch(poll.leftRef(1).toInt()){
+inline int KbWidget::getPollRateBoxIdx(QString poll)
+{
+    switch (poll.leftRef(1).toInt())
+    {
         case 1:
             return 0;
         case 2:
@@ -397,7 +443,8 @@ inline int KbWidget::getPollRateBoxIdx(QString poll){
     }
 }
 
-void KbWidget::devUpdate(){
+void KbWidget::devUpdate()
+{
     // Update device tab
     ui->devLabel->setText(device->usbModel);
     ui->serialLabel->setText(device->usbSerial);
@@ -409,43 +456,50 @@ void KbWidget::devUpdate(){
     ui->pollRateBox->blockSignals(block);
 }
 
-void KbWidget::modeUpdate(){
-}
+void KbWidget::modeUpdate() {}
 
-void KbWidget::on_hwSaveButton_clicked(){
+void KbWidget::on_hwSaveButton_clicked()
+{
     device->save();
     device->hwSave();
     updateProfileList();
     profileChanged();
 }
 
-void KbWidget::on_tabWidget_currentChanged(int index){
-    if(!device)
+void KbWidget::on_tabWidget_currentChanged(int index)
+{
+    if (!device)
         return;
-    if(index == ui->tabWidget->count() - 1){
+    if (index == ui->tabWidget->count() - 1)
+    {
         // Device tab
         updateFwButton();
     }
 }
 
-void KbWidget::updateFwButton(){
-    if(!KbFirmware::hasDownloaded())
+void KbWidget::updateFwButton()
+{
+    if (!KbFirmware::hasDownloaded())
         ui->fwUpdButton->setText(tr("Check for updates"));
-    else {
+    else
+    {
         float newVersion = KbFirmware::versionForBoard(device->productID);
         float oldVersion = device->firmware.toFloat();
-        if(newVersion <= 0.f || newVersion <= oldVersion)
+        if (newVersion <= 0.f || newVersion <= oldVersion)
             ui->fwUpdButton->setText(tr("Up to date"));
         else
             ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(QString::number(newVersion, 'f', 2)));
     }
 }
 
-void KbWidget::on_fwUpdButton_clicked(){
+void KbWidget::on_fwUpdButton_clicked()
+{
     // If alt is pressed, ignore upgrades and go straight to the manual prompt
-    if(!(qApp->keyboardModifiers() & Qt::AltModifier)){
+    if (!(qApp->keyboardModifiers() & Qt::AltModifier))
+    {
         // Check version numbers
-        if(!KbFirmware::hasDownloaded()){
+        if (!KbFirmware::hasDownloaded())
+        {
             ui->fwUpdButton->setText(tr("Checking..."));
             ui->fwUpdButton->setEnabled(false);
         }
@@ -453,18 +507,25 @@ void KbWidget::on_fwUpdButton_clicked(){
         float oldVersion = device->firmware.toFloat();
         ui->fwUpdButton->setEnabled(true);
         updateFwButton();
-        if(newVersion == -1.f){
+        if (newVersion == -1.f)
+        {
             QMessageBox::information(this, tr("Firmware update"), tr("<center>There is a new firmware available for this device.<br />However, it requires a newer version of ckb-next.<br />Please upgrade ckb-next and try again.</center>"));
             return;
-        } else if(newVersion == 0.f){
-            if(QMessageBox::question(this, tr("Firmware update"), tr("<center>There was a problem getting the status for this device.<br />Would you like to select a file manually?</center>")) != QMessageBox::Yes)
+        }
+        else if (newVersion == 0.f)
+        {
+            if (QMessageBox::question(this, tr("Firmware update"), tr("<center>There was a problem getting the status for this device.<br />Would you like to select a file manually?</center>")) != QMessageBox::Yes)
                 return;
             // "Yes" -> fall through to browse file
-        } else if(newVersion <= oldVersion){
-            if(QMessageBox::question(this, tr("Firmware update"), tr("<center>Your firmware is already up to date.<br />Would you like to select a file manually?</center>")) != QMessageBox::Yes)
+        }
+        else if (newVersion <= oldVersion)
+        {
+            if (QMessageBox::question(this, tr("Firmware update"), tr("<center>Your firmware is already up to date.<br />Would you like to select a file manually?</center>")) != QMessageBox::Yes)
                 return;
             // "Yes" -> fall through to browse file
-        } else {
+        }
+        else
+        {
             // Automatic upgrade. Fetch file from web.
             // FwUpgradeDialog can't be parented to KbWidget because KbWidget may be deleted before the dialog exits
             FwUpgradeDialog dialog(parentWidget(), newVersion, "", device);
@@ -474,10 +535,11 @@ void KbWidget::on_fwUpdButton_clicked(){
     }
     // Browse for file
     QString path = QFileDialog::getOpenFileName(this, tr("Select firmware file"), QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), tr("Firmware blobs (*.bin)"));
-    if(path.isEmpty())
+    if (path.isEmpty())
         return;
     QFile file(path);
-    if(!file.open(QIODevice::ReadOnly)){
+    if (!file.open(QIODevice::ReadOnly))
+    {
         QMessageBox::warning(parentWidget(), tr("Error"), tr("<center>File could not be read.</center>"));
         return;
     }
@@ -486,24 +548,27 @@ void KbWidget::on_fwUpdButton_clicked(){
     dialog.exec();
 }
 
-void KbWidget::on_layoutBox_activated(int index){
+void KbWidget::on_layoutBox_activated(int index)
+{
     // Can't use currentIndexChanged as it fires when the GUI is first drawn
     // before the layout has been initialised
     int idxLayout = ui->layoutBox->itemData(index).toInt();
     KeyMap::Layout layout = (KeyMap::Layout)idxLayout;
     // Only set the layout if it was changed
-    if(layout == device->getCurrentLayout())
+    if (layout == device->getCurrentLayout())
         return;
     QString layoutSettingsPath("Devices/%1/hwLayout");
     CkbSettings::set(layoutSettingsPath.arg(device->usbSerial), KeyMap::getLayout(layout));
     device->layout(layout, true);
 }
 
-void KbWidget::switchToProfile(QString profile){
+void KbWidget::switchToProfile(QString profile)
+{
     int len = device->profiles().length();
-    for(int i = 0; i < len; i++){
+    for (int i = 0; i < len; i++)
+    {
         KbProfile* loopProfile = device->profiles().at(i);
-        if(loopProfile->name() != profile)
+        if (loopProfile->name() != profile)
             continue;
 
         qDebug() << "Switching" << this->name() << "to" << profile;
@@ -515,13 +580,15 @@ void KbWidget::switchToProfile(QString profile){
     }
 }
 
-void KbWidget::switchToMode(QString mode){
+void KbWidget::switchToMode(QString mode)
+{
     KbProfile* currentProfile = device->currentProfile();
     int len = currentProfile->modes().length();
 
-    for(int i = 0; i < len; i++){
+    for (int i = 0; i < len; i++)
+    {
         KbMode* loopMode = currentProfile->modes().at(i);
-        if(loopMode->name() != mode)
+        if (loopMode->name() != mode)
             continue;
 
         qDebug() << "Switching" << this->name() << "to mode" << mode << "in" << currentProfile->name();
@@ -533,7 +600,7 @@ void KbWidget::switchToMode(QString mode){
     }
 }
 
-void KbWidget::on_pollRateBox_currentIndexChanged(const QString &arg1)
+void KbWidget::on_pollRateBox_currentIndexChanged(const QString& arg1)
 {
     ui->pollRateBox->setEnabled(false);
     device->setPollRate(arg1.left(1));

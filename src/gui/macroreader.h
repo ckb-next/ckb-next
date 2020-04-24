@@ -52,7 +52,8 @@ public:
     /// \param macBox
     /// \param macText
     ///
-    MacroReaderThread(int macNum, QString macPath, QPlainTextEdit* macBox, QPlainTextEdit* macText) {
+    MacroReaderThread(int macNum, QString macPath, QPlainTextEdit* macBox, QPlainTextEdit* macText)
+    {
         macroNumber = macNum;
         macroPath = macPath;
         macroBox = macBox;
@@ -61,7 +62,7 @@ public:
 
     //////////
     /// \brief run is the notification reader main loop.
-    void run () Q_DECL_OVERRIDE;
+    void run() Q_DECL_OVERRIDE;
 
 private slots:
     //////////

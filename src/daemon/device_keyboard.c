@@ -6,7 +6,8 @@
 #include "profile.h"
 #include "usb.h"
 
-int start_kb_legacy(usbdevice* kb, int makeactive){
+int start_kb_legacy(usbdevice* kb, int makeactive)
+{
     (void)makeactive;
 
     // Put the non-RGB K95 into software mode. Nothing else needs to be done hardware wise
@@ -17,8 +18,9 @@ int start_kb_legacy(usbdevice* kb, int makeactive){
     return 0;
 }
 
-int setactive_kb(usbdevice* kb, int active){
-    if(NEEDS_FW_UPDATE(kb))
+int setactive_kb(usbdevice* kb, int active)
+{
+    if (NEEDS_FW_UPDATE(kb))
         return 0;
 
     pthread_mutex_lock(imutex(kb));
@@ -34,62 +36,70 @@ int setactive_kb(usbdevice* kb, int active){
         { CMD_SET, FIELD_KEYINPUT, 0 },               // Selects key input
         { CMD_SET, FIELD_LIGHTING, 2, 0, 0x03, 0x00 } // Commits key input selection
     };
-    if(active){
+    if (active)
+    {
         // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
         msg[0][2] = MODE_SOFTWARE;
-        if(!usbsend(kb, msg[0], 1))
+        if (!usbsend(kb, msg[0], 1))
             return -1;
         DELAY_MEDIUM(kb);
         // Set input mode on the keys. They must be grouped into packets of 60 bytes (+ 4 bytes header)
         // Keys are referenced in byte pairs, with the first byte representing the key and the second byte representing the mode.
-        for(int key = 0; key < N_KEYS_HW; ){
+        for (int key = 0; key < N_KEYS_HW;)
+        {
             int pair;
-            for(pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++){
+            for (pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++)
+            {
                 // Select both standard and Corsair input. The standard input will be ignored except in BIOS mode.
                 uchar action = IN_HID | IN_CORSAIR;
                 // Additionally, make MR activate the MR ring (this is disabled for now, may be back later)
-                //if(kb->keymap[key].name && !strcmp(kb->keymap[key].name, "mr"))
+                // if(kb->keymap[key].name && !strcmp(kb->keymap[key].name, "mr"))
                 //    action |= ACT_MR_RING;
                 msg[1][4 + pair * 2] = key;
                 msg[1][5 + pair * 2] = action;
             }
             // Byte 2 = pair count (usually 30, less on final message)
             msg[1][2] = pair;
-            if(!usbsend(kb, msg[1], 1))
+            if (!usbsend(kb, msg[1], 1))
                 return -1;
         }
         // Commit new input settings
-        if(!usbsend(kb, msg[2], 1))
+        if (!usbsend(kb, msg[2], 1))
             return -1;
         DELAY_MEDIUM(kb);
-    } else {
+    }
+    else
+    {
         // Set the M-keys back into hardware mode, restore hardware RGB profile. It has to be sent twice for some reason.
         msg[0][2] = MODE_HARDWARE;
-        if(!usbsend(kb, msg[0], 1))
+        if (!usbsend(kb, msg[0], 1))
             return -1;
         DELAY_MEDIUM(kb);
-        if(!usbsend(kb, msg[0], 1))
+        if (!usbsend(kb, msg[0], 1))
             return -1;
         DELAY_MEDIUM(kb);
 #ifdef OS_LINUX
         // On OSX the default key mappings are fine. On Linux, the G keys will freeze the keyboard. Set the keyboard entirely to HID input.
-        for(int key = 0; key < N_KEYS_HW; ){
+        for (int key = 0; key < N_KEYS_HW;)
+        {
             int pair;
-            for(pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++){
+            for (pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++)
+            {
                 uchar action = IN_HID;
                 // Enable hardware actions
-                if(kb->keymap[key].name){
-                    if(!strcmp(kb->keymap[key].name, "mr"))
+                if (kb->keymap[key].name)
+                {
+                    if (!strcmp(kb->keymap[key].name, "mr"))
                         action = ACT_MR_RING;
-                    else if(!strcmp(kb->keymap[key].name, "m1"))
+                    else if (!strcmp(kb->keymap[key].name, "m1"))
                         action = ACT_M1;
-                    else if(!strcmp(kb->keymap[key].name, "m2"))
+                    else if (!strcmp(kb->keymap[key].name, "m2"))
                         action = ACT_M2;
-                    else if(!strcmp(kb->keymap[key].name, "m3"))
+                    else if (!strcmp(kb->keymap[key].name, "m3"))
                         action = ACT_M3;
-                    else if(!strcmp(kb->keymap[key].name, "light"))
+                    else if (!strcmp(kb->keymap[key].name, "light"))
                         action = ACT_LIGHT;
-                    else if(!strcmp(kb->keymap[key].name, "lock"))
+                    else if (!strcmp(kb->keymap[key].name, "lock"))
                         action = ACT_LOCK;
                 }
                 msg[1][4 + pair * 2] = key;
@@ -97,11 +107,11 @@ int setactive_kb(usbdevice* kb, int active){
             }
             // Byte 2 = pair count (usually 30, less on final message)
             msg[1][2] = pair;
-            if(!usbsend(kb, msg[1], 1))
+            if (!usbsend(kb, msg[1], 1))
                 return -1;
         }
         // Commit new input settings
-        if(!usbsend(kb, msg[2], 1))
+        if (!usbsend(kb, msg[2], 1))
             return -1;
         DELAY_MEDIUM(kb);
 #endif
@@ -111,7 +121,8 @@ int setactive_kb(usbdevice* kb, int active){
     return 0;
 }
 
-int cmd_active_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+int cmd_active_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4)
+{
     (void)dummy1;
     (void)dummy2;
     (void)dummy3;
@@ -120,7 +131,8 @@ int cmd_active_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const 
     return setactive_kb(kb, 1);
 }
 
-int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
+int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4)
+{
     (void)dummy1;
     (void)dummy2;
     (void)dummy3;
@@ -129,16 +141,18 @@ int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const ch
     return setactive_kb(kb, 0);
 }
 
-void setmodeindex_legacy(usbdevice *kb, int index){
-    switch(index % 3){
-    case 0:
-        nk95cmd(kb, NK95_M1);
-        break;
-    case 1:
-        nk95cmd(kb, NK95_M2);
-        break;
-    case 2:
-        nk95cmd(kb, NK95_M3);
-        break;
+void setmodeindex_legacy(usbdevice* kb, int index)
+{
+    switch (index % 3)
+    {
+        case 0:
+            nk95cmd(kb, NK95_M1);
+            break;
+        case 1:
+            nk95cmd(kb, NK95_M2);
+            break;
+        case 2:
+            nk95cmd(kb, NK95_M3);
+            break;
     }
 }

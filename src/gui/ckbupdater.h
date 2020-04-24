@@ -9,7 +9,7 @@ class CkbUpdater : public QObject
 {
     Q_OBJECT
 public:
-    explicit CkbUpdater(QObject *parent = 0);
+    explicit CkbUpdater(QObject* parent = 0);
     void checkForNewVersion();
 
 private:

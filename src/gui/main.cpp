@@ -23,7 +23,8 @@ extern "C" void disableAppNap();
 #define SHMEM_SIZE_V015 16
 
 // Command line options
-enum CommandLineParseResults {
+enum CommandLineParseResults
+{
     CommandLineOK,
     CommandLineError,
     CommandLineVersionRequested,
@@ -42,7 +43,8 @@ enum CommandLineParseResults {
  *
  * @return  integer, representing the requested argument
  */
-CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *errorMessage) {
+CommandLineParseResults parseCommandLine(QCommandLineParser& parser, QString* errorMessage)
+{
     // setup parser to interpret -abc as -a -b -c
     parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsCompactedShortOptions);
 
@@ -52,54 +54,69 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     // add -h, --help (/? on windows)
     const QCommandLineOption helpOption = parser.addHelpOption();
     // add -b, --background
-    const QCommandLineOption backgroundOption(QStringList() << "b" << "background",
+    const QCommandLineOption backgroundOption(QStringList() << "b"
+                                                            << "background",
                                               QObject::tr("Starts in background, without displaying the main window."));
     parser.addOption(backgroundOption);
 
     // add -c, --close
-    const QCommandLineOption closeOption(QStringList() << "c" << "close",
+    const QCommandLineOption closeOption(QStringList() << "c"
+                                                       << "close",
                                          QObject::tr("Causes already running instance (if any) to exit."));
     parser.addOption(closeOption);
 
-    const QCommandLineOption switchToProfileOption(QStringList() << "p" << "profile", QObject::tr("Switches to the profile with the specified name on all devices."), "profile-name");
+    const QCommandLineOption switchToProfileOption(QStringList() << "p"
+                                                                 << "profile",
+                                                   QObject::tr("Switches to the profile with the specified name on all devices."), "profile-name");
     parser.addOption(switchToProfileOption);
 
-    const QCommandLineOption switchToModeOption(QStringList() << "m" << "mode", QObject::tr("Switches to the mode either in the current profile, or in the one specified by --profile"), "mode-name");
+    const QCommandLineOption switchToModeOption(QStringList() << "m"
+                                                              << "mode",
+                                                QObject::tr(
+                                                    "Switches to the mode either in the current profile, or in the one specified by --profile"),
+                                                "mode-name");
     parser.addOption(switchToModeOption);
 
     /* parse arguments */
-    if (!parser.parse(QCoreApplication::arguments())) {
+    if (!parser.parse(QCoreApplication::arguments()))
+    {
         // set error, if there already are some
         *errorMessage = parser.errorText();
         return CommandLineError;
     }
 
     /* return requested operation/setup */
-    if (parser.isSet(versionOption)) {
+    if (parser.isSet(versionOption))
+    {
         // print version and exit
         return CommandLineVersionRequested;
     }
 
-    if (parser.isSet(helpOption)) {
+    if (parser.isSet(helpOption))
+    {
         // print help and exit
         return CommandLineHelpRequested;
     }
 
-    if (parser.isSet(backgroundOption)) {
+    if (parser.isSet(backgroundOption))
+    {
         // open application in background
         return CommandLineBackground;
     }
 
-    if (parser.isSet(closeOption)) {
+    if (parser.isSet(closeOption))
+    {
         // close already running application instances, if any
         return CommandLineClose;
     }
 
-    if(parser.isSet(switchToProfileOption)) {
+    if (parser.isSet(switchToProfileOption))
+    {
         return CommandLineSwitchToProfile;
     }
 
-    if(parser.isSet(switchToModeOption)) {
+    if (parser.isSet(switchToModeOption))
+    {
         return CommandLineSwitchToMode;
     }
 
@@ -108,13 +125,17 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
 };
 
 // Scan shared memory for an active PID
-static bool pidActive(const QStringList& lines){
-    foreach(const QString& line, lines){
-        if(line.startsWith("PID ")){
+static bool pidActive(const QStringList& lines)
+{
+    foreach (const QString& line, lines)
+    {
+        if (line.startsWith("PID "))
+        {
             bool ok;
             pid_t pid;
             // Valid PID found?
-            if((pid = line.split(" ")[1].toLong(&ok)) > 0 && ok){
+            if ((pid = line.split(" ")[1].toLong(&ok)) > 0 && ok)
+            {
                 // kill -0 does nothing to the application, but checks if it's running
                 return (kill(pid, 0) == 0 || errno != ESRCH);
             }
@@ -125,27 +146,35 @@ static bool pidActive(const QStringList& lines){
 }
 
 // Check if the application is running. Optionally write something to its shared memory.
-static bool isRunning(const char* command){
+static bool isRunning(const char* command)
+{
     // Try to create shared memory (if successful, application was not already running)
-    if(!appShare.create(SHMEM_SIZE) || !appShare.lock()){
+    if (!appShare.create(SHMEM_SIZE) || !appShare.lock())
+    {
         // Lock existing shared memory
-        if(!appShare.attach() || !appShare.lock())
+        if (!appShare.attach() || !appShare.lock())
             return true;
         bool running = false;
-        if(appShare.size() == SHMEM_SIZE_V015){
+        if (appShare.size() == SHMEM_SIZE_V015)
+        {
             // Old shmem - no PID listed so assume the process is running, and print the command directly to the buffer
-            if(command){
+            if (command)
+            {
                 void* data = appShare.data();
                 snprintf((char*)data, SHMEM_SIZE_V015, "%s", command);
             }
             running = true;
-        } else {
+        }
+        else
+        {
             // New shmem. Scan the contents of the shared memory for a PID
             QStringList lines = QString((const char*)appShare.constData()).split("\n");
-            if(pidActive(lines)){
+            if (pidActive(lines))
+            {
                 running = true;
                 // Append the command
-                if(command){
+                if (command)
+                {
                     lines.append(QString("Option ") + command);
                     QByteArray newMem = lines.join("\n").left(SHMEM_SIZE).toLatin1();
                     // Copy the NUL byte as well as the string
@@ -153,7 +182,8 @@ static bool isRunning(const char* command){
                 }
             }
         }
-        if(running){
+        if (running)
+        {
             appShare.unlock();
             return true;
         }
@@ -164,29 +194,33 @@ static bool isRunning(const char* command){
     return false;
 }
 
-bool checkIfQtCreator(){
+bool checkIfQtCreator()
+{
 #ifdef Q_OS_LINUX
     QString file = QString("/proc/%1/exe").arg(QString::number((long)getppid()));
 
     QFileInfo f(file);
-    if(!f.exists())
+    if (!f.exists())
         return false;
 
     QString exepath = f.canonicalFilePath();
-    if(exepath.endsWith("/qtcreator"))
+    if (exepath.endsWith("/qtcreator"))
         return true;
 #endif
     return false;
 }
 
-int main(int argc, char *argv[]){
+int main(int argc, char* argv[])
+{
 #ifdef Q_OS_LINUX
     // Get rid of "-session" before Qt parses the arguments
-    for(int i = 0; i < argc; i++){
-        if(!strcmp(argv[i], "-session")){
+    for (int i = 0; i < argc; i++)
+    {
+        if (!strcmp(argv[i], "-session"))
+        {
             argv[i][1] = 'b';
             argv[i][2] = '\0';
-            if(i + 1 < argc)
+            if (i + 1 < argc)
                 argv[i + 1][0] = '\0';
             break;
         }
@@ -198,7 +232,7 @@ int main(int argc, char *argv[]){
     // Needs to be called before QApplication is constructed
     {
         QSettings tmp("ckb-next", "ckb-next");
-        if(tmp.value("Program/HiDPI", false).toBool())
+        if (tmp.value("Program/HiDPI", false).toBool())
             QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     }
 #endif
@@ -208,7 +242,7 @@ int main(int argc, char *argv[]){
 
     // Setup translations
     QTranslator translator;
-    if(translator.load(QLocale(), "", "", ":/translations"))
+    if (translator.load(QLocale(), "", "", ":/translations"))
         a.installTranslator(&translator);
 
     // Setup names and versions
@@ -223,7 +257,8 @@ int main(int argc, char *argv[]){
     bool background = false;
 
     // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
-    if(getuid() == 0){
+    if (getuid() == 0)
+    {
         printf("The ckb-next GUI should not be run as root.\n");
         return 0;
     }
@@ -237,58 +272,59 @@ int main(int argc, char *argv[]){
 #endif
 
     // Parse arguments
-    switch (parseCommandLine(parser, &errorMessage)) {
-    case CommandLineOK:
-        // If launched with no argument
-        break;
-    case CommandLineError:
-        fputs(qPrintable(errorMessage), stderr);
-        fputs("\n\n", stderr);
-        fputs(qPrintable(parser.helpText()), stderr);
-        return 1;
-    case CommandLineVersionRequested:
-        // If launched with --version, print version info and then quit
-        printf("%s %s\n", qPrintable(QCoreApplication::applicationName()),
-               qPrintable(QCoreApplication::applicationVersion()));
-        return 0;
-    case CommandLineHelpRequested:
-        // If launched with --help, print help and then quit
-        parser.showHelp();
-        return 0;
-    case CommandLineClose:
-        // If launched with --close, kill existing app
-        if (isRunning("Close"))
-            printf("Asking existing instance to close.\n");
-        else
-            printf("ckb-next is not running.\n");
-        return 0;
-    case CommandLineSwitchToMode:
-    case CommandLineSwitchToProfile:
+    switch (parseCommandLine(parser, &errorMessage))
     {
-        QString profileName = parser.value("profile").left(30);
-        QString modeName = parser.value("mode").left(30);
+        case CommandLineOK:
+            // If launched with no argument
+            break;
+        case CommandLineError:
+            fputs(qPrintable(errorMessage), stderr);
+            fputs("\n\n", stderr);
+            fputs(qPrintable(parser.helpText()), stderr);
+            return 1;
+        case CommandLineVersionRequested:
+            // If launched with --version, print version info and then quit
+            printf("%s %s\n", qPrintable(QCoreApplication::applicationName()), qPrintable(QCoreApplication::applicationVersion()));
+            return 0;
+        case CommandLineHelpRequested:
+            // If launched with --help, print help and then quit
+            parser.showHelp();
+            return 0;
+        case CommandLineClose:
+            // If launched with --close, kill existing app
+            if (isRunning("Close"))
+                printf("Asking existing instance to close.\n");
+            else
+                printf("ckb-next is not running.\n");
+            return 0;
+        case CommandLineSwitchToMode:
+        case CommandLineSwitchToProfile:
+        {
+            QString profileName = parser.value("profile").left(30);
+            QString modeName = parser.value("mode").left(30);
 
-        if(profileName.isEmpty() && modeName.isEmpty()) {
-            printf("No valid profile or mode specified.\n");
+            if (profileName.isEmpty() && modeName.isEmpty())
+            {
+                printf("No valid profile or mode specified.\n");
+                return 0;
+            }
+
+            QString switchStr;
+
+            if (!profileName.isEmpty())
+                switchStr.append("SwitchToProfile: ").append(profileName).append("\nOption ");
+            if (!modeName.isEmpty())
+                switchStr.append("SwitchToMode: ").append(modeName);
+
+            if (!isRunning(switchStr.toUtf8().constData()))
+                printf("ckb-next is not running.\n");
+
             return 0;
         }
-
-        QString switchStr;
-
-        if(!profileName.isEmpty())
-            switchStr.append("SwitchToProfile: ").append(profileName).append("\nOption ");
-        if(!modeName.isEmpty())
-            switchStr.append("SwitchToMode: ").append(modeName);
-
-        if (!isRunning(switchStr.toUtf8().constData()))
-            printf("ckb-next is not running.\n");
-
-        return 0;
-    }
-    case CommandLineBackground:
-        // If launched with --background, launch in background
-        background = true;
-        break;
+        case CommandLineBackground:
+            // If launched with --background, launch in background
+            background = true;
+            break;
     }
 
     bool startDelay = false;
@@ -297,7 +333,7 @@ int main(int argc, char *argv[]){
         startDelay = tmp.value("Program/StartDelay", false).toBool();
     }
 
-    if(startDelay)
+    if (startDelay)
         QThread::sleep(5);
 
 #ifdef Q_OS_MACOS
@@ -306,14 +342,14 @@ int main(int argc, char *argv[]){
 
     disableAppNap();
 
-    FILE *fp = fopen("/tmp/ckb", "w");
+    FILE* fp = fopen("/tmp/ckb", "w");
     fprintf(fp, "%d", getpid());
     fclose(fp);
 #endif
 
     // Launch in background if requested, or if re-launching a previous session
     const char* shm_str = "Open";
-    if(qApp->isSessionRestored())
+    if (qApp->isSessionRestored())
     {
         background = 1;
         shm_str = nullptr;
@@ -321,22 +357,23 @@ int main(int argc, char *argv[]){
     // Check if the parent was Qt Creator.
     // If so, send a close command, wait, then run.
     bool QtCreator = checkIfQtCreator();
-    if(QtCreator)
+    if (QtCreator)
         shm_str = "Close";
 
-    if(background)
+    if (background)
         shm_str = nullptr;
 
-    if(isRunning(shm_str) && !QtCreator){
+    if (isRunning(shm_str) && !QtCreator)
+    {
         printf("ckb-next is already running. Exiting.\n");
         return 0;
     }
 
-    if(QtCreator)
+    if (QtCreator)
         QThread::sleep(1);
 
     MainWindow w;
-    if(!background)
+    if (!background)
         w.show();
 
     return a.exec();

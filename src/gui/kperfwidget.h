@@ -8,8 +8,9 @@
 #include "kbprofile.h"
 #include "colorbutton.h"
 
-namespace Ui {
-class KPerfWidget;
+namespace Ui
+{
+    class KPerfWidget;
 }
 
 class KPerfWidget : public QWidget
@@ -17,7 +18,7 @@ class KPerfWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit KPerfWidget(QWidget *parent = 0);
+    explicit KPerfWidget(QWidget* parent = 0);
     ~KPerfWidget();
 
     void setPerf(KbPerf* newPerf, KbProfile* newProfile);
@@ -28,13 +29,14 @@ public:
     typedef KbPerf::i_hw i_hw;
 
 private:
-    Ui::KPerfWidget *ui;
+    Ui::KPerfWidget* ui;
 
     KbPerf* perf;
     KbProfile* profile;
 
     // Hardware indicator dropdowns
-    enum HwMode {
+    enum HwMode
+    {
         NORMAL,
         ALWAYS_ON,
         ALWAYS_OFF,
@@ -50,10 +52,11 @@ private:
     /// \param [OUT] hw_enable
     void mode2Raw(HwMode mode, bool& sw_enable, i_hw& hw_enable);
 
-    struct IndicatorUi {
+    struct IndicatorUi
+    {
         QCheckBox* enable;
         QComboBox* hwEnable;
-        ColorButton* color1, *color2, *color3;
+        ColorButton *color1, *color2, *color3;
     };
     IndicatorUi indicators[I_COUNT];
     QList<QWidget*> k95Widgets;

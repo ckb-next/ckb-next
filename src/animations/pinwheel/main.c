@@ -1,6 +1,7 @@
 #include <ckb-next/animation.h>
 
-void ckb_info(){
+void ckb_info()
+{
     // Plugin info
     CKB_NAME("Pinwheel");
     CKB_VERSION("0.9");
@@ -42,23 +43,24 @@ int symmetric = 0;
 int counter_clock = 0;
 double x_offset = 0, y_offset = 0;
 
-void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
-    CKB_PARSE_AGRADIENT("color", &animcolor){}
+void ckb_parameter(ckb_runctx* context, const char* name, const char* value)
+{
+    CKB_PARSE_AGRADIENT("color", &animcolor) {}
     double len;
-    CKB_PARSE_DOUBLE("length", &len){
-        animlength = len / 100. * M_PI * 2.;
-    }
-    CKB_PARSE_BOOL("symmetric", &symmetric){}
-    CKB_PARSE_BOOL("counter_clock", &counter_clock){}
+    CKB_PARSE_DOUBLE("length", &len) { animlength = len / 100. * M_PI * 2.; }
+    CKB_PARSE_BOOL("symmetric", &symmetric) {}
+    CKB_PARSE_BOOL("counter_clock", &counter_clock) {}
     CKB_PARSE_DOUBLE("x_offset", &x_offset) {}
     CKB_PARSE_DOUBLE("y_offset", &y_offset) {}
 }
 
-void ckb_init(ckb_runctx* context){
+void ckb_init(ckb_runctx* context)
+{
     // Unused
 }
 
-void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
+void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state)
+{
     // Unused
 }
 
@@ -67,46 +69,51 @@ float x, y;
 
 #define ANGLE(theta) fmod((theta) + M_PI * 2., M_PI * 2.)
 
-void ckb_start(ckb_runctx* context, int state){
+void ckb_start(ckb_runctx* context, int state)
+{
     // Begin or end animation
     frame = state ? 0. : -1.;
     x = (context->width + (context->width * x_offset * 0.01)) / 2.f;
     y = (context->height - (context->height * y_offset * 0.01)) / 2.f;
 }
 
-void ckb_time(ckb_runctx* context, double delta){
-    if(frame < 0.)
+void ckb_time(ckb_runctx* context, double delta)
+{
+    if (frame < 0.)
         return;
     // Spin the wheel
     frame += delta;
-    if(frame > 1.)
+    if (frame > 1.)
         frame -= 1.;
 }
 
-int ckb_frame(ckb_runctx* context){
+int ckb_frame(ckb_runctx* context)
+{
     CKB_KEYCLEAR(context);
-    if(frame < 0.)
+    if (frame < 0.)
         return 0;
     // Color each key according to its angle from the center
     float position;
-    if(counter_clock)
+    if (counter_clock)
         position = ANGLE(frame * M_PI * 2.);
     else
         position = ANGLE(-frame * M_PI * 2.);
     unsigned count = context->keycount;
     ckb_key* keys = context->keys;
-    for(ckb_key* key = keys; key < keys + count; key++){
+    for (ckb_key* key = keys; key < keys + count; key++)
+    {
         float theta;
-        if(key->x == x && key->y == y)
+        if (key->x == x && key->y == y)
             // Dead center = 0°
             theta = 0.f;
         else
             theta = ANGLE(ANGLE(atan2(x - key->x, y - key->y)) - position);
         // If the animation is symmetric, mirror the second half
-        if(symmetric && theta > M_PI)
+        if (symmetric && theta > M_PI)
             theta = M_PI * 2. - theta;
         // Draw the gradient position that corresponds to this angle
-        if(theta < animlength){
+        if (theta < animlength)
+        {
             float distance = theta / animlength;
             float a, r, g, b;
             ckb_grad_color(&a, &r, &g, &b, &animcolor, distance * 100.);

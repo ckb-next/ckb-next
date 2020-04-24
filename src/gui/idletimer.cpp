@@ -10,7 +10,8 @@
 #include <xcb/screensaver.h>
 #include <limits.h>
 
-int IdleTimer::getIdleTime(){
+int IdleTimer::getIdleTime()
+{
     xcb_connection_t* conn = QX11Info::connection();
     int display = QX11Info::appScreen();
 
@@ -21,7 +22,7 @@ int IdleTimer::getIdleTime(){
     delete replyInfo;
 
     // Clamp the value
-    if(userIdle > INT_MAX)
+    if (userIdle > INT_MAX)
         userIdle = INT_MAX;
 
     return (int)userIdle;
@@ -29,17 +30,19 @@ int IdleTimer::getIdleTime(){
 
 #else
 
-int IdleTimer::getIdleTime(){
+int IdleTimer::getIdleTime()
+{
     return 0;
 }
 #endif
 
-bool IdleTimer::isWayland(){
+bool IdleTimer::isWayland()
+{
     QByteArray wdesktop = qgetenv("WAYLAND_DESKTOP");
-    if(!wdesktop.isEmpty())
+    if (!wdesktop.isEmpty())
         return true;
     QString stype(qgetenv("XDG_SESSION_TYPE"));
-    if(stype == "wayland")
+    if (stype == "wayland")
         return true;
     return false;
 }

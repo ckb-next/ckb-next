@@ -6,7 +6,7 @@
 
 // Connected devices
 // If this gets raised to a double digit number, the changes introduced by commit f24988ab68a94 will need to be modified to accommodate for that
-#define DEV_MAX     9
+#define DEV_MAX 9
 extern usbdevice keyboard[DEV_MAX];
 // Is a device active?
 #ifdef OS_LINUX
@@ -70,8 +70,8 @@ void setmodeindex_legacy(usbdevice* kb, int index);
 // The upper nybble controls input mode. 0x80 generates a normal HID interrupt, 0x40 generates a proprietary interrupt. 0xc0 generates both.
 // The exceptions are the proprietary Corsair keys, which only report HID input in BIOS mode and only report Corsair input in non-BIOS mode.
 // In BIOS mode, the Corsair input is disabled no matter what.
-#define IN_HID          0x80
-#define IN_CORSAIR      0x40
+#define IN_HID     0x80
+#define IN_CORSAIR 0x40
 
 // The lower nybble controls various hardware actions
 #define ACT_LIGHT       1
@@ -83,4 +83,4 @@ void setmodeindex_legacy(usbdevice* kb, int index);
 #define ACT_M2          11
 #define ACT_M3          12
 
-#endif  // DEVICE_H
+#endif // DEVICE_H

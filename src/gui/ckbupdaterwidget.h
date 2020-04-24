@@ -5,8 +5,9 @@
 #include <QWidget>
 #include <QNetworkAccessManager>
 
-namespace Ui {
-class CkbUpdaterWidget;
+namespace Ui
+{
+    class CkbUpdaterWidget;
 }
 
 class CkbUpdaterDialog : public QDialog
@@ -14,7 +15,7 @@ class CkbUpdaterDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CkbUpdaterDialog(QString ver,  QString changelog, QWidget *parent = 0);
+    explicit CkbUpdaterDialog(QString ver, QString changelog, QWidget* parent = 0);
     ~CkbUpdaterDialog();
 
 private slots:
@@ -24,7 +25,7 @@ private slots:
     void downloadFinished(QNetworkReply* reply);
 
 private:
-    Ui::CkbUpdaterWidget *ui;
+    Ui::CkbUpdaterWidget* ui;
     QString _version, _changelog;
     QNetworkAccessManager* _manager;
     QNetworkReply* _reply;

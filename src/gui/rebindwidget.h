@@ -8,8 +8,9 @@
 
 // Key rebinding widget
 
-namespace Ui {
-class RebindWidget;
+namespace Ui
+{
+    class RebindWidget;
 }
 
 class RebindWidget : public QWidget
@@ -44,8 +45,8 @@ private slots:
     void on_modeBox_currentIndexChanged(int index);
     void on_lightBox_currentIndexChanged(int index);
     void on_lockBox_currentIndexChanged(int index);
-    void on_programKpBox_textChanged(const QString &arg1);
-    void on_programKrBox_textChanged(const QString &arg1);
+    void on_programKpBox_textChanged(const QString& arg1);
+    void on_programKrBox_textChanged(const QString& arg1);
     void on_animBox_currentIndexChanged(int index);
 
     void on_typingButton_clicked(bool checked);
@@ -77,7 +78,7 @@ private slots:
     void on_rb_delay_default_toggled(bool checked);
 
 private:
-    Ui::RebindWidget *ui;
+    Ui::RebindWidget* ui;
 
     // Tab indices
     const static int TAB_KB = 0, TAB_MOUSE = 1, TAB_ANIM = 2, TAB_SPECIAL = 3, TAB_PROGRAM = 4, TAB_MACRO = 5;
@@ -89,7 +90,7 @@ private:
     // Show some help info
     void helpStatus(int status);
 
-    void setCorrectRadioButton (QString macdef);
+    void setCorrectRadioButton(QString macdef);
 
     KbBind* bind;
     KbProfile* profile;
@@ -103,7 +104,7 @@ private:
     QStringList mouseKeys;
     QStringList mouseExtKeys;
     QStringList wheelKeys;
-    MacroReader* macReader;     ///< \brief macReader holds the MacroReader when macro recording starts.
+    MacroReader* macReader; ///< \brief macReader holds the MacroReader when macro recording starts.
 };
 
 #endif // REBINDWIDGET_H

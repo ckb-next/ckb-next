@@ -12,39 +12,43 @@ QAtomicInt cacheWritesInProgress(0);
 static QMap<QString, QVariant> globalCache;
 // Mutexes for accessing settings
 QMutex settingsMutex(QMutex::Recursive), settingsCacheMutex(QMutex::Recursive);
-#define lockMutex           QMutexLocker locker(backing == _globalSettings ? &settingsMutex : 0)
-#define lockMutexStatic     QMutexLocker locker(&settingsMutex)
-#define lockMutexStatic2    QMutexLocker locker2(&settingsMutex)
-#define lockMutexCache      QMutexLocker locker(&settingsCacheMutex)
+#define lockMutex        QMutexLocker locker(backing == _globalSettings ? &settingsMutex : 0)
+#define lockMutexStatic  QMutexLocker locker(&settingsMutex)
+#define lockMutexStatic2 QMutexLocker locker2(&settingsMutex)
+#define lockMutexCache   QMutexLocker locker(&settingsCacheMutex)
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 5, 0)
-#define qInfo       qDebug
-#define qWarning    qDebug
-#define qFatal      qDebug
-#define qCritical   qDebug
+#define qInfo     qDebug
+#define qWarning  qDebug
+#define qFatal    qDebug
+#define qCritical qDebug
 #endif
 
-static QSettings* globalSettings(){
-    if(!_globalSettings){
+static QSettings* globalSettings()
+{
+    if (!_globalSettings)
+    {
         lockMutexStatic;
-        if(!(volatile QSettings*)_globalSettings){   // Check again after locking mutex in case another thread created the object
+        if (!(volatile QSettings*)_globalSettings)
+        { // Check again after locking mutex in case another thread created the object
             _globalSettings = new QSettings;
             qInfo() << "Path to settings:" << _globalSettings->fileName();
             // Check if a config migration attempt needs to be made.
             // On mac, first check if we need to migrate from plist to ini
             // If we copy nothing from this, we can go and try to migrate straight from the old ckb namespace
-            if(!_globalSettings->value("Program/CkbNextIniMigrationChecked", false).toBool()) {
+            if (!_globalSettings->value("Program/CkbNextIniMigrationChecked", false).toBool())
+            {
 #ifdef Q_OS_MAC
                 CkbSettings::migrateSettings(true);
 #endif
                 // on other platforms, just mark it as true so that if someone migrates settings from linux to mac, it will not try to migrate
                 _globalSettings->setValue("Program/CkbNextIniMigrationChecked", true);
             }
-            if(!_globalSettings->value("Program/CkbMigrationChecked", false).toBool()){
+            if (!_globalSettings->value("Program/CkbMigrationChecked", false).toBool())
+            {
                 CkbSettings::migrateSettings(false);
                 // Mark settings as migrated
                 _globalSettings->setValue("Program/CkbMigrationChecked", true);
-
             }
             // Put the settings object in a separate thread so that it won't lock up the GUI when it syncs
             globalThread = new QThread;
@@ -55,13 +59,15 @@ static QSettings* globalSettings(){
     return _globalSettings;
 }
 
-bool CkbSettings::isBusy(){
+bool CkbSettings::isBusy()
+{
     return cacheWritesInProgress.load() > 0;
 }
 
-void CkbSettings::migrateSettings(bool macFormat){
+void CkbSettings::migrateSettings(bool macFormat)
+{
     QSettings* oldSettings;
-    if(macFormat)
+    if (macFormat)
         oldSettings = new QSettings(QSettings::NativeFormat, QSettings::UserScope, "ckb-next", "ckb-next");
     else
         oldSettings = new QSettings("ckb", "ckb");
@@ -72,10 +78,12 @@ void CkbSettings::migrateSettings(bool macFormat){
     oldSettings->setFallbacksEnabled(false);
     qInfo() << "Looking for old settings in:" << oldSettings->fileName();
     // Check if a basic key exists
-    if(oldSettings->contains("Program/KbdLayout")){
+    if (oldSettings->contains("Program/KbdLayout"))
+    {
         qInfo() << "Found, proceeding to migrate.";
         QStringList oldKeys = oldSettings->allKeys();
-        foreach (const QString &key, oldKeys){
+        foreach (const QString& key, oldKeys)
+        {
             QVariant value = oldSettings->value(key);
             _globalSettings->setValue(key, value);
         }
@@ -84,11 +92,12 @@ void CkbSettings::migrateSettings(bool macFormat){
     delete oldSettings;
 }
 
-void CkbSettings::cleanUp(){
-    if(!_globalSettings)
+void CkbSettings::cleanUp()
+{
+    if (!_globalSettings)
         return;
     // Wait for all writers to finish
-    while(cacheWritesInProgress.load() > 0)
+    while (cacheWritesInProgress.load() > 0)
         QThread::yieldCurrentThread();
     // Stop thread and delete objects
     globalThread->quit();
@@ -99,64 +108,68 @@ void CkbSettings::cleanUp(){
     _globalSettings = 0;
 }
 
-CkbSettings::CkbSettings() :
-    backing(globalSettings()) {
-}
+CkbSettings::CkbSettings() : backing(globalSettings()) {}
 
-CkbSettings::CkbSettings(const QString& basePath, bool eraseExisting) :
-    backing(globalSettings()) {
-    if(basePath.isEmpty()){
-        if(eraseExisting)
+CkbSettings::CkbSettings(const QString& basePath, bool eraseExisting) : backing(globalSettings())
+{
+    if (basePath.isEmpty())
+    {
+        if (eraseExisting)
             qDebug() << "CkbSettings created with basePath = \"\" and eraseExisting = true. This is a mistake.";
         return;
     }
-    if(eraseExisting)
+    if (eraseExisting)
         remove(basePath);
     beginGroup(basePath);
 }
 
-CkbSettings::CkbSettings(QSettings& settings) :
-    backing(&settings) {
-}
+CkbSettings::CkbSettings(QSettings& settings) : backing(&settings) {}
 
-void CkbSettings::beginGroup(const QString& prefix){
+void CkbSettings::beginGroup(const QString& prefix)
+{
     groups.append(prefix);
 }
 
-void CkbSettings::endGroup(){
+void CkbSettings::endGroup()
+{
     groups.removeLast();
 }
 
-QStringList CkbSettings::childGroups() const {
+QStringList CkbSettings::childGroups() const
+{
     QString current = pwd();
     lockMutex;
-    if(!current.isEmpty())
+    if (!current.isEmpty())
         backing->beginGroup(current);
     QStringList res = backing->childGroups();
-    if(!current.isEmpty())
+    if (!current.isEmpty())
         backing->endGroup();
     return res;
 }
 
-QStringList CkbSettings::childKeys() const {
+QStringList CkbSettings::childKeys() const
+{
     QString current = pwd();
     lockMutex;
-    if(!current.isEmpty())
+    if (!current.isEmpty())
         backing->beginGroup(current);
     QStringList res = backing->childKeys();
-    if(!current.isEmpty())
+    if (!current.isEmpty())
         backing->endGroup();
     return res;
 }
 
-bool CkbSettings::contains(const QString& key) const {
+bool CkbSettings::contains(const QString& key) const
+{
     lockMutex;
     return backing->contains(pwd(key));
 }
 
-bool CkbSettings::containsGroup(const QString &group){
+bool CkbSettings::containsGroup(const QString& group)
+{
     QStringList components = group.split("/");
-    if(components.length() > 1){
+    if (components.length() > 1)
+    {
         // Find sub-group
         SGroup group(*this, components[0]);
         return containsGroup(QStringList(components.mid(1)).join('/'));
@@ -164,28 +177,32 @@ bool CkbSettings::containsGroup(const QString &group){
     return childGroups().contains(group);
 }
 
-QVariant CkbSettings::value(const QString& key, const QVariant& defaultValue) const {
+QVariant CkbSettings::value(const QString& key, const QVariant& defaultValue) const
+{
     lockMutex;
     return backing->value(pwd(key), defaultValue);
 }
 
-void CkbSettings::setValue(const QString& key, const QVariant& value){
-    //qDebug() << "Setting " << key << "to value" << value;
+void CkbSettings::setValue(const QString& key, const QVariant& value)
+{
+    // qDebug() << "Setting " << key << "to value" << value;
     // Cache the write values, save them when the object is destroyed
     QString realKey = pwd(key);
     writeCache[realKey] = value;
     // Update global cache if needed
     lockMutexCache;
-    if(globalCache.contains(realKey))
+    if (globalCache.contains(realKey))
         globalCache[realKey] = value;
 }
 
-void CkbSettings::remove(const QString& key){
+void CkbSettings::remove(const QString& key)
+{
     removeCache.append(pwd(key));
 }
 
-CkbSettings::~CkbSettings(){
-    if(removeCache.isEmpty() && writeCache.isEmpty())
+CkbSettings::~CkbSettings()
+{
+    if (removeCache.isEmpty() && writeCache.isEmpty())
         return;
     // Save the settings from the settings thread.
     // They have to be saved from that thread specifically to avoid performance issues
@@ -194,10 +211,11 @@ CkbSettings::~CkbSettings(){
     QObject::staticMetaObject.invokeMethod(writer, "run", Qt::QueuedConnection);
 }
 
-QVariant CkbSettings::get(const QString& key, const QVariant& defaultValue){
+QVariant CkbSettings::get(const QString& key, const QVariant& defaultValue)
+{
     // Store these settings in a memory cache
     lockMutexCache;
-    if(globalCache.contains(key))
+    if (globalCache.contains(key))
         return globalCache.value(key);
     // If it wasn't found in the memory cache, look for it in QSettings
     lockMutexStatic2;
@@ -205,10 +223,11 @@ QVariant CkbSettings::get(const QString& key, const QVariant& defaultValue){
     return globalCache[key] = settings->value(key, defaultValue);
 }
 
-void CkbSettings::set(const QString& key, const QVariant& value){
+void CkbSettings::set(const QString& key, const QVariant& value)
+{
     {
         lockMutexCache;
-        if(globalCache.value(key) == value)
+        if (globalCache.value(key) == value)
             return;
         globalCache[key] = value;
     }

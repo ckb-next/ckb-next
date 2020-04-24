@@ -21,35 +21,47 @@ public:
     // New lighting setup
     KbLight(KbMode* parent, const KeyMap& keyMap);
     // Copy a lighting setup
-    KbLight(KbMode *parent, const KeyMap& keyMap, const KbLight& other);
+    KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other);
     ~KbLight();
 
     // Key map
-    inline const KeyMap&    map() { return _map; }
-    void                    map(const KeyMap& map);
+    inline const KeyMap& map() { return _map; }
+    void map(const KeyMap& map);
     // Key -> color map
     inline const QColorMap& colorMap() { return _qColorMap; }
     // Color a key
-    void                    color(const QString& key, const QColor& newColor);
+    void color(const QString& key, const QColor& newColor);
     // Color all keys in the current map
-    void                    color(const QColor& newColor);
+    void color(const QColor& newColor);
 
     // Overall dimming. 0 = max brightness, 3 = off
-    static const int    MAX_DIM = 3;
-    inline int          dimming()               { return _dimming; }
-    void                dimming(int newDimming, bool overrideShare = false, bool noSave = false);
+    static const int MAX_DIM = 3;
+    inline int dimming() { return _dimming; }
+    void dimming(int newDimming, bool overrideShare = false, bool noSave = false);
     // Shared brightness between all modes (-1 for sharing disabled)
-    static int          shareDimming();
-    static void         shareDimming(int newShareDimming);
+    static int shareDimming();
+    static void shareDimming(int newShareDimming);
 
     // Lighting animations
     typedef QList<KbAnim*> AnimList;
-    KbAnim*             addAnim(const AnimScript* base, const QStringList& keys, const QString& name, const QMap<QString, QVariant>& preset);
-    KbAnim*             duplicateAnim(KbAnim* oldAnim);
-    const AnimList&     animList()                              { return _animList; }
-    void                animList(const AnimList& newAnimList)   { _needsSave = true; _animList = newAnimList; }
-    KbAnim*             findAnim(const QUuid& guid) const       { foreach(KbAnim* anim, _animList) { if(anim->guid() == guid) return anim; } return 0; }
-    int                 findAnimIdx(const QUuid& guid) const    { return _animList.indexOf(findAnim(guid)); }
+    KbAnim* addAnim(const AnimScript* base, const QStringList& keys, const QString& name, const QMap<QString, QVariant>& preset);
+    KbAnim* duplicateAnim(KbAnim* oldAnim);
+    const AnimList& animList() { return _animList; }
+    void animList(const AnimList& newAnimList)
+    {
+        _needsSave = true;
+        _animList = newAnimList;
+    }
+    KbAnim* findAnim(const QUuid& guid) const
+    {
+        foreach (KbAnim* anim, _animList)
+        {
+            if (anim->guid() == guid)
+                return anim;
+        }
+        return 0;
+    }
+    int findAnimIdx(const QUuid& guid) const { return _animList.indexOf(findAnim(guid)); }
     // Preview animation - temporary animation displayed at the top of the animation list
     void previewAnim(const AnimScript* base, const QStringList& keys, const QMap<QString, QVariant>& preset);
     void stopPreview();
@@ -96,16 +108,16 @@ signals:
     void frameDisplayed(const ColorMap& animatedColors, const QSet<QString>& indicatorList);
 
 private:
-    AnimList        _animList;
-    KbAnim*         _previewAnim;
-    KeyMap          _map;
-    QColorMap       _qColorMap;
-    ColorMap        _colorMap, _animMap, _lastFrameAnimMap, _indicatorMap, _lastFrameIndicatorMap;
-    QSet<QString>   _indicatorList;
-    quint64         lastFrameSignal;
-    int             _dimming, _lastFrameDimming, _timerOrigDimming;
-    bool            _start;
-    bool            _needsSave, _needsMapRefresh, _forceFrame;
+    AnimList _animList;
+    KbAnim* _previewAnim;
+    KeyMap _map;
+    QColorMap _qColorMap;
+    ColorMap _colorMap, _animMap, _lastFrameAnimMap, _indicatorMap, _lastFrameIndicatorMap;
+    QSet<QString> _indicatorList;
+    quint64 lastFrameSignal;
+    int _dimming, _lastFrameDimming, _timerOrigDimming;
+    bool _start;
+    bool _needsSave, _needsMapRefresh, _forceFrame;
 
     // Rebuild base ColorMap (if needed)
     void rebuildBaseMap();

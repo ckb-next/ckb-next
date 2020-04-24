@@ -5,8 +5,9 @@
 #include "extrasettingswidget.h"
 #include <QProcess>
 
-namespace Ui {
-class SettingsWidget;
+namespace Ui
+{
+    class SettingsWidget;
 }
 
 class SettingsWidget : public QWidget
@@ -14,7 +15,7 @@ class SettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit SettingsWidget(QWidget *parent = 0);
+    explicit SettingsWidget(QWidget* parent = 0);
     ~SettingsWidget();
 
     // Set text labels
@@ -50,7 +51,7 @@ private slots:
 
 private:
     QProcess* devDetect;
-    Ui::SettingsWidget *ui;
+    Ui::SettingsWidget* ui;
     friend class MainWindow;
     ExtraSettingsWidget* extra;
     void updateModifiers();

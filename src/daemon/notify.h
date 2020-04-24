@@ -24,4 +24,4 @@ void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const c
 // MUTEXES: Locks imutex during operation. Unlocks on close.
 void cmd_get(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* setting);
 
-#endif  // NOTIFY_H
+#endif // NOTIFY_H

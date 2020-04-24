@@ -2,12 +2,11 @@
 #include "ui_animdetailsdialog.h"
 #include <QTextDocumentFragment>
 
-AnimDetailsDialog::AnimDetailsDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::AnimDetailsDialog)
+AnimDetailsDialog::AnimDetailsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::AnimDetailsDialog)
 {
     ui->setupUi(this);
-    foreach(const AnimScript* script, AnimScript::list()){
+    foreach (const AnimScript* script, AnimScript::list())
+    {
         int row = ui->animTable->rowCount();
         ui->animTable->insertRow(row);
         ui->animTable->setItem(row, 0, new QTableWidgetItem(script->name()));

@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-void ckb_info(){
+void ckb_info()
+{
     // Plugin info
     CKB_NAME("Random");
     CKB_VERSION("0.9");
@@ -30,16 +31,19 @@ void ckb_info(){
 
 int fadein = 0, useopacity = 0;
 
-void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
+void ckb_parameter(ckb_runctx* context, const char* name, const char* value)
+{
     CKB_PARSE_BOOL("fade", &fadein) {}
     CKB_PARSE_BOOL("useopacity", &useopacity) {}
 }
 
-void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
+void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state)
+{
     // Unused
 }
 
-typedef struct {
+typedef struct
+{
     unsigned char a, r, g, b;
 } rgb;
 
@@ -48,8 +52,10 @@ rgb* target = 0;
 double phase = -1.;
 
 // Make a new target color for each key
-void newtarget(rgb* data, unsigned count){
-    for(unsigned i = 0; i < count; i++){
+void newtarget(rgb* data, unsigned count)
+{
+    for (unsigned i = 0; i < count; i++)
+    {
         rgb* key = data + i;
         key->a = useopacity ? rand() % 256 : 255;
         key->r = rand() % 256;
@@ -58,15 +64,18 @@ void newtarget(rgb* data, unsigned count){
     }
 }
 
-void ckb_init(ckb_runctx* context){
+void ckb_init(ckb_runctx* context)
+{
     unsigned count = context->keycount;
     current = malloc(count * sizeof(rgb));
     target = malloc(count * sizeof(rgb));
     srand(time(NULL));
 }
 
-void ckb_start(ckb_runctx* context, int state){
-    if(state == 0){
+void ckb_start(ckb_runctx* context, int state)
+{
+    if (state == 0)
+    {
         // Stop animation
         phase = -1.;
         return;
@@ -80,9 +89,10 @@ void ckb_start(ckb_runctx* context, int state){
     // Over the course of the animation, the keys fade between the current pattern and the target pattern
     newtarget(target, count);
     // Set all keys to current
-    for(unsigned i = 0; i < count; i++){
+    for (unsigned i = 0; i < count; i++)
+    {
         ckb_key* key = keys + i;
-        if(fadein)
+        if (fadein)
             current[i].a = 0;
         key->a = current[i].a;
         key->r = current[i].r;
@@ -91,12 +101,14 @@ void ckb_start(ckb_runctx* context, int state){
     }
 }
 
-void ckb_time(ckb_runctx* context, double delta){
-    if(phase < 0.)
+void ckb_time(ckb_runctx* context, double delta)
+{
+    if (phase < 0.)
         return;
     // Advance animation
     phase += delta;
-    if(phase > 1.){
+    if (phase > 1.)
+    {
         // If the animation is complete, pick a new target pattern and start again
         phase -= 1.;
         rgb* temp = target;
@@ -106,14 +118,17 @@ void ckb_time(ckb_runctx* context, double delta){
     }
 }
 
-int ckb_frame(ckb_runctx* context){
-    if(phase < 0.){
+int ckb_frame(ckb_runctx* context)
+{
+    if (phase < 0.)
+    {
         CKB_KEYCLEAR(context);
         return 0;
     }
     ckb_key* keys = context->keys;
     unsigned count = context->keycount;
-    for(unsigned i = 0; i < count; i++){
+    for (unsigned i = 0; i < count; i++)
+    {
         // Color each key according to the position between the last color set and the new color set
         ckb_key* key = keys + i;
         key->a = round(current[i].a * (1. - phase) + target[i].a * phase);

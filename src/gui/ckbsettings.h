@@ -28,7 +28,7 @@ public:
 
     // One-shot get/set
     static QVariant get(const QString& key, const QVariant& defaultValue = QVariant());
-    static void     set(const QString& key, const QVariant& value);
+    static void set(const QString& key, const QVariant& value);
 
     // Whether or not CkbSettings is busy writing data. If busy, the constructors will block until it is not.
     // The global set() will also block if busy, but global get() will not, unless the value has never been read before.
@@ -38,15 +38,15 @@ public:
     static void cleanUp();
 
     // QSettings functions
-    void        beginGroup(const QString& prefix);
-    void        endGroup();
+    void beginGroup(const QString& prefix);
+    void endGroup();
     QStringList childGroups() const;
     QStringList childKeys() const;
-    bool        contains(const QString& key) const;
-    bool        containsGroup(const QString& group);
-    QVariant    value(const QString& key, const QVariant& defaultValue = QVariant()) const;
-    void        setValue(const QString& key, const QVariant& value);
-    void        remove(const QString& key);
+    bool contains(const QString& key) const;
+    bool containsGroup(const QString& group);
+    QVariant value(const QString& key, const QVariant& defaultValue = QVariant()) const;
+    void setValue(const QString& key, const QVariant& value);
+    void remove(const QString& key);
 
 private:
     QSettings* backing;

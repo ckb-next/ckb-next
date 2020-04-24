@@ -193,13 +193,13 @@ static void inputupdate_keys(usbdevice* kb){
             const key* map = kb->keymap + keyindex;
             int scancode = (kb->active) ? bind->base[keyindex] : map->scan;
             char mask = 1 << bit;
-            char old = oldb & mask, new = newb & mask;
+            char old = oldb & mask, newkey = newb & mask;
             // If the key state changed, send it to the input device
-            if(old != new){
+            if(old != newkey){
                 // Don't echo a key press if there's no scancode associated
                 if(!(scancode & SCAN_SILENT)){
                     if(IS_MOD(scancode)){
-                        if(new){
+                        if(newkey){
                             // Modifier down: Add to the end of modifier keys
                             for(int i = keycount + rmodcount; i > 0; i--)
                                 events[modcount + i] = events[modcount + i - 1];
@@ -214,13 +214,13 @@ static void inputupdate_keys(usbdevice* kb){
                         // Regular keypress: add to the end of regular keys
                         for(int i = rmodcount; i > 0; i--)
                             events[modcount + keycount + i] = events[modcount + keycount + i - 1];
-                        events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
+                        events[modcount + keycount++] = newkey ? (scancode + 1) : -(scancode + 1);
                     }
                 }
 
                 // The volume wheel and the mouse wheel don't generate keyups, so create them automatically
 #define IS_WHEEL(scan, kb)  (((scan) == KEY_VOLUMEUP || (scan) == KEY_VOLUMEDOWN || (scan) == BTN_WHEELUP || (scan) == BTN_WHEELDOWN) && (!IS_K65(kb) && !IS_K63(kb)))
-                if(new && IS_WHEEL(map->scan, kb)){
+                if(newkey && IS_WHEEL(map->scan, kb)){
                     for(int i = rmodcount; i > 0; i--)
                         events[modcount + keycount + i] = events[modcount + keycount + i - 1];
                     if(scancode == KEY_UNBOUND)
@@ -233,9 +233,9 @@ static void inputupdate_keys(usbdevice* kb){
                 if(kb->active){
                     for(int notify = 0; notify < OUTFIFO_MAX; notify++){
                         if(mode->notify[notify][byte] & mask){
-                            nprintkey(kb, notify, keyindex, new);
+                            nprintkey(kb, notify, keyindex, newkey);
                             // Wheels doesn't generate keyups
-                            if(new && IS_WHEEL(map->scan, kb))
+                            if(newkey && IS_WHEEL(map->scan, kb))
                                 nprintkey(kb, notify, keyindex, 0);
                         }
                     }

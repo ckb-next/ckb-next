@@ -50,14 +50,14 @@ void restart() {
     level = 0;
 }
 
-char* row1[14] = { "grave",  "1", "2", "3", "4", "5", "6", "7", "8",     "9",   "0",     "minus",  "equal",  "back" };
-char* row2[14] = { "tab",    "q", "w", "e", "r", "t", "y", "u", "i",     "o",   "p",     "lbrace", "rbrace", "bslash" };
-char* row3[13] = { "caps",   "a", "s", "d", "f", "g", "h", "j", "k",     "l",   "colon", "quote",  "enter" };
-char* row4[12] = { "lshift", "z", "x", "c", "v", "b", "n", "m", "comma", "dot", "slash", "rshift" };
+const char* row1[14] = { "grave",  "1", "2", "3", "4", "5", "6", "7", "8",     "9",   "0",     "minus",  "equal",  "back" };
+const char* row2[14] = { "tab",    "q", "w", "e", "r", "t", "y", "u", "i",     "o",   "p",     "lbrace", "rbrace", "bslash" };
+const char* row3[13] = { "caps",   "a", "s", "d", "f", "g", "h", "j", "k",     "l",   "colon", "quote",  "enter" };
+const char* row4[12] = { "lshift", "z", "x", "c", "v", "b", "n", "m", "comma", "dot", "slash", "rshift" };
 
-char* continuesrow[14] = { "prtscn", "scroll", "pause", "ins", "home", "pgup", "del", "del", "end", "pgdn", "up", "left", "down", "right" };
+const char* continuesrow[14] = { "prtscn", "scroll", "pause", "ins", "home", "pgup", "del", "del", "end", "pgdn", "up", "left", "down", "right" };
 
-char* levels[12] = {"f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12" }; // FIXME: Actually use this
+//const char* levels[12] = {"f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12" }; // FIXME: Actually use this
 
 void ckb_init(ckb_runctx* context){
     srand(time(NULL));
@@ -98,7 +98,7 @@ void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){
 void ckb_start(ckb_runctx* context, int state) {
 }
 
-char* get_key_name(long int ep, int row) {
+const char* get_key_name(long int ep, int row) {
     switch(row) {
         case 1:
             return row1[ep];
@@ -268,8 +268,8 @@ void ckb_time(ckb_runctx* context, double delta){
     for(unsigned i = 0; i < count; i++){
         ckb_key* key = context->keys + i;
         char* key_name = key->name;
-        char* enemy_key_name = get_key_name(enemy_pos_int, enemy_row);
-        char* bullet_key_name = get_key_name(bullet_pos_int, bullet_row);
+        const char* enemy_key_name = get_key_name(enemy_pos_int, enemy_row);
+        const char* bullet_key_name = get_key_name(bullet_pos_int, bullet_row);
         key->a = 255;
         if (!strcmp(key_name, row1[0])) {
             key->r = 255;

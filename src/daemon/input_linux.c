@@ -28,9 +28,11 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
         for(int i = 0; i < REL_CNT; i++)
             ioctl(fd, UI_SET_RELBIT, i);
     } else {
-        // Enable all possible keys
-        for(int i = 0; i < KEY_CNT; i++)
+        // Enable common keyboard keys
+        for(int i = KEY_ESC; i <= KEY_MEDIA; i++)
             ioctl(fd, UI_SET_KEYBIT, i);
+        // Enable KEY_FN as that's also used
+        ioctl(fd, UI_SET_KEYBIT, KEY_FN);
         // Enable LEDs
         ioctl(fd, UI_SET_EVBIT, EV_LED);
         //for(int i = 0; i < LED_CNT; i++)

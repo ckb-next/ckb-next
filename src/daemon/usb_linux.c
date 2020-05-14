@@ -656,17 +656,22 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
         return -1;
     }
 #ifdef DEBUG
-    ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s\n", vendor, product, path, syspath);
-#endif // DEDBUG
-    // Find a free USB slot
+    ckb_info("vendor = 0x%x, product = 0x%x, path = %s, syspath = %s\n", vendor, product, path, syspath);
+#endif
+    // Make sure this existing keyboard doesn't have the same syspath (this shouldn't happen)
+    // Oh but it does happen!
+    for(int index = 1; index < DEV_MAX; index++){
+        if(!strcmp(syspath, kbsyspath[index])){
+            ckb_warn("Ignoring duplicate device with path %s at ckb%d\n", path, index);
+            return 0;
+        }
+    }
+
+    // If the path was not found, find a free USB slot and add the device there
     for(int index = 1; index < DEV_MAX; index++){
         usbdevice* kb = keyboard + index;
         if(pthread_mutex_trylock(dmutex(kb))){
             // If the mutex is locked then the device is obviously in use, so keep going
-            if(!strcmp(syspath, kbsyspath[index])){
-                // Make sure this existing keyboard doesn't have the same syspath (this shouldn't happen)
-                return 0;
-            }
             continue;
         }
         if(!IS_CONNECTED(kb)){

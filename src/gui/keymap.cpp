@@ -463,6 +463,42 @@ static const Key NightswordKeys[] = {
 #define NIGHTSWORD_WIDTH     M65_WIDTH
 #define NIGHTSWORD_HEIGHT    M65_HEIGHT
 
+
+// Mouse map - Ironclaw RGB Wireless
+static const Key IronclawWirelessKeys[] = {
+/*  _storageName, _friendlyName, name, x, y, w, h, hasLed, hasScan  */
+    // primary keys
+    {0, "Left Mouse",   "mouse1",     12,  0, 12, 28, false, true  },
+    {0, "Right Mouse",  "mouse2",     31,  0, 12, 28, false, true  },
+    {0, "Middle Mouse", "mouse3",     23,  7,  8,  6, false, true  },
+    
+    // center column keys
+    {0, "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
+    {0, "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
+    {0, "Profile Up",   "profup",   23, 20,  9,  9, false, true  },
+    {0, "Profile Down", "profdown", 23, 30,  9,  9, false, true  },
+    {0, "DPI Up",       "dpiup",    23, 40,  8,  9, false, true  },
+    {0, "DPI Up",       "dpidn",    23, 50,  8,  9, false, true  },
+    
+    // left side forward/back keys
+    {0, "Forward",      "mouse5",      6, 20,  5, 12, false, true  },
+    {0, "Back",         "mouse4",      7, 32,  5, 12, false, true  },
+    {0, "Option",       "optbtn",     10, 26,  8,  9, false, true  },
+
+    // zones for LEDs
+    {0, "Front",        "front",       8,  0,  8,  9, true, false  }
+    {0, "Logo",         "back",       21, 50, NS,     true, false  },
+    {0, "Wheel",        "wheel",      23,  3,  8, 14, true, false  },
+    
+    // need to add DPI LED, even if not directly configurable for indicator to work
+    {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
+
+};
+#define KEYCOUNT_IRONCLAW_W    (sizeof(IronclawWirelessKeys) / sizeof(Key))
+
+#define IRONCLAW_W_WIDTH       52
+#define IRONCLAW_W_HEIGHT      67
+
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
 #define N_LAYOUTS   KeyMap::_LAYOUT_MAX

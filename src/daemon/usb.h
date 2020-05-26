@@ -131,6 +131,10 @@
 #define P_DARK_CORE_SE_WL    0x1b51 /* wireless */
 #define IS_DARK_CORE(kb)     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_DARK_CORE || (kb)->product == P_DARK_CORE_WL || (kb)->product == P_DARK_CORE_SE || (kb)->product == P_DARK_CORE_SE_WL))
 
+#define P_IRONCLAW_W_U       0x1b4c /* Ironclaw RGB Wireless USB */
+#define P_IRONCLAW_W_D       0x1b66 /* Ironclaw RGB Wireless Dongle */
+#define IS_IRONCLAW_W(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_IRONCLAW_WU || (kb)->product == P_IRONCLAW_WD))
+
 #define P_POLARIS            0x1b3b
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
@@ -195,7 +199,7 @@ const char* product_str(ushort product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -235,7 +239,7 @@ const char* product_str(ushort product);
 #define IS_DONGLE(kb)                   ((kb)->product == P_DARK_CORE_WL || (kb)->product == P_DARK_CORE_SE_WL || IS_K63_WL(kb))
 
 /// Used for devices that use a file-based hardware animation system.
-#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_IRONCLAW || (kb)->product == P_HARPOON_PRO || IS_K63_WL(kb) || IS_DARK_CORE(kb))
+#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_IRONCLAW || (kb)->product == P_HARPOON_PRO || IS_K63_WL(kb) || IS_DARK_CORE(kb) || (kb)->product == P_IRONCLAW_W_U || (kb)->product == P_IRONCLAW_W_D)
 
 /// Devices here support setting the pollrate through software
 #define SUPPORTS_ADJRATE(kb)            ((kb)->product == P_K63_NRGB || (kb)->product == P_K66 || (kb)->product == P_K68 || (kb)->product == P_K68_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K95_PLATINUM || (kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_M95 || (kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_HARPOON || (kb)->product == P_HARPOON_PRO || (kb)->product == P_GLAIVE || (kb)->product == P_KATAR || (kb)->product == P_NIGHTSWORD || IS_DARK_CORE(kb))

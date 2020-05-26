@@ -77,6 +77,7 @@ public:
         IRONCLAW,
         NIGHTSWORD,
         DARKCORE,
+        IRONCLAW_W,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

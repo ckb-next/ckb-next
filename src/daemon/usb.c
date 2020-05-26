@@ -30,6 +30,8 @@ dpi_list mouse_dpi_list[] = {
     { P_KATAR, 8000 },
     { P_IRONCLAW, 18000 },
     { P_NIGHTSWORD, 18000},
+    { P_IRONCLAW_W_U, 18000 },
+    { P_IRONCLAW_W_D, 18000 },
     { 0, 0 }, // Keep last and do not remove
 };
 
@@ -88,6 +90,8 @@ device_desc models[] = {
     { V_CORSAIR, P_DARK_CORE_SE, },
     { V_CORSAIR, P_DARK_CORE_WL, },
     { V_CORSAIR, P_DARK_CORE_SE_WL, },
+    { V_CORSAIR, P_IRONCLAW_W_U, },
+    { V_CORSAIR, P_IRONCLAW_W_D, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
@@ -195,6 +199,8 @@ const char* product_str(ushort product){
         return "ironclaw";
     if(product == P_NIGHTSWORD)
         return "nightsword";
+    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D)
+        return "ironclaw";
     if(product == P_POLARIS)
         return "polaris";
     if(product == P_DARK_CORE || product == P_DARK_CORE_WL || product == P_DARK_CORE_SE || product == P_DARK_CORE_SE_WL)

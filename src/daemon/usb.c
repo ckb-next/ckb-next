@@ -29,6 +29,8 @@ dpi_list mouse_dpi_list[] = {
     { P_HARPOON_PRO, 12000 },
     { P_KATAR, 8000 },
     { P_IRONCLAW, 18000 },
+    { P_IRONCLAW_W_U, 18000 },
+    { P_IRONCLAW_W_D, 18000 },
     { 0, 0 }, // Keep last and do not remove
 };
 
@@ -78,6 +80,8 @@ device_desc models[] = {
     { V_CORSAIR, P_HARPOON_PRO, },
     { V_CORSAIR, P_KATAR, },
     { V_CORSAIR, P_IRONCLAW, },
+    { V_CORSAIR, P_IRONCLAW_W_U, },
+    { V_CORSAIR, P_IRONCLAW_W_D, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
@@ -178,6 +182,8 @@ const char* product_str(ushort product){
     if(product == P_KATAR)
         return "katar";
     if(product == P_IRONCLAW)
+        return "ironclaw";
+    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D)
         return "ironclaw";
     if(product == P_POLARIS)
         return "polaris";

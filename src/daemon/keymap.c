@@ -247,9 +247,9 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { "profdn",     -1, KEY_CORSAIR },
     { "profswitch", -1, KEY_CORSAIR },
-    { "profup",     -1, KEY_CORSAIR },
-    { "profdn",     -1, KEY_CORSAIR },
-    { "optbtn",     -1, KEY_CORSAIR },
+    // { "profup",     -1, KEY_CORSAIR },
+    // { "profdn",     -1, KEY_CORSAIR },
+    // { "optbtn",     -1, KEY_CORSAIR },
 
     // Extended mouse buttons (wheel is an axis in HW, 6-8 are recognized by the OS but not present in HW)
     { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },
@@ -354,15 +354,19 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
         } else {
             if(IS_MOUSE_DEV(kb)) {
                 // HID Mouse Input
-                if(firstbyte == MOUSE_IN)
+                if(IS_IRONCLAW_W(kb)) {
+                    icw_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                } else if(firstbyte == MOUSE_IN) {
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
-                // Corsair Mouse Input
-                else if(firstbyte == CORSAIR_IN)
+                } else if(firstbyte == CORSAIR_IN) { // Corsair Mouse Input
                     corsair_mousecopy(kb->input.keys, buffer);
-                else if(firstbyte == 0x05 && urblen == 21) // Seems to be on the Ironclaw RGB only
+                } else if(firstbyte == 0x05 && urblen == 21) { // Seems to be on the Ironclaw RGB only
                     corsair_extended_mousecopy(kb->input.keys, buffer);
-                else
-                    ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x", firstbyte, ep);
+                } else {
+                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                    // corsair_mousecopy(kb->input.keys, buffer);
+                    // ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x", firstbyte, ep);
+                }
             } else {
                 // Assume Keyboard for everything else for now
                 // Accept NKRO only if device is active
@@ -515,6 +519,29 @@ void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     *yaxis += (urbinput[8] << 8) | urbinput[7];
     // Byte 9: wheel
     char wheel = urbinput[9];
+    if(wheel > 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);         // wheelup
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    if(wheel < 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);     // wheeldn
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+}
+
+void icw_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
+    // Byte 1 = mouse buttons (bitfield)
+    for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
+        if(urbinput[0] & (1 << bit))
+            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+        else
+            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+    }
+    // Bytes 5 - 8: movement
+    *xaxis += (urbinput[5] << 8) | urbinput[4];
+    *yaxis += (urbinput[7] << 8) | urbinput[6];
+    // Byte 9: wheel
+    char wheel = urbinput[8];
     if(wheel > 0)
         SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);         // wheelup
     else

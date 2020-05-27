@@ -247,6 +247,9 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { "profdn",     -1, KEY_CORSAIR },
     { "profswitch", -1, KEY_CORSAIR },
+    { "profup",     -1, KEY_CORSAIR },
+    { "profdn",     -1, KEY_CORSAIR },
+    { "optbtn",     -1, KEY_CORSAIR },
 
     // Extended mouse buttons (wheel is an axis in HW, 6-8 are recognized by the OS but not present in HW)
     { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },

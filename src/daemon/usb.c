@@ -200,7 +200,7 @@ const char* product_str(ushort product){
     if(product == P_NIGHTSWORD)
         return "nightsword";
     if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D)
-        return "ironclaw";
+        return "ironclaw_wireless";
     if(product == P_POLARIS)
         return "polaris";
     if(product == P_DARK_CORE || product == P_DARK_CORE_WL || product == P_DARK_CORE_SE || product == P_DARK_CORE_SE_WL)

@@ -29,23 +29,19 @@ keypatch m95patch[] = {
 
 keypatch icwpatch[] = {
     /* idx, name, led, scan */
-    { 208, "mouse7", -1, SCAN_MOUSE | BTN_BACK },
-    { 209, "mouse6", -1, SCAN_MOUSE | BTN_FORWARD },
-    { 210, "thumb6", -1, KEY_CORSAIR },
     { 211, "dpiup",  -1, KEY_CORSAIR },
     { 212, "dpidn",  -1, KEY_CORSAIR },
-    { 218, "sniper", -1, KEY_CORSAIR },
 
 };
 #define ICWPATCH_LEN sizeof(icwpatch)/sizeof(*icwpatch)
 
 keypatches mappatches[] = {
-    { V_CORSAIR, P_K68,                 k63patch, K63PATCH_LEN },
-    { V_CORSAIR, P_K68_NRGB,            k63patch, K63PATCH_LEN },
-    { V_CORSAIR, P_K65,                 k65patch, K65PATCH_LEN },
-    { V_CORSAIR, P_K65_LEGACY,          k65patch, K65PATCH_LEN },
-    { V_CORSAIR, P_K63_NRGB,            k63patch, K63PATCH_LEN },
-    { V_CORSAIR, P_M95,                 m95patch, M95PATCH_LEN },
+    { V_CORSAIR, P_K68,          k63patch, K63PATCH_LEN },
+    { V_CORSAIR, P_K68_NRGB,     k63patch, K63PATCH_LEN },
+    { V_CORSAIR, P_K65,          k65patch, K65PATCH_LEN },
+    { V_CORSAIR, P_K65_LEGACY,   k65patch, K65PATCH_LEN },
+    { V_CORSAIR, P_K63_NRGB,     k63patch, K63PATCH_LEN },
+    { V_CORSAIR, P_M95,          m95patch, M95PATCH_LEN },
     // { V_CORSAIR, P_IRONCLAW_W_U, icwpatch, ICWPATCH_LEN },
     // { V_CORSAIR, P_IRONCLAW_W_D, icwpatch, ICWPATCH_LEN },
 };

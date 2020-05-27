@@ -476,7 +476,7 @@ static const Key IronclawWirelessKeys[] = {
     {0, "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
     {0, "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
     {0, "Profile Up",   "profup",   23, 20,  9,  9, false, true  },
-    {0, "Profile Down", "profdown", 23, 30,  9,  9, false, true  },
+    {0, "Profile Down", "profdn", 23, 30,  9,  9, false, true  },
     {0, "DPI Up",       "dpiup",    23, 40,  8,  9, false, true  },
     {0, "DPI Up",       "dpidn",    23, 50,  8,  9, false, true  },
     
@@ -486,7 +486,7 @@ static const Key IronclawWirelessKeys[] = {
     {0, "Option",       "optbtn",     10, 26,  8,  9, false, true  },
 
     // zones for LEDs
-    {0, "Front",        "front",       8,  0,  8,  9, true, false  }
+    {0, "Front",        "front",       8,  0,  8,  9, true, false  },
     {0, "Logo",         "back",       21, 50, NS,     true, false  },
     {0, "Wheel",        "wheel",      23,  3,  8, 14, true, false  },
     

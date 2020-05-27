@@ -185,7 +185,7 @@ const char* product_str(ushort product){
     if(product == P_IRONCLAW)
         return "ironclaw";
     if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D)
-        return "ironclaw";
+        return "ironclaw_wireless";
     if(product == P_POLARIS)
         return "polaris";
     if(product == P_ST100)

@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0, *darkCoreOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0, *darkCoreOverlay = 0, *ironclawWOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -173,6 +173,11 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!nightswordOverlay)
                 nightswordOverlay = new QImage(":/img/overlay_nightsword.png");
             overlay = nightswordOverlay;
+            xpos = 2.f;
+        } else if(model == KeyMap::IRONCLAW_W){
+            if(!ironclawWOverlay)
+                ironclawWOverlay = new QImage(":/img/overlay_ironclaw.png");
+            overlay = ironclawWOverlay;
             xpos = 2.f;
         }
 

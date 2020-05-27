@@ -425,29 +425,28 @@ static const Key IronclawKeys[] = {
 
 // Mouse map - Ironclaw RGB Wireless
 static const Key IronclawWirelessKeys[] = {
-/*  _storageName, _friendlyName, name, x, y, w, h, hasLed, hasScan  */
     // primary keys
-    {0, "Left Mouse",   "mouse1",     12,  0, 12, 28, false, true  },
-    {0, "Right Mouse",  "mouse2",     31,  0, 12, 28, false, true  },
-    {0, "Middle Mouse", "mouse3",     23,  7,  8,  6, false, true  },
+    {0, "Left Mouse",   "mouse1",   12,  0, 12, 28, false, true  },
+    {0, "Right Mouse",  "mouse2",   31,  0, 12, 28, false, true  },
     
     // center column keys
     {0, "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
+    {0, "Middle Mouse",  "mouse3",  23,  7,  8,  6, false, true  },
     {0, "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
-    {0, "Profile Up",   "profup",   23, 20,  9,  9, false, true  },
-    {0, "Profile Down", "profdn", 23, 30,  9,  9, false, true  },
-    {0, "DPI Up",       "dpiup",    23, 40,  8,  9, false, true  },
-    {0, "DPI Up",       "dpidn",    23, 50,  8,  9, false, true  },
+    {0, "Profile Up",    "profup",  23, 18,  9,  9, false, true  },
+    {0, "Profile Dn",    "profdn",  23, 26,  8,  9, false, true  },
     
     // left side forward/back keys
-    {0, "Forward",      "mouse5",      6, 20,  5, 12, false, true  },
-    {0, "Back",         "mouse4",      7, 32,  5, 12, false, true  },
-    {0, "Option",       "optbtn",     10, 26,  8,  9, false, true  },
+    {0, "DPI Up",        "dpiup",    6,  4,  6,  9, false, true  },
+    {0, "DPI Dn",        "dpidn",    6, 10,  6,  9, false, true  },
+    {0, "Forward",      "mouse5",    6, 20,  5, 12, false, true  },
+    {0, "Back",         "mouse4",    7, 32,  5, 12, false, true  },
+    {0, "Opt",          "optbtn",    9, 27,  6,  9, false, true  },
 
     // zones for LEDs
-    {0, "Front",        "front",       8,  0,  8,  9, true, false  },
-    {0, "Logo",         "back",       21, 50, NS,     true, false  },
-    {0, "Wheel",        "wheel",      23,  3,  8, 14, true, false  },
+    {0, "Front",        "front",     9,  1,  9,  9, true, false  },
+    {0, "Logo",         "back",     21, 50, NS,     true, false  },
+    {0, "Wheel",        "wheel",    23,  3,  8, 14, true, false  },
     
     // need to add DPI LED, even if not directly configurable for indicator to work
     {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
@@ -925,6 +924,19 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Mice also have no layout patches - no other changes necessary
         break;
     }
+    case KeyMap::IRONCLAW_W:{
+        // M65 isn't a keyboard; all mouse maps are unique.
+        for(const Key* key = IronclawWirelessKeys; key < IronclawWirelessKeys + KEYCOUNT_IRONCLAW_W; key++){
+            // Keyboard keys are written from the center because that's where the LEDs are, but the mouse buttons are odd shapes so they're
+            // written from the upper left
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        // Mice also have no layout patches - no other changes necessary
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -1161,6 +1173,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return M95;
     if(lower == "ironclaw")
         return IRONCLAW;
+    if(lower == "ironclaw_wireless")
+        return IRONCLAW_W;
     return NO_MODEL;
 }
 
@@ -1210,6 +1224,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "m95";
     case IRONCLAW:
         return "ironclaw";
+    case IRONCLAW_W:
+        return "ironclaw_wireless";
     default:
         return "";
     }
@@ -1254,6 +1270,8 @@ int KeyMap::modelWidth(Model model){
     case M95:
     case IRONCLAW:
         return M65_WIDTH;
+    case IRONCLAW_W:
+        return M65_WIDTH;
     default:
         return 0;
     }
@@ -1285,6 +1303,8 @@ int KeyMap::modelHeight(Model model){
     case ST100:
     case M95:
     case IRONCLAW:
+        return M65_HEIGHT;
+    case IRONCLAW_W:
         return M65_HEIGHT;
     default:
         return 0;
@@ -1360,6 +1380,9 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     if(map.contains(key))
         return map[key].friendlyName();
     map = KeyMap(IRONCLAW, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+    map = KeyMap(IRONCLAW_W, layout);
     if(map.contains(key))
         return map[key].friendlyName();
 

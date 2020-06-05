@@ -7,6 +7,12 @@
 // Xorg has buggy handling of combined keyboard + mouse devices, so instead we should create two separate devices:
 // One for keyboard events, one for mouse.
 int uinputopen(struct uinput_user_dev* indev, int mouse){
+
+    if (!indev)
+    {
+        return 0;
+    }
+    
     int fd = open("/dev/uinput", O_RDWR);
     if(fd < 0){
         // If that didn't work, try /dev/input/uinput instead

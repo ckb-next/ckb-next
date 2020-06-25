@@ -52,7 +52,9 @@ cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSAFE_INSTALL=ON -DSAFE_UNINSTALL=
 checkfail $?
 
 # Find out how many cores the system has, for make
-JOBS=$(getconf _NPROCESSORS_ONLN 2>/dev/null)
+if [ -z ${JOBS+var} ]; then
+	JOBS=$(getconf _NPROCESSORS_ONLN 2>/dev/null)
+fi
 
 # Default to 2 jobs if something went wrong earlier
 if [[ -z "$JOBS" ]]; then

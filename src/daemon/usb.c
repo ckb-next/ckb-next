@@ -261,11 +261,11 @@ static void* devmain(usbdevice* kb){
         /// (checked via IS_CONNECTED(kb)).
         /// This is true if the kb-structure has a handle and an event pointer both != Null).
         /// If not, the loop is left (the first exit point).
-        pthread_mutex_unlock(dmutex(kb));
+        ticket_unlock(dmutex(kb));
         // Read from FIFO
         const char* line;
         int lines = readlines(kbfifo, linectx, &line);
-        pthread_mutex_lock(dmutex(kb));
+        ticket_lock(dmutex(kb));
         // End thread when the handle is removed
         if(!IS_CONNECTED(kb))
             break;
@@ -287,7 +287,7 @@ static void* devmain(usbdevice* kb){
             }
         }
     }
-    pthread_mutex_unlock(dmutex(kb));
+    ticket_unlock(dmutex(kb));
     ///
     /// After leaving the endless loop the readlines-ctx structure and its buffers are freed by readlines_ctx_free().
     readlines_ctx_free(linectx);
@@ -336,7 +336,7 @@ static void* _setupusb(void* context){
     /// - the standard delay time is initialized in kb->usbdelay
     ///
     usbdevice* kb = context;
-    pthread_mutex_lock(imutex(kb));
+    ticket_lock(imutex(kb));
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(vendor, product);
@@ -444,7 +444,7 @@ static void* _setupusb(void* context){
     /// - From this point - if an error is detected - the error label is addressed by goto statement,
     /// which first performs an unlock on the imutex.
     /// This is interesting because the next statement is exactly this: An unlock on the imutex.
-    pthread_mutex_unlock(imutex(kb));
+    ticket_unlock(imutex(kb));
     ///
     /// - Via vtable the \a kb->start() function is called next.
     /// This is the same for a mouse and an RGB keyboard: start_dev(),
@@ -503,10 +503,10 @@ static void* _setupusb(void* context){
     ///
     /// - The remaining code lines are the two exit labels as described above
     fail:
-    pthread_mutex_unlock(imutex(kb));
+    ticket_unlock(imutex(kb));
     fail_noinput:
     closeusb(kb);
-    pthread_mutex_unlock(dmutex(kb));
+    ticket_unlock(dmutex(kb));
     return 0;
 }
 
@@ -678,9 +678,9 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
         // Send each message via the OS function
         while(1){
             DELAY_SHORT(kb);
-            pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
+            ticket_lock(mmutex(kb)); ///< Synchonization between macro and color information
             int res = os_usbsend(kb, messages + i * MSG_SIZE, 0, file, line);
-            pthread_mutex_unlock(mmutex(kb));
+            ticket_unlock(mmutex(kb));
             if(res == 0)
                 return 0;
             else if(res != -1){
@@ -700,9 +700,9 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
 int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
     while(1){
         DELAY_SHORT(kb);
-        pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
+        ticket_lock(mmutex(kb)); ///< Synchonization between macro and color information
         int res = os_usbsend_control(kb, data, len, bRequest, wValue, wIndex, file, line);
-        pthread_mutex_unlock(mmutex(kb));
+        ticket_unlock(mmutex(kb));
 
         if(res != -1)
             return res;
@@ -764,10 +764,10 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
     // Try a maximum of 5 times
     for (int try = 0; try < 5; try++) {
         // Send the output message
-        pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
+        ticket_lock(mmutex(kb)); ///< Synchonization between macro and color information
         DELAY_SHORT(kb);
         int res = os_usbsend(kb, out_msg, 1, file, line);
-        pthread_mutex_unlock(mmutex(kb));
+        ticket_unlock(mmutex(kb));
         if (res == 0)
             return 0;
         else if (res == -1) {
@@ -837,7 +837,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 /// and closeusb() always returns zero (success).
 ///
 int closeusb(usbdevice* kb){
-    pthread_mutex_lock(imutex(kb));
+    ticket_lock(imutex(kb));
     if(kb->handle){
         int index = INDEX_OF(kb, keyboard);
         ckb_info("Disconnecting %s%d\n", devpath, index);
@@ -850,10 +850,10 @@ int closeusb(usbdevice* kb){
     rmdevpath(kb);
 
     // Wait for thread to close
-    pthread_mutex_unlock(imutex(kb));
-    pthread_mutex_unlock(dmutex(kb));
+    ticket_unlock(imutex(kb));
+    ticket_unlock(dmutex(kb));
     pthread_join(kb->thread, 0);
-    pthread_mutex_lock(dmutex(kb));
+    ticket_lock(dmutex(kb));
 
     // Free the device-specific keymap
     free(kb->keymap);
@@ -888,13 +888,13 @@ void reactivate_devices()
         if(IS_CONNECTED(keyboard + i)){
             kb = keyboard + i;
             // If the device was active, mark it as disabled and re-enable it
-            pthread_mutex_lock(dmutex(kb));
+            ticket_lock(dmutex(kb));
             if(kb->active){
                 kb->active = 0;
                 const devcmd* vt = kb->vtable;
                 vt->active(kb, 0, 0, 0, 0);
             }
-            pthread_mutex_unlock(dmutex(kb));
+            ticket_unlock(dmutex(kb));
         }
     }
 }

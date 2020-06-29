@@ -14,16 +14,34 @@ extern usbdevice keyboard[DEV_MAX];
 #else
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
 #endif
+
+// A struct to implement a FIFO-fair-locking mutex.
+// https://stackoverflow.com/questions/5385777/implementing-a-fifo-mutex-in-pthreads
+typedef struct ticket_lock{
+    pthread_cond_t cond;
+    pthread_mutex_t mutex;
+    unsigned long queue_head, queue_tail;
+} ticket_lock_t;
+
+#define TICKET_LOCK_INITIALIZER { PTHREAD_COND_INITIALIZER, PTHREAD_MUTEX_INITIALIZER, 0, 0 }
+
+// Lock a ticket_lock_t
+void ticket_lock(ticket_lock_t *ticket);
+// Try to lock a ticket_lock_t; returns zero on success
+int ticket_trylock(ticket_lock_t *ticket);
+// Unlock a ticket_lock_t
+void ticket_unlock(ticket_lock_t *ticket);
+
 // A mutex used for USB controls. Needs to be locked before reading or writing the device handle or accessing its profile
-extern pthread_mutex_t devmutex[DEV_MAX];
+extern ticket_lock_t devmutex[DEV_MAX];
 #define dmutex(kb) (devmutex + INDEX_OF(kb, keyboard))
 // Similar, but for key input. Also needs to be locked before accessing output FIFOs.
 // When adding or removing a device you must lock BOTH mutexes, dmutex first.
-extern pthread_mutex_t inputmutex[DEV_MAX];
+extern ticket_lock_t inputmutex[DEV_MAX];
 #define imutex(kb) (inputmutex + INDEX_OF(kb, keyboard))
 
 // Needed to synchronize sending macro-keys to the os and sending color info to the device
-extern pthread_mutex_t macromutex[DEV_MAX];
+extern ticket_lock_t macromutex[DEV_MAX];
 #define mmutex(kb) (macromutex + INDEX_OF(kb, keyboard))
 extern pthread_mutex_t macromutex2[DEV_MAX];
 #define mmutex2(kb) (macromutex2 + INDEX_OF(kb, keyboard))

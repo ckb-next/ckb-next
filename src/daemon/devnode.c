@@ -79,13 +79,13 @@ void check_chmod(const char *pathname, mode_t mode){
 /// Because several independent threads may call updateconnected(), protect that procedure with locking/unlocking of \b devmutex.
 ///
 void _updateconnected(){
-    pthread_mutex_lock(devmutex);
+    ticket_lock(devmutex);
     char cpath[strlen(devpath) + 12];
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
     FILE* cfile = fopen(cpath, "w");
     if(!cfile){
         ckb_warn("Unable to update %s: %s\n", cpath, strerror(errno));
-        pthread_mutex_unlock(devmutex);
+        ticket_unlock(devmutex);
         return;
     }
     int written = 0;
@@ -102,7 +102,7 @@ void _updateconnected(){
     check_chmod(cpath, S_GID_READ);
     check_chown(cpath, 0, gid);
 
-    pthread_mutex_unlock(devmutex);
+    ticket_unlock(devmutex);
 }
 
 void updateconnected(){

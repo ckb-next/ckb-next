@@ -6,12 +6,44 @@
 
 int hwload_mode = 1;        ///< hwload_mode = 1 means read hardware once. should be enough
 
+void ticket_lock(ticket_lock_t *ticket){
+    unsigned long queue_me;
+
+    pthread_mutex_lock(&ticket->mutex);
+    queue_me = ticket->queue_tail++;
+    while (queue_me != ticket->queue_head)
+        pthread_cond_wait(&ticket->cond, &ticket->mutex);
+    pthread_mutex_unlock(&ticket->mutex);
+}
+
+int ticket_trylock(ticket_lock_t *ticket){
+    unsigned long queue_me;
+    int res = 0;
+
+    pthread_mutex_lock(&ticket->mutex);
+    queue_me = ticket->queue_tail++;
+    if (queue_me != ticket->queue_head) {
+        ticket->queue_tail--;
+        res = -1;
+    }
+    pthread_mutex_unlock(&ticket->mutex);
+
+    return res;
+}
+
+
+void ticket_unlock(ticket_lock_t *ticket){
+    pthread_mutex_lock(&ticket->mutex);
+    ticket->queue_head++;
+    pthread_cond_broadcast(&ticket->cond);
+    pthread_mutex_unlock(&ticket->mutex);
+}
+
 // Device list
 usbdevice keyboard[DEV_MAX];    ///< remember all usb devices. Needed for closeusb().
-pthread_mutex_t devlistmutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t devmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };      ///< Mutex for handling the usbdevice structure
-pthread_mutex_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };    ///< Mutex for dealing with usb input frames
-pthread_mutex_t macromutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };    ///< Protecting macros against lightning: Both use usb_send
+ticket_lock_t devmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = TICKET_LOCK_INITIALIZER };          ///< Mutex for handling the usbdevice structure
+ticket_lock_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = TICKET_LOCK_INITIALIZER };        ///< Mutex for dealing with usb input frames
+ticket_lock_t macromutex[DEV_MAX] = { [0 ... DEV_MAX-1] = TICKET_LOCK_INITIALIZER };        ///< Protecting macros against lightning: Both use usb_send
 pthread_mutex_t macromutex2[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };   ///< Protecting the single link list of threads and the macrovar
 pthread_cond_t macrovar[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZER };        ///< This variable is used to stop and wakeup all macro threads which have to wait.
 pthread_mutex_t interruptmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };///< Used for interrupt transfers

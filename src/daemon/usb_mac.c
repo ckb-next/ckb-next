@@ -335,9 +335,9 @@ CGEventRef mouse_event_modifier_callback(CGEventTapProxy proxy, CGEventType type
                 // Only care about the active keyboard for grabbing the modifier keys.
                 // Once found, can move on.
                 if (!IS_MOUSE_DEV(kb) && kb->active == 1) {
-                    pthread_mutex_lock(imutex(kb));
+                    ticket_lock(imutex(kb));
                     CGEventSetFlags(event, (kCGEventFlagMaskNonCoalesced | kb->modifiers | existingFlags));
-                    pthread_mutex_unlock(imutex(kb));
+                    ticket_unlock(imutex(kb));
                     break;
                 }
             }
@@ -493,12 +493,12 @@ void* os_inputmain(void* context){
     while(1){
         CFRunLoopRun();
         // If we get here, the device should be disconnected
-        pthread_mutex_lock(imutex(kb));
+        ticket_lock(imutex(kb));
         if(!IS_CONNECTED(kb)){
-            pthread_mutex_unlock(imutex(kb));
+            ticket_unlock(imutex(kb));
             break;
         }
-        pthread_mutex_unlock(imutex(kb));
+        ticket_unlock(imutex(kb));
     }
 
     // Clean up
@@ -562,9 +562,9 @@ static void remove_device(void* context, io_service_t device, uint32_t message_t
     usbdevice* kb = context;
     if(kb){
         // If the handle is connected to a device, close it
-        pthread_mutex_lock(dmutex(kb));
+        ticket_lock(dmutex(kb));
         closeusb(kb);
-        pthread_mutex_unlock(dmutex(kb));
+        ticket_unlock(dmutex(kb));
     }
     IOObjectRelease(device);
 }
@@ -574,7 +574,7 @@ static void remove_device(void* context, io_service_t device, uint32_t message_t
 static int find_device(uint16_t idvendor, uint16_t idproduct, uint32_t location, int handle_idx){
     // Look for any partially-set up boards matching this device
     for(int i = 1; i < DEV_MAX; i++){
-        if(pthread_mutex_trylock(devmutex + i))
+        if(ticket_trylock(devmutex + i))
             // If the mutex is locked then the device is obviously set up already, keep going
             continue;
         if(keyboard[i].vendor == idvendor && keyboard[i].product == idproduct){
@@ -591,7 +591,7 @@ static int find_device(uint16_t idvendor, uint16_t idproduct, uint32_t location,
     }
     // If none was found, grab the first free device
     for(int i = 1; i < DEV_MAX; i++){
-        if(pthread_mutex_trylock(devmutex + i))
+        if(ticket_trylock(devmutex + i))
             continue;
         if(!keyboard[i].handle){
             // Mark the device as in use and print out a message

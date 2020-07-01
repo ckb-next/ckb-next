@@ -54,13 +54,13 @@ int setactive_mouse(usbdevice* kb, int active){
     else
         // Restore HW mode
         msg[0][2] = MODE_HARDWARE;
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     kb->active = !!active;
     kb->profile->lastlight.forceupdate = 1;
     // Clear input
     memset(&kb->input.keys, 0, sizeof(kb->input.keys));
     inputupdate(kb);
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
     if(!usbsend(kb, msg[0], 1))
         return -1;
     if(active){

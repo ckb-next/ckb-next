@@ -63,12 +63,12 @@ void nprintind(usbdevice* kb, int nnumber, int led, int on){
 void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const char* toggle){
     if(keyindex >= N_KEYS_INPUT)
         return;
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     if(!strcmp(toggle, "on") || *toggle == 0)
         SET_KEYBIT(mode->notify[nnumber], keyindex);
     else if(!strcmp(toggle, "off"))
         CLEAR_KEYBIT(mode->notify[nnumber], keyindex);
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }
 
 // Check hardware mode, bail out if it doesn't exist
@@ -217,7 +217,7 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
 void cmd_get(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* setting){
     (void)dummy;
 
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     _cmd_get(kb, mode, nnumber, setting);
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }

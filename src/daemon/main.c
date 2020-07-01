@@ -31,12 +31,12 @@ static void quit() {
     reset_stop = 1;
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
-        pthread_mutex_lock(devmutex + i);
+        queued_mutex_lock(devmutex + i);
         if(IS_CONNECTED(keyboard + i)){
             revertusb(keyboard + i);
             closeusb(keyboard + i);
         }
-        pthread_mutex_unlock(devmutex + i);
+        queued_mutex_unlock(devmutex + i);
     }
     ckb_info("Closing root controller\n");
     rmdevpath(keyboard);

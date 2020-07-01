@@ -342,7 +342,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
         if(retval)
             ckb_fatal("Error unlocking interrupt mutex %i\n", retval);
     } else {
-        pthread_mutex_lock(imutex(kb));
+        queued_mutex_lock(imutex(kb));
         if(IS_LEGACY_DEV(kb)) {
             if(IS_MOUSE_DEV(kb))
                 m95_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
@@ -377,7 +377,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
         ///
         /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
         inputupdate(kb);
-        pthread_mutex_unlock(imutex(kb));
+        queued_mutex_unlock(imutex(kb));
     }
 }
 

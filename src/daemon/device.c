@@ -27,7 +27,6 @@ void queued_mutex_lock(queued_mutex_t* mutex){
 }
 
 int queued_mutex_trylock(queued_mutex_t* mutex){
-    unsigned long my_turn;
     int res = 0;
     pthread_mutex_lock(&mutex->mutex);
 

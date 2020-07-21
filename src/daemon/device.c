@@ -11,7 +11,7 @@ usbdevice keyboard[DEV_MAX];    ///< remember all usb devices. Needed for closeu
 pthread_mutex_t devlistmutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t devmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };      ///< Mutex for handling the usbdevice structure
 pthread_mutex_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };    ///< Mutex for dealing with usb input frames
-pthread_mutex_t macromutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };    ///< Protecting macros against lightning: Both use usb_send
+pthread_mutex_t macromutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };    ///< Protecting macros against lighting: Both use usb_send
 pthread_mutex_t macromutex2[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };   ///< Protecting the single link list of threads and the macrovar
 pthread_cond_t macrovar[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZER };        ///< This variable is used to stop and wakeup all macro threads which have to wait.
 pthread_mutex_t interruptmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };///< Used for interrupt transfers
@@ -77,6 +77,13 @@ int _start_dev(usbdevice* kb, int makeactive){
 
     if(kb->product == P_M95)
         kb->features &= ~FEAT_POLLRATE; // M95 doesn't support reading the pollrate through the protocol
+
+    if (kb->product == P_LIGHTING_NODE_PRO) {
+        kb->features &= ~FEAT_POLLRATE; // Lighting node pro doesn't support reading the pollrate through the protocol
+        kb->features &= ~FEAT_HWLOAD; // no LED data to read
+        kb->features &= ~(FEAT_FWVERSION | FEAT_FWUPDATE);
+        kb->active = 1;
+    }
     ///
     /// - Now check if device needs a firmware update.
     /// If so, set it up and leave the function without error.

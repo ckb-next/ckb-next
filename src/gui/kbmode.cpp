@@ -20,7 +20,7 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const QString &guid, const QStr
 /// Constructor to copy an existing Keyboard-Mode KbMode &other
 KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other) :
     QObject(parent),
-    _name(other._name), _id(other._id),
+    _name(other._name), _id(other._id),_number_of_fans(other._number_of_fans),
     _light(new KbLight(this, keyMap, *other._light)), _bind(new KbBind(this, parent, keyMap, *other._bind)), _perf(new KbPerf(this, *other._perf)),
     _needsSave(true)
 {
@@ -30,6 +30,7 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other) :
 KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings) :
     QObject(parent),
     _name(settings.value("Name").toString().trimmed()),
+    _number_of_fans(settings.value("NumberOfFans").toInt()),
     _id(settings.value("GUID").toString().trimmed(), settings.value("Modified").toString().trimmed()),
     _light(new KbLight(this, keyMap)), _bind(new KbBind(this, parent, keyMap)), _perf(new KbPerf(this)),
     _needsSave(false)
@@ -52,6 +53,7 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings) :
 KbMode::KbMode(Kb* parent, const KeyMap& keyMap, QSettings* settings) :
     QObject(parent),
     _name(settings->value("Name").toString().trimmed()),
+    _number_of_fans(settings->value("NumberOfFans").toInt()),
     _id(settings->value("GUID").toString().trimmed(), settings->value("Modified").toString().trimmed()),
     _light(new KbLight(this, keyMap)), _bind(new KbBind(this, parent, keyMap)), _perf(new KbPerf(this)),
     _needsSave(false)
@@ -92,6 +94,7 @@ void KbMode::save(CkbSettings& settings){
     settings.setValue("Modified", _id.modifiedString());
     settings.setValue("HwModified", _id.hwModifiedString());
     settings.setValue("Name", _name);
+    settings.setValue("NumberOfFans", _number_of_fans);
     _light->save(settings);
     _bind->save(settings);
     _perf->save(settings);
@@ -102,6 +105,7 @@ void KbMode::modeExport(QSettings* settings){
     settings->setValue("Modified", _id.modifiedString());
     settings->setValue("HwModified", _id.hwModifiedString());
     settings->setValue("Name", _name);
+    settings->setValue("NumberOfFans", _number_of_fans);
     _light->lightExport(settings);
     _bind->bindExport(settings);
     _perf->perfExport(settings);

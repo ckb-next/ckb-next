@@ -24,6 +24,9 @@ static int cmd_io_none(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, c
 
     return 0;
 }
+static void onframe_none(usbdevice* kb){
+    (void)kb;
+}
 static void cmd_macro_none(usbdevice* kb, usbmode* dummy1, int dummy2, const char* dummy3, const char* dummy4){
     (void)kb;
     (void)dummy1;
@@ -32,6 +35,11 @@ static void cmd_macro_none(usbdevice* kb, usbmode* dummy1, int dummy2, const cha
     (void)dummy4;
 }
 static int loadprofile_none(usbdevice* kb){
+    (void)kb;
+
+    return 0;
+}
+static int fancount_none(usbdevice* kb, uchar numberOfFans) {
     (void)kb;
 
     return 0;
@@ -90,7 +98,9 @@ const devcmd vtable_keyboard = {
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_kb,
+    .onframe = onframe_none,
     .updateindicators = updateindicators_kb,
+    .fancount = fancount_none,
     .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
@@ -136,7 +146,9 @@ const devcmd vtable_keyboard_legacy = {
     .loadprofile = loadprofile_none,
     .freeprofile = freeprofile,
     .updatergb = int1_int_none,                 ///< Legacy keyboards do not have an rgb update function
+    .onframe = onframe_none,
     .updateindicators = updateindicators_kb,
+    .fancount = fancount_none,
     .updatedpi = int1_int_none                  ///< This is for mice only
 };
 
@@ -182,6 +194,8 @@ const devcmd vtable_mouse = {
     .loadprofile = loadprofile,             ///< same for all keyboards and mice
     .freeprofile = freeprofile,             ///< same for all keyboards and mice
     .updatergb = updatergb_mouse,           ///< special for mice
+    .onframe = onframe_none,
+    .fancount = fancount_none,
     .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
     .updatedpi = updatedpi                  ///< special for mice
 };
@@ -228,6 +242,56 @@ const devcmd vtable_mousepad = {
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_mousepad,
+    .onframe = onframe_none,
+    .fancount = fancount_none,
+    .updateindicators = int1_void_none,
+    .updatedpi = int1_int_none
+};
+
+// Lighting node
+const devcmd vtable_lighting_node = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_io_none,
+
+    .active = cmd_io_none,
+    .idle = cmd_io_none,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_none,
+    .ion = cmd_none,
+    .iauto = cmd_none,
+
+    .bind = cmd_none,
+    .unbind = cmd_none,
+    .rebind = cmd_none,
+    .macro = cmd_macro_none,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_dev,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_lighting_node,
+    .onframe = onframe_lighting_node,
+    .fancount = fancount_lighting_node,
     .updateindicators = int1_void_none,
     .updatedpi = int1_int_none
 };
@@ -274,6 +338,8 @@ const devcmd vtable_mouse_legacy = {
     .loadprofile = loadprofile_none,
     .freeprofile = freeprofile,
     .updatergb = updatergb_mouse_legacy,
+    .onframe = onframe_none,
+    .fancount = fancount_none,
     .updateindicators = int1_void_none,
     .updatedpi = updatedpi_legacy
 };

@@ -52,7 +52,9 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 
     "notify",
     "inotify",
-    "get"
+    "get",
+
+    "fancount"
 };
 
 #define TRY_WITH_RESET(action)  \
@@ -289,6 +291,14 @@ int readcmd(usbdevice* kb, const char* line){
                 continue;
             }
             break;
+        case FANCOUNT: {
+            uchar numberOfFans;
+            if(sscanf(word, "%hhu", &numberOfFans) == 1){
+                vt->fancount(kb, numberOfFans);
+                continue;
+            }
+            break;
+        }
         default:;
         }
         // For anything else, split the parameter at the colon

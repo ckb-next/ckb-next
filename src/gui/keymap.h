@@ -73,6 +73,7 @@ public:
         K66,
         M65E,
         M95,
+        LIGHTING_NODE_PRO,
         IRONCLAW,
         _MODEL_MAX
     };
@@ -124,6 +125,8 @@ public:
     inline bool         isMousepad() const          { return isMousepad(keyModel); }
     inline static bool  isHeadsetStand(Model model) { return model == ST100; }
     inline bool         isHeadsetStand() const      { return isHeadsetStand(keyModel); }
+    inline static bool  isLightingNode(Model model) { return model == LIGHTING_NODE_PRO; }
+    inline bool         isLightingNode() const      { return isLightingNode(keyModel); }
 
     inline static bool hasLights(Model model)       { return !(model == M95 || model == K66); }
     inline bool        hasLights() const            { return hasLights(keyModel); }

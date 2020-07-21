@@ -29,6 +29,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     connect(device, SIGNAL(modeRenamed()), this, SLOT(profileChanged()));
     connect(device, SIGNAL(modeRenamed()), this, SLOT(modeChanged()));
     connect(device, SIGNAL(modeChanged(bool)), this, SLOT(modeChanged(bool)));
+    connect(ui->fancountSpin, SIGNAL(valueChanged(int)), this, SLOT(on_fancountSpin_valueChanged(int)));
 
     connect(static_cast<MainWindow*>(parent), &MainWindow::switchToProfileCLI, this, &KbWidget::switchToProfile);
     connect(static_cast<MainWindow*>(parent), &MainWindow::switchToModeCLI, this, &KbWidget::switchToMode);
@@ -77,6 +78,15 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
         ui->hwSaveButton->setDisabled(true);
         ui->hwSaveButton->setToolTip(QString(tr("Saving to hardware is not supported on this device.")));
     }
+
+    if (device->isLightingNode()){
+        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->mPerfTab));
+        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->kPerfTab));
+    } else {
+        ui->fancountSpin->hide();
+        ui->fancountLabel->hide();
+    }
+
     // Read device layout
     if(device->features.contains("bind")){
         // Clear the "Default" value
@@ -410,6 +420,8 @@ void KbWidget::devUpdate(){
 }
 
 void KbWidget::modeUpdate(){
+    ui->fancountSpin->setValue(device->currentMode()->getNumberOfFans());
+    device->sendFancount(device->currentMode()->getNumberOfFans());
 }
 
 void KbWidget::on_hwSaveButton_clicked(){
@@ -418,6 +430,14 @@ void KbWidget::on_hwSaveButton_clicked(){
     updateProfileList();
     profileChanged();
 }
+
+void KbWidget::on_fancountSpin_valueChanged(int number_of_fan){
+    if (!device) return;
+    device->sendFancount(number_of_fan);
+    device->currentMode()->setNumberOfFans(number_of_fan);
+    device->currentLight()->forceFrameUpdate();
+}
+
 
 void KbWidget::on_tabWidget_currentChanged(int index){
     if(!device)

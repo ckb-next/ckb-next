@@ -81,6 +81,7 @@ device_desc models[] = {
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
     { V_CORSAIR, P_ST100, },
+    { V_CORSAIR, P_LIGHTING_NODE_PRO, },
 };
 
 size_t N_MODELS = sizeof(models) / sizeof(device_desc);
@@ -182,6 +183,8 @@ const char* product_str(ushort product){
         return "polaris";
     if(product == P_ST100)
         return "st100";
+    if(product == P_LIGHTING_NODE_PRO)
+        return "lighting_node_pro";
     return "";
 }
 
@@ -208,12 +211,34 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
             return &vtable_mouse;
     } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
         return &vtable_mousepad;
+    } else if (IS_LIGHTING_NODE(vendor, product)) { 
+        return &vtable_lighting_node;
     } else {
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;
         else
             return &vtable_keyboard;
     }
+}
+
+/// USB device update loop
+///
+/// This function is used by some device like lighting node pro to send every N time a packet to keep data active
+void* onframe(void* context) {
+    usbdevice* kb = context;
+    while (1) {
+        // End thread when the handle is removed
+        if(!IS_CONNECTED(kb))
+            break;
+
+        /// Update device
+        pthread_mutex_lock(dmutex(kb));
+        kb->vtable->onframe(kb);
+        pthread_mutex_unlock(dmutex(kb));
+
+        usleep(kb->usbdelay * 1000);
+    }
+    return 0;
 }
 
 // USB device main loop
@@ -246,6 +271,17 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
 /// \n Should this function be declared as pthread_t* function, because of the defintion of pthread-create? But void* works also...
 ///
 static void* devmain(usbdevice* kb){
+    pthread_t onframe_thread;
+    int err = pthread_create(&onframe_thread, NULL, onframe, kb);
+    if (err == 0) {
+        #ifdef OS_LINUX
+        char onframe_thread_name[THREAD_NAME_MAX] = "ckbX frame";
+        onframe_thread_name[3] = INDEX_OF(kb, keyboard) + '0';
+        pthread_setname_np(onframe_thread, onframe_thread_name);
+        #endif
+        pthread_detach(onframe_thread);
+    }
+    
     /// \attention dmutex should still be locked when this is called
     int kbfifo = kb->infifo - 1;
     ///

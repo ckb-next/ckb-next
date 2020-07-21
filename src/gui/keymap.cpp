@@ -382,6 +382,156 @@ static const Key PolarisZones[] = {
 };
 #define KEYCOUNT_POLARIS   (sizeof(PolarisZones) / sizeof(Key))
 
+// Lighting node pro
+#define LIGHTING_NODE_PRO_HEIGHT 50
+#define LIGHTING_NODE_PRO_WIDTH 300
+#define LIGHTNODE_PRO_SIZE_X 6
+#define LIGHTNODE_PRO_SIZE_Y 6
+#define LIGHTNODE_PRO_SIZE LIGHTNODE_PRO_SIZE_X, LIGHTNODE_PRO_SIZE_Y
+#define FAN1_OFFSET_X 27
+#define FAN1_OFFSET_Y 22
+#define FAN2_OFFSET_X 75
+#define FAN2_OFFSET_Y 22
+#define FAN3_OFFSET_X 123
+#define FAN3_OFFSET_Y 22
+#define FAN4_OFFSET_X 171
+#define FAN4_OFFSET_Y 22
+#define FAN5_OFFSET_X 219
+#define FAN5_OFFSET_Y 22
+#define FAN6_OFFSET_X 267
+#define FAN6_OFFSET_Y 22
+
+// Name structure
+// f[fan number]l[led number]
+    // led number :
+    //  - 0  = Bottom Inner
+    //  - 1  = Left Inner
+    //  - 2  = Top Inner
+    //  - 3  = Right Inner
+    //  - 4  = Ten O Clock
+    //  - 5  = Nine O Clock
+    //  - 6  = Eight O Clock
+    //  - 7  = Seven O Clock
+    //  - 8  = Six O Clock
+    //  - 9  = Five O Clock
+    //  - 10 = Four O Clock
+    //  - 11 = Three O Clock
+    //  - 12 = Two O Clock
+    //  - 13 = One O Clock
+    //  - 14 = Twelve O Clock
+    //  - 15 = Eleven O Clock
+static const Key LightingNodeProZones[] = {
+    // Fan 1
+    {0, "Fan 1 Bottom Inner", "f1l00", FAN1_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 1 Left Inner", "f1l01", -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 1 Top Inner", "f1l02", FAN1_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 1 Right Inner", "f1l03", LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Ten O Clock", "f1l04", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Nine O Clock", "f1l05", 3 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Eight O Clock", "f1l06", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Seven O Clock", "f1l07", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Six O Clock", "f1l08", FAN1_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Five O Clock", "f1l09", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Four O Clock", "f1l10", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Three O Clock", "f1l11", 3 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X, FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Two O Clock", "f1l12", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 One O Clock", "f1l13", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Twelve O Clock", "f1l14", FAN1_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 1 Eleven O Clock", "f1l15", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN1_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN1_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 2
+    {0, "Fan 2 Bottom Inner", "f2l00", FAN2_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 2 Left Inner", "f2l01", -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X, FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 2 Top Inner", "f2l02", FAN2_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 2 Right Inner", "f2l03", LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X, FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Ten O Clock", "f2l04", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Nine O Clock", "f2l05", 3 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X, FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Eight O Clock", "f2l06", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Seven O Clock", "f2l07", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Six O Clock", "f2l08", FAN2_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Five O Clock", "f2l09", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Four O Clock", "f2l10", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Three O Clock", "f2l11", 3 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X, FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Two O Clock", "f2l12", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 One O Clock", "f2l13", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Twelve O Clock", "f2l14", FAN2_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 2 Eleven O Clock", "f2l15", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN2_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN2_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 3
+    {0, "Fan 3 Bottom Inner", "f3l00", FAN3_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 3 Left Inner", "f3l01", -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X, FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 3 Top Inner", "f3l02", FAN3_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 3 Right Inner", "f3l03", LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X, FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Ten O Clock", "f3l04", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Nine O Clock", "f3l05", 3 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X, FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Eight O Clock", "f3l06", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Seven O Clock", "f3l07", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Six O Clock", "f3l08", FAN3_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Five O Clock", "f3l09", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Four O Clock", "f3l10", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Three O Clock", "f3l11", 3 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X, FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Two O Clock", "f3l12", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 One O Clock", "f3l13", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Twelve O Clock", "f3l14", FAN3_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 3 Eleven O Clock", "f3l15", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN3_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN3_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 4
+    {0, "Fan 4 Bottom Inner", "f4l00", FAN4_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 4 Left Inner", "f4l01", -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X, FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 4 Top Inner", "f4l02", FAN4_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 4 Right Inner", "f4l03", LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X, FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Ten O Clock", "f4l04", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Nine O Clock", "f4l05", 3 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X, FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Eight O Clock", "f4l06", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Seven O Clock", "f4l07", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Six O Clock", "f4l08", FAN4_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Five O Clock", "f4l09", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Four O Clock", "f4l10", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Three O Clock", "f4l11", 3 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X, FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Two O Clock", "f4l12", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 One O Clock", "f4l13", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Twelve O Clock", "f4l14", FAN4_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 4 Eleven O Clock", "f4l15", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN4_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN4_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 5
+    {0, "Fan 5 Bottom Inner", "f5l00", FAN5_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 5 Left Inner", "f5l01", -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X, FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 5 Top Inner", "f5l02", FAN5_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 5 Right Inner", "f5l03", LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X, FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Ten O Clock", "f5l04", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Nine O Clock", "f5l05", 3 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X, FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Eight O Clock", "f5l06", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Seven O Clock", "f5l07", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Six O Clock", "f5l08", FAN5_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Five O Clock", "f5l09", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Four O Clock", "f5l10", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Three O Clock", "f5l11", 3 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X, FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Two O Clock", "f5l12", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 One O Clock", "f5l13", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Twelve O Clock", "f5l14", FAN5_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 5 Eleven O Clock", "f5l15", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN5_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN5_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+
+    // Fan 6
+    {0, "Fan 6 Bottom Inner", "f6l00", FAN6_OFFSET_X, -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 6 Left Inner", "f6l01", -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X, FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 6 Top Inner", "f6l02", FAN6_OFFSET_X, LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false}, 
+    {0, "Fan 6 Right Inner", "f6l03", LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X, FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Ten O Clock", "f6l04", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Nine O Clock", "f6l05", 3 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X, FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Eight O Clock", "f6l06", (short)(2.6 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Seven O Clock", "f6l07", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Six O Clock", "f6l08", FAN6_OFFSET_X, 3 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Five O Clock", "f6l09", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Four O Clock", "f6l10", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(1.5 * LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Three O Clock", "f6l11", 3 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X, FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Two O Clock", "f6l12", (short)(2.6 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(1.5 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 One O Clock", "f6l13", (short)(1.5 * LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Twelve O Clock", "f6l14", FAN6_OFFSET_X, 3 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y, LIGHTNODE_PRO_SIZE, true, false},
+    {0, "Fan 6 Eleven O Clock", "f6l15", (short)(1.5 * -LIGHTNODE_PRO_SIZE_X + FAN6_OFFSET_X), (short)(2.6 * -LIGHTNODE_PRO_SIZE_Y + FAN6_OFFSET_Y), LIGHTNODE_PRO_SIZE, true, false},
+};
+#define KEYCOUNT_LIGHTING_NODE_PRO   (sizeof(LightingNodeProZones) / sizeof(Key))
+
+// ST100
 #define ST100_V 6,22
 #define ST100_H 22,6
 
@@ -852,6 +1002,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::LIGHTING_NODE_PRO:{
+        // Lighting node pro
+        for(const Key* key = LightingNodeProZones; key < LightingNodeProZones + KEYCOUNT_LIGHTING_NODE_PRO; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     case KeyMap::ST100:{
         for(const Key* key = ST100Zones; key < ST100Zones + KEYCOUNT_ST100; key++){
             Key translatedKey = *key;
@@ -1124,6 +1284,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return M65E;
     if(lower == "m95")
         return M95;
+    if(lower == "lighting_node_pro")
+        return LIGHTING_NODE_PRO;
     if(lower == "ironclaw")
         return IRONCLAW;
     return NO_MODEL;
@@ -1173,6 +1335,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "m65e";
     case M95:
         return "m95";
+    case LIGHTING_NODE_PRO:
+        return "lighting_node_pro";
     case IRONCLAW:
         return "ironclaw";
     default:
@@ -1219,6 +1383,8 @@ int KeyMap::modelWidth(Model model){
     case M95:
     case IRONCLAW:
         return M65_WIDTH;
+    case LIGHTING_NODE_PRO:
+        return LIGHTING_NODE_PRO_WIDTH;
     default:
         return 0;
     }
@@ -1251,6 +1417,8 @@ int KeyMap::modelHeight(Model model){
     case M95:
     case IRONCLAW:
         return M65_HEIGHT;
+    case LIGHTING_NODE_PRO:
+        return LIGHTING_NODE_PRO_HEIGHT;
     default:
         return 0;
     }

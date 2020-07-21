@@ -59,7 +59,9 @@ typedef enum {
     INOTIFY,
     GET,
 
-    CMD_LAST = GET
+    FANCOUNT,
+
+    CMD_LAST = FANCOUNT
 } cmd;
 #define CMD_COUNT       (CMD_LAST - CMD_FIRST + 2)
 #define CMD_DEV_COUNT   (CMD_LAST - CMD_VT_FIRST + 1)
@@ -128,10 +130,14 @@ typedef union devcmd {
         void (*freeprofile)(usbdevice* kb);
         // led.h
         int (*updatergb)(usbdevice* kb, int force);
+        int (*fancount)(usbdevice* kb, uchar numberOfFans);
         // input.h
         void (*updateindicators)(usbdevice* kb, int force);
         // dpi.h
         int (*updatedpi)(usbdevice* kb, int force);
+
+        // It's call everytime | it's necessary for lightnode because we have to send a packet to keep color everytime
+        void (*onframe)(usbdevice* kb);
     };
 } devcmd;
 

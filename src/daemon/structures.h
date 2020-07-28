@@ -202,6 +202,13 @@ extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mouse_wireless;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
+extern const union devcmd vtable_bragi;
+
+typedef enum protocol_
+{
+    PROTO_NXP,
+    PROTO_BRAGI,
+} protocol_t;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN 50
@@ -308,6 +315,8 @@ typedef struct {
     // Endpoints the main input thread should listen to
     // Must always end with 0, and endpoints should be 0x80 | i
     uchar input_endpoints[USB_EP_MAX+1];
+    // Protocol
+    protocol_t protocol;
 } usbdevice;
 
 #ifdef OS_LINUX

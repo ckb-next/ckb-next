@@ -224,9 +224,13 @@ const char* product_str(ushort product){
 ///
 /// \todo Is the last point really a good decision and always correct?
 ///
-static const devcmd* get_vtable(ushort vendor, ushort product){
+static const devcmd* get_vtable(usbdevice* kb){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
-    if(IS_MOUSE(vendor, product)) {
+    ushort vendor = kb->vendor;
+    ushort product = kb->product;
+    if(kb->protocol == PROTO_BRAGI) {
+        return &vtable_bragi;
+    } else if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;
         else if(IS_WIRELESS_ID(vendor, product))
@@ -368,10 +372,12 @@ static void* _setupusb(void* context){
     ///
     usbdevice* kb = context;
     queued_mutex_lock(dmutex(kb));
+    if(USES_BRAGI(kb->vendor, kb->product))
+        kb->protocol = PROTO_BRAGI;
     queued_mutex_lock(imutex(kb));
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;
-    const devcmd* vt = kb->vtable = get_vtable(vendor, product);
+    const devcmd* vt = kb->vtable = get_vtable(kb);
     kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(SUPPORTS_ADJRATE(kb))
         kb->features |= FEAT_ADJRATE;

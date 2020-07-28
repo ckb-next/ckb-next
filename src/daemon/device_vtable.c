@@ -8,6 +8,7 @@
 #include "profile.h"
 #include "usb_legacy.h"
 #include "usb_nxp.h"
+#include "usb_bragi.h"
 
 // Do-nothing functions
 static void cmd_none(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
@@ -411,3 +412,54 @@ const devcmd vtable_mouse_legacy = {
     .write = legacy_dev_io,
     .read = legacy_dev_io,
 };
+
+// Bragi vtable
+const devcmd vtable_bragi = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_pollrate_bragi,
+
+    .active = cmd_active_bragi,
+    .idle = cmd_idle_bragi,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_ioff,
+    .ion = cmd_ion,
+    .iauto = cmd_iauto,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_dpi,
+    .dpisel = cmd_dpisel,
+    .lift = cmd_lift_bragi,
+    .snap = cmd_snap_bragi,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_mouse_bragi,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile_none,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_mouse_bragi,
+    .updateindicators = int1_void_none,
+    .updatedpi = updatedpi_bragi,
+    .reset = cmd_none,
+    .fill_input_eps = bragi_fill_input_eps,
+    .write = bragi_usb_write,
+    .read = bragi_usb_read,
+};
+

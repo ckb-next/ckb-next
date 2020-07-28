@@ -65,10 +65,12 @@ if (MACOS OR LINUX)
               device.c
               device_keyboard.c
               device_mouse.c
+              device_bragi.c
               device_vtable.c
               devnode.c
               dpi.c
               dpi_legacy.c
+              dpi_bragi.c
               firmware.c
               input.c
               keymap.c
@@ -78,6 +80,7 @@ if (MACOS OR LINUX)
               led_mouse.c
               led_mousepad.c
               led_wireless.c
+              led_mouse_bragi.c
               main.c
               notify.c
               profile.c
@@ -86,11 +89,13 @@ if (MACOS OR LINUX)
               usb.c
               usb_nxp.c
               usb_legacy.c
+              usb_bragi.c
               command.h
               device.h
               devnode.h
               dpi.h
               dpi_legacy.h
+              dpi_bragi.h
               firmware.h
               includes.h
               input.h
@@ -107,6 +112,8 @@ if (MACOS OR LINUX)
               usb.h
               usb_nxp.h
               usb_legacy.h
+              bragi_proto.h
+              usb_bragi.h
     )
 endif ()
 if (MACOS)

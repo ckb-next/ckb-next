@@ -262,6 +262,9 @@ const char* product_str(ushort product);
 
 #define USB_DELAY_DEFAULT   5
 
+// This should be removed in the future when we implement autodetection
+#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D)))
+
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();
 

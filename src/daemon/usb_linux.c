@@ -94,7 +94,7 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, u
 ///
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
-    if (kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
+    if (kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb) || kb->protocol == PROTO_BRAGI){
         // If we need to read a response, lock the interrupt mutex
         if(is_recv)
             if(pthread_mutex_lock(intmutex(kb)))
@@ -167,7 +167,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 ///
 int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     int res;
-    if(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
+    if(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb) || kb->protocol == PROTO_BRAGI){
         // Wait for 2s
         struct timespec condwait = {0};
         condwait.tv_sec = time(NULL) + 2;
@@ -284,6 +284,30 @@ void os_sendindicators(usbdevice* kb) {
     }
 }
 
+static ushort check_endpoint_in_intf(struct udev* dev_udev, char* base, size_t baselen, int urbcount, ushort* size){
+    for(int i = 0; i < urbcount; i++){
+        ushort ep = 0x80 | (i + 1);
+        // Append the endpoint
+        char epstr[7];
+        snprintf(epstr, 7, "/ep_%02x", ep & 0xFF);
+        strcpy(base + baselen, epstr);
+        // Access it
+        struct udev_device* child = udev_device_new_from_syspath(dev_udev, base);
+        const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
+        // Read its wMaxPacketSize
+        if(sizehex && sscanf(sizehex, "%hx", size) == 1)
+        {
+//#ifdef DEBUG
+            ckb_info("Found EP 0x%hx at %s\n", ep, base);
+//#endif
+            udev_device_unref(child);
+            return ep;
+        }
+        udev_device_unref(child);
+    }
+    return 0;
+}
+
 ///
 /// \brief os_inputmain This function is run in a separate thread and will be detached from the main thread, so it needs to clean up its own resources.
 /// \todo This function is a collection of many tasks. It should be divided into several sub-functions for the sake of greater convenience:
@@ -308,7 +332,7 @@ void* os_inputmain(void* context){
     ///
     /// Monitor input transfers on all endpoints for non-RGB devices
     /// For RGB, monitor all but the last, as it's used for input/output
-    int urbcount = ((IS_LEGACY(vendor, product) || product == P_ST100) ? kb->epcount : (kb->epcount - 1));
+    int urbcount = ((IS_LEGACY(vendor, product) || product == P_ST100 || kb->protocol == PROTO_BRAGI) ? kb->epcount : (kb->epcount - 1));
     if (urbcount == 0) {
         ckb_err("urbcount = 0, so there is nothing to claim in os_inputmain()");
         return 0;
@@ -337,8 +361,6 @@ void* os_inputmain(void* context){
     struct udev_list_entry* udeventry = udev_enumerate_get_list_entry(enumerate);
 
     for(int i = 0; i < urbcount; i++){
-        ushort ep = 0x80 | (i + 1);
-
         // Move to the next entry in the udev list (skipping the first one).
         struct udev_list_entry* nextentry = udev_list_entry_get_next(udeventry);
         const char* path = udev_list_entry_get_name(nextentry);
@@ -353,22 +375,19 @@ void* os_inputmain(void* context){
             path = udev_list_entry_get_name(nextentry);
         }
         // Create the path to the endpoint
-        char finalpath[strlen(path)+7];
+        size_t pathlen = strlen(path);
+        char* finalpath = calloc(pathlen+7, 1);
         // Copy the base path
         strcpy(finalpath, path);
-        // Append the endpoint
-        char epstr[7];
-        snprintf(epstr, 7, "/ep_%02x", ep & 0xFF);
-        strcat(finalpath, epstr);
-        // Access it
-        struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
-        const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
-        // Read its wMaxPacketSize
+        // Try to find any of the wanted endpoints in the current interface
         ushort size = 64;
-        if(sizehex)
-            sscanf(sizehex, "%hx", &size);
-        else
-            ckb_warn("Unable to read wMaxPacketSize for %s, assuming 64", epstr);
+        ushort ep = check_endpoint_in_intf(dev_udev, finalpath, pathlen, urbcount, &size);
+        if(!ep)
+        {
+            ep = 0x80 | (i + 1);
+            ckb_warn("Unable to read wMaxPacketSize for %s, assuming 64 and ep 0x%hx", finalpath, ep);
+        }
+
 #ifdef DEBUG
         ckb_info("Endpoint path %s has wMaxPacketSize %i", epstr, size);
 #endif
@@ -381,7 +400,7 @@ void* os_inputmain(void* context){
         urbs[i].buffer = malloc(urbs[i].buffer_length);
         ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
         // Clean up
-        udev_device_unref(child);
+        free(finalpath);
     }
 
     udev_enumerate_unref(enumerate);

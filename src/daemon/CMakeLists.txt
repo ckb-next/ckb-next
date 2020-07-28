@@ -65,10 +65,12 @@ if (MACOS OR LINUX)
               device.c
               device_keyboard.c
               device_mouse.c
+              device_bragi.c
               device_vtable.c
               devnode.c
               dpi.c
               dpi_legacy.c
+              dpi_bragi.c
               firmware.c
               input.c
               keymap.c
@@ -77,6 +79,7 @@ if (MACOS OR LINUX)
               led_keyboard.c
               led_mouse.c
               led_mousepad.c
+              led_mouse_bragi.c
               main.c
               notify.c
               profile.c
@@ -88,6 +91,7 @@ if (MACOS OR LINUX)
               devnode.h
               dpi.h
               dpi_legacy.h
+              dpi_bragi.h
               firmware.h
               includes.h
               input.h
@@ -101,7 +105,8 @@ if (MACOS OR LINUX)
               protocol.h
               request_hid_mac.h
               structures.h
-              usb.h)
+              usb.h
+              bragi_proto.h)
 endif ()
 if (MACOS)
     target_sources(

@@ -331,8 +331,8 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
 
     // Get first byte of the response
     uchar firstbyte = buffer[0];
-    // If the response starts with CMD_GET (0x0e), that means it needs to go to os_usbrecv()
-    if(urblen == MSG_SIZE && firstbyte == CMD_GET){
+    // If the response starts with CMD_GET (0x0e), or it came from ep4 with bragi, that means it needs to go to os_usbrecv()
+    if(urblen == MSG_SIZE && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == 0x84))){
         int retval = pthread_mutex_lock(intmutex(kb));
         if(retval)
             ckb_fatal("Error locking interrupt mutex %i", retval);

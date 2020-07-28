@@ -379,3 +379,50 @@ const devcmd vtable_mouse_legacy = {
     .updatedpi = updatedpi_legacy,
     .reset = cmd_none,
 };
+
+// Bragi vtable
+const devcmd vtable_bragi = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_pollrate_bragi,
+
+    .active = cmd_active_bragi,
+    .idle = cmd_idle_bragi,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_ioff,
+    .ion = cmd_ion,
+    .iauto = cmd_iauto,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_dpi,
+    .dpisel = cmd_dpisel,
+    .lift = cmd_lift_bragi,
+    .snap = cmd_snap_bragi,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_mouse_bragi,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile_none,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_mouse_bragi,
+    .updateindicators = int1_void_none,
+    .updatedpi = updatedpi_bragi
+};
+

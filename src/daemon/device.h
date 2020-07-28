@@ -73,6 +73,7 @@ int init_cond_monotonic(void);
 int start_dev(usbdevice* kb, int makeactive);
 int start_kb_legacy(usbdevice* kb, int makeactive);
 int start_mouse_legacy(usbdevice* kb, int makeactive);
+int start_mouse_bragi(usbdevice* kb, int makeactive);
 
 // Activates/deactives software control on a device. Return 0 on success
 int setactive_kb(usbdevice* kb, int active);
@@ -86,12 +87,15 @@ int setactive_mouse(usbdevice* kb, int active);
 // Command: Activate a device
 int cmd_active_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_active_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
+int cmd_active_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 // Command: Deactivate a device
 int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
+int cmd_idle_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);
 // Command: Set poll rate
 int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
+int cmd_pollrate_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 
 // Reads the battery of a wireless device
 void* read_battery(void* context);

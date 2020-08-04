@@ -30,6 +30,18 @@ int start_mouse_bragi(usbdevice* kb, int makeactive){
     
     kb->features |= FEAT_ADJRATE;
     kb->features &= ~FEAT_HWLOAD;
+    
+    // The daemon always sends RGB data through handle 0, so go ahead and open it
+    uchar light_init[64] = {BRAGI_MAGIC, BRAGI_OPEN_HANDLE, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING};
+    memset(response, 0, 64);
+    if(!usbrecv(kb, light_init, response))
+        return 1;
+
+    // Check if the device returned an error
+    // Non fatal for now. Should first figure out what the error codes mean.
+    // Device returns 0x03 if we haven't opened the handle.
+    if(response[2] != 0x00)
+        ckb_err("ckb%d Bragi light init returned error 0x%hhx\n", INDEX_OF(kb, keyboard), response[2]);
 
     return 0;
 }

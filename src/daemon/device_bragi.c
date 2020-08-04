@@ -7,19 +7,39 @@
 #include "usb.h"
 #include "bragi_proto.h"
 
+int setactive_bragi(usbdevice* kb, int active){
+    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_MODE, 0, active};
+    uchar response[64] = {0};
+    if(!usbrecv(kb, pkt, response))
+        return 1;
+    kb->active = active - 1;
+    return 0;
+}
+
 int start_mouse_bragi(usbdevice* kb, int makeactive){
     (void)makeactive;
 
 #warning "FIXME"
+    // Check if we're in software mode, and if so, force back to hardware until we explicitly want SW.
+    uchar get_mode[64] = {BRAGI_MAGIC, BRAGI_GET, BRAGI_MODE, 0};
+    uchar response[64] = {0};
+    if(!usbrecv(kb, get_mode, response))
+        return 1;
+
+    if(response[3] == BRAGI_MODE_SOFTWARE){
+        ckb_info("ckb%d Device is software mode during init. Switching to hardware\n", INDEX_OF(kb, keyboard));
+        if(setactive_bragi(kb, BRAGI_MODE_HARDWARE))
+            return 1;
+    }
+
     uchar pollrateLUT[5] = {-1};
     pollrateLUT[BRAGI_POLLRATE_1MS] = 1;
     pollrateLUT[BRAGI_POLLRATE_2MS] = 2;
     pollrateLUT[BRAGI_POLLRATE_4MS] = 4;
     pollrateLUT[BRAGI_POLLRATE_8MS] = 8;
     // Get pollrate
-    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_GET, BRAGI_POLLRATE, 0};
-    uchar response[64] = {0};
-    if(!usbrecv(kb, pkt, response))
+    uchar poll_pkt[64] = {BRAGI_MAGIC, BRAGI_GET, BRAGI_POLLRATE, 0};
+    if(!usbrecv(kb, poll_pkt, response))
         return 1;
     
     uchar pollrate = response[3];
@@ -72,15 +92,6 @@ int cmd_pollrate_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, con
         return 1;
     
     kb->pollrate = rate;
-    return 0;
-}
-
-int setactive_bragi(usbdevice* kb, int active){
-    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_MODE, 0, active};
-    uchar response[64] = {0};
-    if(!usbrecv(kb, pkt, response))
-        return 1;
-    kb->active = active - 1;
     return 0;
 }
 

@@ -6,7 +6,8 @@
 // Commands
 #define BRAGI_SET           0x01
 #define BRAGI_GET           0x02
-#define BRAGI_LIGHT_DATA    0x06
+#define BRAGI_WRITE_DATA    0x06
+#define BRAGI_OPEN_HANDLE   0x0d
 
 // What to get/set
 #define BRAGI_POLLRATE      0x01
@@ -22,7 +23,11 @@
 #define BRAGI_POLLRATE_4MS  0x02
 #define BRAGI_POLLRATE_8MS  0x01
 
-// Unknown
-#define BRAGI_LIGHTING      0x12
+// Resources (used to get handles)
+#define BRAGI_RES_LIGHTING  0x01
+#define BRAGI_RES_PAIRINGID 0x05
+
+// ckb-specific macros
+#define BRAGI_LIGHTING_HANDLE 0x00
 
 #endif // BRAGI_PROTO_H

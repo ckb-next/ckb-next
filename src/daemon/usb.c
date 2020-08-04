@@ -8,6 +8,7 @@
 #include "profile.h"
 #include "usb.h"
 #include "keymap_patch.h"
+#include <ckbnextconfig.h>
 
 // Values taken from the official website
 // Mice not in the list default to 12000 in the GUI
@@ -856,14 +857,22 @@ int closeusb(usbdevice* kb){
     // Wait for thread to close
     pthread_mutex_unlock(imutex(kb));
     pthread_mutex_unlock(dmutex(kb));
+
+    if(pthread_self() == kb->thread){
 #ifdef DEBUG_MUTEX
-    if(pthread_self() == kb->thread)
-        ckb_err("Attempted to pthread_join() self\n");
-    ckb_info("Joining thread 0x%lx for ckb%d by thread 0x%lx\n", kb->thread, INDEX_OF(kb, keyboard), pthread_self());
+        ckb_info("Attempted to pthread_join() self. Detaching instead.\n");
 #endif
-    int joinres = pthread_join(kb->thread, NULL);
-    if(joinres)
-        ckb_info("pthread_join() returned %s (%d)\n", strerror(joinres), joinres);
+        int detachres = pthread_detach(kb->thread);
+        if(detachres)
+            ckb_err("pthread_detach() returned %s (%d)\n", strerror(detachres), detachres);
+    } else {
+#ifdef DEBUG_MUTEX
+        ckb_info("Joining thread 0x%lx for ckb%d by thread 0x%lx\n", kb->thread, INDEX_OF(kb, keyboard), pthread_self());
+#endif
+        int joinres = pthread_join(kb->thread, NULL);
+        if(joinres)
+            ckb_err("pthread_join() returned %s (%d)\n", strerror(joinres), joinres);
+    }
     pthread_mutex_lock(dmutex(kb));
 
     // Free the device-specific keymap

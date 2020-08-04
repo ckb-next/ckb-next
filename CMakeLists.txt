@@ -114,6 +114,7 @@ option(DISABLE_UPDATER "Disable the ckb-next updater. This option should only be
 option(DEBUG_USB_SEND  "Show the contents of USB packets being sent to device."                                OFF)
 option(DEBUG_USB_RECV  "Show the contents of USB packets being received from device through usbrecv()."        OFF)
 option(DEBUG_USB_INPUT "Show the contents of USB packets being received from device through the input thread." OFF)
+option(DEBUG_MUTEX     "Show debugging information regarding thread synchronisation." OFF)
 
 # Options: install
 if (MACOS)

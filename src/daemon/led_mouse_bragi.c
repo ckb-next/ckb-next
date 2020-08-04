@@ -20,7 +20,7 @@ int updatergb_mouse_bragi(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
-    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_LIGHT_DATA, 0, BRAGI_LIGHTING};
+    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_WRITE_DATA, BRAGI_LIGHTING_HANDLE, 0x12};
 
     pkt[7] = newlight->r[LED_MOUSE + 1];
     pkt[13] = newlight->g[LED_MOUSE + 1];

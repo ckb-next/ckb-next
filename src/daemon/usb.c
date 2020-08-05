@@ -518,6 +518,7 @@ static void* _setupusb(void* context){
     queued_mutex_unlock(dmutex(kb));
     updateconnected(kb);
     queued_mutex_lock(dmutex(kb));
+
     ///
     /// devmain()'s return value is returned by _setupusb() when we terminate.
     return devmain(kb);

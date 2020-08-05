@@ -59,6 +59,10 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
         ui->lightWidget->setLegacyM95();
     }
 
+    // If we have a DARK CORE or Dark Core SE, then change the performance tab accordingly
+    if(device->model() == KeyMap::DARKCORE)
+        ui->mPerfWidget->setDarkCore();
+
     // Hide poll rate and FW update as appropriate
     if(!device->features.contains("pollrate")){
         ui->pollRateBox->hide();

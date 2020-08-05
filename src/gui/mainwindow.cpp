@@ -31,36 +31,6 @@ int MainWindow::signalHandlerFd[2] = {0, 0};
 
 MainWindow* MainWindow::mainWindow = 0;
 
-#ifdef USE_LIBAPPINDICATOR
-extern "C" {
-    void quitIndicator(GtkMenu* menu, gpointer data) {
-        Q_UNUSED(menu);
-        MainWindow* window = static_cast<MainWindow*>(data);
-        window->quitApp();
-    }
-
-    void restoreIndicator(GtkMenu* menu, gpointer data) {
-        Q_UNUSED(menu);
-        MainWindow* window = static_cast<MainWindow*>(data);
-        window->showWindow();
-    }
-
-    void indicatorScroll(AppIndicator* indicator, guint steps, GdkScrollDirection direction, gpointer data) {
-        MainWindow* window = static_cast<MainWindow*>(data);
-        switch(direction) {
-            case GDK_SCROLL_UP:
-                emit window->trayIconScrolled(true);
-                break;
-            case GDK_SCROLL_DOWN:
-                emit window->trayIconScrolled(false);
-                break;
-            default:
-                break;
-        }
-    }
-}
-#endif
-
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
 bool is_catalina_or_higher(){
     // Get macOS version. If Catalina or higher, start the daemon agent as the current user to request for HID permission.
@@ -161,60 +131,15 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreAction = new QAction(tr("Restore"), this);
     closeAction = new QAction(tr("Quit"), this);
     changeTrayIconAction = new QAction(tr("Monochrome Tray Icon"), this);
-
-#ifdef USE_LIBAPPINDICATOR
-    QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
-
-    QString desktop = procEnv.value("XDG_CURRENT_DESKTOP", QString("")).toLower();
-    QString qpaTheme = procEnv.value("QT_QPA_PLATFORMTHEME", QString("")).toLower();
-    QString ckbnextAppindicator = procEnv.value("CKB_NEXT_USE_APPINDICATOR", QString("")).toLower();
-    QStringList appIndicatorOn = QStringList() << "yes" << "on" << "1";
-    QStringList appIndicatorOff = QStringList() << "no" << "off" << "0";
-
-    useAppindicator = false;
-    trayIcon = 0;
-
-    if(((desktop == "unity" || qpaTheme == "appmenu-qt5" || qpaTheme == "gtk2") && !appIndicatorOff.contains(ckbnextAppindicator)) || appIndicatorOn.contains(ckbnextAppindicator)){
-        qDebug() << "Using AppIndicator";
-        useAppindicator = true;
-
-        indicatorMenu = gtk_menu_new();
-        indicatorMenuRestoreItem = gtk_menu_item_new_with_label("Restore");
-        indicatorMenuQuitItem = gtk_menu_item_new_with_label("Quit");
-
-        gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuRestoreItem);
-        gtk_menu_shell_append(GTK_MENU_SHELL(indicatorMenu), indicatorMenuQuitItem);
-
-        g_signal_connect(indicatorMenuQuitItem, "activate",
-            G_CALLBACK(quitIndicator), this);
-        g_signal_connect(indicatorMenuRestoreItem, "activate",
-            G_CALLBACK(restoreIndicator), this);
-
-        gtk_widget_show(indicatorMenuRestoreItem);
-        gtk_widget_show(indicatorMenuQuitItem);
-
-        indicator = app_indicator_new("ckb-next", "indicator-messages", APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
-
-        app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
-        app_indicator_set_menu(indicator, GTK_MENU(indicatorMenu));
-        app_indicator_set_icon(indicator, "ckb-next");
-
-        // Catch scroll events
-        g_signal_connect(indicator, "scroll-event", G_CALLBACK(indicatorScroll), this);
-    } else
-#endif
-    {
-        qDebug() << "Using QSytemTrayIcon";
-        trayIconMenu = new QMenu(this);
-        trayIconMenu->addAction(changeTrayIconAction);
-        trayIconMenu->addAction(restoreAction);
-        trayIconMenu->addAction(closeAction);
-        trayIcon = new CkbSystemTrayIcon(getIcon(), this);
-        trayIcon->setContextMenu(trayIconMenu);
-        trayIcon->show();
-        connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
-        connect(trayIcon, &CkbSystemTrayIcon::wheelScrolled, this, &MainWindow::handleTrayScrollEvt);
-    }
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(changeTrayIconAction);
+    trayIconMenu->addAction(restoreAction);
+    trayIconMenu->addAction(closeAction);
+    trayIcon = new CkbSystemTrayIcon(getIcon(), this);
+    trayIcon->setContextMenu(trayIconMenu);
+    trayIcon->show();
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
+    connect(trayIcon, &CkbSystemTrayIcon::scrollRequested, this, &MainWindow::handleTrayScrollEvt);
     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
 #ifdef Q_OS_MACOS
@@ -307,7 +232,8 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 }
 
-void MainWindow::handleTrayScrollEvt(bool up){
+void MainWindow::handleTrayScrollEvt(int delta, Qt::Orientation orientation){
+    bool up = delta > 0;
     emit trayIconScrolled(up);
 }
 
@@ -320,12 +246,7 @@ void MainWindow::checkForCkbUpdates(){
 }
 
 void MainWindow::toggleTrayIcon(bool visible){
-#ifdef USE_LIBAPPINDICATOR
-    if(useAppindicator)
-        app_indicator_set_status(indicator, visible ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
-    else
-#endif
-        trayIcon->setVisible(visible);
+    trayIcon->setVisible(visible);
 }
 
 void MainWindow::addDevice(Kb* device){

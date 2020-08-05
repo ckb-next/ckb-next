@@ -15,17 +15,6 @@
 #include "ckbupdater.h"
 #endif
 
-#ifdef USE_LIBAPPINDICATOR
-// 'signals' has to be undefined as GTK has its own signal mechanism
-#undef signals
-extern "C" {
-  #include <libappindicator/app-indicator.h>
-  #include <gtk/gtk.h>
-}
-// Redefine QT signals as per qtbase/src/corelib/kernel/qobjectdefs.h
-#define signals Q_SIGNALS
-#endif
-
 namespace Ui {
 class MainWindow;
 }
@@ -51,15 +40,6 @@ private:
     QAction* restoreAction;
     QAction* closeAction;
     QAction* changeTrayIconAction;
-
-#ifdef USE_LIBAPPINDICATOR
-    bool                useAppindicator;
-    AppIndicator*       indicator;
-    GtkWidget*          indicatorMenu;
-    GtkWidget*          indicatorMenuQuitItem;
-    GtkWidget*          indicatorMenuRestoreItem;
-#endif
-
     QMenu*              trayIconMenu;
     CkbSystemTrayIcon*  trayIcon;
     void closeEvent(QCloseEvent *event);
@@ -84,7 +64,7 @@ public slots:
     void checkForCkbUpdates();
     void changeTrayIconToMonochrome();
     void changeTrayIconToRGB();
-    void handleTrayScrollEvt(bool up);
+    void handleTrayScrollEvt(int delta, Qt::Orientation orientation);
 
 signals:
     void switchToProfileCLI(QString profile);
@@ -96,7 +76,6 @@ private slots:
     void updateVersion();
     void checkFwUpdates();
     void timerTick();
-    void iconClicked(QSystemTrayIcon::ActivationReason reason);
     void cleanup();
     void showFwUpdateNotification(QWidget* widget, float version);
     void QSignalHandler();
@@ -104,7 +83,7 @@ private slots:
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
     void appleRequestHidTimer();
 #endif
-
+    void iconClicked(QSystemTrayIcon::ActivationReason reason);
 private:
     Ui::MainWindow *ui;
     QSocketNotifier* sigNotifier;

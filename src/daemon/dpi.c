@@ -108,6 +108,7 @@ int updatedpi(usbdevice* kb, int force){
         return 0;
     dpiset* lastdpi = &kb->profile->lastdpi;
     dpiset* newdpi = &kb->profile->currentmode->dpi;
+    lighting* light = &kb->profile->currentmode->light;
     // Don't do anything if the settings haven't changed
     if(!force && !lastdpi->forceupdate && !newdpi->forceupdate
             && !memcmp(lastdpi, newdpi, sizeof(dpiset)))
@@ -175,6 +176,12 @@ int updatedpi(usbdevice* kb, int force){
         data_pkt[6] = (newdpi->x[i] >> 8) & 0xFF;
         data_pkt[7] = newdpi->y[i] & 0xFF;
         data_pkt[8] = (newdpi->y[i] >> 8) & 0xFF;
+        if(IS_DARK_CORE(kb)) {
+            data_pkt[9] = light->r[LED_MOUSE + N_MOUSE_ZONES + i];
+            data_pkt[10] = light->g[LED_MOUSE + N_MOUSE_ZONES + i];
+            data_pkt[11] = light->b[LED_MOUSE + N_MOUSE_ZONES + i];
+        }
+
         if(!usbsend(kb, data_pkt, 1))
             return -1;
     }

@@ -53,6 +53,9 @@ public:
     int hwModeCount;
     const static int HWMODE_MAX = 3;
 
+    const static QString BATTERY_VALUES[5];
+    const static QString BATTERY_CHARGING_VALUES[5];
+
     // Perform a firmware update
     void fwUpdate(const QString& path);
 
@@ -125,6 +128,7 @@ signals:
     void profileAdded();
     void profileRenamed();
     void modeRenamed();
+    void batteryChanged(uint battery, uint charging);
 
     void profileChanged();
     void modeChanged(bool spontaneous);
@@ -171,6 +175,8 @@ private:
     // Following properties shouldn't be used by any other classes
     void updateLayout(bool stop);
 
+    void updateBattery();
+
     static int _frameRate, _scrollSpeed;
     static bool _dither, _mouseAccel;
 
@@ -179,6 +185,8 @@ private:
     KbMode*             _currentMode;
 
     KeyMap::Model   _model;
+
+    uint battery, charging;
 
     // Indicator light state
     bool iState[KbPerf::HW_I_COUNT];

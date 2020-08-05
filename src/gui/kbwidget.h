@@ -64,6 +64,7 @@ private slots:
 
     void devUpdate();
     void modeUpdate();
+    void updateBattery(uint battery, uint charging);
     void on_hwSaveButton_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();

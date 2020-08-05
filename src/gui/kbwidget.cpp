@@ -59,6 +59,14 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     if(device->model() == KeyMap::DARKCORE)
         ui->mPerfWidget->setDarkCore();
 
+    // If the device is supports wireless, show the battery
+    if(device->features.contains("wireless")){
+        connect(device, &Kb::batteryChanged, this, &KbWidget::updateBattery);
+    } else {
+        ui->batteryLabel->hide();
+        ui->batteryStatusLabel->hide();
+    }
+
     // Hide poll rate and FW update as appropriate
     if(!device->features.contains("pollrate")){
         ui->pollRateBox->hide();
@@ -414,6 +422,13 @@ void KbWidget::devUpdate(){
 }
 
 void KbWidget::modeUpdate(){
+}
+
+void KbWidget::updateBattery(uint battery, uint charging){
+    QString label = QString("%1, %2")
+                    .arg(Kb::BATTERY_VALUES[battery])
+                    .arg(Kb::BATTERY_CHARGING_VALUES[charging]);
+    ui->batteryStatusLabel->setText(label);
 }
 
 void KbWidget::on_hwSaveButton_clicked(){

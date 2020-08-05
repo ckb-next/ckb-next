@@ -91,7 +91,15 @@ void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const c
 
 static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
     usbprofile* profile = kb->profile;
-    if(!strcmp(setting, ":mode")){
+     if(!strcmp(setting, ":battery")){
+        if(!IS_WIRELESS(kb)) return;
+        uchar msg[MSG_SIZE] = { CMD_GET, FIELD_BATTERY };
+        uchar in[MSG_SIZE] = {};
+        queued_mutex_unlock(imutex(kb));
+        if(!usbrecv(kb, msg, in)) return;
+        queued_mutex_lock(imutex(kb));
+        nprintf(kb, nnumber, 0, "battery %hhu:%hhu\n", in[4], in[5]);
+    } else if(!strcmp(setting, ":mode")){
         // Get the current mode number
         nprintf(kb, nnumber, mode, "switch\n");
         return;

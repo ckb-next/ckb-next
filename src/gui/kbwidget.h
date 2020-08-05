@@ -68,6 +68,7 @@ private slots:
     void on_modesList_customContextMenuRequested(const QPoint &pos);
 
     void devUpdate();
+    void updateBattery(uint battery, uint charging);
     void on_hwSaveButton_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();

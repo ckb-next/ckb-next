@@ -26,6 +26,7 @@
 #define FIELD_KB_9BCLR 0x27 // 9-bit colour change used by !IS_FULLRANGE keyboards. Write only.
 #define FIELD_KB_COLOR 0x28 // 24-bit colour change used by IS_FULLRANGE keyboards. Write only.
 #define FIELD_KEYINPUT 0x40 // Key input mode; whether an event should trigger a HID or Corsair event (or both). Write only.
+#define FIELD_BATTERY  0x50 // Battery status. Read only.
 
 // Used for FIELD_RESET.
 #define RESET_NORMAL   0x00 // A medium-speed reset.

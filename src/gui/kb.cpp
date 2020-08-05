@@ -19,7 +19,7 @@ bool Kb::_dither = false, Kb::_mouseAccel = true;
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
     devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
-    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
+    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), battery(0), charging(0),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT), _maxDpi(0),
@@ -122,6 +122,9 @@ Kb::Kb(QObject *parent, const QString& path) :
     }
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
+
+    if(features.contains("wireless"))
+        updateBattery();
 
     // Again, find an available notification node for macro definition
     // (if none is found, take notify2)
@@ -227,6 +230,11 @@ void Kb::updateLayout(bool stop){
             mode->light()->close();
     }
     emit infoUpdated();
+}
+
+void Kb::updateBattery(){
+    cmd.write(QString("@%1 get :battery\n").arg(notifyNumber).toLatin1());
+    cmd.flush();
 }
 
 void Kb::dither(bool newDither){
@@ -524,6 +532,17 @@ void Kb::readNotify(QString line){
             mode->bind()->keyEvent(keyName, keyPressed);
         }
         deviceIdleTimer.start();
+    } else if (components[0] == "battery"){
+        QStringList bComponents = components[1].split(':');
+        if(bComponents.length() != 2)
+            return;
+        // Convert battery values into human readable text
+        bool ok;
+        uint newBattery = bComponents[0].toUInt(&ok), newCharging = bComponents[1].toUInt(&ok);
+        if(!ok || newBattery  > 4 || newCharging > 4 && battery != newBattery && charging != newCharging) return;
+        battery = newBattery;
+        charging = newCharging;
+        emit batteryChanged(newBattery, newCharging);
     } else if(components[0] == "i"){
         // Indicator event
         QString i = components[1];
@@ -826,3 +845,6 @@ void Kb::setPollRate(QString poll)
 {
     cmd.write(QString("\npollrate %1\n").arg(poll).toLatin1());
 }
+
+const QString Kb::BATTERY_VALUES[5] = {"Not connected", "Critical", "Low", "Medium", "High"};
+const QString Kb::BATTERY_CHARGING_VALUES[5] = {"N/A", "Not charging", "Charging"};

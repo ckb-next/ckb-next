@@ -93,6 +93,9 @@ int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const
 int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 
+// Reads the battery of a wireless device
+void* read_battery(void* context);
+
 // Sets a device's current mode index. This is only used on the legacy K95; the RGB keyboards have no gettable HW index.
 void setmodeindex_legacy(usbdevice* kb, int index);
 

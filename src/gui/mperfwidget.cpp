@@ -7,7 +7,7 @@
 const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 
 MPerfWidget::MPerfWidget(QWidget *parent) :
-    QWidget(parent), ui(new Ui::MPerfWidget), perf(0), profile(0), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), colorLink(false), isSetting(false) {
+    QWidget(parent), ui(new Ui::MPerfWidget), perf(0), profile(0), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), colorLink(false), isSetting(false), isDarkCore(false) {
     ui->setupUi(this);
     ui->xyBox->setChecked(!_xyLink);
     // Set up DPI stages
@@ -94,7 +94,11 @@ void MPerfWidget::setPerf(KbPerf *newPerf, KbProfile *newProfile){
     }
     ui->iButtonO->color(perf->dpiColor(KbPerf::OTHER));
     ui->aSnapBox->setChecked(perf->angleSnap());
-    ui->lHeightBox->setCurrentIndex(perf->liftHeight() - 1);
+    //Subtract 2 from profile values if using a dark core, since it only supports 3 heights
+    if(isDarkCore)
+        ui->lHeightBox->setCurrentIndex(perf->liftHeight() - 3);
+    else
+        ui->lHeightBox->setCurrentIndex(perf->liftHeight() - 1);
     ui->indicBox->setChecked(perf->dpiIndicator());
     highlightDpiBox(perf->getDpiIdx());
     connect(perf, &KbPerf::dpiChanged, this, &MPerfWidget::highlightDpiBox);
@@ -251,6 +255,39 @@ void MPerfWidget::setLegacyM95(){
         w[i]->hide();
 }
 
+void MPerfWidget::setDarkCore(){
+    isDarkCore = true;
+
+    // Remove lift height elements, which do not work
+    ui->lHeightBox->removeItem(1);
+    ui->lHeightBox->removeItem(2);
+
+    // Disable DPI profile 4 and 5
+    ui->eBox4->setChecked(false);
+    ui->eBox5->setChecked(false);
+
+    // Hide DPI profiles 4 and 5
+    QWidget* w[] = {
+        ui->iButton4,
+        ui->iButton5,
+        ui->eBox4,
+        ui->eBox5,
+        ui->label_13,
+        ui->label_8,
+        ui->xSlider4,
+        ui->xSlider5,
+        ui->ySlider4,
+        ui->ySlider5,
+        ui->xBox4,
+        ui->xBox5,
+        ui->yBox5,
+        ui->yBox4
+    };
+
+    for(size_t i = 0; i < sizeof(w) / sizeof(QWidget*); i++)
+        w[i]->hide();
+}
+
 void MPerfWidget::boxXChanged(int index){
     SET_START;
     QSpinBox* box = stages[index].xBox;
@@ -300,7 +337,13 @@ void MPerfWidget::on_aSnapBox_clicked(bool checked){
 }
 
 void MPerfWidget::on_lHeightBox_activated(int index){
-    perf->liftHeight((KbPerf::height)(index + 1));
+    int height = index + 1;
+
+    // Add 2 to the selected index, since the dark cores lift height ranges from 3 to 5, not 1 to 5
+    if (isDarkCore)
+        height += 2;
+
+    perf->liftHeight((KbPerf::height)height);
 }
 
 void MPerfWidget::on_copyButton_clicked(){

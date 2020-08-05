@@ -49,7 +49,9 @@
 #define P_K63_NRGB           0x1b40
 #define P_K63_NRGB_WL        0x1b45 /* wireless */
 #define P_K63_NRGB_WL2       0x1b50 /* wireless */
-#define IS_K63_WL(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB_WL || (kb)->product == P_K63_NRGB_WL2))
+#define P_K63_NRGB_WL3       0x1b8c /* wireless */
+#define P_K63_NRGB_WL4       0x1b8f /* wireless */
+#define IS_K63_WL(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB_WL || (kb)->product == P_K63_NRGB_WL2 || (kb)->product == P_K63_NRGB_WL3 || (kb)->product == P_K63_NRGB_WL4))
 #define IS_K63(kb)           (IS_K63_WL(kb) || ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB)))
 
 #define P_K65                0x1b17
@@ -181,7 +183,7 @@ const char* product_str(ushort product);
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
 /// Change this if new \b monochrome devices are added
-#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K63_NRGB) || (product) == (P_K63_NRGB_WL) || (product) == (P_K63_NRGB_WL2) || (product) == (P_K68_NRGB) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
+#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K63_NRGB) || (product) == (P_K63_NRGB_WL) || (product) == (P_K63_NRGB_WL2) || (product) == (P_K63_NRGB_WL3) || (product) == (P_K63_NRGB_WL4) || (product) == (P_K68_NRGB) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_LEGACY() is returned.
 #define IS_LEGACY_DEV(kb)               IS_LEGACY((kb)->vendor, (kb)->product)

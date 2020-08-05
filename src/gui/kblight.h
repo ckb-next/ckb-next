@@ -105,7 +105,7 @@ private:
     quint64         lastFrameSignal;
     int             _dimming, _lastFrameDimming, _timerOrigDimming;
     bool            _start;
-    bool            _needsSave, _needsMapRefresh, _forceFrame;
+    bool            _needsSave, _needsMapRefresh, _forceFrame, _timerDimmed;
 
     // Rebuild base ColorMap (if needed)
     void rebuildBaseMap();

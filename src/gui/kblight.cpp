@@ -6,16 +6,18 @@
 
 static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
-static bool _timerDimmed = false;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
-    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0), _timerOrigDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
+    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0),
+    _timerOrigDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false), _timerDimmed(false)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap), lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _timerOrigDimming(_dimming), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false)
+    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap),
+    lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _timerOrigDimming(_dimming),
+    _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false), _timerDimmed(false)
 {
     map(keyMap);
     // Duplicate animations

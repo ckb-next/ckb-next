@@ -163,6 +163,9 @@ typedef struct {
 #define FEAT_ISO        0x400
 #define FEAT_MOUSEACCEL 0x800   // Mouse acceleration (also Mac only)
 
+#define FEAT_DONGLE     0x1000  // Is mouse detachable (supports wireless)?
+#define FEAT_WIRELESS   0x2000  // Is wireless?
+
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL | FEAT_HWLOAD)
 #define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)

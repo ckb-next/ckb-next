@@ -225,8 +225,14 @@ const char* product_str(ushort product);
 /// Used for devices that have a single IN endpoint, and no HID input
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb))
 
-/// Used for devices which are wireless.
+/// Used for devices which support wireless.
 #define IS_WIRELESS(kb)                 (IS_K63_WL(kb) || IS_DARK_CORE(kb))
+
+/// Used for ID combinations which support wireless.
+#define IS_WIRELESS_ID(vendor, product) ((vendor) == V_CORSAIR && (product == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4))
+
+/// Used for devices which are connected via dongle instead of cable.
+#define IS_DONGLE(kb)                   ((kb)->product == P_DARK_CORE_WL || (kb)->product == P_DARK_CORE_SE_WL || IS_K63_WL(kb))
 
 /// Used for devices that use a file-based hardware animation system.
 #define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_IRONCLAW || (kb)->product == P_HARPOON_PRO || IS_K63_WL(kb) || IS_DARK_CORE(kb))

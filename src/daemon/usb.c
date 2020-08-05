@@ -367,6 +367,11 @@ static void* _setupusb(void* context){
         kb->features |= FEAT_ADJRATE;
     if(IS_MONOCHROME(vendor, product))
         kb->features |= FEAT_MONOCHROME;
+    if(IS_DONGLE(kb))
+        kb->features |= FEAT_DONGLE;
+    if(IS_WIRELESS(kb))
+        kb->features |= FEAT_WIRELESS;
+
     kb->usbdelay = USB_DELAY_DEFAULT;
 
     /// Allocate memory for the os_usbrecv() buffer

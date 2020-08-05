@@ -488,10 +488,17 @@ elseif (LINUX)
         ckb-next
             PRIVATE
               "${X11_LIBRARIES}"
-              "${PULSEAUDIO_LIBRARIES}"
               "${XCB_EWMH_LIBRARIES}"
               "${XCB_SCREENSAVER_LIBRARIES}"
               Qt5::X11Extras)
+    if (PULSEAUDIO_FOUND)
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+              "${PULSEAUDIO_LIBRARIES}")
+    else()
+        message(WARNING "PulseAudio not found. Mute indicator will not function.")
+    endif ()
 endif()
 
 if (WITH_SHIPPED_QUAZIP)

@@ -40,6 +40,8 @@ device_desc models[] = {
     { V_CORSAIR, P_K63_NRGB, },
     { V_CORSAIR, P_K63_NRGB_WL, },
     { V_CORSAIR, P_K63_NRGB_WL2, },
+    { V_CORSAIR, P_K63_NRGB_WL3, },
+    { V_CORSAIR, P_K63_NRGB_WL4, },
     { V_CORSAIR, P_K65, },
     { V_CORSAIR, P_K65_LEGACY, },
     { V_CORSAIR, P_K65_LUX, },
@@ -165,7 +167,7 @@ const char* product_str(ushort product){
         return "k65";
     if(product == P_K66)
         return "k66";
-    if(product == P_K63_NRGB || product == P_K63_NRGB_WL || product == P_K63_NRGB_WL2)
+    if(product == P_K63_NRGB || product == P_K63_NRGB_WL || product == P_K63_NRGB_WL2 || product == P_K63_NRGB_WL3 || product == P_K63_NRGB_WL4)
         return "k63";
     if(product == P_K55)
         return "k55";

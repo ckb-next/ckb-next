@@ -307,19 +307,19 @@ static void* indicator_update(void* context){
     indicthread_name[3] = INDEX_OF(kb, keyboard) + '0';
     pthread_setname_np(indicthread_name);
 
-    pthread_mutex_lock(dmutex(kb));
+    queued_mutex_lock(dmutex(kb));
     {
-        pthread_mutex_lock(imutex(kb));
+        queued_mutex_lock(imutex(kb));
         IOOptionBits modifiers = kb->modifiers;
         // Allow the thread to be spawned again
         kb->indicthread = 0;
-        pthread_mutex_unlock(imutex(kb));
+        queued_mutex_unlock(imutex(kb));
         // Num lock on, Caps dependent on modifier state
         uchar ileds = 1 | !!(modifiers & NX_ALPHASHIFTMASK) << 1;
         kb->hw_ileds = ileds;
         kb->vtable->updateindicators(kb, 0);
     }
-    pthread_mutex_unlock(dmutex(kb));
+    queued_mutex_unlock(dmutex(kb));
     return 0;
 }
 

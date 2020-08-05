@@ -15,21 +15,35 @@ extern usbdevice keyboard[DEV_MAX];
 #else
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
 #endif
+
+// A fair queue mutex construct; contenders get to grab the mutex in the order they attempted to acquire it
+typedef struct queued_mutex{
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    unsigned long next_in, next_waiting;
+} queued_mutex_t;
+
+#define QUEUED_MUTEX_INITIALIZER {PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, 0, 0}
+
+void queued_mutex_lock(queued_mutex_t* mutex);   // Lock a queued_mutex
+int queued_mutex_trylock(queued_mutex_t* mutex); // Try to lock a queued_mutex without blocking; returns 0 on success.
+void queued_mutex_unlock(queued_mutex_t* mutex); // Unlock a queued_mutex
+
 #ifdef DEBUG_MUTEX
 #define MUTEX_DBG(str, kb, mutexarray) (ckb_info(str " accessed in %s:%d (%s) at ckb%d, TID 0x%lx, MID %p\n", __FILE__, __LINE__, __func__, INDEX_OF(kb, keyboard), pthread_self(), mutexarray + INDEX_OF(kb, keyboard)) & 0)
 #else
 #define MUTEX_DBG(a, b, c) 0
 #endif
 // A mutex used for USB controls. Needs to be locked before reading or writing the device handle or accessing its profile
-extern pthread_mutex_t devmutex[DEV_MAX];
+extern queued_mutex_t devmutex[DEV_MAX];
 #define dmutex(kb) (devmutex + INDEX_OF(kb, keyboard) + MUTEX_DBG("DMUTEX", kb, devmutex))
 // Similar, but for key input. Also needs to be locked before accessing output FIFOs.
 // When adding or removing a device you must lock BOTH mutexes, dmutex first.
-extern pthread_mutex_t inputmutex[DEV_MAX];
+extern queued_mutex_t inputmutex[DEV_MAX];
 #define imutex(kb) (inputmutex + INDEX_OF(kb, keyboard) + MUTEX_DBG("IMUTEX", kb, inputmutex))
 
 // Needed to synchronize sending macro-keys to the os and sending color info to the device
-extern pthread_mutex_t macromutex[DEV_MAX];
+extern queued_mutex_t macromutex[DEV_MAX];
 #define mmutex(kb) (macromutex + INDEX_OF(kb, keyboard))
 extern pthread_mutex_t macromutex2[DEV_MAX];
 #define mmutex2(kb) (macromutex2 + INDEX_OF(kb, keyboard))

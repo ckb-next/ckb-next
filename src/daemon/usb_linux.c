@@ -273,9 +273,9 @@ void os_sendindicators(usbdevice* kb) {
         ileds = &kb->ileds;
     }
     struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : 1), 500, ileds };
-    pthread_mutex_unlock(dmutex(kb));
+    queued_mutex_unlock(dmutex(kb));
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
-    pthread_mutex_lock(dmutex(kb));
+    queued_mutex_lock(dmutex(kb));
     if(res <= 0) {
         ckb_err("%s\n", res ? strerror(errno) : "No data written");
         if (usb_tryreset(kb) == 0 && countForReset++ < 3) {
@@ -661,7 +661,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
     // Find a free USB slot
     for(int index = 1; index < DEV_MAX; index++){
         usbdevice* kb = keyboard + index;
-        if(pthread_mutex_trylock(dmutex(kb))){
+        if(queued_mutex_trylock(dmutex(kb))){
             // If the mutex is locked then the device is obviously in use, so keep going
             if(!strcmp(syspath, kbsyspath[index])){
                 // Make sure this existing keyboard doesn't have the same syspath (this shouldn't happen)
@@ -675,7 +675,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
             if(kb->handle <= 0){
                 ckb_err("Failed to open USB device: %s\n", strerror(errno));
                 kb->handle = 0;
-                pthread_mutex_unlock(dmutex(kb));
+                queued_mutex_unlock(dmutex(kb));
                 return -1;
             } else {
                 // Set up device
@@ -688,7 +688,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
                 return 0;
             }
         }
-        pthread_mutex_unlock(dmutex(kb));
+        queued_mutex_unlock(dmutex(kb));
     }
     ckb_err("No free devices\n");
     return -1;
@@ -748,10 +748,10 @@ static void usb_rm_device(struct udev_device* dev){
     if(!syspath || syspath[0] == 0)
         return;
     for(int i = 1; i < DEV_MAX; i++){
-        pthread_mutex_lock(devmutex + i);
+        queued_mutex_lock(devmutex + i);
         if(!strcmp(syspath, kbsyspath[i]))
             closeusb(keyboard + i);
-        pthread_mutex_unlock(devmutex + i);
+        queued_mutex_unlock(devmutex + i);
     }
 }
 

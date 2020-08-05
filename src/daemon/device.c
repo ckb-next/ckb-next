@@ -8,14 +8,47 @@ int hwload_mode = 1;        ///< hwload_mode = 1 means read hardware once. shoul
 
 // Device list
 usbdevice keyboard[DEV_MAX];    ///< remember all usb devices. Needed for closeusb().
-pthread_mutex_t devlistmutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t devmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };      ///< Mutex for handling the usbdevice structure
-pthread_mutex_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };    ///< Mutex for dealing with usb input frames
-pthread_mutex_t macromutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };    ///< Protecting macros against lightning: Both use usb_send
+queued_mutex_t devmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = QUEUED_MUTEX_INITIALIZER };        ///< Mutex for handling the usbdevice structure
+queued_mutex_t inputmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = QUEUED_MUTEX_INITIALIZER };      ///< Mutex for dealing with usb input frames
+queued_mutex_t macromutex[DEV_MAX] = { [0 ... DEV_MAX-1] = QUEUED_MUTEX_INITIALIZER };      ///< Protecting macros against lightning: Both use usb_send
 pthread_mutex_t macromutex2[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };   ///< Protecting the single link list of threads and the macrovar
 pthread_cond_t macrovar[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZER };        ///< This variable is used to stop and wakeup all macro threads which have to wait.
 pthread_mutex_t interruptmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };///< Used for interrupt transfers
 pthread_cond_t interruptcond[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZER };   ///< Same as above
+
+void queued_mutex_lock(queued_mutex_t* mutex){
+    pthread_mutex_lock(&mutex->mutex);
+    unsigned long my_turn = mutex->next_waiting++;
+
+    while(my_turn != mutex->next_in)
+        pthread_cond_wait(&mutex->cond, &mutex->mutex);
+
+    pthread_mutex_unlock(&mutex->mutex);
+}
+
+int queued_mutex_trylock(queued_mutex_t* mutex){
+    int res = 0;
+    pthread_mutex_lock(&mutex->mutex);
+
+    if(mutex->next_waiting == mutex->next_in){
+        mutex->next_waiting++;
+    }
+    else{
+        res = -1;
+    }
+
+    pthread_mutex_unlock(&mutex->mutex);
+
+    return res;
+}
+
+void queued_mutex_unlock(queued_mutex_t* mutex){
+    pthread_mutex_lock(&mutex->mutex);
+    mutex->next_in++;
+    pthread_mutex_unlock(&mutex->mutex);
+    pthread_cond_broadcast(&mutex->cond);
+}
+
 
 /// \brief .
 ///

@@ -79,13 +79,13 @@ void check_chmod(const char *pathname, mode_t mode){
 /// Because several independent threads may call updateconnected(), protect that procedure with locking/unlocking of \b devmutex.
 ///
 void _updateconnected(usbdevice* kb){
-    pthread_mutex_lock(devmutex);
+    queued_mutex_lock(devmutex);
     char cpath[strlen(devpath) + 12];
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
     FILE* cfile = fopen(cpath, "w");
     if(!cfile){
         ckb_warn("Unable to update %s: %s\n", cpath, strerror(errno));
-        pthread_mutex_unlock(devmutex);
+        queued_mutex_unlock(devmutex);
         return;
     }
     int written = 0;
@@ -94,7 +94,7 @@ void _updateconnected(usbdevice* kb){
 #ifdef DEBUG_MUTEX
             ckb_info("Locking ckb%d in _updateconnected()\n", i);
 #endif
-            pthread_mutex_lock(devmutex + i);
+            queued_mutex_lock(devmutex + i);
             if(IS_CONNECTED(keyboard + i)){
                 written = 1;
                 fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].serial, keyboard[i].name);
@@ -102,7 +102,7 @@ void _updateconnected(usbdevice* kb){
 #ifdef DEBUG_MUTEX
             ckb_info("Unlocking ckb%d in _updateconnected()\n", i);
 #endif
-            pthread_mutex_unlock(devmutex + i);
+            queued_mutex_unlock(devmutex + i);
         }
     }
     if(!written)
@@ -112,7 +112,7 @@ void _updateconnected(usbdevice* kb){
     check_chmod(cpath, S_GID_READ);
     check_chown(cpath, 0, gid);
 
-    pthread_mutex_unlock(devmutex);
+    queued_mutex_unlock(devmutex);
 }
 
 void updateconnected(usbdevice* kb){

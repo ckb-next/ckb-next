@@ -220,10 +220,10 @@ void cmd_erase(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char*
     (void)dummy2;
     (void)dummy3;
 
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     freemode(mode);
     initmode(mode, kb);
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }
 
 static void _freeprofile(usbdevice* kb){
@@ -243,10 +243,10 @@ void cmd_eraseprofile(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, co
     (void)dummy3;
     (void)dummy4;
 
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     _freeprofile(kb);
     allocprofile(kb);
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }
 
 void freeprofile(usbdevice* kb){

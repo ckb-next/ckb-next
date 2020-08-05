@@ -99,14 +99,14 @@ static void* play_macro(void* param) {
     pthread_mutex_unlock(mmutex2(kb));       ///< Give all new threads the chance to enter the block.
 
     /// Send events for each keypress in the macro
-    pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
+    queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
     for (int a = 0; a < macro->actioncount; a++) {
         macroaction* action = macro->actions + a;
         if (action->rel_x != 0 || action->rel_y != 0)
             os_mousemove(kb, action->rel_x, action->rel_y);
         else {
             os_keypress(kb, action->scan, action->down);
-            pthread_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
+            queued_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
             if (action->delay != UINT_MAX && action->delay) {    ///< local delay set
                 clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
             } else if (kb->delay != UINT_MAX && kb->delay) {     ///< use default global delay
@@ -118,7 +118,7 @@ static void* play_macro(void* param) {
                     clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000}, NULL);
                 }
             }
-            pthread_mutex_lock(mmutex(kb));
+            queued_mutex_lock(mmutex(kb));
         }
     }
 
@@ -128,7 +128,7 @@ static void* play_macro(void* param) {
     pthread_cond_broadcast(mvar(kb));   ///< Wake up all waiting threads
     pthread_mutex_unlock(mmutex2(kb));  ///< for the linked list and the mvar
 
-    pthread_mutex_unlock(mmutex(kb));   ///< Sync keyboard input/output and colorization
+    queued_mutex_unlock(mmutex(kb));   ///< Sync keyboard input/output and colorization
     return 0;
 }
 
@@ -325,17 +325,17 @@ void cmd_bind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char*
     // Find the key to bind to
     uint tocode = 0;
     if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1 && tocode < N_KEYS_INPUT){
-        pthread_mutex_lock(imutex(kb));
+        queued_mutex_lock(imutex(kb));
         mode->bind.base[keyindex] = tocode;
-        pthread_mutex_unlock(imutex(kb));
+        queued_mutex_unlock(imutex(kb));
         return;
     }
     // If not numeric, look it up
     for(int i = 0; i < N_KEYS_INPUT; i++){
         if(kb->keymap[i].name && !strcmp(to, kb->keymap[i].name)){
-            pthread_mutex_lock(imutex(kb));
+            queued_mutex_lock(imutex(kb));
             mode->bind.base[keyindex] = kb->keymap[i].scan;
-            pthread_mutex_unlock(imutex(kb));
+            queued_mutex_unlock(imutex(kb));
             return;
         }
     }
@@ -347,9 +347,9 @@ void cmd_unbind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const cha
 
     if(keyindex >= N_KEYS_INPUT)
         return;
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     mode->bind.base[keyindex] = KEY_UNBOUND;
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }
 
 void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
@@ -358,9 +358,9 @@ void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const cha
 
     if(keyindex >= N_KEYS_INPUT)
         return;
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     mode->bind.base[keyindex] = kb->keymap[keyindex].scan;
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }
 
 static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, usbdevice* kb){
@@ -488,7 +488,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
 void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char* keys, const char* assignment){
     (void)notifynumber;
 
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     _cmd_macro(mode, keys, assignment, kb);
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }

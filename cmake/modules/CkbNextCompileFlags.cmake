@@ -57,3 +57,8 @@ list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
         #    $<$<CONFIG:Debug>:-Wformat=2>
         #    $<$<CONFIG:Debug>:-save-temps>
      )
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0")
+    list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
+        -Wcast-align=strict
+    )
+endif()

@@ -100,6 +100,7 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
     ui->timerBox->hide();
     ui->timerMinBox->hide();
 #endif
+    ui->monochromeBox->setChecked(!settings.value("RGBIcon", true).toBool());
 }
 
 ExtraSettingsWidget::~ExtraSettingsWidget(){
@@ -205,4 +206,9 @@ void ExtraSettingsWidget::on_timerMinBox_editingFinished(){
     KbManager::setIdleTimer(false);
     KbManager::setIdleTimer(true);
 #endif
+}
+
+void ExtraSettingsWidget::on_monochromeBox_toggled(bool checked){
+    CkbSettings::set("Program/RGBIcon", !checked);
+    MainWindow::mainWindow->syncTrayIcon();
 }

@@ -344,148 +344,153 @@
 <context>
     <name>ExtraSettingsWidget</name>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="372"/>
+        <location filename="../../extrasettingswidget.ui" line="462"/>
         <source>By default, the same brightness level will be applied to all profiles and all devices. Enable this to store it with the lighting mode instead.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="375"/>
+        <location filename="../../extrasettingswidget.ui" line="465"/>
         <source>Set brightness per-mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="139"/>
+        <location filename="../../extrasettingswidget.ui" line="54"/>
         <source>Behavior</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="172"/>
+        <location filename="../../extrasettingswidget.ui" line="177"/>
         <source>OS X tweaks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="51"/>
+        <location filename="../../extrasettingswidget.ui" line="280"/>
         <source>The tray icon will not be displayed. The application will still run in the background; re-launch the app to see the GUI again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="54"/>
+        <location filename="../../extrasettingswidget.ui" line="283"/>
         <source>Hide tray icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="461"/>
+        <location filename="../../extrasettingswidget.ui" line="518"/>
         <source>Frame rate (FPS):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="221"/>
+        <location filename="../../extrasettingswidget.ui" line="430"/>
         <source>0 animations found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="233"/>
+        <location filename="../../extrasettingswidget.ui" line="442"/>
         <source>Re-scan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="240"/>
+        <location filename="../../extrasettingswidget.ui" line="449"/>
         <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="91"/>
+        <location filename="../../extrasettingswidget.ui" line="365"/>
         <source>Location:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="451"/>
+        <location filename="../../extrasettingswidget.ui" line="498"/>
         <source>Try this if you&apos;re having problems with mouse movement.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="454"/>
+        <location filename="../../extrasettingswidget.ui" line="501"/>
         <source>Disable mouse acceleration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="74"/>
+        <location filename="../../extrasettingswidget.ui" line="342"/>
         <source>Hardware</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="365"/>
+        <location filename="../../extrasettingswidget.ui" line="531"/>
         <source>Warning: high frame rates may cause stability issues</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="316"/>
+        <location filename="../../extrasettingswidget.ui" line="221"/>
         <source>Scroll</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="342"/>
+        <location filename="../../extrasettingswidget.ui" line="247"/>
         <source>line(s) at a time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="253"/>
+        <location filename="../../extrasettingswidget.ui" line="257"/>
         <source>Disable animated preview when ckb-next is not in focus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="402"/>
+        <location filename="../../extrasettingswidget.ui" line="378"/>
         <source>When using macros with strings longer than 25 chars, some OS may lose characters (e.g. Mint 17.2). Select to prevent that bug.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="405"/>
+        <location filename="../../extrasettingswidget.ui" line="381"/>
         <source>Use delay for very long macros</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="41"/>
+        <location filename="../../extrasettingswidget.ui" line="488"/>
         <source>May improve appearance on some keyboards.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="44"/>
+        <location filename="../../extrasettingswidget.ui" line="491"/>
         <source>Use spatial dithering to simulate extra color resolution</source>
         <translation>Use spatial dithering to simulate extra colour resolution</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="81"/>
+        <location filename="../../extrasettingswidget.ui" line="508"/>
         <source>Try this if you&apos;re having problems with the scroll wheel.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="84"/>
+        <location filename="../../extrasettingswidget.ui" line="511"/>
         <source>Disable scroll acceleration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="395"/>
+        <location filename="../../extrasettingswidget.ui" line="545"/>
+        <source>Monochrome tray icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../extrasettingswidget.ui" line="273"/>
         <source>Animation scripts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="485"/>
+        <location filename="../../extrasettingswidget.ui" line="104"/>
         <source>Turn lights off when idle for</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="517"/>
+        <location filename="../../extrasettingswidget.ui" line="136"/>
         <source>m</source>
         <comment>minutes</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="146"/>
+        <location filename="../../extrasettingswidget.ui" line="164"/>
         <source>Delay application start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="444"/>
+        <location filename="../../extrasettingswidget.ui" line="329"/>
         <source>Enabling per-mode brightness will disable scrolling on the tray icon to change the brightness level</source>
         <translation type="unfinished"></translation>
     </message>
@@ -495,17 +500,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="123"/>
+        <location filename="../../extrasettingswidget.cpp" line="124"/>
         <source>No animations found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="125"/>
+        <location filename="../../extrasettingswidget.cpp" line="126"/>
         <source>1 animation found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="127"/>
+        <location filename="../../extrasettingswidget.cpp" line="128"/>
         <source>%1 animations found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -822,6 +827,14 @@
     <message>
         <location filename="../../kperfwidget.cpp" line="227"/>
         <source>Copy performance settings to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>KStatusNotifierItem</name>
+    <message>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="578"/>
+        <source>Quit</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1642,7 +1655,7 @@ An attempt will be made to import as many as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mperfwidget.cpp" line="262"/>
+        <location filename="../../mperfwidget.cpp" line="307"/>
         <source>Copy performance settings to:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1660,120 +1673,115 @@ An attempt will be made to import as many as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="161"/>
+        <location filename="../../mainwindow.cpp" line="131"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="162"/>
+        <location filename="../../mainwindow.cpp" line="132"/>
         <source>Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="163"/>
-        <source>Monochrome Tray Icon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../mainwindow.cpp" line="237"/>
+        <location filename="../../mainwindow.cpp" line="160"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="245"/>
+        <location filename="../../mainwindow.cpp" line="168"/>
         <source>The ckb-next daemon is not running. This program will &lt;b&gt;not&lt;/b&gt; work without it!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="247"/>
+        <location filename="../../mainwindow.cpp" line="170"/>
         <source>Start it once with:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="249"/>
+        <location filename="../../mainwindow.cpp" line="172"/>
         <source>Enable it for every boot:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="252"/>
+        <location filename="../../mainwindow.cpp" line="175"/>
         <source>Start and enable it with:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="277"/>
+        <location filename="../../mainwindow.cpp" line="200"/>
         <source>The ckb-next daemon is not running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="366"/>
+        <location filename="../../mainwindow.cpp" line="285"/>
         <source>Driver inactive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="373"/>
+        <location filename="../../mainwindow.cpp" line="292"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="373"/>
+        <location filename="../../mainwindow.cpp" line="292"/>
         <source>). Please upgrade ckb-next</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="373"/>
+        <location filename="../../mainwindow.cpp" line="292"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="384"/>
+        <location filename="../../mainwindow.cpp" line="303"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="386"/>
+        <location filename="../../mainwindow.cpp" line="305"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="396"/>
+        <location filename="../../mainwindow.cpp" line="315"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="399"/>
+        <location filename="../../mainwindow.cpp" line="318"/>
         <source>No devices connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="402"/>
+        <location filename="../../mainwindow.cpp" line="321"/>
         <source>1 device connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="404"/>
+        <location filename="../../mainwindow.cpp" line="323"/>
         <source>%1 devices connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="435"/>
+        <location filename="../../mainwindow.cpp" line="354"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="451"/>
+        <location filename="../../mainwindow.cpp" line="370"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="603"/>
+        <location filename="../../mainwindow.cpp" line="502"/>
         <source>Update to v</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="608"/>
+        <location filename="../../mainwindow.cpp" line="507"/>
         <source>Up to date</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1804,22 +1812,17 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="59"/>
-        <source>Same as background.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../main.cpp" line="63"/>
+        <location filename="../../main.cpp" line="61"/>
         <source>Causes already running instance (if any) to exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="66"/>
+        <location filename="../../main.cpp" line="64"/>
         <source>Switches to the profile with the specified name on all devices.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="69"/>
+        <location filename="../../main.cpp" line="67"/>
         <source>Switches to the mode either in the current profile, or in the one specified by --profile</source>
         <translation type="unfinished"></translation>
     </message>

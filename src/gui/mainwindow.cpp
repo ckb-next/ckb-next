@@ -130,9 +130,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
     closeAction = new QAction(tr("Quit"), this);
-    changeTrayIconAction = new QAction(tr("Monochrome Tray Icon"), this);
     trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction(changeTrayIconAction);
     trayIconMenu->addAction(restoreAction);
     trayIconMenu->addAction(closeAction);
     trayIcon = new CkbSystemTrayIcon(getIcon(), this);
@@ -458,30 +456,10 @@ QIcon MainWindow::getIcon() {
 
   // If the icon is RGB then the menu should present a monochrome option
   if (CkbSettings::get("Program/RGBIcon", QVariant(true)).toBool()){
-    changeTrayIconAction->setText("Monochrome Tray Icon");
-    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
     return QIcon(":/img/ckb-next.png");
   }
   // If the icon is monochrome then the menu should present an RGB option
-  changeTrayIconAction->setText("RGB Tray Icon");
-  connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
   return QIcon(":/img/ckb-next-monochrome.png");
-}
-
-void MainWindow::changeTrayIconToMonochrome(){
-    trayIcon->setIcon(QIcon(":/img/ckb-next-monochrome.png"));
-    changeTrayIconAction->setText("RGB Tray Icon");
-    changeTrayIconAction->disconnect();
-    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToRGB()));
-    CkbSettings::set("Program/RGBIcon", false);
-}
-
-void MainWindow::changeTrayIconToRGB(){
-    trayIcon->setIcon(QIcon(":/img/ckb-next.png"));
-    changeTrayIconAction->setText("Monochrome Tray Icon");
-    changeTrayIconAction->disconnect();
-    connect(changeTrayIconAction, SIGNAL(triggered()), this, SLOT(changeTrayIconToMonochrome()));
-    CkbSettings::set("Program/RGBIcon", true);
 }
 
 void MainWindow::cleanup(){
@@ -531,4 +509,8 @@ void MainWindow::checkedForNewVer(QString ver, QString changelog){
     updater->deleteLater();
     settingsWidget->enableUpdateButton();
 #endif
+}
+
+void MainWindow::syncTrayIcon(){
+    trayIcon->setIcon(getIcon());
 }

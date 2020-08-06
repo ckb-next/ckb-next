@@ -32,14 +32,13 @@ public:
     void toggleTrayIcon(bool visible);
     static int signalHandlerFd[2];
     static void PosixSignalHandler(int signal);
-    QIcon getIcon();
+    void syncTrayIcon();
 
 private:
     SettingsWidget* settingsWidget;
     QList<KbWidget*> kbWidgets;
     QAction* restoreAction;
     QAction* closeAction;
-    QAction* changeTrayIconAction;
     QMenu*              trayIconMenu;
     CkbSystemTrayIcon*  trayIcon;
     void closeEvent(QCloseEvent *event);
@@ -56,14 +55,13 @@ private:
     bool catalinaAgentStarted = false;
 
 #endif
+    static QIcon getIcon();
 
 public slots:
     void showWindow();
     void stateChange(Qt::ApplicationState state);
     void quitApp();
     void checkForCkbUpdates();
-    void changeTrayIconToMonochrome();
-    void changeTrayIconToRGB();
     void handleTrayScrollEvt(int delta, Qt::Orientation orientation);
 
 signals:

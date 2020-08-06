@@ -29,12 +29,10 @@ private slots:
     void on_delayBox_clicked(bool checked);
     void on_startDelayBox_clicked(bool checked);
     void on_previewBox_clicked(bool checked);
-
     void on_detailsBtn_clicked();
-
     void on_timerBox_clicked(bool checked);
-
     void on_timerMinBox_editingFinished();
+    void on_monochromeBox_toggled(bool checked);
 
 private:
     Ui::ExtraSettingsWidget *ui;

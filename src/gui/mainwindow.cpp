@@ -186,6 +186,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     signal(SIGINT, MainWindow::PosixSignalHandler);
     signal(SIGTERM, MainWindow::PosixSignalHandler);
+    signal(SIGHUP, MainWindow::PosixSignalHandler);
 
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it
@@ -491,6 +492,10 @@ void MainWindow::QSignalHandler(){
     }
 
     qDebug() << "\nSignal" << sig << "caught. Quitting...";
+    if(sig == SIGHUP){
+        // Restart, but with a delay
+        QProcess::startDetached(QCoreApplication::applicationFilePath(), QStringList() << "-b" << "-d");
+    }
     this->quitApp();
     sigNotifier->setEnabled(true);
 }

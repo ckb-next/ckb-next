@@ -36,6 +36,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
     "profileid",
 
     "rgb",
+    "hwanim",
     "ioff",
     "ion",
     "iauto",

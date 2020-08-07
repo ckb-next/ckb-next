@@ -220,6 +220,8 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
     if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;
+        else if(IS_WIRELESS_ID(vendor, product))
+            return &vtable_mouse_wireless;
         else
             return &vtable_mouse;
     } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
@@ -227,6 +229,8 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
     } else {
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;
+        else if(IS_WIRELESS_ID(vendor, product))
+            return &vtable_keyboard_wireless;
         else
             return &vtable_keyboard;
     }

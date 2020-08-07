@@ -56,6 +56,7 @@ private:
 
 #endif
     static QIcon getIcon();
+    static QString getIconName();
 
 public slots:
     void showWindow();

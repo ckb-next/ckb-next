@@ -571,8 +571,20 @@ if (MACOS)
       GROUP_READ GROUP_EXECUTE
       WORLD_READ WORLD_EXECUTE)
 elseif (LINUX)
+    install(DIRECTORY "${CMAKE_SOURCE_DIR}/linux/icons/"
+        DESTINATION "share/icons/hicolor"
+        FILE_PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ
+        DIRECTORY_PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE)
+
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.png"
+        "${CMAKE_CURRENT_BINARY_DIR}/ckb-next-monochrome.png"
         DESTINATION "share/icons/hicolor/512x512/apps"
         PERMISSIONS
         OWNER_READ OWNER_WRITE

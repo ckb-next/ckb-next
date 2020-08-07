@@ -75,6 +75,57 @@ const devcmd vtable_keyboard = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
+    .ioff = cmd_ioff,
+    .ion = cmd_ion,
+    .iauto = cmd_iauto,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_dev,
+    .setmodeindex = int1_void_none,             ///< is just for non rgb keyboards
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_kb,
+    .updateindicators = updateindicators_kb,
+    .updatedpi = int1_int_none,                 ///< This is for mice only
+    .reset = nxp_reset,
+    .fill_input_eps = nxp_fill_input_eps,
+    .write = nxp_usb_write,
+    .read = nxp_usb_read,
+};
+
+const devcmd vtable_keyboard_wireless = {
+    .hwload = cmd_hwload_kb,
+    .hwsave = cmd_hwsave_kb,
+    .fwupdate = cmd_fwupdate,
+    .pollrate = cmd_pollrate,
+
+    .active = cmd_active_kb,
+    .idle = cmd_idle_kb,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,
@@ -125,6 +176,7 @@ const devcmd vtable_keyboard_legacy = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_none,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,
@@ -175,6 +227,57 @@ const devcmd vtable_mouse = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
+    .ioff = cmd_none,
+    .ion = cmd_none,
+    .iauto = cmd_none,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_dpi,
+    .dpisel = cmd_dpisel,
+    .lift = cmd_lift,
+    .snap = cmd_snap,
+
+    .notify = cmd_notify,
+    .inotify = cmd_none,
+    .get = cmd_get,
+
+    .start = start_dev,
+    .setmodeindex = int1_void_none,         ///< Mice do not have different modes
+    .allocprofile = allocprofile,           ///< same for all keyboards and mice
+    .loadprofile = loadprofile,             ///< same for all keyboards and mice
+    .freeprofile = freeprofile,             ///< same for all keyboards and mice
+    .updatergb = updatergb_mouse,           ///< special for mice
+    .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
+    .updatedpi = updatedpi,                 ///< special for mice
+    .reset = nxp_reset,
+    .fill_input_eps = nxp_fill_input_eps,
+    .write = nxp_usb_write,
+    .read = nxp_usb_read,
+};
+
+const devcmd vtable_mouse_wireless = {
+    .hwload = cmd_hwload_mouse,
+    .hwsave = cmd_hwsave_mouse,
+    .fwupdate = cmd_fwupdate,
+    .pollrate = cmd_pollrate,
+
+    .active = cmd_active_mouse,
+    .idle = cmd_idle_mouse,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_none,
     .ion = cmd_none,
     .iauto = cmd_none,
@@ -225,6 +328,7 @@ const devcmd vtable_mousepad = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_none,
     .ion = cmd_none,
     .iauto = cmd_none,
@@ -275,6 +379,7 @@ const devcmd vtable_mouse_legacy = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,

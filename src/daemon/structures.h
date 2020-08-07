@@ -196,8 +196,10 @@ typedef struct {
 
 // vtables for keyboards/mice (see command.h)
 extern const union devcmd vtable_keyboard;
+extern const union devcmd vtable_keyboard_wireless;
 extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
+extern const union devcmd vtable_mouse_wireless;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
 

@@ -154,7 +154,7 @@ bool CkbSettings::contains(const QString& key) const {
     return backing->contains(pwd(key));
 }
 
-bool CkbSettings::containsGroup(const QString &group){
+bool CkbSettingsBase::containsGroup(const QString& group){
     QStringList components = group.split("/");
     if(components.length() > 1){
         // Find sub-group

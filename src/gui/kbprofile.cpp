@@ -1,6 +1,5 @@
 #include "kbprofile.h"
 #include "kb.h"
-#include <QDebug>
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const KbProfile& other) :
     QObject(parent), _currentMode(0), _name(other._name), _id(other._id), _keyMap(keyMap), _needsSave(true)
@@ -20,11 +19,14 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const QString& guid, cons
         _id.guid = QUuid::createUuid();
 }
 
-KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettings& settings, const QString& guid) :
+KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings, const QString& guid) :
     QObject(parent), _currentMode(0), _id(guid, 0), _keyMap(keyMap), _needsSave(false)
 {
     // Load data from preferences
-    SGroup group(settings, guid);
+    // If we're importing external profiles, then always read the GUID from the first group.
+    // This is done because we can import profiles with existing GUIDs, but assign new GUIDs without replacing them.
+    const QString importGuid = (typeid(settings) == typeid(CkbExternalSettings) ? settings.childGroups().first() : guid);
+    SGroup group(settings, importGuid);
     _name = settings.value("Name").toString().trimmed();
     if(_name == "")
         _name = "Unnamed";
@@ -46,38 +48,11 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettings& settings, co
     }
 }
 
-KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, QSettings* settings, const QString& guid) :
-    QObject(parent), _currentMode(0), _id(guid, 0), _keyMap(keyMap), _needsSave(false)
-{
-    // Load data from import
-    // (GUID)
-    settings->beginGroup(settings->childGroups().first());
-    _name = settings->value("Name").toString().trimmed();
-    if(_name == "")
-        _name = "Unnamed";
-    _id.modifiedString(settings->value("Modified").toString());
-    if(settings->contains("HwModified"))
-        _id.hwModifiedString(settings->value("HwModified").toString());
-    else
-        _id.hwModified = _id.modified;
-    QUuid current = settings->value("CurrentMode").toString().trimmed();
-    // Load modes
-    uint count = settings->value("ModeCount").toUInt();
-    for(uint i = 0; i < count; i++){
-        settings->beginGroup(QString::number(i));
-        KbMode* mode = new KbMode(parent, _keyMap, settings);
-        _modes.append(mode);
-        // Set currentMode to the mode matching the current GUID, or the first mode in case it's not found
-        if(current == mode->id().guid || !_currentMode)
-            _currentMode = mode;
-        settings->endGroup();
+void KbProfile::save(CkbSettingsBase& settings){
+    if(typeid(settings) == typeid(CkbSettings)){
+        _needsSave = false;
+        _id.newModified();
     }
-    settings->endGroup();
-}
-
-void KbProfile::save(CkbSettings& settings){
-    _needsSave = false;
-    _id.newModified();
     // Save data to preferences
     SGroup group(settings, id().guidString());
     settings.setValue("Name", name());
@@ -94,27 +69,6 @@ void KbProfile::save(CkbSettings& settings){
         mode->save(settings);
     }
 }
-
-void KbProfile::profileExport(QSettings* settings){
-    // Save data to preferences
-    settings->beginGroup(id().guidString());
-    settings->setValue("Name", name());
-    settings->setValue("Modified", _id.modifiedString());
-    settings->setValue("HwModified", _id.hwModifiedString());
-    if(_currentMode)
-        settings->setValue("CurrentMode", _currentMode->id().guidString());
-    // Save modes
-    uint count = modeCount();
-    settings->setValue("ModeCount", count);
-    for(uint i = 0; i < count; i++){
-        settings->beginGroup(QString::number(i));
-        KbMode* mode = _modes.at(i);
-        mode->modeExport(settings);
-        settings->endGroup();
-    }
-    settings->endGroup();
-}
-
 
 bool KbProfile::needsSave() const {
     if(_needsSave)

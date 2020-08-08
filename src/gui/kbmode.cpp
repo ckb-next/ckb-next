@@ -27,7 +27,7 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other) :
     connect(_light, SIGNAL(updated()), this, SLOT(doUpdate()));
 }
 
-KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings) :
+KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings) :
     QObject(parent),
     _name(settings.value("Name").toString().trimmed()),
     _id(settings.value("GUID").toString().trimmed(), settings.value("Modified").toString().trimmed()),
@@ -49,28 +49,6 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings) :
     _perf->load(settings);
 }
 
-KbMode::KbMode(Kb* parent, const KeyMap& keyMap, QSettings* settings) :
-    QObject(parent),
-    _name(settings->value("Name").toString().trimmed()),
-    _id(settings->value("GUID").toString().trimmed(), settings->value("Modified").toString().trimmed()),
-    _light(new KbLight(this, keyMap)), _bind(new KbBind(this, parent, keyMap)), _perf(new KbPerf(this)),
-    _needsSave(false)
-{
-    if(settings->contains("HwModified"))
-        _id.hwModifiedString(settings->value("HwModified").toString());
-    else
-        _id.hwModified = _id.modified;
-
-    connect(_light, SIGNAL(updated()), this, SLOT(doUpdate()));
-    if(_id.guid.isNull())
-        _id.guid = QUuid::createUuid();
-    if(_name == "")
-        _name = "Unnamed";
-    _light->lightImport(settings);
-    _bind->bindImport(settings);
-    _perf->perfImport(settings);
-}
-
 void KbMode::newId(){
     _needsSave = true;
     _id = UsbId();
@@ -85,9 +63,11 @@ void KbMode::keyMap(const KeyMap &keyMap){
     _bind->map(keyMap);
 }
 
-void KbMode::save(CkbSettings& settings){
-    _needsSave = false;
-    _id.newModified();
+void KbMode::save(CkbSettingsBase& settings){
+    if(typeid(settings) == typeid(CkbSettings)){
+        _needsSave = false;
+        _id.newModified();
+    }
     settings.setValue("GUID", _id.guidString());
     settings.setValue("Modified", _id.modifiedString());
     settings.setValue("HwModified", _id.hwModifiedString());
@@ -95,20 +75,6 @@ void KbMode::save(CkbSettings& settings){
     _light->save(settings);
     _bind->save(settings);
     _perf->save(settings);
-}
-
-void KbMode::modeExport(QSettings* settings){
-    settings->setValue("GUID", _id.guidString());
-    settings->setValue("Modified", _id.modifiedString());
-    settings->setValue("HwModified", _id.hwModifiedString());
-    settings->setValue("Name", _name);
-    _light->lightExport(settings);
-    _bind->bindExport(settings);
-    _perf->perfExport(settings);
-}
-
-void KbMode::modeImport(QSettings* settings){
-
 }
 
 bool KbMode::needsSave() const {

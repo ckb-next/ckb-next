@@ -40,9 +40,7 @@ public:
     // New mode with key map, and optionally ID
     KbMode(Kb* parent, const KeyMap& keyMap, const QString& guid = "", const QString& modified = "");
     // Mode from settings
-    KbMode(Kb* parent, const KeyMap& keyMap, CkbSettings& settings);
-    // Mode from import
-    KbMode(Kb* parent, const KeyMap& keyMap, QSettings* settings);
+    KbMode(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings);
     // Mode by copy
     KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other);
 
@@ -64,14 +62,10 @@ public:
     inline KbPerf*  perf() { return _perf; }
 
     // Save settings
-    void save(CkbSettings& settings);
+    void save(CkbSettingsBase &settings);
     bool needsSave() const;
     inline void setNeedsSave()          { _needsSave = true; }
     inline void setNeedsUpdate()        { _bind->setNeedsUpdate(); _perf->setNeedsUpdate(); }
-
-    // Import/export
-    void modeExport(QSettings *settings);
-    void modeImport(QSettings *settings);
 
 signals:
     void updated();

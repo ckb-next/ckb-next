@@ -55,7 +55,7 @@ KbLight* KbBind::light(){
     return modeParent()->light();
 }
 
-void KbBind::load(CkbSettings& settings){
+void KbBind::load(CkbSettingsBase& settings){
     _needsSave = false;
     SGroup group(settings, "Binding");
     KeyMap currentMap = _map;
@@ -78,8 +78,9 @@ void KbBind::load(CkbSettings& settings){
     map(currentMap);
 }
 
-void KbBind::save(CkbSettings& settings){
-    _needsSave = false;
+void KbBind::save(CkbSettingsBase& settings){
+    if(typeid(settings) == typeid(CkbSettings))
+        _needsSave = false;
     SGroup group(settings, "Binding");
     settings.setValue("KeyMap", _map.name());
     // Save key settings
@@ -93,49 +94,6 @@ void KbBind::save(CkbSettings& settings){
         }
     }
     settings.setValue("WinLock", _winLock);
-}
-
-void KbBind::bindExport(QSettings* settings){
-    settings->beginGroup("Binding");
-    settings->setValue("KeyMap", _map.name());
-    // Save key settings
-    settings->setValue("UseRealNames", true);
-    {
-        settings->beginGroup("Keys");
-        foreach(QString key, _bind.keys()){
-            KeyAction* act = _bind.value(key);
-            if(act && act->value() != KeyAction::defaultAction(key, devParent()->model()))
-                settings->setValue(key, act->value());
-        }
-        settings->endGroup();
-    }
-    settings->setValue("WinLock", _winLock);
-    settings->endGroup();
-}
-
-void KbBind::bindImport(QSettings* settings){
-    _needsSave = false;
-    settings->beginGroup("Binding");
-    KeyMap currentMap = _map;
-    _map = KeyMap::fromName(settings->value("KeyMap").toString());
-    // Load key settings
-    bool useReal = settings->value("UseRealNames").toBool();
-    _bind.clear();
-    {
-        settings->beginGroup("Keys");
-        foreach(QString key, settings->childKeys()){
-            QString name = key.toLower();
-            if(!useReal)
-                name = _map.fromStorage(name);
-            QString bind = settings->value(key).toString();
-            _bind[name] = new KeyAction(bind, this);
-        }
-        settings->endGroup();
-    }
-    _winLock = settings->value("WinLock").toBool();
-    emit didLoad();
-    map(currentMap);
-    settings->endGroup();
 }
 
 QString KbBind::globalRemap(const QString& key){

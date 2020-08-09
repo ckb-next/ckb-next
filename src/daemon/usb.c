@@ -22,12 +22,14 @@ dpi_list mouse_dpi_list[] = {
     { P_SABRE_N, 10000 },
     { P_SCIMITAR, 12000 },
     { P_SCIMITAR_PRO, 16000 },
+    { P_SCIMITAR_ELITE, 18000 },
     { P_SABRE_O2, 6400 },
     { P_HARPOON, 6000 },
     { P_HARPOON_PRO, 12000 },
     { P_KATAR, 8000 },
     { P_IRONCLAW, 18000 },
-    { P_IRONCLAW_WIRELESS, 18000 },
+    { P_IRONCLAW_W_U, 18000 },
+    { P_IRONCLAW_W_D, 18000 },
     { 0, 0 }, // Keep last and do not remove
 };
 
@@ -71,12 +73,14 @@ device_desc models[] = {
     { V_CORSAIR, P_SABRE_N, },
     { V_CORSAIR, P_SCIMITAR, },
     { V_CORSAIR, P_SCIMITAR_PRO, },
+    { V_CORSAIR, P_SCIMITAR_ELITE, },
     { V_CORSAIR, P_SABRE_O2, },
     { V_CORSAIR, P_HARPOON, },
     { V_CORSAIR, P_HARPOON_PRO, },
     { V_CORSAIR, P_KATAR, },
     { V_CORSAIR, P_IRONCLAW, },
-    { V_CORSAIR, P_IRONCLAW_WIRELESS, },
+    { V_CORSAIR, P_IRONCLAW_W_U, },
+    { V_CORSAIR, P_IRONCLAW_W_D, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
@@ -168,7 +172,7 @@ const char* product_str(ushort product){
         return "m65e";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
-    if(product == P_SCIMITAR || product == P_SCIMITAR_PRO)
+    if(product == P_SCIMITAR || product == P_SCIMITAR_PRO || product == P_SCIMITAR_ELITE)
         return "scimitar";
     if(product == P_HARPOON || product == P_HARPOON_PRO)
         return "harpoon";
@@ -178,7 +182,7 @@ const char* product_str(ushort product){
         return "katar";
     if(product == P_IRONCLAW)
         return "ironclaw";
-    if(product == P_IRONCLAW_WIRELESS)
+    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D)
         return "ironclaw_wireless";
     if(product == P_POLARIS)
         return "polaris";
@@ -201,9 +205,13 @@ const char* product_str(ushort product){
 ///
 /// \todo Is the last point really a good decision and always correct?
 ///
-static const devcmd* get_vtable(ushort vendor, ushort product){
+static const devcmd* get_vtable(usbdevice* kb){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
-    if(IS_MOUSE(vendor, product)) {
+    ushort vendor = kb->vendor;
+    ushort product = kb->product;
+    if(kb->protocol == PROTO_BRAGI) {
+        return &vtable_bragi;
+    } else if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;
         else
@@ -340,10 +348,12 @@ static void* _setupusb(void* context){
     /// - the standard delay time is initialized in kb->usbdelay
     ///
     usbdevice* kb = context;
+    if(USES_BRAGI(kb->vendor, kb->product))
+        kb->protocol = PROTO_BRAGI;
     pthread_mutex_lock(imutex(kb));
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;
-    const devcmd* vt = kb->vtable = get_vtable(vendor, product);
+    const devcmd* vt = kb->vtable = get_vtable(kb);
     kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(SUPPORTS_ADJRATE(kb))
         kb->features |= FEAT_ADJRATE;

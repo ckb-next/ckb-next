@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *ironclawwirelessOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *ironclawWirelessOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -36,7 +36,7 @@ void KeyWidget::map(const KeyMap& newMap){
     }
     if(width < 500)
         width = 500;
-    setFixedSize(width, height);
+    //setFixedSize(width, height);
     update();
 }
 
@@ -162,10 +162,10 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 ironclawOverlay = new QImage(":/img/overlay_ironclaw.png");
             overlay = ironclawOverlay;
             xpos = 2.f;
-        } else if(model == KeyMap::IRONCLAW_WIRELESS){
-            if(!ironclawwirelessOverlay)
-                ironclawwirelessOverlay = new QImage(":/img/overlay_ironclaw_wireless.png");
-            overlay = ironclawwirelessOverlay;
+        } else if(model == KeyMap::IRONCLAW_W){
+            if(!ironclawWirelessOverlay)
+                ironclawWirelessOverlay = new QImage(":/img/overlay_ironclaw_wireless.png");
+            overlay = ironclawWirelessOverlay;
             xpos = 2.f;
         }
 
@@ -220,9 +220,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
         float w = key.width - 2.f;
         float h = key.height - 2.f;
         // In RGB mode, ignore keys without LEDs
-        if((_rgbMode && !key.hasLed)
-                || (!_rgbMode && !key.hasScan))
+        if((_rgbMode && !key.hasLed) || (!_rgbMode && !key.hasScan)){
             continue;
+        }
         // Set color based on key highlight
         bgPainter.setOpacity(1.);
         if(highlight.testBit(i)){
@@ -245,9 +245,10 @@ void KeyWidget::paintEvent(QPaintEvent*){
             else {
                 bgPainter.setBrush(QBrush(keyColor));
                 if(KeyMap::isMouse(model))
-                    bgPainter.setOpacity(0.7);
+                    bgPainter.setOpacity(0.0);
             }
         }
+        // Draw the rectangle
         if((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
             // Not all devices have circular buttons
@@ -398,6 +399,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                     decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
             else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW && !strcmp(key.name, "back")))
+                drawLogo(&key, &decPainter, offX , offY, scale);
+            else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW_W && !strcmp(key.name, "back")))
                 drawLogo(&key, &decPainter, offX , offY, scale);
             else
                 decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));

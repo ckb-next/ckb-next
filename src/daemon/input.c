@@ -72,6 +72,8 @@ static pthread_t macro_pt_first() {
     return pt_head? pt_head->thread_id : 0;
 }
 
+const struct timespec init_repeat_delay = { .tv_nsec = 250000000 };
+
 ///
 /// \brief play_macro is the code for all threads started to play a macro.
 /// \param param \a parameter_t to store Kb-ptr and macro-ptr (thread may get only one user-parameter)
@@ -98,6 +100,7 @@ static void* play_macro(void* param) {
     }
     pthread_mutex_unlock(mmutex2(kb));       ///< Give all new threads the chance to enter the block.
 
+    int firstloop = 1;
     while(1){
         /// Send events for each keypress in the macro
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
@@ -128,6 +131,13 @@ static void* play_macro(void* param) {
         // If the user let go and pressed again, it's okay, because we still need to repeat.
         // The other threads will still be queued up and run after this.
         // Maybe in the future we can add an option to prevent new threads with the same combo.
+        // Additionally, wait for a bit, because otherwise short macros will be repeated even if pressed only once
+        if(firstloop){
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &init_repeat_delay, NULL);
+            firstloop = 0;
+        }
+        // Give some time for userspace applications to catch up
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 50000000}, NULL);
         queued_mutex_lock(imutex(kb));
         const int retrigger = macromask(kb->input.keys, macro->combo);
         queued_mutex_unlock(imutex(kb));

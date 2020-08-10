@@ -98,29 +98,43 @@ static void* play_macro(void* param) {
     }
     pthread_mutex_unlock(mmutex2(kb));       ///< Give all new threads the chance to enter the block.
 
-    /// Send events for each keypress in the macro
-    queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
-    for (int a = 0; a < macro->actioncount; a++) {
-        macroaction* action = macro->actions + a;
-        if (action->rel_x != 0 || action->rel_y != 0)
-            os_mousemove(kb, action->rel_x, action->rel_y);
-        else {
-            os_keypress(kb, action->scan, action->down);
-            queued_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
-            if (action->delay != UINT_MAX && action->delay) {    ///< local delay set
-                clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
-            } else if (kb->delay != UINT_MAX && kb->delay) {     ///< use default global delay
-                clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = kb->delay * 1000}, NULL);
-            } else if (a < (macro->actioncount - 1)) {  ///< use delays depending on macro length
-                if (a > 200) {
-                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 100000}, NULL);
-                } else if (a > 20) {
-                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000}, NULL);
+    while(1){
+        /// Send events for each keypress in the macro
+        queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
+        for (int a = 0; a < macro->actioncount; a++) {
+            macroaction* action = macro->actions + a;
+            if (action->rel_x != 0 || action->rel_y != 0)
+                os_mousemove(kb, action->rel_x, action->rel_y);
+            else {
+                os_keypress(kb, action->scan, action->down);
+                queued_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
+                if (action->delay != UINT_MAX && action->delay) {    ///< local delay set
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
+                } else if (kb->delay != UINT_MAX && kb->delay) {     ///< use default global delay
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = kb->delay * 1000}, NULL);
+                } else if (a < (macro->actioncount - 1)) {  ///< use delays depending on macro length
+                    if (a > 200) {
+                        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 100000}, NULL);
+                    } else if (a > 20) {
+                        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000}, NULL);
+                    }
                 }
+                queued_mutex_lock(mmutex(kb));
             }
-            queued_mutex_lock(mmutex(kb));
         }
+
+        queued_mutex_unlock(mmutex(kb));
+        // Check if the same combination is still held down.
+        // If the user let go and pressed again, it's okay, because we still need to repeat.
+        // The other threads will still be queued up and run after this.
+        // Maybe in the future we can add an option to prevent new threads with the same combo.
+        queued_mutex_lock(imutex(kb));
+        const int retrigger = macromask(kb->input.keys, macro->combo);
+        queued_mutex_unlock(imutex(kb));
+        if(!retrigger)
+            break;
     }
+    queued_mutex_lock(mmutex(kb));
 
     pthread_mutex_lock(mmutex2(kb));    ///< protect the linked list and the mvar
     // ckb_info("Now leaving 0x%lx and waking up all others\n", (unsigned long int)pthread_self());

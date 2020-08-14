@@ -66,6 +66,7 @@ private slots:
     void modeChanged();
     void currentSelectionChanged(const QModelIndex& current, const QModelIndex& previous);
     void on_modesList_customContextMenuRequested(const QPoint &pos);
+    void batteryTrayBox_stateChanged(int state);
 
     void devUpdate();
     void updateBattery(uint battery, uint charging);

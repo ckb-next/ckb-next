@@ -18,7 +18,7 @@ bool Kb::_dither = false, Kb::_mouseAccel = true;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
-    devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
+    batteryTimer(0), batteryIcon(0), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), battery(0), charging(0),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
@@ -123,8 +123,17 @@ Kb::Kb(QObject *parent, const QString& path) :
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
 
-    if(features.contains("wireless"))
+    if(features.contains("wireless")){
+        batteryIcon = new BatteryStatusTrayIcon(usbModel, this);
         updateBattery();
+        batteryTimer = new QTimer(this);
+        connect(batteryTimer, &QTimer::timeout, this, &Kb::updateBattery);
+        connect(this, &Kb::batteryChanged, batteryIcon, &BatteryStatusTrayIcon::setBattery);
+        if(showBatteryIndicator)
+            batteryIcon->show();
+        batteryTimer->setInterval(10000);
+        batteryTimer->start();
+    }
 
     // Again, find an available notification node for macro definition
     // (if none is found, take notify2)
@@ -171,6 +180,9 @@ Kb::Kb(QObject *parent, const QString& path) :
 Kb::~Kb(){
     // Save settings first
     save();
+
+    delete batteryTimer;
+    delete batteryIcon;
 
     // remove the notify channel from the list of notifyPaths.
     ///< \todo I don't think, that notifypaths is used somewhere. So why do we have it?
@@ -291,6 +303,7 @@ void Kb::load(){
                 newCurrentProfile = profile;
         }
     }
+    showBatteryIndicator = settings.setValue("batteryIndicator", showBatteryIndicator);
     if(newCurrentProfile)
         setCurrentProfile(newCurrentProfile);
     else {
@@ -333,6 +346,7 @@ void Kb::save(){
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
     settings.setValue("hwLayout", KeyMap::getLayout(_layout));
+    showBatteryIndicator = settings.value("batteryIndicator", true).toBool();
 }
 
 void Kb::autoSave(){

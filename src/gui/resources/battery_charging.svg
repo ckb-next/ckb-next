@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg1"
+   viewBox="0 0 512 512">
+  <g
+     transform="translate(10)"
+     id="g103"
+     style="fill:#ffffff">
+    <path
+       id="path1"
+       d="M 12,384 V 128 h 418 v 80 h 50 v 96 h -50 v 80 z M 44,160 V 352 H 398 V 160 Z"
+       style="fill:#ffffff;stroke-width:0.755952" />
+  </g>
+  <path
+     id="path18"
+     d="M 86,254.80964 H 202.66666 L 226,195 366,254.80964 H 249.33334 L 226,315 Z"
+     style="fill:#ffffff;stroke-width:1.19926" />
+</svg>

@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QFile>
 #include <QThread>
+#include <QTimer>
 #include "kbprofile.h"
+#include "batterysystemtrayicon.h"
 
 // Class for managing devices
 
@@ -96,6 +98,14 @@ public:
 
     KeyMap::Layout getCurrentLayout();
 
+    // Battery polling timer
+    QTimer* batteryTimer;
+
+    // Battery status icon
+    BatteryStatusTrayIcon* batteryIcon;
+
+    bool showBatteryIndicator;
+
     //////////
     /// For usage with macro definions, these two params must only be readable.
     /// So there are no setters.
@@ -150,6 +160,7 @@ private slots:
 
     void deleteHw();
     void deletePrevious();
+    void updateBattery();
 
 private:
     // Following methods should only be used by KbManager
@@ -174,8 +185,6 @@ private:
 private:
     // Following properties shouldn't be used by any other classes
     void updateLayout(bool stop);
-
-    void updateBattery();
 
     static int _frameRate, _scrollSpeed;
     static bool _dither, _mouseAccel;

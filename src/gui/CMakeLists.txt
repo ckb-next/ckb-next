@@ -112,6 +112,7 @@ if (MACOS OR LINUX)
               animscript.cpp
               animsettingdialog.cpp
               autorun.cpp
+              batterysystemtrayicon.cpp
               ckbsettings.cpp
               ckbsettingswriter.cpp
               ckbupdater.cpp

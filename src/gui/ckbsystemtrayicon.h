@@ -18,6 +18,7 @@ public:
     void setIcon(QIcon icon, QString name);
     CkbSystemTrayIcon(const QIcon& icon, const QString iconName, QObject* parent = 0);
     inline void show() { setStatus(KStatusNotifierItem::Active); }
+    inline void hide() { setStatus(KStatusNotifierItem::Passive); }
     inline void setVisible(bool visible) { setStatus((visible ? KStatusNotifierItem::Active : KStatusNotifierItem::Passive)); }
     ~CkbSystemTrayIcon();
 signals:

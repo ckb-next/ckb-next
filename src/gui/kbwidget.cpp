@@ -3,6 +3,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QUrl>
+#include <QTimer>
 #include "ckbsettings.h"
 #include "fwupgradedialog.h"
 #include "kbfirmware.h"
@@ -21,6 +22,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
 {
     ui->setupUi(this);
     connect(ui->modesList, SIGNAL(orderChanged()), this, SLOT(modesList_reordered()));
+    connect(ui->batteryTrayBox, &QCheckBox::stateChanged, this, &KbWidget::batteryTrayBox_stateChanged);
 
     connect(device, SIGNAL(infoUpdated()), this, SLOT(devUpdate()));
     connect(device, SIGNAL(profileAdded()), this, SLOT(updateProfileList()));
@@ -65,6 +67,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     } else {
         ui->batteryLabel->hide();
         ui->batteryStatusLabel->hide();
+        ui->batteryTrayBox->hide();
     }
 
     // Hide poll rate and FW update as appropriate
@@ -293,6 +296,16 @@ void KbWidget::modesList_reordered(){
     currentProfile->modes(newModes);
 }
 
+void KbWidget::batteryTrayBox_stateChanged(int state){
+    device->showBatteryIndicator = state > 0;
+    device->needsSave();
+    if(state){
+        device->batteryIcon->show();
+    } else {
+        device->batteryIcon->hide();
+    }
+}
+
 void KbWidget::on_modesList_itemChanged(QListWidgetItem *item){
     if(!item || !currentMode || item->data(GUID).toUuid() != currentMode->id().guid)
         return;
@@ -419,6 +432,7 @@ void KbWidget::devUpdate(){
     bool block = ui->pollRateBox->blockSignals(true);
     ui->pollRateBox->setCurrentIndex(getPollRateBoxIdx(device->pollrate));
     ui->pollRateBox->blockSignals(block);
+    ui->batteryTrayBox->setChecked(device->showBatteryIndicator);
 }
 
 void KbWidget::modeUpdate(){
@@ -426,8 +440,8 @@ void KbWidget::modeUpdate(){
 
 void KbWidget::updateBattery(uint battery, uint charging){
     QString label = QString("%1, %2")
-                    .arg(Kb::BATTERY_VALUES[battery])
-                    .arg(Kb::BATTERY_CHARGING_VALUES[charging]);
+                    .arg(BatteryStatusTrayIcon::BATTERY_VALUES[battery])
+                    .arg(BatteryStatusTrayIcon::BATTERY_CHARGING_VALUES[charging]);
     ui->batteryStatusLabel->setText(label);
 }
 

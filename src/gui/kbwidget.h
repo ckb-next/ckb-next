@@ -61,6 +61,7 @@ private slots:
     void on_modesList_itemChanged(QListWidgetItem *item);
     void on_modesList_itemClicked(QListWidgetItem *item);
     void on_modesList_customContextMenuRequested(const QPoint &pos);
+    void batteryTrayBox_stateChanged(int state);
 
     void devUpdate();
     void modeUpdate();

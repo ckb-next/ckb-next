@@ -4,6 +4,7 @@
 #include <QDebug>
 #include "ckbsettings.h"
 #include "kbanim.h"
+#include <typeinfo>
 
 KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettingsBase& settings) :
     QObject(parent), _script(0), _map(map),

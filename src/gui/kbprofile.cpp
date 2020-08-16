@@ -1,5 +1,6 @@
 #include "kbprofile.h"
 #include "kb.h"
+#include <typeinfo>
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const KbProfile& other) :
     QObject(parent), _currentMode(0), _name(other._name), _id(other._id), _keyMap(keyMap), _needsSave(true)

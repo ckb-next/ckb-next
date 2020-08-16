@@ -3,6 +3,7 @@
 #include <QSet>
 #include "kblight.h"
 #include "kbmode.h"
+#include <typeinfo>
 
 static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;

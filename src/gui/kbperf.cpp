@@ -3,6 +3,7 @@
 #include "kb.h"
 #include "media.h"
 #include <cmath>
+#include <typeinfo>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
 #define map_last(map) ((map).last())

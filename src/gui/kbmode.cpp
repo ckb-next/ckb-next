@@ -1,5 +1,6 @@
 #include "kbmode.h"
 #include "kb.h"
+#include <typeinfo>
 
 KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const QString &guid, const QString& modified) :
     QObject(parent),

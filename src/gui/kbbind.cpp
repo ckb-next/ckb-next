@@ -5,6 +5,7 @@
 #include "kbmode.h"
 #include "kb.h"
 #include "qdebug.h"
+#include <typeinfo>
 
 QHash<QString, QString> KbBind::_globalRemap;
 quint64 KbBind::globalRemapTime = 0;

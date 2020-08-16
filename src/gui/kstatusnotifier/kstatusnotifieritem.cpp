@@ -617,8 +617,30 @@ void KStatusNotifierItemPrivate::registerToDaemon()
                 watcher->deleteLater();
                 QDBusPendingReply<QVariant> reply = *watcher;
                 if (reply.isError()) {
-                    qDebug() << "Failed to read protocol version of KStatusNotifierWatcher";
-                    setLegacySystemTrayEnabled(true);
+                    // If we get here, it's possible we're dealing with the non compliant GNOME extension
+                    // Said implementation has a ProtocolVersion() method that returns some identifier other than the protocol version
+                    // Call the method async, and if it succeeds, register the StatusNotifierItem
+                    QDBusMessage extmsg = QDBusMessage::createMethodCall(QString::fromLatin1(s_statusNotifierWatcherServiceName),
+                                                                      QStringLiteral("/StatusNotifierWatcher"),
+                                                                      QString::fromLatin1(s_statusNotifierWatcherServiceName),
+                                                                      QStringLiteral("ProtocolVersion"));
+                    QDBusPendingCall extasync = QDBusConnection::sessionBus().asyncCall(extmsg);
+                    QDBusPendingCallWatcher *extwatcher = new QDBusPendingCallWatcher(extasync, q);
+                    QObject::connect(extwatcher, &QDBusPendingCallWatcher::finished, q,
+                        [this, extwatcher] {
+                            extwatcher->deleteLater();
+                            QDBusPendingReply<QString> reply = *extwatcher;
+                            if (reply.isError()) {
+                                // Failed, fall back
+                                qDebug() << "Failed to get KStatusNotifierWatcher protocol version:" << reply.error();
+                                setLegacySystemTrayEnabled(true);
+                            } else {
+                                qDebug() << "Detected non compliant KStatusNotifierWatcher implementation:" << reply.value();
+                                statusNotifierWatcher->RegisterStatusNotifierItem(statusNotifierItemDBus->service());
+                                setLegacySystemTrayEnabled(false);
+                            }
+                        }
+                    );
                 } else {
                     bool ok = false;
                     const int protocolVersion = reply.value().toInt(&ok);

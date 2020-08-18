@@ -905,11 +905,18 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
 void reactivate_devices()
 {
     ckb_info("System has woken from sleep\n");
-    usbdevice *kb = NULL;
+    usbdevice* kb = NULL;
     for(int i = 1; i < DEV_MAX; i++){
         kb = keyboard + i;
         queued_mutex_lock(dmutex(kb));
-        if(IS_CONNECTED(keyboard + i)){
+        if(IS_CONNECTED(kb)){
+            //os_resetusb(kb, __FILE_NOPATH__, __LINE__);
+            for(int i = 0; i < kb->epcount; i++){
+                if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i) < 0) {
+                    ckb_err("Failed to claim interface %d: %s\n", i, strerror(errno));
+                }
+            }
+
             // If the device was active, mark it as disabled and re-enable it
             if(kb->active){
                 kb->active = 0;

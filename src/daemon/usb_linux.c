@@ -387,21 +387,35 @@ void* os_inputmain(void* context){
     udev_enumerate_unref(enumerate);
     /// The userSpaceFS knows the URBs now, so start monitoring input
     while (1) {
-        struct usbdevfs_urb* urb = 0;
+        struct usbdevfs_urb* urb = NULL;
 
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
         if (ioctl(fd, USBDEVFS_REAPURB, &urb)) {
-            if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
+            if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN) {
                 // Stop the thread if the handle closes
                 break;
-            else if(errno == EPIPE && urb){
+            } else if(errno == EPIPE && urb){
                 /// If just an EPIPE ocurred, give the device a CLEAR_HALT and resubmit the URB.
-                ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
+                if(ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint) < 0)
+                    ckb_info("EPIPE occurred. ioctl failed %d (%s)\n", errno, strerror(errno));
                 // Re-submit the URB
-                if(urb)
-                    ioctl(fd, USBDEVFS_SUBMITURB, urb);
-                urb = 0;
+                if(ioctl(fd, USBDEVFS_SUBMITURB, urb) < 0)
+                    ckb_err("Failed to resubmit URB after EPIPE %d (%s)\n", errno, strerror(errno));
+                urb = NULL;
+            } else if (errno == EINTR) {
+                // If the ioctl syscall was interrupted, it possibly happened due to a suspend or a reset.
+                // We have to reclaim our interfaces and then resend a URB
+                for(int i = 0; i < urbcount; i++){
+                    if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i) < 0) {
+                        ckb_err("Failed to claim interface %d: %s\n", i, strerror(errno));
+                    }
+                }
+//                ckb_info("Submitting URB after EINTR\n");
+//                if(ioctl(fd, USBDEVFS_SUBMITURB, urb) < 0)
+//                   ckb_err("Failed to resubmit URB after EINTR %d (%s)\n", errno, strerror(errno));
+            } else {
+                ckb_err("Unhandled errno for ioctl %d (%s)\n", errno, strerror(errno));
             }
             continue;
         }
@@ -418,7 +432,7 @@ void* os_inputmain(void* context){
 
             /// Re-submit the URB for the next run.
             ioctl(fd, USBDEVFS_SUBMITURB, urb);
-            urb = 0;
+            urb = NULL;
         }
     }
 
@@ -821,8 +835,9 @@ void* suspend_check() {
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 2}, NULL);
         time_t current_time = get_clock_monotonic_seconds(NULL);
 
-        if(prev_time + 4 < current_time)
+        if(prev_time + 4 < current_time){
             reactivate_devices();
+        }
 
         prev_time = current_time;
     }

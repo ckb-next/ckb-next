@@ -774,7 +774,8 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             continue;
         }
         // Wait for the response
-        DELAY_MEDIUM(kb);
+        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
+            DELAY_MEDIUM(kb);
         res = os_usbrecv(kb, in_msg, file, line);
         if(res == 0)
             return 0;
@@ -782,7 +783,8 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             return res;
         if(reset_stop || hwload_mode != 2)
             return 0;
-        DELAY_LONG(kb);
+        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
+            DELAY_LONG(kb);
     }
     // Give up
     ckb_err_fn("Too many send/recv failures. Dropping.\n", file, line);

@@ -30,4 +30,8 @@
 // ckb-specific macros
 #define BRAGI_LIGHTING_HANDLE 0x00
 
+// HID input (2 bytes)
+#define BRAGI_INPUT_0 0x00
+#define BRAGI_INPUT_1 0x02
+
 #endif // BRAGI_PROTO_H

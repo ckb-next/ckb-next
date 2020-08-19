@@ -811,7 +811,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             continue;
         }
         // Wait for the response
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
+        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
             DELAY_MEDIUM(kb);
         res = os_usbrecv(kb, in_msg, file, line);
         if(res == 0)
@@ -820,7 +820,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             return res;
         if(reset_stop || hwload_mode != 2)
             return 0;
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
+        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
             DELAY_LONG(kb);
     }
     // Give up

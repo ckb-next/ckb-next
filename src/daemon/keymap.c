@@ -3,6 +3,7 @@
 #include "keymap.h"
 #include "usb.h"
 #include "input.h"
+#include "bragi_proto.h"
 
 const key keymap[N_KEYS_EXTENDED] = {
     // Keyboard keys
@@ -354,18 +355,20 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
         } else {
             if(IS_MOUSE_DEV(kb)) {
                 // HID Mouse Input
-                if(IS_IRONCLAW_W(kb)) {
-                    icw_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                // In HW mode, Bragi mouse is the same as NXP, but without a header
+                if(kb->protocol == PROTO_BRAGI) {
+                    if(kb->active && firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1)
+                        ckb_info("Ignoring previous URB");
+                    else
+                        hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
                 } else if(firstbyte == MOUSE_IN) {
-                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer + 1);
                 } else if(firstbyte == CORSAIR_IN) { // Corsair Mouse Input
                     corsair_mousecopy(kb->input.keys, buffer);
                 } else if(firstbyte == 0x05 && urblen == 21) { // Seems to be on the Ironclaw RGB only
                     corsair_extended_mousecopy(kb->input.keys, buffer);
                 } else {
-                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
-                    // corsair_mousecopy(kb->input.keys, buffer);
-                    // ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x", firstbyte, ep);
+                    ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x", firstbyte, ep);
                 }
             } else {
                 // Assume Keyboard for everything else for now
@@ -507,29 +510,6 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
 #define BUTTON_HID_COUNT    5
 
 void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
-    // Byte 1 = mouse buttons (bitfield)
-    for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
-        if(urbinput[1] & (1 << bit))
-            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
-        else
-            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
-    }
-    // Bytes 5 - 8: movement
-    *xaxis += (urbinput[6] << 8) | urbinput[5];
-    *yaxis += (urbinput[8] << 8) | urbinput[7];
-    // Byte 9: wheel
-    char wheel = urbinput[9];
-    if(wheel > 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);         // wheelup
-    else
-        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
-    if(wheel < 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);     // wheeldn
-    else
-        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
-}
-
-void icw_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
     // Byte 1 = mouse buttons (bitfield)
     for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
         if(urbinput[0] & (1 << bit))

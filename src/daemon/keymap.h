@@ -80,5 +80,4 @@ void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
 void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
 
 void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput);
-void icw_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput);
 #endif // KEYMAP_H

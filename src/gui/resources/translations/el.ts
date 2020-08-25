@@ -348,148 +348,153 @@
         <translation type="vanished">Ρυθμίσεις Εφαρμογής</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="365"/>
+        <location filename="../../extrasettingswidget.ui" line="531"/>
         <source>Warning: high frame rates may cause stability issues</source>
         <translation>Προσοχή: υψηλός ρυθμός καρέ μπορεί να οδηγήσει σε αστάθεια</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="402"/>
+        <location filename="../../extrasettingswidget.ui" line="378"/>
         <source>When using macros with strings longer than 25 chars, some OS may lose characters (e.g. Mint 17.2). Select to prevent that bug.</source>
         <translation>Οταν χρησιμποιείτε μακροεντολή μεγαλύτερη από 25 χαρακτήρες, το Λειτουργικό Σύστημα μπορεί να παραλείψει κάποιους χαρακτήρες. Επιλέξτε αυτό για να λυθεί το πρόβλημα.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="405"/>
+        <location filename="../../extrasettingswidget.ui" line="381"/>
         <source>Use delay for very long macros</source>
         <translation>Χρήση καθυστέρησης για μεγάλες μακροεντολές</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="395"/>
+        <location filename="../../extrasettingswidget.ui" line="273"/>
         <source>Animation scripts</source>
         <translation>Προγράμματα animation</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="172"/>
+        <location filename="../../extrasettingswidget.ui" line="177"/>
         <source>OS X tweaks</source>
         <translation>Διορθώσεις για OS X</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="91"/>
+        <location filename="../../extrasettingswidget.ui" line="365"/>
         <source>Location:</source>
         <translation>Τοποθεσία:</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="51"/>
+        <location filename="../../extrasettingswidget.ui" line="280"/>
         <source>The tray icon will not be displayed. The application will still run in the background; re-launch the app to see the GUI again.</source>
         <translation>Το εικονίδιο περιοχής ειδοποιήσεων δεν θα εμφανιστεί. Η εφαρμογή θα τρέχει στο παρασκήνιο. Επανεκκινήστε την για να ξαναεμφανιστεί το παράθυρο.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="54"/>
+        <location filename="../../extrasettingswidget.ui" line="283"/>
         <source>Hide tray icon</source>
         <translation>Απόκρυψη εικονιδίου περιοχής ειδοποιήσεων</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="139"/>
+        <location filename="../../extrasettingswidget.ui" line="54"/>
         <source>Behavior</source>
         <translation>Συμπεριφορά</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="372"/>
+        <location filename="../../extrasettingswidget.ui" line="462"/>
         <source>By default, the same brightness level will be applied to all profiles and all devices. Enable this to store it with the lighting mode instead.</source>
         <translation>Από προεπιλογή, το ίδιο επίπεδο φωτεινότητας θα εφαρμόζεται σε όλα τα προφίλ και όλες τις συσκευές. Ενεργοποιήστε αυτό ώστε το επίπεδο να αποθηκέυεται ανά mode.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="375"/>
+        <location filename="../../extrasettingswidget.ui" line="465"/>
         <source>Set brightness per-mode</source>
         <translation>Επίπεδο φωτεινότητας ανά mode</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="461"/>
+        <location filename="../../extrasettingswidget.ui" line="518"/>
         <source>Frame rate (FPS):</source>
         <translation>Ρυθμός καρέ (FPS):</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="485"/>
+        <location filename="../../extrasettingswidget.ui" line="104"/>
         <source>Turn lights off when idle for</source>
         <translation>Απενεργοποίηση φωτισμού όταν το σύστημα είναι αδρανές γιά</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="517"/>
+        <location filename="../../extrasettingswidget.ui" line="136"/>
         <source>m</source>
         <comment>minutes</comment>
         <translation>λ</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="240"/>
+        <location filename="../../extrasettingswidget.ui" line="449"/>
         <source>Details</source>
         <translation>Λεπτομέρειες</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="316"/>
+        <location filename="../../extrasettingswidget.ui" line="221"/>
         <source>Scroll</source>
         <translation>Κύλιση</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="342"/>
+        <location filename="../../extrasettingswidget.ui" line="247"/>
         <source>line(s) at a time</source>
         <translation>γραμμή/ες ανά φορά</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="253"/>
+        <location filename="../../extrasettingswidget.ui" line="257"/>
         <source>Disable animated preview when ckb-next is not in focus</source>
         <translation>Απενεργοποίηση πλήρης προεπισκόπησης όταν το ckb-next δεν είναι εστιασμένο</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="41"/>
+        <location filename="../../extrasettingswidget.ui" line="488"/>
         <source>May improve appearance on some keyboards.</source>
         <translation>Ίσως βελτιώσει την εμφάνιση σε κάποια πληκτρολόγια.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="44"/>
+        <location filename="../../extrasettingswidget.ui" line="491"/>
         <source>Use spatial dithering to simulate extra color resolution</source>
         <translation>Χρήση dithering για προσομοίωση εκτεταμένης χρωματικής ανάλυσης</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="81"/>
+        <location filename="../../extrasettingswidget.ui" line="508"/>
         <source>Try this if you&apos;re having problems with the scroll wheel.</source>
         <translation>Δοκιμάστε το αν έχετε πρόβλημα κατά την κύλιση με τη ροδέλα.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="84"/>
+        <location filename="../../extrasettingswidget.ui" line="511"/>
         <source>Disable scroll acceleration</source>
         <translation>Απενεργοποίηση επιτάχυνσης κύλισης</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="444"/>
+        <location filename="../../extrasettingswidget.ui" line="545"/>
+        <source>Monochrome tray icon</source>
+        <translation>Μονόχρωμο εικονίδιο περιοχής ειδοποιήσεων</translation>
+    </message>
+    <message>
+        <location filename="../../extrasettingswidget.ui" line="329"/>
         <source>Enabling per-mode brightness will disable scrolling on the tray icon to change the brightness level</source>
         <translation>Ενεργοποιώντας το επίπεδο φωτεινότητας ανά mode θα απενεργοποιήσει τη δυνατότητα κύλισης στο εικονίδιο περιοχής ειδοποιήσεων για αλλαγή φωτεινότητας</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="221"/>
+        <location filename="../../extrasettingswidget.ui" line="430"/>
         <source>0 animations found</source>
         <translation>Βρέθηκαν 0 animations</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="233"/>
+        <location filename="../../extrasettingswidget.ui" line="442"/>
         <source>Re-scan</source>
         <translation>Ανίχνευση</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="74"/>
+        <location filename="../../extrasettingswidget.ui" line="342"/>
         <source>Hardware</source>
         <translation>Υλικό</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="451"/>
+        <location filename="../../extrasettingswidget.ui" line="498"/>
         <source>Try this if you&apos;re having problems with mouse movement.</source>
         <translation>Δοκιμάστε αυτό αν έχετε προβλήματα με την κίνηση του ποντικιού.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="454"/>
+        <location filename="../../extrasettingswidget.ui" line="501"/>
         <source>Disable mouse acceleration</source>
         <translation>Απενεργοποίηση επιτάχυνσης ποντικιού</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="146"/>
+        <location filename="../../extrasettingswidget.ui" line="164"/>
         <source>Delay application start</source>
         <translation>Καθυστέρηση εκκίνησης προγράμματος</translation>
     </message>
@@ -499,17 +504,17 @@
         <translation>Αυτό δεν υποστηρίζεται στο Wayland</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="123"/>
+        <location filename="../../extrasettingswidget.cpp" line="124"/>
         <source>No animations found</source>
         <translation>Δεν βρέθηκαν animations</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="125"/>
+        <location filename="../../extrasettingswidget.cpp" line="126"/>
         <source>1 animation found</source>
         <translation>Βρέθηκε 1 animation</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="127"/>
+        <location filename="../../extrasettingswidget.cpp" line="128"/>
         <source>%1 animations found</source>
         <translation>Βρέθηκαν %1 animations</translation>
     </message>
@@ -827,6 +832,14 @@
         <location filename="../../kperfwidget.cpp" line="227"/>
         <source>Copy performance settings to:</source>
         <translation>Αντιγραφή ρυθμίσεων απόδοσης στο:</translation>
+    </message>
+</context>
+<context>
+    <name>KStatusNotifierItem</name>
+    <message>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="578"/>
+        <source>Quit</source>
+        <translation>Έξοδος</translation>
     </message>
 </context>
 <context>
@@ -1689,7 +1702,7 @@ An attempt will be made to import as many as possible.</source>
         <translation>Αντιγραφή σε mode...</translation>
     </message>
     <message>
-        <location filename="../../mperfwidget.cpp" line="262"/>
+        <location filename="../../mperfwidget.cpp" line="307"/>
         <source>Copy performance settings to:</source>
         <translation>Αντιγραφή ρυθμίσεων απόδοσης στο:</translation>
     </message>
@@ -1707,108 +1720,107 @@ An attempt will be made to import as many as possible.</source>
         <translation>Σχετικά</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="161"/>
+        <location filename="../../mainwindow.cpp" line="131"/>
         <source>Restore</source>
         <translation>Επαναφορά</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="162"/>
+        <location filename="../../mainwindow.cpp" line="132"/>
         <source>Quit</source>
         <translation>Έξοδος</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="163"/>
         <source>Monochrome Tray Icon</source>
-        <translation>Μονόχρωμο Εικονίδιο</translation>
+        <translation type="vanished">Μονόχρωμο Εικονίδιο</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="237"/>
+        <location filename="../../mainwindow.cpp" line="160"/>
         <source>Settings</source>
         <translation>Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="245"/>
+        <location filename="../../mainwindow.cpp" line="168"/>
         <source>The ckb-next daemon is not running. This program will &lt;b&gt;not&lt;/b&gt; work without it!</source>
         <translation>Το ckb-next-daemon δεν τρέχει. Αυτό το πρόγραμμα &lt;b&gt;δεν&lt;/b&gt; θα λειτουργήσει χωρίς αυτό!</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="247"/>
+        <location filename="../../mainwindow.cpp" line="170"/>
         <source>Start it once with:</source>
         <translation>Εκκινήστε το μια φορά με:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="249"/>
+        <location filename="../../mainwindow.cpp" line="172"/>
         <source>Enable it for every boot:</source>
         <translation>Ενεργοποιήστε το για κάθε εκκίνηση:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="252"/>
+        <location filename="../../mainwindow.cpp" line="175"/>
         <source>Start and enable it with:</source>
         <translation>Εκκινήστε και ενεργοποιήστε το με:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="277"/>
+        <location filename="../../mainwindow.cpp" line="200"/>
         <source>The ckb-next daemon is not running.</source>
         <translation>Το ckb-next-daemon δεν τρέχει.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="366"/>
+        <location filename="../../mainwindow.cpp" line="285"/>
         <source>Driver inactive</source>
         <translation>Ο driver είναι αδρανής</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="373"/>
+        <location filename="../../mainwindow.cpp" line="292"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Ασυμφωνία έκδοσης του driver (</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="373"/>
+        <location filename="../../mainwindow.cpp" line="292"/>
         <source>). Please upgrade ckb-next</source>
         <translation>). Παρακαλώ ενημερώστε το ckb-next</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="373"/>
+        <location filename="../../mainwindow.cpp" line="292"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation>.&lt;br /&gt;Αν το πρόβλημα παραμένει, επανεκκινήστε το σύστημά σας.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="384"/>
+        <location filename="../../mainwindow.cpp" line="303"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Ποσοχή:&lt;/b&gt; Η επέκταση από &quot;Fumihiko Takayama&quot; δεν επιτρέπεται στο Ασφάλεια και απόρρητο. Επιτρέψτε το και επανασυνδέστε τις συσκευές.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="386"/>
+        <location filename="../../mainwindow.cpp" line="305"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Σιγουρευτείτε ότι το ckb-next-daemon επιτρέπεται στο Ασφάλεια και απόρρητο -&gt; Παρακολούθησή εισόδου.&lt;/br /&gt;Παρακαλώ επιτρέψτε μέχρι 10 δευτερόλεπτα μέχρι να εμφανιστεί η ειδοποίηση ενεργοποιήσης του daemon.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="396"/>
+        <location filename="../../mainwindow.cpp" line="315"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Δεν ήταν δυνατό να φορτωθεί το άρθρωμα πυρήνα uinput. Αν αυτο το πρόβλημα παραμένει μετά από επανεκκίνηση, μεταγλωττίστε πυρήνα με CONFIG_INPUT_UINPUT=y.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="399"/>
+        <location filename="../../mainwindow.cpp" line="318"/>
         <source>No devices connected</source>
         <translation>Δεν υπάρχουν συνδεδεμένες συσκευές</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="402"/>
+        <location filename="../../mainwindow.cpp" line="321"/>
         <source>1 device connected</source>
         <translation>1 συσκευή συνδεδεμένη</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="404"/>
+        <location filename="../../mainwindow.cpp" line="323"/>
         <source>%1 devices connected</source>
         <translation>%1 συσκευές συνδεδεμένες</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="435"/>
+        <location filename="../../mainwindow.cpp" line="354"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation>Υπάρχει νέο firmware για το %1 σας (v%2) Θα θέλατε να το εγκαταστήσετε τώρα;</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="451"/>
+        <location filename="../../mainwindow.cpp" line="370"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
@@ -1817,12 +1829,12 @@ or click &quot;Quit&quot; on the Settings screen.</source>
 ή κάντε κλικ στο &quot;Έξοδος&quot; στο παράθυρο ρυθμίσεων.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="603"/>
+        <location filename="../../mainwindow.cpp" line="502"/>
         <source>Update to v</source>
         <translation>Ενημέρωση στο v</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="608"/>
+        <location filename="../../mainwindow.cpp" line="507"/>
         <source>Up to date</source>
         <translation>Ενημερωμένο</translation>
     </message>
@@ -1869,22 +1881,21 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation>Εκκινείται στο παρασκήνιο, χωρίς να προβάλει το κυρίως παράθυρο.</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="59"/>
         <source>Same as background.</source>
-        <translation>Ομοίως με το background.</translation>
+        <translation type="vanished">Ομοίως με το background.</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="63"/>
+        <location filename="../../main.cpp" line="61"/>
         <source>Causes already running instance (if any) to exit.</source>
         <translation>Αναγκάζει το λογισμικό (αν τρέχει) να κλείσει.</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="66"/>
+        <location filename="../../main.cpp" line="64"/>
         <source>Switches to the profile with the specified name on all devices.</source>
         <translation>Αλλάζει στο προφίλ με το καθορισμένο όνομα σε όλες τις συσκευές.</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="69"/>
+        <location filename="../../main.cpp" line="67"/>
         <source>Switches to the mode either in the current profile, or in the one specified by --profile</source>
         <translation>Αλλάζει στο mode είτε στο τρέχων προφίλ, ή σε προφιλ ορισμένο μέσω του --profile</translation>
     </message>

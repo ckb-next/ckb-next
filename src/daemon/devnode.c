@@ -78,21 +78,31 @@ void check_chmod(const char *pathname, mode_t mode){
 ///
 /// Because several independent threads may call updateconnected(), protect that procedure with locking/unlocking of \b devmutex.
 ///
-void _updateconnected(){
-    pthread_mutex_lock(devmutex);
+void _updateconnected(usbdevice* kb){
+    queued_mutex_lock(devmutex);
     char cpath[strlen(devpath) + 12];
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
     FILE* cfile = fopen(cpath, "w");
     if(!cfile){
         ckb_warn("Unable to update %s: %s\n", cpath, strerror(errno));
-        pthread_mutex_unlock(devmutex);
+        queued_mutex_unlock(devmutex);
         return;
     }
     int written = 0;
-    for(int i = 1; i < DEV_MAX; i++){
-        if(IS_CONNECTED(keyboard + i)){
-            written = 1;
-            fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].serial, keyboard[i].name);
+    if(kb != keyboard){
+        for(int i = 1; i < DEV_MAX; i++){
+#ifdef DEBUG_MUTEX
+            ckb_info("Locking ckb%d in _updateconnected()\n", i);
+#endif
+            queued_mutex_lock(devmutex + i);
+            if(IS_CONNECTED(keyboard + i)){
+                written = 1;
+                fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].serial, keyboard[i].name);
+            }
+#ifdef DEBUG_MUTEX
+            ckb_info("Unlocking ckb%d in _updateconnected()\n", i);
+#endif
+            queued_mutex_unlock(devmutex + i);
         }
     }
     if(!written)
@@ -102,12 +112,12 @@ void _updateconnected(){
     check_chmod(cpath, S_GID_READ);
     check_chown(cpath, 0, gid);
 
-    pthread_mutex_unlock(devmutex);
+    queued_mutex_unlock(devmutex);
 }
 
-void updateconnected(){
+void updateconnected(usbdevice* kb){
     euid_guard_start;
-    _updateconnected();
+    _updateconnected(kb);
     euid_guard_stop;
 }
 
@@ -210,7 +220,7 @@ static int _mkdevpath(usbdevice* kb){
 
     if(kb == keyboard + 0){
         // Root keyboard: write a list of devices
-        _updateconnected();
+        _updateconnected(kb);
         // Write version number
         char vpath[sizeof(path) + 8];
         snprintf(vpath, sizeof(vpath), "%s/version", path);

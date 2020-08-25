@@ -76,13 +76,9 @@ public:
     void base(QFile& cmd, bool ignoreDim = false, bool monochrome = false);
 
     // Load and save from stored settings
-    void load(CkbSettings& settings);
-    void save(CkbSettings& settings);
+    void load(CkbSettingsBase& settings);
+    void save(CkbSettingsBase& settings);
     bool needsSave() const;
-
-    // Import/Export
-    void lightExport(QSettings* settings);
-    void lightImport(QSettings* settings);
 
     // Used to force a frame to be sent to the daemon
     // Needed for when switching profiles as the daemon wipes the old data on switch
@@ -105,7 +101,7 @@ private:
     quint64         lastFrameSignal;
     int             _dimming, _lastFrameDimming, _timerOrigDimming;
     bool            _start;
-    bool            _needsSave, _needsMapRefresh, _forceFrame;
+    bool            _needsSave, _needsMapRefresh, _forceFrame, _timerDimmed;
 
     // Rebuild base ColorMap (if needed)
     void rebuildBaseMap();

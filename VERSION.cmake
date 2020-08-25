@@ -6,4 +6,4 @@ set(ckb-next_VERSION_PATCH 2)
 set(ckb-next_VERSION_IS_RELEASE FALSE)
 
 # Profile format version
-set(ckb-next_PROFILE_VER 1)
+set(ckb-next_PROFILE_VER 2)

@@ -245,10 +245,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
             else {
                 bgPainter.setBrush(QBrush(keyColor));
                 if(KeyMap::isMouse(model))
-                    bgPainter.setOpacity(0.0);
+                    bgPainter.setOpacity(0.7);
             }
         }
-        // Draw the rectangle
         if((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
             // Not all devices have circular buttons

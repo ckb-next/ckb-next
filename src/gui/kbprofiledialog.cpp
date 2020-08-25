@@ -198,7 +198,7 @@ void KbProfileDialog::extractedFileCleanup(QStringList extracted){
 }
 
 void KbProfileDialog::on_exportButton_clicked(){
-    quint16 profileVer = CKB_NEXT_PROFILE_VER;
+    const quint16 profileVer = CKB_NEXT_PROFILE_VER;
 
     // Selected items
     QList<QListWidgetItem*> selectedItems = ui->profileList->selectedItems();
@@ -210,6 +210,22 @@ void KbProfileDialog::on_exportButton_clicked(){
     dialog.setViewMode(QFileDialog::List);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
 
+    // Generate a default filename
+    QString filename;
+    int itemcount = selectedItems.count();
+    for(int i = 0; i < itemcount; i++){
+        QString pname(selectedItems.at(i)->text());
+        pname.replace(QRegularExpression("[^a-zA-Z0-9_]"), QString());
+        if(pname.isEmpty())
+            continue;
+        filename.append(pname);
+        if(i < itemcount - 1)
+            filename.append("_");
+    }
+
+    if(!filename.isEmpty())
+        dialog.selectFile(filename);
+
     if(!dialog.exec())
         return;
 
@@ -219,7 +235,7 @@ void KbProfileDialog::on_exportButton_clicked(){
         return;
 
     // Pick only the first filename
-    QString filename = filenames.at(0);
+    filename = filenames.at(0);
     if(!filename.endsWith(".ckb"))
         filename.append(".ckb");
 
@@ -259,9 +275,10 @@ void KbProfileDialog::on_exportButton_clicked(){
 
         // Used to make sure QSettings is destroyed before trying to hash the ini
         {
-            QSettings exportitem(tmp, QSettings::IniFormat);
+            // The version passed here isn't used anywhere
+            CkbExternalSettings exportitem(tmp, QSettings::IniFormat, CKB_NEXT_PROFILE_VER);
             exportitem.clear();
-            prof->profileExport(&exportitem);
+            prof->save(exportitem);
             exportitem.sync();
 
             if(exportitem.status() == QSettings::NoError)
@@ -318,8 +335,8 @@ bool KbProfileDialog::verifyHash(QString file){
     return false;
 }
 
-void KbProfileDialog::importCleanup(QStringList extracted, QList<QPair<QSettings*, QString>> profileptrs){
-    // Destroy the open QSettings objects
+void KbProfileDialog::importCleanup(QStringList extracted, QList<QPair<CkbExternalSettings*, QString>> profileptrs){
+    // Destroy the open CkbExternalSettings objects
     for(int i = 0; i < profileptrs.count(); i++)
         delete profileptrs.at(i).first;
 
@@ -329,7 +346,6 @@ void KbProfileDialog::importCleanup(QStringList extracted, QList<QPair<QSettings
 }
 
 void KbProfileDialog::on_importButton_clicked(){
-    quint16 profileVer = CKB_NEXT_PROFILE_VER;
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("ckb-next profiles (*.ckb)"));
@@ -360,13 +376,14 @@ void KbProfileDialog::on_importButton_clicked(){
         extractedFileCleanup(extracted);
         return;
     }
-
+    quint16 currentProfileVer = 0;
     {
         QSettings metadata("/tmp/ckbpkg.metadata", QSettings::IniFormat);
         metadata.beginGroup("metadata");
 
         // Pkg version check
-        if(profileVer < metadata.value("version").toInt()){
+        currentProfileVer = metadata.value("version").toInt();
+        if(CKB_NEXT_PROFILE_VER < currentProfileVer){
             QMessageBox::warning(this, tr("Error"), tr("Unsupported package selected. Please update ckb-next to import it."), QMessageBox::Ok);
             extractedFileCleanup(extracted);
             return;
@@ -416,7 +433,7 @@ void KbProfileDialog::on_importButton_clicked(){
 
     QStringList profilestr;
     // <Pointer>, <GUID>
-    QList<QPair<QSettings*, QString>> profileptrs;
+    QList<QPair<CkbExternalSettings*, QString>> profileptrs;
     int pkgProfileCount = 0;
     int pkgVerifiedCount = 0;
 
@@ -425,10 +442,10 @@ void KbProfileDialog::on_importButton_clicked(){
         if(tmpFile.endsWith("ini")){
             pkgProfileCount++;
             if(verifyHash(tmpFile)){
-                QSettings* sptr = new QSettings(extracted.at(i), QSettings::IniFormat);
+                CkbExternalSettings* sptr = new CkbExternalSettings(extracted.at(i), QSettings::IniFormat, currentProfileVer);
                 QString guid(sptr->childGroups().first());
 
-                profileptrs.append(QPair<QSettings*, QString>(sptr, guid));
+                profileptrs.append(QPair<CkbExternalSettings*, QString>(sptr, guid));
                 profilestr.append(sptr->value(guid + "/Name").toString());
                 pkgVerifiedCount++;
             }
@@ -460,7 +477,7 @@ void KbProfileDialog::on_importButton_clicked(){
 
     for(int i = 0; i < profileptrs.count(); i++){
         int ret = 0;
-        QSettings* sptr = profileptrs.at(i).first;
+        CkbExternalSettings* sptr = profileptrs.at(i).first;
         //QString guid = profileptrs.at(i).second;
         //QUuid current = guid.trimmed();
         QUuid guid = sptr->childGroups().first().trimmed();
@@ -491,7 +508,6 @@ void KbProfileDialog::on_importButton_clicked(){
             profileGuid = QUuid::createUuid().toString();
 
         qDebug() << "Importing" << profname;
-
         KbProfile* newProfile = device->newProfile(sptr, profileGuid);
         profiles.append(newProfile);
     }

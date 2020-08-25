@@ -83,7 +83,7 @@ public:
     // Create a new profile/mode. The newly-created object will NOT be inserted into the current profile/mode list.
     inline KbProfile*   newProfile()                                  { return new KbProfile(this, getKeyMap()); }
     inline KbProfile*   newProfile(KbProfile* other)                  { return new KbProfile(this, getKeyMap(), *other); }
-    inline KbProfile*   newProfile(QSettings* settings, QString guid) { return new KbProfile(this, getKeyMap(), settings, guid); }
+    inline KbProfile*   newProfile(CkbExternalSettings* settings, QString guid) { return new KbProfile(this, getKeyMap(), *settings, guid); }
     inline KbMode*      newMode()                                     { return new KbMode(this, getKeyMap()); }
     inline KbMode*      newMode(KbMode* other)                        { return new KbMode(this, getKeyMap(), *other); }
 

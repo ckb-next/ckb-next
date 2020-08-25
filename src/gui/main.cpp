@@ -34,6 +34,8 @@ enum CommandLineParseResults {
     CommandLineSwitchToMode,
 };
 
+bool startDelay = false;
+
 /**
  * parseCommandLine - Setup options and parse command line arguments.
  *
@@ -67,6 +69,15 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     const QCommandLineOption switchToModeOption(QStringList() << "m" << "mode", QObject::tr("Switches to the mode either in the current profile, or in the one specified by --profile"), "mode-name");
     parser.addOption(switchToModeOption);
 
+    QCommandLineOption delayOption(QStringList() << "d" << "delay", QObject::tr("Delays application start for 5 seconds"));
+    // Sigh
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+    delayOption.setFlags(QCommandLineOption::HiddenFromHelp);
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    delayOption.setHidden(true);
+#endif
+    parser.addOption(delayOption);
+
     /* parse arguments */
     if (!parser.parse(QCoreApplication::arguments())) {
         // set error, if there already are some
@@ -83,6 +94,10 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     if (parser.isSet(helpOption)) {
         // print help and exit
         return CommandLineHelpRequested;
+    }
+
+    if(parser.isSet(delayOption)) {
+        startDelay = true;
     }
 
     if (parser.isSet(backgroundOption)) {
@@ -291,10 +306,9 @@ int main(int argc, char *argv[]){
         break;
     }
 
-    bool startDelay = false;
     {
         QSettings tmp;
-        startDelay = tmp.value("Program/StartDelay", false).toBool();
+        startDelay |= tmp.value("Program/StartDelay", false).toBool();
     }
 
     if(startDelay)

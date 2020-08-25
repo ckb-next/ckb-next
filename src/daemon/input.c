@@ -72,6 +72,8 @@ static pthread_t macro_pt_first() {
     return pt_head? pt_head->thread_id : 0;
 }
 
+const struct timespec init_repeat_delay = { .tv_nsec = 250000000 };
+
 ///
 /// \brief play_macro is the code for all threads started to play a macro.
 /// \param param \a parameter_t to store Kb-ptr and macro-ptr (thread may get only one user-parameter)
@@ -98,29 +100,51 @@ static void* play_macro(void* param) {
     }
     pthread_mutex_unlock(mmutex2(kb));       ///< Give all new threads the chance to enter the block.
 
-    /// Send events for each keypress in the macro
-    pthread_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
-    for (int a = 0; a < macro->actioncount; a++) {
-        macroaction* action = macro->actions + a;
-        if (action->rel_x != 0 || action->rel_y != 0)
-            os_mousemove(kb, action->rel_x, action->rel_y);
-        else {
-            os_keypress(kb, action->scan, action->down);
-            pthread_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
-            if (action->delay != UINT_MAX && action->delay) {    ///< local delay set
-                clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
-            } else if (kb->delay != UINT_MAX && kb->delay) {     ///< use default global delay
-                clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = kb->delay * 1000}, NULL);
-            } else if (a < (macro->actioncount - 1)) {  ///< use delays depending on macro length
-                if (a > 200) {
-                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 100000}, NULL);
-                } else if (a > 20) {
-                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000}, NULL);
+    int firstloop = 1;
+    while(1){
+        /// Send events for each keypress in the macro
+        queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
+        for (int a = 0; a < macro->actioncount; a++) {
+            macroaction* action = macro->actions + a;
+            if (action->rel_x != 0 || action->rel_y != 0)
+                os_mousemove(kb, action->rel_x, action->rel_y);
+            else {
+                os_keypress(kb, action->scan, action->down);
+                queued_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
+                if (action->delay != UINT_MAX && action->delay) {    ///< local delay set
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
+                } else if (kb->delay != UINT_MAX && kb->delay) {     ///< use default global delay
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = kb->delay * 1000}, NULL);
+                } else if (a < (macro->actioncount - 1)) {  ///< use delays depending on macro length
+                    if (a > 200) {
+                        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 100000}, NULL);
+                    } else if (a > 20) {
+                        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000}, NULL);
+                    }
                 }
+                queued_mutex_lock(mmutex(kb));
             }
-            pthread_mutex_lock(mmutex(kb));
         }
+
+        queued_mutex_unlock(mmutex(kb));
+        // Check if the same combination is still held down.
+        // If the user let go and pressed again, it's okay, because we still need to repeat.
+        // The other threads will still be queued up and run after this.
+        // Maybe in the future we can add an option to prevent new threads with the same combo.
+        // Additionally, wait for a bit, because otherwise short macros will be repeated even if pressed only once
+        if(firstloop){
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &init_repeat_delay, NULL);
+            firstloop = 0;
+        }
+        // Give some time for userspace applications to catch up
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 50000000}, NULL);
+        queued_mutex_lock(imutex(kb));
+        const int retrigger = macromask(kb->input.keys, macro->combo);
+        queued_mutex_unlock(imutex(kb));
+        if(!retrigger)
+            break;
     }
+    queued_mutex_lock(mmutex(kb));
 
     pthread_mutex_lock(mmutex2(kb));    ///< protect the linked list and the mvar
     // ckb_info("Now leaving 0x%lx and waking up all others\n", (unsigned long int)pthread_self());
@@ -128,7 +152,7 @@ static void* play_macro(void* param) {
     pthread_cond_broadcast(mvar(kb));   ///< Wake up all waiting threads
     pthread_mutex_unlock(mmutex2(kb));  ///< for the linked list and the mvar
 
-    pthread_mutex_unlock(mmutex(kb));   ///< Sync keyboard input/output and colorization
+    queued_mutex_unlock(mmutex(kb));   ///< Sync keyboard input/output and colorization
     return 0;
 }
 
@@ -325,17 +349,17 @@ void cmd_bind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char*
     // Find the key to bind to
     uint tocode = 0;
     if(sscanf(to, "#x%ux", &tocode) != 1 && sscanf(to, "#%u", &tocode) == 1 && tocode < N_KEYS_INPUT){
-        pthread_mutex_lock(imutex(kb));
+        queued_mutex_lock(imutex(kb));
         mode->bind.base[keyindex] = tocode;
-        pthread_mutex_unlock(imutex(kb));
+        queued_mutex_unlock(imutex(kb));
         return;
     }
     // If not numeric, look it up
     for(int i = 0; i < N_KEYS_INPUT; i++){
         if(kb->keymap[i].name && !strcmp(to, kb->keymap[i].name)){
-            pthread_mutex_lock(imutex(kb));
+            queued_mutex_lock(imutex(kb));
             mode->bind.base[keyindex] = kb->keymap[i].scan;
-            pthread_mutex_unlock(imutex(kb));
+            queued_mutex_unlock(imutex(kb));
             return;
         }
     }
@@ -347,9 +371,9 @@ void cmd_unbind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const cha
 
     if(keyindex >= N_KEYS_INPUT)
         return;
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     mode->bind.base[keyindex] = KEY_UNBOUND;
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }
 
 void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* to){
@@ -358,9 +382,9 @@ void cmd_rebind(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const cha
 
     if(keyindex >= N_KEYS_INPUT)
         return;
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     mode->bind.base[keyindex] = kb->keymap[keyindex].scan;
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }
 
 static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, usbdevice* kb){
@@ -488,7 +512,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
 void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char* keys, const char* assignment){
     (void)notifynumber;
 
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
     _cmd_macro(mode, keys, assignment, kb);
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
 }

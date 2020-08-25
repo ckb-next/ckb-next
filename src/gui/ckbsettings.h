@@ -8,9 +8,42 @@
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 
-// QSettings replacement with convenience functions
+class CkbSettingsBase
+{
+public:
+    virtual void        beginGroup(const QString& prefix) = 0;
+    virtual void        endGroup() = 0;
+    virtual QStringList childGroups() const = 0;
+    virtual QStringList childKeys() const = 0;
+    virtual bool        contains(const QString& key) const = 0;
+    virtual QVariant    value(const QString& key, const QVariant& defaultValue = QVariant()) const = 0;
+    virtual void        setValue(const QString& key, const QVariant& value) = 0;
+    virtual void        remove(const QString& key) = 0;
+    bool                containsGroup(const QString& group);
+};
 
-class CkbSettings
+// QSettings wrapper to use common functions for export/import
+class CkbExternalSettings : public CkbSettingsBase, public QSettings
+{
+public:
+    CkbExternalSettings(const QString& s, const QSettings::Format fmt, const quint16& ver): QSettings(s, fmt), _currentProfileVer(ver) {}
+    void        beginGroup(const QString& prefix) { QSettings::beginGroup(prefix); }
+    void        endGroup() {QSettings::endGroup(); }
+    QStringList childGroups() const {return QSettings::childGroups(); }
+    QStringList childKeys() const { return QSettings::childKeys(); }
+    bool        contains(const QString& key) const { return QSettings::contains(key); }
+    QVariant    value(const QString& key, const QVariant& defaultValue = QVariant()) const { return QSettings::value(key, defaultValue); }
+    void        setValue(const QString& key, const QVariant& value) { QSettings::setValue(key, value); }
+    void        remove(const QString& key) { QSettings::remove(key); }
+
+    // Class-specific
+    quint16 profileVer() const { return _currentProfileVer; }
+private:
+    quint16 _currentProfileVer;
+};
+
+// QSettings replacement with convenience functions
+class CkbSettings : public CkbSettingsBase
 {
 public:
     // Basic settings object. No default group.
@@ -43,7 +76,6 @@ public:
     QStringList childGroups() const;
     QStringList childKeys() const;
     bool        contains(const QString& key) const;
-    bool        containsGroup(const QString& group);
     QVariant    value(const QString& key, const QVariant& defaultValue = QVariant()) const;
     void        setValue(const QString& key, const QVariant& value);
     void        remove(const QString& key);
@@ -63,11 +95,11 @@ private:
 class SGroup
 {
 public:
-    inline SGroup(CkbSettings& settings, const QString& prefix) : _settings(settings) { settings.beginGroup(prefix); }
+    inline SGroup(CkbSettingsBase& settings, const QString& prefix) : _settings(settings) { settings.beginGroup(prefix); }
     inline ~SGroup() { _settings.endGroup(); }
 
 private:
-    CkbSettings& _settings;
+    CkbSettingsBase& _settings;
 };
 
 #endif // CKBSETTINGS_H

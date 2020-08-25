@@ -33,13 +33,9 @@ public:
     KbBind(KbMode* modeParent, Kb* devParent, const KeyMap& keyMap, const KbBind& other);
 
     // Load and save from stored settings
-    void        load(CkbSettings& settings);
-    void        save(CkbSettings& settings);
+    void        load(CkbSettingsBase& settings);
+    void        save(CkbSettingsBase& settings);
     inline bool needsSave() const                   { return _needsSave; }
-
-    // Import/Export
-    void bindExport(QSettings *settings);
-    void bindImport(QSettings *settings);
 
     // Key map
     inline const KeyMap&    map()                   { return _map; }

@@ -23,13 +23,9 @@ public:
     const KbPerf& operator= (const KbPerf& rhs);
 
     // Load and save from stored settings
-    void        load(CkbSettings& settings);
-    void        save(CkbSettings& settings);
+    void        load(CkbSettingsBase& settings);
+    void        save(CkbSettingsBase& settings);
     inline bool needsSave() const { return _needsSave; }
-
-    // Import/Export
-    void perfExport(QSettings* settings);
-    void perfImport(QSettings* settings);
 
     // Mouse lift height
     enum height {

@@ -23,15 +23,11 @@ public:
     };
 
     // Load an animation from settings
-    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettings& settings);
-    // Load an animation from exported profile
-    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, QSettings* settings);
+    KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettingsBase &settings);
     // Save an animation to settings
-    void save(CkbSettings& settings);
+    void save(CkbSettingsBase &settings);
     inline bool needsSave() const { return _needsSave; }
 
-    // Import/Export
-    void animExport(QSettings* settings);
     // Create a new animation
     KbAnim(QObject* parent, const KeyMap& map, const QString& name, const QStringList& keys, const AnimScript* script);
     // Copy an existing animation

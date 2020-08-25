@@ -104,6 +104,7 @@ cmake_dependent_option(WITH_PIPE     "Build with 'Pipe' animation."     ON "WITH
 if (LINUX)
     cmake_dependent_option(WITH_MVIZ  "Build with music visualizer."           ON "WITH_ANIMATIONS;WITH_GUI" OFF)
     cmake_dependent_option(USE_XCB    "Build with features that require XCB."  ON  "WITH_GUI" OFF)
+    cmake_dependent_option(USE_DBUS_MENU "Build with DBus support for the tray."  ON  "WITH_GUI" OFF)
     option(USE_PORTAUDIO              "Use portaudio for music visualizer."    OFF)
 else ()
     cmake_dependent_option(WITH_MVIZ   "Build with music visualizer."          OFF "WITH_ANIMATIONS;WITH_GUI" OFF)
@@ -114,6 +115,7 @@ option(DISABLE_UPDATER "Disable the ckb-next updater. This option should only be
 option(DEBUG_USB_SEND  "Show the contents of USB packets being sent to device."                                OFF)
 option(DEBUG_USB_RECV  "Show the contents of USB packets being received from device through usbrecv()."        OFF)
 option(DEBUG_USB_INPUT "Show the contents of USB packets being received from device through the input thread." OFF)
+option(DEBUG_MUTEX     "Show debugging information regarding thread synchronisation." OFF)
 
 # Options: install
 if (MACOS)
@@ -137,7 +139,6 @@ option(SAFE_UNINSTALL "Execute pre-uninstall tasks to ensure correct removal.
     Intended to be used with direct removals without package manager." OFF)
 
 option(WITH_SHIPPED_QUAZIP "Use shipped QuaZip5 instead of system package" OFF)
-option(USE_APPINDICATOR_OVERRIDE "Use gtk2 Appindicator for Qt > 5.7." OFF)
 
 if (NOT WITH_GUI)
     message(WARNING "Building without GUI. Proceed only if you know what you are doing.")

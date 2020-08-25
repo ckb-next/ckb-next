@@ -171,7 +171,8 @@ set_target_properties(
 target_compile_options(
     ckb-next-daemon
       PRIVATE
-        "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
+        "${CKB_NEXT_COMMON_COMPILE_FLAGS}"
+        "${CKB_NEXT_EXTRA_C_FLAGS}")
 
 if (MAC_LEGACY)
     message(WARNING "Building a legacy daemon")

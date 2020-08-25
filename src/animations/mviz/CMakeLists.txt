@@ -99,7 +99,8 @@ set_target_properties(
 target_compile_options(
     mviz
       PRIVATE
-        "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
+        "${CKB_NEXT_COMMON_COMPILE_FLAGS}"
+        "${CKB_NEXT_EXTRA_C_FLAGS}")
 
 add_sanitizers(mviz)
 

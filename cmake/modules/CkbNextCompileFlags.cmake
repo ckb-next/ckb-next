@@ -41,7 +41,6 @@ list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
         -Wcast-align
         -Winit-self
         -Wno-unused-parameter
-        -Werror=incompatible-pointer-types
         -Werror=return-type
         $<$<CONFIG:Debug>:${opt_lvl}>
         #    $<$<CONFIG:Debug>:-Wfloat-equal>
@@ -64,3 +63,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_COMPILER_VERSION VERSI
         -Wcast-align=strict
     )
 endif()
+
+set(CKB_NEXT_EXTRA_C_FLAGS "")
+list(APPEND CKB_NEXT_EXTRA_C_FLAGS
+        -Werror=incompatible-pointer-types
+    )

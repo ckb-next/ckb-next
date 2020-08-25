@@ -47,7 +47,8 @@ foreach (animation IN ITEMS GRADIENT HEAT PINWHEEL RAIN RANDOM RIPPLE WAVE INVAD
     target_compile_options(
       ${animation}
         PRIVATE
-          "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
+          "${CKB_NEXT_COMMON_COMPILE_FLAGS}"
+          "${CKB_NEXT_EXTRA_C_FLAGS}")
 
     add_sanitizers(${animation})
 

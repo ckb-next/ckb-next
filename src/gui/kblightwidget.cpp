@@ -19,19 +19,7 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
     connect(ui->keyWidget, SIGNAL(M95LightToggled()), this, SLOT(toggleM95Light()));
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
-
-    MainWindow* mainWindow = nullptr;
-    foreach(QWidget* widget, qApp->topLevelWidgets()){
-       if(widget->inherits("QMainWindow")) {
-           mainWindow = static_cast<MainWindow*>(widget);
-           break;
-       }
-    }
-
-    if(mainWindow == nullptr)
-        qDebug() << "Couldn't find MainWindow in kblightwidget.cpp";
-    else
-        connect(mainWindow, &MainWindow::trayIconScrolled, this, &KbLightWidget::brightnessScroll);
+    connect(MainWindow::mainWindow, &MainWindow::trayIconScrolled, this, &KbLightWidget::brightnessScroll);
 
     // Restore "show animated" setting
     ui->showAnimBox->setChecked(!CkbSettings::get("UI/Light/ShowBaseOnly").toBool());

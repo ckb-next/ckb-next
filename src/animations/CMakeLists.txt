@@ -28,10 +28,13 @@
 # No need to check for WITH_ANIMATIONS, because all the options below
 # already depend on it through cmake_dependent_option()
 
+add_custom_target(animations)
+
 foreach (animation IN ITEMS GRADIENT HEAT PINWHEEL RAIN RANDOM RIPPLE WAVE INVADERS LIFE SNAKE PIPE)
   if (WITH_${animation})
     string(TOLOWER ${animation} animation)
     add_executable(${animation} ${animation}/main.c)
+    add_dependencies(animations ${animation})
 
     target_link_libraries(
       ${animation}
@@ -60,5 +63,6 @@ endforeach ()
 
 if (WITH_MVIZ)
   add_subdirectory(mviz)
+  add_dependencies(animations mviz)
 endif ()
 

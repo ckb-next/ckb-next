@@ -2,7 +2,7 @@
 #include "ui_kperfwidget.h"
 #include "modeselectdialog.h"
 #include <cmath>
-#include "qoverloadlegacy.h"
+#include "compat/qoverloadlegacy.h"
 
 ///
 /// \brief KPerfWidget::KPerfWidget sets up the UI for Keyboard Performace panel

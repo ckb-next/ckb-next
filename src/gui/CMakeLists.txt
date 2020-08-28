@@ -193,7 +193,8 @@ if (MACOS OR LINUX)
               modeselectdialog.h
               mperfwidget.h
               nowheelcombobox.h
-              qoverloadlegacy.h
+              compat/qoverloadlegacy.h
+              compat/qrand.h
               rebindwidget.h
               rlistwidget.h
               settingswidget.h

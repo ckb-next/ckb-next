@@ -5,6 +5,7 @@
 #include "kblight.h"
 #include "kbbind.h"
 #include "kbperf.h"
+#include "compat/qrand.h"
 
 // ID structure for modes/profiles. Stores a GUID indentifying the item as well as a 32-bit number representing its last modification.
 
@@ -26,7 +27,7 @@ struct UsbId {
 
     // Generate a new random ID
     void newGuid()                                      { guid = QUuid::createUuid(); }
-    void newModified()                                  { quint32 newMod; do { newMod = qrand(); } while(newMod == modified); modified = newMod; }
+    void newModified()                                  { quint32 newMod; do { newMod = Q_RAND(); } while(newMod == modified); modified = newMod; }
 };
 
 class Kb;

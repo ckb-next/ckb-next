@@ -42,6 +42,7 @@ list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
         -Winit-self
         -Wno-unused-parameter
         -Werror=return-type
+        -Wshadow
         $<$<CONFIG:Debug>:${opt_lvl}>
         #    $<$<CONFIG:Debug>:-Wfloat-equal>
         #    $<$<CONFIG:Debug>:-Wundef>

@@ -904,20 +904,26 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
         ckb_info("ckb%i %s (via %s:%d) %s %s", devnum, function, file, line, prefix, converted);
 }
 
-void reactivate_devices()
-{
+#define TRY_WITH_RESET_NOFREE(action)                \
+    while(action){                                   \
+        if(usb_tryreset(kb)){                        \
+            ckb_err(#action " failed after resume"); \
+            return;                                  \
+        }                                            \
+    }
+
+void reactivate_devices(){
     ckb_info("System has woken from sleep");
-    usbdevice *kb = NULL;
     for(int i = 1; i < DEV_MAX; i++){
-        kb = keyboard + i;
+        usbdevice* kb = keyboard + i;
         queued_mutex_lock(dmutex(kb));
-        if(IS_CONNECTED(keyboard + i)){
+        if(IS_CONNECTED(kb) && !NEEDS_FW_UPDATE(kb) && kb->active){
             // If the device was active, mark it as disabled and re-enable it
-            if(kb->active){
-                kb->active = 0;
-                const devcmd* vt = kb->vtable;
-                vt->active(kb, 0, 0, 0, 0);
-            }
+            kb->active = 0;
+            const devcmd* vt = kb->vtable;
+            TRY_WITH_RESET_NOFREE(vt->active(kb, 0, 0, 0, 0));
+            TRY_WITH_RESET_NOFREE(vt->updatergb(kb, 1));
+            TRY_WITH_RESET_NOFREE(vt->updatedpi(kb, 1));
         }
         queued_mutex_unlock(dmutex(kb));
     }

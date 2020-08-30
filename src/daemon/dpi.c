@@ -114,12 +114,12 @@ int updatedpi(usbdevice* kb, int force){
         return 0;
     lastdpi->forceupdate = newdpi->forceupdate = 0;
 
-    if (newdpi->current != lastdpi->current) {
+    if (newdpi->current != lastdpi->current || force) {
         // Before we switch the current DPI stage, make sure the stage we are
         // switching to is both enabled and configured to the correct DPI.
 
         // Enable the stage if necessary.
-        if ((lastdpi->enabled & 1 << newdpi->current) == 0) {
+        if ((lastdpi->enabled & 1 << newdpi->current) == 0 || force) {
             uchar newenabled;
             // If the new enabled flags contain both the current and previous
             // stages, use it.
@@ -139,7 +139,7 @@ int updatedpi(usbdevice* kb, int force){
         }
         // Set the DPI for the new stage if necessary.
         if (newdpi->x[newdpi->current] != lastdpi->x[newdpi->current] ||
-            newdpi->y[newdpi->current] != lastdpi->y[newdpi->current]) {
+            newdpi->y[newdpi->current] != lastdpi->y[newdpi->current] || force) {
             uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
             data_pkt[2] |= newdpi->current;
             // Set the independent X/Y bit if the X/Y values differ
@@ -164,7 +164,7 @@ int updatedpi(usbdevice* kb, int force){
     // Send X/Y DPIs. We've changed to the new stage already so these can be set
     // safely.
     for(int i = 0; i < DPI_COUNT; i++){
-        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i])
+        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i] && !force)
             continue;
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
         data_pkt[2] |= i;
@@ -180,17 +180,17 @@ int updatedpi(usbdevice* kb, int force){
     }
 
     // Send settings
-    if (newdpi->enabled != lastdpi->enabled) {
+    if (newdpi->enabled != lastdpi->enabled || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIMASK, 0, newdpi->enabled };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
     }
-    if (newdpi->lift != lastdpi->lift) {
+    if (newdpi->lift != lastdpi->lift || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_LIFT, 0, newdpi->lift };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
     }
-    if (newdpi->snap != lastdpi->snap) {
+    if (newdpi->snap != lastdpi->snap || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_SNAP, 0, newdpi->snap, 0x05 };
         if(!usbsend(kb, data_pkt, 1))
             return -2;

@@ -244,7 +244,7 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
         if(!usbrecv(kb, data_pkt[i], in_pkt[i]))
             return -2;
         if(memcmp(in_pkt[i], data_pkt[i], 4)){
-            ckb_err("Bad input header\n");
+            ckb_err("Bad input header");
             return -3;
         }
     }
@@ -267,7 +267,7 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
         if(!usbrecv(kb, data_pkt, in_pkt))
             return -2;
         if(memcmp(in_pkt, data_pkt, 4)){
-            ckb_err("Bad input header\n");
+            ckb_err("Bad input header");
             return -3;
         }
         // Copy to profile

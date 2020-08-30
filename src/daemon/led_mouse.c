@@ -72,7 +72,7 @@ int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
         if(!usbrecv(kb, data_pkt, in_pkt))
             return -1;
         if(memcmp(in_pkt, data_pkt, 4)){
-            ckb_err("Bad input header\n");
+            ckb_err("Bad input header");
             return -2;
         }
         // Copy data
@@ -99,7 +99,7 @@ int updatergb_mouse_legacy(usbdevice* kb, int force){
     // Anything else is on
     ushort lastwValue = !!(lastlight->r[MOUSE_BACK_LED] + lastlight->g[MOUSE_BACK_LED] + lastlight->b[MOUSE_BACK_LED]);
     ushort newwValue = !!(newlight->r[MOUSE_BACK_LED] + newlight->g[MOUSE_BACK_LED] + newlight->b[MOUSE_BACK_LED]);
-    //ckb_info("last w %u, neww %u\n", lastwValue, newwValue);
+    //ckb_info("last w %u, neww %u", lastwValue, newwValue);
     if(!force && !lastlight->forceupdate && !newlight->forceupdate && lastwValue == newwValue)
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;

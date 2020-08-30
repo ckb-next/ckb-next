@@ -38,7 +38,7 @@ static void quit() {
         }
         queued_mutex_unlock(devmutex + i);
     }
-    ckb_info("Closing root controller\n");
+    ckb_info("Closing root controller");
     rmdevpath(keyboard);
     usbkill();
 }
@@ -179,13 +179,13 @@ int main(int argc, char** argv){
     if(pidfile){
         pid_t pid;
         if(fscanf(pidfile, "%d", &pid) == EOF)
-            ckb_err("PID fscanf returned EOF (%s)\n", strerror(errno));
+            ckb_err("PID fscanf returned EOF (%s)", strerror(errno));
         fclose(pidfile);
         if(pid > 0){
             // kill -s 0 checks if the PID is active but doesn't send a signal
             if(!kill(pid, 0)){
-                ckb_fatal_nofile("ckb-next-daemon is already running (PID %d). Try `killall ckb-next-daemon`.\n", pid);
-                ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)\n", pidpath);
+                ckb_fatal_nofile("ckb-next-daemon is already running (PID %d). Try `killall ckb-next-daemon`.", pid);
+                ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)", pidpath);
                 return 0;
             }
         }
@@ -200,25 +200,25 @@ int main(int argc, char** argv){
         if(sscanf(argument, "--gid=%u", &newgid) == 1){
             // Set dev node GID
             gid = newgid;
-            ckb_info_nofile("Setting /dev node gid: %u\n", newgid);
+            ckb_info_nofile("Setting /dev node gid: %u", newgid);
         } else if(!strcmp(argument, "--nobind")){
             // Disable key notifications and rebinding
             features_mask &= ~FEAT_BIND & ~FEAT_NOTIFY;
-            ckb_info_nofile("Key binding and key notifications are disabled\n");
+            ckb_info_nofile("Key binding and key notifications are disabled");
         } else if(!strcmp(argument, "--nonotify")){
             // Disable key notifications
             features_mask &= ~FEAT_NOTIFY;
-            ckb_info_nofile("Key notifications are disabled\n");
+            ckb_info_nofile("Key notifications are disabled");
         } else if(sscanf(argument, "--hwload=%6s", hwload) == 1){
             if(!strcmp(hwload, "always") || !strcmp(hwload, "yes") || !strcmp(hwload, "y") || !strcmp(hwload, "a")){
                 hwload_mode = 2;
-                ckb_info_nofile("Setting hardware load: always\n");
+                ckb_info_nofile("Setting hardware load: always");
             } else if(!strcmp(hwload, "tryonce") || !strcmp(hwload, "try") || !strcmp(hwload, "once") || !strcmp(hwload, "t") || !strcmp(hwload, "o")){
                 hwload_mode = 1;
-                ckb_info_nofile("Setting hardware load: tryonce\n");
+                ckb_info_nofile("Setting hardware load: tryonce");
             } else if(!strcmp(hwload, "never") || !strcmp(hwload, "none") || !strcmp(hwload, "no") || !strcmp(hwload, "n")){
                 hwload_mode = 0;
-                ckb_info_nofile("Setting hardware load: never\n");
+                ckb_info_nofile("Setting hardware load: never");
             }
         } else if(!strcmp(argument, "--nonroot")){
             // Allow running as a non-root user
@@ -228,7 +228,7 @@ int main(int argc, char** argv){
         else if(!strcmp(argument, "--nomouseaccel")){
             // On OSX, provide an option to disable mouse acceleration
             features_mask &= ~FEAT_MOUSEACCEL;
-            ckb_info_nofile("Mouse acceleration disabled\n");
+            ckb_info_nofile("Mouse acceleration disabled");
         }
 #endif
     }
@@ -236,17 +236,17 @@ int main(int argc, char** argv){
     // Check UID
     if(getuid() != 0){
         if(forceroot){
-            ckb_fatal_nofile("ckb-next-daemon must be run as root. Try `sudo %s`\n", argv[0]);
+            ckb_fatal_nofile("ckb-next-daemon must be run as root. Try `sudo %s`", argv[0]);
             exit(0);
         } else
-            ckb_warn_nofile("Warning: not running as root, allowing anyway per command-line parameter...\n");
+            ckb_warn_nofile("Warning: not running as root, allowing anyway per command-line parameter...");
     }
 
     // Make root keyboard
     umask(0);
     memset(keyboard, 0, sizeof(keyboard));
     if(!mkdevpath(keyboard))
-        ckb_info("Root controller ready at %s0\n", devpath);
+        ckb_info("Root controller ready at %s0", devpath);
 
     // Attempt to setup signal-safe signal handlers using socketpair(2)
     if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sighandler_pipe) != -1){
@@ -254,7 +254,7 @@ int main(int argc, char** argv){
         signal(SIGINT, sighandler);
         signal(SIGQUIT, sighandler);
     } else
-        ckb_warn_nofile("Unable to setup signal handlers\n");
+        ckb_warn_nofile("Unable to setup signal handlers");
 
 
     // Start the USB system

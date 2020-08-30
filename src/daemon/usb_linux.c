@@ -18,7 +18,7 @@ static char kbsyspath[DEV_MAX][FILENAME_MAX];
 int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
 #ifdef DEBUG_USB_SEND
     int ckb = INDEX_OF(kb, keyboard);
-    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
     if(len)
         print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
 #endif
@@ -27,14 +27,14 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, u
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     if (res == -1){
         int ioctlerrno = errno;
-        ckb_err_fn(" %s, res = 0x%x\n", file, line, strerror(ioctlerrno), res);
+        ckb_err_fn(" %s, res = 0x%x", file, line, strerror(ioctlerrno), res);
         if(ioctlerrno == ETIMEDOUT)
             return -1;
         else
             return 0;
 
     } else if (res != len)
-        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        ckb_warn_fn("Wrote %d bytes (expected %d)", file, line, res, MSG_SIZE);
 
     return res;
 }
@@ -98,7 +98,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         // If we need to read a response, lock the interrupt mutex
         if(is_recv)
             if(pthread_mutex_lock(intmutex(kb)))
-                ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
+                ckb_fatal("Error locking interrupt mutex in os_usbsend()");
 
         struct usbdevfs_bulktransfer transfer = {0};
         // All firmware versions for normal HID devices have the OUT endpoint at the end
@@ -116,7 +116,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 
     if (res <= 0){
         int ioctlerrno = errno;
-        ckb_err_fn(" %s, res = 0x%x\n", file, line, res ? strerror(ioctlerrno) : "No data written", res);
+        ckb_err_fn("%s, res = 0x%x", file, line, res ? strerror(ioctlerrno) : "No data written", res);
         if(res == -1 && ioctlerrno == ETIMEDOUT){
             if(is_recv)
                 pthread_mutex_unlock(intmutex(kb));
@@ -127,7 +127,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
             return 0;
         }
     } else if (res != MSG_SIZE)
-        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+        ckb_warn_fn("Wrote %d bytes (expected %d)", file, line, res, MSG_SIZE);
 #ifdef DEBUG_USB_SEND
     print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
 #endif
@@ -174,31 +174,31 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         int condret = pthread_cond_timedwait(intcond(kb), intmutex(kb), &condwait);
         if(condret != 0){
             if(pthread_mutex_unlock(intmutex(kb)))
-                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
+                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
             if(condret == ETIMEDOUT)
-                ckb_warn_fn("ckb%d: Timeout while waiting for response\n", file, line, INDEX_OF(kb, keyboard));
+                ckb_warn_fn("ckb%d: Timeout while waiting for response", file, line, INDEX_OF(kb, keyboard));
             else
-                ckb_warn_fn("Interrupt cond error %i\n", file, line, condret);
+                ckb_warn_fn("Interrupt cond error %i", file, line, condret);
             return -1;
         }
         memcpy(in_msg, kb->interruptbuf, MSG_SIZE);
         memset(kb->interruptbuf, 0, MSG_SIZE);
         res = MSG_SIZE;
         if(pthread_mutex_unlock(intmutex(kb)))
-            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
+            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
     } else {
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
         if(res <= 0){
             // This is done because ckb_err_fn can set errno itself
             int ioctlerrno = errno;
-            ckb_err_fn("%s\n", file, line, res ? strerror(ioctlerrno) : "No data read");
+            ckb_err_fn("%s", file, line, res ? strerror(ioctlerrno) : "No data read");
             if(res == -1 && ioctlerrno == ETIMEDOUT)
                 return -1;
             else
                 return 0;
         } else if(res != MSG_SIZE)
-            ckb_warn_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+            ckb_warn_fn("Read %d bytes (expected %d)", file, line, res, MSG_SIZE);
     }
 
 #ifdef DEBUG_USB_RECV
@@ -242,7 +242,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
     struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 5000, 0 };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     if(res <= 0){
-        ckb_err_fn("%s\n", file, line, res ? strerror(errno) : "No data written");
+        ckb_err_fn("%s", file, line, res ? strerror(errno) : "No data written");
         return 1;
     }
     return 0;
@@ -277,7 +277,7 @@ void os_sendindicators(usbdevice* kb) {
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     queued_mutex_lock(dmutex(kb));
     if(res <= 0) {
-        ckb_err("%s\n", res ? strerror(errno) : "No data written");
+        ckb_err("%s", res ? strerror(errno) : "No data written");
         if (usb_tryreset(kb) == 0 && countForReset++ < 3) {
             os_sendindicators(kb);
         }
@@ -302,7 +302,7 @@ void* os_inputmain(void* context){
     int fd = kb->handle - 1;
     ushort vendor = kb->vendor, product = kb->product;
     int index = INDEX_OF(kb, keyboard);
-    ckb_info("Starting input thread for %s%d\n", devpath, index);
+    ckb_info("Starting input thread for %s%d", devpath, index);
 
     /// Here the actions in detail:
     ///
@@ -310,7 +310,7 @@ void* os_inputmain(void* context){
     /// For RGB, monitor all but the last, as it's used for input/output
     int urbcount = ((IS_LEGACY(vendor, product) || product == P_ST100) ? kb->epcount : (kb->epcount - 1));
     if (urbcount == 0) {
-        ckb_err("urbcount = 0, so there is nothing to claim in os_inputmain()\n");
+        ckb_err("urbcount = 0, so there is nothing to claim in os_inputmain()");
         return 0;
     }
 
@@ -346,7 +346,7 @@ void* os_inputmain(void* context){
         // usbX/X-X/X-X:1.0/ep_80
         // ~~~~~~~~~~~~~~~~~~~^
         if(path[strlen(path) - 3] == '_'){
-            ckb_info("Applying udev endpoint workaround for %s\n", path);
+            ckb_info("Applying udev endpoint workaround for %s", path);
             // Skip the current entry
             udeventry = nextentry;
             nextentry = udev_list_entry_get_next(udeventry);
@@ -368,9 +368,9 @@ void* os_inputmain(void* context){
         if(sizehex)
             sscanf(sizehex, "%hx", &size);
         else
-            ckb_warn("Unable to read wMaxPacketSize for %s, assuming 64\n", epstr);
+            ckb_warn("Unable to read wMaxPacketSize for %s, assuming 64", epstr);
 #ifdef DEBUG
-        ckb_info("Endpoint path %s has wMaxPacketSize %i\n", epstr, size);
+        ckb_info("Endpoint path %s has wMaxPacketSize %i", epstr, size);
 #endif
         // Increment the udev list pointer
         udeventry = nextentry;
@@ -425,7 +425,7 @@ void* os_inputmain(void* context){
     ///
     /// If the endless loop is terminated, clean up by discarding the URBs via ioctl(USBDEVFS_DISCARDURB),
     /// free the URB buffers and return a null pointer as thread exit code.
-    ckb_info("Stopping input thread for %s%d\n", devpath, index);
+    ckb_info("Stopping input thread for %s%d", devpath, index);
     for(int i = 0; i < urbcount; i++){
         ioctl(fd, USBDEVFS_DISCARDURB, urbs + i);
         free(urbs[i].buffer);
@@ -458,8 +458,8 @@ static int usbunclaim(usbdevice* kb, int resetting) {
     }
     // Intentional unclean exit workaround, because usbhid hangs while initialising these devices.
     if (NEEDS_UNCLEAN_EXIT(kb)) {
-        ckb_warn("Your %s is being uncleanly removed to speed up shutdown times.\n", kb->name);
-        ckb_warn("If you still need the device, you will have to restart ckb-next-daemon.\n");
+        ckb_warn("Your %s is being uncleanly removed to speed up shutdown times.", kb->name);
+        ckb_warn("If you still need the device, you will have to restart ckb-next-daemon.");
         return 0;
     }
     // For RGB keyboards, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
@@ -512,14 +512,14 @@ void os_closeusb(usbdevice* kb){
 static int usbclaim(usbdevice* kb){
     int count = kb->epcount;
 #ifdef DEBUG
-    ckb_info("claiming %d endpoints\n", count);
+    ckb_info("claiming %d endpoints", count);
 #endif // DEBUG
 
     for(int i = 0; i < count; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
         ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
         if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {
-            ckb_err("Failed to claim interface %d: %s\n", i, strerror(errno));
+            ckb_err("Failed to claim interface %d: %s", i, strerror(errno));
             return -1;
         }
     }
@@ -531,7 +531,7 @@ static int usbclaim(usbdevice* kb){
 ///
 #define TEST_RESET(op)                                                      \
     if(op){                                                                 \
-        ckb_err_fn("resetusb failed: %s\n", file, line, strerror(errno));   \
+        ckb_err_fn("resetusb failed: %s", file, line, strerror(errno));   \
         if(errno == EINTR || errno == EAGAIN)                               \
             return -1;              /* try again if status code says so */  \
         return -2;                  /* else, remove device */               \
@@ -607,7 +607,7 @@ int os_setupusb(usbdevice* kb) {
     int index = INDEX_OF(kb, keyboard);
 
     /// - Do some output about connecting interfaces
-    ckb_info("Connecting %s at %s%d\n", kb->name, devpath, index);
+    ckb_info("Connecting %s at %s%d", kb->name, devpath, index);
 
     ///
     /// - Claim the USB interfaces
@@ -616,7 +616,7 @@ int os_setupusb(usbdevice* kb) {
     ///
     const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
 #ifdef DEBUG
-    ckb_info("Claiming interfaces. name=%s, firmware=%s, ep_str=%s\n", name, firmware, ep_str);
+    ckb_info("Claiming interfaces. name=%s, firmware=%s, ep_str=%s", name, firmware, ep_str);
 #endif //DEBUG
     kb->epcount = 0;
     if(ep_str)
@@ -624,11 +624,11 @@ int os_setupusb(usbdevice* kb) {
     if(kb->epcount < 2 && !IS_SINGLE_EP(kb)){
         // If we have an RGB KB with 1 endpoint, it will be in BIOS mode.
         if(kb->epcount == 1){
-            ckb_info("Device is in BIOS mode\n");
+            ckb_info("Device is in BIOS mode");
             return -1;
         }
         // Something probably went wrong if we got here
-        ckb_err("Unable to read endpoint count from udev, assuming %d\n", kb->epcount);
+        ckb_err("Unable to read endpoint count from udev, assuming %d", kb->epcount);
         if (usb_tryreset(kb) == 0) { ///< Try to reset the device and recall the function
             static int retryCount = 0; ///< Don't do this endless in recursion
             if (retryCount++ < 5) {
@@ -637,12 +637,12 @@ int os_setupusb(usbdevice* kb) {
         }
         return -1;
         // ToDo are there special versions we have to detect? If there are, that was the old code to handle it:
-        // This shouldn't happen, but if it does, assume EP count based onckb_warn what the device is supposed to have
+        // This shouldn't happen, but if it does, assume EP count based on what the device is supposed to have
         // kb->epcount = (HAS_FEATURES(kb, FEAT_RGB) ? 4 : 3);
-        // ckb_warn("Unable to read endpoint count from udev, assuming %d and reading >>%s<<...\n", kb->epcount, ep_str);
+        // ckb_warn("Unable to read endpoint count from udev, assuming %d and reading >>%s<<...", kb->epcount, ep_str);
     }
     if(usbclaim(kb)){
-        ckb_err("Failed to claim interfaces: %s\n", strerror(errno));
+        ckb_err("Failed to claim interfaces: %s", strerror(errno));
         return -1;
     }
     return 0;
@@ -652,11 +652,11 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
     const char* path = udev_device_get_devnode(dev);
     const char* syspath = udev_device_get_syspath(dev);
     if(!path || !syspath || path[0] == 0 || syspath[0] == 0){
-        ckb_err("Failed to get device path\n");
+        ckb_err("Failed to get device path");
         return -1;
     }
 #ifdef DEBUG
-    ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s\n", vendor, product, path, syspath);
+    ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s", vendor, product, path, syspath);
 #endif // DEDBUG
     // Find a free USB slot
     for(int index = 1; index < DEV_MAX; index++){
@@ -673,7 +673,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
             // Open the sysfs device
             kb->handle = open(path, O_RDWR) + 1;
             if(kb->handle <= 0){
-                ckb_err("Failed to open USB device: %s\n", strerror(errno));
+                ckb_err("Failed to open USB device: %s", strerror(errno));
                 kb->handle = 0;
                 queued_mutex_unlock(dmutex(kb));
                 return -1;
@@ -690,7 +690,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
         }
         queued_mutex_unlock(dmutex(kb));
     }
-    ckb_err("No free devices\n");
+    ckb_err("No free devices");
     return -1;
 }
 
@@ -808,7 +808,7 @@ static time_t get_clock_monotonic_seconds() {
     struct timespec timespec_var = {0};
 
     if(clock_gettime(CLOCK_BOOTTIME, &timespec_var))
-        ckb_err("Error in clock_gettime()\n");
+        ckb_err("Error in clock_gettime()");
 
     return timespec_var.tv_sec;
 }
@@ -839,7 +839,7 @@ int usbmain(){
     /// Create the udev object with udev_new() (is a function from libudev.h)
     /// terminate -1 if error
     if(!(udev = udev_new())) {
-        ckb_fatal("Failed to initialize udev in usbmain(), usb_linux.c\n");
+        ckb_fatal("Failed to initialize udev in usbmain(), usb_linux.c");
         return -1;
     }
     

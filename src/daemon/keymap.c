@@ -332,15 +332,15 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     if(urblen == MSG_SIZE && firstbyte == CMD_GET){
         int retval = pthread_mutex_lock(intmutex(kb));
         if(retval)
-            ckb_fatal("Error locking interrupt mutex %i\n", retval);
+            ckb_fatal("Error locking interrupt mutex %i", retval);
         memcpy(kb->interruptbuf, buffer, MSG_SIZE);
         // signal os_usbrecv() that the data is ready.
         retval = pthread_cond_broadcast(intcond(kb));
         if(retval)
-            ckb_fatal("Error broadcasting pthread cond %i\n", retval);
+            ckb_fatal("Error broadcasting pthread cond %i", retval);
         retval = pthread_mutex_unlock(intmutex(kb));
         if(retval)
-            ckb_fatal("Error unlocking interrupt mutex %i\n", retval);
+            ckb_fatal("Error unlocking interrupt mutex %i", retval);
     } else {
         queued_mutex_lock(imutex(kb));
         if(IS_LEGACY_DEV(kb)) {
@@ -359,7 +359,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 else if(firstbyte == 0x05 && urblen == 21) // Seems to be on the Ironclaw RGB only
                     corsair_extended_mousecopy(kb->input.keys, buffer);
                 else
-                    ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x\n", firstbyte, ep);
+                    ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x", firstbyte, ep);
             } else {
                 // Assume Keyboard for everything else for now
                 // Accept NKRO only if device is active
@@ -371,7 +371,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         buffer++;
                     corsair_kbcopy(kb->input.keys, buffer);
                 } else
-                    ckb_err("Unknown data received in input thread %02x from endpoint %02x\n", firstbyte, ep);
+                    ckb_err("Unknown data received in input thread %02x from endpoint %02x", firstbyte, ep);
             }
         }
         ///
@@ -400,7 +400,7 @@ void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput
                 if(scan >= 0)
                     SET_KEYBIT(kbinput, hid_codes[keybit]);
                 else
-                    ckb_warn("Got unknown NKRO key press %d\n", keybit);
+                    ckb_warn("Got unknown NKRO key press %d", keybit);
             } else if(scan >= 0)
                 CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
         }
@@ -460,7 +460,7 @@ void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbin
             if(scan >= 0)
                 SET_KEYBIT(kbinput, scan);
             else
-                ckb_warn("Got unknown legacy 6kro key press %d\n", urbinput[i]);
+                ckb_warn("Got unknown legacy 6kro key press %d", urbinput[i]);
         }
     }
 }
@@ -481,7 +481,7 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
                 handle_nkro_key_input(kbinput, urbinput, length, legacy);
                 break;
             default:
-                ckb_warn("Got unknown legacy data\n");
+                ckb_warn("Got unknown legacy data");
         }
     } else {
         switch(urbinput[0]) {
@@ -492,7 +492,7 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
                 handle_nkro_media_keys(kbinput, urbinput, length);
                 break;
             default:
-                ckb_warn("Got unknown data\n");
+                ckb_warn("Got unknown data");
         }
     }
 }

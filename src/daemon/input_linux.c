@@ -12,7 +12,7 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
         // If that didn't work, try /dev/input/uinput instead
         fd = open("/dev/input/uinput", O_RDWR);
         if(fd < 0){
-            ckb_err("Failed to open uinput: %s\n", strerror(errno));
+            ckb_err("Failed to open uinput: %s", strerror(errno));
             return 0;
         }
     }
@@ -46,9 +46,9 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
     ioctl(fd, UI_SET_EVBIT, EV_SYN);
     // Create the device
     if(write(fd, indev, sizeof(*indev)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
     if(ioctl(fd, UI_DEV_CREATE)){
-        ckb_err("Failed to create uinput device: %s\n", strerror(errno));
+        ckb_err("Failed to create uinput device: %s", strerror(errno));
         close(fd);
         return 0;
     }
@@ -71,7 +71,7 @@ int os_inputopen(usbdevice* kb){
     // If not available, load the module
     if(fd < 0){
         if(system("modprobe uinput") != 0) {
-            ckb_fatal("Failed to load uinput module\n");
+            ckb_fatal("Failed to load uinput module");
             return 1;
         }
     }
@@ -115,16 +115,16 @@ void os_inputclose(usbdevice* kb){
     for(int key = 0; key < KEY_CNT; key++){
         event.code = key;
         if(write(kb->uinput_kb - 1, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s\n", strerror(errno));
+            ckb_warn("uinput write failed: %s", strerror(errno));
         if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s\n", strerror(errno));
+            ckb_warn("uinput write failed: %s", strerror(errno));
     }
     event.type = EV_SYN;
     event.code = SYN_REPORT;
     if(write(kb->uinput_kb - 1, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
     if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
     // Close the keyboard
     ioctl(kb->uinput_kb - 1, UI_DEV_DESTROY);
     close(kb->uinput_kb - 1);
@@ -142,7 +142,7 @@ static void isync(int fd){
     event.type = EV_SYN;
     event.code = SYN_REPORT;
     if(write(fd, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
 }
 
 void os_keypress(usbdevice* kb, int scancode, int down){
@@ -168,7 +168,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     if(write(fd, &event, sizeof(event)) > 0)
         isync(fd);
     else
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
@@ -181,14 +181,14 @@ void os_mousemove(usbdevice* kb, int x, int y){
         event.code = REL_X;
         event.value = x;
         if(write(fd, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s\n", strerror(errno));
+            ckb_warn("uinput write failed: %s", strerror(errno));
     }
     //send Y
     if(y!=0){
         event.code = REL_Y;
         event.value = y;
         if(write(fd, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s\n", strerror(errno));
+            ckb_warn("uinput write failed: %s", strerror(errno));
     }
     //send SYN
     isync(fd);

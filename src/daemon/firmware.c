@@ -24,7 +24,7 @@ int getfwversion(usbdevice* kb){
     if(!usbrecv(kb, data_pkt, in_pkt))
         return -1;
     if(in_pkt[0] != CMD_GET || in_pkt[1] != FIELD_IDENT){
-        ckb_err("Bad input header\n");
+        ckb_err("Bad input header");
         return -1;
     }
     char ident_str[3*MSG_SIZE+1] = "";
@@ -32,7 +32,7 @@ int getfwversion(usbdevice* kb){
     for (int i = 0; i < MSG_SIZE; i++) {
         sprintf(ident_str + (3 * i), "%02hhx ", in_pkt[i]);
     }
-    ckb_info("Received identification packet: %s\n", ident_str);
+    ckb_info("Received identification packet: %s", ident_str);
     ushort vendor, product, version, bootloader;
     // Copy the vendor ID, product ID, version, and poll rate from the firmware data
     memcpy(&version, in_pkt + 8, 2);
@@ -46,9 +46,9 @@ int getfwversion(usbdevice* kb){
     }
     // Print a warning if the message didn't match the expected data
     if(vendor != kb->vendor)
-        ckb_warn("Got vendor ID %04x (expected %04x)\n", vendor, kb->vendor);
+        ckb_warn("Got vendor ID %04x (expected %04x)", vendor, kb->vendor);
     if(product != kb->product)
-        ckb_warn("Got product ID %04x (expected %04x)\n", product, kb->product);
+        ckb_warn("Got product ID %04x (expected %04x)", product, kb->product);
     // Set firmware version and poll rate
     if(version == 0 || bootloader == 0){
         // Needs firmware update
@@ -56,7 +56,7 @@ int getfwversion(usbdevice* kb){
         kb->pollrate = -1;
     } else {
         if(version != kb->fwversion && kb->fwversion != 0)
-            ckb_warn("Got firmware version %04x (expected %04x)\n", version, kb->fwversion);
+            ckb_warn("Got firmware version %04x (expected %04x)", version, kb->fwversion);
         kb->fwversion = version;
         kb->pollrate = poll;
     }
@@ -64,7 +64,7 @@ int getfwversion(usbdevice* kb){
     if (kb->layout == LAYOUT_UNKNOWN) {
         kb->layout = in_pkt[23] + 1;
         if (kb->layout > LAYOUT_DUBEOLSIK) {
-            ckb_warn("Got unknown physical layout byte value %d, please file a bug report mentioning your keyboard's physical layout\n", in_pkt[23]);
+            ckb_warn("Got unknown physical layout byte value %d, please file a bug report mentioning your keyboard's physical layout", in_pkt[23]);
             kb->layout = LAYOUT_UNKNOWN;
         }
     }
@@ -80,13 +80,13 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     char* fwdata = calloc(1, FW_MAXSIZE + 256);
     int fd = open(path, O_RDONLY);
     if(fd == -1){
-        ckb_err("Failed to open firmware file %s: %s\n", path, strerror(errno));
+        ckb_err("Failed to open firmware file %s: %s", path, strerror(errno));
         free(fwdata);
         return FW_NOFILE;
     }
     ssize_t length = read(fd, fwdata, FW_MAXSIZE + 1);
     if(length <= 0x108 || length > FW_MAXSIZE){
-        ckb_err("Failed to read firmware file %s: %s\n", path, length <= 0 ? strerror(errno) : "Wrong size");
+        ckb_err("Failed to read firmware file %s: %s", path, length <= 0 ? strerror(errno) : "Wrong size");
         close(fd);
         free(fwdata);
         return FW_NOFILE;
@@ -100,11 +100,11 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     memcpy(&version, fwdata + 0x106, 2);
     // Check against the actual device
     if(vendor != kb->vendor || product != kb->product){
-        ckb_err("Firmware file %s doesn't match device (V: %04x P: %04x)\n", path, vendor, product);
+        ckb_err("Firmware file %s doesn't match device (V: %04x P: %04x)", path, vendor, product);
         free(fwdata);
         return FW_WRONGDEV;
     }
-    ckb_info("Loading firmware version %04x from %s\n", version, path);
+    ckb_info("Loading firmware version %04x from %s", version, path);
     nprintf(kb, nnumber, 0, "fwupdate %s 0/%d\n", path, (int)length);
     // Force the device to 10ms delay (we need to deliver packets very slowly to make sure it doesn't get overwhelmed)
     kb->usbdelay = 10;
@@ -141,14 +141,14 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         }
         if(index == 1){
             if(!usbsend(kb, data_pkt[0], 1)){
-                ckb_err("Firmware update failed\n");
+                ckb_err("Firmware update failed");
                 free(fwdata);
                 return FW_USBFAIL;
             }
             // The above packet can take a lot longer to process, so wait for a while
             sleep(3);
             if(!usbsend(kb, data_pkt[2], npackets - 1)){
-                ckb_err("Firmware update failed\n");
+                ckb_err("Firmware update failed");
                 free(fwdata);
                 return FW_USBFAIL;
             }
@@ -157,7 +157,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
             if(output >= length)
                 data_pkt[npackets][2] = length - last;
             if(!usbsend(kb, data_pkt[1], npackets)){
-                ckb_err("Firmware update failed\n");
+                ckb_err("Firmware update failed");
                 free(fwdata);
                 return FW_USBFAIL;
             }
@@ -170,14 +170,14 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         { CMD_SET, FIELD_RESET, RESET_SLOW, 0 }
     };
     if(!usbsend(kb, data_pkt2[0], 2)){
-        ckb_err("Firmware update failed\n");
+        ckb_err("Firmware update failed");
         free(fwdata);
         return FW_USBFAIL;
     }
     // Updated successfully
     kb->fwversion = version;
     mkfwnode(kb);
-    ckb_info("Firmware update complete\n");
+    ckb_info("Firmware update complete");
     free(fwdata);
     return FW_OK;
 }

@@ -30,7 +30,7 @@ int queued_mutex_trylock(queued_mutex_t* mutex); // Try to lock a queued_mutex w
 void queued_mutex_unlock(queued_mutex_t* mutex); // Unlock a queued_mutex
 
 #ifdef DEBUG_MUTEX
-#define MUTEX_DBG(str, kb, mutexarray) (ckb_info(str " accessed in %s:%d (%s) at ckb%d, TID 0x%lx, MID %p\n", __FILE__, __LINE__, __func__, INDEX_OF(kb, keyboard), pthread_self(), mutexarray + INDEX_OF(kb, keyboard)) & 0)
+#define MUTEX_DBG(str, kb, mutexarray) (ckb_info(str " accessed in %s:%d (%s) at ckb%d, TID 0x%lx, MID %p", __FILE__, __LINE__, __func__, INDEX_OF(kb, keyboard), pthread_self(), mutexarray + INDEX_OF(kb, keyboard)) & 0)
 #else
 #define MUTEX_DBG(a, b, c) 0
 #endif

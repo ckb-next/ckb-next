@@ -6,6 +6,7 @@
 // Commands
 #define BRAGI_SET           0x01
 #define BRAGI_GET           0x02
+#define BRAGI_CLOSE_HANDLE  0x05
 #define BRAGI_WRITE_DATA    0x06
 #define BRAGI_OPEN_HANDLE   0x0d
 

@@ -12,7 +12,39 @@ int setactive_bragi(usbdevice* kb, int active){
     uchar response[64] = {0};
     if(!usbrecv(kb, pkt, response))
         return 1;
+    if(response[2] != 0x00){
+        ckb_err("ckb%d: Failed to set device to SW mode 0x%hhx", INDEX_OF(kb, keyboard), response[2]);
+    }
     kb->active = active - 1;
+
+    // The daemon always sends RGB data through handle 0, so go ahead and open it
+    uchar light_init[64] = {BRAGI_MAGIC, BRAGI_OPEN_HANDLE, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING};
+    memset(response, 0, 64);
+    if(!usbrecv(kb, light_init, response))
+        return 1;
+
+    // Check if the device returned an error
+    // Non fatal for now. Should first figure out what the error codes mean.
+    // Device returns 0x03 on writes if we haven't opened the handle.
+    if(response[2] != 0x00){
+        ckb_err("ckb%d Bragi light init returned error 0x%hhx\n", INDEX_OF(kb, keyboard), response[2]);
+        // CUE seems to attempt to close and reopen the handle if it gets 0x03 on open
+        if(response[2] == 0x03){
+            uchar light_deinit[64] = {BRAGI_MAGIC, BRAGI_CLOSE_HANDLE, 0x01, BRAGI_LIGHTING_HANDLE};
+            if(!usbrecv(kb, light_deinit, response))
+                return 1;
+            if(response[2] != 0x00){
+                ckb_err("ckb%d: Close lighting handle failed with 0x%hhx", INDEX_OF(kb, keyboard), response[2]);
+            }
+            // Try to reopen it
+            if(!usbrecv(kb, light_init, response))
+                return 1;
+            if(response[2] != 0x00){
+                ckb_err("ckb%d Bragi light init (attempt 2) returned error 0x%hhx", INDEX_OF(kb, keyboard), response[2]);
+            }
+        }
+    }
+
     return 0;
 }
 
@@ -50,18 +82,6 @@ int start_mouse_bragi(usbdevice* kb, int makeactive){
     
     kb->features |= FEAT_ADJRATE;
     kb->features &= ~FEAT_HWLOAD;
-    
-    // The daemon always sends RGB data through handle 0, so go ahead and open it
-    uchar light_init[64] = {BRAGI_MAGIC, BRAGI_OPEN_HANDLE, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING};
-    memset(response, 0, 64);
-    if(!usbrecv(kb, light_init, response))
-        return 1;
-
-    // Check if the device returned an error
-    // Non fatal for now. Should first figure out what the error codes mean.
-    // Device returns 0x03 if we haven't opened the handle.
-    if(response[2] != 0x00)
-        ckb_err("ckb%d Bragi light init returned error 0x%hhx\n", INDEX_OF(kb, keyboard), response[2]);
 
     return 0;
 }

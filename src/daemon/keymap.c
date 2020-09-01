@@ -357,10 +357,17 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 // HID Mouse Input
                 // In HW mode, Bragi mouse is the same as NXP, but without a header
                 if(kb->protocol == PROTO_BRAGI) {
-                    if(kb->active && firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1)
-                        ckb_info("Ignoring previous URB");
-                    else
+                    // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
+                    if(kb->active) {
+                        if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1) {
+                            corsair_bragi_mousecopy(kb->input.keys, buffer);
+                        } else {
+                            kb->input.rel_x += (buffer[5] << 8) | buffer[4];
+                            kb->input.rel_y += (buffer[7] << 8) | buffer[6];
+                        }
+                    } else {
                         hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                    }
                 } else if(firstbyte == MOUSE_IN) {
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer + 1);
                 } else if(firstbyte == CORSAIR_IN) { // Corsair Mouse Input
@@ -580,6 +587,62 @@ void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     *yaxis += (urbinput[5] << 8) | urbinput[4];
 
     char wheel = urbinput[6];
+    if(wheel > 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    if(wheel < 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+}
+
+#define BRAGI_MOUSE_BUTTONS 16
+/*
+01 00 == Left
+02 00 == Right
+04 00 == middle
+10 00 == back thumb
+08 00 == front thumb
+80 00 == DPI Up
+00 01 == Dpi Dn
+20 00 == Left Front
+40 00 == Left Back
+00 02 == sniper
+*/
+
+// We have to do it this way, because if we patch the keymap, then we'll break standard input
+const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
+        0x00,
+        0x01,
+        0x02,
+        0x04,
+        0x03,
+        0x05,
+        0x06,
+        0x08,
+        0x09,
+        0x07, // Anything past this is untested
+        0x0A,
+        0x0B,
+        0x0C,
+        0x0D,
+        0x0E,
+        0x0F,
+    };
+
+void corsair_bragi_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
+    urbinput += 2;
+    for(int bit = 0; bit < BRAGI_MOUSE_BUTTONS; bit++){
+        int byte = bit / 8;
+        uchar test = 1 << (bit % 8);
+        if(urbinput[byte] & test)
+            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+        else
+            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+    }
+    
+    char wheel = urbinput[2];
     if(wheel > 0)
         SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
     else

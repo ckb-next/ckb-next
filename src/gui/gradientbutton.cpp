@@ -41,15 +41,15 @@ void GradientButton::fromString(const QString& string){
     _stops.clear();
     // Parse string with sscanf
     QByteArray cString = string.toLatin1();
-    const char* data = cString.data();
+    const char* dataStr = cString.data();
     char pos = -1;
     uchar a, r, g, b;
     while(1){
         int scanned = 0;
         signed char newpos;
-        if(sscanf(data, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
+        if(sscanf(dataStr, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
-        data += scanned;
+        dataStr += scanned;
         // Don't allow stops out-of-order or past 100
         if(newpos <= pos || newpos > 100)
             break;
@@ -60,7 +60,7 @@ void GradientButton::fromString(const QString& string){
     }
     if(_stops.count() == 0){
         // If nothing was read, try a single ARGB constant.
-        if(sscanf(data, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
+        if(sscanf(dataStr, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
             _stops.append(QGradientStop(0., QColor(r, g, b, a)));
             _stops.append(QGradientStop(1., QColor(r, g, b, 0.)));
         }

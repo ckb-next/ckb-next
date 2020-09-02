@@ -682,7 +682,6 @@ void Kb::readNotify(QString line){
                                 lightColor = color;
                             if(key.startsWith("dpi") && key.length() > 3){
                                 // DPI levels go to the KbPerf object instead of KbLight
-                                bool ok = false;
                                 int index = key.mid(3).toInt(&ok);
                                 if(ok)
                                     kbmode->perf()->dpiColor(index, color);

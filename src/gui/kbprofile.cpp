@@ -3,7 +3,7 @@
 #include <typeinfo>
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const KbProfile& other) :
-    QObject(parent), _currentMode(0), _name(other._name), _id(other._id), _keyMap(keyMap), _needsSave(true)
+    QObject(parent), _currentMode(0), _name(other._name), _usbId(other._usbId), _keyMap(keyMap), _needsSave(true)
 {
     foreach(KbMode* mode, other.modes()){
         KbMode* newMode = new KbMode(parent, keyMap, *mode);
@@ -14,14 +14,14 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const KbProfile& other) :
 }
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const QString& guid, const QString& modified) :
-    QObject(parent), _currentMode(0), _id(guid, modified.toUInt(0, 16)), _keyMap(keyMap), _needsSave(true)
+    QObject(parent), _currentMode(0), _usbId(guid, modified.toUInt(0, 16)), _keyMap(keyMap), _needsSave(true)
 {
-    if(_id.guid.isNull())
-        _id.guid = QUuid::createUuid();
+    if(_usbId.guid.isNull())
+        _usbId.guid = QUuid::createUuid();
 }
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings, const QString& guid) :
-    QObject(parent), _currentMode(0), _id(guid, 0), _keyMap(keyMap), _needsSave(false)
+    QObject(parent), _currentMode(0), _usbId(guid, 0), _keyMap(keyMap), _needsSave(false)
 {
     // Load data from preferences
     // If we're importing external profiles, then always read the GUID from the first group.
@@ -31,16 +31,16 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings
     _name = settings.value("Name").toString().trimmed();
     if(_name == "")
         _name = "Unnamed";
-    _id.modifiedString(settings.value("Modified").toString());
+    _usbId.modifiedString(settings.value("Modified").toString());
     if(settings.contains("HwModified"))
-        _id.hwModifiedString(settings.value("HwModified").toString());
+        _usbId.hwModifiedString(settings.value("HwModified").toString());
     else
-        _id.hwModified = _id.modified;
+        _usbId.hwModified = _usbId.modified;
     QUuid current = settings.value("CurrentMode").toString().trimmed();
     // Load modes
     uint count = settings.value("ModeCount").toUInt();
     for(uint i = 0; i < count; i++){
-        SGroup group(settings, QString::number(i));
+        SGroup subGroup(settings, QString::number(i));
         KbMode* mode = new KbMode(parent, _keyMap, settings);
         _modes.append(mode);
         // Set currentMode to the mode matching the current GUID, or the first mode in case it's not found
@@ -52,20 +52,20 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings
 void KbProfile::save(CkbSettingsBase& settings){
     if(typeid(settings) == typeid(CkbSettings)){
         _needsSave = false;
-        _id.newModified();
+        _usbId.newModified();
     }
     // Save data to preferences
     SGroup group(settings, id().guidString());
     settings.setValue("Name", name());
-    settings.setValue("Modified", _id.modifiedString());
-    settings.setValue("HwModified", _id.hwModifiedString());
+    settings.setValue("Modified", _usbId.modifiedString());
+    settings.setValue("HwModified", _usbId.hwModifiedString());
     if(_currentMode)
         settings.setValue("CurrentMode", _currentMode->id().guidString());
     // Save modes
     uint count = modeCount();
     settings.setValue("ModeCount", count);
     for(uint i = 0; i < count; i++){
-        SGroup group(settings, QString::number(i));
+        SGroup subGroup(settings, QString::number(i));
         KbMode* mode = _modes.at(i);
         mode->save(settings);
     }
@@ -83,7 +83,7 @@ bool KbProfile::needsSave() const {
 
 void KbProfile::newId(){
     _needsSave = true;
-    _id = UsbId();
+    _usbId = UsbId();
     foreach(KbMode* mode, _modes)
         mode->newId();
 }

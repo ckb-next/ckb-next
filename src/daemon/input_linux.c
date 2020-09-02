@@ -112,8 +112,8 @@ void os_inputclose(usbdevice* kb){
     struct input_event event;
     memset(&event, 0, sizeof(event));
     event.type = EV_KEY;
-    for(int key = 0; key < KEY_CNT; key++){
-        event.code = key;
+    for(int k = 0; k < KEY_CNT; k++){
+        event.code = k;
         if(write(kb->uinput_kb - 1, &event, sizeof(event)) <= 0)
             ckb_warn("uinput write failed: %s", strerror(errno));
         if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)

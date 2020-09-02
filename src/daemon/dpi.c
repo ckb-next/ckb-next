@@ -261,21 +261,21 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
 
     // Get X/Y DPIs
     for(int i = 0; i < DPI_COUNT; i++){
-        uchar data_pkt[MSG_SIZE] = { CMD_GET, FIELD_MOUSE, MOUSE_DPIPROF, 1 };
-        uchar in_pkt[MSG_SIZE];
-        data_pkt[2] |= i;
-        if(!usbrecv(kb, data_pkt, in_pkt))
+        uchar dpi_pkt[MSG_SIZE] = { CMD_GET, FIELD_MOUSE, MOUSE_DPIPROF, 1 };
+        uchar dpi_in_pkt[MSG_SIZE];
+        dpi_pkt[2] |= i;
+        if(!usbrecv(kb, dpi_pkt, dpi_in_pkt))
             return -2;
-        if(memcmp(in_pkt, data_pkt, 4)){
+        if(memcmp(dpi_in_pkt, dpi_pkt, 4)){
             ckb_err("Bad input header");
             return -3;
         }
         // Copy to profile
-        dpi->x[i] = (in_pkt[6] << 8) | in_pkt[5];
-        dpi->y[i] = (in_pkt[8] << 8) | in_pkt[7];
-        light->r[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[9];
-        light->g[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[10];
-        light->b[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[11];
+        dpi->x[i] = (dpi_in_pkt[6] << 8) | dpi_in_pkt[5];
+        dpi->y[i] = (dpi_in_pkt[8] << 8) | dpi_in_pkt[7];
+        light->r[LED_MOUSE + N_MOUSE_ZONES + i] = dpi_in_pkt[9];
+        light->g[LED_MOUSE + N_MOUSE_ZONES + i] = dpi_in_pkt[10];
+        light->b[LED_MOUSE + N_MOUSE_ZONES + i] = dpi_in_pkt[11];
     }
     // Finished. Set SW DPI light to the current hardware level
     light->r[LED_MOUSE + 2] = light->r[LED_MOUSE + N_MOUSE_ZONES + dpi->current];

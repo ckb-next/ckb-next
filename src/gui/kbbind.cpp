@@ -65,7 +65,7 @@ void KbBind::load(CkbSettingsBase& settings){
     bool useReal = settings.value("UseRealNames").toBool();
     _bind.clear();
     {
-        SGroup group(settings, "Keys");
+        SGroup subgroup(settings, "Keys");
         foreach(QString key, settings.childKeys()){
             QString name = key.toLower();
             if(!useReal)
@@ -87,7 +87,7 @@ void KbBind::save(CkbSettingsBase& settings){
     // Save key settings
     settings.setValue("UseRealNames", true);
     {
-        SGroup group(settings, "Keys");
+        SGroup subgroup(settings, "Keys");
         foreach(QString key, _bind.keys()){
             KeyAction* act = _bind.value(key);
             if(act && act->value() != KeyAction::defaultAction(key, devParent()->model()))

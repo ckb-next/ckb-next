@@ -122,7 +122,7 @@ public:
     void legacyActivated(QSystemTrayIcon::ActivationReason reason);
 
     KDbusImageStruct imageToStruct(const QImage &image);
-    KDbusImageVector iconToVector(const QIcon &icon);
+    KDbusImageVector iconToVector(const QIcon &icn);
     bool checkVisibility(QPoint pos, bool perform = true);
 
     static const int s_protocolVersion;

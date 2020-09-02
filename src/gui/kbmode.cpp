@@ -4,13 +4,13 @@
 
 KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const QString &guid, const QString& modified) :
     QObject(parent),
-    _name("Unnamed"), _id(guid, modified),
+    _name("Unnamed"), _usbId(guid, modified),
     _light(new KbLight(this, keyMap)), _bind(new KbBind(this, parent, keyMap)), _perf(new KbPerf(this)),
     _needsSave(true)
 {
     connect(_light, SIGNAL(updated()), this, SLOT(doUpdate()));
-    if(_id.guid.isNull())
-        _id.guid = QUuid::createUuid();
+    if(_usbId.guid.isNull())
+        _usbId.guid = QUuid::createUuid();
 }
 
 ///
@@ -21,7 +21,7 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const QString &guid, const QStr
 /// Constructor to copy an existing Keyboard-Mode KbMode &other
 KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other) :
     QObject(parent),
-    _name(other._name), _id(other._id),
+    _name(other._name), _usbId(other._usbId),
     _light(new KbLight(this, keyMap, *other._light)), _bind(new KbBind(this, parent, keyMap, *other._bind)), _perf(new KbPerf(this, *other._perf)),
     _needsSave(true)
 {
@@ -31,18 +31,18 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, const KbMode& other) :
 KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings) :
     QObject(parent),
     _name(settings.value("Name").toString().trimmed()),
-    _id(settings.value("GUID").toString().trimmed(), settings.value("Modified").toString().trimmed()),
+    _usbId(settings.value("GUID").toString().trimmed(), settings.value("Modified").toString().trimmed()),
     _light(new KbLight(this, keyMap)), _bind(new KbBind(this, parent, keyMap)), _perf(new KbPerf(this)),
     _needsSave(false)
 {
     if(settings.contains("HwModified"))
-        _id.hwModifiedString(settings.value("HwModified").toString());
+        _usbId.hwModifiedString(settings.value("HwModified").toString());
     else
-        _id.hwModified = _id.modified;
+        _usbId.hwModified = _usbId.modified;
 
     connect(_light, SIGNAL(updated()), this, SLOT(doUpdate()));
-    if(_id.guid.isNull())
-        _id.guid = QUuid::createUuid();
+    if(_usbId.guid.isNull())
+        _usbId.guid = QUuid::createUuid();
     if(_name == "")
         _name = "Unnamed";
     _light->load(settings);
@@ -52,7 +52,7 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings) :
 
 void KbMode::newId(){
     _needsSave = true;
-    _id = UsbId();
+    _usbId = UsbId();
     // Create new IDs for animations
     foreach(KbAnim* anim, _light->animList())
         anim->newId();
@@ -67,11 +67,11 @@ void KbMode::keyMap(const KeyMap &keyMap){
 void KbMode::save(CkbSettingsBase& settings){
     if(typeid(settings) == typeid(CkbSettings)){
         _needsSave = false;
-        _id.newModified();
+        _usbId.newModified();
     }
-    settings.setValue("GUID", _id.guidString());
-    settings.setValue("Modified", _id.modifiedString());
-    settings.setValue("HwModified", _id.hwModifiedString());
+    settings.setValue("GUID", _usbId.guidString());
+    settings.setValue("Modified", _usbId.modifiedString());
+    settings.setValue("HwModified", _usbId.hwModifiedString());
     settings.setValue("Name", _name);
     _light->save(settings);
     _bind->save(settings);

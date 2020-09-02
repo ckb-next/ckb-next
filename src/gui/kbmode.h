@@ -50,8 +50,8 @@ public:
     // Mode properties
     inline const QString&   name() const                    { return _name; }
     inline void             name(const QString& newName)    { _needsSave = true; _name = newName.trimmed(); if(_name == "") _name = "Unnamed"; }
-    inline UsbId&           id()                            { return _id; }
-    inline void             id(const UsbId& newId)          { _needsSave = true; _id = newId; }
+    inline UsbId&           id()                            { return _usbId; }
+    inline void             id(const UsbId& newId)          { _needsSave = true; _usbId = newId; }
     void newId();
 
     // Device key map
@@ -73,7 +73,7 @@ signals:
 
 private:
     QString _name;
-    UsbId _id;
+    UsbId _usbId;
 
     KbLight* _light;
     KbBind* _bind;

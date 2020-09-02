@@ -307,12 +307,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
     decPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     if(_rgbMode){
         // Draw key colors (RGB mode)
-        QHashIterator<QString, Key> k(keyMap);
-        uint i = -1;
-        while(k.hasNext()){
-            k.next();
-            i++;
-            const Key& key = k.value();
+        QHashIterator<QString, Key> keyIter(keyMap);
+        uint cnt = -1;
+        while(keyIter.hasNext()){
+            keyIter.next();
+            cnt++;
+            const Key& key = keyIter.value();
             if(!key.hasLed)
                 continue;
             float x = key.x + offX - 1.8f;
@@ -338,7 +338,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 color = *inDisplay;
             else {
                 // Otherwise, read from base map
-                color = _colorMap.value(k.key());
+                color = _colorMap.value(keyIter.key());
                 if(_monochrome)
                     color = monoRgb(qRed(color), qGreen(color), qBlue(color));
             }
@@ -404,12 +404,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
         font.setBold(true);
         font.setPixelSize(5.25f * scale);
         QFont font0 = font;
-        QHashIterator<QString, Key> k(keyMap);
-        uint i = -1;
-        while(k.hasNext()){
-            k.next();
-            i++;
-            const Key& key = k.value();
+        QHashIterator<QString, Key> keyIter(keyMap);
+        uint cnt = -1;
+        while(keyIter.hasNext()){
+            keyIter.next();
+            cnt++;
+            const Key& key = keyIter.value();
             if(!key.hasScan)
                 continue;
             float x = key.x + offX - key.width / 2.f + 1.f;
@@ -435,9 +435,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"}, {"fn","Fn"},
                 {"mouse1", ""}, {"mouse2", ""}, {"mouse3", "∙"}, {"dpiup", "▲"}, {"dpidn", "▼"}, {"wheelup", "▲"}, {"wheeldn", "▼"}, {"dpi", "◉"}, {"mouse5", "▲"}, {"mouse4", "▼"}, {"sniper", "⊕"}
             };
-            for(uint k = 0; k < sizeof(names) / sizeof(names[0]); k++){
-                if(keyName == names[k].keyName){
-                    name = names[k].displayName;
+            for(uint l = 0; l < sizeof(names) / sizeof(names[0]); l++){
+                if(keyName == names[l].keyName){
+                    name = names[l].displayName;
                     break;
                 }
             }

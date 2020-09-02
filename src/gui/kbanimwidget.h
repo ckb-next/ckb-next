@@ -33,7 +33,7 @@ signals:
     void didUpdateSelection(QStringList keys);
 
 private slots:
-    void on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+    void on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *prev);
     void on_animList_itemChanged(QListWidgetItem *item);
     void on_animList_customContextMenuRequested(const QPoint &pos);
     void on_nameBox_textEdited(const QString &arg1);

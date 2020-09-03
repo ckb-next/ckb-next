@@ -669,7 +669,15 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
             }
             continue;
         }
-        if(!IS_CONNECTED(kb)){
+        // We can't use IS_CONNECTED() here.
+        // If multiple devices are being opened at once, we will attempt to set up the second one before
+        // we're done with the first one, which means the uinput handles might still be 0.
+        // This will cause IS_CONNECTED to return 0, resulting in overwriting ckb1's kb fields with ckb2's,
+        // leaving ckb1 in an unknown and possibly uninitialised state.
+        //
+        // This happened rarely because dmutex was most likely already locked, so we just skipped over the device
+        // before getting here. (See trylock above.)
+        if(!kb->handle){
             // Open the sysfs device
             kb->handle = open(path, O_RDWR) + 1;
             if(kb->handle <= 0){
@@ -881,8 +889,10 @@ int usbmain(){
                 if(res == 0)
                     continue;
                 // If the device matched but the handle wasn't opened correctly, re-enumerate (this sometimes solves the problem)
-                if(res == -1)
+                if(res == -1){
+                    ckb_warn("Handle wasn't opened correctly. Trying again");
                     udev_enum();
+                }
             } else if(!strcmp(action, "remove"))
                 usb_rm_device(dev);
             udev_device_unref(dev);

@@ -860,7 +860,7 @@ int closeusb(usbdevice* kb){
     queued_mutex_unlock(imutex(kb));
     queued_mutex_unlock(dmutex(kb));
 
-    if(pthread_self() == kb->thread){
+    if(pthread_equal(pthread_self(), kb->thread)){
 #ifdef DEBUG_MUTEX
         ckb_info("Attempted to pthread_join() self. Detaching instead.");
 #endif

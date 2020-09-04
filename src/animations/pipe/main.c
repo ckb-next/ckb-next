@@ -31,7 +31,6 @@ void ckb_info(){
 
 long fifonum = 0;
 int fd = -1;
-unsigned char a = 0, r = 0, g = 0, b = 0;
 #define FIFO_NAME_LEN 16
 char fifoname[FIFO_NAME_LEN] = { 0 }; // /tmp/ckbpipeNNN
 #define MAX_INPUT 4096

@@ -108,6 +108,15 @@ int os_inputopen(usbdevice* kb){
 void os_inputclose(usbdevice* kb){
     if(kb->uinput_kb <= 0 || kb->uinput_mouse <= 0)
         return;
+
+    // Tell the led thread to stop and then join it
+    if(kb->ledthread){
+        pthread_kill(*kb->ledthread, SIGUSR2);
+        pthread_join(*kb->ledthread, NULL);
+    }
+    free(kb->ledthread);
+    kb->ledthread = NULL;
+
     // Set all keys released
     struct input_event event;
     memset(&event, 0, sizeof(event));
@@ -215,6 +224,7 @@ void* _ledthread(void* ctx){
         }
         queued_mutex_unlock(dmutex(kb));
     }
+    ckb_info("Stopping indicator thread for ckb%d (%d)", INDEX_OF(kb, keyboard), errno);
     return 0;
 }
 
@@ -222,17 +232,21 @@ int os_setupindicators(usbdevice* kb){
     // Initialize LEDs to all off
     kb->hw_ileds = kb->hw_ileds_old = kb->ileds = 0;
     // Create and detach thread to read LED events
-    pthread_t thread;
-    // Give the thread a reasonable name
-    char ledthread_name[THREAD_NAME_MAX] = "ckbX led";
+    kb->ledthread = malloc(sizeof(pthread_t));
+    if(!kb->ledthread){
+        ckb_fatal("Failed to allocate memory for the indicator led thread");
+        return 1;
+    }
 
-    int err = pthread_create(&thread, 0, _ledthread, kb);
+    int err = pthread_create(kb->ledthread, 0, _ledthread, kb);
     if(err != 0)
         return err;
 
+    // Give the thread a reasonable name
+    char ledthread_name[THREAD_NAME_MAX] = "ckbX led";
+
     ledthread_name[3] = INDEX_OF(kb, keyboard) + '0';
-    pthread_setname_np(thread, ledthread_name);
-    pthread_detach(thread);
+    pthread_setname_np(*kb->ledthread, ledthread_name);
     return 0;
 }
 

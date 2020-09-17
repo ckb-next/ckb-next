@@ -237,6 +237,7 @@ int main(int argc, char** argv){
                     continue;
                 ignored_devices[j].idVendor = vid;
                 ignored_devices[j].idProduct = pid;
+                break;
             }
         }
 #ifdef OS_MAC_LEGACY

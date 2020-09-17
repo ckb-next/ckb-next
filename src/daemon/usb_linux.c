@@ -653,7 +653,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
     for(int i = 0; i < DEV_MAX; i++){
         if(ignored_devices[i].idVendor == vendor && ignored_devices[i].idProduct == product){
             ckb_info("Ignoring device 0x%hx:0x%hx as requested. If you're using this to work around a bug, please report it.", vendor, product);
-            return 0;
+            return 1;
         }
     }
     const char* path = udev_device_get_devnode(dev);

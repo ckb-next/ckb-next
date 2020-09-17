@@ -203,6 +203,7 @@ int main(int argc, char** argv){
         char* argument = argv[i];
         unsigned newgid;
         char hwload[7];
+        ushort vid, pid;
         if(sscanf(argument, "--gid=%u", &newgid) == 1){
             // Set dev node GID
             gid = newgid;
@@ -229,6 +230,14 @@ int main(int argc, char** argv){
         } else if(!strcmp(argument, "--nonroot")){
             // Allow running as a non-root user
             forceroot = 0;
+        } else if(sscanf(argument, "--ignore=%hx:%hx", &vid, &pid) == 2){
+            // Add the vid/pid to the list
+            for(int j = 0; j < DEV_MAX; j++){
+                if(ignored_devices[j].idVendor || ignored_devices[j].idProduct)
+                    continue;
+                ignored_devices[j].idVendor = vid;
+                ignored_devices[j].idProduct = pid;
+            }
         }
 #ifdef OS_MAC_LEGACY
         else if(!strcmp(argument, "--nomouseaccel")){

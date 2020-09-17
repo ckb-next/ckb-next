@@ -649,6 +649,13 @@ int os_setupusb(usbdevice* kb) {
 }
 
 int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
+    // Check if device should be ignored
+    for(int i = 0; i < DEV_MAX; i++){
+        if(ignored_devices[i].idVendor == vendor && ignored_devices[i].idProduct == product){
+            ckb_info("Ignoring device 0x%hx:0x%hx as requested. If you're using this to work around a bug, please report it.", vendor, product);
+            return 0;
+        }
+    }
     const char* path = udev_device_get_devnode(dev);
     const char* syspath = udev_device_get_syspath(dev);
     if(!path || !syspath || path[0] == 0 || syspath[0] == 0){

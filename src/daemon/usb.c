@@ -86,6 +86,7 @@ device_desc models[] = {
 
 size_t N_MODELS = sizeof(models) / sizeof(device_desc);
 
+device_desc ignored_devices[DEV_MAX] = {0};
 
 /// brief .
 ///

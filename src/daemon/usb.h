@@ -132,6 +132,8 @@ typedef struct _device_desc {
 
 extern device_desc models[];
 
+extern device_desc ignored_devices[];
+
 ///
 /// Uncomment to see USB packets sent to the device
 // #define DEBUG_USB_SEND

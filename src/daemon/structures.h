@@ -298,6 +298,9 @@ typedef struct {
     uchar* interruptbuf;
     // Protocol version
     protocol_t protocol;
+    // Poll thread
+    pthread_t* pollthread;
+
 } usbdevice;
 
 #endif  // STRUCTURES_H

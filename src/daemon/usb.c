@@ -879,6 +879,15 @@ int closeusb(usbdevice* kb){
         os_inputclose(kb);
         queued_mutex_unlock(imutex(kb));
         queued_mutex_unlock(dmutex(kb));
+
+        // Shut down the device polling thread
+        if(kb->pollthread){
+            pthread_kill(*kb->pollthread, SIGUSR2);
+            pthread_join(*kb->pollthread, NULL);
+            free(kb->pollthread);
+            kb->pollthread = NULL;
+        }
+
         updateconnected(kb);
         queued_mutex_lock(dmutex(kb));
         queued_mutex_lock(imutex(kb));

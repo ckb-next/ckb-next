@@ -298,7 +298,7 @@ static ushort check_endpoint_in_intf(struct udev* dev_udev, char* base, size_t b
         if(sizehex && sscanf(sizehex, "%hx", size) == 1)
         {
 //#ifdef DEBUG
-            ckb_info("Found EP 0x%hx at %s\n", ep, base);
+            ckb_info("Found EP 0x%hx at %s", ep, base);
 //#endif
             udev_device_unref(child);
             return ep;

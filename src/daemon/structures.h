@@ -317,6 +317,9 @@ typedef struct {
     uchar input_endpoints[USB_EP_MAX+1];
     // Protocol
     protocol_t protocol;
+    // Poll thread
+    pthread_t* pollthread;
+
 } usbdevice;
 
 #ifdef OS_LINUX

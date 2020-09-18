@@ -111,11 +111,9 @@ void sighandler(int type){
     (void) unused_result;
 }
 
-#ifdef OS_LINUX
 void nullhandler(int s){
     safe_write("[I] Caught internal signal SIGUSR2\n");
 }
-#endif
 
 void localecase(char* dst, size_t length, const char* src){
     char* ldst = dst + length;
@@ -309,15 +307,14 @@ int main(int argc, char** argv){
     } else
         ckb_warn_nofile("Unable to setup signal handlers");
 
-#ifdef OS_LINUX
     // Set up do-nothing handler for SIGUSR2
+    // sa_flags must be 0 so that we can interrupt blocking calls in threads by calling pthread_kill()
     struct sigaction new_action = {
         .sa_handler = nullhandler,
         .sa_flags = 0,
     };
     sigemptyset (&new_action.sa_mask);
     sigaction(SIGUSR2, &new_action, NULL);
-#endif
 
     srand(time(NULL));
 

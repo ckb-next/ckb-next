@@ -25,6 +25,7 @@ void CkbSystemTrayIcon::setIcon(QIcon icon, QString name)
     }
 
     // If not, load the internal ones
+    qDebug() << "Indicator icon not found in theme hicolor";
     QList<QSize> availSizes = icon.availableSizes();
     if(!availSizes.length())
         return;

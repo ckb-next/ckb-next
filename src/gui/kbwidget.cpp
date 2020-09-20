@@ -232,6 +232,7 @@ void KbWidget::currentSelectionChanged(const QModelIndex& current, const QModelI
 }
 
 void KbWidget::batteryTrayBox_stateChanged(int state){
+    if(!device->features.contains("wireless")) return;
     device->showBatteryIndicator = state > 0;
     device->needsSave();
     if(state){

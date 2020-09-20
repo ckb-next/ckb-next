@@ -302,7 +302,7 @@ void Kb::load(){
                 newCurrentProfile = profile;
         }
     }
-    showBatteryIndicator = settings.setValue("batteryIndicator", showBatteryIndicator);
+    showBatteryIndicator = settings.value("batteryIndicator", true).toBool();
     if(newCurrentProfile)
         setCurrentProfile(newCurrentProfile);
     else {
@@ -345,7 +345,7 @@ void Kb::save(){
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
     settings.setValue("hwLayout", KeyMap::getLayout(_layout));
-    showBatteryIndicator = settings.value("batteryIndicator", true).toBool();
+    settings.setValue("batteryIndicator", showBatteryIndicator);
 }
 
 void Kb::autoSave(){
@@ -549,9 +549,9 @@ void Kb::readNotify(QString line){
         if(bComponents.length() != 2)
             return;
         // Convert battery values into human readable text
-        bool ok;
-        uint newBattery = bComponents[0].toUInt(&ok), newCharging = bComponents[1].toUInt(&ok);
-        if(!ok || newBattery  > 4 || newCharging > 4 && battery != newBattery && charging != newCharging) return;
+        bool ok, ok2;
+        uint newBattery = bComponents[0].toUInt(&ok), newCharging = bComponents[1].toUInt(&ok2);
+        if(!ok || !ok2 || newBattery  > 4 || newCharging > 4 || (battery == newBattery && charging == newCharging)) return;
         battery = newBattery;
         charging = newCharging;
         emit batteryChanged(newBattery, newCharging);
@@ -859,6 +859,3 @@ void Kb::setPollRate(QString poll)
 {
     cmd.write(QString("\npollrate %1\n").arg(poll).toLatin1());
 }
-
-const QString Kb::BATTERY_VALUES[5] = {"Not connected", "Critical", "Low", "Medium", "High"};
-const QString Kb::BATTERY_CHARGING_VALUES[5] = {"N/A", "Not charging", "Charging"};

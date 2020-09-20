@@ -67,6 +67,8 @@ void cmd_lift(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
         return;
     if(heightnum > LIFT_MAX || heightnum < LIFT_MIN)
         return;
+    if(IS_DARK_CORE(kb) && heightnum < 3) 
+        return;
     mode->dpi.lift = heightnum;
 }
 

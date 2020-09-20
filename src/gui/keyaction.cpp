@@ -140,28 +140,28 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         switch(suffix){
         case LIGHT_UP:
         case LIGHT_UP_WRAP:
-            return "Brightness up";
+            return tr("Brightness up");
         case LIGHT_DOWN:
         case LIGHT_DOWN_WRAP:
-            return "Brightness down";
+            return tr("Brightness down");
         }
     } else if(prefix == "$lock"){
         switch(suffix){
         case LOCK_TOGGLE:
-            return "Toggle Windows lock";
+            return tr("Toggle Windows lock");
         case LOCK_ON:
-            return "Windows lock on";
+            return tr("Windows lock on");
         case LOCK_OFF:
-            return "Windows lock off";
+            return tr("Windows lock off");
         }
     } else if(prefix == "$anim"){
-        return "Start animation";
+        return tr("Start animation");
     } else if(prefix == "$program"){
-        return "Launch program";
+        return tr("Launch program");
     } else if(prefix == "$macro"){
-        return "Send G-key macro";
+        return tr("Send G-key macro");
     }
-    return "(Unknown)";
+    return tr("(Unknown)");
 }
 
 QString KeyAction::modeAction(int mode){

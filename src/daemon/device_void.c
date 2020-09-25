@@ -23,6 +23,9 @@ int cmd_active_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
     uchar init2[2][20] = {
         { 0xcb, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
         { 0xcb, 0x09, 0x2c, 0xaf, 0x26, 0xaf, 0x27, 0xaf, 0x2d, 0xaf, 0x28, 0xaf, 0x29, 0xaf, 0x2e, 0x56, 0x2b, 0x56, 0x2a, 0x56 }
+    //uchar init2_1[20] = {
+        //0xcb, 0x09, 0x1c, 0x00, 0x16, 0x00, 0x17, 0x00, 0x1d, 0x00, 0x18, 0x00, 0x19, 0x00, 0x1b, 0x00, 0x1a, 0x00, 0x1e, 0x00
+
     };
 
     uchar init3[5] =
@@ -89,8 +92,11 @@ int cmd_active_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
     if(!usbsend(kb, init1, 1))
         return -1;
 
-    if(!usbsend(kb, init2[0], 2))
-        return -1;
+    for(int i = 0; i < 2; i++)
+    {
+        if(!usbsend(kb, init2[i], 1))
+            return -1;
+    }
 
     if(!usbsend(kb, init3, 1))
         return -1;
@@ -125,13 +131,17 @@ int cmd_active_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
     if(!usbsend(kb, init13, 1))
         return -1;
 
-    if(!usbsend(kb, init14[0], 14))
-        return -1;
-
+    for(int i = 0; i < 14; i++){
+        if(!usbsend(kb, init14[i], 1))
+            return -1;
+    }
     if(!usbsend(kb, init15, 1))
         return -1;
 
-    if(!usbsend(kb, init16[0], 2))
+    if(!usbsend(kb, init16[0], 1))
+        return -1;
+
+    if(!usbsend(kb, init16[1], 1))
         return -1;
 
     if(!usbsend(kb, init17, 1))
@@ -168,8 +178,10 @@ int cmd_idle_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const 
     uchar deinit4[20] =
         { 0xcb, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-    if(!usbsend(kb, deinit1[0], 2))
-        return -1;
+    for(int i = 0; i < 2; i++){
+        if(!usbsend(kb, deinit1[i], 1))
+            return -1;
+    }
 
     if(!usbsend(kb, deinit2, 1))
         return -1;

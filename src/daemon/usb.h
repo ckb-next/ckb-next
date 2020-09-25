@@ -123,7 +123,6 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-=
 #define P_VOID_USB_1         0x1b29
 #define P_VOID_USB_2         0x1b2a
 #define P_VOID_WIRELESS_1    0x1b27
@@ -241,7 +240,7 @@ const char* product_str(ushort product);
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 // Headset test
-#define IS_HEADSET(vendor, product)     ((vendor) == (V_CORSAIR) && (product == P_VOID_USB_1 || product == P_VOID_USB_2 || produce == P_VOID_WIRELESS_1))
+#define IS_HEADSET(vendor, product)     ((vendor) == (V_CORSAIR) && (product == P_VOID_USB_1 || product == P_VOID_USB_2 || product == P_VOID_WIRELESS_1))
 #define IS_HEADSET_DEV(kb)              IS_HEADSET((kb)->vendor, (kb)->product)
 
 #define USB_DELAY_DEFAULT   5
@@ -313,18 +312,17 @@ int os_resetusb(usbdevice* kb, const char* file, int line);
 /// \param kb THE usbdevice*
 /// \param[IN] messages a Pointer to the first byte of the logical message
 /// \param[IN] count how many buffers is the logical message long?
-/// \param[IN] length of each packet
 /// \param[IN] file for debugging
 /// \param[IN] line for debugging
 /// \param[in] reset_stop global variable is read
 /// \return number of Bytes sent (ideal == count * MSG_SIZE);\n 0 if a block could not be sent and it was not a timeout OR \b reset_stop was required or \b hwload_mode is not set to "always"
-int _usbsend(usbdevice* kb, const uchar* messages, int count, int len, const char* file, int line);
+int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line);
 
 /// \brief usbsend macro is used to wrap _usbsend() with debugging information (file and lineno)
 /// \param kb THE usbdevice*
 /// \param[IN] messages a Pointer to the first byte of the logical message
 /// \param[IN] count how many MSG_SIZE buffers is the logical message long?
-#define usbsend(kb, messages, count, len) _usbsend(kb, messages, count, len, __FILE_NOPATH__, __LINE__)
+#define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
 
 ///
 /// \brief _usbrecv Request data from a USB device by first sending an output packet and then reading the response.
@@ -352,7 +350,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 /// \param file for debugging
 /// \param line for debugging
 /// \return -1 on timeout (try again), 0 on hard error, numer of bytes sent otherwise
-int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, size_t len, const char* file, int line);
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
 
 ///
 /// \brief os_usbrecv receives a max MSGSIZE long buffer from usb device

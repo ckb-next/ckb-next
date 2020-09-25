@@ -232,7 +232,6 @@ const devcmd vtable_mousepad = {
     .updatedpi = int1_int_none
 };
 
-<<<<<<< HEAD
 // Legacy mouse vtable
 const devcmd vtable_mouse_legacy = {
     .hwload = cmd_io_none,

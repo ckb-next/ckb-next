@@ -92,7 +92,7 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, u
 /// If DEBUG_USB_SEND is set during compilation,
 /// the number of bytes sent and their representation are logged to the error channel.
 ///
-int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, size_t len, const char* file, int line) {
+int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     int res;
     if ((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && !IS_HEADSET_DEV(kb)){
         // If we need to read a response, lock the interrupt mutex
@@ -104,7 +104,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, size_t len, con
         // All firmware versions for normal HID devices have the OUT endpoint at the end
         // Devices with no input, such as the Polaris, have it at the start.
         transfer.ep = (IS_SINGLE_EP(kb) ? 1 : kb->epcount);
-        transfer.len = len;
+        transfer.len = MSG_SIZE;
         transfer.timeout = 5000;
         transfer.data = (void*)out_msg;
         res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
@@ -112,7 +112,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, size_t len, con
         // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
         // FIXME: Headsets don't use len
         // FIXME: Use appropriate wValue for headsets
-        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, len, 5000, (void*)out_msg };
+        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
         if(IS_HEADSET_DEV(kb)) {
             // wValue0: first byte of packet
             // wValue1: 0x02

@@ -12,7 +12,7 @@ int cmd_active_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
     (void)dummy3;
     (void)dummy4;
     
-    pthread_mutex_lock(imutex(kb));
+    queued_mutex_lock(imutex(kb));
 
     if(kb->active)
         return 0;
@@ -86,61 +86,61 @@ int cmd_active_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, cons
     uchar init17[2] =
         { 0xc9, 0x66 };
 
-    if(!usbsend(kb, init1, 1, 3))
+    if(!usbsend(kb, init1, 1))
         return -1;
 
-    if(!usbsend(kb, init2[0], 2, 20))
+    if(!usbsend(kb, init2[0], 2))
         return -1;
 
-    if(!usbsend(kb, init3, 1, 5))
+    if(!usbsend(kb, init3, 1))
         return -1;
 
-    if(!usbsend(kb, init4, 1, 3))
+    if(!usbsend(kb, init4, 1))
         return -1;
 
-    if(!usbsend(kb, init5, 1, 20))
+    if(!usbsend(kb, init5, 1))
         return -1;
 
-    if(!usbsend(kb, init6, 1, 2))
+    if(!usbsend(kb, init6, 1))
         return -1;
 
-    if(!usbsend(kb, init7, 1, 3))
+    if(!usbsend(kb, init7, 1))
         return -1;
 
-    if(!usbsend(kb, init8, 1, 20))
+    if(!usbsend(kb, init8, 1))
         return -1;
 
-    if(!usbsend(kb, init9, 1, 5))
+    if(!usbsend(kb, init9, 1))
         return -1;
 
-    if(!usbsend(kb, init10, 1, 20))
+    if(!usbsend(kb, init10, 1))
         return -1;
 
-    if(!usbsend(kb, init11, 1, 5))
+    if(!usbsend(kb, init11, 1))
         return -1;
 
-    if(!usbsend(kb, init12, 1, 20))
+    if(!usbsend(kb, init12, 1))
         return -1;
 
-    if(!usbsend(kb, init13, 1, 2))
+    if(!usbsend(kb, init13, 1))
         return -1;
 
-    if(!usbsend(kb, init14[0], 14, 20))
+    if(!usbsend(kb, init14[0], 14))
         return -1;
 
-    if(!usbsend(kb, init15, 1, 2))
+    if(!usbsend(kb, init15, 1))
         return -1;
 
-    if(!usbsend(kb, init16[0], 2, 20))
+    if(!usbsend(kb, init16[0], 2))
         return -1;
 
-    if(!usbsend(kb, init17, 1, 2))
+    if(!usbsend(kb, init17, 1))
         return -1;
 
 
     kb->active = 1;
 
-    pthread_mutex_unlock(imutex(kb));
+    queued_mutex_unlock(imutex(kb));
     
     return 0;
 }
@@ -168,16 +168,16 @@ int cmd_idle_void(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const 
     uchar deinit4[20] =
         { 0xcb, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-    if(!usbsend(kb, deinit1[0], 2, 20))
+    if(!usbsend(kb, deinit1[0], 2))
         return -1;
 
-    if(!usbsend(kb, deinit2, 1, 5))
+    if(!usbsend(kb, deinit2, 1))
         return -1;
 
-    if(!usbsend(kb, deinit3, 1, 3))
+    if(!usbsend(kb, deinit3, 1))
         return -1;
 
-    if(!usbsend(kb, deinit4, 1, 20))
+    if(!usbsend(kb, deinit4, 1))
         return -1;
 
     kb->active = 0;

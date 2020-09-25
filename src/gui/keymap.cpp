@@ -898,6 +898,8 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map[key->name] = translatedKey;
         }
         // Mice also have no layout patches - no other changes necessary
+        break;
+    }
     case KeyMap::VOID:{
         for(const Key* key = VoidKeys; key < VoidKeys + KEYCOUNT_VOID; key++){
             map[key->name] = *key;

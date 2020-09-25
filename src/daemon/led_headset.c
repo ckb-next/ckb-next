@@ -41,7 +41,7 @@ int updatergb_headset(usbdevice* kb, int force){
     staticrgb[6][5] = newlight->b[0];
 
     // Send RGB data
-    if(!usbsend(kb, staticrgb[0], 10, 20))
+    if(!usbsend(kb, staticrgb[0], 10))
         return -1;
 
     memcpy(lastlight, newlight, sizeof(lighting));

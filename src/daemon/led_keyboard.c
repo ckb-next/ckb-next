@@ -40,7 +40,7 @@ static int update_sidelights(usbdevice* kb) {
     uchar data_pkt[MSG_SIZE] = {
         CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0, !!newlight->sidelight, 0x00
     };
-    if(!usbsend(kb, data_pkt, 1, MSG_SIZE))
+    if(!usbsend(kb, data_pkt, 1))
         return -1;
     return 0;
 }
@@ -128,7 +128,7 @@ int updatergb_kb(usbdevice* kb, int force){
         // The K55 has its own packet type, because it only has three lighting zones.
         uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };
         makergb_k55(newlight, data_pkt);
-        if (!usbsend(kb, data_pkt, 1, MSG_SIZE))
+        if (!usbsend(kb, data_pkt, 1))
             return -1;
     } else if(IS_FULLRANGE(kb)) {
         // Update strafe sidelights if necessary
@@ -175,7 +175,7 @@ int updatergb_kb(usbdevice* kb, int force){
             { CMD_SET, FIELD_KB_9BCLR, 0x00, 0x00, 0xD8 }
         };
         makergb_512(newlight, data_pkt, kb->dither ? ordered8to3 : quantize8to3);
-        if(!usbsend(kb, data_pkt[0], 5, MSG_SIZE))
+        if(!usbsend(kb, data_pkt[0], 5))
             return -1;
     }
 
@@ -203,11 +203,11 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
             { CMD_SET, FIELD_KB_HWCLR, 0x03, 0x01, 0x01, mode + 1, COLOR_BLUE }
         };
         makergb_full(light, data_pkt);
-        if(!usbsend(kb, data_pkt[0], 12, MSG_SIZE))
+        if(!usbsend(kb, data_pkt[0], 12))
             return -1;
         if (IS_STRAFE(kb)){ // end save
             uchar save_end_pkt[MSG_SIZE] = { CMD_SET, FIELD_KB_HWCLR, 0x04, 0x01, 0x01 };
-            if(!usbsend(kb, save_end_pkt, 1, MSG_SIZE))
+            if(!usbsend(kb, save_end_pkt, 1))
                 return -1;
         }
     } else {
@@ -219,7 +219,7 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
             { CMD_SET, FIELD_KB_HWCLR, 0x02, 0x00, 0x01, mode + 1 }
         };
         makergb_512(light, data_pkt, kb->dither ? ordered8to3 : quantize8to3);
-        if(!usbsend(kb, data_pkt[0], 5, MSG_SIZE))
+        if(!usbsend(kb, data_pkt[0], 5))
             return -1;
     }
     return 0;
@@ -310,7 +310,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             { CMD_READ_BULK, 0x04, 36, 0 },
         };
         // Write initial packet
-        if(!usbsend(kb, data_pkt[0], 1, MSG_SIZE))
+        if(!usbsend(kb, data_pkt[0], 1))
             return -1;
         // Read colors
         for(int i = 1; i < 5; i++){

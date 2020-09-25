@@ -53,7 +53,7 @@ int savergb_mouse(usbdevice* kb, lighting* light, int mode){
         data_pkt[4] = light->r[led];
         data_pkt[5] = light->g[led];
         data_pkt[6] = light->b[led];
-        if(!usbsend(kb, data_pkt, 1, MSG_SIZE))
+        if(!usbsend(kb, data_pkt, 1))
             return -1;
         // Set packet for next zone
         data_pkt[2]++;

@@ -91,7 +91,8 @@ const devcmd vtable_keyboard = {
     .freeprofile = freeprofile,
     .updatergb = updatergb_kb,
     .updateindicators = updateindicators_kb,
-    .updatedpi = int1_int_none                  ///< This is for mice only
+    .updatedpi = int1_int_none,                  ///< This is for mice only
+    .reset = nxp_reset,
 };
 
 // Legacy keyboard vtable (K70)
@@ -137,7 +138,8 @@ const devcmd vtable_keyboard_legacy = {
     .freeprofile = freeprofile,
     .updatergb = int1_int_none,                 ///< Legacy keyboards do not have an rgb update function
     .updateindicators = updateindicators_kb,
-    .updatedpi = int1_int_none                  ///< This is for mice only
+    .updatedpi = int1_int_none,                  ///< This is for mice only
+    .reset = cmd_none,
 };
 
 // RGB mouse vtable
@@ -183,7 +185,8 @@ const devcmd vtable_mouse = {
     .freeprofile = freeprofile,             ///< same for all keyboards and mice
     .updatergb = updatergb_mouse,           ///< special for mice
     .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
-    .updatedpi = updatedpi                  ///< special for mice
+    .updatedpi = updatedpi,                  ///< special for mice
+    .reset = nxp_reset,
 };
 
 // RGB Mousepad vtable
@@ -229,7 +232,8 @@ const devcmd vtable_mousepad = {
     .freeprofile = freeprofile,
     .updatergb = updatergb_mousepad,
     .updateindicators = int1_void_none,
-    .updatedpi = int1_int_none
+    .updatedpi = int1_int_none,
+    .reset = nxp_reset,
 };
 
 // Legacy mouse vtable
@@ -275,5 +279,6 @@ const devcmd vtable_mouse_legacy = {
     .freeprofile = freeprofile,
     .updatergb = updatergb_mouse_legacy,
     .updateindicators = int1_void_none,
-    .updatedpi = updatedpi_legacy
+    .updatedpi = updatedpi_legacy,
+    .reset = cmd_none,
 };

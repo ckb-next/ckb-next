@@ -85,6 +85,8 @@ int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, co
 // Sets a device's current mode index. This is only used on the legacy K95; the RGB keyboards have no gettable HW index.
 void setmodeindex_legacy(usbdevice* kb, int index);
 
+// Resets devices using the NXP HID protocol
+void nxp_reset(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* type);
 
 // Per-key input settings for device setup
 // The upper nybble controls input mode. 0x80 generates a normal HID interrupt, 0x40 generates a proprietary interrupt. 0xc0 generates both.

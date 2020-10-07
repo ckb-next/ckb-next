@@ -52,7 +52,9 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 
     "notify",
     "inotify",
-    "get"
+    "get",
+
+    "reset"
 };
 
 #define TRY_WITH_RESET(action)  \
@@ -119,7 +121,7 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
         }
         // Reject anything not related to fwupdate if device has a bricked FW
-        if(NEEDS_FW_UPDATE(kb) && command != FWUPDATE && command != NOTIFYON && command != NOTIFYOFF)
+        if(NEEDS_FW_UPDATE(kb) && command != FWUPDATE && command != NOTIFYON && command != NOTIFYOFF && command != RESET)
             continue;
 
         // Specially handled commands - these are available even when keyboard is IDLE
@@ -211,6 +213,10 @@ int readcmd(usbdevice* kb, const char* line){
                 // bad parameter to handle false commands like "delay off"
                 kb->delay = 0; // No delay.
             }
+            continue;
+        }
+        case RESET: {
+            vt->reset(kb, mode, notifynumber, 0, word);
             continue;
         }
         default:;

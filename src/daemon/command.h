@@ -59,7 +59,9 @@ typedef enum {
     INOTIFY,
     GET,
 
-    CMD_LAST = GET
+    RESET,
+
+    CMD_LAST = RESET
 } cmd;
 #define CMD_COUNT       (CMD_LAST - CMD_FIRST + 2)
 #define CMD_DEV_COUNT   (CMD_LAST - CMD_VT_FIRST + 1)
@@ -132,6 +134,8 @@ typedef union devcmd {
         void (*updateindicators)(usbdevice* kb, int force);
         // dpi.h
         int (*updatedpi)(usbdevice* kb, int force);
+
+        cmdhandler reset;
     };
 } devcmd;
 

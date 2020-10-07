@@ -156,3 +156,23 @@ int start_dev(usbdevice* kb, int makeactive){
     kb->usbdelay = USB_DELAY_DEFAULT;
     return res;
 }
+
+void nxp_reset(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* type){
+    uchar pkt[64] = { 0x07, 0x02, 0xff };
+    if(!strcmp(type, "apply_fw")){ // Also used to get out of BLD mode
+        pkt[2] = 0xf0;
+    } else if(!strcmp(type, "isp")) {
+        pkt[2] = 0xaa;
+    } else if(!strcmp(type, "fast")) {
+        pkt[2] = 0x01;
+    } else if(!strcmp(type, "medium")) {
+        pkt[2] = 0x00;
+    } else if(!strcmp(type, "bld")) { // Reboots to bootloader and forces an eeprom wipe
+        pkt[2] = 0x03;
+    }
+
+    if(pkt[2] != 0xff){
+        if(!usbsend(kb, pkt, 1))
+            ckb_err("%s reset failed", type);
+    }
+}

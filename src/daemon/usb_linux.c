@@ -569,8 +569,10 @@ void strtrim(char* string){
     }
 
     // If we reached the end and didn't find anything, blank out the string
-    if(first[1] == '\0')
+    if(first[1] == '\0'){
         string[0] = '\0';
+        return;
+    }
 
     // Find last non-space
     char* last = first;

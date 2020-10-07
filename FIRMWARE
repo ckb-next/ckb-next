@@ -11,7 +11,7 @@ Hash: SHA512
 !BEGIN FW ENTRIES
 
 # Vendor  Model            FW    URL                                                                Min.ckb File Name                            SHA256                                                              ProductID
-  Corsair K55RGB           30.06 https://www3.corsair.com/software/CUE_V3/K55RGB.zip                0.2.9   K55_App_v3006.bin                    e84aa88ec7f90ddac94f06f4f4e887ce06f013a18a22ece5f367f97899514748    0x1b3d
+  Corsair K55RGB           30.08 https://www3.corsair.com/software/CUE_V3/K55RGB.zip                0.2.9   K55_App_v3008.bin                    c45f9a1eba0795c35a2c2164588eec268bd3f4dda6c40a2a085371c28e89198a    0x1b3d
   Corsair K63               3.08 https://www3.corsair.com/software/CUE_V3/K63.zip                   0.3.2   K63_App_v308.bin                     1b28b50d7338b9e2cf44ebf6130adb973c6aa5770ba7afa255a61ff096850e61    0x1b40
   Corsair K63WL             0.00 https://www3.corsair.com/software/CUE_V3/K63WIRELESS.zip           0.2.9   00000000000000000.bin                0000000000000000000000000000000000000000000000000000000000000000    0x1b45
   Corsair K65RGB            3.08 https://www3.corsair.com/software/CUE_V3/CGK65RGB.zip              0.3.2   K65%20RGB_App_v308.bin               5173de835e2614981a43184f4cca72f96361160a343d17e016f41372ba2ba1bd    0x1b17
@@ -49,16 +49,14 @@ Hash: SHA512
   Corsair SABREPRORGB       3.04 https://www3.corsair.com/software/CUE_V3/SABRERGB.zip              0.3.2   SabrePro_APP_v304RC.bin              5854a79cab22f2c8717a2e1866dab55628783468a0e069e9a43ecc004b71da8c    0x1b2f
   Corsair POLARIS           1.02 https://www3.corsair.com/software/CUE_V3/MM800RGB.zip              0.2.9   SageApp_v1.02.50.bin                 5917b0de570296ba2a80cf5aa67f5bf0ef3026685453eb070364f450c3ab65fa    0x1b3b
   Corsair ST100RGB          0.02 https://www3.corsair.com/software/CUE_V3/ST100RGB.zip              0.2.9   ST100RGB%200.2.91.bin                baa64949b8ec21133789783d9687f9d20e0cb7d912df2f3ab7d7120280bdcd56    0x0a34
-
-!END FW ENTRIES
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEE2efsyk0ijiZmMKgW3+JI69zvL18FAlx25ksACgkQ3+JI69zv
-L1/CEgf/RtxqFrUrkzMzlXUAB5IQGvHhreUQvF00lENeq8G8khE3oTu1gYtrLEVY
-o4WCGD7Nmhy6HPk8j9R0IPxuWSP2kx4F+CbH78UIsO7WbtPFFdeqzhSHf8ByIbnv
-PJz/g6yc75Tnyp82jP/kvPjZlJ7otZ24qV3r56gwRyr7nZwecwLD8U7nODok+963
-FsTYEWJ5hBiJZSC8LnOdMis1HlPR+QNJpCrOn1u1mtDzX1gqy9jeIH7fNOaeIIci
-a5feM6nOgT9xQ15rFxPf0mjPBBIltcTRft6GA/4rSrz6zQ1GQfM5o3v25t6TtJJD
-ZRU17Mfgn5b5YVK3yzWqTTYCeXNqLA==
-=Z1Ym
+iQEzBAEBCgAdFiEE2efsyk0ijiZmMKgW3+JI69zvL18FAl9+AVcACgkQ3+JI69zv
+L1+pBQf/bc7F5QTFEC9RKo3NgOF+wGHyDxH9RJTr2gLud6H+NTzxOJKEN0yWM9mh
+iO10XC+4XcHvjMjUxTD1RBsHzq23nTIP5cfDKyzCkbZdrDR/Vq+WaAnMJmP6VqoT
+KEN9csTT+j5HQVYJoYphZ3nm/n/DGjQkKVoX6jLzmXndcmc8JHfaEPmCyprcQ1uX
+yRURK4HENF/naSx0MMaGldmigwyt/l5eg0ukfQNhqk+o+xZautj47MdB3oSdNi92
+0CIkYNbrFklTKGhWS6zZmyI/FowqAjvsjVP+DaXmNZmetl6WFq1u4GGnFPPM9wbm
+ZeWyk32hvxmKaju4wYsagXQNZV4UHw==
+=fFjD
 -----END PGP SIGNATURE-----

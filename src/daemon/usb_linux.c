@@ -561,19 +561,25 @@ int os_resetusb(usbdevice* kb, const char* file, int line) {
 /// \param string
 ///
 void strtrim(char* string){
-    // Find last non-space
-    char* last = string;
-    for(char* c = string; *c != 0; c++){
-        if(!isspace(*c))
-            last = c;
-    }
-    last[1] = 0;
     // Find first non-space
     char* first = string;
     for(; *first != 0; first++){
         if(!isspace(*first))
             break;
     }
+
+    // If we reached the end and didn't find anything, blank out the string
+    if(first[1] == '\0')
+        string[0] = '\0';
+
+    // Find last non-space
+    char* last = first;
+    for(char* c = string; *c != 0; c++){
+        if(!isspace(*c))
+            last = c;
+    }
+    last[1] = '\0';
+
     if(first != string)
         memmove(string, first, last - first);
 }

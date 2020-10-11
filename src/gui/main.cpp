@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <QTranslator>
+#include "compat/qrand.h"
 
 QSharedMemory appShare("ckb-next");
 
@@ -244,7 +245,7 @@ int main(int argc, char *argv[]){
     }
 
     // Seed the RNG for UsbIds
-    qsrand(QDateTime::currentMSecsSinceEpoch());
+    Q_SRAND(QDateTime::currentMSecsSinceEpoch());
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     // Enable HiDPI support

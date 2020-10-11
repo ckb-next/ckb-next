@@ -58,6 +58,7 @@ set_target_properties(
 target_compile_options(
     KissFFT
       PRIVATE
-      "${CKB_NEXT_COMMON_COMPILE_FLAGS}")
+      "${CKB_NEXT_COMMON_COMPILE_FLAGS}"
+      "${CKB_NEXT_EXTRA_C_FLAGS}")
 
 add_sanitizers(KissFFT)

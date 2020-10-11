@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstdio>
 #include <QPainter>
+#include <QTextStream>
 #include "gradientbutton.h"
 #include "gradientdialog.h"
 
@@ -40,15 +41,15 @@ void GradientButton::fromString(const QString& string){
     _stops.clear();
     // Parse string with sscanf
     QByteArray cString = string.toLatin1();
-    const char* data = cString.data();
+    const char* dataStr = cString.data();
     char pos = -1;
     uchar a, r, g, b;
     while(1){
         int scanned = 0;
         signed char newpos;
-        if(sscanf(data, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
+        if(sscanf(dataStr, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
-        data += scanned;
+        dataStr += scanned;
         // Don't allow stops out-of-order or past 100
         if(newpos <= pos || newpos > 100)
             break;
@@ -59,7 +60,7 @@ void GradientButton::fromString(const QString& string){
     }
     if(_stops.count() == 0){
         // If nothing was read, try a single ARGB constant.
-        if(sscanf(data, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
+        if(sscanf(dataStr, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
             _stops.append(QGradientStop(0., QColor(r, g, b, a)));
             _stops.append(QGradientStop(1., QColor(r, g, b, 0.)));
         }
@@ -81,8 +82,13 @@ QString GradientButton::toString() const {
     QStringList result;
     foreach(const QGradientStop& stop, _stops){
         QString string;
+        QTextStream out(&string);
         const QColor& color = stop.second;
-        result << string.sprintf("%d:%02x%02x%02x%02x", (int)round(stop.first * 100.f), color.alpha(), color.red(), color.green(), color.blue());
+        // "%d:%02x%02x%02x%02x"
+        out << static_cast<int>(round(stop.first * 100.f)) << ':'
+            << qSetFieldWidth(2) << qSetPadChar('0') << hex
+            << color.alpha() << color.red() << color.green() << color.blue();
+        result << string;
     }
     return result.join(" ");
 }

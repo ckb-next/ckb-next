@@ -23,12 +23,12 @@ void RListWidget::timerTick(){
     int c = count();
     for(int i = 0; i < c; i++){
         QListWidgetItem* itm = item(i);
-        QVariant data = itm->data(DATA_ROLE);
-        newItems.append(data);
-        if(i >= previousItems.count() || data != previousItems[i])
+        QVariant itmdata = itm->data(DATA_ROLE);
+        newItems.append(itmdata);
+        if(i >= previousItems.count() || itmdata != previousItems[i])
             reordered = true;
         // Re-select the dragged item (if any)
-        if(data == dragged)
+        if(itmdata == dragged)
             reselect = itm;
     }
     if(previousItems.length() != newItems.length())
@@ -60,13 +60,13 @@ void RListWidget::rescanItems(){
     QList<QVariant> newItems;
     int c = count();
     for(int i = 0; i < c; i++){
-        QVariant data = this->item(i)->data(DATA_ROLE);
-        if(data.isNull()){
+        QVariant itmdata = this->item(i)->data(DATA_ROLE);
+        if(itmdata.isNull()){
             // Generate the ID for this item if it doesn't already exist
-            data = QUuid::createUuid();
-            this->item(i)->setData(DATA_ROLE, data);
+            itmdata = QUuid::createUuid();
+            this->item(i)->setData(DATA_ROLE, itmdata);
         }
-        newItems.append(data);
+        newItems.append(itmdata);
     }
     previousItems = newItems;
 }

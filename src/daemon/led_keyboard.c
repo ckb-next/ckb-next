@@ -278,8 +278,8 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
                 }
 
                 if (memcmp(in_pkt[i], comparePacket, 4)) {
-                    ckb_err("Bad input header\n");
-                    ckb_err("color = %d, i = %d, mode = %d\nOutput (Request): %2.2x %2.2x %2.2x %2.2x\nInput(Reply): %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x\n", clr, i, mode,
+                    ckb_err("Bad input header");
+                    ckb_err("color = %d, i = %d, mode = %d\nOutput (Request): %2.2x %2.2x %2.2x %2.2x\nInput(Reply): %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x", clr, i, mode,
                         comparePacket[0], comparePacket[1], comparePacket[2], comparePacket[3],
                         in_pkt[i][0], in_pkt[i][1], in_pkt[i][2], in_pkt[i][3], in_pkt[i][4], in_pkt[i][5], in_pkt[i][6], in_pkt[i][7]);
                     in_pkt[2][0] = 0x99;
@@ -317,7 +317,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             if(!usbrecv(kb, data_pkt[i],in_pkt[i - 1]))
                 return -1;
             if(memcmp(in_pkt[i - 1], data_pkt[i], 4)){
-                ckb_err("Bad input header\n");
+                ckb_err("Bad input header");
                 return -1;
             }
         }

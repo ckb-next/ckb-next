@@ -209,6 +209,8 @@ typedef struct {
     int handle;
     // uinput handles
     int uinput_kb, uinput_mouse;
+    // keyboard led thread
+    pthread_t* ledthread;
 #else
     // USB identifier
     uint32_t location_id[IFACE_MAX + 1];
@@ -292,6 +294,9 @@ typedef struct {
     uchar* interruptbuf;
     // Protocol version
     protocol_t protocol;
+    // Poll thread
+    pthread_t* pollthread;
+
 } usbdevice;
 
 #endif  // STRUCTURES_H

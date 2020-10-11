@@ -42,15 +42,15 @@ int setactive_kb(usbdevice* kb, int active){
         DELAY_MEDIUM(kb);
         // Set input mode on the keys. They must be grouped into packets of 60 bytes (+ 4 bytes header)
         // Keys are referenced in byte pairs, with the first byte representing the key and the second byte representing the mode.
-        for(int key = 0; key < N_KEYS_HW; ){
+        for(int k = 0; k < N_KEYS_HW; ){
             int pair;
-            for(pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++){
+            for(pair = 0; pair < 30 && k < N_KEYS_HW; pair++, k++){
                 // Select both standard and Corsair input. The standard input will be ignored except in BIOS mode.
                 uchar action = IN_HID | IN_CORSAIR;
                 // Additionally, make MR activate the MR ring (this is disabled for now, may be back later)
-                //if(kb->keymap[key].name && !strcmp(kb->keymap[key].name, "mr"))
+                //if(kb->kmap[k].name && !strcmp(kb->kmap[k].name, "mr"))
                 //    action |= ACT_MR_RING;
-                msg[1][4 + pair * 2] = key;
+                msg[1][4 + pair * 2] = k;
                 msg[1][5 + pair * 2] = action;
             }
             // Byte 2 = pair count (usually 30, less on final message)
@@ -73,26 +73,26 @@ int setactive_kb(usbdevice* kb, int active){
         DELAY_MEDIUM(kb);
 #ifdef OS_LINUX
         // On OSX the default key mappings are fine. On Linux, the G keys will freeze the keyboard. Set the keyboard entirely to HID input.
-        for(int key = 0; key < N_KEYS_HW; ){
+        for(int k = 0; k < N_KEYS_HW; ){
             int pair;
-            for(pair = 0; pair < 30 && key < N_KEYS_HW; pair++, key++){
+            for(pair = 0; pair < 30 && k < N_KEYS_HW; pair++, k++){
                 uchar action = IN_HID;
                 // Enable hardware actions
-                if(kb->keymap[key].name){
-                    if(!strcmp(kb->keymap[key].name, "mr"))
+                if(kb->keymap[k].name){
+                    if(!strcmp(kb->keymap[k].name, "mr"))
                         action = ACT_MR_RING;
-                    else if(!strcmp(kb->keymap[key].name, "m1"))
+                    else if(!strcmp(kb->keymap[k].name, "m1"))
                         action = ACT_M1;
-                    else if(!strcmp(kb->keymap[key].name, "m2"))
+                    else if(!strcmp(kb->keymap[k].name, "m2"))
                         action = ACT_M2;
-                    else if(!strcmp(kb->keymap[key].name, "m3"))
+                    else if(!strcmp(kb->keymap[k].name, "m3"))
                         action = ACT_M3;
-                    else if(!strcmp(kb->keymap[key].name, "light"))
+                    else if(!strcmp(kb->keymap[k].name, "light"))
                         action = ACT_LIGHT;
-                    else if(!strcmp(kb->keymap[key].name, "lock"))
+                    else if(!strcmp(kb->keymap[k].name, "lock"))
                         action = ACT_LOCK;
                 }
-                msg[1][4 + pair * 2] = key;
+                msg[1][4 + pair * 2] = k;
                 msg[1][5 + pair * 2] = action;
             }
             // Byte 2 = pair count (usually 30, less on final message)

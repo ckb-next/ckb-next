@@ -336,15 +336,15 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     if(urblen == MSG_SIZE && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == 0x84))){
         int retval = pthread_mutex_lock(intmutex(kb));
         if(retval)
-            ckb_fatal("Error locking interrupt mutex %i\n", retval);
+            ckb_fatal("Error locking interrupt mutex %i", retval);
         memcpy(kb->interruptbuf, buffer, MSG_SIZE);
         // signal os_usbrecv() that the data is ready.
         retval = pthread_cond_broadcast(intcond(kb));
         if(retval)
-            ckb_fatal("Error broadcasting pthread cond %i\n", retval);
+            ckb_fatal("Error broadcasting pthread cond %i", retval);
         retval = pthread_mutex_unlock(intmutex(kb));
         if(retval)
-            ckb_fatal("Error unlocking interrupt mutex %i\n", retval);
+            ckb_fatal("Error unlocking interrupt mutex %i", retval);
     } else {
         queued_mutex_lock(imutex(kb));
         if(IS_LEGACY_DEV(kb)) {
@@ -357,10 +357,17 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 // HID Mouse Input
                 // In HW mode, Bragi mouse is the same as NXP, but without a header
                 if(kb->protocol == PROTO_BRAGI) {
-                    if(kb->active && firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1)
-                        ckb_info("Ignoring previous URB");
-                    else
+                    // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
+                    if(kb->active) {
+                        if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1) {
+                            corsair_bragi_mousecopy(kb->input.keys, buffer);
+                        } else {
+                            kb->input.rel_x += (buffer[5] << 8) | buffer[4];
+                            kb->input.rel_y += (buffer[7] << 8) | buffer[6];
+                        }
+                    } else {
                         hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                    }
                 } else if(firstbyte == MOUSE_IN) {
                     hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer + 1);
                 } else if(firstbyte == CORSAIR_IN) { // Corsair Mouse Input
@@ -368,7 +375,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 } else if(firstbyte == 0x05 && urblen == 21) { // Seems to be on the Ironclaw RGB only
                     corsair_extended_mousecopy(kb->input.keys, buffer);
                 } else {
-                    ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x\n", firstbyte, ep);
+                    ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x", firstbyte, ep);
                 }
             } else {
                 // Assume Keyboard for everything else for now
@@ -381,7 +388,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         buffer++;
                     corsair_kbcopy(kb->input.keys, buffer);
                 } else
-                    ckb_err("Unknown data received in input thread %02x from endpoint %02x\n", firstbyte, ep);
+                    ckb_err("Unknown data received in input thread %02x from endpoint %02x", firstbyte, ep);
             }
         }
         ///
@@ -410,7 +417,7 @@ void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput
                 if(scan >= 0)
                     SET_KEYBIT(kbinput, hid_codes[keybit]);
                 else
-                    ckb_warn("Got unknown NKRO key press %d\n", keybit);
+                    ckb_warn("Got unknown NKRO key press %d", keybit);
             } else if(scan >= 0)
                 CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
         }
@@ -470,7 +477,7 @@ void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbin
             if(scan >= 0)
                 SET_KEYBIT(kbinput, scan);
             else
-                ckb_warn("Got unknown legacy 6kro key press %d\n", urbinput[i]);
+                ckb_warn("Got unknown legacy 6kro key press %d", urbinput[i]);
         }
     }
 }
@@ -491,7 +498,7 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
                 handle_nkro_key_input(kbinput, urbinput, length, legacy);
                 break;
             default:
-                ckb_warn("Got unknown legacy data\n");
+                ckb_warn("Got unknown legacy data");
         }
     } else {
         switch(urbinput[0]) {
@@ -502,7 +509,7 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
                 handle_nkro_media_keys(kbinput, urbinput, length);
                 break;
             default:
-                ckb_warn("Got unknown data\n");
+                ckb_warn("Got unknown data");
         }
     }
 }
@@ -580,6 +587,62 @@ void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     *yaxis += (urbinput[5] << 8) | urbinput[4];
 
     char wheel = urbinput[6];
+    if(wheel > 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    if(wheel < 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+}
+
+#define BRAGI_MOUSE_BUTTONS 16
+/*
+01 00 == Left
+02 00 == Right
+04 00 == middle
+10 00 == back thumb
+08 00 == front thumb
+80 00 == DPI Up
+00 01 == Dpi Dn
+20 00 == Left Front
+40 00 == Left Back
+00 02 == sniper
+*/
+
+// We have to do it this way, because if we patch the keymap, then we'll break standard input
+const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
+        0x00,
+        0x01,
+        0x02,
+        0x04,
+        0x03,
+        0x05,
+        0x06,
+        0x08,
+        0x09,
+        0x07, // Anything past this is untested
+        0x0A,
+        0x0B,
+        0x0C,
+        0x0D,
+        0x0E,
+        0x0F,
+    };
+
+void corsair_bragi_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
+    urbinput += 2;
+    for(int bit = 0; bit < BRAGI_MOUSE_BUTTONS; bit++){
+        int byte = bit / 8;
+        uchar test = 1 << (bit % 8);
+        if(urbinput[byte] & test)
+            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+        else
+            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+    }
+    
+    char wheel = urbinput[2];
     if(wheel > 0)
         SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
     else

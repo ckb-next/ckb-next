@@ -167,11 +167,11 @@ char* printrgb(const lighting* light, const usbdevice* kb){
         snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%s%n" : " %s%n", names[i], &newlen);
         length += newlen;
         // Look ahead to see if any other keys have this color. If so, print them here as well.
-        uchar kr = r[i], kg = g[i], kb = b[i];
+        uchar k_r = r[i], k_g = g[i], k_b = b[i];
         for(int j = i + 1; j < N_KEYS_EXTENDED; j++){
             if(!names[j][0])
                 continue;
-            if(r[j] != kr || g[j] != kg || b[j] != kb)
+            if(r[j] != k_r || g[j] != k_g || b[j] != k_b)
                 continue;
             snprintf(buffer + length, BUFFER_LEN - length, ",%s%n", names[j], &newlen);
             length += newlen;
@@ -179,7 +179,7 @@ char* printrgb(const lighting* light, const usbdevice* kb){
             names[j][0] = 0;
         }
         // Print the color
-        snprintf(buffer + length, BUFFER_LEN - length, ":%02x%02x%02x%n", kr, kg, kb, &newlen);
+        snprintf(buffer + length, BUFFER_LEN - length, ":%02x%02x%02x%n", k_r, k_g, k_b, &newlen);
         length += newlen;
     }
     return buffer;

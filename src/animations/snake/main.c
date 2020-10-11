@@ -47,10 +47,6 @@ void ckb_info(){
 ckb_gradient firstcolour = { 0 };
 ckb_gradient secondcolour = { 0 };
 unsigned char s_a, s_r, s_g, s_b, e_a, e_r, e_g, e_b;
-int x = 0;
-int y = 0;
-int* x_ptr = &x;
-int* y_ptr = &y;
 ckb_key** snake_keys = 0;
 
 // TODO: add snake length option

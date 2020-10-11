@@ -51,7 +51,7 @@ static pthread_t macro_pt_dequeue() {
     pthread_t retval = 0;
     ptlist_t* elem = 0;
     if (pt_head == 0 && pt_tail == 0) {
-        ckb_err("macro_pt_dequeue: called on empty list.\n");
+        ckb_err("macro_pt_dequeue: called on empty list.");
         return 0;       ///< why are we called?
     }
     elem = pt_head;
@@ -92,11 +92,11 @@ static void* play_macro(void* param) {
     /// So enqueue our thread first, so it is remembered for us and can be seen by all others.
     pthread_mutex_lock(mmutex2(kb));
     macro_pt_enqueue();
-    // ckb_info("Entering critical section with 0x%lx. Queue head is 0x%lx\n",  (unsigned long int)pthread_self(), (unsigned long int)macro_pt_first());
+    // ckb_info("Entering critical section with 0x%lx. Queue head is 0x%lx",  (unsigned long int)pthread_self(), (unsigned long int)macro_pt_first());
     while (macro_pt_first() != pthread_self()) {    ///< If the first thread in the list is not our, another one is running
-        // ckb_info("Now waiting with 0x%lx because of 0x%lx\n", (unsigned long int)pthread_self(), (unsigned long int)macro_pt_first());
+        // ckb_info("Now waiting with 0x%lx because of 0x%lx", (unsigned long int)pthread_self(), (unsigned long int)macro_pt_first());
         pthread_cond_wait(mvar(kb), mmutex2(kb));
-        // ckb_info("Waking up with 0x%lx\n", (unsigned long int)pthread_self());
+        // ckb_info("Waking up with 0x%lx", (unsigned long int)pthread_self());
     }
     pthread_mutex_unlock(mmutex2(kb));       ///< Give all new threads the chance to enter the block.
 
@@ -147,7 +147,7 @@ static void* play_macro(void* param) {
     queued_mutex_lock(mmutex(kb));
 
     pthread_mutex_lock(mmutex2(kb));    ///< protect the linked list and the mvar
-    // ckb_info("Now leaving 0x%lx and waking up all others\n", (unsigned long int)pthread_self());
+    // ckb_info("Now leaving 0x%lx and waking up all others", (unsigned long int)pthread_self());
     macro_pt_dequeue();
     pthread_cond_broadcast(mvar(kb));   ///< Wake up all waiting threads
     pthread_mutex_unlock(mmutex2(kb));  ///< for the linked list and the mvar

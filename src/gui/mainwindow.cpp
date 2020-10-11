@@ -378,8 +378,8 @@ void MainWindow::closeEvent(QCloseEvent *event){
 void MainWindow::timerTick(){
     // Check shared memory for changes
     if(appShare.lock()){
-        void* data = appShare.data();
-        QStringList commands = QString((const char*)data).split("\n");
+        void* shmData = appShare.data();
+        QStringList commands = QString((const char*)shmData).split("\n");
         // Restore PID, remove all other data
         snprintf((char*)appShare.data(), appShare.size(), "PID %ld", (long)getpid());
         appShare.unlock();

@@ -65,10 +65,10 @@ void KbLight::color(const QString& key, const QColor& newColor){
 
 void KbLight::color(const QColor& newColor){
     QRgb newRgb = newColor.rgb();
-    QMutableColorMapIterator i(_qColorMap);
-    while(i.hasNext()){
-        i.next();
-        i.value() = newRgb;
+    QMutableColorMapIterator iter(_qColorMap);
+    while(iter.hasNext()){
+        iter.next();
+        iter.value() = newRgb;
     }
     _needsSave = true;
     // Reset flat map
@@ -431,7 +431,7 @@ void KbLight::load(CkbSettingsBase& settings){
     // Load RGB settings
     bool useReal = settings.value("UseRealNames").toBool();
     {
-        SGroup group(settings, "Keys");
+        SGroup subGroup(settings, "Keys");
         foreach(QString key, settings.childKeys()){
             QString name = key.toLower();
             if(!useReal)
@@ -448,7 +448,7 @@ void KbLight::load(CkbSettingsBase& settings){
         anim->deleteLater();
     _animList.clear();
     {
-        SGroup group(settings, "Animations");
+        SGroup subGroup(settings, "Animations");
         foreach(QString anim, settings.value("List").toStringList()){
             QUuid id = anim;
             _animList.append(new KbAnim(this, _map, id, settings));
@@ -467,7 +467,7 @@ void KbLight::save(CkbSettingsBase& settings){
     settings.setValue("UseRealNames", true);
     {
         // Save RGB settings
-        SGroup group(settings, "Keys");
+        SGroup subGroup(settings, "Keys");
         QMutableColorMapIterator i(_qColorMap);
         while(i.hasNext()){
             i.next();
@@ -476,7 +476,7 @@ void KbLight::save(CkbSettingsBase& settings){
     }
     {
         // Save animations
-        SGroup group(settings, "Animations");
+        SGroup subGroup(settings, "Animations");
         QStringList aList;
         foreach(KbAnim* anim, _animList){
             aList << anim->guid().toString().toUpper();

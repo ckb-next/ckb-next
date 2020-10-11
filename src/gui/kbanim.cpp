@@ -35,7 +35,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettingsBa
     _scriptName = settings.value("ScriptName").toString().trimmed();
     _scriptGuid = settings.value("ScriptGuid").toString();
     {
-        SGroup group(settings, "Parameters");
+        SGroup subgroup(settings, "Parameters");
         foreach(const QString& param, settings.childKeys())
             _parameters[param.toLower()] = settings.value(param);
     }
@@ -374,7 +374,7 @@ void KbAnim::blend(ColorMap& animMap, quint64 timestamp){
 
     // Blend the script's map with the current map
     int blendMode = (int)_mode;
-    blendFunc blend = functions[blendMode];
+    blendFunc blendF = functions[blendMode];
     float fOpacity = _opacity / 255.f;  // save some math by pre-dividing the 255 for qAlpha
 
     const ColorMap& scriptMap = _script->colors();
@@ -409,9 +409,9 @@ void KbAnim::blend(ColorMap& animMap, quint64 timestamp){
             // Use blend function
             float r = qRed(bg) / 255.f, g = qGreen(bg) / 255.f, b = qBlue(bg) / 255.f;
             float a = alpha * fOpacity;
-            r = r * (1.f - a) + blend(r, qRed(fg) / 255.f) * a;
-            g = g * (1.f - a) + blend(g, qGreen(fg) / 255.f) * a;
-            b = b * (1.f - a) + blend(b, qBlue(fg) / 255.f) * a;
+            r = r * (1.f - a) + blendF(r, qRed(fg) / 255.f) * a;
+            g = g * (1.f - a) + blendF(g, qGreen(fg) / 255.f) * a;
+            b = b * (1.f - a) + blendF(b, qBlue(fg) / 255.f) * a;
             bg = qRgb(round(r * 255.f), round(g * 255.f), round(b * 255.f));
         }
     }

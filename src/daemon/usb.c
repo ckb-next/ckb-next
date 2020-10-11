@@ -90,6 +90,7 @@ device_desc models[] = {
 
 size_t N_MODELS = sizeof(models) / sizeof(device_desc);
 
+device_desc ignored_devices[DEV_MAX] = {0};
 
 /// brief .
 ///
@@ -366,7 +367,7 @@ static void* _setupusb(void* context){
     /// Allocate memory for the os_usbrecv() buffer
     kb->interruptbuf = malloc(MSG_SIZE * sizeof(uchar));
     if(!kb->interruptbuf)
-        ckb_fatal("Error allocating memory for usb_recv() %s\n", strerror(errno));
+        ckb_fatal("Error allocating memory for usb_recv() %s", strerror(errno));
 
     // Check if the device needs a patched keymap, and if so patch it.
     patchkeys(kb);
@@ -500,7 +501,7 @@ static void* _setupusb(void* context){
     /// and devmain() is called.
     // Finished. Enter main loop
     int index = INDEX_OF(kb, keyboard);
-    ckb_info("Setup finished for %s%d\n", devpath, index);
+    ckb_info("Setup finished for %s%d", devpath, index);
     queued_mutex_unlock(dmutex(kb));
     updateconnected(kb);
     queued_mutex_lock(dmutex(kb));
@@ -526,7 +527,7 @@ static void* _setupusb(void* context){
 void setupusb(usbdevice* kb){
 
     if(pthread_create(&kb->thread, 0, _setupusb, kb)) {
-        ckb_err("Failed to create USB thread\n");
+        ckb_err("Failed to create USB thread");
         return;
     }
 
@@ -616,17 +617,17 @@ int _resetusb(usbdevice* kb, const char* file, int line){
 int usb_tryreset(usbdevice* kb){
     if(reset_stop)
         return -1;
-    ckb_info("Attempting reset...\n");
+    ckb_info("Attempting reset...");
     while(1){
         int res = resetusb(kb);
         if(!res){
-            ckb_info("Reset success\n");
+            ckb_info("Reset success");
             return 0;
         }
         if(res == -2 || reset_stop)
             break;
     }
-    ckb_err("Reset failed. Disconnecting.\n");
+    ckb_err("Reset failed. Disconnecting.");
     return -1;
 }
 
@@ -799,7 +800,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             DELAY_LONG(kb);
     }
     // Give up
-    ckb_err_fn("Too many send/recv failures. Dropping.\n", file, line);
+    ckb_err_fn("Too many send/recv failures. Dropping.", file, line);
     return 0;
 }
 
@@ -850,10 +851,19 @@ int closeusb(usbdevice* kb){
     queued_mutex_lock(imutex(kb));
     if(kb->handle){
         int index = INDEX_OF(kb, keyboard);
-        ckb_info("Disconnecting %s%d\n", devpath, index);
+        ckb_info("Disconnecting %s%d", devpath, index);
         os_inputclose(kb);
         queued_mutex_unlock(imutex(kb));
         queued_mutex_unlock(dmutex(kb));
+
+        // Shut down the device polling thread
+        if(kb->pollthread){
+            pthread_kill(*kb->pollthread, SIGUSR2);
+            pthread_join(*kb->pollthread, NULL);
+            free(kb->pollthread);
+            kb->pollthread = NULL;
+        }
+
         updateconnected(kb);
         queued_mutex_lock(dmutex(kb));
         queued_mutex_lock(imutex(kb));
@@ -872,20 +882,20 @@ int closeusb(usbdevice* kb){
     queued_mutex_unlock(imutex(kb));
     queued_mutex_unlock(dmutex(kb));
 
-    if(pthread_self() == kb->thread){
+    if(pthread_equal(pthread_self(), kb->thread)){
 #ifdef DEBUG_MUTEX
-        ckb_info("Attempted to pthread_join() self. Detaching instead.\n");
+        ckb_info("Attempted to pthread_join() self. Detaching instead.");
 #endif
         int detachres = pthread_detach(kb->thread);
         if(detachres)
-            ckb_err("pthread_detach() returned %s (%d)\n", strerror(detachres), detachres);
+            ckb_err("pthread_detach() returned %s (%d)", strerror(detachres), detachres);
     } else {
 #ifdef DEBUG_MUTEX
-        ckb_info("Joining thread 0x%lx for ckb%d by thread 0x%lx\n", kb->thread, INDEX_OF(kb, keyboard), pthread_self());
+        ckb_info("Joining thread 0x%lx for ckb%d by thread 0x%lx", kb->thread, INDEX_OF(kb, keyboard), pthread_self());
 #endif
         int joinres = pthread_join(kb->thread, NULL);
         if(joinres)
-            ckb_err("pthread_join() returned %s (%d)\n", strerror(joinres), joinres);
+            ckb_err("pthread_join() returned %s (%d)", strerror(joinres), joinres);
     }
     queued_mutex_lock(dmutex(kb));
 
@@ -911,25 +921,31 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
     for(int i = 0; i < actual_length; i++)
         sprintf(&converted[i * 3], "%02x ", buffer[i]);
     if(line == 0)
-        ckb_info("ckb%i %s %s\n", devnum, prefix, converted);
+        ckb_info("ckb%i %s %s", devnum, prefix, converted);
     else
-        ckb_info("ckb%i %s (via %s:%d) %s %s\n", devnum, function, file, line, prefix, converted);
+        ckb_info("ckb%i %s (via %s:%d) %s %s", devnum, function, file, line, prefix, converted);
 }
 
-void reactivate_devices()
-{
-    ckb_info("System has woken from sleep\n");
-    usbdevice *kb = NULL;
+#define TRY_WITH_RESET_NOFREE(action)                \
+    while(action){                                   \
+        if(usb_tryreset(kb)){                        \
+            ckb_err(#action " failed after resume"); \
+            return;                                  \
+        }                                            \
+    }
+
+void reactivate_devices(){
+    ckb_info("System has woken from sleep");
     for(int i = 1; i < DEV_MAX; i++){
-        kb = keyboard + i;
+        usbdevice* kb = keyboard + i;
         queued_mutex_lock(dmutex(kb));
-        if(IS_CONNECTED(keyboard + i)){
+        if(IS_CONNECTED(kb) && !NEEDS_FW_UPDATE(kb) && kb->active){
             // If the device was active, mark it as disabled and re-enable it
-            if(kb->active){
-                kb->active = 0;
-                const devcmd* vt = kb->vtable;
-                vt->active(kb, 0, 0, 0, 0);
-            }
+            kb->active = 0;
+            const devcmd* vt = kb->vtable;
+            TRY_WITH_RESET_NOFREE(vt->active(kb, 0, 0, 0, 0));
+            TRY_WITH_RESET_NOFREE(vt->updatergb(kb, 1));
+            TRY_WITH_RESET_NOFREE(vt->updatedpi(kb, 1));
         }
         queued_mutex_unlock(dmutex(kb));
     }

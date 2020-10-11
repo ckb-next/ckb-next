@@ -12,7 +12,7 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
         // If that didn't work, try /dev/input/uinput instead
         fd = open("/dev/input/uinput", O_RDWR);
         if(fd < 0){
-            ckb_err("Failed to open uinput: %s\n", strerror(errno));
+            ckb_err("Failed to open uinput: %s", strerror(errno));
             return 0;
         }
     }
@@ -46,9 +46,9 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
     ioctl(fd, UI_SET_EVBIT, EV_SYN);
     // Create the device
     if(write(fd, indev, sizeof(*indev)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
     if(ioctl(fd, UI_DEV_CREATE)){
-        ckb_err("Failed to create uinput device: %s\n", strerror(errno));
+        ckb_err("Failed to create uinput device: %s", strerror(errno));
         close(fd);
         return 0;
     }
@@ -71,7 +71,7 @@ int os_inputopen(usbdevice* kb){
     // If not available, load the module
     if(fd < 0){
         if(system("modprobe uinput") != 0) {
-            ckb_fatal("Failed to load uinput module\n");
+            ckb_fatal("Failed to load uinput module");
             return 1;
         }
     }
@@ -108,23 +108,32 @@ int os_inputopen(usbdevice* kb){
 void os_inputclose(usbdevice* kb){
     if(kb->uinput_kb <= 0 || kb->uinput_mouse <= 0)
         return;
+
+    // Tell the led thread to stop and then join it
+    if(kb->ledthread){
+        pthread_kill(*kb->ledthread, SIGUSR2);
+        pthread_join(*kb->ledthread, NULL);
+    }
+    free(kb->ledthread);
+    kb->ledthread = NULL;
+
     // Set all keys released
     struct input_event event;
     memset(&event, 0, sizeof(event));
     event.type = EV_KEY;
-    for(int key = 0; key < KEY_CNT; key++){
-        event.code = key;
+    for(int k = 0; k < KEY_CNT; k++){
+        event.code = k;
         if(write(kb->uinput_kb - 1, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s\n", strerror(errno));
+            ckb_warn("uinput write failed: %s", strerror(errno));
         if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s\n", strerror(errno));
+            ckb_warn("uinput write failed: %s", strerror(errno));
     }
     event.type = EV_SYN;
     event.code = SYN_REPORT;
     if(write(kb->uinput_kb - 1, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
     if(write(kb->uinput_mouse - 1, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
     // Close the keyboard
     ioctl(kb->uinput_kb - 1, UI_DEV_DESTROY);
     close(kb->uinput_kb - 1);
@@ -142,7 +151,7 @@ static void isync(int fd){
     event.type = EV_SYN;
     event.code = SYN_REPORT;
     if(write(fd, &event, sizeof(event)) <= 0)
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
 }
 
 void os_keypress(usbdevice* kb, int scancode, int down){
@@ -168,7 +177,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
     if(write(fd, &event, sizeof(event)) > 0)
         isync(fd);
     else
-        ckb_warn("uinput write failed: %s\n", strerror(errno));
+        ckb_warn("uinput write failed: %s", strerror(errno));
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
@@ -181,14 +190,14 @@ void os_mousemove(usbdevice* kb, int x, int y){
         event.code = REL_X;
         event.value = x;
         if(write(fd, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s\n", strerror(errno));
+            ckb_warn("uinput write failed: %s", strerror(errno));
     }
     //send Y
     if(y!=0){
         event.code = REL_Y;
         event.value = y;
         if(write(fd, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s\n", strerror(errno));
+            ckb_warn("uinput write failed: %s", strerror(errno));
     }
     //send SYN
     isync(fd);
@@ -215,6 +224,7 @@ void* _ledthread(void* ctx){
         }
         queued_mutex_unlock(dmutex(kb));
     }
+    ckb_info("Stopping indicator thread for ckb%d (%d)", INDEX_OF(kb, keyboard), errno);
     return 0;
 }
 
@@ -222,17 +232,21 @@ int os_setupindicators(usbdevice* kb){
     // Initialize LEDs to all off
     kb->hw_ileds = kb->hw_ileds_old = kb->ileds = 0;
     // Create and detach thread to read LED events
-    pthread_t thread;
-    // Give the thread a reasonable name
-    char ledthread_name[THREAD_NAME_MAX] = "ckbX led";
+    kb->ledthread = malloc(sizeof(pthread_t));
+    if(!kb->ledthread){
+        ckb_fatal("Failed to allocate memory for the indicator led thread");
+        return 1;
+    }
 
-    int err = pthread_create(&thread, 0, _ledthread, kb);
+    int err = pthread_create(kb->ledthread, 0, _ledthread, kb);
     if(err != 0)
         return err;
 
+    // Give the thread a reasonable name
+    char ledthread_name[THREAD_NAME_MAX] = "ckbX led";
+
     ledthread_name[3] = INDEX_OF(kb, keyboard) + '0';
-    pthread_setname_np(thread, ledthread_name);
-    pthread_detach(thread);
+    pthread_setname_np(*kb->ledthread, ledthread_name);
     return 0;
 }
 

@@ -7,7 +7,7 @@
 #include "ui_animsettingdialog.h"
 #include "colorbutton.h"
 #include "gradientbutton.h"
-#include "qoverloadlegacy.h"
+#include "compat/qoverloadlegacy.h"
 
 // QDial shows angles upside down (180° = top, 0° = bottom), so flip it
 static inline int angleFlip(int angle){

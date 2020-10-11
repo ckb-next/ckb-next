@@ -149,14 +149,14 @@ void KbAnimWidget::setSelectedKeys(const QStringList& keys){
         ui->keyButton->setVisible(true);
 }
 
-void KbAnimWidget::on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous){
-    if(!current)
+void KbAnimWidget::on_animList_currentItemChanged(QListWidgetItem* cur, QListWidgetItem* prev){
+    if(!cur)
         setCurrent(0);
     else
-        setCurrent(animations[current->data(Qt::UserRole).toUuid()]);
+        setCurrent(animations[cur->data(Qt::UserRole).toUuid()]);
 }
 
-void KbAnimWidget::on_animList_itemChanged(QListWidgetItem *item){
+void KbAnimWidget::on_animList_itemChanged(QListWidgetItem* item){
     if(item){
         KbAnim* anim = animations[item->data(Qt::UserRole).toUuid()];
         if(anim){

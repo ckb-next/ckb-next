@@ -307,7 +307,7 @@ const devcmd vtable_bragi = {
 
     .dpi = cmd_dpi,
     .dpisel = cmd_dpisel,
-    .lift = cmd_lift_bragi,
+    .lift = cmd_none,
     .snap = cmd_snap_bragi,
 
     .notify = cmd_notify,

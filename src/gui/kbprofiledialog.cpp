@@ -169,11 +169,11 @@ void KbProfileDialog::on_profileList_customContextMenuRequested(const QPoint &po
         // Refresh item icons
         int count = ui->profileList->count();
         for(int i = 0; i < count; i++){
-            QListWidgetItem* item = ui->profileList->item(i);
-            if(item->data(NEW_FLAG).toUInt() == 1)
+            QListWidgetItem* hwitem = ui->profileList->item(i);
+            if(hwitem->data(NEW_FLAG).toUInt() == 1)
                 continue;
-            KbProfile* profile = device->find(item->data(GUID).toUuid());
-            item->setIcon(QIcon((profile == device->hwProfile()) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"));
+            KbProfile* profile = device->find(hwitem->data(GUID).toUuid());
+            hwitem->setIcon(QIcon((profile == device->hwProfile()) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"));
         }
         // No need to repopulate here either
         return;
@@ -464,11 +464,11 @@ void KbProfileDialog::on_importButton_clicked(){
         QMessageBox::warning(this, tr("Error"), tr("Selected package contains some corrupt profiles.\n\nAn attempt will be made to import as many as possible."), QMessageBox::Ok);
 
     QString profilestrf(profilestr.join("\n• "));
-    int ret = QMessageBox::information(this, tr("Profile Import"),
+    int msgret = QMessageBox::information(this, tr("Profile Import"),
                                    tr("The following profiles will be imported.\n\n• ").append(profilestrf),
                                    QMessageBox::Ok,
                                    QMessageBox::Cancel);
-    if(ret == QMessageBox::Cancel){
+    if(msgret == QMessageBox::Cancel){
         importCleanup(extracted, profileptrs);
         return;
     }

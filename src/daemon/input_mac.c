@@ -16,7 +16,7 @@ void add_to_keys(int scan, vhid_keys* input){
             return;
         }
     }
-    ckb_warn("Dropping excess keypress\n");
+    ckb_warn("Dropping excess keypress");
 }
 
 void remove_from_keys(int scan, vhid_keys* input){
@@ -26,7 +26,7 @@ void remove_from_keys(int scan, vhid_keys* input){
             return;
         }
     }
-    ckb_warn("Couldn't find key to release\n");
+    ckb_warn("Couldn't find key to release");
 }
 
 // Functions to add/remove buttons from report
@@ -59,9 +59,9 @@ int os_inputopen(usbdevice* kb){
     io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(VIRTUAL_HID_ROOT_NAME));
 
     if(!service){
-        ckb_info("Attempting to load kext\n");
+        ckb_info("Attempting to load kext");
         system("kextutil " VIRTUAL_HID_KEXT_PATH );
-        ckb_info("Waiting for kext...\n");
+        ckb_info("Waiting for kext...");
 
         // Check every half a second if the kext is initialised, with a max of 10 seconds.
         for(int i = 0; i < 20; i++){
@@ -74,7 +74,7 @@ int os_inputopen(usbdevice* kb){
 
         // If the loop finished and the VHIDDevice is still not available, abort
         if(!service){
-            ckb_fatal("Unable to open VirtualHIDDevice\n");
+            ckb_fatal("Unable to open VirtualHIDDevice");
             return 1;
         }
     }
@@ -82,11 +82,11 @@ int os_inputopen(usbdevice* kb){
     kern_return_t kr;
     kr = IOServiceOpen(service, mach_task_self(), kIOHIDServerConnectType, &(kb->event));
     if(kr != KERN_SUCCESS)
-        ckb_fatal("IOServiceOpen for VirtualHIDKeyboard error\n");
+        ckb_fatal("IOServiceOpen for VirtualHIDKeyboard error");
 
     kr = IOServiceOpen(service, mach_task_self(), kIOHIDServerConnectType, &(kb->event_mouse));
     if(kr != KERN_SUCCESS)
-        ckb_fatal("IOServiceOpen for VirtualHIDPointing error\n");
+        ckb_fatal("IOServiceOpen for VirtualHIDPointing error");
 
     vhid_properties properties = {0};
 
@@ -95,10 +95,10 @@ int os_inputopen(usbdevice* kb){
                                     &properties, sizeof(vhid_properties),
                                     NULL, 0);
     if(kr != KERN_SUCCESS){
-        ckb_fatal("VirtualHIDKeyboard init error\n");
+        ckb_fatal("VirtualHIDKeyboard init error");
     }
 
-    ckb_info("Waiting for VirtualHIDKeyboard...\n");
+    ckb_info("Waiting for VirtualHIDKeyboard...");
 
     while(1){
         bool ready = false;
@@ -108,7 +108,7 @@ int os_inputopen(usbdevice* kb){
                                     NULL, 0,
                                     &ready, &readysize);
         if (kr == KERN_SUCCESS && ready){
-            ckb_info("VirtualHIDKeyboard ready\n");
+            ckb_info("VirtualHIDKeyboard ready");
             break;
         }
 
@@ -122,7 +122,7 @@ int os_inputopen(usbdevice* kb){
                                     NULL, 0,
                                     NULL, 0);
     if(kr != KERN_SUCCESS)
-        ckb_fatal("VirtualHIDPointing init error %x\n", kr);
+        ckb_fatal("VirtualHIDPointing init error %x", kr);
 
     clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 10000000}, NULL);
 
@@ -131,7 +131,7 @@ int os_inputopen(usbdevice* kb){
 
 void os_inputclose(usbdevice* kb){
     if(kb->event){
-        ckb_info("Terminating VirtualHIDKeyboard\n");
+        ckb_info("Terminating VirtualHIDKeyboard");
         IOConnectCallStructMethod(kb->event, reset_virtual_hid_keyboard, NULL, 0, NULL, 0);
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 10000000}, NULL);
         IOConnectCallStructMethod(kb->event, terminate_virtual_hid_keyboard, NULL, 0, NULL, 0);
@@ -139,7 +139,7 @@ void os_inputclose(usbdevice* kb){
         kb->event = 0;
     }
     if(kb->event_mouse){
-        ckb_info("Terminating VirtualHIDPointing\n");
+        ckb_info("Terminating VirtualHIDPointing");
         IOConnectCallStructMethod(kb->event_mouse, reset_virtual_hid_pointing, NULL, 0, NULL, 0);
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 10000000}, NULL);
         IOConnectCallStructMethod(kb->event_mouse, terminate_virtual_hid_pointing, NULL, 0, NULL, 0);
@@ -196,7 +196,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
         IOConnectCallStructMethod(kb->event, post_apple_vendor_top_case_input_report, &kb->kbinput_avtopcase, sizeof(kb->kbinput_avtopcase), NULL, 0);
     }/* else if(IS_VENDOR(scancode)) {
         scancode = scancode - KEY_CONSUMER;
-        ckb_info("Vendor %x\n", scancode);
+        ckb_info("Vendor %x", scancode);
         (*add_remove_keys)(scancode, &(kb->kbinput_vendor.keys));
         kb->kbinput_vendor.keys.keys_[0] = 0x10;
         IOConnectCallStructMethod(kb->event, post_apple_vendor_keyboard_input_report, &kb->kbinput_vendor, sizeof(kb->kbinput_vendor), NULL, 0);

@@ -39,7 +39,7 @@ int rm_recursive(const char* path){
 void check_chown(const char *pathname, uid_t owner, long group){
     if (group >= 0) {
         if (chown(pathname, owner, group) < 0) {
-            ckb_warn("Chown call failed %s: %s\n", pathname, strerror(errno));
+            ckb_warn("Chown call failed %s: %s", pathname, strerror(errno));
             exit(EXIT_FAILURE);
         }
     }
@@ -48,7 +48,7 @@ void check_chown(const char *pathname, uid_t owner, long group){
 void check_fchown(int fd, uid_t owner, long group){
     if (group >= 0) {
         if (fchown(fd, owner, group) < 0) {
-            ckb_warn("FChown call failed: %s\n", strerror(errno));
+            ckb_warn("FChown call failed: %s", strerror(errno));
             exit(EXIT_FAILURE);
         }
     }
@@ -56,7 +56,7 @@ void check_fchown(int fd, uid_t owner, long group){
 
 void check_chmod(const char *pathname, mode_t mode){
     if(chmod(pathname, mode) < 0) {
-        ckb_warn("Chmod call failed %s: %s\n", pathname, strerror(errno));
+        ckb_warn("Chmod call failed %s: %s", pathname, strerror(errno));
         exit(EXIT_FAILURE);
     }
 }
@@ -84,7 +84,7 @@ void _updateconnected(usbdevice* kb){
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
     FILE* cfile = fopen(cpath, "w");
     if(!cfile){
-        ckb_warn("Unable to update %s: %s\n", cpath, strerror(errno));
+        ckb_warn("Unable to update %s: %s", cpath, strerror(errno));
         queued_mutex_unlock(devmutex);
         return;
     }
@@ -92,7 +92,7 @@ void _updateconnected(usbdevice* kb){
     if(kb != keyboard){
         for(int i = 1; i < DEV_MAX; i++){
 #ifdef DEBUG_MUTEX
-            ckb_info("Locking ckb%d in _updateconnected()\n", i);
+            ckb_info("Locking ckb%d in _updateconnected()", i);
 #endif
             queued_mutex_lock(devmutex + i);
             if(IS_CONNECTED(keyboard + i)){
@@ -100,7 +100,7 @@ void _updateconnected(usbdevice* kb){
                 fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].serial, keyboard[i].name);
             }
 #ifdef DEBUG_MUTEX
-            ckb_info("Unlocking ckb%d in _updateconnected()\n", i);
+            ckb_info("Unlocking ckb%d in _updateconnected()", i);
 #endif
             queued_mutex_unlock(devmutex + i);
         }
@@ -133,7 +133,7 @@ int _mknotifynode(usbdevice* kb, int notify){
     snprintf(outpath, sizeof(outpath), "%s%c/notify%c", devpath, index, notify_char);
     if(mkfifo(outpath, S_GID_READ) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK) + 1) == 0){
         // Add one to the FD because 0 is a valid descriptor, but ckb uses 0 for uninitialized devices
-        ckb_warn("Unable to create %s: %s\n", outpath, strerror(errno));
+        ckb_warn("Unable to create %s: %s", outpath, strerror(errno));
         kb->outfifo[notify] = 0;
         remove(outpath);
         return -1;
@@ -180,7 +180,7 @@ static void printnode(const char* path, const char* str){
         check_chmod(path, S_GID_READ);
         check_chown(path, 0, gid);
     } else {
-        ckb_warn("Unable to create %s: %s\n", path, strerror(errno));
+        ckb_warn("Unable to create %s: %s", path, strerror(errno));
         remove(path);
     }
 }
@@ -207,11 +207,11 @@ static int _mkdevpath(usbdevice* kb){
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
     if(rm_recursive(path) != 0 && errno != ENOENT){
-        ckb_err("Unable to delete %s: %s\n", path, strerror(errno));
+        ckb_err("Unable to delete %s: %s", path, strerror(errno));
         return -1;
     }
     if(mkdir(path, S_READDIR) != 0){
-        ckb_err("Unable to create %s: %s\n", path, strerror(errno));
+        ckb_err("Unable to create %s: %s", path, strerror(errno));
         rm_recursive(path);
         return -1;
     }
@@ -231,7 +231,7 @@ static int _mkdevpath(usbdevice* kb){
             check_chmod(vpath, S_GID_READ);
             check_chown(vpath, 0, gid);
         } else {
-            ckb_warn("Unable to create %s: %s\n", vpath, strerror(errno));
+            ckb_warn("Unable to create %s: %s", vpath, strerror(errno));
             remove(vpath);
         }
         // Write PID
@@ -244,7 +244,7 @@ static int _mkdevpath(usbdevice* kb){
             check_chmod(ppath, S_READ);
             check_chown(vpath, 0, gid);
         } else {
-            ckb_warn("Unable to create %s: %s\n", ppath, strerror(errno));
+            ckb_warn("Unable to create %s: %s", ppath, strerror(errno));
             remove(ppath);
         }
     } else {
@@ -255,7 +255,7 @@ static int _mkdevpath(usbdevice* kb){
                 // Open the node in RDWR mode because RDONLY will lock the thread
                 || (kb->infifo = open(inpath, O_RDWR) + 1) == 0){
             // Add one to the FD because 0 is a valid descriptor, but ckb uses 0 for uninitialized devices
-            ckb_err("Unable to create %s: %s\n", inpath, strerror(errno));
+            ckb_err("Unable to create %s: %s", inpath, strerror(errno));
             rm_recursive(path);
             kb->infifo = 0;
             return -1;
@@ -320,7 +320,7 @@ static int _mkdevpath(usbdevice* kb){
             check_chmod(fpath, S_GID_READ);
             check_chown(fpath, 0, gid);
         } else {
-            ckb_warn("Unable to create %s: %s\n", fpath, strerror(errno));
+            ckb_warn("Unable to create %s: %s", fpath, strerror(errno));
             remove(fpath);
         }
         // Write firmware version and poll rate
@@ -345,7 +345,7 @@ int rmdevpath(usbdevice* kb){
         fcntl(fd, F_SETFL, O_RDWR | O_NONBLOCK); // hack to prevent the following hack from blocking if the GUI was running
 #endif
         if (write(fd, "\n", 1) < 0)
-            ckb_warn("Unable to write to filedescriptor %d: %s\n", fd, strerror(errno));
+            ckb_warn("Unable to write to filedescriptor %d: %s", fd, strerror(errno));
         close(fd);
         kb->infifo = 0;
     }
@@ -354,11 +354,11 @@ int rmdevpath(usbdevice* kb){
     char path[strlen(devpath) + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
     if(rm_recursive(path) != 0 && errno != ENOENT){
-        ckb_warn("Unable to delete %s: %s\n", path, strerror(errno));
+        ckb_warn("Unable to delete %s: %s", path, strerror(errno));
         euid_guard_stop;
         return -1;
     }
-    ckb_info("Removed device path %s\n", path);
+    ckb_info("Removed device path %s", path);
     euid_guard_stop;
     return 0;
 }
@@ -375,7 +375,7 @@ int mkfwnode(usbdevice* kb){
         check_chmod(fwpath, S_GID_READ);
         check_chown(fwpath, 0, gid);
     } else {
-        ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
+        ckb_warn("Unable to create %s: %s", fwpath, strerror(errno));
         remove(fwpath);
         return -1;
     }
@@ -389,7 +389,7 @@ int mkfwnode(usbdevice* kb){
         check_chmod(ppath, S_GID_READ);
         check_chown(ppath, 0, gid);
     } else {
-        ckb_warn("Unable to create %s: %s\n", fwpath, strerror(errno));
+        ckb_warn("Unable to create %s: %s", fwpath, strerror(errno));
         remove(ppath);
         return -2;
     }
@@ -461,7 +461,7 @@ unsigned readlines(int fd, readlines_ctx ctx, const char** input){
         *input = 0;
         if(length == MAX_BUFFER){
             // Unless the buffer is completely full, in which case discard it
-            ckb_warn("Too much input (1MB). Dropping.\n");
+            ckb_warn("Too much input (1MB). Dropping.");
             return 0;
         }
         leftoverlen = ctx->leftoverlen = length;

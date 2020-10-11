@@ -73,7 +73,7 @@ int _start_dev(usbdevice* kb, int makeactive){
                 return -1;
             else if(hwload_mode){
                 // hwload=once. Log failure, prevent trying again, and continue.
-                ckb_warn("Unable to load firmware version/poll rate\n");
+                ckb_warn("Unable to load firmware version/poll rate");
                 kb->features &= ~FEAT_HWLOAD;
             }
             kb->pollrate = 0;
@@ -116,7 +116,7 @@ int _start_dev(usbdevice* kb, int makeactive){
     ///
     if(NEEDS_FW_UPDATE(kb)){
         /// - Device needs a firmware update. Finish setting up but don't do anything.
-        ckb_info("Device needs a firmware update. Please issue a fwupdate command.\n");
+        ckb_info("Device needs a firmware update. Please issue a fwupdate command.");
         kb->features = FEAT_RGB | FEAT_FWVERSION | FEAT_FWUPDATE;
         kb->active = 1;
         return 0;
@@ -130,7 +130,7 @@ int _start_dev(usbdevice* kb, int makeactive){
         if(hwloadprofile(kb, 1)){
             if(hwload_mode == 2)
                 return -1;
-            ckb_warn("Unable to load hardware profile\n");
+            ckb_warn("Unable to load hardware profile");
             kb->features &= ~FEAT_HWLOAD;
         }
     }
@@ -144,7 +144,7 @@ int _start_dev(usbdevice* kb, int makeactive){
     for(unsigned i = 1; i < DEV_MAX; i++){
         devlistpos += sprintf(&devlist[devlistpos], "%u: 0x%x; ", i, keyboard[i].product);
     }
-    ckb_info("Attached Devices: %s\n", devlist);
+    ckb_info("Attached Devices: %s", devlist);
     #endif
     return 0;
 }

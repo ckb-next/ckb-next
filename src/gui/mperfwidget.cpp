@@ -2,7 +2,7 @@
 #include "ui_mperfwidget.h"
 #include "modeselectdialog.h"
 #include <cmath>
-#include "qoverloadlegacy.h"
+#include "compat/qoverloadlegacy.h"
 
 const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 

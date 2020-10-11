@@ -6,12 +6,16 @@
 // Commands
 #define BRAGI_SET           0x01
 #define BRAGI_GET           0x02
+#define BRAGI_CLOSE_HANDLE  0x05
 #define BRAGI_WRITE_DATA    0x06
 #define BRAGI_OPEN_HANDLE   0x0d
 
 // What to get/set
 #define BRAGI_POLLRATE      0x01
 #define BRAGI_MODE          0x03
+#define BRAGI_ANGLE_SNAP    0x07
+#define BRAGI_DPI_X         0x21
+#define BRAGI_DPI_Y         0x22
 
 // Bragi mode
 #define BRAGI_MODE_HARDWARE 0x01

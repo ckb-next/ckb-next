@@ -114,12 +114,12 @@ int updatedpi(usbdevice* kb, int force){
         return 0;
     lastdpi->forceupdate = newdpi->forceupdate = 0;
 
-    if (newdpi->current != lastdpi->current) {
+    if (newdpi->current != lastdpi->current || force) {
         // Before we switch the current DPI stage, make sure the stage we are
         // switching to is both enabled and configured to the correct DPI.
 
         // Enable the stage if necessary.
-        if ((lastdpi->enabled & 1 << newdpi->current) == 0) {
+        if ((lastdpi->enabled & 1 << newdpi->current) == 0 || force) {
             uchar newenabled;
             // If the new enabled flags contain both the current and previous
             // stages, use it.
@@ -139,7 +139,7 @@ int updatedpi(usbdevice* kb, int force){
         }
         // Set the DPI for the new stage if necessary.
         if (newdpi->x[newdpi->current] != lastdpi->x[newdpi->current] ||
-            newdpi->y[newdpi->current] != lastdpi->y[newdpi->current]) {
+            newdpi->y[newdpi->current] != lastdpi->y[newdpi->current] || force) {
             uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
             data_pkt[2] |= newdpi->current;
             // Set the independent X/Y bit if the X/Y values differ
@@ -164,7 +164,7 @@ int updatedpi(usbdevice* kb, int force){
     // Send X/Y DPIs. We've changed to the new stage already so these can be set
     // safely.
     for(int i = 0; i < DPI_COUNT; i++){
-        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i])
+        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i] && !force)
             continue;
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
         data_pkt[2] |= i;
@@ -180,17 +180,17 @@ int updatedpi(usbdevice* kb, int force){
     }
 
     // Send settings
-    if (newdpi->enabled != lastdpi->enabled) {
+    if (newdpi->enabled != lastdpi->enabled || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIMASK, 0, newdpi->enabled };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
     }
-    if (newdpi->lift != lastdpi->lift) {
+    if (newdpi->lift != lastdpi->lift || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_LIFT, 0, newdpi->lift };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
     }
-    if (newdpi->snap != lastdpi->snap) {
+    if (newdpi->snap != lastdpi->snap || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_SNAP, 0, newdpi->snap, 0x05 };
         if(!usbsend(kb, data_pkt, 1))
             return -2;
@@ -244,7 +244,7 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
         if(!usbrecv(kb, data_pkt[i], in_pkt[i]))
             return -2;
         if(memcmp(in_pkt[i], data_pkt[i], 4)){
-            ckb_err("Bad input header\n");
+            ckb_err("Bad input header");
             return -3;
         }
     }
@@ -261,21 +261,21 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
 
     // Get X/Y DPIs
     for(int i = 0; i < DPI_COUNT; i++){
-        uchar data_pkt[MSG_SIZE] = { CMD_GET, FIELD_MOUSE, MOUSE_DPIPROF, 1 };
-        uchar in_pkt[MSG_SIZE];
-        data_pkt[2] |= i;
-        if(!usbrecv(kb, data_pkt, in_pkt))
+        uchar dpi_pkt[MSG_SIZE] = { CMD_GET, FIELD_MOUSE, MOUSE_DPIPROF, 1 };
+        uchar dpi_in_pkt[MSG_SIZE];
+        dpi_pkt[2] |= i;
+        if(!usbrecv(kb, dpi_pkt, dpi_in_pkt))
             return -2;
-        if(memcmp(in_pkt, data_pkt, 4)){
-            ckb_err("Bad input header\n");
+        if(memcmp(dpi_in_pkt, dpi_pkt, 4)){
+            ckb_err("Bad input header");
             return -3;
         }
         // Copy to profile
-        dpi->x[i] = (in_pkt[6] << 8) | in_pkt[5];
-        dpi->y[i] = (in_pkt[8] << 8) | in_pkt[7];
-        light->r[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[9];
-        light->g[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[10];
-        light->b[LED_MOUSE + N_MOUSE_ZONES + i] = in_pkt[11];
+        dpi->x[i] = (dpi_in_pkt[6] << 8) | dpi_in_pkt[5];
+        dpi->y[i] = (dpi_in_pkt[8] << 8) | dpi_in_pkt[7];
+        light->r[LED_MOUSE + N_MOUSE_ZONES + i] = dpi_in_pkt[9];
+        light->g[LED_MOUSE + N_MOUSE_ZONES + i] = dpi_in_pkt[10];
+        light->b[LED_MOUSE + N_MOUSE_ZONES + i] = dpi_in_pkt[11];
     }
     // Finished. Set SW DPI light to the current hardware level
     light->r[LED_MOUSE + 2] = light->r[LED_MOUSE + N_MOUSE_ZONES + dpi->current];

@@ -27,8 +27,8 @@ public:
     // Profile properties
     inline QString  name() const                    { return _name; }
     inline void     name(const QString& newName)    { _needsSave = true; _name = newName.trimmed(); if(_name == "") _name = "Unnamed"; }
-    inline UsbId&   id()                            { return _id; }
-    inline void     id(const UsbId& newId)          { _needsSave = true; _id = newId; }
+    inline UsbId&   id()                            { return _usbId; }
+    inline void     id(const UsbId& newId)          { _needsSave = true; _usbId = newId; }
 
     // Creates a new ID for the profile and all of its modes
     void newId();
@@ -57,7 +57,7 @@ public:
 private:
     KbMode* _currentMode;
     QString _name;
-    UsbId   _id;
+    UsbId   _usbId;
     KeyMap  _keyMap;
     ModeList _modes;
     bool _needsSave;

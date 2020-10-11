@@ -19,7 +19,7 @@ static IONotificationPortRef notify = 0;
 int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
 #ifdef DEBUG_USB_SEND
     int ckb = INDEX_OF(kb, keyboard);
-    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
     if(len)
         print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
 #endif
@@ -152,7 +152,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 
         if(is_recv)
             if(pthread_mutex_lock(intmutex(kb)))
-                ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
+                ckb_fatal("Error locking interrupt mutex in os_usbsend()");
 
         // Try sending an interrupt, and if that fails, fall back to setReport through the HID driver.
         // Needed for single EP devices.
@@ -169,7 +169,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
     }
     kb->lastresult = res;
     if(res != kIOReturnSuccess){
-        ckb_err_fn("Got return value 0x%x\n", file, line, res);
+        ckb_err_fn("Got return value 0x%x", file, line, res);
         if(IS_TEMP_FAILURE(res))
             return -1;
         else
@@ -195,17 +195,17 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         int condret = pthread_cond_timedwait(intcond(kb), intmutex(kb), &condwait);
         if(condret != 0){
             if(pthread_mutex_unlock(intmutex(kb)))
-                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
+                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
             if(condret == ETIMEDOUT)
-                ckb_warn_fn("ckb%d: Timeout while waiting for response\n", file, line, INDEX_OF(kb, keyboard));
+                ckb_warn_fn("ckb%d: Timeout while waiting for response", file, line, INDEX_OF(kb, keyboard));
             else
-                ckb_warn_fn("Interrupt cond error %i\n", file, line, condret);
+                ckb_warn_fn("Interrupt cond error %i", file, line, condret);
             return -1;
         }
         memcpy(in_msg, kb->interruptbuf, MSG_SIZE);
         memset(kb->interruptbuf, 0, MSG_SIZE);
         if(pthread_mutex_unlock(intmutex(kb)))
-            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
+            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
 
 #ifdef DEBUG_USB_RECV
         print_urb_buffer("Recv:", in_msg, MSG_SIZE, file, line, __func__);
@@ -221,14 +221,14 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
     kb->lastresult = res;
 
     if(res != kIOReturnSuccess){
-        ckb_err_fn("Got return value 0x%x\n", file, line, res);
+        ckb_err_fn("Got return value 0x%x", file, line, res);
         if(IS_TEMP_FAILURE(res))
             return -1;
         else
             return 0;
     }
     if(length != MSG_SIZE)
-        ckb_err_fn("Read %u bytes (expected %d)\n", file, line, length, MSG_SIZE);
+        ckb_err_fn("Read %u bytes (expected %d)", file, line, length, MSG_SIZE);
 
 #ifdef DEBUG_USB_RECV
     print_urb_buffer("Recv:", in_msg, MSG_SIZE, file, line, __func__);
@@ -240,7 +240,7 @@ int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int
     IOUSBDevRequestTO rq = { 0x40, bRequest, wValue, 0, 0, 0, 0, 5000, 5000 };
     kern_return_t res = (*kb->handle)->DeviceRequestTO(kb->handle, &rq);
     if(res != kIOReturnSuccess){
-        ckb_err_fn("Got return value 0x%x\n", file, line, res);
+        ckb_err_fn("Got return value 0x%x", file, line, res);
         return 1;
     }
     return 0;
@@ -274,7 +274,7 @@ void os_sendindicators(usbdevice* kb){
         CFRelease(leds);
     }
     if(res != kIOReturnSuccess)
-        ckb_err("Got return value 0x%x\n", res);
+        ckb_err("Got return value 0x%x", res);
 }
 
 int os_resetusb(usbdevice* kb, const char* file, int line){
@@ -399,7 +399,7 @@ void register_mouse_event_tap(CFRunLoopTimerRef timer, void* info) {
                 // Add the tap to the runloop.
                 CFRunLoopSourceRef run_loop_source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, mouse_event_tap, 0);
                 if (run_loop_source) {
-                    ckb_info("Registering EventTap for modifier keys.\n");
+                    ckb_info("Registering EventTap for modifier keys.");
                     CFRunLoopAddSource(run_loop, run_loop_source, kCFRunLoopCommonModes);
                     CGEventTapEnable(mouse_event_tap, true);
                     CFRelease(run_loop_source);
@@ -440,7 +440,7 @@ void* os_inputmain(void* context){
         else
             continue;
         if(res != kIOReturnSuccess){
-            ckb_err("Failed to start input thread for %s%d: %x\n", devpath, index, res);
+            ckb_err("Failed to start input thread for %s%d: %x", devpath, index, res);
             return 0;
         }
         if(CFGetTypeID(eventsource) == CFRunLoopSourceGetTypeID())
@@ -448,7 +448,7 @@ void* os_inputmain(void* context){
         else if(CFGetTypeID(eventsource) == CFRunLoopTimerGetTypeID())
             CFRunLoopAddTimer(runloop, (CFRunLoopTimerRef)eventsource, kCFRunLoopDefaultMode);
     }
-    ckb_info("Starting input thread for %s%d\n", devpath, index);
+    ckb_info("Starting input thread for %s%d", devpath, index);
 
     // Start getting reports
     urbctx input[IFACE_MAX];
@@ -502,7 +502,7 @@ void* os_inputmain(void* context){
     }
 
     // Clean up
-    ckb_info("Stopping input thread for %s%d\n", devpath, index);
+    ckb_info("Stopping input thread for %s%d", devpath, index);
     for(int i = 0; i < count; i++)
         free(input[i].buffer);
     return 0;
@@ -515,8 +515,8 @@ int os_setupusb(usbdevice* kb){
     // Get the device firmware version
     (*kb->handle)->GetDeviceReleaseNumber(kb->handle, &kb->fwversion);
     int devnode = INDEX_OF(kb, keyboard);
-    ckb_info("ckb%i USB handles: 0: %p, 1: %p, 2:%p, 3: %p\n", devnode, kb->ifusb[0], kb->ifusb[1], kb->ifusb[2], kb->ifusb[3]);
-    ckb_info("ckb%i HID handles: 0: %p, 1: %p, 2:%p, 3: %p\n", devnode, kb->ifhid[0], kb->ifhid[1], kb->ifhid[2], kb->ifhid[3]);
+    ckb_info("ckb%i USB handles: 0: %p, 1: %p, 2:%p, 3: %p", devnode, kb->ifusb[0], kb->ifusb[1], kb->ifusb[2], kb->ifusb[3]);
+    ckb_info("ckb%i HID handles: 0: %p, 1: %p, 2:%p, 3: %p", devnode, kb->ifhid[0], kb->ifhid[1], kb->ifhid[2], kb->ifhid[3]);
     return 0;
 }
 
@@ -618,7 +618,7 @@ static int seize_wait(long location){
     kern_return_t res;
     if(!master && (res = IOMasterPort(bootstrap_port, &master)) != kIOReturnSuccess){
         master = 0;
-        ckb_warn("Unable to open master port: 0x%08x\n", res);
+        ckb_warn("Unable to open master port: 0x%08x", res);
         return -1;
     }
     const int max_tries = 20;     // give up after ~6s
@@ -659,7 +659,7 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
     // Use the location ID key to group the USB handle with the HID handles
     int index = find_device(idvendor, idproduct, location, 0);
     if(index == -1){
-        ckb_err("No free devices\n");
+        ckb_err("No free devices");
         return 0;
     }
     usbdevice* kb = keyboard + index;
@@ -667,7 +667,7 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
     // Set the handle for the keyboard
     if(kb->handle && kb->handle != INCOMPLETE){
         // This should never happen
-        ckb_warn("Tried to set up handle for device ckb%d, but it was already set up. Skipping...\n", index);
+        ckb_warn("Tried to set up handle for device ckb%d, but it was already set up. Skipping...", index);
         goto error;
     }
     kb->handle = handle;
@@ -679,12 +679,12 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
             usbgetstr(handle, serial_idx, kb->serial, SERIAL_LEN);
         if((*handle)->USBGetProductStringIndex(handle, &product_idx) == kIOReturnSuccess)
             usbgetstr(handle, product_idx, kb->name, KB_NAME_LEN);
-        ckb_info("Connecting %s at %s%d\n", keyboard[index].name, devpath, index);
+        ckb_info("Connecting %s at %s%d", keyboard[index].name, devpath, index);
     }
 
     // Iterate through the USB interfaces. Most of these will fail to open because they're already grabbed by the HID system.
     if(seize_wait(location))
-        ckb_warn("seize_wait failed, connecting anyway...\n");
+        ckb_warn("seize_wait failed, connecting anyway...");
     IOUSBFindInterfaceRequest interfaceRequest;
     interfaceRequest.bInterfaceClass = kIOUSBFindInterfaceDontCare;
     interfaceRequest.bInterfaceSubClass = kIOUSBFindInterfaceDontCare;
@@ -694,7 +694,7 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
     // Count the total number of interfaces as well as the number successfully opened.
     while((iface = IOIteratorNext(iterator)) != 0){
         if(iface_count >= IFACE_MAX){
-            ckb_warn("Too many interfaces. Dropping the rest.\n");
+            ckb_warn("Too many interfaces. Dropping the rest.");
             IOObjectRelease(iface);
             break;
         }
@@ -704,13 +704,13 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
         kern_return_t err;
         wait_loop(err, IOCreatePlugInInterfaceForService(iface, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &plugin, &score));
         if(err != kIOReturnSuccess){
-            ckb_err("Failed to create interface plugin: %x\n", err);
+            ckb_err("Failed to create interface plugin: %x", err);
             goto release;
         }
         usb_iface_t if_handle;
         wait_loop(err, (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID183), (LPVOID)&if_handle));
         if(err != kIOReturnSuccess){
-            ckb_err("QueryInterface failed: %x\n", err);
+            ckb_err("QueryInterface failed: %x", err);
             goto release;
         }
         // Plugin is no longer needed
@@ -722,7 +722,7 @@ static usbdevice* add_usb(usb_dev_t handle, io_object_t** rm_notify){
         err = (*if_handle)->USBInterfaceOpenSeize(if_handle);   // no wait_loop here because this is expected to fail
         if(err == kIOReturnSuccess){
             kb->ifusb[iface_count] = if_handle;
-            ckb_info("ckb%d: Adding USB handle with id %i\n", index, iface_count);
+            ckb_info("ckb%d: Adding USB handle with id %i", index, iface_count);
             iface_success++;
             // Register for removal notification
             IOServiceAddInterestNotification(notify, iface, kIOGeneralInterest, remove_device, kb, kb->rm_notify + 1 + iface_count);
@@ -738,7 +738,7 @@ release:
     if(iface_count == 0){
         // This shouldn't happen, but if it does, assume EP count based on what the device is supposed to have
         iface_count = (HAS_FEATURES(kb, FEAT_RGB) ? 4 : 3);
-        ckb_warn("Unable to count endpoints, assuming %d...\n", iface_count);
+        ckb_warn("Unable to count endpoints, assuming %d...", iface_count);
     }
     kb->epcount = iface_count;
     kb->epcount_usb = iface_success;
@@ -765,14 +765,14 @@ static void iterate_devices_usb(void* context, io_iterator_t iterator){
         kern_return_t err;
         wait_loop(err, IOCreatePlugInInterfaceForService(device, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugin, &score));
         if(err != kIOReturnSuccess){
-            ckb_err("Failed to create device plugin: %x\n", err);
+            ckb_err("Failed to create device plugin: %x", err);
             goto release;
         }
         // Get the device interface
         usb_dev_t handle;
         wait_loop(err, (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID182), (LPVOID*)&handle));
         if(err != kIOReturnSuccess){
-            ckb_err("QueryInterface failed: %x\n", err);
+            ckb_err("QueryInterface failed: %x", err);
             goto release;
         }
         // Plugin is no longer needed
@@ -781,9 +781,9 @@ static void iterate_devices_usb(void* context, io_iterator_t iterator){
         err = (*handle)->USBDeviceOpenSeize(handle);
         if(err == kIOReturnExclusiveAccess){
             // We can't send control transfers but most of the other functions should work
-            ckb_warn("Unable to seize USB handle, continuing anyway...\n");
+            ckb_warn("Unable to seize USB handle, continuing anyway...");
         } else if(err != kIOReturnSuccess){
-            ckb_err("USBDeviceOpen failed: %x\n", err);
+            ckb_err("USBDeviceOpen failed: %x", err);
             continue;
         }
         // Connect it
@@ -827,7 +827,7 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         else if(input == 64 && output <= 2 && feature == 1)
             handle_idx = 0;
         else {
-            ckb_warn("Got unknown V3 handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
+            ckb_warn("Got unknown V3 handle (I: %d, O: %d, F: %d)", (int)input, (int)output, (int)feature);
             return 0;
         }
     } else if(IS_SINGLE_EP(&fakekb)) {
@@ -838,7 +838,7 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
         else if(input == 6)
             handle_idx = 1; // This one is most likely useless
         else {
-            ckb_warn("Got unknown SINGLE_EP handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
+            ckb_warn("Got unknown SINGLE_EP handle (I: %d, O: %d, F: %d)", (int)input, (int)output, (int)feature);
             return 0;
         }
     } else {
@@ -864,7 +864,7 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
                  input == 64))                      // FW >= 2.00 (Scimitar)
             handle_idx = 1;
         else {
-            ckb_warn("Got unknown handle (I: %d, O: %d, F: %d)\n", (int)input, (int)output, (int)feature);
+            ckb_warn("Got unknown handle (I: %d, O: %d, F: %d)", (int)input, (int)output, (int)feature);
             return 0;
         }
     }
@@ -872,25 +872,25 @@ static usbdevice* add_hid(hid_dev_t handle, io_object_t** rm_notify){
     uint32_t location = hidgetlong(handle, CFSTR(kIOHIDLocationIDKey));
     int index = find_device(idvendor, idproduct, location, handle_idx + 1);
     if(index == -1){
-        ckb_err("No free devices\n");
+        ckb_err("No free devices");
         return 0;
     }
     usbdevice* kb = keyboard + index;
 
-    ckb_info("ckb%d: Adding HID handle with id %i\n", index, handle_idx);
+    ckb_info("ckb%d: Adding HID handle with id %i", index, handle_idx);
 
     // Read the serial number and name (if not done yet)
     if(!keyboard[index].serial[0] && !keyboard[index].name[0]){
         hidgetstr(handle, CFSTR(kIOHIDSerialNumberKey), keyboard[index].serial, SERIAL_LEN);
         hidgetstr(handle, CFSTR(kIOHIDProductKey), keyboard[index].name, KB_NAME_LEN);
-        ckb_info("Connecting %s at %s%d\n", keyboard[index].name, devpath, index);
+        ckb_info("Connecting %s at %s%d", keyboard[index].name, devpath, index);
     }
 
 
     // Set the handle
     if(kb->ifhid[handle_idx]){
         // This should never happen
-        ckb_warn("Tried to set up ifhid[%d] for device ckb%d, but it was already set up. Skipping...\n", handle_idx, index);
+        ckb_warn("Tried to set up ifhid[%d] for device ckb%d, but it was already set up. Skipping...", handle_idx, index);
         goto error;
     }
     kb->ifhid[handle_idx] = handle;
@@ -919,24 +919,24 @@ static void iterate_devices_hid(void* context, io_iterator_t iterator){
         kern_return_t err;
         wait_loop(err, IOCreatePlugInInterfaceForService(device, kIOHIDDeviceTypeID, kIOCFPlugInInterfaceID, &plugin, &score));
         if(err != kIOReturnSuccess){
-            ckb_err("Failed to create device plugin: %x\n", err);
+            ckb_err("Failed to create device plugin: %x", err);
             goto release;
         }
         // Get the device interface
         hid_dev_t handle;
         wait_loop(err, (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOHIDDeviceDeviceInterfaceID), (LPVOID*)&handle));
         if(err != kIOReturnSuccess){
-            ckb_err("QueryInterface failed: %x\n", err);
+            ckb_err("QueryInterface failed: %x", err);
             goto release;
         }
         // Plugin is no longer needed
         IODestroyPlugInInterface(plugin);
         // Seize the device handle
         if(seize_wait(hidgetlong(handle, CFSTR(kIOHIDLocationIDKey))))
-            ckb_warn("seize_wait failed, connecting anyway...\n");
+            ckb_warn("seize_wait failed, connecting anyway...");
         wait_loop(err, (*handle)->open(handle, kIOHIDOptionsTypeSeizeDevice));
         if(err != kIOReturnSuccess){
-            ckb_warn("Failed to open device: %x\n", err);
+            ckb_warn("Failed to open device: %x", err);
             goto release;
         }
         // Connect it
@@ -1023,7 +1023,7 @@ int usbmain(){
     io_iterator_t iterator_usb = 0;
     IOReturn res = IOServiceAddMatchingNotification(notify, kIOMatchedNotification, match, iterate_devices_usb, 0, &iterator_usb);
     if(res != kIOReturnSuccess){
-        ckb_fatal("Failed to list USB devices: %x\n", res);
+        ckb_fatal("Failed to list USB devices: %x", res);
         return -1;
     }
     // Iterate existing devices
@@ -1037,7 +1037,7 @@ int usbmain(){
     io_iterator_t iterator_hid = 0;
     res = IOServiceAddMatchingNotification(notify, kIOMatchedNotification, match, iterate_devices_hid, 0, &iterator_hid);
     if(res != kIOReturnSuccess){
-        ckb_fatal("Failed to list HID devices: %x\n", res);
+        ckb_fatal("Failed to list HID devices: %x", res);
         return -1;
     }
     // Iterate existing devices

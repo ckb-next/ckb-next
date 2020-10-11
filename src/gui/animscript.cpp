@@ -186,8 +186,8 @@ bool AnimScript::load(){
             // Don't allow predefined params
             if(name == "trigger" || name == "kptrigger" || name == "kpmode" || name == "duration" || name == "delay" || name == "kpdelay" || name == "repeat" || name == "kprepeat" || name == "stop" || name == "kpstop" || name == "kpmodestop" || name == "kprelease")
                 continue;
-            Param param = { type, name, prefix, postfix, def, minimum, maximum };
-            _info.params.append(param);
+            Param parsed_param = { type, name, prefix, postfix, def, minimum, maximum };
+            _info.params.append(parsed_param);
         } else if(param == "preset"){
             // Add preset
             QString name = urlParam(components.at(1));
@@ -198,9 +198,9 @@ bool AnimScript::load(){
                 QStringList sComponents = setting.split("=");
                 if(sComponents.count() != 2)
                     continue;
-                QString param = sComponents.first().trimmed();
+                QString sParam = sComponents.first().trimmed();
                 QString value = urlParam(sComponents.last());
-                preset[param] = value;
+                preset[sParam] = value;
             }
             // If the preset contains a duration, set the repeat time to the same value
             if(preset.contains("duration")){

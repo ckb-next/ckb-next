@@ -135,7 +135,7 @@ void KbPerf::load(CkbSettingsBase& settings){
     SGroup group(settings, "Performance");
     // Read DPI settings
     {
-        SGroup group(settings, "DPI");
+        SGroup subGroup(settings, "DPI");
         for(int i = 0; i < DPI_COUNT; i++){
             QString iStr = QString::number(i);
             QPoint value = settings.value(iStr).toPoint();
@@ -194,10 +194,10 @@ void KbPerf::load(CkbSettingsBase& settings){
     }
     // Read indicator settings
     if(readIndicators){
-        SGroup group(settings, "Indicators");
+        SGroup subGroup(settings, "Indicators");
         _iOpacity = settings.value("Opacity", 100).toInt() / 100.f;
         for(int i = 0; i < I_COUNT; i++){
-            SGroup group(settings, QString::number(i));
+            SGroup subGroup_(settings, QString::number(i));
             QColor color = settings.value("RGB0").toString();
             if(color.isValid())
                 iColor[i][0] = color;
@@ -229,7 +229,7 @@ void KbPerf::save(CkbSettingsBase& settings){
         _needsSave = false;
     SGroup group(settings, "Performance");
     {
-        SGroup group(settings, "DPI");
+        SGroup subGroup(settings, "DPI");
         for(int i = 0; i < DPI_COUNT; i++){
             QString iStr = QString::number(i);
             settings.setValue(iStr, QPoint(dpiX[i], dpiY[i]));
@@ -244,10 +244,10 @@ void KbPerf::save(CkbSettingsBase& settings){
     settings.setValue("LiftHeight", _liftHeight);
     settings.setValue("AngleSnap", _angleSnap);
     {
-        SGroup group(settings, "Indicators");
+        SGroup subGroup(settings, "Indicators");
         settings.setValue("DPI", _dpiIndicator);
         for(int i = 0; i < I_COUNT; i++){
-            SGroup group(settings, QString::number(i));
+            SGroup subGroup_(settings, QString::number(i));
             settings.setValue("RGB0", iColor[i][0].name(QColor::HexArgb));
             settings.setValue("RGB1", iColor[i][1].name(QColor::HexArgb));
             if(i == LIGHT)

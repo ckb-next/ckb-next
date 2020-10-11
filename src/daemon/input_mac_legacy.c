@@ -54,7 +54,7 @@ static void postevent(io_connect_t event, UInt32 type, NXEventData* ev, IOOption
 
     kern_return_t res = IOHIDPostEvent(event, type, location, ev, kNXEventDataVersion, flags | NX_NONCOALSESCEDMASK, options);
     if(res != kIOReturnSuccess && !silence_errors)
-        ckb_warn("Post event failed: %x\n", res);
+        ckb_warn("Post event failed: %x", res);
 
     if(uid != 0)
         seteuid(0);
@@ -219,7 +219,7 @@ static int open_iohid(io_connect_t* connection){
     kern_return_t res;
     if(!master && (res = IOMasterPort(bootstrap_port, &master)) != kIOReturnSuccess){
         master = 0;
-        ckb_err("Unable to open master port: 0x%08x\n", res);
+        ckb_err("Unable to open master port: 0x%08x", res);
         goto failure;
     }
     // Open the HID service
@@ -248,7 +248,7 @@ int os_inputopen(usbdevice* kb){
     while((res = open_iohid(&kb->event)) != kIOReturnSuccess){
         if(res != kIOReturnNotOpen){
             // If this is a more serious error, at least print a warning
-            ckb_err("Unable to open HID system: 0x%08x\n", res);
+            ckb_err("Unable to open HID system: 0x%08x", res);
             sleep(1);
             continue;
         }

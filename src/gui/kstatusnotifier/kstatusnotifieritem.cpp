@@ -629,13 +629,13 @@ void KStatusNotifierItemPrivate::registerToDaemon()
                     QObject::connect(extwatcher, &QDBusPendingCallWatcher::finished, q,
                         [this, extwatcher] {
                             extwatcher->deleteLater();
-                            QDBusPendingReply<QString> reply = *extwatcher;
-                            if (reply.isError()) {
+                            QDBusPendingReply<QString> pendingWatcherReply = *extwatcher;
+                            if (pendingWatcherReply.isError()) {
                                 // Failed, fall back
-                                qDebug() << "Failed to get KStatusNotifierWatcher protocol version:" << reply.error();
+                                qDebug() << "Failed to get KStatusNotifierWatcher protocol version:" << pendingWatcherReply.error();
                                 setLegacySystemTrayEnabled(true);
                             } else {
-                                qDebug() << "Detected non compliant KStatusNotifierWatcher implementation:" << reply.value();
+                                qDebug() << "Detected non compliant KStatusNotifierWatcher implementation:" << pendingWatcherReply.value();
                                 statusNotifierWatcher->RegisterStatusNotifierItem(statusNotifierItemDBus->service());
                                 setLegacySystemTrayEnabled(false);
                             }
@@ -810,38 +810,38 @@ void KStatusNotifierItemPrivate::minimizeRestore(bool show)
 
 KDbusImageStruct KStatusNotifierItemPrivate::imageToStruct(const QImage &image)
 {
-    KDbusImageStruct icon;
-    icon.width = image.size().width();
-    icon.height = image.size().height();
+    KDbusImageStruct structIcon;
+    structIcon.width = image.size().width();
+    structIcon.height = image.size().height();
     if (image.format() == QImage::Format_ARGB32) {
-        icon.data = QByteArray((char *)image.bits(), QIMAGE_SIZE(image));
+        structIcon.data = QByteArray((char *)image.bits(), QIMAGE_SIZE(image));
     } else {
         QImage image32 = image.convertToFormat(QImage::Format_ARGB32);
-        icon.data = QByteArray((char *)image32.bits(), QIMAGE_SIZE(image32));
+        structIcon.data = QByteArray((char *)image32.bits(), QIMAGE_SIZE(image32));
     }
 
     //swap to network byte order if we are little endian
     if (QSysInfo::ByteOrder == QSysInfo::LittleEndian) {
-        quint32 *uintBuf = (quint32 *) icon.data.data();
-        for (uint i = 0; i < icon.data.size() / sizeof(quint32); ++i) {
+        quint32 *uintBuf = (quint32 *) structIcon.data.data();
+        for (uint i = 0; i < structIcon.data.size() / sizeof(quint32); ++i) {
             *uintBuf = qToBigEndian(*uintBuf);
             ++uintBuf;
         }
     }
 
-    return icon;
+    return structIcon;
 }
 
-KDbusImageVector KStatusNotifierItemPrivate::iconToVector(const QIcon &icon)
+KDbusImageVector KStatusNotifierItemPrivate::iconToVector(const QIcon &icn)
 {
     KDbusImageVector iconVector;
 
     QPixmap iconPixmap;
 
     //if an icon exactly that size wasn't found don't add it to the vector
-    const auto lstSizes = icon.availableSizes();
+    const auto lstSizes = icn.availableSizes();
     for (QSize size : lstSizes) {
-        iconPixmap = icon.pixmap(size);
+        iconPixmap = icn.pixmap(size);
         iconVector.append(imageToStruct(iconPixmap.toImage()));
     }
     return iconVector;

@@ -33,14 +33,17 @@ enum HWANIM_SPEED {
     HWANIM_SPEED_HIGH   = 3
 };
 
+const short DARK_CORE_ZONES[3] = {LED_MOUSE + 1, LED_MOUSE + 5, LED_MOUSE + 3};
+
 int updatergb_wireless(usbdevice* kb, lighting* lastlight, lighting* newlight) {
-    if(IS_DARK_CORE(kb) && !HAS_FEATURES(kb, FEAT_DONGLE)) {
-        for(int i = 0; i < 3; i++) {
-            uchar r[2] = { newlight->r[i] };
-            uchar g[2] = { newlight->g[i] };
-            uchar b[2] = { newlight->b[i] };
-            apply_hwanim(kb, i, 7, 1, 0, r, g, b);
-        }
+    if(IS_K63_WL(kb) || (IS_DARK_CORE(kb) && HAS_FEATURES(kb, FEAT_DONGLE)))
+        return 0;
+    for(int i = 0; i < 3; i++)
+    {
+        uchar r[2] = {newlight->r[DARK_CORE_ZONES[i]]};
+        uchar g[2] = {newlight->g[DARK_CORE_ZONES[i]]};
+        uchar b[2] = {newlight->b[DARK_CORE_ZONES[i]]};
+        apply_hwanim(kb, i, HWANIM_STATIC, HWANIM_SPEED_LOW, HWANIM_DIRECTION_NONE, r, g, b);
     }
 
     memcpy(lastlight, newlight, sizeof(lighting));
@@ -90,7 +93,7 @@ void apply_hwanim(usbdevice* kb, short zone, uchar anim, uchar speed, uchar rand
         switch(anim){
         case HWANIM_COLOURSHIFT:
         case HWANIM_COLOURPULSE:
-            // Deal with the random bytes' weirdness
+            // Deal with the random byte's weirdness
             if (!rand_or_dir) {
                 rand_or_dir = 3;
             }

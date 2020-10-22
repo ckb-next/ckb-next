@@ -5,8 +5,7 @@
 
 // Compare two light structures, ignore keys
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
-    return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES) ||
-        memcmp(lhs->r, rhs->r, 3) || memcmp(lhs->g, rhs->g, 3) || memcmp(lhs->b, rhs->b, 3);
+    return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES);
 }
 
 int updatergb_mouse(usbdevice* kb, int force){

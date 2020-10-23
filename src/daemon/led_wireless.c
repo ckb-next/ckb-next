@@ -36,14 +36,31 @@ enum HWANIM_SPEED {
 const short DARK_CORE_ZONES[3] = {LED_MOUSE + 1, LED_MOUSE + 5, LED_MOUSE + 3};
 
 int updatergb_wireless(usbdevice* kb, lighting* lastlight, lighting* newlight) {
-    if(IS_K63_WL(kb) || (IS_DARK_CORE(kb) && HAS_FEATURES(kb, FEAT_DONGLE)))
+    if(HAS_FEATURES(kb, FEAT_DONGLE)) return 0;
+
+    if(IS_K63_WL(kb)) {
+        // TODO translate updatergb to hwanim for the K63WL
         return 0;
-    for(int i = 0; i < 3; i++)
-    {
-        uchar r[2] = {newlight->r[DARK_CORE_ZONES[i]]};
-        uchar g[2] = {newlight->g[DARK_CORE_ZONES[i]]};
-        uchar b[2] = {newlight->b[DARK_CORE_ZONES[i]]};
-        apply_hwanim(kb, i, HWANIM_STATIC, HWANIM_SPEED_LOW, HWANIM_DIRECTION_NONE, r, g, b);
+    } else if (IS_DARK_CORE(kb)) {
+        if(
+            lastlight->r[LED_MOUSE + 2] != newlight->r[LED_MOUSE + 2] ||
+            lastlight->g[LED_MOUSE + 2] != newlight->g[LED_MOUSE + 2] ||
+            lastlight->b[LED_MOUSE + 2] != newlight->b[LED_MOUSE + 2]
+        )
+            updatedpi(kb, 0);
+        for(int i = 0; i < 3; i++)
+        {
+            if(
+                lastlight->r[DARK_CORE_ZONES[i]] == newlight->r[DARK_CORE_ZONES[i]] &&
+                lastlight->g[DARK_CORE_ZONES[i]] == newlight->g[DARK_CORE_ZONES[i]] &&
+                lastlight->b[DARK_CORE_ZONES[i]] == newlight->b[DARK_CORE_ZONES[i]]
+            )
+                continue;
+            uchar r[2] = {newlight->r[DARK_CORE_ZONES[i]]};
+            uchar g[2] = {newlight->g[DARK_CORE_ZONES[i]]};
+            uchar b[2] = {newlight->b[DARK_CORE_ZONES[i]]};
+            apply_hwanim(kb, i, HWANIM_STATIC, HWANIM_SPEED_LOW, HWANIM_DIRECTION_NONE, r, g, b);
+        }
     }
 
     memcpy(lastlight, newlight, sizeof(lighting));

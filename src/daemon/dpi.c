@@ -1,6 +1,11 @@
 #include "dpi.h"
 #include "usb.h"
 
+// Compare two light structures, ignore keys
+static int rgbcmp(const lighting* lhs, const lighting* rhs){
+    return !(lhs->r[LED_MOUSE + 2] == rhs->r[LED_MOUSE + 2] && lhs->g[LED_MOUSE + 2] == rhs->g[LED_MOUSE + 2] && lhs->b[LED_MOUSE + 2] == rhs->b[LED_MOUSE + 2]);
+}
+
 void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const char* values){
     (void)kb;
     (void)dummy;
@@ -110,9 +115,11 @@ int updatedpi(usbdevice* kb, int force){
         return 0;
     dpiset* lastdpi = &kb->profile->lastdpi;
     dpiset* newdpi = &kb->profile->currentmode->dpi;
-    lighting* light = &kb->profile->currentmode->light;
+    lighting* lastlight = &kb->profile->lastlight;
+    lighting* newlight = &kb->profile->currentmode->light;
     // Don't do anything if the settings haven't changed
     if(!force && !lastdpi->forceupdate && !newdpi->forceupdate
+            && !rgbcmp(lastlight, newlight)
             && !memcmp(lastdpi, newdpi, sizeof(dpiset)))
         return 0;
     lastdpi->forceupdate = newdpi->forceupdate = 0;
@@ -167,7 +174,7 @@ int updatedpi(usbdevice* kb, int force){
     // Send X/Y DPIs. We've changed to the new stage already so these can be set
     // safely.
     for(int i = 0; i < DPI_COUNT; i++){
-        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i] && !force)
+        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i] && !force && !rgbcmp(lastlight, newlight))
             continue;
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
         data_pkt[2] |= i;
@@ -179,9 +186,9 @@ int updatedpi(usbdevice* kb, int force){
         data_pkt[7] = newdpi->y[i] & 0xFF;
         data_pkt[8] = (newdpi->y[i] >> 8) & 0xFF;
         if(IS_DARK_CORE(kb)) {
-            data_pkt[9] = light->r[LED_MOUSE + N_MOUSE_ZONES + i];
-            data_pkt[10] = light->g[LED_MOUSE + N_MOUSE_ZONES + i];
-            data_pkt[11] = light->b[LED_MOUSE + N_MOUSE_ZONES + i];
+            data_pkt[9] = newlight->r[LED_MOUSE + 2];
+            data_pkt[10] = newlight->g[LED_MOUSE + 2];
+            data_pkt[11] = newlight->b[LED_MOUSE + 2];
         }
 
         if(!usbsend(kb, data_pkt, 1))

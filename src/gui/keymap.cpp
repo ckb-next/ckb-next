@@ -375,10 +375,8 @@ static const Key DarkCoreKeys[] = {
     {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
     {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "Wheel Light", "wheel", 22, 2, 8, 16, true, false},
     {0, "DPI Up", "dpiup", 0, 5, 8, 8, false, true}, {0, "DPI Down", "dpidn", 0, 12, 8, 8, false, true},
-    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper", "sniper", 0, 25, 5, 15, false, true}, {0, "Side light", "side", 0, 21, 10, 24, true, false},
-    {0, "Logo", "back", 0, 48, 48, 12, true, false}, {0, "Profile Switch", "profswitch", 22, 20, 8, 12, false, true},
-
-
+    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper", "sniper", 0, 25, 5, 15, false, true}, {0, "Side light", "side", 0, 24, 10, 24, true, false},
+    {0, "Logo", "back", 0, 48, 48, 12, true, false}, {0, "Profile Switch", "profswitch", 22, 20, 8, 12, false, true}, {0, "DPI", "dpi", 0, 0, 10, 24, true,  false }
 };
 #define KEYCOUNT_DARKCORE    (sizeof(DarkCoreKeys) / sizeof(Key))
 

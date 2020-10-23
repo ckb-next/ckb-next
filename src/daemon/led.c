@@ -23,11 +23,6 @@ void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* 
         mode->light.g[index] = g;
         mode->light.b[index] = b;
     }
-
-    // Force DPI update when dpi colors are changed
-    if(IS_MOUSE_DEV(kb) && kb->keymap[keyindex].led >= LED_MOUSE + N_MOUSE_ZONES && kb->keymap[keyindex].led < LED_MOUSE + N_MOUSE_ZONES + DPI_COUNT) {
-        updatedpi(kb, 1);
-    }
 }
 
 // Indicator bitfield from string

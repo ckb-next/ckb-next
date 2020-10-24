@@ -13,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <inttypes.h>
 
 #include <sys/errno.h>
 #include <sys/ioctl.h>

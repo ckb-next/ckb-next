@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>687</width>
-    <height>415</height>
+    <height>435</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1280,77 +1280,139 @@
       <attribute name="title">
        <string>Macro</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QGridLayout" name="gridLayout_7">
+       <property name="leftMargin">
+        <number>7</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>7</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>2</number>
+       </property>
+       <item row="2" column="0">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
           <number>3</number>
          </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetNoConstraint</enum>
+         </property>
          <item>
-          <widget class="QLabel" name="label_4">
+          <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Macro Key Actions</string>
+            <string>Name</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPlainTextEdit" name="pteMacroBox">
-           <property name="focusPolicy">
-            <enum>Qt::WheelFocus</enum>
+          <widget class="QLineEdit" name="macroName"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Preview</string>
            </property>
-           <property name="tabChangesFocus">
+          </widget>
+         </item>
+         <item>
+          <widget class="NoUserInputTextEdit" name="macroPreview">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="contextMenuPolicy">
+            <enum>Qt::DefaultContextMenu</enum>
+           </property>
+           <property name="acceptDrops">
+            <bool>false</bool>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhNoAutoUppercase</set>
+           </property>
+           <property name="documentTitle">
+            <string/>
+           </property>
+           <property name="undoRedoEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
             <bool>true</bool>
            </property>
+           <property name="plainText">
+            <string/>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="delayButtons">
-           <property name="spacing">
-            <number>6</number>
-           </property>
-           <property name="sizeConstraint">
-            <enum>QLayout::SetMinimumSize</enum>
-           </property>
-           <item>
-            <widget class="QRadioButton" name="rb_delay_no">
-             <property name="whatsThis">
-              <string>Disable delay</string>
+          <layout class="QGridLayout" name="gridLayout_6" columnstretch="0,0,0">
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QRadioButton" name="rb_delay_default">
+               <property name="whatsThis">
+                <string>Set delay to default values: 20us up to 15 chars, 200us above</string>
+               </property>
+               <property name="text">
+                <string>de&amp;fault</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rb_delay_asTyped">
+               <property name="whatsThis">
+                <string>Delay will be the same as it was recorded</string>
+               </property>
+               <property name="text">
+                <string>as t&amp;yped</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="4" column="1">
+            <widget class="QComboBox" name="captureTypeBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
-             <property name="text">
-              <string>No &amp;delay</string>
-             </property>
+             <item>
+              <property name="text">
+               <string>This device only</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>All ckb-next devices</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>All keyboards</string>
+              </property>
+             </item>
             </widget>
            </item>
-           <item>
-            <widget class="QRadioButton" name="rb_delay_default">
-             <property name="whatsThis">
-              <string>Set delay to default values: 20us up to 15 chars, 200us above</string>
-             </property>
-             <property name="text">
-              <string>de&amp;fault</string>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <property name="autoExclusive">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="rb_delay_asTyped">
-             <property name="whatsThis">
-              <string>Delay will be the same as it was recorded</string>
-             </property>
-             <property name="text">
-              <string>as t&amp;yped</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
+           <item row="4" column="2">
             <spacer name="horizontalSpacer_27">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1363,164 +1425,201 @@
              </property>
             </spacer>
            </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Record from:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>Keystroke delay:</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
        </item>
-       <item>
-        <widget class="QLabel" name="txtBuffer">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="contextMenuPolicy">
-          <enum>Qt::NoContextMenu</enum>
-         </property>
-         <property name="toolTip">
-          <string notr="true"/>
-         </property>
-         <property name="toolTipDuration">
-          <number>0</number>
-         </property>
-         <property name="statusTip">
-          <string notr="true"/>
-         </property>
-         <property name="whatsThis">
-          <string notr="true"/>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="lineWidth">
-          <number>0</number>
-         </property>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Events</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_29">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Minimum</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>80</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="editAsStringBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Edit as string</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lbl_macro">
          <property name="text">
-          <string/>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="indent">
-          <number>0</number>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
+          <string notr="true">Placeholder</string>
          </property>
         </widget>
        </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item row="2" column="1">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <property name="spacing">
-            <number>3</number>
+          <widget class="QTableView" name="tableView">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-           <property name="sizeConstraint">
-            <enum>QLayout::SetNoConstraint</enum>
+           <property name="dragEnabled">
+            <bool>true</bool>
            </property>
+           <property name="dragDropOverwriteMode">
+            <bool>false</bool>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::InternalMove</enum>
+           </property>
+           <property name="defaultDropAction">
+            <enum>Qt::MoveAction</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <property name="sortingEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="cornerButtonEnabled">
+            <bool>false</bool>
+           </property>
+           <attribute name="horizontalHeaderMinimumSectionSize">
+            <number>22</number>
+           </attribute>
+           <attribute name="horizontalHeaderDefaultSectionSize">
+            <number>65</number>
+           </attribute>
+           <attribute name="horizontalHeaderHighlightSections">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>true</bool>
+           </attribute>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderMinimumSectionSize">
+            <number>22</number>
+           </attribute>
+           <attribute name="verticalHeaderDefaultSectionSize">
+            <number>22</number>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
-            <widget class="QLabel" name="label_2">
+            <widget class="ClickEventPushButton" name="btnStartMacro">
              <property name="text">
-              <string>Macro Name</string>
+              <string>Start Recording</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="pteMacroComment"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_3">
+            <widget class="QToolButton" name="btnAddEvent">
+             <property name="minimumSize">
+              <size>
+               <width>23</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>-1</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
              <property name="text">
-              <string>Macro Sequence</string>
+              <string>Add</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPlainTextEdit" name="pteMacroText">
+            <widget class="QToolButton" name="btnRemoveEvent">
+             <property name="minimumSize">
+              <size>
+               <width>23</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>-1</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Remove</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnClearMacro">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="focusPolicy">
-              <enum>Qt::StrongFocus</enum>
-             </property>
-             <property name="contextMenuPolicy">
-              <enum>Qt::NoContextMenu</enum>
-             </property>
-             <property name="acceptDrops">
-              <bool>false</bool>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhNoAutoUppercase</set>
-             </property>
-             <property name="documentTitle">
-              <string/>
-             </property>
-             <property name="undoRedoEnabled">
-              <bool>false</bool>
-             </property>
-             <property name="readOnly">
-              <bool>false</bool>
-             </property>
-             <property name="plainText">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lbl_macro">
              <property name="text">
-              <string notr="true">Placeholder</string>
+              <string>Clear</string>
              </property>
             </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Record macro</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnStartMacro">
-               <property name="text">
-                <string>Start</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnStopMacro">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string extracomment="was passiert, wenn ich hier iregend einen Kommentar reinschreibe?">Stop</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnClearMacro">
-               <property name="text">
-                <string>Clear</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </item>
           </layout>
          </item>
@@ -1580,6 +1679,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NoUserInputTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>nouserinputtextedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ClickEventPushButton</class>
+   <extends>QToolButton</extends>
+   <header>clickeventpushbutton.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>typingButton</tabstop>
@@ -1622,127 +1733,11 @@
   <tabstop>programKrBox</tabstop>
   <tabstop>programKrSIBox</tabstop>
   <tabstop>programKrModeBox</tabstop>
-  <tabstop>rb_delay_no</tabstop>
-  <tabstop>rb_delay_default</tabstop>
-  <tabstop>rb_delay_asTyped</tabstop>
   <tabstop>unbindButton</tabstop>
   <tabstop>resetButton</tabstop>
   <tabstop>cancelButton</tabstop>
   <tabstop>applyButton</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>cancelButton</sender>
-   <signal>clicked()</signal>
-   <receiver>txtBuffer</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>564</x>
-     <y>320</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>319</x>
-     <y>143</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>unbindButton</sender>
-   <signal>clicked()</signal>
-   <receiver>txtBuffer</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>361</x>
-     <y>313</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>332</x>
-     <y>142</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>resetButton</sender>
-   <signal>clicked()</signal>
-   <receiver>txtBuffer</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>452</x>
-     <y>310</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>348</x>
-     <y>142</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnClearMacro</sender>
-   <signal>clicked()</signal>
-   <receiver>txtBuffer</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>655</x>
-     <y>219</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>339</x>
-     <y>154</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnClearMacro</sender>
-   <signal>clicked()</signal>
-   <receiver>btnStopMacro</receiver>
-   <slot>animateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>711</x>
-     <y>238</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>618</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnClearMacro</sender>
-   <signal>clicked()</signal>
-   <receiver>pteMacroText</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>711</x>
-     <y>238</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>705</x>
-     <y>131</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnStartMacro</sender>
-   <signal>clicked()</signal>
-   <receiver>txtBuffer</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>485</x>
-     <y>228</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>352</x>
-     <y>156</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

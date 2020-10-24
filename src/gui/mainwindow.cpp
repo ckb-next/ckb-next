@@ -468,6 +468,20 @@ QString MainWindow::getIconName() {
     return "ckb-next-monochrome";
 }
 
+void MainWindow::setTabsEnabled(bool e){
+    ui->tabWidget->tabBar()->setEnabled(e);
+    QWidget* currentWidget = ui->tabWidget->currentWidget();
+    if(!currentWidget){
+        qDebug() << "currentWidget in setTabsEnabled is null";
+        return;
+    }
+    KbWidget* kbw = dynamic_cast<KbWidget*>(currentWidget);
+    // The cast can fail if the app is quitting
+    if(!kbw)
+        return;
+    kbw->setTabBarEnabled(e);
+}
+
 void MainWindow::cleanup(){
     foreach(KbWidget* w, kbWidgets)
         delete w;

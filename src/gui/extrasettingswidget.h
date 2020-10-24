@@ -26,7 +26,6 @@ private slots:
     void on_mAccelBox_clicked(bool checked);
     void on_sAccelBox_clicked(bool checked);
     void on_sSpeedBox_valueChanged(int arg1);
-    void on_delayBox_clicked(bool checked);
     void on_startDelayBox_clicked(bool checked);
     void on_previewBox_clicked(bool checked);
     void on_detailsBtn_clicked();

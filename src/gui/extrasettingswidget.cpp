@@ -68,11 +68,6 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
     ui->animPathLabel->setText(AnimScript::paths().join('\n'));
     on_animScanButton_clicked();
 
-    /// Read Macro Delay setting, update UI and Kb-internal flag
-    bool macroDelay = settings.value("MacroDelay").toBool();
-    Kb::macroDelay(macroDelay);
-    ui->delayBox->setChecked(macroDelay);
-
     // Read start delay
     ui->startDelayBox->setChecked(settings.value("StartDelay").toBool());
 
@@ -171,11 +166,6 @@ void ExtraSettingsWidget::on_sAccelBox_clicked(bool checked){
 void ExtraSettingsWidget::on_sSpeedBox_valueChanged(int arg1){
     CkbSettings::set("Program/ScrollSpeed", arg1);
     Kb::scrollSpeed(ui->sAccelBox->isChecked() ? arg1 : 0);
-}
-
-void ExtraSettingsWidget::on_delayBox_clicked(bool checked){
-    CkbSettings::set("Program/MacroDelay", checked);
-    Kb::macroDelay(checked);
 }
 
 void ExtraSettingsWidget::on_startDelayBox_clicked(bool checked){

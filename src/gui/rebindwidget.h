@@ -5,6 +5,8 @@
 #include "kbbind.h"
 #include "kbprofile.h"
 #include "macroreader.h"
+#include "macroline.h"
+#include "macrotablemodel.h"
 
 // Key rebinding widget
 
@@ -65,36 +67,25 @@ private slots:
     void on_programKpSIBox_clicked(bool checked);
     void on_programKrSIBox_clicked(bool checked);
     void on_animButton_clicked(bool checked);
-    void on_pteMacroBox_textChanged();
     void on_btnStartMacro_clicked();
-    void on_btnStopMacro_clicked();
     void on_btnClearMacro_clicked();
-
-    void on_rb_delay_no_toggled(bool checked);
-
-    void on_rb_delay_asTyped_toggled(bool checked);
-
     void on_rb_delay_default_toggled(bool checked);
+    void on_captureTypeBox_currentIndexChanged(int index);
+    void on_editAsStringBtn_clicked();
+    void on_btnRemoveEvent_clicked();
+    void on_btnAddEvent_clicked();
+    int regeneratePreview();
 
 private:
-    Ui::RebindWidget *ui;
+    Ui::RebindWidget* ui;
 
     // Tab indices
     const static int TAB_KB = 0, TAB_MOUSE = 1, TAB_ANIM = 2, TAB_SPECIAL = 3, TAB_PROGRAM = 4, TAB_MACRO = 5;
 
     void setBox(QWidget* box);
-
-    // convert keyboard definion into macro definition
-    void convertMacroBox();
-    // Show some help info
-    void helpStatus(int status);
-
-    void setCorrectRadioButton (QString macdef);
-
     KbBind* bind;
     KbProfile* profile;
     QStringList selection;
-
     QStringList typingKeys;
     QStringList modKeys;
     QStringList fnKeys;
@@ -103,7 +94,17 @@ private:
     QStringList mouseKeys;
     QStringList mouseExtKeys;
     QStringList wheelKeys;
-    MacroReader* macReader;     ///< \brief macReader holds the MacroReader when macro recording starts.
+    MacroReader* macroReader;
+    void macroLineRead(QString line, qint64 ustime, bool keydown);
+    MacroTableModel macroLines;
+    enum CAPTURE_TYPE {
+        CAPTURE_CURRENT_DEVICE,
+        CAPTURE_ALL_DAEMON_DEVICES,
+        CAPTURE_ALL_KEYBOARDS,
+    } captureType;
+    void tabChanged(int idx);
+    void insertIntoMacroPreview(const bool keydown, const bool printable, const QString& line);
+    bool leftMouseClicked;
 };
 
 #endif // REBINDWIDGET_H

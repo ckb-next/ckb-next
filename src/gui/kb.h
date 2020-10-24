@@ -39,9 +39,6 @@ public:
     // Whether dithering is used (all devices)
     static inline bool              dither()                            { return _dither; }
     static void                     dither(bool newDither);
-    // Macro Delay setting
-    static inline bool              macroDelay()                        { return _delay; }
-    static void                     macroDelay(bool flag);
     // OSX: mouse acceleration toggle (all devices)
     static inline bool              mouseAccel()                        { return _mouseAccel; }
     static void                     mouseAccel(bool newAccel);
@@ -207,8 +204,6 @@ private:
     int notifyNumber;
     // Macro Numer to notify macro definition events
     int macroNumber;
-    // flag if macro delay hast to be switched on
-    static bool _delay;
 
     // Needs to be saved?
     bool _needsSave;

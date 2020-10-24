@@ -17,7 +17,7 @@ class KbWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit KbWidget(QWidget *parent, Kb* _device);
+    explicit KbWidget(QWidget* parent, Kb* _device);
     ~KbWidget();
 
     // Device handle
@@ -28,6 +28,7 @@ public:
     bool hasShownNewFW;
     // Update the "Check for updates" label with the current status
     void updateFwButton();
+    void setTabBarEnabled(const bool e);
 
 public slots:
     // Show a tab

@@ -36,6 +36,11 @@ void KbBindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
     updateBind();
 }
 
+void KbBindWidget::setControlsEnabled(const bool e){
+    ui->resetButton->setEnabled(e);
+    ui->copyButton->setEnabled(e);
+}
+
 void KbBindWidget::updateBind(){
     const KeyMap& map = bind->map();
     // Build the action list based on the keymap

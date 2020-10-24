@@ -18,6 +18,7 @@ public:
     ~KbBindWidget();
 
     void setBind(KbBind* newBind, KbProfile* newProfile);
+    void setControlsEnabled(const bool e);
 
 private slots:
     void updateBind();

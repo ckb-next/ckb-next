@@ -123,6 +123,12 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
+#define P_VOID_USB_1         0x1b29
+#define P_VOID_USB_2         0x1b2a
+#define P_VOID_WIRELESS_1    0x1b27
+#define IS_VOID(kb)          ((kb)->vendor == V_CORSAIR && ((kb)->product == P_VOID_USB_1 || (kb)->product == P_VOID_USB_2 || (kb)->product == P_VOID_WIRELESS_1))
+
+
 extern size_t N_MODELS;
 
 typedef struct _device_desc {
@@ -233,6 +239,10 @@ const char* product_str(ushort product);
 #define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_POLARIS))
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
+// Headset test
+#define IS_HEADSET(vendor, product)     ((vendor) == (V_CORSAIR) && (product == P_VOID_USB_1 || product == P_VOID_USB_2 || product == P_VOID_WIRELESS_1))
+#define IS_HEADSET_DEV(kb)              IS_HEADSET((kb)->vendor, (kb)->product)
+
 #define USB_DELAY_DEFAULT   5
 
 /// Start the USB main loop. Returns program exit code when finished
@@ -301,7 +311,7 @@ int os_resetusb(usbdevice* kb, const char* file, int line);
 /// \brief _usbsend send a logical message completely to the given device
 /// \param kb THE usbdevice*
 /// \param[IN] messages a Pointer to the first byte of the logical message
-/// \param[IN] count how many MSG_SIZE buffers is the logical message long?
+/// \param[IN] count how many buffers is the logical message long?
 /// \param[IN] file for debugging
 /// \param[IN] line for debugging
 /// \param[in] reset_stop global variable is read
@@ -336,6 +346,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
 /// \param kb THE usbdevice*
 /// \param out_msg the MSGSIZE char long buffer to send
 /// \param is_recv if true, just send an ioctl for further reading packets. If false, send the data at \b out_msg.
+/// \param len length of the packet
 /// \param file for debugging
 /// \param line for debugging
 /// \return -1 on timeout (try again), 0 on hard error, numer of bytes sent otherwise

@@ -441,6 +441,14 @@ void KbWidget::updateFwButton(){
     }
 }
 
+void KbWidget::setTabBarEnabled(const bool e){
+    ui->tabWidget->tabBar()->setEnabled(e);
+    ui->profileBox->setEnabled(e);
+    ui->modesList->setEnabled(e);
+    ui->hwSaveButton->setEnabled(e);
+    ui->bindWidget->setControlsEnabled(e);
+}
+
 void KbWidget::on_fwUpdButton_clicked(){
     // If alt is pressed, ignore upgrades and go straight to the manual prompt
     if(!(qApp->keyboardModifiers() & Qt::AltModifier)){

@@ -116,6 +116,7 @@ if (MACOS OR LINUX)
               ckbsettingswriter.cpp
               ckbupdater.cpp
               ckbupdaterwidget.cpp
+              clickeventpushbutton.cpp
               colorbutton.cpp
               colormap.cpp
               extrasettingswidget.cpp
@@ -143,10 +144,13 @@ if (MACOS OR LINUX)
               keywidget.cpp
               kperfwidget.cpp
               macroreader.cpp
+              macrostringeditdialog.cpp
+              macrotablemodel.cpp
               main.cpp
               mainwindow.cpp
               modeselectdialog.cpp
               mperfwidget.cpp
+              nouserinputtextedit.cpp
               nowheelcombobox.cpp
               rebindwidget.cpp
               rlistwidget.cpp
@@ -161,6 +165,7 @@ if (MACOS OR LINUX)
               ckbsystemtrayicon.h
               ckbupdater.h
               ckbupdaterwidget.h
+              clickeventpushbutton.h
               colorbutton.h
               colormap.h
               extrasettingswidget.h
@@ -187,11 +192,15 @@ if (MACOS OR LINUX)
               keymap.h
               keywidget.h
               kperfwidget.h
+              macroline.h
               macroreader.h
+              macrostringeditdialog.cpp
+              macrotablemodel.h
               mainwindow.h
               media.h
               modeselectdialog.h
               mperfwidget.h
+              nouserinputtextedit.h
               nowheelcombobox.h
               compat/qoverloadlegacy.h
               compat/qrand.h
@@ -212,6 +221,7 @@ if (MACOS OR LINUX)
               kbwidget.ui
               kperfwidget.ui
               mainwindow.ui
+              macrostringeditdialog.ui
               modeselectdialog.ui
               mperfwidget.ui
               rebindwidget.ui

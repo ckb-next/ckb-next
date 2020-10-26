@@ -33,6 +33,7 @@ public:
     static int signalHandlerFd[2];
     static void PosixSignalHandler(int signal);
     void syncTrayIcon();
+    void setTabsEnabled(bool e);
 
 private:
     SettingsWidget* settingsWidget;

@@ -1,15 +1,40 @@
 #include <QStandardPaths>
 #include "rebindwidget.h"
 #include "ui_rebindwidget.h"
-#include <qdebug.h>     // lae.
+#include <QDebug>
+#include <QMessageBox>
+#include "kbmanager.h"
+#include "macrostringeditdialog.h"
+#include "mainwindow.h"
+#include <QScrollBar>
 
 static const int DPI_OFFSET = -KeyAction::DPI_CYCLE_UP + 1;
 static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
 
+static inline void setLocalUiElementsEnabled(Ui::RebindWidget* const ui, const bool e){
+    ui->editAsStringBtn->setEnabled(e);
+    ui->btnAddEvent->setEnabled(e);
+    ui->btnRemoveEvent->setEnabled(e);
+    ui->btnClearMacro->setEnabled(e);
+}
+
+static inline void setUiElementsEnabled(Ui::RebindWidget* const ui, const bool e){
+    ui->applyButton->setEnabled(e);
+    ui->resetButton->setEnabled(e);
+    ui->unbindButton->setEnabled(e);
+    ui->rb_delay_asTyped->setEnabled(e);
+    ui->rb_delay_default->setEnabled(e);
+    ui->captureTypeBox->setEnabled(e);
+    MainWindow::mainWindow->setTabsEnabled(e);
+    ui->tabWidget->tabBar()->setEnabled(e);
+    ui->cancelButton->setEnabled(e);
+    setLocalUiElementsEnabled(ui, e);
+}
+
 RebindWidget::RebindWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RebindWidget),
-    bind(0), profile(0), macReader(0)
+    bind(nullptr), profile(nullptr), macroReader(nullptr), leftMouseClicked(false)
 {
     ui->setupUi(this);
     ui->lightWrapBox->hide();
@@ -59,9 +84,33 @@ RebindWidget::RebindWidget(QWidget *parent) :
 #else
     ui->progTipLabel->setText("Tip: use xdg-open to launch a file or directory. For instance, to open your home folder:\n  xdg-open " + QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
 #endif
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &RebindWidget::tabChanged);
+    ui->tableView->setModel(&macroLines);
+    ui->tableView->setColumnWidth(0, 24);
+    ui->tableView->setItemDelegateForColumn(0, new MacroDropdownDelegate);
+    connect(ui->tableView->verticalScrollBar(), &QScrollBar::rangeChanged, this, [this](int min, int max){
+        ui->tableView->verticalScrollBar()->setValue(max);
+    });
+
+    // Detect when the user closes the editor. Needed for when they press esc after they have added a new row manually
+    connect(ui->tableView->itemDelegate(), &QAbstractItemDelegate::closeEditor, this, [this](QWidget* e, QAbstractItemDelegate::EndEditHint h = QAbstractItemDelegate::NoHint){
+        setLocalUiElementsEnabled(ui, true);
+        ui->btnStartMacro->setEnabled(true);
+        if(h != QAbstractItemDelegate::RevertModelCache)
+            return;
+        macroLines.removeEmptyRowAtEnd();
+    });
+    connect(&macroLines, &QAbstractTableModel::dataChanged, this, &RebindWidget::regeneratePreview);
+    connect(&macroLines, &QAbstractTableModel::modelReset, this, &RebindWidget::regeneratePreview);
 }
 
 RebindWidget::~RebindWidget(){
+    // Clean things up if the daemon died while we were recording a macro
+    if(macroReader){
+        // re-enable everything
+        setUiElementsEnabled(ui, true);
+        macroReader->deleteLater();
+    }
     delete ui;
 }
 
@@ -180,7 +229,7 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
         action = "";
     KeyAction act(action);
     // Clear everything
-    setBox(0);
+    setBox(nullptr);
     ui->dpiCustXBox->setValue(400);
     ui->dpiCustYBox->setValue(400);
     ui->animOnceBox->setChecked(false);
@@ -194,10 +243,9 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
     ui->programKpModeBox->setEnabled(false);
     ui->programKrModeBox->setEnabled(false);
     // Clear new UI elements in MacroTab
-    ui->pteMacroBox->clear();
-    ui->pteMacroText->clear();
-    ui->pteMacroComment->clear();
-    ui->txtBuffer->clear();
+    ui->macroPreview->clear();
+    ui->macroName->clear();
+    macroLines.clear();
     // Fill in field and select tab according to action type
     bool mouse = act.isMouse();
     if(mouse){
@@ -296,19 +344,37 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                 ui->modeBox->setCurrentIndex(3);
         } else if (sAction == "macro") {
             ui->tabWidget->setCurrentIndex(TAB_MACRO);
-            if (act.isValidMacro()) {
-                ui->pteMacroBox->setPlainText(act.macroContent());
-                ui->pteMacroText->setPlainText(act.macroLine()[1].replace("&das_IST_31N_col0n;", ":"));
-                ui->pteMacroComment->setText(act.macroLine()[2].replace("&das_IST_31N_col0n;", ":"));
-                // Set the invisible Buffer to the original timing information.
-                // For convenience / Migration from older versions:
-                // If the timing information is only "x", then ignore it by setting it to an empty QString.
-                ui->txtBuffer->setText("");
-                if (act.macroTiming() != "x") ui->txtBuffer->setText(act.macroTiming());
-                setCorrectRadioButton(act.macroContent());
-            } else {
-                qDebug("RebindWidget::setSelection found invalid macro definition.");
-                act.macroDisplay();
+            if (act.isMacro()) {
+                // This string needs to exist for as long as the references below are used
+                QString value = act.value();
+                // Split the action and discard the "$macro" from the beginning
+                QVector<QStringRef> macroData = value.midRef(7).split(QChar(':'));
+                const int dataCount = macroData.count();
+                // Old format doesn't have the last field, which is the raw macro data
+                // It might not exist at all (count == 3) or it might be set to "x"
+                if(dataCount == 3 || dataCount == 4){
+                    // Colons in the name field are escaped
+                    QString macroName = macroData[2].toString();
+                    macroName.replace("&das_IST_31N_col0n;", ":");
+                    ui->macroName->setText(macroName);
+
+                    // Pick the appropriate string to parse due to legacy formats
+                    QStringRef macroString = macroData[0];
+                    if(dataCount == 4 && macroData[3] != "x")
+                        macroString = macroData[3];
+
+                    // Try to parse the string
+                    // If there's an error, we'll ignore it and parse as much as possible
+                    macroLines.fromString(macroString.toString(), false);
+
+                    // If the daemon macro string contains even a single delay, then the we set the
+                    // delay to "as typed" instead of "default"
+                    QRegularExpression re("=\\d+");
+                    if(re.match(macroData[0]).hasMatch())
+                        ui->rb_delay_asTyped->setChecked(true);
+                    else
+                        ui->rb_delay_default->setChecked(true);
+                }
             }
         } else
             ui->modeBox->setCurrentIndex(0);
@@ -381,39 +447,42 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
                 krStop = KeyAction::PROGRAM_RE_KPSTOP;
         }
         bind->setAction(keys, KeyAction::programAction(ui->programKpBox->text(), ui->programKrBox->text(), kpStop | krStop));
-    } else if (ui->pteMacroBox->toPlainText().length() > 0) {
-        /// G-key macro handling:
-        /// Set the macro definiton for all keys selected (indeed, it may be multiple keys).
-        /// First, concat the Macro Key Definion and the Macro plain text
-        /// after escaping possible colos in the parts for Macro Text and Macro Comment.
-
-        /// But first, there is a special condition to handle:
-        /// You have recorded a macro with timing infos.
-        /// Afterwards you changed manually the timing infos in the pteMacroBox and press Apply.
-        /// In that case we must overwrite the txtBuffer to remember your changes.
-        if (ui->rb_delay_asTyped->isChecked()) ui->txtBuffer->setText(ui->pteMacroBox->toPlainText());
-
-        /// \todo There is still a bug in the state machine:
-        /// If you record a macro in asTyped-mode, switch to another mode
-        /// and change the vontent of the pteMacroBox manually,
-        /// then the changes are not saved in the timing buffer.
-        /// But anyhow, let's do more relevant things...
-        QString mac;
-        mac = ui->txtBuffer->text();
-        mac = ui->pteMacroComment->text().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
-        mac = ui->pteMacroText->toPlainText().replace(":", "&das_IST_31N_col0n;") + ":" + mac;
-        mac = ui->pteMacroBox->toPlainText() + ":" + mac;
-        bind->setAction(keys, KeyAction::macroAction(mac));
+    } else if (macroLines.length()) {
+        // Check if the macro is matched, and if not, warn the user
+        const int pos = macroLines.isMacroMatched();
+        if(pos > -1){
+            const MacroLine& ml = macroLines.at(pos);
+            const QString msg = (ml.keyDown ?
+                                     tr("Key %1 (%2) is pressed but never released.\n"
+                                   "This will result in the key being pressed by the macro until you manually press the key itself and release it.\n\n"
+                                   "Are you sure you want to continue?")
+                                   : tr("Key %1 (%2) is released but never pressed.\n"
+                                        "This will have no observable effect unless the key is held down manually or by another macro.\n\n"
+                                        "Are you sure you want to continue?"));
+            if(QMessageBox::warning(this, tr("Macro warning"),
+                                 msg.arg(pos + 1).arg(ml.key),
+                                 QMessageBox::Ok, QMessageBox::Cancel) != QMessageBox::Ok) {
+                // Select the row that's causing the warning
+                ui->tableView->selectRow(pos);
+                return;
+            }
+        }
+        // Generate macro format string
+        // Format is $macro:daemon_string:preview_string:user_specified_macro_name:original_recorded_macro_string
+        // $macro: is added by KeyAction::macroAction()
+        // daemon_string is the one sent to the daemon, and original_recorded_macro_string is the raw user data
+        // preview_string is now unused as it can be generated from the remaining data
+        // Any colons in user_specified_macro_name are escaped
+        QString escapedMacroName = ui->macroName->text().replace(":", "&das_IST_31N_col0n;");
+        QString finalDaemonString = macroLines.toString(false);
+        QString originalString = macroLines.toString(true);
+        QString macro = QString("%1::%2:%3").arg(finalDaemonString, escapedMacroName, originalString);
+        bind->setAction(keys, KeyAction::macroAction(macro));
     } else if(doUnbind)
         bind->noAction(keys);
 }
 
 void RebindWidget::on_applyButton_clicked(){
-    // Normally, this should be done via signalling.
-    // Because there is no serarate thread, we have to call it directly
-    // (otherwise we could do Key char conversion step by step,
-    // but so it is more easy to change the key definition):
-    on_btnStopMacro_clicked();
     applyChanges(selection, true);
 }
 
@@ -456,10 +525,8 @@ void RebindWidget::setBox(QWidget* box){
         ui->programKrButton->setChecked(false);
     }
     // Clear macro panel
-    if (box != ui->pteMacroBox) {
-        ui->pteMacroBox->setPlainText("");
-        ui->txtBuffer->setText("");
-        helpStatus(1);
+    if (box != ui->macroPreview) {
+        on_btnClearMacro_clicked();
     }
 }
 
@@ -469,12 +536,6 @@ void RebindWidget::on_typingBox_currentIndexChanged(int index){
     else {
         ui->typingButton->setChecked(true);
         setBox(ui->typingBox);
-    }
-}
-
-void RebindWidget::on_pteMacroBox_textChanged() {
-    if (ui->pteMacroBox->toPlainText().length() > 0) {
-        setBox(ui->pteMacroBox);
     }
 }
 
@@ -717,186 +778,200 @@ void RebindWidget::on_animButton_clicked(bool checked){
         ui->animBox->setCurrentIndex(1);
 }
 
-//////////
-/// \brief RebindWidget::on_btnStartMacro_clicked starts macro recording.
-/// A new notification channel and MacroReader are created to do the job.
-///
-/// The UI is protected against false clicking
-/// (e.g. if you type start and than Apply, the channel is closed in wrong order).
-///
-/// At this time, all neccessary params like macroNumber, macroPath, cmdFile etc. had been cached.
-///
 void RebindWidget::on_btnStartMacro_clicked() {
-    if (!macReader) {
+    // Get the capture type
+    CAPTURE_TYPE type = static_cast<CAPTURE_TYPE>(ui->captureTypeBox->currentIndex());
+    // If we're already capturing, stop
+    if(macroReader) {
+        macroReader->deleteLater();
+        macroReader = nullptr;
+
+        // Disable the macro notify node
+        if(type == CAPTURE_TYPE::CAPTURE_CURRENT_DEVICE) {
+            bind->handleNotificationChannel(false);
+        } else if (type == CAPTURE_TYPE::CAPTURE_ALL_DAEMON_DEVICES) {
+            foreach(Kb* dev, KbManager::devices()) {
+                dev->currentBind()->handleNotificationChannel(false);
+            }
+        }
+
+        // Remove the last mouse click if the user stopped
+        // the capture by clicking on the Stop Recording button
+        if(type != CAPTURE_TYPE::CAPTURE_ALL_KEYBOARDS && leftMouseClicked && ui->btnStartMacro->isClickedByMouse()){
+            macroLines.removeLastMouseLeftClick();
+            QString oldstr = ui->macroPreview->toPlainText();
+            oldstr.replace(QRegularExpression("<mouse1>$"), QString());
+            ui->macroPreview->setPlainText(oldstr);
+        }
+
+        ui->btnStartMacro->setText(tr("Start Recording"));
+        ui->lbl_macro->setText(tr("Click Apply or manually edit the events."));
+        ui->macroPreview->eatKeyEvents(false);
+        ui->macroPreview->releaseKeyboard();
+        setUiElementsEnabled(ui, true);
+
+        // If we captured any data, clear all other selections in the widget
+        if(macroLines.length())
+            setBox(ui->macroPreview);
+        return;
+    }
+    // Else, start a new capture
+    ui->macroPreview->setFocus();
+
+    // Start the appropriate capture mode
+    QStringList devicePaths;
+
+    // Enable the notify node
+    if(type == CAPTURE_TYPE::CAPTURE_CURRENT_DEVICE) {
         bind->handleNotificationChannel(true);
-        macReader = new MacroReader(bind->getMacroNumber(), bind->getMacroPath(), ui->pteMacroBox, ui->pteMacroText);
-        // because of the second thread we need to disable three of the four bottom buttons.
-        // Clicking "Stop" will enable them again.
-        ui->applyButton->setEnabled(false);
-        ui->resetButton->setEnabled(false);
-        ui->unbindButton->setEnabled(false);
-        ui->btnStartMacro->setEnabled(false);
-        ui->btnStopMacro->setEnabled(true);
-        ui->rb_delay_asTyped->setEnabled(false);
-        ui->rb_delay_no->setEnabled(false);
-        ui->rb_delay_default->setEnabled(false);
-        helpStatus(2);
+        devicePaths.append(bind->getMacroPath());
+    } else if (type == CAPTURE_TYPE::CAPTURE_ALL_DAEMON_DEVICES) {
+        foreach(Kb* dev, KbManager::devices()) {
+            dev->currentBind()->handleNotificationChannel(true);
+            devicePaths.append(dev->getMacroPath());
+        }
     }
+
+    leftMouseClicked = false;
+
+    macroReader = new MacroReader(devicePaths);
+    connect(macroReader, &MacroReader::macroLineRead, this, &RebindWidget::macroLineRead);
+
+    if(type == CAPTURE_TYPE::CAPTURE_ALL_KEYBOARDS){
+        connect(ui->macroPreview, &NoUserInputTextEdit::macroKeyEvent, macroReader, &MacroReader::translateQKeyEvent);
+        // Pause macro recording if an error is detected (unknown keypress)
+        connect(macroReader, &MacroReader::macroReadError, this, [this](QString k, QString m) {
+            ui->macroPreview->eatKeyEvents(false);
+            ui->macroPreview->releaseKeyboard();
+            QMessageBox::warning(this, tr("Unknown key combination pressed"), tr("An unknown key combination (%1, %2) has been pressed.\n"
+                                                                     "Make sure your keyboard layout is set to English - United States while recording macros.")
+                                 .arg(k, m));
+            ui->macroPreview->grabKeyboard();
+            ui->macroPreview->eatKeyEvents(true);
+            macroReader->resetTimer();
+        });
+    }
+
+    // Disable the buttons while recording
+    ui->btnStartMacro->setText(tr("Stop Recording"));
+    ui->lbl_macro->setText(tr("Type your macro and press Stop Recording when finished."));
+    ui->macroPreview->eatKeyEvents(true);
+    ui->macroPreview->grabKeyboard();
+    setUiElementsEnabled(ui, false);
 }
 
-//////////
-/// \brief RebindWidget::on_btnStopMacro_clicked ends the macro recording.
-/// Notify channel ist closed, the ReaderThread is deleted when the notification is really down.
-///
-/// Afterwards, the characters in the MacroBox are changed from KB-out format to cmd-in format.
-/// At last the UI changes to the new state.
-///
-void RebindWidget::on_btnStopMacro_clicked() {
-    if (macReader) {
-        bind->handleNotificationChannel(false);
-        delete macReader;
-        macReader = 0;
-        convertMacroBox();
-        ui->applyButton->setEnabled(true);
-        ui->resetButton->setEnabled(true);
-        ui->unbindButton->setEnabled(true);
-        ui->btnStartMacro->setEnabled(true);
-        ui->btnStopMacro->setEnabled(false);
-        ui->rb_delay_asTyped->setEnabled(true);
-        ui->rb_delay_no->setEnabled(true);
-        ui->rb_delay_default->setEnabled(true);
-        helpStatus(3);
-    }
-}
-
-//////////
-/// \brief RebindWidget::on_btnClearMacro_clicked changes the help info an the panel.
-/// The job of clearing the input panels is triggerd with signal/slot via the RebindWidget.ui file.
-///
-/// \todo I do not know what is the better solution with the delay-buttons in case of clicking clear:
-/// Reset the button to the default value or do not touch it? Not clear is ignored.
-///
 void RebindWidget::on_btnClearMacro_clicked() {
-    helpStatus(1);
+    ui->lbl_macro->setText(tr("Click Start Recording or manually edit the events."));
+    macroLines.clear();
+    ui->macroName->clear();
+    ui->macroPreview->clear();
 }
 
-//////////
-/// \brief RebindWidget::helpStatus shows a help line in the ui.
-/// \param status determines what to display.
-///
-void RebindWidget::helpStatus(int status) {
-    switch (status) {
-    case 1:
-        ui->lbl_macro->setText(tr("Type in a macro name in the comment box and click start."));
-        break;
-    case 2:
-        ui->lbl_macro->setText(tr("Type your macro and click stop when finished."));
-        break;
-    case 3:
-        ui->lbl_macro->setText(tr("Click Apply or manually edit Macro Key Actions."));
-        break;
-    default:
-        ui->lbl_macro->setText(tr("Invalid status in RebindWidget::helpStatus (%1)").arg(status));
+void RebindWidget::on_rb_delay_default_toggled(bool checked){
+    macroLines.setDefaultDelay(checked);
+}
+
+void RebindWidget::insertIntoMacroPreview(const bool keydown, const bool printable, const QString& line){
+    if(keydown){
+        ui->macroPreview->moveCursor(QTextCursor::End);
+        if(printable)
+            ui->macroPreview->insertPlainText(line);
+        else if(line == QString("space")) // Special case to handle the spacebar
+            ui->macroPreview->insertPlainText(" ");
+        else
+            ui->macroPreview->insertPlainText("<" + line + ">");
     }
 }
 
-//////////
-/// \brief RebindWidget::convertMacroBox converts the macroBox content.
-/// The KB sends each keypress as "key [+|-]<keyname><newline>"
-/// This is followed by timing information (delays between keystrokes).
-///
-/// The ckb-daemon needs a shorter format, only " [+|-]<keyname>=<delay>",
-/// multiple entries are separated by comma.
-///
-/// That function does the conversion.
-///
-void RebindWidget::convertMacroBox() {
-    QString in;
+void RebindWidget::macroLineRead(QString line, qint64 ustime, bool keydown){
+    const bool printable = (line.length() == 1);
+    macroLines.append(MacroLine(line, ustime, MacroLine::MACRO_DELAY_DEFAULT, keydown));
 
-    // Remember the original input stream before it is converted.
-    // In case of new choice of delay mode we have to restore it.
-    if (ui->txtBuffer->text() == "") {
-        ui->txtBuffer->setText(ui->pteMacroBox->toPlainText());
-        in = ui->pteMacroBox->toPlainText();
-    } else in = ui->txtBuffer->text();
-
-    in.replace (QRegExp("\n"), ",");    // first join all in one line
-    in.replace (QRegExp("key "), "");   // then delete keyword "key" followed by space
-    in.replace (QRegExp(",="), "=");    // at last join each keystroke with its delay parameter
-
-    // How to deal with the delay params?
-    // Because the three radio buttons are mututally exclusive,
-    // we can run through the if-chain w/o conflicts.
-    // If rb_delay_asTyped is checked, do nothing, because that's the standard.
-
-    if (ui->rb_delay_default->isChecked()) {
-        in.replace(QRegExp("=\\d+,"), ",");  // Delete the timing infos, use default value
-        in.replace(QRegExp("=\\d+$"), "");   // The last entry is without comma
-    }
-    if (ui->rb_delay_no->isChecked()) {
-        in.replace(QRegExp("=\\d+,"), "=0,");  // Set timing infos to zero for no delay
-        in.replace(QRegExp("=\\d+$"), "=0");   // Again the last entry w/o comma
-        in.replace(QRegExp("([\\+\\-]\\w+),"), "\\1=0,");  // If no delay is given, force it to zero
-        in.replace(QRegExp("([\\+\\-]\\w+)$"), "\\1=0");
-    }
-
-    // Show the new format by replacing the older one.
-    ui->pteMacroBox->setPlainText(in);
+    // Add keystroke to the key actions textedit
+    // "+k", "-k", these can be represented as text
+    if(line == "mouse1")
+        leftMouseClicked = true;
+    else
+        ui->macroPreview->setFocus();
+    insertIntoMacroPreview(keydown, printable, line);
 }
 
-//////////
-/// \brief RebindWidget::on_rb_delay_no_toggled
-/// \param checked
-/// The following slots are triggerd by changing the mutual exclusive radio buttons
-/// when choosing the delay.
-/// They are called, if the button ist enabled.
-/// This first one should disable all delay.
-///
-void RebindWidget::on_rb_delay_no_toggled(bool checked)
-{
-    convertMacroBox();
-}
-
-//////////
-/// \brief RebindWidget::on_rb_delay_asTyped_toggled
-/// \param checked
-/// This button ist clicked to use the delay times, as they are recorded.
-/// Returs a warning message, if we are not in the recording phase,
-/// because then we don't have the delay times any more.
-///
-void RebindWidget::on_rb_delay_asTyped_toggled(bool checked)
-{
-    convertMacroBox();
-}
-
-//////////
-/// \brief RebindWidget::on_rb_delay_default_toggled
-/// \param checked
-/// This is as easy as the no-delay-button, because this means
-/// take the default values.
-///
-void RebindWidget::on_rb_delay_default_toggled(bool checked)
-{
-    convertMacroBox();
-}
-
-//////////
-/// \brief RebindWidget::setCorrectRadioButton
-/// \param macdef
-/// Set the radiobutton for timing paramters according to
-/// the context.
-/// If no "=" followed by a number and comma can be found, it is the default button.
-/// If "=" can be found and numbers with more than one digit (means: > 9), it is the "asTyped" button
-/// Otherwise it is the "no" button.
-///
-void RebindWidget::setCorrectRadioButton (QString macdef) {
-    if (!macdef.contains(QRegExp("=\\d+,"))) {
-        ui->rb_delay_default->setChecked(true);
+void RebindWidget::tabChanged(int idx){
+    if(macroReader)
         return;
+    // We monitor the tabs, and when we switch to the macro tab, we select the appropriate capture method
+    if(ui->tabWidget->currentWidget() == ui->macroTab){
+        if(bind->map().isKeyboard()){
+            ui->captureTypeBox->setCurrentIndex(CAPTURE_TYPE::CAPTURE_CURRENT_DEVICE);
+        } else {
+            // Check if there are any daemon-managed keyboards connected, and if so, capture from them too
+            foreach(const Kb* dev, KbManager::devices()){
+                if(dev->isKeyboard()){
+                    ui->captureTypeBox->setCurrentIndex(CAPTURE_TYPE::CAPTURE_ALL_DAEMON_DEVICES);
+                    return;
+                }
+            }
+            // If none were found, capture from everything as a last resort
+            ui->captureTypeBox->setCurrentIndex(CAPTURE_TYPE::CAPTURE_ALL_KEYBOARDS);
+        }
     }
-    if (macdef.contains(QRegExp("=\\d\\d+,"))) {
-        ui->rb_delay_asTyped->setChecked(true);
+}
+
+// This is automatically called whenever setCurrentIndex is called programmatically as well
+void RebindWidget::on_captureTypeBox_currentIndexChanged(int index){
+    captureType = static_cast<CAPTURE_TYPE>(index);
+    if(captureType != CAPTURE_ALL_KEYBOARDS)
         return;
+    if(CkbSettings::get("UI/Bind/SuppressCaptureAllWarning", false).toBool())
+        return;
+    QMessageBox msg;
+    // MessageBox takes ownership of the checkbox, so we don't need to delete it
+    msg.setCheckBox(new QCheckBox("Don't warn me again"));
+    msg.setIcon(QMessageBox::Warning);
+    msg.addButton(QMessageBox::Ok);
+    msg.setText(tr("\"Record from all keyboards\" is only recommended if you do not have a keyboard managed by ckb-next.\n"
+                   "It currently only functions with an English - United States keyboard layout.\n"
+                   "Make sure your keyboard is switched to it before recording."));
+    msg.setWindowTitle(tr("Record from all keyboards"));
+    msg.exec();
+    CkbSettings::set("UI/Bind/SuppressCaptureAllWarning", msg.checkBox()->isChecked());
+}
+
+int RebindWidget::regeneratePreview(){
+    ui->macroPreview->clear();
+    const int len = macroLines.length();
+    for(int i = 0; i < len; i++){
+        const MacroLine& ml = macroLines.at(i);
+        insertIntoMacroPreview(ml.keyDown, ml.isPrintable(), ml.key);
     }
-    ui->rb_delay_no->setChecked(true);
+
+    return len;
+}
+
+void RebindWidget::on_editAsStringBtn_clicked(){
+    MacroStringEditDialog* dlg = new MacroStringEditDialog(&macroLines, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->show();
+    connect(dlg, &MacroStringEditDialog::accepted, this, [=](){
+        const int len = macroLines.length();
+        if(len)
+            setBox(ui->macroPreview);
+    });
+}
+
+void RebindWidget::on_btnRemoveEvent_clicked(){
+    const QModelIndexList mil = ui->tableView->selectionModel()->selectedRows();
+    if(!mil.length())
+        return;
+
+    macroLines.removeMultipleColumns(mil);
+    regeneratePreview();
+}
+
+void RebindWidget::on_btnAddEvent_clicked(){
+    setLocalUiElementsEnabled(ui, false);
+    ui->btnStartMacro->setEnabled(false);
+    const QModelIndex idx = macroLines.addBlankElement();
+    ui->tableView->setCurrentIndex(idx);
+    ui->tableView->edit(idx);
 }

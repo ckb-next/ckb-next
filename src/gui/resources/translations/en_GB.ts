@@ -344,173 +344,163 @@
 <context>
     <name>ExtraSettingsWidget</name>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="462"/>
+        <location filename="../../extrasettingswidget.ui" line="380"/>
         <source>By default, the same brightness level will be applied to all profiles and all devices. Enable this to store it with the lighting mode instead.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="465"/>
+        <location filename="../../extrasettingswidget.ui" line="383"/>
         <source>Set brightness per-mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="54"/>
+        <location filename="../../extrasettingswidget.ui" line="240"/>
         <source>Behavior</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="177"/>
+        <location filename="../../extrasettingswidget.ui" line="489"/>
         <source>OS X tweaks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="280"/>
+        <location filename="../../extrasettingswidget.ui" line="127"/>
         <source>The tray icon will not be displayed. The application will still run in the background; re-launch the app to see the GUI again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="283"/>
+        <location filename="../../extrasettingswidget.ui" line="130"/>
         <source>Hide tray icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="518"/>
+        <location filename="../../extrasettingswidget.ui" line="476"/>
         <source>Frame rate (FPS):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="430"/>
+        <location filename="../../extrasettingswidget.ui" line="195"/>
         <source>0 animations found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="442"/>
+        <location filename="../../extrasettingswidget.ui" line="207"/>
         <source>Re-scan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="449"/>
+        <location filename="../../extrasettingswidget.ui" line="214"/>
         <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="365"/>
+        <location filename="../../extrasettingswidget.ui" line="81"/>
         <source>Location:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="498"/>
+        <location filename="../../extrasettingswidget.ui" line="110"/>
         <source>Try this if you&apos;re having problems with mouse movement.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="501"/>
+        <location filename="../../extrasettingswidget.ui" line="113"/>
         <source>Disable mouse acceleration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="342"/>
+        <location filename="../../extrasettingswidget.ui" line="469"/>
         <source>Hardware</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="531"/>
+        <location filename="../../extrasettingswidget.ui" line="535"/>
         <source>Warning: high frame rates may cause stability issues</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="221"/>
+        <location filename="../../extrasettingswidget.ui" line="411"/>
         <source>Scroll</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="247"/>
+        <location filename="../../extrasettingswidget.ui" line="437"/>
         <source>line(s) at a time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="257"/>
+        <location filename="../../extrasettingswidget.ui" line="340"/>
         <source>Disable animated preview when ckb-next is not in focus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="378"/>
-        <source>When using macros with strings longer than 25 chars, some OS may lose characters (e.g. Mint 17.2). Select to prevent that bug.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../extrasettingswidget.ui" line="381"/>
-        <source>Use delay for very long macros</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../extrasettingswidget.ui" line="488"/>
+        <location filename="../../extrasettingswidget.ui" line="357"/>
         <source>May improve appearance on some keyboards.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="491"/>
+        <location filename="../../extrasettingswidget.ui" line="360"/>
         <source>Use spatial dithering to simulate extra color resolution</source>
         <translation>Use spatial dithering to simulate extra colour resolution</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="508"/>
+        <location filename="../../extrasettingswidget.ui" line="519"/>
         <source>Try this if you&apos;re having problems with the scroll wheel.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="511"/>
+        <location filename="../../extrasettingswidget.ui" line="522"/>
         <source>Disable scroll acceleration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="545"/>
+        <location filename="../../extrasettingswidget.ui" line="512"/>
         <source>Monochrome tray icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="273"/>
+        <location filename="../../extrasettingswidget.ui" line="74"/>
         <source>Animation scripts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="104"/>
+        <location filename="../../extrasettingswidget.ui" line="264"/>
         <source>Turn lights off when idle for</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="136"/>
+        <location filename="../../extrasettingswidget.ui" line="296"/>
         <source>m</source>
         <comment>minutes</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="164"/>
+        <location filename="../../extrasettingswidget.ui" line="61"/>
         <source>Delay application start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="329"/>
+        <location filename="../../extrasettingswidget.ui" line="333"/>
         <source>Enabling per-mode brightness will disable scrolling on the tray icon to change the brightness level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="88"/>
+        <location filename="../../extrasettingswidget.cpp" line="83"/>
         <source>This feature is not supported under Wayland</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="124"/>
+        <location filename="../../extrasettingswidget.cpp" line="119"/>
         <source>No animations found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="126"/>
+        <location filename="../../extrasettingswidget.cpp" line="121"/>
         <source>1 animation found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="128"/>
+        <location filename="../../extrasettingswidget.cpp" line="123"/>
         <source>%1 animations found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -950,91 +940,91 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="61"/>
+        <location filename="../../kbbindwidget.cpp" line="66"/>
         <source>Winlock Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="61"/>
+        <location filename="../../kbbindwidget.cpp" line="66"/>
         <source>Windows key lock is currently enabled.
 
 The binding will not function until winlock has been disabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="69"/>
+        <location filename="../../kbbindwidget.cpp" line="74"/>
         <source>Click to select</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="77"/>
+        <location filename="../../kbbindwidget.cpp" line="82"/>
         <source>(Unknown)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="82"/>
+        <location filename="../../kbbindwidget.cpp" line="87"/>
         <source>%1 %2 selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="82"/>
+        <location filename="../../kbbindwidget.cpp" line="87"/>
         <source>buttons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="82"/>
+        <location filename="../../kbbindwidget.cpp" line="87"/>
         <source>keys</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="95"/>
+        <location filename="../../kbbindwidget.cpp" line="100"/>
         <source>&lt;center&gt;Reset all %1s to default?&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="97"/>
+        <location filename="../../kbbindwidget.cpp" line="102"/>
         <source>&lt;center&gt;Reset this %1 to default?&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="99"/>
+        <location filename="../../kbbindwidget.cpp" line="104"/>
         <source>&lt;center&gt;Reset %1 %2s to default?&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="100"/>
+        <location filename="../../kbbindwidget.cpp" line="105"/>
         <source>Confirm action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="92"/>
-        <location filename="../../kbbindwidget.cpp" line="110"/>
+        <location filename="../../kbbindwidget.cpp" line="97"/>
+        <location filename="../../kbbindwidget.cpp" line="115"/>
         <source>button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="92"/>
-        <location filename="../../kbbindwidget.cpp" line="110"/>
+        <location filename="../../kbbindwidget.cpp" line="97"/>
+        <location filename="../../kbbindwidget.cpp" line="115"/>
         <source>key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="111"/>
+        <location filename="../../kbbindwidget.cpp" line="116"/>
         <source>s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="115"/>
+        <location filename="../../kbbindwidget.cpp" line="120"/>
         <source>all %1s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="117"/>
+        <location filename="../../kbbindwidget.cpp" line="122"/>
         <source>Copy binding for </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="117"/>
+        <location filename="../../kbbindwidget.cpp" line="122"/>
         <source> to:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1063,7 +1053,7 @@ The binding will not function until winlock has been disabled.</source>
     </message>
     <message>
         <location filename="../../kblightwidget.ui" line="162"/>
-        <location filename="../../kblightwidget.cpp" line="109"/>
+        <location filename="../../kblightwidget.cpp" line="97"/>
         <source>Click to select</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1083,22 +1073,22 @@ The binding will not function until winlock has been disabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="113"/>
+        <location filename="../../kblightwidget.cpp" line="101"/>
         <source>1 zone selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="115"/>
+        <location filename="../../kblightwidget.cpp" line="103"/>
         <source>1 key selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="118"/>
+        <location filename="../../kblightwidget.cpp" line="106"/>
         <source>%1 zones selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="120"/>
+        <location filename="../../kblightwidget.cpp" line="108"/>
         <source>%1 keys selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1177,71 +1167,71 @@ The binding will not function until winlock has been disabled.</source>
     </message>
     <message>
         <location filename="../../kbprofiledialog.cpp" line="209"/>
-        <location filename="../../kbprofiledialog.cpp" line="335"/>
+        <location filename="../../kbprofiledialog.cpp" line="351"/>
         <source>ckb-next profiles (*.ckb)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="295"/>
-        <location filename="../../kbprofiledialog.cpp" line="345"/>
-        <location filename="../../kbprofiledialog.cpp" line="353"/>
-        <location filename="../../kbprofiledialog.cpp" line="359"/>
-        <location filename="../../kbprofiledialog.cpp" line="370"/>
-        <location filename="../../kbprofiledialog.cpp" line="380"/>
-        <location filename="../../kbprofiledialog.cpp" line="439"/>
-        <location filename="../../kbprofiledialog.cpp" line="447"/>
+        <location filename="../../kbprofiledialog.cpp" line="312"/>
+        <location filename="../../kbprofiledialog.cpp" line="361"/>
+        <location filename="../../kbprofiledialog.cpp" line="369"/>
+        <location filename="../../kbprofiledialog.cpp" line="375"/>
+        <location filename="../../kbprofiledialog.cpp" line="387"/>
+        <location filename="../../kbprofiledialog.cpp" line="397"/>
+        <location filename="../../kbprofiledialog.cpp" line="456"/>
+        <location filename="../../kbprofiledialog.cpp" line="464"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="295"/>
+        <location filename="../../kbprofiledialog.cpp" line="312"/>
         <source>An error occurred while exporting the selected profiles.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="300"/>
+        <location filename="../../kbprofiledialog.cpp" line="317"/>
         <source>Export Successful</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="300"/>
+        <location filename="../../kbprofiledialog.cpp" line="317"/>
         <source>Selected profiles have been exported successfully.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="345"/>
+        <location filename="../../kbprofiledialog.cpp" line="361"/>
         <source>Selected file is not a valid profile.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="353"/>
+        <location filename="../../kbprofiledialog.cpp" line="369"/>
         <source>Could not read %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="359"/>
+        <location filename="../../kbprofiledialog.cpp" line="375"/>
         <source>Package contains invalid metadata.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="370"/>
+        <location filename="../../kbprofiledialog.cpp" line="387"/>
         <source>Unsupported package selected. Please update ckb-next to import it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="380"/>
+        <location filename="../../kbprofiledialog.cpp" line="397"/>
         <source>This profile was not created for the current device type.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="401"/>
-        <location filename="../../kbprofiledialog.cpp" line="450"/>
-        <location filename="../../kbprofiledialog.cpp" line="473"/>
+        <location filename="../../kbprofiledialog.cpp" line="418"/>
+        <location filename="../../kbprofiledialog.cpp" line="467"/>
+        <location filename="../../kbprofiledialog.cpp" line="490"/>
         <source>Profile Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="402"/>
+        <location filename="../../kbprofiledialog.cpp" line="419"/>
         <source>This profile was created for a %1 (%2)
 but it is going to be imported to a %3 (%4).
 
@@ -1251,36 +1241,36 @@ Import Anyway?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="439"/>
+        <location filename="../../kbprofiledialog.cpp" line="456"/>
         <source>Selected package contains no valid profiles.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="447"/>
+        <location filename="../../kbprofiledialog.cpp" line="464"/>
         <source>Selected package contains some corrupt profiles.
 
 An attempt will be made to import as many as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="451"/>
+        <location filename="../../kbprofiledialog.cpp" line="468"/>
         <source>The following profiles will be imported.
 
 • </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="474"/>
+        <location filename="../../kbprofiledialog.cpp" line="491"/>
         <source> already exists. Overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="500"/>
+        <location filename="../../kbprofiledialog.cpp" line="516"/>
         <source>Import Successful</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="500"/>
+        <location filename="../../kbprofiledialog.cpp" line="516"/>
         <source>Profiles have been imported successfully.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1427,49 +1417,49 @@ An attempt will be made to import as many as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="449"/>
+        <location filename="../../kbwidget.cpp" line="457"/>
         <source>Checking...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="457"/>
-        <location filename="../../kbwidget.cpp" line="460"/>
-        <location filename="../../kbwidget.cpp" line="464"/>
+        <location filename="../../kbwidget.cpp" line="465"/>
+        <location filename="../../kbwidget.cpp" line="468"/>
+        <location filename="../../kbwidget.cpp" line="472"/>
         <source>Firmware update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="457"/>
+        <location filename="../../kbwidget.cpp" line="465"/>
         <source>&lt;center&gt;There is a new firmware available for this device.&lt;br /&gt;However, it requires a newer version of ckb-next.&lt;br /&gt;Please upgrade ckb-next and try again.&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="460"/>
+        <location filename="../../kbwidget.cpp" line="468"/>
         <source>&lt;center&gt;There was a problem getting the status for this device.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="464"/>
+        <location filename="../../kbwidget.cpp" line="472"/>
         <source>&lt;center&gt;Your firmware is already up to date.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="476"/>
+        <location filename="../../kbwidget.cpp" line="484"/>
         <source>Select firmware file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="476"/>
+        <location filename="../../kbwidget.cpp" line="484"/>
         <source>Firmware blobs (*.bin)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="481"/>
+        <location filename="../../kbwidget.cpp" line="489"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="481"/>
+        <location filename="../../kbwidget.cpp" line="489"/>
         <source>&lt;center&gt;File could not be read.&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1483,6 +1473,7 @@ An attempt will be made to import as many as possible.</source>
     </message>
     <message>
         <location filename="../../keyaction.cpp" line="102"/>
+        <location filename="../../keyaction.cpp" line="164"/>
         <source>(Unknown)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1534,6 +1525,46 @@ An attempt will be made to import as many as possible.</source>
     <message>
         <location filename="../../keyaction.cpp" line="137"/>
         <source>DPI stage %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="143"/>
+        <source>Brightness up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="146"/>
+        <source>Brightness down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="151"/>
+        <source>Toggle Windows lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="153"/>
+        <source>Windows lock on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="155"/>
+        <source>Windows lock off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="158"/>
+        <source>Start animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="160"/>
+        <source>Launch program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="162"/>
+        <source>Send G-key macro</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1661,6 +1692,82 @@ An attempt will be made to import as many as possible.</source>
     </message>
 </context>
 <context>
+    <name>MacroStringEditDialog</name>
+    <message>
+        <location filename="../../macrostringeditdialog.ui" line="17"/>
+        <source>Edit Macro As String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrostringeditdialog.cpp" line="21"/>
+        <source>Macro string parse error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrostringeditdialog.cpp" line="21"/>
+        <source>An error occured while parsing at column %1&lt;br&gt;&lt;br&gt;Please correct it and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MacroTableModel</name>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="177"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="179"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="187"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="196"/>
+        <source>You can not set a delay before the first key event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="198"/>
+        <source>To set a delay, please switch the delay mode to &quot;as typed&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="213"/>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="215"/>
+        <source>Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="358"/>
+        <source>Delay is too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="365"/>
+        <source>Max random delay is too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="369"/>
+        <source>Max random delay is less or equal to the minimum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="380"/>
+        <source>Invalid key </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="../../mainwindow.ui" line="48"/>
@@ -1708,80 +1815,80 @@ An attempt will be made to import as many as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="200"/>
+        <location filename="../../mainwindow.cpp" line="201"/>
         <source>The ckb-next daemon is not running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="285"/>
+        <location filename="../../mainwindow.cpp" line="286"/>
         <source>Driver inactive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="292"/>
+        <location filename="../../mainwindow.cpp" line="293"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="292"/>
+        <location filename="../../mainwindow.cpp" line="293"/>
         <source>). Please upgrade ckb-next</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="292"/>
+        <location filename="../../mainwindow.cpp" line="293"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="303"/>
+        <location filename="../../mainwindow.cpp" line="304"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="305"/>
+        <location filename="../../mainwindow.cpp" line="306"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="315"/>
+        <location filename="../../mainwindow.cpp" line="316"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="318"/>
+        <location filename="../../mainwindow.cpp" line="319"/>
         <source>No devices connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="321"/>
+        <location filename="../../mainwindow.cpp" line="322"/>
         <source>1 device connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="323"/>
+        <location filename="../../mainwindow.cpp" line="324"/>
         <source>%1 devices connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="354"/>
+        <location filename="../../mainwindow.cpp" line="355"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="370"/>
+        <location filename="../../mainwindow.cpp" line="371"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="502"/>
+        <location filename="../../mainwindow.cpp" line="526"/>
         <source>Update to v</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="507"/>
+        <location filename="../../mainwindow.cpp" line="531"/>
         <source>Up to date</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1807,23 +1914,28 @@ or click &quot;Quit&quot; on the Settings screen.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../main.cpp" line="56"/>
+        <location filename="../../main.cpp" line="59"/>
         <source>Starts in background, without displaying the main window.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="61"/>
+        <location filename="../../main.cpp" line="64"/>
         <source>Causes already running instance (if any) to exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="64"/>
+        <location filename="../../main.cpp" line="67"/>
         <source>Switches to the profile with the specified name on all devices.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="67"/>
+        <location filename="../../main.cpp" line="70"/>
         <source>Switches to the mode either in the current profile, or in the one specified by --profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../main.cpp" line="73"/>
+        <source>Delays application start for 5 seconds</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2076,109 +2188,173 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1292"/>
-        <source>Macro Key Actions</source>
+        <location filename="../../rebindwidget.ui" line="1307"/>
+        <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1317"/>
-        <source>Disable delay</source>
+        <source>Preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1327"/>
+        <location filename="../../rebindwidget.ui" line="1400"/>
+        <source>This device only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1405"/>
+        <source>All ckb-next devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1410"/>
+        <source>All keyboards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1431"/>
+        <source>Record from:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1438"/>
+        <source>Keystroke delay:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1457"/>
+        <source>Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1492"/>
+        <source>Edit as string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1567"/>
+        <location filename="../../rebindwidget.cpp" line="807"/>
+        <source>Start Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1587"/>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1607"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1362"/>
         <source>Set delay to default values: 20us up to 15 chars, 200us above</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1343"/>
+        <location filename="../../rebindwidget.ui" line="1378"/>
         <source>Delay will be the same as it was recorded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1495"/>
-        <source>Record macro</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../rebindwidget.ui" line="1320"/>
-        <source>No &amp;delay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../rebindwidget.ui" line="1330"/>
+        <location filename="../../rebindwidget.ui" line="1365"/>
         <source>de&amp;fault</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1346"/>
+        <location filename="../../rebindwidget.ui" line="1381"/>
         <source>as t&amp;yped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1435"/>
-        <source>Macro Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../rebindwidget.ui" line="1445"/>
-        <source>Macro Sequence</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../rebindwidget.ui" line="1502"/>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../rebindwidget.ui" line="1512"/>
-        <source>Stop</source>
-        <extracomment>was passiert, wenn ich hier iregend einen Kommentar reinschreibe?</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../rebindwidget.ui" line="1519"/>
+        <location filename="../../rebindwidget.ui" line="1620"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1551"/>
+        <location filename="../../rebindwidget.ui" line="1650"/>
         <source>Unbind</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1558"/>
+        <location filename="../../rebindwidget.ui" line="1657"/>
         <source>Reset to Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1565"/>
+        <location filename="../../rebindwidget.ui" line="1664"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1572"/>
+        <location filename="../../rebindwidget.ui" line="1671"/>
         <source>Apply</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="790"/>
-        <source>Type in a macro name in the comment box and click start.</source>
+        <location filename="../../rebindwidget.cpp" line="456"/>
+        <source>Key %1 (%2) is pressed but never released.
+This will result in the key being pressed by the macro until you manually press the key itself and release it.
+
+Are you sure you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="793"/>
-        <source>Type your macro and click stop when finished.</source>
+        <location filename="../../rebindwidget.cpp" line="459"/>
+        <source>Key %1 (%2) is released but never pressed.
+This will have no observable effect unless the key is held down manually or by another macro.
+
+Are you sure you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="796"/>
-        <source>Click Apply or manually edit Macro Key Actions.</source>
+        <location filename="../../rebindwidget.cpp" line="462"/>
+        <source>Macro warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="799"/>
-        <source>Invalid status in RebindWidget::helpStatus (%1)</source>
+        <location filename="../../rebindwidget.cpp" line="808"/>
+        <source>Click Apply or manually edit the events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="846"/>
+        <source>Unknown key combination pressed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="846"/>
+        <source>An unknown key combination (%1, %2) has been pressed.
+Make sure your keyboard layout is set to English - United States while recording macros.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="856"/>
+        <source>Stop Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="857"/>
+        <source>Type your macro and press Stop Recording when finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="864"/>
+        <source>Click Start Recording or manually edit the events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="932"/>
+        <source>&quot;Record from all keyboards&quot; is only recommended if you do not have a keyboard managed by ckb-next.
+It currently only functions with an English - United States keyboard layout.
+Make sure your keyboard is switched to it before recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="935"/>
+        <source>Record from all keyboards</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

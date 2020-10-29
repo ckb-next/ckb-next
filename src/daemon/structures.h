@@ -185,6 +185,13 @@ extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
+extern const union devcmd vtable_bragi;
+
+typedef enum protocol_
+{
+    PROTO_NXP,
+    PROTO_BRAGI,
+} protocol_t;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN 50
@@ -284,6 +291,11 @@ typedef struct {
     key* keymap;
     // Buffer used to store non-HID interrupt reads from the input thread.
     uchar* interruptbuf;
+    // Protocol version
+    protocol_t protocol;
+    // Poll thread
+    pthread_t* pollthread;
+
 } usbdevice;
 
 #endif  // STRUCTURES_H

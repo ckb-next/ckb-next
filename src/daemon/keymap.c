@@ -3,6 +3,7 @@
 #include "keymap.h"
 #include "usb.h"
 #include "input.h"
+#include "bragi_proto.h"
 
 const key keymap[N_KEYS_EXTENDED] = {
     // Keyboard keys
@@ -247,6 +248,9 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
     { "profswitch", -1, KEY_CORSAIR },
+    // { "profup",     -1, KEY_CORSAIR },
+    // { "profdn",     -1, KEY_CORSAIR },
+    // { "optbtn",     -1, KEY_CORSAIR },
 
     // Extended mouse buttons (wheel is an axis in HW, 6-8 are recognized by the OS but not present in HW)
     { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },
@@ -328,8 +332,8 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
 
     // Get first byte of the response
     uchar firstbyte = buffer[0];
-    // If the response starts with CMD_GET (0x0e), that means it needs to go to os_usbrecv()
-    if(urblen == MSG_SIZE && firstbyte == CMD_GET){
+    // If the response starts with CMD_GET (0x0e), or it came from ep4 with bragi, that means it needs to go to os_usbrecv()
+    if(urblen == MSG_SIZE && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == 0x84))){
         int retval = pthread_mutex_lock(intmutex(kb));
         if(retval)
             ckb_fatal("Error locking interrupt mutex %i", retval);
@@ -351,15 +355,28 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
         } else {
             if(IS_MOUSE_DEV(kb)) {
                 // HID Mouse Input
-                if(firstbyte == MOUSE_IN)
-                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
-                // Corsair Mouse Input
-                else if(firstbyte == CORSAIR_IN)
+                // In HW mode, Bragi mouse is the same as NXP, but without a header
+                if(kb->protocol == PROTO_BRAGI) {
+                    // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
+                    if(kb->active) {
+                        if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1) {
+                            corsair_bragi_mousecopy(kb->input.keys, buffer);
+                        } else {
+                            kb->input.rel_x += (buffer[5] << 8) | buffer[4];
+                            kb->input.rel_y += (buffer[7] << 8) | buffer[6];
+                        }
+                    } else {
+                        hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                    }
+                } else if(firstbyte == MOUSE_IN) {
+                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer + 1);
+                } else if(firstbyte == CORSAIR_IN) { // Corsair Mouse Input
                     corsair_mousecopy(kb->input.keys, buffer);
-                else if(firstbyte == 0x05 && urblen == 21) // Seems to be on the Ironclaw RGB only
+                } else if(firstbyte == 0x05 && urblen == 21) { // Seems to be on the Ironclaw RGB only
                     corsair_extended_mousecopy(kb->input.keys, buffer);
-                else
+                } else {
                     ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x", firstbyte, ep);
+                }
             } else {
                 // Assume Keyboard for everything else for now
                 // Accept NKRO only if device is active
@@ -502,16 +519,16 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
 void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
     // Byte 1 = mouse buttons (bitfield)
     for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
-        if(urbinput[1] & (1 << bit))
+        if(urbinput[0] & (1 << bit))
             SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
         else
             CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
     }
     // Bytes 5 - 8: movement
-    *xaxis += (urbinput[6] << 8) | urbinput[5];
-    *yaxis += (urbinput[8] << 8) | urbinput[7];
+    *xaxis += (urbinput[5] << 8) | urbinput[4];
+    *yaxis += (urbinput[7] << 8) | urbinput[6];
     // Byte 9: wheel
-    char wheel = urbinput[9];
+    char wheel = urbinput[8];
     if(wheel > 0)
         SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);         // wheelup
     else
@@ -570,6 +587,62 @@ void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int
     *yaxis += (urbinput[5] << 8) | urbinput[4];
 
     char wheel = urbinput[6];
+    if(wheel > 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
+    if(wheel < 0)
+        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+    else
+        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+}
+
+#define BRAGI_MOUSE_BUTTONS 16
+/*
+01 00 == Left
+02 00 == Right
+04 00 == middle
+10 00 == back thumb
+08 00 == front thumb
+80 00 == DPI Up
+00 01 == Dpi Dn
+20 00 == Left Front
+40 00 == Left Back
+00 02 == sniper
+*/
+
+// We have to do it this way, because if we patch the keymap, then we'll break standard input
+const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
+        0x00,
+        0x01,
+        0x02,
+        0x04,
+        0x03,
+        0x05,
+        0x06,
+        0x08,
+        0x09,
+        0x07, // Anything past this is untested
+        0x0A,
+        0x0B,
+        0x0C,
+        0x0D,
+        0x0E,
+        0x0F,
+    };
+
+void corsair_bragi_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
+    urbinput += 2;
+    for(int bit = 0; bit < BRAGI_MOUSE_BUTTONS; bit++){
+        int byte = bit / 8;
+        uchar test = 1 << (bit % 8);
+        if(urbinput[byte] & test)
+            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+        else
+            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+    }
+    
+    char wheel = urbinput[2];
     if(wheel > 0)
         SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
     else

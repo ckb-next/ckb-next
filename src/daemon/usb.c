@@ -29,6 +29,8 @@ dpi_list mouse_dpi_list[] = {
     { P_HARPOON_PRO, 12000 },
     { P_KATAR, 8000 },
     { P_IRONCLAW, 18000 },
+    { P_IRONCLAW_W_U, 18000 },
+    { P_IRONCLAW_W_D, 18000 },
     { 0, 0 }, // Keep last and do not remove
 };
 
@@ -78,6 +80,8 @@ device_desc models[] = {
     { V_CORSAIR, P_HARPOON_PRO, },
     { V_CORSAIR, P_KATAR, },
     { V_CORSAIR, P_IRONCLAW, },
+    { V_CORSAIR, P_IRONCLAW_W_U, },
+    { V_CORSAIR, P_IRONCLAW_W_D, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
@@ -180,6 +184,8 @@ const char* product_str(ushort product){
         return "katar";
     if(product == P_IRONCLAW)
         return "ironclaw";
+    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D)
+        return "ironclaw_wireless";
     if(product == P_POLARIS)
         return "polaris";
     if(product == P_ST100)
@@ -201,9 +207,13 @@ const char* product_str(ushort product){
 ///
 /// \todo Is the last point really a good decision and always correct?
 ///
-static const devcmd* get_vtable(ushort vendor, ushort product){
+static const devcmd* get_vtable(usbdevice* kb){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
-    if(IS_MOUSE(vendor, product)) {
+    ushort vendor = kb->vendor;
+    ushort product = kb->product;
+    if(kb->protocol == PROTO_BRAGI) {
+        return &vtable_bragi;
+    } else if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;
         else
@@ -341,10 +351,12 @@ static void* _setupusb(void* context){
     ///
     usbdevice* kb = context;
     queued_mutex_lock(dmutex(kb));
+    if(USES_BRAGI(kb->vendor, kb->product))
+        kb->protocol = PROTO_BRAGI;
     queued_mutex_lock(imutex(kb));
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;
-    const devcmd* vt = kb->vtable = get_vtable(vendor, product);
+    const devcmd* vt = kb->vtable = get_vtable(kb);
     kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(SUPPORTS_ADJRATE(kb))
         kb->features |= FEAT_ADJRATE;
@@ -775,7 +787,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             continue;
         }
         // Wait for the response
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
+        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
             DELAY_MEDIUM(kb);
         res = os_usbrecv(kb, in_msg, file, line);
         if(res == 0)
@@ -784,7 +796,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
             return res;
         if(reset_stop || hwload_mode != 2)
             return 0;
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
+        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
             DELAY_LONG(kb);
     }
     // Give up
@@ -843,6 +855,15 @@ int closeusb(usbdevice* kb){
         os_inputclose(kb);
         queued_mutex_unlock(imutex(kb));
         queued_mutex_unlock(dmutex(kb));
+
+        // Shut down the device polling thread
+        if(kb->pollthread){
+            pthread_kill(*kb->pollthread, SIGUSR2);
+            pthread_join(*kb->pollthread, NULL);
+            free(kb->pollthread);
+            kb->pollthread = NULL;
+        }
+
         updateconnected(kb);
         queued_mutex_lock(dmutex(kb));
         queued_mutex_lock(imutex(kb));

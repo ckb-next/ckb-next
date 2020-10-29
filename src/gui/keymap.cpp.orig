@@ -430,6 +430,7 @@ static const Key IronclawWirelessKeys[] = {
     {0, "Right Mouse",  "mouse2",   31,  0, 12, 28, false, true  },
     
     // center column keys
+<<<<<<< HEAD
     {0, "Wheel Up",     "wheelup",  23,  3,  7,  7, false, true  },
     {0, "Middle Mouse",  "mouse3",  23,  7,  7,  6, false, true  },
     {0, "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
@@ -439,17 +440,37 @@ static const Key IronclawWirelessKeys[] = {
     // left side forward/back keys
     {0, "DPI Up",        "dpiup",    7,  6,  6,  8, false, true  },
     {0, "DPI Dn",        "dpidn",    7, 12,  6,  8, false, true  },
+=======
+    {0, "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
+    {0, "Middle Mouse",  "mouse3",  23,  7,  8,  6, false, true  },
+    {0, "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
+    {0, "Profile Up",    "profup",  23, 18,  9,  9, false, true  },
+    {0, "Profile Dn",    "profdn",  23, 26,  8,  9, false, true  },
+    
+    // left side forward/back keys
+    {0, "DPI Up",        "dpiup",    6,  4,  6,  9, false, true  },
+    {0, "DPI Dn",        "dpidn",    6, 10,  6,  9, false, true  },
+>>>>>>> upstream/bragi
     {0, "Forward",      "mouse5",    6, 20,  5, 12, false, true  },
     {0, "Back",         "mouse4",    7, 32,  5, 12, false, true  },
     {0, "Opt",          "optbtn",    9, 27,  6,  9, false, true  },
 
     // zones for LEDs
+<<<<<<< HEAD
     {0, "Front",        "front",     0,  0,  9,  9, true, false  },
     {0, "Logo",         "back",     21, 50, NS,     true, false  },
     {0, "Wheel",        "wheel",    23,  4,  6, 12, true, false  },
     
     // need to add DPI LED, even if not directly configurable for indicator to work
     {0, "DPI",           "dpi",        10, 12,  8,  8, true,  false }
+=======
+    {0, "Front",        "front",     9,  1,  9,  9, true, false  },
+    {0, "Logo",         "back",     21, 50, NS,     true, false  },
+    {0, "Wheel",        "wheel",    23,  3,  8, 14, true, false  },
+    
+    // need to add DPI LED, even if not directly configurable for indicator to work
+    {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
+>>>>>>> upstream/bragi
 
 };
 #define KEYCOUNT_IRONCLAW_W    (sizeof(IronclawWirelessKeys) / sizeof(Key))

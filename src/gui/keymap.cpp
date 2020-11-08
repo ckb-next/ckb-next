@@ -423,30 +423,30 @@ static const Key IronclawKeys[] = {
 #define IRONCLAW_WIDTH       52
 #define IRONCLAW_HEIGHT      67
 
-// Nightsword; copied and edited from Sabre RGB.
+// Nightsword
 static const Key NightswordKeys[] = {
     //Primary buttons
-    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true},
-    {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true},
-    {0, "Middle Mouse", "mouse3", 22, 9, 8, 7, false, true},
-    {0, "Wheel Up", "wheelup", 22, 5, 8, 5, false, true},
-    {0, "Wheel Down", "wheeldn", 22, 15, 8, 5, false, true},
-    //{0, "Wheel Light", "wheel", 22, 5, 8, 15, true, false}, // Only removal; no wheel lighting zone it seems.
+    {0, "Left Mouse", "mouse1", 14, 6, 12, 26, false, true},
+    {0, "Right Mouse", "mouse2", 34, 6, 12, 26, false, true},
+    {0, "Wheel Up", "wheelup",      26, 5, 6, 5, false, true},
+    {0, "Middle Mouse", "mouse3",   26, 10, 6, 5, false, true},
+    {0, "Wheel Down", "wheeldn",    26, 15, 6, 5, false, true},
     //Lighting zones
-    {0, "Front light", "front", 8, -2, 14, 8, true, false },
-    {0, "Logo", "back", 14, 50, 24, 12, true, false},
-    {0, "Rear light", "rear", 14, 55, 24, 8, true, false }, //Addition; open to a better name
-    {0, "DPI Light", "dpi", 5, 4, 5, 12, true, false},
+    {0, "Wheel Light", "wheel", 26, 5, 8, 15, true, false},
+    {0, "Front light", "front", 12, -2, 36, 8, true, false },
+    {0, "Logo", "back",         18, 50, 24, 12, true, false},
+    {0, "Back light", "side", 12, 64, 36, 8, true, false }, //Addition; side == bottom, under logo
+    {0, "DPI Light", "dpi",     6, 11, 5, 12, true, false}, // thumb side DPI indicator light
     //DPI keys
-    {0, "DPI Up", "dpiup", 5, 3, 5, 7, false, true},
-    {0, "DPI Down", "dpidn", 5, 10, 5, 7, false, true},
+    {0, "DPI Up", "dpiup", 12, 10, 5, 7, false, true},
+    {0, "DPI Down", "dpidn", 12, 18, 5, 7, false, true},
     //Profile keys
-    {0, "Profile Up", "profup", 23, 16,  9,  9, false, true  }, //Addition; 2 profile switches instead of 1 for cycling (e.g. Ironclaw)
-    {0, "Profile Down", "profdown", 23, 20,  9,  9, false, true  }, // Addition
+    {0, "Profile Up", "profswitch", 26, 18,  6,  10, false, true  }, //Addition; recognized as profswitch instead of up!
+//  {0, "Profile Down", "profdn", 26, 26,  6,  10, false, true  }, // Addition. Uncomment and change keyname once keymap.c recognizes new keys.
     //Thumb keys (extra should be sniper)
-    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true},
-    {0, "Back", "mouse4", 5, 33, 5, 10, false, true},
-    {0, "Extra button", "thumb1", 22, 20, 8, 18, false, true}
+    {0, "Forward", "mouse5", 8, 21, 5, 9, false, true},
+    {0, "Back", "mouse4", 8, 30, 5, 10, false, true},
+    {0, "Sniper", "sniper", 0, 26, 8, 8, false, true}
 };
 #define KEYCOUNT_NIGHTSWORD  (sizeof(NightswordKeys) / sizeof(Key))
 
@@ -1168,7 +1168,7 @@ KeyMap::Model KeyMap::getModel(const QString& name){
     if(lower == "ironclaw")
         return IRONCLAW;
     if(lower == "nightsword")
-        return IRONCLAW;
+        return NIGHTSWORD;
     return NO_MODEL;
 }
 

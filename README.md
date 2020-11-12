@@ -2,7 +2,7 @@
 
 <a target="_blank" href="http://webchat.freenode.net?channels=%23ckb-next&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>
 
-**ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of Corsair's proprietary CUE software to the Linux and Mac operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+**ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of Corsair's proprietary CUE software to Linux operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
 > __DISCLAIMER__: ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
 
@@ -18,15 +18,16 @@ Major features:
 - Multiple profiles/modes with hardware save function
 - Adjustable mouse DPI with ability to change DPI on button press
 
+### Important information regarding macOS
+macOS is no longer officially supported. For more information, please refer to [issue #660](https://github.com/ckb-next/ckb-next/issues/660).
+
 ### General information
 
 Most of the information can be found on [ckb-next wiki pages](https://github.com/ckb-next/ckb-next/wiki).
 
-[Supported keyboards and mice](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware).
+[Supported devices](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware).
 
 [Linux Installation](https://github.com/ckb-next/ckb-next/wiki/Linux-Installation).
-
-[macOS Installation](https://github.com/ckb-next/ckb-next/wiki/macOS-Installation).
 
 [Troubleshooting](https://github.com/ckb-next/ckb-next/wiki/Troubleshooting).
 

@@ -12,7 +12,7 @@ void ckb_info(){
     CKB_COPYRIGHT("2015-2019", "Tasos Sahanidis");
     CKB_LICENSE("GPLv2+");
     CKB_GUID("{64A824CD-3E12-4973-8F80-AA5E6DA807FA}");
-    CKB_DESCRIPTION("Control lights using named pipes\nplaced in /tmp/.\nData format is RRGGBBAA.\nWARNING: It doesn't clean up the nodes.\nUsage Examples:\necho \"rgb ff00ffff\" > /tmp/ckbpipe000\necho \"rgb r:ff0000ff\" > /tmp/ckbpipe000");
+    CKB_DESCRIPTION("Control lights using named pipes\nplaced in /tmp/.\nData format is RRGGBBAA.\nWARNING: It doesn't clean up the nodes.\nUsage Examples:\necho \"rgb ff00ffff\" > /tmp/ckbpipe000\necho \"rgb r:ff0000ff\" > /tmp/ckbpipe000\nEach rgb command must be terminated with a newline (\\n).");
 
     // Effect parameters
     CKB_PARAM_LONG("fifonum", "/tmp/ckbpipe", "", 0, 0, 200);
@@ -62,62 +62,78 @@ int ckb_frame(ckb_runctx* context){
     if(fd == -1)
         return 0;
 
-    char input[MAX_INPUT] = { 0 };
+    char input[MAX_INPUT];
 
-    ssize_t ret = read(fd, input, MAX_INPUT);
+    ssize_t ret = read(fd, input, MAX_INPUT - 1);
 
     // read() read 0 bytes
-    if(!ret)
+    if(ret < 1)
         return 0;
-    
-    // Something may have gone wrong
-    if(ret == -1){
-        // This is expected and should not be treated as failure
-        if(errno == EWOULDBLOCK)
-            return 0;
 
-        int err = errno;
-        fprintf(stderr, "read failed with %d (%s)\n", err, strerror(err));
-        return -ret;
-    }
+    // NULL terminate the string
+    input[ret] = '\0';
 
-    size_t len = strlen(input);
     unsigned char r = 0, g = 0, b = 0, a = 0;
 
-    if(len < 8 + 4)
-        return 0;
+    // Start parsing loop
+    char* strptr = input;
+    while(strptr < input + ret){
+        // Minimum length of a valid rgb command
+        size_t len = strlen(strptr);
+        if(len < 13)
+            break;
 
-    if(strncmp(input, "rgb ", 4))
-        return 0;
+        if(strncmp(strptr, "rgb ", 4))
+            break;
 
-    char* strptr = input + 4;
+        // Skip over the "rgb "
+        strptr += 4;
+        len -= 4;
 
-    if(sscanf(strptr, "%02hhx%02hhx%02hhx%02hhx", &r, &g, &b, &a) == 4) {
-        for(unsigned i = 0; i < context->keycount; i++){
-            ckb_key* key = context->keys + i;
-            key->a = a;
-            key->r = r;
-            key->g = g;
-            key->b = b;
-        }
-    } else if (len > 8 + 4) {
-        int pos = 0;
-        while(pos < (long int)strlen(strptr)) {
-            char key_name[MAX_INPUT] = { 0 };
-            int tmppos = -1;
-            if(sscanf(strptr + pos, "%[^:]:%02hhx%02hhx%02hhx%02hhx%n", key_name, &r, &g, &b, &a, &tmppos) != 5)
+        // Find the first newline and null terminate the string there
+        char* strptrend;
+        for(strptrend = strptr; strptrend < strptr + len; strptrend++){
+            if(*strptrend == '\n'){
+                *strptrend = '\0';
                 break;
-            pos += tmppos + 1;
+            }
+        }
+
+        // Update the length
+        len = strptrend - strptr;
+
+        // Try to parse
+        // len > 8 means it's a per-key command
+        if (len > 8) {
+            while(strptr < strptrend) {
+                char key_name[MAX_INPUT] = { 0 };
+                int tmppos = -1;
+                if(sscanf(strptr, "%[^:]:%02hhx%02hhx%02hhx%02hhx%n", key_name, &r, &g, &b, &a, &tmppos) != 5)
+                    break;
+                strptr += tmppos + 1;
+                for(unsigned i = 0; i < context->keycount; i++){
+                    ckb_key* key = context->keys + i;
+                    if(strcmp(key_name, key->name))
+                        continue;
+                    key->a = a;
+                    key->r = r;
+                    key->g = g;
+                    key->b = b;
+                }
+            }
+        } else if (sscanf(strptr, "%02hhx%02hhx%02hhx%02hhx", &r, &g, &b, &a) == 4) {
             for(unsigned i = 0; i < context->keycount; i++){
                 ckb_key* key = context->keys + i;
-                if(strcmp(key_name, key->name))
-                    continue;
                 key->a = a;
                 key->r = r;
                 key->g = g;
                 key->b = b;
             }
         }
+
+        // Move to the next command now
+        // The while loop checks if strptr is valid
+        strptr = strptrend + 1;
     }
 
     return 0;

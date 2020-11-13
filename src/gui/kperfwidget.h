@@ -56,6 +56,7 @@ private:
         ColorButton* color1, *color2, *color3;
     };
     IndicatorUi indicators[I_COUNT];
+    QComboBox* muteDev;
     QList<QWidget*> k95Widgets;
 
 private slots:

@@ -26,6 +26,8 @@ public:
         return index(length() - 1, 1);
     }
     inline void clear() {
+        if(!length())
+            return;
         emit beginRemoveRows(QModelIndex(), 0, macroLines.length() - 1);
         macroLines.clear();
         emit endRemoveRows();

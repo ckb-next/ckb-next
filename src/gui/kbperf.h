@@ -5,6 +5,7 @@
 #include <QPoint>
 #include "ckbsettings.h"
 #include "keymap.h"
+#include "media.h"
 
 class KbMode;
 class KbBind;
@@ -110,6 +111,9 @@ public:
     void getIndicator(indicator index, QColor& color1, QColor& color2, QColor& color3, bool& software_enable, i_hw& hardware_enable);
     void setIndicator(indicator index, const QColor& color1, const QColor& color2, const QColor& color3 = QColor(), bool software_enable = true, i_hw hardware_enable = NORMAL);
 
+    muteDevice getMuteDevice();
+    void setMuteDevice(const muteDevice muteDev);
+
     // Updates settings to the driver. Write "mode %d" first. Disable saveCustomDpi when writing a hardware profile or other permanent storage.
     // By default, nothing will be written unless the settings have changed. Use force = true or call setNeedsUpdate() to override.
     void        update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi);
@@ -158,6 +162,7 @@ private:
     QColor iColor[I_COUNT][2];
     QColor light100Color, muteNAColor;
     bool iEnable[I_COUNT];
+    muteDevice iMuteDev;
     i_hw hwIType[HW_I_COUNT];
     bool _dpiIndicator;
 

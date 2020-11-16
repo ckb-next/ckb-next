@@ -53,6 +53,7 @@ KbPerf::KbPerf(KbMode* parent) :
         // Turn all other indicators on
         iEnable[i] = true;
     }
+    iMuteDev = SINK;
 }
 
 KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
@@ -65,6 +66,7 @@ KbPerf::KbPerf(KbMode* parent, const KbPerf& other) :
     for(int i = 0; i < DPI_COUNT + 1; i++)
         dpiClr[i] = other.dpiClr[i];
     memcpy(dpiOn, other.dpiOn, sizeof(dpiOn));
+    iMuteDev = other.iMuteDev;
     for(int i = 0; i < I_COUNT; i++){
         iColor[i][0] = other.iColor[i][0];
         iColor[i][1] = other.iColor[i][1];
@@ -85,6 +87,7 @@ const KbPerf& KbPerf::operator= (const KbPerf& other){
     for(int i = 0; i < DPI_COUNT + 1; i++)
         dpiClr[i] = other.dpiClr[i];
     memcpy(dpiOn, other.dpiOn, sizeof(dpiOn));
+    iMuteDev = other.iMuteDev;
     for(int i = 0; i < I_COUNT; i++){
         iColor[i][0] = other.iColor[i][0];
         iColor[i][1] = other.iColor[i][1];
@@ -133,6 +136,10 @@ void KbPerf::load(CkbSettingsBase& settings){
         }
     }
     SGroup group(settings, "Performance");
+
+    QString s_muteDev = settings.value("MuteDevice", "sink").toString();
+    iMuteDev = (s_muteDev == "source") ? SOURCE : SINK;
+
     // Read DPI settings
     {
         SGroup subGroup(settings, "DPI");
@@ -228,6 +235,7 @@ void KbPerf::save(CkbSettingsBase& settings){
     if(typeid(settings) == typeid(CkbSettings))
         _needsSave = false;
     SGroup group(settings, "Performance");
+    settings.setValue("MuteDevice", (iMuteDev == SOURCE) ? "source" : "sink");
     {
         SGroup subGroup(settings, "DPI");
         for(int i = 0; i < DPI_COUNT; i++){
@@ -391,6 +399,15 @@ void KbPerf::setIndicator(indicator index, const QColor& color1, const QColor& c
     _needsUpdate = _needsSave = true;
 }
 
+muteDevice KbPerf::getMuteDevice() {
+    return iMuteDev;
+}
+void KbPerf::setMuteDevice(const muteDevice muteDev) {
+    iMuteDev = muteDev;
+    _needsUpdate = _needsSave = true;
+}
+
+
 void KbPerf::liftHeight(height newHeight){
     if(newHeight < LOW || newHeight > HIGH)
         return;
@@ -506,7 +523,7 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
             lightIndicator("lock", iColor[LOCK][1].rgba());
     }
     if(iEnable[MUTE]){
-        switch(getMuteState()){
+        switch(getMuteState(iMuteDev)){
         case MUTED:
             lightIndicator("mute", iColor[MUTE][0].rgba());
             break;

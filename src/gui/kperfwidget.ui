@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>840</width>
-    <height>679</height>
+    <width>843</width>
+    <height>737</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,14 +26,44 @@
    <property name="bottomMargin">
     <number>9</number>
    </property>
-   <item row="22" column="5">
-    <widget class="QLabel" name="label_20">
+   <item row="3" column="1" colspan="2">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>On</string>
+      <string>Indicator intensity:</string>
      </property>
     </widget>
    </item>
-   <item row="23" column="4">
+   <item row="16" column="9">
+    <spacer name="horizontalSpacer_6">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="21" column="8">
+    <widget class="QLabel" name="label_23">
+     <property name="text">
+      <string>Off</string>
+     </property>
+    </widget>
+   </item>
+   <item row="22" column="1">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string notr="true">Scroll lock:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="22" column="4">
     <widget class="ColorButton" name="scrollColorOn">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -58,7 +88,14 @@
      </property>
     </widget>
    </item>
-   <item row="23" column="2">
+   <item row="22" column="5">
+    <widget class="QLabel" name="label_21">
+     <property name="text">
+      <string>On</string>
+     </property>
+    </widget>
+   </item>
+   <item row="22" column="2">
     <widget class="QComboBox" name="scrollBox">
      <item>
       <property name="text">
@@ -87,35 +124,36 @@
      </item>
     </widget>
    </item>
-   <item row="17" column="1" colspan="2">
-    <widget class="QCheckBox" name="muteBox">
-     <property name="text">
-      <string>Indicate mute:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="18" column="4" colspan="8">
-    <widget class="QComboBox" name="muteDev">
-     <item>
-      <property name="text">
-       <string>Use default audio output</string>
-      </property>
-     </item>
-     <item>
-       <property name="text">
-        <string>Use default audio input</string>
-       </property>
-     </item>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="13">
-    <widget class="Line" name="line">
+   <item row="17" column="4">
+    <spacer name="verticalSpacer_3">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="18" column="0" colspan="13">
+    <widget class="QLabel" name="label_4">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Lock lights</string>
      </property>
     </widget>
    </item>
-   <item row="12" column="4">
+   <item row="11" column="4">
     <widget class="QWidget" name="k95Spacer" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -137,288 +175,21 @@
      </property>
     </widget>
    </item>
-   <item row="17" column="3">
-    <spacer name="horizontalSpacer_7">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="23" column="5">
-    <widget class="QLabel" name="label_21">
+   <item row="15" column="5">
+    <widget class="QLabel" name="label_11">
      <property name="text">
       <string>On</string>
      </property>
     </widget>
    </item>
-   <item row="15" column="12">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="21" column="4">
-    <widget class="ColorButton" name="numColorOn">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="23" column="1">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string notr="true">Scroll lock:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="21" column="8">
-    <widget class="QLabel" name="label_22">
-     <property name="text">
-      <string>Off</string>
-     </property>
-    </widget>
-   </item>
-   <item row="17" column="4">
-    <widget class="ColorButton" name="muteColorOn">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="13" column="0" colspan="3">
-    <widget class="QLabel" name="label_3">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Top row</string>
-     </property>
-    </widget>
-   </item>
-   <item row="22" column="4">
-    <widget class="ColorButton" name="capsColorOn">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="20" column="0" colspan="13">
-    <widget class="Line" name="line_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="1" colspan="2">
-    <widget class="QCheckBox" name="lightBox">
-     <property name="text">
-      <string>Indicate brightness:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="21" column="7">
-    <widget class="ColorButton" name="numColorOff">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>40</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="1" colspan="2">
-    <widget class="QCheckBox" name="modeBox">
-     <property name="text">
-      <string>Indicate current mode:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="21" column="5">
-    <widget class="QLabel" name="label_19">
+   <item row="9" column="5">
+    <widget class="QLabel" name="k95Label4">
      <property name="text">
       <string>On</string>
      </property>
     </widget>
    </item>
-   <item row="17" column="9">
-    <spacer name="horizontalSpacer_6">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="9" column="4">
-    <widget class="ColorButton" name="modeColorOn">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="11">
-    <widget class="QLabel" name="label_18">
-     <property name="text">
-      <string notr="true">33%</string>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="8">
-    <widget class="QLabel" name="label_16">
-     <property name="text">
-      <string notr="true">67%</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="13">
-    <widget class="QLabel" name="label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>23</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Miscellaneous</string>
-     </property>
-    </widget>
-   </item>
-   <item row="17" column="6">
-    <spacer name="horizontalSpacer_5">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="15" column="0">
+   <item row="14" column="0">
     <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -434,39 +205,14 @@
      </property>
     </spacer>
    </item>
-   <item row="22" column="8">
-    <widget class="QLabel" name="label_23">
+   <item row="9" column="8">
+    <widget class="QLabel" name="k95Label5">
      <property name="text">
       <string>Off</string>
      </property>
     </widget>
    </item>
-   <item row="23" column="7">
-    <widget class="ColorButton" name="scrollColorOff">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="7">
+   <item row="14" column="7">
     <widget class="ColorButton" name="lightColor2">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -491,15 +237,68 @@
      </property>
     </widget>
    </item>
-   <item row="21" column="1">
-    <widget class="QLabel" name="label_5">
+   <item row="15" column="8">
+    <widget class="QLabel" name="label_15">
      <property name="text">
-      <string notr="true">Num lock:</string>
+      <string>Off</string>
      </property>
     </widget>
    </item>
-   <item row="16" column="7">
-    <widget class="ColorButton" name="lockColorOff">
+   <item row="16" column="1" colspan="2">
+    <widget class="QCheckBox" name="muteBox">
+     <property name="text">
+      <string>Indicate mute:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="8">
+    <widget class="QLabel" name="label_16">
+     <property name="text">
+      <string notr="true">67%</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="5">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string notr="true">100%</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="4" colspan="2">
+    <widget class="QSpinBox" name="intensityBox">
+     <property name="suffix">
+      <string notr="true">%</string>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="7">
+    <widget class="ColorButton" name="macroColorOff">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>40</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="10">
+    <widget class="ColorButton" name="lightColor1">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -523,47 +322,23 @@
      </property>
     </widget>
    </item>
-   <item row="23" column="8">
-    <widget class="QLabel" name="label_24">
-     <property name="text">
-      <string>Off</string>
+   <item row="16" column="6">
+    <spacer name="horizontalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
-   </item>
-   <item row="9" column="8">
-    <widget class="QLabel" name="k95Label3">
-     <property name="text">
-      <string>Off</string>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
      </property>
-    </widget>
-   </item>
-   <item row="10" column="1" colspan="2">
-    <widget class="QCheckBox" name="macroBox">
-     <property name="text">
-      <string>Indicate macro recording:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="7">
-    <widget class="ColorButton" name="macroColorOff">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>40</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>0</width>
-       <height>40</height>
+       <width>10</width>
+       <height>20</height>
       </size>
      </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
+    </spacer>
    </item>
-   <item row="21" column="2">
+   <item row="20" column="2">
     <widget class="QComboBox" name="numBox">
      <item>
       <property name="text">
@@ -592,77 +367,14 @@
      </item>
     </widget>
    </item>
-   <item row="16" column="1" colspan="2">
-    <widget class="QCheckBox" name="lockBox">
+   <item row="21" column="1">
+    <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Indicate Windows Lock:</string>
+      <string notr="true">Caps lock:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="10" colspan="3">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QPushButton" name="copyButton">
-       <property name="text">
-        <string>Copy to mode...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_8">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item row="16" column="4">
-    <widget class="ColorButton" name="lockColorOn">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="14" column="0" colspan="13">
-    <widget class="Line" name="line_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="5">
-    <widget class="QLabel" name="k95Label2">
-     <property name="text">
-      <string>On</string>
-     </property>
-    </widget>
-   </item>
-   <item row="22" column="2">
+   <item row="21" column="2">
     <widget class="QComboBox" name="capsBox">
      <item>
       <property name="text">
@@ -691,108 +403,28 @@
      </item>
     </widget>
    </item>
-   <item row="24" column="4">
-    <spacer name="verticalSpacer_4">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>5</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="10" column="8">
-    <widget class="QLabel" name="k95Label5">
+   <item row="8" column="8">
+    <widget class="QLabel" name="k95Label3">
      <property name="text">
       <string>Off</string>
      </property>
     </widget>
    </item>
-   <item row="22" column="7">
-    <widget class="ColorButton" name="capsColorOff">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
+   <item row="4" column="4" colspan="8">
+    <widget class="QComboBox" name="muteDev">
+     <item>
+      <property name="text">
+       <string>Use default audio output</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Use default audio input</string>
+      </property>
+     </item>
     </widget>
    </item>
-   <item row="19" column="0" colspan="13">
-    <widget class="QLabel" name="label_4">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Lock lights</string>
-     </property>
-    </widget>
-   </item>
-   <item row="22" column="1">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string notr="true">Caps lock:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="16" column="5">
-    <widget class="QLabel" name="label_11">
-     <property name="text">
-      <string>On</string>
-     </property>
-    </widget>
-   </item>
-   <item row="17" column="8">
-    <widget class="QLabel" name="label_14">
-     <property name="text">
-      <string>Off</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="4">
-    <widget class="ColorButton" name="macroColorOn">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>40</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="17" column="7">
+   <item row="16" column="7">
     <widget class="ColorButton" name="muteColorOff">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -817,21 +449,97 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="1" colspan="10">
-    <widget class="QLabel" name="k95Label6">
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-       <italic>true</italic>
-      </font>
-     </property>
+   <item row="16" column="8">
+    <widget class="QLabel" name="label_14">
      <property name="text">
-      <string>Note: macro recording not yet implemented. Indicator will always display &quot;off&quot;.</string>
+      <string>Off</string>
      </property>
     </widget>
    </item>
-   <item row="15" column="10">
-    <widget class="ColorButton" name="lightColor1">
+   <item row="12" column="0" colspan="3">
+    <widget class="QLabel" name="label_3">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Top row</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="2">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Indicate mute from:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="20" column="5">
+    <widget class="QLabel" name="label_19">
+     <property name="text">
+      <string>On</string>
+     </property>
+    </widget>
+   </item>
+   <item row="20" column="7">
+    <widget class="ColorButton" name="numColorOff">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>40</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="20" column="8">
+    <widget class="QLabel" name="label_22">
+     <property name="text">
+      <string>Off</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="14" column="12">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="15" column="7">
+    <widget class="ColorButton" name="lockColorOff">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -855,14 +563,138 @@
      </property>
     </widget>
    </item>
-   <item row="16" column="8">
-    <widget class="QLabel" name="label_15">
-     <property name="text">
-      <string>Off</string>
+   <item row="25" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="19" column="0" colspan="13">
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="9" column="7">
+   <item row="20" column="1">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string notr="true">Num lock:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="20" column="4">
+    <widget class="ColorButton" name="numColorOn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="4">
+    <widget class="ColorButton" name="lockColorOn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="13">
+    <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>23</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Miscellaneous</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="10">
+    <widget class="ColorButton" name="muteColorNA">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>If the sound device does not support muting, or if mute status is unknown, this color will be displayed.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="11">
+    <widget class="QLabel" name="label_17">
+     <property name="text">
+      <string>Unknown</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="7">
     <widget class="ColorButton" name="modeColorOff">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -887,8 +719,40 @@
      </property>
     </widget>
    </item>
-   <item row="18" column="4">
-    <spacer name="verticalSpacer_3">
+   <item row="22" column="7">
+    <widget class="ColorButton" name="scrollColorOff">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="22" column="8">
+    <widget class="QLabel" name="label_24">
+     <property name="text">
+      <string>Off</string>
+     </property>
+    </widget>
+   </item>
+   <item row="23" column="4">
+    <spacer name="verticalSpacer_4">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -897,74 +761,13 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
-       <height>20</height>
+       <width>0</width>
+       <height>5</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="15" column="5">
-    <widget class="QLabel" name="label_10">
-     <property name="text">
-      <string notr="true">100%</string>
-     </property>
-    </widget>
-   </item>
-   <item row="17" column="5">
-    <widget class="QLabel" name="label_12">
-     <property name="text">
-      <string>On</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0" colspan="13">
-    <widget class="Line" name="k95Line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="17" column="11">
-    <widget class="QLabel" name="label_17">
-     <property name="text">
-      <string>Unknown</string>
-     </property>
-    </widget>
-   </item>
-   <item row="26" column="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="10" column="5">
-    <widget class="QLabel" name="k95Label4">
-     <property name="text">
-      <string>On</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="5">
-    <widget class="QLabel" name="k95Label1">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>K95 buttons</string>
-     </property>
-    </widget>
-   </item>
-   <item row="25" column="1" colspan="12">
+   <item row="24" column="1" colspan="12">
     <widget class="QLabel" name="label_8">
      <property name="font">
       <font>
@@ -977,7 +780,225 @@
      </property>
     </widget>
    </item>
-   <item row="15" column="4">
+   <item row="16" column="3">
+    <spacer name="horizontalSpacer_7">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="8" column="1" colspan="2">
+    <widget class="QCheckBox" name="modeBox">
+     <property name="text">
+      <string>Indicate current mode:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="13">
+    <widget class="Line" name="k95Line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="4">
+    <widget class="ColorButton" name="muteColorOn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="5">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>On</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="1" colspan="2">
+    <widget class="QCheckBox" name="lightBox">
+     <property name="text">
+      <string>Indicate brightness:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1" colspan="10">
+    <widget class="QLabel" name="k95Label6">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+       <italic>true</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>Note: macro recording not yet implemented. Indicator will always display &quot;off&quot;.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="4">
+    <widget class="ColorButton" name="modeColorOn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="4">
+    <widget class="ColorButton" name="macroColorOn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>40</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="13">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="5">
+    <widget class="QLabel" name="k95Label2">
+     <property name="text">
+      <string>On</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1" colspan="2">
+    <widget class="QCheckBox" name="macroBox">
+     <property name="text">
+      <string>Indicate macro recording:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="21" column="4">
+    <widget class="ColorButton" name="capsColorOn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="21" column="5">
+    <widget class="QLabel" name="label_20">
+     <property name="text">
+      <string>On</string>
+     </property>
+    </widget>
+   </item>
+   <item row="21" column="7">
+    <widget class="ColorButton" name="capsColorOff">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0" colspan="13">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="1" colspan="2">
+    <widget class="QCheckBox" name="lockBox">
+     <property name="text">
+      <string>Indicate Windows Lock:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="4">
     <widget class="ColorButton" name="lightColor3">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1002,96 +1023,32 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="17" column="10">
-    <widget class="ColorButton" name="muteColorNA">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>If the sound device does not support muting, or if mute status is unknown, this color will be displayed.</string>
-     </property>
+   <item row="14" column="11">
+    <widget class="QLabel" name="label_18">
      <property name="text">
-      <string/>
+      <string notr="true">33%</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1" colspan="9">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Indicator intensity:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>10</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="intensityBox">
-       <property name="suffix">
-        <string notr="true">%</string>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="value">
-        <number>100</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
+   <item row="6" column="0" colspan="5">
+    <widget class="QLabel" name="k95Label1">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>K95 buttons</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="7" colspan="5">
+    <widget class="QPushButton" name="copyButton">
+     <property name="text">
+      <string>Copy to mode...</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -1103,8 +1060,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>intensityBox</tabstop>
-  <tabstop>copyButton</tabstop>
   <tabstop>modeBox</tabstop>
   <tabstop>modeColorOn</tabstop>
   <tabstop>modeColorOff</tabstop>

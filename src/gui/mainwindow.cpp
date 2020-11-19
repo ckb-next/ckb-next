@@ -155,8 +155,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
 
-    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
-
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), QString(tr("Settings")));
     settingsWidget->setVersion("ckb-next " CKB_NEXT_VERSION_STR);
 
@@ -482,16 +480,13 @@ void MainWindow::setTabsEnabled(bool e){
     kbw->setTabBarEnabled(e);
 }
 
-void MainWindow::cleanup(){
+MainWindow::~MainWindow(){
     foreach(KbWidget* w, kbWidgets)
         delete w;
     kbWidgets.clear();
     KbManager::stop();
+    deinitAudioSubsystem();
     CkbSettings::cleanUp();
-}
-
-MainWindow::~MainWindow(){
-    cleanup();
     delete ui;
 }
 

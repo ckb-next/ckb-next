@@ -38,3 +38,5 @@ muteState getMuteState(const muteDevice muteDev){
 void disableAppNap(){
     [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep reason:@"Keyboard animation"];
 }
+
+void deinitAudioSubsystem() {}

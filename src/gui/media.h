@@ -17,6 +17,7 @@
 
 // Mute device selection is supported
 EXTERN_C bool isMuteDeviceSupported();
+
 // Device class for mute state
 ENUM_C(muteDevice) {
     SINK,
@@ -29,6 +30,8 @@ ENUM_C(muteState) {
     UNMUTED,
     MUTED
 } ENUM_END_C(muteState);
+
 EXTERN_C muteState getMuteState(const muteDevice muteDev);
+EXTERN_C void deinitAudioSubsystem();
 
 #endif

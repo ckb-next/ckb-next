@@ -76,7 +76,6 @@ private slots:
     void updateVersion();
     void checkFwUpdates();
     void timerTick();
-    void cleanup();
     void showFwUpdateNotification(QWidget* widget, float version);
     void QSignalHandler();
     void checkedForNewVer(QString ver, QString changelog);

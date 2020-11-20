@@ -40,11 +40,11 @@ KbFirmware::KbFirmware() :
     if(hasGPG == UNKNOWN){
         QString output = QString::fromUtf8(_gpg->readAll());
         // Must support RSA keys and SHA256
-        if(output.contains("RSA", Qt::CaseInsensitive) && output.contains("SHA256", Qt::CaseInsensitive)){
+        if(output.contains("RSA", Qt::CaseInsensitive) && output.contains("SHA512", Qt::CaseInsensitive)){
             hasGPG = YES;
         } else {
             hasGPG = NO;
-            qDebug() << _gpg->program() << "does not support RSA and SHA256. Signature verification disabled.";
+            qDebug() << _gpg->program() << "does not support RSA and SHA512. Signature verification disabled.";
         }
     }
 }

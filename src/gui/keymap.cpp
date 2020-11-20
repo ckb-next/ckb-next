@@ -423,6 +423,36 @@ static const Key IronclawKeys[] = {
 #define IRONCLAW_WIDTH       52
 #define IRONCLAW_HEIGHT      67
 
+// Nightsword
+static const Key NightswordKeys[] = {
+    //Primary buttons
+    {0, "Left Mouse", "mouse1", 14, 6, 12, 26, false, true},
+    {0, "Right Mouse", "mouse2", 34, 6, 12, 26, false, true},
+    {0, "Wheel Up", "wheelup",      26, 5, 6, 5, false, true},
+    {0, "Middle Mouse", "mouse3",   26, 10, 6, 5, false, true},
+    {0, "Wheel Down", "wheeldn",    26, 15, 6, 5, false, true},
+    //Lighting zones
+    {0, "Wheel Light", "wheel", 26, 5, 8, 15, true, false},
+    {0, "Front light", "front", 12, -2, 36, 8, true, false },
+    {0, "Logo", "back",         24, 50, 12, 12, true, false},
+    {0, "Back light", "side", 12, 64, 36, 8, true, false }, //Addition; side == bottom, under logo
+    {0, "DPI Light", "dpi",     6, 11, 5, 12, true, false}, // thumb side DPI indicator light
+    //DPI keys
+    {0, "DPI Up", "dpiup", 12, 10, 5, 7, false, true},
+    {0, "DPI Down", "dpidn", 12, 18, 5, 7, false, true},
+    //Profile keys
+    {0, "Profile Up", "profswitch", 26, 18,  6,  10, false, true  },
+    {0, "Profile Down", "profdn", 26, 26,  6,  10, false, true  },
+    //Thumb keys (extra should be sniper)
+    {0, "Forward", "mouse5", 8, 21, 5, 9, false, true},
+    {0, "Back", "mouse4", 8, 30, 5, 10, false, true},
+    {0, "Sniper", "sniper", 0, 26, 8, 8, false, true}
+};
+#define KEYCOUNT_NIGHTSWORD  (sizeof(NightswordKeys) / sizeof(Key))
+
+#define NIGHTSWORD_WIDTH     M65_WIDTH
+#define NIGHTSWORD_HEIGHT    M65_HEIGHT
+
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
 #define N_LAYOUTS   KeyMap::_LAYOUT_MAX
@@ -890,6 +920,17 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Mice also have no layout patches - no other changes necessary
         break;
     }
+    case KeyMap::NIGHTSWORD:{
+        // cloned from IRONCLAW above
+        for(const Key* key = NightswordKeys; key < NightswordKeys + KEYCOUNT_NIGHTSWORD; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        // Mice also have no layout patches - no other changes necessary
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -1126,6 +1167,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return M95;
     if(lower == "ironclaw")
         return IRONCLAW;
+    if(lower == "nightsword")
+        return NIGHTSWORD;
     return NO_MODEL;
 }
 
@@ -1175,6 +1218,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "m95";
     case IRONCLAW:
         return "ironclaw";
+    case NIGHTSWORD:
+        return "nightsword";
     default:
         return "";
     }
@@ -1218,6 +1263,7 @@ int KeyMap::modelWidth(Model model){
     case ST100:
     case M95:
     case IRONCLAW:
+    case NIGHTSWORD:
         return M65_WIDTH;
     default:
         return 0;
@@ -1250,6 +1296,7 @@ int KeyMap::modelHeight(Model model){
     case ST100:
     case M95:
     case IRONCLAW:
+    case NIGHTSWORD:
         return M65_HEIGHT;
     default:
         return 0;
@@ -1325,6 +1372,9 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     if(map.contains(key))
         return map[key].friendlyName();
     map = KeyMap(IRONCLAW, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+    map = KeyMap(NIGHTSWORD, layout);
     if(map.contains(key))
         return map[key].friendlyName();
 

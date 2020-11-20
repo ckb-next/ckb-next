@@ -120,6 +120,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     mainWindow = this;
 
+    kbfw = new KbFirmware();
+
     // Start device manager
     KbManager::init(CKB_NEXT_VERSION_STR);
     connect(KbManager::kbManager(), SIGNAL(kbConnected(Kb*)), this, SLOT(addDevice(Kb*)));
@@ -327,7 +329,7 @@ void MainWindow::checkFwUpdates(){
         return;
     foreach(KbWidget* w, kbWidgets){
         // Display firmware upgrade notification if a new version is available
-        float version = KbFirmware::versionForBoard(w->device->productID);
+        float version = kbfw->versionForBoard(w->device->productID);
         if(version > w->device->firmware.toFloat()){
             if(w->hasShownNewFW)
                 continue;
@@ -404,7 +406,7 @@ void MainWindow::timerTick(){
     }
     // Check for firmware updates (when appropriate)
     if(!CkbSettings::get("Program/DisableAutoFWCheck").toBool()){
-        KbFirmware::checkUpdates();
+        kbfw->checkUpdates();
         checkFwUpdates();
     }
     // Poll for setting updates
@@ -486,6 +488,7 @@ MainWindow::~MainWindow(){
     kbWidgets.clear();
     KbManager::stop();
     deinitAudioSubsystem();
+    delete kbfw;
     CkbSettings::cleanUp();
     delete ui;
 }

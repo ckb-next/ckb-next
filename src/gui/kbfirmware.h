@@ -11,25 +11,26 @@ class KbFirmware : public QObject
 {
     Q_OBJECT
 public:
+    KbFirmware();
+    ~KbFirmware();
+
     // Checks for firmware updates. Maximum of once per hour. Returns true if it actually checked or false if not.
-    static inline bool          checkUpdates()                                                          { return instance._checkUpdates(); }
+    bool checkUpdates();
 
     // Whether or not the firmware table has been downloaded at all.
-    static inline bool          hasDownloaded()                                                         { return instance.lastFinished != 0; }
+    inline bool hasDownloaded() { return lastFinished != 0; }
 
     // Latest firmware version for a keyboard model. Will check for updates automatically and return the latest known version.
     // Zero if version unknown, -1.0 if ckb needs to be upgraded.
-    static inline float         versionForBoard(const ushort productID, bool waitForComplete = false)  { return instance._latestForBoard(productID, waitForComplete); }
+    float versionForBoard(const ushort productID, bool waitForComplete = false);
 
     // Downloads and extracts the latest firmware for a keyboard. Returns an empty array on failure.
-    static inline QByteArray    dataForBoard(const ushort productID)                                   { return instance._fileForBoard(productID); }
+    QByteArray dataForBoard(const ushort productID);
 
     // Network manager object to use with QtNetwork
     QNetworkAccessManager* 	networkManager;
 
 private:
-    KbFirmware();
-    ~KbFirmware();
 
     // Time initiated
     quint64 lastCheck, lastFinished;
@@ -50,13 +51,6 @@ private:
 
     // Can GPG be used to verify signatures?
     enum { UNKNOWN = -1, NO, YES } hasGPG :2;
-
-    // Singleton instance
-    bool                _checkUpdates();
-    float               _latestForBoard(const ushort productID, bool waitForComplete);
-    QByteArray          _fileForBoard(const ushort productID);
-    static KbFirmware   instance;
-
     QProcess*    _gpg;
 
 signals:

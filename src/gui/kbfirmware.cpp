@@ -8,7 +8,6 @@
 // Auto check: 1 hr
 static const quint64 AUTO_CHECK_TIME = 60 * 60 * 1000;
 
-KbFirmware KbFirmware::instance;
 KbFirmware::FW::FW() : fwVersion(0.f), ckbVersion(0.f) {}
 
 KbFirmware::KbFirmware() :
@@ -18,7 +17,7 @@ KbFirmware::KbFirmware() :
     // using WiFi. The problem and workaround are described here:
     // https://lostdomain.org/2017/06/17/qt-qnetworkaccessmanager-causing-latency-spikes-on-wifi/
     qputenv("QT_BEARER_POLL_TIMEOUT", QByteArray::number(-1));
-    networkManager = new QNetworkAccessManager();
+    networkManager = new QNetworkAccessManager(this);
     // Try to find GPG. gpg2 first
     _gpg = new QProcess();
     _gpg->setProgram("gpg2");
@@ -55,7 +54,7 @@ KbFirmware::~KbFirmware(){
     _gpg->deleteLater();
 }
 
-bool KbFirmware::_checkUpdates(){
+bool KbFirmware::checkUpdates(){
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;
@@ -137,8 +136,7 @@ void KbFirmware::processDownload(QNetworkReply* reply){
             if(len < 8)
                 continue;
         }
-        // "VENDOR-PRODUCT"
-        QString device = components[0].toUpper() + "-" + components[1].toUpper();
+
         bool ok;
         FW fw;
         fw.fwVersion = components[2].toFloat();                             // Firmware blob version
@@ -149,8 +147,6 @@ void KbFirmware::processDownload(QNetworkReply* reply){
         fw.productID = components[7].toUShort(&ok, 16);                      // Hex productID assigned to this FW
         // Update entry
         fwTable[QString::number(fw.productID)] = fw;
-        // qDebug() << "saving fwTabel entry[" << QString::number(fw.productID) << "] for device" << device
-        //         << fw.fwVersion << fw.fileName << fw.url << "for ckb-next version >=" << fw.ckbVersion;
     }
     qDebug() << "Downloaded new firmware list." << fwTable.count() << "entries found.";
 }
@@ -164,7 +160,7 @@ void KbFirmware::downloadFinished(){
     emit downloaded();
 }
 
-float KbFirmware::_latestForBoard(const ushort productID, bool waitForComplete) {
+float KbFirmware::versionForBoard(const ushort productID, bool waitForComplete) {
     if((tableDownload || checkUpdates()) && waitForComplete){
         // If waiting is desired, enter an event loop and stay here until the download is finished
         QEventLoop loop(this);
@@ -173,19 +169,16 @@ float KbFirmware::_latestForBoard(const ushort productID, bool waitForComplete) 
     }
     // Find this board
     FW info = fwTable.value(QString::number(productID));
-    if (info.hash.isEmpty()) {
-        // Commented out because it gets spammy due to the timer calling this often.
-        /*if (fwTable.count() > 0)        ///< Only give an error message if we loaded the FIRMWARE file.
-            qDebug() << "Can't find valid firmware version for device" << productID << QString::number(productID);*/
+    if (info.hash.isEmpty())
         return 0.f;
-    }
+
     // Don't return the new version if the current ckb doesn't support it
     if(info.ckbVersion > KbManager::ckbGuiVersionF() || info.ckbVersion > KbManager::ckbDaemonVersionF())
         return -1.f;
     return info.fwVersion;
 }
 
-QByteArray KbFirmware::_fileForBoard(const ushort productID){
+QByteArray KbFirmware::dataForBoard(const ushort productID){
     FW info = fwTable.value(QString::number(productID));
     if(info.hash.isEmpty())
         return "";

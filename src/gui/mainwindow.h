@@ -10,6 +10,7 @@
 #include "settingswidget.h"
 #include <QSocketNotifier>
 #include "ckbsystemtrayicon.h"
+#include "kbfirmware.h"
 
 #ifndef DISABLE_UPDATER
 #include "ckbupdater.h"
@@ -34,6 +35,7 @@ public:
     static void PosixSignalHandler(int signal);
     void syncTrayIcon();
     void setTabsEnabled(bool e);
+    KbFirmware* kbfw;
 
 private:
     SettingsWidget* settingsWidget;

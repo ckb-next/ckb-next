@@ -429,10 +429,10 @@ void KbWidget::on_tabWidget_currentChanged(int index){
 }
 
 void KbWidget::updateFwButton(){
-    if(!KbFirmware::hasDownloaded())
+    if(!MainWindow::mainWindow->kbfw->hasDownloaded())
         ui->fwUpdButton->setText(tr("Check for updates"));
     else {
-        float newVersion = KbFirmware::versionForBoard(device->productID);
+        float newVersion = MainWindow::mainWindow->kbfw->versionForBoard(device->productID);
         float oldVersion = device->firmware.toFloat();
         if(newVersion <= 0.f || newVersion <= oldVersion)
             ui->fwUpdButton->setText(tr("Up to date"));
@@ -453,11 +453,11 @@ void KbWidget::on_fwUpdButton_clicked(){
     // If alt is pressed, ignore upgrades and go straight to the manual prompt
     if(!(qApp->keyboardModifiers() & Qt::AltModifier)){
         // Check version numbers
-        if(!KbFirmware::hasDownloaded()){
+        if(!MainWindow::mainWindow->kbfw->hasDownloaded()){
             ui->fwUpdButton->setText(tr("Checking..."));
             ui->fwUpdButton->setEnabled(false);
         }
-        float newVersion = KbFirmware::versionForBoard(device->productID, true);
+        float newVersion = MainWindow::mainWindow->kbfw->versionForBoard(device->productID, true);
         float oldVersion = device->firmware.toFloat();
         ui->fwUpdButton->setEnabled(true);
         updateFwButton();

@@ -434,15 +434,15 @@ static const Key NightswordKeys[] = {
     //Lighting zones
     {0, "Wheel Light", "wheel", 26, 5, 8, 15, true, false},
     {0, "Front light", "front", 12, -2, 36, 8, true, false },
-    {0, "Logo", "back",         18, 50, 24, 12, true, false},
+    {0, "Logo", "back",         24, 50, 12, 12, true, false},
     {0, "Back light", "side", 12, 64, 36, 8, true, false }, //Addition; side == bottom, under logo
     {0, "DPI Light", "dpi",     6, 11, 5, 12, true, false}, // thumb side DPI indicator light
     //DPI keys
     {0, "DPI Up", "dpiup", 12, 10, 5, 7, false, true},
     {0, "DPI Down", "dpidn", 12, 18, 5, 7, false, true},
     //Profile keys
-    {0, "Profile Up", "profswitch", 26, 18,  6,  10, false, true  }, //Addition; recognized as profswitch instead of up!
-//  {0, "Profile Down", "profdn", 26, 26,  6,  10, false, true  }, // Addition. Uncomment and change keyname once keymap.c recognizes new keys.
+    {0, "Profile Up", "profswitch", 26, 18,  6,  10, false, true  },
+    {0, "Profile Down", "profdn", 26, 26,  6,  10, false, true  },
     //Thumb keys (extra should be sniper)
     {0, "Forward", "mouse5", 8, 21, 5, 9, false, true},
     {0, "Back", "mouse4", 8, 30, 5, 10, false, true},

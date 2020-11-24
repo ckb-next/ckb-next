@@ -107,7 +107,8 @@ void sighandler(int type){
 
 #ifdef OS_LINUX
 void nullhandler(int s){
-    write(1, "[I] Caught internal signal SIGUSR2\n", 35);
+    int unused_result = write(1, "[I] Caught internal signal SIGUSR2\n", 35);
+    (void) unused_result;
 }
 #endif
 

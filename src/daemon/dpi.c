@@ -1,7 +1,7 @@
 #include "dpi.h"
 #include "usb.h"
 
-// Compare two light structures, ignore keys
+// Compare two DPI lights in structures
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
     return !(lhs->r[LED_MOUSE + 2] == rhs->r[LED_MOUSE + 2] && lhs->g[LED_MOUSE + 2] == rhs->g[LED_MOUSE + 2] && lhs->b[LED_MOUSE + 2] == rhs->b[LED_MOUSE + 2]);
 }
@@ -118,9 +118,9 @@ int updatedpi(usbdevice* kb, int force){
     lighting* lastlight = &kb->profile->lastlight;
     lighting* newlight = &kb->profile->currentmode->light;
     // Don't do anything if the settings haven't changed
-    if(!force && !lastdpi->forceupdate && !newdpi->forceupdate
-            && !rgbcmp(lastlight, newlight)
-            && !memcmp(lastdpi, newdpi, sizeof(dpiset)))
+    if(!(force || lastdpi->forceupdate || newdpi->forceupdate
+            || (IS_DARK_CORE(kb) && rgbcmp(lastlight, newlight)) // Only for the NXP dark core for now
+            || memcmp(lastdpi, newdpi, sizeof(dpiset))))
         return 0;
     lastdpi->forceupdate = newdpi->forceupdate = 0;
 
@@ -174,7 +174,8 @@ int updatedpi(usbdevice* kb, int force){
     // Send X/Y DPIs. We've changed to the new stage already so these can be set
     // safely.
     for(int i = 0; i < DPI_COUNT; i++){
-        if (newdpi->x[i] == lastdpi->x[i] && newdpi->y[i] == lastdpi->y[i] && !force && !rgbcmp(lastlight, newlight))
+        if (!(newdpi->x[i] != lastdpi->x[i] || newdpi->y[i] != lastdpi->y[i] ||
+            force || (IS_DARK_CORE(kb) && rgbcmp(lastlight, newlight)))) // Dark core only for now
             continue;
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIPROF, 0 };
         data_pkt[2] |= i;

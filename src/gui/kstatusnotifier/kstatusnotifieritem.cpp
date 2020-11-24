@@ -822,11 +822,15 @@ KDbusImageStruct KStatusNotifierItemPrivate::imageToStruct(const QImage &image)
 
     //swap to network byte order if we are little endian
     if (QSysInfo::ByteOrder == QSysInfo::LittleEndian) {
-        quint32 *uintBuf = (quint32 *) structIcon.data.data();
-        for (uint i = 0; i < structIcon.data.size() / sizeof(quint32); ++i) {
-            *uintBuf = qToBigEndian(*uintBuf);
-            ++uintBuf;
-        }
+        const QByteArray& ba = structIcon.data;
+        const int size = ba.size() / sizeof(quint32);
+        const int sizeBytes = size * sizeof(quint32);
+        quint32 *uintBuf = (uint32_t*)malloc(sizeBytes);
+        memcpy(uintBuf, ba.data(), sizeBytes);
+        for (int i = 0; i < size; ++i)
+            uintBuf[i] = qToBigEndian(uintBuf[i]);
+        structIcon.data = QByteArray((const char*)uintBuf, sizeBytes);
+        free(uintBuf);
     }
 
     return structIcon;

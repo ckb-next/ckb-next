@@ -1,5 +1,6 @@
 #include "led.h"
 #include "usb.h"
+#include "dpi.h"
 
 enum HWANIM_MODE {
     HWANIM_COLOURSHIFT          = 0x00,

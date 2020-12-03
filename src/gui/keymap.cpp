@@ -444,12 +444,12 @@ static const Key IronclawWirelessKeys[] = {
     {0, "Opt",          "optbtn",    9, 27,  6,  9, false, true  },
 
     // zones for LEDs
-    {0, "Front",        "front",     0,  0,  9,  9, true, false  },
+    {0, "Front",        "front",    11,  -5,  32,  9, true, false  },
     {0, "Logo",         "back",     21, 50, NS,     true, false  },
     {0, "Wheel",        "wheel",    23,  4,  6, 12, true, false  },
     
     // need to add DPI LED, even if not directly configurable for indicator to work
-    {0, "DPI",           "dpi",        10, 12,  8,  8, true,  false }
+    {0, "DPI",           "dpi",        0, 11,  8,  8, true,  false }
 
 };
 #define KEYCOUNT_IRONCLAW_W    (sizeof(IronclawWirelessKeys) / sizeof(Key))

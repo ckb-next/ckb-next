@@ -31,7 +31,8 @@ typedef struct {
     short scan;         // Key scancode, OR
     short rel_x, rel_y; // Mouse movement
     char down;          // 0 for keyup, 1 for keydown (ignored if rel_x != 0 || rel_y != 0)
-    uint delay;         // us delay after action; UINT_MAX for use global delay
+    uint32_t delay;     // us delay after action; UINT_MAX for use global delay
+    uint32_t delay_max; // us delay. If != 0 then a delay is randomly picked from delay to delay_max
 } macroaction;
 
 // Key macro
@@ -150,6 +151,9 @@ typedef struct {
 #define FEAT_ISO        0x400
 #define FEAT_MOUSEACCEL 0x800   // Mouse acceleration (also Mac only)
 
+#define FEAT_DONGLE     0x1000  // Is mouse detachable (supports wireless)?
+#define FEAT_WIRELESS   0x2000  // Is wireless?
+
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL | FEAT_HWLOAD)
 #define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)
@@ -180,8 +184,10 @@ typedef struct {
 
 // vtables for keyboards/mice (see command.h)
 extern const union devcmd vtable_keyboard;
+extern const union devcmd vtable_keyboard_wireless;
 extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
+extern const union devcmd vtable_mouse_wireless;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
 extern const union devcmd vtable_bragi;
@@ -286,8 +292,6 @@ typedef struct {
     uchar hw_ileds, hw_ileds_old, ileds;
     // Color dithering in use
     char dither;
-    // Flag to check if large macros should be sent delayed
-    uint delay;
     // Keymap that should be applied to this device
     key* keymap;
     // Buffer used to store non-HID interrupt reads from the input thread.

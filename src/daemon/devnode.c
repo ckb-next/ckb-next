@@ -315,6 +315,11 @@ static int _mkdevpath(usbdevice* kb){
                 fputs(" fwupdate", ffile);
             if(HAS_FEATURES(kb, FEAT_HWLOAD))
                 fputs(" hwload", ffile);
+            if(HAS_FEATURES(kb, FEAT_DONGLE))
+                fputs(" dongle", ffile);
+            if(HAS_FEATURES(kb, FEAT_WIRELESS))
+                fputs(" wireless", ffile);
+
             fputc('\n', ffile);
             fclose(ffile);
             check_chmod(fpath, S_GID_READ);

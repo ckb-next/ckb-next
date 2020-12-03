@@ -19,6 +19,10 @@ int updatergb_mouse(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
+    // The Dark Core has its own lighting protocol.
+    if(IS_DARK_CORE(kb))
+        return updatergb_wireless(kb, lastlight, newlight);
+
     // Prevent writing to DPI LEDs or non-existent LED zones for the Glaive.
     int num_zones = IS_GLAIVE(kb) ? 3 : N_MOUSE_ZONES;
     // Send the RGB values for each zone to the mouse

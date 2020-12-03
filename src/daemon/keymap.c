@@ -246,7 +246,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
-    { 0,            -1,   KEY_NONE },
+    { "profdn",     -1, KEY_CORSAIR },
     { "profswitch", -1, KEY_CORSAIR },
     // { "profup",     -1, KEY_CORSAIR },
     // { "profdn",     -1, KEY_CORSAIR },

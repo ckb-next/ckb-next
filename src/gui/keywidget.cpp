@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *ironclawWirelessOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0, *darkCoreOverlay = 0, *ironclawWirelessOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -36,7 +36,7 @@ void KeyWidget::map(const KeyMap& newMap){
     }
     if(width < 500)
         width = 500;
-    //setFixedSize(width, height);
+    setFixedSize(width, height);
     update();
 }
 
@@ -145,6 +145,13 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 katarOverlay = new QImage(":/img/overlay_katar.png");
             overlay = katarOverlay;
             xpos = 3.5f;
+            ypos = -2.f;
+        } else if(model == KeyMap::DARKCORE){
+            if(!darkCoreOverlay)
+                darkCoreOverlay = new QImage(":/img/overlay_darkcore.png");
+            overlay = darkCoreOverlay;
+            xpos = -5.f;
+            ypos = -2.f;
         } else if(model == KeyMap::POLARIS){
             if(!polarisOverlay)
                 polarisOverlay = new QImage(":/img/overlay_polaris.png");
@@ -162,9 +169,14 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 ironclawOverlay = new QImage(":/img/overlay_ironclaw.png");
             overlay = ironclawOverlay;
             xpos = 2.f;
+        } else if(model == KeyMap::NIGHTSWORD){
+            if(!nightswordOverlay)
+                nightswordOverlay = new QImage(":/img/overlay_nightsword.png");
+            overlay = nightswordOverlay;
+            xpos = 2.f;
         } else if(model == KeyMap::IRONCLAW_W){
             if(!ironclawWirelessOverlay)
-                ironclawWirelessOverlay = new QImage(":/img/overlay_ironclaw_wireless.png");
+                ironclawWirelessOverlay = new QImage(":/img/overlay_ironclaw.png");
             overlay = ironclawWirelessOverlay;
             xpos = 2.f;
         }
@@ -220,9 +232,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
         float w = key.width - 2.f;
         float h = key.height - 2.f;
         // In RGB mode, ignore keys without LEDs
-        if((_rgbMode && !key.hasLed) || (!_rgbMode && !key.hasScan)){
+        if((_rgbMode && !key.hasLed)
+                || (!_rgbMode && !key.hasScan))
             continue;
-        }
         // Set color based on key highlight
         bgPainter.setOpacity(1.);
         if(highlight.testBit(i)){
@@ -312,12 +324,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
     decPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     if(_rgbMode){
         // Draw key colors (RGB mode)
-        QHashIterator<QString, Key> k(keyMap);
-        uint i = -1;
-        while(k.hasNext()){
-            k.next();
-            i++;
-            const Key& key = k.value();
+        QHashIterator<QString, Key> keyIter(keyMap);
+        uint cnt = -1;
+        while(keyIter.hasNext()){
+            keyIter.next();
+            cnt++;
+            const Key& key = keyIter.value();
             if(!key.hasLed)
                 continue;
             float x = key.x + offX - 1.8f;
@@ -343,7 +355,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 color = *inDisplay;
             else {
                 // Otherwise, read from base map
-                color = _colorMap.value(k.key());
+                color = _colorMap.value(keyIter.key());
                 if(_monochrome)
                     color = monoRgb(qRed(color), qGreen(color), qBlue(color));
             }
@@ -397,7 +409,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     drawLogo(&key, &decPainter, offX , offY, scale);
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                     decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
-            else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW && !strcmp(key.name, "back")))
+            else if(model == KeyMap::M95 || ((model == KeyMap::IRONCLAW || model == KeyMap::NIGHTSWORD) && !strcmp(key.name, "back")))
+                drawLogo(&key, &decPainter, offX , offY, scale);
+            else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW_W && !strcmp(key.name, "back")))
                 drawLogo(&key, &decPainter, offX , offY, scale);
             else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW_W && !strcmp(key.name, "back")))
                 drawLogo(&key, &decPainter, offX , offY, scale);
@@ -411,12 +425,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
         font.setBold(true);
         font.setPixelSize(5.25f * scale);
         QFont font0 = font;
-        QHashIterator<QString, Key> k(keyMap);
-        uint i = -1;
-        while(k.hasNext()){
-            k.next();
-            i++;
-            const Key& key = k.value();
+        QHashIterator<QString, Key> keyIter(keyMap);
+        uint cnt = -1;
+        while(keyIter.hasNext()){
+            keyIter.next();
+            cnt++;
+            const Key& key = keyIter.value();
             if(!key.hasScan)
                 continue;
             float x = key.x + offX - key.width / 2.f + 1.f;
@@ -442,9 +456,9 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"}, {"fn","Fn"},
                 {"mouse1", ""}, {"mouse2", ""}, {"mouse3", "∙"}, {"dpiup", "▲"}, {"dpidn", "▼"}, {"wheelup", "▲"}, {"wheeldn", "▼"}, {"dpi", "◉"}, {"mouse5", "▲"}, {"mouse4", "▼"}, {"sniper", "⊕"}
             };
-            for(uint k = 0; k < sizeof(names) / sizeof(names[0]); k++){
-                if(keyName == names[k].keyName){
-                    name = names[k].displayName;
+            for(uint l = 0; l < sizeof(names) / sizeof(names[0]); l++){
+                if(keyName == names[l].keyName){
+                    name = names[l].displayName;
                     break;
                 }
             }

@@ -10,6 +10,7 @@
 #include "settingswidget.h"
 #include <QSocketNotifier>
 #include "ckbsystemtrayicon.h"
+#include "kbfirmware.h"
 
 #ifndef DISABLE_UPDATER
 #include "ckbupdater.h"
@@ -33,6 +34,8 @@ public:
     static int signalHandlerFd[2];
     static void PosixSignalHandler(int signal);
     void syncTrayIcon();
+    void setTabsEnabled(bool e);
+    KbFirmware* kbfw;
 
 private:
     SettingsWidget* settingsWidget;
@@ -75,7 +78,6 @@ private slots:
     void updateVersion();
     void checkFwUpdates();
     void timerTick();
-    void cleanup();
     void showFwUpdateNotification(QWidget* widget, float version);
     void QSignalHandler();
     void checkedForNewVer(QString ver, QString changelog);

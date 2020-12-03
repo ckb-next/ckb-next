@@ -14,12 +14,12 @@ static QSet<QString> notifyPaths;
 static QMutex notifyPathMutex;
 
 int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
-bool Kb::_dither = false, Kb::_mouseAccel = true, Kb::_delay = false;
+bool Kb::_dither = false, Kb::_mouseAccel = true;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
-    devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
-    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL),
+    batteryTimer(0), batteryIcon(0), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
+    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), battery(0), charging(0),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT), _maxDpi(0)
@@ -122,6 +122,18 @@ Kb::Kb(QObject *parent, const QString& path) :
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
 
+    if(features.contains("wireless")){
+        batteryIcon = new BatteryStatusTrayIcon(usbModel, this);
+        updateBattery();
+        batteryTimer = new QTimer(this);
+        connect(batteryTimer, &QTimer::timeout, this, &Kb::updateBattery);
+        connect(this, &Kb::batteryChanged, batteryIcon, &BatteryStatusTrayIcon::setBattery);
+        if(showBatteryIndicator)
+            batteryIcon->show();
+        batteryTimer->setInterval(10000);
+        batteryTimer->start();
+    }
+
     // Again, find an available notification node for macro definition
     // (if none is found, take notify2)
     {
@@ -139,7 +151,6 @@ Kb::Kb(QObject *parent, const QString& path) :
     // Activate device, apply settings, and ask for hardware profile
     cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
     cmd.write(QString("dither %1\n").arg(static_cast<int>(_dither)).toLatin1());
-    cmd.write(QString("\ndelay %1\n").arg(_delay? "on" : "off").toLatin1());
 #ifdef Q_OS_MACOS
     // Write ANSI/ISO flag to daemon (OSX only)
     cmd.write("layout ");
@@ -168,6 +179,9 @@ Kb::Kb(QObject *parent, const QString& path) :
 Kb::~Kb(){
     // Save settings first
     save();
+
+    delete batteryTimer;
+    delete batteryIcon;
 
     // remove the notify channel from the list of notifyPaths.
     ///< \todo I don't think, that notifypaths is used somewhere. So why do we have it?
@@ -229,6 +243,11 @@ void Kb::updateLayout(bool stop){
     emit infoUpdated();
 }
 
+void Kb::updateBattery(){
+    cmd.write(QString("@%1 get :battery\n").arg(notifyNumber).toLatin1());
+    cmd.flush();
+}
+
 void Kb::dither(bool newDither){
     if(newDither == _dither)
         return;
@@ -283,6 +302,7 @@ void Kb::load(){
                 newCurrentProfile = profile;
         }
     }
+    showBatteryIndicator = settings.value("batteryIndicator", true).toBool();
     if(newCurrentProfile)
         setCurrentProfile(newCurrentProfile);
     else {
@@ -297,6 +317,8 @@ void Kb::load(){
             demoProfile = ":/txt/demoprofile_polaris.ini";
         else if(map.model() == KeyMap::ST100)
             demoProfile = ":/txt/demoprofile_st100.ini";
+        else if(map.model() == KeyMap::NIGHTSWORD)
+            demoProfile = ":/txt/demoprofile_nightsword.ini";
         QSettings demoSettings(demoProfile, QSettings::IniFormat, this);
         CkbSettings cSettings(demoSettings);
         KbProfile* demo = new KbProfile(this, map, cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
@@ -323,6 +345,7 @@ void Kb::save(){
     settings.setValue("CurrentProfile", currentGuid);
     settings.setValue("Profiles", guids.trimmed());
     settings.setValue("hwLayout", KeyMap::getLayout(_layout));
+    settings.setValue("batteryIndicator", showBatteryIndicator);
 }
 
 void Kb::autoSave(){
@@ -521,6 +544,17 @@ void Kb::readNotify(QString line){
             mode->light()->animKeypress(keyName, keyPressed);
             mode->bind()->keyEvent(keyName, keyPressed);
         }
+    } else if (components[0] == "battery"){
+        QStringList bComponents = components[1].split(':');
+        if(bComponents.length() != 2)
+            return;
+        // Convert battery values into human readable text
+        bool ok, ok2;
+        uint newBattery = bComponents[0].toUInt(&ok), newCharging = bComponents[1].toUInt(&ok2);
+        if(!ok || !ok2 || newBattery  > 4 || newCharging > 4 || (battery == newBattery && charging == newCharging)) return;
+        battery = newBattery;
+        charging = newCharging;
+        emit batteryChanged(newBattery, newCharging);
     } else if(components[0] == "i"){
         // Indicator event
         QString i = components[1];
@@ -815,19 +849,6 @@ void Kb::setCurrentMode(KbProfile* profile, KbMode* mode, bool spontaneous){
         emit modeChanged(spontaneous);
     }
     mode->light()->forceFrameUpdate();
-}
-
-////
-/// \brief Kb::macroDelay handles the UI-Element macroBox.
-/// Sends a command to the keyboard to switch on or off the delay function on very large macros
-/// \param flag true: Switch on delay function, else switch off
-///
-void Kb::macroDelay(bool flag) {
-   _delay = flag;
-
-   foreach(Kb* kb, activeDevices){
-       kb->cmd.write(QString("\ndelay %1\n").arg(flag? "on" : "off").toLatin1());
-   }
 }
 
 KeyMap::Layout Kb::getCurrentLayout(){

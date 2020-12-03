@@ -17,7 +17,7 @@ class KbWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit KbWidget(QWidget *parent, Kb* _device);
+    explicit KbWidget(QWidget* parent, Kb* _device);
     ~KbWidget();
 
     // Device handle
@@ -28,6 +28,7 @@ public:
     bool hasShownNewFW;
     // Update the "Check for updates" label with the current status
     void updateFwButton();
+    void setTabBarEnabled(const bool e);
 
 public slots:
     // Show a tab
@@ -61,9 +62,11 @@ private slots:
     void on_modesList_itemChanged(QListWidgetItem *item);
     void on_modesList_itemClicked(QListWidgetItem *item);
     void on_modesList_customContextMenuRequested(const QPoint &pos);
+    void batteryTrayBox_stateChanged(int state);
 
     void devUpdate();
     void modeUpdate();
+    void updateBattery(uint battery, uint charging);
     void on_hwSaveButton_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();

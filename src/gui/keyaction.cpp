@@ -77,6 +77,8 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
         return "$dpi:0";
     if(key == "profswitch")
         return "$mode:-3";
+    if(key == "profdn")
+        return "$mode:-4";
 
 #ifdef Q_OS_MACOS
     // macOS has no forwards and backwards, so we bind them to macros that simulate that action
@@ -140,28 +142,28 @@ QString KeyAction::friendlyName(const KeyMap& map) const {
         switch(suffix){
         case LIGHT_UP:
         case LIGHT_UP_WRAP:
-            return "Brightness up";
+            return tr("Brightness up");
         case LIGHT_DOWN:
         case LIGHT_DOWN_WRAP:
-            return "Brightness down";
+            return tr("Brightness down");
         }
     } else if(prefix == "$lock"){
         switch(suffix){
         case LOCK_TOGGLE:
-            return "Toggle Windows lock";
+            return tr("Toggle Windows lock");
         case LOCK_ON:
-            return "Windows lock on";
+            return tr("Windows lock on");
         case LOCK_OFF:
-            return "Windows lock off";
+            return tr("Windows lock off");
         }
     } else if(prefix == "$anim"){
-        return "Start animation";
+        return tr("Start animation");
     } else if(prefix == "$program"){
-        return "Launch program";
+        return tr("Launch program");
     } else if(prefix == "$macro"){
-        return "Send G-key macro";
+        return tr("Send G-key macro");
     }
-    return "(Unknown)";
+    return tr("(Unknown)");
 }
 
 QString KeyAction::modeAction(int mode){
@@ -452,22 +454,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
             else
                 relProgram = process;
         }
-    } else if (prefix == "$macro") {
-        // Do nothing, because all work is done by the keyboard itself.
-        // For now, there is no reason to react on G-key press or release.
-        // If u find some reason, then here is the place for it.
     }
-}
-
-/// \brief KeyAction::macroDisplay is just for debugging.
-/// It shows the content of the key action and some other info.
-///
-void KeyAction::macroDisplay() {
-    qDebug() << "isMacro returns" << (isMacro() ? "true" : "false");
-    qDebug() << "isValidMacro returns" << (isValidMacro() ? "true" : "false");
-    QStringList ret =_value.split(":");
-    qDebug() << "Macro definition contains" << ret.count() << "elements";
-    qDebug() << "Macro definition is" << _value;
 }
 
 void KeyAction::adjustDisplay(){
@@ -521,14 +508,6 @@ void KeyAction::adjustDisplay(){
 #endif
 }
 
-//////////
-/// \brief KeyAction::macroAction is called when applying changes on a macro definition.
-/// macroAction ist called while being in the macro pane
-/// and clicking Apply with something in the Macro Text Box.
-/// It tags that input with "$macro:" for further recognition.
-/// \param macroDef holds the String containing parts 2-5 of a complete macro definition.
-/// \return QString holding the complete G-Key macro definition (parts 1-5)
-///
-QString KeyAction::macroAction(QString macroDef) {
+QString KeyAction::macroAction(const QString& macroDef) {
     return QString ("$macro:%1").arg(macroDef);
 }

@@ -3,6 +3,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QUrl>
+#include <QTimer>
 #include "ckbsettings.h"
 #include "fwupgradedialog.h"
 #include "kbfirmware.h"
@@ -21,6 +22,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
 {
     ui->setupUi(this);
     connect(ui->modesList, SIGNAL(orderChanged()), this, SLOT(modesList_reordered()));
+    connect(ui->batteryTrayBox, &QCheckBox::stateChanged, this, &KbWidget::batteryTrayBox_stateChanged);
 
     connect(device, SIGNAL(infoUpdated()), this, SLOT(devUpdate()));
     connect(device, SIGNAL(profileAdded()), this, SLOT(updateProfileList()));
@@ -53,6 +55,19 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device) :
     if(device->model() == KeyMap::M95){
         ui->mPerfWidget->setLegacyM95();
         ui->lightWidget->setLegacyM95();
+    }
+
+    // If we have a DARK CORE or Dark Core SE, then change the performance tab accordingly
+    if(device->model() == KeyMap::DARKCORE)
+        ui->mPerfWidget->setDarkCore();
+
+    // If the device is supports wireless, show the battery
+    if(device->features.contains("wireless")){
+        connect(device, &Kb::batteryChanged, this, &KbWidget::updateBattery);
+    } else {
+        ui->batteryLabel->hide();
+        ui->batteryStatusLabel->hide();
+        ui->batteryTrayBox->hide();
     }
 
     // Hide poll rate and FW update as appropriate
@@ -281,6 +296,17 @@ void KbWidget::modesList_reordered(){
     currentProfile->modes(newModes);
 }
 
+void KbWidget::batteryTrayBox_stateChanged(int state){
+    if(!device->features.contains("wireless")) return;
+    device->showBatteryIndicator = state > 0;
+    device->needsSave();
+    if(state){
+        device->batteryIcon->show();
+    } else {
+        device->batteryIcon->hide();
+    }
+}
+
 void KbWidget::on_modesList_itemChanged(QListWidgetItem *item){
     if(!item || !currentMode || item->data(GUID).toUuid() != currentMode->id().guid)
         return;
@@ -407,9 +433,17 @@ void KbWidget::devUpdate(){
     bool block = ui->pollRateBox->blockSignals(true);
     ui->pollRateBox->setCurrentIndex(getPollRateBoxIdx(device->pollrate));
     ui->pollRateBox->blockSignals(block);
+    ui->batteryTrayBox->setChecked(device->showBatteryIndicator);
 }
 
 void KbWidget::modeUpdate(){
+}
+
+void KbWidget::updateBattery(uint battery, uint charging){
+    QString label = QString("%1, %2")
+                    .arg(BatteryStatusTrayIcon::BATTERY_VALUES[battery])
+                    .arg(BatteryStatusTrayIcon::BATTERY_CHARGING_VALUES[charging]);
+    ui->batteryStatusLabel->setText(label);
 }
 
 void KbWidget::on_hwSaveButton_clicked(){
@@ -429,10 +463,10 @@ void KbWidget::on_tabWidget_currentChanged(int index){
 }
 
 void KbWidget::updateFwButton(){
-    if(!KbFirmware::hasDownloaded())
+    if(!MainWindow::mainWindow->kbfw->hasDownloaded())
         ui->fwUpdButton->setText(tr("Check for updates"));
     else {
-        float newVersion = KbFirmware::versionForBoard(device->productID);
+        float newVersion = MainWindow::mainWindow->kbfw->versionForBoard(device->productID);
         float oldVersion = device->firmware.toFloat();
         if(newVersion <= 0.f || newVersion <= oldVersion)
             ui->fwUpdButton->setText(tr("Up to date"));
@@ -441,15 +475,23 @@ void KbWidget::updateFwButton(){
     }
 }
 
+void KbWidget::setTabBarEnabled(const bool e){
+    ui->tabWidget->tabBar()->setEnabled(e);
+    ui->profileBox->setEnabled(e);
+    ui->modesList->setEnabled(e);
+    ui->hwSaveButton->setEnabled(e);
+    ui->bindWidget->setControlsEnabled(e);
+}
+
 void KbWidget::on_fwUpdButton_clicked(){
     // If alt is pressed, ignore upgrades and go straight to the manual prompt
     if(!(qApp->keyboardModifiers() & Qt::AltModifier)){
         // Check version numbers
-        if(!KbFirmware::hasDownloaded()){
+        if(!MainWindow::mainWindow->kbfw->hasDownloaded()){
             ui->fwUpdButton->setText(tr("Checking..."));
             ui->fwUpdButton->setEnabled(false);
         }
-        float newVersion = KbFirmware::versionForBoard(device->productID, true);
+        float newVersion = MainWindow::mainWindow->kbfw->versionForBoard(device->productID, true);
         float oldVersion = device->firmware.toFloat();
         ui->fwUpdButton->setEnabled(true);
         updateFwButton();

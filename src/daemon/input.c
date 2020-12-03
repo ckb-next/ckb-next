@@ -20,6 +20,9 @@ static ptlist_t* pt_head = 0;
 /// \brief pt_tail is the tail pointer for the single linked thread list managed by macro_pt_en/dequeue().
 static ptlist_t* pt_tail = 0;
 
+// FIXME: Most of the following macro queueing code is wrong.
+// We can't assume pthread_t is an arithmetic type, so assigning it to 0 is incorrect.
+
 ///
 /// \brief macro_pt_enqueue Save the new thread in the single linked list (FIFO).
 /// \attention Becuase multiple threads may use this function in parallel,
@@ -72,7 +75,20 @@ static pthread_t macro_pt_first() {
     return pt_head? pt_head->thread_id : 0;
 }
 
-const struct timespec init_repeat_delay = { .tv_nsec = 250000000 };
+// Default macro keystroke delay
+const struct timespec macrodelay = { .tv_nsec = 1000000 };
+// Initial repeat delay
+const struct timespec init_repeat_delay = { .tv_nsec = 500000000 };
+// Delay for every subsequent repeat
+const struct timespec catchup_repeat_delay = { .tv_nsec = 50000000 };
+
+static inline void clock_microsleep(uint32_t s) {
+    const struct timespec ts = {
+        .tv_sec = s / 1000000,
+        .tv_nsec = (s % 1000000) * 1000,
+    };
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL);
+}
 
 ///
 /// \brief play_macro is the code for all threads started to play a macro.
@@ -111,16 +127,23 @@ static void* play_macro(void* param) {
             else {
                 os_keypress(kb, action->scan, action->down);
                 queued_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
-                if (action->delay != UINT_MAX && action->delay) {    ///< local delay set
-                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 1000}, NULL);
-                } else if (kb->delay != UINT_MAX && kb->delay) {     ///< use default global delay
-                    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = kb->delay * 1000}, NULL);
-                } else if (a < (macro->actioncount - 1)) {  ///< use delays depending on macro length
-                    if (a > 200) {
-                        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = action->delay * 100000}, NULL);
-                    } else if (a > 20) {
-                        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000}, NULL);
+                if (action->delay != UINT32_MAX && action->delay) {    ///< local delay set
+                    if(action->delay_max) {
+                        // Generate a random delay in the range requested
+                        // First, we need a random number that can be as large as uint32_t
+                        // RAND_MAX can be as low as 0x7fff
+                        uint16_t second = rand() & 0x7fff;
+                        uint16_t first = rand() & 0x7fff;
+                        uint32_t final = ((uint32_t)first << 17);
+                        final |= (second << 1);
+                        // Now that we have a sufficently large random number, range it appropriately
+                        final = ((uint64_t)action->delay + (uint64_t)final) % (action->delay_max - action->delay);
+                        clock_microsleep(final);
+                    } else {
+                        clock_microsleep(action->delay);
                     }
+                } else {
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &macrodelay, NULL);
                 }
                 queued_mutex_lock(mmutex(kb));
             }
@@ -135,9 +158,10 @@ static void* play_macro(void* param) {
         if(firstloop){
             clock_nanosleep(CLOCK_MONOTONIC, 0, &init_repeat_delay, NULL);
             firstloop = 0;
+        } else {
+            // Give some time for userspace applications to catch up
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &catchup_repeat_delay, NULL);
         }
-        // Give some time for userspace applications to catch up
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 50000000}, NULL);
         queued_mutex_lock(imutex(kb));
         const int retrigger = macromask(kb->input.keys, macro->combo);
         queued_mutex_unlock(imutex(kb));
@@ -153,6 +177,7 @@ static void* play_macro(void* param) {
     pthread_mutex_unlock(mmutex2(kb));  ///< for the linked list and the mvar
 
     queued_mutex_unlock(mmutex(kb));   ///< Sync keyboard input/output and colorization
+    free(param);
     return 0;
 }
 
@@ -175,7 +200,7 @@ static void inputupdate_keys(usbdevice* kb){
             if (macromask(input->keys, macro->combo)) {
                 if (!macro->triggered) {
                     parameter_t* params = malloc(sizeof(parameter_t));
-                    if (params == 0) {
+                    if (params == NULL) {
                         perror("inputupdate_keys got no more mem:");
                     } else {
                         pthread_t thread = 0;
@@ -405,22 +430,14 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     int empty = 1;
     int left = strlen(keys), right = strlen(assignment);
     int position = 0, field = 0;
-    char keyname[24];
+    char keyname[40];
     while(position < left && sscanf(keys + position, "%10[^+]%n", keyname, &field) == 1){
-        uint keycode;
-        if((sscanf(keyname, "#%u", &keycode) && keycode < N_KEYS_INPUT)
-                  || (sscanf(keyname, "#x%x", &keycode) && keycode < N_KEYS_INPUT)){
-            // Set a key numerically
-            SET_KEYBIT(macro.combo, keycode);
-            empty = 0;
-        } else {
-            // Find this key in the keymap
-            for(unsigned i = 0; i < N_KEYS_INPUT; i++){
-                if(kb->keymap[i].name && !strcmp(keyname, kb->keymap[i].name)){
-                    macro.combo[i / 8] |= 1 << (i % 8);
-                    empty = 0;
-                    break;
-                }
+        // Find this key in the keymap
+        for(unsigned i = 0; i < N_KEYS_INPUT; i++){
+            if(kb->keymap[i].name && !strcmp(keyname, kb->keymap[i].name)){
+                macro.combo[i / 8] |= 1 << (i % 8);
+                empty = 0;
+                break;
             }
         }
         if(keys[position += field] == '+')
@@ -440,43 +457,40 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     // Scan the actions
     position = 0;
     field = 0;
-    // max action = old 11 chars plus 12 chars which is the max 32-bit int 4294967295 size
-    while(position < right && sscanf(assignment + position, "%23[^,]%n", keyname, &field) == 1){
+    // max action = old 11 chars plus 12 chars which is the max 32-bit unsigned int 4294967295 size * 2 + 1 for range underscore
+    while(position < right && sscanf(assignment + position, "%36[^,]%n", keyname, &field) == 1){
         if(!strcmp(keyname, "clear"))
             break;
 
         // Check for local key delay of the form '[+-]<key>=<delay>'
-        long int long_delay;    // scanned delay value, used to keep delay in range.
-        unsigned int delay = UINT_MAX; // computed delay value. UINT_MAX means use global delay value.
+        int64_t long_delay;    // scanned delay value, used to keep delay in range.
+        int64_t long_delay_range = 0;
+        uint32_t delay = UINT32_MAX; // computed delay value. UINT32_MAX means use the default value.
+        uint32_t delay_range = 0;
         char real_keyname[12];  // temp to hold the left side (key) of the <key>=<delay>
-        int scan_matches = sscanf(keyname, "%11[^=]=%ld", real_keyname, &long_delay);
-        if (scan_matches == 2) {
-            if (0 <= long_delay && long_delay < UINT_MAX) {
-                delay = (unsigned int)long_delay;
-                strcpy(keyname, real_keyname); // keyname[24], real_keyname[12]
+        int scan_matches = sscanf(keyname, "%11[^=]=%"SCNd64"_%"SCNd64, real_keyname, &long_delay, &long_delay_range);
+        if (scan_matches == 2 || scan_matches == 3) {
+            if (0 <= long_delay && long_delay < UINT32_MAX) {
+                delay = (uint32_t)long_delay;
+                strcpy(keyname, real_keyname); // keyname[40], real_keyname[12]
+                if(0 < long_delay_range && long_delay_range < UINT32_MAX
+                        && long_delay_range > long_delay) {
+                    delay_range = (uint32_t)long_delay_range;
+                }
             }
         }
 
         int down = (keyname[0] == '+');
         if(down || keyname[0] == '-'){
-            uint keycode;
-            if((sscanf(keyname + 1, "#%u", &keycode) && keycode < N_KEYS_INPUT)
-                      || (sscanf(keyname + 1, "#x%x", &keycode) && keycode < N_KEYS_INPUT)){
-                // Set a key numerically
-                macro.actions[macro.actioncount].scan = kb->keymap[keycode].scan;
-                macro.actions[macro.actioncount].down = down;
-                macro.actions[macro.actioncount].delay = delay;
-                macro.actioncount++;
-            } else {
-                // Find this key in the keymap
-                for(unsigned i = 0; i < N_KEYS_INPUT; i++){
-                    if(kb->keymap[i].name && !strcmp(keyname + 1, kb->keymap[i].name)){
-                        macro.actions[macro.actioncount].scan = kb->keymap[i].scan;
-                        macro.actions[macro.actioncount].down = down;
-                        macro.actions[macro.actioncount].delay = delay;
-                        macro.actioncount++;
-                        break;
-                    }
+            // Find this key in the keymap
+            for(unsigned i = 0; i < N_KEYS_INPUT; i++){
+                if(kb->keymap[i].name && !strcmp(keyname + 1, kb->keymap[i].name)){
+                    macro.actions[macro.actioncount].scan = kb->keymap[i].scan;
+                    macro.actions[macro.actioncount].down = down;
+                    macro.actions[macro.actioncount].delay = delay;
+                    macro.actions[macro.actioncount].delay_max = delay_range;
+                    macro.actioncount++;
+                    break;
                 }
             }
         }

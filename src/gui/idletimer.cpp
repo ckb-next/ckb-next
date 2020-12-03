@@ -18,7 +18,7 @@ int IdleTimer::getIdleTime(){
     xcb_screensaver_query_info_reply_t* replyInfo = xcb_screensaver_query_info_reply(conn, replyCookie, NULL);
 
     uint32_t userIdle = replyInfo->ms_since_user_input;
-    delete replyInfo;
+    free(replyInfo);
 
     // Clamp the value
     if(userIdle > INT_MAX)

@@ -120,6 +120,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     mainWindow = this;
 
+    kbfw = new KbFirmware();
+
     // Start device manager
     KbManager::init(CKB_NEXT_VERSION_STR);
     connect(KbManager::kbManager(), SIGNAL(kbConnected(Kb*)), this, SLOT(addDevice(Kb*)));
@@ -154,8 +156,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(closeAction, SIGNAL(triggered()), this, SLOT(quitApp()));
     connect(restoreAction, SIGNAL(triggered()), this, SLOT(showWindow()));
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
-
-    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), QString(tr("Settings")));
     settingsWidget->setVersion("ckb-next " CKB_NEXT_VERSION_STR);
@@ -329,7 +329,7 @@ void MainWindow::checkFwUpdates(){
         return;
     foreach(KbWidget* w, kbWidgets){
         // Display firmware upgrade notification if a new version is available
-        float version = KbFirmware::versionForBoard(w->device->productID);
+        float version = kbfw->versionForBoard(w->device->productID);
         if(version > w->device->firmware.toFloat()){
             if(w->hasShownNewFW)
                 continue;
@@ -406,7 +406,7 @@ void MainWindow::timerTick(){
     }
     // Check for firmware updates (when appropriate)
     if(!CkbSettings::get("Program/DisableAutoFWCheck").toBool()){
-        KbFirmware::checkUpdates();
+        kbfw->checkUpdates();
         checkFwUpdates();
     }
     // Poll for setting updates
@@ -468,16 +468,28 @@ QString MainWindow::getIconName() {
     return "ckb-next-monochrome";
 }
 
-void MainWindow::cleanup(){
+void MainWindow::setTabsEnabled(bool e){
+    ui->tabWidget->tabBar()->setEnabled(e);
+    QWidget* currentWidget = ui->tabWidget->currentWidget();
+    if(!currentWidget){
+        qDebug() << "currentWidget in setTabsEnabled is null";
+        return;
+    }
+    KbWidget* kbw = dynamic_cast<KbWidget*>(currentWidget);
+    // The cast can fail if the app is quitting
+    if(!kbw)
+        return;
+    kbw->setTabBarEnabled(e);
+}
+
+MainWindow::~MainWindow(){
     foreach(KbWidget* w, kbWidgets)
         delete w;
     kbWidgets.clear();
     KbManager::stop();
+    deinitAudioSubsystem();
+    delete kbfw;
     CkbSettings::cleanUp();
-}
-
-MainWindow::~MainWindow(){
-    cleanup();
     delete ui;
 }
 

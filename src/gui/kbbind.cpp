@@ -232,21 +232,20 @@ void KbBind::update(QFile& cmd, int notify, bool force){
         if(!act)
             continue;
         QString value = act->driverName();
+        QByteArray keyLatin1 = key.toLatin1();
         if(value.isEmpty()){
             // If the key is unbound or is a special action, unbind it
             cmd.write(" unbind ");
-            cmd.write(key.toLatin1());
+            cmd.write(keyLatin1);
             // if a macro definiton for the key is given,
             // add the converted string to key-buffer "macro"
-            if (act->isValidMacro()) {
-                if (act->macroContent().length() > 0) {
-                    macros.append("macro " + key.toLatin1() + ":" + act->macroContent().toLatin1() + "\n");
-                }
+            if (act->isMacro() && act->macroContent().length() > 0) {
+                macros.append("macro " + keyLatin1 + ":" + act->macroContent().toLatin1() + "\n");
             }
         } else {
             // Otherwise, write the binding
             cmd.write(" bind ");
-            cmd.write(key.toLatin1());
+            cmd.write(keyLatin1);
             cmd.write(":");
             cmd.write(value.toLatin1());
         }

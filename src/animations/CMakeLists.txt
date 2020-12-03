@@ -63,6 +63,8 @@ endforeach ()
 
 if (WITH_MVIZ)
   add_subdirectory(mviz)
-  add_dependencies(animations mviz)
+  if (TARGET mviz)
+    add_dependencies(animations mviz)
+  endif ()
 endif ()
 

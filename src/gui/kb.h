@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QFile>
 #include <QThread>
+#include <QTimer>
 #include "kbprofile.h"
+#include "batterysystemtrayicon.h"
 
 // Class for managing devices
 
@@ -39,9 +41,6 @@ public:
     // Whether dithering is used (all devices)
     static inline bool              dither()                            { return _dither; }
     static void                     dither(bool newDither);
-    // Macro Delay setting
-    static inline bool              macroDelay()                        { return _delay; }
-    static void                     macroDelay(bool flag);
     // OSX: mouse acceleration toggle (all devices)
     static inline bool              mouseAccel()                        { return _mouseAccel; }
     static void                     mouseAccel(bool newAccel);
@@ -55,6 +54,9 @@ public:
     // Required hardware modes
     int hwModeCount;
     const static int HWMODE_MAX = 3;
+
+    const static QString BATTERY_VALUES[5];
+    const static QString BATTERY_CHARGING_VALUES[5];
 
     // Perform a firmware update
     void fwUpdate(const QString& path);
@@ -96,6 +98,14 @@ public:
 
     KeyMap::Layout getCurrentLayout();
 
+    // Battery polling timer
+    QTimer* batteryTimer;
+
+    // Battery status icon
+    BatteryStatusTrayIcon* batteryIcon;
+
+    bool showBatteryIndicator;
+
     //////////
     /// For usage with macro definions, these two params must only be readable.
     /// So there are no setters.
@@ -128,6 +138,7 @@ signals:
     void profileAdded();
     void profileRenamed();
     void modeRenamed();
+    void batteryChanged(uint battery, uint charging);
 
     void profileChanged();
     void modeChanged(bool spontaneous);
@@ -149,6 +160,7 @@ private slots:
 
     void deleteHw();
     void deletePrevious();
+    void updateBattery();
 
 private:
     // Following methods should only be used by KbManager
@@ -183,6 +195,8 @@ private:
 
     KeyMap::Model   _model;
 
+    uint battery, charging;
+
     // Indicator light state
     bool iState[KbPerf::HW_I_COUNT];
 
@@ -207,8 +221,6 @@ private:
     int notifyNumber;
     // Macro Numer to notify macro definition events
     int macroNumber;
-    // flag if macro delay hast to be switched on
-    static bool _delay;
 
     // Needs to be saved?
     bool _needsSave;

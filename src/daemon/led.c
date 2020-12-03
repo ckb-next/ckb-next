@@ -2,6 +2,7 @@
 #include "led.h"
 #include "profile.h"
 #include "usb.h"
+#include "dpi.h"
 
 void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* code){
     (void)kb;

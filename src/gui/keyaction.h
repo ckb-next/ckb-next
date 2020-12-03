@@ -15,14 +15,14 @@ class KeyAction : public QObject
     Q_OBJECT
 public:
     // Action/string conversion
-    KeyAction(const QString& action, QObject *parent = 0);
+    KeyAction(const QString& action, QObject* parent = 0);
     inline QString  value()     const { return _value; }
     inline operator QString ()  const { return _value; }
     // Empty action
     explicit KeyAction(QObject* parent = 0);
 
     // No action
-    static inline QString   noAction()    { return ""; }
+    static inline QString   noAction()    { return QString(); }
     // Default action (usually the same as the key name, but not always)
     static QString          defaultAction(const QString& key, KeyMap::Model model);
 
@@ -31,91 +31,10 @@ public:
     // Name to send to driver (empty string for unbind)
     QString driverName() const;
 
-    //////////
-    /// \brief macroFullLine
-    /// If a macro command and a macro definition exists for the given key,
-    /// returns the complete string except the leading "$"
-    /// (the $ may confuse some caller).
-    /// \return QString
-    /// All 5 parts are returned in one QString.
-    /// If no definition exists, return ""
-    ///
-    inline QString macroFullLine() const {
-        return isMacro() ? _value.right(_value.length()-1) : "";
-    }
-
-     //////////
-     /// \brief isValidMacro checks whether a keyAction contains a valid macro.
-     /// This is done easily: If the macro action starts with $macro:
-     /// and has five elements, delimited by ":", we may assume,
-     /// that is a structural correct macro action.
-     /// If it has 4 entries only, it is an older definition and ok also.
-     /// \return bool as true iff the macro definition contains all four elements.
-     ///
-     inline bool isValidMacro() const {
-        if (isMacro()) {
-            QStringList ret;
-            ret =_value.split(":");
-            return ((ret.count() >= 4) && (ret.count() <= 5));
-        } else {
-            return false;
-        }
-    }
-
-    //////////
-    /// \brief macroLine returns all interresting content for a macro definition.
-    /// \return QStringList returns the Macro Key Definition,
-    ///     Readble Macro String,
-    ///     Readable Macro Comment and
-    ///     the original timing information (if it exists as a 5th part)
-    ///     as QStringList.
-    ///
-    inline QStringList macroLine() const {
-        if (isValidMacro()) {
-            QStringList ret =_value.split(":");
-            ret.removeFirst();
-            return ret;
-        } else return QStringList();
-    }
-
-    //////////
-    /// \brief macroContent returns the macro key definition only
-    /// (the second part of the macro action).
-    /// \return QString macroContent
-    ///
+    // Returns the string that's passed to the daemon
     inline QString macroContent() const {
-        // return isValidMacro() ? _value.split(":")[1].replace(QRegExp("=\\d+"), "") : ""; ///< Is used if we have ckb without delay handling
-        return isValidMacro() ? _value.split(":")[1] : "";
+        return _value.split(":")[1];
     }
-
-    //////////
-    /// \brief macroTiming returns the macro key definition with original timing infos
-    /// (the fifth and up to now last part of the macro action).
-    /// If the implementation does not know anything about delays and has no 5th part,
-    /// return first part.
-    /// \return QString macroTiming
-    ///
-    inline QString macroTiming() const {
-        if (isValidMacro()) {
-            QStringList rval = _value.split(":");
-            return (rval.length() == 4)? rval[1] : rval[4];
-        }
-        return QString("");
-    }
-
-    //////////
-    /// \brief Debug output for invalid macro Definitions
-    ///
-    /// General Info on KeyAction::_value for macros:
-    /// That string consists of 4 elements, all delimited by ":".
-    ///      1.  Macro command indicator "$macro:"
-    ///      2.  Macro Key Definition (coming from pteMacroBox):
-    ///          This sequence will program the keyboard and is hardly readable
-    ///      3.  Readable Macro String: This is displayed in pteMacroText
-    ///      4.  Readable Macro Comment:This is displayed in pteMacroComment
-    ///      5.  completely unreadable original macro information with timing values
-    ///
-    void macroDisplay();
 
     // Mode-switch action.
     // 0 for first mode, 1 for second, etc. Constants below for movement options
@@ -140,7 +59,7 @@ public:
     static QString  programAction(const QString& onPress, const QString& onRelease, int stop);
     // Key to start an animation
     static QString animAction(const QUuid& guid, bool onlyOnce, bool stopOnRelease);
-    static QString macroAction(QString macroDef);   ///< \brief well documented in cpp file
+    static QString macroAction(const QString& macroDef);
 
     // Action type
     enum Type {
@@ -177,7 +96,6 @@ public:
     void keyRelease(KbBind* bind);
     // Adjusts the DISPLAY variable to the mouse's screen. Needed to ensure that programs launch on the correct screen in multihead.
     void adjustDisplay();
-
 
     ~KeyAction();
 private:

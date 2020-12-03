@@ -348,173 +348,171 @@
         <translation type="vanished">Ρυθμίσεις Εφαρμογής</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="531"/>
+        <location filename="../../extrasettingswidget.ui" line="535"/>
         <source>Warning: high frame rates may cause stability issues</source>
         <translation>Προσοχή: υψηλός ρυθμός καρέ μπορεί να οδηγήσει σε αστάθεια</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="378"/>
         <source>When using macros with strings longer than 25 chars, some OS may lose characters (e.g. Mint 17.2). Select to prevent that bug.</source>
-        <translation>Οταν χρησιμποιείτε μακροεντολή μεγαλύτερη από 25 χαρακτήρες, το Λειτουργικό Σύστημα μπορεί να παραλείψει κάποιους χαρακτήρες. Επιλέξτε αυτό για να λυθεί το πρόβλημα.</translation>
+        <translation type="vanished">Οταν χρησιμποιείτε μακροεντολή μεγαλύτερη από 25 χαρακτήρες, το Λειτουργικό Σύστημα μπορεί να παραλείψει κάποιους χαρακτήρες. Επιλέξτε αυτό για να λυθεί το πρόβλημα.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="381"/>
         <source>Use delay for very long macros</source>
-        <translation>Χρήση καθυστέρησης για μεγάλες μακροεντολές</translation>
+        <translation type="vanished">Χρήση καθυστέρησης για μεγάλες μακροεντολές</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="273"/>
+        <location filename="../../extrasettingswidget.ui" line="74"/>
         <source>Animation scripts</source>
         <translation>Προγράμματα animation</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="177"/>
+        <location filename="../../extrasettingswidget.ui" line="489"/>
         <source>OS X tweaks</source>
         <translation>Διορθώσεις για OS X</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="365"/>
+        <location filename="../../extrasettingswidget.ui" line="81"/>
         <source>Location:</source>
         <translation>Τοποθεσία:</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="280"/>
+        <location filename="../../extrasettingswidget.ui" line="127"/>
         <source>The tray icon will not be displayed. The application will still run in the background; re-launch the app to see the GUI again.</source>
         <translation>Το εικονίδιο περιοχής ειδοποιήσεων δεν θα εμφανιστεί. Η εφαρμογή θα τρέχει στο παρασκήνιο. Επανεκκινήστε την για να ξαναεμφανιστεί το παράθυρο.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="283"/>
+        <location filename="../../extrasettingswidget.ui" line="130"/>
         <source>Hide tray icon</source>
         <translation>Απόκρυψη εικονιδίου περιοχής ειδοποιήσεων</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="54"/>
+        <location filename="../../extrasettingswidget.ui" line="240"/>
         <source>Behavior</source>
         <translation>Συμπεριφορά</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="462"/>
+        <location filename="../../extrasettingswidget.ui" line="380"/>
         <source>By default, the same brightness level will be applied to all profiles and all devices. Enable this to store it with the lighting mode instead.</source>
         <translation>Από προεπιλογή, το ίδιο επίπεδο φωτεινότητας θα εφαρμόζεται σε όλα τα προφίλ και όλες τις συσκευές. Ενεργοποιήστε αυτό ώστε το επίπεδο να αποθηκέυεται ανά mode.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="465"/>
+        <location filename="../../extrasettingswidget.ui" line="383"/>
         <source>Set brightness per-mode</source>
         <translation>Επίπεδο φωτεινότητας ανά mode</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="518"/>
+        <location filename="../../extrasettingswidget.ui" line="476"/>
         <source>Frame rate (FPS):</source>
         <translation>Ρυθμός καρέ (FPS):</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="104"/>
+        <location filename="../../extrasettingswidget.ui" line="264"/>
         <source>Turn lights off when idle for</source>
         <translation>Απενεργοποίηση φωτισμού όταν το σύστημα είναι αδρανές γιά</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="136"/>
+        <location filename="../../extrasettingswidget.ui" line="296"/>
         <source>m</source>
         <comment>minutes</comment>
         <translation>λ</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="449"/>
+        <location filename="../../extrasettingswidget.ui" line="214"/>
         <source>Details</source>
         <translation>Λεπτομέρειες</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="221"/>
+        <location filename="../../extrasettingswidget.ui" line="411"/>
         <source>Scroll</source>
         <translation>Κύλιση</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="247"/>
+        <location filename="../../extrasettingswidget.ui" line="437"/>
         <source>line(s) at a time</source>
         <translation>γραμμή/ες ανά φορά</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="257"/>
+        <location filename="../../extrasettingswidget.ui" line="340"/>
         <source>Disable animated preview when ckb-next is not in focus</source>
         <translation>Απενεργοποίηση πλήρης προεπισκόπησης όταν το ckb-next δεν είναι εστιασμένο</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="488"/>
+        <location filename="../../extrasettingswidget.ui" line="357"/>
         <source>May improve appearance on some keyboards.</source>
         <translation>Ίσως βελτιώσει την εμφάνιση σε κάποια πληκτρολόγια.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="491"/>
+        <location filename="../../extrasettingswidget.ui" line="360"/>
         <source>Use spatial dithering to simulate extra color resolution</source>
         <translation>Χρήση dithering για προσομοίωση εκτεταμένης χρωματικής ανάλυσης</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="508"/>
+        <location filename="../../extrasettingswidget.ui" line="519"/>
         <source>Try this if you&apos;re having problems with the scroll wheel.</source>
         <translation>Δοκιμάστε το αν έχετε πρόβλημα κατά την κύλιση με τη ροδέλα.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="511"/>
+        <location filename="../../extrasettingswidget.ui" line="522"/>
         <source>Disable scroll acceleration</source>
         <translation>Απενεργοποίηση επιτάχυνσης κύλισης</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="545"/>
+        <location filename="../../extrasettingswidget.ui" line="512"/>
         <source>Monochrome tray icon</source>
         <translation>Μονόχρωμο εικονίδιο περιοχής ειδοποιήσεων</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="329"/>
+        <location filename="../../extrasettingswidget.ui" line="333"/>
         <source>Enabling per-mode brightness will disable scrolling on the tray icon to change the brightness level</source>
         <translation>Ενεργοποιώντας το επίπεδο φωτεινότητας ανά mode θα απενεργοποιήσει τη δυνατότητα κύλισης στο εικονίδιο περιοχής ειδοποιήσεων για αλλαγή φωτεινότητας</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="430"/>
+        <location filename="../../extrasettingswidget.ui" line="195"/>
         <source>0 animations found</source>
         <translation>Βρέθηκαν 0 animations</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="442"/>
+        <location filename="../../extrasettingswidget.ui" line="207"/>
         <source>Re-scan</source>
         <translation>Ανίχνευση</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="342"/>
+        <location filename="../../extrasettingswidget.ui" line="469"/>
         <source>Hardware</source>
         <translation>Υλικό</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="498"/>
+        <location filename="../../extrasettingswidget.ui" line="110"/>
         <source>Try this if you&apos;re having problems with mouse movement.</source>
         <translation>Δοκιμάστε αυτό αν έχετε προβλήματα με την κίνηση του ποντικιού.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="501"/>
+        <location filename="../../extrasettingswidget.ui" line="113"/>
         <source>Disable mouse acceleration</source>
         <translation>Απενεργοποίηση επιτάχυνσης ποντικιού</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="164"/>
+        <location filename="../../extrasettingswidget.ui" line="61"/>
         <source>Delay application start</source>
         <translation>Καθυστέρηση εκκίνησης προγράμματος</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="88"/>
+        <location filename="../../extrasettingswidget.cpp" line="83"/>
         <source>This feature is not supported under Wayland</source>
         <translation>Αυτό δεν υποστηρίζεται στο Wayland</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="124"/>
+        <location filename="../../extrasettingswidget.cpp" line="119"/>
         <source>No animations found</source>
         <translation>Δεν βρέθηκαν animations</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="126"/>
+        <location filename="../../extrasettingswidget.cpp" line="121"/>
         <source>1 animation found</source>
         <translation>Βρέθηκε 1 animation</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="128"/>
+        <location filename="../../extrasettingswidget.cpp" line="123"/>
         <source>%1 animations found</source>
         <translation>Βρέθηκαν %1 animations</translation>
     </message>
@@ -958,12 +956,12 @@
         <translation>Συσχέτιση Πλήκτρων</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="61"/>
+        <location filename="../../kbbindwidget.cpp" line="66"/>
         <source>Winlock Warning</source>
         <translation>Προειδοποίηση Winlock</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="61"/>
+        <location filename="../../kbbindwidget.cpp" line="66"/>
         <source>Windows key lock is currently enabled.
 
 The binding will not function until winlock has been disabled.</source>
@@ -972,79 +970,79 @@ The binding will not function until winlock has been disabled.</source>
 Δεν θα λειτουργήσει μέχρι να απενεργοποιήσετε το winlock.</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="69"/>
+        <location filename="../../kbbindwidget.cpp" line="74"/>
         <source>Click to select</source>
         <translation>Κλικ για επιλογή</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="77"/>
+        <location filename="../../kbbindwidget.cpp" line="82"/>
         <source>(Unknown)</source>
         <translation>(Άγνωστο)</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="82"/>
+        <location filename="../../kbbindwidget.cpp" line="87"/>
         <source>%1 %2 selected</source>
         <translation>%1 %2 επιλεγμένα</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="82"/>
+        <location filename="../../kbbindwidget.cpp" line="87"/>
         <source>buttons</source>
         <translation>κουμπιά</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="82"/>
+        <location filename="../../kbbindwidget.cpp" line="87"/>
         <source>keys</source>
         <translation>πλήκτρα</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="95"/>
+        <location filename="../../kbbindwidget.cpp" line="100"/>
         <source>&lt;center&gt;Reset all %1s to default?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Επαναφορά όλων των %1ων στις προεπιλογές;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="97"/>
+        <location filename="../../kbbindwidget.cpp" line="102"/>
         <source>&lt;center&gt;Reset this %1 to default?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Επαναφορά αυτού του %1ου στις προεπιλογές;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="99"/>
+        <location filename="../../kbbindwidget.cpp" line="104"/>
         <source>&lt;center&gt;Reset %1 %2s to default?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Επαναφορά %1 %2ών στις προεπιλογές;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="100"/>
+        <location filename="../../kbbindwidget.cpp" line="105"/>
         <source>Confirm action</source>
         <translation>Επιβεβαίωση</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="92"/>
-        <location filename="../../kbbindwidget.cpp" line="110"/>
+        <location filename="../../kbbindwidget.cpp" line="97"/>
+        <location filename="../../kbbindwidget.cpp" line="115"/>
         <source>button</source>
         <translation>κουμπι</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="92"/>
-        <location filename="../../kbbindwidget.cpp" line="110"/>
+        <location filename="../../kbbindwidget.cpp" line="97"/>
+        <location filename="../../kbbindwidget.cpp" line="115"/>
         <source>key</source>
         <translation>πλήκτρ</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="111"/>
+        <location filename="../../kbbindwidget.cpp" line="116"/>
         <source>s</source>
         <translation>α</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="115"/>
+        <location filename="../../kbbindwidget.cpp" line="120"/>
         <source>all %1s</source>
         <translation>όλα %1α</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="117"/>
+        <location filename="../../kbbindwidget.cpp" line="122"/>
         <source>Copy binding for </source>
         <translation>Αντιγραφή συσχέτισης πλήκτρων για </translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="117"/>
+        <location filename="../../kbbindwidget.cpp" line="122"/>
         <source> to:</source>
         <translation> στο:</translation>
     </message>
@@ -1073,7 +1071,7 @@ The binding will not function until winlock has been disabled.</source>
     </message>
     <message>
         <location filename="../../kblightwidget.ui" line="162"/>
-        <location filename="../../kblightwidget.cpp" line="109"/>
+        <location filename="../../kblightwidget.cpp" line="97"/>
         <source>Click to select</source>
         <translation>Κλικ για επιλογή</translation>
     </message>
@@ -1117,22 +1115,22 @@ The binding will not function until winlock has been disabled.</source>
         <translation type="vanished">πλήκτρα</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="113"/>
+        <location filename="../../kblightwidget.cpp" line="101"/>
         <source>1 zone selected</source>
         <translation>1 ζώνη επιλεγμένη</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="115"/>
+        <location filename="../../kblightwidget.cpp" line="103"/>
         <source>1 key selected</source>
         <translation>1 πλήκτρο επιλεγμένο</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="118"/>
+        <location filename="../../kblightwidget.cpp" line="106"/>
         <source>%1 zones selected</source>
         <translation>%1 ζώνες επιλεγμένες</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="120"/>
+        <location filename="../../kblightwidget.cpp" line="108"/>
         <source>%1 keys selected</source>
         <translation>%1 πλήκτρα επιλεγμένα</translation>
     </message>
@@ -1165,19 +1163,19 @@ The binding will not function until winlock has been disabled.</source>
     </message>
     <message>
         <location filename="../../kbprofiledialog.cpp" line="209"/>
-        <location filename="../../kbprofiledialog.cpp" line="335"/>
+        <location filename="../../kbprofiledialog.cpp" line="351"/>
         <source>ckb-next profiles (*.ckb)</source>
         <translation>προφίλ ckb-next (*.ckb)</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="295"/>
-        <location filename="../../kbprofiledialog.cpp" line="345"/>
-        <location filename="../../kbprofiledialog.cpp" line="353"/>
-        <location filename="../../kbprofiledialog.cpp" line="359"/>
-        <location filename="../../kbprofiledialog.cpp" line="370"/>
-        <location filename="../../kbprofiledialog.cpp" line="380"/>
-        <location filename="../../kbprofiledialog.cpp" line="439"/>
-        <location filename="../../kbprofiledialog.cpp" line="447"/>
+        <location filename="../../kbprofiledialog.cpp" line="312"/>
+        <location filename="../../kbprofiledialog.cpp" line="361"/>
+        <location filename="../../kbprofiledialog.cpp" line="369"/>
+        <location filename="../../kbprofiledialog.cpp" line="375"/>
+        <location filename="../../kbprofiledialog.cpp" line="387"/>
+        <location filename="../../kbprofiledialog.cpp" line="397"/>
+        <location filename="../../kbprofiledialog.cpp" line="456"/>
+        <location filename="../../kbprofiledialog.cpp" line="464"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
@@ -1232,54 +1230,54 @@ The binding will not function until winlock has been disabled.</source>
         <translation>Είστε σίγουροι ότι θέλετε να διαγράψετε αυτό το προφίλ;</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="295"/>
+        <location filename="../../kbprofiledialog.cpp" line="312"/>
         <source>An error occurred while exporting the selected profiles.</source>
         <translation>Προέκυψε σφάλμα κατά την εξαγωγή των επιλεγμένων προφίλ.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="300"/>
+        <location filename="../../kbprofiledialog.cpp" line="317"/>
         <source>Export Successful</source>
         <translation>Επιτυχημένη Εξαγωγή</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="300"/>
+        <location filename="../../kbprofiledialog.cpp" line="317"/>
         <source>Selected profiles have been exported successfully.</source>
         <translation>Τα επιλεγμένα προφίλ έχουν εξαχθεί με επιτυχία.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="345"/>
+        <location filename="../../kbprofiledialog.cpp" line="361"/>
         <source>Selected file is not a valid profile.</source>
         <translation>Το επιλεγμένο αρχείο δεν είναι έγκυρο προφίλ.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="353"/>
+        <location filename="../../kbprofiledialog.cpp" line="369"/>
         <source>Could not read %1.</source>
         <translation>Δεν ήταν δυνατή η ανάγνωση του %1.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="359"/>
+        <location filename="../../kbprofiledialog.cpp" line="375"/>
         <source>Package contains invalid metadata.</source>
         <translation>Το πακέτο εμπεριέχει μη-έγκυρα μεταδεδομένα.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="370"/>
+        <location filename="../../kbprofiledialog.cpp" line="387"/>
         <source>Unsupported package selected. Please update ckb-next to import it.</source>
         <translation>Επιλέχθηκε πακέτο που δεν υποστηρίζεται. Παρακαλώ ενημερώστε το ckb-next για να το εισάγετε.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="380"/>
+        <location filename="../../kbprofiledialog.cpp" line="397"/>
         <source>This profile was not created for the current device type.</source>
         <translation>Αυτό το προφίλ δεν δημιουργήθηκε για τον τρέχον τύπο συσκευής.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="401"/>
-        <location filename="../../kbprofiledialog.cpp" line="450"/>
-        <location filename="../../kbprofiledialog.cpp" line="473"/>
+        <location filename="../../kbprofiledialog.cpp" line="418"/>
+        <location filename="../../kbprofiledialog.cpp" line="467"/>
+        <location filename="../../kbprofiledialog.cpp" line="490"/>
         <source>Profile Import</source>
         <translation>Εισαγωγή Προφίλ</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="402"/>
+        <location filename="../../kbprofiledialog.cpp" line="419"/>
         <source>This profile was created for a %1 (%2)
 but it is going to be imported to a %3 (%4).
 
@@ -1294,12 +1292,12 @@ Import Anyway?</source>
 Εισαγωγή έτσι κι αλλιώς;</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="439"/>
+        <location filename="../../kbprofiledialog.cpp" line="456"/>
         <source>Selected package contains no valid profiles.</source>
         <translation>Το επιλεγμένο πακέτο δεν περιέχει έγκυρα προφίλ.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="447"/>
+        <location filename="../../kbprofiledialog.cpp" line="464"/>
         <source>Selected package contains some corrupt profiles.
 
 An attempt will be made to import as many as possible.</source>
@@ -1308,7 +1306,7 @@ An attempt will be made to import as many as possible.</source>
 Θα γίνει προσπάθεια εισαγωγής όσο περισσότερων είναι δυνατόν.</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="451"/>
+        <location filename="../../kbprofiledialog.cpp" line="468"/>
         <source>The following profiles will be imported.
 
 • </source>
@@ -1317,17 +1315,17 @@ An attempt will be made to import as many as possible.</source>
 • </translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="474"/>
+        <location filename="../../kbprofiledialog.cpp" line="491"/>
         <source> already exists. Overwrite it?</source>
         <translation> υπάρχει ήδη. Να αντικατασταθεί;</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="500"/>
+        <location filename="../../kbprofiledialog.cpp" line="516"/>
         <source>Import Successful</source>
         <translation>Επιτυχημένη Εισαγωγή</translation>
     </message>
     <message>
-        <location filename="../../kbprofiledialog.cpp" line="500"/>
+        <location filename="../../kbprofiledialog.cpp" line="516"/>
         <source>Profiles have been imported successfully.</source>
         <translation>Τα προφίλ έχουν εισαχθεί με επιτυχία.</translation>
     </message>
@@ -1474,49 +1472,49 @@ An attempt will be made to import as many as possible.</source>
         <translation>Αναβάθμιση στην έκδοση %1</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="449"/>
+        <location filename="../../kbwidget.cpp" line="457"/>
         <source>Checking...</source>
         <translation>Γίνεται έλεγχος...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="457"/>
-        <location filename="../../kbwidget.cpp" line="460"/>
-        <location filename="../../kbwidget.cpp" line="464"/>
+        <location filename="../../kbwidget.cpp" line="465"/>
+        <location filename="../../kbwidget.cpp" line="468"/>
+        <location filename="../../kbwidget.cpp" line="472"/>
         <source>Firmware update</source>
         <translation>Ενημέρωση firmware</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="457"/>
+        <location filename="../../kbwidget.cpp" line="465"/>
         <source>&lt;center&gt;There is a new firmware available for this device.&lt;br /&gt;However, it requires a newer version of ckb-next.&lt;br /&gt;Please upgrade ckb-next and try again.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Υπάρχει καινούργιο firmware διαθέσιμο για αυτή τη συσκευή.&lt;br /&gt;Ωστόσο, απαιτεί μια νεότερη έκδοση του ckb-next.&lt;br /&gt;Παρακαλώ ενημερώστε το ckb-next και δοκιμάστε ξανά.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="460"/>
+        <location filename="../../kbwidget.cpp" line="468"/>
         <source>&lt;center&gt;There was a problem getting the status for this device.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Υπήρξε πρόβλημα λήψης πληροφοριών για τη συσκευή.&lt;br /&gt;Θα θέλατε να επιλέξετε ένα αρχείο;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="464"/>
+        <location filename="../../kbwidget.cpp" line="472"/>
         <source>&lt;center&gt;Your firmware is already up to date.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Το firmware είναι ήδη ενημερωμένο.&lt;br /&gt;Θα θέλατε να επιλέξετε ένα αρχείο;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="476"/>
+        <location filename="../../kbwidget.cpp" line="484"/>
         <source>Select firmware file</source>
         <translation>Επιλογή αρχείου firmware</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="476"/>
+        <location filename="../../kbwidget.cpp" line="484"/>
         <source>Firmware blobs (*.bin)</source>
         <translation>Αρχεία firmware (*.bin)</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="481"/>
+        <location filename="../../kbwidget.cpp" line="489"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="481"/>
+        <location filename="../../kbwidget.cpp" line="489"/>
         <source>&lt;center&gt;File could not be read.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Δεν ήταν δυνατή η ανάγνωση του αρχείου.&lt;/center&gt;</translation>
     </message>
@@ -1530,6 +1528,7 @@ An attempt will be made to import as many as possible.</source>
     </message>
     <message>
         <location filename="../../keyaction.cpp" line="102"/>
+        <location filename="../../keyaction.cpp" line="164"/>
         <source>(Unknown)</source>
         <translation>(Άγνωστο)</translation>
     </message>
@@ -1582,6 +1581,46 @@ An attempt will be made to import as many as possible.</source>
         <location filename="../../keyaction.cpp" line="137"/>
         <source>DPI stage %1</source>
         <translation>Επίπεδο DPI %1</translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="143"/>
+        <source>Brightness up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="146"/>
+        <source>Brightness down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="151"/>
+        <source>Toggle Windows lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="153"/>
+        <source>Windows lock on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="155"/>
+        <source>Windows lock off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="158"/>
+        <source>Start animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="160"/>
+        <source>Launch program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../keyaction.cpp" line="162"/>
+        <source>Send G-key macro</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1708,6 +1747,82 @@ An attempt will be made to import as many as possible.</source>
     </message>
 </context>
 <context>
+    <name>MacroStringEditDialog</name>
+    <message>
+        <location filename="../../macrostringeditdialog.ui" line="17"/>
+        <source>Edit Macro As String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrostringeditdialog.cpp" line="21"/>
+        <source>Macro string parse error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrostringeditdialog.cpp" line="21"/>
+        <source>An error occured while parsing at column %1&lt;br&gt;&lt;br&gt;Please correct it and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MacroTableModel</name>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="177"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="179"/>
+        <source>Default</source>
+        <translation type="unfinished">Προεπιλεγμένο</translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="187"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Άγνωστο</translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="196"/>
+        <source>You can not set a delay before the first key event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="198"/>
+        <source>To set a delay, please switch the delay mode to &quot;as typed&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="213"/>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="215"/>
+        <source>Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="358"/>
+        <source>Delay is too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="365"/>
+        <source>Max random delay is too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="369"/>
+        <source>Max random delay is less or equal to the minimum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="380"/>
+        <source>Invalid key </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="../../mainwindow.ui" line="48"/>
@@ -1759,68 +1874,68 @@ An attempt will be made to import as many as possible.</source>
         <translation>Εκκινήστε και ενεργοποιήστε το με:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="200"/>
+        <location filename="../../mainwindow.cpp" line="201"/>
         <source>The ckb-next daemon is not running.</source>
         <translation>Το ckb-next-daemon δεν τρέχει.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="285"/>
+        <location filename="../../mainwindow.cpp" line="286"/>
         <source>Driver inactive</source>
         <translation>Ο driver είναι αδρανής</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="292"/>
+        <location filename="../../mainwindow.cpp" line="293"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Ασυμφωνία έκδοσης του driver (</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="292"/>
+        <location filename="../../mainwindow.cpp" line="293"/>
         <source>). Please upgrade ckb-next</source>
         <translation>). Παρακαλώ ενημερώστε το ckb-next</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="292"/>
+        <location filename="../../mainwindow.cpp" line="293"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation>.&lt;br /&gt;Αν το πρόβλημα παραμένει, επανεκκινήστε το σύστημά σας.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="303"/>
+        <location filename="../../mainwindow.cpp" line="304"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Ποσοχή:&lt;/b&gt; Η επέκταση από &quot;Fumihiko Takayama&quot; δεν επιτρέπεται στο Ασφάλεια και απόρρητο. Επιτρέψτε το και επανασυνδέστε τις συσκευές.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="305"/>
+        <location filename="../../mainwindow.cpp" line="306"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Σιγουρευτείτε ότι το ckb-next-daemon επιτρέπεται στο Ασφάλεια και απόρρητο -&gt; Παρακολούθησή εισόδου.&lt;/br /&gt;Παρακαλώ επιτρέψτε μέχρι 10 δευτερόλεπτα μέχρι να εμφανιστεί η ειδοποίηση ενεργοποιήσης του daemon.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="315"/>
+        <location filename="../../mainwindow.cpp" line="316"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Δεν ήταν δυνατό να φορτωθεί το άρθρωμα πυρήνα uinput. Αν αυτο το πρόβλημα παραμένει μετά από επανεκκίνηση, μεταγλωττίστε πυρήνα με CONFIG_INPUT_UINPUT=y.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="318"/>
+        <location filename="../../mainwindow.cpp" line="319"/>
         <source>No devices connected</source>
         <translation>Δεν υπάρχουν συνδεδεμένες συσκευές</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="321"/>
+        <location filename="../../mainwindow.cpp" line="322"/>
         <source>1 device connected</source>
         <translation>1 συσκευή συνδεδεμένη</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="323"/>
+        <location filename="../../mainwindow.cpp" line="324"/>
         <source>%1 devices connected</source>
         <translation>%1 συσκευές συνδεδεμένες</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="354"/>
+        <location filename="../../mainwindow.cpp" line="355"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation>Υπάρχει νέο firmware για το %1 σας (v%2) Θα θέλατε να το εγκαταστήσετε τώρα;</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="370"/>
+        <location filename="../../mainwindow.cpp" line="371"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
@@ -1829,12 +1944,12 @@ or click &quot;Quit&quot; on the Settings screen.</source>
 ή κάντε κλικ στο &quot;Έξοδος&quot; στο παράθυρο ρυθμίσεων.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="502"/>
+        <location filename="../../mainwindow.cpp" line="526"/>
         <source>Update to v</source>
         <translation>Ενημέρωση στο v</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="507"/>
+        <location filename="../../mainwindow.cpp" line="531"/>
         <source>Up to date</source>
         <translation>Ενημερωμένο</translation>
     </message>
@@ -1876,7 +1991,7 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="vanished">Εκκινήστε και ενεργοποιήστε το με:</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="56"/>
+        <location filename="../../main.cpp" line="59"/>
         <source>Starts in background, without displaying the main window.</source>
         <translation>Εκκινείται στο παρασκήνιο, χωρίς να προβάλει το κυρίως παράθυρο.</translation>
     </message>
@@ -1885,19 +2000,24 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="vanished">Ομοίως με το background.</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="61"/>
+        <location filename="../../main.cpp" line="64"/>
         <source>Causes already running instance (if any) to exit.</source>
         <translation>Αναγκάζει το λογισμικό (αν τρέχει) να κλείσει.</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="64"/>
+        <location filename="../../main.cpp" line="67"/>
         <source>Switches to the profile with the specified name on all devices.</source>
         <translation>Αλλάζει στο προφίλ με το καθορισμένο όνομα σε όλες τις συσκευές.</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="67"/>
+        <location filename="../../main.cpp" line="70"/>
         <source>Switches to the mode either in the current profile, or in the one specified by --profile</source>
         <translation>Αλλάζει στο mode είτε στο τρέχων προφίλ, ή σε προφιλ ορισμένο μέσω του --profile</translation>
+    </message>
+    <message>
+        <location filename="../../main.cpp" line="73"/>
+        <source>Delays application start for 5 seconds</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2118,45 +2238,101 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation>Μακροεντολή</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1292"/>
-        <source>Macro Key Actions</source>
-        <translation>Ενέργιες Μακροεντολής</translation>
+        <location filename="../../rebindwidget.ui" line="1307"/>
+        <source>Name</source>
+        <translation type="unfinished">Όνομα</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1317"/>
-        <source>Disable delay</source>
-        <translation>Δεν θα υπάρχει καθυστέρηση</translation>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1327"/>
+        <location filename="../../rebindwidget.ui" line="1400"/>
+        <source>This device only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1405"/>
+        <source>All ckb-next devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1410"/>
+        <source>All keyboards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1431"/>
+        <source>Record from:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1438"/>
+        <source>Keystroke delay:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1457"/>
+        <source>Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1492"/>
+        <source>Edit as string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1567"/>
+        <location filename="../../rebindwidget.cpp" line="807"/>
+        <source>Start Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1587"/>
+        <source>Add</source>
+        <translation type="unfinished">Προσθήκη</translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1607"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Macro Key Actions</source>
+        <translation type="vanished">Ενέργιες Μακροεντολής</translation>
+    </message>
+    <message>
+        <source>Disable delay</source>
+        <translation type="vanished">Δεν θα υπάρχει καθυστέρηση</translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.ui" line="1362"/>
         <source>Set delay to default values: 20us up to 15 chars, 200us above</source>
         <translation>Θα υπάρχει καθυστέρηση 20μs μέχρι 15 χαρακτήρες και 200μs για παραπάνω</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1343"/>
+        <location filename="../../rebindwidget.ui" line="1378"/>
         <source>Delay will be the same as it was recorded</source>
         <translation>Η καθυστέρηση θα είναι ακριβώς όπως καταγράφηκε</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1495"/>
         <source>Record macro</source>
-        <translation>Καταγραφή μακροεντολής</translation>
+        <translation type="vanished">Καταγραφή μακροεντολής</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1512"/>
         <source>Stop</source>
         <extracomment>was passiert, wenn ich hier iregend einen Kommentar reinschreibe?</extracomment>
-        <translation>Διακοπή</translation>
+        <translation type="vanished">Διακοπή</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1519"/>
+        <location filename="../../rebindwidget.ui" line="1620"/>
         <source>Clear</source>
         <translation>Εκκαθάριση</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1502"/>
         <source>Start</source>
-        <translation>Εκκίνηση</translation>
+        <translation type="vanished">Εκκίνηση</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="144"/>
@@ -2194,73 +2370,130 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation>Wi&amp;ndows lock:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1320"/>
         <source>No &amp;delay</source>
-        <translation>Χωρίς &amp;καθυστέρηση</translation>
+        <translation type="vanished">Χωρίς &amp;καθυστέρηση</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1330"/>
+        <location filename="../../rebindwidget.ui" line="1365"/>
         <source>de&amp;fault</source>
         <translation>&amp;Προεπιλογή</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1346"/>
+        <location filename="../../rebindwidget.ui" line="1381"/>
         <source>as t&amp;yped</source>
         <translation>Όπως Π&amp;ληκτρολογείται</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1435"/>
         <source>Macro Name</source>
-        <translation>Όνομα Μακροεντολής</translation>
+        <translation type="vanished">Όνομα Μακροεντολής</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1445"/>
         <source>Macro Sequence</source>
-        <translation>Ακολουθία Μακροεντολής</translation>
+        <translation type="vanished">Ακολουθία Μακροεντολής</translation>
     </message>
     <message>
         <source>Record macro </source>
         <translation type="obsolete">Καταγραφή μακροεντολής</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1551"/>
+        <location filename="../../rebindwidget.ui" line="1650"/>
         <source>Unbind</source>
         <translation>Κατάργηση Συσχέτισης</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1558"/>
+        <location filename="../../rebindwidget.ui" line="1657"/>
         <source>Reset to Default</source>
         <translation>Επαναφορά στα Αρχικά</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1565"/>
+        <location filename="../../rebindwidget.ui" line="1664"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1572"/>
+        <location filename="../../rebindwidget.ui" line="1671"/>
         <source>Apply</source>
         <translation>Εφαρμογή</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="790"/>
         <source>Type in a macro name in the comment box and click start.</source>
-        <translation>Πληκτρολογήστε ένα όνομα στο πεδίο σχολίων και κάντε κλικ στο &quot;Εκκίνηση&quot;.</translation>
+        <translation type="vanished">Πληκτρολογήστε ένα όνομα στο πεδίο σχολίων και κάντε κλικ στο &quot;Εκκίνηση&quot;.</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="793"/>
         <source>Type your macro and click stop when finished.</source>
-        <translation>Πληκτρολογήστε την μακροεντολή και κάντε κλικ στο &quot;Διακοπή&quot; όταν ολοκληρώσετε.</translation>
+        <translation type="vanished">Πληκτρολογήστε την μακροεντολή και κάντε κλικ στο &quot;Διακοπή&quot; όταν ολοκληρώσετε.</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="796"/>
         <source>Click Apply or manually edit Macro Key Actions.</source>
-        <translation>Κάντε κλικ στο &quot;Εφαρμογή&quot; ή επεξεργαστείτε χειροκίνητα τις Ενέργειες Μακροεντολής.</translation>
+        <translation type="vanished">Κάντε κλικ στο &quot;Εφαρμογή&quot; ή επεξεργαστείτε χειροκίνητα τις Ενέργειες Μακροεντολής.</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="799"/>
         <source>Invalid status in RebindWidget::helpStatus (%1)</source>
-        <translation>Άγνωστη κατάσταση στο RebindWidget::helpStatus (%1)</translation>
+        <translation type="vanished">Άγνωστη κατάσταση στο RebindWidget::helpStatus (%1)</translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="456"/>
+        <source>Key %1 (%2) is pressed but never released.
+This will result in the key being pressed by the macro until you manually press the key itself and release it.
+
+Are you sure you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="459"/>
+        <source>Key %1 (%2) is released but never pressed.
+This will have no observable effect unless the key is held down manually or by another macro.
+
+Are you sure you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="462"/>
+        <source>Macro warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="808"/>
+        <source>Click Apply or manually edit the events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="846"/>
+        <source>Unknown key combination pressed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="846"/>
+        <source>An unknown key combination (%1, %2) has been pressed.
+Make sure your keyboard layout is set to English - United States while recording macros.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="856"/>
+        <source>Stop Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="857"/>
+        <source>Type your macro and press Stop Recording when finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="864"/>
+        <source>Click Start Recording or manually edit the events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="932"/>
+        <source>&quot;Record from all keyboards&quot; is only recommended if you do not have a keyboard managed by ckb-next.
+It currently only functions with an English - United States keyboard layout.
+Make sure your keyboard is switched to it before recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../rebindwidget.cpp" line="935"/>
+        <source>Record from all keyboards</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -33,10 +33,11 @@ void KeyWidget::map(const KeyMap& newMap){
     } else {
         width = (keyMap.width() + KEY_SIZE) * 2.3;
         height = (keyMap.height() + KEY_SIZE) * 2.3;
+        setFixedSize(width, height);
     }
-    if(width < 500)
+    if(width < 500){
         width = 500;
-    setFixedSize(width, height);
+    }
     update();
 }
 
@@ -176,7 +177,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             xpos = 2.f;
         } else if(model == KeyMap::IRONCLAW_W){
             if(!ironclawWirelessOverlay)
-                ironclawWirelessOverlay = new QImage(":/img/overlay_ironclaw.png");
+                ironclawWirelessOverlay = new QImage(":/img/overlay_ironclaw_wireless.png");
             overlay = ironclawWirelessOverlay;
             xpos = 2.f;
         }
@@ -410,8 +411,6 @@ void KeyWidget::paintEvent(QPaintEvent*){
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                     decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
             else if(model == KeyMap::M95 || ((model == KeyMap::IRONCLAW || model == KeyMap::NIGHTSWORD) && !strcmp(key.name, "back")))
-                drawLogo(&key, &decPainter, offX , offY, scale);
-            else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW_W && !strcmp(key.name, "back")))
                 drawLogo(&key, &decPainter, offX , offY, scale);
             else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW_W && !strcmp(key.name, "back")))
                 drawLogo(&key, &decPainter, offX , offY, scale);

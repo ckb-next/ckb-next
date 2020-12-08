@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "kbwidget.h"
+#include <QListWidgetItem>
 
 namespace Ui {
 class KbProfileDialog;

@@ -105,6 +105,7 @@ private:
     void tabChanged(int idx);
     void insertIntoMacroPreview(const bool keydown, const bool printable, const QString& line);
     bool leftMouseClicked;
+    MacroDropdownDelegate* macroDelegate;
 };
 
 #endif // REBINDWIDGET_H

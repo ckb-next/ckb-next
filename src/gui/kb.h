@@ -72,10 +72,8 @@ public:
     inline KbPerf*  currentPerf()   { return !_currentMode ? 0 : _currentMode->perf(); }
 
     // Update selection
-    void        setCurrentProfile(KbProfile* profile, bool spontaneous = true);
-    void        setCurrentMode(KbProfile* profile, KbMode* mode, bool spontaneous = true);
-    inline void setCurrentMode(KbProfile* profile, int index, bool spontaneous = true)      { setCurrentMode(profile, profile->modes()[index], spontaneous); }
-    inline void setCurrentMode(KbMode* mode, bool spontaneous = true)                       { setCurrentMode(_currentProfile, mode, spontaneous); }
+    void        setCurrentProfile(KbProfile* profile);
+    void        setCurrentMode(KbMode* mode);
 
     // Create a new profile/mode. The newly-created object will NOT be inserted into the current profile/mode list.
     inline KbProfile*   newProfile()                                  { return new KbProfile(this, getKeyMap()); }
@@ -124,10 +122,10 @@ signals:
     // Profile/mode updates
     void profileAdded();
     void profileRenamed();
-    void modeRenamed();
 
     void profileChanged();
-    void modeChanged(bool spontaneous);
+    void profileAboutToChange();
+    void modeChanged();
 
     // FW update status
     void fwUpdateProgress(int current, int total);

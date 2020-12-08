@@ -331,12 +331,12 @@
 <context>
     <name>ColorButton</name>
     <message>
-        <location filename="../../colorbutton.cpp" line="47"/>
+        <location filename="../../colorbutton.cpp" line="51"/>
         <source>Change color...</source>
         <translation>Αλλαγή χρώματος...</translation>
     </message>
     <message>
-        <location filename="../../colorbutton.cpp" line="91"/>
+        <location filename="../../colorbutton.cpp" line="96"/>
         <source>A system configuration that can lead to instability issues with this software has been detected.&lt;br&gt;&lt;br&gt;If this application locks up after clicking the OK button below, please refer to &lt;a href=&quot;https://github.com/ckb-next/ckb-next/wiki/Troubleshooting#glib-critical-errors-and-lock-up-at-colour-chooser&quot;&gt;https://github.com/ckb-next/ckb-next/wiki/Troubleshooting#glib-critical-errors-and-lock-up-at-colour-chooser&lt;/a&gt;</source>
         <translation>Εντοπίστηκε μια ρύθμιση συστήματος που μπορεί να οδηγήσει σε αστάθεια.&lt;br&gt;&lt;br&gt;Αν αυτή η εφαρμογή παγώσει αφού κάνετε κλικ στο OK, παρακαλώ διαβάστε το &lt;a href=&quot;https://github.com/ckb-next/ckb-next/wiki/Troubleshooting#glib-critical-errors-and-lock-up-at-colour-chooser&quot;&gt;https://github.com/ckb-next/ckb-next/wiki/Troubleshooting#glib-critical-errors-and-lock-up-at-colour-chooser&lt;/a&gt;</translation>
     </message>
@@ -555,54 +555,54 @@
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="97"/>
-        <location filename="../../fwupgradedialog.cpp" line="113"/>
-        <location filename="../../fwupgradedialog.cpp" line="120"/>
+        <location filename="../../fwupgradedialog.cpp" line="98"/>
+        <location filename="../../fwupgradedialog.cpp" line="114"/>
+        <location filename="../../fwupgradedialog.cpp" line="121"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="97"/>
+        <location filename="../../fwupgradedialog.cpp" line="98"/>
         <source>&lt;center&gt;Not a valid firmware for this device.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Δεν είναι έγκυρο αρχείο firmware για αυτή τη συσκευή.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="113"/>
+        <location filename="../../fwupgradedialog.cpp" line="114"/>
         <source>&lt;center&gt;There was a problem with the downloaded file.&lt;br /&gt;Please try again later.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Υπήρχε πρόβλημα με το αρχείο λήψης.&lt;br /&gt;Παρακαλώ δοκιμάστε ξανά αργότερα.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="120"/>
+        <location filename="../../fwupgradedialog.cpp" line="121"/>
         <source>&lt;center&gt;Unable to save temporary file.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Δεν ήταν δυνατή η αποθήκευση προσωρινού αρχείου.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="127"/>
+        <location filename="../../fwupgradedialog.cpp" line="128"/>
         <source>Ready to install new firmware.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Disclaimer:&lt;/b&gt; ckb-next is not endorsed by Corsair.&lt;br /&gt;This is &lt;i&gt;unlikely&lt;/i&gt; to cause any damage, however the developers of this software do not accept any responsibility in such an event.</source>
         <translation>Έτοιμο για εγκατάσταση νέου firmware.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Αποποίηση ευθυνών:&lt;/b&gt; Το ckb-next δεν υποστηρίζεται από την Corsair.&lt;br /&gt;Η ενημέρωση είναι &lt;i&gt;σχεδόν απίθανο&lt;/i&gt; να προκαλέσει ζημιές, παρ&apos;όλα αυτά οι προγραμματιστές αυτού του λογισμικού δεν αναλαμβάνουν καμία ευθύνη σε τέτοια περίπτωση.</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="157"/>
+        <location filename="../../fwupgradedialog.cpp" line="158"/>
         <source>Update successful!</source>
         <translation>Η ενημέρωση ολοκληρώθηκε με επιτυχία!</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="159"/>
+        <location filename="../../fwupgradedialog.cpp" line="160"/>
         <source>Update failed.</source>
         <translation>Η ενημέρωση απέτυχε.</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="160"/>
+        <location filename="../../fwupgradedialog.cpp" line="161"/>
         <source>OK</source>
         <translation>Εντάξει</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="185"/>
+        <location filename="../../fwupgradedialog.cpp" line="186"/>
         <source>Please wait</source>
         <translation>Παρακαλώ περιμένετε</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="186"/>
+        <location filename="../../fwupgradedialog.cpp" line="187"/>
         <source>Installing firmware...</source>
         <translation>Γίνεται εγκατάσταση firmware...</translation>
     </message>
@@ -1136,6 +1136,54 @@ The binding will not function until winlock has been disabled.</source>
     </message>
 </context>
 <context>
+    <name>KbModeEventMgr</name>
+    <message>
+        <location filename="../../kbmodeeventmgr.ui" line="17"/>
+        <source>Mode Event Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbmodeeventmgr.ui" line="32"/>
+        <source>WARNING: Only windows under XWayland will be detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbmodeeventmgr.ui" line="101"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbmodeeventmgr.ui" line="121"/>
+        <source>Add</source>
+        <translation type="unfinished">Προσθήκη</translation>
+    </message>
+    <message>
+        <location filename="../../kbmodeeventmgr.ui" line="128"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbmodeeventmgr.ui" line="135"/>
+        <source>Clear</source>
+        <translation type="unfinished">Εκκαθάριση</translation>
+    </message>
+    <message>
+        <location filename="../../kbmodeeventmgr.ui" line="172"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Ακύρωση</translation>
+    </message>
+    <message>
+        <location filename="../../kbmodeeventmgr.ui" line="185"/>
+        <source>OK</source>
+        <translation type="unfinished">Εντάξει</translation>
+    </message>
+    <message>
+        <location filename="../../kbmodeeventmgr.cpp" line="20"/>
+        <source>Switch to mode &quot;%1&quot; when:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>KbProfileDialog</name>
     <message>
         <source>Keyboard Profiles</source>
@@ -1333,292 +1381,374 @@ An attempt will be made to import as many as possible.</source>
 <context>
     <name>KbWidget</name>
     <message>
-        <location filename="../../kbwidget.ui" line="58"/>
+        <location filename="../../kbwidget.ui" line="174"/>
         <source>Lighting</source>
         <translation>Φωτισμός</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="98"/>
+        <location filename="../../kbwidget.ui" line="214"/>
         <source>Tip: Drag+drop items to reorder. Right-click for menu.</source>
         <translation>Συμβουλή: Μεταφορά και απόθεση αντικειμένων για αναδιάταξη. Δεξί κλικ για μενού.</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="106"/>
+        <location filename="../../kbwidget.ui" line="222"/>
         <source>Binding</source>
         <translation>Συσχέτιση Πλήκτρων</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="138"/>
-        <location filename="../../kbwidget.ui" line="160"/>
+        <location filename="../../kbwidget.ui" line="254"/>
+        <location filename="../../kbwidget.ui" line="276"/>
         <source>Performance</source>
         <translation>Απόδοση</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="182"/>
-        <location filename="../../kbwidget.ui" line="306"/>
+        <location filename="../../kbwidget.ui" line="298"/>
+        <location filename="../../kbwidget.ui" line="422"/>
         <source>Device</source>
         <translation>Συσκευή</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="413"/>
+        <location filename="../../kbwidget.ui" line="529"/>
         <source>Poll rate:</source>
         <translation>Poll rate:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="376"/>
+        <location filename="../../kbwidget.ui" line="492"/>
         <source>Firmware version:</source>
         <translation>Έκδοση Firmware:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="203"/>
-        <location filename="../../kbwidget.ui" line="232"/>
+        <location filename="../../kbwidget.ui" line="319"/>
+        <location filename="../../kbwidget.ui" line="348"/>
         <source>N/A</source>
         <translation>Άγνωστο</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="385"/>
-        <location filename="../../kbwidget.cpp" line="433"/>
+        <location filename="../../kbwidget.ui" line="501"/>
+        <location filename="../../kbwidget.cpp" line="351"/>
         <source>Check for updates</source>
         <translation>Έλεγχος για ενημερώσεις</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="363"/>
+        <location filename="../../kbwidget.ui" line="479"/>
         <source>Status:</source>
         <translation>Κατάσταση:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="261"/>
+        <location filename="../../kbwidget.ui" line="377"/>
         <source>Serial Number:</source>
         <translation>Σειριακός Αριθμός:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="334"/>
+        <location filename="../../kbwidget.ui" line="450"/>
         <source>Default</source>
         <translation>Προεπιλεγμένο</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="268"/>
+        <location filename="../../kbwidget.ui" line="384"/>
         <source>Layout:</source>
         <translation>Διάταξη:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="508"/>
+        <location filename="../../kbwidget.ui" line="54"/>
         <source>Save to hardware</source>
         <translation>Αποθήκευση στη συσκευή</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="78"/>
+        <location filename="../../kbwidget.cpp" line="82"/>
         <source>Saving to hardware is not supported on this device.</source>
         <translation>Δεν υποστηρίζεται η αποθήκευση στη συγκεκριμένη συσκευή.</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="141"/>
+        <location filename="../../kbwidget.cpp" line="145"/>
         <source>This device does not support setting the poll rate through software.</source>
         <translation>Αυτή η συσκευή δεν υποστηρίζει ρύθμιση του poll rate μέσω του λογισμικού.</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="170"/>
+        <location filename="../../kbwidget.cpp" line="173"/>
         <source>Manage profiles...</source>
         <translation>Διαχείριση προφίλ...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="223"/>
         <source>New mode...</source>
-        <translation>Νέο mode...</translation>
+        <translation type="vanished">Νέο mode...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="329"/>
+        <location filename="../../kbwidget.cpp" line="231"/>
         <source>Rename...</source>
         <translation>Μετονομασία...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="330"/>
+        <location filename="../../kbwidget.cpp" line="232"/>
         <source>Duplicate</source>
         <translation>Δημιουργία διπλότυπου</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="331"/>
+        <location filename="../../kbwidget.cpp" line="233"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="336"/>
+        <location filename="../../kbwidget.cpp" line="238"/>
         <source>Move Up</source>
         <translation>Μετακίνηση Πάνω</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="339"/>
+        <location filename="../../kbwidget.cpp" line="244"/>
         <source>Move Down</source>
         <translation>Μετακίνηση Κάτω</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="361"/>
+        <location filename="../../kbwidget.cpp" line="273"/>
         <source>Delete mode</source>
         <translation>Διαγραφή mode</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="361"/>
+        <location filename="../../kbwidget.cpp" line="273"/>
         <source>Are you sure you want to delete this mode?</source>
         <translation>Είστε σίγουροι ότι θέλετε να διαγράψετε αυτό το mode;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="438"/>
+        <location filename="../../kbwidget.cpp" line="356"/>
         <source>Up to date</source>
         <translation>Ενημερωμένο</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="440"/>
+        <location filename="../../kbwidget.cpp" line="358"/>
         <source>Upgrade to v%1</source>
         <translation>Αναβάθμιση στην έκδοση %1</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="457"/>
+        <location filename="../../kbwidget.cpp" line="375"/>
         <source>Checking...</source>
         <translation>Γίνεται έλεγχος...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="465"/>
-        <location filename="../../kbwidget.cpp" line="468"/>
-        <location filename="../../kbwidget.cpp" line="472"/>
+        <location filename="../../kbwidget.cpp" line="383"/>
+        <location filename="../../kbwidget.cpp" line="386"/>
+        <location filename="../../kbwidget.cpp" line="390"/>
         <source>Firmware update</source>
         <translation>Ενημέρωση firmware</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="465"/>
+        <location filename="../../kbwidget.cpp" line="383"/>
         <source>&lt;center&gt;There is a new firmware available for this device.&lt;br /&gt;However, it requires a newer version of ckb-next.&lt;br /&gt;Please upgrade ckb-next and try again.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Υπάρχει καινούργιο firmware διαθέσιμο για αυτή τη συσκευή.&lt;br /&gt;Ωστόσο, απαιτεί μια νεότερη έκδοση του ckb-next.&lt;br /&gt;Παρακαλώ ενημερώστε το ckb-next και δοκιμάστε ξανά.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="468"/>
+        <location filename="../../kbwidget.cpp" line="386"/>
         <source>&lt;center&gt;There was a problem getting the status for this device.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Υπήρξε πρόβλημα λήψης πληροφοριών για τη συσκευή.&lt;br /&gt;Θα θέλατε να επιλέξετε ένα αρχείο;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="472"/>
+        <location filename="../../kbwidget.cpp" line="390"/>
         <source>&lt;center&gt;Your firmware is already up to date.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Το firmware είναι ήδη ενημερωμένο.&lt;br /&gt;Θα θέλατε να επιλέξετε ένα αρχείο;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="484"/>
+        <location filename="../../kbwidget.cpp" line="402"/>
         <source>Select firmware file</source>
         <translation>Επιλογή αρχείου firmware</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="484"/>
+        <location filename="../../kbwidget.cpp" line="402"/>
         <source>Firmware blobs (*.bin)</source>
         <translation>Αρχεία firmware (*.bin)</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="489"/>
+        <location filename="../../kbwidget.cpp" line="407"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="489"/>
+        <location filename="../../kbwidget.cpp" line="407"/>
         <source>&lt;center&gt;File could not be read.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Δεν ήταν δυνατή η ανάγνωση του αρχείου.&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
+    <name>KbWindowInfoModel</name>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="5"/>
+        <source>Case Sensitive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="6"/>
+        <source>Case Insensitive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="7"/>
+        <source>OR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="8"/>
+        <source>AND</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="9"/>
+        <source>is</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="10"/>
+        <source>contains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="11"/>
+        <source>starts with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="12"/>
+        <source>ends with</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="13"/>
+        <source>Window Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="14"/>
+        <source>Program Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="15"/>
+        <source>Instance Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="16"/>
+        <source>Class Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="166"/>
+        <source>Click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="169"/>
+        <source>Click Click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="172"/>
+        <source>Click Click Click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwindowinfomodel.cpp" line="175"/>
+        <source>Good Job! Have a cookie 🍪</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>KeyAction</name>
     <message>
-        <location filename="../../keyaction.cpp" line="95"/>
+        <location filename="../../keyaction.cpp" line="97"/>
         <source>Unbound</source>
         <translation>Μη συσχετισμένο</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="102"/>
-        <location filename="../../keyaction.cpp" line="164"/>
+        <location filename="../../keyaction.cpp" line="104"/>
+        <location filename="../../keyaction.cpp" line="166"/>
         <source>(Unknown)</source>
         <translation>(Άγνωστο)</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="110"/>
+        <location filename="../../keyaction.cpp" line="112"/>
         <source>Switch to previous mode</source>
         <translation>Αλλαγή στο προηγούμενο mode</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="113"/>
+        <location filename="../../keyaction.cpp" line="115"/>
         <source>Switch to next mode</source>
         <translation>Αλλαγή στο επόμενο mode</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="115"/>
+        <location filename="../../keyaction.cpp" line="117"/>
         <source>Switch to mode %1</source>
         <translation>Αλλαγή στο mode %1</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="122"/>
+        <location filename="../../keyaction.cpp" line="124"/>
         <source>DPI cycle up</source>
         <translation>DPI Πάνω (αναδίπλωση)</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="124"/>
+        <location filename="../../keyaction.cpp" line="126"/>
         <source>DPI cycle down</source>
         <translation>DPI Κάτω (αναδίπλωση)</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="126"/>
+        <location filename="../../keyaction.cpp" line="128"/>
         <source>DPI up</source>
         <translation>DPI Πάνω</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="128"/>
+        <location filename="../../keyaction.cpp" line="130"/>
         <source>DPI down</source>
         <translation>DPI Κάτω</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="130"/>
+        <location filename="../../keyaction.cpp" line="132"/>
         <source>Sniper</source>
         <translation>Sniper</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="134"/>
+        <location filename="../../keyaction.cpp" line="136"/>
         <source>DPI: %1, %2</source>
         <translation>DPI: %1, %2</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="137"/>
+        <location filename="../../keyaction.cpp" line="139"/>
         <source>DPI stage %1</source>
         <translation>Επίπεδο DPI %1</translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="143"/>
+        <location filename="../../keyaction.cpp" line="145"/>
         <source>Brightness up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="146"/>
+        <location filename="../../keyaction.cpp" line="148"/>
         <source>Brightness down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="151"/>
+        <location filename="../../keyaction.cpp" line="153"/>
         <source>Toggle Windows lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="153"/>
+        <location filename="../../keyaction.cpp" line="155"/>
         <source>Windows lock on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="155"/>
+        <location filename="../../keyaction.cpp" line="157"/>
         <source>Windows lock off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="158"/>
+        <location filename="../../keyaction.cpp" line="160"/>
         <source>Start animation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="160"/>
+        <location filename="../../keyaction.cpp" line="162"/>
         <source>Launch program</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="162"/>
+        <location filename="../../keyaction.cpp" line="164"/>
         <source>Send G-key macro</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1835,12 +1965,12 @@ An attempt will be made to import as many as possible.</source>
         <translation>Σχετικά</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="131"/>
+        <location filename="../../mainwindow.cpp" line="135"/>
         <source>Restore</source>
         <translation>Επαναφορά</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="132"/>
+        <location filename="../../mainwindow.cpp" line="136"/>
         <source>Quit</source>
         <translation>Έξοδος</translation>
     </message>
@@ -1849,93 +1979,93 @@ An attempt will be made to import as many as possible.</source>
         <translation type="vanished">Μονόχρωμο Εικονίδιο</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="160"/>
+        <location filename="../../mainwindow.cpp" line="162"/>
         <source>Settings</source>
         <translation>Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="168"/>
+        <location filename="../../mainwindow.cpp" line="170"/>
         <source>The ckb-next daemon is not running. This program will &lt;b&gt;not&lt;/b&gt; work without it!</source>
         <translation>Το ckb-next-daemon δεν τρέχει. Αυτό το πρόγραμμα &lt;b&gt;δεν&lt;/b&gt; θα λειτουργήσει χωρίς αυτό!</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="170"/>
+        <location filename="../../mainwindow.cpp" line="172"/>
         <source>Start it once with:</source>
         <translation>Εκκινήστε το μια φορά με:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="172"/>
+        <location filename="../../mainwindow.cpp" line="174"/>
         <source>Enable it for every boot:</source>
         <translation>Ενεργοποιήστε το για κάθε εκκίνηση:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="175"/>
+        <location filename="../../mainwindow.cpp" line="177"/>
         <source>Start and enable it with:</source>
         <translation>Εκκινήστε και ενεργοποιήστε το με:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="201"/>
+        <location filename="../../mainwindow.cpp" line="203"/>
         <source>The ckb-next daemon is not running.</source>
         <translation>Το ckb-next-daemon δεν τρέχει.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="286"/>
+        <location filename="../../mainwindow.cpp" line="293"/>
         <source>Driver inactive</source>
         <translation>Ο driver είναι αδρανής</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="293"/>
+        <location filename="../../mainwindow.cpp" line="300"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Ασυμφωνία έκδοσης του driver (</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="293"/>
+        <location filename="../../mainwindow.cpp" line="300"/>
         <source>). Please upgrade ckb-next</source>
         <translation>). Παρακαλώ ενημερώστε το ckb-next</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="293"/>
+        <location filename="../../mainwindow.cpp" line="300"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation>.&lt;br /&gt;Αν το πρόβλημα παραμένει, επανεκκινήστε το σύστημά σας.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="304"/>
+        <location filename="../../mainwindow.cpp" line="311"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Ποσοχή:&lt;/b&gt; Η επέκταση από &quot;Fumihiko Takayama&quot; δεν επιτρέπεται στο Ασφάλεια και απόρρητο. Επιτρέψτε το και επανασυνδέστε τις συσκευές.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="306"/>
+        <location filename="../../mainwindow.cpp" line="313"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Σιγουρευτείτε ότι το ckb-next-daemon επιτρέπεται στο Ασφάλεια και απόρρητο -&gt; Παρακολούθησή εισόδου.&lt;/br /&gt;Παρακαλώ επιτρέψτε μέχρι 10 δευτερόλεπτα μέχρι να εμφανιστεί η ειδοποίηση ενεργοποιήσης του daemon.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="316"/>
+        <location filename="../../mainwindow.cpp" line="323"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Δεν ήταν δυνατό να φορτωθεί το άρθρωμα πυρήνα uinput. Αν αυτο το πρόβλημα παραμένει μετά από επανεκκίνηση, μεταγλωττίστε πυρήνα με CONFIG_INPUT_UINPUT=y.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="319"/>
+        <location filename="../../mainwindow.cpp" line="326"/>
         <source>No devices connected</source>
         <translation>Δεν υπάρχουν συνδεδεμένες συσκευές</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="322"/>
+        <location filename="../../mainwindow.cpp" line="329"/>
         <source>1 device connected</source>
         <translation>1 συσκευή συνδεδεμένη</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="324"/>
+        <location filename="../../mainwindow.cpp" line="331"/>
         <source>%1 devices connected</source>
         <translation>%1 συσκευές συνδεδεμένες</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="355"/>
+        <location filename="../../mainwindow.cpp" line="362"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation>Υπάρχει νέο firmware για το %1 σας (v%2) Θα θέλατε να το εγκαταστήσετε τώρα;</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="371"/>
+        <location filename="../../mainwindow.cpp" line="378"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
@@ -1944,14 +2074,22 @@ or click &quot;Quit&quot; on the Settings screen.</source>
 ή κάντε κλικ στο &quot;Έξοδος&quot; στο παράθυρο ρυθμίσεων.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="526"/>
+        <location filename="../../mainwindow.cpp" line="537"/>
         <source>Update to v</source>
         <translation>Ενημέρωση στο v</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="531"/>
+        <location filename="../../mainwindow.cpp" line="542"/>
         <source>Up to date</source>
         <translation>Ενημερωμένο</translation>
+    </message>
+</context>
+<context>
+    <name>ModeListTableModel</name>
+    <message>
+        <location filename="../../modelisttablemodel.cpp" line="76"/>
+        <source>New mode...</source>
+        <translation type="unfinished">Νέο mode...</translation>
     </message>
 </context>
 <context>
@@ -2284,7 +2422,7 @@ or click &quot;Quit&quot; on the Settings screen.</source>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1567"/>
-        <location filename="../../rebindwidget.cpp" line="807"/>
+        <location filename="../../rebindwidget.cpp" line="809"/>
         <source>Start Recording</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2432,7 +2570,7 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="vanished">Άγνωστη κατάσταση στο RebindWidget::helpStatus (%1)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="456"/>
+        <location filename="../../rebindwidget.cpp" line="458"/>
         <source>Key %1 (%2) is pressed but never released.
 This will result in the key being pressed by the macro until you manually press the key itself and release it.
 
@@ -2440,7 +2578,7 @@ Are you sure you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="459"/>
+        <location filename="../../rebindwidget.cpp" line="461"/>
         <source>Key %1 (%2) is released but never pressed.
 This will have no observable effect unless the key is held down manually or by another macro.
 
@@ -2448,50 +2586,50 @@ Are you sure you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="462"/>
+        <location filename="../../rebindwidget.cpp" line="464"/>
         <source>Macro warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="808"/>
+        <location filename="../../rebindwidget.cpp" line="810"/>
         <source>Click Apply or manually edit the events.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="846"/>
+        <location filename="../../rebindwidget.cpp" line="848"/>
         <source>Unknown key combination pressed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="846"/>
+        <location filename="../../rebindwidget.cpp" line="848"/>
         <source>An unknown key combination (%1, %2) has been pressed.
 Make sure your keyboard layout is set to English - United States while recording macros.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="856"/>
+        <location filename="../../rebindwidget.cpp" line="858"/>
         <source>Stop Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="857"/>
+        <location filename="../../rebindwidget.cpp" line="859"/>
         <source>Type your macro and press Stop Recording when finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="864"/>
+        <location filename="../../rebindwidget.cpp" line="866"/>
         <source>Click Start Recording or manually edit the events.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="932"/>
+        <location filename="../../rebindwidget.cpp" line="934"/>
         <source>&quot;Record from all keyboards&quot; is only recommended if you do not have a keyboard managed by ckb-next.
 It currently only functions with an English - United States keyboard layout.
 Make sure your keyboard is switched to it before recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="935"/>
+        <location filename="../../rebindwidget.cpp" line="937"/>
         <source>Record from all keyboards</source>
         <translation type="unfinished"></translation>
     </message>

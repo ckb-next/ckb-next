@@ -34,7 +34,8 @@ static inline void setUiElementsEnabled(Ui::RebindWidget* const ui, const bool e
 RebindWidget::RebindWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RebindWidget),
-    bind(nullptr), profile(nullptr), macroReader(nullptr), leftMouseClicked(false)
+    bind(nullptr), profile(nullptr), macroReader(nullptr), leftMouseClicked(false),
+    macroDelegate(new MacroDropdownDelegate)
 {
     ui->setupUi(this);
     ui->lightWrapBox->hide();
@@ -87,7 +88,7 @@ RebindWidget::RebindWidget(QWidget *parent) :
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &RebindWidget::tabChanged);
     ui->tableView->setModel(&macroLines);
     ui->tableView->setColumnWidth(0, 24);
-    ui->tableView->setItemDelegateForColumn(0, new MacroDropdownDelegate);
+    ui->tableView->setItemDelegateForColumn(0, macroDelegate);
     connect(ui->tableView->verticalScrollBar(), &QScrollBar::rangeChanged, this, [this](int min, int max){
         ui->tableView->verticalScrollBar()->setValue(max);
     });
@@ -112,6 +113,7 @@ RebindWidget::~RebindWidget(){
         macroReader->deleteLater();
     }
     delete ui;
+    delete macroDelegate;
 }
 
 void RebindWidget::setBind(KbBind* newBind, KbProfile* newProfile){

@@ -571,8 +571,6 @@ void Kb::readNotify(QString line){
         }
         hwProfile(newProfile);
         emit profileAdded();
-        if(_hwProfile == _currentProfile)
-            emit profileChanged();
     } else if(components[0] == "hwprofilename"){
         // Hardware profile name
         QString name = QUrl::fromPercentEncoding(components[1].toUtf8());
@@ -649,8 +647,6 @@ void Kb::readNotify(QString line){
             if(!(oldName.length() >= name.length() && oldName.left(name.length()) == name)){
                 // Don't change the name if it's a truncated version of what we already have
                 hwMode->name(name);
-                if(_hwProfile == _currentProfile)
-                    emit modeRenamed();
             }
         } else if(components[2] == "hwrgb"){
             // RGB - set mode lighting
@@ -795,26 +791,20 @@ KeyMap Kb::getKeyMap(){
     return KeyMap(_model, _layout);
 }
 
-void Kb::setCurrentProfile(KbProfile *profile, bool spontaneous){
+void Kb::setCurrentProfile(KbProfile* profile){
     while(profile->modeCount() < hwModeCount)
         profile->append(new KbMode(this, getKeyMap()));
-    KbMode* mode = profile->currentMode();
-    if(!mode)
-        profile->currentMode(mode = profile->modes().first());
-    setCurrentMode(profile, mode, spontaneous);
+
+    emit profileAboutToChange();
+    _currentProfile = profile;
+    emit profileChanged();
+    setCurrentMode(profile->currentMode());
 }
 
-void Kb::setCurrentMode(KbProfile* profile, KbMode* mode, bool spontaneous){
-    if(_currentProfile != profile){
-        _currentProfile = profile;
-        _needsSave = true;
-        emit profileChanged();
-    }
-    if(_currentMode != mode || _currentProfile->currentMode() != mode){
-        _currentProfile->currentMode(_currentMode = mode);
-        _needsSave = true;
-        emit modeChanged(spontaneous);
-    }
+void Kb::setCurrentMode(KbMode* mode){
+    _currentProfile->currentMode(_currentMode = mode);
+    _needsSave = true;
+    emit modeChanged();
     mode->light()->forceFrameUpdate();
 }
 

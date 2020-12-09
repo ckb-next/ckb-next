@@ -7,6 +7,7 @@
 #include <ckbnextconfig.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 // usb.c
 extern _Atomic int reset_stop;
@@ -45,33 +46,36 @@ static void quit() {
     usbkill();
 }
 
+static inline void safe_write(const char* const str) {
+    int unused_result = write(1, str, strlen(str));
+    // cast unused result to void to silence over-eager
+    // warning about unused variables:
+    // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
+    (void) unused_result;
+}
+
 ///
 /// \brief ignore_signal
 /// Nested signal handler for previously received signals.
 /// \param type received signal type
 void ignore_signal(int type){
     // Use signal-safe(7) write(3) call to print warning
-    int unused_result = write(1, "\n[W] Ignoring signal ", 22);
+    safe_write("\n[W] Ignoring signal ");
     switch (type) {
         case SIGTERM:
-            unused_result = write(1, "SIGTERM", 7);
+            safe_write("SIGTERM");
             break;
         case SIGINT:
-            unused_result = write(1, "SIGINT", 6);
+            safe_write("SIGINT");
             break;
         case SIGQUIT:
-            unused_result = write(1, "SIGQUIT", 7);
+            safe_write("SIGQUIT");
             break;
         default:
-            unused_result = write(1, "UNKNOWN", 7);
+            safe_write("UNKNOWN");
             break;
     }
-    unused_result = write(1, " (already shutting down)\n", 27);
-
-    // cast unused result to void to silence over-eager
-    // warning about unused variables:
-    // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
-    (void) unused_result;
+    safe_write(" (already shutting down)\n");
 }
 
 ///
@@ -107,8 +111,7 @@ void sighandler(int type){
 
 #ifdef OS_LINUX
 void nullhandler(int s){
-    int unused_result = write(1, "[I] Caught internal signal SIGUSR2\n", 35);
-    (void) unused_result;
+    safe_write("[I] Caught internal signal SIGUSR2\n");
 }
 #endif
 
@@ -205,7 +208,7 @@ int main(int argc, char** argv){
     for(int i = 1; i < argc; i++){
         char* argument = argv[i];
         unsigned newgid;
-        char hwload[7];
+        char hwload[8];
         ushort vid, pid;
         if(sscanf(argument, "--gid=%u", &newgid) == 1){
             // Set dev node GID
@@ -219,7 +222,7 @@ int main(int argc, char** argv){
             // Disable key notifications
             features_mask &= ~FEAT_NOTIFY;
             ckb_info_nofile("Key notifications are disabled");
-        } else if(sscanf(argument, "--hwload=%6s", hwload) == 1){
+        } else if(sscanf(argument, "--hwload=%7s", hwload) == 1){
             if(!strcmp(hwload, "always") || !strcmp(hwload, "yes") || !strcmp(hwload, "y") || !strcmp(hwload, "a")){
                 hwload_mode = 2;
                 ckb_info_nofile("Setting hardware load: always");

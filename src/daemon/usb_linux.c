@@ -836,12 +836,29 @@ static time_t get_clock_monotonic_seconds() {
     return timespec_var.tv_sec;
 }
 
+static const struct timespec sleep_wait = { .tv_sec = 2 };
+static const struct timespec sleep_wait_cal = { .tv_sec = 1 };
+
 void* suspend_check() {
     time_t prev_time = get_clock_monotonic_seconds();
     if(!prev_time)
         return NULL;
+
+    // Check if we're dealing with an unreliable sleep
+    for(int i = 0; i < 5; i++){
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_wait_cal, NULL);
+        time_t current_time = get_clock_monotonic_seconds();
+        // Add 1 second extra to make sure
+        if(prev_time + 3 < current_time){
+            ckb_err("Unreliable timer detected. Will not reactivate devices automatically after suspend.");
+            return NULL;
+        }
+        prev_time = current_time;
+    }
+    
+    ckb_info("Sleep timer test passed");
     while(suspend_run){
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 2}, NULL);
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_wait, NULL);
         time_t current_time = get_clock_monotonic_seconds(NULL);
 
         if(prev_time + 4 < current_time)

@@ -1,6 +1,7 @@
 #include "kbwindowinfomodel.h"
 #include "kbwindowinfo.h"
 #include <QMimeData>
+#include <algorithm>
 
 QString KbWindowInfoModel::caseSensitiveStr = tr("Case Sensitive");
 QString KbWindowInfoModel::caseInsensitiveStr = tr("Case Insensitive");
@@ -127,7 +128,14 @@ bool KbWindowInfoModel::setData(const QModelIndex& index, const QVariant& value,
         wininfo->items[row].item = value.toString();
         break;
     case COL_CASE_INSENSITIVE:
+#if QT_VERSION < QT_VERSION_CHECK(5, 7, 0)
+        if(value.toInt() == 1)
+            wininfo->items[row].flags |= KbWindowInfo::MATCH_CASE_INSENSITIVE;
+        else
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_CASE_INSENSITIVE;
+#else
         wininfo->items[row].flags.setFlag(KbWindowInfo::MATCH_CASE_INSENSITIVE, value.toInt() == 1);
+#endif
         break;
     case COL_MATCH_TYPE:
         wininfo->items[row].type = static_cast<KbWindowInfo::MatchType>(value.toInt());
@@ -137,9 +145,29 @@ bool KbWindowInfoModel::setData(const QModelIndex& index, const QVariant& value,
         break;
     case COL_VERB: {
         const int val = value.toInt();
+#if QT_VERSION < QT_VERSION_CHECK(5, 7, 0)
+        if(val == 1) {
+            wininfo->items[row].flags |= KbWindowInfo::MATCH_SUBSTRING;
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_STARTS_WITH;
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_ENDS_WITH;
+        } else if(val == 2) {
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_SUBSTRING;
+            wininfo->items[row].flags |= KbWindowInfo::MATCH_STARTS_WITH;
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_ENDS_WITH;
+        } else if(val == 3) {
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_SUBSTRING;
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_STARTS_WITH;
+            wininfo->items[row].flags |= KbWindowInfo::MATCH_ENDS_WITH;
+        } else {
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_SUBSTRING;
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_STARTS_WITH;
+            wininfo->items[row].flags &= ~KbWindowInfo::MATCH_ENDS_WITH;
+        }
+#else
         wininfo->items[row].flags.setFlag(KbWindowInfo::MATCH_SUBSTRING, val == 1);
         wininfo->items[row].flags.setFlag(KbWindowInfo::MATCH_STARTS_WITH, val == 2);
         wininfo->items[row].flags.setFlag(KbWindowInfo::MATCH_ENDS_WITH, val == 3);
+#endif
         break;
     }
     default:
@@ -209,7 +237,15 @@ bool KbWindowInfoModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
         return false;
 
     emit layoutAboutToBeChanged();
+#if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
+    QVector<KbWindowInfo::MatchPair>::iterator iter = wininfo->items.begin();
+    if (srcrow < dstrow)
+        std::rotate(iter + srcrow, iter + srcrow + 1, iter + dstrow + 1);
+    else
+        std::rotate(iter + dstrow, iter + srcrow, iter + srcrow + 1);
+#else
     wininfo->items.move(srcrow, dstrow);
+#endif
     emit layoutChanged();
 
     return true;

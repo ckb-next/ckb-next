@@ -1,6 +1,7 @@
 #include "ckbsettings.h"
 #include "kbwindowinfo.h"
 #include "kbmode.h"
+#include <typeinfo>
 
 KbWindowInfo::KbWindowInfo(KbMode* parent) :
     QObject(parent), items(), enabled(false)

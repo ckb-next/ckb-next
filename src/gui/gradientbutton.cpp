@@ -86,7 +86,12 @@ QString GradientButton::toString() const {
         const QColor& color = stop.second;
         // "%d:%02x%02x%02x%02x"
         out << static_cast<int>(round(stop.first * 100.f)) << ':'
-            << qSetFieldWidth(2) << qSetPadChar('0') << hex
+            << qSetFieldWidth(2) << qSetPadChar('0') <<
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+               hex
+#else
+               Qt::hex
+#endif
             << color.alpha() << color.red() << color.green() << color.blue();
         result << string;
     }

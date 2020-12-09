@@ -91,7 +91,13 @@ void XWindowDetector::fetchNewWinInfo(xcb_window_t win, xcb_ewmh_connection_t* e
         }
 
         // Get WM_CLASS
-        wm_class = xcbGetString(conn, win, XCB_ATOM_WM_CLASS, XCB_ATOM_STRING).split(QChar('\0'),QString::SkipEmptyParts);
+        wm_class = xcbGetString(conn, win, XCB_ATOM_WM_CLASS, XCB_ATOM_STRING).split(QChar('\0'),
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+                                                                                     QString::SkipEmptyParts
+#else
+                                                                                     Qt::SkipEmptyParts
+#endif
+                                                                                     );
 
         // Get _NET_WM_NAME using EWMH
         xcb_ewmh_get_utf8_strings_reply_t _net_wm_name;

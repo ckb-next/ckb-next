@@ -80,6 +80,16 @@ public:
     void        setValue(const QString& key, const QVariant& value);
     void        remove(const QString& key);
 
+    // Use Native format on Linux. It is ini but the file extension is .conf
+    // Everything else is going to be ini
+    static const QSettings::Format Format =
+#ifdef Q_OS_LINUX
+            QSettings::NativeFormat;
+#else
+            QSettings::IniFormat;
+#endif
+
+
 private:
     QSettings* backing;
     QStringList groups;

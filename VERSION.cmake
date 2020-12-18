@@ -7,3 +7,6 @@ set(ckb-next_VERSION_IS_RELEASE FALSE)
 
 # Profile format version
 set(ckb-next_PROFILE_VER 2)
+
+# Settings version
+set(ckb-next_SETTINGS_VER 1)

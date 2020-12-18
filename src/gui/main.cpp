@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <QTranslator>
 #include "compat/qrand.h"
+#include <QMessageBox>
 
 QSharedMemory appShare("ckb-next");
 
@@ -195,7 +196,11 @@ bool checkIfQtCreator(){
     return false;
 }
 
+static const quint16 settingsVersion = CKB_NEXT_SETTINGS_VER;
+
 int main(int argc, char *argv[]){
+QSettings::setDefaultFormat(CkbSettings::Format);
+
 #ifdef Q_OS_LINUX
     // Get rid of "-session" before Qt parses the arguments
     for(int i = 0; i < argc; i++){
@@ -209,14 +214,12 @@ int main(int argc, char *argv[]){
     }
 #endif
 
+    QSettings* tmpSettings = new QSettings(CkbSettings::Format, QSettings::UserScope, "ckb-next", "ckb-next");
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     // Explicitly request high dpi scaling if desired
     // Needs to be called before QApplication is constructed
-    {
-        QSettings tmp("ckb-next", "ckb-next");
-        if(tmp.value("Program/HiDPI", false).toBool())
-            QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    }
+    if(tmpSettings->value("Program/HiDPI", false).toBool())
+        QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
     // Setup main application
@@ -226,6 +229,21 @@ int main(int argc, char *argv[]){
     QTranslator translator;
     if(translator.load(QLocale(), "", "", ":/translations"))
         a.installTranslator(&translator);
+
+    const quint16 currentSettingsVersion = tmpSettings->value("Program/SettingsVersion", 0).toInt();
+    if(currentSettingsVersion && currentSettingsVersion > CKB_NEXT_SETTINGS_VER){
+        if(QMessageBox::warning(nullptr, QObject::tr("Downgrade Warning"),
+                                QObject::tr("Downgrading ckb-next will lead to profile data loss. "
+                                            "It is recommended to click Cancel and update to the latest version.<br><br>"
+                                            "If you wish to continue, back up the settings file located at<blockquote>%1</blockquote>and click OK.").arg(tmpSettings->fileName()),
+                                QMessageBox::Ok, QMessageBox::Cancel)
+                == QMessageBox::Cancel){
+            delete tmpSettings;
+            tmpSettings = nullptr;
+            return 0;
+        }
+    }
+    tmpSettings->setValue("Program/SettingsVersion", CKB_NEXT_SETTINGS_VER);
 
     // Setup names and versions
     QCoreApplication::setOrganizationName("ckb-next");
@@ -307,18 +325,14 @@ int main(int argc, char *argv[]){
         break;
     }
 
-    {
-        QSettings tmp;
-        startDelay |= tmp.value("Program/StartDelay", false).toBool();
-    }
+    startDelay |= tmpSettings->value("Program/StartDelay", false).toBool();
+    delete tmpSettings;
+    tmpSettings = nullptr;
 
     if(startDelay)
         QThread::sleep(5);
 
 #ifdef Q_OS_MACOS
-    // Force ini on mac, as there is data loss with the native format
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-
     disableAppNap();
 
     FILE *fp = fopen("/tmp/ckb", "w");

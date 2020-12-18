@@ -196,8 +196,6 @@ bool checkIfQtCreator(){
     return false;
 }
 
-static const quint16 settingsVersion = CKB_NEXT_SETTINGS_VER;
-
 int main(int argc, char *argv[]){
 QSettings::setDefaultFormat(CkbSettings::Format);
 

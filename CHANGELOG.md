@@ -1,5 +1,44 @@
 # Change Log
 
+## [v0.4.3](https://github.com/ckb-next/ckb-next/tree/v0.4.3) (2020-12-18)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.2...v0.4.3)
+
+PLEASE NOTE: This is the last version of ckb-next to officially support macOS.
+It has been reported to work with Big Sur after disabling SIP.
+https://github.com/ckb-next/ckb-next/issues/660
+ARM Macs are NOT supported.
+
+Support for new devices:
+- Scimitar RGB Elite
+- Nightsword RGB
+
+Important bugfixes:
+- Fixed delay when shutting down with K95 RGB
+- Fixed freezing when updating indicator LEDs
+- Indicator LEDs are now more responsive when an animation is playing
+- GUI now starts hidden in tray on KDE
+- The pipe animation now works consistently between mode changes
+- The pipe animation now handles input commands sent in rapid succession before the device is updated
+- Input works on wayland again after recent updates
+- libgdx based games no longer crash on mouse input
+- Mouse settings are now correctly restored when resuming from suspend
+- Fixed a bug where some devices would not be initialised on daemon start and would require a replug
+- Fixed layouts for K68, K65, K63, M95
+
+New features:
+- Under X11 only, lights can now automatically turn off after a user-set time
+- Macros now loop when the key is held down
+- Macro UI has been redesigned and supports recording from non ckb-next managed keyboards
+- Modes can now be changed automatically based on the current focused application (X11/XWayland Only)
+- Translations are now supported
+
+Notes for packagers:
+- The systemd unit directory can be overriden with -DSYSTEMD_UNIT_INSTALL_DIR
+- libappindicator is no longer used
+- Minimum Qt version has been bumped up to 5.5.1 (xenial)
+- cmake now checks for quazip 1.0
+- The following new dependencies have been introduced: Qt5 X11Extras, xcb, xcb-screensaver, xcb-ewmh, Qt5 translation tools, dbusmenu-qt5
+
 ## [v0.4.2](https://github.com/ckb-next/ckb-next/tree/v0.4.2) (2019-10-08)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.1...v0.4.2)
 

@@ -1510,82 +1510,82 @@ An attempt will be made to import as many as possible.</source>
 <context>
     <name>KbWindowInfoModel</name>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="5"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="6"/>
         <source>Case Sensitive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="6"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="7"/>
         <source>Case Insensitive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="7"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="8"/>
         <source>OR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="8"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="9"/>
         <source>AND</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="9"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="10"/>
         <source>is</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="10"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="11"/>
         <source>contains</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="11"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="12"/>
         <source>starts with</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="12"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="13"/>
         <source>ends with</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="13"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="14"/>
         <source>Window Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="14"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="15"/>
         <source>Program Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="15"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="16"/>
         <source>Instance Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="16"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="17"/>
         <source>Class Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="166"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="194"/>
         <source>Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="169"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="197"/>
         <source>Click Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="172"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="200"/>
         <source>Click Click Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="175"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="203"/>
         <source>Good Job! Have a cookie 🍪</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2048,28 +2048,38 @@ or click &quot;Quit&quot; on the Settings screen.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../main.cpp" line="59"/>
+        <location filename="../../main.cpp" line="60"/>
         <source>Starts in background, without displaying the main window.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="64"/>
+        <location filename="../../main.cpp" line="65"/>
         <source>Causes already running instance (if any) to exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="67"/>
+        <location filename="../../main.cpp" line="68"/>
         <source>Switches to the profile with the specified name on all devices.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="70"/>
+        <location filename="../../main.cpp" line="71"/>
         <source>Switches to the mode either in the current profile, or in the one specified by --profile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="73"/>
+        <location filename="../../main.cpp" line="74"/>
         <source>Delays application start for 5 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../main.cpp" line="233"/>
+        <source>Downgrade Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../main.cpp" line="234"/>
+        <source>Downgrading ckb-next will lead to profile data loss. It is recommended to click Cancel and update to the latest version.&lt;br&gt;&lt;br&gt;If you wish to continue, back up the settings file located at&lt;blockquote&gt;%1&lt;/blockquote&gt;and click OK.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

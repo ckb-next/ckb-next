@@ -808,6 +808,14 @@ void Kb::setCurrentMode(KbMode* mode){
     mode->light()->forceFrameUpdate();
 }
 
+KbProfile* Kb::newProfileWithBlankMode(){
+    KbProfile* p = new KbProfile(this, getKeyMap());
+    KbMode* m = newMode();
+    p->append(m);
+    p->currentMode(m);
+    return p;
+}
+
 KeyMap::Layout Kb::getCurrentLayout(){
     return _layout;
 }

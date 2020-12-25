@@ -85,7 +85,7 @@ void KbProfileDialog::on_profileList_itemClicked(QListWidgetItem *item){
         item->setFont(font);
         item->setIcon(QIcon(":/img/icon_profile.png"));
         // Add the new profile and assign it to this item
-        KbProfile* newProfile = device->newProfile();
+        KbProfile* newProfile = device->newProfileWithBlankMode();
         device->appendProfile(newProfile);
         item->setData(GUID, newProfile->id().guid);
         item->setData(NEW_FLAG, 0);

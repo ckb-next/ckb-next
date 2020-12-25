@@ -76,7 +76,7 @@ public:
     void        setCurrentMode(KbMode* mode);
 
     // Create a new profile/mode. The newly-created object will NOT be inserted into the current profile/mode list.
-    inline KbProfile*   newProfile()                                  { return new KbProfile(this, getKeyMap()); }
+    KbProfile*   newProfileWithBlankMode();
     inline KbProfile*   newProfile(KbProfile* other)                  { return new KbProfile(this, getKeyMap(), *other); }
     inline KbProfile*   newProfile(CkbExternalSettings* settings, QString guid) { return new KbProfile(this, getKeyMap(), *settings, guid); }
     inline KbMode*      newMode()                                     { return new KbMode(this, getKeyMap()); }

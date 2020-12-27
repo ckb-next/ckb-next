@@ -84,7 +84,7 @@ public:
     // Needed for when switching profiles as the daemon wipes the old data on switch
     void forceFrameUpdate();
 
-    void timerDimRestore();
+    int timerDimRestore();
     void timerDim();
 signals:
     void didLoad();

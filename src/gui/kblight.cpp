@@ -10,15 +10,18 @@ static QSet<KbLight*> activeLights;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
     QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0),
-    _timerOrigDimming(0), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false), _timerDimmed(false)
+    _timerOrigDimming(-1), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false),
+    // Init timerDimmed as true in case a new device is initialised before the idle timer ticks to restore the brightness
+    _timerDimmed(true)
 {
     map(keyMap);
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
     QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap),
-    lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _timerOrigDimming(_dimming),
-    _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false), _timerDimmed(false)
+    lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _timerOrigDimming(-1),
+    _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false),
+    _timerDimmed(true)
 {
     map(keyMap);
     // Duplicate animations
@@ -505,10 +508,11 @@ void KbLight::timerDim() {
     dimming(3, false, true);
 }
 
-void KbLight::timerDimRestore() {
-    // Don't try to restore the state if the user changed it
-    if(_timerOrigDimming == _dimming || _dimming != 3 || !_timerDimmed)
-        return;
+int  KbLight::timerDimRestore() {
+    // Don't try to restore the dimming state if the user changed it manually
+    if(_timerOrigDimming == _dimming || _timerOrigDimming == -1 || _dimming != 3 || !_timerDimmed)
+        return _timerOrigDimming;
     _timerDimmed = false;
     dimming(_timerOrigDimming, false, true);
+    return _timerOrigDimming;
 }

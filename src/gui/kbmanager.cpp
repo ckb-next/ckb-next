@@ -1,10 +1,17 @@
 #include "kbmanager.h"
 #include "idletimer.h"
+#include <limits>
 
 #ifndef Q_OS_MACOS
 QString devpath = "/dev/input/ckb%1";
 #else
 QString devpath = "/var/run/ckb%1";
+#endif
+
+#ifdef DEBUG_IDLE_TIMER
+#define IDLE_TIMER_DURATION 5000
+#else
+#define IDLE_TIMER_DURATION (CkbSettings::get("Program/IdleTimerDuration", 5).toInt() * 60000)
 #endif
 
 QString KbManager::_guiVersion, KbManager::_daemonVersion = DAEMON_UNAVAILABLE_STR;
@@ -20,26 +27,33 @@ void KbManager::setIdleTimer(bool enable){
         connect(_idleTimer, &QTimer::timeout, _kbManager, &KbManager::idleTimerTick);
     }
     if(enable)
-        _idleTimer->start(CkbSettings::get("Program/IdleTimerDuration", 5).toInt() * 60000);
+        _idleTimer->start(IDLE_TIMER_DURATION);
     else
         _idleTimer->stop();
 }
 void KbManager::idleTimerTick(){
     // Get user idle time
-    int idle = IdleTimer::getIdleTime();
-    int settingsidle = CkbSettings::get("Program/IdleTimerDuration", 5).toInt() * 60000;
-    int res = settingsidle - idle;
-    if(res > 0)
+    const int idle = IdleTimer::getIdleTime();
+    const int settingsidle = IDLE_TIMER_DURATION;
+    const int devidleres = settingsidle - getLastUsedDeviceIdleTime();
+    int systemidleres = settingsidle - idle;
+    if(systemidleres > 0 || devidleres > 0)
     {
+        if(devidleres > systemidleres)
+            systemidleres = devidleres;
+
         // Turn the lights back on (if applicable)
         foreach(Kb* kb, _devices){
-            kb->currentLight()->timerDimRestore();
+            // Check if the dimming state on this device could actually be restored
+            // If not, skip over it to avoid a failed brightness setting restoration with shared dimming
+            if(kb->currentLight()->timerDimRestore() == -1)
+                continue;
             if(KbLight::shareDimming() != -1)
                 break;
         }
 
         // Reschedule the timer if there's still time left
-        _idleTimer->start(res);
+        _idleTimer->start(systemidleres);
         return;
     }
     // Turn off all the lights
@@ -82,6 +96,20 @@ KbManager::KbManager(QObject *parent) : QObject(parent){
 
     // Scan for keyboards immediately so they show up as soon as the GUI appears.
     QTimer::singleShot(0,this,SLOT(scanKeyboards()));
+}
+
+int KbManager::getLastUsedDeviceIdleTime(){
+    qint64 last = std::numeric_limits<qint64>::max();
+
+    for(const Kb* const dev : _devices){
+        const qint64 cur = dev->getDeviceIdleTime();
+        if(last > cur)
+            last = cur;
+    }
+
+    if(last > INT_MAX)
+        last = INT_MAX;
+    return (int)last;
 }
 
 void KbManager::fps(int framerate){

@@ -5,9 +5,10 @@
 #include <QFile>
 #include <QThread>
 #include "kbprofile.h"
+#include <QElapsedTimer>
+#include <limits>
 
 // Class for managing devices
-
 class Kb : public QThread
 {
     Q_OBJECT
@@ -112,6 +113,10 @@ public:
 
     inline ushort getMaxDpi () {return _maxDpi; }
     void setPollRate(QString poll);
+
+    // The valid check is done because we don't start the timer on purpose in the constructor.
+    // This is done so that when a new device is plugged in while the lights are off, it doesn't suddenly return a really low value and wake everything up.
+    inline qint64 getDeviceIdleTime() const { return (deviceIdleTimer.isValid() ? deviceIdleTimer.elapsed() : std::numeric_limits<qint64>::max()); }
 
     ~Kb();
 
@@ -220,6 +225,8 @@ private:
     // Notification reader, launches as a separate thread and reads from file.
     // (QFile doesn't have readyRead() so there's no other way to do this asynchronously)
     void run();
+
+    QElapsedTimer deviceIdleTimer;
 };
 
 #endif // KB_H

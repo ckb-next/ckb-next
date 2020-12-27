@@ -73,6 +73,7 @@ private:
 #ifdef USE_XCB_SCREENSAVER
     static QTimer* _idleTimer;
 #endif
+    int getLastUsedDeviceIdleTime();
 };
 
 #endif // KBMANAGER_H

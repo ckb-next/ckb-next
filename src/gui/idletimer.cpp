@@ -12,7 +12,7 @@
 
 int IdleTimer::getIdleTime(){
     xcb_connection_t* conn = QX11Info::connection();
-    int display = QX11Info::appScreen();
+    const int display = QX11Info::appScreen();
 
     xcb_screensaver_query_info_cookie_t replyCookie = xcb_screensaver_query_info(conn, QX11Info::appRootWindow(display));
     xcb_screensaver_query_info_reply_t* replyInfo = xcb_screensaver_query_info_reply(conn, replyCookie, NULL);

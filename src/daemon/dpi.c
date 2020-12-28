@@ -28,11 +28,7 @@ void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const 
     char stagename[3];
     while(position < left && sscanf(stages + position, "%2[^,]%n", stagename, &field) == 1){
     uchar stagenum;
-#ifdef OS_WINDOWS
-        if(__mingw_sscanf(stagename, "%hhu", &stagenum) && stagenum < DPI_COUNT){
-#else
         if(sscanf(stagename, "%hhu", &stagenum) && stagenum < DPI_COUNT){
-#endif
             // Set DPI for this stage
             if(disable){
                 mode->dpi.enabled &= ~(1 << stagenum);
@@ -55,14 +51,8 @@ void cmd_dpisel(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char
     (void)dummy2;
 
     uchar stagenum;
-#ifdef OS_WINDOWS
-    if(__mingw_sscanf(stage, "%hhu", &stagenum) != 1)
-        return;
-#else
-
     if(sscanf(stage, "%hhu", &stagenum) != 1)
         return;
-#endif
     if(stagenum > DPI_COUNT)
         return;
     mode->dpi.current = stagenum;
@@ -74,13 +64,8 @@ void cmd_lift(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
     (void)dummy2;
 
     uchar heightnum;
-#ifdef OS_WINDOWS
-    if(__mingw_sscanf(height, "%hhu", &heightnum) != 1)
-        return;
-#else
     if(sscanf(height, "%hhu", &heightnum) != 1)
         return;
-#endif
     if(heightnum > LIFT_MAX || heightnum < LIFT_MIN)
         return;
     mode->dpi.lift = heightnum;

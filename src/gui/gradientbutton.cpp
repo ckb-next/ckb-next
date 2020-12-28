@@ -47,13 +47,8 @@ void GradientButton::fromString(const QString& string){
     while(1){
         int scanned = 0;
         signed char newpos;
-#ifdef Q_OS_WIN32
-        if(__mingw_sscanf(dataStr, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
-            break;
-#else
         if(sscanf(dataStr, "%hhd:%2hhx%2hhx%2hhx%2hhx%n", &newpos, &a, &r, &g, &b, &scanned) != 5)
             break;
-#endif
         dataStr += scanned;
         // Don't allow stops out-of-order or past 100
         if(newpos <= pos || newpos > 100)
@@ -65,11 +60,7 @@ void GradientButton::fromString(const QString& string){
     }
     if(_stops.count() == 0){
         // If nothing was read, try a single ARGB constant.
-#ifdef Q_OS_WIN32
-        if(__mingw_sscanf(dataStr, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
-#else
         if(sscanf(dataStr, "%2hhx%2hhx%2hhx%2hhx", &a, &r, &g, &b) == 4){
-#endif
             _stops.append(QGradientStop(0., QColor(r, g, b, a)));
             _stops.append(QGradientStop(1., QColor(r, g, b, 0.)));
         }

@@ -69,3 +69,9 @@ set(CKB_NEXT_EXTRA_C_FLAGS "")
 list(APPEND CKB_NEXT_EXTRA_C_FLAGS
         -Werror=incompatible-pointer-types
     )
+
+if(WINDOWS)
+    list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
+        -D__USE_MINGW_ANSI_STDIO=1
+    )
+endif()

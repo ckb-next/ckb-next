@@ -61,8 +61,6 @@ typedef IOUSBInterfaceInterface183**    usb_iface_t;
 
 // Various POSIX functions that aren't present on OSX
 
-void *memrchr(const void *s, int c, size_t n);
-
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 101200
 typedef int clockid_t;
 #define CLOCK_MONOTONIC 1
@@ -102,4 +100,11 @@ typedef void* KLIB_HANDLE;
 typedef KLIB_HANDLE KHOT_HANDLE;
 
 #endif // OS_WINDOWS
+
+// Present on neither Windows nor Mac
+#if defined(OS_MAC) || defined(OS_WINDOWS)
+#include <sys/types.h>
+void *memrchr(const void *s, int c, size_t n);
+#endif
+
 #endif  // OS_H

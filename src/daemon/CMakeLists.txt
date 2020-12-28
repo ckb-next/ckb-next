@@ -70,6 +70,7 @@ if (MACOS OR LINUX OR WINDOWS)
               device_keyboard.c
               device_mouse.c
               device_vtable.c
+              devnode_common.c
               dpi.c
               dpi_legacy.c
               firmware.c
@@ -89,6 +90,7 @@ if (MACOS OR LINUX OR WINDOWS)
               command.h
               device.h
               devnode.h
+              devnode_common.h
               dpi.h
               dpi_legacy.h
               firmware.h

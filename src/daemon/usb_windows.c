@@ -191,7 +191,7 @@ static int get_UTF8_string_desc(HANDLE* handle, UCHAR iString, char* out, size_t
     return 1;
 }
 
-int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
+int usbadd(KLST_DEVINFO_HANDLE deviceInfo, const unsigned short vendor, const unsigned short product) {
 #ifdef DEBUG
     ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s\n", vendor, product, path, syspath);
 #endif // DEDBUG
@@ -200,13 +200,13 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
     for(int index = 1; index < DEV_MAX; index++){
         if(kbbusnumber[index] == deviceInfo->BusNumber && kbdevaddress[index] == deviceInfo->DeviceAddress){
             usbdevice* kb = keyboard + index;
-            if(pthread_mutex_trylock(dmutex(kb)))
+            if(queued_mutex_trylock(dmutex(kb)))
                 continue;
 
             ckb_info("Match found for %s at %d\n", deviceInfo->DeviceDesc, index);
             if(HAS_ALL_HANDLES(kb)){
                 ckb_err("Tried to add a handle to a device that already has all handles. Expect things to break!\n");
-                pthread_mutex_unlock(dmutex(kb));
+                queued_mutex_unlock(dmutex(kb));
                 return 0;
             }
             kUSB.Init(kb->handle + deviceInfo->Common.MI, deviceInfo);
@@ -218,14 +218,14 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
                 setupusb(kb);
                 return 0;
             }
-            pthread_mutex_unlock(dmutex(kb));
+            queued_mutex_unlock(dmutex(kb));
             return 0;
         }
     }
     // Find a free USB slot
     for(int index = 1; index < DEV_MAX; index++){
         usbdevice* kb = keyboard + index;
-        if(pthread_mutex_trylock(dmutex(kb)))
+        if(queued_mutex_trylock(dmutex(kb)))
             continue;
 
         if(!IS_CONNECTED(kb)){
@@ -282,21 +282,22 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, short vendor, short product) {
             get_UTF8_string_desc(kb->handle[0], devDescr.iSerialNumber, kb->serial, SERIAL_LEN - 1);
             get_UTF8_string_desc(kb->handle[0], devDescr.iProduct, kb->name, KB_NAME_LEN);
 
-            pthread_mutex_unlock(dmutex(kb));
+            queued_mutex_unlock(dmutex(kb));
             return 0;
         }
-        pthread_mutex_unlock(dmutex(kb));
+        queued_mutex_unlock(dmutex(kb));
     }
     ckb_err("No free devices\n");
     return -1;
 }
 
 static int usb_add_device(KLST_DEVINFO_HANDLE deviceInfo){
-    if(deviceInfo->Common.Vid == V_CORSAIR){
-        for(size_t c = 0; c < N_MODELS; c++){
-            if(models[c] == deviceInfo->Common.Pid)
-                return usbadd(deviceInfo, V_CORSAIR, models[c]);
-        }
+    for(size_t c = 0; c < N_MODELS; c++){
+        const unsigned short vid = models[c].idVendor;
+        const unsigned short pid = models[c].idProduct;
+        if(pid == deviceInfo->Common.Pid &&
+                vid == deviceInfo->Common.Vid)
+            return usbadd(deviceInfo, vid, pid);
     }
     return 1;
 }

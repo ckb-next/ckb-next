@@ -233,10 +233,10 @@ static void* devmain(usbdevice* kb){
     while(flag){
         ConnectNamedPipe(kb->infifo, NULL);
         while(1){
-            pthread_mutex_unlock(dmutex(kb));
+            queued_mutex_unlock(dmutex(kb));
             const char* line;
-            int lines = readlines(kb->infifo, linectx, &line);
-            pthread_mutex_lock(dmutex(kb));
+            int lines = readlines(kb, linectx, &line);
+            queued_mutex_lock(dmutex(kb));
             if(lines == -1)
                 break;
             // End thread when the handle is removed
@@ -255,7 +255,7 @@ static void* devmain(usbdevice* kb){
         }
         DisconnectNamedPipe(kb->infifo);
     }
-    pthread_mutex_unlock(dmutex(kb));
+    queued_mutex_unlock(dmutex(kb));
     readlines_ctx_free(linectx);
     return 0;
 }
@@ -291,7 +291,6 @@ static void* devmain(usbdevice* kb){
 ///
 static void* devmain(usbdevice* kb){
     /// \attention dmutex should still be locked when this is called
-    int kbfifo = kb->infifo - 1;
     ///
     /// First a \a readlines_ctx buffer structure is initialized by \c readlines_ctx_init().
     readlines_ctx linectx;
@@ -310,7 +309,7 @@ static void* devmain(usbdevice* kb){
         queued_mutex_unlock(dmutex(kb));
         // Read from FIFO
         const char* line;
-        int lines = readlines(kbfifo, linectx, &line);
+        int lines = readlines(kb, linectx, &line);
         queued_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
         if(!IS_CONNECTED(kb))

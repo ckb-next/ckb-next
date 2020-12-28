@@ -479,9 +479,10 @@ void KbPerf::lightIndicator(const char* name, QRgb rgba){
 
 #ifdef Q_OS_WIN
 EXTERN_C {
-muteState getMuteState(){
+muteState getMuteState(const muteDevice muteDev){
 return (muteState)-1;
 }
+void deinitAudioSubsystem(){}
 }
 #endif
 

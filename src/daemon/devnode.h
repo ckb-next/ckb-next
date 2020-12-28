@@ -41,10 +41,32 @@ int mkfwnode(usbdevice* kb);
 typedef struct _readlines_ctx* readlines_ctx;
 void readlines_ctx_init(readlines_ctx* ctx);
 void readlines_ctx_free(readlines_ctx ctx);
+
+/// Platform-specific function implementations found in devnode_*.c
+// FIXME: maybe move to a new file
+void check_chown(const char* pathname, uid_t owner, long group);
+int create_dev_cmd_fifo(const char* const path, usbdevice* kb);
+int _mknotifynode(usbdevice* kb, int notify);
+int _rmnotifynode(usbdevice* kb, int notify);
+int rm_recursive(const char* path);
+int mkdir_p(const char* pathname, const mode_t mode);
+
 #ifdef OS_WINDOWS
-unsigned readlines(HANDLE fd, readlines_ctx ctx, const char** input);
+int do_pipe_read(HANDLE fd, readlines_ctx ctx, char* buffer, const int offset, const int buffersize);
+void check_fchown(HANDLE fd, uid_t owner, long group);
 #else
-unsigned readlines(int fd, readlines_ctx ctx, const char** input);
+int do_pipe_read(const int fd, readlines_ctx ctx, char* buffer, const int offset, const int buffersize);
+void check_fchown(int fd, uid_t owner, long group);
 #endif
+
+unsigned readlines(usbdevice* kb, readlines_ctx ctx, const char** input);
+
+#define S_GID_READ  (gid >= 0 ? S_CUSTOM_R : S_READ)
+#define MAX_BUFFER (1024 * 1024 - 1)
+struct _readlines_ctx {
+    char* buffer;
+    int buffersize;
+    int leftover, leftoverlen;
+};
 
 #endif  // DEVNODE_H

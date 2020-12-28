@@ -522,10 +522,12 @@ void MainWindow::QSignalHandler(){
     }
 
     qDebug() << "\nSignal" << sig << "caught. Quitting...";
+#ifdef SIGHUP
     if(sig == SIGHUP){
         // Restart, but with a delay
         QProcess::startDetached(QCoreApplication::applicationFilePath(), QStringList() << "-b" << "-d");
     }
+#endif
     this->quitApp();
     sigNotifier->setEnabled(true);
 }

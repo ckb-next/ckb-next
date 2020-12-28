@@ -163,6 +163,10 @@
 #define BTN_BACK            0
 #define BTN_TASK            0
 
+// FIXME: stubs below
+#define KEY_HANJA           0x0000
+#define KEY_HANGEUL         0x0000
+
 #endif // OS_WINDOWS
 
 #endif // KEYMAP_WINDOWS_H

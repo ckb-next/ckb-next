@@ -7,6 +7,7 @@
 #include "kbprofile.h"
 #include <QElapsedTimer>
 #include <limits>
+#include "daemonpipe.h"
 
 // Class for managing devices
 class Kb : public QThread
@@ -201,7 +202,7 @@ private:
     void writeProfileHeader();
 
     // cmd and notify file handles
-    QFile cmd;
+    DaemonPipe cmd;
 
     /// \brief notifyNumber is the trailing number in the device path.
     int notifyNumber;

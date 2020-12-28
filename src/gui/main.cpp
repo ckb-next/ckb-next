@@ -11,6 +11,10 @@
 #include <QTranslator>
 #include "compat/qrand.h"
 #include <QMessageBox>
+#ifdef Q_OS_WIN32
+#include <windows.h>
+// wincon.h for signal handler
+#endif
 
 QSharedMemory appShare("ckb-next");
 
@@ -132,8 +136,23 @@ static bool pidActive(const QStringList& lines){
             pid_t pid;
             // Valid PID found?
             if((pid = line.split(" ")[1].toLong(&ok)) > 0 && ok){
+#ifdef Q_OS_WIN32
+
+                HANDLE pidHandle = OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid);
+                if(pidHandle == NULL || pidHandle == INVALID_HANDLE_VALUE)
+                    return false;
+
+                DWORD exitCode = 0;
+                bool isActive = (GetExitCodeProcess(pidHandle, &exitCode) || exitCode == STILL_ACTIVE);
+#warning "Add error handling"
+                int error = GetLastError();
+
+                CloseHandle(pidHandle);
+                return isActive;
+#else
                 // kill -0 does nothing to the application, but checks if it's running
                 return (kill(pid, 0) == 0 || errno != ESRCH);
+#endif
             }
         }
     }
@@ -219,7 +238,6 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     if(tmpSettings->value("Program/HiDPI", false).toBool())
         QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-
     // Setup main application
     QApplication a(argc, argv);
 
@@ -255,10 +273,12 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     bool background = false;
 
     // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
+#ifndef Q_OS_WIN32
     if(getuid() == 0){
         printf("The ckb-next GUI should not be run as root.\n");
         return 0;
     }
+#endif
 
     // Seed the RNG for UsbIds
     Q_SRAND(QDateTime::currentMSecsSinceEpoch());
@@ -337,7 +357,6 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     fprintf(fp, "%d", getpid());
     fclose(fp);
 #endif
-
     // Launch in background if requested, or if re-launching a previous session
     const char* shm_str = "Open";
     if(qApp->isSessionRestored())

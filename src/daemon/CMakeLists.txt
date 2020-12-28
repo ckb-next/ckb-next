@@ -28,11 +28,15 @@
 # TODO: get rid of ifdefs in sources. This is CMake's task!
 # TODO: use COMPONENT-wise installation instead of ifs()
 
+if (WINDOWS)
+    link_directories("C:\\libusbK-dev-kit\\bin\\dll\\amd64")
+endif ()
+
 add_executable(ckb-next-daemon "")
 add_custom_target(daemon DEPENDS ckb-next-daemon)
 
 # Find external dependencies
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
     find_package(Iconv REQUIRED)
@@ -57,7 +61,7 @@ elseif (LINUX)
 endif ()
 
 # Declare target's source files
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     target_sources(
         ckb-next-daemon
             PRIVATE
@@ -66,7 +70,6 @@ if (MACOS OR LINUX)
               device_keyboard.c
               device_mouse.c
               device_vtable.c
-              devnode.c
               dpi.c
               dpi_legacy.c
               firmware.c
@@ -92,6 +95,7 @@ if (MACOS OR LINUX)
               includes.h
               input.h
               input_mac_vhid.h
+              input_windows_vmulti.h
               keymap.h
               keymap_patch.h
               led.h
@@ -107,6 +111,7 @@ if (MACOS)
     target_sources(
         ckb-next-daemon
             PRIVATE
+              devnode_unix.c
               usb_mac.c
               input_mac.c
               input_mac_legacy.c
@@ -118,12 +123,20 @@ elseif (LINUX)
     target_sources(
         ckb-next-daemon
             PRIVATE
+              devnode_unix.c
               usb_linux.c
               input_linux.c)
+elseif (WINDOWS)
+  target_sources(
+      ckb-next-daemon
+          PRIVATE
+            devnode_windows.c
+            usb_windows.c
+            input_windows.c)
 endif ()
 
 # Declare target's include paths
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     target_include_directories(
         ckb-next-daemon
             PRIVATE
@@ -138,10 +151,17 @@ elseif (LINUX)
         ckb-next-daemon
             PRIVATE
               "${UDEV_INCLUDE_DIRS}")
+elseif (WINDOWS)
+          # TODO: implement this hack properly
+          target_include_directories(
+              ckb-next-daemon
+                  SYSTEM
+                  PRIVATE
+                    "C:\\libusbK-dev-kit\\includes")
 endif ()
 
 # Declare target's link dependencies
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     target_link_libraries(
         ckb-next-daemon
             PRIVATE
@@ -160,6 +180,13 @@ elseif (LINUX)
         ckb-next-daemon
             PRIVATE
               "${UDEV_LIBRARIES}")
+elseif (WINDOWS)
+    target_link_libraries(
+        ckb-next-daemon
+            PRIVATE
+              "usbK"
+              "Setupapi"
+              "Hid")
 endif ()
 
 # Target compile features and options

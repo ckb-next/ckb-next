@@ -9,8 +9,11 @@
 #ifdef __APPLE__
 #define OS_MAC
 #endif
+#ifdef _WIN32
+#define OS_WINDOWS
+#endif
 
-#if !defined(OS_LINUX) && !defined(OS_MAC)
+#if !defined(OS_LINUX) && !defined(OS_MAC) && !defined(OS_WINDOWS)
 #error Your OS is not supported. Edit os.h if you want to compile anyway.
 #endif
 
@@ -87,4 +90,16 @@ extern pthread_mutex_t _euid_guard;
 
 #endif // OS_MAC_LEGACY
 
+#ifdef OS_WINDOWS
+
+typedef int uid_t;
+#include <stdarg.h>
+
+typedef void *PVOID;
+typedef PVOID HANDLE;
+
+typedef void* KLIB_HANDLE;
+typedef KLIB_HANDLE KHOT_HANDLE;
+
+#endif // OS_WINDOWS
 #endif  // OS_H

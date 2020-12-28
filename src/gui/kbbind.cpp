@@ -4,8 +4,9 @@
 #include "kbbind.h"
 #include "kbmode.h"
 #include "kb.h"
-#include "qdebug.h"
 #include <typeinfo>
+#include <QDebug>
+#include "daemonpipe.h"
 
 QHash<QString, QString> KbBind::_globalRemap;
 quint64 KbBind::globalRemapTime = 0;
@@ -196,7 +197,7 @@ void KbBind::setAction(const QString& key, const QString& action){
     _bind[rKey] = new KeyAction(action, this);
 }
 
-void KbBind::update(QFile& cmd, int notify, bool force){
+void KbBind::update(DaemonPipe& cmd, int notify, bool force){
     if(!force && !_needsUpdate && lastGlobalRemapTime == globalRemapTime)
         return;
     lastGlobalRemapTime = globalRemapTime;

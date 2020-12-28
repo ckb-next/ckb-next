@@ -29,6 +29,10 @@ AnimScript::~AnimScript(){
 }
 
 QStringList AnimScript::paths(){
+#ifdef Q_OS_WIN
+    // On Windows the animations are in the same path as the executable, under the animations subdirectory
+    return {qApp->applicationDirPath() + QString("/animations")};
+#else
     QStringList list(CKB_NEXT_ANIMATIONS_PATH);
     // Path for when running the GUI from the build dir
 #ifdef Q_OS_LINUX
@@ -38,6 +42,7 @@ QStringList AnimScript::paths(){
 #endif
     list << QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation).append("/ckb-next/animations"));
     return list;
+#endif // !Q_OS_WIN
 }
 
 void AnimScript::scan(){

@@ -2,6 +2,7 @@
 #define KEYMAP_H
 
 #include "keymap_mac.h"
+#include "keymap_windows.h"
 
 // Reserved keys (no input)
 #define KEY_NONE    -1

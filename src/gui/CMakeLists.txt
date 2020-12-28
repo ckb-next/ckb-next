@@ -67,7 +67,7 @@ if (USE_BREW_QUAZIP)
 endif ()
 
 # Find external dependencies
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
     find_package(Qt5 5.5.1 COMPONENTS Core Widgets Network Gui REQUIRED)
@@ -103,7 +103,7 @@ endif ()
 
 # TODO: get rid of os.h and platform ifdefs
 # Declare target's source files
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     target_sources(
         ckb-next
             PRIVATE
@@ -119,6 +119,7 @@ if (MACOS OR LINUX)
               clickeventpushbutton.cpp
               colorbutton.cpp
               colormap.cpp
+              daemonpipe.cpp
               extrasettingswidget.cpp
               fwupgradedialog.cpp
               gradientbutton.cpp
@@ -173,6 +174,7 @@ if (MACOS OR LINUX)
               clickeventpushbutton.h
               colorbutton.h
               colormap.h
+              daemonpipe.h
               extrasettingswidget.h
               fwupgradedialog.h
               gradientbutton.h
@@ -459,7 +461,7 @@ if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/text.qrc")
 endif ()
 
 # Enhance target's source files based on auxiliary files
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     target_sources(
         ckb-next
             PRIVATE
@@ -470,7 +472,7 @@ if (MACOS OR LINUX)
 endif ()
 
 # Declare target's include paths
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     target_include_directories(
         ckb-next
             PRIVATE
@@ -494,7 +496,7 @@ if (NOT WITH_SHIPPED_QUAZIP)
 endif ()
 
 # Declare target's link dependencies
-if (MACOS OR LINUX)
+if (MACOS OR LINUX OR WINDOWS)
     target_link_libraries(
         ckb-next
             PRIVATE

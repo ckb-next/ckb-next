@@ -8,6 +8,7 @@
 #include "ckbsettings.h"
 #include "keymap.h"
 #include "keyaction.h"
+#include "daemonpipe.h"
 
 class Kb;
 class KbMode;
@@ -81,7 +82,7 @@ public:
 
     // Updates bindings to the driver. Write "mode %d" first.
     // By default, nothing will be written unless bindings have changed. Use force = true or call setNeedsUpdate() to override.
-    void        update(QFile& cmd, int notify, bool force = false);
+    void        update(DaemonPipe &cmd, int notify, bool force = false);
     inline void setNeedsUpdate()                        { _needsUpdate = true; }
 
     ////////
@@ -123,9 +124,9 @@ private:
 
     //////////
     /// \brief lastCmd is a cache-hack.
-    /// Because the QFile ist opened in Kb, and we need it in the macro processing functions,
+    /// Because the DaemonPipe is opened in Kb, and we need it in the macro processing functions,
     /// we cache the value her in lastCmd.
-    QFile*                           lastCmd;
+    DaemonPipe*                           lastCmd;
 
     KeyMap _map;
     // Key -> action map (no entry = default action)

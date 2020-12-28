@@ -12,7 +12,11 @@
 #include <QMenuBar>
 #include <unistd.h>
 #include <ckbnextconfig.h>
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#else
 #include <sys/socket.h>
+#endif
 #include <signal.h>
 #include <QProcess>
 #include "xcb/xwindowdetector.h"
@@ -179,8 +183,10 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
     dialog.setInformativeText(daemonDialogText);
     dialog.setIcon(QMessageBox::Critical);
-
     // Set up signal handler
+#ifdef Q_OS_WIN32
+//SetConsoleCtrlHandler();
+#else
     socketpair(AF_UNIX, SOCK_STREAM, 0, MainWindow::signalHandlerFd);
 
     sigNotifier = new QSocketNotifier(MainWindow::signalHandlerFd[1], QSocketNotifier::Read, this);
@@ -189,7 +195,7 @@ MainWindow::MainWindow(QWidget *parent) :
     signal(SIGINT, MainWindow::PosixSignalHandler);
     signal(SIGTERM, MainWindow::PosixSignalHandler);
     signal(SIGHUP, MainWindow::PosixSignalHandler);
-
+#endif
     // check, whether daemon is running
     // the daemon creates the root device path on initialization and thus it
     // can be assumed, that the daemon is not running if doesn't exist
@@ -505,7 +511,6 @@ MainWindow::~MainWindow(){
 #endif
     delete ui;
 }
-
 void MainWindow::QSignalHandler(){
     sigNotifier->setEnabled(false);
     int sig = -1;
@@ -524,13 +529,13 @@ void MainWindow::QSignalHandler(){
     this->quitApp();
     sigNotifier->setEnabled(true);
 }
-
+#ifndef Q_OS_WIN32
 void MainWindow::PosixSignalHandler(int signal){
     int ret = write(MainWindow::signalHandlerFd[0], &signal, sizeof(signal));
     if(ret == -1)
         qDebug() << "Error on PosixSignalHandler write";
 }
-
+#endif
 void MainWindow::checkedForNewVer(QString ver, QString changelog){
 #ifndef DISABLE_UPDATER
     if(!ver.isEmpty()) {

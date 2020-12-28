@@ -4,6 +4,7 @@
 #include "media.h"
 #include <cmath>
 #include <typeinfo>
+#include "daemonpipe.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
 #define map_last(map) ((map).last())
@@ -420,7 +421,7 @@ void KbPerf::angleSnap(bool newAngleSnap){
     _needsUpdate = _needsSave = true;
 }
 
-void KbPerf::update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi){
+void KbPerf::update(DaemonPipe& cmd, int notifyNumber, bool force, bool saveCustomDpi){
     if(!force && !_needsUpdate)
         return;
     emit settingsUpdated();
@@ -475,6 +476,14 @@ void KbPerf::lightIndicator(const char* name, QRgb rgba){
         return;
     light()->setIndicator(name, qRgba(qRed(rgba), qGreen(rgba), qBlue(rgba), a));
 }
+
+#ifdef Q_OS_WIN
+EXTERN_C {
+muteState getMuteState(){
+return (muteState)-1;
+}
+}
+#endif
 
 void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
     light()->resetIndicators();

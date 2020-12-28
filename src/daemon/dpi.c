@@ -1,5 +1,6 @@
 #include "dpi.h"
 #include "usb.h"
+#include <inttypes.h>
 
 void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const char* values){
     (void)kb;
@@ -26,8 +27,12 @@ void cmd_dpi(usbdevice* kb, usbmode* mode, int dummy, const char* stages, const 
     int position = 0, field = 0;
     char stagename[3];
     while(position < left && sscanf(stages + position, "%2[^,]%n", stagename, &field) == 1){
-        uchar stagenum;
+    uchar stagenum;
+#ifdef OS_WINDOWS
+        if(__mingw_sscanf(stagename, "%hhu", &stagenum) && stagenum < DPI_COUNT){
+#else
         if(sscanf(stagename, "%hhu", &stagenum) && stagenum < DPI_COUNT){
+#endif
             // Set DPI for this stage
             if(disable){
                 mode->dpi.enabled &= ~(1 << stagenum);
@@ -50,8 +55,14 @@ void cmd_dpisel(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char
     (void)dummy2;
 
     uchar stagenum;
+#ifdef OS_WINDOWS
+    if(__mingw_sscanf(stage, "%hhu", &stagenum) != 1)
+        return;
+#else
+
     if(sscanf(stage, "%hhu", &stagenum) != 1)
         return;
+#endif
     if(stagenum > DPI_COUNT)
         return;
     mode->dpi.current = stagenum;
@@ -63,8 +74,13 @@ void cmd_lift(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
     (void)dummy2;
 
     uchar heightnum;
+#ifdef OS_WINDOWS
+    if(__mingw_sscanf(height, "%hhu", &heightnum) != 1)
+        return;
+#else
     if(sscanf(height, "%hhu", &heightnum) != 1)
         return;
+#endif
     if(heightnum > LIFT_MAX || heightnum < LIFT_MIN)
         return;
     mode->dpi.lift = heightnum;
@@ -91,13 +107,13 @@ char* printdpi(const dpiset* dpi, const usbdevice* kb){
     for(int i = 0; i < DPI_COUNT; i++){
         // Print the stage number
         int newlen = 0;
-        snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%d%n" : " %d%n", i, &newlen);
+        newlen = snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%d" : " %d", i);
         length += newlen;
         // Print the DPI settings
         if(!(dpi->enabled & (1 << i)))
-            snprintf(buffer + length, BUFFER_LEN - length, ":off%n", &newlen);
+            newlen = snprintf(buffer + length, BUFFER_LEN - length, ":off");
         else
-            snprintf(buffer + length, BUFFER_LEN - length, ":%u,%u%n", dpi->x[i], dpi->y[i], &newlen);
+            newlen = snprintf(buffer + length, BUFFER_LEN - length, ":%u,%u", dpi->x[i], dpi->y[i]);
         length += newlen;
     }
     return buffer;

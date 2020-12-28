@@ -9,6 +9,9 @@
 #include "usb.h"
 #include "keymap_patch.h"
 #include <ckbnextconfig.h>
+#ifdef OS_WINDOWS
+#include <windows.h>
+#endif
 
 // Values taken from the official website
 // Mice not in the list default to 12000 in the GUI
@@ -222,6 +225,41 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
     }
 }
 
+#ifdef OS_WINDOWS
+static void* devmain(usbdevice* kb){
+    readlines_ctx linectx;
+    readlines_ctx_init(&linectx);
+    int flag = 1;
+    while(flag){
+        ConnectNamedPipe(kb->infifo, NULL);
+        while(1){
+            pthread_mutex_unlock(dmutex(kb));
+            const char* line;
+            int lines = readlines(kb->infifo, linectx, &line);
+            pthread_mutex_lock(dmutex(kb));
+            if(lines == -1)
+                break;
+            // End thread when the handle is removed
+            if(!IS_CONNECTED(kb)){
+                flag = 0;
+                break;
+            }
+            if(lines){
+                if(readcmd(kb, line)){
+                    // USB transfer failed; destroy device
+                    closeusb(kb);
+                    flag = 0;
+                    break;
+                }
+            }
+        }
+        DisconnectNamedPipe(kb->infifo);
+    }
+    pthread_mutex_unlock(dmutex(kb));
+    readlines_ctx_free(linectx);
+    return 0;
+}
+#else
 // USB device main loop
 /// brief .
 ///
@@ -301,7 +339,7 @@ static void* devmain(usbdevice* kb){
     readlines_ctx_free(linectx);
     return 0;
 }
-
+#endif
 /// brief .
 ///
 /// \brief _setupusb A horrible function for setting up an usb device
@@ -932,4 +970,25 @@ void reactivate_devices(){
         }
         queued_mutex_unlock(dmutex(kb));
     }
+}
+
+// UTF-16 (USB descriptor strings) to UTF-8
+void u16dec_char(char* in, char* out, size_t* srclen, size_t* dstlen){
+    iconv_t utf16to8 = iconv_open("UTF-8", "UTF-16LE");
+    if((*srclen % 2) || (utf16to8 == (iconv_t) -1)) {
+        out[0] = 0;
+        return;
+    }
+
+    size_t srclen2 = 0;
+    for(; srclen2 < *srclen; srclen2 += 2){
+        // Since it's UTF16 we need to check both
+        if(!(in[srclen2] || in[srclen2 + 1]))
+            break;
+    }
+
+    if(iconv(utf16to8, &in, &srclen2, &out, dstlen) == (size_t) -1)
+        out[0] = 0;
+
+    iconv_close(utf16to8);
 }

@@ -11,7 +11,7 @@ typedef enum {
     MODE        = -9,
     SWITCH      = -8,
     LAYOUT      = -7,
-    ACCEL       = -6,
+    M_ACCEL     = -6,
     SCROLLSPEED = -5,
     NOTIFYON    = -4,
     NOTIFYOFF   = -3,

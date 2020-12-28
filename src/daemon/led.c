@@ -11,13 +11,22 @@ void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* 
     if(index < 0) {
         if (index == -2){     // Process strafe sidelights
             uchar sideshine;
+#ifdef OS_WINDOWS
+            if (__mingw_sscanf(code, "%2hhx",&sideshine)) // monochromatic
+#else
             if (sscanf(code, "%2hhx",&sideshine)) // monochromatic
+#endif
                 mode->light.sidelight = sideshine;
         }
         return;
     }
+#ifdef OS_WINDOWS
+    uint r, g, b;
+    if(sscanf(code, "%2x%2x%2x", &r, &g, &b) == 3){
+#else
     uchar r, g, b;
     if(sscanf(code, "%2hhx%2hhx%2hhx", &r, &g, &b) == 3){
+#endif
         mode->light.r[index] = r;
         mode->light.g[index] = g;
         mode->light.b[index] = b;
@@ -164,7 +173,7 @@ char* printrgb(const lighting* light, const usbdevice* kb){
             continue;
         // Print the key name
         int newlen = 0;
-        snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%s%n" : " %s%n", names[i], &newlen);
+        newlen = snprintf(buffer + length, BUFFER_LEN - length, length == 0 ? "%s" : " %s", names[i]);
         length += newlen;
         // Look ahead to see if any other keys have this color. If so, print them here as well.
         uchar k_r = r[i], k_g = g[i], k_b = b[i];
@@ -173,7 +182,7 @@ char* printrgb(const lighting* light, const usbdevice* kb){
                 continue;
             if(r[j] != k_r || g[j] != k_g || b[j] != k_b)
                 continue;
-            snprintf(buffer + length, BUFFER_LEN - length, ",%s%n", names[j], &newlen);
+            newlen = snprintf(buffer + length, BUFFER_LEN - length, ",%s", names[j]);
             length += newlen;
             // Erase the key's name so it won't get printed later
             names[j][0] = 0;

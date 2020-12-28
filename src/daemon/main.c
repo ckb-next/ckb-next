@@ -8,6 +8,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#ifdef OS_WINDOWS
+#include <windows.h>
+#endif
 
 // usb.c
 extern _Atomic int reset_stop;
@@ -88,7 +91,9 @@ void ignore_signal(int type){
 void exithandler(int type){
     signal(SIGTERM, ignore_signal);
     signal(SIGINT, ignore_signal);
+#ifndef OS_WINDOWS
     signal(SIGQUIT, ignore_signal);
+#endif
 
     printf("\n[I] Caught signal %d\n", type);
     quit();
@@ -133,9 +138,11 @@ void localecase(char* dst, size_t length, const char* src){
 }
 
 int main(int argc, char** argv){
+#ifndef OS_WINDOWS
     // Set output pipes to buffer on newlines, if they weren't set that way already
     setlinebuf(stdout);
     setlinebuf(stderr);
+#endif
 
     printf("ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
@@ -189,13 +196,34 @@ int main(int argc, char** argv){
     snprintf(pidpath, sizeof(pidpath), "%s0/pid", devpath);
     FILE* pidfile = fopen(pidpath, "r");
     if(pidfile){
+#ifdef OS_WINDOWS
+        int pid;
+#else
         pid_t pid;
+#endif
         if(fscanf(pidfile, "%d", &pid) == EOF)
             ckb_err("PID fscanf returned EOF (%s)", strerror(errno));
         fclose(pidfile);
         if(pid > 0){
+#ifdef OS_WINDOWS
+            int pidres = 0;
+            HANDLE pidHandle = OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid);
+            if(pidHandle == NULL || pidHandle == INVALID_HANDLE_VALUE)
+            {  }else {
+
+
+
+            DWORD exitCode = 0;
+            pidres = (GetExitCodeProcess(pidHandle, &exitCode) || exitCode == STILL_ACTIVE);
+
+            CloseHandle(pidHandle);
+            }
+
+#else
+            int pidres = !kill(pid, 0);
+#endif
             // kill -s 0 checks if the PID is active but doesn't send a signal
-            if(!kill(pid, 0)){
+            if(pidres){
                 ckb_fatal_nofile("ckb-next-daemon is already running (PID %d). Try `killall ckb-next-daemon`.", pid);
                 ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)", pidpath);
                 return 0;
@@ -204,7 +232,9 @@ int main(int argc, char** argv){
     }
 
     // Read parameters
+#ifndef OS_WINDOWS
     int forceroot = 1;
+#endif
     for(int i = 1; i < argc; i++){
         char* argument = argv[i];
         unsigned newgid;
@@ -233,9 +263,11 @@ int main(int argc, char** argv){
                 hwload_mode = 0;
                 ckb_info_nofile("Setting hardware load: never");
             }
+#ifndef OS_WINDOWS
         } else if(!strcmp(argument, "--nonroot")){
             // Allow running as a non-root user
             forceroot = 0;
+#endif
         } else if(sscanf(argument, "--ignore=%hx:%hx", &vid, &pid) == 2){
             // Add the vid/pid to the list
             for(int j = 0; j < DEV_MAX; j++){
@@ -255,6 +287,7 @@ int main(int argc, char** argv){
 #endif
     }
 
+#ifndef OS_WINDOWS
     // Check UID
     if(getuid() != 0){
         if(forceroot){
@@ -263,13 +296,14 @@ int main(int argc, char** argv){
         } else
             ckb_warn_nofile("Warning: not running as root, allowing anyway per command-line parameter...");
     }
-
+#endif
     // Make root keyboard
     umask(0);
     memset(keyboard, 0, sizeof(keyboard));
     if(!mkdevpath(keyboard))
         ckb_info("Root controller ready at %s0", devpath);
 
+#ifndef OS_WINDOWS
     // Attempt to setup signal-safe signal handlers using socketpair(2)
     if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sighandler_pipe) != -1){
         signal(SIGTERM, sighandler);
@@ -277,6 +311,7 @@ int main(int argc, char** argv){
         signal(SIGQUIT, sighandler);
     } else
         ckb_warn_nofile("Unable to setup signal handlers");
+#endif
 
 #ifdef OS_LINUX
     // Set up do-nothing handler for SIGUSR2

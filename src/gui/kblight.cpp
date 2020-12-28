@@ -4,6 +4,7 @@
 #include "kblight.h"
 #include "kbmode.h"
 #include <typeinfo>
+#include "daemonpipe.h"
 
 static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
@@ -228,7 +229,7 @@ void KbLight::close(){
     _start = false;
 }
 
-void KbLight::printRGB(QFile& cmd, const ColorMap &animMap){
+void KbLight::printRGB(DaemonPipe& cmd, const ColorMap &animMap){
     int count = animMap.count();
     const char* const* names = animMap.keyNames();
     const QRgb* colors = animMap.colors();
@@ -305,7 +306,7 @@ void KbLight::forceFrameUpdate(){
     _forceFrame = true;
 }
 
-void KbLight::frameUpdate(QFile& cmd, bool monochrome){
+void KbLight::frameUpdate(DaemonPipe& cmd, bool monochrome){
     rebuildBaseMap();
     _animMap = _colorMap;
     // Advance animations
@@ -391,7 +392,7 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
     cmd.write("\n");
 }
 
-void KbLight::base(QFile &cmd, bool ignoreDim, bool monochrome){
+void KbLight::base(DaemonPipe &cmd, bool ignoreDim, bool monochrome){
     close();
     if(_dimming == MAX_DIM && !ignoreDim){
         cmd.write("rgb 000000");

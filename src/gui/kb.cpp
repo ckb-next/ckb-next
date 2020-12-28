@@ -103,16 +103,25 @@ Kb::Kb(QObject *parent, const QString& path) :
     hwModeCount = (_model == KeyMap::K95) ? 3 : 1;
     // Open cmd in non-blocking mode so that it doesn't lock up if nothing is reading
     // (e.g. if the daemon crashed and didn't clean up the node)
+#ifdef Q_OS_WIN
+    if(!cmd.open(0, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle))
+        return;
+#else
     int fd = open(cmdpath.toLatin1().constData(), O_WRONLY | O_NONBLOCK);
     if(!cmd.open(fd, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle))
         return;
-
+#endif
     // Find an available notification node (if none is found, take notify1)
     {
         QMutexLocker locker(&notifyPathMutex);
         for(int i = 1; i < 10; i++){
             QString notify = QString(path + "/notify%1").arg(i);
+#ifdef Q_OS_WIN32
+#warning "Notify exists stub"
+            if(!notifyPaths.contains(notify)){
+#else
             if(!QFile::exists(notify) && !notifyPaths.contains(notify)){
+#endif
                 notifyNumber = i;
                 notifyPath = notify;
                 break;
@@ -129,7 +138,12 @@ Kb::Kb(QObject *parent, const QString& path) :
         QMutexLocker locker(&notifyPathMutex);
         for(int i = 1; i < 10; i++){
             QString notify = QString(path + "/notify%1").arg(i);
+#ifdef Q_OS_WIN32
+#warning "Notify exists stub"
+            if(!notifyPaths.contains(notify)){
+#else
             if(!QFile::exists(notify) && !notifyPaths.contains(notify)){
+#endif
                 macroNumber = i;
                 macroPath = notify;
                 break;
@@ -483,7 +497,7 @@ void Kb::deleteHw(){
 }
 
 void Kb::run(){
-    QFile notify(notifyPath);
+    DaemonPipe notify(notifyPath);
     // Wait a small amount of time for the node to open (100ms)
     QThread::usleep(100000);
     if(!notify.open(QIODevice::ReadOnly)){

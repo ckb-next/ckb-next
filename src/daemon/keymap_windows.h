@@ -6,6 +6,15 @@
 
 // Replace Linux key constants with HID scancodes for Windows
 //#warning "KEYMAP STUB"
+#define IS_MODIFIER(c)       (c > 0x100 && c < 0x200)
+#define KEY_LEFTSHIFT       0x0102
+#define KEY_RIGHTSHIFT      0x0120
+#define KEY_LEFTCTRL        0x0101
+#define KEY_RIGHTCTRL       0x0110
+#define KEY_LEFTMETA        0x0108
+#define KEY_RIGHTMETA       0x0180
+#define KEY_LEFTALT         0x0104
+#define KEY_RIGHTALT        0x0140
 
 #define KEY_ESC             0x0029
 #define KEY_F1              0x003A
@@ -89,31 +98,23 @@
 
 #define KEY_TAB             0x002B
 #define KEY_CAPSLOCK        0x0039
-#define KEY_LEFTSHIFT       0x00E1
-#define KEY_RIGHTSHIFT      0x00E5
-#define KEY_LEFTCTRL        0x00E0
-#define KEY_RIGHTCTRL       0x00E4
-#define KEY_LEFTMETA        0x00E3
-#define KEY_RIGHTMETA       0x00E7
-#define KEY_LEFTALT         0x00E2
-#define KEY_RIGHTALT        0x00E6
 #define KEY_COMPOSE         0x0076
 #define KEY_FN              0x0000
 
-#define KEY_SYSRQ           0x0000
-#define KEY_SCROLLLOCK      0x0000
-#define KEY_PAUSE           0x0000
-#define KEY_INSERT          0x0000
-#define KEY_HOME            0x0000
-#define KEY_PAGEUP          0x0000
+#define KEY_SYSRQ           0x0046
+#define KEY_SCROLLLOCK      0x0047
+#define KEY_PAUSE           0x0048
+#define KEY_INSERT          0x0049
+#define KEY_HOME            0x004A
+#define KEY_PAGEUP          0x004B
 #define KEY_DELETE          0x004C
-#define KEY_END             0x0000
-#define KEY_PAGEDOWN        0x0000
+#define KEY_END             0x004D
+#define KEY_PAGEDOWN        0x004E
 
-#define KEY_UP              0x0000
-#define KEY_LEFT            0x0000
-#define KEY_DOWN            0x0000
-#define KEY_RIGHT           0x0000
+#define KEY_UP              0x0052
+#define KEY_LEFT            0x0050
+#define KEY_DOWN            0x0051
+#define KEY_RIGHT           0x004F
 
 #define KEY_NUMLOCK         0x0053
 #define KEY_KPSLASH         0x0054
@@ -133,12 +134,13 @@
 #define KEY_KP9             0x0061
 #define KEY_KP0             0x0062
 
-#define KEY_YEN             0x0000
-#define KEY_RO              0x0000
+#define KEY_YEN             0x0089
+#define KEY_RO              0x0087
 #define KEY_KATAKANAHIRAGANA 0x0000
 #define KEY_HENKAN          0x0000
 #define KEY_MUHENKAN        0x0000
 
+//#define IS_
 #define KEY_MUTE            0x007F
 #define KEY_VOLUMEUP        0x0080
 #define KEY_VOLUMEDOWN      0x0081
@@ -154,12 +156,12 @@
 
 #define BTN_LEFT            1
 #define BTN_RIGHT           2
-#define BTN_MIDDLE          3
-#define BTN_SIDE            4
-#define BTN_EXTRA           5
-#define BTN_FORWARD         6
-#define BTN_BACK            7
-#define BTN_TASK            8
+#define BTN_MIDDLE          4
+#define BTN_SIDE            0
+#define BTN_EXTRA           0
+#define BTN_FORWARD         0
+#define BTN_BACK            0
+#define BTN_TASK            0
 
 #endif // OS_WINDOWS
 

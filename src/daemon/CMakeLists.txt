@@ -132,7 +132,8 @@ elseif (WINDOWS)
           PRIVATE
             devnode_windows.c
             usb_windows.c
-            input_windows.c)
+            input_windows.c
+            keymap_windows.h)
 endif ()
 
 # Declare target's include paths

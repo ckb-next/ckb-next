@@ -12,6 +12,54 @@
 #include <hidsdi.h>
 #include <setupapi.h>
 
+static BYTE keyCodes[KBD_KEY_CODES];
+static BYTE shiftKeyFlags;
+static BYTE mouseButtons;
+
+static int add_to_keys(int scancode)
+{
+    // Find an empty position
+    int pos = -1;
+    for(int i = 0; i < KBD_KEY_CODES; i++)
+    {
+        if(!keyCodes[i]){
+            pos = i;
+            break;
+        }
+    }
+
+    // Return if the list is full
+    if(pos < 0)
+        return 1;
+
+    // Check if the scancode is already added by another device
+    for(int i = pos; i < KBD_KEY_CODES; i++)
+        if(keyCodes[i] == scancode)
+            return 0;
+
+    // Finally, if all went well, add the key
+    keyCodes[pos] = scancode;
+    return 0;
+}
+
+static void remove_from_keys(int scancode)
+{
+    // Search for a key in the array and remove it
+    for(int i = 0; i < KBD_KEY_CODES; i++)
+        if(keyCodes[i] == scancode)
+            keyCodes[i] = 0;
+}
+
+static void add_to_field(BYTE* field, int scancode)
+{
+    *field |= (BYTE)scancode;
+}
+
+static void remove_from_field(BYTE* field, int scancode)
+{
+    *field &= ~(BYTE)scancode;
+}
+
 BOOLEAN
 CheckIfOurDevice(
     HANDLE file,
@@ -230,7 +278,7 @@ HidOutput(
 
         if (!HidD_SetOutputReport(file, buffer, bufferSize))
         {
-            printf("failed HidD_SetOutputReport %d\n", GetLastError());
+            printf("failed HidD_SetOutputReport %ld\n", GetLastError());
             return FALSE;
         }
     }
@@ -238,7 +286,7 @@ HidOutput(
     {
         if (!WriteFile(file, buffer, bufferSize, &bytesWritten, NULL))
         {
-            printf("failed WriteFile %d\n", GetLastError());
+            printf("failed WriteFile %ld\n", GetLastError());
             return FALSE;
         }
     }
@@ -249,7 +297,11 @@ HidOutput(
 static vmulti_client_t vmulti;
 
 int os_inputopen(usbdevice* kb){
-
+    if(vmulti.hControl && vmulti.hMessage)
+    {
+        ckb_info("vmulti already open\n");
+        return 0;
+    }
     vmulti.hControl = SearchMatchingHwID(0xff00, 0x0001);
     if (vmulti.hControl == INVALID_HANDLE_VALUE || vmulti.hControl == NULL)
         return 1;
@@ -295,21 +347,65 @@ void os_keypress(usbdevice* kb, int scancode, int down){
        //pMouseReport->Button = 0;
        pMouseReport->XValue = 0;
        pMouseReport->YValue = 0;
-       if(scancode == BTN_WHEELUP || scancode == BTN_WHEELDOWN) {
-           pMouseReport->WheelPosition = (down ? ((scancode == BTN_WHEELUP) ? 1 : -1) : 0);
+       pMouseReport->Button = 0;
+       pMouseReport->WheelPosition = 0;
+       if((scancode == BTN_WHEELUP || scancode == BTN_WHEELDOWN)) {
+            if(down)
+                pMouseReport->WheelPosition = ((scancode == BTN_WHEELUP) ? 127 : -127);
        } else {
-           pMouseReport->Button = scancode;
-          /* int scan = (scancode & ~SCAN_MOUSE);
+           int scan = (scancode & ~SCAN_MOUSE);
            if(down)
-               add_to_buttons(scan, &kb->mouseinput);
+               add_to_field(&mouseButtons, scan);
            else
-               remove_from_buttons(scan, &kb->mouseinput);*/
+               remove_from_field(&mouseButtons, scan);
+           pMouseReport->Button = mouseButtons;
        }
        // Send the report
        HidOutput(FALSE, vmulti.hControl, (PCHAR)vmulti.controlReport, CONTROL_REPORT_SIZE);
 
        return;
    }
+
+    VMultiControlReportHeader* pReport = NULL;
+    VMultiKeyboardReport* pKeyboardReport = NULL;
+
+    //
+    // Set the report header
+    //
+
+    pReport = (VMultiControlReportHeader*)vmulti.controlReport;
+    pReport->ReportID = REPORTID_CONTROL;
+    pReport->ReportLength = sizeof(VMultiKeyboardReport);
+
+    //
+    // Set the input report
+    //
+
+    pKeyboardReport = (VMultiKeyboardReport*)(vmulti.controlReport + sizeof(VMultiControlReportHeader));
+    pKeyboardReport->ReportID = REPORTID_KEYBOARD;
+
+    //TODO rework this
+    if(IS_MODIFIER(scancode))
+    {
+        scancode -= 0x100;
+        if(down)
+            add_to_field(&shiftKeyFlags, scancode);
+        else
+            remove_from_field(&shiftKeyFlags, scancode);
+    }
+    else
+    {
+        if(down)
+            add_to_keys(scancode);
+        else
+            remove_from_keys(scancode);
+    }
+    memcpy(pKeyboardReport->KeyCodes, keyCodes, KBD_KEY_CODES);
+    pKeyboardReport->ShiftKeyFlags = shiftKeyFlags;
+
+    // Send the report
+    // TODO fix unused ret
+    HidOutput(FALSE, vmulti.hControl, (PCHAR)vmulti.controlReport, CONTROL_REPORT_SIZE);
 }
 
 void os_mousemove(usbdevice* kb, int x, int y){
@@ -336,6 +432,7 @@ void os_mousemove(usbdevice* kb, int x, int y){
     pMouseReport->WheelPosition = 0;//wheelPosition;
 
     // Send the report
+    // TODO fix unused ret
     HidOutput(FALSE, vmulti.hControl, (PCHAR)vmulti.controlReport, CONTROL_REPORT_SIZE);
 }
 

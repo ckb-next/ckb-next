@@ -49,15 +49,6 @@ typedef struct _VMULTI_CONTROL_REPORT_HEADER
 // Keyboard specific report infomation
 //
 
-#define KBD_LCONTROL_BIT     1
-#define KBD_LSHIFT_BIT       2
-#define KBD_LALT_BIT         4
-#define KBD_LGUI_BIT         8
-#define KBD_RCONTROL_BIT     16
-#define KBD_RSHIFT_BIT       32
-#define KBD_RALT_BIT         64
-#define KBD_RGUI_BIT         128
-
 #define KBD_KEY_CODES        6
 
 #pragma pack(1)

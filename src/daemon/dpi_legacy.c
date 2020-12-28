@@ -7,7 +7,11 @@ void cmd_lift_legacy(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const
     (void)dummy2;
 
     uchar heightnum;
+#ifdef OS_WINDOWS
+    if(__mingw_sscanf(height, "%hhu", &heightnum) != 1)
+#else
     if(sscanf(height, "%hhu", &heightnum) != 1)
+#endif
         return;
     if(heightnum > LIFT_MAX || heightnum < LIFT_MIN)
         return;

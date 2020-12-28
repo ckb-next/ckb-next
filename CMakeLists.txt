@@ -110,6 +110,10 @@ else ()
     cmake_dependent_option(WITH_MVIZ   "Build with music visualizer."          OFF "WITH_ANIMATIONS;WITH_GUI" OFF)
     set(USE_PORTAUDIO ON)
 endif ()
+
+if(WINDOWS)
+    set(WITH_PIPE OFF)
+endif()
 # Options: daemon
 option(DISABLE_UPDATER "Disable the ckb-next updater. This option should only be enabled during packaging."    OFF)
 option(DEBUG_USB_SEND  "Show the contents of USB packets being sent to device."                                OFF)

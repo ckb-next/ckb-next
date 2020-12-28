@@ -47,6 +47,11 @@ BOOL InitDescriptorIterator(PDESCRIPTOR_ITERATOR descIterator, BYTE* configDescr
     return FALSE;
 }
 
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line)
+{
+    return 0;
+}
+
 int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
     BOOL success = 1;
     UINT len = 0;

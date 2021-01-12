@@ -196,6 +196,7 @@ int main(int argc, char** argv){
     // Check PID, quit if already running
     char pidpath[strlen(devpath) + 6];
     snprintf(pidpath, sizeof(pidpath), "%s0/pid", devpath);
+    printf("HELLO %s HELLO %s\n", devpath, pidpath);
     FILE* pidfile = fopen(pidpath, "r");
     if(pidfile){
 #ifdef OS_WINDOWS

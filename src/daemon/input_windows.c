@@ -15,6 +15,7 @@
 static BYTE keyCodes[KBD_KEY_CODES];
 static BYTE shiftKeyFlags;
 static BYTE mouseButtons;
+static BYTE wheelPosition;
 
 static int add_to_keys(int scancode)
 {
@@ -348,10 +349,10 @@ void os_keypress(usbdevice* kb, int scancode, int down){
        pMouseReport->XValue = 0;
        pMouseReport->YValue = 0;
        pMouseReport->Button = 0;
-       pMouseReport->WheelPosition = 0;
+       wheelPosition = 0;
        if((scancode == BTN_WHEELUP || scancode == BTN_WHEELDOWN)) {
             if(down)
-                pMouseReport->WheelPosition = ((scancode == BTN_WHEELUP) ? 127 : -127);
+                wheelPosition = (scancode == BTN_WHEELUP) ? 1 : -1;
        } else {
            int scan = (scancode & ~SCAN_MOUSE);
            if(down)
@@ -360,6 +361,7 @@ void os_keypress(usbdevice* kb, int scancode, int down){
                remove_from_field(&mouseButtons, scan);
            pMouseReport->Button = mouseButtons;
        }
+       pMouseReport->WheelPosition = wheelPosition;
        // Send the report
        HidOutput(FALSE, vmulti.hControl, (PCHAR)vmulti.controlReport, CONTROL_REPORT_SIZE);
 
@@ -426,10 +428,10 @@ void os_mousemove(usbdevice* kb, int x, int y){
 
     pMouseReport = (VMultiRelativeMouseReport*)(vmulti.controlReport + sizeof(VMultiControlReportHeader));
     pMouseReport->ReportID = REPORTID_RELATIVE_MOUSE;
-    pMouseReport->Button = 0;
+    pMouseReport->Button = mouseButtons;
     pMouseReport->XValue = x;
     pMouseReport->YValue = y;
-    pMouseReport->WheelPosition = 0;//wheelPosition;
+    pMouseReport->WheelPosition = wheelPosition;
 
     // Send the report
     // TODO fix unused ret

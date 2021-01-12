@@ -5,12 +5,13 @@
 #include "usb.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <libusbk.h>
 #include <windows.h>
+#include <libusbk.h>
 
 #ifdef OS_WINDOWS
 
-static int kbdevaddress[DEV_MAX] = {[0 ... DEV_MAX-1] = -1};
+//static int kbdevaddress[DEV_MAX] = {[0 ... DEV_MAX-1] = -1};
+static char kbdevserial[DEV_MAX][KLST_STRING_MAX_LEN] = {[0 ... DEV_MAX-1] = {0}};
 static int kbbusnumber[DEV_MAX] = {[0 ... DEV_MAX-1] = -1};
 #define HAS_ALL_HANDLES(kb) ((kb)->ifcount && (kb)->handlecount == (kb)->ifcount)
 static int HotKRunning = 1;
@@ -59,7 +60,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
         // If we need to read a response, lock the interrupt mutex
         if(is_recv)
             if(pthread_mutex_lock(intmutex(kb)))
-                ckb_fatal("Error locking interrupt mutex in os_usbsend()\n");
+                ckb_fatal("Error locking interrupt mutex in os_usbsend()");
         success = kUSB.WritePipe(kb->handle[kb->ifcount - 1], kb->ifcount, (uchar*)out_msg, MSG_SIZE, &len, NULL);
     } else {
         // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
@@ -69,7 +70,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
 
     if (!success){
         int ioctlerrno = GetLastError();
-        ckb_err_fn(" %s, res = 0x%x\n", file, line, len ? strerror(ioctlerrno) : "No data written", len);
+        ckb_err_fn(" %s, res = 0x%x", file, line, len ? strerror(ioctlerrno) : "No data written", len);
         /*if(res == -1 && ioctlerrno == ETIMEDOUT){
             if(is_recv)
                 pthread_mutex_unlock(intmutex(kb));
@@ -80,7 +81,7 @@ int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* fil
             return 0;
         }*/
     } else if (len != MSG_SIZE)
-        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, len, MSG_SIZE);
+        ckb_warn_fn("Wrote %d bytes (expected %d)", file, line, len, MSG_SIZE);
 #ifdef DEBUG_USB_SEND
     print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
 #endif
@@ -97,31 +98,31 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
         int condret = pthread_cond_timedwait(intcond(kb), intmutex(kb), &condwait);
         if(condret != 0){
             if(pthread_mutex_unlock(intmutex(kb)))
-                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
+                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
             if(condret == ETIMEDOUT)
-                ckb_warn_fn("ckb%d: Timeout while waiting for response\n", file, line, INDEX_OF(kb, keyboard));
+                ckb_warn_fn("ckb%d: Timeout while waiting for response", file, line, INDEX_OF(kb, keyboard));
             else
-                ckb_warn_fn("Interrupt cond error %i\n", file, line, condret);
+                ckb_warn_fn("Interrupt cond error %i", file, line, condret);
             return -1;
         }
         memcpy(in_msg, kb->interruptbuf, MSG_SIZE);
         memset(kb->interruptbuf, 0, MSG_SIZE);
         res = MSG_SIZE;
         if(pthread_mutex_unlock(intmutex(kb)))
-            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()\n");
+            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
     } /*else {
         struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
         res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
         if(res <= 0){
             // This is done because ckb_err_fn can set errno itself
             int ioctlerrno = errno;
-            ckb_err_fn("%s\n", file, line, res ? strerror(ioctlerrno) : "No data read");
+            ckb_err_fn("%s", file, line, res ? strerror(ioctlerrno) : "No data read");
             if(res == -1 && ioctlerrno == ETIMEDOUT)
                 return -1;
             else
                 return 0;
         } else if(res != MSG_SIZE)
-            ckb_warn_fn("Read %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+            ckb_warn_fn("Read %d bytes (expected %d)", file, line, res, MSG_SIZE);
     }*/
 
 #ifdef DEBUG_USB_RECV
@@ -179,7 +180,7 @@ static int get_UTF8_string_desc(HANDLE* handle, UCHAR iString, char* out, size_t
     kPkt->Length = (USHORT)sizeof(buffer);
     UINT lengthTransferred;
     if (!kUSB.ControlTransfer(handle, Pkt, buffer, sizeof(buffer), &lengthTransferred, NULL))
-        ckb_err("Something elsest happened %ld\n", GetLastError());
+        ckb_err("Something elsest happened %ld", GetLastError());
 
     // Sanity check:
     // 0x01 is bDescriptorType, which should be 0x03 for string descriptor
@@ -193,19 +194,22 @@ static int get_UTF8_string_desc(HANDLE* handle, UCHAR iString, char* out, size_t
 
 int usbadd(KLST_DEVINFO_HANDLE deviceInfo, const unsigned short vendor, const unsigned short product) {
 #ifdef DEBUG
-    ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s\n", vendor, product, path, syspath);
+    ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s", vendor, product, path, syspath);
 #endif // DEDBUG
 
     // Search for a matching address and bus number
-    for(int index = 1; index < DEV_MAX; index++){
-        if(kbbusnumber[index] == deviceInfo->BusNumber && kbdevaddress[index] == deviceInfo->DeviceAddress){
-            usbdevice* kb = keyboard + index;
+    for(int i = 1; i < DEV_MAX; i++){
+        ckb_info("%s %d %d %s %d", deviceInfo->SerialNumber, kbbusnumber[i], deviceInfo->BusNumber, kbdevserial[i], deviceInfo->DeviceAddress);
+        // The following doesn't seem to work inside qemu, so replace it with a serial number comparison
+        // kbdevaddress[index] == deviceInfo->DeviceAddress
+        if(kbbusnumber[i] == deviceInfo->BusNumber && !strcmp(deviceInfo->SerialNumber, kbdevserial[i])){
+            usbdevice* kb = keyboard + i;
             if(queued_mutex_trylock(dmutex(kb)))
                 continue;
 
-            ckb_info("Match found for %s at %d\n", deviceInfo->DeviceDesc, index);
+            ckb_info("Match found for %s at %d", deviceInfo->DeviceDesc, i);
             if(HAS_ALL_HANDLES(kb)){
-                ckb_err("Tried to add a handle to a device that already has all handles. Expect things to break!\n");
+                ckb_err("Tried to add a handle to a device that already has all handles. Expect things to break!");
                 queued_mutex_unlock(dmutex(kb));
                 return 0;
             }
@@ -213,7 +217,7 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, const unsigned short vendor, const un
             kb->handlecount++;
             // Check if we now have all the handles
             if(HAS_ALL_HANDLES(kb)){
-                ckb_info("We now have all the handles for ckb%d! Setting up the device...\n", index);
+                ckb_info("We now have all the handles for ckb%d! Setting up the device...", i);
                 // Mutex remains locked
                 setupusb(kb);
                 return 0;
@@ -229,12 +233,12 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, const unsigned short vendor, const un
             continue;
 
         if(!IS_CONNECTED(kb)){
-            ckb_info("Connecting %s at %s%d\n", deviceInfo->DeviceDesc, devpath, index);
+            ckb_info("Connecting %s at %s%d", deviceInfo->DeviceDesc, devpath, index);
             // Set up device
             kb->vendor = vendor;
             kb->product = product;
             kbbusnumber[index] = deviceInfo->BusNumber;
-            kbdevaddress[index] = deviceInfo->DeviceAddress;
+            snprintf(kbdevserial[index], KLST_STRING_MAX_LEN, "%s", deviceInfo->SerialNumber);
             kb->handlecount = 1;
             kUSB.Init(kb->handle + 0, deviceInfo);
             // Get descriptor
@@ -250,13 +254,13 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, const unsigned short vendor, const un
             kPkt->Length = (USHORT)sizeof(configDescriptorBuffer);
 
             if (!kUSB.ControlTransfer(kb->handle[0], Pkt, configDescriptorBuffer, sizeof(configDescriptorBuffer), &lengthTransferred, NULL))
-                ckb_err("Something happened %ld\n", GetLastError());
+                ckb_err("Something happened %ld", GetLastError());
             // Iterate
             DESCRIPTOR_ITERATOR descIterator;
             if (!InitDescriptorIterator(&descIterator, configDescriptorBuffer, lengthTransferred))
-                ckb_err("Something else happened %ld\n", GetLastError());
+                ckb_err("Something else happened %ld", GetLastError());
 
-            ckb_info("ckb%d is supposed to have %d interfaces\n", index, descIterator.Ptr.Config->bNumInterfaces);
+            ckb_info("ckb%d is supposed to have %d interfaces", index, descIterator.Ptr.Config->bNumInterfaces);
             kb->ifcount = (descIterator.Ptr.Config->bNumInterfaces ? descIterator.Ptr.Config->bNumInterfaces : 2);
 
             // Get device descriptor (for fw version in bcdDevice)
@@ -268,11 +272,11 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, const unsigned short vendor, const un
             kPkt->ValueHi = USB_DESCRIPTOR_TYPE_DEVICE;
             kPkt->Length = (USHORT)sizeof(devDescrBuf);
             if (!kUSB.ControlTransfer(kb->handle[0], Pkt, devDescrBuf, sizeof(devDescrBuf), &lengthTransferred, NULL))
-                ckb_err("Something elser happened %ld\n", GetLastError());
+                ckb_err("Something elser happened %ld", GetLastError());
             USB_DEVICE_DESCRIPTOR devDescr;
             memcpy(&devDescr, devDescrBuf, sizeof(devDescr));
             kb->fwversion = devDescr.bcdDevice;
-            ckb_info("bcdDevice %x\n", kb->fwversion);
+            ckb_info("bcdDevice %x", kb->fwversion);
 
             // Get strings (serial/dev name)
             /*devDescr.iSerialNumber;
@@ -287,7 +291,7 @@ int usbadd(KLST_DEVINFO_HANDLE deviceInfo, const unsigned short vendor, const un
         }
         queued_mutex_unlock(dmutex(kb));
     }
-    ckb_err("No free devices\n");
+    ckb_err("No free devices");
     return -1;
 }
 
@@ -309,7 +313,7 @@ void KUSB_API OnHotPlug(KHOT_HANDLE Handle, KLST_DEVINFO_HANDLE deviceInfo, KLST
     if(NotificationType == KLST_SYNC_FLAG_ADDED)
         usb_add_device(deviceInfo);
     else
-        ckb_fatal("FIXME: Device removed. Things will break\n");
+        ckb_fatal("FIXME: Device removed. Things will break");
 }
 
 int usbmain(){
@@ -326,7 +330,7 @@ int usbmain(){
     if (!HotK_Init(&hotHandle, &hotParams))
     {
         int errorCode = GetLastError();
-        ckb_fatal("Error initialising HotK: %08Xh\n",  errorCode);
+        ckb_fatal("Error initialising HotK: %08Xh",  errorCode);
         return errorCode;
     }
 

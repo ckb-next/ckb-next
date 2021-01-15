@@ -3,6 +3,8 @@
 #include <QThread>
 #include <QMutex>
 #include <QDebug>
+#include <QDateTime>
+#include <ckbnextconfig.h>
 
 // Shared global QSettings object
 static QSettings* _globalSettings = 0;
@@ -44,7 +46,21 @@ static QSettings* globalSettings(){
                 CkbSettings::migrateSettings(false);
                 // Mark settings as migrated
                 _globalSettings->setValue("Program/CkbMigrationChecked", true);
-
+            }
+            // If the current settings are older than the expected settings version, take a backup first
+            const quint16 currentSettingsVersion = _globalSettings->value("Program/SettingsVersion", 0).toInt();
+            if(currentSettingsVersion < CKB_NEXT_SETTINGS_VER){
+                QString backupName = QString("ckb-next_backup_%1").arg(QDateTime::currentMSecsSinceEpoch() / 1000);
+                QSettings backupSettings(CkbSettings::Format, QSettings::UserScope, "ckb-next", backupName);
+                qInfo() << "Backing up settings to" << backupSettings.fileName();
+                QStringList oldKeys = _globalSettings->allKeys();
+                for(const QString& key : oldKeys){
+                    QVariant value = _globalSettings->value(key);
+                    backupSettings.setValue(key, value);
+                }
+                qInfo() << oldKeys.count() << "keys backed up.";
+                // Bump the profile version in the current config
+                _globalSettings->setValue("Program/SettingsVersion", CKB_NEXT_SETTINGS_VER);
             }
             // Put the settings object in a separate thread so that it won't lock up the GUI when it syncs
             globalThread = new QThread;
@@ -79,7 +95,7 @@ void CkbSettings::migrateSettings(bool macFormat){
     if(oldSettings->contains("Program/KbdLayout")){
         qInfo() << "Found, proceeding to migrate.";
         QStringList oldKeys = oldSettings->allKeys();
-        foreach (const QString &key, oldKeys){
+        foreach (const QString& key, oldKeys){
             QVariant value = oldSettings->value(key);
             _globalSettings->setValue(key, value);
         }

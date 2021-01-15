@@ -240,8 +240,9 @@ QSettings::setDefaultFormat(CkbSettings::Format);
             tmpSettings = nullptr;
             return 0;
         }
+        // Only handle the downgrade here. The upgrade is handled in CkbSettings.
+        tmpSettings->setValue("Program/SettingsVersion", CKB_NEXT_SETTINGS_VER);
     }
-    tmpSettings->setValue("Program/SettingsVersion", CKB_NEXT_SETTINGS_VER);
 
     // Setup names and versions
     QCoreApplication::setOrganizationName("ckb-next");

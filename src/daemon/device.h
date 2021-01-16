@@ -28,6 +28,8 @@ typedef struct queued_mutex{
 void queued_mutex_lock(queued_mutex_t* mutex);   // Lock a queued_mutex
 int queued_mutex_trylock(queued_mutex_t* mutex); // Try to lock a queued_mutex without blocking; returns 0 on success.
 void queued_mutex_unlock(queued_mutex_t* mutex); // Unlock a queued_mutex
+void queued_cond_nanosleep(pthread_cond_t *restrict cond, queued_mutex_t *restrict mutex, const uint32_t ns);
+int cond_nanosleep(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex, uint32_t ns);
 
 #ifdef DEBUG_MUTEX
 #define MUTEX_DBG(str, kb, mutexarray) (ckb_info(str " accessed in %s:%d (%s) at ckb%d, TID 0x%lx, MID %p", __FILE__, __LINE__, __func__, INDEX_OF(kb, keyboard), pthread_self(), mutexarray + INDEX_OF(kb, keyboard)) & 0)
@@ -56,6 +58,8 @@ extern pthread_mutex_t interruptmutex[DEV_MAX];
 // Pthread cond for the above
 extern pthread_cond_t interruptcond[DEV_MAX];
 #define intcond(kb) (interruptcond + INDEX_OF(kb, keyboard))
+
+int init_cond_monotonic(void);
 
 // Sets up device hardware, after software initialization is finished. Also used during resets
 // Should be called only from setupusb/resetusb

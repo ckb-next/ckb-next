@@ -16,6 +16,22 @@ pthread_cond_t macrovar[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZE
 pthread_mutex_t interruptmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };///< Used for interrupt transfers
 pthread_cond_t interruptcond[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZER };   ///< Same as above
 
+///
+/// \brief cond_nanosleep matches semantics of pthread_cond_timedwait, but with a relative wake time
+/// \param cond     as pthread_cond_timedwait, but must use CLOCK_MONOTONIC
+/// \param mutex    as pthread_cond_timedwait
+/// \param ns       the maximum duration of sleep, in nanoseconds
+/// \return         as pthread_cond_timedwait. returns ENOTSUP if clock_gettime fails
+///
+int cond_nanosleep(pthread_cond_t *restrict cond,
+                   pthread_mutex_t *restrict mutex, uint32_t ns) {
+    struct timespec ts = { 0 };
+    if(clock_gettime(CLOCK_MONOTONIC, &ts))
+        return ENOTSUP;
+    timespec_add(&ts, ns);
+    return pthread_cond_timedwait(cond, mutex, &ts);
+}
+
 void queued_mutex_lock(queued_mutex_t* mutex){
     pthread_mutex_lock(&mutex->mutex);
     unsigned long my_turn = mutex->next_waiting++;
@@ -49,6 +65,50 @@ void queued_mutex_unlock(queued_mutex_t* mutex){
     pthread_cond_broadcast(&mutex->cond);
 }
 
+///
+/// \brief queued_cond_nanosleep matches semantics of cond_nanosleep, but accepts a queued_mutex_t instead of a mutex
+/// \param cond     as cond_nanosleep
+/// \param mutex    as cond_nanosleep, but is a queued_mutex_t
+/// \param ns       as cond_nanosleep
+/// \return         as queued_cond_timedwait
+///
+void queued_cond_nanosleep(pthread_cond_t *restrict cond,
+                           queued_mutex_t *restrict mutex, const uint32_t ns) {
+    pthread_mutex_lock(&mutex->mutex);
+
+    // release mutex
+    mutex->next_in++;
+    pthread_cond_broadcast(&mutex->cond);
+
+    // perform the sleep
+    cond_nanosleep(cond, &mutex->mutex, ns);
+
+    // reacquire mutex
+    unsigned long my_turn = mutex->next_waiting++;
+
+    while(my_turn != mutex->next_in)
+        pthread_cond_wait(&mutex->cond, &mutex->mutex);
+
+    pthread_mutex_unlock(&mutex->mutex);
+}
+
+/// Initialize pthread_cond's with a monotonic clock, if possible
+int init_cond_monotonic(void) {
+    pthread_condattr_t monotonic_condattr;
+
+    if(pthread_condattr_init(&monotonic_condattr) ||
+       pthread_condattr_setclock(&monotonic_condattr, CLOCK_MONOTONIC))
+        return 1;
+
+    // pthread_cond_init
+    for(int i = 0 ; i < DEV_MAX ; i++) {
+        // add initializers here
+    }
+
+    pthread_condattr_destroy(&monotonic_condattr);
+
+    return 0;
+}
 
 /// \brief .
 ///

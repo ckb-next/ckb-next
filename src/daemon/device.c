@@ -14,7 +14,7 @@ queued_mutex_t macromutex[DEV_MAX] = { [0 ... DEV_MAX-1] = QUEUED_MUTEX_INITIALI
 pthread_mutex_t macromutex2[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };   ///< Protecting the single link list of threads and the macrovar
 pthread_cond_t macrovar[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZER };        ///< This variable is used to stop and wakeup all macro threads which have to wait.
 pthread_mutex_t interruptmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };///< Used for interrupt transfers
-pthread_cond_t interruptcond[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZER };   ///< Same as above
+pthread_cond_t interruptcond[DEV_MAX];                                                      ///< Same as above
 
 ///
 /// \brief cond_nanosleep matches semantics of pthread_cond_timedwait, but with a relative wake time
@@ -102,7 +102,8 @@ int init_cond_monotonic(void) {
 
     // pthread_cond_init
     for(int i = 0 ; i < DEV_MAX ; i++) {
-        // add initializers here
+        if(pthread_cond_init(&interruptcond[i], &monotonic_condattr))
+            return 1;
     }
 
     pthread_condattr_destroy(&monotonic_condattr);

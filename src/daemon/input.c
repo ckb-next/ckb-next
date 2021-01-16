@@ -78,9 +78,9 @@ static pthread_t macro_pt_first() {
 // Default macro keystroke delay
 const struct timespec macrodelay = { .tv_nsec = 1000000 };
 // Initial repeat delay
-const struct timespec init_repeat_delay = { .tv_nsec = 500000000 };
+#define DELAY_REPEAT_INITIAL 500000000
 // Delay for every subsequent repeat
-const struct timespec catchup_repeat_delay = { .tv_nsec = 50000000 };
+#define DELAY_REPEAT_CATCHUP 500000000
 
 static inline void clock_microsleep(uint32_t s) {
     const struct timespec ts = {
@@ -116,7 +116,11 @@ static void* play_macro(void* param) {
     }
     pthread_mutex_unlock(mmutex2(kb));       ///< Give all new threads the chance to enter the block.
 
-    int firstloop = 1;
+    /*
+     * Is this the first time the macro is being repeated due to the key being
+     * held down continuously?
+     */
+    int first_keydownloop = 1;
     while(1){
         /// Send events for each keypress in the macro
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
@@ -150,24 +154,41 @@ static void* play_macro(void* param) {
         }
 
         queued_mutex_unlock(mmutex(kb));
-        // Check if the same combination is still held down.
-        // If the user let go and pressed again, it's okay, because we still need to repeat.
-        // The other threads will still be queued up and run after this.
-        // Maybe in the future we can add an option to prevent new threads with the same combo.
-        // Additionally, wait for a bit, because otherwise short macros will be repeated even if pressed only once
-        if(firstloop){
-            clock_nanosleep(CLOCK_MONOTONIC, 0, &init_repeat_delay, NULL);
-            firstloop = 0;
-        } else {
-            // Give some time for userspace applications to catch up
-            clock_nanosleep(CLOCK_MONOTONIC, 0, &catchup_repeat_delay, NULL);
-        }
+
+        int delay_ns = first_keydownloop ? DELAY_REPEAT_INITIAL : DELAY_REPEAT_CATCHUP;
+
         queued_mutex_lock(imutex(kb));
-        const int retrigger = macromask(kb->input.keys, macro->combo);
-        queued_mutex_unlock(imutex(kb));
-        if(!retrigger)
+        if (macro->triggered > 1) {
+            macro->triggered -= 2;
+            delay_ns = 0;
+            first_keydownloop = 1;
+        }
+
+        if (macro->triggered == 0)
             break;
+
+        if (!delay_ns) {
+            queued_mutex_unlock(imutex(kb));
+            continue;
+        }
+
+        queued_cond_nanosleep(mintvar(kb), imutex(kb), delay_ns);
+
+        if (macro->triggered == 2) {
+            // the key was released, but not pressed again, during the sleep
+            macro->triggered = 0;
+            break;
+        }
+
+        // if the key released and pressed during the sleep, reset to use DELAY_REPEAT_INITIAL
+        if (macro->triggered == 1)
+            first_keydownloop = 0;
+
+        queued_mutex_unlock(imutex(kb));
     }
+    macro->running = 0;
+    queued_mutex_unlock(imutex(kb));
+
     queued_mutex_lock(mmutex(kb));
 
     pthread_mutex_lock(mmutex2(kb));    ///< protect the linked list and the mvar
@@ -197,8 +218,24 @@ static void inputupdate_keys(usbdevice* kb){
     if (kb->active) {
         for (int i = 0; i < bind->macrocount; i++) {
             keymacro* macro = &bind->macros[i];
+            // see the definition of keymacro.triggered in structures.h
             if (macromask(input->keys, macro->combo)) {
-                if (!macro->triggered) {
+                if(!(macro->triggered & 1))
+                    macro->triggered += 1;
+                else
+                    continue;
+            } else {
+                if((macro->triggered & 1)) {
+                    macro->triggered += 1;
+                    pthread_cond_broadcast(mintvar(kb));
+                }
+                continue;
+            }
+
+            if (macro->triggered <= 3) {
+                // start up a thread if there isn't already one running
+                if (!macro->running) {
+                    // assert(macro->triggered == 1)
                     parameter_t* params = malloc(sizeof(parameter_t));
                     if (params == NULL) {
                         perror("inputupdate_keys got no more mem:");
@@ -206,12 +243,14 @@ static void inputupdate_keys(usbdevice* kb){
                         pthread_t thread = 0;
                         params->kb = kb;
                         params->macro = macro;
+                        macro->running = 1;
                         int retval = pthread_create(&thread, 0, play_macro, (void*)params);
                         if (retval) {
+                            macro->triggered = 0;
+                            macro->running = 0;
                             perror("inputupdate_keys: Creating thread returned not null");
                         } else {
                             pthread_detach(thread);
-                            macro->triggered = 1;
 
 #ifndef OS_MAC
                             // name thread externally if it was created on non-mac systems
@@ -220,8 +259,12 @@ static void inputupdate_keys(usbdevice* kb){
 #endif // OS_MAC
                         }
                     }
+                } else {
+                    // if there is already a thread running, it may be waiting for DELAY_REPEAT_*
+                    // it does not need to wait anymore
+                    pthread_cond_broadcast(mintvar(kb));
                 }
-            } else macro->triggered = 0;
+            }
         }
     }
     // Make a list of keycodes to send. Rearrange them so that modifier keydowns always come first

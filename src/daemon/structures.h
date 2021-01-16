@@ -40,7 +40,19 @@ typedef struct {
     macroaction* actions;
     int actioncount;
     uchar combo[N_KEYBYTES_INPUT];
+
+    /*
+     * The number of times the key has been pressed and released.  It is therefore
+     * even if the key is up, and odd if the key is down.  Whenever the macro execution
+     * completes:
+     *  - The counter is decremented by two, unless it is at 1.
+     *  - If state > 0, the macro is repeated, with a delay if state == 1.
+     *
+     * If the key is released during the delay, the counter is set to 0, and the running
+     * thread shuts itself down immediately.
+     */
     char triggered;
+    char running;       // is there a thread currently running
 } keymacro;
 
 // Key bindings for a mode (keyboard + mouse)

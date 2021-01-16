@@ -51,6 +51,8 @@ extern pthread_mutex_t macromutex2[DEV_MAX];
 #define mmutex2(kb) (macromutex2 + INDEX_OF(kb, keyboard))
 extern pthread_cond_t macrovar[DEV_MAX];
 #define mvar(kb) (macrovar + INDEX_OF(kb, keyboard))
+extern pthread_cond_t macroint[DEV_MAX];
+#define mintvar(kb) (macroint + INDEX_OF(kb, keyboard))
 
 // Mutex used for transfering URB Interrupt data between threads
 extern pthread_mutex_t interruptmutex[DEV_MAX];

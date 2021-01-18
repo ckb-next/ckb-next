@@ -379,5 +379,5 @@ QSettings::setDefaultFormat(CkbSettings::Format);
       w->show();
     }
       
-    return a->exec();
+    return a.exec();
 }

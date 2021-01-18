@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "kbmanager.h"
 #include <ckbnextconfig.h>
 #include <QApplication>
 #include <QDateTime>
@@ -221,7 +222,9 @@ QSettings::setDefaultFormat(CkbSettings::Format);
 #endif
 
     // Setup main application
-    QApplication a(argc, argv);
+    std::unique_ptr<QCoreApplication> app
+      (background ? new QCoreApplication(argc, argv) : new QApplication(argc, argv));
+    QCoreApplication& a = *app;
 
     // Setup translations
     QTranslator translator;
@@ -362,9 +365,19 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     if(QtCreator)
         QThread::sleep(1);
 
-    MainWindow w;
-    if(!background)
-        w.show();
-
-    return a.exec();
+    
+    std::unique_ptr<MainWindow> w;
+    if (background)
+    {
+      AnimScript::scan();
+      KbManager::init(CKB_NEXT_VERSION_STR);
+      Kb::frameRate (30);
+    }
+    else
+    {
+      w.reset (new MainWindow);
+      w->show();
+    }
+      
+    return a->exec();
 }

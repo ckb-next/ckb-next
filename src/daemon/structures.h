@@ -52,7 +52,7 @@ typedef struct {
      * thread shuts itself down immediately.
      */
     char triggered;
-    char running;       // is there a thread currently running
+    void* running;      // pointer to the parameter_t of the currently running thread (null if none)
 } keymacro;
 
 // Key bindings for a mode (keyboard + mouse)

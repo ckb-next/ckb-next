@@ -124,8 +124,8 @@ static void* play_macro(void* param) {
     while(1){
         /// Send events for each keypress in the macro
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
-        for (int a = 0; a < macro->actioncount; a++) {
-            macroaction* action = macro->actions + a;
+        for (int a = 0; a < ptr->actioncount; a++) {
+            macroaction* action = ptr->actions + a;
             if (action->rel_x != 0 || action->rel_y != 0)
                 os_mousemove(kb, action->rel_x, action->rel_y);
             else {
@@ -158,6 +158,13 @@ static void* play_macro(void* param) {
         int delay_ns = first_keydownloop ? DELAY_REPEAT_INITIAL : DELAY_REPEAT_CATCHUP;
 
         queued_mutex_lock(imutex(kb));
+        // detect if the macro playback has been aborted
+        if (ptr->abort) {
+            // we are responsible for free-ing actions.
+            free(ptr->actions);
+            break;
+        }
+
         if (macro->triggered > 1) {
             macro->triggered -= 2;
             delay_ns = 0;
@@ -186,7 +193,8 @@ static void* play_macro(void* param) {
 
         queued_mutex_unlock(imutex(kb));
     }
-    macro->running = 0;
+    if (!ptr->abort)
+        macro->running = NULL;
     queued_mutex_unlock(imutex(kb));
 
     queued_mutex_lock(mmutex(kb));
@@ -243,11 +251,14 @@ static void inputupdate_keys(usbdevice* kb){
                         pthread_t thread = 0;
                         params->kb = kb;
                         params->macro = macro;
-                        macro->running = 1;
+                        params->actions = macro->actions;
+                        params->actioncount = macro->actioncount;
+                        params->abort = 0;
+                        macro->running = (void *)params;
                         int retval = pthread_create(&thread, 0, play_macro, (void*)params);
                         if (retval) {
                             macro->triggered = 0;
-                            macro->running = 0;
+                            macro->running = NULL;
                             perror("inputupdate_keys: Creating thread returned not null");
                         } else {
                             pthread_detach(thread);
@@ -394,6 +405,17 @@ void updateindicators_kb(usbdevice* kb, int force){
     }
 }
 
+///
+/// \brief destroymacro free actions if macro is not currently running
+/// \param macro
+///
+inline void destroymacro(keymacro* macro) {
+    if (macro->running)
+        ((parameter_t *)macro->running)->abort = 1;
+    else
+        free(macro->actions);
+}
+
 void initbind(binding* bind, usbdevice* kb){
     for(int i = 0; i < N_KEYS_INPUT; i++)
         bind->base[i] = kb->keymap[i].scan;
@@ -404,7 +426,7 @@ void initbind(binding* bind, usbdevice* kb){
 
 void freebind(binding* bind){
     for(int i = 0; i < bind->macrocount; i++)
-        free(bind->macros[i].actions);
+        destroymacro(&bind->macros[i]);
     free(bind->macros);
     memset(bind, 0, sizeof(*bind));
 }
@@ -460,7 +482,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     if(!keys && !assignment){
         // Null strings = "macro clear" -> erase the whole thing
         for(int i = 0; i < bind->macrocount; i++)
-            free(bind->macros[i].actions);
+            destroymacro(&bind->macros[i]);
         bind->macrocount = 0;
         return;
     }
@@ -545,7 +567,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     keymacro* macros = bind->macros;
     for(int i = 0; i < bind->macrocount; i++){
         if(!memcmp(macros[i].combo, macro.combo, N_KEYBYTES_INPUT)){
-            free(macros[i].actions);
+            destroymacro(&macros[i]);
             // If the new macro has no actions, erase the existing one
             if(!macro.actioncount){
                 for(int j = i + 1; j < bind->macrocount; j++)

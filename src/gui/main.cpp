@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "kbmanager.h"
 #include <ckbnextconfig.h>
 #include <QApplication>
 #include <QDateTime>
@@ -34,6 +35,7 @@ enum CommandLineParseResults {
     CommandLineHelpRequested,
     CommandLineClose,
     CommandLineBackground,
+    CommandLineDaemon,
     CommandLineSwitchToProfile,
     CommandLineSwitchToMode,
 };
@@ -65,6 +67,9 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     const QCommandLineOption backgroundOption(QStringList() << "b" << "background",
                                               QObject::tr("Starts in background, without displaying the main window."));
     parser.addOption(backgroundOption);
+    const QCommandLineOption daemonOption(QStringList() << "x" << "daemon",
+                                              QObject::tr("Starts as daemon without display connection."));
+    parser.addOption(daemonOption);
 
     // add -c, --close
     const QCommandLineOption closeOption(QStringList() << "c" << "close",
@@ -131,6 +136,11 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     if (parser.isSet(backgroundOption)) {
         // open application in background
         return CommandLineBackground;
+    }
+
+    if (parser.isSet(daemonOption)) {
+        // open application in background
+        return CommandLineDaemon;
     }
 
     if (parser.isSet(closeOption)) {
@@ -251,7 +261,9 @@ QSettings::setDefaultFormat(CkbSettings::Format);
 #endif
 
     // Setup main application
-    QApplication a(argc, argv);
+    std::unique_ptr<QCoreApplication> app
+      (daemon ? new QCoreApplication(argc, argv) : new QApplication(argc, argv));
+    QCoreApplication& a = *app;
 
     // Setup translations
     QTranslator translator;
@@ -283,7 +295,7 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     QCommandLineParser parser;
     QString errorMessage;
     parser.setApplicationDescription("Open Source Corsair Input Device Driver for Linux and OSX.");
-    bool background = false;
+    bool background = false, daemon = false;
 
     // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
     if(getuid() == 0){
@@ -352,6 +364,11 @@ QSettings::setDefaultFormat(CkbSettings::Format);
         // If launched with --background, launch in background
         background = true;
         break;
+    case CommandLineDaemon:
+        // If launched with --daemon, launch as daemon
+        background = true;
+        daemon = true;
+        break;
     }
 
     startDelay |= tmpSettings->value("Program/StartDelay", false).toBool();
@@ -385,7 +402,7 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     if(background)
         shm_str = nullptr;
 
-    if(isRunning(shm_str) && !QtCreator){
+    if(!background && isRunning(shm_str) && !QtCreator){
         printf("ckb-next is already running. Exiting.\n");
         return 0;
     }
@@ -393,17 +410,27 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     if(QtCreator)
         QThread::sleep(1);
 
-    MainWindow w(silent);
-    if(!background)
-        w.show();
+    std::unique_ptr<MainWindow> w;
+    if (daemon)
+    {
+      AnimScript::scan();
+      KbManager::init(CKB_NEXT_VERSION_STR);
+      Kb::frameRate (30);
+    }
+    else
+    {
+      w.reset (new MainWindow(silent));
+      if(!background)
+        w->show();
 
 #ifndef QT_NO_DEBUG
-    if(kwdebug){
+      if(kwdebug){
         KeyWidgetDebugger* d = new KeyWidgetDebugger;
         d->show();
         QObject::connect(&w, &MainWindow::destroyed, [d](){delete d;});
-    }
+      }
 #endif
-
+    }
+      
     return a.exec();
 }

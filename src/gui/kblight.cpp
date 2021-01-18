@@ -472,7 +472,7 @@ void KbLight::load(CkbSettingsBase& settings){
         }
     }
     emit didLoad();
-    map(currentMap);
+    map(currentMap.count() == 0 ? _map : currentMap);
 }
 
 void KbLight::save(CkbSettingsBase& settings){

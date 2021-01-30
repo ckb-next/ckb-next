@@ -913,7 +913,8 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
     while(action){                                   \
         if(usb_tryreset(kb)){                        \
             ckb_err(#action " failed after resume"); \
-            return;                                  \
+            queued_mutex_unlock(dmutex(kb));         \
+            continue;                                \
         }                                            \
     }
 

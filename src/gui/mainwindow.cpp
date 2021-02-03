@@ -141,7 +141,7 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconClicked(QSystemTrayIcon::ActivationReason)));
-    connect(trayIcon, &CkbSystemTrayIcon::scrollRequested, this, &MainWindow::handleTrayScrollEvt);
+    connect(trayIcon, &CkbSystemTrayIcon::scrollRequested, KbManager::kbManager(), &KbManager::brightnessScroll);
     toggleTrayIcon(!CkbSettings::get("Program/SuppressTrayIcon").toBool());
 
 #ifdef Q_OS_MACOS
@@ -236,11 +236,6 @@ MainWindow::MainWindow(QWidget *parent) :
         windowDetector = new XWindowDetector();
         windowDetector->start();
 #endif
-}
-
-void MainWindow::handleTrayScrollEvt(int delta, Qt::Orientation orientation){
-    bool up = delta > 0;
-    emit trayIconScrolled(up);
 }
 
 void MainWindow::checkForCkbUpdates(){

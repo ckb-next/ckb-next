@@ -19,7 +19,6 @@ KbLightWidget::KbLightWidget(QWidget *parent) :
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
     connect(ui->keyWidget, SIGNAL(M95LightToggled()), this, SLOT(toggleM95Light()));
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
-    connect(MainWindow::mainWindow, &MainWindow::trayIconScrolled, this, &KbLightWidget::brightnessScroll);
 
     // Restore "show animated" setting
     ui->showAnimBox->setChecked(!CkbSettings::get("UI/Light/ShowBaseOnly").toBool());
@@ -198,22 +197,6 @@ void KbLightWidget::on_animButton_clicked(){
     }
     ui->animWidget->addAnim(script, currentSelection, animName, script->preset(presetId));
     light->restartAnimation();
-}
-
-void KbLightWidget::brightnessScroll(bool up){
-    // Only run this if shared dimming is enabled
-    if(!light || KbLight::shareDimming() == -1)
-        return;
-
-    int dimming = light->dimming();
-    dimming += (up ? -1 : 1);
-
-    if(dimming < 0)
-        dimming = 0;
-    if(dimming > KbLight::MAX_DIM)
-        dimming = KbLight::MAX_DIM;
-
-    light->dimming(dimming, true);
 }
 
 void KbLightWidget::setLegacyM95(){

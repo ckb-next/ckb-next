@@ -39,7 +39,6 @@ private slots:
     void on_showAnimBox_clicked(bool checked);
 
     void toggleSidelight(); //strafe
-    void brightnessScroll(bool up);
     void toggleM95Light();
 
     void stateChange(Qt::ApplicationState state);

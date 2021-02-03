@@ -224,3 +224,25 @@ void KbManager::scanKeyboards(){
         connect(_scanTimer, SIGNAL(timeout()), kb, SLOT(autoSave()));
     }
 }
+
+void KbManager::brightnessScroll(int delta, Qt::Orientation orientation){
+    const bool up = delta > 0;
+    int dimming = KbLight::shareDimming();
+
+    // Only run this if shared dimming is enabled
+    if(KbLight::shareDimming() == -1)
+        return;
+
+    QSet<Kb*>::const_iterator i = _devices.begin();
+    if(_devices.empty() || i == _devices.end())
+        return;
+
+    dimming += (up ? -1 : 1);
+
+    if(dimming < 0)
+        dimming = 0;
+    if(dimming > KbLight::MAX_DIM)
+        dimming = KbLight::MAX_DIM;
+
+    (*i)->currentLight()->dimming(dimming);
+}

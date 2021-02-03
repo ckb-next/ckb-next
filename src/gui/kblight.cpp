@@ -96,8 +96,8 @@ void KbLight::shareDimming(int newShareDimming){
     }
 }
 
-void KbLight::dimming(int newDimming, bool overrideShare, bool noSave){
-    if(!(_shareDimming == -1 || overrideShare))
+void KbLight::dimming(int newDimming, bool noSave){
+    if(_shareDimming != -1)
         shareDimming(newDimming);
     if(!noSave)
         _needsSave = true;
@@ -505,7 +505,7 @@ void KbLight::timerDim() {
         return;
     _timerOrigDimming = _dimming;
     _timerDimmed = true;
-    dimming(3, false, true);
+    dimming(3, true);
 }
 
 int  KbLight::timerDimRestore() {
@@ -513,6 +513,6 @@ int  KbLight::timerDimRestore() {
     if(_timerOrigDimming == _dimming || _timerOrigDimming == -1 || _dimming != 3 || !_timerDimmed)
         return _timerOrigDimming;
     _timerDimmed = false;
-    dimming(_timerOrigDimming, false, true);
+    dimming(_timerOrigDimming, true);
     return _timerOrigDimming;
 }

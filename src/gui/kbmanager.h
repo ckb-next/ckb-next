@@ -47,6 +47,8 @@ public:
     static void setIdleTimer(bool enable);
 #endif
 
+public slots:
+    void brightnessScroll(int delta, Qt::Orientation orientation);
 signals:
     // A new device was connected.
     void kbConnected(Kb* device);

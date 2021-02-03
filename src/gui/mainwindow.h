@@ -66,7 +66,6 @@ public slots:
     void stateChange(Qt::ApplicationState state);
     void quitApp();
     void checkForCkbUpdates();
-    void handleTrayScrollEvt(int delta, Qt::Orientation orientation);
 
 signals:
     void switchToProfileCLI(QString profile);

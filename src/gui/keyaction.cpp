@@ -1,4 +1,4 @@
-#include <qdebug.h>
+#include <QDebug>
 #include "keyaction.h"
 #include "kb.h"
 #include "kbanim.h"

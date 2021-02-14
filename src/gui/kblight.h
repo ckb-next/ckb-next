@@ -86,6 +86,7 @@ public:
 
     int timerDimRestore();
     void timerDim();
+    inline bool isTimerDimmed() const { return _timerDimmed; }
 signals:
     void didLoad();
     void updated();

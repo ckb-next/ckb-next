@@ -143,7 +143,8 @@ void ExtraSettingsWidget::on_ditherBox_clicked(bool checked){
 void ExtraSettingsWidget::pollUpdates(){
     // Check for changes to shared brightness setting
     int dimming = KbLight::shareDimming();
-    if(dimming != lastSharedDimming && !CkbSettings::isBusy()){
+    // Don't do anything if the global brightness has been dimmed by the timer
+    if(dimming != lastSharedDimming && !CkbSettings::isBusy() && !KbManager::kbManager()->getDeviceTimerDimmed()){
         CkbSettings::set("Program/GlobalBrightness", dimming);
         lastSharedDimming = dimming;
     }

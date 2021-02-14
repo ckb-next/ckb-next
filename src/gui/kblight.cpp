@@ -12,7 +12,7 @@ KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
     QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0),
     _timerOrigDimming(-1), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false),
     // Init timerDimmed as true in case a new device is initialised before the idle timer ticks to restore the brightness
-    _timerDimmed(true)
+    _timerDimmed(false)
 {
     map(keyMap);
 }
@@ -21,7 +21,7 @@ KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
     QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap),
     lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _timerOrigDimming(-1),
     _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false),
-    _timerDimmed(true)
+    _timerDimmed(false)
 {
     map(keyMap);
     // Duplicate animations
@@ -466,7 +466,8 @@ void KbLight::save(CkbSettingsBase& settings){
         _needsSave = false;
     SGroup group(settings, "Lighting");
     settings.setValue("KeyMap", _map.name());
-    settings.setValue("Brightness", _dimming);
+    // If the lights were dimmed by the timer, then make sure we save the real dimming value
+    settings.setValue("Brightness", (_timerDimmed ? _timerOrigDimming : _dimming));
     settings.setValue("UseRealNames", true);
     {
         // Save RGB settings

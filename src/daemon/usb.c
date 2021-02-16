@@ -909,13 +909,16 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
         ckb_info("ckb%i %s (via %s:%d) %s %s", devnum, function, file, line, prefix, converted);
 }
 
-#define TRY_WITH_RESET_NOFREE(action)                \
-    while(action){                                   \
-        if(usb_tryreset(kb)){                        \
-            ckb_err(#action " failed after resume"); \
-            queued_mutex_unlock(dmutex(kb));         \
-            continue;                                \
-        }                                            \
+#define TRY_WITH_RESET_NOFREE(action, ret)       \
+    ret = 0;                                     \
+    while(action){                               \
+        if((ret = usb_tryreset(kb)))             \
+            break;                               \
+    }                                            \
+    if(ret){                                     \
+        ckb_err(#action " failed after resume"); \
+        queued_mutex_unlock(dmutex(kb));         \
+        continue;                                \
     }
 
 void reactivate_devices(){
@@ -924,12 +927,13 @@ void reactivate_devices(){
         usbdevice* kb = keyboard + i;
         queued_mutex_lock(dmutex(kb));
         if(IS_CONNECTED(kb) && !NEEDS_FW_UPDATE(kb) && kb->active){
+            int ret;
             // If the device was active, mark it as disabled and re-enable it
             kb->active = 0;
             const devcmd* vt = kb->vtable;
-            TRY_WITH_RESET_NOFREE(vt->active(kb, 0, 0, 0, 0));
-            TRY_WITH_RESET_NOFREE(vt->updatergb(kb, 1));
-            TRY_WITH_RESET_NOFREE(vt->updatedpi(kb, 1));
+            TRY_WITH_RESET_NOFREE(vt->active(kb, 0, 0, 0, 0), ret);
+            TRY_WITH_RESET_NOFREE(vt->updatergb(kb, 1), ret);
+            TRY_WITH_RESET_NOFREE(vt->updatedpi(kb, 1), ret);
         }
         queued_mutex_unlock(dmutex(kb));
     }

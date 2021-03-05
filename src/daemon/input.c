@@ -409,7 +409,7 @@ void updateindicators_kb(usbdevice* kb, int force){
 /// \brief destroymacro free actions if macro is not currently running
 /// \param macro
 ///
-inline void destroymacro(keymacro* macro) {
+static inline void destroymacro(keymacro* macro) {
     if (macro->running)
         ((parameter_t *)macro->running)->abort = 1;
     else

@@ -224,7 +224,12 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
         case SWITCH:
             if(profile->currentmode != mode){
+                queued_mutex_lock(imutex(kb));
+                binding* bind = &profile->currentmode->bind;
+                for (int i = 0; i < bind->macrocount; i++)
+                    bind->macros[i].triggered = 0;
                 profile->currentmode = mode;
+                queued_mutex_unlock(imutex(kb));
                 // Set mode light for non-RGB K95
                 int index = INDEX_OF(mode, profile->mode);
                 vt->setmodeindex(kb, index);

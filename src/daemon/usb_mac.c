@@ -189,10 +189,8 @@ int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
 
     // Read the data from the input thread
     if((kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb))) {
-        struct timespec condwait = {0, 0};
         // Wait for 2s
-        condwait.tv_sec = time(NULL) + 2;
-        int condret = pthread_cond_timedwait(intcond(kb), intmutex(kb), &condwait);
+        int condret = cond_nanosleep(intcond(kb), intmutex(kb), 2000000000);
         if(condret != 0){
             if(pthread_mutex_unlock(intmutex(kb)))
                 ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");

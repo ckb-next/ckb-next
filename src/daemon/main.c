@@ -290,6 +290,11 @@ int main(int argc, char** argv){
 
     srand(time(NULL));
 
+    if(init_cond_monotonic())  {
+        ckb_fatal("Failed to initialize monotonic clock.");
+        exit(1);
+    }
+
     // Start the USB system
     int result = usbmain();
     quit();

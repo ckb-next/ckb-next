@@ -54,6 +54,9 @@ int os_setupindicators(usbdevice* kb);
 typedef struct parameter {
     usbdevice* kb;
     keymacro* macro;
+    macroaction* actions;
+    int actioncount;
+    char abort;
 } parameter_t;
 
 /// \brief struct ptlist is one element in the single linked list to store  macro_play threads waiting for their execution

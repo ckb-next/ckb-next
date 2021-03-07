@@ -18,7 +18,7 @@ extern int hwload_mode;
 int sighandler_pipe[2] = { 0, 0 };
 
 // Timespec utility function
-void timespec_add(struct timespec* timespec, long nanoseconds){
+void timespec_add(struct timespec* timespec, int64_t nanoseconds){
     nanoseconds += timespec->tv_nsec;
     timespec->tv_sec += nanoseconds / 1000000000;
     timespec->tv_nsec = nanoseconds % 1000000000;

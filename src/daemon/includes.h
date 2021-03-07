@@ -59,7 +59,7 @@ typedef unsigned int uint;
 #define ckb_info(fmt, args...)                  fprintf(ckb_s_out, "[I] " fmt "\n", ## args)
 
 // Timespec utilities
-void timespec_add(struct timespec* timespec, long nanoseconds);
+void timespec_add(struct timespec* timespec, int64_t nanoseconds);
 #define timespec_gt(left, right)    ((left).tv_sec > (right).tv_sec || ((left).tv_sec == (right).tv_sec && (left).tv_nsec > (right).tv_nsec))
 #define timespec_eq(left, right)    ((left).tv_sec == (right).tv_sec && (left).tv_nsec == (right).tv_nsec)
 #define timespec_ge(left, right)    ((left).tv_sec > (right).tv_sec || ((left).tv_sec == (right).tv_sec && (left).tv_nsec >= (right).tv_nsec))

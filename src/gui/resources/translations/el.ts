@@ -2786,7 +2786,7 @@ File not found or not executable.</source>
     <message>
         <location filename="../../settingswidget.cpp" line="220"/>
         <source>Return code %1</source>
-        <translation>Κώδικάς επιστροφής %1</translation>
+        <translation>Κωδικός επιστροφής %1</translation>
     </message>
     <message>
         <location filename="../../settingswidget.cpp" line="226"/>

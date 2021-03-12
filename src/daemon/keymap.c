@@ -320,6 +320,29 @@ static const short hid_codes[256] = {
 /// Legacy Keyboard | IS_LEGACY && !IS_MOUSE | nA | nA | hid_kb_translate()
 ///
 
+static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
+    if(length != MSG_SIZE)
+        return;
+
+    // Skip the 0x00 0x02 header
+    urbinput += 2;
+
+    for(int byte = 0; byte < 14; byte++){
+        char input = urbinput[byte];
+        for(int bit = 0; bit < 8; bit++){
+            int keybit = byte * 8 + bit;
+            int scan = hid_codes[keybit];
+            if((input >> bit) & 1){
+                if(scan >= 0)
+                    SET_KEYBIT(kbinput, hid_codes[keybit]);
+                else
+                    ckb_warn("Got unknown bragi key press %d", keybit);
+            } else if(scan >= 0)
+                CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
+        }
+    }
+}
+
 void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep){
     if(!urblen)
         return;
@@ -379,14 +402,18 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 }
             } else {
                 // Assume Keyboard for everything else for now
-                // Accept NKRO only if device is active
+                // Accept NKRO only if device is not active
                 if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
                     if(!kb->active)
                         hid_kb_translate(kb->input.keys, urblen, buffer, 0);
                 } else if(urblen == MSG_SIZE) {
-                    if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
-                        buffer++;
-                    corsair_kbcopy(kb->input.keys, buffer);
+                    if(kb->protocol == PROTO_BRAGI) {
+                        handle_bragi_key_input(kb->input.keys, buffer, urblen);
+                    } else {
+                        if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
+                            buffer++;
+                        corsair_kbcopy(kb->input.keys, buffer);
+                    }
                 } else
                     ckb_err("Unknown data received in input thread %02x from endpoint %02x", firstbyte, ep);
             }

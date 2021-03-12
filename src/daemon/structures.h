@@ -203,6 +203,7 @@ extern const union devcmd vtable_mouse_wireless;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
 extern const union devcmd vtable_bragi;
+extern const union devcmd vtable_bragi_keyboard;
 
 typedef enum protocol_
 {

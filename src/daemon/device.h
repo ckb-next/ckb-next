@@ -74,6 +74,7 @@ int start_dev(usbdevice* kb, int makeactive);
 int start_kb_legacy(usbdevice* kb, int makeactive);
 int start_mouse_legacy(usbdevice* kb, int makeactive);
 int start_mouse_bragi(usbdevice* kb, int makeactive);
+int start_keyboard_bragi(usbdevice* kb, int makeactive);
 
 // Activates/deactives software control on a device. Return 0 on success
 int setactive_kb(usbdevice* kb, int active);

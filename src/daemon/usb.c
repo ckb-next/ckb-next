@@ -232,7 +232,10 @@ static const devcmd* get_vtable(usbdevice* kb){
     ushort vendor = kb->vendor;
     ushort product = kb->product;
     if(kb->protocol == PROTO_BRAGI) {
-        return &vtable_bragi;
+        if(IS_MOUSE(vendor, product))
+            return &vtable_bragi;
+        else
+            return &vtable_bragi_keyboard;
     } else if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;

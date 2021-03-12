@@ -463,3 +463,51 @@ const devcmd vtable_bragi = {
     .read = bragi_usb_read,
 };
 
+const devcmd vtable_bragi_keyboard = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_pollrate_bragi,
+
+    .active = cmd_active_bragi,
+    .idle = cmd_idle_bragi,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_ioff,
+    .ion = cmd_ion,
+    .iauto = cmd_iauto,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_keyboard_bragi,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile_none,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_keyboard_bragi,
+    .updateindicators = int1_void_none,
+    .updatedpi = int1_int_none,
+    .reset = cmd_none,
+    .fill_input_eps = bragi_fill_input_eps,
+    .write = bragi_usb_write,
+    .read = bragi_usb_read,
+};

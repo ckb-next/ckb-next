@@ -346,9 +346,9 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
     // it's moved to offset 0x15, right after the above loop finishes
     for(int bit = 0; bit < 8; bit++){
         if((urbinput[13] >> bit) & 1)
-            SET_KEYBIT(kbinput, hid_codes[bit + 224]);
+            SET_KEYBIT(kbinput, hid_codes[bit + 223]);
         else
-            CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
+            CLEAR_KEYBIT(kbinput, hid_codes[bit + 223]);
     }
 }
 

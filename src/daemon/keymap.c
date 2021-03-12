@@ -296,6 +296,12 @@ static const short hid_codes[256] = {
      -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
 };
 
+static const short bragi_extra_lut[40] = {
+    60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97,
+    -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
+    -2, -2, -2, -2, -2, -2, -2, -2
+};
+
 // There are three types of keyboard input. 6KRO, NKRO and Corsair.
 //
 // 6KRO is only enabled in BIOS mode, and since we do not touch devices in bios mode,
@@ -321,9 +327,6 @@ static const short hid_codes[256] = {
 ///
 
 static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
-    if(length != MSG_SIZE)
-        return;
-
     // Skip the 0x00 0x02 header
     urbinput += 2;
 
@@ -334,22 +337,46 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
             int scan = hid_codes[keybit];
             if((input >> bit) & 1){
                 if(scan >= 0)
-                    SET_KEYBIT(kbinput, hid_codes[keybit]);
+                    SET_KEYBIT(kbinput, scan);
                 else
                     ckb_warn("Got unknown bragi key press %d", keybit);
             } else if(scan >= 0)
-                CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
+                CLEAR_KEYBIT(kbinput, scan);
         }
     }
 
     // This is supposed to be the byte at offset 0x01, but because the header has an 0x02 at that position,
-    // it's moved to offset 0x15, right after the above loop finishes
+    // it's moved to offset 0x15, right after the above loop finishes.
+    // Since there's more after this, we just read from a different LUT
+    for(int byte = 0; byte < 5; byte++){
+        char input = urbinput[13 + byte];
+        for(int bit = 0; bit < 8; bit++){
+            int keybit = byte * 8 + bit;
+            int scan = bragi_extra_lut[keybit];
+            if((input >> bit) & 1){
+                if(scan >= 0)
+                    SET_KEYBIT(kbinput, scan);
+                else
+                    ckb_warn("Got unknown extended bragi key press %d", keybit);
+            } else if(scan >= 0)
+                CLEAR_KEYBIT(kbinput, scan);
+        }
+    }
+    /*
     for(int bit = 0; bit < 8; bit++){
         if((urbinput[13] >> bit) & 1)
             SET_KEYBIT(kbinput, hid_codes[bit + 223]);
         else
             CLEAR_KEYBIT(kbinput, hid_codes[bit + 223]);
     }
+    
+    // Followed by rwin at urbinput[14], bit 0
+    if((urbinput[13] >> bit) & 1)
+        SET_KEYBIT(kbinput, hid_codes[bit + 223]);
+    else
+        CLEAR_KEYBIT(kbinput, hid_codes[ + 223]);
+    223+8
+    */
 }
 
 void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep){

@@ -55,7 +55,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "l",          0x6f, KEY_L },
     { "colon",      0x7b, KEY_SEMICOLON },
     { "quote",      0x87, KEY_APOSTROPHE },
-    { "lshift",     0x04, KEY_LEFTSHIFT },
+    { "lshift",     0x04, KEY_LEFTSHIFT }, // 48
     { "bslash_iso", 0x10, KEY_102ND },
     { "z",          0x1c, KEY_Z },
     { "x",          0x28, KEY_X },
@@ -67,9 +67,9 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "comma",      0x70, KEY_COMMA },
     { "dot",        0x7c, KEY_DOT },
     { "slash",      0x88, KEY_SLASH },
-    { "lctrl",      0x05, KEY_LEFTCTRL },
+    { "lctrl",      0x05, KEY_LEFTCTRL }, // 60
     { "lwin",       0x11, KEY_LEFTMETA },
-    { "lalt",       0x1d, KEY_LEFTALT },
+    { "lalt",       0x1d, KEY_LEFTALT }, // 62
     { "hanja",      -1,   KEY_HANJA },
     { "space",      0x35, KEY_SPACE },
     { "hangul",     -1,   KEY_HANGEUL },
@@ -297,9 +297,9 @@ static const short hid_codes[256] = {
 };
 
 static const short bragi_extra_lut[40] = {
-    60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97,
-    -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
-    -2, -2, -2, -2, -2, -2, -2, -2
+    -1, 60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131, 
+    97, -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,
+    -2, -2, -2, -2, -2, -2, -2, -2,
 };
 
 // There are three types of keyboard input. 6KRO, NKRO and Corsair.

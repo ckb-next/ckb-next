@@ -327,7 +327,7 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
     // Skip the 0x00 0x02 header
     urbinput += 2;
 
-    for(int byte = 0; byte < 14; byte++){
+    for(int byte = 0; byte < 13; byte++){
         char input = urbinput[byte];
         for(int bit = 0; bit < 8; bit++){
             int keybit = byte * 8 + bit;
@@ -340,6 +340,15 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
             } else if(scan >= 0)
                 CLEAR_KEYBIT(kbinput, hid_codes[keybit]);
         }
+    }
+
+    // This is supposed to be the byte at offset 0x01, but because the header has an 0x02 at that position,
+    // it's moved to offset 0x15, right after the above loop finishes
+    for(int bit = 0; bit < 8; bit++){
+        if((urbinput[13] >> bit) & 1)
+            SET_KEYBIT(kbinput, hid_codes[bit + 224]);
+        else
+            CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
     }
 }
 

@@ -296,10 +296,10 @@ static const short hid_codes[256] = {
      -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
 };
 
-static const short bragi_extra_lut[40] = {
-     -1, 60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,
-     97, -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2, 120, 121, 122, 123, 124,
-    125, -2,  -2,  -2,  -2,  -2,  -2,  -2,
+static const short bragi_extra_lut[56] = {
+    108, 109, 110, 118, 119,  49,  69,  97,  -1, 60,  48,  62,  61,  91,  90,  67,
+     68,  71,  96,  99, 101,  -2, 130, 131,  97, -2,  98, 100, 101,  99,  96,  70,
+    132,  -2,  -2, 120, 121, 122, 123, 124, 125, -2,  -2,  -2,  -2,  -2,  -2,  -2,
 };
 
 // There are three types of keyboard input. 6KRO, NKRO and Corsair.
@@ -330,7 +330,7 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
     // Skip the 0x00 0x02 header
     urbinput += 2;
 
-    for(int byte = 0; byte < 13; byte++){
+    for(int byte = 0; byte < 12; byte++){
         char input = urbinput[byte];
         for(int bit = 0; bit < 8; bit++){
             int keybit = byte * 8 + bit;
@@ -348,8 +348,8 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
     // This is supposed to be the byte at offset 0x01, but because the header has an 0x02 at that position,
     // it's moved to offset 0x15, right after the above loop finishes.
     // Since there's more after this, we just read from a different LUT
-    for(int byte = 0; byte < 5; byte++){
-        char input = urbinput[13 + byte];
+    for(int byte = 0; byte < 6; byte++){
+        char input = urbinput[12 + byte];
         for(int bit = 0; bit < 8; bit++){
             int keybit = byte * 8 + bit;
             int scan = bragi_extra_lut[keybit];

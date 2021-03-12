@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include "mainwindow.h"
 #include <ckbnextconfig.h>
+#include <QProgressBar>
 
 extern QString devpath;
 
@@ -18,7 +19,7 @@ static QStringList modKeys, modNames;
 static bool updateRequestedByUser = false;
 
 SettingsWidget::SettingsWidget(QWidget *parent) :
-    QWidget(parent), devDetect(nullptr),
+    QWidget(parent), devDetect(nullptr), devDetectProgress(nullptr),
     ui(new Ui::SettingsWidget)
 {
     ui->setupUi(this);
@@ -188,7 +189,7 @@ void SettingsWidget::on_aboutQt_clicked(){
 
 void SettingsWidget::on_generateReportButton_clicked(){
     // Don't allow the script to run twice
-    if(devDetect)
+    if(devDetect || devDetectProgress)
         return;
 
     QMessageBox::information(this, tr("Generate report"), tr("This will collect software logs, as well as information about the Corsair devices in your system.\n\n"
@@ -201,6 +202,8 @@ void SettingsWidget::on_generateReportButton_clicked(){
 #elif defined(Q_OS_MACOS)
     QString devDetectPath("/Applications/ckb-next.app/Contents/Resources/ckb-next-dev-detect");
 #endif
+    devDetectProgress = new QProgressDialog(tr("Generating Report"), "", 0, 0, this);
+    devDetectProgress->setCancelButton(nullptr);
     devDetect->start(devDetectPath, QStringList() << "--nouserinput");
 
     // Check if it was started successfully
@@ -209,9 +212,13 @@ void SettingsWidget::on_generateReportButton_clicked(){
                                                                                   "File not found or not executable."));
         devDetect->deleteLater();
     }
+    devDetectProgress->open();
 }
 
 void SettingsWidget::devDetectFinished(int retVal){
+    devDetectProgress->close();
+    delete devDetectProgress;
+    devDetectProgress = nullptr;
     QFile report("/tmp/ckb-next-dev-detect-report.gz");
     if(retVal || !report.exists()){
         QString errMsg(tr("An error occurred while trying to execute ckb-next-dev-detect.\n\n"));

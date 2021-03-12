@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "extrasettingswidget.h"
 #include <QProcess>
+#include <QProgressDialog>
 
 namespace Ui {
 class SettingsWidget;
@@ -50,6 +51,7 @@ private slots:
 
 private:
     QProcess* devDetect;
+    QProgressDialog* devDetectProgress;
     Ui::SettingsWidget *ui;
     friend class MainWindow;
     ExtraSettingsWidget* extra;

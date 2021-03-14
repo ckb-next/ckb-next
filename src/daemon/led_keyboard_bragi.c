@@ -28,16 +28,19 @@ int updatergb_keyboard_bragi(usbdevice* kb, int force){
     // Buffer needs (4 + 156*3 + 12 padding) + 7 bytes for the first header.
     // 0xd4010000 == 468
     uchar rgb_pkt[BRAGI_RGB_PKT_SIZE] = {BRAGI_MAGIC, BRAGI_WRITE_DATA, BRAGI_LIGHTING_HANDLE, 0xd4, 0x01, 0x00, 0x00};
+    uchar* pkt = rgb_pkt + 7 + 4;
     // Red
-    memcpy(rgb_pkt + 7 + 4, r, N_BRAGI_KEYBOARD_KEYS);
+    memcpy(pkt, r, N_BRAGI_KEYBOARD_KEYS);
+    pkt += N_BRAGI_KEYBOARD_KEYS;
     // Green
-    memcpy(rgb_pkt, g, N_BRAGI_KEYBOARD_KEYS);
+    memcpy(pkt, g, N_BRAGI_KEYBOARD_KEYS);
+    pkt += N_BRAGI_KEYBOARD_KEYS;
     // Blue
-    memcpy(rgb_pkt, b, N_BRAGI_KEYBOARD_KEYS);
+    memcpy(pkt, b, N_BRAGI_KEYBOARD_KEYS);
 
-    uchar* pkt = rgb_pkt;
     // Now start sending 64 byte chunks.
     // First packet is ready as-is
+    pkt = rgb_pkt;
 #warning "Check if the device responded with success"
     uchar response[64] = {0};
     if(!usbrecv(kb, pkt, response))
@@ -45,7 +48,8 @@ int updatergb_keyboard_bragi(usbdevice* kb, int force){
 
     // Second to eigth packet
     // Get to the end of the last packet, go back 3 bytes and insert the header for the continue write
-    while((pkt += 64 - 3) < rgb_pkt + BRAGI_RGB_PKT_SIZE) {
+    while((pkt += 64) < rgb_pkt + BRAGI_RGB_PKT_SIZE) {
+        pkt -= 3;
         pkt[0] = BRAGI_MAGIC;
         pkt[1] = BRAGI_CONTINUE_WRITE;
         pkt[2] = BRAGI_LIGHTING_HANDLE;

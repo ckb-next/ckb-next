@@ -4,8 +4,8 @@
 #include "mainwindow.h"
 #include "ckbsettings.h"
 #include "animdetailsdialog.h"
-#ifdef USE_XCB_SCREENSAVER
 #include "kbmanager.h"
+#ifdef USE_XCB_SCREENSAVER
 #include "idletimer.h"
 #endif
 // KbLight

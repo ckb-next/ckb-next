@@ -27,10 +27,15 @@ pthread_cond_t interruptcond[DEV_MAX];                                          
 int cond_nanosleep(pthread_cond_t *restrict cond,
                    pthread_mutex_t *restrict mutex, uint32_t ns) {
     struct timespec ts = { 0 };
+#ifdef OS_MAC
+    timespec_add(&ts, ns);
+    return pthread_cond_timedwait_relative_np(cond, mutex, &ts);
+#else
     if(clock_gettime(CLOCK_MONOTONIC, &ts))
         return ENOTSUP;
     timespec_add(&ts, ns);
     return pthread_cond_timedwait(cond, mutex, &ts);
+#endif
 }
 
 void queued_mutex_lock(queued_mutex_t* mutex){
@@ -113,8 +118,11 @@ void queued_cond_nanosleep(pthread_cond_t *restrict cond,
 int init_cond_monotonic(void) {
     pthread_condattr_t monotonic_condattr;
 
-    if(pthread_condattr_init(&monotonic_condattr) ||
-       pthread_condattr_setclock(&monotonic_condattr, CLOCK_MONOTONIC))
+    if(pthread_condattr_init(&monotonic_condattr)
+#ifndef OS_MAC
+        || pthread_condattr_setclock(&monotonic_condattr, CLOCK_MONOTONIC)
+#endif
+    )
         return 1;
 
     // pthread_cond_init

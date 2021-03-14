@@ -14,6 +14,7 @@ int updatergb_mouse_legacy(usbdevice* kb, int force);
 int updatergb_wireless(usbdevice* kb, lighting* lastlight, lighting* newlight);
 void apply_hwanim(usbdevice* kb, short zone, uchar anim, uchar speed, uchar rand_or_dir, uchar r[2], uchar g[2], uchar b[2]);
 int updatergb_mouse_bragi(usbdevice* kb, int force);
+int updatergb_keyboard_bragi(usbdevice* kb, int force);
 
 // Saves RGB data to device memory. Returns 0 on success.
 int savergb_kb(usbdevice* kb, lighting* light, int mode);

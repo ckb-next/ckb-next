@@ -57,7 +57,7 @@ int updatergb_mouse_bragi(usbdevice* kb, int force){
     uchar response[64] = {0};
     if(!usbrecv(kb, pkt, response))
         return 1;
-
+#warning "Check if the device responded with success"
     memcpy(lastlight, newlight, sizeof(lighting));
     return 0;
 }

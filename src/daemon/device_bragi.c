@@ -31,7 +31,7 @@ void* bragi_poll_thread(void* ctx){
     return NULL;
 }
 
-int setactive_bragi(usbdevice* kb, int active){
+static int setactive_bragi(usbdevice* kb, int active){
     const int ckb_id = INDEX_OF(kb, keyboard);
     uchar pkt[64] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_MODE, 0, active};
     uchar response[64] = {0};
@@ -93,9 +93,8 @@ int setactive_bragi(usbdevice* kb, int active){
     return 0;
 }
 
-int start_mouse_bragi(usbdevice* kb, int makeactive){
-    (void)makeactive;
-
+static int start_bragi_common(usbdevice* kb){
+    kb->usbdelay = 10; // This might not be needed, but won't harm
 #warning "FIXME. Read more properties, such as fw version and pairing id"
     // Check if we're in software mode, and if so, force back to hardware until we explicitly want SW.
     uchar pkt[64] = {BRAGI_MAGIC, BRAGI_GET, BRAGI_MODE, 0};
@@ -130,6 +129,27 @@ int start_mouse_bragi(usbdevice* kb, int makeactive){
     kb->features |= FEAT_ADJRATE;
     kb->features &= ~FEAT_HWLOAD;
 
+    kb->usbdelay = USB_DELAY_DEFAULT;
+
+    return 0;
+}
+
+int start_mouse_bragi(usbdevice* kb, int makeactive){
+    if(start_bragi_common(kb))
+        return 1;
+
+    if(makeactive)
+        setactive_bragi(kb, BRAGI_MODE_SOFTWARE);
+    return 0;
+}
+
+int start_keyboard_bragi(usbdevice* kb, int makeactive){
+    if(start_bragi_common(kb))
+        return 1;
+
+    if(makeactive)
+        if(setactive_bragi(kb, BRAGI_MODE_SOFTWARE))
+            return 1;
     return 0;
 }
 
@@ -179,4 +199,3 @@ int cmd_idle_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const
 
     return setactive_bragi(kb, BRAGI_MODE_HARDWARE);
 }
-

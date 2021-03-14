@@ -10,3 +10,4 @@
 #cmakedefine DEBUG_USB_RECV
 #cmakedefine DEBUG_USB_INPUT
 #cmakedefine DEBUG_MUTEX
+#cmakedefine NO_FAIR_MUTEX_QUEUEING

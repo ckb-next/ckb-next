@@ -16,6 +16,10 @@ extern usbdevice keyboard[DEV_MAX];
 #define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
 #endif
 
+#ifdef NO_FAIR_MUTEX_QUEUEING
+#define QUEUED_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+typedef pthread_mutex_t queued_mutex_t;
+#else
 // A fair queue mutex construct; contenders get to grab the mutex in the order they attempted to acquire it
 typedef struct queued_mutex{
     pthread_mutex_t mutex;
@@ -24,6 +28,7 @@ typedef struct queued_mutex{
 } queued_mutex_t;
 
 #define QUEUED_MUTEX_INITIALIZER {PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, 0, 0}
+#endif
 
 void queued_mutex_lock(queued_mutex_t* mutex);   // Lock a queued_mutex
 int queued_mutex_trylock(queued_mutex_t* mutex); // Try to lock a queued_mutex without blocking; returns 0 on success.

@@ -34,6 +34,9 @@ int cond_nanosleep(pthread_cond_t *restrict cond,
 }
 
 void queued_mutex_lock(queued_mutex_t* mutex){
+#ifdef NO_FAIR_MUTEX_QUEUEING
+    pthread_mutex_lock(mutex);
+#else
     pthread_mutex_lock(&mutex->mutex);
     unsigned long my_turn = mutex->next_waiting++;
 
@@ -41,9 +44,13 @@ void queued_mutex_lock(queued_mutex_t* mutex){
         pthread_cond_wait(&mutex->cond, &mutex->mutex);
 
     pthread_mutex_unlock(&mutex->mutex);
+#endif
 }
 
 int queued_mutex_trylock(queued_mutex_t* mutex){
+#ifdef NO_FAIR_MUTEX_QUEUEING
+    return pthread_mutex_trylock(mutex);
+#else
     int res = 0;
     pthread_mutex_lock(&mutex->mutex);
 
@@ -57,13 +64,18 @@ int queued_mutex_trylock(queued_mutex_t* mutex){
     pthread_mutex_unlock(&mutex->mutex);
 
     return res;
+#endif
 }
 
 void queued_mutex_unlock(queued_mutex_t* mutex){
+#ifdef NO_FAIR_MUTEX_QUEUEING
+    pthread_mutex_unlock(mutex);
+#else
     pthread_mutex_lock(&mutex->mutex);
     mutex->next_in++;
     pthread_mutex_unlock(&mutex->mutex);
     pthread_cond_broadcast(&mutex->cond);
+#endif
 }
 
 ///
@@ -75,6 +87,9 @@ void queued_mutex_unlock(queued_mutex_t* mutex){
 ///
 void queued_cond_nanosleep(pthread_cond_t *restrict cond,
                            queued_mutex_t *restrict mutex, const uint32_t ns) {
+#ifdef NO_FAIR_MUTEX_QUEUEING
+    cond_nanosleep(cond, mutex, ns);
+#else
     pthread_mutex_lock(&mutex->mutex);
 
     // release mutex
@@ -91,6 +106,7 @@ void queued_cond_nanosleep(pthread_cond_t *restrict cond,
         pthread_cond_wait(&mutex->cond, &mutex->mutex);
 
     pthread_mutex_unlock(&mutex->mutex);
+#endif
 }
 
 /// Initialize pthread_cond's with a monotonic clock, if possible

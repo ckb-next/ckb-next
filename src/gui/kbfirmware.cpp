@@ -11,7 +11,7 @@ static const quint64 AUTO_CHECK_TIME = 60 * 60 * 1000;
 KbFirmware::FW::FW() : fwVersion(0.f), ckbVersion(0.f) {}
 
 KbFirmware::KbFirmware() :
-    lastCheck(0), lastFinished(0), tableDownload(0), hasGPG(UNKNOWN)
+    lastCheck(0), lastFinished(0), tableDownload(0), hasGPG(GPG_UNKNOWN)
 {
     // Disable bearer polling. This corrects an issue with latency spikes when
     // using WiFi. The problem and workaround are described here:
@@ -30,20 +30,20 @@ KbFirmware::KbFirmware() :
         _gpg->start();
         _gpg->waitForFinished();
         if(_gpg->error() == QProcess::FailedToStart){
-            hasGPG = NO;
+            hasGPG = GPG_NO;
             qDebug() << "No GPG2 or GPG detected. Signature verification disabled.";
         }
     }
 
     // If set to NO it means there was no binary found
     // So don't bother checking capabilities
-    if(hasGPG == UNKNOWN){
+    if(hasGPG == GPG_UNKNOWN){
         QString output = QString::fromUtf8(_gpg->readAll());
         // Must support RSA keys and SHA256
         if(output.contains("RSA", Qt::CaseInsensitive) && output.contains("SHA512", Qt::CaseInsensitive)){
-            hasGPG = YES;
+            hasGPG = GPG_YES;
         } else {
-            hasGPG = NO;
+            hasGPG = GPG_NO;
             qDebug() << _gpg->program() << "does not support RSA and SHA512. Signature verification disabled.";
         }
     }

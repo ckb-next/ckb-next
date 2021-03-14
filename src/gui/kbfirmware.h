@@ -50,7 +50,7 @@ private:
     QNetworkReply* tableDownload;
 
     // Can GPG be used to verify signatures?
-    enum { UNKNOWN = -1, NO, YES } hasGPG :2;
+    enum { GPG_UNKNOWN = -1, GPG_NO, GPG_YES } hasGPG :2;
     QProcess*    _gpg;
 
 signals:

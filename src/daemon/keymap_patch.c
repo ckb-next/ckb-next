@@ -55,6 +55,9 @@ void patchkeys(usbdevice* kb){
     // Copy the default keymap over
     kb->keymap = malloc(sizeof(keymap));
     memcpy(kb->keymap, keymap, sizeof(keymap));
+    // Check if we need to patch the bragi base map
+    if(kb->protocol == PROTO_BRAGI)
+        memcpy(kb->keymap, keymap_bragi, sizeof(keymap_bragi));
     // Iterate through the patches for all devices
     for(size_t pos = 0; pos < KEYPATCHES_LEN; pos++){
         if(mappatches[pos].vendor == kb->vendor && mappatches[pos].product == kb->product){

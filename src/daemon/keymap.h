@@ -51,6 +51,8 @@
 #define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED)
 #define N_KEYBYTES_EXTENDED     ((N_KEYS_EXTENDED + 7) / 8)
 
+#define N_KEYS_BRAGI_PATCH      171
+
 // Map from key name to LED code and USB scan code
 typedef struct {
     const char* name;
@@ -66,6 +68,7 @@ typedef struct {
 // List of keys, ordered according to where they appear in the keyboard input.
 // Begins with keyboard keys, followed by extra keys, then mouse buttons, and finally LED zones
 extern const key keymap[N_KEYS_EXTENDED];
+extern const key keymap_bragi[N_KEYS_BRAGI_PATCH];
 // Decides which of the following functions it needs to call
 void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep);
 

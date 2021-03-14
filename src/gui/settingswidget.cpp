@@ -202,8 +202,6 @@ void SettingsWidget::on_generateReportButton_clicked(){
 #elif defined(Q_OS_MACOS)
     QString devDetectPath("/Applications/ckb-next.app/Contents/Resources/ckb-next-dev-detect");
 #endif
-    devDetectProgress = new QProgressDialog(tr("Generating Report"), "", 0, 0, this);
-    devDetectProgress->setCancelButton(nullptr);
     devDetect->start(devDetectPath, QStringList() << "--nouserinput");
 
     // Check if it was started successfully
@@ -211,7 +209,10 @@ void SettingsWidget::on_generateReportButton_clicked(){
         QMessageBox::critical(this, tr("Error executing ckb-next-dev-detect"), tr("An error occurred while trying to execute ckb-next-dev-detect.\n"
                                                                                   "File not found or not executable."));
         devDetect->deleteLater();
+        return;
     }
+    devDetectProgress = new QProgressDialog(tr("Generating Report"), "", 0, 0, this);
+    devDetectProgress->setCancelButton(nullptr);
     devDetectProgress->open();
 }
 

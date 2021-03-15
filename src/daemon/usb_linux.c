@@ -674,12 +674,13 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
     // Find a free USB slot
     for(int index = 1; index < DEV_MAX; index++){
         usbdevice* kb = keyboard + index;
+        // Make sure any existing keyboard doesn't have the same syspath (this shouldn't happen, but it does happen...)
+        if(!strcmp(syspath, kbsyspath[index])){
+            ckb_warn("Attempted to add device with duplicate syspath %s (path %s)", syspath, path);
+            return 1;
+        }
         if(queued_mutex_trylock(dmutex(kb))){
             // If the mutex is locked then the device is obviously in use, so keep going
-            if(!strcmp(syspath, kbsyspath[index])){
-                // Make sure this existing keyboard doesn't have the same syspath (this shouldn't happen)
-                return 0;
-            }
             continue;
         }
         // We can't use IS_CONNECTED() here.

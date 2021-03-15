@@ -217,6 +217,8 @@ typedef struct {
     int uinput_kb, uinput_mouse;
     // keyboard led thread
     pthread_t* ledthread;
+    // Hack to get the led thread to shut down if stuck waiting for dmutex
+    int shutdown_ledthread;
 #else
     // USB identifier
     uint32_t location_id[IFACE_MAX + 1];

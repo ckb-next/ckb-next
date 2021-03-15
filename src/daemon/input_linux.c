@@ -111,8 +111,13 @@ void os_inputclose(usbdevice* kb){
 
     // Tell the led thread to stop and then join it
     if(kb->ledthread){
+        kb->shutdown_ledthread = 1;
+        queued_mutex_unlock(imutex(kb));
+        queued_mutex_unlock(dmutex(kb));
         pthread_kill(*kb->ledthread, SIGUSR2);
         pthread_join(*kb->ledthread, NULL);
+        queued_mutex_lock(dmutex(kb));
+        queued_mutex_lock(imutex(kb));
     }
     free(kb->ledthread);
     kb->ledthread = NULL;
@@ -218,6 +223,10 @@ void* _ledthread(void* ctx){
         }
         // Update them if needed
         queued_mutex_lock(dmutex(kb));
+        if(kb->shutdown_ledthread){
+            queued_mutex_unlock(dmutex(kb));
+            break;
+        }
         if(kb->hw_ileds != ileds){
             kb->hw_ileds = ileds;
             kb->vtable->updateindicators(kb, 0);

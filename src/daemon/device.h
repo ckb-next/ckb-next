@@ -107,6 +107,9 @@ void setmodeindex_legacy(usbdevice* kb, int index);
 // Resets devices using the NXP HID protocol
 void nxp_reset(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* type);
 
+// Used to clear the input struct and force an rgb update when switching between hw and sw modes
+void clear_input_and_rgb(usbdevice* kb, const int active);
+
 // Per-key input settings for device setup
 // The upper nybble controls input mode. 0x80 generates a normal HID interrupt, 0x40 generates a proprietary interrupt. 0xc0 generates both.
 // The exceptions are the proprietary Corsair keys, which only report HID input in BIOS mode and only report Corsair input in non-BIOS mode.

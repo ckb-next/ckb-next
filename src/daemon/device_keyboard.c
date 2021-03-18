@@ -21,13 +21,7 @@ int setactive_kb(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
 
-    queued_mutex_lock(imutex(kb));
-    kb->active = !!active;
-    kb->profile->lastlight.forceupdate = 1;
-    // Clear input
-    memset(&kb->input.keys, 0, sizeof(kb->input.keys));
-    inputupdate(kb);
-    queued_mutex_unlock(imutex(kb));
+    clear_input_and_rgb(kb, active);
 
     uchar msg[3][MSG_SIZE] = {
         { CMD_SET, FIELD_SPECIAL, 0 },                // Disables or enables HW control for top row

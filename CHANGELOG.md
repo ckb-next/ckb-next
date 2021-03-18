@@ -1,5 +1,15 @@
 # Change Log
 
+## [v0.4.4](https://github.com/ckb-next/ckb-next/tree/v0.4.4) (2021-03-18)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.3...v0.4.4)
+
+Important bugfixes:
+- Fixed a crash when creating a new profile
+- Fixed lights turning off unexpectedly or not being restored correctly
+- Macros can now be repeated quickly by repeatedly pressing the keys
+- Fixed various deadlocks when resuming from suspend or during device initialisation
+- Fixed devices not functioning during system boot requiring a daemon restart
+
 ## [v0.4.3](https://github.com/ckb-next/ckb-next/tree/v0.4.3) (2020-12-18)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.2...v0.4.3)
 

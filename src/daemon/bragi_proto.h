@@ -17,6 +17,7 @@
 #define BRAGI_ANGLE_SNAP    0x07
 #define BRAGI_DPI_X         0x21
 #define BRAGI_DPI_Y         0x22
+#define BRAGI_HWLAYOUT      0x41
 
 // Bragi mode
 #define BRAGI_MODE_HARDWARE 0x01

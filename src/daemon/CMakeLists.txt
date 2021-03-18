@@ -91,6 +91,7 @@ if (MACOS OR LINUX)
               usb_nxp.c
               usb_legacy.c
               usb_bragi.c
+              bragi_common.c
               command.h
               device.h
               devnode.h
@@ -115,6 +116,7 @@ if (MACOS OR LINUX)
               usb_legacy.h
               bragi_proto.h
               usb_bragi.h
+              bragi_common.h
     )
 endif ()
 if (MACOS)

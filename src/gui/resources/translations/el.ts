@@ -2722,7 +2722,7 @@ Make sure your keyboard is switched to it before recording.</source>
     </message>
     <message>
         <location filename="../../settingswidget.ui" line="403"/>
-        <location filename="../../settingswidget.cpp" line="195"/>
+        <location filename="../../settingswidget.cpp" line="197"/>
         <source>Generate report</source>
         <translation>Δημιουργία αναφοράς</translation>
     </message>
@@ -2733,14 +2733,13 @@ Make sure your keyboard is switched to it before recording.</source>
     </message>
     <message>
         <location filename="../../settingswidget.ui" line="435"/>
-        <location filename="../../settingswidget.cpp" line="284"/>
+        <location filename="../../settingswidget.cpp" line="286"/>
         <source>Uninstall ckb-next</source>
         <translation>Απεγκατάσταση του ckb-next</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="494"/>
         <source>© 2014-2016 &lt;a href=&quot;https://github.com/ccMSC/&quot; style=&quot;text-decoration:none;&quot;&gt;ccMSC&lt;/a&gt;.&lt;br/&gt;© 2017-2019 &lt;a href=&quot;https://github.com/ckb-next/ckb-next/graphs/contributors&quot; style=&quot;text-decoration:none;&quot;&gt;The ckb-next development team&lt;/a&gt;.</source>
-        <translation>© 2014-2016 &lt;a href=&quot;https://github.com/ccMSC/&quot; style=&quot;text-decoration:none;&quot;&gt;ccMSC&lt;/a&gt;.&lt;br/&gt;© 2017-2019 &lt;a href=&quot;https://github.com/ckb-next/ckb-next/graphs/contributors&quot; style=&quot;text-decoration:none;&quot;&gt;Η ομάδα ανάπτυξης του ckb-next&lt;/a&gt;.</translation>
+        <translation type="vanished">© 2014-2016 &lt;a href=&quot;https://github.com/ccMSC/&quot; style=&quot;text-decoration:none;&quot;&gt;ccMSC&lt;/a&gt;.&lt;br/&gt;© 2017-2019 &lt;a href=&quot;https://github.com/ckb-next/ckb-next/graphs/contributors&quot; style=&quot;text-decoration:none;&quot;&gt;Η ομάδα ανάπτυξης του ckb-next&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../../settingswidget.ui" line="547"/>
@@ -2748,12 +2747,17 @@ Make sure your keyboard is switched to it before recording.</source>
         <translation>Έξοδος</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="95"/>
+        <location filename="../../settingswidget.cpp" line="92"/>
+        <source>The ckb-next development team</source>
+        <translation>Η ομάδα ανάπτυξης του ckb-next</translation>
+    </message>
+    <message>
+        <location filename="../../settingswidget.cpp" line="96"/>
         <source>&lt;br/&gt;Special thanks to &lt;a href=&quot;https://github.com/tekezo&quot; style=&quot;text-decoration:none;&quot;&gt;tekezo&lt;/a&gt; for &lt;a href=&quot;https://github.com/tekezo/Karabiner-VirtualHIDDevice&quot; style=&quot;text-decoration:none;&quot;&gt;VirtualHIDDevice&lt;/a&gt;.</source>
         <translation>&lt;br/&gt;Ιδιαίτερες ευχαριστίες στον &lt;a href=&quot;https://github.com/tekezo&quot; style=&quot;text-decoration:none;&quot;&gt;tekezo&lt;/a&gt; για το &lt;a href=&quot;https://github.com/tekezo/Karabiner-VirtualHIDDevice&quot; style=&quot;text-decoration:none;&quot;&gt;VirtualHIDDevice&lt;/a&gt;.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="195"/>
+        <location filename="../../settingswidget.cpp" line="197"/>
         <source>This will collect software logs, as well as information about the Corsair devices in your system.
 
 Make sure they are plugged in and click OK.</source>
@@ -2762,25 +2766,25 @@ Make sure they are plugged in and click OK.</source>
 Σιγουρευτείτε ότι είναι συνδεδεμένες και κάντε κλικ στο OK.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="209"/>
-        <location filename="../../settingswidget.cpp" line="229"/>
+        <location filename="../../settingswidget.cpp" line="211"/>
+        <location filename="../../settingswidget.cpp" line="231"/>
         <source>Error executing ckb-next-dev-detect</source>
         <translation>Σφάλμα εκτέλεσης του ckb-next-dev-detect</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="209"/>
+        <location filename="../../settingswidget.cpp" line="211"/>
         <source>An error occurred while trying to execute ckb-next-dev-detect.
 File not found or not executable.</source>
         <translation>Παρουσιάστηκε σφάλμα κατά την εκτέλεση του ckb-next-dev-detect.
 Το αρχείο δεν βρέθηκε ή δεν είναι εκτελέσιμο.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="214"/>
+        <location filename="../../settingswidget.cpp" line="216"/>
         <source>Generating Report</source>
         <translation>Γίνεται δημιουργία αναφοράς</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="225"/>
+        <location filename="../../settingswidget.cpp" line="227"/>
         <source>An error occurred while trying to execute ckb-next-dev-detect.
 
 </source>
@@ -2789,44 +2793,44 @@ File not found or not executable.</source>
 </translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="228"/>
+        <location filename="../../settingswidget.cpp" line="230"/>
         <source>Return code %1</source>
         <translation>Κωδικός επιστροφής %1</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="234"/>
+        <location filename="../../settingswidget.cpp" line="236"/>
         <source>Select output directory</source>
         <translation>Επιλέξτε φακέλου εξόδου</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="237"/>
+        <location filename="../../settingswidget.cpp" line="239"/>
         <source>Report generated successfully</source>
         <translation>Επιτυχής δημιουργία αναφοράς</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="237"/>
+        <location filename="../../settingswidget.cpp" line="239"/>
         <source>The report has been generated successfully.</source>
         <translation>Η αναφορά δημιουργήθηκε με επιτυχία.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="247"/>
+        <location filename="../../settingswidget.cpp" line="249"/>
         <source>Error writing report</source>
         <translation>Σφάλμα εγγραφής αναφοράς</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="247"/>
+        <location filename="../../settingswidget.cpp" line="249"/>
         <source>Could not write report to the selected directory.
 Please pick a different one and try again.</source>
         <translation>Δεν ήταν δυνατή η δημιουργία αναφοράς στον επιλεγμένο φάκελο.
 Παρακαλώ διαλέξτε έναν άλλο φάκελο και δοκιμάστε ξανά.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="266"/>
+        <location filename="../../settingswidget.cpp" line="268"/>
         <source>Checking...</source>
         <translation>Γίνεται έλεγχος...</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="284"/>
+        <location filename="../../settingswidget.cpp" line="286"/>
         <source>WARNING: Clicking OK will uninstall ckb-next and any older versions of the software from your system.
 
 Your settings and lighting profiles will be preserved.</source>
@@ -2835,12 +2839,12 @@ Your settings and lighting profiles will be preserved.</source>
 Οι ρυθμίσεις και τα προφίλ σας θα διατηρηθούν.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="296"/>
+        <location filename="../../settingswidget.cpp" line="298"/>
         <source>Please restart ckb-next</source>
         <translation>Παρακαλώ επανεκκινήστε το ckb-next</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="296"/>
+        <location filename="../../settingswidget.cpp" line="298"/>
         <source>Please click the Quit button and restart ckb-next for the changes to take effect.</source>
         <translation>Κάντε κλικ στο κουμπί Έξοδος και επανεκκινήστε το ckb-next για να εφαρμοστούν οι αλλαγές.</translation>
     </message>

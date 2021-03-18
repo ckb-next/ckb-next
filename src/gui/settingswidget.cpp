@@ -89,13 +89,15 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
         ui->loginItemBox->setChecked(AutoRun::isEnabled());
     }
 
+    QString copyrightText = QString("© 2014-2016 <a href=\"https://github.com/ccMSC/\" style=\"text-decoration:none;\">ccMSC</a>.<br/>© 2017-%1 <a href=\"https://github.com/ckb-next/ckb-next/graphs/contributors\" style=\"text-decoration:none;\">%2</a>.").arg(CKB_NEXT_COPYRIGHT_YEAR, tr("The ckb-next development team"));
+
 #ifndef OS_MAC_LEGACY
 #ifdef Q_OS_MACOS
-    QString labelText = ui->label_2->text();
-    labelText.append(tr("<br/>Special thanks to <a href=\"https://github.com/tekezo\" style=\"text-decoration:none;\">tekezo</a> for <a href=\"https://github.com/tekezo/Karabiner-VirtualHIDDevice\" style=\"text-decoration:none;\">VirtualHIDDevice</a>."));
-    ui->label_2->setText(labelText);
+    copyrightText.append(tr("<br/>Special thanks to <a href=\"https://github.com/tekezo\" style=\"text-decoration:none;\">tekezo</a> for <a href=\"https://github.com/tekezo/Karabiner-VirtualHIDDevice\" style=\"text-decoration:none;\">VirtualHIDDevice</a>."));
 #endif
 #endif
+
+    ui->label_2->setText(copyrightText);
 
 #ifdef DISABLE_UPDATER
     ui->autoUpdBox->hide();

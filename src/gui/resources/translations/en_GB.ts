@@ -1053,7 +1053,7 @@ The binding will not function until winlock has been disabled.</source>
     </message>
     <message>
         <location filename="../../kblightwidget.ui" line="162"/>
-        <location filename="../../kblightwidget.cpp" line="97"/>
+        <location filename="../../kblightwidget.cpp" line="96"/>
         <source>Click to select</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1073,22 +1073,22 @@ The binding will not function until winlock has been disabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="101"/>
+        <location filename="../../kblightwidget.cpp" line="100"/>
         <source>1 zone selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="103"/>
+        <location filename="../../kblightwidget.cpp" line="102"/>
         <source>1 key selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="106"/>
+        <location filename="../../kblightwidget.cpp" line="105"/>
         <source>%1 zones selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="108"/>
+        <location filename="../../kblightwidget.cpp" line="107"/>
         <source>%1 keys selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1946,75 +1946,75 @@ An attempt will be made to import as many as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="293"/>
+        <location filename="../../mainwindow.cpp" line="288"/>
         <source>Driver inactive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="295"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="295"/>
         <source>). Please upgrade ckb-next</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="295"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="311"/>
+        <location filename="../../mainwindow.cpp" line="306"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="313"/>
+        <location filename="../../mainwindow.cpp" line="308"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="323"/>
+        <location filename="../../mainwindow.cpp" line="318"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="326"/>
+        <location filename="../../mainwindow.cpp" line="321"/>
         <source>No devices connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="329"/>
+        <location filename="../../mainwindow.cpp" line="324"/>
         <source>1 device connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="331"/>
+        <location filename="../../mainwindow.cpp" line="326"/>
         <source>%1 devices connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="362"/>
+        <location filename="../../mainwindow.cpp" line="357"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="378"/>
+        <location filename="../../mainwindow.cpp" line="373"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="537"/>
+        <location filename="../../mainwindow.cpp" line="532"/>
         <source>Update to v</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="542"/>
+        <location filename="../../mainwindow.cpp" line="537"/>
         <source>Up to date</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2561,7 +2561,7 @@ Make sure your keyboard is switched to it before recording.</source>
     </message>
     <message>
         <location filename="../../settingswidget.ui" line="403"/>
-        <location filename="../../settingswidget.cpp" line="194"/>
+        <location filename="../../settingswidget.cpp" line="195"/>
         <source>Generate report</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2572,7 +2572,7 @@ Make sure your keyboard is switched to it before recording.</source>
     </message>
     <message>
         <location filename="../../settingswidget.ui" line="435"/>
-        <location filename="../../settingswidget.cpp" line="276"/>
+        <location filename="../../settingswidget.cpp" line="284"/>
         <source>Uninstall ckb-next</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2592,86 +2592,91 @@ Make sure your keyboard is switched to it before recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="94"/>
+        <location filename="../../settingswidget.cpp" line="95"/>
         <source>&lt;br/&gt;Special thanks to &lt;a href=&quot;https://github.com/tekezo&quot; style=&quot;text-decoration:none;&quot;&gt;tekezo&lt;/a&gt; for &lt;a href=&quot;https://github.com/tekezo/Karabiner-VirtualHIDDevice&quot; style=&quot;text-decoration:none;&quot;&gt;VirtualHIDDevice&lt;/a&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="194"/>
+        <location filename="../../settingswidget.cpp" line="195"/>
         <source>This will collect software logs, as well as information about the Corsair devices in your system.
 
 Make sure they are plugged in and click OK.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="208"/>
-        <location filename="../../settingswidget.cpp" line="221"/>
+        <location filename="../../settingswidget.cpp" line="209"/>
+        <location filename="../../settingswidget.cpp" line="229"/>
         <source>Error executing ckb-next-dev-detect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="208"/>
+        <location filename="../../settingswidget.cpp" line="209"/>
         <source>An error occurred while trying to execute ckb-next-dev-detect.
 File not found or not executable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="217"/>
+        <location filename="../../settingswidget.cpp" line="214"/>
+        <source>Generating Report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../settingswidget.cpp" line="225"/>
         <source>An error occurred while trying to execute ckb-next-dev-detect.
 
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="220"/>
+        <location filename="../../settingswidget.cpp" line="228"/>
         <source>Return code %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="226"/>
+        <location filename="../../settingswidget.cpp" line="234"/>
         <source>Select output directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="229"/>
+        <location filename="../../settingswidget.cpp" line="237"/>
         <source>Report generated successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="229"/>
+        <location filename="../../settingswidget.cpp" line="237"/>
         <source>The report has been generated successfully.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="239"/>
+        <location filename="../../settingswidget.cpp" line="247"/>
         <source>Error writing report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="239"/>
+        <location filename="../../settingswidget.cpp" line="247"/>
         <source>Could not write report to the selected directory.
 Please pick a different one and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="258"/>
+        <location filename="../../settingswidget.cpp" line="266"/>
         <source>Checking...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="276"/>
+        <location filename="../../settingswidget.cpp" line="284"/>
         <source>WARNING: Clicking OK will uninstall ckb-next and any older versions of the software from your system.
 
 Your settings and lighting profiles will be preserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="288"/>
+        <location filename="../../settingswidget.cpp" line="296"/>
         <source>Please restart ckb-next</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="288"/>
+        <location filename="../../settingswidget.cpp" line="296"/>
         <source>Please click the Quit button and restart ckb-next for the changes to take effect.</source>
         <translation type="unfinished"></translation>
     </message>

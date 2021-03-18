@@ -1071,7 +1071,7 @@ The binding will not function until winlock has been disabled.</source>
     </message>
     <message>
         <location filename="../../kblightwidget.ui" line="162"/>
-        <location filename="../../kblightwidget.cpp" line="97"/>
+        <location filename="../../kblightwidget.cpp" line="96"/>
         <source>Click to select</source>
         <translation>Κλικ για επιλογή</translation>
     </message>
@@ -1115,22 +1115,22 @@ The binding will not function until winlock has been disabled.</source>
         <translation type="vanished">πλήκτρα</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="101"/>
+        <location filename="../../kblightwidget.cpp" line="100"/>
         <source>1 zone selected</source>
         <translation>1 ζώνη επιλεγμένη</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="103"/>
+        <location filename="../../kblightwidget.cpp" line="102"/>
         <source>1 key selected</source>
         <translation>1 πλήκτρο επιλεγμένο</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="106"/>
+        <location filename="../../kblightwidget.cpp" line="105"/>
         <source>%1 zones selected</source>
         <translation>%1 ζώνες επιλεγμένες</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="108"/>
+        <location filename="../../kblightwidget.cpp" line="107"/>
         <source>%1 keys selected</source>
         <translation>%1 πλήκτρα επιλεγμένα</translation>
     </message>
@@ -2009,63 +2009,63 @@ An attempt will be made to import as many as possible.</source>
         <translation>Το ckb-next-daemon δεν τρέχει.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="293"/>
+        <location filename="../../mainwindow.cpp" line="288"/>
         <source>Driver inactive</source>
         <translation>Ο driver είναι αδρανής</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="295"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Ασυμφωνία έκδοσης του driver (</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="295"/>
         <source>). Please upgrade ckb-next</source>
         <translation>). Παρακαλώ ενημερώστε το ckb-next</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="295"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation>.&lt;br /&gt;Αν το πρόβλημα παραμένει, επανεκκινήστε το σύστημά σας.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="311"/>
+        <location filename="../../mainwindow.cpp" line="306"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Ποσοχή:&lt;/b&gt; Η επέκταση από &quot;Fumihiko Takayama&quot; δεν επιτρέπεται στο Ασφάλεια και απόρρητο. Επιτρέψτε το και επανασυνδέστε τις συσκευές.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="313"/>
+        <location filename="../../mainwindow.cpp" line="308"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Σιγουρευτείτε ότι το ckb-next-daemon επιτρέπεται στο Ασφάλεια και απόρρητο -&gt; Παρακολούθησή εισόδου.&lt;/br /&gt;Παρακαλώ επιτρέψτε μέχρι 10 δευτερόλεπτα μέχρι να εμφανιστεί η ειδοποίηση ενεργοποιήσης του daemon.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="323"/>
+        <location filename="../../mainwindow.cpp" line="318"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Δεν ήταν δυνατό να φορτωθεί το άρθρωμα πυρήνα uinput. Αν αυτο το πρόβλημα παραμένει μετά από επανεκκίνηση, μεταγλωττίστε πυρήνα με CONFIG_INPUT_UINPUT=y.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="326"/>
+        <location filename="../../mainwindow.cpp" line="321"/>
         <source>No devices connected</source>
         <translation>Δεν υπάρχουν συνδεδεμένες συσκευές</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="329"/>
+        <location filename="../../mainwindow.cpp" line="324"/>
         <source>1 device connected</source>
         <translation>1 συσκευή συνδεδεμένη</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="331"/>
+        <location filename="../../mainwindow.cpp" line="326"/>
         <source>%1 devices connected</source>
         <translation>%1 συσκευές συνδεδεμένες</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="362"/>
+        <location filename="../../mainwindow.cpp" line="357"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation>Υπάρχει νέο firmware για το %1 σας (v%2) Θα θέλατε να το εγκαταστήσετε τώρα;</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="378"/>
+        <location filename="../../mainwindow.cpp" line="373"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
@@ -2074,12 +2074,12 @@ or click &quot;Quit&quot; on the Settings screen.</source>
 ή κάντε κλικ στο &quot;Έξοδος&quot; στο παράθυρο ρυθμίσεων.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="537"/>
+        <location filename="../../mainwindow.cpp" line="532"/>
         <source>Update to v</source>
         <translation>Ενημέρωση στο v</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="542"/>
+        <location filename="../../mainwindow.cpp" line="537"/>
         <source>Up to date</source>
         <translation>Ενημερωμένο</translation>
     </message>
@@ -2722,7 +2722,7 @@ Make sure your keyboard is switched to it before recording.</source>
     </message>
     <message>
         <location filename="../../settingswidget.ui" line="403"/>
-        <location filename="../../settingswidget.cpp" line="194"/>
+        <location filename="../../settingswidget.cpp" line="195"/>
         <source>Generate report</source>
         <translation>Δημιουργία αναφοράς</translation>
     </message>
@@ -2733,7 +2733,7 @@ Make sure your keyboard is switched to it before recording.</source>
     </message>
     <message>
         <location filename="../../settingswidget.ui" line="435"/>
-        <location filename="../../settingswidget.cpp" line="276"/>
+        <location filename="../../settingswidget.cpp" line="284"/>
         <source>Uninstall ckb-next</source>
         <translation>Απεγκατάσταση του ckb-next</translation>
     </message>
@@ -2748,12 +2748,12 @@ Make sure your keyboard is switched to it before recording.</source>
         <translation>Έξοδος</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="94"/>
+        <location filename="../../settingswidget.cpp" line="95"/>
         <source>&lt;br/&gt;Special thanks to &lt;a href=&quot;https://github.com/tekezo&quot; style=&quot;text-decoration:none;&quot;&gt;tekezo&lt;/a&gt; for &lt;a href=&quot;https://github.com/tekezo/Karabiner-VirtualHIDDevice&quot; style=&quot;text-decoration:none;&quot;&gt;VirtualHIDDevice&lt;/a&gt;.</source>
         <translation>&lt;br/&gt;Ιδιαίτερες ευχαριστίες στον &lt;a href=&quot;https://github.com/tekezo&quot; style=&quot;text-decoration:none;&quot;&gt;tekezo&lt;/a&gt; για το &lt;a href=&quot;https://github.com/tekezo/Karabiner-VirtualHIDDevice&quot; style=&quot;text-decoration:none;&quot;&gt;VirtualHIDDevice&lt;/a&gt;.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="194"/>
+        <location filename="../../settingswidget.cpp" line="195"/>
         <source>This will collect software logs, as well as information about the Corsair devices in your system.
 
 Make sure they are plugged in and click OK.</source>
@@ -2762,20 +2762,25 @@ Make sure they are plugged in and click OK.</source>
 Σιγουρευτείτε ότι είναι συνδεδεμένες και κάντε κλικ στο OK.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="208"/>
-        <location filename="../../settingswidget.cpp" line="221"/>
+        <location filename="../../settingswidget.cpp" line="209"/>
+        <location filename="../../settingswidget.cpp" line="229"/>
         <source>Error executing ckb-next-dev-detect</source>
         <translation>Σφάλμα εκτέλεσης του ckb-next-dev-detect</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="208"/>
+        <location filename="../../settingswidget.cpp" line="209"/>
         <source>An error occurred while trying to execute ckb-next-dev-detect.
 File not found or not executable.</source>
         <translation>Παρουσιάστηκε σφάλμα κατά την εκτέλεση του ckb-next-dev-detect.
 Το αρχείο δεν βρέθηκε ή δεν είναι εκτελέσιμο.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="217"/>
+        <location filename="../../settingswidget.cpp" line="214"/>
+        <source>Generating Report</source>
+        <translation>Γίνεται δημιουργία αναφοράς</translation>
+    </message>
+    <message>
+        <location filename="../../settingswidget.cpp" line="225"/>
         <source>An error occurred while trying to execute ckb-next-dev-detect.
 
 </source>
@@ -2784,44 +2789,44 @@ File not found or not executable.</source>
 </translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="220"/>
+        <location filename="../../settingswidget.cpp" line="228"/>
         <source>Return code %1</source>
         <translation>Κωδικός επιστροφής %1</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="226"/>
+        <location filename="../../settingswidget.cpp" line="234"/>
         <source>Select output directory</source>
         <translation>Επιλέξτε φακέλου εξόδου</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="229"/>
+        <location filename="../../settingswidget.cpp" line="237"/>
         <source>Report generated successfully</source>
         <translation>Επιτυχής δημιουργία αναφοράς</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="229"/>
+        <location filename="../../settingswidget.cpp" line="237"/>
         <source>The report has been generated successfully.</source>
         <translation>Η αναφορά δημιουργήθηκε με επιτυχία.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="239"/>
+        <location filename="../../settingswidget.cpp" line="247"/>
         <source>Error writing report</source>
         <translation>Σφάλμα εγγραφής αναφοράς</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="239"/>
+        <location filename="../../settingswidget.cpp" line="247"/>
         <source>Could not write report to the selected directory.
 Please pick a different one and try again.</source>
         <translation>Δεν ήταν δυνατή η δημιουργία αναφοράς στον επιλεγμένο φάκελο.
 Παρακαλώ διαλέξτε έναν άλλο φάκελο και δοκιμάστε ξανά.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="258"/>
+        <location filename="../../settingswidget.cpp" line="266"/>
         <source>Checking...</source>
         <translation>Γίνεται έλεγχος...</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="276"/>
+        <location filename="../../settingswidget.cpp" line="284"/>
         <source>WARNING: Clicking OK will uninstall ckb-next and any older versions of the software from your system.
 
 Your settings and lighting profiles will be preserved.</source>
@@ -2830,12 +2835,12 @@ Your settings and lighting profiles will be preserved.</source>
 Οι ρυθμίσεις και τα προφίλ σας θα διατηρηθούν.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="288"/>
+        <location filename="../../settingswidget.cpp" line="296"/>
         <source>Please restart ckb-next</source>
         <translation>Παρακαλώ επανεκκινήστε το ckb-next</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.cpp" line="288"/>
+        <location filename="../../settingswidget.cpp" line="296"/>
         <source>Please click the Quit button and restart ckb-next for the changes to take effect.</source>
         <translation>Κάντε κλικ στο κουμπί Έξοδος και επανεκκινήστε το ckb-next για να εφαρμοστούν οι αλλαγές.</translation>
     </message>

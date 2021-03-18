@@ -160,10 +160,8 @@ const char* vendor_str(ushort vendor){
 const char* product_str(ushort product){
     if(product == P_K95 || product == P_K95_LEGACY)
         return "k95";
-    if(product == P_K95_PLATINUM)
+    if(product == P_K95_PLATINUM || product == P_K95_PLATINUM_XT)
         return "k95p";
-    if(product == P_K95_PLATINUM_XT)
-        return "k95pxt";
     if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
     if(product == P_K70_MK2 || product == P_K70_MK2SE || product == P_K70_MK2LP)

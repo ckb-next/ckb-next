@@ -3,6 +3,7 @@
 #include "firmware.h"
 #include "profile.h"
 #include "usb.h"
+#include "input.h"
 
 int hwload_mode = 1;        ///< hwload_mode = 1 means read hardware once. should be enough
 
@@ -262,4 +263,15 @@ void nxp_reset(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char*
         if(!usbsend(kb, pkt, sizeof(pkt), 1))
             ckb_err("%s reset failed", type);
     }
+}
+
+void clear_input_and_rgb(usbdevice* kb, const int active)
+{
+    queued_mutex_lock(imutex(kb));
+    kb->active = !!active;
+    kb->profile->lastlight.forceupdate = 1;
+    // Clear input
+    memset(&kb->input.keys, 0, sizeof(kb->input.keys));
+    inputupdate(kb);
+    queued_mutex_unlock(imutex(kb));
 }

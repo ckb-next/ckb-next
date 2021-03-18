@@ -40,7 +40,9 @@ static int setactive_bragi(usbdevice* kb, int active){
     if(response[2] != 0x00){
         ckb_err("ckb%d: Failed to set device to %s mode 0x%hhx", ckb_id, (active == BRAGI_MODE_SOFTWARE ? "SW" : "HW"), response[2]);
     }
-    kb->active = active - 1;
+
+    clear_input_and_rgb(kb, active - 1);
+
     // We don't need to do anything else if we're going back to hardware mode
     if(active == BRAGI_MODE_HARDWARE)
         return 0;

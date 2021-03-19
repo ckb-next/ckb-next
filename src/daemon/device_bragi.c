@@ -6,6 +6,7 @@
 #include "profile.h"
 #include "usb.h"
 #include "bragi_proto.h"
+#include "bragi_common.h"
 
 // CUE polls devices every 52 seconds
 const struct timespec bragi_poll_delay = { .tv_sec = 50 };
@@ -33,12 +34,9 @@ void* bragi_poll_thread(void* ctx){
 
 static int setactive_bragi(usbdevice* kb, int active){
     const int ckb_id = INDEX_OF(kb, keyboard);
-    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_MODE, 0, active};
-    uchar response[64] = {0};
-    if(!usbrecv(kb, pkt, response))
+    if(bragi_set_property(kb, BRAGI_MODE, active)){
+        ckb_err("ckb%d: Failed to set device to %s mode", ckb_id, (active == BRAGI_MODE_SOFTWARE ? "SW" : "HW"));
         return 1;
-    if(response[2] != 0x00){
-        ckb_err("ckb%d: Failed to set device to %s mode 0x%hhx", ckb_id, (active == BRAGI_MODE_SOFTWARE ? "SW" : "HW"), response[2]);
     }
 
     clear_input_and_rgb(kb, active - 1);
@@ -66,7 +64,7 @@ static int setactive_bragi(usbdevice* kb, int active){
 
     // The daemon always sends RGB data through handle 0, so go ahead and open it
     uchar light_init[64] = {BRAGI_MAGIC, BRAGI_OPEN_HANDLE, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING};
-    memset(response, 0, 64);
+    uchar response[64] = {0};
     if(!usbrecv(kb, light_init, response))
         return 1;
 
@@ -99,12 +97,13 @@ static int start_bragi_common(usbdevice* kb){
     kb->usbdelay = 10; // This might not be needed, but won't harm
 #warning "FIXME. Read more properties, such as fw version and pairing id"
     // Check if we're in software mode, and if so, force back to hardware until we explicitly want SW.
-    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_GET, BRAGI_MODE, 0};
-    uchar response[64] = {0};
-    if(!usbrecv(kb, pkt, response))
+    int prop = bragi_get_property(kb, BRAGI_MODE);
+    if(prop < 0){
+        ckb_fatal("ckb%d: Couldn't get bragi device mode. Aborting", INDEX_OF(kb, keyboard));
         return 1;
+    }
 
-    if(response[3] == BRAGI_MODE_SOFTWARE){
+    if(prop == BRAGI_MODE_SOFTWARE){
         ckb_info("ckb%d: Device is in software mode during init. Switching to hardware", INDEX_OF(kb, keyboard));
         if(setactive_bragi(kb, BRAGI_MODE_HARDWARE))
             return 1;
@@ -118,16 +117,14 @@ static int start_bragi_common(usbdevice* kb){
     pollrateLUT[BRAGI_POLLRATE_4MS] = 4;
     pollrateLUT[BRAGI_POLLRATE_8MS] = 8;
     // Get pollrate
-    pkt[2] = BRAGI_POLLRATE;
-    if(!usbrecv(kb, pkt, response))
-        return 1;
-    
-    uchar pollrate = response[3];
+    prop = bragi_get_property(kb, BRAGI_POLLRATE);
+
+    uchar pollrate = prop;
     if(pollrate > 4)
         return 1;
-    
+
     kb->pollrate = pollrateLUT[pollrate];
-    
+
     kb->features |= FEAT_ADJRATE;
     kb->features &= ~FEAT_HWLOAD;
 
@@ -141,7 +138,8 @@ int start_mouse_bragi(usbdevice* kb, int makeactive){
         return 1;
 
     if(makeactive)
-        setactive_bragi(kb, BRAGI_MODE_SOFTWARE);
+        if(setactive_bragi(kb, BRAGI_MODE_SOFTWARE))
+            return 1;
     return 0;
 }
 
@@ -149,11 +147,32 @@ int start_keyboard_bragi(usbdevice* kb, int makeactive){
     if(start_bragi_common(kb))
         return 1;
 
+    int prop = bragi_get_property(kb, BRAGI_HWLAYOUT);
+    // Physical layout detection.
+    kb->layout = prop;
+    // So far ISO and ANSI are known and match.
+    if (kb->layout != LAYOUT_ANSI && kb->layout != LAYOUT_ISO) {
+        ckb_warn("Got unknown physical layout byte value %d, please file a bug report mentioning your keyboard's physical layout", prop);
+        kb->layout = LAYOUT_UNKNOWN;
+    }
+
     if(makeactive)
         if(setactive_bragi(kb, BRAGI_MODE_SOFTWARE))
             return 1;
     return 0;
 }
+
+static const uchar daemon_pollrate_to_bragi[9] = {
+    1,
+    BRAGI_POLLRATE_1MS,
+    BRAGI_POLLRATE_2MS,
+    1,
+    BRAGI_POLLRATE_4MS,
+    1,
+    1,
+    1,
+    BRAGI_POLLRATE_8MS,
+};
 
 int cmd_pollrate_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3){
     (void)dummy1;
@@ -163,21 +182,7 @@ int cmd_pollrate_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, con
     if(rate > 8 || rate < 0)
         return 0;
     
-    uchar pollrateLUT[9] = {
-        1,
-        BRAGI_POLLRATE_1MS,
-        BRAGI_POLLRATE_2MS,
-        1,
-        BRAGI_POLLRATE_4MS,
-        1,
-        1,
-        1,
-        BRAGI_POLLRATE_8MS,
-    };
-
-    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_POLLRATE, 0, pollrateLUT[rate]};
-    uchar response[64] = {0};
-    if(!usbrecv(kb, pkt, response))
+    if(bragi_set_property(kb, BRAGI_POLLRATE, daemon_pollrate_to_bragi[rate]))
         return 1;
     
     kb->pollrate = rate;

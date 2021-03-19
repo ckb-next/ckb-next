@@ -88,6 +88,7 @@ if (MACOS OR LINUX)
               profile_keyboard.c
               profile_mouse.c
               usb.c
+              bragi_common.c
               command.h
               device.h
               devnode.h
@@ -108,7 +109,8 @@ if (MACOS OR LINUX)
               request_hid_mac.h
               structures.h
               usb.h
-              bragi_proto.h)
+              bragi_proto.h
+              bragi_common.h)
 endif ()
 if (MACOS)
     target_sources(

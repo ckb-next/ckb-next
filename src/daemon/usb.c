@@ -148,7 +148,7 @@ const char* vendor_str(ushort vendor){
 const char* product_str(ushort product){
     if(product == P_K95 || product == P_K95_LEGACY)
         return "k95";
-    if(product == P_K95_PLATINUM)
+    if(product == P_K95_PLATINUM || product == P_Y730)
         return "k95p";
     if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
@@ -192,8 +192,6 @@ const char* product_str(ushort product){
         return "polaris";
     if(product == P_ST100)
         return "st100";
-    if(product == P_Y730)
-        return "y730";
     return "";
 }
 
@@ -705,8 +703,7 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
     }
     return total_sent;
 }
-
-int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
+int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
     while(1){
         DELAY_SHORT(kb);
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
@@ -724,6 +721,25 @@ int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType
         DELAY_LONG(kb);
     }
 }
+
+int _legion_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
+    while(1){
+        queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
+        int res = os_legion_usbsend_control(kb, data, len, bmRequestType, bRequest, wValue, wIndex, file, line);
+        queued_mutex_unlock(mmutex(kb));
+
+        if(res != -1)
+            return res;
+
+        // Stop immediately if the program is shutting down or hardware load is set to tryonce
+        if(reset_stop || hwload_mode != 2)
+            return 0;
+
+        // Retry as long as the result is temporary failure
+        DELAY_LONG(kb);
+    }
+}
+
 
 /// \brief .
 ///

@@ -38,7 +38,7 @@ int os_usbrecv_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestTy
     return res;
 }
 
-int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
+int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
 #ifdef DEBUG_USB_SEND
     int ckb = INDEX_OF(kb, keyboard);
     ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
@@ -46,7 +46,7 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestTy
         print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
 #endif
 
-    struct usbdevfs_ctrltransfer transfer = { bmRequestType, bRequest, wValue, wIndex, len, 5000, data };
+    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, wIndex, len, 5000, data };
     int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
     if (res == -1){
         int ioctlerrno = errno;
@@ -61,6 +61,32 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestTy
 
     return res;
 }
+
+
+int os_legion_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
+#ifdef DEBUG_USB_SEND
+    int ckb = INDEX_OF(kb, keyboard);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu\n", ckb, file, line, bmRequestType, bRequest, wValue, wIndex, len);
+    if(len)
+        print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
+#endif
+
+    struct usbdevfs_ctrltransfer transfer = { bmRequestType, bRequest, wValue, wIndex, len, 5000, data };
+    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    if (res == -1){
+        int ioctlerrno = errno;
+        ckb_err_fn(" %s, res = 0x%x\n", file, line, strerror(ioctlerrno), res);
+        if(ioctlerrno == ETIMEDOUT)
+            return -1;
+        else
+            return 0;
+
+    } else if (res != len)
+        ckb_warn_fn("Wrote %d bytes (expected %d)\n", file, line, res, MSG_SIZE);
+
+    return res;
+}
+
 
 ////
 /// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long

@@ -2,11 +2,7 @@
 #include "idletimer.h"
 #include <limits>
 
-#ifndef Q_OS_MACOS
 QString devpath = "/dev/input/ckb%1";
-#else
-QString devpath = "/var/run/ckb%1";
-#endif
 
 #ifdef DEBUG_IDLE_TIMER
 #define IDLE_TIMER_DURATION 5000

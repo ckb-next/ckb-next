@@ -1,4 +1,4 @@
-# ckb-next: RGB Driver for Linux and macOS
+# ckb-next: RGB Driver for Linux + Support for LENOVO LEGION Y740
 
 <a target="_blank" href="http://webchat.freenode.net?channels=%23ckb-next&uio=d4"><img src="https://cloud.githubusercontent.com/assets/493242/14886493/5c660ea2-0d51-11e6-8249-502e6c71e9f2.png" height = "20" /></a>
 

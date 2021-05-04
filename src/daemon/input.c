@@ -390,12 +390,14 @@ void updateindicators_kb(usbdevice* kb, int force){
 
         ushort leds = kb->ileds;
         int len = 1;
-        if(kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) {
+        if(kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb) || kb->protocol == PROTO_BRAGI) {
             leds = (kb->ileds << 8) | 0x0001;
             len = 2;
         }
         queued_mutex_unlock(dmutex(kb));
         ctrltransfer transfer = { .bRequestType = 0x21, .bRequest = 0x09, .wValue = 0x0200, .wIndex = 0, .wLength = len, .timeout = 5000, .data = &leds };
+        if(kb->protocol == PROTO_BRAGI)
+            transfer.wValue += 1;
         os_usb_control(kb, &transfer, __FILE_NOPATH__, __LINE__);
         queued_mutex_lock(dmutex(kb));
     }

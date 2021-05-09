@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include "keymap_patch.h"
 
 // usb.c
 extern _Atomic int reset_stop;
@@ -245,6 +246,33 @@ int main(int argc, char** argv){
                 ignored_devices[j].idProduct = pid;
                 break;
             }
+        } else if(!strncmp(argument, "--search=", 9)) {
+            char* searchstr = argument + 9;
+            usbdevice dev = {0};
+
+            int count;
+            if(sscanf(searchstr, "%hx:%hx%n", &dev.vendor, &dev.product, &count) == 2) {
+                searchstr += count;
+                if(*searchstr != '\0')
+                    searchstr++;
+            }
+
+            patchkeys(&dev);
+
+            // Search through the patched keymap
+            for (int j = 0; j < N_KEYS_EXTENDED; j++) {
+                if (!dev.keymap[j].name)
+                    continue;
+
+                if (!strcasecmp(searchstr, dev.keymap[j].name)) {
+                    printf("Key %s has id %d\n", dev.keymap[j].name, j);
+                    free(dev.keymap);
+                    return 0;
+                }
+            }
+            printf("Key %s was not found\n", searchstr);
+            free(dev.keymap);
+            return 1;
         }
 #ifdef OS_MAC_LEGACY
         else if(!strcmp(argument, "--nomouseaccel")){

@@ -13,6 +13,7 @@
 // usb.c
 extern _Atomic int reset_stop;
 extern int features_mask;
+extern int enable_experimental;
 // device.c
 extern int hwload_mode;
 
@@ -273,6 +274,8 @@ int main(int argc, char** argv){
             printf("Key %s was not found\n", searchstr);
             free(dev.keymap);
             return 1;
+        } else if(!strcmp(argument, "--enable-experimental")) {
+            enable_experimental = 1;
         }
 #ifdef OS_MAC_LEGACY
         else if(!strcmp(argument, "--nomouseaccel")){

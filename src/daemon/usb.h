@@ -192,6 +192,13 @@ const char* product_str(ushort product);
 /// Used to apply quirks and features to the PLATINUM devices.
 #define IS_PLATINUM(kb)                 ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K95_PLATINUM))
 
+// Mousepad test
+#define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_POLARIS))
+#define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
+
+// Devices that are considered experimental and are either not fully tested, or aren't fully implemented
+#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && (0))
+
 /// Some devices cause usbhid to spend a long time initialising it. To work around this, we intentionally uncleanly
 /// deinitialise the device, skipping the usbhid handover.
 #define NEEDS_UNCLEAN_EXIT(kb)          ((kb)->product == P_K65_RFIRE || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K95)
@@ -230,12 +237,6 @@ const char* product_str(ushort product);
 
 /// This constant is used to initialize \b kb->usbdelay.
 /// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
-/// Pure Hacker code.
-
-// Mousepad test
-#define IS_MOUSEPAD(vendor, product)    ((vendor) == (V_CORSAIR) && (product) == (P_POLARIS))
-#define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
-
 #define USB_DELAY_DEFAULT   5
 
 /// Start the USB main loop. Returns program exit code when finished

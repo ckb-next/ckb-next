@@ -9,6 +9,7 @@
 
 // usb.c
 extern _Atomic int reset_stop;
+extern int enable_experimental;
 
 /// \details
 /// \brief all open usb devices have their system path names here in this array.
@@ -764,8 +765,11 @@ static int usb_add_device(struct udev_device* dev){
         return 1;
 
     for(size_t c = 0; c < N_MODELS; c++){
-        if(models[c].idVendor == vid && models[c].idProduct == pid)
+        if(models[c].idVendor == vid && models[c].idProduct == pid){
+            if(IS_EXPERIMENTAL(vid, pid) && !enable_experimental)
+                continue;
             return usbadd(dev, models[c].idVendor, models[c].idProduct);
+        }
     }
 
     return 1;

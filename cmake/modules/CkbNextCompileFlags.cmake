@@ -44,6 +44,7 @@ list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
         -Werror=return-type
         -Wshadow
         $<$<CONFIG:Debug>:${opt_lvl}>
+        $<$<CONFIG:Debug>:-Wvla>
         #    $<$<CONFIG:Debug>:-Wfloat-equal>
         #    $<$<CONFIG:Debug>:-Wundef>
         #    $<$<CONFIG:Debug>:-Wshadow>

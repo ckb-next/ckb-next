@@ -298,23 +298,16 @@ void os_sendindicators(usbdevice* kb) {
 void* os_inputmain(void* context){
     usbdevice* kb = context;
     int fd = kb->handle - 1;
-    ushort vendor = kb->vendor, product = kb->product;
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Starting input thread for %s%d", devpath, index);
 
-    /// Here the actions in detail:
-    ///
-    /// Monitor input transfers on all endpoints for non-RGB devices
-    /// For RGB, monitor all but the last, as it's used for input/output
-    int urbcount = ((IS_LEGACY(vendor, product) || product == P_ST100) ? kb->epcount : (kb->epcount - 1));
-    if (urbcount == 0) {
-        ckb_err("urbcount = 0, so there is nothing to claim in os_inputmain()");
+    if (kb->input_endpoints[0] == 0) {
+        ckb_err("No endpoints claimed in inputmain");
         return 0;
     }
 
     /// Get an usbdevfs_urb data structure and clear it via memset()
-    struct usbdevfs_urb urbs[urbcount];
-    memset(urbs, 0, sizeof(urbs));
+    struct usbdevfs_urb urbs[USB_EP_MAX] = {0};
 
     /// Query udev for wMaxPacketSize on each endpoint, due to certain devices sending more data than the max defined, causing all sorts of issues.
     /// A syspath example would be:
@@ -334,53 +327,72 @@ void* os_inputmain(void* context){
     // Create a list containing them
     struct udev_list_entry* udeventry = udev_enumerate_get_list_entry(enumerate);
 
-    for(int i = 0; i < urbcount; i++){
-        ushort ep = 0x80 | (i + 1);
-
+    int ifcount = 0;
+    do {
         // Move to the next entry in the udev list (skipping the first one).
         struct udev_list_entry* nextentry = udev_list_entry_get_next(udeventry);
         const char* path = udev_list_entry_get_name(nextentry);
         // If there's an underscore, that means we are dealing with udev iterating through endpoints
         // usbX/X-X/X-X:1.0/ep_80
         // ~~~~~~~~~~~~~~~~~~~^
-        if(path[strlen(path) - 3] == '_'){
+        // We only want to iterate through the interfaces
+        size_t pathlen = strlen(path);
+        if(path[pathlen - 3] == '_'){
             ckb_info("Applying udev endpoint workaround for %s", path);
             // Skip the current entry
             udeventry = nextentry;
             nextentry = udev_list_entry_get_next(udeventry);
             path = udev_list_entry_get_name(nextentry);
+            pathlen = strlen(path);
         }
         // Create the path to the endpoint
-        char finalpath[strlen(path)+7];
-        // Copy the base path
-        strcpy(finalpath, path);
-        // Append the endpoint
-        char epstr[7];
-        snprintf(epstr, 7, "/ep_%02x", ep & 0xFF);
-        strcat(finalpath, epstr);
-        // Access it
-        struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
-        const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
-        // Read its wMaxPacketSize
+        size_t finalpathlen = pathlen + 7;
+        char* finalpath = malloc(finalpathlen);
+        // Try to find any of the wanted endpoints in the current interface
+        // We'll assume that each interface has at most one IN endpoint
         ushort size = 64;
-        if(sizehex)
-            sscanf(sizehex, "%hx", &size);
-        else
-            ckb_warn("Unable to read wMaxPacketSize for %s, assuming 64", epstr);
+        ushort ep = 0;
+        // here
+        for(int i = 0; (ep = kb->input_endpoints[i]); i++){
+            // Build the path
+            snprintf(finalpath, finalpathlen, "%s/ep_%02hhx", path, ep);
+            // Access it
+            struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
+            const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
+            // Read its wMaxPacketSize
+            if(sizehex && sscanf(sizehex, "%hx", &size) == 1)
+            {
+    //#ifdef DEBUG
+                ckb_info("Found EP 0x%hx at %s", ep, finalpath);
+    //#endif
+                udev_device_unref(child);
+                break;
+            }
+            udev_device_unref(child);
+        }
+        // there
+        if(!ep)
+        {
+            ckb_warn("Unable to read wMaxPacketSize for %s, ignoring", finalpath);
+            free(finalpath);
+            continue;
+        }
+
 #ifdef DEBUG
         ckb_info("Endpoint path %s has wMaxPacketSize %i", epstr, size);
 #endif
         // Increment the udev list pointer
         udeventry = nextentry;
         // Set the URB parameters
-        urbs[i].buffer_length = size;
-        urbs[i].type = USBDEVFS_URB_TYPE_INTERRUPT;
-        urbs[i].endpoint = ep;
-        urbs[i].buffer = malloc(urbs[i].buffer_length);
-        ioctl(fd, USBDEVFS_SUBMITURB, urbs + i);
+        urbs[ifcount].buffer_length = size;
+        urbs[ifcount].type = USBDEVFS_URB_TYPE_INTERRUPT;
+        urbs[ifcount].endpoint = ep;
+        urbs[ifcount].buffer = malloc(size);
+        ioctl(fd, USBDEVFS_SUBMITURB, urbs + ifcount);
         // Clean up
-        udev_device_unref(child);
-    }
+        free(finalpath);
+        ifcount++;
+    } while (*(kb->input_endpoints + ifcount));
 
     udev_enumerate_unref(enumerate);
     /// The userSpaceFS knows the URBs now, so start monitoring input
@@ -424,7 +436,7 @@ void* os_inputmain(void* context){
     /// If the endless loop is terminated, clean up by discarding the URBs via ioctl(USBDEVFS_DISCARDURB),
     /// free the URB buffers and return a null pointer as thread exit code.
     ckb_info("Stopping input thread for %s%d", devpath, index);
-    for(int i = 0; i < urbcount; i++){
+    for(int i = 0; i < ifcount; i++){
         ioctl(fd, USBDEVFS_DISCARDURB, urbs + i);
         free(urbs[i].buffer);
     }

@@ -203,6 +203,7 @@ extern const union devcmd vtable_mouse_legacy;
 #define SERIAL_LEN  34
 #define MSG_SIZE    64
 #define IFACE_MAX   4
+#define USB_EP_MAX  16
 typedef struct {
     // Function table (see command.h)
     const union devcmd* vtable;
@@ -298,6 +299,9 @@ typedef struct {
     key* keymap;
     // Buffer used to store non-HID interrupt reads from the input thread.
     uchar* interruptbuf;
+    // Endpoints the main input thread should listen to
+    // Must always end with 0, and endpoints should be 0x80 | i
+    uchar input_endpoints[USB_EP_MAX+1];
 } usbdevice;
 
 #endif  // STRUCTURES_H

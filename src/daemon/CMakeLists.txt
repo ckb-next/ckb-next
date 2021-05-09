@@ -83,6 +83,8 @@ if (MACOS OR LINUX)
               profile_keyboard.c
               profile_mouse.c
               usb.c
+              usb_nxp.c
+              usb_legacy.c
               command.h
               device.h
               devnode.h
@@ -101,7 +103,10 @@ if (MACOS OR LINUX)
               protocol.h
               request_hid_mac.h
               structures.h
-              usb.h)
+              usb.h
+              usb_nxp.h
+              usb_legacy.h
+    )
 endif ()
 if (MACOS)
     target_sources(

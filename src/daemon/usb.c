@@ -389,6 +389,9 @@ static void* _setupusb(void* context){
     if(!kb->name[0])
         snprintf(kb->name, KB_NAME_LEN, "%s %s", vendor_str(kb->vendor), product_str(kb->product));
 
+    // Ask the protocol handler to set the endpoints required for the main input thread
+    kb->vtable->fill_input_eps(kb);
+
     // Set up an input device for key events
     ///
     /// - Then the user level input subsystem is activated via os_openinput().

@@ -6,6 +6,8 @@
 #include "led.h"
 #include "notify.h"
 #include "profile.h"
+#include "usb_legacy.h"
+#include "usb_nxp.h"
 
 // Do-nothing functions
 static void cmd_none(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
@@ -93,6 +95,7 @@ const devcmd vtable_keyboard = {
     .updateindicators = updateindicators_kb,
     .updatedpi = int1_int_none,                  ///< This is for mice only
     .reset = nxp_reset,
+    .fill_input_eps = nxp_fill_input_eps,
 };
 
 // Legacy keyboard vtable (K70)
@@ -140,6 +143,7 @@ const devcmd vtable_keyboard_legacy = {
     .updateindicators = updateindicators_kb,
     .updatedpi = int1_int_none,                  ///< This is for mice only
     .reset = cmd_none,
+    .fill_input_eps = legacy_fill_input_eps,
 };
 
 // RGB mouse vtable
@@ -187,6 +191,7 @@ const devcmd vtable_mouse = {
     .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
     .updatedpi = updatedpi,                  ///< special for mice
     .reset = nxp_reset,
+    .fill_input_eps = nxp_fill_input_eps,
 };
 
 // RGB Mousepad vtable
@@ -234,6 +239,7 @@ const devcmd vtable_mousepad = {
     .updateindicators = int1_void_none,
     .updatedpi = int1_int_none,
     .reset = nxp_reset,
+    .fill_input_eps = nxp_fill_input_eps,
 };
 
 // Legacy mouse vtable
@@ -281,4 +287,5 @@ const devcmd vtable_mouse_legacy = {
     .updateindicators = int1_void_none,
     .updatedpi = updatedpi_legacy,
     .reset = cmd_none,
+    .fill_input_eps = legacy_fill_input_eps,
 };

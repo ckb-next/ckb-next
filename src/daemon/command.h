@@ -136,6 +136,7 @@ typedef union devcmd {
         int (*updatedpi)(usbdevice* kb, int force);
 
         cmdhandler reset;
+        void (*fill_input_eps)(usbdevice* kb);
     };
 } devcmd;
 

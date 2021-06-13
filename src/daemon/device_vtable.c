@@ -289,3 +289,49 @@ const devcmd vtable_mouse_legacy = {
     .reset = cmd_none,
     .fill_input_eps = legacy_fill_input_eps,
 };
+
+// Laptop vtable
+const devcmd vtable_laptop_kb = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_io_none,
+
+    .active = cmd_active_laptop,
+    .idle = cmd_idle_laptop,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_ioff,
+    .ion = cmd_ion,
+    .iauto = cmd_iauto,
+
+    .bind = cmd_none,
+    .unbind = cmd_none,
+    .rebind = cmd_none,
+    .macro = cmd_macro_none,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_laptop_kb,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile_none,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_laptop,
+    .updateindicators = int1_void_none,
+    .updatedpi = int1_int_none
+};

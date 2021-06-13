@@ -84,6 +84,8 @@ device_desc models[] = {
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
     { V_CORSAIR, P_ST100, },
+    // Laptops,
+    { V_ITE, P_Y730, },
 };
 
 size_t N_MODELS = sizeof(models) / sizeof(device_desc);
@@ -120,6 +122,8 @@ int enable_experimental = 0;
 const char* vendor_str(ushort vendor){
     if(vendor == V_CORSAIR)
         return "corsair";
+    if(vendor == V_ITE)
+        return "ite";
     return "";
 }
 
@@ -147,7 +151,7 @@ const char* vendor_str(ushort vendor){
 const char* product_str(ushort product){
     if(product == P_K95 || product == P_K95_LEGACY)
         return "k95";
-    if(product == P_K95_PLATINUM)
+    if(product == P_K95_PLATINUM || product == P_Y730)
         return "k95p";
     if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
@@ -210,6 +214,8 @@ const char* product_str(ushort product){
 ///
 static const devcmd* get_vtable(ushort vendor, ushort product){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
+    if(vendor == V_ITE && product == P_Y730)
+        return &vtable_laptop_kb;
     if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;
@@ -703,7 +709,6 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
     }
     return total_sent;
 }
-
 int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
     while(1){
         DELAY_SHORT(kb);
@@ -722,6 +727,25 @@ int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ush
         DELAY_LONG(kb);
     }
 }
+
+int _legion_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
+    while(1){
+        queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
+        int res = os_legion_usbsend_control(kb, data, len, bmRequestType, bRequest, wValue, wIndex, file, line);
+        queued_mutex_unlock(mmutex(kb));
+
+        if(res != -1)
+            return res;
+
+        // Stop immediately if the program is shutting down or hardware load is set to tryonce
+        if(reset_stop || hwload_mode != 2)
+            return 0;
+
+        // Retry as long as the result is temporary failure
+        DELAY_LONG(kb);
+    }
+}
+
 
 /// \brief .
 ///

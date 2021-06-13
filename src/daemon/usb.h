@@ -42,6 +42,7 @@
 /// Currently known for this are \b usb_linux.c and \b usb_mac.c
 ///
 #define V_CORSAIR            0x1b1c
+#define V_ITE                0x048d
 
 #define P_K55                0x1b3d
 #define IS_K55(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K55)
@@ -125,6 +126,8 @@
 
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
+
+#define P_Y730               0xc935
 
 extern size_t N_MODELS;
 
@@ -404,6 +407,13 @@ void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actua
 int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
 #define usbsend_control(kb, message, len, bRequest, wValue, wIndex) _usbsend_control(kb, message, len, bRequest, wValue, wIndex, __FILE_NOPATH__, __LINE__)
 int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
+
+
+
+int _legion_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
+#define legion_usbsend_control(kb, message, len, bmRequestType, bRequest, wValue, wIndex) _legion_usbsend_control(kb, message, len, bmRequestType, bRequest, wValue, wIndex, __FILE_NOPATH__, __LINE__)
+int os_legion_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bmRequestType, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
+
 
 // receive message from initial sighandler socketpair communication
 extern int sighandler_pipe[2];

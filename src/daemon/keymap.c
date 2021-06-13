@@ -35,7 +35,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "w",          0x1a, KEY_W },
     { "e",          0x26, KEY_E },
     { "r",          0x32, KEY_R },
-    { "t",          0x3e, KEY_T },
+    { "t",          0x3b, KEY_T },
     { "y",          0x4a, KEY_Y },
     { "u",          0x56, KEY_U },
     { "i",          0x62, KEY_I },

@@ -1,6 +1,6 @@
 # ckb-next: RGB Driver for Linux and macOS
 
-<a target="_blank" href="https://kiwiirc.com/nextclient/irc.libera.chat/#ckb-next"><img src="https://img.shields.io/badge/%23irc-libera.chat-blue.svg" height="20" alt="irc.libera.chat #ckb-next" /></a>
+<a target="_blank" href="https://web.libera.chat/?channels=#ckb-next"><img src="https://img.shields.io/badge/%23irc-libera.chat-blue.svg" height="20" alt="irc.libera.chat #ckb-next" /></a>
 
 **ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of Corsair's proprietary CUE software to Linux operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
@@ -40,6 +40,6 @@ Most of the information can be found on [ckb-next wiki pages](https://github.com
 Maintainers reserve the rights to modify and remove issues, pull requests and comments therein, that are denunciating, off-topic, harmful, hateful and overall inappropriate.
 Please be appreciative, humble and kind to each other.
 
-* IRC chat: `#ckb-next` channel at [irc.libera.chat](https://kiwiirc.com/nextclient/irc.libera.chat/#ckb-next)
+* IRC chat: `#ckb-next` channel at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next)
 * Mailing list: [ckb-next@googlegroups.com](https://groups.google.com/forum/#!forum/ckb-next)
 * [GitHub Issues](https://github.com/ckb-next/ckb-next/issues)

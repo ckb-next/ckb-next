@@ -202,6 +202,7 @@ extern const union devcmd vtable_mouse_legacy;
 #define KB_NAME_LEN 50
 #define SERIAL_LEN  34
 #define MSG_SIZE    64
+#define MAX_MSG_SIZE 1024
 #define IFACE_MAX   4
 #define USB_EP_MAX  16
 typedef struct {
@@ -303,5 +304,20 @@ typedef struct {
     // Must always end with 0, and endpoints should be 0x80 | i
     uchar input_endpoints[USB_EP_MAX+1];
 } usbdevice;
+
+#ifdef OS_LINUX
+typedef struct usbdevfs_ctrltransfer ctrltransfer;
+#else
+// Used to request an explicit URB Control transfer for backends that do controls only, or require values that change
+typedef struct {
+    uint8_t bRequestType;
+    uint8_t bRequest;
+    uint16_t wValue;
+    uint16_t wIndex;
+    uint16_t wLength;
+    uint32_t timeout;
+    void* data;
+} ctrltransfer;
+#endif
 
 #endif  // STRUCTURES_H

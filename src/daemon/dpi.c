@@ -132,7 +132,7 @@ int updatedpi(usbdevice* kb, int force){
                 newenabled = lastdpi->enabled | 1 << newdpi->current;
             }
             uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIMASK, 0, newenabled };
-            if(!usbsend(kb, data_pkt, 1))
+            if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
                 return -2;
             // Cache the flags we wrote.
             lastdpi->enabled = newenabled;
@@ -149,7 +149,7 @@ int updatedpi(usbdevice* kb, int force){
             data_pkt[6] = (newdpi->x[newdpi->current] >> 8) & 0xFF;
             data_pkt[7] = newdpi->y[newdpi->current] & 0xFF;
             data_pkt[8] = (newdpi->y[newdpi->current] >> 8) & 0xFF;
-            if(!usbsend(kb, data_pkt, 1))
+            if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
                 return -1;
             // Set these values in the cache so we don't rewrite them.
             lastdpi->x[newdpi->current] = newdpi->x[newdpi->current];
@@ -157,7 +157,7 @@ int updatedpi(usbdevice* kb, int force){
         }
         // Set current DPI stage.
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPI, 0, newdpi->current };
-        if(!usbsend(kb, data_pkt, 1))
+        if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -2;
     }
     
@@ -175,24 +175,24 @@ int updatedpi(usbdevice* kb, int force){
         data_pkt[6] = (newdpi->x[i] >> 8) & 0xFF;
         data_pkt[7] = newdpi->y[i] & 0xFF;
         data_pkt[8] = (newdpi->y[i] >> 8) & 0xFF;
-        if(!usbsend(kb, data_pkt, 1))
+        if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -1;
     }
 
     // Send settings
     if (newdpi->enabled != lastdpi->enabled || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_DPIMASK, 0, newdpi->enabled };
-        if(!usbsend(kb, data_pkt, 1))
+        if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -2;
     }
     if (newdpi->lift != lastdpi->lift || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_LIFT, 0, newdpi->lift };
-        if(!usbsend(kb, data_pkt, 1))
+        if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -2;
     }
     if (newdpi->snap != lastdpi->snap || force) {
         uchar data_pkt[MSG_SIZE] = { CMD_SET, FIELD_MOUSE, MOUSE_SNAP, 0, newdpi->snap, 0x05 };
-        if(!usbsend(kb, data_pkt, 1))
+        if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -2;
     }
 
@@ -214,7 +214,7 @@ int savedpi(usbdevice* kb, dpiset* dpi, lighting* light){
         data_pkt[9] = light->r[LED_MOUSE + N_MOUSE_ZONES + i];
         data_pkt[10] = light->g[LED_MOUSE + N_MOUSE_ZONES + i];
         data_pkt[11] = light->b[LED_MOUSE + N_MOUSE_ZONES + i];
-        if(!usbsend(kb, data_pkt, 1))
+        if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -1;
     }
 
@@ -225,7 +225,7 @@ int savedpi(usbdevice* kb, dpiset* dpi, lighting* light){
         { CMD_SET, FIELD_MOUSE, MOUSE_LIFT, 1, dpi->lift },
         { CMD_SET, FIELD_MOUSE, MOUSE_SNAP, 1, dpi->snap, 0x05 }
     };
-    if(!usbsend(kb, data_pkt[0], 4))
+    if(!usbsend(kb, data_pkt[0], MSG_SIZE, 4))
         return -2;
     // Finished
     return 0;
@@ -241,7 +241,7 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
     };
     uchar in_pkt[4][MSG_SIZE];
     for(int i = 0; i < 4; i++){
-        if(!usbrecv(kb, data_pkt[i], in_pkt[i]))
+        if(!usbrecv(kb, data_pkt[i], MSG_SIZE, in_pkt[i]))
             return -2;
         if(memcmp(in_pkt[i], data_pkt[i], 4)){
             ckb_err("Bad input header");
@@ -264,7 +264,7 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
         uchar dpi_pkt[MSG_SIZE] = { CMD_GET, FIELD_MOUSE, MOUSE_DPIPROF, 1 };
         uchar dpi_in_pkt[MSG_SIZE];
         dpi_pkt[2] |= i;
-        if(!usbrecv(kb, dpi_pkt, dpi_in_pkt))
+        if(!usbrecv(kb, dpi_pkt, sizeof(dpi_pkt), dpi_in_pkt))
             return -2;
         if(memcmp(dpi_in_pkt, dpi_pkt, 4)){
             ckb_err("Bad input header");

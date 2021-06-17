@@ -13,19 +13,18 @@ extern int enable_experimental;
 
 /// \details
 /// \brief all open usb devices have their system path names here in this array.
-
 static char kbsyspath[DEV_MAX][FILENAME_MAX];
 
-int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line) {
+// USB IO functions
+int os_usb_control(usbdevice* kb, ctrltransfer* transfer, const char* file, int line) {
 #ifdef DEBUG_USB_SEND
-    int ckb = INDEX_OF(kb, keyboard);
-    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu", ckb, file, line, 0x40, bRequest, wValue, wIndex, len);
-    if(len)
-        print_urb_buffer("Control buffer:", data, len, file, line, __func__, ckb);
+    const int ckb = INDEX_OF(kb, keyboard);
+    ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu", ckb, file, line, transfer->bRequestType, transfer->bRequest, transfer->wValue, transfer->wIndex, transfer->wLength);
+    if(transfer->wLength)
+        print_urb_buffer("Control buffer:", transfer->data, transfer->wLength, file, line, __func__, ckb);
 #endif
 
-    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, wIndex, len, 5000, data };
-    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
+    const int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, transfer);
     if (res == -1){
         int ioctlerrno = errno;
         ckb_err_fn(" %s, res = 0x%x", file, line, strerror(ioctlerrno), res);
@@ -34,253 +33,30 @@ int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, u
         else
             return 0;
 
-    } else if (res != len)
+    } else if (res != transfer->wLength)
         ckb_warn_fn("Wrote %d bytes (expected %d)", file, line, res, MSG_SIZE);
 
     return res;
 }
 
-////
-/// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long
-///
-/// os_usbsend has two functions:
-/// - if is_recv == false, it tries to send a given MSG_SIZE buffer via the usb interface given with kb.
-/// - otherwise a request is sent via the usb device to initiate the receiving of a message from the remote device.
-///
-/// The functionality for sending distinguishes two cases,
-/// depending on the version number of the firmware of the connected device:
-/// \n If the firmware is less or equal 1.2, the transmission is done via an ioctl().
-/// The ioctl() is given a struct usbdevfs_ctrltransfer, in which the relevant parameters are entered:
-///
-/// bRequestType | bRequest | wValue | EP | size | Timeout | data
-/// ------------ | -------- | ------ | -- | ---- | ------- | ----
-/// 0x21 | 0x09 | 0x0200 | endpoint / IF to be addressed from epcount-1 | MSG_SIZE | 5000 (=5ms) | the message buffer pointer
-/// Host to Device, Type=Class, Recipient=Interface | 9 = Send data? | specific | last or pre-last device # | 64 | 5000 | out_msg
-///
-/// \n The ioctl command is USBDEVFS_CONTROL.
-///
-/// The same constellation is used if the device is requested to send its data (is_recv = true).
-///
-/// For a more recent firmware and is_recv = false,
-/// the ioctl command USBDEVFS_CONTROL is not used
-/// (this tells the bus to enter the control mode),
-/// but the bulk method is used: USBDEVFS_BULK.
-/// This is astonishing, because all of the endpoints are type Interrupt, not bulk.
-///
-/// Anyhow, forthis purpose a different structure is used for the ioctl() (struct \b usbdevfs_bulktransfer)
-/// and this is also initialized differently:
-/// \n The length and timeout parameters are given the same values as above.
-/// The formal parameter out_msg is also passed as a buffer pointer.
-/// For the endpoints, the firmware version is differentiated again:
-/// \n For a firmware version between 1.3 and <2.0 endpoint 4 is used,
-/// otherwise (it can only be >=2.0) endpoint 3 is used.
-///
-/// \todo Since the handling of endpoints has already led to problems elsewhere, this implementation is extremely hardware-dependent and critical!
-/// \n Eg. the new keyboard K95PLATINUMRGB has a version number significantly less than 2.0 - will it run with this implementation?
-///
-/// The ioctl() - no matter what type -
-/// returns the number of bytes sent.
-/// Now comes the usual check:
-/// - If the return value is -1 AND the error is a timeout (ETIMEOUT),
-/// os_usbsend() will return -1 to indicate that it is probably a recoverable problem and a retry is recommended.
-/// - For another negative value or other error identifier OR 0 bytes sent, 0 is returned as a heavy error identifier.
-/// - In all other cases, the function returns the number of bytes sent.
-///
-/// If this is not the entire blocksize (MSG_SIZE bytes),
-/// an error message is issued on the standard error channel
-/// [warning "Wrote YY bytes (expected 64)"].
-///
-/// If DEBUG_USB_SEND is set during compilation,
-/// the number of bytes sent and their representation are logged to the error channel.
-///
-int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line) {
-    int res;
-    if (kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
-        // If we need to read a response, lock the interrupt mutex
-        if(is_recv)
-            if(pthread_mutex_lock(intmutex(kb)))
-                ckb_fatal("Error locking interrupt mutex in os_usbsend()");
-
-        struct usbdevfs_bulktransfer transfer = {0};
-        // All firmware versions for normal HID devices have the OUT endpoint at the end
-        // Devices with no input, such as the Polaris, have it at the start.
-        transfer.ep = (IS_SINGLE_EP(kb) ? 1 : kb->epcount);
-        transfer.len = MSG_SIZE;
-        transfer.timeout = 5000;
-        transfer.data = (void*)out_msg;
-        res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
-    } else {
-        // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
-        struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, MSG_SIZE, 5000, (void*)out_msg };
-        res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
-    }
-
+int os_usb_interrupt_out(usbdevice* kb, unsigned int ep, unsigned int len, uchar* data, const char* file, int line)
+{
+#ifdef DEBUG_USB_SEND
+    print_urb_buffer("Sending:", data, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
+#endif
+    const struct usbdevfs_bulktransfer transfer = { .ep = ep, .len = len, .timeout = 5000, .data = data, };
+    int res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);
     if (res <= 0){
         int ioctlerrno = errno;
         ckb_err_fn("%s, res = 0x%x", file, line, res ? strerror(ioctlerrno) : "No data written", res);
-        if(res == -1 && ioctlerrno == ETIMEDOUT){
-            if(is_recv)
-                pthread_mutex_unlock(intmutex(kb));
+        if(res == -1 && ioctlerrno == ETIMEDOUT)
             return -1;
-        } else {
-            if(is_recv)
-                pthread_mutex_unlock(intmutex(kb));
+        else
             return 0;
-        }
-    } else if (res != MSG_SIZE)
-        ckb_warn_fn("Wrote %d bytes (expected %d)", file, line, res, MSG_SIZE);
-#ifdef DEBUG_USB_SEND
-    print_urb_buffer("Sent:", out_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
-#endif
-
+    } else if ((unsigned int)res != len) {
+        ckb_warn_fn("Wrote %d bytes (expected %d)", file, line, res, len);
+    }
     return res;
-}
-
-///
-/// \brief os_usbrecv receives a max MSGSIZE long buffer from usb device
-
-/// os_usbrecv does what its name says:
-///
-/// The comment at the beginning of the procedure
-/// causes the suspicion that the firmware versionspecific distinction
-/// is missing for receiving from usb endpoint 3 or 4.
-/// The commented code contains only the reception from EP4,
-/// but this may be wrong for a software version 2.0 or higher (see the code for os-usbsend ()).
-///
-/// \n So all the receiving is done via an ioctl() like in os_usbsend.
-/// The ioctl() is given a struct usbdevfs_ctrltransfer, in which the relevant parameters are entered:
-///
-/// bRequestType | bRequest | wValue | EP | size | Timeout | data
-/// ------------ | -------- | ------ | -- | ---- | ------- | ----
-/// 0xA1 | 0x01 | 0x0200 | endpoint to be addressed from epcount - 1 | MSG_SIZE | 5ms | the message buffer pointer
-/// Device to Host, Type=Class, Recipient=Interface | 1 = RECEIVE? | specific | Interface # | 64 | 5000 | in_msg
-///
-/// The ioctl() returns the number of bytes received.
-/// Here is the usual check again:
-/// - If the return value is -1 AND the error is a timeout (ETIMEOUT),
-/// os_usbrecv() will return -1 to indicate that it is probably a recoverable problem and a retry is recommended.
-/// - For another negative value or other error identifier OR 0 bytes are received, 0 is returned as an identifier for a heavy error.
-/// - In all other cases, the function returns the number of bytes received.
-///
-/// If this is not the entire blocksize (MSG_SIZE bytes),
-/// an error message is issued on the standard error channel
-/// [warning "Read YY bytes (expected 64)"].
-///
-int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line){
-    int res;
-    if(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
-        // Wait for 2s
-        int condret = cond_nanosleep(intcond(kb), intmutex(kb), 2000000000);
-        if(condret != 0){
-            if(pthread_mutex_unlock(intmutex(kb)))
-                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
-            if(condret == ETIMEDOUT)
-                ckb_warn_fn("ckb%d: Timeout while waiting for response", file, line, INDEX_OF(kb, keyboard));
-            else
-                ckb_warn_fn("Interrupt cond error %i", file, line, condret);
-            return -1;
-        }
-        memcpy(in_msg, kb->interruptbuf, MSG_SIZE);
-        memset(kb->interruptbuf, 0, MSG_SIZE);
-        res = MSG_SIZE;
-        if(pthread_mutex_unlock(intmutex(kb)))
-            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
-    } else {
-        struct usbdevfs_ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, MSG_SIZE, 5000, in_msg };
-        res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
-        if(res <= 0){
-            // This is done because ckb_err_fn can set errno itself
-            int ioctlerrno = errno;
-            ckb_err_fn("%s", file, line, res ? strerror(ioctlerrno) : "No data read");
-            if(res == -1 && ioctlerrno == ETIMEDOUT)
-                return -1;
-            else
-                return 0;
-        } else if(res != MSG_SIZE)
-            ckb_warn_fn("Read %d bytes (expected %d)", file, line, res, MSG_SIZE);
-    }
-
-#ifdef DEBUG_USB_RECV
-    print_urb_buffer("Recv:", in_msg, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
-#endif
-
-    return res;
-}
-
-///
-/// \brief _nk95cmd If we control a non RGB keyboard, set the keyboard via ioctl with usbdevfs_ctrltransfer
-///
-/// To send control packets to a non RGB non color K95 Keyboard,
-/// use this function. Normally it is called via the nk95cmd() macro.
-///
-/// If it is the wrong device for which the function is called, 0 is returned and nothing done.
-/// Otherwise a usbdevfs_ctrltransfer structure is filled and an USBDEVFS_CONTROL ioctl() called.
-///
-/// bRequestType | bRequest | wValue | EP | size | Timeout | data
-/// ------------ | -------- | ------ | -- | ---- | ------- | ----
-/// 0x40 | see table below to switch hardware-modus at Keyboard | wValue | device | MSG_SIZE | 5ms | the message buffer pointer
-/// Host to Device, Type=Vendor, Recipient=Device | bRequest parameter | given wValue Parameter | device 0 | 0 data to write | 5000 | null
-///
-/// If a 0 or a negative error number is returned by the ioctl, an error message is shown depending on the errno or "No data written" if retval was 0.
-/// In either case 1 is returned to indicate the error.
-/// If the ioctl returned a value > 0, 0 is returned to indicate no error.
-///
-/// Currently the following combinations for bRequest and wValue are used:
-/// Device | what it might to do | constant | bRequest | wValue
-/// ------ | ------------------- | -------- | -------- | ------
-/// non RGB Keyboard | set HW-modus on (leave the ckb driver) | HWON | 0x0002 | 0x0030
-/// non RGB Keyboard | set HW-modus off (initialize the ckb driver) | HWOFF | 0x0002 | 0x0001
-/// non RGB Keyboard | set light modus M1 in single-color keyboards | NK95_M1 | 0x0014 | 0x0001
-/// non RGB Keyboard | set light modus M2 in single-color keyboards | NK95_M2 | 0x0014 | 0x0002
-/// non RGB Keyboard | set light modus M3 in single-color keyboards | NK95_M3 | 0x0014 | 0x0003
-/// \see usb.h
-///
-int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line){
-    if(kb->product != P_K95_LEGACY)
-        return 0;
-    struct usbdevfs_ctrltransfer transfer = { 0x40, bRequest, wValue, 0, 0, 5000, 0 };
-    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
-    if(res <= 0){
-        ckb_err_fn("%s", file, line, res ? strerror(errno) : "No data written");
-        return 1;
-    }
-    return 0;
-}
-
-/// \brief .
-///
-/// \brief os_sendindicators update the indicators for the special keys (Numlock, Capslock and what else?)
-///
-/// Read the data from kb->ileds ans send them via ioctl() to the keyboard.
-///
-/// bRequestType | bRequest | wValue | EP | size | Timeout | data
-/// ------------ | -------- | ------ | -- | ---- | ------- | ----
-/// 0x21 | 0x09 | 0x0200 | Interface 0 | MSG_SIZE 1 Byte | timeout 0,5ms | the message buffer pointer
-/// Host to Device, Type=Class, Recipient=Interface (why not endpoint?) | 9 = SEND? | specific | 0 | 1 | 500 | struct* kb->ileds
-///
-/// \n The ioctl command is USBDEVFS_CONTROL.
-///
-void os_sendindicators(usbdevice* kb) {
-    static int countForReset = 0;
-    void *ileds;
-    ushort leds;
-    if(kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) {
-        leds = (kb->ileds << 8) | 0x0001;
-        ileds = &leds;
-    }
-    else {
-        ileds = &kb->ileds;
-    }
-    struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0200, 0x00, ((kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb)) ? 2 : 1), 500, ileds };
-    queued_mutex_unlock(dmutex(kb));
-    int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, &transfer);
-    queued_mutex_lock(dmutex(kb));
-    if(res <= 0) {
-        ckb_err("%s", res ? strerror(errno) : "No data written");
-        if (usb_tryreset(kb) == 0 && countForReset++ < 3) {
-            os_sendindicators(kb);
-        }
-    }
 }
 
 ///
@@ -353,7 +129,6 @@ void* os_inputmain(void* context){
         // We'll assume that each interface has at most one IN endpoint
         ushort size = 64;
         ushort ep = 0;
-        // here
         for(int i = 0; (ep = kb->input_endpoints[i]); i++){
             // Build the path
             snprintf(finalpath, finalpathlen, "%s/ep_%02hhx", path, ep);
@@ -371,7 +146,6 @@ void* os_inputmain(void* context){
             }
             udev_device_unref(child);
         }
-        // there
         if(!ep)
         {
             ckb_warn("Unable to read wMaxPacketSize for %s, ignoring", finalpath);

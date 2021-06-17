@@ -18,7 +18,7 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
     uchar in_pkt[MSG_SIZE];
     for(int i = 0; i <= 1; i++){
         data_pkt[0][3] = i;
-        if(!usbrecv(kb, data_pkt[0], in_pkt)){
+        if(!usbrecv(kb, data_pkt[0], MSG_SIZE, in_pkt)){
             free(hw);
             return -1;
         }
@@ -27,7 +27,7 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
     // Ask for profile and mode names
     for(int i = 0; i <= 1; i++){
         data_pkt[1][3] = i;
-        if(!usbrecv(kb, data_pkt[1],in_pkt)){
+        if(!usbrecv(kb, data_pkt[1], MSG_SIZE, in_pkt)){
             free(hw);
             return -1;
         }
@@ -70,14 +70,14 @@ int cmd_hwsave_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
     for(int i = 0; i <= 1; i++){
         data_pkt[0][3] = i;
         memcpy(data_pkt[0] + 4, hw->name[i], MD_NAME_LEN * 2);
-        if(!usbsend(kb, data_pkt[0], 1))
+        if(!usbsend(kb, data_pkt[0], MSG_SIZE, 1))
             return -1;
     }
     // Save the IDs
     for(int i = 0; i <= 1; i++){
         data_pkt[1][3] = i;
         memcpy(data_pkt[1] + 4, hw->id + i, sizeof(usbid));
-        if(!usbsend(kb, data_pkt[1], 1))
+        if(!usbsend(kb, data_pkt[1], MSG_SIZE, 1))
             return -1;
     }
     // Save the RGB data for the non-DPI zones

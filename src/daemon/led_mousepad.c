@@ -30,7 +30,7 @@ int updatergb_mousepad(usbdevice* kb, int force){
         *rgb_data++ = newlight->b[i];
     }
     // Send RGB data
-    if(!usbsend(kb, data_pkt, 1))
+    if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
         return -1;
     memcpy(lastlight, newlight, sizeof(lighting));
     return 0;

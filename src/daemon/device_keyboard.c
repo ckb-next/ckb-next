@@ -37,7 +37,7 @@ int setactive_kb(usbdevice* kb, int active){
     if(active){
         // Put the M-keys (K95) as well as the Brightness/Lock keys into software-controlled mode.
         msg[0][2] = MODE_SOFTWARE;
-        if(!usbsend(kb, msg[0], 1))
+        if(!usbsend(kb, msg[0], MSG_SIZE, 1))
             return -1;
         DELAY_MEDIUM(kb);
         // Set input mode on the keys. They must be grouped into packets of 60 bytes (+ 4 bytes header)
@@ -55,20 +55,20 @@ int setactive_kb(usbdevice* kb, int active){
             }
             // Byte 2 = pair count (usually 30, less on final message)
             msg[1][2] = pair;
-            if(!usbsend(kb, msg[1], 1))
+            if(!usbsend(kb, msg[1], MSG_SIZE, 1))
                 return -1;
         }
         // Commit new input settings
-        if(!usbsend(kb, msg[2], 1))
+        if(!usbsend(kb, msg[2], MSG_SIZE, 1))
             return -1;
         DELAY_MEDIUM(kb);
     } else {
         // Set the M-keys back into hardware mode, restore hardware RGB profile. It has to be sent twice for some reason.
         msg[0][2] = MODE_HARDWARE;
-        if(!usbsend(kb, msg[0], 1))
+        if(!usbsend(kb, msg[0], MSG_SIZE, 1))
             return -1;
         DELAY_MEDIUM(kb);
-        if(!usbsend(kb, msg[0], 1))
+        if(!usbsend(kb, msg[0], MSG_SIZE, 1))
             return -1;
         DELAY_MEDIUM(kb);
 #ifdef OS_LINUX
@@ -97,11 +97,11 @@ int setactive_kb(usbdevice* kb, int active){
             }
             // Byte 2 = pair count (usually 30, less on final message)
             msg[1][2] = pair;
-            if(!usbsend(kb, msg[1], 1))
+            if(!usbsend(kb, msg[1], MSG_SIZE, 1))
                 return -1;
         }
         // Commit new input settings
-        if(!usbsend(kb, msg[2], 1))
+        if(!usbsend(kb, msg[2], MSG_SIZE, 1))
             return -1;
         DELAY_MEDIUM(kb);
 #endif

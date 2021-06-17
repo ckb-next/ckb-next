@@ -49,6 +49,13 @@ static int int1_int_none(usbdevice* kb, int dummy){
     return 0;
 }
 
+#if 0
+static int cmd_io_stub(usbdevice* kb, void* ptr, int len, int is_recv, const char* file, int line){
+    ckb_fatal_fn("This should never be called", file, line);
+    return -1;
+}
+#endif
+
 /// \brief RGB keyboard vtable holds functions for each device type.
 ///
 const devcmd vtable_keyboard = {
@@ -87,15 +94,17 @@ const devcmd vtable_keyboard = {
     .get = cmd_get,
 
     .start = start_dev,
-    .setmodeindex = int1_void_none,             ///< is just for non rgb keyboards
+    .setmodeindex = int1_void_none,
     .allocprofile = allocprofile,
     .loadprofile = loadprofile,
     .freeprofile = freeprofile,
     .updatergb = updatergb_kb,
     .updateindicators = updateindicators_kb,
-    .updatedpi = int1_int_none,                  ///< This is for mice only
+    .updatedpi = int1_int_none,
     .reset = nxp_reset,
     .fill_input_eps = nxp_fill_input_eps,
+    .write = nxp_usb_write,
+    .read = nxp_usb_read,
 };
 
 // Legacy keyboard vtable (K70)
@@ -135,15 +144,17 @@ const devcmd vtable_keyboard_legacy = {
     .get = cmd_get,
 
     .start = start_kb_legacy,
-    .setmodeindex = setmodeindex_legacy,        ///< This is special for legacy keyboards
+    .setmodeindex = setmodeindex_legacy,
     .allocprofile = allocprofile,
     .loadprofile = loadprofile_none,
     .freeprofile = freeprofile,
-    .updatergb = int1_int_none,                 ///< Legacy keyboards do not have an rgb update function
+    .updatergb = int1_int_none,
     .updateindicators = updateindicators_kb,
-    .updatedpi = int1_int_none,                  ///< This is for mice only
+    .updatedpi = int1_int_none,
     .reset = cmd_none,
     .fill_input_eps = legacy_fill_input_eps,
+    .write = legacy_dev_io,
+    .read = legacy_dev_io,
 };
 
 // RGB mouse vtable
@@ -183,15 +194,17 @@ const devcmd vtable_mouse = {
     .get = cmd_get,
 
     .start = start_dev,
-    .setmodeindex = int1_void_none,         ///< Mice do not have different modes
-    .allocprofile = allocprofile,           ///< same for all keyboards and mice
-    .loadprofile = loadprofile,             ///< same for all keyboards and mice
-    .freeprofile = freeprofile,             ///< same for all keyboards and mice
-    .updatergb = updatergb_mouse,           ///< special for mice
-    .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
-    .updatedpi = updatedpi,                  ///< special for mice
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_mouse,
+    .updateindicators = int1_void_none,
+    .updatedpi = updatedpi,
     .reset = nxp_reset,
     .fill_input_eps = nxp_fill_input_eps,
+    .write = nxp_usb_write,
+    .read = nxp_usb_read,
 };
 
 // RGB Mousepad vtable
@@ -240,6 +253,8 @@ const devcmd vtable_mousepad = {
     .updatedpi = int1_int_none,
     .reset = nxp_reset,
     .fill_input_eps = nxp_fill_input_eps,
+    .write = nxp_usb_write,
+    .read = nxp_usb_read,
 };
 
 // Legacy mouse vtable
@@ -288,4 +303,6 @@ const devcmd vtable_mouse_legacy = {
     .updatedpi = updatedpi_legacy,
     .reset = cmd_none,
     .fill_input_eps = legacy_fill_input_eps,
+    .write = legacy_dev_io,
+    .read = legacy_dev_io,
 };

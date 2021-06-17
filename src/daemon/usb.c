@@ -360,7 +360,7 @@ static void* _setupusb(void* context){
     kb->usbdelay = USB_DELAY_DEFAULT;
 
     /// Allocate memory for the os_usbrecv() buffer
-    kb->interruptbuf = malloc(MSG_SIZE * sizeof(uchar));
+    kb->interruptbuf = calloc(MAX_MSG_SIZE, sizeof(uchar));
     if(!kb->interruptbuf)
         ckb_fatal("Error allocating memory for usb_recv() %s", strerror(errno));
 
@@ -557,6 +557,8 @@ void setupusb(usbdevice* kb){
 int revertusb(usbdevice* kb){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
+
+    // FIXME: This should be moved to a device-specific function
     if(!HAS_FEATURES(kb, FEAT_RGB)){
         nk95cmd(kb, NK95_HWON);
         return 0;
@@ -634,59 +636,15 @@ int usb_tryreset(usbdevice* kb){
 ///
 extern int hwload_mode;
 
-/// \brief .
-///
-/// \todo A lot of different conditions are combined in this code. Don't think, it is good in every combination...
-///
-/// The main task of _usbsend () is to transfer the complete logical message from the buffer beginning with \a messages to <b>count * MSG_SIZE</b>.
-/// \n According to usb 2.0 specification, a USB transmits a maximum of 64 byte user data packets.
-/// For the transmission of longer messages we need a segmentation.
-/// And that is exactly what happens here.
-///
-/// The message is given one by one to os_usbsend() in MSG_SIZE (= 64) byte large bites.
-/// \attention This means that the buffer given as argument must be n * MSG_SIZE Byte long.
-///
-/// An essential constant parameter which is relevant for os_usbsend() only is is_recv = 0, which means sending.
-///
-/// Now it gets a little complicated again:
-/// - If os_usbsend() returns 0, only zero bytes could be sent in one of the packets,
-/// or it was an error (-1 from the systemcall), but not a timeout.
-/// How many Bytes were sent in total from earlier calls does not seem to matter,
-/// _usbsend() returns a total of 0.
-/// - Returns os_usbsend() -1, first check if \b reset_stop is set globally
-/// or (incomprehensible) hwload_mode is not set to "always".
-/// In either case, _usbsend() returns 0,
-/// otherwise it is assumed to be a temporary transfer error and it simply retransmits the physical packet after a long delay.
-/// - If the return value of os_usbsend() was neither 0 nor -1,
-/// it specifies the numer of bytes transferred.
-/// \n Here is an information hiding conflict with os_usbsend() (at least in the Linux version):
-/// \n If os_usbsend() can not transfer the entire packet,
-/// errors are thrown and the number of bytes sent is returned.
-/// _usbsend() interprets this as well
-/// and remembers the total number of bytes transferred in the local variable \b total_sent.
-/// Subsequently, however, transmission is continued with the next complete MSG_SIZE block
-/// and not with the first of the possibly missing bytes.
-/// \todo Check whether this is the same in the macOS variant. It is not dramatic, but if errors occur, it can certainly irritate the devices completely if they receive incomplete data streams. Do we have errors with the messages "Wrote YY bytes (expected 64)" in the system logs? If not, we do not need to look any further.
-///
-/// When the last packet is transferred,
-/// _usbsend() returns the effectively counted set of bytes (from \b total_sent).
-/// This at least gives the caller the opportunity to check whether something has been lost in the middle.
-///
-/// A bit strange is the structure of the program:
-/// Handling the \b count MSG_SIZE blocks to be transferred is done
-/// in the outer for (...) loop.
-/// Repeating the transfer with a treatable error is managed by the inner while(1) loop.
-/// \n This must be considered when reading the code;
-/// The "break" on successful block transfer leaves the inner while, not the for (...).
-///
-int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line){
+// Wrapper around the vtable write() function for error handling and recovery
+int _usbsend(usbdevice* kb, void* messages, size_t msg_len, int count, const char* file, int line){
     int total_sent = 0;
     for(int i = 0; i < count; i++){
         // Send each message via the OS function
         while(1){
             DELAY_SHORT(kb);
             queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
-            int res = os_usbsend(kb, messages + i * MSG_SIZE, 0, file, line);
+            int res = kb->vtable->write(kb, messages + i * msg_len, msg_len, 0, file, line);
             queued_mutex_unlock(mmutex(kb));
             if(res == 0)
                 return 0;
@@ -704,76 +662,16 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
     return total_sent;
 }
 
-int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line){
-    while(1){
-        DELAY_SHORT(kb);
-        queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
-        int res = os_usbsend_control(kb, data, len, bRequest, wValue, wIndex, file, line);
-        queued_mutex_unlock(mmutex(kb));
+// Wrapper around the vtable write() and read() functions for error handling and recovery
+int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const char* file, int line){
+    // For now assume that msg_len is for both out_msg and in_msg
 
-        if(res != -1)
-            return res;
-
-        // Stop immediately if the program is shutting down or hardware load is set to tryonce
-        if(reset_stop || hwload_mode != 2)
-            return 0;
-
-        // Retry as long as the result is temporary failure
-        DELAY_LONG(kb);
-    }
-}
-
-/// \brief .
-///
-/// To fully understand this, you need to know about usb:
-/// All control is at the usb host (the CPU).
-/// If the device wants to communicate something to the host,
-/// it must wait for the host to ask.
-/// The usb protocol defines the cycles and periods in which actions are to be taken.
-///
-/// So in order to receive a data packet from the device,
-/// the host must first send a send request.
-/// \n This is done by _usbrecv() in the first block
-/// by sending the MSG_SIZE large data block from \b out_msg via os_usbsend() as it is a machine depending implementation.
-/// The usb target device is as always determined over kb.
-///
-/// For os_usbsend() to know that it is a receive request,
-/// the \b is_recv parameter is set to true (1).
-/// With this, os_usbsend () generates a control package for the hardware, not a data packet.
-///
-/// If sending of the control package is not successful,
-/// a maximum of 5 times the transmission is repeated (including the first attempt).
-/// If a non-cancelable error is signaled or the drive is stopped via reset_stop,
-/// _usbrecv() immediately returns 0.
-///
-/// After this, the function waits for the requested response from the device using os_usbrecv ().
-///
-/// os_usbrecv() returns 0, -1 or something else.
-/// \n Zero signals a serious error which is not treatable and _usbrecv() also returns 0.
-/// \n -1 means that it is a treatable error - a timeout for example -
-/// and therefore the next transfer attempt is started after a long pause (DELAY_LONG)
-/// if not reset_stop or the wrong hwload_mode require a termination with a return value of 0.
-///
-/// After 5 attempts, _usbrecv () returns and returns 0 as well as an error message.
-///
-/// When data is received, the number of received bytes is returned.
-/// This should always be MSG_SIZE,
-/// but os_usbrecv() can also return less.
-/// It should not be more,
-/// because then there would be an unhandled buffer overflow,
-/// but it could be less.
-/// This would be signaled in os_usbrecv () with a message.
-///
-/// The buffers behind \b out_msg and \b in_msg are MSG_SIZE at least (currently 64 Bytes).
-/// More is ok but useless, less brings unpredictable behavior.
-///
-int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line){
     // Try a maximum of 5 times
     for (int try = 0; try < 5; try++) {
         // Send the output message
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
         DELAY_SHORT(kb);
-        int res = os_usbsend(kb, out_msg, 1, file, line);
+        int res = kb->vtable->write(kb, out_msg, msg_len, 1, file, line);
         queued_mutex_unlock(mmutex(kb));
         if (res == 0)
             return 0;
@@ -787,7 +685,7 @@ int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* fil
         // Wait for the response
         if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
             DELAY_MEDIUM(kb);
-        res = os_usbrecv(kb, in_msg, file, line);
+        res = kb->vtable->read(kb, in_msg, msg_len, 0, file, line);
         if(res == 0)
             return 0;
         else if(res != -1)

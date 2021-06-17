@@ -40,7 +40,7 @@ static int update_sidelights(usbdevice* kb) {
     uchar data_pkt[MSG_SIZE] = {
         CMD_SET, FIELD_LIGHTING, MODE_SIDELIGHT, 0, !!newlight->sidelight, 0x00
     };
-    if(!usbsend(kb, data_pkt, 1))
+    if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
         return -1;
     return 0;
 }
@@ -116,7 +116,7 @@ int updatergb_kb(usbdevice* kb, int force){
         uchar winlock_pkt[MSG_SIZE] = {
             CMD_SET, FIELD_LIGHTING, MODE_WINLOCK, 0, winlock_status, 0
         };
-        if (!usbsend(kb, winlock_pkt, 1))
+        if (!usbsend(kb, winlock_pkt, sizeof(winlock_pkt), 1))
             return -1;
     }
    
@@ -128,7 +128,7 @@ int updatergb_kb(usbdevice* kb, int force){
         // The K55 has its own packet type, because it only has three lighting zones.
         uchar data_pkt[MSG_SIZE] = { 0x07, 0x25, 0x00 };
         makergb_k55(newlight, data_pkt);
-        if (!usbsend(kb, data_pkt, 1))
+        if (!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -1;
     } else if(IS_FULLRANGE(kb)) {
         // Update strafe sidelights if necessary
@@ -160,7 +160,7 @@ int updatergb_kb(usbdevice* kb, int force){
         if(IS_MONOCHROME_DEV(kb))
             data_pkt_count = 4;
 
-        if(!usbsend(kb, data_pkt[0], data_pkt_count))
+        if(!usbsend(kb, data_pkt[0], MSG_SIZE, data_pkt_count))
             return -1;
     } else {
         // Update strafe sidelights if necessary
@@ -175,7 +175,7 @@ int updatergb_kb(usbdevice* kb, int force){
             { CMD_SET, FIELD_KB_9BCLR, 0x00, 0x00, 0xD8 }
         };
         makergb_512(newlight, data_pkt, kb->dither ? ordered8to3 : quantize8to3);
-        if(!usbsend(kb, data_pkt[0], 5))
+        if(!usbsend(kb, data_pkt[0], MSG_SIZE, 5))
             return -1;
     }
 
@@ -203,11 +203,11 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
             { CMD_SET, FIELD_KB_HWCLR, 0x03, 0x01, 0x01, mode + 1, COLOR_BLUE }
         };
         makergb_full(light, data_pkt);
-        if(!usbsend(kb, data_pkt[0], 12))
+        if(!usbsend(kb, data_pkt[0], MSG_SIZE, 12))
             return -1;
         if (IS_STRAFE(kb)){ // end save
             uchar save_end_pkt[MSG_SIZE] = { CMD_SET, FIELD_KB_HWCLR, 0x04, 0x01, 0x01 };
-            if(!usbsend(kb, save_end_pkt, 1))
+            if(!usbsend(kb, save_end_pkt, sizeof(save_end_pkt), 1))
                 return -1;
         }
     } else {
@@ -219,7 +219,7 @@ int savergb_kb(usbdevice* kb, lighting* light, int mode){
             { CMD_SET, FIELD_KB_HWCLR, 0x02, 0x00, 0x01, mode + 1 }
         };
         makergb_512(light, data_pkt, kb->dither ? ordered8to3 : quantize8to3);
-        if(!usbsend(kb, data_pkt[0], 5))
+        if(!usbsend(kb, data_pkt[0], MSG_SIZE, 5))
             return -1;
     }
     return 0;
@@ -264,7 +264,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
         uchar* colors[3] = { light->r, light->g, light->b };
         for(int clr = 0; clr < 3; clr++){
             for(int i = 0; i < 4; i++){
-                if(!usbrecv(kb, data_pkt[i + clr * 4], in_pkt[i]))
+                if(!usbrecv(kb, data_pkt[i + clr * 4], MSG_SIZE, in_pkt[i]))
                     return -1;
 
                 uchar* comparePacket = data_pkt[i + clr * 4];   ///< That is the old comparison method: you get back what you sent.
@@ -286,7 +286,7 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
                     in_pkt[2][1] = 0x99;
                     in_pkt[2][2] = 0x99;
                     in_pkt[2][3] = 0x99;
-                    usbrecv(kb, in_pkt[2], in_pkt[2]); // just to find it in the wireshark log
+                    usbrecv(kb, in_pkt[2], MSG_SIZE, in_pkt[2]); // just to find it in the wireshark log
                     return -1;
                 }
             }
@@ -310,11 +310,11 @@ int loadrgb_kb(usbdevice* kb, lighting* light, int mode){
             { CMD_READ_BULK, 0x04, 36, 0 },
         };
         // Write initial packet
-        if(!usbsend(kb, data_pkt[0], 1))
+        if(!usbsend(kb, data_pkt[0], MSG_SIZE, 1))
             return -1;
         // Read colors
         for(int i = 1; i < 5; i++){
-            if(!usbrecv(kb, data_pkt[i],in_pkt[i - 1]))
+            if(!usbrecv(kb, data_pkt[i], MSG_SIZE, in_pkt[i - 1]))
                 return -1;
             if(memcmp(in_pkt[i - 1], data_pkt[i], 4)){
                 ckb_err("Bad input header");

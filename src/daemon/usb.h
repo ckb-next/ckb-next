@@ -146,7 +146,7 @@ extern device_desc ignored_devices[];
 // #define DEBUG_USB_RECV
 
 ///
-/// Uncomment to see USB packets received from the device throug the input thread
+/// Uncomment to see USB packets received from the device through the input thread
 // #define DEBUG_USB_INPUT
 
 ///
@@ -310,13 +310,13 @@ int os_resetusb(usbdevice* kb, const char* file, int line);
 /// \param[IN] line for debugging
 /// \param[in] reset_stop global variable is read
 /// \return number of Bytes sent (ideal == count * MSG_SIZE);\n 0 if a block could not be sent and it was not a timeout OR \b reset_stop was required or \b hwload_mode is not set to "always"
-int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, int line);
+int _usbsend(usbdevice* kb, void* messages, size_t msg_len, int count, const char* file, int line);
 
 /// \brief usbsend macro is used to wrap _usbsend() with debugging information (file and lineno)
 /// \param kb THE usbdevice*
 /// \param[IN] messages a Pointer to the first byte of the logical message
 /// \param[IN] count how many MSG_SIZE buffers is the logical message long?
-#define usbsend(kb, messages, count) _usbsend(kb, messages, count, __FILE_NOPATH__, __LINE__)
+#define usbsend(kb, messages, msg_len, count) _usbsend(kb, messages, msg_len, count, __FILE_NOPATH__, __LINE__)
 
 ///
 /// \brief _usbrecv Request data from a USB device by first sending an output packet and then reading the response.
@@ -327,53 +327,19 @@ int _usbsend(usbdevice* kb, const uchar* messages, int count, const char* file, 
 /// \param[IN] line for debugging
 /// \param[IN] reset_stop global variable is read
 /// \return number of bytes read or zero on failure.
-int _usbrecv(usbdevice* kb, const uchar* out_msg, uchar* in_msg, const char* file, int line);
+int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const char* file, int line);
 
 /// \brief usbrecv macro is used to wrap _usbrecv() with debugging information (file and lineno)
 /// \param kb THE usbdevice*
 /// \param[IN] out_msg What information does the caller want from the device?
 /// \param[OUT] in_msg Here comes the answer; The names represent the usb view, not the view of this function! So INput from usb is OUTput of this function.
-#define usbrecv(kb, out_msg, in_msg) _usbrecv(kb, out_msg, in_msg, __FILE_NOPATH__, __LINE__)
+#define usbrecv(kb, out_msg, msg_len, in_msg) _usbrecv(kb, out_msg, msg_len, in_msg, __FILE_NOPATH__, __LINE__)
 
-/// \details
-/// \brief os_usbsend sends a data packet (MSG_SIZE = 64) Bytes long
-/// \param kb THE usbdevice*
-/// \param out_msg the MSGSIZE char long buffer to send
-/// \param is_recv if true, just send an ioctl for further reading packets. If false, send the data at \b out_msg.
-/// \param file for debugging
-/// \param line for debugging
-/// \return -1 on timeout (try again), 0 on hard error, numer of bytes sent otherwise
-int os_usbsend(usbdevice* kb, const uchar* out_msg, int is_recv, const char* file, int line);
-
-///
-/// \brief os_usbrecv receives a max MSGSIZE long buffer from usb device
-/// \param kb THE usbdevice*
-/// \param in_msg the buffer to fill with the message received
-/// \param file for debugging
-/// \param line for debugging
-/// \return -1 on timeout, 0 on hard error, numer of bytes received otherwise
-int os_usbrecv(usbdevice* kb, uchar* in_msg, const char* file, int line);
-
-///
-/// \brief os_sendindicators update the indicators for the special keys (Numlock, Capslock and what else?)
-/// \param kb THE usbdevice*
-void os_sendindicators(usbdevice* kb);
-
-///
-/// \brief _nk95cmd If we control a non RGB keyboard, set the keyboard via ioctl with usbdevfs_ctrltransfer
-/// \param kb THE usbdevice*
-/// \param bRequest the byte array with the usb request
-/// \param wValue a usb wValue
-/// \param file for error message
-/// \param line for error message
-/// \return 1 (true) on failure, 0 (false) on success.
-int _nk95cmd(usbdevice* kb, uchar bRequest, ushort wValue, const char* file, int line);
-
-/// \brief nk95cmd() macro is used to wrap _nk95cmd() with debugging information (file and lineno).
+/// \brief nk95cmd() macro is used to send legacy keyboard commands
 /// the command structure is different:
 /// \n Just the bits 23..16 are used as bits 7..0 for bRequest
 /// \n Bits 15..0 are used as wValue
-#define nk95cmd(kb, command) _nk95cmd(kb, (command) >> 16 & 0xFF, (command) & 0xFFFF, __FILE_NOPATH__, __LINE__)
+#define nk95cmd(kb, command) kb->vtable->write(kb, &(ctrltransfer) { .bRequestType = 0x40, .bRequest = (command) >> 16 & 0xFF, .wValue = (command) & 0xFFFF, .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL}, 0, 0, __FILE_NOPATH__, __LINE__)
 
 /// Hardware-specific commands for the K95 nonRGB,
 /// \see [usb2.0 documentation for details](http://www.usb.org/developers/docs/usb_20.zip).
@@ -401,9 +367,7 @@ int usb_tryreset(usbdevice* kb);
 
 void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum);
 
-int _usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
-#define usbsend_control(kb, message, len, bRequest, wValue, wIndex) _usbsend_control(kb, message, len, bRequest, wValue, wIndex, __FILE_NOPATH__, __LINE__)
-int os_usbsend_control(usbdevice* kb, uchar* data, ushort len, uchar bRequest, ushort wValue, ushort wIndex, const char* file, int line);
+int os_usb_control(usbdevice* kb, ctrltransfer* transfer, const char* file, int line);
 
 // receive message from initial sighandler socketpair communication
 extern int sighandler_pipe[2];
@@ -417,5 +381,7 @@ typedef struct _dpi_list {
 } dpi_list;
 
 extern dpi_list mouse_dpi_list[];
+
+int os_usb_interrupt_out(usbdevice* kb, unsigned int ep, unsigned int len, uchar* data, const char* file, int line);
 
 #endif  // USB_H

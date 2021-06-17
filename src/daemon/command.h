@@ -71,6 +71,7 @@ typedef enum {
 typedef void (*cmdhandler)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter);    // Normal command
 typedef int (*cmdhandler_io)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter);  // Command with hardware I/O - returns zero on success
 typedef void (*cmdhandler_mac)(usbdevice* kb, usbmode* modeidx, int notifyidx, const char* keys, const char* assignment); // Macro command has a different left-side handler
+typedef int (*device_io)(usbdevice* kb, void* ptr, int len, int is_recv, const char* file, int line);
 typedef union devcmd {
     // Commands can be accessed by name or by position
     cmdhandler      do_cmd[CMD_DEV_COUNT];
@@ -136,7 +137,12 @@ typedef union devcmd {
         int (*updatedpi)(usbdevice* kb, int force);
 
         cmdhandler reset;
+
+        // Everything below this line should not be exposed through the command interface
         void (*fill_input_eps)(usbdevice* kb);
+
+        device_io write;
+        device_io read;
     };
 } devcmd;
 

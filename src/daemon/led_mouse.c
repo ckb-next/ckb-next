@@ -33,7 +33,7 @@ int updatergb_mouse(usbdevice* kb, int force){
         *rgb_data++ = newlight->b[LED_MOUSE + i];
     }
     // Send RGB data
-    if(!usbsend(kb, data_pkt, 1))
+    if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
         return -1;
 
     memcpy(lastlight, newlight, sizeof(lighting));
@@ -53,7 +53,7 @@ int savergb_mouse(usbdevice* kb, lighting* light, int mode){
         data_pkt[4] = light->r[led];
         data_pkt[5] = light->g[led];
         data_pkt[6] = light->b[led];
-        if(!usbsend(kb, data_pkt, 1))
+        if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -1;
         // Set packet for next zone
         data_pkt[2]++;
@@ -69,7 +69,7 @@ int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
     // Load each RGB zone
     int zonecount = IS_SCIMITAR(kb) ? 4 : IS_SABRE(kb) ? 3 : 2;
     for(int i = 0; i < zonecount; i++){
-        if(!usbrecv(kb, data_pkt, in_pkt))
+        if(!usbrecv(kb, data_pkt, sizeof(data_pkt), in_pkt))
             return -1;
         if(memcmp(in_pkt, data_pkt, 4)){
             ckb_err("Bad input header");
@@ -108,6 +108,6 @@ int updatergb_mouse_legacy(usbdevice* kb, int force){
     lastlight->g[MOUSE_BACK_LED] = newlight->g[MOUSE_BACK_LED];
     lastlight->b[MOUSE_BACK_LED] = newlight->b[MOUSE_BACK_LED];
 
-    usbsend_control(kb, NULL, 0, 49, newwValue, 0);
+    usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 49, .wValue = newwValue, .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL }), 0, 1);
     return 0;
 }

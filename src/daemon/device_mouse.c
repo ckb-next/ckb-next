@@ -8,20 +8,18 @@
 
 int start_mouse_legacy(usbdevice* kb, int makeactive){
     (void)makeactive;
-
-    // kb, ptr, len, bRequest, wValue, wIndex
     // 0x00002 == HW Playback off
     // 0x00001 == HW Playback on
-    usbsend_control(kb, NULL, 0, 2, 0x0002, 0);
+    usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 2, .wValue = 0x0002, .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL }), 0, 1);
     // Send initial DPI settings
     unsigned char pkt1[] = {0x04, 0x02, 0x10, 0x10, 0x30, 0x30, 0x78, 0x78, 0x08, 0x08};
-    usbsend_control(kb, pkt1, 10, 174, 0x0000, 0);
+    usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 174, .wValue = 0x0000, .wIndex = 0, .wLength = sizeof(pkt1), .timeout = 5000, .data = pkt1 }), 0, 1);
     // ????
     unsigned char pkt2[] = {0x02, 0x02, 0x03, 0x02, 0xff, 0x3c, 0x00, 0x00, 0x00, 0x06};
-    usbsend_control(kb, pkt2, 10, 3, 0x0000, 0);
+    usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 3, .wValue = 0x0000, .wIndex = 0, .wLength = sizeof(pkt2), .timeout = 5000, .data = pkt2 }), 0, 1);
     // Angle snap ON
     unsigned char pkt3[] = {0x01};
-    usbsend_control(kb, pkt3, 1, 100, 0x0000, 0);
+    usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 100, .wValue = 0x0000, .wIndex = 0, .wLength = sizeof(pkt3), .timeout = 5000, .data = pkt3 }), 0, 1);
 
     kb->active = 1;
     kb->pollrate = -1;
@@ -33,7 +31,7 @@ int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, co
     (void)dummy2;
     (void)dummy3;
 
-    usbsend_control(kb, NULL, 0, 10, rate, 0);
+    usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 10, .wValue = rate, .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL }), 0, 1);
 
     // Device should disconnect+reconnect, but update the poll rate field in case it doesn't
     kb->pollrate = rate;
@@ -61,11 +59,11 @@ int setactive_mouse(usbdevice* kb, int active){
     memset(&kb->input.keys, 0, sizeof(kb->input.keys));
     inputupdate(kb);
     queued_mutex_unlock(imutex(kb));
-    if(!usbsend(kb, msg[0], 1))
+    if(!usbsend(kb, msg[0], MSG_SIZE, 1))
         return -1;
     if(active){
         // Set up key input
-        if(!usbsend(kb, msg[1], 1))
+        if(!usbsend(kb, msg[1], MSG_SIZE, 1))
             return -1;
         for(int i = 0; i < keycount; i++){
             msg[1][i * 2 + 4] = i + 1;
@@ -101,7 +99,7 @@ int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const cha
     uchar msg[MSG_SIZE] = {
         CMD_SET, FIELD_POLLRATE, 0, 0, (uchar)rate
     };
-    if(!usbsend(kb, msg, 1))
+    if(!usbsend(kb, msg, sizeof(msg), 1))
         return -1;
     // Device should disconnect+reconnect, but update the poll rate field in case it doesn't
     kb->pollrate = rate;

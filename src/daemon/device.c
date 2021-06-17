@@ -259,7 +259,7 @@ void nxp_reset(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char*
     }
 
     if(pkt[2] != 0xff){
-        if(!usbsend(kb, pkt, 1))
+        if(!usbsend(kb, pkt, sizeof(pkt), 1))
             ckb_err("%s reset failed", type);
     }
 }

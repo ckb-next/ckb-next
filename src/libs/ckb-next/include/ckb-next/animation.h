@@ -182,7 +182,7 @@ void ckb_alpha_blend(ckb_key* key, float a, float r, float g, float b);
 
 // URL-encoded string printer
 void printurl(const char* src){
-    char out[strlen(src) * 3 + 1];
+    char* out = malloc(strlen(src) * 3 + 1);
     char* dst = out;
     char s;
     while((s = *src++)){
@@ -208,6 +208,7 @@ void printurl(const char* src){
     }
     *dst = '\0';
     printf("%s", out);
+    free(out);
 }
 
 // URL decode

@@ -804,13 +804,14 @@ int closeusb(usbdevice* kb){
 
 /// Formats and writes the current urb buffer to the console
 void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum){
-    char converted[actual_length * 3 + 1];
+    char* converted = malloc(actual_length * 3 + 1);
     for(int i = 0; i < actual_length; i++)
-        sprintf(&converted[i * 3], "%02x ", buffer[i]);
+        sprintf(converted + i * 3, "%02x ", buffer[i]);
     if(line == 0)
         ckb_info("ckb%i %s %s", devnum, prefix, converted);
     else
         ckb_info("ckb%i %s (via %s:%d) %s %s", devnum, function, file, line, prefix, converted);
+    free(converted);
 }
 
 #define TRY_WITH_RESET_NOFREE(action, ret)       \

@@ -187,23 +187,8 @@ int main(int argc, char** argv){
 #endif
 
     // Check PID, quit if already running
-    char pidpath[strlen(devpath) + 6];
-    snprintf(pidpath, sizeof(pidpath), "%s0/pid", devpath);
-    FILE* pidfile = fopen(pidpath, "r");
-    if(pidfile){
-        pid_t pid;
-        if(fscanf(pidfile, "%d", &pid) == EOF)
-            ckb_err("PID fscanf returned EOF (%s)", strerror(errno));
-        fclose(pidfile);
-        if(pid > 0){
-            // kill -s 0 checks if the PID is active but doesn't send a signal
-            if(!kill(pid, 0)){
-                ckb_fatal_nofile("ckb-next-daemon is already running (PID %d). Try `killall ckb-next-daemon`.", pid);
-                ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)", pidpath);
-                return 0;
-            }
-        }
-    }
+    if(is_pid_running())
+        return 1;
 
     // Read parameters
     int forceroot = 1;

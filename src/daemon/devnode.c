@@ -8,11 +8,35 @@
 #include <ckbnextconfig.h>
 
 // OSX doesn't like putting FIFOs in /dev for some reason
+// Don't make these pointers, as doing so will result in sizeof() not producing the correct result.
 #ifndef OS_MAC
-const char *const devpath = "/dev/input/ckb";
+const char devpath[] = "/dev/input/ckb";
 #else
-const char *const devpath = "/var/run/ckb";
+const char devpath[] = "/var/run/ckb";
 #endif
+
+#define DEVPATH_LEN (sizeof(devpath) - 1)
+
+int is_pid_running(void){
+    char pidpath[DEVPATH_LEN + 6];
+    snprintf(pidpath, sizeof(pidpath), "%s0/pid", devpath);
+    FILE* pidfile = fopen(pidpath, "r");
+    if(pidfile){
+        pid_t pid;
+        if(fscanf(pidfile, "%d", &pid) == EOF)
+            ckb_err("PID fscanf returned EOF (%s)", strerror(errno));
+        fclose(pidfile);
+        if(pid > 0){
+            // kill -s 0 checks if the PID is active but doesn't send a signal
+            if(!kill(pid, 0)){
+                ckb_fatal_nofile("ckb-next-daemon is already running (PID %d). Try `killall ckb-next-daemon`.", pid);
+                ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)", pidpath);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 
 long gid = -1;
 #define S_GID_READ  (gid >= 0 ? S_CUSTOM_R : S_READ)
@@ -80,7 +104,7 @@ void check_chmod(const char *pathname, mode_t mode){
 ///
 void _updateconnected(usbdevice* kb){
     queued_mutex_lock(devmutex);
-    char cpath[strlen(devpath) + 12];
+    char cpath[DEVPATH_LEN + 12];
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
     FILE* cfile = fopen(cpath, "w");
     if(!cfile){
@@ -129,7 +153,7 @@ int _mknotifynode(usbdevice* kb, int notify){
     // Create the notification node
     char index = (INDEX_OF(kb, keyboard) % 10) + '0';
     char notify_char = (notify % 10) + '0';
-    char outpath[strlen(devpath) + 10 * sizeof(char)];
+    char outpath[DEVPATH_LEN + 10 * sizeof(char)];
     snprintf(outpath, sizeof(outpath), "%s%c/notify%c", devpath, index, notify_char);
     if(mkfifo(outpath, S_GID_READ) != 0 || (kb->outfifo[notify] = open(outpath, O_RDWR | O_NONBLOCK) + 1) == 0){
         // Add one to the FD because 0 is a valid descriptor, but ckb uses 0 for uninitialized devices
@@ -154,7 +178,7 @@ int _rmnotifynode(usbdevice* kb, int notify){
         return -1;
     char index = (INDEX_OF(kb, keyboard) % 10) + '0';
     char notify_char = (notify % 10) + '0';
-    char outpath[strlen(devpath) + 10 * sizeof(char)];
+    char outpath[DEVPATH_LEN + 10 * sizeof(char)];
     snprintf(outpath, sizeof(outpath), "%s%c/notify%c", devpath, index, notify_char);
     // Close FIFO
     close(kb->outfifo[notify] - 1);
@@ -204,7 +228,7 @@ static char* layoutstr(char layout){
 static int _mkdevpath(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
     // Create the control path
-    char path[strlen(devpath) + 2];
+    char path[DEVPATH_LEN + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
     if(rm_recursive(path) != 0 && errno != ENOENT){
         ckb_err("Unable to delete %s: %s", path, strerror(errno));
@@ -351,7 +375,7 @@ int rmdevpath(usbdevice* kb){
     }
     for(int i = 0; i < OUTFIFO_MAX; i++)
         _rmnotifynode(kb, i);
-    char path[strlen(devpath) + 2];
+    char path[DEVPATH_LEN + 2];
     snprintf(path, sizeof(path), "%s%d", devpath, index);
     if(rm_recursive(path) != 0 && errno != ENOENT){
         ckb_warn("Unable to delete %s: %s", path, strerror(errno));
@@ -365,7 +389,7 @@ int rmdevpath(usbdevice* kb){
 
 int mkfwnode(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
-    char fwpath[strlen(devpath) + 12];
+    char fwpath[DEVPATH_LEN + 12];
     snprintf(fwpath, sizeof(fwpath), "%s%d/fwversion", devpath, index);
     FILE* fwfile = fopen(fwpath, "w");
     if(fwfile){
@@ -379,7 +403,7 @@ int mkfwnode(usbdevice* kb){
         remove(fwpath);
         return -1;
     }
-    char ppath[strlen(devpath) + 11];
+    char ppath[DEVPATH_LEN + 11];
     snprintf(ppath, sizeof(ppath), "%s%d/pollrate", devpath, index);
     FILE* pfile = fopen(ppath, "w");
     if(pfile){

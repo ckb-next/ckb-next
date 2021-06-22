@@ -118,10 +118,11 @@ void cmd_name(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
     (void)dummy1;
     (void)dummy2;
 
-    char decoded[strlen(name) + 1];
+    char* decoded = malloc(strlen(name) + 1);
     urldecode2(decoded, name);
     size_t srclen = strlen(decoded), dstlen = MD_NAME_LEN;
     u16enc(decoded, mode->name, &srclen, &dstlen);
+    free(decoded);
 }
 
 void cmd_profilename(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* name){
@@ -130,10 +131,11 @@ void cmd_profilename(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
     (void)dummy3;
 
     usbprofile* profile = kb->profile;
-    char decoded[strlen(name) + 1];
+    char* decoded = malloc(strlen(name) + 1);
     urldecode2(decoded, name);
     size_t srclen = strlen(decoded), dstlen = PR_NAME_LEN;
     u16enc(decoded, profile->name, &srclen, &dstlen);
+    free(decoded);
 }
 
 char* printname(ushort* name, int length){

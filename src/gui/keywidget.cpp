@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0, *darkCoreOverlay = 0, *ironclawWirelessOverlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -145,6 +145,13 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 katarOverlay = new QImage(":/img/overlay_katar.png");
             overlay = katarOverlay;
             xpos = 3.5f;
+            ypos = -2.f;
+        } else if(model == KeyMap::DARKCORE){
+            if(!darkCoreOverlay)
+                darkCoreOverlay = new QImage(":/img/overlay_darkcore.png");
+            overlay = darkCoreOverlay;
+            xpos = -5.f;
+            ypos = -2.f;
         } else if(model == KeyMap::POLARIS){
             if(!polarisOverlay)
                 polarisOverlay = new QImage(":/img/overlay_polaris.png");
@@ -166,6 +173,11 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!nightswordOverlay)
                 nightswordOverlay = new QImage(":/img/overlay_nightsword.png");
             overlay = nightswordOverlay;
+            xpos = 2.f;
+        } else if(model == KeyMap::IRONCLAW_W){
+            if(!ironclawWirelessOverlay)
+                ironclawWirelessOverlay = new QImage(":/img/overlay_ironclaw.png");
+            overlay = ironclawWirelessOverlay;
             xpos = 2.f;
         }
 
@@ -398,6 +410,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                     decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
             else if(model == KeyMap::M95 || ((model == KeyMap::IRONCLAW || model == KeyMap::NIGHTSWORD) && !strcmp(key.name, "back")))
+                drawLogo(&key, &decPainter, offX , offY, scale);
+            else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW_W && !strcmp(key.name, "back")))
                 drawLogo(&key, &decPainter, offX , offY, scale);
             else
                 decPainter.drawEllipse(QRectF(x * scale, y * scale, w * scale, h * scale));

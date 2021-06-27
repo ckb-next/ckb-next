@@ -8,6 +8,7 @@
 #include "profile.h"
 #include "usb_legacy.h"
 #include "usb_nxp.h"
+#include "usb_bragi.h"
 
 // Do-nothing functions
 static void cmd_none(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4){
@@ -75,6 +76,57 @@ const devcmd vtable_keyboard = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
+    .ioff = cmd_ioff,
+    .ion = cmd_ion,
+    .iauto = cmd_iauto,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_dev,
+    .setmodeindex = int1_void_none,             ///< is just for non rgb keyboards
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_kb,
+    .updateindicators = updateindicators_kb,
+    .updatedpi = int1_int_none,                 ///< This is for mice only
+    .reset = nxp_reset,
+    .fill_input_eps = nxp_fill_input_eps,
+    .write = nxp_usb_write,
+    .read = nxp_usb_read,
+};
+
+const devcmd vtable_keyboard_wireless = {
+    .hwload = cmd_hwload_kb,
+    .hwsave = cmd_hwsave_kb,
+    .fwupdate = cmd_fwupdate,
+    .pollrate = cmd_pollrate,
+
+    .active = cmd_active_kb,
+    .idle = cmd_idle_kb,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,
@@ -125,6 +177,7 @@ const devcmd vtable_keyboard_legacy = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_none,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,
@@ -175,6 +228,57 @@ const devcmd vtable_mouse = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
+    .ioff = cmd_none,
+    .ion = cmd_none,
+    .iauto = cmd_none,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_dpi,
+    .dpisel = cmd_dpisel,
+    .lift = cmd_lift,
+    .snap = cmd_snap,
+
+    .notify = cmd_notify,
+    .inotify = cmd_none,
+    .get = cmd_get,
+
+    .start = start_dev,
+    .setmodeindex = int1_void_none,         ///< Mice do not have different modes
+    .allocprofile = allocprofile,           ///< same for all keyboards and mice
+    .loadprofile = loadprofile,             ///< same for all keyboards and mice
+    .freeprofile = freeprofile,             ///< same for all keyboards and mice
+    .updatergb = updatergb_mouse,           ///< special for mice
+    .updateindicators = int1_void_none,     ///< Mice do not have keyboard indicators like num
+    .updatedpi = updatedpi,                 ///< special for mice
+    .reset = nxp_reset,
+    .fill_input_eps = nxp_fill_input_eps,
+    .write = nxp_usb_write,
+    .read = nxp_usb_read,
+};
+
+const devcmd vtable_mouse_wireless = {
+    .hwload = cmd_hwload_mouse,
+    .hwsave = cmd_hwsave_mouse,
+    .fwupdate = cmd_fwupdate,
+    .pollrate = cmd_pollrate,
+
+    .active = cmd_active_mouse,
+    .idle = cmd_idle_mouse,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_none,
     .ion = cmd_none,
     .iauto = cmd_none,
@@ -225,6 +329,7 @@ const devcmd vtable_mousepad = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_none,
     .ion = cmd_none,
     .iauto = cmd_none,
@@ -275,6 +380,7 @@ const devcmd vtable_mouse_legacy = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
+    .hwanim = cmd_hwanim,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,
@@ -305,4 +411,103 @@ const devcmd vtable_mouse_legacy = {
     .fill_input_eps = legacy_fill_input_eps,
     .write = legacy_dev_io,
     .read = legacy_dev_io,
+};
+
+// Bragi vtable
+const devcmd vtable_bragi = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_pollrate_bragi,
+
+    .active = cmd_active_bragi,
+    .idle = cmd_idle_bragi,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_ioff,
+    .ion = cmd_ion,
+    .iauto = cmd_iauto,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_dpi,
+    .dpisel = cmd_dpisel,
+    .lift = cmd_none,
+    .snap = cmd_snap_bragi,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_mouse_bragi,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile_none,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_mouse_bragi,
+    .updateindicators = int1_void_none,
+    .updatedpi = updatedpi_bragi,
+    .reset = cmd_none,
+    .fill_input_eps = bragi_fill_input_eps,
+    .write = bragi_usb_write,
+    .read = bragi_usb_read,
+};
+
+const devcmd vtable_bragi_keyboard = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_pollrate_bragi,
+
+    .active = cmd_active_bragi,
+    .idle = cmd_idle_bragi,
+
+    .erase = cmd_erase,
+    .eraseprofile = cmd_eraseprofile,
+    .name = cmd_name,
+    .profilename = cmd_profilename,
+    .id = cmd_id,
+    .profileid = cmd_profileid,
+
+    .rgb = cmd_rgb,
+    .ioff = cmd_ioff,
+    .ion = cmd_ion,
+    .iauto = cmd_iauto,
+
+    .bind = cmd_bind,
+    .unbind = cmd_unbind,
+    .rebind = cmd_rebind,
+    .macro = cmd_macro,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_notify,
+    .inotify = cmd_inotify,
+    .get = cmd_get,
+
+    .start = start_keyboard_bragi,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile_none,
+    .freeprofile = freeprofile,
+    .updatergb = updatergb_keyboard_bragi,
+    .updateindicators = updateindicators_kb,
+    .updatedpi = int1_int_none,
+    .reset = cmd_none,
+    .fill_input_eps = bragi_fill_input_eps,
+    .write = bragi_usb_write,
+    .read = bragi_usb_read,
 };

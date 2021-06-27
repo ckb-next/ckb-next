@@ -163,6 +163,9 @@ typedef struct {
 #define FEAT_ISO        0x400
 #define FEAT_MOUSEACCEL 0x800   // Mouse acceleration (also Mac only)
 
+#define FEAT_DONGLE     0x1000  // Is mouse detachable (supports wireless)?
+#define FEAT_WIRELESS   0x2000  // Is wireless?
+
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL | FEAT_HWLOAD)
 #define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)
@@ -193,13 +196,23 @@ typedef struct {
 
 // vtables for keyboards/mice (see command.h)
 extern const union devcmd vtable_keyboard;
+extern const union devcmd vtable_keyboard_wireless;
 extern const union devcmd vtable_keyboard_legacy;
 extern const union devcmd vtable_mouse;
+extern const union devcmd vtable_mouse_wireless;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
+extern const union devcmd vtable_bragi;
+extern const union devcmd vtable_bragi_keyboard;
+
+typedef enum protocol_
+{
+    PROTO_NXP,
+    PROTO_BRAGI,
+} protocol_t;
 
 // Structure for tracking keyboard/mouse devices
-#define KB_NAME_LEN 50
+#define KB_NAME_LEN 64
 #define SERIAL_LEN  34
 #define MSG_SIZE    64
 #define MAX_MSG_SIZE 1024
@@ -303,6 +316,11 @@ typedef struct {
     // Endpoints the main input thread should listen to
     // Must always end with 0, and endpoints should be 0x80 | i
     uchar input_endpoints[USB_EP_MAX+1];
+    // Protocol
+    protocol_t protocol;
+    // Poll thread
+    pthread_t* pollthread;
+
 } usbdevice;
 
 #ifdef OS_LINUX

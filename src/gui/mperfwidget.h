@@ -27,6 +27,7 @@ public:
 
     static const int DPI_COUNT = KbPerf::DPI_COUNT;
     void setLegacyM95();
+    void setDarkCore();
     void setMaxDpi(ushort dpi);
 private:
     Ui::MPerfWidget *ui;
@@ -47,6 +48,8 @@ private:
 
     // Hack: prevent recursive slot calls
     bool isSetting;
+
+    bool isDarkCore;
 
     void hideItemsInLayout(QLayout* layout);
 

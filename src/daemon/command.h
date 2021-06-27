@@ -38,6 +38,7 @@ typedef enum {
 
     // LED control
     RGB,
+    HWANIM,
     IOFF,
     ION,
     IAUTO,
@@ -100,6 +101,7 @@ typedef union devcmd {
 
         // led.h
         cmdhandler rgb;
+        cmdhandler hwanim;
         cmdhandler ioff;
         cmdhandler ion;
         cmdhandler iauto;

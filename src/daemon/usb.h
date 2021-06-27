@@ -21,7 +21,7 @@
 ///
 /// Block No. | contains | Devices are bundled via
 /// --------- | -------- | -----------------------
-/// 1 | The first block contains the K63 Non RGB Keyboard. No other K63 is known so far.
+/// 1 | The first block contains the K63 Non RGB Keyboard.
 /// 2 | the K65-like keyboards, regardless of their properties (RGB, ...). | In summary, they can be queried using the macro IS_K65().
 /// 3 | K68 keyboards | IS_K68().
 /// 4 | the K70-like Keyboards with all their configuration types | summarized by IS_K70().
@@ -47,7 +47,12 @@
 #define IS_K55(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K55)
 
 #define P_K63_NRGB           0x1b40
-#define IS_K63(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K63_NRGB)
+#define P_K63_NRGB_WL        0x1b45 /* wireless */
+#define P_K63_NRGB_WL2       0x1b50 /* wireless */
+#define P_K63_NRGB_WL3       0x1b8c /* wireless */
+#define P_K63_NRGB_WL4       0x1b8f /* wireless */
+#define IS_K63_WL(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB_WL || (kb)->product == P_K63_NRGB_WL2 || (kb)->product == P_K63_NRGB_WL3 || (kb)->product == P_K63_NRGB_WL4))
+#define IS_K63(kb)           (IS_K63_WL(kb) || ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K63_NRGB)))
 
 #define P_K65                0x1b17
 #define P_K65_LEGACY         0x1b07
@@ -78,6 +83,7 @@
 #define P_K95                0x1b11
 #define P_K95_LEGACY         0x1b08
 #define P_K95_PLATINUM       0x1b2d
+#define P_K95_PLATINUM_XT    0x1b89 // Don't think this needs to be in the macro
 #define IS_K95(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K90_LEGACY || (kb)->product == P_K95 || (kb)->product == P_K95_LEGACY || (kb)->product == P_K95_PLATINUM))
 
 #define P_STRAFE             0x1b20
@@ -119,6 +125,16 @@
 
 #define P_NIGHTSWORD	     0x1b5c
 #define IS_NIGHTSWORD(kb)    ((kb)->vendor == V_CORSAIR && (kb)->product == P_NIGHTSWORD)
+
+#define P_DARK_CORE          0x1b35 /* wired */
+#define P_DARK_CORE_WL       0x1b64 /* wireless */
+#define P_DARK_CORE_SE       0x1b4b /* wired */
+#define P_DARK_CORE_SE_WL    0x1b51 /* wireless */
+#define IS_DARK_CORE(kb)     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_DARK_CORE || (kb)->product == P_DARK_CORE_WL || (kb)->product == P_DARK_CORE_SE || (kb)->product == P_DARK_CORE_SE_WL))
+
+#define P_IRONCLAW_W_U       0x1b4c /* Ironclaw RGB Wireless USB */
+#define P_IRONCLAW_W_D       0x1b66 /* Ironclaw RGB Wireless Dongle */
+#define IS_IRONCLAW_W(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_IRONCLAW_W_U || (kb)->product == P_IRONCLAW_W_D))
 
 #define P_POLARIS            0x1b3b
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
@@ -172,7 +188,7 @@ const char* product_str(ushort product);
 /// The difference between non RGB and monochrome is, that monochrome has lights, but just in one color.
 /// nonRGB has no lights.
 /// Change this if new \b monochrome devices are added
-#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K63_NRGB) || (product) == (P_K68_NRGB) || (product) == (P_K70_LUX_NRGB) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
+#define IS_MONOCHROME(vendor, product)  ((vendor) == (V_CORSAIR) && ((product) == (P_K63_NRGB) || (product) == (P_K63_NRGB_WL) || (product) == (P_K63_NRGB_WL2) || (product) == (P_K63_NRGB_WL3) || (product) == (P_K63_NRGB_WL4) || (product) == (P_K68_NRGB) || (product) == (P_STRAFE_NRGB) || (product) == (P_STRAFE_NRGB_2)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_LEGACY() is returned.
 #define IS_LEGACY_DEV(kb)               IS_LEGACY((kb)->vendor, (kb)->product)
@@ -184,7 +200,7 @@ const char* product_str(ushort product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D)))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -197,7 +213,7 @@ const char* product_str(ushort product);
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 // Devices that are considered experimental and are either not fully tested, or aren't fully implemented
-#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && (0))
+#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && ((product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4 || (product) == P_K95_PLATINUM_XT || (product) == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_IRONCLAW_W_U || (product) == P_IRONCLAW_W_D))
 
 /// Some devices cause usbhid to spend a long time initialising it. To work around this, we intentionally uncleanly
 /// deinitialise the device, skipping the usbhid handover.
@@ -206,7 +222,7 @@ const char* product_str(ushort product);
 /// Used for new devices that come with V3 firmware endpoint configuration out of the factory, but have fwversion < 0x300.
 /// Note: only the RGB variant of the K68 needs a v3 override.
 /// Note: P_K70_MK2 doesn't seem to require this, but it was added as a precaution
-#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_IRONCLAW || (kb)->product == P_NIGHTSWORD || (kb)->product == P_SCIMITAR_ELITE)
+#define IS_V3_OVERRIDE(kb)              ((kb)->product == P_K68 || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_IRONCLAW || (kb)->product == P_NIGHTSWORD || (kb)->product == P_SCIMITAR_ELITE || IS_DARK_CORE(kb) || (kb)->product == P_IRONCLAW_W_U || (kb)->product == P_IRONCLAW_W_D)
 
 /// Used when a device has a firmware with a low version number that uses the new endpoint configuration.
 #define IS_V2_OVERRIDE(kb)              (IS_V3_OVERRIDE(kb) || IS_PLATINUM(kb) || IS_K63(kb) || IS_K68(kb) || IS_HARPOON(kb) || IS_GLAIVE(kb) || IS_KATAR(kb) || (kb)->product == P_STRAFE_NRGB_2 || IS_POLARIS(kb) || IS_ST100(kb) || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_K66)
@@ -214,11 +230,20 @@ const char* product_str(ushort product);
 /// Used for devices that have a single IN endpoint, and no HID input
 #define IS_SINGLE_EP(kb)                (IS_POLARIS(kb) || IS_ST100(kb))
 
+/// Used for devices which support wireless.
+#define IS_WIRELESS(kb)                 (IS_K63_WL(kb) || IS_DARK_CORE(kb))
+
+/// Used for ID combinations which support wireless.
+#define IS_WIRELESS_ID(vendor, product) ((vendor) == V_CORSAIR && (product == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4))
+
+/// Used for devices which are connected via dongle instead of cable.
+#define IS_DONGLE(kb)                   ((kb)->product == P_DARK_CORE_WL || (kb)->product == P_DARK_CORE_SE_WL || IS_K63_WL(kb))
+
 /// Used for devices that use a file-based hardware animation system.
-#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_IRONCLAW || (kb)->product == P_HARPOON_PRO)
+#define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_IRONCLAW || (kb)->product == P_HARPOON_PRO || IS_K63_WL(kb) || IS_DARK_CORE(kb) || (kb)->product == P_IRONCLAW_W_U || (kb)->product == P_IRONCLAW_W_D)
 
 /// Devices here support setting the pollrate through software
-#define SUPPORTS_ADJRATE(kb)            ((kb)->product == P_K63_NRGB || (kb)->product == P_K66 || (kb)->product == P_K68 || (kb)->product == P_K68_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K95_PLATINUM || (kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_M95 || (kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_HARPOON || (kb)->product == P_HARPOON_PRO || (kb)->product == P_GLAIVE || (kb)->product == P_KATAR || (kb)->product == P_NIGHTSWORD)
+#define SUPPORTS_ADJRATE(kb)            ((kb)->product == P_K63_NRGB || (kb)->product == P_K66 || (kb)->product == P_K68 || (kb)->product == P_K68_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K95_PLATINUM || (kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_M95 || (kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_HARPOON || (kb)->product == P_HARPOON_PRO || (kb)->product == P_GLAIVE || (kb)->product == P_KATAR || (kb)->product == P_NIGHTSWORD || IS_DARK_CORE(kb) || (kb)->product == P_K95_PLATINUM_XT)
 
 /// USB delays for when the keyboards get picky about timing
 /// That was the original comment, but it is used anytime.
@@ -238,6 +263,9 @@ const char* product_str(ushort product);
 /// This constant is used to initialize \b kb->usbdelay.
 /// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
 #define USB_DELAY_DEFAULT   5
+
+// This should be removed in the future when we implement autodetection
+#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT)))
 
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();

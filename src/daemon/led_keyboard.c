@@ -108,6 +108,9 @@ int updatergb_kb(usbdevice* kb, int force){
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
+    if(IS_K63_WL(kb))
+        return updatergb_wireless(kb, lastlight, newlight);
+
     if (kb->product == P_K66 || kb->product == P_K68_NRGB) {
         // The K68 NRGB doesn't support winlock setting through the
         // normal packets, so we have to use a different packet to set it.
@@ -132,7 +135,7 @@ int updatergb_kb(usbdevice* kb, int force){
             return -1;
     } else if(IS_FULLRANGE(kb)) {
         // Update strafe sidelights if necessary
-	if (IS_STRAFE(kb) && update_sidelights(kb))
+        if (IS_STRAFE(kb) && update_sidelights(kb))
             return -1;
         
         // 16.8M color lighting works fine on strafe and is the only way it actually works
@@ -164,7 +167,7 @@ int updatergb_kb(usbdevice* kb, int force){
             return -1;
     } else {
         // Update strafe sidelights if necessary
-	if (IS_STRAFE(kb) && update_sidelights(kb))
+        if (IS_STRAFE(kb) && update_sidelights(kb))
             return -1;
         // On older keyboards it looks flickery and causes lighting glitches, so we don't use it.
         uchar data_pkt[5][MSG_SIZE] = {

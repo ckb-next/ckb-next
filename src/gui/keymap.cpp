@@ -370,6 +370,16 @@ static const Key K95PLbar[] = {
 };
 #define LBARCOUNT_K95P (sizeof(K95PLbar) / sizeof(Key))
 
+// Mouse map - DARK CORE
+static const Key DarkCoreKeys[] = {
+    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
+    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "Wheel Light", "wheel", 22, 2, 8, 16, true, false},
+    {0, "DPI Up", "dpiup", 0, 5, 8, 8, false, true}, {0, "DPI Down", "dpidn", 0, 12, 8, 8, false, true},
+    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper", "sniper", 0, 25, 5, 15, false, true}, {0, "Side light", "side", 0, 24, 10, 24, true, false},
+    {0, "Logo", "back", 0, 48, 48, 12, true, false}, {0, "Profile Switch", "profswitch", 22, 20, 8, 12, false, true}, {0, "DPI", "dpi", 0, 0, 10, 24, true,  false }
+};
+#define KEYCOUNT_DARKCORE    (sizeof(DarkCoreKeys) / sizeof(Key))
+
 // MM800 Polaris
 #define POLARIS_V 6, 14
 #define POLARIS_H 14, 6
@@ -452,6 +462,41 @@ static const Key NightswordKeys[] = {
 
 #define NIGHTSWORD_WIDTH     M65_WIDTH
 #define NIGHTSWORD_HEIGHT    M65_HEIGHT
+
+
+// Mouse map - Ironclaw RGB Wireless
+static const Key IronclawWirelessKeys[] = {
+    // primary keys
+    {0, "Left Mouse",   "mouse1",   12,  0, 12, 28, false, true  },
+    {0, "Right Mouse",  "mouse2",   31,  0, 12, 28, false, true  },
+    
+    // center column keys
+    {0, "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
+    {0, "Middle Mouse",  "mouse3",  23,  7,  8,  6, false, true  },
+    {0, "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
+    {0, "Profile Up",    "profup",  23, 18,  9,  9, false, true  },
+    {0, "Profile Dn",    "profdn",  23, 26,  8,  9, false, true  },
+    
+    // left side forward/back keys
+    {0, "DPI Up",        "dpiup",    6,  4,  6,  9, false, true  },
+    {0, "DPI Dn",        "dpidn",    6, 10,  6,  9, false, true  },
+    {0, "Forward",      "mouse5",    6, 20,  5, 12, false, true  },
+    {0, "Back",         "mouse4",    7, 32,  5, 12, false, true  },
+    {0, "Opt",          "optbtn",    9, 27,  6,  9, false, true  },
+
+    // zones for LEDs
+    {0, "Front",        "front",     9,  1,  9,  9, true, false  },
+    {0, "Logo",         "back",     21, 50, NS,     true, false  },
+    {0, "Wheel",        "wheel",    23,  3,  8, 14, true, false  },
+    
+    // need to add DPI LED, even if not directly configurable for indicator to work
+    {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
+
+};
+#define KEYCOUNT_IRONCLAW_W    (sizeof(IronclawWirelessKeys) / sizeof(Key))
+
+#define IRONCLAW_W_WIDTH       52
+#define IRONCLAW_W_HEIGHT      67
 
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
@@ -872,6 +917,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::DARKCORE:{
+        // Dark Core
+        for(const Key* key = DarkCoreKeys; key < DarkCoreKeys + KEYCOUNT_DARKCORE; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     case KeyMap::POLARIS:{
         // MM800 Polaris Mousepad
         for(const Key* key = PolarisZones; key < PolarisZones + KEYCOUNT_POLARIS; key++){
@@ -923,6 +978,19 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     case KeyMap::NIGHTSWORD:{
         // cloned from IRONCLAW above
         for(const Key* key = NightswordKeys; key < NightswordKeys + KEYCOUNT_NIGHTSWORD; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        // Mice also have no layout patches - no other changes necessary
+        break;
+    }
+    case KeyMap::IRONCLAW_W:{
+        // M65 isn't a keyboard; all mouse maps are unique.
+        for(const Key* key = IronclawWirelessKeys; key < IronclawWirelessKeys + KEYCOUNT_IRONCLAW_W; key++){
+            // Keyboard keys are written from the center because that's where the LEDs are, but the mouse buttons are odd shapes so they're
+            // written from the upper left
             Key translatedKey = *key;
             translatedKey.x += translatedKey.width / 2;
             translatedKey.y += translatedKey.height / 2;
@@ -1153,6 +1221,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return GLAIVE;
     if(lower == "katar")
         return KATAR;
+    if(lower == "darkcore")
+        return DARKCORE;
     if(lower == "polaris")
         return POLARIS;
     if(lower == "st100")
@@ -1169,6 +1239,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return IRONCLAW;
     if(lower == "nightsword")
         return NIGHTSWORD;
+    if(lower == "ironclaw_wireless")
+        return IRONCLAW_W;
     return NO_MODEL;
 }
 
@@ -1204,6 +1276,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "glaive";
     case KATAR:
         return "katar";
+    case DARKCORE:
+        return "darkcore";
     case POLARIS:
         return "polaris";
     case ST100:
@@ -1220,6 +1294,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "ironclaw";
     case NIGHTSWORD:
         return "nightsword";
+    case IRONCLAW_W:
+        return "ironclaw_wireless";
     default:
         return "";
     }
@@ -1259,11 +1335,14 @@ int KeyMap::modelWidth(Model model){
     case HARPOON:
     case GLAIVE:
     case KATAR:
+    case DARKCORE:
     case POLARIS:
     case ST100:
     case M95:
     case IRONCLAW:
     case NIGHTSWORD:
+        return M65_WIDTH;
+    case IRONCLAW_W:
         return M65_WIDTH;
     default:
         return 0;
@@ -1292,11 +1371,14 @@ int KeyMap::modelHeight(Model model){
     case HARPOON:
     case GLAIVE:
     case KATAR:
+    case DARKCORE:
     case POLARIS:
     case ST100:
     case M95:
     case IRONCLAW:
     case NIGHTSWORD:
+        return M65_HEIGHT;
+    case IRONCLAW_W:
         return M65_HEIGHT;
     default:
         return 0;
@@ -1375,6 +1457,9 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     if(map.contains(key))
         return map[key].friendlyName();
     map = KeyMap(NIGHTSWORD, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+    map = KeyMap(IRONCLAW_W, layout);
     if(map.contains(key))
         return map[key].friendlyName();
 

@@ -30,6 +30,8 @@ dpi_list mouse_dpi_list[] = {
     { P_KATAR, 8000 },
     { P_IRONCLAW, 18000 },
     { P_NIGHTSWORD, 18000},
+    { P_IRONCLAW_W_U, 18000 },
+    { P_IRONCLAW_W_D, 18000 },
     { 0, 0 }, // Keep last and do not remove
 };
 
@@ -38,6 +40,10 @@ device_desc models[] = {
     // Keyboards
     { V_CORSAIR, P_K55, },
     { V_CORSAIR, P_K63_NRGB, },
+    { V_CORSAIR, P_K63_NRGB_WL, },
+    { V_CORSAIR, P_K63_NRGB_WL2, },
+    { V_CORSAIR, P_K63_NRGB_WL3, },
+    { V_CORSAIR, P_K63_NRGB_WL4, },
     { V_CORSAIR, P_K65, },
     { V_CORSAIR, P_K65_LEGACY, },
     { V_CORSAIR, P_K65_LUX, },
@@ -62,6 +68,7 @@ device_desc models[] = {
     { V_CORSAIR, P_STRAFE_NRGB, },
     { V_CORSAIR, P_STRAFE_NRGB_2, },
     { V_CORSAIR, P_STRAFE_MK2, },
+    { V_CORSAIR, P_K95_PLATINUM_XT, },
     // Mice
     { V_CORSAIR, P_M65, },
     { V_CORSAIR, P_M65_PRO, },
@@ -80,6 +87,12 @@ device_desc models[] = {
     { V_CORSAIR, P_KATAR, },
     { V_CORSAIR, P_IRONCLAW, },
     { V_CORSAIR, P_NIGHTSWORD, },
+    { V_CORSAIR, P_DARK_CORE, },
+    { V_CORSAIR, P_DARK_CORE_SE, },
+    { V_CORSAIR, P_DARK_CORE_WL, },
+    { V_CORSAIR, P_DARK_CORE_SE_WL, },
+    { V_CORSAIR, P_IRONCLAW_W_U, },
+    { V_CORSAIR, P_IRONCLAW_W_D, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
@@ -147,7 +160,7 @@ const char* vendor_str(ushort vendor){
 const char* product_str(ushort product){
     if(product == P_K95 || product == P_K95_LEGACY)
         return "k95";
-    if(product == P_K95_PLATINUM)
+    if(product == P_K95_PLATINUM || product == P_K95_PLATINUM_XT)
         return "k95p";
     if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
         return "k70";
@@ -159,7 +172,7 @@ const char* product_str(ushort product){
         return "k65";
     if(product == P_K66)
         return "k66";
-    if(product == P_K63_NRGB)
+    if(product == P_K63_NRGB || product == P_K63_NRGB_WL || product == P_K63_NRGB_WL2 || product == P_K63_NRGB_WL3 || product == P_K63_NRGB_WL4)
         return "k63";
     if(product == P_K55)
         return "k55";
@@ -187,8 +200,12 @@ const char* product_str(ushort product){
         return "ironclaw";
     if(product == P_NIGHTSWORD)
         return "nightsword";
+    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D)
+        return "ironclaw_wireless";
     if(product == P_POLARIS)
         return "polaris";
+    if(product == P_DARK_CORE || product == P_DARK_CORE_WL || product == P_DARK_CORE_SE || product == P_DARK_CORE_SE_WL)
+        return "darkcore";
     if(product == P_ST100)
         return "st100";
     return "";
@@ -208,11 +225,20 @@ const char* product_str(ushort product){
 ///
 /// \todo Is the last point really a good decision and always correct?
 ///
-static const devcmd* get_vtable(ushort vendor, ushort product){
+static const devcmd* get_vtable(usbdevice* kb){
     // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
-    if(IS_MOUSE(vendor, product)) {
+    ushort vendor = kb->vendor;
+    ushort product = kb->product;
+    if(kb->protocol == PROTO_BRAGI) {
+        if(IS_MOUSE(vendor, product))
+            return &vtable_bragi;
+        else
+            return &vtable_bragi_keyboard;
+    } else if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;
+        else if(IS_WIRELESS_ID(vendor, product))
+            return &vtable_mouse_wireless;
         else
             return &vtable_mouse;
     } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
@@ -220,6 +246,8 @@ static const devcmd* get_vtable(ushort vendor, ushort product){
     } else {
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;
+        else if(IS_WIRELESS_ID(vendor, product))
+            return &vtable_keyboard_wireless;
         else
             return &vtable_keyboard;
     }
@@ -348,15 +376,22 @@ static void* _setupusb(void* context){
     ///
     usbdevice* kb = context;
     queued_mutex_lock(dmutex(kb));
+    if(USES_BRAGI(kb->vendor, kb->product))
+        kb->protocol = PROTO_BRAGI;
     queued_mutex_lock(imutex(kb));
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;
-    const devcmd* vt = kb->vtable = get_vtable(vendor, product);
+    const devcmd* vt = kb->vtable = get_vtable(kb);
     kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(SUPPORTS_ADJRATE(kb))
         kb->features |= FEAT_ADJRATE;
     if(IS_MONOCHROME(vendor, product))
         kb->features |= FEAT_MONOCHROME;
+    if(IS_DONGLE(kb))
+        kb->features |= FEAT_DONGLE;
+    if(IS_WIRELESS(kb))
+        kb->features |= FEAT_WIRELESS;
+
     kb->usbdelay = USB_DELAY_DEFAULT;
 
     /// Allocate memory for the os_usbrecv() buffer
@@ -503,6 +538,7 @@ static void* _setupusb(void* context){
     queued_mutex_unlock(dmutex(kb));
     updateconnected(kb);
     queued_mutex_lock(dmutex(kb));
+
     ///
     /// devmain()'s return value is returned by _setupusb() when we terminate.
     return devmain(kb);
@@ -683,7 +719,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
             continue;
         }
         // Wait for the response
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
+        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
             DELAY_MEDIUM(kb);
         res = kb->vtable->read(kb, in_msg, msg_len, 0, file, line);
         if(res == 0)
@@ -692,7 +728,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
             return res;
         if(reset_stop || hwload_mode != 2)
             return 0;
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)))
+        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
             DELAY_LONG(kb);
     }
     // Give up
@@ -751,6 +787,15 @@ int closeusb(usbdevice* kb){
         os_inputclose(kb);
         queued_mutex_unlock(imutex(kb));
         queued_mutex_unlock(dmutex(kb));
+
+        // Shut down the device polling thread
+        if(kb->pollthread){
+            pthread_kill(*kb->pollthread, SIGUSR2);
+            pthread_join(*kb->pollthread, NULL);
+            free(kb->pollthread);
+            kb->pollthread = NULL;
+        }
+
         updateconnected(kb);
         queued_mutex_lock(dmutex(kb));
         queued_mutex_lock(imutex(kb));

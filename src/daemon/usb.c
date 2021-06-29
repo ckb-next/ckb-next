@@ -12,7 +12,7 @@
 
 // Values taken from the official website
 // Mice not in the list default to 12000 in the GUI
-dpi_list mouse_dpi_list[] = {
+const dpi_list mouse_dpi_list[] = {
     { P_M65, 8200 },
     { P_M65_PRO, 12000 },
     { P_M65_RGB_ELITE, 18000 },
@@ -36,7 +36,7 @@ dpi_list mouse_dpi_list[] = {
 };
 
 // WARNING: macOS doesn't support idVendor != 0x1b1c at the moment
-device_desc models[] = {
+const device_desc models[] = {
     // Keyboards
     { V_CORSAIR, P_K55, },
     { V_CORSAIR, P_K63_NRGB, },
@@ -99,7 +99,7 @@ device_desc models[] = {
     { V_CORSAIR, P_ST100, },
 };
 
-size_t N_MODELS = sizeof(models) / sizeof(device_desc);
+const size_t N_MODELS = sizeof(models) / sizeof(device_desc);
 
 device_desc ignored_devices[DEV_MAX] = {0};
 

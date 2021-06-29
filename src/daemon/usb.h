@@ -142,14 +142,14 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
-extern size_t N_MODELS;
+extern const size_t N_MODELS;
 
 typedef struct _device_desc {
     ushort idVendor;
     ushort idProduct;
 } device_desc;
 
-extern device_desc models[];
+extern const device_desc models[];
 
 extern device_desc ignored_devices[];
 
@@ -408,7 +408,7 @@ typedef struct _dpi_list {
     ushort dpi; // 0 for device-specific way to query (currently unused)
 } dpi_list;
 
-extern dpi_list mouse_dpi_list[];
+extern const dpi_list mouse_dpi_list[];
 
 int os_usb_interrupt_out(usbdevice* kb, unsigned int ep, unsigned int len, uchar* data, const char* file, int line);
 

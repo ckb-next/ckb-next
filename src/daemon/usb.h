@@ -46,6 +46,8 @@
 #define P_K55                0x1b3d
 #define IS_K55(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_K55)
 
+#define P_K60_PRO            0x1ba0
+
 #define P_K63_NRGB           0x1b40
 #define P_K63_NRGB_WL        0x1b45 /* wireless */
 #define P_K63_NRGB_WL2       0x1b50 /* wireless */
@@ -213,7 +215,7 @@ const char* product_str(ushort product);
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 // Devices that are considered experimental and are either not fully tested, or aren't fully implemented
-#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && ((product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4 || (product) == P_K95_PLATINUM_XT || (product) == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_IRONCLAW_W_U || (product) == P_IRONCLAW_W_D))
+#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && ((product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4 || (product) == P_K95_PLATINUM_XT || (product) == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_IRONCLAW_W_U || (product) == P_IRONCLAW_W_D || (product) == P_K60_PRO))
 
 /// Some devices cause usbhid to spend a long time initialising it. To work around this, we intentionally uncleanly
 /// deinitialise the device, skipping the usbhid handover.
@@ -265,7 +267,7 @@ const char* product_str(ushort product);
 #define USB_DELAY_DEFAULT   5
 
 // This should be removed in the future when we implement autodetection
-#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT)))
+#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_K60_PRO)))
 
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();

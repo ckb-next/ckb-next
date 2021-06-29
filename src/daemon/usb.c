@@ -39,6 +39,7 @@ dpi_list mouse_dpi_list[] = {
 device_desc models[] = {
     // Keyboards
     { V_CORSAIR, P_K55, },
+    { V_CORSAIR, P_K60_PRO, },
     { V_CORSAIR, P_K63_NRGB, },
     { V_CORSAIR, P_K63_NRGB_WL, },
     { V_CORSAIR, P_K63_NRGB_WL2, },
@@ -162,7 +163,7 @@ const char* product_str(ushort product){
         return "k95";
     if(product == P_K95_PLATINUM || product == P_K95_PLATINUM_XT)
         return "k95p";
-    if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB)
+    if(product == P_K70 || product == P_K70_LEGACY || product == P_K70_LUX || product == P_K70_LUX_NRGB || product == P_K70_RFIRE || product == P_K70_RFIRE_NRGB || product == P_K60_PRO)
         return "k70";
     if(product == P_K70_MK2 || product == P_K70_MK2SE || product == P_K70_MK2LP)
         return "k70mk2";

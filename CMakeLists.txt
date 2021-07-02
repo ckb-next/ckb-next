@@ -117,6 +117,7 @@ option(DEBUG_USB_RECV  "Show the contents of USB packets being received from dev
 option(DEBUG_USB_INPUT "Show the contents of USB packets being received from device through the input thread." OFF)
 option(DEBUG_MUTEX     "Show debugging information regarding thread synchronisation." OFF)
 option(NO_FAIR_MUTEX_QUEUEING "Disable fair mutex queueing. Debugging only." OFF)
+option(DEBUG_INPUT_SYNC "Print a debug message every time an event bundle is delivered to the OS." OFF)
 
 # Options: install
 if (MACOS)

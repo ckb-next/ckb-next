@@ -11,5 +11,6 @@
 #cmakedefine DEBUG_USB_INPUT
 #cmakedefine DEBUG_MUTEX
 #cmakedefine NO_FAIR_MUTEX_QUEUEING
+#cmakedefine DEBUG_INPUT_SYNC
 
 #define CKB_NEXT_COPYRIGHT_YEAR "${ckb-next_COPYRIGHT_YEAR}"

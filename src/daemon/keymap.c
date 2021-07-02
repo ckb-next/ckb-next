@@ -5,6 +5,18 @@
 #include "input.h"
 #include "bragi_proto.h"
 
+// Translates input from HID to a ckb input bitfield.
+static void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy);
+static void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput);
+static void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urbinput);
+
+// Copies input from Corsair reports
+static void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput);
+static void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
+static void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
+static void corsair_bragi_mousecopy(usbinput* input, const unsigned char* urbinput);
+
+
 const key keymap[N_KEYS_EXTENDED] = {
     // Keyboard keys
     { "esc",        0x00, KEY_ESC },
@@ -248,9 +260,6 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { "profdn",     -1, KEY_CORSAIR },
     { "profswitch", -1, KEY_CORSAIR },
-    // { "profup",     -1, KEY_CORSAIR },
-    // { "profdn",     -1, KEY_CORSAIR },
-    // { "optbtn",     -1, KEY_CORSAIR },
 
     // Extended mouse buttons (wheel is an axis in HW, 6-8 are recognized by the OS but not present in HW)
     { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },
@@ -258,6 +267,8 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "mouse6",     -1, SCAN_MOUSE | BTN_FORWARD },
     { "mouse7",     -1, SCAN_MOUSE | BTN_BACK },
     { "mouse8",     -1, SCAN_MOUSE | BTN_TASK },
+    { "wheellf",    -1, SCAN_MOUSE | BTN_WHEELLEFT },
+    { "wheelrg",    -1, SCAN_MOUSE | BTN_WHEELRIGHT },
 
     // RGB mouse zones
     { "front",      LED_MOUSE, KEY_NONE },
@@ -492,18 +503,6 @@ static const short bragi_extra_lut[56] = {
 // Since Corsair input packets are sent along with NKRO ones, in software mode, we need to ignore NKRO.
 // Handled by corsair_kbcopy()
 
-/// Process the input depending on type of device. Interpret the actual size of the URB buffer
-///
-/// device | detect with macro combination | seems to be endpoint # | actual buffer-length | function called
-/// ------ | ----------------------------- | ---------------------- | -------------------- | ---------------
-/// mouse (RGB and non RGB) | IS_MOUSE | nA | 8, 10 or 11 | hid_mouse_translate()
-/// mouse (RGB and non RGB) | IS_MOUSE | nA | MSG_SIZE (64) | corsair_mousecopy()
-/// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 1 | 8 (BIOS Mode) | hid_kb_translate()
-/// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 2 | 5 or 21, KB inactive! | hid_kb_translate()
-/// RGB Keyboard | !IS_LEGACY && !IS_MOUSE | 3? | MSG_SIZE | corsair_kbcopy()
-/// Legacy Keyboard | IS_LEGACY && !IS_MOUSE | nA | nA | hid_kb_translate()
-///
-
 static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
     // Skip the 0x00 0x02 header
     urbinput += 2;
@@ -586,7 +585,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
         queued_mutex_lock(imutex(kb));
         if(IS_LEGACY_DEV(kb)) {
             if(IS_MOUSE_DEV(kb))
-                m95_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                m95_mouse_translate(&kb->input, urblen, buffer);
             else
                 hid_kb_translate(kb->input.keys, urblen, buffer, 1);
         } else {
@@ -597,16 +596,16 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                     // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
                     if(kb->active) {
                         if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1) {
-                            corsair_bragi_mousecopy(kb->input.keys, buffer);
+                            corsair_bragi_mousecopy(&kb->input, buffer);
                         } else {
                             kb->input.rel_x += (buffer[5] << 8) | buffer[4];
                             kb->input.rel_y += (buffer[7] << 8) | buffer[6];
                         }
                     } else {
-                        hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer);
+                        hid_mouse_translate(&kb->input, urblen, buffer);
                     }
                 } else if(firstbyte == MOUSE_IN) {
-                    hid_mouse_translate(kb->input.keys, &kb->input.rel_x, &kb->input.rel_y, urblen, buffer + 1);
+                    hid_mouse_translate(&kb->input, urblen, buffer + 1);
                 } else if(firstbyte == CORSAIR_IN) { // Corsair Mouse Input
                     corsair_mousecopy(kb->input.keys, buffer);
                 } else if(firstbyte == 0x05 && urblen == 21) { // Seems to be on the Ironclaw RGB only
@@ -757,27 +756,19 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
 
 #define BUTTON_HID_COUNT    5
 
-void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
+void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput){
     // Byte 1 = mouse buttons (bitfield)
     for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
         if(urbinput[0] & (1 << bit))
-            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+            SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
         else
-            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+            CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
     }
     // Bytes 5 - 8: movement
-    *xaxis += (urbinput[5] << 8) | urbinput[4];
-    *yaxis += (urbinput[7] << 8) | urbinput[6];
+    input->rel_x += (urbinput[5] << 8) | urbinput[4];
+    input->rel_y += (urbinput[7] << 8) | urbinput[6];
     // Byte 9: wheel
-    char wheel = urbinput[8];
-    if(wheel > 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);         // wheelup
-    else
-        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
-    if(wheel < 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);     // wheeldn
-    else
-        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+    input->whl_rel_y = (char)urbinput[8];
 }
 
 void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput){
@@ -812,30 +803,21 @@ void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urb
         CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + 3);
 }
 
-void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput){
+void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urbinput){
     if(length != 7)
         return;
     unsigned short input = (((unsigned short)urbinput[1]) << 8) | urbinput[0];
     for(int bit = 0; bit < 16; bit++){
         unsigned char current_bit = (input >> bit) & 1;
         if(current_bit)
-            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+            SET_KEYBIT(kbinput->keys, MOUSE_BUTTON_FIRST + bit);
         else
-            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + bit);
+            CLEAR_KEYBIT(kbinput->keys, MOUSE_BUTTON_FIRST + bit);
     }
 
-    *xaxis += (urbinput[3] << 8) | urbinput[2];
-    *yaxis += (urbinput[5] << 8) | urbinput[4];
-
-    char wheel = urbinput[6];
-    if(wheel > 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
-    else
-        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
-    if(wheel < 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
-    else
-        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+    kbinput->rel_x += (urbinput[3] << 8) | urbinput[2];
+    kbinput->rel_y += (urbinput[5] << 8) | urbinput[4];
+    kbinput->whl_rel_y = (char)urbinput[6];
 }
 
 #define BRAGI_MOUSE_BUTTONS 16
@@ -872,24 +854,16 @@ const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
         0x0F,
     };
 
-void corsair_bragi_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
+void corsair_bragi_mousecopy(usbinput* input, const unsigned char* urbinput){
     urbinput += 2;
     for(int bit = 0; bit < BRAGI_MOUSE_BUTTONS; bit++){
         int byte = bit / 8;
         uchar test = 1 << (bit % 8);
         if(urbinput[byte] & test)
-            SET_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+            SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
         else
-            CLEAR_KEYBIT(kbinput, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+            CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
     }
     
-    char wheel = urbinput[2];
-    if(wheel > 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
-    else
-        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST);
-    if(wheel < 0)
-        SET_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
-    else
-        CLEAR_KEYBIT(kbinput, MOUSE_EXTRA_FIRST + 1);
+    input->whl_rel_y = (char)urbinput[2];
 }

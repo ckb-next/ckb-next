@@ -43,21 +43,25 @@ void cmd_macro(usbdevice* kb, usbmode* mode, const int notifynumber, const char*
 void os_keypress(usbdevice* kb, int scancode, int down);
 // Generate mouse movement
 void os_mousemove(usbdevice* kb, int x, int y);
+void os_mousescroll(usbdevice* kb, int x, int y);
 
 // Perform OS-specific setup for indicator lights. Called when the device is created. Return 0 on success.
 int os_setupindicators(usbdevice* kb);
+
+// OS Specific function to either send a report to the input subsystem, or sync the previously sent events
+void os_inputsync(usbdevice* kb, int s_kb, int m);
 
 ///
 /// \brief struct parameter contains the values for a fresh started macro_play thread.
 /// \a parameter_t is the typedef for it.
 ///
-typedef struct parameter {
+typedef struct _macro_param {
     usbdevice* kb;
     keymacro* macro;
     macroaction* actions;
     int actioncount;
     char abort;
-} parameter_t;
+} macro_param;
 
 /// \brief struct ptlist is one element in the single linked list to store  macro_play threads waiting for their execution
 /// \a ptlist_t is the typedef for it.

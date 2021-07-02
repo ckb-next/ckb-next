@@ -4,8 +4,13 @@
 #include "device.h"
 #include "input.h"
 #include "notify.h"
+#include <assert.h>
 
-int macromask(const uchar* keys, const uchar* macro){
+#define IS_SCROLLWHEEL_V(scan)  ((scan) == BTN_WHEELUP   || (scan) == BTN_WHEELDOWN)
+#define IS_SCROLLWHEEL_H(scan)  ((scan) == BTN_WHEELLEFT || (scan) == BTN_WHEELRIGHT)
+#define IS_VOLWHEEL(scan)      (((scan) == KEY_VOLUMEUP  || (scan) == KEY_VOLUMEDOWN) && DEV_HAS_VOLWHEEL(kb))
+
+static int macromask(const uchar* keys, const uchar* macro){
     // Scan a macro against key input. Return 0 if any of them don't match
     for(int i = 0; i < N_KEYBYTES_INPUT; i++){
         if((keys[i] & macro[i]) != macro[i])
@@ -92,11 +97,11 @@ static inline void clock_microsleep(uint32_t s) {
 
 ///
 /// \brief play_macro is the code for all threads started to play a macro.
-/// \param param \a parameter_t to store Kb-ptr and macro-ptr (thread may get only one user-parameter)
+/// \param param \a macro_param to store Kb-ptr and macro-ptr (thread may get only one user-parameter)
 /// \return 0 on success, -1 else (no one is interested in it except the kernel...)
 ///
 static void* play_macro(void* param) {
-    parameter_t* ptr = (parameter_t*) param;
+    macro_param* ptr = param;
     usbdevice* kb = ptr->kb;
     keymacro* macro = ptr->macro;
 
@@ -126,10 +131,22 @@ static void* play_macro(void* param) {
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro output and color information
         for (int a = 0; a < ptr->actioncount; a++) {
             macroaction* action = ptr->actions + a;
-            if (action->rel_x != 0 || action->rel_y != 0)
+            if (action->rel_x != 0 || action->rel_y != 0){
                 os_mousemove(kb, action->rel_x, action->rel_y);
-            else {
-                os_keypress(kb, action->scan, action->down);
+                os_inputsync(kb, 0, 1);
+            } else {
+                if(IS_SCROLLWHEEL_V(action->scan)) {
+                    if(action->down)
+                        os_mousescroll(kb, 0, (action->scan == BTN_WHEELUP ? 1 : -1));
+                } else if(IS_SCROLLWHEEL_H(action->scan)) {
+                    if(action->down)
+                        os_mousescroll(kb, (action->scan == BTN_WHEELLEFT ? 1 : -1), 0);
+                } else {
+                    os_keypress(kb, action->scan, action->down);
+                }
+                int sync_mouse = action->scan & SCAN_MOUSE;
+                os_inputsync(kb, !sync_mouse, sync_mouse);
+
                 queued_mutex_unlock(mmutex(kb));           ///< use this unlock / relock for enablling the parallel running colorization
                 if (action->delay != UINT32_MAX && action->delay) {    ///< local delay set
                     if(action->delay_max) {
@@ -194,7 +211,7 @@ static void* play_macro(void* param) {
         queued_mutex_unlock(imutex(kb));
     }
     if (!ptr->abort)
-        macro->running = NULL;
+        macro->param = NULL;
     queued_mutex_unlock(imutex(kb));
 
     queued_mutex_lock(mmutex(kb));
@@ -210,11 +227,31 @@ static void* play_macro(void* param) {
     return 0;
 }
 
+// Checks if the macro mask contains any wheels to prevent it from looping endlessly
+static inline int is_wheel_keybit(const usbdevice* kb, const uchar* macro){
+    for(int i = 0; i < N_KEYBYTES_INPUT; i++){
+        // Most entries are probably going to be 0, so skip over them
+        if(!macro[i])
+            continue;
+        // Go through each bit
+        for(int j = 0; j < 8; j++){
+            if(!((macro[i] >> j) & 1))
+                continue;
+            // Get the index of the item and look it up in the keymap
+            const key* ckey = kb->keymap + i * 8 + j;
+            // If there's at least a single wheel, return true
+            if(IS_VOLWHEEL(ckey->scan) || IS_SCROLLWHEEL_V(ckey->scan) || IS_SCROLLWHEEL_H(ckey->scan))
+                return 1;
+        }
+    }
+    return 0;
+}
+
 ///
-/// \brief inputupdate_keys Handle input from Keyboard or mouse; start Macrof if detected.
+/// \brief inputupdate_keys Handle input from Keyboard or mouse; start Macro if detected.
 /// \param kb
 ///
-static void inputupdate_keys(usbdevice* kb){
+static inline void inputupdate_keys(usbdevice* kb, int* sync_kb, int* sync_mouse){
     usbmode* mode = kb->profile->currentmode;
     binding* bind = &mode->bind;
     usbinput* input = &kb->input;
@@ -228,13 +265,17 @@ static void inputupdate_keys(usbdevice* kb){
             keymacro* macro = &bind->macros[i];
             // see the definition of keymacro.triggered in structures.h
             if (macromask(input->keys, macro->combo)) {
-                if(!(macro->triggered & 1))
-                    macro->triggered += 1;
-                else
+                if(!(macro->triggered & 1)){
+                    macro->triggered++;
+                    // Because there are no keyup events for wheels, pretend we received them
+                    // to prevent endless looping
+                    if(is_wheel_keybit(kb, macro->combo))
+                        macro->triggered++;
+                } else
                     continue;
             } else {
                 if((macro->triggered & 1)) {
-                    macro->triggered += 1;
+                    macro->triggered++;
                     pthread_cond_broadcast(mintvar(kb));
                 }
                 continue;
@@ -242,23 +283,23 @@ static void inputupdate_keys(usbdevice* kb){
 
             if (macro->triggered <= 3) {
                 // start up a thread if there isn't already one running
-                if (!macro->running) {
+                if (!macro->param) {
                     // assert(macro->triggered == 1)
-                    parameter_t* params = malloc(sizeof(parameter_t));
+                    macro_param* params = malloc(sizeof(macro_param));
                     if (params == NULL) {
                         perror("inputupdate_keys got no more mem:");
                     } else {
-                        pthread_t thread = 0;
                         params->kb = kb;
                         params->macro = macro;
                         params->actions = macro->actions;
                         params->actioncount = macro->actioncount;
                         params->abort = 0;
-                        macro->running = (void *)params;
-                        int retval = pthread_create(&thread, 0, play_macro, (void*)params);
+                        macro->param = params;
+                        pthread_t thread;
+                        int retval = pthread_create(&thread, 0, play_macro, params);
                         if (retval) {
                             macro->triggered = 0;
-                            macro->running = NULL;
+                            macro->param = NULL;
                             perror("inputupdate_keys: Creating thread returned not null");
                         } else {
                             pthread_detach(thread);
@@ -281,9 +322,11 @@ static void inputupdate_keys(usbdevice* kb){
     // Make a list of keycodes to send. Rearrange them so that modifier keydowns always come first
     // and modifier keyups always come last. This ensures that shortcut keys will register properly
     // even if both keydown events happen at once.
-    // N_KEYS + 4 is used because the volume wheel generates keydowns and keyups at the same time
-    // (it's currently impossible to press all four at once, but safety first)
-    int events[N_KEYS_INPUT + 4];
+    // + 2 is used because the volume wheel generates keydowns and keyups at the same time
+    // + (-SCHAR_MIN) * 2 * 2 is used because a mouse wheel can generate up to 128*2 events at once, one for x, and one for y to be safe
+    static_assert(sizeof(input->whl_rel_x) == sizeof(char) && sizeof(input->whl_rel_y) == sizeof(char),
+        "Please change SCHAR_MIN below to the one for the appropriate type used by the scroll wheel.");
+    int events[N_KEYS_INPUT + 2 + (-SCHAR_MIN) * 2 * 2];
     int modcount = 0, keycount = 0, rmodcount = 0;
     for(int byte = 0; byte < N_KEYBYTES_INPUT; byte++){
         char oldb = input->prevkeys[byte], newb = input->keys[byte];
@@ -302,6 +345,8 @@ static void inputupdate_keys(usbdevice* kb){
                 // Don't echo a key press if there's no scancode associated
                 if(!(scancode & SCAN_SILENT)){
                     if(IS_MOD(scancode)){
+                        // Only keyboards have modifiers, so ask explicitly for a sync if we only have a modifier in the queue
+                        *sync_kb = 1;
                         if(new){
                             // Modifier down: Add to the end of modifier keys
                             for(int i = keycount + rmodcount; i > 0; i--)
@@ -313,44 +358,106 @@ static void inputupdate_keys(usbdevice* kb){
                             // Modifier up: Add to the end of everything
                             events[modcount + keycount + rmodcount++] = -(scancode + 1);
                         }
+                    } else if(IS_SCROLLWHEEL_V(scancode)) {
+                        // Simulate scrolling if this came from a macro or a device without an axis (keyboard)
+                        if(!input->whl_rel_y)
+                            input->whl_rel_y = (scancode == BTN_WHEELUP ? 1 : -1);
+                        os_mousescroll(kb, 0, input->whl_rel_y);
+                        *sync_mouse = 1;
+                    } else if(scancode == BTN_WHEELLEFT || scancode == BTN_WHEELRIGHT) {
+                        // Always simulate scrolling as no device supports this yet
+                        os_mousescroll(kb, (scancode == BTN_WHEELLEFT ? 1 : -1), 0);
+                        *sync_mouse = 1;
                     } else {
                         // Regular keypress: add to the end of regular keys
-                        for(int i = rmodcount; i > 0; i--)
-                            events[modcount + keycount + i] = events[modcount + keycount + i - 1];
+                        if(scancode & SCAN_MOUSE)
+                            *sync_mouse = 1;
+                        else
+                            *sync_kb = 1;
+                        memmove(events + modcount + keycount + 1, events + modcount + keycount, sizeof(int) * rmodcount);
                         events[modcount + keycount++] = new ? (scancode + 1) : -(scancode + 1);
                     }
                 }
 
-                // The volume wheel and the mouse wheel don't generate keyups, so create them automatically
-#define IS_WHEEL(scan, kb)  (((scan) == KEY_VOLUMEUP || (scan) == KEY_VOLUMEDOWN || (scan) == BTN_WHEELUP || (scan) == BTN_WHEELDOWN) && (!IS_K65(kb) && !IS_K63(kb)))
-                if(new && IS_WHEEL(map->scan, kb)){
-                    for(int i = rmodcount; i > 0; i--)
-                        events[modcount + keycount + i] = events[modcount + keycount + i - 1];
-                    if(scancode == KEY_UNBOUND)
-                        scancode = map->scan;
-                    events[modcount + keycount++] = -(scancode + 1);
-                    input->keys[byte] &= ~mask;
+                // The volume/scroll wheels don't generate keyups, so create them automatically when necessary
+                if(new){
+                    if(scancode != KEY_UNBOUND){
+                        // If it's a volume wheel, just add a single keyup event to the FIFO
+                        // Else if the event originated from a scroll wheel, and is bound to something other than a scroll wheel,
+                        // multiply the last few events by the amount of events received from the hid report
+                        if(IS_VOLWHEEL(map->scan)){
+                            // Make room for it
+                            memmove(events + modcount + keycount + 1, events + modcount + keycount, sizeof(int) * rmodcount);
+                            // Duplicate the last event, but with keyup
+                            events[modcount + keycount++] = -(scancode + 1);
+                        } else if (IS_SCROLLWHEEL_V(map->scan)){
+                            if(!IS_SCROLLWHEEL_V(scancode)){
+                                if(!input->whl_rel_y){
+                                    ckb_err("whl_rel_y is 0");
+                                    input->whl_rel_y = 1;
+                                }
+                                const int rel_y = abs(input->whl_rel_y);
+                                // Make room for the extra events. We already have one, thus - 1.
+                                memmove(events + modcount + keycount + rel_y * 2 - 1, events + modcount + keycount, sizeof(int) * rmodcount);
+                                // Duplicate the last event, but with keyup
+                                events[modcount + keycount++] = -(scancode + 1);
+
+                                // Copy the last two events as many times as needed
+                                for(int i = 0; i < rel_y - 1; i++){
+                                    memcpy(events + modcount + keycount, events + modcount + keycount - 2, sizeof(int) * 2);
+                                    keycount += 2;
+                                }
+                            }
+                        }
+                    }
+                    // Clear the key bit so that we can receive events of this type in the next run
+                    if(IS_VOLWHEEL(map->scan) || IS_SCROLLWHEEL_V(map->scan))
+                        input->keys[byte] &= ~mask;
                 }
 
                 // Print notifications if desired
                 if(kb->active){
                     for(int notify = 0; notify < OUTFIFO_MAX; notify++){
                         if(mode->notify[notify][byte] & mask){
-                            nprintkey(kb, notify, keyindex, new);
-                            // Wheels doesn't generate keyups
-                            if(new && IS_WHEEL(map->scan, kb))
-                                nprintkey(kb, notify, keyindex, 0);
+                            // Wheels don't generate keyups and additionally can produce multiple events
+                            // with a single report. No device so far supports scrolling horizontally,
+                            // so only vertical notifications are implemented.
+                            if(IS_SCROLLWHEEL_V(map->scan)){
+                                for(int i = 0; i < abs(input->whl_rel_y); i++){
+                                    nprintkey(kb, notify, keyindex, 1);
+                                    nprintkey(kb, notify, keyindex, 0);
+                                }
+                            } else if(IS_VOLWHEEL(map->scan)){
+                                    nprintkey(kb, notify, keyindex, 1);
+                                    nprintkey(kb, notify, keyindex, 0);
+                            } else {
+                                nprintkey(kb, notify, keyindex, new);
+                            }
                         }
                     }
                 }
             }
         }
     }
-    /// Process all queued keypresses
+    // Process all queued keypresses
     int totalkeys = modcount + keycount + rmodcount;
+    int prev_scan = KEY_UNBOUND;
     for(int i = 0; i < totalkeys; i++){
-        int scancode = events[i];
-        os_keypress(kb, (scancode < 0 ? -scancode : scancode) - 1, scancode > 0);
+        const int scancode = events[i];
+        const int absscan = abs(scancode);
+        // Force a keyboard sync if the event queue contains two of the same scancode before the second keypress is sent
+        // This can't happen in mice because the wheel is an axis
+        if(prev_scan == absscan){
+#ifdef DEBUG_INPUT_SYNC
+            ckb_info("Pre duplicate event sync");
+#endif
+            os_inputsync(kb, 1, 0);
+#ifdef DEBUG_INPUT_SYNC
+            ckb_info("Post duplicate event sync");
+#endif
+        }
+        os_keypress(kb, absscan - 1, scancode > 0);
+        prev_scan = absscan;
     }
 }
 
@@ -362,16 +469,38 @@ void inputupdate(usbdevice* kb){
 #endif
             || !kb->profile)
         return;
-    // Process key/button input
-    inputupdate_keys(kb);
-    // Process mouse movement
+
     usbinput* input = &kb->input;
+    int sync_kb = 0;
+    int sync_mouse = 0;
+
+    // Let inputupdate_keys handle the wheel, while also keeping
+    // the data reported by the mouse for the axis.
+    // This is done to allow rebinding
+
+    // Wheel up/down
+    if(input->whl_rel_y > 0)
+        SET_KEYBIT(input->keys, MOUSE_EXTRA_FIRST);
+    else
+        CLEAR_KEYBIT(input->keys, MOUSE_EXTRA_FIRST);
+
+    if(input->whl_rel_y < 0)
+        SET_KEYBIT(input->keys, MOUSE_EXTRA_FIRST + 1);
+    else
+        CLEAR_KEYBIT(input->keys, MOUSE_EXTRA_FIRST + 1);
+
+    // Process key/button input
+    inputupdate_keys(kb, &sync_kb, &sync_mouse);
+    // Process mouse movement
     if(input->rel_x != 0 || input->rel_y != 0){
         os_mousemove(kb, input->rel_x, input->rel_y);
         input->rel_x = input->rel_y = 0;
+        sync_mouse = 1;
     }
     // Finish up
     memcpy(input->prevkeys, input->keys, N_KEYBYTES_INPUT);
+    input->whl_rel_x = input->whl_rel_y = 0;
+    os_inputsync(kb, sync_kb, sync_mouse);
 }
 
 void updateindicators_kb(usbdevice* kb, int force){
@@ -397,7 +526,7 @@ void updateindicators_kb(usbdevice* kb, int force){
         queued_mutex_unlock(dmutex(kb));
         ctrltransfer transfer = { .bRequestType = 0x21, .bRequest = 0x09, .wValue = 0x0200, .wIndex = 0, .wLength = len, .timeout = 5000, .data = &leds };
         if(kb->protocol == PROTO_BRAGI)
-            transfer.wValue += 1;
+            transfer.wValue++;
         os_usb_control(kb, &transfer, __FILE_NOPATH__, __LINE__);
         queued_mutex_lock(dmutex(kb));
     }
@@ -422,8 +551,8 @@ void updateindicators_kb(usbdevice* kb, int force){
 /// \param macro
 ///
 static inline void destroymacro(keymacro* macro) {
-    if (macro->running)
-        ((parameter_t *)macro->running)->abort = 1;
+    if (macro->param)
+        macro->param->abort = 1;
     else
         free(macro->actions);
 }

@@ -11,6 +11,8 @@
 // The mouse wheel is actually a relative axis, but we treat it like a pair of buttons
 #define BTN_WHEELUP     0x1f01
 #define BTN_WHEELDOWN   0x1f02
+#define BTN_WHEELLEFT   0x1f03
+#define BTN_WHEELRIGHT  0x1f04
 
 #ifdef OS_MAC_LEGACY
 // On Linux there's no meaningful distinction between these keys
@@ -35,7 +37,7 @@
 #define N_MOUSEPAD_ZONES        15
 // Mouse buttons
 #define N_BUTTONS_HW            25
-#define N_BUTTONS_EXTENDED      30
+#define N_BUTTONS_EXTENDED      32
 #define MOUSE_BUTTON_FIRST      (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA + N_GENERIC_ZONES)
 #define MOUSE_EXTRA_FIRST       (MOUSE_BUTTON_FIRST + N_BUTTONS_HW)
 // Number of keys that generate input
@@ -69,20 +71,6 @@ typedef struct {
 // Begins with keyboard keys, followed by extra keys, then mouse buttons, and finally LED zones
 extern const key keymap[N_KEYS_EXTENDED];
 extern const key keymap_bragi[N_KEYS_BRAGI_PATCH];
-// Decides which of the following functions it needs to call
+// Decides which of the input parsing functions it needs to call
 void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep);
-
-// Translates input from HID to a ckb input bitfield.
-// Use positive endpoint for non-RGB keyboards, negative endpoint for RGB
-void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy);
-void hid_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput);
-
-// Copies input from Corsair reports
-void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput);
-void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
-void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
-
-void m95_mouse_translate(unsigned char* kbinput, short* xaxis, short* yaxis, int length, const unsigned char* urbinput);
-
-void corsair_bragi_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
 #endif // KEYMAP_H

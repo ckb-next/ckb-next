@@ -35,6 +35,8 @@ typedef struct {
     uint32_t delay_max; // us delay. If != 0 then a delay is randomly picked from delay to delay_max
 } macroaction;
 
+struct _macro_param;
+
 // Key macro
 typedef struct {
     macroaction* actions;
@@ -52,7 +54,7 @@ typedef struct {
      * thread shuts itself down immediately.
      */
     char triggered;
-    void* running;      // pointer to the parameter_t of the currently running thread (null if none)
+    struct _macro_param* param;
 } keymacro;
 
 // Key bindings for a mode (keyboard + mouse)
@@ -146,6 +148,7 @@ typedef struct {
     uchar keys[N_KEYBYTES_INPUT];
     uchar prevkeys[N_KEYBYTES_INPUT];
     short rel_x, rel_y;
+    signed char whl_rel_x, whl_rel_y;
 } usbinput;
 
 // Device features

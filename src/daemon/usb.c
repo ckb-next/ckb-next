@@ -91,6 +91,8 @@ const device_desc models[] = {
     { V_CORSAIR, P_DARK_CORE_SE, },
     { V_CORSAIR, P_DARK_CORE_WL, },
     { V_CORSAIR, P_DARK_CORE_SE_WL, },
+    { V_CORSAIR, P_DARK_CORE_RGB_PRO_SE, },
+    { V_CORSAIR, P_DARK_CORE_RGB_PRO_SE_WL, },
     { V_CORSAIR, P_IRONCLAW_W_U, },
     { V_CORSAIR, P_IRONCLAW_W_D, },
     // Mousepads
@@ -200,7 +202,7 @@ const char* product_str(ushort product){
         return "ironclaw";
     if(product == P_NIGHTSWORD)
         return "nightsword";
-    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D)
+    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D || product == P_DARK_CORE_RGB_PRO_SE || product == P_DARK_CORE_RGB_PRO_SE_WL)
         return "ironclaw_wireless";
     if(product == P_POLARIS)
         return "polaris";

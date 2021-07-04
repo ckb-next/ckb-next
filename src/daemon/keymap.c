@@ -14,8 +14,7 @@ static void m95_mouse_translate(usbinput* kbinput, int length, const unsigned ch
 static void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput);
 static void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
 static void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
-static void corsair_bragi_mousecopy(usbinput* input, const unsigned char* urbinput);
-
+static void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput);
 
 const key keymap[N_KEYS_EXTENDED] = {
     // Keyboard keys
@@ -596,7 +595,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                     // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
                     if(kb->active) {
                         if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1) {
-                            corsair_bragi_mousecopy(&kb->input, buffer);
+                            corsair_bragi_mousecopy(kb, &kb->input, buffer);
                         } else {
                             kb->input.rel_x += (buffer[5] << 8) | buffer[4];
                             kb->input.rel_y += (buffer[7] << 8) | buffer[6];
@@ -854,7 +853,7 @@ const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
         0x0F,
     };
 
-void corsair_bragi_mousecopy(usbinput* input, const unsigned char* urbinput){
+void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput){
     urbinput += 2;
     for(int bit = 0; bit < BRAGI_MOUSE_BUTTONS; bit++){
         int byte = bit / 8;
@@ -864,6 +863,13 @@ void corsair_bragi_mousecopy(usbinput* input, const unsigned char* urbinput){
         else
             CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
     }
-    
-    input->whl_rel_y = (char)urbinput[2];
+
+    // This needs to be signed
+    signed char wheel = urbinput[2];
+
+    // We need a better way to identify this
+    if(kb->vendor == V_CORSAIR && (kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL))
+        wheel = urbinput[1];
+
+    input->whl_rel_y = wheel;
 }

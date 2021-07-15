@@ -174,7 +174,7 @@ void ckb_alpha_blend(ckb_key* key, float a, float r, float g, float b);
 
 #ifndef CKB_NO_MAIN
 
-#ifdef DEBUG
+#ifdef ANIM_DEBUG
 #define DBG(str, args...) fprintf(stderr, str"\n", ## args);
 #else
 #define DBG(str, args...) do {} while(0)

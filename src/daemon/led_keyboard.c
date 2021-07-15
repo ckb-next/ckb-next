@@ -94,7 +94,9 @@ static void makergb_k55(const lighting* light, uchar data_pkt[MSG_SIZE]){
 
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
     // Compare two light structures, up until the first three generic zones for the K55.
-    return memcmp(lhs->r, rhs->r, LED_GENERIC_FIRST + 3) || memcmp(lhs->g, rhs->g, LED_GENERIC_FIRST + 3) || memcmp(lhs->b, rhs->b, LED_GENERIC_FIRST + 3);
+    // We compare led scancodes, not keymap array indices
+    // 0xA2 is the highest scancode (topbar16) + 1 because that's an index and we need length
+    return memcmp(lhs->r, rhs->r, 0xA2 + 1) || memcmp(lhs->g, rhs->g, 0xA2 + 1) || memcmp(lhs->b, rhs->b, 0xA2 + 1);
 }
 
 int updatergb_kb(usbdevice* kb, int force){

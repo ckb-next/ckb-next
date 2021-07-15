@@ -339,5 +339,11 @@ int readcmd(usbdevice* kb, const char* line){
         TRY_WITH_RESET(vt->updatedpi(kb, 0));
     }
     free(word);
+
+#ifndef NDEBUG
+    if(command == RGB)
+        memset(kb->encounteredleds, 0, sizeof(kb->encounteredleds));
+#endif
+
     return 0;
 }

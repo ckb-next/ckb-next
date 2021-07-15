@@ -323,6 +323,13 @@ typedef struct {
     protocol_t protocol;
     // Poll thread
     pthread_t* pollthread;
+#ifndef NDEBUG
+    // List of led scancodes that have been encountered since the last rgb update
+    struct {
+        ushort led;
+        int index;
+    } encounteredleds[N_KEYS_EXTENDED];
+#endif
 
 } usbdevice;
 

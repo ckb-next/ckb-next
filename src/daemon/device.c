@@ -225,7 +225,7 @@ int _start_dev(usbdevice* kb, int makeactive){
     // Activate software mode if requested
     if(makeactive)
         return setactive(kb, 1);
-    #ifdef DEBUG
+#ifndef NDEBUG
     // 12 for each device + null terminator
     char devlist[12*(DEV_MAX-1)+1];
     int devlistpos = 0;
@@ -233,7 +233,7 @@ int _start_dev(usbdevice* kb, int makeactive){
         devlistpos += sprintf(&devlist[devlistpos], "%u: 0x%x; ", i, keyboard[i].product);
     }
     ckb_info("Attached Devices: %s", devlist);
-    #endif
+#endif
     return 0;
 }
 

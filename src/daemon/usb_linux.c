@@ -138,9 +138,7 @@ void* os_inputmain(void* context){
             // Read its wMaxPacketSize
             if(sizehex && sscanf(sizehex, "%hx", &size) == 1)
             {
-    //#ifdef DEBUG
                 ckb_info("Found EP 0x%hx at %s", ep, finalpath);
-    //#endif
                 udev_device_unref(child);
                 break;
             }
@@ -153,8 +151,8 @@ void* os_inputmain(void* context){
             continue;
         }
 
-#ifdef DEBUG
-        ckb_info("Endpoint path %s has wMaxPacketSize %i", epstr, size);
+#ifndef NDEBUG
+        ckb_info("Endpoint path %s has wMaxPacketSize %i", finalpath, size);
 #endif
         // Increment the udev list pointer
         udeventry = nextentry;
@@ -296,7 +294,7 @@ void os_closeusb(usbdevice* kb){
 ///
 static int usbclaim(usbdevice* kb){
     int count = kb->epcount;
-#ifdef DEBUG
+#ifndef NDEBUG
     ckb_info("claiming %d endpoints", count);
 #endif // DEBUG
 
@@ -408,7 +406,7 @@ int os_setupusb(usbdevice* kb) {
     /// \todo in these modules a pullrequest is outstanding
     ///
     const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
-#ifdef DEBUG
+#ifndef NDEBUG
     ckb_info("Claiming interfaces. name=%s, firmware=%s, ep_str=%s", name, firmware, ep_str);
 #endif //DEBUG
     kb->epcount = 0;
@@ -455,8 +453,8 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
         ckb_err("Failed to get device path");
         return -1;
     }
-#ifdef DEBUG
-    ckb_info(">>>vendor = 0x%x, product = 0x%x, path = %s, syspath = %s", vendor, product, path, syspath);
+#ifndef NDEBUG
+    ckb_info("Adding device with vendor = 0x%x, product = 0x%x, path = %s, syspath = %s", vendor, product, path, syspath);
 #endif // DEDBUG
 
     for(int i = 0; i < DEV_MAX; i++){

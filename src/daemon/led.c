@@ -8,7 +8,7 @@ void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* 
     (void)kb;
     (void)dummy;
 
-    int index = kb->keymap[keyindex].led;
+    short index = kb->keymap[keyindex].led;
     if(index < 0) {
         if (index == -2){     // Process strafe sidelights
             uchar sideshine;
@@ -17,6 +17,30 @@ void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* 
         }
         return;
     }
+#ifndef NDEBUG
+    else {
+        // This is reset every time a new rgb command is called
+        for(int i = 0; i < N_KEYS_EXTENDED; i++){
+            if(!kb->encounteredleds[i].led){
+                // If we get here, save the led scancode
+                kb->encounteredleds[i].led = index + 1;
+                kb->encounteredleds[i].index = keyindex;
+                break;
+            }
+            if(index + 1 == kb->encounteredleds[i].led){
+                // Hack, but it doesn't matter as this is a debug feature
+                // If we found a duplicate key by the same index, then give up
+                if(kb->encounteredleds[i].index == keyindex){
+                    memset(kb->encounteredleds, 0, sizeof(kb->encounteredleds));
+                    break;
+                }
+                ckb_err("ckb%d: Duplicate led scancode (0x%hx) set by key %s (%d), last set by %s (%d)", INDEX_OF(kb, keyboard), index, kb->keymap[keyindex].name, keyindex, kb->keymap[kb->encounteredleds[i].index].name, kb->encounteredleds[i].index);
+                kb->encounteredleds[i].index = keyindex;
+                break;
+            }
+        }
+    }
+#endif
     uchar r, g, b;
     if(sscanf(code, "%2hhx%2hhx%2hhx", &r, &g, &b) == 3){
         mode->light.r[index] = r;
@@ -125,7 +149,7 @@ char* printrgb(const lighting* light, const usbdevice* kb){
     const uchar* mb = light->b;
     for(int i = 0; i < N_KEYS_EXTENDED; i++){
         // Translate the key index to an RGB index using the key map
-        int k = kb->keymap[i].led;
+        short k = kb->keymap[i].led;
         if(k < 0)
             continue;
         r[i] = mr[k];

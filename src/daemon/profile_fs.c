@@ -118,14 +118,14 @@ static int fs_mysterious_0e(usbdevice* kb){
 }
 
 static int fs_get_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
-    ckb_info("Receiving %s\n", filename);
+    ckb_info("Receiving %s", filename);
     // Prepare to load the file.
     uchar switch_pkt[2][MSG_SIZE] = {
         { 0x07, 0x17, 0x0c, profile, 0 }, // Switch profile.
         { 0x07, 0x17, 0x07, 0x00, 0 }     // Load filename.
     };
     memcpy(switch_pkt[1] + 4, filename, strlen(filename));
-    ckb_info("Syncing\n");
+    ckb_info("Syncing");
     if(!usbsend(kb, switch_pkt[0], MSG_SIZE, 2))
         return -1;
     // Synchronisation.
@@ -138,7 +138,7 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
         if(!usbrecv(kb, sync_pkt[i], MSG_SIZE, dummy))
             return -1;
     }
-    ckb_info("Beginning read...\n");
+    ckb_info("Beginning read...");
     // Read file.
     while(size > 0){
         for(int pkt = 1; pkt <= 5 && size > 0; pkt++, size -= 60){
@@ -154,17 +154,17 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
         if(!usbrecv(kb, sync_pkt[0], MSG_SIZE, dummy))
             return -1;
     }
-    ckb_info("Finishing read...\n");
+    ckb_info("Finishing read...");
     // Finish up.
     uchar eof_pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
     if(!usbsend(kb, eof_pkt, MSG_SIZE, 1))
         return -1;
-    ckb_info("Done reading %s!\n", filename);
+    ckb_info("Done reading %s!", filename);
     return 1;
 }
 
 static int fs_send_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
-    ckb_info("Sending %s\n", filename);
+    ckb_info("Sending %s", filename);
     // Prepare to send the file.
     uchar switch_pkt[2][MSG_SIZE] = {
         { 0x07, 0x17, 0x0c, profile, 0 }, // Switch profile.
@@ -184,7 +184,7 @@ static int fs_send_file(usbdevice* kb, const char* filename, int size, int profi
         if(!usbrecv(kb, sync_pkt[i], MSG_SIZE, dummy))
             return -1;
     }
-    ckb_info("Beginning write...\n");
+    ckb_info("Beginning write...");
     // Write file.
     while(size > 0){
         for(int pkt = 1; pkt <= 5 && size > 0; pkt++, size -= 60){
@@ -203,7 +203,7 @@ static int fs_send_file(usbdevice* kb, const char* filename, int size, int profi
         if(!usbrecv(kb, sync_pkt[0], MSG_SIZE, dummy))
             return -1;
     }
-    ckb_info("Finishing write...\n");
+    ckb_info("Finishing write...");
     // Finish up.
     uchar eof_pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
     if(!usbsend(kb, eof_pkt, MSG_SIZE, 1))

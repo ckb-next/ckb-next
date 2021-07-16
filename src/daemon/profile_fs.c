@@ -124,7 +124,7 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
         { 0x07, 0x17, 0x0c, profile, 0 }, // Switch profile.
         { 0x07, 0x17, 0x07, 0x00, 0 }     // Load filename.
     };
-    memcpy(switch_pkt[1] + 4, filename, 16);
+    memcpy(switch_pkt[1] + 4, filename, strlen(filename));
     ckb_info("Syncing\n");
     if(!usbsend(kb, switch_pkt[0], MSG_SIZE, 2))
         return -1;
@@ -170,7 +170,7 @@ static int fs_send_file(usbdevice* kb, const char* filename, int size, int profi
         { 0x07, 0x17, 0x0c, profile, 0 }, // Switch profile.
         { 0x07, 0x17, 0x05, 0x00, 0 }     // Write to filename.
     };
-    memcpy(switch_pkt[1] + 4, filename, 16);
+    memcpy(switch_pkt[1] + 4, filename, strlen(filename));
     ckb_info("Syncing\n");
     if(!usbsend(kb, switch_pkt[0], MSG_SIZE, 2))
         return -1;

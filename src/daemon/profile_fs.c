@@ -10,6 +10,14 @@
 
 #define LAYER_COUNT        1
 
+static int fs_set_profile_guid(usbdevice* kb, const char* guid){
+    uchar pkt[MSG_SIZE] = { 0x07, 0x15, 0x00, 0x00, 0 };
+    memcpy(pkt + 4, guid, 16);
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
+        return -1;
+    return 0;
+}
+
 static int fs_get_buffer_size(usbdevice* kb){
     uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x01, 0x00, 0 };
     uchar reply[MSG_SIZE] = {0};
@@ -120,24 +128,14 @@ static int fs_mysterious_0e(usbdevice* kb){
 static int fs_get_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
     ckb_info("Receiving %s", filename);
     // Prepare to load the file.
-    uchar switch_pkt[2][MSG_SIZE] = {
-        { 0x07, 0x17, 0x0c, profile, 0 }, // Switch profile.
-        { 0x07, 0x17, 0x07, 0x00, 0 }     // Load filename.
-    };
-    memcpy(switch_pkt[1] + 4, filename, strlen(filename));
-    ckb_info("Syncing");
-    if(!usbsend(kb, switch_pkt[0], MSG_SIZE, 2))
+    if(fs_switch_profile(kb, profile) < 0)
         return -1;
+    if(fs_set_read_filename(kb, filename) < 0)
+        return -1;
+    ckb_info("Syncing");
     // Synchronisation.
-    uchar sync_pkt[2][MSG_SIZE] = {
-        { 0x0e, 0x17, 0x0d, 0x00, 0 }, // Sync packet.
-        { 0x0e, 0x17, 0x03, 0x01, 0 }  // ???
-    };
-    uchar dummy[MSG_SIZE];
-    for(int i = 0; i <= 1; i++){
-        if(!usbrecv(kb, sync_pkt[i], MSG_SIZE, dummy))
-            return -1;
-    }
+    if(fs_get_command_status(kb) != 0)
+        return -1;
     ckb_info("Beginning read...");
     // Read file.
     while(size > 0){
@@ -151,14 +149,11 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
             data += s;
         }
         // Synchronise between bursts.
-        if(!usbrecv(kb, sync_pkt[0], MSG_SIZE, dummy))
+        if(!fs_get_command_status(kb))
             return -1;
     }
     ckb_info("Finishing read...");
-    // Finish up.
-    uchar eof_pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
-    if(!usbsend(kb, eof_pkt, MSG_SIZE, 1))
-        return -1;
+    fs_set_eof(kb);
     ckb_info("Done reading %s!", filename);
     return 1;
 }
@@ -166,24 +161,12 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
 static int fs_send_file(usbdevice* kb, const char* filename, int size, int profile, uchar* data){
     ckb_info("Sending %s", filename);
     // Prepare to send the file.
-    uchar switch_pkt[2][MSG_SIZE] = {
-        { 0x07, 0x17, 0x0c, profile, 0 }, // Switch profile.
-        { 0x07, 0x17, 0x05, 0x00, 0 }     // Write to filename.
-    };
-    memcpy(switch_pkt[1] + 4, filename, strlen(filename));
-    ckb_info("Syncing\n");
-    if(!usbsend(kb, switch_pkt[0], MSG_SIZE, 2))
+    if(fs_switch_profile(kb, profile) < 0)
         return -1;
-    // Synchronisation.
-    uchar sync_pkt[2][MSG_SIZE] = {
-        { 0x0e, 0x17, 0x0d, 0x00, 0 }, // Sync packet.
-        { 0x0e, 0x17, 0x03, 0x00, 0 }  // ???
-    };
-    uchar dummy[MSG_SIZE];
-    for(int i = 0; i <= 1; i++){
-        if(!usbrecv(kb, sync_pkt[i], MSG_SIZE, dummy))
-            return -1;
-    }
+    if(fs_set_write_filename(kb, filename) < 0)
+        return -1;
+    if(fs_get_command_status(kb) != 0)
+        return -1;
     ckb_info("Beginning write...");
     // Write file.
     while(size > 0){
@@ -196,18 +179,14 @@ static int fs_send_file(usbdevice* kb, const char* filename, int size, int profi
             data += s;
         }
         // Write burst.
-        uchar out_pkt[MSG_SIZE] = { 0x07, 0x17, 0x09, 0 };
-        if(!usbsend(kb, out_pkt, MSG_SIZE, 1))
+        if(fs_mysterious_09(kb) < 0)
             return -1;
         // Synchronise between bursts.
-        if(!usbrecv(kb, sync_pkt[0], MSG_SIZE, dummy))
+        if(fs_get_command_status(kb) != 0)
             return -1;
     }
-    ckb_info("Finishing write...");
     // Finish up.
-    uchar eof_pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
-    if(!usbsend(kb, eof_pkt, MSG_SIZE, 1))
-        return -1;
+    fs_set_eof(kb);
     ckb_info("Done writing %s!", filename);
     return 1;
 }
@@ -256,7 +235,19 @@ static int loadrgb_fs(usbdevice* kb, lighting* light, int mode){
 static int savergb_fs(usbdevice* kb, lighting* light, int mode){
     uchar data[LIGHTRGB_SIZE] = { 0 };
     char filename[16] = { 0 };
+
+    if(!fs_mysterious_0e(kb))
+        return -1;
+
     for(int layer = 0; layer < LAYER_COUNT; layer++){
+        // Send Profile GUID.
+        char* id = getid(kb->hw->id + 0);
+        if(!fs_set_profile_guid(kb, id)) {
+            free(id);
+            return -1;
+        }
+        free(id);
+
         // lght_XX.d - ???
         uchar strange_cue_packet_must_investigate[37] = {
             7, 0, 0, 0, 0, 0, 0, 0,
@@ -324,17 +315,20 @@ static int savergb_fs(usbdevice* kb, lighting* light, int mode){
         return -1;
 
     uchar profile_map_magic[4] = {
-        65, 0, 0, 0
+        0x41, 0, 0, 0
     };
 
     if(!fs_send_file(kb, "PROFILE.MAP", 4, mode, profile_map_magic))
         return -1;
 
     uchar profile_dat_magic[4] = {
-        80, 1, 0, 0
+        0x50, 0x01, 0, 0
     };
 
     if(!fs_send_file(kb, "PROFILE.DAT", 4, mode, profile_dat_magic))
+        return -1;
+
+    if(!fs_mysterious_0e(kb))
         return -1;
 
     return 1;

@@ -20,13 +20,13 @@
 # QuaZip_LIBRARIES           - List of QuaZip libraries
 # QuaZip_ZLIB_INCLUDE_DIR    - The include dir of zlib headers
 
+# First try to find QuaZip 1.0
+find_package(QuaZip-Qt5 QUIET)
 
 IF (QuaZip_LIBRARIES)
     # in cache already
     SET(QuaZip_FOUND TRUE)
-ELSE (QuaZip_LIBRARIES)
-    # First try to find QuaZip 1.0
-    find_package(QuaZip-Qt5 QUIET)
+ELSE ()
     IF(QuaZip-Qt5_FOUND)
         message("-- Found QuaZip: QuaZip::QuaZip")
         SET(QuaZip_FOUND TRUE)
@@ -48,4 +48,4 @@ ELSE (QuaZip_LIBRARIES)
         SET(QuaZip_INCLUDE_DIRS ${QuaZip_INCLUDE_DIR} ${QuaZip_ZLIB_INCLUDE_DIR})
         find_package_handle_standard_args(QuaZip DEFAULT_MSG QuaZip_LIBRARIES QuaZip_INCLUDE_DIR QuaZip_ZLIB_INCLUDE_DIR QuaZip_INCLUDE_DIRS)
     ENDIF ()
-ENDIF (QuaZip_LIBRARIES)
+ENDIF ()

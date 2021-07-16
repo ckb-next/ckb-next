@@ -148,7 +148,7 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
             if(!usbrecv(kb, read_pkt, MSG_SIZE, out_pkt))
                 return -1;
             memcpy(data, out_pkt + 4, s);
-            *data = *data + s;
+            data += s;
         }
         // Synchronise between bursts.
         if(!usbrecv(kb, sync_pkt[0], MSG_SIZE, dummy))
@@ -193,7 +193,7 @@ static int fs_send_file(usbdevice* kb, const char* filename, int size, int profi
             memcpy(out_pkt + 4, data, s);
             if(!usbsend(kb, out_pkt, MSG_SIZE, 1))
                 return -1;
-            *data = *data + s;
+            data += s;
         }
         // Write burst.
         uchar out_pkt[MSG_SIZE] = { 0x07, 0x17, 0x09, 0 };

@@ -13,7 +13,7 @@
 static int fs_get_buffer_size(usbdevice* kb){
     uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x01, 0x00, 0 };
     uchar reply[MSG_SIZE] = {0};
-    if(!usbrecv(kb, pkt, reply))
+    if(!usbrecv(kb, pkt, MSG_SIZE, reply))
         return -1;
     // Buffer size is a 16-bit number at a fairly strange offset.
     int bufsize = (reply[15] << 8) | reply[14];
@@ -23,7 +23,7 @@ static int fs_get_buffer_size(usbdevice* kb){
 static size_t fs_get_current_file_size(usbdevice* kb){
     uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x03, 0x00, 0 };
     uchar reply[MSG_SIZE] = {0};
-    if(!usbrecv(kb, pkt, reply))
+    if(!usbrecv(kb, pkt, MSG_SIZE, reply))
         return -1;
     // Size is an unsigned 32-bit int.
     size_t size = (reply[7] << 24) | (reply[6] << 16) | (reply[5] << 8) | reply[4];
@@ -33,7 +33,7 @@ static size_t fs_get_current_file_size(usbdevice* kb){
 static int fs_get_file_list(usbdevice* kb, uchar* data[], int count){
     uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x04, 0x00, 0 };
     uchar reply[MSG_SIZE] = {0};
-    if(!usbrecv(kb, pkt, reply))
+    if(!usbrecv(kb, pkt, MSG_SIZE, reply))
         return -1;
     for (int i = 0; i < count; i++) {
         // Format: 16-byte GUID, then 4 bytes of something.
@@ -45,7 +45,7 @@ static int fs_get_file_list(usbdevice* kb, uchar* data[], int count){
 static int fs_set_write_filename(usbdevice* kb, char* filename){
     uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x05, 0x00, 0 };
     memcpy(pkt + 4, filename, 12);
-    if(!usbsend(kb, pkt, 1))
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
         return -1;
     return 0;
 }
@@ -53,14 +53,14 @@ static int fs_set_write_filename(usbdevice* kb, char* filename){
 static int fs_set_read_filename(usbdevice* kb, char* filename){
     uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x07, 0x00, 0 };
     memcpy(pkt + 4, filename, 12);
-    if(!usbsend(kb, pkt, 1))
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
         return -1;
     return 0;
 }
 
 static int fs_set_eof(usbdevice* kb){
     uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
-    if(!usbsend(kb, pkt, 1))
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
         return -1;
     return 0;
 }
@@ -68,7 +68,7 @@ static int fs_set_eof(usbdevice* kb){
 // No idea about this one.
 static int fs_mysterious_09(usbdevice* kb){
     uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x09, 0x00, 0 };
-    if(!usbsend(kb, pkt, 1))
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
         return -1;
     return 0;
 }
@@ -76,7 +76,7 @@ static int fs_mysterious_09(usbdevice* kb){
 // We're still not sure about this, but it happens only on reads.
 static int fs_begin_read(usbdevice* kb){
     uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x0a, 0x00, 0 };
-    if(!usbsend(kb, pkt, 1))
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
         return -1;
     return 0;
 }
@@ -84,7 +84,7 @@ static int fs_begin_read(usbdevice* kb){
 // We're still not sure about this, but it happens only on writes.
 static int fs_begin_write(usbdevice* kb){
     uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x0b, 0x00, 0 };
-    if(!usbsend(kb, pkt, 1))
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
         return -1;
     return 0;
 }
@@ -92,7 +92,7 @@ static int fs_begin_write(usbdevice* kb){
 static int fs_switch_profile(usbdevice* kb, int profile){
     uchar pkt[MSG_SIZE] = { 0x07, 0x17, 0x0c, 0x00, 0 };
     pkt[3] = profile;
-    if(!usbsend(kb, pkt, 1))
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
         return -1;
     return 0;
 }
@@ -104,7 +104,7 @@ static int fs_switch_profile(usbdevice* kb, int profile){
 static int fs_get_command_status(usbdevice* kb){
     uchar pkt[MSG_SIZE] = { 0x0e, 0x17, 0x0d, 0x00, 0 };
     uchar reply[MSG_SIZE] = {0};
-    if(!usbrecv(kb, pkt, reply))
+    if(!usbrecv(kb, pkt, MSG_SIZE, reply))
         return -1;
     return reply[4];
 }
@@ -112,7 +112,7 @@ static int fs_get_command_status(usbdevice* kb){
 // No idea what this does.
 static int fs_mysterious_0e(usbdevice* kb){
     uchar pkt[MSG_SIZE] = {0x07, 0x17, 0x0e, 0x00, 0 };
-    if(!usbsend(kb, pkt, 1))
+    if(!usbsend(kb, pkt, MSG_SIZE, 1))
         return -1;
     return 0;
 }
@@ -126,7 +126,7 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
     };
     memcpy(switch_pkt[1] + 4, filename, 16);
     ckb_info("Syncing\n");
-    if(!usbsend(kb, switch_pkt[0], 2))
+    if(!usbsend(kb, switch_pkt[0], MSG_SIZE, 2))
         return -1;
     // Synchronisation.
     uchar sync_pkt[2][MSG_SIZE] = {
@@ -135,7 +135,7 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
     };
     uchar dummy[MSG_SIZE];
     for(int i = 0; i <= 1; i++){
-        if(!usbrecv(kb, sync_pkt[i], dummy))
+        if(!usbrecv(kb, sync_pkt[i], MSG_SIZE, dummy))
             return -1;
     }
     ckb_info("Beginning read...\n");
@@ -145,19 +145,19 @@ static int fs_get_file(usbdevice* kb, const char* filename, int size, int profil
             int s = (size > 60) ? 60 : size;
             uchar read_pkt[MSG_SIZE] = { 0xff, pkt, s, 0x00, 0 };
             uchar out_pkt[MSG_SIZE];
-            if(!usbrecv(kb, read_pkt, out_pkt))
+            if(!usbrecv(kb, read_pkt, MSG_SIZE, out_pkt))
                 return -1;
             memcpy(data, out_pkt + 4, s);
             *data = *data + s;
         }
         // Synchronise between bursts.
-        if(!usbrecv(kb, sync_pkt[0], dummy))
+        if(!usbrecv(kb, sync_pkt[0], MSG_SIZE, dummy))
             return -1;
     }
     ckb_info("Finishing read...\n");
     // Finish up.
     uchar eof_pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
-    if(!usbsend(kb, eof_pkt, 1))
+    if(!usbsend(kb, eof_pkt, MSG_SIZE, 1))
         return -1;
     ckb_info("Done reading %s!\n", filename);
     return 1;
@@ -172,7 +172,7 @@ static int fs_send_file(usbdevice* kb, const char* filename, int size, int profi
     };
     memcpy(switch_pkt[1] + 4, filename, 16);
     ckb_info("Syncing\n");
-    if(!usbsend(kb, switch_pkt[0], 2))
+    if(!usbsend(kb, switch_pkt[0], MSG_SIZE, 2))
         return -1;
     // Synchronisation.
     uchar sync_pkt[2][MSG_SIZE] = {
@@ -181,7 +181,7 @@ static int fs_send_file(usbdevice* kb, const char* filename, int size, int profi
     };
     uchar dummy[MSG_SIZE];
     for(int i = 0; i <= 1; i++){
-        if(!usbrecv(kb, sync_pkt[i], dummy))
+        if(!usbrecv(kb, sync_pkt[i], MSG_SIZE, dummy))
             return -1;
     }
     ckb_info("Beginning write...\n");
@@ -191,22 +191,22 @@ static int fs_send_file(usbdevice* kb, const char* filename, int size, int profi
             int s = (size > 60) ? 60 : size;
             uchar out_pkt[MSG_SIZE] = { 0x7f, pkt, s, 0x00, 0 };
             memcpy(out_pkt + 4, data, s);
-            if(!usbsend(kb, out_pkt, 1))
+            if(!usbsend(kb, out_pkt, MSG_SIZE, 1))
                 return -1;
             *data = *data + s;
         }
         // Write burst.
         uchar out_pkt[MSG_SIZE] = { 0x07, 0x17, 0x09, 0 };
-        if(!usbsend(kb, out_pkt, 1))
+        if(!usbsend(kb, out_pkt, MSG_SIZE, 1))
             return -1;
         // Synchronise between bursts.
-        if(!usbrecv(kb, sync_pkt[0], dummy))
+        if(!usbrecv(kb, sync_pkt[0], MSG_SIZE, dummy))
             return -1;
     }
     ckb_info("Finishing write...\n");
     // Finish up.
     uchar eof_pkt[MSG_SIZE] = { 0x07, 0x17, 0x08, 0x00, 0 };
-    if(!usbsend(kb, eof_pkt, 1))
+    if(!usbsend(kb, eof_pkt, MSG_SIZE, 1))
         return -1;
     ckb_info("Done writing %s!", filename);
     return 1;
@@ -282,13 +282,13 @@ static int savergb_fs(usbdevice* kb, lighting* light, int mode){
             0x89, 0x65, 0x6d, 0x75, 0x7d, 0x85, 0x58, 0x8d, 0x62, 0x6a,
             0x72, 0x01, 0x7a, 0x09, 0x82, 0x8a, 0x11, 0x19, 0x21, 0x29,
             0x31, 0x08, 0x39, 0x41, 0x49, 0x51, 0x59, 0x02, 0x0a, 0x90,
-            0x91, 0x92, 0x9e, 0xa0, 0x93, 0x94, 0x95, 0x96, 0x12, 0x97, 
+            0x91, 0x92, 0x9e, 0xa0, 0x93, 0x94, 0x95, 0x96, 0x12, 0x97,
             0x98, 0x99, 0x9a, 0x9b, 0x9f, 0xa2, 0xa1, 0x9c, 0x9d, 0x1a,
             0x22, 0x10, 0x2a, 0x32, 0x3a, 0x42, 0x4a, 0x52, 0x5a, 0x03,
             0x0b, 0x13, 0x18, 0x1b, 0x23, 0x2b, 0x33, 0x3b, 0x43, 0x4b,
             0x53, 0x5b, 0x04, 0x20, 0x14, 0x1c, 0x24, 0x2c, 0x34, 0x3c,
             0x44, 0x4c, 0x54, 0x28, 0x5c, 0x05, 0x0d, 0x15, 0x25, 0x3d,
-            0x45, 0x30, 0x4d, 0x06, 0x0e, 0x16, 0x1e, 0x26, 0x2e, 0x36, 
+            0x45, 0x30, 0x4d, 0x06, 0x0e, 0x16, 0x1e, 0x26, 0x2e, 0x36,
             0x38, 0x3e, 0x46, 0x56, 0x07, 0x17, 0x1f, 0x27, 0x40, 0x2f,
             0x37, 0x3f, 0x47, 0x4f, 0x57, 0x5f, 0x68, 0x70
         };
@@ -320,7 +320,7 @@ static int savergb_fs(usbdevice* kb, lighting* light, int mode){
     // Lighting count (currently one supported).
     if(!fs_send_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
         return -1;
-    
+
     uchar profile_map_magic[4] = {
         65, 0, 0, 0
     };
@@ -390,7 +390,7 @@ int cmd_hwsave_fs(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const 
         // Save RGB.
         if(!savergb_fs(kb, hw->light + mode, mode))
             return -1;
-        
+
         uchar data[5*MSG_SIZE] = { 0x49, 0x00, 0 };
         // Profile GUID.
         memcpy(data + 2, hw->id + mode, sizeof(usbid));

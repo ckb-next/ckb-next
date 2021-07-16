@@ -254,9 +254,7 @@ static int loadrgb_fs(usbdevice* kb, lighting* light, int mode){
 }
 
 static int savergb_fs(usbdevice* kb, lighting* light, int mode){
-    uchar data[LIGHTRGB_SIZE] = { LAYER_COUNT, 0 };
-    // Zero out the buffer.
-    data[0] = 0;
+    uchar data[LIGHTRGB_SIZE] = { 0 };
     char filename[16] = { 0 };
     for(int layer = 0; layer < LAYER_COUNT; layer++){
         // lght_XX.d - ???
@@ -317,8 +315,12 @@ static int savergb_fs(usbdevice* kb, lighting* light, int mode){
             return -1;
     }
 
+    uchar lghtcnt[4] = {
+        LAYER_COUNT, 0, 0, 0
+    };
+
     // Lighting count (currently one supported).
-    if(!fs_send_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, data))
+    if(!fs_send_file(kb, "lghtcnt.cnt", LIGHTCOUNT_SIZE, mode, lghtcnt))
         return -1;
 
     uchar profile_map_magic[4] = {

@@ -35,6 +35,8 @@ Most of the information can be found on [ckb-next wiki pages](https://github.com
 
 [Contributing](https://github.com/ckb-next/ckb-next/wiki/Contributing).
 
+[Community Pipe Animation Scripts](https://github.com/ckb-next/ckb-next/wiki/Community-Pipe-Scripts).
+
 ### Contact
 
 Maintainers reserve the rights to modify and remove issues, pull requests and comments therein, that are denunciating, off-topic, harmful, hateful and overall inappropriate.

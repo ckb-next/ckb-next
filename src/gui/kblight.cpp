@@ -319,11 +319,13 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
     if(_animMap == _lastFrameAnimMap && _indicatorMap == _lastFrameIndicatorMap && _lastFrameDimming == _dimming && !_forceFrame)
         return;
 
-     _forceFrame = false;
+    // This is used to prevent spamming "rgb 000000" to the daemon when the lights are off
+    const bool lastFrameOrForce = _lastFrameDimming != _dimming || _forceFrame;
 
     _lastFrameAnimMap = _animMap;
     _lastFrameIndicatorMap = _indicatorMap;
     _lastFrameDimming = _dimming;
+    _forceFrame = false;
 
     int count = _animMap.count();
     QRgb* colors = _animMap.colors();
@@ -361,7 +363,7 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
     }
 
     // If brightness is at 0%, turn off lighting entirely
-    if(_dimming == 3){
+    if(_dimming == 3 && lastFrameOrForce){
         cmd.write("rgb 000000\n");
         return;
     }

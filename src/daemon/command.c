@@ -277,8 +277,10 @@ int readcmd(usbdevice* kb, const char* line){
             uint r, g, b;
             if(sscanf(word, "%02x%02x%02x", &r, &g, &b) == 3){
                 // Set all keys
+                // We use -1 instead of notifynumber here to disable errors about duplicate led scancodes being set (in debug mode)
+                // That parameter in cmd_rgb is a dummy anyway
                 for(int i = 0; i < N_KEYS_EXTENDED; i++)
-                    vt->rgb(kb, mode, notifynumber, i, word);
+                    vt->rgb(kb, mode, -1, i, word);
                 continue;
             }
             break;

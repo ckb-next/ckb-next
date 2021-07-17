@@ -295,7 +295,7 @@ void os_closeusb(usbdevice* kb){
 static int usbclaim(usbdevice* kb){
     int count = kb->epcount;
 #ifndef NDEBUG
-    ckb_info("claiming %d endpoints", count);
+    ckb_info("ckb%d: Claiming %d endpoints", INDEX_OF(kb, keyboard), count);
 #endif // DEBUG
 
     for(int i = 0; i < count; i++){

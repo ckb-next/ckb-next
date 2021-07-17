@@ -18,7 +18,7 @@ void cmd_rgb(usbdevice* kb, usbmode* mode, int dummy, int keyindex, const char* 
         return;
     }
 #ifndef NDEBUG
-    else {
+    else if(dummy != -1) {
         // This is reset every time a new rgb command is called
         for(int i = 0; i < N_KEYS_EXTENDED; i++){
             if(!kb->encounteredleds[i].led){

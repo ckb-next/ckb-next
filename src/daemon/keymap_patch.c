@@ -53,7 +53,6 @@ keypatches mappatches[] = {
 /// If a match is found, patch the device-specific keymap in usbdevice.
 void patchkeys(usbdevice* kb){
     // Copy the default keymap over
-    kb->keymap = malloc(sizeof(keymap));
     memcpy(kb->keymap, keymap, sizeof(keymap));
     // Check if we need to patch the bragi base map
     if(kb->protocol == PROTO_BRAGI)

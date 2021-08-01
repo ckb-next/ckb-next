@@ -396,11 +396,6 @@ static void* _setupusb(void* context){
 
     kb->usbdelay = USB_DELAY_DEFAULT;
 
-    /// Allocate memory for the os_usbrecv() buffer
-    kb->interruptbuf = calloc(MAX_MSG_SIZE, sizeof(uchar));
-    if(!kb->interruptbuf)
-        ckb_fatal("Error allocating memory for usb_recv() %s", strerror(errno));
-
     // Check if the device needs a patched keymap, and if so patch it.
     patchkeys(kb);
 
@@ -832,12 +827,6 @@ int closeusb(usbdevice* kb){
             ckb_err("pthread_join() returned %s (%d)", strerror(joinres), joinres);
     }
     queued_mutex_lock(dmutex(kb));
-
-    // Free the device-specific keymap
-    free(kb->keymap);
-
-    // Free the memory used for the os_usbrecv() buffer
-    free(kb->interruptbuf);
 
     // Delete the profile and the control path
     if(!kb->vtable)

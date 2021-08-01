@@ -215,12 +215,13 @@ typedef enum protocol_
 } protocol_t;
 
 // Structure for tracking keyboard/mouse devices
-#define KB_NAME_LEN 64
-#define SERIAL_LEN  34
-#define MSG_SIZE    64
-#define MAX_MSG_SIZE 1024
-#define IFACE_MAX   4
-#define USB_EP_MAX  16
+#define KB_NAME_LEN         64
+#define SERIAL_LEN          34
+#define MSG_SIZE            64
+#define BRAGI_JUMBO_SIZE    1024
+#define MAX_MSG_SIZE        BRAGI_JUMBO_SIZE
+#define IFACE_MAX           4
+#define USB_EP_MAX          16
 typedef struct {
     // Function table (see command.h)
     const union devcmd* vtable;
@@ -313,9 +314,9 @@ typedef struct {
     // Color dithering in use
     char dither;
     // Keymap that should be applied to this device
-    key* keymap;
+    key keymap[sizeof(keymap)];
     // Buffer used to store non-HID interrupt reads from the input thread.
-    uchar* interruptbuf;
+    uchar interruptbuf[MAX_MSG_SIZE];
     // Endpoints the main input thread should listen to
     // Must always end with 0, and endpoints should be 0x80 | i
     uchar input_endpoints[USB_EP_MAX+1];

@@ -250,12 +250,10 @@ int main(int argc, char** argv){
 
                 if (!strcasecmp(searchstr, dev.keymap[j].name)) {
                     printf("Key %s has id %d\n", dev.keymap[j].name, j);
-                    free(dev.keymap);
                     return 0;
                 }
             }
             printf("Key %s was not found\n", searchstr);
-            free(dev.keymap);
             return 1;
         } else if(!strcmp(argument, "--enable-experimental")) {
             enable_experimental = 1;

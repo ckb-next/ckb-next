@@ -44,9 +44,11 @@ list(APPEND CKB_NEXT_COMMON_COMPILE_FLAGS
         -Werror=return-type
         -Wshadow
         -Wno-cpp
+        -Wno-unused-function
         $<$<CONFIG:Debug>:${opt_lvl}>
         $<$<CONFIG:Debug>:-Wvla>
         $<$<CONFIG:Debug>:-Wcpp>
+        $<$<CONFIG:Debug>:-Wunused-function>
         #    $<$<CONFIG:Debug>:-Wfloat-equal>
         #    $<$<CONFIG:Debug>:-Wundef>
         #    $<$<CONFIG:Debug>:-Wshadow>

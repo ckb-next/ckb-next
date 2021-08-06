@@ -1172,7 +1172,7 @@ Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translatio
     <message>
         <location filename="../../kbprofiledialog.ui" line="48"/>
         <source>Tip: Hold down Ctrl and click on multiple profiles to export</source>
-        <translation>Tipp: Zum Exportieren von mehreren Profilen, halten Sie Strg gedrückt und klicken Sie mehrere Profile</translation>
+        <translation>Tipp: Zum Exportieren von mehreren Profilen, halten Sie Strg gedrückt und klicken Sie auf mehrere Profile</translation>
     </message>
     <message>
         <location filename="../../kbprofiledialog.ui" line="57"/>
@@ -2445,8 +2445,10 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
     <message>
         <location filename="../../rebindwidget.ui" line="1378"/>
         <source>Delay will be the same as it was recorded</source>
-        <translatorcomment>Verzögerung wie bei Aufzeichnung</translatorcomment>
-        <translation>Die Verzögerung ist dieselbe wie bei der Aufnahme</translation>
+        <translation variants="yes">
+            <lengthvariant>Die Verzögerung ist dieselbe wie bei der Aufnahme</lengthvariant>
+            <lengthvariant>Verzögerung wie bei Aufnahme</lengthvariant>
+        </translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1365"/>
@@ -2536,12 +2538,12 @@ Vergewissern Sie sich, dass Ihre Tastaturbelegung auf Englisch - Vereinigte Staa
     <message>
         <location filename="../../rebindwidget.cpp" line="859"/>
         <source>Type your macro and press Stop Recording when finished.</source>
-        <translation>Makro eingeben und danach auf Aufzeichnung anhalten klicken.</translation>
+        <translation>Makro eingeben und danach auf "Aufzeichnung anhalten" klicken.</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.cpp" line="866"/>
         <source>Click Start Recording or manually edit the events.</source>
-        <translation>Auf Aufzeichnung starten klicken oder manuell Ereignisse manuell bearbeiten.</translation>
+        <translation>Auf "Aufzeichnung starten" klicken oder manuell Ereignisse manuell bearbeiten.</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.cpp" line="934"/>

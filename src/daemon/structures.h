@@ -324,6 +324,8 @@ typedef struct {
     protocol_t protocol;
     // Poll thread
     pthread_t* pollthread;
+    // Size in bytes of the primary output endpoint
+    int out_ep_packet_size;
 #ifndef NDEBUG
     // List of led scancodes that have been encountered since the last rgb update
     struct {

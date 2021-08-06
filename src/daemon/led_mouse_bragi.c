@@ -2,6 +2,7 @@
 #include "notify.h"
 #include "profile.h"
 #include "usb.h"
+#include "bragi_common.h"
 #include "bragi_proto.h"
 
 #define N_BRAGI_MOUSE_ZONES 9
@@ -20,9 +21,8 @@ int updatergb_mouse_bragi(usbdevice* kb, int force){
     if(!force && !lastlight->forceupdate && !newlight->forceupdate
             && !rgbcmp(lastlight, newlight))
         return 0;
-    lastlight->forceupdate = newlight->forceupdate = 0;
 
-    uchar pkt[64] = {BRAGI_MAGIC, BRAGI_WRITE_DATA, BRAGI_LIGHTING_HANDLE, 0x12};
+    uchar pkt[BRAGI_JUMBO_SIZE] = {0};
 
     // Back
     pkt[7] = newlight->r[LED_MOUSE + 1];
@@ -54,10 +54,9 @@ int updatergb_mouse_bragi(usbdevice* kb, int force){
     pkt[18] = newlight->g[LED_MOUSE + 8];
     pkt[24] = newlight->b[LED_MOUSE + 8];
 
-    uchar response[64] = {0};
-    if(!usbrecv(kb, pkt, sizeof(pkt), response))
-        return 1;
-#warning "Check if the device responded with success"
+    bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), 0x12);
+    lastlight->forceupdate = newlight->forceupdate = 0;
+
     memcpy(lastlight, newlight, sizeof(lighting));
     return 0;
 }

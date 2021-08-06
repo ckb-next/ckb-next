@@ -380,6 +380,12 @@ static void* _setupusb(void* context){
     queued_mutex_lock(dmutex(kb));
     if(USES_BRAGI(kb->vendor, kb->product))
         kb->protocol = PROTO_BRAGI;
+
+    if(USES_BRAGI_JUMBO(kb->vendor, kb->product))
+        kb->out_ep_packet_size = BRAGI_JUMBO_SIZE;
+    else
+        kb->out_ep_packet_size = MSG_SIZE;
+
     queued_mutex_lock(imutex(kb));
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;

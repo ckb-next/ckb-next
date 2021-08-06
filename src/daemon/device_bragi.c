@@ -12,13 +12,13 @@
 const struct timespec bragi_poll_delay = { .tv_sec = 50 };
 
 void* bragi_poll_thread(void* ctx){
-    uchar poll_pkt[64] = {0x08, 0x12};
+    uchar poll_pkt[BRAGI_JUMBO_SIZE] = {0x08, 0x12};
     usbdevice* kb = ctx;
     int ret;
     while(!(ret = clock_nanosleep(CLOCK_MONOTONIC, 0, &bragi_poll_delay, NULL))){
         queued_mutex_lock(dmutex(kb));
         if(kb->active){
-            uchar poll_response[64] = {0};
+            uchar poll_response[BRAGI_JUMBO_SIZE] = {0};
             if(usbrecv(kb, poll_pkt, sizeof(poll_response), poll_response)){
                 if(poll_response[1] != 0x12)
                     ckb_err("ckb%d: Invalid bragi poll response (0x%hhx)", INDEX_OF(kb, keyboard), poll_response[1]);
@@ -63,8 +63,8 @@ static int setactive_bragi(usbdevice* kb, int active){
     }
 
     // The daemon always sends RGB data through handle 0, so go ahead and open it
-    uchar light_init[64] = {BRAGI_MAGIC, BRAGI_OPEN_HANDLE, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING};
-    uchar response[64] = {0};
+    uchar light_init[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_OPEN_HANDLE, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING};
+    uchar response[BRAGI_JUMBO_SIZE] = {0};
     if(!usbrecv(kb, light_init, sizeof(light_init), response))
         return 1;
 
@@ -75,7 +75,7 @@ static int setactive_bragi(usbdevice* kb, int active){
         ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, response[2]);
         // CUE seems to attempt to close and reopen the handle if it gets 0x03 on open
         if(response[2] == 0x03){
-            uchar light_deinit[64] = {BRAGI_MAGIC, BRAGI_CLOSE_HANDLE, 0x01, BRAGI_LIGHTING_HANDLE};
+            uchar light_deinit[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_CLOSE_HANDLE, 0x01, BRAGI_LIGHTING_HANDLE};
             if(!usbrecv(kb, light_deinit, sizeof(light_deinit), response))
                 return 1;
             if(response[2] != 0x00){

@@ -272,6 +272,9 @@ const char* product_str(ushort product);
 // This should be removed in the future when we implement autodetection
 #define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL)))
 
+// Devices that use bragi jumbo packets (1024 bytes)
+#define USES_BRAGI_JUMBO(vendor, product)           ((vendor) == (V_CORSAIR) && 0)
+
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();
 

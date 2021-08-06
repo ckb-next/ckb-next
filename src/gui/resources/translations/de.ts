@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de_DE">
+<TS version="2.1" language="de">
 <context>
     <name>AnimAddDialog</name>
     <message>
@@ -34,7 +34,7 @@
     <message>
         <location filename="../../animdetailsdialog.ui" line="48"/>
         <source>Name</source>
-        <translation></translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../../animdetailsdialog.ui" line="53"/>
@@ -44,7 +44,7 @@
     <message>
         <location filename="../../animdetailsdialog.ui" line="58"/>
         <source>Version</source>
-        <translation></translation>
+        <translation>Version</translation>
     </message>
     <message>
         <location filename="../../animdetailsdialog.ui" line="63"/>
@@ -146,7 +146,7 @@
     <message>
         <location filename="../../animsettingdialog.ui" line="352"/>
         <source>Name</source>
-        <translation></translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../../animsettingdialog.ui" line="359"/>
@@ -171,7 +171,7 @@
     <message>
         <location filename="../../animsettingdialog.ui" line="387"/>
         <source>Version:</source>
-        <translation></translation>
+        <translation>Version:</translation>
     </message>
     <message>
         <location filename="../../animsettingdialog.ui" line="394"/>
@@ -186,7 +186,7 @@
     <message>
         <location filename="../../animsettingdialog.ui" line="437"/>
         <source>Version</source>
-        <translation></translation>
+        <translation>Version</translation>
     </message>
     <message>
         <location filename="../../animsettingdialog.ui" line="444"/>
@@ -206,7 +206,7 @@
     <message>
         <location filename="../../animsettingdialog.cpp" line="26"/>
         <source> Animation</source>
-        <translation></translation>
+        <translation> Animation</translation>
     </message>
     <message>
         <location filename="../../animsettingdialog.cpp" line="33"/>
@@ -1409,7 +1409,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../kbwidget.ui" line="479"/>
         <source>Status:</source>
-        <translation></translation>
+        <translation>Status:</translation>
     </message>
     <message>
         <location filename="../../kbwidget.ui" line="492"/>

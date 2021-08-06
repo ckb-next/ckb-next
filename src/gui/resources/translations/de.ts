@@ -196,7 +196,7 @@
     <message>
         <location filename="../../animsettingdialog.ui" line="451"/>
         <source>Script name:</source>
-        <translation>Skript-Name:</translation>
+        <translation>Skriptname:</translation>
     </message>
     <message>
         <location filename="../../animsettingdialog.ui" line="471"/>
@@ -380,7 +380,7 @@
     <message>
         <location filename="../../extrasettingswidget.ui" line="127"/>
         <source>The tray icon will not be displayed. The application will still run in the background; re-launch the app to see the GUI again.</source>
-        <translation>Das Tray-Icon wird nicht angezeigt. Das Programm wird weiterhin im Hintergrund laufen; starten Sie die App neu, um die GUI wiederzusehen.</translation>
+        <translation>Das Tray-Icon wird nicht angezeigt. Das Programm wird weiterhin im Hintergrund laufen; starten Sie die App neu, um die GUI wieder zu öffnen.</translation>
     </message>
     <message>
         <location filename="../../extrasettingswidget.ui" line="130"/>
@@ -583,7 +583,7 @@
     <message>
         <location filename="../../fwupgradedialog.cpp" line="128"/>
         <source>Ready to install new firmware.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Disclaimer:&lt;/b&gt; ckb-next is not endorsed by Corsair.&lt;br /&gt;This is &lt;i&gt;unlikely&lt;/i&gt; to cause any damage, however the developers of this software do not accept any responsibility in such an event.</source>
-        <translation>Bereit neue Firmware zu installieren.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Haftungsausschluss:&lt;/b&gt; ckb-next wird nicht von Corsair unterstützt.&lt;br /&gt;Es ist &lt;i&gt;unwahrscheinlich&lt;/i&gt; irgendeinen Schaden zu verursachen, jedoch übernehmen die Entwickler dieser Software keine Verantwortung in einem solchen Fall.</translation>
+        <translation>Bereit neue Firmware zu installieren.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Haftungsausschluss:&lt;/b&gt; ckb-next wird nicht von Corsair unterstützt.&lt;br /&gt;Das wird &lt;i&gt;wahrscheinlich keine&lt;/i&gt; Schäden verursachen, jedoch übernehmen die Entwickler dieser Software keine Verantwortung in einem solchen Fall.</translation>
     </message>
     <message>
         <location filename="../../fwupgradedialog.cpp" line="158"/>
@@ -1057,7 +1057,7 @@ Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translatio
     <message>
         <location filename="../../kblightwidget.ui" line="71"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If enabled, the same colors will be displayed here as on the keyboard. If disabled, the base colors will be shown.&lt;/p&gt;&lt;p&gt;Note: The animation preview will be disabled when the window loses focus to preserve computation resources.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If enabled, the same colours will be displayed here as on the keyboard. If disabled, the base colors will be shown.&lt;/p&gt;&lt;p&gt;Note: The animation preview will be disabled when the window loses focus to preserve computation resources.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wenn aktiviert, werden hier die gleichen Farben angezeigt wie auf der Tastatur. Wenn deaktiviert, werden die Grundfarben angezeigt.&lt;/p&gt;&lt;p&gt;Hinweis: Die Animationsvorschau wird deaktiviert, wenn das Fenster den Fokus verliert, um Systemressourcen zu sparen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../../kblightwidget.ui" line="74"/>
@@ -1172,7 +1172,7 @@ Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translatio
     <message>
         <location filename="../../kbprofiledialog.ui" line="48"/>
         <source>Tip: Hold down Ctrl and click on multiple profiles to export</source>
-        <translation>Tipp: Strg gedrückt halten und auf mehrere Profile zum Exportieren klicken</translation>
+        <translation>Tipp: Zum Exportieren von mehreren Profilen, halten Sie Strg gedrückt und klicken Sie mehrere Profile</translation>
     </message>
     <message>
         <location filename="../../kbprofiledialog.ui" line="57"/>
@@ -1238,7 +1238,7 @@ Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translatio
         <location filename="../../kbprofiledialog.cpp" line="209"/>
         <location filename="../../kbprofiledialog.cpp" line="351"/>
         <source>ckb-next profiles (*.ckb)</source>
-        <translation>ckb-next-Profile.(*.ckb)</translation>
+        <translation>ckb-next-Profile (*.ckb)</translation>
     </message>
     <message>
         <location filename="../../kbprofiledialog.cpp" line="312"/>
@@ -1288,7 +1288,7 @@ Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translatio
     <message>
         <location filename="../../kbprofiledialog.cpp" line="387"/>
         <source>Unsupported package selected. Please update ckb-next to import it.</source>
-        <translation>Nicht unterstütztes Paket ausgewählt. Bitte ckb-next aktualisieren, um es zu importieren.</translation>
+        <translation>Ausgewähltes Paket wird nicht unterstützt. Bitte aktualisieren Sie ckb-next, um es zu importieren.</translation>
     </message>
     <message>
         <location filename="../../kbprofiledialog.cpp" line="397"/>
@@ -1545,12 +1545,12 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../kbwindowinfomodel.cpp" line="6"/>
         <source>Case Sensitive</source>
-        <translation>Groß- Kleinschreibung beachtet</translation>
+        <translation>Groß- &amp; Kleinschreibung beachtet</translation>
     </message>
     <message>
         <location filename="../../kbwindowinfomodel.cpp" line="7"/>
         <source>Case Insensitive</source>
-        <translation>Groß- Kleinschreibung nicht beachtet</translation>
+        <translation>Groß- &amp; Kleinschreibung nicht beachtet</translation>
     </message>
     <message>
         <location filename="../../kbwindowinfomodel.cpp" line="8"/>

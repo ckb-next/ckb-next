@@ -18,7 +18,8 @@ public:
     // USB model and serial number
     QString usbModel, usbSerial;
     // Device information
-    QString features, firmware, pollrate;
+    QStringList features;
+    QString firmware, pollrate;
     bool monochrome;
     ushort productID;
     bool hwload;

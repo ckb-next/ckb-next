@@ -17,7 +17,7 @@ int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
 bool Kb::_dither = false, Kb::_mouseAccel = true;
 
 Kb::Kb(QObject *parent, const QString& path) :
-    QThread(parent), features("N/A"), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
+    QThread(parent), features(QStringList()), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
     batteryTimer(0), batteryIcon(0), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), battery(0), charging(0),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
@@ -31,16 +31,15 @@ Kb::Kb(QObject *parent, const QString& path) :
     // Get the features, model, serial number, FW version (if available), poll rate (if available), and layout from /dev nodes
     QFile ftpath(path + "/features"), mpath(path + "/model"), spath(path + "/serial"), fwpath(path + "/fwversion"), ppath(path + "/pollrate"), prodpath(path + "/productid"), hwlayoutPath(path + "/layout"), dpiPath(path + "/dpi");
     if (ftpath.open(QIODevice::ReadOnly)){
-        features = ftpath.read(1000);
-        features = features.trimmed();
+        QString featurestr = ftpath.read(1000).trimmed();
         ftpath.close();
         // Read model from features (first word: vendor, second word: product)
-        QStringList list = features.split(" ");
-        if(list.length() < 2)
+        features = featurestr.split(" ");
+        if(features.length() < 2)
             return;
-        _model = KeyMap::getModel(list[1]);
+        _model = KeyMap::getModel(features[1]);
         if(_model == KeyMap::NO_MODEL) {
-            qDebug() << "could not find valid model information:" << list[1] << "produced" << _model;
+            qDebug() << "could not find valid model information:" << features[1] << "produced" << _model;
             return;
         }
     } else {

@@ -82,7 +82,7 @@
     <message>
         <location filename="../../animsettingdialog.ui" line="91"/>
         <source>Timing</source>
-        <translatorcomment>Couldn&apos;t think of any shorter German alternatives, but Timing is commonly used, too</translatorcomment>
+        <translatorcomment>Couldn’t think of any shorter German alternatives, but Timing is commonly used, too</translatorcomment>
         <translation>Timing</translation>
     </message>
     <message>
@@ -1654,12 +1654,14 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../keyaction.cpp" line="124"/>
         <source>DPI cycle up</source>
-        <translation></translation>
+        <translatorcomment>Alternative: zirkulieren (?)</translatorcomment>
+        <translation>DPI aufwärts durchschalten</translation>
     </message>
     <message>
         <location filename="../../keyaction.cpp" line="126"/>
         <source>DPI cycle down</source>
-        <translation></translation>
+        <translatorcomment>“durchschalten” is not a perfect match for “cycle”</translatorcomment>
+        <translation>DPI abwärts durchschalten</translation>
     </message>
     <message>
         <location filename="../../keyaction.cpp" line="128"/>
@@ -1669,7 +1671,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../keyaction.cpp" line="130"/>
         <source>DPI down</source>
-        <translation>DPI senken</translation>
+        <translation>DPI verringern</translation>
     </message>
     <message>
         <location filename="../../keyaction.cpp" line="132"/>
@@ -1694,7 +1696,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../keyaction.cpp" line="148"/>
         <source>Brightness down</source>
-        <translation>Helligkeit senken</translation>
+        <translation>Helligkeit verringern</translation>
     </message>
     <message>
         <location filename="../../keyaction.cpp" line="153"/>
@@ -2176,22 +2178,22 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
     <message>
         <location filename="../../rebindwidget.ui" line="416"/>
         <source>(Cycle Up)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Höher - umlaufend)</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="421"/>
         <source>(Cycle Down)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Geringer - umlaufend)</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="426"/>
         <source>(Up)</source>
-        <translation>(Hoch)</translation>
+        <translation>(Höher)</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="431"/>
         <source>(Down)</source>
-        <translation>(Niedrig)</translation>
+        <translation>(Geringer)</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="436"/>
@@ -2287,7 +2289,7 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         <location filename="../../rebindwidget.ui" line="803"/>
         <location filename="../../rebindwidget.ui" line="813"/>
         <source>Wrap-around</source>
-        <translation type="unfinished">Im Kreislauf</translation>
+        <translation>Umlaufend</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="855"/>
@@ -2415,7 +2417,7 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
     <message>
         <location filename="../../rebindwidget.ui" line="1492"/>
         <source>Edit as string</source>
-        <translatorcomment>&quot;Zeichenkette&quot; is too long for the button, I think</translatorcomment>
+        <translatorcomment>“Zeichenkette” is too long for the button, I think</translatorcomment>
         <translation variants="yes">
             <lengthvariant>Als String bearbeiten</lengthvariant>
             <lengthvariant>Als Zeichenkette bearbeiten</lengthvariant>
@@ -2491,7 +2493,7 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
 This will result in the key being pressed by the macro until you manually press the key itself and release it.
 
 Are you sure you want to continue?</source>
-        <translation>Taste %1 (%2) wird gedrückt, aber nicht losgelassen.
+        <translation>Taste %1 (%2) wird gedrückt, aber nie losgelassen.
 Dies führt dazu, dass die Taste vom Makro gedrückt wird, bis Sie die Taste selbst manuell drücken und loslassen.
 
 Sind Sie sicher, dass Sie fortfahren möchten?</translation>
@@ -2502,7 +2504,7 @@ Sind Sie sicher, dass Sie fortfahren möchten?</translation>
 This will have no observable effect unless the key is held down manually or by another macro.
 
 Are you sure you want to continue?</source>
-        <translation>Die Taste %1 (%2) wurde losgelassen, aber nie gedrückt.
+        <translation>Taste %1 (%2) wird losgelassen, aber nie gedrückt.
 Dies hat keine erkennbaren Auswirkungen, es sei denn, die Taste wird manuell oder durch ein anderes Makro gedrückt gehalten.
 
 Sind Sie sicher, dass Sie fortfahren möchten?</translation>
@@ -2570,7 +2572,7 @@ Vergewissern Sie sich, dass Ihre Tastatur vor der Aufnahme auf diese Belegung um
     <message>
         <location filename="../../settingswidget.ui" line="125"/>
         <source>Modifier keys</source>
-        <translatorcomment>&quot;Zusatztasten&quot; is used by Windows</translatorcomment>
+        <translatorcomment>“Zusatztasten” is used by Windows</translatorcomment>
         <translation>Zusatztasten</translation>
     </message>
     <message>

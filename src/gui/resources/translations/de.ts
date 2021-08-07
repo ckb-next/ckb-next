@@ -291,7 +291,7 @@
     <message>
         <location filename="../../ckbupdaterwidget.cpp" line="55"/>
         <source>Downloading</source>
-        <translation>Herunterladen</translation>
+        <translation>Wird heruntergeladen</translation>
     </message>
     <message>
         <location filename="../../ckbupdaterwidget.cpp" line="102"/>
@@ -859,7 +859,7 @@
     <message>
         <location filename="../../kbanimwidget.ui" line="181"/>
         <source>Add</source>
-        <translation>Hinzufügen</translation>
+        <translation>Addieren</translation>
     </message>
     <message>
         <location filename="../../kbanimwidget.ui" line="186"/>
@@ -1495,7 +1495,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../kbwidget.cpp" line="375"/>
         <source>Checking...</source>
-        <translation>Überprüfen...</translation>
+        <translation>Wird überprüft...</translation>
     </message>
     <message>
         <location filename="../../kbwidget.cpp" line="383"/>
@@ -1507,7 +1507,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../kbwidget.cpp" line="383"/>
         <source>&lt;center&gt;There is a new firmware available for this device.&lt;br /&gt;However, it requires a newer version of ckb-next.&lt;br /&gt;Please upgrade ckb-next and try again.&lt;/center&gt;</source>
-        <translation>&lt;center&gt;Es ist eine neue Firmware für dieses Gerät verfügbar.&lt;br /&gt;Allerdings wird dafür eine neuere Version von ckb-next benötigt.&lt;br /&gt;Bitte ckb-next aktualisieren und erneut versuchen.&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;Es ist eine neue Firmware für dieses Gerät verfügbar.&lt;br /&gt;Allerdings wird dafür eine neuere Version von ckb-next benötigt.&lt;br /&gt;Bitte aktualisieren Sie ckb-next und versuchen Sie es erneut.&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../kbwidget.cpp" line="386"/>
@@ -1869,7 +1869,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../macrostringeditdialog.cpp" line="21"/>
         <source>An error occured while parsing at column %1&lt;br&gt;&lt;br&gt;Please correct it and try again.</source>
-        <translation>Beim Parsen der Spalte %1 ist ein Fehler aufgetreten&lt;br&gt;&lt;br&gt;Bitte korrigieren und erneut versuchen.</translation>
+        <translation>Beim Parsen der Spalte %1 ist ein Fehler aufgetreten&lt;br&gt;&lt;br&gt;Bitte korrigieren Sie dies und versuchen Sie erneut.</translation>
     </message>
 </context>
 <context>
@@ -1995,12 +1995,12 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../mainwindow.cpp" line="295"/>
         <source>). Please upgrade ckb-next</source>
-        <translation>). Bitte ckb-next aktualisieren</translation>
+        <translation>). Bitte aktualisieren Sie ckb-next</translation>
     </message>
     <message>
         <location filename="../../mainwindow.cpp" line="295"/>
         <source>. If the problem persists, try rebooting.</source>
-        <translation>. Wenn das Problem weiterhin besteht, Neustart versuchen.</translation>
+        <translation>. Wenn das Problem weiterhin besteht, versuchen Sie es mit einem Rechner-Neustart.</translation>
     </message>
     <message>
         <location filename="../../mainwindow.cpp" line="306"/>
@@ -2728,7 +2728,7 @@ Bitte wählen Sie ein anderes Verzeichnis und versuchen Sie es erneut.</translat
     <message>
         <location filename="../../settingswidget.cpp" line="268"/>
         <source>Checking...</source>
-        <translation>Überprüfen...</translation>
+        <translation>Wird überprüft...</translation>
     </message>
     <message>
         <location filename="../../settingswidget.cpp" line="286"/>
@@ -2742,7 +2742,7 @@ Ihre Einstellungen und Beleuchtungsprofile bleiben erhalten.</translation>
     <message>
         <location filename="../../settingswidget.cpp" line="298"/>
         <source>Please restart ckb-next</source>
-        <translation>Bitte ckb-next neu starten</translation>
+        <translation>Bitte starten Sie ckb-next</translation>
     </message>
     <message>
         <location filename="../../settingswidget.cpp" line="298"/>

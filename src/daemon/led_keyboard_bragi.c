@@ -35,7 +35,7 @@ int updatergb_keyboard_bragi(usbdevice* kb, int force){
     memcpy(pkt, b, N_BRAGI_KEYBOARD_KEYS);
 
     // Write to device
-    if(bragi_write_to_handle(kb, rgb_pkt, BRAGI_LIGHTING_HANDLE, sizeof(rgb_pkt), N_BRAGI_KEYBOARD_KEYS*3))
+    if(bragi_write_to_handle_offset(kb, rgb_pkt, BRAGI_LIGHTING_HANDLE, sizeof(rgb_pkt), N_BRAGI_KEYBOARD_KEYS*3))
         return 1;
 
     newlight->forceupdate = 0;

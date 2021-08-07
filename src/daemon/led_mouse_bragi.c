@@ -54,7 +54,9 @@ int updatergb_mouse_bragi(usbdevice* kb, int force){
     pkt[18] = newlight->g[LED_MOUSE + 8];
     pkt[24] = newlight->b[LED_MOUSE + 8];
 
-    bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), 0x12);
+    if(bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), 0x12))
+        return 1;
+
     lastlight->forceupdate = newlight->forceupdate = 0;
 
     memcpy(lastlight, newlight, sizeof(lighting));

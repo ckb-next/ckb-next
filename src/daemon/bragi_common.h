@@ -25,6 +25,9 @@ static inline int _bragi_check_success(const uchar* out, const uchar* in, int de
                                         return -1; \
                                     }
 
+// the _offset functions have 4 bytes extra after the header and before the data starts
 size_t bragi_calculate_buffer_size(usbdevice* kb, uint32_t data_len);
+size_t bragi_calculate_buffer_size_offset(usbdevice* kb, uint32_t data_len);
 int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len);
+int bragi_write_to_handle_offset(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len);
 #endif

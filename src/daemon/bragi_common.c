@@ -29,10 +29,10 @@ int bragi_set_property(usbdevice* kb, const uchar prop, const uchar val) {
     return 0;
 }
 
-size_t bragi_calculate_buffer_size(usbdevice* kb, uint32_t data_len){
+static inline size_t bragi_calculate_buffer_size_common(usbdevice* kb, uint32_t data_len, int offset){
     // Calculate how many bytes are required for the buffer
-    // The first packet is going to be len - ep_out_packet_size + header (11 bytes)
-    int64_t size_without_first = (int64_t)data_len - kb->out_ep_packet_size + 11;
+    // The first packet is going to be len - ep_out_packet_size + header (offset bytes)
+    int64_t size_without_first = (int64_t)data_len - kb->out_ep_packet_size + offset;
     if(size_without_first >= 0){
         // Divide to get the number of packets (out_ep_packet_size - continue write header (3 bytes))
         // 1 + because we have to account for the first packet as well
@@ -45,11 +45,20 @@ size_t bragi_calculate_buffer_size(usbdevice* kb, uint32_t data_len){
     return kb->out_ep_packet_size;
 }
 
-// First 11 bytes must be kept at 00
+size_t bragi_calculate_buffer_size(usbdevice* kb, uint32_t data_len){
+    return bragi_calculate_buffer_size_common(kb, data_len, 7);
+}
+
+size_t bragi_calculate_buffer_size_offset(usbdevice* kb, uint32_t data_len){
+    return bragi_calculate_buffer_size_common(kb, data_len, 11);
+}
+
+
+// First offset bytes must be zeroed and will be overwritten by these functions
 // This is done to avoid having to allocate more memory and copy it on every write
-int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len){
+static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len, int offset){
 #ifndef NDEBUG
-    size_t bytes_req = bragi_calculate_buffer_size(kb, data_len);
+    size_t bytes_req = bragi_calculate_buffer_size_common(kb, data_len, offset);
     if(bytes_req > buf_len){
         ckb_fatal("Buffer not large enough. Needs to be at least %zu bytes.", bytes_req);
         return 0;
@@ -75,8 +84,8 @@ int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_le
 #warning "Check if the device responded with success"
     uchar* pkt_out = pkt;
     // Get to the end of the last packet, go back 3 bytes and insert the header for the continue write
-    while((pkt_out += kb->out_ep_packet_size) < pkt + data_len + 11) {
-        //printf("buf sent %ld, remaining %ld\n", pkt_out - pkt, (int64_t)data_len + 11 - (pkt_out - pkt));
+    while((pkt_out += kb->out_ep_packet_size) < pkt + data_len + offset) {
+        //printf("buf sent %ld, remaining %ld\n", pkt_out - pkt, (int64_t)data_len + offset - (pkt_out - pkt));
         pkt_out -= 3;
         pkt_out[0] = BRAGI_MAGIC;
         pkt_out[1] = BRAGI_CONTINUE_WRITE;
@@ -87,4 +96,12 @@ int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_le
     }
 
     return 0;
+}
+
+int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len){
+    return bragi_write_to_handle_common(kb, pkt, handle, buf_len, data_len, 7);
+}
+
+int bragi_write_to_handle_offset(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len) {
+    return bragi_write_to_handle_common(kb, pkt, handle, buf_len, data_len, 11);
 }

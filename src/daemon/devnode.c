@@ -343,6 +343,8 @@ static int _mkdevpath(usbdevice* kb){
                 fputs(" dongle", ffile);
             if(HAS_FEATURES(kb, FEAT_WIRELESS))
                 fputs(" wireless", ffile);
+            if(HAS_FEATURES(kb, FEAT_BATTERY))
+                fputs(" battery", ffile);
 
             fputc('\n', ffile);
             fclose(ffile);

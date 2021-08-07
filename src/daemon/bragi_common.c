@@ -3,7 +3,7 @@
 
 // Gets a property using the bragi protocol
 // Error when return value < 0
-int bragi_get_property(usbdevice* kb, const uchar prop) {
+long int bragi_get_property(usbdevice* kb, const uchar prop) {
     uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_GET, prop, 0};
     uchar response[BRAGI_JUMBO_SIZE] = {0};
     if(!usbrecv(kb, pkt, sizeof(pkt), response))
@@ -12,7 +12,7 @@ int bragi_get_property(usbdevice* kb, const uchar prop) {
         ckb_err("Failed to get property 0x%hhx. Error was 0x%hhx", prop, response[2]);
         return -2;
     }
-    return response[3];
+    return ((ushort)response[4] << 8) | response[3];
 }
 
 // Sets a property using the bragi protocol

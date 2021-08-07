@@ -92,7 +92,8 @@ void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const c
 static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
     usbprofile* profile = kb->profile;
      if(!strcmp(setting, ":battery")){
-        if(!IS_WIRELESS(kb)) return;
+        if(!IS_WIRELESS_DEV(kb) || kb->protocol != PROTO_NXP)
+            return;
         uchar msg[MSG_SIZE] = { CMD_GET, FIELD_BATTERY };
         uchar in[MSG_SIZE] = {};
         queued_mutex_unlock(imutex(kb));

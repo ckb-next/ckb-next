@@ -56,9 +56,6 @@ public:
     int hwModeCount;
     const static int HWMODE_MAX = 3;
 
-    const static QString BATTERY_VALUES[5];
-    const static QString BATTERY_CHARGING_VALUES[5];
-
     // Perform a firmware update
     void fwUpdate(const QString& path);
 

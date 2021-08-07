@@ -65,8 +65,8 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
     if(device->model() == KeyMap::DARKCORE)
         ui->mPerfWidget->setDarkCore();
 
-    // If the device is supports wireless, show the battery
-    if(device->features.contains("wireless")){
+    // If the device is supports it, show the battery
+    if(device->features.contains("battery")){
         connect(device, &Kb::batteryChanged, this, &KbWidget::updateBattery);
     } else {
         ui->batteryLabel->hide();
@@ -232,7 +232,8 @@ void KbWidget::currentSelectionChanged(const QModelIndex& current, const QModelI
 }
 
 void KbWidget::batteryTrayBox_stateChanged(int state){
-    if(!device->features.contains("wireless")) return;
+    if(!device->features.contains("battery"))
+        return;
     device->showBatteryIndicator = state > 0;
     device->needsSave();
     if(state){

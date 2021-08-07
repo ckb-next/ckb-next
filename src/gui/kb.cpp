@@ -123,7 +123,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     cmd.write(QString("notifyon %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
 
-    if(features.contains("wireless")){
+    if(features.contains("battery")){
         batteryIcon = new BatteryStatusTrayIcon(usbModel, this);
         updateBattery();
         batteryTimer = new QTimer(this);
@@ -855,10 +855,6 @@ KeyMap::Layout Kb::getCurrentLayout(){
     return _layout;
 }
 
-void Kb::setPollRate(const QString& poll)
-{
+void Kb::setPollRate(const QString& poll){
     cmd.write(QString("\npollrate %1\n").arg(poll).toLatin1());
 }
-
-const QString Kb::BATTERY_VALUES[5] = {"Not connected", "Critical", "Low", "Medium", "High"};
-const QString Kb::BATTERY_CHARGING_VALUES[5] = {"N/A", "Not charging", "Charging"};

@@ -19,6 +19,12 @@
 #define BRAGI_DPI_Y         0x22
 #define BRAGI_HWLAYOUT      0x41
 
+// Read only dev info
+#define BRAGI_VID           0x11
+#define BRAGI_PID           0x12
+#define BRAGI_BATTERY_LEVEL 0x0f
+#define BRAGI_BATTERY_STATUS 0x10
+
 // Bragi mode
 #define BRAGI_MODE_HARDWARE 0x01
 #define BRAGI_MODE_SOFTWARE 0x02
@@ -28,6 +34,9 @@
 #define BRAGI_POLLRATE_2MS  0x03
 #define BRAGI_POLLRATE_4MS  0x02
 #define BRAGI_POLLRATE_8MS  0x01
+
+// Dongle subdevice-related information
+#define BRAGI_SUBDEVICE_BITFIELD 0x36
 
 // Resources (used to get handles)
 #define BRAGI_RES_LIGHTING  0x01

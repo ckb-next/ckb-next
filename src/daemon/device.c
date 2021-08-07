@@ -265,8 +265,7 @@ void nxp_reset(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char*
     }
 }
 
-void clear_input_and_rgb(usbdevice* kb, const int active)
-{
+void clear_input_and_rgb(usbdevice* kb, const int active){
     queued_mutex_lock(imutex(kb));
     kb->active = !!active;
     kb->profile->lastlight.forceupdate = 1;

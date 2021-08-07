@@ -168,6 +168,7 @@ typedef struct {
 
 #define FEAT_DONGLE     0x1000  // Is mouse detachable (supports wireless)?
 #define FEAT_WIRELESS   0x2000  // Is wireless?
+#define FEAT_BATTERY    0x4000  // Has a battery that can be read?
 
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL | FEAT_HWLOAD)
@@ -205,8 +206,9 @@ extern const union devcmd vtable_mouse;
 extern const union devcmd vtable_mouse_wireless;
 extern const union devcmd vtable_mousepad;
 extern const union devcmd vtable_mouse_legacy;
-extern const union devcmd vtable_bragi;
+extern const union devcmd vtable_bragi_mouse;
 extern const union devcmd vtable_bragi_keyboard;
+extern const union devcmd vtable_bragi_dongle;
 
 typedef enum protocol_
 {
@@ -222,7 +224,10 @@ typedef enum protocol_
 #define MAX_MSG_SIZE        BRAGI_JUMBO_SIZE
 #define IFACE_MAX           4
 #define USB_EP_MAX          16
-typedef struct {
+#define MAX_CHILDREN        8
+
+struct usbdevice_;
+typedef struct usbdevice_ {
     // Function table (see command.h)
     const union devcmd* vtable;
     // I/O devices
@@ -333,7 +338,12 @@ typedef struct {
         int index;
     } encounteredleds[N_KEYS_EXTENDED];
 #endif
-
+    // Parent device (for wireless dongles supporting multiple subdevices)
+    struct usbdevice_* parent;
+    // Children (if this is a parent)
+    struct usbdevice_* children[8];
+    // Bragi child device id
+    unsigned char bragi_child_id;
 } usbdevice;
 
 #ifdef OS_LINUX

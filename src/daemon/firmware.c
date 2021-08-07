@@ -69,7 +69,7 @@ int getfwversion(usbdevice* kb){
         }
     }
     // Wireless requires extra handshake packets.
-    if(IS_WIRELESS(kb)){
+    if(IS_WIRELESS_DEV(kb)){
         uchar wireless_pkt[5][MSG_SIZE] = { 
             { CMD_GET, 0xae, 0 },
             { CMD_GET, 0x4a, 0 },

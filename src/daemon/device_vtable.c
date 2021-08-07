@@ -413,8 +413,8 @@ const devcmd vtable_mouse_legacy = {
     .read = legacy_dev_io,
 };
 
-// Bragi vtable
-const devcmd vtable_bragi = {
+// Bragi vtables
+const devcmd vtable_bragi_mouse = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
     .fwupdate = cmd_io_none,
@@ -505,6 +505,55 @@ const devcmd vtable_bragi_keyboard = {
     .freeprofile = freeprofile,
     .updatergb = updatergb_keyboard_bragi,
     .updateindicators = updateindicators_kb,
+    .updatedpi = int1_int_none,
+    .reset = cmd_none,
+    .fill_input_eps = bragi_fill_input_eps,
+    .write = bragi_usb_write,
+    .read = bragi_usb_read,
+};
+
+const devcmd vtable_bragi_dongle = {
+    .hwload = cmd_io_none,
+    .hwsave = cmd_io_none,
+    .fwupdate = cmd_io_none,
+    .pollrate = cmd_io_none,
+
+    .active = cmd_io_none,
+    .idle = cmd_io_none,
+
+    .erase = cmd_none,
+    .eraseprofile = cmd_none,
+    .name = cmd_name,
+    .profilename = cmd_none,
+    .id = cmd_none,
+    .profileid = cmd_none,
+
+    .rgb = cmd_none,
+    .ioff = cmd_none,
+    .ion = cmd_none,
+    .iauto = cmd_none,
+
+    .bind = cmd_none,
+    .unbind = cmd_none,
+    .rebind = cmd_none,
+    .macro = cmd_macro_none,
+
+    .dpi = cmd_macro_none,
+    .dpisel = cmd_none,
+    .lift = cmd_none,
+    .snap = cmd_none,
+
+    .notify = cmd_none,
+    .inotify = cmd_none,
+    .get = cmd_none,
+
+    .start = start_dongle_bragi,
+    .setmodeindex = int1_void_none,
+    .allocprofile = allocprofile,
+    .loadprofile = loadprofile_none,
+    .freeprofile = freeprofile,
+    .updatergb = int1_int_none,
+    .updateindicators = int1_void_none,
     .updatedpi = int1_int_none,
     .reset = cmd_none,
     .fill_input_eps = bragi_fill_input_eps,

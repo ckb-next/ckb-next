@@ -2,6 +2,7 @@
 #include "usb.h"
 #include "device.h"
 #include "bragi_common.h"
+#include "command.h"
 
 void bragi_fill_input_eps(usbdevice* kb)
 {
@@ -18,10 +19,20 @@ int bragi_usb_write(usbdevice* kb, void* out, int len, int is_recv, const char* 
         if(pthread_mutex_lock(intmutex(kb)))
             ckb_fatal("Error locking interrupt mutex in os_usbsend()");
 
-    int res = os_usb_interrupt_out(kb, kb->epcount, kb->out_ep_packet_size, out, file, line);
+    int res;
+
+    // If this device has a parent, route all IO through it instead, setting our id
+    if(kb->parent){
+        unsigned char* pkt = out;
+        pkt[0] |= kb->bragi_child_id;
+        res = os_usb_interrupt_out(kb->parent, kb->parent->epcount, kb->parent->out_ep_packet_size, out, file, line);
+    } else {
+        res = os_usb_interrupt_out(kb, kb->epcount, kb->out_ep_packet_size, out, file, line);
+    }
     // Unlock on failure
     if(is_recv && res < 1)
         pthread_mutex_unlock(intmutex(kb));
+
     return res;
 }
 
@@ -43,5 +54,6 @@ int bragi_usb_read(usbdevice* kb, void* in, int len, int dummy, const char* file
     memcpy(in, kb->interruptbuf, kb->out_ep_packet_size);
     if(pthread_mutex_unlock(intmutex(kb)))
         ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
+
     return len;
 }

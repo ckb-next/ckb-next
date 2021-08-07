@@ -162,6 +162,64 @@ int start_keyboard_bragi(usbdevice* kb, int makeactive){
     return 0;
 }
 
+static inline int bragi_dongle_probe(usbdevice* kb){
+    // Ask the device for the mapping
+    int prop = bragi_get_property(kb, BRAGI_SUBDEVICE_BITFIELD);
+    // Go through every device and add it
+    for(int i = 1; i < 8; i++){
+        if(!((prop >> i) & 1))
+            continue;
+        ckb_info("Found bragi subdevice %d", i);
+        // Find a free device slot
+        for(int index = 1; index < DEV_MAX; index++){
+            usbdevice* subkb = keyboard + index;
+            // use kb->handle for now, maybe it's better to use a more common field
+            if(queued_mutex_trylock(dmutex(subkb))){
+                // If the mutex is locked then the device is obviously in use, so keep going
+                continue;
+            }
+
+            // Ignore it if it has already been initialised
+            if(subkb->handle){
+                queued_mutex_unlock(dmutex(subkb));
+                continue;
+            }
+
+            subkb->handle = 1; // invalid
+            subkb->parent = kb;
+
+            subkb->out_ep_packet_size = kb->out_ep_packet_size;
+
+            // Assign a mouse vtable for now, can be changed later after we get vid/pid
+            subkb->vtable = &vtable_bragi_mouse;
+
+            subkb->bragi_child_id = i;
+
+            // Add the device to our children array
+            kb->children[i-1] = subkb;
+
+            // Fill dev information
+            ushort vid = bragi_get_property(subkb, BRAGI_VID);
+            ushort pid = bragi_get_property(subkb, BRAGI_PID);
+
+            ckb_info("Subkb vendor: 0x%hx, product: 0x%hx", vid, pid);
+            subkb->vendor = vid;
+            subkb->product = pid;
+
+            // Unlock mutex here for now
+            queued_mutex_unlock(dmutex(subkb));
+            break;
+        }
+    }
+    return 0;
+}
+
+int start_dongle_bragi(usbdevice* kb, int makeactive){
+    // Probe for devices
+    bragi_dongle_probe(kb);
+    return 0;
+}
+
 static const uchar daemon_pollrate_to_bragi[9] = {
     1,
     BRAGI_POLLRATE_1MS,

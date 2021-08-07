@@ -568,16 +568,26 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     // Get first byte of the response
     uchar firstbyte = buffer[0];
     // If the response starts with CMD_GET (0x0e), or it came from ep4 with bragi, that means it needs to go to os_usbrecv()
-    if(urblen == MSG_SIZE && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == 0x84))){
-        int retval = pthread_mutex_lock(intmutex(kb));
+    if(urblen == kb->out_ep_packet_size && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == 0x84))){
+        usbdevice* targetkb = kb;
+        if(kb->protocol == PROTO_BRAGI){
+            // Extract the device id
+            int devid = firstbyte & 0x7;
+            if(devid && kb->children[devid - 1]){
+                targetkb = kb->children[devid - 1];
+            }
+        }
+
+        int retval = pthread_mutex_lock(intmutex(targetkb));
         if(retval)
             ckb_fatal("Error locking interrupt mutex %i", retval);
-        memcpy(kb->interruptbuf, buffer, MSG_SIZE);
+        memcpy(targetkb->interruptbuf, buffer, kb->out_ep_packet_size);
+
         // signal os_usbrecv() that the data is ready.
-        retval = pthread_cond_broadcast(intcond(kb));
+        retval = pthread_cond_broadcast(intcond(targetkb));
         if(retval)
             ckb_fatal("Error broadcasting pthread cond %i", retval);
-        retval = pthread_mutex_unlock(intmutex(kb));
+        retval = pthread_mutex_unlock(intmutex(targetkb));
         if(retval)
             ckb_fatal("Error unlocking interrupt mutex %i", retval);
     } else {

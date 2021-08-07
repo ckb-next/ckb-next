@@ -232,14 +232,16 @@ static const devcmd* get_vtable(usbdevice* kb){
     ushort vendor = kb->vendor;
     ushort product = kb->product;
     if(kb->protocol == PROTO_BRAGI) {
-        if(IS_MOUSE(vendor, product))
-            return &vtable_bragi;
+        if(IS_DONGLE(kb))
+            return &vtable_bragi_dongle;
+        else if(IS_MOUSE(vendor, product))
+            return &vtable_bragi_mouse;
         else
             return &vtable_bragi_keyboard;
     } else if(IS_MOUSE(vendor, product)) {
         if(IS_LEGACY(vendor, product))
             return &vtable_mouse_legacy;
-        else if(IS_WIRELESS_ID(vendor, product))
+        else if(IS_WIRELESS(vendor, product))
             return &vtable_mouse_wireless;
         else
             return &vtable_mouse;
@@ -248,7 +250,7 @@ static const devcmd* get_vtable(usbdevice* kb){
     } else {
         if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;
-        else if(IS_WIRELESS_ID(vendor, product))
+        else if(IS_WIRELESS(vendor, product))
             return &vtable_keyboard_wireless;
         else
             return &vtable_keyboard;
@@ -390,15 +392,19 @@ static void* _setupusb(void* context){
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;
     const devcmd* vt = kb->vtable = get_vtable(kb);
-    kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
+    if(!(IS_DONGLE(kb) && kb->protocol == PROTO_BRAGI))
+        kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(SUPPORTS_ADJRATE(kb))
         kb->features |= FEAT_ADJRATE;
     if(IS_MONOCHROME(vendor, product))
         kb->features |= FEAT_MONOCHROME;
     if(IS_DONGLE(kb))
         kb->features |= FEAT_DONGLE;
-    if(IS_WIRELESS(kb))
+    if(IS_WIRELESS_DEV(kb)){
         kb->features |= FEAT_WIRELESS;
+        if((kb->protocol == PROTO_BRAGI && !IS_DONGLE(kb)) || kb->protocol != PROTO_BRAGI)
+            kb->features |= FEAT_BATTERY;
+    }
 
     kb->usbdelay = USB_DELAY_DEFAULT;
 
@@ -598,7 +604,7 @@ int revertusb(usbdevice* kb){
         return 0;
 
     // FIXME: This should be moved to a device-specific function
-    if(!HAS_FEATURES(kb, FEAT_RGB)){
+    if(IS_LEGACY_DEV(kb)){
         nk95cmd(kb, NK95_HWON);
         return 0;
     }

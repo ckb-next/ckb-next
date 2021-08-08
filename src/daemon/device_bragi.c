@@ -264,3 +264,14 @@ int cmd_idle_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const
 
     return setactive_bragi(kb, BRAGI_MODE_HARDWARE);
 }
+
+void bragi_get_battery_info(usbdevice* kb){
+    long int stat = bragi_get_property(kb, BRAGI_BATTERY_STATUS);
+    long int chg = bragi_get_property(kb, BRAGI_BATTERY_LEVEL);
+    if(stat < 0 || chg < 0){
+        ckb_err("ckb%d: Failed to get bragi battery properties", INDEX_OF(kb, keyboard));
+        return;
+    }
+    kb->battery_level = chg / 10;
+    kb->battery_status = stat;
+}

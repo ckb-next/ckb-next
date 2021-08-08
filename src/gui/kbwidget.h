@@ -69,7 +69,7 @@ private slots:
     void batteryTrayBox_stateChanged(int state);
 
     void devUpdate();
-    void updateBattery(uint battery, uint charging);
+    void updateBattery(uint battery, BatteryStatus charging);
     void on_hwSaveButton_clicked();
     void on_tabWidget_currentChanged(int index);
     void on_fwUpdButton_clicked();

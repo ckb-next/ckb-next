@@ -19,7 +19,7 @@ bool Kb::_dither = false, Kb::_mouseAccel = true;
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), features(QStringList()), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
     batteryTimer(0), batteryIcon(0), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
-    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), battery(0), charging(0),
+    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), batteryLevel(0), batteryStatus(BatteryStatus::BATT_STATUS_UNKNOWN),
     lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT), _maxDpi(0),
@@ -551,11 +551,12 @@ void Kb::readNotify(const QString& line){
             return;
         // Convert battery values into human readable text
         bool ok, ok2;
-        uint newBattery = bComponents[0].toUInt(&ok), newCharging = bComponents[1].toUInt(&ok2);
-        if(!ok || !ok2 || newBattery  > 4 || newCharging > 4 || (battery == newBattery && charging == newCharging)) return;
-        battery = newBattery;
-        charging = newCharging;
-        emit batteryChanged(newBattery, newCharging);
+        uint newBatteryLevel = bComponents[0].toUInt(&ok), newBatteryStatus = bComponents[1].toUInt(&ok2);
+        if(!ok || !ok2 || newBatteryStatus >= BatteryStatus::BATT_STATUS_INVALID || (batteryLevel == newBatteryLevel && batteryStatus == newBatteryStatus))
+            return;
+        batteryLevel = newBatteryLevel;
+        batteryStatus = static_cast<BatteryStatus>(newBatteryStatus);
+        emit batteryChanged(batteryLevel, batteryStatus);
     } else if(components[0] == "i"){
         // Indicator event
         QString i = components[1];

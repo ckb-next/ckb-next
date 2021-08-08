@@ -4,6 +4,7 @@
 #include "led.h"
 #include "notify.h"
 #include "profile.h"
+#include "command.h"
 
 void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, ...){
     if(!kb)
@@ -15,10 +16,10 @@ void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, .
         // If node number was given, print to that node (if open)
         if((fifo = kb->outfifo[nodenumber] - 1) != -1){
             va_start(va_args, format);
-            if(mode)
-                dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
-            vdprintf(fifo, format, va_args);
-	    va_end(va_args);
+                if(mode)
+                    dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
+                vdprintf(fifo, format, va_args);
+            va_end(va_args);
         }
         return;
     }
@@ -26,10 +27,10 @@ void nprintf(usbdevice* kb, int nodenumber, usbmode* mode, const char* format, .
     for(int i = 0; i < OUTFIFO_MAX; i++){
         if((fifo = kb->outfifo[i] - 1) != -1){
             va_start(va_args, format);
-            if(mode)
-                dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
-            vdprintf(fifo, format, va_args);
-	    va_end(va_args);
+                if(mode)
+                    dprintf(fifo, "mode %d ", INDEX_OF(mode, profile->mode) + 1);
+                vdprintf(fifo, format, va_args);
+            va_end(va_args);
         }
     }
 }
@@ -92,17 +93,10 @@ void cmd_notify(usbdevice* kb, usbmode* mode, int nnumber, int keyindex, const c
 static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* setting){
     usbprofile* profile = kb->profile;
      if(!strcmp(setting, ":battery")){
-        if(!IS_WIRELESS_DEV(kb) || kb->protocol != PROTO_NXP)
-            return;
-        uchar msg[MSG_SIZE] = { CMD_GET, FIELD_BATTERY };
-        uchar in[MSG_SIZE] = {};
         queued_mutex_unlock(imutex(kb));
-        if(!usbrecv(kb, msg, sizeof(msg), in)){
-            queued_mutex_lock(imutex(kb));
-            return;
-        }
+        kb->vtable->get_battery_info(kb);
         queued_mutex_lock(imutex(kb));
-        nprintf(kb, nnumber, 0, "battery %hhu:%hhu\n", in[4], in[5]);
+        nprintf(kb, nnumber, 0, "battery %hhu:%hhu\n", kb->battery_level, kb->battery_status & 0xFF);
     } else if(!strcmp(setting, ":mode")){
         // Get the current mode number
         nprintf(kb, nnumber, mode, "switch\n");

@@ -49,6 +49,9 @@ static int int1_int_none(usbdevice* kb, int dummy){
 
     return 0;
 }
+static void int0_void_none(usbdevice* kb){
+    (void)kb;
+}
 
 #if 0
 static int cmd_io_stub(usbdevice* kb, void* ptr, int len, int is_recv, const char* file, int line){
@@ -107,6 +110,7 @@ const devcmd vtable_keyboard = {
     .fill_input_eps = nxp_fill_input_eps,
     .write = nxp_usb_write,
     .read = nxp_usb_read,
+    .get_battery_info = int0_void_none,
 };
 
 const devcmd vtable_keyboard_wireless = {
@@ -157,6 +161,7 @@ const devcmd vtable_keyboard_wireless = {
     .fill_input_eps = nxp_fill_input_eps,
     .write = nxp_usb_write,
     .read = nxp_usb_read,
+    .get_battery_info = nxp_get_battery_info,
 };
 
 // Legacy keyboard vtable (K70)
@@ -208,6 +213,7 @@ const devcmd vtable_keyboard_legacy = {
     .fill_input_eps = legacy_fill_input_eps,
     .write = legacy_dev_io,
     .read = legacy_dev_io,
+    .get_battery_info = int0_void_none,
 };
 
 // RGB mouse vtable
@@ -259,6 +265,7 @@ const devcmd vtable_mouse = {
     .fill_input_eps = nxp_fill_input_eps,
     .write = nxp_usb_write,
     .read = nxp_usb_read,
+    .get_battery_info = int0_void_none,
 };
 
 const devcmd vtable_mouse_wireless = {
@@ -309,6 +316,7 @@ const devcmd vtable_mouse_wireless = {
     .fill_input_eps = nxp_fill_input_eps,
     .write = nxp_usb_write,
     .read = nxp_usb_read,
+    .get_battery_info = nxp_get_battery_info,
 };
 
 // RGB Mousepad vtable
@@ -360,6 +368,7 @@ const devcmd vtable_mousepad = {
     .fill_input_eps = nxp_fill_input_eps,
     .write = nxp_usb_write,
     .read = nxp_usb_read,
+    .get_battery_info = int0_void_none,
 };
 
 // Legacy mouse vtable
@@ -411,6 +420,7 @@ const devcmd vtable_mouse_legacy = {
     .fill_input_eps = legacy_fill_input_eps,
     .write = legacy_dev_io,
     .read = legacy_dev_io,
+    .get_battery_info = int0_void_none,
 };
 
 // Bragi vtables
@@ -461,6 +471,7 @@ const devcmd vtable_bragi_mouse = {
     .fill_input_eps = bragi_fill_input_eps,
     .write = bragi_usb_write,
     .read = bragi_usb_read,
+    .get_battery_info = bragi_get_battery_info,
 };
 
 const devcmd vtable_bragi_keyboard = {
@@ -510,6 +521,7 @@ const devcmd vtable_bragi_keyboard = {
     .fill_input_eps = bragi_fill_input_eps,
     .write = bragi_usb_write,
     .read = bragi_usb_read,
+    .get_battery_info = bragi_get_battery_info,
 };
 
 const devcmd vtable_bragi_dongle = {
@@ -559,4 +571,5 @@ const devcmd vtable_bragi_dongle = {
     .fill_input_eps = bragi_fill_input_eps,
     .write = bragi_usb_write,
     .read = bragi_usb_read,
+    .get_battery_info = int0_void_none,
 };

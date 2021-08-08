@@ -344,6 +344,14 @@ typedef struct usbdevice_ {
     struct usbdevice_* children[8];
     // Bragi child device id
     unsigned char bragi_child_id;
+    // Battery information
+    enum {
+        BATT_STATUS_UNKNOWN,
+        BATT_STATUS_CHARGING,
+        BATT_STATUS_DISCHARGING,
+        BATT_STATUS_CHARGED,
+    } battery_status;
+    unsigned char battery_level;
 } usbdevice;
 
 #ifdef OS_LINUX

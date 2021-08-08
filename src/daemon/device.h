@@ -99,9 +99,6 @@ int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const cha
 int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 int cmd_pollrate_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3);
 
-// Reads the battery of a wireless device
-void* read_battery(void* context);
-
 // Sets a device's current mode index. This is only used on the legacy K95; the RGB keyboards have no gettable HW index.
 void setmodeindex_legacy(usbdevice* kb, int index);
 
@@ -110,6 +107,9 @@ void nxp_reset(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char*
 
 // Used to clear the input struct and force an rgb update when switching between hw and sw modes
 void clear_input_and_rgb(usbdevice* kb, const int active);
+
+void nxp_get_battery_info(usbdevice* kb);
+void bragi_get_battery_info(usbdevice* kb);
 
 // Per-key input settings for device setup
 // The upper nybble controls input mode. 0x80 generates a normal HID interrupt, 0x40 generates a proprietary interrupt. 0xc0 generates both.

@@ -138,7 +138,7 @@ signals:
     // Profile/mode updates
     void profileAdded();
     void profileRenamed();
-    void batteryChanged(uint battery, uint charging);
+    void batteryChanged(uint batteryLevel, BatteryStatus batteryStatus);
 
     void profileChanged();
     void profileAboutToChange();
@@ -196,7 +196,8 @@ private:
 
     KeyMap::Model   _model;
 
-    uint battery, charging;
+    uint batteryLevel;
+    BatteryStatus batteryStatus;
 
     // Indicator light state
     bool iState[KbPerf::HW_I_COUNT];

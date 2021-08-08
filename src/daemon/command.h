@@ -145,6 +145,8 @@ typedef union devcmd {
 
         device_io write;
         device_io read;
+
+        void (*get_battery_info)(usbdevice* kb);
     };
 } devcmd;
 

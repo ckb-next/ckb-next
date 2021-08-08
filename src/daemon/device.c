@@ -274,3 +274,26 @@ void clear_input_and_rgb(usbdevice* kb, const int active){
     inputupdate(kb);
     queued_mutex_unlock(imutex(kb));
 }
+
+static const ushort nxp_battery_lut[5] = {
+    0,
+    15,
+    30,
+    50,
+    100,
+};
+
+void nxp_get_battery_info(usbdevice* kb){
+    uchar msg[MSG_SIZE] = { CMD_GET, FIELD_BATTERY };
+    uchar in[MSG_SIZE] = { 0 };
+    if(!usbrecv(kb, msg, sizeof(msg), in)){
+        ckb_err("ckb%d: Failed to get battery info. Returning last known state.", INDEX_OF(kb, keyboard));
+        return;
+    }
+    if(in[4] > (sizeof(nxp_battery_lut)/sizeof(*nxp_battery_lut)) - 1){
+        ckb_err("ckb%d: Invalid battery level received 0x%hhx.", INDEX_OF(kb, keyboard), in[4]);
+        return;
+    }
+    kb->battery_level = nxp_battery_lut[in[4]];
+    kb->battery_status = in[5];
+}

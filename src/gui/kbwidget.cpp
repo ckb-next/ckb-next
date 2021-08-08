@@ -357,10 +357,11 @@ void KbWidget::devUpdate(){
     ui->batteryTrayBox->setChecked(device->showBatteryIndicator);
 }
 
-void KbWidget::updateBattery(uint battery, uint charging){
-    QString label = QString("%1, %2")
-                    .arg(BatteryStatusTrayIcon::BATTERY_VALUES[battery])
-                    .arg(BatteryStatusTrayIcon::BATTERY_CHARGING_VALUES[charging]);
+void KbWidget::updateBattery(uint battery, BatteryStatus charging){
+    QString label = QString("%1 (%2%), %3")
+                    .arg(BatteryStatusTrayIcon::BATTERY_VALUES[BatteryStatusTrayIcon::getBatteryString(battery)],
+                    QString::number(battery),
+                    BatteryStatusTrayIcon::BATTERY_STATUS_VALUES[charging]);
     ui->batteryStatusLabel->setText(label);
 }
 

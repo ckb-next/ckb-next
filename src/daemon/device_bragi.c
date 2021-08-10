@@ -173,19 +173,19 @@ static inline int bragi_dongle_probe(usbdevice* kb){
         // Find a free device slot
         for(int index = 1; index < DEV_MAX; index++){
             usbdevice* subkb = keyboard + index;
-            // use kb->handle for now, maybe it's better to use a more common field
             if(queued_mutex_trylock(dmutex(subkb))){
                 // If the mutex is locked then the device is obviously in use, so keep going
                 continue;
             }
 
             // Ignore it if it has already been initialised
-            if(subkb->handle){
+            if(subkb->status > STATUS_DISCONNECTED){
                 queued_mutex_unlock(dmutex(subkb));
                 continue;
             }
 
-            subkb->handle = 1; // invalid
+            subkb->status = STATUS_CONNECTING;
+            subkb->fwversion = 1234; // invalid
             subkb->parent = kb;
 
             subkb->out_ep_packet_size = kb->out_ep_packet_size;
@@ -207,7 +207,8 @@ static inline int bragi_dongle_probe(usbdevice* kb){
             subkb->product = pid;
 
             // Unlock mutex here for now
-            queued_mutex_unlock(dmutex(subkb));
+            //queued_mutex_unlock(dmutex(subkb));
+            setupusb(subkb);
             break;
         }
     }
@@ -236,13 +237,13 @@ int cmd_pollrate_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, con
     (void)dummy1;
     (void)dummy2;
     (void)dummy3;
-    
+
     if(rate > 8 || rate < 0)
         return 0;
-    
+
     if(bragi_set_property(kb, BRAGI_POLLRATE, daemon_pollrate_to_bragi[rate]))
         return 1;
-    
+
     kb->pollrate = rate;
     return 0;
 }

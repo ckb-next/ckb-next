@@ -140,7 +140,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 glaiveOverlay = new QImage(":/img/overlay_glaive.png");
             overlay = glaiveOverlay;
             xpos = 3.5f;
-        } else if(model == KeyMap::KATAR){
+        } else if(model == KeyMap::KATAR || model == KeyMap::KATARPROXT){
             if(!katarOverlay)
                 katarOverlay = new QImage(":/img/overlay_katar.png");
             overlay = katarOverlay;

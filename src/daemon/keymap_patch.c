@@ -55,6 +55,20 @@ keypatch harpoonwlpatch[] = {
 };
 #define HARPOONWLPATCH_LEN sizeof(harpoonwlpatch)/sizeof(*harpoonwlpatch)
 
+keypatch katarproxtpatch[] = {
+    { 237, "dpi",  LED_MOUSE,     KEY_NONE },
+    { 238, NULL,   0,             KEY_NONE },
+    { 239, NULL,   0,             KEY_NONE },
+    { 240, NULL,   0,             KEY_NONE },
+    { 241, NULL,   0,             KEY_NONE },
+    { 242, NULL,   0,             KEY_NONE },
+    { 243, NULL,   0,             KEY_NONE },
+    { 244, NULL,   0,             KEY_NONE },
+    { 245, NULL,   0,             KEY_NONE },
+    { 246, NULL,   0,             KEY_NONE },
+};
+#define KATARPROXTPATCH_LEN sizeof(katarproxtpatch)/sizeof(*katarproxtpatch)
+
 keypatches mappatches[] = {
     { V_CORSAIR, P_K68,          k63patch,       K63PATCH_LEN },
     { V_CORSAIR, P_K68_NRGB,     k63patch,       K63PATCH_LEN },
@@ -64,6 +78,7 @@ keypatches mappatches[] = {
     { V_CORSAIR, P_M95,          m95patch,       M95PATCH_LEN },
     { V_CORSAIR, P_IRONCLAW_W_U, icwpatch,       ICWPATCH_LEN },
     { V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch, HARPOONWLPATCH_LEN },
+    { V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch,KATARPROXTPATCH_LEN },
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 

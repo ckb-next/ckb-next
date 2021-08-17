@@ -617,6 +617,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         } else {
                             kb->input.rel_x += (buffer[5] << 8) | buffer[4];
                             kb->input.rel_y += (buffer[7] << 8) | buffer[6];
+                            kb->input.whl_rel_y = (signed char)buffer[8];
                         }
                     } else {
                         hid_mouse_translate(&kb->input, urblen, buffer);

@@ -145,11 +145,7 @@ void* os_inputmain(void* context){
             udev_device_unref(child);
         }
         if(!ep)
-        {
-            ckb_warn("Unable to read wMaxPacketSize for %s, ignoring", finalpath);
-            free(finalpath);
-            continue;
-        }
+            ckb_fatal("Unable to read wMaxPacketSize for %s, assuming 64", finalpath);
 
 #ifndef NDEBUG
         ckb_info("Endpoint path %s has wMaxPacketSize %i", finalpath, size);

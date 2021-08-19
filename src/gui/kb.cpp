@@ -191,15 +191,20 @@ Kb::~Kb(){
     // Kill notification thread and remove node
     activeDevices.remove(this);
     if(!isOpen()){
-        terminate();
-        wait(1000);
+        if(!wait(1000)){
+            terminate();
+            qDebug() << "Second wait returned" << wait(1000);
+        }
+        cmd.close();
         return;
     }
     if(notifyNumber > 0)
         cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
     cmd.flush();
-    terminate();
-    wait(1000);
+    if(!wait(1000)){
+        terminate();
+        qDebug() << "Second wait returned" << wait(1000);
+    }
     cmd.close();
 }
 
@@ -526,6 +531,7 @@ void Kb::run(){
     }
     QMutexLocker locker(&notifyPathMutex);
     notifyPaths.remove(notifyPath);
+    qDebug() << "Notify thread returning. Read" << line.length() << "isOpen()" << notify.isOpen();
 }
 
 void Kb::readNotify(const QString& line){

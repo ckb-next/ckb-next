@@ -190,21 +190,16 @@ Kb::~Kb(){
 
     // Kill notification thread and remove node
     activeDevices.remove(this);
-    if(!isOpen()){
-        if(!wait(1000)){
-            terminate();
-            qDebug() << "Second wait returned" << wait(1000);
-        }
-        cmd.close();
-        return;
-    }
-    if(notifyNumber > 0)
+    if(cmd.isOpen() && notifyNumber > 0){
         cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
-    cmd.flush();
+        // Manually flush so that the daemon closes the notify pipe and the thread can gracefully stop
+        cmd.flush();
+    }
     if(!wait(1000)){
         terminate();
         qDebug() << "Second wait returned" << wait(1000);
     }
+    // This does nothing if cmd isn't open.
     cmd.close();
 }
 

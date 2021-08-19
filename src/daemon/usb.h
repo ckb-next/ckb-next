@@ -138,6 +138,10 @@
 #define P_DARK_CORE_RGB_PRO_SE_WL    0x1b7f/* wireless - dongle  Defining Dark Core RGB Pro SE here as it uses the same protocol as Ironclaw */
 #define IS_IRONCLAW_W(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_IRONCLAW_W_U || (kb)->product == P_IRONCLAW_W_D) || (kb)->product == P_DARK_CORE_RGB_PRO_SE) || (kb)->product == P_DARK_CORE_RGB_PRO_SE_WL))
 
+#define P_HARPOON_WL_U       0x1b5e
+#define P_HARPOON_WL_D       0x1b65
+#define IS_HARPOON_WL(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_HARPOON_WL_U || (kb)->product == P_HARPOON_WL_D))
+
 #define P_POLARIS            0x1b3b
 #define IS_POLARIS(kb)       ((kb)->vendor == V_CORSAIR && ((kb)->product == P_POLARIS))
 
@@ -202,7 +206,7 @@ const char* product_str(ushort product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL)))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -215,7 +219,7 @@ const char* product_str(ushort product);
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 // Devices that are considered experimental and are either not fully tested, or aren't fully implemented
-#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && ((product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4 || (product) == P_K95_PLATINUM_XT || (product) == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_IRONCLAW_W_U || (product) == P_IRONCLAW_W_D || (product) == P_DARK_CORE_RGB_PRO_SE || (product) == P_DARK_CORE_RGB_PRO_SE_WL))
+#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && ((product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4 || (product) == P_K95_PLATINUM_XT || (product) == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_IRONCLAW_W_U || (product) == P_IRONCLAW_W_D || (product) == P_DARK_CORE_RGB_PRO_SE || (product) == P_DARK_CORE_RGB_PRO_SE_WL || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D))
 
 /// Some devices cause usbhid to spend a long time initialising it. To work around this, we intentionally uncleanly
 /// deinitialise the device, skipping the usbhid handover.
@@ -270,7 +274,7 @@ const char* product_str(ushort product);
 #define USB_DELAY_DEFAULT   5
 
 // This should be removed in the future when we implement autodetection
-#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL)))
+#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D))
 
 // Devices that use bragi jumbo packets (1024 bytes)
 #define USES_BRAGI_JUMBO(vendor, product)           ((vendor) == (V_CORSAIR) && 0)

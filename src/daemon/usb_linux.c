@@ -241,18 +241,18 @@ static int usbunclaim(usbdevice* kb, int resetting) {
         ckb_warn("If you still need the device, you will have to restart ckb-next-daemon.");
         return 0;
     }
-    // For RGB keyboards, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
+    // For NXP devices, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
     // Reconnecting any of the others causes trouble.
-    if (!resetting) {
-        struct usbdevfs_ioctl ctl = { 0, USBDEVFS_CONNECT, 0 };
+    if (resetting)
+        return 0;
+    struct usbdevfs_ioctl ctl = { 0, USBDEVFS_CONNECT, 0 };
+    for(int i = 0; i < count; i++){
+        // Do not reattach interface 2 if it's an NXP device
+        // FIXME: Is this still an issue?
+        if(i == 2 && kb->protocol == PROTO_NXP)
+            continue;
+        ctl.ifno = i;
         ioctl(handle, USBDEVFS_IOCTL, &ctl);
-        ctl.ifno = 1;
-        ioctl(handle, USBDEVFS_IOCTL, &ctl);
-        // Also reconnect iface #2 (HID) for non-RGB keyboards
-        if(!HAS_FEATURES(kb, FEAT_RGB)){
-            ctl.ifno = 2;
-            ioctl(handle, USBDEVFS_IOCTL, &ctl);
-        }
     }
     return 0;
 }
@@ -291,7 +291,7 @@ void os_closeusb(usbdevice* kb){
 static int usbclaim(usbdevice* kb){
     int count = kb->epcount;
 #ifndef NDEBUG
-    ckb_info("ckb%d: Claiming %d endpoints", INDEX_OF(kb, keyboard), count);
+    ckb_info("ckb%d: Claiming %d interfaces", INDEX_OF(kb, keyboard), count);
 #endif // DEBUG
 
     for(int i = 0; i < count; i++){

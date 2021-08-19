@@ -6,8 +6,14 @@
 
 void bragi_fill_input_eps(usbdevice* kb)
 {
+    // HACK: Harpoon WL has EPs starting from 0x82
+    // Ideally, we'd read them from the OS and make sure they are valid instead of guessing
+    int offset = 1;
+    if(IS_HARPOON_WL(kb))
+        offset = 2;
+
     for(int i = 0; i < kb->epcount; i++)
-        kb->input_endpoints[i] = (i + 1) | 0x80;
+        kb->input_endpoints[i] = (i + offset) | 0x80;
 }
 
 int bragi_usb_write(usbdevice* kb, void* out, int len, int is_recv, const char* file, int line)

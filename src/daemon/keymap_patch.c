@@ -28,22 +28,42 @@ keypatch m95patch[] = {
 #define M95PATCH_LEN sizeof(m95patch)/sizeof(*m95patch)
 
 keypatch icwpatch[] = {
-    /* idx, name, led, scan */
-    { 211, "dpiup",  -1, KEY_CORSAIR },
-    { 212, "dpidn",  -1, KEY_CORSAIR },
-
+    { 237, "back",  LED_MOUSE,     KEY_NONE },
+    { 238, "wheel", LED_MOUSE + 1, KEY_NONE },
+    { 239, "front", LED_MOUSE + 2, KEY_NONE },
+    { 240, "dpi0",  LED_MOUSE + 3, KEY_NONE },
+    { 241, "dpi1",  LED_MOUSE + 4, KEY_NONE },
+    { 242, "dpi2",  LED_MOUSE + 5, KEY_NONE },
+    { 243, NULL,    0,             KEY_NONE },
+    { 244, NULL,    0,             KEY_NONE },
+    { 245, NULL,    0,             KEY_NONE },
+    { 246, NULL,    0,             KEY_NONE },
 };
 #define ICWPATCH_LEN sizeof(icwpatch)/sizeof(*icwpatch)
 
+keypatch harpoonwlpatch[] = {
+    { 237, "dpi",  LED_MOUSE,     KEY_NONE },
+    { 238, "back", LED_MOUSE + 1, KEY_NONE },
+    { 239, NULL,   0,             KEY_NONE },
+    { 240, NULL,   0,             KEY_NONE },
+    { 241, NULL,   0,             KEY_NONE },
+    { 242, NULL,   0,             KEY_NONE },
+    { 243, NULL,   0,             KEY_NONE },
+    { 244, NULL,   0,             KEY_NONE },
+    { 245, NULL,   0,             KEY_NONE },
+    { 246, NULL,   0,             KEY_NONE },
+};
+#define HARPOONWLPATCH_LEN sizeof(harpoonwlpatch)/sizeof(*harpoonwlpatch)
+
 keypatches mappatches[] = {
-    { V_CORSAIR, P_K68,          k63patch, K63PATCH_LEN },
-    { V_CORSAIR, P_K68_NRGB,     k63patch, K63PATCH_LEN },
-    { V_CORSAIR, P_K65,          k65patch, K65PATCH_LEN },
-    { V_CORSAIR, P_K65_LEGACY,   k65patch, K65PATCH_LEN },
-    { V_CORSAIR, P_K63_NRGB,     k63patch, K63PATCH_LEN },
-    { V_CORSAIR, P_M95,          m95patch, M95PATCH_LEN },
-    // { V_CORSAIR, P_IRONCLAW_W_U, icwpatch, ICWPATCH_LEN },
-    // { V_CORSAIR, P_IRONCLAW_W_D, icwpatch, ICWPATCH_LEN },
+    { V_CORSAIR, P_K68,          k63patch,       K63PATCH_LEN },
+    { V_CORSAIR, P_K68_NRGB,     k63patch,       K63PATCH_LEN },
+    { V_CORSAIR, P_K65,          k65patch,       K65PATCH_LEN },
+    { V_CORSAIR, P_K65_LEGACY,   k65patch,       K65PATCH_LEN },
+    { V_CORSAIR, P_K63_NRGB,     k63patch,       K63PATCH_LEN },
+    { V_CORSAIR, P_M95,          m95patch,       M95PATCH_LEN },
+    { V_CORSAIR, P_IRONCLAW_W_U, icwpatch,       ICWPATCH_LEN },
+    { V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch, HARPOONWLPATCH_LEN },
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 

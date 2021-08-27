@@ -803,7 +803,7 @@
     <message>
         <location filename="../../kperfwidget.ui" line="815"/>
         <source>Note: macro recording not yet implemented. Indicator will always display &quot;off&quot;.</source>
-        <translation>Hinweis: Makro-Aufzeichnungen sind noch nicht implementiert. Der Indikator zeigt immer &quot;aus&quot; an.</translation>
+        <translation>Hinweis: Makro-Aufzeichnungen sind noch nicht implementiert. Der Indikator zeigt immer &quot;Aus&quot; an.</translation>
     </message>
     <message>
         <location filename="../../kperfwidget.ui" line="916"/>
@@ -1869,7 +1869,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../macrostringeditdialog.cpp" line="21"/>
         <source>An error occured while parsing at column %1&lt;br&gt;&lt;br&gt;Please correct it and try again.</source>
-        <translation>Beim Parsen der Spalte %1 ist ein Fehler aufgetreten&lt;br&gt;&lt;br&gt;Bitte korrigieren Sie dies und versuchen Sie erneut.</translation>
+        <translation>Beim Parsen der Spalte %1 ist ein Fehler aufgetreten&lt;br&gt;&lt;br&gt;Bitte korrigieren Sie dies und versuchen Sie es erneut.</translation>
     </message>
 </context>
 <context>
@@ -2742,7 +2742,7 @@ Ihre Einstellungen und Beleuchtungsprofile bleiben erhalten.</translation>
     <message>
         <location filename="../../settingswidget.cpp" line="298"/>
         <source>Please restart ckb-next</source>
-        <translation>Bitte starten Sie ckb-next</translation>
+        <translation>Bitte starten Sie ckb-next neu</translation>
     </message>
     <message>
         <location filename="../../settingswidget.cpp" line="298"/>

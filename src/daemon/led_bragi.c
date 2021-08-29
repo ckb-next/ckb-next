@@ -52,6 +52,9 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
 
     uchar pkt[BRAGI_JUMBO_SIZE] = {0};
 
+    int brightness = 1000;
+    bragi_set_property(kb, BRAGI_BRIGHTNESS, brightness);
+
     static_assert(sizeof(pkt) >= 7 + N_KEYS_EXTENDED * 3, "Bragi RGB packet must be large enough to fit all possible zones in the keymap");
 
     memcpy(pkt + 7, newlight->r + led_offset, CPY_SZ(r));

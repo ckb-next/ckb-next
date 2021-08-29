@@ -17,8 +17,8 @@ long int bragi_get_property(usbdevice* kb, const uchar prop) {
 
 // Sets a property using the bragi protocol
 // Error when return value < 0. Success == 0
-int bragi_set_property(usbdevice* kb, const uchar prop, const uchar val) {
-    uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_SET, prop, 0, val, 0};
+int bragi_set_property(usbdevice* kb, const uchar prop, const ushort val) {
+    uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_SET, prop, 0, val&255, val>>8};
     uchar response[BRAGI_JUMBO_SIZE] = {0};
     if(!usbrecv(kb, pkt, sizeof(pkt), response))
         return -1;

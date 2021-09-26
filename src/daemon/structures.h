@@ -357,6 +357,8 @@ typedef struct usbdevice_ {
         STATUS_CONNECTING,
         STATUS_CONNECTED,
     } status;
+    uchar bragi_out_ep;
+    uchar bragi_in_ep;
 } usbdevice;
 
 #ifdef OS_LINUX

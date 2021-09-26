@@ -14,6 +14,18 @@ void bragi_fill_input_eps(usbdevice* kb)
 
     for(int i = 0; i < kb->epcount; i++)
         kb->input_endpoints[i] = (i + offset) | 0x80;
+
+    // Pick the correct input and output EPs.
+    // Most use 0x84 and 4, but there are a few exceptions...
+    kb->bragi_out_ep = 0x4;
+    kb->bragi_in_ep = 0x84;
+
+    // Exceptions should set the EPs here
+    if(kb->vendor == V_CORSAIR){
+        switch(kb->product){
+
+        }
+    }
 }
 
 int bragi_usb_write(usbdevice* kb, void* out, int len, int is_recv, const char* file, int line)
@@ -31,9 +43,9 @@ int bragi_usb_write(usbdevice* kb, void* out, int len, int is_recv, const char* 
     if(kb->parent){
         unsigned char* pkt = out;
         pkt[0] |= kb->bragi_child_id;
-        res = os_usb_interrupt_out(kb->parent, 4, kb->parent->out_ep_packet_size, out, file, line);
+        res = os_usb_interrupt_out(kb->parent, kb->parent->bragi_out_ep, kb->parent->out_ep_packet_size, out, file, line);
     } else {
-        res = os_usb_interrupt_out(kb, 4, kb->out_ep_packet_size, out, file, line);
+        res = os_usb_interrupt_out(kb, kb->bragi_out_ep, kb->out_ep_packet_size, out, file, line);
     }
     // Unlock on failure
     if(is_recv && res < 1)

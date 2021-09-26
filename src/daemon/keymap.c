@@ -545,7 +545,7 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         else
             CLEAR_KEYBIT(kbinput, hid_codes[bit + 223]);
     }
-    
+
     // Followed by rwin at urbinput[14], bit 0
     if((urbinput[13] >> bit) & 1)
         SET_KEYBIT(kbinput, hid_codes[bit + 223]);
@@ -568,7 +568,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     // Get first byte of the response
     uchar firstbyte = buffer[0];
     // If the response starts with CMD_GET (0x0e), or it came from ep4 with bragi, that means it needs to go to os_usbrecv()
-    if(urblen == kb->out_ep_packet_size && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == 0x84))){
+    if(urblen == kb->out_ep_packet_size && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == kb->bragi_in_ep))){
         usbdevice* targetkb = kb;
         if(kb->protocol == PROTO_BRAGI){
             // Extract the device id

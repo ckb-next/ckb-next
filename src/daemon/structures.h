@@ -352,6 +352,11 @@ typedef struct usbdevice_ {
         BATT_STATUS_CHARGED,
     } battery_status;
     unsigned char battery_level;
+    enum {
+        STATUS_DISCONNECTED,
+        STATUS_CONNECTING,
+        STATUS_CONNECTED,
+    } status;
 } usbdevice;
 
 #ifdef OS_LINUX

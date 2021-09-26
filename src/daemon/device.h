@@ -9,12 +9,6 @@
 // If this gets raised to a double digit number, the changes introduced by commit f24988ab68a94 will need to be modified to accommodate for that
 #define DEV_MAX     9
 extern usbdevice keyboard[DEV_MAX];
-// Is a device active?
-#ifdef OS_LINUX
-#define IS_CONNECTED(kb) ((kb) && (kb)->handle && (((kb)->uinput_kb && (kb)->uinput_mouse) || IS_SINGLE_EP(kb)))
-#else
-#define IS_CONNECTED(kb) ((kb) && (kb)->handle && (kb)->event)
-#endif
 
 #ifdef NO_FAIR_MUTEX_QUEUEING
 #define QUEUED_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER

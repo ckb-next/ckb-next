@@ -302,8 +302,7 @@ static void* devmain(usbdevice* kb){
     while(1){
         ///
         /// If the reading via readlines() is successful (we might have read multiple lines),
-        /// the interpretation is done by readcmd() iff the connection to the device is still available
-        /// (checked via IS_CONNECTED(kb)).
+        /// the interpretation is done by readcmd() if the connection to the device is still available
         /// This is true if the kb-structure has a handle and an event pointer both != Null).
         /// If not, the loop is left (the first exit point).
         queued_mutex_unlock(dmutex(kb));
@@ -312,14 +311,13 @@ static void* devmain(usbdevice* kb){
         int lines = readlines(kbfifo, linectx, &line);
         queued_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
-        if(!IS_CONNECTED(kb))
+        if(kb->status == STATUS_DISCONNECTED)
             break;
         ///
         /// if nothing is in the line buffer (some magic interrupt?),
         /// continue in the endless while without any reaction.
         if(lines){
             /// \todo readcmd() gets a \b line, not \b lines. Have a look on that later.
-            /// \n Is the condition IS_CONNECTED valid? What functions change the condititon for the macro?
             if(readcmd(kb, line)){
                 ///
                 /// If interpretation and communication with the usb device got errors,
@@ -546,6 +544,7 @@ static void* _setupusb(void* context){
     // Finished. Enter main loop
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Setup finished for %s%d", devpath, index);
+    kb->status = STATUS_CONNECTED;
     queued_mutex_unlock(dmutex(kb));
     updateconnected(kb);
     queued_mutex_lock(dmutex(kb));
@@ -881,7 +880,7 @@ void reactivate_devices(){
     for(int i = 1; i < DEV_MAX; i++){
         usbdevice* kb = keyboard + i;
         queued_mutex_lock(dmutex(kb));
-        if(IS_CONNECTED(kb) && !NEEDS_FW_UPDATE(kb) && kb->active){
+        if(kb->status == STATUS_CONNECTED && !NEEDS_FW_UPDATE(kb) && kb->active){
             int ret;
             // If the device was active, mark it as disabled and re-enable it
             kb->active = 0;

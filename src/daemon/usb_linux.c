@@ -273,6 +273,7 @@ void os_closeusb(usbdevice* kb){
         udev_device_unref(kb->udev);
     kb->handle = 0;
     kb->udev = 0;
+    kb->status = STATUS_DISCONNECTED;
     kbsyspath[INDEX_OF(kb, keyboard)][0] = 0;
 }
 
@@ -469,15 +470,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
             // If the mutex is locked then the device is obviously in use, so keep going
             continue;
         }
-        // We can't use IS_CONNECTED() here.
-        // If multiple devices are being opened at once, we will attempt to set up the second one before
-        // we're done with the first one, which means the uinput handles might still be 0.
-        // This will cause IS_CONNECTED to return 0, resulting in overwriting ckb1's kb fields with ckb2's,
-        // leaving ckb1 in an unknown and possibly uninitialised state.
-        //
-        // This happened rarely because dmutex was most likely already locked, so we just skipped over the device
-        // before getting here. (See trylock above.)
-        if(!kb->handle){
+        if(kb->status == STATUS_DISCONNECTED){
             // Open the sysfs device
             kb->handle = open(path, O_RDWR) + 1;
             if(kb->handle <= 0){
@@ -491,6 +484,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
                 kb->vendor = vendor;
                 kb->product = product;
                 strncpy(kbsyspath[index], syspath, FILENAME_MAX);
+                kb->status = STATUS_CONNECTING;
                 // Mutex remains locked
                 setupusb(kb);
                 return 0;
@@ -653,12 +647,12 @@ int usbmain(){
         ckb_fatal("Failed to initialize udev in usbmain(), usb_linux.c");
         return -1;
     }
-    
+
     // Create thread that detects system suspend
     pthread_t suspend_thread;
     pthread_create(&suspend_thread, NULL, suspend_check, NULL);
     pthread_setname_np(suspend_thread, "suspend");
-    
+
     ///
     /// Enumerate all currently connected devices
     udev_enum();
@@ -672,7 +666,7 @@ int usbmain(){
     // Get an fd for the monitor
     int fd = udev_monitor_get_fd(monitor);
     fd_set fds;
-    
+
     while(udev){
         FD_ZERO(&fds);
         FD_SET(fd, &fds);
@@ -721,7 +715,7 @@ int usbmain(){
     udev_monitor_unref(monitor);
     suspend_run = 0;
     pthread_join(suspend_thread, NULL);
-    
+
     return 0;
 }
 

@@ -23,6 +23,10 @@ void bragi_fill_input_eps(usbdevice* kb)
     // Exceptions should set the EPs here
     if(kb->vendor == V_CORSAIR){
         switch(kb->product){
+            case P_K57_D:
+                kb->bragi_out_ep = 0x2;
+                kb->bragi_in_ep = 0x82;
+                break;
             case P_K57_U:
                 kb->bragi_out_ep = 0x1;
                 kb->bragi_in_ep = 0x82;

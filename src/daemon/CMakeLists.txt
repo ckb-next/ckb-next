@@ -80,8 +80,7 @@ if (MACOS OR LINUX)
               led_mouse.c
               led_mousepad.c
               led_wireless.c
-              led_mouse_bragi.c
-              led_keyboard_bragi.c
+              led_bragi.c
               main.c
               notify.c
               profile.c

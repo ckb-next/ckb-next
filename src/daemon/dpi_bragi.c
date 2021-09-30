@@ -18,7 +18,7 @@ void cmd_snap_bragi(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const 
     if(mode->dpi.snap != orig_snap){
         uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_ANGLE_SNAP, 0, mode->dpi.snap};
         uchar response[BRAGI_JUMBO_SIZE] = {0};
-        if(!usbrecv(kb, pkt, sizeof(pkt), response) || bragi_check_sucess(pkt, response))
+        if(!usbrecv(kb, pkt, sizeof(pkt), response) || bragi_check_success(pkt, response))
             return;
     }
 }
@@ -43,7 +43,7 @@ int updatedpi_bragi(usbdevice* kb, int force){
         return -2;
 #warning "FIXME: This fails initially for some reason, causing a reset"
     /*
-    if(bragi_check_sucess(pkt, response))
+    if(bragi_check_success(pkt, response))
         return -1;
     */
 
@@ -54,7 +54,7 @@ int updatedpi_bragi(usbdevice* kb, int force){
         return -2;
 
     /*
-    if(bragi_check_sucess(pkt, response))
+    if(bragi_check_success(pkt, response))
         return -1;
     */
 

@@ -49,11 +49,6 @@ size_t bragi_calculate_buffer_size(usbdevice* kb, uint32_t data_len){
     return bragi_calculate_buffer_size_common(kb, data_len, 7);
 }
 
-size_t bragi_calculate_buffer_size_offset(usbdevice* kb, uint32_t data_len){
-    return bragi_calculate_buffer_size_common(kb, data_len, 11);
-}
-
-
 // First offset bytes must be zeroed and will be overwritten by these functions
 // This is done to avoid having to allocate more memory and copy it on every write
 static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len, int offset){
@@ -93,6 +88,9 @@ static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar 
         // Send the new packet
         if(!usbrecv(kb, pkt_out, BRAGI_JUMBO_SIZE, response))
             return 1;
+        // Don't return if the packet failed, as it might be something recoverable.
+        // We don't really know what the error codes mean yet.
+        bragi_check_success(pkt_out, response);
     }
 
     return 0;
@@ -100,8 +98,4 @@ static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar 
 
 int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len){
     return bragi_write_to_handle_common(kb, pkt, handle, buf_len, data_len, 7);
-}
-
-int bragi_write_to_handle_offset(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len) {
-    return bragi_write_to_handle_common(kb, pkt, handle, buf_len, data_len, 11);
 }

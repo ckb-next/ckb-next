@@ -4,12 +4,13 @@
 #include "includes.h"
 #include "structures.h"
 #include "usb.h"
+#include "device.h" // for usbdevice keyboard[]
 #include <stdint.h>
 
 long int bragi_get_property(usbdevice* kb, const uchar prop);
 int bragi_set_property(usbdevice* kb, const uchar prop, const uchar val);
 
-#define bragi_check_sucess(a, b) _bragi_check_success((a), (b), INDEX_OF(kb, keyboard), __func__, __FILE__, __LINE__)
+#define bragi_check_success(a, b) _bragi_check_success((a), (b), INDEX_OF(kb, keyboard), __func__, __FILE__, __LINE__)
 
 static inline int _bragi_check_success(const uchar* out, const uchar* in, int dev, const char* fn, const char* file, int line){
     int res = (out[1] != in[1] || in[2]);
@@ -25,9 +26,6 @@ static inline int _bragi_check_success(const uchar* out, const uchar* in, int de
                                         return -1; \
                                     }
 
-// the _offset functions have 4 bytes extra after the header and before the data starts
 size_t bragi_calculate_buffer_size(usbdevice* kb, uint32_t data_len);
-size_t bragi_calculate_buffer_size_offset(usbdevice* kb, uint32_t data_len);
 int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len);
-int bragi_write_to_handle_offset(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len);
 #endif

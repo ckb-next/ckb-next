@@ -353,9 +353,10 @@ typedef struct usbdevice_ {
     } battery_status;
     unsigned char battery_level;
     enum {
-        STATUS_DISCONNECTED,
-        STATUS_CONNECTING,
-        STATUS_CONNECTED,
+        DEV_STATUS_DISCONNECTED,
+        DEV_STATUS_CONNECTING,
+        DEV_STATUS_CONNECTED,
+        DEV_STATUS_DISCONNECTING,
     } status;
     uchar bragi_out_ep;
     uchar bragi_in_ep;

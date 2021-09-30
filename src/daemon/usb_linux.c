@@ -273,7 +273,6 @@ void os_closeusb(usbdevice* kb){
         udev_device_unref(kb->udev);
     kb->handle = 0;
     kb->udev = 0;
-    kb->status = STATUS_DISCONNECTED;
     kbsyspath[INDEX_OF(kb, keyboard)][0] = 0;
 }
 
@@ -470,7 +469,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
             // If the mutex is locked then the device is obviously in use, so keep going
             continue;
         }
-        if(kb->status == STATUS_DISCONNECTED){
+        if(kb->status == DEV_STATUS_DISCONNECTED){
             // Open the sysfs device
             kb->handle = open(path, O_RDWR) + 1;
             if(kb->handle <= 0){
@@ -484,7 +483,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
                 kb->vendor = vendor;
                 kb->product = product;
                 strncpy(kbsyspath[index], syspath, FILENAME_MAX);
-                kb->status = STATUS_CONNECTING;
+                kb->status = DEV_STATUS_CONNECTING;
                 // Mutex remains locked
                 setupusb(kb);
                 return 0;

@@ -37,7 +37,7 @@ static void quit() {
     for(int i = 1; i < DEV_MAX; i++){
         // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
         queued_mutex_lock(devmutex + i);
-        if((keyboard + i)->status > STATUS_DISCONNECTED){
+        if((keyboard + i)->status == DEV_STATUS_CONNECTING || (keyboard + i)->status == DEV_STATUS_CONNECTED){
             revertusb(keyboard + i);
             closeusb(keyboard + i);
         }

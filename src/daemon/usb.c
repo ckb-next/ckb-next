@@ -314,7 +314,7 @@ static void* devmain(usbdevice* kb){
         int lines = readlines(kbfifo, linectx, &line);
         queued_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
-        if(kb->status == STATUS_DISCONNECTED)
+        if(kb->status == DEV_STATUS_DISCONNECTING || kb->status == DEV_STATUS_DISCONNECTED)
             break;
         ///
         /// if nothing is in the line buffer (some magic interrupt?),
@@ -547,7 +547,7 @@ static void* _setupusb(void* context){
     // Finished. Enter main loop
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Setup finished for %s%d", devpath, index);
-    kb->status = STATUS_CONNECTED;
+    kb->status = DEV_STATUS_CONNECTED;
     queued_mutex_unlock(dmutex(kb));
     updateconnected(kb);
     queued_mutex_lock(dmutex(kb));
@@ -793,6 +793,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
 /// and closeusb() always returns zero (success).
 ///
 int closeusb(usbdevice* kb){
+    kb->status = DEV_STATUS_DISCONNECTING;
     queued_mutex_lock(imutex(kb));
     if(kb->handle){
         int index = INDEX_OF(kb, keyboard);
@@ -849,6 +850,7 @@ int closeusb(usbdevice* kb){
         return 0;
     kb->vtable->freeprofile(kb);
     queued_mutex_lock(imutex(kb));
+    // This implicitly sets the status to STATUS_DISCONNECTED
     memset(kb, 0, sizeof(usbdevice));
     queued_mutex_unlock(imutex(kb));
     return 0;
@@ -883,7 +885,7 @@ void reactivate_devices(){
     for(int i = 1; i < DEV_MAX; i++){
         usbdevice* kb = keyboard + i;
         queued_mutex_lock(dmutex(kb));
-        if(kb->status == STATUS_CONNECTED && !NEEDS_FW_UPDATE(kb) && kb->active){
+        if(kb->status == DEV_STATUS_CONNECTED && !NEEDS_FW_UPDATE(kb) && kb->active){
             int ret;
             // If the device was active, mark it as disabled and re-enable it
             kb->active = 0;

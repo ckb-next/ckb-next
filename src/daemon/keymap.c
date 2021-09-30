@@ -517,6 +517,10 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         // The 2nd URB byte goes after the 13th in the keymap, shifted by 1 (otherwise it'll apply to voldn)
         // This has the modifiers, starting with lcrtl
         kbinput[13] = (kbinput[13] & 1) | (urbinput[1] << 1);
+
+        // Finally, copy the left over rwin that we lost due to the left shift above
+        // We can ovewrite the other bits with 0 as they aren't really used in NKRO mode
+        kbinput[14] = urbinput[1] >> 7;
     } else if(urbinput[0] == NKRO_MEDIA_IN && length == 3) {
         // This section is similar to handle_nkro_media_keys(), but with different indices due to the different keymap
         // This works because these keys can not be pressed at the same time

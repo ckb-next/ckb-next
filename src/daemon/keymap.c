@@ -11,7 +11,9 @@ static void hid_mouse_translate(usbinput* input, int length, const unsigned char
 static void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urbinput);
 
 // Copies input from Corsair reports
-static void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput);
+static inline void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput){
+    memcpy(kbinput, urbinput, N_KEYBYTES_HW);
+}
 static void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
 static void corsair_extended_mousecopy(unsigned char* kbinput, const unsigned char* urbinput);
 static void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput);
@@ -285,11 +287,77 @@ const key keymap[N_KEYS_EXTENDED] = {
 };
 
 // This gets patched on top of the above in keymap_patch.c in the same order
-// Ideally, we'll reorder these so that we don't need the key LUT
-// for mapping sw mode packets in bragi keyboards, at the expense
-// of having to make a new LUT for hid mode
+// The following keys are unknown and need to be added
+/*
+{ "ro",             -1, KEY_RO },
+{ "hanja",          -1, KEY_HANJA },
+{ "profswitch",    128, KEY_CORSAIR },
+{ "katahira",       -1, KEY_KATAKANAHIRAGANA },
+{ "hangul",         -1, KEY_HANGEUL },
+the G keys after G6, if they ever make another keyboard with them
+{ "yen",            -1, KEY_YEN }, // UNKNOWN
+{ "muhenkan",       -1, KEY_MUHENKAN },
+{ "henkan",         -1, KEY_HENKAN },
+*/
 const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { "a",               4, KEY_A },
+    { "b",               5, KEY_B },
+    { "c",               6, KEY_C },
+    { "d",               7, KEY_D },
+    { "e",               8, KEY_E },
+    { "f",               9, KEY_F },
+    { "g",              10, KEY_G },
+    { "h",              11, KEY_H },
+    { "i",              12, KEY_I },
+    { "j",              13, KEY_J },
+    { "k",              14, KEY_K },
+    { "l",              15, KEY_L },
+    { "m",              16, KEY_M },
+    { "n",              17, KEY_N },
+    { "o",              18, KEY_O },
+    { "p",              19, KEY_P },
+    { "q",              20, KEY_Q },
+    { "r",              21, KEY_R },
+    { "s",              22, KEY_S },
+    { "t",              23, KEY_T },
+    { "u",              24, KEY_U },
+    { "v",              25, KEY_V },
+    { "w",              26, KEY_W },
+    { "x",              27, KEY_X },
+    { "y",              28, KEY_Y },
+    { "z",              29, KEY_Z },
+    { "1",              30, KEY_1 },
+    { "2",              31, KEY_2 },
+    { "3",              32, KEY_3 },
+    { "4",              33, KEY_4 },
+    { "5",              34, KEY_5 },
+    { "6",              35, KEY_6 },
+    { "7",              36, KEY_7 },
+    { "8",              37, KEY_8 },
+    { "9",              38, KEY_9 },
+    { "0",              39, KEY_0 },
+    { "enter",          40, KEY_ENTER },
     { "esc",            41, KEY_ESC },
+    { "bspace",         42, KEY_BACKSPACE },
+    { "tab",            43, KEY_TAB },
+    { "space",          44, KEY_SPACE },
+    { "minus",          45, KEY_MINUS },
+    { "equal",          46, KEY_EQUAL },
+    { "lbrace",         47, KEY_LEFTBRACE },
+    { "rbrace",         48, KEY_RIGHTBRACE },
+    { "bslash",         49, KEY_BACKSLASH },
+    { "hash",           50,  KEY_BACKSLASH_ISO },
+    { "colon",          51, KEY_SEMICOLON },
+    { "quote",          52, KEY_APOSTROPHE },
+    { "grave",          53, KEY_GRAVE },
+    { "comma",          54, KEY_COMMA },
+    { "dot",            55, KEY_DOT },
+    { "slash",          56, KEY_SLASH },
+    { "caps",           57, KEY_CAPSLOCK },
     { "f1",             58, KEY_F1 },
     { "f2",             59, KEY_F2 },
     { "f3",             60, KEY_F3 },
@@ -301,66 +369,6 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "f9",             66, KEY_F9 },
     { "f10",            67, KEY_F10 },
     { "f11",            68, KEY_F11 },
-    { "grave",          53, KEY_GRAVE },
-    { "1",              30, KEY_1 },
-    { "2",              31, KEY_2 },
-    { "3",              32, KEY_3 },
-    { "4",              33, KEY_4 },
-    { "5",              34, KEY_5 },
-    { "6",              35, KEY_6 },
-    { "7",              36, KEY_7 },
-    { "8",              37, KEY_8 },
-    { "9",              38, KEY_9 },
-    { "0",              39, KEY_0 },
-    { "minus",          45, KEY_MINUS },
-    { "tab",            43, KEY_TAB },
-    { "q",              20, KEY_Q },
-    { "w",              26, KEY_W },
-    { "e",               8, KEY_E },
-    { "r",              21, KEY_R },
-    { "t",              23, KEY_T },
-    { "y",              28, KEY_Y },
-    { "u",              24, KEY_U },
-    { "i",              12, KEY_I },
-    { "o",              18, KEY_O },
-    { "p",              19, KEY_P },
-    { "lbrace",         47, KEY_LEFTBRACE },
-    { "caps",           57, KEY_CAPSLOCK },
-    { "a",               4, KEY_A },
-    { "s",              22, KEY_S },
-    { "d",               7, KEY_D },
-    { "f",               9, KEY_F },
-    { "g",              10, KEY_G },
-    { "h",              11, KEY_H },
-    { "j",              13, KEY_J },
-    { "k",              14, KEY_K },
-    { "l",              15, KEY_L },
-    { "colon",          51, KEY_SEMICOLON },
-    { "quote",          52, KEY_APOSTROPHE },
-    { "lshift",        106, KEY_LEFTSHIFT },
-    { "bslash_iso",    100, KEY_102ND }, // UNKNOWN
-    { "z",              29, KEY_Z },
-    { "x",              27, KEY_X },
-    { "c",               6, KEY_C },
-    { "v",              25, KEY_V },
-    { "b",               5, KEY_B },
-    { "n",              17, KEY_N },
-    { "m",              16, KEY_M },
-    { "comma",          54, KEY_COMMA },
-    { "dot",            55, KEY_DOT },
-    { "slash",          56, KEY_SLASH },
-    { "lctrl",         105, KEY_LEFTCTRL },
-    { "lwin",          108, KEY_LEFTMETA },
-    { "lalt",          107, KEY_LEFTALT },
-    { "hanja",          -1, KEY_HANJA },
-    { "space",          44, KEY_SPACE },
-    { "hangul",         -1, KEY_HANGEUL },
-    { "katahira",       -1, KEY_KATAKANAHIRAGANA },
-    { "ralt",          111, KEY_RIGHTALT },
-    { "rwin",          112, KEY_RIGHTMETA },
-    { "rmenu",         101, KEY_COMPOSE },
-    { "profswitch",    128, KEY_CORSAIR },
-    { "light",         113, KEY_CORSAIR },
     { "f12",            69, KEY_F12 },
     { "prtscn",         70, KEY_SYSRQ },
     { "scroll",         71, KEY_SCROLLLOCK },
@@ -368,79 +376,82 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "ins",            73, KEY_INSERT },
     { "home",           74, KEY_HOME },
     { "pgup",           75, KEY_PAGEUP },
-    { "rbrace",         48, KEY_RIGHTBRACE },
-    { "bslash",         49, KEY_BACKSLASH },
-    { "hash",           50, KEY_BACKSLASH_ISO },
-    { "enter",          40, KEY_ENTER },
-    { "ro",             -1, KEY_RO }, // UNKNOWN
-    { "equal",          46, KEY_EQUAL },
-    { "yen",            -1, KEY_YEN }, // UNKNOWN
-    { "bspace",         42, KEY_BACKSPACE },
     { "del",            76, KEY_DELETE },
     { "end",            77, KEY_END },
     { "pgdn",           78, KEY_PAGEDOWN },
-    { "rshift",        110, KEY_RIGHTSHIFT },
-    { "rctrl",         109, KEY_RIGHTCTRL },
-    { "up",             82, KEY_UP },
+    { "right",          79, KEY_RIGHT },
     { "left",           80, KEY_LEFT },
     { "down",           81, KEY_DOWN },
-    { "right",          79, KEY_RIGHT },
-    { "lock",          114, KEY_CORSAIR },
-    { "mute",          102, KEY_MUTE },
-    { "stop",          123, KEY_STOPCD },
-    { "prev",          126, KEY_PREVIOUSSONG },
-    { "play",          124, KEY_PLAYPAUSE },
-    { "next",          125, KEY_NEXTSONG },
+    { "up",             82, KEY_UP },
     { "numlock",        83, KEY_NUMLOCK },
     { "numslash",       84, KEY_KPSLASH },
     { "numstar",        85, KEY_KPASTERISK },
     { "numminus",       86, KEY_KPMINUS },
     { "numplus",        87, KEY_KPPLUS },
     { "numenter",       88, KEY_KPENTER },
-    { "num7",           95, KEY_KP7 },
-    { "num8",           96, KEY_KP8 },
-    { "num9",           97, KEY_KP9 },
-    { 0,                -1, KEY_NONE },
-    { "num4",           92, KEY_KP4 },
-    { "num5",           93, KEY_KP5 },
-    { "num6",           94, KEY_KP6 },
     { "num1",           89, KEY_KP1 },
     { "num2",           90, KEY_KP2 },
     { "num3",           91, KEY_KP3 },
+    { "num4",           92, KEY_KP4 },
+    { "num5",           93, KEY_KP5 },
+    { "num6",           94, KEY_KP6 },
+    { "num7",           95, KEY_KP7 },
+    { "num8",           96, KEY_KP8 },
+    { "num9",           97, KEY_KP9 },
     { "num0",           98, KEY_KP0 },
     { "numdot",         99, KEY_KPDOT },
+    { "bslash_iso",    100, KEY_102ND },
+    { "rmenu",         101, KEY_COMPOSE },
+    { "mute",          102, KEY_MUTE },
+    { "volup",         103, KEY_VOLUMEUP },
+    { "voldn",         104, KEY_VOLUMEDOWN },
+    { "lctrl",         105, KEY_LEFTCTRL },
+    { "lshift",        106, KEY_LEFTSHIFT },
+    { "lalt",          107, KEY_LEFTALT },
+    { "lwin",          108, KEY_LEFTMETA },
+    { "rctrl",         109, KEY_RIGHTCTRL },
+    { "rshift",        110, KEY_RIGHTSHIFT },
+    { "ralt",          111, KEY_RIGHTALT },
+    { "rwin",          112, KEY_RIGHTMETA },
+    { "light",         113, KEY_CORSAIR },
+    { "lock",            1, KEY_CORSAIR },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { "fn",            122, KEY_FN },
+    { "stop",          123, KEY_STOPCD },
+    { "play",          124, KEY_PLAYPAUSE },
+    { "next",          125, KEY_NEXTSONG },
+    { "prev",          126, KEY_PREVIOUSSONG },
+    { "mr",             -1, KEY_CORSAIR },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
     { "g1",            131, KEY_CORSAIR },
     { "g2",            132, KEY_CORSAIR },
     { "g3",            133, KEY_CORSAIR },
     { "g4",            134, KEY_CORSAIR },
     { "g5",            135, KEY_CORSAIR },
     { "g6",            136, KEY_CORSAIR },
-    { "g7",             -1, KEY_CORSAIR }, // This and below up until topbar are unknown
-    { "g8",             -1, KEY_CORSAIR },
-    { "g9",             -1, KEY_CORSAIR },
-    { "g10",            -1, KEY_CORSAIR },
-    { "volup",          -1, KEY_VOLUMEUP },
-    { "voldn",          -1, KEY_VOLUMEDOWN },
-    { "mr",             -1, KEY_CORSAIR },
-    { "m1",             -1, KEY_CORSAIR },
-    { "m2",             -1, KEY_CORSAIR },
-    { "m3",             -1, KEY_CORSAIR },
-    { "g11",            -1, KEY_CORSAIR },
-    { "g12",            -1, KEY_CORSAIR },
-    { "g13",            -1, KEY_CORSAIR },
-    { "g14",            -1, KEY_CORSAIR },
-    { "g15",            -1, KEY_CORSAIR },
-    { "g16",            -1, KEY_CORSAIR },
-    { "g17",            -1, KEY_CORSAIR },
-    { "g18",            -1, KEY_CORSAIR },
-    { "muhenkan",       -1, KEY_MUHENKAN },
-    { "henkan",         -1, KEY_HENKAN },
-    { "fn",            122, KEY_FN },
     { 0,                -1, KEY_NONE },
     { 0,                -1, KEY_NONE },
     { 0,                -1, KEY_NONE },
     { 0,                -1, KEY_NONE },
     { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { 0,                -1, KEY_NONE },
+    { "status",          0, KEY_NONE }, // This might need to be moved elsewhere
     { "topbar1",       137, KEY_NONE },
     { "topbar2",       138, KEY_NONE },
     { "topbar3",       139, KEY_NONE },
@@ -484,12 +495,6 @@ static const short hid_codes[256] = {
      -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
 };
 
-static const short bragi_extra_lut[56] = {
-    109, 110, 118, 119, 108,  49,  97, 130, 131, 60,  48,  62,  61,  91,  90,  67,
-     68,  71,  96,  -2,  -2,  -2,  -2,  -2,  -2, -2,  -2,  98, 100, 101,  99,  -2,
-     70,  -2,  -2, 120, 121, 122, 123, 124, 125, -2,  -2,  -2,  -2,  -2,  -2,  -2,
-};
-
 // There are three types of keyboard input. 6KRO, NKRO and Corsair.
 //
 // 6KRO is only enabled in BIOS mode, and since we do not touch devices in bios mode,
@@ -503,56 +508,54 @@ static const short bragi_extra_lut[56] = {
 // Handled by corsair_kbcopy()
 
 static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
-    // Skip the 0x00 0x02 header
-    urbinput += 2;
+    // Handle the 01 input and 02 media keys
+    if(urbinput[0] == NKRO_KEY_IN && length == 16){
+        // Skipping the first two bytes, the following 13 bytes can be copied as-is, with an offset
+        // So let's copy them first before we start bodging
+        memcpy(kbinput, urbinput + 2, 13);
 
-    for(int byte = 0; byte < 12; byte++){
-        char input = urbinput[byte];
-        for(int bit = 0; bit < 8; bit++){
-            int keybit = byte * 8 + bit;
-            int scan = hid_codes[keybit];
-            if((input >> bit) & 1){
-                if(scan >= 0)
-                    SET_KEYBIT(kbinput, scan);
-                else
-                    ckb_warn("Got unknown bragi key press %d", keybit);
-            } else if(scan >= 0)
-                CLEAR_KEYBIT(kbinput, scan);
+        // The 2nd URB byte goes after the 13th in the keymap, shifted by 1 (otherwise it'll apply to voldn)
+        // This has the modifiers, starting with lcrtl
+        kbinput[13] = (kbinput[13] & 1) | (urbinput[1] << 1);
+    } else if(urbinput[0] == NKRO_MEDIA_IN && length == 3) {
+        // This section is similar to handle_nkro_media_keys(), but with different indices due to the different keymap
+        // This works because these keys can not be pressed at the same time
+        CLEAR_KEYBIT(kbinput, 125);         // next
+        CLEAR_KEYBIT(kbinput, 126);         // prev
+        CLEAR_KEYBIT(kbinput, 123);         // stop
+        CLEAR_KEYBIT(kbinput, 124);         // play
+
+        CLEAR_KEYBIT(kbinput, 102);         // mute
+        CLEAR_KEYBIT(kbinput, 103);         // volup
+        CLEAR_KEYBIT(kbinput, 104);         // voldn
+
+        // We only care about the first byte
+        switch(urbinput[1]){
+        case 181:
+            SET_KEYBIT(kbinput, 125);   // next
+            break;
+        case 182:
+            SET_KEYBIT(kbinput, 126);   // prev
+            break;
+        case 183:
+            SET_KEYBIT(kbinput, 123);   // stop
+            break;
+        case 205:
+            SET_KEYBIT(kbinput, 124);   // play
+            break;
+        case 226:
+            SET_KEYBIT(kbinput, 102);   // mute
+            break;
+        case 233:
+            SET_KEYBIT(kbinput, 103);   // volup
+            break;
+        case 234:
+            SET_KEYBIT(kbinput, 104);   // voldn
+            break;
         }
+    } else {
+        ckb_err("Invalid length %d and header 0x%hhx combination in handle_bragi_key_input()", length, urbinput[0]);
     }
-
-    // This is supposed to be the byte at offset 0x01, but because the header has an 0x02 at that position,
-    // it's moved to offset 0x15, right after the above loop finishes.
-    // Since there's more after this, we just read from a different LUT
-    for(int byte = 0; byte < 6; byte++){
-        char input = urbinput[12 + byte];
-        for(int bit = 0; bit < 8; bit++){
-            int keybit = byte * 8 + bit;
-            int scan = bragi_extra_lut[keybit];
-            if((input >> bit) & 1){
-                if(scan >= 0)
-                    SET_KEYBIT(kbinput, scan);
-                else
-                    ckb_warn("Got unknown extended bragi key press %d", keybit);
-            } else if(scan >= 0)
-                CLEAR_KEYBIT(kbinput, scan);
-        }
-    }
-    /*
-    for(int bit = 0; bit < 8; bit++){
-        if((urbinput[13] >> bit) & 1)
-            SET_KEYBIT(kbinput, hid_codes[bit + 223]);
-        else
-            CLEAR_KEYBIT(kbinput, hid_codes[bit + 223]);
-    }
-
-    // Followed by rwin at urbinput[14], bit 0
-    if((urbinput[13] >> bit) & 1)
-        SET_KEYBIT(kbinput, hid_codes[bit + 223]);
-    else
-        CLEAR_KEYBIT(kbinput, hid_codes[ + 223]);
-    223+8
-    */
 }
 
 void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep){
@@ -626,16 +629,19 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 // Assume Keyboard for everything else for now
                 // Accept NKRO only if device is not active
                 if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
-                    if(!kb->active)
-                        hid_kb_translate(kb->input.keys, urblen, buffer, 0);
-                } else if(urblen == MSG_SIZE) {
-                    if(kb->protocol == PROTO_BRAGI) {
-                        handle_bragi_key_input(kb->input.keys, buffer, urblen);
-                    } else {
-                        if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
-                            buffer++;
-                        corsair_kbcopy(kb->input.keys, buffer);
+                    if(!kb->active){
+                        if(kb->protocol == PROTO_BRAGI)
+                            handle_bragi_key_input(kb->input.keys, buffer, urblen);
+                        else
+                            hid_kb_translate(kb->input.keys, urblen, buffer, 0);
                     }
+                } else if(urblen == MSG_SIZE) {
+                    // Skip the bragi header
+                    if(kb->protocol == PROTO_BRAGI)
+                        buffer += 2;
+                    else if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
+                        buffer++;
+                    corsair_kbcopy(kb->input.keys, buffer);
                 } else
                     ckb_err("Unknown data received in input thread %02x from endpoint %02x", firstbyte, ep);
             }
@@ -648,7 +654,13 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
 }
 
 void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length, int legacy){
+    int bytelen = (legacy ? 14 : 19);
     int start = !legacy; // Legacy packets start from 0x00, other ones start from 0x01
+    if(length < start + bytelen + 1){
+        ckb_err("Invalid length %d in handle_nkro_key_input() legacy %d", length, legacy);
+        return;
+    }
+
     for(int bit = 0; bit < 8; bit++){
         if((urbinput[start] >> bit) & 1)
             SET_KEYBIT(kbinput, hid_codes[bit + 224]);
@@ -656,7 +668,6 @@ void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput
             CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
     }
 
-    int bytelen = (legacy ? 14 : 19);
     for(int byte = 0; byte < bytelen; byte++){
         char input = urbinput[start + byte + 1];
         for(int bit = 0; bit < 8; bit++){
@@ -778,10 +789,6 @@ void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbin
     input->rel_y += (urbinput[7] << 8) | urbinput[6];
     // Byte 9: wheel
     input->whl_rel_y = (char)urbinput[8];
-}
-
-void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput){
-    memcpy(kbinput, urbinput, N_KEYBYTES_HW);
 }
 
 void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){

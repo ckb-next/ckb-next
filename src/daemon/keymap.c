@@ -509,7 +509,8 @@ static const short hid_codes[256] = {
 
 static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
     // Handle the 01 input and 02 media keys
-    if(urbinput[0] == NKRO_KEY_IN && length == 16){
+    // On the K57 WL length is 16, but on the K95P XT it is 21
+    if(urbinput[0] == NKRO_KEY_IN && length >= 16){
         // Skipping the first two bytes, the following 13 bytes can be copied as-is, with an offset
         // So let's copy them first before we start bodging
         memcpy(kbinput, urbinput + 2, 13);

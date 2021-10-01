@@ -13,11 +13,19 @@
 
 // What to get/set
 #define BRAGI_POLLRATE      0x01
+#define BRAGI_BRIGHTNESS    0x02
 #define BRAGI_MODE          0x03
 #define BRAGI_ANGLE_SNAP    0x07
+#define BRAGI_DPI_INDEX     0x1E
+#define BRAGI_DPI_MASK      0x1F
 #define BRAGI_DPI_X         0x21
 #define BRAGI_DPI_Y         0x22
+#define BRAGI_DPI0_COLOR    0x2F
+#define BRAGI_DPI1_COLOR    0x30
+#define BRAGI_DPI2_COLOR    0x31
 #define BRAGI_HWLAYOUT      0x41
+
+// 0x18-0x1A contain the DPI values for DPI0,1,2 0x23-0x28 contain the seperated DPIX and Y values for DPI0,1,2
 
 // Read only dev info
 #define BRAGI_VID           0x11

@@ -617,6 +617,9 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         } else {
                             kb->input.rel_x += (buffer[5] << 8) | buffer[4];
                             kb->input.rel_y += (buffer[7] << 8) | buffer[6];
+                            // Some bragi devices do not report scrolling in the SW packet
+                            if(SW_PKT_HAS_NO_WHEEL(kb))
+                                kb->input.whl_rel_y = (signed char)buffer[8];
                         }
                     } else {
                         hid_mouse_translate(&kb->input, urblen, buffer);
@@ -885,6 +888,10 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
         else
             CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
     }
+
+    // Do not try to read the wheel from the SW packet if there's no data for it
+    if(SW_PKT_HAS_NO_WHEEL(kb))
+        return;
 
     // This needs to be signed
     signed char wheel = urbinput[2];

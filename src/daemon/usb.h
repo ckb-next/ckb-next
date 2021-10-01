@@ -282,6 +282,9 @@ const char* product_str(ushort product);
 // Devices that use bragi jumbo packets (1024 bytes)
 #define USES_BRAGI_JUMBO(vendor, product)           ((vendor) == (V_CORSAIR) && 0)
 
+// Used for devices that have the scroll wheel packet in the hardware hid packet only
+#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_KATAR_PRO_XT))
+
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();
 

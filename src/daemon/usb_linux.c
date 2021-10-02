@@ -21,7 +21,7 @@ int os_usb_control(usbdevice* kb, ctrltransfer* transfer, const char* file, int 
     const int ckb = INDEX_OF(kb, keyboard);
     ckb_info("ckb%d Control (%s:%d): bmRequestType: 0x%02hhx, bRequest: %hhu, wValue: 0x%04hx, wIndex: %04hx, wLength: %hu", ckb, file, line, transfer->bRequestType, transfer->bRequest, transfer->wValue, transfer->wIndex, transfer->wLength);
     if(transfer->wLength)
-        print_urb_buffer("Control buffer:", transfer->data, transfer->wLength, file, line, __func__, ckb);
+        print_urb_buffer("Control buffer:", transfer->data, transfer->wLength, file, line, __func__, ckb, 0);
 #endif
 
     const int res = ioctl(kb->handle - 1, USBDEVFS_CONTROL, transfer);
@@ -42,7 +42,7 @@ int os_usb_control(usbdevice* kb, ctrltransfer* transfer, const char* file, int 
 int os_usb_interrupt_out(usbdevice* kb, unsigned int ep, unsigned int len, uchar* data, const char* file, int line)
 {
 #ifdef DEBUG_USB_SEND
-    print_urb_buffer("Sending:", data, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard));
+    print_urb_buffer("Sending:", data, MSG_SIZE, file, line, __func__, INDEX_OF(kb, keyboard), (uchar)ep);
 #endif
     const struct usbdevfs_bulktransfer transfer = { .ep = ep, .len = len, .timeout = 5000, .data = data, };
     int res = ioctl(kb->handle - 1, USBDEVFS_BULK, &transfer);

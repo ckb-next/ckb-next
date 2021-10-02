@@ -861,14 +861,17 @@ int closeusb(usbdevice* kb){
 }
 
 /// Formats and writes the current urb buffer to the console
-void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum){
+void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum, const uchar ep){
     char* converted = malloc(actual_length * 3 + 1);
     for(int i = 0; i < actual_length; i++)
         sprintf(converted + i * 3, "%02x ", buffer[i]);
+    char ep_str[6] = {0};
+    if(ep)
+        snprintf(ep_str, sizeof(ep_str), " (%02x)", ep);
     if(line == 0)
-        ckb_info("ckb%i %s %s", devnum, prefix, converted);
+        ckb_info("ckb%d %s%s %s", devnum, prefix, ep_str, converted);
     else
-        ckb_info("ckb%i %s (via %s:%d) %s %s", devnum, function, file, line, prefix, converted);
+        ckb_info("ckb%d %s (via %s:%d) %s%s %s", devnum, function, file, line, prefix, ep_str, converted);
     free(converted);
 }
 

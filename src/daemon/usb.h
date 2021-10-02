@@ -411,7 +411,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
 /// \return 0 on success, -1 otherwise
 int usb_tryreset(usbdevice* kb);
 
-void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum);
+void print_urb_buffer(const char* prefix, const unsigned char* buffer, int actual_length, const char* file, int line, const char* function, int devnum, const uchar ep);
 
 int os_usb_control(usbdevice* kb, ctrltransfer* transfer, const char* file, int line);
 

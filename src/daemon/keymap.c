@@ -570,7 +570,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     usbdevice* kb = context;
 
 #ifdef DEBUG_USB_INPUT
-    print_urb_buffer("Input Recv:", buffer, urblen, NULL, 0, NULL, INDEX_OF(kb, keyboard));
+    print_urb_buffer("Input:", buffer, urblen, NULL, 0, NULL, INDEX_OF(kb, keyboard), (uchar)ep);
 #endif
 
     // Get first byte of the response

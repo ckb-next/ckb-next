@@ -613,7 +613,10 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                     // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
                     if(kb->active) {
                         if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1) {
-                            corsair_bragi_mousecopy(kb, &kb->input, buffer);
+                            if(urblen == 64)
+                                corsair_bragi_mousecopy(kb, &kb->input, buffer);
+                            else
+                                ckb_err("Invalid length in corsair_bragi_mousecopy(). Expected 64, got %d", urblen);
                         } else {
                             kb->input.rel_x += (buffer[5] << 8) | buffer[4];
                             kb->input.rel_y += (buffer[7] << 8) | buffer[6];
@@ -860,46 +863,70 @@ void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urb
 
 // We have to do it this way, because if we patch the keymap, then we'll break standard input
 const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
-        0x00,
-        0x01,
-        0x02,
-        0x04,
-        0x03,
-        0x05,
-        0x06,
-        0x08,
-        0x09,
-        0x07, // Anything past this is untested
-        0x0A,
-        0x0B,
-        0x0C,
-        0x0D,
-        0x0E,
-        0x0F,
-    };
+    0x00,
+    0x01,
+    0x02,
+    0x04,
+    0x03,
+    0x05,
+    0x06,
+    0x08,
+    0x09,
+    0x07, // Anything past this is untested
+    0x0A,
+    0x0B,
+    0x0C,
+    0x0D,
+    0x0E,
+    0x0F,
+};
+
+// DPI cycle/up and forwards are just swapped compared to corsair_bragi_lut
+const unsigned char harpoon_wl_lut[BRAGI_MOUSE_BUTTONS] = {
+    0x00,
+    0x01,
+    0x02,
+    0x04,
+    0x05,
+    0x03,
+};
 
 void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput){
-    urbinput += 2;
-    for(int bit = 0; bit < BRAGI_MOUSE_BUTTONS; bit++){
-        int byte = bit / 8;
-        uchar test = 1 << (bit % 8);
-        if(urbinput[byte] & test)
-            SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+    // Increment this only once, as the loop below will increment it the first time as well
+    // to skip the 00 02 header.
+    urbinput++;
+
+    int buttons = BRAGI_MOUSE_BUTTONS;
+
+    // Some devices only have one byte, so set those to 8 buttons
+    // We need a better way to identify this
+    if(kb->vendor == V_CORSAIR && (kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U))
+        buttons = 8;
+
+    // Pick the appropriate LUT. We can't patch the keymap as that will break standard HID input.
+    const unsigned char* lut = corsair_bragi_lut;
+    if(kb->vendor == V_CORSAIR && kb->product == P_HARPOON_WL_U)
+        lut = harpoon_wl_lut;
+
+    for(int bit = 0; bit < buttons; bit++){
+        int bitinbyte = bit % 8;
+        // On every byte change, increment the input packet pointer
+        if(bitinbyte == 0)
+            urbinput++;
+
+        uchar test = 1 << bitinbyte;
+        if(*urbinput & test)
+            SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + lut[bit]);
         else
-            CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + corsair_bragi_lut[bit]);
+            CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + lut[bit]);
     }
 
     // Do not try to read the wheel from the SW packet if there's no data for it
     if(SW_PKT_HAS_NO_WHEEL(kb))
         return;
 
-    // This needs to be signed
-    signed char wheel = urbinput[2];
-
-    // We need a better way to identify this
-    if(kb->vendor == V_CORSAIR && (kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U))
-        wheel = urbinput[1];
-
-    input->whl_rel_y = wheel;
+    // Read the wheel data that's located right after the button data.
+    urbinput++;
+    input->whl_rel_y = (signed char)*urbinput;
 }
 

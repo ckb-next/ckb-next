@@ -897,7 +897,7 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
     signed char wheel = urbinput[2];
 
     // We need a better way to identify this
-    if(kb->vendor == V_CORSAIR && (kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL))
+    if(kb->vendor == V_CORSAIR && (kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U))
         wheel = urbinput[1];
 
     input->whl_rel_y = wheel;

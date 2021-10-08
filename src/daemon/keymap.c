@@ -610,9 +610,12 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 // HID Mouse Input
                 // In HW mode, Bragi mouse is the same as NXP, but without a header
                 if(kb->protocol == PROTO_BRAGI) {
-                    // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
-                    if(kb->active) {
-                        if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_1) {
+                    // Discard device notifications for now
+                    if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_NOTIFY){
+
+                    } else if(kb->active) {
+                        // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
+                        if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_HID) {
                             if(urblen == 64)
                                 corsair_bragi_mousecopy(kb, &kb->input, buffer);
                             else

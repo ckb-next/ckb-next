@@ -848,6 +848,7 @@ void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urb
 }
 
 #define BRAGI_MOUSE_BUTTONS 16
+#define BRAGI_ONE_BYTE_MOUSE_BUTTONS 8
 /*
 01 00 == Left
 02 00 == Right
@@ -882,13 +883,15 @@ const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
 };
 
 // DPI cycle/up and forwards are just swapped compared to corsair_bragi_lut
-const unsigned char harpoon_wl_lut[BRAGI_MOUSE_BUTTONS] = {
+const unsigned char harpoon_wl_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
     0x00,
     0x01,
     0x02,
     0x04,
     0x05,
     0x03,
+    0x06, // This and the one below are unused
+    0x08, // but we need them to be non zero so that they don't undo left click
 };
 
 void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput){
@@ -901,7 +904,7 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
     // Some devices only have one byte, so set those to 8 buttons
     // We need a better way to identify this
     if(kb->vendor == V_CORSAIR && (kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U))
-        buttons = 8;
+        buttons = BRAGI_ONE_BYTE_MOUSE_BUTTONS;
 
     // Pick the appropriate LUT. We can't patch the keymap as that will break standard HID input.
     const unsigned char* lut = corsair_bragi_lut;

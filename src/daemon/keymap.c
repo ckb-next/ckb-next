@@ -887,9 +887,9 @@ const unsigned char harpoon_wl_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
     0x00,
     0x01,
     0x02,
-    0x04,
     0x05,
     0x03,
+    0x04,
     0x06, // This and the one below are unused
     0x08, // but we need them to be non zero so that they don't undo left click
 };

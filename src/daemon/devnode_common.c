@@ -48,7 +48,7 @@ void _updateconnected(usbdevice* kb){
             ckb_info("Locking ckb%d in _updateconnected()", i);
 #endif
             queued_mutex_lock(devmutex + i);
-            if(kb->status == STATUS_CONNECTED){
+            if(IS_CONNECTED(kb)){
                 written = 1;
                 fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].serial, keyboard[i].name);
             }

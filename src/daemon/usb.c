@@ -429,8 +429,9 @@ static void* _setupusb(void* context){
     /// As a result, some parameters should be set in kb (name, serial, fwversion, epcount = number of usb endpoints),
     /// and all endpoints should be claimed with usbclaim().
     /// Claiming is the only point where os_setupusb() can produce an error (-1, otherwise 0).
-    if(os_setupusb(kb))
-        goto fail;
+    if(!kb->parent)
+        if(os_setupusb(kb))
+            goto fail;
 
     ///
     /// - The following two statements deal with possible errors when setting the kb values in the current routine:
@@ -459,26 +460,28 @@ static void* _setupusb(void* context){
     ///
     /// - The next action is to create a separate thread, which gets as parameter kb and starts with os_inputmain().
     /// The thread is immediately detached so that it can return its resource completely independently if it should terminate.
-    if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
-        goto fail;
+    if(!kb->parent){
+        if(pthread_create(&kb->inputthread, 0, os_inputmain, kb))
+            goto fail;
 
 #ifndef OS_MAC
-    // name this thread externally if not on mac,
-    // on mac `pthread_setname_np` is only naming the current thread
-    char inputthread_name[THREAD_NAME_MAX] = "ckbX input";
-    inputthread_name[3] = INDEX_OF(kb, keyboard) + '0';
-    pthread_setname_np(kb->inputthread, inputthread_name);
+        // name this thread externally if not on mac,
+        // on mac `pthread_setname_np` is only naming the current thread
+        char inputthread_name[THREAD_NAME_MAX] = "ckbX input";
+        inputthread_name[3] = INDEX_OF(kb, keyboard) + '0';
+        pthread_setname_np(kb->inputthread, inputthread_name);
 #endif // OS_MAC
-    pthread_detach(kb->inputthread);
+        pthread_detach(kb->inputthread);
 
-    ///
-    /// - The same happens with os_setupindicators(),
-    /// which initially initializes all LED variables in kb to off and then starts the _ledthread() thread
-    /// with kb as parameter and then detaches it.
-    /// Here again only the generation of the thread can fail.
-    if(!(IS_MOUSE_DEV(kb) || IS_MOUSEPAD_DEV(kb))) {
-        if(os_setupindicators(kb))
-            goto fail;
+        ///
+        /// - The same happens with os_setupindicators(),
+        /// which initially initializes all LED variables in kb to off and then starts the _ledthread() thread
+        /// with kb as parameter and then detaches it.
+        /// Here again only the generation of the thread can fail.
+        if(!(IS_MOUSE_DEV(kb) || IS_MOUSEPAD_DEV(kb))) {
+            if(os_setupindicators(kb))
+                goto fail;
+        }
     }
 
     // Set up device

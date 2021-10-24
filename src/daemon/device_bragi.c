@@ -40,6 +40,15 @@ static int setactive_bragi(usbdevice* kb, int active){
     }
 
     clear_input_and_rgb(kb, active - 1);
+    // Propagate the active status to the parent
+#warning "FIXME: On idle we should only propagate it if we're the last device left active"
+    if(kb->parent){
+        usbdevice* p = kb->parent;
+        queued_mutex_lock(dmutex(p));
+        // FIXME: Should we use setactive from the vtable?
+        p->active = kb->active;
+        queued_mutex_unlock(dmutex(p));
+    }
 
     // We don't need to do anything else if we're going back to hardware mode
     if(active == BRAGI_MODE_HARDWARE)

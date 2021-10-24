@@ -575,17 +575,43 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
 
     // Get first byte of the response
     uchar firstbyte = buffer[0];
-    // If the response starts with CMD_GET (0x0e), or it came from ep4 with bragi, that means it needs to go to os_usbrecv()
-    if(urblen == kb->out_ep_packet_size && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == kb->bragi_in_ep))){
-        usbdevice* targetkb = kb;
-        if(kb->protocol == PROTO_BRAGI){
+
+    // Legacy and NXP devices don't support children
+    // so we don't use targetkb in code specific to those.
+    // For when we explicitly need to address the dongle/root device, we also use plain `kb`
+
+    // In HW mode, all wireless events come from the dongle device (0).
+    // In SW mode, each (remappable) event comes from the appropriate child device.
+    // Unremappable events such as mouse movement continue to come from the dongle device even in SW mode.
+    //
+    // We need to use heuristics to detect mouse and keyboard packets in both modes
+    // to forward them to the appropriate child.
+    //
+    // All device specific events have the max length of bytes
+    usbdevice* targetkb = kb;
+    if(kb->protocol == PROTO_BRAGI && IS_DONGLE(kb)){
+        if(urblen == kb->out_ep_packet_size){
             // Extract the device id
             int devid = firstbyte & 0x7;
-            if(devid && kb->children[devid - 1]){
+            if(devid && kb->children[devid - 1])
                 targetkb = kb->children[devid - 1];
-            }
-        }
+        } else {
+            // Guess what device the event needs to go to
 
+            // FIXME: We are only picking the first device for now.
+            // We need to keep track of the mouse/keyboard children and use those pointers directly
+            // to avoid a for loop with IS_MOUSE and IS_KEYBOARD for every single input packet.
+            if(kb->children[0])
+                targetkb = kb->children[0];
+#ifdef DEBUG_USB_INPUT
+            else
+                ckb_err("kb->children[0] is NULL");
+#endif
+        }
+    }
+
+    // If the response starts with CMD_GET (0x0e) for NXP, or it came from a bragi command EP, that means it needs to go to os_usbrecv()
+    if(urblen == kb->out_ep_packet_size && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == kb->bragi_in_ep))){
         int retval = pthread_mutex_lock(intmutex(targetkb));
         if(retval)
             ckb_fatal("Error locking interrupt mutex %i", retval);
@@ -598,37 +624,41 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
         retval = pthread_mutex_unlock(intmutex(targetkb));
         if(retval)
             ckb_fatal("Error unlocking interrupt mutex %i", retval);
+    } else if (kb->protocol == PROTO_BRAGI && urblen == kb->out_ep_packet_size && buffer[1] == BRAGI_INPUT_NOTIFY){
+        // Handle bragi notifications here
+#ifdef DEBUG_USB_INPUT
+        ckb_info("Detected bragi notification");
+#endif
     } else {
-        queued_mutex_lock(imutex(kb));
+        queued_mutex_lock(imutex(targetkb));
+
         if(IS_LEGACY_DEV(kb)) {
             if(IS_MOUSE_DEV(kb))
                 m95_mouse_translate(&kb->input, urblen, buffer);
             else
                 hid_kb_translate(kb->input.keys, urblen, buffer, 1);
         } else {
-            if(IS_MOUSE_DEV(kb)) {
+            if(IS_MOUSE_DEV(targetkb)) {
                 // HID Mouse Input
                 // In HW mode, Bragi mouse is the same as NXP, but without a header
                 if(kb->protocol == PROTO_BRAGI) {
-                    // Discard device notifications for now
-                    if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_NOTIFY){
-
-                    } else if(kb->active) {
+                    if(targetkb->active) {
                         // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
-                        if(firstbyte == BRAGI_INPUT_0 && buffer[1] == BRAGI_INPUT_HID) {
+                        if(buffer[1] == BRAGI_INPUT_HID) {
                             if(urblen == 64)
-                                corsair_bragi_mousecopy(kb, &kb->input, buffer);
+                                corsair_bragi_mousecopy(kb, &targetkb->input, buffer);
                             else
                                 ckb_err("Invalid length in corsair_bragi_mousecopy(). Expected 64, got %d", urblen);
                         } else {
-                            kb->input.rel_x += (buffer[5] << 8) | buffer[4];
-                            kb->input.rel_y += (buffer[7] << 8) | buffer[6];
+                            targetkb->input.rel_x += (buffer[5] << 8) | buffer[4];
+                            targetkb->input.rel_y += (buffer[7] << 8) | buffer[6];
                             // Some bragi devices do not report scrolling in the SW packet
+                            // These type of hacks most likely apply to the dongle, and not the device itself in WL mode
                             if(SW_PKT_HAS_NO_WHEEL(kb))
-                                kb->input.whl_rel_y = (signed char)buffer[8];
+                                targetkb->input.whl_rel_y = (signed char)buffer[8];
                         }
                     } else {
-                        hid_mouse_translate(&kb->input, urblen, buffer);
+                        hid_mouse_translate(&targetkb->input, urblen, buffer);
                     }
                 } else if(firstbyte == MOUSE_IN) {
                     hid_mouse_translate(&kb->input, urblen, buffer + 1);
@@ -643,11 +673,11 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 // Assume Keyboard for everything else for now
                 // Accept NKRO only if device is not active
                 if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
-                    if(!kb->active){
+                    if(!targetkb->active){
                         if(kb->protocol == PROTO_BRAGI)
-                            handle_bragi_key_input(kb->input.keys, buffer, urblen);
+                            handle_bragi_key_input(targetkb->input.keys, buffer, urblen);
                         else
-                            hid_kb_translate(kb->input.keys, urblen, buffer, 0);
+                            hid_kb_translate(targetkb->input.keys, urblen, buffer, 0);
                     }
                 } else if(urblen == MSG_SIZE) {
                     // Skip the bragi header
@@ -655,15 +685,15 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         buffer += 2;
                     else if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
                         buffer++;
-                    corsair_kbcopy(kb->input.keys, buffer);
+                    corsair_kbcopy(targetkb->input.keys, buffer);
                 } else
                     ckb_err("Unknown data received in input thread %02x from endpoint %02x", firstbyte, ep);
             }
         }
         ///
         /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
-        inputupdate(kb);
-        queued_mutex_unlock(imutex(kb));
+        inputupdate(targetkb);
+        queued_mutex_unlock(imutex(targetkb));
     }
 }
 

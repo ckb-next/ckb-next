@@ -179,12 +179,12 @@ static inline int bragi_dongle_probe(usbdevice* kb){
             }
 
             // Ignore it if it has already been initialised
-            if(subkb->status > STATUS_DISCONNECTED){
+            if(subkb->status > DEV_STATUS_DISCONNECTED){
                 queued_mutex_unlock(dmutex(subkb));
                 continue;
             }
 
-            subkb->status = STATUS_CONNECTING;
+            subkb->status = DEV_STATUS_CONNECTING;
             subkb->fwversion = 1234; // invalid
             subkb->parent = kb;
 

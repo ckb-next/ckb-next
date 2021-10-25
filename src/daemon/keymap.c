@@ -673,23 +673,27 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 // Assume Keyboard for everything else for now
 
                 // We need to split the bragi code because the size check needs to go first
-                if(kb->protocol == PROTO_BRAGI){
-                    if(targetkb->active && urblen == kb->out_ep_packet_size)
+                if(kb->protocol == PROTO_BRAGI) {
+                    if(urblen == kb->out_ep_packet_size) {
                         corsair_kbcopy(targetkb->input.keys, buffer + 2);
-                    else if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN)
-                        handle_bragi_key_input(targetkb->input.keys, buffer, urblen);
-                    else
-                        ckb_err("Unknown bragi input received %02x from endpoint %02x", firstbyte, ep);
+                    } else if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
+                        if(!targetkb->active)
+                            handle_bragi_key_input(targetkb->input.keys, buffer, urblen);
+                    } else {
+                        ckb_err("Unknown bragi data received in input thread %02x from endpoint %02x", firstbyte, ep);
+                    }
                 } else {
                     // Accept NKRO only if device is not active
                     if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
-                        hid_kb_translate(targetkb->input.keys, urblen, buffer, 0);
+                        if(!targetkb->active)
+                            hid_kb_translate(targetkb->input.keys, urblen, buffer, 0);
                     } else if(urblen == MSG_SIZE) {
                         if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
                             buffer++;
                         corsair_kbcopy(targetkb->input.keys, buffer);
-                    } else
+                    } else {
                         ckb_err("Unknown data received in input thread %02x from endpoint %02x", firstbyte, ep);
+                    }
                 }
             }
         }

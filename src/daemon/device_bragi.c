@@ -205,7 +205,9 @@ static inline int bragi_dongle_probe(usbdevice* kb){
             subkb->bragi_child_id = i;
 
             // Add the device to our children array
+            pthread_mutex_lock(cmutex(kb));
             kb->children[i-1] = subkb;
+            pthread_mutex_unlock(cmutex(kb));
 
             // Fill dev information
             ushort vid = bragi_get_property(subkb, BRAGI_VID);

@@ -60,6 +60,10 @@ extern pthread_mutex_t interruptmutex[DEV_MAX];
 extern pthread_cond_t interruptcond[DEV_MAX];
 #define intcond(kb) (interruptcond + INDEX_OF(kb, keyboard))
 
+// Mutex to access the children for each device
+extern pthread_mutex_t childrenmutex[DEV_MAX];
+#define cmutex(kb) (childrenmutex + INDEX_OF(kb, keyboard))
+
 int init_cond_monotonic(void);
 
 // Sets up device hardware, after software initialization is finished. Also used during resets

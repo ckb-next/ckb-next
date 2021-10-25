@@ -590,6 +590,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     // All device specific events have the max length of bytes
     usbdevice* targetkb = kb;
     if(kb->protocol == PROTO_BRAGI && IS_DONGLE(kb)){
+        pthread_mutex_lock(cmutex(kb));
         if(urblen == kb->out_ep_packet_size){
             // Extract the device id
             int devid = firstbyte & 0x7;
@@ -608,6 +609,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 ckb_err("kb->children[0] is NULL");
 #endif
         }
+        pthread_mutex_unlock(cmutex(kb));
     }
 
     // If the response starts with CMD_GET (0x0e) for NXP, or it came from a bragi command EP, that means it needs to go to os_usbrecv()

@@ -17,6 +17,7 @@ pthread_cond_t macrovar[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_COND_INITIALIZE
 pthread_cond_t macroint[DEV_MAX];                                                           ///< Should a macro thread's sleep be interrupted, due to repeated key press?
 pthread_mutex_t interruptmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };///< Used for interrupt transfers
 pthread_cond_t interruptcond[DEV_MAX];                                                      ///< Same as above
+pthread_mutex_t childrenmutex[DEV_MAX] = { [0 ... DEV_MAX-1] = PTHREAD_MUTEX_INITIALIZER };
 
 ///
 /// \brief cond_nanosleep matches semantics of pthread_cond_timedwait, but with a relative wake time
@@ -175,7 +176,7 @@ int _start_dev(usbdevice* kb, int makeactive){
     ///
     if(IS_SINGLE_EP(kb))
         kb->features &= ~FEAT_BIND;
-    
+
     ///
     /// The Polaris doesn't support hardware profiles, so remove the FEAT_HWLOAD bit.
     ///
@@ -187,7 +188,7 @@ int _start_dev(usbdevice* kb, int makeactive){
     ///
     if(USES_FILE_HWSAVE(kb))
         kb->features &= ~FEAT_HWLOAD;
-    
+
     ///
     /// K66 has no backlight
     ///

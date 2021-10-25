@@ -246,13 +246,21 @@ void* _ledthread(void* ctx){
         }
         // Update them if needed
         queued_mutex_lock(dmutex(kb));
-        if(kb->shutdown_ledthread){
-            queued_mutex_unlock(dmutex(kb));
-            break;
-        }
+
         if(kb->hw_ileds != ileds){
             kb->hw_ileds = ileds;
             kb->vtable->updateindicators(kb, 0);
+        }
+
+        // This check needs to be after updateindicators.
+        // Some devices have quirks that delay URB Controls, so it's possible for the SIGUSR2 signal
+        // to be sent before we have reached the read() in this loop as we're waiting for the kernel
+        // to finish the control transfer.
+        //
+        // Perhaps this should be converted to a select() with a pipe instead of a signal
+        if(kb->shutdown_ledthread){
+            queued_mutex_unlock(dmutex(kb));
+            break;
         }
         queued_mutex_unlock(dmutex(kb));
     }

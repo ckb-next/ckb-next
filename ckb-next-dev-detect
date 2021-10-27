@@ -34,6 +34,8 @@ if [[ "$1" != "--elevate" ]]; then
     else
         OUT="pkexec not found${N}${N}`bash \"$ABSPATH\" --elevate`"
     fi
+    OUT="${OUT}${N}${N}Environment:${N}`printenv | grep "QT\|XDG.*DESKTOP\|DISPLAY\|WAYLAND_DESKTOP\|XDG_SESSION_TYPE" 2>&1`"
+    OUT="${OUT}${N}\`\`\`${N}"
     echo "$OUT" | gzip > "${OUTPATH}ckb-next-dev-detect-report.gz"
     echo "Done! Please send the following report to the developers."
     echo "Location: ${OUTPATH}ckb-next-dev-detect-report.gz"
@@ -68,13 +70,10 @@ else
             OUT="${OUT}${N}${N}Daemon on last boot:${N}`journalctl -o short-precise -b -1 --unit=ckb-next-daemon 2>&1`"
         fi
         OUT="${OUT}${N}${N}Dev nodes:${N}`find /dev/input/ckb* -print -type f -exec cat {} \; 2>&1`"
-        OUT="${OUT}${N}${N}Environment:${N}`printenv | grep "QT\|XDG.*DESKTOP\|DISPLAY" 2>&1`"
         OUT="${OUT}${N}${N}Kernel command line:${N}`cat /proc/cmdline`"
         GUIPATH="$(which ckb-next)"
         OUT="${OUT}${N}${N}GUI ldd:${N}`ldd ${GUIPATH}`"
     fi
-
-    OUT="${OUT}${N}\`\`\`${N}"
 
     # Print to stdout
     echo "$OUT"

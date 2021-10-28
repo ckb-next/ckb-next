@@ -676,7 +676,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
 
                 // We need to split the bragi code because the size check needs to go first
                 if(kb->protocol == PROTO_BRAGI) {
-                    if(urblen == kb->out_ep_packet_size) {
+                    if(urblen == 64) {
                         corsair_kbcopy(targetkb->input.keys, buffer + 2);
                     } else if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
                         if(!targetkb->active)

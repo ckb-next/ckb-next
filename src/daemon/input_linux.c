@@ -249,7 +249,7 @@ void* _ledthread(void* ctx){
 
         if(kb->hw_ileds != ileds){
             kb->hw_ileds = ileds;
-            kb->vtable->updateindicators(kb, 0);
+            kb->vtable.updateindicators(kb, 0);
         }
 
         // This check needs to be after updateindicators.

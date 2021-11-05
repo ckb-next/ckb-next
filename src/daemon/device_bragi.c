@@ -200,7 +200,7 @@ static inline int bragi_dongle_probe(usbdevice* kb){
             subkb->out_ep_packet_size = kb->out_ep_packet_size;
 
             // Assign a mouse vtable for now, can be changed later after we get vid/pid
-            subkb->vtable = &vtable_bragi_mouse;
+            memcpy(&subkb->vtable, &vtable_bragi_mouse, sizeof(devcmd));
 
             subkb->bragi_child_id = i;
 

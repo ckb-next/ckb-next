@@ -399,7 +399,10 @@ static void* _setupusb(void* context){
     queued_mutex_lock(imutex(kb));
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;
-    const devcmd* vt = kb->vtable = get_vtable(kb);
+    const devcmd* vt = get_vtable(kb);
+    memcpy(&kb->vtable, vt, sizeof(devcmd));
+    vt = &kb->vtable;
+
     if(!(IS_DONGLE(kb) && kb->protocol == PROTO_BRAGI))
         kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(SUPPORTS_ADJRATE(kb))
@@ -446,7 +449,7 @@ static void* _setupusb(void* context){
         snprintf(kb->name, KB_NAME_LEN, "%s %s", vendor_str(kb->vendor), product_str(kb->product));
 
     // Ask the protocol handler to set the endpoints required for the main input thread
-    kb->vtable->fill_input_eps(kb);
+    kb->vtable.fill_input_eps(kb);
 
     // Set up an input device for key events
     ///
@@ -640,9 +643,9 @@ int _resetusb(usbdevice* kb, const char* file, int line){
         return res;
     DELAY_LONG(kb);
     // Re-initialize the device
-    if(kb->vtable->start(kb, kb->active) != 0)
+    if(kb->vtable.start(kb, kb->active) != 0)
         return -1;
-    if(kb->vtable->updatergb(kb, 1) != 0)
+    if(kb->vtable.updatergb(kb, 1) != 0)
         return -1;
     return 0;
 }
@@ -701,7 +704,7 @@ int _usbsend(usbdevice* kb, void* messages, size_t msg_len, int count, const cha
         while(1){
             DELAY_SHORT(kb);
             queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
-            int res = kb->vtable->write(kb, messages + i * msg_len, msg_len, 0, file, line);
+            int res = kb->vtable.write(kb, messages + i * msg_len, msg_len, 0, file, line);
             queued_mutex_unlock(mmutex(kb));
             if(res == 0)
                 return 0;
@@ -728,7 +731,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
         // Send the output message
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
         DELAY_SHORT(kb);
-        int res = kb->vtable->write(kb, out_msg, msg_len, 1, file, line);
+        int res = kb->vtable.write(kb, out_msg, msg_len, 1, file, line);
         queued_mutex_unlock(mmutex(kb));
         if (res == 0)
             return 0;
@@ -742,7 +745,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
         // Wait for the response
         if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
             DELAY_MEDIUM(kb);
-        res = kb->vtable->read(kb, in_msg, msg_len, 0, file, line);
+        res = kb->vtable.read(kb, in_msg, msg_len, 0, file, line);
         if(res == 0)
             return 0;
         else if(res != -1)
@@ -854,9 +857,9 @@ int closeusb(usbdevice* kb){
     queued_mutex_lock(dmutex(kb));
 
     // Delete the profile and the control path
-    if(!kb->vtable)
+    if(!kb->vtable.freeprofile)
         return 0;
-    kb->vtable->freeprofile(kb);
+    kb->vtable.freeprofile(kb);
     queued_mutex_lock(imutex(kb));
     // This implicitly sets the status to STATUS_DISCONNECTED
     memset(kb, 0, sizeof(usbdevice));
@@ -900,7 +903,7 @@ void reactivate_devices(){
             int ret;
             // If the device was active, mark it as disabled and re-enable it
             kb->active = 0;
-            const devcmd* vt = kb->vtable;
+            const devcmd* vt = &kb->vtable;
             TRY_WITH_RESET_NOFREE(vt->active(kb, 0, 0, 0, 0), ret);
             TRY_WITH_RESET_NOFREE(vt->updatergb(kb, 1), ret);
             TRY_WITH_RESET_NOFREE(vt->updatedpi(kb, 1), ret);

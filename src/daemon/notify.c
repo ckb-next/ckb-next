@@ -94,7 +94,7 @@ static void _cmd_get(usbdevice* kb, usbmode* mode, int nnumber, const char* sett
     usbprofile* profile = kb->profile;
      if(!strcmp(setting, ":battery")){
         queued_mutex_unlock(imutex(kb));
-        kb->vtable->get_battery_info(kb);
+        kb->vtable.get_battery_info(kb);
         queued_mutex_lock(imutex(kb));
         nprintf(kb, nnumber, 0, "battery %hhu:%hhu\n", kb->battery_level, kb->battery_status & 0xFF);
     } else if(!strcmp(setting, ":mode")){

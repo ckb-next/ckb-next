@@ -82,7 +82,7 @@ int setactive_mouse(usbdevice* kb, int active);
 /// \brief setactive() calls via the corresponding kb->vtable either the active() or the idle() function.
 /// \n active() is called if the parameter makeactive is true, idle if it is false.
 /// \n What function is called effectively is device dependent. Have a look at \a device_vtable.c for more information.
-#define setactive(kb, makeactive) ((makeactive) ? (kb)->vtable->active((kb), 0, 0, 0, 0) : (kb)->vtable->idle((kb), 0, 0, 0, 0))
+#define setactive(kb, makeactive) ((makeactive) ? (kb)->vtable.active((kb), 0, 0, 0, 0) : (kb)->vtable.idle((kb), 0, 0, 0, 0))
 
 // Command: Activate a device
 int cmd_active_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const char* dummy4);

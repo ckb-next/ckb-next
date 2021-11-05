@@ -1,7 +1,8 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "includes.h"
+typedef struct usbdevice_ usbdevice;
+typedef struct usbmode_ usbmode;
 
 // Command operations
 typedef enum {

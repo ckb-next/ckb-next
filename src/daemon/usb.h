@@ -386,7 +386,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
 /// the command structure is different:
 /// \n Just the bits 23..16 are used as bits 7..0 for bRequest
 /// \n Bits 15..0 are used as wValue
-#define nk95cmd(kb, command) kb->vtable->write(kb, &(ctrltransfer) { .bRequestType = 0x40, .bRequest = (command) >> 16 & 0xFF, .wValue = (command) & 0xFFFF, .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL}, 0, 0, __FILE_NOPATH__, __LINE__)
+#define nk95cmd(kb, command) kb->vtable.write(kb, &(ctrltransfer) { .bRequestType = 0x40, .bRequest = (command) >> 16 & 0xFF, .wValue = (command) & 0xFFFF, .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL}, 0, 0, __FILE_NOPATH__, __LINE__)
 
 /// Hardware-specific commands for the K95 nonRGB,
 /// \see [usb2.0 documentation for details](http://www.usb.org/developers/docs/usb_20.zip).

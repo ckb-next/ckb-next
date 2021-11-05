@@ -1,5 +1,6 @@
 #include <limits.h>
 #include "command.h"
+#include "includes.h"
 #include "device.h"
 #include "devnode.h"
 #include "led.h"
@@ -71,7 +72,7 @@ int readcmd(usbdevice* kb, const char* line){
     char* word = malloc(strlen(line) + 1);
     int wordlen;
     const char* newline = 0;
-    const devcmd* vt = kb->vtable;
+    const devcmd* vt = &kb->vtable;
     usbprofile* profile = kb->profile;
     usbmode* mode = 0;
     int notifynumber = 0;

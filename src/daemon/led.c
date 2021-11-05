@@ -71,7 +71,7 @@ void cmd_ioff(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
     // Add the bits to ioff, remove them from ion
     mode->ioff |= bits;
     mode->ion &= ~bits;
-    kb->vtable->updateindicators(kb, 0);
+    kb->vtable.updateindicators(kb, 0);
 }
 
 void cmd_ion(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* led){
@@ -82,7 +82,7 @@ void cmd_ion(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* l
     // Remove the bits from ioff, add them to ion
     mode->ioff &= ~bits;
     mode->ion |= bits;
-    kb->vtable->updateindicators(kb, 0);
+    kb->vtable.updateindicators(kb, 0);
 }
 
 void cmd_iauto(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* led){
@@ -93,7 +93,7 @@ void cmd_iauto(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char*
     // Remove the bits from both ioff and ion
     mode->ioff &= ~bits;
     mode->ion &= ~bits;
-    kb->vtable->updateindicators(kb, 0);
+    kb->vtable.updateindicators(kb, 0);
 }
 
 void cmd_inotify(usbdevice* kb, usbmode* mode, int nnumber, int dummy, const char* led){

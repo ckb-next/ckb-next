@@ -101,7 +101,7 @@ int setactive_kb(usbdevice* kb, int active){
 #endif
     }
     // Update indicator LEDs if the profile contains settings for them
-    kb->vtable->updateindicators(kb, 0);
+    kb->vtable.updateindicators(kb, 0);
     return 0;
 }
 

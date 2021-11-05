@@ -87,4 +87,19 @@ extern pthread_mutex_t _euid_guard;
 
 #endif // OS_MAC_LEGACY
 
+#ifdef OS_LINUX
+typedef struct usbdevfs_ctrltransfer ctrltransfer;
+#else
+// Used to request an explicit URB Control transfer for backends that do controls only, or require values that change
+typedef struct {
+    uint8_t bRequestType;
+    uint8_t bRequest;
+    uint16_t wValue;
+    uint16_t wIndex;
+    uint16_t wLength;
+    uint32_t timeout;
+    void* data;
+} ctrltransfer;
+#endif
+
 #endif  // OS_H

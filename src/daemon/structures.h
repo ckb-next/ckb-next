@@ -3,6 +3,7 @@
 
 #include "includes.h"
 #include "keymap.h"
+#include "command.h"
 #ifdef OS_MAC
 #include "input_mac_vhid.h" // For the VirtualHIDDevice structs
 #endif
@@ -98,7 +99,7 @@ typedef struct {
 
 // Native mode structure
 #define MD_NAME_LEN 16
-typedef struct {
+typedef struct usbmode_ {
     lighting light;
     binding bind;
     dpiset dpi;
@@ -229,7 +230,7 @@ typedef enum protocol_
 struct usbdevice_;
 typedef struct usbdevice_ {
     // Function table (see command.h)
-    const union devcmd* vtable;
+    union devcmd vtable;
     // I/O devices
     // Note that FDs have 1 added to them, because these are initialized to zero when the program starts but zero is technically a valid FD
     // So the actual value is (fd - 1)
@@ -361,20 +362,5 @@ typedef struct usbdevice_ {
     uchar bragi_out_ep;
     uchar bragi_in_ep;
 } usbdevice;
-
-#ifdef OS_LINUX
-typedef struct usbdevfs_ctrltransfer ctrltransfer;
-#else
-// Used to request an explicit URB Control transfer for backends that do controls only, or require values that change
-typedef struct {
-    uint8_t bRequestType;
-    uint8_t bRequest;
-    uint16_t wValue;
-    uint16_t wIndex;
-    uint16_t wLength;
-    uint32_t timeout;
-    void* data;
-} ctrltransfer;
-#endif
 
 #endif  // STRUCTURES_H

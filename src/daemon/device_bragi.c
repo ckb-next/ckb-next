@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include "command.h"
 #include "device.h"
 #include "devnode.h"
@@ -7,6 +8,7 @@
 #include "usb.h"
 #include "bragi_proto.h"
 #include "bragi_common.h"
+#include "led.h"
 
 // CUE polls devices every 52 seconds
 const struct timespec bragi_poll_delay = { .tv_sec = 50 };
@@ -85,9 +87,21 @@ static int setactive_bragi(usbdevice* kb, int active){
     // Check if the device returned an error
     // Non fatal for now. Should first figure out what the error codes mean.
     // Device returns 0x03 on writes if we haven't opened the handle.
-    if(light)
-        ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, light);
+    if(light == 0x01) {
+        // A K100 has been observed to return 0x01, so it probably means "not supported"
+        // If we get that response, we instead try to open the alt rgb lighting resource
+        ckb_warn("ckb%d: Bragi light init returned not supported", ckb_id);
+        light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, BRAGI_RES_ALT_LIGHTING);
+        if(light < 0)
+            return light;
 
+        if(light)
+            ckb_err("ckb%d: Bragi alt light init returned error 0x%hhx", ckb_id, light);
+        else // Swap the RGB function if we're using alt lighting
+            kb->vtable.updatergb = updatergb_keyboard_bragi_alt;
+    } else {
+        ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, light);
+    }
     return 0;
 }
 

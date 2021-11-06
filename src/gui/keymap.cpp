@@ -325,7 +325,7 @@ static const Key GlaiveKeys[] = {
 // Katar
 static const Key KatarKeys[] = {
     {0, "Left Mouse", "mouse1", 7, 4, 14, 18, false, true}, {0, "Right Mouse", "mouse2", 28, 4, 14, 18, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 7, 7, false, true},
-    {0, "Wheel Up", "wheelup", 22, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 15, 7, 5, false, true}, 
+    {0, "Wheel Up", "wheelup", 22, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 15, 7, 5, false, true},
     {0, "DPI Cycle", "dpiup", 22, 19, 6, 12, false, true}, {0, "Logo Light", "front", 15, 43, 20, 20, true, false},
 };
 #define KEYCOUNT_KATAR  (sizeof(KatarKeys) / sizeof(Key))
@@ -422,14 +422,14 @@ static const Key IronclawKeys[] = {
     // primary keys
     {0, "Left Mouse",    "mouse1",     12,  0, 12, 28, false, true  },
     {0, "Right Mouse",   "mouse2",     31,  0, 12, 28, false, true  },
-    
+
     // center column keys
     {0, "Wheel Up",      "wheelup",    23,  3,  8,  7, false, true  },
     {0, "Middle Mouse",  "mouse3",     23,  7,  8,  6, false, true  },
     {0, "Wheel Down",    "wheeldn",    23, 12,  8,  7, false, true  },
     {0, "Profile Cycle", "profswitch", 23, 18,  9,  9, false, true  },
     {0, "DPI Cycle",     "dpiup",      23, 26,  8,  9, false, true  },
-    
+
     // left side forward/back keys
     {0, "Forward",    "mouse5",      6, 20,  5, 12, false, true  },
     {0, "Back",       "mouse4",      7, 32,  5, 12, false, true  },
@@ -437,7 +437,7 @@ static const Key IronclawKeys[] = {
     // zones for LEDs
     {0, "Logo",          "back",       21, 50,  NS,    true,  false },
     {0, "Wheel",         "wheel",      23, 3,  8,  14, true,  false },
-    
+
     // need to add DPI LED, even if not directly configurable for indicator to work
     {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
 
@@ -483,14 +483,14 @@ static const Key IronclawWirelessKeys[] = {
     // primary keys
     {0, "Left Mouse",   "mouse1",   12,  0, 12, 28, false, true  },
     {0, "Right Mouse",  "mouse2",   31,  0, 12, 28, false, true  },
-    
+
     // center column keys
     {0, "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
     {0, "Middle Mouse",  "mouse3",  23,  7,  8,  6, false, true  },
     {0, "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
     {0, "Profile Up",    "profup",  23, 18,  9,  9, false, true  },
     {0, "Profile Dn",    "profdn",  23, 26,  8,  9, false, true  },
-    
+
     // left side forward/back keys
     {0, "DPI Up",        "dpiup",    6,  4,  6,  9, false, true  },
     {0, "DPI Dn",        "dpidn",    6, 10,  6,  9, false, true  },
@@ -502,7 +502,7 @@ static const Key IronclawWirelessKeys[] = {
     {0, "Front",        "front",     9,  1,  9,  9, true, false  },
     {0, "Logo",         "back",     21, 50, NS,     true, false  },
     {0, "Wheel",        "wheel",    23,  3,  8, 14, true, false  },
-    
+
     // need to add DPI LED, even if not directly configurable for indicator to work
     {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
 
@@ -589,6 +589,15 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Done! return the map
         break;
     }
+    case KeyMap::K95L:{
+        // The K95 Legacy map is based on the K95
+        // but with the light program button
+        map = getMap(KeyMap::K95, layout);
+        const Key lghtpgm = {0, "Lighting Programming", "lghtpgm", 210, 0, NS, true, true};
+        map.insert(lghtpgm.name, lghtpgm);
+        break;
+    }
+
     case KeyMap::K95P:{
         // The K95 Platinum map is based on the K95
         map = getMap(KeyMap::K95, layout);
@@ -1267,6 +1276,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return NIGHTSWORD;
     if(lower == "ironclaw_wireless")
         return IRONCLAW_W;
+    if(lower == "k95l")
+        return K95L;
     return NO_MODEL;
 }
 
@@ -1324,6 +1335,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "nightsword";
     case IRONCLAW_W:
         return "ironclaw_wireless";
+    case K95L:
+        return "k95l";
     default:
         return "";
     }
@@ -1349,6 +1362,7 @@ int KeyMap::modelWidth(Model model){
     case K70MK2:
         return K70_WIDTH;
     case K95:
+    case K95L:
          return K95_WIDTH;
     case K95P:
     case K55:
@@ -1388,6 +1402,7 @@ int KeyMap::modelHeight(Model model){
     case K70:
     case K70MK2:
     case K95:
+    case K95L:
     case STRAFE:
     case STRAFE_MK2:
         return K95_HEIGHT;
@@ -1459,6 +1474,11 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
 
     // The only key missing from it should be Fn, which is found on STRAFE
     map = KeyMap(STRAFE, layout);
+    if(map.contains(key))
+        return map[key].friendlyName();
+
+    // Light Program for the legacy K95
+    map = KeyMap(K95L, layout);
     if(map.contains(key))
         return map[key].friendlyName();
 

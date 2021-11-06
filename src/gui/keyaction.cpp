@@ -14,7 +14,7 @@
 KeyAction::Type KeyAction::type() const {
     if(_value.isEmpty())
         return UNBOUND;
-    if(_value.at(0) == '$')
+    if(_value.at(0) == '$' || _value == "lghtpgm")
         return SPECIAL;
     return NORMAL;
 }

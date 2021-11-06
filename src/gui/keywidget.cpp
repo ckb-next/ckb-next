@@ -261,7 +261,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             }
         }
         if((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
-                || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
+                || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || !strcmp(key.name, "lghtpgm") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
             // Not all devices have circular buttons
             x += w / 8.f;
             y += h / 8.f;
@@ -452,7 +452,8 @@ void KeyWidget::paintEvent(QPaintEvent*){
                 {"lctrl", "Ctrl"}, {"rctrl", "Ctrl"}, {"lwin", "❖"}, {"rwin", "❖"}, {"lalt", "Alt"}, {"ralt", "Alt"},
 #endif
                 {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"}, {"fn","Fn"},
-                {"mouse1", ""}, {"mouse2", ""}, {"mouse3", "∙"}, {"dpiup", "▲"}, {"dpidn", "▼"}, {"wheelup", "▲"}, {"wheeldn", "▼"}, {"dpi", "◉"}, {"mouse5", "▲"}, {"mouse4", "▼"}, {"sniper", "⊕"}
+                {"mouse1", ""}, {"mouse2", ""}, {"mouse3", "∙"}, {"dpiup", "▲"}, {"dpidn", "▼"}, {"wheelup", "▲"}, {"wheeldn", "▼"}, {"dpi", "◉"}, {"mouse5", "▲"}, {"mouse4", "▼"}, {"sniper", "⊕"},
+                {"lghtpgm", "☼P"}
             };
             for(uint l = 0; l < sizeof(names) / sizeof(names[0]); l++){
                 if(keyName == names[l].keyName){
@@ -462,7 +463,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             }
             if(keyName == "thumb1" && model == KeyMap::SABRE)
                 name = "∙";
-            if(keyName == "mr" || keyName == "m1" || keyName == "m2" || keyName == "m3" || keyName == "up" || keyName == "down" || keyName == "left" || keyName == "right")
+            if(keyName == "mr" || keyName == "m1" || keyName == "m2" || keyName == "m3" || keyName == "up" || keyName == "down" || keyName == "left" || keyName == "right" || keyName == "lghtpgm")
                 // Use a smaller size for MR, M1 - M3, and arrow keys
                 font.setPixelSize(font.pixelSize() * 0.75);
             else if(keyName == "end")

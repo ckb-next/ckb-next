@@ -166,7 +166,9 @@ const char* vendor_str(ushort vendor){
 /// product_str() needs the \a product \a ID
 ///
 const char* product_str(ushort product){
-    if(product == P_K95 || product == P_K95_LEGACY)
+    if(product == P_K95_LEGACY)
+        return "k95l";
+    if(product == P_K95)
         return "k95";
     if(product == P_K95_PLATINUM || product == P_K95_PLATINUM_XT)
         return "k95p";

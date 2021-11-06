@@ -79,6 +79,7 @@ public:
         DARKCORE,
         IRONCLAW_W,
         KATARPROXT,
+        K95L,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

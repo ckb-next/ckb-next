@@ -245,8 +245,14 @@ int main(int argc, char** argv){
 
             // Search through the patched keymap
             for (int j = 0; j < N_KEYS_EXTENDED; j++) {
-                if (!dev.keymap[j].name)
-                    continue;
+                // Special case, where we're searching for the first NULL entry
+                if (!dev.keymap[j].name) {
+                    if (*searchstr != '\0')
+                        continue;
+
+                    printf("First NULL key has id %d\n", j);
+                    return 0;
+                }
 
                 if (!strcasecmp(searchstr, dev.keymap[j].name)) {
                     printf("Key %s has id %d\n", dev.keymap[j].name, j);

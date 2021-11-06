@@ -147,6 +147,7 @@ if (MACOS OR LINUX)
               keymap.cpp
               keywidget.cpp
               kperfwidget.cpp
+              legacylightwidget.cpp
               macroreader.cpp
               macrostringeditdialog.cpp
               macrotablemodel.cpp
@@ -199,6 +200,7 @@ if (MACOS OR LINUX)
               keymap.h
               keywidget.h
               kperfwidget.h
+              legacylightwidget.h
               macroline.h
               macroreader.h
               macrostringeditdialog.cpp
@@ -234,6 +236,7 @@ if (MACOS OR LINUX)
               kbprofiledialog.ui
               kbwidget.ui
               kperfwidget.ui
+              legacylightwidget.ui
               mainwindow.ui
               macrostringeditdialog.ui
               modeselectdialog.ui

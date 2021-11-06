@@ -39,6 +39,10 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
         connect(windowDetector, &XWindowDetector::activeWindowChanged, this, &KbWidget::switchToModeByFocus);
 #endif
 
+    // Remove the Legacy Lighting tab on anything other than the K95L
+    if(device->model() != KeyMap::K95L)
+        ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->legacyLightTab));
+
     // Remove the Lighting and Performance tabs from non-RGB keyboards
     if(!device->features.contains("rgb")){
         if(device->model() != KeyMap::M95){

@@ -20,7 +20,6 @@ Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), features(QStringList()), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
     batteryTimer(0), batteryIcon(0), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), batteryLevel(0), batteryStatus(BatteryStatus::BATT_STATUS_UNKNOWN),
-    lastAutoSave(QDateTime::currentMSecsSinceEpoch()),
     _hwProfile(0), prevProfile(0), prevMode(0),
     cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT), _maxDpi(0),
     deviceIdleTimer()
@@ -349,11 +348,8 @@ void Kb::save(){
 }
 
 void Kb::autoSave(){
-    quint64 now = QDateTime::currentMSecsSinceEpoch();
-    if(needsSave() && now >= lastAutoSave + 15 * 1000 && !CkbSettings::isBusy()){
+    if(needsSave() && !CkbSettings::isBusy())
         save();
-        lastAutoSave = now;
-    }
 }
 
 void Kb::hwSave(){

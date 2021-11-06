@@ -204,7 +204,6 @@ private:
 
     // CkbSettings path
     QString prefsPath;
-    quint64 lastAutoSave;
 
     // Current firmware update file
     QString fwUpdPath;

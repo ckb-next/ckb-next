@@ -90,12 +90,11 @@ KbManager::KbManager(QObject *parent) : QObject(parent){
     // Set up the timers
     _eventTimer = new QTimer(this);
     _eventTimer->setTimerType(Qt::PreciseTimer);
+    _saveTimer = new QTimer(this);
+    _saveTimer->start(30 * 1000);
     _scanTimer = new QTimer(this);
     _scanTimer->start(1000);
-    connect(_scanTimer, SIGNAL(timeout()), this, SLOT(scanKeyboards()));
-
-    // Scan for keyboards immediately so they show up as soon as the GUI appears.
-    QTimer::singleShot(0,this,SLOT(scanKeyboards()));
+    connect(_scanTimer, &QTimer::timeout, this, &KbManager::scanKeyboards);
 }
 
 int KbManager::getLastUsedDeviceIdleTime(){
@@ -220,8 +219,8 @@ void KbManager::scanKeyboards(){
         // Load preferences and send signal
         emit kbConnected(kb);
         kb->load();
-        connect(_eventTimer, SIGNAL(timeout()), kb, SLOT(frameUpdate()));
-        connect(_scanTimer, SIGNAL(timeout()), kb, SLOT(autoSave()));
+        connect(_eventTimer, &QTimer::timeout, kb, &Kb::frameUpdate);
+        connect(_saveTimer, &QTimer::timeout, kb, &Kb::autoSave);
     }
 }
 

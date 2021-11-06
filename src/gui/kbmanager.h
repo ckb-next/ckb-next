@@ -50,6 +50,8 @@ public:
 
 public slots:
     void brightnessScroll(int delta, Qt::Orientation orientation);
+    void scanKeyboards();
+
 signals:
     // A new device was connected.
     void kbConnected(Kb* device);
@@ -60,7 +62,6 @@ signals:
     void versionUpdated();
 
 private slots:
-    void scanKeyboards();
 #ifdef USE_XCB_SCREENSAVER
     void idleTimerTick();
 #endif
@@ -72,7 +73,7 @@ private:
     explicit KbManager(QObject* parent = 0);
 
     QSet<Kb*> _devices;
-    QTimer* _eventTimer, *_scanTimer;
+    QTimer* _eventTimer, *_scanTimer, *_saveTimer;
 #ifdef USE_XCB_SCREENSAVER
     static QTimer* _idleTimer;
 #endif

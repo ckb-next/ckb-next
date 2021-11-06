@@ -232,10 +232,12 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 #endif
 #ifdef USE_XCB_EWMH
-        qRegisterMetaType<XWindowInfo>("XWindowInfo");
-        windowDetector = new XWindowDetector();
-        windowDetector->start();
+    qRegisterMetaType<XWindowInfo>("XWindowInfo");
+    windowDetector = new XWindowDetector();
+    windowDetector->start();
 #endif
+
+    KbManager::kbManager()->scanKeyboards();
 }
 
 void MainWindow::checkForCkbUpdates(){

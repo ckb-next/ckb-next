@@ -2,6 +2,7 @@
 #include "notify.h"
 #include "profile.h"
 #include "usb.h"
+#include "nxp_proto.h"
 
 // Compare two light structures, ignore keys
 static int rgbcmp(const lighting* lhs, const lighting* rhs){

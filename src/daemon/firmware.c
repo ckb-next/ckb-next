@@ -2,6 +2,7 @@
 #include "firmware.h"
 #include "notify.h"
 #include "usb.h"
+#include "nxp_proto.h"
 
 #define FW_OK       0
 #define FW_NOFILE   -1
@@ -70,7 +71,7 @@ int getfwversion(usbdevice* kb){
     }
     // Wireless requires extra handshake packets.
     if(IS_WIRELESS_DEV(kb)){
-        uchar wireless_pkt[5][MSG_SIZE] = { 
+        uchar wireless_pkt[5][MSG_SIZE] = {
             { CMD_GET, 0xae, 0 },
             { CMD_GET, 0x4a, 0 },
             { CMD_GET, 0x50, 0 },

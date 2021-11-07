@@ -5,6 +5,8 @@
 #include "input.h"
 #include "profile.h"
 #include "usb.h"
+#include "nxp_proto.h"
+#include "legacykb_proto.h"
 
 int start_kb_legacy(usbdevice* kb, int makeactive){
     (void)makeactive;

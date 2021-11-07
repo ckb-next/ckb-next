@@ -5,6 +5,7 @@
 #include "input.h"
 #include "profile.h"
 #include "usb.h"
+#include "nxp_proto.h"
 
 int start_mouse_legacy(usbdevice* kb, int makeactive){
     (void)makeactive;

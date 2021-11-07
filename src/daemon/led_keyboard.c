@@ -4,6 +4,7 @@
 #include "notify.h"
 #include "profile.h"
 #include "usb.h"
+#include "nxp_proto.h"
 
 // Define an ordered dithering table by using bit reversion.
 #define BR1(x) ((((x) & 0xaa) >> 1) | (((x) & 0x55) << 1))
@@ -124,7 +125,7 @@ int updatergb_kb(usbdevice* kb, int force){
         if (!usbsend(kb, winlock_pkt, sizeof(winlock_pkt), 1))
             return -1;
     }
-   
+
     // Don't send data if the keyboard has no lighting.
     if (!HAS_FEATURES(kb, FEAT_RGB))
         return 0;
@@ -139,7 +140,7 @@ int updatergb_kb(usbdevice* kb, int force){
         // Update strafe sidelights if necessary
         if (IS_STRAFE(kb) && update_sidelights(kb))
             return -1;
-        
+
         // 16.8M color lighting works fine on strafe and is the only way it actually works
         uchar data_pkt[12][MSG_SIZE] = {
             // Red

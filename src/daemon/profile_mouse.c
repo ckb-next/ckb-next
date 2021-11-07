@@ -2,6 +2,7 @@
 #include "profile.h"
 #include "usb.h"
 #include "led.h"
+#include "nxp_proto.h"
 
 int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const char* dummy3){
     (void)dummy1;

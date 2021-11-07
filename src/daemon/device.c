@@ -4,6 +4,7 @@
 #include "profile.h"
 #include "usb.h"
 #include "input.h"
+#include "nxp_proto.h"
 
 int hwload_mode = 1;        ///< hwload_mode = 1 means read hardware once. should be enough
 

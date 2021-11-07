@@ -104,10 +104,11 @@ if (MACOS OR LINUX)
               keymap.h
               keymap_patch.h
               led.h
+              legacykb_proto.h
               notify.h
+              nxp_proto.h
               os.h
               profile.h
-              protocol.h
               request_hid_mac.h
               structures.h
               usb.h

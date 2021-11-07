@@ -2,6 +2,7 @@
 #include "notify.h"
 #include "profile.h"
 #include "usb.h"
+#include "nxp_proto.h"
 
 // Compare two light structures, ignore keys
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
@@ -97,7 +98,7 @@ int loadrgb_mouse(usbdevice* kb, lighting* light, int mode){
 int updatergb_mouse_legacy(usbdevice* kb, int force){
     lighting* lastlight = &kb->profile->lastlight;
     lighting* newlight = &kb->profile->currentmode->light;
-    // Don't do anything if the lighting hasn't changed        
+    // Don't do anything if the lighting hasn't changed
     // We only use "back" on the legacy M95 for consistency
     // 0x00 on R, G and B channels is off
     // Anything else is on
@@ -107,7 +108,7 @@ int updatergb_mouse_legacy(usbdevice* kb, int force){
     if(!force && !lastlight->forceupdate && !newlight->forceupdate && lastwValue == newwValue)
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
-    
+
     lastlight->r[MOUSE_BACK_LED] = newlight->r[MOUSE_BACK_LED];
     lastlight->g[MOUSE_BACK_LED] = newlight->g[MOUSE_BACK_LED];
     lastlight->b[MOUSE_BACK_LED] = newlight->b[MOUSE_BACK_LED];

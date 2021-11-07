@@ -4,6 +4,7 @@
 #include "usb.h"
 #include "input.h"
 #include "bragi_proto.h"
+#include "nxp_proto.h"
 
 // Translates input from HID to a ckb input bitfield.
 static void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy);

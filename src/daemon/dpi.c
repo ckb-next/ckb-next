@@ -1,5 +1,6 @@
 #include "dpi.h"
 #include "usb.h"
+#include "nxp_proto.h"
 
 // Compare two DPI lights in structures
 static int rgbcmp(const lighting* lhs, const lighting* rhs){
@@ -72,7 +73,7 @@ void cmd_lift(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* 
         return;
     if(heightnum > LIFT_MAX || heightnum < LIFT_MIN)
         return;
-    if(IS_DARK_CORE(kb) && heightnum < 3) 
+    if(IS_DARK_CORE(kb) && heightnum < 3)
         return;
     mode->dpi.lift = heightnum;
 }
@@ -170,7 +171,7 @@ int updatedpi(usbdevice* kb, int force){
         if(!usbsend(kb, data_pkt, sizeof(data_pkt), 1))
             return -2;
     }
-    
+
     // Send X/Y DPIs. We've changed to the new stage already so these can be set
     // safely.
     for(int i = 0; i < DPI_COUNT; i++){

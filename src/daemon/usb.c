@@ -9,6 +9,7 @@
 #include "usb.h"
 #include "keymap_patch.h"
 #include <ckbnextconfig.h>
+#include "legacykb_proto.h"
 
 // Values taken from the official website
 // Mice not in the list default to 12000 in the GUI

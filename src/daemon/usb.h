@@ -5,7 +5,6 @@
 
 #include "includes.h"
 #include "keymap.h"
-#include "protocol.h"
 
 /// \file usb.h
 /// Definitions for using USB interface
@@ -381,29 +380,6 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
 /// \param[IN] out_msg What information does the caller want from the device?
 /// \param[OUT] in_msg Here comes the answer; The names represent the usb view, not the view of this function! So INput from usb is OUTput of this function.
 #define usbrecv(kb, out_msg, msg_len, in_msg) _usbrecv(kb, out_msg, msg_len, in_msg, __FILE_NOPATH__, __LINE__)
-
-/// \brief nk95cmd() macro is used to send legacy keyboard commands
-/// the command structure is different:
-/// \n Just the bits 23..16 are used as bits 7..0 for bRequest
-/// \n Bits 15..0 are used as wValue
-#define nk95cmd(kb, command) kb->vtable.write(kb, &(ctrltransfer) { .bRequestType = 0x40, .bRequest = (command) >> 16 & 0xFF, .wValue = (command) & 0xFFFF, .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL}, 0, 0, __FILE_NOPATH__, __LINE__)
-
-/// Hardware-specific commands for the K95 nonRGB,
-/// \see [usb2.0 documentation for details](http://www.usb.org/developers/docs/usb_20.zip).
-/// Set Hardware playback off
-#define NK95_HWOFF  0x020030
-
-/// Hardware playback on
-#define NK95_HWON   0x020001
-
-/// Switch to mode 1
-#define NK95_M1     0x140001
-
-/// Switch to mode 2
-#define NK95_M2     0x140002
-
-/// Switch to mode 3
-#define NK95_M3     0x140003
 
 ///
 /// \brief usb_tryreset does what the name means: Try to reset the usb via resetusb()

@@ -169,12 +169,8 @@ KbWidget::~KbWidget(){
     delete ui;
 }
 
-void KbWidget::showFirstTab(){
-    ui->tabWidget->setCurrentIndex(0);
-}
-
-void KbWidget::showLastTab(){
-    ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
+void KbWidget::showDeviceTab(){
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->indexOf(ui->devTab));
 }
 
 void KbWidget::updateProfileList(){

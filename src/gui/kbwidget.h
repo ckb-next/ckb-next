@@ -33,11 +33,9 @@ public:
     void updateFwButton();
     void setTabBarEnabled(const bool e);
 
-public slots:
-    // Show a tab
-    void showFirstTab();
-    void showLastTab();
+    void showDeviceTab();
 
+public slots:
     // Display firmware update dialog
     inline void showFwUpdate()          { on_fwUpdButton_clicked(); }
 

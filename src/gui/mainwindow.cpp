@@ -358,7 +358,7 @@ void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
     // Ask for update
     if(QMessageBox::information(this, "Firmware update", tr("A new firmware is available for your %1 (v%2)\nWould you like to install it now?").arg(w->device->usbModel, QString::number(version, 'f', 2)), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), QMessageBox::Yes) == QMessageBox::Yes){
         // If accepted, switch to the firmware tab and bring up the update window
-        w->showLastTab();
+        w->showDeviceTab();
         ui->tabWidget->setCurrentIndex(kbWidgets.indexOf(w));
         w->showFwUpdate();
     }

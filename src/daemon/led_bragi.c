@@ -31,7 +31,7 @@ static inline size_t bragi_led_count(usbdevice* kb){
     LED_CASE_K(P_K57_U, 137);
     LED_CASE_M(P_KATAR_PRO_XT, 1);
     default:
-        ckb_err("Unknown product 0x%hhx", kb->product);
+        ckb_err("Unknown product 0x%hx", kb->product);
         return 0;
     }
 }

@@ -2,11 +2,11 @@
 #include "kbmanager.h"
 #include <quazip.h>
 #include <quazipfile.h>
-#include <QDateTime>
+#include "monotonicclock.h"
 #include <QDebug>
 
-// Auto check: 1 hr
-static const quint64 AUTO_CHECK_TIME = 60 * 60 * 1000;
+// Auto check: 6 hr
+static const qint64 AUTO_CHECK_TIME = 60 * 60 * 6000;
 
 KbFirmware::FW::FW() : fwVersion(0.f), ckbVersion(0.f) {}
 
@@ -55,7 +55,7 @@ KbFirmware::~KbFirmware(){
 }
 
 bool KbFirmware::checkUpdates(){
-    quint64 now = QDateTime::currentMSecsSinceEpoch();
+    qint64 now = MonotonicClock::msecs();
     if(now < lastCheck + AUTO_CHECK_TIME)
         return false;
     tableDownload = networkManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/ckb-next/ckb-next/master/FIRMWARE")));
@@ -68,7 +68,7 @@ void KbFirmware::processDownload(QNetworkReply* reply){
     if(reply->error() != QNetworkReply::NoError)
         return;
     // Update last check
-    lastCheck = lastFinished = QDateTime::currentMSecsSinceEpoch();
+    lastCheck = lastFinished = MonotonicClock::msecs();
     QByteArray data = reply->readAll();
     // Don't do anything if this is the same as the last version downloaded
     QByteArray hash = QCryptographicHash::hash(data, QCryptographicHash::Sha256);

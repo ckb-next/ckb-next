@@ -1,6 +1,5 @@
 #include <cmath>
 #include <QApplication>
-#include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include <QUrl>

@@ -1,5 +1,5 @@
 #include <cmath>
-#include <QDateTime>
+#include "monotonicclock.h"
 #include <QSet>
 #include "kblight.h"
 #include "kbmode.h"
@@ -108,7 +108,7 @@ void KbLight::dimming(int newDimming, bool noSave){
 KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys, const QString& name, const QMap<QString, QVariant>& preset){
     // Stop and restart all existing animations
     stopPreview();
-    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    quint64 timestamp = MonotonicClock::msecs();
     foreach(KbAnim* anim, _animList){
         anim->stop();
         anim->trigger(timestamp);
@@ -132,7 +132,7 @@ KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys, const 
 void KbLight::previewAnim(const AnimScript* base, const QStringList& keys, const QMap<QString, QVariant>& preset){
     if(_previewAnim)
         stopPreview();
-    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    quint64 timestamp = MonotonicClock::msecs();
     // Load the new animation and set preset parameters
     KbAnim* anim = new KbAnim(this, _map, "", keys, base);
     QMapIterator<QString, QVariant> i(preset);
@@ -155,7 +155,7 @@ void KbLight::stopPreview(){
 
 KbAnim* KbLight::duplicateAnim(KbAnim* oldAnim){
     // Stop and restart all existing animations
-    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    quint64 timestamp = MonotonicClock::msecs();
     foreach(KbAnim* anim, _animList){
         anim->stop();
         anim->trigger(timestamp);
@@ -185,7 +185,7 @@ bool KbLight::isStarted(){
 }
 
 void KbLight::restartAnimation(){
-    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    quint64 timestamp = MonotonicClock::msecs();
     foreach(KbAnim* anim, _animList){
         anim->stop();
         anim->trigger(timestamp);
@@ -197,11 +197,11 @@ void KbLight::restartAnimation(){
 void KbLight::animKeypress(const QString& key, bool down){
     foreach(KbAnim* anim, _animList){
         if(anim->keys().contains(key))
-            anim->keypress(key, down, QDateTime::currentMSecsSinceEpoch());
+            anim->keypress(key, down, MonotonicClock::msecs());
     }
     if(_previewAnim){
         if(_previewAnim->keys().contains(key))
-            _previewAnim->keypress(key, down, QDateTime::currentMSecsSinceEpoch());
+            _previewAnim->keypress(key, down, MonotonicClock::msecs());
     }
 }
 
@@ -212,7 +212,7 @@ void KbLight::open(){
     activeLights.insert(this);
     if(_start)
         return;
-    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    quint64 timestamp = MonotonicClock::msecs();
     foreach(KbAnim* anim, _animList)
         anim->trigger(timestamp);
     if(_previewAnim)
@@ -309,7 +309,7 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
     rebuildBaseMap();
     _animMap = _colorMap;
     // Advance animations
-    quint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    quint64 timestamp = MonotonicClock::msecs();
     foreach(KbAnim* anim, _animList)
         anim->blend(_animMap, timestamp);
     if(_previewAnim)

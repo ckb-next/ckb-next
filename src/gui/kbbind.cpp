@@ -1,4 +1,4 @@
-#include <QDateTime>
+#include "monotonicclock.h"
 #include <QUrl>
 #include "ckbsettings.h"
 #include "kbbind.h"
@@ -8,7 +8,7 @@
 #include <typeinfo>
 
 QHash<QString, QString> KbBind::_globalRemap;
-quint64 KbBind::globalRemapTime = 0;
+qint64 KbBind::globalRemapTime = 0;
 
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _map(keyMap),
@@ -112,7 +112,7 @@ void KbBind::setGlobalRemap(const QHash<QString, QString>& keyToActual){
         if(i.key() != i.value())
             _globalRemap[i.key()] = i.value();
     }
-    globalRemapTime = QDateTime::currentMSecsSinceEpoch();
+    globalRemapTime = MonotonicClock::msecs();
 }
 
 void KbBind::loadGlobalRemap(){
@@ -120,7 +120,7 @@ void KbBind::loadGlobalRemap(){
     CkbSettings settings("Program/GlobalRemap");
     foreach(const QString& key, settings.childKeys())
         _globalRemap[key] = settings.value(key).toString();
-    globalRemapTime = QDateTime::currentMSecsSinceEpoch();
+    globalRemapTime = MonotonicClock::msecs();
 }
 
 void KbBind::saveGlobalRemap(){

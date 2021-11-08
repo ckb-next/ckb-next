@@ -118,8 +118,8 @@ private:
     KeyAction* bindAction(const QString& key);
 
     static QHash<QString, QString>  _globalRemap;
-    static quint64                  globalRemapTime;
-    quint64                         lastGlobalRemapTime;
+    static qint64                  globalRemapTime;
+    qint64                         lastGlobalRemapTime;
 
     //////////
     /// \brief lastCmd is a cache-hack.

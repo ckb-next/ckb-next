@@ -2,7 +2,6 @@
 #include <QSet>
 #include <QUrl>
 #include <QMutex>
-#include <QDateTime>
 #include <QDebug>
 #include "kb.h"
 #include "kbmanager.h"

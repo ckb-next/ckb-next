@@ -1,5 +1,4 @@
 #include <cmath>
-#include <QDateTime>
 #include <QMetaEnum>
 #include <QDebug>
 #include "ckbsettings.h"

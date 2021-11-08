@@ -3,7 +3,7 @@
 #include "kb.h"
 #include "kbanim.h"
 #include "kbprofile.h"
-#include <QDateTime>
+#include "monotonicclock.h"
 #include <QUrl>
 #include <cstring>
 #include <cstdio>
@@ -399,7 +399,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         if(down){
             if(!onlyOnce || !anim->isActive())
                 // If "only once" is enabled, don't start the animation when it's already running
-                anim->trigger(QDateTime::currentMSecsSinceEpoch(), true);
+                anim->trigger(MonotonicClock::msecs(), true);
         } else if(stopOnRelease){
             // Key released - stop animation
             anim->stop();

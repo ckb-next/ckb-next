@@ -33,7 +33,7 @@ public:
 private:
 
     // Time initiated
-    quint64 lastCheck, lastFinished;
+    qint64 lastCheck, lastFinished;
     // Model -> firmware table
     struct FW {
         QString     url, fileName;

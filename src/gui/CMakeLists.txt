@@ -210,6 +210,7 @@ if (MACOS OR LINUX)
               modeselectdialog.h
               modelisttablemodel.h
               modelistwidget.h
+              monotonicclock.h
               mperfwidget.h
               nouserinputtextedit.h
               nowheelcombobox.h

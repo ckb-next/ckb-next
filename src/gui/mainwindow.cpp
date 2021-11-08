@@ -1,4 +1,3 @@
-
 #include "ckbsettings.h"
 #include "kbmanager.h"
 #include "kbfirmware.h"
@@ -15,6 +14,7 @@
 #include <sys/socket.h>
 #include <signal.h>
 #include <QProcess>
+#include "monotonicclock.h"
 #include "xcb/xwindowdetector.h"
 XWindowDetector* windowDetector = nullptr;
 
@@ -440,8 +440,8 @@ void MainWindow::stateChange(Qt::ApplicationState state){
     // On OSX it's possible for the app to be brought to the foreground without the window actually reappearing.
     // We want to make sure it's shown when this happens.
 #ifdef Q_OS_MAC
-    static quint64 lastStateChange = 0;
-    quint64 now = QDateTime::currentMSecsSinceEpoch();
+    static qint64 lastStateChange = 0;
+    qint64 now = MonotonicClock::msecs();
     if(state == Qt::ApplicationActive){
         // This happens once at startup so ignore it. Also don't allow it to be called more than once every 2s.
         if(lastStateChange != 0 && now >= lastStateChange + 2 * 1000)

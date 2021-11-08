@@ -1,12 +1,12 @@
 #ifndef __APPLE__
 
 #ifdef USE_LIBPULSE
-#include <QDateTime>
 #include <pulse/context.h>
 #include <pulse/introspect.h>
 #include <pulse/subscribe.h>
 #include <pulse/mainloop.h>
 #include <QDebug>
+#include "monotonicclock.h"
 #endif
 #include "media.h"
 
@@ -103,7 +103,7 @@ static void ContextStateCallback(pa_context* context, void* data){
         paContext = nullptr;
 
         //Try to reconnect again shortly.
-        reconnectTime = QDateTime::currentMSecsSinceEpoch() + 10000;
+        reconnectTime = MonotonicClock::msecs() + 10000;
         lastKnownSink = lastKnownSource = UNKNOWN;
     }
 }
@@ -128,7 +128,7 @@ muteState getMuteState(const muteDevice muteDev){
     // Connect to the local Pulse Audio server. It's usually running but a
     // reconnect is attempted periodically whenever the connection fails or is
     // terminated.
-    if(paContext == nullptr && QDateTime::currentMSecsSinceEpoch() >= reconnectTime){
+    if(paContext == nullptr && MonotonicClock::msecs() >= reconnectTime){
         qDebug() << "Creating PulseAudio context";
         pa_mainloop_api* api = pa_mainloop_get_api(mainLoop);
         if(api == nullptr)

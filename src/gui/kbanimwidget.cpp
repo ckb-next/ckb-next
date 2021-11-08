@@ -1,4 +1,3 @@
-#include <QDateTime>
 #include <QMenu>
 #include "animsettingdialog.h"
 #include "kbanimwidget.h"

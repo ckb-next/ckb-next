@@ -649,7 +649,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
                         if(buffer[1] == BRAGI_INPUT_HID) {
                             if(urblen == 64)
-                                corsair_bragi_mousecopy(kb, &targetkb->input, buffer);
+                                corsair_bragi_mousecopy(targetkb, &targetkb->input, buffer);
                             else
                                 ckb_err("Invalid length in corsair_bragi_mousecopy(). Expected 64, got %d", urblen);
                         } else {
@@ -657,7 +657,9 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                             targetkb->input.rel_y += (buffer[7] << 8) | buffer[6];
                             // Some bragi devices do not report scrolling in the SW packet
                             // These type of hacks most likely apply to the dongle, and not the device itself in WL mode
-                            if(SW_PKT_HAS_NO_WHEEL(kb))
+                            // Despite that, use targetkb for now, just because corsair_bragi_mousecopy has subkb passed to it, performing the same check.
+                            // If the above is in fact true, then we'll need a workaround.
+                            if(SW_PKT_HAS_NO_WHEEL(targetkb))
                                 targetkb->input.whl_rel_y = (signed char)buffer[8];
                         }
                     } else {

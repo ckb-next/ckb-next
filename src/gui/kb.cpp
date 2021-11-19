@@ -829,7 +829,11 @@ void Kb::setCurrentProfile(KbProfile* profile){
     emit profileAboutToChange();
     _currentProfile = profile;
     emit profileChanged();
-    setCurrentMode(profile->currentMode());
+    // Hack to prevent crash when switching to HW mode on first start with no config file.
+    // It happens when called by KbWidget::on_profileBox_activated().
+    // The KbWidget event will re-call this after the currentMode has properly been set.
+    if(profile->currentMode())
+        setCurrentMode(profile->currentMode());
 }
 
 void Kb::setCurrentMode(KbMode* mode){

@@ -95,10 +95,21 @@ static int setactive_bragi(usbdevice* kb, int active){
         if(light < 0)
             return light;
 
-        if(light)
+        if(light) {
             ckb_err("ckb%d: Bragi alt light init returned error 0x%hhx", ckb_id, light);
-        else // Swap the RGB function if we're using alt lighting
+        } else {
+            // Swap the RGB function if we're using alt lighting
             kb->vtable.updatergb = updatergb_keyboard_bragi_alt;
+
+            // Open the second lighting handle
+            // We don't yet know if this is K100 specific or if it has to be opened along with the alt one
+            light = bragi_open_handle(kb, BRAGI_2ND_LIGHTING_HANDLE, BRAGI_RES_LIGHTING_EXTRA);
+            if(light < 0)
+                return light;
+
+            if(light)
+                ckb_err("ckb%d: Bragi extra light init returned error 0x%hhx", ckb_id, light);
+        }
     } else {
         ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, light);
     }

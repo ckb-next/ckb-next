@@ -34,6 +34,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_NIGHTSWORD, 18000},
     { P_IRONCLAW_W_U, 18000 },
     { P_HARPOON_WL_U, 10000 },
+    { P_GLAIVE_PRO, 16000 },
     { 0, 0 }, // Keep last and do not remove
 };
 
@@ -102,6 +103,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_IRONCLAW_W_D, },
     { V_CORSAIR, P_HARPOON_WL_U, },
     { V_CORSAIR, P_HARPOON_WL_D, },
+    { V_CORSAIR, P_GLAIVE_PRO, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
@@ -209,6 +211,8 @@ const char* product_str(ushort product){
         return "katarproxt";
     if(product == P_GLAIVE)
         return "glaive";
+    if(product == P_GLAIVE_PRO)
+        return "glaivepro";
     if(product == P_KATAR)
         return "katar";
     if(product == P_IRONCLAW)

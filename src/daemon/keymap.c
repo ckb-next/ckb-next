@@ -202,6 +202,28 @@ const key keymap[N_KEYS_EXTENDED] = {
     // Strafe logo backlight
     { "logo",      0x7d, KEY_CORSAIR },
 
+    // 20 empty entries for the K100 (patched by the bragi keymap)
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+
     // Keys not present on any device
     { "lightup",    -1, KEY_BRIGHTNESSUP },
     { "lightdn",    -1, KEY_BRIGHTNESSDOWN },
@@ -474,6 +496,29 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "topbar17",      153, KEY_NONE },
     { "topbar18",      154, KEY_NONE },
     { "topbar19",      155, KEY_NONE },
+    { 0,            -1,   KEY_NONE }, // Extra zones for K100
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
+    { 0,            -1,   KEY_NONE },
 };
 
 // LUT for HID -> Corsair scancodes (-1 for no scan code, -2 for currently unsupported)

@@ -3,10 +3,16 @@
 #include "profile.h"
 #include "usb.h"
 #include "nxp_proto.h"
+#include "dpi.h"
+#include <stdbool.h>
 
 // Compare two light structures, ignore keys
-static int rgbcmp(const lighting* lhs, const lighting* rhs){
+static inline int rgbcmp(const lighting* lhs, const lighting* rhs){
     return memcmp(lhs->r + LED_MOUSE, rhs->r + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->g + LED_MOUSE, rhs->g + LED_MOUSE, N_MOUSE_ZONES) || memcmp(lhs->b + LED_MOUSE, rhs->b + LED_MOUSE, N_MOUSE_ZONES);
+}
+
+static inline int dpirgbcmp(const lighting* lhs, const lighting* rhs){
+    return memcmp(lhs->r + DPI_RGB_START, rhs->r + DPI_RGB_START, DPI_COUNT) || memcmp(lhs->g + DPI_RGB_START, rhs->g + DPI_RGB_START, DPI_COUNT) || memcmp(lhs->b + DPI_RGB_START, rhs->b + DPI_RGB_START, DPI_COUNT);
 }
 
 int updatergb_mouse(usbdevice* kb, int force){
@@ -14,14 +20,20 @@ int updatergb_mouse(usbdevice* kb, int force){
         return 0;
     lighting* lastlight = &kb->profile->lastlight;
     lighting* newlight = &kb->profile->currentmode->light;
+    bool fupdate = force || lastlight->forceupdate || newlight->forceupdate;
+
+    // Force a DPI update if the rgb0-rgb5 zones have changed
+    // This needs to be above the main rgbcmp check as it doesn't return
+    if(NXP_RGB_IN_DPI_PKT(kb) && (fupdate || dpirgbcmp(lastlight, newlight)))
+        updatedpi(kb, 1);
+
     // Don't do anything if the lighting hasn't changed
-    if(!force && !lastlight->forceupdate && !newlight->forceupdate
-            && !rgbcmp(lastlight, newlight))
+    if(!(fupdate || rgbcmp(lastlight, newlight)))
         return 0;
     lastlight->forceupdate = newlight->forceupdate = 0;
 
     // The Dark Core has its own lighting protocol.
-    if(IS_DARK_CORE(kb))
+    if(IS_DARK_CORE_NXP(kb))
         return updatergb_wireless(kb, lastlight, newlight);
 
     // Prevent writing to DPI LEDs or non-existent LED zones for the Glaive.

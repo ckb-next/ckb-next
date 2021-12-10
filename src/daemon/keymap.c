@@ -279,7 +279,7 @@ const key keymap[N_KEYS_EXTENDED] = {
     { "wheel",      LED_MOUSE + 3, KEY_NONE },
     { "thumb",      LED_MOUSE + 4, KEY_NONE },
     { "side",       LED_MOUSE + 5, KEY_NONE },
-    { "dpi0",       LED_MOUSE + 6, KEY_NONE },  // HW DPI light levels (0 = sniper, 1..5 = modes)
+    { "dpi0",       LED_MOUSE + 6, KEY_NONE },  // HW/SW (non realtime) DPI light levels (0 = sniper, 1..5 = modes)
     { "dpi1",       LED_MOUSE + 7, KEY_NONE },
     { "dpi2",       LED_MOUSE + 8, KEY_NONE },
     { "dpi3",       LED_MOUSE + 9, KEY_NONE },

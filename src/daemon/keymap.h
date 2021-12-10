@@ -47,11 +47,12 @@
 // LED_MOUSE is an LED index, so technically this is wrong
 // It just needs to be a large enough number to not conflict with any of the other "base" led scancodes
 // For example topbar16 with dpi4
-#define LED_MOUSE               (N_KEYS_HW + N_KEY_ZONES)
+#define LED_MOUSE               N_KEYS_INPUT
 #define N_MOUSE_ZONES           6
 #define N_MOUSE_ZONES_EXTENDED  12
 // Index of DPI light
 #define LED_DPI                 (LED_MOUSE + 2)
+#define DPI_RGB_START           (LED_MOUSE + 6)
 // Total number of keys recognized by software
 #define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED)
 #define N_KEYBYTES_EXTENDED     ((N_KEYS_EXTENDED + 7) / 8)

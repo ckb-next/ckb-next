@@ -43,13 +43,7 @@ int updatergb_wireless(usbdevice* kb, lighting* lastlight, lighting* newlight) {
     if(IS_K63_WL(kb)) {
         // TODO translate updatergb to hwanim for the K63WL
         return 0;
-    } else if (IS_DARK_CORE(kb)) {
-        if(
-            lastlight->r[LED_MOUSE + 2] != newlight->r[LED_MOUSE + 2] ||
-            lastlight->g[LED_MOUSE + 2] != newlight->g[LED_MOUSE + 2] ||
-            lastlight->b[LED_MOUSE + 2] != newlight->b[LED_MOUSE + 2]
-        )
-            updatedpi(kb, 0);
+    } else if (IS_DARK_CORE_NXP(kb)) {
         for(int i = 0; i < 3; i++)
         {
             if(
@@ -90,7 +84,7 @@ void apply_hwanim(usbdevice* kb, short zone, uchar anim, uchar speed, uchar rand
     // Create pointer to anim_pkt which starts at index 4
     uchar* anim_ptr = anim_pkt + 4;
 
-    if(IS_DARK_CORE(kb)){
+    if(IS_DARK_CORE_NXP(kb)){
         switch(speed){
         case HWANIM_SPEED_LOW:
         case HWANIM_SPEED_MEDIUM:
@@ -174,13 +168,13 @@ void apply_hwanim(usbdevice* kb, short zone, uchar anim, uchar speed, uchar rand
     }
 
     // K63WL is shifted one byte to the left since it lacks the zone byte
-    if(IS_DARK_CORE(kb))
+    if(IS_DARK_CORE_NXP(kb))
         *anim_ptr++ = 1 << zone;       // Bitmask.
     *anim_ptr++ = anim;                // Command (static colour).
     *anim_ptr++ = speed;               // Speed (1-3)
     *anim_ptr++ = rand_or_dir;         // Random/Alternating byte (Dark Core) Direction byte on K63WL
     *anim_ptr++ = 100;                 // Opacity (100%).
-    if(IS_DARK_CORE(kb)){
+    if(IS_DARK_CORE_NXP(kb)){
         *anim_ptr++ = r[0];
         *anim_ptr++ = g[0];
         *anim_ptr++ = b[0];

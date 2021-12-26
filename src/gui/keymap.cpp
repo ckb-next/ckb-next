@@ -1032,6 +1032,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Mice also have no layout patches - no other changes necessary
         break;
     }
+    case KeyMap::GLAIVEPRO:{
+        // Based on the Glaive
+        map = getMap(KeyMap::GLAIVE, layout);
+        // Change dpiup back to DPI Up, and add dpidn
+        map["dpiup"]._friendlyName = "DPI Up";
+        map["dpiup"].height = 8;
+        map["dpiup"].y -= 2;
+        map["dpidn"] = {0, "DPI Down", "dpidn", 34, 29, 6, 8, false, true};
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -1278,6 +1288,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return IRONCLAW_W;
     if(lower == "k95l")
         return K95L;
+    if(lower == "glaivepro")
+        return GLAIVEPRO;
     return NO_MODEL;
 }
 
@@ -1337,6 +1349,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "ironclaw_wireless";
     case K95L:
         return "k95l";
+    case GLAIVEPRO:
+        return "glaivepro";
     default:
         return "";
     }
@@ -1384,6 +1398,7 @@ int KeyMap::modelWidth(Model model){
     case M95:
     case IRONCLAW:
     case NIGHTSWORD:
+    case GLAIVEPRO:
         return M65_WIDTH;
     case IRONCLAW_W:
         return M65_WIDTH;
@@ -1422,6 +1437,7 @@ int KeyMap::modelHeight(Model model){
     case M95:
     case IRONCLAW:
     case NIGHTSWORD:
+    case GLAIVEPRO:
         return M65_HEIGHT;
     case IRONCLAW_W:
         return M65_HEIGHT;

@@ -411,4 +411,12 @@ extern const dpi_list mouse_dpi_list[];
 
 int os_usb_interrupt_out(usbdevice* kb, unsigned int ep, unsigned int len, uchar* data, const char* file, int line);
 
+///
+/// \brief Wait for devices to be reactivated after suspend.
+///
+/// Should be called before communicating with any device.
+///
+/// \warning dmutex may NOT be held by the calling thread.
+void wait_until_suspend_processed();
+
 #endif  // USB_H

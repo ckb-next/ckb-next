@@ -170,7 +170,9 @@ void* os_inputmain(void* context){
 
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
-        if (ioctl(fd, USBDEVFS_REAPURB, &urb)) {
+        int res = ioctl(fd, USBDEVFS_REAPURB, &urb);
+        wait_until_suspend_processed();
+        if (res) {
             if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
@@ -597,6 +599,76 @@ static void udev_enum(){
 
 _Atomic int suspend_run = 1;
 
+///
+/// \brief Gracefully resume from suspend.
+static void graceful_suspend_resume() {
+    // Wait for the kernel to finish reattaching drivers. Avoids race
+    // conditions (kernel bug) and situations where the usbhid driver is
+    // attached after we already believe to be in control of the device.
+    // Retry for at most 5 seconds.
+    // XXX: Is 5s too much? It might be possible for interfaces to be left
+    // unclaimed indefinitely.
+    for (int try = 0; suspend_run && try < 100; try++) {
+        int drivers_attached = 1;
+        for (int i = 1; i < DEV_MAX; i++) {
+            usbdevice* kb = keyboard + i;
+            if (kb->status == DEV_STATUS_CONNECTED && kb->active) {
+                for (int j = 0; j < kb->epcount; j++) {
+                    // Replicates the logic from usbunclaim() - ignore
+                    // interfaces other than 0 and 1.
+                    if (j == 2 && kb->protocol == PROTO_NXP)
+                        continue;
+
+                    struct usbdevfs_getdriver query = {
+                        .interface = j,
+                    };
+                    if (ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
+                        if (errno == ENODATA) {
+                            // No driver attached yet, so keep waiting.
+                            drivers_attached = 0;
+                        }
+                        // Ignore other errors.
+                    }
+                }
+            }
+        }
+        if (drivers_attached) break;
+        else {
+            struct timespec sleep_for = { .tv_nsec = 50 * 1000000 };
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_for, NULL);
+        }
+    }
+    // If some interfaces are now claimed by a driver other than usbfs (or
+    // none), attemt to reclaim them.
+    for (int i = 1; i < DEV_MAX; i++) {
+        usbdevice* kb = keyboard + i;
+        if (kb->status == DEV_STATUS_CONNECTED) {
+            int needs_reclaim = 0;
+            for (int j = 0; j < kb->epcount; j++) {
+                struct usbdevfs_getdriver query = {
+                    .interface = j,
+                };
+                if (!ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
+                    if (strcmp("usbfs", query.driver)) {
+                        needs_reclaim = 1;
+                        break;
+                    }
+                } else {
+                    if (errno == ENODATA) {
+                        needs_reclaim = 1;
+                        break;
+                    }
+                }
+            }
+            if (needs_reclaim) {
+                usbclaim(kb);
+                // Ignore errors for now. reactivate_devices() should
+                // try to reset the device.
+            }
+        }
+    }
+}
+
 // While POSIX says we may need a runtime test, on Linux the clock
 // was added immediately after the define was introduced, so a
 // compile time check should be enough
@@ -617,20 +689,51 @@ static time_t get_clock_monotonic_seconds() {
     return timespec_var.tv_sec;
 }
 
+static pthread_mutex_t suspend_check_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t suspend_check_cond = PTHREAD_COND_INITIALIZER;
+static time_t prev_suspend_check_time;
+
 void* suspend_check() {
-    time_t prev_time = get_clock_monotonic_seconds();
-    if(!prev_time)
+    time_t current_time = get_clock_monotonic_seconds();
+    if(!current_time)
         return NULL;
+    pthread_mutex_lock(&suspend_check_mutex);
+    prev_suspend_check_time = current_time;
+    pthread_mutex_unlock(&suspend_check_mutex);
     while(suspend_run){
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 2}, NULL);
-        time_t current_time = get_clock_monotonic_seconds(NULL);
+        current_time = get_clock_monotonic_seconds();
 
-        if(prev_time + 4 < current_time)
+        if (prev_suspend_check_time + 4 < current_time) {
+            graceful_suspend_resume();
             reactivate_devices();
+            // Some time might have passed, get a fresh timestamp so other
+            // threads can continue
+            current_time = get_clock_monotonic_seconds();
+        }
 
-        prev_time = current_time;
+        pthread_mutex_lock(&suspend_check_mutex);
+        prev_suspend_check_time = current_time;
+        pthread_cond_broadcast(&suspend_check_cond);
+        pthread_mutex_unlock(&suspend_check_mutex);
     }
     return NULL;
+}
+
+void wait_until_suspend_processed() {
+    // Prevent other threads from doing anything after waking from suspend and
+    // before the suspend thread has finished reactivate_devices().
+    // If necessary, this could be optimized by first checking an _Atomic
+    // representing prev_suspend_check_time instead of locking the shared mutex
+    // directly.
+
+    time_t current_time = get_clock_monotonic_seconds();
+    pthread_mutex_lock(&suspend_check_mutex);
+    while (suspend_run && prev_suspend_check_time + 4 < current_time) {
+        pthread_cond_wait(&suspend_check_cond, &suspend_check_mutex);
+        current_time = get_clock_monotonic_seconds();
+    }
+    pthread_mutex_unlock(&suspend_check_mutex);
 }
 
 /// \brief .

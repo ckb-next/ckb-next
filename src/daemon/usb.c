@@ -324,6 +324,7 @@ static void* devmain(usbdevice* kb){
         // Read from FIFO
         const char* line;
         int lines = readlines(kbfifo, linectx, &line);
+        wait_until_suspend_processed();
         queued_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
         if(kb->status == DEV_STATUS_DISCONNECTING || kb->status == DEV_STATUS_DISCONNECTED)

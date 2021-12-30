@@ -21,7 +21,7 @@ public:
     int         moveCurrent(int to);
     void        setCurrentColor(const QColor& color);
 
-signals:
+Q_SIGNALS:
     void currentChanged(QColor color, bool spontaneous, int position);
 
 private:

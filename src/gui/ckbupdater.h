@@ -18,10 +18,10 @@ private:
     QString _latestVerStr;
     QString parseChangeLog(QByteArray* bytes);
 
-signals:
+Q_SIGNALS:
     void checkedForNewVer(QString ver, QString changelog);
 
-private slots:
+private Q_SLOTS:
     void finished(QNetworkReply* reply);
 };
 

@@ -37,23 +37,23 @@ KPerfWidget::KPerfWidget(QWidget *parent) :
         // Map signals
         if(indicators[i].enable){
             connect(indicators[i].enable, &QCheckBox::clicked, [=] () {
-                emit uiUpdated(i);
+                Q_EMIT uiUpdated(i);
             });
         }
         if(indicators[i].hwEnable){
             connect(indicators[i].hwEnable, OVERLOAD_PTR(int, QComboBox, activated), [=] () {
-                emit uiUpdated(i);
+                Q_EMIT uiUpdated(i);
             });
         }
         connect(indicators[i].color1, &ColorButton::colorChanged, [=] () {
-            emit uiUpdated(i);
+            Q_EMIT uiUpdated(i);
         });
         connect(indicators[i].color2, &ColorButton::colorChanged, [=] () {
-            emit uiUpdated(i);
+            Q_EMIT uiUpdated(i);
         });
         if(indicators[i].color3){
             connect(indicators[i].color3, &ColorButton::colorChanged, [=] () {
-                emit uiUpdated(i);
+                Q_EMIT uiUpdated(i);
             });
         }
     }

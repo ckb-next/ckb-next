@@ -27,7 +27,7 @@ public:
     // Sets current selection (chooses keys to rebind)
     void setSelection(const QStringList& newSelection, bool applyPrevious = false);
 
-private slots:
+private Q_SLOTS:
     void applyChanges(const QStringList& keys, bool doUnbind);
     void on_applyButton_clicked();
     void on_cancelButton_clicked();

@@ -263,7 +263,7 @@ void SettingsWidget::on_autoUpdBox_clicked(bool checked)
 
 void SettingsWidget::on_pushButton_2_clicked()
 {
-    emit checkForUpdates();
+    Q_EMIT checkForUpdates();
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_2->setText(tr("Checking..."));
     updateRequestedByUser = true;

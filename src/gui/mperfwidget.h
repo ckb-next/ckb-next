@@ -53,7 +53,7 @@ private:
 
     void hideItemsInLayout(QLayout* layout);
 
-private slots:
+private Q_SLOTS:
     void colorClicked(int index);
     void colorChanged(int index);
     void sliderXValueChanged(int index);

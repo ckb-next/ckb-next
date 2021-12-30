@@ -20,9 +20,9 @@ void GradientDialogWidget::setStops(const QGradientStops& stops){
     }
     _current = 0;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-    emit currentChanged(_colors.first(), false, 0);
+    Q_EMIT currentChanged(_colors.first(), false, 0);
 #else
-    emit currentChanged(_colors.value(_colors.keys().first()), false, 0);
+    Q_EMIT currentChanged(_colors.value(_colors.keys().first()), false, 0);
 #endif
     update();
 }
@@ -284,7 +284,7 @@ void GradientDialogWidget::mouseReleaseEvent(QMouseEvent* event){
         // Rejoin selection with gradient
         _current = selectedStop();
         _colors = selectionColors();
-        emit currentChanged(_colors.value(_current), true, _current);
+        Q_EMIT currentChanged(_colors.value(_current), true, _current);
         selectedPos = -1;
         selected = QColor();
         makeStops();

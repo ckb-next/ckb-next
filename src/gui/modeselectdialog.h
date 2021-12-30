@@ -22,7 +22,7 @@ public:
     // Mode(s) selected by the user
     QList<KbMode*> selection();
 
-private slots:
+private Q_SLOTS:
     void on_selAllButton_clicked();
     void on_selNoneButton_clicked();
 

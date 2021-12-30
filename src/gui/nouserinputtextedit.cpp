@@ -13,7 +13,7 @@ bool NoUserInputTextEdit::eventFilter(QObject* obj, QEvent* evt){
 
         // modifiers(): Warning: This function cannot always be trusted.
         // The user can confuse it by pressing both Shift keys simultaneously and releasing one of them, for example.
-        emit macroKeyEvent(keyevt->key(), (evt->type() == QEvent::KeyPress), keyevt->modifiers());
+        Q_EMIT macroKeyEvent(keyevt->key(), (evt->type() == QEvent::KeyPress), keyevt->modifiers());
         return true;
     } else if (evt->type() == QEvent::ContextMenu) {
         return true;

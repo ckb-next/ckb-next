@@ -17,9 +17,9 @@ public:
     explicit XWindowDetector(QObject *parent = 0);
     void terminateEventLoop();
 
-signals:
+Q_SIGNALS:
     void activeWindowChanged(XWindowInfo info);
-public slots:
+public Q_SLOTS:
 
 void run();
 

@@ -20,7 +20,7 @@ public:
     void setBind(KbBind* newBind, KbProfile* newProfile);
     void setControlsEnabled(const bool e);
 
-private slots:
+private Q_SLOTS:
     void updateBind();
     void newLayout();
     void newSelection(const QStringList& selection);

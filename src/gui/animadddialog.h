@@ -20,7 +20,7 @@ public:
     const AnimScript*   chosenScript();
     int                 chosenPreset();
 
-private slots:
+private Q_SLOTS:
     void on_animBox_activated(int index);
     void on_presetBox_activated(int index);
     void on_previewBox_clicked(bool checked);

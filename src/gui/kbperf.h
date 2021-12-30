@@ -123,7 +123,7 @@ public:
     void applyIndicators(int modeIndex, const bool indicatorState[HW_I_COUNT]);
     int getDpiIdx();
 
-signals:
+Q_SIGNALS:
     void didLoad();
     void settingsUpdated();
     void dpiChanged(int index);

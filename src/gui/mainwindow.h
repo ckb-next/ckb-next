@@ -61,17 +61,17 @@ private:
     static QIcon getIcon();
     static QString getIconName();
 
-public slots:
+public Q_SLOTS:
     void showWindow();
     void stateChange(Qt::ApplicationState state);
     void quitApp();
     void checkForCkbUpdates();
 
-signals:
+Q_SIGNALS:
     void switchToProfileCLI(QString profile);
     void switchToModeCLI(QString mode);
 
-private slots:
+private Q_SLOTS:
     void addDevice(Kb* device);
     void removeDevice(Kb* device);
     void updateVersion();
@@ -91,7 +91,7 @@ private:
     CkbUpdater* updater;
 #endif
 
-signals:
+Q_SIGNALS:
     void trayIconScrolled(bool up);
 };
 

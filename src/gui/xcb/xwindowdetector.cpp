@@ -126,7 +126,7 @@ void XWindowDetector::fetchNewWinInfo(xcb_window_t win, xcb_ewmh_connection_t* e
             wm_class_name = wm_class.at(1);
         }
         const XWindowInfo info = {pid, window_name, getExePathByPID(pid), wm_instance_name, wm_class_name};
-        emit activeWindowChanged(info);
+        Q_EMIT activeWindowChanged(info);
     }
 }
 

@@ -157,7 +157,7 @@ void KbFirmware::downloadFinished(){
     processDownload(tableDownload);
     tableDownload->deleteLater();
     tableDownload = 0;
-    emit downloaded();
+    Q_EMIT downloaded();
 }
 
 float KbFirmware::versionForBoard(const ushort productID, bool waitForComplete) {

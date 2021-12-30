@@ -24,14 +24,14 @@ void CkbUpdater::finished(QNetworkReply* reply){
             float currentVer = KbManager::ckbGuiVersionF();
 
             if(latestVer <= currentVer) {
-                emit checkedForNewVer(QString(), QString());
+                Q_EMIT checkedForNewVer(QString(), QString());
             } else
                 _accessManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/ckb-next/ckb-next/master/CHANGELOG.md")));
         } else
-            emit checkedForNewVer(_latestVerStr, parseChangeLog(&bytes));
+            Q_EMIT checkedForNewVer(_latestVerStr, parseChangeLog(&bytes));
 
     } else
-        emit checkedForNewVer(QString(), QString());
+        Q_EMIT checkedForNewVer(QString(), QString());
     reply->deleteLater();
 }
 

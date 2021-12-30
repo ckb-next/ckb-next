@@ -84,11 +84,11 @@ void ModeListWidget::setDevice(Kb* dev){
     });
 
     // Pass through some needed signals
-    connect(floatingView, &QTableView::clicked, this, [this](const QModelIndex& idx) { emit clicked(idx); });
-    connect(floatingView, &QTableView::doubleClicked, this, [this](const QModelIndex& idx) { emit doubleClicked(idx); });
+    connect(floatingView, &QTableView::clicked, this, [this](const QModelIndex& idx) { Q_EMIT clicked(idx); });
+    connect(floatingView, &QTableView::doubleClicked, this, [this](const QModelIndex& idx) { Q_EMIT doubleClicked(idx); });
     // Don't lose "focus" when right clicking
     connect(floatingView, &QTableView::customContextMenuRequested, this, [this](const QPoint& p) {
-        emit customContextMenuRequested(p);
+        Q_EMIT customContextMenuRequested(p);
     });
 
 #ifndef USE_XCB_EWMH

@@ -70,7 +70,7 @@ public:
     inline void setNeedsSave()          { _needsSave = true; }
     inline void setNeedsUpdate()        { _bind->setNeedsUpdate(); _perf->setNeedsUpdate(); }
 
-signals:
+Q_SIGNALS:
     void updated();
 
 private:
@@ -84,7 +84,7 @@ private:
 
     bool _needsSave;
 
-private slots:
+private Q_SLOTS:
     void doUpdate();
 };
 

@@ -58,7 +58,7 @@ private:
     IndicatorUi indicators[I_COUNT];
     QList<QWidget*> k95Widgets;
 
-private slots:
+private Q_SLOTS:
     void uiUpdated(int index);
     void on_intensityBox_valueChanged(int arg1);
     void on_copyButton_clicked();

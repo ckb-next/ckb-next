@@ -35,7 +35,7 @@ void RListWidget::timerTick(){
         return;
     if(reordered){
         previousItems = newItems;
-        emit orderChanged();
+        Q_EMIT orderChanged();
         if(reselect){
             reselect->setSelected(true);
             setCurrentItem(reselect);

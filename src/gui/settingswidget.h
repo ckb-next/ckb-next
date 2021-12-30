@@ -28,10 +28,10 @@ public:
     void enableUpdateButton();
     void setUpdateButtonText(const QString& text);
 
-signals:
+Q_SIGNALS:
     void checkForUpdates();
 
-private slots:
+private Q_SLOTS:
     void on_pushButton_clicked();
     void on_capsBox_activated(int index);
     void on_shiftBox_activated(int index);

@@ -28,11 +28,11 @@ public:
 
     void setSelectedKeys(const QStringList& keys);
 
-signals:
+Q_SIGNALS:
     void animChanged(KbAnim* selection);
     void didUpdateSelection(QStringList keys);
 
-private slots:
+private Q_SLOTS:
     void on_animList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *prev);
     void on_animList_itemChanged(QListWidgetItem *item);
     void on_animList_customContextMenuRequested(const QPoint &pos);

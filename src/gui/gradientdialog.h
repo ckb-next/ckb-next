@@ -38,7 +38,7 @@ private:
 
     Ui::GradientDialog *ui;
 
-private slots:
+private Q_SLOTS:
     void currentChanged(const QColor& color, bool spontaneous, int position);
     void colorChanged(QColor color);
 

@@ -43,7 +43,7 @@ void MacroReader::macroDataReceived(QLocalSocket* f){
         const char* key = macroKeyData + 5;
         QString line = QString::fromUtf8(key);
         qint64 elapsed = keyStrokeTime();
-        emit macroLineRead(line, elapsed, down);
+        Q_EMIT macroLineRead(line, elapsed, down);
     }
 }
 
@@ -258,10 +258,10 @@ void MacroReader::translateQKeyEvent(int keycode, bool down, Qt::KeyboardModifie
         QString keycodestr = metaEnum.valueToKey(keycode);
         if(keycodestr.isEmpty())
             keycodestr = QString("keycode %1").arg(keycode);
-        emit macroReadError(keycodestr, modifierstr);
+        Q_EMIT macroReadError(keycodestr, modifierstr);
         return;
     }
     QString line = QString::fromUtf8(keystr);
     qint64 elapsed = keyStrokeTime();
-    emit macroLineRead(line, elapsed, down);
+    Q_EMIT macroLineRead(line, elapsed, down);
 }

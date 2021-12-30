@@ -59,7 +59,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((QCheckBox*)widget)->setChecked(value.toBool());
             colSpan = 4;
             connect((QCheckBox*)widget, &QCheckBox::stateChanged, [=] () {
-                emit updateParam(param.name);
+                Q_EMIT updateParam(param.name);
             });
             break;
         case AnimScript::Param::LONG:
@@ -72,7 +72,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 postfix = "";
             }
             connect((QSpinBox*)widget, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
-                emit updateParam(param.name);
+                Q_EMIT updateParam(param.name);
             });
             break;
         case AnimScript::Param::DOUBLE:
@@ -86,7 +86,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 postfix = "";
             }
             connect((QDoubleSpinBox*)widget, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
-                emit updateParam(param.name);
+                Q_EMIT updateParam(param.name);
             });
             break;
         case AnimScript::Param::RGB:
@@ -94,7 +94,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((ColorButton*)widget)->color(QColor("#" + value.toString()));
             colSpan = 3;
             connect((ColorButton*)widget, &ColorButton::colorChanged, [=] () {
-                emit updateParam(param.name);
+                Q_EMIT updateParam(param.name);
             });
             break;
         case AnimScript::Param::ARGB:{
@@ -109,7 +109,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((ColorButton*)widget)->color(color);
             colSpan = 3;
             connect((ColorButton*)widget, &ColorButton::colorChanged, [=] () {
-                emit updateParam(param.name);
+                Q_EMIT updateParam(param.name);
             });
             break;
         }
@@ -118,7 +118,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((GradientButton*)widget)->fromString(value.toString());
             colSpan = 3;
             connect((GradientButton*)widget, &GradientButton::gradientChanged, [=] () {
-                emit updateParam(param.name);
+                Q_EMIT updateParam(param.name);
             });
             break;
         case AnimScript::Param::AGRADIENT:
@@ -126,7 +126,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((GradientButton*)widget)->fromString(value.toString());
             colSpan = 3;
             connect((GradientButton*)widget, &GradientButton::gradientChanged, [=] () {
-                emit updateParam(param.name);
+                Q_EMIT updateParam(param.name);
             });
             break;
         case AnimScript::Param::ANGLE:
@@ -144,7 +144,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((QDial*)widget)->setInvertedAppearance(true);
             ((QDial*)widget)->setValue(angleFlip(value.toInt()));
             connect((QDial*)widget, &QDial::valueChanged, [=] () {
-                emit angleDialChanged(param.name);
+                Q_EMIT angleDialChanged(param.name);
             });
             break;
         case AnimScript::Param::STRING:
@@ -152,7 +152,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             ((QLineEdit*)widget)->setText(value.toString());
             colSpan = 3;
             connect((QLineEdit*)widget, &QLineEdit::textEdited, [=] () {
-                emit updateParam(param.name);
+                Q_EMIT updateParam(param.name);
             });
             break;
         case AnimScript::Param::LABEL:
@@ -183,7 +183,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
                 spinner->setValue(value.toInt());
                 angleSpinners[param.name] = spinner;
                 connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
-                    emit angleSpinnerChanged(param.name);
+                    Q_EMIT angleSpinnerChanged(param.name);
                 });
                 ui->settingsGrid->addWidget(spinner, row, 4);
                 colSpan = 2;
@@ -222,7 +222,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->settingsGrid->addWidget(check, row, 3, 1, 4);
     settingWidgets["trigger"] = check;
     connect(check, &QCheckBox::stateChanged, [=] () {
-        emit updateParam("trigger");
+        Q_EMIT updateParam("trigger");
     });
     row++;
     check = new QCheckBox(tr("Start with key press"), this);
@@ -230,7 +230,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->settingsGrid->addWidget(check, row, 3, 1, 2);
     settingWidgets["kptrigger"] = check;
     connect(check, &QCheckBox::stateChanged, [=] () {
-        emit updateParam("kptrigger");
+        Q_EMIT updateParam("kptrigger");
     });
     // Add an option allowing the user to select keypress mode
     QComboBox* combo = new QComboBox(this);
@@ -252,7 +252,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->settingsGrid->addWidget(combo, row, 5, 1, 2);
     settingWidgets["kpmode"] = combo;
     connect(combo, OVERLOAD_PTR(int, QComboBox, activated), [=] () {
-        emit updateParam("kpmode");
+        Q_EMIT updateParam("kpmode");
     });
     row++;
 
@@ -269,7 +269,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     settingWidgets["kpmodestop"] = ui->kpModeStopBox;
     ui->kpModeStopBox->setChecked(anim->parameter("kpmodestop").toBool());
     connect(ui->kpModeStopBox, &QCheckBox::clicked, [=] () {
-        emit updateParam("kpmodestop");
+        Q_EMIT updateParam("kpmodestop");
     });
 
     settingWidgets["kprelease"] = ui->kpReleaseBox;
@@ -289,7 +289,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         spinner->setValue(anim->parameter("stop").toInt());
         settingWidgets["stop"] = spinner;
         connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
-            emit updateParam("stop");
+            Q_EMIT updateParam("stop");
         });
         ui->timeGrid->addWidget(spinner, 4, 3);
         ui->timeGrid->addWidget(new QLabel(tr("times"), this), 4, 4);
@@ -301,7 +301,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         spinner->setValue(anim->parameter("kpstop").toInt());
         settingWidgets["kpstop"] = spinner;
         connect(spinner, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
-            emit updateParam("kpstop");
+            Q_EMIT updateParam("kpstop");
         });
         ui->timeGrid->addWidget(spinner, 12, 3);
         ui->timeGrid->addWidget(new QLabel(tr("times"), this), 12, 4);
@@ -336,7 +336,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             spinner->setValue(stop);
         settingWidgets["stop"] = spinner;
         connect(spinner, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
-            emit updateParam("stop");
+            Q_EMIT updateParam("stop");
         });
         ui->timeGrid->addWidget(spinner, 4, 3);
         ui->timeGrid->addWidget(new QLabel(tr("seconds"), this), 4, 4);
@@ -352,7 +352,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             spinner->setValue(kpstop);
         settingWidgets["kpstop"] = spinner;
         connect(spinner, OVERLOAD_PTR(double, QDoubleSpinBox, valueChanged), [=] () {
-            emit updateParam("kpstop");
+            Q_EMIT updateParam("kpstop");
         });
         ui->timeGrid->addWidget(spinner, 12, 3);
         ui->timeGrid->addWidget(new QLabel(tr("seconds"), this), 12, 4);

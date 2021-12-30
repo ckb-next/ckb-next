@@ -75,7 +75,7 @@ void KbBind::load(CkbSettingsBase& settings){
         }
     }
     _winLock = settings.value("WinLock").toBool();
-    emit didLoad();
+    Q_EMIT didLoad();
     map(currentMap);
 }
 
@@ -136,7 +136,7 @@ void KbBind::map(const KeyMap& map){
     _map = map;
     _needsUpdate = true;
     _needsSave = true;
-    emit layoutChanged();
+    Q_EMIT layoutChanged();
 }
 
 KeyAction* KbBind::bindAction(const QString& key) {
@@ -200,7 +200,7 @@ void KbBind::update(QFile& cmd, int notify, bool force){
     if(!force && !_needsUpdate && lastGlobalRemapTime == globalRemapTime)
         return;
     lastGlobalRemapTime = globalRemapTime;
-    emit updated();
+    Q_EMIT updated();
     _needsUpdate = false;
     // Reset all keys and enable notifications for all
     cmd.write(QString("\n@%1 rebind all notify all").arg(notify).toLatin1());

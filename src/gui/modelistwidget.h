@@ -15,7 +15,7 @@ public:
     void setDevice(Kb* dev);
     inline void setIgnoreFocusLoss(const bool e) { ignoreFocusLoss = e; }
     ~ModeListWidget();
-signals:
+Q_SIGNALS:
     void orderChanged();
 
 private:

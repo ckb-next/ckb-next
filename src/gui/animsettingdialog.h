@@ -37,7 +37,7 @@ private:
 
     QFrame* hLine();
 
-private slots:
+private Q_SLOTS:
     void newDuration(double duration);
     void updateStops();
     void angleDialChanged(const QString& name);

@@ -51,13 +51,13 @@ public:
             return;
         _needsSave = true;
         enabled = e;
-        emit enableStateChanged();
+        Q_EMIT enableStateChanged();
     }
     inline bool isEnabled() const {
         return enabled;
     }
     QVector<MatchPair> items;
-signals:
+Q_SIGNALS:
     void enableStateChanged();
 private:
     bool _needsSave;

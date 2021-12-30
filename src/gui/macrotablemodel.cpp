@@ -255,9 +255,9 @@ bool MacroTableModel::setData(const QModelIndex& index, const QVariant& value, i
             // If the key was blank (means the user is editing a new row), then delete it if we couldn't add it
             if(isNewEntry){
                 const int row = index.row();
-                emit beginRemoveRows(QModelIndex(), row, row);
+                Q_EMIT beginRemoveRows(QModelIndex(), row, row);
                 macroLines.removeAt(row);
-                emit endRemoveRows();
+                Q_EMIT endRemoveRows();
             }
             return false;
         }
@@ -296,7 +296,7 @@ bool MacroTableModel::setData(const QModelIndex& index, const QVariant& value, i
     default:
         qDebug() << "Unknown column in setData";
     }
-    emit dataChanged(index, index, {role});
+    Q_EMIT dataChanged(index, index, {role});
     return true;
 }
 
@@ -391,9 +391,9 @@ QString MacroTableModel::fromString(const QString& input, const bool stopOnError
     const int len = input.length();
     if(previousEnd != len && stopOnError)
         MACRO_ERROR(previousEnd, len);
-    emit beginResetModel();
+    Q_EMIT beginResetModel();
     macroLines = newMacroLines;
-    emit endResetModel();
+    Q_EMIT endResetModel();
     return QString();
 }
 
@@ -404,14 +404,14 @@ void MacroTableModel::removeLastMouseLeftClick(){
         const MacroLine& ml = macroLines.at(i);
         // Once the Key Up was found, start searching for a keydown
         if(foundKeyUp && ml.keyDown && ml.key == "mouse1"){
-            emit beginRemoveRows(QModelIndex(), i, i);
+            Q_EMIT beginRemoveRows(QModelIndex(), i, i);
             macroLines.removeAt(i);
-            emit endRemoveRows();
+            Q_EMIT endRemoveRows();
             return;
         } else if(!ml.keyDown && ml.key == "mouse1") {
-            emit beginRemoveRows(QModelIndex(), i, i);
+            Q_EMIT beginRemoveRows(QModelIndex(), i, i);
             macroLines.removeAt(i);
-            emit endRemoveRows();
+            Q_EMIT endRemoveRows();
             foundKeyUp = true;
         }
     }
@@ -476,9 +476,9 @@ void MacroTableModel::removeMultipleColumns(QModelIndexList l){
     // and then iterate counting down
     for(int i = l.length(); i--;){
         const int row = l.at(i).row();
-        emit beginRemoveRows(QModelIndex(), row, row);
+        Q_EMIT beginRemoveRows(QModelIndex(), row, row);
         macroLines.remove(row);
-        emit endRemoveRows();
+        Q_EMIT endRemoveRows();
     }
 }
 
@@ -511,13 +511,13 @@ bool MacroTableModel::dropMimeData(const QMimeData* data, Qt::DropAction action,
     if(rows.isEmpty())
         return true;
 
-    emit beginResetModel();
+    Q_EMIT beginResetModel();
 
     // Move the items to the destination index
     std::stable_partition(macroLines.begin(), macroLines.begin() + dstrow, [&rows](const MacroLine& ml){return !rows.contains(&ml);});
     std::stable_partition(macroLines.begin() + dstrow, macroLines.end(), [&rows](const MacroLine& ml){return rows.contains(&ml);});
 
-    emit endResetModel();
+    Q_EMIT endResetModel();
     return true;
 }
 
@@ -526,7 +526,7 @@ void MacroTableModel::removeEmptyRowAtEnd(){
     if(!macroLines.at(i).key.isEmpty())
         return;
 
-    emit beginRemoveRows(QModelIndex(), i, i);
+    Q_EMIT beginRemoveRows(QModelIndex(), i, i);
     macroLines.remove(i);
-    emit endRemoveRows();
+    Q_EMIT endRemoveRows();
 }

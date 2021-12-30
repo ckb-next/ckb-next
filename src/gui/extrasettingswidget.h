@@ -17,7 +17,7 @@ public:
 
     void pollUpdates();
 
-private slots:
+private Q_SLOTS:
     void on_trayBox_clicked(bool checked);
     void on_brightnessBox_clicked(bool checked);
     void on_animScanButton_clicked();

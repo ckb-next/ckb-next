@@ -141,14 +141,14 @@ void KbManager::scanKeyboards(){
     if(!connected.open(QIODevice::ReadOnly)){
         // No root controller - remove all keyboards
         foreach(Kb* kb, _devices){
-            emit kbDisconnected(kb);
+            Q_EMIT kbDisconnected(kb);
             kb->save();
             delete kb;
         }
         _devices.clear();
         if(_daemonVersion != DAEMON_UNAVAILABLE_STR){
             _daemonVersion = DAEMON_UNAVAILABLE_STR;
-            emit versionUpdated();
+            Q_EMIT versionUpdated();
         }
         return;
     }
@@ -162,7 +162,7 @@ void KbManager::scanKeyboards(){
         vString = DAEMON_UNAVAILABLE_STR;
     if(_daemonVersion != vString){
         _daemonVersion = vString;
-        emit versionUpdated();
+        Q_EMIT versionUpdated();
     }
 
     // Scan connected devices
@@ -193,7 +193,7 @@ void KbManager::scanKeyboards(){
             continue;
         // Device not found, remove
         i.remove();
-        emit kbDisconnected(kb);
+        Q_EMIT kbDisconnected(kb);
         kb->save();
         delete kb;
     }
@@ -217,7 +217,7 @@ void KbManager::scanKeyboards(){
         }
         _devices.insert(kb);
         // Load preferences and send signal
-        emit kbConnected(kb);
+        Q_EMIT kbConnected(kb);
         kb->load();
         connect(_eventTimer, &QTimer::timeout, kb, &Kb::frameUpdate);
         connect(_saveTimer, &QTimer::timeout, kb, &Kb::autoSave);

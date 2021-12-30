@@ -21,7 +21,7 @@ public:
     ~KbModeEventMgr();
     virtual void closeEvent(QCloseEvent* evt);
 
-private slots:
+private Q_SLOTS:
     void on_cancelBtn_clicked();
     void on_okBtn_clicked();
     void on_addbtn_clicked();

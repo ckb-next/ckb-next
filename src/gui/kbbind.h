@@ -101,11 +101,11 @@ public:
     /// \param start is boolean. If true, notification channel is opened for all keys, otherwise channel ist closed.
     void handleNotificationChannel(bool start);
 
-public slots:
+public Q_SLOTS:
     // Callback for a keypress event.
     void keyEvent(const QString& key, bool down);
 
-signals:
+Q_SIGNALS:
     void didLoad();
     void layoutChanged();
     void updated();

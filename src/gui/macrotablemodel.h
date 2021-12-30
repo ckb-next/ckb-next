@@ -16,9 +16,9 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
     inline void append(const MacroLine& ml) {
-        emit beginInsertRows(QModelIndex(), macroLines.length(), macroLines.length());
+        Q_EMIT beginInsertRows(QModelIndex(), macroLines.length(), macroLines.length());
         macroLines.append(ml);
-        emit endInsertRows();
+        Q_EMIT endInsertRows();
     }
     inline QModelIndex addBlankElement(){
         const MacroLine ml;
@@ -28,9 +28,9 @@ public:
     inline void clear() {
         if(!length())
             return;
-        emit beginRemoveRows(QModelIndex(), 0, macroLines.length() - 1);
+        Q_EMIT beginRemoveRows(QModelIndex(), 0, macroLines.length() - 1);
         macroLines.clear();
-        emit endRemoveRows();
+        Q_EMIT endRemoveRows();
     }
     inline const MacroLine& at(int i) const {
         return macroLines.at(i);
@@ -46,7 +46,7 @@ public:
     inline void setDefaultDelay(bool set){
         defaultDelay = set;
         // Update UI to disable editing the delay in the table
-        emit dataChanged(index(0, 2), index(length() - 1, 2));
+        Q_EMIT dataChanged(index(0, 2), index(length() - 1, 2));
     }
     void removeLastMouseLeftClick();
     static const QSet<QString> validMacroKeys;

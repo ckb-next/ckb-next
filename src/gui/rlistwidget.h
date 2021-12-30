@@ -12,10 +12,10 @@ class RListWidget : public QListWidget
 public:
     explicit RListWidget(QWidget *parent = 0);
 
-signals:
+Q_SIGNALS:
     void orderChanged();
 
-private slots:
+private Q_SLOTS:
     void timerTick();
     void enter(QListWidgetItem* item);
     void change(QListWidgetItem* item);

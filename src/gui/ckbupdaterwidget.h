@@ -17,7 +17,7 @@ public:
     explicit CkbUpdaterDialog(const QString& ver,  const QString& changelog, QWidget *parent = 0);
     ~CkbUpdaterDialog();
 
-private slots:
+private Q_SLOTS:
     void on_remindMeLaterButton_clicked();
     void on_updateButton_clicked();
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);

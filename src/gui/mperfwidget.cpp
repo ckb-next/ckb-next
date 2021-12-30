@@ -37,35 +37,35 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
         stages[i].ySlider->setTracking(false);
         // Map signals
         connect(stages[i].indicator, &ColorButton::clicked, [=] (){
-            emit colorClicked(i);
+            Q_EMIT colorClicked(i);
         });
         connect(stages[i].indicator, &ColorButton::colorChanged, [=] () {
-            emit colorChanged(i);
+            Q_EMIT colorChanged(i);
         });
         // valueChanged is used to update the settings
         // sliderMoved is used to update the spinbox in realtime
         connect(stages[i].xSlider, &QSlider::valueChanged, [=] () {
-            emit sliderXValueChanged(i);
+            Q_EMIT sliderXValueChanged(i);
         });
         connect(stages[i].ySlider, &QSlider::valueChanged, [=] () {
-            emit sliderYValueChanged(i);
+            Q_EMIT sliderYValueChanged(i);
         });
         connect(stages[i].xSlider, &QSlider::sliderMoved, [=] () {
-            emit sliderXMoved(i);
+            Q_EMIT sliderXMoved(i);
         });
         connect(stages[i].ySlider, &QSlider::sliderMoved, [=] () {
-            emit sliderYMoved(i);
+            Q_EMIT sliderYMoved(i);
         });
         connect(stages[i].xBox, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
-            emit boxXChanged(i);
+            Q_EMIT boxXChanged(i);
         });
         connect(stages[i].yBox, OVERLOAD_PTR(int, QSpinBox, valueChanged), [=] () {
-            emit boxYChanged(i);
+            Q_EMIT boxYChanged(i);
         });
         if(stages[i].enableCheck)
             // Sniper has no enable
             connect(stages[i].enableCheck, &QCheckBox::stateChanged, [=] () {
-                emit enableChanged(i);
+                Q_EMIT enableChanged(i);
             });
         // Hide indicator arrows
         stages[i].indicatorLabel->setVisible(false);

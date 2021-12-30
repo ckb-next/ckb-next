@@ -101,7 +101,7 @@ public:
 
     ~AnimScript();
 
-private slots:
+private Q_SLOTS:
     void readProcessErr();
     void readProcess();
 

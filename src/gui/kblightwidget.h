@@ -24,7 +24,7 @@ public:
     void setMonochrome();
     void setLegacyM95();
 
-private slots:
+private Q_SLOTS:
     void updateLight();
     void newSelection(const QStringList& selection);
     void changeColor(const QColor& newColor);

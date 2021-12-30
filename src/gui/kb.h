@@ -131,7 +131,7 @@ public:
 
     ~Kb();
 
-signals:
+Q_SIGNALS:
     // Layout/model updated
     void infoUpdated();
 
@@ -148,14 +148,14 @@ signals:
     void fwUpdateProgress(int current, int total);
     void fwUpdateFinished(bool succeeded);
 
-public slots:
+public Q_SLOTS:
     // Send lighting and settings to the driver
     void frameUpdate();
 
     // Auto-save every 15s (if settings have changed, and no other writes are in progress)
     void autoSave();
 
-private slots:
+private Q_SLOTS:
     // Processes lines read from the notification node
     void readNotify(const QString& line);
 

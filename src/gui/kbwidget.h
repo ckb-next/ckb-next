@@ -35,7 +35,7 @@ public:
 
     void showDeviceTab();
 
-public slots:
+public Q_SLOTS:
     // Display firmware update dialog
     inline void showFwUpdate()          { on_fwUpdButton_clicked(); }
 
@@ -53,11 +53,11 @@ private:
     void openEventMgr(KbMode* mode);
     // These profileAboutToChange/profileChanged functions should be removed at some point
     // and have all the work from the context menu done in the model
-    // so that it can emit the appropriate signals
+    // so that it can Q_EMIT the appropriate signals
     // instead of resetting the whole thing
     inline void profileAboutToChange() { dynamic_cast<ModeListTableModel*>(ui->modesList->model())->profileAboutToChange(); }
     inline void profileChanged() { dynamic_cast<ModeListTableModel*>(ui->modesList->model())->profileChanged(); }
-private slots:
+private Q_SLOTS:
     void updateProfileList();
     void on_profileBox_activated(int index);
 

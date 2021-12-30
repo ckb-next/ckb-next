@@ -23,10 +23,10 @@ public:
     inline bool bigIcons()  const               { return _bigIcons; }
     void        bigIcons(bool newBigIcons);
 
-signals:
+Q_SIGNALS:
     void colorChanged(QColor newColor);
 
-private slots:
+private Q_SLOTS:
     void pickColor();
 #if 0
     void versionWarning();

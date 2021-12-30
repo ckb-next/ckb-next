@@ -48,11 +48,11 @@ public:
     static void setIdleTimer(bool enable);
 #endif
 
-public slots:
+public Q_SLOTS:
     void brightnessScroll(int delta, Qt::Orientation orientation);
     void scanKeyboards();
 
-signals:
+Q_SIGNALS:
     // A new device was connected.
     void kbConnected(Kb* device);
     // A device was disconnected. The Kb object will be deleted afterward.
@@ -61,7 +61,7 @@ signals:
     // The daemon version info was updated (or the daemon was started/stopped)
     void versionUpdated();
 
-private slots:
+private Q_SLOTS:
 #ifdef USE_XCB_SCREENSAVER
     void idleTimerTick();
 #endif

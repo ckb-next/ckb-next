@@ -228,7 +228,7 @@ void KbPerf::load(CkbSettingsBase& settings){
             }
         }
     }
-    emit didLoad();
+    Q_EMIT didLoad();
 }
 
 void KbPerf::save(CkbSettingsBase& settings){
@@ -294,12 +294,12 @@ void KbPerf::baseDpiIdx(int newIdx) {
     dpiBaseIdx = newIdx;
     _curDpi(dpi(dpiBaseIdx));
     _needsUpdate = _needsSave = true;
-    emit dpiChanged(newIdx);
+    Q_EMIT dpiChanged(newIdx);
 }
 
 quint64 KbPerf::pushDpi(const QPoint& newDpi, bool sniper){
     _sniper = sniper;
-    emit dpiChanged((sniper ? 0 : 6));
+    Q_EMIT dpiChanged((sniper ? 0 : 6));
     quint64 index = runningPushIdx++;
     pushedDpis[index] = newDpi;
     _curDpi(newDpi);
@@ -318,7 +318,7 @@ void KbPerf::popDpi(quint64 pushIdx){
         _curDpi(map_last(pushedDpis));
     } 
     _needsUpdate = _needsSave = true;
-    emit dpiChanged(dpiBaseIdx);
+    Q_EMIT dpiChanged(dpiBaseIdx);
 }
 
 void KbPerf::dpiUp(){
@@ -423,7 +423,7 @@ void KbPerf::angleSnap(bool newAngleSnap){
 void KbPerf::update(QFile& cmd, int notifyNumber, bool force, bool saveCustomDpi){
     if(!force && !_needsUpdate)
         return;
-    emit settingsUpdated();
+    Q_EMIT settingsUpdated();
     _needsUpdate = false;
     cmd.write(" ");
     // Save DPI stage 0 (sniper)

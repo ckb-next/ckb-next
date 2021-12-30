@@ -87,7 +87,7 @@ public:
     int timerDimRestore();
     void timerDim();
     inline bool isTimerDimmed() const { return _timerDimmed; }
-signals:
+Q_SIGNALS:
     void didLoad();
     void updated();
     void frameDisplayed(const ColorMap& animatedColors, const QSet<QString>& indicatorList);

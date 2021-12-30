@@ -41,12 +41,12 @@ public:
     void setAnimationToSelection();
     void clearAnimation();
 
-public slots:
+public Q_SLOTS:
     // Sets display colors. Pass an empty map to clear.
     // These will be displayed instead of the regular color map, if supplied.
     void displayColorMap(const ColorMap& newDisplayMap, const QSet<QString>& indicators = QSet<QString>());
 
-signals:
+Q_SIGNALS:
     // Emitted when the selection is changed.
     void selectionChanged(QStringList selected);
     void sidelightToggled();

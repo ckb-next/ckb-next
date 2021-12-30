@@ -12,10 +12,10 @@ public:
     void    fromString(const QString& string);
     QString toString() const;
 
-signals:
+Q_SIGNALS:
     void gradientChanged();
 
-private slots:
+private Q_SLOTS:
     void pickGradient();
 
 private:

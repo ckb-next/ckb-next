@@ -571,13 +571,13 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
         if(std::fabs(key.x - mx) <= key.width / 2.f - 1.f && std::fabs(key.y - my) <= key.height / 2.f - 1.f){
             // Sidelights can't have a color, but they can be toggled
             if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")){
-                emit sidelightToggled(); // get the kblightwidget to record it
+                Q_EMIT sidelightToggled(); // get the kblightwidget to record it
                 update();
                 break;
             }
             // TODO: Merge with the above
             if(keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back")){
-                emit M95LightToggled();
+                Q_EMIT M95LightToggled();
                 update();
                 break;
             }
@@ -681,7 +681,7 @@ void KeyWidget::mouseReleaseEvent(QMouseEvent* event){
         if(selection.testBit(i++))
             selectedNames << key;
     }
-    emit selectionChanged(selectedNames);
+    Q_EMIT selectionChanged(selectedNames);
     update();
 }
 
@@ -696,7 +696,7 @@ void KeyWidget::setSelection(const QStringList& keys){
     newSelection.fill(false);
     mouseDownMode = NONE;
     update();
-    emit selectionChanged(keys);
+    Q_EMIT selectionChanged(keys);
 }
 
 void KeyWidget::selectAll(){
@@ -717,7 +717,7 @@ void KeyWidget::selectAll(){
     newSelection.fill(false);
     mouseDownMode = NONE;
     update();
-    emit selectionChanged(selectedNames);
+    Q_EMIT selectionChanged(selectedNames);
 }
 
 void KeyWidget::clearSelection(){
@@ -725,7 +725,7 @@ void KeyWidget::clearSelection(){
     newSelection.fill(false);
     mouseDownMode = NONE;
     update();
-    emit selectionChanged(QStringList());
+    Q_EMIT selectionChanged(QStringList());
 }
 
 void KeyWidget::setAnimation(const QStringList& keys){

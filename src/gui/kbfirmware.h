@@ -53,10 +53,10 @@ private:
     enum { GPG_UNKNOWN = -1, GPG_NO, GPG_YES } hasGPG :2;
     QProcess*    _gpg;
 
-signals:
+Q_SIGNALS:
     void downloaded();
 
-private slots:
+private Q_SLOTS:
     void processDownload(QNetworkReply* reply);
     void downloadFinished();
 };

@@ -23,11 +23,11 @@ private:
     qint64 keyStrokeTime();
     static constexpr int MACRO_ARRAY_LEN = 24;
 
-signals:
+Q_SIGNALS:
     void macroLineRead(QString key, qint64 ustime, bool keydown);
     void macroReadError(QString key, QString modifiers);
 
-public slots:
+public Q_SLOTS:
     void translateQKeyEvent(int keycode, bool down, Qt::KeyboardModifiers modifiers);
 };
 

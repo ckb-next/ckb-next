@@ -102,6 +102,6 @@ void GradientButton::pickGradient(){
     GradientDialog dialog(this);
     _stops = dialog.getGradient(_stops);
     updateImage();
-    emit gradientChanged();
+    Q_EMIT gradientChanged();
 }
 

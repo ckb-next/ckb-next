@@ -117,7 +117,7 @@ void KbAnimWidget::duplicateAnim(KbAnim* old){
 
 void KbAnimWidget::setCurrent(KbAnim* newCurrent){
     if(newCurrent != current)
-        emit animChanged(current = newCurrent);
+        Q_EMIT animChanged(current = newCurrent);
     if(!current){
         selectedKeys.clear();
         ui->selectionStack->setCurrentIndex(0);
@@ -229,7 +229,7 @@ void KbAnimWidget::on_keyButton_clicked(){
                 keys << key;
         }
         current->keys(keys);
-        emit didUpdateSelection(selectedKeys);
+        Q_EMIT didUpdateSelection(selectedKeys);
     }
     light->restartAnimation();
 }

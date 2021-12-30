@@ -17,7 +17,7 @@ public:
     explicit KbProfileDialog(KbWidget* parent = 0);
     ~KbProfileDialog();
 
-private slots:
+private Q_SLOTS:
     void profileList_reordered();
     void on_profileList_itemClicked(QListWidgetItem* item);
     void on_profileList_itemChanged(QListWidgetItem* item);

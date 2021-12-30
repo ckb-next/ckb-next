@@ -9,7 +9,7 @@ class NoUserInputTextEdit : public QPlainTextEdit {
 public:
     NoUserInputTextEdit(QWidget* parent);
     inline void eatKeyEvents(bool e) { redirectKeyEvents = e; }
-signals:
+Q_SIGNALS:
     void macroKeyEvent(int keycode, bool keydown, Qt::KeyboardModifiers modifiers);
 private:
     bool eventFilter(QObject* obj, QEvent* evt);

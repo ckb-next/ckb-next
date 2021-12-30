@@ -204,7 +204,7 @@ void KbWidget::on_profileBox_activated(int index){
     device->setCurrentProfile(device->profiles()[index]);
     // Focus the mode list to highlight the whole row properly
     ui->modesList->setFocus();
-    // Device will emit profileChanged() and modeChanged() signals to update UI
+    // Device will Q_EMIT profileChanged() and modeChanged() signals to update UI
 }
 
 void KbWidget::modeChanged(){

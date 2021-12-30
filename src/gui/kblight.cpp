@@ -46,7 +46,7 @@ void KbLight::map(const KeyMap& map){
     _animMap.init(_map);
     _indicatorMap.init(_map);
     _needsSave = _needsMapRefresh = true;
-    emit updated();
+    Q_EMIT updated();
 }
 
 KbLight::~KbLight(){
@@ -102,7 +102,7 @@ void KbLight::dimming(int newDimming, bool noSave){
     if(!noSave)
         _needsSave = true;
     _dimming = newDimming;
-    emit updated();
+    Q_EMIT updated();
 }
 
 KbAnim* KbLight::addAnim(const AnimScript *base, const QStringList &keys, const QString& name, const QMap<QString, QVariant>& preset){
@@ -358,7 +358,7 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
 
     // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
     if(timestamp >= lastFrameSignal + 50){
-        emit frameDisplayed(_animMap, _indicatorList);
+        Q_EMIT frameDisplayed(_animMap, _indicatorList);
         lastFrameSignal = timestamp;
     }
 
@@ -459,7 +459,7 @@ void KbLight::load(CkbSettingsBase& settings){
             _animList.append(new KbAnim(this, _map, id, settings));
         }
     }
-    emit didLoad();
+    Q_EMIT didLoad();
     map(currentMap);
 }
 

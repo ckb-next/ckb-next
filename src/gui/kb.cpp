@@ -167,7 +167,7 @@ Kb::Kb(QObject *parent, const QString& path) :
     cmd.write(" get :i :keys\n");
     cmd.flush();
 
-    emit infoUpdated();
+    Q_EMIT infoUpdated();
     activeDevices.insert(this);
 
     // Start a separate thread to read from the notification node
@@ -238,7 +238,7 @@ void Kb::updateLayout(bool stop){
         foreach(KbMode* mode, _currentProfile->modes())
             mode->light()->close();
     }
-    emit infoUpdated();
+    Q_EMIT infoUpdated();
 }
 
 void Kb::updateBattery(){
@@ -324,8 +324,8 @@ void Kb::load(){
         setCurrentProfile(demo);
     }
 
-    emit infoUpdated();
-    emit profileAdded();
+    Q_EMIT infoUpdated();
+    Q_EMIT profileAdded();
 }
 
 void Kb::save(){
@@ -552,7 +552,7 @@ void Kb::readNotify(const QString& line){
             return;
         batteryLevel = newBatteryLevel;
         batteryStatus = static_cast<BatteryStatus>(newBatteryStatus);
-        emit batteryChanged(batteryLevel, batteryStatus);
+        Q_EMIT batteryChanged(batteryLevel, batteryStatus);
     } else if(components[0] == "i"){
         // Indicator event
         QString i = components[1];
@@ -601,7 +601,7 @@ void Kb::readNotify(const QString& line){
             }
         }
         hwProfile(newProfile);
-        emit profileAdded();
+        Q_EMIT profileAdded();
     } else if(components[0] == "hwprofilename"){
         // Hardware profile name
         QString name = QUrl::fromPercentEncoding(components[1].toUtf8());
@@ -611,7 +611,7 @@ void Kb::readNotify(const QString& line){
         if(!(oldName.length() >= name.length() && oldName.left(name.length()) == name)){
             // Don't change the name if it's a truncated version of what we already have
             _hwProfile->name(name);
-            emit profileRenamed();
+            Q_EMIT profileRenamed();
         }
     } else if(components[0] == "mode"){
         // Mode-specific data
@@ -651,7 +651,7 @@ void Kb::readNotify(const QString& line){
                 if(!_profiles.contains(_hwProfile) && _hwProfile->modeCount() >= hwModeCount){
                     _profiles.append(_hwProfile);
                     _needsSave = true;
-                    emit profileAdded();
+                    Q_EMIT profileAdded();
                     if(!_currentProfile)
                         setCurrentProfile(_hwProfile);
                 }
@@ -805,15 +805,15 @@ void Kb::readNotify(const QString& line){
             return;
         QString res = components[2];
         if(res == "invalid" || res == "fail")
-            emit fwUpdateFinished(false);
+            Q_EMIT fwUpdateFinished(false);
         else if(res == "ok")
-            emit fwUpdateFinished(true);
+            Q_EMIT fwUpdateFinished(true);
         else {
             // "xx/yy" indicates progress
             if(!res.contains("/"))
                 return;
             QStringList numbers = res.split("/");
-            emit fwUpdateProgress(numbers[0].toInt(), numbers[1].toInt());
+            Q_EMIT fwUpdateProgress(numbers[0].toInt(), numbers[1].toInt());
         }
     }
 }
@@ -826,9 +826,9 @@ void Kb::setCurrentProfile(KbProfile* profile){
     while(profile->modeCount() < hwModeCount)
         profile->append(new KbMode(this, getKeyMap()));
 
-    emit profileAboutToChange();
+    Q_EMIT profileAboutToChange();
     _currentProfile = profile;
-    emit profileChanged();
+    Q_EMIT profileChanged();
     // Hack to prevent crash when switching to HW mode on first start with no config file.
     // It happens when called by KbWidget::on_profileBox_activated().
     // The KbWidget event will re-call this after the currentMode has properly been set.
@@ -839,7 +839,7 @@ void Kb::setCurrentProfile(KbProfile* profile){
 void Kb::setCurrentMode(KbMode* mode){
     _currentProfile->currentMode(_currentMode = mode);
     _needsSave = true;
-    emit modeChanged();
+    Q_EMIT modeChanged();
     mode->light()->forceFrameUpdate();
 }
 

@@ -402,9 +402,9 @@ void MainWindow::timerTick(){
                     // Quit application
                     qApp->quit();
                 else if(option.startsWith("SwitchToProfile"))
-                    emit switchToProfileCLI(option.section(' ', 1));
+                    Q_EMIT switchToProfileCLI(option.section(' ', 1));
                 else if(option.startsWith("SwitchToMode: "))
-                    emit switchToModeCLI(option.section(' ', 1));
+                    Q_EMIT switchToModeCLI(option.section(' ', 1));
             }
         }
     }

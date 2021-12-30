@@ -88,7 +88,7 @@ bool KbMode::needsSave() const {
 }
 
 void KbMode::doUpdate(){
-    emit updated();
+    Q_EMIT updated();
 }
 
 ///

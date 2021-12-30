@@ -20,7 +20,7 @@ public:
 
     int exec();
 
-private slots:
+private Q_SLOTS:
     void fwUpdateProgress(int current, int total);
     void fwUpdateFinished(bool succeeded);
     void removeDev();

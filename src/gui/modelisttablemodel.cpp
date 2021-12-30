@@ -14,7 +14,7 @@ ModeListTableModel::ModeListTableModel(Kb *dev, QObject* parent) : QAbstractTabl
 
 void ModeListTableModel::profileAboutToChange(){
     KbProfile* currentProfile = device->currentProfile();
-    emit beginResetModel();
+    Q_EMIT beginResetModel();
     if(!currentProfile)
         return;
     for(int i = 0; i < currentProfile->modeCount(); i++)
@@ -24,12 +24,12 @@ void ModeListTableModel::profileAboutToChange(){
 void ModeListTableModel::profileChanged(){
     // Signals will have always been connected when this is called
     // and we'll always have a valid profile
-    emit endResetModel();
+    Q_EMIT endResetModel();
     KbProfile* currentProfile = device->currentProfile();
     for(int i = 0; i < currentProfile->modeCount(); i++){
         connect(currentProfile->at(i)->winInfo(), &KbWindowInfo::enableStateChanged, this, [this, i](){
             QModelIndex changed = index(i, COL_EVENT_ICON);
-            emit dataChanged(changed, changed, {Qt::DecorationRole});
+            Q_EMIT dataChanged(changed, changed, {Qt::DecorationRole});
         });
     }
 }
@@ -130,7 +130,7 @@ bool ModeListTableModel::setData(const QModelIndex& index, const QVariant& value
         return false;
 
     prof->at(row)->name(value.toString());
-    emit dataChanged(index, index, {Qt::EditRole, Qt::DisplayRole});
+    Q_EMIT dataChanged(index, index, {Qt::EditRole, Qt::DisplayRole});
 
     return true;
 }
@@ -138,13 +138,13 @@ bool ModeListTableModel::setData(const QModelIndex& index, const QVariant& value
 int ModeListTableModel::addNewMode(){
     KbMode* newMode = device->newMode();
     // "Add" the new mode item back
-    emit beginInsertRows(QModelIndex(), rowCount()-1, rowCount()-1);
+    Q_EMIT beginInsertRows(QModelIndex(), rowCount()-1, rowCount()-1);
     device->currentProfile()->append(newMode);
     device->setCurrentMode(newMode);
     const int newrow = rowCount() - 2;
     // Update the previous new mode item with the new mode
-    emit dataChanged(index(newrow, 0), index(newrow, columnCount()-1), {Qt::DisplayRole, Qt::EditRole, Qt::DecorationRole});
-    emit endInsertRows();
+    Q_EMIT dataChanged(index(newrow, 0), index(newrow, columnCount()-1), {Qt::DisplayRole, Qt::EditRole, Qt::DecorationRole});
+    Q_EMIT endInsertRows();
     return newrow;
 }
 
@@ -170,9 +170,9 @@ bool ModeListTableModel::dropMimeData(const QMimeData* data, Qt::DropAction acti
     if(srcrow == dstrow)
         return false;
 
-    emit layoutAboutToBeChanged();
+    Q_EMIT layoutAboutToBeChanged();
     device->currentProfile()->move(srcrow, dstrow);
-    emit layoutChanged();
+    Q_EMIT layoutChanged();
 
     return true;
 }

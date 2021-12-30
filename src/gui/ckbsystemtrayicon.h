@@ -21,7 +21,7 @@ public:
     inline void hide() { setStatus(KStatusNotifierItem::Passive); }
     inline void setVisible(bool visible) { setStatus((visible ? KStatusNotifierItem::Active : KStatusNotifierItem::Passive)); }
     ~CkbSystemTrayIcon();
-signals:
+Q_SIGNALS:
     // This is never emitted by KStatusNotifierItem
     void activated(QSystemTrayIcon::ActivationReason);
 private:
@@ -32,13 +32,13 @@ private:
     {
         if(evt->type() == QEvent::Wheel) {
             QWheelEvent* wheelEvt = static_cast<QWheelEvent*>(evt);
-            emit scrollRequested(wheelEvt->delta(), wheelEvt->orientation());
+            Q_EMIT scrollRequested(wheelEvt->delta(), wheelEvt->orientation());
             return true;
         }
         return QSystemTrayIcon::event(evt);
     }
 
-signals:
+Q_SIGNALS:
         void scrollRequested(int delta, Qt::Orientation orientation);
 
 public:

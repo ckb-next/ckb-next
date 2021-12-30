@@ -77,7 +77,7 @@ void ColorButton::pickColor(){
     if(newColor.isValid()){
         _color = newColor;
         updateImage();
-        emit colorChanged(_color);
+        Q_EMIT colorChanged(_color);
     }
 }
 

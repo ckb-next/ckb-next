@@ -1300,6 +1300,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K95P;
     if(lower == "strafe")
         return STRAFE;
+    if(lower == "m55")
+        return M55;
     if(lower == "m65")
         return M65;
     if(lower == "sabre")
@@ -1363,6 +1365,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k95P";
     case STRAFE:
         return "strafe";
+    case M55:
+        return "m55";
     case M65:
         return "m65";
     case SABRE:
@@ -1436,6 +1440,7 @@ int KeyMap::modelWidth(Model model){
     case STRAFE:
     case STRAFE_MK2:
         return KSTRAFE_WIDTH;
+    case M55:
     case M65:
     case M65E:
     case SABRE:
@@ -1477,6 +1482,7 @@ int KeyMap::modelHeight(Model model){
         return K95P_HEIGHT;
     case K60:
     	return K60_HEIGHT;
+    case M55:
     case M65:
     case M65E:
     case SABRE:

@@ -296,16 +296,27 @@ static int usbclaim(usbdevice* kb){
     ckb_info("ckb%d: Claiming %d interfaces", INDEX_OF(kb, keyboard), count);
 #endif // DEBUG
 
+    int retries = 0;
     for(int i = 0; i < count; i++){
-        struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        if (ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl)) {
+        while (1) {
+            struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
+            ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
+            if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {
+                if (errno == EBUSY && retries < 50) {
+                    retries++;
+                    struct timespec sleep_for = { .tv_nsec = 100 * 1000000 };
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_for, NULL);
+                    continue;
+                }
 #ifndef NDEBUG
-            ckb_info("USBDEVFS_DISCONNECT on interface %d: %s", i, strerror(errno));
+                if (errno == EBUSY)
+                    ckb_info("Retry timeout after %d seconds", retries / 10);
 #endif // DEBUG
-        }
-        if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {
-            ckb_err("Failed to claim interface %d: %s", i, strerror(errno));
-            return -1;
+                ckb_err("Failed to claim interface %d: %s", i, strerror(errno));
+                return -1;
+            } else {
+                break;
+            }
         }
     }
     return 0;
@@ -612,7 +623,7 @@ static void graceful_suspend_resume() {
     // Retry for at most 5 seconds.
     // XXX: Is 5s too much? It might be possible for interfaces to be left
     // unclaimed indefinitely.
-    for (int try = 0; suspend_run && try < 100; try++) {
+    for (int try = 0; suspend_run && try < 50; try++) {
         int drivers_attached = 1;
         for (int i = 1; i < DEV_MAX; i++) {
             usbdevice* kb = keyboard + i;
@@ -642,7 +653,7 @@ static void graceful_suspend_resume() {
 #endif // DEBUG
             break;
         } else {
-            struct timespec sleep_for = { .tv_nsec = 50 * 1000000 };
+            struct timespec sleep_for = { .tv_nsec = 100 * 1000000 };
             clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_for, NULL);
         }
     }

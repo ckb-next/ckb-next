@@ -171,8 +171,8 @@ void* os_inputmain(void* context){
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
         int res = ioctl(fd, USBDEVFS_REAPURB, &urb);
-        wait_until_suspend_processed();
         if (res) {
+            wait_until_suspend_processed();
             if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
@@ -198,7 +198,9 @@ void* os_inputmain(void* context){
             process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
 
             /// Re-submit the URB for the next run.
-            ioctl(fd, USBDEVFS_SUBMITURB, urb);
+            if (ioctl(fd, USBDEVFS_SUBMITURB, urb)) {
+                wait_until_suspend_processed();
+            }
             urb = 0;
         }
     }

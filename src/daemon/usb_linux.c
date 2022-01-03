@@ -629,6 +629,7 @@ static void graceful_suspend_resume() {
         int drivers_attached = 1;
         for (int i = 1; i < DEV_MAX; i++) {
             usbdevice* kb = keyboard + i;
+            queued_mutex_lock(dmutex(kb));
             if (kb->status == DEV_STATUS_CONNECTED && kb->active) {
                 for (int j = 0; j < kb->epcount; j++) {
                     // Replicates the logic from usbunclaim() - ignore
@@ -648,6 +649,7 @@ static void graceful_suspend_resume() {
                     }
                 }
             }
+            queued_mutex_unlock(dmutex(kb));
         }
         if (drivers_attached) {
 #ifndef NDEBUG
@@ -663,7 +665,8 @@ static void graceful_suspend_resume() {
     // none), attemt to reclaim them.
     for (int i = 1; i < DEV_MAX; i++) {
         usbdevice* kb = keyboard + i;
-        if (kb->status == DEV_STATUS_CONNECTED) {
+        queued_mutex_lock(dmutex(kb));
+        if (kb->status == DEV_STATUS_CONNECTED && kb->active) {
             int needs_reclaim = 0;
             for (int j = 0; j < kb->epcount; j++) {
                 struct usbdevfs_getdriver query = {
@@ -693,6 +696,7 @@ static void graceful_suspend_resume() {
                 // try to reset the device.
             }
         }
+        queued_mutex_unlock(dmutex(kb));
     }
 }
 

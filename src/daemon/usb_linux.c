@@ -298,7 +298,11 @@ static int usbclaim(usbdevice* kb){
 
     for(int i = 0; i < count; i++){
         struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
+        if (ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl)) {
+#ifndef NDEBUG
+            ckb_info("USBDEVFS_DISCONNECT on interface %d: %s", i, strerror(errno));
+#endif // DEBUG
+        }
         if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {
             ckb_err("Failed to claim interface %d: %s", i, strerror(errno));
             return -1;
@@ -632,8 +636,12 @@ static void graceful_suspend_resume() {
                 }
             }
         }
-        if (drivers_attached) break;
-        else {
+        if (drivers_attached) {
+#ifndef NDEBUG
+            ckb_info("graceful_suspend_resume: drivers_attached");
+#endif // DEBUG
+            break;
+        } else {
             struct timespec sleep_for = { .tv_nsec = 50 * 1000000 };
             clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_for, NULL);
         }
@@ -650,11 +658,17 @@ static void graceful_suspend_resume() {
                 };
                 if (!ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
                     if (strcmp("usbfs", query.driver)) {
+#ifndef NDEBUG
+                        ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave %s, reclaiming", i, j, query.driver);
+#endif // DEBUG
                         needs_reclaim = 1;
                         break;
                     }
                 } else {
                     if (errno == ENODATA) {
+#ifndef NDEBUG
+                        ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave ENODATA, reclaiming", i, j);
+#endif // DEBUG
                         needs_reclaim = 1;
                         break;
                     }

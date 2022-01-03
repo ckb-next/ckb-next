@@ -28,6 +28,22 @@ int os_usb_control(usbdevice* kb, ctrltransfer* transfer, const char* file, int 
     if (res == -1){
         int ioctlerrno = errno;
         ckb_err_fn(" %s, res = 0x%x", file, line, strerror(ioctlerrno), res);
+#ifndef NDEBUG
+        if (ioctlerrno == EBUSY) {
+            if ((transfer->bRequestType & 0x1f) == 1) {
+                struct usbdevfs_getdriver query = {
+                    .interface = transfer->wIndex,
+                };
+                if (!ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
+                    ckb_info("Directed at interface %d, which is claimed by %s", transfer->wIndex, query.driver);
+                } else {
+                    ckb_info("Directed at interface %d, GETDRIVER error %s", transfer->wIndex, strerror(errno));
+                }
+            } else {
+                ckb_info("Directed at endpoint (called from where?)");
+            }
+        }
+#endif
         if(ioctlerrno == ETIMEDOUT)
             return -1;
         else

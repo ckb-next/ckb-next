@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0, *darkCoreOverlay = 0, *ironclawWirelessOverlay = 0, *glaiveproOverlay = 0;
+static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0, *darkCoreOverlay = 0, *ironclawWirelessOverlay = 0, *glaiveproOverlay = 0,* m55Overlay = 0;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -183,6 +183,11 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!ironclawWirelessOverlay)
                 ironclawWirelessOverlay = new QImage(":/img/overlay_ironclaw.png");
             overlay = ironclawWirelessOverlay;
+            xpos = 2.f;
+        } else if(model == KeyMap::M55){
+            if(!m55Overlay)
+                m55Overlay = new QImage(":/img/overlay_m55.png");
+            overlay = m55Overlay;
             xpos = 2.f;
         }
 

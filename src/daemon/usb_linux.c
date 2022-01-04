@@ -642,7 +642,7 @@ static void graceful_suspend_resume() {
     // XXX: Is 5s too much? It might be possible for interfaces to be left
     // unclaimed indefinitely.
     for (int try = 0; suspend_run && try < 50; try++) {
-        int drivers_attached = 1;
+        bool drivers_attached = true;
         for (int i = 1; i < DEV_MAX; i++) {
             usbdevice* kb = keyboard + i;
             queued_mutex_lock(dmutex(kb));
@@ -659,7 +659,7 @@ static void graceful_suspend_resume() {
                     if (ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
                         if (errno == ENODATA) {
                             // No driver attached yet, so keep waiting.
-                            drivers_attached = 0;
+                            drivers_attached = false;
                         }
                         // Ignore other errors.
                     }
@@ -683,7 +683,7 @@ static void graceful_suspend_resume() {
         usbdevice* kb = keyboard + i;
         queued_mutex_lock(dmutex(kb));
         if (kb->status == DEV_STATUS_CONNECTED && kb->active) {
-            int needs_reclaim = 0;
+            bool needs_reclaim = false;
             for (int j = 0; j < kb->epcount; j++) {
                 struct usbdevfs_getdriver query = {
                     .interface = j,
@@ -693,7 +693,7 @@ static void graceful_suspend_resume() {
 #ifndef NDEBUG
                         ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave %s, reclaiming", i, j, query.driver);
 #endif // DEBUG
-                        needs_reclaim = 1;
+                        needs_reclaim = true;
                         break;
                     }
                 } else {
@@ -701,7 +701,7 @@ static void graceful_suspend_resume() {
 #ifndef NDEBUG
                         ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave ENODATA, reclaiming", i, j);
 #endif // DEBUG
-                        needs_reclaim = 1;
+                        needs_reclaim = true;
                         break;
                     }
                 }

@@ -80,8 +80,8 @@ public:
         KATARPROXT,
         K95L,
         GLAIVEPRO,
-		K60,
         M55,
+        K60,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)
@@ -96,7 +96,6 @@ public:
         US_DVORAK,
         FR,                 // French
         DE,                 // German
-		GR,                 // Greek
         IT,                 // Italian
         JP,                 // Japanese
         NO,                 // Norwegian

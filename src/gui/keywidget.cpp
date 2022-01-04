@@ -419,7 +419,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     drawLogo(&key, &decPainter, offX , offY, scale);
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                     decPainter.drawRect(QRectF((key.x + offX - key.width / 2.f - 2.f) * scale, y * scale, (key.width + 4.f) * scale, h * scale));
-            else if(model == KeyMap::M95 || ((model == KeyMap::IRONCLAW || model == KeyMap::NIGHTSWORD) && !strcmp(key.name, "back")))
+            else if(model == KeyMap::M95 || ((model == KeyMap::IRONCLAW || model == KeyMap::NIGHTSWORD || model == KeyMap::M55) && !strcmp(key.name, "back")))
                 drawLogo(&key, &decPainter, offX , offY, scale);
             else if(model == KeyMap::M95 || (model == KeyMap::IRONCLAW_W && !strcmp(key.name, "back")))
                 drawLogo(&key, &decPainter, offX , offY, scale);

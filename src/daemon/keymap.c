@@ -949,14 +949,6 @@ const unsigned char m55_wl_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
     0x06, //forwards
     0x05, //backwards
     0x08, //dpi up?
-    0x09,
-    0x07, // Anything past this is untested
-    0x0A,
-    0x0B,
-    0x0C,
-    0x0D,
-    0x0E,
-    0x0F,
 };
 
 void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput){
@@ -975,7 +967,7 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
     const unsigned char* lut = corsair_bragi_lut;
     if(kb->vendor == V_CORSAIR && kb->product == P_HARPOON_WL_U)
         lut = harpoon_wl_lut;
-    if(kb->vendor == V_CORSAIR && kb->product == P_M55_RGB_PRO)
+    else if(kb->vendor == V_CORSAIR && kb->product == P_M55_RGB_PRO)
         lut = m55_wl_lut;
 
     for(int bit = 0; bit < buttons; bit++){

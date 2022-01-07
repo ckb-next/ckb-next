@@ -377,7 +377,6 @@ static const Key M95Keys[] = {
 
 
 // M55
-// TODO 
 static const Key M55Keys[] = {
     {0, "Left Mouse",       "mouse1",    5,  4, 14, 18, false, true},
     {0, "Right Mouse",      "mouse2",   28,  4, 14, 18, false, true},

@@ -17,10 +17,11 @@ keypatch k63patch[] = {
 #define K63PATCH_LEN sizeof(k63patch)/sizeof(*k63patch)
 
 keypatch m55patch[] = {
-    { 210, "mouse6", -1, KEY_CORSAIR },
-    { 211, "mouse7", -1, KEY_CORSAIR },
-    { 213, "dpiup",  -1, KEY_CORSAIR },
-    { 237, "dpi", LED_MOUSE, KEY_NONE },
+    { 210, "mouse6", -1,        KEY_CORSAIR },
+    { 211, "mouse7", -1,        KEY_CORSAIR },
+    { 213, "dpiup",  -1,        KEY_CORSAIR },
+    { 237, "dpi",    LED_MOUSE, KEY_NONE },
+    { 239, NULL,     0,         KEY_NONE },
 };
 #define M55PATCH_LEN sizeof(m55patch)/sizeof(*m55patch)
 

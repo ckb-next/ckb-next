@@ -84,6 +84,7 @@ keypatches mappatches[] = {
     { V_CORSAIR, P_IRONCLAW_W_U, icwpatch,       ICWPATCH_LEN },
     { V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch, HARPOONWLPATCH_LEN },
     { V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch,KATARPROXTPATCH_LEN },
+    { V_CORSAIR, P_KATAR_PRO,    katarproxtpatch,KATARPROXTPATCH_LEN },
     { V_CORSAIR, P_K95_LEGACY,   k95legacypatch, K95LEGACYPATCH_LEN },
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

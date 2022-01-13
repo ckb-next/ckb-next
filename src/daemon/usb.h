@@ -121,6 +121,7 @@
 #define IS_GLAIVE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_GLAIVE || (kb)->product == P_GLAIVE_PRO))
 
 #define P_KATAR              0x1b22
+#define P_KATAR_PRO          0x1b93
 #define P_KATAR_PRO_XT       0x1bac
 #define IS_KATAR(kb)         ((kb)->vendor == V_CORSAIR && (kb)->product == P_KATAR)
 
@@ -211,7 +212,7 @@ const char* product_str(ushort product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_KATAR_PRO_XT) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_GLAIVE_PRO))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_KATAR_PRO) || (product) == (P_KATAR_PRO_XT) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_GLAIVE_PRO))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -253,7 +254,7 @@ const char* product_str(ushort product);
 #define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_IRONCLAW || (kb)->product == P_HARPOON_PRO || IS_K63_WL(kb) || IS_DARK_CORE_NXP(kb) || (kb)->product == P_IRONCLAW_W_U || (kb)->product == P_IRONCLAW_W_D || (kb)->product == P_NIGHTSWORD)
 
 /// Devices here support setting the pollrate through software
-#define SUPPORTS_ADJRATE(kb)            ((kb)->product == P_K63_NRGB || (kb)->product == P_K66 || (kb)->product == P_K68 || (kb)->product == P_K68_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K95_PLATINUM || (kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_M95 || (kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_HARPOON || (kb)->product == P_HARPOON_PRO || (kb)->product == P_GLAIVE || (kb)->product == P_KATAR || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_NIGHTSWORD || IS_DARK_CORE_NXP(kb) || (kb)->product == P_K95_PLATINUM_XT || (kb)->product == P_GLAIVE_PRO)
+#define SUPPORTS_ADJRATE(kb)            ((kb)->product == P_K63_NRGB || (kb)->product == P_K66 || (kb)->product == P_K68 || (kb)->product == P_K68_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K95_PLATINUM || (kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_M95 || (kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_HARPOON || (kb)->product == P_HARPOON_PRO || (kb)->product == P_GLAIVE || (kb)->product == P_KATAR || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO || (kb)->product == P_NIGHTSWORD || IS_DARK_CORE_NXP(kb) || (kb)->product == P_K95_PLATINUM_XT || (kb)->product == P_GLAIVE_PRO)
 
 // Devices that have volume wheels (or don't)
 #define DEV_HAS_VOLWHEEL(kb)                (!(IS_K65(kb) || IS_K63(kb) || (kb)->product == P_K57_U))
@@ -281,13 +282,13 @@ const char* product_str(ushort product);
 #define USB_DELAY_DEFAULT   5
 
 // This should be removed in the future when we implement autodetection
-#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_KATAR_PRO_XT))
+#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_KATAR_PRO_XT || (product) == P_KATAR_PRO))
 
 // Devices that use bragi jumbo packets (1024 bytes)
 #define USES_BRAGI_JUMBO(vendor, product)           ((vendor) == (V_CORSAIR) && 0)
 
 // Used for devices that have the scroll wheel packet in the hardware hid packet only
-#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_KATAR_PRO_XT))
+#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO))
 
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();

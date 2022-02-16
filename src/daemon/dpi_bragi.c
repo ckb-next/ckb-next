@@ -58,6 +58,9 @@ int updatedpi_bragi(usbdevice* kb, int force){
         return -1;
     */
 
+    // M55 need this to properly update DPI LED
+    kb->vtable.updatergb(kb, 1);
+
     memcpy(lastdpi, newdpi, sizeof(dpiset));
     return 0;
 }

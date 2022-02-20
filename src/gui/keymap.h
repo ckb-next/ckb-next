@@ -80,6 +80,7 @@ public:
         KATARPROXT,
         K95L,
         GLAIVEPRO,
+        M55,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)
@@ -124,7 +125,7 @@ public:
     // Type of device
     inline static bool  isKeyboard(Model model)     { return !isMouse(model) && !isMousepad(model) && !isHeadsetStand(model) && model != NO_MODEL; }
     inline bool         isKeyboard() const          { return isKeyboard(keyModel); }
-    inline static bool  isMouse(Model model)        { return model == M65 || model == SABRE || model == SCIMITAR || model == HARPOON || model == GLAIVE || model == KATAR || model == KATARPROXT || model == M65E || model == M95 || model == IRONCLAW || model == NIGHTSWORD || model == DARKCORE || model == IRONCLAW_W || model == GLAIVEPRO; }
+    inline static bool  isMouse(Model model)        { return model == M55 || model == M65 || model == SABRE || model == SCIMITAR || model == HARPOON || model == GLAIVE || model == KATAR || model == KATARPROXT || model == M65E || model == M95 || model == IRONCLAW || model == NIGHTSWORD || model == DARKCORE || model == IRONCLAW_W || model == GLAIVEPRO; }
     inline bool         isMouse() const             { return isMouse(keyModel); }
     inline static bool  isMousepad(Model model)     { return model == POLARIS; }
     inline bool         isMousepad() const          { return isMousepad(keyModel); }

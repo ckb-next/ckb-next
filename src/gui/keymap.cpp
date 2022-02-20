@@ -375,6 +375,24 @@ static const Key M95Keys[] = {
 };
 #define KEYCOUNT_M95    (sizeof(M95Keys) / sizeof(Key))
 
+
+// M55
+static const Key M55Keys[] = {
+    {0, "Left Mouse",       "mouse1",    5,  4, 14, 18, false, true},
+    {0, "Right Mouse",      "mouse2",   28,  4, 14, 18, false, true},
+    {0, "Middle Mouse",     "mouse3",   20,  6,  7,  8, false, true},
+    {0, "Wheel Up",         "wheelup",  20,  3,  7,  5, false, true},
+    {0, "Wheel Down",       "wheeldn",  20, 13,  7,  5, false, true},
+    {0, "DPI Cycle",        "dpiup",    20, 19,  6, 10, false, true},
+    {0, "DPI Light",        "dpi",      20, 15,  8,  6, true,  false},
+    {0, "Forward",          "mouse4",    3, 24,  5, 10, false, true},
+    {0, "Back",             "mouse5",    3, 33,  5, 10, false, true},
+    {0, "Forward (7)",      "mouse6",   40, 24,  5, 10, false, true},
+    {0, "Back (8)",         "mouse7",   40, 33,  5, 10, false, true},
+    {0, "Logo",             "back",     10, 50, 24, 12, true,  false}
+};
+#define KEYCOUNT_M55    (sizeof(M55Keys) / sizeof(Key))
+
 // K95 Platinum lightbar
 static const Key K95PLbar[] = {
     {0, 0, "topbar1", 4, -3, LBS, true, false}, {0, 0, "topbar2", 19, -3, LBS, true, false}, {0, 0, "topbar3", 34, -3, LBS, true, false}, {0, 0, "topbar4", 49, -3, LBS, true, false}, {0, 0, "topbar5", 64, -3, LBS, true, false}, {0, 0, "topbar6", 79, -3, LBS, true, false},
@@ -1042,6 +1060,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["dpidn"] = {0, "DPI Down", "dpidn", 34, 29, 6, 8, false, true};
         break;
     }
+    case KeyMap::M55:{
+        // m55
+        for(const Key* key = M55Keys; key < M55Keys + KEYCOUNT_M55; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
     // Map is finished, return result
@@ -1252,6 +1280,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K95P;
     if(lower == "strafe")
         return STRAFE;
+    if(lower == "m55")
+        return M55;
     if(lower == "m65")
         return M65;
     if(lower == "sabre")
@@ -1313,6 +1343,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k95P";
     case STRAFE:
         return "strafe";
+    case M55:
+        return "m55";
     case M65:
         return "m65";
     case SABRE:
@@ -1384,6 +1416,7 @@ int KeyMap::modelWidth(Model model){
     case STRAFE:
     case STRAFE_MK2:
         return KSTRAFE_WIDTH;
+    case M55:
     case M65:
     case M65E:
     case SABRE:
@@ -1423,6 +1456,7 @@ int KeyMap::modelHeight(Model model){
         return K95_HEIGHT;
     case K95P:
         return K95P_HEIGHT;
+    case M55:
     case M65:
     case M65E:
     case SABRE:

@@ -28,6 +28,22 @@ int os_usb_control(usbdevice* kb, ctrltransfer* transfer, const char* file, int 
     if (res == -1){
         int ioctlerrno = errno;
         ckb_err_fn(" %s, res = 0x%x", file, line, strerror(ioctlerrno), res);
+#ifndef NDEBUG
+        if (ioctlerrno == EBUSY) {
+            if ((transfer->bRequestType & 0x1f) == 1) {
+                struct usbdevfs_getdriver query = {
+                    .interface = transfer->wIndex,
+                };
+                if (!ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
+                    ckb_info("Directed at interface %d, which is claimed by %s", transfer->wIndex, query.driver);
+                } else {
+                    ckb_info("Directed at interface %d, GETDRIVER error %s", transfer->wIndex, strerror(errno));
+                }
+            } else {
+                ckb_info("Directed at endpoint (called from where?)");
+            }
+        }
+#endif
         if(ioctlerrno == ETIMEDOUT)
             return -1;
         else
@@ -170,7 +186,9 @@ void* os_inputmain(void* context){
 
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
-        if (ioctl(fd, USBDEVFS_REAPURB, &urb)) {
+        int res = ioctl(fd, USBDEVFS_REAPURB, &urb);
+        if (res) {
+            wait_until_suspend_processed();
             if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
@@ -196,7 +214,9 @@ void* os_inputmain(void* context){
             process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
 
             /// Re-submit the URB for the next run.
-            ioctl(fd, USBDEVFS_SUBMITURB, urb);
+            if (ioctl(fd, USBDEVFS_SUBMITURB, urb)) {
+                wait_until_suspend_processed();
+            }
             urb = 0;
         }
     }
@@ -294,12 +314,27 @@ static int usbclaim(usbdevice* kb){
     ckb_info("ckb%d: Claiming %d interfaces", INDEX_OF(kb, keyboard), count);
 #endif // DEBUG
 
+    int retries = 0;
     for(int i = 0; i < count; i++){
-        struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
-        ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
-        if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {
-            ckb_err("Failed to claim interface %d: %s", i, strerror(errno));
-            return -1;
+        while (1) {
+            struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
+            ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
+            if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {
+                if (errno == EBUSY && retries < 50) {
+                    retries++;
+                    struct timespec sleep_for = { .tv_nsec = 100 * 1000000 };
+                    clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_for, NULL);
+                    continue;
+                }
+#ifndef NDEBUG
+                if (errno == EBUSY)
+                    ckb_info("Retry timeout after %d seconds", retries / 10);
+#endif // DEBUG
+                ckb_err("Failed to claim interface %d: %s", i, strerror(errno));
+                return -1;
+            } else {
+                break;
+            }
         }
     }
     return 0;
@@ -597,6 +632,90 @@ static void udev_enum(){
 
 _Atomic int suspend_run = 1;
 
+///
+/// \brief Gracefully resume from suspend.
+static void graceful_suspend_resume() {
+    // Wait for the kernel to finish reattaching drivers. Avoids race
+    // conditions (kernel bug) and situations where the usbhid driver is
+    // attached after we already believe to be in control of the device.
+    // Retry for at most 5 seconds.
+    // XXX: Is 5s too much? It might be possible for interfaces to be left
+    // unclaimed indefinitely.
+    for (int try = 0; suspend_run && try < 50; try++) {
+        bool drivers_attached = true;
+        for (int i = 1; i < DEV_MAX; i++) {
+            usbdevice* kb = keyboard + i;
+            queued_mutex_lock(dmutex(kb));
+            if (kb->status == DEV_STATUS_CONNECTED && kb->active) {
+                for (int j = 0; j < kb->epcount; j++) {
+                    // Replicates the logic from usbunclaim() - ignore
+                    // interfaces other than 0 and 1.
+                    if (j == 2 && kb->protocol == PROTO_NXP)
+                        continue;
+
+                    struct usbdevfs_getdriver query = {
+                        .interface = j,
+                    };
+                    if (ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
+                        if (errno == ENODATA) {
+                            // No driver attached yet, so keep waiting.
+                            drivers_attached = false;
+                        }
+                        // Ignore other errors.
+                    }
+                }
+            }
+            queued_mutex_unlock(dmutex(kb));
+        }
+        if (drivers_attached) {
+#ifndef NDEBUG
+            ckb_info("graceful_suspend_resume: drivers_attached");
+#endif // DEBUG
+            break;
+        } else {
+            struct timespec sleep_for = { .tv_nsec = 100 * 1000000 };
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_for, NULL);
+        }
+    }
+    // If some interfaces are now claimed by a driver other than usbfs (or
+    // none), attemt to reclaim them.
+    for (int i = 1; i < DEV_MAX; i++) {
+        usbdevice* kb = keyboard + i;
+        queued_mutex_lock(dmutex(kb));
+        if (kb->status == DEV_STATUS_CONNECTED && kb->active) {
+            bool needs_reclaim = false;
+            for (int j = 0; j < kb->epcount; j++) {
+                struct usbdevfs_getdriver query = {
+                    .interface = j,
+                };
+                if (!ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
+                    if (strcmp("usbfs", query.driver)) {
+#ifndef NDEBUG
+                        ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave %s, reclaiming", i, j, query.driver);
+#endif // DEBUG
+                        needs_reclaim = true;
+                        break;
+                    }
+                } else {
+                    if (errno == ENODATA) {
+#ifndef NDEBUG
+                        ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave ENODATA, reclaiming", i, j);
+#endif // DEBUG
+                        needs_reclaim = true;
+                        break;
+                    }
+                }
+            }
+            if (needs_reclaim) {
+                usbclaim(kb);
+                // Ignore errors for now. reactivate_devices() should
+                // try to reset the device.
+            }
+        }
+        queued_mutex_unlock(dmutex(kb));
+    }
+}
+
 // While POSIX says we may need a runtime test, on Linux the clock
 // was added immediately after the define was introduced, so a
 // compile time check should be enough
@@ -617,20 +736,51 @@ static time_t get_clock_monotonic_seconds() {
     return timespec_var.tv_sec;
 }
 
+static pthread_mutex_t suspend_check_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t suspend_check_cond = PTHREAD_COND_INITIALIZER;
+static time_t prev_suspend_check_time;
+
 void* suspend_check() {
-    time_t prev_time = get_clock_monotonic_seconds();
-    if(!prev_time)
+    time_t current_time = get_clock_monotonic_seconds();
+    if(!current_time)
         return NULL;
+    pthread_mutex_lock(&suspend_check_mutex);
+    prev_suspend_check_time = current_time;
+    pthread_mutex_unlock(&suspend_check_mutex);
     while(suspend_run){
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 2}, NULL);
-        time_t current_time = get_clock_monotonic_seconds(NULL);
+        current_time = get_clock_monotonic_seconds();
 
-        if(prev_time + 4 < current_time)
+        if (prev_suspend_check_time + 4 < current_time) {
+            graceful_suspend_resume();
             reactivate_devices();
+            // Some time might have passed, get a fresh timestamp so other
+            // threads can continue
+            current_time = get_clock_monotonic_seconds();
+        }
 
-        prev_time = current_time;
+        pthread_mutex_lock(&suspend_check_mutex);
+        prev_suspend_check_time = current_time;
+        pthread_cond_broadcast(&suspend_check_cond);
+        pthread_mutex_unlock(&suspend_check_mutex);
     }
     return NULL;
+}
+
+void wait_until_suspend_processed() {
+    // Prevent other threads from doing anything after waking from suspend and
+    // before the suspend thread has finished reactivate_devices().
+    // If necessary, this could be optimized by first checking an _Atomic
+    // representing prev_suspend_check_time instead of locking the shared mutex
+    // directly.
+
+    time_t current_time = get_clock_monotonic_seconds();
+    pthread_mutex_lock(&suspend_check_mutex);
+    while (suspend_run && prev_suspend_check_time + 4 < current_time) {
+        pthread_cond_wait(&suspend_check_cond, &suspend_check_mutex);
+        current_time = get_clock_monotonic_seconds();
+    }
+    pthread_mutex_unlock(&suspend_check_mutex);
 }
 
 /// \brief .

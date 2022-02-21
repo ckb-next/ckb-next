@@ -120,6 +120,12 @@ static const KeyPatch patchDvorak[] = {
     {0, ";", "z"}, {0, "Q", "x"}, {0, "J", "c"}, {0, "K", "v"}, {0, "X", "b"}, {0, "B", "n"}, {0, "W", "comma"}, {0, "V", "dot"}, {0, "Z", "slash"},
 };
 
+static const KeyPatch patchGR[] = {
+	{0, ";:", "q"}, {0, "ς", "w"}, {0, "ρ", "r"}, {0, "θ", "u"}, {0, "π", "p"},
+	{0, "σ", "s"}, {0, "δ", "d"}, {0, "φ", "f"}, {0, "γ", "g"}, {0, "ξ", "j"}, {0, "λ", "l"},
+	{0, "ψ", "c"}, {0, "ω", "v"}
+};
+
 // Apply a patch to a key map
 #define PATCH_COUNT(patch) (sizeof(patch) / sizeof(KeyPatch))
 #define patch(map, patches) _patch(map, patches, PATCH_COUNT(patches))
@@ -236,6 +242,11 @@ static void patchABNT2(QHash<QString, Key>& map){
 // K63 is the same as the K65 in terms of size
 #define K63_WIDTH       K65_WIDTH
 #define K63_HEIGHT      K65_HEIGHT
+
+// K60 has only six rows
+#define K60_WIDTH       K70_WIDTH
+#define K60_HEIGHT      62
+
 
 static const Key K68TopRow[] = {
     {0, "Volume Down", "voldn", 285 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 297 - K70_X_START, 0, 13, 8, true, true},
@@ -573,8 +584,11 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             patch(map, patchSE);
             break;
         case KeyMap::JP:
-            /*patch(map, patchJP);
-            break;*/
+            /*patch(map, patchJP);*/
+            break;
+        case KeyMap::GR:
+        	patch(map, patchGR);
+
         default:;
             // English QWERTY - no patch needed
         }
@@ -777,6 +791,31 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map[key->name] = *key;
 
         break;
+    }
+    case KeyMap::K60:{
+        map = getMap(KeyMap::K70, layout);
+        map.remove("light");
+        map.remove("lock");
+        map.remove("mute");
+        map.remove("volup");
+        map.remove("voldn");
+        map.remove("stop");
+        map.remove("prev");
+        map.remove("play");
+        map.remove("next");
+
+        // Replace rwin with Fn
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+
+        QMutableHashIterator<QString, Key> i(map);
+		while(i.hasNext()){
+			i.next();
+			i.value().y -= 14;
+		}
+
+    	break;
     }
     case KeyMap::K55:{
         // The K55 map is based on the K95
@@ -1084,6 +1123,8 @@ KeyMap::Layout KeyMap::locale(QList<QPair<int, QString>>* layouts){
         layout = KeyMap::US;
     else if(loc.startsWith("en-gb"))
         layout = KeyMap::GB;
+    else if(loc.startsWith("el-gr"))
+    	layout = KeyMap::GR;
 
     // Check if the hardware supports the detected layout
     for(int i = 0; i < layouts->count(); i++)
@@ -1135,6 +1176,8 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
         return SE;
     if(lower == "gb")
         return GB;
+    if(lower == "gr")
+        return GR;
     return NO_LAYOUT;
 }
 
@@ -1174,6 +1217,8 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "es";
     case SE:
         return "se";
+    case GR:
+    	return "gr";
     default:
         return "";
     }
@@ -1194,6 +1239,7 @@ QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
          << "English (United States, Dvorak)"
          << "French"
          << "German"
+         << "Greek"
          << "Italian"
          << "Japanese"
          << "Norwegian"
@@ -1217,15 +1263,15 @@ QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
                 << KeyMap::addToList(7, &list)
                 << KeyMap::addToList(8, &list)
                 << KeyMap::addToList(9, &list)
-                << KeyMap::addToList(11, &list)
+                << KeyMap::addToList(10, &list)
                 << KeyMap::addToList(12, &list)
-                << KeyMap::addToList(14, &list)
+                << KeyMap::addToList(13, &list)
                 << KeyMap::addToList(15, &list)
                 << KeyMap::addToList(16, &list);
     else if(layout == "abnt")
-        retlist << KeyMap::addToList(13, &list);
+        retlist << KeyMap::addToList(14, &list);
     else if(layout == "jis")
-        retlist << KeyMap::addToList(10, &list);
+        retlist << KeyMap::addToList(11, &list);
     else
         for(int i = 0; i < list.count(); i++)
             retlist << KeyMap::addToList(i, &list);
@@ -1236,6 +1282,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
     QString lower = name.toLower();
     if(lower == "k55")
         return K55;
+    if(lower == "k60")
+    	return K60;
     if(lower == "k63")
         return K63;
     if(lower == "k65")
@@ -1297,6 +1345,8 @@ QString KeyMap::getModel(KeyMap::Model model){
     switch(model){
     case K55:
         return "k55";
+    case K60:
+    	return "k60";
     case K63:
         return "k63";
     case K65:
@@ -1365,6 +1415,8 @@ KeyMap KeyMap::fromName(const QString &name){
 
 int KeyMap::modelWidth(Model model){
     switch(model){
+    case K60:
+    	return K60_WIDTH;
     case K63:
         return K63_WIDTH;
     case K65:
@@ -1423,6 +1475,8 @@ int KeyMap::modelHeight(Model model){
         return K95_HEIGHT;
     case K95P:
         return K95P_HEIGHT;
+    case K60:
+    	return K60_HEIGHT;
     case M65:
     case M65E:
     case SABRE:

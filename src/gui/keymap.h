@@ -80,6 +80,8 @@ public:
         KATARPROXT,
         K95L,
         GLAIVEPRO,
+        M55,
+        K60,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

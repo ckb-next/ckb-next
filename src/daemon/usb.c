@@ -14,6 +14,7 @@
 // Values taken from the official website
 // Mice not in the list default to 12000 in the GUI
 const dpi_list mouse_dpi_list[] = {
+    { P_M55_RGB_PRO, 12400 },
     { P_M65, 8200 },
     { P_M65_PRO, 12000 },
     { P_M65_RGB_ELITE, 18000 },
@@ -77,6 +78,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_K57_D, },
     { V_CORSAIR, P_K57_U, },
     // Mice
+    { V_CORSAIR, P_M55_RGB_PRO, },
     { V_CORSAIR, P_M65, },
     { V_CORSAIR, P_M65_PRO, },
     { V_CORSAIR, P_M65_RGB_ELITE, },
@@ -202,6 +204,8 @@ const char* product_str(ushort product){
         return "strafe_mk2";
     if(product == P_M95)
         return "m95";
+    if(product == P_M55_RGB_PRO)
+        return "m55";
     if(product == P_M65 || product == P_M65_PRO)
         return "m65";
     if(product == P_M65_RGB_ELITE)
@@ -330,6 +334,7 @@ static void* devmain(usbdevice* kb){
         // Read from FIFO
         const char* line;
         int lines = readlines(kbfifo, linectx, &line);
+        wait_until_suspend_processed();
         queued_mutex_lock(dmutex(kb));
         // End thread when the handle is removed
         if(kb->status == DEV_STATUS_DISCONNECTING || kb->status == DEV_STATUS_DISCONNECTED)

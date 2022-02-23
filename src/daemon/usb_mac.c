@@ -1079,4 +1079,9 @@ void usbkill(){
     CFRunLoopStop(mainloop);
 }
 
+void wait_until_suspend_processed() {
+    // No-op: currently only used on Linux. If adding something here, make sure
+    // the function is called in appropriate places.
+}
+
 #endif

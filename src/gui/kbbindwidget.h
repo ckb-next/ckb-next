@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "kbbind.h"
 #include "kbprofile.h"
+#include "keywidget.h"
 
 namespace Ui {
 class KbBindWidget;
@@ -35,6 +36,7 @@ private:
     KbBind*     bind;
     KbProfile*  profile;
     QStringList currentSelection;
+    KeyWidget* keyWidget;
 };
 
 #endif // KBBINDWIDGET_H

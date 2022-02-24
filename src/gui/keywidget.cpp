@@ -15,7 +15,7 @@ static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay =
 extern QRgb monoRgb(float r, float g, float b);
 
 KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
-    QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1), mouseDownMode(NONE), _rgbMode(rgbMode), _monochrome(false)
+    QWidget(parent), mouseDownX(-1), mouseDownY(-1), mouseCurrentX(-1), mouseCurrentY(-1), mouseDownMode(NONE), _rgbMode(rgbMode), _monochrome(false), _aspectRatio(0.5)
 {
     setMouseTracking(true);
     setAutoFillBackground(false);
@@ -26,17 +26,11 @@ void KeyWidget::map(const KeyMap& newMap){
     selection = QBitArray(keyMap.count());
     newSelection = QBitArray(keyMap.count());
     animation = QBitArray(keyMap.count());
-    int width, height;
-    if(keyMap.isMouse()){
-        width = (keyMap.width() + KEY_SIZE) * 2.6;
-        height = (keyMap.height() + KEY_SIZE) * 2.6;
-    } else {
-        width = (keyMap.width() + KEY_SIZE) * 2.3;
-        height = (keyMap.height() + KEY_SIZE) * 2.3;
-    }
-    if(width < 500)
-        width = 500;
-    setFixedSize(width, height);
+    _aspectRatio = keyMap.width() / (float)keyMap.height();
+    if(keyMap.isKeyboard())
+        _aspectRatio -= 0.35;
+    else if(keyMap.isMousepad())
+        _aspectRatio += 0.35;
     update();
 }
 
@@ -198,7 +192,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             blank->fill(newcol);
             overlay = blank;
         }
-        painter.drawRect(0, 0, width(), height());
+        painter.drawRect(0, 0, wWidth, wHeight);
         float oXScale = scale / 9.f, oYScale = scale / 9.f;             // The overlay has a resolution of 9px per keymap unit
         float x = (xpos + offX) * scale, y = (ypos + offY) * scale;
         int w = overlay->width() * oXScale, h = overlay->height() * oYScale;
@@ -209,7 +203,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
     } else {
         // Otherwise, draw a solid background
         painter.setBrush(QBrush(bgColor));
-        painter.drawRect(0, 0, width(), height());
+        painter.drawRect(0, 0, wWidth, wHeight);
     }
 
     // Draw mouse highlight (if any)

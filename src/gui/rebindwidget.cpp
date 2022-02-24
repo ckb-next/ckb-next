@@ -200,10 +200,10 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
 
     selection = newSelection;
     if(newSelection.isEmpty()){
-        hide();
+        setEnabled(false);
         return;
     } else
-        show();
+        setEnabled(true);
 
     bool hasAction = false;
     QString action;

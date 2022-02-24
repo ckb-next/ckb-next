@@ -48,6 +48,7 @@ private:
     QStringList currentSelection;
 
     Ui::KbLightWidget *ui;
+    KeyWidget* keyWidget;
 
     void startAnimationPreview();
     void stopAnimationPreview();

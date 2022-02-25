@@ -131,7 +131,7 @@
 #define P_IRONCLAW           0x1b5d
 #define IS_IRONCLAW(kb)      ((kb)->vendor == V_CORSAIR && (kb)->product == P_IRONCLAW)
 
-#define P_NIGHTSWORD	     0x1b5c
+#define P_NIGHTSWORD         0x1b5c
 #define IS_NIGHTSWORD(kb)    ((kb)->vendor == V_CORSAIR && (kb)->product == P_NIGHTSWORD)
 
 #define P_DARK_CORE          0x1b35 /* wired */

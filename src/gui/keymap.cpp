@@ -1296,7 +1296,7 @@ QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
                 << KeyMap::addToList(14, &list)
                 << KeyMap::addToList(15, &list)
                 << KeyMap::addToList(16, &list)
-                << KeyMap::addToList(16, &list);
+                << KeyMap::addToList(17, &list);
     else if(layout == "abnt")
         retlist << KeyMap::addToList(13, &list);
     else if(layout == "jis")

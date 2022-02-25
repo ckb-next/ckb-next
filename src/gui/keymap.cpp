@@ -121,9 +121,9 @@ static const KeyPatch patchDvorak[] = {
 };
 
 static const KeyPatch patchGR[] = {
-    {0, ";:", "q"}, {0, "ς", "w"}, {0, "ρ", "r"}, {0, "θ", "u"}, {0, "π", "p"},
-    {0, "σ", "s"}, {0, "δ", "d"}, {0, "φ", "f"}, {0, "γ", "g"}, {0, "ξ", "j"}, {0, "λ", "l"},
-    {0, "ψ", "c"}, {0, "ω", "v"}
+    {0, ";:", "q"}, {0, "ς", "w"}, {0, "Ρ", "r"}, {0, "Θ", "u"}, {0, "Π", "p"},
+    {0, "Σ", "s"}, {0, "Δ", "d"}, {0, "Φ", "f"}, {0, "Γ", "g"}, {0, "Ξ", "j"}, {0, "Λ", "l"},
+    {0, "Ψ", "c"}, {0, "Ω", "v"}
 };
 
 // Apply a patch to a key map
@@ -604,7 +604,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         case KeyMap::JP:
             /*patch(map, patchJP);*/
             break;
-        case KeyMap::GR:
+        case KeyMap::GR_ANSI:
             patch(map, patchGR);
 
         default:;
@@ -1119,7 +1119,6 @@ KeyMap::Layout KeyMap::locale(QList<QPair<int, QString>>* layouts){
     setlocale(LC_ALL, "");
     QString loc = setlocale(LC_CTYPE, 0);
     loc = loc.toLower().replace('_', '-');
-
     KeyMap::Layout layout = KeyMap::NO_LAYOUT;
 
     if(loc.startsWith("dk-"))
@@ -1151,8 +1150,8 @@ KeyMap::Layout KeyMap::locale(QList<QPair<int, QString>>* layouts){
         layout = KeyMap::US;
     else if(loc.startsWith("en-gb"))
         layout = KeyMap::GB;
-    else if(loc.startsWith("el-gr"))
-        layout = KeyMap::GR;
+    else if(loc.startsWith("el-"))
+        layout = KeyMap::GR_ANSI;
 
     // Check if the hardware supports the detected layout
     for(int i = 0; i < layouts->count(); i++)
@@ -1205,7 +1204,7 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
     if(lower == "gb")
         return GB;
     if(lower == "gr")
-        return GR;
+        return GR_ANSI;
     return NO_LAYOUT;
 }
 
@@ -1245,7 +1244,7 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "es";
     case SE:
         return "se";
-    case GR:
+    case GR_ANSI:
         return "gr";
     default:
         return "";
@@ -1281,7 +1280,8 @@ QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
     QList<QPair<int, QString>> retlist;
     if(layout == "ansi")
         retlist << KeyMap::addToList(5, &list)
-                << KeyMap::addToList(6, &list);
+                << KeyMap::addToList(6, &list)
+                << KeyMap::addToList(17, &list);
     else if(layout == "iso")
         retlist << KeyMap::addToList(0, &list)
                 << KeyMap::addToList(1, &list)

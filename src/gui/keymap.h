@@ -104,13 +104,14 @@ public:
         MX,                 // Spanish (Mexico/Latin America)
         ES,                 // Spanish (Spain)
         SE,                 // Swedish
-        GR,                 // Greek
+        GR_ANSI,            // Greek Ansi
+        GR_ISO,             // Greek ISO
         _LAYOUT_MAX
     };
     // Human-readable names of each layout
     static QList<QPair<int, QString> > layoutNames(const QString& layout);
     // ISO (105-key) or ANSI (104-key)?
-    inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK && layout != PL; }
+    inline static bool  isISO(Layout layout)    { return layout != US && layout != US_DVORAK && layout != PL && layout != GR_ANSI; }
     inline bool         isISO() const           { return isISO(keyLayout); }
 
     // JP (106-key)?

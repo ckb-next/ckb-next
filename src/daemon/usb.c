@@ -138,7 +138,7 @@ _Atomic int reset_stop = 0;
 int features_mask = -1;
 
 // Enable experimental support for not fully supported devices
-int enable_experimental = 1;
+int enable_experimental = 0;
 
 /// brief .
 ///

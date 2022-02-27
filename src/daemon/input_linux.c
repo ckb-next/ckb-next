@@ -1,6 +1,7 @@
 #include "command.h"
 #include "device.h"
 #include "input.h"
+#include "usb.h"
 
 #ifdef OS_LINUX
 
@@ -245,6 +246,7 @@ void* _ledthread(void* ctx){
                 ileds &= ~which;
         }
         // Update them if needed
+        wait_until_suspend_processed();
         queued_mutex_lock(dmutex(kb));
 
         if(kb->hw_ileds != ileds){

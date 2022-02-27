@@ -97,6 +97,7 @@
 #define P_STRAFE_MK2         0x1b48
 #define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2))
 
+#define P_M55_RGB_PRO        0x1b70
 #define P_M65                0x1b12
 #define P_M65_PRO            0x1b2e
 #define P_M65_RGB_ELITE      0x1b5a
@@ -215,7 +216,7 @@ const char* product_str(ushort product);
 #define IS_FULLRANGE(kb)                (!IS_LEGACY((kb)->vendor, (kb)->product) && (kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_KATAR_PRO) || (product) == (P_KATAR_PRO_XT) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_GLAIVE_PRO))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M55_RGB_PRO) || (product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_KATAR_PRO) || (product) == (P_KATAR_PRO_XT) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_GLAIVE_PRO))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -285,13 +286,13 @@ const char* product_str(ushort product);
 #define USB_DELAY_DEFAULT   5
 
 // This should be removed in the future when we implement autodetection
-#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_KATAR_PRO_XT || (product) == P_KATAR_PRO || (product) == P_K60_PRO_RGB ))
+#define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_M55_RGB_PRO) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_KATAR_PRO_XT || (product) == P_KATAR_PRO || (product) == P_K60_PRO_RGB ))
 
 // Devices that use bragi jumbo packets (1024 bytes)
 #define USES_BRAGI_JUMBO(vendor, product)           ((vendor) == (V_CORSAIR) && 0)
 
 // Used for devices that have the scroll wheel packet in the hardware hid packet only
-#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO))
+#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO))
 
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();
@@ -414,5 +415,13 @@ typedef struct _dpi_list {
 extern const dpi_list mouse_dpi_list[];
 
 int os_usb_interrupt_out(usbdevice* kb, unsigned int ep, unsigned int len, uchar* data, const char* file, int line);
+
+///
+/// \brief Wait for devices to be reactivated after suspend.
+///
+/// Should be called before communicating with any device.
+///
+/// \warning dmutex may NOT be held by the calling thread.
+void wait_until_suspend_processed();
 
 #endif  // USB_H

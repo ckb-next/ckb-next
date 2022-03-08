@@ -739,7 +739,7 @@ void Kb::readNotify(const QString& line){
                 if(dpi.length() != 2)
                     continue;
                 QStringList xy = dpi[1].split(',');
-                int x, y;
+                int x = 0, y = 0;
                 bool off = false;
                 if(xy.length() < 2){
                     // If the right side only has one parameter, set both X and Y

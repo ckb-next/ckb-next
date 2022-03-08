@@ -199,6 +199,7 @@ if (MACOS OR LINUX)
               keyaction.h
               keymap.h
               keywidget.h
+              keywidgetlayout.h
               kperfwidget.h
               legacylightwidget.h
               macroline.h

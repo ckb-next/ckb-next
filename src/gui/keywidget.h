@@ -7,6 +7,7 @@
 #include <QWidget>
 #include "keymap.h"
 #include "colormap.h"
+#include <cmath>
 
 class KeyWidget : public QWidget
 {
@@ -41,6 +42,14 @@ public:
     void setAnimationToSelection();
     void clearAnimation();
 
+    bool hasHeightForWidth() const override { return true; }
+    inline float aspectRatio() const {
+        return _aspectRatio;
+    }
+    int heightForWidth(int w) const override {
+        return std::round(w / aspectRatio());
+    }
+
 public slots:
     // Sets display colors. Pass an empty map to clear.
     // These will be displayed instead of the regular color map, if supplied.
@@ -72,6 +81,8 @@ private:
         TOGGLE,
     } mouseDownMode;
     bool _rgbMode, _monochrome;
+
+    float _aspectRatio;
 
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* event);

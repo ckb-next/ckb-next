@@ -3,14 +3,27 @@
 #include "modeselectdialog.h"
 #include "rebindwidget.h"
 #include "ui_kbbindwidget.h"
+#include "keywidgetlayout.h"
+#include "keywidget.h"
 
 KbBindWidget::KbBindWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::KbBindWidget), bind(0), profile(0)
+    ui(new Ui::KbBindWidget), bind(0), profile(0), keyWidget(new KeyWidget(this))
 {
     ui->setupUi(this);
-    ui->keyWidget->rgbMode(false);
-    connect(ui->keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
+    keyWidget->rgbMode(false);
+    connect(keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
+
+    // Make a new KeyWidgetLayout that preserves the aspect ratio and add it
+    KeyWidgetLayout* l = new KeyWidgetLayout();
+    l->addWidget(keyWidget);
+    ui->verticalLayout->removeWidget(ui->controlWidget);
+    l->addWidget(ui->controlWidget);
+
+    keyWidget->setFocusPolicy(Qt::ClickFocus);
+    ui->verticalLayout->insertLayout(2, l);
+    ui->verticalLayout->setStretchFactor(l, 1);
+    ui->verticalLayout->setStretchFactor(ui->rbWidget, 1);
 }
 
 KbBindWidget::~KbBindWidget(){
@@ -18,7 +31,7 @@ KbBindWidget::~KbBindWidget(){
 }
 
 void KbBindWidget::setBind(KbBind* newBind, KbProfile* newProfile){
-    ui->keyWidget->clearSelection();
+    keyWidget->clearSelection();
     ui->rbWidget->setBind(newBind, newProfile);
     newSelection(QStringList());
     if(bind == newBind)
@@ -47,13 +60,13 @@ void KbBindWidget::updateBind(){
     QHash<QString, QString> actions;
     foreach(const QString& key, map.keys())
         actions[key] = bind->action(key);
-    ui->keyWidget->bindMap(actions);
+    keyWidget->bindMap(actions);
     ui->rbWidget->setSelection(currentSelection);
     updateSelDisplay();
 }
 
 void KbBindWidget::newLayout(){
-    ui->keyWidget->map(bind->map());
+    keyWidget->map(bind->map());
     ui->rbWidget->setBind(bind, profile);
     updateSelDisplay();
 }

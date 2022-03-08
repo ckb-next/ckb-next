@@ -3,25 +3,37 @@
 #include "kblightwidget.h"
 #include "ui_kblightwidget.h"
 #include "mainwindow.h"
+#include "keywidgetlayout.h"
 
 KbLightWidget::KbLightWidget(QWidget *parent) :
     QWidget(parent), light(0),
-    ui(new Ui::KbLightWidget)
+    ui(new Ui::KbLightWidget), keyWidget(new KeyWidget(this))
 {
     ui->setupUi(this);
     if(AnimScript::count() == 0)
         ui->animButton->setEnabled(false);
 
     connect(ui->bgButton, SIGNAL(colorChanged(QColor)), this, SLOT(changeColor(QColor)));
-    connect(ui->keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
-    connect(ui->keyWidget, SIGNAL(sidelightToggled()), this, SLOT(toggleSidelight())); // click on a toggle button, like sidelight
+    connect(keyWidget, SIGNAL(selectionChanged(QStringList)), this, SLOT(newSelection(QStringList)));
+    connect(keyWidget, SIGNAL(sidelightToggled()), this, SLOT(toggleSidelight())); // click on a toggle button, like sidelight
     connect(ui->animWidget, SIGNAL(animChanged(KbAnim*)), this, SLOT(changeAnim(KbAnim*)));
     connect(ui->animWidget, SIGNAL(didUpdateSelection(QStringList)), this, SLOT(changeAnimKeys(QStringList)));
-    connect(ui->keyWidget, SIGNAL(M95LightToggled()), this, SLOT(toggleM95Light()));
+    connect(keyWidget, SIGNAL(M95LightToggled()), this, SLOT(toggleM95Light()));
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
 
     // Restore "show animated" setting
     ui->showAnimBox->setChecked(!CkbSettings::get("UI/Light/ShowBaseOnly").toBool());
+
+    // Make a new KeyWidgetLayout that preserves the aspect ratio and add it
+    KeyWidgetLayout* l = new KeyWidgetLayout();
+    l->addWidget(keyWidget);
+    ui->verticalLayout->removeWidget(ui->controlWidget);
+    l->addWidget(ui->controlWidget);
+
+    keyWidget->setFocusPolicy(Qt::ClickFocus);
+    ui->verticalLayout->insertLayout(2, l);
+    ui->verticalLayout->setStretchFactor(l, 2);
+    ui->verticalLayout->setStretchFactor(ui->animWidget, 1);
 }
 
 KbLightWidget::~KbLightWidget(){
@@ -29,8 +41,8 @@ KbLightWidget::~KbLightWidget(){
 }
 
 void KbLightWidget::setLight(KbLight* newLight){
-    ui->keyWidget->clearSelection();
-    ui->keyWidget->clearAnimation();
+    keyWidget->clearSelection();
+    keyWidget->clearAnimation();
     ui->animWidget->clearSelection();
     if(light == newLight)
         return;
@@ -42,14 +54,14 @@ void KbLightWidget::setLight(KbLight* newLight){
     connect(newLight, SIGNAL(updated()), this, SLOT(updateLight()));
     light = newLight;
     updateLight();
-    ui->keyWidget->setAnimation(QStringList());
+    keyWidget->setAnimation(QStringList());
     ui->animWidget->setLight(newLight);
     if(ui->showAnimBox->isChecked())
         on_showAnimBox_clicked(true);
 }
 
 void KbLightWidget::setMonochrome(){
-    ui->keyWidget->monochrome(true);
+    keyWidget->monochrome(true);
 }
 
 void KbLightWidget::on_showAnimBox_clicked(bool checked){
@@ -61,14 +73,14 @@ void KbLightWidget::on_showAnimBox_clicked(bool checked){
     } else {
         if(light)
             stopAnimationPreview();
-        ui->keyWidget->displayColorMap(ColorMap());
+        keyWidget->displayColorMap(ColorMap());
     }
     CkbSettings::set("UI/Light/ShowBaseOnly", !checked);
 }
 
 void KbLightWidget::updateLight(){
-    ui->keyWidget->map(light->map());
-    ui->keyWidget->colorMap(light->colorMap());
+    keyWidget->map(light->map());
+    keyWidget->colorMap(light->colorMap());
     ui->brightnessBox->setCurrentIndex(light->dimming());
 }
 
@@ -112,7 +124,7 @@ void KbLightWidget::changeColor(const QColor& newColor){
     if(light){
         foreach(QString key, currentSelection)
             light->color(key, newColor);
-        ui->keyWidget->colorMap(light->colorMap());
+        keyWidget->colorMap(light->colorMap());
     }
 }
 
@@ -125,7 +137,7 @@ void KbLightWidget::toggleSidelight(){
                 light->color("lsidel", QRgb(0xFF000000));
                 light->color("rsidel", QRgb(0xFF000000));
         }
-        ui->keyWidget->colorMap(light->colorMap());
+        keyWidget->colorMap(light->colorMap());
     }
 }
 
@@ -136,19 +148,19 @@ void KbLightWidget::toggleM95Light(){
             light->color("back",QRgb(0xFFFFFFFF));
         else
             light->color("back", QRgb(0xFF000000));
-        ui->keyWidget->colorMap(light->colorMap());
+        keyWidget->colorMap(light->colorMap());
     }
 }
 void KbLightWidget::changeAnim(KbAnim *newAnim){
     if(newAnim)
-        ui->keyWidget->setSelection(newAnim->keys());
+        keyWidget->setSelection(newAnim->keys());
     else
-        ui->keyWidget->clearSelection();
-    ui->keyWidget->setAnimationToSelection();
+        keyWidget->clearSelection();
+    keyWidget->setAnimationToSelection();
 }
 
 void KbLightWidget::changeAnimKeys(const QStringList& keys){
-    ui->keyWidget->setAnimation(keys);
+    keyWidget->setAnimation(keys);
 }
 
 void KbLightWidget::stateChange(Qt::ApplicationState state){
@@ -160,7 +172,7 @@ void KbLightWidget::stateChange(Qt::ApplicationState state){
     } else {
         if(light)
             stopAnimationPreview();
-        ui->keyWidget->displayColorMap(ColorMap());
+        keyWidget->displayColorMap(ColorMap());
     }
 }
 
@@ -171,14 +183,14 @@ void KbLightWidget::on_brightnessBox_activated(int index){
 
 void KbLightWidget::on_bgButton_clicked(){
     if(currentSelection.isEmpty())
-        ui->keyWidget->selectAll();
+        keyWidget->selectAll();
 }
 
 void KbLightWidget::on_animButton_clicked(){
     if(AnimScript::count() == 0)
         return;
     if(currentSelection.isEmpty())
-        ui->keyWidget->selectAll();
+        keyWidget->selectAll();
     AnimAddDialog dialog(this, light, currentSelection);
     dialog.exec();
     if(dialog.result() != QDialog::Accepted)
@@ -205,9 +217,9 @@ void KbLightWidget::setLegacyM95(){
 }
 
 void KbLightWidget::startAnimationPreview(){
-    connect(light, SIGNAL(frameDisplayed(const ColorMap&,const QSet<QString>&)), ui->keyWidget, SLOT(displayColorMap(const ColorMap&,const QSet<QString>&)));
+    connect(light, SIGNAL(frameDisplayed(const ColorMap&,const QSet<QString>&)), keyWidget, SLOT(displayColorMap(const ColorMap&,const QSet<QString>&)));
 }
 
 void KbLightWidget::stopAnimationPreview(){
-    disconnect(light, SIGNAL(frameDisplayed(const ColorMap&,const QSet<QString>&)), ui->keyWidget, SLOT(displayColorMap(const ColorMap&,const QSet<QString>&)));
+    disconnect(light, SIGNAL(frameDisplayed(const ColorMap&,const QSet<QString>&)), keyWidget, SLOT(displayColorMap(const ColorMap&,const QSet<QString>&)));
 }

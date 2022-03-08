@@ -681,6 +681,49 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 if(kb->protocol == PROTO_BRAGI) {
                     if(urblen == 64) {
                         corsair_kbcopy(targetkb->input.keys, buffer + 2);
+                        // Check if we need to apply an awful hack to get media keys working
+                        if(BRAGI_HAS_MEDIA_MACRO(targetkb)){
+                            // if Fn is pressed
+                            if(ISSET_KEYBIT(targetkb->input.keys, 122)){
+                                // As awful as this hack
+                                bool matched = true;
+                                if(ISSET_KEYBIT(targetkb->input.keys, 62)) { // F5 -> mute
+                                    CLEAR_KEYBIT(targetkb->input.keys, 62);
+                                    SET_KEYBIT(targetkb->input.keys, 102);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 64)) { // F7 -> voldn
+                                    CLEAR_KEYBIT(targetkb->input.keys, 64);
+                                    SET_KEYBIT(targetkb->input.keys, 104);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 65)) { // F8 -> volup
+                                    CLEAR_KEYBIT(targetkb->input.keys, 65);
+                                    SET_KEYBIT(targetkb->input.keys, 103);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 66)) { // F9 -> stop
+                                    CLEAR_KEYBIT(targetkb->input.keys, 66);
+                                    SET_KEYBIT(targetkb->input.keys, 123);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 67)) { // F10 -> prev
+                                    CLEAR_KEYBIT(targetkb->input.keys, 67);
+                                    SET_KEYBIT(targetkb->input.keys, 126);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 68)) { // F11 -> playpause
+                                    CLEAR_KEYBIT(targetkb->input.keys, 68);
+                                    SET_KEYBIT(targetkb->input.keys, 124);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 69)) { // F12 -> next
+                                    CLEAR_KEYBIT(targetkb->input.keys, 69);
+                                    SET_KEYBIT(targetkb->input.keys, 125);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 58)) { // F1 -> winlock
+                                    CLEAR_KEYBIT(targetkb->input.keys, 58);
+                                    SET_KEYBIT(targetkb->input.keys, 114);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 60)) { // F3 -> brightnessdn (not supported, map to generic "light")
+                                    CLEAR_KEYBIT(targetkb->input.keys, 60);
+                                    SET_KEYBIT(targetkb->input.keys, 113);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 61)) { // F4 -> brightnessup (not supported, map to generic "light")
+                                    CLEAR_KEYBIT(targetkb->input.keys, 61);
+                                    SET_KEYBIT(targetkb->input.keys, 113);
+                                } else {
+                                    matched = false;
+                                }
+                                if(matched)
+                                    CLEAR_KEYBIT(targetkb->input.keys, 122);
+                            }
+                        }
                     } else if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
                         if(!targetkb->active)
                             handle_bragi_key_input(targetkb->input.keys, buffer, urblen);

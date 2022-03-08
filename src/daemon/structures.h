@@ -18,6 +18,7 @@ typedef struct {
 // The do-while business is a hack to make statements like "if(a) SET_KEYBIT(...); else CLEAR_KEYBIT(...);" work
 #define SET_KEYBIT(array, index) do { (array)[(index) / 8] |= 1 << ((index) % 8); } while(0)
 #define CLEAR_KEYBIT(array, index) do { (array)[(index) / 8] &= ~(1 << ((index) % 8)); } while(0)
+#define ISSET_KEYBIT(array, index) ((array)[(index) / 8] & (1 << ((index) % 8)))
 
 // Indicator LEDs
 #define I_NUM       1

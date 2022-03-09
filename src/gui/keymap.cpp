@@ -237,6 +237,11 @@ static void patchABNT2(QHash<QString, Key>& map){
 #define K63_WIDTH       K65_WIDTH
 #define K63_HEIGHT      K65_HEIGHT
 
+// K60 has only six rows
+#define K60_WIDTH       K70_WIDTH
+#define K60_HEIGHT      62
+
+
 static const Key K68TopRow[] = {
     {0, "Volume Down", "voldn", 285 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 297 - K70_X_START, 0, 13, 8, true, true},
 };
@@ -796,6 +801,31 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
         break;
     }
+    case KeyMap::K60:{
+        map = getMap(KeyMap::K70, layout);
+        map.remove("light");
+        map.remove("lock");
+        map.remove("mute");
+        map.remove("volup");
+        map.remove("voldn");
+        map.remove("stop");
+        map.remove("prev");
+        map.remove("play");
+        map.remove("next");
+
+        // Replace rwin with Fn
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            i.value().y -= 14;
+        }
+
+        break;
+    }
     case KeyMap::K55:{
         // The K55 map is based on the K95
         map = getMap(KeyMap::K95, layout);
@@ -1264,6 +1294,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
     QString lower = name.toLower();
     if(lower == "k55")
         return K55;
+    if(lower == "k60")
+        return K60;
     if(lower == "k63")
         return K63;
     if(lower == "k65")
@@ -1327,6 +1359,8 @@ QString KeyMap::getModel(KeyMap::Model model){
     switch(model){
     case K55:
         return "k55";
+    case K60:
+        return "k60";
     case K63:
         return "k63";
     case K65:
@@ -1397,6 +1431,8 @@ KeyMap KeyMap::fromName(const QString &name){
 
 int KeyMap::modelWidth(Model model){
     switch(model){
+    case K60:
+        return K60_WIDTH;
     case K63:
         return K63_WIDTH;
     case K65:
@@ -1455,6 +1491,8 @@ int KeyMap::modelHeight(Model model){
         return K95_HEIGHT;
     case K95P:
         return K95P_HEIGHT;
+    case K60:
+        return K60_HEIGHT;
     case M55:
     case M65:
     case M65E:

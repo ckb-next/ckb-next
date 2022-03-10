@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include "keywidget.h"
 #include <cmath>
+#include <cassert>
 
 class KeyWidgetLayout : public QLayout
 {

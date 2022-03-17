@@ -119,6 +119,14 @@ option(DEBUG_MUTEX     "Show debugging information regarding thread synchronisat
 option(NO_FAIR_MUTEX_QUEUEING "Disable fair mutex queueing. Debugging only." OFF)
 option(DEBUG_INPUT_SYNC "Print a debug message every time an event bundle is delivered to the OS." OFF)
 
+# Make sure NO_FAIR_MUTEX_QUEUEING is set if TSAN is enabled
+# Otherwise you end up with threading issues that are not detected
+if (SANITIZE_THREAD AND NOT NO_FAIR_MUTEX_QUEUEING)
+    message(FATAL_ERROR "Thread Sanitizer was enabled but NO_FAIR_MUTEX_QUEUEING is set to FALSE. Please re-run cmake with -DNO_FAIR_MUTEX_QUEUEING=1 or disable SANITIZE_THREAD.")
+elseif (NO_FAIR_MUTEX_QUEUEING AND NOT SANITIZE_THREAD)
+    message(WARNING "NO_FAIR_MUTEX_QUEUEING is enabled. Make sure to disable it afterwards.")
+endif()
+
 # Options: install
 if (MACOS)
     set(CMAKE_INSTALL_PREFIX "/Applications")

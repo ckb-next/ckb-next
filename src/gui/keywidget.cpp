@@ -32,6 +32,7 @@ void KeyWidget::map(const KeyMap& newMap){
     else if(keyMap.isMousepad())
         _aspectRatio += 0.35;
     update();
+    updateGeometry();
 }
 
 void KeyWidget::drawInfo(float& scale, float& offsetX, float& offsetY, int ratio){

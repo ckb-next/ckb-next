@@ -99,3 +99,92 @@ static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar 
 int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len){
     return bragi_write_to_handle_common(kb, pkt, handle, buf_len, data_len, 7);
 }
+
+// Returns the size of the opened handle
+static inline uint32_t bragi_probe_handle(usbdevice* kb, uchar handle){
+    uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_PROBE_HANDLE, handle, 0};
+    uchar response[BRAGI_JUMBO_SIZE] = {0};
+    if(!usbrecv(kb, pkt, sizeof(pkt), response))
+        return 0;
+    if(response[2]) {
+        ckb_err("Failed to probe handle 0x%hhx. Error was 0x%hhx", handle, response[2]);
+        return 0;
+    }
+    uint32_t len;
+    // If we ever want to support big endian, len needs to be shifted
+    memcpy(&len, response + 5, sizeof(uint32_t));
+    return len;
+}
+
+uint32_t bragi_read_from_handle(usbdevice* kb, uchar handle, uchar** data){
+    *data = NULL;
+    uint32_t len = bragi_probe_handle(kb, handle);
+    if(len <= 0)
+        return 0;
+
+    // Let's assume that len won't be more than 100MiB for safety
+    if(len > 100*1024*1024){
+        ckb_fatal("Attempted to read file larger than 100MiB (%" PRIu32 " bytes) from handle 0x%hhx", len, handle);
+        return 0;
+    }
+
+    // Don't forget to free!
+    *data = malloc(len);
+
+    // Keep asking for data as long as there's more
+    // signed int here because the subtraction at the end will result in negative numbers
+    int64_t bytes_remaining = len;
+    while(bytes_remaining > 0){
+        uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_READ_DATA, handle, 0};
+        uchar response[BRAGI_JUMBO_SIZE] = {0};
+        if(!usbrecv(kb, pkt, sizeof(pkt), response)){
+            free(*data);
+            *data = NULL;
+            return 0;
+        }
+        if(response[2]) {
+            ckb_err("Failed to read from handle 0x%hhx. Error was 0x%hhx", handle, response[2]);
+            free(*data);
+            *data = NULL;
+            return 0;
+        }
+
+        // Subtract the header
+        int64_t actual_payload = kb->out_ep_packet_size - 3;
+        if(actual_payload > bytes_remaining)
+            actual_payload = bytes_remaining;
+
+        memcpy(*data + (len - bytes_remaining), response + 3, actual_payload);
+        bytes_remaining -= actual_payload;
+    }
+
+    return len;
+}
+
+int bragi_close_handle(usbdevice* kb, uchar handle){
+    uchar handleclose[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_CLOSE_HANDLE, 1, handle, 0};
+    uchar response[BRAGI_JUMBO_SIZE] = {0};
+    if(!usbrecv(kb, handleclose, sizeof(handleclose), response))
+        return -1;
+    if(response[2])
+        ckb_warn("Failed to close handle 0x%hhx. Error was 0x%hhx", handle, response[2]);
+    return response[2];
+}
+
+int bragi_open_handle(usbdevice* kb, uchar handle, ushort resource){
+    // FIXME: Endianness
+    uchar handleopen[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_OPEN_HANDLE, handle, resource & 0xFF, resource >> 8, 0};
+    uchar response[BRAGI_JUMBO_SIZE] = {0};
+    if(!usbrecv(kb, handleopen, sizeof(handleopen), response))
+        return -1;
+    if(response[2] == 0x03){
+        bragi_close_handle(kb, handle);
+        if(!usbrecv(kb, handleopen, sizeof(handleopen), response))
+            return -1;
+        if(response[2])
+            ckb_err("Failed to open handle 0x%hhx. Error was 0x%hhx", handle, response[2]);
+    }
+    else if(response[2])
+        ckb_err("Failed to open handle 0x%hhx. Error was 0x%hhx", handle, response[2]);
+    return response[2];
+}

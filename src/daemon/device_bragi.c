@@ -33,6 +33,9 @@ void* bragi_poll_thread(void* ctx){
 }
 
 static int setactive_bragi(usbdevice* kb, int active){
+    if(active == BRAGI_MODE_HARDWARE)
+        bragi_close_handle(kb, BRAGI_LIGHTING_HANDLE);
+
     const int ckb_id = INDEX_OF(kb, keyboard);
     if(bragi_set_property(kb, BRAGI_MODE, active)){
         ckb_err("ckb%d: Failed to set device to %s mode", ckb_id, (active == BRAGI_MODE_SOFTWARE ? "SW" : "HW"));
@@ -71,51 +74,33 @@ static int setactive_bragi(usbdevice* kb, int active){
         }
     }
 
-    // The daemon always sends RGB data through handle 0, so go ahead and open it
-    uchar light_init[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_OPEN_HANDLE, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING};
-    uchar response[BRAGI_JUMBO_SIZE] = {0};
-    if(!usbrecv(kb, light_init, sizeof(light_init), response))
-        return 1;
+    // The daemon will always send RGB data through handle 0 (), so go ahead and open it
+    int light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING);
+    if(light < 0)
+        return light;
 
     // Check if the device returned an error
     // Non fatal for now. Should first figure out what the error codes mean.
     // Device returns 0x03 on writes if we haven't opened the handle.
-    if(response[2] != 0x00){
-        ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, response[2]);
-        // CUE seems to attempt to close and reopen the handle if it gets 0x03 on open
-        if(response[2] == 0x03){
-            uchar light_deinit[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_CLOSE_HANDLE, 0x01, BRAGI_LIGHTING_HANDLE};
-            if(!usbrecv(kb, light_deinit, sizeof(light_deinit), response))
-                return 1;
-            if(response[2] != 0x00){
-                ckb_err("ckb%d: Close lighting handle failed with 0x%hhx", ckb_id, response[2]);
-            }
-            // Try to reopen it
-            if(!usbrecv(kb, light_init, sizeof(light_init), response))
-                return 1;
-            if(response[2] != 0x00){
-                ckb_err("ckb%d: Bragi light init (attempt 2) returned error 0x%hhx", ckb_id, response[2]);
-            }
-        }
-    }
+    if(light)
+        ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, light);
 
     return 0;
 }
 
 static int start_bragi_common(usbdevice* kb){
     kb->usbdelay = 10; // This might not be needed, but won't harm
-#warning "FIXME. Read more properties, such as fw version and pairing id"
-    // Check if we're in software mode, and if so, force back to hardware until we explicitly want SW.
+#warning "FIXME. Read more properties, such as fw version"
+    // Check if we're in HW mode, and if so, switch to software in order to read the properties/handles
     int prop = bragi_get_property(kb, BRAGI_MODE);
     if(prop < 0){
         ckb_fatal("ckb%d: Couldn't get bragi device mode. Aborting", INDEX_OF(kb, keyboard));
         return 1;
     }
 
-    if(prop == BRAGI_MODE_SOFTWARE){
-        ckb_info("ckb%d: Device is in software mode during init. Switching to hardware", INDEX_OF(kb, keyboard));
-        if(setactive_bragi(kb, BRAGI_MODE_HARDWARE))
-            return 1;
+    if(prop == BRAGI_MODE_HARDWARE){
+        // We set this directly to avoid spawning the poll thread
+        bragi_set_property(kb, BRAGI_MODE, BRAGI_MODE_SOFTWARE);
     }
 
 #warning "Add error messages in case of failure"
@@ -138,6 +123,40 @@ static int start_bragi_common(usbdevice* kb){
     kb->features &= ~FEAT_HWLOAD;
 
     kb->usbdelay = USB_DELAY_DEFAULT;
+
+    // Read pairing ID
+    if(IS_WIRELESS_DEV(kb)){
+        int pair = bragi_open_handle(kb, BRAGI_GENERIC_HANDLE, BRAGI_RES_PAIRINGID);
+        if(pair < 0)
+            return pair;
+
+        if(!pair){
+            uchar* pairid;
+            uint32_t dlen = bragi_read_from_handle(kb, BRAGI_GENERIC_HANDLE, &pairid);
+            if(dlen == PAIR_ID_SIZE){
+                memcpy(kb->wl_pairing_id, pairid, dlen);
+            } else {
+                printf("Invalid pairing ID length (%"PRIu32"). Data: ", dlen);
+                for(uint32_t i = 0; i < dlen; i++)
+                    printf("%02hhx ", pairid[i]);
+
+                putchar('\n');
+            }
+
+            free(pairid);
+
+            bragi_close_handle(kb, BRAGI_GENERIC_HANDLE);
+        }
+    }
+
+    char str[PAIR_ID_SIZE*3+1] = {0};
+    for(uint32_t i = 0; i < PAIR_ID_SIZE; i++)
+        snprintf(str + i * 3, sizeof(str), "%02hhx ", kb->wl_pairing_id[i]);
+
+    ckb_info("ckb%d: Pairing id: %s", INDEX_OF(kb, keyboard), str);
+
+    // Switch back to HW mode
+    bragi_set_property(kb, BRAGI_MODE, BRAGI_MODE_HARDWARE);
 
     return 0;
 }
@@ -227,6 +246,10 @@ static inline int bragi_dongle_probe(usbdevice* kb){
 }
 
 int start_dongle_bragi(usbdevice* kb, int makeactive){
+    start_bragi_common(kb);
+    // Force back to SW mode
+    // FIXME: Does this make a difference?
+    bragi_set_property(kb, BRAGI_MODE, BRAGI_MODE_SOFTWARE);
     // Probe for devices
     bragi_dongle_probe(kb);
     return 0;

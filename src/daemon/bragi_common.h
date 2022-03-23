@@ -28,4 +28,7 @@ static inline int _bragi_check_success(const uchar* out, const uchar* in, int de
 
 size_t bragi_calculate_buffer_size(usbdevice* kb, uint32_t data_len);
 int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_len, uint32_t data_len);
+uint32_t bragi_read_from_handle(usbdevice* kb, uchar handle, uchar** data);
+int bragi_open_handle(usbdevice* kb, uchar handle, ushort resource);
+int bragi_close_handle(usbdevice* kb, uchar handle);
 #endif

@@ -227,6 +227,7 @@ typedef enum protocol_
 #define IFACE_MAX           4
 #define USB_EP_MAX          16
 #define MAX_CHILDREN        8
+#define PAIR_ID_SIZE        8
 
 struct usbdevice_;
 typedef struct usbdevice_ {
@@ -362,6 +363,7 @@ typedef struct usbdevice_ {
     } status;
     uchar bragi_out_ep;
     uchar bragi_in_ep;
+    uchar wl_pairing_id[PAIR_ID_SIZE];
 } usbdevice;
 
 #endif  // STRUCTURES_H

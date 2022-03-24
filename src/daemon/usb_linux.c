@@ -182,7 +182,7 @@ void* os_inputmain(void* context){
     udev_enumerate_unref(enumerate);
     /// The userSpaceFS knows the URBs now, so start monitoring input
     while (1) {
-        struct usbdevfs_urb* urb = 0;
+        struct usbdevfs_urb* urb = NULL;
 
         /// if the ioctl returns something != 0, let's have a deeper look what happened.
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
@@ -198,7 +198,7 @@ void* os_inputmain(void* context){
                 // Re-submit the URB
                 if(urb)
                     ioctl(fd, USBDEVFS_SUBMITURB, urb);
-                urb = 0;
+                urb = NULL;
             }
             continue;
         }
@@ -217,7 +217,7 @@ void* os_inputmain(void* context){
             if (ioctl(fd, USBDEVFS_SUBMITURB, urb)) {
                 wait_until_suspend_processed();
             }
-            urb = 0;
+            urb = NULL;
         }
     }
 

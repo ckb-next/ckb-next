@@ -61,4 +61,7 @@
 #define BRAGI_INPUT_NOTIFY  0x01
 #define BRAGI_INPUT_HID     0x02
 
+// Notification IDs
+#define BRAGI_NOTIFICATION_CONNECTIONSTATUS 0x36
+
 #endif // BRAGI_PROTO_H

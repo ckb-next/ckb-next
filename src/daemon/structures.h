@@ -344,7 +344,7 @@ typedef struct usbdevice_ {
     // Parent device (for wireless dongles supporting multiple subdevices)
     struct usbdevice_* parent;
     // Children (if this is a parent)
-    struct usbdevice_* children[8];
+    struct usbdevice_* children[MAX_CHILDREN];
     // Bragi child device id
     unsigned char bragi_child_id;
     // Battery information

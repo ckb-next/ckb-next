@@ -88,49 +88,41 @@ void check_chmod(const char *pathname, mode_t mode){
 ///
 /// \brief _updateconnected Update the list of connected devices.
 ///
-/// \<devicepath\> normally is /dev/input/ckb or /input/ckb.
-/// \n Open the normal file under \<devicepath\>0/connected for writing.
-/// For each device connected, print its devicepath+number,
-/// the serial number of the usb device and the usb name of the device connected to that usb interface.
-/// \n eg:
-/// \n /dev/input/ckb1 0F022014ABABABABABABABABABABA999 Corsair K95 RGB Gaming Keyboard
-/// \n /dev/input/ckb2 0D02303DBACBACBACBACBACBACBAC998 Corsair M65 RGB Gaming Mouse
-///
-/// Set the file ownership to root.
-/// If the glob var gid is explicitly set to something different from -1 (the initial value), set file permission to 640, else to 644.
-/// This is used if you start the daemon with --gid=\<GID\> Parameter.
-///
-/// Because several independent threads may call updateconnected(), protect that procedure with locking/unlocking of \b devmutex.
-///
+/// Keeps track of device state separately (so that there's no need to lock every single dmutex)
+/// dmutex for kb should already be locked before calling this
 void _updateconnected(usbdevice* kb){
     queued_mutex_lock(devmutex);
+    static char names[DEV_MAX][KB_NAME_LEN] = {{0}};
+    static char serials[DEV_MAX][SERIAL_LEN] = {{0}};
+
     char cpath[DEVPATH_LEN + 12];
     snprintf(cpath, sizeof(cpath), "%s0/connected", devpath);
     FILE* cfile = fopen(cpath, "w");
     if(!cfile){
-        ckb_warn("Unable to update %s: %s", cpath, strerror(errno));
+        ckb_err("Unable to open %s: %s", cpath, strerror(errno));
         queued_mutex_unlock(devmutex);
         return;
     }
-    int written = 0;
+
+    // Don't write anything if we just want to create the paths
     if(kb != keyboard){
-        for(int i = 1; i < DEV_MAX; i++){
-#ifdef DEBUG_MUTEX
-            ckb_info("Locking ckb%d in _updateconnected()", i);
-#endif
-            queued_mutex_lock(devmutex + i);
-            if((keyboard + i)->status == DEV_STATUS_CONNECTED){
-                written = 1;
-                fprintf(cfile, "%s%d %s %s\n", devpath, i, keyboard[i].serial, keyboard[i].name);
-            }
-#ifdef DEBUG_MUTEX
-            ckb_info("Unlocking ckb%d in _updateconnected()", i);
-#endif
-            queued_mutex_unlock(devmutex + i);
+        const int index = INDEX_OF(kb, keyboard);
+
+        // Update the arrays with the status of the devices
+        if(kb->status == DEV_STATUS_CONNECTED){
+            strcpy(names[index], kb->name);
+            strcpy(serials[index], kb->serial);
+        } else {
+            names[index][0] = '\0';
+            serials[index][0] = '\0';
         }
-    }
-    if(!written)
+
+        for(int i = 1; i < DEV_MAX; i++)
+            if(serials[i][0])
+                fprintf(cfile, "%s%d %s %s\n", devpath, i, serials[i], names[i]);
         fputc('\n', cfile);
+    }
+
     fclose(cfile);
 
     check_chmod(cpath, S_GID_READ);

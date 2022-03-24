@@ -413,11 +413,11 @@ int os_setupusb(usbdevice* kb) {
     struct udev_device* dev = kb->udev;
     const char* name = udev_device_get_sysattr_value(dev, "product");
     if(name)
-        strncpy(kb->name, name, KB_NAME_LEN);
+        snprintf(kb->name, KB_NAME_LEN, "%s", name);
     strtrim(kb->name);
     const char* serial = udev_device_get_sysattr_value(dev, "serial");
     if(serial)
-        strncpy(kb->serial, serial, SERIAL_LEN);
+        snprintf(kb->serial, SERIAL_LEN, "%s", serial);
     strtrim(kb->serial);
     ///
     /// - Copy firmware version (needed to determine USB protocol)

@@ -220,7 +220,7 @@ typedef enum protocol_
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN         64
-#define SERIAL_LEN          34
+#define SERIAL_LEN          35
 #define MSG_SIZE            64
 #define BRAGI_JUMBO_SIZE    1024
 #define MAX_MSG_SIZE        BRAGI_JUMBO_SIZE
@@ -302,9 +302,9 @@ typedef struct usbdevice_ {
     // Whether the keyboard is being actively controlled by the driver
     char active;
     // Device name
-    char name[KB_NAME_LEN+1]; // increase by 1 for the trailing \0 for names that are exactly KB_NAME_LEN, e.g. "Corsair STRAFE RGB Gaming Keyboard"
+    char name[KB_NAME_LEN];
     // Device serial number
-    char serial[SERIAL_LEN+1];
+    char serial[SERIAL_LEN];
     // USB vendor and product IDs
     ushort vendor, product;
     // Firmware version

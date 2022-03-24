@@ -579,9 +579,7 @@ static void* _setupusb(void* context){
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Setup finished for %s%d", devpath, index);
     kb->status = DEV_STATUS_CONNECTED;
-    queued_mutex_unlock(dmutex(kb));
     updateconnected(kb);
-    queued_mutex_lock(dmutex(kb));
 
     ///
     /// devmain()'s return value is returned by _setupusb() when we terminate.
@@ -825,39 +823,29 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
 ///
 int closeusb(usbdevice* kb){
     kb->status = DEV_STATUS_DISCONNECTING;
+    const int index = INDEX_OF(kb, keyboard);
+    ckb_info("Disconnecting %s%d", devpath, index);
+    updateconnected(kb);
+
     queued_mutex_lock(imutex(kb));
-    if(kb->handle){
-        int index = INDEX_OF(kb, keyboard);
-        ckb_info("Disconnecting %s%d", devpath, index);
-        os_inputclose(kb);
-        queued_mutex_unlock(imutex(kb));
-        queued_mutex_unlock(dmutex(kb));
+    os_inputclose(kb);
 
-        // Shut down the device polling thread
-        if(kb->pollthread){
-            pthread_kill(*kb->pollthread, SIGUSR2);
-            pthread_join(*kb->pollthread, NULL);
-            free(kb->pollthread);
-            kb->pollthread = NULL;
-        }
-
-        updateconnected(kb);
-        queued_mutex_lock(dmutex(kb));
-        queued_mutex_lock(imutex(kb));
-        // Close USB device
-        os_closeusb(kb);
-    } else {
-        queued_mutex_unlock(imutex(kb));
-        queued_mutex_unlock(dmutex(kb));
-        updateconnected(kb);
-        queued_mutex_lock(dmutex(kb));
-        queued_mutex_lock(imutex(kb));
-    }
+    // Close USB device
+    os_closeusb(kb);
     rmdevpath(kb);
 
-    // Wait for thread to close
+    // Wait for threads to close
     queued_mutex_unlock(imutex(kb));
     queued_mutex_unlock(dmutex(kb));
+
+    // Shut down the device polling thread
+    if(kb->pollthread){
+        // Unlock dmutex to allow pollthread to quit
+        pthread_kill(*kb->pollthread, SIGUSR2);
+        pthread_join(*kb->pollthread, NULL);
+        free(kb->pollthread);
+        kb->pollthread = NULL;
+    }
 
     if(pthread_equal(pthread_self(), kb->thread)){
 #ifdef DEBUG_MUTEX
@@ -875,12 +863,11 @@ int closeusb(usbdevice* kb){
             ckb_err("pthread_join() returned %s (%d)", strerror(joinres), joinres);
     }
     queued_mutex_lock(dmutex(kb));
+    queued_mutex_lock(imutex(kb));
 
     // Delete the profile and the control path
-    if(!kb->vtable.freeprofile)
-        return 0;
-    kb->vtable.freeprofile(kb);
-    queued_mutex_lock(imutex(kb));
+    if(kb->vtable.freeprofile)
+        kb->vtable.freeprofile(kb);
     // This implicitly sets the status to STATUS_DISCONNECTED
     memset(kb, 0, sizeof(usbdevice));
     queued_mutex_unlock(imutex(kb));

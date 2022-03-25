@@ -31,4 +31,5 @@ int bragi_write_to_handle(usbdevice* kb, uchar* pkt, uchar handle, size_t buf_le
 uint32_t bragi_read_from_handle(usbdevice* kb, uchar handle, uchar** data);
 int bragi_open_handle(usbdevice* kb, uchar handle, ushort resource);
 int bragi_close_handle(usbdevice* kb, uchar handle);
+void bragi_update_dongle_subdevs(usbdevice* kb, int prop);
 #endif

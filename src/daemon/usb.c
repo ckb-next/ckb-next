@@ -257,7 +257,6 @@ const char* product_str(ushort product){
 /// \todo Is the last point really a good decision and always correct?
 ///
 static const devcmd* get_vtable(usbdevice* kb){
-    // return IS_MOUSE(vendor, product) ? &vtable_mouse : !IS_LEGACY(vendor, product) ? &vtable_keyboard : &vtable_keyboard_nonrgb;
     ushort vendor = kb->vendor;
     ushort product = kb->product;
     if(kb->protocol == PROTO_BRAGI) {
@@ -827,6 +826,17 @@ int closeusb(usbdevice* kb){
     ckb_info("Disconnecting %s%d", devpath, index);
     updateconnected(kb);
 
+    // If the device has children, disconnect them first
+    queued_mutex_lock(cmutex(kb));
+    for(int i = 0; i < MAX_CHILDREN; i++){
+        if(!kb->children[i])
+            continue;
+        queued_mutex_lock(dmutex(kb->children[i]));
+        closeusb(kb->children[i]);
+        queued_mutex_unlock(dmutex(kb->children[i]));
+        kb->children[i] = NULL;
+    }
+
     queued_mutex_lock(imutex(kb));
     os_inputclose(kb);
 
@@ -835,41 +845,46 @@ int closeusb(usbdevice* kb){
     rmdevpath(kb);
 
     // Wait for threads to close
-    queued_mutex_unlock(imutex(kb));
-    queued_mutex_unlock(dmutex(kb));
+    if(kb->pollthread || kb->thread){
+        queued_mutex_unlock(imutex(kb));
+        queued_mutex_unlock(dmutex(kb));
 
-    // Shut down the device polling thread
-    if(kb->pollthread){
-        // Unlock dmutex to allow pollthread to quit
-        pthread_kill(*kb->pollthread, SIGUSR2);
-        pthread_join(*kb->pollthread, NULL);
-        free(kb->pollthread);
-        kb->pollthread = NULL;
+        // Shut down the device polling thread
+        if(kb->pollthread){
+            // Unlock dmutex to allow pollthread to quit
+            pthread_kill(*kb->pollthread, SIGUSR2);
+            pthread_join(*kb->pollthread, NULL);
+            free(kb->pollthread);
+            kb->pollthread = NULL;
+        }
+
+        if(kb->thread){
+            if(pthread_equal(pthread_self(), kb->thread)){
+#ifdef DEBUG_MUTEX
+                ckb_info("Attempted to pthread_join() self. Detaching instead.");
+#endif
+                int detachres = pthread_detach(kb->thread);
+                if(detachres)
+                    ckb_err("pthread_detach() returned %s (%d)", strerror(detachres), detachres);
+            } else {
+#ifdef DEBUG_MUTEX
+                ckb_info("Joining thread 0x%lx for ckb%d by thread 0x%lx", kb->thread, INDEX_OF(kb, keyboard), pthread_self());
+#endif
+                int joinres = pthread_join(kb->thread, NULL);
+                if(joinres)
+                    ckb_err("pthread_join() returned %s (%d)", strerror(joinres), joinres);
+            }
+        }
+        queued_mutex_lock(dmutex(kb));
+        queued_mutex_lock(imutex(kb));
     }
 
-    if(pthread_equal(pthread_self(), kb->thread)){
-#ifdef DEBUG_MUTEX
-        ckb_info("Attempted to pthread_join() self. Detaching instead.");
-#endif
-        int detachres = pthread_detach(kb->thread);
-        if(detachres)
-            ckb_err("pthread_detach() returned %s (%d)", strerror(detachres), detachres);
-    } else {
-#ifdef DEBUG_MUTEX
-        ckb_info("Joining thread 0x%lx for ckb%d by thread 0x%lx", kb->thread, INDEX_OF(kb, keyboard), pthread_self());
-#endif
-        int joinres = pthread_join(kb->thread, NULL);
-        if(joinres)
-            ckb_err("pthread_join() returned %s (%d)", strerror(joinres), joinres);
-    }
-    queued_mutex_lock(dmutex(kb));
-    queued_mutex_lock(imutex(kb));
-
-    // Delete the profile and the control path
+    // Delete the profile
     if(kb->vtable.freeprofile)
         kb->vtable.freeprofile(kb);
     // This implicitly sets the status to STATUS_DISCONNECTED
     memset(kb, 0, sizeof(usbdevice));
+    queued_mutex_unlock(cmutex(kb));
     queued_mutex_unlock(imutex(kb));
     return 0;
 }

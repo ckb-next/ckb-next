@@ -188,3 +188,126 @@ int bragi_open_handle(usbdevice* kb, uchar handle, ushort resource){
         ckb_err("Failed to open handle 0x%hhx. Error was 0x%hhx", handle, response[2]);
     return response[2];
 }
+
+// We use this to get the name of the device as it's not reported wirelessly
+// Only wireless devices (and not dongles) should be added here
+static inline char* bragi_wl_string(usbdevice* kb){
+    if(kb->vendor != V_CORSAIR){
+        ckb_err("Vendor is not V_CORSAIR");
+        return NULL;
+    }
+    switch(kb->product){
+    case P_K57_U:
+        return "CORSAIR K57 RGB Wireless Gaming Keyboard";
+    case P_HARPOON_WL_U:
+        return "CORSAIR HARPOON RGB WIRELESS Gaming Mouse";
+    default:
+        ckb_err("Unknown product 0x%hx", kb->product);
+        return NULL;
+    }
+}
+
+// Returns the first available usbdevice in `keyboard`
+// If it can't find one, it returns NULL
+// It locks dmutex and it remains locked after the function returns
+static inline usbdevice* find_available_usbdevice(){
+    // Find a free device slot
+    for(int i = 1; i < DEV_MAX; i++){
+        usbdevice* kb = keyboard + i;
+        if(queued_mutex_trylock(dmutex(kb))){
+            // If the mutex is locked then the device is obviously in use, so keep going
+            continue;
+        }
+
+        // Ignore it if it has already been initialised
+        if(kb->status > DEV_STATUS_DISCONNECTED){
+            queued_mutex_unlock(dmutex(kb));
+            continue;
+        }
+
+        return kb;
+    }
+    return NULL;
+}
+
+void bragi_update_dongle_subdevs(usbdevice* kb, int prop){
+    // We don't want any other threads messing with this while we're probing
+    // Do note that this also blocks USB IO
+    pthread_mutex_lock(cmutex(kb));
+
+    // First, check if any devices have been disconnected
+    for(int i = 1; i < 8; i++){
+        if((prop >> i) & 1)
+            continue;
+
+        if(!kb->children[i-1])
+            continue;
+
+        // Disconnect the device
+        usbdevice* subkb = kb->children[i-1];
+        queued_mutex_lock(dmutex(subkb));
+        ckb_info("ckb%d: Bragi subdevice ckb%d disappeared", INDEX_OF(kb, keyboard), INDEX_OF(subkb, keyboard));
+        closeusb(subkb);
+        kb->children[i-1] = NULL;
+        queued_mutex_unlock(dmutex(subkb));
+    }
+
+    // Then, check if any new devices have been connected
+    for(int i = 1; i < 8; i++){
+        if(!((prop >> i) & 1))
+            continue;
+
+        // Skip this device if it's already been added
+        if(kb->children[i-1])
+            continue;
+
+        ckb_info("Found new bragi subdevice %d", i);
+
+        usbdevice* subkb = find_available_usbdevice();
+        if(!subkb){
+            ckb_err("No more free devices");
+            break;
+        }
+        subkb->status = DEV_STATUS_CONNECTING;
+        subkb->fwversion = 1234; // invalid
+        subkb->parent = kb;
+
+        subkb->out_ep_packet_size = kb->out_ep_packet_size;
+
+        // Assign a mouse vtable for now, can be changed later after we get vid/pid
+        memcpy(&subkb->vtable, &vtable_bragi_mouse, sizeof(devcmd));
+
+        subkb->bragi_child_id = i;
+
+        // Add the device to our children array
+        //pthread_mutex_lock(cmutex(kb));
+        kb->children[i-1] = subkb;
+        // Must be unlocked as soon as possible, before we try to get any properties
+        pthread_mutex_unlock(cmutex(kb));
+
+        // Fill dev information
+        ushort vid = bragi_get_property(subkb, BRAGI_VID);
+        ushort pid = bragi_get_property(subkb, BRAGI_PID);
+
+        ckb_info("ckb%d: Subkb vendor: 0x%hx, product: 0x%hx", INDEX_OF(subkb, keyboard), vid, pid);
+        subkb->vendor = vid;
+        subkb->product = pid;
+
+        if(vid == 0xffff || pid == 0xffff){
+            closeusb(subkb);
+            queued_mutex_unlock(dmutex(subkb));
+            queued_mutex_lock(cmutex(kb));
+            kb->children[i-1] = NULL;
+            queued_mutex_unlock(cmutex(kb));
+            continue;
+        }
+
+        const char* const name = bragi_wl_string(subkb);
+        if(name)
+            snprintf(subkb->name, KB_NAME_LEN, "%s", name);
+
+        setupusb(subkb);
+        pthread_mutex_lock(cmutex(kb));
+    }
+    pthread_mutex_unlock(cmutex(kb));
+}

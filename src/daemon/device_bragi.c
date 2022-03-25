@@ -193,55 +193,7 @@ int start_keyboard_bragi(usbdevice* kb, int makeactive){
 static inline int bragi_dongle_probe(usbdevice* kb){
     // Ask the device for the mapping
     int prop = bragi_get_property(kb, BRAGI_SUBDEVICE_BITFIELD);
-    // Go through every device and add it
-    for(int i = 1; i < 8; i++){
-        if(!((prop >> i) & 1))
-            continue;
-        ckb_info("Found bragi subdevice %d", i);
-        // Find a free device slot
-        for(int index = 1; index < DEV_MAX; index++){
-            usbdevice* subkb = keyboard + index;
-            if(queued_mutex_trylock(dmutex(subkb))){
-                // If the mutex is locked then the device is obviously in use, so keep going
-                continue;
-            }
-
-            // Ignore it if it has already been initialised
-            if(subkb->status > DEV_STATUS_DISCONNECTED){
-                queued_mutex_unlock(dmutex(subkb));
-                continue;
-            }
-
-            subkb->status = DEV_STATUS_CONNECTING;
-            subkb->fwversion = 1234; // invalid
-            subkb->parent = kb;
-
-            subkb->out_ep_packet_size = kb->out_ep_packet_size;
-
-            // Assign a mouse vtable for now, can be changed later after we get vid/pid
-            memcpy(&subkb->vtable, &vtable_bragi_mouse, sizeof(devcmd));
-
-            subkb->bragi_child_id = i;
-
-            // Add the device to our children array
-            pthread_mutex_lock(cmutex(kb));
-            kb->children[i-1] = subkb;
-            pthread_mutex_unlock(cmutex(kb));
-
-            // Fill dev information
-            ushort vid = bragi_get_property(subkb, BRAGI_VID);
-            ushort pid = bragi_get_property(subkb, BRAGI_PID);
-
-            ckb_info("Subkb vendor: 0x%hx, product: 0x%hx", vid, pid);
-            subkb->vendor = vid;
-            subkb->product = pid;
-
-            // Unlock mutex here for now
-            //queued_mutex_unlock(dmutex(subkb));
-            setupusb(subkb);
-            break;
-        }
-    }
+    bragi_update_dongle_subdevs(kb, prop);
     return 0;
 }
 

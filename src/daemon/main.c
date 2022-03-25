@@ -34,15 +34,22 @@ void timespec_add(struct timespec* timespec, int64_t nanoseconds){
 static void quit() {
     // Abort any USB resets in progress
     reset_stop = 1;
+    // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
     for(int i = 1; i < DEV_MAX; i++){
-        // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
         queued_mutex_lock(devmutex + i);
-        if((keyboard + i)->status == DEV_STATUS_CONNECTING || (keyboard + i)->status == DEV_STATUS_CONNECTED){
+        if((keyboard + i)->status == DEV_STATUS_CONNECTING || (keyboard + i)->status == DEV_STATUS_CONNECTED)
             revertusb(keyboard + i);
-            closeusb(keyboard + i);
-        }
         queued_mutex_unlock(devmutex + i);
     }
+
+    // We do this in a separate loop so that devices with children won't be removed before the children have been set to "idle"
+    for(int i = 1; i < DEV_MAX; i++){
+        queued_mutex_lock(devmutex + i);
+        if((keyboard + i)->status == DEV_STATUS_CONNECTING || (keyboard + i)->status == DEV_STATUS_CONNECTED)
+            closeusb(keyboard + i);
+        queued_mutex_unlock(devmutex + i);
+    }
+
     ckb_info("Closing root controller");
     rmdevpath(keyboard);
     usbkill();

@@ -827,7 +827,7 @@ int closeusb(usbdevice* kb){
     updateconnected(kb);
 
     // If the device has children, disconnect them first
-    queued_mutex_lock(cmutex(kb));
+    pthread_mutex_lock(cmutex(kb));
     for(int i = 0; i < MAX_CHILDREN; i++){
         if(!kb->children[i])
             continue;
@@ -884,7 +884,7 @@ int closeusb(usbdevice* kb){
         kb->vtable.freeprofile(kb);
     // This implicitly sets the status to STATUS_DISCONNECTED
     memset(kb, 0, sizeof(usbdevice));
-    queued_mutex_unlock(cmutex(kb));
+    pthread_mutex_unlock(cmutex(kb));
     queued_mutex_unlock(imutex(kb));
     return 0;
 }

@@ -280,7 +280,6 @@ void bragi_update_dongle_subdevs(usbdevice* kb, int prop){
         subkb->bragi_child_id = i;
 
         // Add the device to our children array
-        //pthread_mutex_lock(cmutex(kb));
         kb->children[i-1] = subkb;
         // Must be unlocked as soon as possible, before we try to get any properties
         pthread_mutex_unlock(cmutex(kb));
@@ -296,9 +295,9 @@ void bragi_update_dongle_subdevs(usbdevice* kb, int prop){
         if(vid == 0xffff || pid == 0xffff){
             closeusb(subkb);
             queued_mutex_unlock(dmutex(subkb));
-            queued_mutex_lock(cmutex(kb));
+            pthread_mutex_lock(cmutex(kb));
             kb->children[i-1] = NULL;
-            queued_mutex_unlock(cmutex(kb));
+            pthread_mutex_unlock(cmutex(kb));
             continue;
         }
 

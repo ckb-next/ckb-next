@@ -124,7 +124,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!scimOverlay)
                 scimOverlay = new QImage(":/img/overlay_scimitar.png");
             overlay = scimOverlay;
-            xpos = 3.5f;
+            xpos = 10.3f;
         } else if(model == KeyMap::HARPOON){
             if(!harpOverlay)
                 harpOverlay = new QImage(":/img/overlay_harpoon.png");

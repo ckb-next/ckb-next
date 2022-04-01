@@ -351,19 +351,19 @@ static const Key KatarPROXTKeys[] = {
 
 // Scimitar
 static const Key ScimKeys[] = {
-    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 12, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 8, 6, false, true}, {0, "Front light", "front", 30, 0, 12, 8, true, false },
-    {0, "Wheel Up", "wheelup", 22, 3, 8, 6, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 6, false, true}, {0, "Wheel Light", "wheel", 22, 3, 8, 17, true, false},
-    {0, "DPI Up", "dpiup", 22, 19, 8, 9, false, true}, {0, "DPI Light", "dpi", 1, 12, 8, 4, true, false}, {0, "DPI Down", "dpidn", 22, 28, 8, 9, false, true},
-    {0, "Thumb light", "thumb", 0, 21, 10, 24, true, false},
-    {0, "1", "thumb1", -13, 18, 7, 7, false, true}, {0, "2", "thumb2", -6, 18, 7, 7, false, true}, {0, "3", "thumb3", 1, 18, 7, 7, false, true},
-    {0, "4", "thumb4", -13, 25, 7, 7, false, true}, {0, "5", "thumb5", -6, 25, 7, 7, false, true}, {0, "6", "thumb6", 1, 25, 7, 7, false, true},
-    {0, "7", "thumb7", -13, 32, 7, 7, false, true}, {0, "8", "thumb8", -6, 32, 7, 7, false, true}, {0, "9", "thumb9", 1, 32, 7, 7, false, true},
-    {0, "10", "thumb10", -13, 39, 7, 7, false, true}, {0, "11", "thumb11", -6, 39, 7, 7, false, true}, {0, "12", "thumb12", 1, 39, 7, 7, false, true},
-    {0, "Logo", "back", 14, 50, 24, 16, true, false}
+    {0, "Left Mouse", "mouse1", 15, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 37, 0, 12, 32, false, true}, {0, "Middle Mouse", "mouse3", 29, 9, 8, 6, false, true}, {0, "Front light", "front", 37, 0, 12, 8, true, false },
+    {0, "Wheel Up", "wheelup", 29, 3, 8, 6, false, true}, {0, "Wheel Down", "wheeldn", 29, 14, 8, 6, false, true}, {0, "Wheel Light", "wheel", 29, 3, 8, 17, true, false},
+    {0, "DPI Up", "dpiup", 29, 19, 8, 9, false, true}, {0, "DPI Light", "dpi", 8, 12, 8, 4, true, false}, {0, "DPI Down", "dpidn", 29, 28, 8, 9, false, true},
+    {0, "Thumb light", "thumb", 7, 21, 10, 24, true, false},
+    {0, "1", "thumb1", -6, 18, 7, 7, false, true}, {0, "2", "thumb2", 1, 18, 7, 7, false, true}, {0, "3", "thumb3", 8, 18, 7, 7, false, true},
+    {0, "4", "thumb4", -6, 25, 7, 7, false, true}, {0, "5", "thumb5", 1, 25, 7, 7, false, true}, {0, "6", "thumb6", 8, 25, 7, 7, false, true},
+    {0, "7", "thumb7", -6, 32, 7, 7, false, true}, {0, "8", "thumb8", 1, 32, 7, 7, false, true}, {0, "9", "thumb9", 8, 32, 7, 7, false, true},
+    {0, "10", "thumb10", -6, 39, 7, 7, false, true}, {0, "11", "thumb11", 1, 39, 7, 7, false, true}, {0, "12", "thumb12", 8, 39, 7, 7, false, true},
+    {0, "Logo", "back", 21, 50, 24, 16, true, false}
 };
 #define KEYCOUNT_SCIM   (sizeof(ScimKeys) / sizeof(Key))
 
-#define SCIM_WIDTH      M65_WIDTH
+#define SCIM_WIDTH      66
 #define SCIM_HEIGHT     M65_HEIGHT
 
 // M95
@@ -1452,11 +1452,12 @@ int KeyMap::modelWidth(Model model){
     case STRAFE:
     case STRAFE_MK2:
         return KSTRAFE_WIDTH;
+    case SCIMITAR:
+        return SCIM_WIDTH;
     case M55:
     case M65:
     case M65E:
     case SABRE:
-    case SCIMITAR:
     case HARPOON:
     case GLAIVE:
     case KATAR:

@@ -22,7 +22,7 @@ int efd;
 XWindowDetector::XWindowDetector(QObject *parent) :
     QThread(parent)
 {
-    efd = eventfd(0, 0);
+    efd = eventfd(0, EFD_NONBLOCK);
 }
 
 void XWindowDetector::terminateEventLoop()
@@ -146,13 +146,24 @@ void XWindowDetector::run()
         if(err)
             qDebug() << "XCB error code" << err->error_code;
         free(err);
+        xcb_disconnect(conn);
         return;
     }
     xcb_window_t win = 0;
 
-    msleep(500);
+    do {
+        msleep(200);
+        xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, NULL);
+        // Read from the eventfd to allow breaking from the loop to quit
+        uint64_t buf;
+        if(read(efd, &buf, sizeof(buf)) == -1 && errno == EAGAIN)
+            continue;
+        xcb_disconnect(conn);
+        xcb_ewmh_connection_wipe(ewmh);
+        return;
+    } while(!win);
+    qDebug() << "Found initial X window";
 
-    xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, NULL);
     listenForWindowEvents(conn, win, &values);
 
     int xcbFd = xcb_get_file_descriptor(conn);

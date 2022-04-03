@@ -12,8 +12,8 @@
 #include <unistd.h>
 
 // Gets the current focused window, listens for focus out events on it, and repeats on new events.
-const uint32_t values = XCB_EVENT_MASK_FOCUS_CHANGE | XCB_EVENT_MASK_PROPERTY_CHANGE;
-const uint32_t values_unsubscribe = XCB_EVENT_MASK_FOCUS_CHANGE;
+const uint32_t values = XCB_EVENT_MASK_PROPERTY_CHANGE;
+const uint32_t values_unsubscribe = 0;
 
 xcb_window_t appwindow = 0;
 int efd;
@@ -130,11 +130,37 @@ void XWindowDetector::fetchNewWinInfo(xcb_window_t win, xcb_ewmh_connection_t* e
     }
 }
 
+static inline xcb_screen_t* getPreferredScreen(xcb_connection_t* conn, int preferred_screen){
+    xcb_screen_iterator_t iter = xcb_setup_roots_iterator(xcb_get_setup(conn));
+    for(int i = 0; i < preferred_screen; i++){
+        if(!iter.rem)
+            return NULL;
+        xcb_screen_next(&iter);
+    }
+    return iter.data;
+}
+
+static inline xcb_window_t getActiveWindow(xcb_ewmh_connection_t* ewmh, int preferred_screen){
+    xcb_window_t win = 0;
+    xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, NULL);
+    while(!win) {
+        QThread::msleep(50);
+        xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, NULL);
+        // Read from the eventfd to allow breaking from the loop to quit
+        uint64_t buf;
+        if(read(efd, &buf, sizeof(buf)) == -1 && errno == EAGAIN)
+            continue;
+        return 0;
+    }
+    return win;
+}
+
 void XWindowDetector::run()
 {
     int preferred_screen = 0;
     // XCB
     xcb_connection_t* conn = xcb_connect(NULL, &preferred_screen);
+    xcb_screen_t* scr = getPreferredScreen(conn, preferred_screen);
 
     // EWMH
     xcb_ewmh_connection_t ewmh_c;
@@ -149,70 +175,54 @@ void XWindowDetector::run()
         xcb_disconnect(conn);
         return;
     }
-    xcb_window_t win = 0;
 
-    do {
-        msleep(200);
-        xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, NULL);
-        // Read from the eventfd to allow breaking from the loop to quit
-        uint64_t buf;
-        if(read(efd, &buf, sizeof(buf)) == -1 && errno == EAGAIN)
-            continue;
-        xcb_disconnect(conn);
-        xcb_ewmh_connection_wipe(ewmh);
-        return;
-    } while(!win);
-    qDebug() << "Found initial X window";
+    // Enable notifications for the root window
+    listenForWindowEvents(conn, scr->root, &values);
 
-    listenForWindowEvents(conn, win, &values);
-
+    xcb_window_t cur_win = 0;
+    bool window_has_ewmh = false; // Used to skip window title change events
     int xcbFd = xcb_get_file_descriptor(conn);
     fd_set fds;
-
-    xcb_generic_event_t* evt = nullptr;
-    bool window_has_ewmh = false; // Used to skip window title change events for both legacy and ewmh
+    xcb_generic_event_t* evt;
     while((evt = xcbWaitForEventInterruptible(conn, xcbFd, &fds)))
     {
         const uint8_t eventtype = evt->response_type & ~0x80;
-        // Window focus changed
-        if(eventtype == XCB_FOCUS_OUT)
-        {
-            // The following is needed because EWMH is not updated the moment the event is received
-            // It is also used to filter out duplicate events
-            int cnt = 0;
-            xcb_window_t newwin = win;
-            do
-            {
-
-                xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &newwin, NULL);
-                msleep(40);
-                cnt++;
-            } while(win == newwin && cnt < 5);
-            if(cnt > 4)
-            {
-                free(evt);
-                listenForWindowEvents(conn, win, &values);
-                continue;
-            }
-            // We no longer want property change events for non focused windows
-            listenForWindowEvents(conn, win, &values_unsubscribe);
-            win = newwin;
-
-            fetchNewWinInfo(win, ewmh, conn, window_has_ewmh);
-
-            // Set up event mask
-            listenForWindowEvents(conn, win, &values);
-        }
-        else if (eventtype == XCB_PROPERTY_NOTIFY) // Property changed. Used for window name changes
-        {
+        if (eventtype == XCB_PROPERTY_NOTIFY) {
             xcb_property_notify_event_t* notifyevt = reinterpret_cast<xcb_property_notify_event_t*>(evt);
-            // Only accept legacy WM_NAME if we haven't gotten an ewmh name
-            if(notifyevt->atom == ewmh->_NET_WM_NAME || (!window_has_ewmh && notifyevt->atom == XCB_ATOM_WM_NAME)
-                    || notifyevt->atom == XCB_ATOM_WM_CLASS)
-                fetchNewWinInfo(win, ewmh, conn, window_has_ewmh);
+
+            // Root window events are used to monitor for the active window
+            if(notifyevt->window == scr->root){
+                // Ignore notifications for all atoms other than the active window
+                if(notifyevt->atom != ewmh->_NET_ACTIVE_WINDOW)
+                    continue;
+
+                xcb_window_t new_win = getActiveWindow(ewmh, preferred_screen);
+                if(!new_win){
+                    free(evt);
+                    xcb_ewmh_connection_wipe(ewmh);
+                    xcb_disconnect(conn);
+                    return;
+                }
+
+                if(cur_win != new_win){
+                    if(cur_win)
+                        listenForWindowEvents(conn, cur_win, &values_unsubscribe);
+                    cur_win = new_win;
+
+                    listenForWindowEvents(conn, new_win, &values);
+                    fetchNewWinInfo(new_win, ewmh, conn, window_has_ewmh);
+                }
+            } else if(notifyevt->window == cur_win) {
+                // Only accept legacy WM_NAME if we haven't gotten an ewmh name
+                if(notifyevt->atom == ewmh->_NET_WM_NAME || (!window_has_ewmh && notifyevt->atom == XCB_ATOM_WM_NAME)
+                        || notifyevt->atom == XCB_ATOM_WM_CLASS){
+                    fetchNewWinInfo(cur_win, ewmh, conn, window_has_ewmh);
+                }
+            }
         }
         free(evt);
     }
+
     qDebug() << "Disconnecting from X";
     xcb_ewmh_connection_wipe(ewmh);
     xcb_disconnect(conn);

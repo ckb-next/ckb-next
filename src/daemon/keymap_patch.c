@@ -106,9 +106,37 @@ keypatches mappatches[] = {
 void patchkeys(usbdevice* kb){
     // Copy the default keymap over
     memcpy(kb->keymap, keymap, sizeof(keymap));
+
     // Check if we need to patch the bragi base map
     if(kb->protocol == PROTO_BRAGI)
         memcpy(kb->keymap, keymap_bragi, sizeof(keymap_bragi));
+
+    // If it's a mouse, patch in profswitch
+    // This needs to be done after the bragi keymap patch
+    // as the position of profswitch differs
+    if(IS_MOUSE_DEV(kb)){
+#define PROFSWITCH_M_IDX (MOUSE_BUTTON_FIRST + 24)
+        int profswitch_kb_idx = -1;
+        for(int i = 0; i < LED_GENERIC_FIRST; i++) {
+            if(!strcmp(kb->keymap[i].name, "profswitch")) {
+                profswitch_kb_idx = i;
+                break;
+            }
+        }
+
+        if(profswitch_kb_idx < 0) {
+            ckb_err("Could not find profswitch in base keymap. Not patching profswitch for mouse.");
+        } else {
+            kb->keymap[PROFSWITCH_M_IDX].name = kb->keymap[profswitch_kb_idx].name;
+            kb->keymap[PROFSWITCH_M_IDX].led = -1;
+            kb->keymap[PROFSWITCH_M_IDX].scan = KEY_CORSAIR;
+            // Clear the keyboard one
+            kb->keymap[profswitch_kb_idx].name = NULL;
+            kb->keymap[profswitch_kb_idx].led = 0;
+            kb->keymap[profswitch_kb_idx].scan = KEY_NONE;
+        }
+    }
+
     // Iterate through the patches for all devices
     for(size_t pos = 0; pos < KEYPATCHES_LEN; pos++){
         if(mappatches[pos].vendor == kb->vendor && mappatches[pos].product == kb->product){

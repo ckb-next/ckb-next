@@ -262,7 +262,8 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
     { "profdn",     -1, KEY_CORSAIR },
-    { "profswitch", -1, KEY_CORSAIR },
+    { 0,            -1,   KEY_NONE }, // "profswitch" lives here for mice, however it's patched in manually
+                                      // as the keyboard profswitch interferes and needs to be disabled first
 
     // Extended mouse buttons (wheel is an axis in HW, 6-8 are recognized by the OS but not present in HW)
     { "wheelup",    -1, SCAN_MOUSE | BTN_WHEELUP },

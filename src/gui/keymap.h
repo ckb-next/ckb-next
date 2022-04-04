@@ -82,6 +82,7 @@ public:
         GLAIVEPRO,
         M55,
         K60,
+        K57_WL,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

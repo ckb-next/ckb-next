@@ -826,6 +826,62 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
         break;
     }
+    case KeyMap::K57_WL:{
+        // Take the K95 map
+        map = getMap(KeyMap::K95, layout);
+
+        // Replace rwin with Fn
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+
+        // Replace volume wheel
+        map["voldn"] = {0, "Volume Down", "voldn", map["mute"].x + 12, 0, map["mute"].width, map["mute"].height, true, true};
+        map["volup"] = {0, "Volume Up", "volup", map["mute"].x + 24, 0, map["mute"].width, map["mute"].height, true, true};
+
+        // Fix up the G keys
+        map.remove("g7");
+        map.remove("g8");
+        map.remove("g9");
+        map.remove("g10");
+        map.remove("g11");
+        map.remove("g12");
+        map.remove("g13");
+        map.remove("g14");
+        map.remove("g15");
+        map.remove("g16");
+        map.remove("g17");
+        map.remove("g18");
+        // Place the remaining G keys vertically
+        map["g1"].x = 22;
+        map["g2"].x = 22;
+        map["g3"].x = 22;
+        map["g4"].x = 22;
+        map["g5"].x = 22;
+        map["g6"].x = 22;
+        map["g2"].y = 26; //14+(12*1)
+        map["g3"].y = 38; //14+(12*2)
+        map["g4"].y = 50; //14+(12*3)
+        map["g5"].y = 62; //14+(12*4)
+        map["g6"].y = 74; //14+(12*5)
+
+        // Remove M keys
+        map.remove("m1");
+        map.remove("m2");
+        map.remove("m3");
+
+        // Move MR to the left of brightness
+        map["mr"].x = map["light"].x - 12;
+
+        // Shift all keys down (to make room for the lightbar), and to the left
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            i.value().x -= K95P_X_START;
+        }
+
+        break;
+    }
     case KeyMap::K55:{
         // The K55 map is based on the K95
         map = getMap(KeyMap::K95, layout);
@@ -1294,6 +1350,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
     QString lower = name.toLower();
     if(lower == "k55")
         return K55;
+    if(lower == "k57_wireless")
+        return K57_WL;
     if(lower == "k60")
         return K60;
     if(lower == "k63")
@@ -1359,6 +1417,8 @@ QString KeyMap::getModel(KeyMap::Model model){
     switch(model){
     case K55:
         return "k55";
+    case K57_WL:
+        return "k57_wireless";
     case K60:
         return "k60";
     case K63:
@@ -1448,6 +1508,7 @@ int KeyMap::modelWidth(Model model){
          return K95_WIDTH;
     case K95P:
     case K55:
+    case K57_WL:
         return K95P_WIDTH;
     case STRAFE:
     case STRAFE_MK2:
@@ -1479,6 +1540,7 @@ int KeyMap::modelWidth(Model model){
 int KeyMap::modelHeight(Model model){
     switch(model){
     case K55:
+    case K57_WL:
     case K63:
     case K65:
     case K66:

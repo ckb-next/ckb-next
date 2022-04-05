@@ -510,9 +510,11 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[HW_I_COUNT
         }
     }
     // KB indicators
-    // Disable the M indicators for the K70MK2 and the STRAFE_MK2.
+    // Disable the M indicators for the K70MK2, the STRAFE_MK2, and the K70_TKL.
     // FIXME: Only enable them for devices that need them instead
-    if(iEnable[MODE] && !(this->modeParent()->bind()->map().model() == KeyMap::K70MK2 || this->modeParent()->bind()->map().model() == KeyMap::STRAFE_MK2)){
+    if(iEnable[MODE] && !(this->modeParent()->bind()->map().model() == KeyMap::K70MK2 ||
+                          this->modeParent()->bind()->map().model() == KeyMap::STRAFE_MK2 ||
+                          this->modeParent()->bind()->map().model() == KeyMap::K70_TKL)){
         for(uchar i = 0; i < Kb::HWMODE_MAX; i++){
             char name[4];
             snprintf(name, sizeof(name), "m%d", i + 1);

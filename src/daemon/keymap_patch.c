@@ -118,6 +118,8 @@ void patchkeys(usbdevice* kb){
 #define PROFSWITCH_M_IDX (MOUSE_BUTTON_FIRST + 24)
         int profswitch_kb_idx = -1;
         for(int i = 0; i < LED_GENERIC_FIRST; i++) {
+            if(!kb->keymap[i].name)
+                continue;
             if(!strcmp(kb->keymap[i].name, "profswitch")) {
                 profswitch_kb_idx = i;
                 break;

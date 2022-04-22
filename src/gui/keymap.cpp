@@ -801,6 +801,12 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
         break;
     }
+    case KeyMap::K63_WL:{
+        // Same as K65
+        map = getMap(KeyMap::K65, layout);
+
+        break;
+    }
     case KeyMap::K60:{
         map = getMap(KeyMap::K70, layout);
         map.remove("light");
@@ -1356,6 +1362,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K60;
     if(lower == "k63")
         return K63;
+    if(lower == "k63_wireless")
+        return K63_WL;
     if(lower == "k65")
         return K65;
     if(lower == "k66")
@@ -1423,6 +1431,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k60";
     case K63:
         return "k63";
+    case K63_WL:
+        return "k63_wireless";
     case K65:
         return "k65";
     case K68:
@@ -1494,6 +1504,7 @@ int KeyMap::modelWidth(Model model){
     case K60:
         return K60_WIDTH;
     case K63:
+    case K63_WL:
         return K63_WIDTH;
     case K65:
         return K65_WIDTH;
@@ -1542,6 +1553,7 @@ int KeyMap::modelHeight(Model model){
     case K55:
     case K57_WL:
     case K63:
+    case K63_WL:
     case K65:
     case K66:
     case K68:

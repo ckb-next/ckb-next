@@ -842,8 +842,8 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("rwin");
 
         // Replace volume wheel
-        map["voldn"] = {0, "Volume Down", "voldn", map["mute"].x + 12, 0, map["mute"].width, map["mute"].height, true, true};
-        map["volup"] = {0, "Volume Up", "volup", map["mute"].x + 24, 0, map["mute"].width, map["mute"].height, true, true};
+        map["voldn"] = {0, "Volume Down", "voldn", static_cast<short>(map["mute"].x + 12), 0, map["mute"].width, map["mute"].height, true, true};
+        map["volup"] = {0, "Volume Up", "volup", static_cast<short>(map["mute"].x + 24), 0, map["mute"].width, map["mute"].height, true, true};
 
         // Fix up the G keys
         map.remove("g7");

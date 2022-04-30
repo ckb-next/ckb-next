@@ -163,7 +163,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!m95Overlay)
                 m95Overlay = new QImage(":/img/overlay_m95.png");
             overlay = m95Overlay;
-            xpos = 2.f;
+            xpos = 35.3f;
         } else if(model == KeyMap::IRONCLAW){
             if(!ironclawOverlay)
                 ironclawOverlay = new QImage(":/img/overlay_ironclaw.png");

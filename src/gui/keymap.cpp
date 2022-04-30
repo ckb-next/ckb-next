@@ -368,18 +368,19 @@ static const Key ScimKeys[] = {
 
 // M95
 static const Key M95Keys[] = {
-    {0, "Left Mouse", "mouse1", 9, 6, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 30, 6, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
-    {0, "4", "thumb6", 23, 28, 7, 12, false, true},
-    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "DPI Up (5)", "dpiup", 5, -1, 6, 9, false, true}, {0, "DPI Down (6)", "dpidn", 5, 6, 6, 9, false, true},
-    {0, "Forward (7)", "mouse6", -42, 14, 14, 8, false, true}, {0, "Back (8)", "mouse7", -30, 14, 14, 8, false, true}, {0, "Sniper (14)", "sniper", -40, 20, 8, 14, false, true},
-    {0, "9", "thumb1", -18, 14, 18, 8, false, true}, {0, "15", "thumb7", -18, 20, 10, 20, false, true},
-    {0, "10", "thumb2", -10, 21, 10, 11, false, true},{0, "11", "thumb3", -10, 30, 10, 11, false, true},
-    {0, "12", "thumb4", -18, 38, 18, 8, false, true}, {0, "13", "thumb5", -34, 38, 18, 8, false, true},
-    {0, "Logo", "back", 20, 55, 12, 12, true, false}
+    {0, "Left Mouse", "mouse1", 42, 6, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 63, 6, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 55, 8, 8, 7, false, true},
+    {0, "4", "thumb6", 56, 28, 7, 12, false, true},
+    {0, "Wheel Up", "wheelup", 55, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 55, 14, 8, 5, false, true}, {0, "DPI Up (5)", "dpiup", 38, -1, 6, 9, false, true}, {0, "DPI Down (6)", "dpidn", 38, 6, 6, 9, false, true},
+    {0, "Forward (7)", "mouse6", -9, 14, 14, 8, false, true}, {0, "Back (8)", "mouse7", 3, 14, 14, 8, false, true}, {0, "Sniper (14)", "sniper", -6, 20, 8, 14, false, true},
+    {0, "9", "thumb1", 15, 14, 18, 8, false, true}, {0, "15", "thumb7", 15, 20, 10, 22, false, true},
+    {0, "10", "thumb2", 23, 20, 10, 12, false, true},{0, "11", "thumb3", 23, 30, 10, 12, false, true},
+    {0, "12", "thumb4", 15, 40, 18, 8, false, true}, {0, "13", "thumb5", -1, 40, 18, 8, false, true},
+    {0, "Logo", "back", 53, 55, 12, 12, true, false}
 
 };
 #define KEYCOUNT_M95    (sizeof(M95Keys) / sizeof(Key))
 
+#define M95_WIDTH      110
 
 // M55
 static const Key M55Keys[] = {
@@ -1526,6 +1527,8 @@ int KeyMap::modelWidth(Model model){
         return KSTRAFE_WIDTH;
     case SCIMITAR:
         return SCIM_WIDTH;
+    case M95:
+        return M95_WIDTH;
     case M55:
     case M65:
     case M65E:
@@ -1537,7 +1540,6 @@ int KeyMap::modelWidth(Model model){
     case DARKCORE:
     case POLARIS:
     case ST100:
-    case M95:
     case IRONCLAW:
     case NIGHTSWORD:
     case GLAIVEPRO:

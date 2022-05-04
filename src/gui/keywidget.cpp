@@ -144,7 +144,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!katarOverlay)
                 katarOverlay = new QImage(":/img/overlay_katar.png");
             overlay = katarOverlay;
-            xpos = 3.5f;
+            xpos = 3.7f;
             ypos = -2.f;
         } else if(model == KeyMap::DARKCORE){
             if(!darkCoreOverlay)

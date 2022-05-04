@@ -139,11 +139,11 @@ static void patchnonJP106(QHash<QString, Key>& map){
     map.remove("katahira");
     map.remove("ro");
 }
-static void patchISO(QHash<QString, Key>& map){
+static inline void patchISO(QHash<QString, Key>& map){
     patchnonJP106(map);
     map.remove("bslash");
 }
-static void patchANSI(QHash<QString, Key>& map){
+static inline void patchANSI(QHash<QString, Key>& map){
     patchnonJP106(map);
     map.remove("bslash_iso");
     map.remove("hash");
@@ -156,7 +156,7 @@ static void patchANSI(QHash<QString, Key>& map){
     lshift.x = ANSI_LSHIFT_X;
     lshift.width = ANSI_LSHIFT_W;
 }
-static void patchJP106(QHash<QString, Key>& map){
+static inline void patchJP106(QHash<QString, Key>& map){
     // First apply the ISO patch
     map.remove("bslash");
 
@@ -191,7 +191,7 @@ static void patchJP106(QHash<QString, Key>& map){
     map.remove("rwin");
 }
 // Used to fix the Fn size and remove Alt when necessary in JP layouts for compatible devices
-static void patchJP106fn(QHash<QString, Key>& map){
+static inline void patchJP106fn(QHash<QString, Key>& map){
     if(map.contains("fn")){
         map.remove("ralt");
         Key& fn = map["fn"];
@@ -200,7 +200,7 @@ static void patchJP106fn(QHash<QString, Key>& map){
     }
 }
 // Patch for ABNT 2 layout
-static void patchABNT2(QHash<QString, Key>& map){
+static inline void patchABNT2(QHash<QString, Key>& map){
     map.remove("yen");
     map.remove("henkan");
     map.remove("muhenkan");
@@ -782,9 +782,6 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["fn"] = KStrafeKeys[3];
         map["fn"].x -= 12;
 
-        if(KeyMap::isJP(layout))
-            patchJP106fn(map);
-
         // Done!
         break;
     }
@@ -937,8 +934,6 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["fn"] = KStrafeKeys[3];
         map["fn"].x = map["rwin"].x;
         map.remove("rwin");
-        if(KeyMap::isJP(layout))
-            patchJP106fn(map);
         // Shift all keys to the left, and disable their LEDs
         QMutableHashIterator<QString, Key> i(map);
         while(i.hasNext()){
@@ -980,9 +975,6 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("prev");
         map.remove("play");
         map.remove("next");
-
-        if(KeyMap::isJP(layout))
-            patchJP106fn(map);
 
         // Done!
         break;
@@ -1165,6 +1157,10 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     }
     default:;    // <- stop GCC from complaining
     }
+
+    if(KeyMap::isJP(layout))
+        patchJP106fn(map);
+
     // Map is finished, return result
     return map;
 }

@@ -183,7 +183,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!m55Overlay)
                 m55Overlay = new QImage(":/img/overlay_m55.png");
             overlay = m55Overlay;
-            xpos = 2.f;
+            xpos = 5.7f;
         }
 
         if(!overlay){

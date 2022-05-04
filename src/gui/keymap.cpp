@@ -384,18 +384,18 @@ static const Key M95Keys[] = {
 
 // M55
 static const Key M55Keys[] = {
-    {0, "Left Mouse",       "mouse1",    5,  4, 14, 18, false, true},
-    {0, "Right Mouse",      "mouse2",   28,  4, 14, 18, false, true},
-    {0, "Middle Mouse",     "mouse3",   20,  6,  7,  8, false, true},
-    {0, "Wheel Up",         "wheelup",  20,  3,  7,  5, false, true},
-    {0, "Wheel Down",       "wheeldn",  20, 13,  7,  5, false, true},
-    {0, "DPI Cycle",        "dpiup",    20, 19,  6, 10, false, true},
-    {0, "DPI Light",        "dpi",      20, 15,  8,  6, true,  false},
-    {0, "Forward",          "mouse4",    3, 24,  5, 10, false, true},
-    {0, "Back",             "mouse5",    3, 33,  5, 10, false, true},
-    {0, "Forward (7)",      "mouse6",   40, 24,  5, 10, false, true},
-    {0, "Back (8)",         "mouse7",   40, 33,  5, 10, false, true},
-    {0, "Logo",             "back",     10, 50, 24, 12, true,  false}
+    {0, "Left Mouse",       "mouse1",    8,  4, 14, 18, false, true},
+    {0, "Right Mouse",      "mouse2",   31,  4, 14, 18, false, true},
+    {0, "Middle Mouse",     "mouse3",   24,  6,  7,  8, false, true},
+    {0, "Wheel Up",         "wheelup",  24,  3,  7,  5, false, true},
+    {0, "Wheel Down",       "wheeldn",  24, 13,  7,  5, false, true},
+    {0, "DPI Cycle",        "dpiup",    24, 19,  6, 10, false, true},
+    {0, "DPI Light",        "dpi",      23, 15,  8,  6, true,  false},
+    {0, "Forward",          "mouse4",    6, 24,  5, 10, false, true},
+    {0, "Back",             "mouse5",    6, 33,  5, 10, false, true},
+    {0, "Forward (7)",      "mouse6",   43, 24,  5, 10, false, true},
+    {0, "Back (8)",         "mouse7",   43, 33,  5, 10, false, true},
+    {0, "Logo",             "back",     21, 50, 12, 12, true,  false}
 };
 #define KEYCOUNT_M55    (sizeof(M55Keys) / sizeof(Key))
 

@@ -800,8 +800,12 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     case KeyMap::K63_WL:{
-        // Same as K65
-        map = getMap(KeyMap::K65, layout);
+        // Same as K63 but with Fn
+        map = getMap(KeyMap::K63, layout);
+
+        map.remove("rwin");
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x -= 12;
 
         break;
     }

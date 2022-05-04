@@ -303,7 +303,6 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!strcmp(key.name, "enter")){
                 if(key.height == 24){
                     // ISO enter key isn't rectangular
-                    y = key.y + 1.f;
                     h = 10.f;
                     bgPainter.drawRect(QRectF((x + w - 13.f) * scale, y * scale, 13.f * scale, 22.f * scale));
                 } else {

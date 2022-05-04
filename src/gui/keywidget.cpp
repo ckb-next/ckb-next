@@ -129,7 +129,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!harpOverlay)
                 harpOverlay = new QImage(":/img/overlay_harpoon.png");
             overlay = harpOverlay;
-            xpos = 3.5f;
+            xpos = 4.3f;
         } else if(model == KeyMap::GLAIVE){
             if(!glaiveOverlay)
                 glaiveOverlay = new QImage(":/img/overlay_glaive.png");

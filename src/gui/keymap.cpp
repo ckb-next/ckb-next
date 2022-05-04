@@ -307,7 +307,7 @@ static const Key SabreKeys[] = {
 static const Key HarpoonKeys[] = {
     {0, "Left Mouse", "mouse1", 10, 5, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 30, 5, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 25, 11, 6, 7, false, true},
     {0, "Wheel Up", "wheelup", 25, 7, 6, 5, false, true}, {0, "Wheel Down", "wheeldn", 25, 17, 6, 5, false, true},
-    {0, "DPI Cycle", "dpiup", 25, 23, 6, 10, false, true}, {0, "Logo Light", "dpi", 17, 40, 20, 20, true, false},
+    {0, "DPI Cycle", "dpiup", 25, 23, 6, 10, false, true}, {0, "Logo Light", "dpi", 18, 40, 20, 20, true, false},
     {0, "Forward", "mouse5", 3, 24, 5, 10, false, true}, {0, "Back", "mouse4", 3, 33, 5, 10, false, true}
 };
 #define KEYCOUNT_HARPOON  (sizeof(HarpoonKeys) / sizeof(Key))

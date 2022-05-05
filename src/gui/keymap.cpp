@@ -343,9 +343,9 @@ static const Key KatarPROXTKeys[] = {
     {0, "Wheel Up",         "wheelup",  22,  5,  7,  5, false, true},
     {0, "Wheel Down",       "wheeldn",  22, 15,  7,  5, false, true},
     {0, "DPI Cycle",        "dpiup",    22, 19,  6, 12, false, true},
-    {0, "DPI Wheel Light",  "dpi",      22,  3,  8, 14, true,  false},
-    {0, "Forward",          "mouse4",    3, 24,  5, 10, false, true},
-    {0, "Back",             "mouse5",    3, 33,  5, 10, false, true}
+    {0, "DPI Wheel Light",  "dpi",      21,  3,  8, 14, true,  false},
+    {0, "Forward",          "mouse5",    3, 24,  5, 10, false, true},
+    {0, "Back",             "mouse4",    3, 33,  5, 10, false, true}
 };
 #define KEYCOUNT_KATAR_PROXT  (sizeof(KatarPROXTKeys) / sizeof(Key))
 

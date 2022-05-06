@@ -14,7 +14,7 @@ QString devpath = "/var/run/ckb%1";
 #define IDLE_TIMER_DURATION (CkbSettings::get("Program/IdleTimerDuration", 5).toInt() * 60000)
 #endif
 
-QString KbManager::_guiVersion, KbManager::_daemonVersion = DAEMON_UNAVAILABLE_STR;
+CkbVersionNumber KbManager::_guiVersion, KbManager::_daemonVersion;
 KbManager* KbManager::_kbManager = 0;
 
 #ifdef USE_XCB_SCREENSAVER
@@ -68,7 +68,8 @@ void KbManager::idleTimerTick(){
 #endif
 
 void KbManager::init(const QString& guiVersion){
-    _guiVersion = guiVersion;
+    qRegisterMetaType<CkbVersionNumber>();
+    _guiVersion = CkbVersionNumber(guiVersion);
     if(_kbManager)
         return;
     _kbManager = new KbManager();
@@ -121,20 +122,6 @@ void KbManager::fps(int framerate){
         timer->start(1000 / framerate);
 }
 
-float KbManager::parseVersionString(QString version){
-    // Remove extraneous info (anything after + or -, anything non-numeric)
-    QStringList dots = version.replace(QRegExp("\\+|-.+"), "").replace(QRegExp("[^\\d\\.]"), "").split(".");
-    float base = 1.f;
-    float res = 0.f;
-    // A number like "1.2.3" will result in 1.0203
-    // NB: will fail if a point version goes over 99 or if using more than two dots. floats can only reliably encode 7 decimal digits.
-    foreach(const QString& dot, dots){
-        res += dot.toFloat() * base;
-        base /= 100.f;
-    }
-    return res;
-}
-
 void KbManager::scanKeyboards(){
     QString rootdev = devpath.arg(0);
     QFile connected(rootdev + "/connected");
@@ -146,23 +133,21 @@ void KbManager::scanKeyboards(){
             delete kb;
         }
         _devices.clear();
-        if(_daemonVersion != DAEMON_UNAVAILABLE_STR){
-            _daemonVersion = DAEMON_UNAVAILABLE_STR;
+        if(!_daemonVersion.isNull()){
+            _daemonVersion = CkbVersionNumber();
             emit versionUpdated();
         }
         return;
     }
-    // Check daemon version
-    QFile version(rootdev + "/version");
-    QString vString;
-    if(version.open(QIODevice::ReadOnly)){
-        vString = QString::fromUtf8(version.readLine()).trimmed();
-        version.close();
-    } else
-        vString = DAEMON_UNAVAILABLE_STR;
-    if(_daemonVersion != vString){
-        _daemonVersion = vString;
-        emit versionUpdated();
+
+    if(_daemonVersion.isNull()){
+        // Check daemon version
+        QFile version(rootdev + "/version");
+        if(version.open(QIODevice::ReadOnly)){
+            _daemonVersion = CkbVersionNumber(QString::fromUtf8(version.readLine()).trimmed());
+            emit versionUpdated();
+            version.close();
+        }
     }
 
     // Scan connected devices

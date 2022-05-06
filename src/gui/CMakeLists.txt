@@ -117,6 +117,7 @@ if (MACOS OR LINUX)
               ckbsettingswriter.cpp
               ckbupdater.cpp
               ckbupdaterwidget.cpp
+              ckbversionnumber.cpp
               clickeventpushbutton.cpp
               colorbutton.cpp
               colormap.cpp
@@ -172,6 +173,7 @@ if (MACOS OR LINUX)
               ckbsystemtrayicon.h
               ckbupdater.h
               ckbupdaterwidget.h
+              ckbversionnumber.h
               clickeventpushbutton.h
               colorbutton.h
               colormap.h

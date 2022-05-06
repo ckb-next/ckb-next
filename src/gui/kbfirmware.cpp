@@ -8,7 +8,7 @@
 // Auto check: 6 hr
 static const qint64 AUTO_CHECK_TIME = 60 * 60 * 6000;
 
-KbFirmware::FW::FW() : fwVersion(0.f), ckbVersion(0.f) {}
+KbFirmware::FW::FW() : fwVersion(CkbVersionNumber()), ckbVersion(CkbVersionNumber()) {}
 
 KbFirmware::KbFirmware() :
     lastCheck(0), lastFinished(0), tableDownload(0), hasGPG(GPG_UNKNOWN)
@@ -137,14 +137,18 @@ void KbFirmware::processDownload(QNetworkReply* reply){
                 continue;
         }
 
-        bool ok;
         FW fw;
-        fw.fwVersion = components[2].toFloat();                             // Firmware blob version
+        fw.fwVersion = CkbVersionNumber(components[2]);                     // Firmware blob version
         fw.url = QUrl::fromPercentEncoding(components[3].toLatin1());       // URL to zip file
-        fw.ckbVersion = KbManager::parseVersionString(components[4]);       // Minimum ckb version
+        fw.ckbVersion = CkbVersionNumber(components[4]);                    // Minimum ckb version
         fw.fileName = QUrl::fromPercentEncoding(components[5].toLatin1());  // Name of file inside zip
         fw.hash = QByteArray::fromHex(components[6].toLatin1());            // SHA256 of file inside zip
-        fw.productID = components[7].toUShort(&ok, 16);                      // Hex productID assigned to this FW
+        fw.productID = components[7].toUShort(nullptr, 16);                 // Hex productID assigned to this FW
+
+        // If the current ckb doesn't support the new version, mark it as such
+        if(fw.ckbVersion > KbManager::ckbGuiVersion() || fw.ckbVersion > KbManager::ckbDaemonVersion())
+            fw.fwVersion.setCkbTooOld();
+
         // Update entry
         fwTable[QString::number(fw.productID)] = fw;
     }
@@ -160,7 +164,7 @@ void KbFirmware::downloadFinished(){
     emit downloaded();
 }
 
-float KbFirmware::versionForBoard(const ushort productID, bool waitForComplete) {
+CkbVersionNumber KbFirmware::versionForBoard(const ushort productID, bool waitForComplete) {
     if((tableDownload || checkUpdates()) && waitForComplete){
         // If waiting is desired, enter an event loop and stay here until the download is finished
         QEventLoop loop(this);
@@ -168,18 +172,15 @@ float KbFirmware::versionForBoard(const ushort productID, bool waitForComplete) 
         loop.exec();
     }
     // Find this board
-    FW info = fwTable.value(QString::number(productID));
+    const FW& info = fwTable.value(QString::number(productID));
     if (info.hash.isEmpty())
-        return 0.f;
+        return CkbVersionNumber();
 
-    // Don't return the new version if the current ckb doesn't support it
-    if(info.ckbVersion > KbManager::ckbGuiVersionF() || info.ckbVersion > KbManager::ckbDaemonVersionF())
-        return -1.f;
     return info.fwVersion;
 }
 
 QByteArray KbFirmware::dataForBoard(const ushort productID){
-    FW info = fwTable.value(QString::number(productID));
+    const FW& info = fwTable.value(QString::number(productID));
     if(info.hash.isEmpty())
         return "";
     // Download zip from URL. Wait for it to finish.

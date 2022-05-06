@@ -15,14 +15,14 @@ struct KbId {
 static const int DIALOG_WIDTH = 420;
 static const int DIALOG_HEIGHT_MIN = 200, DIALOG_HEIGHT_MAX(240);
 
-FwUpgradeDialog::FwUpgradeDialog(QWidget* parent, float newV, const QByteArray& fwBlob, Kb* device) :
+FwUpgradeDialog::FwUpgradeDialog(QWidget* parent, CkbVersionNumber newV, const QByteArray& fwBlob, Kb* device) :
     QDialog(parent),
     ui(new Ui::FwUpgradeDialog),
     blob(fwBlob), kb(device), evLoop(0), exitSuccess(true)
 {
     ui->setupUi(this);
-    ui->curLabel->setText(kb->firmware);
-    ui->newLabel->setText(QString::number(newV, 'f', 2));
+    ui->curLabel->setText(kb->firmware.app.toString());
+    ui->newLabel->setText(newV.toString());
     ui->devLabel->setText(kb->usbModel);
 
     connect(device, SIGNAL(destroyed()), this, SLOT(removeDev()));
@@ -69,23 +69,20 @@ void FwUpgradeDialog::cleanBlob(){
 }
 
 // Returns firmware version if valid for device, 0 if invalid
-static float verifyFw(const QByteArray& blob, const ushort productID) {
-    ushort vendor = 0x1b1c;      ///< Corsair has at the moment just one vendorID
+static CkbVersionNumber verifyFw(const QByteArray& blob, const ushort productID) {
+    ushort vendor = 0x1b1c;
     if(blob.length() < 0x0108)
-        return 0.f;
+        return CkbVersionNumber();
     const char* bData = blob.data();
-    // Make sure it matches this device based on the vendor and product IDs embedded in the blob
 
+    // Make sure it matches this device based on the vendor and product IDs embedded in the blob
     if (memcmp(&vendor, bData + 0x102, 2) || memcmp(&productID, bData + 0x104, 2)) {
         qCritical() << "Something really bad happened - wrong firmware file detected";
-        return 0.f; ///< Something really bad has happened - wrong firmware file detected.
+        return CkbVersionNumber();
     }
 
-    // Copy the version from the blob
-    short version;
-    memcpy(&version, bData + 0x106, 2);
-    // Un-hexify it
-    return QString::number(version, 16).toFloat() / 100.f;
+    // Extract the version from the blob
+    return CkbVersionNumber(blob.mid(0x106, 2));
 }
 
 int FwUpgradeDialog::exec(){
@@ -93,12 +90,12 @@ int FwUpgradeDialog::exec(){
 
     if(!blob.isEmpty()){
         // If a blob was already specified, check its version and validity
-        float newV = verifyFw(blob, productID);
-        if(newV == 0.f){
+        CkbVersionNumber newV = verifyFw(blob, productID);
+        if(newV.isNull()){
             QMessageBox::warning(parentWidget(), tr("Error"), tr("<center>Not a valid firmware for this device.</center>"));
             return QDialog::Rejected;
         }
-        ui->newLabel->setText(QString::number(newV, 'f', 2));
+        ui->newLabel->setText(newV.toString());
     } else {
         // Download a new blob file
         ui->progressBar->show();
@@ -108,8 +105,8 @@ int FwUpgradeDialog::exec(){
         // This can take a while
         blob = MainWindow::mainWindow->kbfw->dataForBoard(productID);
         // Check validity
-        float newV = verifyFw(blob, productID);
-        if(newV == 0.f){
+        CkbVersionNumber newV = verifyFw(blob, productID);
+        if(newV.isNull()){
             hide();
             QMessageBox::warning(parentWidget(), tr("Error"), tr("<center>There was a problem with the downloaded file.<br />Please try again later.</center>"));
             return QDialog::Rejected;
@@ -139,7 +136,7 @@ int FwUpgradeDialog::exec(){
 }
 
 void FwUpgradeDialog::removeDev(){
-    kb = 0;
+    kb = nullptr;
     // Assume success if upgrade in progress
     if(!savePath.isEmpty())
         fwUpdateFinished(true);

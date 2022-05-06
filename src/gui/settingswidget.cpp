@@ -125,8 +125,8 @@ void SettingsWidget::setStatus(const QString& text){
     ui->devicesLabel->setText(text);
 }
 
-void SettingsWidget::setVersion(const QString& version){
-    ui->versionLabel->setText(version);
+void SettingsWidget::setVersion(const CkbVersionNumber& version){
+    ui->versionLabel->setText(QString("ckb-next ") + version.toString());
 }
 
 static inline QString right(const QString& left){

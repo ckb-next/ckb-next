@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include "ckbversionnumber.h"
 
 class CkbUpdater : public QObject
 {
@@ -14,9 +15,9 @@ public:
 
 private:
     QNetworkAccessManager* _accessManager;
-    QString getVersionString(QByteArray* bytes);
-    QString _latestVerStr;
-    QString parseChangeLog(QByteArray* bytes);
+    CkbVersionNumber getLatestVersion(const QByteArray& bytes);
+    CkbVersionNumber latestVer;
+    QString parseChangeLog(const QByteArray& bytes);
 
 signals:
     void checkedForNewVer(QString ver, QString changelog);

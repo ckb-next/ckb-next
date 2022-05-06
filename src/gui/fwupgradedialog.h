@@ -15,7 +15,7 @@ class FwUpgradeDialog : public QDialog
     Q_OBJECT
 
 public:
-    FwUpgradeDialog(QWidget* parent, float newV, const QByteArray& fwBlob, Kb* device);
+    FwUpgradeDialog(QWidget* parent, CkbVersionNumber newV, const QByteArray& fwBlob, Kb* device);
     ~FwUpgradeDialog();
 
     int exec();

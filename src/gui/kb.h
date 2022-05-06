@@ -9,6 +9,27 @@
 #include <QElapsedTimer>
 #include <limits>
 #include "batterysystemtrayicon.h"
+#include "ckbversionnumber.h"
+
+struct firmware_t {
+    CkbVersionNumber app;
+    CkbVersionNumber bld;
+    CkbVersionNumber radioapp;
+    CkbVersionNumber radiobld;
+    void parse(const QString& str){
+        // KeepEmptyParts is the default
+        QVector<QStringRef> split = str.leftRef(str.size()-1).split(QChar('\n'));
+        // Old < 0.5.0 format (NXP and legacy)
+        if(split.size() == 1){
+            app = CkbVersionNumber(split.at(0).toString());
+        } else if (split.size() >= 4) {
+            app = CkbVersionNumber(split.at(0).toString());
+            bld = CkbVersionNumber(split.at(1).toString());
+            radioapp = CkbVersionNumber(split.at(2).toString());
+            radiobld = CkbVersionNumber(split.at(3).toString());
+        }
+    }
+};
 
 // Class for managing devices
 class Kb : public QThread
@@ -19,11 +40,12 @@ public:
     QString usbModel, usbSerial;
     // Device information
     QStringList features;
-    QString firmware, pollrate;
+    QString pollrate;
     bool monochrome;
     ushort productID;
     bool hwload;
     bool adjrate;
+    firmware_t firmware;
 
     // Keyboard model
     inline KeyMap::Model    model() const                       { return _model; }

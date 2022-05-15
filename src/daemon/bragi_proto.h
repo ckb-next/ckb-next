@@ -18,6 +18,10 @@
 #define BRAGI_BRIGHTNESS    0x02
 #define BRAGI_MODE          0x03
 #define BRAGI_ANGLE_SNAP    0x07
+#define BRAG_APP_VER        0x13
+#define BRAG_BLD_VER        0x14
+#define BRAG_RADIO_APP_VER  0x15
+#define BRAG_RADIO_BLD_VER  0x16
 #define BRAGI_DPI_INDEX     0x1E
 #define BRAGI_DPI_MASK      0x1F
 #define BRAGI_DPI_X         0x21
@@ -63,5 +67,8 @@
 
 // Notification IDs
 #define BRAGI_NOTIFICATION_CONNECTIONSTATUS 0x36
+
+// Errors
+#define BRAGI_ERROR_NOTSUPPORTED 0x05
 
 #endif // BRAGI_PROTO_H

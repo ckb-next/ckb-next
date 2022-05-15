@@ -88,11 +88,17 @@ static int setactive_bragi(usbdevice* kb, int active){
     return 0;
 }
 
+// Dear compiler, please emit a bswap and an shr. Thank you!
+static inline uint32_t bragi_fwver_bswap(uint32_t fwv){
+    return ((((fwv) & 0xff000000) >> 24) | (((fwv) & 0x00ff0000) >>  8) |
+        (((fwv) & 0x0000ff00) <<  8) | (((fwv) & 0x000000ff) << 24)) >> 8;
+}
+
 static int start_bragi_common(usbdevice* kb){
     kb->usbdelay = 10; // This might not be needed, but won't harm
-#warning "FIXME. Read more properties, such as fw version"
+
     // Check if we're in HW mode, and if so, switch to software in order to read the properties/handles
-    int prop = bragi_get_property(kb, BRAGI_MODE);
+    int64_t prop = bragi_get_property(kb, BRAGI_MODE);
     if(prop < 0){
         ckb_fatal("ckb%d: Couldn't get bragi device mode. Aborting", INDEX_OF(kb, keyboard));
         return 1;
@@ -102,6 +108,25 @@ static int start_bragi_common(usbdevice* kb){
         // We set this directly to avoid spawning the poll thread
         bragi_set_property(kb, BRAGI_MODE, BRAGI_MODE_SOFTWARE);
     }
+
+    // Read FW versions
+    kb->fwversion = kb->bldversion = kb->radioappversion = kb->radiobldversion = UINT32_MAX;
+
+    prop = bragi_get_property(kb, BRAG_APP_VER);
+    if(prop >= 0)
+        kb->fwversion = bragi_fwver_bswap(prop);
+
+    prop = bragi_get_property(kb, BRAG_BLD_VER);
+    if(prop >= 0)
+        kb->bldversion = bragi_fwver_bswap(prop);
+
+    prop = bragi_get_property(kb, BRAG_RADIO_APP_VER);
+    if(prop >= 0)
+        kb->radioappversion = bragi_fwver_bswap(prop);
+
+    prop = bragi_get_property(kb, BRAG_RADIO_BLD_VER);
+    if(prop >= 0)
+        kb->radiobldversion = bragi_fwver_bswap(prop);
 
 #warning "Add error messages in case of failure"
 
@@ -175,12 +200,12 @@ int start_keyboard_bragi(usbdevice* kb, int makeactive){
     if(start_bragi_common(kb))
         return 1;
 
-    int prop = bragi_get_property(kb, BRAGI_HWLAYOUT);
+    int64_t prop = bragi_get_property(kb, BRAGI_HWLAYOUT);
     // Physical layout detection.
     kb->layout = prop;
     // So far ISO and ANSI are known and match.
     if (kb->layout != LAYOUT_ANSI && kb->layout != LAYOUT_ISO) {
-        ckb_warn("Got unknown physical layout byte value %d, please file a bug report mentioning your keyboard's physical layout", prop);
+        ckb_warn("Got unknown physical layout byte value %" PRId64 ", please file a bug report mentioning your keyboard's physical layout", prop);
         kb->layout = LAYOUT_UNKNOWN;
     }
 
@@ -192,7 +217,9 @@ int start_keyboard_bragi(usbdevice* kb, int makeactive){
 
 static inline int bragi_dongle_probe(usbdevice* kb){
     // Ask the device for the mapping
-    int prop = bragi_get_property(kb, BRAGI_SUBDEVICE_BITFIELD);
+    int64_t prop = bragi_get_property(kb, BRAGI_SUBDEVICE_BITFIELD);
+    if(prop < 0)
+        return -1;
     bragi_update_dongle_subdevs(kb, prop);
     return 0;
 }
@@ -203,6 +230,7 @@ int start_dongle_bragi(usbdevice* kb, int makeactive){
     // FIXME: Does this make a difference?
     bragi_set_property(kb, BRAGI_MODE, BRAGI_MODE_SOFTWARE);
     // Probe for devices
+    // FIXME: Do something about this failing
     bragi_dongle_probe(kb);
     return 0;
 }
@@ -253,8 +281,8 @@ int cmd_idle_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const
 }
 
 void bragi_get_battery_info(usbdevice* kb){
-    long int stat = bragi_get_property(kb, BRAGI_BATTERY_STATUS);
-    long int chg = bragi_get_property(kb, BRAGI_BATTERY_LEVEL);
+    int64_t stat = bragi_get_property(kb, BRAGI_BATTERY_STATUS);
+    int64_t chg = bragi_get_property(kb, BRAGI_BATTERY_LEVEL);
     if(stat < 0 || chg < 0){
         ckb_err("ckb%d: Failed to get bragi battery properties", INDEX_OF(kb, keyboard));
         return;

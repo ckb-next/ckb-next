@@ -3,16 +3,19 @@
 
 // Gets a property using the bragi protocol
 // Error when return value < 0
-long int bragi_get_property(usbdevice* kb, const uchar prop) {
+int64_t bragi_get_property(usbdevice* kb, const uchar prop) {
     uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_GET, prop, 0};
     uchar response[BRAGI_JUMBO_SIZE] = {0};
     if(!usbrecv(kb, pkt, sizeof(pkt), response))
         return -1;
     if(response[2]) {
-        ckb_err("Failed to get property 0x%hhx. Error was 0x%hhx", prop, response[2]);
+        if(response[2] == BRAGI_ERROR_NOTSUPPORTED)
+            ckb_warn("Failed to get property 0x%hhx. Device said it's not supported.", prop);
+        else
+            ckb_err("Failed to get property 0x%hhx. Error was 0x%hhx", prop, response[2]);
         return -2;
     }
-    return ((ushort)response[4] << 8) | response[3];
+    return ((uint32_t)response[5] << 16) | ((uint32_t)response[4] << 8) | response[3];
 }
 
 // Sets a property using the bragi protocol
@@ -23,7 +26,10 @@ int bragi_set_property(usbdevice* kb, const uchar prop, const ushort val) {
     if(!usbrecv(kb, pkt, sizeof(pkt), response))
         return -1;
     if(response[2]) {
-        ckb_err("Failed to set property 0x%hhx. Error was 0x%hhx", prop, response[2]);
+        if(response[2] == BRAGI_ERROR_NOTSUPPORTED)
+            ckb_warn("Failed to set property 0x%hhx. Device said it's not supported.", prop);
+        else
+            ckb_err("Failed to set property 0x%hhx. Error was 0x%hhx", prop, response[2]);
         return -2;
     }
     return 0;

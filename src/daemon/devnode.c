@@ -308,6 +308,9 @@ static int _mkdevpath(usbdevice* kb){
         printnode(dpath, dpistr);
 
         // Write the device's features
+        // NOTE: Features that have their own files, which can be blank to indicate lack of support should NOT be added here.
+        // It is implied that if the file is blank or does not exist, then the feature is not supported.
+        // FIXME: Apply this to pollrate
         char fpath[sizeof(path) + 9];
         snprintf(fpath, sizeof(fpath), "%s/features", path);
         FILE* ffile = fopen(fpath, "w");
@@ -325,8 +328,6 @@ static int _mkdevpath(usbdevice* kb){
                 fputs(" bind", ffile);
             if(HAS_FEATURES(kb, FEAT_NOTIFY))
                 fputs(" notify", ffile);
-            if(HAS_FEATURES(kb, FEAT_FWVERSION))
-                fputs(" fwversion", ffile);
             if(HAS_FEATURES(kb, FEAT_FWUPDATE))
                 fputs(" fwupdate", ffile);
             if(HAS_FEATURES(kb, FEAT_HWLOAD))
@@ -386,13 +387,49 @@ int rmdevpath(usbdevice* kb){
     return 0;
 }
 
+static inline uchar FWBcdToBin(const uchar v){
+    return ((v >> 4) * 10) + (v & 0xF);
+}
+
+static inline void FWtoThreeSegments(FILE* fwfile, uint32_t ver, usbdevice* kb){
+    // If the device doesn't support reading fw ver, or the version is UINT32_MAX (which means we couldn't read the version), leave blank
+    // Latter happens when trying to request a bragi radio version for a device that doesn't have one
+    // 0 is a valid fw version (when app is corrupt)
+    if(!HAS_FEATURES(kb, FEAT_FWVERSION) || ver == UINT32_MAX)
+        return;
+
+    // NXP/Legacy devices use BCD, but also bragi devices if we can't read the fw ver (and only have bcdDevice)
+    // At the moment we overwrite the bcdDevice for bragi, so we do not need to handle it
+    // If in the future we encounter a bragi device which does not report an APP fw ver, this will need to be changed
+    if(kb->protocol == PROTO_BRAGI)
+        fprintf(fwfile, "%hhu.%hhu.%hhu", ver >> 16 & 0xFF, ver >> 8 & 0xFF, ver & 0xFF);
+    else
+        fprintf(fwfile, "%hhu.%hhu", FWBcdToBin(ver >> 8 & 0xFF), FWBcdToBin(ver & 0xFF));
+}
+
 int mkfwnode(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
     char fwpath[DEVPATH_LEN + 12];
     snprintf(fwpath, sizeof(fwpath), "%s%d/fwversion", devpath, index);
     FILE* fwfile = fopen(fwpath, "w");
     if(fwfile){
-        fprintf(fwfile, "%04x", kb->fwversion);
+        // Start with APP ver
+        FWtoThreeSegments(fwfile, kb->fwversion, kb);
+        fputc('\n', fwfile);
+
+        // Followed by BLD ver
+        FWtoThreeSegments(fwfile, kb->bldversion, kb);
+        fputc('\n', fwfile);
+
+        // Followed by WL radio APP ver
+        FWtoThreeSegments(fwfile, kb->radioappversion, kb);
+        fputc('\n', fwfile);
+
+        // Followed by WL radio BLD ver
+        FWtoThreeSegments(fwfile, kb->radiobldversion, kb);
+        fputc('\n', fwfile);
+
+        // Closing newline
         fputc('\n', fwfile);
         fclose(fwfile);
         check_chmod(fwpath, S_GID_READ);

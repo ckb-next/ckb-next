@@ -423,7 +423,7 @@ int os_setupusb(usbdevice* kb) {
     /// - Copy firmware version (needed to determine USB protocol)
     const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
     if(firmware)
-        sscanf(firmware, "%hx", &kb->fwversion);
+        sscanf(firmware, "%"SCNx32, &kb->fwversion);
     else
         kb->fwversion = 0;
     int index = INDEX_OF(kb, keyboard);

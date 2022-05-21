@@ -21,8 +21,7 @@ public:
     inline bool hasDownloaded() { return lastFinished != 0; }
 
     // Latest firmware version for a keyboard model. Will check for updates automatically and return the latest known version.
-    // Zero if version unknown, -1.0 if ckb needs to be upgraded.
-    float versionForBoard(const ushort productID, bool waitForComplete = false);
+    CkbVersionNumber versionForBoard(const ushort productID, bool waitForComplete = false);
 
     // Downloads and extracts the latest firmware for a keyboard. Returns an empty array on failure.
     QByteArray dataForBoard(const ushort productID);
@@ -38,7 +37,8 @@ private:
     struct FW {
         QString     url, fileName;
         QByteArray  hash;
-        float       fwVersion, ckbVersion;
+        CkbVersionNumber fwVersion;
+        CkbVersionNumber ckbVersion;
         ushort       productID;
         FW();
     };

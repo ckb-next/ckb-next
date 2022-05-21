@@ -125,7 +125,7 @@ MainWindow::MainWindow(QWidget *parent) :
     kbfw = new KbFirmware();
 
     // Start device manager
-    KbManager::init(CKB_NEXT_VERSION_STR);
+    KbManager::init(QApplication::applicationVersion());
     connect(KbManager::kbManager(), SIGNAL(kbConnected(Kb*)), this, SLOT(addDevice(Kb*)));
     connect(KbManager::kbManager(), SIGNAL(kbDisconnected(Kb*)), this, SLOT(removeDevice(Kb*)));
     connect(KbManager::kbManager(), SIGNAL(versionUpdated()), this, SLOT(updateVersion()));
@@ -160,7 +160,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(stateChange(Qt::ApplicationState)));
 
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), QString(tr("Settings")));
-    settingsWidget->setVersion("ckb-next " CKB_NEXT_VERSION_STR);
+    settingsWidget->setVersion(KbManager::ckbGuiVersion());
 
     // create daemon dialog as a QMessageBox
     // this will create a focussed dialog, that has to be interacted with,
@@ -285,16 +285,16 @@ void MainWindow::removeDevice(Kb* device){
 }
 
 void MainWindow::updateVersion(){
-    QString daemonVersion = KbManager::ckbDaemonVersion();
-    if(daemonVersion == DAEMON_UNAVAILABLE_STR){
+    const CkbVersionNumber& daemonVersion = KbManager::ckbDaemonVersion();
+    if(daemonVersion.isNull()){
         settingsWidget->setStatus(tr("Driver inactive"));
         return;
     }
     int count = kbWidgets.count();
     // Warn if the daemon version doesn't match the GUI
     QString daemonWarning;
-    if(daemonVersion != CKB_NEXT_VERSION_STR)
-        daemonWarning = tr("<br /><br /><b>Warning:</b> Driver version mismatch (") + daemonVersion + tr("). Please upgrade ckb-next") + QString(KbManager::ckbDaemonVersionF() > KbManager::ckbGuiVersionF() ? "" : "-daemon") + tr(". If the problem persists, try rebooting.");
+    if(!daemonVersion.isEqualVerStr(KbManager::ckbGuiVersion()))
+        daemonWarning = tr("<br /><br /><b>Warning:</b> Driver version mismatch (") + daemonVersion.toString() + tr("). Please upgrade ckb-next") + QString(KbManager::ckbDaemonVersion() > KbManager::ckbGuiVersion() ? "" : "-daemon") + tr(". If the problem persists, try rebooting.");
     if(count == 0){
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
         QProcess kextstat;
@@ -333,22 +333,22 @@ void MainWindow::checkFwUpdates(){
         return;
     foreach(KbWidget* w, kbWidgets){
         // Display firmware upgrade notification if a new version is available
-        float version = kbfw->versionForBoard(w->device->productID);
-        if(version > w->device->firmware.toFloat()){
+        CkbVersionNumber version = kbfw->versionForBoard(w->device->productID);
+        if(version > w->device->firmware.app){
             if(w->hasShownNewFW)
                 continue;
             w->hasShownNewFW = true;
             w->updateFwButton();
             // Don't run this method here because it will lock up the timer and prevent devices from working properly
             // Use a queued invocation instead
-            metaObject()->invokeMethod(this, "showFwUpdateNotification", Qt::QueuedConnection, Q_ARG(QWidget*, w), Q_ARG(float, version));
+            metaObject()->invokeMethod(this, "showFwUpdateNotification", Qt::QueuedConnection, Q_ARG(QWidget*, w), Q_ARG(CkbVersionNumber, version));
             // Don't display more than one of these at once
             return;
         }
     }
 }
 
-void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
+void MainWindow::showFwUpdateNotification(QWidget* widget, CkbVersionNumber version){
     static bool isShowing = false;
     if(isShowing)
         return;
@@ -356,7 +356,7 @@ void MainWindow::showFwUpdateNotification(QWidget* widget, float version){
     showWindow();
     KbWidget* w = (KbWidget*)widget;
     // Ask for update
-    if(QMessageBox::information(this, "Firmware update", tr("A new firmware is available for your %1 (v%2)\nWould you like to install it now?").arg(w->device->usbModel, QString::number(version, 'f', 2)), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), QMessageBox::Yes) == QMessageBox::Yes){
+    if(QMessageBox::information(this, "Firmware update", tr("A new firmware is available for your %1 (v%2)\nWould you like to install it now?").arg(w->device->usbModel, version.toString()), QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No), QMessageBox::Yes) == QMessageBox::Yes){
         // If accepted, switch to the firmware tab and bring up the update window
         w->showDeviceTab();
         ui->tabWidget->setCurrentIndex(kbWidgets.indexOf(w));

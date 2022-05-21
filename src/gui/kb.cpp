@@ -16,7 +16,7 @@ int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
 bool Kb::_dither = false, Kb::_mouseAccel = true;
 
 Kb::Kb(QObject *parent, const QString& path) :
-    QThread(parent), features(QStringList()), firmware("N/A"), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false),
+    QThread(parent), features(QStringList()), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false), firmware(),
     batteryTimer(0), batteryIcon(0), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
     _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), batteryLevel(0), batteryStatus(BatteryStatus::BATT_STATUS_UNKNOWN),
     _hwProfile(0), prevProfile(0), prevMode(0),
@@ -63,12 +63,11 @@ Kb::Kb(QObject *parent, const QString& path) :
     }
     if (usbSerial == "")
         usbSerial = "Unknown-" + usbModel;
-    if (features.contains("fwversion") && fwpath.open(QIODevice::ReadOnly)) {
-        firmware = fwpath.read(100);
-        firmware = QString::number(firmware.trimmed().toInt() / 100., 'f', 2);
+    if (fwpath.open(QIODevice::ReadOnly)) {
+        firmware.parse(fwpath.read(100));
         fwpath.close();
         if (prodpath.open(QIODevice::ReadOnly)) {
-            productID = prodpath.read(4).toUShort(0, 16);
+            productID = prodpath.read(4).toUShort(nullptr, 16);
             // qInfo() << "ProductID of device is" << productID;
         } else {
             qCritical() << "could not open" << prodpath.fileName();

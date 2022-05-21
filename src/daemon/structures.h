@@ -308,7 +308,7 @@ typedef struct usbdevice_ {
     // USB vendor and product IDs
     ushort vendor, product;
     // Firmware version
-    ushort fwversion;
+    uint32_t fwversion, bldversion, radioappversion, radiobldversion;
     // Poll rate (ms), or -1 if unsupported
     char pollrate;
     // Physical device layout; LAYOUT_NONE if irrelevant, LAYOUT_UNKNOWN if unimplemented.

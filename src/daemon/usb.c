@@ -431,12 +431,15 @@ static void* _setupusb(void* context){
     if(IS_MONOCHROME(vendor, product))
         kb->features |= FEAT_MONOCHROME;
     if(IS_DONGLE(kb))
-        kb->features |= FEAT_DONGLE;
+        kb->features |= (FEAT_DONGLE | FEAT_FWVERSION);
     if(IS_WIRELESS_DEV(kb)){
         kb->features |= FEAT_WIRELESS;
         if((kb->protocol == PROTO_BRAGI && !IS_DONGLE(kb)) || kb->protocol != PROTO_BRAGI)
             kb->features |= FEAT_BATTERY;
     }
+    // Disable FWUPDATE for all bragi devices
+    if(kb->protocol == PROTO_BRAGI)
+        kb->features &= ~FEAT_FWUPDATE;
 
     kb->usbdelay = USB_DELAY_DEFAULT;
 

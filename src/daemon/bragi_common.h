@@ -7,7 +7,7 @@
 #include "device.h" // for usbdevice keyboard[]
 #include <stdint.h>
 
-long int bragi_get_property(usbdevice* kb, const uchar prop);
+int64_t bragi_get_property(usbdevice* kb, const uchar prop);
 int bragi_set_property(usbdevice* kb, const uchar prop, const ushort val);
 
 #define bragi_check_success(a, b) _bragi_check_success((a), (b), INDEX_OF(kb, keyboard), __func__, __FILE__, __LINE__)

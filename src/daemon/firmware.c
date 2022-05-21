@@ -50,17 +50,18 @@ int getfwversion(usbdevice* kb){
         ckb_warn("Got vendor ID %04x (expected %04x)", vendor, kb->vendor);
     if(product != kb->product)
         ckb_warn("Got product ID %04x (expected %04x)", product, kb->product);
+    if(version != kb->fwversion && kb->fwversion != 0)
+        ckb_warn("Got firmware version %04x (expected %04x)", version, kb->fwversion);
+
     // Set firmware version and poll rate
-    if(version == 0 || bootloader == 0){
-        // Needs firmware update
-        kb->fwversion = 0;
+    kb->fwversion = version;
+    kb->pollrate = poll;
+    kb->bldversion = bootloader;
+    kb->radioappversion = kb->radiobldversion = UINT32_MAX;
+
+    if(version == 0 || bootloader == 0)
         kb->pollrate = -1;
-    } else {
-        if(version != kb->fwversion && kb->fwversion != 0)
-            ckb_warn("Got firmware version %04x (expected %04x)", version, kb->fwversion);
-        kb->fwversion = version;
-        kb->pollrate = poll;
-    }
+
     // Physical layout detection.
     if (kb->layout == LAYOUT_UNKNOWN) {
         kb->layout = in_pkt[23] + 1;
@@ -100,7 +101,7 @@ int getfwversion(usbdevice* kb){
             if(!usbsend(kb, wireless_pkt[4], MSG_SIZE, 1))
                 return -1;
         }
-        /// !!! REMOVE THIS WHEN HARDWARE PROFILES AND WIRELESS FW UPDATE ARE ADDED
+        /// FIXME: REMOVE THIS WHEN HARDWARE PROFILES AND WIRELESS FW UPDATE ARE ADDED
         kb->features &= ~(FEAT_HWLOAD | FEAT_FWUPDATE);
     }
 

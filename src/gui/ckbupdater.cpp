@@ -4,8 +4,9 @@
 #include <QNetworkReply>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include "ckbversionnumber.h"
 
-CkbUpdater::CkbUpdater(QObject *parent) : QObject(parent), _accessManager(new QNetworkAccessManager(this)), _latestVerStr(QString()){
+CkbUpdater::CkbUpdater(QObject *parent) : QObject(parent), _accessManager(new QNetworkAccessManager(this)), latestVer(CkbVersionNumber()){
     connect(_accessManager, &QNetworkAccessManager::finished, this, &CkbUpdater::finished); // FIXME: use finished() on QNetworkReply instead
 }
 
@@ -19,41 +20,34 @@ void CkbUpdater::finished(QNetworkReply* reply){
         QByteArray bytes = reply->readAll();
 
         if(reply->url().url().endsWith("VERSION.cmake")) {
-            _latestVerStr = getVersionString(&bytes);
-            float latestVer = KbManager::parseVersionString(_latestVerStr);
-            float currentVer = KbManager::ckbGuiVersionF();
+            latestVer = getLatestVersion(bytes);
+            CkbVersionNumber currentVer = KbManager::ckbGuiVersion();
 
-            if(latestVer <= currentVer) {
-                emit checkedForNewVer(QString(), QString());
-            } else
+            if(latestVer > currentVer)
                 _accessManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/ckb-next/ckb-next/master/CHANGELOG.md")));
+            else
+                emit checkedForNewVer(QString(), QString());
         } else
-            emit checkedForNewVer(_latestVerStr, parseChangeLog(&bytes));
-
+            emit checkedForNewVer(latestVer.toString(), parseChangeLog(bytes));
     } else
         emit checkedForNewVer(QString(), QString());
     reply->deleteLater();
 }
 
-QString CkbUpdater::getVersionString(QByteArray* bytes){
-    // return "0.3.2"; // Uncomment and set a higher version to force the update message to pop up
-    QString ret;
+CkbVersionNumber CkbUpdater::getLatestVersion(const QByteArray& bytes){
+    //return CkbVersionNumber(QLatin1String("99.99.99")); // Uncomment to force the update message to pop up
 
-    if(bytes->count() > 1000)
-        return ret;
-
-    QString str(*bytes);
+    QString str(bytes);
 
     QRegularExpression re("ckb-next_VERSION +\"([0-9\\.]+)\"", QRegularExpression::MultilineOption);
     QRegularExpressionMatch match = re.match(str);
     if(match.hasMatch())
-        ret = match.captured(1);
-    return ret;
+        return CkbVersionNumber(match.captured(1));
+    return CkbVersionNumber();
 }
 
-QString CkbUpdater::parseChangeLog(QByteArray* bytes){
-    QByteArray lbytes = bytes->left(4000); // Don't read too much data
-    QList<QByteArray> bytelist = lbytes.split('\n');
+QString CkbUpdater::parseChangeLog(const QByteArray& bytes){
+    QList<QByteArray> bytelist = bytes.split('\n');
 
     bool append = false;
     QString changelog;

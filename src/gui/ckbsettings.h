@@ -50,8 +50,6 @@ public:
     CkbSettings();
     // Settings object with a default group. Optionally erases any existing group with the same name.
     CkbSettings(const QString& basePath, bool eraseExisting = false);
-    // CkbSettings from QSettings
-    CkbSettings(QSettings& settings);
 
     ~CkbSettings();
 
@@ -89,6 +87,9 @@ public:
             QSettings::IniFormat;
 #endif
 
+protected:
+    // CkbSettings from QSettings
+    CkbSettings(QSettings& settings);
 
 private:
     QSettings* backing;
@@ -100,8 +101,13 @@ private:
     inline QString pwd(const QString& key) const { return pwd() + (groups.isEmpty() ? "" : "/") + key; }
 };
 
-// Settings group wrapper. Useful for easily pushing/popping a group without worrying about everything breaking if you forgot endGroup.
+class CkbDemoSettings : public CkbSettings {
 
+public:
+    CkbDemoSettings(QSettings& settings) : CkbSettings(settings) {}
+};
+
+// Settings group wrapper. Useful for easily pushing/popping a group without worrying about everything breaking if you forgot endGroup.
 class SGroup
 {
 public:

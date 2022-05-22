@@ -317,7 +317,7 @@ void Kb::load(){
         else if(map.model() == KeyMap::NIGHTSWORD)
             demoProfile = ":/txt/demoprofile_nightsword.ini";
         QSettings demoSettings(demoProfile, QSettings::IniFormat, this);
-        CkbSettings cSettings(demoSettings);
+        CkbDemoSettings cSettings(demoSettings);
         KbProfile* demo = new KbProfile(this, map, cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
         _profiles.append(demo);
         setCurrentProfile(demo);

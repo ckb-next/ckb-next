@@ -1,7 +1,6 @@
 #ifndef WINDOWINFO_H
 #define WINDOWINFO_H
 #include <QString>
-#include <QSettings>
 #include "ckbsettings.h"
 #include <QVector>
 

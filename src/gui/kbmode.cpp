@@ -49,7 +49,9 @@ KbMode::KbMode(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings) :
     if(_name == "")
         _name = "Unnamed";
     _light->load(settings);
-    _bind->load(settings);
+    // Do not load the bindings if we're importing a demo mode
+    if(typeid(settings) != typeid(CkbDemoSettings))
+        _bind->load(settings);
     _perf->load(settings);
     _winInfo->load(settings);
 }

@@ -12,4 +12,4 @@ set(ckb-next_PROFILE_VER 3)
 set(ckb-next_SETTINGS_VER 1)
 
 # Copyright year string
-set(ckb-next_COPYRIGHT_YEAR "2021")
+set(ckb-next_COPYRIGHT_YEAR "2022")

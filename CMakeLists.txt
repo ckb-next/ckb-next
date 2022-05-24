@@ -31,6 +31,8 @@ cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 
 project(ckb-next LANGUAGES C CXX)
 include(VERSION.cmake)
+# Because cmakedefine does not like dashes...
+set(ckb_next_VERSION_IS_RELEASE ${ckb-next_VERSION_IS_RELEASE})
 
 # Let CMake find custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")

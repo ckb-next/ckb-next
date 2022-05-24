@@ -270,6 +270,9 @@ int main(int argc, char** argv){
             return 1;
         } else if(!strcmp(argument, "--enable-experimental")) {
             enable_experimental = 1;
+#ifdef ckb_next_VERSION_IS_RELEASE
+            ckb_info("You have enabled support for experimental devices in a ckb-next stable release. It is recommended to use the latest code from git.");
+#endif
         }
 #ifdef OS_MAC_LEGACY
         else if(!strcmp(argument, "--nomouseaccel")){

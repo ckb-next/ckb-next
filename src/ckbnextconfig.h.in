@@ -14,3 +14,4 @@
 #cmakedefine DEBUG_INPUT_SYNC
 
 #define CKB_NEXT_COPYRIGHT_YEAR "${ckb-next_COPYRIGHT_YEAR}"
+#cmakedefine ckb_next_VERSION_IS_RELEASE

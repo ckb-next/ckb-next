@@ -748,22 +748,28 @@ void* suspend_check() {
     pthread_mutex_lock(&suspend_check_mutex);
     prev_suspend_check_time = current_time;
     pthread_mutex_unlock(&suspend_check_mutex);
+    bool woke_up = false;
     while(suspend_run){
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 2}, NULL);
         current_time = get_clock_monotonic_seconds();
 
         if (prev_suspend_check_time + 4 < current_time) {
             graceful_suspend_resume();
-            reactivate_devices();
             // Some time might have passed, get a fresh timestamp so other
             // threads can continue
             current_time = get_clock_monotonic_seconds();
+            woke_up = true;
         }
 
         pthread_mutex_lock(&suspend_check_mutex);
         prev_suspend_check_time = current_time;
         pthread_cond_broadcast(&suspend_check_cond);
         pthread_mutex_unlock(&suspend_check_mutex);
+
+        if(woke_up){
+            reactivate_devices();
+            woke_up = false;
+        }
     }
     return NULL;
 }

@@ -287,6 +287,64 @@
     </message>
 </context>
 <context>
+    <name>BatteryStatusTrayIcon</name>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="24"/>
+        <source>Not connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="24"/>
+        <source>Critical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="24"/>
+        <source>Low</source>
+        <translation type="unfinished">Niedrig</translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="24"/>
+        <source>Medium</source>
+        <translation type="unfinished">Mittel</translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="24"/>
+        <source>High</source>
+        <translation type="unfinished">Hoch</translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="25"/>
+        <source>N/A</source>
+        <translation>n. a.</translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="25"/>
+        <source>Discharging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="25"/>
+        <source>Charging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="25"/>
+        <source>Fully Charged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="26"/>
+        <source>Battery: %1 (%2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../batterysystemtrayicon.cpp" line="27"/>
+        <source>Status: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CkbUpdaterDialog</name>
     <message>
         <location filename="../../ckbupdaterwidget.cpp" line="55"/>
@@ -559,54 +617,58 @@
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="98"/>
-        <location filename="../../fwupgradedialog.cpp" line="114"/>
-        <location filename="../../fwupgradedialog.cpp" line="121"/>
+        <location filename="../../fwupgradedialog.cpp" line="90"/>
+        <location filename="../../fwupgradedialog.cpp" line="106"/>
+        <location filename="../../fwupgradedialog.cpp" line="113"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="98"/>
+        <location filename="../../fwupgradedialog.cpp" line="90"/>
         <source>&lt;center&gt;Not a valid firmware for this device.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Keine gültige Firmware für dieses Gerät.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="114"/>
+        <location filename="../../fwupgradedialog.cpp" line="106"/>
         <source>&lt;center&gt;There was a problem with the downloaded file.&lt;br /&gt;Please try again later.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Es ist ein Problem beim Herunterladen der Datei aufgetreten.&lt;br /&gt;Bitte später erneut versuchen.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="121"/>
+        <location filename="../../fwupgradedialog.cpp" line="113"/>
         <source>&lt;center&gt;Unable to save temporary file.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Temporäre Datei kann nicht gespeichert werden.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="128"/>
         <source>Ready to install new firmware.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Disclaimer:&lt;/b&gt; ckb-next is not endorsed by Corsair.&lt;br /&gt;This is &lt;i&gt;unlikely&lt;/i&gt; to cause any damage, however the developers of this software do not accept any responsibility in such an event.</source>
-        <translation>Bereit neue Firmware zu installieren.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Haftungsausschluss:&lt;/b&gt; ckb-next wird nicht von Corsair unterstützt.&lt;br /&gt;Das wird &lt;i&gt;wahrscheinlich keine&lt;/i&gt; Schäden verursachen, jedoch übernehmen die Entwickler dieser Software keine Verantwortung in einem solchen Fall.</translation>
+        <translation type="vanished">Bereit neue Firmware zu installieren.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Haftungsausschluss:&lt;/b&gt; ckb-next wird nicht von Corsair unterstützt.&lt;br /&gt;Das wird &lt;i&gt;wahrscheinlich keine&lt;/i&gt; Schäden verursachen, jedoch übernehmen die Entwickler dieser Software keine Verantwortung in einem solchen Fall.</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="158"/>
+        <location filename="../../fwupgradedialog.cpp" line="120"/>
+        <source>Ready to install new firmware.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Disclaimer:&lt;/b&gt; ckb-next is not endorsed by Corsair.&lt;br /&gt;&lt;br /&gt;This is &lt;i&gt;unlikely&lt;/i&gt; to cause any damage, however the developers of this software do not accept any responsibility in such an event.</source>
+        <translation>Bereit neue Firmware zu installieren.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Haftungsausschluss:&lt;/b&gt; ckb-next wird nicht von Corsair unterstützt.&lt;br /&gt;&lt;br /&gt;Das wird &lt;i&gt;wahrscheinlich keine&lt;/i&gt; Schäden verursachen, jedoch übernehmen die Entwickler dieser Software keine Verantwortung in einem solchen Fall.</translation>
+    </message>
+    <message>
+        <location filename="../../fwupgradedialog.cpp" line="149"/>
         <source>Update successful!</source>
         <translation>Erfolgreich aktualisiert!</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="160"/>
+        <location filename="../../fwupgradedialog.cpp" line="151"/>
         <source>Update failed.</source>
         <translation>Update fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="161"/>
+        <location filename="../../fwupgradedialog.cpp" line="152"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="186"/>
+        <location filename="../../fwupgradedialog.cpp" line="176"/>
         <source>Please wait</source>
         <translation>Bitte warten</translation>
     </message>
     <message>
-        <location filename="../../fwupgradedialog.cpp" line="187"/>
+        <location filename="../../fwupgradedialog.cpp" line="177"/>
         <source>Installing firmware...</source>
         <translation>Firmware wird installiert...</translation>
     </message>
@@ -898,7 +960,7 @@
     </message>
     <message>
         <location filename="../../kbanimwidget.ui" line="264"/>
-        <location filename="../../kbanimwidget.cpp" line="240"/>
+        <location filename="../../kbanimwidget.cpp" line="239"/>
         <source>Delete animation</source>
         <translation>Animation entfernen</translation>
     </message>
@@ -908,22 +970,22 @@
         <translation>Eigenschaften bearbeiten</translation>
     </message>
     <message>
-        <location filename="../../kbanimwidget.cpp" line="184"/>
+        <location filename="../../kbanimwidget.cpp" line="183"/>
         <source>Rename...</source>
         <translation>Umbennen...</translation>
     </message>
     <message>
-        <location filename="../../kbanimwidget.cpp" line="185"/>
+        <location filename="../../kbanimwidget.cpp" line="184"/>
         <source>Duplicate</source>
         <translation>Duplizieren</translation>
     </message>
     <message>
-        <location filename="../../kbanimwidget.cpp" line="186"/>
+        <location filename="../../kbanimwidget.cpp" line="185"/>
         <source>Delete</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../../kbanimwidget.cpp" line="240"/>
+        <location filename="../../kbanimwidget.cpp" line="239"/>
         <source>Are you sure you want to delete this animation?</source>
         <translation>Sind Sie sicher, dass Sie diese Animation löschen möchten?</translation>
     </message>
@@ -936,32 +998,32 @@
         <translation>Tasten</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.ui" line="126"/>
+        <location filename="../../kbbindwidget.ui" line="80"/>
         <source>Copy to mode...</source>
         <translation>In Modus kopieren...</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.ui" line="139"/>
+        <location filename="../../kbbindwidget.ui" line="93"/>
         <source>Click to select keys</source>
         <translation>Klicken, um Tasten auszuwählen</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.ui" line="167"/>
+        <location filename="../../kbbindwidget.ui" line="115"/>
         <source>Reset</source>
         <translation>Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.ui" line="200"/>
+        <location filename="../../kbbindwidget.ui" line="131"/>
         <source>Binding</source>
         <translation>Zuordnung</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="66"/>
+        <location filename="../../kbbindwidget.cpp" line="79"/>
         <source>Winlock Warning</source>
         <translation>Winlock-Warnung</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="66"/>
+        <location filename="../../kbbindwidget.cpp" line="79"/>
         <source>Windows key lock is currently enabled.
 
 The binding will not function until winlock has been disabled.</source>
@@ -970,79 +1032,79 @@ The binding will not function until winlock has been disabled.</source>
 Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="74"/>
+        <location filename="../../kbbindwidget.cpp" line="87"/>
         <source>Click to select</source>
         <translation>Zum Auswählen klicken</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="82"/>
+        <location filename="../../kbbindwidget.cpp" line="95"/>
         <source>(Unknown)</source>
         <translation>(Unbekannt)</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="87"/>
+        <location filename="../../kbbindwidget.cpp" line="100"/>
         <source>%1 %2 selected</source>
         <translation>%1 %2 ausgewählt</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="87"/>
+        <location filename="../../kbbindwidget.cpp" line="100"/>
         <source>buttons</source>
         <translation>Maustasten</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="87"/>
+        <location filename="../../kbbindwidget.cpp" line="100"/>
         <source>keys</source>
         <translation>Tasten</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="100"/>
+        <location filename="../../kbbindwidget.cpp" line="113"/>
         <source>&lt;center&gt;Reset all %1s to default?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Alle %1n auf Standard zurücksetzen?&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="102"/>
+        <location filename="../../kbbindwidget.cpp" line="115"/>
         <source>&lt;center&gt;Reset this %1 to default?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Diese %1 auf Standard zurücksetzen?&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="104"/>
+        <location filename="../../kbbindwidget.cpp" line="117"/>
         <source>&lt;center&gt;Reset %1 %2s to default?&lt;/center&gt;</source>
         <translation>&lt;center&gt;%1 %2n auf Standard zurücksetzen?&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="105"/>
+        <location filename="../../kbbindwidget.cpp" line="118"/>
         <source>Confirm action</source>
         <translation>Aktion bestätigen</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="97"/>
-        <location filename="../../kbbindwidget.cpp" line="115"/>
+        <location filename="../../kbbindwidget.cpp" line="110"/>
+        <location filename="../../kbbindwidget.cpp" line="128"/>
         <source>button</source>
         <translation>Maustaste</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="97"/>
-        <location filename="../../kbbindwidget.cpp" line="115"/>
+        <location filename="../../kbbindwidget.cpp" line="110"/>
+        <location filename="../../kbbindwidget.cpp" line="128"/>
         <source>key</source>
         <translation>Taste</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="116"/>
+        <location filename="../../kbbindwidget.cpp" line="129"/>
         <source>s</source>
         <translation>n</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="120"/>
+        <location filename="../../kbbindwidget.cpp" line="133"/>
         <source>all %1s</source>
         <translation>Alle %1n</translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="122"/>
+        <location filename="../../kbbindwidget.cpp" line="135"/>
         <source>Copy binding for </source>
         <translation>Zuordnung kopieren für </translation>
     </message>
     <message>
-        <location filename="../../kbbindwidget.cpp" line="122"/>
+        <location filename="../../kbbindwidget.cpp" line="135"/>
         <source> to:</source>
         <translation> nach:</translation>
     </message>
@@ -1050,63 +1112,63 @@ Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translatio
 <context>
     <name>KbLightWidget</name>
     <message>
-        <location filename="../../kblightwidget.ui" line="52"/>
+        <location filename="../../kblightwidget.ui" line="55"/>
         <source>Colors</source>
         <translation>Farben</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.ui" line="71"/>
+        <location filename="../../kblightwidget.ui" line="74"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If enabled, the same colors will be displayed here as on the keyboard. If disabled, the base colors will be shown.&lt;/p&gt;&lt;p&gt;Note: The animation preview will be disabled when the window loses focus to preserve computation resources.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wenn aktiviert, werden hier die gleichen Farben angezeigt wie auf der Tastatur. Wenn deaktiviert, werden die Grundfarben angezeigt.&lt;/p&gt;&lt;p&gt;Hinweis: Die Animationsvorschau wird deaktiviert, wenn das Fenster den Fokus verliert, um Systemressourcen zu sparen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.ui" line="74"/>
+        <location filename="../../kblightwidget.ui" line="77"/>
         <source>Show animated</source>
         <translation>Animiert anzeigen</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.ui" line="149"/>
+        <location filename="../../kblightwidget.ui" line="201"/>
         <source>Change color...</source>
         <translation>Farbe ändern...</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.ui" line="162"/>
-        <location filename="../../kblightwidget.cpp" line="96"/>
+        <location filename="../../kblightwidget.ui" line="111"/>
+        <location filename="../../kblightwidget.cpp" line="108"/>
         <source>Click to select</source>
         <translation>Zum Ändern klicken</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.ui" line="190"/>
+        <location filename="../../kblightwidget.ui" line="220"/>
         <source>New animation...</source>
         <translation>Neue Animation...</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.ui" line="253"/>
+        <location filename="../../kblightwidget.ui" line="163"/>
         <source>Off</source>
         <translation>Aus</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.ui" line="326"/>
+        <location filename="../../kblightwidget.ui" line="242"/>
         <source>Animations</source>
         <translation>Animationen</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="100"/>
+        <location filename="../../kblightwidget.cpp" line="112"/>
         <source>1 zone selected</source>
         <translation>1 Zone ausgewählt</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="102"/>
+        <location filename="../../kblightwidget.cpp" line="114"/>
         <source>1 key selected</source>
         <translation>1 Taste ausgewählt</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="105"/>
+        <location filename="../../kblightwidget.cpp" line="117"/>
         <source>%1 zones selected</source>
         <translation>%1 Zonen ausgewählt</translation>
     </message>
     <message>
-        <location filename="../../kblightwidget.cpp" line="107"/>
+        <location filename="../../kblightwidget.cpp" line="119"/>
         <source>%1 keys selected</source>
         <translation>%1 Tasten ausgewählt</translation>
     </message>
@@ -1360,6 +1422,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <name>KbWidget</name>
     <message>
         <location filename="../../kbwidget.ui" line="174"/>
+        <location filename="../../kbwidget.ui" line="254"/>
         <source>Lighting</source>
         <translation>Beleuchtung</translation>
     </message>
@@ -1374,56 +1437,84 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
         <translation>Zuordnung</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="254"/>
-        <location filename="../../kbwidget.ui" line="276"/>
+        <location filename="../../kbwidget.ui" line="286"/>
+        <location filename="../../kbwidget.ui" line="308"/>
         <source>Performance</source>
         <translation>Leistung</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="298"/>
-        <location filename="../../kbwidget.ui" line="422"/>
+        <location filename="../../kbwidget.ui" line="330"/>
+        <location filename="../../kbwidget.ui" line="408"/>
         <source>Device</source>
         <translation>Gerät</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="319"/>
-        <location filename="../../kbwidget.ui" line="348"/>
+        <location filename="../../kbwidget.ui" line="370"/>
+        <source>Wireless version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwidget.ui" line="562"/>
+        <location filename="../../kbwidget.ui" line="572"/>
+        <location filename="../../kbwidget.ui" line="612"/>
+        <location filename="../../kbwidget.ui" line="622"/>
+        <location filename="../../kbwidget.ui" line="717"/>
         <source>N/A</source>
         <translation>n. a.</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="377"/>
+        <location filename="../../kbwidget.ui" line="710"/>
+        <source>Wireless Bootloader version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwidget.ui" line="421"/>
         <source>Serial Number:</source>
         <translation>Seriennummer:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="384"/>
+        <location filename="../../kbwidget.ui" line="592"/>
         <source>Layout:</source>
         <translation>Belegung:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="450"/>
+        <location filename="../../kbwidget.ui" line="449"/>
         <source>Default</source>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="479"/>
+        <location filename="../../kbwidget.ui" line="585"/>
         <source>Status:</source>
         <translation>Status:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="492"/>
+        <location filename="../../kbwidget.ui" line="605"/>
+        <source>Battery:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwidget.ui" line="669"/>
+        <source>Enable system tray icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwidget.ui" line="684"/>
+        <source>Bootloader version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kbwidget.ui" line="697"/>
         <source>Firmware version:</source>
         <translation>Firmware-Version:</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="501"/>
-        <location filename="../../kbwidget.cpp" line="351"/>
+        <location filename="../../kbwidget.ui" line="537"/>
+        <location filename="../../kbwidget.cpp" line="401"/>
         <source>Check for updates</source>
         <translation>Nach Updates suchen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.ui" line="529"/>
+        <location filename="../../kbwidget.ui" line="528"/>
         <source>Poll rate:</source>
         <translation>Abrufrate:</translation>
     </message>
@@ -1433,109 +1524,113 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
         <translation>Auf Hardware speichern</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="82"/>
+        <location filename="../../kbwidget.cpp" line="101"/>
         <source>Saving to hardware is not supported on this device.</source>
         <translation>Auf diesem Gerät wird das Speichern auf Hardware nicht unterstützt.</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="145"/>
+        <location filename="../../kbwidget.cpp" line="164"/>
         <source>This device does not support setting the poll rate through software.</source>
         <translation>Bei diesem Gerät kann die Abrufrate nicht per Software eingestellt werden.</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="173"/>
+        <location filename="../../kbwidget.cpp" line="188"/>
         <source>Manage profiles...</source>
         <translation>Profile verwalten...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="231"/>
+        <location filename="../../kbwidget.cpp" line="258"/>
         <source>Rename...</source>
         <translation>Umbenennen...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="232"/>
+        <location filename="../../kbwidget.cpp" line="259"/>
         <source>Duplicate</source>
         <translation>Duplizieren</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="233"/>
+        <location filename="../../kbwidget.cpp" line="260"/>
         <source>Delete</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="238"/>
+        <location filename="../../kbwidget.cpp" line="265"/>
         <source>Move Up</source>
         <translation>Nach oben bewegen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="244"/>
+        <location filename="../../kbwidget.cpp" line="271"/>
         <source>Move Down</source>
         <translation>Nach unten bewegen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="273"/>
+        <location filename="../../kbwidget.cpp" line="300"/>
         <source>Delete mode</source>
         <translation>Modus entfernen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="273"/>
+        <location filename="../../kbwidget.cpp" line="300"/>
         <source>Are you sure you want to delete this mode?</source>
         <translation>Sind Sie sicher, dass Sie diesen Modus löschen möchten?</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="356"/>
+        <location filename="../../kbwidget.cpp" line="406"/>
         <source>Up to date</source>
         <translation>Aktuell</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="358"/>
+        <location filename="../../kbwidget.cpp" line="408"/>
         <source>Upgrade to v%1</source>
         <translation>Auf v%1 aktualisieren</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="375"/>
+        <location filename="../../kbwidget.cpp" line="425"/>
         <source>Checking...</source>
         <translation>Wird überprüft...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="383"/>
-        <location filename="../../kbwidget.cpp" line="386"/>
-        <location filename="../../kbwidget.cpp" line="390"/>
+        <location filename="../../kbwidget.cpp" line="433"/>
+        <location filename="../../kbwidget.cpp" line="437"/>
+        <location filename="../../kbwidget.cpp" line="440"/>
         <source>Firmware update</source>
         <translation>Firmware-Update</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="383"/>
         <source>&lt;center&gt;There is a new firmware available for this device.&lt;br /&gt;However, it requires a newer version of ckb-next.&lt;br /&gt;Please upgrade ckb-next and try again.&lt;/center&gt;</source>
-        <translation>&lt;center&gt;Es ist eine neue Firmware für dieses Gerät verfügbar.&lt;br /&gt;Allerdings wird dafür eine neuere Version von ckb-next benötigt.&lt;br /&gt;Bitte aktualisieren Sie ckb-next und versuchen Sie es erneut.&lt;/center&gt;</translation>
+        <translation type="vanished">&lt;center&gt;Es ist eine neue Firmware für dieses Gerät verfügbar.&lt;br /&gt;Allerdings wird dafür eine neuere Version von ckb-next benötigt.&lt;br /&gt;Bitte aktualisieren Sie ckb-next und versuchen Sie es erneut.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="386"/>
+        <location filename="../../kbwidget.cpp" line="433"/>
         <source>&lt;center&gt;There was a problem getting the status for this device.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation>center&gt;Es gab ein Problem beim Abrufen des Status für dieses Gerät.&lt;br /&gt;Möchten Sie manuell eine Datei auswählen?&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="390"/>
+        <location filename="../../kbwidget.cpp" line="437"/>
+        <source>&lt;center&gt;There is a new firmware available for this device (v%1).&lt;br /&gt;However, it requires a newer version of ckb-next.&lt;br /&gt;Please upgrade ckb-next and try again.&lt;/center&gt;</source>
+        <translation>&lt;center&gt;Es ist eine neue Firmware für dieses Gerät verfügbar (v%1).&lt;br /&gt;Allerdings wird dafür eine neuere Version von ckb-next benötigt.&lt;br /&gt;Bitte aktualisieren Sie ckb-next und versuchen Sie es erneut.&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../kbwidget.cpp" line="440"/>
         <source>&lt;center&gt;Your firmware is already up to date.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Die Firmware ist bereits auf dem neuesten Stand.&lt;br /&gt;Möchten Sie manuell eine Datei auswählen?&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="402"/>
+        <location filename="../../kbwidget.cpp" line="452"/>
         <source>Select firmware file</source>
         <translation>Firmware-Datei auswählen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="402"/>
+        <location filename="../../kbwidget.cpp" line="452"/>
         <source>Firmware blobs (*.bin)</source>
         <translation>Firmware-Blobs (*.bin)</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="407"/>
+        <location filename="../../kbwidget.cpp" line="457"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="407"/>
+        <location filename="../../kbwidget.cpp" line="457"/>
         <source>&lt;center&gt;File could not be read.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Datei konnte nicht gelesen werden.&lt;/center&gt;</translation>
     </message>
@@ -1730,6 +1825,29 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     </message>
 </context>
 <context>
+    <name>LegacyLightWidget</name>
+    <message>
+        <location filename="../../legacylightwidget.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../legacylightwidget.ui" line="47"/>
+        <source>Hardware Lighting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../legacylightwidget.ui" line="61"/>
+        <source>This device only supports lighting set in hardware. This means that in order to program your lighting settings you must perform the following steps on the keyboard:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../legacylightwidget.ui" line="71"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;ol style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select the mode to program the lights for by pressing the correct button (M1, M2 or M3).&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Hold down the lighting programming button (to the left of the brightness button) until the ring around it starts flashing.&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Press each key you want to toggle the light for.&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Once finished, hold down the lighting programming button once more until the ring stops flashing.&lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MPerfWidget</name>
     <message>
         <location filename="../../mperfwidget.ui" line="44"/>
@@ -1848,7 +1966,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
         <translation>In Modus kopieren...</translation>
     </message>
     <message>
-        <location filename="../../mperfwidget.cpp" line="307"/>
+        <location filename="../../mperfwidget.cpp" line="350"/>
         <source>Copy performance settings to:</source>
         <translation>Leistungseinstellungen kopieren nach:</translation>
     </message>
@@ -1983,64 +2101,64 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
         <translation>Der ckb-next-Daemon läuft nicht.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="288"/>
+        <location filename="../../mainwindow.cpp" line="290"/>
         <source>Driver inactive</source>
         <translation>Treiber inaktiv</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="295"/>
+        <location filename="../../mainwindow.cpp" line="297"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warnung:&lt;/b&gt; Treiber-Version stimmt nicht überein(</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="295"/>
+        <location filename="../../mainwindow.cpp" line="297"/>
         <source>). Please upgrade ckb-next</source>
         <translation>). Bitte aktualisieren Sie ckb-next</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="295"/>
+        <location filename="../../mainwindow.cpp" line="297"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation>. Wenn das Problem weiterhin besteht, versuchen Sie es mit einem Rechner-Neustart.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="306"/>
+        <location filename="../../mainwindow.cpp" line="308"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Warnung:&lt;/b&gt; Die Systemerweiterung von &quot;Fumihiko Takayama&quot; ist unter Sicherheit &amp; Datenschutz nicht erlaubt. Bitte lassen Sie sie zu und stecken Sie dann Ihre Geräte ab und wieder an.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="308"/>
+        <location filename="../../mainwindow.cpp" line="310"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Warnung:&lt;/b&gt; Stellen Sie sicher, dass ckb-next-daemon unter Sicherheit &amp; Datenschutz-&gt; Eingabeüberwachung zugelassen ist. &lt;br /&gt;Bitte warten Sie bis zu 10 Sekunden, bis die Aufforderung zum Neustart des Daemons erscheint, nachdem Sie die Eingabeüberwachung zugelassen haben.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="318"/>
+        <location filename="../../mainwindow.cpp" line="320"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Warnung:&lt;/b&gt; Das uinput-Modul konnte nicht geladen werden. Wenn dieses Problem nach einem Neustart weiterhin besteht, kompilieren Sie einen Kernel mit CONFIG_INPUT_UINPUT=y.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="321"/>
+        <location filename="../../mainwindow.cpp" line="323"/>
         <source>No devices connected</source>
         <translation>Keine Geräte verbunden</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="324"/>
+        <location filename="../../mainwindow.cpp" line="326"/>
         <source>1 device connected</source>
         <translation>1 Gerät verbunden</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="326"/>
+        <location filename="../../mainwindow.cpp" line="328"/>
         <source>%1 devices connected</source>
         <translation>%1 Geräte verbunden</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="357"/>
+        <location filename="../../mainwindow.cpp" line="359"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation>Eine neue Firmware ist für Ihr(e) %1 (v%2) verfübar
 Möchten Sie sie installieren?</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="373"/>
+        <location filename="../../mainwindow.cpp" line="375"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
@@ -2049,12 +2167,12 @@ Um es zu beenden, wählen Sie Beenden aus dem Tray-Menü
 oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="532"/>
+        <location filename="../../mainwindow.cpp" line="534"/>
         <source>Update to v</source>
         <translation>Aktualisieren auf v</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="537"/>
+        <location filename="../../mainwindow.cpp" line="539"/>
         <source>Up to date</source>
         <translation>Aktuell</translation>
     </message>
@@ -2122,153 +2240,158 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         <source>Downgrading ckb-next will lead to profile data loss. It is recommended to click Cancel and update to the latest version.&lt;br&gt;&lt;br&gt;If you wish to continue, back up the settings file located at&lt;blockquote&gt;%1&lt;/blockquote&gt;and click OK.</source>
         <translation>Ein Downgrade von ckb-next führt zum Verlust von Profildaten. Es wird empfohlen, auf Abbrechen zu klicken und auf die neueste Version zu aktualisieren.&lt;br&gt;&lt;br&gt;Wenn Sie fortfahren möchten, sichern Sie die Einstellungsdatei, die sich unter&lt;blockquote&gt;%1&lt;/blockquote&gt; befindet, und klicken Sie auf OK.</translation>
     </message>
+    <message>
+        <location filename="../../ckbversionnumber.cpp" line="16"/>
+        <source>N/A</source>
+        <translation>n. a.</translation>
+    </message>
 </context>
 <context>
     <name>RebindWidget</name>
     <message>
-        <location filename="../../rebindwidget.ui" line="45"/>
+        <location filename="../../rebindwidget.ui" line="69"/>
         <source>Keyboard</source>
         <translation>Tastatur</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="144"/>
+        <location filename="../../rebindwidget.ui" line="257"/>
         <source>T&amp;yping:</source>
         <translation>&amp;Tippen:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="185"/>
+        <location filename="../../rebindwidget.ui" line="203"/>
         <source>M&amp;edia:</source>
         <translation>&amp;Mediensteuerung:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="237"/>
+        <location filename="../../rebindwidget.ui" line="267"/>
         <source>Modi&amp;fier:</source>
         <translation>Zu&amp;satztasten:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="244"/>
+        <location filename="../../rebindwidget.ui" line="183"/>
         <source>Miscellaneous:</source>
         <translation>Sonstiges:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="269"/>
+        <location filename="../../rebindwidget.ui" line="193"/>
         <source>&amp;Number pad:</source>
         <translation>Ziffer&amp;nblock:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="293"/>
+        <location filename="../../rebindwidget.ui" line="275"/>
         <source>Mouse</source>
         <translation>Maus</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="299"/>
+        <location filename="../../rebindwidget.ui" line="515"/>
         <source>Cha&amp;nge DPI:</source>
         <translation>DPI ä&amp;ndern:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="382"/>
+        <location filename="../../rebindwidget.ui" line="316"/>
         <source>4 (Back)</source>
         <translation>4 (Zurück)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="387"/>
+        <location filename="../../rebindwidget.ui" line="321"/>
         <source>5 (Forward)</source>
         <translation>5 (Vor)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="416"/>
+        <location filename="../../rebindwidget.ui" line="405"/>
         <source>(Cycle Up)</source>
         <translation>(Höher - umlaufend)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="421"/>
+        <location filename="../../rebindwidget.ui" line="410"/>
         <source>(Cycle Down)</source>
         <translation>(Geringer - umlaufend)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="426"/>
+        <location filename="../../rebindwidget.ui" line="415"/>
         <source>(Up)</source>
         <translation>(Höher)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="431"/>
+        <location filename="../../rebindwidget.ui" line="420"/>
         <source>(Down)</source>
         <translation>(Geringer)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="436"/>
+        <location filename="../../rebindwidget.ui" line="425"/>
         <source>Sniper</source>
         <translation>Sniper</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="466"/>
+        <location filename="../../rebindwidget.ui" line="455"/>
         <source>Custom:</source>
         <translation>Eigene:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="499"/>
+        <location filename="../../rebindwidget.ui" line="547"/>
         <source>Left</source>
         <translation>Links</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="504"/>
+        <location filename="../../rebindwidget.ui" line="552"/>
         <source>Right</source>
         <translation>Rechts</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="509"/>
+        <location filename="../../rebindwidget.ui" line="557"/>
         <source>Middle</source>
         <translation>Mittel</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="523"/>
-        <location filename="../../rebindwidget.ui" line="890"/>
+        <location filename="../../rebindwidget.ui" line="386"/>
+        <location filename="../../rebindwidget.ui" line="900"/>
         <source>Up</source>
         <translation>Nach oben</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="528"/>
-        <location filename="../../rebindwidget.ui" line="895"/>
+        <location filename="../../rebindwidget.ui" line="391"/>
+        <location filename="../../rebindwidget.ui" line="905"/>
         <source>Down</source>
         <translation>Nach unten</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="536"/>
+        <location filename="../../rebindwidget.ui" line="525"/>
         <source>Standard button:</source>
         <translation>Standardtaste:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="565"/>
+        <location filename="../../rebindwidget.ui" line="508"/>
         <source>DPI is only available for mice.</source>
         <translation>DPI ist nur für Mäuse verfügbar.</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="572"/>
+        <location filename="../../rebindwidget.ui" line="357"/>
         <source>Wheel:</source>
         <translation>Mausrad:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="595"/>
+        <location filename="../../rebindwidget.ui" line="294"/>
         <source>Special button:</source>
         <translation>Spezialtaste:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="639"/>
+        <location filename="../../rebindwidget.ui" line="624"/>
         <source>Animation</source>
         <translation>Animation</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="702"/>
+        <location filename="../../rebindwidget.ui" line="706"/>
         <source>Stop on key release</source>
         <translation>Bei Loslassen anhalten</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="709"/>
+        <location filename="../../rebindwidget.ui" line="713"/>
         <source>Restart every time</source>
         <translation>Jedes Mal neu starten</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="738"/>
+        <location filename="../../rebindwidget.ui" line="636"/>
         <source>Start a&amp;nimation on keypress:</source>
         <translation variants="yes">
             <lengthvariant>A&amp;nimation beim Drücken einer Taste starten:</lengthvariant>
@@ -2276,96 +2399,96 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="768"/>
+        <location filename="../../rebindwidget.ui" line="756"/>
         <source>Special</source>
         <translation>Spezial</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="793"/>
+        <location filename="../../rebindwidget.ui" line="878"/>
         <source>Switch to mode:</source>
         <translation>Zu Modus wechseln:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="803"/>
-        <location filename="../../rebindwidget.ui" line="813"/>
+        <location filename="../../rebindwidget.ui" line="936"/>
+        <location filename="../../rebindwidget.ui" line="991"/>
         <source>Wrap-around</source>
         <translation>Umlaufend</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="855"/>
+        <location filename="../../rebindwidget.ui" line="913"/>
         <source>Wi&amp;ndows lock:</source>
         <translation>Wi&amp;ndows-Lock:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="915"/>
+        <location filename="../../rebindwidget.ui" line="834"/>
         <source>Toggle</source>
         <translation>Umschalten</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="920"/>
+        <location filename="../../rebindwidget.ui" line="839"/>
         <source>On</source>
         <translation>An</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="925"/>
+        <location filename="../../rebindwidget.ui" line="844"/>
         <source>Off</source>
         <translation>Aus</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="933"/>
+        <location filename="../../rebindwidget.ui" line="868"/>
         <source>Brightness:</source>
         <translation>Helligkeit:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="955"/>
+        <location filename="../../rebindwidget.ui" line="793"/>
         <source>(Previous)</source>
         <translation>(Vorheriger)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="960"/>
+        <location filename="../../rebindwidget.ui" line="798"/>
         <source>(Next)</source>
         <translation>(Nächster)</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1024"/>
+        <location filename="../../rebindwidget.ui" line="1015"/>
         <source>Program</source>
         <translation>Programm</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1065"/>
+        <location filename="../../rebindwidget.ui" line="1056"/>
         <source>Launch program on key press:</source>
         <translation>Programm mit Drücken der Taste starten:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1104"/>
+        <location filename="../../rebindwidget.ui" line="1095"/>
         <source>Launch program on key release:</source>
         <translation>Programm mit Loslassen der Taste starten:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1142"/>
-        <location filename="../../rebindwidget.ui" line="1208"/>
+        <location filename="../../rebindwidget.ui" line="1133"/>
+        <location filename="../../rebindwidget.ui" line="1199"/>
         <source>Single instance</source>
         <translation>Nur eine Instanz</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1156"/>
-        <location filename="../../rebindwidget.ui" line="1222"/>
+        <location filename="../../rebindwidget.ui" line="1147"/>
+        <location filename="../../rebindwidget.ui" line="1213"/>
         <source>Run indefinitely</source>
         <translation>Endlos ausführen</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1161"/>
+        <location filename="../../rebindwidget.ui" line="1152"/>
         <source>Stop on release</source>
         <translation>Bei Loslassen anhalten</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1166"/>
-        <location filename="../../rebindwidget.ui" line="1227"/>
+        <location filename="../../rebindwidget.ui" line="1157"/>
+        <location filename="../../rebindwidget.ui" line="1218"/>
         <source>Stop on re-press</source>
         <translation>Bei Erneutdrücken anhalten</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1257"/>
+        <location filename="../../rebindwidget.ui" line="1248"/>
         <source>Tip</source>
         <translation>Tipp</translation>
     </message>
@@ -2375,47 +2498,47 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         <translation>Makro</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1307"/>
+        <location filename="../../rebindwidget.ui" line="1313"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1317"/>
+        <location filename="../../rebindwidget.ui" line="1329"/>
         <source>Preview</source>
         <translation>Vorschau</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1400"/>
+        <location filename="../../rebindwidget.ui" line="1424"/>
         <source>This device only</source>
         <translation>Nur dieses Gerät</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1405"/>
+        <location filename="../../rebindwidget.ui" line="1429"/>
         <source>All ckb-next devices</source>
         <translation>Alle ckb-next Geräte</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1410"/>
+        <location filename="../../rebindwidget.ui" line="1434"/>
         <source>All keyboards</source>
         <translation>Alle Tastaturen</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1431"/>
+        <location filename="../../rebindwidget.ui" line="1455"/>
         <source>Record from:</source>
         <translation>Aufzeichnen von:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1438"/>
+        <location filename="../../rebindwidget.ui" line="1462"/>
         <source>Keystroke delay:</source>
         <translation>Tastenverzögerung:</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1457"/>
+        <location filename="../../rebindwidget.ui" line="1481"/>
         <source>Events</source>
         <translation>Ereignisse</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1492"/>
+        <location filename="../../rebindwidget.ui" line="1516"/>
         <source>Edit as string</source>
         <translatorcomment>“Zeichenkette” is too long for the button, I think</translatorcomment>
         <translation variants="yes">
@@ -2424,28 +2547,28 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1567"/>
+        <location filename="../../rebindwidget.ui" line="1609"/>
         <location filename="../../rebindwidget.cpp" line="809"/>
         <source>Start Recording</source>
         <translation>Aufzeichnung starten</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1587"/>
+        <location filename="../../rebindwidget.ui" line="1635"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1607"/>
+        <location filename="../../rebindwidget.ui" line="1661"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1362"/>
+        <location filename="../../rebindwidget.ui" line="1380"/>
         <source>Set delay to default values: 20us up to 15 chars, 200us above</source>
         <translation>Verzögerung auf Standardwerte setzen: 20us bis zu 15 Zeichen, 200us darüber</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1378"/>
+        <location filename="../../rebindwidget.ui" line="1396"/>
         <source>Delay will be the same as it was recorded</source>
         <translation variants="yes">
             <lengthvariant>Die Verzögerung ist dieselbe wie bei der Aufnahme</lengthvariant>
@@ -2453,37 +2576,37 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1365"/>
+        <location filename="../../rebindwidget.ui" line="1383"/>
         <source>de&amp;fault</source>
         <translation>&amp;Standard</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1381"/>
+        <location filename="../../rebindwidget.ui" line="1399"/>
         <source>as t&amp;yped</source>
         <translation>&amp;Wie eingegeben</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1620"/>
+        <location filename="../../rebindwidget.ui" line="1680"/>
         <source>Clear</source>
         <translation>Leeren</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1650"/>
+        <location filename="../../rebindwidget.ui" line="1710"/>
         <source>Unbind</source>
         <translation>Zuordnung aufheben</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1657"/>
+        <location filename="../../rebindwidget.ui" line="1717"/>
         <source>Reset to Default</source>
         <translation>Auf Standard zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1664"/>
+        <location filename="../../rebindwidget.ui" line="1724"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1671"/>
+        <location filename="../../rebindwidget.ui" line="1731"/>
         <source>Apply</source>
         <translation>Anwenden</translation>
     </message>
@@ -2540,12 +2663,12 @@ Vergewissern Sie sich, dass Ihre Tastaturbelegung auf Englisch - Vereinigte Staa
     <message>
         <location filename="../../rebindwidget.cpp" line="859"/>
         <source>Type your macro and press Stop Recording when finished.</source>
-        <translation>Makro eingeben und danach auf "Aufzeichnung anhalten" klicken.</translation>
+        <translation>Makro eingeben und danach auf &quot;Aufzeichnung anhalten&quot; klicken.</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.cpp" line="866"/>
         <source>Click Start Recording or manually edit the events.</source>
-        <translation>Auf "Aufzeichnung starten" klicken oder manuell Ereignisse manuell bearbeiten.</translation>
+        <translation>Auf &quot;Aufzeichnung starten&quot; klicken oder manuell Ereignisse manuell bearbeiten.</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.cpp" line="934"/>
@@ -2570,80 +2693,80 @@ Vergewissern Sie sich, dass Ihre Tastatur vor der Aufnahme auf diese Belegung um
         <translation>Keine Geräte verbunden</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="125"/>
+        <location filename="../../settingswidget.ui" line="131"/>
         <source>Modifier keys</source>
         <translatorcomment>“Zusatztasten” is used by Windows</translatorcomment>
         <translation>Zusatztasten</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="310"/>
+        <location filename="../../settingswidget.ui" line="322"/>
         <source>These will override the keyboard profile. See &quot;Binding&quot; tab for more settings.</source>
         <translation>Damit wird das Tastaturprofil überschrieben. Siehe Zuordnung-Tab für weitere Einstellungen.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="339"/>
+        <location filename="../../settingswidget.ui" line="357"/>
         <source>Application</source>
         <translation>Programm</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="353"/>
+        <location filename="../../settingswidget.ui" line="371"/>
         <source>ckb-next will be started when you log in to your computer.</source>
         <translation>ckb-next wird automatisch gestartet, wenn sie sich an diesem Computer anmelden.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="356"/>
+        <location filename="../../settingswidget.ui" line="374"/>
         <source>Start ckb-next at login</source>
         <translation>ckb-next mit Anmeldung starten</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="363"/>
+        <location filename="../../settingswidget.ui" line="381"/>
         <source>You will be notified when new firmware versions are available. You&apos;ll have the option to install them immediately or wait until later.</source>
         <translation>Sie werden benachrichtigt, wenn neue Firmware-Versionen verfügbar sind. Sie haben dann die Möglichkeit, diese sofort zu installieren oder bis zu einem späteren Zeitpunkt zu warten.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="366"/>
+        <location filename="../../settingswidget.ui" line="384"/>
         <source>Check for new firmware automatically</source>
         <translation>Automatisch nach Firmware-Updates suchen</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="376"/>
+        <location filename="../../settingswidget.ui" line="394"/>
         <source>Check for ckb-next updates on startup</source>
         <translation>Beim Starten nach ckb-next-Updates suchen</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="386"/>
+        <location filename="../../settingswidget.ui" line="404"/>
         <source>Enable this only if you have a high DPI monitor and the ckb-next window shows up too small.</source>
         <translation>Aktivieren Sie diese Option nur, wenn Sie einen Monitor mit hohem DPI-Wert haben und das ckb-next-Fenster zu klein dargestellt wird.</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="389"/>
+        <location filename="../../settingswidget.ui" line="407"/>
         <source>Enable HiDPI Scaling</source>
         <translation>HiDPI-Skalierung aktivieren</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="403"/>
+        <location filename="../../settingswidget.ui" line="421"/>
         <location filename="../../settingswidget.cpp" line="197"/>
         <source>Generate report</source>
         <translation>Bericht erzeugen</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="428"/>
+        <location filename="../../settingswidget.ui" line="446"/>
         <source>Check for updates</source>
         <translation>Nach Updates suchen</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="435"/>
+        <location filename="../../settingswidget.ui" line="453"/>
         <location filename="../../settingswidget.cpp" line="286"/>
         <source>Uninstall ckb-next</source>
         <translation>ckb-next deinstallieren</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="540"/>
+        <location filename="../../settingswidget.ui" line="571"/>
         <source>About Qt</source>
         <translation>Über Qt</translation>
     </message>
     <message>
-        <location filename="../../settingswidget.ui" line="547"/>
+        <location filename="../../settingswidget.ui" line="578"/>
         <source>Quit</source>
         <translation>Beenden</translation>
     </message>

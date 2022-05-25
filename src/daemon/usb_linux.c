@@ -188,11 +188,12 @@ void* os_inputmain(void* context){
         /// Broken devices or shutting down the entire system leads to closing the device and finishing this thread.
         int res = ioctl(fd, USBDEVFS_REAPURB, &urb);
         if (res) {
+            int ioctlerrno = errno;
             wait_until_suspend_processed();
-            if (errno == ENODEV || errno == ENOENT || errno == ESHUTDOWN)
+            if (ioctlerrno == ENODEV || ioctlerrno == ENOENT || ioctlerrno == ESHUTDOWN)
                 // Stop the thread if the handle closes
                 break;
-            else if(errno == EPIPE && urb){
+            else if(ioctlerrno == EPIPE && urb){
                 /// If just an EPIPE ocurred, give the device a CLEAR_HALT and resubmit the URB.
                 ioctl(fd, USBDEVFS_CLEAR_HALT, &urb->endpoint);
                 // Re-submit the URB

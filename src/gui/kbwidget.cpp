@@ -405,7 +405,7 @@ void KbWidget::updateFwButton(){
         if(newVersion.isNull() || newVersion <= oldVersion)
             ui->fwUpdButton->setText(tr("Up to date"));
         else
-            ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(oldVersion.toString()));
+            ui->fwUpdButton->setText(tr("Upgrade to v%1").arg(newVersion.toString()));
     }
 }
 

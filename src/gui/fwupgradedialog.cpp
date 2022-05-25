@@ -12,9 +12,6 @@ struct KbId {
     const char* feature;
 };
 
-static const int DIALOG_WIDTH = 420;
-static const int DIALOG_HEIGHT_MIN = 200, DIALOG_HEIGHT_MAX(240);
-
 FwUpgradeDialog::FwUpgradeDialog(QWidget* parent, CkbVersionNumber newV, const QByteArray& fwBlob, Kb* device) :
     QDialog(parent),
     ui(new Ui::FwUpgradeDialog),
@@ -28,8 +25,6 @@ FwUpgradeDialog::FwUpgradeDialog(QWidget* parent, CkbVersionNumber newV, const Q
     connect(device, SIGNAL(destroyed()), this, SLOT(removeDev()));
     connect(device, SIGNAL(fwUpdateProgress(int,int)), this, SLOT(fwUpdateProgress(int,int)));
     connect(device, SIGNAL(fwUpdateFinished(bool)), this, SLOT(fwUpdateFinished(bool)));
-
-    setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MIN);
 }
 
 FwUpgradeDialog::~FwUpgradeDialog(){
@@ -122,10 +117,9 @@ int FwUpgradeDialog::exec(){
     ui->progressBar->setValue(0);
     ui->progressBar->setMaximum(1);
     ui->progressBar->setTextVisible(false);
-    ui->statusLabel->setText(tr("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb-next is not endorsed by Corsair.<br />This is <i>unlikely</i> to cause any damage, however the developers of this software do not accept any responsibility in such an event."));
+    ui->statusLabel->setText(tr("Ready to install new firmware.<br /><br /><b>Disclaimer:</b> ckb-next is not endorsed by Corsair.<br /><br />This is <i>unlikely</i> to cause any damage, however the developers of this software do not accept any responsibility in such an event."));
     ui->cancelButton->setEnabled(true);
     ui->actionButton->setEnabled(true);
-    setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MAX);
     show();
     // Run modal event loop
     evLoop = new QEventLoop(this);
@@ -173,7 +167,6 @@ void FwUpgradeDialog::on_cancelButton_clicked(){
 void FwUpgradeDialog::on_actionButton_clicked(){
     if(!savePath.isEmpty() && kb){
         // Start upgrade
-        setFixedSize(DIALOG_WIDTH, DIALOG_HEIGHT_MIN);
         ui->progressBar->show();
         ui->progressBar->setValue(0);
         ui->progressBar->setMaximum(0);

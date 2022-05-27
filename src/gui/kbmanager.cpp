@@ -15,7 +15,7 @@ QString devpath = "/var/run/ckb%1";
 #endif
 
 CkbVersionNumber KbManager::_guiVersion, KbManager::_daemonVersion;
-KbManager* KbManager::_kbManager = 0;
+KbManager* KbManager::_kbManager = nullptr;
 
 #ifdef USE_XCB_SCREENSAVER
 QTimer* KbManager::_idleTimer = nullptr;

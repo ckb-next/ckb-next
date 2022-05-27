@@ -11,7 +11,7 @@ class ModeListWidget : public QTableView
 {
     Q_OBJECT
 public:
-    explicit ModeListWidget(QWidget* parent = 0);
+    explicit ModeListWidget(QWidget* parent = nullptr);
     void setDevice(Kb* dev);
     inline void setIgnoreFocusLoss(const bool e) { ignoreFocusLoss = e; }
     ~ModeListWidget();

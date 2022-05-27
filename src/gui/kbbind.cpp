@@ -206,16 +206,16 @@ void KbBind::update(QFile& cmd, int notify, bool force){
     cmd.write(QString("\n@%1 rebind all notify all").arg(notify).toLatin1());
     // Make sure modifier keys are included as they may be remapped globally
     QHash<QString, KeyAction*> bind(_bind);
-    if(!_bind.contains("caps")) bind["caps"] = 0;
-    if(!_bind.contains("lshift")) bind["lshift"] = 0;
-    if(!_bind.contains("rshift")) bind["rshift"] = 0;
-    if(!_bind.contains("lctrl")) bind["lctrl"] = 0;
-    if(!_bind.contains("rctrl")) bind["rctrl"] = 0;
-    if(!_bind.contains("lwin")) bind["lwin"] = 0;
-    if(!_bind.contains("rwin")) bind["rwin"] = 0;
-    if(!_bind.contains("lalt")) bind["lalt"] = 0;
-    if(!_bind.contains("ralt")) bind["ralt"] = 0;
-    if(!_bind.contains("fn")) bind["fn"] = 0;
+    if(!_bind.contains("caps")) bind["caps"] = nullptr;
+    if(!_bind.contains("lshift")) bind["lshift"] = nullptr;
+    if(!_bind.contains("rshift")) bind["rshift"] = nullptr;
+    if(!_bind.contains("lctrl")) bind["lctrl"] = nullptr;
+    if(!_bind.contains("rctrl")) bind["rctrl"] = nullptr;
+    if(!_bind.contains("lwin")) bind["lwin"] = nullptr;
+    if(!_bind.contains("rwin")) bind["rwin"] = nullptr;
+    if(!_bind.contains("lalt")) bind["lalt"] = nullptr;
+    if(!_bind.contains("ralt")) bind["ralt"] = nullptr;
+    if(!_bind.contains("fn")) bind["fn"] = nullptr;
     QHashIterator<QString, KeyAction*> i(bind);
 
     // Initialize String buffer for macro Key definitions (G-keys)

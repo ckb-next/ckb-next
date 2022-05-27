@@ -11,7 +11,7 @@ static const qint64 AUTO_CHECK_TIME = 60 * 60 * 6000;
 KbFirmware::FW::FW() : fwVersion(CkbVersionNumber()), ckbVersion(CkbVersionNumber()) {}
 
 KbFirmware::KbFirmware() :
-    lastCheck(0), lastFinished(0), tableDownload(0), hasGPG(GPG_UNKNOWN)
+    lastCheck(0), lastFinished(0), tableDownload(nullptr), hasGPG(GPG_UNKNOWN)
 {
     // Disable bearer polling. This corrects an issue with latency spikes when
     // using WiFi. The problem and workaround are described here:
@@ -160,7 +160,7 @@ void KbFirmware::downloadFinished(){
         return;
     processDownload(tableDownload);
     tableDownload->deleteLater();
-    tableDownload = 0;
+    tableDownload = nullptr;
     emit downloaded();
 }
 

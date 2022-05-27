@@ -10,12 +10,12 @@
 QHash<QUuid, AnimScript*> AnimScript::scripts;
 
 AnimScript::AnimScript(QObject* parent, const QString& path) :
-    QObject(parent), _path(path), initialized(false), process(0)
+    QObject(parent), _path(path), initialized(false), process(nullptr)
 {
 }
 
 AnimScript::AnimScript(QObject* parent, const AnimScript& base) :
-    QObject(parent), _info(base._info), _path(base._path), initialized(false), process(0)
+    QObject(parent), _info(base._info), _path(base._path), initialized(false), process(nullptr)
 {
 }
 
@@ -88,7 +88,7 @@ QList<const AnimScript*> AnimScript::list(){
 }
 
 AnimScript* AnimScript::copy(QObject* parent, const QUuid& id){
-     return scripts.contains(id) ? new AnimScript(parent, *scripts.value(id)) : 0;
+     return scripts.contains(id) ? new AnimScript(parent, *scripts.value(id)) : nullptr;
 }
 
 inline QString urlParam(const QString& param){
@@ -414,7 +414,7 @@ void AnimScript::end(){
         process->kill();
         connect(process, SIGNAL(finished(int)), process, SLOT(deleteLater()));
         disconnect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readProcess()));
-        process = 0;
+        process = nullptr;
     }
 }
 void AnimScript::readProcessErr(){

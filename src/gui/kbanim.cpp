@@ -6,7 +6,7 @@
 #include <typeinfo>
 
 KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettingsBase& settings) :
-    QObject(parent), _script(0), _map(map),
+    QObject(parent), _script(nullptr), _map(map),
     repeatTime(0), kpRepeatTime(0), stopTime(0), kpStopTime(0), repeatMsec(0), kpRepeatMsec(0),
     _guid(id), _isActive(false), _isActiveKp(false), _needsSave(false)
 {

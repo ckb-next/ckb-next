@@ -48,7 +48,7 @@ public:
 
     inline int              modeCount() const           { return _modes.count(); }
     inline int              indexOf(KbMode* mode) const { return _modes.indexOf(mode); }
-    inline KbMode*          find(const QUuid& id)       { foreach(KbMode* mode, _modes) { if(mode->id().guid == id) return mode; } return 0; }
+    inline KbMode*          find(const QUuid& id)       { foreach(KbMode* mode, _modes) { if(mode->id().guid == id) return mode; } return nullptr; }
     inline KbMode*          at(const int idx) const     { return _modes.at(idx); }
 
     // Currently-selected mode

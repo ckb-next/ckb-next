@@ -12,7 +12,7 @@ class ExtraSettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ExtraSettingsWidget(QWidget *parent = 0);
+    explicit ExtraSettingsWidget(QWidget *parent = nullptr);
     ~ExtraSettingsWidget();
 
     void pollUpdates();

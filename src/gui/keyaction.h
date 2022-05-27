@@ -15,11 +15,11 @@ class KeyAction : public QObject
     Q_OBJECT
 public:
     // Action/string conversion
-    KeyAction(const QString& action, QObject* parent = 0);
+    KeyAction(const QString& action, QObject* parent = nullptr);
     inline QString  value()     const { return _value; }
     inline operator QString ()  const { return _value; }
     // Empty action
-    explicit KeyAction(QObject* parent = 0);
+    explicit KeyAction(QObject* parent = nullptr);
 
     // No action
     static inline QString   noAction()    { return QString(); }

@@ -8,7 +8,7 @@
 
 KbBindWidget::KbBindWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::KbBindWidget), bind(0), profile(0), keyWidget(new KeyWidget(this))
+    ui(new Ui::KbBindWidget), bind(nullptr), profile(nullptr), keyWidget(new KeyWidget(this))
 {
     ui->setupUi(this);
     keyWidget->rgbMode(false);

@@ -14,7 +14,7 @@ class GradientDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit GradientDialog(QWidget *parent = 0);
+    explicit GradientDialog(QWidget *parent = nullptr);
     ~GradientDialog();
 
     QGradientStops getGradient(const QGradientStops& prevGradient);

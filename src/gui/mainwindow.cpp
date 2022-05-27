@@ -31,7 +31,7 @@ extern QString devpath;
 
 int MainWindow::signalHandlerFd[2] = {0, 0};
 
-MainWindow* MainWindow::mainWindow = 0;
+MainWindow* MainWindow::mainWindow = nullptr;
 
 #if defined(Q_OS_MACOS) && !defined(OS_MAC_LEGACY)
 bool is_catalina_or_higher(){

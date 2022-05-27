@@ -14,7 +14,7 @@ class KbProfileDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit KbProfileDialog(KbWidget* parent = 0);
+    explicit KbProfileDialog(KbWidget* parent = nullptr);
     ~KbProfileDialog();
 
 private slots:

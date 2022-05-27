@@ -5,12 +5,12 @@
 #include <QMessageBox>
 
 KbAnimWidget::KbAnimWidget(QWidget* parent) :
-    QWidget(parent), light(0), current(0), noReorder(false),
+    QWidget(parent), light(nullptr), current(nullptr), noReorder(false),
     ui(new Ui::KbAnimWidget)
 {
     ui->setupUi(this);
     ui->animList->setVisible(false);
-    setCurrent(0);
+    setCurrent(nullptr);
     connect(ui->animList, SIGNAL(orderChanged()), this, SLOT(reorderAnims()));
 }
 
@@ -31,7 +31,7 @@ void KbAnimWidget::setLight(KbLight* newLight){
 
 void KbAnimWidget::refreshList(){
     noReorder = true;
-    setCurrent(0);
+    setCurrent(nullptr);
     ui->animList->clear();
     animations.clear();
     // Add the animations from the new lighting mode
@@ -75,8 +75,8 @@ void KbAnimWidget::reorderAnims(){
 }
 
 void KbAnimWidget::clearSelection(){
-    ui->animList->setCurrentItem(0);
-    setCurrent(0);
+    ui->animList->setCurrentItem(nullptr);
+    setCurrent(nullptr);
 }
 
 void KbAnimWidget::addAnim(const AnimScript* base, const QStringList& keyList, const QString& name, const QMap<QString, QVariant>& preset){
@@ -150,7 +150,7 @@ void KbAnimWidget::setSelectedKeys(const QStringList& keys){
 
 void KbAnimWidget::on_animList_currentItemChanged(QListWidgetItem* cur, QListWidgetItem* prev){
     if(!cur)
-        setCurrent(0);
+        setCurrent(nullptr);
     else
         setCurrent(animations[cur->data(Qt::UserRole).toUuid()]);
 }
@@ -243,7 +243,7 @@ void KbAnimWidget::on_deleteButton_clicked(){
         animList.removeAll(current);
         light->animList(animList);
         current->deleteLater();
-        setCurrent(0);
+        setCurrent(nullptr);
         delete ui->animList->currentItem();
         if(animations.count() == 0){
             ui->animList->setVisible(false);

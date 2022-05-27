@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay = 0, *sabOverlay = 0, *scimOverlay = 0, *harpOverlay = 0, *glaiveOverlay = 0, *polarisOverlay = 0, *katarOverlay = 0, *m95Overlay = 0, *ironclawOverlay = 0, *nightswordOverlay = 0, *darkCoreOverlay = 0, *ironclawWirelessOverlay = 0, *glaiveproOverlay = 0,* m55Overlay = 0;
+static QImage* m65Overlay= nullptr, *sabOverlay= nullptr, *scimOverlay= nullptr, *harpOverlay= nullptr, *glaiveOverlay= nullptr, *polarisOverlay= nullptr, *katarOverlay= nullptr, *m95Overlay= nullptr, *ironclawOverlay= nullptr, *nightswordOverlay= nullptr, *darkCoreOverlay= nullptr, *ironclawWirelessOverlay= nullptr, *glaiveproOverlay= nullptr,* m55Overlay= nullptr;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -108,7 +108,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
 
     if(!keyMap.isKeyboard()){
         // Draw mouse overlays
-        const QImage* overlay = 0;
+        const QImage* overlay = nullptr;
         float xpos = 0.f, ypos = -2.f;
         if(model == KeyMap::M65 || model == KeyMap::M65E){
             if(!m65Overlay)

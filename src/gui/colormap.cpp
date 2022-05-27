@@ -1,7 +1,7 @@
 #include "colormap.h"
 
 ColorMap::ColorMap() :
-    _keyNames(0), _colors(0), _count(0), _mapCount(0)
+    _keyNames(nullptr), _colors(nullptr), _count(0), _mapCount(0)
 {
 }
 
@@ -10,7 +10,7 @@ ColorMap::~ColorMap(){
 }
 
 ColorMap::ColorMap(const ColorMap& rhs) :
-    _keyNames(0), _colors(0), _count(0), _mapCount(0)
+    _keyNames(nullptr), _colors(nullptr), _count(0), _mapCount(0)
 {
     *this = rhs;
 }
@@ -91,20 +91,20 @@ void ColorMap::init(const KeyMap& map){
 
 QRgb* ColorMap::colorForName(const char* name){
     if(!_keyNames)
-        return 0;
+        return nullptr;
     const char** namePtr = (const char**)bsearch(&name, _keyNames, _count, sizeof(const char*), qs_strcmp);
     if(!namePtr)
-        return 0;
+        return nullptr;
     ptrdiff_t position = namePtr - _keyNames;
     return _colors + position;
 }
 
 const QRgb* ColorMap::colorForName(const char* name) const {
     if(!_keyNames)
-        return 0;
+        return nullptr;
     const char** namePtr = (const char**)bsearch(&name, _keyNames, _count, sizeof(const char*), qs_strcmp);
     if(!namePtr)
-        return 0;
+        return nullptr;
     ptrdiff_t position = namePtr - _keyNames;
     return _colors + position;
 }

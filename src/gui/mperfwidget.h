@@ -20,7 +20,7 @@ class MPerfWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit MPerfWidget(QWidget *parent = 0);
+    explicit MPerfWidget(QWidget *parent = nullptr);
     ~MPerfWidget();
 
     void setPerf(KbPerf* newPerf, KbProfile* newProfile);

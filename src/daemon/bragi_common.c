@@ -82,7 +82,6 @@ static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar 
 
     // After sending the first chunk, if buf_len < data_len
     // start sending the additional chunks
-#warning "Check if the device responded with success"
     uchar* pkt_out = pkt;
     // Get to the end of the last packet, go back 3 bytes and insert the header for the continue write
     while((pkt_out += kb->out_ep_packet_size) < pkt + data_len + offset) {

@@ -128,8 +128,6 @@ static int start_bragi_common(usbdevice* kb){
     if(prop >= 0)
         kb->radiobldversion = bragi_fwver_bswap(prop);
 
-#warning "Add error messages in case of failure"
-
     uchar pollrateLUT[5] = {-1};
     pollrateLUT[BRAGI_POLLRATE_1MS] = 1;
     pollrateLUT[BRAGI_POLLRATE_2MS] = 2;
@@ -139,8 +137,9 @@ static int start_bragi_common(usbdevice* kb){
     prop = bragi_get_property(kb, BRAGI_POLLRATE);
 
     uchar pollrate = prop;
+    // Silently cap this to 1ms until we add support for faster pollrates
     if(pollrate > 4)
-        return 1;
+        pollrate = 4;
 
     kb->pollrate = pollrateLUT[pollrate];
 

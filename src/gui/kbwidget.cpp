@@ -82,6 +82,9 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
     if(!device->features.contains("pollrate")){
         ui->pollRateBox->hide();
         ui->pollLabel2->hide();
+        ui->horizontalLayout_2->removeItem(ui->horizontalSpacer_4);
+        delete ui->horizontalSpacer_4;
+        ui->horizontalSpacer_4 = nullptr;
     }
     if(!device->features.contains("fwupdate")){
         ui->fwUpdButton->hide();

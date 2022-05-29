@@ -4,6 +4,7 @@
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.4...v0.5.0)
 
 Support for new devices:
+- K95 Platinum XT
 - Katar Pro
 - Katar Pro XT
 - Glaive Pro

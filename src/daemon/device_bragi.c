@@ -95,8 +95,6 @@ static inline uint32_t bragi_fwver_bswap(uint32_t fwv){
 }
 
 static int start_bragi_common(usbdevice* kb){
-    kb->usbdelay = 10; // This might not be needed, but won't harm
-
     // Check if we're in HW mode, and if so, switch to software in order to read the properties/handles
     int64_t prop = bragi_get_property(kb, BRAGI_MODE);
     if(prop < 0){

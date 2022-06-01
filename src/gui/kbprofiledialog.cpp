@@ -45,7 +45,7 @@ void KbProfileDialog::profileList_reordered(){
 
 void KbProfileDialog::repopulate(){
     ui->profileList->clear();
-    QListWidgetItem* current = 0;
+    QListWidgetItem* current = nullptr;
     foreach(KbProfile* profile, device->profiles()){
         QListWidgetItem* item = new QListWidgetItem(QIcon((profile == device->hwProfile()) ? ":/img/icon_profile_hardware.png" : ":/img/icon_profile.png"), profile->name(), ui->profileList);
         item->setData(GUID, profile->id().guid);

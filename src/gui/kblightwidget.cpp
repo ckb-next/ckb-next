@@ -6,7 +6,7 @@
 #include "keywidgetlayout.h"
 
 KbLightWidget::KbLightWidget(QWidget *parent) :
-    QWidget(parent), light(0),
+    QWidget(parent), light(nullptr),
     ui(new Ui::KbLightWidget), keyWidget(new KeyWidget(this))
 {
     ui->setupUi(this);

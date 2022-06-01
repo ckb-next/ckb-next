@@ -9,7 +9,7 @@ class GradientDialogWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit GradientDialogWidget(QWidget *parent = 0);
+    explicit GradientDialogWidget(QWidget *parent = nullptr);
 
     void                    setStops(const QGradientStops& stops);
     inline QGradientStops   stops()                                 { return _stops; }

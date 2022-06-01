@@ -20,12 +20,12 @@ KeyAction::Type KeyAction::type() const {
 }
 
 KeyAction::KeyAction(const QString &action, QObject *parent)
-    : QObject(parent), _value(action), preProgram(0), relProgram(0), sniperValue(0)
+    : QObject(parent), _value(action), preProgram(nullptr), relProgram(nullptr), sniperValue(0)
 {
 }
 
 KeyAction::KeyAction(QObject *parent)
-    : QObject(parent), _value(""), preProgram(0), relProgram(0), sniperValue(0)
+    : QObject(parent), _value(""), preProgram(nullptr), relProgram(nullptr), sniperValue(0)
 {
 }
 
@@ -409,13 +409,13 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         QString onPress, onRelease;
         int stop = programInfo(onPress, onRelease);
         // Stop running programs based on setting
-        QProcess* process = 0;
+        QProcess* process = nullptr;
         if(down){
             if(stop & PROGRAM_PR_KPSTOP){
                 process = preProgram;
                 if(process)
                     process->kill();
-                process = 0;
+                process = nullptr;
             }
             if(stop & PROGRAM_RE_KPSTOP)
                 process = relProgram;

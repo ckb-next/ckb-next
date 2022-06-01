@@ -17,7 +17,7 @@ class KPerfWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit KPerfWidget(QWidget *parent = 0);
+    explicit KPerfWidget(QWidget *parent = nullptr);
     ~KPerfWidget();
 
     void setPerf(KbPerf* newPerf, KbProfile* newProfile);

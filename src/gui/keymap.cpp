@@ -14,13 +14,13 @@
 // Key positions (K95 - English)
 // This is the master key map that includes ANSI, ISO and JP-106 layouts - use patchANSI(), patchISO() or patchJP106() to finalize it
 static const Key K95Keys[] = {
-    {0, 0, "mr", 38, 0, NS, true, true}, {0, 0, "m1", 50, 0, NS, true, true}, {0, 0, "m2", 62, 0, NS, true, true}, {0, 0, "m3", 74, 0, NS, true, true}, {0, "Brightness", "light", 222, 0, NS, true, true}, {0, "Windows Lock", "lock", 234, 0, NS, true, true}, {0, "Mute", "mute", 273, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 290, -2, 18, 6, false, true}, {0, "Volume down", "voldn", 290, 2, 18, 6, false, true},
-    {0, 0, "g1", 0, 14, NS, true, true}, {0, 0, "g2", 11, 14, NS, true, true}, {0, 0, "g3", 22, 14, NS, true, true}, {0, "Esc", "esc", 38, 14, NS, true, true}, {0, 0, "f1", 58, 14, NS, true, true}, {0, 0, "f2", 70, 14, NS, true, true}, {0, 0, "f3", 82, 14, NS, true, true}, {0, 0, "f4", 94, 14, NS, true, true}, {0, 0, "f5", 114, 14, NS, true, true}, {0, 0, "f6", 126, 14, NS, true, true}, {0, 0, "f7", 138, 14, NS, true, true}, {0, 0, "f8", 150, 14, NS, true, true}, {0, 0, "f9", 170, 14, NS, true, true}, {0, 0, "f10", 182, 14, NS, true, true}, {0, 0, "f11", 194, 14, NS, true, true}, {0, 0, "f12", 206, 14, NS, true, true}, {0, "Print Screen\nSysRq", "prtscn", 222, 14, NS, true, true}, {0, "Scroll Lock", "scroll", 234, 14, NS, true, true}, {0, "Pause\nBreak", "pause", 246, 14, NS, true, true}, {0, "Stop", "stop", 262, 14, 12, 8, true, true}, {0, "Previous", "prev", 273, 14, 13, 8, true, true}, {0, "Play/Pause", "play", 285, 14, 13, 8, true, true}, {0, "Next", "next", 296, 14, 12, 8, true, true},
-    {0, 0, "g4", 0, 25, NS, true, true}, {0, 0, "g5", 11, 25, NS, true, true}, {0, 0, "g6", 22, 25, NS, true, true}, {0, "`", "grave", 38, 27, NS, true, true}, {0, 0, "1", 50, 27, NS, true, true}, {0, 0, "2", 62, 27, NS, true, true}, {0, 0, "3", 74, 27, NS, true, true}, {0, 0, "4", 86, 27, NS, true, true}, {0, 0, "5", 98, 27, NS, true, true}, {0, 0, "6", 110, 27, NS, true, true}, {0, 0, "7", 122, 27, NS, true, true}, {0, 0, "8", 134, 27, NS, true, true}, {0, 0, "9", 146, 27, NS, true, true}, {0, 0, "0", 158, 27, NS, true, true}, {0, "-", "minus", 170, 27, NS, true, true}, {0, "=", "equal", 182, 27, NS, true, true}, {0, "¥", "yen", 194, 27, NS, true, true}, {0, "Backspace", "bspace", 200, 27, 24, 12, true, true}, {0, "Insert", "ins", 222, 27, NS, true, true}, {0, "Home", "home", 234, 27, NS, true, true}, {0, "Page Up", "pgup", 246, 27, NS, true, true}, {0, "Num Lock", "numlock", 261, 27, NS, true, true}, {0, "NumPad /", "numslash", 273, 27, NS, true, true}, {0, "NumPad *", "numstar", 285, 27, NS, true, true}, {0, "NumPad -", "numminus", 297, 27, NS, true, true},
-    {0, 0, "g7", 0, 39, NS, true, true}, {0, 0, "g8", 11, 39, NS, true, true}, {0, 0, "g9", 22, 39, NS, true, true}, {0, "Tab", "tab", 41, 39, 18, 12, true, true}, {0, 0, "q", 56, 39, NS, true, true}, {0, 0, "w", 68, 39, NS, true, true}, {0, 0, "e", 80, 39, NS, true, true}, {0, 0, "r", 92, 39, NS, true, true}, {0, 0, "t", 104, 39, NS, true, true}, {0, 0, "y", 116, 39, NS, true, true}, {0, 0, "u", 128, 39, NS, true, true}, {0, 0, "i", 140, 39, NS, true, true}, {0, 0, "o", 152, 39, NS, true, true}, {0, 0, "p", 164, 39, NS, true, true}, {0, "[", "lbrace", 176, 39, NS, true, true}, {0, "]", "rbrace", 188, 39, NS, true, true}, {0, "\\", "bslash", 203, 39, 18, 12, true, true}, {0, "Enter", "enter", 203, 45, 18, 24, true, true}, {0, "Delete", "del", 222, 39, NS, true, true}, {0, "End", "end", 234, 39, NS, true, true}, {0, "Page Down", "pgdn", 246, 39, NS, true, true}, {0, "NumPad 7", "num7", 261, 39, NS, true, true}, {0, "NumPad 8", "num8", 273, 39, NS, true, true}, {0, "NumPad 9", "num9", 285, 39, NS, true, true}, {0, "NumPad +", "numplus", 297, 45, 12, 24, true, true},
-    {0, 0, "g10", 0, 50, NS, true, true}, {0, 0, "g11", 11, 50, NS, true, true}, {0, 0, "g12", 22, 50, NS, true, true}, {0, "Caps Lock", "caps", 42, 51, 20, 12, true, true}, {0, 0, "a", 59, 51, NS, true, true}, {0, 0, "s", 71, 51, NS, true, true}, {0, 0, "d", 83, 51, NS, true, true}, {0, 0, "f", 95, 51, NS, true, true}, {0, 0, "g", 107, 51, NS, true, true}, {0, 0, "h", 119, 51, NS, true, true}, {0, 0, "j", 131, 51, NS, true, true}, {0, 0, "k", 143, 51, NS, true, true}, {0, 0, "l", 155, 51, NS, true, true}, {0, ";", "colon", 167, 51, NS, true, true}, {0, "'", "quote", 179, 51, NS, true, true}, {0, "#", "hash", 191, 51, NS, true, true}, {0, "NumPad 4", "num4", 261, 51, NS, true, true}, {0, "NumPad 5", "num5", 273, 51, NS, true, true}, {0, "NumPad 6", "num6", 285, 51, NS, true, true},
-    {0, 0, "g13", 0, 64, NS, true, true}, {0, 0, "g14", 11, 64, NS, true, true}, {0, 0, "g15", 22, 64, NS, true, true}, {0, "Left Shift", "lshift", 39, 63, 14, 12, true, true}, {"bslash", "\\", "bslash_iso", 53, 63, NS, true, true}, {0, 0, "z", 65, 63, NS, true, true}, {0, 0, "x", 77, 63, NS, true, true}, {0, 0, "c", 89, 63, NS, true, true}, {0, 0, "v", 101, 63, NS, true, true}, {0, 0, "b", 113, 63, NS, true, true}, {0, 0, "n", 125, 63, NS, true, true}, {0, 0, "m", 137, 63, NS, true, true}, {0, ",", "comma", 149, 63, NS, true, true}, {0, ".", "dot", 161, 63, NS, true, true}, {0, "/", "slash", 173, 63, NS, true, true}, {0, "_", "ro", 185, 63, NS, true, true}, {0, "Right Shift", "rshift", 196, 63, 32, 12, true, true}, {0, "Up", "up", 234, 63, NS, true, true}, {0, "NumPad 1", "num1", 261, 63, NS, true, true}, {0, "NumPad 2", "num2", 273, 63, NS, true, true}, {0, "NumPad 3", "num3", 285, 63, NS, true, true}, {0, "NumPad Enter", "numenter", 297, 69, 12, 24, true, true},
-    {0, 0, "g16", 0, 75, NS, true, true}, {0, 0, "g17", 11, 75, NS, true, true}, {0, 0, "g18", 22, 75, NS, true, true}, {0, "Left Ctrl", "lctrl", 40, 75, 16, 12, true, true}, {0, "Left Windows", "lwin", 54, 75, NS, true, true}, {0, "Left Alt", "lalt", 67, 75, 14, 12, true, true}, {0, "無変換", "muhenkan", 80, 75, NS, true, true}, {0, "Space", "space", 116, 75, 84, 12, true, true}, {0, "変換", "henkan", 150, 75, NS, true, true}, {0, "ひらがな カタカナ ローマ字", "katahira", 162, 75, NS, true, true}, {0, "Right Alt", "ralt", 165, 75, 14, 12, true, true}, {0, "Right Windows", "rwin", 178, 75, NS, true, true}, {0, "Menu", "rmenu", 190, 75, NS, true, true}, {0, "Right Ctrl", "rctrl", 204, 75, 16, 12, true, true}, {0, "Left", "left", 222, 75, NS, true, true}, {0, "Down", "down", 234, 75, NS, true, true}, {0, "Right", "right", 246, 75, NS, true, true}, {0, "NumPad 0", "num0", 267, 75, 24, 12, true, true}, {0, "NumPad .", "numdot", 285, 75, NS, true, true}
+    {nullptr, nullptr, "mr", 38, 0, NS, true, true}, {nullptr, nullptr, "m1", 50, 0, NS, true, true}, {nullptr, nullptr, "m2", 62, 0, NS, true, true}, {nullptr, nullptr, "m3", 74, 0, NS, true, true}, {nullptr,  "Brightness", "light", 222, 0, NS, true, true}, {nullptr,  "Windows Lock", "lock", 234, 0, NS, true, true}, {nullptr,  "Mute", "mute", 273, 0, 13, 8, true, true}, {nullptr,  "Volume Up", "volup", 290, -2, 18, 6, false, true}, {nullptr,  "Volume down", "voldn", 290, 2, 18, 6, false, true},
+    {nullptr, nullptr, "g1", 0, 14, NS, true, true}, {nullptr, nullptr, "g2", 11, 14, NS, true, true}, {nullptr, nullptr, "g3", 22, 14, NS, true, true}, {nullptr,  "Esc", "esc", 38, 14, NS, true, true}, {nullptr, nullptr, "f1", 58, 14, NS, true, true}, {nullptr, nullptr, "f2", 70, 14, NS, true, true}, {nullptr, nullptr, "f3", 82, 14, NS, true, true}, {nullptr, nullptr, "f4", 94, 14, NS, true, true}, {nullptr, nullptr, "f5", 114, 14, NS, true, true}, {nullptr, nullptr, "f6", 126, 14, NS, true, true}, {nullptr, nullptr, "f7", 138, 14, NS, true, true}, {nullptr, nullptr, "f8", 150, 14, NS, true, true}, {nullptr, nullptr, "f9", 170, 14, NS, true, true}, {nullptr, nullptr, "f10", 182, 14, NS, true, true}, {nullptr, nullptr, "f11", 194, 14, NS, true, true}, {nullptr, nullptr, "f12", 206, 14, NS, true, true}, {nullptr,  "Print Screen\nSysRq", "prtscn", 222, 14, NS, true, true}, {nullptr,  "Scroll Lock", "scroll", 234, 14, NS, true, true}, {nullptr,  "Pause\nBreak", "pause", 246, 14, NS, true, true}, {nullptr,  "Stop", "stop", 262, 14, 12, 8, true, true}, {nullptr,  "Previous", "prev", 273, 14, 13, 8, true, true}, {nullptr,  "Play/Pause", "play", 285, 14, 13, 8, true, true}, {nullptr,  "Next", "next", 296, 14, 12, 8, true, true},
+    {nullptr, nullptr, "g4", 0, 25, NS, true, true}, {nullptr, nullptr, "g5", 11, 25, NS, true, true}, {nullptr, nullptr, "g6", 22, 25, NS, true, true}, {nullptr,  "`", "grave", 38, 27, NS, true, true}, {nullptr, nullptr, "1", 50, 27, NS, true, true}, {nullptr, nullptr, "2", 62, 27, NS, true, true}, {nullptr, nullptr, "3", 74, 27, NS, true, true}, {nullptr, nullptr, "4", 86, 27, NS, true, true}, {nullptr, nullptr, "5", 98, 27, NS, true, true}, {nullptr, nullptr, "6", 110, 27, NS, true, true}, {nullptr, nullptr, "7", 122, 27, NS, true, true}, {nullptr, nullptr, "8", 134, 27, NS, true, true}, {nullptr, nullptr, "9", 146, 27, NS, true, true}, {nullptr, nullptr, "0", 158, 27, NS, true, true}, {nullptr,  "-", "minus", 170, 27, NS, true, true}, {nullptr,  "=", "equal", 182, 27, NS, true, true}, {nullptr,  "¥", "yen", 194, 27, NS, true, true}, {nullptr,  "Backspace", "bspace", 200, 27, 24, 12, true, true}, {nullptr,  "Insert", "ins", 222, 27, NS, true, true}, {nullptr,  "Home", "home", 234, 27, NS, true, true}, {nullptr,  "Page Up", "pgup", 246, 27, NS, true, true}, {nullptr,  "Num Lock", "numlock", 261, 27, NS, true, true}, {nullptr,  "NumPad /", "numslash", 273, 27, NS, true, true}, {nullptr,  "NumPad *", "numstar", 285, 27, NS, true, true}, {nullptr,  "NumPad -", "numminus", 297, 27, NS, true, true},
+    {nullptr, nullptr, "g7", 0, 39, NS, true, true}, {nullptr, nullptr, "g8", 11, 39, NS, true, true}, {nullptr, nullptr, "g9", 22, 39, NS, true, true}, {nullptr,  "Tab", "tab", 41, 39, 18, 12, true, true}, {nullptr, nullptr, "q", 56, 39, NS, true, true}, {nullptr, nullptr, "w", 68, 39, NS, true, true}, {nullptr, nullptr, "e", 80, 39, NS, true, true}, {nullptr, nullptr, "r", 92, 39, NS, true, true}, {nullptr, nullptr, "t", 104, 39, NS, true, true}, {nullptr, nullptr, "y", 116, 39, NS, true, true}, {nullptr, nullptr, "u", 128, 39, NS, true, true}, {nullptr, nullptr, "i", 140, 39, NS, true, true}, {nullptr, nullptr, "o", 152, 39, NS, true, true}, {nullptr, nullptr, "p", 164, 39, NS, true, true}, {nullptr,  "[", "lbrace", 176, 39, NS, true, true}, {nullptr,  "]", "rbrace", 188, 39, NS, true, true}, {nullptr,  "\\", "bslash", 203, 39, 18, 12, true, true}, {nullptr,  "Enter", "enter", 203, 45, 18, 24, true, true}, {nullptr,  "Delete", "del", 222, 39, NS, true, true}, {nullptr,  "End", "end", 234, 39, NS, true, true}, {nullptr,  "Page Down", "pgdn", 246, 39, NS, true, true}, {nullptr,  "NumPad 7", "num7", 261, 39, NS, true, true}, {nullptr,  "NumPad 8", "num8", 273, 39, NS, true, true}, {nullptr,  "NumPad 9", "num9", 285, 39, NS, true, true}, {nullptr,  "NumPad +", "numplus", 297, 45, 12, 24, true, true},
+    {nullptr, nullptr, "g10", 0, 50, NS, true, true}, {nullptr, nullptr, "g11", 11, 50, NS, true, true}, {nullptr, nullptr, "g12", 22, 50, NS, true, true}, {nullptr,  "Caps Lock", "caps", 42, 51, 20, 12, true, true}, {nullptr, nullptr, "a", 59, 51, NS, true, true}, {nullptr, nullptr, "s", 71, 51, NS, true, true}, {nullptr, nullptr, "d", 83, 51, NS, true, true}, {nullptr, nullptr, "f", 95, 51, NS, true, true}, {nullptr, nullptr, "g", 107, 51, NS, true, true}, {nullptr, nullptr, "h", 119, 51, NS, true, true}, {nullptr, nullptr, "j", 131, 51, NS, true, true}, {nullptr, nullptr, "k", 143, 51, NS, true, true}, {nullptr, nullptr, "l", 155, 51, NS, true, true}, {nullptr,  ";", "colon", 167, 51, NS, true, true}, {nullptr,  "'", "quote", 179, 51, NS, true, true}, {nullptr,  "#", "hash", 191, 51, NS, true, true}, {nullptr,  "NumPad 4", "num4", 261, 51, NS, true, true}, {nullptr,  "NumPad 5", "num5", 273, 51, NS, true, true}, {nullptr,  "NumPad 6", "num6", 285, 51, NS, true, true},
+    {nullptr, nullptr, "g13", 0, 64, NS, true, true}, {nullptr, nullptr, "g14", 11, 64, NS, true, true}, {nullptr, nullptr, "g15", 22, 64, NS, true, true}, {nullptr,  "Left Shift", "lshift", 39, 63, 14, 12, true, true}, {"bslash", "\\", "bslash_iso", 53, 63, NS, true, true}, {nullptr, nullptr, "z", 65, 63, NS, true, true}, {nullptr, nullptr, "x", 77, 63, NS, true, true}, {nullptr, nullptr, "c", 89, 63, NS, true, true}, {nullptr, nullptr, "v", 101, 63, NS, true, true}, {nullptr, nullptr, "b", 113, 63, NS, true, true}, {nullptr, nullptr, "n", 125, 63, NS, true, true}, {nullptr, nullptr, "m", 137, 63, NS, true, true}, {nullptr,  ",", "comma", 149, 63, NS, true, true}, {nullptr,  ".", "dot", 161, 63, NS, true, true}, {nullptr,  "/", "slash", 173, 63, NS, true, true}, {nullptr,  "_", "ro", 185, 63, NS, true, true}, {nullptr,  "Right Shift", "rshift", 196, 63, 32, 12, true, true}, {nullptr,  "Up", "up", 234, 63, NS, true, true}, {nullptr,  "NumPad 1", "num1", 261, 63, NS, true, true}, {nullptr,  "NumPad 2", "num2", 273, 63, NS, true, true}, {nullptr,  "NumPad 3", "num3", 285, 63, NS, true, true}, {nullptr,  "NumPad Enter", "numenter", 297, 69, 12, 24, true, true},
+    {nullptr, nullptr, "g16", 0, 75, NS, true, true}, {nullptr, nullptr, "g17", 11, 75, NS, true, true}, {nullptr, nullptr, "g18", 22, 75, NS, true, true}, {nullptr,  "Left Ctrl", "lctrl", 40, 75, 16, 12, true, true}, {nullptr,  "Left Windows", "lwin", 54, 75, NS, true, true}, {nullptr,  "Left Alt", "lalt", 67, 75, 14, 12, true, true}, {nullptr,  "無変換", "muhenkan", 80, 75, NS, true, true}, {nullptr,  "Space", "space", 116, 75, 84, 12, true, true}, {nullptr,  "変換", "henkan", 150, 75, NS, true, true}, {nullptr,  "ひらがな カタカナ ローマ字", "katahira", 162, 75, NS, true, true}, {nullptr,  "Right Alt", "ralt", 165, 75, 14, 12, true, true}, {nullptr,  "Right Windows", "rwin", 178, 75, NS, true, true}, {nullptr,  "Menu", "rmenu", 190, 75, NS, true, true}, {nullptr,  "Right Ctrl", "rctrl", 204, 75, 16, 12, true, true}, {nullptr,  "Left", "left", 222, 75, NS, true, true}, {nullptr,  "Down", "down", 234, 75, NS, true, true}, {nullptr,  "Right", "right", 246, 75, NS, true, true}, {nullptr,  "NumPad 0", "num0", 267, 75, 24, 12, true, true}, {nullptr,  "NumPad .", "numdot", 285, 75, NS, true, true}
 };
 #define KEYCOUNT_K95 (sizeof(K95Keys) / sizeof(Key))
 
@@ -41,19 +41,19 @@ struct KeyPatch {
 };
 
 static const KeyPatch patchDK[] = {
-    {0, "§", "grave"}, {0, "+", "minus"}, {0, "´", "equal"},
-    {0, "Å", "lbrace"}, {0, "¨", "rbrace"},
-    {0, "Æ", "colon"}, {0, "Ø", "quote"}, {0, "'", "hash"},
-    {0, "<", "bslash_iso"}, {0, "-", "slash"},
+    {nullptr,  "§", "grave"}, {nullptr,  "+", "minus"}, {nullptr,  "´", "equal"},
+    {nullptr,  "Å", "lbrace"}, {nullptr,  "¨", "rbrace"},
+    {nullptr,  "Æ", "colon"}, {nullptr,  "Ø", "quote"}, {nullptr,  "'", "hash"},
+    {nullptr,  "<", "bslash_iso"}, {nullptr,  "-", "slash"},
 };
 
 static const KeyPatch patchEU[] = {
-    {0, "\\ (R)", "hash"},
-    {0, "\\ (L)", "bslash_iso"},
+    {nullptr,  "\\ (R)", "hash"},
+    {nullptr,  "\\ (L)", "bslash_iso"},
 };
 
 static const KeyPatch patchFR[] = {
-    {"sup2", "²", "grave"}, {0, "&", "1"}, {0, "É", "2"}, {0, "\"", "3"}, {0, "'", "4"}, {0, "(", "5"}, {0, "-", "6"}, {0, "È", "7"}, {0, "_", "8"}, {0, "Ç", "9"}, {0, "À", "0"}, {"rparen", ")", "minus"},
+    {"sup2", "²", "grave"}, {nullptr,  "&", "1"}, {nullptr,  "É", "2"}, {nullptr,  "\"", "3"}, {nullptr,  "'", "4"}, {nullptr,  "(", "5"}, {nullptr,  "-", "6"}, {nullptr,  "È", "7"}, {nullptr,  "_", "8"}, {nullptr,  "Ç", "9"}, {nullptr,  "À", "0"}, {"rparen", ")", "minus"},
     {"a", "A", "q"}, {"z", "Z", "w"}, {"caret", "^", "lbrace"}, {"dollar", "$", "rbrace"},
     {"q", "Q", "a"}, {"m", "M", "colon"}, {"percent", "Ù", "quote"}, {"star", "*", "hash"},
     {"angle", "<", "bslash_iso"}, {"w", "W", "z"}, {"comma", ",", "m"}, {"semicolon", ";", "comma"}, {"colon", ":", "dot"}, {"exclam", "!", "slash"},
@@ -67,24 +67,24 @@ static const KeyPatch patchDE[] = {
 };
 
 static const KeyPatch patchIT[] = {
-    {0, "\\", "grave"}, {0, "'", "minus"}, {0, "Ì", "equal"},
-    {0, "È", "lbrace"}, {0, "+", "rbrace"},
-    {0, "Ò", "colon"}, {0, "À", "quote"}, {0, "Ù", "hash"},
-    {0, "<", "bslash_iso"}, {0, "-", "slash"},
+    {nullptr,  "\\", "grave"}, {nullptr,  "'", "minus"}, {nullptr,  "Ì", "equal"},
+    {nullptr,  "È", "lbrace"}, {nullptr,  "+", "rbrace"},
+    {nullptr,  "Ò", "colon"}, {nullptr,  "À", "quote"}, {nullptr,  "Ù", "hash"},
+    {nullptr,  "<", "bslash_iso"}, {nullptr,  "-", "slash"},
 };
 
 static const KeyPatch patchNO[] = {
-    {0, "§", "grave"}, {0, "+", "minus"}, {0, "´", "equal"},
-    {0, "Å", "lbrace"}, {0, "¨", "rbrace"},
-    {0, "Ø", "colon"}, {0, "Æ", "quote"}, {0, "'", "hash"},
-    {0, "<", "bslash_iso"}, {0, "-", "slash"},
+    {nullptr,  "§", "grave"}, {nullptr,  "+", "minus"}, {nullptr,  "´", "equal"},
+    {nullptr,  "Å", "lbrace"}, {nullptr,  "¨", "rbrace"},
+    {nullptr,  "Ø", "colon"}, {nullptr,  "Æ", "quote"}, {nullptr,  "'", "hash"},
+    {nullptr,  "<", "bslash_iso"}, {nullptr,  "-", "slash"},
 };
 
 static const KeyPatch patchMX[] = {
-    {0, "|", "grave"}, {0, "'", "minus"}, {0, "¿", "equal"},
-    {0, "´", "lbrace"}, {0, "+", "rbrace"},
-    {0, "Ñ", "colon"}, {0, "{", "quote"}, {0, "}", "hash"},
-    {0, "<", "bslash_iso"}, {0, "-", "slash"},
+    {nullptr,  "|", "grave"}, {nullptr,  "'", "minus"}, {nullptr,  "¿", "equal"},
+    {nullptr,  "´", "lbrace"}, {nullptr,  "+", "rbrace"},
+    {nullptr,  "Ñ", "colon"}, {nullptr,  "{", "quote"}, {nullptr,  "}", "hash"},
+    {nullptr,  "<", "bslash_iso"}, {nullptr,  "-", "slash"},
 };
 
 static const KeyPatch patchPTBR[] = {
@@ -114,10 +114,10 @@ static const KeyPatch patchSE[] = {
 };*/
 
 static const KeyPatch patchDvorak[] = {
-    {0, "[", "minus"}, {0, "]", "equal"},
-    {0, "'", "q"}, {0, ",", "w"}, {0, ".", "e"}, {0, "P", "r"}, {0, "Y", "t"}, {0, "F", "y"}, {0, "G", "u"}, {0, "C", "i"}, {0, "R", "o"}, {0, "L", "p"}, {0, "/", "lbrace"}, {0, "=", "rbrace"},
-    {0, "O", "s"}, {0, "E", "d"}, {0, "U", "f"}, {0, "I", "g"}, {0, "D", "h"}, {0, "H", "j"}, {0, "T", "k"}, {0, "N", "l"}, {0, "S", "colon"}, {0, "-", "quote"},
-    {0, ";", "z"}, {0, "Q", "x"}, {0, "J", "c"}, {0, "K", "v"}, {0, "X", "b"}, {0, "B", "n"}, {0, "W", "comma"}, {0, "V", "dot"}, {0, "Z", "slash"},
+    {nullptr,  "[", "minus"}, {nullptr,  "]", "equal"},
+    {nullptr,  "'", "q"}, {nullptr,  ",", "w"}, {nullptr,  ".", "e"}, {nullptr,  "P", "r"}, {nullptr,  "Y", "t"}, {nullptr,  "F", "y"}, {nullptr,  "G", "u"}, {nullptr,  "C", "i"}, {nullptr,  "R", "o"}, {nullptr,  "L", "p"}, {nullptr,  "/", "lbrace"}, {nullptr,  "=", "rbrace"},
+    {nullptr,  "O", "s"}, {nullptr,  "E", "d"}, {nullptr,  "U", "f"}, {nullptr,  "I", "g"}, {nullptr,  "D", "h"}, {nullptr,  "H", "j"}, {nullptr,  "T", "k"}, {nullptr,  "N", "l"}, {nullptr,  "S", "colon"}, {nullptr,  "-", "quote"},
+    {nullptr,  ";", "z"}, {nullptr,  "Q", "x"}, {nullptr,  "J", "c"}, {nullptr,  "K", "v"}, {nullptr,  "X", "b"}, {nullptr,  "B", "n"}, {nullptr,  "W", "comma"}, {nullptr,  "V", "dot"}, {nullptr,  "Z", "slash"},
 };
 
 // Apply a patch to a key map
@@ -243,24 +243,24 @@ static inline void patchABNT2(QHash<QString, Key>& map){
 
 
 static const Key K68TopRow[] = {
-    {0, "Volume Down", "voldn", 285 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 297 - K70_X_START, 0, 13, 8, true, true},
+    {nullptr,  "Volume Down", "voldn", 285 - K70_X_START, 0, 13, 8, true, true}, {nullptr,  "Volume Up", "volup", 297 - K70_X_START, 0, 13, 8, true, true},
 };
 #define K68_TOP_COUNT (sizeof(K68TopRow) / sizeof(Key))
 
 static const Key K65TopRow[] = {
-    {0, "Brightness", "light", 164 - K70_X_START, 0, 12, 12, true, true}, {0, "Mute", "mute", 176 - K70_X_START, 0, 12, 12, true, true}, {0, "Volume Down", "voldn", 192 - K70_X_START, 0, 14, 8, true, true}, {0, "Volume Up", "volup", 205 - K70_X_START, 0, 14, 8, true, true}, {0, "Windows Lock", "lock", 222 - K70_X_START, 0, 12, 12, true, true}
+    {nullptr,  "Brightness", "light", 164 - K70_X_START, 0, 12, 12, true, true}, {nullptr,  "Mute", "mute", 176 - K70_X_START, 0, 12, 12, true, true}, {nullptr,  "Volume Down", "voldn", 192 - K70_X_START, 0, 14, 8, true, true}, {nullptr,  "Volume Up", "volup", 205 - K70_X_START, 0, 14, 8, true, true}, {nullptr,  "Windows Lock", "lock", 222 - K70_X_START, 0, 12, 12, true, true}
 };
 #define K65_TOP_COUNT (sizeof(K65TopRow) / sizeof(Key))
 
 static const Key K63TopRow[] = {
-    {0, "Stop", "stop", K70_X_START - 37, 0, 12, 8, true, true}, {0, "Previous", "prev", K70_X_START - 26, 0, 12, 8, true, true}, {0, "Play/Pause", "play", K70_X_START - 15, 0, 12, 8, true, true}, {0, "Next", "next", K70_X_START - 4, 0, 12, 8, true, true}, {0, "Brightness", "light", 170 - K70_X_START, 0, 12, 12, true, true}, {0, "Windows Lock", "lock", 180 - K70_X_START, 0, 12, 12, true, true}, {0, "Mute", "mute", 222 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Down", "voldn", 234 - K70_X_START, 0, 13, 8, true, true}, {0, "Volume Up", "volup", 246 - K70_X_START, 0, 13, 8, true, true}
+    {nullptr,  "Stop", "stop", K70_X_START - 37, 0, 12, 8, true, true}, {nullptr,  "Previous", "prev", K70_X_START - 26, 0, 12, 8, true, true}, {nullptr,  "Play/Pause", "play", K70_X_START - 15, 0, 12, 8, true, true}, {nullptr,  "Next", "next", K70_X_START - 4, 0, 12, 8, true, true}, {nullptr,  "Brightness", "light", 170 - K70_X_START, 0, 12, 12, true, true}, {nullptr,  "Windows Lock", "lock", 180 - K70_X_START, 0, 12, 12, true, true}, {nullptr,  "Mute", "mute", 222 - K70_X_START, 0, 13, 8, true, true}, {nullptr,  "Volume Down", "voldn", 234 - K70_X_START, 0, 13, 8, true, true}, {nullptr,  "Volume Up", "volup", 246 - K70_X_START, 0, 13, 8, true, true}
 };
 #define K63_TOP_COUNT (sizeof(K63TopRow) / sizeof(Key))
 
 static const Key K55Zones[] = {
-    {0, "Zone 1", "zone1", 46, 45, ZS, true, false},
-    {0, "Zone 2", "zone2", 140, 45, ZS, true, false},
-    {0, "Zone 3", "zone3", 233, 45, ZS, true, false},
+    {nullptr,  "Zone 1", "zone1", 46, 45, ZS, true, false},
+    {nullptr,  "Zone 2", "zone2", 140, 45, ZS, true, false},
+    {nullptr,  "Zone 3", "zone3", 233, 45, ZS, true, false},
 };
 #define K55_ZONES (sizeof(K55Zones) / sizeof(Key))
 
@@ -271,19 +271,19 @@ static const Key K55Zones[] = {
 #define KSTRAFE_HEIGHT      K95_HEIGHT
 
 static const Key KStrafeKeys[] = {
-    {0, "Sidelight", "lsidel", 0, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT, true, false},
-    {0, "Sidelight", "rsidel", KSTRAFE_WIDTH, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT, true, false},
-    {0, "Logo", "logo", KSTRAFE_X_START, 0, NS, true, false},
-    {0, "Function", "fn", 152, 75, NS, true, true}
+    {nullptr,  "Sidelight", "lsidel", 0, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT, true, false},
+    {nullptr,  "Sidelight", "rsidel", KSTRAFE_WIDTH, KSTRAFE_HEIGHT/2, KSTRAFE_X_START, KSTRAFE_HEIGHT, true, false},
+    {nullptr,  "Logo", "logo", KSTRAFE_X_START, 0, NS, true, false},
+    {nullptr,  "Function", "fn", 152, 75, NS, true, true}
 };
 
 // Mouse map - M65
 static const Key M65Keys[] = {
-    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
-    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "Wheel Light", "front", 22, 15, 8, 8, true, false},
-    {0, "DPI Up", "dpiup", 22, 19, 8, 6, false, true}, {0, "DPI Light", "dpi", 22, 24, 8, 8, true, false}, {0, "DPI Down", "dpidn", 22, 31, 8, 6, false, true},
-    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper", "sniper", 0, 25, 5, 15, false, true},
-    {0, "Logo", "back", 14, 55, 24, 12, true, false}
+    {nullptr,  "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {nullptr,  "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {nullptr,  "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
+    {nullptr,  "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {nullptr,  "Wheel Light", "front", 22, 15, 8, 8, true, false},
+    {nullptr,  "DPI Up", "dpiup", 22, 19, 8, 6, false, true}, {nullptr,  "DPI Light", "dpi", 22, 24, 8, 8, true, false}, {nullptr,  "DPI Down", "dpidn", 22, 31, 8, 6, false, true},
+    {nullptr,  "Forward", "mouse5", 5, 24, 5, 9, false, true}, {nullptr,  "Back", "mouse4", 5, 33, 5, 10, false, true}, {nullptr,  "Sniper", "sniper", 0, 25, 5, 15, false, true},
+    {nullptr,  "Logo", "back", 14, 55, 24, 12, true, false}
 };
 #define KEYCOUNT_M65    (sizeof(M65Keys) / sizeof(Key))
 
@@ -292,11 +292,11 @@ static const Key M65Keys[] = {
 
 // Sabre
 static const Key SabreKeys[] = {
-    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 8, 7, false, true}, {0, "Front light", "front", 8, -2, 14, 8, true, false },
-    {0, "Wheel Up", "wheelup", 22, 5, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 15, 8, 5, false, true}, {0, "Wheel Light", "wheel", 22, 5, 8, 15, true, false}, {0, "Extra button", "thumb1", 22, 20, 8, 18, false, true},
-    {0, "DPI Up", "dpiup", 5, 3, 5, 7, false, true}, {0, "DPI Down", "dpidn", 5, 10, 5, 7, false, true}, {0, "DPI Light", "dpi", 5, 4, 5, 12, true, false},
-    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true},
-    {0, "Logo", "back", 14, 50, 24, 12, true, false}
+    {nullptr,  "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {nullptr,  "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {nullptr,  "Middle Mouse", "mouse3", 22, 9, 8, 7, false, true}, {nullptr,  "Front light", "front", 8, -2, 14, 8, true, false },
+    {nullptr,  "Wheel Up", "wheelup", 22, 5, 8, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 22, 15, 8, 5, false, true}, {nullptr,  "Wheel Light", "wheel", 22, 5, 8, 15, true, false}, {nullptr,  "Extra button", "thumb1", 22, 20, 8, 18, false, true},
+    {nullptr,  "DPI Up", "dpiup", 5, 3, 5, 7, false, true}, {nullptr,  "DPI Down", "dpidn", 5, 10, 5, 7, false, true}, {nullptr,  "DPI Light", "dpi", 5, 4, 5, 12, true, false},
+    {nullptr,  "Forward", "mouse5", 5, 24, 5, 9, false, true}, {nullptr,  "Back", "mouse4", 5, 33, 5, 10, false, true},
+    {nullptr,  "Logo", "back", 14, 50, 24, 12, true, false}
 };
 #define KEYCOUNT_SABRE  (sizeof(SabreKeys) / sizeof(Key))
 
@@ -305,10 +305,10 @@ static const Key SabreKeys[] = {
 
 // Harpoon
 static const Key HarpoonKeys[] = {
-    {0, "Left Mouse", "mouse1", 10, 5, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 30, 5, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 25, 11, 6, 7, false, true},
-    {0, "Wheel Up", "wheelup", 25, 7, 6, 5, false, true}, {0, "Wheel Down", "wheeldn", 25, 17, 6, 5, false, true},
-    {0, "DPI Cycle", "dpiup", 25, 23, 6, 10, false, true}, {0, "Logo Light", "dpi", 18, 40, 20, 20, true, false},
-    {0, "Forward", "mouse5", 3, 24, 5, 10, false, true}, {0, "Back", "mouse4", 3, 33, 5, 10, false, true}
+    {nullptr,  "Left Mouse", "mouse1", 10, 5, 14, 26, false, true}, {nullptr,  "Right Mouse", "mouse2", 30, 5, 14, 26, false, true}, {nullptr,  "Middle Mouse", "mouse3", 25, 11, 6, 7, false, true},
+    {nullptr,  "Wheel Up", "wheelup", 25, 7, 6, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 25, 17, 6, 5, false, true},
+    {nullptr,  "DPI Cycle", "dpiup", 25, 23, 6, 10, false, true}, {nullptr,  "Logo Light", "dpi", 18, 40, 20, 20, true, false},
+    {nullptr,  "Forward", "mouse5", 3, 24, 5, 10, false, true}, {nullptr,  "Back", "mouse4", 3, 33, 5, 10, false, true}
 };
 #define KEYCOUNT_HARPOON  (sizeof(HarpoonKeys) / sizeof(Key))
 
@@ -317,10 +317,10 @@ static const Key HarpoonKeys[] = {
 
 // Glaive
 static const Key GlaiveKeys[] = {
-    {0, "Left Mouse", "mouse1", 17, 3, 14, 18, false, true}, {0, "Right Mouse", "mouse2", 37, 3, 14, 18, false, true}, {0, "Middle Mouse", "mouse3", 31, 9, 7, 7, false, true}, {0, "Front light", "front", 16, -5, 36, 8, true, false },
-    {0, "Wheel Up", "wheelup", 31, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 31, 15, 7, 5, false, true}, {0, "Side Lights", "side", 22, 24, 7, 20, true, false},
-    {0, "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {0, "Logo Light", "back", 24, 43, 20, 20, true, false},
-    {0, "Forward", "mouse5", 15, 22, 5, 11, false, true}, {0, "Back", "mouse4", 15, 32, 5, 11, false, true}
+    {nullptr,  "Left Mouse", "mouse1", 17, 3, 14, 18, false, true}, {nullptr,  "Right Mouse", "mouse2", 37, 3, 14, 18, false, true}, {nullptr,  "Middle Mouse", "mouse3", 31, 9, 7, 7, false, true}, {nullptr,  "Front light", "front", 16, -5, 36, 8, true, false },
+    {nullptr,  "Wheel Up", "wheelup", 31, 5, 7, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 31, 15, 7, 5, false, true}, {nullptr,  "Side Lights", "side", 22, 24, 7, 20, true, false},
+    {nullptr,  "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {nullptr,  "Logo Light", "back", 24, 43, 20, 20, true, false},
+    {nullptr,  "Forward", "mouse5", 15, 22, 5, 11, false, true}, {nullptr,  "Back", "mouse4", 15, 32, 5, 11, false, true}
 };
 #define KEYCOUNT_GLAIVE  (sizeof(GlaiveKeys) / sizeof(Key))
 
@@ -329,37 +329,37 @@ static const Key GlaiveKeys[] = {
 
 // Katar
 static const Key KatarKeys[] = {
-    {0, "Left Mouse", "mouse1", 7, 4, 14, 18, false, true}, {0, "Right Mouse", "mouse2", 28, 4, 14, 18, false, true}, {0, "Middle Mouse", "mouse3", 22, 9, 7, 7, false, true},
-    {0, "Wheel Up", "wheelup", 22, 5, 7, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 15, 7, 5, false, true},
-    {0, "DPI Cycle", "dpiup", 22, 19, 6, 12, false, true}, {0, "Logo Light", "front", 15, 43, 20, 20, true, false},
+    {nullptr,  "Left Mouse", "mouse1", 7, 4, 14, 18, false, true}, {nullptr,  "Right Mouse", "mouse2", 28, 4, 14, 18, false, true}, {nullptr,  "Middle Mouse", "mouse3", 22, 9, 7, 7, false, true},
+    {nullptr,  "Wheel Up", "wheelup", 22, 5, 7, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 22, 15, 7, 5, false, true},
+    {nullptr,  "DPI Cycle", "dpiup", 22, 19, 6, 12, false, true}, {nullptr,  "Logo Light", "front", 15, 43, 20, 20, true, false},
 };
 #define KEYCOUNT_KATAR  (sizeof(KatarKeys) / sizeof(Key))
 
 // Katar PRO XT
 static const Key KatarPROXTKeys[] = {
-    {0, "Left Mouse",       "mouse1",    7,  4, 14, 18, false, true},
-    {0, "Right Mouse",      "mouse2",   28,  4, 14, 18, false, true},
-    {0, "Middle Mouse",     "mouse3",   22,  9,  7,  7, false, true},
-    {0, "Wheel Up",         "wheelup",  22,  5,  7,  5, false, true},
-    {0, "Wheel Down",       "wheeldn",  22, 15,  7,  5, false, true},
-    {0, "DPI Cycle",        "dpiup",    22, 19,  6, 12, false, true},
-    {0, "DPI Wheel Light",  "dpi",      21,  3,  8, 14, true,  false},
-    {0, "Forward",          "mouse5",    3, 24,  5, 10, false, true},
-    {0, "Back",             "mouse4",    3, 33,  5, 10, false, true}
+    {nullptr,  "Left Mouse",       "mouse1",    7,  4, 14, 18, false, true},
+    {nullptr,  "Right Mouse",      "mouse2",   28,  4, 14, 18, false, true},
+    {nullptr,  "Middle Mouse",     "mouse3",   22,  9,  7,  7, false, true},
+    {nullptr,  "Wheel Up",         "wheelup",  22,  5,  7,  5, false, true},
+    {nullptr,  "Wheel Down",       "wheeldn",  22, 15,  7,  5, false, true},
+    {nullptr,  "DPI Cycle",        "dpiup",    22, 19,  6, 12, false, true},
+    {nullptr,  "DPI Wheel Light",  "dpi",      21,  3,  8, 14, true,  false},
+    {nullptr,  "Forward",          "mouse5",    3, 24,  5, 10, false, true},
+    {nullptr,  "Back",             "mouse4",    3, 33,  5, 10, false, true}
 };
 #define KEYCOUNT_KATAR_PROXT  (sizeof(KatarPROXTKeys) / sizeof(Key))
 
 // Scimitar
 static const Key ScimKeys[] = {
-    {0, "Left Mouse", "mouse1", 15, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 37, 0, 12, 32, false, true}, {0, "Middle Mouse", "mouse3", 29, 9, 8, 6, false, true}, {0, "Front light", "front", 37, 0, 12, 8, true, false },
-    {0, "Wheel Up", "wheelup", 29, 3, 8, 6, false, true}, {0, "Wheel Down", "wheeldn", 29, 14, 8, 6, false, true}, {0, "Wheel Light", "wheel", 29, 3, 8, 17, true, false},
-    {0, "DPI Up", "dpiup", 29, 19, 8, 9, false, true}, {0, "DPI Light", "dpi", 8, 12, 8, 4, true, false}, {0, "DPI Down", "dpidn", 29, 28, 8, 9, false, true},
-    {0, "Thumb light", "thumb", 7, 21, 10, 24, true, false},
-    {0, "1", "thumb1", -6, 18, 7, 7, false, true}, {0, "2", "thumb2", 1, 18, 7, 7, false, true}, {0, "3", "thumb3", 8, 18, 7, 7, false, true},
-    {0, "4", "thumb4", -6, 25, 7, 7, false, true}, {0, "5", "thumb5", 1, 25, 7, 7, false, true}, {0, "6", "thumb6", 8, 25, 7, 7, false, true},
-    {0, "7", "thumb7", -6, 32, 7, 7, false, true}, {0, "8", "thumb8", 1, 32, 7, 7, false, true}, {0, "9", "thumb9", 8, 32, 7, 7, false, true},
-    {0, "10", "thumb10", -6, 39, 7, 7, false, true}, {0, "11", "thumb11", 1, 39, 7, 7, false, true}, {0, "12", "thumb12", 8, 39, 7, 7, false, true},
-    {0, "Logo", "back", 21, 50, 24, 16, true, false}
+    {nullptr,  "Left Mouse", "mouse1", 15, 0, 14, 32, false, true}, {nullptr,  "Right Mouse", "mouse2", 37, 0, 12, 32, false, true}, {nullptr,  "Middle Mouse", "mouse3", 29, 9, 8, 6, false, true}, {nullptr,  "Front light", "front", 37, 0, 12, 8, true, false },
+    {nullptr,  "Wheel Up", "wheelup", 29, 3, 8, 6, false, true}, {nullptr,  "Wheel Down", "wheeldn", 29, 14, 8, 6, false, true}, {nullptr,  "Wheel Light", "wheel", 29, 3, 8, 17, true, false},
+    {nullptr,  "DPI Up", "dpiup", 29, 19, 8, 9, false, true}, {nullptr,  "DPI Light", "dpi", 8, 12, 8, 4, true, false}, {nullptr,  "DPI Down", "dpidn", 29, 28, 8, 9, false, true},
+    {nullptr,  "Thumb light", "thumb", 7, 21, 10, 24, true, false},
+    {nullptr,  "1", "thumb1", -6, 18, 7, 7, false, true}, {nullptr,  "2", "thumb2", 1, 18, 7, 7, false, true}, {nullptr,  "3", "thumb3", 8, 18, 7, 7, false, true},
+    {nullptr,  "4", "thumb4", -6, 25, 7, 7, false, true}, {nullptr,  "5", "thumb5", 1, 25, 7, 7, false, true}, {nullptr,  "6", "thumb6", 8, 25, 7, 7, false, true},
+    {nullptr,  "7", "thumb7", -6, 32, 7, 7, false, true}, {nullptr,  "8", "thumb8", 1, 32, 7, 7, false, true}, {nullptr,  "9", "thumb9", 8, 32, 7, 7, false, true},
+    {nullptr,  "10", "thumb10", -6, 39, 7, 7, false, true}, {nullptr,  "11", "thumb11", 1, 39, 7, 7, false, true}, {nullptr,  "12", "thumb12", 8, 39, 7, 7, false, true},
+    {nullptr,  "Logo", "back", 21, 50, 24, 16, true, false}
 };
 #define KEYCOUNT_SCIM   (sizeof(ScimKeys) / sizeof(Key))
 
@@ -368,14 +368,14 @@ static const Key ScimKeys[] = {
 
 // M95
 static const Key M95Keys[] = {
-    {0, "Left Mouse", "mouse1", 42, 6, 14, 26, false, true}, {0, "Right Mouse", "mouse2", 63, 6, 14, 26, false, true}, {0, "Middle Mouse", "mouse3", 55, 8, 8, 7, false, true},
-    {0, "4", "thumb6", 56, 28, 7, 12, false, true},
-    {0, "Wheel Up", "wheelup", 55, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 55, 14, 8, 5, false, true}, {0, "DPI Up (5)", "dpiup", 38, -1, 6, 9, false, true}, {0, "DPI Down (6)", "dpidn", 38, 6, 6, 9, false, true},
-    {0, "Forward (7)", "mouse6", -9, 14, 14, 8, false, true}, {0, "Back (8)", "mouse7", 3, 14, 14, 8, false, true}, {0, "Sniper (14)", "sniper", -6, 20, 8, 14, false, true},
-    {0, "9", "thumb1", 15, 14, 18, 8, false, true}, {0, "15", "thumb7", 15, 20, 10, 22, false, true},
-    {0, "10", "thumb2", 23, 20, 10, 12, false, true},{0, "11", "thumb3", 23, 30, 10, 12, false, true},
-    {0, "12", "thumb4", 15, 40, 18, 8, false, true}, {0, "13", "thumb5", -1, 40, 18, 8, false, true},
-    {0, "Logo", "back", 53, 55, 12, 12, true, false}
+    {nullptr,  "Left Mouse", "mouse1", 42, 6, 14, 26, false, true}, {nullptr,  "Right Mouse", "mouse2", 63, 6, 14, 26, false, true}, {nullptr,  "Middle Mouse", "mouse3", 55, 8, 8, 7, false, true},
+    {nullptr,  "4", "thumb6", 56, 28, 7, 12, false, true},
+    {nullptr,  "Wheel Up", "wheelup", 55, 4, 8, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 55, 14, 8, 5, false, true}, {nullptr,  "DPI Up (5)", "dpiup", 38, -1, 6, 9, false, true}, {nullptr,  "DPI Down (6)", "dpidn", 38, 6, 6, 9, false, true},
+    {nullptr,  "Forward (7)", "mouse6", -9, 14, 14, 8, false, true}, {nullptr,  "Back (8)", "mouse7", 3, 14, 14, 8, false, true}, {nullptr,  "Sniper (14)", "sniper", -6, 20, 8, 14, false, true},
+    {nullptr,  "9", "thumb1", 15, 14, 18, 8, false, true}, {nullptr,  "15", "thumb7", 15, 20, 10, 22, false, true},
+    {nullptr,  "10", "thumb2", 23, 20, 10, 12, false, true},{nullptr,  "11", "thumb3", 23, 30, 10, 12, false, true},
+    {nullptr,  "12", "thumb4", 15, 40, 18, 8, false, true}, {nullptr,  "13", "thumb5", -1, 40, 18, 8, false, true},
+    {nullptr,  "Logo", "back", 53, 55, 12, 12, true, false}
 
 };
 #define KEYCOUNT_M95    (sizeof(M95Keys) / sizeof(Key))
@@ -384,37 +384,37 @@ static const Key M95Keys[] = {
 
 // M55
 static const Key M55Keys[] = {
-    {0, "Left Mouse",       "mouse1",    8,  4, 14, 18, false, true},
-    {0, "Right Mouse",      "mouse2",   31,  4, 14, 18, false, true},
-    {0, "Middle Mouse",     "mouse3",   24,  6,  7,  8, false, true},
-    {0, "Wheel Up",         "wheelup",  24,  3,  7,  5, false, true},
-    {0, "Wheel Down",       "wheeldn",  24, 13,  7,  5, false, true},
-    {0, "DPI Cycle",        "dpiup",    24, 19,  6, 10, false, true},
-    {0, "DPI Light",        "dpi",      23, 15,  8,  6, true,  false},
-    {0, "Forward",          "mouse4",    6, 24,  5, 10, false, true},
-    {0, "Back",             "mouse5",    6, 33,  5, 10, false, true},
-    {0, "Forward (7)",      "mouse6",   43, 24,  5, 10, false, true},
-    {0, "Back (8)",         "mouse7",   43, 33,  5, 10, false, true},
-    {0, "Logo",             "back",     21, 50, 12, 12, true,  false}
+    {nullptr,  "Left Mouse",       "mouse1",    8,  4, 14, 18, false, true},
+    {nullptr,  "Right Mouse",      "mouse2",   31,  4, 14, 18, false, true},
+    {nullptr,  "Middle Mouse",     "mouse3",   24,  6,  7,  8, false, true},
+    {nullptr,  "Wheel Up",         "wheelup",  24,  3,  7,  5, false, true},
+    {nullptr,  "Wheel Down",       "wheeldn",  24, 13,  7,  5, false, true},
+    {nullptr,  "DPI Cycle",        "dpiup",    24, 19,  6, 10, false, true},
+    {nullptr,  "DPI Light",        "dpi",      23, 15,  8,  6, true,  false},
+    {nullptr,  "Forward",          "mouse4",    6, 24,  5, 10, false, true},
+    {nullptr,  "Back",             "mouse5",    6, 33,  5, 10, false, true},
+    {nullptr,  "Forward (7)",      "mouse6",   43, 24,  5, 10, false, true},
+    {nullptr,  "Back (8)",         "mouse7",   43, 33,  5, 10, false, true},
+    {nullptr,  "Logo",             "back",     21, 50, 12, 12, true,  false}
 };
 #define KEYCOUNT_M55    (sizeof(M55Keys) / sizeof(Key))
 
 // K95 Platinum lightbar
 static const Key K95PLbar[] = {
-    {0, 0, "topbar1", 4, -3, LBS, true, false}, {0, 0, "topbar2", 19, -3, LBS, true, false}, {0, 0, "topbar3", 34, -3, LBS, true, false}, {0, 0, "topbar4", 49, -3, LBS, true, false}, {0, 0, "topbar5", 64, -3, LBS, true, false}, {0, 0, "topbar6", 79, -3, LBS, true, false},
-    {0, 0, "topbar7", 94, -3, LBS, true, false}, {0, 0, "topbar8", 109, -3, LBS, true, false}, {0, 0, "topbar9", 124, -3, LBS, true, false}, {0, 0, "topbar10", 139, -3, LBS, true, false}, {0, 0, "topbar11", 154, -3, LBS, true, false}, {0, 0, "topbar12", 169, -3, LBS, true, false},
-    {0, 0, "topbar13", 184, -3, LBS, true, false}, {0, 0, "topbar14", 199, -3, LBS, true, false}, {0, 0, "topbar15", 214, -3, LBS, true, false}, {0, 0, "topbar16", 229, -3, LBS, true, false}, {0, 0, "topbar17", 244, -3, LBS, true, false}, {0, 0, "topbar18", 259, -3, LBS, true, false},
-    {0, 0, "topbar19", 274, -3, LBS, true, false},
+    {nullptr, nullptr, "topbar1", 4, -3, LBS, true, false}, {nullptr, nullptr, "topbar2", 19, -3, LBS, true, false}, {nullptr, nullptr, "topbar3", 34, -3, LBS, true, false}, {nullptr, nullptr, "topbar4", 49, -3, LBS, true, false}, {nullptr, nullptr, "topbar5", 64, -3, LBS, true, false}, {nullptr, nullptr, "topbar6", 79, -3, LBS, true, false},
+    {nullptr, nullptr, "topbar7", 94, -3, LBS, true, false}, {nullptr, nullptr, "topbar8", 109, -3, LBS, true, false}, {nullptr, nullptr, "topbar9", 124, -3, LBS, true, false}, {nullptr, nullptr, "topbar10", 139, -3, LBS, true, false}, {nullptr, nullptr, "topbar11", 154, -3, LBS, true, false}, {nullptr, nullptr, "topbar12", 169, -3, LBS, true, false},
+    {nullptr, nullptr, "topbar13", 184, -3, LBS, true, false}, {nullptr, nullptr, "topbar14", 199, -3, LBS, true, false}, {nullptr, nullptr, "topbar15", 214, -3, LBS, true, false}, {nullptr, nullptr, "topbar16", 229, -3, LBS, true, false}, {nullptr, nullptr, "topbar17", 244, -3, LBS, true, false}, {nullptr, nullptr, "topbar18", 259, -3, LBS, true, false},
+    {nullptr, nullptr, "topbar19", 274, -3, LBS, true, false},
 };
 #define LBARCOUNT_K95P (sizeof(K95PLbar) / sizeof(Key))
 
 // Mouse map - DARK CORE
 static const Key DarkCoreKeys[] = {
-    {0, "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {0, "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {0, "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
-    {0, "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {0, "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {0, "Wheel Light", "wheel", 22, 2, 8, 16, true, false},
-    {0, "DPI Up", "dpiup", 0, 5, 8, 8, false, true}, {0, "DPI Down", "dpidn", 0, 12, 8, 8, false, true},
-    {0, "Forward", "mouse5", 5, 24, 5, 9, false, true}, {0, "Back", "mouse4", 5, 33, 5, 10, false, true}, {0, "Sniper", "sniper", 0, 25, 5, 15, false, true}, {0, "Side light", "side", 0, 24, 10, 24, true, false},
-    {0, "Logo", "back", 0, 48, 48, 12, true, false}, {0, "Profile Switch", "profswitch", 22, 20, 8, 12, false, true}, {0, "DPI", "dpi", 0, 0, 10, 24, true,  false }
+    {nullptr,  "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {nullptr,  "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {nullptr,  "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
+    {nullptr,  "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {nullptr,  "Wheel Light", "wheel", 22, 2, 8, 16, true, false},
+    {nullptr,  "DPI Up", "dpiup", 0, 5, 8, 8, false, true}, {nullptr,  "DPI Down", "dpidn", 0, 12, 8, 8, false, true},
+    {nullptr,  "Forward", "mouse5", 5, 24, 5, 9, false, true}, {nullptr,  "Back", "mouse4", 5, 33, 5, 10, false, true}, {nullptr,  "Sniper", "sniper", 0, 25, 5, 15, false, true}, {nullptr,  "Side light", "side", 0, 24, 10, 24, true, false},
+    {nullptr,  "Logo", "back", 0, 48, 48, 12, true, false}, {nullptr,  "Profile Switch", "profswitch", 22, 20, 8, 12, false, true}, {nullptr,  "DPI", "dpi", 0, 0, 10, 24, true,  false }
 };
 #define KEYCOUNT_DARKCORE    (sizeof(DarkCoreKeys) / sizeof(Key))
 
@@ -423,10 +423,10 @@ static const Key DarkCoreKeys[] = {
 #define POLARIS_H 14, 6
 
 static const Key PolarisZones[] = {
-    {0, "Zone 1", "zone1", 65, 4, POLARIS_V, true, false}, {0, "Zone 2", "zone2", 65, 16, POLARIS_V, true, false}, {0, "Zone 3", "zone3", 65, 28, POLARIS_V, true, false}, {0, "Zone 4", "zone4", 65, 40, POLARIS_V, true, false},
-    {0, "Zone 5", "zone5", 65, 52, POLARIS_V, true, false}, {0, "Zone 6", "zone6", 43, 62, POLARIS_H, true, false}, {0, "Zone 7", "zone7", 31, 62, POLARIS_H, true, false}, {0, "Zone 8", "zone8", 19, 62, POLARIS_H, true, false},
-    {0, "Zone 9", "zone9", 7, 62, POLARIS_H, true, false}, {0, "Zone 10", "zone10", -5, 62, POLARIS_H, true, false}, {0, "Zone 11", "zone11", -19, 52, POLARIS_V, true, false}, {0, "Zone 12", "zone12", -19, 40, POLARIS_V, true, false},
-    {0, "Zone 13", "zone13", -19, 28, POLARIS_V, true, false}, {0, "Zone 14", "zone14", -19, 16, POLARIS_V, true, false}, {0, "Zone 15", "zone15", -19, 4, POLARIS_V, true, false}
+    {nullptr,  "Zone 1", "zone1", 65, 4, POLARIS_V, true, false}, {nullptr,  "Zone 2", "zone2", 65, 16, POLARIS_V, true, false}, {nullptr,  "Zone 3", "zone3", 65, 28, POLARIS_V, true, false}, {nullptr,  "Zone 4", "zone4", 65, 40, POLARIS_V, true, false},
+    {nullptr,  "Zone 5", "zone5", 65, 52, POLARIS_V, true, false}, {nullptr,  "Zone 6", "zone6", 43, 62, POLARIS_H, true, false}, {nullptr,  "Zone 7", "zone7", 31, 62, POLARIS_H, true, false}, {nullptr,  "Zone 8", "zone8", 19, 62, POLARIS_H, true, false},
+    {nullptr,  "Zone 9", "zone9", 7, 62, POLARIS_H, true, false}, {nullptr,  "Zone 10", "zone10", -5, 62, POLARIS_H, true, false}, {nullptr,  "Zone 11", "zone11", -19, 52, POLARIS_V, true, false}, {nullptr,  "Zone 12", "zone12", -19, 40, POLARIS_V, true, false},
+    {nullptr,  "Zone 13", "zone13", -19, 28, POLARIS_V, true, false}, {nullptr,  "Zone 14", "zone14", -19, 16, POLARIS_V, true, false}, {nullptr,  "Zone 15", "zone15", -19, 4, POLARIS_V, true, false}
 };
 #define KEYCOUNT_POLARIS   (sizeof(PolarisZones) / sizeof(Key))
 
@@ -434,36 +434,36 @@ static const Key PolarisZones[] = {
 #define ST100_H 22,6
 
 static const Key ST100Zones[] = {
-    {0, "Zone 1", "zone1", 16, 10, ST100_H, true, false}, {0, "Zone 2", "zone2", 36, 10, ST100_H, true, false}, {0, "Zone 3", "zone3", 52, 30, ST100_V, true, false}, {0, "Zone 4", "zone4", 52, 50, ST100_V, true, false},
-    {0, "Logo", "zone5", 21, -1, NS, true, false}, // Logo
-    {0, "Zone 6", "zone6", 16, 66, ST100_H, true, false}, {0, "Zone 7", "zone7", -4, 50, ST100_V, true, false}, {0, "Zone 8", "zone8", -4, 30, ST100_V, true, false},
-    {0, "Zone 9", "zone9", -4, 10, ST100_H, true, false},
+    {nullptr,  "Zone 1", "zone1", 16, 10, ST100_H, true, false}, {nullptr,  "Zone 2", "zone2", 36, 10, ST100_H, true, false}, {nullptr,  "Zone 3", "zone3", 52, 30, ST100_V, true, false}, {nullptr,  "Zone 4", "zone4", 52, 50, ST100_V, true, false},
+    {nullptr,  "Logo", "zone5", 21, -1, NS, true, false}, // Logo
+    {nullptr,  "Zone 6", "zone6", 16, 66, ST100_H, true, false}, {nullptr,  "Zone 7", "zone7", -4, 50, ST100_V, true, false}, {nullptr,  "Zone 8", "zone8", -4, 30, ST100_V, true, false},
+    {nullptr,  "Zone 9", "zone9", -4, 10, ST100_H, true, false},
 };
 #define KEYCOUNT_ST100     (sizeof(ST100Zones) / sizeof(Key))
 
 // Mouse map - Ironclaw
 static const Key IronclawKeys[] = {
     // primary keys
-    {0, "Left Mouse",    "mouse1",     12,  0, 12, 28, false, true  },
-    {0, "Right Mouse",   "mouse2",     31,  0, 12, 28, false, true  },
+    {nullptr,  "Left Mouse",    "mouse1",     12,  0, 12, 28, false, true  },
+    {nullptr,  "Right Mouse",   "mouse2",     31,  0, 12, 28, false, true  },
 
     // center column keys
-    {0, "Wheel Up",      "wheelup",    23,  3,  8,  7, false, true  },
-    {0, "Middle Mouse",  "mouse3",     23,  7,  8,  6, false, true  },
-    {0, "Wheel Down",    "wheeldn",    23, 12,  8,  7, false, true  },
-    {0, "Profile Cycle", "profswitch", 23, 18,  9,  9, false, true  },
-    {0, "DPI Cycle",     "dpiup",      23, 26,  8,  9, false, true  },
+    {nullptr,  "Wheel Up",      "wheelup",    23,  3,  8,  7, false, true  },
+    {nullptr,  "Middle Mouse",  "mouse3",     23,  7,  8,  6, false, true  },
+    {nullptr,  "Wheel Down",    "wheeldn",    23, 12,  8,  7, false, true  },
+    {nullptr,  "Profile Cycle", "profswitch", 23, 18,  9,  9, false, true  },
+    {nullptr,  "DPI Cycle",     "dpiup",      23, 26,  8,  9, false, true  },
 
     // left side forward/back keys
-    {0, "Forward",    "mouse5",      6, 20,  5, 12, false, true  },
-    {0, "Back",       "mouse4",      7, 32,  5, 12, false, true  },
+    {nullptr,  "Forward",    "mouse5",      6, 20,  5, 12, false, true  },
+    {nullptr,  "Back",       "mouse4",      7, 32,  5, 12, false, true  },
 
     // zones for LEDs
-    {0, "Logo",          "back",       21, 50,  NS,    true,  false },
-    {0, "Wheel",         "wheel",      23, 3,  8,  14, true,  false },
+    {nullptr,  "Logo",          "back",       21, 50,  NS,    true,  false },
+    {nullptr,  "Wheel",         "wheel",      23, 3,  8,  14, true,  false },
 
     // need to add DPI LED, even if not directly configurable for indicator to work
-    {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
+    {nullptr,  "DPI",           "dpi",        10, 10,  8,  8, true,  false }
 
 };
 #define KEYCOUNT_IRONCLAW    (sizeof(IronclawKeys) / sizeof(Key))
@@ -474,27 +474,27 @@ static const Key IronclawKeys[] = {
 // Nightsword
 static const Key NightswordKeys[] = {
     //Primary buttons
-    {0, "Left Mouse", "mouse1", 14, 6, 12, 26, false, true},
-    {0, "Right Mouse", "mouse2", 34, 6, 12, 26, false, true},
-    {0, "Wheel Up", "wheelup",      26, 5, 6, 5, false, true},
-    {0, "Middle Mouse", "mouse3",   26, 10, 6, 5, false, true},
-    {0, "Wheel Down", "wheeldn",    26, 15, 6, 5, false, true},
+    {nullptr,  "Left Mouse", "mouse1", 14, 6, 12, 26, false, true},
+    {nullptr,  "Right Mouse", "mouse2", 34, 6, 12, 26, false, true},
+    {nullptr,  "Wheel Up", "wheelup",      26, 5, 6, 5, false, true},
+    {nullptr,  "Middle Mouse", "mouse3",   26, 10, 6, 5, false, true},
+    {nullptr,  "Wheel Down", "wheeldn",    26, 15, 6, 5, false, true},
     //Lighting zones
-    {0, "Wheel Light", "wheel", 26, 5, 8, 15, true, false},
-    {0, "Front light", "front", 12, -2, 36, 8, true, false },
-    {0, "Logo", "back",         24, 50, 12, 12, true, false},
-    {0, "Back light", "side", 12, 64, 36, 8, true, false }, //Addition; side == bottom, under logo
-    {0, "DPI Light", "dpi",     6, 11, 5, 12, true, false}, // thumb side DPI indicator light
+    {nullptr,  "Wheel Light", "wheel", 26, 5, 8, 15, true, false},
+    {nullptr,  "Front light", "front", 12, -2, 36, 8, true, false },
+    {nullptr,  "Logo", "back",         24, 50, 12, 12, true, false},
+    {nullptr,  "Back light", "side", 12, 64, 36, 8, true, false }, //Addition; side == bottom, under logo
+    {nullptr,  "DPI Light", "dpi",     6, 11, 5, 12, true, false}, // thumb side DPI indicator light
     //DPI keys
-    {0, "DPI Up", "dpiup", 12, 10, 5, 7, false, true},
-    {0, "DPI Down", "dpidn", 12, 18, 5, 7, false, true},
+    {nullptr,  "DPI Up", "dpiup", 12, 10, 5, 7, false, true},
+    {nullptr,  "DPI Down", "dpidn", 12, 18, 5, 7, false, true},
     //Profile keys
-    {0, "Profile Up", "profswitch", 26, 18,  6,  10, false, true  },
-    {0, "Profile Down", "profdn", 26, 26,  6,  10, false, true  },
+    {nullptr,  "Profile Up", "profswitch", 26, 18,  6,  10, false, true  },
+    {nullptr,  "Profile Down", "profdn", 26, 26,  6,  10, false, true  },
     //Thumb keys (extra should be sniper)
-    {0, "Forward", "mouse5", 8, 21, 5, 9, false, true},
-    {0, "Back", "mouse4", 8, 30, 5, 10, false, true},
-    {0, "Sniper", "sniper", 0, 26, 8, 8, false, true}
+    {nullptr,  "Forward", "mouse5", 8, 21, 5, 9, false, true},
+    {nullptr,  "Back", "mouse4", 8, 30, 5, 10, false, true},
+    {nullptr,  "Sniper", "sniper", 0, 26, 8, 8, false, true}
 };
 #define KEYCOUNT_NIGHTSWORD  (sizeof(NightswordKeys) / sizeof(Key))
 
@@ -505,30 +505,30 @@ static const Key NightswordKeys[] = {
 // Mouse map - Ironclaw RGB Wireless
 static const Key IronclawWirelessKeys[] = {
     // primary keys
-    {0, "Left Mouse",   "mouse1",   12,  0, 12, 28, false, true  },
-    {0, "Right Mouse",  "mouse2",   31,  0, 12, 28, false, true  },
+    {nullptr,  "Left Mouse",   "mouse1",   12,  0, 12, 28, false, true  },
+    {nullptr,  "Right Mouse",  "mouse2",   31,  0, 12, 28, false, true  },
 
     // center column keys
-    {0, "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
-    {0, "Middle Mouse",  "mouse3",  23,  7,  8,  6, false, true  },
-    {0, "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
-    {0, "Profile Up",    "profup",  23, 18,  9,  9, false, true  },
-    {0, "Profile Dn",    "profdn",  23, 26,  8,  9, false, true  },
+    {nullptr,  "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
+    {nullptr,  "Middle Mouse",  "mouse3",  23,  7,  8,  6, false, true  },
+    {nullptr,  "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
+    {nullptr,  "Profile Up",    "profup",  23, 18,  9,  9, false, true  },
+    {nullptr,  "Profile Dn",    "profdn",  23, 26,  8,  9, false, true  },
 
     // left side forward/back keys
-    {0, "DPI Up",        "dpiup",    6,  4,  6,  9, false, true  },
-    {0, "DPI Dn",        "dpidn",    6, 10,  6,  9, false, true  },
-    {0, "Forward",      "mouse5",    6, 20,  5, 12, false, true  },
-    {0, "Back",         "mouse4",    7, 32,  5, 12, false, true  },
-    {0, "Opt",          "optbtn",    9, 27,  6,  9, false, true  },
+    {nullptr,  "DPI Up",        "dpiup",    6,  4,  6,  9, false, true  },
+    {nullptr,  "DPI Dn",        "dpidn",    6, 10,  6,  9, false, true  },
+    {nullptr,  "Forward",      "mouse5",    6, 20,  5, 12, false, true  },
+    {nullptr,  "Back",         "mouse4",    7, 32,  5, 12, false, true  },
+    {nullptr,  "Opt",          "optbtn",    9, 27,  6,  9, false, true  },
 
     // zones for LEDs
-    {0, "Front",        "front",     9,  1,  9,  9, true, false  },
-    {0, "Logo",         "back",     21, 50, NS,     true, false  },
-    {0, "Wheel",        "wheel",    23,  3,  8, 14, true, false  },
+    {nullptr,  "Front",        "front",     9,  1,  9,  9, true, false  },
+    {nullptr,  "Logo",         "back",     21, 50, NS,     true, false  },
+    {nullptr,  "Wheel",        "wheel",    23,  3,  8, 14, true, false  },
 
     // need to add DPI LED, even if not directly configurable for indicator to work
-    {0, "DPI",           "dpi",        10, 10,  8,  8, true,  false }
+    {nullptr,  "DPI",           "dpi",        10, 10,  8,  8, true,  false }
 
 };
 #define KEYCOUNT_IRONCLAW_W    (sizeof(IronclawWirelessKeys) / sizeof(Key))
@@ -617,7 +617,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // The K95 Legacy map is based on the K95
         // but with the light program button
         map = getMap(KeyMap::K95, layout);
-        const Key lghtpgm = {0, "Lighting Programming", "lghtpgm", 210, 0, NS, true, true};
+        const Key lghtpgm = {nullptr,  "Lighting Programming", "lghtpgm", 210, 0, NS, true, true};
         map.insert(lghtpgm.name, lghtpgm);
         break;
     }
@@ -657,7 +657,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("m3");
         map.remove("mr");
         // Add profile button
-        map["profswitch"] = {0, "Profile Switch", "profswitch", 64, 1, 11, 8, true, true};
+        map["profswitch"] = {nullptr,  "Profile Switch", "profswitch", 64, 1, 11, 8, true, true};
         // Centre Brightness/Winlock between F1 and F4
         map["light"].x = 75;
         map["lock"].x = 86;
@@ -712,7 +712,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map = getMap(KeyMap::K70, layout);
         // Starting from the right of F2
         // Add profswitch
-        map["profswitch"] = {0, "Profile Switch", "profswitch", 40, 0, 10, 8, true, true};
+        map["profswitch"] = {nullptr,  "Profile Switch", "profswitch", 40, 0, 10, 8, true, true};
 
         map["light"].x = 49;
         map["light"].width = 10;
@@ -723,9 +723,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["lock"].height = 8;
 
         // Add logo1 (m3)
-        map["m3"] = {0, "Logo 1", "m3", 118, 0, NS, true, false};
+        map["m3"] = {nullptr,  "Logo 1", "m3", 118, 0, NS, true, false};
         // Add logo2 (g11)
-        map["g11"] = {0, "Logo 2", "g11", 138, 0, NS, true, false};
+        map["g11"] = {nullptr,  "Logo 2", "g11", 138, 0, NS, true, false};
 
         // Move mute and volup/dn one block to the left
         map["mute"].x -= 10;
@@ -844,8 +844,8 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("rwin");
 
         // Replace volume wheel
-        map["voldn"] = {0, "Volume Down", "voldn", static_cast<short>(map["mute"].x + 12), 0, map["mute"].width, map["mute"].height, true, true};
-        map["volup"] = {0, "Volume Up", "volup", static_cast<short>(map["mute"].x + 24), 0, map["mute"].width, map["mute"].height, true, true};
+        map["voldn"] = {nullptr,  "Volume Down", "voldn", static_cast<short>(map["mute"].x + 12), 0, map["mute"].width, map["mute"].height, true, true};
+        map["volup"] = {nullptr,  "Volume Up", "volup", static_cast<short>(map["mute"].x + 24), 0, map["mute"].width, map["mute"].height, true, true};
 
         // Fix up the G keys
         map.remove("g7");
@@ -1089,7 +1089,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     // Same as M65 but with the wheel zone instead of the front one
     case KeyMap::M65E:{
         map = getMap(KeyMap::M65, layout);
-        map["wheel"] = {0, "Wheel Light", "wheel", map["front"].x, map["front"].y, map["front"].width, map["front"].height, true, false};
+        map["wheel"] = {nullptr,  "Wheel Light", "wheel", map["front"].x, map["front"].y, map["front"].width, map["front"].height, true, false};
         map.remove("front");
         break;
     }
@@ -1146,7 +1146,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["dpiup"]._friendlyName = "DPI Up";
         map["dpiup"].height = 8;
         map["dpiup"].y -= 2;
-        map["dpidn"] = {0, "DPI Down", "dpidn", 34, 29, 6, 8, false, true};
+        map["dpidn"] = {nullptr,  "DPI Down", "dpidn", 34, 29, 6, 8, false, true};
         break;
     }
     case KeyMap::M55:{
@@ -1171,7 +1171,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
 KeyMap::Layout KeyMap::locale(QList<QPair<int, QString>>* layouts){
     setlocale(LC_ALL, "");
-    QString loc = setlocale(LC_CTYPE, 0);
+    QString loc = setlocale(LC_CTYPE, nullptr);
     loc = loc.toLower().replace('_', '-');
 
     KeyMap::Layout layout = KeyMap::NO_LAYOUT;

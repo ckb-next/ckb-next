@@ -16,7 +16,7 @@ class CkbSystemTrayIcon : public QSystemTrayIcon {
 public:
 #ifdef USE_DBUS_MENU
     void setIcon(QIcon icon, QString name);
-    CkbSystemTrayIcon(const QIcon& icon, const QString iconName, QObject* parent = 0);
+    CkbSystemTrayIcon(const QIcon& icon, const QString iconName, QObject* parent = nullptr);
     inline void show() { setStatus(KStatusNotifierItem::Active); }
     inline void hide() { setStatus(KStatusNotifierItem::Passive); }
     inline void setVisible(bool visible) { setStatus((visible ? KStatusNotifierItem::Active : KStatusNotifierItem::Passive)); }
@@ -27,7 +27,7 @@ signals:
 private:
     QString previousPath;
 #else
-    CkbSystemTrayIcon(const QIcon& icon, const QString iconName, QObject* parent = 0) :  QSystemTrayIcon(icon, parent) {}
+    CkbSystemTrayIcon(const QIcon& icon, const QString iconName, QObject* parent = nullptr) :  QSystemTrayIcon(icon, parent) {}
     virtual bool event(QEvent* evt)
     {
         if(evt->type() == QEvent::Wheel) {

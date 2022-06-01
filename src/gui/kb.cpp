@@ -17,9 +17,9 @@ bool Kb::_dither = false, Kb::_mouseAccel = true;
 
 Kb::Kb(QObject *parent, const QString& path) :
     QThread(parent), features(QStringList()), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false), firmware(),
-    batteryTimer(0), batteryIcon(0), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
-    _currentProfile(0), _currentMode(0), _model(KeyMap::NO_MODEL), batteryLevel(0), batteryStatus(BatteryStatus::BATT_STATUS_UNKNOWN),
-    _hwProfile(0), prevProfile(0), prevMode(0),
+    batteryTimer(nullptr), batteryIcon(nullptr), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
+    _currentProfile(nullptr), _currentMode(nullptr), _model(KeyMap::NO_MODEL), batteryLevel(0), batteryStatus(BatteryStatus::BATT_STATUS_UNKNOWN),
+    _hwProfile(nullptr), prevProfile(nullptr), prevMode(nullptr),
     cmd(cmdpath), notifyNumber(1), macroNumber(2), _needsSave(false), _layout(KeyMap::NO_LAYOUT), _maxDpi(0),
     deviceIdleTimer()
 {
@@ -288,7 +288,7 @@ void Kb::load(){
     _needsSave = false;
     CkbSettings settings(prefsPath);
     // Read profiles
-    KbProfile* newCurrentProfile = 0;
+    KbProfile* newCurrentProfile = nullptr;
     QString current = settings.value("CurrentProfile").toString().trimmed().toUpper();
     foreach(QString guid, settings.value("Profiles").toString().split(" ")){
         guid = guid.trimmed().toUpper();
@@ -479,7 +479,7 @@ void Kb::frameUpdate(){
 
 void Kb::deletePrevious(){
     disconnect(prevMode, SIGNAL(destroyed()), this, SLOT(deletePrevious()));
-    prevMode = 0;
+    prevMode = nullptr;
 }
 
 void Kb::hwProfile(KbProfile* newHwProfile){
@@ -494,7 +494,7 @@ void Kb::hwProfile(KbProfile* newHwProfile){
 
 void Kb::deleteHw(){
     disconnect(_hwProfile, SIGNAL(destroyed()), this, SLOT(deleteHw()));
-    _hwProfile = 0;
+    _hwProfile = nullptr;
 }
 
 void Kb::run(){
@@ -572,7 +572,7 @@ void Kb::readNotify(const QString& line){
         // Find the hardware profile in the list of profiles
         QString guid = components[1];
         QString modified = components[2];
-        KbProfile* newProfile = 0;
+        KbProfile* newProfile = nullptr;
         foreach(KbProfile* profile, _profiles){
             if(profile->id().guid == guid){
                 newProfile = profile;
@@ -624,7 +624,7 @@ void Kb::readNotify(const QString& line){
             QString guid = components[3];
             QString modified = components[4];
             // Look for this mode in the hardware profile
-            KbMode* hwMode = 0;
+            KbMode* hwMode = nullptr;
             bool isUpdated = false;
             foreach(KbMode* kbMode, _hwProfile->modes()){
                 if(kbMode->id().guid == guid){

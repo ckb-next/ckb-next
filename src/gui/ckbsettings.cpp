@@ -7,14 +7,14 @@
 #include <ckbnextconfig.h>
 
 // Shared global QSettings object
-static QSettings* _globalSettings = 0;
-static QThread* globalThread = 0;
+static QSettings* _globalSettings = nullptr;
+static QThread* globalThread = nullptr;
 QAtomicInt cacheWritesInProgress(0);
 // Global one-shot settings cache, to avoid reading/writing QSettings constantly
 static QMap<QString, QVariant> globalCache;
 // Mutexes for accessing settings
 QMutex settingsMutex(QMutex::Recursive), settingsCacheMutex(QMutex::Recursive);
-#define lockMutex           QMutexLocker locker(backing == _globalSettings ? &settingsMutex : 0)
+#define lockMutex           QMutexLocker locker(backing == _globalSettings ? &settingsMutex : nullptr)
 #define lockMutexStatic     QMutexLocker locker(&settingsMutex)
 #define lockMutexStatic2    QMutexLocker locker2(&settingsMutex)
 #define lockMutexCache      QMutexLocker locker(&settingsCacheMutex)
@@ -119,8 +119,8 @@ void CkbSettings::cleanUp(){
     globalThread->wait();
     delete globalThread;
     delete _globalSettings;
-    globalThread = 0;
-    _globalSettings = 0;
+    globalThread = nullptr;
+    _globalSettings = nullptr;
 }
 
 CkbSettings::CkbSettings() :

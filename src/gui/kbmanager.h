@@ -30,12 +30,12 @@ public:
 
     // Event timer for the driver. Created during init(). Starts ticking when fps() is called.
     // Use this for animations or other events which need to run at a high frame rate.
-    static inline QTimer* eventTimer()      { return _kbManager ? _kbManager->_eventTimer : 0; }
+    static inline QTimer* eventTimer()      { return _kbManager ? _kbManager->_eventTimer : nullptr; }
     // Sets the frame rate for the event timer
     static void fps(int framerate);
 
     // Timer for scanning the driver/device list. May also be useful for periodic GUI events. Created during init(), always runs at 10FPS.
-    static inline QTimer* scanTimer()       { return _kbManager ? _kbManager->_scanTimer : 0; }
+    static inline QTimer* scanTimer()       { return _kbManager ? _kbManager->_scanTimer : nullptr; }
     inline bool getDeviceTimerDimmed() { for(Kb* kb : _devices) if(kb->currentLight()->isTimerDimmed()) { return true; } return false; }
 
 #ifdef USE_XCB_SCREENSAVER
@@ -65,7 +65,7 @@ private:
     static KbManager* _kbManager;
     static CkbVersionNumber _guiVersion, _daemonVersion;
 
-    explicit KbManager(QObject* parent = 0);
+    explicit KbManager(QObject* parent = nullptr);
 
     QSet<Kb*> _devices;
     QTimer* _eventTimer, *_scanTimer, *_saveTimer;

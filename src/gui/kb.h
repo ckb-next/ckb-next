@@ -89,13 +89,13 @@ public:
     void                            profiles(const QList<KbProfile*>& newProfiles)  { _needsSave = true; _profiles = newProfiles; }
     void                            appendProfile(KbProfile* newProfile)            { _needsSave = true; _profiles.append(newProfile); }
     inline int                      indexOf(KbProfile* profile)                     { return _profiles.indexOf(profile); }
-    inline KbProfile*               find(const QUuid& id)                           { foreach(KbProfile* profile, _profiles) { if(profile->id().guid == id) return profile; } return 0; }
+    inline KbProfile*               find(const QUuid& id)                           { foreach(KbProfile* profile, _profiles) { if(profile->id().guid == id) return profile; } return nullptr; }
 
     // Currently-selected mode
     inline KbMode*  currentMode()   { return _currentMode; }
-    inline KbLight* currentLight()  { return !_currentMode ? 0 : _currentMode->light(); }
-    inline KbBind*  currentBind()   { return !_currentMode ? 0 : _currentMode->bind(); }
-    inline KbPerf*  currentPerf()   { return !_currentMode ? 0 : _currentMode->perf(); }
+    inline KbLight* currentLight()  { return _currentMode ? _currentMode->light() : nullptr; }
+    inline KbBind*  currentBind()   { return _currentMode ? _currentMode->bind() : nullptr; }
+    inline KbPerf*  currentPerf()   { return _currentMode ? _currentMode->perf() : nullptr; }
 
     // Update selection
     void        setCurrentProfile(KbProfile* profile);

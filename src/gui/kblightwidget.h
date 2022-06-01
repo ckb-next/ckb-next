@@ -17,7 +17,7 @@ class KbLightWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit KbLightWidget(QWidget *parent = 0);
+    explicit KbLightWidget(QWidget *parent = nullptr);
     ~KbLightWidget();
 
     void setLight(KbLight* newLight);

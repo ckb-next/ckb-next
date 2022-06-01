@@ -10,7 +10,7 @@ class RListWidget : public QListWidget
 {
     Q_OBJECT
 public:
-    explicit RListWidget(QWidget *parent = 0);
+    explicit RListWidget(QWidget *parent = nullptr);
 
 signals:
     void orderChanged();

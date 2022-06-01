@@ -75,5 +75,10 @@ list(APPEND CKB_NEXT_EXTRA_C_FLAGS
         -Werror=incompatible-pointer-types
     )
 
+set(CKB_NEXT_EXTRA_CXX_FLAGS "")
+list(APPEND CKB_NEXT_EXTRA_CXX_FLAGS
+        -Wzero-as-null-pointer-constant
+    )
+
 string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 string(REPLACE "-O2" "-O3" CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")

@@ -41,7 +41,7 @@ struct Key {
     }
 
     // Convert to bool -> key exists?
-    inline operator bool () const { return name != 0; }
+    inline operator bool () const { return name != nullptr; }
     inline bool operator !() const { return !(bool)*this; }
 };
 
@@ -165,7 +165,7 @@ public:
     inline uint height() const  { return keyHeight; }
 
     // Keys by name
-    inline Key  key(const QString& name) const          { Key empty = {0,0,0,0,0,0,0,0,0}; return _keys.value(name, empty); }
+    inline Key  key(const QString& name) const          { Key empty = {nullptr,nullptr,nullptr,0,0,0,0,0,0}; return _keys.value(name, empty); }
     inline Key  operator[](const QString& name) const   { return key(name); }
     inline bool contains(const QString& name) const     { return _keys.contains(name); }
     // List all key names/values

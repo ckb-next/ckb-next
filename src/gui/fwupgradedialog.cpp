@@ -15,7 +15,7 @@ struct KbId {
 FwUpgradeDialog::FwUpgradeDialog(QWidget* parent, CkbVersionNumber newV, const QByteArray& fwBlob, Kb* device) :
     QDialog(parent),
     ui(new Ui::FwUpgradeDialog),
-    blob(fwBlob), kb(device), evLoop(0), exitSuccess(true)
+    blob(fwBlob), kb(device), evLoop(nullptr), exitSuccess(true)
 {
     ui->setupUi(this);
     ui->curLabel->setText(kb->firmware.app.toString());

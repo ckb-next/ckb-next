@@ -14,7 +14,7 @@ class KeyWidget : public QWidget
     Q_OBJECT
 public:
     // New key widget. rgbMode = true to display colors, false to display key names
-    explicit KeyWidget(QWidget *parent = 0, bool rgbMode = true);
+    explicit KeyWidget(QWidget *parent = nullptr, bool rgbMode = true);
     inline bool     rgbMode()                   { return _rgbMode; }
     inline void     rgbMode(bool newRgbMode)    { _rgbMode = newRgbMode; update(); }
     // For RGB maps, monochrome = true to covert everything to grayscale

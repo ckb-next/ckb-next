@@ -43,5 +43,6 @@ Maintainers reserve the rights to modify and remove issues, pull requests and co
 Please be appreciative, humble and kind to each other.
 
 * IRC chat: `#ckb-next` channel at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next)
+* [Matrix](https://matrix.to/#/#ckb-next:matrix.org): `#ckb-next:matrix.org`
 * Mailing list: [ckb-next@googlegroups.com](https://groups.google.com/forum/#!forum/ckb-next)
 * [GitHub Issues](https://github.com/ckb-next/ckb-next/issues)

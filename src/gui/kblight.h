@@ -48,7 +48,7 @@ public:
     KbAnim*             duplicateAnim(KbAnim* oldAnim);
     const AnimList&     animList()                              { return _animList; }
     void                animList(const AnimList& newAnimList)   { _needsSave = true; _animList = newAnimList; }
-    KbAnim*             findAnim(const QUuid& guid) const       { foreach(KbAnim* anim, _animList) { if(anim->guid() == guid) return anim; } return 0; }
+    KbAnim*             findAnim(const QUuid& guid) const       { foreach(KbAnim* anim, _animList) { if(anim->guid() == guid) return anim; } return nullptr; }
     int                 findAnimIdx(const QUuid& guid) const    { return _animList.indexOf(findAnim(guid)); }
     // Preview animation - temporary animation displayed at the top of the animation list
     void previewAnim(const AnimScript* base, const QStringList& keys, const QMap<QString, QVariant>& preset);

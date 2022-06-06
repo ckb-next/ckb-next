@@ -7,11 +7,11 @@
 const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 
 MPerfWidget::MPerfWidget(QWidget *parent) :
-    QWidget(parent), ui(new Ui::MPerfWidget), perf(0), profile(0), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), colorLink(false), isSetting(false), isDarkCore(false) {
+    QWidget(parent), ui(new Ui::MPerfWidget), perf(nullptr), profile(nullptr), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), colorLink(false), isSetting(false), isDarkCore(false) {
     ui->setupUi(this);
     ui->xyBox->setChecked(!_xyLink);
     // Set up DPI stages
-    stages[0].indicator = ui->iButton0; stages[0].xSlider = ui->xSlider0; stages[0].ySlider = ui->ySlider0; stages[0].xBox = ui->xBox0; stages[0].yBox = ui->yBox0; stages[0].enableCheck = 0;
+    stages[0].indicator = ui->iButton0; stages[0].xSlider = ui->xSlider0; stages[0].ySlider = ui->ySlider0; stages[0].xBox = ui->xBox0; stages[0].yBox = ui->yBox0; stages[0].enableCheck = nullptr;
     stages[1].indicator = ui->iButton1; stages[1].xSlider = ui->xSlider1; stages[1].ySlider = ui->ySlider1; stages[1].xBox = ui->xBox1; stages[1].yBox = ui->yBox1; stages[1].enableCheck = ui->eBox1;
     stages[2].indicator = ui->iButton2; stages[2].xSlider = ui->xSlider2; stages[2].ySlider = ui->ySlider2; stages[2].xBox = ui->xBox2; stages[2].yBox = ui->yBox2; stages[2].enableCheck = ui->eBox2;
     stages[3].indicator = ui->iButton3; stages[3].xSlider = ui->xSlider3; stages[3].ySlider = ui->ySlider3; stages[3].xBox = ui->xBox3; stages[3].yBox = ui->yBox3; stages[3].enableCheck = ui->eBox3;

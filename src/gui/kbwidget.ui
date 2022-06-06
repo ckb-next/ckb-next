@@ -562,14 +562,20 @@
           <string>N/A</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <set>Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
        <item row="7" column="2">
         <widget class="QLabel" name="wlValLabel">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
          <property name="text">
           <string>N/A</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -608,8 +614,14 @@
        </item>
        <item row="6" column="2">
         <widget class="QLabel" name="bldValLabel">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
          <property name="text">
           <string>N/A</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -622,7 +634,7 @@
           <string>N/A</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <set>Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -644,6 +656,9 @@
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByMouse</set>
            </property>
           </widget>
          </item>
@@ -697,8 +712,14 @@
        </item>
        <item row="8" column="2">
         <widget class="QLabel" name="wlBldValLabel">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
          <property name="text">
           <string>N/A</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>

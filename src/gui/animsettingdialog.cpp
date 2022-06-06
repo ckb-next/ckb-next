@@ -19,7 +19,7 @@ static inline int angleFlip(int angle){
 
 AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     QDialog(parent),
-    ui(new Ui::AnimSettingDialog), stopCheck(0), kpStopCheck(0),
+    ui(new Ui::AnimSettingDialog), stopCheck(nullptr), kpStopCheck(nullptr),
     _anim(anim), lastDuration(1.0)
 {
     ui->setupUi(this);
@@ -50,7 +50,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         if(param.type != AnimScript::Param::BOOL && param.type != AnimScript::Param::LABEL)
             ui->settingsGrid->addWidget(new QLabel(param.prefix, this), row, 1);
         // Configure and display main widget
-        QWidget* widget = 0;
+        QWidget* widget = nullptr;
         int colSpan = 1;
         QString postfix = param.postfix;
         switch(param.type){
@@ -103,7 +103,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             QColor color;
             if(val.length() == 8){
                 color = "#" + val.right(6);
-                color.setAlpha(val.left(2).toInt(0, 16));
+                color.setAlpha(val.left(2).toInt(nullptr, 16));
             } else
                 color = "#" + val;
             ((ColorButton*)widget)->color(color);

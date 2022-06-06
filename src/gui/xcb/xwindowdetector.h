@@ -14,7 +14,7 @@ class XWindowDetector : public QThread
     Q_OBJECT
 #ifdef USE_XCB_EWMH
 public:
-    explicit XWindowDetector(QObject *parent = 0);
+    explicit XWindowDetector(QObject* parent = nullptr);
     void terminateEventLoop();
 
 signals:

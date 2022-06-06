@@ -16,15 +16,15 @@ struct UsbId {
     quint32 hwModified; // Last modification value saved to hardware
 
     inline  UsbId(const QString& _guid, quint32 _modified) : guid(_guid), modified(_modified), hwModified(_modified) {}
-    inline  UsbId(const QString& _guid, const QString& _modified) : guid(_guid), modified(_modified.toUInt(0, 16)), hwModified(modified) {}
+    inline  UsbId(const QString& _guid, const QString& _modified) : guid(_guid), modified(_modified.toUInt(nullptr, 16)), hwModified(modified) {}
     inline  UsbId() : guid(QUuid::createUuid()),modified(0) {}
 
     QString guidString() const                          { return guid.toString().toUpper(); }
     void    guidString(const QString& newGuid)          { guid = newGuid; }
     QString modifiedString() const                      { return QString::number(modified, 16); }
-    void    modifiedString(const QString& newModified)  { modified = newModified.toUInt(0, 16); }
+    void    modifiedString(const QString& newModified)  { modified = newModified.toUInt(nullptr, 16); }
     QString hwModifiedString() const                    { return QString::number(hwModified, 16); }
-    void    hwModifiedString(const QString& newModified){ hwModified = newModified.toUInt(0, 16); }
+    void    hwModifiedString(const QString& newModified){ hwModified = newModified.toUInt(nullptr, 16); }
 
     // Generate a new random ID
     void newGuid()                                      { guid = QUuid::createUuid(); }

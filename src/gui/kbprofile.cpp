@@ -3,7 +3,7 @@
 #include <typeinfo>
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const KbProfile& other) :
-    QObject(parent), _currentMode(0), _name(other._name), _usbId(other._usbId), _keyMap(keyMap), _needsSave(true)
+    QObject(parent), _currentMode(nullptr), _name(other._name), _usbId(other._usbId), _keyMap(keyMap), _needsSave(true)
 {
     foreach(KbMode* mode, other.modes()){
         KbMode* newMode = new KbMode(parent, keyMap, *mode);
@@ -14,14 +14,14 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const KbProfile& other) :
 }
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, const QString& guid, const QString& modified) :
-    QObject(parent), _currentMode(0), _usbId(guid, modified.toUInt(0, 16)), _keyMap(keyMap), _needsSave(true)
+    QObject(parent), _currentMode(nullptr), _usbId(guid, modified.toUInt(nullptr, 16)), _keyMap(keyMap), _needsSave(true)
 {
     if(_usbId.guid.isNull())
         _usbId.guid = QUuid::createUuid();
 }
 
 KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings, const QString& guid) :
-    QObject(parent), _currentMode(0), _usbId(guid, 0), _keyMap(keyMap), _needsSave(false)
+    QObject(parent), _currentMode(nullptr), _usbId(guid, 0), _keyMap(keyMap), _needsSave(false)
 {
     // Load data from preferences
     // If we're importing external profiles, then always read the GUID from the first group.

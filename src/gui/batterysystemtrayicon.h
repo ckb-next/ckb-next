@@ -16,7 +16,7 @@ class BatteryStatusTrayIcon : public CkbSystemTrayIcon {
     Q_OBJECT
 
     public:
-        BatteryStatusTrayIcon( QString _name, QObject* parent = 0 )
+        BatteryStatusTrayIcon( QString _name, QObject* parent = nullptr )
                              : CkbSystemTrayIcon(QIcon(":/img/ckb-next-monochrome.png"), "ckb-next-monochrome", parent), name(_name) {
             QMenu* menu = new QMenu();
             QAction* nameAct = new QAction(name);

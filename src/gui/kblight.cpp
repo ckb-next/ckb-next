@@ -9,7 +9,7 @@ static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
-    QObject(parent), _previewAnim(0), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0),
+    QObject(parent), _previewAnim(nullptr), lastFrameSignal(0), _dimming(0), _lastFrameDimming(0),
     _timerOrigDimming(-1), _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false),
     // Init timerDimmed as true in case a new device is initialised before the idle timer ticks to restore the brightness
     _timerDimmed(false)
@@ -18,7 +18,7 @@ KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
-    QObject(parent), _previewAnim(0), _map(other._map), _qColorMap(other._qColorMap),
+    QObject(parent), _previewAnim(nullptr), _map(other._map), _qColorMap(other._qColorMap),
     lastFrameSignal(0), _dimming(other._dimming), _lastFrameDimming(other._lastFrameDimming), _timerOrigDimming(-1),
     _start(false), _needsSave(true), _needsMapRefresh(true), _forceFrame(false),
     _timerDimmed(false)
@@ -150,7 +150,7 @@ void KbLight::previewAnim(const AnimScript* base, const QStringList& keys, const
 
 void KbLight::stopPreview(){
     delete _previewAnim;
-    _previewAnim = 0;
+    _previewAnim = nullptr;
 }
 
 KbAnim* KbLight::duplicateAnim(KbAnim* oldAnim){

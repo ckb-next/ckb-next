@@ -7,7 +7,7 @@ class ColorButton : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit ColorButton(QWidget* parent = 0, bool allowAlpha = false);
+    explicit ColorButton(QWidget* parent = nullptr, bool allowAlpha = false);
 
     // Current color
     inline const QColor&    color() const                   { return _color; }

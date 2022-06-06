@@ -14,7 +14,7 @@ class CkbUpdaterDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CkbUpdaterDialog(const QString& ver,  const QString& changelog, QWidget *parent = 0);
+    explicit CkbUpdaterDialog(const QString& ver,  const QString& changelog, QWidget *parent = nullptr);
     ~CkbUpdaterDialog();
 
 private slots:

@@ -17,7 +17,7 @@ RListWidget::RListWidget(QWidget *parent) :
 
 void RListWidget::timerTick(){
     bool reordered = false;
-    QListWidgetItem* reselect = 0;
+    QListWidgetItem* reselect = nullptr;
     QList<QVariant> newItems;
     // Scan the item list to see if they changed
     int c = count();

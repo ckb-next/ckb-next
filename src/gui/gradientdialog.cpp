@@ -153,7 +153,7 @@ void GradientDialog::setPreset(const QString &newPreset){
         return;
     if(newPreset == ""){
         ui->presetList->clearSelection();
-        ui->presetList->setCurrentItem(0);
+        ui->presetList->setCurrentItem(nullptr);
         Preset current = presets.value(currentPreset);
         QString curName = ui->presetName->text().trimmed();
         if(curName == "" || (curName == current.name && current.builtIn))

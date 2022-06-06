@@ -15,7 +15,7 @@ class KbBindWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit KbBindWidget(QWidget *parent = 0);
+    explicit KbBindWidget(QWidget *parent = nullptr);
     ~KbBindWidget();
 
     void setBind(KbBind* newBind, KbProfile* newProfile);

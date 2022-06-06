@@ -7,7 +7,7 @@ class GradientButton : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit GradientButton(QWidget* parent = 0, bool allowAlpha = false);
+    explicit GradientButton(QWidget* parent = nullptr, bool allowAlpha = false);
 
     void    fromString(const QString& string);
     QString toString() const;

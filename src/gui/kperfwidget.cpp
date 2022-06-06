@@ -14,14 +14,14 @@ KPerfWidget::KPerfWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     // Set up indicators
-    indicators[0].enable = 0; indicators[0].hwEnable = ui->numBox; indicators[0].color1 = ui->numColorOn; indicators[0].color2 = ui->numColorOff; indicators[0].color3 = 0;
-    indicators[1].enable = 0; indicators[1].hwEnable = ui->capsBox; indicators[1].color1 = ui->capsColorOn; indicators[1].color2 = ui->capsColorOff; indicators[1].color3 = 0;
-    indicators[2].enable = 0; indicators[2].hwEnable = ui->scrollBox; indicators[2].color1 = ui->scrollColorOn; indicators[2].color2 = ui->scrollColorOff; indicators[2].color3 = 0;
-    indicators[3].enable = ui->modeBox; indicators[3].hwEnable = 0; indicators[3].color1 = ui->modeColorOn; indicators[3].color2 = ui->modeColorOff; indicators[3].color3 = 0;
-    indicators[4].enable = ui->macroBox; indicators[4].hwEnable = 0; indicators[4].color1 = ui->macroColorOn; indicators[4].color2 = ui->macroColorOff; indicators[4].color3 = 0;
-    indicators[5].enable = ui->lightBox; indicators[5].hwEnable = 0; indicators[5].color1 = ui->lightColor1; indicators[5].color2 = ui->lightColor2; indicators[5].color3 = ui->lightColor3;
-    indicators[6].enable = ui->lockBox; indicators[6].hwEnable = 0; indicators[6].color1 = ui->lockColorOn; indicators[6].color2 = ui->lockColorOff; indicators[6].color3 = 0;
-    indicators[7].enable = ui->muteBox; indicators[7].hwEnable = 0; indicators[7].color1 = ui->muteColorOn; indicators[7].color2 = ui->muteColorOff; indicators[7].color3 = ui->muteColorNA;
+    indicators[0].enable= nullptr; indicators[0].hwEnable = ui->numBox; indicators[0].color1 = ui->numColorOn; indicators[0].color2 = ui->numColorOff; indicators[0].color3= nullptr;
+    indicators[1].enable= nullptr; indicators[1].hwEnable = ui->capsBox; indicators[1].color1 = ui->capsColorOn; indicators[1].color2 = ui->capsColorOff; indicators[1].color3= nullptr;
+    indicators[2].enable= nullptr; indicators[2].hwEnable = ui->scrollBox; indicators[2].color1 = ui->scrollColorOn; indicators[2].color2 = ui->scrollColorOff; indicators[2].color3= nullptr;
+    indicators[3].enable = ui->modeBox; indicators[3].hwEnable= nullptr; indicators[3].color1 = ui->modeColorOn; indicators[3].color2 = ui->modeColorOff; indicators[3].color3= nullptr;
+    indicators[4].enable = ui->macroBox; indicators[4].hwEnable= nullptr; indicators[4].color1 = ui->macroColorOn; indicators[4].color2 = ui->macroColorOff; indicators[4].color3= nullptr;
+    indicators[5].enable = ui->lightBox; indicators[5].hwEnable= nullptr; indicators[5].color1 = ui->lightColor1; indicators[5].color2 = ui->lightColor2; indicators[5].color3 = ui->lightColor3;
+    indicators[6].enable = ui->lockBox; indicators[6].hwEnable= nullptr; indicators[6].color1 = ui->lockColorOn; indicators[6].color2 = ui->lockColorOff; indicators[6].color3= nullptr;
+    indicators[7].enable = ui->muteBox; indicators[7].hwEnable= nullptr; indicators[7].color1 = ui->muteColorOn; indicators[7].color2 = ui->muteColorOff; indicators[7].color3 = ui->muteColorNA;
     for(int i = 0; i < I_COUNT; i++){
         indicators[i].color1->setLabel(false);
         indicators[i].color1->bigIcons(true);

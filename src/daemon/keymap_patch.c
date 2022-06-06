@@ -141,7 +141,7 @@ void patchkeys(usbdevice* kb){
         for(int i = 0; i < LED_GENERIC_FIRST; i++) {
             if(!kb->keymap[i].name)
                 continue;
-            if(!strcmp(kb->keymap[i].name, "profswitch") || (IS_DARK_CORE_RGB_PRO(kb) && (!strcmp(kb->keymap[i].name, "profdn")))) {
+            if(!strcmp(kb->keymap[i].name, "profswitch")) {
                 profswitch_kb_idx = i;
                 break;
             }

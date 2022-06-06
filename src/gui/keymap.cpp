@@ -435,7 +435,7 @@ static const Key DarkCoreRgbProKeys[] = {
     {0, "Thumb light",    "thumb",       5, 55,  8,  8, true, false},
     {0, "Side light",     "side",       30, 48,  8,  8, true, false},
     {0, "Logo",           "back",       15, 48, 15, 15, true, false},
-//    {0, "Profile Switch", "mouse6",     19, 19,  8, 12, false, false},
+    {0, "Profile Switch", "profswitch",     19, 19,  8, 12, false, false},
     {0, "DPI",            "dpi",        19, 15,  8, 12, true,  false}
 };
 #define KEYCOUNT_DARKCORERGBPRO    (sizeof(DarkCoreRgbProKeys) / sizeof(Key))
@@ -1530,9 +1530,6 @@ QString KeyMap::getModel(KeyMap::Model model){
 }
 
 KeyMap KeyMap::fromName(const QString &name){
-  QByteArray ba = name.toLocal8Bit();
-  const char *c_str2 = ba.data();
-  printf("str2: %s\n", c_str2);
     QStringList list = name.trimmed().split(" ");
     if(list.length() != 2)
         return KeyMap();

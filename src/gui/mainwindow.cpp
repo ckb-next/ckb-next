@@ -169,10 +169,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QMessageBox dialog;
     dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
 #ifndef Q_OS_MACOS
-    QString daemonDialogText = QString(tr("Start it once with:")) +
+    QString daemonDialogText = tr("Start it once with:") +
     "<blockquote><code>sudo systemctl start ckb-next-daemon</code></blockquote>" +
     tr("Enable it for every boot:") +
-    "<blockquote><code>sudo systemctl enable ckb-next-daemon</code></blockquote>";
+    "<blockquote><code>sudo systemctl enable ckb-next-daemon</code></blockquote><br>" +
+    tr("If \"Unit ckb-next-daemon.service is masked.\", unmask it first and try again:") +
+    "<blockquote><code>sudo systemctl unmask ckb-next-daemon</code></blockquote>";
 #else
     QString daemonDialogText = QString(tr("Start and enable it with:")) +
     "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist</code></blockquote>";

@@ -52,7 +52,11 @@ static int int1_int_none(usbdevice* kb, int dummy){
 static void int0_void_none(usbdevice* kb){
     (void)kb;
 }
-
+static int cmd_pollrate_none(usbdevice* kb, pollrate_t poll){
+    (void)kb;
+    (void)poll;
+    return 0;
+}
 #if 0
 static int cmd_io_stub(usbdevice* kb, void* ptr, int len, int is_recv, const char* file, int line){
     ckb_fatal_fn("This should never be called", file, line);
@@ -169,7 +173,7 @@ const devcmd vtable_keyboard_legacy = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
     .fwupdate = cmd_io_none,
-    .pollrate = cmd_io_none,
+    .pollrate = cmd_pollrate_none,
 
     .active = cmd_io_none,
     .idle = cmd_io_none,
@@ -324,7 +328,7 @@ const devcmd vtable_mousepad = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
     .fwupdate = cmd_fwupdate,
-    .pollrate = cmd_io_none,
+    .pollrate = cmd_pollrate_none,
 
     .active = cmd_active_mouse,
     .idle = cmd_idle_mouse,
@@ -528,7 +532,7 @@ const devcmd vtable_bragi_dongle = {
     .hwload = cmd_io_none,
     .hwsave = cmd_io_none,
     .fwupdate = cmd_io_none,
-    .pollrate = cmd_io_none,
+    .pollrate = cmd_pollrate_none,
 
     .active = cmd_io_none,
     .idle = cmd_io_none,

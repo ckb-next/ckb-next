@@ -310,7 +310,7 @@ static int _mkdevpath(usbdevice* kb){
         // Write the device's features
         // NOTE: Features that have their own files, which can be blank to indicate lack of support should NOT be added here.
         // It is implied that if the file is blank or does not exist, then the feature is not supported.
-        // FIXME: Apply this to pollrate
+        // FIXME: Apply this to pollrate after a few versions (the flag is only kept for backwards compat)
         char fpath[sizeof(path) + 9];
         snprintf(fpath, sizeof(fpath), "%s/features", path);
         FILE* ffile = fopen(fpath, "w");
@@ -407,6 +407,16 @@ static inline void FWtoThreeSegments(FILE* fwfile, uint32_t ver, usbdevice* kb){
         fprintf(fwfile, "%hhu.%hhu", FWBcdToBin(ver >> 8 & 0xFF), FWBcdToBin(ver & 0xFF));
 }
 
+static const char* const pollrate_to_str[POLLRATE_COUNT] = {
+    [POLLRATE_8MS] = "8 ms",
+    [POLLRATE_4MS] = "4 ms",
+    [POLLRATE_2MS] = "2 ms",
+    [POLLRATE_1MS] = "1 ms",
+    [POLLRATE_05MS] = "0.5 ms",
+    [POLLRATE_025MS] = "0.25 ms",
+    [POLLRATE_01MS] = "0.1 ms",
+};
+
 int mkfwnode(usbdevice* kb){
     int index = INDEX_OF(kb, keyboard);
     char fwpath[DEVPATH_LEN + 12];
@@ -443,7 +453,11 @@ int mkfwnode(usbdevice* kb){
     snprintf(ppath, sizeof(ppath), "%s%d/pollrate", devpath, index);
     FILE* pfile = fopen(ppath, "w");
     if(pfile){
-        fprintf(pfile, "%d ms", kb->pollrate);
+        if(kb->pollrate != POLLRATE_UNKNOWN)
+            fputs(pollrate_to_str[kb->pollrate], pfile);
+        fputc('\n', pfile);
+        if(kb->maxpollrate != POLLRATE_UNKNOWN)
+            fputs(pollrate_to_str[kb->maxpollrate], pfile);
         fputc('\n', pfile);
         fclose(pfile);
         check_chmod(ppath, S_GID_READ);

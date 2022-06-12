@@ -22,17 +22,23 @@ int start_mouse_legacy(usbdevice* kb, int makeactive){
     unsigned char pkt3[] = {0x01};
     usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 100, .wValue = 0x0000, .wIndex = 0, .wLength = sizeof(pkt3), .timeout = 5000, .data = pkt3 }), 0, 1);
 
+    // Maybe in the future someone can add the command to get the pollrate
+    // Until then, pretend it's all 1ms
     kb->active = 1;
-    kb->pollrate = -1;
+    kb->maxpollrate = kb->pollrate = POLLRATE_1MS;
     return 0;
 }
 
-int cmd_pollrate_legacy(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3){
-    (void)dummy1;
-    (void)dummy2;
-    (void)dummy3;
+static const uint16_t nxp_and_legacy_pollrate[POLLRATE_COUNT] = {
+    [POLLRATE_8MS] = 8,
+    [POLLRATE_4MS] = 4,
+    [POLLRATE_2MS] = 2,
+    [POLLRATE_1MS] = 1,
+};
 
-    usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 10, .wValue = rate, .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL }), 0, 1);
+
+int cmd_pollrate_legacy(usbdevice* kb, pollrate_t rate){
+    usbsend(kb, (&(ctrltransfer) { .bRequestType = 0x40, .bRequest = 10, .wValue = nxp_and_legacy_pollrate[rate], .wIndex = 0, .wLength = 0, .timeout = 5000, .data = NULL }), 0, 1);
 
     // Device should disconnect+reconnect, but update the poll rate field in case it doesn't
     kb->pollrate = rate;
@@ -88,13 +94,9 @@ int cmd_idle_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const
     return setactive_mouse(kb, 0);
 }
 
-int cmd_pollrate(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3){
-    (void)dummy1;
-    (void)dummy2;
-    (void)dummy3;
-
+int cmd_pollrate(usbdevice* kb, pollrate_t rate){
     uchar msg[MSG_SIZE] = {
-        CMD_SET, FIELD_POLLRATE, 0, 0, (uchar)rate
+        CMD_SET, FIELD_POLLRATE, 0, 0, nxp_and_legacy_pollrate[rate]
     };
     if(!usbsend(kb, msg, sizeof(msg), 1))
         return -1;

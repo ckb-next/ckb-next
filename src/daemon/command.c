@@ -257,9 +257,31 @@ int readcmd(usbdevice* kb, const char* line){
             }
             continue;
         case POLLRATE: {
-            uint rate;
-            if(HAS_FEATURES(kb, FEAT_ADJRATE) && sscanf(word, "%u", &rate) == 1 && (rate == 1 || rate == 2 || rate == 4 || rate == 8))
-                TRY_WITH_RESET(vt->pollrate(kb, mode, notifynumber, rate, 0));
+            if(HAS_FEATURES(kb, FEAT_ADJRATE)){
+                pollrate_t rate;
+                if(!strcmp(word, "8"))
+                    rate = POLLRATE_8MS;
+                else if(!strcmp(word, "4"))
+                    rate = POLLRATE_4MS;
+                else if(!strcmp(word, "2"))
+                    rate = POLLRATE_2MS;
+                else if(!strcmp(word, "1"))
+                    rate = POLLRATE_1MS;
+                else if(!strcmp(word, "0.5"))
+                    rate = POLLRATE_05MS;
+                else if(!strcmp(word, "0.25"))
+                    rate = POLLRATE_025MS;
+                else if(!strcmp(word, "0.1"))
+                    rate = POLLRATE_01MS;
+                else
+                    continue;
+
+                if(rate > kb->maxpollrate){
+                    ckb_err("ckb%d: Poll rate %s ms is not supported by this device", INDEX_OF(kb, keyboard), word);
+                    continue;
+                }
+                TRY_WITH_RESET(vt->pollrate(kb, rate));
+            }
             continue;
         }
         case ERASEPROFILE:

@@ -95,6 +95,11 @@ static inline uint32_t bragi_fwver_bswap(uint32_t fwv){
 }
 
 static int start_bragi_common(usbdevice* kb){
+    kb->usbdelay = 10; // This might not be needed, but won't harm
+    kb->pollrate = POLLRATE_UNKNOWN;
+    // Assume 1 ms unless told otherwise
+    kb->maxpollrate = POLLRATE_1MS;
+
     // Check if we're in HW mode, and if so, switch to software in order to read the properties/handles
     int64_t prop = bragi_get_property(kb, BRAGI_MODE);
     if(prop < 0){
@@ -126,20 +131,15 @@ static int start_bragi_common(usbdevice* kb){
     if(prop >= 0)
         kb->radiobldversion = bragi_fwver_bswap(prop);
 
-    uchar pollrateLUT[5] = {-1};
-    pollrateLUT[BRAGI_POLLRATE_1MS] = 1;
-    pollrateLUT[BRAGI_POLLRATE_2MS] = 2;
-    pollrateLUT[BRAGI_POLLRATE_4MS] = 4;
-    pollrateLUT[BRAGI_POLLRATE_8MS] = 8;
     // Get pollrate
     prop = bragi_get_property(kb, BRAGI_POLLRATE);
+    if(prop >= 0 && prop - 1 < POLLRATE_COUNT)
+        kb->pollrate = prop - 1;
 
-    uchar pollrate = prop;
-    // Silently cap this to 1ms until we add support for faster pollrates
-    if(pollrate > 4)
-        pollrate = 4;
-
-    kb->pollrate = pollrateLUT[pollrate];
+    // Get max pollrate
+    prop = bragi_get_property(kb, BRAGI_MAX_POLLRATE);
+    if(prop >= 0 && prop - 1 < POLLRATE_COUNT)
+        kb->maxpollrate = prop - 1;
 
     kb->features |= FEAT_ADJRATE;
     kb->features &= ~FEAT_HWLOAD;
@@ -232,27 +232,8 @@ int start_dongle_bragi(usbdevice* kb, int makeactive){
     return 0;
 }
 
-static const uchar daemon_pollrate_to_bragi[9] = {
-    1,
-    BRAGI_POLLRATE_1MS,
-    BRAGI_POLLRATE_2MS,
-    1,
-    BRAGI_POLLRATE_4MS,
-    1,
-    1,
-    1,
-    BRAGI_POLLRATE_8MS,
-};
-
-int cmd_pollrate_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int rate, const char* dummy3){
-    (void)dummy1;
-    (void)dummy2;
-    (void)dummy3;
-
-    if(rate > 8 || rate < 0)
-        return 0;
-
-    if(bragi_set_property(kb, BRAGI_POLLRATE, daemon_pollrate_to_bragi[rate]))
+int cmd_pollrate_bragi(usbdevice* kb, pollrate_t rate){
+    if(bragi_set_property(kb, BRAGI_POLLRATE, rate + 1))
         return 1;
 
     kb->pollrate = rate;

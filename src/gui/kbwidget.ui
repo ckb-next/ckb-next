@@ -481,6 +481,21 @@
            </property>
            <item>
             <property name="text">
+             <string notr="true">0.1 ms</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">0.25 ms</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">0.5 ms</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string notr="true">1 ms</string>
             </property>
            </item>

@@ -9,6 +9,24 @@
 #define FW_WRONGDEV -2
 #define FW_USBFAIL  -3
 
+static inline pollrate_t nxp_pollrate(const uchar rate){
+    switch(rate){
+        case 1:
+            return POLLRATE_1MS;
+        case 2:
+            return POLLRATE_2MS;
+        case 4:
+            return POLLRATE_4MS;
+        case 8:
+            return POLLRATE_8MS;
+        default:
+            ckb_err("Invalid NXP pollrate 0x%hhx", rate);
+            // You can set the pollrate to an invalid value and the device will keep the invalid value
+            // Should default to 1ms
+            return POLLRATE_1MS;
+    }
+}
+
 int getfwversion(usbdevice* kb){
     // Ask board for firmware info
     uchar data_pkt[MSG_SIZE] = { CMD_GET, FIELD_IDENT, 0 };
@@ -40,11 +58,8 @@ int getfwversion(usbdevice* kb){
     memcpy(&bootloader, in_pkt + 10, 2);
     memcpy(&vendor, in_pkt + 12, 2);
     memcpy(&product, in_pkt + 14, 2);
-    char poll = in_pkt[16];
-    if(poll <= 0){
-        poll = -1;
-        kb->features &= ~FEAT_POLLRATE;
-    }
+    kb->pollrate = nxp_pollrate(in_pkt[16]);
+
     // Print a warning if the message didn't match the expected data
     if(vendor != kb->vendor)
         ckb_warn("Got vendor ID %04x (expected %04x)", vendor, kb->vendor);
@@ -53,14 +68,10 @@ int getfwversion(usbdevice* kb){
     if(version != kb->fwversion && kb->fwversion != 0)
         ckb_warn("Got firmware version %04x (expected %04x)", version, kb->fwversion);
 
-    // Set firmware version and poll rate
+    // Set firmware version
     kb->fwversion = version;
-    kb->pollrate = poll;
     kb->bldversion = bootloader;
     kb->radioappversion = kb->radiobldversion = UINT32_MAX;
-
-    if(version == 0 || bootloader == 0)
-        kb->pollrate = -1;
 
     // Physical layout detection.
     if (kb->layout == LAYOUT_UNKNOWN) {

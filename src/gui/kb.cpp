@@ -15,8 +15,27 @@ static QMutex notifyPathMutex;
 int Kb::_frameRate = 30, Kb::_scrollSpeed = 0;
 bool Kb::_dither = false, Kb::_mouseAccel = true;
 
+static inline Kb::pollrate_t stringToPollrate(const QString& str){
+    if(str == QLatin1String("8 ms"))
+        return Kb::POLLRATE_8MS;
+    else if(str == QLatin1String("4 ms"))
+        return Kb::POLLRATE_4MS;
+    else if(str == QLatin1String("2 ms"))
+        return Kb::POLLRATE_2MS;
+    else if(str == QLatin1String("1 ms"))
+        return Kb::POLLRATE_1MS;
+    else if(str == QLatin1String("0.5 ms"))
+        return Kb::POLLRATE_05MS;
+    else if(str == QLatin1String("0.25 ms"))
+        return Kb::POLLRATE_025MS;
+    else if(str == QLatin1String("0.1 ms"))
+        return Kb::POLLRATE_01MS;
+    else
+        return Kb::POLLRATE_UNKNOWN;
+}
+
 Kb::Kb(QObject *parent, const QString& path) :
-    QThread(parent), features(QStringList()), pollrate("N/A"), monochrome(false), hwload(false), adjrate(false), firmware(),
+    QThread(parent), features(QStringList()), pollrate(POLLRATE_UNKNOWN), maxpollrate(POLLRATE_UNKNOWN), monochrome(false), hwload(false), adjrate(false), firmware(),
     batteryTimer(nullptr), batteryIcon(nullptr), showBatteryIndicator(false), devpath(path), cmdpath(path + "/cmd"), notifyPath(path + "/notify1"), macroPath(path + "/notify2"),
     _currentProfile(nullptr), _currentMode(nullptr), _model(KeyMap::NO_MODEL), batteryLevel(0), batteryStatus(BatteryStatus::BATT_STATUS_UNKNOWN),
     _hwProfile(nullptr), prevProfile(nullptr), prevMode(nullptr),
@@ -73,10 +92,17 @@ Kb::Kb(QObject *parent, const QString& path) :
             qCritical() << "could not open" << prodpath.fileName();
         }
     }
-    if (features.contains("pollrate") && ppath.open(QIODevice::ReadOnly)){
-        pollrate = ppath.read(100);
-        pollrate = pollrate.trimmed();
+    if (ppath.open(QIODevice::ReadOnly)){
+        QStringList sl = QString(ppath.read(100)).trimmed().split(QLatin1Char('\n'));
         ppath.close();
+        if(sl.length() > 0)
+            pollrate = stringToPollrate(sl.at(0));
+        if(sl.length() > 1)
+            maxpollrate = stringToPollrate(sl.at(1));
+
+        if(pollrate > maxpollrate)
+                maxpollrate = POLLRATE_UNKNOWN;
+
         if(features.contains("adjrate"))
             adjrate = true;
     }

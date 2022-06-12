@@ -30,6 +30,8 @@
 #define BRAGI_DPI1_COLOR    0x30
 #define BRAGI_DPI2_COLOR    0x31
 #define BRAGI_HWLAYOUT      0x41
+// Untested. Only known because CUE complained about it in its logs
+#define BRAGI_MAX_POLLRATE  0x96
 
 // 0x18-0x1A contain the DPI values for DPI0,1,2 0x23-0x28 contain the seperated DPIX and Y values for DPI0,1,2
 

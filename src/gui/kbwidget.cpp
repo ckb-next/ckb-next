@@ -24,6 +24,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
     prevmode(nullptr)
 {
     ui->setupUi(this);
+    Q_ASSERT(ui->pollRateBox->count() == Kb::POLLRATE_COUNT);
     ui->modesList->setDevice(device);
     connect(device, &Kb::profileRenamed, this, &KbWidget::updateProfileList);
     connect(device, &Kb::profileAdded, this, &KbWidget::updateProfileList);
@@ -79,7 +80,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
     }
 
     // Hide poll rate and FW update as appropriate
-    if(!device->features.contains("pollrate")){
+    if(device->pollrate == Kb::POLLRATE_UNKNOWN){
         ui->pollRateBox->hide();
         ui->pollLabel2->hide();
         ui->horizontalLayout_2->removeItem(ui->horizontalSpacer_4);
@@ -91,6 +92,15 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
         ui->fwUpdLabel->hide();
         ui->fwUpdLayout->removeItem(ui->fwUpdLayout->itemAt(1));
     }
+    // Remove unsupported pollrates
+    // Block signals so that the pollrate doesn't change
+    bool block = ui->pollRateBox->blockSignals(true);
+    if(device->maxpollrate != Kb::POLLRATE_UNKNOWN){
+        for(int i = 0; i < (Kb::POLLRATE_COUNT - 1) - device->maxpollrate; i++)
+            ui->pollRateBox->removeItem(0);
+    }
+    ui->pollRateBox->blockSignals(block);
+
     // Remove binding tab if the device doesn't support it
     if(!device->features.contains("bind")){
         ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->bindTab));
@@ -334,19 +344,6 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint& pos){
 #endif
 }
 
-inline int KbWidget::getPollRateBoxIdx(const QString& poll){
-    switch(poll.leftRef(1).toInt()){
-        case 1:
-            return 0;
-        case 2:
-            return 1;
-        case 4:
-            return 2;
-        default: // Includes case 8
-            return 3;
-    }
-}
-
 void KbWidget::devUpdate(){
     // Update device tab
     ui->devLabel->setText(device->usbModel);
@@ -512,7 +509,7 @@ void KbWidget::switchToMode(const QString& mode){
 
 void KbWidget::on_pollRateBox_currentIndexChanged(const QString& arg1) {
     ui->pollRateBox->setEnabled(false);
-    device->setPollRate(arg1.left(1));
+    device->setPollRate(arg1.left(arg1.indexOf(QLatin1String(" ms"))));
 }
 
 // Returns true if a match is found

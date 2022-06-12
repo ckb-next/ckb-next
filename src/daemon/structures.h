@@ -218,6 +218,19 @@ typedef enum protocol_
     PROTO_BRAGI,
 } protocol_t;
 
+typedef enum pollrate_ {
+    POLLRATE_UNKNOWN = -1,
+    POLLRATE_8MS,
+    POLLRATE_4MS,
+    POLLRATE_2MS,
+    POLLRATE_1MS,
+    POLLRATE_05MS,
+    POLLRATE_025MS,
+    POLLRATE_01MS,
+    POLLRATE_COUNT,
+} pollrate_t;
+
+
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN         64
 #define SERIAL_LEN          35
@@ -309,8 +322,8 @@ typedef struct usbdevice_ {
     ushort vendor, product;
     // Firmware version
     uint32_t fwversion, bldversion, radioappversion, radiobldversion;
-    // Poll rate (ms), or -1 if unsupported
-    char pollrate;
+    // Poll rate and max
+    pollrate_t pollrate, maxpollrate;
     // Physical device layout; LAYOUT_NONE if irrelevant, LAYOUT_UNKNOWN if unimplemented.
     uchar layout;
     // USB protocol delay (ms)

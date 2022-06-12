@@ -40,7 +40,20 @@ public:
     QString usbModel, usbSerial;
     // Device information
     QStringList features;
-    QString pollrate;
+
+    enum pollrate_t {
+        POLLRATE_UNKNOWN = -1,
+        POLLRATE_8MS,
+        POLLRATE_4MS,
+        POLLRATE_2MS,
+        POLLRATE_1MS,
+        POLLRATE_05MS,
+        POLLRATE_025MS,
+        POLLRATE_01MS,
+        POLLRATE_COUNT,
+    };
+    pollrate_t pollrate, maxpollrate;
+
     bool monochrome;
     ushort productID;
     bool hwload;

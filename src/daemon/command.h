@@ -3,6 +3,7 @@
 
 typedef struct usbdevice_ usbdevice;
 typedef struct usbmode_ usbmode;
+typedef enum pollrate_ pollrate_t;
 
 // Command operations
 typedef enum {
@@ -74,6 +75,7 @@ typedef void (*cmdhandler)(usbdevice* kb, usbmode* modeidx, int notifyidx, int k
 typedef int (*cmdhandler_io)(usbdevice* kb, usbmode* modeidx, int notifyidx, int keyindex, const char* parameter);  // Command with hardware I/O - returns zero on success
 typedef void (*cmdhandler_mac)(usbdevice* kb, usbmode* modeidx, int notifyidx, const char* keys, const char* assignment); // Macro command has a different left-side handler
 typedef int (*device_io)(usbdevice* kb, void* ptr, int len, int is_recv, const char* file, int line);
+typedef int (*cmdhandler_poll)(usbdevice* kb, pollrate_t rate);
 typedef union devcmd {
     // Commands can be accessed by name or by position
     cmdhandler      do_cmd[CMD_DEV_COUNT];
@@ -86,7 +88,7 @@ typedef union devcmd {
         // firmware.h
         cmdhandler_io fwupdate;
         // device.h
-        cmdhandler_io pollrate;
+        cmdhandler_poll pollrate;
 
         // device.h
         cmdhandler_io active;

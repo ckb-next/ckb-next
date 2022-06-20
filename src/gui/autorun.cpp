@@ -4,6 +4,7 @@
 #include "autorun.h"
 #include "ckbsettings.h"
 #include <QDebug>
+#include <QFileInfo>
 
 // >=0.3.0 (new) paths
 #ifdef Q_OS_LINUX
@@ -30,7 +31,9 @@ static const QString oldSettingPath = "Program/DidLoginItem";
 bool AutoRun::available() {
     // Allow autostart if the program is located in a system path
 #ifdef Q_OS_LINUX
-    return QDir::root().absoluteFilePath(QStandardPaths::findExecutable("ckb-next")) == qApp->applicationFilePath();
+    const QString& fpath = qApp->applicationFilePath();
+    QFileInfo finfo(fpath);
+    return QDir::root().absoluteFilePath(QStandardPaths::findExecutable(finfo.fileName())) == fpath;
 #elif defined(Q_OS_MACOS)
     return qApp->applicationFilePath().startsWith("/Applications/ckb-next.app", Qt::CaseInsensitive);
 #endif

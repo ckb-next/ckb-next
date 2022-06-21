@@ -1,0 +1,155 @@
+---
+inputs:
+  archlinux-build-dependencies:
+    default: >-
+      cmake
+      git
+      libdbusmenu-qt5
+      libpulse
+      libsystemd
+      libxcb
+      make
+      pkgconf
+      qt5-base
+      qt5-tools
+      qt5-x11extras
+      quazip
+      xcb-util-wm
+      zlib
+
+  debian-build-dependencies:
+    default: >-
+      cmake
+      git
+      libdbusmenu-qt5-dev
+      libpulse-dev
+      libqt5x11extras5-dev
+      libquazip5-dev
+      libudev-dev
+      libxcb-ewmh-dev
+      libxcb-screensaver0-dev
+      libxcb1-dev
+      qtbase5-dev
+      qttools5-dev
+      zlib1g-dev
+
+  debian-package-dependencies:
+    default: >-
+      dpkg-dev
+      file
+
+  fedora-build-dependencies:
+    default: >-
+      cmake
+      dbusmenu-qt5-devel
+      git
+      glibc
+      libxcb-devel
+      make
+      pulseaudio-libs-devel
+      qt5-linguist
+      qt5-qtbase-devel
+      qt5-qtx11extras-devel
+      quazip-qt5-devel
+      systemd-devel
+      xcb-util-devel
+      xcb-util-wm-devel
+      zlib-devel
+
+  fedora-package-dependencies:
+    default: >-
+      rpm-build
+
+  rhel-build-dependencies:
+    default: >-
+      cmake3
+      dbusmenu-qt5-devel
+      git
+      glibc
+      libxcb-devel
+      make
+      pulseaudio-libs-devel
+      qt5-linguist
+      qt5-qtbase-devel
+      qt5-qtx11extras-devel
+      quazip-qt5-devel
+      systemd-devel
+      xcb-util-devel
+      xcb-util-wm-devel
+      zlib-devel
+
+  rhel-package-dependencies:
+    default: >-
+      rpm-build
+
+  ubuntu-build-dependencies:
+    default: >-
+      cmake
+      git
+      libdbusmenu-qt5-dev
+      libpulse-dev
+      libqt5x11extras5-dev
+      libquazip5-dev
+      libudev-dev
+      libxcb-ewmh-dev
+      libxcb-screensaver0-dev
+      libxcb1-dev
+      qtbase5-dev
+      qttools5-dev
+      zlib1g-dev
+
+  ubuntu-package-dependencies:
+    default: >-
+      dpkg-dev
+      file
+
+runs:
+  using: composite
+  steps:
+    - name: Install Dependencies (AlmaLinux/Amazon Linux/Rocky Linux)
+      uses: ./.github/actions/dependencies/install/yum
+      with:
+        dependencies: epel-release
+        packages: >-
+          ${{ inputs.rhel-build-dependencies }}
+          ${{ inputs.rhel-package-dependencies }}
+          ${{ matrix.compiler == 'LLVM' && 'clang' || 'gcc gcc-c++' }}
+      if: |
+        startsWith(matrix.image, 'almalinux:') ||
+        startsWith(matrix.image, 'amazonlinux:') ||
+        startsWith(matrix.image, 'rockylinux:')
+
+    - name: Install Dependencies (Arch Linux)
+      uses: ./.github/actions/dependencies/install/pacman
+      with:
+        packages: >-
+          ${{ inputs.archlinux-build-dependencies }}
+          ${{ matrix.compiler == 'LLVM' && 'clang' || 'gcc' }}
+      if: startsWith(matrix.image, 'archlinux:')
+
+    - name: Install Dependencies (Debian)
+      uses: ./.github/actions/dependencies/install/apt-get
+      with:
+        packages: >-
+          ${{ inputs.debian-build-dependencies }}
+          ${{ inputs.debian-package-dependencies }}
+          ${{ matrix.compiler == 'LLVM' && 'clang' || 'g++ gcc' }}
+      if: startsWith(matrix.image, 'debian:')
+
+    - name: Install Dependencies (Fedora)
+      uses: ./.github/actions/dependencies/install/yum
+      with:
+        packages: >-
+          ${{ inputs.fedora-build-dependencies }}
+          ${{ inputs.fedora-package-dependencies }}
+          ${{ matrix.compiler == 'LLVM' && 'clang' || 'gcc gcc-c++' }}
+      if: startsWith(matrix.image, 'fedora:')
+
+    - name: Install Dependencies (Ubuntu)
+      uses: ./.github/actions/dependencies/install/apt-get
+      with:
+        packages: >-
+          ${{ inputs.ubuntu-build-dependencies }}
+          ${{ inputs.ubuntu-package-dependencies }}
+          ${{ matrix.compiler == 'LLVM' && 'clang' || 'g++ gcc' }}
+      if: startsWith(matrix.image, 'ubuntu:')

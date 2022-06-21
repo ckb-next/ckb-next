@@ -1,0 +1,31 @@
+---
+runs:
+  using: composite
+  steps:
+    - name: Create `cpack` symbolic link
+      run: |
+        if ! command -v cpack &> /dev/null && command -v cpack3 &> /dev/null; then
+          ln --symbolic cpack3 /usr/bin/cpack
+        fi
+      shell: bash --noprofile --norc -euxo pipefail {0}
+
+    - name: Use `TGZ` generator
+      run: |
+        echo "CPACK_OPTIONS=-G TGZ" >> ${GITHUB_ENV}
+      shell: bash --noprofile --norc -euxo pipefail {0}
+      if: startsWith(matrix.image, 'archlinux:')
+
+    - name: Use `RPM` generator
+      run: |
+        echo "CPACK_OPTIONS=-G RPM" >> ${GITHUB_ENV}
+      shell: bash --noprofile --norc -euxo pipefail {0}
+      if: |
+        startsWith(matrix.image, 'almalinux:') ||
+        startsWith(matrix.image, 'amazonlinux:') ||
+        startsWith(matrix.image, 'fedora:') ||
+        startsWith(matrix.image, 'rockylinux:')
+
+    - name: Package
+      run: cpack --config CPackConfig.cmake ${CPACK_OPTIONS:-}
+      shell: bash --noprofile --norc -euxo pipefail {0}
+      working-directory: build

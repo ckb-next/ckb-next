@@ -14,7 +14,10 @@ assignees: ''
 - This is not a place for bug reports or feature requests.
 
 ## Required Information
-
+**Issue Title:**</br>
+Device Name - What it is 
+> "K95 Platinum XT - Keyboard"
+</br></br>
 1. What is the name of the device? 
 > "1. K95 Platinum XT"
 2. What is it?

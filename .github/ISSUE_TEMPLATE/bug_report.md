@@ -33,11 +33,11 @@ How did you [install ckb-next](https://github.com/ckb-next/ckb-next/wiki/Linux-I
 ## Required Documents
 **Do not just copy and pase your raw logs into this box.** </br>
 
-Drag a txt file into this window, or use a service like [pastebin](https://pastebin.com/).:
+Drag a txt file into this window, or use a service like [pastebin](https://pastebin.com/).
 
 1. Generated Report, see steps below.
 2. Any additional crash reports or logs that seem relevant.
-###### In the ckb-next GUI, click the `Generate Report` button in the `Settings` tab of the  user interface and attach the generated report to this issue.*
+###### How to generate a report: In the ckb-next GUI, click the `Generate Report` button in the `Settings` tab of the  user interface and attach the generated report to this issue.*
 
 ## ---Delete everything above before you submit.---
 ```

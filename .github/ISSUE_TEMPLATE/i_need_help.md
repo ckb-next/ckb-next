@@ -6,6 +6,8 @@ labels: question
 assignees: ''
 
 ---
+## How to Title:
+> "How do I make my shift key toggle caps lock?
 
 ## Resources
 * IRC chat: #ckb-next channel at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next)
@@ -13,9 +15,6 @@ assignees: ''
 
 ## Required Information
 
-**Issue Title:**
-> "How do I make my shift key toggle caps lock?
-</br></br>
 1. **What do you need help with?** </br>
 *examples:*
 > "1. Installation" </br>

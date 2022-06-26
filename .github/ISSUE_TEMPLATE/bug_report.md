@@ -6,6 +6,10 @@ labels: bug
 assignees: ''
 
 ---
+## How to Title:
+Device Name - Description
+> "K95 Platinum XT - Not Recognised"
+
 ## Due Diligence
 - Check if device is supported [here.](#)
 - Search in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues) for similar bugs.
@@ -14,10 +18,6 @@ assignees: ''
 
 
 ## Required Information
-**Issue Title:**</br>
-Device Name - Description
-> "K95 Platinum XT - Not Recognised"
-</br></br>
 
 1. **What is the name of the device you are using?**
 > "1. K95 Platinum XT"

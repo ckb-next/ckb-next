@@ -6,6 +6,9 @@ labels: new-device
 assignees: ''
 
 ---
+## Issue Title:
+Device Name - What it is 
+> "K95 Platinum XT - Keyboard"
 
 ## Due Diligence
 - Check if device is supported already [here.](#)
@@ -14,16 +17,16 @@ assignees: ''
 - This is not a place for bug reports or feature requests.
 
 ## Required Information
-**Issue Title:**</br>
-Device Name - What it is 
-> "K95 Platinum XT - Keyboard"
-</br></br>
+
 1. What is the name of the device? 
 > "1. K95 Platinum XT"
+
 2. What is it?
 > "2. Keyboard"
+
 3. What is the SKU of the device you are using? Follow [this guide](https://help.corsair.com/hc/en-us/articles/360025378691-Find-a-Serial-Number-or-Lot-Code) to find it.
 > "3. CH-9127414-NA"
+
 4. Link to Corsair's product page
 > "4. [Link](https://www.corsair.com/us/en/Categories/Products/Gaming-Keyboards/RGB-Mechanical-Gaming-Keyboards/K95-RGB-PLATINUM-XT-Mechanical-Gaming-Keyboard/p/CH-9127411-NA)"
 

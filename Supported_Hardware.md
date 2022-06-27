@@ -5,7 +5,7 @@ Please open a bug report if you find one of these variants incompatible or an En
 
 | FAMILY   | MODEL                      | Status            | DEVICE ID   |
 |----------|----------------------------|-------------------|-------------|
-|**K55**   | PRO                        | Unsupported #838  | 1ba4        |
+|**K55**   | PRO                        | Requested #838    | 1ba4        |
 |          | PRO LITE                   | *Supported        |             |
 |          | PRO XT                     | *Supported        |             |
 |**K57**   | Wireless                   | *Expiremental     |             |

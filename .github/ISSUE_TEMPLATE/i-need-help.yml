@@ -2,7 +2,7 @@ name: I need help!
 description: Request help.
 title: "[Question]: "
 labels: ["question"]
-assignees:
+assignees: "      "
 body:
 - type: markdown
   attributes:

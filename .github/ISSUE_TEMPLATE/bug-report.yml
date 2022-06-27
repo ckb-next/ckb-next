@@ -2,7 +2,7 @@ name: Bug Report
 description: Report an issue with existing supported devices.
 title: "[Bug]: "
 labels: ["bug"]
-assignees:
+assignees: "      "
 body:
 - type: markdown
   attributes:

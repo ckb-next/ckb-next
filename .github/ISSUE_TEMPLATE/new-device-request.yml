@@ -1,0 +1,13 @@
+name: New Device Request
+description: Ask for the project to implement support for a new device.
+title: "[New Device]: "
+labels: ["new-device"]
+assignees:
+body:
+- type: markdown
+  attributes:
+    value: |
+    - Check if the device is supported [here.](/Supported_Hardware.md)
+    - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
+    - Verify your installation is up-to-date.
+    - One bug per issue.

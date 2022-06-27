@@ -1,5 +1,5 @@
 ---
-name: Bug Report
+name: DEPRECIATED Bug Report
 about: Report an issue with existing supported devices.
 title: ''
 labels: bug

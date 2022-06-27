@@ -1,5 +1,5 @@
 ---
-name: I need help!
+name: DEPRECIATED I need help!
 about: Request help (not for bugs).
 title: ''
 labels: question

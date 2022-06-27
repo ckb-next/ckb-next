@@ -1,5 +1,5 @@
 ---
-name: New Device Request
+name: DEPRECIATED New Device Request
 about: Ask for the project to support a new device.
 title: ''
 labels: new-device

@@ -1,5 +1,5 @@
 ---
-name: Feature Request
+name: DEPRECIATE Feature Request
 about: Suggest an idea for this project (not a new device)
 title: ''
 labels: enhancement

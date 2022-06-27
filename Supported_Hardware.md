@@ -1,9 +1,9 @@
 ## Keyboards
-**Bold** Entries are verified as compatable based on user reporting of SKUs after 06/26/22. </br>
-\* SKUs do not currently have the ability to save profiles to the hardware. Settings will be saved to software only. </br> 
+**Bold** Entries are verified as compatible based on user reporting of SKUs after 06/26/22. </br>
+\* SKUs cannot currently save profiles to the hardware. Settings can only be saved to software. </br> 
 ~~Strikethrough~~ entries are EXPERIMENTAL as of `ckb-next v0.5.0`</br>
 
-This list is a reformat of a very *vauge* compatability list and may have inaccurate information at the SKU level. The "Family" and "MODEL" Support *should* be accurate. Please open a bug report if you find of of these skus to be incompatable, or an Enhancement issue if your SKU is compatable. 
+This list is a reformat of a very *vague* compatibility list and may have inaccurate information at the SKU level. The "Family" and "MODEL" Support *should* be accurate. Please open a bug report if you find one of these SKUs incompatible or an Enhancement issue if your SKU is compatible. 
 
 | FAMILY   | MODEL                      | SKU               | CHERRY            | OTHERSWITCH     | UNIQUE CHASSIS   | LED        | DEVICE ID   |
 |----------|----------------------------|-------------------|-------------------|-----------------|------------------|------------|-------------|

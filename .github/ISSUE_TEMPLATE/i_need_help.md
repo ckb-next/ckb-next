@@ -31,10 +31,10 @@ assignees: ''
 Not needed if there isn't something explicitly wrong.</br></br>
 Drag a txt file into this window, or use a service like [pastebin](https://pastebin.com/).
 
-1. Generated Report, see steps below.
+1. Generated Report; see steps below.
 2. Any additional crash reports or logs that seem relevant.
 ##### How to generate a report: 
-###### In the ckb-next GUI, click the `Generate Report` button in the `Settings` tab of the  user interface and attach the generated report to this issue.*
+###### In the ckb-next GUI, click the `Generate Report` button in the `Settings` tab of the user interface and attach the generated report to this issue.*
 
 </br>
 
@@ -50,7 +50,7 @@ Additional logs URL: (if the files aren't attached).
 
 
 ```
-Additonal Notes:
+Additional Notes:
 
 
 ```

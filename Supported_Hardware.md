@@ -5,6 +5,8 @@
 
 This list is a reformat of a very *vague* compatibility list and may have inaccurate information at the SKU level. The "Family" and "MODEL" Support *should* be accurate. Please open a bug report if you find one of these SKUs incompatible or an Enhancement issue if your SKU is compatible. 
 
+CTL + F is recommended. 
+
 | FAMILY   | MODEL                      | SKU               | CHERRY            | OTHERSWITCH     | UNIQUE CHASSIS   | LED        | DEVICE ID   |
 |----------|----------------------------|-------------------|-------------------|-----------------|------------------|------------|-------------|
 |**K55**   | BASE                       | CH-9226765-NA     |                   | Rubber Dome     |                  | RGB        |             |
@@ -95,9 +97,41 @@ This list is a reformat of a very *vague* compatibility list and may have inaccu
 |          |                            |*CH-9104113-NA     | Silent            |                 |                  | RGB        |             |
 
 ## Mice
-| WIP |
-|-----|
-|  Coming Soon   |
+| Family    | MODEL                 | SKU            | Prog Buttons | LED Zones | Body         | LED Color | Sensor  | Device ID |
+|-----------|-----------------------|----------------|--------------|-----------|--------------|-----------|---------|-----------|
+| M55       | PRO Ambidextrous      | *CH-9308111-NA | 8            | 2         | White        | RGB       | Optical |           |
+|           |                       | *CH-9308011-NA | 8            | 2         | Black        | RGB       | Optical |           |
+| M65       | BASE                  | CH-9000071-NA  | 8            | 3         | White        | RGB       | Optical |           |
+|           |                       | CH-9000070-NA  | 8            | 3         | Black        | RGB       | Optical |           |
+|           | PRO                   | CH-9300111-NA  | 8            | 3         | White        | RGB       | Optical |           |
+|           |                       | CH-9300011-NA  | 8            | 3         | Black        | RGB       | Optical |           |
+|           | ELITE                 | *CH-9309111-NA | 8            | 2         | White        | RGB       | Optical |           |
+|           |                       | *CH-9309011-NA | 8            | 2         | Black        | RGB       | Optical |           |
+| Sabre     | BASE                  | CH-9303011-NA  | 8            | 4         |              | RGB       | Optical |           |
+|           | PRO CHAMP Ultra-Light | CH-9303111-NA  | 6            | 2         |              | RGB       | Optical |           |
+|           | PRO CHAMP             | CH-9303101-NA  | 6            | 0         | Black        | None      | Optical |           |
+| Scimitar  | BASE                  | CH-9000231-NA  | 17           | 4         | Black        | RGB       | Optical |           |
+|           |                       | CH-9000091-NA  | 17           | 4         | Black/Yellow | RGB       | Optical |           |
+|           | ELITE                 | *CH-9304211-NA | 17           | 4         | Black        | RGB NEW   | Optical |           |
+|           |                       | *CH-9304311-NA | 17           | 4         | Black        | RGB OLD   | Optical |           |
+|           | PRO                   | *CH-9304111-NA | 17           | 4         | Black        | RGB       | Optical |           |
+| HARPOON   | BASE                  | CH-9301011-NA  | 6            | 1         | Black        | RGB       | Optical |           |
+|           | PRO                   | CH-9301111-NA  | 6            | 1         | Black        | RGB       | Optical |           |
+|           | ~~Wireless~~          |~~*CH-9311011-NA~~| ~~6~~      | ~~1~~     | ~~Black~~    | ~~RGB~~   | ~~Optical~~ |       |
+| GLAIVE    | BASE                  | *CH-9302011-NA | 6            | 3         | Black        | RGB       | Optical |           |
+|           |                       | *CH-9302111-NA | 6            | 3         | Aluminum     | RGB       | Optical |           |
+|           | PRO                   | *CH-9302211-NA | 7            | 3         | Black        | RGB       | Optical |           |
+|           |                       | *CH-9302311-NA | 7            | 3         | Aluminum     | RGB       | Optical |           |
+| KATAR     | BASE                  | CH-9000095-NA  | 4            | 1         | Black        | Red       | Optical |           |
+|           | PRO XT Ultra-Light    | *CH-930C111-NA | 6            | 1         | Black        | RGB       | Optical |           |
+|           | PRO Wireless          | *CH-931C011-NA | 6            | 1         | Black        | RGB       | Optical |           |
+| IRONCLAW  | Base                  | *CH-9306011-NA | 8            | 4         | Black        | RGB       | Optical |           |
+|           | Wireless              | *CH-9302011-NA | 8            | 4         | Black        | RGB       | Optical |           |
+| DARK CORE | Base                  | *CH-9315211-NA | 9            | 4         | Black OLD    | RGB       | Optical |           |
+|           | Base                  | *CH-9315011-NA | 9            | 4         | Black NEW    | RGB       | Optical |           |
+|           | SE                    | *CH-9315311-NA | 9            | 4         | Black OLD    | RGB       | Optical |           |
+|           |                       | *CH-9315111-NA | 9            | 4         | Black NEW    | RGB       | Optical |           |
+|           | PRO SE                | *CH-9315511-WW | 9            | 4         | Black        | RGB       | Optical |           |
 
 ## Mouse Pads
 | FAMILY  | MODEL     | SKU               | EDITION |

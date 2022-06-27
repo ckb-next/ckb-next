@@ -19,20 +19,27 @@ Device Name - Description
 ## Required Information
 
 1. **What is the name of the device you are using?**
+
 > "1. K95 Platinum XT"
-2. **What is the SKU of the device you are using? Follow [this guide](https://help.corsair.com/hc/en-us/articles/360025378691-Find-a-Serial-Number-or-Lot-Code) to find it.**
-> "2. CH-9127414-NA"
-3. **What Distro are you using?**
-> "3. Arch"
-4. **Installation Source**:
+
+2. **What Distro are you using?**
+> "2. Arch"
+
+3. **Installation Source**:
 How did you [install ckb-next](https://github.com/ckb-next/ckb-next/wiki/Linux-Installation)? 
-> "4. AUR"
-5. **ckb-next version** found at the top of the `Settings` tab in the GUI.
-> "5. ckb-next 0.5.0"
-6. **What is the expected behavior?**
-> "6. The keyboard should work after system awakens from sleep."
-7. **What happened, and could you fix it?**
-> "7. The keyboard won't work when the computer wakes up unless I restart the computer or unplug and replug."
+
+> "3. AUR"
+
+4. **ckb-next version** found at the top of the `Settings` tab in the GUI.
+
+> "4. ckb-next 0.5.0"
+
+5. **What is the expected behavior?**
+
+> "5. The keyboard should work after system awakens from sleep."
+
+6. **What happened, and could you fix it?**
+> "6. The keyboard won't work when the computer wakes up unless I restart the computer or unplug and replug."
 
 ## Required Documents
 **Do not just copy and paste your raw logs into this box.** </br>
@@ -47,12 +54,11 @@ Drag a txt file into this window, or use a service like [pastebin](https://paste
 ## --- Delete everything above before you submit. ---
 
 1. Model:
-2. SKU:
-3. Distro:
-4. Installation Source:
-5. Version:
-6. Expected behavior:
-7. Observed Behavior:
+2. Distro:
+3. Installation Source:
+4. Version:
+5. Expected behavior:
+6. Observed Behavior:
 
 
 

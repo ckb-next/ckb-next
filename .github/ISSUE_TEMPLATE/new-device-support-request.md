@@ -24,11 +24,8 @@ Device Name - What it is
 2. What is it?
 > "2. A keyboard."
 
-3. What is the SKU of the device you are using? Follow [this guide](https://help.corsair.com/hc/en-us/articles/360025378691-Find-a-Serial-Number-or-Lot-Code) to find it.
-> "3. CH-9127414-NA"
-
-4. Link to Corsair's product page
-> "4. [Link](https://www.corsair.com/us/en/Categories/Products/Gaming-Keyboards/RGB-Mechanical-Gaming-Keyboards/K95-RGB-PLATINUM-XT-Mechanical-Gaming-Keyboard/p/CH-9127411-NA)"
+3. Link to Corsair's product page (optional)
+> "3. [Link](https://www.corsair.com/us/en/Categories/Products/Gaming-Keyboards/RGB-Mechanical-Gaming-Keyboards/K95-RGB-PLATINUM-XT-Mechanical-Gaming-Keyboard/p/CH-9127411-NA)"
 
 
 ## Required Documents
@@ -43,10 +40,9 @@ Drag a txt file into this window, or use a service like [pastebin](https://paste
 
 ## --- Delete everything above before you submit. ---
 
- 1. Device Name:
- 2. Device Type:
- 3. SKU:
- 4. [Product Page](#) Replace # with the link.
+1. Device Name:
+2. Device Type:
+3. Optional [Product Page](#) Replace # with the link.
 
 Generated Report URL: (if the file isn't attached).
 * Link

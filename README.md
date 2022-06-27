@@ -24,9 +24,6 @@ Major features:
 ### [Mouse Pads](Supported_Hardware.md#mouse-pads)
 ### [Other](Supported_Hardware.md#other-devices)
 
-## Request support for a new device
-
-[Open an Issue](https://github.com/ckb-next/ckb-next/issues/new/choose) and select "New Device Request." Be sure to follow the instructions.
 
 ## Ask for Help
 Reach out on the IRC at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next) on or via [Matrix](https://matrix.to/#/#ckb-next:matrix.org)
@@ -36,8 +33,11 @@ As a last resort, submit a [help request](https://github.com/ckb-next/ckb-next/i
 ## Contribute
 Check out our [Contributing Guidelines](https://github.com/ckb-next/ckb-next/wiki/Contributing) before submitting new issues.
 
-[Report a Bug](https://github.com/ckb-next/ckb-next/issues/new/choose)
-[Request an Enhancement](https://github.com/ckb-next/ckb-next/issues/new/choose)
+### [Report a Bug](https://github.com/ckb-next/ckb-next/issues/new/choose) select "Bug Report"
+
+### [Request an Enhancement](https://github.com/ckb-next/ckb-next/issues/new/choose) select "Featrue Request"
+
+### [Request a new Device](https://github.com/ckb-next/ckb-next/issues/new/choose) select "New Device Request."
 
 
 

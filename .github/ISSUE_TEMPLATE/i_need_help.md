@@ -15,20 +15,25 @@ assignees: ''
 
 ## Required Information
 
-1. **What do you need help with?** </br>
+1. **What do you need help with?**
+
 *examples:*
 > "1. Installation" </br>
 > "1. Am I doing this right?" </br>
 > "1. This weird thing is happening." </br>
 
 2. **Can you elaborate?**
+
 > "2. It's pretty self explanitory." </br>
 > "2. Insert detail description here..."
 
 
 ## Documents
-**Do not just copy and pase your raw logs into this box.** </br>
-Not needed if there isn't something explicitly wrong.</br></br>
+
+**Do not just copy and pase your raw logs into this box.**
+
+Logs are not needed if there isn't something explicitly wrong.</br>
+
 Drag a txt file into this window, or use a service like [pastebin](https://pastebin.com/).
 
 1. Generated Report; see steps below.

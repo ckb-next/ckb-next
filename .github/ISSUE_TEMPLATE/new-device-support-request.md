@@ -32,7 +32,7 @@ Device Name - What it is
 
 
 ## Required Documents
-**Do not just copy and paste your raw logs into this box.** </br>
+**Do not just copy and paste your raw logs into this box.**
 
 Drag a txt file into this window, or use a service like [pastebin](https://pastebin.com/).
 

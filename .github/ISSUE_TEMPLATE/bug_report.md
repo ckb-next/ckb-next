@@ -11,7 +11,7 @@ Device Name - Description
 > "K95 Platinum XT - Not Recognised"
 
 ## Due Diligence
-- Check if the device is supported [here.](#)
+- Check if the device is supported [here.](/Supported_Hardware.md)
 - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
 - Verify your installation is up-to-date.
 - One bug per issue.

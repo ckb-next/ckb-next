@@ -11,7 +11,7 @@ Device Name - Description
 > "K95 Platinum XT - Brightness Slider"
 
 ## Due Diligence
-- Check if the device is supported [here.](#) if this is device-specific.
+- Check if the device is supported [here.](/Supported_Hardware.md) if this is device-specific.
 - Search in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues) for similar requests.
 - Verify your installation is up-to-date.
 - One enhancement per issue.

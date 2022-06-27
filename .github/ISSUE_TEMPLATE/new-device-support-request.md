@@ -11,7 +11,7 @@ Device Name - What it is
 > "K95 Platinum XT - Keyboard"
 
 ## Due Diligence
-- Check if the device is supported already [here.](#)
+- Check if the device is supported already [here.](/Supported_Hardware.md)
 - Search in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues) for duplicate requests. If it exists, add a "bump" comment in that request. Don't open a new request. We will close duplicates.
 - Verify your installation is up-to-date. We need a wiki page outlining the update process. Please contribute if you know how!
 - This is not a place for bug reports or feature requests.

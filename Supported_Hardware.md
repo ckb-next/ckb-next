@@ -66,17 +66,13 @@ Please open a bug report if you find one of these variants incompatible or an En
 |              | PRO Wireless            | Supported           |             |
 | IRONCLAW     | RGB                     | *Supported          |             |
 |              | Wireless                | *Expiremental       |             |
-| NIGHTSWOARD  | RGB                     | Supported           |             |         
+| NIGHTSWORD   | RGB                     | Supported           |             |         
 | DARK CORE    | RGB                     | *Expiremental       |             |
 |              | SE                      | *Expiremental       |             |
 |              | PRO SE                  | *Expiremental       | 1b1c:1b7e   |
-
-## Mouse Pads
-| FAMILY  | MODEL     | STATUS            | Device ID   |
-|---------|-----------|-------------------|-------------|
-|MM800    |POLARIS    | Supported         |
 
 ## Other Devices
 | FAMILY  | MODEL     | Purpose         | STATUS            | Device ID   |
 |---------|-----------|-----------------|-------------------|-------------|
 |ST100    |Premium    | Headphone Stand | Supported         |             |
+|MM800    |POLARIS    | Mousepad        | *Expiremental     |

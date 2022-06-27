@@ -21,8 +21,7 @@ Major features:
 
 ### [Keyboards](Supported_Hardware.md#keyboards)
 ### [Mice](Supported_Hardware.md#mice)
-### [Mouse Pads](Supported_Hardware.md#mouse-pads)
-### [Other](Supported_Hardware.md#other-devices)
+### [Other Devices](Supported_Hardware.md#other-devices)
 
 
 ## Ask for Help

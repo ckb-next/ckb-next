@@ -6,7 +6,7 @@ labels: new-device
 assignees: ''
 
 ---
-## Issue Title:
+## How to Title:
 Device Name - What it is 
 > "K95 Platinum XT - Keyboard"
 

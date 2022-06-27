@@ -11,9 +11,9 @@ Device Name - Description
 > "K95 Platinum XT - Brightness Slider"
 
 ## Due Diligence
-- Check if device is supported [here.](#) if this is device specific.
+- Check if the device is supported [here.](#) if this is device-specific.
 - Search in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues) for similar requests.
-- Veryify your installation is up-to-date.
+- Verify your installation is up-to-date.
 - One enhancement per issue.
 
 ## Required Information
@@ -28,11 +28,11 @@ Device Name - Description
 > "2. No"</br>
 > "2. Maybe?"
 
-3. **If you want change an existing feature, what does it do now?**
-> "4. To change the brightness for the K95 you have a dropdown with 4 options." </br>
-> "4. I want a to suggest a new feature."
+3. **What does it do now if you want to change an existing feature?**
+> "3. To change the brightness for the K95, you have a dropdown with four options." </br>
+> "3. I want to suggest a new feature."
 
-4.**What new thing should happen?**
+4. **What new thing should happen?**
 > "4. Can we get a slider instead?"
 
 ## --- Delete everything above before you submit. ---
@@ -44,7 +44,7 @@ Device Name - Description
 
 
 ```
-Additonal Notes:
+Additional Notes:
 
 
 ```

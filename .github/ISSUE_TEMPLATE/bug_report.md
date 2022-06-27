@@ -42,12 +42,9 @@ How did you [install ckb-next](https://github.com/ckb-next/ckb-next/wiki/Linux-I
 > "6. The keyboard won't work when the computer wakes up unless I restart the computer or unplug and replug."
 
 ## Required Documents
-**Do not just copy and paste your raw logs into this box.** </br>
-
-Drag a txt file into this window, or use a service like [pastebin](https://pastebin.com/).
-
 1. Generated Report; see steps below.
 2. Any additional crash reports or logs that seem relevant.
+
 ##### How to generate a report: 
 ###### In the ckb-next GUI, click the `Generate Report` button in the `Settings` tab of the user interface and attach the generated report to this issue.*
 
@@ -59,18 +56,33 @@ Drag a txt file into this window, or use a service like [pastebin](https://paste
 4. Version:
 5. Expected behavior:
 6. Observed Behavior:
-
-
-
-Generated Report URL: (if the file isn't attached).
-* Link
-
-Additional logs URL: (if the files aren't attached).
-* Link
+```
+Additional Notes: 
 
 
 ```
-Additional Notes:
-
+Attach .txt files or paste logs here.
+<details><summary>Generated Logs</summary>
+<p>
 
 ```
+
+-- PASTE HERE --
+
+```
+
+</p>
+</details>
+
+
+<details><summary>Optional Additional Logs</summary>
+<p>
+
+```
+
+-- PASTE HERE --
+
+```
+
+</p>
+</details>

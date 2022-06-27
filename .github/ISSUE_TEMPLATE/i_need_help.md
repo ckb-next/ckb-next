@@ -30,11 +30,7 @@ assignees: ''
 
 ## Documents
 
-**Do not just copy and pase your raw logs into this box.**
-
 Logs are not needed if there isn't something explicitly wrong.</br>
-
-Drag a txt file into this window, or use a service like [pastebin](https://pastebin.com/).
 
 1. Generated Report; see steps below.
 2. Any additional crash reports or logs that seem relevant.
@@ -45,17 +41,35 @@ Drag a txt file into this window, or use a service like [pastebin](https://paste
 
 ## --- Delete everything above before you submit. ---
 1. 
-2.
-
-Generated Report URL: (if the file isn't attached).
-* Link
-
-Additional logs URL: (if the files aren't attached).
-* Link
+2. 
+```
+Additional Notes: 
 
 
 ```
-Additional Notes:
 
+Attach .txt files or paste logs here.
+<details><summary>Generated Logs</summary>
+<p>
 
 ```
+
+-- PASTE HERE --
+
+```
+
+</p>
+</details>
+
+
+<details><summary>Optional Additional Logs</summary>
+<p>
+
+```
+
+-- PASTE HERE --
+
+```
+
+</p>
+</details>

@@ -29,9 +29,6 @@ Device Name - What it is
 
 
 ## Required Documents
-**Do not just copy and paste your raw logs into this box.**
-
-Drag a txt file into this window, or use a service like [pastebin](https://pastebin.com/).
 
 1. Generated Report; see steps below.
 2. Any additional logs that seem relevant.
@@ -43,15 +40,33 @@ Drag a txt file into this window, or use a service like [pastebin](https://paste
 1. Device Name:
 2. Device Type:
 3. Optional [Product Page](#) Replace # with the link.
-
-Generated Report URL: (if the file isn't attached).
-* Link
-
-Additional logs URL: (if the files aren't attached).
-* Link
-
 ```
-Additional Notes:
+Additional Notes: 
 
 
 ```
+Attach .txt files or paste logs here.
+<details><summary>Generated Logs</summary>
+<p>
+
+```
+
+-- PASTE HERE --
+
+```
+
+</p>
+</details>
+
+
+<details><summary>Optional Additional Logs</summary>
+<p>
+
+```
+
+-- PASTE HERE --
+
+```
+
+</p>
+</details>

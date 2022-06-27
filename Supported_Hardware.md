@@ -9,7 +9,7 @@ CTL + F is recommended.
 
 | FAMILY   | MODEL                      | SKU               | CHERRY            | OTHERSWITCH     | UNIQUE CHASSIS   | LED        | DEVICE ID   |
 |----------|----------------------------|-------------------|-------------------|-----------------|------------------|------------|-------------|
-|**K55**   | BASE                       | CH-9226765-NA     |                   | Rubber Dome     |                  | RGB        |             |
+|**K55**   | PRO                        | CH-9226765-NA     |                   | Rubber Dome     |                  | RGB        |             |
 |          | PRO LITE                   | CH-9226065-NA     |                   | Rubber Dome     |                  | RGB        |             |
 |          | PRO XT                     | CH-9226715-NA     |                   | Rubber Dome     |                  | RGB        |             |
 |~~K57~~   | ~~Wireless~~               |~~*CH-925C015-NA~~ |                   |~~Rubber Dome~~  |                  |~~RGB~~     |             |
@@ -21,7 +21,7 @@ CTL + F is recommended.
 |          |                            |*CH-910D029-NA     | MV                |                 |                  | Red        |             |
 |          | Vengance                   |*CH-9000004-NA     | Red               |                 |                  | Red        |             |
 |**K63**   | Compact                    | CH-9115020-NA     | Red               |                 |                  | Red        |             |
-|          |~~Wireless~~                |*~~CH-9145030-NA~~ |~~Red~~            |                 |                  |~~Blue~~    |             |
+|          |~~Wireless~~                |*~~CH-9145030-NA~~ |~~Red~~            |                 |                  |~~Blue~~    |~~1b45:1b45~~|
 |          |~~Wireless Special Edition~~|*~~CH-9145050-NA~~ |~~Red~~            |                 |                  |~~Ice Blue~~|             |
 |**K65**   | Mini                       | CH-9194012-NA     | Brown             |                 |                  | RGB        |             |
 |          |                            | CH-9194010-NA     | Red               |                 |                  | RGB        |             |

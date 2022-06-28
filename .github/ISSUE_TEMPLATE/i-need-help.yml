@@ -2,12 +2,19 @@ name: I need help!
 description: Request help.
 title: "[Question]: "
 labels: ["question"]
-assignees: "      "
 body:
-- type: markdown
-  attributes:
-    value: |
-    - Check if the device is supported [here.](/Supported_Hardware.md)
-    - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
-    - Verify your installation is up-to-date.
-    - One bug per issue.
+  - type: markdown
+    attributes:
+      value: |
+        - Check if the device is supported [here.](/Supported_Hardware.md)
+        - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
+        - Verify your installation is up-to-date.
+        - One bug per issue.
+  - type: textarea
+    id: question-subject
+    attributes:
+      label: Subject
+      description: What do you need help with?
+      placeholder: ex. Am I doing this right?
+    validations:
+      required: true

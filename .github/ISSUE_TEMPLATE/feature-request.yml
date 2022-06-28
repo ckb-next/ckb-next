@@ -2,12 +2,19 @@ name: Feature Request
 description: Suggest an idea for this project.
 title: "[Enhancement]: "
 labels: ["enhancement"]
-assignees: "      "
 body:
-- type: markdown
-  attributes:
-    value: |
-    - Check if the device is supported [here.](/Supported_Hardware.md)
-    - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
-    - Verify your installation is up-to-date.
-    - One bug per issue.
+  - type: markdown
+    attributes:
+      value: |
+        - Check if the device is supported [here.](/Supported_Hardware.md)
+        - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
+        - Verify your installation is up-to-date.
+        - One bug per issue.
+  - type: textarea
+    id: enhancement-desc
+    attributes:
+      label: Device Details
+      description: What is it you want to see changed?
+      placeholder: ex. Allow one key to make a thing happen
+    validations:
+      required: true

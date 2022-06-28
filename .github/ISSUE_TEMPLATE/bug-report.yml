@@ -2,12 +2,19 @@ name: Bug Report
 description: Report an issue with existing supported devices.
 title: "[Bug]: "
 labels: ["bug"]
-assignees: "      "
 body:
-- type: markdown
-  attributes:
-    value: |
-    - Check if the device is supported [here.](/Supported_Hardware.md)
-    - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
-    - Verify your installation is up-to-date.
-    - One bug per issue.
+  - type: markdown
+    attributes:
+      value: |
+        - Check if the device is supported [here.](/Supported_Hardware.md)
+        - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
+        - Verify your installation is up-to-date.
+        - One bug per issue.
+  - type: input
+    id: name
+    attributes:
+      label: Device Details
+      description: What is the name of the device you are using?
+      placeholder: ex. K95 Platinum XT
+    validations:
+      required: true

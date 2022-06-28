@@ -60,6 +60,21 @@ body:
     validations:
       required: false
   - type: textarea
+    id: additional-details
+    attributes:
+      label: Additional Details
+      description: Is there anything else that may be helpful?
+      value: |
+        <details><summary>Report</summary>
+        <p>
+
+        Paste Here
+
+        </p>
+        </details>
+    validations:
+      required: false
+  - type: textarea
     id: generated-report
     attributes:
       label: Generated Report
@@ -68,26 +83,7 @@ body:
         <details><summary>Report</summary>
         <p>
 
-        ```
         Paste Here
-        ```
-
-        </p>
-        </details>
-    validations:
-      required: false
-  - type: textarea
-    id: additional-report
-    attributes:
-      label: Additional Report
-      description: Attach or paste any additional logs you think may be useful.
-      value: |
-        <details><summary>Report</summary>
-        <p>
-
-        ```
-        Paste Here
-        ```
 
         </p>
         </details>

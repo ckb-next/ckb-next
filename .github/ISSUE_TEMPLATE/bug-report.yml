@@ -74,7 +74,6 @@ body:
 
         </p>
         </details>
-      render: bash
     validations:
       required: false
   - type: textarea
@@ -92,6 +91,5 @@ body:
 
         </p>
         </details>
-      render: bash
     validations:
       required: false

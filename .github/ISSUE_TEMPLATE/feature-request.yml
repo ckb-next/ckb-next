@@ -6,6 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
+        ### Due Diligence
         - Check if the device is supported [here.](/Supported_Hardware.md)
         - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
         - Verify your installation is up-to-date.
@@ -13,8 +14,8 @@ body:
   - type: textarea
     id: enhancement-desc
     attributes:
-      label: Device Details
+      label: Enhancement Details
       description: What is it you want to see changed?
-      placeholder: ex. Allow one key to make a thing happen
+      placeholder: ex. Add a button to a place to do the thing.
     validations:
       required: true

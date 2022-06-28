@@ -64,7 +64,7 @@ body:
     attributes:
       label: Generated Report
       description: In the ckb-next GUI, click the Generate Report button in the Settings tab of the user interface and attach the generated report to this issue or pase it here.
-    render: bash
+      render: bash
     validations:
       required: true
   - type: textarea
@@ -72,6 +72,6 @@ body:
     attributes:
       label: Additional Report
       description: Attach or paste any additional logs you think may be useful.
-    render: bash
+      render: bash
     validations:
       required: true

@@ -14,7 +14,7 @@ body:
   - type: input
     id: name
     attributes:
-      label: Device Details
+      label: Device Name
       description: What is the name of the device you are using?
       placeholder: ex. K95 Platinum XT
     validations:
@@ -22,7 +22,7 @@ body:
   - type: input
     id: distro
     attributes:
-      label: OS Details
+      label: OS Distro
       description: What Linux distro are you using?
       placeholder: ex. Arch
     validations:
@@ -30,7 +30,7 @@ body:
   - type: input
     id: install-choice
     attributes:
-      label: Installation
+      label: Installation Method
       description: How did you install ckb-next?
       placeholder: ex. AUR
     validations:

@@ -36,7 +36,7 @@ Check out our [Contributing Guidelines](https://github.com/ckb-next/ckb-next/wik
 
 ### [Report a Bug](https://github.com/ckb-next/ckb-next/issues/new/choose) select "Bug Report"
 
-### [Request an Enhancement](https://github.com/ckb-next/ckb-next/issues/new/choose) select "Featrue Request"
+### [Request an Enhancement](https://github.com/ckb-next/ckb-next/issues/new/choose) select "Feature Request"
 
 ### [Request a new Device](https://github.com/ckb-next/ckb-next/issues/new/choose) select "New Device Request."
 

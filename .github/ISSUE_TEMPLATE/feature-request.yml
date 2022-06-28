@@ -19,3 +19,50 @@ body:
       placeholder: ex. Add a button to a place to do the thing.
     validations:
       required: true
+  - type: input
+    id: what
+    attributes:
+      label: What is it you want to see changed?
+      description: (Can overlap with multiple things)
+      placeholder: ex. "GUI" (or) K95 "Platinum XT"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: What does it do now?
+      description: What does it do now if you want to change an existing feature?
+      placeholder: ex. "No (or) "I want to suggest a new feature"
+    validations:
+      required: true
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: What does it do now?
+      description: What does it do now if you want to change an existing feature?
+      placeholder: ex. To change the brightness for the K95, you have a dropdown with four options.
+    validations:
+      required: true
+  - type: textarea
+    id: new-behavior
+    attributes:
+      label: What new thing should happen?
+      description: Describe what you want to propose.
+      placeholder: ex. Can we get a slider instead?
+    validations:
+      required: true
+  - type: textarea
+    id: additional-details
+    attributes:
+      label: Additional Details
+      description: Is there anything else that may be helpful?
+      value: |
+        <details><summary>Report</summary>
+        <p>
+
+        Type Here.
+
+        </p>
+        </details>
+    validations:
+      required: false

@@ -27,14 +27,6 @@ body:
       placeholder: ex. "GUI" (or) K95 "Platinum XT"
     validations:
       required: true
-  - type: input
-    id: device
-    attributes:
-      label: What does it do now?
-      description: What does it do now if you want to change an existing feature?
-      placeholder: ex. "No (or) "I want to suggest a new feature"
-    validations:
-      required: true
   - type: textarea
     id: current-behavior
     attributes:

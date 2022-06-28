@@ -64,14 +64,34 @@ body:
     attributes:
       label: Generated Report
       description: In the ckb-next GUI, click the Generate Report button in the Settings tab of the user interface and attach the generated report to this issue or pase it here.
+      value: |
+        <details><summary>Report</summary>
+        <p>
+
+        ```
+        Paste Here
+        ```
+
+        </p>
+        </details>
       render: bash
     validations:
-      required: true
+      required: false
   - type: textarea
     id: additional-report
     attributes:
       label: Additional Report
       description: Attach or paste any additional logs you think may be useful.
+      value: |
+        <details><summary>Report</summary>
+        <p>
+
+        ```
+        Paste Here
+        ```
+
+        </p>
+        </details>
       render: bash
     validations:
-      required: true
+      required: false

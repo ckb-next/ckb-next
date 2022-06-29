@@ -21,9 +21,9 @@ Major features:
 
 ## Supported Devices
 
-### [Keyboards](Supported_Hardware.md#keyboards)
-### [Mice](Supported_Hardware.md#mice)
-### [Other Devices](Supported_Hardware.md#other-devices)
+### [Keyboards](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#keyboards)
+### [Mice](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#mice)
+### [Other Devices](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#other-devices)
 
 
 ## Ask for Help

@@ -188,7 +188,7 @@ int _start_dev(usbdevice* kb, int makeactive){
     if(NEEDS_FW_UPDATE(kb)){
         /// - Device needs a firmware update. Finish setting up but don't do anything.
         ckb_info("Device needs a firmware update. Please issue a fwupdate command.");
-        kb->features = FEAT_RGB | FEAT_FWVERSION | FEAT_FWUPDATE;
+        kb->features = FEAT_FWVERSION | FEAT_FWUPDATE;
         kb->active = 1;
         return 0;
     }

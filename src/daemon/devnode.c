@@ -424,7 +424,11 @@ int mkfwnode(usbdevice* kb){
     FILE* fwfile = fopen(fwpath, "w");
     if(fwfile){
         // Start with APP ver
-        FWtoThreeSegments(fwfile, kb->fwversion, kb);
+        // Force 0 if we require a fw update
+        if(NEEDS_FW_UPDATE(kb))
+            FWtoThreeSegments(fwfile, 0, kb);
+        else
+            FWtoThreeSegments(fwfile, kb->fwversion, kb);
         fputc('\n', fwfile);
 
         // Followed by BLD ver

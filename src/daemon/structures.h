@@ -183,7 +183,7 @@ typedef struct {
 #define HAS_ANY_FEATURE(kb, feat)   (!!((kb)->features & (feat)))
 
 // Bricked firmware?
-#define NEEDS_FW_UPDATE(kb) ((kb)->fwversion == 0 && HAS_FEATURES((kb), FEAT_FWUPDATE | FEAT_FWVERSION))
+#define NEEDS_FW_UPDATE(kb) ((kb)->needs_fw_update && HAS_FEATURES((kb), FEAT_FWUPDATE | FEAT_FWVERSION))
 
 // Lines per scroll (OSX only)
 #define SCROLL_ACCELERATED  0
@@ -377,6 +377,7 @@ typedef struct usbdevice_ {
     uchar bragi_out_ep;
     uchar bragi_in_ep;
     uchar wl_pairing_id[PAIR_ID_SIZE];
+    bool needs_fw_update;
 } usbdevice;
 
 #endif  // STRUCTURES_H

@@ -27,7 +27,9 @@ Major features:
 
 
 ## Ask for Help
-Reach out on the IRC at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next) on or via [Matrix](https://matrix.to/#/#ckb-next:matrix.org)
+### Reach out on the IRC at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next) or via [Matrix](https://matrix.to/#/#ckb-next:matrix.org)
+
+* Using a matrix client will style the IRC to look like popular platforms like Discord. See available [matrix clients](https://matrix.org/clients/). [Element](https://matrix.org/docs/projects/client/element) is probably best for new users. 
 
 As a last resort, submit a [help request](https://github.com/ckb-next/ckb-next/issues/new/choose) via an issue. 
 

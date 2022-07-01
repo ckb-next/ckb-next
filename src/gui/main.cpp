@@ -37,6 +37,7 @@ enum CommandLineParseResults {
 };
 
 bool startDelay = false;
+bool silent = false;
 
 /**
  * parseCommandLine - Setup options and parse command line arguments.
@@ -72,13 +73,18 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     parser.addOption(switchToModeOption);
 
     QCommandLineOption delayOption(QStringList() << "d" << "delay", QObject::tr("Delays application start for 5 seconds"));
+    QCommandLineOption silentOption(QStringList() << "s" << "silent", QObject::tr("Disables the daemon not running popup"));
+
     // Sigh
 #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
     delayOption.setFlags(QCommandLineOption::HiddenFromHelp);
+    silentOption.setFlags(QCommandLineOption::HiddenFromHelp);
 #elif QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     delayOption.setHidden(true);
+    silentOption.setHidden(true);
 #endif
     parser.addOption(delayOption);
+    parser.addOption(silentOption);
 
     /* parse arguments */
     if (!parser.parse(QCoreApplication::arguments())) {
@@ -102,6 +108,10 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
         startDelay = true;
     }
 
+    if(parser.isSet(silentOption)) {
+        silent = true;
+    }
+
     if (parser.isSet(backgroundOption)) {
         // open application in background
         return CommandLineBackground;
@@ -122,7 +132,7 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
 
     /* no explicit argument was passed */
     return CommandLineOK;
-};
+}
 
 // Scan shared memory for an active PID
 static bool pidActive(const QStringList& lines){
@@ -343,7 +353,7 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     const char* shm_str = "Open";
     if(qApp->isSessionRestored())
     {
-        background = 1;
+        background = true;
         shm_str = nullptr;
     }
     // Check if the parent was Qt Creator.
@@ -363,7 +373,7 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     if(QtCreator)
         QThread::sleep(1);
 
-    MainWindow w;
+    MainWindow w(silent);
     if(!background)
         w.show();
 

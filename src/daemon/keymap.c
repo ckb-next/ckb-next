@@ -566,6 +566,29 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
     }
 }
 
+// We just need the first few buttons only, so realistically it doesn't matter
+#define BUTTON_BLD_COUNT 5
+
+static inline void hid_mouse_bld_translate(usbinput* input, int length, const unsigned char* urbinput){
+    if(length < 4){
+        ckb_err("Invalid length %d", length);
+        return;
+    }
+    // Byte 0 = mouse buttons (bitfield)
+    for(int bit = 0; bit < BUTTON_BLD_COUNT; bit++){
+        if(urbinput[0] & (1 << bit))
+            SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
+        else
+            CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
+    }
+    // Bytes 1 - 2: movement
+    input->rel_x += (signed char)urbinput[1];
+    input->rel_y += (signed char)urbinput[2];
+    // Byte 3: wheel
+    input->whl_rel_y = (signed char)urbinput[3];
+}
+
+
 void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep){
     if(!urblen)
         return;
@@ -666,7 +689,12 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         hid_mouse_translate(&targetkb->input, urblen, buffer);
                     }
                 } else if(firstbyte == MOUSE_IN) {
-                    hid_mouse_translate(&kb->input, urblen, buffer + 1);
+                    // If we're in bootloader mode, parse the simplified reports
+                    // This is only tested against an M65 with bld version 3
+                    if(kb->needs_fw_update)
+                        hid_mouse_bld_translate(&kb->input, urblen - 1, buffer + 1);
+                    else
+                        hid_mouse_translate(&kb->input, urblen - 1, buffer + 1);
                 } else if(firstbyte == CORSAIR_IN) { // Corsair Mouse Input
                     corsair_mousecopy(kb->input.keys, buffer);
                 } else if(firstbyte == 0x05 && urblen == 21) { // Seems to be on the Ironclaw RGB only
@@ -756,7 +784,7 @@ void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput
     int bytelen = (legacy ? 14 : 19);
     int start = !legacy; // Legacy packets start from 0x00, other ones start from 0x01
     if(length < start + bytelen + 1){
-        ckb_err("Invalid length %d in handle_nkro_key_input() legacy %d", length, legacy);
+        ckb_err("Invalid length %d legacy %d", length, legacy);
         return;
     }
 
@@ -876,7 +904,11 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
 #define BUTTON_HID_COUNT    5
 
 void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput){
-    // Byte 1 = mouse buttons (bitfield)
+    if(length < 9){
+        ckb_err("Invalid length %d", length);
+        return;
+    }
+    // Byte 0 = mouse buttons (bitfield)
     for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
         if(urbinput[0] & (1 << bit))
             SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
@@ -887,7 +919,7 @@ void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbin
     input->rel_x += (urbinput[5] << 8) | urbinput[4];
     input->rel_y += (urbinput[7] << 8) | urbinput[6];
     // Byte 9: wheel
-    input->whl_rel_y = (char)urbinput[8];
+    input->whl_rel_y = (signed char)urbinput[8];
 }
 
 void corsair_mousecopy(unsigned char* kbinput, const unsigned char* urbinput){
@@ -932,7 +964,7 @@ void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urb
 
     kbinput->rel_x += (urbinput[3] << 8) | urbinput[2];
     kbinput->rel_y += (urbinput[5] << 8) | urbinput[4];
-    kbinput->whl_rel_y = (char)urbinput[6];
+    kbinput->whl_rel_y = (signed char)urbinput[6];
 }
 
 #define BRAGI_MOUSE_BUTTONS 16

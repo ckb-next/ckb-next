@@ -74,20 +74,22 @@ int getfwversion(usbdevice* kb){
 
         // Set firmware version
         // Don't overwrite it if it's 0
-        if(version)
+        if(version){
             kb->fwversion = version;
-        else
+
+            // Physical layout detection.
+            if (kb->layout == LAYOUT_UNKNOWN) {
+                kb->layout = in_pkt[23] + 1;
+                if (kb->layout > LAYOUT_DUBEOLSIK) {
+                    ckb_warn("Got unknown physical layout byte value %d, please file a bug report mentioning your keyboard's physical layout", in_pkt[23]);
+                    kb->layout = LAYOUT_UNKNOWN;
+                }
+            }
+        } else {
             kb->needs_fw_update = true;
+        }
         kb->bldversion = bootloader;
 
-        // Physical layout detection.
-        if (kb->layout == LAYOUT_UNKNOWN) {
-            kb->layout = in_pkt[23] + 1;
-            if (kb->layout > LAYOUT_DUBEOLSIK) {
-                ckb_warn("Got unknown physical layout byte value %d, please file a bug report mentioning your keyboard's physical layout", in_pkt[23]);
-                kb->layout = LAYOUT_UNKNOWN;
-            }
-        }
         // Wireless requires extra handshake packets.
         if(IS_WIRELESS_DEV(kb)){
             uchar wireless_pkt[5][MSG_SIZE] = {
@@ -123,7 +125,8 @@ int getfwversion(usbdevice* kb){
             kb->features &= ~(FEAT_HWLOAD | FEAT_FWUPDATE);
         }
     } else if (in_pkt[1] == 0) {
-        ckb_warn("Device responded with 0e00 to 0e01 request"); // This happens when we're in bootloader mode
+        // This happens when we're in bootloader mode, but not on all devices
+        ckb_warn("Device responded with 0e00 to 0e01 request");
         kb->bldversion = kb->fwversion;
         kb->needs_fw_update = true;
     }

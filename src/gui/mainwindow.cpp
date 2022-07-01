@@ -115,7 +115,7 @@ void MainWindow::appleRequestHidTimer(){
 }
 #endif
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(const bool silent, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -198,7 +198,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // `.arg(0)` is necessary to interpolate the correct suffix into the path
     // see `./kbmanager.cpp` for details
     QFileInfo rootDevPath(devpath.arg(0));
-    if (!rootDevPath.exists()) {
+    if (!(rootDevPath.exists()  || silent)) {
         // set settings widget's status
         // show the main window (otherwise only the dialog will be visible)
         // finally show the dialog
@@ -518,7 +518,7 @@ void MainWindow::QSignalHandler(){
     qDebug() << "\nSignal" << sig << "caught. Quitting...";
     if(sig == SIGHUP){
         // Restart, but with a delay
-        QProcess::startDetached(QCoreApplication::applicationFilePath(), QStringList() << "-b" << "-d");
+        QProcess::startDetached(QCoreApplication::applicationFilePath(), QStringList() << "-b" << "-d" << "-s");
     }
     this->quitApp();
     sigNotifier->setEnabled(true);

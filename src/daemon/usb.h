@@ -302,6 +302,10 @@ const char* product_str(ushort product);
 // Used for devices that have the scroll wheel packet in the hardware hid packet only
 #define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO))
 
+// Used to swap charge & discharge index for device need it
+#define IS_SWAPPED_CHARGE(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == 0x0000/*P_DARK_CORE*/ || (kb)->product == 0x0001/*P_DARK_CORE_WL*/))
+
+
 /// Start the USB main loop. Returns program exit code when finished
 int usbmain();
 

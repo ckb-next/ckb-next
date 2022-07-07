@@ -266,5 +266,15 @@ void bragi_get_battery_info(usbdevice* kb){
         return;
     }
     kb->battery_level = chg / 10;
+    if (IS_SWAPPED_CHARGE(kb)) {
+        switch (stat) {
+            case 1:
+                stat = 2;
+                break;
+            case 2:
+                stat = 1;
+                break;
+        }
+    }
     kb->battery_status = stat;
 }

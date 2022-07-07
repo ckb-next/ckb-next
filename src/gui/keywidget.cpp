@@ -9,7 +9,7 @@
 
 static const int KEY_SIZE = 12;
 
-static QImage* m65Overlay= nullptr, *sabOverlay= nullptr, *scimOverlay= nullptr, *harpOverlay= nullptr, *glaiveOverlay= nullptr, *polarisOverlay= nullptr, *katarOverlay= nullptr, *m95Overlay= nullptr, *ironclawOverlay= nullptr, *nightswordOverlay= nullptr, *darkCoreOverlay= nullptr, *ironclawWirelessOverlay= nullptr, *glaiveproOverlay= nullptr,* m55Overlay= nullptr;
+static QImage* m65Overlay= nullptr, *sabOverlay= nullptr, *scimOverlay= nullptr, *harpOverlay= nullptr, *glaiveOverlay= nullptr, *polarisOverlay= nullptr, *katarOverlay= nullptr, *m95Overlay= nullptr, *ironclawOverlay= nullptr, *nightswordOverlay= nullptr, *darkCoreOverlay = nullptr, *darkCoreRgbProOverlay = nullptr, *ironclawWirelessOverlay= nullptr, *glaiveproOverlay= nullptr,* m55Overlay= nullptr;
 
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
@@ -150,6 +150,12 @@ void KeyWidget::paintEvent(QPaintEvent*){
             if(!darkCoreOverlay)
                 darkCoreOverlay = new QImage(":/img/overlay_darkcore.png");
             overlay = darkCoreOverlay;
+            xpos = -5.f;
+            ypos = -2.f;
+        } else if(model == KeyMap::DARKCORERGBPRO){
+            if(!darkCoreRgbProOverlay)
+                darkCoreRgbProOverlay = new QImage(":/img/overlay_darkcore_rgb_pro.png");
+            overlay = darkCoreRgbProOverlay;
             xpos = -5.f;
             ypos = -2.f;
         } else if(model == KeyMap::POLARIS){

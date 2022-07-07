@@ -407,7 +407,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     drawTopLeftCorner(&decPainter, kx, ky, kw, kh, scale);
                 } else
                     decPainter.drawRect(QRectF(kx * scale, ky * scale, kw * scale, kh * scale));
-            } else if (model == KeyMap::K55)
+            } else if (model == KeyMap::K55 || model == KeyMap::K55PRO)
                 decPainter.drawRect(QRectF(x * scale, y * scale, w * scale, h * scale));
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 1")
                     drawLogo(&key, &decPainter, offX , offY, scale);

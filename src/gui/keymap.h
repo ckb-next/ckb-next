@@ -84,6 +84,7 @@ public:
         K60,
         K57_WL,
         K63_WL,
+        K55PRO,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

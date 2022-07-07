@@ -22,6 +22,6 @@ void BatteryStatusTrayIcon::setBattery(uint battery, BatteryStatus charging){
 }
 
 const QString BatteryStatusTrayIcon::BATTERY_VALUES[5] = {tr("Not connected"), tr("Critical"), tr("Low"), tr("Medium"), tr("High")};
-const QString BatteryStatusTrayIcon::BATTERY_STATUS_VALUES[4] = {tr("N/A"), tr("Discharging"), tr("Charging"), tr("Fully Charged")};
+const QString BatteryStatusTrayIcon::BATTERY_STATUS_VALUES[4] = {tr("N/A"), tr("Charging"), tr("Discharging"), tr("Fully Charged")};
 const QString BatteryStatusTrayIcon::batTrayLevel = tr("Battery: %1 (%2%)");
 const QString BatteryStatusTrayIcon::batTrayStatus = tr("Status: %1");

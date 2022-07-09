@@ -37,9 +37,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_IRONCLAW_W_U, 18000 },
     { P_HARPOON_WL_U, 10000 },
     { P_DARK_CORE_RGB_PRO, 18000 },
-    { P_DARK_CORE_RGB_PRO_WL, 18000 },
     { P_DARK_CORE_RGB_PRO_SE, 18000 },
-    { P_DARK_CORE_RGB_PRO_SE_WL, 18000 },
     { P_GLAIVE_PRO, 16000 },
     { 0, 0 }, // Keep last and do not remove
 };

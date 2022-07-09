@@ -420,23 +420,26 @@ static const Key DarkCoreKeys[] = {
 
 // Mouse map - DARK CORE RGB PRO
 static const Key DarkCoreRgbProKeys[] = {
-    {0, "Left Mouse",     "mouse1",      8,  0, 14, 32, false, true},
-    {0, "Right Mouse",    "mouse2",     25,  0, 14, 32, false, true},
-    {0, "Middle Mouse",   "mouse3",     19,  8,  8,  7, false, true},
-    {0, "Wheel Up",       "wheelup",    19,  4,  8,  5, false, true},
-    {0, "Wheel Down",     "wheeldn",    19, 14,  8,  5, false, true},
-    {0, "Wheel Light",    "wheel",      19,  5,  8, 10, true, false},
-    {0, "DPI Up",         "dpiup",       0,  5,  8,  8, false, true},
-    {0, "DPI Down",       "dpidn",       0, 12,  8,  8, false, true},
-    {0, "Forward",        "mouse5",      5, 24, 10,  9, true, true},
-    {0, "Back",           "mouse4",      5, 29,  5, 10, true, true},
-    {0, "Bar 3 light",    "bar3",        5, 35,  5,  8, true, false},
-    {0, "Bar 4 light",    "bar4",        5, 40,  5,  8, true, false},
-    {0, "Thumb light",    "thumb",       5, 55,  8,  8, true, false},
-    {0, "Side light",     "side",       30, 48,  8,  8, true, false},
-    {0, "Logo",           "back",       15, 48, 15, 15, true, false},
-    {0, "Profile Switch", "profswitch",     19, 19,  8, 12, false, false},
-    {0, "DPI",            "dpi",        19, 15,  8, 12, true,  false}
+    {nullptr, "Left Mouse",     "mouse1",      8,  0, 14, 24, false, true},
+    {nullptr, "Right Mouse",    "mouse2",     25,  0, 14, 24, false, true},
+    {nullptr, "Middle Mouse",   "mouse3",     19,  8,  8,  7, false, true},
+    {nullptr, "Wheel Up",       "wheelup",    19,  4,  8,  5, false, true},
+    {nullptr, "Wheel Down",     "wheeldn",    19, 14,  8,  5, false, true},
+    {nullptr, "Wheel Light",    "wheel",      19,  5,  8, 10, true,  false},
+    {nullptr, "DPI Up",         "dpiup",       0,  5,  8,  8, false, true},
+    {nullptr, "DPI Down",       "dpidn",       0, 12,  8,  8, false, true},
+    {nullptr, "Forward",        "mouse5",      5, 24, 10,  9, true,  true},
+    {nullptr, "Back",           "mouse4",      5, 29,  5, 10, true,  true},
+    {nullptr, "Bar 3 light",    "bar3",        5, 35,  5,  8, true,  false},
+    {nullptr, "Bar 4 light",    "bar4",        5, 40,  5,  8, true,  false},
+    {nullptr, "Thumb light",    "thumb",       5, 55,  8,  8, true,  false},
+    {nullptr, "Side light",     "side",       30, 48,  8,  8, true,  false},
+    {nullptr, "Logo",           "back",       15, 48, 15, 15, true,  false},
+    {nullptr, "Profile",        "profdn",     19, 19,  8, 8,  false,  true},
+    {nullptr, "DPI0",           "dpiw0",       19, 15,  8, 8,  true,  false},
+    {nullptr, "DPI3",           "dpiw3",       10,  5,  8, 8,  true,  false},
+    {nullptr, "DPI2",           "dpiw2",        5,  5,  8, 8,  true,  false},
+    {nullptr, "DPI1",           "dpiw1",         0,  5,  8, 8,  true,  false},
 };
 #define KEYCOUNT_DARKCORERGBPRO    (sizeof(DarkCoreRgbProKeys) / sizeof(Key))
 

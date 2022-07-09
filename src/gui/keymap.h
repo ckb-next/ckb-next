@@ -76,7 +76,6 @@ public:
         IRONCLAW,
         NIGHTSWORD,
         DARKCORE,
-        DARKCORERGBPRO,
         IRONCLAW_W,
         KATARPROXT,
         K95L,
@@ -85,6 +84,7 @@ public:
         K60,
         K57_WL,
         K63_WL,
+        DARKCORERGBPRO,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

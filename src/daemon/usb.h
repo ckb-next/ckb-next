@@ -150,7 +150,6 @@
 #define P_DARK_CORE_RGB_PRO_WL       0x1b81/* wireless - dongle  Defining Dark Core RGB Pro SE here as it uses the same protocol as Ironclaw */
 #define P_DARK_CORE_RGB_PRO_SE       0x1b7e /* wired */
 #define P_DARK_CORE_RGB_PRO_SE_WL    0x1b7f/* wireless - dongle  Defining Dark Core RGB Pro SE here as it uses the same protocol as Ironclaw */
-#define IS_DARK_CORE_RGB_PRO(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_DARK_CORE_RGB_PRO || (kb)->product == P_DARK_CORE_RGB_PRO_WL || (kb)->product == P_DARK_CORE_RGB_PRO_SE || (kb)->product == P_DARK_CORE_RGB_PRO_SE_WL))
 #define IS_IRONCLAW_W(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_IRONCLAW_W_U || (kb)->product == P_IRONCLAW_W_D || (kb)->product == P_DARK_CORE_RGB_PRO || (kb)->product == P_DARK_CORE_RGB_PRO_WL || (kb)->product == P_DARK_CORE_RGB_PRO_SE || (kb)->product == P_DARK_CORE_RGB_PRO_SE_WL))
 
 #define P_HARPOON_WL_U       0x1b5e

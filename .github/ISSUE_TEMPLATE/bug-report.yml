@@ -14,16 +14,16 @@ body:
   - type: input
     id: name
     attributes:
-      label: Device Name
-      description: What is the name of the device you are using?
-      placeholder: ex. K95 Platinum XT
+      label: Affected Devices
+      description: What is the name of the device you are using that are not functioning as expected? If more than one devices are experiencing issues list them here separated by a comma.
+      placeholder: ex. K95 Platinum XT, Dark Core SE
     validations:
       required: true
   - type: input
     id: distro
     attributes:
-      label: OS Distro
-      description: What Linux distro are you using?
+      label: Linux Distribution
+      description: Which Linux distribution are you using?
       placeholder: ex. Arch
     validations:
       required: true
@@ -39,7 +39,7 @@ body:
     id: build-version
     attributes:
       label: ckb-next version
-      description: What version is found at the top of the Settings tab in the GUI.
+      description: What version is found at the top of the Settings tab in the application.
       placeholder: ex. ckb-next 0.5.0
     validations:
       required: true
@@ -63,12 +63,12 @@ body:
     id: additional-details
     attributes:
       label: Additional Details
-      description: Is there anything else that may be helpful?
+      description: Is there anything other information that could be helpful to pinpoint the issue?
       value: |
         <details><summary>Report</summary>
         <p>
 
-        Type Here.
+        Enter your text here.
 
         </p>
         </details>
@@ -78,12 +78,13 @@ body:
     id: generated-report
     attributes:
       label: Generated Report
-      description: In the ckb-next GUI, click the Generate Report button in the Settings tab of the user interface and attach the generated report to this issue or pase it here.
+      description: |
+        In the ckb-next application, click the Generate Report button in the Settings tab of the user interface. </br></br>  Click into the text box below then drag the .gz file into it.
       value: |
         <details><summary>Report</summary>
         <p>
 
-        Paste Here
+        Drag your generated report here.
 
         </p>
         </details>

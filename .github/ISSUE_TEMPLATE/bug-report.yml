@@ -1,6 +1,5 @@
 name: Bug Report
 description: Report an issue with existing supported devices.
-title: " :lady_beetle:"
 labels: ["bug"]
 body:
   - type: markdown

@@ -1,6 +1,5 @@
 name: I need help!
 description: Request help.
-title: "  :question:"
 labels: ["question"]
 body:
   - type: markdown

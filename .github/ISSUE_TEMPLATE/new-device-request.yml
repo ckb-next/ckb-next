@@ -1,6 +1,5 @@
 name: New Device Request
 description: Ask for the project to implement support for a new device.
-title: "  :keyboard:"
 labels: ["new-device"]
 body:
   - type: markdown

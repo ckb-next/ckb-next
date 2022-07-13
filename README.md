@@ -25,6 +25,17 @@ Major features:
 ### [Mice](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#mice)
 ### [Other Devices](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#other-devices)
 
+## General information
+
+You can find most of the information in the [ckb-next wiki pages](https://github.com/ckb-next/ckb-next/wiki)
+
+### [Installation](https://github.com/ckb-next/ckb-next/wiki/Linux-Installation)
+
+### [Troubleshooting](https://github.com/ckb-next/ckb-next/wiki/Troubleshooting)
+
+### [Known Issues](https://github.com/ckb-next/ckb-next/wiki/Known-issues)
+
+### [Community Pipe Animation Scripts](https://github.com/ckb-next/ckb-next/wiki/Community-Pipe-Scripts)
 
 ## Ask for Help
 Reach out on the IRC at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next) on or via [Matrix](https://matrix.to/#/#ckb-next:matrix.org)
@@ -44,15 +55,3 @@ Check out our [Contributing Guidelines](https://github.com/ckb-next/ckb-next/wik
 
 > Maintainers reserve the right to modify and remove issues, pull requests, and comments that are denunciating, off-topic, harmful, hateful, and inappropriate.
 Please be appreciative, humble, and kind to each other.
-
-## General information
-
-You can find most of the information in the [ckb-next wiki pages](https://github.com/ckb-next/ckb-next/wiki).
-
-### [Installation](https://github.com/ckb-next/ckb-next/wiki/Linux-Installation).
-
-### [Troubleshooting](https://github.com/ckb-next/ckb-next/wiki/Troubleshooting).
-
-### [Known Issues](https://github.com/ckb-next/ckb-next/wiki/Known-issues).
-
-### [Community Pipe Animation Scripts](https://github.com/ckb-next/ckb-next/wiki/Community-Pipe-Scripts).

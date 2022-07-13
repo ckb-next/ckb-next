@@ -7,10 +7,8 @@ body:
     attributes:
       value: |
         ### Due Diligence
-        - Check if the device is supported.
-        - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
-        - Verify your installation is up-to-date.
-        - One bug per issue.
+        - See if your suggestion has already been talked about in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
+        - One suggestion per issue.
   - type: textarea
     id: enhancement-desc
     attributes:

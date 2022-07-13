@@ -22,7 +22,7 @@ body:
   - type: dropdown
     id: what-device
     attributes:
-      label: What kind of device  is it?
+      label: What kind of device is it?
       description: What kind of device would you like support for? Keep in mind that anything other than Mice and Keyboards are not currently being looked at for support in the immediate future. 
       options:
         - Keyboard

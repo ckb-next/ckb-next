@@ -1,6 +1,6 @@
 name: Feature Request
 description: Suggest an idea for this project.
-title: "[Enhancement]: "
+title: " "
 labels: ["enhancement"]
 body:
   - type: markdown
@@ -14,7 +14,7 @@ body:
     attributes:
       label: Enhancement Details
       description: What is it you want to see changed?
-      placeholder: ex. Add a button to a place to do the thing.
+      placeholder: ex. Instead of having a dropdown to select the brightness for the K95 RGB Platinum XT could we have a slider?.
     validations:
       required: true
   - type: textarea
@@ -23,12 +23,7 @@ body:
       label: Additional Details
       description: Is there anything else that may be helpful?
       value: |
-        <details><summary>Report</summary>
-        <p>
-
-        Type Here.
-
-        </p>
-        </details>
+        Add additional details here.
     validations:
       required: false
+      

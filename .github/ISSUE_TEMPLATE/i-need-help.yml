@@ -1,6 +1,6 @@
 name: I need help!
 description: Request help.
-title: "[Question]: "
+title: " "
 labels: ["question"]
 body:
   - type: markdown
@@ -30,7 +30,7 @@ body:
     attributes:
       label: Can you elaborate?
       description: What do you need help with?
-      placeholder: It's pretty self explanitory.
+      placeholder: It's pretty self explanatory.
     validations:
       required: true
   - type: textarea
@@ -39,27 +39,16 @@ body:
       label: Additional Details
       description: Is there anything else that may be helpful?
       value: |
-        <details><summary>Report</summary>
-        <p>
-
-        Paste Here
-
-        </p>
-        </details>
+        Add any additional details here.
     validations:
       required: false
   - type: textarea
     id: generated-report
     attributes:
-      label: Generated Report
+      label: Generated Report (if applicable)
       description: In the ckb-next GUI, click the Generate Report button in the Settings tab of the user interface and attach the generated report to this issue or pase it here.
       value: |
-        <details><summary>Report</summary>
-        <p>
-
-        Paste Here
-
-        </p>
-        </details>
+        Drag your generated report here if it's applicable.
     validations:
       required: false
+      

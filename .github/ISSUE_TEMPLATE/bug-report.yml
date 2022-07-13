@@ -65,13 +65,7 @@ body:
       label: Additional Details
       description: Is there anything other information that could be helpful to pinpoint the issue?
       value: |
-        <details><summary>Report</summary>
-        <p>
-
         Enter your text here.
-
-        </p>
-        </details>
     validations:
       required: false
   - type: textarea
@@ -81,12 +75,7 @@ body:
       description: |
         In the ckb-next application, click the Generate Report button in the Settings tab of the user interface. </br></br>  Click into the text box below then drag the .gz file into it.
       value: |
-        <details><summary>Report</summary>
-        <p>
-
         Drag your generated report here.
-
-        </p>
-        </details>
     validations:
       required: true
+      

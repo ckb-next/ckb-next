@@ -15,8 +15,8 @@ body:
     id: device-model
     attributes:
       label: What is the name of the device?
-      description: Please be specific. Copying the name from the sticker on the device or the title of Corsair's product page will yeild the best result.
-      placeholder: ex. K95 PLATINUM XT
+      description: Please be specific. Copying the name from the sticker on the device or the title of Corsair's product page will yield the best result.
+      placeholder: ex. K95 RGB PLATINUM XT
     validations:
       required: true
   - type: dropdown
@@ -59,7 +59,8 @@ body:
     id: generated-report
     attributes:
       label: Generated Report
-      description: In the ckb-next GUI, click the Generate Report button in the Settings tab of the user interface and attach the generated report to this issue or pase it here.
+      description: |
+        In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. </br></br>  Click into the text box below then drag the .gz file into it.
       value: |
         Drag your generated report here.
     validations:

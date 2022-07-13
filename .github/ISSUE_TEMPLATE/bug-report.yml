@@ -1,6 +1,6 @@
 name: Bug Report
 description: Report an issue with existing supported devices.
-title: "[Bug]: "
+title: " "
 labels: ["bug"]
 body:
   - type: markdown
@@ -16,7 +16,7 @@ body:
     attributes:
       label: Affected Devices
       description: What is the name of the device you are using that are not functioning as expected? If more than one devices are experiencing issues list them here separated by a comma.
-      placeholder: ex. K95 Platinum XT, Dark Core SE
+      placeholder: ex. K95 RGB Platinum XT, Dark Core SE
     validations:
       required: true
   - type: input
@@ -65,7 +65,7 @@ body:
       label: Additional Details
       description: Is there anything other information that could be helpful to pinpoint the issue?
       value: |
-        Enter your text here.
+        Add any additional details here.
     validations:
       required: false
   - type: textarea
@@ -73,7 +73,7 @@ body:
     attributes:
       label: Generated Report
       description: |
-        In the ckb-next application, click the Generate Report button in the Settings tab of the user interface. </br></br>  Click into the text box below then drag the .gz file into it.
+        In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. </br></br>  Click into the text box below then drag the .gz file into it.
       value: |
         Drag your generated report here.
     validations:

@@ -9,14 +9,6 @@ body:
         ## Please try these Resources first!
         * IRC chat: #ckb-next channel at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next)
         * [Matrix](https://matrix.to/#/#ckb-next:matrix.org): #ckb-next:matrix.org
-  - type: markdown
-    attributes:
-      value: |
-        ### Due Diligence
-        - Check if the device is supported.
-        - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
-        - Verify your installation is up-to-date.
-        - One bug per issue.
   - type: textarea
     id: question-subject
     attributes:
@@ -46,7 +38,8 @@ body:
     id: generated-report
     attributes:
       label: Generated Report (if applicable)
-      description: In the ckb-next GUI, click the Generate Report button in the Settings tab of the user interface and attach the generated report to this issue or pase it here.
+      description: |
+        In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. </br></br>  Click into the text box below then drag the .gz file into it.
       value: |
         Drag your generated report here if it's applicable.
     validations:

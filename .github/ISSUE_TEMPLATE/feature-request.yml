@@ -23,7 +23,7 @@ body:
       label: Additional Details
       description: Is there anything else that may be helpful?
       value: |
-        Add additional details here.
+        Add any additional details here.
     validations:
       required: false
       

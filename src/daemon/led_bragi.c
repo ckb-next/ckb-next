@@ -32,6 +32,7 @@ static inline size_t bragi_led_count(usbdevice* kb){
     LED_CASE_K(P_K60_PRO_RGB, 123);
     LED_CASE_K(P_K60_PRO_RGB_LP, 123);
     LED_CASE_K(P_K60_PRO_RGB_SE, 123);
+    LED_CASE_K(P_K60_PRO_MONO, 123);
     LED_CASE_M(P_KATAR_PRO_XT, 1);
     LED_CASE_M(P_KATAR_PRO, 1);
     LED_CASE_M(P_M55_RGB_PRO, 2);
@@ -71,11 +72,16 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
 
     static_assert(sizeof(pkt) >= 7 + N_KEYS_EXTENDED * 3, "Bragi RGB packet must be large enough to fit all possible zones in the keymap");
 
-    memcpy(pkt + 7, newlight->r + led_offset, CPY_SZ(r));
-    memcpy(pkt + 7 + CPY_SZ(r), newlight->g + led_offset, CPY_SZ(g));
-    memcpy(pkt + 7 + CPY_SZ(r) + CPY_SZ(g), newlight->b + led_offset, CPY_SZ(b));
+    size_t bytes = zones;
 
-    if(bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), 3 * zones))
+    memcpy(pkt + 7, newlight->r + led_offset, CPY_SZ(r));
+    if(!IS_MONOCHROME_DEV(kb)) {
+        bytes *= 3; // 3 channels
+        memcpy(pkt + 7 + CPY_SZ(r), newlight->g + led_offset, CPY_SZ(g));
+        memcpy(pkt + 7 + CPY_SZ(r) + CPY_SZ(g), newlight->b + led_offset, CPY_SZ(b));
+    }
+
+    if(bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), bytes))
         return 1;
 
     lastlight->forceupdate = newlight->forceupdate = 0;

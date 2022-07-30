@@ -75,7 +75,10 @@ static int setactive_bragi(usbdevice* kb, int active){
     }
 
     // The daemon will always send RGB data through handle 0 (), so go ahead and open it
-    int light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING);
+    uchar res = BRAGI_RES_LIGHTING;
+    if(IS_MONOCHROME_DEV(kb))
+        res = BRAGI_RES_LIGHTING_MONOCHROME;
+    int light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, res);
     if(light < 0)
         return light;
 

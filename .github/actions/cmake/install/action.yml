@@ -1,0 +1,7 @@
+---
+runs:
+  using: composite
+  steps:
+    - name: Install
+      run: cmake --build build --target install
+      shell: bash --noprofile --norc -euxo pipefail {0}

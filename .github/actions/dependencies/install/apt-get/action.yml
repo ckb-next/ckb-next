@@ -1,0 +1,18 @@
+---
+inputs:
+  packages:
+    description: List of package(s) to install
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Update package information
+      run: apt-get --yes update
+      shell: bash --noprofile --norc -euxo pipefail {0}
+
+    - name: Install package(s)
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: apt-get --yes install ${{ inputs.packages }}
+      shell: bash --noprofile --norc -euxo pipefail {0}

@@ -1,0 +1,44 @@
+---
+inputs:
+  dependencies:
+    description: List of package(s) to pre-install
+    required: false
+  groups:
+    description: List of group(s) to install
+    required: false
+  packages:
+    description: List of package(s) to install
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Enable PowerTools repository (AlmaLinux 8/Rocky Linux 8)
+      run: |
+        dnf --assumeyes --skip-broken install "dnf-command(config-manager)"
+        dnf config-manager --set-enabled powertools
+      shell: bash --noprofile --norc -euxo pipefail {0}
+      if: matrix.image == 'almalinux:8' || matrix.image == 'rockylinux:8'
+
+    - name: Enable EPEL repository (Amazon Linux 2)
+      run: amazon-linux-extras install epel -y
+      shell: bash --noprofile --norc -euxo pipefail {0}
+      if: matrix.image == 'amazonlinux:2' && contains(inputs.dependencies, 'epel-release')
+
+    - name: Install dependency package(s)
+      run: |
+        if [ -n "${{ inputs.dependencies }}" ]; then
+          yum --assumeyes install ${{ inputs.dependencies }}
+        fi
+      shell: bash --noprofile --norc -euxo pipefail {0}
+
+    - name: Install group(s)
+      run: |
+        if [ -n '${{ inputs.groups }}' ]; then
+          yum --assumeyes groups install ${{ inputs.groups }}
+        fi
+      shell: bash --noprofile --norc -euxo pipefail {0}
+
+    - name: Install package(s)
+      run: yum --assumeyes --skip-broken install ${{ inputs.packages }}
+      shell: bash --noprofile --norc -euxo pipefail {0}

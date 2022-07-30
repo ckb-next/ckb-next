@@ -1,6 +1,7 @@
 CMakeLists.txt.user
 bin/
 build/
+!.github/actions/cmake/build
 *.app/
 cmake-build*/
 *.pkg

@@ -118,19 +118,19 @@ static int start_bragi_common(usbdevice* kb){
     // Read FW versions
     kb->fwversion = kb->bldversion = kb->radioappversion = kb->radiobldversion = UINT32_MAX;
 
-    prop = bragi_get_property(kb, BRAG_APP_VER);
+    prop = bragi_get_property(kb, BRAGI_APP_VER);
     if(prop >= 0)
         kb->fwversion = bragi_fwver_bswap(prop);
 
-    prop = bragi_get_property(kb, BRAG_BLD_VER);
+    prop = bragi_get_property(kb, BRAGI_BLD_VER);
     if(prop >= 0)
         kb->bldversion = bragi_fwver_bswap(prop);
 
-    prop = bragi_get_property(kb, BRAG_RADIO_APP_VER);
+    prop = bragi_get_property(kb, BRAGI_RADIO_APP_VER);
     if(prop >= 0)
         kb->radioappversion = bragi_fwver_bswap(prop);
 
-    prop = bragi_get_property(kb, BRAG_RADIO_BLD_VER);
+    prop = bragi_get_property(kb, BRAGI_RADIO_BLD_VER);
     if(prop >= 0)
         kb->radiobldversion = bragi_fwver_bswap(prop);
 

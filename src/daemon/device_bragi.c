@@ -149,6 +149,12 @@ static int start_bragi_common(usbdevice* kb){
 
     kb->usbdelay = USB_DELAY_DEFAULT;
 
+    // Check if the device supports fine or coarse brightness
+    if(bragi_get_property(kb, BRAGI_BRIGHTNESS) >= 0)
+        kb->brightness_mode = BRIGHTNESS_HARDWARE_FINE;
+    else if(bragi_get_property(kb, BRAGI_BRIGHTNESS_COARSE) >= 0)
+        kb->brightness_mode = BRIGHTNESS_HARDWARE_COARSE;
+
     // Read pairing ID
     if(IS_WIRELESS_DEV(kb)){
         int pair = bragi_open_handle(kb, BRAGI_GENERIC_HANDLE, BRAGI_RES_PAIRINGID);

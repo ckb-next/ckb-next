@@ -339,6 +339,10 @@ static int _mkdevpath(usbdevice* kb){
             if(HAS_FEATURES(kb, FEAT_BATTERY))
                 fputs(" battery", ffile);
 
+            if(kb->brightness_mode == BRIGHTNESS_HARDWARE_COARSE)
+                fputs(" hwbright_coarse", ffile);
+            else if(kb->brightness_mode == BRIGHTNESS_HARDWARE_FINE)
+                fputs(" hwbright_fine", ffile);
             fputc('\n', ffile);
             fclose(ffile);
             check_chmod(fpath, S_GID_READ);

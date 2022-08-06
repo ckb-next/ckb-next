@@ -69,8 +69,12 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
     int laston = memcmp(lastlight->r + led_offset, pkt, CPY_SZ(r)) ||
                  memcmp(lastlight->g + led_offset, pkt, CPY_SZ(g)) ||
                  memcmp(lastlight->b + led_offset, pkt, CPY_SZ(b));
-    if (newon != laston || force)
-        bragi_set_property(kb, BRAGI_BRIGHTNESS, newon ? 1000 : 0);
+    if (newon != laston || force){
+        if(kb->brightness_mode == BRIGHTNESS_HARDWARE_COARSE)
+            bragi_set_property(kb, BRAGI_BRIGHTNESS_COARSE, newon ? 3 : 0);
+        else if(kb->brightness_mode == BRIGHTNESS_HARDWARE_FINE)
+            bragi_set_property(kb, BRAGI_BRIGHTNESS, newon ? 1000 : 0);
+    }
 
     static_assert(sizeof(pkt) >= 7 + N_KEYS_EXTENDED * 3, "Bragi RGB packet must be large enough to fit all possible zones in the keymap");
 

@@ -30,6 +30,8 @@
 #define BRAGI_DPI1_COLOR    0x30
 #define BRAGI_DPI2_COLOR    0x31
 #define BRAGI_HWLAYOUT      0x41
+#define BRAGI_BRIGHTNESS_COARSE 0x44
+
 // Untested. Only known because CUE complained about it in its logs
 #define BRAGI_MAX_POLLRATE  0x96
 

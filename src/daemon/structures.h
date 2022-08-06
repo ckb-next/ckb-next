@@ -378,6 +378,11 @@ typedef struct usbdevice_ {
     uchar bragi_in_ep;
     uchar wl_pairing_id[PAIR_ID_SIZE];
     bool needs_fw_update;
+    enum {
+        BRIGHTNESS_SOFTWARE,
+        BRIGHTNESS_HARDWARE_FINE,
+        BRIGHTNESS_HARDWARE_COARSE,
+    } brightness_mode;
 } usbdevice;
 
 #endif  // STRUCTURES_H

@@ -185,6 +185,29 @@ void KPerfWidget::setPerf(KbPerf* newPerf, KbProfile* newProfile){
             ui->label_12->hide();
             ui->label_14->hide();
             ui->label_17->hide();
+       } else if(profile->keyMap().model() == KeyMap::K57_WL) { // hide indicators unsupported by K57_WL
+            ui->label_3->hide();
+            ui->line_2->hide();
+            ui->lightBox->hide();
+            ui->lightColor1->hide();
+            ui->lightColor2->hide();
+            ui->lightColor3->hide();
+            ui->label_10->hide();
+            ui->label_16->hide();
+            ui->label_18->hide();
+            ui->lockBox->hide();
+            ui->lockColorOn->hide();
+            ui->lockColorOff->hide();
+            ui->label_11->hide();
+            ui->label_15->hide();
+            ui->muteBox->hide();
+            ui->muteColorOn->hide();
+            ui->muteColorOff->hide();
+            ui->muteColorNA->hide();
+            ui->label_12->hide();
+            ui->label_14->hide();
+            ui->label_17->hide();
+            //ui->verticalSpacer_3->hide();
        }
     }
 }

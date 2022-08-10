@@ -283,7 +283,7 @@ static bool mviz_init_capture(){
     }
 
     if(!pa_str){
-        static_assert(sizeof(float) == 4);
+        static_assert(sizeof(float) == 4, "Expected 32 bit floats");
         static const pa_sample_spec ss = {
             .format = PA_SAMPLE_FLOAT32LE,
             .rate = 48000,

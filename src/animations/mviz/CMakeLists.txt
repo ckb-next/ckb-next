@@ -27,8 +27,8 @@
 
 if (NOT USE_PORTAUDIO)
     find_package(PulseAudio)
-    if (NOT ${PULSEAUDIOSIMPLE_FOUND})
-        message(WARNING "Missing PulseAudio Simple API. Not building mviz.")
+    if (NOT ${PULSEAUDIO_FOUND})
+        message(WARNING "Missing PulseAudio API. Not building mviz.")
         return()
     endif ()
 endif ()
@@ -61,9 +61,9 @@ else ()
     target_include_directories(
         mviz
             PRIVATE
-              "${PULSEAUDIOSIMPLE_INCLUDE_DIRS}")
+              "${PULSEAUDIO_INCLUDE_DIRS}")
 
-    set(AUDIO_LIBRARIES "${PULSEAUDIOSIMPLE_LIBRARIES}")
+    set(AUDIO_LIBRARIES "${PULSEAUDIO_LIBRARIES}")
 endif ()
 
 if (MACOS)

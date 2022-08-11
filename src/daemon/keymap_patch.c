@@ -81,6 +81,10 @@ static const keypatch DCRGBPpatch[] = {
     { 248, "bar4",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
 };
 
+keypatch k100patch[] = {
+    {114, "lock", 114, KEY_CORSAIR },
+};
+
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
 
@@ -99,7 +103,9 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K55_PRO_XT,   k55proxtpatch),
     ADD_PATCH(V_CORSAIR, P_DARK_CORE_RGB_PRO,   DCRGBPpatch),
     ADD_PATCH(V_CORSAIR, P_DARK_CORE_RGB_PRO_SE,   DCRGBPpatch),
+    ADD_PATCH(V_CORSAIR, P_K100,         k100patch),
 };
+
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 
 #define CLEAR_KEYMAP_ENTRY(x)   { \

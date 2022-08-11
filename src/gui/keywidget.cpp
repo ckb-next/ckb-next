@@ -63,8 +63,56 @@ KeyWidget::KeyWidget(QWidget* parent) :
 #endif
 }
 
+static inline int calculateControlWheelOffset(int d){
+    //return abs((d % 7) - 3);
+    switch(d)
+    {
+    case 1:
+    case 8:
+    case 9:
+        return 0;
+    case 2:
+    case 7:
+    case 10:
+        return 1;
+    case 3:
+    case 6:
+        return 2;
+    case 4:
+    case 5:
+        return 3;
+    default:
+        return -1;
+    }
+}
+
 static inline QRectF getKeyRect(const Key& key){
-    return QRectF(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
+    QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
+    // Special case for the pie-shaped ctrl wheel segments
+    // We pretend they are small rectangles instead
+    if(!strncmp(key.name, "ctrlwheel", 9)){
+        int d;
+        if(sscanf(key.name + 9, "%d", &d) == 1) {
+            const int offX = calculateControlWheelOffset(d + 2);
+            const int offY = calculateControlWheelOffset(d);
+            float newX = keyRect.x() + offX * 5.5f - 6.5f;
+            float newY = keyRect.y() + offY * 5.5f - 6.5f;
+
+            // These are intended to "stack"
+            if(offX > 0)
+                newX -= 2.7f;
+            if(offX == 3)
+                newX -= 4.f;
+
+            if(offY > 0)
+                newY -= 2.7f;
+            if(offY == 3)
+                newY -= 4.f;
+
+            keyRect.moveTo(newX, newY);
+        }
+    }
+    return keyRect;
 }
 
 void KeyWidget::map(const KeyMap& newMap){
@@ -292,6 +340,7 @@ void KeyWidget::paintGL(){
     // Draw key backgrounds
     painter.setPen(Qt::NoPen);
     int i = -1;
+    int d;
     for(const Key& key : keyMap){
         i++;
         float x = key.x + drawInfoOffset.x() - key.width / 2.f + 1.f;
@@ -327,8 +376,9 @@ void KeyWidget::paintGL(){
                     painter.setOpacity(0.7);
             }
         }
-        if((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
-                || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || !strcmp(key.name, "lghtpgm") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))){
+        if(((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K100 && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+                || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || !strcmp(key.name, "lghtpgm") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))) ||
+                !strcmp(key.name, "ctrlwheelb")){
             // Not all devices have circular buttons
             x += w / 8.f;
             y += h / 8.f;
@@ -361,6 +411,36 @@ void KeyWidget::paintGL(){
             painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
         } else if (model == KeyMap::M95) {
             painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
+        } else if (sscanf(key.name, "ctrlwheel%d", &d) == 1) {
+            // Undo the offset in the keymap definition
+            // Hardcode (20, 20) here so that key.width and key.height can be used for the hover rectangles
+            x = key.x - calculateControlWheelOffset(d + 2) + drawInfoOffset.x() - 20 / 2.f + 1.f;
+            y = key.y - calculateControlWheelOffset(d) + drawInfoOffset.y() - 20 / 2.f + 1.f;
+            w = h = 20 - 2.f;
+            float bx = x + 5.f;
+            float by = y + 5.f;
+            float bw = w - 10.f;
+            float bh = h - 10.f;
+
+            int angle = 90 - 45 * (d - 1);
+
+            // Create a pie
+            QPainterPath p;
+            QRectF rect = QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale);
+            p.moveTo(rect.center());
+            p.arcTo(rect, angle, -45);
+
+            // Create a smaller inner circle
+            QPainterPath p2;
+            QRectF rect2 = QRectF(bx * drawInfoScale, by * drawInfoScale, bw * drawInfoScale, bh * drawInfoScale);
+            p2.moveTo(rect2.center());
+            p2.arcTo(rect2, angle, 360);
+
+            // Draw their difference
+            painter.drawPath(p-p2);
+            //QPainterPath diff = p - p2;
+
+            //bgPainter.drawRect(diff.boundingRect() - QMarginsF(1*scale, 1*scale, 1*scale, 1*scale));
         } else {
             if(!strcmp(key.name, "enter")){
                 if(key.height == 24){
@@ -462,7 +542,36 @@ void KeyWidget::paintGL(){
                 painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                 painter.drawRect(QRectF((key.x + drawInfoOffset.x() - key.width / 2.f - 2.f) * drawInfoScale, y * drawInfoScale, (key.width + 4.f) * drawInfoScale, h * drawInfoScale));
-            else
+            else if (sscanf(key.name, "ctrlwheel%d", &d) == 1){
+                // Hardcode (20, 20) here so that key.width and key.height can be used for the hover rectangles
+                x = key.x - calculateControlWheelOffset(d + 2) + drawInfoOffset.x() - 20 / 2.f + 2.5f;
+                y = key.y - calculateControlWheelOffset(d) + drawInfoOffset.y() - 20 / 2.f + 2.5f;
+                w = 20 - 5.f;
+                h = 20 - 5.f;
+
+                float bx = x + 2.f;
+                float by = y + 2.f;
+                float bw = w - 4.f;
+                float bh = h - 4.f;
+
+                int angle = 90 - 45 * (d - 1);
+
+                // Create a pie
+                QPainterPath p;
+                QRectF rect = QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale);
+                p.moveTo(rect.center());
+                p.arcTo(rect, angle, -45);
+
+                // Create a smaller inner circle
+                QPainterPath p2;
+                QRectF rect2 = QRectF(bx * drawInfoScale, by * drawInfoScale, bw * drawInfoScale, bh * drawInfoScale);
+                p2.moveTo(rect2.center());
+                p2.arcTo(rect2, angle, 360);
+
+                // Draw their difference
+                painter.drawPath(p-p2);
+
+            } else
                 painter.drawEllipse(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
         }
     } else {

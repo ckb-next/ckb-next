@@ -59,11 +59,16 @@
 // Resources (used to get handles)
 #define BRAGI_RES_LIGHTING  0x01
 #define BRAGI_RES_LIGHTING_MONOCHROME 0x10
+// Used for devices that have RGBRGBRGB packets instead of RRRGGGBBB
+#define BRAGI_RES_ALT_LIGHTING  0x22
+// Secondary lighting packet
+#define BRAGI_RES_LIGHTING_EXTRA  0x2e
 #define BRAGI_RES_PAIRINGID 0x05
 
 // ckb-specific macros
 #define BRAGI_LIGHTING_HANDLE 0x00
 #define BRAGI_GENERIC_HANDLE  0x01 // This is used for quick read/writes. Do NOT leave it open.
+#define BRAGI_2ND_LIGHTING_HANDLE 0x02 // This one is opened if a device needs a secondary lighting hangle
 
 // HID input (2 bytes)
 #define BRAGI_INPUT_0       0x00

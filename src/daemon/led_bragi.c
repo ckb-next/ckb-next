@@ -38,6 +38,7 @@ static inline size_t bragi_led_count(usbdevice* kb){
     LED_CASE_M(P_M55_RGB_PRO, 2);
     LED_CASE_K(P_K55_PRO, 5);
     LED_CASE_K(P_K55_PRO_XT, 137);
+    LED_CASE_K(P_K100, 193);
     default:
         ckb_err("Unknown product 0x%hx", kb->product);
         return 0;
@@ -102,4 +103,66 @@ int updatergb_mouse_bragi(usbdevice* kb, int force){
 
 int updatergb_keyboard_bragi(usbdevice* kb, int force){
     return updatergb_bragi(kb, force, 0);
+}
+
+//#define BRAGI_ALT_RGB_HEADER 14
+#define BRAGI_ALT_RGB_HEADER 2
+static inline int updatergb_alt_bragi(usbdevice* kb, int force){
+    if(!kb->active)
+        return 0;
+    lighting* lastlight = &kb->profile->lastlight;
+    lighting* newlight = &kb->profile->currentmode->light;
+
+    // Ideally this will be moved to the usbdevice struct at some point
+    const size_t zones = bragi_led_count(kb);
+
+    // Don't do anything if the lighting hasn't changed
+    if(!force && !lastlight->forceupdate && !newlight->forceupdate
+            && !rgbcmp(lastlight, newlight, zones, 0))
+        return 0;
+
+    uchar pkt1[BRAGI_JUMBO_SIZE] = {0};
+    pkt1[7] = 0x12; // Some kind of header?
+
+    uchar* start = pkt1 + 7 + BRAGI_ALT_RGB_HEADER;
+    // Copy red first
+    for(size_t i = 0; i < zones; i++)
+        start[i * 3] = newlight->r[i];
+
+    // Green
+    for(size_t i = 0; i < zones; i++)
+        start[i * 3 + 1] = newlight->g[i];
+
+    // Blue
+    for(size_t i = 0; i < zones; i++)
+        start[i * 3 + 2] = newlight->b[i];
+
+    //if(bragi_write_to_handle(kb, pkt1, BRAGI_LIGHTING_HANDLE, sizeof(pkt1), 3 * zones + BRAGI_ALT_RGB_HEADER))
+    // FIXME: HACK to get the packet to have the correct length field for the K100
+    if(bragi_write_to_handle(kb, pkt1, BRAGI_LIGHTING_HANDLE, sizeof(pkt1), 3 * 193 + BRAGI_ALT_RGB_HEADER))
+        return 1;
+
+    // FIXME implement second packet
+    uchar pkt2[BRAGI_JUMBO_SIZE] = {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header
+        0x1b, 0x00, 0x20, 0xe7, 0xca, 0x2f, 0x88, 0x9f, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
+        0x00, 0x01, 0x00, 0x0d, 0x00, 0x01, 0x01, 0x00, 0x04, 0x00, 0x00, 0x08, 0x06, 0x02, 0x48, 0x00,
+        0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x01, 0x00, 0x00, 0x00, 0xff, 0x02, 0x00,
+        0x00, 0x00, 0xff, 0x72, 0x00, 0x00, 0x00, 0xff, 0x80, 0x00, 0x00, 0x00, 0xff, 0x89, 0x00, 0x00,
+        0x00, 0xff, 0xb6, 0x00, 0x00, 0x00, 0xff, 0xb7, 0x00, 0x00, 0x00, 0xff, 0xb8, 0x00, 0x00, 0x00,
+        0xff, 0xb9, 0x00, 0x00, 0x00, 0xff, 0xba, 0x00, 0x00, 0x00, 0xff, 0xbb, 0x00, 0x00, 0x00, 0xff,
+        0xbc, 0x00, 0x00, 0x00, 0xff, 0xbd, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+
+    if(bragi_write_to_handle(kb, pkt2, BRAGI_2ND_LIGHTING_HANDLE, sizeof(pkt2), 0x48))
+        return 1;
+
+    lastlight->forceupdate = newlight->forceupdate = 0;
+
+    memcpy(lastlight, newlight, sizeof(lighting));
+    return 0;
+}
+
+int updatergb_keyboard_bragi_alt(usbdevice* kb, int force){
+    return updatergb_alt_bragi(kb, force);
 }

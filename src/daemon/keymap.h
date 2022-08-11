@@ -26,8 +26,8 @@
 #define N_KEYS_HW               152
 #define N_KEYBYTES_HW           ((N_KEYS_HW + 7) / 8)
 // Light zones (have LED codes but don't generate input)
-// Two strafe side lights (although really they are tied into one control) + logo backlight + Platinum top bar
-#define N_KEY_ZONES             22
+// Two strafe side lights (although really they are tied into one control) + logo backlight + Platinum top bar + K100 (20) extra leds
+#define N_KEY_ZONES             42
 // Additional keys recognized by the driver but may not be present on keyboard
 #define N_KEYS_EXTRA            16
 // Generic RGB Zones (Polaris/K55/...)
@@ -57,7 +57,7 @@
 #define N_KEYS_EXTENDED         (N_KEYS_INPUT + N_MOUSE_ZONES_EXTENDED)
 #define N_KEYBYTES_EXTENDED     ((N_KEYS_EXTENDED + 7) / 8)
 
-#define N_KEYS_BRAGI_PATCH      171
+#define N_KEYS_BRAGI_PATCH      194
 
 // Map from key name to LED code and USB scan code
 typedef struct {

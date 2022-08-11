@@ -83,6 +83,11 @@ keypatch k95legacypatch[] = {
 };
 #define K95LEGACYPATCH_LEN sizeof(k95legacypatch)/sizeof(*k95legacypatch)
 
+keypatch k100patch[] = {
+    {114, "lock", 114, KEY_CORSAIR },
+};
+#define K100PATCH_LEN sizeof(k100patch)/sizeof(*k100patch)
+
 keypatches mappatches[] = {
     { V_CORSAIR, P_K68,          k63patch,       K63PATCH_LEN },
     { V_CORSAIR, P_K68_NRGB,     k63patch,       K63PATCH_LEN },
@@ -96,7 +101,9 @@ keypatches mappatches[] = {
     { V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch,KATARPROXTPATCH_LEN },
     { V_CORSAIR, P_KATAR_PRO,    katarproxtpatch,KATARPROXTPATCH_LEN },
     { V_CORSAIR, P_K95_LEGACY,   k95legacypatch, K95LEGACYPATCH_LEN },
+    { V_CORSAIR, P_K100,         k100patch,      K100PATCH_LEN},
 };
+
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 
 /// \brief

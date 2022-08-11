@@ -82,6 +82,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_K95_PLATINUM_XT, },
     { V_CORSAIR, P_K57_D, },
     { V_CORSAIR, P_K57_U, },
+    { V_CORSAIR, P_K100, },
     // Mice
     { V_CORSAIR, P_M55_RGB_PRO, },
     { V_CORSAIR, P_M65, },
@@ -179,6 +180,8 @@ const char* vendor_str(ushort vendor){
 /// product_str() needs the \a product \a ID
 ///
 const char* product_str(ushort product){
+    if(product == P_K100)
+        return "k100";
     if(product == P_K95_LEGACY)
         return "k95l";
     if(product == P_K95)

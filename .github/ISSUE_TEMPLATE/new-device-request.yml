@@ -10,19 +10,11 @@ body:
         - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
         - Verify your installation is up-to-date.
         - One request per issue.
-  - type: input
-    id: device-model
-    attributes:
-      label: What is the name of the device?
-      description: Please be specific. Copying the name from the sticker on the device or the title of Corsair's product page will yield the best result.
-      placeholder: ex. K95 RGB PLATINUM XT
-    validations:
-      required: true
   - type: dropdown
-    id: what-device
+    id: what-kind-of-device
     attributes:
       label: What kind of device is it?
-      description: What kind of device would you like support for? Keep in mind that anything other than Mice and Keyboards are not currently being looked at for support in the immediate future. 
+      description: What kind of device would you like support for? Keep in mind that only Mice and Keyboards are prioritized at the moment, everything else is on a best-efforts base only. 
       options:
         - Keyboard
         - Mouse
@@ -36,6 +28,14 @@ body:
         - AIO Coolers
         - RAM
         - System
+    validations:
+      required: true
+  - type: input
+    id: device-model
+    attributes:
+      label: What is the name of the device?
+      description: Please be specific. Copying the name from the sticker on the device or the title of Corsair's product page will yield the best result.
+      placeholder: ex. K95 RGB PLATINUM XT
     validations:
       required: true
   - type: input

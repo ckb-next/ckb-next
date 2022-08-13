@@ -55,7 +55,7 @@ body:
     attributes:
       label: Did you try anything that may have helped?
       description: Explain if you restarted your computer, logged out, replugged, etc. 
-      placeholder: ex. The keyboard should work after system awakens from sleep.
+      placeholder: ex. After reboot the keyboard works as expected again.
     validations:
       required: false
   - type: textarea

@@ -13,15 +13,13 @@ body:
     attributes:
       label: Subject
       description: What do you need help with?
-      placeholder: ex. Am I doing this right?
     validations:
       required: true
   - type: textarea
     id: question-body
     attributes:
-      label: Can you elaborate?
-      description: What do you need help with?
-      placeholder: It's pretty self explanatory.
+      label: Describe your situation in detail.
+      description: Please provide as many relevant information as you can:\ Device(s), OS, used version of ckb-next, package-source, etc.
     validations:
       required: true
   - type: textarea

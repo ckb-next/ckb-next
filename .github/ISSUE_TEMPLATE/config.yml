@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Matrix
+    url: https://matrix.to/#/#ckb-next:matrix.org
+    about: "Ask for support in the #ckb-next room."
+  - name: IRC
+    url: https://web.libera.chat/?channels=#ckb-next
+    about: "Ask for support in #ckb-next at web.libera.chat."

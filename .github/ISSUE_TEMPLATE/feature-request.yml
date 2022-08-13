@@ -13,7 +13,7 @@ body:
     attributes:
       label: Enhancement Details
       description: What is it you want to see changed?
-      placeholder: ex. Instead of having a dropdown to select the brightness for the K95 RGB Platinum XT could we have a slider?.
+      placeholder: ex. Instead of having a dropdown to select the brightness for the K95 RGB Platinum XT could we have a slider?
     validations:
       required: true
   - type: textarea

@@ -84,6 +84,7 @@ public:
         K60,
         K57_WL,
         K63_WL,
+        K55PRO,
         DARKCORERGBPRO,
         _MODEL_MAX
     };

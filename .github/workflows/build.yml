@@ -1,0 +1,68 @@
+---
+name: Build
+
+on:
+  - push
+
+jobs:
+  Linux:
+    name: ${{ matrix.image }} (${{ matrix.compiler }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          - 'amazonlinux:2'
+          - 'archlinux:latest'
+          - 'almalinux:8'
+          - 'rockylinux:8'
+          - 'debian:10'
+          - 'debian:11'
+          - 'fedora:35'
+          - 'fedora:36'
+          - 'ubuntu:20.04'
+          - 'ubuntu:22.04'
+        build_type:
+          - Release
+        compiler:
+          - GNU
+      fail-fast: false
+    container:
+      env:
+        BUILD_TYPE: ${{ matrix.build_type || 'Debug' }}
+        CC: ${{ matrix.compiler == 'LLVM' && 'clang' || 'gcc' }}
+        CXX: ${{ matrix.compiler == 'LLVM' && 'clang++' || 'g++' }}
+      image: ${{ matrix.image }}
+    steps:
+      - name: Install `git`
+        run: |
+          if command -v apt-get &> /dev/null; then
+            apt-get --quiet --quiet update && apt-get --quiet --quiet install git
+          elif command -v pacman &> /dev/null; then
+            pacman --sync --refresh --sysupgrade --noconfirm git
+          elif command -v yum &> /dev/null; then
+            yum --assumeyes install git
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        uses: ./.github/actions/dependencies/install
+
+      - name: Build `ckb-next`
+        uses: ./.github/actions/cmake/build
+
+      - name: Install `ckb-next`
+        uses: ./.github/actions/cmake/install
+
+      - name: Run `ckb-next-daemon --help`
+        run: |
+          ckb-next-daemon --help
+
+      - name: Package `ckb-next`
+        uses: ./.github/actions/cmake/package
+
+      - name: Upload `ckb-next` package to workflow artifacts
+        uses: ./.github/actions/upload-package

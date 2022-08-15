@@ -71,16 +71,25 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
     int laston = memcmp(lastlight->r + led_offset, pkt, CPY_SZ(r)) ||
                  memcmp(lastlight->g + led_offset, pkt, CPY_SZ(g)) ||
                  memcmp(lastlight->b + led_offset, pkt, CPY_SZ(b));
-    if (newon != laston || force)
-        bragi_set_property(kb, BRAGI_BRIGHTNESS, newon ? 1000 : 0);
+    if (newon != laston || force){
+        if(kb->brightness_mode == BRIGHTNESS_HARDWARE_COARSE)
+            bragi_set_property(kb, BRAGI_BRIGHTNESS_COARSE, newon ? 3 : 0);
+        else if(kb->brightness_mode == BRIGHTNESS_HARDWARE_FINE)
+            bragi_set_property(kb, BRAGI_BRIGHTNESS, newon ? 1000 : 0);
+    }
 
     static_assert(sizeof(pkt) >= 7 + N_KEYS_EXTENDED * 3, "Bragi RGB packet must be large enough to fit all possible zones in the keymap");
 
-    memcpy(pkt + 7, newlight->r + led_offset, CPY_SZ(r));
-    memcpy(pkt + 7 + CPY_SZ(r), newlight->g + led_offset, CPY_SZ(g));
-    memcpy(pkt + 7 + CPY_SZ(r) + CPY_SZ(g), newlight->b + led_offset, CPY_SZ(b));
+    size_t bytes = zones;
 
-    if(bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), 3 * zones))
+    memcpy(pkt + 7, newlight->r + led_offset, CPY_SZ(r));
+    if(!IS_MONOCHROME_DEV(kb)) {
+        bytes *= 3; // 3 channels
+        memcpy(pkt + 7 + CPY_SZ(r), newlight->g + led_offset, CPY_SZ(g));
+        memcpy(pkt + 7 + CPY_SZ(r) + CPY_SZ(g), newlight->b + led_offset, CPY_SZ(b));
+    }
+
+    if(bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), bytes))
         return 1;
 
     lastlight->forceupdate = newlight->forceupdate = 0;

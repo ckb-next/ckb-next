@@ -46,9 +46,12 @@ const dpi_list mouse_dpi_list[] = {
 const device_desc models[] = {
     // Keyboards
     { V_CORSAIR, P_K55, },
+    { V_CORSAIR, P_K55_PRO, },
+    { V_CORSAIR, P_K55_PRO_XT, },
     { V_CORSAIR, P_K60_PRO_RGB, },
     { V_CORSAIR, P_K60_PRO_RGB_LP, },
     { V_CORSAIR, P_K60_PRO_RGB_SE, },
+    { V_CORSAIR, P_K60_PRO_MONO, },
     { V_CORSAIR, P_K63_NRGB, },
     { V_CORSAIR, P_K63_NRGB_WL, },
     { V_CORSAIR, P_K63_NRGB_WL2, },
@@ -200,12 +203,14 @@ const char* product_str(ushort product){
         return "k63";
     if(product == P_K63_NRGB_WL || product == P_K63_NRGB_WL2 || product == P_K63_NRGB_WL3 || product == P_K63_NRGB_WL4)
         return "k63_wireless";
-    if(product == P_K60_PRO_RGB || product == P_K60_PRO_RGB_LP || product == P_K60_PRO_RGB_SE)
+    if(product == P_K60_PRO_RGB || product == P_K60_PRO_RGB_LP || product == P_K60_PRO_RGB_SE || product == P_K60_PRO_MONO)
         return "k60";
-    if(product == P_K57_U || product == P_K57_D)
+    if(product == P_K57_U || product == P_K57_D || product == P_K55_PRO_XT)
         return "k57_wireless";
     if(product == P_K55)
         return "k55";
+    if(product == P_K55_PRO)
+        return "k55pro";
     if(product == P_STRAFE || product == P_STRAFE_NRGB || product == P_STRAFE_NRGB_2)
         return "strafe";
     if(product == P_STRAFE_MK2)

@@ -75,7 +75,10 @@ static int setactive_bragi(usbdevice* kb, int active){
     }
 
     // The daemon will always send RGB data through handle 0 (), so go ahead and open it
-    int light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, BRAGI_RES_LIGHTING);
+    uchar res = BRAGI_RES_LIGHTING;
+    if(IS_MONOCHROME_DEV(kb))
+        res = BRAGI_RES_LIGHTING_MONOCHROME;
+    int light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, res);
     if(light < 0)
         return light;
 
@@ -115,19 +118,19 @@ static int start_bragi_common(usbdevice* kb){
     // Read FW versions
     kb->fwversion = kb->bldversion = kb->radioappversion = kb->radiobldversion = UINT32_MAX;
 
-    prop = bragi_get_property(kb, BRAG_APP_VER);
+    prop = bragi_get_property(kb, BRAGI_APP_VER);
     if(prop >= 0)
         kb->fwversion = bragi_fwver_bswap(prop);
 
-    prop = bragi_get_property(kb, BRAG_BLD_VER);
+    prop = bragi_get_property(kb, BRAGI_BLD_VER);
     if(prop >= 0)
         kb->bldversion = bragi_fwver_bswap(prop);
 
-    prop = bragi_get_property(kb, BRAG_RADIO_APP_VER);
+    prop = bragi_get_property(kb, BRAGI_RADIO_APP_VER);
     if(prop >= 0)
         kb->radioappversion = bragi_fwver_bswap(prop);
 
-    prop = bragi_get_property(kb, BRAG_RADIO_BLD_VER);
+    prop = bragi_get_property(kb, BRAGI_RADIO_BLD_VER);
     if(prop >= 0)
         kb->radiobldversion = bragi_fwver_bswap(prop);
 
@@ -145,6 +148,12 @@ static int start_bragi_common(usbdevice* kb){
     kb->features &= ~FEAT_HWLOAD;
 
     kb->usbdelay = USB_DELAY_DEFAULT;
+
+    // Check if the device supports fine or coarse brightness
+    if(bragi_get_property(kb, BRAGI_BRIGHTNESS) >= 0)
+        kb->brightness_mode = BRIGHTNESS_HARDWARE_FINE;
+    else if(bragi_get_property(kb, BRAGI_BRIGHTNESS_COARSE) >= 0)
+        kb->brightness_mode = BRIGHTNESS_HARDWARE_COARSE;
 
     // Read pairing ID
     if(IS_WIRELESS_DEV(kb)){

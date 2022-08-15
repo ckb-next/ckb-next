@@ -1,0 +1,30 @@
+---
+inputs:
+  new_package_name:
+    default: ckb-next.${{ matrix.image }}.${{ matrix.compiler || 'GNU' }}.${{ matrix.build_type || 'Debug' }}
+    description: Name of package file (without suffix)
+    required: false
+
+  old_package_name:
+    default: ckb-next
+    description: Name of package file (without suffix)
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Rename package
+      run: |
+        mkdir -p /tmp/package
+        for OLD_PACKAGE_FILE in ${{ inputs.old_package_name }}.*; do
+          NEW_PACKAGE_FILE=$(echo ${OLD_PACKAGE_FILE} | sed -e 's/${{ inputs.old_package_name }}/${{ inputs.new_package_name }}/' -e 's/:/-/')
+          mv ${OLD_PACKAGE_FILE} /tmp/package/${NEW_PACKAGE_FILE}
+        done
+      shell: bash --noprofile --norc -euxo pipefail {0}
+      working-directory: build
+
+    - name: Upload package
+      uses: actions/upload-artifact@v3
+      with:
+        name: Packages
+        path: /tmp/package/*

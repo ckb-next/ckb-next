@@ -1,0 +1,27 @@
+---
+runs:
+  using: composite
+  steps:
+    - name: Create `cmake` symbolic link
+      run: |
+        if ! command -v cmake &> /dev/null && command -v cmake3 &> /dev/null; then
+          ln --symbolic cmake3 /usr/bin/cmake
+        fi
+      shell: bash --noprofile --norc -euxo pipefail {0}
+
+    - name: Prepare `build` directory
+      run: |
+        cmake -S . -B build \
+          -LA \
+          -DCMAKE_BUILD_TYPE=${BUILD_TYPE:-Debug} \
+          -DFORCE_INIT_SYSTEM=systemd \
+          -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX:-/usr} \
+          -DSAFE_INSTALL=ON \
+          -DSAFE_UNINSTALL=ON
+      shell: bash --noprofile --norc -euxo pipefail {0}
+
+    - name: Build
+      run: |
+        export CMAKE_BUILD_PARALLEL_LEVEL=${BUILD_PARALLEL_LEVEL:-$(nproc)}
+        cmake --build build
+      shell: bash --noprofile --norc -euxo pipefail {0}

@@ -11,6 +11,9 @@
 // K55 Zone Size
 #define ZS 97, 75
 
+// K55 PRO Zone Size
+#define ZSP 59, 75
+
 // Key positions (K95 - English)
 // This is the master key map that includes ANSI, ISO and JP-106 layouts - use patchANSI(), patchISO() or patchJP106() to finalize it
 static const Key K95Keys[] = {
@@ -264,6 +267,14 @@ static const Key K55Zones[] = {
 };
 #define K55_ZONES (sizeof(K55Zones) / sizeof(Key))
 
+static const Key K55PROZones[] = {
+    {nullptr,  "Zone 1", "zone1", 26, 45, ZSP, true, false},
+    {nullptr,  "Zone 2", "zone2", 83, 45, ZSP, true, false},
+    {nullptr,  "Zone 3", "zone3", 140, 45, ZSP, true, false},
+    {nullptr,  "Zone 4", "zone4", 197, 45, ZSP, true, false},
+    {nullptr,  "Zone 5", "zone5", 254, 45, ZSP, true, false},
+};
+#define K55PRO_ZONES (sizeof(K55PROZones) / sizeof(Key))
 
 // Strafe has side lights
 #define KSTRAFE_X_START     12
@@ -1008,6 +1019,15 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Done!
         break;
     }
+    case KeyMap::K55PRO:{
+        // Keys are the same as the K55, but has 5 zones instead
+        map = getMap(KeyMap::K55, layout);
+
+        // Overwrite the zones
+        for(const Key* key = K55PROZones; key < K55PROZones + K55PRO_ZONES; key++)
+            map[key->name] = *key;
+        break;
+    }
     case KeyMap::M65:{
         // M65 isn't a keyboard; all mouse maps are unique.
         for(const Key* key = M65Keys; key < M65Keys + KEYCOUNT_M65; key++){
@@ -1456,6 +1476,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K95L;
     if(lower == "glaivepro")
         return GLAIVEPRO;
+    if(lower == "k55pro")
+        return K55PRO;
     return NO_MODEL;
 }
 
@@ -1463,6 +1485,8 @@ QString KeyMap::getModel(KeyMap::Model model){
     switch(model){
     case K55:
         return "k55";
+    case K55PRO:
+        return "k55pro";
     case K57_WL:
         return "k57_wireless";
     case K60:
@@ -1557,6 +1581,8 @@ int KeyMap::modelWidth(Model model){
     case K95:
     case K95L:
          return K95_WIDTH;
+    case K55PRO:
+        return K95P_WIDTH + 1; // FIXME
     case K95P:
     case K55:
     case K57_WL:
@@ -1593,6 +1619,7 @@ int KeyMap::modelWidth(Model model){
 int KeyMap::modelHeight(Model model){
     switch(model){
     case K55:
+    case K55PRO:
     case K57_WL:
     case K63:
     case K63_WL:

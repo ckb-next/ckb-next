@@ -1320,56 +1320,43 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
     }
 }
 
-QPair<int, QString> KeyMap::addToList(int i, QStringList* list){
-    return QPair<int, QString>(i, list->at(i));
+QPair<int, QString> KeyMap::addToList(int i, const QStringList& list){
+    return QPair<int, QString>(i, list.at(i));
 }
 
+const QStringList KeyMap::layoutList {
+    "Danish", "English (ISO/European)", "English (ISO/European, Dvorak)", "English (United Kingdom)", "English (United Kingdom, Dvorak)",
+     "English (United States)", "English (United States, Dvorak)", "French", "German", "Italian", "Japanese", "Norwegian", "Polish",
+     "Portuguese (Brazil)", "Spanish (Latin America)", "Spanish (Spain)", "Swedish"
+};
 QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
-    QStringList list;
-    list << "Danish"
-         << "English (ISO/European)"
-         << "English (ISO/European, Dvorak)"
-         << "English (United Kingdom)"
-         << "English (United Kingdom, Dvorak)"
-         << "English (United States)"
-         << "English (United States, Dvorak)"
-         << "French"
-         << "German"
-         << "Italian"
-         << "Japanese"
-         << "Norwegian"
-         << "Polish"
-         << "Portuguese (Brazil)"
-         << "Spanish (Latin America)"
-         << "Spanish (Spain)"
-         << "Swedish";
 
     // Create a list containing the layouts supported by the current device
     QList<QPair<int, QString>> retlist;
     if(layout == "ansi")
-        retlist << KeyMap::addToList(5, &list)
-                << KeyMap::addToList(6, &list);
+        retlist << KeyMap::addToList(5, layoutList)
+                << KeyMap::addToList(6, layoutList);
     else if(layout == "iso")
-        retlist << KeyMap::addToList(0, &list)
-                << KeyMap::addToList(1, &list)
-                << KeyMap::addToList(2, &list)
-                << KeyMap::addToList(3, &list)
-                << KeyMap::addToList(4, &list)
-                << KeyMap::addToList(7, &list)
-                << KeyMap::addToList(8, &list)
-                << KeyMap::addToList(9, &list)
-                << KeyMap::addToList(11, &list)
-                << KeyMap::addToList(12, &list)
-                << KeyMap::addToList(14, &list)
-                << KeyMap::addToList(15, &list)
-                << KeyMap::addToList(16, &list);
+        retlist << KeyMap::addToList(0, layoutList)
+                << KeyMap::addToList(1, layoutList)
+                << KeyMap::addToList(2, layoutList)
+                << KeyMap::addToList(3, layoutList)
+                << KeyMap::addToList(4, layoutList)
+                << KeyMap::addToList(7, layoutList)
+                << KeyMap::addToList(8, layoutList)
+                << KeyMap::addToList(9, layoutList)
+                << KeyMap::addToList(11, layoutList)
+                << KeyMap::addToList(12, layoutList)
+                << KeyMap::addToList(14, layoutList)
+                << KeyMap::addToList(15, layoutList)
+                << KeyMap::addToList(16, layoutList);
     else if(layout == "abnt")
-        retlist << KeyMap::addToList(13, &list);
+        retlist << KeyMap::addToList(13, layoutList);
     else if(layout == "jis")
-        retlist << KeyMap::addToList(10, &list);
+        retlist << KeyMap::addToList(10, layoutList);
     else
-        for(int i = 0; i < list.count(); i++)
-            retlist << KeyMap::addToList(i, &list);
+        for(int i = 0; i < layoutList.count(); i++)
+            retlist << KeyMap::addToList(i, layoutList);
     return retlist;
 }
 
@@ -1661,17 +1648,17 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     // it would probably be best to remove the friendly names from the maps and have a completely separate name->friendlyName store
     KeyMap map(K95, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
 
     // The only key missing from it should be Fn, which is found on STRAFE
     map = KeyMap(STRAFE, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
 
     // Light Program for the legacy K95
     map = KeyMap(K95L, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
 
     // Additionally, there are a handful of keys not present on any physical keyboard, but we need names for them
     if(key == "f13" || key == "f14" || key == "f15" || key == "f16" || key == "f17" || key == "f18" || key == "f19" || key == "f20"
@@ -1687,22 +1674,22 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     // All other names are found on mice
     map = KeyMap(SCIMITAR, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(M65, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(HARPOON, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(IRONCLAW, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(NIGHTSWORD, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(IRONCLAW_W, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
 
     // Not found at all
     return "";

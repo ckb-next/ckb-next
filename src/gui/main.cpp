@@ -11,6 +11,7 @@
 #include <QTranslator>
 #include "compat/qrand.h"
 #include <QMessageBox>
+#include "keywidgetdebugger.h"
 
 QSharedMemory appShare("ckb-next");
 
@@ -38,6 +39,9 @@ enum CommandLineParseResults {
 
 bool startDelay = false;
 bool silent = false;
+#ifndef QT_NO_DEBUG
+bool kwdebug = false;
+#endif
 
 /**
  * parseCommandLine - Setup options and parse command line arguments.
@@ -86,6 +90,11 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     parser.addOption(delayOption);
     parser.addOption(silentOption);
 
+#ifndef QT_NO_DEBUG
+    QCommandLineOption kwdebugOption("kwdebug", QObject::tr("Enables the KeyWidget debug window"));
+    parser.addOption(kwdebugOption);
+#endif
+
     /* parse arguments */
     if (!parser.parse(QCoreApplication::arguments())) {
         // set error, if there already are some
@@ -111,6 +120,12 @@ CommandLineParseResults parseCommandLine(QCommandLineParser &parser, QString *er
     if(parser.isSet(silentOption)) {
         silent = true;
     }
+
+#ifndef QT_NO_DEBUG
+    if(parser.isSet(kwdebugOption)) {
+        kwdebug = true;
+    }
+#endif
 
     if (parser.isSet(backgroundOption)) {
         // open application in background
@@ -376,6 +391,14 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     MainWindow w(silent);
     if(!background)
         w.show();
+
+#ifndef QT_NO_DEBUG
+    if(kwdebug){
+        KeyWidgetDebugger* d = new KeyWidgetDebugger;
+        d->setAttribute(Qt::WA_DeleteOnClose);
+        d->show();
+    }
+#endif
 
     return a.exec();
 }

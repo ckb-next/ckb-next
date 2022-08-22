@@ -147,6 +147,7 @@ if (MACOS OR LINUX)
               keyaction.cpp
               keymap.cpp
               keywidget.cpp
+              keywidgetdebugger.cpp
               kperfwidget.cpp
               legacylightwidget.cpp
               macroreader.cpp
@@ -201,6 +202,7 @@ if (MACOS OR LINUX)
               keyaction.h
               keymap.h
               keywidget.h
+              keywidgetdebugger.h
               keywidgetlayout.h
               kperfwidget.h
               legacylightwidget.h
@@ -239,6 +241,7 @@ if (MACOS OR LINUX)
               kbmodeeventmgr.ui
               kbprofiledialog.ui
               kbwidget.ui
+              keywidgetdebugger.ui
               kperfwidget.ui
               legacylightwidget.ui
               mainwindow.ui

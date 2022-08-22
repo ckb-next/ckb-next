@@ -90,7 +90,7 @@ void KbBindWidget::updateSelDisplay(){
     if(count == 1){
         // Single key selected: show key name and binding
         QString key = currentSelection[0];
-        const Key& pos = bind->map()[key];
+        const Key& pos = bind->map().key(key);
         if(!pos)
             ui->selectLabel->setText(tr("(Unknown)"));
         else

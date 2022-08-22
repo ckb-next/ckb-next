@@ -159,7 +159,7 @@ QString KbBind::defaultAction(const QString& key){
 }
 
 QString KbBind::friendlyName(const QString& key){
-    const Key& pos = _map[globalRemap(key)];
+    const Key& pos = _map.key(globalRemap(key));
     if(!pos)
         return "(Unknown)";
     return pos.friendlyName();

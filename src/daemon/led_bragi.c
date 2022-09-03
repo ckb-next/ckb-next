@@ -137,9 +137,7 @@ static inline int updatergb_alt_bragi(usbdevice* kb, int force){
     for(size_t i = 0; i < zones; i++)
         start[i * 3 + 2] = newlight->b[i];
 
-    //if(bragi_write_to_handle(kb, pkt1, BRAGI_LIGHTING_HANDLE, sizeof(pkt1), 3 * zones + BRAGI_ALT_RGB_HEADER))
-    // FIXME: HACK to get the packet to have the correct length field for the K100
-    if(bragi_write_to_handle(kb, pkt1, BRAGI_LIGHTING_HANDLE, sizeof(pkt1), 3 * 193 + BRAGI_ALT_RGB_HEADER))
+    if(bragi_write_to_handle(kb, pkt1, BRAGI_LIGHTING_HANDLE, sizeof(pkt1), 3 * zones + BRAGI_ALT_RGB_HEADER))
         return 1;
 
     // FIXME implement second packet

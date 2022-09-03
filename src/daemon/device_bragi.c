@@ -35,8 +35,10 @@ void* bragi_poll_thread(void* ctx){
 }
 
 static int setactive_bragi(usbdevice* kb, int active){
-    if(active == BRAGI_MODE_HARDWARE)
+    if(active == BRAGI_MODE_HARDWARE){
         bragi_close_handle(kb, BRAGI_LIGHTING_HANDLE);
+        bragi_close_handle(kb, BRAGI_2ND_LIGHTING_HANDLE);
+    }
 
     const int ckb_id = INDEX_OF(kb, keyboard);
     if(bragi_set_property(kb, BRAGI_MODE, active)){
@@ -87,7 +89,7 @@ static int setactive_bragi(usbdevice* kb, int active){
     // Check if the device returned an error
     // Non fatal for now. Should first figure out what the error codes mean.
     // Device returns 0x03 on writes if we haven't opened the handle.
-    /*if(light == 0x01) {
+    if(light == 0x01) {
         // A K100 has been observed to return 0x01, so it probably means "not supported"
         // If we get that response, we instead try to open the alt rgb lighting resource
         ckb_warn("ckb%d: Bragi light init returned not supported", ckb_id);
@@ -110,7 +112,7 @@ static int setactive_bragi(usbdevice* kb, int active){
             if(light)
                 ckb_err("ckb%d: Bragi extra light init returned error 0x%hhx", ckb_id, light);
         }
-    } else */if(light) {
+    } else if(light) {
         ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, light);
     }
     return 0;

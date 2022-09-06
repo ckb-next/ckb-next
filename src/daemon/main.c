@@ -190,7 +190,7 @@ int main(int argc, char** argv){
     if((dpid = is_pid_running())){
         ckb_fatal_nofile("ckb-next-daemon is already running (PID %ld).", (long)dpid);
         ckb_fatal_nofile("Try `systemctl stop ckb-next-daemon` or `killall ckb-next-daemon`.");
-        ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)", pidpath);
+        ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again.)", pidpath);
         return 1;
     }
 

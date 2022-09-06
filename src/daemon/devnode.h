@@ -6,7 +6,7 @@
 
 /// Device path base ("/dev/input/ckb" or "/var/run/ckb")
 extern const char devpath[];
-int is_pid_running();
+pid_t is_pid_running();
 
 /// Group ID for the control nodes. -1 to give read/write access to everybody
 extern long gid;

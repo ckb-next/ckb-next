@@ -103,7 +103,8 @@
 #define P_STRAFE_MK2         0x1b48
 #define IS_STRAFE(kb)        ((kb)->vendor == V_CORSAIR && ((kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2))
 
-#define P_K100               0x1b7c
+#define P_K100_OPTICAL       0x1b7c
+#define P_K100_MECHANICAL    0x1b7d
 
 #define P_M55_RGB_PRO        0x1b70
 

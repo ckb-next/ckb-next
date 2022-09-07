@@ -703,6 +703,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
         break;
     }
+    case KeyMap::K100_OPTICAL:
     case KeyMap::K100_MECHANICAL:{
         map = getMap(KeyMap::K95P, layout);
         // Shift everything down except the existing topbar

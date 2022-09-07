@@ -636,7 +636,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
 
-    case KeyMap::K95P: {
+    case KeyMap::K95P:{
         // The K95 Platinum map is based on the K95
         map = getMap(KeyMap::K95, layout);
         // Remove excess G keys
@@ -692,18 +692,18 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["volup"].y += 1;
         // Shift all keys down (to make room for the lightbar), and to the left
         QMutableHashIterator<QString, Key> i(map);
-        while (i.hasNext()) {
+        while (i.hasNext()){
             i.next();
             i.value().x -= K95P_X_START;
             i.value().y += 6;
         }
         // Add lightbar
-        for (const Key *key = K95PLbar; key < K95PLbar + LBARCOUNT_K95P; key++)
+        for(const Key* key = K95PLbar; key < K95PLbar + LBARCOUNT_K95P; key++)
             map.insert(key->name, *key);
 
         break;
     }
-        case KeyMap::K100_MECHANICAL:{
+    case KeyMap::K100_MECHANICAL:{
         map = getMap(KeyMap::K95P, layout);
         // Shift everything down except the existing topbar
         QMutableHashIterator<QString, Key> i(map);
@@ -1259,10 +1259,6 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     default:;    // <- stop GCC from complaining
-        case KeyMap::NO_MODEL:
-            break;
-        case KeyMap::_MODEL_MAX:
-            break;
     }
 
     if(KeyMap::isJP(layout))

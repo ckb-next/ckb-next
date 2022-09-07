@@ -636,7 +636,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
 
-    case KeyMap::K95P:{
+    case KeyMap::K95P: {
         // The K95 Platinum map is based on the K95
         map = getMap(KeyMap::K95, layout);
         // Remove excess G keys
@@ -671,7 +671,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("m3");
         map.remove("mr");
         // Add profile button
-        map["profswitch"] = {nullptr,  "Profile Switch", "profswitch", 64, 1, 11, 8, true, true};
+        map["profswitch"] = {nullptr, "Profile Switch", "profswitch", 64, 1, 11, 8, true, true};
         // Centre Brightness/Winlock between F1 and F4
         map["light"].x = 75;
         map["lock"].x = 86;
@@ -692,18 +692,18 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["volup"].y += 1;
         // Shift all keys down (to make room for the lightbar), and to the left
         QMutableHashIterator<QString, Key> i(map);
-        while(i.hasNext()){
+        while (i.hasNext()) {
             i.next();
             i.value().x -= K95P_X_START;
             i.value().y += 6;
         }
         // Add lightbar
-        for(const Key* key = K95PLbar; key < K95PLbar + LBARCOUNT_K95P; key++)
-                map.insert(key->name, *key);
+        for (const Key *key = K95PLbar; key < K95PLbar + LBARCOUNT_K95P; key++)
+            map.insert(key->name, *key);
 
         break;
     }
-    case KeyMap::K100:{
+        case KeyMap::K100_MECHANICAL:{
         map = getMap(KeyMap::K95P, layout);
         // Shift everything down except the existing topbar
         QMutableHashIterator<QString, Key> i(map);
@@ -1259,6 +1259,10 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     default:;    // <- stop GCC from complaining
+        case KeyMap::NO_MODEL:
+            break;
+        case KeyMap::_MODEL_MAX:
+            break;
     }
 
     if(KeyMap::isJP(layout))
@@ -1520,8 +1524,10 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return GLAIVEPRO;
     if(lower == "k55pro")
         return K55PRO;
-    if(lower == "k100")
-        return K100;
+    if(lower == "k100_optical")
+        return K100_OPTICAL;
+    if(lower == "k100_mechanical")
+        return K100_MECHANICAL;
     return NO_MODEL;
 }
 
@@ -1593,8 +1599,10 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k95l";
     case GLAIVEPRO:
         return "glaivepro";
-    case K100:
-        return "k100";
+    case K100_MECHANICAL:
+        return "k100_mechanical";
+    case K100_OPTICAL:
+        return "k100_optical";
     default:
         return "";
     }
@@ -1631,7 +1639,8 @@ int KeyMap::modelWidth(Model model){
     case K55:
     case K57_WL:
         return K95P_WIDTH;
-    case K100:
+    case K100_MECHANICAL:
+    case K100_OPTICAL:
         return K100_WIDTH;
     case STRAFE:
     case STRAFE_MK2:
@@ -1680,7 +1689,8 @@ int KeyMap::modelHeight(Model model){
         return K95_HEIGHT;
     case K95P:
         return K95P_HEIGHT;
-    case K100:
+    case K100_MECHANICAL:
+    case K100_OPTICAL:
         return K100_HEIGHT;
     case K60:
         return K60_HEIGHT;

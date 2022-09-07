@@ -89,19 +89,20 @@ keypatch k100patch[] = {
 #define K100PATCH_LEN sizeof(k100patch)/sizeof(*k100patch)
 
 keypatches mappatches[] = {
-    { V_CORSAIR, P_K68,          k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_K68_NRGB,     k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_K65,          k65patch,       K65PATCH_LEN },
-    { V_CORSAIR, P_K65_LEGACY,   k65patch,       K65PATCH_LEN },
-    { V_CORSAIR, P_K63_NRGB,     k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_M55_RGB_PRO,  m55patch,       M55PATCH_LEN },
-    { V_CORSAIR, P_M95,          m95patch,       M95PATCH_LEN },
-    { V_CORSAIR, P_IRONCLAW_W_U, icwpatch,       ICWPATCH_LEN },
-    { V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch, HARPOONWLPATCH_LEN },
-    { V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch,KATARPROXTPATCH_LEN },
-    { V_CORSAIR, P_KATAR_PRO,    katarproxtpatch,KATARPROXTPATCH_LEN },
-    { V_CORSAIR, P_K95_LEGACY,   k95legacypatch, K95LEGACYPATCH_LEN },
-    { V_CORSAIR, P_K100,         k100patch,      K100PATCH_LEN},
+    { V_CORSAIR, P_K68,             k63patch,       K63PATCH_LEN },
+    { V_CORSAIR, P_K68_NRGB,        k63patch,       K63PATCH_LEN },
+    { V_CORSAIR, P_K65,             k65patch,       K65PATCH_LEN },
+    { V_CORSAIR, P_K65_LEGACY,      k65patch,       K65PATCH_LEN },
+    { V_CORSAIR, P_K63_NRGB,        k63patch,       K63PATCH_LEN },
+    { V_CORSAIR, P_M55_RGB_PRO,     m55patch,       M55PATCH_LEN },
+    { V_CORSAIR, P_M95,             m95patch,       M95PATCH_LEN },
+    { V_CORSAIR, P_IRONCLAW_W_U,    icwpatch,       ICWPATCH_LEN },
+    { V_CORSAIR, P_HARPOON_WL_U,    harpoonwlpatch, HARPOONWLPATCH_LEN },
+    { V_CORSAIR, P_KATAR_PRO_XT,    katarproxtpatch,KATARPROXTPATCH_LEN },
+    { V_CORSAIR, P_KATAR_PRO,       katarproxtpatch,KATARPROXTPATCH_LEN },
+    { V_CORSAIR, P_K95_LEGACY,      k95legacypatch, K95LEGACYPATCH_LEN },
+    { V_CORSAIR, P_K100_OPTICAL,    k100patch,      K100PATCH_LEN},
+    { V_CORSAIR, P_K100_MECHANICAL, k100patch,      K100PATCH_LEN},
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

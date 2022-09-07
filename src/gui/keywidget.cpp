@@ -289,7 +289,7 @@ void KeyWidget::paintEvent(QPaintEvent*){
                     bgPainter.setOpacity(0.7);
             }
         }
-        if(((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K100 && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+        if(((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K100_MECHANICAL && model != KeyMap::K100_OPTICAL && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || !strcmp(key.name, "lghtpgm") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))) ||
                 !strcmp(key.name, "ctrlwheelb")){
             // Not all devices have circular buttons

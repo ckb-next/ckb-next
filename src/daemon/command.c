@@ -62,33 +62,23 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 #define TRY_WITH_RESET(action)  \
     while(action){              \
         if(usb_tryreset(kb)){   \
-            free(word);         \
             return 1;           \
         }                       \
     }
 
 
-int readcmd(usbdevice* kb, const char* line){
-    char* word = malloc(strlen(line) + 1);
-    int wordlen;
-    const char* newline = 0;
+int readcmd(usbdevice* kb, char* line){
     const devcmd* vt = &kb->vtable;
     usbprofile* profile = kb->profile;
-    usbmode* mode = 0;
+    usbmode* mode = profile->currentmode;
     int notifynumber = 0;
     // Read words from the input
     cmd command = NONE;
-    while(sscanf(line, "%s%n", word, &wordlen) == 1){
-        line += wordlen;
-        // If we passed a newline, reset the context
-        if(line > newline){
-            mode = profile->currentmode;
-            command = NONE;
-            notifynumber = 0;
-            newline = strchr(line, '\n');
-            if(!newline)
-                newline = line + strlen(line);
-        }
+    char* ptr = NULL;
+    char* intok = line;
+    char* word = NULL;
+    while((word = strtok_r(intok, " ", &ptr))){
+        intok = NULL;
         // Check for a command word
         for(int i = 0; i < CMD_COUNT - 1; i++){
             if(!strcmp(word, cmd_strings[i])){
@@ -252,7 +242,6 @@ int readcmd(usbdevice* kb, const char* line){
         case FWUPDATE:
             // FW update parses a whole word. Unlike hwload/hwsave, there's no try again on failure.
             if(vt->fwupdate(kb, mode, notifynumber, 0, word)){
-                free(word);
                 return 1;
             }
             continue;
@@ -363,7 +352,6 @@ int readcmd(usbdevice* kb, const char* line){
         TRY_WITH_RESET(vt->updatergb(kb, 0));
         TRY_WITH_RESET(vt->updatedpi(kb, 0));
     }
-    free(word);
 
 #ifndef NDEBUG
     if(command == RGB)

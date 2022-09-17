@@ -293,81 +293,43 @@ static const devcmd* get_vtable(usbdevice* kb){
 }
 
 // USB device main loop
-/// brief .
-///
-/// \brief devmain is called by _setupusb
-/// \param kb the pointer to the device. Even if it has the name kb, it is valid also for a mouse (the whole driver seems to be implemented first for a keyboard).
-/// \return always a nullptr
-///
-/// # Synchronization
-/// The syncing via mutexes is interesting:
-/// 1. \a imutex (the Input mutex)\n
-/// This one is locked in \c setupusb().
-/// That function does only two things: Locking the mutex and trying to start a thread at \c _setupusb().
-/// _setupusb() unlocks \a imutex  after getting some buffers and initalizing internal structures from the indicators
-/// (this function often gets problems with error messages like "unable to read indicators" or "Timeout bla blubb").
-/// \warning have a look at \a updateindicators() later.
-/// \warning if creating the thread is not successful, the \a imutex remains blocked. Have a look at setupusb() later.
-///
-/// 2. \a dmutex (the Device mutex)\n
-/// This one is very interesting, because it is handled in devmain().
-/// It seems that it is locked only in \a _ledthread(), which is a thread created in \a os_setupindicators().
-/// os_setupindicators() again is called in \a _setupusb() long before calling devmain().
-/// So this mutex is locked when we start the function as the old comment says.\n
-/// Before reading from the FIFO and direct afterwards an unlock..lock sequence is implemented here.
-/// Even if only the function readlines() should be surrounded by the unlock..lock,
-/// the variable definition of the line pointer is also included here. Not nice, but does not bother either.
-/// Probably the Unlock..lock is needed so that now another process can change the control structure \a linectx while we wait in readlines().
-/// \todo Hope to find the need for dmutex usage later.
-/// \n Should this function be declared as pthread_t* function, because of the defintion of pthread-create? But void* works also...
-///
 static void* devmain(usbdevice* kb){
     /// \attention dmutex should still be locked when this is called
-    int kbfifo = kb->infifo - 1;
-    ///
-    /// First a \a readlines_ctx buffer structure is initialized by \c readlines_ctx_init().
-    readlines_ctx linectx;
-    readlines_ctx_init(&linectx);
-    ///
-    /// After some setup functions, beginning in _setupusb() which has called devmain(),
-    /// we read the command input-Fifo designated to that device in an endless loop.
-    /// This loop has two possible exits (plus reaction to signals, not mentioned here).
+    const int kbfifo = kb->infifo - 1;
+    readlines_ctx* linectx = calloc(1, sizeof(readlines_ctx));
+
     while(1){
-        ///
-        /// If the reading via readlines() is successful (we might have read multiple lines),
-        /// the interpretation is done by readcmd() if the connection to the device is still available
-        /// This is true if the kb-structure has a handle and an event pointer both != Null).
-        /// If not, the loop is left (the first exit point).
         queued_mutex_unlock(dmutex(kb));
-        // Read from FIFO
-        const char* line;
-        int lines = readlines(kbfifo, linectx, &line);
+        // Read from cmd FIFO
+        int ret = readline_fifo(kbfifo, linectx);
         wait_until_suspend_processed();
         queued_mutex_lock(dmutex(kb));
+
         // End thread when the handle is removed
         if(kb->status == DEV_STATUS_DISCONNECTING || kb->status == DEV_STATUS_DISCONNECTED)
             break;
-        ///
-        /// if nothing is in the line buffer (some magic interrupt?),
-        /// continue in the endless while without any reaction.
-        if(lines){
-            /// \todo readcmd() gets a \b line, not \b lines. Have a look on that later.
-            if(readcmd(kb, line)){
-                ///
-                /// If interpretation and communication with the usb device got errors,
-                /// they are signalled by readcmd() (non zero retcode).
-                /// In this case the usb device is closed via closeusb()
-                /// and the endless loop is left (the second exit point).
-                // USB transfer failed; destroy device
-                closeusb(kb);
-                break;
-            }
+
+        if(ret == -1) {
+            // EOF
+            break;
+        } else if(ret < -1) {
+            // Retry
+            continue;
+        } else {
+            // Keep consuming the buffered lines
+            // We break when readline_fifo is about to block so that it blocks above with dmutex unlocked
+            do {
+                if(readcmd(kb, linectx->buf)){
+                    // USB transfer failed or command requested disconnect; destroy device
+                    closeusb(kb);
+                    goto cleanup;
+                }
+            } while(ret > 0 && (ret = readline_fifo(kbfifo, linectx)) >= 0);
         }
     }
+cleanup:
     queued_mutex_unlock(dmutex(kb));
-    ///
-    /// After leaving the endless loop the readlines-ctx structure and its buffers are freed by readlines_ctx_free().
-    readlines_ctx_free(linectx);
+    free(linectx);
     return 0;
 }
 

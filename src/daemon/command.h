@@ -155,7 +155,7 @@ typedef union devcmd {
 
 // Parse input from FIFO. Lock dmutex first (see device.h)
 // This function is also responsible for calling all of the cmd_ functions. They should not be invoked elsewhere.
-int readcmd(usbdevice* kb, const char* line);
+int readcmd(usbdevice* kb, char* line);
 
 #endif  // COMMAND_H
 

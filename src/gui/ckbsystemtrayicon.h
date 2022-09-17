@@ -27,6 +27,10 @@ signals:
 private:
     QString previousPath;
 #else
+    // setToolTip implementations for feature parity
+    // They discard the icon
+    void setToolTip(const QString& iconName, const QString& title, const QString& subTitle) { QSystemTrayIcon::setToolTip(QString("%1: %2").arg(title, subTitle)); }
+    void setToolTip(const QIcon& icon, const QString& title, const QString& subTitle) { QSystemTrayIcon::setToolTip(QString("%1: %2").arg(title, subTitle)); }
     CkbSystemTrayIcon(const QIcon& icon, const QString iconName, QObject* parent = nullptr) :  QSystemTrayIcon(icon, parent) {}
     virtual bool event(QEvent* evt)
     {

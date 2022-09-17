@@ -66,7 +66,6 @@ static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar 
     }
 #endif
     // Add the header
-    pkt[0] = BRAGI_MAGIC;
     pkt[1] = BRAGI_WRITE_DATA;
     pkt[2] = handle;
     // Add the length to the header
@@ -77,9 +76,14 @@ static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar 
 
     // Send the first packet as-is
     uchar response[BRAGI_JUMBO_SIZE] = {0};
-    if(!usbrecv(kb, pkt, BRAGI_JUMBO_SIZE, response))
-        return 1;
-
+    if(pkt[0] & BRAGI_MAGIC){
+        if(!usbrecv(kb, pkt, BRAGI_JUMBO_SIZE, response))
+            return 1;
+        bragi_check_success(pkt, response);
+    } else {
+        if(!usbsend(kb, pkt, BRAGI_JUMBO_SIZE, 1))
+            return 1;
+    }
     // After sending the first chunk, if buf_len < data_len
     // start sending the additional chunks
     uchar* pkt_out = pkt;
@@ -87,15 +91,20 @@ static inline int bragi_write_to_handle_common(usbdevice* kb, uchar* pkt, uchar 
     while((pkt_out += kb->out_ep_packet_size) < pkt + data_len + offset) {
         //printf("buf sent %ld, remaining %ld\n", pkt_out - pkt, (int64_t)data_len + offset - (pkt_out - pkt));
         pkt_out -= 3;
-        pkt_out[0] = BRAGI_MAGIC;
+        pkt_out[0] = pkt[0];
         pkt_out[1] = BRAGI_CONTINUE_WRITE;
         pkt_out[2] = BRAGI_LIGHTING_HANDLE;
         // Send the new packet
-        if(!usbrecv(kb, pkt_out, BRAGI_JUMBO_SIZE, response))
-            return 1;
-        // Don't return if the packet failed, as it might be something recoverable.
-        // We don't really know what the error codes mean yet.
-        bragi_check_success(pkt_out, response);
+        if(pkt[0] & BRAGI_MAGIC){
+            if(!usbrecv(kb, pkt_out, BRAGI_JUMBO_SIZE, response))
+                return 1;
+            // Don't return if the packet failed, as it might be something recoverable.
+            // We don't really know what the error codes mean yet.
+            bragi_check_success(pkt_out, response);
+        } else {
+            if(!usbsend(kb, pkt_out, BRAGI_JUMBO_SIZE, 1))
+                return 1;
+        }
     }
 
     return 0;

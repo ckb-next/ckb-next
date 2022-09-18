@@ -85,7 +85,6 @@ public:
         // Calculate the width/height while preserving the aspect ratio
         // This is needed because Qt does not support any kind of "widthForHeight"
         int keyWidgetHeight = keyWidget->heightForWidth(r.width());
-        int commonWidth = r.width();
         if(keyWidgetHeight > r.height()){
             keyWidgetHeight = r.height();
         }
@@ -97,7 +96,7 @@ public:
         }
 
         // Calculate the final width
-        commonWidth = std::round(keyWidgetHeight * w->aspectRatio());
+        int commonWidth = std::round(keyWidgetHeight * w->aspectRatio());
 
         // If the calculated width is not enough for the control widget, force it to be that
         const int controlWidthHint = controls->sizeHint().width();

@@ -31,10 +31,8 @@ KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
 
 void KbLight::map(const KeyMap& map){
     // If any of the keys are missing from the color map, set them to white
-    QHashIterator<QString, Key> i(map);
-    while(i.hasNext()){
-        i.next();
-        const QString& key = i.key();
+    for(const Key& k : map){
+        const char* key = k.name;
         if(!_qColorMap.contains(key))
             _qColorMap[key] = 0xFFFFFFFF;
     }

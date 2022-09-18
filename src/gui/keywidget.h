@@ -4,12 +4,12 @@
 #include <QBitArray>
 #include <QMouseEvent>
 #include <QPaintEvent>
-#include <QWidget>
+#include <QOpenGLWidget>
 #include "keymap.h"
 #include "colormap.h"
 #include <cmath>
 
-class KeyWidget : public QWidget
+class KeyWidget : public QOpenGLWidget
 {
     Q_OBJECT
 public:
@@ -71,8 +71,9 @@ private:
     QBitArray selection;
     QBitArray newSelection;
     QBitArray animation;
-    int mouseDownX, mouseDownY;
-    int mouseCurrentX, mouseCurrentY;
+    // These should not be scaled so that the rect renders correctly
+    QPointF mouseDown;
+    QRectF mouseHighlightRect;
     enum {
         NONE,
         SET,
@@ -84,21 +85,30 @@ private:
 
     float _aspectRatio;
 
+    QImage _currentOverlay;
+    QPointF _overlayPos;
+
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
 
-    // Get drawing scale/offset. drawX = (keymapX + offsetX) * scale
-    void drawInfo(float& scale, float& offsetX, float& offsetY, int ratio = 1);
+    QPointF drawInfoOffset;
+    float drawInfoScale;
 
     // Helper functions for rendering keys
-    void drawLogo(const Key* key, QPainter* decPainter, float offX, float offY, float scale);
+    void drawLogo(const Key* key, QPainter* decPainter);
     void drawBottomRightCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawBottomLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawTopRightCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawTopLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
-    void drawStrafeSidelights(const Key* key, QPainter* decPainter, float offX, float offY, float scale, const QColor& keyColor, const QColor& color, const QColor& bgColor, int ratio);
+    void drawStrafeSidelights(const Key* key, QPainter* painter, const QColor& kC, const QColor& c, const QColor& bgC);
+    void paintGL() override;
+    void calculateDrawInfo(const QSize& size);
+    void resizeEvent(QResizeEvent* event) override {
+        calculateDrawInfo(event->size());
+        QOpenGLWidget::resizeEvent(event);
+    }
 };
 
 #endif // RGBWIDGET_H

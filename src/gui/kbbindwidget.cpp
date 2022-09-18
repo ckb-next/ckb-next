@@ -106,7 +106,7 @@ void KbBindWidget::on_resetButton_clicked(){
     if(selection.isEmpty())
         // Reset all keys if none selected
         selection = map.keys();
-    uint count = selection.count();
+    int count = selection.count();
     QString type = bind->isMouse() ? tr("button") : tr("key");
     QString text;
     if(count == map.count())

@@ -16,6 +16,7 @@
 #include "mainwindow.h"
 #include <QItemSelectionModel>
 #include "modelisttablemodel.h"
+#include "ckbmainbackgroundcolour.h"
 
 KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector) :
     QWidget(parent),
@@ -23,6 +24,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
     ui(new Ui::KbWidget), currentMode(nullptr),
     prevmode(nullptr)
 {
+    CkbMainBackgroundColour::init(parent);
     ui->setupUi(this);
     Q_ASSERT(ui->pollRateBox->count() == Kb::POLLRATE_COUNT);
     ui->modesList->setDevice(device);

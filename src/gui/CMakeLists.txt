@@ -113,6 +113,7 @@ if (MACOS OR LINUX)
               animsettingdialog.cpp
               autorun.cpp
               batterysystemtrayicon.cpp
+              ckbmainbackgroundcolour.cpp
               ckbsettings.cpp
               ckbsettingswriter.cpp
               ckbupdater.cpp
@@ -169,6 +170,7 @@ if (MACOS OR LINUX)
               animscript.h
               animsettingdialog.h
               autorun.h
+              ckbmainbackgroundcolour.h
               ckbsettings.h
               ckbsettingswriter.h
               ckbsystemtrayicon.h

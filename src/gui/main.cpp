@@ -12,6 +12,7 @@
 #include "compat/qrand.h"
 #include <QMessageBox>
 #include "keywidgetdebugger.h"
+#include <QSurfaceFormat>
 
 QSharedMemory appShare("ckb-next");
 
@@ -222,6 +223,10 @@ bool checkIfQtCreator(){
 }
 
 int main(int argc, char *argv[]){
+QSurfaceFormat fmt;
+fmt.setSamples(8);
+QSurfaceFormat::setDefaultFormat(fmt);
+
 QSettings::setDefaultFormat(CkbSettings::Format);
 
 #ifdef Q_OS_LINUX

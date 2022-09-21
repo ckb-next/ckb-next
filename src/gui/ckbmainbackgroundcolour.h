@@ -3,6 +3,7 @@
 #include <QColor>
 #include <QPixmap>
 #include <QTabWidget>
+#include <QDebug>
 
 // This is awful.
 // QOpenGLWidget can't be rendered transparently, so the background needs to be filled with something.
@@ -14,8 +15,10 @@
 class CkbMainBackgroundColour {
 public:
     static const QColor& getColour() {
-        Q_ASSERT(c.isValid());
-        return c;
+        if(c.isValid())
+            return c;
+        qDebug() << "Returning default colour in CkbMainBackgroundColour. This is expected for KeyWidgetDebugger.";
+        return unknown;
     }
     static void init(QWidget* parent) {
         if(c.isValid())
@@ -37,6 +40,7 @@ public:
 
 private:
     static QColor c;
+    static const QColor unknown;
 };
 
 #endif // CKBMAINBACKGROUNDCOLOUR_H

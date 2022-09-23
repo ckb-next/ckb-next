@@ -7,6 +7,7 @@
 #include "notify.h"
 #include "profile.h"
 #include "usb.h"
+#include <ckbnextconfig.h>
 
 static const char* const cmd_strings[CMD_COUNT - 1] = {
     // NONE is implicit
@@ -66,6 +67,17 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
         }                       \
     }
 
+#define HERTZ_LIM 16528925L // 60.5Hz
+
+static inline long timespec_diff_ns (struct timespec* a, struct timespec* b){
+    const time_t diff_s = a->tv_sec - b->tv_sec;
+    const long diff_ns = a->tv_nsec - b->tv_nsec;
+    // Check for possible overflow
+    if(diff_ns > 0 && (LONG_MAX - diff_ns) / 1000000000L <= diff_s)
+        return LONG_MAX;
+
+    return diff_ns + diff_s * 1000000000L;
+}
 
 int readcmd(usbdevice* kb, char* line){
     const devcmd* vt = &kb->vtable;
@@ -349,6 +361,27 @@ int readcmd(usbdevice* kb, char* line){
 
     // Finish up
     if(!NEEDS_FW_UPDATE(kb)){
+        if(command == RGB){
+            struct timespec now;
+            clock_gettime(CLOCK_MONOTONIC, &now);
+            long int diff = timespec_diff_ns(&now, &kb->last_rgb);
+
+            if(diff > 0 && diff < HERTZ_LIM){
+#ifndef NDEBUG
+                ckb_warn("ckb%d: RGB command called too quickly (%ld ns). Throttling...", INDEX_OF(kb, keyboard), diff);
+#endif
+                const long int sleep_ns = HERTZ_LIM - diff;
+                clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = sleep_ns}, NULL);
+                now.tv_nsec += sleep_ns;
+#ifdef FPS_COUNTER
+                diff += sleep_ns;
+#endif
+            }
+#ifdef FPS_COUNTER
+            ckb_info("ckb%d: FPS %f", INDEX_OF(kb, keyboard), 1.f / (diff / 1000000000.f));
+#endif
+            memcpy(&kb->last_rgb, &now, sizeof(struct timespec));
+        }
         TRY_WITH_RESET(vt->updatergb(kb, 0));
         TRY_WITH_RESET(vt->updatedpi(kb, 0));
     }

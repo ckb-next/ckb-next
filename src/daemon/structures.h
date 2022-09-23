@@ -383,6 +383,7 @@ typedef struct usbdevice_ {
         BRIGHTNESS_HARDWARE_FINE,
         BRIGHTNESS_HARDWARE_COARSE,
     } brightness_mode;
+    struct timespec last_rgb;
 } usbdevice;
 
 #endif  // STRUCTURES_H

@@ -8,6 +8,8 @@
 #include "keymap.h"
 #include "colormap.h"
 #include <cmath>
+#include <ckbnextconfig.h>
+#include <QElapsedTimer>
 
 class KeyWidget : public QOpenGLWidget
 {
@@ -25,6 +27,7 @@ public:
     const KeyMap&       map() const                         { return keyMap; }
     void                map(const KeyMap& newMap);
     // Key -> color map (must contain exactly the keys in the key map)
+
     const QColorMap&    colorMap() const                    { return _colorMap; }
     void                colorMap(const QColorMap& newColorMap);
     // Key -> binding map
@@ -109,6 +112,9 @@ private:
         calculateDrawInfo(event->size());
         QOpenGLWidget::resizeEvent(event);
     }
+#ifdef FPS_COUNTER
+    QElapsedTimer glFpsTimer;
+#endif
 };
 
 #endif // RGBWIDGET_H

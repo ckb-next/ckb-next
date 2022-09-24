@@ -10,6 +10,7 @@
 #include <limits>
 #include <QLabel>
 #include "ckbmainbackgroundcolour.h"
+#include <ckbnextconfig.h>
 
 static const int KEY_SIZE = 12;
 
@@ -56,6 +57,9 @@ KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
     QPalette p = palette();
     p.setColor(QPalette::Window, CkbMainBackgroundColour::getColour());
     setPalette(p);
+#ifdef FPS_COUNTER
+    glFpsTimer.start();
+#endif
 }
 
 void KeyWidget::map(const KeyMap& newMap){
@@ -491,6 +495,17 @@ void KeyWidget::paintGL(){
         painter.setBrush(bgHighlightBrush);
         painter.drawRect(mouseHighlightRect);
     }
+
+#ifdef FPS_COUNTER
+    painter.setPen(QPen(green, 1.0));
+    QFont fpsfont = painter.font();
+    fpsfont.setBold(true);
+    fpsfont.setPointSize(14);
+    painter.setFont(fpsfont);
+    painter.drawText(5, 18, QString::number(1.0/((double)glFpsTimer.restart()/1000.0), 'f', 2));
+    painter.setPen(QPen(blue, 1.0));
+    painter.drawText(5, 36, QLatin1String("XX.XX")); // Placeholder
+#endif
 }
 
 void KeyWidget::paintEvent(QPaintEvent* e){

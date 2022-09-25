@@ -112,6 +112,7 @@ private:
         calculateDrawInfo(event->size());
         QOpenGLWidget::resizeEvent(event);
     }
+    bool event(QEvent *e) override;
 #ifdef FPS_COUNTER
     QElapsedTimer glFpsTimer;
     double kbLoopElapsed;

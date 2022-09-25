@@ -169,6 +169,27 @@ void KeyWidget::calculateDrawInfo(const QSize& size){
     drawInfoOffset.setY((h / drawInfoScale - keyMap.height()) / 2.f);
 }
 
+bool KeyWidget::event(QEvent* e){
+    if(e->type() != QEvent::ToolTip)
+        return QOpenGLWidget::event(e);
+
+    QHelpEvent* he = static_cast<QHelpEvent*>(e);
+    QPointF mouseCurrentScaled = he->pos() / drawInfoScale - drawInfoOffset;
+
+    for(const Key& key: keyMap){
+        // Get the name of the key under the cursor
+        QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
+        if(keyRect.contains(mouseCurrentScaled)){
+            QToolTip::showText(he->globalPos(), key.friendlyName(false));
+            return true;
+        }
+    }
+    // No key was found under the cursor
+    QToolTip::hideText();
+    e->ignore();
+    return true;
+}
+
 void KeyWidget::colorMap(const QColorMap& newColorMap){
     _colorMap = newColorMap;
     update();
@@ -553,19 +574,20 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
 
 void KeyWidget::mouseMoveEvent(QMouseEvent* event){
     event->accept();
-    QString curTooltip;
+
+    if(mouseDownMode == NONE)
+        return;
 
     // Find selection rectangle
     const QPointF& mouseCurrent = event->localPos();
     QPointF mouseCurrentScaled = mouseCurrent / drawInfoScale - drawInfoOffset;
 
     QRectF mouseHighlightRectScaled;
+
     // Clear new selection
-    if(mouseDownMode != NONE){
-        newSelection.fill(false);
-        mouseHighlightRect = QRectF(mouseCurrent, mouseDown).normalized();
-        mouseHighlightRectScaled = QRectF(mouseCurrentScaled, mouseDown / drawInfoScale - drawInfoOffset).normalized();
-    }
+    newSelection.fill(false);
+    mouseHighlightRect = QRectF(mouseCurrent, mouseDown).normalized();
+    mouseHighlightRectScaled = QRectF(mouseCurrentScaled, mouseDown / drawInfoScale - drawInfoOffset).normalized();
 
     // See if the event hit any keys
     int i = -1;
@@ -575,9 +597,6 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
                 || (!_rgbMode && !key.hasScan))
             continue;
         QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
-        // Update tooltip with the mouse hover (if any), even if it's not selectable
-        if(keyRect.contains(mouseCurrentScaled))
-            curTooltip = key.friendlyName(false);
         // on STRAFE Sidelights and indicators can't be assigned color the way other keys are colored
         if(((keyMap.model() == KeyMap::STRAFE || keyMap.model() == KeyMap::STRAFE_MK2) && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")))
                 || (keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back"))
@@ -587,14 +606,7 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
             newSelection.setBit(i);
     }
 
-    if(mouseDownMode != NONE)
-        update();
-
-    if(toolTip() != curTooltip){
-        setToolTip(curTooltip);
-        if(curTooltip.isEmpty())
-            QToolTip::hideText();
-    }
+    update();
 }
 
 void KeyWidget::mouseReleaseEvent(QMouseEvent* event){

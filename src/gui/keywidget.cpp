@@ -59,6 +59,7 @@ KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
     setPalette(p);
 #ifdef FPS_COUNTER
     glFpsTimer.start();
+    kbLoopElapsed = 0.0;
 #endif
 }
 
@@ -173,11 +174,15 @@ void KeyWidget::colorMap(const QColorMap& newColorMap){
     update();
 }
 
-void KeyWidget::displayColorMap(const ColorMap& newDisplayMap, const QSet<QString>& indicators){
+void KeyWidget::displayColorMap(const ColorMap& newDisplayMap, const QSet<QString>& indicators, quint64 renderInterval){
     if(!isVisible())
         return;
     _displayColorMap = newDisplayMap;
     _indicators = indicators;
+#ifdef FPS_COUNTER
+    if(renderInterval != std::numeric_limits<quint64>::max())
+        kbLoopElapsed = renderInterval;
+#endif
     update();
 }
 
@@ -504,7 +509,8 @@ void KeyWidget::paintGL(){
     painter.setFont(fpsfont);
     painter.drawText(5, 18, QString::number(1.0/((double)glFpsTimer.restart()/1000.0), 'f', 2));
     painter.setPen(QPen(blue, 1.0));
-    painter.drawText(5, 36, QLatin1String("XX.XX")); // Placeholder
+    if(kbLoopElapsed > 0.0)
+        painter.drawText(5, 36, QString::number(1.0/(kbLoopElapsed/1000.0), 'f', 2));
 #endif
 }
 

@@ -56,7 +56,7 @@ public:
 public slots:
     // Sets display colors. Pass an empty map to clear.
     // These will be displayed instead of the regular color map, if supplied.
-    void displayColorMap(const ColorMap& newDisplayMap, const QSet<QString>& indicators = QSet<QString>());
+    void displayColorMap(const ColorMap& newDisplayMap, const QSet<QString>& indicators, quint64 renderInterval);
 
 signals:
     // Emitted when the selection is changed.
@@ -114,6 +114,7 @@ private:
     }
 #ifdef FPS_COUNTER
     QElapsedTimer glFpsTimer;
+    double kbLoopElapsed;
 #endif
 };
 

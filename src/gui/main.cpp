@@ -400,8 +400,8 @@ QSettings::setDefaultFormat(CkbSettings::Format);
 #ifndef QT_NO_DEBUG
     if(kwdebug){
         KeyWidgetDebugger* d = new KeyWidgetDebugger;
-        d->setAttribute(Qt::WA_DeleteOnClose);
         d->show();
+        QObject::connect(&w, &MainWindow::destroyed, [d](){delete d;});
     }
 #endif
 

@@ -172,7 +172,6 @@ Kb::Kb(QObject *parent, const QString& path) :
         notifyPaths.insert(notifyPath); ///< \todo Is adding notify2 to the notifypaths neccessary?
     }
     // Activate device, apply settings, and ask for hardware profile
-    cmd.write(QString("fps %1\n").arg(_frameRate).toLatin1());
     cmd.write(QString("dither %1\n").arg(static_cast<int>(_dither)).toLatin1());
 #ifdef Q_OS_MACOS
     // Write ANSI/ISO flag to daemon (OSX only)
@@ -232,10 +231,6 @@ void Kb::frameRate(int newFrameRate){
     if(newFrameRate == _frameRate)
         return;
     _frameRate = newFrameRate;
-    foreach(Kb* kb, activeDevices){
-        kb->cmd.write(QString("fps %1\n").arg(newFrameRate).toLatin1());
-        kb->cmd.flush();
-    }
 }
 
 void Kb::layout(KeyMap::Layout newLayout, bool stop){

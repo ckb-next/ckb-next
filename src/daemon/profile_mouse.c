@@ -9,7 +9,7 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
     (void)dummy2;
     (void)dummy3;
 
-    DELAY_LONG(kb);
+    DELAY_100MS();
     hwprofile* hw = calloc(1, sizeof(hwprofile));
     // Ask for profile and mode IDs
     uchar data_pkt[2][MSG_SIZE] = {
@@ -48,7 +48,7 @@ int cmd_hwload_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, cons
     // Free the existing profile (if any)
     free(kb->hw);
     kb->hw = hw;
-    DELAY_LONG(kb);
+    DELAY_100MS();
     return 0;
 }
 
@@ -58,7 +58,7 @@ int cmd_hwsave_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
     (void)dummy3;
     (void)dummy4;
 
-    DELAY_LONG(kb);
+    DELAY_100MS();
     hwprofile* hw = kb->hw;
     if(!hw)
         hw = kb->hw = calloc(1, sizeof(hwprofile));
@@ -87,6 +87,6 @@ int cmd_hwsave_mouse(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, con
     // Save the DPI data (also saves RGB for those states)
     if(savedpi(kb, hw->dpi, hw->light))
         return -1;
-    DELAY_LONG(kb);
+    DELAY_100MS();
     return 0;
 }

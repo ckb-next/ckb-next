@@ -5,19 +5,24 @@ typedef struct usbdevice_ usbdevice;
 typedef struct usbmode_ usbmode;
 typedef enum pollrate_ pollrate_t;
 
+typedef enum {
+    DELAY_SEND,
+    DELAY_RECV,
+    DELAY_INDICATORS,
+} delay_type_t;
+
 // Command operations
 typedef enum {
     // Special - handled by readcmd, no device functions
-    NONE        = -11,
-    DELAY       = -10,   CMD_FIRST = DELAY,
-    MODE        = -9,
-    SWITCH      = -8,
-    LAYOUT      = -7,
-    ACCEL       = -6,
-    SCROLLSPEED = -5,
-    NOTIFYON    = -4,
-    NOTIFYOFF   = -3,
-    FPS         = -2,
+    NONE        = -10,
+    DELAY       = -9,   CMD_FIRST = DELAY,
+    MODE        = -8,
+    SWITCH      = -7,
+    LAYOUT      = -6,
+    ACCEL       = -5,
+    SCROLLSPEED = -4,
+    NOTIFYON    = -3,
+    NOTIFYOFF   = -2,
     DITHER      = -1,
 
     // Hardware data
@@ -150,6 +155,7 @@ typedef union devcmd {
         device_io read;
 
         void (*get_battery_info)(usbdevice* kb);
+        void (*delay)(usbdevice* kb, delay_type_t type);
     };
 } devcmd;
 

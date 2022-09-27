@@ -35,7 +35,7 @@ int setactive_kb(usbdevice* kb, int active){
         msg[0][2] = MODE_SOFTWARE;
         if(!usbsend(kb, msg[0], MSG_SIZE, 1))
             return -1;
-        DELAY_MEDIUM(kb);
+        DELAY_30MS();
         // Set input mode on the keys. They must be grouped into packets of 60 bytes (+ 4 bytes header)
         // Keys are referenced in byte pairs, with the first byte representing the key and the second byte representing the mode.
         for(int k = 0; k < N_KEYS_HW; ){
@@ -57,16 +57,16 @@ int setactive_kb(usbdevice* kb, int active){
         // Commit new input settings
         if(!usbsend(kb, msg[2], MSG_SIZE, 1))
             return -1;
-        DELAY_MEDIUM(kb);
+        DELAY_30MS();
     } else {
         // Set the M-keys back into hardware mode, restore hardware RGB profile. It has to be sent twice for some reason.
         msg[0][2] = MODE_HARDWARE;
         if(!usbsend(kb, msg[0], MSG_SIZE, 1))
             return -1;
-        DELAY_MEDIUM(kb);
+        DELAY_30MS();
         if(!usbsend(kb, msg[0], MSG_SIZE, 1))
             return -1;
-        DELAY_MEDIUM(kb);
+        DELAY_30MS();
 #ifdef OS_LINUX
         // On OSX the default key mappings are fine. On Linux, the G keys will freeze the keyboard. Set the keyboard entirely to HID input.
         for(int k = 0; k < N_KEYS_HW; ){
@@ -99,7 +99,7 @@ int setactive_kb(usbdevice* kb, int active){
         // Commit new input settings
         if(!usbsend(kb, msg[2], MSG_SIZE, 1))
             return -1;
-        DELAY_MEDIUM(kb);
+        DELAY_30MS();
 #endif
     }
     // Update indicator LEDs if the profile contains settings for them
@@ -125,7 +125,7 @@ int cmd_idle_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const ch
     return setactive_kb(kb, 0);
 }
 
-void setmodeindex_legacy(usbdevice *kb, int index){
+void setmodeindex_legacy(usbdevice* kb, int index){
     switch(index % 3){
     case 0:
         nk95cmd(kb, NK95_M1);
@@ -137,4 +137,10 @@ void setmodeindex_legacy(usbdevice *kb, int index){
         nk95cmd(kb, NK95_M3);
         break;
     }
+}
+
+static const struct timespec legacy_delay_ts = {.tv_nsec = 30000000000};
+void legacy_delay(usbdevice* kb, delay_type_t type){
+    // Fixed 30ms delay should be fine
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &legacy_delay_ts, NULL);
 }

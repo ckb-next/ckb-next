@@ -170,7 +170,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     ckb_info("Loading firmware version %04x from %s", version, path);
     nprintf(kb, nnumber, 0, "fwupdate %s 0/%d\n", path, (int)length);
     // Force the device to 10ms delay (we need to deliver packets very slowly to make sure it doesn't get overwhelmed)
-    kb->usbdelay = 10;
+    kb->usbdelay_us = 10000;
     // Send the firmware messages (256 bytes at a time)
     uchar data_pkt[7][MSG_SIZE] = {
         { CMD_SET, FIELD_FW_START, 0xf0, 0x01, 0 },

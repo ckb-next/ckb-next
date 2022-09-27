@@ -19,7 +19,6 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
     "scrollspeed",
     "notifyon",
     "notifyoff",
-    "fps",
     "dither",
 
     "hwload",
@@ -180,21 +179,6 @@ int readcmd(usbdevice* kb, char* line){
                 mode = profile->mode + newmode - 1;
             continue;
         }
-        case FPS: {
-            // USB command delay (2 - 10ms)
-            uint framerate;
-            if(sscanf(word, "%u", &framerate) == 1 && framerate > 0){
-                // Not all devices require the same number of messages per frame; select delay appropriately
-                uint per_frame = IS_MOUSE_DEV(kb) ? 2 : IS_FULLRANGE(kb) ? 14 : 5;
-                uint delay = 1000 / framerate / per_frame;
-                if(delay < 2)
-                    delay = 2;
-                else if(delay > 10)
-                    delay = 10;
-                kb->usbdelay = delay;
-            }
-            continue;
-        }
         case DITHER: {
             // 0: No dither, 1: Ordered dither.
             uint dither;
@@ -240,15 +224,14 @@ int readcmd(usbdevice* kb, char* line){
             }
             continue;
         case HWLOAD: case HWSAVE:{
-            char delay = kb->usbdelay;
+            ushort delay = kb->usbdelay_us;
             // Ensure delay of at least 10ms as the device can get overwhelmed otherwise
-            if(delay < 10)
-                kb->usbdelay = 10;
+            kb->usbdelay_us = 10000;
             // Try to load/save the hardware profile. Reset on failure, disconnect if reset fails.
             TRY_WITH_RESET(vt->do_io[command](kb, mode, notifynumber, 1, 0));
             // Re-send the current RGB state as it sometimes gets scrambled
             TRY_WITH_RESET(vt->updatergb(kb, 1));
-            kb->usbdelay = delay;
+            kb->usbdelay_us = delay;
             continue;
         }
         case FWUPDATE:

@@ -18,7 +18,7 @@ int cmd_hwload_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const c
     (void)dummy2;
     (void)dummy3;
 
-    DELAY_LONG(kb);
+    DELAY_100MS();
     hwprofile* hw = calloc(1, sizeof(hwprofile));
     // Ask for profile and mode IDs
     uchar data_pkt[2][MSG_SIZE] = {
@@ -54,7 +54,7 @@ int cmd_hwload_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int apply, const c
     // Free the existing profile (if any)
     free(kb->hw);
     kb->hw = hw;
-    DELAY_LONG(kb);
+    DELAY_100MS();
     return 0;
 }
 
@@ -64,7 +64,7 @@ int cmd_hwsave_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const 
     (void)dummy3;
     (void)dummy4;
 
-    DELAY_LONG(kb);
+    DELAY_100MS();
     hwprofile* hw = kb->hw;
     if(!hw)
         hw = kb->hw = calloc(1, sizeof(hwprofile));
@@ -94,6 +94,6 @@ int cmd_hwsave_kb(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const 
         if(savergb_kb(kb, hw->light + i, i))
             return -1;
     }
-    DELAY_LONG(kb);
+    DELAY_100MS();
     return 0;
 }

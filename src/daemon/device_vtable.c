@@ -115,6 +115,7 @@ const devcmd vtable_keyboard = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = int0_void_none,
+    .delay = nxp_delay,
 };
 
 const devcmd vtable_keyboard_wireless = {
@@ -166,6 +167,7 @@ const devcmd vtable_keyboard_wireless = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = nxp_get_battery_info,
+    .delay = nxp_delay,
 };
 
 // Legacy keyboard vtable (K70)
@@ -218,6 +220,7 @@ const devcmd vtable_keyboard_legacy = {
     .write = legacy_dev_io,
     .read = legacy_dev_io,
     .get_battery_info = int0_void_none,
+    .delay = legacy_delay,
 };
 
 // RGB mouse vtable
@@ -270,6 +273,7 @@ const devcmd vtable_mouse = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = int0_void_none,
+    .delay = nxp_delay,
 };
 
 const devcmd vtable_mouse_wireless = {
@@ -321,6 +325,7 @@ const devcmd vtable_mouse_wireless = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = nxp_get_battery_info,
+    .delay = nxp_delay,
 };
 
 // RGB Mousepad vtable
@@ -373,6 +378,7 @@ const devcmd vtable_mousepad = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = int0_void_none,
+    .delay = nxp_delay,
 };
 
 // Legacy mouse vtable
@@ -425,6 +431,7 @@ const devcmd vtable_mouse_legacy = {
     .write = legacy_dev_io,
     .read = legacy_dev_io,
     .get_battery_info = int0_void_none,
+    .delay = legacy_delay,
 };
 
 // Bragi vtables
@@ -476,6 +483,7 @@ const devcmd vtable_bragi_mouse = {
     .write = bragi_usb_write,
     .read = bragi_usb_read,
     .get_battery_info = bragi_get_battery_info,
+    .delay = bragi_delay,
 };
 
 const devcmd vtable_bragi_keyboard = {
@@ -526,6 +534,7 @@ const devcmd vtable_bragi_keyboard = {
     .write = bragi_usb_write,
     .read = bragi_usb_read,
     .get_battery_info = bragi_get_battery_info,
+    .delay = bragi_delay,
 };
 
 const devcmd vtable_bragi_dongle = {
@@ -576,4 +585,5 @@ const devcmd vtable_bragi_dongle = {
     .write = bragi_usb_write,
     .read = bragi_usb_read,
     .get_battery_info = int0_void_none,
+    .delay = bragi_delay,
 };

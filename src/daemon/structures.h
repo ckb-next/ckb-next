@@ -327,7 +327,7 @@ typedef struct usbdevice_ {
     // Physical device layout; LAYOUT_NONE if irrelevant, LAYOUT_UNKNOWN if unimplemented.
     uchar layout;
     // USB protocol delay (ms)
-    char usbdelay;
+    short usbdelay_us;
     // Current input state
     usbinput input;
     // Indicator LED state

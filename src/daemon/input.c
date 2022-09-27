@@ -515,7 +515,7 @@ void updateindicators_kb(usbdevice* kb, int force){
     kb->ileds = new;
     kb->hw_ileds_old = hw_new;
     if(old != new || force){
-        DELAY_SHORT(kb);
+        kb->vtable.delay(kb, DELAY_INDICATORS);
 
         ushort leds = kb->ileds;
         int len = 1;

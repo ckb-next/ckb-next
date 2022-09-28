@@ -476,49 +476,39 @@ int mkfwnode(usbdevice* kb){
     return 0;
 }
 
-// -1 means EOF, < -1 means retry. Positive indicates remaining lines in buffer.
-// (How many more times this function can be called before the read will block again).
+// 0 means EOF, < 0 means retry.
+// This function needs to return all the commands read at once so that the parser can handle duplicate commands
 int readline_fifo(int fd, readlines_ctx* ctx){
-
-    if(ctx->count || ctx->leftover_bytes) {
-        // Move everything from the start of the next string back to the beginning
-        memmove(ctx->buf, ctx->buf + ctx->next_start, ctx->buffer_bytes - ctx->next_start);
+    if(ctx->next_start) {
+        // Move anything left over back to the beginning
+        memmove(ctx->buf, ctx->next_start, ctx->leftover_bytes);
     }
 
-    if(!ctx->count) {
-        const size_t max_read = MAX_BUFFER - 1 - ctx->leftover_bytes;
+    const size_t max_read = MAX_BUFFER - ctx->leftover_bytes;
 
-        // Read fresh data
-        ssize_t ret = read(fd, ctx->buf + ctx->leftover_bytes, max_read);
-        if(ret <= 0)
-            return ret - 1;
+    // Read fresh data
+    ssize_t ret = read(fd, ctx->buf + ctx->leftover_bytes, max_read);
+    if(ret <= 0)
+        return ret;
 
-        ctx->buf[ctx->leftover_bytes + ret] = '\0';
+    // Find the last newline and terminate the string there
+    char* last = memrchr(ctx->buf, '\n', ctx->leftover_bytes + ret);
+    ctx->next_start = last;
 
-        // Replace all newlines with null terminators
-        char* pos = ctx->buf;
-        char* last = ctx->buf;
-        while((pos = strchr(pos, '\n'))){
-            ctx->count++;
-            *pos++ = '\0';
-            last = pos;
-        }
-        if(!ctx->count && (size_t)ret == max_read){
+    // No newline found yet
+    if(!last){
+        if((size_t)ret == max_read){
             ckb_warn("String too long (%dKB). Dropping...", MAX_BUFFER/1024);
             ctx->leftover_bytes = 0;
-            return -2;
+        } else {
+            ctx->leftover_bytes += ret;
         }
-        ctx->buffer_bytes = (size_t)ret + ctx->leftover_bytes;
-        ctx->leftover_bytes = ctx->buf + ctx->buffer_bytes - last;
-
-        // No newline found yet
-        if(!ctx->count){
-            ctx->next_start = 0;
-            return -2;
-        }
+        return -1;
     }
-    // Find where the next string starts from.
-    // We precalculate this here because after we return the string, we expect it to be modified by strtok.
-    ctx->next_start = strlen(ctx->buf) + 1;
-    return --ctx->count;
+
+    *last = '\0';
+
+    ctx->leftover_bytes = (ret + ctx->leftover_bytes) - (last - ctx->buf) - 1;
+
+    return 1;
 }

@@ -309,22 +309,18 @@ static void* devmain(usbdevice* kb){
         if(kb->status == DEV_STATUS_DISCONNECTING || kb->status == DEV_STATUS_DISCONNECTED)
             break;
 
-        if(ret == -1) {
+        if(ret == 0) {
             // EOF
             break;
-        } else if(ret < -1) {
+        } else if(ret < 0) {
             // Retry
             continue;
         } else {
-            // Keep consuming the buffered lines
-            // We break when readline_fifo is about to block so that it blocks above with dmutex unlocked
-            do {
-                if(readcmd(kb, linectx->buf)){
-                    // USB transfer failed or command requested disconnect; destroy device
-                    closeusb(kb);
-                    goto cleanup;
-                }
-            } while(ret > 0 && (ret = readline_fifo(kbfifo, linectx)) >= 0);
+            if(readcmd(kb, linectx->buf)){
+                // USB transfer failed or command requested disconnect; destroy device
+                closeusb(kb);
+                goto cleanup;
+            }
         }
     }
 cleanup:

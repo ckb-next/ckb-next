@@ -89,7 +89,8 @@ int readcmd(usbdevice* kb, char* line){
     char* ptr = NULL;
     char* intok = line;
     char* word = NULL;
-    while((word = strtok_r(intok, " ", &ptr))){
+    // This is done this way to eat up duplicate commands (for example multiple buffered rgb commands)
+    while((word = strtok_r(intok, " \n", &ptr))){
         intok = NULL;
         // Check for a command word
         for(int i = 0; i < CMD_COUNT - 1; i++){

@@ -40,8 +40,8 @@ int mkfwnode(usbdevice* kb);
 #define MAX_BUFFER (1024 * 128)
 typedef struct {
     char buf[MAX_BUFFER];
-    size_t leftover_bytes, buffer_bytes, next_start;
-    int count;
+    size_t leftover_bytes;
+    char* next_start;
 } readlines_ctx;
 int readline_fifo(int fd, readlines_ctx* ctx);
 

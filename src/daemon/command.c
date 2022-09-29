@@ -80,6 +80,10 @@ static inline long timespec_diff_ns (struct timespec* a, struct timespec* b){
 }
 
 int readcmd(usbdevice* kb, char* line){
+#ifdef FPS_COUNTER
+    // workaround for being able to check if an rgb command was issued
+    bool had_rgb = false;
+#endif
     const devcmd* vt = &kb->vtable;
     usbprofile* profile = kb->profile;
     usbmode* mode = profile->currentmode;
@@ -308,6 +312,9 @@ int readcmd(usbdevice* kb, char* line){
                     vt->rgb(kb, mode, -1, i, word);
                 continue;
             }
+#ifdef FPS_COUNTER
+            had_rgb = true;
+#endif
             break;
         }
         case MACRO:
@@ -362,35 +369,21 @@ int readcmd(usbdevice* kb, char* line){
 
     // Finish up
     if(!NEEDS_FW_UPDATE(kb)){
-        if(command == RGB){
-            struct timespec now;
-            clock_gettime(CLOCK_MONOTONIC, &now);
-            long int diff = timespec_diff_ns(&now, &kb->last_rgb);
-
-            if(diff > 0 && diff < HERTZ_LIM){
-#ifndef NDEBUG
-                ckb_warn("ckb%d: RGB command called too quickly (%ld ns). Throttling...", INDEX_OF(kb, keyboard), diff);
-#endif
-                const long int sleep_ns = HERTZ_LIM - diff;
-                clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = sleep_ns}, NULL);
-                now.tv_nsec += sleep_ns;
-#ifdef FPS_COUNTER
-                diff += sleep_ns;
-#endif
-            }
-#ifdef FPS_COUNTER
-            ckb_info("ckb%d: FPS %f", INDEX_OF(kb, keyboard), 1.f / (diff / 1000000000.f));
-#endif
-            memcpy(&kb->last_rgb, &now, sizeof(struct timespec));
-        }
         TRY_WITH_RESET(vt->updatergb(kb, 0));
-        TRY_WITH_RESET(vt->updatedpi(kb, 0));
-    }
-
 #ifndef NDEBUG
-    if(command == RGB)
         memset(kb->encounteredleds, 0, sizeof(kb->encounteredleds));
 #endif
+#ifdef FPS_COUNTER
+        if(had_rgb){
+            struct timespec now;
+            clock_gettime(CLOCK_MONOTONIC, &now);
+            const long int diff = timespec_diff_ns(&now, &kb->last_rgb);
+            ckb_info("ckb%d: FPS %f", INDEX_OF(kb, keyboard), 1.f / (diff / 1000000000.f));
+            memcpy(&kb->last_rgb, &now, sizeof(struct timespec));
+        }
+#endif
+        TRY_WITH_RESET(vt->updatedpi(kb, 0));
+    }
 
     return 0;
 }

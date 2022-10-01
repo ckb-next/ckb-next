@@ -26,6 +26,7 @@ private slots:
     void on_y_valueChanged(int arg1);
     void on_w_valueChanged(int arg1);
     void on_h_valueChanged(int arg1);
+    void on_showSelectionSurfaces_toggled(bool checked);
 
 private:
     Ui::KeyWidgetDebugger* ui;

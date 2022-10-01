@@ -31,6 +31,10 @@ static const QColor green(160, 255, 168);
 static const QColor white(255, 255, 255);
 static const QColor yellow(255, 248, 128);
 
+#ifndef NDEBUG
+static const QBrush hitboxBrush(QColor(255, 136, 136, 128));
+#endif
+
 // KbLight.cpp
 extern QRgb monoRgb(float r, float g, float b);
 
@@ -49,8 +53,8 @@ static const QMap<QString, QString> keyNames {
     {"lghtpgm", "☼P"}
 };
 
-KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
-    QOpenGLWidget(parent), mouseDownMode(NONE), _rgbMode(rgbMode), _monochrome(false), _aspectRatio(0.5), drawInfoScale(0.f)
+KeyWidget::KeyWidget(QWidget* parent) :
+    QOpenGLWidget(parent), mouseDownMode(NONE), _rgbMode(true), _monochrome(false), _aspectRatio(0.5), drawInfoScale(0.f), _debug(false)
 {
     setMouseTracking(true);
     setAutoFillBackground(true);
@@ -61,6 +65,10 @@ KeyWidget::KeyWidget(QWidget *parent, bool rgbMode) :
     glFpsTimer.start();
     kbLoopElapsed = 0.0;
 #endif
+}
+
+static inline QRectF getKeyRect(const Key& key){
+    return QRectF(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
 }
 
 void KeyWidget::map(const KeyMap& newMap){
@@ -153,9 +161,10 @@ void KeyWidget::map(const KeyMap& newMap){
             }
         }
     } else {
-        _currentOverlay= QImage();
+        _currentOverlay = QImage();
     }
     calculateDrawInfo(size());
+    setDebug(_debug);
 }
 
 void KeyWidget::calculateDrawInfo(const QSize& size){
@@ -188,6 +197,17 @@ bool KeyWidget::event(QEvent* e){
     QToolTip::hideText();
     e->ignore();
     return true;
+}
+
+void KeyWidget::setDebug(bool debug){
+#ifndef NDEBUG
+    _debug = debug;
+    hitboxes.clear();
+    if(debug)
+        for(const Key& key : keyMap)
+            hitboxes[key.name] = getKeyRect(key);
+    update();
+#endif
 }
 
 void KeyWidget::colorMap(const QColorMap& newColorMap){
@@ -522,6 +542,15 @@ void KeyWidget::paintGL(){
         painter.drawRect(mouseHighlightRect);
     }
 
+#ifndef NDEBUG
+    if(_debug){
+        painter.setBrush(hitboxBrush);
+        painter.setPen(red);
+        for(const QRectF& hitbox : hitboxes)
+            painter.drawRect(QRectF((hitbox.x() + drawInfoOffset.x()) * drawInfoScale, (hitbox.y() + drawInfoOffset.y()) * drawInfoScale, hitbox.width()*drawInfoScale, hitbox.height()*drawInfoScale));
+    }
+#endif
+
 #ifdef FPS_COUNTER
     painter.setPen(QPen(green, 1.0));
     QFont fpsfont = painter.font();
@@ -551,7 +580,7 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
         if((_rgbMode && !key.hasLed)
                 || (!_rgbMode && !key.hasScan))
             continue;
-        QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
+        QRectF keyRect = getKeyRect(key);
         if(keyRect.contains(mouseDownScaled)){
             // Sidelights can't have a color, but they can be toggled
             if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")){
@@ -596,7 +625,7 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
         if((_rgbMode && !key.hasLed)
                 || (!_rgbMode && !key.hasScan))
             continue;
-        QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
+        QRectF keyRect = getKeyRect(key);
         // on STRAFE Sidelights and indicators can't be assigned color the way other keys are colored
         if(((keyMap.model() == KeyMap::STRAFE || keyMap.model() == KeyMap::STRAFE_MK2) && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")))
                 || (keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back"))

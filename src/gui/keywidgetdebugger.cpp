@@ -6,8 +6,9 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QListWidgetItem>
+#include <QSignalBlocker>
 
-KeyWidgetDebugger::KeyWidgetDebugger(QWidget *parent) :
+KeyWidgetDebugger::KeyWidgetDebugger(QWidget* parent) :
     QWidget(parent),
     ui(new Ui::KeyWidgetDebugger), w(new KeyWidget(this)), m(KeyMap::Model::NO_MODEL), l(KeyMap::Layout::NO_LAYOUT)
 {
@@ -68,6 +69,11 @@ void KeyWidgetDebugger::on_keyList_currentItemChanged(QListWidgetItem* current, 
     if(!current)
         return;
     Key k = map.key(current->text());
+    // Block signals so that valueChanged events aren't called
+    const QSignalBlocker b1(ui->x);
+    const QSignalBlocker b2(ui->y);
+    const QSignalBlocker b3(ui->w);
+    const QSignalBlocker b4(ui->h);
     ui->x->setValue(k.x);
     ui->y->setValue(k.y);
     ui->w->setValue(k.width);
@@ -99,4 +105,9 @@ void KeyWidgetDebugger::on_w_valueChanged(int arg1)
 void KeyWidgetDebugger::on_h_valueChanged(int arg1)
 {
     HANDLE_SPINBOX_VAL(height, arg1);
+}
+
+void KeyWidgetDebugger::on_showSelectionSurfaces_toggled(bool checked)
+{
+    w->setDebug(checked);
 }

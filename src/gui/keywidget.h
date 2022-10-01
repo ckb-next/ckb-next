@@ -16,7 +16,7 @@ class KeyWidget : public QOpenGLWidget
     Q_OBJECT
 public:
     // New key widget. rgbMode = true to display colors, false to display key names
-    explicit KeyWidget(QWidget *parent = nullptr, bool rgbMode = true);
+    KeyWidget(QWidget* parent);
     inline bool     rgbMode()                   { return _rgbMode; }
     inline void     rgbMode(bool newRgbMode)    { _rgbMode = newRgbMode; update(); }
     // For RGB maps, monochrome = true to covert everything to grayscale
@@ -52,6 +52,7 @@ public:
     int heightForWidth(int w) const override {
         return std::round(w / aspectRatio());
     }
+    void setDebug(bool debug);
 
 public slots:
     // Sets display colors. Pass an empty map to clear.
@@ -112,10 +113,14 @@ private:
         calculateDrawInfo(event->size());
         QOpenGLWidget::resizeEvent(event);
     }
-    bool event(QEvent *e) override;
+    bool event(QEvent* e) override;
+    bool _debug;
 #ifdef FPS_COUNTER
     QElapsedTimer glFpsTimer;
     double kbLoopElapsed;
+#endif
+#ifndef NDEBUG
+    QHash<const char*, QRectF> hitboxes;
 #endif
 };
 

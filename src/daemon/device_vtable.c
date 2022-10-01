@@ -115,6 +115,8 @@ const devcmd vtable_keyboard = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = int0_void_none,
+    .delay = nxp_delay,
+    .setfps = nxp_kb_setfps,
 };
 
 const devcmd vtable_keyboard_wireless = {
@@ -166,6 +168,8 @@ const devcmd vtable_keyboard_wireless = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = nxp_get_battery_info,
+    .delay = nxp_delay,
+    .setfps = nxp_kb_setfps,
 };
 
 // Legacy keyboard vtable (K70)
@@ -218,6 +222,8 @@ const devcmd vtable_keyboard_legacy = {
     .write = legacy_dev_io,
     .read = legacy_dev_io,
     .get_battery_info = int0_void_none,
+    .delay = legacy_delay,
+    .setfps = int1_void_none, // Legacy devices have a fixed delay
 };
 
 // RGB mouse vtable
@@ -270,6 +276,8 @@ const devcmd vtable_mouse = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = int0_void_none,
+    .delay = nxp_delay,
+    .setfps = nxp_mouse_setfps,
 };
 
 const devcmd vtable_mouse_wireless = {
@@ -321,6 +329,8 @@ const devcmd vtable_mouse_wireless = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = nxp_get_battery_info,
+    .delay = nxp_delay,
+    .setfps = nxp_mouse_setfps,
 };
 
 // RGB Mousepad vtable
@@ -373,6 +383,8 @@ const devcmd vtable_mousepad = {
     .write = nxp_usb_write,
     .read = nxp_usb_read,
     .get_battery_info = int0_void_none,
+    .delay = nxp_delay,
+    .setfps = nxp_mouse_setfps,
 };
 
 // Legacy mouse vtable
@@ -425,6 +437,8 @@ const devcmd vtable_mouse_legacy = {
     .write = legacy_dev_io,
     .read = legacy_dev_io,
     .get_battery_info = int0_void_none,
+    .delay = legacy_delay,
+    .setfps = int1_void_none, // Legacy devices have a fixed delay
 };
 
 // Bragi vtables
@@ -476,6 +490,8 @@ const devcmd vtable_bragi_mouse = {
     .write = bragi_usb_write,
     .read = bragi_usb_read,
     .get_battery_info = bragi_get_battery_info,
+    .delay = bragi_delay,
+    .setfps = int1_void_none, // Bragi devices respond to everything, so no need for delays
 };
 
 const devcmd vtable_bragi_keyboard = {
@@ -526,6 +542,8 @@ const devcmd vtable_bragi_keyboard = {
     .write = bragi_usb_write,
     .read = bragi_usb_read,
     .get_battery_info = bragi_get_battery_info,
+    .delay = bragi_delay,
+    .setfps = int1_void_none, // Bragi devices respond to everything, so no need for delays
 };
 
 const devcmd vtable_bragi_dongle = {
@@ -576,4 +594,6 @@ const devcmd vtable_bragi_dongle = {
     .write = bragi_usb_write,
     .read = bragi_usb_read,
     .get_battery_info = int0_void_none,
+    .delay = bragi_delay,
+    .setfps = int1_void_none, // Bragi devices respond to everything, so no need for delays
 };

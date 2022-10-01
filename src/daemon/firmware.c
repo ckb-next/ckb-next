@@ -135,24 +135,27 @@ int getfwversion(usbdevice* kb){
 }
 
 #define FW_MAXSIZE  (255 * 256)
+#define FWUPDATE_RET(r) { kb->usbdelay_ns = delay; free(fwdata); return r; }
 
 // Updates the device's firmware with the specified file. Returns one of the FW_ constants.
 // Lock the keyboard's main mutex before calling this and unlock it when done.
 int fwupdate(usbdevice* kb, const char* path, int nnumber){
+    // Force the device to 10ms delay (we need to deliver packets very slowly to make sure it doesn't get overwhelmed)
+    long delay = kb->usbdelay_ns;
+    kb->usbdelay_ns = 10000000L;
+
     // Read the firmware from the given path
     char* fwdata = calloc(1, FW_MAXSIZE + 256);
     int fd = open(path, O_RDONLY);
     if(fd == -1){
         ckb_err("Failed to open firmware file %s: %s", path, strerror(errno));
-        free(fwdata);
-        return FW_NOFILE;
+        FWUPDATE_RET(FW_NOFILE);
     }
     ssize_t length = read(fd, fwdata, FW_MAXSIZE + 1);
     if(length <= 0x108 || length > FW_MAXSIZE){
         ckb_err("Failed to read firmware file %s: %s", path, length <= 0 ? strerror(errno) : "Wrong size");
         close(fd);
-        free(fwdata);
-        return FW_NOFILE;
+        FWUPDATE_RET(FW_NOFILE);
     }
     close(fd);
 
@@ -164,13 +167,11 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     // Check against the actual device
     if(vendor != kb->vendor || product != kb->product){
         ckb_err("Firmware file %s doesn't match device (V: %04x P: %04x)", path, vendor, product);
-        free(fwdata);
-        return FW_WRONGDEV;
+        FWUPDATE_RET(FW_WRONGDEV);
     }
     ckb_info("Loading firmware version %04x from %s", version, path);
     nprintf(kb, nnumber, 0, "fwupdate %s 0/%d\n", path, (int)length);
-    // Force the device to 10ms delay (we need to deliver packets very slowly to make sure it doesn't get overwhelmed)
-    kb->usbdelay = 10;
+
     // Send the firmware messages (256 bytes at a time)
     uchar data_pkt[7][MSG_SIZE] = {
         { CMD_SET, FIELD_FW_START, 0xf0, 0x01, 0 },
@@ -205,15 +206,13 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
         if(index == 1){
             if(!usbsend(kb, data_pkt[0], MSG_SIZE, 1)){
                 ckb_err("Firmware update failed");
-                free(fwdata);
-                return FW_USBFAIL;
+                FWUPDATE_RET(FW_USBFAIL);
             }
             // The above packet can take a lot longer to process, so wait for a while
-            sleep(3);
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_sec = 3}, NULL);
             if(!usbsend(kb, data_pkt[2], MSG_SIZE, npackets - 1)){
                 ckb_err("Firmware update failed");
-                free(fwdata);
-                return FW_USBFAIL;
+                FWUPDATE_RET(FW_USBFAIL);
             }
         } else {
             // If the output ends here, set the length byte appropriately
@@ -221,8 +220,7 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
                 data_pkt[npackets][2] = length - last;
             if(!usbsend(kb, data_pkt[1], MSG_SIZE, npackets)){
                 ckb_err("Firmware update failed");
-                free(fwdata);
-                return FW_USBFAIL;
+                FWUPDATE_RET(FW_USBFAIL);
             }
         }
         nprintf(kb, nnumber, 0, "fwupdate %s %d/%d\n", path, output, (int)length);
@@ -234,15 +232,13 @@ int fwupdate(usbdevice* kb, const char* path, int nnumber){
     };
     if(!usbsend(kb, data_pkt2[0], MSG_SIZE, 2)){
         ckb_err("Firmware update failed");
-        free(fwdata);
-        return FW_USBFAIL;
+        FWUPDATE_RET(FW_USBFAIL);
     }
     // Updated successfully
     kb->fwversion = version;
     mkfwnode(kb);
     ckb_info("Firmware update complete");
-    free(fwdata);
-    return FW_OK;
+    FWUPDATE_RET(FW_OK);
 }
 
 int cmd_fwupdate(usbdevice* kb, usbmode* dummy1, int nnumber, int dummy2, const char* path){

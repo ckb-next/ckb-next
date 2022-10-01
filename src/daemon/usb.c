@@ -404,16 +404,11 @@ static void* _setupusb(void* context){
     if(kb->protocol == PROTO_BRAGI)
         kb->features &= ~FEAT_FWUPDATE;
 
-    kb->usbdelay = USB_DELAY_DEFAULT;
-
     // Check if the device needs a patched keymap, and if so patch it.
     patchkeys(kb);
 
     // Perform OS-specific setup
-    ///
-    /// - A fixed 100ms wait is the start.
-    /// <b>Although the DELAY_LONG macro is given a parameter, it is ignored. Occasionally refactor it.</b>
-    DELAY_LONG(kb);
+    DELAY_100MS();
 
     ///
     /// - The first relevant point is the operating system-specific opening of the interface in os_setupusb().
@@ -590,11 +585,11 @@ int revertusb(usbdevice* kb){
 ///
 int _resetusb(usbdevice* kb, const char* file, int line){
     // Perform a USB reset
-    DELAY_LONG(kb);
+    DELAY_100MS();
     int res = os_resetusb(kb, file, line);
     if(res)
         return res;
-    DELAY_LONG(kb);
+    DELAY_100MS();
     // Re-initialize the device
     if(kb->vtable.start(kb, kb->active) != 0)
         return -1;
@@ -650,7 +645,7 @@ int _usbsend(usbdevice* kb, void* messages, size_t msg_len, int count, const cha
     for(int i = 0; i < count; i++){
         // Send each message via the OS function
         while(1){
-            DELAY_SHORT(kb);
+            kb->vtable.delay(kb, DELAY_SEND);
             queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
             int res = kb->vtable.write(kb, messages + i * msg_len, msg_len, 0, file, line);
             queued_mutex_unlock(mmutex(kb));
@@ -664,7 +659,7 @@ int _usbsend(usbdevice* kb, void* messages, size_t msg_len, int count, const cha
             if(reset_stop)
                 return 0;
             // Retry as long as the result is temporary failure
-            DELAY_LONG(kb);
+            DELAY_100MS();
         }
     }
     return total_sent;
@@ -678,7 +673,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
     for (int try = 0; try < 5; try++) {
         // Send the output message
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
-        DELAY_SHORT(kb);
+        kb->vtable.delay(kb, DELAY_SEND);
         int res = kb->vtable.write(kb, out_msg, msg_len, 1, file, line);
         queued_mutex_unlock(mmutex(kb));
         if (res == 0)
@@ -687,12 +682,11 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
             // Retry on temporary failure
             if (reset_stop)
                 return 0;
-            DELAY_LONG(kb);
+            DELAY_100MS();
             continue;
         }
         // Wait for the response
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
-            DELAY_MEDIUM(kb);
+        kb->vtable.delay(kb, DELAY_RECV);
         res = kb->vtable.read(kb, in_msg, msg_len, 0, file, line);
         if(res == 0)
             return 0;
@@ -700,8 +694,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
             return res;
         if(reset_stop)
             return 0;
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
-            DELAY_LONG(kb);
+        DELAY_100MS();
     }
     // Give up
     ckb_err_fn("Too many send/recv failures. Dropping.", file, line);

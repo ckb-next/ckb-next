@@ -82,7 +82,7 @@ static inline long timespec_diff_ns (struct timespec* a, struct timespec* b){
 int readcmd(usbdevice* kb, char* line){
 #ifdef FPS_COUNTER
     // workaround for being able to check if an rgb command was issued
-    bool had_rgb = false;
+    int rgb_cmd_count = 0;
 #endif
     const devcmd* vt = &kb->vtable;
     usbprofile* profile = kb->profile;
@@ -100,6 +100,10 @@ int readcmd(usbdevice* kb, char* line){
         for(int i = 0; i < CMD_COUNT - 1; i++){
             if(!strcmp(word, cmd_strings[i])){
                 command = i + CMD_FIRST;
+#ifdef FPS_COUNTER
+                if(command == RGB)
+                    rgb_cmd_count++;
+#endif
 #ifndef OS_MAC
                 // Layout and mouse acceleration aren't used on Linux; ignore
                 if(command == LAYOUT || command == ACCEL || command == SCROLLSPEED)
@@ -186,18 +190,9 @@ int readcmd(usbdevice* kb, char* line){
             continue;
         }
         case FPS: {
-            // USB command delay (2 - 10ms)
-            uint framerate;
-            if(sscanf(word, "%u", &framerate) == 1 && framerate > 0){
-                // Not all devices require the same number of messages per frame; select delay appropriately
-                uint per_frame = IS_MOUSE_DEV(kb) ? 2 : IS_FULLRANGE(kb) ? 14 : 5;
-                uint delay = 1000 / framerate / per_frame;
-                if(delay < 2)
-                    delay = 2;
-                else if(delay > 10)
-                    delay = 10;
-                kb->usbdelay = delay;
-            }
+            int framerate;
+            if(sscanf(word, "%d", &framerate) == 1 && framerate >= 5)
+                vt->setfps(kb, framerate);
             continue;
         }
         case DITHER: {
@@ -245,15 +240,10 @@ int readcmd(usbdevice* kb, char* line){
             }
             continue;
         case HWLOAD: case HWSAVE:{
-            char delay = kb->usbdelay;
-            // Ensure delay of at least 10ms as the device can get overwhelmed otherwise
-            if(delay < 10)
-                kb->usbdelay = 10;
             // Try to load/save the hardware profile. Reset on failure, disconnect if reset fails.
             TRY_WITH_RESET(vt->do_io[command](kb, mode, notifynumber, 1, 0));
             // Re-send the current RGB state as it sometimes gets scrambled
             TRY_WITH_RESET(vt->updatergb(kb, 1));
-            kb->usbdelay = delay;
             continue;
         }
         case FWUPDATE:
@@ -312,9 +302,6 @@ int readcmd(usbdevice* kb, char* line){
                     vt->rgb(kb, mode, -1, i, word);
                 continue;
             }
-#ifdef FPS_COUNTER
-            had_rgb = true;
-#endif
             break;
         }
         case MACRO:
@@ -374,12 +361,14 @@ int readcmd(usbdevice* kb, char* line){
         memset(kb->encounteredleds, 0, sizeof(kb->encounteredleds));
 #endif
 #ifdef FPS_COUNTER
-        if(had_rgb){
+        if(rgb_cmd_count){
             struct timespec now;
             clock_gettime(CLOCK_MONOTONIC, &now);
             const long int diff = timespec_diff_ns(&now, &kb->last_rgb);
             ckb_info("ckb%d: FPS %f", INDEX_OF(kb, keyboard), 1.f / (diff / 1000000000.f));
             memcpy(&kb->last_rgb, &now, sizeof(struct timespec));
+            if(rgb_cmd_count > 1)
+                ckb_warn("ckb%d: RGB loop behind by %d commands", INDEX_OF(kb, keyboard), rgb_cmd_count - 1);
         }
 #endif
         TRY_WITH_RESET(vt->updatedpi(kb, 0));

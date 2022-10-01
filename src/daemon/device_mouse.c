@@ -104,3 +104,11 @@ int cmd_pollrate(usbdevice* kb, pollrate_t rate){
     kb->pollrate = rate;
     return 0;
 }
+
+void nxp_mouse_setfps(usbdevice* kb, int fps){
+    // Assumes 2 packets at most
+    if(fps > 35)
+        kb->usbdelay_ns = 6000000L;
+    else
+        kb->usbdelay_ns = 10000000L;
+}

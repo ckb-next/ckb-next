@@ -614,9 +614,15 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
     QRectF mouseHighlightRectScaled;
 
     // Clear new selection
-    newSelection.fill(false);
     mouseHighlightRect = QRectF(mouseCurrent, mouseDown).normalized();
     mouseHighlightRectScaled = QRectF(mouseCurrentScaled, mouseDown / drawInfoScale - drawInfoOffset).normalized();
+
+    // If the rect is not valid (mouseCurrent == mouseDown, or just a line),
+    // the selection will temporarily go away due to intersect not being defined
+    if(!mouseHighlightRect.isValid() || !mouseHighlightRectScaled.isValid())
+        return;
+
+    newSelection.fill(false);
 
     // See if the event hit any keys
     int i = -1;
@@ -631,7 +637,7 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
                 || (keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back"))
                 || _indicators.contains(key.name)) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
             continue;
-        if(mouseHighlightRectScaled.isValid() && mouseHighlightRectScaled.intersects(keyRect))
+        if(mouseHighlightRectScaled.intersects(keyRect))
             newSelection.setBit(i);
     }
 

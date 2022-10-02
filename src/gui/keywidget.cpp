@@ -186,6 +186,12 @@ bool KeyWidget::event(QEvent* e){
     QPointF mouseCurrentScaled = he->pos() / drawInfoScale - drawInfoOffset;
 
     for(const Key& key: keyMap){
+
+        // Don't show tooltips for keys in the wrong mode
+        if((_rgbMode && !key.hasLed)
+                || (!_rgbMode && !key.hasScan))
+            continue;
+
         // Get the name of the key under the cursor
         QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
         if(keyRect.contains(mouseCurrentScaled)){

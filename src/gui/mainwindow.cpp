@@ -435,6 +435,7 @@ void MainWindow::iconClicked(QSystemTrayIcon::ActivationReason reason){
 void MainWindow::showWindow(){
     showNormal();
     raise();
+    adjustSize(); //added adjustSize() #864
     activateWindow();
 }
 

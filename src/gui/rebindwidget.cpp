@@ -40,8 +40,6 @@ RebindWidget::RebindWidget(QWidget *parent) :
     ui->setupUi(this);
     ui->lightWrapBox->hide();
     ui->modeWrapBox->hide();
-    ui->programKpExtra->hide();
-    ui->programKrExtra->hide();
 
     // Populate key lists
     modKeys << "caps" << "lshift" << "rshift" << "lctrl" << "rctrl" << "lwin" << "rwin" << "lalt" << "ralt" << "rmenu" << "fn";
@@ -83,7 +81,7 @@ RebindWidget::RebindWidget(QWidget *parent) :
     // Add tip label
     ui->progTipLabel->setText("Tip: use the open command to launch a file, directory, or app. For instance, to start Safari:\n  open /Applications/Safari.app");
 #else
-    ui->progTipLabel->setText("Tip: use xdg-open to launch a file or directory. For instance, to open your home folder:\n  xdg-open " + QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
+    ui->progTipLabel->setText(tr("Tip: use xdg-open to launch a file or directory. For instance, to open your home folder:\n  xdg-open ") + QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
 #endif
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &RebindWidget::tabChanged);
     ui->tableView->setModel(&macroLines);
@@ -659,22 +657,18 @@ void RebindWidget::on_lockBox_currentIndexChanged(int index){
 void RebindWidget::on_programKpBox_textChanged(const QString &arg1){
     if(arg1.isEmpty()){
         ui->programKpButton->setChecked(false);
-        ui->programKpExtra->hide();
     } else {
         ui->programKpButton->setChecked(true);
         setBox(ui->programKpBox);
-        ui->programKpExtra->show();
     }
 }
 
 void RebindWidget::on_programKrBox_textChanged(const QString &arg1){
     if(arg1.isEmpty()){
         ui->programKrButton->setChecked(false);
-        ui->programKrExtra->hide();
     } else {
         ui->programKrButton->setChecked(true);
         setBox(ui->programKrBox);
-        ui->programKrExtra->show();
     }
 }
 

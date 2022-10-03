@@ -344,6 +344,23 @@ void Kb::load(){
             demoProfile = ":/txt/demoprofile_nightsword.ini";
         else if(map.model() == KeyMap::K55PRO)
             demoProfile = ":/txt/demoprofile_k55pro.ini";
+        //added missing profiles
+        else if(map.model() == KeyMap::K60)
+            demoProfile = ":/text/demoprofile_k55"
+        else if(map.model() == KeyMap::K63)
+            demoProfile = ":/text/demoprofile_k55"
+        else if(map.model() == KeyMap::K63_WL)
+            demoProfile = ":/text/demoprofile_k55"
+        else if(map.model() == KeyMap::K65)
+            demoProfile = ":/text/demoprofile_k55"
+        else if(map.model() == KeyMap::K66)
+            demoProfile = ":/text/demoprofile_k55"
+        else if(map.model() == KeyMap::K68)
+            demoProfile = ":/text/demoprofile_k55"
+        else if(map.model() == KeyMap::K70)
+            demoProfile = ":/text/demoprofile_k55"
+        else if(map.model() == KeyMap::K95P)
+            demoProfile = ":/text/demoprofile_k55"
         QSettings demoSettings(demoProfile, QSettings::IniFormat, this);
         CkbDemoSettings cSettings(demoSettings);
         KbProfile* demo = new KbProfile(this, map, cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");

@@ -50,7 +50,7 @@ RebindWidget::RebindWidget(QWidget *parent) :
     mediaKeys << "stop" << "prev" << "play" << "next" << "volup" << "voldn" << "mute" << "eject";
     mouseKeys << "mouse1" << "mouse2" << "mouse3";
     mouseExtKeys << "mouse4" << "mouse5" << "mouse6" << "mouse7" << "mouse8";
-    wheelKeys << "wheelup" << "wheeldn";
+    wheelKeys << "wheelup" << "wheeldn" << "wheellf" << "wheelrg";
 #ifndef Q_OS_MACOS
     fnKeys << "f21" << "f22" << "f23" << "f24";
 #endif

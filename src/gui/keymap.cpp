@@ -1,6 +1,7 @@
 #include <clocale>
 #include <QMap>
 #include "keymap.h"
+#include <QObject>
 
 const Key KeyMap::emptyKey = {nullptr,nullptr,nullptr,0,0,0,0,0,0};
 
@@ -1667,8 +1668,14 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
         return "Screen Brightness Up";
     else if(key == "lightdn")
         return "Screen Brightness Down";
-    else if(key == "eject" || key == "power")
-        return key[0].toUpper() + key.mid(1);   // capitalize first letter
+    else if(key == "eject")
+        return QObject::tr("Eject");
+    else if(key == "power")
+        return QObject::tr("Power");
+    else if(key == "wheellf")
+        return QObject::tr("Wheel Left");
+    else if(key == "wheelrg")
+        return QObject::tr("Wheel Right");
 
     // All other names are found on mice
     map = KeyMap(SCIMITAR, layout);

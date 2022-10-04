@@ -242,6 +242,9 @@ static inline void patchABNT2(QHash<QString, Key>& map){
 #define K65_WIDTH       209
 #define K65_HEIGHT      K70_HEIGHT
 
+#define K65_MINI_WIDTH  162
+#define K65_MINI_HEIGHT 48
+
 // K63 is the same as the K65 in terms of size
 #define K63_WIDTH       K65_WIDTH
 #define K63_HEIGHT      K65_HEIGHT
@@ -905,6 +908,26 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["fn"].x -= 12;
 
         // Done!
+        break;
+    }
+    case KeyMap::K65_MINI:{
+        map = getMap(KeyMap::K65, layout);
+
+        // Move Esc so that it doesn't get deleted
+        map["esc"].y += 13;
+        map.remove("grave");
+
+        // Remove the whole top bar and shift everything up
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+
+            if((i.value().y -= 27) < 0)
+                i.remove();
+            else if((i.value().x -= 3) > K65_MINI_WIDTH + 2)
+                i.remove();
+        }
+
         break;
     }
     case KeyMap::K63:{
@@ -1591,6 +1614,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return BRAGI_DONGLE;
     if(lower == "k100")
         return K100;
+    if(lower == "k65_mini")
+        return K65_MINI;
     return NO_MODEL;
 }
 
@@ -1670,6 +1695,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "bragi_dongle";
     case K100:
         return "k100";
+    case K65_MINI:
+        return "k65_mini";
     default:
         return "";
     }
@@ -1693,6 +1720,8 @@ int KeyMap::modelWidth(Model model){
         return K63_WIDTH;
     case K65:
         return K65_WIDTH;
+    case K65_MINI:
+        return K65_MINI_WIDTH;
     case K66:
     case K68:
         return K68_WIDTH;
@@ -1764,6 +1793,8 @@ int KeyMap::modelHeight(Model model){
         return K60_HEIGHT;
     case K60_TKL:
         return K60_TKL_HEIGHT;
+    case K65_MINI:
+        return K65_MINI_HEIGHT;
     case M55:
     case M65:
     case M65E:

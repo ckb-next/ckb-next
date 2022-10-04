@@ -202,11 +202,19 @@ private:
     static int modelHeight(Model model);
 
     QHash<QString, Key> _keys;
-    short keyWidth, keyHeight;
     Model keyModel :8;
     Layout keyLayout :8;
 
     static QPair<int, QString> addToList(int i, const QStringList& list);
+protected:
+    short keyWidth, keyHeight;
+
+};
+
+struct KeyMapDebug : KeyMap {
+    using KeyMap::KeyMap;
+    using KeyMap::keyWidth;
+    using KeyMap::keyHeight;
 };
 
 #endif // KEYMAP_H

@@ -27,13 +27,15 @@ private slots:
     void on_w_valueChanged(int arg1);
     void on_h_valueChanged(int arg1);
     void on_showSelectionSurfaces_toggled(bool checked);
+    void on_devw_valueChanged(int arg1);
+    void on_devh_valueChanged(int arg1);
 
 private:
     Ui::KeyWidgetDebugger* ui;
     KeyWidget* w;
     KeyMap::Model m;
     KeyMap::Layout l;
-    KeyMap map;
+    KeyMapDebug map;
     void updateMap();
 };
 

@@ -1613,13 +1613,13 @@ int KeyMap::modelHeight(Model model){
 
 KeyMap::KeyMap(Model _keyModel, Layout _keyLayout) :
     _keys(getMap(_keyModel, _keyLayout)),
-    keyWidth(modelWidth(_keyModel)), keyHeight(modelHeight(_keyModel)),
-    keyModel(_keyModel), keyLayout(_keyLayout)
+    keyModel(_keyModel), keyLayout(_keyLayout),
+    keyWidth(modelWidth(_keyModel)), keyHeight(modelHeight(_keyModel))
 {}
 
 KeyMap::KeyMap() :
-     keyWidth(0), keyHeight(0),
-     keyModel(NO_MODEL), keyLayout(NO_LAYOUT)
+     keyModel(NO_MODEL), keyLayout(NO_LAYOUT),
+     keyWidth(0), keyHeight(0)
 {}
 
 QStringList KeyMap::byPosition() const {

@@ -13,9 +13,36 @@
   <property name="windowTitle">
    <string>KeyWidgetDebugger</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0,0,0,0,0,0,1">
-   <item row="0" column="0" colspan="8">
-    <layout class="QVBoxLayout" name="verticalLayout"/>
+  <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0,0,0,0,0,0,0,0,0,1">
+   <item row="3" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="5">
+    <widget class="QSpinBox" name="h">
+     <property name="maximum">
+      <number>200</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="4">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>H</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="11">
+    <widget class="QListWidget" name="keyList"/>
    </item>
    <item row="6" column="2">
     <widget class="QLabel" name="label">
@@ -24,7 +51,17 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="7">
+   <item row="2" column="5">
+    <widget class="QSpinBox" name="w">
+     <property name="maximum">
+      <number>200</number>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="3" colspan="7">
+    <widget class="QComboBox" name="layoutComboBox"/>
+   </item>
+   <item row="3" column="10">
     <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -37,53 +74,8 @@
      </property>
     </spacer>
    </item>
-   <item row="7" column="2">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Layout</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="3" colspan="4">
-    <widget class="QComboBox" name="modelComboBox"/>
-   </item>
-   <item row="2" column="3">
-    <widget class="QSpinBox" name="x">
-     <property name="minimum">
-      <number>-50</number>
-     </property>
-     <property name="maximum">
-      <number>300</number>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="6">
-    <widget class="QSpinBox" name="w">
-     <property name="maximum">
-      <number>200</number>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="5">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>H</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>X</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="5">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>W</string>
-     </property>
-    </widget>
+   <item row="0" column="0" colspan="11">
+    <layout class="QVBoxLayout" name="verticalLayout"/>
    </item>
    <item row="3" column="3">
     <widget class="QSpinBox" name="y">
@@ -95,36 +87,13 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="6">
-    <widget class="QSpinBox" name="h">
-     <property name="maximum">
-      <number>200</number>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="4">
+   <item row="2" column="6">
     <spacer name="horizontalSpacer_3">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeType">
       <enum>QSizePolicy::MinimumExpanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0" colspan="8">
-    <widget class="QListWidget" name="keyList"/>
-   </item>
-   <item row="3" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -141,10 +110,17 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="3" colspan="4">
-    <widget class="QComboBox" name="layoutComboBox"/>
+   <item row="2" column="3">
+    <widget class="QSpinBox" name="x">
+     <property name="minimum">
+      <number>-50</number>
+     </property>
+     <property name="maximum">
+      <number>300</number>
+     </property>
+    </widget>
    </item>
-   <item row="8" column="2" colspan="5">
+   <item row="8" column="2" colspan="8">
     <widget class="QCheckBox" name="lightingCheckBox">
      <property name="text">
       <string>Lighting</string>
@@ -154,12 +130,56 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="2" colspan="5">
+   <item row="9" column="2" colspan="8">
     <widget class="QCheckBox" name="showSelectionSurfaces">
      <property name="text">
       <string>Show key selection surfaces</string>
      </property>
     </widget>
+   </item>
+   <item row="6" column="3" colspan="7">
+    <widget class="QComboBox" name="modelComboBox"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>X</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>W</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Layout</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="7">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>DevW</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="7">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>DevH</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="8">
+    <widget class="QSpinBox" name="devw"/>
+   </item>
+   <item row="3" column="8">
+    <widget class="QSpinBox" name="devh"/>
    </item>
   </layout>
  </widget>

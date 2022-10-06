@@ -2,12 +2,6 @@
 #include "keymap_patch.h"
 #include "keymap.h"
 
-// The Alt code is used for Fn in the K65
-keypatch k65patch[] = {
-    { 146, "fn", 0x59, KEY_FN },
-};
-#define K65PATCH_LEN sizeof(k65patch)/sizeof(*k65patch)
-
 // Vol Up/Dn LED addresses for K63 and K68.
 // Possibly for all devices that have LEDs on vol up/dn
 keypatch k63patch[] = {
@@ -86,8 +80,6 @@ keypatch k95legacypatch[] = {
 keypatches mappatches[] = {
     { V_CORSAIR, P_K68,          k63patch,       K63PATCH_LEN },
     { V_CORSAIR, P_K68_NRGB,     k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_K65,          k65patch,       K65PATCH_LEN },
-    { V_CORSAIR, P_K65_LEGACY,   k65patch,       K65PATCH_LEN },
     { V_CORSAIR, P_K63_NRGB,     k63patch,       K63PATCH_LEN },
     { V_CORSAIR, P_M55_RGB_PRO,  m55patch,       M55PATCH_LEN },
     { V_CORSAIR, P_M95,          m95patch,       M95PATCH_LEN },

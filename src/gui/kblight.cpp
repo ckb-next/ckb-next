@@ -4,6 +4,7 @@
 #include "kblight.h"
 #include "kbmode.h"
 #include <typeinfo>
+#include <ckbnextconfig.h>
 
 static int _shareDimming = -1;
 static QSet<KbLight*> activeLights;
@@ -15,6 +16,9 @@ KbLight::KbLight(KbMode* parent, const KeyMap& keyMap) :
     _timerDimmed(false)
 {
     map(keyMap);
+#ifdef FPS_COUNTER
+    previousTimestamp = 0;
+#endif
 }
 
 KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
@@ -27,14 +31,15 @@ KbLight::KbLight(KbMode* parent, const KeyMap& keyMap, const KbLight& other) :
     // Duplicate animations
     foreach(KbAnim* animation, other._animList)
         _animList.append(new KbAnim(this, keyMap, *animation));
+#ifdef FPS_COUNTER
+    previousTimestamp = 0;
+#endif
 }
 
 void KbLight::map(const KeyMap& map){
     // If any of the keys are missing from the color map, set them to white
-    QHashIterator<QString, Key> i(map);
-    while(i.hasNext()){
-        i.next();
-        const QString& key = i.key();
+    for(const Key& k : map){
+        const char* key = k.name;
         if(!_qColorMap.contains(key))
             _qColorMap[key] = 0xFFFFFFFF;
     }
@@ -356,11 +361,18 @@ void KbLight::frameUpdate(QFile& cmd, bool monochrome){
         }
     }
 
-    // Emit signals for the animation (only do this every 50ms - it can cause a lot of CPU usage)
+    // Emit signals for the GUI preview (only do this every 50ms - it can cause a lot of CPU usage)
     if(timestamp >= lastFrameSignal + 50){
-        emit frameDisplayed(_animMap, _indicatorList);
+#ifdef FPS_COUNTER
+        emit frameDisplayed(_animMap, _indicatorList, timestamp - previousTimestamp);
+#else
+        emit frameDisplayed(_animMap, _indicatorList, 0);
+#endif
         lastFrameSignal = timestamp;
     }
+#ifdef FPS_COUNTER
+    previousTimestamp = timestamp;
+#endif
 
     // If brightness is at 0%, turn off lighting entirely
     if(_dimming == 3 && lastFrameOrForce){

@@ -10,16 +10,17 @@
 // OSX doesn't like putting FIFOs in /dev for some reason
 // Don't make these pointers, as doing so will result in sizeof() not producing the correct result.
 #ifndef OS_MAC
-const char devpath[] = "/dev/input/ckb";
+#define DEVPATH "/dev/input/ckb"
 #else
-const char devpath[] = "/var/run/ckb";
+#define DEVPATH "/var/run/ckb"
 #endif
 
+const char devpath[] = DEVPATH;
 #define DEVPATH_LEN (sizeof(devpath) - 1)
 
-int is_pid_running(void){
-    char pidpath[DEVPATH_LEN + 6];
-    snprintf(pidpath, sizeof(pidpath), "%s0/pid", devpath);
+const char pidpath[] = DEVPATH "0/pid";
+
+pid_t is_pid_running(void){
     FILE* pidfile = fopen(pidpath, "r");
     if(pidfile){
         pid_t pid;
@@ -28,11 +29,8 @@ int is_pid_running(void){
         fclose(pidfile);
         if(pid > 0){
             // kill -s 0 checks if the PID is active but doesn't send a signal
-            if(!kill(pid, 0)){
-                ckb_fatal_nofile("ckb-next-daemon is already running (PID %d). Try `killall ckb-next-daemon`.", pid);
-                ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again)", pidpath);
-                return 1;
-            }
+            if(!kill(pid, 0))
+                return pid;
         }
     }
     return 0;
@@ -478,75 +476,39 @@ int mkfwnode(usbdevice* kb){
     return 0;
 }
 
-#define MAX_BUFFER (1024 * 1024 - 1)
-struct _readlines_ctx {
-    char* buffer;
-    int buffersize;
-    int leftover, leftoverlen;
-};
-
-void readlines_ctx_init(readlines_ctx* ctx){
-    // Allocate buffers to store data
-    *ctx = calloc(1, sizeof(struct _readlines_ctx));
-    int buffersize = (*ctx)->buffersize = 4095;
-    (*ctx)->buffer = malloc(buffersize + 1);
-}
-
-void readlines_ctx_free(readlines_ctx ctx){
-    free(ctx->buffer);
-    free(ctx);
-}
-
-unsigned readlines(int fd, readlines_ctx ctx, const char** input){
-    // Move any data left over from a previous read to the start of the buffer
-    char* buffer = ctx->buffer;
-    int buffersize = ctx->buffersize;
-    int leftover = ctx->leftover, leftoverlen = ctx->leftoverlen;
-    memcpy(buffer, buffer + leftover, leftoverlen);
-    // Read data from the file
-    ssize_t length = read(fd, buffer + leftoverlen, buffersize - leftoverlen);
-    length = (length < 0 ? 0 : length) + leftoverlen;
-    leftover = ctx->leftover = leftoverlen = ctx->leftoverlen = 0;
-    if(length <= 0){
-        *input = 0;
-        return 0;
+// 0 means EOF, < 0 means retry.
+// This function needs to return all the commands read at once so that the parser can handle duplicate commands
+int readline_fifo(int fd, readlines_ctx* ctx){
+    if(ctx->next_start) {
+        // Move anything left over back to the beginning
+        memmove(ctx->buf, ctx->next_start, ctx->leftover_bytes);
     }
-    // Continue buffering until all available input is read or there's no room left
-    while(length == buffersize){
-        if(buffersize == MAX_BUFFER)
-            break;
-        int oldsize = buffersize;
-        buffersize += 4096;
-        ctx->buffersize = buffersize;
-        buffer = ctx->buffer = realloc(buffer, buffersize + 1);
-        ssize_t length2 = read(fd, buffer + oldsize, buffersize - oldsize);
-        if(length2 <= 0)
-            break;
-        length += length2;
-    }
-    buffer[length] = 0;
-    // Input should be issued one line at a time and should end with a newline.
-    char* lastline = memrchr(buffer, '\n', length);
-    if(lastline == buffer + length - 1){
-        // If the buffer ends in a newline, process the whole string
-        *input = buffer;
-        return length;
-    } else if(lastline){
-        // Otherwise, chop off the last line but process everything else
-        *lastline = 0;
-        leftover = ctx->leftover = lastline + 1 - buffer;
-        leftoverlen = ctx->leftoverlen = length - leftover;
-        *input = buffer;
-        return leftover - 1;
-    } else {
-        // If a newline wasn't found at all, process the whole buffer next time
-        *input = 0;
-        if(length == MAX_BUFFER){
-            // Unless the buffer is completely full, in which case discard it
-            ckb_warn("Too much input (1MB). Dropping.");
-            return 0;
+
+    const size_t max_read = MAX_BUFFER - ctx->leftover_bytes;
+
+    // Read fresh data
+    ssize_t ret = read(fd, ctx->buf + ctx->leftover_bytes, max_read);
+    if(ret <= 0)
+        return ret;
+
+    // Find the last newline and terminate the string there
+    char* last = memrchr(ctx->buf, '\n', ctx->leftover_bytes + ret);
+    ctx->next_start = last;
+
+    // No newline found yet
+    if(!last){
+        if((size_t)ret == max_read){
+            ckb_warn("String too long (%dKB). Dropping...", MAX_BUFFER/1024);
+            ctx->leftover_bytes = 0;
+        } else {
+            ctx->leftover_bytes += ret;
         }
-        leftoverlen = ctx->leftoverlen = length;
-        return 0;
+        return -1;
     }
+
+    *last = '\0';
+
+    ctx->leftover_bytes = (ret + ctx->leftover_bytes) - (last - ctx->buf) - 1;
+
+    return 1;
 }

@@ -4,17 +4,19 @@
 #include <QBitArray>
 #include <QMouseEvent>
 #include <QPaintEvent>
-#include <QWidget>
+#include <QOpenGLWidget>
 #include "keymap.h"
 #include "colormap.h"
 #include <cmath>
+#include <ckbnextconfig.h>
+#include <QElapsedTimer>
 
-class KeyWidget : public QWidget
+class KeyWidget : public QOpenGLWidget
 {
     Q_OBJECT
 public:
     // New key widget. rgbMode = true to display colors, false to display key names
-    explicit KeyWidget(QWidget *parent = nullptr, bool rgbMode = true);
+    KeyWidget(QWidget* parent);
     inline bool     rgbMode()                   { return _rgbMode; }
     inline void     rgbMode(bool newRgbMode)    { _rgbMode = newRgbMode; update(); }
     // For RGB maps, monochrome = true to covert everything to grayscale
@@ -25,6 +27,7 @@ public:
     const KeyMap&       map() const                         { return keyMap; }
     void                map(const KeyMap& newMap);
     // Key -> color map (must contain exactly the keys in the key map)
+
     const QColorMap&    colorMap() const                    { return _colorMap; }
     void                colorMap(const QColorMap& newColorMap);
     // Key -> binding map
@@ -49,11 +52,12 @@ public:
     int heightForWidth(int w) const override {
         return std::round(w / aspectRatio());
     }
+    void setDebug(bool debug);
 
 public slots:
     // Sets display colors. Pass an empty map to clear.
     // These will be displayed instead of the regular color map, if supplied.
-    void displayColorMap(const ColorMap& newDisplayMap, const QSet<QString>& indicators = QSet<QString>());
+    void displayColorMap(const ColorMap& newDisplayMap, const QSet<QString>& indicators, quint64 renderInterval);
 
 signals:
     // Emitted when the selection is changed.
@@ -71,8 +75,9 @@ private:
     QBitArray selection;
     QBitArray newSelection;
     QBitArray animation;
-    int mouseDownX, mouseDownY;
-    int mouseCurrentX, mouseCurrentY;
+    // These should not be scaled so that the rect renders correctly
+    QPointF mouseDown;
+    QRectF mouseHighlightRect;
     enum {
         NONE,
         SET,
@@ -84,21 +89,39 @@ private:
 
     float _aspectRatio;
 
+    QImage _currentOverlay;
+    QPointF _overlayPos;
+
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
 
-    // Get drawing scale/offset. drawX = (keymapX + offsetX) * scale
-    void drawInfo(float& scale, float& offsetX, float& offsetY, int ratio = 1);
+    QPointF drawInfoOffset;
+    float drawInfoScale;
 
     // Helper functions for rendering keys
-    void drawLogo(const Key* key, QPainter* decPainter, float offX, float offY, float scale);
+    void drawLogo(const Key* key, QPainter* decPainter);
     void drawBottomRightCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawBottomLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawTopRightCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawTopLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
-    void drawStrafeSidelights(const Key* key, QPainter* decPainter, float offX, float offY, float scale, const QColor& keyColor, const QColor& color, const QColor& bgColor, int ratio);
+    void drawStrafeSidelights(const Key* key, QPainter* painter, const QColor& kC, const QColor& c, const QColor& bgC);
+    void paintGL() override;
+    void calculateDrawInfo(const QSize& size);
+    void resizeEvent(QResizeEvent* event) override {
+        calculateDrawInfo(event->size());
+        QOpenGLWidget::resizeEvent(event);
+    }
+    bool event(QEvent* e) override;
+    bool _debug;
+#ifdef FPS_COUNTER
+    QElapsedTimer glFpsTimer;
+    double kbLoopElapsed;
+#endif
+#ifndef NDEBUG
+    QHash<const char*, QRectF> hitboxes;
+#endif
 };
 
 #endif // RGBWIDGET_H

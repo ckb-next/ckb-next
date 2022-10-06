@@ -327,7 +327,7 @@ typedef struct usbdevice_ {
     // Physical device layout; LAYOUT_NONE if irrelevant, LAYOUT_UNKNOWN if unimplemented.
     uchar layout;
     // USB protocol delay (ms)
-    char usbdelay;
+    long usbdelay_ns;
     // Current input state
     usbinput input;
     // Indicator LED state
@@ -383,6 +383,7 @@ typedef struct usbdevice_ {
         BRIGHTNESS_HARDWARE_FINE,
         BRIGHTNESS_HARDWARE_COARSE,
     } brightness_mode;
+    struct timespec last_rgb;
 } usbdevice;
 
 #endif  // STRUCTURES_H

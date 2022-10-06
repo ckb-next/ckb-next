@@ -70,7 +70,7 @@ endif ()
 if (MACOS OR LINUX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    find_package(Qt5 5.5.1 COMPONENTS Core Widgets Network Gui REQUIRED)
+    find_package(Qt5 5.6.0 COMPONENTS Core Widgets Network Gui REQUIRED)
     find_package(ZLIB REQUIRED)
 endif ()
 if (MACOS)
@@ -113,6 +113,7 @@ if (MACOS OR LINUX)
               animsettingdialog.cpp
               autorun.cpp
               batterysystemtrayicon.cpp
+              ckbmainbackgroundcolour.cpp
               ckbsettings.cpp
               ckbsettingswriter.cpp
               ckbupdater.cpp
@@ -147,6 +148,7 @@ if (MACOS OR LINUX)
               keyaction.cpp
               keymap.cpp
               keywidget.cpp
+              keywidgetdebugger.cpp
               kperfwidget.cpp
               legacylightwidget.cpp
               macroreader.cpp
@@ -168,6 +170,7 @@ if (MACOS OR LINUX)
               animscript.h
               animsettingdialog.h
               autorun.h
+              ckbmainbackgroundcolour.h
               ckbsettings.h
               ckbsettingswriter.h
               ckbsystemtrayicon.h
@@ -201,6 +204,7 @@ if (MACOS OR LINUX)
               keyaction.h
               keymap.h
               keywidget.h
+              keywidgetdebugger.h
               keywidgetlayout.h
               kperfwidget.h
               legacylightwidget.h
@@ -239,6 +243,7 @@ if (MACOS OR LINUX)
               kbmodeeventmgr.ui
               kbprofiledialog.ui
               kbwidget.ui
+              keywidgetdebugger.ui
               kperfwidget.ui
               legacylightwidget.ui
               mainwindow.ui

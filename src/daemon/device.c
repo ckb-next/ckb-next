@@ -219,12 +219,12 @@ int _start_dev(usbdevice* kb, int makeactive){
 }
 
 int start_dev(usbdevice* kb, int makeactive){
-    // Force USB interval to 10ms during initial setup phase; return to nominal 5ms after setup completes.
-    kb->usbdelay = 10;
+    // Force USB interval to 10ms during initial setup phase; assume 30FPS afterwards.
+    kb->usbdelay_ns = 10000000L;
     kb->maxpollrate = POLLRATE_1MS;
     kb->pollrate = POLLRATE_UNKNOWN;
     int res = _start_dev(kb, makeactive);
-    kb->usbdelay = USB_DELAY_DEFAULT;
+    kb->vtable.setfps(kb, 30);
     return res;
 }
 
@@ -287,4 +287,25 @@ void nxp_get_battery_info(usbdevice* kb){
             break;
     }
     kb->battery_status = in[5];
+}
+
+void nxp_delay(usbdevice* kb, delay_type_t type){
+    long delay;
+    switch(type){
+    case DELAY_SEND:
+        delay = kb->usbdelay_ns;
+        break;
+    case DELAY_RECV:
+        if(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb))
+            return;
+        delay = kb->usbdelay_ns * 10;
+        break;
+    case DELAY_INDICATORS:
+        delay = kb->usbdelay_ns;
+        break;
+    default:
+        ckb_err("Invalid delay type %d", type);
+        delay = 5000000L;
+    }
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = delay}, NULL);
 }

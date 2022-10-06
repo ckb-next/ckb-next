@@ -98,7 +98,6 @@ static inline uint32_t bragi_fwver_bswap(uint32_t fwv){
 }
 
 static int start_bragi_common(usbdevice* kb){
-    kb->usbdelay = 10; // This might not be needed, but won't harm
     kb->pollrate = POLLRATE_UNKNOWN;
     // Assume 1 ms unless told otherwise
     kb->maxpollrate = POLLRATE_1MS;
@@ -146,8 +145,6 @@ static int start_bragi_common(usbdevice* kb){
 
     kb->features |= FEAT_ADJRATE;
     kb->features &= ~FEAT_HWLOAD;
-
-    kb->usbdelay = USB_DELAY_DEFAULT;
 
     // Check if the device supports fine or coarse brightness
     if(bragi_get_property(kb, BRAGI_BRIGHTNESS) >= 0)
@@ -276,4 +273,10 @@ void bragi_get_battery_info(usbdevice* kb){
     }
     kb->battery_level = chg / 10;
     kb->battery_status = stat;
+}
+
+void bragi_delay(usbdevice* kb, delay_type_t type){
+    // Don't bother with delays in bragi.
+    // Since we use usbrecv for everything, the devices tell us when they are ready to handle another packet.
+    return;
 }

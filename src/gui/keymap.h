@@ -160,24 +160,34 @@ public:
     inline QString  name() const    { return (strModel() + " " + strLayout()).toUpper(); }
 
     // Number of keys in the keymap
-    inline uint count() const   { return _keys.count(); }
+    inline int count() const   { return _keys.count(); }
     // Keyboard total width
-    inline uint width() const   { return keyWidth; }
+    inline short width() const   { return keyWidth; }
     // Keyboard total height
-    inline uint height() const  { return keyHeight; }
+    inline short height() const  { return keyHeight; }
 
     // Keys by name
-    inline Key  key(const QString& name) const          { Key empty = {nullptr,nullptr,nullptr,0,0,0,0,0,0}; return _keys.value(name, empty); }
-    inline Key  operator[](const QString& name) const   { return key(name); }
+    inline Key  key(const QString& name) const          { return _keys.value(name, emptyKey); }
+    inline Key& operator[](const QString& name)         { return _keys[name]; }
     inline bool contains(const QString& name) const     { return _keys.contains(name); }
-    // List all key names/values
-    inline const QHash<QString, Key>&   map() const                         { return _keys; }
-    inline operator                     const QHash<QString, Key>& () const { return _keys; }
+    inline QHash<QString, Key>::const_iterator begin() const { return _keys.cbegin(); }
+    inline QHash<QString, Key>::const_iterator end() const { return _keys.cend(); }
     QStringList     keys() const                        { return _keys.keys(); }
     QList<Key>      positions() const                   { return _keys.values(); }
     // Key name to/from storage name. Returns the given name if not found.
-    inline QString  toStorage(const QString& name)      { const char* storage = key(name).storageName(); if(!storage) return name; return storage; }
-    inline QString  fromStorage(const QString& storage) { QHashIterator<QString, Key> i(*this); while(i.hasNext()) { i.next(); const char* s = i.value().storageName(); if(s == storage) return i.value().name; } return storage; }
+    inline QString toStorage(const QString& name) {
+        const char* storage = key(name).storageName();
+        if(!storage)
+            return name;
+        return storage;
+    }
+    inline QString fromStorage(const QString& storage) {
+        for(const Key& key : *this){
+            if(key.storageName() == storage)
+                return key.name;
+        }
+        return storage;
+    }
 
     // Keys by position (top to bottom, left to right)
     QStringList byPosition() const;
@@ -185,16 +195,27 @@ public:
     // Friendly key name on any device
     static QString friendlyName(const QString& key, Layout layout = US);
 
+    static const QStringList layoutList;
+
 private:
+    static const Key emptyKey;
     static int modelWidth(Model model);
     static int modelHeight(Model model);
 
     QHash<QString, Key> _keys;
-    short keyWidth, keyHeight;
     Model keyModel :8;
     Layout keyLayout :8;
 
-    static QPair<int, QString> addToList(int i, QStringList *list);
+    static QPair<int, QString> addToList(int i, const QStringList& list);
+protected:
+    short keyWidth, keyHeight;
+
+};
+
+struct KeyMapDebug : KeyMap {
+    using KeyMap::KeyMap;
+    using KeyMap::keyWidth;
+    using KeyMap::keyHeight;
 };
 
 #endif // KEYMAP_H

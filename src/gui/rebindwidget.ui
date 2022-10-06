@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>687</width>
-    <height>297</height>
+    <height>313</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -391,6 +391,16 @@
            <string>Down</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Left</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Right</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="4" column="4">
@@ -624,19 +634,6 @@
        <string>Animation</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="1" colspan="2">
-        <widget class="QRadioButton" name="animButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Start a&amp;nimation on keypress:</string>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="2">
         <widget class="QComboBox" name="animBox">
          <property name="sizePolicy">
@@ -742,6 +739,19 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="0" column="1" colspan="7">
+        <widget class="QRadioButton" name="animButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Start a&amp;nimation on keypress:</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -1015,62 +1025,10 @@
        <string>Program</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="1">
+       <item row="2" column="1">
         <widget class="QLineEdit" name="programKpBox"/>
        </item>
-       <item row="2" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>5</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="0">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>5</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="programKpButton">
-         <property name="text">
-          <string>Launch program on key press:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2" colspan="2">
-        <spacer name="horizontalSpacer_11">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="2">
+       <item row="2" column="2">
         <spacer name="horizontalSpacer_13">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -1086,157 +1044,7 @@
          </property>
         </spacer>
        </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="programKrBox"/>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QCheckBox" name="programKrButton">
-         <property name="text">
-          <string>Launch program on key release:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <spacer name="horizontalSpacer_12">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="3" colspan="2">
-        <widget class="QWidget" name="programKpExtra" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="spacing">
-           <number>12</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QCheckBox" name="programKpSIBox">
-            <property name="text">
-             <string>Single instance</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="programKpModeBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <item>
-             <property name="text">
-              <string>Run indefinitely</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Stop on release</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Stop on re-press</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_15">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="4" column="3" colspan="2">
-        <widget class="QWidget" name="programKrExtra" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <property name="spacing">
-           <number>12</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QCheckBox" name="programKrSIBox">
-            <property name="text">
-             <string>Single instance</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="programKrModeBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <item>
-             <property name="text">
-              <string>Run indefinitely</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Stop on re-press</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_16">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="5" column="1" colspan="4">
+       <item row="6" column="1" colspan="4">
         <widget class="QLabel" name="progTipLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -1245,14 +1053,44 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Tip</string>
+          <string notr="true">Tip</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
-       <item row="6" column="1" colspan="4">
+       <item row="3" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>5</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0" colspan="5">
+        <widget class="QCheckBox" name="programKrButton">
+         <property name="text">
+          <string>Launch program on key release:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="5">
+        <widget class="QCheckBox" name="programKpButton">
+         <property name="text">
+          <string>Launch program on key press:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1" colspan="4">
         <spacer name="verticalSpacer_9">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1267,6 +1105,84 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="programKrBox"/>
+       </item>
+       <item row="2" column="0">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>5</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="3">
+        <widget class="QCheckBox" name="programKpSIBox">
+         <property name="text">
+          <string>Single instance</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4">
+        <widget class="QComboBox" name="programKpModeBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <item>
+          <property name="text">
+           <string>Run indefinitely</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Stop on release</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Stop on re-press</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="5" column="3">
+        <widget class="QCheckBox" name="programKrSIBox">
+         <property name="text">
+          <string>Single instance</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="4">
+        <widget class="QComboBox" name="programKrModeBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <item>
+          <property name="text">
+           <string>Run indefinitely</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Stop on re-press</string>
+          </property>
+         </item>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -1787,12 +1703,8 @@
   <tabstop>lockBox</tabstop>
   <tabstop>programKpButton</tabstop>
   <tabstop>programKpBox</tabstop>
-  <tabstop>programKpSIBox</tabstop>
-  <tabstop>programKpModeBox</tabstop>
   <tabstop>programKrButton</tabstop>
   <tabstop>programKrBox</tabstop>
-  <tabstop>programKrSIBox</tabstop>
-  <tabstop>programKrModeBox</tabstop>
   <tabstop>unbindButton</tabstop>
   <tabstop>resetButton</tabstop>
   <tabstop>cancelButton</tabstop>

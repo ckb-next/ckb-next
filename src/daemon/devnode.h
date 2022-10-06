@@ -6,7 +6,7 @@
 
 /// Device path base ("/dev/input/ckb" or "/var/run/ckb")
 extern const char devpath[];
-int is_pid_running();
+pid_t is_pid_running();
 
 /// Group ID for the control nodes. -1 to give read/write access to everybody
 extern long gid;
@@ -37,9 +37,12 @@ int rmnotifynode(usbdevice* kb, int notify);
 int mkfwnode(usbdevice* kb);
 
 /// Custom readline is needed for FIFOs. fopen()/getline() will die if the data is sent in too fast.
-typedef struct _readlines_ctx* readlines_ctx;
-void readlines_ctx_init(readlines_ctx* ctx);
-void readlines_ctx_free(readlines_ctx ctx);
-unsigned readlines(int fd, readlines_ctx ctx, const char** input);
+#define MAX_BUFFER (1024 * 128)
+typedef struct {
+    char buf[MAX_BUFFER];
+    size_t leftover_bytes;
+    char* next_start;
+} readlines_ctx;
+int readline_fifo(int fd, readlines_ctx* ctx);
 
 #endif  // DEVNODE_H

@@ -299,81 +299,39 @@ static const devcmd* get_vtable(usbdevice* kb){
 }
 
 // USB device main loop
-/// brief .
-///
-/// \brief devmain is called by _setupusb
-/// \param kb the pointer to the device. Even if it has the name kb, it is valid also for a mouse (the whole driver seems to be implemented first for a keyboard).
-/// \return always a nullptr
-///
-/// # Synchronization
-/// The syncing via mutexes is interesting:
-/// 1. \a imutex (the Input mutex)\n
-/// This one is locked in \c setupusb().
-/// That function does only two things: Locking the mutex and trying to start a thread at \c _setupusb().
-/// _setupusb() unlocks \a imutex  after getting some buffers and initalizing internal structures from the indicators
-/// (this function often gets problems with error messages like "unable to read indicators" or "Timeout bla blubb").
-/// \warning have a look at \a updateindicators() later.
-/// \warning if creating the thread is not successful, the \a imutex remains blocked. Have a look at setupusb() later.
-///
-/// 2. \a dmutex (the Device mutex)\n
-/// This one is very interesting, because it is handled in devmain().
-/// It seems that it is locked only in \a _ledthread(), which is a thread created in \a os_setupindicators().
-/// os_setupindicators() again is called in \a _setupusb() long before calling devmain().
-/// So this mutex is locked when we start the function as the old comment says.\n
-/// Before reading from the FIFO and direct afterwards an unlock..lock sequence is implemented here.
-/// Even if only the function readlines() should be surrounded by the unlock..lock,
-/// the variable definition of the line pointer is also included here. Not nice, but does not bother either.
-/// Probably the Unlock..lock is needed so that now another process can change the control structure \a linectx while we wait in readlines().
-/// \todo Hope to find the need for dmutex usage later.
-/// \n Should this function be declared as pthread_t* function, because of the defintion of pthread-create? But void* works also...
-///
 static void* devmain(usbdevice* kb){
     /// \attention dmutex should still be locked when this is called
-    int kbfifo = kb->infifo - 1;
-    ///
-    /// First a \a readlines_ctx buffer structure is initialized by \c readlines_ctx_init().
-    readlines_ctx linectx;
-    readlines_ctx_init(&linectx);
-    ///
-    /// After some setup functions, beginning in _setupusb() which has called devmain(),
-    /// we read the command input-Fifo designated to that device in an endless loop.
-    /// This loop has two possible exits (plus reaction to signals, not mentioned here).
+    const int kbfifo = kb->infifo - 1;
+    readlines_ctx* linectx = calloc(1, sizeof(readlines_ctx));
+
     while(1){
-        ///
-        /// If the reading via readlines() is successful (we might have read multiple lines),
-        /// the interpretation is done by readcmd() if the connection to the device is still available
-        /// This is true if the kb-structure has a handle and an event pointer both != Null).
-        /// If not, the loop is left (the first exit point).
         queued_mutex_unlock(dmutex(kb));
-        // Read from FIFO
-        const char* line;
-        int lines = readlines(kbfifo, linectx, &line);
+        // Read from cmd FIFO
+        int ret = readline_fifo(kbfifo, linectx);
         wait_until_suspend_processed();
         queued_mutex_lock(dmutex(kb));
+
         // End thread when the handle is removed
         if(kb->status == DEV_STATUS_DISCONNECTING || kb->status == DEV_STATUS_DISCONNECTED)
             break;
-        ///
-        /// if nothing is in the line buffer (some magic interrupt?),
-        /// continue in the endless while without any reaction.
-        if(lines){
-            /// \todo readcmd() gets a \b line, not \b lines. Have a look on that later.
-            if(readcmd(kb, line)){
-                ///
-                /// If interpretation and communication with the usb device got errors,
-                /// they are signalled by readcmd() (non zero retcode).
-                /// In this case the usb device is closed via closeusb()
-                /// and the endless loop is left (the second exit point).
-                // USB transfer failed; destroy device
+
+        if(ret == 0) {
+            // EOF
+            break;
+        } else if(ret < 0) {
+            // Retry
+            continue;
+        } else {
+            if(readcmd(kb, linectx->buf)){
+                // USB transfer failed or command requested disconnect; destroy device
                 closeusb(kb);
-                break;
+                goto cleanup;
             }
         }
     }
+cleanup:
     queued_mutex_unlock(dmutex(kb));
-    ///
-    /// After leaving the endless loop the readlines-ctx structure and its buffers are freed by readlines_ctx_free().
-    readlines_ctx_free(linectx);
+    free(linectx);
     return 0;
 }
 
@@ -452,16 +410,11 @@ static void* _setupusb(void* context){
     if(kb->protocol == PROTO_BRAGI)
         kb->features &= ~FEAT_FWUPDATE;
 
-    kb->usbdelay = USB_DELAY_DEFAULT;
-
     // Check if the device needs a patched keymap, and if so patch it.
     patchkeys(kb);
 
     // Perform OS-specific setup
-    ///
-    /// - A fixed 100ms wait is the start.
-    /// <b>Although the DELAY_LONG macro is given a parameter, it is ignored. Occasionally refactor it.</b>
-    DELAY_LONG(kb);
+    DELAY_100MS();
 
     ///
     /// - The first relevant point is the operating system-specific opening of the interface in os_setupusb().
@@ -638,11 +591,11 @@ int revertusb(usbdevice* kb){
 ///
 int _resetusb(usbdevice* kb, const char* file, int line){
     // Perform a USB reset
-    DELAY_LONG(kb);
+    DELAY_100MS();
     int res = os_resetusb(kb, file, line);
     if(res)
         return res;
-    DELAY_LONG(kb);
+    DELAY_100MS();
     // Re-initialize the device
     if(kb->vtable.start(kb, kb->active) != 0)
         return -1;
@@ -698,7 +651,7 @@ int _usbsend(usbdevice* kb, void* messages, size_t msg_len, int count, const cha
     for(int i = 0; i < count; i++){
         // Send each message via the OS function
         while(1){
-            DELAY_SHORT(kb);
+            kb->vtable.delay(kb, DELAY_SEND);
             queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
             int res = kb->vtable.write(kb, messages + i * msg_len, msg_len, 0, file, line);
             queued_mutex_unlock(mmutex(kb));
@@ -712,7 +665,7 @@ int _usbsend(usbdevice* kb, void* messages, size_t msg_len, int count, const cha
             if(reset_stop)
                 return 0;
             // Retry as long as the result is temporary failure
-            DELAY_LONG(kb);
+            DELAY_100MS();
         }
     }
     return total_sent;
@@ -726,7 +679,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
     for (int try = 0; try < 5; try++) {
         // Send the output message
         queued_mutex_lock(mmutex(kb)); ///< Synchonization between macro and color information
-        DELAY_SHORT(kb);
+        kb->vtable.delay(kb, DELAY_SEND);
         int res = kb->vtable.write(kb, out_msg, msg_len, 1, file, line);
         queued_mutex_unlock(mmutex(kb));
         if (res == 0)
@@ -735,12 +688,11 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
             // Retry on temporary failure
             if (reset_stop)
                 return 0;
-            DELAY_LONG(kb);
+            DELAY_100MS();
             continue;
         }
         // Wait for the response
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
-            DELAY_MEDIUM(kb);
+        kb->vtable.delay(kb, DELAY_RECV);
         res = kb->vtable.read(kb, in_msg, msg_len, 0, file, line);
         if(res == 0)
             return 0;
@@ -748,8 +700,7 @@ int _usbrecv(usbdevice* kb, void* out_msg, size_t msg_len, uchar* in_msg, const 
             return res;
         if(reset_stop)
             return 0;
-        if(!(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)) && kb->protocol != PROTO_BRAGI)
-            DELAY_LONG(kb);
+        DELAY_100MS();
     }
     // Give up
     ckb_err_fn("Too many send/recv failures. Dropping.", file, line);

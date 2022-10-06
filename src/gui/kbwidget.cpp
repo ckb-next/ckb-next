@@ -16,6 +16,7 @@
 #include "mainwindow.h"
 #include <QItemSelectionModel>
 #include "modelisttablemodel.h"
+#include "ckbmainbackgroundcolour.h"
 
 KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector) :
     QWidget(parent),
@@ -23,6 +24,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
     ui(new Ui::KbWidget), currentMode(nullptr),
     prevmode(nullptr)
 {
+    CkbMainBackgroundColour::init(parent);
     ui->setupUi(this);
     Q_ASSERT(ui->pollRateBox->count() == Kb::POLLRATE_COUNT);
     ui->modesList->setDevice(device);
@@ -131,8 +133,7 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
         for(int i = 0; i < layoutnames.count(); i++)
             ui->layoutBox->addItem(layoutnames[i].second, layoutnames[i].first);
 
-        KeyMap::Layout settingsLayout;
-        KeyMap::Layout layout = settingsLayout = KeyMap::getLayout(settings.value("hwLayout").toString());
+        KeyMap::Layout layout = KeyMap::getLayout(settings.value("hwLayout").toString());
         if(layout == KeyMap::NO_LAYOUT){
             // If the layout hasn't been set yet, first check if one was set globally from a previous version
             // If not, try to pick an appropriate one that's supported by the hardware

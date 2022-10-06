@@ -277,24 +277,12 @@ const char* product_str(ushort product);
 // Devices that use the NXP protocol and have the DPI stage RGB data in the DPI packet
 #define NXP_RGB_IN_DPI_PKT(kb)          ((kb)->vendor == V_CORSAIR && ((kb)->product == P_GLAIVE_PRO || IS_DARK_CORE_NXP(kb)))
 
-/// USB delays for when the keyboards get picky about timing
-/// That was the original comment, but it is used anytime.
+#define DELAY_100MS()       \
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL)
 
-/// The short delay is used before any send or receive
-#define DELAY_SHORT(kb)      \
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = ((int) (kb->usbdelay)) * 1000000}, NULL)  // base (default: 5ms)
-
-/// the medium delay is used after sending a command before waiting for the answer.
-#define DELAY_MEDIUM(kb)     \
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = ((int) (kb->usbdelay)) * 10000000}, NULL)  // x10 (default: 50ms)
-
-/// The longest delay takes place where something went wrong (eg when resetting the device)
-#define DELAY_LONG(kb)       \
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL)  // long, fixed 100ms
-
-/// This constant is used to initialize \b kb->usbdelay.
-/// It is used in many places (see macros above) but often also overwritten to the fixed value of 10.
-#define USB_DELAY_DEFAULT   5
+// This is used in NXP only. Would be nice if it can be removed.
+#define DELAY_30MS()        \
+        clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000000}, NULL)
 
 // This should be removed in the future when we implement autodetection
 #define USES_BRAGI(vendor, product)                  ((vendor) == (V_CORSAIR) && ((product) == (P_M55_RGB_PRO) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_KATAR_PRO_XT || (product) == P_KATAR_PRO || (product) == P_K60_PRO_RGB || (product) == P_K60_PRO_RGB_LP || (product) == P_K60_PRO_RGB_SE || (product) == P_K60_PRO_MONO || (product) == P_K55_PRO || (product) == P_K55_PRO_XT) || (product) == (P_DARK_CORE_RGB_PRO) || (product) == (P_DARK_CORE_RGB_PRO_WL))

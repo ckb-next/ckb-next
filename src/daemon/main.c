@@ -14,7 +14,7 @@
 extern _Atomic int reset_stop;
 extern int features_mask;
 extern int enable_experimental;
-
+extern const char pidpath[];
 int sighandler_pipe[2] = { 0, 0 };
 
 // Timespec utility function
@@ -186,8 +186,13 @@ int main(int argc, char** argv){
 #endif
 
     // Check PID, quit if already running
-    if(is_pid_running())
+    pid_t dpid;
+    if((dpid = is_pid_running())){
+        ckb_fatal_nofile("ckb-next-daemon is already running (PID %ld).", (long)dpid);
+        ckb_fatal_nofile("Try `systemctl stop ckb-next-daemon` or `killall ckb-next-daemon`.");
+        ckb_fatal_nofile("(If you're certain the process is dead, delete %s and try again.)", pidpath);
         return 1;
+    }
 
     // Read parameters
     int forceroot = 1;

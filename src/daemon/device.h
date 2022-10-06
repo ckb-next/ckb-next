@@ -109,6 +109,13 @@ void clear_input_and_rgb(usbdevice* kb, const int active);
 void nxp_get_battery_info(usbdevice* kb);
 void bragi_get_battery_info(usbdevice* kb);
 
+void legacy_delay(usbdevice* kb, delay_type_t type);
+void nxp_delay(usbdevice* kb, delay_type_t type);
+void bragi_delay(usbdevice* kb, delay_type_t type);
+
+void nxp_mouse_setfps(usbdevice* kb, int fps);
+void nxp_kb_setfps(usbdevice* kb, int fps);
+
 // Per-key input settings for device setup
 // The upper nybble controls input mode. 0x80 generates a normal HID interrupt, 0x40 generates a proprietary interrupt. 0xc0 generates both.
 // The exceptions are the proprietary Corsair keys, which only report HID input in BIOS mode and only report Corsair input in non-BIOS mode.

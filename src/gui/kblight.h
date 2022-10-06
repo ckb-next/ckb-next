@@ -9,6 +9,7 @@
 #include "kbanim.h"
 #include "keymap.h"
 #include "colormap.h"
+#include <ckbnextconfig.h>
 
 class KbMode;
 
@@ -90,7 +91,7 @@ public:
 signals:
     void didLoad();
     void updated();
-    void frameDisplayed(const ColorMap& animatedColors, const QSet<QString>& indicatorList);
+    void frameDisplayed(const ColorMap& animatedColors, const QSet<QString>& indicatorList, quint64 timestamp);
 
 private:
     AnimList        _animList;
@@ -108,6 +109,9 @@ private:
     void rebuildBaseMap();
     // Print RGB values to cmd node
     void printRGB(QFile& cmd, const ColorMap& animMap);
+#ifdef FPS_COUNTER
+    quint64 previousTimestamp;
+#endif
 };
 
 #endif // KBLIGHT_H

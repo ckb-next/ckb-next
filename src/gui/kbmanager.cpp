@@ -116,10 +116,13 @@ void KbManager::fps(int framerate){
     QTimer* timer = eventTimer();
     if(!timer)
         return;
+    // Explicitly round the result to the nearest integer
+    // If we strip the decimal part, then we end up with 62.5 FPS instead of 60
+    const int target = roundf(1000.f / framerate);
     if(timer->isActive())
-        timer->setInterval(1000 / framerate);
+        timer->setInterval(target);
     else
-        timer->start(1000 / framerate);
+        timer->start(target);
 }
 
 void KbManager::scanKeyboards(){

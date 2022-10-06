@@ -71,12 +71,6 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
     int laston = memcmp(lastlight->r + led_offset, pkt, CPY_SZ(r)) ||
                  memcmp(lastlight->g + led_offset, pkt, CPY_SZ(g)) ||
                  memcmp(lastlight->b + led_offset, pkt, CPY_SZ(b));
-    if (newon != laston || force){
-        if(kb->brightness_mode == BRIGHTNESS_HARDWARE_COARSE)
-            bragi_set_property(kb, BRAGI_BRIGHTNESS_COARSE, newon ? 3 : 0);
-        else if(kb->brightness_mode == BRIGHTNESS_HARDWARE_FINE)
-            bragi_set_property(kb, BRAGI_BRIGHTNESS, newon ? 1000 : 0);
-    }
 
     static_assert(sizeof(pkt) >= 7 + N_KEYS_EXTENDED * 3, "Bragi RGB packet must be large enough to fit all possible zones in the keymap");
 
@@ -91,6 +85,16 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
 
     if(bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), bytes))
         return 1;
+
+    // Keep this check below the write.
+    // This is done to prevent a delay when turning the lights off, caused by slow HW.
+    // There seems to be no way to prevent the delay when turning the lights back on.
+    if (newon != laston || force){
+        if(kb->brightness_mode == BRIGHTNESS_HARDWARE_COARSE)
+            bragi_set_property(kb, BRAGI_BRIGHTNESS_COARSE, newon ? 3 : 0);
+        else if(kb->brightness_mode == BRIGHTNESS_HARDWARE_FINE)
+            bragi_set_property(kb, BRAGI_BRIGHTNESS, newon ? 1000 : 0);
+    }
 
     lastlight->forceupdate = newlight->forceupdate = 0;
 

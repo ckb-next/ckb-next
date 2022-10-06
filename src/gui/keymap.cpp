@@ -1,6 +1,9 @@
 #include <clocale>
 #include <QMap>
 #include "keymap.h"
+#include <QObject>
+
+const Key KeyMap::emptyKey = {nullptr,nullptr,nullptr,0,0,0,0,0,0};
 
 // Normal key size
 #define NS 12, 12
@@ -294,7 +297,7 @@ static const Key M65Keys[] = {
     {nullptr,  "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {nullptr,  "Wheel Light", "front", 22, 15, 8, 8, true, false},
     {nullptr,  "DPI Up", "dpiup", 22, 19, 8, 6, false, true}, {nullptr,  "DPI Light", "dpi", 22, 24, 8, 8, true, false}, {nullptr,  "DPI Down", "dpidn", 22, 31, 8, 6, false, true},
     {nullptr,  "Forward", "mouse5", 5, 24, 5, 9, false, true}, {nullptr,  "Back", "mouse4", 5, 33, 5, 10, false, true}, {nullptr,  "Sniper", "sniper", 0, 25, 5, 15, false, true},
-    {nullptr,  "Logo", "back", 14, 55, 24, 12, true, false}
+    {nullptr,  "Logo", "back", 20, 54, 12, 12, true, false}
 };
 #define KEYCOUNT_M65    (sizeof(M65Keys) / sizeof(Key))
 
@@ -307,7 +310,7 @@ static const Key SabreKeys[] = {
     {nullptr,  "Wheel Up", "wheelup", 22, 5, 8, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 22, 15, 8, 5, false, true}, {nullptr,  "Wheel Light", "wheel", 22, 5, 8, 15, true, false}, {nullptr,  "Extra button", "thumb1", 22, 20, 8, 18, false, true},
     {nullptr,  "DPI Up", "dpiup", 5, 3, 5, 7, false, true}, {nullptr,  "DPI Down", "dpidn", 5, 10, 5, 7, false, true}, {nullptr,  "DPI Light", "dpi", 5, 4, 5, 12, true, false},
     {nullptr,  "Forward", "mouse5", 5, 24, 5, 9, false, true}, {nullptr,  "Back", "mouse4", 5, 33, 5, 10, false, true},
-    {nullptr,  "Logo", "back", 14, 50, 24, 12, true, false}
+    {nullptr,  "Logo", "back", 21, 50, 12, 12, true, false}
 };
 #define KEYCOUNT_SABRE  (sizeof(SabreKeys) / sizeof(Key))
 
@@ -330,7 +333,7 @@ static const Key HarpoonKeys[] = {
 static const Key GlaiveKeys[] = {
     {nullptr,  "Left Mouse", "mouse1", 17, 3, 14, 18, false, true}, {nullptr,  "Right Mouse", "mouse2", 37, 3, 14, 18, false, true}, {nullptr,  "Middle Mouse", "mouse3", 31, 9, 7, 7, false, true}, {nullptr,  "Front light", "front", 16, -5, 36, 8, true, false },
     {nullptr,  "Wheel Up", "wheelup", 31, 5, 7, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 31, 15, 7, 5, false, true}, {nullptr,  "Side Lights", "side", 22, 24, 7, 20, true, false},
-    {nullptr,  "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {nullptr,  "Logo Light", "back", 24, 43, 20, 20, true, false},
+    {nullptr,  "DPI Cycle", "dpiup", 31, 19, 6, 12, false, true}, {nullptr,  "Logo Light", "back", 26, 45, 16, 16, true, false},
     {nullptr,  "Forward", "mouse5", 15, 22, 5, 11, false, true}, {nullptr,  "Back", "mouse4", 15, 32, 5, 11, false, true}
 };
 #define KEYCOUNT_GLAIVE  (sizeof(GlaiveKeys) / sizeof(Key))
@@ -370,7 +373,7 @@ static const Key ScimKeys[] = {
     {nullptr,  "4", "thumb4", -6, 25, 7, 7, false, true}, {nullptr,  "5", "thumb5", 1, 25, 7, 7, false, true}, {nullptr,  "6", "thumb6", 8, 25, 7, 7, false, true},
     {nullptr,  "7", "thumb7", -6, 32, 7, 7, false, true}, {nullptr,  "8", "thumb8", 1, 32, 7, 7, false, true}, {nullptr,  "9", "thumb9", 8, 32, 7, 7, false, true},
     {nullptr,  "10", "thumb10", -6, 39, 7, 7, false, true}, {nullptr,  "11", "thumb11", 1, 39, 7, 7, false, true}, {nullptr,  "12", "thumb12", 8, 39, 7, 7, false, true},
-    {nullptr,  "Logo", "back", 21, 50, 24, 16, true, false}
+    {nullptr,  "Logo", "back", 26, 50, 16, 16, true, false}
 };
 #define KEYCOUNT_SCIM   (sizeof(ScimKeys) / sizeof(Key))
 
@@ -425,7 +428,7 @@ static const Key DarkCoreKeys[] = {
     {nullptr,  "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {nullptr,  "Wheel Light", "wheel", 22, 2, 8, 16, true, false},
     {nullptr,  "DPI Up", "dpiup", 0, 5, 8, 8, false, true}, {nullptr,  "DPI Down", "dpidn", 0, 12, 8, 8, false, true},
     {nullptr,  "Forward", "mouse5", 5, 24, 5, 9, false, true}, {nullptr,  "Back", "mouse4", 5, 33, 5, 10, false, true}, {nullptr,  "Sniper", "sniper", 0, 25, 5, 15, false, true}, {nullptr,  "Side light", "side", 0, 24, 10, 24, true, false},
-    {nullptr,  "Logo", "back", 0, 48, 48, 12, true, false}, {nullptr,  "Profile Switch", "profswitch", 22, 20, 8, 12, false, true}, {nullptr,  "DPI", "dpi", 0, 0, 10, 24, true,  false }
+    {nullptr,  "Logo", "back", 19, 50, 12, 12, true, false}, {nullptr,  "Profile Switch", "profswitch", 22, 20, 8, 12, false, true}, {nullptr,  "DPI", "dpi", 0, 0, 10, 24, true,  false }
 };
 #define KEYCOUNT_DARKCORE    (sizeof(DarkCoreKeys) / sizeof(Key))
 
@@ -1355,56 +1358,43 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
     }
 }
 
-QPair<int, QString> KeyMap::addToList(int i, QStringList* list){
-    return QPair<int, QString>(i, list->at(i));
+QPair<int, QString> KeyMap::addToList(int i, const QStringList& list){
+    return QPair<int, QString>(i, list.at(i));
 }
 
+const QStringList KeyMap::layoutList {
+    "Danish", "English (ISO/European)", "English (ISO/European, Dvorak)", "English (United Kingdom)", "English (United Kingdom, Dvorak)",
+     "English (United States)", "English (United States, Dvorak)", "French", "German", "Italian", "Japanese", "Norwegian", "Polish",
+     "Portuguese (Brazil)", "Spanish (Latin America)", "Spanish (Spain)", "Swedish"
+};
 QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
-    QStringList list;
-    list << "Danish"
-         << "English (ISO/European)"
-         << "English (ISO/European, Dvorak)"
-         << "English (United Kingdom)"
-         << "English (United Kingdom, Dvorak)"
-         << "English (United States)"
-         << "English (United States, Dvorak)"
-         << "French"
-         << "German"
-         << "Italian"
-         << "Japanese"
-         << "Norwegian"
-         << "Polish"
-         << "Portuguese (Brazil)"
-         << "Spanish (Latin America)"
-         << "Spanish (Spain)"
-         << "Swedish";
 
     // Create a list containing the layouts supported by the current device
     QList<QPair<int, QString>> retlist;
     if(layout == "ansi")
-        retlist << KeyMap::addToList(5, &list)
-                << KeyMap::addToList(6, &list);
+        retlist << KeyMap::addToList(5, layoutList)
+                << KeyMap::addToList(6, layoutList);
     else if(layout == "iso")
-        retlist << KeyMap::addToList(0, &list)
-                << KeyMap::addToList(1, &list)
-                << KeyMap::addToList(2, &list)
-                << KeyMap::addToList(3, &list)
-                << KeyMap::addToList(4, &list)
-                << KeyMap::addToList(7, &list)
-                << KeyMap::addToList(8, &list)
-                << KeyMap::addToList(9, &list)
-                << KeyMap::addToList(11, &list)
-                << KeyMap::addToList(12, &list)
-                << KeyMap::addToList(14, &list)
-                << KeyMap::addToList(15, &list)
-                << KeyMap::addToList(16, &list);
+        retlist << KeyMap::addToList(0, layoutList)
+                << KeyMap::addToList(1, layoutList)
+                << KeyMap::addToList(2, layoutList)
+                << KeyMap::addToList(3, layoutList)
+                << KeyMap::addToList(4, layoutList)
+                << KeyMap::addToList(7, layoutList)
+                << KeyMap::addToList(8, layoutList)
+                << KeyMap::addToList(9, layoutList)
+                << KeyMap::addToList(11, layoutList)
+                << KeyMap::addToList(12, layoutList)
+                << KeyMap::addToList(14, layoutList)
+                << KeyMap::addToList(15, layoutList)
+                << KeyMap::addToList(16, layoutList);
     else if(layout == "abnt")
-        retlist << KeyMap::addToList(13, &list);
+        retlist << KeyMap::addToList(13, layoutList);
     else if(layout == "jis")
-        retlist << KeyMap::addToList(10, &list);
+        retlist << KeyMap::addToList(10, layoutList);
     else
-        for(int i = 0; i < list.count(); i++)
-            retlist << KeyMap::addToList(i, &list);
+        for(int i = 0; i < layoutList.count(); i++)
+            retlist << KeyMap::addToList(i, layoutList);
     return retlist;
 }
 
@@ -1664,24 +1654,21 @@ int KeyMap::modelHeight(Model model){
 
 KeyMap::KeyMap(Model _keyModel, Layout _keyLayout) :
     _keys(getMap(_keyModel, _keyLayout)),
-    keyWidth(modelWidth(_keyModel)), keyHeight(modelHeight(_keyModel)),
-    keyModel(_keyModel), keyLayout(_keyLayout)
+    keyModel(_keyModel), keyLayout(_keyLayout),
+    keyWidth(modelWidth(_keyModel)), keyHeight(modelHeight(_keyModel))
 {}
 
 KeyMap::KeyMap() :
-     keyWidth(0), keyHeight(0),
-     keyModel(NO_MODEL), keyLayout(NO_LAYOUT)
+     keyModel(NO_MODEL), keyLayout(NO_LAYOUT),
+     keyWidth(0), keyHeight(0)
 {}
 
 QStringList KeyMap::byPosition() const {
     // Use QMaps to order the keys
     QMap<int, QMap<int, QString> > ordered;
-    QHashIterator<QString, Key> i(*this);
-    while(i.hasNext()){
-        i.next();
-        const Key& key = i.value();
-        ordered[key.y][key.x] = i.key();
-    }
+    for(const Key& key: *this)
+        ordered[key.y][key.x] = key.name;
+
     // Merge them into a single list
     QStringList result;
     QMapIterator<int, QMap<int, QString> > y(ordered);
@@ -1702,17 +1689,17 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     // it would probably be best to remove the friendly names from the maps and have a completely separate name->friendlyName store
     KeyMap map(K95, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
 
     // The only key missing from it should be Fn, which is found on STRAFE
     map = KeyMap(STRAFE, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
 
     // Light Program for the legacy K95
     map = KeyMap(K95L, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
 
     // Additionally, there are a handful of keys not present on any physical keyboard, but we need names for them
     if(key == "f13" || key == "f14" || key == "f15" || key == "f16" || key == "f17" || key == "f18" || key == "f19" || key == "f20"
@@ -1722,28 +1709,34 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
         return "Screen Brightness Up";
     else if(key == "lightdn")
         return "Screen Brightness Down";
-    else if(key == "eject" || key == "power")
-        return key[0].toUpper() + key.mid(1);   // capitalize first letter
+    else if(key == "eject")
+        return QObject::tr("Eject");
+    else if(key == "power")
+        return QObject::tr("Power");
+    else if(key == "wheellf")
+        return QObject::tr("Wheel Left");
+    else if(key == "wheelrg")
+        return QObject::tr("Wheel Right");
 
     // All other names are found on mice
     map = KeyMap(SCIMITAR, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(M65, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(HARPOON, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(IRONCLAW, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(NIGHTSWORD, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
     map = KeyMap(IRONCLAW_W, layout);
     if(map.contains(key))
-        return map[key].friendlyName();
+        return map.key(key).friendlyName();
 
     // Not found at all
     return "";

@@ -140,7 +140,7 @@ static void* play_macro(void* param) {
                         os_mousescroll(kb, 0, (action->scan == BTN_WHEELUP ? 1 : -1));
                 } else if(IS_SCROLLWHEEL_H(action->scan)) {
                     if(action->down)
-                        os_mousescroll(kb, (action->scan == BTN_WHEELLEFT ? 1 : -1), 0);
+                        os_mousescroll(kb, (action->scan == BTN_WHEELLEFT ? -1 : 1), 0);
                 } else {
                     os_keypress(kb, action->scan, action->down);
                 }
@@ -364,9 +364,14 @@ static inline void inputupdate_keys(usbdevice* kb, int* sync_kb, int* sync_mouse
                             input->whl_rel_y = (scancode == BTN_WHEELUP ? 1 : -1);
                         os_mousescroll(kb, 0, input->whl_rel_y);
                         *sync_mouse = 1;
-                    } else if(scancode == BTN_WHEELLEFT || scancode == BTN_WHEELRIGHT) {
-                        // Always simulate scrolling as no device supports this yet
-                        os_mousescroll(kb, (scancode == BTN_WHEELLEFT ? 1 : -1), 0);
+                    } else if(IS_SCROLLWHEEL_H(scancode)) {
+                        // Simulate horizontal scrolling as no device supports this yet
+                        // The only exception is binding the vertical scroll wheel to the horizontal one
+                        if(IS_SCROLLWHEEL_V(map->scan))
+                            input->whl_rel_x = input->whl_rel_y;
+                        else
+                            input->whl_rel_x = (scancode == BTN_WHEELLEFT ? -1 : 1);
+                        os_mousescroll(kb, input->whl_rel_x, 0);
                         *sync_mouse = 1;
                     } else {
                         // Regular keypress: add to the end of regular keys
@@ -515,7 +520,7 @@ void updateindicators_kb(usbdevice* kb, int force){
     kb->ileds = new;
     kb->hw_ileds_old = hw_new;
     if(old != new || force){
-        DELAY_SHORT(kb);
+        kb->vtable.delay(kb, DELAY_INDICATORS);
 
         ushort leds = kb->ileds;
         int len = 1;

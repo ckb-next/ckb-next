@@ -7,6 +7,7 @@
 #include "notify.h"
 #include "profile.h"
 #include "usb.h"
+#include <ckbnextconfig.h>
 
 static const char* const cmd_strings[CMD_COUNT - 1] = {
     // NONE is implicit
@@ -62,37 +63,47 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 #define TRY_WITH_RESET(action)  \
     while(action){              \
         if(usb_tryreset(kb)){   \
-            free(word);         \
             return 1;           \
         }                       \
     }
 
+#define HERTZ_LIM 16528925L // 60.5Hz
 
-int readcmd(usbdevice* kb, const char* line){
-    char* word = malloc(strlen(line) + 1);
-    int wordlen;
-    const char* newline = 0;
+static inline long timespec_diff_ns (struct timespec* a, struct timespec* b){
+    const time_t diff_s = a->tv_sec - b->tv_sec;
+    const long diff_ns = a->tv_nsec - b->tv_nsec;
+    // Check for possible overflow
+    if(diff_ns > 0 && (LONG_MAX - diff_ns) / 1000000000L <= diff_s)
+        return LONG_MAX;
+
+    return diff_ns + diff_s * 1000000000L;
+}
+
+int readcmd(usbdevice* kb, char* line){
+#ifdef FPS_COUNTER
+    // workaround for being able to check if an rgb command was issued
+    int rgb_cmd_count = 0;
+#endif
     const devcmd* vt = &kb->vtable;
     usbprofile* profile = kb->profile;
-    usbmode* mode = 0;
+    usbmode* mode = profile->currentmode;
     int notifynumber = 0;
     // Read words from the input
     cmd command = NONE;
-    while(sscanf(line, "%s%n", word, &wordlen) == 1){
-        line += wordlen;
-        // If we passed a newline, reset the context
-        if(line > newline){
-            mode = profile->currentmode;
-            command = NONE;
-            notifynumber = 0;
-            newline = strchr(line, '\n');
-            if(!newline)
-                newline = line + strlen(line);
-        }
+    char* ptr = NULL;
+    char* intok = line;
+    char* word = NULL;
+    // This is done this way to eat up duplicate commands (for example multiple buffered rgb commands)
+    while((word = strtok_r(intok, " \n", &ptr))){
+        intok = NULL;
         // Check for a command word
         for(int i = 0; i < CMD_COUNT - 1; i++){
             if(!strcmp(word, cmd_strings[i])){
                 command = i + CMD_FIRST;
+#ifdef FPS_COUNTER
+                if(command == RGB)
+                    rgb_cmd_count++;
+#endif
 #ifndef OS_MAC
                 // Layout and mouse acceleration aren't used on Linux; ignore
                 if(command == LAYOUT || command == ACCEL || command == SCROLLSPEED)
@@ -179,18 +190,9 @@ int readcmd(usbdevice* kb, const char* line){
             continue;
         }
         case FPS: {
-            // USB command delay (2 - 10ms)
-            uint framerate;
-            if(sscanf(word, "%u", &framerate) == 1 && framerate > 0){
-                // Not all devices require the same number of messages per frame; select delay appropriately
-                uint per_frame = IS_MOUSE_DEV(kb) ? 2 : IS_FULLRANGE(kb) ? 14 : 5;
-                uint delay = 1000 / framerate / per_frame;
-                if(delay < 2)
-                    delay = 2;
-                else if(delay > 10)
-                    delay = 10;
-                kb->usbdelay = delay;
-            }
+            int framerate;
+            if(sscanf(word, "%d", &framerate) == 1 && framerate >= 5)
+                vt->setfps(kb, framerate);
             continue;
         }
         case DITHER: {
@@ -238,21 +240,15 @@ int readcmd(usbdevice* kb, const char* line){
             }
             continue;
         case HWLOAD: case HWSAVE:{
-            char delay = kb->usbdelay;
-            // Ensure delay of at least 10ms as the device can get overwhelmed otherwise
-            if(delay < 10)
-                kb->usbdelay = 10;
             // Try to load/save the hardware profile. Reset on failure, disconnect if reset fails.
             TRY_WITH_RESET(vt->do_io[command](kb, mode, notifynumber, 1, 0));
             // Re-send the current RGB state as it sometimes gets scrambled
             TRY_WITH_RESET(vt->updatergb(kb, 1));
-            kb->usbdelay = delay;
             continue;
         }
         case FWUPDATE:
             // FW update parses a whole word. Unlike hwload/hwsave, there's no try again on failure.
             if(vt->fwupdate(kb, mode, notifynumber, 0, word)){
-                free(word);
                 return 1;
             }
             continue;
@@ -361,14 +357,22 @@ int readcmd(usbdevice* kb, const char* line){
     // Finish up
     if(!NEEDS_FW_UPDATE(kb)){
         TRY_WITH_RESET(vt->updatergb(kb, 0));
-        TRY_WITH_RESET(vt->updatedpi(kb, 0));
-    }
-    free(word);
-
 #ifndef NDEBUG
-    if(command == RGB)
         memset(kb->encounteredleds, 0, sizeof(kb->encounteredleds));
 #endif
+#ifdef FPS_COUNTER
+        if(rgb_cmd_count){
+            struct timespec now;
+            clock_gettime(CLOCK_MONOTONIC, &now);
+            const long int diff = timespec_diff_ns(&now, &kb->last_rgb);
+            ckb_info("ckb%d: FPS %f", INDEX_OF(kb, keyboard), 1.f / (diff / 1000000000.f));
+            memcpy(&kb->last_rgb, &now, sizeof(struct timespec));
+            if(rgb_cmd_count > 1)
+                ckb_warn("ckb%d: RGB loop behind by %d commands", INDEX_OF(kb, keyboard), rgb_cmd_count - 1);
+        }
+#endif
+        TRY_WITH_RESET(vt->updatedpi(kb, 0));
+    }
 
     return 0;
 }

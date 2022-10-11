@@ -36,7 +36,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="modeLabel">
      <property name="text">
-      <string/>
+      <string>TIP: Type in xprop or xwininfo to the terminal and click on a window to find its name</string>
      </property>
     </widget>
    </item>

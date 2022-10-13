@@ -1,0 +1,27 @@
+name: Feature Request
+description: Suggest an idea for this project.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Due Diligence
+        - See if your suggestion has already been talked about in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
+        - One suggestion per issue.
+  - type: textarea
+    id: enhancement-desc
+    attributes:
+      label: Enhancement Details
+      description: What is it you want to see changed?
+      placeholder: ex. Instead of having a dropdown to select the brightness for the K95 RGB Platinum XT could we have a slider?
+    validations:
+      required: true
+  - type: textarea
+    id: additional-details
+    attributes:
+      label: Additional Details
+      description: Is there anything else that may be helpful?
+      value: |
+        Add any additional details here.
+    validations:
+      required: false

@@ -1,0 +1,66 @@
+name: New Device Request
+description: Ask for the project to implement support for a new device.
+labels: ["new-device"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Due Diligence
+        - Check if the device is supported.
+        - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
+        - Verify your installation is up-to-date.
+        - One request per issue.
+  - type: dropdown
+    id: what-kind-of-device
+    attributes:
+      label: What kind of device is it?
+      description: What kind of device would you like support for? Keep in mind that only Mice and Keyboards are prioritized at the moment, everything else is on a best-efforts base only. 
+      options:
+        - Keyboard
+        - Mouse
+        - Headphone
+        - Mouse Pad
+        - Lighting
+        - Fan
+        - Cases
+        - Power Supplies
+        - Control Modules (Commander PRO)
+        - AIO Coolers
+        - RAM
+        - System
+    validations:
+      required: true
+  - type: input
+    id: device-model
+    attributes:
+      label: What is the name of the device?
+      description: Please be specific. Copying the name from the sticker on the device or the title of Corsair's product page will yield the best result.
+      placeholder: ex. K95 RGB PLATINUM XT
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link to Corsair's Product Page
+      description: Optionally, please include a link to your exact device on Corsair's Website. 
+    validations:
+      required: false
+  - type: textarea
+    id: additional-details
+    attributes:
+      label: Additional Details
+      description: Is there anything else that may be helpful?
+      value: |
+        Add any additional details here.
+    validations:
+      required: false
+  - type: textarea
+    id: generated-report
+    attributes:
+      label: Generated Report
+      description: |
+        In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. Alternatively, run ckb-next-dev-detect in a terminal.</br></br>  Click into the text box below then drag the .gz file into it.
+      value: |
+        Drag your generated report here.
+    validations:
+      required: true

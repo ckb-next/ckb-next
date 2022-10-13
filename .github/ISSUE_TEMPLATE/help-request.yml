@@ -1,0 +1,36 @@
+name: Help Request
+description: Request help.
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Please try these Resources first!
+        * IRC chat: #ckb-next channel at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next)
+        * [Matrix](https://matrix.to/#/#ckb-next:matrix.org): #ckb-next:matrix.org
+  - type: textarea
+    id: question-body
+    attributes:
+      label: Describe your situation in detail.
+      description: Please provide as many relevant information as you can:\ Device(s), OS, used version of ckb-next, package-source, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: additional-details
+    attributes:
+      label: Additional Details
+      description: Is there anything else that may be helpful?
+      value: |
+        Add any additional details here.
+    validations:
+      required: false
+  - type: textarea
+    id: generated-report
+    attributes:
+      label: Generated Report (if applicable)
+      description: |
+        In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. Alternatively, run ckb-next-dev-detect in a terminal.</br></br>  Click into the text box below then drag the .gz file into it.
+      value: |
+        Drag your generated report here if it's applicable.
+    validations:
+      required: false

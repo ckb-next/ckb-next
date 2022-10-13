@@ -1,0 +1,79 @@
+name: Bug Report
+description: Report an issue with existing supported devices.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Due Diligence
+        - Check if the device is supported.
+        - Search for similar bugs in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
+        - Verify your installation is up-to-date.
+        - One bug per issue.
+  - type: input
+    id: name
+    attributes:
+      label: Affected Devices
+      description: What is the name of the device you are using that are not functioning as expected? If more than one devices are experiencing issues list them here separated by a comma.
+      placeholder: ex. K95 RGB Platinum XT, Dark Core SE
+    validations:
+      required: true
+  - type: input
+    id: distro
+    attributes:
+      label: Linux Distribution
+      description: Which Linux distribution are you using?
+      placeholder: ex. Arch
+    validations:
+      required: true
+  - type: input
+    id: install-choice
+    attributes:
+      label: Installation Method
+      description: How did you install ckb-next?
+      placeholder: ex. AUR
+    validations:
+      required: true
+  - type: input
+    id: build-version
+    attributes:
+      label: ckb-next version
+      description: What version is found at the top of the Settings tab in the application.
+      placeholder: ex. ckb-next 0.5.0
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What did you expect?
+      description: What is the expected behavior? What is wrong or missing?
+      placeholder: ex. The keyboard should work after system awakens from sleep.
+    validations:
+      required: true
+  - type: textarea
+    id: user-solutions
+    attributes:
+      label: Did you try anything that may have helped?
+      description: Explain if you restarted your computer, logged out, replugged, etc. 
+      placeholder: ex. After reboot the keyboard works as expected again.
+    validations:
+      required: false
+  - type: textarea
+    id: additional-details
+    attributes:
+      label: Additional Details
+      description: Is there anything other information that could be helpful to pinpoint the issue?
+      value: |
+        Add any additional details here.
+    validations:
+      required: false
+  - type: textarea
+    id: generated-report
+    attributes:
+      label: Generated Report
+      description: |
+        In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. Alternatively, run ckb-next-dev-detect in a terminal.</br></br>  Click into the text box below then drag the .gz file into it.
+      value: |
+        Drag your generated report here.
+    validations:
+      required: true

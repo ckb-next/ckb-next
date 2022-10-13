@@ -59,9 +59,8 @@ body:
     attributes:
       label: Generated Report
       description: |
-        In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. </br></br>  Click into the text box below then drag the .gz file into it.
+        In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. Alternatively, run ckb-next-dev-detect in a terminal.</br></br>  Click into the text box below then drag the .gz file into it.
       value: |
         Drag your generated report here.
     validations:
       required: true
-      

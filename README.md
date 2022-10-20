@@ -5,7 +5,8 @@
 
 **ckb-next** is an open-source driver for Corsair devices. It aims to bring the features of Corsair's proprietary iCUE software to Linux operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
-***Disclaimer:*** ckb-next is not an official Corsair product. It is not supported by, affiliated with, or endorsed by Corsair. It is licensed under the GNU General Public License (version 2) in the hope that it will be helpful, but with NO WARRANTY of any kind.
+***Disclaimer:*** ckb-next is not an official Corsair product. It is not supported by, affiliated with, or endorsed by Corsair. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, WITHOUT ANY WARRANTY. See the
+GNU General Public License for more details.
 
 ## Supported Devices
 | | | |

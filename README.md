@@ -7,9 +7,14 @@
 
 ***Disclaimer:*** ckb-next is not an official Corsair product. It is not supported by, affiliated with, or endorsed by Corsair. It is licensed under the GNU General Public License (version 2) in the hope that it will be helpful, but with NO WARRANTY of any kind.
 
+## Supported Devices
+| | | |
+| - | - | - |
+| [![Keyboards](https://img.shields.io/badge/Keyboards-2ea44f)](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#keyboards) | [![Mice](https://img.shields.io/badge/Mice-2ea44f)](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#mice) | [![Other Devices](https://img.shields.io/badge/Other_Devices-2ea44f)](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#other-devices) | 
+
 ![Screenshot](https://i.imgur.com/zMK9jOP.png)
 
-Major features:
+## Major features:
 
 - Control multiple devices independently
 - United States and European keyboard layouts
@@ -18,12 +23,6 @@ Major features:
 - Reactive lighting
 - Multiple profiles/modes with hardware save function
 - Adjustable mouse DPI with the ability to change DPI on button press
-
-## Supported Devices
-
-### [Keyboards](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#keyboards)
-### [Mice](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#mice)
-### [Other Devices](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#other-devices)
 
 ## General information
 

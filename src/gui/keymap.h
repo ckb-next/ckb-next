@@ -103,6 +103,7 @@ public:
         JP,                 // Japanese
         NO,                 // Norwegian
         PL,                 // Polish (identical to US)
+        PT,                 // Portuguese
         PT_BR,              // Portuguese (Brazil)
         MX,                 // Spanish (Mexico/Latin America)
         ES,                 // Spanish (Spain)

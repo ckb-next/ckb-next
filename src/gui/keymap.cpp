@@ -93,6 +93,10 @@ static const KeyPatch patchMX[] = {
     {nullptr,  "<", "bslash_iso"}, {nullptr,  "-", "slash"},
 };
 
+// DON'T KNOW WHAT TO DO WITH THIS
+static const KeyPatch patchPT[] = {
+};
+
 static const KeyPatch patchPTBR[] = {
     {"quote", "'", "grave"},
     {"accent", "´", "lbrace"}, {"lbrace", "[", "rbrace"},
@@ -600,6 +604,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             break;
         case KeyMap::MX:
             patch(map, patchMX);
+            break;
+        case KeyMap::PT:
+            patch(map, patchPT);
             break;
         case KeyMap::PT_BR:
             patch(map, patchPTBR);
@@ -1213,6 +1220,8 @@ KeyMap::Layout KeyMap::locale(QList<QPair<int, QString>>* layouts){
         layout = KeyMap::PL;
     else if(loc.startsWith("pt-br"))
         layout = KeyMap::PT_BR;
+    else if(loc.startsWith("pt"))
+        layout = KeyMap::PT;
     else if(loc.startsWith("no-"))
         layout = KeyMap::NO;
     else if(loc.startsWith("es-es"))
@@ -1271,6 +1280,8 @@ KeyMap::Layout KeyMap::getLayout(const QString& name){
         return PL;
     if(lower == "pt_br")
         return PT_BR;
+    if(lower == "pt")
+        return PT;
     if(lower == "mx")
         return MX;
     if(lower == "es")
@@ -1310,6 +1321,8 @@ QString KeyMap::getLayout(KeyMap::Layout layout){
         return "no";
     case PL:
         return "pl";
+    case PT:
+        return "pt";
     case PT_BR:
         return "pt_br";
     case MX:
@@ -1328,9 +1341,24 @@ QPair<int, QString> KeyMap::addToList(int i, const QStringList& list){
 }
 
 const QStringList KeyMap::layoutList {
-    "Danish", "English (ISO/European)", "English (ISO/European, Dvorak)", "English (United Kingdom)", "English (United Kingdom, Dvorak)",
-     "English (United States)", "English (United States, Dvorak)", "French", "German", "Italian", "Japanese", "Norwegian", "Polish",
-     "Portuguese (Brazil)", "Spanish (Latin America)", "Spanish (Spain)", "Swedish"
+    "Danish",
+    "English (ISO/European)",
+    "English (ISO/European, Dvorak)",
+    "English (United Kingdom)",
+    "English (United Kingdom, Dvorak)",
+    "English (United States)",
+    "English (United States, Dvorak)",
+    "French",
+    "German",
+    "Italian",
+    "Japanese",
+    "Norwegian",
+    "Polish",
+    "Portuguese (Portugal)",
+    "Portuguese (Brazil)",
+    "Spanish (Latin America)",
+    "Spanish (Spain)",
+    "Swedish"
 };
 QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
 
@@ -1350,11 +1378,12 @@ QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
                 << KeyMap::addToList(9, layoutList)
                 << KeyMap::addToList(11, layoutList)
                 << KeyMap::addToList(12, layoutList)
-                << KeyMap::addToList(14, layoutList)
+                << KeyMap::addToList(13, layoutList)
                 << KeyMap::addToList(15, layoutList)
-                << KeyMap::addToList(16, layoutList);
+                << KeyMap::addToList(16, layoutList)
+                << KeyMap::addToList(17, layoutList);
     else if(layout == "abnt")
-        retlist << KeyMap::addToList(13, layoutList);
+        retlist << KeyMap::addToList(14, layoutList);
     else if(layout == "jis")
         retlist << KeyMap::addToList(10, layoutList);
     else

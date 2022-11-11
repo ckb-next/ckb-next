@@ -333,7 +333,7 @@ QString MacroTableModel::fromString(const QString& input, const bool stopOnError
     QString str = input.simplified();
     str.replace(QChar(' '), QString(""));
     QVector<MacroLine> newMacroLines;
-    QRegularExpression re("(\\+|-)([a-z0-9]+)(=(\\d+)(_(\\d+))?)?(,|$)");
+    QRegularExpression re("(\\+|-)([a-z0-9_]+)(=(\\d+)(_(\\d+))?)?(,|$)");
     QRegularExpressionMatchIterator i = re.globalMatch(str);
     qint64 prevDelay = MacroLine::MACRO_DELAY_DEFAULT, prevMaxDelay = MacroLine::MACRO_DELAY_DEFAULT;
     int previousEnd = 0;

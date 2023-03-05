@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include "keywidgetdebugger.h"
 #include <QSurfaceFormat>
+#include <iostream>
 
 QSharedMemory appShare("ckb-next");
 
@@ -282,7 +283,7 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     // Setup argument parser
     QCommandLineParser parser;
     QString errorMessage;
-    parser.setApplicationDescription("Open Source Corsair Input Device Driver for Linux and OSX.");
+    parser.setApplicationDescription(CKB_NEXT_DESCRIPTION);
     bool background = false;
 
     // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
@@ -392,6 +393,8 @@ QSettings::setDefaultFormat(CkbSettings::Format);
 
     if(QtCreator)
         QThread::sleep(1);
+
+    std::cout << "ckb-next " << CKB_NEXT_VERSION_STR << std::endl;
 
     MainWindow w(silent);
     if(!background)

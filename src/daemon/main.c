@@ -142,7 +142,6 @@ int main(int argc, char** argv){
     setlinebuf(stdout);
     setlinebuf(stderr);
 
-    printf("ckb-next: Corsair RGB driver %s\n", CKB_NEXT_VERSION_STR);
     // If --help occurs anywhere in the command-line, don't launch the program but instead print usage
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i], "--help")){
@@ -152,10 +151,8 @@ int main(int argc, char** argv){
 #else
                         "Usage: ckb-next-daemon [--version] [--gid=<gid>] [--nonotify] [--nobind] [--nonroot]\n"
 #endif
-                        "\n"
-                        "See https://github.com/ckb-next/ckb-next/wiki/CKB-Daemon-Manual for full instructions.\n"
-                        "\n"
-                        "Command-line parameters:\n"
+                        "%s\n\n"
+                        "Options:\n"
                         "    --version\n"
                         "        Print version string to stdout and quit.\n"
                         "    --gid=<gid>\n"
@@ -172,13 +169,16 @@ int main(int argc, char** argv){
 #endif
                         "    --nonroot\n"
                         "        Allows running ckb-next-daemon as a non root user.\n"
-                        "        This will almost certainly not work. Use only if you know what you're doing.\n"
-                        "\n", devpath);
-            exit(0);
+                        "        This will almost certainly not work. Use only if you know what you're doing.\n",
+                        CKB_NEXT_DESCRIPTION, devpath);
+            return 0;
         } else if (!strcmp(argv[i], "--version")){
+            printf("ckb-next-daemon %s\n", CKB_NEXT_VERSION_STR);
             return 0;
         }
     }
+
+    printf("ckb-next-daemon %s\n", CKB_NEXT_VERSION_STR);
 
 #ifdef OS_MAC
     if(argc == 2 && getuid() != 0 && !(strcmp(argv[1], "--request-hid-permission-because-it-doesnt-work-as-root-thanks-apple")))

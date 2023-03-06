@@ -259,57 +259,14 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     if(tmpSettings->value("Program/HiDPI", false).toBool())
         QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-
-    // Setup main application
-    std::unique_ptr<QCoreApplication> app
-      (daemon ? new QCoreApplication(argc, argv) : new QApplication(argc, argv));
-    QCoreApplication& a = *app;
-
-    // Setup translations
-    QTranslator translator;
-    if(translator.load(QLocale(), "", "", ":/translations"))
-        a.installTranslator(&translator);
-
-    const quint16 currentSettingsVersion = tmpSettings->value("Program/SettingsVersion", 0).toInt();
-    if(currentSettingsVersion && currentSettingsVersion > CKB_NEXT_SETTINGS_VER){
-        if(QMessageBox::warning(nullptr, QObject::tr("Downgrade Warning"),
-                                QObject::tr("Downgrading ckb-next will lead to profile data loss. "
-                                            "It is recommended to click Cancel and update to the latest version.<br><br>"
-                                            "If you wish to continue, back up the settings file located at<blockquote>%1</blockquote>and click OK.").arg(tmpSettings->fileName()),
-                                QMessageBox::Ok, QMessageBox::Cancel)
-                == QMessageBox::Cancel){
-            delete tmpSettings;
-            tmpSettings = nullptr;
-            return 0;
-        }
-        // Only handle the downgrade here. The upgrade is handled in CkbSettings.
-        tmpSettings->setValue("Program/SettingsVersion", CKB_NEXT_SETTINGS_VER);
-    }
-
-    // Setup names and versions
-    QCoreApplication::setOrganizationName("ckb-next");
-    QCoreApplication::setApplicationVersion(CKB_NEXT_VERSION_STR);
-    QCoreApplication::setApplicationName("ckb-next");
-
     // Setup argument parser
     QCommandLineParser parser;
     QString errorMessage;
-    parser.setApplicationDescription("Open Source Corsair Input Device Driver for Linux and OSX.");
     bool background = false, daemon = false;
+    {
+      QCoreApplication parser_app(argc, argv);
+    parser.setApplicationDescription("Open Source Corsair Input Device Driver for Linux and OSX.");
 
-    // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
-    if(getuid() == 0){
-        printf("The ckb-next GUI should not be run as root.\n");
-        return 0;
-    }
-
-    // Seed the RNG for UsbIds
-    Q_SRAND(QDateTime::currentMSecsSinceEpoch());
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
-    // Enable HiDPI support
-    qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
 
     // Parse arguments
     switch (parseCommandLine(parser, &errorMessage)) {
@@ -370,6 +327,52 @@ QSettings::setDefaultFormat(CkbSettings::Format);
         daemon = true;
         break;
     }
+    }
+
+    // Setup main application
+    std::unique_ptr<QCoreApplication> app
+      (daemon ? new QCoreApplication(argc, argv) : new QApplication(argc, argv));
+    QCoreApplication& a = *app;
+
+    // Setup translations
+    QTranslator translator;
+    if(translator.load(QLocale(), "", "", ":/translations"))
+        a.installTranslator(&translator);
+
+    const quint16 currentSettingsVersion = tmpSettings->value("Program/SettingsVersion", 0).toInt();
+    if(currentSettingsVersion && currentSettingsVersion > CKB_NEXT_SETTINGS_VER){
+        if(QMessageBox::warning(nullptr, QObject::tr("Downgrade Warning"),
+                                QObject::tr("Downgrading ckb-next will lead to profile data loss. "
+                                            "It is recommended to click Cancel and update to the latest version.<br><br>"
+                                            "If you wish to continue, back up the settings file located at<blockquote>%1</blockquote>and click OK.").arg(tmpSettings->fileName()),
+                                QMessageBox::Ok, QMessageBox::Cancel)
+                == QMessageBox::Cancel){
+            delete tmpSettings;
+            tmpSettings = nullptr;
+            return 0;
+        }
+        // Only handle the downgrade here. The upgrade is handled in CkbSettings.
+        tmpSettings->setValue("Program/SettingsVersion", CKB_NEXT_SETTINGS_VER);
+    }
+
+    // Setup names and versions
+    QCoreApplication::setOrganizationName("ckb-next");
+    QCoreApplication::setApplicationVersion(CKB_NEXT_VERSION_STR);
+    QCoreApplication::setApplicationName("ckb-next");
+
+    // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
+    if(getuid() == 0){
+        printf("The ckb-next GUI should not be run as root.\n");
+        return 0;
+    }
+
+    // Seed the RNG for UsbIds
+    Q_SRAND(QDateTime::currentMSecsSinceEpoch());
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
+    // Enable HiDPI support
+    qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 
     startDelay |= tmpSettings->value("Program/StartDelay", false).toBool();
     delete tmpSettings;

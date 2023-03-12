@@ -232,6 +232,12 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>23</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <weight>75</weight>

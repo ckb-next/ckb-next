@@ -57,6 +57,14 @@ KPerfWidget::KPerfWidget(QWidget *parent) :
             });
         }
     }
+
+    if (isMuteDeviceSupported()){
+        ui->muteDev->setEnabled(true);
+        connect(ui->muteDev, OVERLOAD_PTR(int, QComboBox, currentIndexChanged), [=] (int index) {
+            perf->setMuteDevice(static_cast<muteDevice>(index));
+        });
+    }
+
     k95Widgets << ui->modeBox << ui->modeColorOn << ui->modeColorOff << ui->macroBox << ui->macroColorOn << ui->macroColorOff << ui->k95Label1 << ui->k95Label2 << ui->k95Label3 << ui->k95Label4 << ui->k95Label5 << ui->k95Label6 << ui->k95Line << ui->k95Spacer;
 }
 
@@ -170,6 +178,8 @@ void KPerfWidget::setPerf(KbPerf* newPerf, KbProfile* newProfile){
             if(indicators[i].color3) indicators[i].color3->setEnabled(false);
         }
     }
+    // Set mute device
+    ui->muteDev->setCurrentIndex(perf->getMuteDevice());
     // Hide K95 indicators on non-K95s
     if(profile->keyMap().model() == KeyMap::K95){
         foreach(QWidget* w, k95Widgets)

@@ -64,6 +64,12 @@
    </item>
    <item row="12" column="0" colspan="7">
     <widget class="QLabel" name="label_5">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>23</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <weight>75</weight>
@@ -230,6 +236,12 @@
    </item>
    <item row="0" column="0" colspan="7">
     <widget class="QLabel" name="label">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>23</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <weight>75</weight>
@@ -459,6 +471,12 @@
    </item>
    <item row="16" column="0" colspan="7">
     <widget class="QLabel" name="label_2">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>23</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <weight>75</weight>
@@ -479,6 +497,12 @@
    </item>
    <item row="22" column="0" colspan="7">
     <widget class="QLabel" name="osxLabel">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>23</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <weight>75</weight>

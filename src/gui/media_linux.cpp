@@ -154,6 +154,9 @@ void deinitAudioSubsystem() {
     }
 }
 #else
+bool isMuteDeviceSupported() {
+    return false;
+}
 muteState getMuteState(const muteDevice muteDev){
     return UNKNOWN;
 }

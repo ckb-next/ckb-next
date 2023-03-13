@@ -762,14 +762,32 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         ckb_err("Unknown bragi data received in input thread %02x from endpoint %02x", firstbyte, ep);
                     }
                 } else {
-                    // Accept NKRO only if device is not active
+#define NXP_STRAFE_MEDIA_WORKAROUND(kb) (kb->vendor == V_CORSAIR && kb->product == P_STRAFE)
+#define NXP_STRAFE_MEDIA_MASK 0x3e
+//#define NXP_STRAFE_VOL_MASK 0xc
+                    // Accept NKRO only if device is not active, unless it's media keys and it's an original strafe with the media key bug
                     if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
-                        if(!targetkb->active)
+                        if(!targetkb->active || (firstbyte == NKRO_MEDIA_IN && NXP_STRAFE_MEDIA_WORKAROUND(targetkb)))
                             hid_kb_translate(targetkb->input.keys, urblen, buffer, 0);
                     } else if(urblen == MSG_SIZE) {
-                        if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no header
+                        if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no report id
                             buffer++;
-                        corsair_kbcopy(targetkb->input.keys, buffer);
+                        // If it's an original strafe RGB, to work around the media keys getting stuck down on the 03 packet,
+                        // we save the bits before the kbcopy and then restore them afterwards for the 02 packet to take effect.
+                        if(NXP_STRAFE_MEDIA_WORKAROUND(targetkb)) {
+                            // Store
+                            uchar media_key_state_1 = targetkb->input.keys[12];
+                            uchar media_key_state_2 = targetkb->input.keys[16];
+                            // Apply fresh key data
+                            corsair_kbcopy(targetkb->input.keys, buffer);
+                            // Restore
+                            targetkb->input.keys[12] = (targetkb->input.keys[12] & ~NXP_STRAFE_MEDIA_MASK) | (media_key_state_1 & NXP_STRAFE_MEDIA_MASK);
+                            //targetkb->input.keys[16] = (targetkb->input.keys[16] & ~NXP_STRAFE_VOL_MASK) | (media_key_state_2 & NXP_STRAFE_VOL_MASK);
+                            // We can just copy this byte as-is, as there are no M or G keys in the strafe.
+                            targetkb->input.keys[16] = media_key_state_2;
+                        } else {
+                            corsair_kbcopy(targetkb->input.keys, buffer);
+                        }
                     } else {
                         ckb_err("Unknown data received in input thread %02x from endpoint %02x", firstbyte, ep);
                     }

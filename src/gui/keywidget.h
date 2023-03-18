@@ -92,10 +92,10 @@ private:
     QImage _currentOverlay;
     QPointF _overlayPos;
 
-    void paintEvent(QPaintEvent*);
-    void mousePressEvent(QMouseEvent* event);
-    void mouseMoveEvent(QMouseEvent* event);
-    void mouseReleaseEvent(QMouseEvent* event);
+    void paintEvent(QPaintEvent*) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
 
     QPointF drawInfoOffset;
     float drawInfoScale;

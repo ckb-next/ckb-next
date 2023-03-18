@@ -164,6 +164,7 @@ static int start_bragi_common(usbdevice* kb){
             if(dlen == PAIR_ID_SIZE){
                 memcpy(kb->wl_pairing_id, pairid, dlen);
             } else {
+                // FIXME: Clean this up
                 printf("Invalid pairing ID length (%"PRIu32"). Data: ", dlen);
                 for(uint32_t i = 0; i < dlen; i++)
                     printf("%02hhx ", pairid[i]);
@@ -175,13 +176,13 @@ static int start_bragi_common(usbdevice* kb){
 
             bragi_close_handle(kb, BRAGI_GENERIC_HANDLE);
         }
+
+        char str[PAIR_ID_SIZE*3+1] = {0};
+        for(int i = 0; i < PAIR_ID_SIZE; i++)
+            snprintf(str + i * 3, sizeof(str) - i * 3, "%02hhx ", kb->wl_pairing_id[i]);
+
+        ckb_info("ckb%d: Pairing id: %s", INDEX_OF(kb, keyboard), str);
     }
-
-    char str[PAIR_ID_SIZE*3+1] = {0};
-    for(int i = 0; i < PAIR_ID_SIZE; i++)
-        snprintf(str + i * 3, sizeof(str) - i * 3, "%02hhx ", kb->wl_pairing_id[i]);
-
-    ckb_info("ckb%d: Pairing id: %s", INDEX_OF(kb, keyboard), str);
 
     // Switch back to HW mode
     bragi_set_property(kb, BRAGI_MODE, BRAGI_MODE_HARDWARE);

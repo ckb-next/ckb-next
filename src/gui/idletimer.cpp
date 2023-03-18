@@ -15,7 +15,7 @@ int IdleTimer::getIdleTime(){
     const int display = QX11Info::appScreen();
 
     xcb_screensaver_query_info_cookie_t replyCookie = xcb_screensaver_query_info(conn, QX11Info::appRootWindow(display));
-    xcb_screensaver_query_info_reply_t* replyInfo = xcb_screensaver_query_info_reply(conn, replyCookie, NULL);
+    xcb_screensaver_query_info_reply_t* replyInfo = xcb_screensaver_query_info_reply(conn, replyCookie, nullptr);
 
     uint32_t userIdle = replyInfo->ms_since_user_input;
     free(replyInfo);

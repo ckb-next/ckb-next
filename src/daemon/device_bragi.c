@@ -178,8 +178,8 @@ static int start_bragi_common(usbdevice* kb){
     }
 
     char str[PAIR_ID_SIZE*3+1] = {0};
-    for(uint32_t i = 0; i < PAIR_ID_SIZE; i++)
-        snprintf(str + i * 3, sizeof(str), "%02hhx ", kb->wl_pairing_id[i]);
+    for(int i = 0; i < PAIR_ID_SIZE; i++)
+        snprintf(str + i * 3, sizeof(str) - i * 3, "%02hhx ", kb->wl_pairing_id[i]);
 
     ckb_info("ckb%d: Pairing id: %s", INDEX_OF(kb, keyboard), str);
 

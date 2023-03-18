@@ -307,8 +307,8 @@ quint64 KbPerf::pushDpi(const QPoint& newDpi, bool sniper){
 }
 
 void KbPerf::popDpi(quint64 pushIdx){
-    if(!pushedDpis.contains(pushIdx)) {   
-      return;
+    if(!pushedDpis.contains(pushIdx)) {
+        return;
     }
     pushedDpis.remove(pushIdx);
     if (pushedDpis.isEmpty()) {
@@ -316,7 +316,7 @@ void KbPerf::popDpi(quint64 pushIdx){
     } else {
         // Set the DPI to the last-pushed value still on the stack
         _curDpi(map_last(pushedDpis));
-    } 
+    }
     _needsUpdate = _needsSave = true;
     emit dpiChanged(dpiBaseIdx);
 }
@@ -476,7 +476,7 @@ void KbPerf::lightIndicator(const char* name, QRgb rgba){
     light()->setIndicator(name, qRgba(qRed(rgba), qGreen(rgba), qBlue(rgba), a));
 }
 
-void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
+void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[HW_I_COUNT]){
     light()->resetIndicators();
     if(_iOpacity <= 0.f)
         return;

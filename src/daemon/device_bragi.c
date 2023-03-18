@@ -86,7 +86,7 @@ static int setactive_bragi(usbdevice* kb, int active){
     // Non fatal for now. Should first figure out what the error codes mean.
     // Device returns 0x03 on writes if we haven't opened the handle.
     if(light)
-        ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, light);
+        ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, (uchar)light);
 
     return 0;
 }

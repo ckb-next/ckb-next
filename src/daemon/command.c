@@ -69,6 +69,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 
 #define HERTZ_LIM 16528925L // 60.5Hz
 
+#ifdef FPS_COUNTER
 static inline long timespec_diff_ns (struct timespec* a, struct timespec* b){
     const time_t diff_s = a->tv_sec - b->tv_sec;
     const long diff_ns = a->tv_nsec - b->tv_nsec;
@@ -78,6 +79,7 @@ static inline long timespec_diff_ns (struct timespec* a, struct timespec* b){
 
     return diff_ns + diff_s * 1000000000L;
 }
+#endif
 
 int readcmd(usbdevice* kb, char* line){
 #ifdef FPS_COUNTER

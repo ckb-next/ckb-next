@@ -404,7 +404,7 @@ static inline void FWtoThreeSegments(FILE* fwfile, uint32_t ver, usbdevice* kb){
     // At the moment we overwrite the bcdDevice for bragi, so we do not need to handle it
     // If in the future we encounter a bragi device which does not report an APP fw ver, this will need to be changed
     if(kb->protocol == PROTO_BRAGI)
-        fprintf(fwfile, "%hhu.%hhu.%hhu", ver >> 16 & 0xFF, ver >> 8 & 0xFF, ver & 0xFF);
+        fprintf(fwfile, "%hhu.%hhu.%hhu", (uchar)(ver >> 16 & 0xFF), (uchar)(ver >> 8 & 0xFF), (uchar)(ver & 0xFF));
     else
         fprintf(fwfile, "%hhu.%hhu", FWBcdToBin(ver >> 8 & 0xFF), FWBcdToBin(ver & 0xFF));
 }

@@ -144,7 +144,7 @@ void* os_inputmain(void* context){
         // Try to find any of the wanted endpoints in the current interface
         // We'll assume that each interface has at most one IN endpoint
         ushort size = 64;
-        ushort ep = 0;
+        uchar ep = 0;
         for(int i = 0; (ep = kb->input_endpoints[i]); i++){
             // Build the path
             snprintf(finalpath, finalpathlen, "%s/ep_%02hhx", path, ep);
@@ -154,7 +154,7 @@ void* os_inputmain(void* context){
             // Read its wMaxPacketSize
             if(sizehex && sscanf(sizehex, "%hx", &size) == 1)
             {
-                ckb_info("Found EP 0x%hx at %s", ep, finalpath);
+                ckb_info("Found EP 0x%hhx at %s", ep, finalpath);
                 udev_device_unref(child);
                 break;
             }

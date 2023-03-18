@@ -377,9 +377,7 @@ void KeyWidget::paintGL(){
     // Render the key decorations (RGB -> light circles, binding -> key names)
     if(_rgbMode){
         // Draw key colors (RGB mode)
-        int cnt = -1;
         for(const Key& key : keyMap){
-            cnt++;
             if(!key.hasLed)
                 continue;
             float x = key.x + drawInfoOffset.x() - 1.8f;
@@ -463,9 +461,7 @@ void KeyWidget::paintGL(){
         font.setBold(true);
         font.setPixelSize(5.25f * drawInfoScale);
         QFont font0 = font;
-        uint cnt = -1;
         for(const Key& key : keyMap){
-            cnt++;
             if(!key.hasScan)
                 continue;
 

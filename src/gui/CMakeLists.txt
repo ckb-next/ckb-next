@@ -502,6 +502,7 @@ endif ()
 if (NOT WITH_SHIPPED_QUAZIP)
     target_include_directories(
         ckb-next
+            SYSTEM
             PRIVATE
               "${QuaZip_INCLUDE_DIR}") # TODO: export QuaZip target and inherit dirs
 endif ()

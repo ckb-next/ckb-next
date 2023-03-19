@@ -72,6 +72,7 @@ if (MACOS OR LINUX)
     find_package(Threads REQUIRED)
     find_package(Qt5 5.6.0 COMPONENTS Core Widgets Network Gui REQUIRED)
     find_package(ZLIB REQUIRED)
+    find_package(QuaZip REQUIRED)
 endif ()
 if (MACOS)
     find_library(FOUNDATION_LIBRARY Foundation)
@@ -499,13 +500,12 @@ elseif (LINUX)
               "${X11_INCLUDE_DIR}")
 endif ()
 
-if (NOT WITH_SHIPPED_QUAZIP)
-    target_include_directories(
-        ckb-next
-            SYSTEM
-            PRIVATE
-              "${QuaZip_INCLUDE_DIR}") # TODO: export QuaZip target and inherit dirs
-endif ()
+
+target_include_directories(
+    ckb-next
+        SYSTEM
+        PRIVATE
+          "${QuaZip_INCLUDE_DIR}")
 
 # Declare target's link dependencies
 if (MACOS OR LINUX)
@@ -545,17 +545,10 @@ elseif (LINUX)
     endif ()
 endif()
 
-if (WITH_SHIPPED_QUAZIP)
-    target_link_libraries(
-        ckb-next
-            PRIVATE
-              QuaZip::quazip5)
-else ()
-    target_link_libraries(
-        ckb-next
-            PRIVATE
-            "${QuaZip_LIBRARIES}")
-endif ()
+target_link_libraries(
+    ckb-next
+        PRIVATE
+        "${QuaZip_LIBRARIES}")
 
 # Target compile features and options
 set_target_properties(

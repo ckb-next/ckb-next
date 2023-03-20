@@ -31,6 +31,7 @@ ELSE ()
         message("-- Found QuaZip: QuaZip::QuaZip")
         SET(QuaZip_FOUND TRUE)
         SET(QuaZip_LIBRARIES "QuaZip::QuaZip" CACHE INTERNAL "")
+        SET(QuaZip_INCLUDE_DIR "QuaZip::QuaZip" CACHE INTERNAL "")
     ELSE ()
         set(QuaZip_LIB_VERSION_SUFFIX 5)
         FIND_LIBRARY(QuaZip_LIBRARIES

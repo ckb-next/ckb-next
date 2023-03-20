@@ -1,19 +1,31 @@
 #include "ckbsettings.h"
 #include "ckbsettingswriter.h"
 #include <QThread>
-#include <QMutex>
 #include <QDebug>
 #include <QDateTime>
 #include <ckbnextconfig.h>
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#include <QRecursiveMutex>
+#else
+#include <QMutex>
+#endif
 
 // Shared global QSettings object
 static QSettings* _globalSettings = nullptr;
 static QThread* globalThread = nullptr;
 QAtomicInt cacheWritesInProgress(0);
+
 // Global one-shot settings cache, to avoid reading/writing QSettings constantly
 static QMap<QString, QVariant> globalCache;
+
 // Mutexes for accessing settings
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+QRecursiveMutex settingsMutex, settingsCacheMutex;
+#else
 QMutex settingsMutex(QMutex::Recursive), settingsCacheMutex(QMutex::Recursive);
+#endif
+
 #define lockMutex           QMutexLocker locker(backing == _globalSettings ? &settingsMutex : nullptr)
 #define lockMutexStatic     QMutexLocker locker(&settingsMutex)
 #define lockMutexStatic2    QMutexLocker locker2(&settingsMutex)

@@ -38,7 +38,7 @@
 #define MODE_HARDWARE  0x01 // This should be hardware controlled and not generate an event.
 #define MODE_SOFTWARE  0x02 // This should be software controlled and generate an event.
 #define MODE_SIDELIGHT 0x08 // Strafe sidelighting control.
-#define MODE_WINLOCK   0x09 // K68 winlock control.
+#define MODE_WINLOCK   0x09 // K55 and K68 winlock control.
 
 // Used for FIELD_MOUSE. All subcommands are read/write.
 #define MOUSE_DPI      0x02 // Mouse DPI mode.

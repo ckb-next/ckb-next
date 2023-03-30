@@ -960,6 +960,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             i.value().hasLed = false;
         }
 
+        // https://github.com/ckb-next/ckb-next/issues/931
+        map["lock"].hasLed = true;
+
         // Append the zones to the keymap
         for(const Key* key = K55Zones; key < K55Zones + K55_ZONES; key++)
             map[key->name] = *key;

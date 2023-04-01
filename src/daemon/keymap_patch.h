@@ -10,7 +10,7 @@ typedef struct {
 typedef struct {
     ushort vendor;
     ushort product;
-    keypatch* patch;
+    const keypatch* patch;
     size_t patchlen;
 } keypatches;
 

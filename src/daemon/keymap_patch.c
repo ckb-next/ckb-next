@@ -4,13 +4,13 @@
 
 // Vol Up/Dn LED addresses for K63 and K68.
 // Possibly for all devices that have LEDs on vol up/dn
-keypatch k63patch[] = {
+static const keypatch k63patch[] = {
     { 130, "volup", 0x82, KEY_VOLUMEUP },
     { 131, "voldn", 0x8e, KEY_VOLUMEDOWN },
 };
 #define K63PATCH_LEN sizeof(k63patch)/sizeof(*k63patch)
 
-keypatch m55patch[] = {
+static const keypatch m55patch[] = {
     { 210, "mouse6", -1,        KEY_CORSAIR },
     { 211, "mouse7", -1,        KEY_CORSAIR },
     { 213, "dpiup",  -1,        KEY_CORSAIR },
@@ -18,7 +18,7 @@ keypatch m55patch[] = {
 };
 #define M55PATCH_LEN sizeof(m55patch)/sizeof(*m55patch)
 
-keypatch m95patch[] = {
+static const keypatch m95patch[] = {
     { 208, "mouse7", -1, SCAN_MOUSE | BTN_BACK },
     { 209, "mouse6", -1, SCAN_MOUSE | BTN_FORWARD },
     { 210, "thumb6", -1, KEY_CORSAIR },
@@ -29,7 +29,7 @@ keypatch m95patch[] = {
 };
 #define M95PATCH_LEN sizeof(m95patch)/sizeof(*m95patch)
 
-keypatch icwpatch[] = {
+static const keypatch icwpatch[] = {
     { 237, "back",  LED_MOUSE,     KEY_NONE },
     { 238, "wheel", LED_MOUSE + 1, KEY_NONE },
     { 239, "front", LED_MOUSE + 2, KEY_NONE },
@@ -39,23 +39,23 @@ keypatch icwpatch[] = {
 };
 #define ICWPATCH_LEN sizeof(icwpatch)/sizeof(*icwpatch)
 
-keypatch harpoonwlpatch[] = {
+static const keypatch harpoonwlpatch[] = {
     { 237, "dpi",  LED_MOUSE,     KEY_NONE },
     { 238, "back", LED_MOUSE + 1, KEY_NONE },
 };
 #define HARPOONWLPATCH_LEN sizeof(harpoonwlpatch)/sizeof(*harpoonwlpatch)
 
-keypatch katarproxtpatch[] = {
+static const keypatch katarproxtpatch[] = {
     { 237, "dpi",  LED_MOUSE,     KEY_NONE },
 };
 #define KATARPROXTPATCH_LEN sizeof(katarproxtpatch)/sizeof(*katarproxtpatch)
 
-keypatch k95legacypatch[] = {
+static const keypatch k95legacypatch[] = {
     { 111, "lghtpgm",  0,     KEY_CORSAIR }, // Lighting program key for legacy devices
 };
 #define K95LEGACYPATCH_LEN sizeof(k95legacypatch)/sizeof(*k95legacypatch)
 
-keypatches mappatches[] = {
+static const keypatches mappatches[] = {
     { V_CORSAIR, P_K68,          k63patch,       K63PATCH_LEN },
     { V_CORSAIR, P_K68_NRGB,     k63patch,       K63PATCH_LEN },
     { V_CORSAIR, P_K63_NRGB,     k63patch,       K63PATCH_LEN },
@@ -118,7 +118,7 @@ void patchkeys(usbdevice* kb){
         if(mappatches[pos].vendor == kb->vendor && mappatches[pos].product == kb->product){
             // Iterate through the keys in the selected patch
             for(size_t i = 0; i < mappatches[pos].patchlen; i++){
-                keypatch* curpatch = mappatches[pos].patch;
+                const keypatch* curpatch = mappatches[pos].patch;
                 size_t idx = curpatch[i].idx;
                 kb->keymap[idx].name = curpatch[i].name;
                 kb->keymap[idx].led = curpatch[i].led;

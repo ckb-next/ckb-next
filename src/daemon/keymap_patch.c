@@ -15,7 +15,6 @@ keypatch m55patch[] = {
     { 211, "mouse7", -1,        KEY_CORSAIR },
     { 213, "dpiup",  -1,        KEY_CORSAIR },
     { 237, "dpi",    LED_MOUSE, KEY_NONE },
-    { 239, NULL,     0,         KEY_NONE },
 };
 #define M55PATCH_LEN sizeof(m55patch)/sizeof(*m55patch)
 
@@ -37,38 +36,17 @@ keypatch icwpatch[] = {
     { 240, "dpi0",  LED_MOUSE + 3, KEY_NONE },
     { 241, "dpi1",  LED_MOUSE + 4, KEY_NONE },
     { 242, "dpi2",  LED_MOUSE + 5, KEY_NONE },
-    { 243, NULL,    0,             KEY_NONE },
-    { 244, NULL,    0,             KEY_NONE },
-    { 245, NULL,    0,             KEY_NONE },
-    { 246, NULL,    0,             KEY_NONE },
 };
 #define ICWPATCH_LEN sizeof(icwpatch)/sizeof(*icwpatch)
 
 keypatch harpoonwlpatch[] = {
     { 237, "dpi",  LED_MOUSE,     KEY_NONE },
     { 238, "back", LED_MOUSE + 1, KEY_NONE },
-    { 239, NULL,   0,             KEY_NONE },
-    { 240, NULL,   0,             KEY_NONE },
-    { 241, NULL,   0,             KEY_NONE },
-    { 242, NULL,   0,             KEY_NONE },
-    { 243, NULL,   0,             KEY_NONE },
-    { 244, NULL,   0,             KEY_NONE },
-    { 245, NULL,   0,             KEY_NONE },
-    { 246, NULL,   0,             KEY_NONE },
 };
 #define HARPOONWLPATCH_LEN sizeof(harpoonwlpatch)/sizeof(*harpoonwlpatch)
 
 keypatch katarproxtpatch[] = {
     { 237, "dpi",  LED_MOUSE,     KEY_NONE },
-    { 238, NULL,   0,             KEY_NONE },
-    { 239, NULL,   0,             KEY_NONE },
-    { 240, NULL,   0,             KEY_NONE },
-    { 241, NULL,   0,             KEY_NONE },
-    { 242, NULL,   0,             KEY_NONE },
-    { 243, NULL,   0,             KEY_NONE },
-    { 244, NULL,   0,             KEY_NONE },
-    { 245, NULL,   0,             KEY_NONE },
-    { 246, NULL,   0,             KEY_NONE },
 };
 #define KATARPROXTPATCH_LEN sizeof(katarproxtpatch)/sizeof(*katarproxtpatch)
 
@@ -90,6 +68,12 @@ keypatches mappatches[] = {
     { V_CORSAIR, P_K95_LEGACY,   k95legacypatch, K95LEGACYPATCH_LEN },
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
+
+#define CLEAR_KEYMAP_ENTRY(x)   { \
+    (x).name = NULL; \
+    (x).led = -1; \
+    (x).scan = KEY_NONE; \
+}
 
 /// \brief
 ///
@@ -125,9 +109,7 @@ void patchkeys(usbdevice* kb){
             kb->keymap[PROFSWITCH_M_IDX].led = -1;
             kb->keymap[PROFSWITCH_M_IDX].scan = KEY_CORSAIR;
             // Clear the keyboard one
-            kb->keymap[profswitch_kb_idx].name = NULL;
-            kb->keymap[profswitch_kb_idx].led = 0;
-            kb->keymap[profswitch_kb_idx].scan = KEY_NONE;
+            CLEAR_KEYMAP_ENTRY(kb->keymap[profswitch_kb_idx]);
         }
     }
 
@@ -137,10 +119,24 @@ void patchkeys(usbdevice* kb){
             // Iterate through the keys in the selected patch
             for(size_t i = 0; i < mappatches[pos].patchlen; i++){
                 keypatch* curpatch = mappatches[pos].patch;
-                int idx = curpatch[i].idx;
+                size_t idx = curpatch[i].idx;
                 kb->keymap[idx].name = curpatch[i].name;
                 kb->keymap[idx].led = curpatch[i].led;
                 kb->keymap[idx].scan = curpatch[i].scan;
+                // Now go through the full keymap so far and remove any entries that
+                // either the have same LED as what was patched in, or same name
+                for(size_t j = 0; j < sizeof(keymap)/sizeof(*keymap); j++){
+                    // Don't delete the freshly patched entry
+                    if(j == idx)
+                        continue;
+                    // Name first
+                    if(kb->keymap[j].name && curpatch[i].name && !strcmp(kb->keymap[j].name, curpatch[i].name))
+                        CLEAR_KEYMAP_ENTRY(kb->keymap[j]);
+                    // LED index
+                    // In this case, only reset the LED, as there's potential to break keybinds
+                    if(kb->keymap[j].led >= 0 && curpatch[i].led >= 0 && kb->keymap[j].led == curpatch[i].led)
+                        kb->keymap[j].led = -1;
+                }
             }
             return;
         }

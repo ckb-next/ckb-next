@@ -236,6 +236,12 @@ int main(int argc, char** argv){
             }
 
             patchkeys(&dev);
+#if 0
+            for (int j = 0; j < N_KEYS_EXTENDED; j++) {
+                printf("{ %10s, %3hd, %4hd },\n", (dev.keymap[j].name ? dev.keymap[j].name : "NULL"),
+                    dev.keymap[j].led, dev.keymap[j].scan);
+            }
+#endif
 
             // Search through the patched keymap
             for (int j = 0; j < N_KEYS_EXTENDED; j++) {

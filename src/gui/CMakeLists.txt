@@ -90,7 +90,6 @@ AudioToolbox: ${AUDIOTOOLBOX_LIBRARY}")
     endif ()
         mark_as_advanced(FOUNDATION_LIBRARY COREAUDIO_LIBRARY AUDIOTOOLBOX_LIBRARY)
 elseif (LINUX)
-    find_package(X11 REQUIRED)
     find_package(Qt5 5.2.0 COMPONENTS X11Extras DBus)
 endif ()
 
@@ -282,6 +281,14 @@ elseif (LINUX)
         else()
             message(FATAL_ERROR "XCB-Screensaver or Qt5 X11Extras was not found. Either install them or pass -DUSE_XCB=0 to disable idle detection.")
         endif()
+        if(XCB_FOUND AND Qt5X11Extras_FOUND)
+            target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_XCB)
+        else()
+            message(FATAL_ERROR "XCB or Qt5 X11Extras was not found. Either install them or pass -DUSE_XCB=0 to disable idle detection.")
+        endif()
         if(XCB_EWMH_FOUND)
             target_compile_definitions(
             ckb-next
@@ -296,6 +303,7 @@ elseif (LINUX)
                 message(FATAL_ERROR "XCB-EWMH was not found. Either install it or pass -DUSE_XCB=0 to disable active window detection.")
         endif()
     endif()
+
     target_sources(
         ckb-next
             PRIVATE
@@ -491,15 +499,6 @@ if (MACOS OR LINUX)
               "${CMAKE_CURRENT_SOURCE_DIR}"
               "${CMAKE_CURRENT_BINARY_DIR}")
 endif ()
-if (MACOS)
-elseif (LINUX)
-    target_include_directories(
-        ckb-next
-            SYSTEM
-            PRIVATE
-              "${X11_INCLUDE_DIR}")
-endif ()
-
 
 target_include_directories(
     ckb-next
@@ -531,7 +530,6 @@ elseif (LINUX)
     target_link_libraries(
         ckb-next
             PRIVATE
-              "${X11_LIBRARIES}"
               "${XCB_EWMH_LIBRARIES}"
               "${XCB_SCREENSAVER_LIBRARIES}"
               Qt5::X11Extras)

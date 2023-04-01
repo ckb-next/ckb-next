@@ -94,8 +94,9 @@ public:
     void keyEvent(KbBind* bind, bool down);
     // Perform keyup action (if any)
     void keyRelease(KbBind* bind);
-    // Adjusts the DISPLAY variable to the mouse's screen. Needed to ensure that programs launch on the correct screen in multihead.
-    void adjustDisplay();
+    // Returns the contents of the DISPLAY env var set appropriately for the X11 screen the cursor is in.
+    // This is only relevant when using ZaphodHeads.
+    QString getDisplayForScreenCursor();
 
     ~KeyAction();
 private:

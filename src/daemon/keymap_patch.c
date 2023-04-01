@@ -58,6 +58,11 @@ static const keypatch k55propatch[] = {
     {  96,  "lock",    0, KEY_CORSAIR },
 };
 
+// Just winlock
+static const keypatch k55proxtpatch[] = {
+    {  96,  "lock",    0, KEY_CORSAIR },
+};
+
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
 
@@ -73,6 +78,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_KATAR_PRO,    katarproxtpatch),
     ADD_PATCH(V_CORSAIR, P_K95_LEGACY,   k95legacypatch),
     ADD_PATCH(V_CORSAIR, P_K55_PRO,      k55propatch),
+    ADD_PATCH(V_CORSAIR, P_K55_PRO_XT,   k55proxtpatch),
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 

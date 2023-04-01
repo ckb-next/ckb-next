@@ -8,7 +8,6 @@ static const keypatch k63patch[] = {
     { 130, "volup", 0x82, KEY_VOLUMEUP },
     { 131, "voldn", 0x8e, KEY_VOLUMEDOWN },
 };
-#define K63PATCH_LEN sizeof(k63patch)/sizeof(*k63patch)
 
 static const keypatch m55patch[] = {
     { 210, "mouse6", -1,        KEY_CORSAIR },
@@ -16,7 +15,6 @@ static const keypatch m55patch[] = {
     { 213, "dpiup",  -1,        KEY_CORSAIR },
     { 237, "dpi",    LED_MOUSE, KEY_NONE },
 };
-#define M55PATCH_LEN sizeof(m55patch)/sizeof(*m55patch)
 
 static const keypatch m95patch[] = {
     { 208, "mouse7", -1, SCAN_MOUSE | BTN_BACK },
@@ -27,7 +25,6 @@ static const keypatch m95patch[] = {
     { 218, "sniper", -1, KEY_CORSAIR },
 
 };
-#define M95PATCH_LEN sizeof(m95patch)/sizeof(*m95patch)
 
 static const keypatch icwpatch[] = {
     { 237, "back",  LED_MOUSE,     KEY_NONE },
@@ -37,35 +34,34 @@ static const keypatch icwpatch[] = {
     { 241, "dpi1",  LED_MOUSE + 4, KEY_NONE },
     { 242, "dpi2",  LED_MOUSE + 5, KEY_NONE },
 };
-#define ICWPATCH_LEN sizeof(icwpatch)/sizeof(*icwpatch)
 
 static const keypatch harpoonwlpatch[] = {
     { 237, "dpi",  LED_MOUSE,     KEY_NONE },
     { 238, "back", LED_MOUSE + 1, KEY_NONE },
 };
-#define HARPOONWLPATCH_LEN sizeof(harpoonwlpatch)/sizeof(*harpoonwlpatch)
 
 static const keypatch katarproxtpatch[] = {
     { 237, "dpi",  LED_MOUSE,     KEY_NONE },
 };
-#define KATARPROXTPATCH_LEN sizeof(katarproxtpatch)/sizeof(*katarproxtpatch)
 
 static const keypatch k95legacypatch[] = {
     { 111, "lghtpgm",  0,     KEY_CORSAIR }, // Lighting program key for legacy devices
 };
-#define K95LEGACYPATCH_LEN sizeof(k95legacypatch)/sizeof(*k95legacypatch)
+
+#define ADD_PATCH(vendor, product, patch) \
+    { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
 
 static const keypatches mappatches[] = {
-    { V_CORSAIR, P_K68,          k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_K68_NRGB,     k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_K63_NRGB,     k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_M55_RGB_PRO,  m55patch,       M55PATCH_LEN },
-    { V_CORSAIR, P_M95,          m95patch,       M95PATCH_LEN },
-    { V_CORSAIR, P_IRONCLAW_W_U, icwpatch,       ICWPATCH_LEN },
-    { V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch, HARPOONWLPATCH_LEN },
-    { V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch,KATARPROXTPATCH_LEN },
-    { V_CORSAIR, P_KATAR_PRO,    katarproxtpatch,KATARPROXTPATCH_LEN },
-    { V_CORSAIR, P_K95_LEGACY,   k95legacypatch, K95LEGACYPATCH_LEN },
+    ADD_PATCH(V_CORSAIR, P_K68,          k63patch),
+    ADD_PATCH(V_CORSAIR, P_K68_NRGB,     k63patch),
+    ADD_PATCH(V_CORSAIR, P_K63_NRGB,     k63patch),
+    ADD_PATCH(V_CORSAIR, P_M55_RGB_PRO,  m55patch),
+    ADD_PATCH(V_CORSAIR, P_M95,          m95patch),
+    ADD_PATCH(V_CORSAIR, P_IRONCLAW_W_U, icwpatch),
+    ADD_PATCH(V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch),
+    ADD_PATCH(V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch),
+    ADD_PATCH(V_CORSAIR, P_KATAR_PRO,    katarproxtpatch),
+    ADD_PATCH(V_CORSAIR, P_K95_LEGACY,   k95legacypatch),
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 

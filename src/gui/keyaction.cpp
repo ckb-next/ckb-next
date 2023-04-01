@@ -457,10 +457,13 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
     }
 }
 
+// From main.cpp
+extern const char* DISPLAY;
+
 void KeyAction::adjustDisplay(){
 #ifdef USE_LIBX11
     // Try to get the current display from the X server
-    char* display_name = XDisplayName(NULL);
+    char* display_name = XDisplayName(DISPLAY);
     if(!display_name)
         return;
     Display* display = XOpenDisplay(display_name);

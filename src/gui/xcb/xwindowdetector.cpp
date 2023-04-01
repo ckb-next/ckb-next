@@ -155,11 +155,14 @@ static inline xcb_window_t getActiveWindow(xcb_ewmh_connection_t* ewmh, int pref
     return win;
 }
 
+// From main.cpp
+extern const char* DISPLAY;
+
 void XWindowDetector::run()
 {
     int preferred_screen = 0;
     // XCB
-    xcb_connection_t* conn = xcb_connect(nullptr, &preferred_screen);
+    xcb_connection_t* conn = xcb_connect(DISPLAY, &preferred_screen);
     xcb_screen_t* scr = getPreferredScreen(conn, preferred_screen);
 
     // EWMH

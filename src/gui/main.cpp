@@ -223,6 +223,8 @@ bool checkIfQtCreator(){
     return false;
 }
 
+const char* DISPLAY = nullptr;
+
 int main(int argc, char *argv[]){
 QSurfaceFormat fmt;
 fmt.setSamples(8);
@@ -232,13 +234,18 @@ QSettings::setDefaultFormat(CkbSettings::Format);
 
 #ifdef Q_OS_LINUX
     // Get rid of "-session" before Qt parses the arguments
-    for(int i = 0; i < argc; i++){
-        if(!strcmp(argv[i], "-session")){
+    for(int i = 1; i < argc; i++){
+        QByteArray arg(argv[i]);
+        if (arg.startsWith("--"))
+            arg.remove(0, 1);
+        if(arg == "-session"){
             argv[i][1] = 'b';
             argv[i][2] = '\0';
-            if(i + 1 < argc)
-                argv[i + 1][0] = '\0';
-            break;
+            if(i + 1 < argc) {
+                argv[++i][0] = '\0';
+            }
+        } else if (arg == "-display" && i < argc - 1) {
+            DISPLAY = argv[++i];
         }
     }
 #endif

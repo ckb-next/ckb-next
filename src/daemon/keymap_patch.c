@@ -48,6 +48,16 @@ static const keypatch k95legacypatch[] = {
     { 111, "lghtpgm",  0,     KEY_CORSAIR }, // Lighting program key for legacy devices
 };
 
+// Shift all generic zones by one and move winlock to 0
+static const keypatch k55propatch[] = {
+    { 190, "zone1", 0x01, KEY_NONE },
+    { 191, "zone2", 0x02, KEY_NONE },
+    { 192, "zone3", 0x03, KEY_NONE },
+    { 193, "zone4", 0x04, KEY_NONE },
+    { 194, "zone5", 0x05, KEY_NONE },
+    {  96,  "lock",    0, KEY_CORSAIR },
+};
+
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
 
@@ -62,6 +72,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch),
     ADD_PATCH(V_CORSAIR, P_KATAR_PRO,    katarproxtpatch),
     ADD_PATCH(V_CORSAIR, P_K95_LEGACY,   k95legacypatch),
+    ADD_PATCH(V_CORSAIR, P_K55_PRO,      k55propatch),
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 

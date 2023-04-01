@@ -7,8 +7,12 @@
 #include <QUrl>
 #include <cstring>
 #include <cstdio>
-#ifdef USE_LIBX11
-#include <X11/Xlib.h>
+#ifdef USE_XCB
+#include "mainwindow.h"
+#include <QWindow>
+#include <xcb/xcb.h>
+#include <xcb/xproto.h>
+#include <QX11Info>
 #endif
 
 KeyAction::Type KeyAction::type() const {
@@ -439,15 +443,30 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         }
 
         // Adjust the selected display.
-        adjustDisplay();
+        const QString& newDisplay = getDisplayForScreenCursor();
+
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        if(!newDisplay.isEmpty())
+            env.insert(QLatin1String("DISPLAY"), newDisplay);
 
         // Start the program. Wrap it around sh to parse arguments.
         if((down && (stop & PROGRAM_PR_MULTI))
                 || (!down && (stop & PROGRAM_RE_MULTI))){
             // Multiple instances allowed? Start detached process
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+            QProcess proc;
+            proc.setProgram("sh");
+            proc.setArguments(QStringList() << "-c" << program);
+            proc.setProcessEnvironment(env);
+            proc.startDetached();
+#else
+            if(!newDisplay.isEmpty())
+                program.prepend(QString("DISPLAY=%1 ").arg(newDisplay));
             QProcess::startDetached("sh", QStringList() << "-c" << program);
+#endif
         } else {
             process = new QProcess(this);
+            process->setProcessEnvironment(env);
             process->start("sh", QStringList() << "-c" << program);
             if(down)
                 preProgram = process;
@@ -457,55 +476,51 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
     }
 }
 
-void KeyAction::adjustDisplay(){
-#ifdef USE_LIBX11
-    // Try to get the current display from the X server
-    char* display_name = XDisplayName(NULL);
-    if(!display_name)
-        return;
-    Display* display = XOpenDisplay(display_name);
-    if(!display)
-        return;
-    char* display_string = DisplayString(display);
-    if(!display_string || strlen(display_string) == 0){
-        XCloseDisplay(display);
-        return;
-    }
-    size_t envstr_size = strlen(display_string) + 4;
-    char* envstr = new char[envstr_size];
-    strncpy(envstr, display_string, envstr_size);
-    envstr[envstr_size - 1] = 0;
+// From main.cpp
+extern const char* DISPLAY;
 
-    Window root_window = XRootWindow(display, DefaultScreen(display));
-    Window root_window_ret, child_window_ret, window;
-    XWindowAttributes attr;
-    int root_x, root_y, win_x, win_y;
-    unsigned int mask_ret;
+QString KeyAction::getDisplayForScreenCursor(){
+    QString displaystr;
+#ifdef USE_XCB
+    if(QApplication::platformName() != QLatin1String("xcb"))
+        return displaystr;
+    xcb_connection_t* conn = QX11Info::connection();
 
-    // Find the screen which currently has the mouse
-    XQueryPointer(display, root_window, &root_window_ret, &child_window_ret, &root_x, &root_y, &win_x, &win_y, &mask_ret);
-    if(child_window_ret == (Window)NULL)
-        window = root_window_ret;
-    else
-        window = child_window_ret;
-    XGetWindowAttributes(display, window,  &attr);
+    // First, get the window id
+    const MainWindow* const mw = MainWindow::mainWindow;
+    if(!mw || !mw->windowHandle())
+        return displaystr;
 
-    char* ptr = strchr(envstr, ':');
-    if(ptr){
-        ptr = strchr(ptr, '.');
-        if(ptr)
-            *ptr = '\0';
-        char buf[16];
-        snprintf(buf, sizeof(buf), ".%i", XScreenNumberOfScreen(attr.screen));
-        strncat(envstr, buf, envstr_size - 1 - strlen(envstr));
+    xcb_window_t ckb_xcb_id = static_cast<xcb_window_t>(mw->windowHandle()->winId());
 
-        // Update environment variable
-        setenv("DISPLAY", envstr, 1);
+    // Check if the cursor is in the same screen as the ckb-next window
+    xcb_query_pointer_reply_t* ptr_reply = xcb_query_pointer_reply(conn, xcb_query_pointer(conn, ckb_xcb_id), NULL);
+
+    if(!ptr_reply->same_screen) {
+        // Get the screen ID
+        int screen = 0;
+        xcb_screen_iterator_t iter = xcb_setup_roots_iterator(xcb_get_setup(conn));
+        for(int i = 0; iter.rem; i++) {
+            if(iter.data->root == ptr_reply->root) {
+                screen = i;
+                break;
+            }
+            xcb_screen_next(&iter);
+        }
+
+        char* host;
+        int parsed_display;
+        if(xcb_parse_display(DISPLAY, &host, &parsed_display, NULL)) {
+            displaystr = QString("%1:%2.%3").arg(QString::fromUtf8(host)).arg(parsed_display).arg(screen);
+            free(host);
+        }
+    } else if(DISPLAY) {
+        displaystr = QString(DISPLAY);
     }
 
-    delete[] envstr;
-    XCloseDisplay(display);
+    free(ptr_reply);
 #endif
+    return displaystr;
 }
 
 QString KeyAction::macroAction(const QString& macroDef) {

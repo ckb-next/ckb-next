@@ -10,6 +10,9 @@
 #include <string.h>
 #include "keymap_patch.h"
 
+#define TERM_REV_VID "\033[7m"
+#define TERM_NORM    "\033[0m"
+
 // usb.c
 extern _Atomic int reset_stop;
 extern int features_mask;
@@ -242,12 +245,8 @@ int main(int argc, char** argv){
             fill_usbdevice_protocol(&dev);
 
             patchkeys(&dev);
-#if 0
-            for (int j = 0; j < N_KEYS_EXTENDED; j++) {
-                printf("{ %10s, %3hd, %4hd },\n", (dev.keymap[j].name ? dev.keymap[j].name : "NULL"),
-                    dev.keymap[j].led, dev.keymap[j].scan);
-            }
-#endif
+
+            int found = -1;
 
             // Search through the patched keymap
             for (int j = 0; j < N_KEYS_EXTENDED; j++) {
@@ -256,17 +255,40 @@ int main(int argc, char** argv){
                     if (*searchstr != '\0')
                         continue;
 
-                    printf("First NULL key has id %d\n", j);
-                    return 0;
+                    found = j;
+                    break;
                 }
 
                 if (!strcasecmp(searchstr, dev.keymap[j].name)) {
-                    printf("Key %s has id %d\n", dev.keymap[j].name, j);
-                    return 0;
+                    found = j;
+                    break;
                 }
             }
-            printf("Key %s was not found\n", searchstr);
-            return 1;
+
+            for (int j = 0; j < N_KEYS_EXTENDED; j++) {
+                if(j == found)
+                    fputs(TERM_REV_VID, stdout);
+
+                printf("{ %10s, %3hd, %4hd },", (dev.keymap[j].name ? dev.keymap[j].name : "NULL"),
+                    dev.keymap[j].led, dev.keymap[j].scan);
+
+                if(j == found)
+                    fputs(TERM_NORM, stdout);
+                putchar('\n');
+            }
+
+            putchar('\n');
+
+            if(found == -1) {
+                printf("Key %s was not found\n", searchstr);
+                return 1;
+            } else if (*searchstr == '\0') {
+                printf("First NULL key has id %d\n", found);
+            } else {
+                printf("Key %s has id %d\n", dev.keymap[found].name, found);
+            }
+
+            return 0;
         } else if(!strcmp(argument, "--enable-experimental")) {
             enable_experimental = 1;
 #ifdef ckb_next_VERSION_IS_RELEASE

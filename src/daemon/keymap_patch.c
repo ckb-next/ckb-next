@@ -50,17 +50,17 @@ static const keypatch k95legacypatch[] = {
 
 // Shift all generic zones by one and move winlock to 0
 static const keypatch k55propatch[] = {
-    { 190, "zone1", 0x01, KEY_NONE },
-    { 191, "zone2", 0x02, KEY_NONE },
-    { 192, "zone3", 0x03, KEY_NONE },
-    { 193, "zone4", 0x04, KEY_NONE },
-    { 194, "zone5", 0x05, KEY_NONE },
-    {  96,  "lock",    0, KEY_CORSAIR },
+    { 114,  "lock", 0, KEY_CORSAIR },
+    { 190, "zone1", 1, KEY_NONE },
+    { 191, "zone2", 2, KEY_NONE },
+    { 192, "zone3", 3, KEY_NONE },
+    { 193, "zone4", 4, KEY_NONE },
+    { 194, "zone5", 5, KEY_NONE },
 };
 
 // Just winlock
 static const keypatch k55proxtpatch[] = {
-    {  96,  "lock",    0, KEY_CORSAIR },
+    { 114,  "lock", 0, KEY_CORSAIR },
 };
 
 #define ADD_PATCH(vendor, product, patch) \

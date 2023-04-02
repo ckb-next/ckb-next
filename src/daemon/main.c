@@ -137,6 +137,9 @@ void localecase(char* dst, size_t length, const char* src){
     *dst = 0;
 }
 
+// For --search
+extern void fill_usbdevice_protocol(usbdevice* kb);
+
 int main(int argc, char** argv){
     // Set output pipes to buffer on newlines, if they weren't set that way already
     setlinebuf(stdout);
@@ -234,6 +237,9 @@ int main(int argc, char** argv){
                 if(*searchstr != '\0')
                     searchstr++;
             }
+
+            // We need to call this before patchkeys, otherwise the bragi keymap will never be applied
+            fill_usbdevice_protocol(&dev);
 
             patchkeys(&dev);
 #if 0

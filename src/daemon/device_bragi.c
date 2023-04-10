@@ -7,6 +7,7 @@
 #include "usb.h"
 #include "bragi_proto.h"
 #include "bragi_common.h"
+#include "utils.h"
 
 // CUE polls devices every 52 seconds
 const struct timespec bragi_poll_delay = { .tv_sec = 50 };
@@ -282,3 +283,77 @@ void bragi_delay(usbdevice* kb, delay_type_t type){
     // Since we use usbrecv for everything, the devices tell us when they are ready to handle another packet.
     return;
 }
+
+static void bragi_set_device_keys(usbdevice* kb, unsigned char* pairing_id, unsigned char* encryption_key) {
+    uchar pkt[BRAGI_JUMBO_SIZE] = {0};
+
+    // Write the PAIRING_ID to the device first
+    bragi_open_handle(kb, BRAGI_GENERIC_HANDLE, BRAGI_RES_PAIRINGID);
+    memcpy(pkt + 7, pairing_id, sizeof(uchar) * 8);
+    bragi_write_to_handle(kb, pkt, BRAGI_GENERIC_HANDLE, sizeof(pkt), sizeof(uchar) * 8);
+    bragi_close_handle(kb, BRAGI_GENERIC_HANDLE);
+
+    // The ENCRYPTION_KEY must be written directly after the PAIRING_ID
+    bragi_open_handle(kb, BRAGI_GENERIC_HANDLE, BRAGI_RES_ENCRYPTIONKEY);
+    memcpy(pkt + 7, encryption_key, sizeof(uchar) * 16);
+    bragi_write_to_handle(kb, pkt, BRAGI_GENERIC_HANDLE, sizeof(pkt), sizeof(uchar) * 16);
+
+    bragi_close_handle(kb, BRAGI_GENERIC_HANDLE);
+}
+
+void cmd_pair_bragi(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* to) {
+    (void)mode;
+    (void)dummy1;
+    (void)dummy2;
+
+    if(kb->protocol != PROTO_BRAGI) {
+        ckb_err("Dongle device doesn't use bragi protocol");
+        return;
+    }
+
+    uchar encryption_key[16];
+    if(ckb_generate_random(16, encryption_key) < 16) {
+        ckb_err("Couldn't generate encryption key");
+        return;
+    }
+
+    uchar pairing_id[8];
+    if(ckb_generate_random(8, pairing_id) < 8) {
+        ckb_err("Couldn't generate pairing ID");
+        return;
+    }
+
+    // Set the dongle device pairing_id and encryption_key
+    bragi_set_device_keys(kb, pairing_id, encryption_key);
+
+    char* devices = strdup(to);
+    char* token_ptr;
+    char* device_name = strtok_r(devices, ",", &token_ptr);
+    while(device_name != NULL) {
+
+        int ckb_id = 0;
+        if(!sscanf(device_name, "ckb%d", &ckb_id)) {
+            ckb_err("Failed to parse device name: %s", device_name);
+            continue;
+        }
+
+        usbdevice* device = keyboard + ckb_id;
+        queued_mutex_lock(dmutex(device));
+
+        if(device->protocol == PROTO_BRAGI) {
+            if(device->status == DEV_STATUS_CONNECTED) {
+                bragi_set_device_keys(device, pairing_id, encryption_key);
+                ckb_info("Synchronized %s to %s", device->name, kb->name);
+            } else {
+                ckb_err("Device ckb%d not found or connected", ckb_id);
+            }
+        } else {
+            ckb_err("ckb%d doesn't use bragi protocol", ckb_id);
+        }
+
+        device_name = strtok_r(NULL, ",", &token_ptr);
+        queued_mutex_unlock(dmutex(device));
+    }
+    free(devices);
+}
+

@@ -1,5 +1,6 @@
 #include "command.h"
 #include "device.h"
+#include "profile.h"
 #include "dpi.h"
 #include "firmware.h"
 #include "input.h"
@@ -450,6 +451,7 @@ const devcmd vtable_bragi_mouse = {
 
     .active = cmd_active_bragi,
     .idle = cmd_idle_bragi,
+    .pair = cmd_none,
 
     .erase = cmd_erase,
     .eraseprofile = cmd_eraseprofile,
@@ -502,6 +504,7 @@ const devcmd vtable_bragi_keyboard = {
 
     .active = cmd_active_bragi,
     .idle = cmd_idle_bragi,
+    .pair = cmd_none,
 
     .erase = cmd_erase,
     .eraseprofile = cmd_eraseprofile,
@@ -554,6 +557,7 @@ const devcmd vtable_bragi_dongle = {
 
     .active = cmd_io_none,
     .idle = cmd_io_none,
+    .pair = cmd_pair_bragi,
 
     .erase = cmd_none,
     .eraseprofile = cmd_none,

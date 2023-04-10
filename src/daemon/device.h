@@ -96,6 +96,8 @@ int cmd_idle_bragi(usbdevice* kb, usbmode* dummy1, int dummy2, int dummy3, const
 int cmd_pollrate(usbdevice* kb, pollrate_t rate);
 int cmd_pollrate_legacy(usbdevice* kb, pollrate_t rate);
 int cmd_pollrate_bragi(usbdevice* kb, pollrate_t rate);
+// Command: Pair devices
+void cmd_pair_bragi(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const char* to);
 
 // Sets a device's current mode index. This is only used on the legacy K95; the RGB keyboards have no gettable HW index.
 void setmodeindex_legacy(usbdevice* kb, int index);

@@ -48,18 +48,20 @@ int nxp_usb_read(usbdevice* kb, void* in, int len, int dummy, const char* file, 
 
     if(kb->fwversion >= 0x120 || IS_V2_OVERRIDE(kb)){
         // Wait for max 2s
-        int condret = cond_nanosleep(intcond(kb), intmutex(kb), 2000000000);
-        if(condret != 0){
-            if(pthread_mutex_unlock(intmutex(kb)))
-                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
-            if(condret == ETIMEDOUT)
-                ckb_warn_fn("ckb%d: Timeout while waiting for response", file, line, INDEX_OF(kb, keyboard));
-            else
-                ckb_warn_fn("Interrupt cond error %i", file, line, condret);
-            return -1;
+        if(!kb->interruptbuf_ready){
+            int condret = cond_nanosleep(intcond(kb), intmutex(kb), 2000000000);
+            if(condret != 0){
+                if(pthread_mutex_unlock(intmutex(kb)))
+                    ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
+                if(condret == ETIMEDOUT)
+                    ckb_warn_fn("ckb%d: Timeout while waiting for response", file, line, INDEX_OF(kb, keyboard));
+                else
+                    ckb_warn_fn("Interrupt cond error %i", file, line, condret);
+                return -1;
+            }
         }
+        kb->interruptbuf_ready = false;
         memcpy(in, kb->interruptbuf, len);
-        memset(kb->interruptbuf, 0, len);
         if(pthread_mutex_unlock(intmutex(kb)))
             ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
         return len;

@@ -338,6 +338,8 @@ typedef struct usbdevice_ {
     key keymap[sizeof(keymap)];
     // Buffer used to store non-HID interrupt reads from the input thread.
     uchar interruptbuf[MAX_MSG_SIZE];
+    // Predicate for condition
+    bool interruptbuf_ready;
     // Endpoints the main input thread should listen to
     // Must always end with 0, and endpoints should be 0x80 | i
     uchar input_endpoints[USB_EP_MAX+1];

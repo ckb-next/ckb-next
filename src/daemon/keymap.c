@@ -646,6 +646,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
         int retval = pthread_mutex_lock(intmutex(targetkb));
         if(retval)
             ckb_fatal("Error locking interrupt mutex %i", retval);
+        targetkb->interruptbuf_ready = true;
         memcpy(targetkb->interruptbuf, buffer, kb->out_ep_packet_size);
 
         // signal os_usbrecv() that the data is ready.

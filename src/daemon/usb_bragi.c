@@ -69,16 +69,19 @@ int bragi_usb_read(usbdevice* kb, void* in, int len, int dummy, const char* file
     BRAGI_PKT_SIZE_CHECK(len, file, line);
 
     // Wait for max 2s
-    int condret = cond_nanosleep(intcond(kb), intmutex(kb), 2000000000);
-    if(condret != 0){
-        if(pthread_mutex_unlock(intmutex(kb)))
-            ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
-        if(condret == ETIMEDOUT)
-            ckb_warn_fn("ckb%d: Timeout while waiting for response", file, line, INDEX_OF(kb, keyboard));
-        else
-            ckb_warn_fn("Interrupt cond error %i", file, line, condret);
-        return -1;
+    if(!kb->interruptbuf_ready){
+        int condret = cond_nanosleep(intcond(kb), intmutex(kb), 2000000000);
+        if(condret != 0){
+            if(pthread_mutex_unlock(intmutex(kb)))
+                ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
+            if(condret == ETIMEDOUT)
+                ckb_warn_fn("ckb%d: Timeout while waiting for response", file, line, INDEX_OF(kb, keyboard));
+            else
+                ckb_warn_fn("Interrupt cond error %i", file, line, condret);
+            return -1;
+        }
     }
+    kb->interruptbuf_ready = false;
     memcpy(in, kb->interruptbuf, kb->out_ep_packet_size);
     if(pthread_mutex_unlock(intmutex(kb)))
         ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");

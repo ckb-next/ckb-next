@@ -1,4 +1,4 @@
-name: Feature Request
+name: Enhancement / Feature Request
 description: Suggest an idea for this project.
 labels: ["enhancement"]
 body:
@@ -8,6 +8,7 @@ body:
         ### Due Diligence
         - See if your suggestion has already been talked about in open and closed [Issues](https://github.com/ckb-next/ckb-next/issues).
         - One suggestion per issue.
+        - For wiki edits please put a changelog in Enhancement Details and the .patch file in Additional Details.
   - type: textarea
     id: enhancement-desc
     attributes:

@@ -233,6 +233,7 @@ int start_dongle_bragi(usbdevice* kb, int makeactive){
     // Force back to SW mode
     // FIXME: Does this make a difference?
     bragi_set_property(kb, BRAGI_MODE, BRAGI_MODE_SOFTWARE);
+    kb->active = 1;
     // Probe for devices
     // FIXME: Do something about this failing
     bragi_dongle_probe(kb);

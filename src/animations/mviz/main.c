@@ -57,6 +57,11 @@ static unsigned int* key_lit = NULL;
 
 static int single_colour = 0;
 
+static int agc = 0;
+static float agc_mult = 1.0f;
+#define AGC_ADD_PCT 0.002f
+#define AGC_CUTOFF 0.005f
+
 #define ENUMVALSTR_(x) #x
 #define ENUMVALSTR(x) ENUMVALSTR_(x)
 typedef enum {
@@ -72,7 +77,7 @@ static long int default_device = CAPTURE_DEV_SERVER, old_default_device = CAPTUR
 void ckb_info(){
     CKB_NAME("Music Visualization");
     CKB_VERSION("1.0");
-    CKB_COPYRIGHT("2017-2022", "RULER501 & TasosSah");
+    CKB_COPYRIGHT("2017-2023", "RULER501 & TasosSah");
     CKB_LICENSE("GPLv2+");
     CKB_GUID("{097D69F0-70B2-48B8-AFE2-25CA1DB0D92C}");
     CKB_DESCRIPTION("A collection of music visualization effects.<br><a href=\"https://github.com/ckb-next/ckb-next/wiki/Animations#mviz-music-visualizer\">Set-up instructions</a>");
@@ -86,6 +91,7 @@ void ckb_info(){
 
     CKB_PARAM_BOOL("singlecol", "Single Colour", 0);
     CKB_PARAM_LONG("default_device", "Audio device type:", "", CAPTURE_DEV_MONITOR, CAPTURE_DEV_SERVER, CAPTURE_DEV_MAX-1);
+    CKB_PARAM_BOOL("agc", "Auto Gain Control", 1);
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_NONE);
@@ -195,10 +201,29 @@ static void pa_read_cb(pa_stream* p, size_t nbytes, void* userdata){
         // If we get too many samples, ignore the extra ones
         const size_t samples = datasz / sizeof(*dataptr) > FFT_SIZE ? FFT_SIZE : datasz / sizeof(*dataptr);
 
-        for(size_t i = 0; i < samples; i++){
-            inbuf[i].r = dataptr[i] * hann_res[i];
-            //inbuf[i].i = 0;
+        if(agc) {
+            // Find the loudest sample
+            float loudest = -1.f;
+            for(size_t i = 0; i < samples; i++)
+                if(dataptr[i] > loudest)
+                    loudest = dataptr[i];
+
+            const float mult = loudest < AGC_CUTOFF ? 1.f : 1.f / loudest;
+            // To increase the gain, slowly add the multiplier to the global one
+            // Lower it instantly though
+            if(mult > agc_mult) {
+                const float temp_agc_mult = agc_mult + AGC_ADD_PCT * mult;
+                // Make sure the loudest sample won't go above 1.f
+                // If it will, don't add to the multiplier anymore
+                if(loudest * temp_agc_mult <= 1.f)
+                    agc_mult = temp_agc_mult;
+            } else {
+                agc_mult = mult;
+            }
         }
+
+        for(size_t i = 0; i < samples; i++)
+            inbuf[i].r = dataptr[i] * agc_mult * hann_res[i];
 
         kiss_fft(config, inbuf, outbuf);
 
@@ -372,6 +397,9 @@ void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
             mviz_init_capture();
             old_default_device = default_device;
         }
+    };
+    CKB_PARSE_BOOL("agc", &agc){
+        agc_mult = 1.0f;
     };
 }
 

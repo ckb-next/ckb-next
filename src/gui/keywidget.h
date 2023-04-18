@@ -89,7 +89,7 @@ private:
 
     float _aspectRatio;
 
-    QImage _currentOverlay;
+    QImage _currentOverlay, _currentOverlayScaled;
     QPointF _overlayPos;
 
     void paintEvent(QPaintEvent*) override;

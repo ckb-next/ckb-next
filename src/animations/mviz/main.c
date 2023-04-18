@@ -492,7 +492,7 @@ int ckb_frame(ckb_runctx* context){
     if(pa_state != PA_CONTEXT_READY)
         return 0;
 
-    for(int i = 0; i < 5 && pa_mainloop_iterate(pa_ml, 0, NULL) > 0; i++)
+    for(int i = 0; i < 15 && pa_mainloop_iterate(pa_ml, 0, NULL) > 0; i++)
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 500000}, NULL);
 
     ckb_key* keys = context->keys;

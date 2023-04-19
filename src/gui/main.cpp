@@ -228,6 +228,8 @@ const char* DISPLAY = nullptr;
 int main(int argc, char *argv[]){
 QSurfaceFormat fmt;
 fmt.setSamples(8);
+// HACK: Disable vsync so that the GUI thread isn't blocked when monitors enter power saving
+fmt.setSwapInterval(0);
 QSurfaceFormat::setDefaultFormat(fmt);
 
 QSettings::setDefaultFormat(CkbSettings::Format);

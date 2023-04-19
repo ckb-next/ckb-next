@@ -376,8 +376,8 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui->sLicenseLabel->setText(script->license());
     ui->sDescLabel->setText(script->description());
 
-    // Lock dialog size
-    setFixedSize(minimumSize());
+    setMinimumSize(minimumSizeHint());
+    adjustSize();
 }
 
 void AnimSettingDialog::newDuration(double duration){

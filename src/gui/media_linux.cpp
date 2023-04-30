@@ -46,6 +46,11 @@ static void ServerCallback(pa_context* context, const pa_server_info* info, void
     // Keep track of the default source and sink. Only these are checked. If
     // the user changes this, SourceCallback or SinkCallback will be called afterwards
     // automatically. This will then check if the new default source and sink are muted.
+
+    // Crashes have been reported where info is nullptr and we try to dereference it.
+    if(info == nullptr)
+        return;
+
     defaultSink = info->default_sink_name;
     defaultSource = info->default_source_name;
 }

@@ -14,6 +14,7 @@
 #include "keywidgetdebugger.h"
 #include <QSurfaceFormat>
 #include <iostream>
+#include "ckbsystemquirks.h"
 
 QSharedMemory appShare("ckb-next");
 
@@ -224,10 +225,15 @@ bool checkIfQtCreator(){
 }
 
 const char* DISPLAY = nullptr;
+const char* argv0 = nullptr;
 
 int main(int argc, char* argv[]){
     // Warning: The order of everything in main() is very fragile
     // Please be very careful if shuffling things around
+
+    // First assign argv0 because we need it in CkbSystemQuirks
+    if(argc > 0)
+        argv0 = argv[0];
 
     // Setup names and versions
     // This needs to be done before the first QSettings is created
@@ -243,7 +249,7 @@ int main(int argc, char* argv[]){
     // Note: The settings are not exposed in the UI
     QSurfaceFormat fmt;
 
-    int msaa = tmpSettings->value("Program/GL/MSAA", 8).toInt();
+    int msaa = tmpSettings->value("Program/GL/MSAA", CkbSystemQuirks::getMaxMSAA()).toInt();
     if(msaa >= 0 && msaa <= 16)
         fmt.setSamples(msaa);
 
@@ -419,6 +425,7 @@ int main(int argc, char* argv[]){
         QThread::sleep(1);
 
     std::cout << "ckb-next " << CKB_NEXT_VERSION_STR << std::endl;
+    qDebug() << "Using" << CkbSystemQuirks::getGlVendor() << CkbSystemQuirks::getGlRenderer();
 
     MainWindow w(silent);
     if(!background)

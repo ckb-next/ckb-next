@@ -46,4 +46,5 @@ endif ()
 
 if (WITH_GUI)
     add_subdirectory(gui)
+    add_subdirectory(sinfo)
 endif ()

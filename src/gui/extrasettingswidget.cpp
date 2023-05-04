@@ -96,6 +96,7 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
     ui->timerMinBox->hide();
 #endif
     ui->monochromeBox->setChecked(!settings.value("RGBIcon", true).toBool());
+    ui->msaaBox->setChecked(settings.contains("GL/MSAA") && settings.value("GL/MSAA").toInt() == 0);
 }
 
 ExtraSettingsWidget::~ExtraSettingsWidget(){
@@ -202,4 +203,12 @@ void ExtraSettingsWidget::on_timerMinBox_editingFinished(){
 void ExtraSettingsWidget::on_monochromeBox_toggled(bool checked){
     CkbSettings::set("Program/RGBIcon", !checked);
     MainWindow::mainWindow->syncTrayIcon();
+}
+
+void ExtraSettingsWidget::on_msaaBox_toggled(bool checked){
+    CkbSettings s("Program/GL");
+    if(checked)
+        s.setValue("MSAA", 0);
+    else
+        s.remove("MSAA");
 }

@@ -24,7 +24,7 @@ public:
 signals:
     void macroKeyEvent(int keycode, bool keydown, Qt::KeyboardModifiers modifiers);
 private:
-    bool eventFilter(QObject* obj, QEvent* evt);
+    bool eventFilter(QObject* obj, QEvent* evt) override;
     bool redirectKeyEvents;
 };
 

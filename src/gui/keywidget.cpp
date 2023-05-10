@@ -181,6 +181,13 @@ void KeyWidget::calculateDrawInfo(const QSize& size){
     // FIXME: cleanup
     drawInfoOffset.setX((w / drawInfoScale - keyMap.width()) / 2.f);
     drawInfoOffset.setY((h / drawInfoScale - keyMap.height()) / 2.f);
+    if(_currentOverlay.isNull()) {
+        _currentOverlayScaled = QImage();
+    } else {
+        QSize sz = _currentOverlay.size() * drawInfoScale / 9.f;
+        // We need to transform the image with QImage::scaled() because painter.drawImage() will butcher it, even with smoothing enabled
+        _currentOverlayScaled = _currentOverlay.scaled(sz, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    }
 }
 
 bool KeyWidget::event(QEvent* e){
@@ -270,13 +277,11 @@ void KeyWidget::paintGL(){
     // Draw background
     painter.setPen(Qt::NoPen);
 
-    if(!_currentOverlay.isNull()){
+    if(!_currentOverlayScaled.isNull()){
         // FIXME: Properly centre this instead of relying on a pre-set offset
         // The overlay has a resolution of 9px per keymap unit
         QPointF pos = (_overlayPos + drawInfoOffset) * drawInfoScale;
-        QSize sz = _currentOverlay.size() * drawInfoScale / 9.f;
-        // We need to transform the image with QImage::scaled() because painter.drawImage() will butcher it, even with smoothing enabled
-        painter.drawImage(QRectF(pos, sz), _currentOverlay.scaled(sz, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+        painter.drawImage(QRectF(pos, _currentOverlayScaled.size()), _currentOverlayScaled);
     } else {
         // Otherwise, draw a solid background
         painter.setBrush(QBrush(bgColor));
@@ -382,9 +387,7 @@ void KeyWidget::paintGL(){
     // Render the key decorations (RGB -> light circles, binding -> key names)
     if(_rgbMode){
         // Draw key colors (RGB mode)
-        int cnt = -1;
         for(const Key& key : keyMap){
-            cnt++;
             if(!key.hasLed)
                 continue;
             float x = key.x + drawInfoOffset.x() - 1.8f;
@@ -468,9 +471,7 @@ void KeyWidget::paintGL(){
         font.setBold(true);
         font.setPixelSize(5.25f * drawInfoScale);
         QFont font0 = font;
-        uint cnt = -1;
         for(const Key& key : keyMap){
-            cnt++;
             if(!key.hasScan)
                 continue;
 

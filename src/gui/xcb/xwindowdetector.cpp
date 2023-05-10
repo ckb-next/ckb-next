@@ -48,7 +48,7 @@ QString XWindowDetector::xcbGetString(xcb_connection_t* conn, xcb_window_t win, 
 {
     QString xcb_string;
     xcb_get_property_cookie_t prop = xcb_get_property(conn, 0, win, atom, type, 0, 128);
-    xcb_get_property_reply_t* reply = xcb_get_property_reply(conn, prop, NULL);
+    xcb_get_property_reply_t* reply = xcb_get_property_reply(conn, prop, nullptr);
     if(!reply)
         return xcb_string;
     int len = xcb_get_property_value_length(reply);
@@ -63,7 +63,7 @@ xcb_generic_event_t* XWindowDetector::xcbWaitForEventInterruptible(xcb_connectio
     FD_ZERO(fds);
     FD_SET(xcbFd, fds);
     FD_SET(efd, fds);
-    if(pselect(((xcbFd > efd) ? xcbFd : efd) + 1, fds, NULL, NULL, NULL, NULL) > 0)
+    if(pselect(((xcbFd > efd) ? xcbFd : efd) + 1, fds, nullptr, nullptr, nullptr, nullptr) > 0)
     {
         // If we received data from the eventfd, then we need to tell the thread to close. Otherwise, we have an event from xcb.
         if(FD_ISSET(efd, fds))
@@ -83,7 +83,7 @@ void XWindowDetector::fetchNewWinInfo(xcb_window_t win, xcb_ewmh_connection_t* e
     do
     {
         // get PID if possible
-        xcb_get_property_reply_t* pid_reply = xcb_get_property_reply(conn, xcb_ewmh_get_wm_pid(ewmh, win), NULL);
+        xcb_get_property_reply_t* pid_reply = xcb_get_property_reply(conn, xcb_ewmh_get_wm_pid(ewmh, win), nullptr);
         if(pid_reply)
         {
             xcb_ewmh_get_wm_pid_from_reply(&pid, pid_reply);
@@ -101,7 +101,7 @@ void XWindowDetector::fetchNewWinInfo(xcb_window_t win, xcb_ewmh_connection_t* e
 
         // Get _NET_WM_NAME using EWMH
         xcb_ewmh_get_utf8_strings_reply_t _net_wm_name;
-        if(xcb_ewmh_get_wm_name_from_reply(ewmh, &_net_wm_name, xcb_get_property_reply(conn, xcb_ewmh_get_wm_name(ewmh, win), NULL)))
+        if(xcb_ewmh_get_wm_name_from_reply(ewmh, &_net_wm_name, xcb_get_property_reply(conn, xcb_ewmh_get_wm_name(ewmh, win), nullptr)))
         {
             window_name = QString::fromUtf8(_net_wm_name.strings, _net_wm_name.strings_len);
             xcb_ewmh_get_utf8_strings_reply_wipe(&_net_wm_name);
@@ -134,7 +134,7 @@ static inline xcb_screen_t* getPreferredScreen(xcb_connection_t* conn, int prefe
     xcb_screen_iterator_t iter = xcb_setup_roots_iterator(xcb_get_setup(conn));
     for(int i = 0; i < preferred_screen; i++){
         if(!iter.rem)
-            return NULL;
+            return nullptr;
         xcb_screen_next(&iter);
     }
     return iter.data;
@@ -142,10 +142,10 @@ static inline xcb_screen_t* getPreferredScreen(xcb_connection_t* conn, int prefe
 
 static inline xcb_window_t getActiveWindow(xcb_ewmh_connection_t* ewmh, int preferred_screen){
     xcb_window_t win = 0;
-    xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, NULL);
+    xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, nullptr);
     while(!win) {
         QThread::msleep(50);
-        xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, NULL);
+        xcb_ewmh_get_active_window_reply(ewmh, xcb_ewmh_get_active_window(ewmh, preferred_screen), &win, nullptr);
         // Read from the eventfd to allow breaking from the loop to quit
         uint64_t buf;
         if(read(efd, &buf, sizeof(buf)) == -1 && errno == EAGAIN)
@@ -155,11 +155,14 @@ static inline xcb_window_t getActiveWindow(xcb_ewmh_connection_t* ewmh, int pref
     return win;
 }
 
+// From main.cpp
+extern const char* DISPLAY;
+
 void XWindowDetector::run()
 {
     int preferred_screen = 0;
     // XCB
-    xcb_connection_t* conn = xcb_connect(NULL, &preferred_screen);
+    xcb_connection_t* conn = xcb_connect(DISPLAY, &preferred_screen);
     xcb_screen_t* scr = getPreferredScreen(conn, preferred_screen);
 
     // EWMH

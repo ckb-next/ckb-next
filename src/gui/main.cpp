@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include "keywidgetdebugger.h"
 #include <QSurfaceFormat>
+#include <iostream>
 
 QSharedMemory appShare("ckb-next");
 
@@ -222,22 +223,31 @@ bool checkIfQtCreator(){
     return false;
 }
 
+const char* DISPLAY = nullptr;
+
 int main(int argc, char *argv[]){
 QSurfaceFormat fmt;
 fmt.setSamples(8);
+// HACK: Disable vsync so that the GUI thread isn't blocked when monitors enter power saving
+fmt.setSwapInterval(0);
 QSurfaceFormat::setDefaultFormat(fmt);
 
 QSettings::setDefaultFormat(CkbSettings::Format);
 
 #ifdef Q_OS_LINUX
     // Get rid of "-session" before Qt parses the arguments
-    for(int i = 0; i < argc; i++){
-        if(!strcmp(argv[i], "-session")){
+    for(int i = 1; i < argc; i++){
+        QByteArray arg(argv[i]);
+        if (arg.startsWith("--"))
+            arg.remove(0, 1);
+        if(arg == "-session"){
             argv[i][1] = 'b';
             argv[i][2] = '\0';
-            if(i + 1 < argc)
-                argv[i + 1][0] = '\0';
-            break;
+            if(i + 1 < argc) {
+                argv[++i][0] = '\0';
+            }
+        } else if (arg == "-display" && i < argc - 1) {
+            DISPLAY = argv[++i];
         }
     }
 #endif
@@ -282,7 +292,7 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     // Setup argument parser
     QCommandLineParser parser;
     QString errorMessage;
-    parser.setApplicationDescription("Open Source Corsair Input Device Driver for Linux and OSX.");
+    parser.setApplicationDescription(CKB_NEXT_DESCRIPTION);
     bool background = false;
 
     // Although the daemon runs as root, the GUI needn't and shouldn't be, as it has the potential to corrupt settings data.
@@ -392,6 +402,8 @@ QSettings::setDefaultFormat(CkbSettings::Format);
 
     if(QtCreator)
         QThread::sleep(1);
+
+    std::cout << "ckb-next " << CKB_NEXT_VERSION_STR << std::endl;
 
     MainWindow w(silent);
     if(!background)

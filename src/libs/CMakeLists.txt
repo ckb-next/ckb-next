@@ -29,17 +29,5 @@ if (WITH_MVIZ) # otherwise doesn't make sense to include
     add_subdirectory(kissfft)
 endif ()
 
-if (WITH_GUI)
-    find_package(QuaZip)
-    if(NOT QuaZip_FOUND)
-        set(WITH_SHIPPED_QUAZIP ON)
-        set(WITH_SHIPPED_QUAZIP ON PARENT_SCOPE)
-        message(WARNING "Quazip was not found. Using bundled version.")
-    endif ()
-    if (WITH_SHIPPED_QUAZIP)
-        add_subdirectory(quazip)
-    endif ()
-endif (WITH_GUI)
-
 # ckb-next libraries
 add_subdirectory(ckb-next)

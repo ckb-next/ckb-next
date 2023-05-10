@@ -2,30 +2,21 @@
 #include "keymap_patch.h"
 #include "keymap.h"
 
-// The Alt code is used for Fn in the K65
-keypatch k65patch[] = {
-    { 146, "fn", 0x59, KEY_FN },
-};
-#define K65PATCH_LEN sizeof(k65patch)/sizeof(*k65patch)
-
 // Vol Up/Dn LED addresses for K63 and K68.
 // Possibly for all devices that have LEDs on vol up/dn
-keypatch k63patch[] = {
+static const keypatch k63patch[] = {
     { 130, "volup", 0x82, KEY_VOLUMEUP },
     { 131, "voldn", 0x8e, KEY_VOLUMEDOWN },
 };
-#define K63PATCH_LEN sizeof(k63patch)/sizeof(*k63patch)
 
-keypatch m55patch[] = {
+static const keypatch m55patch[] = {
     { 210, "mouse6", -1,        KEY_CORSAIR },
     { 211, "mouse7", -1,        KEY_CORSAIR },
     { 213, "dpiup",  -1,        KEY_CORSAIR },
     { 237, "dpi",    LED_MOUSE, KEY_NONE },
-    { 239, NULL,     0,         KEY_NONE },
 };
-#define M55PATCH_LEN sizeof(m55patch)/sizeof(*m55patch)
 
-keypatch m95patch[] = {
+static const keypatch m95patch[] = {
     { 208, "mouse7", -1, SCAN_MOUSE | BTN_BACK },
     { 209, "mouse6", -1, SCAN_MOUSE | BTN_FORWARD },
     { 210, "thumb6", -1, KEY_CORSAIR },
@@ -34,56 +25,45 @@ keypatch m95patch[] = {
     { 218, "sniper", -1, KEY_CORSAIR },
 
 };
-#define M95PATCH_LEN sizeof(m95patch)/sizeof(*m95patch)
 
-keypatch icwpatch[] = {
+static const keypatch icwpatch[] = {
     { 237, "back",  LED_MOUSE,     KEY_NONE },
     { 238, "wheel", LED_MOUSE + 1, KEY_NONE },
     { 239, "front", LED_MOUSE + 2, KEY_NONE },
     { 240, "dpi0",  LED_MOUSE + 3, KEY_NONE },
     { 241, "dpi1",  LED_MOUSE + 4, KEY_NONE },
     { 242, "dpi2",  LED_MOUSE + 5, KEY_NONE },
-    { 243, NULL,    0,             KEY_NONE },
-    { 244, NULL,    0,             KEY_NONE },
-    { 245, NULL,    0,             KEY_NONE },
-    { 246, NULL,    0,             KEY_NONE },
 };
-#define ICWPATCH_LEN sizeof(icwpatch)/sizeof(*icwpatch)
 
-keypatch harpoonwlpatch[] = {
+static const keypatch harpoonwlpatch[] = {
     { 237, "dpi",  LED_MOUSE,     KEY_NONE },
     { 238, "back", LED_MOUSE + 1, KEY_NONE },
-    { 239, NULL,   0,             KEY_NONE },
-    { 240, NULL,   0,             KEY_NONE },
-    { 241, NULL,   0,             KEY_NONE },
-    { 242, NULL,   0,             KEY_NONE },
-    { 243, NULL,   0,             KEY_NONE },
-    { 244, NULL,   0,             KEY_NONE },
-    { 245, NULL,   0,             KEY_NONE },
-    { 246, NULL,   0,             KEY_NONE },
 };
-#define HARPOONWLPATCH_LEN sizeof(harpoonwlpatch)/sizeof(*harpoonwlpatch)
 
-keypatch katarproxtpatch[] = {
+static const keypatch katarproxtpatch[] = {
     { 237, "dpi",  LED_MOUSE,     KEY_NONE },
-    { 238, NULL,   0,             KEY_NONE },
-    { 239, NULL,   0,             KEY_NONE },
-    { 240, NULL,   0,             KEY_NONE },
-    { 241, NULL,   0,             KEY_NONE },
-    { 242, NULL,   0,             KEY_NONE },
-    { 243, NULL,   0,             KEY_NONE },
-    { 244, NULL,   0,             KEY_NONE },
-    { 245, NULL,   0,             KEY_NONE },
-    { 246, NULL,   0,             KEY_NONE },
 };
-#define KATARPROXTPATCH_LEN sizeof(katarproxtpatch)/sizeof(*katarproxtpatch)
 
-keypatch k95legacypatch[] = {
+static const keypatch k95legacypatch[] = {
     { 111, "lghtpgm",  0,     KEY_CORSAIR }, // Lighting program key for legacy devices
 };
-#define K95LEGACYPATCH_LEN sizeof(k95legacypatch)/sizeof(*k95legacypatch)
 
-keypatch DCRGBPpatch[] = {
+// Shift all generic zones by one and move winlock to 0
+static const keypatch k55propatch[] = {
+    { 114,  "lock", 0, KEY_CORSAIR },
+    { 190, "zone1", 1, KEY_NONE },
+    { 191, "zone2", 2, KEY_NONE },
+    { 192, "zone3", 3, KEY_NONE },
+    { 193, "zone4", 4, KEY_NONE },
+    { 194, "zone5", 5, KEY_NONE },
+};
+
+// Just winlock
+static const keypatch k55proxtpatch[] = {
+    { 114,  "lock", 0, KEY_CORSAIR },
+};
+
+static const keypatch DCRGBPpatch[] = {
     { 209, "mouse5",  LED_MOUSE + 1, SCAN_MOUSE | BTN_EXTRA }, // "bar0"
     { 208, "mouse4",  LED_MOUSE + 2, SCAN_MOUSE | BTN_SIDE  }, // "bar1"
     { 228, 0,  -1, KEY_NONE },
@@ -100,25 +80,33 @@ keypatch DCRGBPpatch[] = {
     { 247, "bar3",    LED_MOUSE + 3, KEY_NONE }, // "bar2"
     { 248, "bar4",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
 };
-#define DCRGBPPATCH_LEN sizeof(DCRGBPpatch)/sizeof(*DCRGBPpatch)
 
-keypatches mappatches[] = {
-    { V_CORSAIR, P_K68,          k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_K68_NRGB,     k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_K65,          k65patch,       K65PATCH_LEN },
-    { V_CORSAIR, P_K65_LEGACY,   k65patch,       K65PATCH_LEN },
-    { V_CORSAIR, P_K63_NRGB,     k63patch,       K63PATCH_LEN },
-    { V_CORSAIR, P_M55_RGB_PRO,  m55patch,       M55PATCH_LEN },
-    { V_CORSAIR, P_M95,          m95patch,       M95PATCH_LEN },
-    { V_CORSAIR, P_IRONCLAW_W_U, icwpatch,       ICWPATCH_LEN },
-    { V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch, HARPOONWLPATCH_LEN },
-    { V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch,KATARPROXTPATCH_LEN },
-    { V_CORSAIR, P_KATAR_PRO,    katarproxtpatch,KATARPROXTPATCH_LEN },
-    { V_CORSAIR, P_K95_LEGACY,   k95legacypatch, K95LEGACYPATCH_LEN },
-    { V_CORSAIR, P_DARK_CORE_RGB_PRO,       DCRGBPpatch,    DCRGBPPATCH_LEN },
-    { V_CORSAIR, P_DARK_CORE_RGB_PRO_SE,    DCRGBPpatch,    DCRGBPPATCH_LEN },
+#define ADD_PATCH(vendor, product, patch) \
+    { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
+
+static const keypatches mappatches[] = {
+    ADD_PATCH(V_CORSAIR, P_K68,          k63patch),
+    ADD_PATCH(V_CORSAIR, P_K68_NRGB,     k63patch),
+    ADD_PATCH(V_CORSAIR, P_K63_NRGB,     k63patch),
+    ADD_PATCH(V_CORSAIR, P_M55_RGB_PRO,  m55patch),
+    ADD_PATCH(V_CORSAIR, P_M95,          m95patch),
+    ADD_PATCH(V_CORSAIR, P_IRONCLAW_W_U, icwpatch),
+    ADD_PATCH(V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch),
+    ADD_PATCH(V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch),
+    ADD_PATCH(V_CORSAIR, P_KATAR_PRO,    katarproxtpatch),
+    ADD_PATCH(V_CORSAIR, P_K95_LEGACY,   k95legacypatch),
+    ADD_PATCH(V_CORSAIR, P_K55_PRO,      k55propatch),
+    ADD_PATCH(V_CORSAIR, P_K55_PRO_XT,   k55proxtpatch),
+    ADD_PATCH(V_CORSAIR, P_DARK_CORE_RGB_PRO,   DCRGBPpatch),
+    ADD_PATCH(V_CORSAIR, P_DARK_CORE_RGB_PRO_SE,   DCRGBPpatch),
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
+
+#define CLEAR_KEYMAP_ENTRY(x)   { \
+    (x).name = NULL; \
+    (x).led = -1; \
+    (x).scan = KEY_NONE; \
+}
 
 /// \brief
 ///
@@ -154,9 +142,7 @@ void patchkeys(usbdevice* kb){
             kb->keymap[PROFSWITCH_M_IDX].led = -1;
             kb->keymap[PROFSWITCH_M_IDX].scan = KEY_CORSAIR;
             // Clear the keyboard one
-            kb->keymap[profswitch_kb_idx].name = NULL;
-            kb->keymap[profswitch_kb_idx].led = 0;
-            kb->keymap[profswitch_kb_idx].scan = KEY_NONE;
+            CLEAR_KEYMAP_ENTRY(kb->keymap[profswitch_kb_idx]);
         }
     }
 
@@ -165,11 +151,25 @@ void patchkeys(usbdevice* kb){
         if(mappatches[pos].vendor == kb->vendor && mappatches[pos].product == kb->product){
             // Iterate through the keys in the selected patch
             for(size_t i = 0; i < mappatches[pos].patchlen; i++){
-                keypatch* curpatch = mappatches[pos].patch;
-                int idx = curpatch[i].idx;
+                const keypatch* curpatch = mappatches[pos].patch;
+                size_t idx = curpatch[i].idx;
                 kb->keymap[idx].name = curpatch[i].name;
                 kb->keymap[idx].led = curpatch[i].led;
                 kb->keymap[idx].scan = curpatch[i].scan;
+                // Now go through the full keymap so far and remove any entries that
+                // either the have same LED as what was patched in, or same name
+                for(size_t j = 0; j < sizeof(keymap)/sizeof(*keymap); j++){
+                    // Don't delete the freshly patched entry
+                    if(j == idx)
+                        continue;
+                    // Name first
+                    if(kb->keymap[j].name && curpatch[i].name && !strcmp(kb->keymap[j].name, curpatch[i].name))
+                        CLEAR_KEYMAP_ENTRY(kb->keymap[j]);
+                    // LED index
+                    // In this case, only reset the LED, as there's potential to break keybinds
+                    if(kb->keymap[j].led >= 0 && curpatch[i].led >= 0 && kb->keymap[j].led == curpatch[i].led)
+                        kb->keymap[j].led = -1;
+                }
             }
             return;
         }

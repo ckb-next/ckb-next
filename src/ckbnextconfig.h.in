@@ -16,3 +16,4 @@
 
 #define CKB_NEXT_COPYRIGHT_YEAR "${ckb-next_COPYRIGHT_YEAR}"
 #cmakedefine ckb_next_VERSION_IS_RELEASE
+#define CKB_NEXT_DESCRIPTION "Open Source Driver for Corsair devices."

@@ -335,6 +335,16 @@ cleanup:
     return 0;
 }
 
+void fill_usbdevice_protocol(usbdevice* kb){
+    if(USES_BRAGI(kb->vendor, kb->product))
+        kb->protocol = PROTO_BRAGI;
+
+    if(USES_BRAGI_JUMBO(kb->vendor, kb->product))
+        kb->out_ep_packet_size = BRAGI_JUMBO_SIZE;
+    else
+        kb->out_ep_packet_size = MSG_SIZE;
+}
+
 /// brief .
 ///
 /// \brief _setupusb A horrible function for setting up an usb device
@@ -378,14 +388,7 @@ static void* _setupusb(void* context){
     ///
     usbdevice* kb = context;
     queued_mutex_lock(dmutex(kb));
-    if(USES_BRAGI(kb->vendor, kb->product))
-        kb->protocol = PROTO_BRAGI;
-
-    if(USES_BRAGI_JUMBO(kb->vendor, kb->product))
-        kb->out_ep_packet_size = BRAGI_JUMBO_SIZE;
-    else
-        kb->out_ep_packet_size = MSG_SIZE;
-
+    fill_usbdevice_protocol(kb);
     queued_mutex_lock(imutex(kb));
     // Set standard fields
     ushort vendor = kb->vendor, product = kb->product;

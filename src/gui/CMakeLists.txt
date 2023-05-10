@@ -72,6 +72,7 @@ if (MACOS OR LINUX)
     find_package(Threads REQUIRED)
     find_package(Qt5 5.6.0 COMPONENTS Core Widgets Network Gui REQUIRED)
     find_package(ZLIB REQUIRED)
+    find_package(QuaZip REQUIRED)
 endif ()
 if (MACOS)
     find_library(FOUNDATION_LIBRARY Foundation)
@@ -89,7 +90,6 @@ AudioToolbox: ${AUDIOTOOLBOX_LIBRARY}")
     endif ()
         mark_as_advanced(FOUNDATION_LIBRARY COREAUDIO_LIBRARY AUDIOTOOLBOX_LIBRARY)
 elseif (LINUX)
-    find_package(X11 REQUIRED)
     find_package(Qt5 5.2.0 COMPONENTS X11Extras DBus)
 endif ()
 
@@ -281,6 +281,14 @@ elseif (LINUX)
         else()
             message(FATAL_ERROR "XCB-Screensaver or Qt5 X11Extras was not found. Either install them or pass -DUSE_XCB=0 to disable idle detection.")
         endif()
+        if(XCB_FOUND AND Qt5X11Extras_FOUND)
+            target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_XCB)
+        else()
+            message(FATAL_ERROR "XCB or Qt5 X11Extras was not found. Either install them or pass -DUSE_XCB=0 to disable idle detection.")
+        endif()
         if(XCB_EWMH_FOUND)
             target_compile_definitions(
             ckb-next
@@ -295,6 +303,7 @@ elseif (LINUX)
                 message(FATAL_ERROR "XCB-EWMH was not found. Either install it or pass -DUSE_XCB=0 to disable active window detection.")
         endif()
     endif()
+
     target_sources(
         ckb-next
             PRIVATE
@@ -490,21 +499,12 @@ if (MACOS OR LINUX)
               "${CMAKE_CURRENT_SOURCE_DIR}"
               "${CMAKE_CURRENT_BINARY_DIR}")
 endif ()
-if (MACOS)
-elseif (LINUX)
-    target_include_directories(
-        ckb-next
-            SYSTEM
-            PRIVATE
-              "${X11_INCLUDE_DIR}")
-endif ()
 
-if (NOT WITH_SHIPPED_QUAZIP)
-    target_include_directories(
-        ckb-next
-            PRIVATE
-              "${QuaZip_INCLUDE_DIR}") # TODO: export QuaZip target and inherit dirs
-endif ()
+target_include_directories(
+    ckb-next
+        SYSTEM
+        PRIVATE
+          "${QuaZip_INCLUDE_DIR}")
 
 # Declare target's link dependencies
 if (MACOS OR LINUX)
@@ -530,7 +530,6 @@ elseif (LINUX)
     target_link_libraries(
         ckb-next
             PRIVATE
-              "${X11_LIBRARIES}"
               "${XCB_EWMH_LIBRARIES}"
               "${XCB_SCREENSAVER_LIBRARIES}"
               Qt5::X11Extras)
@@ -544,17 +543,10 @@ elseif (LINUX)
     endif ()
 endif()
 
-if (WITH_SHIPPED_QUAZIP)
-    target_link_libraries(
-        ckb-next
-            PRIVATE
-              QuaZip::quazip5)
-else ()
-    target_link_libraries(
-        ckb-next
-            PRIVATE
-            "${QuaZip_LIBRARIES}")
-endif ()
+target_link_libraries(
+    ckb-next
+        PRIVATE
+        "${QuaZip_LIBRARIES}")
 
 # Target compile features and options
 set_target_properties(

@@ -28,6 +28,12 @@
    </property>
    <item>
     <widget class="QLabel" name="versionLabel">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>23</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <weight>75</weight>
@@ -89,7 +95,7 @@
         <x>0</x>
         <y>0</y>
         <width>809</width>
-        <height>503</height>
+        <height>497</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -120,6 +126,12 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>23</height>
+            </size>
            </property>
            <property name="font">
             <font>
@@ -346,6 +358,12 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>23</height>
+            </size>
            </property>
            <property name="font">
             <font>

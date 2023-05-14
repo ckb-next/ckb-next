@@ -870,26 +870,20 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     case KeyMap::K70_TKL:{
-        map = getMap(KeyMap::K70, layout);
-        // Very similar to the K63 but with slightly different media button positions
-        QMutableHashIterator<QString, Key> i(map);
-        while(i.hasNext()){
-            i.next();
-            if(i.value().x >= K65_WIDTH)
-                i.remove();
-        }
+        // Same width as the K63 but with a top row more like the K70
+        map = getMap(KeyMap::K63, layout);
         for(const Key* key = K70TklTopRow; key < K70TklTopRow + K70_TKL_TOP_COUNT; key++)
             map[key->name] = *key;
 
         map.remove("rwin");
+        map.remove("voldn");
+        map.remove("volup");
         map["fn"] = KStrafeKeys[3];
         map["fn"].x -= 12;
         map["light"].x = 190 - K70_X_START;
         map["light"].height = 8;
         map["lock"].x = 202 - K70_X_START;
         map["lock"].height = 8;
-
-        // Done!
         break;
     }
     case KeyMap::STRAFE_MK2:{

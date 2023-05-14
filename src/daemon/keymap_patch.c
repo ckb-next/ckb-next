@@ -86,10 +86,10 @@ keypatch k100patch[] = {
 };
 
 keypatch k70tklpatch[] = {
-    { 1, "logo",    1, KEY_CORSAIR },
     { 114, "lock",    114, KEY_CORSAIR },
-    { 128, "profswitch",    128, KEY_CORSAIR },
+    {   1, "logo",      1, KEY_NONE },
 };
+
 
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }

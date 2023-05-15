@@ -876,8 +876,6 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map[key->name] = *key;
 
         map.remove("rwin");
-        map.remove("voldn");
-        map.remove("volup");
         map["fn"] = KStrafeKeys[3];
         map["fn"].x -= 12;
         map["light"].x = 190 - K70_X_START;

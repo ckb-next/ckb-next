@@ -247,6 +247,10 @@ static inline void patchABNT2(QHash<QString, Key>& map){
 #define K60_WIDTH       K70_WIDTH
 #define K60_HEIGHT      62
 
+// K60 PRO TKL has only six rows and no numpad on the right
+#define K60_TKL_WIDTH   K65_WIDTH
+#define K60_TKL_HEIGHT  K60_HEIGHT
+
 
 static const Key K68TopRow[] = {
     {nullptr,  "Volume Down", "voldn", 285 - K70_X_START, 0, 13, 8, true, true}, {nullptr,  "Volume Up", "volup", 297 - K70_X_START, 0, 13, 8, true, true},
@@ -873,6 +877,37 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
         break;
     }
+    case KeyMap::K60_TKL:{
+        map = getMap(KeyMap::K63, layout);
+        // QMutableHashIterator<QString, Key> i(map);
+        // while(i.hasNext()){
+        //     i.next();
+        //     // Move key to left. Remove it if it fell off the edge
+        //     if((i.value().x -= K70_X_START) < 0)
+        //         i.remove();
+        // }
+        map.remove("light");
+        map.remove("lock");
+        map.remove("mute");
+        map.remove("volup");
+        map.remove("voldn");
+        map.remove("stop");
+        map.remove("prev");
+        map.remove("play");
+        map.remove("next");
+
+        // Replace rwin with Fn
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+        
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            i.value().y -= 14;
+        }
+        break;
+    }
     case KeyMap::K57_WL:{
         // Take the K95 map
         map = getMap(KeyMap::K95, layout);
@@ -1409,6 +1444,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K57_WL;
     if(lower == "k60")
         return K60;
+    if(lower == "k60_tkl")
+        return K60_TKL;
     if(lower == "k63")
         return K63;
     if(lower == "k63_wireless")
@@ -1484,6 +1521,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k57_wireless";
     case K60:
         return "k60";
+    case K60_TKL:
+        return "k60_tkl";
     case K63:
         return "k63";
     case K63_WL:
@@ -1560,6 +1599,8 @@ int KeyMap::modelWidth(Model model){
     switch(model){
     case K60:
         return K60_WIDTH;
+    case K60_TKL:
+        return K60_TKL_WIDTH;
     case K63:
     case K63_WL:
         return K63_WIDTH;
@@ -1630,6 +1671,8 @@ int KeyMap::modelHeight(Model model){
         return K95P_HEIGHT;
     case K60:
         return K60_HEIGHT;
+    case K60_TKL:
+        return K60_TKL_HEIGHT;
     case M55:
     case M65:
     case M65E:

@@ -86,6 +86,7 @@ public:
         K63_WL,
         K55PRO,
         DARKCORERGBPRO,
+        K60_TKL,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

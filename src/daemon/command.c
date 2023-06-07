@@ -29,6 +29,7 @@ static const char* const cmd_strings[CMD_COUNT - 1] = {
 
     "active",
     "idle",
+    "pair",
 
     "erase",
     "eraseprofile",
@@ -289,7 +290,7 @@ int readcmd(usbdevice* kb, char* line){
             profile = kb->profile;
             mode = profile->currentmode;
             continue;
-        case ERASE: case NAME: case IOFF: case ION: case IAUTO: case INOTIFY: case PROFILENAME: case ID: case PROFILEID: case DPISEL: case LIFT: case SNAP:
+        case ERASE: case NAME: case IOFF: case ION: case IAUTO: case INOTIFY: case PROFILENAME: case ID: case PROFILEID: case DPISEL: case LIFT: case SNAP: case PAIR:
             // All of the above just parse the whole word
             vt->do_cmd[command](kb, mode, notifynumber, 0, word);
             continue;

@@ -35,6 +35,7 @@ typedef enum {
     // Software control on/off
     ACTIVE,
     IDLE,
+    PAIR,
 
     // Profile/mode metadata
     ERASE,
@@ -98,6 +99,7 @@ typedef union devcmd {
         // device.h
         cmdhandler_io active;
         cmdhandler_io idle;
+        cmdhandler pair;
 
         // profile.h
         cmdhandler erase;

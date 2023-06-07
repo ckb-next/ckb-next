@@ -151,6 +151,8 @@ Kb::Kb(QObject *parent, const QString& path) :
         batteryTimer = new QTimer(this);
         connect(batteryTimer, &QTimer::timeout, this, &Kb::updateBattery);
         connect(this, &Kb::batteryChanged, batteryIcon, &BatteryStatusTrayIcon::setBattery);
+        if (this->currentPerf())
+            connect(this, &Kb::batteryChangedLed, this->currentPerf(), &KbPerf::setBattery);
         if(showBatteryIndicator)
             batteryIcon->show();
         batteryTimer->setInterval(10000);
@@ -580,6 +582,7 @@ void Kb::readNotify(const QString& line){
         batteryLevel = newBatteryLevel;
         batteryStatus = static_cast<BatteryStatus>(newBatteryStatus);
         emit batteryChanged(batteryLevel, batteryStatus);
+        emit batteryChangedLed(batteryLevel, batteryStatus);
     } else if(components[0] == "i"){
         // Indicator event
         QString i = components[1];
@@ -866,6 +869,9 @@ void Kb::setCurrentProfile(KbProfile* profile){
 void Kb::setCurrentMode(KbMode* mode){
     _currentProfile->currentMode(_currentMode = mode);
     _needsSave = true;
+    
+    if(features.contains("battery") && this->currentPerf())
+        connect(this, &Kb::batteryChangedLed, this->currentPerf(), &KbPerf::setBattery);
     emit modeChanged();
     mode->light()->forceFrameUpdate();
 }

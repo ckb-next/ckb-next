@@ -36,6 +36,8 @@ const dpi_list mouse_dpi_list[] = {
     { P_NIGHTSWORD, 18000},
     { P_IRONCLAW_W_U, 18000 },
     { P_HARPOON_WL_U, 10000 },
+    { P_DARK_CORE_RGB_PRO, 18000 },
+    { P_DARK_CORE_RGB_PRO_SE, 18000 },
     { P_GLAIVE_PRO, 16000 },
     { 0, 0 }, // Keep last and do not remove
 };
@@ -107,6 +109,8 @@ const device_desc models[] = {
     { V_CORSAIR, P_DARK_CORE_SE, },
     { V_CORSAIR, P_DARK_CORE_WL, },
     { V_CORSAIR, P_DARK_CORE_SE_WL, },
+    { V_CORSAIR, P_DARK_CORE_RGB_PRO, },
+    { V_CORSAIR, P_DARK_CORE_RGB_PRO_WL, },
     { V_CORSAIR, P_DARK_CORE_RGB_PRO_SE, },
     { V_CORSAIR, P_DARK_CORE_RGB_PRO_SE_WL, },
     { V_CORSAIR, P_IRONCLAW_W_U, },
@@ -238,8 +242,10 @@ const char* product_str(ushort product){
         return "ironclaw";
     if(product == P_NIGHTSWORD)
         return "nightsword";
-    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D || product == P_DARK_CORE_RGB_PRO_SE || product == P_DARK_CORE_RGB_PRO_SE_WL || product == P_HARPOON_WL_U || product == P_HARPOON_WL_D)
+    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D || product == P_HARPOON_WL_U || product == P_HARPOON_WL_D)
         return "ironclaw_wireless";
+    if(product == P_DARK_CORE_RGB_PRO || product == P_DARK_CORE_RGB_PRO_WL || product == P_DARK_CORE_RGB_PRO_SE || product == P_DARK_CORE_RGB_PRO_SE_WL)
+        return "dark_core_rgb_pro";
     if(product == P_POLARIS)
         return "polaris";
     if(product == P_DARK_CORE || product == P_DARK_CORE_WL || product == P_DARK_CORE_SE || product == P_DARK_CORE_SE_WL)

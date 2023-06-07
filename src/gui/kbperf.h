@@ -6,6 +6,7 @@
 #include "ckbsettings.h"
 #include "keymap.h"
 #include "media.h"
+#include "batterysystemtrayicon.h"
 
 class KbMode;
 class KbBind;
@@ -128,6 +129,8 @@ signals:
     void settingsUpdated();
     void dpiChanged(int index);
 
+    public slots:
+        void setBattery(uint battery, BatteryStatus charging);
 private:
     // Related objects
     inline KbMode*  modeParent() const { return (KbMode*)parent(); }
@@ -165,6 +168,8 @@ private:
     muteDevice iMuteDev;
     i_hw hwIType[HW_I_COUNT];
     bool _dpiIndicator;
+    uint batteryLevel;
+    BatteryStatus batteryCharging;
 
     // Mouse settings
     height _liftHeight;

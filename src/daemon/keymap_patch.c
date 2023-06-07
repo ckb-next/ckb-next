@@ -63,6 +63,24 @@ static const keypatch k55proxtpatch[] = {
     { 114,  "lock", 0, KEY_CORSAIR },
 };
 
+static const keypatch DCRGBPpatch[] = {
+    { 209, "mouse5",  LED_MOUSE + 1, SCAN_MOUSE | BTN_EXTRA }, // "bar0"
+    { 208, "mouse4",  LED_MOUSE + 2, SCAN_MOUSE | BTN_SIDE  }, // "bar1"
+    { 228, 0,  -1, KEY_NONE },
+    { 213, "profdn",  -1, KEY_CORSAIR },
+    { 238, "back",    LED_MOUSE + 6, KEY_NONE }, // "logo"
+    { 239, 0,     -1, KEY_NONE },
+    { 240, "wheel",   LED_MOUSE + 0, KEY_NONE },
+    { 241, "thumb",   LED_MOUSE + 5, KEY_NONE },
+    { 242, "side",    LED_MOUSE + 7, KEY_NONE },
+    { 243, "dpiw0",    LED_MOUSE + 11, KEY_NONE }, // sniper led
+    { 244, "dpiw1",    LED_MOUSE + 8, KEY_NONE },
+    { 245, "dpiw2",    LED_MOUSE + 9, KEY_NONE },
+    { 246, "dpiw3",    LED_MOUSE +10, KEY_NONE },
+    { 247, "bar3",    LED_MOUSE + 3, KEY_NONE }, // "bar2"
+    { 248, "bar4",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
+};
+
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
 
@@ -79,6 +97,8 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K95_LEGACY,   k95legacypatch),
     ADD_PATCH(V_CORSAIR, P_K55_PRO,      k55propatch),
     ADD_PATCH(V_CORSAIR, P_K55_PRO_XT,   k55proxtpatch),
+    ADD_PATCH(V_CORSAIR, P_DARK_CORE_RGB_PRO,   DCRGBPpatch),
+    ADD_PATCH(V_CORSAIR, P_DARK_CORE_RGB_PRO_SE,   DCRGBPpatch),
 };
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)
 

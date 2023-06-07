@@ -278,6 +278,14 @@ void nxp_get_battery_info(usbdevice* kb){
         return;
     }
     kb->battery_level = nxp_battery_lut[in[4]];
+    switch (in[5]) {
+        case 1:
+            in[5] = 2;
+            break;
+        case 2:
+            in[5] = 1;
+            break;
+    }
     kb->battery_status = in[5];
 }
 

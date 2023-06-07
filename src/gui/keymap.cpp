@@ -432,6 +432,31 @@ static const Key DarkCoreKeys[] = {
 };
 #define KEYCOUNT_DARKCORE    (sizeof(DarkCoreKeys) / sizeof(Key))
 
+// Mouse map - DARK CORE RGB PRO
+static const Key DarkCoreRgbProKeys[] = {
+    {nullptr, "Left Mouse",     "mouse1",      8,  0, 14, 24, false, true},
+    {nullptr, "Right Mouse",    "mouse2",     25,  0, 14, 24, false, true},
+    {nullptr, "Middle Mouse",   "mouse3",     19,  8,  8,  7, false, true},
+    {nullptr, "Wheel Up",       "wheelup",    19,  4,  8,  5, false, true},
+    {nullptr, "Wheel Down",     "wheeldn",    19, 14,  8,  5, false, true},
+    {nullptr, "Wheel Light",    "wheel",      19,  5,  8, 10, true,  false},
+    {nullptr, "DPI Up",         "dpiup",       0,  5,  8,  8, false, true},
+    {nullptr, "DPI Down",       "dpidn",       0, 12,  8,  8, false, true},
+    {nullptr, "Forward",        "mouse5",      5, 24, 10,  9, true,  true},
+    {nullptr, "Back",           "mouse4",      5, 29,  5, 10, true,  true},
+    {nullptr, "Bar 3 light",    "bar3",        5, 35,  5,  8, true,  false},
+    {nullptr, "Bar 4 light",    "bar4",        5, 40,  5,  8, true,  false},
+    {nullptr, "Thumb light",    "thumb",       5, 55,  8,  8, true,  false},
+    {nullptr, "Side light",     "side",       30, 48,  8,  8, true,  false},
+    {nullptr, "Logo",           "back",       15, 48, 15, 15, true,  false},
+    {nullptr, "Profile",        "profdn",     19, 19,  8, 8,  false,  true},
+    {nullptr, "DPI0",           "dpiw0",       19, 15,  8, 8,  true,  false},
+    {nullptr, "DPI3",           "dpiw3",       10,  5,  8, 8,  true,  false},
+    {nullptr, "DPI2",           "dpiw2",        5,  5,  8, 8,  true,  false},
+    {nullptr, "DPI1",           "dpiw1",         0,  5,  8, 8,  true,  false},
+};
+#define KEYCOUNT_DARKCORERGBPRO    (sizeof(DarkCoreRgbProKeys) / sizeof(Key))
+
 // MM800 Polaris
 #define POLARIS_V 6, 14
 #define POLARIS_H 14, 6
@@ -1093,6 +1118,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::DARKCORERGBPRO:{
+        // Dark Core
+        for(const Key* key = DarkCoreRgbProKeys; key < DarkCoreRgbProKeys + KEYCOUNT_DARKCORERGBPRO; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     case KeyMap::POLARIS:{
         // MM800 Polaris Mousepad
         for(const Key* key = PolarisZones; key < PolarisZones + KEYCOUNT_POLARIS; key++){
@@ -1410,6 +1445,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return KATARPROXT;
     if(lower == "darkcore")
         return DARKCORE;
+    if(lower == "dark_core_rgb_pro")
+        return DARKCORERGBPRO;
     if(lower == "polaris")
         return POLARIS;
     if(lower == "st100")
@@ -1483,6 +1520,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "katarproxt";
     case DARKCORE:
         return "darkcore";
+    case DARKCORERGBPRO:
+        return "dark_core_rgb_pro";
     case POLARIS:
         return "polaris";
     case ST100:
@@ -1557,6 +1596,7 @@ int KeyMap::modelWidth(Model model){
     case KATAR:
     case KATARPROXT:
     case DARKCORE:
+    case DARKCORERGBPRO:
     case POLARIS:
     case ST100:
     case IRONCLAW:
@@ -1600,6 +1640,7 @@ int KeyMap::modelHeight(Model model){
     case KATAR:
     case KATARPROXT:
     case DARKCORE:
+    case DARKCORERGBPRO:
     case POLARIS:
     case ST100:
     case M95:

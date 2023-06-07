@@ -174,6 +174,7 @@ signals:
     void profileAdded();
     void profileRenamed();
     void batteryChanged(uint batteryLevel, BatteryStatus batteryStatus);
+    void batteryChangedLed(uint batteryLevel, BatteryStatus batteryStatus);
 
     void profileChanged();
     void profileAboutToChange();

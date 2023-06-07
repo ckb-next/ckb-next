@@ -149,6 +149,11 @@ void KeyWidget::map(const KeyMap& newMap){
             _currentOverlay.load(":/img/overlay_m55.png");
             _overlayPos.setX(5.7f);
             break;
+        case KeyMap::DARKCORERGBPRO:
+            _currentOverlay.load(":/img/overlay_darkcore_rgb_pro.png");
+            _overlayPos.setX(-5.f);
+            _overlayPos.setY(-2.f);
+            break;
         case KeyMap::ST100: // Entries without overlays should not be added here. This will (hopefully) be moved.
             _overlayPos.setX(-18.5);
             // fallthrough

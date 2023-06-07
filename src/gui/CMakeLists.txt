@@ -116,6 +116,7 @@ if (MACOS OR LINUX)
               ckbmainbackgroundcolour.cpp
               ckbsettings.cpp
               ckbsettingswriter.cpp
+              ckbsystemquirks.cpp
               ckbupdater.cpp
               ckbupdaterwidget.cpp
               ckbversionnumber.cpp
@@ -173,6 +174,7 @@ if (MACOS OR LINUX)
               ckbmainbackgroundcolour.h
               ckbsettings.h
               ckbsettingswriter.h
+              ckbsystemquirks.h
               ckbsystemtrayicon.h
               ckbupdater.h
               ckbupdaterwidget.h

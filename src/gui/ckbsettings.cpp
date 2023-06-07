@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <ckbnextconfig.h>
+#include <QCoreApplication>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 #include <QRecursiveMutex>
@@ -63,7 +64,7 @@ static QSettings* globalSettings(){
             const quint16 currentSettingsVersion = _globalSettings->value("Program/SettingsVersion", 0).toInt();
             if(currentSettingsVersion < CKB_NEXT_SETTINGS_VER){
                 QString backupName = QString("ckb-next_backup_%1").arg(QDateTime::currentMSecsSinceEpoch() / 1000);
-                QSettings backupSettings(CkbSettings::Format, QSettings::UserScope, "ckb-next", backupName);
+                QSettings backupSettings(CkbSettings::Format, QSettings::UserScope, QCoreApplication::organizationName(), backupName);
                 qInfo() << "Backing up settings to" << backupSettings.fileName();
                 QStringList oldKeys = _globalSettings->allKeys();
                 for(const QString& key : oldKeys){
@@ -94,7 +95,7 @@ bool CkbSettings::isBusy(){
 void CkbSettings::migrateSettings(bool macFormat){
     QSettings* oldSettings;
     if(macFormat)
-        oldSettings = new QSettings(QSettings::NativeFormat, QSettings::UserScope, "ckb-next", "ckb-next");
+        oldSettings = new QSettings(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationName(), QCoreApplication::applicationName());
     else
         oldSettings = new QSettings("ckb", "ckb");
 

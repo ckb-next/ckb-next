@@ -14,6 +14,7 @@
 #include "keywidgetdebugger.h"
 #include <QSurfaceFormat>
 #include <iostream>
+#include "ckbsystemquirks.h"
 
 QSharedMemory appShare("ckb-next");
 
@@ -224,18 +225,44 @@ bool checkIfQtCreator(){
 }
 
 const char* DISPLAY = nullptr;
+const char* argv0 = nullptr;
 
-int main(int argc, char *argv[]){
-QSurfaceFormat fmt;
-fmt.setSamples(8);
-// HACK: Disable vsync so that the GUI thread isn't blocked when monitors enter power saving
-fmt.setSwapInterval(0);
-QSurfaceFormat::setDefaultFormat(fmt);
+int main(int argc, char* argv[]){
+    // Warning: The order of everything in main() is very fragile
+    // Please be very careful if shuffling things around
 
-QSettings::setDefaultFormat(CkbSettings::Format);
+    // First assign argv0 because we need it in CkbSystemQuirks
+    if(argc > 0)
+        argv0 = argv[0];
+
+    // Setup names and versions
+    // This needs to be done before the first QSettings is created
+    QCoreApplication::setOrganizationName("ckb-next");
+    QCoreApplication::setApplicationVersion(CKB_NEXT_VERSION_STR);
+    QCoreApplication::setApplicationName("ckb-next");
+
+    // Initialize a temporary QSettings very early to apply quirks before QApplication is created
+    QSettings::setDefaultFormat(CkbSettings::Format);
+    QSettings* tmpSettings = new QSettings();
+
+    // Apply OpenGL-related settings before QApplication
+    // Note: The settings are not exposed in the UI
+    QSurfaceFormat fmt;
+
+    int msaa = tmpSettings->value("Program/GL/MSAA", CkbSystemQuirks::getMaxMSAA()).toInt();
+    if(msaa >= 0 && msaa <= 16)
+        fmt.setSamples(msaa);
+
+    // HACK: Disable vsync so that the GUI thread isn't blocked when monitors enter power saving
+    const int swapInterval = tmpSettings->value("Program/GL/SwapInterval", 0).toInt();
+    if(swapInterval >= 0)
+        fmt.setSwapInterval(swapInterval);
+
+    QSurfaceFormat::setDefaultFormat(fmt);
 
 #ifdef Q_OS_LINUX
     // Get rid of "-session" before Qt parses the arguments
+    // Also store any value of -display
     for(int i = 1; i < argc; i++){
         QByteArray arg(argv[i]);
         if (arg.startsWith("--"))
@@ -252,7 +279,6 @@ QSettings::setDefaultFormat(CkbSettings::Format);
     }
 #endif
 
-    QSettings* tmpSettings = new QSettings(CkbSettings::Format, QSettings::UserScope, "ckb-next", "ckb-next");
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     // Explicitly request high dpi scaling if desired
     // Needs to be called before QApplication is constructed
@@ -283,11 +309,6 @@ QSettings::setDefaultFormat(CkbSettings::Format);
         // Only handle the downgrade here. The upgrade is handled in CkbSettings.
         tmpSettings->setValue("Program/SettingsVersion", CKB_NEXT_SETTINGS_VER);
     }
-
-    // Setup names and versions
-    QCoreApplication::setOrganizationName("ckb-next");
-    QCoreApplication::setApplicationVersion(CKB_NEXT_VERSION_STR);
-    QCoreApplication::setApplicationName("ckb-next");
 
     // Setup argument parser
     QCommandLineParser parser;
@@ -404,6 +425,7 @@ QSettings::setDefaultFormat(CkbSettings::Format);
         QThread::sleep(1);
 
     std::cout << "ckb-next " << CKB_NEXT_VERSION_STR << std::endl;
+    qDebug() << "Using" << CkbSystemQuirks::getGlVendor() << CkbSystemQuirks::getGlRenderer();
 
     MainWindow w(silent);
     if(!background)

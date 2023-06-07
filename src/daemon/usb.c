@@ -52,6 +52,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_K60_PRO_RGB_LP, },
     { V_CORSAIR, P_K60_PRO_RGB_SE, },
     { V_CORSAIR, P_K60_PRO_MONO, },
+    { V_CORSAIR, P_K60_PRO_TKL, },
     { V_CORSAIR, P_K63_NRGB, },
     { V_CORSAIR, P_K63_NRGB_WL, },
     { V_CORSAIR, P_K63_NRGB_WL2, },
@@ -205,6 +206,8 @@ const char* product_str(ushort product){
         return "k63_wireless";
     if(product == P_K60_PRO_RGB || product == P_K60_PRO_RGB_LP || product == P_K60_PRO_RGB_SE || product == P_K60_PRO_MONO)
         return "k60";
+    if(product == P_K60_PRO_TKL)
+        return "k60_tkl";
     if(product == P_K57_U || product == P_K57_D || product == P_K55_PRO_XT)
         return "k57_wireless";
     if(product == P_K55)

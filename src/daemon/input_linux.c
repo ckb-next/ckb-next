@@ -30,6 +30,10 @@ int uinputopen(struct uinput_user_dev* indev, int mouse){
         ioctl(fd, UI_SET_RELBIT, REL_Y);
         ioctl(fd, UI_SET_RELBIT, REL_WHEEL);
         ioctl(fd, UI_SET_RELBIT, REL_HWHEEL);
+#ifdef REL_WHEEL_HI_RES
+        ioctl(fd, UI_SET_RELBIT, REL_WHEEL_HI_RES);
+        ioctl(fd, UI_SET_RELBIT, REL_HWHEEL_HI_RES);
+#endif
     } else {
         // Enable common keyboard keys
         for(int i = KEY_ESC; i <= KEY_MEDIA; i++)
@@ -221,14 +225,26 @@ void os_mousescroll(usbdevice* kb, int x, int y){
         event.code = REL_HWHEEL;
         event.value = x;
         if(write(fd, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s", strerror(errno));
+            ckb_warn("uinput REL_HWHEEL failed: %s", strerror(errno));
+#ifdef REL_HWHEEL_HI_RES
+        event.code = REL_HWHEEL_HI_RES;
+        event.value = x * 120;
+        if(write(fd, &event, sizeof(event)) <= 0)
+            ckb_warn("uinput REL_HWHEEL_HI_RES failed: %s", strerror(errno));
+#endif
     }
 
     if(y){
         event.code = REL_WHEEL;
         event.value = y;
         if(write(fd, &event, sizeof(event)) <= 0)
-            ckb_warn("uinput write failed: %s", strerror(errno));
+            ckb_warn("uinput REL_WHEEL failed: %s", strerror(errno));
+#ifdef REL_WHEEL_HI_RES
+        event.code = REL_WHEEL_HI_RES;
+        event.value = y * 120;
+        if(write(fd, &event, sizeof(event)) <= 0)
+            ckb_warn("uinput REL_WHEEL_HI_RES failed: %s", strerror(errno));
+#endif
     }
 }
 

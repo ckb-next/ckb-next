@@ -87,6 +87,7 @@ public:
         K55PRO,
         DARKCORERGBPRO,
         K60_TKL,
+        BRAGI_DONGLE,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)
@@ -138,7 +139,7 @@ public:
     inline static bool  isHeadsetStand(Model model) { return model == ST100; }
     inline bool         isHeadsetStand() const      { return isHeadsetStand(keyModel); }
 
-    inline static bool hasLights(Model model)       { return !(model == M95 || model == K66); }
+    inline static bool hasLights(Model model)       { return !(model == M95 || model == K66 || model == BRAGI_DONGLE); }
     inline bool        hasLights() const            { return hasLights(keyModel); }
 
     // Creates a blank key map

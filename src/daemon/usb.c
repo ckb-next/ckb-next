@@ -123,6 +123,8 @@ const device_desc models[] = {
     { V_CORSAIR, P_POLARIS, },
     // Headset stands
     { V_CORSAIR, P_ST100, },
+    // Misc
+    { V_CORSAIR, P_GENERIC_BRAGI_DONGLE, },
 };
 
 const size_t N_MODELS = sizeof(models) / sizeof(device_desc);
@@ -255,6 +257,8 @@ const char* product_str(ushort product){
         return "darkcore";
     if(product == P_ST100)
         return "st100";
+    if(product == P_GENERIC_BRAGI_DONGLE)
+        return "bragi_dongle";
     return "";
 }
 

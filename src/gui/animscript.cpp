@@ -64,7 +64,7 @@ void AnimScript::scan(){
                 scripts[script->_info.guid] = script;
                 continue;
             }
-            if(!script->presets().count())
+            if(!script->presets().count() && !script->name().isEmpty())
                 qWarning() << script->name() << "has no default preset and will not be loaded.";
             delete script;
         }

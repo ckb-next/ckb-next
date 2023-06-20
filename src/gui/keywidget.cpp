@@ -57,10 +57,6 @@ KeyWidget::KeyWidget(QWidget* parent) :
     QOpenGLWidget(parent), mouseDownMode(NONE), _rgbMode(true), _monochrome(false), _aspectRatio(0.5), drawInfoScale(0.f), _debug(false)
 {
     setMouseTracking(true);
-    setAutoFillBackground(true);
-    QPalette p = palette();
-    p.setColor(QPalette::Window, CkbMainBackgroundColour::getColour());
-    setPalette(p);
 #ifdef FPS_COUNTER
     glFpsTimer.start();
     kbLoopElapsed = 0.0;
@@ -274,9 +270,14 @@ void KeyWidget::paintGL(){
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
     const KeyMap::Model model = keyMap.model();
     const KeyMap::Layout layout = keyMap.layout();
-    // Draw background
+
     painter.setPen(Qt::NoPen);
 
+    // Clear everything
+    painter.setBrush(QBrush(CkbMainBackgroundColour::getColour()));
+    painter.drawRect(rect());
+
+    // Draw background
     if(!_currentOverlayScaled.isNull()){
         // FIXME: Properly centre this instead of relying on a pre-set offset
         // The overlay has a resolution of 9px per keymap unit

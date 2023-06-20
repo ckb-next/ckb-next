@@ -26,8 +26,7 @@ public:
         QTabWidget* t = new QTabWidget(parent);
         t->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         t->setFixedSize(200, 200);
-        t->setAutoFillBackground(true);
-
+        t->addTab(new QWidget(), "");
         QPixmap p = t->grab();
         c = p.toImage().pixelColor(100, 180);
         delete t;

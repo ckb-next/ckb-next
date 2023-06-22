@@ -146,7 +146,8 @@ muteState getMuteState(const muteDevice muteDev){
         pa_context_connect(paContext, nullptr, PA_CONTEXT_NOAUTOSPAWN, nullptr);
     }
 
-    pa_mainloop_iterate(mainLoop, 0, nullptr);
+    for(int i = 0; i < 6 && pa_mainloop_iterate(mainLoop, 0, nullptr) > 0; i++);
+
     return mute_state(muteDev);
 }
 void deinitAudioSubsystem() {

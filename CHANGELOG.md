@@ -1,5 +1,40 @@
 # Change Log
 
+## [v0.6.0](https://github.com/ckb-next/ckb-next/tree/v0.6.0) (2023-06-23)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.5.0...v0.6.0)
+
+Support for new devices:
+- K55 RGB PRO
+- K55 RGB PRO XT
+- K60 PRO (Monochrome)
+- K60 PRO TKL RGB
+- Dark Core RGB Pro (experimental)
+- Dark Core RGB Pro SE (experimental)
+- Slipstream wireless dongle (when paired with a single supported device)
+
+Important bugfixes:
+- The <kbd>Fn</kbd> key now behaves as expected on the K65
+- The GUI now accepts macros containing the ISO backslash key
+- A workaround is now implemented to prevent the media keys on the Strafe from getting stuck pressed
+- The daemon no longer crashes with a `buffer overflow detected` message on start under certain conditions
+- The WinLock LED now functions on the K55 RGB and K55 RGB Pro XT
+- The GUI no longer crashes under certain conditions when the sound server is being restarted
+- The battery states are now reported correctly in the GUI
+- The brightness is now correctly set for newer devices (and the lights now turn off instantly)
+
+New features:
+- The device previews are now rendered using the GPU
+- Horizontal scrolling is now available for binding
+- The mute indicator can now indicate either the default output or input audio device
+- The music visualizer now supports automatic gain control, automatically adapting to volume changes
+- It is now possible to pair wireless devices with dongles (not in GUI yet)
+
+Notes for packagers:
+- There is a new binary `ckb-next-sinfo`. It is not optional and must be bundled with the GUI. It is not meant to be ran by the end user.
+- The explicit dependency to Xlib has been dropped. Only XCB is required
+- pulse-simple is no longer used. There is still a dependency on libpulse
+- Quazip (for Qt5) is no longer bundled and is required
+
 ## [v0.5.0](https://github.com/ckb-next/ckb-next/tree/v0.5.0) (2022-05-27)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.4.4...v0.5.0)
 

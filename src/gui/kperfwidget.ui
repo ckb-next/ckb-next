@@ -958,13 +958,6 @@
      </property>
     </widget>
    </item>
-   <item row="32" column="1" colspan="4">
-    <widget class="QPushButton" name="copyButton">
-     <property name="text">
-      <string>Copy performance settings to mode...</string>
-     </property>
-    </widget>
-   </item>
    <item row="21" column="7">
     <widget class="ColorButton" name="capsColorOff">
      <property name="sizePolicy">
@@ -1085,6 +1078,13 @@
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="32" column="1" colspan="10">
+    <widget class="QPushButton" name="copyButton">
+     <property name="text">
+      <string>Copy performance settings to mode...</string>
      </property>
     </widget>
    </item>

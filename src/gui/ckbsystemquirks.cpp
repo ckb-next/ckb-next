@@ -46,7 +46,7 @@ void CkbSystemQuirks::init() {
     QDir d = fi.dir();
 
     QProcess p;
-    p.start(d.filePath(utility));
+    p.start(d.filePath(utility), QStringList());
     // Note: On some UNIX operating systems, this function may return true
     // but the process may later report a QProcess::FailedToStart error.
     // ^ Applies to waitForFinished() too as it internally calls waitForStarted() in this scenario
@@ -54,7 +54,7 @@ void CkbSystemQuirks::init() {
 
     if(!started || p.error() == QProcess::FailedToStart) {
         d.setPath(CKB_NEXT_UTILITIES_PATH);
-        p.start(d.filePath(utility));
+        p.start(d.filePath(utility), QStringList());
         started = p.waitForFinished(5000);
     }
     if(!started || p.error() != QProcess::UnknownError || p.exitStatus() != QProcess::NormalExit ||

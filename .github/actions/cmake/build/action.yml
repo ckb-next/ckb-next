@@ -17,7 +17,8 @@ runs:
           -DFORCE_INIT_SYSTEM=systemd \
           -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX:-/usr} \
           -DSAFE_INSTALL=ON \
-          -DSAFE_UNINSTALL=ON
+          -DSAFE_UNINSTALL=ON \
+          -DWERROR=ON
       shell: bash --noprofile --norc -euxo pipefail {0}
 
     - name: Build

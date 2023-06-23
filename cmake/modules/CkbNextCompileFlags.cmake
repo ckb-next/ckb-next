@@ -87,6 +87,7 @@ if(WERROR)
     list(APPEND CKB_NEXT_EXTRA_C_FLAGS
         -Werror
         -Wno-error=cpp
+        -Wno-error=cast-align
     )
     list(APPEND CKB_NEXT_EXTRA_CXX_FLAGS
         -Werror

@@ -227,6 +227,9 @@ static inline void patchABNT2(QHash<QString, Key>& map){
 #define K95P_X_START     20
 #define K95P_WIDTH       (K95_WIDTH - K95P_X_START + 1)
 
+#define K100_HEIGHT      (K95P_HEIGHT + 6)
+#define K100_WIDTH       (K95P_WIDTH + 10)
+
 // K70 cuts off the G keys on the left, as well as MR/M1/M2/M3
 #define K70_X_START     38
 #define K70_WIDTH       (K95_WIDTH - K70_X_START)
@@ -238,6 +241,9 @@ static inline void patchABNT2(QHash<QString, Key>& map){
 // K65 additionally removes the numpad on the right, and has a different top row
 #define K65_WIDTH       209
 #define K65_HEIGHT      K70_HEIGHT
+
+#define K65_MINI_WIDTH  162
+#define K65_MINI_HEIGHT 48
 
 // K63 is the same as the K65 in terms of size
 #define K63_WIDTH       K65_WIDTH
@@ -419,10 +425,10 @@ static const Key M55Keys[] = {
 
 // K95 Platinum lightbar
 static const Key K95PLbar[] = {
-    {nullptr, nullptr, "topbar1", 4, -3, LBS, true, false}, {nullptr, nullptr, "topbar2", 19, -3, LBS, true, false}, {nullptr, nullptr, "topbar3", 34, -3, LBS, true, false}, {nullptr, nullptr, "topbar4", 49, -3, LBS, true, false}, {nullptr, nullptr, "topbar5", 64, -3, LBS, true, false}, {nullptr, nullptr, "topbar6", 79, -3, LBS, true, false},
-    {nullptr, nullptr, "topbar7", 94, -3, LBS, true, false}, {nullptr, nullptr, "topbar8", 109, -3, LBS, true, false}, {nullptr, nullptr, "topbar9", 124, -3, LBS, true, false}, {nullptr, nullptr, "topbar10", 139, -3, LBS, true, false}, {nullptr, nullptr, "topbar11", 154, -3, LBS, true, false}, {nullptr, nullptr, "topbar12", 169, -3, LBS, true, false},
-    {nullptr, nullptr, "topbar13", 184, -3, LBS, true, false}, {nullptr, nullptr, "topbar14", 199, -3, LBS, true, false}, {nullptr, nullptr, "topbar15", 214, -3, LBS, true, false}, {nullptr, nullptr, "topbar16", 229, -3, LBS, true, false}, {nullptr, nullptr, "topbar17", 244, -3, LBS, true, false}, {nullptr, nullptr, "topbar18", 259, -3, LBS, true, false},
-    {nullptr, nullptr, "topbar19", 274, -3, LBS, true, false},
+    {nullptr, "Top Light Bar 1", "topbar1", 4, -3, LBS, true, false}, {nullptr, "Top Light Bar 2", "topbar2", 19, -3, LBS, true, false}, {nullptr, "Top Light Bar 3", "topbar3", 34, -3, LBS, true, false}, {nullptr, "Top Light Bar 4", "topbar4", 49, -3, LBS, true, false}, {nullptr, "Top Light Bar 5", "topbar5", 64, -3, LBS, true, false}, {nullptr, "Top Light Bar 6", "topbar6", 79, -3, LBS, true, false},
+    {nullptr, "Top Light Bar 7", "topbar7", 94, -3, LBS, true, false}, {nullptr, "Top Light Bar 8", "topbar8", 109, -3, LBS, true, false}, {nullptr, "Top Light Bar 9", "topbar9", 124, -3, LBS, true, false}, {nullptr, "Top Light Bar 10", "topbar10", 139, -3, LBS, true, false}, {nullptr, "Top Light Bar 11", "topbar11", 154, -3, LBS, true, false}, {nullptr, "Top Light Bar 12", "topbar12", 169, -3, LBS, true, false},
+    {nullptr, "Top Light Bar 13", "topbar13", 184, -3, LBS, true, false}, {nullptr, "Top Light Bar 14", "topbar14", 199, -3, LBS, true, false}, {nullptr, "Top Light Bar 15", "topbar15", 214, -3, LBS, true, false}, {nullptr, "Top Light Bar 16", "topbar16", 229, -3, LBS, true, false}, {nullptr, "Top Light Bar 17", "topbar17", 244, -3, LBS, true, false}, {nullptr, "Top Light Bar 18", "topbar18", 259, -3, LBS, true, false},
+    {nullptr, "Top Light Bar 19", "topbar19", 274, -3, LBS, true, false},
 };
 #define LBARCOUNT_K95P (sizeof(K95PLbar) / sizeof(Key))
 
@@ -732,6 +738,82 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
         break;
     }
+    case KeyMap::K100:{
+        map = getMap(KeyMap::K95P, layout);
+        // Shift everything down except the existing topbar
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            if(!i.key().contains("topbar"))
+                i.value().y += (K100_HEIGHT - K95P_HEIGHT);
+
+             i.value().x += (K100_WIDTH - K95P_WIDTH)/2;
+        }
+        // Shrink the top lightbar and add the extra three items
+        for(int j = 0; j < 19; j++){
+            QString key = QString("topbar%1").arg(j + 1);
+            map[key].width = 15; // maybe 15
+            map[key].x -= j * 2 + 1;
+        }
+        map["topbar20"] = {nullptr, "Top Light Bar 20", "topbar20", 255, -3, 15, 6, true, false};
+        map["topbar21"] = {nullptr, "Top Light Bar 21", "topbar21", 268, -3, 15, 6, true, false};
+        map["topbar22"] = {nullptr, "Top Light Bar 22", "topbar22", 281, -3, 15, 6, true, false};
+
+        // Add the left and right bars
+        map["leftbar1"] = {nullptr, "Left Light Bar 1", "leftbar1", -2, -2, 6, 9, true, false};
+        map["leftbar2"] = {nullptr, "Left Light Bar 2", "leftbar2", -2, 7, 6, 9, true, false};
+        map["leftbar3"] = {nullptr, "Left Light Bar 3", "leftbar3", -2, 16, 6, 9, true, false};
+        map["leftbar4"] = {nullptr, "Left Light Bar 4", "leftbar4", -2, 25, 6, 9, true, false};
+        map["leftbar5"] = {nullptr, "Left Light Bar 5", "leftbar5", -2, 34, 6, 9, true, false};
+        map["leftbar6"] = {nullptr, "Left Light Bar 6", "leftbar6", -2, 43, 6, 9, true, false};
+        map["leftbar7"] = {nullptr, "Left Light Bar 7", "leftbar7", -2, 52, 6, 9, true, false};
+        map["leftbar8"] = {nullptr, "Left Light Bar 8", "leftbar8", -2, 61, 6, 9, true, false};
+        map["leftbar9"] = {nullptr, "Left Light Bar 9", "leftbar9", -2, 70, 6, 9, true, false};
+        map["leftbar10"] = {nullptr, "Left Light Bar 10", "leftbar10", -2, 79, 6, 9, true, false};
+        map["leftbar11"] = {nullptr, "Left Light Bar 11", "leftbar11", -2, 88, 6, 9, true, false};
+
+        map["rightbar1"] = {nullptr, "Right Light Bar 1", "rightbar1", 292, -2, 6, 9, true, false};
+        map["rightbar2"] = {nullptr, "Right Light Bar 2", "rightbar2", 292, 7, 6, 9, true, false};
+        map["rightbar3"] = {nullptr, "Right Light Bar 3", "rightbar3", 292, 16, 6, 9, true, false};
+        map["rightbar4"] = {nullptr, "Right Light Bar 4", "rightbar4", 292, 25, 6, 9, true, false};
+        map["rightbar5"] = {nullptr, "Right Light Bar 5", "rightbar5", 292, 34, 6, 9, true, false};
+        map["rightbar6"] = {nullptr, "Right Light Bar 6", "rightbar6", 292, 43, 6, 9, true, false};
+        map["rightbar7"] = {nullptr, "Right Light Bar 7", "rightbar7", 292, 52, 6, 9, true, false};
+        map["rightbar8"] = {nullptr, "Right Light Bar 8", "rightbar8", 292, 61, 6, 9, true, false};
+        map["rightbar9"] = {nullptr, "Right Light Bar 9", "rightbar9", 292, 70, 6, 9, true, false};
+        map["rightbar10"] = {nullptr, "Right Light Bar 10", "rightbar10", 292, 79, 6, 9, true, false};
+        map["rightbar11"] = {nullptr, "Right Light Bar 11", "rightbar11", 292, 88, 6, 9, true, false};
+
+        map["ctrlwheelb"] = map["light"];
+        map["ctrlwheelb"].name = "ctrlwheelb";
+        map["ctrlwheelb"]._friendlyName = "Control Wheel Button";
+        map["ctrlwheelb"].height = map["ctrlwheelb"].width;
+        map["ctrlwheelb"].y -= 3;
+
+        map["profswitch"].height += 1;
+        map["lock"].height = map["mute"].height = map["profswitch"].height;
+        map["mute"].y = map["profswitch"].y = map["lock"].y = map["ctrlwheelb"].y;
+        map["volup"].y = map["ctrlwheelb"].y - 2;
+        map["voldn"].y = map["ctrlwheelb"].y + 2;
+        map["profswitch"].x -= 1;
+        map["lock"].x += 1;
+
+        map["ctrlwheel1"] = {nullptr, "Control Wheel 22.5°",  "ctrlwheel1", 60+2, 10, 8, 6, true, false};
+        map["ctrlwheel2"] = {nullptr, "Control Wheel 67.5°",  "ctrlwheel2", 60+3, 10+1, 5, 8, true, false};
+        map["ctrlwheel3"] = {nullptr, "Control Wheel 112.5°", "ctrlwheel3", 60+3, 10+2, 5, 8, true, false};
+        map["ctrlwheel4"] = {nullptr, "Control Wheel 157.5°", "ctrlwheel4", 60+2, 10+3, 8, 6, true, false};
+        map["ctrlwheel5"] = {nullptr, "Control Wheel 202.5°", "ctrlwheel5", 60+1, 10+3, 8, 6, true, false};
+        map["ctrlwheel6"] = {nullptr, "Control Wheel 247.5°", "ctrlwheel6", 60, 10+2, 5, 8, true, false};
+        map["ctrlwheel7"] = {nullptr, "Control Wheel 292.5°", "ctrlwheel7", 60, 10+1, 5, 8, true, false};
+        map["ctrlwheel8"] = {nullptr, "Control Wheel 337.5°", "ctrlwheel8", 60+1, 10, 8, 6, true, false};
+
+        map["logoleft"] = {nullptr, "Logo Left", "logoleft", 134, 10, 10, 10, true, false};
+        map["logo"] = {nullptr, "Logo", "logo", 144, 10, 10, 10, true, false};
+        map["logoright"] = {nullptr, "Logo Right", "logoright", 154, 10, 10, 10, true, false};
+
+        map.remove("light");
+        break;
+    }
     case KeyMap::K70:{
         // The K70 maps are based on the K95 maps. However all the keys are shifted left and the G keys are removed
         map = getMap(KeyMap::K95, layout);
@@ -826,6 +908,26 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["fn"].x -= 12;
 
         // Done!
+        break;
+    }
+    case KeyMap::K65_MINI:{
+        map = getMap(KeyMap::K65, layout);
+
+        // Move Esc so that it doesn't get deleted
+        map["esc"].y += 13;
+        map.remove("grave");
+
+        // Remove the whole top bar and shift everything up
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+
+            if((i.value().y -= 27) < 0)
+                i.remove();
+            else if((i.value().x -= 3) > K65_MINI_WIDTH + 2)
+                i.remove();
+        }
+
         break;
     }
     case KeyMap::K63:{
@@ -1510,6 +1612,10 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K55PRO;
     if(lower == "bragi_dongle")
         return BRAGI_DONGLE;
+    if(lower == "k100")
+        return K100;
+    if(lower == "k65_mini")
+        return K65_MINI;
     return NO_MODEL;
 }
 
@@ -1587,6 +1693,10 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "glaivepro";
     case BRAGI_DONGLE:
         return "bragi_dongle";
+    case K100:
+        return "k100";
+    case K65_MINI:
+        return "k65_mini";
     default:
         return "";
     }
@@ -1610,6 +1720,8 @@ int KeyMap::modelWidth(Model model){
         return K63_WIDTH;
     case K65:
         return K65_WIDTH;
+    case K65_MINI:
+        return K65_MINI_WIDTH;
     case K66:
     case K68:
         return K68_WIDTH;
@@ -1625,6 +1737,8 @@ int KeyMap::modelWidth(Model model){
     case K55:
     case K57_WL:
         return K95P_WIDTH;
+    case K100:
+        return K100_WIDTH;
     case STRAFE:
     case STRAFE_MK2:
         return KSTRAFE_WIDTH;
@@ -1673,10 +1787,14 @@ int KeyMap::modelHeight(Model model){
         return K95_HEIGHT;
     case K95P:
         return K95P_HEIGHT;
+    case K100:
+        return K100_HEIGHT;
     case K60:
         return K60_HEIGHT;
     case K60_TKL:
         return K60_TKL_HEIGHT;
+    case K65_MINI:
+        return K65_MINI_HEIGHT;
     case M55:
     case M65:
     case M65E:

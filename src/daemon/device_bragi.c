@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include "command.h"
 #include "device.h"
 #include "devnode.h"
@@ -8,6 +9,7 @@
 #include "bragi_proto.h"
 #include "bragi_common.h"
 #include "utils.h"
+#include "led.h"
 
 // CUE polls devices every 52 seconds
 const struct timespec bragi_poll_delay = { .tv_sec = 50 };
@@ -34,8 +36,10 @@ void* bragi_poll_thread(void* ctx){
 }
 
 static int setactive_bragi(usbdevice* kb, int active){
-    if(active == BRAGI_MODE_HARDWARE)
+    if(active == BRAGI_MODE_HARDWARE){
         bragi_close_handle(kb, BRAGI_LIGHTING_HANDLE);
+        bragi_close_handle(kb, BRAGI_2ND_LIGHTING_HANDLE);
+    }
 
     const int ckb_id = INDEX_OF(kb, keyboard);
     if(bragi_set_property(kb, BRAGI_MODE, active)){
@@ -86,9 +90,51 @@ static int setactive_bragi(usbdevice* kb, int active){
     // Check if the device returned an error
     // Non fatal for now. Should first figure out what the error codes mean.
     // Device returns 0x03 on writes if we haven't opened the handle.
-    if(light)
-        ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, (uchar)light);
+    if(light == 0x01) {
+        // A K100 has been observed to return 0x01, so it probably means "not supported"
+        // If we get that response, we instead try to open the alt rgb lighting resource
+        ckb_warn("ckb%d: Bragi light init returned not supported", ckb_id);
+        light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, BRAGI_RES_ALT_LIGHTING);
+        if(light < 0)
+            return light;
 
+        if(light) {
+            ckb_err("ckb%d: Bragi alt light init returned error 0x%hhx", ckb_id, (uchar)light);
+        } else {
+            // Swap the RGB function if we're using alt lighting
+            kb->vtable.updatergb = updatergb_keyboard_bragi_alt;
+
+            // Open the second lighting handle
+            // We don't yet know if this is K100 specific or if it has to be opened along with the alt one
+            light = bragi_open_handle(kb, BRAGI_2ND_LIGHTING_HANDLE, BRAGI_RES_LIGHTING_EXTRA);
+            if(light < 0)
+                return light;
+
+            if(light){
+                ckb_err("ckb%d: Bragi extra light init returned error 0x%hhx", ckb_id, (uchar)light);
+            } else {
+                // FIXME: Figure out what this is. It is definitely lighting related.
+                // It has been observed to break lighting on specific keys (such has the '3' key)
+                // but only on a specific K100 (fw 0.32.6, bld 0.10.45)
+                // It remains commented out for now
+                /*uchar pkt2[BRAGI_JUMBO_SIZE] = {
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // header
+                    0x1b, 0x00, 0x20, 0xe7, 0xca, 0x2f, 0x88, 0x9f, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
+                    0x00, 0x01, 0x00, 0x0d, 0x00, 0x01, 0x01, 0x00, 0x04, 0x00, 0x00, 0x08, 0x06, 0x02, 0x48, 0x00,
+                    0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x01, 0x00, 0x00, 0x00, 0xff, 0x02, 0x00,
+                    0x00, 0x00, 0xff, 0x72, 0x00, 0x00, 0x00, 0xff, 0x80, 0x00, 0x00, 0x00, 0xff, 0x89, 0x00, 0x00,
+                    0x00, 0xff, 0xb6, 0x00, 0x00, 0x00, 0xff, 0xb7, 0x00, 0x00, 0x00, 0xff, 0xb8, 0x00, 0x00, 0x00,
+                    0xff, 0xb9, 0x00, 0x00, 0x00, 0xff, 0xba, 0x00, 0x00, 0x00, 0xff, 0xbb, 0x00, 0x00, 0x00, 0xff,
+                    0xbc, 0x00, 0x00, 0x00, 0xff, 0xbd, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                };
+
+                if(bragi_write_to_handle(kb, pkt2, BRAGI_2ND_LIGHTING_HANDLE, sizeof(pkt2), 0x48))
+                    return 1;*/
+            }
+        }
+    } else if(light) {
+        ckb_err("ckb%d: Bragi light init returned error 0x%hhx", ckb_id, (uchar)light);
+    }
     return 0;
 }
 

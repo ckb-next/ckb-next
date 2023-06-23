@@ -88,6 +88,8 @@ public:
         DARKCORERGBPRO,
         K60_TKL,
         BRAGI_DONGLE,
+        K100,
+        K65_MINI,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

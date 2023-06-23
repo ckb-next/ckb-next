@@ -26,7 +26,7 @@ jobs:
           - 'ubuntu:22.04'
           - 'ubuntu:rolling'
         build_type:
-          - Release
+          - Debug
         compiler:
           - GNU
       fail-fast: false

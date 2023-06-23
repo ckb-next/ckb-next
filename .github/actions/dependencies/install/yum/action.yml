@@ -20,6 +20,13 @@ runs:
       shell: bash --noprofile --norc -euxo pipefail {0}
       if: matrix.image == 'almalinux:8' || matrix.image == 'rockylinux:8'
 
+    - name: Enable CRB repository (AlmaLinux 9/Rocky Linux 9)
+      run: |
+        dnf --assumeyes --skip-broken install "dnf-command(config-manager)"
+        dnf config-manager --set-enabled crb
+      shell: bash --noprofile --norc -euxo pipefail {0}
+      if: matrix.image == 'almalinux:9' || matrix.image == 'rockylinux:9'
+
     - name: Enable EPEL repository (Amazon Linux 2)
       run: amazon-linux-extras install epel -y
       shell: bash --noprofile --norc -euxo pipefail {0}

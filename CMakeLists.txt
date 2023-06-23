@@ -121,6 +121,7 @@ option(DEBUG_MUTEX     "Show debugging information regarding thread synchronisat
 option(NO_FAIR_MUTEX_QUEUEING "Disable fair mutex queueing. Debugging only." OFF)
 option(DEBUG_INPUT_SYNC "Print a debug message every time an event bundle is delivered to the OS." OFF)
 option(FPS_COUNTER     "Enable FPS counters." OFF)
+option(WERROR     "Enable Werror (for CI)" OFF)
 
 # Make sure NO_FAIR_MUTEX_QUEUEING is set if TSAN is enabled
 # Otherwise you end up with threading issues that are not detected

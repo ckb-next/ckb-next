@@ -90,6 +90,7 @@ public:
         BRAGI_DONGLE,
         K100,
         K65_MINI,
+        K70_TKL,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

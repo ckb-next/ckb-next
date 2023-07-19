@@ -90,9 +90,9 @@ static int setactive_bragi(usbdevice* kb, int active){
     // Check if the device returned an error
     // Non fatal for now. Should first figure out what the error codes mean.
     // Device returns 0x03 on writes if we haven't opened the handle.
-    if(light == 0x01) {
-        // A K100 has been observed to return 0x01, so it probably means "not supported"
-        // If we get that response, we instead try to open the alt rgb lighting resource
+    if(light == 0x01 || light == 0x06) {
+        // Some K100s have been observed to return either 0x01 or 0x06 which probably means "not supported"
+        // If we get either response, we instead try to open the alt rgb lighting resource
         ckb_warn("ckb%d: Bragi light init returned not supported", ckb_id);
         light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, BRAGI_RES_ALT_LIGHTING);
         if(light < 0)

@@ -30,6 +30,7 @@
 cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 
 project(ckb-next LANGUAGES C CXX)
+include(CTest)
 include(VERSION.cmake)
 # Because cmakedefine does not like dashes...
 set(ckb_next_VERSION_IS_RELEASE ${ckb-next_VERSION_IS_RELEASE})

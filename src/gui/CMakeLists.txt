@@ -668,3 +668,5 @@ if (MACOS)
     include(DeployQt5)
     install_qt5_executable("ckb-next.app" "${plugins}" "" "${dirs}" "")
 endif ()
+
+add_subdirectory(tests)

@@ -295,6 +295,9 @@ void KeyWidget::bindMap(const BindMap& newBindMap){
 }
 
 void KeyWidget::paintGL(){
+    // Don't bother painting anything if the scale is 0
+    if(drawInfoScale <= 0.f)
+        return;
     // Determine which keys to highlight
     QBitArray highlight;
     switch(mouseDownMode){

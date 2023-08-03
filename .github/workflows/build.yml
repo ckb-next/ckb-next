@@ -66,6 +66,10 @@ jobs:
         run: |
           ckb-next-daemon --help
 
+      - name: Run tests
+        run: |
+          CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test
+
       - name: Package `ckb-next`
         uses: ./.github/actions/cmake/package
 

@@ -25,4 +25,5 @@ runs:
       run: |
         export CMAKE_BUILD_PARALLEL_LEVEL=${BUILD_PARALLEL_LEVEL:-$(nproc)}
         cmake --build build
+        cmake --build build --target build_tests
       shell: bash --noprofile --norc -euxo pipefail {0}

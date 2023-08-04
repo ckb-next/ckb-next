@@ -14,7 +14,8 @@ void checkForICCMessages(QtMsgType type, const QMessageLogContext& context, cons
 
 void TestQImageICC::initTestCase()
 {
-    QLoggingCategory::setFilterRules("qt.gui.icc.warning=true");
+    QLoggingCategory::setFilterRules("qt.gui.icc.warning=true\n"
+                                    "qt.gui.icc.info=true");
     qInstallMessageHandler(checkForICCMessages);
 }
 

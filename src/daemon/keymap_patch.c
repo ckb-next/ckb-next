@@ -80,20 +80,6 @@ static const keypatch DCRGBPpatch[] = {
 };
 
 
-static const keypatch SCIMITARpatch[] = {
-        { 269, "mouse8",  LED_MOUSE + 2, KEY_NONE  }, // "bar1"
-        { 270, "mouse9",  LED_MOUSE + 1, KEY_NONE }, // "bar0"
-        { 271, "mouse10",    LED_MOUSE + 6, KEY_NONE }, // "logo"
-        { 272, "wheel",   LED_MOUSE + 0, KEY_NONE },
-        { 273, "mouse11",   LED_MOUSE + 5, KEY_NONE },
-        { 274, "mouse12",    LED_MOUSE + 7, KEY_NONE },
-        { 275, "mouse13",   LED_MOUSE + 11, KEY_NONE }, // sniper led
-        { 276, "mouse14",   LED_MOUSE + 8, KEY_NONE },
-        { 277, "mouse15",   LED_MOUSE + 9, KEY_NONE },
-        { 278, "mouse16",   LED_MOUSE +10, KEY_NONE },
-        { 279, "mouse17",    LED_MOUSE + 3, KEY_NONE }, // "bar2"
-        { 280, "mouse18",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
-};
 
 keypatch k100patch[] = {
     {114, "lock", 114, KEY_CORSAIR },

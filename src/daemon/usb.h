@@ -276,7 +276,7 @@ const char* product_str(ushort product);
 /// Used for devices which are connected via dongle instead of cable.
 #define IS_DONGLE(kb)                   ((kb)->product == P_DARK_CORE_WL || (kb)->product == P_DARK_CORE_SE_WL || (kb)->product == P_DARK_CORE_RGB_PRO_WL || (kb)->product == P_DARK_CORE_RGB_PRO_SE_WL || (kb)->product == P_IRONCLAW_W_D || (kb)->product == P_K63_NRGB_WL2 || (kb)->product == P_K63_NRGB_WL4 || (kb)->product == P_K57_D || (kb)->product == P_HARPOON_WL_D || (kb)->product == P_GENERIC_BRAGI_DONGLE || (kb)->product == P_SCIMITAR_ELITE_W_D)
 
-/// Used for devices that use a file-based hardware animation system. (kb)->product == P_IRONCLAW_W_U || (kb)->product == P_IRONCLAW_W_D ||
+/// Used for devices that use a file-based hardware animation system.
 #define USES_FILE_HWSAVE(kb)            ((kb)->product == P_K95_PLATINUM || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_GLAIVE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_K70_MK2LP || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_IRONCLAW || IS_K63_WL(kb) || IS_DARK_CORE_NXP(kb) || (kb)->product == P_IRONCLAW_W_U ||  (kb)->product == P_SCIMITAR_ELITE_W_U || (kb)->product == P_SCIMITAR_ELITE_W_D ||   (kb)->product == P_IRONCLAW_W_D || (kb)->product == P_NIGHTSWORD)
 
 /// Devices here support setting the pollrate through software

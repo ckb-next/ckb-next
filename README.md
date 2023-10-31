@@ -1,14 +1,21 @@
-# ckb-next: RGB Driver for Linux
+# ckb-next: Corsair Driver for Linux
 
 <a target="_blank" href="https://web.libera.chat/?channels=#ckb-next"><img src="https://img.shields.io/badge/%23irc-libera.chat-blue.svg" height="20" alt="irc.libera.chat #ckb-next" /></a>
+[![Chat on Matrix](https://matrix.to/img/matrix-badge.svg)](https://matrix.to/#/#ckb-next:matrix.org)
 
-**ckb-next** is an open-source driver for Corsair keyboards and mice. It aims to bring the features of Corsair's proprietary CUE software to Linux operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
+**ckb-next** is an open-source driver for Corsair devices. It aims to bring the features of Corsair's proprietary iCUE software to Linux operating systems. This project is currently a work in progress, but it already supports much of the same functionality, including full RGB animations. More features are coming soon. Testing and bug reports are appreciated!
 
-> __DISCLAIMER__: ckb-next is not an official Corsair product. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, but with NO WARRANTY of any kind.
+***Disclaimer:*** ckb-next is not an official Corsair product. It is not supported by, affiliated with, or endorsed by Corsair. It is licensed under the GNU General Public License (version 2) in the hope that it will be useful, WITHOUT ANY WARRANTY. See the
+GNU General Public License for more details.
+
+## Supported Devices
+| | | |
+| - | - | - |
+| [![Keyboards](https://img.shields.io/badge/Keyboards-2ea44f)](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#keyboards) | [![Mice](https://img.shields.io/badge/Mice-2ea44f)](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#mice) | [![Other Devices](https://img.shields.io/badge/Other_Devices-2ea44f)](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware#other-devices) | 
 
 ![Screenshot](https://i.imgur.com/zMK9jOP.png)
 
-Major features:
+## Major features:
 
 - Control multiple devices independently
 - United States and European keyboard layouts
@@ -16,33 +23,35 @@ Major features:
 - Per-key lighting and animation
 - Reactive lighting
 - Multiple profiles/modes with hardware save function
-- Adjustable mouse DPI with ability to change DPI on button press
+- Adjustable mouse DPI with the ability to change DPI on button press
 
-### Important information regarding macOS
-macOS is no longer officially supported. For more information, please refer to [issue #660](https://github.com/ckb-next/ckb-next/issues/660).
+## General information
 
-### General information
+You can find most of the information in the [ckb-next wiki pages](https://github.com/ckb-next/ckb-next/wiki)
 
-Most of the information can be found on [ckb-next wiki pages](https://github.com/ckb-next/ckb-next/wiki).
+### [Installation](https://github.com/ckb-next/ckb-next/wiki/Linux-Installation)
 
-[Supported devices](https://github.com/ckb-next/ckb-next/wiki/Supported-Hardware).
+### [Troubleshooting](https://github.com/ckb-next/ckb-next/wiki/Troubleshooting)
 
-[Linux Installation](https://github.com/ckb-next/ckb-next/wiki/Linux-Installation).
+### [Known Issues](https://github.com/ckb-next/ckb-next/wiki/Known-issues)
 
-[Troubleshooting](https://github.com/ckb-next/ckb-next/wiki/Troubleshooting).
+### [Community Pipe Animation Scripts](https://github.com/ckb-next/ckb-next/wiki/Community-Pipe-Scripts)
 
-[Known Issues](https://github.com/ckb-next/ckb-next/wiki/Known-issues).
+## Ask for Help
+Reach out on the IRC at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next) on or via [Matrix](https://matrix.to/#/#ckb-next:matrix.org)
 
-[Contributing](https://github.com/ckb-next/ckb-next/wiki/Contributing).
+As a last resort, submit a [help request](https://github.com/ckb-next/ckb-next/issues/new/choose) via an issue. 
 
-[Community Pipe Animation Scripts](https://github.com/ckb-next/ckb-next/wiki/Community-Pipe-Scripts).
+## Contribute
+Check out our [Contributing Guidelines](https://github.com/ckb-next/ckb-next/wiki/Contributing) before submitting new issues.
 
-### Contact
+### [Report a Bug](https://github.com/ckb-next/ckb-next/issues/new/choose) select "Bug Report"
 
-Maintainers reserve the rights to modify and remove issues, pull requests and comments therein, that are denunciating, off-topic, harmful, hateful and overall inappropriate.
-Please be appreciative, humble and kind to each other.
+### [Request an Enhancement](https://github.com/ckb-next/ckb-next/issues/new/choose) select "Feature Request"
 
-* IRC chat: `#ckb-next` channel at [irc.libera.chat](https://web.libera.chat/?channels=#ckb-next)
-* [Matrix](https://matrix.to/#/#ckb-next:matrix.org): `#ckb-next:matrix.org`
-* Mailing list: [ckb-next@googlegroups.com](https://groups.google.com/forum/#!forum/ckb-next)
-* [GitHub Issues](https://github.com/ckb-next/ckb-next/issues)
+### [Request a new Device](https://github.com/ckb-next/ckb-next/issues/new/choose) select "New Device Request."
+
+
+
+> Maintainers reserve the right to modify and remove issues, pull requests, and comments that are denunciating, off-topic, harmful, hateful, and inappropriate.
+Please be appreciative, humble, and kind to each other.

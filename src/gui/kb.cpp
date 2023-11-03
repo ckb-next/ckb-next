@@ -215,7 +215,7 @@ Kb::~Kb(){
 
     // Kill notification thread and remove node
     activeDevices.remove(this);
-    if(cmd.isOpen() && notifyNumber > 0){
+    if(QFile::exists(cmdpath) && cmd.isOpen() && notifyNumber > 0){
         cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
         // Manually flush so that the daemon closes the notify pipe and the thread can gracefully stop
         cmd.flush();

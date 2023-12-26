@@ -79,6 +79,8 @@ static const keypatch DCRGBPpatch[] = {
     { 268, "bar4",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
 };
 
+
+
 keypatch k100patch[] = {
     {114, "lock", 114, KEY_CORSAIR },
 };
@@ -99,6 +101,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_M55_RGB_PRO,  m55patch),
     ADD_PATCH(V_CORSAIR, P_M95,          m95patch),
     ADD_PATCH(V_CORSAIR, P_IRONCLAW_W_U, icwpatch),
+   //ADD_PATCH(V_CORSAIR, P_SCIMITAR_ELITE_W_U, DCRGBPpatch),
     ADD_PATCH(V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch),
     ADD_PATCH(V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch),
     ADD_PATCH(V_CORSAIR, P_KATAR_PRO,    katarproxtpatch),

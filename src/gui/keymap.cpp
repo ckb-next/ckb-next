@@ -392,8 +392,8 @@ static const Key ScimKeys[] = {
         {nullptr,  "Thumb light", "thumb", 7, 21, 10, 24, true, false},
         {nullptr,  "1", "#230", -6, 18, 7, 7, false, true}, {nullptr,  "2", "#231", 1, 18, 7, 7, false, true}, {nullptr,  "3", "#233", 8, 18, 7, 7, false, true},
         {nullptr,  "4", "#234", -6, 25, 7, 7, false, true}, {nullptr,  "5", "#232", 1, 25, 7, 7, false, true}, {nullptr,  "6", "#235", 8, 25, 7, 7, false, true},
-        {nullptr,  "7", "#237", -6, 32, 7, 7, false, true}, {nullptr,  "8", "#248", 1, 32, 7, 7, false, true}, {nullptr,  "9", "#239", 8, 32, 7, 7, false, true},
-        {nullptr,  "10", "#240", -6, 39, 7, 7, false, true}, {nullptr,  "11", "#241", 1, 39, 7, 7, false, true}, {nullptr,  "12", "thumb12", 8, 39, 7, 7, false, true},
+        {nullptr,  "7", "#236", -6, 32, 7, 7, false, true}, {nullptr,  "8", "#237", 1, 32, 7, 7, false, true}, {nullptr,  "9", "#238", 8, 32, 7, 7, false, true},
+        {nullptr,  "10", "#239", -6, 39, 7, 7, false, true}, {nullptr,  "11", "#240", 1, 39, 7, 7, false, true}, {nullptr,  "12", "thumb12", 8, 39, 7, 7, false, true},
         {nullptr,  "Logo", "back", 26, 50, 16, 16, true, false}
 };
 #define KEYCOUNT_SCIM   (sizeof(ScimKeys) / sizeof(Key))

@@ -163,6 +163,14 @@ void XWindowDetector::run()
     int preferred_screen = 0;
     // XCB
     xcb_connection_t* conn = xcb_connect(DISPLAY, &preferred_screen);
+    int xcb_err = xcb_connection_has_error(conn);
+    if(xcb_err)
+    {
+        qDebug() << "XCB connect error code:" << xcb_err;
+        xcb_disconnect(conn);
+        return;
+    }
+
     xcb_screen_t* scr = getPreferredScreen(conn, preferred_screen);
 
     // EWMH

@@ -9,7 +9,7 @@ if [[ -z "$LC_ALL" && -z "$LANG" ]]; then
 else
 	# don't let LC_ALL to be set because it always overrides all LC_*,
 	# while LANG only sets LC_* once
-	if [[ ! -z "$LC_ALL" ]]; then
+	if [[ -n "$LC_ALL" ]]; then
 		export LC_ALL=
 	fi
 fi
@@ -29,7 +29,7 @@ function checkfail {
     if [[ $1 -ne 0 ]]; then
         echo "An error occurred,"
         echo "press enter to exit."
-        read -rs dummy
+        read -rs
         exit "$1"
     fi
 }

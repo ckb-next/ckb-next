@@ -1065,6 +1065,7 @@ const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
     0x0D,
     0x0E,
     0x0F,
+
 };
 
 // DPI cycle/up and forwards are just swapped compared to corsair_bragi_lut

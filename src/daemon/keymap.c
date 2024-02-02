@@ -1032,7 +1032,7 @@ void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urb
     kbinput->whl_rel_y = (signed char)urbinput[6];
 }
 
-#define BRAGI_MOUSE_BUTTONS 16
+#define BRAGI_MOUSE_BUTTONS 17
 #define BRAGI_ONE_BYTE_MOUSE_BUTTONS 8
 /*
 01 00 == Left
@@ -1049,23 +1049,23 @@ void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urb
 
 // We have to do it this way, because if we patch the keymap, then we'll break standard input
 const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
-    0x00,
-    0x01,
-    0x02,
-    0x04,
-    0x03,
-    0x05,
-    0x06,
-    0x08,
-    0x09,
-    0x07, // Anything past this is untested
-    0x0A,
-    0x0B,
-    0x0C,
-    0x0D,
-    0x0E,
-    0x0F,
-
+        0x00,
+        0x01,
+        0x02,
+        0x04,
+        0x03,
+        0x05,
+        0x06,
+        0x08,
+        0x09,
+        0x07, // Anything past this is untested
+        0x0A,
+        0x0B,
+        0x0C,
+        0x0D,
+        0x0E,
+        0x0F,
+        0x10,
 };
 
 // DPI cycle/up and forwards are just swapped compared to corsair_bragi_lut
@@ -1101,7 +1101,7 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
 
     // Some devices only have one byte, so set those to 8 buttons
     // We need a better way to identify this
-    if(kb->vendor == V_CORSAIR && (kb->product == P_M55_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U || kb->product == P_DARK_CORE_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_WL || kb->product == P_SCIMITAR_ELITE_W_U || kb->product == P_SCIMITAR_ELITE_W_D))
+    if(kb->vendor == V_CORSAIR && (kb->product == P_M55_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U || kb->product == P_DARK_CORE_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_WL))
         buttons = BRAGI_ONE_BYTE_MOUSE_BUTTONS;
 
     // Pick the appropriate LUT. We can't patch the keymap as that will break standard HID input.

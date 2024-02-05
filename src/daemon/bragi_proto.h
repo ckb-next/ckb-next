@@ -24,6 +24,7 @@
 #define BRAGI_RADIO_BLD_VER 0x16
 #define BRAGI_DPI_INDEX     0x1E
 #define BRAGI_DPI_MASK      0x1F
+#define BRAGI_DPI_XY        0x20
 #define BRAGI_DPI_X         0x21
 #define BRAGI_DPI_Y         0x22
 #define BRAGI_DPI0_COLOR    0x2F

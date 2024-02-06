@@ -102,7 +102,8 @@ static const keypatch SCIMITARpatch[] = {
         { 277, "thumb6",   9, SCAN_MOUSE },
         { 278, "thumb7",   10, SCAN_MOUSE }, // "bar2"
         { 279, "thumb8",11, SCAN_MOUSE }, // "bar3"
-        { 280, "sniper",12, SCAN_MOUSE }, // "bar3"
+        { 280, "thumb9",12, SCAN_MOUSE }, // "bar3"
+        { 281, "sniper",13, SCAN_MOUSE }, // "bar3"
 };
 
 

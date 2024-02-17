@@ -1,9 +1,18 @@
 #include "ckbsettingswriter.h"
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#include <QRecursiveMutex>
+#else
 #include <QMutex>
+#endif
 
 // Mirror ckbsettings.cpp
 extern QAtomicInt cacheWritesInProgress;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+extern QRecursiveMutex settingsMutex, settingsCacheMutex;
+#else
 extern QMutex settingsMutex, settingsCacheMutex;
+#endif
 #define lockMutex           QMutexLocker locker(backing == _globalSettings ? &mutex : 0)
 #define lockMutexStatic     QMutexLocker locker(&settingsMutex)
 #define lockMutexStatic2    QMutexLocker locker2(&settingsMutex)

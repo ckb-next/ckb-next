@@ -67,6 +67,7 @@ public:
         GLAIVE,
         KATAR,
         POLARIS,
+        MM700,
         ST100,
         K70MK2,
         STRAFE_MK2,
@@ -137,7 +138,7 @@ public:
     inline bool         isKeyboard() const          { return isKeyboard(keyModel); }
     inline static bool  isMouse(Model model)        { return model == M55 || model == M65 || model == SABRE || model == SCIMITAR || model == HARPOON || model == GLAIVE || model == KATAR || model == KATARPROXT || model == M65E || model == M95 || model == IRONCLAW || model == NIGHTSWORD || model == DARKCORE || model == DARKCORERGBPRO || model == IRONCLAW_W || model == GLAIVEPRO; }
     inline bool         isMouse() const             { return isMouse(keyModel); }
-    inline static bool  isMousepad(Model model)     { return model == POLARIS; }
+    inline static bool  isMousepad(Model model)     { return model == POLARIS || model == MM700; }
     inline bool         isMousepad() const          { return isMousepad(keyModel); }
     inline static bool  isHeadsetStand(Model model) { return model == ST100; }
     inline bool         isHeadsetStand() const      { return isHeadsetStand(keyModel); }

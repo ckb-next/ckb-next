@@ -215,6 +215,7 @@ Kb::~Kb(){
 
     // Kill notification thread and remove node
     activeDevices.remove(this);
+    // FIXME: https://github.com/ckb-next/ckb-next/pull/1011
     if(QFile::exists(cmdpath) && cmd.isOpen() && notifyNumber > 0){
         cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
         // Manually flush so that the daemon closes the notify pipe and the thread can gracefully stop
@@ -869,7 +870,7 @@ void Kb::setCurrentProfile(KbProfile* profile){
 void Kb::setCurrentMode(KbMode* mode){
     _currentProfile->currentMode(_currentMode = mode);
     _needsSave = true;
-    
+
     if(features.contains("battery") && this->currentPerf())
         connect(this, &Kb::batteryChangedLed, this->currentPerf(), &KbPerf::setBattery);
     emit modeChanged();

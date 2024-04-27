@@ -341,6 +341,8 @@ elseif (LINUX)
                   kstatusnotifier/kstatusnotifieritemdbus_p.h
                   kstatusnotifier/kstatusnotifieritem.h
                   kstatusnotifier/kstatusnotifieritemprivate_p.h
+                  kstatusnotifier/debug_p.h
+                  kstatusnotifier/config-kstatusnotifieritem.h
                   ckbsystemtrayicon.cpp
                   ${statusNotifierAutogen})
     endif()

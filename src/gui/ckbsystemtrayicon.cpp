@@ -16,6 +16,8 @@ CkbSystemTrayIcon::CkbSystemTrayIcon(const QIcon& icon, const QString iconName, 
 
         emit scrollRequested(data);
     });
+    // KDE added extra tray options but ckb-next already has them, so turn them off.
+    KStatusNotifierItem::setStandardActionsEnabled(false);
 }
 
 // Not all implementations support passing icons by pixmap

@@ -1,37 +1,35 @@
-/* This file is part of the KDE libraries
-   Copyright 2009 by Marco Martin <notmart@gmail.com>
+/*
+    This file is part of the KDE libraries
+    SPDX-FileCopyrightText: 2009 Marco Martin <notmart@gmail.com>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License (LGPL) as published by the Free Software Foundation;
-   either version 2 of the License, or (at your option) any later
-   version.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+    SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
 #include "kstatusnotifieritemdbus_p.h"
-#include "kstatusnotifieritemprivate_p.h"
+#include "debug_p.h"
 #include "kstatusnotifieritem.h"
+#include "kstatusnotifieritemprivate_p.h"
 
-#include <QDBusConnection>
 #include <QMenu>
 
+//#include <kwindowsystem.h>
+
 #include "statusnotifierwatcher_interface.h"
+
 #include "statusnotifieritemadaptor.h"
 
+#ifdef Q_OS_WIN64
+__inline int toInt(WId wid)
+{
+    return (int)((__int64)wid);
+}
+
+#else
 __inline int toInt(WId wid)
 {
     return (int)wid;
 }
+#endif
 
 // Marshall the ImageStruct data into a D-BUS argument
 const QDBusArgument &operator<<(QDBusArgument &argument, const KDbusImageStruct &icon)
@@ -130,16 +128,15 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, KDbusToolTipStruc
 int KStatusNotifierItemDBus::s_serviceCount = 0;
 
 KStatusNotifierItemDBus::KStatusNotifierItemDBus(KStatusNotifierItem *parent)
-    : QObject(parent),
-      m_statusNotifierItem(parent),
-      m_connId(QStringLiteral("org.kde.StatusNotifierItem-%1-%2")
-                .arg(QCoreApplication::applicationPid())
-                .arg(++s_serviceCount)),
-      m_dbus(QDBusConnection(m_connId))
+    : QObject(parent)
+    , m_statusNotifierItem(parent)
+    , m_connId(QStringLiteral("org.kde.StatusNotifierItem-%1-%2").arg(QCoreApplication::applicationPid()).arg(++s_serviceCount))
+    , m_dbus(QDBusConnection(m_connId))
 {
     m_dbus = QDBusConnection::connectToBus(QDBusConnection::SessionBus, m_connId);
 
     new StatusNotifierItemAdaptor(this);
+    qCDebug(LOG_KSTATUSNOTIFIERITEM) << "service is" << m_connId;
     m_dbus.registerObject(QStringLiteral("/StatusNotifierItem"), this);
 }
 
@@ -164,11 +161,13 @@ bool KStatusNotifierItemDBus::ItemIsMenu() const
     return (m_statusNotifierItem->d->associatedWidget == m_statusNotifierItem->d->menu);
 }
 
-//DBUS slots
+// DBUS slots
 
 QString KStatusNotifierItemDBus::Category() const
 {
-    return QLatin1String(m_statusNotifierItem->metaObject()->enumerator(m_statusNotifierItem->metaObject()->indexOfEnumerator("ItemCategory")).valueToKey(m_statusNotifierItem->category()));
+    return QLatin1String(m_statusNotifierItem->metaObject()
+                             ->enumerator(m_statusNotifierItem->metaObject()->indexOfEnumerator("ItemCategory"))
+                             .valueToKey(m_statusNotifierItem->category()));
 }
 
 QString KStatusNotifierItemDBus::Title() const
@@ -183,7 +182,9 @@ QString KStatusNotifierItemDBus::Id() const
 
 QString KStatusNotifierItemDBus::Status() const
 {
-    return QLatin1String(m_statusNotifierItem->metaObject()->enumerator(m_statusNotifierItem->metaObject()->indexOfEnumerator("ItemStatus")).valueToKey(m_statusNotifierItem->status()));
+    return QLatin1String(m_statusNotifierItem->metaObject()
+                             ->enumerator(m_statusNotifierItem->metaObject()->indexOfEnumerator("ItemStatus"))
+                             .valueToKey(m_statusNotifierItem->status()));
 }
 
 int KStatusNotifierItemDBus::WindowId() const
@@ -195,7 +196,7 @@ int KStatusNotifierItemDBus::WindowId() const
     }
 }
 
-//Icon
+// Icon
 
 QString KStatusNotifierItemDBus::IconName() const
 {
@@ -217,7 +218,7 @@ KDbusImageVector KStatusNotifierItemDBus::OverlayIconPixmap() const
     return m_statusNotifierItem->d->serializedOverlayIcon;
 }
 
-//Requesting attention icon and movie
+// Requesting attention icon and movie
 
 QString KStatusNotifierItemDBus::AttentionIconName() const
 {
@@ -234,7 +235,7 @@ QString KStatusNotifierItemDBus::AttentionMovieName() const
     return m_statusNotifierItem->d->movieName;
 }
 
-//ToolTip
+// ToolTip
 
 KDbusToolTipStruct KStatusNotifierItemDBus::ToolTip() const
 {
@@ -252,13 +253,13 @@ QString KStatusNotifierItemDBus::IconThemePath() const
     return m_statusNotifierItem->d->iconThemePath;
 }
 
-//Menu
+// Menu
 QDBusObjectPath KStatusNotifierItemDBus::Menu() const
 {
     return QDBusObjectPath(m_statusNotifierItem->d->menuObjectPath);
 }
 
-//Interaction
+// Interaction
 
 void KStatusNotifierItemDBus::ContextMenu(int x, int y)
 {
@@ -266,7 +267,7 @@ void KStatusNotifierItemDBus::ContextMenu(int x, int y)
         return;
     }
 
-    //TODO: nicer placement, possible?
+    // TODO: nicer placement, possible?
     if (!m_statusNotifierItem->d->menu->isVisible()) {
         m_statusNotifierItem->d->menu->popup(QPoint(x, y));
     } else {
@@ -281,12 +282,19 @@ void KStatusNotifierItemDBus::Activate(int x, int y)
 
 void KStatusNotifierItemDBus::SecondaryActivate(int x, int y)
 {
-    emit m_statusNotifierItem->secondaryActivateRequested(QPoint(x, y));
+    Q_EMIT m_statusNotifierItem->secondaryActivateRequested(QPoint(x, y));
 }
 
 void KStatusNotifierItemDBus::Scroll(int delta, const QString &orientation)
 {
     Qt::Orientation dir = (orientation.toLower() == QLatin1String("horizontal") ? Qt::Horizontal : Qt::Vertical);
-    emit m_statusNotifierItem->scrollRequested(-delta, dir);
+    Q_EMIT m_statusNotifierItem->scrollRequested(delta, dir);
 }
 
+/*void KStatusNotifierItemDBus::ProvideXdgActivationToken(const QString &token)
+{
+    m_xdgActivationToken = token;
+    KWindowSystem::setCurrentXdgActivationToken(token);
+}*/
+
+#include "moc_kstatusnotifieritemdbus_p.cpp"

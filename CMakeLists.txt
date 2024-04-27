@@ -27,7 +27,7 @@
 
 # Lower it _only_ if tested to work correctly with that version!
 # Might be as low as 3.3, but again, use at your own risk
-cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.13.4 FATAL_ERROR)
 
 project(ckb-next LANGUAGES C CXX)
 include(VERSION.cmake)

@@ -606,7 +606,7 @@ void Kb::readNotify(const QString& line){
         QString modified = components[2];
         KbProfile* newProfile = nullptr;
         foreach(KbProfile* profile, _profiles){
-            if(profile->id().guid == guid){
+            if(profile->id().guid == QUuid::fromString(guid)){
                 newProfile = profile;
                 break;
             }
@@ -659,7 +659,7 @@ void Kb::readNotify(const QString& line){
             KbMode* hwMode = nullptr;
             bool isUpdated = false;
             foreach(KbMode* kbMode, _hwProfile->modes()){
-                if(kbMode->id().guid == guid){
+                if(kbMode->id().guid == QUuid::fromString(guid)){
                     hwMode = kbMode;
                     if(kbMode->id().hwModifiedString() != modified){
                         // Update modification time

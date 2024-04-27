@@ -70,8 +70,11 @@ endif ()
 if (MACOS OR LINUX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    find_package(QT NAMES Qt5 REQUIRED COMPONENTS Core Widgets Network Gui)
+    find_package(QT NAMES ${QT_LIST} REQUIRED COMPONENTS Core Widgets Network Gui)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Network Gui)
+    if(QT_VERSION VERSION_GREATER_EQUAL 6)
+        find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
+    endif()
     find_package(ZLIB REQUIRED)
     find_package(QuaZip REQUIRED)
 endif ()
@@ -283,7 +286,7 @@ elseif (LINUX)
         pkg_check_modules(XCB_EWMH xcb-ewmh)
         pkg_check_modules(XCB_SCREENSAVER xcb-screensaver)
 
-        if(XCB_SCREENSAVER_FOUND AND Qt5X11Extras_FOUND)
+        if(XCB_SCREENSAVER_FOUND AND (Qt5X11Extras_FOUND OR QT_VERSION_MAJOR VERSION_EQUAL 6))
             target_compile_definitions(
             ckb-next
                 PRIVATE
@@ -291,7 +294,7 @@ elseif (LINUX)
         else()
             message(FATAL_ERROR "XCB-Screensaver or Qt5 X11Extras was not found. Either install them or pass -DUSE_XCB=0 to disable idle detection.")
         endif()
-        if(XCB_FOUND AND Qt5X11Extras_FOUND)
+        if(XCB_FOUND AND (Qt5X11Extras_FOUND OR QT_VERSION_MAJOR VERSION_EQUAL 6))
             target_compile_definitions(
             ckb-next
                 PRIVATE
@@ -343,12 +346,18 @@ elseif (LINUX)
             PRIVATE
                 USE_DBUS_MENU)
 
-        cmake_language(EVAL CODE
-            "qt${QT_VERSION_MAJOR}_add_dbus_adaptor(statusNotifierAutogen \"kstatusnotifier/org.kde.StatusNotifierItem.xml\"
-                \"kstatusnotifier/kstatusnotifieritemdbus_p.h\" KStatusNotifierItemDBus)
-            qt${QT_VERSION_MAJOR}_add_dbus_interface(statusNotifierAutogen \"kstatusnotifier/org.kde.StatusNotifierWatcher.xml\" statusnotifierwatcher_interface)
-            qt${QT_VERSION_MAJOR}_add_dbus_interface(statusNotifierAutogen \"kstatusnotifier/org.freedesktop.Notifications.xml\" notifications_interface)"
-        )
+        if(QT_VERSION VERSION_GREATER_EQUAL "5.15")
+            qt_add_dbus_adaptor(statusNotifierAutogen "kstatusnotifier/org.kde.StatusNotifierItem.xml"
+                                "kstatusnotifier/kstatusnotifieritemdbus_p.h" KStatusNotifierItemDBus)
+            qt_add_dbus_interface(statusNotifierAutogen "kstatusnotifier/org.kde.StatusNotifierWatcher.xml" statusnotifierwatcher_interface)
+            qt_add_dbus_interface(statusNotifierAutogen "kstatusnotifier/org.freedesktop.Notifications.xml" notifications_interface)
+        else()
+            qt5_add_dbus_adaptor(statusNotifierAutogen "kstatusnotifier/org.kde.StatusNotifierItem.xml"
+                                "kstatusnotifier/kstatusnotifieritemdbus_p.h" KStatusNotifierItemDBus)
+            qt5_add_dbus_interface(statusNotifierAutogen "kstatusnotifier/org.kde.StatusNotifierWatcher.xml" statusnotifierwatcher_interface)
+            qt5_add_dbus_interface(statusNotifierAutogen "kstatusnotifier/org.freedesktop.Notifications.xml" notifications_interface)
+        endif()
+
         #set_property(SOURCE ${statusNotifierAutogen} PROPERTY SKIP_AUTOGEN ON)
         target_sources(
             ckb-next
@@ -362,6 +371,32 @@ elseif (LINUX)
                   kstatusnotifier/config-kstatusnotifieritem.h
                   ckbsystemtrayicon.cpp
                   ${statusNotifierAutogen})
+        if(QT_VERSION VERSION_GREATER_EQUAL "6")
+            qt6_add_dbus_adaptor(canonicalDbusMenuAutogen "${CMAKE_CURRENT_SOURCE_DIR}/kstatusnotifier/libdbusmenu-qt/com.canonical.dbusmenu.xml"
+                "${CMAKE_CURRENT_SOURCE_DIR}/kstatusnotifier/libdbusmenu-qt/dbusmenuexporterdbus_p.h"
+                DBusMenuExporterDBus)
+
+            #set_property(SOURCE ${canonicalDbusMenuAutogen} PROPERTY SKIP_AUTOGEN ON)
+            target_sources(
+                ckb-next
+                    PRIVATE
+                        kstatusnotifier/libdbusmenu-qt/dbusmenu_p.cpp
+                        kstatusnotifier/libdbusmenu-qt/dbusmenuexporter.cpp
+                        kstatusnotifier/libdbusmenu-qt/dbusmenuexporterdbus_p.cpp
+                        kstatusnotifier/libdbusmenu-qt/dbusmenushortcut_p.cpp
+                        kstatusnotifier/libdbusmenu-qt/dbusmenutypes_p.cpp
+                        kstatusnotifier/libdbusmenu-qt/utils.cpp
+                        kstatusnotifier/libdbusmenu-qt/dbusmenu_p.h
+                        kstatusnotifier/libdbusmenu-qt/dbusmenuexporter.h
+                        kstatusnotifier/libdbusmenu-qt/dbusmenuexporterdbus_p.h
+                        kstatusnotifier/libdbusmenu-qt/dbusmenuexporterprivate_p.h
+                        kstatusnotifier/libdbusmenu-qt/dbusmenushortcut_p.h
+                        kstatusnotifier/libdbusmenu-qt/dbusmenutypes_p.h
+                        kstatusnotifier/libdbusmenu-qt/utils_p.h
+                        kstatusnotifier/libdbusmenu-qt/debug_p.h
+                        ${canonicalDbusMenuAutogen}
+            )
+        endif()
     endif()
 endif ()
 
@@ -543,6 +578,12 @@ if (MACOS OR LINUX)
                 Qt${QT_VERSION_MAJOR}::Widgets
                 Qt${QT_VERSION_MAJOR}::Gui
                 ZLIB::ZLIB)
+if (QT_VERSION VERSION_GREATER_EQUAL "6")
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+                Qt6::OpenGLWidgets)
+endif ()
 
 endif ()
 if(MACOS)
@@ -582,10 +623,17 @@ target_link_libraries(
         "${QuaZip_LIBRARIES}")
 
 # Target compile features and options
-set_target_properties(
-    ckb-next
-        PROPERTIES
-          CXX_STANDARD 11)
+if (QT_VERSION_MAJOR VERSION_LESS "6")
+    set_target_properties(
+        ckb-next
+            PROPERTIES
+              CXX_STANDARD 11)
+else ()
+    set_target_properties(
+        ckb-next
+            PROPERTIES
+              CXX_STANDARD 17)
+endif()
 
 target_compile_options(
     ckb-next

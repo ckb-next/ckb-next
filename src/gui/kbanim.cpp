@@ -32,7 +32,7 @@ KbAnim::KbAnim(QObject* parent, const KeyMap& map, const QUuid id, CkbSettingsBa
     if(!modeOk)
         _mode = Normal;
     _scriptName = settings.value("ScriptName").toString().trimmed();
-    _scriptGuid = settings.value("ScriptGuid").toString();
+    _scriptGuid = QUuid::fromString(settings.value("ScriptGuid").toString());
     {
         SGroup subgroup(settings, "Parameters");
         foreach(const QString& param, settings.childKeys())

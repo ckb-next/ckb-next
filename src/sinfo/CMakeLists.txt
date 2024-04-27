@@ -1,4 +1,4 @@
-find_package(QT NAMES Qt5 COMPONENTS Widgets REQUIRED)
+find_package(QT NAMES ${QT_LIST} COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
 add_executable(ckb-next-sinfo sinfo.cpp)

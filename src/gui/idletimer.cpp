@@ -6,7 +6,11 @@
 #include <QWindow>
 
 #ifdef USE_XCB_SCREENSAVER
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QX11Info>
+#else
+#include <QGuiApplication>
+#endif
 #include <xcb/xcb.h>
 #include <xcb/screensaver.h>
 #include <limits.h>
@@ -17,7 +21,16 @@ int IdleTimer::getIdleTime(){
     const MainWindow* const mw = MainWindow::mainWindow;
     if(!mw || !mw->windowHandle())
         return 0;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0 ,0)
     xcb_connection_t* conn = QX11Info::connection();
+#else
+    xcb_connection_t* conn = nullptr;
+    QNativeInterface::QX11Application* x11Application;
+    if(!(x11Application = qGuiApp->nativeInterface<QNativeInterface::QX11Application>()))
+        return 0;
+
+    conn = x11Application->connection();
+#endif
 
     xcb_get_geometry_cookie_t geomCookie = xcb_get_geometry(conn, mw->windowHandle()->winId());
     xcb_get_geometry_reply_t* geomReply = xcb_get_geometry_reply(conn, geomCookie, nullptr);

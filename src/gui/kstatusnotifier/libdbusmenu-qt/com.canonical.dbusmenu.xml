@@ -318,21 +318,25 @@ License version 3 and version 2.1 along with this program.  If not, see
 		<signal name="ItemsPropertiesUpdated">
 			<annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="DBusMenuItemList"/>
 			<annotation name="org.qtproject.QtDBus.QtTypeName.Out1" value="DBusMenuItemKeysList"/>
+		<!--
 			<dox:d>
 			Triggered when there are lots of property updates across many items
 			so they all get grouped into a single dbus message.  The format is
 			the ID of the item with a hashtable of names and values for those
 			properties.
 			</dox:d>
+		-->
 			<arg type="a(ia{sv})" name="updatedProps" direction="out" />
 			<arg type="a(ias)" name="removedProps" direction="out" />
 		</signal>
 
 		<signal name="LayoutUpdated">
+		<!--
 			<dox:d>
 			Triggered by the application to notify display of a layout update, up to
 			revision
 			</dox:d>
+		-->
 			<arg type="u" name="revision" direction="out" >
 				<dox:d>The revision of the layout that we're currently on</dox:d>
 			</arg>
@@ -345,12 +349,14 @@ License version 3 and version 2.1 along with this program.  If not, see
 			</arg>
 		</signal>
 		<signal name="ItemActivationRequested">
+		<!--
 			<dox:d>
 			  The server is requesting that all clients displaying this
 			  menu open it to the user.  This would be for things like
 			  hotkeys that when the user presses them the menu should
 			  open and display itself to the user.
 			</dox:d>
+                -->
 			<arg type="i" name="id" direction="out" >
 				<dox:d>ID of the menu that should be activated</dox:d>
 			</arg>

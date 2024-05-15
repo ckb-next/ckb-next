@@ -139,7 +139,7 @@ void setmodeindex_legacy(usbdevice* kb, int index){
     }
 }
 
-static const struct timespec legacy_delay_ts = {.tv_nsec = 30000000000};
+static const struct timespec legacy_delay_ts = {.tv_sec = 30};
 void legacy_delay(usbdevice* kb, delay_type_t type){
     // Fixed 30ms delay should be fine
     clock_nanosleep(CLOCK_MONOTONIC, 0, &legacy_delay_ts, NULL);

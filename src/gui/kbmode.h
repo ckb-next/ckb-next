@@ -20,7 +20,7 @@ struct UsbId {
     inline  UsbId() : guid(QUuid::createUuid()),modified(0) {}
 
     QString guidString() const                          { return guid.toString().toUpper(); }
-    void    guidString(const QString& newGuid)          { guid = newGuid; }
+    void    guidString(const QString& newGuid)          { guid = QUuid::fromString(newGuid); }
     QString modifiedString() const                      { return QString::number(modified, 16); }
     void    modifiedString(const QString& newModified)  { modified = newModified.toUInt(nullptr, 16); }
     QString hwModifiedString() const                    { return QString::number(hwModified, 16); }

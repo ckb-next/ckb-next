@@ -68,9 +68,9 @@ void KeyWidgetDebugger::on_layoutComboBox_currentIndexChanged(int arg1)
     updateMap();
 }
 
-void KeyWidgetDebugger::on_modelComboBox_currentIndexChanged(const QString& arg1)
+void KeyWidgetDebugger::on_modelComboBox_currentIndexChanged(int arg1)
 {
-    m = KeyMap::getModel(arg1);
+    m = KeyMap::getModel(ui->modelComboBox->itemText(arg1));
     updateMap();
 }
 

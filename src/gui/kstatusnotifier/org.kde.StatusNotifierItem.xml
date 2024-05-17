@@ -48,8 +48,11 @@
     <property name="ToolTip" type="(sa(iiay)ss)" access="read">
       <annotation name="org.qtproject.QtDBus.QtTypeName" value="KDbusToolTipStruct"/>
     </property>
-
-
+    <!--
+    <method name="ProvideXdgActivationToken">
+        <arg name="token" type="s" direction="in"/>
+    </method>
+    -->
     <!-- interaction: the systemtray wants the application to do something -->
     <method name="ContextMenu">
         <!-- we're passing the coordinates of the icon, so the app knows where to put the popup window -->
@@ -83,6 +86,9 @@
     </signal>
 
     <signal name="NewOverlayIcon">
+    </signal>
+
+    <signal name="NewMenu">
     </signal>
 
     <signal name="NewToolTip">

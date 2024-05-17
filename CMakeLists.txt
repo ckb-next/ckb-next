@@ -27,7 +27,7 @@
 
 # Lower it _only_ if tested to work correctly with that version!
 # Might be as low as 3.3, but again, use at your own risk
-cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.13.4 FATAL_ERROR)
 
 project(ckb-next LANGUAGES C CXX)
 include(VERSION.cmake)
@@ -153,6 +153,12 @@ option(SAFE_INSTALL "Execute pre-install tasks to ensure correct installation.
     Intended to be used with direct installations without package manager." OFF)
 option(SAFE_UNINSTALL "Execute pre-uninstall tasks to ensure correct removal.
     Intended to be used with direct removals without package manager." OFF)
+option(PREFER_QT6 "Build with Qt 6 if available." OFF)
+
+set(QT_LIST Qt5)
+if (PREFER_QT6)
+    list(INSERT QT_LIST 0 Qt6)
+endif ()
 
 if (NOT WITH_GUI)
     message(WARNING "Building without GUI. Proceed only if you know what you are doing.")

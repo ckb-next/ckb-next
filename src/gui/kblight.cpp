@@ -467,7 +467,7 @@ void KbLight::load(CkbSettingsBase& settings){
     {
         SGroup subGroup(settings, "Animations");
         foreach(QString anim, settings.value("List").toStringList()){
-            QUuid id = anim;
+            QUuid id(anim);
             _animList.append(new KbAnim(this, _map, id, settings));
         }
     }

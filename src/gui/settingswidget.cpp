@@ -106,7 +106,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     ui->autoUpdBox->setChecked(!settings.value("DisableAutoUpdCheck", false).toBool());
 #endif
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     ui->hiDPIBox->setChecked(settings.value("HiDPI", false).toBool());
 #else
     ui->hiDPIBox->hide();

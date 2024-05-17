@@ -279,7 +279,7 @@ int main(int argc, char* argv[]){
     }
 #endif
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     // Explicitly request high dpi scaling if desired
     // Needs to be called before QApplication is constructed
     if(tmpSettings->value("Program/HiDPI", false).toBool())
@@ -325,7 +325,7 @@ int main(int argc, char* argv[]){
     // Seed the RNG for UsbIds
     Q_SRAND(QDateTime::currentMSecsSinceEpoch());
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     // Enable HiDPI support
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif

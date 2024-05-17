@@ -44,7 +44,7 @@ public:
 #endif
 
 public slots:
-    void brightnessScroll(int delta, Qt::Orientation orientation);
+    void brightnessScroll(QPoint delta);
     void scanKeyboards();
 
 signals:

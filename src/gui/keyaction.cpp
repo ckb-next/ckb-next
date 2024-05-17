@@ -12,7 +12,9 @@
 #include <QWindow>
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QX11Info>
+#endif
 #endif
 
 KeyAction::Type KeyAction::type() const {
@@ -244,7 +246,7 @@ QUuid KeyAction::animInfo(bool &onlyOnce, bool &stopOnRelease) const {
     QStringList split = param.split("+");
     if(split.length() < 2)
         return QUuid();
-    QUuid id = split[0];
+    QUuid id(split[0]);
     int flags = split[1].toInt();
     onlyOnce = !!(flags & ANIM_ONCE);
     stopOnRelease = !!(flags & ANIM_KRSTOP);
@@ -484,17 +486,24 @@ QString KeyAction::getDisplayForScreenCursor(){
 #ifdef USE_XCB
     if(QApplication::platformName() != QLatin1String("xcb"))
         return displaystr;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0 ,0)
     xcb_connection_t* conn = QX11Info::connection();
+#else
+    xcb_connection_t* conn = nullptr;
+    QNativeInterface::QX11Application* x11Application;
+    if((x11Application = qGuiApp->nativeInterface<QNativeInterface::QX11Application>()))
+        conn = x11Application->connection();
+#endif
 
     // First, get the window id
     const MainWindow* const mw = MainWindow::mainWindow;
-    if(!mw || !mw->windowHandle())
+    if(!mw || !mw->windowHandle() || !conn)
         return displaystr;
 
     xcb_window_t ckb_xcb_id = static_cast<xcb_window_t>(mw->windowHandle()->winId());
 
     // Check if the cursor is in the same screen as the ckb-next window
-    xcb_query_pointer_reply_t* ptr_reply = xcb_query_pointer_reply(conn, xcb_query_pointer(conn, ckb_xcb_id), NULL);
+    xcb_query_pointer_reply_t* ptr_reply = xcb_query_pointer_reply(conn, xcb_query_pointer(conn, ckb_xcb_id), nullptr);
 
     if(!ptr_reply->same_screen) {
         // Get the screen ID
@@ -510,7 +519,7 @@ QString KeyAction::getDisplayForScreenCursor(){
 
         char* host;
         int parsed_display;
-        if(xcb_parse_display(DISPLAY, &host, &parsed_display, NULL)) {
+        if(xcb_parse_display(DISPLAY, &host, &parsed_display, nullptr)) {
             displaystr = QString("%1:%2.%3").arg(QString::fromUtf8(host)).arg(parsed_display).arg(screen);
             free(host);
         }

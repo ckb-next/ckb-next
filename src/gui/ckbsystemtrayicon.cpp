@@ -7,6 +7,17 @@
 CkbSystemTrayIcon::CkbSystemTrayIcon(const QIcon& icon, const QString iconName, QObject*parent) : KStatusNotifierItem("ckb-next", parent), previousPath("")
 {
     setIcon(icon, iconName);
+    connect(this, &KStatusNotifierItem::scrollRequested, [this](int delta, Qt::Orientation orientation) {
+        QPoint data;
+        if(orientation == Qt::Horizontal)
+            data.setX(delta);
+        else
+            data.setY(delta);
+
+        emit scrollRequested(data);
+    });
+    // KDE added extra tray options but ckb-next already has them, so turn them off.
+    KStatusNotifierItem::setStandardActionsEnabled(false);
 }
 
 // Not all implementations support passing icons by pixmap
@@ -66,4 +77,5 @@ CkbSystemTrayIcon::~CkbSystemTrayIcon()
     QFile f(previousPath);
     if(f.exists())
         f.remove();
+    disconnect(this, &KStatusNotifierItem::scrollRequested, nullptr, nullptr);
 }

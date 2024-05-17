@@ -24,6 +24,7 @@ public:
 signals:
     // This is never emitted by KStatusNotifierItem
     void activated(QSystemTrayIcon::ActivationReason);
+    void scrollRequested(QPoint delta);
 private:
     QString previousPath;
 #else
@@ -36,14 +37,14 @@ private:
     {
         if(evt->type() == QEvent::Wheel) {
             QWheelEvent* wheelEvt = static_cast<QWheelEvent*>(evt);
-            emit scrollRequested(wheelEvt->delta(), wheelEvt->orientation());
+            emit scrollRequested(wheelEvt->angleDelta());
             return true;
         }
         return QSystemTrayIcon::event(evt);
     }
 
 signals:
-        void scrollRequested(int delta, Qt::Orientation orientation);
+        void scrollRequested(QPoint delta);
 
 public:
         void setIcon(QIcon icon, QString name) { QSystemTrayIcon::setIcon(icon); }

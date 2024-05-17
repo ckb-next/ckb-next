@@ -126,6 +126,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_GLAIVE_PRO, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
+    { V_CORSAIR, P_MM700, },
     // Headset stands
     { V_CORSAIR, P_ST100, },
     // Misc
@@ -270,6 +271,8 @@ const char* product_str(ushort product){
         return "st100";
     if(product == P_GENERIC_BRAGI_DONGLE)
         return "bragi_dongle";
+    if(product == P_MM700)
+        return "mm700";
     return "";
 }
 
@@ -295,6 +298,8 @@ static const devcmd* get_vtable(usbdevice* kb){
             return &vtable_bragi_dongle;
         else if(IS_MOUSE(vendor, product))
             return &vtable_bragi_mouse;
+        else if(IS_MOUSEPAD(vendor, product))
+            return &vtable_bragi_mousepad;
         else
             return &vtable_bragi_keyboard;
     } else if(IS_MOUSE(vendor, product)) {
@@ -413,7 +418,6 @@ static void* _setupusb(void* context){
     const devcmd* vt = get_vtable(kb);
     memcpy(&kb->vtable, vt, sizeof(devcmd));
     vt = &kb->vtable;
-
     if(!(IS_DONGLE(kb) && kb->protocol == PROTO_BRAGI))
         kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(SUPPORTS_ADJRATE(kb))
@@ -563,7 +567,6 @@ void setupusb(usbdevice* kb){
         ckb_err("Failed to create USB thread");
         return;
     }
-
 #ifndef OS_MAC
     // name this thread externally if not on mac,
     // on mac `pthread_setname_np` is only naming the current thread

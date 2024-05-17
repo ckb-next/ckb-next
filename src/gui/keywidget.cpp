@@ -173,6 +173,11 @@ void KeyWidget::map(const KeyMap& newMap){
             _currentOverlay.load(":/img/overlay_polaris.png");
             _overlayPos.setX(-19.5f);
             break;
+        case KeyMap::MM700:
+            _currentOverlay.load(":/img/overlay_mm700.png");
+            _overlayPos.setX(-15.f);
+            _overlayPos.setY(2.f);
+            break;
         case KeyMap::M95:
             _currentOverlay.load(":/img/overlay_m95.png");
             _overlayPos.setX(35.3f);
@@ -396,6 +401,32 @@ void KeyWidget::paintGL(){
                 drawBottomRightCorner(&painter, x, y, w, h+2.f, drawInfoScale);
             } else
                 painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
+        } else if (model == KeyMap::MM700) {
+            // Draw the edges as polygons
+            if(!strcmp(key.name, "zone1")) {
+                QPointF edgePoints[6] = {
+                    QPointF( x*drawInfoScale,           y*drawInfoScale),
+                    QPointF((x + w+60)*drawInfoScale,   y*drawInfoScale),
+                    QPointF((x + w+60)*drawInfoScale,   (y + h)*drawInfoScale),
+                    QPointF((x + h)*drawInfoScale,      (y + h)*drawInfoScale),
+                    QPointF((x + h)*drawInfoScale,      (y + w)*drawInfoScale),
+                    QPointF( x*drawInfoScale,           (y + w)*drawInfoScale),
+                };
+                painter.drawPolygon(edgePoints, 6);
+            } else if(!strcmp(key.name, "zone2")) {
+                QPointF edgePoints[8] = {
+                    QPointF( (x-5) *drawInfoScale,               y*drawInfoScale),
+                    QPointF((x + w)*drawInfoScale,          y*drawInfoScale),
+                    QPointF((x + w)*drawInfoScale,          (y + h)*drawInfoScale),
+                    QPointF((x - h + w - 77)*drawInfoScale, (y + h)*drawInfoScale),
+                    QPointF((x - h + w - 77)*drawInfoScale, (y + h - w)*drawInfoScale),
+                    QPointF( x*drawInfoScale,               (y + h - w)*drawInfoScale),
+                    QPointF( (x)*drawInfoScale,             (y + w)*drawInfoScale),
+                    QPointF( (x- 5 )*drawInfoScale,         (y + w)*drawInfoScale),
+                };
+                painter.drawPolygon(edgePoints, 8);
+            } else
+                painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
         } else if(model == KeyMap::ST100){
             // Draw the edges as polygons
             if(!strcmp(key.name, "zone7")){
@@ -519,6 +550,40 @@ void KeyWidget::paintGL(){
                     drawBottomLeftCorner(&painter, kx, ky, kw, kh+2.f, drawInfoScale);
                  } else if(!strcmp(key.name, "zone5")){
                     drawBottomRightCorner(&painter, kx, ky, kw, kh+2.f, drawInfoScale);
+                 } else
+                    painter.drawRect(QRectF(kx * drawInfoScale, ky * drawInfoScale, kw * drawInfoScale, kh * drawInfoScale));
+             } else if (model == KeyMap::MM700) {
+                float kx = key.x + drawInfoOffset.x() - key.width / 2.f + 2.f;
+                float ky = key.y + drawInfoOffset.y() - key.height / 2.f + 2.f;
+                float kw = key.width - 4.f;
+                float kh = key.height - 4.f;
+                // No border
+                painter.setPen(QPen(QColor(0,0,0,0), 1));
+                // Draw the edges as polygons
+                if(!strcmp(key.name, "zone1")) {
+                    QPointF edgePoints[6] = {
+                        QPointF( kx*drawInfoScale,          ky*drawInfoScale),
+                        QPointF((kx + kw+60)*drawInfoScale, ky*drawInfoScale),
+                        QPointF((kx + kw+60)*drawInfoScale, (ky + kh)*drawInfoScale),
+                        QPointF((kx + kh)*drawInfoScale,    (ky + kh)*drawInfoScale),
+                        QPointF((kx + kh)*drawInfoScale,    (ky + kw)*drawInfoScale),
+                        QPointF( kx*drawInfoScale,          (ky + kw)*drawInfoScale),
+                    };
+                    painter.drawPolygon(edgePoints, 6);
+                 } else if(!strcmp(key.name, "zone2")) {
+                    QPointF edgePoints[8] = {
+                        QPointF( (kx-5)*drawInfoScale,              ky*drawInfoScale),
+                        QPointF((kx + kw)*drawInfoScale,            ky*drawInfoScale),
+                        QPointF((kx + kw)*drawInfoScale,            (ky + kh)*drawInfoScale),
+                        QPointF((kx - kh + kw - 77)*drawInfoScale,  (ky + kh)*drawInfoScale),
+                        QPointF((kx - kh + kw - 77)*drawInfoScale,  (ky + kh - kw)*drawInfoScale),
+                        QPointF( kx*drawInfoScale,                  (ky + kh - kw)*drawInfoScale),
+                        QPointF( (kx)*drawInfoScale,                (ky + kw)*drawInfoScale),
+                        QPointF( (kx- 5 )*drawInfoScale,            (ky + kw)*drawInfoScale),
+                    };
+                    painter.drawPolygon(edgePoints, 8);
+                 } else if(!strcmp(key.name, "zone3")) {
+                    drawLogo(&key , &painter);
                  } else
                     painter.drawRect(QRectF(kx * drawInfoScale, ky * drawInfoScale, kw * drawInfoScale, kh * drawInfoScale));
             } else if (model == KeyMap::ST100) {

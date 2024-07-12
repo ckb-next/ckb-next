@@ -21,19 +21,19 @@
 # QuaZip_ZLIB_INCLUDE_DIR    - The include dir of zlib headers
 
 # First try to find QuaZip 1.0
-find_package(QuaZip-Qt5 QUIET)
+find_package(QuaZip-Qt${QT_VERSION_MAJOR} QUIET)
 
 IF (QuaZip_LIBRARIES)
     # in cache already
     SET(QuaZip_FOUND TRUE)
 ELSE ()
-    IF(QuaZip-Qt5_FOUND)
+    IF(QuaZip-Qt${QT_VERSION_MAJOR}_FOUND)
         message("-- Found QuaZip: QuaZip::QuaZip")
         SET(QuaZip_FOUND TRUE)
         SET(QuaZip_LIBRARIES "QuaZip::QuaZip" CACHE INTERNAL "")
         SET(QuaZip_INCLUDE_DIR "QuaZip::QuaZip" CACHE INTERNAL "")
     ELSE ()
-        set(QuaZip_LIB_VERSION_SUFFIX 5)
+        set(QuaZip_LIB_VERSION_SUFFIX ${QT_VERSION_MAJOR})
         FIND_LIBRARY(QuaZip_LIBRARIES
                 WIN32_DEBUG_POSTFIX d
                 NAMES quazip${QuaZip_LIB_VERSION_SUFFIX} libquazip.dylib

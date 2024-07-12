@@ -347,8 +347,13 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             if (act.isMacro()) {
                 // This string needs to exist for as long as the references below are used
                 QString value = act.value();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 // Split the action and discard the "$macro" from the beginning
                 QVector<QStringRef> macroData = value.midRef(7).split(QChar(':'));
+#else
+                QStringView valueView(value);
+                QList<QStringView> macroData = valueView.sliced(7).split(QChar(':'));
+#endif
                 const int dataCount = macroData.count();
                 // Old format doesn't have the last field, which is the raw macro data
                 // It might not exist at all (count == 3) or it might be set to "x"
@@ -359,8 +364,8 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                     ui->macroName->setText(macroName);
 
                     // Pick the appropriate string to parse due to legacy formats
-                    QStringRef macroString = macroData[0];
-                    if(dataCount == 4 && macroData[3] != "x")
+                    QStringView macroString = macroData[0];
+                    if(dataCount == 4 && macroData[3] != QStringLiteral("x"))
                         macroString = macroData[3];
 
                     // Try to parse the string

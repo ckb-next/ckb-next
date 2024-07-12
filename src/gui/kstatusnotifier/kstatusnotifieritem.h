@@ -1,29 +1,20 @@
-/* This file is part of the KDE libraries
-   Copyright 2009 by Marco Martin <notmart@gmail.com>
+/*
+    This file is part of the KDE libraries
+    SPDX-FileCopyrightText: 2009 Marco Martin <notmart@gmail.com>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License (LGPL) as published by the Free Software Foundation;
-   either version 2 of the License, or (at your option) any later
-   version.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+    SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
 #ifndef KSTATUSNOTIFIERITEM_H
 #define KSTATUSNOTIFIERITEM_H
 
 #include <QObject>
-#include <QString>
 #include <QPoint>
+#include <QString>
+
+//#include <kstatusnotifieritem_export.h>
+
+#include <memory>
 
 class QAction;
 class QMenu;
@@ -66,7 +57,8 @@ class KStatusNotifierItemPrivate;
  * @author Marco Martin <notmart@gmail.com>
  * @since 4.4
  */
-class KStatusNotifierItem : public QObject
+#define KSTATUSNOTIFIERITEM_EXPORT
+class KSTATUSNOTIFIERITEM_EXPORT KStatusNotifierItem : public QObject
 {
     Q_OBJECT
 
@@ -82,20 +74,21 @@ class KStatusNotifierItem : public QObject
 
     friend class KStatusNotifierItemDBus;
     friend class KStatusNotifierItemPrivate;
+
 public:
     /**
      * All the possible status this icon can have, depending on the
      * importance of the events that happens in the parent application
      */
     enum ItemStatus {
-        /// Nothing is happening in the application, so showing this icon is not required
+        /// Nothing is happening in the application, so showing this icon is not required. This is the default value
         Passive = 1,
         /// The application is doing something, or it is important that the
         /// icon is always reachable from the user
         Active = 2,
         /// The application requests the attention of the user, for instance
         /// battery running out or a new IM message was received
-        NeedsAttention = 3
+        NeedsAttention = 3,
     };
     Q_ENUM(ItemStatus)
 
@@ -104,7 +97,7 @@ public:
      * so can be drawn in a different way or in a different place
      */
     enum ItemCategory {
-        /// An icon for a normal application, can be seen as its taskbar entry
+        /// An icon for a normal application, can be seen as its taskbar entry. This is the default value
         ApplicationStatus = 1,
         /// This is a communication oriented application; this icon will be used
         /// for things such as the notification of a new message
@@ -115,7 +108,7 @@ public:
         SystemServices = 3,
         /// This application shows hardware status or a means to control it
         Hardware = 4,
-        Reserved = 129
+        Reserved = 129,
     };
     Q_ENUM(ItemCategory)
 
@@ -125,7 +118,7 @@ public:
      * @param parent the parent object for this object. If the object passed in as
      * a parent is also a QWidget, it will  be used as the main application window
      * represented by this icon and will be shown/hidden when an activation is requested.
-     * @see associatedWidget
+     * @see associatedWindow
      **/
     explicit KStatusNotifierItem(QObject *parent = nullptr);
 
@@ -145,7 +138,7 @@ public:
      * @param parent the parent object for this object. If the object passed in as
      * a parent is also a QWidget, it will  be used as the main application window
      * represented by this icon and will be shown/hidden when an activation is requested.
-     * @see associatedWidget
+     * @see associatedWindow
      **/
     explicit KStatusNotifierItem(const QString &id, QObject *parent = nullptr);
 
@@ -191,7 +184,7 @@ public:
      */
     ItemStatus status() const;
 
-    //Main icon related functions
+    // Main icon related functions
     /**
      * Sets a new main icon for the system tray
      *
@@ -244,7 +237,7 @@ public:
      */
     QIcon overlayIconPixmap() const;
 
-    //Requesting attention icon
+    // Requesting attention icon
 
     /**
      * Sets a new icon that should be used when the application
@@ -287,7 +280,7 @@ public:
      */
     QString attentionMovieName() const;
 
-    //ToolTip handling
+    // ToolTip handling
     /**
      * Sets a new toolTip or this icon, a toolTip is composed of an icon,
      * a title and a text, all fields are optional.
@@ -414,6 +407,16 @@ public:
     QAction *action(const QString &name) const;
 
     /**
+     * Sets whether to show the standard items in the menu, such as Quit
+     */
+    void setStandardActionsEnabled(bool enabled);
+
+    /**
+     * @return if the standard items in the menu, such as Quit
+     */
+    bool standardActionsEnabled() const;
+
+    /**
      * Shows the user a notification. If possible use KNotify instead
      *
      * @param title message title
@@ -423,15 +426,31 @@ public:
      */
     void showMessage(const QString &title, const QString &message, const QString &icon, int timeout = 10000);
 
+    /**
+     * @return the last provided token to be used with Wayland's xdg_activation_v1
+     */
+    //QString providedToken() const;
+
 public Q_SLOTS:
 
     /**
-     * Shows the main widget and try to position it on top
-     * of the other windows, if the widget is already visible, hide it.
+     * Shows the main window and try to position it on top
+     * of the other windows, if the window is already visible, hide it.
      *
      * @param pos if it's a valid position it represents the mouse coordinates when the event was triggered
      */
     virtual void activate(const QPoint &pos = QPoint());
+
+    /**
+     * Hides the main window, if not already hidden.
+     *
+     * Stores some information about the window which otherwise would be lost due to unmapping
+     * from the window system. Use when toggling the main window via activate(const QPoint &)
+     * is not wanted, but instead the hidden state should be reached in any case.
+     *
+     * @since 6.0
+     */
+    void hideAssociatedWidget();
 
 Q_SIGNALS:
     /**
@@ -468,11 +487,9 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
-    KStatusNotifierItemPrivate *const d;
+    std::unique_ptr<KStatusNotifierItemPrivate> const d;
 
-    Q_PRIVATE_SLOT(d, void serviceChange(const QString &name,
-                                         const QString &oldOwner,
-                                         const QString &newOwner))
+    Q_PRIVATE_SLOT(d, void serviceChange(const QString &name, const QString &oldOwner, const QString &newOwner))
     Q_PRIVATE_SLOT(d, void contextMenuAboutToShow())
     Q_PRIVATE_SLOT(d, void maybeQuit())
     Q_PRIVATE_SLOT(d, void minimizeRestore())

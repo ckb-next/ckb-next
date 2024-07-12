@@ -697,7 +697,11 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
     event->accept();
     mouseDownMode = (event->modifiers() & Qt::AltModifier) ? SUBTRACT : (event->modifiers() & Qt::ShiftModifier) ? ADD : (event->modifiers() & Qt::ControlModifier) ? TOGGLE : SET;
     // See if the event hit a key
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     mouseDown = event->localPos();
+#else
+    mouseDown = event->position();
+#endif
     QPointF mouseDownScaled = mouseDown / drawInfoScale - drawInfoOffset;
     int i = -1;
     for(const Key& key : keyMap){
@@ -733,7 +737,11 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
         return;
 
     // Find selection rectangle
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     const QPointF& mouseCurrent = event->localPos();
+#else
+    const QPointF& mouseCurrent = event->position();
+#endif
     QPointF mouseCurrentScaled = mouseCurrent / drawInfoScale - drawInfoOffset;
 
     QRectF mouseHighlightRectScaled;

@@ -480,7 +480,7 @@ void KbProfileDialog::on_importButton_clicked(){
         CkbExternalSettings* sptr = profileptrs.at(i).first;
         //QString guid = profileptrs.at(i).second;
         //QUuid current = guid.trimmed();
-        QUuid guid = sptr->childGroups().first().trimmed();
+        QUuid guid(sptr->childGroups().first().trimmed());
         // Messy, shhhh
         const QString& profname = profilestr.at(i);
         KbProfile* profilematch = nullptr;

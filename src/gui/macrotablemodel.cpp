@@ -1,7 +1,8 @@
-#include "macrotablemodel.h"
+﻿#include "macrotablemodel.h"
 #include <QRegularExpression>
 #include <QStringBuilder>
 #include <QMimeData>
+#include <QIODevice>
 
 const QSet<QString> MacroTableModel::validMacroKeys =
         QSet<QString>{"esc",
@@ -275,7 +276,12 @@ bool MacroTableModel::setData(const QModelIndex& index, const QVariant& value, i
             ml.usTime = ml.usTimeMax = MacroLine::MACRO_DELAY_DEFAULT;
             return true;
         }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QStringView view(valstr);
+        QList<QStringView> split = view.split(QChar('_'));
+#else
         QVector<QStringRef> split = valstr.splitRef(QChar('_'));
+#endif
         const int len = split.length();
         if(len != 1 && len != 2)
             return false;
@@ -322,19 +328,25 @@ QString MacroTableModel::toString(bool rawData){
 
     return l;
 }
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0 ,0)
 #define MACRO_ERROR(end, start)  return QString::number(end) % ":<br>" % str.leftRef(end) \
                                         % "<b><span style=\"color: #ff0000;\">" % str.midRef(end, start - end) % "</span></b>" \
                                         % str.midRef(start)
+#else
+#define MACRO_ERROR(end, start)  return QString::number(end) % ":<br>" % strView.first(end) \
+                                        % "<b><span style=\"color: #ff0000;\">" % strView.sliced(end, start - end) % "</span></b>" \
+                                        % strView.sliced(start)
+#endif
 #define MACRO_ERROR_RET()       MACRO_ERROR(previousEnd, currentStart)
 #define MACRO_ERROR_RET_SUFFIX(end, start, suffix) MACRO_ERROR(end, start) % "<br><br>" % suffix
 QString MacroTableModel::fromString(const QString& input, const bool stopOnError){
     // Replace all "whitespace" characters with ' ', and then remove that as well
     QString str = input.simplified();
     str.replace(QChar(' '), QString(""));
+    QStringView strView(str);
     QVector<MacroLine> newMacroLines;
     QRegularExpression re("(\\+|-)([a-z0-9_]+)(=(\\d+)(_(\\d+))?)?(,|$)");
-    QRegularExpressionMatchIterator i = re.globalMatch(str);
+    QRegularExpressionMatchIterator i = re.globalMatch(strView.toString());
     qint64 prevDelay = MacroLine::MACRO_DELAY_DEFAULT, prevMaxDelay = MacroLine::MACRO_DELAY_DEFAULT;
     int previousEnd = 0;
     while (i.hasNext()) {
@@ -344,10 +356,15 @@ QString MacroTableModel::fromString(const QString& input, const bool stopOnError
         if(previousEnd != currentStart && stopOnError){
             MACRO_ERROR_RET();
         }
-        QStringRef act = m.capturedRef(1);
+        QStringView act = m.capturedView(1);
         QString key = m.captured(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0 ,0)
         QStringRef delaystr = m.capturedRef(4);
         QStringRef maxDelayStr = m.capturedRef(6);
+#else
+        QStringView delaystr = m.capturedView(4);
+        QStringView maxDelayStr = m.capturedView(6);
+#endif
 
         qint64 delay = MacroLine::MACRO_DELAY_DEFAULT, maxDelay = MacroLine::MACRO_DELAY_DEFAULT;
         if(!delaystr.isNull()){
@@ -372,7 +389,7 @@ QString MacroTableModel::fromString(const QString& input, const bool stopOnError
             }
         }
         // Act and key will always be valid strings
-        const bool down = (act == "+");
+        const bool down = (act == QStringLiteral("+"));
 
         // Make sure the key actually exists
         if(!validMacroKeys.contains(key)){

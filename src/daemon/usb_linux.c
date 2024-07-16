@@ -804,7 +804,6 @@ int usbmain(){
         ckb_fatal("Failed to initialize udev in usbmain(), usb_linux.c");
         return -1;
     }
-
     // Create thread that detects system suspend
     pthread_t suspend_thread;
     pthread_create(&suspend_thread, NULL, suspend_check, NULL);

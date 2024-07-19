@@ -884,6 +884,24 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["lock"].height = 8;
         break;
     }
+    case KeyMap::K70_CORE_DE:{
+        map = getMap(KeyMap::K70, layout);
+        map.remove("light");
+        map.remove("lock");
+        map.remove("mute");
+        map.remove("volup");
+        map.remove("voldn");
+        map.remove("stop");
+        map.remove("prev");
+        map.remove("play");
+        map.remove("next");
+
+        // Replace rwin with Fn
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+        break;
+    }
     case KeyMap::STRAFE_MK2:{
         map = getMap(KeyMap::K70MK2, layout);
         // move everything right to make the space for the left sidelight
@@ -1644,6 +1662,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K100;
     if(lower == "k65_mini")
         return K65_MINI;
+    if(lower == "k70_core_de")
+        return K70_CORE_DE;
     return NO_MODEL;
 }
 
@@ -1727,6 +1747,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k100";
     case K65_MINI:
         return "k65_mini";
+    case K70_CORE_DE:
+        return "k70_core_de";
     default:
         return "";
     }
@@ -1742,6 +1764,7 @@ KeyMap KeyMap::fromName(const QString &name){
 int KeyMap::modelWidth(Model model){
     switch(model){
     case K60:
+    case K70_CORE_DE:
         return K60_WIDTH;
     case K60_TKL:
         return K60_TKL_WIDTH;
@@ -1812,6 +1835,7 @@ int KeyMap::modelHeight(Model model){
     case K70:
     case K70MK2:
     case K70_TKL:
+    case K70_CORE_DE:
     case K95:
     case K95L:
     case STRAFE:

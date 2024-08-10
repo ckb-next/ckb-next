@@ -425,6 +425,44 @@ elseif (LINUX)
         endif ()
     endif ()
 
+    # A way to check for 66
+    if (EXISTS "/run/66" OR "66" IN_LIST FORCE_INIT_SYSTEM)
+        message(STATUS "66 detected")
+    endif ()
+        set(CKB_NEXT_INIT_SYSTEM "66" CACHE INTERNAL "")
+	set(66_INSTALL_DIR "${66_INSTALL_PATH}" CACHE STRING "Where to install 66 service file.")
+
+        # Generate and import service
+        message(STATUS "Generating and importing ckb-next service (${CKB_NEXT_INIT_SYSTEM})")
+        configure_file(
+            "${ckb-next_SOURCE_DIR}/linux/66/ckb-next-daemon"
+            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon"
+            @ONLY)
+
+        if (SAFE_INSTALL)
+            foreach (daemon IN ITEMS "ckb-next-daemon")
+                execute_process(
+		    COMMAND sudo 66-enable ckb-daemon-daemon
+                    COMMAND sudo 66-start ckb-daemon-daemon
+                    RESULT_VARIABLE daemon_active)
+                if ("${daemon_active}" EQUAL 0)
+                    message(STATUS "Running ${daemon} detected")
+                    install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: stopping ${daemon}\")")
+                    install(CODE "execute_process(COMMAND sudo 66-stop ckb-next-daemon)")
+                endif ()
+                execute_process(
+		    COMMAND sudo 66-intree | grep -o ckb-next-daemon | awk '{print $1; exit}'
+		    RESULT_VARIABLE daemon_active)
+                if ("${daemon_enabled}" EQUAL ckb-next-daemon)
+                    message(STATUS "Enabled ${daemon} detected")
+                    install(CODE "message(STATUS \"${CKB_NEXT_INIT_SYSTEM}: permanently disabling ${daemon}\")")
+                    install(CODE "execute_process(COMMAND sudo 66-disable ckb-next-daemon)")
+                endif ()
+            endforeach ()
+        endif ()
+
+    endif ()
+
 endif ()
 
 # Declare target's installation paths
@@ -488,7 +526,15 @@ elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "SysVinit")
         WORLD_READ             WORLD_EXECUTE)
 elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "unknown")
     message(WARNING "No supported system service detected.
-    Supported services are: systemd, launchd, OpenRC, upstart, SysVinit.")
+    Supported services are: systemd, launchd, OpenRC, upstart, SysVinit, 66.")
+elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "66")
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next"
+	DESTINATION "${66-PATH}"
+        PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ)
 endif ()
 
 if (LINUX)

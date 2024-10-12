@@ -439,7 +439,7 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "rwin",          112, KEY_RIGHTMETA },
     { "light",         113, KEY_CORSAIR },
     { "lock",            1, KEY_CORSAIR },
-    { 0,                -1, KEY_NONE },
+    { "ro",            115, KEY_RO },
     { 0,                -1, KEY_NONE },
     { 0,                -1, KEY_NONE },
     { 0,                -1, KEY_NONE },
@@ -556,7 +556,7 @@ static const short hid_codes[256] = {
 
 static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
     // Handle the 01 input and 02 media keys
-    // On the K57 WL length is 16, but on the K95P XT it is 21
+    // On the K57 WL length is 16, but on the K95P XT and K60 (1b1c:1bad) it is 21
     if(urbinput[0] == NKRO_KEY_IN && length >= 16){
         // Skipping the first two bytes, the following 13 bytes can be copied as-is, with an offset
         // So let's copy them first before we start bodging
@@ -567,8 +567,39 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         kbinput[13] = (kbinput[13] & 1) | (urbinput[1] << 1);
 
         // Finally, copy the left over rwin that we lost due to the left shift above
-        // We can ovewrite the other bits with 0 as they aren't really used in NKRO mode
+        // as well as the international keys (below)
         kbinput[14] = urbinput[1] >> 7;
+
+        // The 16 byte ones have their HID descriptors as follows:
+        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+        //   Usage Minimum (0x00)
+        //   Usage Maximum (0x67)
+        //   Report Count (104)
+        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+        //   Usage Minimum (0x87)
+        //   Usage Maximum (0x8E)
+        //   Report Count (8)
+
+        // The 21 byte ones have the full range 0x00~0x97
+        if(length == 16) {
+            // The international keys fall in the last byte.
+            // In the bragi keymap, ro (bit 0) is 3 bits after rwin (bit 0)
+
+            // This is untested, but it should work(tm)!
+            kbinput[14] |= urbinput[15] << 3;
+            // No room for intl8, it overlaps with fn (and also likely unused) :(
+            kbinput[15] |= (urbinput[15] >> 5) & 3;
+        } else if(length == 21) {
+            // Grab the ro (intl1) key and add it to the keymap
+            kbinput[14] |= (urbinput[18] & 0x80) >> 4;
+            // Then from intl2 to intl5 (incl.), to fill the remaining 4 bits in the keymap byte
+            kbinput[14] |= urbinput[19] << 4;
+            // And finally, intl6 and intl7 to fill the first 2 bits in the next keymap byte.
+            kbinput[15] |= (urbinput[19] >> 4) & 3;
+            // Also no room for intl8 :(
+        } else {
+            ckb_warn("Unhandled NKRO_KEY_IN length %d in handle_bragi_key_input(), international keys will not function", length);
+        }
     } else if(urbinput[0] == NKRO_MEDIA_IN && length == 3) {
         // This section is similar to handle_nkro_media_keys(), but with different indices due to the different keymap
         // This works because these keys can not be pressed at the same time

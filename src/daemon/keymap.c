@@ -439,7 +439,7 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "rwin",          112, KEY_RIGHTMETA },
     { "light",         113, KEY_CORSAIR },
     { "lock",            1, KEY_CORSAIR },
-    { 0,                -1, KEY_NONE },
+    { "ro",            115, KEY_RO },
     { 0,                -1, KEY_NONE },
     { 0,                -1, KEY_NONE },
     { 0,                -1, KEY_NONE },

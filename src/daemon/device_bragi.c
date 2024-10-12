@@ -255,7 +255,7 @@ int start_keyboard_bragi(usbdevice* kb, int makeactive){
     // Physical layout detection.
     kb->layout = prop;
     // So far ISO and ANSI are known and match.
-    if (kb->layout != LAYOUT_ANSI && kb->layout != LAYOUT_ISO) {
+    if (kb->layout != LAYOUT_ANSI && kb->layout != LAYOUT_ISO && kb->layout != LAYOUT_ABNT) {
         ckb_warn("Got unknown physical layout byte value %" PRId64 ", please file a bug report mentioning your keyboard's physical layout", prop);
         kb->layout = LAYOUT_UNKNOWN;
     }

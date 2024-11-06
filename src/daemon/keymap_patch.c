@@ -88,6 +88,10 @@ keypatch k70tklpatch[] = {
     {   1, "logo",      1, KEY_NONE },
 };
 
+keypatch k70propatch[] = {
+    { 114, "lock",    114, KEY_CORSAIR },
+};
+
 
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
@@ -111,6 +115,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K100_MECHANICAL,         k100patch),
     ADD_PATCH(V_CORSAIR, P_K100_OPTICAL_VARIANT,         k100patch),
     ADD_PATCH(V_CORSAIR, P_K70_TKL,      k70tklpatch),
+    ADD_PATCH(V_CORSAIR, P_K70_PRO, k70propatch)
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

@@ -91,21 +91,6 @@ keypatch k70tklpatch[] = {
 };
 
 static const keypatch SCIMITARpatch[] = {
-<<<<<<< Updated upstream
-        { 269, "mouse5",   1, SCAN_MOUSE  }, // "bar1"
-        { 270, "dpidn",      2, SCAN_MOUSE }, // "logo"
-        { 271, "dpiup",    3, SCAN_MOUSE },
-        { 272, "thumb1",   4, SCAN_MOUSE },
-        { 273, "thumb2",  5, SCAN_MOUSE },
-        { 274, "thumb3",   6, SCAN_MOUSE }, // sniper led
-        { 275, "thumb4",    7, SCAN_MOUSE },
-        { 276, "thumb5",    8, SCAN_MOUSE },
-        { 277, "thumb6",   9, SCAN_MOUSE },
-        { 278, "thumb7",   10, SCAN_MOUSE }, // "bar2"
-        { 279, "thumb8",11, SCAN_MOUSE }, // "bar3"
-        { 280, "thumb9",12, SCAN_MOUSE }, // "bar3"
-        { 281, "sniper",13, SCAN_MOUSE }, // "bar3"
-=======
     { 210, "mouse4", -1, SCAN_MOUSE | BTN_SIDE },   // Back button
     { 211, "mouse5", -1, SCAN_MOUSE | BTN_EXTRA },  // Forward button
     { 213, "dpiup", -1, KEY_CORSAIR },
@@ -122,7 +107,6 @@ static const keypatch SCIMITARpatch[] = {
     { 279, "thumb8",11, SCAN_MOUSE },
     { 280, "thumb9",12, SCAN_MOUSE },
     { 281, "sniper",13, SCAN_MOUSE },
->>>>>>> Stashed changes
 };
 
 

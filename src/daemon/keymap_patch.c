@@ -79,6 +79,8 @@ static const keypatch DCRGBPpatch[] = {
     { 268, "bar4",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
 };
 
+
+
 keypatch k100patch[] = {
     {114, "lock", 114, KEY_CORSAIR },
 };
@@ -86,6 +88,25 @@ keypatch k100patch[] = {
 keypatch k70tklpatch[] = {
     { 114, "lock",    114, KEY_CORSAIR },
     {   1, "logo",      1, KEY_NONE },
+};
+
+static const keypatch SCIMITARpatch[] = {
+    { 210, "mouse4", -1, SCAN_MOUSE | BTN_SIDE },   // Back button
+    { 211, "mouse5", -1, SCAN_MOUSE | BTN_EXTRA },  // Forward button
+    { 213, "dpiup", -1, KEY_CORSAIR },
+    { 237, "dpi", LED_MOUSE, KEY_NONE },
+    { 270, "dpidn",      2, SCAN_MOUSE },
+    { 271, "dpiup",    3, SCAN_MOUSE },
+    { 272, "thumb1",   4, SCAN_MOUSE },
+    { 273, "thumb2",  5, SCAN_MOUSE },
+    { 274, "thumb3",   6, SCAN_MOUSE },
+    { 275, "thumb4",    7, SCAN_MOUSE },
+    { 276, "thumb5",    8, SCAN_MOUSE },
+    { 277, "thumb6",    9, SCAN_MOUSE },
+    { 278, "thumb7",   10, SCAN_MOUSE },
+    { 279, "thumb8", SCAN_MOUSE | BTN_SIDE + 7, SCAN_MOUSE },
+    { 280, "thumb9", 12, SCAN_MOUSE },
+    { 281, "sniper", 13, SCAN_MOUSE },
 };
 
 
@@ -99,6 +120,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_M55_RGB_PRO,  m55patch),
     ADD_PATCH(V_CORSAIR, P_M95,          m95patch),
     ADD_PATCH(V_CORSAIR, P_IRONCLAW_W_U, icwpatch),
+    ADD_PATCH(V_CORSAIR, P_SCIMITAR_ELITE_W_U, SCIMITARpatch),
     ADD_PATCH(V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch),
     ADD_PATCH(V_CORSAIR, P_KATAR_PRO_XT, katarproxtpatch),
     ADD_PATCH(V_CORSAIR, P_KATAR_PRO,    katarproxtpatch),

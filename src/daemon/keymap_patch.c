@@ -102,11 +102,11 @@ static const keypatch SCIMITARpatch[] = {
     { 274, "thumb3",   6, SCAN_MOUSE },
     { 275, "thumb4",    7, SCAN_MOUSE },
     { 276, "thumb5",    8, SCAN_MOUSE },
-    { 277, "thumb6",   9, SCAN_MOUSE },
+    { 277, "thumb6",    9, SCAN_MOUSE },
     { 278, "thumb7",   10, SCAN_MOUSE },
-    { 279, "thumb8",11, SCAN_MOUSE },
-    { 280, "thumb9",12, SCAN_MOUSE },
-    { 281, "sniper",13, SCAN_MOUSE },
+    { 279, "thumb8", SCAN_MOUSE | BTN_SIDE + 7, SCAN_MOUSE },
+    { 280, "thumb9", 12, SCAN_MOUSE },
+    { 281, "sniper", 13, SCAN_MOUSE },
 };
 
 

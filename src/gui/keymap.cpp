@@ -921,6 +921,42 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["lock"].height = 8;
         break;
     }
+    case KeyMap::K70_CORE_RGB:{
+            map = getMap(KeyMap::K70, layout);
+            map.remove("light");
+            map.remove("lock");
+            map.remove("mute");
+            map.remove("volup");
+            map.remove("voldn");
+            map.remove("stop");
+            map.remove("prev");
+            map.remove("play");
+            map.remove("next");
+
+            // Replace rwin with Fn
+            map["fn"] = KStrafeKeys[3];
+            map["fn"].x = map["rwin"].x;
+            map.remove("rwin");
+            break;
+    }
+    case KeyMap::K70_CORE_RGB:{
+            map = getMap(KeyMap::K70, layout);
+            map.remove("light");
+            map.remove("lock");
+            map.remove("mute");
+            map.remove("volup");
+            map.remove("voldn");
+            map.remove("stop");
+            map.remove("prev");
+            map.remove("play");
+            map.remove("next");
+
+            // Replace rwin with Fn
+            map["fn"] = KStrafeKeys[3];
+            map["fn"].x = map["rwin"].x;
+            map.remove("rwin");
+            break;
+    }
     case KeyMap::STRAFE_MK2:{
         map = getMap(KeyMap::K70MK2, layout);
         // move everything right to make the space for the left sidelight
@@ -1695,6 +1731,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K65_MINI;
     if(lower == "k70pro")
         return K70_PRO;
+    if(lower == "k70_core_rgb")
+        return K70_CORE_RGB;
     return NO_MODEL;
 }
 
@@ -1782,6 +1820,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k65_mini";
     case K70_PRO:
         return "k70pro";
+    case K70_CORE_RGB:
+        return "k70_core_rgb";
     default:
         return "";
     }
@@ -1797,6 +1837,8 @@ KeyMap KeyMap::fromName(const QString &name){
 int KeyMap::modelWidth(Model model){
     switch(model){
     case K60:
+        return K60_WIDTH;
+    case K70_CORE_RGB:
         return K60_WIDTH;
     case K60_TKL:
         return K60_TKL_WIDTH;
@@ -1871,6 +1913,7 @@ int KeyMap::modelHeight(Model model){
     case K70MK2:
     case K70_PRO:
     case K70_TKL:
+    case K70_CORE_RGB:
     case K95:
     case K95L:
     case STRAFE:

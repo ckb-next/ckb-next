@@ -926,12 +926,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map.remove("light");
             map.remove("lock");
             map.remove("mute");
-            map.remove("volup");
-            map.remove("voldn");
             map.remove("stop");
             map.remove("prev");
             map.remove("play");
             map.remove("next");
+
+            // This is the profile switch button but comes across as play
+            map["play"] = { nullptr,  "Play", "play", 227, 14, 16, 11, false, true};
+
+            // K70 Core RGP has a volume knob that can be pressed
+            map["knobpress"] = {nullptr,  "Press", "kobpress",  252, 10, 12, 8, false, true};
 
             // Replace rwin with Fn
             map["fn"] = KStrafeKeys[3];

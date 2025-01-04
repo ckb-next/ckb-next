@@ -8,11 +8,38 @@
 #include <QListWidgetItem>
 #include <QSignalBlocker>
 #include <limits>
+#include <QFile>
+#include <QTextStream>
+#include <algorithm>
+
+bool comp(Key& a, Key& b) {
+    return strcmp(a.name, b.name) < 0;
+}
 
 KeyWidgetDebugger::KeyWidgetDebugger(QWidget* parent) :
     QWidget(parent),
     ui(new Ui::KeyWidgetDebugger), w(new KeyWidget(this)), m(KeyMap::Model::NO_MODEL), l(KeyMap::Layout::NO_LAYOUT)
 {
+    // FIXME MAKE THIS A BUTTON
+    for(int j = KeyMap::Layout::NO_LAYOUT + 1; j < KeyMap::Layout::_LAYOUT_MAX; j++) {
+        KeyMap::Layout lay = static_cast<KeyMap::Layout>(j);
+        for(int i = KeyMap::Model::NO_MODEL + 1; i < KeyMap::Model::_MODEL_MAX; i++) {
+            KeyMap::Model keyMapModel = static_cast<KeyMap::Model>(i);
+            QFile f(QString("layout-%1-%2").arg(KeyMap::getModel(keyMapModel), KeyMap::getLayout(lay)));
+            f.open(QIODevice::WriteOnly);
+            QTextStream ts(&f);
+            KeyMapDebug keyMapDbg(keyMapModel, lay);
+            QList<Key> ll = keyMapDbg.positions();
+            std::sort(ll.begin(), ll.end(), comp);
+            for(const Key& k : ll) {
+                const QRect bRect = k.boundingRect();
+                ts << k.name << " " << bRect.x() << " " << bRect.y() << " " << bRect.width() << " " << bRect.height() << "\n";
+            }
+            f.close();
+        }
+    }
+
+
     ui->setupUi(this);
     ui->devw->setMaximum(std::numeric_limits<short>::max());
     ui->devh->setMaximum(std::numeric_limits<short>::max());
@@ -84,37 +111,49 @@ void KeyWidgetDebugger::on_keyList_currentItemChanged(QListWidgetItem* current, 
     const QSignalBlocker b2(ui->y);
     const QSignalBlocker b3(ui->w);
     const QSignalBlocker b4(ui->h);
-    ui->x->setValue(k.x);
-    ui->y->setValue(k.y);
-    ui->w->setValue(k.width);
-    ui->h->setValue(k.height);
+
+    if(k.is_auto_rect()) {
+        ui->x->setValue(k.rectX());
+        ui->y->setValue(k.rectY());
+        ui->w->setValue(k.rectWidth());
+        ui->h->setValue(k.rectHeight());
+        ui->x->setEnabled(true);
+        ui->y->setEnabled(true);
+        ui->w->setEnabled(true);
+        ui->h->setEnabled(true);
+    } else {
+        ui->x->setEnabled(false);
+        ui->y->setEnabled(false);
+        ui->w->setEnabled(false);
+        ui->h->setEnabled(false);
+    }
     w->setSelection(QStringList(current->text()));
 }
 
 #define HANDLE_SPINBOX_VAL(arg, val) \
     if(!ui->keyList->currentItem()) \
         return; \
-    map[ui->keyList->currentItem()->text()].arg = val; \
+    map[ui->keyList->currentItem()->text()].setRect##arg(val); \
     w->map(map);
 
 void KeyWidgetDebugger::on_x_valueChanged(int arg1)
 {
-    HANDLE_SPINBOX_VAL(x, arg1);
+    HANDLE_SPINBOX_VAL(X, arg1);
 }
 
 void KeyWidgetDebugger::on_y_valueChanged(int arg1)
 {
-    HANDLE_SPINBOX_VAL(y, arg1);
+    HANDLE_SPINBOX_VAL(Y, arg1);
 }
 
 void KeyWidgetDebugger::on_w_valueChanged(int arg1)
 {
-    HANDLE_SPINBOX_VAL(width, arg1);
+    HANDLE_SPINBOX_VAL(Width, arg1);
 }
 
 void KeyWidgetDebugger::on_h_valueChanged(int arg1)
 {
-    HANDLE_SPINBOX_VAL(height, arg1);
+    HANDLE_SPINBOX_VAL(Height, arg1);
 }
 
 void KeyWidgetDebugger::on_showSelectionSurfaces_toggled(bool checked)

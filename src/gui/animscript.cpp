@@ -317,15 +317,16 @@ int AnimScript::begin(quint64 timestamp){
     minX = INT_MAX;
     minY = INT_MAX;
     foreach(const QString& key, keysCopy){
-        const Key& pos = _map.key(key);
-        if(!pos){
+        const Key& k = _map.key(key);
+        if(!k){
             keysCopy.removeAll(key);
             continue;
         }
-        if(pos.x < minX)
-            minX = pos.x;
-        if(pos.y < minY)
-            minY = pos.y;
+        const QRect boundingRect = k.boundingRect();
+        if(boundingRect.x() < minX)
+            minX = boundingRect.x();
+        if(boundingRect.y() < minY)
+            minY = boundingRect.y();
     }
     if(keysCopy.isEmpty()){
         // If the key list is empty, don't actually start the animation but pretend it's running anyway
@@ -342,8 +343,9 @@ int AnimScript::begin(quint64 timestamp){
     process->write("begin keymap\n");
     process->write(QString("keycount %1\n").arg(keysCopy.count()).toLatin1());
     foreach(const QString& key, keysCopy){
-        const Key& pos = _map.key(key);
-        process->write(QString("key %1 %2,%3\n").arg(key).arg(pos.x - minX).arg(pos.y - minY).toLatin1());
+        const Key& k = _map.key(key);
+        const QRect boundingRect = k.boundingRect();
+        process->write(QString("key %1 %2,%3\n").arg(key).arg(boundingRect.x() - minX).arg(boundingRect.y() - minY).toLatin1());
     }
     process->write("end keymap\n");
     // Write parameters
@@ -403,7 +405,8 @@ void AnimScript::keypress(const QString& key, bool pressed, quint64 timestamp){
         if(!kp)
             return;
         advance(timestamp);
-        process->write(("key " + QString("%1,%2").arg(kp.x - minX).arg(kp.y - minY) + (pressed ? " down\n" : " up\n")).toLatin1());
+        const QRect boundingRect = kp.boundingRect();
+        process->write(("key " + QString("%1,%2").arg(boundingRect.x() - minX).arg(boundingRect.y() - minY) + (pressed ? " down\n" : " up\n")).toLatin1());
         break;
     }
 }

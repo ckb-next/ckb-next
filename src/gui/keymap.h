@@ -3,6 +3,7 @@
 
 #include <QColor>
 #include <QHash>
+#include <QPolygon>
 
 // Key information
 struct Key {
@@ -13,8 +14,7 @@ struct Key {
     const char* _friendlyName;
     const char* name;
     // LED position, measured roughly in 16th inches. Most keys are 3/4" apart (12x12).
-    short x, y;
-    short width, height;
+    QPolygon pos;
     // Whether or not the key has an LED, scancode, or both
     bool hasLed;
     bool hasScan;
@@ -43,6 +43,40 @@ struct Key {
     // Convert to bool -> key exists?
     inline operator bool () const { return name != nullptr; }
     inline bool operator !() const { return !(bool)*this; }
+    inline void translate(const int dx, const int dy) { pos.translate(dx, dy); }
+    // Is pos a rectangle that was created from a QRect?
+#warning "FIXME"
+    // FIXME also: should be 5 if we decide the polys need to be closed
+    // FIXME == 4 or == 5
+    inline bool is_auto_rect() const { return pos.length() >= 4 && pos[0].x() == pos[3].x() && pos[0].y() == pos[1].y() && pos[1].x() == pos[2].x() && pos[2].y() == pos[3].y(); }
+    // Use all of the below only if you know it's a QRect
+    // Hacky scale that adds the appropriate offsets to the appropriate points
+    inline void extendRect(const int w, const int h) {
+        Q_ASSERT(is_auto_rect());
+        // For width, add to the y of the two right points
+        pos[1].rx() = pos[2].rx() = pos[1].rx() + w;
+        // For height, add to the y of the two bottom points
+        pos[2].ry() = pos[3].ry() = pos[2].ry() + h;
+    }
+    // Similar to above, but absolute
+    inline void setRectWidth(const int w) {
+        Q_ASSERT(is_auto_rect());
+        pos[1].rx() = pos[2].rx() = pos[0].rx() + w;
+    }
+    inline void setRectHeight(const int h) {
+        Q_ASSERT(is_auto_rect());
+        pos[2].ry() = pos[3].ry() = pos[0].ry() + h;
+    }
+    inline int rectWidth() const { Q_ASSERT(is_auto_rect()); return pos[1].x() - pos[0].x(); }
+    inline int rectHeight() const { Q_ASSERT(is_auto_rect()); return pos[2].y() - pos[0].y(); }
+    inline int rectX() const { Q_ASSERT(is_auto_rect()); return pos[0].x(); }
+    inline int rectY() const { Q_ASSERT(is_auto_rect()); return pos[0].y(); }
+    inline void setRectX(const int x) { Q_ASSERT(is_auto_rect()); pos.translate(x - pos[0].x(), 0); }
+    inline void setRectY(const int y) { Q_ASSERT(is_auto_rect()); pos.translate(0, y - pos[0].y()); }
+    inline void setRectPos(const int x, const int y) { Q_ASSERT(is_auto_rect()); pos.translate(x - pos[0].x(), y - pos[0].y()); }
+    // This hack is needed due to how boundingRect is calculated...
+    // QPolygonF does not have this problem, so it's fine to do QPolygonF(pos).boundingRect(); in other places
+    inline QRect boundingRect() const { QRect boundingRect = pos.boundingRect(); boundingRect.setSize(boundingRect.size() - QSize{1,1}); return boundingRect; }
 };
 
 // Key layout/device info class

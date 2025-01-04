@@ -11,6 +11,7 @@
 #include <QLabel>
 #include "ckbmainbackgroundcolour.h"
 #include <ckbnextconfig.h>
+#include <QPolygonF>
 
 static const int KEY_SIZE = 12;
 
@@ -86,17 +87,23 @@ static inline int calculateControlWheelOffset(int d){
     }
 }
 
-static inline QRectF getKeyRect(const Key& key){
-    QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
+static inline QPolygonF getKeyPolygon(const Key& key){
+    //QPolygonF keyPoly(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
+
+    QPolygonF keyPoly(key.pos);
+    //QPolygonF keyPoly = QTransform::fromScale(2.f, 2.f).map(keyPolyy);
     // Special case for the pie-shaped ctrl wheel segments
     // We pretend they are small rectangles instead
-    if(!strncmp(key.name, "ctrlwheel", 9)){
+#warning "FIXME"
+    /*if(!strncmp(key.name, "ctrlwheel", 9)){
+        Q_ASSERT(key.is_auto_rect());
+#warning "FIXME: Make them proper segments and not rectangles in keymap"
         int d;
         if(sscanf(key.name + 9, "%d", &d) == 1) {
             const int offX = calculateControlWheelOffset(d + 2);
             const int offY = calculateControlWheelOffset(d);
-            float newX = keyRect.x() + offX * 5.5f - 6.5f;
-            float newY = keyRect.y() + offY * 5.5f - 6.5f;
+            float newX = keyPoly.x() + offX * 5.5f - 6.5f;
+            float newY = keyPoly.y() + offY * 5.5f - 6.5f;
 
             // These are intended to "stack"
             if(offX > 0)
@@ -109,10 +116,10 @@ static inline QRectF getKeyRect(const Key& key){
             if(offY == 3)
                 newY -= 4.f;
 
-            keyRect.moveTo(newX, newY);
+            keyPoly.moveTo(newX, newY);
         }
-    }
-    return keyRect;
+    }*/
+    return keyPoly;
 }
 
 void KeyWidget::map(const KeyMap& newMap){
@@ -230,6 +237,9 @@ void KeyWidget::calculateDrawInfo(const QSize& size){
     // FIXME: cleanup
     drawInfoOffset.setX((w / drawInfoScale - keyMap.width()) / 2.f);
     drawInfoOffset.setY((h / drawInfoScale - keyMap.height()) / 2.f);
+    drawTransform.reset();
+    drawTransform.scale(drawInfoScale, drawInfoScale);
+    //drawTransform.translate(drawInfoOffset.x(), drawInfoOffset.y());
     if(_currentOverlay.isNull()) {
         _currentOverlayScaled = QImage();
     } else {
@@ -254,8 +264,9 @@ bool KeyWidget::event(QEvent* e){
             continue;
 
         // Get the name of the key under the cursor
-        QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
-        if(keyRect.contains(mouseCurrentScaled)){
+#warning "Translate as below"
+        //QRectF keyRect(QPointF(key.x, key.y) - QPointF(key.width, key.height) / 2.f + QPointF(1.f, 1.f), QSize(key.width, key.height) - QSize(2, 2));
+        if(QPolygonF(key.pos).containsPoint(mouseCurrentScaled, Qt::OddEvenFill)){
             QToolTip::showText(he->globalPos(), key.friendlyName(false));
             return true;
         }
@@ -272,7 +283,7 @@ void KeyWidget::setDebug(bool debug){
     hitboxes.clear();
     if(debug)
         for(const Key& key : keyMap)
-            hitboxes[key.name] = getKeyRect(key);
+            hitboxes[key.name] = getKeyPolygon(key);
     update();
 #endif
 }
@@ -351,10 +362,12 @@ void KeyWidget::paintGL(){
     int d;
     for(const Key& key : keyMap){
         i++;
-        float x = key.x + drawInfoOffset.x() - key.width / 2.f + 1.f;
+        /*float x = key.x + drawInfoOffset.x() - key.width / 2.f + 1.f;
         float y = key.y + drawInfoOffset.y() - key.height / 2.f + 1.f;
         float w = key.width - 2.f;
-        float h = key.height - 2.f;
+        float h = key.height - 2.f;*/
+#warning "FIXME: translate"
+        QPolygonF keyPoly(key.pos);
         // In RGB mode, ignore keys without LEDs
         if((_rgbMode && !key.hasLed)
                 || (!_rgbMode && !key.hasScan))
@@ -384,7 +397,8 @@ void KeyWidget::paintGL(){
                     painter.setOpacity(0.7);
             }
         }
-        if(((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K100 && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2 && model != KeyMap::K70_TKL) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+        painter.drawPolygon(drawTransform.map(keyPoly));
+        /*if(((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K100 && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2 && model != KeyMap::K70_TKL) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || !strcmp(key.name, "lghtpgm") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))) ||
                 !strcmp(key.name, "ctrlwheelb")){
             // Not all devices have circular buttons
@@ -494,7 +508,7 @@ void KeyWidget::paintGL(){
                 w += 1.f;
             }
             painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
-        }
+        }*/
     }
 
     painter.setOpacity(1.0);
@@ -505,16 +519,15 @@ void KeyWidget::paintGL(){
         for(const Key& key : keyMap){
             if(!key.hasLed)
                 continue;
+
+#warning "FIXME: trans"
+            QPolygonF keyPoly = drawTransform.map(QPolygonF(key.pos));
+            /*
             float x = key.x + drawInfoOffset.x() - 1.8f;
             float y = key.y + drawInfoOffset.y() - 1.8f;
             float w = 3.6f;
-            float h = 3.6f;
-            /*if(model == KeyMap::K55){
-                x = key.x;
-                y = key.y;
-                w = key.width;
-                h = key.height;
-            }*/
+            float h = 3.6f;*/
+
             // Display a white circle around regular keys, red circle around indicators
             if(_indicators.contains(key.name))
                 painter.setPen(QPen(QColor(255, 248, 136), 1.5));
@@ -533,6 +546,7 @@ void KeyWidget::paintGL(){
                     color = monoRgb(qRed(color), qGreen(color), qBlue(color));
             }
             painter.setBrush(QBrush(color));
+/*
             // Strafe side lights (toggle lights with no animation)
             if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")) {
                 drawStrafeSidelights(&key, &painter, keyColor, color, bgColor);
@@ -641,6 +655,8 @@ void KeyWidget::paintGL(){
 
             } else
                 painter.drawEllipse(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
+*/
+            painter.drawPolygon(keyPoly);
         }
     } else {
         // Draw key names
@@ -653,10 +669,8 @@ void KeyWidget::paintGL(){
             if(!key.hasScan)
                 continue;
 
-            float x = key.x + drawInfoOffset.x() - key.width / 2.f + 1.f;
-            float y = key.y + drawInfoOffset.y() - key.height / 2.f;
-            float w = key.width - 2.f;
-            float h = key.height;
+            // We draw the text in the centre of the bounding rect
+            const QRectF keyRect = drawTransform.map(QPolygonF(key.pos)).boundingRect();
 
             // Print the key's friendly name (with some exceptions)
             QString keyName = KbBind::globalRemap(key.name);
@@ -688,15 +702,14 @@ void KeyWidget::paintGL(){
                 name = "\\";
             // Determine the appropriate size to draw the text at
             painter.setFont(font);
-            QRectF rect(x * drawInfoScale, y * drawInfoScale - 1.f, w * drawInfoScale, h * drawInfoScale);
-            int flags = Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextWordWrap;
-            QRectF bounds = painter.boundingRect(rect, flags, name);
 
-            while((bounds.height() >= rect.height() - 8. || bounds.width() >= rect.width() - 2.) && font.pixelSize() >= 5){
+            int flags = Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextWordWrap;
+            QRectF bounds = painter.boundingRect(keyRect, flags, name);
+            while((bounds.height() >= keyRect.height() - 8. || bounds.width() >= keyRect.width() - 2.) && font.pixelSize() >= 5){
                 // Scale font size down until it fits inside the key
                 font.setPixelSize(font.pixelSize() - 2);
                 painter.setFont(font);
-                bounds = painter.boundingRect(rect, flags, name);
+                bounds = painter.boundingRect(keyRect, flags, name);
             }
 
             // Pick color based on key function
@@ -720,7 +733,7 @@ void KeyWidget::paintGL(){
             else
                 // Remapped key - yellow
                 painter.setPen(yellow);
-            painter.drawText(rect, flags, name);
+            painter.drawText(keyRect, flags, name);
             font = font0;
         }
 
@@ -736,8 +749,10 @@ void KeyWidget::paintGL(){
     if(_debug){
         painter.setBrush(hitboxBrush);
         painter.setPen(red);
-        for(const QRectF& hitbox : hitboxes)
-            painter.drawRect(QRectF((hitbox.x() + drawInfoOffset.x()) * drawInfoScale, (hitbox.y() + drawInfoOffset.y()) * drawInfoScale, hitbox.width()*drawInfoScale, hitbox.height()*drawInfoScale));
+        for(const QPolygonF& hitbox : hitboxes)
+            //painter.drawRect(QRectF((hitbox.x() + drawInfoOffset.x()) * drawInfoScale, (hitbox.y() + drawInfoOffset.y()) * drawInfoScale, hitbox.width()*drawInfoScale, hitbox.height()*drawInfoScale));
+            painter.drawPolygon(drawTransform.map(hitbox));
+#warning "FIXME: Scale and other calculations above"
     }
 #endif
 
@@ -774,8 +789,8 @@ void KeyWidget::mousePressEvent(QMouseEvent* event){
         if((_rgbMode && !key.hasLed)
                 || (!_rgbMode && !key.hasScan))
             continue;
-        QRectF keyRect = getKeyRect(key);
-        if(keyRect.contains(mouseDownScaled)){
+        QPolygonF keyPoly = getKeyPolygon(key);
+        if(keyPoly.containsPoint(mouseDownScaled, Qt::OddEvenFill)){
             // Sidelights can't have a color, but they can be toggled
             if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")){
                 emit sidelightToggled(); // get the kblightwidget to record it
@@ -809,15 +824,15 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
 #endif
     QPointF mouseCurrentScaled = mouseCurrent / drawInfoScale - drawInfoOffset;
 
-    QRectF mouseHighlightRectScaled;
-
     // Clear new selection
     mouseHighlightRect = QRectF(mouseCurrent, mouseDown).normalized();
-    mouseHighlightRectScaled = QRectF(mouseCurrentScaled, mouseDown / drawInfoScale - drawInfoOffset).normalized();
+    //mouseHighlightRectScaled = QRectF(mouseCurrentScaled, mouseDown / drawInfoScale - drawInfoOffset).normalized();
+    QPolygonF mouseHighlightPolyScaled(QRectF(mouseCurrentScaled, mouseDown / drawInfoScale - drawInfoOffset));
+
 
     // If the rect is not valid (mouseCurrent == mouseDown, or just a line),
     // the selection will temporarily go away due to intersect not being defined
-    if(!mouseHighlightRect.isValid() || !mouseHighlightRectScaled.isValid())
+    if(!mouseHighlightRect.isValid())
         return;
 
     newSelection.fill(false);
@@ -829,13 +844,13 @@ void KeyWidget::mouseMoveEvent(QMouseEvent* event){
         if((_rgbMode && !key.hasLed)
                 || (!_rgbMode && !key.hasScan))
             continue;
-        QRectF keyRect = getKeyRect(key);
+        QPolygonF keyPoly = getKeyPolygon(key);
         // on STRAFE Sidelights and indicators can't be assigned color the way other keys are colored
         if(((keyMap.model() == KeyMap::STRAFE || keyMap.model() == KeyMap::STRAFE_MK2) && (!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel")))
                 || (keyMap.model() == KeyMap::M95 && !strcmp(key.name, "back"))
                 || _indicators.contains(key.name)) // FIX: _indicators check fails whenever _indicators is empty because "show animated" is unchecked
             continue;
-        if(mouseHighlightRectScaled.intersects(keyRect))
+        if(mouseHighlightPolyScaled.intersects(keyPoly))
             newSelection.setBit(i);
     }
 
@@ -945,10 +960,12 @@ void KeyWidget::clearAnimation(){
 }
 
 void KeyWidget::drawLogo(const Key* key, QPainter* painter){
-    float lx = key->x + drawInfoOffset.x() - key->width / 2.f + 2.f;
-    float ly = key->y + drawInfoOffset.y() - key->height / 2.f + 2.f;
-    float lw = key->width - 4.f;
-    float lh = key->height - 4.f;
+    Q_ASSERT(key->is_auto_rect());
+    const QRect boundingRect = key->boundingRect();
+    float lx = boundingRect.x() + drawInfoOffset.x() - boundingRect.width() / 2.f + 2.f;
+    float ly = boundingRect.y() + drawInfoOffset.y() - boundingRect.height() / 2.f + 2.f;
+    float lw = boundingRect.width() - 4.f;
+    float lh = boundingRect.height() - 4.f;
     QPainterPath logo;
     logo.moveTo(lx*drawInfoScale,(ly+lh)*drawInfoScale);
     logo.quadTo((lx+2.f)*drawInfoScale,(ly+lh/2.f)*drawInfoScale,lx*drawInfoScale,ly*drawInfoScale);
@@ -1006,10 +1023,12 @@ void KeyWidget::drawTopLeftCorner(QPainter* painter, float x, float y, float w, 
 }
 
 void KeyWidget::drawStrafeSidelights(const Key* key, QPainter* painter, const QColor& kC, const QColor& c, const QColor& bgC){
-    float kx = key->x + drawInfoOffset.x() - key->width / 2.f + 1.f;
-    float ky = key->y + drawInfoOffset.y() - key->height / 2.f + 1.f;
-    float kw = key->width - 2.f;
-    float kh = key->height - 2.f;
+    Q_ASSERT(key->is_auto_rect());
+    const QRect boundingRect = key->boundingRect();
+    float kx = boundingRect.x() + drawInfoOffset.x() - boundingRect.width() / 2.f + 1.f;
+    float ky = boundingRect.y() + drawInfoOffset.y() - boundingRect.height() / 2.f + 1.f;
+    float kw = boundingRect.width() - 2.f;
+    float kh = boundingRect.height() - 2.f;
     int wWidth = width(), wHeight = height();
 
     QRadialGradient gradient(QPointF(wWidth/2.f, wHeight/2.f), wWidth/2.f);

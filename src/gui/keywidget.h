@@ -10,6 +10,7 @@
 #include <cmath>
 #include <ckbnextconfig.h>
 #include <QElapsedTimer>
+#include <QTransform>
 
 class KeyWidget : public QOpenGLWidget
 {
@@ -99,6 +100,7 @@ private:
 
     QPointF drawInfoOffset;
     float drawInfoScale;
+    QTransform drawTransform;
 
     // Helper functions for rendering keys
     void drawLogo(const Key* key, QPainter* decPainter);
@@ -120,7 +122,7 @@ private:
     double kbLoopElapsed;
 #endif
 #ifndef NDEBUG
-    QHash<const char*, QRectF> hitboxes;
+    QHash<const char*, QPolygonF> hitboxes;
 #endif
 };
 

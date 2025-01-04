@@ -508,9 +508,12 @@ void KbWidget::switchToMode(const QString& mode){
     }
 }
 
-void KbWidget::on_pollRateBox_currentIndexChanged(const QString& arg1) {
+void KbWidget::on_pollRateBox_currentIndexChanged(int arg1) {
+    if(arg1 == -1)
+        return;
+    const QString str = ui->pollRateBox->itemText(arg1);
     ui->pollRateBox->setEnabled(false);
-    device->setPollRate(arg1.left(arg1.indexOf(QLatin1String(" ms"))));
+    device->setPollRate(str.left(str.indexOf(QLatin1String(" ms"))));
 }
 
 // Returns true if a match is found

@@ -78,6 +78,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_K70_PRO, },
     { V_CORSAIR, P_K70_PRO_OPTIC, },
     { V_CORSAIR, P_K70_CORE_RGB, },
+    { V_CORSAIR, P_K70_CORE_RGB_2, },
     { V_CORSAIR, P_K90_LEGACY, },
     { V_CORSAIR, P_K95, },
     { V_CORSAIR, P_K95_LEGACY, },
@@ -212,6 +213,8 @@ const char* product_str(ushort product){
     if(product == P_K70_PRO || product == P_K70_PRO_OPTIC)
         return "k70pro";
     if(product == P_K70_CORE_RGB)
+        return "k70_core_rgb";
+    if(product == P_K70_CORE_RGB_2)
         return "k70_core_rgb";
     if(product == P_K68 || product == P_K68_NRGB)
         return "k68";

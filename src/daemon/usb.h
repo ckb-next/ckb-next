@@ -129,7 +129,7 @@
 #define P_SCIMITAR_PRO       0x1b3e
 #define P_SCIMITAR_ELITE     0x1b8b
 #define P_SCIMITAR_RGB_ELITE 0x1be3
-#define IS_SCIMITAR(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE) || (kb)->product == P_SCIMITAR_RGB_ELITE))
+#define IS_SCIMITAR(kb)      ((kb)->vendor == V_CORSAIR && ((kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_SCIMITAR_RGB_ELITE))
 
 #define P_HARPOON            0x1b3c
 #define P_HARPOON_PRO        0x1b75

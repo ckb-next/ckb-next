@@ -204,8 +204,10 @@ void XWindowDetector::run()
             // Root window events are used to monitor for the active window
             if(notifyevt->window == scr->root){
                 // Ignore notifications for all atoms other than the active window
-                if(notifyevt->atom != ewmh->_NET_ACTIVE_WINDOW)
+                if(notifyevt->atom != ewmh->_NET_ACTIVE_WINDOW){
+                    free(evt);
                     continue;
+                }
 
                 xcb_window_t new_win = getActiveWindow(ewmh, preferred_screen);
                 if(!new_win){

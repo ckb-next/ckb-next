@@ -25,6 +25,7 @@ runs:
 
     - name: Generate package name
       run: 'echo "ARTIFACT_NAME=$(echo ${{ matrix.image }}-${{ matrix.compiler }} | tr : -)" >> $GITHUB_ENV'
+      shell: bash --noprofile --norc -euxo pipefail {0}
 
     - name: Upload package
       uses: actions/upload-artifact@v4

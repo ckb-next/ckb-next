@@ -24,7 +24,7 @@ runs:
       working-directory: build
 
     - name: Generate package name
-      run: echo "ARTIFACT_NAME=$(echo ${{ matrix.image }}-${{ matrix.compiler }} | tr : -)" >> $GITHUB_ENV
+      run: 'echo "ARTIFACT_NAME=$(echo ${{ matrix.image }}-${{ matrix.compiler }} | tr : -)" >> $GITHUB_ENV'
 
     - name: Upload package
       uses: actions/upload-artifact@v4

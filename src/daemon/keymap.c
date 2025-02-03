@@ -453,7 +453,7 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "prev",          126, KEY_PREVIOUSSONG },
     { "mr",             -1, KEY_CORSAIR },
     { "profswitch",    128, KEY_CORSAIR },
-    { 0,                -1, KEY_NONE },
+    { "knobpress",     129, KEY_MUTE },
     { 0,                -1, KEY_NONE },
     { "g1",            131, KEY_CORSAIR },
     { "g2",            132, KEY_CORSAIR },
@@ -612,6 +612,8 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         CLEAR_KEYBIT(kbinput, 103);         // volup
         CLEAR_KEYBIT(kbinput, 104);         // voldn
 
+
+
         // We only care about the first byte
         switch(urbinput[1]){
         case 181:
@@ -634,6 +636,23 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
             break;
         case 234:
             SET_KEYBIT(kbinput, 104);   // voldn
+            break;
+        }
+    } else if(urbinput[0] == NKRO_MEDIA_IN && length == 5) {
+        CLEAR_KEYBIT(kbinput, 129);         // mute k70 core knob
+        CLEAR_KEYBIT(kbinput, 122);         // voldn k70 core knob
+        CLEAR_KEYBIT(kbinput, 123);         // volup k70 core knob
+
+        switch(urbinput[1])
+        {
+        case 129:
+            SET_KEYBIT(kbinput, 102);   // mute k70 core knob
+            break;
+        case 122:
+            SET_KEYBIT(kbinput, 104);   // voldn k70 core knob
+            break;
+        case 123:
+            SET_KEYBIT(kbinput, 103);   // volup k70 core knob
             break;
         }
     } else {

@@ -34,6 +34,7 @@ void bragi_fill_input_eps(usbdevice* kb)
             case P_K100_MECHANICAL:
             case P_K65_MINI:
             case P_K70_TKL:
+            case P_K70_PRO:
                 kb->bragi_out_ep = 0x1;
                 kb->bragi_in_ep = 0x82;
                 break;

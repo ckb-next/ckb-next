@@ -869,6 +869,30 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["voldn"].x -= 10;
         break;
     }
+    case KeyMap::K70_PRO:{
+        // Same as K70 MK2 but right Windows key is a function key
+        map = getMap(KeyMap::K70MK2, layout);
+
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+
+        // these keys are all the way to left
+        map["profswitch"].x = 0;
+        map["light"].x = 9;
+        map["lock"].x = 18;
+
+        // these keys are all the way to the right
+        map["mute"].x += 10;
+        map["volup"].x += 10;
+        map["voldn"].x += 10;
+
+        map["topbar1"] = {nullptr, "Logo", "topbar1", 128, 0, NS, true, false};
+        map.remove("m3");
+        map.remove("g11");
+
+        break;
+    }
     case KeyMap::K70_TKL:{
         // Same width as the K63 but with a top row more like the K70
         map = getMap(KeyMap::K63, layout);
@@ -1644,6 +1668,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K100;
     if(lower == "k65_mini")
         return K65_MINI;
+    if(lower == "k70pro")
+        return K70_PRO;
     return NO_MODEL;
 }
 
@@ -1727,6 +1753,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k100";
     case K65_MINI:
         return "k65_mini";
+    case K70_PRO:
+        return "k70pro";
     default:
         return "";
     }
@@ -1758,6 +1786,7 @@ int KeyMap::modelWidth(Model model){
         return K68_WIDTH;
     case K70:
     case K70MK2:
+    case K70_PRO:
         return K70_WIDTH;
     case K95:
     case K95L:
@@ -1811,6 +1840,7 @@ int KeyMap::modelHeight(Model model){
     case K68:
     case K70:
     case K70MK2:
+    case K70_PRO:
     case K70_TKL:
     case K95:
     case K95L:

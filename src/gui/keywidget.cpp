@@ -379,7 +379,7 @@ void KeyWidget::paintGL(){
                     painter.setOpacity(0.7);
             }
         }
-        if(((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K100 && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2 && model != KeyMap::K70_TKL) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
+        if(((model != KeyMap::STRAFE && model != KeyMap::K95P && model != KeyMap::K100 && model != KeyMap::K70MK2 && model != KeyMap::STRAFE_MK2 && model != KeyMap::K70_TKL && model != KeyMap::K70_PRO) && (!strcmp(key.name, "mr") || !strcmp(key.name, "m1") || !strcmp(key.name, "m2") || !strcmp(key.name, "m3")
                 || !strcmp(key.name, "light") || !strcmp(key.name, "lock") || !strcmp(key.name, "lghtpgm") || (model == KeyMap::K65 && !strcmp(key.name, "mute")))) ||
                 !strcmp(key.name, "ctrlwheelb")){
             // Not all devices have circular buttons
@@ -408,7 +408,7 @@ void KeyWidget::paintGL(){
                 drawTopLeftCorner(&painter, x, y, w, h, drawInfoScale);
             } else
                 painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
-        } else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2 || model == KeyMap::K70_TKL) && key.friendlyName().startsWith("Logo")) {
+        } else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2 || model == KeyMap::K70_TKL || model == KeyMap::K70_PRO) && key.friendlyName().startsWith("Logo")) {
             w += 10.f;
             x -= 5.f;
             painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));

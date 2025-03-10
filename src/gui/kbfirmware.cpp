@@ -116,7 +116,7 @@ void KbFirmware::processDownload(QNetworkReply* reply){
     bool scan = false;
     foreach(QString line, lines){
         // Collapse whitespace
-        line.replace(QRegExp("\\s+"), " ").remove(QRegExp("^\\s")).remove(QRegExp("\\s$"));
+        line.replace(QRegularExpression("\\s+"), " ").remove(QRegularExpression("^\\s")).remove(QRegularExpression("\\s$"));
         // Skip empty or commented-out lines
         if(line.length() == 0 || line.at(0) == '#')
             continue;

@@ -9,6 +9,15 @@
       <arg name="id" type="u" direction="out"/>
       <arg name="action_key" type="s" direction="out"/>
     </signal>
+    <!-- non-standard -->
+    <signal name="NotificationReplied">
+      <arg name="id" type="u" direction="out"/>
+      <arg name="text" type="s" direction="out"/>
+    </signal>
+    <signal name="ActivationToken">
+      <arg name="id" type="u" direction="out"/>
+      <arg name="activation_token" type="s" direction="out"/>
+    </signal>
     <method name="Notify">
       <annotation name="org.qtproject.QtDBus.QtTypeName.In6" value="QVariantMap"/>
       <arg type="u" direction="out"/>
@@ -33,5 +42,28 @@
       <arg type="s" name="version" direction="out"/>
       <arg type="s" name="spec_version" direction="out"/>
     </method>
+
+    <!-- Inhibitions -->
+    <method name="Inhibit">
+      <annotation name="org.qtproject.QtDBus.QtTypeName.In2" value="QVariantMap"/>
+      <arg type="u" direction="out"/>
+      <arg name="desktop_entry" type="s" direction="in"/>
+      <arg name="reason" type="s" direction="in"/>
+      <arg name="hints" type="a{sv}" direction="in"/>
+    </method>
+
+    <method name="UnInhibit">
+      <arg type="u" direction="in"/>
+    </method>
+
+    <property name="Inhibited" type="b" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+
+    <!--<method name="ListInhibitors">
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QList&lt;Inhibition&gt;"/>
+      <arg name="inhibitors" type="a(ssa{sv})" direction="out"/>
+    </method>-->
+
   </interface>
 </node>

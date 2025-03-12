@@ -11,6 +11,8 @@ void bragi_fill_input_eps(usbdevice* kb)
     int offset = 1;
     if(IS_HARPOON_WL(kb))
         offset = 2;
+    else if(IS_MM700(kb))
+        offset = 4;
 
     for(int i = 0; i < kb->epcount; i++)
         kb->input_endpoints[i] = (i + offset) | 0x80;

@@ -117,8 +117,9 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K100_OPTICAL,         k100patch),
     ADD_PATCH(V_CORSAIR, P_K100_MECHANICAL,         k100patch),
     ADD_PATCH(V_CORSAIR, P_K100_OPTICAL_VARIANT,         k100patch),
-    ADD_PATCH(V_CORSAIR, P_K70_TKL,      k70tklpatch),
-    ADD_PATCH(V_CORSAIR, P_K70_PRO, k70propatch)
+    ADD_PATCH(V_CORSAIR, P_K70_TKL,       k70tklpatch),
+    ADD_PATCH(V_CORSAIR, P_K70_PRO,       k70propatch),
+    ADD_PATCH(V_CORSAIR, P_K70_PRO_OPTIC, k70propatch)
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

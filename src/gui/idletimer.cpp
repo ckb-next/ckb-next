@@ -1,5 +1,6 @@
 #include "idletimer.h"
 #include "wayland/waylandutils.h"
+#include <QScopedPointer>
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
 #include <QGlobalStatic>

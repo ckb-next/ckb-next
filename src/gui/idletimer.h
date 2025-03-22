@@ -3,7 +3,10 @@
 
 class IdleTimerImpl {
 public:
-    virtual int getIdleTime() = 0;
+    virtual int getIdleTime() const = 0;
+    virtual inline bool isSupported() const {
+        return true;
+    }
 };
 
 class IdleTimer

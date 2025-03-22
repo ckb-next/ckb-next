@@ -11,12 +11,20 @@
 #include "xcb/xcbidletimer.h"
 #endif
 
+#ifdef USE_WAYLAND_IDLE_NOTIFY
+#include "wayland/waylandidletimer.h"
+#endif
+
 class IdleTimerHelper {
 public:
     QScopedPointer<IdleTimerImpl> m_impl;
 
     IdleTimerHelper() {
-        if (!WaylandUtils::isWayland()) {
+        if (WaylandUtils::isWayland()) {
+#ifdef USE_WAYLAND_IDLE_NOTIFY
+            m_impl.reset(new WaylandIdleTimer());
+#endif
+        } else {
 #ifdef USE_XCB_SCREENSAVER
             m_impl.reset(new XcbIdleTimer());
 #endif
@@ -37,5 +45,5 @@ int IdleTimer::getIdleTime()
 
 bool IdleTimer::isSupported()
 {
-    return g_helper->m_impl.isNull();
+    return g_helper->m_impl.isNull() ? false : g_helper->m_impl->isSupported();
 }

@@ -6,7 +6,7 @@
 class XcbIdleTimer : public IdleTimerImpl
 {
 public:
-    int getIdleTime() override;
+    int getIdleTime() const override;
 };
 
 #endif // XCBIDLETIMER_HPP

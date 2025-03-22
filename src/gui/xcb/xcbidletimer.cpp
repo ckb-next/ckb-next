@@ -17,7 +17,7 @@
 
 #include "mainwindow.h"
 
-int XcbIdleTimer::getIdleTime()
+int XcbIdleTimer::getIdleTime() const
 {
     const MainWindow* const mw = MainWindow::mainWindow;
     if(!mw || !mw->windowHandle())

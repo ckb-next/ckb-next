@@ -398,6 +398,13 @@ elseif (LINUX)
             )
         endif()
     endif()
+
+    target_sources(
+        ckb-next
+            PRIVATE
+                wayland/waylandutils.cpp
+                wayland/waylandutils.h
+    )
 endif ()
 
 if (MAC_LEGACY)

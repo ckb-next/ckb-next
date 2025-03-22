@@ -5,9 +5,7 @@
 #include "ckbsettings.h"
 #include "animdetailsdialog.h"
 #include "kbmanager.h"
-#ifdef USE_XCB_SCREENSAVER
-#include "idletimer.h"
-#endif
+#include "wayland/waylandutils.h"
 // KbLight
 static int lastSharedDimming = -2;
 
@@ -79,7 +77,7 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
 #endif
     // We need to explicitly disable this if there's a wayland session.
     // If not, the idle timer will only count when there's activity inside XWayland windows.
-    if(IdleTimer::isWayland()){
+    if(WaylandUtils::isWayland()){
         QString notSupported(tr("This feature is not supported under Wayland"));
         ui->timerBox->setToolTip(notSupported);
         ui->timerMinBox->setToolTip(notSupported);

@@ -1,6 +1,7 @@
 #include "kbmanager.h"
 #include "idletimer.h"
 #include <limits>
+#include "wayland/waylandutils.h"
 
 #ifndef Q_OS_MACOS
 QString devpath = "/dev/input/ckb%1";
@@ -74,7 +75,7 @@ void KbManager::init(const QString& guiVersion){
         return;
     _kbManager = new KbManager();
 #ifdef USE_XCB_SCREENSAVER
-    if(!IdleTimer::isWayland() && CkbSettings::get("Program/IdleTimerEnable", true).toBool()){
+    if(!WaylandUtils::isWayland() && CkbSettings::get("Program/IdleTimerEnable", true).toBool()){
         setIdleTimer(true);
     }
 #endif

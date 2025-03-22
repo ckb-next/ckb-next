@@ -54,13 +54,3 @@ int IdleTimer::getIdleTime(){
     return 0;
 }
 #endif
-
-bool IdleTimer::isWayland(){
-    QByteArray wdesktop = qgetenv("WAYLAND_DESKTOP");
-    if(!wdesktop.isEmpty())
-        return true;
-    QString stype(qgetenv("XDG_SESSION_TYPE"));
-    if(stype == "wayland")
-        return true;
-    return false;
-}

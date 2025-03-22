@@ -5,7 +5,6 @@ class IdleTimer
 {
 public:
     static int getIdleTime();
-    static bool isWayland();
 };
 
 #endif // IDLETIMER_H

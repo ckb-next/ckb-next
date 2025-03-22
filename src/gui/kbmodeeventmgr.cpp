@@ -4,7 +4,7 @@
 #include <QDebug>
 #include "kbwidget.h"
 #include <QCloseEvent>
-#include "idletimer.h"
+#include "wayland/waylandutils.h"
 #include "kbwindowinfomodel.h"
 
 KbModeEventMgr::KbModeEventMgr(QWidget* parent, KbMode* m) :
@@ -15,7 +15,7 @@ KbModeEventMgr::KbModeEventMgr(QWidget* parent, KbMode* m) :
     connect(model, &KbWindowInfoModel::rowsInserted, this, &KbModeEventMgr::rowsChanged);
     connect(model, &KbWindowInfoModel::rowsRemoved, this, &KbModeEventMgr::rowsChanged);
     ui->setupUi(this);
-    if(!IdleTimer::isWayland())
+    if(!WaylandUtils::isWayland())
         ui->waylandWarning->hide();
     ui->modeLabel->setText(QString(tr("Switch to mode \"%1\" when:")).arg(m->name()));
     ui->tableView->setModel(model);

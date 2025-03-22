@@ -411,6 +411,30 @@ elseif (LINUX)
                 wayland/waylandutils.cpp
                 wayland/waylandutils.h
     )
+
+    if (USE_WAYLAND)
+        find_package(Wayland COMPONENTS Client REQUIRED)
+
+        target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_WAYLAND
+        )
+
+        target_link_libraries(
+            ckb-next
+                PRIVATE
+                    Wayland::Client
+        )
+
+        if (Qt6_VERSION VERSION_LESS "6.5.0")
+            target_link_libraries(
+                ckb-next
+                    PRIVATE
+                        Qt${QT_VERSION_MAJOR}::GuiPrivate # For QPlatformNativeInterface. Qt 6.5 and later has QNativeInterface::QWaylandApplication.
+            )
+        endif ()
+    endif ()
 endif ()
 
 if (MAC_LEGACY)

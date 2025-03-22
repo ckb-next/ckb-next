@@ -287,6 +287,12 @@ elseif (LINUX)
         pkg_check_modules(XCB_SCREENSAVER xcb-screensaver)
 
         if(XCB_SCREENSAVER_FOUND AND (Qt5X11Extras_FOUND OR QT_VERSION_MAJOR VERSION_EQUAL 6))
+            target_sources(
+                ckb-next
+                    PRIVATE
+                        xcb/xcbidletimer.cpp
+                        xcb/xcbidletimer.h
+            )
             target_compile_definitions(
             ckb-next
                 PRIVATE
@@ -398,6 +404,72 @@ elseif (LINUX)
             )
         endif()
     endif()
+
+    target_sources(
+        ckb-next
+            PRIVATE
+                wayland/waylandutils.cpp
+                wayland/waylandutils.h
+    )
+
+    if (USE_WAYLAND)
+        find_package(Wayland COMPONENTS Client REQUIRED)
+        find_package(WaylandProtocols REQUIRED)
+        find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS WaylandClient)
+
+        if (QT_VERSION VERSION_GREATER_EQUAL "6.0.0")
+            if (NOT EXISTS ${WaylandProtocols_DATADIR}/staging/ext-idle-notify/ext-idle-notify-v1.xml)
+                message(FATAL_ERROR "Wayland ext-idle-notify-v1 protocol is not found. Either install them or pass -DUSE_WAYLAND=0 to disable idle detection.")
+            endif ()
+
+            if (Qt6_VERSION VERSION_GREATER_EQUAL "6.8.0")
+                set(private_code_option  "PRIVATE_CODE")
+            endif()
+
+            qt_generate_wayland_protocol_client_sources(
+               ckb-next
+                   ${private_code_option}
+                   FILES
+                       ${WaylandProtocols_DATADIR}/staging/ext-idle-notify/ext-idle-notify-v1.xml
+            )
+
+            target_sources(
+                ckb-next
+                    PRIVATE
+                        wayland/waylandidletimer.cpp
+                        wayland/waylandidletimer.h
+            )
+
+            target_compile_definitions(
+                ckb-next
+                    PRIVATE
+                        USE_WAYLAND_IDLE_NOTIFY
+            )
+        else()
+            message(FATAL_ERROR "Wayland idle detection required Qt 6 or later. Either build with Qt 6 or pass -DUSE_WAYLAND=0 to disable idle detection.")
+        endif()
+
+        target_compile_definitions(
+            ckb-next
+                PRIVATE
+                    USE_WAYLAND
+        )
+
+        target_link_libraries(
+            ckb-next
+                PRIVATE
+                    Wayland::Client
+                    Qt${QT_VERSION_MAJOR}::WaylandClient
+        )
+
+        if (Qt6_VERSION VERSION_LESS "6.5.0")
+            target_link_libraries(
+                ckb-next
+                    PRIVATE
+                        Qt${QT_VERSION_MAJOR}::GuiPrivate # For QPlatformNativeInterface. Qt 6.5 and later has QNativeInterface::QWaylandApplication.
+            )
+        endif ()
+    endif ()
 endif ()
 
 if (MAC_LEGACY)

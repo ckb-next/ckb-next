@@ -5,7 +5,7 @@
 #include "ckbsettings.h"
 #include "animdetailsdialog.h"
 #include "kbmanager.h"
-#include "wayland/waylandutils.h"
+#include "idletimer.h"
 // KbLight
 static int lastSharedDimming = -2;
 
@@ -71,14 +71,12 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
 
     ui->previewBox->setChecked(settings.value("DisablePreviewOnFocusLoss", true).toBool());
 
-#if defined(Q_OS_LINUX) && defined(USE_XCB_SCREENSAVER)
+#ifdef Q_OS_LINUX
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
     ui->timerMinBox->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
 #endif
-    // We need to explicitly disable this if there's a wayland session.
-    // If not, the idle timer will only count when there's activity inside XWayland windows.
-    if(WaylandUtils::isWayland()){
-        QString notSupported(tr("This feature is not supported under Wayland"));
+    if(!IdleTimer::isSupported()){
+        QString notSupported(tr("This feature is not supported under your current compositor"));
         ui->timerBox->setToolTip(notSupported);
         ui->timerMinBox->setToolTip(notSupported);
         ui->timerBox->setEnabled(false);
@@ -183,7 +181,7 @@ void ExtraSettingsWidget::on_detailsBtn_clicked(){
 }
 
 void ExtraSettingsWidget::on_timerBox_clicked(bool checked){
-#ifdef USE_XCB_SCREENSAVER
+#ifdef Q_OS_LINUX
     ui->timerMinBox->setEnabled(checked);
     CkbSettings::set("Program/IdleTimerEnable", checked);
     KbManager::setIdleTimer(checked);
@@ -191,7 +189,7 @@ void ExtraSettingsWidget::on_timerBox_clicked(bool checked){
 }
 
 void ExtraSettingsWidget::on_timerMinBox_editingFinished(){
-#ifdef USE_XCB_SCREENSAVER
+#ifdef Q_OS_LINUX
     CkbSettings::set("Program/IdleTimerDuration", ui->timerMinBox->value());
     KbManager::setIdleTimer(false);
     KbManager::setIdleTimer(true);

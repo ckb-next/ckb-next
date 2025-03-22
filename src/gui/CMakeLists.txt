@@ -287,6 +287,12 @@ elseif (LINUX)
         pkg_check_modules(XCB_SCREENSAVER xcb-screensaver)
 
         if(XCB_SCREENSAVER_FOUND AND (Qt5X11Extras_FOUND OR QT_VERSION_MAJOR VERSION_EQUAL 6))
+            target_sources(
+                ckb-next
+                    PRIVATE
+                        xcb/xcbidletimer.cpp
+                        xcb/xcbidletimer.h
+            )
             target_compile_definitions(
             ckb-next
                 PRIVATE

@@ -17,7 +17,7 @@ QString devpath = "/var/run/ckb%1";
 CkbVersionNumber KbManager::_guiVersion, KbManager::_daemonVersion;
 KbManager* KbManager::_kbManager = nullptr;
 
-#ifdef USE_XCB_SCREENSAVER
+#ifdef Q_OS_LINUX
 QTimer* KbManager::_idleTimer = nullptr;
 void KbManager::setIdleTimer(bool enable){
     if(!_idleTimer){
@@ -73,8 +73,8 @@ void KbManager::init(const QString& guiVersion){
     if(_kbManager)
         return;
     _kbManager = new KbManager();
-#ifdef USE_XCB_SCREENSAVER
-    if(!IdleTimer::isWayland() && CkbSettings::get("Program/IdleTimerEnable", true).toBool()){
+#ifdef Q_OS_LINUX
+    if(IdleTimer::isSupported() && CkbSettings::get("Program/IdleTimerEnable", true).toBool()){
         setIdleTimer(true);
     }
 #endif

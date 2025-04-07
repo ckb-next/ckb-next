@@ -926,8 +926,6 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map.remove("light");
             map.remove("lock");
             map.remove("mute");
-            map.remove("volup");
-            map.remove("voldn");
             map.remove("stop");
             map.remove("prev");
             map.remove("play");

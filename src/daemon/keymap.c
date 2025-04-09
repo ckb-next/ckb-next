@@ -638,23 +638,6 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
             SET_KEYBIT(kbinput, 104);   // voldn
             break;
         }
-    } else if(urbinput[0] == NKRO_MEDIA_IN && length == 5) {
-        CLEAR_KEYBIT(kbinput, 129);         // mute k70 core knob
-        CLEAR_KEYBIT(kbinput, 122);         // voldn k70 core knob
-        CLEAR_KEYBIT(kbinput, 123);         // volup k70 core knob
-
-        switch(urbinput[1])
-        {
-        case 129:
-            SET_KEYBIT(kbinput, 102);   // mute k70 core knob
-            break;
-        case 122:
-            SET_KEYBIT(kbinput, 104);   // voldn k70 core knob
-            break;
-        case 123:
-            SET_KEYBIT(kbinput, 103);   // volup k70 core knob
-            break;
-        }
     } else {
         ckb_err("Invalid length %d and header 0x%hhx combination in handle_bragi_key_input()", length, urbinput[0]);
     }

@@ -931,7 +931,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map.remove("play");
             map.remove("next");
 
-            // This is the profile switch button but comes across as play
+            // This is the media button that defaults to play
             map["play"] = { nullptr,  "Play", "play", 227, 14, 16, 11, false, true};
 
             // K70 Core RGP has a volume knob that can be pressed

@@ -213,11 +213,7 @@ const char* product_str(ushort product){
         return "k70tkl";
     if(product == P_K70_PRO || product == P_K70_PRO_OPTIC)
         return "k70pro";
-    if(product == P_K70_CORE_RGB)
-        return "k70_core_rgb";
-    if(product == P_K70_CORE_RGB_2)
-        return "k70_core_rgb";
-    if(product == P_K70_CORE_RGB_3)
+    if(product == P_K70_CORE_RGB || product == P_K70_CORE_RGB_2 || product == P_K70_CORE_RGB_3)
         return "k70_core_rgb";
     if(product == P_K68 || product == P_K68_NRGB)
         return "k68";

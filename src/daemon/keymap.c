@@ -641,6 +641,32 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
             ckb_err("Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_bragi_key_input()", length, urbinput[1]);
             break;
         }
+    } else if(urbinput[0] == NKRO_MEDIA_IN && length == 5) {
+        // This section is similar to handle_nkro_media_keys(), but with different indices due to the different keymap
+        // This works because these keys can not be pressed at the same time
+        CLEAR_KEYBIT(kbinput, 124);         // play
+
+        CLEAR_KEYBIT(kbinput, 102);         // mute
+        CLEAR_KEYBIT(kbinput, 103);         // volup
+        CLEAR_KEYBIT(kbinput, 104);         // voldn
+
+        // We only care about the first byte
+        switch(urbinput[1]){
+        case 205:
+            SET_KEYBIT(kbinput, 124);   // play
+            break;
+        case 226:
+            SET_KEYBIT(kbinput, 102);   // mute
+            break;
+        case 233:
+            SET_KEYBIT(kbinput, 103);   // volup
+            break;
+        case 234:
+            SET_KEYBIT(kbinput, 104);   // voldn
+            break;
+        default:
+            ckb_err("Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_bragi_key_input()", length, urbinput[1]);
+            break;
         }
     } else {
         ckb_err("Invalid length %d and header 0x%hhx combination in handle_bragi_key_input()", length, urbinput[0]);

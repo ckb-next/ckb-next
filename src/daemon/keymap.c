@@ -970,16 +970,16 @@ void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbin
 void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy){
     if(legacy) {
         switch(length) {
-            case 2: // K65 Media keys
+            case NKRO_K65_MEDIA_IN: // K65 Media keys
                 length = 1;
                 // fall through
-            case 4: // Media Keys
+            case NKRO_LEGACY_MEDIA_IN: // Media Keys
                 handle_nkro_media_keys(kbinput, urbinput, length);
                 break;
-            case 8: // G/MR Keys
+            case NKRO_6KRO_MEDIA_IN: // G/MR Keys
                 handle_legacy_6kro_input(kbinput, urbinput, length);
                 break;
-            case 15: // NKRO Input
+            case NKRO_LEGACY_KEY_IN: // NKRO Input
                 handle_nkro_key_input(kbinput, urbinput, length, legacy);
                 break;
             default:
@@ -987,10 +987,10 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
         }
     } else {
         switch(urbinput[0]) {
-            case 0x01:
+            case NKRO_KEY_IN:
                 handle_nkro_key_input(kbinput, urbinput, length, legacy);
                 break;
-            case 0x02:
+            case NKRO_MEDIA_IN:
                 handle_nkro_media_keys(kbinput, urbinput, length);
                 break;
             default:

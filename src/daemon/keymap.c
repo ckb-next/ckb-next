@@ -374,7 +374,7 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "lbrace",         47, KEY_LEFTBRACE },
     { "rbrace",         48, KEY_RIGHTBRACE },
     { "bslash",         49, KEY_BACKSLASH },
-    { "hash",           50,  KEY_BACKSLASH_ISO },
+    { "hash",           50, KEY_BACKSLASH_ISO },
     { "colon",          51, KEY_SEMICOLON },
     { "quote",          52, KEY_APOSTROPHE },
     { "grave",          53, KEY_GRAVE },

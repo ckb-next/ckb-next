@@ -637,6 +637,10 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         case 234:
             SET_KEYBIT(kbinput, 104);   // voldn
             break;
+        default:
+            ckb_err("Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_bragi_key_input()", length, urbinput[1]);
+            break;
+        }
         }
     } else {
         ckb_err("Invalid length %d and header 0x%hhx combination in handle_bragi_key_input()", length, urbinput[0]);
@@ -940,6 +944,13 @@ void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinpu
             break;
         case 234:
             SET_KEYBIT(kbinput, 131);   // voldn
+            break;
+        default:
+            ckb_err(
+                "Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_nkro_media_keys()",
+                length,
+                urbinput[1]
+            );
             break;
         }
     }

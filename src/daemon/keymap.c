@@ -862,19 +862,11 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                                     CLEAR_KEYBIT(targetkb->input.keys, 122);
                             }
                         }else if(IS_K70CORERGB(targetkb)){
-                            ckb_info("Key press detected in input thread %02x from K70 Core RGB %02x", firstbyte, ep);
-
                             #define K70_CORE_MEDIA_MASK 0x60
                             if(buffer[1] == 0x5 && buffer[2] == K70_CORE_MEDIA_MASK) {
                                 // This is a packet from the volume knob
                                 // We need to handle it appropriately then clear the keys so we stop getting garbage
                                 if(buffer[4] == 0x01) {
-                                    ckb_info(
-                                        "Volume knob up key buffer 0:0x%hhx 1:0x%hhx 2:0x%hhx 3:0x%hhx 4:0x%hhx 5:0x%hhx 6:0x%hhx 7:0x%hhx 8:0x%hhx 9:0x%hhx 10:0x%hhx 11:0x%hhx 12:0x%hhx 13:0x%hhx 14:0x%hhx 15:0x%hhx 16:0x%hhx 17:0x%hhx 18:0x%hhx 19:0x%hhx 20:0x%hhx 21:0x%hhx 22:0x%hhx 23:0x%hhx",
-                                        buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7],
-                                        buffer[8], buffer[9], buffer[10], buffer[11], buffer[12], buffer[13], buffer[14], buffer[15],
-                                        buffer[16], buffer[17], buffer[18], buffer[19], buffer[20], buffer[21], buffer[22], buffer[23]
-                                    );
                                     // Volume knob turned left
                                     // Store
                                     uchar media_key_state_1 = targetkb->input.keys[12];
@@ -890,12 +882,6 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                                     // We can just copy this byte as-is, as there are no M or G keys in the strafe.
                                     targetkb->input.keys[16] = media_key_state_2;
                                 } else if(buffer[4] == 0xFF) {
-                                    ckb_info(
-                                        "Volume knob down key buffer 0:0x%hhx 1:0x%hhx 2:0x%hhx 3:0x%hhx 4:0x%hhx 5:0x%hhx 6:0x%hhx 7:0x%hhx 8:0x%hhx 9:0x%hhx 10:0x%hhx 11:0x%hhx 12:0x%hhx 13:0x%hhx 14:0x%hhx 15:0x%hhx 16:0x%hhx 17:0x%hhx 18:0x%hhx 19:0x%hhx 20:0x%hhx 21:0x%hhx 22:0x%hhx 23:0x%hhx",
-                                        buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7],
-                                        buffer[8], buffer[9], buffer[10], buffer[11], buffer[12], buffer[13], buffer[14], buffer[15],
-                                        buffer[16], buffer[17], buffer[18], buffer[19], buffer[20], buffer[21], buffer[22], buffer[23]
-                                    );
                                     // Volume knob turned left
                                     // Store
                                     uchar media_key_state_1 = targetkb->input.keys[12];

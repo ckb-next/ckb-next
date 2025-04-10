@@ -923,19 +923,22 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
     }
     case KeyMap::K70_CORE_RGB:{
             map = getMap(KeyMap::K70, layout);
-            map.remove("light");
-            map.remove("lock");
             map.remove("mute");
-            map.remove("stop");
-            map.remove("prev");
-            map.remove("play");
-            map.remove("next");
+            map["lock"] = {nullptr, "Lock", "lock", 20, 2, NS, false, true}; // F1 alternate
+            map["profswitch"] = {nullptr, "Profile Switch", "profswitch", 32, 2, 11, 11, false, true}; // F2 alternate
+            map["light"] = {nullptr, "Light", "light", 50, 2, NS, false, true}; // F3 and F4 alternate
+            map["stop"] = {nullptr, "Stop", "stop", 76, 2, 11, 11, false, true}; // F5 alternate
+            map["prev"] = { nullptr,  "Previous", "prev", 88, 2, 11, 11, false, true}; // F6 alternate
+            map["play"] = { nullptr,  "Play", "play", 100, 2, 11, 11, false, true}; // F7 alternate
+            map["next"] = { nullptr,  "Next", "next", 112, 2, 11, 11, false, true}; // F8 alternate
+            map["ctrlwheelb"] = {nullptr, "Wheel", "ctrlwheelb", 168, 2, NS, false, true}; // F12 alternate
 
             // This is the media button that defaults to play
-            map["play"] = { nullptr,  "Play", "play", 227, 14, 16, 11, false, true};
+            // We already have a play Fn button so we want to map it to something else so it can be programmed
+            map["g1"] = { nullptr,  "G1", "g1", 227, 14, 16, 11, false, true};
 
             // K70 Core RGP has a volume knob that can be pressed
-            map["knobpress"] = {nullptr,  "Press", "kobpress",  252, 10, 12, 8, false, true};
+            map["knobpress"] = {nullptr,  "Mute", "mute",  259, 14, NS, false, true};
 
             // Replace rwin with Fn
             map["fn"] = KStrafeKeys[3];

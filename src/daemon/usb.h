@@ -95,7 +95,8 @@
 #define P_K70_CORE_RGB       0x2b0a
 #define P_K70_CORE_RGB_2     0x1bfd
 #define P_K70_CORE_RGB_3     0x1bff
-#define IS_K70(kb) ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K70_TKL || (kb)->product == P_K70_PRO || (kb)->product == P_K70_PRO_OPTIC || (kb)->product == P_K70_CORE_RGB || (kb)->product == P_K70_CORE_RGB_2 || (kb)->product == P_K70_CORE_RGB_3))
+#define IS_K70(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70 || (kb)->product == P_K70_LEGACY || (kb)->product == P_K70_RFIRE || (kb)->product == P_K70_RFIRE_NRGB || (kb)->product == P_K70_LUX || (kb)->product == P_K70_LUX_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K70_TKL || (kb)->product == P_K70_PRO || (kb)->product == P_K70_PRO_OPTIC || IS_K70CORERGB(kb))
+#define IS_K70CORERGB(kb)    ((kb)->vendor == V_CORSAIR && ((kb)->product == P_K70_CORE_RGB || (kb)->product == P_K70_CORE_RGB_2 || (kb)->product == P_K70_CORE_RGB_3))
 
 // The Legacy K90 behaves like a Legacy K95.
 #define P_K90_LEGACY         0x1b02
@@ -287,7 +288,7 @@ const char* product_str(ushort product);
 #define SUPPORTS_ADJRATE(kb)            ((kb)->product == P_K60_PRO_TKL || (kb)->product == P_K60_PRO_RGB || (kb)->product == P_K60_PRO_MONO || (kb)->product == P_K60_PRO_RGB_LP || (kb)->product == P_K60_PRO_RGB_SE || (kb)->product == P_K63_NRGB || (kb)->product == P_K66 || (kb)->product == P_K68 || (kb)->product == P_K68_NRGB || (kb)->product == P_K70_MK2 || (kb)->product == P_K70_MK2SE || (kb)->product == P_K70_MK2LP || (kb)->product == P_K95_PLATINUM || (kb)->product == P_STRAFE || (kb)->product == P_STRAFE_NRGB || (kb)->product == P_STRAFE_NRGB_2 || (kb)->product == P_STRAFE_MK2 || (kb)->product == P_M55_RGB_PRO || (kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE || (kb)->product == P_M95 || (kb)->product == P_SABRE_O || (kb)->product == P_SABRE_L || (kb)->product == P_SABRE_N || (kb)->product == P_SABRE_O2 || (kb)->product == P_SCIMITAR || (kb)->product == P_SCIMITAR_ELITE || (kb)->product == P_SCIMITAR_PRO || (kb)->product == P_HARPOON || (kb)->product == P_HARPOON_PRO || (kb)->product == P_GLAIVE || (kb)->product == P_KATAR || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO || (kb)->product == P_NIGHTSWORD || IS_DARK_CORE_NXP(kb) || (kb)->product == P_K95_PLATINUM_XT || (kb)->product == P_GLAIVE_PRO || (kb)->product == P_K55_PRO || (kb)->product == P_K55_PRO_XT || (kb)->product == P_GENERIC_BRAGI_DONGLE)
 
 // Bragi devices that use macros for media keys. Currently used to apply a terrible workaround.
-#define BRAGI_HAS_MEDIA_MACRO(kb)       (IS_K60PRORGB(kb))
+#define BRAGI_HAS_MEDIA_MACRO(kb)       (IS_K60PRORGB(kb) || IS_K70CORERGB(kb))
 
 // Devices that have volume wheels (or don't)
 #define DEV_HAS_VOLWHEEL(kb)            (!(IS_K65(kb) || IS_K63(kb) || (kb)->product == P_K57_U || IS_K55(kb) || BRAGI_HAS_MEDIA_MACRO(kb)))

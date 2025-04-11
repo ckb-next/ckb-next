@@ -291,7 +291,7 @@ const char* product_str(ushort product);
 #define BRAGI_HAS_MEDIA_MACRO(kb)       (IS_K60PRORGB(kb) || IS_K70CORERGB(kb))
 
 // Devices that have volume wheels (or don't)
-#define DEV_HAS_VOLWHEEL(kb)            (!(IS_K65(kb) || IS_K63(kb) || (kb)->product == P_K57_U || IS_K55(kb) || BRAGI_HAS_MEDIA_MACRO(kb)))
+#define DEV_HAS_VOLWHEEL(kb)            (!(IS_K65(kb) || IS_K63(kb) || (kb)->product == P_K57_U || IS_K55(kb) || IS_K60PRORGB(kb)))
 
 // Devices that use the NXP protocol and have the DPI stage RGB data in the DPI packet
 #define NXP_RGB_IN_DPI_PKT(kb)          ((kb)->vendor == V_CORSAIR && ((kb)->product == P_GLAIVE_PRO || IS_DARK_CORE_NXP(kb)))

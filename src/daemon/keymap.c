@@ -867,7 +867,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                                 // This is a packet from the volume knob
                                 // We need to handle it appropriately then clear the keys so we stop getting garbage
                                 if(buffer[4] == 0x01) {
-                                    // Volume knob turned left
+                                    // Volume knob turned right
                                     // Store
                                     uchar media_key_state_1 = targetkb->input.keys[12];
                                     uchar media_key_state_2 = targetkb->input.keys[16];

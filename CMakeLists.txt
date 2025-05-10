@@ -159,9 +159,10 @@ option(PREFER_QT6 "Build with Qt 6 if available." OFF)
 set(CMAKE_FIND_PACKAGE_SORT_ORDER NATURAL)
 set(CMAKE_FIND_PACKAGE_SORT_DIRECTION DEC)
 
-set(QT_LIST Qt5)
 if (PREFER_QT6)
-    list(INSERT QT_LIST 0 Qt6)
+    set(QT_LIST Qt6)
+else()
+    set(QT_LIST Qt5)
 endif ()
 
 if (NOT WITH_GUI)

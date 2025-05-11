@@ -1,0 +1,360 @@
+ckb-next-dev-detect - Tue May  6 18:43:18 CDT 2025
+
+```
+Kernel: Linux archdesktop-bay 6.14.4-zen1-2-zen #1 ZEN SMP PREEMPT_DYNAMIC Tue, 29 Apr 2025 09:23:22 +0000 x86_64 GNU/Linux
+
+OS Version:
+LSB Version:	n/a
+Distributor ID:	Arch
+Description:	Arch Linux
+Release:	rolling
+Codename:	n/a
+
+USB Devices:
+
+Bus 001 Device 014: ID 1b1c:2b08 Corsair CORSAIR M75 WIRELESS Gaming Mouse
+Negotiated speed: Full Speed (12Mbps)
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass            0 [unknown]
+  bDeviceSubClass         0 [unknown]
+  bDeviceProtocol         0 
+  bMaxPacketSize0        64
+  idVendor           0x1b1c Corsair
+  idProduct          0x2b08 CORSAIR M75 WIRELESS Gaming Mouse
+  bcdDevice            5.06
+  iManufacturer           1 Corsair
+  iProduct                2 CORSAIR M75 WIRELESS Gaming Mouse
+  iSerial                 3 C27B4AF664443256
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength       0x00ad
+    bNumInterfaces          6
+    bConfigurationValue     1
+    iConfiguration          4 Bootloader version: 0.0.6
+    bmAttributes         0xe0
+      Self Powered
+      Remote Wakeup
+    MaxPower              500mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      1 Boot Interface Subclass
+      bInterfaceProtocol      2 Mouse
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      85
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      0 
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      27
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x84  EP 4 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x04  EP 4 OUT
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        2
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      0 
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      21
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        3
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      1 Keyboard
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      57
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x01  EP 1 OUT
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        4
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      2 Mouse
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      30
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x85  EP 5 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        5
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      0 
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      25
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x86  EP 6 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+Device Status:     0x0001
+  Self Powered
+
+Dmesg on current boot:
+May 06 18:15:01.094373 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 18:15:01.094564 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 18:15:01.094648 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 18:15:01.094755 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.0001/input/input2
+May 06 18:15:01.094895 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0001: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 18:15:01.095025 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0002: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 18:15:01.095159 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0003: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 18:15:01.095168 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.0004/input/input3
+May 06 18:15:01.095327 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0004: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 18:15:01.095341 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.0005/input/input4
+May 06 18:15:01.095491 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0005: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 18:15:01.095502 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.0006/input/input5
+May 06 18:15:01.095785 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0006: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+May 06 18:29:39.403414 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 18:29:39.403547 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 18:29:39.403582 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 18:29:39.458414 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.000A/input/input26
+May 06 18:29:39.509414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000A: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 18:29:39.517415 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000B: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 18:29:39.526416 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000C: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 18:29:39.535415 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.000D/input/input27
+May 06 18:29:39.622414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000D: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 18:29:39.630416 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.000E/input/input28
+May 06 18:29:39.630450 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000E: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 18:29:39.639416 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.000F/input/input29
+May 06 18:29:39.690414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000F: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+May 06 18:29:46.933414 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 18:29:46.933544 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 18:29:46.933588 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 18:29:46.988414 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.0010/input/input30
+May 06 18:29:47.039414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0010: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 18:29:47.047411 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0011: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 18:29:47.056413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0012: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 18:29:47.065413 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.0013/input/input31
+May 06 18:29:47.155413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0013: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 18:29:47.163412 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.0014/input/input32
+May 06 18:29:47.163438 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0014: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 18:29:47.172413 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.0015/input/input33
+May 06 18:29:47.223413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0015: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+May 06 18:34:16.993413 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 18:34:16.993573 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 18:34:16.993610 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 18:34:17.048415 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.0018/input/input40
+May 06 18:34:17.099414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0018: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 18:34:17.107412 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0019: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 18:34:17.116417 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.001A: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 18:34:17.125413 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.001B/input/input41
+May 06 18:34:17.212413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.001B: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 18:34:17.220413 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.001C/input/input42
+May 06 18:34:17.220445 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.001C: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 18:34:17.229414 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.001D/input/input43
+May 06 18:34:17.280413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.001D: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+May 06 18:39:51.377431 archdesktop-bay kernel: warning: `ckb-next.real' uses wireless extensions which will stop working for Wi-Fi 7 hardware; use nl80211
+
+Dmesg on last boot:
+May 04 15:45:39.123311 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=1bdc, bcdDevice= 5.04
+May 04 15:45:39.123480 archdesktop-bay kernel: usb 1-3: Product: CORSAIR SLIPSTREAM WIRELESS USB Receiver
+May 04 15:45:39.123562 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 04 15:45:39.123668 archdesktop-bay kernel: input: Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:1BDC.0001/input/input2
+May 04 15:45:39.123799 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0001: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input0
+May 04 15:45:39.123927 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0002: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input1
+May 04 15:45:39.124054 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0003: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input2
+May 04 15:45:39.124064 archdesktop-bay kernel: input: Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver Keyboard as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:1BDC.0004/input/input3
+May 04 15:45:39.124199 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0004: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input5
+May 04 15:45:39.124213 archdesktop-bay kernel: input: Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:1BDC.0005/input/input4
+May 04 15:45:39.124338 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0005: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input4
+May 04 15:45:39.124348 archdesktop-bay kernel: input: Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver Keyboard as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:1BDC.0006/input/input5
+May 04 15:45:39.124621 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0006: input,hidraw5: USB HID v1.11 Keyboard [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input3
+May 04 15:46:41.661218 archdesktop-bay kernel: usb 3-3: New USB device found, idVendor=1b1c, idProduct=0a73, bcdDevice= 0.00
+May 04 15:46:41.820565 archdesktop-bay kernel: usb 3-3: Product: CORSAIR HS80 RGB Wireless Gaming Receiver
+May 04 15:46:41.820674 archdesktop-bay kernel: usb 3-3: Manufacturer: Corsair
+May 04 15:46:41.820879 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver Keyboard as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.3/0003:1B1C:0A73.000A/input/input26
+May 04 15:46:41.820901 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.3/0003:1B1C:0A73.000A/input/input27
+May 04 15:46:41.820918 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.3/0003:1B1C:0A73.000A/input/input28
+May 04 15:46:41.820938 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.3/0003:1B1C:0A73.000A/input/input29
+May 04 15:46:41.820958 archdesktop-bay kernel: hid-generic 0003:1B1C:0A73.000A: input,hiddev100,hidraw9: USB HID v1.11 Keyboard [Corsair CORSAIR HS80 RGB Wireless Gaming Receiver] on usb-0000:0b:00.3-3/input3
+May 04 15:46:41.821134 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.4/0003:1B1C:0A73.000B/input/input30
+May 04 15:46:41.821152 archdesktop-bay kernel: hid-generic 0003:1B1C:0A73.000B: input,hidraw10: USB HID v1.11 Mouse [Corsair CORSAIR HS80 RGB Wireless Gaming Receiver] on usb-0000:0b:00.3-3/input4
+
+Daemon on current boot:
+May 06 18:39:48.110280 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 18:39:48.123252 archdesktop-bay ckb-next-daemon[41995]: ckb-next-daemon 0.6.2
+May 06 18:39:48.123508 archdesktop-bay ckb-next-daemon[41995]: [I] Root controller ready at /dev/input/ckb0
+
+Daemon on last boot:
+-- No entries --
+
+Dev nodes:
+/dev/input/ckb0
+/dev/input/ckb0/pid
+41995
+/dev/input/ckb0/version
+0.6.2
+/dev/input/ckb0/connected
+
+Kernel command line:
+BOOT_IMAGE=/vmlinuz-linux-zen root=UUID=ac0652a2-174e-46fc-b3d7-cb0921dd79b2 rw loglevel=3 quiet
+
+GUI ldd:
+
+Environment:
+QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+XDG_SESSION_DESKTOP=Hyprland
+QT_QPA_PLATFORMTHEME=qt6ct
+XDG_SESSION_TYPE=wayland
+XDG_CURRENT_DESKTOP=Hyprland
+WAYLAND_DISPLAY=wayland-1
+QT_QUICK_CONTROLS_STYLE=org.hyprland.style
+QT_QPA_PLATFORM=wayland;xcb
+DISPLAY=:1
+QT_AUTO_SCREEN_SCALE_FACTOR=1
+QT_SCALE_FACTOR=1
+```
+

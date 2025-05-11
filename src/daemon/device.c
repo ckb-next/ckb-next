@@ -203,9 +203,6 @@ int _start_dev(usbdevice* kb, int makeactive){
             kb->features &= ~FEAT_HWLOAD;
         }
     }
-    // Activate software mode if requested
-    if(makeactive)
-        return setactive(kb, 1);
 #ifndef NDEBUG
     // 12 for each device + null terminator
     char devlist[12*(DEV_MAX-1)+1];

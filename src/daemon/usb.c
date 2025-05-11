@@ -18,6 +18,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_M65, 8200 },
     { P_M65_PRO, 12000 },
     { P_M65_RGB_ELITE, 18000 },
+    { P_M75, 26000 },
     { P_M95, 8200 },
     { P_GLAIVE, 16000 },
     { P_SABRE_O, 6400 },
@@ -32,7 +33,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_KATAR_PRO_XT, 18000 },
     { P_KATAR, 8000 },
     { P_KATAR_PRO, 12400 },
-    { P_IRONCLAW, 18000 },
+    { P_IRONCLAW, 18000},
     { P_NIGHTSWORD, 18000},
     { P_IRONCLAW_W_U, 18000 },
     { P_HARPOON_WL_U, 10000 },
@@ -102,6 +103,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_M65, },
     { V_CORSAIR, P_M65_PRO, },
     { V_CORSAIR, P_M65_RGB_ELITE, },
+    { V_CORSAIR, P_M75, },
     { V_CORSAIR, P_M95, },
     { V_CORSAIR, P_GLAIVE, },
     { V_CORSAIR, P_SABRE_O, },
@@ -164,7 +166,7 @@ _Atomic int reset_stop = 0;
 int features_mask = -1;
 
 // Enable experimental support for not fully supported devices
-int enable_experimental = 0;
+int enable_experimental = 1;
 
 /// brief .
 ///
@@ -252,6 +254,8 @@ const char* product_str(ushort product){
         return "m65";
     if(product == P_M65_RGB_ELITE)
         return "m65e";
+    if(product == P_M75)
+        return "m75";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO || product == P_SCIMITAR_ELITE || product == P_SCIMITAR_ELITE_BRAGI)

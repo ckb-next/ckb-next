@@ -783,6 +783,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     //
     // All device specific events have the max length of bytes
     usbdevice* targetkb = kb;
+
     if(kb->protocol == PROTO_BRAGI && IS_DONGLE(kb)){
         pthread_mutex_lock(cmutex(kb));
         if(urblen == kb->out_ep_packet_size){
@@ -878,19 +879,6 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         else
                             hid_mouse_translate(&targetkb->input, urblen, buffer);
                     }
-                } else if(firstbyte == MOUSE_IN) {
-                    // If we're in bootloader mode, parse the simplified reports
-                    // This is only tested against an M65 with bld version 3
-                    if(kb->needs_fw_update)
-                        hid_mouse_bld_translate(&kb->input, urblen - 1, buffer + 1);
-                    else
-                        hid_mouse_translate(&kb->input, urblen - 1, buffer + 1);
-                } else if(firstbyte == CORSAIR_IN) { // Corsair Mouse Input
-                    corsair_mousecopy(kb->input.keys, buffer);
-                } else if(firstbyte == 0x05 && urblen == 21) { // Seems to be on the Ironclaw RGB only
-                    corsair_extended_mousecopy(kb->input.keys, buffer);
-                } else {
-                    ckb_err("Unknown mouse data received in input thread %02x from endpoint %02x", firstbyte, ep);
                 }
             } else {
                 // Assume Keyboard for everything else for now
@@ -921,11 +909,6 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         } else {
                             ckb_err("Unimplemented bragi input packet %hhx\n", buffer[1]);
                         }
-                    } else if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
-                        if(!targetkb->active)
-                            handle_bragi_key_input(targetkb->input.keys, buffer, urblen);
-                    } else {
-                        ckb_err("Unknown bragi data received in input thread %02x from endpoint %02x", firstbyte, ep);
                     }
                 } else {
 #define NXP_STRAFE_MEDIA_WORKAROUND(kb) (kb->vendor == V_CORSAIR && kb->product == P_STRAFE)
@@ -960,8 +943,6 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 }
             }
         }
-        ///
-        /// The input data is transformed and copied to the kb structure. Now give it to the OS and unlock the imutex afterwards.
         inputupdate(targetkb);
         queued_mutex_unlock(imutex(targetkb));
     }

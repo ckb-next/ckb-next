@@ -121,8 +121,11 @@ int getfwversion(usbdevice* kb){
                 if(!usbsend(kb, wireless_pkt[4], MSG_SIZE, 1))
                     return -1;
             }
-            /// FIXME: REMOVE THIS WHEN HARDWARE PROFILES AND WIRELESS FW UPDATE ARE ADDED
-            kb->features &= ~(FEAT_HWLOAD | FEAT_FWUPDATE);
+            // Load the hardware profile after creating blank profiles
+            if(IS_MOUSE_DEV(kb)) {
+                if(cmd_idle_mouse(kb, NULL, 0, 1, NULL))
+                    ckb_warn("Failed to load hardware profile for wireless mouse");
+            }
         }
     } else if (in_pkt[1] == 0) {
         // This happens when we're in bootloader mode, but not on all devices

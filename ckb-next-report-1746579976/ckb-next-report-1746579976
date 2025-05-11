@@ -1,0 +1,491 @@
+ckb-next-dev-detect - Tue May  6 20:06:11 CDT 2025
+
+```
+Kernel: Linux archdesktop-bay 6.14.4-zen1-2-zen #1 ZEN SMP PREEMPT_DYNAMIC Tue, 29 Apr 2025 09:23:22 +0000 x86_64 GNU/Linux
+
+OS Version:
+LSB Version:	n/a
+Distributor ID:	Arch
+Description:	Arch Linux
+Release:	rolling
+Codename:	n/a
+
+USB Devices:
+
+Bus 001 Device 016: ID 1b1c:2b08 Corsair CORSAIR M75 WIRELESS Gaming Mouse
+Negotiated speed: Full Speed (12Mbps)
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass            0 [unknown]
+  bDeviceSubClass         0 [unknown]
+  bDeviceProtocol         0 
+  bMaxPacketSize0        64
+  idVendor           0x1b1c Corsair
+  idProduct          0x2b08 CORSAIR M75 WIRELESS Gaming Mouse
+  bcdDevice            5.06
+  iManufacturer           1 Corsair
+  iProduct                2 CORSAIR M75 WIRELESS Gaming Mouse
+  iSerial                 3 C27B4AF664443256
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength       0x00ad
+    bNumInterfaces          6
+    bConfigurationValue     1
+    iConfiguration          4 Bootloader version: 0.0.6
+    bmAttributes         0xe0
+      Self Powered
+      Remote Wakeup
+    MaxPower              500mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      1 Boot Interface Subclass
+      bInterfaceProtocol      2 Mouse
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      85
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      0 
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      27
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x84  EP 4 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x04  EP 4 OUT
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        2
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      0 
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      21
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        3
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      1 Keyboard
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      57
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x01  EP 1 OUT
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        4
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      2 Mouse
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      30
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x85  EP 5 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        5
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      0 
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 (null)
+          wDescriptorLength      25
+          Report Descriptors: 
+            ** UNAVAILABLE **
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x86  EP 6 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+Device Status:     0x0001
+  Self Powered
+
+Dmesg on current boot:
+May 06 18:15:01.094373 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 18:15:01.094564 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 18:15:01.094648 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 18:15:01.094755 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.0001/input/input2
+May 06 18:15:01.094895 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0001: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 18:15:01.095025 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0002: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 18:15:01.095159 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0003: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 18:15:01.095168 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.0004/input/input3
+May 06 18:15:01.095327 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0004: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 18:15:01.095341 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.0005/input/input4
+May 06 18:15:01.095491 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0005: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 18:15:01.095502 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.0006/input/input5
+May 06 18:15:01.095785 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0006: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+May 06 18:29:39.403414 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 18:29:39.403547 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 18:29:39.403582 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 18:29:39.458414 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.000A/input/input26
+May 06 18:29:39.509414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000A: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 18:29:39.517415 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000B: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 18:29:39.526416 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000C: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 18:29:39.535415 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.000D/input/input27
+May 06 18:29:39.622414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000D: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 18:29:39.630416 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.000E/input/input28
+May 06 18:29:39.630450 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000E: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 18:29:39.639416 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.000F/input/input29
+May 06 18:29:39.690414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.000F: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+May 06 18:29:46.933414 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 18:29:46.933544 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 18:29:46.933588 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 18:29:46.988414 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.0010/input/input30
+May 06 18:29:47.039414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0010: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 18:29:47.047411 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0011: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 18:29:47.056413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0012: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 18:29:47.065413 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.0013/input/input31
+May 06 18:29:47.155413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0013: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 18:29:47.163412 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.0014/input/input32
+May 06 18:29:47.163438 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0014: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 18:29:47.172413 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.0015/input/input33
+May 06 18:29:47.223413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0015: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+May 06 18:34:16.993413 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 18:34:16.993573 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 18:34:16.993610 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 18:34:17.048415 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.0018/input/input40
+May 06 18:34:17.099414 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0018: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 18:34:17.107412 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0019: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 18:34:17.116417 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.001A: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 18:34:17.125413 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.001B/input/input41
+May 06 18:34:17.212413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.001B: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 18:34:17.220413 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.001C/input/input42
+May 06 18:34:17.220445 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.001C: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 18:34:17.229414 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.001D/input/input43
+May 06 18:34:17.280413 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.001D: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+May 06 18:39:51.377431 archdesktop-bay kernel: warning: `ckb-next.real' uses wireless extensions which will stop working for Wi-Fi 7 hardware; use nl80211
+May 06 19:58:20.070424 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=2b08, bcdDevice= 5.06
+May 06 19:58:20.070655 archdesktop-bay kernel: usb 1-3: Product: CORSAIR M75 WIRELESS Gaming Mouse
+May 06 19:58:20.070710 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 06 19:58:20.353677 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:2B08.0020/input/input50
+May 06 19:58:20.353701 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0020: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input0
+May 06 19:58:20.353905 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0021: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input1
+May 06 19:58:20.354082 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0022: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input2
+May 06 19:58:20.354243 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:2B08.0023/input/input51
+May 06 19:58:20.354259 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0023: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input3
+May 06 19:58:20.354429 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:2B08.0024/input/input52
+May 06 19:58:20.354451 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0024: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input4
+May 06 19:58:20.354619 archdesktop-bay kernel: input: Corsair CORSAIR M75 WIRELESS Gaming Mouse as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:2B08.0025/input/input53
+May 06 19:58:20.354637 archdesktop-bay kernel: hid-generic 0003:1B1C:2B08.0025: input,hidraw5: USB HID v1.11 Device [Corsair CORSAIR M75 WIRELESS Gaming Mouse] on usb-0000:01:00.0-3/input5
+
+Dmesg on last boot:
+May 04 15:45:39.123311 archdesktop-bay kernel: usb 1-3: New USB device found, idVendor=1b1c, idProduct=1bdc, bcdDevice= 5.04
+May 04 15:45:39.123480 archdesktop-bay kernel: usb 1-3: Product: CORSAIR SLIPSTREAM WIRELESS USB Receiver
+May 04 15:45:39.123562 archdesktop-bay kernel: usb 1-3: Manufacturer: Corsair
+May 04 15:45:39.123668 archdesktop-bay kernel: input: Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.0/0003:1B1C:1BDC.0001/input/input2
+May 04 15:45:39.123799 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0001: input,hidraw0: USB HID v1.11 Mouse [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input0
+May 04 15:45:39.123927 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0002: hiddev96,hidraw1: USB HID v1.11 Device [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input1
+May 04 15:45:39.124054 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0003: hiddev97,hidraw2: USB HID v1.11 Device [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input2
+May 04 15:45:39.124064 archdesktop-bay kernel: input: Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver Keyboard as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.5/0003:1B1C:1BDC.0004/input/input3
+May 04 15:45:39.124199 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0004: input,hidraw3: USB HID v1.11 Keyboard [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input5
+May 04 15:45:39.124213 archdesktop-bay kernel: input: Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.4/0003:1B1C:1BDC.0005/input/input4
+May 04 15:45:39.124338 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0005: input,hidraw4: USB HID v1.11 Mouse [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input4
+May 04 15:45:39.124348 archdesktop-bay kernel: input: Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver Keyboard as /devices/pci0000:00/0000:00:01.2/0000:01:00.0/usb1/1-3/1-3:1.3/0003:1B1C:1BDC.0006/input/input5
+May 04 15:45:39.124621 archdesktop-bay kernel: hid-generic 0003:1B1C:1BDC.0006: input,hidraw5: USB HID v1.11 Keyboard [Corsair CORSAIR SLIPSTREAM WIRELESS USB Receiver] on usb-0000:01:00.0-3/input3
+May 04 15:46:41.661218 archdesktop-bay kernel: usb 3-3: New USB device found, idVendor=1b1c, idProduct=0a73, bcdDevice= 0.00
+May 04 15:46:41.820565 archdesktop-bay kernel: usb 3-3: Product: CORSAIR HS80 RGB Wireless Gaming Receiver
+May 04 15:46:41.820674 archdesktop-bay kernel: usb 3-3: Manufacturer: Corsair
+May 04 15:46:41.820879 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver Keyboard as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.3/0003:1B1C:0A73.000A/input/input26
+May 04 15:46:41.820901 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.3/0003:1B1C:0A73.000A/input/input27
+May 04 15:46:41.820918 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.3/0003:1B1C:0A73.000A/input/input28
+May 04 15:46:41.820938 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.3/0003:1B1C:0A73.000A/input/input29
+May 04 15:46:41.820958 archdesktop-bay kernel: hid-generic 0003:1B1C:0A73.000A: input,hiddev100,hidraw9: USB HID v1.11 Keyboard [Corsair CORSAIR HS80 RGB Wireless Gaming Receiver] on usb-0000:0b:00.3-3/input3
+May 04 15:46:41.821134 archdesktop-bay kernel: input: Corsair CORSAIR HS80 RGB Wireless Gaming Receiver as /devices/pci0000:00/0000:00:08.1/0000:0b:00.3/usb3/3-3/3-3:1.4/0003:1B1C:0A73.000B/input/input30
+May 04 15:46:41.821152 archdesktop-bay kernel: hid-generic 0003:1B1C:0A73.000B: input,hidraw10: USB HID v1.11 Mouse [Corsair CORSAIR HS80 RGB Wireless Gaming Receiver] on usb-0000:0b:00.3-3/input4
+
+Daemon on current boot:
+May 06 18:39:48.110280 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 18:39:48.123252 archdesktop-bay ckb-next-daemon[41995]: ckb-next-daemon 0.6.2
+May 06 18:39:48.123508 archdesktop-bay ckb-next-daemon[41995]: [I] Root controller ready at /dev/input/ckb0
+May 06 18:47:07.926017 archdesktop-bay ckb-next-daemon[41995]: [I] Caught signal 15
+May 06 18:47:07.926017 archdesktop-bay ckb-next-daemon[41995]: [I] Closing root controller
+May 06 18:47:07.926219 archdesktop-bay ckb-next-daemon[41995]: [I] Removed device path /dev/input/ckb0
+May 06 18:47:07.926115 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 18:47:07.927051 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 18:47:07.927195 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 18:47:08.699197 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 18:47:08.713363 archdesktop-bay ckb-next-daemon[45622]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 18:47:08.713653 archdesktop-bay ckb-next-daemon[45622]: [I] Root controller ready at /dev/input/ckb0
+May 06 18:54:35.273468 archdesktop-bay ckb-next-daemon[45622]: [I] Caught signal 15
+May 06 18:54:35.273468 archdesktop-bay ckb-next-daemon[45622]: [I] Closing root controller
+May 06 18:54:35.273693 archdesktop-bay ckb-next-daemon[45622]: [I] Removed device path /dev/input/ckb0
+May 06 18:54:35.273580 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 18:54:35.274484 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 18:54:35.274625 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 18:54:36.136326 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 18:54:36.157587 archdesktop-bay ckb-next-daemon[51320]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 18:54:36.157972 archdesktop-bay ckb-next-daemon[51320]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:00:48.712974 archdesktop-bay ckb-next-daemon[51320]: [I] Caught signal 15
+May 06 19:00:48.712974 archdesktop-bay ckb-next-daemon[51320]: [I] Closing root controller
+May 06 19:00:48.713210 archdesktop-bay ckb-next-daemon[51320]: [I] Removed device path /dev/input/ckb0
+May 06 19:00:48.713072 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 19:00:48.714093 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:00:48.714255 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 19:00:49.514801 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:00:49.531824 archdesktop-bay ckb-next-daemon[54211]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:00:49.532118 archdesktop-bay ckb-next-daemon[54211]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:18:02.003230 archdesktop-bay ckb-next-daemon[54211]: [I] Caught signal 15
+May 06 19:18:02.003230 archdesktop-bay ckb-next-daemon[54211]: [I] Closing root controller
+May 06 19:18:02.003452 archdesktop-bay ckb-next-daemon[54211]: [I] Removed device path /dev/input/ckb0
+May 06 19:18:02.003516 archdesktop-bay systemd[1]: Stopping ckb-next-daemon.service...
+May 06 19:18:02.003930 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:18:02.004075 archdesktop-bay systemd[1]: Stopped ckb-next-daemon.service.
+May 06 19:18:02.609094 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:18:02.625365 archdesktop-bay ckb-next-daemon[60339]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:18:02.625735 archdesktop-bay ckb-next-daemon[60339]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:18:06.870519 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 19:18:06.874621 archdesktop-bay ckb-next-daemon[60339]: [I] Caught signal 15
+May 06 19:18:06.874621 archdesktop-bay ckb-next-daemon[60339]: [I] Closing root controller
+May 06 19:18:06.874821 archdesktop-bay ckb-next-daemon[60339]: [I] Removed device path /dev/input/ckb0
+May 06 19:18:06.875431 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:18:06.875589 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 19:18:06.876618 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:18:06.895475 archdesktop-bay ckb-next-daemon[62650]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:18:06.895740 archdesktop-bay ckb-next-daemon[62650]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:29:56.726666 archdesktop-bay ckb-next-daemon[62650]: [I] Caught signal 15
+May 06 19:29:56.726666 archdesktop-bay ckb-next-daemon[62650]: [I] Closing root controller
+May 06 19:29:56.726883 archdesktop-bay ckb-next-daemon[62650]: [I] Removed device path /dev/input/ckb0
+May 06 19:29:56.726784 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 19:29:56.727707 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:29:56.727869 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 19:29:57.528795 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:29:57.553846 archdesktop-bay ckb-next-daemon[66208]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:29:57.554107 archdesktop-bay ckb-next-daemon[66208]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:30:00.826499 archdesktop-bay ckb-next-daemon[66208]: [I] Caught signal 15
+May 06 19:30:00.826499 archdesktop-bay ckb-next-daemon[66208]: [I] Closing root controller
+May 06 19:30:00.826745 archdesktop-bay ckb-next-daemon[66208]: [I] Removed device path /dev/input/ckb0
+May 06 19:30:00.826581 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 19:30:00.827538 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:30:00.827693 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 19:30:00.829123 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:30:00.844521 archdesktop-bay ckb-next-daemon[66358]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:30:00.844802 archdesktop-bay ckb-next-daemon[66358]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:48:35.228370 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 19:48:35.232522 archdesktop-bay ckb-next-daemon[66358]: [I] Caught signal 15
+May 06 19:48:35.232522 archdesktop-bay ckb-next-daemon[66358]: [I] Closing root controller
+May 06 19:48:35.232726 archdesktop-bay ckb-next-daemon[66358]: [I] Removed device path /dev/input/ckb0
+May 06 19:48:35.233358 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:48:35.233523 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 19:48:36.002086 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:48:36.028838 archdesktop-bay ckb-next-daemon[70901]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:48:36.029124 archdesktop-bay ckb-next-daemon[70901]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:48:40.878464 archdesktop-bay ckb-next-daemon[70901]: [I] Caught signal 15
+May 06 19:48:40.878464 archdesktop-bay ckb-next-daemon[70901]: [I] Closing root controller
+May 06 19:48:40.878630 archdesktop-bay ckb-next-daemon[70901]: [I] Removed device path /dev/input/ckb0
+May 06 19:48:40.878552 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 19:48:40.879427 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:48:40.879567 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 19:48:40.880865 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:48:40.904660 archdesktop-bay ckb-next-daemon[71049]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:48:40.904943 archdesktop-bay ckb-next-daemon[71049]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:57:45.478324 archdesktop-bay ckb-next-daemon[71049]: [I] Caught signal 15
+May 06 19:57:45.478324 archdesktop-bay ckb-next-daemon[71049]: [I] Closing root controller
+May 06 19:57:45.478600 archdesktop-bay ckb-next-daemon[71049]: [I] Removed device path /dev/input/ckb0
+May 06 19:57:45.478512 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 19:57:45.479506 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:57:45.479677 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 19:57:46.245658 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:57:46.264855 archdesktop-bay ckb-next-daemon[74103]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:57:46.265135 archdesktop-bay ckb-next-daemon[74103]: [I] Root controller ready at /dev/input/ckb0
+May 06 19:57:46.290394 archdesktop-bay ckb-next-daemon[74103]: [I] Caught signal 15
+May 06 19:57:46.290394 archdesktop-bay ckb-next-daemon[74103]: [I] Closing root controller
+May 06 19:57:46.290475 archdesktop-bay ckb-next-daemon[74103]: [I] Removed device path /dev/input/ckb0
+May 06 19:57:46.290519 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 19:57:46.291397 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 19:57:46.291559 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 19:57:46.292813 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 19:57:46.311702 archdesktop-bay ckb-next-daemon[74111]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 19:57:46.311978 archdesktop-bay ckb-next-daemon[74111]: [I] Root controller ready at /dev/input/ckb0
+May 06 20:05:40.915187 archdesktop-bay ckb-next-daemon[74111]: [I] Caught signal 15
+May 06 20:05:40.915187 archdesktop-bay ckb-next-daemon[74111]: [I] Closing root controller
+May 06 20:05:40.915405 archdesktop-bay ckb-next-daemon[74111]: [I] Removed device path /dev/input/ckb0
+May 06 20:05:40.915303 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 20:05:40.916269 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 20:05:40.916451 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 20:05:41.738008 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 20:05:41.768155 archdesktop-bay ckb-next-daemon[82770]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 20:05:41.768444 archdesktop-bay ckb-next-daemon[82770]: [I] Root controller ready at /dev/input/ckb0
+May 06 20:05:41.795716 archdesktop-bay ckb-next-daemon[82770]: [I] Caught signal 15
+May 06 20:05:41.795716 archdesktop-bay ckb-next-daemon[82770]: [I] Closing root controller
+May 06 20:05:41.795801 archdesktop-bay ckb-next-daemon[82770]: [I] Removed device path /dev/input/ckb0
+May 06 20:05:41.795850 archdesktop-bay systemd[1]: Stopping Corsair Keyboards and Mice Daemon...
+May 06 20:05:41.796720 archdesktop-bay systemd[1]: ckb-next-daemon.service: Deactivated successfully.
+May 06 20:05:41.796866 archdesktop-bay systemd[1]: Stopped Corsair Keyboards and Mice Daemon.
+May 06 20:05:41.798150 archdesktop-bay systemd[1]: Started Corsair Keyboards and Mice Daemon.
+May 06 20:05:41.809421 archdesktop-bay ckb-next-daemon[82778]: ckb-next-daemon 0.6.2-9-g659b8ff
+May 06 20:05:41.809699 archdesktop-bay ckb-next-daemon[82778]: [I] Root controller ready at /dev/input/ckb0
+
+Daemon on last boot:
+-- No entries --
+
+Dev nodes:
+/dev/input/ckb0
+/dev/input/ckb0/pid
+82778
+/dev/input/ckb0/version
+0.6.2-9-g659b8ff
+/dev/input/ckb0/connected
+
+Kernel command line:
+BOOT_IMAGE=/vmlinuz-linux-zen root=UUID=ac0652a2-174e-46fc-b3d7-cb0921dd79b2 rw loglevel=3 quiet
+
+GUI ldd:
+
+Environment:
+QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+XDG_SESSION_DESKTOP=Hyprland
+QT_QPA_PLATFORMTHEME=qt6ct
+XDG_SESSION_TYPE=wayland
+QT_BEARER_POLL_TIMEOUT=-1
+XDG_CURRENT_DESKTOP=Hyprland
+WAYLAND_DISPLAY=wayland-1
+QT_QUICK_CONTROLS_STYLE=org.hyprland.style
+QT_QPA_PLATFORM=wayland;xcb
+DISPLAY=:1
+QT_AUTO_SCREEN_SCALE_FACTOR=1
+QT_SCALE_FACTOR=1
+```
+

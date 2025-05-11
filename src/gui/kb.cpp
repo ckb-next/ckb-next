@@ -349,6 +349,8 @@ void Kb::load(){
             demoProfile = ":/txt/demoprofile_k55pro.ini";
         else if(map.model() == KeyMap::MM700)
             demoProfile = ":/txt/demoprofile_mm700.ini";
+        else if(map.model() == KeyMap::M75)
+            demoProfile = ":/txt/demoprofile_m75.ini";
         QSettings demoSettings(demoProfile, QSettings::IniFormat, this);
         CkbDemoSettings cSettings(demoSettings);
         KbProfile* demo = new KbProfile(this, map, cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");

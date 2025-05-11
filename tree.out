@@ -1,0 +1,1413 @@
+.
+├── CHANGELOG.md
+├── CMakeLists.txt
+├── FIRMWARE
+├── FIRMWARE.unsigned
+├── LICENSE
+├── README.md
+├── VERSION.cmake
+├── build
+│   ├── CMakeCache.txt
+│   ├── CMakeFiles
+│   │   ├── 4.0.1-dirty
+│   │   │   ├── CMakeCCompiler.cmake
+│   │   │   ├── CMakeCXXCompiler.cmake
+│   │   │   ├── CMakeDetermineCompilerABI_C.bin
+│   │   │   ├── CMakeDetermineCompilerABI_CXX.bin
+│   │   │   ├── CMakeSystem.cmake
+│   │   │   ├── CompilerIdC
+│   │   │   │   ├── CMakeCCompilerId.c
+│   │   │   │   ├── a.out
+│   │   │   │   └── tmp
+│   │   │   └── CompilerIdCXX
+│   │   │       ├── CMakeCXXCompilerId.cpp
+│   │   │       ├── a.out
+│   │   │       └── tmp
+│   │   ├── CMakeConfigureLog.yaml
+│   │   ├── CMakeDirectoryInformation.cmake
+│   │   ├── CMakeRuleHashes.txt
+│   │   ├── CMakeScratch
+│   │   ├── InstallScripts.json
+│   │   ├── Makefile.cmake
+│   │   ├── Makefile2
+│   │   ├── TargetDirectories.txt
+│   │   ├── cmake.check_cache
+│   │   ├── pkgRedirects
+│   │   ├── progress.marks
+│   │   └── uninstall.dir
+│   │       ├── DependInfo.cmake
+│   │       ├── build.make
+│   │       ├── cmake_clean.cmake
+│   │       ├── compiler_depend.make
+│   │       ├── compiler_depend.ts
+│   │       └── progress.make
+│   ├── CPackConfig.cmake
+│   ├── CPackSourceConfig.cmake
+│   ├── Makefile
+│   ├── bin
+│   │   ├── ckb-next
+│   │   ├── ckb-next-daemon
+│   │   ├── ckb-next-sinfo
+│   │   ├── gradient
+│   │   ├── heat
+│   │   ├── invaders
+│   │   ├── life
+│   │   ├── mviz
+│   │   ├── pinwheel
+│   │   ├── pipe
+│   │   ├── rain
+│   │   ├── random
+│   │   ├── ripple
+│   │   ├── snake
+│   │   └── wave
+│   ├── ckbnextconfig.h
+│   ├── cmake_install.cmake
+│   ├── cmake_uninstall.cmake
+│   ├── install_manifest.txt
+│   └── src
+│       ├── CMakeFiles
+│       │   ├── CMakeDirectoryInformation.cmake
+│       │   └── progress.marks
+│       ├── Makefile
+│       ├── animations
+│       │   ├── CMakeFiles
+│       │   │   ├── CMakeDirectoryInformation.cmake
+│       │   │   ├── animations.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   └── progress.make
+│       │   │   ├── gradient.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── gradient
+│       │   │   │   │   ├── main.c.o
+│       │   │   │   │   └── main.c.o.d
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   └── progress.make
+│       │   │   ├── heat.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── heat
+│       │   │   │   │   ├── main.c.o
+│       │   │   │   │   └── main.c.o.d
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   └── progress.make
+│       │   │   ├── invaders.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── invaders
+│       │   │   │   │   ├── main.c.o
+│       │   │   │   │   └── main.c.o.d
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   └── progress.make
+│       │   │   ├── life.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── life
+│       │   │   │   │   ├── main.c.o
+│       │   │   │   │   └── main.c.o.d
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   └── progress.make
+│       │   │   ├── pinwheel.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   ├── pinwheel
+│       │   │   │   │   ├── main.c.o
+│       │   │   │   │   └── main.c.o.d
+│       │   │   │   └── progress.make
+│       │   │   ├── pipe.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   ├── pipe
+│       │   │   │   │   ├── main.c.o
+│       │   │   │   │   └── main.c.o.d
+│       │   │   │   └── progress.make
+│       │   │   ├── progress.marks
+│       │   │   ├── rain.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   ├── progress.make
+│       │   │   │   └── rain
+│       │   │   │       ├── main.c.o
+│       │   │   │       └── main.c.o.d
+│       │   │   ├── random.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   ├── progress.make
+│       │   │   │   └── random
+│       │   │   │       ├── main.c.o
+│       │   │   │       └── main.c.o.d
+│       │   │   ├── ripple.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   ├── progress.make
+│       │   │   │   └── ripple
+│       │   │   │       ├── main.c.o
+│       │   │   │       └── main.c.o.d
+│       │   │   ├── snake.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   ├── progress.make
+│       │   │   │   └── snake
+│       │   │   │       ├── main.c.o
+│       │   │   │       └── main.c.o.d
+│       │   │   └── wave.dir
+│       │   │       ├── DependInfo.cmake
+│       │   │       ├── build.make
+│       │   │       ├── cmake_clean.cmake
+│       │   │       ├── compiler_depend.internal
+│       │   │       ├── compiler_depend.make
+│       │   │       ├── compiler_depend.ts
+│       │   │       ├── depend.make
+│       │   │       ├── flags.make
+│       │   │       ├── link.d
+│       │   │       ├── link.txt
+│       │   │       ├── progress.make
+│       │   │       └── wave
+│       │   │           ├── main.c.o
+│       │   │           └── main.c.o.d
+│       │   ├── Makefile
+│       │   ├── cmake_install.cmake
+│       │   └── mviz
+│       │       ├── CMakeFiles
+│       │       │   ├── CMakeDirectoryInformation.cmake
+│       │       │   ├── mviz.dir
+│       │       │   │   ├── DependInfo.cmake
+│       │       │   │   ├── build.make
+│       │       │   │   ├── cmake_clean.cmake
+│       │       │   │   ├── compiler_depend.internal
+│       │       │   │   ├── compiler_depend.make
+│       │       │   │   ├── compiler_depend.ts
+│       │       │   │   ├── depend.make
+│       │       │   │   ├── flags.make
+│       │       │   │   ├── link.d
+│       │       │   │   ├── link.txt
+│       │       │   │   ├── main.c.o
+│       │       │   │   ├── main.c.o.d
+│       │       │   │   └── progress.make
+│       │       │   └── progress.marks
+│       │       ├── Makefile
+│       │       └── cmake_install.cmake
+│       ├── cmake_install.cmake
+│       ├── daemon
+│       │   ├── CMakeFiles
+│       │   │   ├── CMakeDirectoryInformation.cmake
+│       │   │   ├── ckb-next-daemon.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── bragi_common.c.o
+│       │   │   │   ├── bragi_common.c.o.d
+│       │   │   │   ├── bragi_notification.c.o
+│       │   │   │   ├── bragi_notification.c.o.d
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── command.c.o
+│       │   │   │   ├── command.c.o.d
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── device.c.o
+│       │   │   │   ├── device.c.o.d
+│       │   │   │   ├── device_bragi.c.o
+│       │   │   │   ├── device_bragi.c.o.d
+│       │   │   │   ├── device_keyboard.c.o
+│       │   │   │   ├── device_keyboard.c.o.d
+│       │   │   │   ├── device_mouse.c.o
+│       │   │   │   ├── device_mouse.c.o.d
+│       │   │   │   ├── device_vtable.c.o
+│       │   │   │   ├── device_vtable.c.o.d
+│       │   │   │   ├── devnode.c.o
+│       │   │   │   ├── devnode.c.o.d
+│       │   │   │   ├── dpi.c.o
+│       │   │   │   ├── dpi.c.o.d
+│       │   │   │   ├── dpi_bragi.c.o
+│       │   │   │   ├── dpi_bragi.c.o.d
+│       │   │   │   ├── dpi_legacy.c.o
+│       │   │   │   ├── dpi_legacy.c.o.d
+│       │   │   │   ├── firmware.c.o
+│       │   │   │   ├── firmware.c.o.d
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── input.c.o
+│       │   │   │   ├── input.c.o.d
+│       │   │   │   ├── input_linux.c.o
+│       │   │   │   ├── input_linux.c.o.d
+│       │   │   │   ├── keymap.c.o
+│       │   │   │   ├── keymap.c.o.d
+│       │   │   │   ├── keymap_patch.c.o
+│       │   │   │   ├── keymap_patch.c.o.d
+│       │   │   │   ├── led.c.o
+│       │   │   │   ├── led.c.o.d
+│       │   │   │   ├── led_bragi.c.o
+│       │   │   │   ├── led_bragi.c.o.d
+│       │   │   │   ├── led_keyboard.c.o
+│       │   │   │   ├── led_keyboard.c.o.d
+│       │   │   │   ├── led_mouse.c.o
+│       │   │   │   ├── led_mouse.c.o.d
+│       │   │   │   ├── led_mousepad.c.o
+│       │   │   │   ├── led_mousepad.c.o.d
+│       │   │   │   ├── led_wireless.c.o
+│       │   │   │   ├── led_wireless.c.o.d
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   ├── main.c.o
+│       │   │   │   ├── main.c.o.d
+│       │   │   │   ├── notify.c.o
+│       │   │   │   ├── notify.c.o.d
+│       │   │   │   ├── profile.c.o
+│       │   │   │   ├── profile.c.o.d
+│       │   │   │   ├── profile_keyboard.c.o
+│       │   │   │   ├── profile_keyboard.c.o.d
+│       │   │   │   ├── profile_mouse.c.o
+│       │   │   │   ├── profile_mouse.c.o.d
+│       │   │   │   ├── progress.make
+│       │   │   │   ├── usb.c.o
+│       │   │   │   ├── usb.c.o.d
+│       │   │   │   ├── usb_bragi.c.o
+│       │   │   │   ├── usb_bragi.c.o.d
+│       │   │   │   ├── usb_legacy.c.o
+│       │   │   │   ├── usb_legacy.c.o.d
+│       │   │   │   ├── usb_linux.c.o
+│       │   │   │   ├── usb_linux.c.o.d
+│       │   │   │   ├── usb_nxp.c.o
+│       │   │   │   ├── usb_nxp.c.o.d
+│       │   │   │   ├── utils.c.o
+│       │   │   │   └── utils.c.o.d
+│       │   │   ├── daemon.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   └── progress.make
+│       │   │   └── progress.marks
+│       │   ├── Makefile
+│       │   ├── cmake_install.cmake
+│       │   └── service
+│       │       └── ckb-next-daemon.service
+│       ├── dev-detect
+│       │   ├── CMakeFiles
+│       │   │   ├── CMakeDirectoryInformation.cmake
+│       │   │   └── progress.marks
+│       │   ├── Makefile
+│       │   └── cmake_install.cmake
+│       ├── gui
+│       │   ├── CMakeFiles
+│       │   │   ├── CMakeDirectoryInformation.cmake
+│       │   │   ├── ckb-next-lrelease.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   └── progress.make
+│       │   │   ├── ckb-next.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── animadddialog.cpp.o
+│       │   │   │   ├── animadddialog.cpp.o.d
+│       │   │   │   ├── animdetailsdialog.cpp.o
+│       │   │   │   ├── animdetailsdialog.cpp.o.d
+│       │   │   │   ├── animscript.cpp.o
+│       │   │   │   ├── animscript.cpp.o.d
+│       │   │   │   ├── animsettingdialog.cpp.o
+│       │   │   │   ├── animsettingdialog.cpp.o.d
+│       │   │   │   ├── autorun.cpp.o
+│       │   │   │   ├── autorun.cpp.o.d
+│       │   │   │   ├── batterysystemtrayicon.cpp.o
+│       │   │   │   ├── batterysystemtrayicon.cpp.o.d
+│       │   │   │   ├── build.make
+│       │   │   │   ├── ckb-next_autogen
+│       │   │   │   │   ├── EJRQKI7XPS
+│       │   │   │   │   │   ├── qrc_binary.cpp.o
+│       │   │   │   │   │   ├── qrc_binary.cpp.o.d
+│       │   │   │   │   │   ├── qrc_image.cpp.o
+│       │   │   │   │   │   ├── qrc_image.cpp.o.d
+│       │   │   │   │   │   ├── qrc_text.cpp.o
+│       │   │   │   │   │   ├── qrc_text.cpp.o.d
+│       │   │   │   │   │   ├── qrc_translation.cpp.o
+│       │   │   │   │   │   └── qrc_translation.cpp.o.d
+│       │   │   │   │   ├── mocs_compilation.cpp.o
+│       │   │   │   │   └── mocs_compilation.cpp.o.d
+│       │   │   │   ├── ckbmainbackgroundcolour.cpp.o
+│       │   │   │   ├── ckbmainbackgroundcolour.cpp.o.d
+│       │   │   │   ├── ckbsettings.cpp.o
+│       │   │   │   ├── ckbsettings.cpp.o.d
+│       │   │   │   ├── ckbsettingswriter.cpp.o
+│       │   │   │   ├── ckbsettingswriter.cpp.o.d
+│       │   │   │   ├── ckbsystemquirks.cpp.o
+│       │   │   │   ├── ckbsystemquirks.cpp.o.d
+│       │   │   │   ├── ckbsystemtrayicon.cpp.o
+│       │   │   │   ├── ckbsystemtrayicon.cpp.o.d
+│       │   │   │   ├── ckbupdater.cpp.o
+│       │   │   │   ├── ckbupdater.cpp.o.d
+│       │   │   │   ├── ckbupdaterwidget.cpp.o
+│       │   │   │   ├── ckbupdaterwidget.cpp.o.d
+│       │   │   │   ├── ckbversionnumber.cpp.o
+│       │   │   │   ├── ckbversionnumber.cpp.o.d
+│       │   │   │   ├── clickeventpushbutton.cpp.o
+│       │   │   │   ├── clickeventpushbutton.cpp.o.d
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── colorbutton.cpp.o
+│       │   │   │   ├── colorbutton.cpp.o.d
+│       │   │   │   ├── colormap.cpp.o
+│       │   │   │   ├── colormap.cpp.o.d
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   ├── depend.make
+│       │   │   │   ├── extrasettingswidget.cpp.o
+│       │   │   │   ├── extrasettingswidget.cpp.o.d
+│       │   │   │   ├── flags.make
+│       │   │   │   ├── fwupgradedialog.cpp.o
+│       │   │   │   ├── fwupgradedialog.cpp.o.d
+│       │   │   │   ├── gradientbutton.cpp.o
+│       │   │   │   ├── gradientbutton.cpp.o.d
+│       │   │   │   ├── gradientdialog.cpp.o
+│       │   │   │   ├── gradientdialog.cpp.o.d
+│       │   │   │   ├── gradientdialogwidget.cpp.o
+│       │   │   │   ├── gradientdialogwidget.cpp.o.d
+│       │   │   │   ├── idletimer.cpp.o
+│       │   │   │   ├── idletimer.cpp.o.d
+│       │   │   │   ├── kb.cpp.o
+│       │   │   │   ├── kb.cpp.o.d
+│       │   │   │   ├── kbanim.cpp.o
+│       │   │   │   ├── kbanim.cpp.o.d
+│       │   │   │   ├── kbanimwidget.cpp.o
+│       │   │   │   ├── kbanimwidget.cpp.o.d
+│       │   │   │   ├── kbbind.cpp.o
+│       │   │   │   ├── kbbind.cpp.o.d
+│       │   │   │   ├── kbbindwidget.cpp.o
+│       │   │   │   ├── kbbindwidget.cpp.o.d
+│       │   │   │   ├── kbfirmware.cpp.o
+│       │   │   │   ├── kbfirmware.cpp.o.d
+│       │   │   │   ├── kblight.cpp.o
+│       │   │   │   ├── kblight.cpp.o.d
+│       │   │   │   ├── kblightwidget.cpp.o
+│       │   │   │   ├── kblightwidget.cpp.o.d
+│       │   │   │   ├── kbmanager.cpp.o
+│       │   │   │   ├── kbmanager.cpp.o.d
+│       │   │   │   ├── kbmode.cpp.o
+│       │   │   │   ├── kbmode.cpp.o.d
+│       │   │   │   ├── kbmodeeventmgr.cpp.o
+│       │   │   │   ├── kbmodeeventmgr.cpp.o.d
+│       │   │   │   ├── kbperf.cpp.o
+│       │   │   │   ├── kbperf.cpp.o.d
+│       │   │   │   ├── kbprofile.cpp.o
+│       │   │   │   ├── kbprofile.cpp.o.d
+│       │   │   │   ├── kbprofiledialog.cpp.o
+│       │   │   │   ├── kbprofiledialog.cpp.o.d
+│       │   │   │   ├── kbwidget.cpp.o
+│       │   │   │   ├── kbwidget.cpp.o.d
+│       │   │   │   ├── kbwindowinfo.cpp.o
+│       │   │   │   ├── kbwindowinfo.cpp.o.d
+│       │   │   │   ├── kbwindowinfomodel.cpp.o
+│       │   │   │   ├── kbwindowinfomodel.cpp.o.d
+│       │   │   │   ├── keyaction.cpp.o
+│       │   │   │   ├── keyaction.cpp.o.d
+│       │   │   │   ├── keymap.cpp.o
+│       │   │   │   ├── keymap.cpp.o.d
+│       │   │   │   ├── keywidget.cpp.o
+│       │   │   │   ├── keywidget.cpp.o.d
+│       │   │   │   ├── keywidgetdebugger.cpp.o
+│       │   │   │   ├── keywidgetdebugger.cpp.o.d
+│       │   │   │   ├── kperfwidget.cpp.o
+│       │   │   │   ├── kperfwidget.cpp.o.d
+│       │   │   │   ├── kstatusnotifier
+│       │   │   │   │   ├── kstatusnotifieritem.cpp.o
+│       │   │   │   │   ├── kstatusnotifieritem.cpp.o.d
+│       │   │   │   │   ├── kstatusnotifieritemdbus_p.cpp.o
+│       │   │   │   │   └── kstatusnotifieritemdbus_p.cpp.o.d
+│       │   │   │   ├── legacylightwidget.cpp.o
+│       │   │   │   ├── legacylightwidget.cpp.o.d
+│       │   │   │   ├── link.d
+│       │   │   │   ├── link.txt
+│       │   │   │   ├── macroreader.cpp.o
+│       │   │   │   ├── macroreader.cpp.o.d
+│       │   │   │   ├── macrostringeditdialog.cpp.o
+│       │   │   │   ├── macrostringeditdialog.cpp.o.d
+│       │   │   │   ├── macrotablemodel.cpp.o
+│       │   │   │   ├── macrotablemodel.cpp.o.d
+│       │   │   │   ├── main.cpp.o
+│       │   │   │   ├── main.cpp.o.d
+│       │   │   │   ├── mainwindow.cpp.o
+│       │   │   │   ├── mainwindow.cpp.o.d
+│       │   │   │   ├── media_linux.cpp.o
+│       │   │   │   ├── media_linux.cpp.o.d
+│       │   │   │   ├── modelisttablemodel.cpp.o
+│       │   │   │   ├── modelisttablemodel.cpp.o.d
+│       │   │   │   ├── modelistwidget.cpp.o
+│       │   │   │   ├── modelistwidget.cpp.o.d
+│       │   │   │   ├── modeselectdialog.cpp.o
+│       │   │   │   ├── modeselectdialog.cpp.o.d
+│       │   │   │   ├── mperfwidget.cpp.o
+│       │   │   │   ├── mperfwidget.cpp.o.d
+│       │   │   │   ├── notifications_interface.cpp.o
+│       │   │   │   ├── notifications_interface.cpp.o.d
+│       │   │   │   ├── nouserinputtextedit.cpp.o
+│       │   │   │   ├── nouserinputtextedit.cpp.o.d
+│       │   │   │   ├── nowheelcombobox.cpp.o
+│       │   │   │   ├── nowheelcombobox.cpp.o.d
+│       │   │   │   ├── progress.make
+│       │   │   │   ├── rebindwidget.cpp.o
+│       │   │   │   ├── rebindwidget.cpp.o.d
+│       │   │   │   ├── rlistwidget.cpp.o
+│       │   │   │   ├── rlistwidget.cpp.o.d
+│       │   │   │   ├── settingswidget.cpp.o
+│       │   │   │   ├── settingswidget.cpp.o.d
+│       │   │   │   ├── statusnotifieritemadaptor.cpp.o
+│       │   │   │   ├── statusnotifieritemadaptor.cpp.o.d
+│       │   │   │   ├── statusnotifierwatcher_interface.cpp.o
+│       │   │   │   ├── statusnotifierwatcher_interface.cpp.o.d
+│       │   │   │   ├── wayland
+│       │   │   │   │   ├── waylandutils.cpp.o
+│       │   │   │   │   └── waylandutils.cpp.o.d
+│       │   │   │   └── xcb
+│       │   │   │       ├── xcbidletimer.cpp.o
+│       │   │   │       ├── xcbidletimer.cpp.o.d
+│       │   │   │       ├── xwindowdetector.cpp.o
+│       │   │   │       └── xwindowdetector.cpp.o.d
+│       │   │   ├── ckb-next_autogen.dir
+│       │   │   │   ├── AutoRcc_binary_EJRQKI7XPS_Info.json
+│       │   │   │   ├── AutoRcc_binary_EJRQKI7XPS_Lock.lock
+│       │   │   │   ├── AutoRcc_binary_EJRQKI7XPS_Used.txt
+│       │   │   │   ├── AutoRcc_image_EJRQKI7XPS_Info.json
+│       │   │   │   ├── AutoRcc_image_EJRQKI7XPS_Lock.lock
+│       │   │   │   ├── AutoRcc_image_EJRQKI7XPS_Used.txt
+│       │   │   │   ├── AutoRcc_text_EJRQKI7XPS_Info.json
+│       │   │   │   ├── AutoRcc_text_EJRQKI7XPS_Lock.lock
+│       │   │   │   ├── AutoRcc_text_EJRQKI7XPS_Used.txt
+│       │   │   │   ├── AutoRcc_translation_EJRQKI7XPS_Info.json
+│       │   │   │   ├── AutoRcc_translation_EJRQKI7XPS_Lock.lock
+│       │   │   │   ├── AutoRcc_translation_EJRQKI7XPS_Used.txt
+│       │   │   │   ├── AutogenInfo.json
+│       │   │   │   ├── AutogenUsed.txt
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── ParseCache.txt
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.internal
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   └── progress.make
+│       │   │   ├── ckb-next_autogen_timestamp_deps.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   └── progress.make
+│       │   │   ├── gui.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   └── progress.make
+│       │   │   ├── lupdate.dir
+│       │   │   │   ├── DependInfo.cmake
+│       │   │   │   ├── build.make
+│       │   │   │   ├── cmake_clean.cmake
+│       │   │   │   ├── compiler_depend.make
+│       │   │   │   ├── compiler_depend.ts
+│       │   │   │   └── progress.make
+│       │   │   └── progress.marks
+│       │   ├── Makefile
+│       │   ├── binary.qrc
+│       │   ├── ckb-next-key.gpg
+│       │   ├── ckb-next-monochrome.png
+│       │   ├── ckb-next.autostart.desktop
+│       │   ├── ckb-next.desktop
+│       │   ├── ckb-next.png
+│       │   ├── ckb-next_autogen
+│       │   │   ├── EJRQKI7XPS
+│       │   │   │   ├── qrc_binary.cpp
+│       │   │   │   ├── qrc_image.cpp
+│       │   │   │   ├── qrc_text.cpp
+│       │   │   │   └── qrc_translation.cpp
+│       │   │   ├── EWIEGA46WW
+│       │   │   │   ├── moc_animadddialog.cpp
+│       │   │   │   ├── moc_animadddialog.cpp.d
+│       │   │   │   ├── moc_animdetailsdialog.cpp
+│       │   │   │   ├── moc_animdetailsdialog.cpp.d
+│       │   │   │   ├── moc_animscript.cpp
+│       │   │   │   ├── moc_animscript.cpp.d
+│       │   │   │   ├── moc_animsettingdialog.cpp
+│       │   │   │   ├── moc_animsettingdialog.cpp.d
+│       │   │   │   ├── moc_batterysystemtrayicon.cpp
+│       │   │   │   ├── moc_batterysystemtrayicon.cpp.d
+│       │   │   │   ├── moc_ckbsettingswriter.cpp
+│       │   │   │   ├── moc_ckbsettingswriter.cpp.d
+│       │   │   │   ├── moc_ckbsystemtrayicon.cpp
+│       │   │   │   ├── moc_ckbsystemtrayicon.cpp.d
+│       │   │   │   ├── moc_ckbupdater.cpp
+│       │   │   │   ├── moc_ckbupdater.cpp.d
+│       │   │   │   ├── moc_ckbupdaterwidget.cpp
+│       │   │   │   ├── moc_ckbupdaterwidget.cpp.d
+│       │   │   │   ├── moc_clickeventpushbutton.cpp
+│       │   │   │   ├── moc_clickeventpushbutton.cpp.d
+│       │   │   │   ├── moc_colorbutton.cpp
+│       │   │   │   ├── moc_colorbutton.cpp.d
+│       │   │   │   ├── moc_extrasettingswidget.cpp
+│       │   │   │   ├── moc_extrasettingswidget.cpp.d
+│       │   │   │   ├── moc_fwupgradedialog.cpp
+│       │   │   │   ├── moc_fwupgradedialog.cpp.d
+│       │   │   │   ├── moc_gradientbutton.cpp
+│       │   │   │   ├── moc_gradientbutton.cpp.d
+│       │   │   │   ├── moc_gradientdialog.cpp
+│       │   │   │   ├── moc_gradientdialog.cpp.d
+│       │   │   │   ├── moc_gradientdialogwidget.cpp
+│       │   │   │   ├── moc_gradientdialogwidget.cpp.d
+│       │   │   │   ├── moc_kb.cpp
+│       │   │   │   ├── moc_kb.cpp.d
+│       │   │   │   ├── moc_kbanim.cpp
+│       │   │   │   ├── moc_kbanim.cpp.d
+│       │   │   │   ├── moc_kbanimwidget.cpp
+│       │   │   │   ├── moc_kbanimwidget.cpp.d
+│       │   │   │   ├── moc_kbbind.cpp
+│       │   │   │   ├── moc_kbbind.cpp.d
+│       │   │   │   ├── moc_kbbindwidget.cpp
+│       │   │   │   ├── moc_kbbindwidget.cpp.d
+│       │   │   │   ├── moc_kbfirmware.cpp
+│       │   │   │   ├── moc_kbfirmware.cpp.d
+│       │   │   │   ├── moc_kblight.cpp
+│       │   │   │   ├── moc_kblight.cpp.d
+│       │   │   │   ├── moc_kblightwidget.cpp
+│       │   │   │   ├── moc_kblightwidget.cpp.d
+│       │   │   │   ├── moc_kbmanager.cpp
+│       │   │   │   ├── moc_kbmanager.cpp.d
+│       │   │   │   ├── moc_kbmode.cpp
+│       │   │   │   ├── moc_kbmode.cpp.d
+│       │   │   │   ├── moc_kbmodeeventmgr.cpp
+│       │   │   │   ├── moc_kbmodeeventmgr.cpp.d
+│       │   │   │   ├── moc_kbperf.cpp
+│       │   │   │   ├── moc_kbperf.cpp.d
+│       │   │   │   ├── moc_kbprofile.cpp
+│       │   │   │   ├── moc_kbprofile.cpp.d
+│       │   │   │   ├── moc_kbprofiledialog.cpp
+│       │   │   │   ├── moc_kbprofiledialog.cpp.d
+│       │   │   │   ├── moc_kbwidget.cpp
+│       │   │   │   ├── moc_kbwidget.cpp.d
+│       │   │   │   ├── moc_kbwindowinfo.cpp
+│       │   │   │   ├── moc_kbwindowinfo.cpp.d
+│       │   │   │   ├── moc_kbwindowinfomodel.cpp
+│       │   │   │   ├── moc_kbwindowinfomodel.cpp.d
+│       │   │   │   ├── moc_keyaction.cpp
+│       │   │   │   ├── moc_keyaction.cpp.d
+│       │   │   │   ├── moc_keywidget.cpp
+│       │   │   │   ├── moc_keywidget.cpp.d
+│       │   │   │   ├── moc_keywidgetdebugger.cpp
+│       │   │   │   ├── moc_keywidgetdebugger.cpp.d
+│       │   │   │   ├── moc_kperfwidget.cpp
+│       │   │   │   ├── moc_kperfwidget.cpp.d
+│       │   │   │   ├── moc_legacylightwidget.cpp
+│       │   │   │   ├── moc_legacylightwidget.cpp.d
+│       │   │   │   ├── moc_macroreader.cpp
+│       │   │   │   ├── moc_macroreader.cpp.d
+│       │   │   │   ├── moc_macrostringeditdialog.cpp
+│       │   │   │   ├── moc_macrostringeditdialog.cpp.d
+│       │   │   │   ├── moc_macrotablemodel.cpp
+│       │   │   │   ├── moc_macrotablemodel.cpp.d
+│       │   │   │   ├── moc_mainwindow.cpp
+│       │   │   │   ├── moc_mainwindow.cpp.d
+│       │   │   │   ├── moc_modelisttablemodel.cpp
+│       │   │   │   ├── moc_modelisttablemodel.cpp.d
+│       │   │   │   ├── moc_modelistwidget.cpp
+│       │   │   │   ├── moc_modelistwidget.cpp.d
+│       │   │   │   ├── moc_modeselectdialog.cpp
+│       │   │   │   ├── moc_modeselectdialog.cpp.d
+│       │   │   │   ├── moc_mperfwidget.cpp
+│       │   │   │   ├── moc_mperfwidget.cpp.d
+│       │   │   │   ├── moc_nouserinputtextedit.cpp
+│       │   │   │   ├── moc_nouserinputtextedit.cpp.d
+│       │   │   │   ├── moc_nowheelcombobox.cpp
+│       │   │   │   ├── moc_nowheelcombobox.cpp.d
+│       │   │   │   ├── moc_rebindwidget.cpp
+│       │   │   │   ├── moc_rebindwidget.cpp.d
+│       │   │   │   ├── moc_rlistwidget.cpp
+│       │   │   │   ├── moc_rlistwidget.cpp.d
+│       │   │   │   ├── moc_settingswidget.cpp
+│       │   │   │   └── moc_settingswidget.cpp.d
+│       │   │   ├── JL3LVDP2LZ
+│       │   │   │   ├── moc_xwindowdetector.cpp
+│       │   │   │   └── moc_xwindowdetector.cpp.d
+│       │   │   ├── deps
+│       │   │   ├── include
+│       │   │   │   ├── moc_kstatusnotifieritem.cpp
+│       │   │   │   ├── moc_kstatusnotifieritem.cpp.d
+│       │   │   │   ├── moc_kstatusnotifieritemdbus_p.cpp
+│       │   │   │   ├── moc_kstatusnotifieritemdbus_p.cpp.d
+│       │   │   │   ├── moc_kstatusnotifieritemprivate_p.cpp
+│       │   │   │   ├── moc_kstatusnotifieritemprivate_p.cpp.d
+│       │   │   │   ├── ui_animadddialog.h
+│       │   │   │   ├── ui_animdetailsdialog.h
+│       │   │   │   ├── ui_animsettingdialog.h
+│       │   │   │   ├── ui_ckbupdaterwidget.h
+│       │   │   │   ├── ui_extrasettingswidget.h
+│       │   │   │   ├── ui_fwupgradedialog.h
+│       │   │   │   ├── ui_gradientdialog.h
+│       │   │   │   ├── ui_kbanimwidget.h
+│       │   │   │   ├── ui_kbbindwidget.h
+│       │   │   │   ├── ui_kblightwidget.h
+│       │   │   │   ├── ui_kbmodeeventmgr.h
+│       │   │   │   ├── ui_kbprofiledialog.h
+│       │   │   │   ├── ui_kbwidget.h
+│       │   │   │   ├── ui_keywidgetdebugger.h
+│       │   │   │   ├── ui_kperfwidget.h
+│       │   │   │   ├── ui_legacylightwidget.h
+│       │   │   │   ├── ui_macrostringeditdialog.h
+│       │   │   │   ├── ui_mainwindow.h
+│       │   │   │   ├── ui_modeselectdialog.h
+│       │   │   │   ├── ui_mperfwidget.h
+│       │   │   │   ├── ui_rebindwidget.h
+│       │   │   │   └── ui_settingswidget.h
+│       │   │   ├── moc_predefs.h
+│       │   │   ├── mocs_compilation.cpp
+│       │   │   └── timestamp
+│       │   ├── ckb-next_battery_0.png
+│       │   ├── ckb-next_battery_1.png
+│       │   ├── ckb-next_battery_2.png
+│       │   ├── ckb-next_battery_3.png
+│       │   ├── ckb-next_battery_4.png
+│       │   ├── ckb-next_battery_charging.png
+│       │   ├── cmake_install.cmake
+│       │   ├── de.qm
+│       │   ├── demoprofile.conf
+│       │   ├── demoprofile_k55.ini
+│       │   ├── demoprofile_k55pro.ini
+│       │   ├── demoprofile_m95.ini
+│       │   ├── demoprofile_mm700.ini
+│       │   ├── demoprofile_nightsword.ini
+│       │   ├── demoprofile_polaris.ini
+│       │   ├── demoprofile_st100.ini
+│       │   ├── el.qm
+│       │   ├── en_GB.qm
+│       │   ├── icon_blank.png
+│       │   ├── icon_mode.png
+│       │   ├── icon_mode1.png
+│       │   ├── icon_mode1_hardware.png
+│       │   ├── icon_mode2.png
+│       │   ├── icon_mode2_hardware.png
+│       │   ├── icon_mode3.png
+│       │   ├── icon_mode3_hardware.png
+│       │   ├── icon_plus.png
+│       │   ├── icon_profile.png
+│       │   ├── icon_profile_hardware.png
+│       │   ├── image.qrc
+│       │   ├── lightning.svg
+│       │   ├── lightning_disabled.svg
+│       │   ├── notifications_interface.cpp
+│       │   ├── notifications_interface.h
+│       │   ├── notifications_interface.moc
+│       │   ├── notifications_interface.moc_parameters
+│       │   ├── overlay_darkcore.png
+│       │   ├── overlay_darkcore_rgb_pro.png
+│       │   ├── overlay_glaive.png
+│       │   ├── overlay_glaivepro.png
+│       │   ├── overlay_harpoon.png
+│       │   ├── overlay_ironclaw.png
+│       │   ├── overlay_katar.png
+│       │   ├── overlay_m55.png
+│       │   ├── overlay_m65.png
+│       │   ├── overlay_m95.png
+│       │   ├── overlay_mm700.png
+│       │   ├── overlay_nightsword.png
+│       │   ├── overlay_polaris.png
+│       │   ├── overlay_sabre.png
+│       │   ├── overlay_scimitar.png
+│       │   ├── statusnotifieritemadaptor.cpp
+│       │   ├── statusnotifieritemadaptor.h
+│       │   ├── statusnotifieritemadaptor.moc
+│       │   ├── statusnotifieritemadaptor.moc_parameters
+│       │   ├── statusnotifierwatcher_interface.cpp
+│       │   ├── statusnotifierwatcher_interface.h
+│       │   ├── statusnotifierwatcher_interface.moc
+│       │   ├── statusnotifierwatcher_interface.moc_parameters
+│       │   ├── text.qrc
+│       │   └── translation.qrc
+│       ├── libs
+│       │   ├── CMakeFiles
+│       │   │   ├── CMakeDirectoryInformation.cmake
+│       │   │   └── progress.marks
+│       │   ├── Makefile
+│       │   ├── ckb-next
+│       │   │   ├── Animation
+│       │   │   │   ├── AnimationConfig.cmake
+│       │   │   │   ├── AnimationConfigVersion.cmake
+│       │   │   │   └── AnimationTargets.cmake
+│       │   │   ├── CMakeFiles
+│       │   │   │   ├── CMakeDirectoryInformation.cmake
+│       │   │   │   ├── Export
+│       │   │   │   │   └── 68cb684ecf63f5a2e4d5e77a46946792
+│       │   │   │   │       └── AnimationTargets.cmake
+│       │   │   │   └── progress.marks
+│       │   │   ├── Makefile
+│       │   │   └── cmake_install.cmake
+│       │   ├── cmake_install.cmake
+│       │   └── kissfft
+│       │       ├── CMakeFiles
+│       │       │   ├── CMakeDirectoryInformation.cmake
+│       │       │   ├── KissFFT.dir
+│       │       │   │   ├── DependInfo.cmake
+│       │       │   │   ├── build.make
+│       │       │   │   ├── cmake_clean.cmake
+│       │       │   │   ├── cmake_clean_target.cmake
+│       │       │   │   ├── compiler_depend.internal
+│       │       │   │   ├── compiler_depend.make
+│       │       │   │   ├── compiler_depend.ts
+│       │       │   │   ├── depend.make
+│       │       │   │   ├── flags.make
+│       │       │   │   ├── kiss_fft.c.o
+│       │       │   │   ├── kiss_fft.c.o.d
+│       │       │   │   ├── kiss_fftr.c.o
+│       │       │   │   ├── kiss_fftr.c.o.d
+│       │       │   │   ├── link.txt
+│       │       │   │   └── progress.make
+│       │       │   └── progress.marks
+│       │       ├── Makefile
+│       │       ├── cmake_install.cmake
+│       │       └── libKissFFT.a
+│       ├── mac-uninstall
+│       │   ├── CMakeFiles
+│       │   │   ├── CMakeDirectoryInformation.cmake
+│       │   │   └── progress.marks
+│       │   ├── Makefile
+│       │   └── cmake_install.cmake
+│       └── sinfo
+│           ├── CMakeFiles
+│           │   ├── CMakeDirectoryInformation.cmake
+│           │   ├── ckb-next-sinfo.dir
+│           │   │   ├── DependInfo.cmake
+│           │   │   ├── build.make
+│           │   │   ├── cmake_clean.cmake
+│           │   │   ├── compiler_depend.internal
+│           │   │   ├── compiler_depend.make
+│           │   │   ├── compiler_depend.ts
+│           │   │   ├── depend.make
+│           │   │   ├── flags.make
+│           │   │   ├── link.d
+│           │   │   ├── link.txt
+│           │   │   ├── progress.make
+│           │   │   ├── sinfo.cpp.o
+│           │   │   └── sinfo.cpp.o.d
+│           │   └── progress.marks
+│           ├── Makefile
+│           └── cmake_install.cmake
+├── ckb-next-dev-detect
+├── ckb-next-dev-detect-report
+│   └── ckb-next-dev-detect-report
+├── cmake
+│   ├── cmake_uninstall.cmake.in
+│   └── modules
+│       ├── CkbNextBuildType.cmake
+│       ├── CkbNextCompileFlags.cmake
+│       ├── CkbNextDetermineVersion.cmake
+│       ├── CkbNextPlatform.cmake
+│       ├── DeployQt5.cmake
+│       ├── FindIconv.cmake
+│       ├── FindPulseAudio.cmake
+│       ├── FindQuaZip.cmake
+│       ├── FindUDEV.cmake
+│       ├── FindWayland.cmake
+│       ├── FindWaylandProtocols.cmake
+│       ├── MacroEnsureOutOfSourceBuild.cmake
+│       └── sanitizers
+│           ├── FindASan.cmake
+│           ├── FindMSan.cmake
+│           ├── FindSanitizers.cmake
+│           ├── FindTSan.cmake
+│           ├── FindUBSan.cmake
+│           ├── asan-wrapper
+│           └── sanitize-helpers.cmake
+├── libera.svg
+├── linux
+│   ├── 66
+│   │   └── ckb-next
+│   ├── ckb-next.autostart.desktop.in
+│   ├── ckb-next.desktop.in
+│   ├── debian
+│   │   ├── DOCKER
+│   │   │   ├── BUILD_CREATE_DOCKER.md
+│   │   │   ├── Dockerfile
+│   │   │   └── entry_point.sh
+│   │   └── postinst
+│   ├── icons
+│   │   ├── 128x128
+│   │   │   ├── apps
+│   │   │   │   ├── ckb-next-monochrome.png
+│   │   │   │   └── ckb-next.png
+│   │   │   └── status
+│   │   │       ├── ckb-next_battery_0.png
+│   │   │       ├── ckb-next_battery_1.png
+│   │   │       ├── ckb-next_battery_2.png
+│   │   │       ├── ckb-next_battery_3.png
+│   │   │       ├── ckb-next_battery_4.png
+│   │   │       └── ckb-next_battery_charging.png
+│   │   ├── 16x16
+│   │   │   ├── apps
+│   │   │   │   ├── ckb-next-monochrome.png
+│   │   │   │   └── ckb-next.png
+│   │   │   └── status
+│   │   │       ├── ckb-next_battery_0.png
+│   │   │       ├── ckb-next_battery_1.png
+│   │   │       ├── ckb-next_battery_2.png
+│   │   │       ├── ckb-next_battery_3.png
+│   │   │       ├── ckb-next_battery_4.png
+│   │   │       └── ckb-next_battery_charging.png
+│   │   ├── 22x22
+│   │   │   ├── apps
+│   │   │   │   ├── ckb-next-monochrome.png
+│   │   │   │   └── ckb-next.png
+│   │   │   └── status
+│   │   │       ├── ckb-next_battery_0.png
+│   │   │       ├── ckb-next_battery_1.png
+│   │   │       ├── ckb-next_battery_2.png
+│   │   │       ├── ckb-next_battery_3.png
+│   │   │       ├── ckb-next_battery_4.png
+│   │   │       └── ckb-next_battery_charging.png
+│   │   ├── 256x256
+│   │   │   ├── apps
+│   │   │   │   ├── ckb-next-monochrome.png
+│   │   │   │   └── ckb-next.png
+│   │   │   └── status
+│   │   │       ├── ckb-next_battery_0.png
+│   │   │       ├── ckb-next_battery_1.png
+│   │   │       ├── ckb-next_battery_2.png
+│   │   │       ├── ckb-next_battery_3.png
+│   │   │       ├── ckb-next_battery_4.png
+│   │   │       └── ckb-next_battery_charging.png
+│   │   ├── 32x32
+│   │   │   ├── apps
+│   │   │   │   ├── ckb-next-monochrome.png
+│   │   │   │   └── ckb-next.png
+│   │   │   └── status
+│   │   │       ├── ckb-next_battery_0.png
+│   │   │       ├── ckb-next_battery_1.png
+│   │   │       ├── ckb-next_battery_2.png
+│   │   │       ├── ckb-next_battery_3.png
+│   │   │       ├── ckb-next_battery_4.png
+│   │   │       └── ckb-next_battery_charging.png
+│   │   └── 48x48
+│   │       ├── apps
+│   │       │   ├── ckb-next-monochrome.png
+│   │       │   └── ckb-next.png
+│   │       └── status
+│   │           ├── ckb-next_battery_0.png
+│   │           ├── ckb-next_battery_1.png
+│   │           ├── ckb-next_battery_2.png
+│   │           ├── ckb-next_battery_3.png
+│   │           ├── ckb-next_battery_4.png
+│   │           └── ckb-next_battery_charging.png
+│   ├── openrc
+│   │   └── ckb-next-daemon.in
+│   ├── systemd
+│   │   └── ckb-next-daemon.service.in
+│   ├── sysvinit
+│   │   └── ckb-next-daemon.in
+│   ├── udev
+│   │   └── 99-ckb-next-daemon.rules
+│   └── upstart
+│       └── ckb-next-daemon.conf.in
+├── macos
+│   ├── README.rtf
+│   ├── ckb-next.icns
+│   ├── daemon-postinstall.sh
+│   ├── daemon-preinstall.sh
+│   ├── daemon-restart.sh
+│   ├── gpl-2.0.rtf
+│   ├── gui-preinstall.sh
+│   ├── org.ckb-next.daemon.plist
+│   ├── org.ckb-next.daemon_agent.plist
+│   ├── org.ckb-next.info.plist.in
+│   ├── org.ckb-next.plist
+│   ├── org.pqrs.driver.Karabiner.VirtualHIDDevice.v060800.kext
+│   │   └── Contents
+│   │       ├── Info.plist
+│   │       ├── MacOS
+│   │       │   └── VirtualHIDDevice
+│   │       └── _CodeSignature
+│   │           └── CodeResources
+│   ├── pkgproj
+│   │   ├── appdmg.json
+│   │   ├── ckb-next-legacy.pkgproj
+│   │   └── ckb-next.pkgproj
+│   └── uninstall.sh
+├── quickinstall
+├── scripts
+│   ├── defs2magic.py
+│   ├── keymaptest.py
+│   ├── mac_build
+│   │   ├── build_mac.sh
+│   │   └── build_mac_legacy.sh
+│   ├── nxp_rgb_count.py
+│   ├── sign_firmware.sh
+│   └── ts2txt.sh
+├── src
+│   ├── CMakeLists.txt
+│   ├── animations
+│   │   ├── CMakeLists.txt
+│   │   ├── gradient
+│   │   │   └── main.c
+│   │   ├── heat
+│   │   │   └── main.c
+│   │   ├── invaders
+│   │   │   └── main.c
+│   │   ├── life
+│   │   │   └── main.c
+│   │   ├── mviz
+│   │   │   ├── CMakeLists.txt
+│   │   │   └── main.c
+│   │   ├── pinwheel
+│   │   │   └── main.c
+│   │   ├── pipe
+│   │   │   └── main.c
+│   │   ├── rain
+│   │   │   └── main.c
+│   │   ├── random
+│   │   │   └── main.c
+│   │   ├── ripple
+│   │   │   └── main.c
+│   │   ├── snake
+│   │   │   └── main.c
+│   │   └── wave
+│   │       └── main.c
+│   ├── ckbnextconfig.h.in
+│   ├── daemon
+│   │   ├── CMakeLists.txt
+│   │   ├── bragi_common.c
+│   │   ├── bragi_common.h
+│   │   ├── bragi_notification.c
+│   │   ├── bragi_notification.h
+│   │   ├── bragi_proto.h
+│   │   ├── command.c
+│   │   ├── command.h
+│   │   ├── device.c
+│   │   ├── device.h
+│   │   ├── device_bragi.c
+│   │   ├── device_keyboard.c
+│   │   ├── device_mouse.c
+│   │   ├── device_vtable.c
+│   │   ├── devnode.c
+│   │   ├── devnode.h
+│   │   ├── dpi.c
+│   │   ├── dpi.h
+│   │   ├── dpi_bragi.c
+│   │   ├── dpi_bragi.h
+│   │   ├── dpi_legacy.c
+│   │   ├── dpi_legacy.h
+│   │   ├── extra_mac.c
+│   │   ├── firmware.c
+│   │   ├── firmware.h
+│   │   ├── includes.h
+│   │   ├── input.c
+│   │   ├── input.h
+│   │   ├── input_linux.c
+│   │   ├── input_mac.c
+│   │   ├── input_mac_legacy.c
+│   │   ├── input_mac_mouse_legacy.c
+│   │   ├── input_mac_vhid.h
+│   │   ├── keymap.c
+│   │   ├── keymap.h
+│   │   ├── keymap_mac.h
+│   │   ├── keymap_mac_legacy.h
+│   │   ├── keymap_patch.c
+│   │   ├── keymap_patch.h
+│   │   ├── led.c
+│   │   ├── led.h
+│   │   ├── led_bragi.c
+│   │   ├── led_keyboard.c
+│   │   ├── led_mouse.c
+│   │   ├── led_mousepad.c
+│   │   ├── led_wireless.c
+│   │   ├── legacykb_proto.h
+│   │   ├── main.c
+│   │   ├── notify.c
+│   │   ├── notify.h
+│   │   ├── nxp_proto.h
+│   │   ├── os.h
+│   │   ├── profile.c
+│   │   ├── profile.h
+│   │   ├── profile_keyboard.c
+│   │   ├── profile_mouse.c
+│   │   ├── request_hid_mac.c
+│   │   ├── request_hid_mac.h
+│   │   ├── structures.h
+│   │   ├── usb.c
+│   │   ├── usb.h
+│   │   ├── usb_bragi.c
+│   │   ├── usb_bragi.h
+│   │   ├── usb_legacy.c
+│   │   ├── usb_legacy.h
+│   │   ├── usb_linux.c
+│   │   ├── usb_mac.c
+│   │   ├── usb_nxp.c
+│   │   ├── usb_nxp.h
+│   │   ├── utils.c
+│   │   └── utils.h
+│   ├── dev-detect
+│   │   └── CMakeLists.txt
+│   ├── gui
+│   │   ├── CMakeLists.txt
+│   │   ├── animadddialog.cpp
+│   │   ├── animadddialog.h
+│   │   ├── animadddialog.ui
+│   │   ├── animdetailsdialog.cpp
+│   │   ├── animdetailsdialog.h
+│   │   ├── animdetailsdialog.ui
+│   │   ├── animscript.cpp
+│   │   ├── animscript.h
+│   │   ├── animsettingdialog.cpp
+│   │   ├── animsettingdialog.h
+│   │   ├── animsettingdialog.ui
+│   │   ├── autorun.cpp
+│   │   ├── autorun.h
+│   │   ├── batterysystemtrayicon.cpp
+│   │   ├── batterysystemtrayicon.h
+│   │   ├── ckbmainbackgroundcolour.cpp
+│   │   ├── ckbmainbackgroundcolour.h
+│   │   ├── ckbsettings.cpp
+│   │   ├── ckbsettings.h
+│   │   ├── ckbsettingswriter.cpp
+│   │   ├── ckbsettingswriter.h
+│   │   ├── ckbsystemquirks.cpp
+│   │   ├── ckbsystemquirks.h
+│   │   ├── ckbsystemtrayicon.cpp
+│   │   ├── ckbsystemtrayicon.h
+│   │   ├── ckbupdater.cpp
+│   │   ├── ckbupdater.h
+│   │   ├── ckbupdaterwidget.cpp
+│   │   ├── ckbupdaterwidget.h
+│   │   ├── ckbupdaterwidget.ui
+│   │   ├── ckbversionnumber.cpp
+│   │   ├── ckbversionnumber.h
+│   │   ├── clickeventpushbutton.cpp
+│   │   ├── clickeventpushbutton.h
+│   │   ├── colorbutton.cpp
+│   │   ├── colorbutton.h
+│   │   ├── colormap.cpp
+│   │   ├── colormap.h
+│   │   ├── compat
+│   │   │   ├── qoverloadlegacy.h
+│   │   │   └── qrand.h
+│   │   ├── extrasettingswidget.cpp
+│   │   ├── extrasettingswidget.h
+│   │   ├── extrasettingswidget.ui
+│   │   ├── fwupgradedialog.cpp
+│   │   ├── fwupgradedialog.h
+│   │   ├── fwupgradedialog.ui
+│   │   ├── gradientbutton.cpp
+│   │   ├── gradientbutton.h
+│   │   ├── gradientdialog.cpp
+│   │   ├── gradientdialog.h
+│   │   ├── gradientdialog.ui
+│   │   ├── gradientdialogwidget.cpp
+│   │   ├── gradientdialogwidget.h
+│   │   ├── idletimer.cpp
+│   │   ├── idletimer.h
+│   │   ├── kb.cpp
+│   │   ├── kb.h
+│   │   ├── kbanim.cpp
+│   │   ├── kbanim.h
+│   │   ├── kbanimwidget.cpp
+│   │   ├── kbanimwidget.h
+│   │   ├── kbanimwidget.ui
+│   │   ├── kbbind.cpp
+│   │   ├── kbbind.h
+│   │   ├── kbbindwidget.cpp
+│   │   ├── kbbindwidget.h
+│   │   ├── kbbindwidget.ui
+│   │   ├── kbfirmware.cpp
+│   │   ├── kbfirmware.h
+│   │   ├── kblight.cpp
+│   │   ├── kblight.h
+│   │   ├── kblightwidget.cpp
+│   │   ├── kblightwidget.h
+│   │   ├── kblightwidget.ui
+│   │   ├── kbmanager.cpp
+│   │   ├── kbmanager.h
+│   │   ├── kbmode.cpp
+│   │   ├── kbmode.h
+│   │   ├── kbmodeeventmgr.cpp
+│   │   ├── kbmodeeventmgr.h
+│   │   ├── kbmodeeventmgr.ui
+│   │   ├── kbperf.cpp
+│   │   ├── kbperf.h
+│   │   ├── kbprofile.cpp
+│   │   ├── kbprofile.h
+│   │   ├── kbprofiledialog.cpp
+│   │   ├── kbprofiledialog.h
+│   │   ├── kbprofiledialog.ui
+│   │   ├── kbwidget.cpp
+│   │   ├── kbwidget.h
+│   │   ├── kbwidget.ui
+│   │   ├── kbwindowinfo.cpp
+│   │   ├── kbwindowinfo.h
+│   │   ├── kbwindowinfomodel.cpp
+│   │   ├── kbwindowinfomodel.h
+│   │   ├── keyaction.cpp
+│   │   ├── keyaction.h
+│   │   ├── keymap.cpp
+│   │   ├── keymap.h
+│   │   ├── keywidget.cpp
+│   │   ├── keywidget.h
+│   │   ├── keywidgetdebugger.cpp
+│   │   ├── keywidgetdebugger.h
+│   │   ├── keywidgetdebugger.ui
+│   │   ├── keywidgetlayout.h
+│   │   ├── kperfwidget.cpp
+│   │   ├── kperfwidget.h
+│   │   ├── kperfwidget.ui
+│   │   ├── kstatusnotifier
+│   │   │   ├── COPYING.LIB
+│   │   │   ├── config-kstatusnotifieritem.h
+│   │   │   ├── debug_p.h
+│   │   │   ├── kstatusnotifieritem.cpp
+│   │   │   ├── kstatusnotifieritem.h
+│   │   │   ├── kstatusnotifieritemdbus_p.cpp
+│   │   │   ├── kstatusnotifieritemdbus_p.h
+│   │   │   ├── kstatusnotifieritemprivate_p.h
+│   │   │   ├── libdbusmenu-qt
+│   │   │   │   ├── com.canonical.dbusmenu.xml
+│   │   │   │   ├── dbusmenu_p.cpp
+│   │   │   │   ├── dbusmenu_p.h
+│   │   │   │   ├── dbusmenuexporter.cpp
+│   │   │   │   ├── dbusmenuexporter.h
+│   │   │   │   ├── dbusmenuexporterdbus_p.cpp
+│   │   │   │   ├── dbusmenuexporterdbus_p.h
+│   │   │   │   ├── dbusmenuexporterprivate_p.h
+│   │   │   │   ├── dbusmenushortcut_p.cpp
+│   │   │   │   ├── dbusmenushortcut_p.h
+│   │   │   │   ├── dbusmenutypes_p.cpp
+│   │   │   │   ├── dbusmenutypes_p.h
+│   │   │   │   ├── debug_p.h
+│   │   │   │   ├── utils.cpp
+│   │   │   │   └── utils_p.h
+│   │   │   ├── org.freedesktop.Notifications.xml
+│   │   │   ├── org.kde.StatusNotifierItem.xml
+│   │   │   └── org.kde.StatusNotifierWatcher.xml
+│   │   ├── legacylightwidget.cpp
+│   │   ├── legacylightwidget.h
+│   │   ├── legacylightwidget.ui
+│   │   ├── macroline.h
+│   │   ├── macroreader.cpp
+│   │   ├── macroreader.h
+│   │   ├── macrostringeditdialog.cpp
+│   │   ├── macrostringeditdialog.h
+│   │   ├── macrostringeditdialog.ui
+│   │   ├── macrotablemodel.cpp
+│   │   ├── macrotablemodel.h
+│   │   ├── main.cpp
+│   │   ├── mainwindow.cpp
+│   │   ├── mainwindow.h
+│   │   ├── mainwindow.ui
+│   │   ├── media.h
+│   │   ├── media_linux.cpp
+│   │   ├── media_mac.m
+│   │   ├── modelisttablemodel.cpp
+│   │   ├── modelisttablemodel.h
+│   │   ├── modelistwidget.cpp
+│   │   ├── modelistwidget.h
+│   │   ├── modeselectdialog.cpp
+│   │   ├── modeselectdialog.h
+│   │   ├── modeselectdialog.ui
+│   │   ├── monotonicclock.h
+│   │   ├── mperfwidget.cpp
+│   │   ├── mperfwidget.h
+│   │   ├── mperfwidget.ui
+│   │   ├── nouserinputtextedit.cpp
+│   │   ├── nouserinputtextedit.h
+│   │   ├── nowheelcombobox.cpp
+│   │   ├── nowheelcombobox.h
+│   │   ├── rebindwidget.cpp
+│   │   ├── rebindwidget.h
+│   │   ├── rebindwidget.ui
+│   │   ├── resources
+│   │   │   ├── ckb-next-key.gpg
+│   │   │   ├── ckb-next-monochrome.png
+│   │   │   ├── ckb-next.png
+│   │   │   ├── ckb-next_battery_0.png
+│   │   │   ├── ckb-next_battery_0.svg
+│   │   │   ├── ckb-next_battery_1.png
+│   │   │   ├── ckb-next_battery_1.svg
+│   │   │   ├── ckb-next_battery_2.png
+│   │   │   ├── ckb-next_battery_2.svg
+│   │   │   ├── ckb-next_battery_3.png
+│   │   │   ├── ckb-next_battery_3.svg
+│   │   │   ├── ckb-next_battery_4.png
+│   │   │   ├── ckb-next_battery_4.svg
+│   │   │   ├── ckb-next_battery_charging.png
+│   │   │   ├── ckb-next_battery_charging.svg
+│   │   │   ├── demos
+│   │   │   │   ├── demoprofile.conf
+│   │   │   │   ├── demoprofile_k55.ini
+│   │   │   │   ├── demoprofile_k55pro.ini
+│   │   │   │   ├── demoprofile_m95.ini
+│   │   │   │   ├── demoprofile_mm700.ini
+│   │   │   │   ├── demoprofile_nightsword.ini
+│   │   │   │   ├── demoprofile_polaris.ini
+│   │   │   │   └── demoprofile_st100.ini
+│   │   │   ├── icon_blank.png
+│   │   │   ├── icon_mode.png
+│   │   │   ├── icon_mode1.png
+│   │   │   ├── icon_mode1_hardware.png
+│   │   │   ├── icon_mode2.png
+│   │   │   ├── icon_mode2_hardware.png
+│   │   │   ├── icon_mode3.png
+│   │   │   ├── icon_mode3_hardware.png
+│   │   │   ├── icon_plus.png
+│   │   │   ├── icon_profile.png
+│   │   │   ├── icon_profile_hardware.png
+│   │   │   ├── lightning.svg
+│   │   │   ├── lightning_disabled.svg
+│   │   │   ├── overlay_darkcore.png
+│   │   │   ├── overlay_darkcore.svg
+│   │   │   ├── overlay_darkcore_rgb_pro.png
+│   │   │   ├── overlay_darkcore_rgb_pro.svg
+│   │   │   ├── overlay_glaive.png
+│   │   │   ├── overlay_glaive.svg
+│   │   │   ├── overlay_glaivepro.png
+│   │   │   ├── overlay_glaivepro.svg
+│   │   │   ├── overlay_harpoon.png
+│   │   │   ├── overlay_harpoon.svg
+│   │   │   ├── overlay_ironclaw.png
+│   │   │   ├── overlay_ironclaw.svg
+│   │   │   ├── overlay_katar.png
+│   │   │   ├── overlay_katar.svg
+│   │   │   ├── overlay_m55.png
+│   │   │   ├── overlay_m55.svg
+│   │   │   ├── overlay_m65.png
+│   │   │   ├── overlay_m95.png
+│   │   │   ├── overlay_m95.svg
+│   │   │   ├── overlay_mm700.png
+│   │   │   ├── overlay_mm700.svg
+│   │   │   ├── overlay_nightsword.png
+│   │   │   ├── overlay_nightsword.svg
+│   │   │   ├── overlay_polaris.png
+│   │   │   ├── overlay_polaris.svg
+│   │   │   ├── overlay_sabre.png
+│   │   │   ├── overlay_scimitar.png
+│   │   │   └── translations
+│   │   │       ├── de.ts
+│   │   │       ├── el.ts
+│   │   │       └── en_GB.ts
+│   │   ├── rlistwidget.cpp
+│   │   ├── rlistwidget.h
+│   │   ├── settingswidget.cpp
+│   │   ├── settingswidget.h
+│   │   ├── settingswidget.ui
+│   │   ├── wayland
+│   │   │   ├── waylandidletimer.cpp
+│   │   │   ├── waylandidletimer.h
+│   │   │   ├── waylandutils.cpp
+│   │   │   └── waylandutils.h
+│   │   └── xcb
+│   │       ├── xcbidletimer.cpp
+│   │       ├── xcbidletimer.h
+│   │       ├── xwindowdetector.cpp
+│   │       ├── xwindowdetector.h
+│   │       └── xwindowinfo.h
+│   ├── libs
+│   │   ├── CMakeLists.txt
+│   │   ├── ckb-next
+│   │   │   ├── CMakeLists.txt
+│   │   │   ├── cmake
+│   │   │   │   └── AnimationConfig.cmake
+│   │   │   └── include
+│   │   │       └── ckb-next
+│   │   │           └── animation.h
+│   │   └── kissfft
+│   │       ├── CMakeLists.txt
+│   │       ├── COPYING
+│   │       ├── include
+│   │       │   └── kissfft
+│   │       │       ├── _kiss_fft_guts.h
+│   │       │       ├── kiss_fft.h
+│   │       │       └── kiss_fftr.h
+│   │       ├── kiss_fft.c
+│   │       └── kiss_fftr.c
+│   ├── mac-uninstall
+│   │   └── CMakeLists.txt
+│   └── sinfo
+│       ├── CMakeLists.txt
+│       └── sinfo.cpp
+├── tree.out
+└── zMK9jOP.png
+
+157 directories, 1254 files

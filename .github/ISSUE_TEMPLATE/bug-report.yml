@@ -54,7 +54,7 @@ body:
     id: user-solutions
     attributes:
       label: Did you try anything that may have helped?
-      description: Explain if you restarted your computer, logged out, replugged, etc. 
+      description: Explain if you restarted your computer, logged out, replugged, etc.
       placeholder: ex. After reboot the keyboard works as expected again.
     validations:
       required: false
@@ -63,8 +63,7 @@ body:
     attributes:
       label: Additional Details
       description: Is there anything other information that could be helpful to pinpoint the issue?
-      value: |
-        Add any additional details here.
+      placeholder: Add any additional details here.
     validations:
       required: false
   - type: textarea
@@ -73,7 +72,6 @@ body:
       label: Generated Report
       description: |
         In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. Alternatively, run ckb-next-dev-detect in a terminal.</br></br>  Click into the text box below then drag the .gz file into it.
-      value: |
-        Drag your generated report here.
+      placeholder: Drag your generated report here.
     validations:
       required: true

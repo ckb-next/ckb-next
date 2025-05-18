@@ -25,7 +25,6 @@ static const keypatch m95patch[] = {
     { 211+20, "dpiup",  -1, KEY_CORSAIR },
     { 212+20, "dpidn",  -1, KEY_CORSAIR },
     { 218+20, "sniper", -1, KEY_CORSAIR },
-
 };
 
 static const keypatch icwpatch[] = {
@@ -81,13 +80,11 @@ static const keypatch DCRGBPpatch[] = {
     { 268, "bar4",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
 };
 
-
-
-keypatch k100patch[] = {
+static const keypatch k100patch[] = {
     {114, "lock", 114, KEY_CORSAIR },
 };
 
-keypatch k70tklpatch[] = {
+static const keypatch k70tklpatch[] = {
     { 114, "lock",    114, KEY_CORSAIR },
     {   1, "logo",      1, KEY_NONE },
 };
@@ -107,14 +104,13 @@ static const keypatch SCIMITARpatch[] = {
     { 278, "thumb7",   10, SCAN_MOUSE },
     { 279, "thumb8", (SCAN_MOUSE | BTN_SIDE) + 7, SCAN_MOUSE },
     { 280, "thumb9", 12, SCAN_MOUSE },
-    { 281, "sniper", 13, SCAN_MOUSE },
-
-keypatch k70propatch[] = {
-    { 114, "lock",    114, KEY_CORSAIR },
-    { 138, "logo",    138, KEY_NONE },
-
+    { 281, "sniper", 13, SCAN_MOUSE }
 };
 
+static const keypatch k70propatch[] = {
+    { 114, "lock",    114, KEY_CORSAIR },
+    { 138, "logo",    138, KEY_NONE },
+};
 
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
@@ -165,8 +161,6 @@ void patchkeys(usbdevice* kb){
         memcpy(kb->keymap, keymap_bragi, sizeof(keymap_bragi));
 
     // If it's a mouse, patch in profswitch
-    // This needs to be done after the bragi keymap patch
-    // as the position of profswitch differs
     if(IS_MOUSE_DEV(kb)){
 #define PROFSWITCH_M_IDX (MOUSE_BUTTON_FIRST + 24)
         int profswitch_kb_idx = -1;
@@ -185,7 +179,6 @@ void patchkeys(usbdevice* kb){
             kb->keymap[PROFSWITCH_M_IDX].name = kb->keymap[profswitch_kb_idx].name;
             kb->keymap[PROFSWITCH_M_IDX].led = -1;
             kb->keymap[PROFSWITCH_M_IDX].scan = KEY_CORSAIR;
-            // Clear the keyboard one
             CLEAR_KEYMAP_ENTRY(kb->keymap[profswitch_kb_idx]);
         }
     }
@@ -193,24 +186,17 @@ void patchkeys(usbdevice* kb){
     // Iterate through the patches for all devices
     for(size_t pos = 0; pos < KEYPATCHES_LEN; pos++){
         if(mappatches[pos].vendor == kb->vendor && mappatches[pos].product == kb->product){
-            // Iterate through the keys in the selected patch
             for(size_t i = 0; i < mappatches[pos].patchlen; i++){
                 const keypatch* curpatch = mappatches[pos].patch;
                 size_t idx = curpatch[i].idx;
                 kb->keymap[idx].name = curpatch[i].name;
                 kb->keymap[idx].led = curpatch[i].led;
                 kb->keymap[idx].scan = curpatch[i].scan;
-                // Now go through the full keymap so far and remove any entries that
-                // either the have same LED as what was patched in, or same name
                 for(size_t j = 0; j < sizeof(keymap)/sizeof(*keymap); j++){
-                    // Don't delete the freshly patched entry
                     if(j == idx)
                         continue;
-                    // Name first
                     if(kb->keymap[j].name && curpatch[i].name && !strcmp(kb->keymap[j].name, curpatch[i].name))
                         CLEAR_KEYMAP_ENTRY(kb->keymap[j]);
-                    // LED index
-                    // In this case, only reset the LED, as there's potential to break keybinds
                     if(kb->keymap[j].led >= 0 && curpatch[i].led >= 0 && kb->keymap[j].led == curpatch[i].led)
                         kb->keymap[j].led = -1;
                 }

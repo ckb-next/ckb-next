@@ -1,5 +1,20 @@
 # Change Log
 
+## [v0.6.2](https://github.com/ckb-next/ckb-next/tree/v0.6.2) (2025-03-17)
+[Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.6.1...v0.6.2)
+
+This release addresses a **major regression** in v0.6.1.
+
+Support for new devices:
+- MM700
+- K70 RGB Pro
+
+Bug fixes:
+- Some keys, bindings, or DPI not working on any of the following devices: M55 Pro, M95, Ironclaw Wireless, Harpoon Wireless, Katar Pro XT, K55 Pro.
+
+Notes for packagers:
+- Please drop v0.6.1 or backport https://github.com/ckb-next/ckb-next/commit/7a7d0c80bf1ef56a024606ae49551ce84872ce72 as soon as possible.
+
 ## [v0.6.1](https://github.com/ckb-next/ckb-next/tree/v0.6.1) (2025-03-09)
 [Full Changelog](https://github.com/ckb-next/ckb-next/compare/v0.6.0...v0.6.1)
 

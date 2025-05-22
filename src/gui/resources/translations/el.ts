@@ -1153,7 +1153,7 @@ The binding will not function until winlock has been disabled.</source>
         <location filename="../../kbbindwidget.cpp" line="110"/>
         <location filename="../../kbbindwidget.cpp" line="128"/>
         <source>key</source>
-        <translation>πλήκτρ</translation>
+        <translation>πλήκτρο</translation>
     </message>
     <message>
         <location filename="../../kbbindwidget.cpp" line="129"/>

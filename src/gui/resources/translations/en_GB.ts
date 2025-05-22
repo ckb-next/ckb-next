@@ -1658,82 +1658,82 @@ An attempt will be made to import as many as possible.</source>
 <context>
     <name>KbWindowInfoModel</name>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="6"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="23"/>
         <source>Case Sensitive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="7"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="24"/>
         <source>Case Insensitive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="8"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="25"/>
         <source>OR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="9"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="26"/>
         <source>AND</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="10"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="27"/>
         <source>is</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="11"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="28"/>
         <source>contains</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="12"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="29"/>
         <source>starts with</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="13"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="30"/>
         <source>ends with</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="14"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="31"/>
         <source>Window Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="15"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="32"/>
         <source>Program Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="16"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="33"/>
         <source>Instance Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="17"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="34"/>
         <source>Class Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="194"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="210"/>
         <source>Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="197"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="213"/>
         <source>Click Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="200"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="216"/>
         <source>Click Click Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="203"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="219"/>
         <source>Good Job! Have a cookie 🍪</source>
         <translation type="unfinished"></translation>
     </message>

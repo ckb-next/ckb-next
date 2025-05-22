@@ -1299,7 +1299,7 @@ The binding will not function until winlock has been disabled.</source>
     <message>
         <location filename="../../kbmodeeventmgr.ui" line="197"/>
         <source>Tip: Run xprop or xwininfo in a terminal and click on a window to find out its title and other values.</source>
-        <translation>Συμβουλή: Εκτελέστε xprop ή xwininfo σε ένα  και έπειτα επιλέξτε ένα παράθυρο για να βρείτε τον τίτλο του και άλλες πληροφορίες.</translation>
+        <translation>Συμβουλή: Εκτελέστε xprop ή xwininfo σε ένα τερματικό και έπειτα επιλέξτε ένα παράθυρο για να βρείτε τον τίτλο του και άλλες πληροφορίες.</translation>
     </message>
     <message>
         <location filename="../../kbmodeeventmgr.ui" line="45"/>
@@ -1741,82 +1741,82 @@ An attempt will be made to import as many as possible.</source>
 <context>
     <name>KbWindowInfoModel</name>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="6"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="23"/>
         <source>Case Sensitive</source>
         <translation>Με Διάκρηση Πεζών-Κεφαλαίων</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="7"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="24"/>
         <source>Case Insensitive</source>
         <translation>Χωρίς Διάκρηση Πεζών-Κεφαλαίων</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="8"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="25"/>
         <source>OR</source>
         <translation>&apos;Η</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="9"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="26"/>
         <source>AND</source>
         <translation>ΚΑΙ</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="10"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="27"/>
         <source>is</source>
         <translation>είναι</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="11"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="28"/>
         <source>contains</source>
         <translation>περιέχει</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="12"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="29"/>
         <source>starts with</source>
         <translation>αρχίζει με</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="13"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="30"/>
         <source>ends with</source>
         <translation>τελειώνει με</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="14"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="31"/>
         <source>Window Title</source>
         <translation>Τίτλος Παραθύρου</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="15"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="32"/>
         <source>Program Path</source>
         <translation>Διαδρομή Προγράμματος</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="16"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="33"/>
         <source>Instance Name</source>
         <translation>Όνομα Παρουσίας</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="17"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="34"/>
         <source>Class Name</source>
         <translation>Όνομα Κλάσης</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="194"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="210"/>
         <source>Click</source>
         <translation>Κλικ</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="197"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="213"/>
         <source>Click Click</source>
         <translation>Κλικ Κλικ</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="200"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="216"/>
         <source>Click Click Click</source>
         <translation>Κλικ Κλικ Κλικ</translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="203"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="219"/>
         <source>Good Job! Have a cookie 🍪</source>
         <translation>Συγχαρητήρια! Ορίστε ένα κουλουράκι 🍪</translation>
     </message>

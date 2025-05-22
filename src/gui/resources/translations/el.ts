@@ -2177,12 +2177,12 @@ An attempt will be made to import as many as possible.</source>
     <message>
         <location filename="../../macrotablemodel.cpp" line="214"/>
         <source>Min. Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Ελ. Καθυστέρηση</translation>
     </message>
     <message>
         <location filename="../../macrotablemodel.cpp" line="216"/>
         <source>Max. Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Μεγ. Καθυστέρηση</translation>
     </message>
     <message>
         <source>Delay</source>

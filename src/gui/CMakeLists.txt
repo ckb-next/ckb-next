@@ -537,7 +537,7 @@ add_custom_target(ckb-next-lrelease SOURCES "${QM_FILES}")
 
 # Simple target to call lupdate on demand
 add_custom_target(lupdate
-    COMMAND Qt5::lupdate "." "-ts" ${qt_translations_rel}
+    COMMAND Qt${QT_VERSION_MAJOR}::lupdate "." "-ts" ${qt_translations_rel}
     WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
 
 if (MACOS)

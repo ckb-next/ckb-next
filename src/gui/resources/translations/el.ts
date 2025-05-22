@@ -1659,7 +1659,7 @@ An attempt will be made to import as many as possible.</source>
     <message>
         <location filename="../../kbwidget.cpp" line="281"/>
         <source>Manage Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Διαχείριση Συμβάντων</translation>
     </message>
     <message>
         <location filename="../../kbwidget.cpp" line="285"/>

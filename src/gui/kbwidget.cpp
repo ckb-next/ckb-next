@@ -278,7 +278,7 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint& pos){
         del->setEnabled(false);
     QAction* moveup = new QAction(tr("Move Up"), this);
 #ifdef USE_XCB_EWMH
-    QAction* focusevts = new QAction("Manage Events", this);
+    QAction* focusevts = new QAction(tr("Manage Events"), this);
 #endif
     if(row == 0)
         moveup->setEnabled(false);

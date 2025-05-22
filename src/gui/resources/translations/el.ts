@@ -1657,6 +1657,11 @@ An attempt will be made to import as many as possible.</source>
         <translation>Μετακίνηση Πάνω</translation>
     </message>
     <message>
+        <location filename="../../kbwidget.cpp" line="281"/>
+        <source>Manage Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../kbwidget.cpp" line="285"/>
         <source>Move Down</source>
         <translation>Μετακίνηση Κάτω</translation>

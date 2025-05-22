@@ -101,6 +101,8 @@ RebindWidget::RebindWidget(QWidget *parent) :
     });
     connect(&macroLines, &QAbstractTableModel::dataChanged, this, &RebindWidget::regeneratePreview);
     connect(&macroLines, &QAbstractTableModel::modelReset, this, &RebindWidget::regeneratePreview);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
 }
 
 RebindWidget::~RebindWidget(){
@@ -886,7 +888,7 @@ void RebindWidget::insertIntoMacroPreview(const bool keydown, const bool printab
 
 void RebindWidget::macroLineRead(QString line, qint64 ustime, bool keydown){
     const bool printable = (line.length() == 1);
-    macroLines.append(MacroLine(line, ustime, MacroLine::MACRO_DELAY_DEFAULT, keydown));
+    macroLines.append(MacroLine(line, ustime, ustime, keydown));
 
     // Add keystroke to the key actions textedit
     // "+k", "-k", these can be represented as text

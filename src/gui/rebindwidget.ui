@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>687</width>
-    <height>313</height>
+    <height>316</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1497,9 +1497,6 @@
            <attribute name="horizontalHeaderHighlightSections">
             <bool>false</bool>
            </attribute>
-           <attribute name="horizontalHeaderStretchLastSection">
-            <bool>true</bool>
-           </attribute>
            <attribute name="verticalHeaderVisible">
             <bool>false</bool>
            </attribute>
@@ -1543,7 +1540,6 @@
              <property name="font">
               <font>
                <pointsize>-1</pointsize>
-               <weight>50</weight>
                <bold>false</bold>
               </font>
              </property>
@@ -1569,7 +1565,6 @@
              <property name="font">
               <font>
                <pointsize>-1</pointsize>
-               <weight>50</weight>
                <bold>false</bold>
               </font>
              </property>

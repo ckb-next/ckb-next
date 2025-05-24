@@ -612,8 +612,6 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         CLEAR_KEYBIT(kbinput, 103);         // volup
         CLEAR_KEYBIT(kbinput, 104);         // voldn
 
-
-
         // We only care about the first byte
         switch(urbinput[1]){
         case 181:

@@ -55,12 +55,8 @@
 
 // HID input commands
 // Keyboards
-#define NKRO_KEY_IN             0x01 // NKRO key input
-#define NKRO_LEGACY_KEY_IN      0x0F // NKRO legacy key input
-#define NKRO_MEDIA_IN           0x02 // NKRO media key input
-#define NKRO_K65_MEDIA_IN       0x02 // NKRO K65 media key input
-#define NKRO_LEGACY_MEDIA_IN    0x04 // NKRO legacy media key input
-#define NKRO_6KRO_MEDIA_IN      0x08 // NKRO G/MR key input
+#define NKRO_KEY_IN    0x01 // NKRO key input
+#define NKRO_MEDIA_IN  0x02 // NKRO media key input
 // Mice
 #define MOUSE_IN       0x01 // Standard HID mouse input (Position/Buttons)
 // Common

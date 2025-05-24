@@ -1051,11 +1051,7 @@ void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinpu
             SET_KEYBIT(kbinput, 131);   // voldn
             break;
         default:
-            ckb_err(
-                "Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_nkro_media_keys()",
-                length,
-                urbinput[1]
-            );
+            ckb_err("Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_nkro_media_keys()", length, urbinput[1]);
             break;
         }
     }

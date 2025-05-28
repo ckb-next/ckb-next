@@ -38,13 +38,13 @@ public:
     static inline QTimer* scanTimer()       { return _kbManager ? _kbManager->_scanTimer : nullptr; }
     inline bool getDeviceTimerDimmed() { for(Kb* kb : _devices) if(kb->currentLight()->isTimerDimmed()) { return true; } return false; }
 
-#ifdef USE_XCB_SCREENSAVER
+#ifdef Q_OS_LINUX
     // Called to restart the idle timer
     static void setIdleTimer(bool enable);
 #endif
 
 public slots:
-    void brightnessScroll(int delta, Qt::Orientation orientation);
+    void brightnessScroll(QPoint delta);
     void scanKeyboards();
 
 signals:
@@ -57,7 +57,7 @@ signals:
     void versionUpdated();
 
 private slots:
-#ifdef USE_XCB_SCREENSAVER
+#ifdef Q_OS_LINUX
     void idleTimerTick();
 #endif
 
@@ -69,7 +69,7 @@ private:
 
     QSet<Kb*> _devices;
     QTimer* _eventTimer, *_scanTimer, *_saveTimer;
-#ifdef USE_XCB_SCREENSAVER
+#ifdef Q_OS_LINUX
     static QTimer* _idleTimer;
 #endif
     int getLastUsedDeviceIdleTime();

@@ -76,6 +76,9 @@ const device_desc models[] = {
     { V_CORSAIR, P_K70_MK2SE, },
     { V_CORSAIR, P_K70_MK2LP, },
     { V_CORSAIR, P_K70_TKL, },
+    { V_CORSAIR, P_K70_TKL_CHAMP_OPTIC, },
+    { V_CORSAIR, P_K70_PRO, },
+    { V_CORSAIR, P_K70_PRO_OPTIC, },
     { V_CORSAIR, P_K90_LEGACY, },
     { V_CORSAIR, P_K95, },
     { V_CORSAIR, P_K95_LEGACY, },
@@ -129,6 +132,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_GLAIVE_PRO, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
+    { V_CORSAIR, P_MM700, },
     // Headset stands
     { V_CORSAIR, P_ST100, },
     // Misc
@@ -206,8 +210,10 @@ const char* product_str(ushort product){
         return "k70";
     if(product == P_K70_MK2 || product == P_K70_MK2SE || product == P_K70_MK2LP)
         return "k70mk2";
-    if(product == P_K70_TKL)
+    if(product == P_K70_TKL || product == P_K70_TKL_CHAMP_OPTIC)
         return "k70tkl";
+    if(product == P_K70_PRO || product == P_K70_PRO_OPTIC)
+        return "k70pro";
     if(product == P_K68 || product == P_K68_NRGB)
         return "k68";
     if(product == P_K65 || product == P_K65_LEGACY || product == P_K65_LUX || product == P_K65_RFIRE)
@@ -273,6 +279,8 @@ const char* product_str(ushort product){
         return "st100";
     if(product == P_GENERIC_BRAGI_DONGLE)
         return "bragi_dongle";
+    if(product == P_MM700)
+        return "mm700";
     return "";
 }
 
@@ -298,6 +306,8 @@ static const devcmd* get_vtable(usbdevice* kb){
             return &vtable_bragi_dongle;
         else if(IS_MOUSE(vendor, product))
             return &vtable_bragi_mouse;
+        else if(IS_MOUSEPAD(vendor, product))
+            return &vtable_bragi_mousepad;
         else
             return &vtable_bragi_keyboard;
     } else if(IS_MOUSE(vendor, product)) {

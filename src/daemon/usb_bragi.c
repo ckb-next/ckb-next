@@ -11,6 +11,8 @@ void bragi_fill_input_eps(usbdevice* kb)
     int offset = 1;
     if(IS_HARPOON_WL(kb))
         offset = 2;
+    else if(IS_MM700(kb))
+        offset = 4;
 
     for(int i = 0; i < kb->epcount; i++)
         kb->input_endpoints[i] = (i + offset) | 0x80;
@@ -34,6 +36,9 @@ void bragi_fill_input_eps(usbdevice* kb)
             case P_K100_MECHANICAL:
             case P_K65_MINI:
             case P_K70_TKL:
+            case P_K70_TKL_CHAMP_OPTIC:
+            case P_K70_PRO:
+            case P_K70_PRO_OPTIC:
                 kb->bragi_out_ep = 0x1;
                 kb->bragi_in_ep = 0x82;
                 break;

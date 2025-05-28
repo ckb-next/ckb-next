@@ -278,7 +278,7 @@ void KbWidget::on_modesList_customContextMenuRequested(const QPoint& pos){
         del->setEnabled(false);
     QAction* moveup = new QAction(tr("Move Up"), this);
 #ifdef USE_XCB_EWMH
-    QAction* focusevts = new QAction("Manage Events", this);
+    QAction* focusevts = new QAction(tr("Manage Events"), this);
 #endif
     if(row == 0)
         moveup->setEnabled(false);
@@ -508,9 +508,12 @@ void KbWidget::switchToMode(const QString& mode){
     }
 }
 
-void KbWidget::on_pollRateBox_currentIndexChanged(const QString& arg1) {
+void KbWidget::on_pollRateBox_currentIndexChanged(int arg1) {
+    if(arg1 == -1)
+        return;
+    const QString str = ui->pollRateBox->itemText(arg1);
     ui->pollRateBox->setEnabled(false);
-    device->setPollRate(arg1.left(arg1.indexOf(QLatin1String(" ms"))));
+    device->setPollRate(str.left(str.indexOf(QLatin1String(" ms"))));
 }
 
 // Returns true if a match is found

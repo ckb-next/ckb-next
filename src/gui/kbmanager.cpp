@@ -17,7 +17,7 @@ QString devpath = "/var/run/ckb%1";
 CkbVersionNumber KbManager::_guiVersion, KbManager::_daemonVersion;
 KbManager* KbManager::_kbManager = nullptr;
 
-#ifdef USE_XCB_SCREENSAVER
+#ifdef Q_OS_LINUX
 QTimer* KbManager::_idleTimer = nullptr;
 void KbManager::setIdleTimer(bool enable){
     if(!_idleTimer){
@@ -73,8 +73,8 @@ void KbManager::init(const QString& guiVersion){
     if(_kbManager)
         return;
     _kbManager = new KbManager();
-#ifdef USE_XCB_SCREENSAVER
-    if(!IdleTimer::isWayland() && CkbSettings::get("Program/IdleTimerEnable", true).toBool()){
+#ifdef Q_OS_LINUX
+    if(IdleTimer::isSupported() && CkbSettings::get("Program/IdleTimerEnable", true).toBool()){
         setIdleTimer(true);
     }
 #endif
@@ -212,8 +212,7 @@ void KbManager::scanKeyboards(){
     }
 }
 
-void KbManager::brightnessScroll(int delta, Qt::Orientation orientation){
-    const bool up = delta > 0;
+void KbManager::brightnessScroll(QPoint delta){
     int dimming = KbLight::shareDimming();
 
     // Only run this if shared dimming is enabled
@@ -224,7 +223,7 @@ void KbManager::brightnessScroll(int delta, Qt::Orientation orientation){
     if(_devices.empty() || i == _devices.end())
         return;
 
-    dimming += (up ? -1 : 1);
+    dimming += (delta.ry() > 0 ? -1 : 1);
 
     if(dimming < 0)
         dimming = 0;

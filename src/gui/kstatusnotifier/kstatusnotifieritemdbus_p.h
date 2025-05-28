@@ -1,41 +1,28 @@
-/* This file is part of the KDE libraries
-   Copyright 2009 by Marco Martin <notmart@gmail.com>
+/*
+    This file is part of the KDE libraries
+    SPDX-FileCopyrightText: 2009 Marco Martin <notmart@gmail.com>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License (LGPL) as published by the Free Software Foundation;
-   either version 2 of the License, or (at your option) any later
-   version.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+    SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
 #ifndef KSTATUSNOTIFIERITEMDBUS_H
 #define KSTATUSNOTIFIERITEMDBUS_H
 
-#include <QObject>
-#include <QString>
 #include <QDBusArgument>
 #include <QDBusConnection>
 #include <QDBusObjectPath>
-#include <QVector>
+#include <QList>
+#include <QObject>
+#include <QString>
 
-//Custom message type for DBus
+// Custom message type for DBus
 struct KDbusImageStruct {
     int width;
     int height;
     QByteArray data;
 };
 
-typedef QVector<KDbusImageStruct> KDbusImageVector;
+typedef QList<KDbusImageStruct> KDbusImageVector;
 
 struct KDbusToolTipStruct {
     QString icon;
@@ -68,9 +55,10 @@ class KStatusNotifierItemDBus : public QObject
     Q_PROPERTY(QDBusObjectPath Menu READ Menu)
 
     friend class KStatusNotifierItem;
+
 public:
     explicit KStatusNotifierItemDBus(KStatusNotifierItem *parent);
-    ~KStatusNotifierItemDBus();
+    ~KStatusNotifierItemDBus() override;
 
     /**
      * @return the dbus connection used by this object
@@ -169,7 +157,7 @@ public:
     QDBusObjectPath Menu() const;
 
 public Q_SLOTS:
-    //interaction
+    // interaction
     /**
      * Shows the context menu associated to this item
      * at the desired screen position
@@ -192,6 +180,13 @@ public Q_SLOTS:
      */
     void Scroll(int delta, const QString &orientation);
 
+    /**
+     * Provide a @p token for xdg_activation_v1
+     *
+     * So that the Wayland compositor knows who is requesting an activation.
+     */
+    //void ProvideXdgActivationToken(const QString &token);
+
 Q_SIGNALS:
     /**
      * Inform the systemtray that the own main icon has been changed,
@@ -211,6 +206,11 @@ Q_SIGNALS:
     void NewAttentionIcon();
 
     /**
+     * Inform the systemtray that a new context menu has been set.
+     */
+    void NewMenu();
+
+    /**
      * Inform the systemtray that something in the tooltip has been changed
      */
     void NewToolTip();
@@ -224,6 +224,7 @@ Q_SIGNALS:
 private:
     KStatusNotifierItem *m_statusNotifierItem;
     QString m_connId;
+    //QString m_xdgActivationToken;
     QDBusConnection m_dbus;
     static int s_serviceCount;
 };

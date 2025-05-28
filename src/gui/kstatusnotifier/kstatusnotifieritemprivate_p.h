@@ -1,37 +1,28 @@
-/* This file is part of the KDE libraries
-   Copyright 2009 by Marco Martin <notmart@gmail.com>
+/*
+    This file is part of the KDE libraries
+    SPDX-FileCopyrightText: 2009 Marco Martin <notmart@gmail.com>
 
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License (LGPL) as published by the Free Software Foundation;
-   either version 2 of the License, or (at your option) any later
-   version.
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+    SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
 #ifndef KSTATUSNOTIFIERITEMPRIVATE_H
 #define KSTATUSNOTIFIERITEMPRIVATE_H
 
+#include <QEventLoopLocker>
+#include <QMovie>
 #include <QObject>
 #include <QString>
-#include <QMovie>
 #include <QSystemTrayIcon>
 #include <QWheelEvent>
 
 #include "kstatusnotifieritem.h"
+
+#ifdef QT_DBUS_LIB
 #include "kstatusnotifieritemdbus_p.h"
 
-#include "statusnotifierwatcher_interface.h"
 #include "notifications_interface.h"
+#include "statusnotifierwatcher_interface.h"
+#endif
 
 class KSystemTrayIcon;
 class QMenu;
@@ -54,7 +45,7 @@ public:
     {
         if (e->type() == QEvent::Wheel) {
             QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(e);
-            emit wheel(wheelEvent->angleDelta().y());
+            Q_EMIT wheel(wheelEvent->angleDelta().y());
         }
 
         return false;
@@ -80,9 +71,7 @@ public:
 
     void setIconWithMask(QIcon &icon, bool isMask)
     {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
         icon.setIsMask(isMask);
-#endif
         QSystemTrayIcon::setIcon(icon);
     }
 
@@ -121,13 +110,26 @@ public:
     void legacyWheelEvent(int delta);
     void legacyActivated(QSystemTrayIcon::ActivationReason reason);
 
-    KDbusImageStruct imageToStruct(const QImage &image);
-    KDbusImageVector iconToVector(const QIcon &icn);
     bool checkVisibility(QPoint pos, bool perform = true);
 
     static const int s_protocolVersion;
 
     KStatusNotifierItem *q;
+
+#ifdef QT_DBUS_LIB
+    KDbusImageStruct imageToStruct(const QImage &image);
+    KDbusImageVector iconToVector(const QIcon &icn);
+
+    KDbusImageVector serializedIcon;
+    KDbusImageVector serializedAttentionIcon;
+    KDbusImageVector serializedOverlayIcon;
+    KDbusImageVector serializedToolTipIcon;
+
+    org::kde::StatusNotifierWatcher *statusNotifierWatcher = nullptr;
+    org::freedesktop::Notifications *notificationsClient = nullptr;
+
+    KStatusNotifierItemDBus *statusNotifierItemDBus;
+#endif
 
     KStatusNotifierItem::ItemCategory category;
     QString id;
@@ -135,37 +137,37 @@ public:
     KStatusNotifierItem::ItemStatus status;
 
     QString iconName;
-    KDbusImageVector serializedIcon;
     QIcon icon;
 
     QString overlayIconName;
-    KDbusImageVector serializedOverlayIcon;
     QIcon overlayIcon;
 
     QString attentionIconName;
     QIcon attentionIcon;
-    KDbusImageVector serializedAttentionIcon;
     QString movieName;
     QPointer<QMovie> movie;
 
     QString toolTipIconName;
-    KDbusImageVector serializedToolTipIcon;
     QIcon toolTipIcon;
     QString toolTipTitle;
     QString toolTipSubTitle;
     QString iconThemePath;
     QString menuObjectPath;
+    KStatusNotifierLegacyIcon *systemTrayIcon;
 
     QMenu *menu;
     QHash<QString, QAction *> actionCollection;
-    QWidget *associatedWidget;
+    QPointer<QWidget> associatedWidget;
     QPoint associatedWidgetPos;
     QAction *titleAction;
-    org::kde::StatusNotifierWatcher *statusNotifierWatcher;
-    org::freedesktop::Notifications *notificationsClient;
 
-    KStatusNotifierLegacyIcon *systemTrayIcon;
-    KStatusNotifierItemDBus *statusNotifierItemDBus;
+    // Ensure that closing the last KMainWindow doesn't exit the application
+    // if a system tray icon is still present.
+    QEventLoopLocker eventLoopLocker;
+
+    bool hasQuit : 1;
+    bool onAllDesktops : 1;
+    bool standardActionsEnabled : 1;
 };
 
 #endif

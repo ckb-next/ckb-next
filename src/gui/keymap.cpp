@@ -490,6 +490,19 @@ static const Key PolarisZones[] = {
 };
 #define KEYCOUNT_POLARIS   (sizeof(PolarisZones) / sizeof(Key))
 
+// MM700
+#define MM700_WIDTH      110
+#define MM700_HEIGHT     60
+#define MM700_V 6, 62
+#define MM700_H 62, 6
+
+static const Key MM700Zones[] = {
+    {nullptr,  "Zone 1", "zone1", -16, 1, MM700_H, true, false},
+    {nullptr,  "Zone 2", "zone2", 119, 1, MM700_V, true, false},
+    {nullptr,  "Zone 3", "zone3", 104, -5, NS, true, false}
+};
+#define KEYCOUNT_MM700   (sizeof(MM700Zones) / sizeof(Key))
+
 #define ST100_V 6,22
 #define ST100_H 22,6
 
@@ -867,6 +880,30 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["mute"].x -= 10;
         map["volup"].x -= 10;
         map["voldn"].x -= 10;
+        break;
+    }
+    case KeyMap::K70_PRO:{
+        // Same as K70 MK2 but right Windows key is a function key
+        map = getMap(KeyMap::K70MK2, layout);
+
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+
+        // these keys are all the way to left
+        map["profswitch"].x = 0;
+        map["light"].x = 9;
+        map["lock"].x = 18;
+
+        // these keys are all the way to the right
+        map["mute"].x += 10;
+        map["volup"].x += 10;
+        map["voldn"].x += 10;
+
+        map["logo"] = {nullptr, "Logo", "logo", 128, 0, NS, true, false};
+        map.remove("m3");
+        map.remove("g11");
+
         break;
     }
     case KeyMap::K70_TKL:{
@@ -1301,6 +1338,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::MM700:{
+        // MM700 Mousepad
+        for(const Key* key = MM700Zones; key < MM700Zones + KEYCOUNT_MM700; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     case KeyMap::ST100:{
         for(const Key* key = ST100Zones; key < ST100Zones + KEYCOUNT_ST100; key++){
             Key translatedKey = *key;
@@ -1614,6 +1661,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return DARKCORERGBPRO;
     if(lower == "polaris")
         return POLARIS;
+    if(lower == "mm700")
+        return MM700;
     if(lower == "st100")
         return ST100;
     if(lower == "k70mk2")
@@ -1644,6 +1693,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K100;
     if(lower == "k65_mini")
         return K65_MINI;
+    if(lower == "k70pro")
+        return K70_PRO;
     return NO_MODEL;
 }
 
@@ -1699,6 +1750,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "dark_core_rgb_pro";
     case POLARIS:
         return "polaris";
+    case MM700:
+        return "mm700";
     case ST100:
         return "st100";
     case K70MK2:
@@ -1727,6 +1780,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k100";
     case K65_MINI:
         return "k65_mini";
+    case K70_PRO:
+        return "k70pro";
     default:
         return "";
     }
@@ -1758,6 +1813,7 @@ int KeyMap::modelWidth(Model model){
         return K68_WIDTH;
     case K70:
     case K70MK2:
+    case K70_PRO:
         return K70_WIDTH;
     case K95:
     case K95L:
@@ -1794,6 +1850,8 @@ int KeyMap::modelWidth(Model model){
     case GLAIVEPRO:
     case IRONCLAW_W:
         return M65_WIDTH;
+    case MM700:
+        return MM700_WIDTH;
     default:
         return 0;
     }
@@ -1811,6 +1869,7 @@ int KeyMap::modelHeight(Model model){
     case K68:
     case K70:
     case K70MK2:
+    case K70_PRO:
     case K70_TKL:
     case K95:
     case K95L:
@@ -1847,6 +1906,8 @@ int KeyMap::modelHeight(Model model){
         return M65_HEIGHT;
     case IRONCLAW_W:
         return M65_HEIGHT;
+    case MM700:
+        return MM700_HEIGHT;
     default:
         return 0;
     }

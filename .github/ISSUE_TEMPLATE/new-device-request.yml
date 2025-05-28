@@ -14,7 +14,7 @@ body:
     id: what-kind-of-device
     attributes:
       label: What kind of device is it?
-      description: What kind of device would you like support for? Keep in mind that only Mice and Keyboards are prioritized at the moment, everything else is on a best-efforts base only. 
+      description: What kind of device would you like support for? Keep in mind that only Mice and Keyboards are prioritized at the moment, everything else is on a best-efforts base only.
       options:
         - Keyboard
         - Mouse
@@ -42,7 +42,7 @@ body:
     id: link
     attributes:
       label: Link to Corsair's Product Page
-      description: Optionally, please include a link to your exact device on Corsair's Website. 
+      description: Optionally, please include a link to your exact device on Corsair's Website.
     validations:
       required: false
   - type: textarea
@@ -50,8 +50,7 @@ body:
     attributes:
       label: Additional Details
       description: Is there anything else that may be helpful?
-      value: |
-        Add any additional details here.
+      placeholder: Add any additional details here.
     validations:
       required: false
   - type: textarea
@@ -60,7 +59,6 @@ body:
       label: Generated Report
       description: |
         In the ckb-next application, go to the Settings tab of the user interface and click the Generate Report button. Alternatively, run ckb-next-dev-detect in a terminal.</br></br>  Click into the text box below then drag the .gz file into it.
-      value: |
-        Drag your generated report here.
+      placeholder: Drag your generated report here.
     validations:
       required: true

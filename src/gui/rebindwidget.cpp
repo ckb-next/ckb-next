@@ -101,6 +101,8 @@ RebindWidget::RebindWidget(QWidget *parent) :
     });
     connect(&macroLines, &QAbstractTableModel::dataChanged, this, &RebindWidget::regeneratePreview);
     connect(&macroLines, &QAbstractTableModel::modelReset, this, &RebindWidget::regeneratePreview);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
 }
 
 RebindWidget::~RebindWidget(){
@@ -347,8 +349,13 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
             if (act.isMacro()) {
                 // This string needs to exist for as long as the references below are used
                 QString value = act.value();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 // Split the action and discard the "$macro" from the beginning
                 QVector<QStringRef> macroData = value.midRef(7).split(QChar(':'));
+#else
+                QStringView valueView(value);
+                QList<QStringView> macroData = valueView.sliced(7).split(QChar(':'));
+#endif
                 const int dataCount = macroData.count();
                 // Old format doesn't have the last field, which is the raw macro data
                 // It might not exist at all (count == 3) or it might be set to "x"
@@ -359,8 +366,8 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                     ui->macroName->setText(macroName);
 
                     // Pick the appropriate string to parse due to legacy formats
-                    QStringRef macroString = macroData[0];
-                    if(dataCount == 4 && macroData[3] != "x")
+                    QStringView macroString = macroData[0];
+                    if(dataCount == 4 && macroData[3] != QStringLiteral("x"))
                         macroString = macroData[3];
 
                     // Try to parse the string
@@ -881,7 +888,7 @@ void RebindWidget::insertIntoMacroPreview(const bool keydown, const bool printab
 
 void RebindWidget::macroLineRead(QString line, qint64 ustime, bool keydown){
     const bool printable = (line.length() == 1);
-    macroLines.append(MacroLine(line, ustime, MacroLine::MACRO_DELAY_DEFAULT, keydown));
+    macroLines.append(MacroLine(line, ustime, ustime, keydown));
 
     // Add keystroke to the key actions textedit
     // "+k", "-k", these can be represented as text

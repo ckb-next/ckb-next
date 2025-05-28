@@ -46,7 +46,7 @@ public:
     inline void setDefaultDelay(bool set){
         defaultDelay = set;
         // Update UI to disable editing the delay in the table
-        emit dataChanged(index(0, 2), index(length() - 1, 2));
+        emit dataChanged(index(0, 2), index(length() - 1, 3));
     }
     void removeLastMouseLeftClick();
     static const QSet<QString> validMacroKeys;

@@ -36,7 +36,7 @@ KbProfile::KbProfile(Kb* parent, const KeyMap& keyMap, CkbSettingsBase& settings
         _usbId.hwModifiedString(settings.value("HwModified").toString());
     else
         _usbId.hwModified = _usbId.modified;
-    QUuid current = settings.value("CurrentMode").toString().trimmed();
+    QUuid current(settings.value("CurrentMode").toString().trimmed());
     // Load modes
     uint count = settings.value("ModeCount").toUInt();
     for(uint i = 0; i < count; i++){

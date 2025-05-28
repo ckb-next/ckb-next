@@ -1,7 +1,8 @@
-#include "macrotablemodel.h"
+﻿#include "macrotablemodel.h"
 #include <QRegularExpression>
 #include <QStringBuilder>
 #include <QMimeData>
+#include <QIODevice>
 
 const QSet<QString> MacroTableModel::validMacroKeys =
         QSet<QString>{"esc",
@@ -159,7 +160,7 @@ int MacroTableModel::rowCount(const QModelIndex& parent) const{
 }
 
 int MacroTableModel::columnCount(const QModelIndex& parent) const{
-    return 3;
+    return 4;
 }
 
 QVariant MacroTableModel::data(const QModelIndex& index, int role) const{
@@ -167,22 +168,20 @@ QVariant MacroTableModel::data(const QModelIndex& index, int role) const{
         const int row = index.row();
         if(row < length()){
             const MacroLine ml = macroLines.at(row);
-            switch(index.column()){
+            const int col = index.column();
+            switch(col){
                 case 0:
                     return QString((ml.keyDown ? "↓" : "↑"));
                 case 1:
                     return QString(ml.key);
                 case 2:
+                case 3:
                     if(index.row() == 0)
                         return QString(tr("None"));
                     else if(defaultDelay || ml.usTime == MacroLine::MACRO_DELAY_DEFAULT)
                         return QString(tr("Default"));
-                    else {
-                        if(ml.usTimeMax == MacroLine::MACRO_DELAY_DEFAULT)
-                            return QString::number(ml.usTime);
-                        else
-                            return QString("%1_%2").arg(ml.usTime).arg(ml.usTimeMax);
-                    }
+                    else
+                        return QString::number(col == 2 ? ml.usTime : ml.usTimeMax);
                 default:
                     return tr("Unknown");
             }
@@ -191,7 +190,7 @@ QVariant MacroTableModel::data(const QModelIndex& index, int role) const{
         if(index.column() == 0)
             return Qt::AlignCenter;
     } else if(role == Qt::ToolTipRole){
-        if(index.column() == 2){
+        if(index.column() == 2 || index.column() == 3){
             if(index.row() == 0)
                 return QString(tr("You can not set a delay before the first key event"));
             else if(defaultDelay)
@@ -212,7 +211,9 @@ QVariant MacroTableModel::headerData(int section, Qt::Orientation orientation, i
             case 1:
                 return QString(tr("Key"));
             case 2:
-                return QString(tr("Delay"));
+                return QString(tr("Min. Delay"));
+            case 3:
+                return QString(tr("Max. Delay"));
             default:
                 return QVariant();
         }
@@ -229,7 +230,7 @@ Qt::ItemFlags MacroTableModel::flags(const QModelIndex &idx) const{
         f |= Qt::ItemIsDropEnabled;
 
     // Disable the right column if needed
-    if(idx == index(0, 2) || (idx.column() == 2 && defaultDelay))
+    if(idx == index(0, 2) || idx == index(0,3) || ((idx.column() == 2 || idx.column() == 3) && defaultDelay))
         f &= ~Qt::ItemIsEnabled;
 
     return f;
@@ -243,7 +244,8 @@ bool MacroTableModel::setData(const QModelIndex& index, const QVariant& value, i
     if (!index.isValid() || role != Qt::EditRole)
         return false;
     MacroLine& ml = macroLines[index.row()];
-    switch(index.column()){
+    const int col = index.column();
+    switch(col){
     case 0:
         ml.keyDown = !value.toInt(); // toInt() because the variant has an index int in it, which will get converted to bool
         break;
@@ -269,27 +271,32 @@ bool MacroTableModel::setData(const QModelIndex& index, const QVariant& value, i
     }
         break;
     case 2:
+    case 3:
     {
         const QString valstr = value.toString();
         if(valstr.isEmpty()){
             ml.usTime = ml.usTimeMax = MacroLine::MACRO_DELAY_DEFAULT;
             return true;
         }
-        QVector<QStringRef> split = valstr.splitRef(QChar('_'));
-        const int len = split.length();
-        if(len != 1 && len != 2)
-            return false;
+
         bool ok;
-        qint64 delay = split.at(0).toLongLong(&ok);
+        const qint64 delay = valstr.toLongLong(&ok);
         if(!ok || delay < 0)
             return false;
-        ml.usTime = delay;
-        if(len == 2){
-            qint64 maxDelay = split.at(1).toLongLong(&ok);
-            // We must also make sure that the max delay is less than the min
-            if(!ok || maxDelay <= delay)
+
+        if(col == 2) {
+            if(delay > ml.usTimeMax)
+                ml.usTimeMax = delay;
+
+            ml.usTime = delay;
+        } else {
+            if(delay < ml.usTime && ml.usTimeMax != MacroLine::MACRO_DELAY_DEFAULT)
                 return false;
-            ml.usTimeMax = maxDelay;
+
+            if(ml.usTime == MacroLine::MACRO_DELAY_DEFAULT)
+                ml.usTime = delay;
+
+            ml.usTimeMax = delay;
         }
     }
         break;
@@ -313,7 +320,7 @@ QString MacroTableModel::toString(bool rawData){
             const qint64 usTime = nextMl.usTime;
             if(usTime != MacroLine::MACRO_DELAY_DEFAULT && (!defaultDelay || rawData)){
                 l.append("=" + QString::number(usTime));
-                if(nextMl.usTimeMax != MacroLine::MACRO_DELAY_DEFAULT)
+                if(nextMl.usTimeMax != nextMl.usTime)
                     l.append("_" + QString::number(nextMl.usTimeMax));
             }
             l.append(",");
@@ -322,19 +329,25 @@ QString MacroTableModel::toString(bool rawData){
 
     return l;
 }
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0 ,0)
 #define MACRO_ERROR(end, start)  return QString::number(end) % ":<br>" % str.leftRef(end) \
                                         % "<b><span style=\"color: #ff0000;\">" % str.midRef(end, start - end) % "</span></b>" \
                                         % str.midRef(start)
+#else
+#define MACRO_ERROR(end, start)  return QString::number(end) % ":<br>" % strView.first(end) \
+                                        % "<b><span style=\"color: #ff0000;\">" % strView.sliced(end, start - end) % "</span></b>" \
+                                        % strView.sliced(start)
+#endif
 #define MACRO_ERROR_RET()       MACRO_ERROR(previousEnd, currentStart)
 #define MACRO_ERROR_RET_SUFFIX(end, start, suffix) MACRO_ERROR(end, start) % "<br><br>" % suffix
 QString MacroTableModel::fromString(const QString& input, const bool stopOnError){
     // Replace all "whitespace" characters with ' ', and then remove that as well
     QString str = input.simplified();
     str.replace(QChar(' '), QString(""));
+    QStringView strView(str);
     QVector<MacroLine> newMacroLines;
     QRegularExpression re("(\\+|-)([a-z0-9_]+)(=(\\d+)(_(\\d+))?)?(,|$)");
-    QRegularExpressionMatchIterator i = re.globalMatch(str);
+    QRegularExpressionMatchIterator i = re.globalMatch(strView.toString());
     qint64 prevDelay = MacroLine::MACRO_DELAY_DEFAULT, prevMaxDelay = MacroLine::MACRO_DELAY_DEFAULT;
     int previousEnd = 0;
     while (i.hasNext()) {
@@ -344,10 +357,15 @@ QString MacroTableModel::fromString(const QString& input, const bool stopOnError
         if(previousEnd != currentStart && stopOnError){
             MACRO_ERROR_RET();
         }
-        QStringRef act = m.capturedRef(1);
+        QStringView act = m.capturedView(1);
         QString key = m.captured(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0 ,0)
         QStringRef delaystr = m.capturedRef(4);
         QStringRef maxDelayStr = m.capturedRef(6);
+#else
+        QStringView delaystr = m.capturedView(4);
+        QStringView maxDelayStr = m.capturedView(6);
+#endif
 
         qint64 delay = MacroLine::MACRO_DELAY_DEFAULT, maxDelay = MacroLine::MACRO_DELAY_DEFAULT;
         if(!delaystr.isNull()){
@@ -358,21 +376,22 @@ QString MacroTableModel::fromString(const QString& input, const bool stopOnError
                     MACRO_ERROR_RET_SUFFIX(m.capturedStart(4), m.capturedEnd(4), tr("Delay is too large"));
                 delay = MacroLine::MACRO_DELAY_DEFAULT;
             }
+            maxDelay = delay;
             if(!maxDelayStr.isNull()){
                 maxDelay = maxDelayStr.toLongLong(&ok);
                 if(!ok){
                     if(stopOnError)
                         MACRO_ERROR_RET_SUFFIX(m.capturedStart(6), m.capturedEnd(6), tr("Max random delay is too large"));
-                    maxDelay = MacroLine::MACRO_DELAY_DEFAULT;
+                    maxDelay = delay;
                 } else if(maxDelay <= delay) {
                     if(stopOnError)
                         MACRO_ERROR_RET_SUFFIX(m.capturedStart(6), m.capturedEnd(6), tr("Max random delay is less or equal to the minimum"));
-                    maxDelay = MacroLine::MACRO_DELAY_DEFAULT;
+                    maxDelay = delay;
                 }
             }
         }
         // Act and key will always be valid strings
-        const bool down = (act == "+");
+        const bool down = (act == QStringLiteral("+"));
 
         // Make sure the key actually exists
         if(!validMacroKeys.contains(key)){

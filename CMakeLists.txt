@@ -27,7 +27,7 @@
 
 # Lower it _only_ if tested to work correctly with that version!
 # Might be as low as 3.3, but again, use at your own risk
-cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.13.4 FATAL_ERROR)
 
 project(ckb-next LANGUAGES C CXX)
 include(VERSION.cmake)
@@ -107,6 +107,7 @@ if (LINUX)
     cmake_dependent_option(WITH_MVIZ  "Build with music visualizer."           ON "WITH_ANIMATIONS;WITH_GUI" OFF)
     cmake_dependent_option(USE_XCB    "Build with features that require XCB."  ON  "WITH_GUI" OFF)
     cmake_dependent_option(USE_DBUS_MENU "Build with DBus support for the tray."  ON  "WITH_GUI" OFF)
+    cmake_dependent_option(USE_WAYLAND "Build with features that require Wayland."  ON  "WITH_GUI;PREFER_QT6" OFF)
     option(USE_PORTAUDIO              "Use portaudio for music visualizer."    OFF)
 else ()
     cmake_dependent_option(WITH_MVIZ   "Build with music visualizer."          OFF "WITH_ANIMATIONS;WITH_GUI" OFF)
@@ -153,6 +154,15 @@ option(SAFE_INSTALL "Execute pre-install tasks to ensure correct installation.
     Intended to be used with direct installations without package manager." OFF)
 option(SAFE_UNINSTALL "Execute pre-uninstall tasks to ensure correct removal.
     Intended to be used with direct removals without package manager." OFF)
+option(PREFER_QT6 "Build with Qt 6 if available." ON)
+
+set(CMAKE_FIND_PACKAGE_SORT_ORDER NATURAL)
+set(CMAKE_FIND_PACKAGE_SORT_DIRECTION DEC)
+
+set(QT_LIST Qt5)
+if (PREFER_QT6)
+    list(INSERT QT_LIST 0 Qt6)
+endif ()
 
 if (NOT WITH_GUI)
     message(WARNING "Building without GUI. Proceed only if you know what you are doing.")

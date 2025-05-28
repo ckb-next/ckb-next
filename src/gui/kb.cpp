@@ -215,7 +215,8 @@ Kb::~Kb(){
 
     // Kill notification thread and remove node
     activeDevices.remove(this);
-    if(cmd.isOpen() && notifyNumber > 0){
+    // FIXME: https://github.com/ckb-next/ckb-next/pull/1011
+    if(QFile::exists(cmdpath) && cmd.isOpen() && notifyNumber > 0){
         cmd.write(QString("idle\nnotifyoff %1\n").arg(notifyNumber).toLatin1());
         // Manually flush so that the daemon closes the notify pipe and the thread can gracefully stop
         cmd.flush();
@@ -346,6 +347,8 @@ void Kb::load(){
             demoProfile = ":/txt/demoprofile_nightsword.ini";
         else if(map.model() == KeyMap::K55PRO)
             demoProfile = ":/txt/demoprofile_k55pro.ini";
+        else if(map.model() == KeyMap::MM700)
+            demoProfile = ":/txt/demoprofile_mm700.ini";
         QSettings demoSettings(demoProfile, QSettings::IniFormat, this);
         CkbDemoSettings cSettings(demoSettings);
         KbProfile* demo = new KbProfile(this, map, cSettings, "{BA7FC152-2D51-4C26-A7A6-A036CC93D924}");
@@ -605,7 +608,7 @@ void Kb::readNotify(const QString& line){
         QString modified = components[2];
         KbProfile* newProfile = nullptr;
         foreach(KbProfile* profile, _profiles){
-            if(profile->id().guid == guid){
+            if(profile->id().guid == QUuid::fromString(guid)){
                 newProfile = profile;
                 break;
             }
@@ -658,7 +661,7 @@ void Kb::readNotify(const QString& line){
             KbMode* hwMode = nullptr;
             bool isUpdated = false;
             foreach(KbMode* kbMode, _hwProfile->modes()){
-                if(kbMode->id().guid == guid){
+                if(kbMode->id().guid == QUuid::fromString(guid)){
                     hwMode = kbMode;
                     if(kbMode->id().hwModifiedString() != modified){
                         // Update modification time
@@ -869,7 +872,7 @@ void Kb::setCurrentProfile(KbProfile* profile){
 void Kb::setCurrentMode(KbMode* mode){
     _currentProfile->currentMode(_currentMode = mode);
     _needsSave = true;
-    
+
     if(features.contains("battery") && this->currentPerf())
         connect(this, &Kb::batteryChangedLed, this->currentPerf(), &KbPerf::setBattery);
     emit modeChanged();

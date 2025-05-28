@@ -35,6 +35,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_IRONCLAW, 18000 },
     { P_NIGHTSWORD, 18000},
     { P_IRONCLAW_W_U, 18000 },
+    { P_SCIMITAR_ELITE_W_U , 26000 },
     { P_HARPOON_WL_U, 10000 },
     { P_DARK_CORE_RGB_PRO, 18000 },
     { P_DARK_CORE_RGB_PRO_SE, 18000 },
@@ -106,6 +107,8 @@ const device_desc models[] = {
     { V_CORSAIR, P_SCIMITAR, },
     { V_CORSAIR, P_SCIMITAR_PRO, },
     { V_CORSAIR, P_SCIMITAR_ELITE, },
+    { V_CORSAIR, P_SCIMITAR_ELITE_W_U, },
+    { V_CORSAIR, P_SCIMITAR_ELITE_W_D, },
     { V_CORSAIR, P_SABRE_O2, },
     { V_CORSAIR, P_HARPOON, },
     { V_CORSAIR, P_HARPOON_PRO, },
@@ -247,7 +250,7 @@ const char* product_str(ushort product){
         return "m65e";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
-    if(product == P_SCIMITAR || product == P_SCIMITAR_PRO || product == P_SCIMITAR_ELITE)
+    if(product == P_SCIMITAR || product == P_SCIMITAR_PRO || product == P_SCIMITAR_ELITE || product == P_SCIMITAR_ELITE_W_D ||product == P_SCIMITAR_ELITE_W_U )
         return "scimitar";
     if(product == P_HARPOON || product == P_HARPOON_PRO)
         return "harpoon";

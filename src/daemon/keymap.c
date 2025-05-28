@@ -1063,7 +1063,7 @@ void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urb
     kbinput->whl_rel_y = (signed char)urbinput[6];
 }
 
-#define BRAGI_MOUSE_BUTTONS 16
+#define BRAGI_MOUSE_BUTTONS 17
 #define BRAGI_ONE_BYTE_MOUSE_BUTTONS 8
 /*
 01 00 == Left
@@ -1080,22 +1080,23 @@ void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urb
 
 // We have to do it this way, because if we patch the keymap, then we'll break standard input
 const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
-    0x00,
-    0x01,
-    0x02,
-    0x04,
-    0x03,
-    0x05,
-    0x06,
-    0x08,
-    0x09,
-    0x07, // Anything past this is untested
-    0x0A,
-    0x0B,
-    0x0C,
-    0x0D,
-    0x0E,
-    0x0F,
+        0x00,
+        0x01,
+        0x02,
+        0x04,
+        0x03,
+        0x05,
+        0x06,
+        0x08,
+        0x09,
+        0x07, // Anything past this is untested
+        0x0A,
+        0x0B,
+        0x0C,
+        0x0D,
+        0x0E,
+        0x0F,
+        0x10,
 };
 
 // DPI cycle/up and forwards are just swapped compared to corsair_bragi_lut

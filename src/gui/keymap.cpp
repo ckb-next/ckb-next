@@ -386,15 +386,15 @@ static const Key KatarPROXTKeys[] = {
 
 // Scimitar
 static const Key ScimKeys[] = {
-    {nullptr,  "Left Mouse", "mouse1", 15, 0, 14, 32, false, true}, {nullptr,  "Right Mouse", "mouse2", 37, 0, 12, 32, false, true}, {nullptr,  "Middle Mouse", "mouse3", 29, 9, 8, 6, false, true}, {nullptr,  "Front light", "front", 37, 0, 12, 8, true, false },
-    {nullptr,  "Wheel Up", "wheelup", 29, 3, 8, 6, false, true}, {nullptr,  "Wheel Down", "wheeldn", 29, 14, 8, 6, false, true}, {nullptr,  "Wheel Light", "wheel", 29, 3, 8, 17, true, false},
-    {nullptr,  "DPI Up", "dpiup", 29, 19, 8, 9, false, true}, {nullptr,  "DPI Light", "dpi", 8, 12, 8, 4, true, false}, {nullptr,  "DPI Down", "dpidn", 29, 28, 8, 9, false, true},
-    {nullptr,  "Thumb light", "thumb", 7, 21, 10, 24, true, false},
-    {nullptr,  "1", "thumb1", -6, 18, 7, 7, false, true}, {nullptr,  "2", "thumb2", 1, 18, 7, 7, false, true}, {nullptr,  "3", "thumb3", 8, 18, 7, 7, false, true},
-    {nullptr,  "4", "thumb4", -6, 25, 7, 7, false, true}, {nullptr,  "5", "thumb5", 1, 25, 7, 7, false, true}, {nullptr,  "6", "thumb6", 8, 25, 7, 7, false, true},
-    {nullptr,  "7", "thumb7", -6, 32, 7, 7, false, true}, {nullptr,  "8", "thumb8", 1, 32, 7, 7, false, true}, {nullptr,  "9", "thumb9", 8, 32, 7, 7, false, true},
-    {nullptr,  "10", "thumb10", -6, 39, 7, 7, false, true}, {nullptr,  "11", "thumb11", 1, 39, 7, 7, false, true}, {nullptr,  "12", "thumb12", 8, 39, 7, 7, false, true},
-    {nullptr,  "Logo", "back", 26, 50, 16, 16, true, false}
+        {nullptr,  "Left Mouse", "mouse1", 15, 0, 14, 32, false, true}, {nullptr,  "Right Mouse", "mouse2", 37, 0, 12, 32, false, true}, {nullptr,  "Middle Mouse", "mouse3", 29, 9, 8, 6, false, true}, {nullptr,  "Front light", "front", 37, 0, 12, 8, true, false },
+        {nullptr,  "Wheel Up", "wheelup", 29, 3, 8, 6, false, true}, {nullptr,  "Wheel Down", "wheeldn", 29, 14, 8, 6, false, true}, {nullptr,  "Wheel Light", "wheel", 29, 3, 8, 17, true, false},
+        {nullptr,  "DPI Up", "#229", 29, 19, 8, 9, false, true}, {nullptr,  "DPI Light", "dpi", 8, 12, 8, 4, true, false},
+        {nullptr,  "Thumb light", "thumb", 7, 21, 10, 24, true, false},
+        {nullptr,  "1", "#230", -6, 18, 7, 7, false, true}, {nullptr,  "2", "#231", 1, 18, 7, 7, false, true}, {nullptr,  "3", "#233", 8, 18, 7, 7, false, true},
+        {nullptr,  "4", "#234", -6, 25, 7, 7, false, true}, {nullptr,  "5", "#232", 1, 25, 7, 7, false, true}, {nullptr,  "6", "#235", 8, 25, 7, 7, false, true},
+        {nullptr,  "7", "#236", -6, 32, 7, 7, false, true}, {nullptr,  "8", "#237", 1, 32, 7, 7, false, true}, {nullptr,  "9", "#238", 8, 32, 7, 7, false, true},
+        {nullptr,  "10", "#239", -6, 39, 7, 7, false, true}, {nullptr,  "11", "#240", 1, 39, 7, 7, false, true}, {nullptr,  "12", "#241", 8, 39, 7, 7, false, true},
+        {nullptr,  "Logo", "back", 26, 50, 16, 16, true, false}
 };
 #define KEYCOUNT_SCIM   (sizeof(ScimKeys) / sizeof(Key))
 

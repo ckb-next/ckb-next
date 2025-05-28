@@ -25,6 +25,7 @@ static inline size_t bragi_led_count(usbdevice* kb){
         return 0;
     }
     switch(kb->product){
+    LED_CASE_M(P_SCIMITAR_ELITE_W_U, 12);
     LED_CASE_M(P_IRONCLAW_W_U, 6);
     LED_CASE_M(P_HARPOON_WL_U, 2);
     LED_CASE_K(P_K95_PLATINUM_XT, 156);
@@ -46,10 +47,12 @@ static inline size_t bragi_led_count(usbdevice* kb){
     LED_CASE_K(P_K100_OPTICAL_VARIANT, 193);
     LED_CASE_K(P_K65_MINI, 123);
     LED_CASE_K(P_K70_TKL, 193);
+
+  
     LED_CASE_K(P_K70_TKL_CHAMP_OPTIC, 193);
     LED_CASE_K(P_MM700, 3);
     LED_CASE_K(P_K70_PRO, 193);
-    LED_CASE_K(P_K70_PRO_OPTIC, 193);
+
     default:
         ckb_err("Unknown product 0x%hx", kb->product);
         return 0;

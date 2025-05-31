@@ -290,8 +290,17 @@ int main(int argc, char* argv[]){
     QApplication a(argc, argv);
 
     // Setup translations
-    QTranslator translator;
-    if(translator.load(QLocale(), "", "", ":/translations"))
+    QTranslator translator, qttranslator;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define LOCATION location
+#else
+#define LOCATION path
+#endif
+    if(qttranslator.load(QLocale(), QStringLiteral("qt"), QStringLiteral("_"), QLibraryInfo::LOCATION(QLibraryInfo::TranslationsPath)))
+        a.installTranslator(&qttranslator);
+#undef LOCATION
+
+    if(translator.load(QLocale(), QStringLiteral(""), QStringLiteral(""), QStringLiteral(":/translations")))
         a.installTranslator(&translator);
 
     const quint16 currentSettingsVersion = tmpSettings->value("Program/SettingsVersion", 0).toInt();

@@ -548,22 +548,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="83"/>
-        <source>This feature is not supported under Wayland</source>
+        <location filename="../../extrasettingswidget.cpp" line="79"/>
+        <source>This feature is not supported under your current compositor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="120"/>
+        <location filename="../../extrasettingswidget.cpp" line="116"/>
         <source>No animations found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="122"/>
+        <location filename="../../extrasettingswidget.cpp" line="118"/>
         <source>1 animation found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.cpp" line="124"/>
+        <location filename="../../extrasettingswidget.cpp" line="120"/>
         <source>%1 animations found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -843,12 +843,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kperfwidget.ui" line="964"/>
+        <location filename="../../kperfwidget.ui" line="1087"/>
         <source>Copy performance settings to mode...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kperfwidget.ui" line="1080"/>
+        <location filename="../../kperfwidget.ui" line="1073"/>
         <source>Miscellaneous</source>
         <translation type="unfinished"></translation>
     </message>
@@ -901,8 +901,39 @@
 <context>
     <name>KStatusNotifierItem</name>
     <message>
-        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="578"/>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="521"/>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="1159"/>
+        <source>&amp;Minimize</source>
+        <comment>@action:inmenu</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="876"/>
         <source>Quit</source>
+        <comment>@action:inmenu</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="1156"/>
+        <source>&amp;Restore</source>
+        <comment>@action:inmenu</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="1172"/>
+        <source>Confirm Quit From System Tray</source>
+        <comment>@title:window</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="1173"/>
+        <source>&lt;qt&gt;Are you sure you want to quit &lt;b&gt;%1&lt;/b&gt;?&lt;/qt&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="1178"/>
+        <source>Quit</source>
+        <comment>@action:button</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1547,6 +1578,11 @@ An attempt will be made to import as many as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../kbwidget.cpp" line="281"/>
+        <source>Manage Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../kbwidget.cpp" line="285"/>
         <source>Move Down</source>
         <translation type="unfinished"></translation>
@@ -1622,82 +1658,82 @@ An attempt will be made to import as many as possible.</source>
 <context>
     <name>KbWindowInfoModel</name>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="6"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="23"/>
         <source>Case Sensitive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="7"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="24"/>
         <source>Case Insensitive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="8"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="25"/>
         <source>OR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="9"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="26"/>
         <source>AND</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="10"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="27"/>
         <source>is</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="11"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="28"/>
         <source>contains</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="12"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="29"/>
         <source>starts with</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="13"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="30"/>
         <source>ends with</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="14"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="31"/>
         <source>Window Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="15"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="32"/>
         <source>Program Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="16"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="33"/>
         <source>Instance Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="17"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="34"/>
         <source>Class Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="194"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="210"/>
         <source>Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="197"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="213"/>
         <source>Click Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="200"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="216"/>
         <source>Click Click Click</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../kbwindowinfomodel.cpp" line="203"/>
+        <location filename="../../kbwindowinfomodel.cpp" line="219"/>
         <source>Good Job! Have a cookie 🍪</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1705,103 +1741,103 @@ An attempt will be made to import as many as possible.</source>
 <context>
     <name>KeyAction</name>
     <message>
-        <location filename="../../keyaction.cpp" line="101"/>
+        <location filename="../../keyaction.cpp" line="103"/>
         <source>Unbound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="108"/>
-        <location filename="../../keyaction.cpp" line="170"/>
+        <location filename="../../keyaction.cpp" line="110"/>
+        <location filename="../../keyaction.cpp" line="172"/>
         <source>(Unknown)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="116"/>
+        <location filename="../../keyaction.cpp" line="118"/>
         <source>Switch to previous mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="119"/>
+        <location filename="../../keyaction.cpp" line="121"/>
         <source>Switch to next mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="121"/>
+        <location filename="../../keyaction.cpp" line="123"/>
         <source>Switch to mode %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="128"/>
+        <location filename="../../keyaction.cpp" line="130"/>
         <source>DPI cycle up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="130"/>
+        <location filename="../../keyaction.cpp" line="132"/>
         <source>DPI cycle down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="132"/>
+        <location filename="../../keyaction.cpp" line="134"/>
         <source>DPI up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="134"/>
+        <location filename="../../keyaction.cpp" line="136"/>
         <source>DPI down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="136"/>
+        <location filename="../../keyaction.cpp" line="138"/>
         <source>Sniper</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="140"/>
+        <location filename="../../keyaction.cpp" line="142"/>
         <source>DPI: %1, %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="143"/>
+        <location filename="../../keyaction.cpp" line="145"/>
         <source>DPI stage %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="149"/>
+        <location filename="../../keyaction.cpp" line="151"/>
         <source>Brightness up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="152"/>
+        <location filename="../../keyaction.cpp" line="154"/>
         <source>Brightness down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="157"/>
+        <location filename="../../keyaction.cpp" line="159"/>
         <source>Toggle Windows lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="159"/>
+        <location filename="../../keyaction.cpp" line="161"/>
         <source>Windows lock on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="161"/>
+        <location filename="../../keyaction.cpp" line="163"/>
         <source>Windows lock off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="164"/>
+        <location filename="../../keyaction.cpp" line="166"/>
         <source>Start animation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="166"/>
+        <location filename="../../keyaction.cpp" line="168"/>
         <source>Launch program</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keyaction.cpp" line="168"/>
+        <location filename="../../keyaction.cpp" line="170"/>
         <source>Send G-key macro</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2031,57 +2067,62 @@ An attempt will be made to import as many as possible.</source>
 <context>
     <name>MacroTableModel</name>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="177"/>
+        <location filename="../../macrotablemodel.cpp" line="180"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="179"/>
+        <location filename="../../macrotablemodel.cpp" line="182"/>
         <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="187"/>
+        <location filename="../../macrotablemodel.cpp" line="186"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="196"/>
+        <location filename="../../macrotablemodel.cpp" line="195"/>
         <source>You can not set a delay before the first key event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="198"/>
+        <location filename="../../macrotablemodel.cpp" line="197"/>
         <source>To set a delay, please switch the delay mode to &quot;as typed&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="213"/>
+        <location filename="../../macrotablemodel.cpp" line="212"/>
         <source>Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="215"/>
-        <source>Delay</source>
+        <location filename="../../macrotablemodel.cpp" line="214"/>
+        <source>Min. Delay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="358"/>
+        <location filename="../../macrotablemodel.cpp" line="216"/>
+        <source>Max. Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../macrotablemodel.cpp" line="376"/>
         <source>Delay is too large</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="365"/>
+        <location filename="../../macrotablemodel.cpp" line="384"/>
         <source>Max random delay is too large</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="369"/>
+        <location filename="../../macrotablemodel.cpp" line="388"/>
         <source>Max random delay is less or equal to the minimum</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../macrotablemodel.cpp" line="380"/>
+        <location filename="../../macrotablemodel.cpp" line="399"/>
         <source>Invalid key </source>
         <translation type="unfinished"></translation>
     </message>
@@ -2291,27 +2332,27 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ckbversionnumber.cpp" line="16"/>
+        <location filename="../../ckbversionnumber.cpp" line="19"/>
         <source>N/A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keymap.cpp" line="1763"/>
+        <location filename="../../keymap.cpp" line="1974"/>
         <source>Eject</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keymap.cpp" line="1765"/>
+        <location filename="../../keymap.cpp" line="1976"/>
         <source>Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keymap.cpp" line="1767"/>
+        <location filename="../../keymap.cpp" line="1978"/>
         <source>Wheel Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keymap.cpp" line="1769"/>
+        <location filename="../../keymap.cpp" line="1980"/>
         <source>Wheel Right</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2607,18 +2648,18 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1525"/>
-        <location filename="../../rebindwidget.cpp" line="803"/>
+        <location filename="../../rebindwidget.ui" line="1522"/>
+        <location filename="../../rebindwidget.cpp" line="810"/>
         <source>Start Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1551"/>
+        <location filename="../../rebindwidget.ui" line="1547"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1577"/>
+        <location filename="../../rebindwidget.ui" line="1572"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2643,27 +2684,27 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1596"/>
+        <location filename="../../rebindwidget.ui" line="1591"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1626"/>
+        <location filename="../../rebindwidget.ui" line="1621"/>
         <source>Unbind</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1633"/>
+        <location filename="../../rebindwidget.ui" line="1628"/>
         <source>Reset to Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1640"/>
+        <location filename="../../rebindwidget.ui" line="1635"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.ui" line="1647"/>
+        <location filename="../../rebindwidget.ui" line="1642"/>
         <source>Apply</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2674,7 +2715,7 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="456"/>
+        <location filename="../../rebindwidget.cpp" line="463"/>
         <source>Key %1 (%2) is pressed but never released.
 This will result in the key being pressed by the macro until you manually press the key itself and release it.
 
@@ -2682,7 +2723,7 @@ Are you sure you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="459"/>
+        <location filename="../../rebindwidget.cpp" line="466"/>
         <source>Key %1 (%2) is released but never pressed.
 This will have no observable effect unless the key is held down manually or by another macro.
 
@@ -2690,50 +2731,50 @@ Are you sure you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="462"/>
+        <location filename="../../rebindwidget.cpp" line="469"/>
         <source>Macro warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="804"/>
+        <location filename="../../rebindwidget.cpp" line="811"/>
         <source>Click Apply or manually edit the events.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="842"/>
+        <location filename="../../rebindwidget.cpp" line="849"/>
         <source>Unknown key combination pressed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="842"/>
+        <location filename="../../rebindwidget.cpp" line="849"/>
         <source>An unknown key combination (%1, %2) has been pressed.
 Make sure your keyboard layout is set to English - United States while recording macros.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="852"/>
+        <location filename="../../rebindwidget.cpp" line="859"/>
         <source>Stop Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="853"/>
+        <location filename="../../rebindwidget.cpp" line="860"/>
         <source>Type your macro and press Stop Recording when finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="860"/>
+        <location filename="../../rebindwidget.cpp" line="867"/>
         <source>Click Start Recording or manually edit the events.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="928"/>
+        <location filename="../../rebindwidget.cpp" line="935"/>
         <source>&quot;Record from all keyboards&quot; is only recommended if you do not have a keyboard managed by ckb-next.
 It currently only functions with an English - United States keyboard layout.
 Make sure your keyboard is switched to it before recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../rebindwidget.cpp" line="931"/>
+        <location filename="../../rebindwidget.cpp" line="938"/>
         <source>Record from all keyboards</source>
         <translation type="unfinished"></translation>
     </message>

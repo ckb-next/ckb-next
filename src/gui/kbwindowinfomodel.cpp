@@ -3,21 +3,37 @@
 #include <QMimeData>
 #include <algorithm>
 
-QString KbWindowInfoModel::caseSensitiveStr = tr("Case Sensitive");
-QString KbWindowInfoModel::caseInsensitiveStr = tr("Case Insensitive");
-QString KbWindowInfoModel::orStr = tr("OR");
-QString KbWindowInfoModel::andStr = tr("AND");
-QString KbWindowInfoModel::isStr = tr("is");
-QString KbWindowInfoModel::containsStr = tr("contains");
-QString KbWindowInfoModel::startsStr = tr("starts with");
-QString KbWindowInfoModel::endsStr = tr("ends with");
-QString KbWindowInfoModel::titleStr = tr("Window Title");
-QString KbWindowInfoModel::pathStr = tr("Program Path");
-QString KbWindowInfoModel::instanceStr = tr("Instance Name");
-QString KbWindowInfoModel::classStr = tr("Class Name");
+// Awful
+QString KbWindowInfoModel::caseSensitiveStr;
+QString KbWindowInfoModel::caseInsensitiveStr;
+QString KbWindowInfoModel::orStr;
+QString KbWindowInfoModel::andStr;
+QString KbWindowInfoModel::isStr;
+QString KbWindowInfoModel::containsStr;
+QString KbWindowInfoModel::startsStr;
+QString KbWindowInfoModel::endsStr;
+QString KbWindowInfoModel::titleStr;
+QString KbWindowInfoModel::pathStr;
+QString KbWindowInfoModel::instanceStr;
+QString KbWindowInfoModel::classStr;
 
 KbWindowInfoModel::KbWindowInfoModel(KbWindowInfo* i, QObject* parent) :
-    QAbstractTableModel(parent), wininfo(i) {}
+    QAbstractTableModel(parent), wininfo(i) {
+    if(caseSensitiveStr.isEmpty()) {
+        caseSensitiveStr = tr("Case Sensitive");
+        caseInsensitiveStr = tr("Case Insensitive");
+        orStr = tr("OR");
+        andStr = tr("AND");
+        isStr = tr("is");
+        containsStr = tr("contains");
+        startsStr = tr("starts with");
+        endsStr = tr("ends with");
+        titleStr = tr("Window Title");
+        pathStr = tr("Program Path");
+        instanceStr = tr("Instance Name");
+        classStr = tr("Class Name");
+    }
+}
 
 int KbWindowInfoModel::rowCount(const QModelIndex& parent) const {
     return wininfo->items.length();

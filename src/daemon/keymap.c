@@ -453,7 +453,7 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "prev",          126, KEY_PREVIOUSSONG },
     { "mr",             -1, KEY_CORSAIR },
     { "profswitch",    128, KEY_CORSAIR },
-    { "knobpress",     129, KEY_MUTE },
+    { "dialpress",     129, KEY_MUTE },
     { 0,                -1, KEY_NONE },
     { "g1",            131, KEY_CORSAIR },
     { "g2",            132, KEY_CORSAIR },

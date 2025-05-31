@@ -937,8 +937,8 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             // We already have a play Fn button so we want to map it to something else so it can be programmed
             map["g1"] = { nullptr,  "G1", "g1", 227, 14, 16, 11, false, true};
 
-            // K70 Core RGP has a volume knob that can be pressed
-            map["knobpress"] = {nullptr,  "Mute", "mute",  259, 14, NS, false, true};
+            // K70 Core RGB has a volume knob that can be pressed
+            map["dialpress"] = {nullptr,  "Mute", "mute",  259, 14, NS, false, true};
 
             // Replace rwin with Fn
             map["fn"] = KStrafeKeys[3];

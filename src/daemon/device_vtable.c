@@ -84,7 +84,7 @@ const devcmd vtable_keyboard = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
-    .hwanim = cmd_hwanim,
+    .hwanim = cmd_none,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,
@@ -191,7 +191,7 @@ const devcmd vtable_keyboard_legacy = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_none,
-    .hwanim = cmd_hwanim,
+    .hwanim = cmd_none,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,
@@ -245,7 +245,7 @@ const devcmd vtable_mouse = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
-    .hwanim = cmd_hwanim,
+    .hwanim = cmd_none,
     .ioff = cmd_none,
     .ion = cmd_none,
     .iauto = cmd_none,
@@ -352,7 +352,7 @@ const devcmd vtable_mousepad = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
-    .hwanim = cmd_hwanim,
+    .hwanim = cmd_none,
     .ioff = cmd_none,
     .ion = cmd_none,
     .iauto = cmd_none,
@@ -406,7 +406,7 @@ const devcmd vtable_mouse_legacy = {
     .profileid = cmd_profileid,
 
     .rgb = cmd_rgb,
-    .hwanim = cmd_hwanim,
+    .hwanim = cmd_none,
     .ioff = cmd_ioff,
     .ion = cmd_ion,
     .iauto = cmd_iauto,

@@ -217,6 +217,7 @@ typedef enum protocol_
 {
     PROTO_NXP,
     PROTO_BRAGI,
+    PROTO_LEGACY,
 } protocol_t;
 
 typedef enum pollrate_ {

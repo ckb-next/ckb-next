@@ -716,7 +716,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     // If the response starts with CMD_GET (0x0e) for NXP, or it came from a bragi command EP, that means it needs to go to os_usbrecv()
     if(urblen == kb->out_ep_packet_size && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == kb->bragi_in_ep))){
 #ifdef DEBUG_USB_RECV
-    print_urb_buffer("Recv:", buffer, urblen, NULL, 0, NULL, INDEX_OF(targetkb, keyboard), (uchar)ep);
+        print_urb_buffer("Recv:", buffer, urblen, NULL, 0, NULL, INDEX_OF(targetkb, keyboard), (uchar)ep);
 #endif
         int retval = pthread_mutex_lock(intmutex(targetkb));
         if(retval)
@@ -736,7 +736,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     } else {
         queued_mutex_lock(imutex(targetkb));
 
-        if(IS_LEGACY_DEV(kb)) {
+        if(kb->protocol == PROTO_LEGACY) {
             if(IS_MOUSE_DEV(kb))
                 m95_mouse_translate(&kb->input, urblen, buffer);
             else

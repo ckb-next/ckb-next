@@ -281,24 +281,11 @@ const char* product_str(ushort product){
     return "";
 }
 
-/// brief .
-///
-/// \brief get_vtable returns the correct vtable pointer
-/// \param vendor short usb vendor ID
-/// \param product short usb product ID
-/// \return Depending on the type and model, the corresponding vtable pointer is returned (see below)
-///
-/// At present, we have three different vtables:
-/// - \c vtable_mouse is used for all mouse types. This may be wrong with some newer mice?
-/// - \c vtable_keyboard is used for all RGB Keyboards.
-/// - \c vtable_keyboard_nonrgb for all the rest.
-///
-/// \todo Is the last point really a good decision and always correct?
-///
 static const devcmd* get_vtable(usbdevice* kb){
-    ushort vendor = kb->vendor;
-    ushort product = kb->product;
-    if(kb->protocol == PROTO_BRAGI) {
+    const ushort vendor = kb->vendor;
+    const ushort product = kb->product;
+    switch(kb->protocol){
+    case PROTO_BRAGI:
         if(IS_DONGLE(kb))
             return &vtable_bragi_dongle;
         else if(IS_MOUSE(vendor, product))
@@ -307,23 +294,32 @@ static const devcmd* get_vtable(usbdevice* kb){
             return &vtable_bragi_mousepad;
         else
             return &vtable_bragi_keyboard;
-    } else if(IS_MOUSE(vendor, product)) {
-        if(IS_LEGACY(vendor, product))
+        break;
+    case PROTO_LEGACY:
+        if(IS_MOUSE(vendor, product))
             return &vtable_mouse_legacy;
-        else if(IS_WIRELESS(vendor, product))
-            return &vtable_mouse_wireless;
         else
-            return &vtable_mouse;
-    } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
-        return &vtable_mousepad;
-    } else {
-        if(IS_LEGACY(vendor, product))
             return &vtable_keyboard_legacy;
-        else if(IS_WIRELESS(vendor, product))
-            return &vtable_keyboard_wireless;
-        else
-            return &vtable_keyboard;
+        break;
+    case PROTO_NXP:
+        if(IS_MOUSE(vendor, product)) {
+            if(IS_WIRELESS(vendor, product))
+                return &vtable_mouse_wireless;
+            else
+                return &vtable_mouse;
+        } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
+            return &vtable_mousepad;
+        } else {
+            if(IS_WIRELESS(vendor, product))
+                return &vtable_keyboard_wireless;
+            else
+                return &vtable_keyboard;
+        }
+        break;
+    default:
+        ckb_fatal("ckb%d: Unknown protocol for device", INDEX_OF(kb, keyboard));
     }
+    return NULL;
 }
 
 // USB device main loop
@@ -366,11 +362,17 @@ cleanup:
 void fill_usbdevice_protocol(usbdevice* kb){
     if(USES_BRAGI(kb->vendor, kb->product))
         kb->protocol = PROTO_BRAGI;
+    else if(IS_LEGACY_DEV(kb))
+        kb->protocol = PROTO_LEGACY;
+    else
+        kb->protocol = PROTO_NXP;
 
     if(USES_BRAGI_JUMBO(kb->vendor, kb->product))
         kb->out_ep_packet_size = BRAGI_JUMBO_SIZE;
     else
         kb->out_ep_packet_size = MSG_SIZE;
+
+    ckb_info("ckb%d: Adding device with protocol %d", INDEX_OF(kb, keyboard), (int)kb->protocol);
 }
 
 /// brief .
@@ -425,7 +427,7 @@ static void* _setupusb(void* context){
     vt = &kb->vtable;
 
     if(!(IS_DONGLE(kb) && kb->protocol == PROTO_BRAGI))
-        kb->features = (IS_LEGACY(vendor, product) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
+        kb->features = (IS_LEGACY_DEV(kb) ? FEAT_STD_LEGACY : FEAT_STD_RGB) & features_mask;
     if(SUPPORTS_ADJRATE(kb))
         kb->features |= FEAT_ADJRATE;
     if(IS_MONOCHROME(vendor, product))
@@ -604,7 +606,7 @@ int revertusb(usbdevice* kb){
         return 0;
 
     // FIXME: This should be moved to a device-specific function
-    if(IS_LEGACY_DEV(kb)){
+    if(kb->protocol == PROTO_LEGACY){
         nk95cmd(kb, NK95_HWON);
         return 0;
     }

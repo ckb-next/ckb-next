@@ -524,7 +524,7 @@ void updateindicators_kb(usbdevice* kb, int force){
 
         ushort leds = kb->ileds;
         int len = 1;
-        if(kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb) || kb->protocol == PROTO_BRAGI) {
+        if((kb->protocol == PROTO_NXP && (kb->fwversion >= 0x300 || IS_V3_OVERRIDE(kb))) || kb->protocol == PROTO_BRAGI) {
             leds = (kb->ileds << 8) | 0x0001;
             len = 2;
         }

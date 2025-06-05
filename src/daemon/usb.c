@@ -197,7 +197,7 @@ const char* vendor_str(ushort vendor){
 const char* product_str(ushort product){
     if(product == P_K100_OPTICAL || product == P_K100_MECHANICAL || product == P_K100_OPTICAL_VARIANT)
         return "k100";
-    if(product == P_K95_LEGACY)
+    if(product == P_K95_LEGACY || product == P_K90_LEGACY)
         return "k95l";
     if(product == P_K95)
         return "k95";

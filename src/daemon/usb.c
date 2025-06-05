@@ -282,35 +282,33 @@ const char* product_str(ushort product){
 }
 
 static const devcmd* get_vtable(usbdevice* kb){
-    const ushort vendor = kb->vendor;
-    const ushort product = kb->product;
     switch(kb->protocol){
     case PROTO_BRAGI:
         if(IS_DONGLE(kb))
             return &vtable_bragi_dongle;
-        else if(IS_MOUSE(vendor, product))
+        else if(IS_MOUSE_DEV(kb))
             return &vtable_bragi_mouse;
-        else if(IS_MOUSEPAD(vendor, product))
+        else if(IS_MOUSEPAD_DEV(kb))
             return &vtable_bragi_mousepad;
         else
             return &vtable_bragi_keyboard;
         break;
     case PROTO_LEGACY:
-        if(IS_MOUSE(vendor, product))
+        if(IS_MOUSE_DEV(kb))
             return &vtable_mouse_legacy;
         else
             return &vtable_keyboard_legacy;
         break;
     case PROTO_NXP:
-        if(IS_MOUSE(vendor, product)) {
-            if(IS_WIRELESS(vendor, product))
+        if(IS_MOUSE_DEV(kb)) {
+            if(IS_WIRELESS_DEV(kb))
                 return &vtable_mouse_wireless;
             else
                 return &vtable_mouse;
-        } else if(IS_MOUSEPAD(vendor, product) || product == P_ST100) {
+        } else if(IS_MOUSEPAD_DEV(kb) || kb->product == P_ST100) {
             return &vtable_mousepad;
         } else {
-            if(IS_WIRELESS(vendor, product))
+            if(IS_WIRELESS_DEV(kb))
                 return &vtable_keyboard_wireless;
             else
                 return &vtable_keyboard;

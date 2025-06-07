@@ -386,6 +386,8 @@ typedef struct usbdevice_ {
         BRIGHTNESS_HARDWARE_COARSE,
     } brightness_mode;
     struct timespec last_rgb;
+    // Legacy devices only
+    unsigned char previous_6kro[8];
 } usbdevice;
 
 #endif  // STRUCTURES_H

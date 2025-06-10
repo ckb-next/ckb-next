@@ -6,6 +6,7 @@
 #include <cmath>
 #include <QSet>
 #include "kb.h"
+#include "idletimer.h"
 
 // Class for managing keyboard devices. Handles scanning devices from the daemon and creating/destroying Kb objects for each device.
 
@@ -46,6 +47,7 @@ public:
 public slots:
     void brightnessScroll(QPoint delta);
     void scanKeyboards();
+    void forceDimLights();
 
 signals:
     // A new device was connected.
@@ -73,6 +75,8 @@ private:
     static QTimer* _idleTimer;
 #endif
     int getLastUsedDeviceIdleTime();
+    static int settingsIdle;
+    inline int getCombinedIdleTime() { return std::min<int>(IdleTimer::getIdleTime(), getLastUsedDeviceIdleTime()); }
 };
 
 #endif // KBMANAGER_H

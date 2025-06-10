@@ -2,6 +2,9 @@
 #include "idletimer.h"
 #include <limits>
 
+#define WAKE_CHECK_INTERVAL 500
+#define DIM_FORCE_DELAY (WAKE_CHECK_INTERVAL + 100)
+
 #ifndef Q_OS_MACOS
 QString devpath = "/dev/input/ckb%1";
 #else
@@ -16,6 +19,7 @@ QString devpath = "/var/run/ckb%1";
 
 CkbVersionNumber KbManager::_guiVersion, KbManager::_daemonVersion;
 KbManager* KbManager::_kbManager = nullptr;
+int KbManager::settingsIdle = INT_MAX;
 
 #ifdef Q_OS_LINUX
 QTimer* KbManager::_idleTimer = nullptr;
@@ -31,17 +35,30 @@ void KbManager::setIdleTimer(bool enable){
     else
         _idleTimer->stop();
 }
-void KbManager::idleTimerTick(){
-    // Get user idle time
-    const int idle = IdleTimer::getIdleTime();
-    const int settingsidle = IDLE_TIMER_DURATION;
-    const int devidleres = settingsidle - getLastUsedDeviceIdleTime();
-    int systemidleres = settingsidle - idle;
-    if(systemidleres > 0 || devidleres > 0)
-    {
-        if(devidleres > systemidleres)
-            systemidleres = devidleres;
 
+void KbManager::forceDimLights()
+{
+    if(!(IdleTimer::isSupported() && CkbSettings::get("Program/IdleTimerEnable", true).toBool() && _idleTimer)) {
+        qInfo().noquote() << tr("Please enable \"Turn lights off when idle\" before using --sleep");
+        return;
+    }
+
+    // Delay to not wake up immediately
+    QTimer::singleShot(DIM_FORCE_DELAY, this, [this]() {
+        const int newSettingsIdle = getCombinedIdleTime();
+        // If we allow too small values, then the devices will never wake up
+        if(newSettingsIdle > DIM_FORCE_DELAY) {
+            _idleTimer->stop();
+            settingsIdle = newSettingsIdle;
+            idleTimerTick();
+        }
+    });
+}
+
+void KbManager::idleTimerTick(){
+    const int idleres = settingsIdle - getCombinedIdleTime();
+    if(idleres > 0)
+    {
         // Turn the lights back on (if applicable)
         foreach(Kb* kb, _devices){
             // Check if the dimming state on this device could actually be restored
@@ -52,10 +69,14 @@ void KbManager::idleTimerTick(){
                 break;
         }
 
+        // Reset it if changed by forceDimLights()
+        settingsIdle = IDLE_TIMER_DURATION;
+
         // Reschedule the timer if there's still time left
-        _idleTimer->start(systemidleres);
+        _idleTimer->start(idleres);
         return;
     }
+
     // Turn off all the lights
     foreach(Kb* kb, _devices){
         kb->currentLight()->timerDim();
@@ -63,7 +84,7 @@ void KbManager::idleTimerTick(){
             break;
     }
     // Start checking for activity every half a second
-    _idleTimer->start(500);
+    _idleTimer->start(WAKE_CHECK_INTERVAL);
 }
 #endif
 
@@ -73,6 +94,7 @@ void KbManager::init(const QString& guiVersion){
     if(_kbManager)
         return;
     _kbManager = new KbManager();
+    settingsIdle = IDLE_TIMER_DURATION;
 #ifdef Q_OS_LINUX
     if(IdleTimer::isSupported() && CkbSettings::get("Program/IdleTimerEnable", true).toBool()){
         setIdleTimer(true);

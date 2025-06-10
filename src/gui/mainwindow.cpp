@@ -130,6 +130,7 @@ MainWindow::MainWindow(const bool silent, QWidget *parent) :
     connect(KbManager::kbManager(), SIGNAL(kbDisconnected(Kb*)), this, SLOT(removeDevice(Kb*)));
     connect(KbManager::kbManager(), SIGNAL(versionUpdated()), this, SLOT(updateVersion()));
     connect(KbManager::scanTimer(), SIGNAL(timeout()), this, SLOT(timerTick()));
+    connect(this, &MainWindow::dimAllLightsForIdleCLI, KbManager::kbManager(), &KbManager::forceDimLights);
 
     // Set up tray icon
     restoreAction = new QAction(tr("Restore"), this);
@@ -407,6 +408,8 @@ void MainWindow::timerTick(){
                     emit switchToProfileCLI(option.section(' ', 1));
                 else if(option.startsWith("SwitchToMode: "))
                     emit switchToModeCLI(option.section(' ', 1));
+                else if(option == QLatin1String("Sleep"))
+                    emit dimAllLightsForIdleCLI();
             }
         }
     }

@@ -70,6 +70,7 @@ public slots:
 signals:
     void switchToProfileCLI(QString profile);
     void switchToModeCLI(QString mode);
+    void dimAllLightsForIdleCLI();
 
 private slots:
     void addDevice(Kb* device);

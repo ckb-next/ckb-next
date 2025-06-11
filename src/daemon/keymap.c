@@ -375,7 +375,7 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "lbrace",         47, KEY_LEFTBRACE },
     { "rbrace",         48, KEY_RIGHTBRACE },
     { "bslash",         49, KEY_BACKSLASH },
-    { "hash",           50,  KEY_BACKSLASH_ISO },
+    { "hash",           50, KEY_BACKSLASH_ISO },
     { "colon",          51, KEY_SEMICOLON },
     { "quote",          52, KEY_APOSTROPHE },
     { "grave",          53, KEY_GRAVE },
@@ -454,7 +454,7 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "prev",          126, KEY_PREVIOUSSONG },
     { "mr",             -1, KEY_CORSAIR },
     { "profswitch",    128, KEY_CORSAIR },
-    { 0,                -1, KEY_NONE },
+    { "dialpress",     129, KEY_MUTE },
     { 0,                -1, KEY_NONE },
     { "g1",            131, KEY_CORSAIR },
     { "g2",            132, KEY_CORSAIR },
@@ -601,7 +601,7 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         } else {
             ckb_warn("Unhandled NKRO_KEY_IN length %d in handle_bragi_key_input(), international keys will not function", length);
         }
-    } else if(urbinput[0] == NKRO_MEDIA_IN && length == 3) {
+    } else if(urbinput[0] == NKRO_MEDIA_IN && (length == 3 || length == 5)) {
         // This section is similar to handle_nkro_media_keys(), but with different indices due to the different keymap
         // This works because these keys can not be pressed at the same time
         CLEAR_KEYBIT(kbinput, 125);         // next
@@ -635,6 +635,9 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
             break;
         case 234:
             SET_KEYBIT(kbinput, 104);   // voldn
+            break;
+        default:
+            ckb_err("Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_bragi_key_input()", length, urbinput[1]);
             break;
         }
     } else {
@@ -789,7 +792,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                     if(urblen == 64) {
                         corsair_kbcopy(targetkb->input.keys, buffer + 2);
                         // Check if we need to apply an awful hack to get media keys working
-                        if(BRAGI_HAS_MEDIA_MACRO(targetkb)){
+                        if(IS_K60PRORGB(targetkb)){
                             // if Fn is pressed
                             if(ISSET_KEYBIT(targetkb->input.keys, 122)){
                                 // As awful as this hack
@@ -818,6 +821,87 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                                 } else if (ISSET_KEYBIT(targetkb->input.keys, 58)) { // F1 -> winlock
                                     CLEAR_KEYBIT(targetkb->input.keys, 58);
                                     SET_KEYBIT(targetkb->input.keys, 114);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 60)) { // F3 -> brightnessdn (not supported, map to generic "light")
+                                    CLEAR_KEYBIT(targetkb->input.keys, 60);
+                                    SET_KEYBIT(targetkb->input.keys, 113);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 61)) { // F4 -> brightnessup (not supported, map to generic "light")
+                                    CLEAR_KEYBIT(targetkb->input.keys, 61);
+                                    SET_KEYBIT(targetkb->input.keys, 113);
+                                } else {
+                                    matched = false;
+                                }
+                                if(matched)
+                                    CLEAR_KEYBIT(targetkb->input.keys, 122);
+                            }
+                        }else if(IS_K70CORERGB(targetkb)){
+                            #define K70_CORE_MEDIA_MASK 0x60
+                            if(buffer[1] == 0x5 && buffer[2] == K70_CORE_MEDIA_MASK) {
+                                // This is a packet from the volume knob
+                                // We need to handle it appropriately then clear the keys so we stop getting garbage
+                                if(buffer[4] == 0x01) {
+                                    // Volume knob turned right
+                                    // Store
+                                    uchar media_key_state_1 = targetkb->input.keys[12];
+                                    uchar media_key_state_2 = targetkb->input.keys[16];
+
+                                    // Apply fresh key data
+                                    memset(targetkb->input.keys, 0, sizeof targetkb->input.keys);
+                                    SET_KEYBIT(targetkb->input.keys, 103); // volup
+
+                                    // Restore
+                                    targetkb->input.keys[12] = (targetkb->input.keys[12] & ~K70_CORE_MEDIA_MASK) | (media_key_state_1 & K70_CORE_MEDIA_MASK);
+                                    //targetkb->input.keys[16] = (targetkb->input.keys[16] & ~NXP_STRAFE_VOL_MASK) | (media_key_state_2 & NXP_STRAFE_VOL_MASK);
+                                    // We can just copy this byte as-is, as there are no M or G keys in the strafe.
+                                    targetkb->input.keys[16] = media_key_state_2;
+                                } else if(buffer[4] == 0xFF) {
+                                    // Volume knob turned left
+                                    // Store
+                                    uchar media_key_state_1 = targetkb->input.keys[12];
+                                    uchar media_key_state_2 = targetkb->input.keys[16];
+
+                                    // Apply fresh key data
+                                    memset(targetkb->input.keys, 0, sizeof targetkb->input.keys);
+                                    SET_KEYBIT(targetkb->input.keys, 104); // voldn
+
+                                    // Restore
+                                    targetkb->input.keys[12] = (targetkb->input.keys[12] & ~K70_CORE_MEDIA_MASK) | (media_key_state_1 & K70_CORE_MEDIA_MASK);
+                                    //targetkb->input.keys[16] = (targetkb->input.keys[16] & ~NXP_STRAFE_VOL_MASK) | (media_key_state_2 & NXP_STRAFE_VOL_MASK);
+                                    // We can just copy this byte as-is, as there are no M or G keys in the strafe.
+                                    targetkb->input.keys[16] = media_key_state_2;
+                                }
+                            }
+
+                            // As awful as this hack
+                            if(ISSET_KEYBIT(targetkb->input.keys, 124)) { // The play/pause key next to the volume knob
+                                // We have a play/pause function key so set this to something else
+                                CLEAR_KEYBIT(targetkb->input.keys, 124);
+                                SET_KEYBIT(targetkb->input.keys, 131); // G1
+                            }
+
+                            // if Fn is pressed
+                            if(ISSET_KEYBIT(targetkb->input.keys, 122)){
+                                bool matched = true;
+                                if(ISSET_KEYBIT(targetkb->input.keys, 62)) { // F5 -> stop
+                                    CLEAR_KEYBIT(targetkb->input.keys, 62);
+                                    SET_KEYBIT(targetkb->input.keys, 123);
+                                } if(ISSET_KEYBIT(targetkb->input.keys, 63)) { // F6 -> prev
+                                    CLEAR_KEYBIT(targetkb->input.keys, 63);
+                                    SET_KEYBIT(targetkb->input.keys, 126);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 64)) { // F7 -> play/pause
+                                    CLEAR_KEYBIT(targetkb->input.keys, 64);
+                                    SET_KEYBIT(targetkb->input.keys, 124);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 65)) { // F8 -> next
+                                    CLEAR_KEYBIT(targetkb->input.keys, 65);
+                                    SET_KEYBIT(targetkb->input.keys, 125);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 69)) { // F12 -> supposed to switch knob function (map to ctrlwheelb)
+                                    CLEAR_KEYBIT(targetkb->input.keys, 69);
+                                    SET_KEYBIT(targetkb->input.keys, 137);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 58)) { // F1 -> winlock
+                                    CLEAR_KEYBIT(targetkb->input.keys, 58);
+                                    SET_KEYBIT(targetkb->input.keys, 114);
+                                } else if (ISSET_KEYBIT(targetkb->input.keys, 59)) { // F2 -> profile switch
+                                    CLEAR_KEYBIT(targetkb->input.keys, 59);
+                                    SET_KEYBIT(targetkb->input.keys, 128);
                                 } else if (ISSET_KEYBIT(targetkb->input.keys, 60)) { // F3 -> brightnessdn (not supported, map to generic "light")
                                     CLEAR_KEYBIT(targetkb->input.keys, 60);
                                     SET_KEYBIT(targetkb->input.keys, 113);
@@ -939,6 +1023,9 @@ void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinpu
             break;
         case 234:
             SET_KEYBIT(kbinput, 131);   // voldn
+            break;
+        default:
+            ckb_err("Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_nkro_media_keys()", length, urbinput[1]);
             break;
         }
     }

@@ -77,6 +77,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             break;
         case AnimScript::Param::DOUBLE:
             widget = new QDoubleSpinBox(this);
+            ((QDoubleSpinBox*)widget)->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
             ((QDoubleSpinBox*)widget)->setDecimals(1);
             ((QDoubleSpinBox*)widget)->setMinimum(param.minimum.toDouble());
             ((QDoubleSpinBox*)widget)->setMaximum(param.maximum.toDouble());
@@ -207,6 +208,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         lastDuration = anim->parameter("duration").toDouble();
         ui->settingsGrid->addWidget(new QLabel(tr("Duration:"), this), row, 1);
         QDoubleSpinBox* spinner = new QDoubleSpinBox(this);
+        spinner->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
         spinner->setDecimals(1);
         spinner->setMinimum(0.1);
         spinner->setValue(lastDuration);
@@ -326,6 +328,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         // Add stop times as double values
         // Stop time
         QDoubleSpinBox* spinner = new QDoubleSpinBox(this);
+        spinner->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
         spinner->setDecimals(1);
         spinner->setMinimum(0.1);
         spinner->setMaximum(24. * 60. * 60.);
@@ -342,6 +345,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         ui->timeGrid->addWidget(new QLabel(tr("seconds"), this), 4, 4);
         // KP stop time
         spinner = new QDoubleSpinBox(this);
+        spinner->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
         spinner->setDecimals(1);
         spinner->setMinimum(0.1);
         spinner->setMaximum(24. * 60. * 60.);

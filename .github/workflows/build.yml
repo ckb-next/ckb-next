@@ -17,7 +17,6 @@ jobs:
           - 'almalinux:9'
           - 'rockylinux:8'
           - 'rockylinux:9'
-          - 'debian:10'
           - 'debian:11'
           - 'debian:12'
           - 'fedora:37'

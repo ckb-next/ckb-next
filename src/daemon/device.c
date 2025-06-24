@@ -160,9 +160,9 @@ int _start_dev(usbdevice* kb, int makeactive){
         kb->features &= ~FEAT_BIND;
 
     ///
-    /// The Polaris doesn't support hardware profiles, so remove the FEAT_HWLOAD bit.
+    /// Some devices don't support hardware profiles, so remove the FEAT_HWLOAD bit.
     ///
-    if(IS_POLARIS(kb))
+    if(HAS_NO_HW_PROFILE(kb))
         kb->features &= ~FEAT_HWLOAD;
 
     ///

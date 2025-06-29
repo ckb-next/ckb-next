@@ -14,6 +14,10 @@
 #define BTN_WHEELLEFT   0x1f03
 #define BTN_WHEELRIGHT  0x1f04
 
+// Extra input keys for K100 iWheel rotation
+#define KEY_K100_WHEEL_CW     (MOUSE_EXTRA_FIRST + 3)
+#define KEY_K100_WHEEL_CCW    (MOUSE_EXTRA_FIRST + 4)
+
 #ifdef OS_MAC_LEGACY
 // On Linux there's no meaningful distinction between these keys
 // On the OSX legacy build this is used for layout auto-detection (see input_mac_legacy.c)
@@ -41,7 +45,7 @@
 #define MOUSE_BUTTON_FIRST      (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA + N_GENERIC_ZONES)
 #define MOUSE_EXTRA_FIRST       (MOUSE_BUTTON_FIRST + N_BUTTONS_HW)
 // Number of keys that generate input
-#define N_KEYS_INPUT            (MOUSE_BUTTON_FIRST + N_BUTTONS_EXTENDED)
+#define N_KEYS_INPUT            (KEY_K100_WHEEL_CCW + 1)
 #define N_KEYBYTES_INPUT        ((N_KEYS_INPUT + 7) / 8)
 // Mouse zones
 // LED_MOUSE is an LED index, so technically this is wrong

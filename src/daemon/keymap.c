@@ -224,6 +224,9 @@ const key keymap[N_KEYS_EXTENDED] = {
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
     { 0,            -1,   KEY_NONE },
+    { "k100_wheel_cw",  -1, KEY_K100_WHEEL_CW },
+    { "k100_wheel_ccw", -1, KEY_K100_WHEEL_CCW },
+
 
     // Keys not present on any device
     { "lightup",    -1, KEY_BRIGHTNESSUP },
@@ -734,6 +737,23 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     } else if (kb->protocol == PROTO_BRAGI && urblen == kb->out_ep_packet_size && buffer[1] == BRAGI_INPUT_NOTIFY){
         // Process bragi notifications
         bragi_process_notification(kb, targetkb, buffer);
+    } else if (kb->vendor == V_CORSAIR && kb->product == P_K100_MECHANICAL && buffer[0] == 0x03) {
+            // Detect K100 iWheel rotation from raw key events
+            switch (buffer[2]) {
+                case 208: // KEY_FASTFORWARD
+                    memset(targetkb->input.keys, 0, N_KEYBYTES_INPUT);
+                    SET_KEYBIT(targetkb->input.keys, KEY_K100_WHEEL_CW);
+                    break;
+                case 168: // KEY_REWIND
+                    memset(targetkb->input.keys, 0, N_KEYBYTES_INPUT);
+                    SET_KEYBIT(targetkb->input.keys, KEY_K100_WHEEL_CCW);
+                    break;
+                default:
+                    break;
+            }
+            inputupdate(targetkb);
+            queued_mutex_unlock(imutex(targetkb));
+            return;
     } else {
         queued_mutex_lock(imutex(targetkb));
 

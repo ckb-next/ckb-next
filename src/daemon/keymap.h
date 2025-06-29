@@ -45,7 +45,7 @@
 #define MOUSE_BUTTON_FIRST      (N_KEYS_HW + N_KEY_ZONES + N_KEYS_EXTRA + N_GENERIC_ZONES)
 #define MOUSE_EXTRA_FIRST       (MOUSE_BUTTON_FIRST + N_BUTTONS_HW)
 // Number of keys that generate input
-#define N_KEYS_INPUT            (KEY_K100_WHEEL_CCW + 1)
+#define N_KEYS_INPUT            (MOUSE_BUTTON_FIRST + N_BUTTONS_EXTENDED)
 #define N_KEYBYTES_INPUT        ((N_KEYS_INPUT + 7) / 8)
 // Mouse zones
 // LED_MOUSE is an LED index, so technically this is wrong

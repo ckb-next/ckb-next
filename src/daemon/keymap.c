@@ -6,9 +6,10 @@
 #include "bragi_proto.h"
 #include "nxp_proto.h"
 #include "bragi_notification.h"
+#include <assert.h>
 
 // Translates input from HID to a ckb input bitfield.
-static void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy);
+static void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urbinput);
 static void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput);
 static void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urbinput);
 
@@ -524,28 +525,28 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
 // Modified from Linux drivers/hid/usbhid/usbkbd.c, key codes replaced with keymap array indices and K95 keys added
 // Make sure the indices match the keyindex as passed to nprintkey() in notify.c
 static const short hid_codes[256] = {
-     -1,  -1,  -1,  -1,  37,  54,  52,  39,  27,  40,  41,  42,  32,  43,  44,  45,
-     56,  55,  33,  34,  25,  28,  38,  29,  31,  53,  26,  51,  30,  50,  13,  14,
-     15,  16,  17,  18,  19,  20,  21,  22,  82,   0,  86,  24,  64,  23,  84,  35,
-     79,  80,  81,  46,  47,  12,  57,  58,  59,  36,   1,   2,   3,   4,   5,   6,
-      7,   8,   9,  10,  11,  72,  73,  74,  75,  76,  77,  78,  87,  88,  89,  95,
-     93,  94,  92, 102, 103, 104, 105, 106, 107, 115, 116, 117, 112, 113, 114, 108,
-    109, 110, 118, 119,  49,  69,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,
-     -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  98,  -2,  -2,  -2,  -2,  -2,  -2,  97,
-    130, 131,  -1,  -1,  -1,  -2,  -1,  83,  66,  85, 145, 144,  -2,  -1,  -1,  -1,
-     65,  63,  -2,  -2,  -2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-     -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-     -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-     -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, 111,  -1,  -1,  -1,
-    120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 136, 137, 138, 139, 140, 141,
-     60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97,
-     -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1,
+     -1,  -1,  -1,  -1,  37,  54,  52,  39,  27,  40,  41,  42,  32,  43,  44,  45, // 16
+     56,  55,  33,  34,  25,  28,  38,  29,  31,  53,  26,  51,  30,  50,  13,  14, // 32
+     15,  16,  17,  18,  19,  20,  21,  22,  82,   0,  86,  24,  64,  23,  84,  35, // 48
+     79,  80,  81,  46,  47,  12,  57,  58,  59,  36,   1,   2,   3,   4,   5,   6, // 64
+      7,   8,   9,  10,  11,  72,  73,  74,  75,  76,  77,  78,  87,  88,  89,  95, // 80
+     93,  94,  92, 102, 103, 104, 105, 106, 107, 115, 116, 117, 112, 113, 114, 108, // 96
+    109, 110, 118, 119,  49,  69,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2, // 112
+     -2,  -2,  -2,  -2,  -2,  -2,  -2,  -2,  98,  -2,  -2,  -2,  -2,  -2,  -2,  97, // 128
+    130, 131,  -1,  -1,  -1,  -2,  -1,  83,  66,  85, 145, 144,  -2,  -1,  -1,  -1, // 144
+     65,  63,  -2,  -2,  -2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, // 160
+     -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, // 176
+     -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, // 192
+     -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, 111,  -1,  -1,  -1, // 208
+    120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 136, 137, 138, 139, 140, 141, // 224
+     60,  48,  62,  61,  91,  90,  67,  68, 142, 143,  99, 101,  -2, 130, 131,  97, // 240
+     -2, 133, 134, 135,  -2,  96,  -2, 132,  -2,  -2,  71,  71,  71,  71,  -1,  -1, // 256
 };
 
 // There are three types of keyboard input. 6KRO, NKRO and Corsair.
 //
 // 6KRO is only enabled in BIOS mode, and since we do not touch devices in bios mode,
-// we do not need to implement it.
+// we do not need to implement it for modern devices. Legacy devices seem to use 6KRO in one way or another.
 //
 // NKRO is enabled during normal operation. Key packets start with 0x01, media key packets with 0x02.
 // It does NOT get disabled when the keyboard is in software mode. Handled by hid_kb_translate()
@@ -719,7 +720,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     // If the response starts with CMD_GET (0x0e) for NXP, or it came from a bragi command EP, that means it needs to go to os_usbrecv()
     if(urblen == kb->out_ep_packet_size && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == kb->bragi_in_ep))){
 #ifdef DEBUG_USB_RECV
-    print_urb_buffer("Recv:", buffer, urblen, NULL, 0, NULL, INDEX_OF(targetkb, keyboard), (uchar)ep);
+        print_urb_buffer("Recv:", buffer, urblen, NULL, 0, NULL, INDEX_OF(targetkb, keyboard), (uchar)ep);
 #endif
         int retval = pthread_mutex_lock(intmutex(targetkb));
         if(retval)
@@ -739,11 +740,11 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     } else {
         queued_mutex_lock(imutex(targetkb));
 
-        if(IS_LEGACY_DEV(kb)) {
+        if(kb->protocol == PROTO_LEGACY) {
             if(IS_MOUSE_DEV(kb))
                 m95_mouse_translate(&kb->input, urblen, buffer);
             else
-                hid_kb_translate(kb->input.keys, urblen, buffer, 1);
+                hid_kb_translate(kb, urblen, buffer);
         } else {
             if(IS_MOUSE_DEV(targetkb)) {
                 // HID Mouse Input
@@ -927,7 +928,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                     // Accept NKRO only if device is not active, unless it's media keys and it's an original strafe with the media key bug
                     if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
                         if(!targetkb->active || (firstbyte == NKRO_MEDIA_IN && NXP_STRAFE_MEDIA_WORKAROUND(targetkb)))
-                            hid_kb_translate(targetkb->input.keys, urblen, buffer, 0);
+                            hid_kb_translate(targetkb, urblen, buffer);
                     } else if(urblen == MSG_SIZE) {
                         if((kb->fwversion >= 0x130 || IS_V2_OVERRIDE(kb)) && firstbyte == CORSAIR_IN) // Ugly hack due to old FW 1.15 packets having no report id
                             buffer++;
@@ -1030,42 +1031,64 @@ void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinpu
     }
 }
 
-void handle_legacy_6kro_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
-    // Clear previous input
-    for(int i = 0; i < 256; i++){
-        if(hid_codes[i] >= 0)
-            CLEAR_KEYBIT(kbinput, hid_codes[i]);
+static inline void handle_legacy_6kro_input(usbdevice* kb, const unsigned char* urbinput){
+    // urbinput MUST be 8 bytes
+    static_assert(sizeof(kb->previous_6kro) == 8, "previous_6kro is not 8 bytes");
+
+    // We can't unconditionally blank the keymap because that will cause keyups
+    // if there is a combination of NKRO for input and 6KRO for G keys.
+    // And due to how 6KRO works, there is no "fixed" position to tell what keys are up.
+    // So what we do is store a copy to use as "previous" keys, then we keyup those, and keydown the new ones
+
+    // First byte: modifier keys e0-e7
+    for(int bit = 0; bit < 8; bit++) {
+        // Clear the old ones
+        if((kb->previous_6kro[0] >> bit) & 1)
+            CLEAR_KEYBIT(kb->input.keys, hid_codes[bit + 224]);
+        // Apply the new ones
+        if((urbinput[0] >> bit) & 1)
+            SET_KEYBIT(kb->input.keys, hid_codes[bit + 224]);
     }
-    // Set new input
-    for(int i = 0; i < 8; i++){
-        if((urbinput[0] >> i) & 1)
-            SET_KEYBIT(kbinput, hid_codes[i + 224]);
-    }
-    for(int i = 2; i < length; i++){
-        if(urbinput[i] > 3){
-            int scan = hid_codes[urbinput[i]];
+
+    // One byte padding (according to the hid descriptor)
+
+    // Then the 6 reports for 6KRO, one byte each
+    // Do the same again
+    for(int i = 2; i < 8; i++){
+        // Key was pressed, clear it
+        if(kb->previous_6kro[i] > 3){
+            const int scan = hid_codes[kb->previous_6kro[i]];
             if(scan >= 0)
-                SET_KEYBIT(kbinput, scan);
+                CLEAR_KEYBIT(kb->input.keys, scan);
+        }
+
+        if(urbinput[i] > 3){
+            const int scan = hid_codes[urbinput[i]];
+            if(scan >= 0)
+                SET_KEYBIT(kb->input.keys, scan);
             else
                 ckb_warn("Got unknown legacy 6kro key press %d", urbinput[i]);
         }
     }
+
+    // Store new keys for the next run
+    memcpy(kb->previous_6kro, urbinput, sizeof(kb->previous_6kro));
 }
 
-void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* urbinput, int legacy){
-    if(legacy) {
+void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urbinput){
+    if(kb->protocol == PROTO_LEGACY) {
         switch(length) {
             case 2: // K65 Media keys
                 length = 1;
                 // fall through
             case 4: // Media Keys
-                handle_nkro_media_keys(kbinput, urbinput, length);
+                handle_nkro_media_keys(kb->input.keys, urbinput, length);
                 break;
             case 8: // G/MR Keys
-                handle_legacy_6kro_input(kbinput, urbinput, length);
+                handle_legacy_6kro_input(kb, urbinput);
                 break;
             case 15: // NKRO Input
-                handle_nkro_key_input(kbinput, urbinput, length, legacy);
+                handle_nkro_key_input(kb->input.keys, urbinput, length, 1);
                 break;
             default:
                 ckb_warn("Got unknown legacy data");
@@ -1073,10 +1096,10 @@ void hid_kb_translate(unsigned char* kbinput, int length, const unsigned char* u
     } else {
         switch(urbinput[0]) {
             case 0x01:
-                handle_nkro_key_input(kbinput, urbinput, length, legacy);
+                handle_nkro_key_input(kb->input.keys, urbinput, length, 0);
                 break;
             case 0x02:
-                handle_nkro_media_keys(kbinput, urbinput, length);
+                handle_nkro_media_keys(kb->input.keys, urbinput, length);
                 break;
             default:
                 ckb_warn("Got unknown data");

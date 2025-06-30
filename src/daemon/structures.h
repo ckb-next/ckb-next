@@ -217,6 +217,7 @@ typedef enum protocol_
 {
     PROTO_NXP,
     PROTO_BRAGI,
+    PROTO_LEGACY,
 } protocol_t;
 
 typedef enum pollrate_ {
@@ -385,6 +386,8 @@ typedef struct usbdevice_ {
         BRIGHTNESS_HARDWARE_COARSE,
     } brightness_mode;
     struct timespec last_rgb;
+    // Legacy devices only
+    unsigned char previous_6kro[8];
 } usbdevice;
 
 #endif  // STRUCTURES_H

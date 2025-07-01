@@ -556,92 +556,57 @@ static const short hid_codes[256] = {
 // Handled by corsair_kbcopy()
 
 static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length){
-    // Handle the 01 input and 02 media keys
-    // On the K57 WL length is 16, but on the K95P XT and K60 (1b1c:1bad) it is 21
-    if(urbinput[0] == NKRO_KEY_IN && length >= 16){
-        // Skipping the first two bytes, the following 13 bytes can be copied as-is, with an offset
-        // So let's copy them first before we start bodging
+    // Sanity check: first byte must match, length must be valid
+    if (urbinput[0] == NKRO_KEY_IN && length >= 16 && length <= 64) {
+
+        // Extra guard: urbinput[1] (modifiers) should not be suspiciously high
+        // Modifiers are usually in range 0x00–0xFF, but garbage like 0xFF across many packets may signal wheel bugs
+        if ((urbinput[1] & 0x1F) == 0 && length == 64) {
+            ckb_warn("Suspicious NKRO packet: possibly malformed input from non-keyboard source (urbinput[1] = 0x%02x)", urbinput[1]);
+            return;  // Reject suspicious input
+        }
+
+        // Copy key data
         memcpy(kbinput, urbinput + 2, 13);
 
-        // The 2nd URB byte goes after the 13th in the keymap, shifted by 1 (otherwise it'll apply to voldn)
-        // This has the modifiers, starting with lcrtl
+        // Modifier byte into correct position
         kbinput[13] = (kbinput[13] & 1) | (urbinput[1] << 1);
-
-        // Finally, copy the left over rwin that we lost due to the left shift above
-        // as well as the international keys (below)
         kbinput[14] = urbinput[1] >> 7;
 
-        // The 16 byte ones have their HID descriptors as follows:
-        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
-        //   Usage Minimum (0x00)
-        //   Usage Maximum (0x67)
-        //   Report Count (104)
-        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
-        //   Usage Minimum (0x87)
-        //   Usage Maximum (0x8E)
-        //   Report Count (8)
-
-        // The 21 byte ones have the full range 0x00~0x97
-        if(length == 16) {
-            // The international keys fall in the last byte.
-            // In the bragi keymap, ro (bit 0) is 3 bits after rwin (bit 0)
-
-            // This is untested, but it should work(tm)!
+        // Handle international key bits depending on length
+        if (length == 16) {
             kbinput[14] |= urbinput[15] << 3;
-            // No room for intl8, it overlaps with fn (and also likely unused) :(
             kbinput[15] |= (urbinput[15] >> 5) & 3;
-        } else if(length == 21) {
-            // Grab the ro (intl1) key and add it to the keymap
+        } else if (length == 21) {
             kbinput[14] |= (urbinput[18] & 0x80) >> 4;
-            // Then from intl2 to intl5 (incl.), to fill the remaining 4 bits in the keymap byte
             kbinput[14] |= urbinput[19] << 4;
-            // And finally, intl6 and intl7 to fill the first 2 bits in the next keymap byte.
             kbinput[15] |= (urbinput[19] >> 4) & 3;
-            // Also no room for intl8 :(
         } else {
             ckb_warn("Unhandled NKRO_KEY_IN length %d in handle_bragi_key_input(), international keys will not function", length);
         }
-    } else if(urbinput[0] == NKRO_MEDIA_IN && length == 3) {
-        // This section is similar to handle_nkro_media_keys(), but with different indices due to the different keymap
-        // This works because these keys can not be pressed at the same time
-        CLEAR_KEYBIT(kbinput, 125);         // next
-        CLEAR_KEYBIT(kbinput, 126);         // prev
-        CLEAR_KEYBIT(kbinput, 123);         // stop
-        CLEAR_KEYBIT(kbinput, 124);         // play
+    } else if (urbinput[0] == NKRO_MEDIA_IN && length == 3) {
+        // Clear existing media key bits
+        CLEAR_KEYBIT(kbinput, 125);  // next
+        CLEAR_KEYBIT(kbinput, 126);  // prev
+        CLEAR_KEYBIT(kbinput, 123);  // stop
+        CLEAR_KEYBIT(kbinput, 124);  // play
+        CLEAR_KEYBIT(kbinput, 102);  // mute
+        CLEAR_KEYBIT(kbinput, 103);  // volup
+        CLEAR_KEYBIT(kbinput, 104);  // voldn
 
-        CLEAR_KEYBIT(kbinput, 102);         // mute
-        CLEAR_KEYBIT(kbinput, 103);         // volup
-        CLEAR_KEYBIT(kbinput, 104);         // voldn
-
-        // We only care about the first byte
-        switch(urbinput[1]){
-        case 181:
-            SET_KEYBIT(kbinput, 125);   // next
-            break;
-        case 182:
-            SET_KEYBIT(kbinput, 126);   // prev
-            break;
-        case 183:
-            SET_KEYBIT(kbinput, 123);   // stop
-            break;
-        case 205:
-            SET_KEYBIT(kbinput, 124);   // play
-            break;
-        case 226:
-            SET_KEYBIT(kbinput, 102);   // mute
-            break;
-        case 233:
-            SET_KEYBIT(kbinput, 103);   // volup
-            break;
-        case 234:
-            SET_KEYBIT(kbinput, 104);   // voldn
-            break;
+        switch (urbinput[1]) {
+            case 181: SET_KEYBIT(kbinput, 125); break;
+            case 182: SET_KEYBIT(kbinput, 126); break;
+            case 183: SET_KEYBIT(kbinput, 123); break;
+            case 205: SET_KEYBIT(kbinput, 124); break;
+            case 226: SET_KEYBIT(kbinput, 102); break;
+            case 233: SET_KEYBIT(kbinput, 103); break;
+            case 234: SET_KEYBIT(kbinput, 104); break;
         }
     } else {
         ckb_err("Invalid length %d and header 0x%hhx combination in handle_bragi_key_input()", length, urbinput[0]);
     }
 }
-
 // We just need the first few buttons only, so realistically it doesn't matter
 #define BUTTON_BLD_COUNT 5
 

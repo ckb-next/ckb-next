@@ -237,6 +237,7 @@ typedef enum pollrate_ {
 #define KB_NAME_LEN         64
 #define SERIAL_LEN          35
 #define MSG_SIZE            64
+#define BRAGI_LARGE_SIZE    128
 #define BRAGI_JUMBO_SIZE    1024
 #define MAX_MSG_SIZE        BRAGI_JUMBO_SIZE
 #define IFACE_MAX           4

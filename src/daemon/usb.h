@@ -307,6 +307,9 @@ const char* product_str(ushort product);
 // Devices that use bragi jumbo packets (1024 bytes)
 #define USES_BRAGI_JUMBO(vendor, product)           ((vendor) == (V_CORSAIR) && ((product) == P_K100_OPTICAL || (product) == P_K100_MECHANICAL || (product) == P_K100_OPTICAL_VARIANT || (product) == P_K65_MINI || (product) == P_K70_TKL || (product) == P_K70_TKL_CHAMP_OPTIC || (product) == P_K70_PRO || (product) == P_K70_PRO_OPTIC))
 
+// Devices that use large bragi packets (128 bytes)
+#define USES_BRAGI_LARGE(vendor, product)           ((vendor) == (V_CORSAIR) && ((product) == 0))
+
 // Used for devices that have the scroll wheel packet in the hardware hid packet only
 #define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO))
 

@@ -367,6 +367,8 @@ void fill_usbdevice_protocol(usbdevice* kb){
 
     if(USES_BRAGI_JUMBO(kb->vendor, kb->product))
         kb->out_ep_packet_size = BRAGI_JUMBO_SIZE;
+    else if(USES_BRAGI_LARGE(kb->vendor, kb->product))
+        kb->out_ep_packet_size = BRAGI_LARGE_SIZE;
     else
         kb->out_ep_packet_size = MSG_SIZE;
 

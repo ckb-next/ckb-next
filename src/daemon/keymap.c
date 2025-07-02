@@ -645,7 +645,7 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
     }
 }
 
-void handle_bragi_media_keys(usbdevice* targetkb){
+static inline void handle_bragi_media_keys(usbdevice* targetkb){
     if(BRAGI_HAS_MEDIA_MACRO(targetkb)){
         if(IS_K60PRORGB(targetkb)){
             // if Fn is pressed

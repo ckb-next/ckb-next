@@ -93,6 +93,7 @@ public:
         K70_TKL,
         MM700,
         K70_PRO,
+        K70_CORE_RGB,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

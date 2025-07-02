@@ -935,10 +935,10 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
 
             // This is the media button that defaults to play
             // We already have a play Fn button so we want to map it to something else so it can be programmed
-            map["g1"] = { nullptr,  "G1", "g1", 227, 14, 16, 11, false, true};
+            map["mr"] = { nullptr,  "Macro", "mr", 227, 14, 16, 11, false, true};
 
             // K70 Core RGB has a volume knob that can be pressed
-            map["dialpress"] = {nullptr,  "Mute", "mute",  259, 14, NS, false, true};
+            map["dialpress"] = {nullptr,  "Dial", "dialpress",  259, 14, NS, false, true};
 
             // Replace rwin with Fn
             map["fn"] = KStrafeKeys[3];

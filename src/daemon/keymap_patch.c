@@ -97,7 +97,7 @@ keypatch k70propatch[] = {
 
 keypatch k70corergbpatch[] = {
     { 124, "mr",    -1, KEY_CORSAIR },
-    { 127, "play", /*...*/ },
+    { 127, "play",  -1, KEY_PLAY },
 };
 
 #define ADD_PATCH(vendor, product, patch) \

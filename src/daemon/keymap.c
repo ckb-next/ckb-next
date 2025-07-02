@@ -559,6 +559,12 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
     // Handle the 01 input and 02 media keys
     // On the K57 WL length is 16, but on the K95P XT and K60 (1b1c:1bad) it is 21
     if(urbinput[0] == NKRO_KEY_IN && length >= 16){
+        // Extra guard: urbinput[1] (modifiers) should not be suspiciously high
+        // Modifiers are usually in range 0x00–0xFF, but garbage like 0xFF across many packets may signal wheel bugs
+        if ((urbinput[1] & 0x1F) == 0 && length == 64) {
+            ckb_warn("Suspicious NKRO packet: possibly malformed input from non-keyboard source (urbinput[1] = 0x%02x)", urbinput[1]);
+            return;  // Reject suspicious input
+        }
         // Skipping the first two bytes, the following 13 bytes can be copied as-is, with an offset
         // So let's copy them first before we start bodging
         memcpy(kbinput, urbinput + 2, 13);

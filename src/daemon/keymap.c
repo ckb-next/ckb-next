@@ -794,45 +794,106 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                             corsair_kbcopy(targetkb->input.keys, buffer + 2);
                             // Check if we need to apply an awful hack to get media keys working
                             if(BRAGI_HAS_MEDIA_MACRO(targetkb)){
-                                // if Fn is pressed
-                                if(ISSET_KEYBIT(targetkb->input.keys, 122)){
-                                    // As awful as this hack
-                                    bool matched = true;
-                                    if(ISSET_KEYBIT(targetkb->input.keys, 62)) { // F5 -> mute
-                                        CLEAR_KEYBIT(targetkb->input.keys, 62);
-                                        SET_KEYBIT(targetkb->input.keys, 102);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 64)) { // F7 -> voldn
-                                        CLEAR_KEYBIT(targetkb->input.keys, 64);
-                                        SET_KEYBIT(targetkb->input.keys, 104);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 65)) { // F8 -> volup
-                                        CLEAR_KEYBIT(targetkb->input.keys, 65);
-                                        SET_KEYBIT(targetkb->input.keys, 103);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 66)) { // F9 -> stop
-                                        CLEAR_KEYBIT(targetkb->input.keys, 66);
-                                        SET_KEYBIT(targetkb->input.keys, 123);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 67)) { // F10 -> prev
-                                        CLEAR_KEYBIT(targetkb->input.keys, 67);
-                                        SET_KEYBIT(targetkb->input.keys, 126);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 68)) { // F11 -> playpause
-                                        CLEAR_KEYBIT(targetkb->input.keys, 68);
-                                        SET_KEYBIT(targetkb->input.keys, 124);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 69)) { // F12 -> next
-                                        CLEAR_KEYBIT(targetkb->input.keys, 69);
-                                        SET_KEYBIT(targetkb->input.keys, 125);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 58)) { // F1 -> winlock
-                                        CLEAR_KEYBIT(targetkb->input.keys, 58);
-                                        SET_KEYBIT(targetkb->input.keys, 114);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 60)) { // F3 -> brightnessdn (not supported, map to generic "light")
-                                        CLEAR_KEYBIT(targetkb->input.keys, 60);
-                                        SET_KEYBIT(targetkb->input.keys, 113);
-                                    } else if (ISSET_KEYBIT(targetkb->input.keys, 61)) { // F4 -> brightnessup (not supported, map to generic "light")
-                                        CLEAR_KEYBIT(targetkb->input.keys, 61);
-                                        SET_KEYBIT(targetkb->input.keys, 113);
-                                    } else {
-                                        matched = false;
+                                if(IS_K60PRORGB(targetkb)){
+                                    // if Fn is pressed
+                                    if(ISSET_KEYBIT(targetkb->input.keys, 122)){
+                                        // As awful as this hack
+                                        bool matched = true;
+                                        if(ISSET_KEYBIT(targetkb->input.keys, 62)) { // F5 -> mute
+                                            CLEAR_KEYBIT(targetkb->input.keys, 62);
+                                            SET_KEYBIT(targetkb->input.keys, 102);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 64)) { // F7 -> voldn
+                                            CLEAR_KEYBIT(targetkb->input.keys, 64);
+                                            SET_KEYBIT(targetkb->input.keys, 104);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 65)) { // F8 -> volup
+                                            CLEAR_KEYBIT(targetkb->input.keys, 65);
+                                            SET_KEYBIT(targetkb->input.keys, 103);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 66)) { // F9 -> stop
+                                            CLEAR_KEYBIT(targetkb->input.keys, 66);
+                                            SET_KEYBIT(targetkb->input.keys, 123);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 67)) { // F10 -> prev
+                                            CLEAR_KEYBIT(targetkb->input.keys, 67);
+                                            SET_KEYBIT(targetkb->input.keys, 126);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 68)) { // F11 -> playpause
+                                            CLEAR_KEYBIT(targetkb->input.keys, 68);
+                                            SET_KEYBIT(targetkb->input.keys, 124);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 69)) { // F12 -> next
+                                            CLEAR_KEYBIT(targetkb->input.keys, 69);
+                                            SET_KEYBIT(targetkb->input.keys, 125);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 58)) { // F1 -> winlock
+                                            CLEAR_KEYBIT(targetkb->input.keys, 58);
+                                            SET_KEYBIT(targetkb->input.keys, 114);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 60)) { // F3 -> brightnessdn (not supported, map to generic "light")
+                                            CLEAR_KEYBIT(targetkb->input.keys, 60);
+                                            SET_KEYBIT(targetkb->input.keys, 113);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 61)) { // F4 -> brightnessup (not supported, map to generic "light")
+                                            CLEAR_KEYBIT(targetkb->input.keys, 61);
+                                            SET_KEYBIT(targetkb->input.keys, 113);
+                                        } else {
+                                            matched = false;
+                                        }
+                                        if(matched)
+                                            CLEAR_KEYBIT(targetkb->input.keys, 122);
                                     }
-                                    if(matched)
-                                        CLEAR_KEYBIT(targetkb->input.keys, 122);
+                                }else if(IS_K70CORERGB(targetkb)){
+                                    // As awful as this hack
+                                    if(ISSET_KEYBIT(targetkb->input.keys, 124)) { // The play/pause key next to the volume knob
+                                        // We have a play/pause function key so set this to something else
+                                        CLEAR_KEYBIT(targetkb->input.keys, 124);
+                                        SET_KEYBIT(targetkb->input.keys, 131); // G1
+                                    }
+
+                                    // if Fn is pressed
+                                    if(ISSET_KEYBIT(targetkb->input.keys, 122)){
+                                        bool matched = true;
+                                        if(ISSET_KEYBIT(targetkb->input.keys, 62)) { // F5 -> stop
+                                            CLEAR_KEYBIT(targetkb->input.keys, 62);
+                                            SET_KEYBIT(targetkb->input.keys, 123);
+                                        } if(ISSET_KEYBIT(targetkb->input.keys, 63)) { // F6 -> prev
+                                            CLEAR_KEYBIT(targetkb->input.keys, 63);
+                                            SET_KEYBIT(targetkb->input.keys, 126);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 64)) { // F7 -> play/pause
+                                            CLEAR_KEYBIT(targetkb->input.keys, 64);
+                                            SET_KEYBIT(targetkb->input.keys, 124);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 65)) { // F8 -> next
+                                            CLEAR_KEYBIT(targetkb->input.keys, 65);
+                                            SET_KEYBIT(targetkb->input.keys, 125);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 69)) { // F12 -> supposed to switch knob function (map to ctrlwheelb)
+                                            CLEAR_KEYBIT(targetkb->input.keys, 69);
+                                            SET_KEYBIT(targetkb->input.keys, 137);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 58)) { // F1 -> winlock
+                                            CLEAR_KEYBIT(targetkb->input.keys, 58);
+                                            SET_KEYBIT(targetkb->input.keys, 114);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 59)) { // F2 -> profile switch
+                                            CLEAR_KEYBIT(targetkb->input.keys, 59);
+                                            SET_KEYBIT(targetkb->input.keys, 128);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 60)) { // F3 -> brightnessdn (not supported, map to generic "light")
+                                            CLEAR_KEYBIT(targetkb->input.keys, 60);
+                                            SET_KEYBIT(targetkb->input.keys, 113);
+                                        } else if (ISSET_KEYBIT(targetkb->input.keys, 61)) { // F4 -> brightnessup (not supported, map to generic "light")
+                                            CLEAR_KEYBIT(targetkb->input.keys, 61);
+                                            SET_KEYBIT(targetkb->input.keys, 113);
+                                        } else {
+                                            matched = false;
+                                        }
+                                        if(matched)
+                                            CLEAR_KEYBIT(targetkb->input.keys, 122);
+                                    }
+                                }
+                            }
+                        } else if(buffer[1] == BRAGI_INPUT_DIAL) {
+                            if(IS_K70CORERGB(targetkb)){ // || IS_K65_PLUS(targetkb)
+                                #define MEDIA_MASK 0x60
+                                if(buffer[1] == BRAGI_INPUT_DIAL && buffer[2] == MEDIA_MASK) {
+                                    // This is a packet from the volume dial
+                                    // We need to handle it appropriately then clear the keys so we stop getting garbage
+                                    if(buffer[4] == 0x01) {
+                                        // Apply fresh key data
+                                        SET_KEYBIT(targetkb->input.keys, 103); // volup
+                                    } else if(buffer[4] == 0xFF && buffer[5] == 0xFF && buffer[6] == 0xFF && buffer[7] == 0xFF) {
+                                        // Apply fresh key data
+                                        SET_KEYBIT(targetkb->input.keys, 104); // voldn
+                                    }
                                 }
                             }
                         } else {

@@ -28,7 +28,7 @@ static const keypatch m95patch[] = {
 
 };
 
-static const keypatch nightsabrepatch[] = {
+static const keypatch nightsabrewlpatch[] = {
     { 230, "mouse5",  -1, SCAN_MOUSE | BTN_EXTRA },
     { 231, "mouse4",  -1, SCAN_MOUSE | BTN_SIDE },
     { 233, "dpiup",   -1, KEY_CORSAIR },
@@ -131,7 +131,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_TKL_CHAMP_OPTIC, k70tklpatch),
     ADD_PATCH(V_CORSAIR, P_K70_PRO,       k70propatch),
     ADD_PATCH(V_CORSAIR, P_K70_PRO_OPTIC, k70propatch),
-    ADD_PATCH(V_CORSAIR, P_NIGHTSABRE_WL, nightsabrepatch),
+    ADD_PATCH(V_CORSAIR, P_NIGHTSABRE_WL, nightsabrewlpatch),
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

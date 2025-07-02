@@ -636,6 +636,8 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         case 234:
             SET_KEYBIT(kbinput, 104);   // voldn
             break;
+        case 0:
+            break; // key up
         default:
             ckb_err("Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_bragi_key_input()", length, urbinput[1]);
             break;

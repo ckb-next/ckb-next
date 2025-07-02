@@ -609,6 +609,34 @@ static const Key IronclawWirelessKeys[] = {
 #define IRONCLAW_W_WIDTH       52
 #define IRONCLAW_W_HEIGHT      67
 
+// Mouse map - Nightsabre RGB Wireless
+static const Key NightsabreWirelessKeys[] = {
+    // primary keys
+    {nullptr,  "Left Mouse",   "mouse1",   12,  0, 12, 28, false, true  },
+    {nullptr,  "Right Mouse",  "mouse2",   31,  0, 12, 28, false, true  },
+
+    // center column keys
+    {nullptr,  "Wheel Up",     "wheelup",  23,  3,  8,  7, false, true  },
+    {nullptr,  "Middle Mouse",  "mouse3",  23,  7,  8,  6, false, true  },
+    {nullptr,  "Wheel Down",   "wheeldn",  23, 12,  8,  7, false, true  },
+    {nullptr,  "Profile Up",    "profup",  26, 26,  9,  9, false, true  },
+    {nullptr,  "Profile Dn",    "profdn",  18, 26,  8,  9, false, true  },
+
+    // left side forward/back keys
+    {nullptr,  "DPI Up",        "dpiup",    6,  4,  6,  9, false, true  },
+    {nullptr,  "DPI Dn",        "dpidn",    6, 10,  6,  9, false, true  },
+    {nullptr,  "Forward",      "mouse5",    6, 20,  5, 12, false, true  },
+    {nullptr, "Back",         "mouse4",    7, 32,  5, 12, false, true  },
+
+    // zones for LEDs
+    // TODO
+    
+};
+#define KEYCOUNT_NIGHTSABRE    (sizeof(NightsabreWirelessKeys) / sizeof(Key))
+
+#define NIGHTSABRE_WIDTH       72
+#define NIGHTSABRE_HEIGHT      M65_HEIGHT
+
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
 #define N_LAYOUTS   KeyMap::_LAYOUT_MAX
@@ -1430,6 +1458,15 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::NIGHTSABRE_WL:{
+        for(const Key* key = NightsabreWirelessKeys; key < NightsabreWirelessKeys + KEYCOUNT_NIGHTSABRE; key++){
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
 
@@ -1695,6 +1732,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K65_MINI;
     if(lower == "k70pro")
         return K70_PRO;
+    if(lower == "nightsabre")
+        return NIGHTSABRE_WL;
     return NO_MODEL;
 }
 
@@ -1782,6 +1821,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k65_mini";
     case K70_PRO:
         return "k70pro";
+    case NIGHTSABRE_WL:
+        return "nightsabre";
     default:
         return "";
     }
@@ -1852,6 +1893,8 @@ int KeyMap::modelWidth(Model model){
         return M65_WIDTH;
     case MM700:
         return MM700_WIDTH;
+    case NIGHTSABRE_WL:
+        return NIGHTSABRE_WIDTH;
     default:
         return 0;
     }
@@ -1908,6 +1951,8 @@ int KeyMap::modelHeight(Model model){
         return M65_HEIGHT;
     case MM700:
         return MM700_HEIGHT;
+    case NIGHTSABRE_WL:
+        return NIGHTSABRE_HEIGHT;
     default:
         return 0;
     }

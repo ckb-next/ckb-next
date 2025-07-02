@@ -938,7 +938,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map["mr"] = { nullptr,  "Macro", "mr", 227, 14, 16, 11, false, true};
 
             // K70 Core RGB has a volume knob that can be pressed
-            map["dialpress"] = {nullptr,  "Dial", "dialpress",  259, 14, NS, false, true};
+            map["mute"] = {nullptr,  "Mute", "mute",  259, 14, NS, false, true};
 
             // Replace rwin with Fn
             map["fn"] = KStrafeKeys[3];

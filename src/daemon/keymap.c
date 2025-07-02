@@ -882,18 +882,18 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                                 }
                             }
                         } else if(buffer[1] == BRAGI_INPUT_DIAL) {
-                            if(IS_K70CORERGB(targetkb)){ // || IS_K65_PLUS(targetkb)
-                                #define MEDIA_MASK 0x60
-                                if(buffer[1] == BRAGI_INPUT_DIAL && buffer[2] == MEDIA_MASK) {
-                                    // This is a packet from the volume dial
-                                    // We need to handle it appropriately then clear the keys so we stop getting garbage
-                                    if(buffer[4] == 0x01) {
-                                        // Apply fresh key data
-                                        SET_KEYBIT(targetkb->input.keys, 103); // volup
-                                    } else if(buffer[4] == 0xFF && buffer[5] == 0xFF && buffer[6] == 0xFF && buffer[7] == 0xFF) {
-                                        // Apply fresh key data
-                                        SET_KEYBIT(targetkb->input.keys, 104); // voldn
-                                    }
+                            #define MEDIA_MASK 0x60
+                            if(buffer[1] == BRAGI_INPUT_DIAL && buffer[2] == MEDIA_MASK) {
+                                // This is a packet from the volume dial
+                                // We need to handle it appropriately then clear the keys so we stop getting garbage
+                                int32_t wheel;
+                                memcpy(&wheel, buffer + 4, sizeof(int32_t));
+                                if(wheel > 0) {
+                                    // Apply fresh key data
+                                    SET_KEYBIT(targetkb->input.keys, 103); // volup
+                                } else {
+                                    // Apply fresh key data
+                                    SET_KEYBIT(targetkb->input.keys, 104); // voldn
                                 }
                             }
                         } else {

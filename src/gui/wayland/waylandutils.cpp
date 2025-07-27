@@ -113,7 +113,11 @@ Q_GLOBAL_STATIC(WaylandUtilsHelper, g_helper)
 bool hasInterface(const QString &name, quint32 version)
 {
     auto it = std::find_if(g_helper->m_registerData.constBegin(), g_helper->m_registerData.constEnd(), [&name, &version](const RegistryData& data){
-        return data.interfaceName == name && data.version == version;
+        const bool matched = data.interfaceName == name;
+        if (version == 0) {
+            return matched;
+        }
+        return matched && data.version == version;
     });
     return it != g_helper->m_registerData.constEnd();
 }

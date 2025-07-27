@@ -14,7 +14,7 @@ namespace WaylandUtils
 bool isWayland();
 
 #ifdef USE_WAYLAND
-bool hasInterface(const QString &name, quint32 version);
+bool hasInterface(const QString &name, quint32 version = 0);
 
 wl_display *display();
 wl_seat *seat();

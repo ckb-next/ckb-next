@@ -27,7 +27,7 @@
 
 add_executable(ckb-next "")
 set_property(TARGET ckb-next PROPERTY AUTOGEN_TARGET_DEPENDS ckb-next-lrelease)
-add_custom_target(gui DEPENDS ckb-next)
+add_custom_target(gui DEPENDS ckb-next ckb-next-sinfo animations)
 
 # Declare we want macOS Bundle
 if (MACOS)

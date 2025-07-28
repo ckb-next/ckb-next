@@ -52,7 +52,7 @@ public:
 };
 
 WaylandIdleTimer::WaylandIdleTimer()
-    : m_supported{WaylandUtils::hasInterface("ext_idle_notifier_v1", 1)}
+    : m_supported{WaylandUtils::hasInterface("ext_idle_notifier_v1")}
 {
     if (m_supported) {
         auto seat = WaylandUtils::seat();

@@ -22,6 +22,13 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     ui(new Ui::AnimSettingDialog), stopCheck(nullptr), kpStopCheck(nullptr),
     _anim(anim), lastDuration(1.0)
 {
+// Re-declare checkStateChanged() signal if Qt Version is below 6.7.0.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    void (QCheckBox::*checkStateChanged)(Qt::CheckState) = &QCheckBox::checkStateChanged;
+#else // QT_VERSION < 6.7.0
+    void (QCheckBox::*checkStateChanged)(int) = &QCheckBox::stateChanged;
+#endif
+
     ui->setupUi(this);
     setWindowTitle(anim->scriptName() + tr(" Animation"));
     ui->animName->setText(anim->name());
@@ -58,7 +65,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             widget = new QCheckBox(param.prefix, this);
             ((QCheckBox*)widget)->setChecked(value.toBool());
             colSpan = 4;
-            connect((QCheckBox*)widget, &QCheckBox::stateChanged, [=] () {
+            connect((QCheckBox*)widget, checkStateChanged, [=] () {
                 emit updateParam(param.name);
             });
             break;
@@ -223,7 +230,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     check->setChecked(anim->parameter("trigger").toBool());
     ui->settingsGrid->addWidget(check, row, 3, 1, 4);
     settingWidgets["trigger"] = check;
-    connect(check, &QCheckBox::stateChanged, [=] () {
+    connect(check, checkStateChanged, [=] () {
         emit updateParam("trigger");
     });
     row++;
@@ -231,7 +238,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
     check->setChecked(anim->parameter("kptrigger").toBool());
     ui->settingsGrid->addWidget(check, row, 3, 1, 2);
     settingWidgets["kptrigger"] = check;
-    connect(check, &QCheckBox::stateChanged, [=] () {
+    connect(check, checkStateChanged, [=] () {
         emit updateParam("kptrigger");
     });
     // Add an option allowing the user to select keypress mode
@@ -526,6 +533,10 @@ void AnimSettingDialog::on_kpRepeatBox_valueChanged(double arg1){
     updateParam("kprepeat");
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+void AnimSettingDialog::on_kpReleaseBox_checkStateChanged(Qt::CheckState arg1){
+#else // QT_VERSION < 6.7.0
 void AnimSettingDialog::on_kpReleaseBox_stateChanged(int arg1){
+#endif
     updateParam("kprelease");
 }

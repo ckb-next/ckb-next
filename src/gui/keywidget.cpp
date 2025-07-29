@@ -204,8 +204,7 @@ void KeyWidget::map(const KeyMap& newMap){
             _overlayPos.setY(-2.f);
             break;
         case KeyMap::DARKSTAR:
-            // TODO: darkstar overlay
-            _currentOverlay.load(":/img/overlay_m95.png");
+            _currentOverlay.load(":/img/overlay_darkstar.png");
             _overlayPos.setX(30.f);
             break;
         case KeyMap::ST100: // Entries without overlays should not be added here. This will (hopefully) be moved.

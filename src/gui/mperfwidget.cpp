@@ -286,8 +286,6 @@ void MPerfWidget::setDarkCore(){
 
     for(size_t i = 0; i < sizeof(w) / sizeof(QWidget*); i++)
         w[i]->hide();
-
-    ui->label_12->setText("Value");
 }
 
 void MPerfWidget::setDarkStar() {
@@ -313,6 +311,8 @@ void MPerfWidget::setDarkStar() {
 
     for(size_t i = 0; i < sizeof(w) / sizeof(QWidget*); i++)
         w[i]->hide();
+
+    ui->label_12->setText("Value");
 }
 
 void MPerfWidget::boxXChanged(int index){

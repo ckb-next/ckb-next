@@ -611,25 +611,25 @@ static const Key IronclawWirelessKeys[] = {
 
 // Mouse map - Darkstar RGB Wireless
 static const Key DarkstarKeys[] = {
-        {nullptr,  "Left Mouse",   "mouse1",   37,  0, 8, 28, false, true  },
-        {nullptr,  "Right Mouse",  "mouse2",   62,  0, 8, 28, false, true  },
+        {nullptr,  "Left Mouse",   "mouse1",   36,  2, 8, 28, false, true  },
+        {nullptr,  "Right Mouse",  "mouse2",   54,  2, 8, 28, false, true  },
 
         // center column keys
-        {nullptr,  "Wheel Up",     "wheelup",  50,  2,  8,  7, false, true  },
-        {nullptr,  "Middle Mouse",  "mouse3",  50,  7,  8,  6, false, true  },
-        {nullptr,  "Wheel Down",   "wheeldn",  50, 12,  8,  7, false, true  },
+        {nullptr,  "Wheel Up",     "wheelup",  46,  3,  7,  6, false, true  },
+        {nullptr,  "Middle Mouse",  "mouse3",  46,  9,  7,  9, false, true  },
+        {nullptr,  "Wheel Down",   "wheeldn",  46, 17,  7,  6, false, true  },
 
         // mouse wheel side-to-side
-        {nullptr, "Wheel Left", "wheellf", 45, 6, 5, 6, false, true},
-        {nullptr, "Wheel Right", "wheelrg", 59, 6, 5, 6, false, true},
+        {nullptr, "Wheel Left", "wheellf", 43, 8, 4, 10, false, true},
+        {nullptr, "Wheel Right", "wheelrg", 51, 8, 4, 10, false, true},
 
         // profile keys
-        {nullptr,  "Profile Up",    "profup",  50, 18,  8,  9, false, true  },
-        {nullptr,  "Profile Dn",    "profdn",  50, 26,  8,  9, false, true  },
+        {nullptr,  "Profile Up",    "profup",  47, 24,  5,  7, false, true  },
+        {nullptr,  "Profile Dn",    "profdn",  47, 31,  5,  7, false, true  },
 
         // dpi keys
-        {nullptr,  "DPI Up",        "dpiup",    31,  4,  6,  9, false, true  },
-        {nullptr,  "DPI Down",        "dpidn",    31, 10,  6,  9, false, true  },
+        {nullptr,  "DPI Up",        "dpiup",    32,  4,  5,  12, false, true  },
+        {nullptr,  "DPI Down",        "dpidn",    32, 15,  5,  12, false, true  },
 
         // thumb keys
         {nullptr,  "Thumb 1",        "thumb1",    0,  30,  8,  8, false, true  },

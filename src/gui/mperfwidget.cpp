@@ -8,6 +8,13 @@ const static QString xyLinkPath = "UI/DPI/UnlinkXY";
 
 MPerfWidget::MPerfWidget(QWidget *parent) :
     QWidget(parent), ui(new Ui::MPerfWidget), perf(nullptr), profile(nullptr), _xyLink(!CkbSettings::get(xyLinkPath).toBool()), colorLink(false), isSetting(false), isDarkCore(false) {
+// Re-declare checkStateChanged() signal if Qt Version is below 6.7.0.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    void (QCheckBox::*checkStateChanged)(Qt::CheckState) = &QCheckBox::checkStateChanged;
+#else // QT_VERSION < 6.7.0
+    void (QCheckBox::*checkStateChanged)(int) = &QCheckBox::stateChanged;
+#endif
+
     ui->setupUi(this);
     ui->xyBox->setChecked(!_xyLink);
     // Set up DPI stages
@@ -64,7 +71,7 @@ MPerfWidget::MPerfWidget(QWidget *parent) :
         });
         if(stages[i].enableCheck)
             // Sniper has no enable
-            connect(stages[i].enableCheck, &QCheckBox::stateChanged, [=] () {
+            connect(stages[i].enableCheck, checkStateChanged, [=] () {
                 emit enableChanged(i);
             });
         // Hide indicator arrows

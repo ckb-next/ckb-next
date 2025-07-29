@@ -68,7 +68,11 @@ private slots:
     void modeChanged();
     void currentSelectionChanged(const QModelIndex& current, const QModelIndex& previous);
     void on_modesList_customContextMenuRequested(const QPoint &pos);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    void batteryTrayBox_checkStateChanged(Qt::CheckState);
+#else // QT_VERSION < 6.7.0
     void batteryTrayBox_stateChanged(int state);
+#endif
 
     void devUpdate();
     void updateBattery(uint battery, BatteryStatus charging);

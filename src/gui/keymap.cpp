@@ -609,6 +609,42 @@ static const Key IronclawWirelessKeys[] = {
 #define IRONCLAW_W_WIDTH       52
 #define IRONCLAW_W_HEIGHT      67
 
+// Mouse map - Darkstar RGB Wireless
+static const Key DarkstarKeys[] = {
+        {nullptr,  "Left Mouse",   "mouse1",   37,  0, 8, 28, false, true  },
+        {nullptr,  "Right Mouse",  "mouse2",   62,  0, 8, 28, false, true  },
+
+        // center column keys
+        {nullptr,  "Wheel Up",     "wheelup",  50,  2,  8,  7, false, true  },
+        {nullptr,  "Middle Mouse",  "mouse3",  50,  7,  8,  6, false, true  },
+        {nullptr,  "Wheel Down",   "wheeldn",  50, 12,  8,  7, false, true  },
+
+        // mouse wheel side-to-side
+        {nullptr, "Wheel Left", "wheellf", 45, 6, 5, 6, false, true},
+        {nullptr, "Wheel Right", "wheelrg", 59, 6, 5, 6, false, true},
+
+        // profile keys
+        {nullptr,  "Profile Up",    "profup",  50, 18,  8,  9, false, true  },
+        {nullptr,  "Profile Dn",    "profdn",  50, 26,  8,  9, false, true  },
+
+        // dpi keys
+        {nullptr,  "DPI Up",        "dpiup",    31,  4,  6,  9, false, true  },
+        {nullptr,  "DPI Down",        "dpidn",    31, 10,  6,  9, false, true  },
+
+        // thumb keys
+        {nullptr,  "Thumb 1",        "thumb1",    0,  30,  8,  8, false, true  },
+        {nullptr,  "Thumb 2",        "thumb2",    0,  24,  8,  8, false, true  },
+        {nullptr,  "Thumb 3",      "thumb3",    0,     18,  14, 8, false, true  },
+        {nullptr,  "Thumb 4",         "thumb4",    12, 18,  14, 8, false, true  },
+        {nullptr,  "Thumb 5",          "thumb5",    18, 24,  8,  8, false, true  },
+        {nullptr,  "Thumb 6",          "thumb6",    18, 30,  8,  8, false, true  },
+};
+
+#define KEYCOUNT_DARKSTAR_W    (sizeof(DarkstarKeys) / sizeof(Key))
+
+#define DARKSTAR_WIDTH       72
+#define DARKSTAR_HEIGHT      67
+
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
 #define N_LAYOUTS   KeyMap::_LAYOUT_MAX
@@ -1454,6 +1490,17 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::DARKSTAR:{
+        for(const Key* key = DarkstarKeys; key < DarkstarKeys + KEYCOUNT_DARKSTAR_W; key++){
+            // Keyboard keys are written from the center because that's where the LEDs are, but the mouse buttons are odd shapes so they're
+            // written from the upper left
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
 
@@ -1721,6 +1768,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70_PRO;
     if(lower == "k70_core_rgb")
         return K70_CORE_RGB;
+    if(lower == "darkstar")
+        return DARKSTAR;
     return NO_MODEL;
 }
 
@@ -1810,6 +1859,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70pro";
     case K70_CORE_RGB:
         return "k70_core_rgb";
+    case DARKSTAR:
+        return "darkstar";
     default:
         return "";
     }
@@ -1882,6 +1933,8 @@ int KeyMap::modelWidth(Model model){
         return M65_WIDTH;
     case MM700:
         return MM700_WIDTH;
+    case DARKSTAR:
+        return DARKSTAR_WIDTH;
     default:
         return 0;
     }
@@ -1939,6 +1992,8 @@ int KeyMap::modelHeight(Model model){
         return M65_HEIGHT;
     case MM700:
         return MM700_HEIGHT;
+    case DARKSTAR:
+        return DARKSTAR_HEIGHT;
     default:
         return 0;
     }
@@ -2027,6 +2082,9 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     if(map.contains(key))
         return map.key(key).friendlyName();
     map = KeyMap(IRONCLAW_W, layout);
+    if(map.contains(key))
+        return map.key(key).friendlyName();
+    map = KeyMap(DARKSTAR, layout);
     if(map.contains(key))
         return map.key(key).friendlyName();
 

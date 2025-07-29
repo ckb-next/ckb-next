@@ -1217,6 +1217,25 @@ const unsigned char m55_wl_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
     0x08, //dpi up?
 };
 
+const unsigned char darkstar_lut[BRAGI_MOUSE_BUTTONS] = {
+    0x00, // left
+    0x01, // right
+    0x02, // middle
+    30, // scroll left
+    31, // scroll right
+    9, // thumb leftmost
+    8, // thumb bottom left
+    12, // thumb right
+    13, // thumb bottom right
+    10, // thumb top left
+    11, // thumb top right
+    5, // dpi up
+    6, // dpi down
+    22, // profile up
+    23, // profile down
+    21, // NONE
+};
+
 void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput){
     // Increment this only once, as the loop below will increment it the first time as well
     // to skip the 00 02 header.
@@ -1235,6 +1254,8 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
         lut = harpoon_wl_lut;
     else if(kb->vendor == V_CORSAIR && kb->product == P_M55_RGB_PRO)
         lut = m55_wl_lut;
+    else if(kb->vendor == V_CORSAIR && kb->product == P_DARKSTAR)
+        lut = darkstar_lut;
 
     for(int bit = 0; bit < buttons; bit++){
         int bitinbyte = bit % 8;

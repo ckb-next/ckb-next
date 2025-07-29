@@ -39,6 +39,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_DARK_CORE_RGB_PRO, 18000 },
     { P_DARK_CORE_RGB_PRO_SE, 18000 },
     { P_GLAIVE_PRO, 16000 },
+    { P_DARKSTAR, 26000 },
     { 0, 0 }, // Keep last and do not remove
 };
 
@@ -130,6 +131,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_HARPOON_WL_U, },
     { V_CORSAIR, P_HARPOON_WL_D, },
     { V_CORSAIR, P_GLAIVE_PRO, },
+    { V_CORSAIR, P_DARKSTAR, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     { V_CORSAIR, P_MM700, },
@@ -283,6 +285,8 @@ const char* product_str(ushort product){
         return "bragi_dongle";
     if(product == P_MM700)
         return "mm700";
+    if(product == P_DARKSTAR)
+        return "darkstar";
     return "";
 }
 

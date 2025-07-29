@@ -184,6 +184,9 @@
 #define P_ST100              0x0a34
 #define IS_ST100(kb)         ((kb)->vendor == V_CORSAIR && ((kb)->product == P_ST100))
 
+#define P_DARKSTAR           0x1bb2
+#define IS_DARKSTAR(kb) ((kb)->vendor == V_CORSAIR && (kb)->product == P_DARKSTAR)
+
 #define P_GENERIC_BRAGI_DONGLE 0x1ba6
 
 extern const size_t N_MODELS;
@@ -245,7 +248,7 @@ const char* product_str(ushort product);
 #define IS_FULLRANGE(kb)                ((kb)->product != P_K65 && (kb)->product != P_K70 && (kb)->product != P_K95 && (kb)->product != P_STRAFE_NRGB)
 
 /// Mouse vs keyboard test
-#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M55_RGB_PRO) || (product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_KATAR_PRO) || (product) == (P_KATAR_PRO_XT) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_DARK_CORE_RGB_PRO) || (product) == (P_DARK_CORE_RGB_PRO_WL) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_GLAIVE_PRO))
+#define IS_MOUSE(vendor, product)       ((vendor) == (V_CORSAIR) && ((product) == (P_M55_RGB_PRO) || (product) == (P_M65) || (product) == (P_M65_PRO) || (product) == (P_M65_RGB_ELITE) || (product) == (P_M95) || (product) == (P_SABRE_O) || (product) == (P_SABRE_L) || (product) == (P_SABRE_N) || (product) == (P_SCIMITAR) || (product) == (P_SCIMITAR_PRO) || (product) == (P_SCIMITAR_ELITE) || (product) == (P_SABRE_O2) || (product) == (P_GLAIVE) || (product) == (P_HARPOON) || (product) == (P_HARPOON_PRO) || (product) == (P_KATAR) || (product) == (P_KATAR_PRO) || (product) == (P_KATAR_PRO_XT) || (product) == (P_IRONCLAW) || (product) == (P_NIGHTSWORD) || (product) == (P_DARK_CORE) || (product) == (P_DARK_CORE_WL) || (product) == (P_DARK_CORE_SE) || (product) == (P_DARK_CORE_SE_WL) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_DARK_CORE_RGB_PRO) || (product) == (P_DARK_CORE_RGB_PRO_WL) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_GLAIVE_PRO  || (product) == P_DARKSTAR))
 
 /// For calling with a usbdevice*, vendor and product are extracted and IS_MOUSE() is returned.
 #define IS_MOUSE_DEV(kb)                IS_MOUSE((kb)->vendor, (kb)->product)
@@ -306,7 +309,7 @@ const char* product_str(ushort product);
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 30000000}, NULL)
 
 // This should be removed in the future when we implement autodetection
-#define USES_BRAGI(vendor, product)                  (((vendor) == (V_CORSAIR)) && ((product) == (P_M55_RGB_PRO) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_KATAR_PRO_XT || (product) == P_KATAR_PRO || (product) == P_K60_PRO_RGB || (product) == P_K60_PRO_RGB_LP || (product) == P_K60_PRO_RGB_SE || (product) == P_K60_PRO_MONO || (product) == P_K60_PRO_TKL || (product) == P_K55_PRO || (product) == P_K55_PRO_XT || (product) == (P_DARK_CORE_RGB_PRO) || (product) == (P_DARK_CORE_RGB_PRO_WL) || (product) == P_GENERIC_BRAGI_DONGLE || (product) == P_K100_OPTICAL || (product) == P_K100_MECHANICAL || (product) == P_K100_OPTICAL_VARIANT || (product) == P_K65_MINI || (product) == P_K70_TKL || (product) == P_K70_TKL_CHAMP_OPTIC || (product) == P_MM700 || (product) == P_K70_PRO || (product) == P_K70_PRO_OPTIC || (product) == P_K70_CORE_RGB || (product) == P_K70_CORE_RGB_2 || (product) == P_K70_CORE_RGB_3))
+#define USES_BRAGI(vendor, product)                  (((vendor) == (V_CORSAIR)) && ((product) == (P_M55_RGB_PRO) || (product) == (P_IRONCLAW_W_U) || (product) == (P_IRONCLAW_W_D) || (product) == (P_K95_PLATINUM_XT) || (product) == (P_DARK_CORE_RGB_PRO_SE) || (product) == (P_DARK_CORE_RGB_PRO_SE_WL) || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_KATAR_PRO_XT || (product) == P_KATAR_PRO || (product) == P_K60_PRO_RGB || (product) == P_K60_PRO_RGB_LP || (product) == P_K60_PRO_RGB_SE || (product) == P_K60_PRO_MONO || (product) == P_K60_PRO_TKL || (product) == P_K55_PRO || (product) == P_K55_PRO_XT || (product) == (P_DARK_CORE_RGB_PRO) || (product) == (P_DARK_CORE_RGB_PRO_WL) || (product) == P_GENERIC_BRAGI_DONGLE || (product) == P_K100_OPTICAL || (product) == P_K100_MECHANICAL || (product) == P_K100_OPTICAL_VARIANT || (product) == P_K65_MINI || (product) == P_K70_TKL || (product) == P_K70_TKL_CHAMP_OPTIC || (product) == P_MM700 || (product) == P_K70_PRO || (product) == P_K70_PRO_OPTIC || (product) == P_K70_CORE_RGB || (product) == P_K70_CORE_RGB_2 || (product) == P_K70_CORE_RGB_3 || (product) == P_DARKSTAR))
 
 // Devices that use bragi jumbo packets (1024 bytes)
 #define USES_BRAGI_JUMBO(vendor, product)           ((vendor) == (V_CORSAIR) && ((product) == P_K100_OPTICAL || (product) == P_K100_MECHANICAL || (product) == P_K100_OPTICAL_VARIANT || (product) == P_K65_MINI || (product) == P_K70_TKL || (product) == P_K70_TKL_CHAMP_OPTIC || (product) == P_K70_PRO || (product) == P_K70_PRO_OPTIC))
@@ -315,7 +318,7 @@ const char* product_str(ushort product);
 #define USES_BRAGI_LARGE(vendor, product)           ((vendor) == (V_CORSAIR) && ((product) == 0))
 
 // Used for devices that have the scroll wheel packet in the hardware hid packet only
-#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO))
+#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO) || (kb)->product == P_DARKSTAR)
 
 #define HAS_NO_HW_PROFILE(kb)                       ((kb)->vendor == V_CORSAIR && (IS_POLARIS(kb) || (kb)->product == P_K55))
 

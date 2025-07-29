@@ -23,18 +23,8 @@ void cmd_snap_bragi(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const 
     }
 }
 
-int updatedpi_bragi(usbdevice* kb, int force){
-    if(!kb->active)
-        return 0;
-    dpiset* lastdpi = &kb->profile->lastdpi;
-    dpiset* newdpi = &kb->profile->currentmode->dpi;
-    // Don't do anything if the settings haven't changed
-    if(!force && !lastdpi->forceupdate && !newdpi->forceupdate
-            && !memcmp(lastdpi, newdpi, sizeof(dpiset)))
-        return 0;
-    lastdpi->forceupdate = newdpi->forceupdate = 0;
-
-    // Set the current DPI requested.
+static int updatedpi_bragi_separate(usbdevice* kb, const dpiset* newdpi)
+{
     uchar response[BRAGI_JUMBO_SIZE] = {0};
     uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_DPI_X, 0};
     pkt[4] = newdpi->x[newdpi->current] & 0xFF;
@@ -52,11 +42,55 @@ int updatedpi_bragi(usbdevice* kb, int force){
     pkt[5] = (newdpi->y[newdpi->current] >> 8) & 0xFF;
     if(!usbrecv(kb, pkt, sizeof(pkt), response))
         return -2;
-
     /*
     if(bragi_check_success(pkt, response))
         return -1;
     */
+
+    return 0;
+}
+
+static int updatedpi_bragi_combined(usbdevice* kb, const dpiset* newdpi)
+{
+    uchar response[BRAGI_JUMBO_SIZE] = {0};
+    uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_DPI_COMBINED, 0};
+    pkt[4] = newdpi->x[newdpi->current] & 0xFF;
+    pkt[5] = (newdpi->x[newdpi->current] >> 8) & 0xFF;
+    if(!usbrecv(kb, pkt, sizeof(pkt), response))
+        return -2;
+#warning "FIXME: This fails initially for some reason, causing a reset"
+    /*
+    if(bragi_check_success(pkt, response))
+        return -1;
+    */
+
+    return 0;
+}
+
+int updatedpi_bragi(usbdevice* kb, int force){
+    if(!kb->active)
+        return 0;
+
+    dpiset* lastdpi = &kb->profile->lastdpi;
+    dpiset* newdpi = &kb->profile->currentmode->dpi;
+    // Don't do anything if the settings haven't changed
+    if(!force && !lastdpi->forceupdate && !newdpi->forceupdate
+            && !memcmp(lastdpi, newdpi, sizeof(dpiset)))
+        return 0;
+    lastdpi->forceupdate = newdpi->forceupdate = 0;
+
+    ckb_info("updatedpi_bragi x: %u", newdpi->x[newdpi->current]);
+
+    // Set the current DPI requested.
+    int ret = 0;
+    if (!IS_DARKSTAR(kb)) {
+        ret = updatedpi_bragi_separate(kb, newdpi);
+    } else {
+        ret = updatedpi_bragi_combined(kb, newdpi);
+    }
+    if (ret)
+        return ret;
+
 
     // M55 need this to properly update DPI LED
     kb->vtable.updatergb(kb, 1);

@@ -286,6 +286,33 @@ void MPerfWidget::setDarkCore(){
 
     for(size_t i = 0; i < sizeof(w) / sizeof(QWidget*); i++)
         w[i]->hide();
+
+    ui->label_12->setText("Value");
+}
+
+void MPerfWidget::setDarkStar() {
+    // darkstar seemingly only supports 1D dpi setting: hide the y axis settings
+    ui->xyBox->setDisabled(true);
+    ui->xyBox->hide();
+
+    QWidget* w[] = {
+            ui->ySlider0,
+            ui->ySlider1,
+            ui->ySlider2,
+            ui->ySlider3,
+            ui->ySlider4,
+            ui->ySlider5,
+            ui->yBox0,
+            ui->yBox1,
+            ui->yBox2,
+            ui->yBox3,
+            ui->yBox4,
+            ui->yBox5,
+            ui->label_4
+    };
+
+    for(size_t i = 0; i < sizeof(w) / sizeof(QWidget*); i++)
+        w[i]->hide();
 }
 
 void MPerfWidget::boxXChanged(int index){

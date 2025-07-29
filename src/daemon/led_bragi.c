@@ -69,6 +69,10 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
     // Ideally this will be moved to the usbdevice struct at some point
     const size_t zones = bragi_led_count(kb);
 
+    // TODO(joncppl): hack while worked out for darkstar
+    if (zones == 0)
+        return 0;
+
     // Don't do anything if the lighting hasn't changed
     if(!force && !lastlight->forceupdate && !newlight->forceupdate
             && !rgbcmp(lastlight, newlight, zones, led_offset))

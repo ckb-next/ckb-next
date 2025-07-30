@@ -13,8 +13,6 @@ jobs:
       matrix:
         image:
           - 'archlinux:latest'
-          - 'almalinux:8'
-          - 'almalinux:9'
           - 'rockylinux:8'
           - 'rockylinux:9'
           - 'debian:11'

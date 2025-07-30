@@ -26,12 +26,10 @@ inputs:
       quazip-qt6
       qt6-tools
       qt6-wayland
-      git
 
   fedora-build-dependencies:
     default: >-
       cmake
-      git
       glibc
       libxcb-devel
       make
@@ -54,7 +52,6 @@ inputs:
     default: >-
       cmake3
       dbusmenu-qt5-devel
-      git
       glibc
       libxcb-devel
       make
@@ -75,7 +72,6 @@ inputs:
   ubuntu-qt5-build-dependencies:
     default: >-
       cmake
-      git
       libdbusmenu-qt5-dev
       libpulse-dev
       libqt5x11extras5-dev

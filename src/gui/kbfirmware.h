@@ -41,6 +41,10 @@ private:
         CkbVersionNumber ckbVersion;
         ushort       productID;
         FW();
+
+        // Explicit definition of copy and assignment operators to silence the compilation warnings.
+        FW(const FW& fw) : productID(fw.productID) {};
+        FW& operator=(const FW& other) { return *this; }
     };
     QMap<QString, FW>   fwTable;
     // SHA256 of last downloaded table (redundancy check)

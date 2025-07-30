@@ -19,6 +19,7 @@ runs:
           -DSAFE_INSTALL=ON \
           -DSAFE_UNINSTALL=ON \
           -DWERROR=ON
+        cmake -S . -B build \
       shell: bash --noprofile --norc -euxo pipefail {0}
 
     - name: Build

@@ -1,5 +1,18 @@
 ---
 inputs:
+  alpine-build-dependencies:
+    default: >-
+      make
+      cmake
+      eudev-dev
+      libdbusmenu-qt-dev
+      pulseaudio-dev
+      qt6-qtbase-dev
+      qt6-qt5compat-dev
+      qt6-qttools-dev
+      quazip-dev
+      xcb-util-wm-dev
+
   archlinux-build-dependencies:
     default: >-
       base-devel
@@ -145,3 +158,11 @@ runs:
           ${{ inputs.ubuntu-package-dependencies }}
           ${{ matrix.compiler == 'LLVM' && 'clang' || 'g++ gcc' }}
       if: (startsWith(matrix.image, 'ubuntu:') || startsWith(matrix.image, 'debian:')) && matrix.image != 'ubuntu:22.04' && matrix.image != 'debian:11'
+
+    - name: Install Dependencies (Alpine)
+      uses: ./.github/actions/dependencies/install/apk
+      with:
+        packages: >-
+          ${{ inputs.alpine-build-dependencies }}
+          ${{ matrix.compiler == 'LLVM' && 'clang' || 'g++ gcc' }}
+      if: startsWith(matrix.image, 'alpine:')

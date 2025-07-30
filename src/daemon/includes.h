@@ -16,9 +16,9 @@
 #include <unistd.h>
 #include <inttypes.h>
 
-#include <sys/errno.h>
+#include <errno.h>
 #include <sys/ioctl.h>
-#include <sys/signal.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>

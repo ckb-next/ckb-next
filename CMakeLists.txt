@@ -88,6 +88,7 @@ endif ()
 
 # Options: GUI
 option(WITH_GUI "Build with Qt GUI to manipulate animations." ON)
+option(PREFER_QT6 "Build with Qt 6 if available." ON)
 
 # Options: GUI animations
 option(WITH_ANIMATIONS "Build with animations." ON)
@@ -154,7 +155,6 @@ option(SAFE_INSTALL "Execute pre-install tasks to ensure correct installation.
     Intended to be used with direct installations without package manager." OFF)
 option(SAFE_UNINSTALL "Execute pre-uninstall tasks to ensure correct removal.
     Intended to be used with direct removals without package manager." OFF)
-option(PREFER_QT6 "Build with Qt 6 if available." ON)
 
 set(CMAKE_FIND_PACKAGE_SORT_ORDER NATURAL)
 set(CMAKE_FIND_PACKAGE_SORT_DIRECTION DEC)

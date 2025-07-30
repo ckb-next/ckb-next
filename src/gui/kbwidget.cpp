@@ -32,7 +32,11 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
     connect(device, &Kb::profileAdded, this, &KbWidget::updateProfileList);
     connect(device, &Kb::modeChanged, this, &KbWidget::modeChanged);
     connect(device, &Kb::infoUpdated, this, &KbWidget::devUpdate);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect(ui->batteryTrayBox, &QCheckBox::checkStateChanged, this, &KbWidget::batteryTrayBox_checkStateChanged);
+#else // QT_VERSION < 6.7.0
     connect(ui->batteryTrayBox, &QCheckBox::stateChanged, this, &KbWidget::batteryTrayBox_stateChanged);
+#endif
     connect(MainWindow::mainWindow, &MainWindow::switchToProfileCLI, this, &KbWidget::switchToProfile);
     connect(MainWindow::mainWindow, &MainWindow::switchToModeCLI, this, &KbWidget::switchToMode);
     connect(ui->modesList->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &KbWidget::currentSelectionChanged);
@@ -245,7 +249,11 @@ void KbWidget::currentSelectionChanged(const QModelIndex& current, const QModelI
     device->setCurrentMode(mode);
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+void KbWidget::batteryTrayBox_checkStateChanged(int state){
+#else // QT_VERSION < 6.7.0
 void KbWidget::batteryTrayBox_stateChanged(int state){
+#endif
     if(!device->features.contains("battery"))
         return;
     device->showBatteryIndicator = state > 0;

@@ -92,5 +92,6 @@ if(WERROR)
     list(APPEND CKB_NEXT_EXTRA_CXX_FLAGS
         -Werror
         -Wno-error=cpp
+        -Wno-error=deprecated-declarations
     )
 endif()

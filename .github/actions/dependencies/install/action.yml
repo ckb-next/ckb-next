@@ -1,56 +1,44 @@
 ---
 inputs:
+  alpine-build-dependencies:
+    default: >-
+      make
+      cmake
+      eudev-dev
+      libdbusmenu-qt-dev
+      pulseaudio-dev
+      qt6-qtbase-dev
+      qt6-qt5compat-dev
+      qt6-qttools-dev
+      quazip-dev
+      xcb-util-wm-dev
+
   archlinux-build-dependencies:
     default: >-
+      base-devel
       cmake
-      git
-      libdbusmenu-qt5
-      libpulse
       libsystemd
-      libxcb
-      make
-      pkgconf
-      qt5-base
-      qt5-tools
-      qt5-x11extras
-      quazip
-      xcb-util-wm
       zlib
-
-  debian-build-dependencies:
-    default: >-
-      cmake
-      git
-      libdbusmenu-qt5-dev
-      libpulse-dev
-      libqt5x11extras5-dev
-      libquazip5-dev
-      libudev-dev
-      libxcb-ewmh-dev
-      libxcb-screensaver0-dev
-      libxcb1-dev
-      qtbase5-dev
-      qttools5-dev
-      zlib1g-dev
-
-  debian-package-dependencies:
-    default: >-
-      dpkg-dev
-      file
+      libpulse
+      libxcb
+      xcb-util-wm
+      qt6-base
+      quazip-qt6
+      qt6-tools
+      qt6-wayland
 
   fedora-build-dependencies:
     default: >-
       cmake
-      dbusmenu-qt5-devel
-      git
       glibc
       libxcb-devel
       make
       pulseaudio-libs-devel
-      qt5-linguist
-      qt5-qtbase-devel
-      qt5-qtx11extras-devel
-      quazip-qt5-devel
+      qt6-linguist
+      qt6-qttools-devel
+      qt6-qtbase-devel
+      quazip-qt6-devel
+      qt6-qtwayland-devel
       systemd-devel
       xcb-util-devel
       xcb-util-wm-devel
@@ -64,7 +52,6 @@ inputs:
     default: >-
       cmake3
       dbusmenu-qt5-devel
-      git
       glibc
       libxcb-devel
       make
@@ -82,10 +69,9 @@ inputs:
     default: >-
       rpm-build
 
-  ubuntu-build-dependencies:
+  ubuntu-qt5-build-dependencies:
     default: >-
       cmake
-      git
       libdbusmenu-qt5-dev
       libpulse-dev
       libqt5x11extras5-dev
@@ -97,6 +83,21 @@ inputs:
       qtbase5-dev
       qttools5-dev
       zlib1g-dev
+
+  ubuntu-qt6-build-dependencies:
+    default: >-
+      build-essential
+      cmake
+      qt6-base-dev
+      libudev-dev
+      zlib1g-dev
+      libpulse-dev
+      libquazip1-qt6-dev
+      qt6-tools-dev
+      qt6-wayland-dev
+      libxcb-screensaver0-dev
+      libxcb-ewmh-dev
+      libxcb1-dev
 
   ubuntu-package-dependencies:
     default: >-
@@ -127,15 +128,6 @@ runs:
           ${{ matrix.compiler == 'LLVM' && 'clang' || 'gcc' }}
       if: startsWith(matrix.image, 'archlinux:')
 
-    - name: Install Dependencies (Debian)
-      uses: ./.github/actions/dependencies/install/apt-get
-      with:
-        packages: >-
-          ${{ inputs.debian-build-dependencies }}
-          ${{ inputs.debian-package-dependencies }}
-          ${{ matrix.compiler == 'LLVM' && 'clang' || 'g++ gcc' }}
-      if: startsWith(matrix.image, 'debian:')
-
     - name: Install Dependencies (Fedora)
       uses: ./.github/actions/dependencies/install/yum
       with:
@@ -145,11 +137,28 @@ runs:
           ${{ matrix.compiler == 'LLVM' && 'clang' || 'gcc gcc-c++' }}
       if: startsWith(matrix.image, 'fedora:')
 
-    - name: Install Dependencies (Ubuntu)
+    - name: Install Dependencies (Ubuntu / Debian Qt5)
       uses: ./.github/actions/dependencies/install/apt-get
       with:
         packages: >-
-          ${{ inputs.ubuntu-build-dependencies }}
+          ${{ inputs.ubuntu-qt5-build-dependencies }}
           ${{ inputs.ubuntu-package-dependencies }}
           ${{ matrix.compiler == 'LLVM' && 'clang' || 'g++ gcc' }}
-      if: startsWith(matrix.image, 'ubuntu:')
+      if: (startsWith(matrix.image, 'ubuntu:') || startsWith(matrix.image, 'debian:')) && (matrix.image == 'ubuntu:22.04' || matrix.image == 'debian:11')
+
+    - name: Install Dependencies (Ubuntu / Debian Qt6)
+      uses: ./.github/actions/dependencies/install/apt-get
+      with:
+        packages: >-
+          ${{ inputs.ubuntu-qt6-build-dependencies }}
+          ${{ inputs.ubuntu-package-dependencies }}
+          ${{ matrix.compiler == 'LLVM' && 'clang' || 'g++ gcc' }}
+      if: (startsWith(matrix.image, 'ubuntu:') || startsWith(matrix.image, 'debian:')) && matrix.image != 'ubuntu:22.04' && matrix.image != 'debian:11'
+
+    - name: Install Dependencies (Alpine)
+      uses: ./.github/actions/dependencies/install/apk
+      with:
+        packages: >-
+          ${{ inputs.alpine-build-dependencies }}
+          ${{ matrix.compiler == 'LLVM' && 'clang' || 'g++ gcc' }}
+      if: startsWith(matrix.image, 'alpine:')

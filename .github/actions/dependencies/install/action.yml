@@ -12,6 +12,8 @@ inputs:
       qt6-qttools-dev
       quazip-dev
       xcb-util-wm-dev
+      qt6-qtwayland-dev
+      wayland-protocols 
 
   archlinux-build-dependencies:
     default: >-
@@ -26,6 +28,7 @@ inputs:
       quazip-qt6
       qt6-tools
       qt6-wayland
+      wayland-protocols
 
   fedora-build-dependencies:
     default: >-
@@ -43,6 +46,8 @@ inputs:
       xcb-util-devel
       xcb-util-wm-devel
       zlib-devel
+      wayland-devel
+      wayland-protocols-devel
 
   fedora-package-dependencies:
     default: >-
@@ -94,10 +99,13 @@ inputs:
       libpulse-dev
       libquazip1-qt6-dev
       qt6-tools-dev
+      qt6-wayland
       qt6-wayland-dev
       libxcb-screensaver0-dev
       libxcb-ewmh-dev
       libxcb1-dev
+      qt6-base-private-dev
+      wayland-protocols
 
   ubuntu-package-dependencies:
     default: >-

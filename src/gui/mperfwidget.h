@@ -28,6 +28,7 @@ public:
     static const int DPI_COUNT = KbPerf::DPI_COUNT;
     void setLegacyM95();
     void setDarkCore();
+    void setDarkStar();
     void setMaxDpi(ushort dpi);
 private:
     Ui::MPerfWidget *ui;

@@ -49,7 +49,7 @@
 // For example topbar16 with dpi4
 #define LED_MOUSE               N_KEYS_INPUT
 #define N_MOUSE_ZONES           6
-#define N_MOUSE_ZONES_EXTENDED  12
+#define N_MOUSE_ZONES_EXTENDED  13
 // Index of DPI light
 #define LED_DPI                 (LED_MOUSE + 2)
 #define DPI_RGB_START           (LED_MOUSE + 6)

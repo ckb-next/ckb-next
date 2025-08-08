@@ -72,6 +72,9 @@ KbWidget::KbWidget(QWidget *parent, Kb *_device, XWindowDetector* windowDetector
     if(device->model() == KeyMap::DARKCORE)
         ui->mPerfWidget->setDarkCore();
 
+    if (device->model() == KeyMap::DARKSTAR)
+        ui->mPerfWidget->setDarkStar();
+
     // If the device is supports it, show the battery
     if(device->features.contains("battery")){
         connect(device, &Kb::batteryChanged, this, &KbWidget::updateBattery);

@@ -79,8 +79,6 @@ int updatedpi_bragi(usbdevice* kb, int force){
         return 0;
     lastdpi->forceupdate = newdpi->forceupdate = 0;
 
-    ckb_info("updatedpi_bragi x: %u", newdpi->x[newdpi->current]);
-
     // Set the current DPI requested.
     int ret = 0;
     if (!IS_DARKSTAR(kb)) {

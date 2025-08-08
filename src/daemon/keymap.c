@@ -1221,19 +1221,19 @@ const unsigned char darkstar_lut[BRAGI_MOUSE_BUTTONS] = {
     0x00, // left
     0x01, // right
     0x02, // middle
-    30, // scroll left
-    31, // scroll right
-    9, // thumb leftmost
-    8, // thumb bottom left
-    12, // thumb right
-    13, // thumb bottom right
-    10, // thumb top left
-    11, // thumb top right
-    5, // dpi up
-    6, // dpi down
-    22, // profile up
-    23, // profile down
-    21, // NONE
+    0x1e, // scroll left
+    0x1f, // scroll right
+    0x09, // thumb leftmost
+    0x08, // thumb bottom left
+    0x0c, // thumb right
+    0x0d, // thumb bottom right
+    0x0a, // thumb top left
+    0x0b, // thumb top right
+    0x05, // dpi up
+    0x06, // dpi down
+    0x16, // profile up
+    0x17, // profile down
+    0x15, // NONE
 };
 
 void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput){

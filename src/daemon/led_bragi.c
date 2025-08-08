@@ -41,6 +41,7 @@ static inline size_t bragi_led_count(usbdevice* kb){
     LED_CASE_K(P_K55_PRO_XT, 137);
     LED_CASE_M(P_DARK_CORE_RGB_PRO, 12);
     LED_CASE_M(P_DARK_CORE_RGB_PRO_SE, 12);
+    LED_CASE_M(P_DARKSTAR, 13);
     LED_CASE_K(P_K100_OPTICAL, 193);
     LED_CASE_K(P_K100_MECHANICAL, 193);
     LED_CASE_K(P_K100_OPTICAL_VARIANT, 193);
@@ -68,10 +69,6 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
 
     // Ideally this will be moved to the usbdevice struct at some point
     const size_t zones = bragi_led_count(kb);
-
-    // TODO(joncppl): hack while worked out for darkstar
-    if (zones == 0)
-        return 0;
 
     // Don't do anything if the lighting hasn't changed
     if(!force && !lastlight->forceupdate && !newlight->forceupdate

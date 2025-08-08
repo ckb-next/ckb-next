@@ -151,7 +151,8 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_2, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_3, k70corergbpatch),
-    ADD_PATCH(V_CORSAIR, P_DARKSTAR, darkstarpatch)
+    ADD_PATCH(V_CORSAIR, P_DARKSTAR, darkstarpatch),
+    ADD_PATCH(V_CORSAIR, P_DARKSTAR_W, darkstarpatch),
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

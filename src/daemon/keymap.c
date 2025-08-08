@@ -1254,7 +1254,7 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
         lut = harpoon_wl_lut;
     else if(kb->vendor == V_CORSAIR && kb->product == P_M55_RGB_PRO)
         lut = m55_wl_lut;
-    else if(kb->vendor == V_CORSAIR && kb->product == P_DARKSTAR)
+    else if(IS_DARKSTAR(kb))
         lut = darkstar_lut;
 
     for(int bit = 0; bit < buttons; bit++){

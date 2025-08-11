@@ -122,7 +122,6 @@ if (MACOS OR LINUX)
               animdetailsdialog.cpp
               animscript.cpp
               animsettingdialog.cpp
-              autorun.cpp
               batterysystemtrayicon.cpp
               ckbmainbackgroundcolour.cpp
               ckbsettings.cpp
@@ -181,7 +180,6 @@ if (MACOS OR LINUX)
               animdetailsdialog.h
               animscript.h
               animsettingdialog.h
-              autorun.h
               ckbmainbackgroundcolour.h
               ckbsettings.h
               ckbsettingswriter.h
@@ -574,26 +572,19 @@ if (MACOS)
       "${CMAKE_SOURCE_DIR}/macos/org.ckb-next.plist"
       "${CMAKE_CURRENT_BINARY_DIR}/org.ckb-next.plist"
         COPYONLY)
-
-    if (NOT TEXT_QRC_STRING)
-        set(TEXT_QRC_STRING "<file>org.ckb-next.plist</file>\n")
-    endif ()
-
 elseif (LINUX)
-    if (NOT TEXT_QRC_STRING)
-        set(TEXT_QRC_STRING "<file>ckb-next.autostart.desktop</file>\n")
-    endif ()
-
     # Generate and import desktop files
     message(STATUS "Generating and importing ckb-next.desktop")
+    set(CKB_NEXT_BACKGROUND_ARG "")
     configure_file(
       "${CMAKE_SOURCE_DIR}/linux/ckb-next.desktop.in"
       "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop"
         @ONLY)
-    message(STATUS "Generating and importing ckb-next.autostart.desktop")
+    message(STATUS "Generating autostart/ckb-next.desktop")
+    set(CKB_NEXT_BACKGROUND_ARG " --background")
     configure_file(
-      "${CMAKE_SOURCE_DIR}/linux/ckb-next.autostart.desktop.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.autostart.desktop"
+      "${CMAKE_SOURCE_DIR}/linux/ckb-next.desktop.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/autostart/ckb-next.desktop"
         @ONLY)
 endif ()
 
@@ -793,6 +784,14 @@ elseif (LINUX)
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/ckb-next.desktop"
         DESTINATION "share/applications"
+        PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ
+        WORLD_READ)
+
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/autostart/ckb-next.desktop"
+        DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/xdg/autostart"
         PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ

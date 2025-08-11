@@ -36,7 +36,6 @@
      </property>
      <property name="font">
       <font>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -135,7 +134,6 @@
            </property>
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -367,7 +365,6 @@
            </property>
            <property name="font">
             <font>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -380,16 +377,6 @@
           <widget class="Line" name="line_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="loginItemBox">
-           <property name="toolTip">
-            <string>ckb-next will be started when you log in to your computer.</string>
-           </property>
-           <property name="text">
-            <string>Start ckb-next at login</string>
            </property>
           </widget>
          </item>

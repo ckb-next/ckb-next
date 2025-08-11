@@ -73,6 +73,7 @@ find_package(Sanitizers)
 
 include(CMakeDependentOption)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE STRING "Where to put binaries after compilation.")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE STRING "Where to put libraries after compilation.")
 set(UDEV_RULE_DIRECTORY "/lib/udev/rules.d" CACHE STRING "Where to install the udev rule.")

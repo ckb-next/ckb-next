@@ -47,7 +47,11 @@ private slots:
     void on_repeatBox_valueChanged(double arg1);
     void on_kpDelayBox_valueChanged(double arg1);
     void on_kpRepeatBox_valueChanged(double arg1);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    void on_kpReleaseBox_checkStateChanged(Qt::CheckState arg1);
+#else // QT_VERSION < 6.7.0
     void on_kpReleaseBox_stateChanged(int arg1);
+#endif
 };
 
 #endif // ANIMSETTINGDIALOG_H

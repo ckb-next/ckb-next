@@ -377,7 +377,15 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                     // If the daemon macro string contains even a single delay, then the we set the
                     // delay to "as typed" instead of "default"
                     QRegularExpression re("=\\d+");
-                    if(re.match(macroData[0]).hasMatch())
+// Use different match function depending on Qt version, 6.5.0 deprecates
+// QRegularExpression::match() in favor of QRegularExpression::matchView() when
+// using a QStringView parameter.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+                    bool has_match = re.matchView(macroData[0]).hasMatch();
+#else // QT_VERSION < 6.5.0
+                    bool has_match = re.match(macroData[0]).hasMatch();
+#endif
+                    if(has_match)
                         ui->rb_delay_asTyped->setChecked(true);
                     else
                         ui->rb_delay_default->setChecked(true);

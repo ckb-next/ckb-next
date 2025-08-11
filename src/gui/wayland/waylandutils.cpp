@@ -65,7 +65,7 @@ public:
             return;
         }
 
-        m_seat = static_cast<m_seat *>(nativeInterface->nativeResourceForIntegration("m_seat"));
+        m_seat = static_cast<wl_seat *>(nativeInterface->nativeResourceForIntegration("m_seat"));
         if (!m_seat) {
             m_display = nullptr;
             return;

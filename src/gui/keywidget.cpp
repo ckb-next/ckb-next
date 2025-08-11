@@ -50,7 +50,7 @@ static const QMap<QString, QString> keyNames {
 #endif
     {"rmenu", "▤"}, {"up", "▲"}, {"left", "◀"}, {"down", "▼"}, {"right", "▶"}, {"fn","Fn"},
     {"mouse1", ""}, {"mouse2", ""}, {"mouse3", "∙"}, {"dpiup", "▲"}, {"dpidn", "▼"}, {"wheelup", "▲"}, {"wheeldn", "▼"}, {"dpi", "◉"}, {"mouse5", "▲"}, {"mouse4", "▼"}, {"sniper", "⊕"},
-    {"lghtpgm", "☼P"}
+    {"lghtpgm", "☼P"}, {"profup", "▲"}, {"profdn", "▼"}, {"wheellf", "◀"}, {"wheelrg", "▶"}
 };
 
 KeyWidget::KeyWidget(QWidget* parent) :
@@ -202,6 +202,10 @@ void KeyWidget::map(const KeyMap& newMap){
             _currentOverlay.load(":/img/overlay_darkcore_rgb_pro.png");
             _overlayPos.setX(-5.f);
             _overlayPos.setY(-2.f);
+            break;
+        case KeyMap::DARKSTAR:
+            _currentOverlay.load(":/img/overlay_darkstar.png");
+            _overlayPos.setX(30.f);
             break;
         case KeyMap::ST100: // Entries without overlays should not be added here. This will (hopefully) be moved.
             _overlayPos.setX(-18.5);
@@ -372,7 +376,7 @@ void KeyWidget::paintGL(){
             if(!strcmp(key.name, "sniper"))
                 // Sniper key uses a reddish base color instead of the usual grey
                 painter.setBrush(QBrush(sniperColor));
-            else if(model == KeyMap::SCIMITAR && !strncmp(key.name, "thumb", 5) && strcmp(key.name, "thumb"))
+            else if((model == KeyMap::SCIMITAR || model == KeyMap::DARKSTAR) && !strncmp(key.name, "thumb", 5) && strcmp(key.name, "thumb"))
                 // Thumbgrid keys use a black color
                 painter.setBrush(QBrush(thumbColor));
             else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel") || !strcmp(key.name, "logo"))

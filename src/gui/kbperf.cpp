@@ -507,8 +507,13 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[HW_I_COUNT
                     }
                 }
             }
+        } else if (this->modeParent()->bind()->map().model() == KeyMap::DARKSTAR) {
+            lightIndicator("dpiw0", dpiClr[index].rgba());
+            if (index >= 2 || !index) lightIndicator("dpiw1", dpiClr[index].rgba());
+            if (index >= 3 || !index) lightIndicator("dpiw2", dpiClr[index].rgba());
         }
     }
+
     // KB indicators
     // Disable the M indicators for the K70MK2, the STRAFE_MK2, and the K70_TKL.
     // FIXME: Only enable them for devices that need them instead

@@ -40,7 +40,6 @@ private slots:
     void on_altBox_activated(int index);
     void on_winBox_activated(int index);
     void on_autoFWBox_clicked(bool checked);
-    void on_loginItemBox_clicked(bool checked);
     void on_aboutQt_clicked();
     void on_generateReportButton_clicked();
     void devDetectFinished(int retVal);

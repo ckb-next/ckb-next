@@ -127,6 +127,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_DARK_CORE_RGB_PRO_SE_WL, },
     { V_CORSAIR, P_IRONCLAW_W_U, },
     { V_CORSAIR, P_IRONCLAW_W_D, },
+    { V_CORSAIR, P_IRONCLAW_W_DG, },
     { V_CORSAIR, P_HARPOON_WL_U, },
     { V_CORSAIR, P_HARPOON_WL_D, },
     { V_CORSAIR, P_GLAIVE_PRO, },
@@ -269,7 +270,7 @@ const char* product_str(ushort product){
         return "ironclaw";
     if(product == P_NIGHTSWORD)
         return "nightsword";
-    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D || product == P_HARPOON_WL_U || product == P_HARPOON_WL_D)
+    if(product == P_IRONCLAW_W_U || product == P_IRONCLAW_W_D || product == P_IRONCLAW_W_DG || product == P_HARPOON_WL_U || product == P_HARPOON_WL_D)
         return "ironclaw_wireless";
     if(product == P_DARK_CORE_RGB_PRO || product == P_DARK_CORE_RGB_PRO_WL || product == P_DARK_CORE_RGB_PRO_SE || product == P_DARK_CORE_RGB_PRO_SE_WL)
         return "dark_core_rgb_pro";

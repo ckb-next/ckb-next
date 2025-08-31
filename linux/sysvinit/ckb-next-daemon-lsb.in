@@ -1,0 +1,81 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:         ckb-next
+# Required-Start:   $local_fs $remote_fs
+# Required-Stop:    $local_fs $remote_fs
+# Default-Start:    2 3 4 5
+# Default-Stop:     0 1 6
+# Short-Description:        Start and stop the corsair keyboards and mice daemon
+### END INIT INFO
+#
+# Original copyright 2017-2018 ckb-next Development Team <ckb-next@googlegroups.com>
+# Modified for LSB compliance 2025 by Brent Spillner <s p i l l n e r @ a c m . o r g>
+# Distributed under the terms of the GNU General Public License v2
+
+NAME="ckb-next-daemon"
+DESC="Corsair keyboards and mice"
+PIDFILE="/dev/input/ckb0/pid" # DO NOT CHANGE
+DAEMON="@CMAKE_INSTALL_PREFIX@/bin/ckb-next-daemon"
+
+# Exit if daemon not installed
+[ -x "$DAEMON" ] || exit 0
+
+if [ -f /lib/lsb/init-functions ]; then
+    . /lib/lsb/init-functions
+elif [ -f /etc/init.d/functions ]; then
+	# Alternate path used on some non-fully-LSB-compliant distributions
+    . /etc/init.d/functions
+else
+	echo "WARNING: path to LSB-style daemon control functions could not be determined; $NAME probably won't start as expected"
+fi
+
+do_start () {
+    if start_daemon -p $PIDFILE $DAEMON ; then
+		log_success_msg "Started $DESC $NAME"
+	else
+		log_failure_msg "Could not start $DESC $NAME"
+	fi
+}
+
+do_stop () {
+	for signal in -QUIT -TERM -KILL ; do
+        if killproc -p $PIDFILE $DAEMON $signal ; then
+		    log_success_msg "Stopped $DESC $NAME with signal $signal"
+			return 0
+		else
+		    log_warning_msg "$DESC $NAME did not respond to signal $signal"
+			sleep 1
+		fi
+	done
+	log_failure_msg "Unable to stop $DESC $NAME; are you running as root?"
+}
+
+case "$1" in
+    start)
+        do_start
+        ;;
+    stop)
+        do_stop
+        ;;
+    restart)
+        log_success_msg "Restarting $DESC" "$NAME"
+        do_stop
+        do_start
+        ;;
+    reload)
+        if killproc -p $PIDFILE $DAEMON -USR1 ; then
+            log_success_msg "Reloaded $DESC $NAME"
+		else
+            log_failure_msg "Unable to reload $DESC $NAME"
+		fi
+        ;;
+    status)
+		pidofproc -p $PIDFILE $DAEMON > /dev/null
+        echo "$DAEMON is" $(test $? = 0 && echo "" || echo "not") running
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|status}" >&2
+        exit 1
+esac
+
+exit 0

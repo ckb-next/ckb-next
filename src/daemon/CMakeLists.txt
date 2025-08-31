@@ -411,10 +411,20 @@ elseif (LINUX)
 
         # Generate and import service
         message(STATUS "Generating and importing ckb-next-daemon (${CKB_NEXT_INIT_SYSTEM})")
-        configure_file(
-            "${ckb-next_SOURCE_DIR}/linux/sysvinit/ckb-next-daemon.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.sh"
-            @ONLY)
+        if (EXISTS "/sbin/start-stop-daemon" OR EXISTS "/usr/sbin/start-stop-daemon" OR EXISTS "/usr/local/sbin/start-stop-daemon" OR
+            EXISTS "/bin/start-stop-daemon"  OR EXISTS "/usr/bin/start-stop-daemon"  OR EXISTS "/usr/local/bin/start-stop-daemon")
+            # Use the Debian-style daemon management utilities
+            configure_file(
+                "${ckb-next_SOURCE_DIR}/linux/sysvinit/ckb-next-daemon-deb.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.sh"
+                @ONLY)
+        else ()
+            # Use LSB-compliant daemon management utilities
+            configure_file(
+                "${ckb-next_SOURCE_DIR}/linux/sysvinit/ckb-next-daemon-lsb.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/service/ckb-next-daemon.sh"
+                @ONLY)
+        endif ()
 
         if (SAFE_INSTALL)
             if (EXISTS "/dev/input/ckb0/pid")

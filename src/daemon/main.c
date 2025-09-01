@@ -27,14 +27,43 @@ void timespec_add(struct timespec* timespec, int64_t nanoseconds){
     timespec->tv_nsec = nanoseconds % 1000000000;
 }
 
+// Daemon run states--- used to determine whether special actions (e.g. USB reload) have been commanded
+enum { DAEMON_PAUSED, DAEMON_RUNNING, RELOAD_DAEMON } runstate = DAEMON_PAUSED;
+
+#define SIGDESCR(S) { SIG ## S, "SIG" # S }
+struct signal_descriptor { int value; const char *name; };
+static struct signal_descriptor signals_trapped[] = {
+    SIGDESCR(TERM), SIGDESCR(INT), SIGDESCR(QUIT), /* These are the traditional shutdown signals */
+    SIGDESCR(HUP), SIGDESCR(USR1), /* These will trigger a reload of the USB subsystem */
+    SIGDESCR(USR2)                 /* This signal is used only for synchronization between heavyweight threads */
+    /* TODO: could add additional signals here to try to reset keyboard to HID mode
+     * in the event of an abnormal daemon process exit (e.g. SEGV, ILL, ABRT).
+     * If not trapped, those signals will likely leave the device unusable until it is reset,
+     * either via onboard firmware or disconnecting from and reconnecting to the USB bus.
+     */
+};
+
 ///
-/// \brief quit
-/// Stop working the daemon.
-/// function is called if the daemon received a sigterm
+/// \brief initialize_keyboard
+/// Establish the keyboard controller device.
+/// Must be called before any non-trivial sighandler() is set.
+static void initialize_keyboard(void) {
+    memset(keyboard, 0, sizeof(keyboard));
+    if(!mkdevpath(keyboard))
+        ckb_info("Root controller ready at %s0", devpath);
+}
+
+///
+/// \brief usb_shutdown
+/// Disconnect daemon from the USB subsystem.
+/// Called if we received a termination (TERM/INT/QUIT) or reload (HUP/USR1) signal.
 /// In this case, locking the device-mutex is ok.
-static void quit() {
+/// For reload signals, will be followed by re-establishing the entire USB device tree.
+/// For termination signals, will be followed by daemon exit.
+static void usb_shutdown() {
     // Abort any USB resets in progress
     reset_stop = 1;
+
     // Before closing, set all keyboards back to HID input mode so that the stock driver can still talk to them
     for(int i = 1; i < DEV_MAX; i++){
         queued_mutex_lock(devmutex + i);
@@ -65,44 +94,138 @@ static inline void safe_write(const char* const str) {
 }
 
 ///
+/// \brief get_signal_name
+/// Return a read-only string representation (in static heap memory) of the signal name.
+/// The caller does not need to free() anything afterward, but unhandled signals will be reported
+/// simply as "UNKNOWN" with no indication of the actual number
+static const char *get_signal_name(int type) {
+    for (size_t i = 0; i < sizeof(signals_trapped) / sizeof(signals_trapped[0]); i++)
+        if (signals_trapped[i].value == type)
+            return signals_trapped[i].name;
+    return "UNKNOWN";
+}
+
+///
+/// \brief get_temp_signal_name
+/// Return a writable string representation of the signal name.
+/// The caller is responsible for free()-ing the memory afterward, but unhandled signals will have
+/// their number included in the returned string to support more detailed troubleshooting.
+static char *get_temp_signal_name(int type) {
+    char *tmp;
+    for (size_t i = 0; i < sizeof(signals_trapped) / sizeof(signals_trapped[0]); i++)
+        if (signals_trapped[i].value == type)
+            return strdup(signals_trapped[i].name);
+    tmp = malloc(32);
+    if (tmp)
+        snprintf(tmp, 32, "UNKNOWN (%d)", type);
+    return tmp;
+}
+
+
+///
 /// \brief ignore_signal
 /// Nested signal handler for previously received signals.
 /// \param type received signal type
 void ignore_signal(int type){
-    // Use signal-safe(7) write(3) call to print warning
-    safe_write("\n[W] Ignoring signal ");
-    switch (type) {
-        case SIGTERM:
-            safe_write("SIGTERM");
-            break;
-        case SIGINT:
-            safe_write("SIGINT");
-            break;
-        case SIGQUIT:
-            safe_write("SIGQUIT");
-            break;
-        default:
-            safe_write("UNKNOWN");
-            break;
+    // Use signal-safe(7) write(3) call to print warnings
+
+    static int interrupt_count = 0;
+    if (type == SIGINT) {
+        // Failsafe abort on double-^C
+        if (interrupt_count++) {
+            safe_write("\n[W] Received double SIGINT; aborting daemon even though signal processing nominally suspended\n");
+            usb_shutdown();
+            exit(2);
+        } else
+            safe_write("\n[W] Received SIGINT while signal processing suspended; send again to force daemon exit\n");
+    } else {
+        interrupt_count = 0;
+        safe_write("\n[W] Ignoring signal ");
+        safe_write(get_signal_name(type));
+        safe_write(" (signal processing suspended during daemon shutdown or reload)\n");
     }
-    safe_write(" (already shutting down)\n");
+}
+
+///
+/// \brief suspend_all_signals
+/// Temporarily set null handlers for any further incoming signals
+/// Useful to ensure (unless signals arrive in very close succession) that we aren't
+/// interrupted again while handling the first signal.
+/// Could more efficiently be handled with a global in_signal_handler semaphore,
+/// but this approach more closely mirrors the original daemon code.
+static void suspend_all_signals()
+{
+    for (size_t i = 0; i < sizeof(signals_trapped) / sizeof(signals_trapped[0]); i++)
+        if (signals_trapped[i].value != SIGUSR2)
+            signal(signals_trapped[i].value, ignore_signal);
+}
+
+
+///
+/// \brief restore_signal_handlers
+/// Set up signal handlers for each supported signal.
+/// \param which ONLY_NULLHANDLER -> only set up SIGUSR2 (useful if we were unable to
+/// establish the communications pipe for non-trivial signals)
+/// RESTORE_ALL -> set up all supported handlers
+/// RESTORE_LAST -> restore the previous behavior
+enum { ONLY_NULLHANDLER, RESTORE_ALL, RESTORE_LAST };
+static void restore_signal_handlers(int which)
+{
+    void sighandler(int), nullhandler(int);
+    static int last_signal_set = -1;
+
+    if (which == RESTORE_ALL || which == RESTORE_LAST && last_signal_set == RESTORE_ALL)
+        for (size_t i = 0; i < sizeof(signals_trapped) / sizeof(signals_trapped[0]); i++)
+            if (signals_trapped[i].value != SIGUSR2)
+                signal(signals_trapped[i].value, sighandler);
+
+    // Set up do-nothing handler for SIGUSR2
+    // sa_flags must be 0 so that we can interrupt blocking calls in threads by calling pthread_kill()
+    struct sigaction new_action = {
+        .sa_handler = nullhandler,
+        .sa_flags = 0,
+    };
+    sigemptyset (&new_action.sa_mask);
+    sigaction(SIGUSR2, &new_action, NULL);
+
+    if (which != RESTORE_LAST)
+        last_signal_set = which;
 }
 
 ///
 /// \brief exithandler
-/// Main signal handler to catch further signals and call shutdown
-/// sequence of daemon. This function is allowed to call unsafe
+/// Main signal handler to catch further signals and call reload or shutdown
+/// sequence of daemon, as appropriate. This function is allowed to call unsafe
 /// (signal-safe(7)) function calls, as it is itself executed in another
 /// process via the socket handler.
+/// If exithandler() returns to caller, usbmain() should eventually terminate and return to main()
 /// \param type received signal type
 void exithandler(int type){
-    signal(SIGTERM, ignore_signal);
-    signal(SIGINT, ignore_signal);
-    signal(SIGQUIT, ignore_signal);
-
     printf("\n[I] Caught signal %d\n", type);
-    quit();
-    exit(0);
+    suspend_all_signals();
+
+    if (type == SIGTERM || type == SIGINT || type == SIGQUIT) {
+        usb_shutdown();
+        exit(0);
+#ifndef OS_MAC
+    // For now, ignore the "reload" signals on MacOS, as I'm not set up to test on that platform.
+    // However, anyone who wants to try it could add usbkill() to the bottom of mac_exithandler()
+    // and then remove this #ifdef; I think that should make the MacOS behavior equivalent to Linux.
+    } else if (type == SIGHUP || type == SIGUSR1) {
+        runstate = RELOAD_DAEMON;
+        restore_signal_handlers(RESTORE_LAST);
+#endif
+    } else {
+        // Never expected to be triggered; we somehow set sighandler() on a signal that was not added to this function's logic.
+        char *name = get_temp_signal_name(type);
+        safe_write("[E] exithandler() passed unsupported signal ");
+        safe_write(name ? name : "(null)");
+        if (name)
+            free(name);
+        safe_write("\nAborting daemon.\n");
+        usb_shutdown();
+        exit(1);
+    }
 }
 
 ///
@@ -120,7 +243,12 @@ void sighandler(int type){
 }
 
 void nullhandler(int s){
-    safe_write("[I] Caught internal signal SIGUSR2\n");
+    char *name = get_temp_signal_name(s);
+    safe_write("[I] Caught internal signal ");
+    safe_write(name ? name : "(null)");
+    if (name)
+        free(name);
+    safe_write("\n");
 }
 
 void localecase(char* dst, size_t length, const char* src){
@@ -231,6 +359,7 @@ int main(int argc, char** argv){
                 break;
             }
         } else if(!strncmp(argument, "--search=", 9)) {
+            // TODO: repeat this search process on a daemon reload signal?
             char* searchstr = argument + 9;
             usbdevice dev = {0};
 
@@ -314,27 +443,18 @@ int main(int argc, char** argv){
     }
 
     // Make root keyboard
+    // Do this before setting signal handlers just in case we get an early signal
+    // (usb_shutdown() expects to find a valid keyboard structure)
     umask(0);
-    memset(keyboard, 0, sizeof(keyboard));
-    if(!mkdevpath(keyboard))
-        ckb_info("Root controller ready at %s0", devpath);
+    initialize_keyboard();
 
     // Attempt to setup signal-safe signal handlers using socketpair(2)
-    if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sighandler_pipe) != -1){
-        signal(SIGTERM, sighandler);
-        signal(SIGINT, sighandler);
-        signal(SIGQUIT, sighandler);
-    } else
-        ckb_warn_nofile("Unable to setup signal handlers");
-
-    // Set up do-nothing handler for SIGUSR2
-    // sa_flags must be 0 so that we can interrupt blocking calls in threads by calling pthread_kill()
-    struct sigaction new_action = {
-        .sa_handler = nullhandler,
-        .sa_flags = 0,
-    };
-    sigemptyset (&new_action.sa_mask);
-    sigaction(SIGUSR2, &new_action, NULL);
+    if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sighandler_pipe) != -1) {
+        restore_signal_handlers(RESTORE_ALL);
+    } else {
+        ckb_warn_nofile("Unable to setup pipe for signal handling");
+        restore_signal_handlers(ONLY_NULLHANDLER);
+    }
 
     srand(time(NULL));
 
@@ -344,7 +464,16 @@ int main(int argc, char** argv){
     }
 
     // Start the USB system
-    int result = usbmain();
-    quit();
-    return result;
+    while (1) {
+        int result;
+
+        runstate = DAEMON_RUNNING;
+        result = usbmain();
+        usb_shutdown();
+        if (runstate != RELOAD_DAEMON)
+            return result;
+
+        // Reloading, so re-initialize USB subsystem and loop back to running state
+        initialize_keyboard();
+    }
 }

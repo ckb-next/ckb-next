@@ -174,7 +174,7 @@ static void restore_signal_handlers(int which)
     void sighandler(int), nullhandler(int);
     static int last_signal_set = -1;
 
-    if (which == RESTORE_ALL || which == RESTORE_LAST && last_signal_set == RESTORE_ALL)
+    if (which == RESTORE_ALL || (which == RESTORE_LAST && last_signal_set == RESTORE_ALL))
         for (size_t i = 0; i < sizeof(signals_trapped) / sizeof(signals_trapped[0]); i++)
             if (signals_trapped[i].value != SIGUSR2)
                 signal(signals_trapped[i].value, sighandler);

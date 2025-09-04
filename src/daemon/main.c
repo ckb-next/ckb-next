@@ -207,14 +207,9 @@ void exithandler(int type){
     if (type == SIGTERM || type == SIGINT || type == SIGQUIT) {
         usb_shutdown();
         exit(0);
-#ifndef OS_MAC
-    // For now, ignore the "reload" signals on MacOS, as I'm not set up to test on that platform.
-    // However, anyone who wants to try it could add usbkill() to the bottom of mac_exithandler()
-    // and then remove this #ifdef; I think that should make the MacOS behavior equivalent to Linux.
     } else if (type == SIGHUP || type == SIGUSR1) {
         runstate = RELOAD_DAEMON;
         restore_signal_handlers(RESTORE_LAST);
-#endif
     } else {
         // Never expected to be triggered; we somehow set sighandler() on a signal that was not added to this function's logic.
         char *name = get_temp_signal_name(type);

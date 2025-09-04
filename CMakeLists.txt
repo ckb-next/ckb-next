@@ -126,6 +126,27 @@ option(DEBUG_INPUT_SYNC "Print a debug message every time an event bundle is del
 option(FPS_COUNTER     "Enable FPS counters." OFF)
 option(WERROR     "Enable Werror (for CI)" OFF)
 
+if (NOT DISALLOW_SYSVINIT)
+    find_program(START_STOP_DAEMON start-stop-daemon
+        PATHS /sbin /usr/sbin /usr/local/sbin /bin /usr/bin /usr/local/bin
+        DOC "Path to Debian-style start-stop-daemon utility")
+    if (START_STOP_DAEMON)
+        # Need a pure-boolean variable as default for USE_START_STOP_DAEMON (option()/cmake_dependent_option() do not evaluate expressions)
+        set(START_STOP_DAEMON_FOUND TRUE)
+    endif ()
+
+    option(USE_START_STOP_DAEMON "Use the Debian-style start-stop-daemon command in management script (affects sysvinit only)" ${START_STOP_DAEMON_FOUND})
+    if (USE_START_STOP_DAEMON AND NOT START_STOP_DAEMON_FOUND)
+        message(WARNING "Debian-style start-stop-daemon not found in system paths, but sysvinit script overridden to use it anyway")
+    elseif (NOT USE_START_STOP_DAEMON AND START_STOP_DAEMON_FOUND)
+        message(STATUS "Have " ${START_STOP_DAEMON} ", but sysvinit script overridden to use LSB-compliant commands")
+    elseif (START_STOP_DAEMON_FOUND)
+        message(STATUS "Found Debian-style daemon control utility at " ${START_STOP_DAEMON})
+    else ()
+        message(STATUS "Debian-style start-stop-daemon not found in system paths, sysvinit control script would default to LSB-compliant tools only")
+    endif ()
+endif ()
+
 # Make sure NO_FAIR_MUTEX_QUEUEING is set if TSAN is enabled
 # Otherwise you end up with threading issues that are not detected
 if (SANITIZE_THREAD AND NOT NO_FAIR_MUTEX_QUEUEING)

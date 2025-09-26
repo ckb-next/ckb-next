@@ -609,6 +609,63 @@ static const Key IronclawWirelessKeys[] = {
 #define IRONCLAW_W_WIDTH       52
 #define IRONCLAW_W_HEIGHT      67
 
+// Mouse map - Darkstar RGB Wireless
+static const Key DarkstarKeys[] = {
+        {nullptr, "Left Mouse",   "mouse1",     36, 2,  8,  28, false, true},
+        {nullptr, "Right Mouse",  "mouse2",     54, 2,  8,  28, false, true},
+
+        // center column keys
+        {nullptr, "Wheel Up",     "wheelup",    46, 3,  7,  6,  false, true},
+        {nullptr, "Middle Mouse", "mouse3",     46, 9,  7,  9,  false, true},
+        {nullptr, "Wheel Down",   "wheeldn",    46, 17, 7,  6,  false, true},
+
+        // mouse wheel side-to-side
+        {nullptr, "Wheel Left",   "wheellf",    43, 8,  4,  10, false, true},
+        {nullptr, "Wheel Right",  "wheelrg",    51, 8,  4,  10, false, true},
+
+        // profile keys
+        {nullptr, "Profile Up",   "profup",     47, 24, 5,  7,  false, true},
+        {nullptr, "Profile Dn",   "profdn",     47, 31, 5,  7,  false, true},
+
+        // dpi keys
+        {nullptr, "DPI Up",       "dpiup",      32, 4,  5,  12, false, true},
+        {nullptr, "DPI Down",     "dpidn",      32, 15, 5,  12, false, true},
+
+        // thumb keys
+        {nullptr, "Thumb 1",      "thumb1",     0,  30, 8,  8,  false, true},
+        {nullptr, "Thumb 2",      "thumb2",     0,  24, 8,  8,  false, true},
+        {nullptr, "Thumb 3",      "thumb3",     0,  18, 14, 8,  false, true},
+        {nullptr, "Thumb 4",      "thumb4",     12, 18, 14, 8,  false, true},
+        {nullptr, "Thumb 5",      "thumb5",     18, 24, 8,  8,  false, true},
+        {nullptr, "Thumb 6",      "thumb6",     18, 30, 8,  8,  false, true},
+
+        // dpi lights bottom to top
+        {nullptr, "DPI0",         "dpiw0",      26, 13, 6,  4,  true,  false},
+        {nullptr, "DPI1",         "dpiw1",      26, 9,  6,  4,  true,  false},
+        {nullptr, "DPI2",         "dpiw2",      26, 5,  6,  4,  true,  false},
+
+        {nullptr, "Wheel",        "wheel",      45, 10, 8,  8,  true,  false},
+
+        {nullptr, "Logo",         "back",       44, 50, 10, 10, true,  false},
+
+        {nullptr, "Front Left",   "frontleft",  37, 0,  8,  8,  true,  false},
+        {nullptr, "Front Right",  "frontright", 54, 0,  8,  8,  true,  false},
+
+        // bar light zones are left to right (3 per side)
+        {nullptr, "Bar 0",        "bar0",       33, 36, 6,  6,  true,  false},
+        {nullptr, "Bar 1",        "bar1",       37, 35, 6,  6,  true,  false},
+        {nullptr, "Bar 2",        "bar2",       41, 34, 6,  6,  true,  false},
+
+        {nullptr, "Bar 3",        "bar3",       52, 30, 6,  6,  true,  false},
+        {nullptr, "Bar 4",        "bar4",       56, 29, 6,  6,  true,  false},
+        {nullptr, "Bar 5",        "bar5",       60, 28, 6,  6,  true,  false},
+};
+
+#define KEYCOUNT_DARKSTAR_W    (sizeof(DarkstarKeys) / sizeof(Key))
+
+#define DARKSTAR_WIDTH       72
+#define DARKSTAR_HEIGHT      67
+
 // Map getter. Each model/layout pair only needs to be constructed once; after that, future KeyMaps can copy the existing maps.
 #define N_MODELS    KeyMap::_MODEL_MAX
 #define N_LAYOUTS   KeyMap::_LAYOUT_MAX
@@ -1454,6 +1511,17 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         }
         break;
     }
+    case KeyMap::DARKSTAR:{
+        for(const Key* key = DarkstarKeys; key < DarkstarKeys + KEYCOUNT_DARKSTAR_W; key++){
+            // Keyboard keys are written from the center because that's where the LEDs are, but the mouse buttons are odd shapes so they're
+            // written from the upper left
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        break;
+    }
     default:;    // <- stop GCC from complaining
     }
 
@@ -1721,6 +1789,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70_PRO;
     if(lower == "k70_core_rgb")
         return K70_CORE_RGB;
+    if(lower == "darkstar")
+        return DARKSTAR;
     return NO_MODEL;
 }
 
@@ -1810,6 +1880,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70pro";
     case K70_CORE_RGB:
         return "k70_core_rgb";
+    case DARKSTAR:
+        return "darkstar";
     default:
         return "";
     }
@@ -1882,6 +1954,8 @@ int KeyMap::modelWidth(Model model){
         return M65_WIDTH;
     case MM700:
         return MM700_WIDTH;
+    case DARKSTAR:
+        return DARKSTAR_WIDTH;
     default:
         return 0;
     }
@@ -1939,6 +2013,8 @@ int KeyMap::modelHeight(Model model){
         return M65_HEIGHT;
     case MM700:
         return MM700_HEIGHT;
+    case DARKSTAR:
+        return DARKSTAR_HEIGHT;
     default:
         return 0;
     }
@@ -2027,6 +2103,9 @@ QString KeyMap::friendlyName(const QString& key, Layout layout){
     if(map.contains(key))
         return map.key(key).friendlyName();
     map = KeyMap(IRONCLAW_W, layout);
+    if(map.contains(key))
+        return map.key(key).friendlyName();
+    map = KeyMap(DARKSTAR, layout);
     if(map.contains(key))
         return map.key(key).friendlyName();
 

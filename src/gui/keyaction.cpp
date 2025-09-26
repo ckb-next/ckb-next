@@ -81,10 +81,13 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
         return "$dpi:-1";
     if(key == "sniper")
         return "$dpi:0";
+    // Profile buttons
     if(key == "profswitch")
         return "$mode:-3";
     if(key == "profdn")
         return "$mode:-4";
+    if(key == "profup")
+        return "$mode:-3";
 
 #ifdef Q_OS_MACOS
     // macOS has no forwards and backwards, so we bind them to macros that simulate that action

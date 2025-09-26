@@ -81,6 +81,28 @@ static const keypatch DCRGBPpatch[] = {
     { 268, "bar4",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
 };
 
+static const keypatch darkstarpatch[] = {
+    {247, "profup", -1, KEY_CORSAIR},
+
+    {257, "frontleft",  LED_MOUSE + 0,  KEY_NONE},
+    {258, "frontright", LED_MOUSE + 1,  KEY_NONE},
+    {259, "wheel",      LED_MOUSE + 2,  KEY_NONE},
+
+    // bar light zones are left to right (3 per side)
+    {261, "bar0",       LED_MOUSE + 3,  KEY_NONE},
+    {262, "bar1",       LED_MOUSE + 4,  KEY_NONE},
+    {263, "bar2",       LED_MOUSE + 5,  KEY_NONE},
+    {264, "bar3",       LED_MOUSE + 6,  KEY_NONE},
+    {265, "bar4",       LED_MOUSE + 7,  KEY_NONE},
+    {266, "bar5",       LED_MOUSE + 8,  KEY_NONE},
+    {260, "back",       LED_MOUSE + 9,  KEY_NONE},
+
+    // dpi lights bottom to top
+    {267, "dpiw0",      LED_MOUSE + 10, KEY_NONE},
+    {268, "dpiw1",      LED_MOUSE + 11, KEY_NONE},
+    {269, "dpiw2",      LED_MOUSE + 12, KEY_NONE},
+};
+
 keypatch k100patch[] = {
     {114, "lock", 114, KEY_CORSAIR },
 };
@@ -129,6 +151,8 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_2, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_3, k70corergbpatch),
+    ADD_PATCH(V_CORSAIR, P_DARKSTAR, darkstarpatch),
+    ADD_PATCH(V_CORSAIR, P_DARKSTAR_W, darkstarpatch),
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

@@ -614,6 +614,7 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         CLEAR_KEYBIT(kbinput, 104);         // voldn
 
         // We only care about the first byte
+        // FIXME: Why?
         switch(urbinput[1]){
         case 181:
             SET_KEYBIT(kbinput, 125);   // next
@@ -946,23 +947,21 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     }
 }
 
-void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput, int length, int legacy){
-    int bytelen = (legacy ? 14 : 19);
-    int start = !legacy; // Legacy packets start from 0x00, other ones start from 0x01
-    if(length < start + bytelen + 1){
-        ckb_err("Invalid length %d legacy %d", length, legacy);
+void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput, const int length, const int bytelen){
+    if(length < bytelen + 1){
+        ckb_err("Invalid length %d bytelen %d", length, bytelen);
         return;
     }
 
     for(int bit = 0; bit < 8; bit++){
-        if((urbinput[start] >> bit) & 1)
+        if((urbinput[0] >> bit) & 1)
             SET_KEYBIT(kbinput, hid_codes[bit + 224]);
         else
             CLEAR_KEYBIT(kbinput, hid_codes[bit + 224]);
     }
 
     for(int byte = 0; byte < bytelen; byte++){
-        char input = urbinput[start + byte + 1];
+        char input = urbinput[byte + 1];
         for(int bit = 0; bit < 8; bit++){
             int keybit = byte * 8 + bit;
             int scan = hid_codes[keybit];
@@ -977,7 +976,7 @@ void handle_nkro_key_input(unsigned char* kbinput, const unsigned char* urbinput
     }
 }
 
-void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinput, int length){
+void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinput, const int length){
     // Media keys
     CLEAR_KEYBIT(kbinput, 97);          // mute
     CLEAR_KEYBIT(kbinput, 98);          // stop
@@ -1009,8 +1008,10 @@ void handle_nkro_media_keys(unsigned char* kbinput, const unsigned char* urbinpu
         case 234:
             SET_KEYBIT(kbinput, 131);   // voldn
             break;
+        case 0: // keyup
+            break;
         default:
-            ckb_err("Unhandled NKRO_MEDIA_IN length %d first:0x%hhx in handle_nkro_media_keys()", length, urbinput[1]);
+            ckb_err("Unhandled NKRO_MEDIA_IN 0x%hhx length %d in handle_nkro_media_keys()", urbinput[i], length);
             break;
         }
     }
@@ -1060,7 +1061,11 @@ static inline void handle_legacy_6kro_input(usbdevice* kb, const unsigned char* 
     memcpy(kb->previous_6kro, urbinput, sizeof(kb->previous_6kro));
 }
 
+#define KB_LEGACY_INPUT_LEN 14
+#define KB_NKRO_INPUT_LEN 19
+
 void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urbinput){
+    // Legacy keyboards don't have Report IDs
     if(kb->protocol == PROTO_LEGACY) {
         switch(length) {
             case 2: // K65 Media keys
@@ -1073,18 +1078,19 @@ void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urbinput){
                 handle_legacy_6kro_input(kb, urbinput);
                 break;
             case 15: // NKRO Input
-                handle_nkro_key_input(kb->input.keys, urbinput, length, 1);
+                handle_nkro_key_input(kb->input.keys, urbinput, length, KB_LEGACY_INPUT_LEN);
                 break;
             default:
                 ckb_warn("Got unknown legacy data");
         }
     } else {
+        // Make sure to skip the Report ID
         switch(urbinput[0]) {
-            case 0x01:
-                handle_nkro_key_input(kb->input.keys, urbinput, length, 0);
+            case NKRO_KEY_IN:
+                handle_nkro_key_input(kb->input.keys, urbinput + 1, length - 1, KB_NKRO_INPUT_LEN);
                 break;
-            case 0x02:
-                handle_nkro_media_keys(kb->input.keys, urbinput, length);
+            case NKRO_MEDIA_IN:
+                handle_nkro_media_keys(kb->input.keys, urbinput + 1, length - 1);
                 break;
             default:
                 ckb_warn("Got unknown data");

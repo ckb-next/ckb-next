@@ -180,7 +180,11 @@ static bool pidActive(const QStringList& lines){
 // Check if the application is running. Optionally write something to its shared memory.
 static bool isRunning(const char* command){
     // Try to create shared memory (if successful, application was not already running)
-    if(!appShare.create(SHMEM_SIZE) || !appShare.lock()){
+    // We try to create it twice, because if ckb-next crashes a certain way (ASAN), then we end up
+    // with a situation where create() fails with QSharedMemory::AlreadyExists
+    // but then attach() also fails with QSharedMemory::NotFound.
+    // By trying to create it twice, if it fails twice, that means it actually already exists.
+    if((!appShare.create(SHMEM_SIZE) && !appShare.create(SHMEM_SIZE)) || !appShare.lock()){
         // Lock existing shared memory
         if(!appShare.attach() || !appShare.lock())
             return true;

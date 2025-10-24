@@ -106,6 +106,7 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
         }
     }
 
+#endif
     QString copyrightText = QString("© 2014-2016 <a href=\"https://github.com/ccMSC/\" style=\"text-decoration:none;\">ccMSC</a>.<br/>© 2017-%1 <a href=\"https://github.com/ckb-next/ckb-next/graphs/contributors\" style=\"text-decoration:none;\">%2</a>.").arg(CKB_NEXT_COPYRIGHT_YEAR, tr("The ckb-next development team"));
 
 #ifndef OS_MAC_LEGACY

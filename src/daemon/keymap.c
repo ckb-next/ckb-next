@@ -10,6 +10,7 @@
 
 // Translates input from HID to a ckb input bitfield.
 static void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urbinput);
+static void hid_bragi_short_mouse_translate(usbinput* input, int length, const unsigned char* urbinput);
 static void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput);
 static void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urbinput);
 
@@ -840,23 +841,42 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 if(kb->protocol == PROTO_BRAGI) {
                     if(targetkb->active) {
                         // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
-                        if(buffer[1] == BRAGI_INPUT_HID) {
-                            if(urblen == 64)
-                                corsair_bragi_mousecopy(targetkb, &targetkb->input, buffer);
-                            else
-                                ckb_err("Invalid length in corsair_bragi_mousecopy(). Expected 64, got %d", urblen);
+                        // The urblen check is done here (and is 64 bytes even for 128 byte mice) because we don't check what comes from which endpoint
+                        // It is easy to mix up a bragi and an hid packet with just buffer[1] == BRAGI_INPUT_HID
+                        if(buffer[1] == BRAGI_INPUT_HID && urblen == 64) {
+                            corsair_bragi_mousecopy(targetkb, &targetkb->input, buffer);
                         } else {
-                            targetkb->input.rel_x += (buffer[5] << 8) | buffer[4];
-                            targetkb->input.rel_y += (buffer[7] << 8) | buffer[6];
-                            // Some bragi devices do not report scrolling in the SW packet
-                            // These type of hacks most likely apply to the dongle, and not the device itself in WL mode
-                            // Despite that, use targetkb for now, just because corsair_bragi_mousecopy has subkb passed to it, performing the same check.
-                            // If the above is in fact true, then we'll need a workaround.
-                            if(SW_PKT_HAS_NO_WHEEL(targetkb))
-                                targetkb->input.whl_rel_y = (signed char)buffer[8];
+                            if(USES_BRAGI_SHORT_REPORT(targetkb)) {
+                                if(urblen < 6) {
+                                    ckb_err("Bragi HID urblen too short %d < 6", urblen);
+                                } else {
+                                    targetkb->input.rel_x += (buffer[2] << 8) | buffer[1];
+                                    targetkb->input.rel_y += (buffer[4] << 8) | buffer[3];
+                                    if(SW_PKT_HAS_NO_WHEEL(targetkb))
+                                        targetkb->input.whl_rel_y = (signed char)buffer[5];
+                                }
+                            } else {
+                                if(urblen < 9) {
+                                    ckb_err("Bragi HID urblen too short %d < 9", urblen);
+                                } else {
+                                    targetkb->input.rel_x += (buffer[5] << 8) | buffer[4];
+                                    targetkb->input.rel_y += (buffer[7] << 8) | buffer[6];
+                                    // Some bragi devices do not report scrolling in the SW packet
+                                    // These type of hacks most likely apply to the dongle, and not the device itself in WL mode
+                                    // Despite that, use targetkb for now, just because corsair_bragi_mousecopy has subkb passed to it, performing the same check.
+                                    // If the above is in fact true, then we'll need a workaround.
+                                    if(SW_PKT_HAS_NO_WHEEL(targetkb))
+                                        targetkb->input.whl_rel_y = (signed char)buffer[8];
+                                }
+                            }
                         }
                     } else {
-                        hid_mouse_translate(&targetkb->input, urblen, buffer);
+                        // Because they couldn't leave the descriptor alone, there's now a shorter one
+                        // FIXME: Should this be targetkb?
+                        if(USES_BRAGI_SHORT_REPORT(targetkb))
+                            hid_bragi_short_mouse_translate(&targetkb->input, urblen, buffer);
+                        else
+                            hid_mouse_translate(&targetkb->input, urblen, buffer);
                     }
                 } else if(firstbyte == MOUSE_IN) {
                     // If we're in bootloader mode, parse the simplified reports
@@ -1100,6 +1120,25 @@ void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urbinput){
 
 #define BUTTON_HID_COUNT    5
 
+void hid_bragi_short_mouse_translate(usbinput* input, int length, const unsigned char* urbinput){
+    if(length != 6){
+        ckb_err("Invalid bragi short length %d", length);
+        return;
+    }
+    // Byte 0 = mouse buttons (bitfield)
+    for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
+        if(urbinput[0] & (1 << bit))
+            SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
+        else
+            CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
+    }
+    // Bytes 1 - 4: movement
+    input->rel_x += (urbinput[2] << 8) | urbinput[1];
+    input->rel_y += (urbinput[4] << 8) | urbinput[3];
+    // Byte 5: wheel
+    input->whl_rel_y = (signed char)urbinput[5];
+}
+
 void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput){
     if(length < 9){
         ckb_err("Invalid length %d", length);
@@ -1112,10 +1151,10 @@ void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbin
         else
             CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
     }
-    // Bytes 5 - 8: movement
+    // Bytes 4 - 7: movement
     input->rel_x += (urbinput[5] << 8) | urbinput[4];
     input->rel_y += (urbinput[7] << 8) | urbinput[6];
-    // Byte 9: wheel
+    // Byte 8: wheel
     input->whl_rel_y = (signed char)urbinput[8];
 }
 

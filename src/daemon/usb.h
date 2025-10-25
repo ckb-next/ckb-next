@@ -317,6 +317,9 @@ const char* product_str(ushort product);
 // Used for devices that have the scroll wheel packet in the hardware hid packet only
 #define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO))
 
+// For devices that have the new short HID report (6 bytes)
+#define USES_BRAGI_SHORT_REPORT(kb)                 ((kb)->vendor == (V_CORSAIR) && (0))
+
 #define HAS_NO_HW_PROFILE(kb)                       ((kb)->vendor == V_CORSAIR && (IS_POLARIS(kb) || (kb)->product == P_K55))
 
 /// Start the USB main loop. Returns program exit code when finished

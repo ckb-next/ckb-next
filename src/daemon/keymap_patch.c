@@ -101,6 +101,14 @@ static const keypatch k70corergbpatch[] = {
     { 129, "mute",  -1, KEY_MUTE },
 };
 
+static const keypatch scimitarbragipatch[] = {
+    { 237+20, "front",  LED_MOUSE + 2,     KEY_NONE },
+    { 238+20, "back",   LED_MOUSE,         KEY_NONE },
+    { 239+20, "dpi",    LED_MOUSE + 4,     KEY_NONE },
+    { 240+20, "wheel",  LED_MOUSE + 1,     KEY_NONE },
+    { 241+20, "thumb",  LED_MOUSE + 3,     KEY_NONE },
+};
+
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
 
@@ -129,6 +137,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_2, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_3, k70corergbpatch),
+    ADD_PATCH(V_CORSAIR, P_SCIMITAR_ELITE_BRAGI, scimitarbragipatch),
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

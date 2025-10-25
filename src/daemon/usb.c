@@ -39,6 +39,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_DARK_CORE_RGB_PRO, 18000 },
     { P_DARK_CORE_RGB_PRO_SE, 18000 },
     { P_GLAIVE_PRO, 16000 },
+    { P_SCIMITAR_ELITE_BRAGI, 18000 },
     { 0, 0 }, // Keep last and do not remove
 };
 
@@ -130,6 +131,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_HARPOON_WL_U, },
     { V_CORSAIR, P_HARPOON_WL_D, },
     { V_CORSAIR, P_GLAIVE_PRO, },
+    { V_CORSAIR, P_SCIMITAR_ELITE_BRAGI, },
     // Mousepads
     { V_CORSAIR, P_POLARIS, },
     { V_CORSAIR, P_MM700, },
@@ -252,7 +254,7 @@ const char* product_str(ushort product){
         return "m65e";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
-    if(product == P_SCIMITAR || product == P_SCIMITAR_PRO || product == P_SCIMITAR_ELITE)
+    if(product == P_SCIMITAR || product == P_SCIMITAR_PRO || product == P_SCIMITAR_ELITE || product == P_SCIMITAR_ELITE_BRAGI)
         return "scimitar";
     if(product == P_HARPOON || product == P_HARPOON_PRO)
         return "harpoon";

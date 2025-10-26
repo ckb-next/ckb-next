@@ -81,21 +81,21 @@ static const keypatch DCRGBPpatch[] = {
     { 268, "bar4",    LED_MOUSE + 4, KEY_NONE }, // "bar3"
 };
 
-keypatch k100patch[] = {
+static const keypatch k100patch[] = {
     {114, "lock", 114, KEY_CORSAIR },
 };
 
-keypatch k70tklpatch[] = {
+static const keypatch k70tklpatch[] = {
     { 114, "lock",    114, KEY_CORSAIR },
     {   1, "logo",      1, KEY_NONE },
 };
 
-keypatch k70propatch[] = {
+static const keypatch k70propatch[] = {
     { 114, "lock",    114, KEY_CORSAIR },
     { 138, "logo",    138, KEY_NONE },
 };
 
-keypatch k70corergbpatch[] = {
+static const keypatch k70corergbpatch[] = {
     { 124, "mr",    -1, KEY_CORSAIR },
     { 127, "play",  -1, KEY_PLAY },
     { 129, "mute",  -1, KEY_MUTE },

@@ -9,6 +9,6 @@ Comment=Corsair keyboard driver user interface
 Keywords=ckb;corsair;keyboard;rgb;
 Categories=Settings;System;
 TryExec=@CMAKE_INSTALL_PREFIX@/bin/ckb-next
-Exec=@CMAKE_INSTALL_PREFIX@/bin/ckb-next
+Exec=@CMAKE_INSTALL_PREFIX@/bin/ckb-next@CKB_NEXT_BACKGROUND_ARG@
 Icon=ckb-next
 StartupNotify=true

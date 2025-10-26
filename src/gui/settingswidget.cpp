@@ -1,6 +1,5 @@
 #include <QTimer>
 #include "animscript.h"
-#include "autorun.h"
 #include "ckbsettings.h"
 #include "kb.h"
 #include "settingswidget.h"
@@ -79,16 +78,35 @@ SettingsWidget::SettingsWidget(QWidget *parent) :
     // Read auto update settings
     ui->autoFWBox->setChecked(!settings.value("DisableAutoFWCheck").toBool());
 
-    // Read auto run settings
-    if(!AutoRun::available())
-        ui->loginItemBox->hide();
-    else {
-        if(!AutoRun::once())
-            // If this is the first time running the app, enable auto run by default
-            AutoRun::enable();
-        ui->loginItemBox->setChecked(AutoRun::isEnabled());
+#ifdef Q_OS_LINUX
+    static const QString deletedAutorunPath = QStringLiteral("Program/DeletedOldAutostart");
+    // If autostart was enabled, and there's an autostart file in XDG_CONFIG_DIRS, then delete the local one.
+    if(!CkbSettings::get(deletedAutorunPath).toBool()) {
+        CkbSettings::set(deletedAutorunPath, QVariant::fromValue<bool>(true));
+
+        // Have to do this manually since Qt won't separate system paths from user ones
+        QStringList config_dirs = QString::fromLocal8Bit(qgetenv("XDG_CONFIG_DIRS")).split(QChar(':'), Qt::SkipEmptyParts);
+        if(config_dirs.isEmpty())
+            config_dirs.append(QStringLiteral("/etc/xdg"));
+
+        for(const QString& str : config_dirs) {
+            QDir d(str);
+            if(!d.exists() || !d.cd(QStringLiteral("autostart")))
+                continue;
+
+            if(d.exists(QStringLiteral("ckb-next.desktop"))) {
+                qDebug() << "Found autostart file in" << d.absolutePath();
+                // Path copy pasted from the old autorun.cpp
+                static const QDir path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/autostart");
+                // ckb-next wouldn't let you modify the autostart file before, so if the file exists, it's a pretty good guarantee that it's the one we created
+                // If the user modified it and made it read only, then this won't be able to remove it anyway
+                QFile::remove(path.absoluteFilePath(QStringLiteral("ckb-next.autostart.desktop")));
+                break;
+            }
+        }
     }
 
+#endif
     QString copyrightText = QString("© 2014-2016 <a href=\"https://github.com/ccMSC/\" style=\"text-decoration:none;\">ccMSC</a>.<br/>© 2017-%1 <a href=\"https://github.com/ckb-next/ckb-next/graphs/contributors\" style=\"text-decoration:none;\">%2</a>.").arg(CKB_NEXT_COPYRIGHT_YEAR, tr("The ckb-next development team"));
 
 #ifndef OS_MAC_LEGACY
@@ -176,13 +194,6 @@ void SettingsWidget::on_winBox_activated(int index){
 
 void SettingsWidget::on_autoFWBox_clicked(bool checked){
     CkbSettings::set("Program/DisableAutoFWCheck", !checked);
-}
-
-void SettingsWidget::on_loginItemBox_clicked(bool checked){
-    if(checked)
-        AutoRun::enable();
-    else
-        AutoRun::disable();
 }
 
 void SettingsWidget::on_aboutQt_clicked(){

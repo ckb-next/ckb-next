@@ -866,6 +866,9 @@ int usbmain(){
                 // warning about unused variables:
                 // https://sourceware.org/bugzilla/show_bug.cgi?id=11959
                 (void) unused_result;
+
+                // If we returned from exithandler(), may be in a "reload" sequence -> let usbmain() return to main()
+                break;
             }
         }
     }

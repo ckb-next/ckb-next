@@ -185,7 +185,7 @@ public Q_SLOTS:
      *
      * So that the Wayland compositor knows who is requesting an activation.
      */
-    //void ProvideXdgActivationToken(const QString &token);
+    void ProvideXdgActivationToken(const QString &token);
 
 Q_SIGNALS:
     /**
@@ -224,7 +224,7 @@ Q_SIGNALS:
 private:
     KStatusNotifierItem *m_statusNotifierItem;
     QString m_connId;
-    //QString m_xdgActivationToken;
+    QString m_xdgActivationToken;
     QDBusConnection m_dbus;
     static int s_serviceCount;
 };

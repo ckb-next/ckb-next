@@ -158,7 +158,7 @@ QString KStatusNotifierItemDBus::service() const
 
 bool KStatusNotifierItemDBus::ItemIsMenu() const
 {
-    return (m_statusNotifierItem->d->associatedWidget == m_statusNotifierItem->d->menu);
+    return m_statusNotifierItem->isMenu();
 }
 
 // DBUS slots
@@ -291,10 +291,11 @@ void KStatusNotifierItemDBus::Scroll(int delta, const QString &orientation)
     Q_EMIT m_statusNotifierItem->scrollRequested(delta, dir);
 }
 
-/*void KStatusNotifierItemDBus::ProvideXdgActivationToken(const QString &token)
+void KStatusNotifierItemDBus::ProvideXdgActivationToken(const QString &token)
 {
     m_xdgActivationToken = token;
-    KWindowSystem::setCurrentXdgActivationToken(token);
-}*/
+    qDebug() << "ProvideXdgActivationToken stub!";
+    //KWindowSystem::setCurrentXdgActivationToken(token);
+}
 
 #include "moc_kstatusnotifieritemdbus_p.cpp"

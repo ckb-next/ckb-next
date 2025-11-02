@@ -10,5 +10,6 @@
 #define qCDebug qDebug
 #define qCWarning qWarning
 
+#include "config-kstatusnotifieritem.h"
 
 #endif // DEBUG_P_H

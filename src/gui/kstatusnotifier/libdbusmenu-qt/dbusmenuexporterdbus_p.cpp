@@ -9,7 +9,6 @@
 // Qt
 #include <QDBusMessage>
 #include <QMenu>
-#include <QVariant>
 
 // Local
 #include "dbusmenuadaptor.h"

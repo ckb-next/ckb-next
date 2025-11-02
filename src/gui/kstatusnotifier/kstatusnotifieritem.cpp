@@ -1015,7 +1015,7 @@ void KStatusNotifierItemPrivate::legacyActivated(QSystemTrayIcon::ActivationReas
 {
     if (reason == QSystemTrayIcon::MiddleClick) {
         Q_EMIT q->secondaryActivateRequested(systemTrayIcon->geometry().topLeft());
-    } else if (reason == QSystemTrayIcon::Trigger) {
+    } else if (reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick) { // ckb-next: QSystemTrayIcon::DoubleClick can be emitted even if the second click happens many minutes later
         q->activate(systemTrayIcon->geometry().topLeft());
     }
 }

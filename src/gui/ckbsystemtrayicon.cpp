@@ -10,9 +10,9 @@ CkbSystemTrayIcon::CkbSystemTrayIcon(const QIcon& icon, const QString iconName, 
     connect(this, &KStatusNotifierItem::scrollRequested, [this](int delta, Qt::Orientation orientation) {
         QPoint data;
         if(orientation == Qt::Horizontal)
-            data.setX(delta); // Untested (and unused), might need to be -delta too
+            data.setX(delta);
         else
-            data.setY(-delta);
+            data.setY(delta);
 
         emit scrollRequested(data);
     });

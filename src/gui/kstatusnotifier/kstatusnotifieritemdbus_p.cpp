@@ -127,11 +127,12 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, KDbusToolTipStruc
 
 int KStatusNotifierItemDBus::s_serviceCount = 0;
 
-KStatusNotifierItemDBus::KStatusNotifierItemDBus(KStatusNotifierItem *parent)
+KStatusNotifierItemDBus::KStatusNotifierItemDBus(KStatusNotifierItem *parent, bool isKde_)
     : QObject(parent)
     , m_statusNotifierItem(parent)
     , m_connId(QStringLiteral("org.kde.StatusNotifierItem-%1-%2").arg(QCoreApplication::applicationPid()).arg(++s_serviceCount))
     , m_dbus(QDBusConnection(m_connId))
+    , isKde(isKde_)
 {
     m_dbus = QDBusConnection::connectToBus(QDBusConnection::SessionBus, m_connId);
 
@@ -288,6 +289,10 @@ void KStatusNotifierItemDBus::SecondaryActivate(int x, int y)
 void KStatusNotifierItemDBus::Scroll(int delta, const QString &orientation)
 {
     Qt::Orientation dir = (orientation.toLower() == QLatin1String("horizontal") ? Qt::Horizontal : Qt::Vertical);
+    // ckb-next: It seems like all other implementations are inverted.
+    // They also only seem to return +/-1
+    if(!isKde && std::abs(delta) == 1)
+        delta = -delta * 120;
     Q_EMIT m_statusNotifierItem->scrollRequested(delta, dir);
 }
 

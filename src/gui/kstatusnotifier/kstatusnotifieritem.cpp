@@ -839,6 +839,9 @@ KStatusNotifierItemPrivate::KStatusNotifierItemPrivate(KStatusNotifierItem *item
     , onAllDesktops(false)
     , standardActionsEnabled(true)
 {
+    isKde = !qEnvironmentVariableIsEmpty("KDE_FULL_SESSION")
+            || qgetenv("XDG_CURRENT_DESKTOP") == "KDE"
+            || qgetenv("QT_QPA_PLATFORMTHEME").toLower() == "kde";
 }
 
 void KStatusNotifierItemPrivate::init(const QString &extraId)
@@ -849,7 +852,7 @@ void KStatusNotifierItemPrivate::init(const QString &extraId)
     qDBusRegisterMetaType<KDbusImageVector>();
     qDBusRegisterMetaType<KDbusToolTipStruct>();
 
-    statusNotifierItemDBus = new KStatusNotifierItemDBus(q);
+    statusNotifierItemDBus = new KStatusNotifierItemDBus(q, isKde);
 
     QDBusServiceWatcher *watcher = new QDBusServiceWatcher(QString::fromLatin1(s_statusNotifierWatcherServiceName),
                                                            QDBusConnection::sessionBus(),
@@ -1006,9 +1009,7 @@ void KStatusNotifierItemPrivate::setLegacyMode(bool legacy)
 
 void KStatusNotifierItemPrivate::legacyWheelEvent(int delta)
 {
-#if HAVE_DBUS
-    statusNotifierItemDBus->Scroll(delta, QStringLiteral("vertical"));
-#endif
+    Q_EMIT q->scrollRequested(delta, Qt::Vertical);
 }
 
 void KStatusNotifierItemPrivate::legacyActivated(QSystemTrayIcon::ActivationReason reason)
@@ -1028,9 +1029,6 @@ void KStatusNotifierItemPrivate::setLegacySystemTrayEnabled(bool enabled)
     }
 
     if (enabled) {
-        bool isKde = !qEnvironmentVariableIsEmpty("KDE_FULL_SESSION")
-            || qgetenv("XDG_CURRENT_DESKTOP") == "KDE"
-            || qgetenv("QT_QPA_PLATFORMTHEME").toLower() == "kde";
         if (!systemTrayIcon && !isKde) {
             if (!QSystemTrayIcon::isSystemTrayAvailable()) {
                 return;

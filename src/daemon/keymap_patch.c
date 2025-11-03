@@ -109,6 +109,30 @@ static const keypatch scimitarbragipatch[] = {
     { 241+20, "thumb",  LED_MOUSE + 3,     KEY_NONE },
 };
 
+static const keypatch k95platinumxtpatch[] = {
+    // Shift the topbar LEDs by one compared to the K100 on the keymap
+    { 137, NULL,             -1, KEY_NONE },
+    { 138, "topbar1",       137, KEY_NONE },
+    { 139, "topbar2",       138, KEY_NONE },
+    { 140, "topbar3",       139, KEY_NONE },
+    { 141, "topbar4",       140, KEY_NONE },
+    { 142, "topbar5",       141, KEY_NONE },
+    { 143, "topbar6",       142, KEY_NONE },
+    { 144, "topbar7",       143, KEY_NONE },
+    { 145, "topbar8",       144, KEY_NONE },
+    { 146, "topbar9",       145, KEY_NONE },
+    { 147, "topbar10",      146, KEY_NONE },
+    { 148, "topbar11",      147, KEY_NONE },
+    { 149, "topbar12",      148, KEY_NONE },
+    { 150, "topbar13",      149, KEY_NONE },
+    { 151, "topbar14",      150, KEY_NONE },
+    { 152, "topbar15",      151, KEY_NONE },
+    { 153, "topbar16",      152, KEY_NONE },
+    { 154, "topbar17",      153, KEY_NONE },
+    { 155, "topbar18",      154, KEY_NONE },
+    { 156, "topbar19",      155, KEY_NONE },
+};
+
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
 
@@ -138,6 +162,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_2, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_3, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_SCIMITAR_ELITE_BRAGI, scimitarbragipatch),
+    ADD_PATCH(V_CORSAIR, P_K95_PLATINUM_XT, k95platinumxtpatch),
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

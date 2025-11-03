@@ -57,7 +57,7 @@ class KStatusNotifierItemDBus : public QObject
     friend class KStatusNotifierItem;
 
 public:
-    explicit KStatusNotifierItemDBus(KStatusNotifierItem *parent);
+    explicit KStatusNotifierItemDBus(KStatusNotifierItem *parent, bool isKde_);
     ~KStatusNotifierItemDBus() override;
 
     /**
@@ -227,6 +227,7 @@ private:
     QString m_xdgActivationToken;
     QDBusConnection m_dbus;
     static int s_serviceCount;
+    bool isKde;
 };
 
 const QDBusArgument &operator<<(QDBusArgument &argument, const KDbusImageStruct &icon);

@@ -171,6 +171,7 @@ public:
     bool standardActionsEnabled : 1;
     bool quitAborted = false;
     bool isMenu = false;
+    bool isKde;
 };
 
 #endif

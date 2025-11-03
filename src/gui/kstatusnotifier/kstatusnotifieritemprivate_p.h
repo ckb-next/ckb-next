@@ -15,9 +15,10 @@
 #include <QSystemTrayIcon>
 #include <QWheelEvent>
 
+#include "config-kstatusnotifieritem.h"
 #include "kstatusnotifieritem.h"
 
-#ifdef QT_DBUS_LIB
+#if HAVE_DBUS
 #include "kstatusnotifieritemdbus_p.h"
 
 #include "notifications_interface.h"
@@ -101,7 +102,7 @@ public:
     void setLegacySystemTrayEnabled(bool enabled);
     void syncLegacySystemTrayIcon();
     void contextMenuAboutToShow();
-    void maybeQuit();
+    void quit();
     void minimizeRestore();
     void minimizeRestore(bool show);
     void hideMenu();
@@ -116,7 +117,7 @@ public:
 
     KStatusNotifierItem *q;
 
-#ifdef QT_DBUS_LIB
+#if HAVE_DBUS
     KDbusImageStruct imageToStruct(const QImage &image);
     KDbusImageVector iconToVector(const QIcon &icn);
 
@@ -168,6 +169,9 @@ public:
     bool hasQuit : 1;
     bool onAllDesktops : 1;
     bool standardActionsEnabled : 1;
+    bool quitAborted = false;
+    bool isMenu = false;
+    bool isKde;
 };
 
 #endif

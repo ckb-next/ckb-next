@@ -8,56 +8,64 @@
 #ifndef KSTATUSNOTIFIERITEM_H
 #define KSTATUSNOTIFIERITEM_H
 
+#include <QMenu>
 #include <QObject>
 #include <QPoint>
 #include <QString>
 
 //#include <kstatusnotifieritem_export.h>
+#include "config-kstatusnotifieritem.h"
 
 #include <memory>
 
 class QAction;
-class QMenu;
 
 class KStatusNotifierItemPrivate;
 
-/**
- * @class KStatusNotifierItem kstatusnotifieritem.h KStatusNotifierItem
+/*!
+ * \class KStatusNotifierItem
+ * \inmodule KStatusNotifierItem
  *
- * \brief %KDE Status notifier Item protocol implementation
+ * \brief KDE Status Notifier Item protocol implementation.
  *
  * This class implements the Status notifier Item D-Bus specification.
  * It provides an icon similar to the classical systemtray icons,
  * with some key differences:
  *
- * - the actual representation is done by the systemtray (or the app behaving
+ * \list
+ * \li the actual representation is done by the systemtray (or the app behaving
  *   like it) itself, not by this app.  Since 4.5 this also includes the menu,
  *   which means you cannot use embed widgets in the menu.
  *
- * - there is communication between the systemtray and the icon owner, so the
+ * \li there is communication between the systemtray and the icon owner, so the
  *   system tray can know if the application is in a normal or in a requesting
  *   attention state.
  *
- * - icons are divided in categories, so the systemtray can represent in a
+ * \li icons are divided in categories, so the systemtray can represent in a
  *   different way the icons from normal applications and for instance the ones
  *   about hardware status.
+ * \endlist
  *
  * Whenever possible you should prefer passing icon by name rather than by
  * pixmap because:
  *
- * - it is much lighter on D-Bus (no need to pass all image pixels).
+ * \list
+ * \li it is much lighter on D-Bus (no need to pass all image pixels).
  *
- * - it makes it possible for the systemtray to load an icon of the appropriate
+ * \li it makes it possible for the systemtray to load an icon of the appropriate
  *   size or to replace your icon with a systemtray specific icon which matches
  *   with the desktop theme.
  *
- * - some implementations of the system tray do not support passing icons by
+ * \li some implementations of the system tray do not support passing icons by
  *   pixmap and will show a blank icon instead.
+ * \endlist
  *
- * @author Marco Martin <notmart@gmail.com>
- * @since 4.4
+ * \note When used inside a Flatpak it is important to request explicit support
+ * in the Flatpak manifest with the following line:
+ * \c --talk-name=org.kde.StatusNotifierWatcher
+ *
+ * \since 4.4
  */
-#define KSTATUSNOTIFIERITEM_EXPORT
 class KSTATUSNOTIFIERITEM_EXPORT KStatusNotifierItem : public QObject
 {
     Q_OBJECT
@@ -76,54 +84,74 @@ class KSTATUSNOTIFIERITEM_EXPORT KStatusNotifierItem : public QObject
     friend class KStatusNotifierItemPrivate;
 
 public:
-    /**
+    /*!
      * All the possible status this icon can have, depending on the
-     * importance of the events that happens in the parent application
+     * importance of the events that happens in the parent application.
+     *
+     * \value Passive
+     *        Nothing is happening in the application, so showing this icon is
+     *        not required. This is the default value.
+     *
+     * \value Active
+     *        The application is doing something, or it is important that the
+     *        icon is always reachable from the user.
+     *
+     * \value NeedsAttention
+     *        The application requests the attention of the user, for instance
+     *        battery running out or a new IM message was received.
      */
     enum ItemStatus {
-        /// Nothing is happening in the application, so showing this icon is not required. This is the default value
         Passive = 1,
-        /// The application is doing something, or it is important that the
-        /// icon is always reachable from the user
         Active = 2,
-        /// The application requests the attention of the user, for instance
-        /// battery running out or a new IM message was received
         NeedsAttention = 3,
     };
     Q_ENUM(ItemStatus)
 
-    /**
+    /*!
      * Different kinds of applications announce their type to the systemtray,
-     * so can be drawn in a different way or in a different place
+     * so can be drawn in a different way or in a different place.
+     *
+     * \value ApplicationStatus
+     *        An icon for a normal application, can be seen as its taskbar
+     *        entry. This is the default value.
+     *
+     * \value Communications
+     *        This is a communication oriented application; this icon will be used
+     *        for things such as the notification of a new message.
+     *
+     * \value SystemServices
+     *        This is a system service, it can show itself in the system tray if
+     *        it requires interaction from the user or wants to inform him about
+     *        something.
+     *
+     * \value Hardware
+     *        This application shows hardware status or a means to control it.
+     *
+     * \value Reserved
      */
     enum ItemCategory {
-        /// An icon for a normal application, can be seen as its taskbar entry. This is the default value
         ApplicationStatus = 1,
-        /// This is a communication oriented application; this icon will be used
-        /// for things such as the notification of a new message
         Communications = 2,
-        /// This is a system service, it can show itself in the system tray if
-        /// it requires interaction from the user or wants to inform him about
-        /// something
         SystemServices = 3,
-        /// This application shows hardware status or a means to control it
         Hardware = 4,
         Reserved = 129,
     };
     Q_ENUM(ItemCategory)
 
-    /**
-     * Construct a new status notifier item
+    /*!
+     * \brief Construct a new status notifier item.
      *
-     * @param parent the parent object for this object. If the object passed in as
+     * \a parent the parent object for this object. If the object passed in as
      * a parent is also a QWidget, it will  be used as the main application window
      * represented by this icon and will be shown/hidden when an activation is requested.
-     * @see associatedWindow
+     *
+     * \sa associatedWidget
      **/
     explicit KStatusNotifierItem(QObject *parent = nullptr);
 
-    /**
-     * Construct a new status notifier item with a unique identifier.
+    /*!
+     * \brief Construct a new status notifier item with a unique identifier.
+     *
      * If your application has more than one status notifier item and the user
      * should be able to manipulate them separately (e.g. mark them for hiding
      * in a user interface), the id can be used to differentiate between them.
@@ -134,354 +162,447 @@ public:
      * associate configuration information with this item in a way that can persist
      * between sessions or application restarts.
      *
-     * @param id the unique id for this icon
-     * @param parent the parent object for this object. If the object passed in as
+     * \a id the unique id for this icon
+     *
+     * \a parent the parent object for this object. If the object passed in as
      * a parent is also a QWidget, it will  be used as the main application window
      * represented by this icon and will be shown/hidden when an activation is requested.
-     * @see associatedWindow
+     *
+     * \sa associatedWidget
      **/
     explicit KStatusNotifierItem(const QString &id, QObject *parent = nullptr);
 
     ~KStatusNotifierItem() override;
 
-    /**
-     * @return The id which was specified in the constructor. This should be
-     * guaranteed to be consistent between application starts and
+    /*!
+     * \brief Returns the id which was specified in the constructor.
+     *
+     * This should be guaranteed to be consistent between application starts and
      * untranslated, as host applications displaying items may use it for
      * storing configuration related to this item.
      */
     QString id() const;
 
-    /**
-     * Sets the category for this icon, usually it's needed to call this function only once
+    /*!
+     * \brief Sets the category for this icon.
      *
-     * @param category the new category for this icon
+     * Usually it's needed to call this function only once.
+     *
+     * \a category the new category for this icon
      */
     void setCategory(const ItemCategory category);
 
-    /**
-     * @return the application category
+    /*!
+     * \brief Returns the application category.
      */
     ItemCategory category() const;
 
-    /**
-     * Sets a title for this icon
+    /*!
+     * \brief Sets a \a title for this icon.
      */
     void setTitle(const QString &title);
 
-    /**
-     * @return the title of this icon
+    /*!
+     * \brief Returns the title of this icon.
      */
     QString title() const;
 
-    /**
-     * Sets a new status for this icon.
+    /*!
+     * \brief Sets a new \a status for this icon.
      */
     void setStatus(const ItemStatus status);
 
-    /**
-     * @return the current application status
+    /*!
+     * \brief Returns the current application status.
      */
     ItemStatus status() const;
 
     // Main icon related functions
-    /**
-     * Sets a new main icon for the system tray
+    /*!
+     * \brief Sets a new main icon for the system tray.
      *
-     * @param name it must be a QIcon::fromTheme compatible name, this is
-     * the preferred way to set an icon
+     * \a name it must be a QIcon::fromTheme compatible name, this is
+     *         the preferred way to set an icon
      */
     void setIconByName(const QString &name);
 
-    /**
-     * @return the name of the main icon to be displayed
-     * if image() is not empty this will always return an empty string
+    /*!
+     * \brief Returns the name of the main icon to be displayed.
+     *
+     * If image() is not empty this will always return an empty string
      */
     QString iconName() const;
 
-    /**
-     * Sets a new main icon for the system tray
+    /*!
+     * \brief Sets a new main icon for the system tray.
      *
-     * @param pixmap our icon, use setIcon(const QString) when possible
+     * \a icon our icon, use setIcon(const QString) when possible
      */
     void setIconByPixmap(const QIcon &icon);
 
-    /**
-     * @return a pixmap of the icon
+    /*!
+     * \brief Returns a pixmap of the icon.
      */
     QIcon iconPixmap() const;
 
-    /**
-     * Sets an icon to be used as overlay for the main one
-     * @param icon name, if name is and empty QString()
-     *     (and overlayIconPixmap() is empty too) the icon will be removed
+    /*!
+     * \brief Sets an icon to be used as overlay for the main one.
+     *
+     * \a name the icon name, if name is and empty QString()
+     *         (and overlayIconPixmap() is empty too) the icon will be removed
      */
     void setOverlayIconByName(const QString &name);
 
-    /**
-     * @return the name of the icon to be used as overlay fr the main one
+    /*!
+     * \brief Returns the name of the icon to be used as overlay fr the main one.
      */
     QString overlayIconName() const;
 
-    /**
-     * Sets an icon to be used as overlay for the main one
+    /*!
+     * \brief Sets an icon to be used as overlay for the main one.
+     *
      *   setOverlayIconByPixmap(QIcon()) will remove the overlay when
      *   overlayIconName() is empty too.
      *
-     * @param pixmap our overlay icon, use setOverlayIcon(const QString) when possible.
+     * \a icon our overlay icon, use setOverlayIcon(const QString) when possible.
      */
     void setOverlayIconByPixmap(const QIcon &icon);
 
-    /**
-     * @return a pixmap of the icon
+    /*!
+     * Returns a pixmap of the icon
      */
     QIcon overlayIconPixmap() const;
 
     // Requesting attention icon
 
-    /**
-     * Sets a new icon that should be used when the application
+    /*!
+     * \brief Sets a new icon that should be used when the application
      * wants to request attention (usually the systemtray
-     * will blink between this icon and the main one)
+     * will blink between this icon and the main one).
      *
-     * @param name QIcon::fromTheme compatible name of icon to use
+     * \a name QIcon::fromTheme compatible name of icon to use
      */
     void setAttentionIconByName(const QString &name);
 
-    /**
-     * @return the name of the icon to be displayed when the application
-     * is requesting the user's attention
-     * if attentionImage() is not empty this will always return an empty string
+    /*!
+     * \brief Returns the name of the icon to be displayed when the application
+     * is requesting the user's attention.
+     *
+     * If attentionImage() is not empty this will always return an empty string.
      */
     QString attentionIconName() const;
 
-    /**
-     * Sets the pixmap of the requesting attention icon.
+    /*!
+     * \brief Sets the pixmap of the requesting attention icon.
+     *
      * Use setAttentionIcon(const QString) instead when possible.
      *
-     * @param icon QIcon to use for requesting attention.
+     * \a icon QIcon to use for requesting attention.
      */
     void setAttentionIconByPixmap(const QIcon &icon);
 
-    /**
-     * @return a pixmap of the requesting attention icon
+    /*!
+     * Returns a pixmap of the requesting attention icon
      */
     QIcon attentionIconPixmap() const;
 
-    /**
-     * Sets a movie as the requesting attention icon.
+    /*!
+     * \brief Sets a movie \a name as the requesting attention icon.
+     *
      * This overrides anything set in setAttentionIcon()
      */
     void setAttentionMovieByName(const QString &name);
 
-    /**
-     * @return the name of the movie to be displayed when the application is
-     * requesting the user attention
+    /*!
+     * \brief Returns the name of the movie to be displayed when the application is
+     * requesting the user attention.
      */
     QString attentionMovieName() const;
 
     // ToolTip handling
-    /**
-     * Sets a new toolTip or this icon, a toolTip is composed of an icon,
+    /*!
+     * \brief Sets a new toolTip for this icon.
+     *
+     * A toolTip is composed of an icon,
      * a title and a text, all fields are optional.
      *
-     * @param iconName a QIcon::fromTheme compatible name for the tootip icon
-     * @param title tootip title
-     * @param subTitle subtitle for the toolTip
+     * \a iconName a QIcon::fromTheme compatible name for the tootip icon
+     *
+     * \a title tootip title
+     *
+     * \a subTitle subtitle for the toolTip
      */
     void setToolTip(const QString &iconName, const QString &title, const QString &subTitle);
 
-    /**
-     * Sets a new toolTip or this status notifier item.
-     * This is an overloaded member provided for convenience
+    /*!
+     * \brief Sets a new toolTip or this status notifier item.
+     *
+     * \overload setTooltip()
+     *
+     * \a icon a QIcon() pixmap for the tooltip icon
+     *
+     * \a title tootip title
+     *
+     * \a subTitle subtitle for the toolTip
      */
     void setToolTip(const QIcon &icon, const QString &title, const QString &subTitle);
 
-    /**
-     * Set a new icon for the toolTip
+    /*!
+     * \brief Sets a new icon for the toolTip.
      *
-     * @param name the name for the icon
+     * \a name the name for the icon
      */
     void setToolTipIconByName(const QString &name);
 
-    /**
-     * @return the name of the toolTip icon
-     * if toolTipImage() is not empty this will always return an empty string
+    /*!
+     * \brief Returns the name of the toolTip icon.
+     *
+     * If toolTipImage() is not empty this will always return an empty string.
      */
     QString toolTipIconName() const;
 
-    /**
-     * Set a new icon for the toolTip.
+    /*!
+     * \brief Set a new icon for the toolTip.
      *
      * Use setToolTipIconByName(QString) if possible.
-     * @param pixmap representing the icon
+     *
+     * \a icon representing the icon
      */
     void setToolTipIconByPixmap(const QIcon &icon);
 
-    /**
-     * @return a serialization of the toolTip icon data
+    /*!
+     * \brief Returns a serialization of the toolTip icon data.
      */
     QIcon toolTipIconPixmap() const;
 
-    /**
-     * Sets a new title for the toolTip
+    /*!
+     * \brief Sets a new \a title for the toolTip.
      */
     void setToolTipTitle(const QString &title);
 
-    /**
-     * @return the title of the main icon toolTip
+    /*!
+     * \brief Returns the title of the main icon toolTip.
      */
     QString toolTipTitle() const;
 
-    /**
-     * Sets a new subtitle for the toolTip
+    /*!
+     * \brief Sets a new \a subTitle for the toolTip.
      */
     void setToolTipSubTitle(const QString &subTitle);
 
-    /**
-     * @return the subtitle of the main icon toolTip
+    /*!
+     * \brief Returns the subtitle of the main icon toolTip.
      */
     QString toolTipSubTitle() const;
 
-    /**
-     * Sets a new context menu for this StatusNotifierItem.
+    /*!
+     * \brief Sets a new context \a menu for this StatusNotifierItem.
+     *
      * the menu will be shown with a contextMenu(int,int)
      * call by the systemtray over D-Bus
-     * usually you don't need to call this unless you want to use
-     * a custom QMenu subclass as context menu.
      *
      * The KStatusNotifierItem instance takes ownership of the menu,
      * and will delete it upon its destruction.
      */
     void setContextMenu(QMenu *menu);
 
-    /**
-     * Access the context menu associated to this status notifier item
+    /*!
+     * \brief Access the context menu associated to this status notifier item.
      */
     QMenu *contextMenu() const;
 
-    /**
-     * Sets the main widget associated with this StatusNotifierItem
+    /*!
+     * \brief Sets the main widget associated with this StatusNotifierItem.
      *
-     * If you pass contextMenu() as a parent then the menu will be displayed
-     * when the user activate the icon. In this case the activate() method will
-     * not be called and the activateRequested() signal will not be emitted
+     * \a window The window to be used.
      *
-     * @param parent the new main widget: must be a top level window,
-     *               if it's not parent->window() will be used instead.
+     * \since 6.0
      */
-    void setAssociatedWidget(QWidget *parent);
+    void setAssociatedWidget(QWidget *widget);
 
-    /**
-     * Access the main widget associated with this StatusNotifierItem
+    /*!
+     * \brief Access the main widget associated with this StatusNotifierItem.
+     *
+     * \since 6.0
      */
     QWidget *associatedWidget() const;
 
-    /**
-     * All the actions present in the menu
+#if KSTATUSNOTIFIERITEM_ENABLE_DEPRECATED_SINCE(6, 6)
+    /*!
+     * \brief All the actions present in the menu.
+     *
+     * \deprecated[6.6] Read actions using contextMenu() instead.
      */
+    KSTATUSNOTIFIERITEM_DEPRECATED_VERSION(6, 6, "Read actions from contextMenu()")
     QList<QAction *> actionCollection() const;
+#endif
 
-    /**
-     * Adds an action to the actionCollection()
+#if KSTATUSNOTIFIERITEM_ENABLE_DEPRECATED_SINCE(6, 6)
+    /*!
+     * \brief Adds an action to the actionCollection().
      *
-     * @param name the name of the action
-     * @param action the action we want to add
+     * \a name the name of the action
+     *
+     * \a action the action we want to add
+     *
+     * \deprecated[6.6] Add actions using contextMenu() instead.
      */
+    KSTATUSNOTIFIERITEM_DEPRECATED_VERSION(6, 6, "Add actions to contextMenu()")
     void addAction(const QString &name, QAction *action);
+#endif
 
-    /**
-     * Removes an action from the collection
+#if KSTATUSNOTIFIERITEM_ENABLE_DEPRECATED_SINCE(6, 6)
+    /*!
+     * \brief Removes an action from the collection.
      *
-     * @param name the name of the action
+     * \a name the name of the action
+     *
+     * \deprecated [6.6] Remove actions using contextMenu() instead.
      */
+    KSTATUSNOTIFIERITEM_DEPRECATED_VERSION(6, 6, "Remove actions from contextMenu()")
     void removeAction(const QString &name);
+#endif
 
-    /**
-     * Retrieves an action from the action collection
-     * by the action name
+#if KSTATUSNOTIFIERITEM_ENABLE_DEPRECATED_SINCE(6, 6)
+    /*!
+     * \brief Retrieves an action from the action collection by the action name.
      *
-     * @param name the name of the action to retrieve
-     * @since 5.12
+     * \a name the name of the action to retrieve
+     *
+     * \since 5.12
+     *
+     * \deprecated [6.6] Read actions using contextMenu(). For controlling
+     *                   the behavior of the Quit action use quitRequested()
+     *                   and abortQuit()
      */
+    KSTATUSNOTIFIERITEM_DEPRECATED_VERSION(6, 6, "See API docs")
     QAction *action(const QString &name) const;
+#endif
 
-    /**
-     * Sets whether to show the standard items in the menu, such as Quit
+    /*!
+     * \a enabled Whether to show the standard items in the menu, such as Quit.
      */
     void setStandardActionsEnabled(bool enabled);
 
-    /**
-     * @return if the standard items in the menu, such as Quit
+    /*!
+     * \brief Returns if the standard items in the menu, such as Quit.
      */
     bool standardActionsEnabled() const;
 
-    /**
-     * Shows the user a notification. If possible use KNotify instead
+    /*!
+     * \brief Shows the user a notification.
      *
-     * @param title message title
-     * @param message the actual text shown to the user
-     * @param icon icon to be shown to the user
-     * @param timeout how much time will elaps before hiding the message
+     * If possible use KNotify instead.
+     *
+     * \a title message title
+     *
+     * \a message the actual text shown to the user
+     *
+     * \a icon icon to be shown to the user
+     *
+     * \a timeout how much time will elapse before hiding the message
      */
     void showMessage(const QString &title, const QString &message, const QString &icon, int timeout = 10000);
 
-    /**
-     * @return the last provided token to be used with Wayland's xdg_activation_v1
+    /*!
+     * \brief Returns the last provided token to be used with Wayland's xdg_activation_v1.
      */
-    //QString providedToken() const;
+    QString providedToken() const;
+
+    /*!
+     * \brief Cancelles an ongoing quit operation.
+     *
+     * Call this in a slot connected to quitRequested().
+     *
+     * \sa quitRequested()
+     *
+     * \since 6.5
+     */
+    void abortQuit();
+
+    /*!
+     * Indictates that this item only supports the context menu. Instead of sending
+     * activate the provided the menu will be shown.
+     *
+     * \sa setContextMenu
+     *
+     * \since 6.14
+     */
+    void setIsMenu(bool isMenu);
+
+    /*!
+     * Returns if the item indicates that it only supports the context menu.
+     *
+     * \since 6.14
+     */
+    bool isMenu() const;
 
 public Q_SLOTS:
 
-    /**
-     * Shows the main window and try to position it on top
+    /*!
+     * \brief Shows the main window and try to position it on top
      * of the other windows, if the window is already visible, hide it.
      *
-     * @param pos if it's a valid position it represents the mouse coordinates when the event was triggered
+     * \a pos if it's a valid position it represents the mouse coordinates when the event was triggered
      */
     virtual void activate(const QPoint &pos = QPoint());
 
-    /**
-     * Hides the main window, if not already hidden.
+    /*!
+     * \brief Hides the main window, if not already hidden.
      *
      * Stores some information about the window which otherwise would be lost due to unmapping
      * from the window system. Use when toggling the main window via activate(const QPoint &)
      * is not wanted, but instead the hidden state should be reached in any case.
      *
-     * @since 6.0
+     * \since 6.0
      */
     void hideAssociatedWidget();
 
 Q_SIGNALS:
-    /**
-     * Inform the host application that the mouse wheel
-     * (or another mean of scrolling that the visualization provides) has been used
+    /*!
+     * \brief Inform the host application that the mouse wheel
+     * (or another mean of scrolling that the visualization provides) has been used.
      *
-     * @param delta the amount of scrolling, can be either positive or negative
-     * @param orientation direction of the scrolling, can be either horizontal or vertical
+     * \a delta the amount of scrolling, can be either positive or negative
+     *
+     * \a orientation direction of the scrolling, can be either horizontal or vertical
      */
     void scrollRequested(int delta, Qt::Orientation orientation);
 
-    /**
-     * Inform the host application that an activation has been requested,
-     *           for instance left mouse click, but this is not guaranteed since
+    /*!
+     * \brief Inform the host application that an activation has been requested.
+     *
+     *           For instance left mouse click, but this is not guaranteed since
      *           it's dependent from the visualization
-     * @param active if it's true the application asked for the activation
+     *
+     * \a active if it's true the application asked for the activation
      *              of the main window, if it's false it asked for hiding
-     * @param pos the position in the screen where the user clicked to
+     *
+     * \a pos the position in the screen where the user clicked to
      *  trigger this signal, QPoint() if it's not the consequence of a mouse click.
      */
     void activateRequested(bool active, const QPoint &pos);
 
-    /**
-     * Alternate activate action,
-     * for instance right mouse click, but this is not guaranteed since
+    /*!
+     * \brief Alternate activate action.
+     *
+     * For instance right mouse click, but this is not guaranteed since
      * it's dependent from the visualization
      *
-     * @param pos the position in the screen where the user clicked to
+     * \a pos the position in the screen where the user clicked to
      *  trigger this signal, QPoint() if it's not the consequence of a mouse click.
      */
     void secondaryActivateRequested(const QPoint &pos);
+
+    /*!
+     * \brief Emitted when the Quit action is triggered.
+     *
+     * If abortQuit() is called from the slot the quit is cancelled.
+     * This allows to e.g. display a custom confirmation prompt.
+     *
+     * \since 6.5
+     */
+    void quitRequested();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -491,7 +612,7 @@ private:
 
     Q_PRIVATE_SLOT(d, void serviceChange(const QString &name, const QString &oldOwner, const QString &newOwner))
     Q_PRIVATE_SLOT(d, void contextMenuAboutToShow())
-    Q_PRIVATE_SLOT(d, void maybeQuit())
+    Q_PRIVATE_SLOT(d, void quit())
     Q_PRIVATE_SLOT(d, void minimizeRestore())
     Q_PRIVATE_SLOT(d, void legacyWheelEvent(int))
     Q_PRIVATE_SLOT(d, void legacyActivated(QSystemTrayIcon::ActivationReason))

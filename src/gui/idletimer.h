@@ -7,6 +7,7 @@ public:
     virtual inline bool isSupported() const {
         return true;
     }
+    virtual ~IdleTimerImpl() = default;
 };
 
 class IdleTimer

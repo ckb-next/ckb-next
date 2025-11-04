@@ -196,7 +196,9 @@ void DBusMenuExporterPrivate::addAction(QAction *action, int parentId)
  */
 void DBusMenuExporterPrivate::removeActionInternal(QObject *object)
 {
-    QAction *action = static_cast<QAction *>(object);
+    QAction *action = qobject_cast<QAction *>(object);
+    if(action == nullptr)
+        return;
     m_actionProperties.remove(action);
     int id = m_idForAction.take(action);
     m_actionForId.remove(id);

@@ -101,6 +101,10 @@ public:
 
         wl_display_dispatch(m_display);
         wl_display_roundtrip(m_display);
+
+        // HACK: Destroy the registry proxy to indirectly remove the listener
+        // This way we avoid crashing when the display disappears/changes
+        wl_proxy_destroy(reinterpret_cast<wl_proxy*>(m_registry));
     }
 };
 

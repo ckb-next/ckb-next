@@ -6,20 +6,29 @@
 #ifdef USE_WAYLAND
 class wl_display;
 class wl_seat;
+#include <QList>
 #endif
 
-namespace WaylandUtils
+class WaylandUtils
 {
 
-bool isWayland();
+public:
+    static bool isWayland();
 
 #ifdef USE_WAYLAND
-bool hasInterface(const QString &name, quint32 version = 0);
+    WaylandUtils();
+    static wl_seat* seat();
 
-wl_display *display();
-wl_seat *seat();
+    bool hasInterface(const QString& name, quint32 version = 0);
+
+private:
+    struct RegistryData {
+        QString interfaceName;
+        quint32 version;
+    };
+    QList<RegistryData> m_registerData;
 #endif
 
-} // WaylandUtils
+}; // WaylandUtils
 
 #endif // WAYLANDUTILS_HPP

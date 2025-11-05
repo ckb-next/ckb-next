@@ -3,6 +3,7 @@
 
 #ifdef USE_WAYLAND_IDLE_NOTIFY
 #include "idletimer.h"
+#include "waylandutils.h"
 
 #include <QScopedPointer>
 
@@ -17,6 +18,7 @@ public:
     bool isSupported() const override;
 
 private:
+    QScopedPointer<WaylandUtils> wl_utils;
     bool m_supported;
     QScopedPointer<WaylandIdleNotifier> m_notifier;
     QScopedPointer<WaylandIdleNotification> m_notification;

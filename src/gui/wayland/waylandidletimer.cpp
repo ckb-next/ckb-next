@@ -52,13 +52,13 @@ public:
 };
 
 WaylandIdleTimer::WaylandIdleTimer()
-    : m_supported{WaylandUtils::hasInterface("ext_idle_notifier_v1")}
+    : wl_utils(new WaylandUtils), m_supported(wl_utils->hasInterface("ext_idle_notifier_v1"))
 {
     if (m_supported) {
         auto seat = WaylandUtils::seat();
         m_notifier.reset(new WaylandIdleNotifier());
 #ifdef USE_WAYLAND_INPUT_IDLE_NOTIFY
-        if (WaylandUtils::hasInterface("ext_idle_notifier_v1", 2)) {
+        if (wl_utils->hasInterface("ext_idle_notifier_v1", 2)) {
             m_notification.reset(new WaylandIdleNotification(m_notifier->get_input_idle_notification(0, seat)));
         } else {
             m_notification.reset(new WaylandIdleNotification(m_notifier->get_idle_notification(0, seat)));
@@ -88,4 +88,6 @@ bool WaylandIdleTimer::isSupported() const
 {
     return m_supported;
 }
+
 #endif
+

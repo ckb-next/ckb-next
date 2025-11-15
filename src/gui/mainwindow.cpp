@@ -255,6 +255,50 @@ void MainWindow::toggleTrayIcon(bool visible){
     trayIcon->setVisible(visible);
 }
 
+void MainWindow::reorderTabs() {
+    int was_on_settings_tab =
+        ui->tabWidget->currentIndex() == (ui->tabWidget->count() - 1);
+    int new_index = -1;
+
+    // Get currently open tab - if possible - to determine its name, which is
+    // used to restore its index.
+    QWidget *widget = ui->tabWidget->currentWidget();
+    KbWidget *kbw = nullptr;
+    if (widget)
+        kbw = dynamic_cast<KbWidget*>(widget);
+
+    // Clear tab widget to fully rebuild afterwards.
+    ui->tabWidget->clear();
+
+    // Rebuild the tab-order based on the attached device's name.
+    foreach(QString name, kbWidgetNames) {
+        int tab_index = -1;
+        foreach(KbWidget* w, kbWidgets) {
+            // Re-add tabs according to name.
+            if (w->name() == name) {
+                tab_index = ui->tabWidget->addTab(w, w->name());
+                break;
+            }
+        }
+
+        // If the current name matches the previously active widget, remember
+        // its new index.
+        if (kbw != nullptr && kbw->name() == name && tab_index >= 0)
+            new_index = tab_index;
+    }
+
+    // Always append the settings tab at the end.
+    ui->tabWidget->addTab(settingsWidget, QString(tr("Settings")));
+
+    // If the previously active tab was the settings page, restore this
+    // explicitly. Otherwise restore the previous device tab or fallback to the
+    // first tab if the active device was detached.
+    if (was_on_settings_tab)
+        ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
+    else
+        ui->tabWidget->setCurrentIndex(new_index < 0 ? 0 : new_index);
+}
+
 void MainWindow::addDevice(Kb* device){
     // Connected already?
     foreach(KbWidget* w, kbWidgets){
@@ -264,11 +308,10 @@ void MainWindow::addDevice(Kb* device){
     // Add the keyboard
     KbWidget* widget = new KbWidget(this, device, windowDetector);
     kbWidgets.append(widget);
-    // Add to tabber; switch to this device if the user is on the settings screen
-    int count = ui->tabWidget->count();
-    ui->tabWidget->insertTab(count - 1, widget, widget->name());
-    if(ui->tabWidget->currentIndex() == count)
-        ui->tabWidget->setCurrentIndex(count - 1);
+    // Only add unique device names.
+    if (kbWidgetNames.indexOf(widget->name()) == -1)
+        kbWidgetNames.append(widget->name());
+    reorderTabs();
     // Update connected device count
     updateVersion();
 }
@@ -278,11 +321,11 @@ void MainWindow::removeDevice(Kb* device){
         // Remove this device from the UI
         if(w->device == device){
             int i = kbWidgets.indexOf(w);
-            ui->tabWidget->removeTab(i);
             kbWidgets.removeAt(i);
             w->deleteLater();
         }
     }
+    reorderTabs();
     // Update connected device count
     updateVersion();
 }

@@ -40,6 +40,9 @@ public:
 private:
     SettingsWidget* settingsWidget;
     QList<KbWidget*> kbWidgets;
+    // List of device names in order they were added. This is used to re-create
+    // the tab list.
+    QList<QString> kbWidgetNames;
     QAction* restoreAction;
     QAction* closeAction;
     QMenu*              trayIconMenu;
@@ -85,6 +88,8 @@ private slots:
     void appleRequestHidTimer();
 #endif
     void iconClicked(QSystemTrayIcon::ActivationReason reason);
+    // Recreate the device tab order and maintain the active tab if possible.
+    void reorderTabs();
 private:
     Ui::MainWindow *ui;
     QSocketNotifier* sigNotifier;

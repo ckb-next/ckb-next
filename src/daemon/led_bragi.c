@@ -53,6 +53,7 @@ static inline size_t bragi_led_count(usbdevice* kb){
     LED_CASE_K(P_K70_CORE_RGB, 123);
     LED_CASE_K(P_K70_CORE_RGB_2, 123);
     LED_CASE_K(P_K70_CORE_RGB_3, 123);
+    LED_CASE_K(P_K70_MAX, 116);
     LED_CASE_M(P_SCIMITAR_ELITE_BRAGI, 5);
 
     default:

@@ -48,7 +48,7 @@ fi
 
 rm -rf build
 
-cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSAFE_INSTALL=ON -DSAFE_UNINSTALL=ON
+cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Debug -DSAFE_INSTALL=ON -DSAFE_UNINSTALL=ON
 checkfail $?
 
 # Find out how many cores the system has, for make

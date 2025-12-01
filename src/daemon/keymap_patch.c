@@ -95,6 +95,32 @@ static const keypatch k70propatch[] = {
     { 138, "logo",    138, KEY_NONE },
 };
 
+#if 0
+// Keymap patches for specific devices
+typedef struct {
+    size_t idx; // Index of key to patch in keymap
+    const char* name;
+    short led;
+    short scan;
+} keypatch;
+#endif
+
+static const keypatch k70maxpatch[] = {
+/*    { 114, "lock",    114, KEY_CORSAIR },*/
+/*    { 138, "logo",    138, KEY_NONE },*/
+/*    { 114, "lock",    0, KEY_CORSAIR },*/
+/*    { 124, "play",  -1, KEY_PLAYPAUSE },*/
+/*    { 125, "next",  -1, KEY_NEXTSONG },*/
+/*    { 124, "prev",  -1, KEY_PREVIOUSSONG },*/
+/*    { 183, "stop",  -1, KEY_STOPCD },*/
+    { 190, "logoleft",      -2, KEY_CORSAIR },
+    { 191, "logo",      -2, KEY_CORSAIR },
+    { 192, "logoright",      -2, KEY_CORSAIR },
+/*    { 124, "mr",    -1, KEY_CORSAIR },*/
+/*    { 118, "play",  -1, KEY_PLAYPAUSE },*/
+/*    { 129, "mute",  -1, KEY_MUTE },*/
+};
+
 static const keypatch k70corergbpatch[] = {
     { 124, "mr",    -1, KEY_CORSAIR },
     { 127, "play",  -1, KEY_PLAY },
@@ -157,6 +183,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_TKL,       k70tklpatch),
     ADD_PATCH(V_CORSAIR, P_K70_TKL_CHAMP_OPTIC, k70tklpatch),
     ADD_PATCH(V_CORSAIR, P_K70_PRO,       k70propatch),
+    ADD_PATCH(V_CORSAIR, P_K70_MAX,       k70maxpatch),
     ADD_PATCH(V_CORSAIR, P_K70_PRO_OPTIC, k70propatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_2, k70corergbpatch),

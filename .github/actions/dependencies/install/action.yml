@@ -5,7 +5,6 @@ inputs:
       make
       cmake
       eudev-dev
-      libdbusmenu-qt-dev
       pulseaudio-dev
       qt6-qtbase-dev
       qt6-qt5compat-dev
@@ -13,7 +12,7 @@ inputs:
       quazip-dev
       xcb-util-wm-dev
       qt6-qtwayland-dev
-      wayland-protocols 
+      wayland-protocols
 
   archlinux-build-dependencies:
     default: >-

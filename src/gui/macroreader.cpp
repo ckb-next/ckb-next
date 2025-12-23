@@ -136,8 +136,8 @@ static inline const char* translateQtKeyCode(int keycode, Qt::KeyboardModifiers 
     SKN(Qt::Key_9, "9", Qt::KeypadModifier, "num9");
     SKN(Qt::Key_0, "0", Qt::KeypadModifier, "num0");
     SKN(Qt::Key_Minus, "minus", Qt::KeypadModifier, "numminus");
-    SKN(Qt::Key_Plus, "equals", Qt::KeypadModifier, "numplus");
-    SK(Qt::Key_Equal, "equals");
+    SKN(Qt::Key_Plus, "equal", Qt::KeypadModifier, "numplus");
+    SK(Qt::Key_Equal, "equal");
     SK(Qt::Key_Backspace, "bspace");
 
     // Shift second row

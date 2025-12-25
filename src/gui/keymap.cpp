@@ -1107,8 +1107,8 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("rwin");
 
         // Replace volume wheel
-        map["voldn"] = {nullptr,  "Volume Down", "voldn", static_cast<short>(map["mute"].x + 12), 0, map["mute"].width, map["mute"].height, true, true};
-        map["volup"] = {nullptr,  "Volume Up", "volup", static_cast<short>(map["mute"].x + 24), 0, map["mute"].width, map["mute"].height, true, true};
+        map["voldn"] = {nullptr,  "Volume Down", "voldn", static_cast<short>(map["mute"].x + 12), 0, map["mute"].width, map["mute"].height, false, true};
+        map["volup"] = {nullptr,  "Volume Up", "volup", static_cast<short>(map["mute"].x + 24), 0, map["mute"].width, map["mute"].height, false, true};
 
         // Fix up the G keys
         map.remove("g7");
@@ -1144,6 +1144,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Move MR to the left of brightness
         map["mr"].x = map["light"].x - 12;
 
+        // No led on these keys
+        map["mr"].hasLed = false;
+        map["light"].hasLed = false;
+        map["lock"].hasLed = false;
+        map["mute"].hasLed = false;
+        map["stop"].hasLed = false;
+        map["prev"].hasLed = false;
+        map["play"].hasLed = false;
+        map["next"].hasLed = false;
+        
         // Shift all keys down (to make room for the lightbar), and to the left
         QMutableHashIterator<QString, Key> i(map);
         while(i.hasNext()){

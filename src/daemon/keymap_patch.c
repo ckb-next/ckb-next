@@ -133,6 +133,16 @@ static const keypatch k95platinumxtpatch[] = {
     { 156, "topbar19",      155, KEY_NONE },
 };
 
+// M65 RGB Ultra: 3 RGB zones (logo, wheel, DPI indicator) + buttons
+static const keypatch m65ultrapatch[] = {
+    { 210+20, "dpiup",  -1,             KEY_CORSAIR },
+    { 211+20, "dpidn",  -1,             KEY_CORSAIR },
+    { 212+20, "sniper", -1,             KEY_CORSAIR },
+    { 237+20, "front",  LED_MOUSE,      KEY_NONE },     // Logo zone
+    { 238+20, "wheel",  LED_MOUSE + 1,  KEY_NONE },     // Wheel zone
+    { 239+20, "dpi",    LED_MOUSE + 2,  KEY_NONE },     // DPI indicator zone
+};
+
 #define ADD_PATCH(vendor, product, patch) \
     { (vendor), (product), (patch), sizeof(patch)/sizeof(*patch) }
 
@@ -163,6 +173,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_3, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_SCIMITAR_ELITE_BRAGI, scimitarbragipatch),
     ADD_PATCH(V_CORSAIR, P_K95_PLATINUM_XT, k95platinumxtpatch),
+    ADD_PATCH(V_CORSAIR, P_M65_RGB_ULTRA, m65ultrapatch),
 };
 
 #define KEYPATCHES_LEN sizeof(mappatches)/sizeof(*mappatches)

@@ -1388,6 +1388,14 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("front");
         break;
     }
+    // M65 Ultra has 3 zones: front (logo), wheel, dpi
+    case KeyMap::M65_ULTRA:{
+        map = getMap(KeyMap::M65, layout);
+        // Keep front (logo) from M65, add wheel and dpi zones
+        map["wheel"] = {nullptr, "Wheel Light", "wheel", map["front"].x, map["front"].y - 5, map["front"].width, 5, true, false};
+        map["dpi"] = {nullptr, "DPI Light", "dpi", map["front"].x, map["front"].y + map["front"].height, map["front"].width, 5, true, false};
+        break;
+    }
     case KeyMap::M95:{
         for(const Key* key = M95Keys; key < M95Keys + KEYCOUNT_M95; key++){
             Key translatedKey = *key;
@@ -1697,6 +1705,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return STRAFE_MK2;
     if(lower == "m65e")
         return M65E;
+    if(lower == "m65u")
+        return M65_ULTRA;
     if(lower == "m95")
         return M95;
     if(lower == "ironclaw")
@@ -1788,6 +1798,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "strafe_mk2";
     case M65E:
         return "m65e";
+    case M65_ULTRA:
+        return "m65u";
     case M95:
         return "m95";
     case IRONCLAW:
@@ -1866,6 +1878,7 @@ int KeyMap::modelWidth(Model model){
     case M55:
     case M65:
     case M65E:
+    case M65_ULTRA:
     case SABRE:
     case HARPOON:
     case GLAIVE:
@@ -1920,6 +1933,7 @@ int KeyMap::modelHeight(Model model){
     case M55:
     case M65:
     case M65E:
+    case M65_ULTRA:
     case SABRE:
     case SCIMITAR:
     case HARPOON:

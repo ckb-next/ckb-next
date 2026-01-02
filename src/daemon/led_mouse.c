@@ -18,6 +18,7 @@ static inline int dpirgbcmp(const lighting* lhs, const lighting* rhs){
 int updatergb_mouse(usbdevice* kb, int force){
     if(!kb->active)
         return 0;
+
     lighting* lastlight = &kb->profile->lastlight;
     lighting* newlight = &kb->profile->currentmode->light;
     bool fupdate = force || lastlight->forceupdate || newlight->forceupdate;
@@ -26,6 +27,54 @@ int updatergb_mouse(usbdevice* kb, int force){
     // This needs to be above the main rgbcmp check as it doesn't return
     if(NXP_RGB_IN_DPI_PKT(kb) && (fupdate || dpirgbcmp(lastlight, newlight)))
         updatedpi(kb, 1);
+
+    // M65 RGB Ultra uses HID protocol instead of standard NXP
+    if(kb->product == P_M65_RGB_ULTRA){
+        // For M65 Ultra, check all 3 zones: logo, wheel, DPI
+        int logo_changed = (lastlight->r[LED_MOUSE] != newlight->r[LED_MOUSE]) ||
+                          (lastlight->g[LED_MOUSE] != newlight->g[LED_MOUSE]) ||
+                          (lastlight->b[LED_MOUSE] != newlight->b[LED_MOUSE]);
+        int wheel_changed = (lastlight->r[LED_MOUSE + 1] != newlight->r[LED_MOUSE + 1]) ||
+                           (lastlight->g[LED_MOUSE + 1] != newlight->g[LED_MOUSE + 1]) ||
+                           (lastlight->b[LED_MOUSE + 1] != newlight->b[LED_MOUSE + 1]);
+        int dpi_changed = (lastlight->r[LED_DPI] != newlight->r[LED_DPI]) ||
+                         (lastlight->g[LED_DPI] != newlight->g[LED_DPI]) ||
+                         (lastlight->b[LED_DPI] != newlight->b[LED_DPI]);
+
+        if(!(fupdate || logo_changed || wheel_changed || dpi_changed))
+            return 0;
+        lastlight->forceupdate = newlight->forceupdate = 0;
+
+        // RGB mode enable command (must send before RGB updates work)
+        uchar rgb_mode_enable[MSG_SIZE] = { 0x08, 0x0D, 0x00, 0x01, 0x00, 0 };
+        if(!usbsend(kb, rgb_mode_enable, sizeof(rgb_mode_enable), 1))
+            return -1;
+
+        // Send RGB for all THREE zones in ONE packet
+        // Format: 08 06 00 09 00 00 00 [Red×3] [Green×3] [Blue×3]
+        uchar rgb_pkt[MSG_SIZE] = { 0x08, 0x06, 0x00, 0x09, 0x00, 0x00, 0x00, 0 };
+
+        // Red channels (bytes 7-9)
+        rgb_pkt[7] = newlight->r[LED_MOUSE];      // Logo Red
+        rgb_pkt[8] = newlight->r[LED_MOUSE + 1];  // Wheel Red
+        rgb_pkt[9] = newlight->r[LED_DPI];        // DPI Red
+
+        // Green channels (bytes 10-12)
+        rgb_pkt[10] = newlight->g[LED_MOUSE];      // Logo Green
+        rgb_pkt[11] = newlight->g[LED_MOUSE + 1];  // Wheel Green
+        rgb_pkt[12] = newlight->g[LED_DPI];        // DPI Green
+
+        // Blue channels (bytes 13-15)
+        rgb_pkt[13] = newlight->b[LED_MOUSE];      // Logo Blue
+        rgb_pkt[14] = newlight->b[LED_MOUSE + 1];  // Wheel Blue
+        rgb_pkt[15] = newlight->b[LED_DPI];        // DPI Blue
+
+        if(!usbsend(kb, rgb_pkt, sizeof(rgb_pkt), 1))
+            return -1;
+
+        memcpy(lastlight, newlight, sizeof(lighting));
+        return 0;
+    }
 
     // Don't do anything if the lighting hasn't changed
     if(!(fupdate || rgbcmp(lastlight, newlight)))

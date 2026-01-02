@@ -1388,12 +1388,14 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("front");
         break;
     }
-    // M65 Ultra has 3 zones: front (logo), wheel, dpi
+    // M65 Ultra has 2 RGB zones: back (logo), wheel
+    // (DPI indicator is controlled by DPI stage color, not a separate zone)
     case KeyMap::M65_ULTRA:{
         map = getMap(KeyMap::M65, layout);
-        // Keep front (logo) from M65, add wheel and dpi zones
-        map["wheel"] = {nullptr, "Wheel Light", "wheel", map["front"].x, map["front"].y - 5, map["front"].width, 5, true, false};
-        map["dpi"] = {nullptr, "DPI Light", "dpi", map["front"].x, map["front"].y + map["front"].height, map["front"].width, 5, true, false};
+        // Rename "front" (from M65 base) to "back" (logo), add "wheel"
+        map["back"] = {nullptr, "Logo Light", "back", map["front"].x, map["front"].y, map["front"].width, map["front"].height, true, false};
+        map["wheel"] = {nullptr, "Wheel Light", "wheel", map["front"].x, short(map["front"].y - 5), map["front"].width, 5, true, false};
+        map.remove("front");
         break;
     }
     case KeyMap::M95:{

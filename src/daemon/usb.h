@@ -125,8 +125,7 @@
 #define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE))
 
 #define P_M75                0x1bf1 /* wired */
-#define P_M75_SLIP           0x1bdc /* slipstream dongle, same between M75 Air and M75 Wireless */
-#define IS_M75(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M75 || (kb)->product == P_M75_SLIP))
+#define IS_M75(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M75))
 
 #define P_M95                0x1b06
 

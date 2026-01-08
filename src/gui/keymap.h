@@ -61,7 +61,6 @@ public:
         K95P,
         STRAFE,
         M65,
-        M75,
         SABRE,
         SCIMITAR,
         HARPOON,
@@ -95,6 +94,7 @@ public:
         MM700,
         K70_PRO,
         K70_CORE_RGB,
+        M75,
         _MODEL_MAX
     };
     // Key layouts (ordered alphabetically by name)

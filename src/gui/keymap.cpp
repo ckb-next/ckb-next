@@ -327,11 +327,16 @@ static const Key M65Keys[] = {
 
 // Mouse map - M75
 static const Key M75Keys[] = {
-    {nullptr,  "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {nullptr,  "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {nullptr,  "Middle Mouse", "mouse3", 22, 8, 8, 7, false, true},
-    {nullptr,  "Wheel Up", "wheelup", 22, 4, 8, 5, false, true}, {nullptr,  "Wheel Down", "wheeldn", 22, 14, 8, 5, false, true}, {nullptr,  "Wheel Light", "front", 22, 15, 8, 8, true, false},
-    {nullptr,  "DPI Up", "dpiup", 22, 19, 8, 6, false, true}, {nullptr,  "DPI Light", "dpi", 22, 24, 8, 8, true, false}, {nullptr,  "DPI Down", "dpidn", 22, 31, 8, 6, false, true},
-    {nullptr,  "Forward", "mouse5", 5, 24, 5, 9, false, true}, {nullptr,  "Back", "mouse4", 5, 33, 5, 10, false, true}, {nullptr,  "Sniper", "sniper", 0, 25, 5, 15, false, true},
-    {nullptr,  "Logo", "back", 20, 54, 12, 12, true, false}
+    {nullptr,  "Left Mouse",       "mouse1",    8,  4, 14, 18, false, true},
+    {nullptr,  "Right Mouse",      "mouse2",   31,  4, 14, 18, false, true},
+    {nullptr,  "Middle Mouse",     "mouse3",   24,  6,  7,  8, false, true},
+    {nullptr,  "Wheel Up",         "wheelup",  24,  3,  7,  5, false, true},
+    {nullptr,  "Wheel Down",       "wheeldn",  24, 13,  7,  5, false, true},
+    {nullptr,  "Forward",          "mouse5",    6, 24,  5, 10, false, true},
+    {nullptr,  "Back",             "mouse4",    6, 33,  5, 10, false, true},
+    {nullptr,  "Forward (R)",      "mouse6",   43, 24,  5, 10, false, true},
+    {nullptr,  "Back (R)",         "mouse7",   43, 33,  5, 10, false, true},
+    {nullptr,  "Logo",             "front",    21, 50, 12, 12, true,  false}
 };
 #define KEYCOUNT_M75    (sizeof(M75Keys) / sizeof(Key))
 
@@ -1910,6 +1915,8 @@ int KeyMap::modelWidth(Model model){
     case GLAIVEPRO:
     case IRONCLAW_W:
         return M65_WIDTH;
+    case M75:
+        return M75_WIDTH;
     case MM700:
         return MM700_WIDTH;
     default:
@@ -1965,6 +1972,8 @@ int KeyMap::modelHeight(Model model){
     case NIGHTSWORD:
     case GLAIVEPRO:
         return M65_HEIGHT;
+    case M75:
+        return M75_HEIGHT;
     case IRONCLAW_W:
         return M65_HEIGHT;
     case MM700:

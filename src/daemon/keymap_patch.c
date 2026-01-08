@@ -18,6 +18,11 @@ static const keypatch m55patch[] = {
     { 237+20, "dpi",    LED_MOUSE, KEY_NONE },
 };
 
+static const keypatch m75patch[] = {
+    { 210+20, "mouse6", -1,        KEY_CORSAIR },
+    { 211+20, "mouse7", -1,        KEY_CORSAIR },
+};
+
 static const keypatch m95patch[] = {
     { 208+20, "mouse7", -1, SCAN_MOUSE | BTN_BACK },
     { 209+20, "mouse6", -1, SCAN_MOUSE | BTN_FORWARD },
@@ -141,6 +146,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K68_NRGB,     k63patch),
     ADD_PATCH(V_CORSAIR, P_K63_NRGB,     k63patch),
     ADD_PATCH(V_CORSAIR, P_M55_RGB_PRO,  m55patch),
+    ADD_PATCH(V_CORSAIR, P_M75,          m75patch),
     ADD_PATCH(V_CORSAIR, P_M95,          m95patch),
     ADD_PATCH(V_CORSAIR, P_IRONCLAW_W_U, icwpatch),
     ADD_PATCH(V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch),

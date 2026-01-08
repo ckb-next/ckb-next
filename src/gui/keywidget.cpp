@@ -138,6 +138,10 @@ void KeyWidget::map(const KeyMap& newMap){
             _currentOverlay.load(":/img/overlay_m65.png");
             _overlayPos.setX(2.f);
             break;
+        case KeyMap::M75:
+            _currentOverlay.load(":/img/overlay_m75.png");
+            _overlayPos.setX(5.7f);
+            break;
         case KeyMap::SABRE:
             _currentOverlay.load(":/img/overlay_sabre.png");
             _overlayPos.setX(1.f);

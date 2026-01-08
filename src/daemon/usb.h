@@ -124,8 +124,9 @@
 #define P_M65_RGB_ELITE      0x1b5a
 #define IS_M65(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M65 || (kb)->product == P_M65_PRO || (kb)->product == P_M65_RGB_ELITE))
 
-#define P_M75                0x2b08
-#define IS_M75(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_M75)
+#define P_M75                0x1bf1 /* wired */
+#define P_M75_SLIP           0x1bdc /* slipstream dongle, same between M75 Air and M75 Wireless */
+#define IS_M75(kb)           ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M75 || (kb)->product == P_M75_SLIP))
 
 #define P_M95                0x1b06
 
@@ -320,7 +321,6 @@ const char* product_str(ushort product);
 
 // Used for devices that have the scroll wheel packet in the hardware hid packet only
 #define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO || (kb)->product == P_SCIMITAR_ELITE_BRAGI || (kb)->product == P_M75))
-#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO))
 
 // For devices that have the new short HID report (6 bytes)
 #define USES_BRAGI_SHORT_REPORT(kb)                 ((kb)->vendor == (V_CORSAIR) && ((kb)->product == P_SCIMITAR_ELITE_BRAGI))

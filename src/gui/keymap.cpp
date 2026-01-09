@@ -327,16 +327,16 @@ static const Key M65Keys[] = {
 
 // Mouse map - M75
 static const Key M75Keys[] = {
-    {nullptr,  "Left Mouse",       "mouse1",    7,  1, 14, 22, false, true},
-    {nullptr,  "Right Mouse",      "mouse2",   24,  1, 14, 22, false, true},
-    {nullptr,  "Middle Mouse",     "mouse3",   20,  6,  5,  5, false, true},
-    {nullptr,  "Wheel Up",         "wheelup",  20,  3,  5,  4, false, true},
-    {nullptr,  "Wheel Down",       "wheeldn",  20,  9,  5,  4, false, true},
-    {nullptr,  "Forward",          "mouse5",    4, 18,  4,  8, false, true},
-    {nullptr,  "Back",             "mouse4",    4, 25,  4,  8, false, true},
-    {nullptr,  "Forward (R)",      "mouse6",   37, 18,  4,  8, false, true},
-    {nullptr,  "Back (R)",         "mouse7",   37, 25,  4,  8, false, true},
-    {nullptr,  "Logo",             "front",    16, 42, 12, 12, true,  false}
+    {nullptr,  "Left Mouse",       "mouse1",   11,  1, 13, 22, false, true},
+    {nullptr,  "Right Mouse",      "mouse2",   29,  1, 13, 22, false, true},
+    {nullptr,  "Middle Mouse",     "mouse3",   24,  6,  5,  5, false, true},
+    {nullptr,  "Wheel Up",         "wheelup",  24,  3,  5,  4, false, true},
+    {nullptr,  "Wheel Down",       "wheeldn",  24,  9,  5,  4, false, true},
+    {nullptr,  "Forward",          "mouse5",    8, 18,  4,  8, false, true},
+    {nullptr,  "Back",             "mouse4",    8, 25,  4,  8, false, true},
+    {nullptr,  "Forward (R)",      "mouse6",   40, 18,  4,  8, false, true},
+    {nullptr,  "Back (R)",         "mouse7",   40, 25,  4,  8, false, true},
+    {nullptr,  "Logo",             "front",    20, 42, 12, 12, true,  false}
 };
 #define KEYCOUNT_M75    (sizeof(M75Keys) / sizeof(Key))
 

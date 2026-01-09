@@ -1484,7 +1484,7 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map[key->name] = translatedKey;
         }
         break;
-    } 
+    }
     default:;    // <- stop GCC from complaining
     }
 

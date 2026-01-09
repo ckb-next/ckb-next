@@ -33,7 +33,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_KATAR_PRO_XT, 18000 },
     { P_KATAR, 8000 },
     { P_KATAR_PRO, 12400 },
-    { P_IRONCLAW, 18000},
+    { P_IRONCLAW, 18000 },
     { P_NIGHTSWORD, 18000},
     { P_IRONCLAW_W_U, 18000 },
     { P_HARPOON_WL_U, 10000 },

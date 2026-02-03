@@ -14,8 +14,13 @@ void bragi_fill_input_eps(usbdevice* kb)
     else if(IS_MM700(kb))
         offset = 4;
 
-    for(int i = 0; i < kb->epcount; i++)
-        kb->input_endpoints[i] = (i + offset) | 0x80;
+    /*for(int i = 0; i < kb->epcount; i++)
+        kb->input_endpoints[i] = (i + offset) | 0x80;*/
+    kb->input_endpoints[0] = 0x81;
+    kb->input_endpoints[1] = 0x83;
+    kb->input_endpoints[2] = 0x84;
+    kb->input_endpoints[3] = 0x85;
+    kb->input_endpoints[4] = 0;
 
     // Pick the correct input and output EPs.
     // Most use 0x84 and 4, but there are a few exceptions...

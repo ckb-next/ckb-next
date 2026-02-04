@@ -83,7 +83,7 @@ static int setactive_bragi(usbdevice* kb, int active){
     uchar res = BRAGI_RES_LIGHTING;
     if(IS_MONOCHROME_DEV(kb))
         res = BRAGI_RES_LIGHTING_MONOCHROME;
-    int light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, res);
+    int light = 1; //bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, res);
     if(light < 0)
         return light;
 

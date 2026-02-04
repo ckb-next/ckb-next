@@ -921,16 +921,17 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         } else {
                             ckb_err("Unimplemented bragi input packet %hhx\n", buffer[1]);
                         }
-                    } else if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
-                        if(!targetkb->active) {
-                            // K55 RGB CORE has different HID descriptors: 0x02 is NKRO_KEY_IN and 0x03 is NKRO_MEDIA_IN
-                            if (kb->product == P_K55_CORE)
-                                buffer[0]--;
-
-                            handle_bragi_key_input(targetkb->input.keys, buffer, urblen);
-                        }
                     } else {
-                        ckb_err("Unknown bragi data received in input thread %02x from endpoint %02x", firstbyte, ep);
+                        // K55 RGB CORE has different HID descriptors: 0x02 is NKRO_KEY_IN and 0x03 is NKRO_MEDIA_IN
+                        if (kb->product == P_K55_CORE)
+                            buffer[0]--;
+
+                        if(firstbyte == NKRO_KEY_IN || firstbyte == NKRO_MEDIA_IN) {
+                            if(!targetkb->active)
+                                handle_bragi_key_input(targetkb->input.keys, buffer, urblen);
+                        } else {
+                            ckb_err("Unknown bragi data received in input thread %02x from endpoint %02x", firstbyte, ep);
+                        }
                     }
                 } else {
 #define NXP_STRAFE_MEDIA_WORKAROUND(kb) (kb->vendor == V_CORSAIR && kb->product == P_STRAFE)

@@ -235,11 +235,11 @@ const char* product_str(ushort product){
         return "k60";
     if(product == P_K60_PRO_TKL)
         return "k60_tkl";
-    if(product == P_K57_U || product == P_K57_D || product == P_K55_PRO_XT)
+    if(product == P_K57_U || product == P_K57_D || product == P_K55_PRO_XT || product == P_K55_CORE)
         return "k57_wireless";
     if(product == P_K55)
         return "k55";
-    if(product == P_K55_PRO || product == P_K55_CORE)
+    if(product == P_K55_PRO)
         return "k55pro";
     if(product == P_STRAFE || product == P_STRAFE_NRGB || product == P_STRAFE_NRGB_2)
         return "strafe";

@@ -126,7 +126,7 @@ int updatergb_keyboard_bragi(usbdevice* kb, int force){
     return updatergb_bragi(kb, force, 0);
 }
 
-#define BRAGI_ALT_RGB_HEADER 2
+#define BRAGI_ALT_RGB_HEADER_LEN 2
 static inline int updatergb_alt_bragi(usbdevice* kb, int force){
     if(!kb->active)
         return 0;
@@ -141,10 +141,21 @@ static inline int updatergb_alt_bragi(usbdevice* kb, int force){
             && !rgbcmp(lastlight, newlight, zones, 0))
         return 0;
 
-    uchar pkt1[BRAGI_JUMBO_SIZE] = {0};
-    pkt1[7] = 0x12; // Some kind of header?
+    uchar pkt[BRAGI_JUMBO_SIZE] = {0};
 
-    uchar* start = pkt1 + 7 + BRAGI_ALT_RGB_HEADER;
+    // Since the blank pkt is used to check if the lights are off, we need to make sure it's sufficiently large
+    static_assert(LED_MOUSE <= sizeof(pkt), "pkt is not large enough to check if all zones are off");
+    // Switch LEDs off if its all black, because being able to just switch them off even in hw mode is really nice
+    int newon  = memcmp( newlight->r, pkt, CPY_SZ(r)) ||
+                 memcmp( newlight->g, pkt, CPY_SZ(g)) ||
+                 memcmp( newlight->b, pkt, CPY_SZ(b));
+    int laston = memcmp(lastlight->r, pkt, CPY_SZ(r)) ||
+                 memcmp(lastlight->g, pkt, CPY_SZ(g)) ||
+                 memcmp(lastlight->b, pkt, CPY_SZ(b));
+
+    pkt[7] = 0x12; // Some kind of header?
+
+    uchar* start = pkt + 7 + BRAGI_ALT_RGB_HEADER_LEN;
     // Copy red first
     for(size_t i = 0; i < zones; i++)
         start[i * 3] = newlight->r[i];
@@ -157,8 +168,18 @@ static inline int updatergb_alt_bragi(usbdevice* kb, int force){
     for(size_t i = 0; i < zones; i++)
         start[i * 3 + 2] = newlight->b[i];
 
-    if(bragi_write_to_handle(kb, pkt1, BRAGI_LIGHTING_HANDLE, sizeof(pkt1), 3 * zones + BRAGI_ALT_RGB_HEADER))
+    if(bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), 3 * zones + BRAGI_ALT_RGB_HEADER_LEN))
         return 1;
+
+    // Keep this check below the write.
+    // This is done to prevent a delay when turning the lights off, caused by slow HW.
+    // There seems to be no way to prevent the delay when turning the lights back on.
+    if (newon != laston || force){
+        if(kb->brightness_mode == BRIGHTNESS_HARDWARE_COARSE)
+            bragi_set_property(kb, BRAGI_BRIGHTNESS_COARSE, newon ? 3 : 0);
+        else if(kb->brightness_mode == BRIGHTNESS_HARDWARE_FINE)
+            bragi_set_property(kb, BRAGI_BRIGHTNESS, newon ? 1000 : 0);
+    }
 
     lastlight->forceupdate = newlight->forceupdate = 0;
 

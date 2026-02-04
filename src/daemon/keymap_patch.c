@@ -60,6 +60,20 @@ static const keypatch k55propatch[] = {
     { 194+20, "zone5", 5, KEY_NONE },
 };
 
+static const keypatch k55corepatch[] = {
+    { 114,  "lock", 0, KEY_CORSAIR },
+    { 190+20, "zone1", 1, KEY_NONE },
+    { 191+20, "zone2", 2, KEY_NONE },
+    { 192+20, "zone3", 3, KEY_NONE },
+    { 193+20, "zone4", 4, KEY_NONE },
+    { 194+20, "zone5", 5, KEY_NONE },
+    { 195+20, "zone6", 6, KEY_NONE },
+    { 196+20, "zone7", 7, KEY_NONE },
+    { 197+20, "zone8", 8, KEY_NONE },
+    { 198+20, "zone9", 9, KEY_NONE },
+    { 199+20, "zone10", 10, KEY_NONE },
+};
+
 // Just winlock
 static const keypatch k55proxtpatch[] = {
     { 114,  "lock", 0, KEY_CORSAIR },
@@ -149,7 +163,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K95_LEGACY,   k95legacypatch),
     ADD_PATCH(V_CORSAIR, P_K55_PRO,      k55propatch),
     ADD_PATCH(V_CORSAIR, P_K55_PRO_XT,   k55proxtpatch),
-    ADD_PATCH(V_CORSAIR, P_K55_CORE,     k55propatch),
+    ADD_PATCH(V_CORSAIR, P_K55_CORE,     k55corepatch),
     ADD_PATCH(V_CORSAIR, P_DARK_CORE_RGB_PRO,   DCRGBPpatch),
     ADD_PATCH(V_CORSAIR, P_DARK_CORE_RGB_PRO_SE,   DCRGBPpatch),
     ADD_PATCH(V_CORSAIR, P_K100_OPTICAL,         k100patch),

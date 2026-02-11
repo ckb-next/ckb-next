@@ -24,6 +24,8 @@ static inline void setUiElementsEnabled(Ui::RebindWidget* const ui, const bool e
     ui->unbindButton->setEnabled(e);
     ui->rb_delay_asTyped->setEnabled(e);
     ui->rb_delay_default->setEnabled(e);
+    ui->rep_debounce_input->setEnabled(e);
+    ui->rep_delay_input->setEnabled(e);
     ui->captureTypeBox->setEnabled(e);
     MainWindow::mainWindow->setTabsEnabled(e);
     ui->tabWidget->tabBar()->setEnabled(e);
@@ -876,6 +878,8 @@ void RebindWidget::on_btnClearMacro_clicked() {
     macroLines.clear();
     ui->macroName->clear();
     ui->macroPreview->clear();
+    ui->rep_debounce_input->setValue(500);
+    ui->rep_delay_input->setValue(500);
 }
 
 void RebindWidget::on_rb_delay_default_toggled(bool checked){

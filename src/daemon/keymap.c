@@ -1,10 +1,12 @@
 #include "device.h"
+#include "devnode.h"
 #include "includes.h"
 #include "keymap.h"
 #include "usb.h"
 #include "input.h"
 #include "bragi_proto.h"
 #include "nxp_proto.h"
+#include "m65_ultra_proto.h"
 #include "bragi_notification.h"
 #include <assert.h>
 
@@ -13,6 +15,7 @@ static void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urb
 static void hid_bragi_short_mouse_translate(usbinput* input, int length, const unsigned char* urbinput);
 static void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput);
 static void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urbinput);
+static void m65_ultra_mouse_translate(usbdevice* kb, usbinput* input, const unsigned char* urbinput, int urblen);
 
 // Copies input from Corsair reports
 static inline void corsair_kbcopy(unsigned char* kbinput, const unsigned char* urbinput){
@@ -807,6 +810,7 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
     }
 
     // If the response starts with CMD_GET (0x0e) for NXP, or it came from a bragi command EP, that means it needs to go to os_usbrecv()
+    // Note: M65 Ultra responses are handled directly in m65_ultra_mouse_translate, not via interruptbuf
     if(urblen == kb->out_ep_packet_size && (firstbyte == CMD_GET || (kb->protocol == PROTO_BRAGI && ep == kb->bragi_in_ep))){
 #ifdef DEBUG_USB_RECV
         print_urb_buffer("Recv:", buffer, urblen, NULL, 0, NULL, INDEX_OF(targetkb, keyboard), (uchar)ep);
@@ -836,9 +840,12 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                 hid_kb_translate(kb, urblen, buffer);
         } else {
             if(IS_MOUSE_DEV(targetkb)) {
+                // M65 RGB Ultra has its own input format (uses PROTO_NXP with custom packets)
+                if(IS_M65_ULTRA(targetkb)) {
+                    m65_ultra_mouse_translate(targetkb, &targetkb->input, buffer, urblen);
                 // HID Mouse Input
                 // In HW mode, Bragi mouse is the same as NXP, but without a header
-                if(kb->protocol == PROTO_BRAGI) {
+                } else if(kb->protocol == PROTO_BRAGI) {
                     if(targetkb->active) {
                         // When active, we need the movement from the standard hid packet, but the buttons from the extra packet
                         // The urblen check is done here (and is 64 bytes even for 128 byte mice) because we don't check what comes from which endpoint
@@ -1329,5 +1336,82 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
     // Read the wheel data that's located right after the button data.
     urbinput++;
     input->whl_rel_y = (signed char)*urbinput;
+}
+
+/*
+ * M65 RGB Ultra input translation
+ *
+ * The M65 RGB Ultra sends two types of input packets:
+ * 1. Button state reports (64 bytes from EP 0x84): byte[1]==0x02, buttons in byte[2]
+ * 2. HID mouse reports (short packets from EP 0x82): standard HID mouse format
+ */
+static void m65_ultra_mouse_translate(usbdevice* kb, usbinput* input, const unsigned char* urbinput, int urblen){
+    // Handle 64-byte packets (button state and firmware response)
+    if(urblen == 64){
+        // Firmware response: 00 02 00 [major] [minor] [patch]
+        // Only check when firmware version is unknown
+        if(kb->fwversion == 0 && urbinput[0] == 0x00 && urbinput[1] == 0x02 && urbinput[2] == 0x00){
+            uchar major = urbinput[3];
+            uchar minor = urbinput[4];
+            uchar patch = urbinput[5];
+            uint32_t new_version = (major << 16) | (minor << 8) | patch;
+            if(new_version != 0 && major != 0){
+                ckb_info("M65 Ultra: Firmware response received: %d.%d.%d", major, minor, patch);
+                kb->fwversion = new_version;
+                mkfwnode(kb);  // Update GUI
+            }
+            return;
+        }
+
+        // Handle len=64 button event packets (byte[1] = 0x02)
+        if(urbinput[1] == 0x02){
+            // In software mode, ALL buttons come through byte[2]:
+            // Bit 0 (0x01) = Left (button 0)
+            // Bit 1 (0x02) = Right (button 1)
+            // Bit 2 (0x04) = Middle (button 2)
+            // Bit 3 (0x08) = Back (button 3)
+            // Bit 4 (0x10) = Forward (button 4)
+            // Bit 5 (0x20) = DPI Up (button 6)
+            // Bit 6 (0x40) = DPI Down (button 7)
+            // Bit 7 (0x80) = Sniper (button 13)
+
+            // Standard mouse buttons (0-4)
+            for(int bit = 0; bit < 5; bit++){
+                if(urbinput[2] & (1 << bit))
+                    SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
+                else
+                    CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
+            }
+
+            // DPI Up (button 6)
+            if(urbinput[2] & 0x20)
+                SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + 6);
+            else
+                CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + 6);
+
+            // DPI Down (button 7)
+            if(urbinput[2] & 0x40)
+                SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + 7);
+            else
+                CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + 7);
+
+            // Sniper (button 13)
+            if(urbinput[2] & 0x80)
+                SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + 13);
+            else
+                CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + 13);
+        }
+        return;  // All len=64 packets handled, don't process as boot mouse report
+    }
+
+    // Standard HID mouse report (short packets from EP 0x82)
+    // Format: buttons, x_lo, x_hi, y_lo, y_hi, wheel, ...
+    if(urblen >= 6){
+        // Movement and wheel only - buttons are handled by 64-byte packets
+        // This prevents race condition where short packets would overwrite button state
+        input->rel_x += (int16_t)((urbinput[2] << 8) | urbinput[1]);
+        input->rel_y += (int16_t)((urbinput[4] << 8) | urbinput[3]);
+        input->whl_rel_y = (signed char)urbinput[5];
+    }
 }
 

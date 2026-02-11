@@ -135,6 +135,7 @@ void KeyWidget::map(const KeyMap& newMap){
         switch(model){
         case KeyMap::M65:
         case KeyMap::M65E:
+        case KeyMap::M65_ULTRA:
             _currentOverlay.load(":/img/overlay_m65.png");
             _overlayPos.setX(2.f);
             break;

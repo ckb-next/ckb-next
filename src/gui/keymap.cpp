@@ -1388,6 +1388,16 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map.remove("front");
         break;
     }
+    // M65 Ultra has 2 RGB zones: back (logo), wheel
+    // (DPI indicator is controlled by DPI stage color, not a separate zone)
+    case KeyMap::M65_ULTRA:{
+        map = getMap(KeyMap::M65, layout);
+        // Rename "front" (from M65 base) to "back" (logo), add "wheel"
+        map["back"] = {nullptr, "Logo Light", "back", map["front"].x, map["front"].y, map["front"].width, map["front"].height, true, false};
+        map["wheel"] = {nullptr, "Wheel Light", "wheel", map["front"].x, short(map["front"].y - 5), map["front"].width, 5, true, false};
+        map.remove("front");
+        break;
+    }
     case KeyMap::M95:{
         for(const Key* key = M95Keys; key < M95Keys + KEYCOUNT_M95; key++){
             Key translatedKey = *key;
@@ -1697,6 +1707,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return STRAFE_MK2;
     if(lower == "m65e")
         return M65E;
+    if(lower == "m65u")
+        return M65_ULTRA;
     if(lower == "m95")
         return M95;
     if(lower == "ironclaw")
@@ -1788,6 +1800,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "strafe_mk2";
     case M65E:
         return "m65e";
+    case M65_ULTRA:
+        return "m65u";
     case M95:
         return "m95";
     case IRONCLAW:
@@ -1866,6 +1880,7 @@ int KeyMap::modelWidth(Model model){
     case M55:
     case M65:
     case M65E:
+    case M65_ULTRA:
     case SABRE:
     case HARPOON:
     case GLAIVE:
@@ -1920,6 +1935,7 @@ int KeyMap::modelHeight(Model model){
     case M55:
     case M65:
     case M65E:
+    case M65_ULTRA:
     case SABRE:
     case SCIMITAR:
     case HARPOON:

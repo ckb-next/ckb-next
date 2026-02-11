@@ -4,7 +4,9 @@
 
 void nxp_fill_input_eps(usbdevice* kb)
 {
-    int epcount = (kb->product == P_ST100 ? kb->epcount : (kb->epcount - 1));
+    // Most NXP devices reserve the last endpoint for output, so we use epcount - 1
+    // ST100 and M65 Ultra use all endpoints for input (output goes to EP 0x04)
+    int epcount = (kb->product == P_ST100 || IS_M65_ULTRA(kb)) ? kb->epcount : (kb->epcount - 1);
     for(int i = 0; i < epcount; i++)
         kb->input_endpoints[i] = (i + 1) | 0x80;
 }

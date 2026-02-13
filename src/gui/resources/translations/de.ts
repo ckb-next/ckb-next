@@ -91,7 +91,7 @@
         <source>Repeat every:</source>
         <translation variants="yes">
             <lengthvariant>Wiederholen alle:</lengthvariant>
-            <lengthvariant>Wiederh. alle</lengthvariant>
+            <lengthvariant>Wiederh. alle:</lengthvariant>
         </translation>
     </message>
     <message>
@@ -291,27 +291,27 @@
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="24"/>
         <source>Not connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht verbunden</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="24"/>
         <source>Critical</source>
-        <translation type="unfinished"></translation>
+        <translation>Kritisch</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="24"/>
         <source>Low</source>
-        <translation type="unfinished">Niedrig</translation>
+        <translation>Niedrig</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="24"/>
         <source>Medium</source>
-        <translation type="unfinished">Mittel</translation>
+        <translation>Mittel</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="24"/>
         <source>High</source>
-        <translation type="unfinished">Hoch</translation>
+        <translation>Hoch</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="25"/>
@@ -321,27 +321,27 @@
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="25"/>
         <source>Discharging</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird entladen</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="25"/>
         <source>Charging</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird geladen</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="25"/>
         <source>Fully Charged</source>
-        <translation type="unfinished"></translation>
+        <translation>Vollständig Geladen</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="26"/>
         <source>Battery: %1 (%2%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Batterie: %1 (%2%)</translation>
     </message>
     <message>
         <location filename="../../batterysystemtrayicon.cpp" line="27"/>
         <source>Status: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Status: %1</translation>
     </message>
 </context>
 <context>
@@ -443,7 +443,7 @@
     <message>
         <location filename="../../extrasettingswidget.ui" line="20"/>
         <source>Application Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Anwendungseinstellungen</translation>
     </message>
     <message>
         <location filename="../../extrasettingswidget.ui" line="181"/>
@@ -473,7 +473,7 @@
     <message>
         <location filename="../../extrasettingswidget.ui" line="562"/>
         <source>Disable Anti Aliasing (Requires restart)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kantenglättung deaktivieren (Erfordert Neustart)</translation>
     </message>
     <message>
         <location filename="../../extrasettingswidget.ui" line="260"/>
@@ -575,7 +575,7 @@
     <message>
         <location filename="../../extrasettingswidget.cpp" line="79"/>
         <source>This feature is not supported under your current compositor</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Funktion wird vom aktuellen Compositor nicht unterstützt</translation>
     </message>
     <message>
         <location filename="../../extrasettingswidget.cpp" line="116"/>
@@ -854,27 +854,27 @@
     <message>
         <location filename="../../kperfwidget.ui" line="803"/>
         <source>Default audio output</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Audioausgabe</translation>
     </message>
     <message>
         <location filename="../../kperfwidget.ui" line="808"/>
         <source>Default audio input</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Audioeingabe</translation>
     </message>
     <message>
         <location filename="../../kperfwidget.ui" line="822"/>
         <source>Note: macro recording not implemented. Indicator will always display &quot;off&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinweis: Makro-Aufzeichnungen sind noch nicht implementiert. Der Indikator zeigt immer &quot;Aus&quot; an.</translation>
     </message>
     <message>
         <location filename="../../kperfwidget.ui" line="950"/>
         <source>Indicate mute from:</source>
-        <translation type="unfinished"></translation>
+        <translation>Stummschaltung anzeigen von:</translation>
     </message>
     <message>
         <location filename="../../kperfwidget.ui" line="1087"/>
         <source>Copy performance settings to mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>Leistungseinstellungen kopieren nach...</translation>
     </message>
     <message>
         <location filename="../../kperfwidget.ui" line="1073"/>
@@ -946,19 +946,28 @@
         <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="1171"/>
         <source>&amp;Minimize</source>
         <comment>@action:inmenu</comment>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Minimieren</translation>
     </message>
     <message>
         <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="892"/>
         <source>Quit</source>
         <comment>@action:inmenu</comment>
-        <translation type="unfinished">Beenden</translation>
+        <translation>Beenden</translation>
     </message>
     <message>
         <location filename="../../kstatusnotifier/kstatusnotifieritem.cpp" line="1168"/>
         <source>&amp;Restore</source>
         <comment>@action:inmenu</comment>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Wiederherstellen</translation>
+    </message>
+    <message>
+        <source>Confirm Quit From System Tray</source>
+        <comment>@title:window</comment>
+        <translation type="vanished">Beenden bestätigen</translation>
+    </message>
+    <message>
+        <source>&lt;qt&gt;Are you sure you want to quit &lt;b&gt;%1&lt;/b&gt;?&lt;/qt&gt;</source>
+        <translation type="vanished">&lt;qt&gt;Sind Sie sicher, dass Sie &lt;b&gt;%1&lt;/b&gt; beenden möchten?&lt;/qt&gt;</translation>
     </message>
     <message>
         <source>Quit</source>
@@ -1238,7 +1247,7 @@ Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translatio
     <message>
         <location filename="../../kbmanager.cpp" line="42"/>
         <source>Please enable &quot;Turn lights off when idle&quot; before using --sleep</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte aktivieren Sie &quot;Beleuchtung im Leerlauf ausschalten,&quot; bevor Sie --sleep verwenden.</translation>
     </message>
 </context>
 <context>
@@ -1279,7 +1288,7 @@ Die Zuordnung wird nicht funktionieren bis Winlock deaktiviert wird.</translatio
     <message>
         <location filename="../../kbmodeeventmgr.ui" line="197"/>
         <source>Tip: Run xprop or xwininfo in a terminal and click on a window to find out its title and other values.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipp: Führen Sie &lt;i&gt;xprop&lt;/i&gt; oder &lt;i&gt;xwininfo&lt;/i&gt; in einem Terminal aus und klicken Sie ein Fenster an, um dessen Titel und andere Werte herauszufinden.</translation>
     </message>
     <message>
         <location filename="../../kbmodeeventmgr.ui" line="45"/>
@@ -1524,7 +1533,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../kbwidget.ui" line="370"/>
         <source>Wireless version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kabellose Version:</translation>
     </message>
     <message>
         <location filename="../../kbwidget.ui" line="577"/>
@@ -1538,7 +1547,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../kbwidget.ui" line="724"/>
         <source>Wireless Bootloader version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kabellose Bootloader Version:</translation>
     </message>
     <message>
         <location filename="../../kbwidget.ui" line="421"/>
@@ -1563,17 +1572,17 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../kbwidget.ui" line="626"/>
         <source>Battery:</source>
-        <translation type="unfinished"></translation>
+        <translation>Batterie:</translation>
     </message>
     <message>
         <location filename="../../kbwidget.ui" line="683"/>
         <source>Enable system tray icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemleistensymbol aktivieren</translation>
     </message>
     <message>
         <location filename="../../kbwidget.ui" line="698"/>
         <source>Bootloader version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bootloader Version:</translation>
     </message>
     <message>
         <location filename="../../kbwidget.ui" line="711"/>
@@ -1907,57 +1916,57 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="14"/>
         <source>KeyWidgetDebugger</source>
-        <translation type="unfinished"></translation>
+        <translation>Tastatur Debugger</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="40"/>
         <source>H</source>
-        <translation type="unfinished"></translation>
+        <translation>H</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="50"/>
         <source>Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Modell</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="109"/>
         <source>Y</source>
-        <translation type="unfinished"></translation>
+        <translation>Y</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="126"/>
         <source>Lighting</source>
-        <translation type="unfinished">Beleuchtung</translation>
+        <translation>Beleuchtung</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="136"/>
         <source>Show key selection surfaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewählte Tastenoberflächen anzeigen</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="146"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="153"/>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="160"/>
         <source>Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Belegung</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="167"/>
         <source>DevW</source>
-        <translation type="unfinished"></translation>
+        <translation>Gerätebreite</translation>
     </message>
     <message>
         <location filename="../../keywidgetdebugger.ui" line="174"/>
         <source>DevH</source>
-        <translation type="unfinished"></translation>
+        <translation>Gerätehöhe</translation>
     </message>
 </context>
 <context>
@@ -1965,22 +1974,22 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../legacylightwidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Beleuchtung (Veraltet)</translation>
     </message>
     <message>
         <location filename="../../legacylightwidget.ui" line="47"/>
         <source>Hardware Lighting</source>
-        <translation type="unfinished"></translation>
+        <translation>Hardwarebeleuchtung</translation>
     </message>
     <message>
         <location filename="../../legacylightwidget.ui" line="61"/>
         <source>This device only supports lighting set in hardware. This means that in order to program your lighting settings you must perform the following steps on the keyboard:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Gerät unterstützt lediglich hardwareseitige Beleuchtung. Das bedeutet, um die Beleuchtung zu programmieren, müssen folgende Schritte auf der Tastatur ausgeführt werden:</translation>
     </message>
     <message>
         <location filename="../../legacylightwidget.ui" line="71"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;ol style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select the mode to program the lights for by pressing the correct button (M1, M2 or M3).&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Hold down the lighting programming button (to the left of the brightness button) until the ring around it starts flashing.&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Press each key you want to toggle the light for.&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Once finished, hold down the lighting programming button once more until the ring stops flashing.&lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;ol style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Wählen sie den Programmierungsmodus für die Beleuchtung durch Drücken der entsprechenden Taste (M1, M2 oder M3).&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Halten Sie den Knopf zur Programmierung der Beleuchtung (links der Helligkeitstasten) bis der Ring darum anfängt zu blinken.&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Drücken Sie jede Taste, für die Sie die Beleuchtung umschalten wollen.&lt;/li&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Sobald Sie fertig sind, halten Sie den Knopf zur Programmierung der Beleuchtung erneut, bis der Ring darum aufhört zu blinken.&lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -2161,12 +2170,12 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../macrotablemodel.cpp" line="214"/>
         <source>Min. Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Min. Verzögerung</translation>
     </message>
     <message>
         <location filename="../../macrotablemodel.cpp" line="216"/>
         <source>Max. Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. Verzögerung</translation>
     </message>
     <message>
         <source>Delay</source>
@@ -2238,7 +2247,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     <message>
         <location filename="../../mainwindow.cpp" line="177"/>
         <source>If &quot;Unit ckb-next-daemon.service is masked.&quot;, unmask it first and try again:</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls Sie die Nachricht &quot;Dienst ckb-next-daemon.service ist maskiert&quot; erhalten, entsperren Sie ihn und versuchen Sie es erneut:</translation>
     </message>
     <message>
         <location filename="../../mainwindow.cpp" line="180"/>
@@ -2378,7 +2387,7 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
     <message>
         <location filename="../../main.cpp" line="83"/>
         <source>Turns the lights off as if the system was idling.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deaktiviert die Beleuchtung, so als ob das System im Leerlauf ist.</translation>
     </message>
     <message>
         <location filename="../../main.cpp" line="86"/>
@@ -2388,7 +2397,7 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
     <message>
         <location filename="../../main.cpp" line="87"/>
         <source>Disables the daemon not running popup</source>
-        <translation type="unfinished"></translation>
+        <translation>Deaktiviert den &lt;i&gt;Der Daemon läuft nicht&lt;/i&gt; PopUp</translation>
     </message>
     <message>
         <location filename="../../main.cpp" line="101"/>
@@ -2413,22 +2422,22 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
     <message>
         <location filename="../../keymap.cpp" line="2008"/>
         <source>Eject</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswerfen</translation>
     </message>
     <message>
         <location filename="../../keymap.cpp" line="2010"/>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Netzschalter</translation>
     </message>
     <message>
         <location filename="../../keymap.cpp" line="2012"/>
         <source>Wheel Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Mausrad links</translation>
     </message>
     <message>
         <location filename="../../keymap.cpp" line="2014"/>
         <source>Wheel Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Mausrad rechts</translation>
     </message>
 </context>
 <context>
@@ -2826,7 +2835,8 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         <location filename="../../rebindwidget.cpp" line="90"/>
         <source>Tip: use xdg-open to launch a file or directory. For instance, to open your home folder:
   xdg-open </source>
-        <translation type="unfinished"></translation>
+        <translation>Tipp: Nutzen Sie xdg-open, um eine Datei auszuführen oder ein Ordner zu öffnen. Zum Beispiel, um Ihr Heimverzeichnis zu öffnen:
+  xdg-open </translation>
     </message>
     <message>
         <location filename="../../rebindwidget.cpp" line="496"/>

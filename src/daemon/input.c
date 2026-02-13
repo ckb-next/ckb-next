@@ -87,10 +87,6 @@ static pthread_t macro_pt_first() {
 // Default macro keystroke delay
 #define NANOSECONDS_PER_MILLISECONDS 1000000
 const struct timespec macrodelay = { .tv_nsec = 1 * NANOSECONDS_PER_MILLISECONDS };
-// Initial repeat delay
-#define DELAY_REPEAT_INITIAL 500 * NANOSECONDS_PER_MILLISECONDS
-// Delay for every subsequent repeat
-#define DELAY_REPEAT_CATCHUP 500 * NANOSECONDS_PER_MILLISECONDS
 
 static inline void clock_microsleep(uint32_t s) {
     const struct timespec ts = {
@@ -177,7 +173,9 @@ static void* play_macro(void* param) {
 
         queued_mutex_unlock(mmutex(kb));
 
-        int delay_ns = first_keydownloop ? DELAY_REPEAT_INITIAL : DELAY_REPEAT_CATCHUP;
+        int delay_ns = first_keydownloop
+            ? macro->repetition_debounce_ms * NANOSECONDS_PER_MILLISECONDS
+            : macro->repetition_delay_ms * NANOSECONDS_PER_MILLISECONDS;
 
         queued_mutex_lock(imutex(kb));
         // detect if the macro playback has been aborted
@@ -209,7 +207,7 @@ static void* play_macro(void* param) {
             break;
         }
 
-        // if the key released and pressed during the sleep, reset to use DELAY_REPEAT_INITIAL
+        // if the key released and pressed during the sleep, reset to use the default repetition value
         if (macro->triggered == 1)
             first_keydownloop = 0;
 

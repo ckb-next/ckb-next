@@ -5,6 +5,7 @@
 #include "input.h"
 #include "notify.h"
 #include <assert.h>
+#include <string.h>
 
 #define IS_SCROLLWHEEL_V(scan)  ((scan) == BTN_WHEELUP   || (scan) == BTN_WHEELDOWN)
 #define IS_SCROLLWHEEL_H(scan)  ((scan) == BTN_WHEELLEFT || (scan) == BTN_WHEELRIGHT)
@@ -673,8 +674,26 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     // Scan the actions
     position = 0;
     field = 0;
+
+    // Check if repetition debounce and delay tokens are attached to the assignment.
+    // Validate value to be between 0 and 2000 inclusive. Default to 500ms.
+    const char *delay_tok = strchr(assignment, ':');
+    macro.repetition_debounce_ms = 500;
+    macro.repetition_delay_ms = 500;
+    if (delay_tok != NULL) {
+        unsigned long debounce_ms = 0;
+        unsigned long delay_ms = 0;
+
+        if (sscanf(delay_tok, ":%lu;%lu", &debounce_ms, &delay_ms) == 2) {
+            if (debounce_ms > 0 && debounce_ms <= 2000)
+                macro.repetition_debounce_ms = (uint32_t) debounce_ms;
+            if (delay_ms > 0 && delay_ms <= 2000)
+                macro.repetition_delay_ms = (uint32_t) delay_ms;
+        }
+    }
+
     // max action = old 11 chars plus 12 chars which is the max 32-bit unsigned int 4294967295 size * 2 + 1 for range underscore
-    while(position < right && sscanf(assignment + position, "%"N_SCANF_KEYNAME"[^,]%n", keyname, &field) == 1){
+    while(position < right && sscanf(assignment + position, "%"N_SCANF_KEYNAME"[^,:]%n", keyname, &field) == 1){
         if(!strcmp(keyname, "clear"))
             break;
 

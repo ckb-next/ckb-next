@@ -246,7 +246,10 @@ void KbBind::update(QFile& cmd, int notify, bool force){
                 QVector<QStringRef> macroContent = act->value().splitRef(':');
 #endif
                 if (macroContent[1].length() > 0)
-                    macros.append("macro " + keyLatin1 + ":" + macroContent[1].toLatin1() + "\n");
+                    // Fields used: 1 - daemon string, 5 - repetition delay
+                    macros.append("macro " + keyLatin1
+                            + ":" + macroContent[1].toLatin1()
+                            + ":" + macroContent[5].toLatin1());
             }
         } else {
             // Otherwise, write the binding

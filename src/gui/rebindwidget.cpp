@@ -11,6 +11,8 @@
 static const int DPI_OFFSET = -KeyAction::DPI_CYCLE_UP + 1;
 static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
 
+static const QString MACRO_MAGIC_COLON_REPLACEMENT = QStringLiteral("&das_IST_31N_col0n;");
+
 static inline void setLocalUiElementsEnabled(Ui::RebindWidget* const ui, const bool e){
     ui->editAsStringBtn->setEnabled(e);
     ui->btnAddEvent->setEnabled(e);
@@ -364,7 +366,7 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                 if(dataCount == 3 || dataCount == 4){
                     // Colons in the name field are escaped
                     QString macroName = macroData[2].toString();
-                    macroName.replace("&das_IST_31N_col0n;", ":");
+                    macroName.replace(MACRO_MAGIC_COLON_REPLACEMENT, ":");
                     ui->macroName->setText(macroName);
 
                     // Pick the appropriate string to parse due to legacy formats
@@ -490,7 +492,7 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         // daemon_string is the one sent to the daemon, and original_recorded_macro_string is the raw user data
         // preview_string is now unused as it can be generated from the remaining data
         // Any colons in user_specified_macro_name are escaped
-        QString escapedMacroName = ui->macroName->text().replace(":", "&das_IST_31N_col0n;");
+        QString escapedMacroName = ui->macroName->text().replace(":", MACRO_MAGIC_COLON_REPLACEMENT);
         QString finalDaemonString = macroLines.toString(false);
         QString originalString = macroLines.toString(true);
         QString macro = QString("%1::%2:%3").arg(finalDaemonString, escapedMacroName, originalString);

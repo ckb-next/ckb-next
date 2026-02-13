@@ -2716,17 +2716,17 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
     <message>
         <location filename="../../rebindwidget.ui" line="1338"/>
         <source>Holding the key will repeat the macro indefinitely. With this value you can define the delay between individual executions of the registered macro.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Halten der Taste wiederholt das Makro dauerhaft. Mit diesem Wert können Sie einstellen, wie lange die Pause zwischen individuellen Ausführungen des Makros sein soll.</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1341"/>
         <source>Repetition delay:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholungsverzögerung:</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1395"/>
         <source>Holding the key will repeat the macro indefinitely. With this value you can define the delay before the initial execution of the registered macro.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Halten der Taste wiederholt das Makro dauerhaft. Mit diesem Wert können Sie einstellen, wie lange die Verzögerung vor der ersten Ausführungen des Makros sein soll.</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1398"/>
@@ -2737,7 +2737,7 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         <location filename="../../rebindwidget.ui" line="1408"/>
         <location filename="../../rebindwidget.ui" line="1430"/>
         <source>ms</source>
-        <translation type="unfinished"></translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1464"/>

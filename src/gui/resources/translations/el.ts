@@ -2727,12 +2727,12 @@ or click &quot;Quit&quot; on the Settings screen.</source>
     <message>
         <location filename="../../rebindwidget.ui" line="1338"/>
         <source>Holding the key will repeat the macro indefinitely. With this value you can define the delay between individual executions of the registered macro.</source>
-        <translation type="unfinished"></translation>
+        <translation>Κρατόντας το πλήκτρο πατημένο, η μακροεντολή θα επαναλαμβάνεται επ&apos; αόριστον. Με αυτήν την τιμή μπορείτε να ορίσετε την καθυστέρηση μεταξύ των εκτελέσεων της καταχωρημένης μακροεντολής.</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1341"/>
         <source>Repetition delay:</source>
-        <translation type="unfinished"></translation>
+        <translation>Καθυστέρηση επανάληψης:</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1395"/>
@@ -2748,7 +2748,7 @@ or click &quot;Quit&quot; on the Settings screen.</source>
         <location filename="../../rebindwidget.ui" line="1408"/>
         <location filename="../../rebindwidget.ui" line="1430"/>
         <source>ms</source>
-        <translation type="unfinished"></translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location filename="../../rebindwidget.ui" line="1464"/>

@@ -1407,16 +1407,8 @@ static void m65_ultra_mouse_translate(usbdevice* kb, usbinput* input, const unsi
     // Standard HID mouse report (short packets from EP 0x82)
     // Format: buttons, x_lo, x_hi, y_lo, y_hi, wheel, ...
     if(urblen >= 6){
-        // Handle buttons from byte[0] (works in both HW and SW mode)
-        uchar buttons = urbinput[0];
-        for(int i = 0; i < 5; i++){
-            if(buttons & (1 << i))
-                SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + i);
-            else
-                CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + i);
-        }
-
-        // Movement and wheel
+        // Movement and wheel only - buttons are handled by 64-byte packets
+        // This prevents race condition where short packets would overwrite button state
         input->rel_x += (int16_t)((urbinput[2] << 8) | urbinput[1]);
         input->rel_y += (int16_t)((urbinput[4] << 8) | urbinput[3]);
         input->whl_rel_y = (signed char)urbinput[5];

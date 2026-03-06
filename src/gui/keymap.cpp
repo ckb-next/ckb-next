@@ -17,6 +17,9 @@ const Key KeyMap::emptyKey = {nullptr,nullptr,nullptr,0,0,0,0,0,0};
 // K55 PRO Zone Size
 #define ZSP 59, 75
 
+// K55 CORE Zone Size
+#define ZSC 31, 75
+
 // Key positions (K95 - English)
 // This is the master key map that includes ANSI, ISO and JP-106 layouts - use patchANSI(), patchISO() or patchJP106() to finalize it
 static const Key K95Keys[] = {
@@ -299,6 +302,20 @@ static const Key K55PROZones[] = {
     {nullptr,  "Zone 5", "zone5", 254, 45, ZSP, true, false},
 };
 #define K55PRO_ZONES (sizeof(K55PROZones) / sizeof(Key))
+
+static const Key K55COREZones[] = {
+    {nullptr,  "Zone 1", "zone1", 10, 45, ZSC, true, false},
+    {nullptr,  "Zone 2", "zone2", 39, 45, ZSC, true, false},
+    {nullptr,  "Zone 3", "zone3", 68, 45, ZSC, true, false},
+    {nullptr,  "Zone 4", "zone4", 97, 45, ZSC, true, false},
+    {nullptr,  "Zone 5", "zone5", 126, 45, ZSC, true, false},
+    {nullptr,  "Zone 6", "zone6", 155, 45, ZSC, true, false},
+    {nullptr,  "Zone 7", "zone7", 184, 45, ZSC, true, false},
+    {nullptr,  "Zone 8", "zone8", 213, 45, ZSC, true, false},
+    {nullptr,  "Zone 9", "zone9", 242, 45, ZSC, true, false},
+    {nullptr,  "Zone 10", "zone10", 271, 45, ZSC, true, false},
+};
+#define K55CORE_ZONES (sizeof(K55COREZones) / sizeof(Key))
 
 // Strafe has side lights
 #define KSTRAFE_X_START     12
@@ -1258,6 +1275,25 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map[key->name] = *key;
         break;
     }
+    case KeyMap::K55_CORE:{
+        // Keys are similar to the K55, but has 10 zones instead and different media layout
+        map = getMap(KeyMap::K55, layout);
+
+        // Overwrite the zones
+        for(const Key* key = K55COREZones; key < K55COREZones + K55CORE_ZONES; key++)
+            map[key->name] = *key;
+
+        // Fix up media keys
+
+        // No prev/next/stop
+        map.remove("prev");
+        map.remove("next");
+        map.remove("stop");
+
+        // Brightness and lock
+
+        break;
+    }
     case KeyMap::M65:{
         // M65 isn't a keyboard; all mouse maps are unique.
         for(const Key* key = M65Keys; key < M65Keys + KEYCOUNT_M65; key++){
@@ -1721,6 +1757,9 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70_PRO;
     if(lower == "k70_core_rgb")
         return K70_CORE_RGB;
+    if(lower == "k55_core")
+        return K55_CORE;
+
     return NO_MODEL;
 }
 
@@ -1810,6 +1849,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70pro";
     case K70_CORE_RGB:
         return "k70_core_rgb";
+    case K55_CORE:
+        return "k55_core";
     default:
         return "";
     }
@@ -1850,6 +1891,8 @@ int KeyMap::modelWidth(Model model){
          return K95_WIDTH;
     case K55PRO:
         return K95P_WIDTH + 1; // FIXME
+    case K55_CORE:
+        return K95P_WIDTH + 2; // FIXME
     case K95P:
     case K55:
     case K57_WL:
@@ -1891,6 +1934,7 @@ int KeyMap::modelHeight(Model model){
     switch(model){
     case K55:
     case K55PRO:
+    case K55_CORE:
     case K57_WL:
     case K63:
     case K63_WL:

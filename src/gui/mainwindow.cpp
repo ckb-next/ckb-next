@@ -24,6 +24,7 @@ XWindowDetector* windowDetector = nullptr;
 #endif
 
 #include "ckbsystemtrayicon.h"
+#include "daemonwarndialog.h"
 
 
 extern QSharedMemory appShare;
@@ -163,25 +164,7 @@ MainWindow::MainWindow(const bool silent, QWidget *parent) :
     ui->tabWidget->addTab(settingsWidget = new SettingsWidget(this), QString(tr("Settings")));
     settingsWidget->setVersion(KbManager::ckbGuiVersion());
 
-    // create daemon dialog as a QMessageBox
-    // this will create a focussed dialog, that has to be interacted with,
-    // if the daemon is not running
-    // set the main and informative text to tell the user about the issue
-    QMessageBox dialog;
-    dialog.setText(tr("The ckb-next daemon is not running. This program will <b>not</b> work without it!"));
-#ifndef Q_OS_MACOS
-    QString daemonDialogText = tr("Start it once with:") +
-    "<blockquote><code>sudo systemctl start ckb-next-daemon</code></blockquote>" +
-    tr("Enable it for every boot:") +
-    "<blockquote><code>sudo systemctl enable ckb-next-daemon</code></blockquote><br>" +
-    tr("If \"Unit ckb-next-daemon.service is masked.\", unmask it first and try again:") +
-    "<blockquote><code>sudo systemctl unmask ckb-next-daemon</code></blockquote>";
-#else
-    QString daemonDialogText = QString(tr("Start and enable it with:")) +
-    "<blockquote><code>sudo launchctl load -w /Library/LaunchDaemons/org.ckb-next.daemon.plist</code></blockquote>";
-#endif
-    dialog.setInformativeText(daemonDialogText);
-    dialog.setIcon(QMessageBox::Critical);
+    DaemonWarnDialog *warnDialog = new DaemonWarnDialog(mainWindow);
 
     // Set up signal handler
     socketpair(AF_UNIX, SOCK_STREAM, 0, MainWindow::signalHandlerFd);
@@ -205,7 +188,7 @@ MainWindow::MainWindow(const bool silent, QWidget *parent) :
         // finally show the dialog
         settingsWidget->setStatus(tr("The ckb-next daemon is not running."));
         showWindow();
-        dialog.exec();
+        warnDialog->open();
     }
 #ifndef DISABLE_UPDATER
     if(!CkbSettings::get("Program/DisableAutoUpdCheck", false).toBool())

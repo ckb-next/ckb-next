@@ -138,6 +138,7 @@ if (MACOS OR LINUX)
               clickeventpushbutton.cpp
               colorbutton.cpp
               colormap.cpp
+              daemonwarndialog.cpp
               extrasettingswidget.cpp
               fwupgradedialog.cpp
               gradientbutton.cpp
@@ -195,6 +196,7 @@ if (MACOS OR LINUX)
               clickeventpushbutton.h
               colorbutton.h
               colormap.h
+              daemonwarndialog.h
               extrasettingswidget.h
               fwupgradedialog.h
               gradientbutton.h
@@ -249,6 +251,7 @@ if (MACOS OR LINUX)
               animdetailsdialog.ui
               animsettingdialog.ui
               ckbupdaterwidget.ui
+              daemonwarndialog.ui
               extrasettingswidget.ui
               fwupgradedialog.ui
               gradientdialog.ui

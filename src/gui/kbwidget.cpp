@@ -230,7 +230,7 @@ void KbWidget::modeChanged(){
     // Update tabs
     ui->lightWidget->setLight(device->currentLight());
     ui->bindWidget->setBind(device->currentBind(), device->currentProfile());
-    ui->kPerfWidget->setPerf(device->currentPerf(), device->currentProfile());
+    ui->kPerfWidget->setPerf(device->currentPerf(), device->currentProfile(), device->currentBind());
     ui->mPerfWidget->setPerf(device->currentPerf(), device->currentProfile());
     // Update selection
     ui->modesList->setCurrentIndex(ui->modesList->model()->index(index, 0));

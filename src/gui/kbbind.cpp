@@ -12,7 +12,7 @@ qint64 KbBind::globalRemapTime = 0;
 
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _map(keyMap),
-    _winLock(false), _needsUpdate(true), _needsSave(true) {
+    _winLock(false), _catsLockMode(false), _catsLockActive(false), _needsUpdate(true), _needsSave(true) {
 }
 
 ///
@@ -24,7 +24,7 @@ KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap) :
 ///
 KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const KbBind& other) :
     QObject(modeParent), _devParent(parentBoard), lastGlobalRemapTime(globalRemapTime), _bind(other._bind),
-    _winLock(false), _needsUpdate(true), _needsSave(true) {
+    _winLock(false), _catsLockMode(false), _catsLockActive(false), _needsUpdate(true), _needsSave(true) {
     map(keyMap);
 
     /// Create a new Hash table and copy all entries
@@ -75,6 +75,8 @@ void KbBind::load(CkbSettingsBase& settings){
         }
     }
     _winLock = settings.value("WinLock").toBool();
+    _catsLockMode = settings.value("CatsLockMode").toBool();
+    // _catsLockActive intentionally NOT loaded — always starts unlocked on profile load.
     emit didLoad();
     map(currentMap);
 }
@@ -95,6 +97,7 @@ void KbBind::save(CkbSettingsBase& settings){
         }
     }
     settings.setValue("WinLock", _winLock);
+    settings.setValue("CatsLockMode", _catsLockMode);
 }
 
 QString KbBind::globalRemap(const QString& key){
@@ -263,6 +266,45 @@ void KbBind::update(QFile& cmd, int notify, bool force){
     if(_winLock)
         cmd.write(" unbind lwin rwin");
 
+    // Cats Lock: when active, silence every key except the WinLock key itself.
+    // Written after the normal binding loop so these override any custom binds.
+    if(_catsLockMode && _catsLockActive) {
+        static const char* const silenced[] = {
+            // Function row
+            "esc","f1","f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12",
+            // System cluster
+            "prtscn","scroll","pause",
+            // Navigation cluster
+            "ins","home","pgup","del","end","pgdn",
+            "up","down","left","right",
+            // Number row
+            "grave","1","2","3","4","5","6","7","8","9","0","minus","equal","bspace",
+            // QWERTY rows
+            "tab","q","w","e","r","t","y","u","i","o","p","lbrace","rbrace","bslash",
+            "caps","a","s","d","f","g","h","j","k","l","semi","quote","enter",
+            "lshift","z","x","c","v","b","n","m","comma","dot","slash","rshift",
+            // Bottom row
+            "lctrl","lwin","lalt","space","ralt","rwin","rmenu","rctrl",
+            // Numpad
+            "numlock","kp_slash","kp_asterisk","kp_minus",
+            "kp7","kp8","kp9","kp_plus",
+            "kp4","kp5","kp6",
+            "kp1","kp2","kp3",
+            "kp0","kp_dot","kp_enter",
+            // Media / G-keys (present on K95 and similar)
+            "mute","volup","voldn","stop","prev","play","next",
+            "g1","g2","g3","g4","g5","g6","g7","g8","g9","g10",
+            "g11","g12","g13","g14","g15","g16","g17","g18",
+            // ISO extra key, light key, mode keys
+            "bslash_iso","light","m1","m2","m3","mr",
+            nullptr
+        };
+        for(const char* const* k = silenced; *k; ++k) {
+            cmd.write(" unbind ");
+            cmd.write(*k);
+        }
+    }
+
     // At last, send Macro definitions if available.
     // If no definitions are made, clear macro will be sent only to reset all macros,
     cmd.write(macros.toLatin1());
@@ -305,8 +347,39 @@ void KbBind::handleNotificationChannel(bool start) {
 }
 
 void KbBind::keyEvent(const QString& key, bool down){
+    // Cats Lock: intercept the WinLock key to toggle the lock state.
+    // We handle it here (not via KeyAction) so the lock key is never truly
+    // unbound — it always does something, and no changes to keyaction.cpp are needed.
+    if(_catsLockMode && key == "lock") {
+        if(down)
+            setCatsLockActive(!_catsLockActive);
+        return; // consume the event; don't pass to the normal action system
+    }
+
     QString rKey = globalRemap(key);
     KeyAction* act = bindAction(rKey);
     if(act)
         act->keyEvent(this, down);
+}
+
+void KbBind::setCatsLockMode(bool enable) {
+    if(_catsLockMode == enable)
+        return;
+    _catsLockMode = enable;
+    if(!enable && _catsLockActive) {
+        // Disabling the mode while locked: silently unlock first so the next
+        // update() call restores full bindings.
+        _catsLockActive = false;
+        emit catsLockActiveChanged(false);
+    }
+    _needsUpdate = true;
+    _needsSave   = true;
+}
+
+void KbBind::setCatsLockActive(bool active) {
+    if(_catsLockActive == active)
+        return;
+    _catsLockActive = active;
+    _needsUpdate    = true;
+    emit catsLockActiveChanged(active);
 }

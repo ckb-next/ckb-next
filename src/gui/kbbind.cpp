@@ -281,16 +281,16 @@ void KbBind::update(QFile& cmd, int notify, bool force){
             "grave","1","2","3","4","5","6","7","8","9","0","minus","equal","bspace",
             // QWERTY rows
             "tab","q","w","e","r","t","y","u","i","o","p","lbrace","rbrace","bslash",
-            "caps","a","s","d","f","g","h","j","k","l","semi","quote","enter",
+            "caps","a","s","d","f","g","h","j","k","l","colon","quote","enter",
             "lshift","z","x","c","v","b","n","m","comma","dot","slash","rshift",
             // Bottom row
             "lctrl","lwin","lalt","space","ralt","rwin","rmenu","rctrl",
-            // Numpad
-            "numlock","kp_slash","kp_asterisk","kp_minus",
-            "kp7","kp8","kp9","kp_plus",
-            "kp4","kp5","kp6",
-            "kp1","kp2","kp3",
-            "kp0","kp_dot","kp_enter",
+            // Numpad (names from src/daemon/keymap.c)
+            "numlock","numslash","numstar","numminus","numplus","numenter",
+            "num7","num8","num9",
+            "num4","num5","num6",
+            "num1","num2","num3",
+            "num0","numdot",
             // Media / G-keys (present on K95 and similar)
             "mute","volup","voldn","stop","prev","play","next",
             "g1","g2","g3","g4","g5","g6","g7","g8","g9","g10",

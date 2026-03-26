@@ -945,6 +945,30 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map.remove("rwin");
             break;
     }
+    case KeyMap::K70_CORE_RGB_TKL:{
+            // TKL version: K63 base with K70 Core RGB TKL Fn-layer keys
+            map = getMap(KeyMap::K63, layout);
+            map["scroll"] = {nullptr, "Scroll Lock", "scroll", 20, 2, NS, false, true}; // Fn+F1
+            map["profswitch"] = {nullptr, "Profile Switch", "profswitch", 32, 2, 11, 11, false, true}; // Fn+F2
+            map["stop"] = {nullptr, "Stop", "stop", 76, 2, 11, 11, false, true}; // Fn+F5
+            map["prev"] = { nullptr,  "Previous", "prev", 88, 2, 11, 11, false, true}; // Fn+F6
+            map["play"] = { nullptr,  "Play", "play", 100, 2, 11, 11, false, true}; // Fn+F7
+            map["next"] = { nullptr,  "Next", "next", 112, 2, 11, 11, false, true}; // Fn+F8
+            map["lock"] = {nullptr, "Lock", "lock", 124, 2, NS, false, true}; // Fn+F9
+            map["ctrlwheelb"] = {nullptr, "Mode", "ctrlwheelb", 168, 2, NS, false, true}; // Fn+F12
+
+            // This is the media button that defaults to play
+            map["mr"] = { nullptr,  "Macro", "mr", 180, 14, 16, 11, false, true};
+
+            // K70 Core RGB TKL has a volume knob that can be pressed
+            map["mute"] = {nullptr,  "Mute", "mute",  197, 14, NS, false, true};
+
+            // Replace rwin with Fn
+            map["fn"] = KStrafeKeys[3];
+            map["fn"].x = map["rwin"].x;
+            map.remove("rwin");
+            break;
+    }
     case KeyMap::STRAFE_MK2:{
         map = getMap(KeyMap::K70MK2, layout);
         // move everything right to make the space for the left sidelight
@@ -1721,6 +1745,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return K70_PRO;
     if(lower == "k70_core_rgb")
         return K70_CORE_RGB;
+    if(lower == "k70_core_rgb_tkl")
+        return K70_CORE_RGB_TKL;
     return NO_MODEL;
 }
 
@@ -1810,6 +1836,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k70pro";
     case K70_CORE_RGB:
         return "k70_core_rgb";
+    case K70_CORE_RGB_TKL:
+        return "k70_core_rgb_tkl";
     default:
         return "";
     }
@@ -1833,6 +1861,7 @@ int KeyMap::modelWidth(Model model){
     case K63:
     case K63_WL:
     case K70_TKL:
+    case K70_CORE_RGB_TKL:
         return K63_WIDTH;
     case K65:
         return K65_WIDTH;
@@ -1902,6 +1931,7 @@ int KeyMap::modelHeight(Model model){
     case K70_PRO:
     case K70_TKL:
     case K70_CORE_RGB:
+    case K70_CORE_RGB_TKL:
     case K95:
     case K95L:
     case STRAFE:

@@ -349,6 +349,9 @@
          <property name="singleStep">
           <number>50</number>
          </property>
+         <property name="stepType">
+          <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
+         </property>
         </widget>
        </item>
        <item row="3" column="0" colspan="2">
@@ -608,6 +611,9 @@
          </property>
          <property name="singleStep">
           <number>50</number>
+         </property>
+         <property name="stepType">
+          <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
          </property>
         </widget>
        </item>

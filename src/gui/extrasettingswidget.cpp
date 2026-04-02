@@ -72,9 +72,7 @@ ExtraSettingsWidget::ExtraSettingsWidget(QWidget *parent) :
     ui->previewBox->setChecked(settings.value("DisablePreviewOnFocusLoss", true).toBool());
 
 #ifdef Q_OS_LINUX
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
     ui->timerMinBox->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
-#endif
     if(!IdleTimer::isSupported()){
         QString notSupported(tr("This feature is not supported under your current compositor"));
         ui->timerBox->setToolTip(notSupported);

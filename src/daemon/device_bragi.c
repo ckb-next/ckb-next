@@ -83,9 +83,14 @@ static int setactive_bragi(usbdevice* kb, int active){
     uchar res = BRAGI_RES_LIGHTING;
     if(IS_MONOCHROME_DEV(kb))
         res = BRAGI_RES_LIGHTING_MONOCHROME;
+    else if(kb->product == P_K70_PRO_MECH)
+        res = BRAGI_RES_ALT_LIGHTING;
     int light = bragi_open_handle(kb, BRAGI_LIGHTING_HANDLE, res);
     if(light < 0)
         return light;
+
+    if(kb->product == P_K70_PRO_MECH && !light)
+        kb->vtable.updatergb = updatergb_keyboard_bragi_alt;
 
     // Check if the device returned an error
     // Non fatal for now. Should first figure out what the error codes mean.

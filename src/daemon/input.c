@@ -82,10 +82,6 @@ static pthread_t macro_pt_first() {
 
 // Default macro keystroke delay
 const struct timespec macrodelay = { .tv_nsec = 1000000 };
-// Initial repeat delay
-#define DELAY_REPEAT_INITIAL 500000000
-// Delay for every subsequent repeat
-#define DELAY_REPEAT_CATCHUP 500000000
 
 static inline void clock_microsleep(uint32_t s) {
     const struct timespec ts = {
@@ -172,7 +168,7 @@ static void* play_macro(void* param) {
 
         queued_mutex_unlock(mmutex(kb));
 
-        int delay_ns = first_keydownloop ? DELAY_REPEAT_INITIAL : DELAY_REPEAT_CATCHUP;
+        int delay_us = first_keydownloop ? macro->delay_repeat_initial : macro->delay_repeat;
 
         queued_mutex_lock(imutex(kb));
         // detect if the macro playback has been aborted
@@ -184,19 +180,19 @@ static void* play_macro(void* param) {
 
         if (macro->triggered > 1) {
             macro->triggered -= 2;
-            delay_ns = 0;
+            delay_us = 0;
             first_keydownloop = 1;
         }
 
         if (macro->triggered == 0)
             break;
 
-        if (!delay_ns) {
+        if (!delay_us) {
             queued_mutex_unlock(imutex(kb));
             continue;
         }
 
-        queued_cond_nanosleep(mintvar(kb), imutex(kb), delay_ns);
+        queued_cond_nanosleep(mintvar(kb), imutex(kb), delay_us*1000);
 
         if (macro->triggered == 2) {
             // the key was released, but not pressed again, during the sleep
@@ -204,7 +200,7 @@ static void* play_macro(void* param) {
             break;
         }
 
-        // if the key released and pressed during the sleep, reset to use DELAY_REPEAT_INITIAL
+        // if the key released and pressed during the sleep, reset to use delay_repeat_initial
         if (macro->triggered == 1)
             first_keydownloop = 0;
 
@@ -665,9 +661,24 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     // Allocate a buffer for them
     macro.actions = calloc(count, sizeof(macroaction));
     macro.actioncount = 0;
-    // Scan the actions
+    // set repeat delay
     position = 0;
     field = 0;
+    if (assignment[position] == '=') {
+        position++;
+        sscanf(assignment + position, "%u%n", &(macro.delay_repeat_initial), &field);
+        if ((field == 0) || (assignment[position += field] != ';'))
+            return;
+        position++;
+        sscanf(assignment + position, "%u%n", &(macro.delay_repeat), &field);
+        if ((field == 0) || (assignment[position += field] != ';'))
+            return;
+        position++;
+    } else {
+        macro.delay_repeat_initial = 500000;
+        macro.delay_repeat = 500000;
+    }
+    // Scan the actions
     // max action = old 11 chars plus 12 chars which is the max 32-bit unsigned int 4294967295 size * 2 + 1 for range underscore
     while(position < right && sscanf(assignment + position, "%36[^,]%n", keyname, &field) == 1){
         if(!strcmp(keyname, "clear"))

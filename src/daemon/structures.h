@@ -56,6 +56,10 @@ typedef struct {
      * thread shuts itself down immediately.
      */
     char triggered;
+
+    uint32_t delay_repeat_initial;  // us dey before the first repeaet
+    uint32_t delay_repeat;          // us delay before subsequent repeat
+
     struct _macro_param* param;
 } keymacro;
 

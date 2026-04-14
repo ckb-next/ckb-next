@@ -87,6 +87,9 @@ static pthread_t macro_pt_first() {
 // Default macro keystroke delay
 #define NANOSECONDS_PER_MILLISECONDS 1000000
 const struct timespec macrodelay = { .tv_nsec = 1 * NANOSECONDS_PER_MILLISECONDS };
+// Default and max values for macro repetition delays/debounces
+#define REPETITION_DEFAULT_VALUE 500
+#define REPETITION_MAX_VALUE 2000
 
 static inline void clock_microsleep(uint32_t s) {
     const struct timespec ts = {
@@ -676,16 +679,16 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     // Check if repetition debounce and delay tokens are attached to the assignment.
     // Validate value to be between 0 and 2000 inclusive. Default to 500ms.
     const char *delay_tok = strchr(assignment, ':');
-    macro.repetition_debounce_ms = 500;
-    macro.repetition_delay_ms = 500;
+    macro.repetition_delay_ms = REPETITION_DEFAULT_VALUE;
+    macro.repetition_debounce_ms = REPETITION_DEFAULT_VALUE;
     if (delay_tok != NULL) {
         unsigned long debounce_ms = 0;
         unsigned long delay_ms = 0;
 
         if (sscanf(delay_tok, ":%lu;%lu", &debounce_ms, &delay_ms) == 2) {
-            if (debounce_ms > 0 && debounce_ms <= 2000)
+            if (debounce_ms > 0 && debounce_ms <= REPETITION_MAX_VALUE)
                 macro.repetition_debounce_ms = (uint32_t) debounce_ms;
-            if (delay_ms > 0 && delay_ms <= 2000)
+            if (delay_ms > 0 && delay_ms <= REPETITION_MAX_VALUE)
                 macro.repetition_delay_ms = (uint32_t) delay_ms;
         }
     }

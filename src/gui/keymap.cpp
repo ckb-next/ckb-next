@@ -835,6 +835,12 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["logo"] = {nullptr, "Logo", "logo", 144, 10, 10, 10, true, false};
         map["logoright"] = {nullptr, "Logo Right", "logoright", 154, 10, 10, 10, true, false};
 
+        // Replace rwin with Fn
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map["fn"].y = map["rwin"].y;
+        map.remove("rwin");
+
         map.remove("light");
         break;
     }

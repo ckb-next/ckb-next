@@ -4,7 +4,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <errno.h>
 
 void ckb_info(){
     // Plugin info

@@ -89,6 +89,14 @@ void KbFirmware::processDownload(QNetworkReply* reply){
             return;
         }
         firmware.close();
+
+        // Make temp gpg homedir
+        QDir gpgDir(tmp);
+        if(!tmp.mkpath("ckb-gpg-homedir") || !gpgDir.cd("ckb-gpg-homedir")) {
+            qDebug() << "Failed to create temporary gpg homedir";
+            return;
+        }
+
         // Write GPG key
         QString keyPath = tmp.absoluteFilePath(QString("ckb-%1-key.gpg").arg(pid));
         if(!QFile::copy(":/bin/ckb-next-key.gpg", keyPath)){
@@ -97,7 +105,7 @@ void KbFirmware::processDownload(QNetworkReply* reply){
             return;
         }
         // Check signature
-        _gpg->setArguments(QStringList("--no-default-keyring") << "--keyring" << keyPath << "--verify" << fwPath);
+        _gpg->setArguments(QStringList("--no-default-keyring") << "--homedir" << gpgDir.absolutePath() << "--keyring" << keyPath << "--verify" << fwPath);
         _gpg->start();
         _gpg->waitForFinished();
         // Clean up temp files

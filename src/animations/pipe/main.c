@@ -1,5 +1,6 @@
 #include <ckb-next/animation.h>
 #include <fcntl.h>
+#include <pwd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -16,6 +17,8 @@ void ckb_info(){
 
     // Effect parameters
     CKB_PARAM_LONG("fifonum", "/tmp/ckbpipe", "", 0, 0, 200);
+    CKB_PARAM_STRING("file_mode", "File Mode", "", "0600");
+    CKB_PARAM_STRING("owner", "Owner", "", "root");
 
     // Timing/input parameters
     CKB_KPMODE(CKB_KP_POSITION);
@@ -30,23 +33,49 @@ void ckb_info(){
 }
 
 long fifonum = 0;
+mode_t fifomode = 0600;
+uid_t uid = 0;
 int fd = -1;
 #define FIFO_NAME_LEN 16
 char fifoname[FIFO_NAME_LEN] = { 0 }; // /tmp/ckbpipeNNN
 #define MAX_INPUT 4096
 
 void ckb_init(ckb_runctx* context){
-
 }
 
 void ckb_parameter(ckb_runctx* context, const char* name, const char* value){
     CKB_PARSE_LONG("fifonum", &fifonum){
         sprintf(fifoname, "/tmp/ckbpipe%03hhu", (unsigned char)fifonum);
-        unlink(fifoname);
-        // Create named pipe in tmp
-        mkfifo(fifoname, 0600);
-        fd = open(fifoname, O_RDONLY | O_NONBLOCK);
     }
+    CKB_PARSE_STRING("owner") {
+        struct passwd *pwd = getpwnam(value);
+        if (pwd != NULL)
+            uid = pwd->pw_uid;
+    }
+    CKB_PARSE_STRING("file_mode") {
+        // Validate input:
+        // - Mode string must be 4 characters in length.
+        // - Mode string may only contain numeric characters '0' - '7'.
+        size_t len = strlen(value);
+        if (len != 4 || strspn(value, "01234567") != len)
+            return;
+
+        // Parse string value into mode_t.
+        // Do this by reading the string from the right and appending the read
+        // character as numeric value to the new mode.
+        mode_t new_mode = 0;
+        size_t e = 0;
+        do
+            new_mode += (pow(10, e++) * (value[--len] - '0'));
+        while (len > 0);
+
+        fifomode = new_mode;
+    }
+
+    unlink(fifoname);
+    mkfifo(fifoname, fifomode);
+    (void) chown(fifoname, uid, -1);
+    fd = open(fifoname, O_RDONLY | O_NONBLOCK);
 }
 
 void ckb_keypress(ckb_runctx* context, ckb_key* key, int x, int y, int state){

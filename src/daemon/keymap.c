@@ -1285,6 +1285,28 @@ const unsigned char scimitar_bragi_lut[BRAGI_THREE_BYTE_MOUSE_BUTTONS] = {
     0x13,
 };
 
+// SE variant: single DPI toggle button at bit 3 (mapped to "dpiup" in the GUI),
+// and a bottom profile-switch button at bit 4 (mapped to "profswitch").
+const unsigned char scimitar_elite_se_lut[BRAGI_THREE_BYTE_MOUSE_BUTTONS] = {
+    0x00,
+    0x01,
+    0x02,
+    0x05, // DPI toggle
+    0x18, // Bottom button (used for profile switching?)
+    0x08,
+    0x09,
+    0x0A,
+    0x0B,
+    0x0C,
+    0x0D,
+    0x0E,
+    0x0F,
+    0x10,
+    0x11,
+    0x12,
+    0x13,
+};
+
 void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char* urbinput){
     // Increment this only once, as the loop below will increment it the first time as well
     // to skip the 00 02 header.
@@ -1303,10 +1325,13 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
             lut = harpoon_wl_lut;
         else if(kb->vendor == V_CORSAIR && kb->product == P_M55_RGB_PRO)
             lut = m55_wl_lut;
-    } else if (kb->vendor == V_CORSAIR && (kb->product == P_SCIMITAR_ELITE_BRAGI)) {
+    } else if (kb->vendor == V_CORSAIR && (kb->product == P_SCIMITAR_ELITE_BRAGI || kb->product == P_SCIMITAR_ELITE_SE_U)) {
         buttons = BRAGI_THREE_BYTE_MOUSE_BUTTONS;
-        if(kb->vendor == V_CORSAIR && kb->product == P_SCIMITAR_ELITE_BRAGI)
+        if(kb->product == P_SCIMITAR_ELITE_BRAGI) {
             lut = scimitar_bragi_lut;
+        } else if(kb->product == P_SCIMITAR_ELITE_SE_U) {
+            lut = scimitar_elite_se_lut;
+        }
     }
 
     for(int bit = 0; bit < buttons; bit++){

@@ -301,6 +301,9 @@ const char* product_str(ushort product);
 // Devices that use the NXP protocol and have the DPI stage RGB data in the DPI packet
 #define NXP_RGB_IN_DPI_PKT(kb)          ((kb)->vendor == V_CORSAIR && ((kb)->product == P_GLAIVE_PRO || IS_DARK_CORE_NXP(kb)))
 
+// Devices that have a single combined DPI property instead of X/Y
+#define USES_COMBINED_DPI(kb)           ((kb)->vendor == V_CORSAIR && (kb)->product == P_SCIMITAR_ELITE_SE_U)
+
 #define DELAY_100MS()       \
         clock_nanosleep(CLOCK_MONOTONIC, 0, &(struct timespec) {.tv_nsec = 100000000}, NULL)
 

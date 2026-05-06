@@ -9,11 +9,21 @@
 void ckb_info(){
     // Plugin info
     CKB_NAME("Pipe");
-    CKB_VERSION("1.0");
-    CKB_COPYRIGHT("2015-2019", "Tasos Sahanidis");
+    CKB_VERSION("1.1");
+    CKB_COPYRIGHT("2015-2026", "Tasos Sahanidis");
     CKB_LICENSE("GPLv2+");
     CKB_GUID("{64A824CD-3E12-4973-8F80-AA5E6DA807FA}");
-    CKB_DESCRIPTION("Control lights using named pipes\nplaced in /tmp/.\nData format is RRGGBBAA.\nWARNING: It doesn't clean up the nodes.\nUsage Examples:\necho \"rgb ff00ffff\" > /tmp/ckbpipe000\necho \"rgb r:ff0000ff\" > /tmp/ckbpipe000\nEach rgb command must be terminated with a newline (\\n).");
+    CKB_DESCRIPTION(
+        "Control lights using named pipes\n"
+        "placed in /tmp/.\n"
+        "Data format is RRGGBBAA.\n\n"
+        "WARNING: It doesn't clean up the nodes.\n\n"
+        "Usage Examples:\n"
+        "\techo \"rgb ff00ffff\" > /tmp/ckbpipe000\n"
+        "\techo \"rgb r:ff0000ff\" > /tmp/ckbpipe000\n\n"
+        "Each rgb command must be terminated with a newline (\\n).\n\n"
+        "Use Owner and File Mode to control ownership of named pipe. The Owner must exist, otherwise it is not changed. The File Mode is a bitstring as described in `chmod(2)`. Use only if you understand what you are doing."
+    );
 
     // Effect parameters
     CKB_PARAM_LONG("fifonum", "/tmp/ckbpipe", "", 0, 0, 200);

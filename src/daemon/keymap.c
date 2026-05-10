@@ -458,8 +458,8 @@ const key keymap_bragi[N_KEYS_BRAGI_PATCH] = {
     { "prev",          126, KEY_PREVIOUSSONG },
     { "mr",            -1,  KEY_CORSAIR },
     { "profswitch",    128, KEY_CORSAIR },
-    { 0,               -1,  KEY_NONE },
-    { 0,               -1,  KEY_NONE },
+    { "ctrlwheelcw",    -1, KEY_CORSAIR },
+    { "ctrlwheelccw",   -1, KEY_CORSAIR },
     { "g1",            131, KEY_CORSAIR },
     { "g2",            132, KEY_CORSAIR },
     { "g3",            133, KEY_CORSAIR },
@@ -918,11 +918,11 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                                 int32_t wheel;
                                 memcpy(&wheel, buffer + 4, sizeof(int32_t));
                                 if(wheel > 0) {
-                                    // Apply fresh key data
-                                    SET_KEYBIT(targetkb->input.keys, 103); // volup
+                                    // Apply fresh key data: clockwise rotation
+                                    SET_KEYBIT(targetkb->input.keys, 129);
                                 } else {
-                                    // Apply fresh key data
-                                    SET_KEYBIT(targetkb->input.keys, 104); // voldn
+                                    // Apply fresh key data: counter-clockwise rotation
+                                    SET_KEYBIT(targetkb->input.keys, 130);
                                 }
                             }
                         } else {

@@ -83,9 +83,9 @@ static pthread_t macro_pt_first() {
 // Default macro keystroke delay
 const struct timespec macrodelay = { .tv_nsec = 1000000 };
 // Initial repeat delay
-#define DELAY_REPEAT_INITIAL 500000000
+#define DELAY_REPEAT_INITIAL 1000000
 // Delay for every subsequent repeat
-#define DELAY_REPEAT_CATCHUP 500000000
+#define DELAY_REPEAT_CATCHUP 1000000
 
 static inline void clock_microsleep(uint32_t s) {
     const struct timespec ts = {

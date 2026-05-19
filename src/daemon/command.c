@@ -332,8 +332,8 @@ int readcmd(usbdevice* kb, char* line){
         }
         // Scan the left side for key names and run the requested command
         int position = 0, field = 0;
-        char keyname[11] = { 0 };
-        while(position < left && sscanf(word + position, "%10[^:,]%n", keyname, &field) == 1){
+        char keyname[N_KEYNAME_LENGTH] = { 0 };
+        while(position < left && sscanf(word + position, "%"N_SCANF_KEYNAME"[^:,]%n", keyname, &field) == 1){
             uint keycode;
             if(!strcmp(keyname, "all")){
                 // Set all keys

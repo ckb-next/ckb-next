@@ -645,8 +645,8 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     int empty = 1;
     int left = strlen(keys), right = strlen(assignment);
     int position = 0, field = 0;
-    char keyname[40];
-    while(position < left && sscanf(keys + position, "%10[^+]%n", keyname, &field) == 1){
+    char keyname[N_KEYNAME_LENGTH];
+    while(position < left && sscanf(keys + position, "%"N_SCANF_KEYNAME"[^+]%n", keyname, &field) == 1){
         // Find this key in the keymap
         for(unsigned i = 0; i < N_KEYS_INPUT; i++){
             if(kb->keymap[i].name && !strcmp(keyname, kb->keymap[i].name)){
@@ -673,7 +673,7 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     position = 0;
     field = 0;
     // max action = old 11 chars plus 12 chars which is the max 32-bit unsigned int 4294967295 size * 2 + 1 for range underscore
-    while(position < right && sscanf(assignment + position, "%36[^,]%n", keyname, &field) == 1){
+    while(position < right && sscanf(assignment + position, "%"N_SCANF_KEYNAME"[^,]%n", keyname, &field) == 1){
         if(!strcmp(keyname, "clear"))
             break;
 
@@ -682,12 +682,13 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
         int64_t long_delay_range = 0;
         uint32_t delay = UINT32_MAX; // computed delay value. UINT32_MAX means use the default value.
         uint32_t delay_range = 0;
-        char real_keyname[12];  // temp to hold the left side (key) of the <key>=<delay>
-        int scan_matches = sscanf(keyname, "%11[^=]=%"SCNd64"_%"SCNd64, real_keyname, &long_delay, &long_delay_range);
+        char real_keyname[N_KEYNAME_LENGTH]; // temp to hold the left side (key) of the <key>=<delay>
+        int scan_matches = sscanf(keyname, "%"N_SCANF_KEYNAME"[^=]=%"SCNd64"_%"SCNd64, real_keyname, &long_delay, &long_delay_range);
         if (scan_matches == 2 || scan_matches == 3) {
             if (0 <= long_delay && long_delay < UINT32_MAX) {
                 delay = (uint32_t)long_delay;
-                strcpy(keyname, real_keyname); // keyname[40], real_keyname[12]
+                static_assert(sizeof(keyname) >= sizeof(real_keyname), "");
+                strcpy(keyname, real_keyname);
                 if(0 < long_delay_range && long_delay_range < UINT32_MAX
                         && long_delay_range > long_delay) {
                     delay_range = (uint32_t)long_delay_range;

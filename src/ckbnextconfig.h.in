@@ -18,3 +18,12 @@
 #define CKB_NEXT_COPYRIGHT_YEAR "${ckb-next_COPYRIGHT_YEAR}"
 #cmakedefine ckb_next_VERSION_IS_RELEASE
 #define CKB_NEXT_DESCRIPTION "Open Source Driver for Corsair devices."
+
+#include <assert.h>
+// Number of characters allowed for key names.
+#define N_KEYNAME_LENGTH      40
+#define N_KEYNAME_STRLEN      39
+#define N_KEYNAME_STR_REAL(x) #x
+#define N_KEYNAME_STR(x)      N_KEYNAME_STR_REAL(x)
+#define N_SCANF_KEYNAME       N_KEYNAME_STR(N_KEYNAME_STRLEN)
+static_assert((N_KEYNAME_LENGTH == N_KEYNAME_STRLEN + 1), "N_KEYNAME_LENGTH must be 1 greater than N_KEYNAME_STRLEN");

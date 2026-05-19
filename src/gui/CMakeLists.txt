@@ -74,6 +74,8 @@ if (MACOS OR LINUX)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Network Gui)
     if(QT_VERSION VERSION_GREATER_EQUAL 6)
         find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
+    else()
+        find_package(OpenGL REQUIRED)
     endif()
     find_package(ZLIB REQUIRED)
     find_package(QuaZip REQUIRED)
@@ -651,6 +653,16 @@ if (QT_VERSION VERSION_GREATER_EQUAL "6")
         ckb-next
             PRIVATE
                 Qt6::OpenGLWidgets)
+else()
+    target_include_directories(
+        ckb-next
+            SYSTEM
+            PRIVATE
+              OpenGL::GL)
+    target_link_libraries(
+        ckb-next
+            PRIVATE
+            OpenGL::GL)
 endif ()
 
 endif ()

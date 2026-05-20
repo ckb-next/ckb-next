@@ -336,6 +336,8 @@ static int _mkdevpath(usbdevice* kb){
                 fputs(" wireless", ffile);
             if(HAS_FEATURES(kb, FEAT_BATTERY))
                 fputs(" battery", ffile);
+            if(HAS_FEATURES(kb, FEAT_LEGACY_IN))
+                fputs(" legacy_in", ffile);
 
             if(kb->brightness_mode == BRIGHTNESS_HARDWARE_COARSE)
                 fputs(" hwbright_coarse", ffile);

@@ -172,6 +172,8 @@ typedef struct {
 #define FEAT_WIRELESS   0x2000  // Is wireless?
 #define FEAT_BATTERY    0x4000  // Has a battery that can be read?
 
+#define FEAT_LEGACY_IN  0x8000 // Is a device using the legacy process_input_urb() path? This has nothing to do with legacy devices
+
 // Standard feature sets
 #define FEAT_COMMON     (FEAT_BIND | FEAT_NOTIFY | FEAT_FWVERSION | FEAT_MOUSEACCEL | FEAT_HWLOAD)
 #define FEAT_STD_RGB    (FEAT_COMMON | FEAT_RGB | FEAT_POLLRATE | FEAT_FWUPDATE)

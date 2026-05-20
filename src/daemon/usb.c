@@ -450,6 +450,9 @@ static void* _setupusb(void* context){
     if(kb->protocol == PROTO_BRAGI)
         kb->features &= ~FEAT_FWUPDATE;
 
+    // All devices use the legacy input path right now
+    kb->features |= FEAT_LEGACY_IN;
+
     // Check if the device needs a patched keymap, and if so patch it.
     patchkeys(kb);
 

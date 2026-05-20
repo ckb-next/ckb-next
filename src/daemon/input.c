@@ -9,6 +9,9 @@
 #define IS_SCROLLWHEEL_V(scan)  ((scan) == BTN_WHEELUP   || (scan) == BTN_WHEELDOWN)
 #define IS_SCROLLWHEEL_H(scan)  ((scan) == BTN_WHEELLEFT || (scan) == BTN_WHEELRIGHT)
 #define IS_VOLWHEEL(scan)      (((scan) == KEY_VOLUMEUP  || (scan) == KEY_VOLUMEDOWN) && DEV_HAS_VOLWHEEL(kb))
+// Lookup control wheel events by index in keymap. Alternatively one could check for non-null key->name to start with "ctrlwheel".
+// FIXME: Replace by proper lookup of map in keymap.
+#define IS_CTRLWHEEL(kb, index) ((kb)->protocol == PROTO_BRAGI && ((index) == 129 || (index) == 130))
 
 static int macromask(const uchar* keys, const uchar* macro){
     // Scan a macro against key input. Return 0 if any of them don't match
@@ -241,7 +244,7 @@ static inline int is_wheel_keybit(const usbdevice* kb, const uchar* macro){
             // Get the index of the item and look it up in the keymap
             const key* ckey = kb->keymap + keyindex;
             // If there's at least a single wheel, return true
-            if(IS_VOLWHEEL(ckey->scan) || IS_SCROLLWHEEL_V(ckey->scan) || IS_SCROLLWHEEL_H(ckey->scan))
+            if(IS_VOLWHEEL(ckey->scan) || IS_SCROLLWHEEL_V(ckey->scan) || IS_SCROLLWHEEL_H(ckey->scan) || IS_CTRLWHEEL(kb, keyindex))
                 return 1;
         }
     }
@@ -391,7 +394,7 @@ static inline void inputupdate_keys(usbdevice* kb, int* sync_kb, int* sync_mouse
                         // If it's a volume wheel, just add a single keyup event to the FIFO
                         // Else if the event originated from a scroll wheel, and is bound to something other than a scroll wheel,
                         // multiply the last few events by the amount of events received from the hid report
-                        if(IS_VOLWHEEL(map->scan)){
+                        if(IS_VOLWHEEL(map->scan) || IS_CTRLWHEEL(kb, keyindex)){
                             // Make room for it
                             memmove(events + modcount + keycount + 1, events + modcount + keycount, sizeof(int) * rmodcount);
                             // Duplicate the last event, but with keyup
@@ -417,7 +420,7 @@ static inline void inputupdate_keys(usbdevice* kb, int* sync_kb, int* sync_mouse
                         }
                     }
                     // Clear the key bit so that we can receive events of this type in the next run
-                    if(IS_VOLWHEEL(map->scan) || IS_SCROLLWHEEL_V(map->scan))
+                    if(IS_VOLWHEEL(map->scan) || IS_SCROLLWHEEL_V(map->scan) || IS_CTRLWHEEL(kb, keyindex))
                         input->keys[byte] &= ~mask;
                 }
 

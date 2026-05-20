@@ -897,26 +897,31 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
 
                 // We need to split the bragi code because the size check needs to go first
                 if(kb->protocol == PROTO_BRAGI) {
+#define BRAGI_MEDIA_MASK 0x60
+                    // Always clear the control wheel key bits.
+                    // This will enable the daemon to emulate keyup events in inputupdate_keys().
+                    if (DEV_HAS_CTRLWHEEL(kb)) {
+                        CLEAR_KEYBIT(targetkb->input.keys, 129);
+                        CLEAR_KEYBIT(targetkb->input.keys, 130);
+                    }
+
                     if(urblen == 64) {
                         if(buffer[1] == BRAGI_INPUT_HID) {
                             corsair_kbcopy(targetkb->input.keys, buffer + 2);
                             // Check if we need to apply an awful hack to get media keys working
 
                             handle_bragi_media_keys(targetkb);
-                        } else if(buffer[1] == BRAGI_INPUT_DIAL) {
-                            #define MEDIA_MASK 0x60
-                            if(buffer[1] == BRAGI_INPUT_DIAL && buffer[2] == MEDIA_MASK) {
-                                // This is a packet from the volume dial
-                                // We need to handle it appropriately then clear the keys so we stop getting garbage
-                                int32_t wheel;
-                                memcpy(&wheel, buffer + 4, sizeof(int32_t));
-                                if(wheel > 0) {
-                                    // Apply fresh key data: clockwise rotation
-                                    SET_KEYBIT(targetkb->input.keys, 129);
-                                } else {
-                                    // Apply fresh key data: counter-clockwise rotation
-                                    SET_KEYBIT(targetkb->input.keys, 130);
-                                }
+                        } else if(buffer[1] == BRAGI_INPUT_DIAL && buffer[2] == BRAGI_MEDIA_MASK) {
+                            // This is a packet from the control dial
+                            // We need to handle it appropriately then clear the keys so we stop getting garbage
+                            int32_t wheel;
+                            memcpy(&wheel, buffer + 4, sizeof(int32_t));
+                            if(wheel > 0) {
+                                // Apply fresh key data: clockwise rotation
+                                SET_KEYBIT(targetkb->input.keys, 129);
+                            } else {
+                                // Apply fresh key data: counter-clockwise rotation
+                                SET_KEYBIT(targetkb->input.keys, 130);
                             }
                         } else {
                             ckb_err("Unimplemented bragi input packet %hhx\n", buffer[1]);

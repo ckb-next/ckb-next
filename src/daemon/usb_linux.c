@@ -49,8 +49,9 @@ int os_usb_control(usbdevice* kb, ctrltransfer* transfer, const char* file, int 
         else
             return 0;
 
-    } else if (res != transfer->wLength)
-        ckb_warn_fn("Wrote %d bytes (expected %d)", file, line, res, MSG_SIZE);
+    } else if (res != transfer->wLength) {
+        ckb_warn_fn("Wrote %d bytes (expected %hu)", file, line, res, transfer->wLength);
+    }
 
     return res;
 }

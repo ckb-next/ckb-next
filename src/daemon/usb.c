@@ -364,22 +364,92 @@ cleanup:
     return 0;
 }
 
+static size_t iconv_usb_string(char* data_in, size_t len_in, char* data_out, size_t len_out) {
+    // len_out > 2
+    // Try to decode the string, ignoring the first two bytes (buffer[1] should be 0x03 == string descriptor)
+    char* instr = data_in + 2;
+    iconv_t utf8descr = iconv_open("UTF-8", "UTF-16LE");
+    if(utf8descr != (iconv_t) -1)
+    {
+        size_t inbytesleft = len_in - 2;
+        size_t outbytesleft = len_out - 1;
+        iconv(utf8descr, &instr, &inbytesleft, &data_out, &outbytesleft);
+        iconv_close(utf8descr);
+        *data_out = '\0';
+        return len_out - outbytesleft;
+    }
+    return 0;
+}
+
+static const char* proto_str_map[_PROTO_MAX] = {
+    "NXP",
+    "Bragi",
+    "Legacy",
+};
+
 void fill_usbdevice_protocol(usbdevice* kb){
-    if(USES_BRAGI(kb->vendor, kb->product))
-        kb->protocol = PROTO_BRAGI;
-    else if(IS_LEGACY_DEV(kb))
+    kb->protocol_version = -1;
+
+    // If we're a child, copy the parent's protocol since we can't directly send URBs
+    if(kb->parent) {
+        kb->protocol = kb->parent->protocol;
+        kb->protocol_version = kb->parent->protocol_version;
+        kb->out_ep_packet_size = kb->parent->out_ep_packet_size;
+        goto proto_end;
+    }
+
+    if(IS_LEGACY_DEV(kb)) {
+        kb->protocol_version = 0;
         kb->protocol = PROTO_LEGACY;
-    else
-        kb->protocol = PROTO_NXP;
+        kb->out_ep_packet_size = MSG_SIZE; // Unsure if needed
+        goto proto_end;
+    }
 
-    if(USES_BRAGI_JUMBO(kb->vendor, kb->product))
-        kb->out_ep_packet_size = BRAGI_JUMBO_SIZE;
-    else if(USES_BRAGI_LARGE(kb->vendor, kb->product))
-        kb->out_ep_packet_size = BRAGI_LARGE_SIZE;
-    else
-        kb->out_ep_packet_size = MSG_SIZE;
+    // PXX is PROTO_NXP
+    // BPXX is PROTO_BRAGI
+    // The catch is that for Bragi the string is at 0x05 but for NXP it's at 0x04.
+    // Try NXP first, then Bragi, then if that also fails, assume NXP and hope for the best.
+    int ret = 0;
+    char data_in[64] = {0};
+    char usb_string[64] = {0};
+    ctrltransfer transfer = { 0x80, 0x06, 0x304, 0x0409, sizeof(data_in), 500, data_in };
+    if((ret = os_usb_control(kb, &transfer, __FILE__, __LINE__)) > 4 && iconv_usb_string(data_in, ret, usb_string, sizeof(usb_string))) {
+        int end;
+        if(sscanf(usb_string, "P%hhd%n", &kb->protocol_version, &end) == 1 && usb_string[end] == '\0') {
+            kb->protocol = PROTO_NXP;
+            kb->out_ep_packet_size = MSG_SIZE;
+            goto proto_end;
+        }
+    }
 
-    ckb_info("ckb%d: Adding device with protocol %d", INDEX_OF(kb, keyboard), (int)kb->protocol);
+    // Try Bragi now
+    transfer.wValue = 0x305;
+    memset(data_in, 0, sizeof(data_in));
+    if((ret = os_usb_control(kb, &transfer, __FILE__, __LINE__)) > 4 && iconv_usb_string(data_in, ret, usb_string, sizeof(usb_string))) {
+        int end;
+        if(sscanf(usb_string, "BP%hhd%n", &kb->protocol_version, &end) == 1 && usb_string[end] == '\0') {
+            // Successful bragi match
+            kb->protocol = PROTO_BRAGI;
+
+            // FIXME: Autodetect this in the future too
+            if(USES_BRAGI_JUMBO(kb->vendor, kb->product))
+                kb->out_ep_packet_size = BRAGI_JUMBO_SIZE;
+            else if(USES_BRAGI_LARGE(kb->vendor, kb->product))
+                kb->out_ep_packet_size = BRAGI_LARGE_SIZE;
+            else
+                kb->out_ep_packet_size = MSG_SIZE;
+
+            goto proto_end;
+        }
+    }
+
+    // Something failed, fall back to NXP
+    ckb_warn("ckb%d: Protocol detection failed. Assuming NXP and MSG_SIZE.", INDEX_OF(kb, keyboard));
+    kb->protocol = PROTO_NXP;
+    kb->out_ep_packet_size = MSG_SIZE;
+
+proto_end:
+    ckb_info("ckb%d: Adding device with protocol %s version %hhd", INDEX_OF(kb, keyboard), proto_str_map[kb->protocol] ? proto_str_map[kb->protocol] : "Unknown", kb->protocol_version);
 }
 
 /// brief .

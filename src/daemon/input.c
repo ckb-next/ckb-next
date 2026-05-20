@@ -229,16 +229,17 @@ static void* play_macro(void* param) {
 
 // Checks if the macro mask contains any wheels to prevent it from looping endlessly
 static inline int is_wheel_keybit(const usbdevice* kb, const uchar* macro){
-    for(int i = 0; i < N_KEYBYTES_INPUT; i++){
+    for(int byte = 0; byte < N_KEYBYTES_INPUT; byte++){
         // Most entries are probably going to be 0, so skip over them
-        if(!macro[i])
+        if(!macro[byte])
             continue;
         // Go through each bit
-        for(int j = 0; j < 8; j++){
-            if(!((macro[i] >> j) & 1))
+        for(int bit = 0; bit < 8; bit++){
+            int keyindex = byte * 8 + bit;
+            if(!((macro[byte] >> bit) & 1))
                 continue;
             // Get the index of the item and look it up in the keymap
-            const key* ckey = kb->keymap + i * 8 + j;
+            const key* ckey = kb->keymap + keyindex;
             // If there's at least a single wheel, return true
             if(IS_VOLWHEEL(ckey->scan) || IS_SCROLLWHEEL_V(ckey->scan) || IS_SCROLLWHEEL_H(ckey->scan))
                 return 1;

@@ -3,8 +3,7 @@
 
 void legacy_fill_input_eps(usbdevice* kb)
 {
-    for(int i = 0; i < kb->epcount; i++)
-        kb->input_endpoints[i] = (i + 1) | 0x80;
+    // FIXME: What do we do with this?
 }
 
 int legacy_dev_io(usbdevice* kb, void* out, int len, int is_recv, const char* file, int line)

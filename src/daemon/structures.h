@@ -4,6 +4,7 @@
 #include "includes.h"
 #include "keymap.h"
 #include "command.h"
+#include <sodium.h>
 #ifdef OS_MAC
 #include "input_mac_vhid.h" // For the VirtualHIDDevice structs
 #endif
@@ -302,8 +303,6 @@ typedef struct usbdevice_ {
     char scroll_rate;
 #endif
 #endif
-    // Number of endpoints on the USB device
-    int epcount;
     // Thread used for USB/devnode communication. To close: lock mutexes, set handle to zero, unlock, then wait for thread to stop
     pthread_t thread;
     // Thread for device input. Will close on its own when the device is terminated.
@@ -344,9 +343,6 @@ typedef struct usbdevice_ {
     key keymap[sizeof(keymap)];
     // Buffer used to store non-HID interrupt reads from the input thread.
     uchar interruptbuf[MAX_MSG_SIZE];
-    // Endpoints the main input thread should listen to
-    // Must always end with 0, and endpoints should be 0x80 | i
-    uchar input_endpoints[USB_EP_MAX+1];
     // Protocol
     protocol_t protocol;
     // Protocol version (Unknown = -1)
@@ -394,6 +390,20 @@ typedef struct usbdevice_ {
     struct timespec last_rgb;
     // Legacy devices only
     unsigned char previous_6kro[8];
+    uchar bNumInterfaces;
+    struct {
+        uchar bInterfaceNumber;
+        uchar bNumEndpoints;
+        struct {
+            uchar bEndpointAddress;
+            ushort wMaxPacketSize;
+        } endpoints[4]; // FIXME: Arbitrary limit (should we do 16?)
+        uchar report_descriptor[4096];
+        uchar report_descriptor_hash[crypto_hash_sha256_BYTES];
+        int report_descriptor_len;
+        bool dont_claim; // FIXME: Unused
+    } hid_interfaces[10]; // FIXME: Arbitrary limit
+    uchar num_endpoints_in; // Count of how many IN EPs we actually have in the above struct
 } usbdevice;
 
 #endif  // STRUCTURES_H

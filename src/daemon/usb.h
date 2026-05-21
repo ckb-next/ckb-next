@@ -336,6 +336,8 @@ void usbkill();
 /// \param[OUT] kb->thread is used to store the thread ID of the fresh created thread.
 void setupusb(usbdevice* kb);
 
+int os_get_device_ifs_eps(usbdevice* kb);
+
 ///
 /// \brief os_setupusb OS-specific setup for a specific usb device.
 /// \param kb THE usbdevice*

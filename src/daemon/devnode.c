@@ -475,6 +475,26 @@ int mkfwnode(usbdevice* kb){
         remove(ppath);
         return -2;
     }
+
+    char rpath[DEVPATH_LEN + 21];
+    snprintf(rpath, sizeof(rpath), "%s%d/report_descriptors", devpath, index);
+    FILE* rfile = fopen(rpath, "w");
+    if(rfile){
+        for(uchar i = 0; i < kb->bNumInterfaces; i++) {
+            fprintf(rfile, "%02hhx: ", kb->hid_interfaces[i].bInterfaceNumber);
+            for(size_t d = 0; d < sizeof(kb->hid_interfaces[0].report_descriptor_hash); d++)
+                fprintf(rfile, "%02hhx", kb->hid_interfaces[i].report_descriptor_hash[d]);
+            fputc('\n', rfile);
+        }
+        fclose(rfile);
+        check_chmod(rpath, S_GID_READ);
+        check_chown(rpath, 0, gid);
+    } else {
+        ckb_warn("Unable to create %s: %s", rpath, strerror(errno));
+        remove(rpath);
+        return -3;
+    }
+
     return 0;
 }
 

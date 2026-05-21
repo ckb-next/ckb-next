@@ -3,6 +3,7 @@
 #include "input.h"
 #include "notify.h"
 #include "usb.h"
+#include <sodium.h>
 
 #ifdef OS_LINUX
 #include <time.h>
@@ -89,99 +90,188 @@ int os_usb_interrupt_out(usbdevice* kb, unsigned int ep, unsigned int len, uchar
 /// 7. return null
 ///
 
+static inline short udev_get_byte_hex(struct udev_device* d, const char* what) {
+    const char* that = udev_device_get_sysattr_value(d, what);
+    uchar ret;
+    if(!that || sscanf(that, "%hhx", &ret) != 1)
+        return -1;
+    return ret;
+}
+
+static inline short udev_get_byte_dec(struct udev_device* d, const char* what) {
+    const char* that = udev_device_get_sysattr_value(d, what);
+    uchar ret;
+    if(!that || sscanf(that, "%hhu", &ret) != 1)
+        return -1;
+    return ret;
+}
+
+int os_get_device_ifs_eps(usbdevice* kb) {
+    short temp;
+    if((temp = udev_get_byte_dec(kb->udev, "bNumInterfaces")) <= 0) {
+        ckb_err("FAIL");
+        return -1;
+    }
+    kb->bNumInterfaces = temp;
+
+    ckb_info("%hhu", kb->bNumInterfaces);
+
+    // Enumerate the current device's children
+    struct udev* dev_udev = udev_device_get_udev(kb->udev);
+    struct udev_enumerate* enumerate = udev_enumerate_new(dev_udev);
+    udev_enumerate_add_match_parent(enumerate, kb->udev);
+    udev_enumerate_add_match_property(enumerate, "DEVTYPE", "usb_interface");
+    udev_enumerate_scan_devices(enumerate);
+
+    // Create a list containing them
+    struct udev_list_entry* udeventry;
+
+    uchar ifcount = 0;
+    udev_list_entry_foreach(udeventry, udev_enumerate_get_list_entry(enumerate)) {
+        // Move to the next entry in the udev list (skipping the first one).
+        const char* path = udev_list_entry_get_name(udeventry);
+        ckb_info("path %s", path);
+
+        // If there's an underscore, that means we are dealing with udev iterating through endpoints
+        // FIXME Is the above needed with the usb_interface devtype filter? I removed it for now
+
+        struct udev_device* udev_if = udev_device_new_from_syspath(dev_udev, path);
+
+        // Check if it's an HID interface
+        if((temp = udev_get_byte_hex(udev_if, "bInterfaceClass")) < 0) {
+            udev_device_unref(udev_if);
+            ckb_err("FAIL");
+            return -2;
+        }
+
+        if(temp != 3) { // HID
+            udev_device_unref(udev_if);
+            ckb_info("NOT HID %d", temp);
+            // Do not increment ifcount here
+            continue;
+        }
+
+        // Fill in the interface information
+        if((temp = udev_get_byte_hex(udev_if, "bInterfaceNumber")) < 0) {
+            udev_device_unref(udev_if);
+            ckb_err("FAIL");
+            return -3;
+        }
+        kb->hid_interfaces[ifcount].bInterfaceNumber = temp;
+
+        if((temp = udev_get_byte_hex(udev_if, "bNumEndpoints")) < 0) {
+            udev_device_unref(udev_if);
+            ckb_err("FAIL");
+            return -4;
+        }
+        kb->hid_interfaces[ifcount].bNumEndpoints = temp;
+
+        // Iterate through the endpoints
+        // Sadly modern udev doesn't seem to let us do it, so we'll use fs access
+        DIR* dir = opendir(path);
+        if (!dir) {
+            udev_device_unref(udev_if);
+            ckb_err("DIR");
+            return -5;
+        }
+
+        uchar epcount = 0;
+        struct dirent *entry;
+        while ((entry = readdir(dir)) != NULL) {
+            if(entry->d_type != DT_DIR)
+                continue;
+
+            if(strncmp(entry->d_name, "ep_", 3))
+                continue;
+
+            unsigned char bEndpointAddress;
+            if(sscanf(entry->d_name, "ep_%hhx", &bEndpointAddress) != 1)
+                continue;
+            ckb_info("EP %hhx", bEndpointAddress);
+            kb->hid_interfaces[ifcount].endpoints[epcount].bEndpointAddress = bEndpointAddress;
+
+            kb->hid_interfaces[ifcount].endpoints[epcount].wMaxPacketSize = 64;
+            char* wMaxPacketSizePath = malloc(strlen(path) + 1 + strlen(entry->d_name) + strlen("/wMaxPacketSize") + 1);
+            sprintf(wMaxPacketSizePath, "%s/%s/wMaxPacketSize", path, entry->d_name);
+            ckb_info("%s", wMaxPacketSizePath);
+            FILE* wMaxPacketSizeFile = fopen(wMaxPacketSizePath, "r");
+            if(wMaxPacketSizeFile) {
+                ushort wMaxPacketSize;
+                if(fscanf(wMaxPacketSizeFile, "%hx", &wMaxPacketSize) == 1)
+                    kb->hid_interfaces[ifcount].endpoints[epcount].wMaxPacketSize = wMaxPacketSize;
+                else
+                    ckb_err("FAILED TO PARSE");
+                fclose(wMaxPacketSizeFile);
+            } else {
+                ckb_err("FAILED TO FOPEN wMaxPacketSize");
+            }
+            free(wMaxPacketSizePath);
+
+            if(bEndpointAddress & 0x80)
+                kb->num_endpoints_in++;
+            ckb_info("Found EP %02hhx in IF %02hhx with wMaxPacketSize %hx at %s", bEndpointAddress, kb->hid_interfaces[ifcount].bInterfaceNumber, kb->hid_interfaces[ifcount].endpoints[epcount].wMaxPacketSize, path);
+            epcount++;
+        }
+
+        closedir(dir);
+
+        if(epcount != kb->hid_interfaces[ifcount].bNumEndpoints) {
+            ckb_warn("epcount != bNumEndpoints. Assuming epcount.");
+            kb->hid_interfaces[ifcount].bNumEndpoints = epcount;
+        }
+
+        udev_device_unref(udev_if);
+        ifcount++;
+    }
+
+    udev_enumerate_unref(enumerate);
+
+    if(ifcount != kb->bNumInterfaces) {
+        // This is expected on certain devices since we're filtering for HID interfaces only
+#ifndef NDEBUG
+        ckb_info("ifcount != bNumInterfaces. Assuming ifcount.");
+#endif
+        kb->bNumInterfaces = ifcount;
+    }
+
+    return 0;
+}
+
 void* os_inputmain(void* context){
     usbdevice* kb = context;
     int fd = kb->handle - 1;
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Starting input thread for %s%d", devpath, index);
 
-    if (kb->input_endpoints[0] == 0) {
+    if (kb->num_endpoints_in == 0) {
         ckb_err("No endpoints claimed in inputmain");
-        return 0;
+        return NULL;
     }
 
-    /// Get an usbdevfs_urb data structure and clear it via memset()
-    struct usbdevfs_urb urbs[USB_EP_MAX] = {0};
+    struct usbdevfs_urb* urbs = calloc(kb->num_endpoints_in, sizeof(struct usbdevfs_urb));
+    if(!urbs) {
+        ckb_fatal("Can't allocate memory for usbdevfs_urb");
+        return NULL;
+    }
 
-    /// Query udev for wMaxPacketSize on each endpoint, due to certain devices sending more data than the max defined, causing all sorts of issues.
-    /// A syspath example would be:
-    /// $ cat "/sys/devices/pci0000:00/0000:00:05.0/0000:03:00.0/usb8/8-2/8-2:1.2/ep_03/wMaxPacketSize"
-    /// 0040
-    /// Where 0x0040 == 64
-    ///
-    /// Submit all the URBs via ioctl(USBDEVFS_SUBMITURB) with type USBDEVFS_URB_TYPE_INTERRUPT (the endpoints are defined as type interrupt).
-    /// Endpoint number is 0x80..0x82 or 0x83, depending on the model and FW version.
+    for(uchar i = 0, ep = 0; i < kb->bNumInterfaces && ep < kb->num_endpoints_in; i++) {
+        for(uchar j = 0; j < kb->hid_interfaces[i].bNumEndpoints; j++) {
+            const uchar bEndpointAddress = kb->hid_interfaces[i].endpoints[j].bEndpointAddress;
+            if(!(bEndpointAddress & 0x80))
+                continue;
 
-    // Enumerate the current device's children
-    struct udev* dev_udev = udev_device_get_udev(kb->udev);
-    struct udev_enumerate* enumerate = udev_enumerate_new(dev_udev);
-    udev_enumerate_add_match_parent(enumerate, kb->udev);
-    udev_enumerate_scan_devices(enumerate);
-
-    // Create a list containing them
-    struct udev_list_entry* udeventry = udev_enumerate_get_list_entry(enumerate);
-
-    int ifcount = 0;
-    do {
-        // Move to the next entry in the udev list (skipping the first one).
-        struct udev_list_entry* nextentry = udev_list_entry_get_next(udeventry);
-        const char* path = udev_list_entry_get_name(nextentry);
-        // If there's an underscore, that means we are dealing with udev iterating through endpoints
-        // usbX/X-X/X-X:1.0/ep_80
-        // ~~~~~~~~~~~~~~~~~~~^
-        // We only want to iterate through the interfaces
-        size_t pathlen = strlen(path);
-        if(path[pathlen - 3] == '_'){
-            ckb_info("Applying udev endpoint workaround for %s", path);
-            // Skip the current entry
-            udeventry = nextentry;
-            nextentry = udev_list_entry_get_next(udeventry);
-            path = udev_list_entry_get_name(nextentry);
-            pathlen = strlen(path);
+            const ushort wMaxPacketSize = kb->hid_interfaces[i].endpoints[j].wMaxPacketSize;
+            // Set the URB parameters
+            urbs[ep].buffer_length = wMaxPacketSize;
+            urbs[ep].type = USBDEVFS_URB_TYPE_INTERRUPT;
+            urbs[ep].endpoint = bEndpointAddress;
+            urbs[ep].buffer = malloc(wMaxPacketSize);
+            ioctl(fd, USBDEVFS_SUBMITURB, urbs + ep);
+            ep++;
         }
-        // Create the path to the endpoint
-        size_t finalpathlen = pathlen + 7;
-        char* finalpath = malloc(finalpathlen);
-        // Try to find any of the wanted endpoints in the current interface
-        // We'll assume that each interface has at most one IN endpoint
-        ushort size = 64;
-        uchar ep = 0;
-        for(int i = 0; (ep = kb->input_endpoints[i]); i++){
-            // Build the path
-            snprintf(finalpath, finalpathlen, "%s/ep_%02hhx", path, ep);
-            // Access it
-            struct udev_device* child = udev_device_new_from_syspath(dev_udev, finalpath);
-            const char* sizehex = udev_device_get_sysattr_value(child, "wMaxPacketSize");
-            // Read its wMaxPacketSize
-            if(sizehex && sscanf(sizehex, "%hx", &size) == 1)
-            {
-                ckb_info("Found EP 0x%hhx at %s", ep, finalpath);
-                udev_device_unref(child);
-                break;
-            }
-            udev_device_unref(child);
-        }
-        if(!ep)
-            ckb_fatal("Unable to read wMaxPacketSize for %s, assuming 64", finalpath);
+    }
 
-#ifndef NDEBUG
-        ckb_info("Endpoint path %s has wMaxPacketSize %i", finalpath, size);
-#endif
-        // Increment the udev list pointer
-        udeventry = nextentry;
-        // Set the URB parameters
-        urbs[ifcount].buffer_length = size;
-        urbs[ifcount].type = USBDEVFS_URB_TYPE_INTERRUPT;
-        urbs[ifcount].endpoint = ep;
-        urbs[ifcount].buffer = malloc(size);
-        ioctl(fd, USBDEVFS_SUBMITURB, urbs + ifcount);
-        // Clean up
-        free(finalpath);
-        ifcount++;
-    } while (*(kb->input_endpoints + ifcount));
-
-    udev_enumerate_unref(enumerate);
-    /// The userSpaceFS knows the URBs now, so start monitoring input
+    // Start monitoring input
     while (1) {
         struct usbdevfs_urb* urb = NULL;
 
@@ -227,11 +317,14 @@ void* os_inputmain(void* context){
     /// If the endless loop is terminated, clean up by discarding the URBs via ioctl(USBDEVFS_DISCARDURB),
     /// free the URB buffers and return a null pointer as thread exit code.
     ckb_info("Stopping input thread for %s%d", devpath, index);
-    for(int i = 0; i < ifcount; i++){
+    for(int i = 0; i < kb->num_endpoints_in; i++){
         ioctl(fd, USBDEVFS_DISCARDURB, urbs + i);
         free(urbs[i].buffer);
     }
-    return 0;
+
+    free(urbs);
+
+    return NULL;
 }
 
 /// \brief .
@@ -253,27 +346,29 @@ void* os_inputmain(void* context){
 ///
 static int usbunclaim(usbdevice* kb, int resetting) {
     int handle = kb->handle - 1;
-    int count = kb->epcount;
-    for (int i = 0; i < count; i++) {
-        ioctl(handle, USBDEVFS_RELEASEINTERFACE, &i);
+    for(uchar i = 0; i < kb->bNumInterfaces; i++){
+        if(kb->hid_interfaces[i].dont_claim)
+            continue;
+
+        const uchar bInterfaceNumber = kb->hid_interfaces[i].bInterfaceNumber;
+
+        ioctl(handle, USBDEVFS_RELEASEINTERFACE, &bInterfaceNumber);
     }
+
     // Intentional unclean exit workaround, because usbhid hangs while initialising these devices.
     if (NEEDS_UNCLEAN_EXIT(kb)) {
         ckb_warn("Your %s is being uncleanly removed to speed up shutdown times.", kb->name);
         ckb_warn("If you still need the device, you will have to restart ckb-next-daemon.");
         return 0;
     }
-    // For NXP devices, the kernel driver should only be reconnected to interfaces 0 and 1 (HID), and only if we're not about to do a USB reset.
-    // Reconnecting any of the others causes trouble.
+
+    // The kernel driver should only be reconnected if we're not about to do a USB reset.
     if (resetting)
         return 0;
+
     struct usbdevfs_ioctl ctl = { 0, USBDEVFS_CONNECT, 0 };
-    for(int i = 0; i < count; i++){
-        // Do not reattach interface 2 if it's an NXP device
-        // FIXME: Is this still an issue?
-        if(i == 2 && kb->protocol == PROTO_NXP)
-            continue;
-        ctl.ifno = i;
+    for(int i = 0; i < kb->bNumInterfaces; i++){
+        ctl.ifno = kb->hid_interfaces[i].bInterfaceNumber;
         ioctl(handle, USBDEVFS_IOCTL, &ctl);
     }
     return 0;
@@ -311,17 +406,21 @@ void os_closeusb(usbdevice* kb){
 /// Function is called  in usb_linux.c only, so it is declared as static now.
 ///
 static int usbclaim(usbdevice* kb){
-    int count = kb->epcount;
+    int retries = 0;
+    for(uchar i = 0; i < kb->bNumInterfaces; i++){
+        if(kb->hid_interfaces[i].dont_claim)
+            continue;
+
+        const uchar bInterfaceNumber = kb->hid_interfaces[i].bInterfaceNumber;
+
 #ifndef NDEBUG
-    ckb_info("ckb%d: Claiming %d interfaces", INDEX_OF(kb, keyboard), count);
+        ckb_info("ckb%d: Claiming interface %02hhx", INDEX_OF(kb, keyboard), bInterfaceNumber);
 #endif // DEBUG
 
-    int retries = 0;
-    for(int i = 0; i < count; i++){
         while (1) {
-            struct usbdevfs_ioctl ctl = { i, USBDEVFS_DISCONNECT, 0 };
+            struct usbdevfs_ioctl ctl = { bInterfaceNumber, USBDEVFS_DISCONNECT, 0 };
             ioctl(kb->handle - 1, USBDEVFS_IOCTL, &ctl);
-            if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &i)) {
+            if(ioctl(kb->handle - 1, USBDEVFS_CLAIMINTERFACE, &bInterfaceNumber)) {
                 if (errno == EBUSY && retries < 50) {
                     retries++;
                     struct timespec sleep_for = { .tv_nsec = 100 * 1000000 };
@@ -411,19 +510,19 @@ void strtrim(char* string){
 /// Claiming is the only point where os_setupusb() can produce an error (-1).
 ///
 int os_setupusb(usbdevice* kb) {
-    ///
-    /// - Copy device description and serial
     struct udev_device* dev = kb->udev;
+
+    // Fill in product, serial and fwversion
     const char* name = udev_device_get_sysattr_value(dev, "product");
     if(name)
         snprintf(kb->name, KB_NAME_LEN, "%s", name);
     strtrim(kb->name);
+
     const char* serial = udev_device_get_sysattr_value(dev, "serial");
     if(serial)
         snprintf(kb->serial, SERIAL_LEN, "%s", serial);
     strtrim(kb->serial);
-    ///
-    /// - Copy firmware version (needed to determine USB protocol)
+
     const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
     if(firmware)
         sscanf(firmware, "%"SCNx32, &kb->fwversion);
@@ -431,40 +530,16 @@ int os_setupusb(usbdevice* kb) {
         kb->fwversion = 0;
     int index = INDEX_OF(kb, keyboard);
 
-    /// - Do some output about connecting interfaces
-    ckb_info("Connecting %s at %s%d", kb->name, devpath, index);
+    ckb_info("Connecting %s with bcdDevice %s at %s%d", kb->name, firmware, devpath, index);
 
-    ///
-    /// - Claim the USB interfaces
-    ///
-    /// \todo in these modules a pullrequest is outstanding
-    ///
-    const char* ep_str = udev_device_get_sysattr_value(dev, "bNumInterfaces");
-#ifndef NDEBUG
-    ckb_info("Claiming interfaces. name=%s, firmware=%s, ep_str=%s", name, firmware, ep_str);
-#endif //DEBUG
-    kb->epcount = 0;
-    if(ep_str)
-        sscanf(ep_str, "%d", &kb->epcount);
-    if(kb->epcount < 2 && !IS_SINGLE_EP(kb)){
-        // If we have an RGB KB with 1 endpoint, it will be in BIOS mode.
-        if(kb->epcount == 1){
+    // FIXME: There has to be a better way to detect this
+    // FIXME: Make this a vtable function
+    // Bragi devices have more than 1 interface in BIOS mode
+    if(kb->protocol == PROTO_NXP && kb->bNumInterfaces < 2 && !IS_SINGLE_EP(kb)){
+        if(kb->bNumInterfaces == 1){
             ckb_info("Device is in BIOS mode");
             return -1;
         }
-        // Something probably went wrong if we got here
-        ckb_err("Unable to read endpoint count from udev, assuming %d", kb->epcount);
-        if (usb_tryreset(kb) == 0) { ///< Try to reset the device and recall the function
-            static int retryCount = 0; ///< Don't do this endless in recursion
-            if (retryCount++ < 5) {
-                return os_setupusb(kb); ///< os_setupusb() has a return value (used as boolean)
-            }
-        }
-        return -1;
-        // ToDo are there special versions we have to detect? If there are, that was the old code to handle it:
-        // This shouldn't happen, but if it does, assume EP count based on what the device is supposed to have
-        // kb->epcount = (HAS_FEATURES(kb, FEAT_RGB) ? 4 : 3);
-        // ckb_warn("Unable to read endpoint count from udev, assuming %d and reading >>%s<<...", kb->epcount, ep_str);
     }
     if(usbclaim(kb)){
         ckb_err("Failed to claim interfaces: %s", strerror(errno));
@@ -649,15 +724,16 @@ static void graceful_suspend_resume() {
         for (int i = 1; i < DEV_MAX; i++) {
             usbdevice* kb = keyboard + i;
             queued_mutex_lock(dmutex(kb));
-            if (kb->status == DEV_STATUS_CONNECTED && kb->active) {
-                for (int j = 0; j < kb->epcount; j++) {
-                    // Replicates the logic from usbunclaim() - ignore
-                    // interfaces other than 0 and 1.
-                    if (j == 2 && kb->protocol == PROTO_NXP)
+            if (kb->status == DEV_STATUS_CONNECTED) {
+                // Replicates the logic from usbunclaim()
+                for(uchar j = 0; j < kb->bNumInterfaces; j++){
+                    if(kb->hid_interfaces[i].dont_claim)
                         continue;
 
+                    const uchar bInterfaceNumber = kb->hid_interfaces[j].bInterfaceNumber;
+
                     struct usbdevfs_getdriver query = {
-                        .interface = j,
+                        .interface = bInterfaceNumber,
                     };
                     if (ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
                         if (errno == ENODATA) {
@@ -685,16 +761,20 @@ static void graceful_suspend_resume() {
     for (int i = 1; i < DEV_MAX; i++) {
         usbdevice* kb = keyboard + i;
         queued_mutex_lock(dmutex(kb));
-        if (kb->status == DEV_STATUS_CONNECTED && kb->active) {
+        if (kb->status == DEV_STATUS_CONNECTED) {
             bool needs_reclaim = false;
-            for (int j = 0; j < kb->epcount; j++) {
+            for(uchar j = 0; j < kb->bNumInterfaces; j++){
+                if(kb->hid_interfaces[j].dont_claim)
+                    continue;
+
+                const uchar bInterfaceNumber = kb->hid_interfaces[j].bInterfaceNumber;
                 struct usbdevfs_getdriver query = {
-                    .interface = j,
+                    .interface = bInterfaceNumber,
                 };
                 if (!ioctl(kb->handle - 1, USBDEVFS_GETDRIVER, &query)) {
                     if (strcmp("usbfs", query.driver)) {
 #ifndef NDEBUG
-                        ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave %s, reclaiming", i, j, query.driver);
+                        ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave %s, reclaiming", i, bInterfaceNumber, query.driver);
 #endif // DEBUG
                         needs_reclaim = true;
                         break;
@@ -702,7 +782,7 @@ static void graceful_suspend_resume() {
                 } else {
                     if (errno == ENODATA) {
 #ifndef NDEBUG
-                        ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave ENODATA, reclaiming", i, j);
+                        ckb_info("ckb%d: USBDEVFS_GETDRIVER on interface %d gave ENODATA, reclaiming", i, bInterfaceNumber);
 #endif // DEBUG
                         needs_reclaim = true;
                         break;

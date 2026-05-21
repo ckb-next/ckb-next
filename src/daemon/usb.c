@@ -452,6 +452,20 @@ proto_end:
     ckb_info("ckb%d: Adding device with protocol %s version %hhd", INDEX_OF(kb, keyboard), proto_str_map[kb->protocol] ? proto_str_map[kb->protocol] : "Unknown", kb->protocol_version);
 }
 
+static void read_hid_descriptors(usbdevice* kb) {
+    ctrltransfer transfer = { 0x81, 0x06, 0x2200, 0, sizeof(kb->hid_interfaces[0].report_descriptor), 500, NULL };
+
+    for(uchar i = 0; i < kb->bNumInterfaces; i++) {
+        int ret;
+        transfer.wIndex = kb->hid_interfaces[i].bInterfaceNumber;
+        transfer.data = &kb->hid_interfaces[i].report_descriptor;
+        if((ret = os_usb_control(kb, &transfer, __FILE__, __LINE__))) {
+            kb->hid_interfaces[i].report_descriptor_len = ret;
+            crypto_hash_sha256(kb->hid_interfaces[i].report_descriptor_hash, kb->hid_interfaces[i].report_descriptor, ret);
+        }
+    }
+}
+
 /// brief .
 ///
 /// \brief _setupusb A horrible function for setting up an usb device
@@ -495,6 +509,9 @@ static void* _setupusb(void* context){
     ///
     usbdevice* kb = context;
     queued_mutex_lock(dmutex(kb));
+    if(!kb->parent) {
+        os_get_device_ifs_eps(kb);
+    }
     fill_usbdevice_protocol(kb);
     queued_mutex_lock(imutex(kb));
     // Set standard fields
@@ -534,9 +551,10 @@ static void* _setupusb(void* context){
     /// As a result, some parameters should be set in kb (name, serial, fwversion, epcount = number of usb endpoints),
     /// and all endpoints should be claimed with usbclaim().
     /// Claiming is the only point where os_setupusb() can produce an error (-1, otherwise 0).
-    if(!kb->parent)
+    if(!kb->parent) {
         if(os_setupusb(kb))
             goto fail;
+        read_hid_descriptors(kb);}
 
     ///
     /// - The following two statements deal with possible errors when setting the kb values in the current routine:

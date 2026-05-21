@@ -6,17 +6,7 @@
 
 void bragi_fill_input_eps(usbdevice* kb)
 {
-    // HACK: Harpoon WL has EPs starting from 0x82
-    // Ideally, we'd read them from the OS and make sure they are valid instead of guessing
-    int offset = 1;
-    if(IS_HARPOON_WL(kb))
-        offset = 2;
-    else if(IS_MM700(kb))
-        offset = 4;
-
-    for(int i = 0; i < kb->epcount; i++)
-        kb->input_endpoints[i] = (i + offset) | 0x80;
-
+    // FIXME: Use descriptors
     // Pick the correct input and output EPs.
     // Most use 0x84 and 4, but there are a few exceptions...
     kb->bragi_out_ep = 0x4;

@@ -4,9 +4,7 @@
 
 void nxp_fill_input_eps(usbdevice* kb)
 {
-    int epcount = (kb->product == P_ST100 ? kb->epcount : (kb->epcount - 1));
-    for(int i = 0; i < epcount; i++)
-        kb->input_endpoints[i] = (i + 1) | 0x80;
+    // FIXME: Repurpose for picking what interface does what
 }
 
 int nxp_usb_write(usbdevice* kb, void* out, int len, int is_recv, const char* file, int line)
@@ -25,15 +23,17 @@ int nxp_usb_write(usbdevice* kb, void* out, int len, int is_recv, const char* fi
 
         // All firmware versions for normal HID devices have the OUT endpoint at the end
         // Devices with no input, such as the Polaris, have it at the start.
-        unsigned int ep = (IS_SINGLE_EP(kb) ? 1 : kb->epcount);
+        // FIXME: Get rid of ep
+        unsigned int ep = (IS_SINGLE_EP(kb) ? 1 : kb->bNumInterfaces);
         int res = os_usb_interrupt_out(kb, ep, len, out, file, line);
         // Unlock on failure
         if(is_recv && res < 1)
             pthread_mutex_unlock(intmutex(kb));
         return res;
     } else {
-        // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->epcount - 1 works
-        ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->epcount - 1, len, 5000, out };
+        // Note, Ctrl Transfers require an index, not an endpoint, which is why kb->bNumInterfaces - 1 works
+        // FIXME: figure out the correct index, whether it's hardcoded or the number of the output interface
+        ctrltransfer transfer = { 0x21, 0x09, 0x0200, kb->bNumInterfaces - 1, len, 5000, out };
         return os_usb_control(kb, &transfer, file, line);
     }
 }
@@ -64,7 +64,7 @@ int nxp_usb_read(usbdevice* kb, void* in, int len, int dummy, const char* file, 
             ckb_fatal("Error unlocking interrupt mutex in os_usbrecv()");
         return len;
     } else {
-        ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->epcount - 1, len, 5000, in };
+        ctrltransfer transfer = { 0xa1, 0x01, 0x0300, kb->bNumInterfaces - 1, len, 5000, in };
         return os_usb_control(kb, &transfer, file, line);
     }
 }

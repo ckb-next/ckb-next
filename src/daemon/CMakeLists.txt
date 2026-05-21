@@ -36,6 +36,7 @@ if (MACOS OR LINUX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
     find_package(Iconv REQUIRED)
+    find_package(Sodium REQUIRED)
 endif ()
 if (MACOS)
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -149,7 +150,8 @@ if (MACOS OR LINUX)
             PRIVATE
               "${CMAKE_CURRENT_SOURCE_DIR}"
               "${CMAKE_CURRENT_BINARY_DIR}"
-              "${ICONV_INCLUDE_DIR}")
+              "${ICONV_INCLUDE_DIR}"
+              "${sodium_INCLUDE_DIR}")
 endif ()
 if (MACOS)
     # Compiler knows better
@@ -166,7 +168,8 @@ if (MACOS OR LINUX)
         ckb-next-daemon
             PRIVATE
               Threads::Threads
-              "${ICONV_LIBRARIES}")
+              "${ICONV_LIBRARIES}"
+              "${sodium_LIBRARY_RELEASE}")
 endif ()
 if (MACOS)
     target_link_libraries(

@@ -469,7 +469,7 @@ int mkfwnode(usbdevice* kb){
         check_chmod(ppath, S_GID_READ);
         check_chown(ppath, 0, gid);
     } else {
-        ckb_warn("Unable to create %s: %s", fwpath, strerror(errno));
+        ckb_warn("Unable to create %s: %s", ppath, strerror(errno));
         remove(ppath);
         return -2;
     }

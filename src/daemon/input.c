@@ -185,6 +185,15 @@ static void* play_macro(void* param) {
             break;
         }
 
+        // Toggle mode: keep looping until toggle_active is cleared by a second key press
+        if (macro->toggle) {
+            if (!macro->toggle_active) {
+                break;
+            }
+            queued_mutex_unlock(imutex(kb));
+            continue;
+        }
+
         if (macro->triggered > 1) {
             macro->triggered -= 2;
             delay_ns = 0;
@@ -267,6 +276,61 @@ static inline void inputupdate_keys(usbdevice* kb, int* sync_kb, int* sync_mouse
     if (kb->active) {
         for (int i = 0; i < bind->macrocount; i++) {
             keymacro* macro = &bind->macros[i];
+
+            // Toggle mode: first press starts looping, second press stops
+            if (macro->toggle) {
+                if (macromask(input->keys, macro->combo)) {
+                    if (!(macro->triggered & 1)) {
+                        // Key just pressed (transition from up to down)
+                        macro->triggered = 1;
+                        // Because there are no keyup events for wheels, pretend we received them
+                        if (is_wheel_keybit(kb, macro->combo))
+                            macro->triggered = 0;
+                        if (!macro->toggle_active) {
+                            // Toggle ON: start the macro
+                            macro->toggle_active = 1;
+                            if (!macro->param) {
+                                macro_param* params = malloc(sizeof(macro_param));
+                                if (params == NULL) {
+                                    perror("inputupdate_keys got no more mem:");
+                                } else {
+                                    params->kb = kb;
+                                    params->macro = macro;
+                                    params->actions = macro->actions;
+                                    params->actioncount = macro->actioncount;
+                                    params->abort = 0;
+                                    macro->param = params;
+                                    pthread_t thread;
+                                    int retval = pthread_create(&thread, 0, play_macro, params);
+                                    if (retval) {
+                                        free(params);
+                                        macro->triggered = 0;
+                                        macro->toggle_active = 0;
+                                        macro->param = NULL;
+                                        perror("inputupdate_keys: Creating thread returned not null");
+                                    } else {
+                                        pthread_detach(thread);
+#ifndef OS_MAC
+                                        pthread_setname_np(thread, "ckb macro");
+#endif // OS_MAC
+                                    }
+                                }
+                            }
+                        } else {
+                            // Toggle OFF: stop the macro
+                            macro->toggle_active = 0;
+                            pthread_cond_broadcast(mintvar(kb));
+                        }
+                    }
+                    // else: key was already pressed, no repeat in toggle mode
+                } else {
+                    // Key released: just clear the key-down state
+                    if (macro->triggered & 1)
+                        macro->triggered = 0;
+                }
+                continue;
+            }
+
             // see the definition of keymacro.triggered in structures.h
             if (macromask(input->keys, macro->combo)) {
                 if(!(macro->triggered & 1)){
@@ -676,6 +740,14 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     while(position < right && sscanf(assignment + position, "%"N_SCANF_KEYNAME"[^,]%n", keyname, &field) == 1){
         if(!strcmp(keyname, "clear"))
             break;
+
+        // Check for toggle mode keyword
+        if(!strcmp(keyname, "toggle")){
+            macro.toggle = 1;
+            if(assignment[position += field] == ',')
+                position++;
+            continue;
+        }
 
         // Check for local key delay of the form '[+-]<key>=<delay>'
         int64_t long_delay;    // scanned delay value, used to keep delay in range.

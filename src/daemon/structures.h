@@ -56,6 +56,10 @@ typedef struct {
      * thread shuts itself down immediately.
      */
     char triggered;
+    /* 1 = toggle mode: first key press starts the macro looping, second press stops it */
+    char toggle;
+    /* (toggle mode only) 1 = macro is currently active and should keep looping */
+    char toggle_active;
     struct _macro_param* param;
 } keymacro;
 

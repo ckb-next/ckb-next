@@ -16,6 +16,7 @@ static inline void setLocalUiElementsEnabled(Ui::RebindWidget* const ui, const b
     ui->btnAddEvent->setEnabled(e);
     ui->btnRemoveEvent->setEnabled(e);
     ui->btnClearMacro->setEnabled(e);
+    ui->macroToggleBox->setEnabled(e);
 }
 
 static inline void setUiElementsEnabled(Ui::RebindWidget* const ui, const bool e){
@@ -389,6 +390,9 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                         ui->rb_delay_asTyped->setChecked(true);
                     else
                         ui->rb_delay_default->setChecked(true);
+
+                    // Check if the daemon string has the toggle mode prefix
+                    ui->macroToggleBox->setChecked(macroData[0].startsWith(QStringLiteral("toggle,")));
                 }
             }
         } else
@@ -490,6 +494,9 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
         // Any colons in user_specified_macro_name are escaped
         QString escapedMacroName = ui->macroName->text().replace(":", "&das_IST_31N_col0n;");
         QString finalDaemonString = macroLines.toString(false);
+        // Prepend toggle mode keyword to daemon string if toggle mode is enabled
+        if (ui->macroToggleBox->isChecked())
+            finalDaemonString = "toggle," + finalDaemonString;
         QString originalString = macroLines.toString(true);
         QString macro = QString("%1::%2:%3").arg(finalDaemonString, escapedMacroName, originalString);
         bind->setAction(keys, KeyAction::macroAction(macro));
@@ -542,6 +549,7 @@ void RebindWidget::setBox(QWidget* box){
     // Clear macro panel
     if (box != ui->macroPreview) {
         on_btnClearMacro_clicked();
+        ui->macroToggleBox->setChecked(false);
     }
 }
 

@@ -1379,6 +1379,16 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QCheckBox" name="macroToggleBox">
+             <property name="toolTip">
+              <string>When enabled, pressing the key once starts the macro looping and pressing it again stops it</string>
+             </property>
+             <property name="text">
+              <string>Toggle mode (press to start/stop)</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>

@@ -408,10 +408,12 @@ int main(int argc, char *argv[]){
                     continue;
                 }
                 ckb_key* key = ctx.keys + i;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-truncation"
-                snprintf(key->name, CKB_KEYNAME_MAX, "%s", param);
-#pragma GCC diagnostic pop
+                int ret;
+                if ((ret = snprintf(key->name, CKB_KEYNAME_MAX, "%s", param)) >= CKB_KEYNAME_MAX || ret < 0) {
+                    // Truncation occurred. Ignore this key.
+                    DBG("Ignoring key '%s' because of truncation", param);
+                    continue;
+                }
                 key->x = x;
                 key->y = y;
                 if(x > max_x)

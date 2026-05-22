@@ -408,7 +408,10 @@ int main(int argc, char *argv[]){
                     continue;
                 }
                 ckb_key* key = ctx.keys + i;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
                 snprintf(key->name, CKB_KEYNAME_MAX, "%s", param);
+#pragma GCC diagnostic pop
                 key->x = x;
                 key->y = y;
                 if(x > max_x)

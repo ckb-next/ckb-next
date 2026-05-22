@@ -163,7 +163,7 @@ char* printrgb(const lighting* light, const usbdevice* kb){
         if(kb->keymap[i].led < 0 || !has_key(name, kb))
             names[i][0] = 0;
         else
-            strncpy(names[i], name, N_KEYNAME_LENGTH);
+            snprintf(names[i], N_KEYNAME_LENGTH, "%s", name);
     }
     // Check to make sure these aren't all the same color
     int same = 1;

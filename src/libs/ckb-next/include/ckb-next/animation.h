@@ -129,7 +129,7 @@
 // Key definition
 #define CKB_KEYNAME_MAX 40
 typedef struct {
-    char name[CKB_KEYNAME_MAX+1];
+    char name[CKB_KEYNAME_MAX];
     int x, y;
     unsigned char a, r, g, b;
 } ckb_key;
@@ -408,8 +408,7 @@ int main(int argc, char *argv[]){
                     continue;
                 }
                 ckb_key* key = ctx.keys + i;
-                strncpy(key->name, param, CKB_KEYNAME_MAX);
-                key->name[CKB_KEYNAME_MAX] = '\0';
+                snprintf(key->name, CKB_KEYNAME_MAX, "%s", param);
                 key->x = x;
                 key->y = y;
                 if(x > max_x)

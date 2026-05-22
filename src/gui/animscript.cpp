@@ -447,9 +447,9 @@ void AnimScript::readProcess(){
         }
         if(line.startsWith("argb ")){
             // Add a color to the buffer
-            char keyName[31];
+            char keyName[N_KEYNAME_LENGTH];
             QRgb keyColor = 0;
-            if(sscanf(line, "argb %30s %x", keyName, &keyColor) != 2)
+            if(sscanf(line, "argb %" N_SCANF_KEYNAME "s %x", keyName, &keyColor) != 2)
                 continue;
             QRgb* inMap = _colorBuffer.colorForName(keyName);
             if(!inMap)

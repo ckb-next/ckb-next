@@ -127,7 +127,7 @@
 #define CKB_REAL_ANGLE(angle)           fmod((-(angle) + 90.) * M_PI / 180. + M_PI * 2., M_PI * 2.)
 
 // Key definition
-#define CKB_KEYNAME_MAX 12
+#define CKB_KEYNAME_MAX 40
 typedef struct {
     char name[CKB_KEYNAME_MAX+1];
     int x, y;

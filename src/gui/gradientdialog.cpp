@@ -31,9 +31,18 @@ GradientDialog::GradientDialog(QWidget *parent) :
     rainbow.gradient.append(QGradientStop(0.67, QColor(0, 0, 255)));
     rainbow.gradient.append(QGradientStop(0.83, QColor(255, 0, 255)));
     rainbow.gradient.append(QGradientStop(1.00, QColor(255, 0, 0)));
+    Preset pastelRainbow("Pastel Rainbow", true);
+    pastelRainbow.gradient.append(QGradientStop(0.00, QColor(240, 158, 167)));
+    pastelRainbow.gradient.append(QGradientStop(0.17, QColor(246, 202, 148)));
+    pastelRainbow.gradient.append(QGradientStop(0.33, QColor(193, 235, 192)));
+    pastelRainbow.gradient.append(QGradientStop(0.50, QColor(160, 255, 252)));
+    pastelRainbow.gradient.append(QGradientStop(0.67, QColor(199, 202, 255)));
+    pastelRainbow.gradient.append(QGradientStop(0.83, QColor(246, 194, 243)));
+    pastelRainbow.gradient.append(QGradientStop(1.00, QColor(240, 158, 167)));
     addPreset(blackAndWhite);
     addPreset(fade);
     addPreset(rainbow);
+    addPreset(pastelRainbow);
 
     // Load stored presets
     CkbSettings settings(prefsPath);

@@ -9,7 +9,6 @@
 #include <QToolTip>
 #include <limits>
 #include <QLabel>
-#include "ckbmainbackgroundcolour.h"
 #include <ckbnextconfig.h>
 
 static const int KEY_SIZE = 12;
@@ -57,6 +56,7 @@ KeyWidget::KeyWidget(QWidget* parent) :
     QOpenGLWidget(parent), mouseDownMode(NONE), _rgbMode(true), _monochrome(false), _aspectRatio(0.5), drawInfoScale(0.f), _debug(false)
 {
     setMouseTracking(true);
+    setAttribute(Qt::WA_AlwaysStackOnTop);
 #ifdef FPS_COUNTER
     glFpsTimer.start();
     kbLoopElapsed = 0.0;
@@ -331,8 +331,7 @@ void KeyWidget::paintGL(){
     painter.setPen(Qt::NoPen);
 
     // Clear everything
-    painter.setBrush(QBrush(CkbMainBackgroundColour::getColour()));
-    painter.drawRect(rect());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Draw background
     if(!_currentOverlayScaled.isNull()){
@@ -753,6 +752,12 @@ void KeyWidget::paintGL(){
     if(kbLoopElapsed > 0.0)
         painter.drawText(5, 36, QString::number(1.0/(kbLoopElapsed/1000.0), 'f', 2));
 #endif
+}
+
+void KeyWidget::initializeGL()
+{
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+    QOpenGLWidget::initializeGL();
 }
 
 void KeyWidget::paintEvent(QPaintEvent* e){

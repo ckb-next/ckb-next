@@ -176,7 +176,7 @@ static void* play_macro(void* param) {
 
         queued_mutex_unlock(mmutex(kb));
 
-        int delay_ns = first_keydownloop
+        uint32_t delay_ns = first_keydownloop
             ? macro->repetition_debounce_ms * NANOSECONDS_PER_MILLISECONDS
             : macro->repetition_delay_ms * NANOSECONDS_PER_MILLISECONDS;
 
@@ -682,10 +682,11 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     macro.repetition_delay_ms = REPETITION_DEFAULT_VALUE;
     macro.repetition_debounce_ms = REPETITION_DEFAULT_VALUE;
     if (delay_tok != NULL) {
-        unsigned long debounce_ms = 0;
-        unsigned long delay_ms = 0;
+        static_assert(REPETITION_MAX_VALUE <= UINT32_MAX, "Repetition max value larger than what uint32_t can hold");
+        uint32_t debounce_ms = 0;
+        uint32_t delay_ms = 0;
 
-        if (sscanf(delay_tok, ":%lu;%lu", &debounce_ms, &delay_ms) == 2) {
+        if (sscanf(delay_tok, ":%"SCNu32";%"SCNu32, &debounce_ms, &delay_ms) == 2) {
             if (debounce_ms > 0 && debounce_ms <= REPETITION_MAX_VALUE)
                 macro.repetition_debounce_ms = (uint32_t) debounce_ms;
             if (delay_ms > 0 && delay_ms <= REPETITION_MAX_VALUE)

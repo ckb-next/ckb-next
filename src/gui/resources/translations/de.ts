@@ -416,22 +416,22 @@
 <context>
     <name>ExtraSettingsWidget</name>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="313"/>
+        <location filename="../../extrasettingswidget.ui" line="309"/>
         <source>By default, the same brightness level will be applied to all profiles and all devices. Enable this to store it with the lighting mode instead.</source>
         <translation>Standardmäßig wird für alle Profile und alle Geräte derselbe Helligkeitswert verwendet. Aktivieren Sie diese Option, um ihn stattdessen mit dem Beleuchtungsmodus zu speichern.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="316"/>
+        <location filename="../../extrasettingswidget.ui" line="312"/>
         <source>Set brightness per-mode</source>
         <translation>Helligkeit pro Modus einstellen</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="219"/>
+        <location filename="../../extrasettingswidget.ui" line="217"/>
         <source>Behavior</source>
         <translation>Verhalten</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="238"/>
+        <location filename="../../extrasettingswidget.ui" line="235"/>
         <source>OS X tweaks</source>
         <translation>OS X-Optimierungen</translation>
     </message>
@@ -441,37 +441,42 @@
         <translation>Das Tray-Icon wird nicht angezeigt. Das Programm wird weiterhin im Hintergrund laufen; starten Sie die App neu, um die GUI wieder zu öffnen.</translation>
     </message>
     <message>
+        <location filename="../../extrasettingswidget.ui" line="20"/>
+        <source>Application Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../extrasettingswidget.ui" line="181"/>
         <source>Hide tray icon</source>
         <translation>Tray-Icon verstecken</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="392"/>
+        <location filename="../../extrasettingswidget.ui" line="388"/>
         <source>Frame rate (FPS):</source>
         <translation>Wiederholungsrate (FPS):</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="441"/>
+        <location filename="../../extrasettingswidget.ui" line="437"/>
         <source>0 animations found</source>
         <translation>0 Animationen gefunden</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="453"/>
+        <location filename="../../extrasettingswidget.ui" line="449"/>
         <source>Re-scan</source>
         <translation>Nochmal suchen</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="460"/>
+        <location filename="../../extrasettingswidget.ui" line="456"/>
         <source>Details</source>
         <translation>Details</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="566"/>
+        <location filename="../../extrasettingswidget.ui" line="562"/>
         <source>Disable Anti Aliasing (Requires restart)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="264"/>
+        <location filename="../../extrasettingswidget.ui" line="260"/>
         <source>Location:</source>
         <translation>Speicherort:</translation>
     </message>
@@ -486,12 +491,12 @@
         <translation>Mausbeschleunigung deaktivieren</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="200"/>
+        <location filename="../../extrasettingswidget.ui" line="199"/>
         <source>Hardware</source>
         <translation>Hardware</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="306"/>
+        <location filename="../../extrasettingswidget.ui" line="302"/>
         <source>Warning: high frame rates may cause stability issues</source>
         <translation>Warnung: Hohe Wiederholungsraten können Stabilitätsprobleme verursachen</translation>
     </message>
@@ -507,27 +512,27 @@
         <translation>Zeile(n) auf einmal scrollen</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="365"/>
+        <location filename="../../extrasettingswidget.ui" line="361"/>
         <source>Disable animated preview when ckb-next is not in focus</source>
         <translation>Animierte Vorschau deaktivieren, wenn ckb-next nicht im Fokus ist</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="382"/>
+        <location filename="../../extrasettingswidget.ui" line="378"/>
         <source>May improve appearance on some keyboards.</source>
         <translation>Kann bei einigen Tastaturen das Erscheinungsbild verbessern.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="385"/>
+        <location filename="../../extrasettingswidget.ui" line="381"/>
         <source>Use spatial dithering to simulate extra color resolution</source>
         <translation>Räumliches Dithering verwenden, um zusätzliche Farbauflösung zu simulieren</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="339"/>
+        <location filename="../../extrasettingswidget.ui" line="335"/>
         <source>Try this if you&apos;re having problems with the scroll wheel.</source>
         <translation>Versuchen Sie dies, wenn Sie Probleme mit dem Scrollrad haben.</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="342"/>
+        <location filename="../../extrasettingswidget.ui" line="338"/>
         <source>Disable scroll acceleration</source>
         <translation>Scroll-Beschleunigung deaktivieren</translation>
     </message>
@@ -537,17 +542,17 @@
         <translation>Einfarbiges Icon</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="257"/>
+        <location filename="../../extrasettingswidget.ui" line="253"/>
         <source>Animation scripts</source>
         <translation>Animationsskripte</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="506"/>
+        <location filename="../../extrasettingswidget.ui" line="502"/>
         <source>Turn lights off when idle for</source>
         <translation>Beleuchtung im Leerlauf ausschalten nach</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="538"/>
+        <location filename="../../extrasettingswidget.ui" line="534"/>
         <source>m</source>
         <comment>minutes</comment>
         <translatorcomment>Units are usually written with a space</translatorcomment>
@@ -559,7 +564,7 @@
         <translation>Programmstart verzögern</translation>
     </message>
     <message>
-        <location filename="../../extrasettingswidget.ui" line="358"/>
+        <location filename="../../extrasettingswidget.ui" line="354"/>
         <source>Enabling per-mode brightness will disable scrolling on the tray icon to change the brightness level</source>
         <translation>Wenn Sie Helligkeit für jeden Modus einzeln einstellen, wird das Scrollen auf dem Tray-Symbol zum Ändern der Helligkeitsstufe deaktiviert</translation>
     </message>
@@ -685,84 +690,84 @@
 <context>
     <name>GradientDialog</name>
     <message>
-        <location filename="../../gradientdialog.ui" line="29"/>
+        <location filename="../../gradientdialog.ui" line="35"/>
         <source>Pick Gradient</source>
         <translation>Farbverlauf auswählen</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.ui" line="113"/>
+        <location filename="../../gradientdialog.ui" line="198"/>
         <source>Pick Color...</source>
         <translation>Farbe auswählen...</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.ui" line="145"/>
+        <location filename="../../gradientdialog.ui" line="230"/>
         <source>Position:</source>
         <translation>Position:</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.ui" line="179"/>
+        <location filename="../../gradientdialog.ui" line="264"/>
         <source>Color:</source>
         <translation>Farbe:</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.ui" line="211"/>
+        <location filename="../../gradientdialog.ui" line="47"/>
         <source>Presets</source>
         <translation>Vorlagen</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.ui" line="254"/>
+        <location filename="../../gradientdialog.ui" line="101"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.ui" line="261"/>
+        <location filename="../../gradientdialog.ui" line="108"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.ui" line="271"/>
+        <location filename="../../gradientdialog.ui" line="118"/>
         <source>Delete</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.cpp" line="131"/>
+        <location filename="../../gradientdialog.cpp" line="140"/>
         <source>1 point</source>
         <translation>1 Punkt</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.cpp" line="133"/>
+        <location filename="../../gradientdialog.cpp" line="142"/>
         <source>%1 points</source>
         <translation>%1 Punkte</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.cpp" line="160"/>
-        <location filename="../../gradientdialog.cpp" line="188"/>
+        <location filename="../../gradientdialog.cpp" line="169"/>
+        <location filename="../../gradientdialog.cpp" line="197"/>
         <source>Custom</source>
         <translation>Benutzerdefiniert</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.cpp" line="193"/>
+        <location filename="../../gradientdialog.cpp" line="202"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.cpp" line="193"/>
+        <location filename="../../gradientdialog.cpp" line="202"/>
         <source>Can&apos;t overwrite a built-in preset. Please choose a different name.</source>
         <translation>Eine integrierte Vorlage kann nicht überschrieben werden. Bitte wählen Sie einen anderen Namen.</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.cpp" line="198"/>
-        <location filename="../../gradientdialog.cpp" line="215"/>
+        <location filename="../../gradientdialog.cpp" line="207"/>
+        <location filename="../../gradientdialog.cpp" line="224"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.cpp" line="198"/>
+        <location filename="../../gradientdialog.cpp" line="207"/>
         <source>Preset &quot;%1&quot; already exists. Replace?</source>
         <translation>Vorlage &quot;%1&quot; existiert bereits. Ersetzen?</translation>
     </message>
     <message>
-        <location filename="../../gradientdialog.cpp" line="215"/>
+        <location filename="../../gradientdialog.cpp" line="224"/>
         <source>Delete preset &quot;%1&quot;?</source>
         <translation>Vorlage &quot;%1&quot; entfernen?</translation>
     </message>
@@ -1577,7 +1582,7 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
     </message>
     <message>
         <location filename="../../kbwidget.ui" line="552"/>
-        <location filename="../../kbwidget.cpp" line="412"/>
+        <location filename="../../kbwidget.cpp" line="410"/>
         <source>Check for updates</source>
         <translation>Nach Updates suchen</translation>
     </message>
@@ -1592,79 +1597,79 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
         <translation>Auf Hardware speichern</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="120"/>
+        <location filename="../../kbwidget.cpp" line="118"/>
         <source>Saving to hardware is not supported on this device.</source>
         <translation>Auf diesem Gerät wird das Speichern auf Hardware nicht unterstützt.</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="182"/>
+        <location filename="../../kbwidget.cpp" line="180"/>
         <source>This device does not support setting the poll rate through software.</source>
         <translation>Bei diesem Gerät kann die Abrufrate nicht per Software eingestellt werden.</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="206"/>
+        <location filename="../../kbwidget.cpp" line="204"/>
         <source>Manage profiles...</source>
         <translation>Profile verwalten...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="282"/>
+        <location filename="../../kbwidget.cpp" line="280"/>
         <source>Rename...</source>
         <translation>Umbenennen...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="283"/>
+        <location filename="../../kbwidget.cpp" line="281"/>
         <source>Duplicate</source>
         <translation>Duplizieren</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="284"/>
+        <location filename="../../kbwidget.cpp" line="282"/>
         <source>Delete</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="289"/>
+        <location filename="../../kbwidget.cpp" line="287"/>
         <source>Move Up</source>
         <translation>Nach oben bewegen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="291"/>
+        <location filename="../../kbwidget.cpp" line="289"/>
         <source>Manage Events</source>
         <translation>Events verwalten</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="295"/>
+        <location filename="../../kbwidget.cpp" line="293"/>
         <source>Move Down</source>
         <translation>Nach unten bewegen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="324"/>
+        <location filename="../../kbwidget.cpp" line="322"/>
         <source>Delete mode</source>
         <translation>Modus entfernen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="324"/>
+        <location filename="../../kbwidget.cpp" line="322"/>
         <source>Are you sure you want to delete this mode?</source>
         <translation>Sind Sie sicher, dass Sie diesen Modus löschen möchten?</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="417"/>
+        <location filename="../../kbwidget.cpp" line="415"/>
         <source>Up to date</source>
         <translation>Aktuell</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="419"/>
+        <location filename="../../kbwidget.cpp" line="417"/>
         <source>Upgrade to v%1</source>
         <translation>Auf v%1 aktualisieren</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="436"/>
+        <location filename="../../kbwidget.cpp" line="434"/>
         <source>Checking...</source>
         <translation>Wird überprüft...</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="444"/>
-        <location filename="../../kbwidget.cpp" line="448"/>
-        <location filename="../../kbwidget.cpp" line="451"/>
+        <location filename="../../kbwidget.cpp" line="442"/>
+        <location filename="../../kbwidget.cpp" line="446"/>
+        <location filename="../../kbwidget.cpp" line="449"/>
         <source>Firmware update</source>
         <translation>Firmware-Update</translation>
     </message>
@@ -1673,37 +1678,37 @@ Es wird versucht, so viele wie möglich zu importieren.</translation>
         <translation type="vanished">&lt;center&gt;Es ist eine neue Firmware für dieses Gerät verfügbar.&lt;br /&gt;Allerdings wird dafür eine neuere Version von ckb-next benötigt.&lt;br /&gt;Bitte aktualisieren Sie ckb-next und versuchen Sie es erneut.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="444"/>
+        <location filename="../../kbwidget.cpp" line="442"/>
         <source>&lt;center&gt;There was a problem getting the status for this device.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation>center&gt;Es gab ein Problem beim Abrufen des Status für dieses Gerät.&lt;br /&gt;Möchten Sie manuell eine Datei auswählen?&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="448"/>
+        <location filename="../../kbwidget.cpp" line="446"/>
         <source>&lt;center&gt;There is a new firmware available for this device (v%1).&lt;br /&gt;However, it requires a newer version of ckb-next.&lt;br /&gt;Please upgrade ckb-next and try again.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Es ist eine neue Firmware für dieses Gerät verfügbar (v%1).&lt;br /&gt;Allerdings wird dafür eine neuere Version von ckb-next benötigt.&lt;br /&gt;Bitte aktualisieren Sie ckb-next und versuchen Sie es erneut.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="451"/>
+        <location filename="../../kbwidget.cpp" line="449"/>
         <source>&lt;center&gt;Your firmware is already up to date.&lt;br /&gt;Would you like to select a file manually?&lt;/center&gt;</source>
         <translation>&lt;center&gt;Die Firmware ist bereits auf dem neuesten Stand.&lt;br /&gt;Möchten Sie manuell eine Datei auswählen?&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="463"/>
+        <location filename="../../kbwidget.cpp" line="461"/>
         <source>Select firmware file</source>
         <translation>Firmware-Datei auswählen</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="463"/>
+        <location filename="../../kbwidget.cpp" line="461"/>
         <source>Firmware blobs (*.bin)</source>
         <translation>Firmware-Blobs (*.bin)</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="468"/>
+        <location filename="../../kbwidget.cpp" line="466"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../../kbwidget.cpp" line="468"/>
+        <location filename="../../kbwidget.cpp" line="466"/>
         <source>&lt;center&gt;File could not be read.&lt;/center&gt;</source>
         <translation>&lt;center&gt;Datei konnte nicht gelesen werden.&lt;/center&gt;</translation>
     </message>
@@ -2406,22 +2411,22 @@ oder klicken Sie auf &quot;Beenden&quot; in den Einstellungen.</translation>
         <translation>n. a.</translation>
     </message>
     <message>
-        <location filename="../../keymap.cpp" line="2005"/>
+        <location filename="../../keymap.cpp" line="2008"/>
         <source>Eject</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keymap.cpp" line="2007"/>
+        <location filename="../../keymap.cpp" line="2010"/>
         <source>Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keymap.cpp" line="2009"/>
+        <location filename="../../keymap.cpp" line="2012"/>
         <source>Wheel Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../keymap.cpp" line="2011"/>
+        <location filename="../../keymap.cpp" line="2014"/>
         <source>Wheel Right</source>
         <translation type="unfinished"></translation>
     </message>

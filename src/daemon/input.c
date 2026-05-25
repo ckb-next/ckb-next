@@ -5,6 +5,7 @@
 #include "input.h"
 #include "notify.h"
 #include <assert.h>
+#include <string.h>
 
 #define IS_SCROLLWHEEL_V(scan)  ((scan) == BTN_WHEELUP   || (scan) == BTN_WHEELDOWN)
 #define IS_SCROLLWHEEL_H(scan)  ((scan) == BTN_WHEELLEFT || (scan) == BTN_WHEELRIGHT)
@@ -84,11 +85,11 @@ static pthread_t macro_pt_first() {
 }
 
 // Default macro keystroke delay
-const struct timespec macrodelay = { .tv_nsec = 1000000 };
-// Initial repeat delay
-#define DELAY_REPEAT_INITIAL 500000000
-// Delay for every subsequent repeat
-#define DELAY_REPEAT_CATCHUP 500000000
+#define NANOSECONDS_PER_MILLISECONDS 1000000
+const struct timespec macrodelay = { .tv_nsec = 1 * NANOSECONDS_PER_MILLISECONDS };
+// Default and max values for macro repetition delays/debounces
+#define REPETITION_DEFAULT_VALUE 500
+#define REPETITION_MAX_VALUE 2000
 
 static inline void clock_microsleep(uint32_t s) {
     const struct timespec ts = {
@@ -175,7 +176,9 @@ static void* play_macro(void* param) {
 
         queued_mutex_unlock(mmutex(kb));
 
-        int delay_ns = first_keydownloop ? DELAY_REPEAT_INITIAL : DELAY_REPEAT_CATCHUP;
+        uint32_t delay_ns = first_keydownloop
+            ? macro->repetition_debounce_ms * NANOSECONDS_PER_MILLISECONDS
+            : macro->repetition_delay_ms * NANOSECONDS_PER_MILLISECONDS;
 
         queued_mutex_lock(imutex(kb));
         // detect if the macro playback has been aborted
@@ -207,7 +210,7 @@ static void* play_macro(void* param) {
             break;
         }
 
-        // if the key released and pressed during the sleep, reset to use DELAY_REPEAT_INITIAL
+        // if the key released and pressed during the sleep, reset to use the default repetition value
         if (macro->triggered == 1)
             first_keydownloop = 0;
 
@@ -672,8 +675,27 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     // Scan the actions
     position = 0;
     field = 0;
+
+    // Check if repetition debounce and delay tokens are attached to the assignment.
+    // Validate value to be between 0 and 2000 inclusive. Default to 500ms.
+    const char *delay_tok = strchr(assignment, ':');
+    macro.repetition_delay_ms = REPETITION_DEFAULT_VALUE;
+    macro.repetition_debounce_ms = REPETITION_DEFAULT_VALUE;
+    if (delay_tok != NULL) {
+        static_assert(REPETITION_MAX_VALUE <= UINT32_MAX, "Repetition max value larger than what uint32_t can hold");
+        uint32_t debounce_ms = 0;
+        uint32_t delay_ms = 0;
+
+        if (sscanf(delay_tok, ":%"SCNu32";%"SCNu32, &debounce_ms, &delay_ms) == 2) {
+            if (debounce_ms > 0 && debounce_ms <= REPETITION_MAX_VALUE)
+                macro.repetition_debounce_ms = (uint32_t) debounce_ms;
+            if (delay_ms > 0 && delay_ms <= REPETITION_MAX_VALUE)
+                macro.repetition_delay_ms = (uint32_t) delay_ms;
+        }
+    }
+
     // max action = old 11 chars plus 12 chars which is the max 32-bit unsigned int 4294967295 size * 2 + 1 for range underscore
-    while(position < right && sscanf(assignment + position, "%"N_SCANF_KEYNAME"[^,]%n", keyname, &field) == 1){
+    while(position < right && sscanf(assignment + position, "%"N_SCANF_KEYNAME"[^,:]%n", keyname, &field) == 1){
         if(!strcmp(keyname, "clear"))
             break;
 

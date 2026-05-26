@@ -425,32 +425,32 @@
         <location filename="../../daemonwarndialog.ui" line="82"/>
         <location filename="../../daemonwarndialog.ui" line="98"/>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>In die Zwischenablage kopieren</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="127"/>
         <source>If &quot;Unit ckb-next-daemon.service is masked&quot;, unmask it first and try again:</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls Sie die Nachricht &quot;Dienst ckb-next-daemon.service ist maskiert&quot; erhalten, entsperren Sie ihn und versuchen Sie es erneut:</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="147"/>
         <source>Start it once with:</source>
-        <translation type="unfinished">Einmalig starten mit:</translation>
+        <translation>Einmalig starten mit:</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="154"/>
         <source>The ckb-next daemon is not running. This program will &lt;b&gt;not&lt;/b&gt; work without it!</source>
-        <translation type="unfinished">Der ckb-next-Daemon läuft nicht. Das Programm wird ohne &lt;b&gt;nicht&lt;/b&gt; nicht funktionieren!</translation>
+        <translation>Der ckb-next-Daemon läuft nicht. Das Programm wird ohne &lt;b&gt;nicht&lt;/b&gt; nicht funktionieren!</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="177"/>
         <source>Enable it for every boot:</source>
-        <translation type="unfinished">Für jeden Systemstart aktivieren:</translation>
+        <translation>Für jeden Systemstart aktivieren:</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.cpp" line="49"/>
         <source>Start and enable it with:</source>
-        <translation type="unfinished">Starten und aktivieren mit:</translation>
+        <translation>Starten und aktivieren mit:</translation>
     </message>
 </context>
 <context>

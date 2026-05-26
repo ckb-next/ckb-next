@@ -404,39 +404,39 @@
     <message>
         <location filename="../../daemonwarndialog.ui" line="23"/>
         <source>ckb-next-daemon not running</source>
-        <translation type="unfinished"></translation>
+        <translation>Το ckb-next-daemon δεν τρέχει</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="69"/>
         <location filename="../../daemonwarndialog.ui" line="82"/>
         <location filename="../../daemonwarndialog.ui" line="98"/>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Αντιγραφή στο πρόχειρο</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="127"/>
         <source>If &quot;Unit ckb-next-daemon.service is masked&quot;, unmask it first and try again:</source>
-        <translation type="unfinished"></translation>
+        <translation>Αν &quot;Unit ckb-next-daemon.service is masked.&quot;, τότε ξεμασκαρέψτε το και προσπαθήστε ξανά:</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="147"/>
         <source>Start it once with:</source>
-        <translation type="unfinished">Εκκινήστε το μια φορά με:</translation>
+        <translation>Εκκινήστε το μια φορά με:</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="154"/>
         <source>The ckb-next daemon is not running. This program will &lt;b&gt;not&lt;/b&gt; work without it!</source>
-        <translation type="unfinished">Το ckb-next-daemon δεν τρέχει. Αυτό το πρόγραμμα &lt;b&gt;δεν&lt;/b&gt; θα λειτουργήσει χωρίς αυτό!</translation>
+        <translation>Το ckb-next-daemon δεν τρέχει. Αυτό το πρόγραμμα &lt;b&gt;δεν&lt;/b&gt; θα λειτουργήσει χωρίς αυτό!</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.ui" line="177"/>
         <source>Enable it for every boot:</source>
-        <translation type="unfinished">Ενεργοποιήστε το για κάθε εκκίνηση:</translation>
+        <translation>Ενεργοποιήστε το για κάθε εκκίνηση:</translation>
     </message>
     <message>
         <location filename="../../daemonwarndialog.cpp" line="49"/>
         <source>Start and enable it with:</source>
-        <translation type="unfinished">Εκκινήστε και ενεργοποιήστε το με:</translation>
+        <translation>Εκκινήστε και ενεργοποιήστε το με:</translation>
     </message>
 </context>
 <context>

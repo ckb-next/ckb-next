@@ -400,6 +400,46 @@
     </message>
 </context>
 <context>
+    <name>DaemonWarnDialog</name>
+    <message>
+        <location filename="../../daemonwarndialog.ui" line="23"/>
+        <source>ckb-next-daemon not running</source>
+        <translation>Το ckb-next-daemon δεν τρέχει</translation>
+    </message>
+    <message>
+        <location filename="../../daemonwarndialog.ui" line="69"/>
+        <location filename="../../daemonwarndialog.ui" line="82"/>
+        <location filename="../../daemonwarndialog.ui" line="98"/>
+        <source>Copy to clipboard</source>
+        <translation>Αντιγραφή στο πρόχειρο</translation>
+    </message>
+    <message>
+        <location filename="../../daemonwarndialog.ui" line="127"/>
+        <source>If &quot;Unit ckb-next-daemon.service is masked&quot;, unmask it first and try again:</source>
+        <translation>Αν &quot;Unit ckb-next-daemon.service is masked.&quot;, τότε ξεμασκαρέψτε το και προσπαθήστε ξανά:</translation>
+    </message>
+    <message>
+        <location filename="../../daemonwarndialog.ui" line="147"/>
+        <source>Start it once with:</source>
+        <translation>Εκκινήστε το μια φορά με:</translation>
+    </message>
+    <message>
+        <location filename="../../daemonwarndialog.ui" line="154"/>
+        <source>The ckb-next daemon is not running. This program will &lt;b&gt;not&lt;/b&gt; work without it!</source>
+        <translation>Το ckb-next-daemon δεν τρέχει. Αυτό το πρόγραμμα &lt;b&gt;δεν&lt;/b&gt; θα λειτουργήσει χωρίς αυτό!</translation>
+    </message>
+    <message>
+        <location filename="../../daemonwarndialog.ui" line="177"/>
+        <source>Enable it for every boot:</source>
+        <translation>Ενεργοποιήστε το για κάθε εκκίνηση:</translation>
+    </message>
+    <message>
+        <location filename="../../daemonwarndialog.cpp" line="49"/>
+        <source>Start and enable it with:</source>
+        <translation>Εκκινήστε και ενεργοποιήστε το με:</translation>
+    </message>
+</context>
+<context>
     <name>ExtraSettingsWidget</name>
     <message>
         <location filename="../../extrasettingswidget.ui" line="20"/>
@@ -2224,12 +2264,12 @@ An attempt will be made to import as many as possible.</source>
         <translation>Σχετικά</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="136"/>
+        <location filename="../../mainwindow.cpp" line="137"/>
         <source>Restore</source>
         <translation>Επαναφορά</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="137"/>
+        <location filename="../../mainwindow.cpp" line="138"/>
         <source>Quit</source>
         <translation>Έξοδος</translation>
     </message>
@@ -2238,98 +2278,93 @@ An attempt will be made to import as many as possible.</source>
         <translation type="vanished">Μονόχρωμο Εικονίδιο</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="163"/>
+        <location filename="../../mainwindow.cpp" line="164"/>
         <source>Settings</source>
         <translation>Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="171"/>
         <source>The ckb-next daemon is not running. This program will &lt;b&gt;not&lt;/b&gt; work without it!</source>
-        <translation>Το ckb-next-daemon δεν τρέχει. Αυτό το πρόγραμμα &lt;b&gt;δεν&lt;/b&gt; θα λειτουργήσει χωρίς αυτό!</translation>
+        <translation type="vanished">Το ckb-next-daemon δεν τρέχει. Αυτό το πρόγραμμα &lt;b&gt;δεν&lt;/b&gt; θα λειτουργήσει χωρίς αυτό!</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="173"/>
         <source>Start it once with:</source>
-        <translation>Εκκινήστε το μια φορά με:</translation>
+        <translation type="vanished">Εκκινήστε το μια φορά με:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="175"/>
         <source>Enable it for every boot:</source>
-        <translation>Ενεργοποιήστε το για κάθε εκκίνηση:</translation>
+        <translation type="vanished">Ενεργοποιήστε το για κάθε εκκίνηση:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="177"/>
         <source>If &quot;Unit ckb-next-daemon.service is masked.&quot;, unmask it first and try again:</source>
-        <translation>Αν &quot;Unit ckb-next-daemon.service is masked.&quot;, τότε ξεμασκαρέψτε το και προσπαθήστε ξανά:</translation>
+        <translation type="vanished">Αν &quot;Unit ckb-next-daemon.service is masked.&quot;, τότε ξεμασκαρέψτε το και προσπαθήστε ξανά:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="180"/>
         <source>Start and enable it with:</source>
-        <translation>Εκκινήστε και ενεργοποιήστε το με:</translation>
+        <translation type="vanished">Εκκινήστε και ενεργοποιήστε το με:</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="206"/>
+        <location filename="../../mainwindow.cpp" line="189"/>
         <source>The ckb-next daemon is not running.</source>
         <translation>Το ckb-next-daemon δεν τρέχει.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="293"/>
+        <location filename="../../mainwindow.cpp" line="276"/>
         <source>Driver inactive</source>
         <translation>Ο driver είναι αδρανής</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="283"/>
         <source>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Driver version mismatch (</source>
         <translation>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Ασυμφωνία έκδοσης του driver (</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="283"/>
         <source>). Please upgrade ckb-next</source>
         <translation>). Παρακαλώ ενημερώστε το ckb-next</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="300"/>
+        <location filename="../../mainwindow.cpp" line="283"/>
         <source>. If the problem persists, try rebooting.</source>
         <translation>.&lt;br /&gt;Αν το πρόβλημα παραμένει, επανεκκινήστε το σύστημά σας.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="311"/>
+        <location filename="../../mainwindow.cpp" line="294"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; System Extension by &quot;Fumihiko Takayama&quot; is not allowed in Security &amp; Privacy. Please allow it and then unplug and replug your devices.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Ποσοχή:&lt;/b&gt; Η επέκταση από &quot;Fumihiko Takayama&quot; δεν επιτρέπεται στο Ασφάλεια και απόρρητο. Επιτρέψτε το και επανασυνδέστε τις συσκευές.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="313"/>
+        <location filename="../../mainwindow.cpp" line="296"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; Make sure ckb-next-daemon is allowed in Security &amp; Privacy -&gt; Input monitoring.&lt;br /&gt;Please allow for up to 10 seconds for the daemon restart prompt to show up after allowing input monitoring.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Σιγουρευτείτε ότι το ckb-next-daemon επιτρέπεται στο Ασφάλεια και απόρρητο -&gt; Παρακολούθησή εισόδου.&lt;/br /&gt;Παρακαλώ επιτρέψτε μέχρι 10 δευτερόλεπτα μέχρι να εμφανιστεί η ειδοποίηση ενεργοποιήσης του daemon.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="323"/>
+        <location filename="../../mainwindow.cpp" line="306"/>
         <source>&lt;br /&gt;&lt;b&gt;Warning:&lt;/b&gt; The uinput module could not be loaded. If this issue persists after rebooting, compile a kernel with CONFIG_INPUT_UINPUT=y.</source>
         <translation>&lt;br /&gt;&lt;b&gt;Προσοχή:&lt;/b&gt; Δεν ήταν δυνατό να φορτωθεί το άρθρωμα πυρήνα uinput. Αν αυτο το πρόβλημα παραμένει μετά από επανεκκίνηση, μεταγλωττίστε πυρήνα με CONFIG_INPUT_UINPUT=y.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="326"/>
+        <location filename="../../mainwindow.cpp" line="309"/>
         <source>No devices connected</source>
         <translation>Δεν υπάρχουν συνδεδεμένες συσκευές</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="329"/>
+        <location filename="../../mainwindow.cpp" line="312"/>
         <source>1 device connected</source>
         <translation>1 συσκευή συνδεδεμένη</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="331"/>
+        <location filename="../../mainwindow.cpp" line="314"/>
         <source>%1 devices connected</source>
         <translation>%1 συσκευές συνδεδεμένες</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="362"/>
+        <location filename="../../mainwindow.cpp" line="345"/>
         <source>A new firmware is available for your %1 (v%2)
 Would you like to install it now?</source>
         <translation>Υπάρχει νέο firmware για το %1 σας (v%2) Θα θέλατε να το εγκαταστήσετε τώρα;</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="378"/>
+        <location filename="../../mainwindow.cpp" line="361"/>
         <source>ckb-next will still run in the background.
 To close it, choose Quit from the tray menu
 or click &quot;Quit&quot; on the Settings screen.</source>
@@ -2338,12 +2373,12 @@ or click &quot;Quit&quot; on the Settings screen.</source>
 ή κάντε κλικ στο &quot;Έξοδος&quot; στο παράθυρο ρυθμίσεων.</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="539"/>
+        <location filename="../../mainwindow.cpp" line="522"/>
         <source>Update to v</source>
         <translation>Ενημέρωση στο v</translation>
     </message>
     <message>
-        <location filename="../../mainwindow.cpp" line="544"/>
+        <location filename="../../mainwindow.cpp" line="527"/>
         <source>Up to date</source>
         <translation>Ενημερωμένο</translation>
     </message>

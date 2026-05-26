@@ -113,6 +113,22 @@ static const KeyPatch patchSE[] = {
     {"oe", "Ö", "colon"}, {"ae", "Ä", "quote"}, {"quote", "'", "hash"},
     {"angle", "<", "bslash_iso"}, {"minus", "-", "slash"},
 };
+static const KeyPatch patchTR[] = {
+    {"quote", "\"", "grave"},
+    {"asterisk", "*", "minus"},
+    {"minus", "-", "equal"},
+
+    {"gbreve", "Ğ", "lbrace"},
+    {"udiaeresis", "Ü", "rbrace"},
+
+    {"scedilla", "Ş", "colon"},
+    {"idiaeresis", "İ", "quote"},
+
+    {"less", "<", "bslash_iso"},
+
+    {"odiaeresis", "Ö", "comma"},
+    {"ccedilla", "Ç", "dot"},
+};
 
 /*static const KeyPatch patchJP[] = {
     {"lbrace", "[", "rbrace"},
@@ -668,6 +684,9 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             break;
         case KeyMap::SE:
             patch(map, patchSE);
+            break;
+        case KeyMap::TR:
+            patch(map, patchTR);
             break;
         case KeyMap::JP:
             /*patch(map, patchJP);
@@ -1605,7 +1624,7 @@ QPair<int, QString> KeyMap::addToList(int i, const QStringList& list){
 const QStringList KeyMap::layoutList {
     "Danish", "English (ISO/European)", "English (ISO/European, Dvorak)", "English (United Kingdom)", "English (United Kingdom, Dvorak)",
      "English (United States)", "English (United States, Dvorak)", "French", "German", "Italian", "Japanese", "Norwegian", "Polish",
-     "Portuguese (Brazil)", "Spanish (Latin America)", "Spanish (Spain)", "Swedish"
+     "Portuguese (Brazil)", "Spanish (Latin America)", "Spanish (Spain)", "Swedish", "Turkish"
 };
 QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
 
@@ -1627,7 +1646,8 @@ QList<QPair<int, QString>> KeyMap::layoutNames(const QString& layout){
                 << KeyMap::addToList(12, layoutList)
                 << KeyMap::addToList(14, layoutList)
                 << KeyMap::addToList(15, layoutList)
-                << KeyMap::addToList(16, layoutList);
+                << KeyMap::addToList(16, layoutList)
+                << KeyMap::addToList(17, layoutList);
     else if(layout == "abnt")
         retlist << KeyMap::addToList(13, layoutList);
     else if(layout == "jis")

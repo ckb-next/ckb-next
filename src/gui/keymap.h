@@ -116,6 +116,7 @@ public:
         MX,                 // Spanish (Mexico/Latin America)
         ES,                 // Spanish (Spain)
         SE,                 // Swedish
+        TR,                 // Turkish
         _LAYOUT_MAX
     };
     // Human-readable names of each layout

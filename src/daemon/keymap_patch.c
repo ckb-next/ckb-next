@@ -158,6 +158,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_TKL_CHAMP_OPTIC, k70tklpatch),
     ADD_PATCH(V_CORSAIR, P_K70_PRO,       k70propatch),
     ADD_PATCH(V_CORSAIR, P_K70_PRO_OPTIC, k70propatch),
+    ADD_PATCH(V_CORSAIR, P_K70_PRO_MECH, k70propatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_2, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_3, k70corergbpatch),

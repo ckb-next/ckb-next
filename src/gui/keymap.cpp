@@ -325,6 +325,25 @@ static const Key M65Keys[] = {
 #define M65_WIDTH       52
 #define M65_HEIGHT      67
 
+// Mouse map - M75
+static const Key M75Keys[] = {
+    {nullptr,  "Left Mouse",       "mouse1",   11,  1, 13, 22, false, true},
+    {nullptr,  "Right Mouse",      "mouse2",   29,  1, 13, 22, false, true},
+    {nullptr,  "Middle Mouse",     "mouse3",   24,  6,  5,  5, false, true},
+    {nullptr,  "Wheel Up",         "wheelup",  24,  3,  5,  4, false, true},
+    {nullptr,  "Wheel Down",       "wheeldn",  24,  9,  5,  4, false, true},
+    {nullptr,  "Forward",          "mouse5",    8, 18,  4,  8, false, true},
+    {nullptr,  "Back",             "mouse4",    8, 25,  4,  8, false, true},
+    {nullptr,  "Forward (R)",      "mouse6",   40, 18,  4,  8, false, true},
+    {nullptr,  "Back (R)",         "mouse7",   40, 25,  4,  8, false, true},
+    {nullptr,  "Logo",             "front",    20, 40, 12, 12, true,  false},
+    {nullptr,  "Underglow",        "back",     19, 52, 14, 6, true,  false}
+};
+#define KEYCOUNT_M75    (sizeof(M75Keys) / sizeof(Key))
+
+#define M75_WIDTH       52
+#define M75_HEIGHT      67
+
 // Sabre
 static const Key SabreKeys[] = {
     {nullptr,  "Left Mouse", "mouse1", 8, 0, 14, 32, false, true}, {nullptr,  "Right Mouse", "mouse2", 30, 0, 14, 32, false, true}, {nullptr,  "Middle Mouse", "mouse3", 22, 9, 8, 7, false, true}, {nullptr,  "Front light", "front", 8, -2, 14, 8, true, false },
@@ -1274,6 +1293,19 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         // Mice also have no layout patches - no other changes necessary
         break;
     }
+    case KeyMap::M75:{
+        // M75 isn't a keyboard; all mouse maps are unique. for now well use the M65 layout
+        for(const Key* key = M75Keys; key < M75Keys + KEYCOUNT_M75; key++){
+            // Keyboard keys are written from the center because that's where the LEDs are, but the mouse buttons are odd shapes so they're
+            // written from the upper left
+            Key translatedKey = *key;
+            translatedKey.x += translatedKey.width / 2;
+            translatedKey.y += translatedKey.height / 2;
+            map[key->name] = translatedKey;
+        }
+        // Mice also have no layout patches - no other changes necessary
+        break;
+    }
     case KeyMap::SABRE:{
         // Sabre mouse
         for(const Key* key = SabreKeys; key < SabreKeys + KEYCOUNT_SABRE; key++){
@@ -1670,6 +1702,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return M55;
     if(lower == "m65")
         return M65;
+    if(lower == "m75")
+        return M75;
     if(lower == "sabre")
         return SABRE;
     if(lower == "scimitar")
@@ -1761,6 +1795,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "m55";
     case M65:
         return "m65";
+    case M75:
+        return "m75";
     case SABRE:
         return "sabre";
     case SCIMITAR:
@@ -1883,6 +1919,8 @@ int KeyMap::modelWidth(Model model){
     case GLAIVEPRO:
     case IRONCLAW_W:
         return M65_WIDTH;
+    case M75:
+        return M75_WIDTH;
     case MM700:
         return MM700_WIDTH;
     default:
@@ -1938,6 +1976,8 @@ int KeyMap::modelHeight(Model model){
     case NIGHTSWORD:
     case GLAIVEPRO:
         return M65_HEIGHT;
+    case M75:
+        return M75_HEIGHT;
     case IRONCLAW_W:
         return M65_HEIGHT;
     case MM700:

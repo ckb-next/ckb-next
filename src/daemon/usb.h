@@ -259,7 +259,7 @@ const char* product_str(ushort product);
 #define IS_MOUSEPAD_DEV(kb)             IS_MOUSEPAD((kb)->vendor, (kb)->product)
 
 // Devices that are considered experimental and are either not fully tested, or aren't fully implemented
-#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && ((product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4 || (product) == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_IRONCLAW_W_U || (product) == P_IRONCLAW_W_D || (product) == P_HARPOON_WL_U || (product) == P_HARPOON_WL_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_DARK_CORE_RGB_PRO || (product) == P_DARK_CORE_RGB_PRO_WL || (product) == P_GENERIC_BRAGI_DONGLE || (product) == P_K65_MINI))
+#define IS_EXPERIMENTAL(vendor, product) ((vendor) == V_CORSAIR && ((product) == P_K63_NRGB_WL || (product) == P_K63_NRGB_WL2 || (product) == P_K63_NRGB_WL3 || (product) == P_K63_NRGB_WL4 || (product) == P_DARK_CORE || (product) == P_DARK_CORE_WL || (product) == P_DARK_CORE_SE || (product) == P_DARK_CORE_SE_WL || (product) == P_IRONCLAW_W_U || (product) == P_IRONCLAW_W_D || (product) == P_K57_U || (product) == P_K57_D || (product) == P_DARK_CORE_RGB_PRO || (product) == P_DARK_CORE_RGB_PRO_WL || (product) == P_GENERIC_BRAGI_DONGLE || (product) == P_K65_MINI))
 
 /// Some devices cause usbhid to spend a long time initialising it. To work around this, we intentionally uncleanly
 /// deinitialise the device, skipping the usbhid handover.
@@ -319,7 +319,7 @@ const char* product_str(ushort product);
 #define USES_BRAGI_LARGE(vendor, product)           ((vendor) == (V_CORSAIR) && ((product) == P_SCIMITAR_ELITE_BRAGI))
 
 // Used for devices that have the scroll wheel packet in the hardware hid packet only
-#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO || (kb)->product == P_SCIMITAR_ELITE_BRAGI))
+#define SW_PKT_HAS_NO_WHEEL(kb)                     ((kb)->vendor == V_CORSAIR && ((kb)->product == P_M55_RGB_PRO || (kb)->product == P_KATAR_PRO_XT || (kb)->product == P_KATAR_PRO || (kb)->product == P_SCIMITAR_ELITE_BRAGI || (kb)->product == P_HARPOON_WL_U))
 
 // For devices that have the new short HID report (6 bytes)
 #define USES_BRAGI_SHORT_REPORT(kb)                 ((kb)->vendor == (V_CORSAIR) && ((kb)->product == P_SCIMITAR_ELITE_BRAGI))

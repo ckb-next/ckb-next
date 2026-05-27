@@ -71,6 +71,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             break;
         case AnimScript::Param::LONG:
             widget = new QSpinBox(this);
+            ((QSpinBox*)widget)->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
             ((QSpinBox*)widget)->setMinimum(param.minimum.toInt());
             ((QSpinBox*)widget)->setMaximum(param.maximum.toInt());
             ((QSpinBox*)widget)->setValue(value.toInt());
@@ -184,6 +185,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
             // Angles additionally have a spin box
             if(param.type == AnimScript::Param::ANGLE){
                 QSpinBox* spinner = new QSpinBox(this);
+                spinner->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
                 spinner->setMinimum(0);
                 spinner->setMaximum(359);
                 spinner->setWrapping(true);
@@ -293,6 +295,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         // Mode repeat
         ui->timeGrid->addWidget(new QLabel(tr("Repeat:"), this), 4, 1);
         QSpinBox* spinner = new QSpinBox(this);
+        spinner->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
         spinner->setMinimum(0);
         spinner->setMaximum(1000000);
         spinner->setValue(anim->parameter("stop").toInt());
@@ -305,6 +308,7 @@ AnimSettingDialog::AnimSettingDialog(QWidget* parent, KbAnim* anim) :
         // KP repeat
         ui->timeGrid->addWidget(new QLabel(tr("Repeat:"), this), 12, 1);
         spinner = new QSpinBox(this);
+        spinner->setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
         spinner->setMinimum(0);
         spinner->setMaximum(1000000);
         spinner->setValue(anim->parameter("kpstop").toInt());

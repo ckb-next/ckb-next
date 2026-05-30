@@ -417,7 +417,6 @@ void fill_usbdevice_protocol(usbdevice* kb){
         int end;
         if(sscanf(usb_string, "P%hhd%n", &kb->protocol_version, &end) == 1 && usb_string[end] == '\0') {
             kb->protocol = PROTO_NXP;
-            kb->out_ep_packet_size = MSG_SIZE;
             goto proto_end;
         }
     }
@@ -430,15 +429,6 @@ void fill_usbdevice_protocol(usbdevice* kb){
         if(sscanf(usb_string, "BP%hhd%n", &kb->protocol_version, &end) == 1 && usb_string[end] == '\0') {
             // Successful bragi match
             kb->protocol = PROTO_BRAGI;
-
-            // FIXME: Autodetect this in the future too
-            if(USES_BRAGI_JUMBO(kb->vendor, kb->product))
-                kb->out_ep_packet_size = BRAGI_JUMBO_SIZE;
-            else if(USES_BRAGI_LARGE(kb->vendor, kb->product))
-                kb->out_ep_packet_size = BRAGI_LARGE_SIZE;
-            else
-                kb->out_ep_packet_size = MSG_SIZE;
-
             goto proto_end;
         }
     }

@@ -236,6 +236,27 @@ typedef enum pollrate_ {
     POLLRATE_COUNT,
 } pollrate_t;
 
+typedef struct {
+    uchar bEndpointAddress;
+    ushort wMaxPacketSize;
+    void (*handler)(struct usbdevice_* context, uchar* buffer, int urblen, uchar ep);
+} endpoint_t;
+
+enum {
+    EP_LOOKUP_OUT,
+    EP_LOOKUP_IN,
+    EP_LOOKUP_MAX
+};
+
+typedef struct {
+    bool hid_in : 1;        // Enough to get mostly useful input from the device in hardware mode (basic keys, mouse movement and clicks).
+    bool hid_extra_in : 1;  // Things like volume or media keys on a keyboard, or extra mouse buttons on a mouse
+    bool vendor_in : 1;     // Enough to get mostly useful input from the device in software mode (basic keys, mouse movement and clicks).
+    bool cmd_in : 1;        // Vendor defined command input (device to host)
+    bool cmd_out : 1;       // Vendor defined command output (host to device)
+    bool bios_mode : 1;     // This endpoint has a bios mode report descriptor
+    bool dont_claim : 1;    // Endpoints in this interface should be ignored
+} endpoint_type_t;
 
 // Structure for tracking keyboard/mouse devices
 #define KB_NAME_LEN         64
@@ -378,7 +399,6 @@ typedef struct usbdevice_ {
         DEV_STATUS_CONNECTED,
         DEV_STATUS_DISCONNECTING,
     } status;
-    uchar bragi_out_ep;
     uchar bragi_in_ep;
     uchar wl_pairing_id[PAIR_ID_SIZE];
     bool needs_fw_update;
@@ -394,16 +414,19 @@ typedef struct usbdevice_ {
     struct {
         uchar bInterfaceNumber;
         uchar bNumEndpoints;
-        struct {
-            uchar bEndpointAddress;
-            ushort wMaxPacketSize;
-        } endpoints[4]; // FIXME: Arbitrary limit (should we do 16?)
+        endpoint_t endpoints[EP_LOOKUP_MAX]; // Limit to 2 for now.
         uchar report_descriptor[4096];
         uchar report_descriptor_hash[crypto_hash_sha256_BYTES];
         int report_descriptor_len;
-        bool dont_claim; // FIXME: Unused
-    } hid_interfaces[10]; // FIXME: Arbitrary limit
-    uchar num_endpoints_in; // Count of how many IN EPs we actually have in the above struct
+        endpoint_type_t type;
+    } hid_interfaces[5]; // FIXME: Arbitrary limit
+    uchar bragi_out_ep; // FIXME: Remove bragi from name
 } usbdevice;
+
+typedef struct {
+    uchar report_descriptor_hash[crypto_hash_sha256_BYTES];
+    endpoint_type_t type;
+    void (*handler)(struct usbdevice_* context, uchar* buffer, int urblen, uchar ep);
+} report_descriptor_t; // FIXME better name
 
 #endif  // STRUCTURES_H

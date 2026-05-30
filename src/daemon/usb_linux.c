@@ -164,6 +164,13 @@ int os_get_device_ifs_eps(usbdevice* kb) {
             ckb_err("FAIL");
             return -4;
         }
+
+        if(kb->hid_interfaces[ifcount].bNumEndpoints >= sizeof(kb->hid_interfaces[0].endpoints)/sizeof(kb->hid_interfaces[0].endpoints[0])) {
+        // FIXME
+        //if(kb->hid_interfaces[ifcount].bNumEndpoints >= EP_LOOKUP_MAX) {
+            ckb_fatal("BLAH");
+            return -5;
+        }
         kb->hid_interfaces[ifcount].bNumEndpoints = temp;
 
         // Iterate through the endpoints
@@ -188,9 +195,15 @@ int os_get_device_ifs_eps(usbdevice* kb) {
             if(sscanf(entry->d_name, "ep_%hhx", &bEndpointAddress) != 1)
                 continue;
             ckb_info("EP %hhx", bEndpointAddress);
-            kb->hid_interfaces[ifcount].endpoints[epcount].bEndpointAddress = bEndpointAddress;
+            int direction = bEndpointAddress & 0x80 ? EP_LOOKUP_IN : EP_LOOKUP_OUT;
+            if(kb->hid_interfaces[ifcount].endpoints[direction].bEndpointAddress) {
+                // FIXME:
+                ckb_err("IGNORING EP");
+                continue;
+            }
+            kb->hid_interfaces[ifcount].endpoints[direction].bEndpointAddress = bEndpointAddress;
 
-            kb->hid_interfaces[ifcount].endpoints[epcount].wMaxPacketSize = 64;
+            kb->hid_interfaces[ifcount].endpoints[direction].wMaxPacketSize = 64;
             char* wMaxPacketSizePath = malloc(strlen(path) + 1 + strlen(entry->d_name) + strlen("/wMaxPacketSize") + 1);
             sprintf(wMaxPacketSizePath, "%s/%s/wMaxPacketSize", path, entry->d_name);
             ckb_info("%s", wMaxPacketSizePath);
@@ -198,7 +211,7 @@ int os_get_device_ifs_eps(usbdevice* kb) {
             if(wMaxPacketSizeFile) {
                 ushort wMaxPacketSize;
                 if(fscanf(wMaxPacketSizeFile, "%hx", &wMaxPacketSize) == 1)
-                    kb->hid_interfaces[ifcount].endpoints[epcount].wMaxPacketSize = wMaxPacketSize;
+                    kb->hid_interfaces[ifcount].endpoints[direction].wMaxPacketSize = wMaxPacketSize;
                 else
                     ckb_err("FAILED TO PARSE");
                 fclose(wMaxPacketSizeFile);
@@ -207,9 +220,8 @@ int os_get_device_ifs_eps(usbdevice* kb) {
             }
             free(wMaxPacketSizePath);
 
-            if(bEndpointAddress & 0x80)
-                kb->num_endpoints_in++;
-            ckb_info("Found EP %02hhx in IF %02hhx with wMaxPacketSize %hx at %s", bEndpointAddress, kb->hid_interfaces[ifcount].bInterfaceNumber, kb->hid_interfaces[ifcount].endpoints[epcount].wMaxPacketSize, path);
+
+            ckb_info("Found EP %02hhx in IF %02hhx with wMaxPacketSize %hx at %s", bEndpointAddress, kb->hid_interfaces[ifcount].bInterfaceNumber, kb->hid_interfaces[ifcount].endpoints[direction].wMaxPacketSize, path);
             epcount++;
         }
 
@@ -243,33 +255,32 @@ void* os_inputmain(void* context){
     int index = INDEX_OF(kb, keyboard);
     ckb_info("Starting input thread for %s%d", devpath, index);
 
-    if (kb->num_endpoints_in == 0) {
+    // Only one IN/OUT EP pair for each interface at best
+    struct usbdevfs_urb urbs[sizeof(kb->hid_interfaces)/sizeof(*kb->hid_interfaces)];
+
+    uchar ep = 0;
+    for(uchar i = 0; i < kb->bNumInterfaces; i++) {
+
+        const uchar bEndpointAddress = kb->hid_interfaces[i].endpoints[EP_LOOKUP_IN].bEndpointAddress;
+        if(!bEndpointAddress)
+            continue;
+
+        const ushort wMaxPacketSize = kb->hid_interfaces[i].endpoints[EP_LOOKUP_IN].wMaxPacketSize;
+        // Set the URB parameters
+        urbs[ep].buffer_length = wMaxPacketSize;
+        urbs[ep].type = USBDEVFS_URB_TYPE_INTERRUPT;
+        urbs[ep].endpoint = bEndpointAddress;
+        urbs[ep].buffer = malloc(wMaxPacketSize);
+        ioctl(fd, USBDEVFS_SUBMITURB, urbs + ep);
+        ep++;
+    }
+
+    if(!ep) {
         ckb_err("No endpoints claimed in inputmain");
+
         return NULL;
     }
 
-    struct usbdevfs_urb* urbs = calloc(kb->num_endpoints_in, sizeof(struct usbdevfs_urb));
-    if(!urbs) {
-        ckb_fatal("Can't allocate memory for usbdevfs_urb");
-        return NULL;
-    }
-
-    for(uchar i = 0, ep = 0; i < kb->bNumInterfaces && ep < kb->num_endpoints_in; i++) {
-        for(uchar j = 0; j < kb->hid_interfaces[i].bNumEndpoints; j++) {
-            const uchar bEndpointAddress = kb->hid_interfaces[i].endpoints[j].bEndpointAddress;
-            if(!(bEndpointAddress & 0x80))
-                continue;
-
-            const ushort wMaxPacketSize = kb->hid_interfaces[i].endpoints[j].wMaxPacketSize;
-            // Set the URB parameters
-            urbs[ep].buffer_length = wMaxPacketSize;
-            urbs[ep].type = USBDEVFS_URB_TYPE_INTERRUPT;
-            urbs[ep].endpoint = bEndpointAddress;
-            urbs[ep].buffer = malloc(wMaxPacketSize);
-            ioctl(fd, USBDEVFS_SUBMITURB, urbs + ep);
-            ep++;
-        }
-    }
 
     // Start monitoring input
     while (1) {
@@ -303,7 +314,18 @@ void* os_inputmain(void* context){
             if(urb->status == -ESHUTDOWN && reset_stop)
                 break;
 
-            process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
+            // FIXME: Fall back to process_input_urb()
+            // Find the interface containing this endpoint and call its handler
+            for(uchar i = 0; i < kb->bNumInterfaces; i++) {
+                if(urb->endpoint == kb->hid_interfaces[i].endpoints[EP_LOOKUP_IN].bEndpointAddress) {
+                    if(kb->hid_interfaces[i].endpoints[EP_LOOKUP_IN].handler)
+                        kb->hid_interfaces[i].endpoints[EP_LOOKUP_IN].handler(kb, urb->buffer, urb->actual_length, urb->endpoint);
+                    else
+                        ckb_err("No handler for EP %x", urb->endpoint);
+                }
+            }
+
+            //process_input_urb(kb, urb->buffer, urb->actual_length, urb->endpoint);
 
             /// Re-submit the URB for the next run.
             if (ioctl(fd, USBDEVFS_SUBMITURB, urb)) {
@@ -317,12 +339,10 @@ void* os_inputmain(void* context){
     /// If the endless loop is terminated, clean up by discarding the URBs via ioctl(USBDEVFS_DISCARDURB),
     /// free the URB buffers and return a null pointer as thread exit code.
     ckb_info("Stopping input thread for %s%d", devpath, index);
-    for(int i = 0; i < kb->num_endpoints_in; i++){
+    for(uchar i = 0; i < ep; i++){
         ioctl(fd, USBDEVFS_DISCARDURB, urbs + i);
         free(urbs[i].buffer);
     }
-
-    free(urbs);
 
     return NULL;
 }
@@ -347,7 +367,7 @@ void* os_inputmain(void* context){
 static int usbunclaim(usbdevice* kb, int resetting) {
     int handle = kb->handle - 1;
     for(uchar i = 0; i < kb->bNumInterfaces; i++){
-        if(kb->hid_interfaces[i].dont_claim)
+        if(kb->hid_interfaces[i].type.dont_claim)
             continue;
 
         const uchar bInterfaceNumber = kb->hid_interfaces[i].bInterfaceNumber;
@@ -408,7 +428,7 @@ void os_closeusb(usbdevice* kb){
 static int usbclaim(usbdevice* kb){
     int retries = 0;
     for(uchar i = 0; i < kb->bNumInterfaces; i++){
-        if(kb->hid_interfaces[i].dont_claim)
+        if(kb->hid_interfaces[i].type.dont_claim)
             continue;
 
         const uchar bInterfaceNumber = kb->hid_interfaces[i].bInterfaceNumber;
@@ -727,7 +747,7 @@ static void graceful_suspend_resume() {
             if (kb->status == DEV_STATUS_CONNECTED) {
                 // Replicates the logic from usbunclaim()
                 for(uchar j = 0; j < kb->bNumInterfaces; j++){
-                    if(kb->hid_interfaces[i].dont_claim)
+                    if(kb->hid_interfaces[i].type.dont_claim)
                         continue;
 
                     const uchar bInterfaceNumber = kb->hid_interfaces[j].bInterfaceNumber;
@@ -764,7 +784,7 @@ static void graceful_suspend_resume() {
         if (kb->status == DEV_STATUS_CONNECTED) {
             bool needs_reclaim = false;
             for(uchar j = 0; j < kb->bNumInterfaces; j++){
-                if(kb->hid_interfaces[j].dont_claim)
+                if(kb->hid_interfaces[j].type.dont_claim)
                     continue;
 
                 const uchar bInterfaceNumber = kb->hid_interfaces[j].bInterfaceNumber;

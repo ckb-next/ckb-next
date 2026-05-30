@@ -76,5 +76,6 @@ typedef struct {
 extern const key keymap[N_KEYS_EXTENDED];
 extern const key keymap_bragi[N_KEYS_BRAGI_PATCH];
 // Decides which of the input parsing functions it needs to call
-void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep);
+struct usbdevice_;
+void process_input_urb(struct usbdevice_* kb, unsigned char* buffer, int urblen, uchar ep);
 #endif // KEYMAP_H

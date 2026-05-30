@@ -757,11 +757,9 @@ static inline void hid_mouse_bld_translate(usbinput* input, int length, const un
 }
 
 
-void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort ep){
+void process_input_urb(struct usbdevice_ * kb, unsigned char* buffer, int urblen, uchar ep){
     if(!urblen)
         return;
-
-    usbdevice* kb = context;
 
 #ifdef DEBUG_USB_INPUT
     print_urb_buffer("Input:", buffer, urblen, NULL, 0, NULL, INDEX_OF(kb, keyboard), (uchar)ep);

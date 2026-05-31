@@ -57,6 +57,9 @@ typedef struct {
      */
     char triggered;
     struct _macro_param* param;
+
+    uint32_t repetition_debounce_ms;
+    uint32_t repetition_delay_ms;
 } keymacro;
 
 // Key bindings for a mode (keyboard + mouse)

@@ -5,10 +5,14 @@
 #include "input.h"
 #include "notify.h"
 #include <assert.h>
+#include <string.h>
 
 #define IS_SCROLLWHEEL_V(scan)  ((scan) == BTN_WHEELUP   || (scan) == BTN_WHEELDOWN)
 #define IS_SCROLLWHEEL_H(scan)  ((scan) == BTN_WHEELLEFT || (scan) == BTN_WHEELRIGHT)
 #define IS_VOLWHEEL(scan)      (((scan) == KEY_VOLUMEUP  || (scan) == KEY_VOLUMEDOWN) && DEV_HAS_VOLWHEEL(kb))
+// Lookup control wheel events by index in keymap. Alternatively one could check for non-null key->name to start with "ctrlwheel".
+// FIXME: Replace by proper lookup of map in keymap.
+#define IS_CTRLWHEEL(kb, index) ((kb)->protocol == PROTO_BRAGI && ((index) == 129 || (index) == 130))
 
 static int macromask(const uchar* keys, const uchar* macro){
     // Scan a macro against key input. Return 0 if any of them don't match
@@ -81,11 +85,11 @@ static pthread_t macro_pt_first() {
 }
 
 // Default macro keystroke delay
-const struct timespec macrodelay = { .tv_nsec = 1000000 };
-// Initial repeat delay
-#define DELAY_REPEAT_INITIAL 500000000
-// Delay for every subsequent repeat
-#define DELAY_REPEAT_CATCHUP 500000000
+#define NANOSECONDS_PER_MILLISECONDS 1000000
+const struct timespec macrodelay = { .tv_nsec = 1 * NANOSECONDS_PER_MILLISECONDS };
+// Default and max values for macro repetition delays/debounces
+#define REPETITION_DEFAULT_VALUE 500
+#define REPETITION_MAX_VALUE 2000
 
 static inline void clock_microsleep(uint32_t s) {
     const struct timespec ts = {
@@ -172,7 +176,9 @@ static void* play_macro(void* param) {
 
         queued_mutex_unlock(mmutex(kb));
 
-        int delay_ns = first_keydownloop ? DELAY_REPEAT_INITIAL : DELAY_REPEAT_CATCHUP;
+        uint32_t delay_ns = first_keydownloop
+            ? macro->repetition_debounce_ms * NANOSECONDS_PER_MILLISECONDS
+            : macro->repetition_delay_ms * NANOSECONDS_PER_MILLISECONDS;
 
         queued_mutex_lock(imutex(kb));
         // detect if the macro playback has been aborted
@@ -204,7 +210,7 @@ static void* play_macro(void* param) {
             break;
         }
 
-        // if the key released and pressed during the sleep, reset to use DELAY_REPEAT_INITIAL
+        // if the key released and pressed during the sleep, reset to use the default repetition value
         if (macro->triggered == 1)
             first_keydownloop = 0;
 
@@ -229,18 +235,19 @@ static void* play_macro(void* param) {
 
 // Checks if the macro mask contains any wheels to prevent it from looping endlessly
 static inline int is_wheel_keybit(const usbdevice* kb, const uchar* macro){
-    for(int i = 0; i < N_KEYBYTES_INPUT; i++){
+    for(int byte = 0; byte < N_KEYBYTES_INPUT; byte++){
         // Most entries are probably going to be 0, so skip over them
-        if(!macro[i])
+        if(!macro[byte])
             continue;
         // Go through each bit
-        for(int j = 0; j < 8; j++){
-            if(!((macro[i] >> j) & 1))
+        for(int bit = 0; bit < 8; bit++){
+            int keyindex = byte * 8 + bit;
+            if(!((macro[byte] >> bit) & 1))
                 continue;
             // Get the index of the item and look it up in the keymap
-            const key* ckey = kb->keymap + i * 8 + j;
+            const key* ckey = kb->keymap + keyindex;
             // If there's at least a single wheel, return true
-            if(IS_VOLWHEEL(ckey->scan) || IS_SCROLLWHEEL_V(ckey->scan) || IS_SCROLLWHEEL_H(ckey->scan))
+            if(IS_VOLWHEEL(ckey->scan) || IS_SCROLLWHEEL_V(ckey->scan) || IS_SCROLLWHEEL_H(ckey->scan) || IS_CTRLWHEEL(kb, keyindex))
                 return 1;
         }
     }
@@ -390,7 +397,7 @@ static inline void inputupdate_keys(usbdevice* kb, int* sync_kb, int* sync_mouse
                         // If it's a volume wheel, just add a single keyup event to the FIFO
                         // Else if the event originated from a scroll wheel, and is bound to something other than a scroll wheel,
                         // multiply the last few events by the amount of events received from the hid report
-                        if(IS_VOLWHEEL(map->scan)){
+                        if(IS_VOLWHEEL(map->scan) || IS_CTRLWHEEL(kb, keyindex)){
                             // Make room for it
                             memmove(events + modcount + keycount + 1, events + modcount + keycount, sizeof(int) * rmodcount);
                             // Duplicate the last event, but with keyup
@@ -416,7 +423,7 @@ static inline void inputupdate_keys(usbdevice* kb, int* sync_kb, int* sync_mouse
                         }
                     }
                     // Clear the key bit so that we can receive events of this type in the next run
-                    if(IS_VOLWHEEL(map->scan) || IS_SCROLLWHEEL_V(map->scan))
+                    if(IS_VOLWHEEL(map->scan) || IS_SCROLLWHEEL_V(map->scan) || IS_CTRLWHEEL(kb, keyindex))
                         input->keys[byte] &= ~mask;
                 }
 
@@ -641,8 +648,8 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     int empty = 1;
     int left = strlen(keys), right = strlen(assignment);
     int position = 0, field = 0;
-    char keyname[40];
-    while(position < left && sscanf(keys + position, "%10[^+]%n", keyname, &field) == 1){
+    char keyname[N_KEYNAME_LENGTH];
+    while(position < left && sscanf(keys + position, "%"N_SCANF_KEYNAME"[^+]%n", keyname, &field) == 1){
         // Find this key in the keymap
         for(unsigned i = 0; i < N_KEYS_INPUT; i++){
             if(kb->keymap[i].name && !strcmp(keyname, kb->keymap[i].name)){
@@ -668,8 +675,27 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
     // Scan the actions
     position = 0;
     field = 0;
+
+    // Check if repetition debounce and delay tokens are attached to the assignment.
+    // Validate value to be between 0 and 2000 inclusive. Default to 500ms.
+    const char *delay_tok = strchr(assignment, ':');
+    macro.repetition_delay_ms = REPETITION_DEFAULT_VALUE;
+    macro.repetition_debounce_ms = REPETITION_DEFAULT_VALUE;
+    if (delay_tok != NULL) {
+        static_assert(REPETITION_MAX_VALUE <= UINT32_MAX, "Repetition max value larger than what uint32_t can hold");
+        uint32_t debounce_ms = 0;
+        uint32_t delay_ms = 0;
+
+        if (sscanf(delay_tok, ":%"SCNu32";%"SCNu32, &debounce_ms, &delay_ms) == 2) {
+            if (debounce_ms > 0 && debounce_ms <= REPETITION_MAX_VALUE)
+                macro.repetition_debounce_ms = (uint32_t) debounce_ms;
+            if (delay_ms > 0 && delay_ms <= REPETITION_MAX_VALUE)
+                macro.repetition_delay_ms = (uint32_t) delay_ms;
+        }
+    }
+
     // max action = old 11 chars plus 12 chars which is the max 32-bit unsigned int 4294967295 size * 2 + 1 for range underscore
-    while(position < right && sscanf(assignment + position, "%36[^,]%n", keyname, &field) == 1){
+    while(position < right && sscanf(assignment + position, "%"N_SCANF_KEYNAME"[^,:]%n", keyname, &field) == 1){
         if(!strcmp(keyname, "clear"))
             break;
 
@@ -678,12 +704,13 @@ static void _cmd_macro(usbmode* mode, const char* keys, const char* assignment, 
         int64_t long_delay_range = 0;
         uint32_t delay = UINT32_MAX; // computed delay value. UINT32_MAX means use the default value.
         uint32_t delay_range = 0;
-        char real_keyname[12];  // temp to hold the left side (key) of the <key>=<delay>
-        int scan_matches = sscanf(keyname, "%11[^=]=%"SCNd64"_%"SCNd64, real_keyname, &long_delay, &long_delay_range);
+        char real_keyname[N_KEYNAME_LENGTH]; // temp to hold the left side (key) of the <key>=<delay>
+        int scan_matches = sscanf(keyname, "%"N_SCANF_KEYNAME"[^=]=%"SCNd64"_%"SCNd64, real_keyname, &long_delay, &long_delay_range);
         if (scan_matches == 2 || scan_matches == 3) {
             if (0 <= long_delay && long_delay < UINT32_MAX) {
                 delay = (uint32_t)long_delay;
-                strcpy(keyname, real_keyname); // keyname[40], real_keyname[12]
+                static_assert(sizeof(keyname) >= sizeof(real_keyname), "");
+                strcpy(keyname, real_keyname);
                 if(0 < long_delay_range && long_delay_range < UINT32_MAX
                         && long_delay_range > long_delay) {
                     delay_range = (uint32_t)long_delay_range;

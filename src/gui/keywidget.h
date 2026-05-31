@@ -108,6 +108,7 @@ private:
     void drawTopLeftCorner(QPainter* painter, float x, float y, float w, float h, float scale);
     void drawStrafeSidelights(const Key* key, QPainter* painter, const QColor& kC, const QColor& c, const QColor& bgC);
     void paintGL() override;
+    void initializeGL() override;
     void calculateDrawInfo(const QSize& size);
     void resizeEvent(QResizeEvent* event) override {
         calculateDrawInfo(event->size());

@@ -808,28 +808,25 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["rightbar10"] = {nullptr, "Right Light Bar 10", "rightbar10", 292, 79, 6, 9, true, false};
         map["rightbar11"] = {nullptr, "Right Light Bar 11", "rightbar11", 292, 88, 6, 9, true, false};
 
-        map["ctrlwheelb"] = map["light"];
-        map["ctrlwheelb"].name = "ctrlwheelb";
-        map["ctrlwheelb"]._friendlyName = "Control Wheel Button";
-        map["ctrlwheelb"].height = map["ctrlwheelb"].width;
-        map["ctrlwheelb"].y -= 3;
+        map["profswitch"] = {nullptr,  "Profile Switch", "profswitch", 20, 10, 11, 9, true, true};
+        map["ctrlwheelccw"] = {nullptr, "Control Wheel Counterclockwise", "ctrlwheelccw", 28, 10, 6, 16, false, true };
+        map["ctrlwheelb"] = {nullptr, "Control Wheel Button", "ctrlwheelb", 35, 10, 11, 11, true, true };
+        map["ctrlwheelcw"] = {nullptr, "Control Wheel Clockwise", "ctrlwheelcw", 42, 10, 6, 16, false, true };
+        map["lock"] = {nullptr, "Lock", "lock", 50, 10, 11, 9, true, true};
 
-        map["profswitch"].height += 1;
-        map["lock"].height = map["mute"].height = map["profswitch"].height;
+        map["mute"].height = map["profswitch"].height;
         map["mute"].y = map["profswitch"].y = map["lock"].y = map["ctrlwheelb"].y;
         map["volup"].y = map["ctrlwheelb"].y - 2;
         map["voldn"].y = map["ctrlwheelb"].y + 2;
-        map["profswitch"].x -= 1;
-        map["lock"].x += 1;
 
-        map["ctrlwheel1"] = {nullptr, "Control Wheel 22.5°",  "ctrlwheel1", 60+2, 10, 8, 6, true, false};
-        map["ctrlwheel2"] = {nullptr, "Control Wheel 67.5°",  "ctrlwheel2", 60+3, 10+1, 5, 8, true, false};
-        map["ctrlwheel3"] = {nullptr, "Control Wheel 112.5°", "ctrlwheel3", 60+3, 10+2, 5, 8, true, false};
-        map["ctrlwheel4"] = {nullptr, "Control Wheel 157.5°", "ctrlwheel4", 60+2, 10+3, 8, 6, true, false};
-        map["ctrlwheel5"] = {nullptr, "Control Wheel 202.5°", "ctrlwheel5", 60+1, 10+3, 8, 6, true, false};
-        map["ctrlwheel6"] = {nullptr, "Control Wheel 247.5°", "ctrlwheel6", 60, 10+2, 5, 8, true, false};
-        map["ctrlwheel7"] = {nullptr, "Control Wheel 292.5°", "ctrlwheel7", 60, 10+1, 5, 8, true, false};
-        map["ctrlwheel8"] = {nullptr, "Control Wheel 337.5°", "ctrlwheel8", 60+1, 10, 8, 6, true, false};
+        map["ctrlwheel1"] = {nullptr, "Control Wheel 22.5°",  "ctrlwheel1", 35+2, 10, 8, 6, true, false};
+        map["ctrlwheel2"] = {nullptr, "Control Wheel 67.5°",  "ctrlwheel2", 35+3, 10+1, 5, 8, true, false};
+        map["ctrlwheel3"] = {nullptr, "Control Wheel 112.5°", "ctrlwheel3", 35+3, 10+2, 5, 8, true, false};
+        map["ctrlwheel4"] = {nullptr, "Control Wheel 157.5°", "ctrlwheel4", 35+2, 10+3, 8, 6, true, false};
+        map["ctrlwheel5"] = {nullptr, "Control Wheel 202.5°", "ctrlwheel5", 35+1, 10+3, 8, 6, true, false};
+        map["ctrlwheel6"] = {nullptr, "Control Wheel 247.5°", "ctrlwheel6", 35, 10+2, 5, 8, true, false};
+        map["ctrlwheel7"] = {nullptr, "Control Wheel 292.5°", "ctrlwheel7", 35, 10+1, 5, 8, true, false};
+        map["ctrlwheel8"] = {nullptr, "Control Wheel 337.5°", "ctrlwheel8", 35+1, 10, 8, 6, true, false};
 
         map["logoleft"] = {nullptr, "Logo Left", "logoleft", 134, 10, 10, 10, true, false};
         map["logo"] = {nullptr, "Logo", "logo", 144, 10, 10, 10, true, false};

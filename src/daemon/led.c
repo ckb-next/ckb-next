@@ -157,13 +157,13 @@ char* printrgb(const lighting* light, const usbdevice* kb){
         b[i] = mb[k];
     }
     // Make a buffer to track key names and to filter out duplicates
-    char names[N_KEYS_EXTENDED][11];
+    char names[N_KEYS_EXTENDED][N_KEYNAME_LENGTH];
     for(int i = 0; i < N_KEYS_EXTENDED; i++){
         const char* name = kb->keymap[i].name;
         if(kb->keymap[i].led < 0 || !has_key(name, kb))
             names[i][0] = 0;
         else
-            strncpy(names[i], name, 11);
+            snprintf(names[i], N_KEYNAME_LENGTH, "%s", name);
     }
     // Check to make sure these aren't all the same color
     int same = 1;

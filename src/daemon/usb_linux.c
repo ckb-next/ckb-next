@@ -519,7 +519,7 @@ int usbadd(struct udev_device* dev, ushort vendor, ushort product) {
                 kb->udev = dev;
                 kb->vendor = vendor;
                 kb->product = product;
-                strncpy(kbsyspath[index], syspath, FILENAME_MAX);
+                snprintf(kbsyspath[index], FILENAME_MAX, "%s", syspath);
                 kb->status = DEV_STATUS_CONNECTING;
                 // Mutex remains locked
                 setupusb(kb);

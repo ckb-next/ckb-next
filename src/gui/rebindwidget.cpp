@@ -11,6 +11,10 @@
 static const int DPI_OFFSET = -KeyAction::DPI_CYCLE_UP + 1;
 static const int DPI_CUST_IDX = KeyAction::DPI_CUSTOM + DPI_OFFSET;
 
+static const int MACRO_DEFAULT_REPETITION_DEBOUNCE = 500;
+static const int MACRO_DEFAULT_REPETITION_DELAY = 500;
+static const QString MACRO_MAGIC_COLON_REPLACEMENT = QStringLiteral("&das_IST_31N_col0n;");
+
 static inline void setLocalUiElementsEnabled(Ui::RebindWidget* const ui, const bool e){
     ui->editAsStringBtn->setEnabled(e);
     ui->btnAddEvent->setEnabled(e);
@@ -24,6 +28,8 @@ static inline void setUiElementsEnabled(Ui::RebindWidget* const ui, const bool e
     ui->unbindButton->setEnabled(e);
     ui->rb_delay_asTyped->setEnabled(e);
     ui->rb_delay_default->setEnabled(e);
+    ui->rep_debounce_input->setEnabled(e);
+    ui->rep_delay_input->setEnabled(e);
     ui->captureTypeBox->setEnabled(e);
     MainWindow::mainWindow->setTabsEnabled(e);
     ui->tabWidget->tabBar()->setEnabled(e);
@@ -356,13 +362,18 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                 QStringView valueView(value);
                 QList<QStringView> macroData = valueView.sliced(7).split(QChar(':'));
 #endif
+
                 const int dataCount = macroData.count();
-                // Old format doesn't have the last field, which is the raw macro data
-                // It might not exist at all (count == 3) or it might be set to "x"
-                if(dataCount == 3 || dataCount == 4){
+                // Macro strings have had different number of field depending on
+                // their version:
+                // - Initial version: 3 fields,
+                // - next iteration: 4 fields, appended the raw macro data,
+                //                   which might be "x" in certain situations,
+                // - current iteration: 5 fields, appended repetition debounce & delay.
+                if (3 <= dataCount && dataCount <= 5) {
                     // Colons in the name field are escaped
                     QString macroName = macroData[2].toString();
-                    macroName.replace("&das_IST_31N_col0n;", ":");
+                    macroName.replace(MACRO_MAGIC_COLON_REPLACEMENT, ":");
                     ui->macroName->setText(macroName);
 
                     // Pick the appropriate string to parse due to legacy formats
@@ -389,6 +400,20 @@ void RebindWidget::setSelection(const QStringList& newSelection, bool applyPrevi
                         ui->rb_delay_asTyped->setChecked(true);
                     else
                         ui->rb_delay_default->setChecked(true);
+
+                    // Set the repetition delay value if it's supplied.
+                    if (dataCount == 5) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                        QVector<QStringRef> repetitionData = macroData[4].split(QChar(';'));
+#else // QT_VERSION >= 6.0.0
+                        QList<QStringView> repetitionData = macroData[4].split(QChar(';'));
+#endif
+                        ui->rep_debounce_input->setValue(repetitionData[0].toInt());
+                        ui->rep_delay_input->setValue(repetitionData[1].toInt());
+                    } else {
+                        ui->rep_debounce_input->setValue(MACRO_DEFAULT_REPETITION_DEBOUNCE);
+                        ui->rep_delay_input->setValue(MACRO_DEFAULT_REPETITION_DELAY);
+                    }
                 }
             }
         } else
@@ -483,15 +508,17 @@ void RebindWidget::applyChanges(const QStringList& keys, bool doUnbind){
             }
         }
         // Generate macro format string
-        // Format is $macro:daemon_string:preview_string:user_specified_macro_name:original_recorded_macro_string
+        // Format is $macro:daemon_string:preview_string:user_specified_macro_name:original_recorded_macro_string:repetition_debounce;repetition_delay
         // $macro: is added by KeyAction::macroAction()
         // daemon_string is the one sent to the daemon, and original_recorded_macro_string is the raw user data
         // preview_string is now unused as it can be generated from the remaining data
         // Any colons in user_specified_macro_name are escaped
-        QString escapedMacroName = ui->macroName->text().replace(":", "&das_IST_31N_col0n;");
+        QString escapedMacroName = ui->macroName->text().replace(":", MACRO_MAGIC_COLON_REPLACEMENT);
         QString finalDaemonString = macroLines.toString(false);
         QString originalString = macroLines.toString(true);
-        QString macro = QString("%1::%2:%3").arg(finalDaemonString, escapedMacroName, originalString);
+        QString repDebounceString = ui->rep_debounce_input->cleanText();
+        QString repDelayString = ui->rep_delay_input->cleanText();
+        QString macro = QString("%1::%2:%3:%4;%5").arg(finalDaemonString, escapedMacroName, originalString, repDebounceString, repDelayString);
         bind->setAction(keys, KeyAction::macroAction(macro));
     } else if(doUnbind)
         bind->noAction(keys);
@@ -876,6 +903,8 @@ void RebindWidget::on_btnClearMacro_clicked() {
     macroLines.clear();
     ui->macroName->clear();
     ui->macroPreview->clear();
+    ui->rep_debounce_input->setValue(MACRO_DEFAULT_REPETITION_DEBOUNCE);
+    ui->rep_delay_input->setValue(MACRO_DEFAULT_REPETITION_DELAY);
 }
 
 void RebindWidget::on_rb_delay_default_toggled(bool checked){

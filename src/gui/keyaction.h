@@ -31,11 +31,6 @@ public:
     // Name to send to driver (empty string for unbind)
     QString driverName() const;
 
-    // Returns the string that's passed to the daemon
-    inline QString macroContent() const {
-        return _value.split(":")[1];
-    }
-
     // Mode-switch action.
     // 0 for first mode, 1 for second, etc. Constants below for movement options
     const static int MODE_PREV = -2, MODE_NEXT = -1;

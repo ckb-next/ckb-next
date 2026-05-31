@@ -127,9 +127,9 @@
 #define CKB_REAL_ANGLE(angle)           fmod((-(angle) + 90.) * M_PI / 180. + M_PI * 2., M_PI * 2.)
 
 // Key definition
-#define CKB_KEYNAME_MAX 12
+#define CKB_KEYNAME_MAX 40
 typedef struct {
-    char name[CKB_KEYNAME_MAX+1];
+    char name[CKB_KEYNAME_MAX];
     int x, y;
     unsigned char a, r, g, b;
 } ckb_key;
@@ -408,8 +408,12 @@ int main(int argc, char *argv[]){
                     continue;
                 }
                 ckb_key* key = ctx.keys + i;
-                strncpy(key->name, param, CKB_KEYNAME_MAX);
-                key->name[CKB_KEYNAME_MAX] = '\0';
+                int ret;
+                if ((ret = snprintf(key->name, CKB_KEYNAME_MAX, "%s", param)) >= CKB_KEYNAME_MAX || ret < 0) {
+                    // Truncation occurred. Ignore this key.
+                    DBG("Ignoring key '%s' because of truncation", param);
+                    continue;
+                }
                 key->x = x;
                 key->y = y;
                 if(x > max_x)

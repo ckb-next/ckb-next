@@ -56,6 +56,11 @@ WaylandIdleTimer::WaylandIdleTimer()
 {
     if (m_supported) {
         auto seat = WaylandUtils::seat();
+	if(seat == nullptr) {
+            qDebug() << "wl_seat is NULL";
+            m_supported = false;
+            return;
+        }
         m_notifier.reset(new WaylandIdleNotifier());
 #ifdef USE_WAYLAND_INPUT_IDLE_NOTIFY
         if (wl_utils->hasInterface("ext_idle_notifier_v1", 2)) {

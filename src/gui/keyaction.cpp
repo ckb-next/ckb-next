@@ -75,6 +75,8 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
     if(key == "dpiup"){
         if(model == KeyMap::M55 || model == KeyMap::HARPOON || model == KeyMap::GLAIVE || model == KeyMap::IRONCLAW)
             return "$dpi:-4";
+        if(model == KeyMap::IRONCLAW_W)
+            return "$dpi:-2";
         return "$dpi:-2";
     }
     if(key == "dpidn")
@@ -83,8 +85,12 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
         return "$dpi:0";
     if(key == "profswitch")
         return "$mode:-3";
+    if(key == "profup")
+        return "$mode:-3";
     if(key == "profdn")
         return "$mode:-4";
+    if(key == "optbtn")
+        return "$dpi:0";
 
 #ifdef Q_OS_MACOS
     // macOS has no forwards and backwards, so we bind them to macros that simulate that action

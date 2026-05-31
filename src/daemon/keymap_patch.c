@@ -29,6 +29,10 @@ static const keypatch m95patch[] = {
 };
 
 static const keypatch icwpatch[] = {
+    // Button patches: map unused keymap slots for IRONCLAW wireless-specific buttons
+    { MOUSE_BUTTON_FIRST + 20, "profup", -1, KEY_CORSAIR },
+    { MOUSE_BUTTON_FIRST + 21, "optbtn", -1, KEY_CORSAIR },
+    // LED zone patches
     { 237+20, "back",  LED_MOUSE,     KEY_NONE },
     { 238+20, "wheel", LED_MOUSE + 1, KEY_NONE },
     { 239+20, "front", LED_MOUSE + 2, KEY_NONE },

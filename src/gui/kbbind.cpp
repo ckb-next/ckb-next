@@ -245,11 +245,11 @@ void KbBind::update(QFile& cmd, int notify, bool force){
 #else // QT_VERSION < 6.0.0
                 QVector<QStringRef> macroContent = act->value().splitRef(':');
 #endif
-                if (macroContent[1].length() > 0)
-                    // Fields used: 1 - daemon string, 5 - repetition delay
-                    macros.append("macro " + keyLatin1
-                            + ":" + macroContent[1].toLatin1()
-                            + ":" + macroContent[5].toLatin1());
+                // Fields used: 1 - daemon string, 5 - repetition delay
+                if (macroContent.at(1).length() > 0)
+                    macros.append("macro " + keyLatin1 + ":" + macroContent.at(1).toLatin1());
+                if (macroContent.length() > 5 && macroContent.at(5).length() > 0)
+                    macros.append(":" + macroContent.at(5).toLatin1());
             }
         } else {
             // Otherwise, write the binding

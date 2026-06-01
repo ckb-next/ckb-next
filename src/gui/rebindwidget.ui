@@ -1407,6 +1407,9 @@
              <property name="suffix">
               <string>ms</string>
              </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
              <property name="maximum">
               <number>2000</number>
              </property>

@@ -1,0 +1,113 @@
+{
+    "protocols": {
+        "Bragi": {
+            "descriptors": [
+                {
+                    "comment": "1b62 dongle fwver whatever",
+                    "hash": "2b5a06acbf477778fc317d770f02736c140837eda13de1b2f47e1c1fb572be23",
+                    "flags": [
+                        "hid_in"
+                    ],
+                    "handler": "proces_input_urb"
+                },
+                {
+                    "comment": "",
+                    "hash": "08aae1b81c1110fee21a688fa9a7fd9f101f6e85c0e0e04101ddd64f76d457eb",
+                    "flags": [
+                        "cmd_out", "cmd_in"
+                    ],
+                    "handler": "proces_input_urb"
+                },
+                {
+                    "comment": "",
+                    "hash": "ee82851300f31d7033f9781c127908bee87a7acebabf948ad80e99c59f7a5ba6",
+                    "flags": [
+                        "vendor_in"
+                    ],
+                    "handler": "proces_input_urb"
+                },
+                {
+                    "comment": "",
+                    "hash": "9500abc906ecd3ac849fa4f8a65fcbc773bd965d54eebe817603253cb5ddfc08",
+                    "flags": [
+                        "hid_extra_in"
+                    ],
+                    "handler": "proces_input_urb"
+                },
+                {
+                    "comment": "same device wired mode",
+                    "hash": "29bdd499e03931cccc41f6bddae4469528941c8778e4357226df891c501bdceb",
+                    "flags": [
+                        "hid_in", "hid_extra_in"
+                    ],
+                    "handler": "proces_input_urb"
+                },
+                {
+                    "comment": "ironclaw wired",
+                    "hash": "23b9c4bae611a9e42fc3bbb7b6af6e6a1684b50c2a6ce2ca4ada94b6dbcca9dc",
+                    "flags": [
+                        "hid_in"
+                    ],
+                    "handler": "proces_input_urb"
+                },
+                {
+                    "comment": "also ironclaw wired but no idea what this is probably keyboard input",
+                    "hash": "9d548afa167670e162e8975e172d40747d057fce3098d52b4c09c24e882cd0bb",
+                    "flags": [
+                        "hid_extra_in"
+                    ],
+                    "handler": null
+                },
+                {
+                    "comment": "ironclaw wireless same as above",
+                    "hash": "b7146312cc9769dd09d279551d0584bd3344d9f34e4fdb9913c91c6846e5c728",
+                    "flags": [
+                        "hid_extra_in"
+                    ],
+                    "handler": null
+                }
+            ]
+        },
+        "NXP": {
+            "descriptors": [
+                {
+                    "comment": "1b1c K70 fwver 3 HID",
+                    "hash": "5e2b9356be7d1a61224d94aa84f70226e2fc26429ae84bdd34459bb2f9a75ac2",
+                    "flags": [
+                        "cmd_in", "hid_in", "vendor_in", "hid_extra_in"
+                    ],
+                    "handler": "proces_input_urb"
+                },
+                {
+                    "comment": "1b2e M65 fwver 3 HID",
+                    "hash": "e7ee44c033dd4e7d4fd4ac81ee76f7bd8ef861535c5f45dbb91edfbdc524ef64",
+                    "flags": [
+                        "cmd_in", "hid_in", "vendor_in", "hid_extra_in"
+                    ],
+                    "handler": "proces_input_urb"
+                },
+                {
+                    "comment": "fwver3 common vendor",
+                    "hash": "f4ce17cd77a95f822ed0af59d965021a4bbcdec3b7e1f3d80b5529e1deb30eee",
+                    "flags": [
+                        "cmd_out"
+                    ],
+                    "handler": "proces_input_urb"
+                }
+            ]
+        },
+        "Legacy": {
+            "descriptors": [
+                {
+                    "comment": "string",
+                    "hash": "string",
+                    "flags": [
+                        "bios_mode"
+                    ],
+                    "handler": "proces_input_urb"
+                }
+            ]
+        }
+    },
+    "devices": {}
+}

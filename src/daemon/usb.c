@@ -381,7 +381,7 @@ static size_t iconv_usb_string(char* data_in, size_t len_in, char* data_out, siz
     return 0;
 }
 
-static const char* proto_str_map[_PROTO_MAX] = {
+const char* proto_str_map[_PROTO_MAX] = {
     "NXP",
     "Bragi",
     "Legacy",

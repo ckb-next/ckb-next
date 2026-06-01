@@ -1,43 +1,37 @@
 #include "structures.h"
 #include "usb.h"
 #include "device.h"
-
-static const report_descriptor_t nxp_descriptors[] = {
-    // 1b1c K70 fwver 3 HID
-    {
-        { 0x5e, 0x2b, 0x93, 0x56, 0xbe, 0x7d, 0x1a, 0x61, 0x22, 0x4d, 0x94, 0xaa, 0x84 ,0xf7, 0x02, 0x26, 0xe2, 0xfc, 0x26, 0x42, 0x9a, 0xe8, 0x4b, 0xdd, 0x34, 0x45, 0x9b, 0xb2, 0xf9, 0xa7, 0x5a, 0xc2 },
-        { .cmd_in = true, .hid_in = true, .vendor_in = true, .hid_extra_in = true },
-        process_input_urb
-    },
-    // 1b2e M65 fwver 3 HID
-    {
-        { 0xe7, 0xee, 0x44, 0xc0, 0x33, 0xdd, 0x4e, 0x7d, 0x4f, 0xd4, 0xac, 0x81, 0xee, 0x76, 0xf7, 0xbd, 0x8e, 0xf8, 0x61, 0x53, 0x5c, 0x5f, 0x45, 0xdb, 0xb9, 0x1e, 0xdf, 0xbd, 0xc5, 0x24, 0xef, 0x64 },
-        { .cmd_in = true, .hid_in = true, .vendor_in = true, .hid_extra_in = true },
-        process_input_urb
-    },
-    // fwver3 common vendor
-    {
-        { 0xf4, 0xce, 0x17, 0xcd, 0x77, 0xa9, 0x5f, 0x82, 0x2e, 0xd0, 0xaf, 0x59, 0xd9, 0x65, 0x02, 0x1a, 0x4b, 0xbc, 0xde, 0xc3, 0xb7, 0xe1, 0xf3, 0xd8, 0x0b, 0x55, 0x29, 0xe1, 0xde, 0xb3, 0x0e, 0xee },
-        { .cmd_out = true },
-        NULL
-    },
-};
+#include "json.h"
 
 void nxp_fill_input_eps(usbdevice* kb)
 {
+    json_t* descriptors = json_get_descriptors_for_protocol(kb);
     // Match descriptors to interfaces and install input handlers
     for(uchar j = 0; j < kb->bNumInterfaces; j++) {
-        for(size_t i = 0; i < sizeof(nxp_descriptors)/sizeof(*nxp_descriptors); i++) {
-            if(!memcmp(nxp_descriptors[i].report_descriptor_hash, kb->hid_interfaces[j].report_descriptor_hash, crypto_hash_sha256_BYTES)) {
-                ckb_info("MATCHED DESCR");
-                kb->hid_interfaces[j].type = nxp_descriptors[i].type;
+        for(size_t i = 0; i < json_array_size(descriptors); i++) {
+            json_t* descriptor = json_array_get(descriptors, i);
+            uchar hash_bytes[crypto_hash_sha256_BYTES];
+            if(!json_parse_descriptor_hash(descriptor, hash_bytes)) {
+                // FIXME
+                return;
+            }
+            if(!memcmp(hash_bytes, kb->hid_interfaces[j].report_descriptor_hash, crypto_hash_sha256_BYTES)) {
+                json_print_descriptor_comment(descriptor);
+                if(!json_parse_descriptor_flags(descriptor, &kb->hid_interfaces[j].type)) {
+                    // FIXME
+                    return;
+                }
+
                 // Input
-                if(kb->hid_interfaces[j].endpoints[EP_LOOKUP_IN].bEndpointAddress && (nxp_descriptors[i].type.cmd_in || nxp_descriptors[i].type.hid_in || nxp_descriptors[i].type.vendor_in)) {
-                    kb->hid_interfaces[j].endpoints[EP_LOOKUP_IN].handler = nxp_descriptors[i].handler;
+                if(kb->hid_interfaces[j].endpoints[EP_LOOKUP_IN].bEndpointAddress && (kb->hid_interfaces[j].type.cmd_in || kb->hid_interfaces[j].type.hid_in || kb->hid_interfaces[j].type.vendor_in)) {
+                    if(!json_parse_descriptor_handler(descriptor, kb->hid_interfaces[j].endpoints + EP_LOOKUP_IN)) {
+                        return;
+                        // FIXME
+                    }
                 }
 
                 // Output
-                if(kb->hid_interfaces[j].endpoints[EP_LOOKUP_OUT].bEndpointAddress && nxp_descriptors[i].type.cmd_out) {
+                if(kb->hid_interfaces[j].endpoints[EP_LOOKUP_OUT].bEndpointAddress && kb->hid_interfaces[j].type.cmd_out) {
                     kb->bragi_out_ep = kb->hid_interfaces[j].endpoints[EP_LOOKUP_OUT].bEndpointAddress;
                 }
 

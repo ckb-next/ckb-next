@@ -27,3 +27,6 @@
 #define N_KEYNAME_STR(x)      N_KEYNAME_STR_REAL(x)
 #define N_SCANF_KEYNAME       N_KEYNAME_STR(N_KEYNAME_STRLEN)
 static_assert((N_KEYNAME_LENGTH == N_KEYNAME_STRLEN + 1), "N_KEYNAME_LENGTH must be 1 greater than N_KEYNAME_STRLEN");
+
+#define CKB_NEXT_DAEMON_ETC_PATH "/etc/ckb-next-daemon/"
+#define CKB_NEXT_DAEMON_SHARE_PATH "${CMAKE_INSTALL_PREFIX}/share/ckb-next-daemon/"

@@ -142,6 +142,9 @@ void localecase(char* dst, size_t length, const char* src){
 
 // For --search
 extern void fill_usbdevice_protocol(usbdevice* kb);
+// json.c
+extern bool json_init();
+extern bool json_deinit();
 
 int main(int argc, char** argv){
     // Set output pipes to buffer on newlines, if they weren't set that way already
@@ -343,8 +346,12 @@ int main(int argc, char** argv){
         exit(1);
     }
 
+    if(!json_init())
+        exit(1);
+
     // Start the USB system
     int result = usbmain();
     quit();
+    json_deinit();
     return result;
 }

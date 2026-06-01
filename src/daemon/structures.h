@@ -423,10 +423,4 @@ typedef struct usbdevice_ {
     uchar bragi_out_ep; // FIXME: Remove bragi from name
 } usbdevice;
 
-typedef struct {
-    uchar report_descriptor_hash[crypto_hash_sha256_BYTES];
-    endpoint_type_t type;
-    void (*handler)(struct usbdevice_* context, uchar* buffer, int urblen, uchar ep);
-} report_descriptor_t; // FIXME better name
-
 #endif  // STRUCTURES_H

@@ -37,6 +37,8 @@ if (MACOS OR LINUX)
     find_package(Threads REQUIRED)
     find_package(Iconv REQUIRED)
     find_package(Sodium REQUIRED)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(Jansson REQUIRED jansson)
 endif ()
 if (MACOS)
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -74,6 +76,7 @@ if (MACOS OR LINUX)
               dpi_bragi.c
               firmware.c
               input.c
+              json.c
               keymap.c
               keymap_patch.c
               led.c
@@ -104,6 +107,7 @@ if (MACOS OR LINUX)
               includes.h
               input.h
               input_mac_vhid.h
+              json.h
               keymap.h
               keymap_patch.h
               led.h
@@ -151,7 +155,8 @@ if (MACOS OR LINUX)
               "${CMAKE_CURRENT_SOURCE_DIR}"
               "${CMAKE_CURRENT_BINARY_DIR}"
               "${ICONV_INCLUDE_DIR}"
-              "${sodium_INCLUDE_DIR}")
+              "${sodium_INCLUDE_DIR}"
+              "${Jansson_INCLUDE_DIR}")
 endif ()
 if (MACOS)
     # Compiler knows better
@@ -169,7 +174,8 @@ if (MACOS OR LINUX)
             PRIVATE
               Threads::Threads
               "${ICONV_LIBRARIES}"
-              "${sodium_LIBRARY_RELEASE}")
+              "${sodium_LIBRARY_RELEASE}"
+              "${Jansson_LIBRARIES}")
 endif ()
 if (MACOS)
     target_link_libraries(
@@ -503,6 +509,8 @@ elseif ("${CKB_NEXT_INIT_SYSTEM}" STREQUAL "unknown")
     Supported services are: systemd, launchd, OpenRC, upstart, SysVinit.")
 endif ()
 
+configure_file(hid.json "${CMAKE_BINARY_DIR}/bin/hid.json" COPYONLY)
+
 if (LINUX)
   if (SAFE_INSTALL)
     install(CODE "
@@ -524,6 +532,13 @@ if (LINUX)
   install(
     FILES "${CMAKE_SOURCE_DIR}/linux/udev/99-ckb-next-daemon.rules"
     DESTINATION "${UDEV_RULE_DIRECTORY}"
+    PERMISSIONS
+    OWNER_READ OWNER_WRITE
+    GROUP_READ
+    WORLD_READ)
+  install(
+    FILES "${CMAKE_BINARY_DIR}/bin/hid.json"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ckb-next-daemon/"
     PERMISSIONS
     OWNER_READ OWNER_WRITE
     GROUP_READ

@@ -925,28 +925,28 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         break;
     }
     case KeyMap::K70_CORE_RGB:{
-            map = getMap(KeyMap::K70, layout);
-            map["lock"] = {nullptr, "Lock", "lock", 20, 2, NS, false, true}; // F1 alternate
-            map["profswitch"] = {nullptr, "Profile Switch", "profswitch", 32, 2, 11, 11, false, true}; // F2 alternate
-            map["light"] = {nullptr, "Light", "light", 50, 2, NS, false, true}; // F3 and F4 alternate
-            map["stop"] = {nullptr, "Stop", "stop", 76, 2, 11, 11, false, true}; // F5 alternate
-            map["prev"] = { nullptr,  "Previous", "prev", 88, 2, 11, 11, false, true}; // F6 alternate
-            map["play"] = { nullptr,  "Play", "play", 100, 2, 11, 11, false, true}; // F7 alternate
-            map["next"] = { nullptr,  "Next", "next", 112, 2, 11, 11, false, true}; // F8 alternate
-            map["ctrlwheelb"] = {nullptr, "Wheel", "ctrlwheelb", 168, 2, NS, false, true}; // F12 alternate
+        map = getMap(KeyMap::K70, layout);
+        map["lock"] = {nullptr, "Lock", "lock", 20, 2, NS, false, true}; // F1 alternate
+        map["profswitch"] = {nullptr, "Profile Switch", "profswitch", 32, 2, 11, 11, false, true}; // F2 alternate
+        map["light"] = {nullptr, "Light", "light", 50, 2, NS, false, true}; // F3 and F4 alternate
+        map["stop"] = {nullptr, "Stop", "stop", 76, 2, 11, 11, false, true}; // F5 alternate
+        map["prev"] = { nullptr,  "Previous", "prev", 88, 2, 11, 11, false, true}; // F6 alternate
+        map["play"] = { nullptr,  "Play", "play", 100, 2, 11, 11, false, true}; // F7 alternate
+        map["next"] = { nullptr,  "Next", "next", 112, 2, 11, 11, false, true}; // F8 alternate
+        map["ctrlwheelb"] = {nullptr, "Wheel", "ctrlwheelb", 168, 2, NS, false, true}; // F12 alternate
 
-            // This is the media button that defaults to play
-            // We already have a play Fn button so we want to map it to something else so it can be programmed
-            map["mr"] = { nullptr,  "Macro", "mr", 227, 14, 16, 11, false, true};
+        // This is the media button that defaults to play
+        // We already have a play Fn button so we want to map it to something else so it can be programmed
+        map["mr"] = { nullptr,  "Macro", "mr", 227, 14, 16, 11, false, true};
 
-            // K70 Core RGB has a volume knob that can be pressed
-            map["mute"] = {nullptr,  "Mute", "mute",  259, 14, NS, false, true};
+        // K70 Core RGB has a volume knob that can be pressed
+        map["mute"] = {nullptr,  "Mute", "mute",  259, 14, NS, false, true};
 
-            // Replace rwin with Fn
-            map["fn"] = KStrafeKeys[3];
-            map["fn"].x = map["rwin"].x;
-            map.remove("rwin");
-            break;
+        // Replace rwin with Fn
+        map["fn"] = KStrafeKeys[3];
+        map["fn"].x = map["rwin"].x;
+        map.remove("rwin");
+        break;
     }
     case KeyMap::STRAFE_MK2:{
         map = getMap(KeyMap::K70MK2, layout);

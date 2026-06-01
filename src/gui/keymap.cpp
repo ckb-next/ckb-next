@@ -930,17 +930,23 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
         map["profswitch"] = {nullptr, "Profile Switch", "profswitch", 32, 2, 11, 11, false, true}; // F2 alternate
         map["light"] = {nullptr, "Light", "light", 50, 2, NS, false, true}; // F3 and F4 alternate
         map["stop"] = {nullptr, "Stop", "stop", 76, 2, 11, 11, false, true}; // F5 alternate
-        map["prev"] = { nullptr,  "Previous", "prev", 88, 2, 11, 11, false, true}; // F6 alternate
-        map["play"] = { nullptr,  "Play", "play", 100, 2, 11, 11, false, true}; // F7 alternate
-        map["next"] = { nullptr,  "Next", "next", 112, 2, 11, 11, false, true}; // F8 alternate
-        map["ctrlwheelb"] = {nullptr, "Wheel", "ctrlwheelb", 168, 2, NS, false, true}; // F12 alternate
+        map["prev"] = {nullptr,  "Previous", "prev", 88, 2, 11, 11, false, true}; // F6 alternate
+        map["play"] = {nullptr,  "Play/Pause", "play", 100, 2, 11, 11, false, true}; // F7 alternate
+        map["next"] = {nullptr,  "Next", "next", 112, 2, 11, 11, false, true}; // F8 alternate
 
         // This is the media button that defaults to play
         // We already have a play Fn button so we want to map it to something else so it can be programmed
-        map["mr"] = { nullptr,  "Macro", "mr", 227, 14, 16, 11, false, true};
+        map["g1"] = {nullptr,  "Play/Pause", "g1", 227, 14, NS, false, true};
 
-        // K70 Core RGB has a volume knob that can be pressed
-        map["mute"] = {nullptr,  "Mute", "mute",  259, 14, NS, false, true};
+        // Instead of a "classic" volume barrel/mute button, the K70 CORE RGB has a general-purpose controlwheel, which
+        // is by default bound to "voldn"/"mute"/"volup" for rotation ccw/push/rotation cw respectively.
+        // The dial itself has no led, in HW mode the F12 key is used for indication.
+        map.remove("mute");
+        map.remove("volup");
+        map.remove("voldn");
+        map["ctrlwheelccw"] = {nullptr, "Control Wheel Counterclockwise", "ctrlwheelccw", 248, 14, 6, 16, false, true };
+        map["ctrlwheelb"] = {nullptr, "Control Wheel Button", "ctrlwheelb", 255, 14, NS, false, true };
+        map["ctrlwheelcw"] = {nullptr, "Control Wheel Clockwise", "ctrlwheelcw", 262, 14, 6, 16, false, true };
 
         // Replace rwin with Fn
         map["fn"] = KStrafeKeys[3];

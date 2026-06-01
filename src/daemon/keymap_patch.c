@@ -25,7 +25,6 @@ static const keypatch m95patch[] = {
     { 211+20, "dpiup",  -1, KEY_CORSAIR },
     { 212+20, "dpidn",  -1, KEY_CORSAIR },
     { 218+20, "sniper", -1, KEY_CORSAIR },
-
 };
 
 static const keypatch icwpatch[] = {
@@ -96,9 +95,9 @@ static const keypatch k70propatch[] = {
 };
 
 static const keypatch k70corergbpatch[] = {
-    { 124, "mr",    -1, KEY_CORSAIR },
-    { 127, "play",  -1, KEY_PLAY },
-    { 129, "mute",  -1, KEY_MUTE },
+    { 102, "mute",  -1, KEY_NONE },
+    { 103, "volup", -1, KEY_NONE },
+    { 104, "voldn", -1, KEY_NONE },
 };
 
 static const keypatch scimitarbragipatch[] = {

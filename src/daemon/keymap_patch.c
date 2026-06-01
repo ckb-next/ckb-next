@@ -109,6 +109,13 @@ static const keypatch scimitarbragipatch[] = {
     { 241+20, "thumb",  LED_MOUSE + 3,     KEY_NONE },
 };
 
+static const keypatch scimitarelitesepatch[] = {
+    { 237+20, "back",   LED_MOUSE,         KEY_NONE },
+    { 238+20, "front",  LED_MOUSE + 1,     KEY_NONE },
+    { 239+20, "dpi",    LED_MOUSE + 2,     KEY_NONE },
+    { 240+20, "bottom", LED_MOUSE + 3,     KEY_NONE },
+};
+
 static const keypatch k95platinumxtpatch[] = {
     // Shift the topbar LEDs by one compared to the K100 on the keymap
     { 137, NULL,             -1, KEY_NONE },
@@ -162,6 +169,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_2, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_K70_CORE_RGB_3, k70corergbpatch),
     ADD_PATCH(V_CORSAIR, P_SCIMITAR_ELITE_BRAGI, scimitarbragipatch),
+    ADD_PATCH(V_CORSAIR, P_SCIMITAR_ELITE_SE_U, scimitarelitesepatch),
     ADD_PATCH(V_CORSAIR, P_K95_PLATINUM_XT, k95platinumxtpatch),
 };
 

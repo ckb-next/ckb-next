@@ -143,6 +143,7 @@ void KeyWidget::map(const KeyMap& newMap){
             _overlayPos.setX(1.f);
             break;
         case KeyMap::SCIMITAR:
+        case KeyMap::SCIMITAR_ELITE_SE:
             _currentOverlay.load(":/img/overlay_scimitar.png");
             _overlayPos.setX(10.3f);
             break;
@@ -371,7 +372,7 @@ void KeyWidget::paintGL(){
             if(!strcmp(key.name, "sniper"))
                 // Sniper key uses a reddish base color instead of the usual grey
                 painter.setBrush(QBrush(sniperColor));
-            else if(model == KeyMap::SCIMITAR && !strncmp(key.name, "thumb", 5) && strcmp(key.name, "thumb"))
+            else if((model == KeyMap::SCIMITAR || model == KeyMap::SCIMITAR_ELITE_SE) && !strncmp(key.name, "thumb", 5) && strcmp(key.name, "thumb"))
                 // Thumbgrid keys use a black color
                 painter.setBrush(QBrush(thumbColor));
             else if(!strcmp(key.name, "lsidel") || !strcmp(key.name, "rsidel") || !strcmp(key.name, "logo"))

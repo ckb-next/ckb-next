@@ -36,7 +36,7 @@ int updatedpi_bragi(usbdevice* kb, int force){
 
     // Set the current DPI requested.
     uchar response[BRAGI_JUMBO_SIZE] = {0};
-    uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_SET, BRAGI_DPI_X, 0};
+    uchar pkt[BRAGI_JUMBO_SIZE] = {BRAGI_MAGIC, BRAGI_SET, USES_COMBINED_DPI(kb) ? BRAGI_DPI_COMBINED : BRAGI_DPI_X, 0};
     pkt[4] = newdpi->x[newdpi->current] & 0xFF;
     pkt[5] = (newdpi->x[newdpi->current] >> 8) & 0xFF;
     if(!usbrecv(kb, pkt, sizeof(pkt), response))
@@ -47,11 +47,14 @@ int updatedpi_bragi(usbdevice* kb, int force){
         return -1;
     */
 
-    pkt[2] = BRAGI_DPI_Y;
-    pkt[4] = newdpi->y[newdpi->current] & 0xFF;
-    pkt[5] = (newdpi->y[newdpi->current] >> 8) & 0xFF;
-    if(!usbrecv(kb, pkt, sizeof(pkt), response))
-        return -2;
+    // Don't send Y if device uses combined value
+    if(!USES_COMBINED_DPI(kb)){
+        pkt[2] = BRAGI_DPI_Y;
+        pkt[4] = newdpi->y[newdpi->current] & 0xFF;
+        pkt[5] = (newdpi->y[newdpi->current] >> 8) & 0xFF;
+        if(!usbrecv(kb, pkt, sizeof(pkt), response))
+            return -2;
+    }
 
     /*
     if(bragi_check_success(pkt, response))

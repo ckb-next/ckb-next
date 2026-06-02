@@ -540,7 +540,8 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[HW_I_COUNT
         }
     }
     if(iEnable[LOCK]){
-        if(bind()->winLock())
+        // Light the lock indicator when either WinLock or Cats Lock is active.
+        if(bind()->winLock() || bind()->catsLockActive())
             lightIndicator("lock", iColor[LOCK][0].rgba());
         else
             lightIndicator("lock", iColor[LOCK][1].rgba());

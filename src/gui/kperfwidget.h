@@ -6,6 +6,7 @@
 #include <QComboBox>
 #include "kbperf.h"
 #include "kbprofile.h"
+#include "kbbind.h"
 #include "colorbutton.h"
 
 namespace Ui {
@@ -20,7 +21,7 @@ public:
     explicit KPerfWidget(QWidget *parent = nullptr);
     ~KPerfWidget();
 
-    void setPerf(KbPerf* newPerf, KbProfile* newProfile);
+    void setPerf(KbPerf* newPerf, KbProfile* newProfile, KbBind* newBind);
 
     static const int I_COUNT = KbPerf::I_COUNT;
     static const int HW_I_COUNT = KbPerf::HW_I_COUNT;
@@ -32,6 +33,7 @@ private:
 
     KbPerf* perf;
     KbProfile* profile;
+    KbBind* bind;
 
     // Hardware indicator dropdowns
     enum HwMode {
@@ -62,6 +64,8 @@ private slots:
     void uiUpdated(int index);
     void on_intensityBox_valueChanged(int arg1);
     void on_copyButton_clicked();
+    void on_catsLockBox_toggled(bool checked);
+    void on_catsLockActiveChanged(bool active);
 };
 
 #endif // KPERFWIDGET_H

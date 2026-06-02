@@ -3,6 +3,7 @@
 #include "notify.h"
 #include "usb.h"
 #include "nxp_proto.h"
+#include "m65_ultra_proto.h"
 
 #define FW_OK       0
 #define FW_NOFILE   -1

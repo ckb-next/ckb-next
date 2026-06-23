@@ -159,6 +159,12 @@ void KbLightWidget::changeAnim(KbAnim *newAnim){
     keyWidget->setAnimationToSelection();
 }
 
+void KbLightWidget::on_restartButton_clicked() {
+    if (light) {
+        light->restartAnimation();
+    }
+}
+
 void KbLightWidget::changeAnimKeys(const QStringList& keys){
     keyWidget->setAnimation(keys);
 }

@@ -42,6 +42,7 @@ private slots:
     void toggleM95Light();
 
     void stateChange(Qt::ApplicationState state);
+    void on_restartButton_clicked();
 
 private:
     KbLight* light;

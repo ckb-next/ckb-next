@@ -119,6 +119,75 @@ int updatedpi(usbdevice* kb, int force){
         return 0;
     lastdpi->forceupdate = newdpi->forceupdate = 0;
 
+    // M65 RGB Ultra uses different DPI protocol
+    if(kb->product == P_M65_RGB_ULTRA){
+        ckb_info("M65 Ultra DPI: current=%d, stages: 0=%d/%d 1=%d/%d 2=%d/%d 3=%d/%d 4=%d/%d 5=%d/%d enabled=0x%02x",
+                 newdpi->current,
+                 newdpi->x[0], newdpi->y[0],
+                 newdpi->x[1], newdpi->y[1],
+                 newdpi->x[2], newdpi->y[2],
+                 newdpi->x[3], newdpi->y[3],
+                 newdpi->x[4], newdpi->y[4],
+                 newdpi->x[5], newdpi->y[5],
+                 newdpi->enabled);
+
+        // M65 RGB Ultra: Use SIMPLE format for DPI control
+        // Format: 08 01 21 00 VV VV (X DPI, 16-bit LE)
+        //         08 01 22 00 VV VV (Y DPI, 16-bit LE)
+        // Changes apply IMMEDIATELY - NO COMMIT needed!
+        //
+        // Set the DPI for the current stage
+        int stage = newdpi->current;
+        if(stage < 0 || stage >= DPI_COUNT){
+            ckb_warn("M65 Ultra: Invalid DPI stage %d", stage);
+            return -1;
+        }
+
+        ushort x_dpi = newdpi->x[stage];
+        ushort y_dpi = newdpi->y[stage];
+
+        ckb_info("M65 Ultra: Setting stage %d DPI to %d/%d", stage, x_dpi, y_dpi);
+
+        // Set X DPI
+        uchar x_pkt[MSG_SIZE] = { 0x08, 0x01, 0x21, 0x00,
+                                   (uchar)(x_dpi & 0xFF),
+                                   (uchar)((x_dpi >> 8) & 0xFF), 0 };
+        if(!usbsend(kb, x_pkt, sizeof(x_pkt), 1)){
+            ckb_warn("M65 Ultra: Failed to set X DPI");
+            return -1;
+        }
+
+        // Set Y DPI
+        uchar y_pkt[MSG_SIZE] = { 0x08, 0x01, 0x22, 0x00,
+                                   (uchar)(y_dpi & 0xFF),
+                                   (uchar)((y_dpi >> 8) & 0xFF), 0 };
+        if(!usbsend(kb, y_pkt, sizeof(y_pkt), 1)){
+            ckb_warn("M65 Ultra: Failed to set Y DPI");
+            return -1;
+        }
+
+        ckb_info("M65 Ultra: DPI set successfully (no commit needed)");
+
+        // Update DPI indicator LED color based on current stage
+        // DPI stage colors are stored at DPI_RGB_START + stage_index
+        // Copy to LED_DPI for display
+        newlight->r[LED_DPI] = newlight->r[DPI_RGB_START + stage];
+        newlight->g[LED_DPI] = newlight->g[DPI_RGB_START + stage];
+        newlight->b[LED_DPI] = newlight->b[DPI_RGB_START + stage];
+
+        ckb_info("M65 Ultra: DPI indicator color set to stage %d: %02x %02x %02x",
+                 stage,
+                 newlight->r[LED_DPI],
+                 newlight->g[LED_DPI],
+                 newlight->b[LED_DPI]);
+
+        // Trigger RGB update to send new DPI indicator color
+        newlight->forceupdate = 1;
+
+        memcpy(lastdpi, newdpi, sizeof(dpiset));
+        return 0;
+    }
+
     if (newdpi->current != lastdpi->current || force) {
         // Before we switch the current DPI stage, make sure the stage we are
         // switching to is both enabled and configured to the correct DPI.
@@ -299,3 +368,4 @@ int loaddpi(usbdevice* kb, dpiset* dpi, lighting* light){
     light->b[LED_MOUSE + 2] = light->b[LED_MOUSE + N_MOUSE_ZONES + dpi->current];
     return 0;
 }
+

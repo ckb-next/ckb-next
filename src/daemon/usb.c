@@ -18,6 +18,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_M65, 8200 },
     { P_M65_PRO, 12000 },
     { P_M65_RGB_ELITE, 18000 },
+    { P_M65_RGB_ULTRA_WL, 26000 },
     { P_M95, 8200 },
     { P_GLAIVE, 16000 },
     { P_SABRE_O, 6400 },
@@ -102,6 +103,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_M65, },
     { V_CORSAIR, P_M65_PRO, },
     { V_CORSAIR, P_M65_RGB_ELITE, },
+    { V_CORSAIR, P_M65_RGB_ULTRA_WL, },
     { V_CORSAIR, P_M95, },
     { V_CORSAIR, P_GLAIVE, },
     { V_CORSAIR, P_SABRE_O, },
@@ -139,6 +141,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_ST100, },
     // Misc
     { V_CORSAIR, P_GENERIC_BRAGI_DONGLE, },
+    { V_CORSAIR, P_GENERIC_BRAGI_DONGLE_2, },
 };
 
 const size_t N_MODELS = sizeof(models) / sizeof(device_desc);
@@ -252,6 +255,9 @@ const char* product_str(ushort product){
         return "m65";
     if(product == P_M65_RGB_ELITE)
         return "m65e";
+    // Reuse the M65 RGB Elite layout in the GUI for now
+    if(product == P_M65_RGB_ULTRA_WL)
+        return "m65e";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO || product == P_SCIMITAR_ELITE || product == P_SCIMITAR_ELITE_BRAGI)
@@ -281,7 +287,7 @@ const char* product_str(ushort product){
         return "darkcore";
     if(product == P_ST100)
         return "st100";
-    if(product == P_GENERIC_BRAGI_DONGLE)
+    if(product == P_GENERIC_BRAGI_DONGLE || product == P_GENERIC_BRAGI_DONGLE_2)
         return "bragi_dongle";
     if(product == P_MM700)
         return "mm700";

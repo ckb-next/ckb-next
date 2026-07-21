@@ -212,6 +212,8 @@ static inline char* bragi_wl_string(usbdevice* kb){
         return "CORSAIR DARK CORE RGB PRO Gaming Mouse";
     case P_DARK_CORE_RGB_PRO_SE:
         return "CORSAIR DARK CORE RGB PRO SE Gaming Mouse";
+    case P_M65_RGB_ULTRA_WL:
+        return "CORSAIR M65 RGB ULTRA WIRELESS Gaming Mouse";
     default:
         ckb_err("Unknown product 0x%hx", kb->product);
         return NULL;

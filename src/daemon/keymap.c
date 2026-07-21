@@ -1270,6 +1270,18 @@ const unsigned char m55_wl_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
 };
 
 
+// Same as corsair_bragi_lut except sniper is at bit 7
+const unsigned char m65_ultra_wl_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
+    0x00,
+    0x01,
+    0x02,
+    0x04, // forwards
+    0x03, // backwards
+    0x05, // dpi up
+    0x06, // dpi down
+    0x07, // sniper
+};
+
 const unsigned char scimitar_bragi_lut[BRAGI_THREE_BYTE_MOUSE_BUTTONS] = {
     0x00,
     0x01,
@@ -1302,12 +1314,14 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
 
     // Some devices only have one byte, so set those to 8 buttons. Others have three.
     // We need a better way to identify this
-    if(kb->vendor == V_CORSAIR && (kb->product == P_M55_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U || kb->product == P_DARK_CORE_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_WL)) {
+    if(kb->vendor == V_CORSAIR && (kb->product == P_M55_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U || kb->product == P_DARK_CORE_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_WL || kb->product == P_M65_RGB_ULTRA_WL)) {
         buttons = BRAGI_ONE_BYTE_MOUSE_BUTTONS;
         if(kb->vendor == V_CORSAIR && kb->product == P_HARPOON_WL_U)
             lut = harpoon_wl_lut;
         else if(kb->vendor == V_CORSAIR && kb->product == P_M55_RGB_PRO)
             lut = m55_wl_lut;
+        else if(kb->vendor == V_CORSAIR && kb->product == P_M65_RGB_ULTRA_WL)
+            lut = m65_ultra_wl_lut;
     } else if (kb->vendor == V_CORSAIR && (kb->product == P_SCIMITAR_ELITE_BRAGI)) {
         buttons = BRAGI_THREE_BYTE_MOUSE_BUTTONS;
         if(kb->vendor == V_CORSAIR && kb->product == P_SCIMITAR_ELITE_BRAGI)

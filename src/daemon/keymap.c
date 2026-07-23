@@ -1245,6 +1245,28 @@ const unsigned char corsair_bragi_lut[BRAGI_MOUSE_BUTTONS] = {
     0x0F,
 };
 
+// IRONCLAW RGB Wireless-specific LUT
+// Bits 0-6 match the generic LUT, but bits 7-9 map to profup, profdn, optbtn
+// instead of thumb1, thumb2, sniper which don't exist on this mouse.
+const unsigned char ironclaw_wl_lut[BRAGI_MOUSE_BUTTONS] = {
+    0x00, // bit 0  → mouse1 (left)
+    0x01, // bit 1  → mouse2 (right)
+    0x02, // bit 2  → mouse3 (middle)
+    0x04, // bit 3  → mouse5 (forward thumb)
+    0x03, // bit 4  → mouse4 (back thumb)
+    0x05, // bit 5  → dpiup (thumb side)
+    0x06, // bit 6  → dpidn (thumb side)
+    0x14, // bit 7  → profup (behind scroll, position 20)
+    0x17, // bit 8  → profdn (behind scroll, position 23)
+    0x15, // bit 9  → optbtn (thumb, position 21)
+    0x0A, // bit 10 → unused
+    0x0B, // bit 11 → unused
+    0x0C, // bit 12 → unused
+    0x0D, // bit 13 → unused
+    0x0E, // bit 14 → unused
+    0x0F, // bit 15 → unused
+};
+
 // DPI cycle/up and forwards are just swapped compared to corsair_bragi_lut
 const unsigned char harpoon_wl_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
     0x00,
@@ -1312,6 +1334,8 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
         buttons = BRAGI_THREE_BYTE_MOUSE_BUTTONS;
         if(kb->vendor == V_CORSAIR && kb->product == P_SCIMITAR_ELITE_BRAGI)
             lut = scimitar_bragi_lut;
+    } else if (kb->vendor == V_CORSAIR && (kb->product == P_IRONCLAW_W_U || kb->product == P_IRONCLAW_W_D)) {
+        lut = ironclaw_wl_lut;
     }
 
     for(int bit = 0; bit < buttons; bit++){

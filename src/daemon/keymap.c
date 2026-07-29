@@ -730,6 +730,40 @@ static inline void handle_bragi_media_keys(usbdevice* targetkb){
                 if(matched)
                     CLEAR_KEYBIT(targetkb->input.keys, 122);
             }
+        }else if(IS_K70CORERGBTKL(targetkb)){
+            // if Fn is pressed
+            if(ISSET_KEYBIT(targetkb->input.keys, 122)){
+                bool matched = true;
+                if(ISSET_KEYBIT(targetkb->input.keys, 58)) { // F1 -> scroll lock
+                    CLEAR_KEYBIT(targetkb->input.keys, 58);
+                    SET_KEYBIT(targetkb->input.keys, 71);
+                } else if (ISSET_KEYBIT(targetkb->input.keys, 59)) { // F2 -> profile switch
+                    CLEAR_KEYBIT(targetkb->input.keys, 59);
+                    SET_KEYBIT(targetkb->input.keys, 128);
+                } else if(ISSET_KEYBIT(targetkb->input.keys, 62)) { // F5 -> stop
+                    CLEAR_KEYBIT(targetkb->input.keys, 62);
+                    SET_KEYBIT(targetkb->input.keys, 123);
+                } else if(ISSET_KEYBIT(targetkb->input.keys, 63)) { // F6 -> prev
+                    CLEAR_KEYBIT(targetkb->input.keys, 63);
+                    SET_KEYBIT(targetkb->input.keys, 126);
+                } else if (ISSET_KEYBIT(targetkb->input.keys, 64)) { // F7 -> play/pause
+                    CLEAR_KEYBIT(targetkb->input.keys, 64);
+                    SET_KEYBIT(targetkb->input.keys, 124);
+                } else if (ISSET_KEYBIT(targetkb->input.keys, 65)) { // F8 -> next
+                    CLEAR_KEYBIT(targetkb->input.keys, 65);
+                    SET_KEYBIT(targetkb->input.keys, 125);
+                } else if (ISSET_KEYBIT(targetkb->input.keys, 66)) { // F9 -> winlock
+                    CLEAR_KEYBIT(targetkb->input.keys, 66);
+                    SET_KEYBIT(targetkb->input.keys, 114);
+                } else if (ISSET_KEYBIT(targetkb->input.keys, 69)) { // F12 -> mode toggle (map to ctrlwheelb)
+                    CLEAR_KEYBIT(targetkb->input.keys, 69);
+                    SET_KEYBIT(targetkb->input.keys, 137);
+                } else {
+                    matched = false;
+                }
+                if(matched)
+                    CLEAR_KEYBIT(targetkb->input.keys, 122);
+            }
         }
     }
 }

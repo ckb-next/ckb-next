@@ -300,6 +300,20 @@ static const Key K55PROZones[] = {
 };
 #define K55PRO_ZONES (sizeof(K55PROZones) / sizeof(Key))
 
+static const Key K55COREZones[] = {
+    {nullptr, "Zone 1",  "zone1",   14, 45, 28, 82, true, false},
+    {nullptr, "Zone 2",  "zone2",   42, 45, 28, 82, true, false},
+    {nullptr, "Zone 3",  "zone3",   70, 45, 28, 82, true, false},
+    {nullptr, "Zone 4",  "zone4",   98, 45, 28, 82, true, false},
+    {nullptr, "Zone 5",  "zone5",  126, 45, 28, 82, true, false},
+    {nullptr, "Zone 6",  "zone6",  154, 45, 28, 82, true, false},
+    {nullptr, "Zone 7",  "zone7",  182, 45, 28, 82, true, false},
+    {nullptr, "Zone 8",  "zone8",  210, 45, 28, 82, true, false},
+    {nullptr, "Zone 9",  "zone9",  238, 45, 28, 82, true, false},
+    {nullptr, "Zone 10", "zone10", 266, 45, 28, 82, true, false},
+};
+#define K55CORE_ZONES (sizeof(K55COREZones) / sizeof(Key))
+
 // Strafe has side lights
 #define KSTRAFE_X_START     12
 #define KSTRAFE_WIDTH       (K70_WIDTH + (KSTRAFE_X_START * 2))
@@ -1267,6 +1281,17 @@ static QHash<QString, Key> getMap(KeyMap::Model model, KeyMap::Layout layout){
             map[key->name] = *key;
         break;
     }
+    case KeyMap::K55CORE:{
+        map = getMap(KeyMap::K70, layout);
+        QMutableHashIterator<QString, Key> i(map);
+        while(i.hasNext()){
+            i.next();
+            i.value().hasLed = false;
+        }
+        for(const Key* key = K55COREZones; key < K55COREZones + K55CORE_ZONES; key++)
+            map[key->name] = *key;
+        break;
+    }
     case KeyMap::M65:{
         // M65 isn't a keyboard; all mouse maps are unique.
         for(const Key* key = M65Keys; key < M65Keys + KEYCOUNT_M65; key++){
@@ -1720,6 +1745,8 @@ KeyMap::Model KeyMap::getModel(const QString& name){
         return GLAIVEPRO;
     if(lower == "k55pro")
         return K55PRO;
+    if(lower == "k55core")
+        return K55CORE;
     if(lower == "bragi_dongle")
         return BRAGI_DONGLE;
     if(lower == "k100")
@@ -1739,6 +1766,8 @@ QString KeyMap::getModel(KeyMap::Model model){
         return "k55";
     case K55PRO:
         return "k55pro";
+    case K55CORE:
+        return "k55core";
     case K57_WL:
         return "k57_wireless";
     case K60:
@@ -1853,6 +1882,7 @@ int KeyMap::modelWidth(Model model){
     case K70:
     case K70MK2:
     case K70_PRO:
+    case K55CORE:
         return K70_WIDTH;
     case K95:
     case K95L:
@@ -1900,6 +1930,7 @@ int KeyMap::modelHeight(Model model){
     switch(model){
     case K55:
     case K55PRO:
+    case K55CORE:
     case K57_WL:
     case K63:
     case K63_WL:

@@ -39,6 +39,8 @@ static int setactive_bragi(usbdevice* kb, int active){
     if(active == BRAGI_MODE_HARDWARE){
         bragi_close_handle(kb, BRAGI_LIGHTING_HANDLE);
         bragi_close_handle(kb, BRAGI_2ND_LIGHTING_HANDLE);
+        if(kb->product == P_K55_CORE)
+            bragi_close_handle(kb, BRAGI_GENERIC_HANDLE);
     }
 
     const int ckb_id = INDEX_OF(kb, keyboard);
@@ -77,6 +79,18 @@ static int setactive_bragi(usbdevice* kb, int active){
         } else {
             ckb_err("ckb%d: Failed to allocate memory for bragi poll thread", ckb_id);
         }
+    }
+
+    if(kb->product == P_K55_CORE){
+        int light = bragi_open_handle(kb, BRAGI_GENERIC_HANDLE, BRAGI_RES_ALT_LIGHTING);
+        if(light < 0)
+            return light;
+        if(light){
+            ckb_err("ckb%d: K55 CORE light init returned error 0x%hhx", ckb_id, (uchar)light);
+            return light;
+        }
+        kb->vtable.updatergb = updatergb_k55core_bragi;
+        return 0;
     }
 
     // The daemon will always send RGB data through handle 0 (), so go ahead and open it
@@ -172,13 +186,15 @@ static int start_bragi_common(usbdevice* kb){
     if(prop >= 0)
         kb->bldversion = bragi_fwver_bswap(prop);
 
-    prop = bragi_get_property(kb, BRAGI_RADIO_APP_VER);
-    if(prop >= 0)
-        kb->radioappversion = bragi_fwver_bswap(prop);
+    if(IS_WIRELESS_DEV(kb)){
+        prop = bragi_get_property(kb, BRAGI_RADIO_APP_VER);
+        if(prop >= 0)
+            kb->radioappversion = bragi_fwver_bswap(prop);
 
-    prop = bragi_get_property(kb, BRAGI_RADIO_BLD_VER);
-    if(prop >= 0)
-        kb->radiobldversion = bragi_fwver_bswap(prop);
+        prop = bragi_get_property(kb, BRAGI_RADIO_BLD_VER);
+        if(prop >= 0)
+            kb->radiobldversion = bragi_fwver_bswap(prop);
+    }
 
     // Get pollrate
     prop = bragi_get_property(kb, BRAGI_POLLRATE);
@@ -402,4 +418,3 @@ void cmd_pair_bragi(usbdevice* kb, usbmode* mode, int dummy1, int dummy2, const 
     }
     free(devices);
 }
-

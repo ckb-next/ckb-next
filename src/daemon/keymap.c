@@ -602,7 +602,7 @@ static inline void handle_bragi_key_input(unsigned char* kbinput, const unsigned
         } else {
             ckb_warn("Unhandled NKRO_KEY_IN length %d in handle_bragi_key_input(), international keys will not function", length);
         }
-    } else if(urbinput[0] == NKRO_MEDIA_IN && (length == 3 || length == 5)) {
+    } else if(urbinput[0] == NKRO_MEDIA_IN && (length == 3 || length == 5 || length == 16)) {
         // This section is similar to handle_nkro_media_keys(), but with different indices due to the different keymap
         // This works because these keys can not be pressed at the same time
         CLEAR_KEYBIT(kbinput, 125);         // next
@@ -1335,4 +1335,3 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
     urbinput++;
     input->whl_rel_y = (signed char)*urbinput;
 }
-

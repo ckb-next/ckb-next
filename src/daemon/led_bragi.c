@@ -39,6 +39,7 @@ static inline size_t bragi_led_count(usbdevice* kb){
     LED_CASE_M(P_M55_RGB_PRO, 2);
     LED_CASE_K(P_K55_PRO, 6);
     LED_CASE_K(P_K55_PRO_XT, 137);
+    LED_CASE_K(P_K55_CORE, 10);
     LED_CASE_M(P_DARK_CORE_RGB_PRO, 12);
     LED_CASE_M(P_DARK_CORE_RGB_PRO_SE, 12);
     LED_CASE_K(P_K100_OPTICAL, 193);
@@ -167,4 +168,35 @@ static inline int updatergb_alt_bragi(usbdevice* kb, int force){
 
 int updatergb_keyboard_bragi_alt(usbdevice* kb, int force){
     return updatergb_alt_bragi(kb, force);
+}
+
+int updatergb_k55core_bragi(usbdevice* kb, int force){
+    if(!kb->active)
+        return 0;
+
+    lighting* lastlight = &kb->profile->lastlight;
+    lighting* newlight = &kb->profile->currentmode->light;
+    const size_t zones = 10;
+
+    if(!force && !lastlight->forceupdate && !newlight->forceupdate
+            && !rgbcmp(lastlight, newlight, zones, 0))
+        return 0;
+
+    // K55 CORE uses alternate lighting resource 0x22 on handle 1. Its
+    // payload is 0x12, 0x00, three performance-mode bytes, then ten
+    // interleaved RGB triplets.
+    uchar pkt[BRAGI_JUMBO_SIZE] = {0};
+    pkt[7] = 0x12;
+    for(size_t i = 0; i < zones; i++){
+        pkt[12 + i * 3] = newlight->r[i];
+        pkt[13 + i * 3] = newlight->g[i];
+        pkt[14 + i * 3] = newlight->b[i];
+    }
+
+    if(bragi_write_to_handle(kb, pkt, BRAGI_GENERIC_HANDLE, sizeof(pkt), 35))
+        return 1;
+
+    lastlight->forceupdate = newlight->forceupdate = 0;
+    memcpy(lastlight, newlight, sizeof(lighting));
+    return 0;
 }

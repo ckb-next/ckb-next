@@ -347,6 +347,8 @@ void Kb::load(){
             demoProfile = ":/txt/demoprofile_nightsword.ini";
         else if(map.model() == KeyMap::K55PRO)
             demoProfile = ":/txt/demoprofile_k55pro.ini";
+        else if(map.model() == KeyMap::K55CORE)
+            demoProfile = ":/txt/demoprofile_k55pro.ini";
         else if(map.model() == KeyMap::MM700)
             demoProfile = ":/txt/demoprofile_mm700.ini";
         QSettings demoSettings(demoProfile, QSettings::IniFormat, this);

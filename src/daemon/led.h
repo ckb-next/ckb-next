@@ -16,6 +16,7 @@ void apply_hwanim(usbdevice* kb, short zone, uchar anim, uchar speed, uchar rand
 int updatergb_mouse_bragi(usbdevice* kb, int force);
 int updatergb_keyboard_bragi(usbdevice* kb, int force);
 int updatergb_keyboard_bragi_alt(usbdevice* kb, int force);
+int updatergb_k55core_bragi(usbdevice* kb, int force);
 
 // Saves RGB data to device memory. Returns 0 on success.
 int savergb_kb(usbdevice* kb, lighting* light, int mode);

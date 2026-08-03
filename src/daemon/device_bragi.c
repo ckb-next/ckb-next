@@ -276,7 +276,14 @@ int start_keyboard_bragi(usbdevice* kb, int makeactive){
         kb->layout = LAYOUT_UNKNOWN;
     }
 
-    if(makeactive)
+    // Unlike other wired Bragi keyboards, the K55 CORE does not remain usable
+    // through its hardware-mode NKRO reports after we claim its interfaces and
+    // probe the protocol. The GUI used to hide this by issuing `active` as soon
+    // as it opened the command FIFO. Start this device in software mode in the
+    // daemon so basic input is available at boot and graphical login screens.
+    if(kb->product == P_K55_CORE && !makeactive)
+        ckb_info("ckb%d: Enabling K55 CORE software mode for input without a GUI", INDEX_OF(kb, keyboard));
+    if(makeactive || kb->product == P_K55_CORE)
         if(setactive_bragi(kb, BRAGI_MODE_SOFTWARE))
             return 1;
     return 0;

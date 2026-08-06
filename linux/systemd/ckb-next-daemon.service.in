@@ -7,6 +7,14 @@ Description=Corsair Keyboards and Mice Daemon
 [Service]
 ExecStart=@CMAKE_INSTALL_PREFIX@/bin/ckb-next-daemon
 Restart=on-failure
+ProtectSystem=Full
+ProtectHome=True
+PrivateNetwork=True
+RestrictSUIDSGID=True
+NoNewPrivileges=True
+RestrictNamespaces=True
+ProtectControlGroups=True
+MemoryDenyWriteExecute=True
 
 [Install]
 WantedBy=multi-user.target

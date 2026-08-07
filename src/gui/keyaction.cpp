@@ -73,7 +73,7 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
         return "$lock:0";
     // DPI buttons
     if(key == "dpiup"){
-        if(model == KeyMap::M55 || model == KeyMap::HARPOON || model == KeyMap::GLAIVE || model == KeyMap::IRONCLAW)
+        if(model == KeyMap::M55 || model == KeyMap::HARPOON || model == KeyMap::GLAIVE || model == KeyMap::IRONCLAW || model == KeyMap::IRONCLAW_W)
             return "$dpi:-4";
         return "$dpi:-2";
     }
@@ -81,7 +81,11 @@ QString KeyAction::defaultAction(const QString& key, KeyMap::Model model){
         return "$dpi:-1";
     if(key == "sniper")
         return "$dpi:0";
+    if(key == "optbtn")
+        return "$dpi:0";
     if(key == "profswitch")
+        return "$mode:-3";
+    if(key == "profup")
         return "$mode:-3";
     if(key == "profdn")
         return "$mode:-4";

@@ -28,6 +28,9 @@ static const keypatch m95patch[] = {
 };
 
 static const keypatch icwpatch[] = {
+    { 232, "optbtn",              -1, KEY_CORSAIR },
+    { 233, "profup",              -1, KEY_CORSAIR },
+    { 234, "profdn",              -1, KEY_CORSAIR },
     { 237+20, "back",  LED_MOUSE,     KEY_NONE },
     { 238+20, "wheel", LED_MOUSE + 1, KEY_NONE },
     { 239+20, "front", LED_MOUSE + 2, KEY_NONE },

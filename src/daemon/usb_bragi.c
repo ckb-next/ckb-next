@@ -26,8 +26,8 @@ void bragi_fill_input_eps(usbdevice* kb)
     if(kb->vendor == V_CORSAIR){
         switch(kb->product){
             case P_K57_D:
-                kb->bragi_out_ep = 0x2;
-                kb->bragi_in_ep = 0x82;
+                kb->input_endpoints[0] = 0x81; // Endpoint 1 (Keystrokes / Media)
+                kb->input_endpoints[1] = 0x84; // Endpoint 4 (Bragi Status Checks)
                 break;
             case P_K57_U:
             case P_K55_PRO:

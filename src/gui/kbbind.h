@@ -79,6 +79,15 @@ public:
     inline bool winLock()                   { return _winLock; }
     void        winLock(bool newWinLock)    { _winLock = newWinLock; _needsUpdate = true; }
 
+    // Cats Lock: when mode is enabled the WinLock (lock) key toggles a full
+    // keyboard lockdown — every key is silenced except the lock key itself,
+    // so only the user (not the cat) can unlock it from the GUI.
+    // _catsLockMode is persisted per profile; _catsLockActive is runtime-only.
+    inline bool catsLockMode()   const { return _catsLockMode; }
+    inline bool catsLockActive() const { return _catsLockActive; }
+    void        setCatsLockMode(bool enable);
+    void        setCatsLockActive(bool active);
+
     // Updates bindings to the driver. Write "mode %d" first.
     // By default, nothing will be written unless bindings have changed. Use force = true or call setNeedsUpdate() to override.
     void        update(QFile& cmd, int notify, bool force = false);
@@ -109,6 +118,8 @@ signals:
     void didLoad();
     void layoutChanged();
     void updated();
+    // Fired whenever the keyboard flips between locked and unlocked at runtime.
+    void catsLockActiveChanged(bool active);
 
 private:
     Kb* _devParent;
@@ -132,6 +143,8 @@ private:
     QHash<QString, KeyAction*> _bind;
 
     bool _winLock;
+    bool _catsLockMode;   ///< persisted: is Cats Lock configured for this mode?
+    bool _catsLockActive; ///< runtime only: is the keyboard currently locked?
     bool _needsUpdate;
     bool _needsSave;
     friend class KeyAction;

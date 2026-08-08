@@ -430,7 +430,19 @@
      </property>
     </widget>
    </item>
-   <item row="33" column="1">
+   <item row="33" column="1" colspan="11">
+    <widget class="QCheckBox" name="catsLockBox">
+     <property name="text">
+      <string>Cats Lock: WinLock key locks all other keys</string>
+     </property>
+     <property name="toolTip">
+      <string>When enabled, pressing the WinLock key silences every other key.
+Press WinLock again to unlock. Useful for stopping cats and other
+small animals from typing. Uncheck this box to disable the feature.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="34" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -1124,6 +1136,7 @@
   <tabstop>scrollBox</tabstop>
   <tabstop>scrollColorOn</tabstop>
   <tabstop>scrollColorOff</tabstop>
+  <tabstop>catsLockBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>

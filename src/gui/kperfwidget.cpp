@@ -10,7 +10,8 @@
 ///
 KPerfWidget::KPerfWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::KPerfWidget)
+    ui(new Ui::KPerfWidget),
+    perf(nullptr), profile(nullptr), bind(nullptr)
 {
     ui->setupUi(this);
     // Set up indicators
@@ -135,9 +136,23 @@ void KPerfWidget::mode2Raw(HwMode mode, bool& sw_enable, i_hw& hw_enable){
     }
 }
 
-void KPerfWidget::setPerf(KbPerf* newPerf, KbProfile* newProfile){
+void KPerfWidget::setPerf(KbPerf* newPerf, KbProfile* newProfile, KbBind* newBind){
     perf = newPerf;
     profile = newProfile;
+    bind = newBind;
+
+    // Cats Lock: sync checkbox and connect the runtime-active signal.
+    // Disconnect first to avoid duplicate connections on mode switch.
+    disconnect(bind, &KbBind::catsLockActiveChanged,
+               this, &KPerfWidget::on_catsLockActiveChanged);
+    // Block signals while syncing checkbox state so we don't call setCatsLockMode
+    // back on a bind that already has the correct value.
+    ui->catsLockBox->blockSignals(true);
+    ui->catsLockBox->setChecked(bind->catsLockMode());
+    ui->catsLockBox->blockSignals(false);
+    on_catsLockActiveChanged(bind->catsLockActive()); // update label immediately
+    connect(bind, &KbBind::catsLockActiveChanged,
+            this, &KPerfWidget::on_catsLockActiveChanged);
     // Set intensity
     ui->intensityBox->setValue(std::round(perf->iOpacity() * 100.f));
     // Set hardware indicator values
@@ -230,6 +245,19 @@ void KPerfWidget::on_intensityBox_valueChanged(int arg1){
     if(!perf)
         return;
     perf->iOpacity(arg1 / 100.f);
+}
+
+void KPerfWidget::on_catsLockBox_toggled(bool checked){
+    if(!bind)
+        return;
+    bind->setCatsLockMode(checked);
+}
+
+void KPerfWidget::on_catsLockActiveChanged(bool active){
+    // Update the checkbox label so the current lock state is always visible.
+    ui->catsLockBox->setText(active
+        ? tr("Cats Lock: keyboard is LOCKED (press WinLock to unlock)")
+        : tr("Cats Lock: WinLock key locks all other keys"));
 }
 
 void KPerfWidget::on_copyButton_clicked(){

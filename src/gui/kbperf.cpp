@@ -508,6 +508,21 @@ void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[HW_I_COUNT
                 }
             }
         }
+        else if (this->modeParent()->bind()->map().model() == KeyMap::SABREPRO) {
+            // Replicate the firmware's sliding meter on the 3-LED DPI bar
+            // (stages 1..5 -> x-- xx- -x- -xx --x, dpiw1..3 = bottom to top).
+            // Unlit LEDs are painted black so the position stays legible over
+            // animations, matching what the bar looks like in hardware mode.
+            static const bool sabreBar[5][3] = {
+                {1,0,0}, {1,1,0}, {0,1,0}, {0,1,1}, {0,0,1}
+            };
+            int row = index - 1;
+            if(row < 0) row = 0;
+            if(row > 4) row = 4;
+            const char* barNames[3] = {"dpiw1", "dpiw2", "dpiw3"};
+            for(int i = 0; i < 3; i++)
+                lightIndicator(barNames[i], sabreBar[row][i] ? dpiClr[index].rgba() : qRgb(0, 0, 0));
+        }
     }
     // KB indicators
     // Disable the M indicators for the K70MK2, the STRAFE_MK2, and the K70_TKL.

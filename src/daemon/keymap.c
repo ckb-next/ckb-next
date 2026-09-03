@@ -1126,7 +1126,9 @@ void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urbinput){
 #define BUTTON_HID_COUNT    5
 
 void hid_bragi_short_mouse_translate(usbinput* input, int length, const unsigned char* urbinput){
-    if(length != 6){
+    // The Scimitar Elite sends exactly 6 bytes; the SABRE RGB PRO sends 11 with
+    // the same button/movement/wheel layout in the first 6 (trailing bytes unused).
+    if(length < 6){
         ckb_err("Invalid bragi short length %d", length);
         return;
     }

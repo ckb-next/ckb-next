@@ -14,6 +14,7 @@
 // Values taken from the official website
 // Mice not in the list default to 12000 in the GUI
 const dpi_list mouse_dpi_list[] = {
+    { P_SABRE_RGB_PRO, 18000 },
     { P_M55_RGB_PRO, 12400 },
     { P_M65, 8200 },
     { P_M65_PRO, 12000 },
@@ -98,6 +99,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_K100_OPTICAL_VARIANT, },
     { V_CORSAIR, P_K65_MINI, },
     // Mice
+    { V_CORSAIR, P_SABRE_RGB_PRO, },
     { V_CORSAIR, P_M55_RGB_PRO, },
     { V_CORSAIR, P_M65, },
     { V_CORSAIR, P_M65_PRO, },
@@ -248,6 +250,8 @@ const char* product_str(ushort product){
         return "m95";
     if(product == P_M55_RGB_PRO)
         return "m55";
+    if(product == P_SABRE_RGB_PRO)
+        return "sabrepro";
     if(product == P_M65 || product == P_M65_PRO)
         return "m65";
     if(product == P_M65_RGB_ELITE)

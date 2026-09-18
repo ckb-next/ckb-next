@@ -147,7 +147,13 @@ int init_cond_monotonic(void) {
 ///
 int _start_dev(usbdevice* kb, int makeactive){
     // Get the firmware version from the device
-    if(getfwversion(kb)){
+    // M65 RGB Ultra uses custom protocol - firmware query happens in setactive_m65_ultra()
+    if(kb->product == P_M65_RGB_ULTRA){
+        // M65 Ultra is wired only - mark wireless/bootloader versions as unavailable
+        kb->bldversion = kb->radioappversion = kb->radiobldversion = UINT32_MAX;
+        kb->layout = LAYOUT_NONE;
+        kb->pollrate = POLLRATE_1MS;
+    } else if(getfwversion(kb)){
         ckb_warn("Unable to load firmware version/poll rate");
         kb->features &= ~(FEAT_POLLRATE | FEAT_ADJRATE | FEAT_HWLOAD);
         if(!kb->fwversion)
@@ -181,6 +187,10 @@ int _start_dev(usbdevice* kb, int makeactive){
 
     if(kb->product == P_M95)
         kb->features &= ~FEAT_POLLRATE; // M95 doesn't support reading the pollrate through the protocol
+
+    // M65 RGB Ultra doesn't support hardware profiles or poll rate via NXP protocol
+    if(kb->product == P_M65_RGB_ULTRA)
+        kb->features &= ~(FEAT_HWLOAD | FEAT_POLLRATE);
     ///
     /// - Now check if device needs a firmware update.
     /// If so, set it up and leave the function without error.
@@ -224,6 +234,11 @@ int start_dev(usbdevice* kb, int makeactive){
     kb->maxpollrate = POLLRATE_1MS;
     kb->pollrate = POLLRATE_UNKNOWN;
     int res = _start_dev(kb, makeactive);
+
+    // M65 RGB Ultra: Firmware query happens when GUI activates the device
+    // (inside setactive_m65_ultra) - not during initial setup due to timing issues
+    // with the input thread not being ready yet
+
     kb->vtable.setfps(kb, 30);
     return res;
 }

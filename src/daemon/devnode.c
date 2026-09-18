@@ -403,7 +403,8 @@ static inline void FWtoThreeSegments(FILE* fwfile, uint32_t ver, usbdevice* kb){
     // NXP/Legacy devices use BCD, but also bragi devices if we can't read the fw ver (and only have bcdDevice)
     // At the moment we overwrite the bcdDevice for bragi, so we do not need to handle it
     // If in the future we encounter a bragi device which does not report an APP fw ver, this will need to be changed
-    if(kb->protocol == PROTO_BRAGI)
+    // M65 Ultra uses three-segment binary version like Bragi, not BCD like other NXP devices
+    if(kb->protocol == PROTO_BRAGI || IS_M65_ULTRA(kb))
         fprintf(fwfile, "%hhu.%hhu.%hhu", (uchar)(ver >> 16 & 0xFF), (uchar)(ver >> 8 & 0xFF), (uchar)(ver & 0xFF));
     else
         fprintf(fwfile, "%hhu.%hhu", FWBcdToBin(ver >> 8 & 0xFF), FWBcdToBin(ver & 0xFF));

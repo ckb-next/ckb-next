@@ -1,0 +1,22 @@
+# Colored makepkg-like functions
+msg_blue() {
+  printf "${blue}==>${bold} $1${all_off}\n"
+}
+
+note() {
+  printf "${blue}==>${yellow} NOTE:${bold} $1${all_off}\n"
+}
+
+all_off="$(tput sgr0)"
+bold="${all_off}$(tput bold)"
+blue="${bold}$(tput setaf 4)"
+yellow="${bold}$(tput setaf 3)"
+
+_as_service() {
+    note "You need to run ckb-next-daemon as a systemd service:
+          systemctl enable --now ckb-next-daemon.service"
+}
+
+post_install() {
+    _as_service
+}

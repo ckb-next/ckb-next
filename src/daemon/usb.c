@@ -18,6 +18,7 @@ const dpi_list mouse_dpi_list[] = {
     { P_M65, 8200 },
     { P_M65_PRO, 12000 },
     { P_M65_RGB_ELITE, 18000 },
+    { P_M65_RGB_ULTRA, 26000 },
     { P_M95, 8200 },
     { P_GLAIVE, 16000 },
     { P_SABRE_O, 6400 },
@@ -102,6 +103,7 @@ const device_desc models[] = {
     { V_CORSAIR, P_M65, },
     { V_CORSAIR, P_M65_PRO, },
     { V_CORSAIR, P_M65_RGB_ELITE, },
+    { V_CORSAIR, P_M65_RGB_ULTRA, },
     { V_CORSAIR, P_M95, },
     { V_CORSAIR, P_GLAIVE, },
     { V_CORSAIR, P_SABRE_O, },
@@ -252,6 +254,8 @@ const char* product_str(ushort product){
         return "m65";
     if(product == P_M65_RGB_ELITE)
         return "m65e";
+    if(product == P_M65_RGB_ULTRA)
+        return "m65u";
     if(product == P_SABRE_O || product == P_SABRE_L || product == P_SABRE_N || product == P_SABRE_O2)
         return "sabre";
     if(product == P_SCIMITAR || product == P_SCIMITAR_PRO || product == P_SCIMITAR_ELITE || product == P_SCIMITAR_ELITE_BRAGI)

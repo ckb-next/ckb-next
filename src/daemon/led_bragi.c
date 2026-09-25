@@ -37,6 +37,7 @@ static inline size_t bragi_led_count(usbdevice* kb){
     LED_CASE_M(P_KATAR_PRO_XT, 1);
     LED_CASE_M(P_KATAR_PRO, 1);
     LED_CASE_M(P_M55_RGB_PRO, 2);
+    LED_CASE_M(P_M65_RGB_ULTRA, 3);
     LED_CASE_K(P_K55_PRO, 6);
     LED_CASE_K(P_K55_PRO_XT, 137);
     LED_CASE_M(P_DARK_CORE_RGB_PRO, 12);
@@ -91,11 +92,23 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
 
     size_t bytes = zones;
 
-    memcpy(pkt + 7, newlight->r + led_offset, CPY_SZ(r));
-    if(!IS_MONOCHROME_DEV(kb)) {
-        bytes *= 3; // 3 channels
-        memcpy(pkt + 7 + CPY_SZ(r), newlight->g + led_offset, CPY_SZ(g));
-        memcpy(pkt + 7 + CPY_SZ(r) + CPY_SZ(g), newlight->b + led_offset, CPY_SZ(b));
+    if(kb->product == P_M65_RGB_ULTRA){
+        // Device zone order is logo, scroll wheel, dpi indicator.
+        // With led_offset at "back", the GUI order is back, dpi, wheel - swap the last two.
+        static const uchar zmap[3] = {0, 2, 1};
+        bytes *= 3;
+        for(size_t i = 0; i < zones; i++){
+            pkt[7 + i]             = newlight->r[led_offset + zmap[i]];
+            pkt[7 + zones + i]     = newlight->g[led_offset + zmap[i]];
+            pkt[7 + zones * 2 + i] = newlight->b[led_offset + zmap[i]];
+        }
+    } else {
+        memcpy(pkt + 7, newlight->r + led_offset, CPY_SZ(r));
+        if(!IS_MONOCHROME_DEV(kb)) {
+            bytes *= 3; // 3 channels
+            memcpy(pkt + 7 + CPY_SZ(r), newlight->g + led_offset, CPY_SZ(g));
+            memcpy(pkt + 7 + CPY_SZ(r) + CPY_SZ(g), newlight->b + led_offset, CPY_SZ(b));
+        }
     }
 
     if(bragi_write_to_handle(kb, pkt, BRAGI_LIGHTING_HANDLE, sizeof(pkt), bytes))
@@ -118,7 +131,9 @@ static int updatergb_bragi(usbdevice* kb, int force, const size_t led_offset){
 }
 
 int updatergb_mouse_bragi(usbdevice* kb, int force){
-    return updatergb_bragi(kb, force, LED_MOUSE);
+    // The M65E layout has no "front" zone, so its LEDs start at back (LED_MOUSE + 1)
+    const size_t led_offset = LED_MOUSE + (kb->product == P_M65_RGB_ULTRA ? 1 : 0);
+    return updatergb_bragi(kb, force, led_offset);
 }
 
 int updatergb_keyboard_bragi(usbdevice* kb, int force){

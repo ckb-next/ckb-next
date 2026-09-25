@@ -11,6 +11,7 @@
 // Translates input from HID to a ckb input bitfield.
 static void hid_kb_translate(usbdevice* kb, int length, const unsigned char* urbinput);
 static void hid_bragi_short_mouse_translate(usbinput* input, int length, const unsigned char* urbinput);
+static void hid_mouse_translate_noreportid(usbinput* input, int length, const unsigned char* urbinput);
 static void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput);
 static void m95_mouse_translate(usbinput* kbinput, int length, const unsigned char* urbinput);
 
@@ -846,7 +847,9 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         if(buffer[1] == BRAGI_INPUT_HID && urblen == 64) {
                             corsair_bragi_mousecopy(targetkb, &targetkb->input, buffer);
                         } else {
-                            if(USES_BRAGI_SHORT_REPORT(targetkb)) {
+                            // The M65 RGB Ultra's report has no Report ID, so it shares the short layout.
+                            // Its byte 0 buttons must be ignored here, or a held button is released on motion.
+                            if(USES_BRAGI_SHORT_REPORT(targetkb) || HAS_HID_NO_REPORTID(targetkb)) {
                                 if(urblen < 6) {
                                     ckb_err("Bragi HID urblen too short %d < 6", urblen);
                                 } else {
@@ -875,6 +878,8 @@ void process_input_urb(void* context, unsigned char* buffer, int urblen, ushort 
                         // FIXME: Should this be targetkb?
                         if(USES_BRAGI_SHORT_REPORT(targetkb))
                             hid_bragi_short_mouse_translate(&targetkb->input, urblen, buffer);
+                        else if(HAS_HID_NO_REPORTID(targetkb))
+                            hid_mouse_translate_noreportid(&targetkb->input, urblen, buffer);
                         else
                             hid_mouse_translate(&targetkb->input, urblen, buffer);
                     }
@@ -1144,6 +1149,24 @@ void hid_bragi_short_mouse_translate(usbinput* input, int length, const unsigned
     input->whl_rel_y = (signed char)urbinput[5];
 }
 
+// For devices whose HID mouse report has no Report ID prefix (e.g. M65 RGB Ultra).
+// Layout: [0]=buttons [1-2]=X int16LE [3-4]=Y int16LE [5]=wheel int8 [6+]=vendor (ignored)
+static void hid_mouse_translate_noreportid(usbinput* input, int length, const unsigned char* urbinput){
+    if(length < 6){
+        ckb_err("Invalid length %d", length);
+        return;
+    }
+    for(int bit = 0; bit < BUTTON_HID_COUNT; bit++){
+        if(urbinput[0] & (1 << bit))
+            SET_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
+        else
+            CLEAR_KEYBIT(input->keys, MOUSE_BUTTON_FIRST + bit);
+    }
+    input->rel_x += (urbinput[2] << 8) | urbinput[1];
+    input->rel_y += (urbinput[4] << 8) | urbinput[3];
+    input->whl_rel_y = (signed char)urbinput[5];
+}
+
 void hid_mouse_translate(usbinput* input, int length, const unsigned char* urbinput){
     if(length < 9){
         ckb_err("Invalid length %d", length);
@@ -1270,6 +1293,19 @@ const unsigned char m55_wl_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
 };
 
 
+// All 8 buttons in one byte, in straight bit order (verified by capture:
+// 0x08 back, 0x10 forward, 0x20 dpiup, 0x40 dpidn, 0x80 sniper)
+const unsigned char m65_ultra_lut[BRAGI_ONE_BYTE_MOUSE_BUTTONS] = {
+    0x00,
+    0x01,
+    0x02,
+    0x03, // back
+    0x04, // forward
+    0x05, // dpi up
+    0x06, // dpi down
+    0x07, // sniper
+};
+
 const unsigned char scimitar_bragi_lut[BRAGI_THREE_BYTE_MOUSE_BUTTONS] = {
     0x00,
     0x01,
@@ -1302,12 +1338,14 @@ void corsair_bragi_mousecopy(usbdevice* kb, usbinput* input, const unsigned char
 
     // Some devices only have one byte, so set those to 8 buttons. Others have three.
     // We need a better way to identify this
-    if(kb->vendor == V_CORSAIR && (kb->product == P_M55_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U || kb->product == P_DARK_CORE_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_WL)) {
+    if(kb->vendor == V_CORSAIR && (kb->product == P_M55_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_SE || kb->product == P_DARK_CORE_RGB_PRO_SE_WL || kb->product == P_HARPOON_WL_U || kb->product == P_DARK_CORE_RGB_PRO || kb->product == P_DARK_CORE_RGB_PRO_WL || kb->product == P_M65_RGB_ULTRA)) {
         buttons = BRAGI_ONE_BYTE_MOUSE_BUTTONS;
         if(kb->vendor == V_CORSAIR && kb->product == P_HARPOON_WL_U)
             lut = harpoon_wl_lut;
         else if(kb->vendor == V_CORSAIR && kb->product == P_M55_RGB_PRO)
             lut = m55_wl_lut;
+        else if(kb->vendor == V_CORSAIR && kb->product == P_M65_RGB_ULTRA)
+            lut = m65_ultra_lut;
     } else if (kb->vendor == V_CORSAIR && (kb->product == P_SCIMITAR_ELITE_BRAGI)) {
         buttons = BRAGI_THREE_BYTE_MOUSE_BUTTONS;
         if(kb->vendor == V_CORSAIR && kb->product == P_SCIMITAR_ELITE_BRAGI)

@@ -69,3 +69,4 @@ if (WITH_MVIZ)
   endif ()
 endif ()
 
+file(TOUCH "${CMAKE_BINARY_DIR}/bin/ckb_next_bin_build_dir_here")

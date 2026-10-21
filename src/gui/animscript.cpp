@@ -32,7 +32,7 @@ QStringList AnimScript::paths(){
     // Path for when running the GUI from the build dir
 #ifdef Q_OS_LINUX
     QString appDirPath =  QCoreApplication::applicationDirPath();
-    if(!appDirPath.startsWith("/usr"))
+    if(QDir(appDirPath).exists("ckb_next_bin_build_dir_here"))
         list << appDirPath;
 #endif
     list << QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation).append("/ckb-next/animations"));

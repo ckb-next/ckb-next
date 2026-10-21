@@ -18,6 +18,23 @@ static const keypatch m55patch[] = {
     { 237+20, "dpi",    LED_MOUSE, KEY_NONE },
 };
 
+// SABRE RGB PRO: 3 RGB zones. LED_MOUSE+0 = logo ("back", matching the GUI swatch),
+// LED_MOUSE+1 = scroll wheel, LED_MOUSE+2 = "dpi" indicator (from the base mouse keymap).
+static const keypatch sabrepropatch[] = {
+    // Buttons arrive on EP 0x83 via the generic corsair_bragi_lut, which lands the DPI
+    // button (bit 5) at MOUSE_BUTTON_FIRST + 5 = index 230. dpiup must be named there (not
+    // at the M55's m55_wl_lut offset), else the press hits an unnamed slot and can't bind.
+    { 210+20, "dpiup", -1,            KEY_CORSAIR },
+    { 237+20, "back",  LED_MOUSE,     KEY_NONE },
+    { 238+20, "wheel", LED_MOUSE + 1, KEY_NONE },
+    // The 3-LED DPI bar. Frame positions run right-to-left physically, so the
+    // leftmost LED (dpiw1) is the highest zone index. Renaming these rows also
+    // removes the base keymap's duplicate "wheel" at LED_MOUSE + 3.
+    { 239+20, "dpiw3", LED_MOUSE + 2, KEY_NONE },
+    { 240+20, "dpiw2", LED_MOUSE + 3, KEY_NONE },
+    { 241+20, "dpiw1", LED_MOUSE + 4, KEY_NONE },
+};
+
 static const keypatch m95patch[] = {
     { 208+20, "mouse7", -1, SCAN_MOUSE | BTN_BACK },
     { 209+20, "mouse6", -1, SCAN_MOUSE | BTN_FORWARD },
@@ -140,6 +157,7 @@ static const keypatches mappatches[] = {
     ADD_PATCH(V_CORSAIR, P_K68_NRGB,     k63patch),
     ADD_PATCH(V_CORSAIR, P_K63_NRGB,     k63patch),
     ADD_PATCH(V_CORSAIR, P_M55_RGB_PRO,  m55patch),
+    ADD_PATCH(V_CORSAIR, P_SABRE_RGB_PRO, sabrepropatch),
     ADD_PATCH(V_CORSAIR, P_M95,          m95patch),
     ADD_PATCH(V_CORSAIR, P_IRONCLAW_W_U, icwpatch),
     ADD_PATCH(V_CORSAIR, P_HARPOON_WL_U, harpoonwlpatch),

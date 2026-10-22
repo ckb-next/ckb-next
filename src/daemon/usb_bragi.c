@@ -17,6 +17,11 @@ void bragi_fill_input_eps(usbdevice* kb)
     for(int i = 0; i < kb->epcount; i++)
         kb->input_endpoints[i] = (i + offset) | 0x80;
 
+    // K55 CORE exposes interrupt IN endpoints 0x81, 0x83 and 0x85.
+    if(kb->vendor == V_CORSAIR && kb->product == P_K55_CORE)
+        for(int i = 0; i < kb->epcount; i++)
+            kb->input_endpoints[i] = (i * 2 + 1) | 0x80;
+
     // Pick the correct input and output EPs.
     // Most use 0x84 and 4, but there are a few exceptions...
     kb->bragi_out_ep = 0x4;
@@ -25,6 +30,9 @@ void bragi_fill_input_eps(usbdevice* kb)
     // Exceptions should set the EPs here
     if(kb->vendor == V_CORSAIR){
         switch(kb->product){
+            case P_K55_CORE:
+                kb->bragi_in_ep = 0x83;
+                break;
             case P_K57_D:
                 kb->bragi_out_ep = 0x2;
                 kb->bragi_in_ep = 0x82;

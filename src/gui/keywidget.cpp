@@ -605,7 +605,7 @@ void KeyWidget::paintGL(){
                     drawTopLeftCorner(&painter, kx, ky, kw, kh, drawInfoScale);
                 } else
                     painter.drawRect(QRectF(kx * drawInfoScale, ky * drawInfoScale, kw * drawInfoScale, kh * drawInfoScale));
-            } else if (model == KeyMap::K55 || model == KeyMap::K55PRO)
+            } else if (model == KeyMap::K55 || model == KeyMap::K55PRO || model == KeyMap::K55CORE)
                 painter.drawRect(QRectF(x * drawInfoScale, y * drawInfoScale, w * drawInfoScale, h * drawInfoScale));
             else if ((model == KeyMap::K70MK2 || model == KeyMap::STRAFE_MK2) && key.friendlyName() == "Logo 2")
                 painter.drawRect(QRectF((key.x + drawInfoOffset.x() - key.width / 2.f - 2.f) * drawInfoScale, y * drawInfoScale, (key.width + 4.f) * drawInfoScale, h * drawInfoScale));

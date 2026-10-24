@@ -7,6 +7,9 @@
 #include "usb.h"
 #include "nxp_proto.h"
 
+// Forward declaration for M65 Ultra
+static int setactive_m65_ultra(usbdevice* kb, int active);
+
 int start_mouse_legacy(usbdevice* kb, int makeactive){
     (void)makeactive;
     // 0x00002 == HW Playback off
@@ -48,6 +51,11 @@ int cmd_pollrate_legacy(usbdevice* kb, pollrate_t rate){
 int setactive_mouse(usbdevice* kb, int active){
     if(NEEDS_FW_UPDATE(kb))
         return 0;
+
+    // M65 RGB Ultra uses different protocol
+    if(kb->product == P_M65_RGB_ULTRA)
+        return setactive_m65_ultra(kb, active);
+
     const int keycount = 20;
     uchar msg[2][MSG_SIZE] = {
         { CMD_SET, FIELD_SPECIAL, 0 },            // Disables or enables HW control for DPI and Sniper button
@@ -112,3 +120,87 @@ void nxp_mouse_setfps(usbdevice* kb, int fps){
     else
         kb->usbdelay_ns = 10000000L;
 }
+
+// Helper function to send M65 Ultra command with delay
+static int m65_ultra_send(usbdevice* kb, const uchar* out_msg, const char* desc){
+    if(!usbsend(kb, (void*)out_msg, MSG_SIZE, 1)){
+        ckb_warn("M65 Ultra: Failed to send %s", desc);
+        return -1;
+    }
+    usleep(10000);  // 10ms delay
+    return 0;
+}
+
+// M65 RGB Ultra initialization
+static int setactive_m65_ultra(usbdevice* kb, int active){
+    clear_input_and_rgb(kb, active);
+
+    if(active){
+        // Enable software control mode
+        uchar enable_sw_mode[MSG_SIZE] = { 0x08, 0x01, 0x03, 0x00, 0x02, 0 };
+        if(m65_ultra_send(kb, enable_sw_mode, "enable software mode") < 0)
+            return -1;
+
+        // Query firmware version if not already known
+        int fw_was_unknown = (kb->fwversion == 0);
+        if(fw_was_unknown){
+            ckb_info("M65 Ultra: Querying firmware version...");
+
+            uchar fw_query[MSG_SIZE] = { 0x08, 0x02, 0x13, 0x00, 0 };
+            if(m65_ultra_send(kb, fw_query, "query firmware version") < 0){
+                ckb_warn("M65 Ultra: Failed to send firmware query");
+            }
+
+            for(int i = 0; i < 20; i++){
+                usleep(10000);
+                if(kb->fwversion != 0){
+                    ckb_info("M65 Ultra: Firmware version received: %d.%d.%d",
+                             (kb->fwversion >> 16) & 0xFF,
+                             (kb->fwversion >> 8) & 0xFF,
+                             kb->fwversion & 0xFF);
+                    break;
+                }
+            }
+
+            if(kb->fwversion == 0)
+                ckb_warn("M65 Ultra: Timeout waiting for firmware version");
+
+            // Skip RGB init on first pass - will happen when GUI connects
+            return 0;
+        }
+
+        // Set RGB brightness to 100%
+        uchar set_brightness[MSG_SIZE] = { 0x08, 0x01, 0x02, 0x00, 0xE8, 0x03, 0 };
+        if(m65_ultra_send(kb, set_brightness, "set brightness") < 0)
+            return -1;
+
+        // RGB subsystem enable
+        uchar rgb_subsys_enable[MSG_SIZE] = { 0x08, 0x0D, 0x00, 0x02, 0x00, 0 };
+        if(m65_ultra_send(kb, rgb_subsys_enable, "RGB subsystem enable") < 0)
+            return -1;
+
+        // RGB initialization zone 08
+        uchar rgb_init[MSG_SIZE] = { 0x08, 0x06, 0x00, 0x08, 0x00, 0x00, 0x00,
+                                      0x01, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0 };
+        if(m65_ultra_send(kb, rgb_init, "RGB init zone 08") < 0)
+            return -1;
+
+        // Commit initialization
+        uchar commit[MSG_SIZE] = { 0x08, 0x05, 0x01, 0x00, 0 };
+        if(m65_ultra_send(kb, commit, "commit") < 0)
+            return -1;
+
+        ckb_info("M65 Ultra: RGB initialized and ready");
+        kb->active = 1;
+        kb->pollrate = POLLRATE_1MS;
+    } else {
+        uchar disable_sw_mode[MSG_SIZE] = { 0x08, 0x01, 0x03, 0x00, 0x00, 0 };
+        if(m65_ultra_send(kb, disable_sw_mode, "disable software mode") < 0)
+            return -1;
+        ckb_info("M65 Ultra: Returned to hardware mode");
+        kb->active = 0;
+    }
+
+    return 0;
+}
+

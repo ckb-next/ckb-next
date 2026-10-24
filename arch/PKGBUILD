@@ -1,0 +1,51 @@
+# Maintainer: Marco Ziliani
+# Based on the AUR ckb-next-git PKGBUILD by Tasos Sahanidis <aur@tasossah.com>
+# This variant builds from the local checkout at the repository root.
+
+pkgname=ckb-next-git
+pkgver=0.6.2.r2350.gbe6b004
+pkgrel=1
+epoch=1
+pkgdesc="Corsair Keyboard and Mouse Input Driver, local build"
+arch=('i686' 'pentium4' 'x86_64')
+url="https://github.com/rylos/ckb-next"
+license=('GPL2')
+depends=('qt6-base' 'hicolor-icon-theme' 'quazip-qt6' 'qt6-tools' 'qt6-wayland' 'libxcb' 'xcb-util-wm' 'python3' 'python-pyqt6' 'wayland-protocols')
+makedepends=('git' 'cmake')
+optdepends=('libpulse')
+conflicts=('ckb-git' 'ckb-git-latest' 'ckb-next')
+provides=('ckb-next')
+install=ckb-next-git.install
+source=("ckb-next-git::git+file://${startdir}/.."
+        'AUR_wrapper.py')
+sha256sums=('SKIP'
+            'SKIP')
+
+pkgver() {
+  cd "$srcdir/ckb-next-git"
+  printf "0.6.2.r%s.g%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  cd "$srcdir/ckb-next-git"
+
+  cmake -H. -Bbuild \
+    -DCMAKE_INSTALL_PREFIX="/usr" \
+    -DCMAKE_BUILD_TYPE="Release" \
+    -DCMAKE_INSTALL_LIBDIR="lib" \
+    -DCMAKE_INSTALL_LIBEXECDIR="lib" \
+    -DDISABLE_UPDATER=1 \
+    -DUDEV_RULE_DIRECTORY="/usr/lib/udev/rules.d" \
+    -DFORCE_INIT_SYSTEM="systemd"
+  cmake --build build --target all
+}
+
+package() {
+  cd "$srcdir/ckb-next-git"
+
+  DESTDIR="$pkgdir" cmake --build build --target install
+
+  # Rename the real binary and add the wrapper
+  mv "$pkgdir/usr/bin/ckb-next" "$pkgdir/usr/bin/ckb-next.real"
+  install -Dm755 "$srcdir/AUR_wrapper.py" "$pkgdir/usr/bin/ckb-next"
+}

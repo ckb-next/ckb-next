@@ -5,6 +5,7 @@ build/
 *.app/
 cmake-build*/
 *.pkg
+*.pkg.tar.zst
 .DS_Store
 .*
 !.gitignore

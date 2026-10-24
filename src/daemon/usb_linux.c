@@ -423,8 +423,9 @@ int os_setupusb(usbdevice* kb) {
     strtrim(kb->serial);
     ///
     /// - Copy firmware version (needed to determine USB protocol)
+    /// M65 Ultra uses custom protocol for real firmware version - don't use USB descriptor
     const char* firmware = udev_device_get_sysattr_value(dev, "bcdDevice");
-    if(firmware)
+    if(firmware && !IS_M65_ULTRA(kb))
         sscanf(firmware, "%"SCNx32, &kb->fwversion);
     else
         kb->fwversion = 0;
